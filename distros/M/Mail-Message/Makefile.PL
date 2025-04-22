@@ -1,10 +1,10 @@
 use ExtUtils::MakeMaker;
 
-require 5.010;
+require 5.016;
 
 use IO::Handle;
 
-my $VERSION = '3.016';
+my $VERSION = '3.017';
 
 my @optional =
 ( 

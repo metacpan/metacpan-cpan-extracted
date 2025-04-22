@@ -10,7 +10,15 @@ use Test::More tests => 8;
 use Test::Exception;
 use Test::Warn;
 use File::Compare;
+use Config;
 use Convert::Pheno;
+
+# Skip all tests if running on an ld architecture
+# mrueda 012025
+if ( $Config{archname} =~ /-ld\b/ ) {
+    plan skip_all => 'Skipping tests on ld architectures due to known issues';
+    exit;
+}
 
 my $ohdsi_db = 'share/db/ohdsi.db';
 
@@ -185,7 +193,6 @@ for my $method ( sort keys %{$input} ) {
 }
 
 sub _normalize_windows_file {
-
     my ( $filein, $fileout ) = @_;
 
     # For the Windows file

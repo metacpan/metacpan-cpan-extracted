@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Listener 0.803;
+package IO::Async::Listener 0.804;
 
 use v5.14;
 use warnings;

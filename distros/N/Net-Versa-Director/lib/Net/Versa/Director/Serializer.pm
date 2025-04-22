@@ -1,5 +1,5 @@
 package Net::Versa::Director::Serializer;
-$Net::Versa::Director::Serializer::VERSION = '0.002000';
+$Net::Versa::Director::Serializer::VERSION = '0.003000';
 # ABSTRACT: Versa Director REST API serializer
 
 use v5.36;
@@ -50,7 +50,7 @@ Net::Versa::Director::Serializer - Versa Director REST API serializer
 
 =head1 VERSION
 
-version 0.002000
+version 0.003000
 
 =head1 AUTHOR
 
@@ -58,7 +58,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexander Hartmaier.
+This software is copyright (c) 2025 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

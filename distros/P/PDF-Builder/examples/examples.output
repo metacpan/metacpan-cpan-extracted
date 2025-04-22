@@ -241,7 +241,7 @@ to see when the resulting PDFs are displayed.
 
 BarCode.pl
   BarCode.pdf
-   1 page x 11 barcodes, NOT VERIFIED AS CORRECT (need scanners!)
+   1 page x 11 barcodes, NOT VERIFIED AS CORRECT (need scanners to test!)
 
 Boxes.pl
   Boxes.pdf
@@ -253,7 +253,15 @@ Bspline.pl
 
 Column.pl
   Column.pdf
-   12 pages demonstrating column() method with markup
+   10 pages demonstrating column() method with markup
+
+Column_lists.pl
+  Column_lists.pdf
+   3 pages demonstrating column() method output of ol and ul lists
+
+#Column_layouts.pl    TBD
+#  Column_layouts.pdf
+#   ? pages demonstrating column() method output with different column shapes
 
 Content.pl
   Content.pdf
@@ -352,4 +360,8 @@ ShowFont.pl
   ShowFont.pdf
    15 pages each of Helvetica in 10 different Latin encodings
    run without command line arguments to get help
+
+SVG.pl
+  SVG.pdf
+   5 pages of 5 different SVG inputs
 

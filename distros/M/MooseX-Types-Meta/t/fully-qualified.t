@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 
 use Class::MOP;
 use Class::MOP::Class ();

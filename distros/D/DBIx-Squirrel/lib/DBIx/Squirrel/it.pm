@@ -28,7 +28,7 @@ use Sub::Name 'subname';
 use DBIx::Squirrel::util qw(
     cluckf
     confessf
-    isolate_callbacks
+    callbacks_args
 );
 use namespace::clean;
 
@@ -436,7 +436,7 @@ L<DBIx::Squirrel::db> packages.
 
 sub new {
     my $class = ref $_[0] ? ref shift : shift;
-    my( $transforms, $sth, @bind_values ) = isolate_callbacks(@_);
+    my( $transforms, $sth, @bind_values ) = callbacks_args(@_);
     confessf E_BAD_STH unless UNIVERSAL::isa( $sth, 'DBIx::Squirrel::st' );
     my $self = bless {}, $class;
     $self->_private_state( {
@@ -613,7 +613,7 @@ BEGIN {
 
 sub start {
     my( $attr,       $self )        = shift->_private_state;
-    my( $transforms, @bind_values ) = isolate_callbacks(@_);
+    my( $transforms, @bind_values ) = callbacks_args(@_);
     if ( @{$transforms} ) {
         $attr->{transforms} = [ @{ $attr->{transforms_initial} }, @{$transforms} ];
     }

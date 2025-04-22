@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst-View-BasePerRequest.
 
+0.013 - 2025-04-22
+  - Attempt to stringify any body responses that are objects
+
 0.012 - 2024-10-22
   - Update content blocks to accept arguments
 

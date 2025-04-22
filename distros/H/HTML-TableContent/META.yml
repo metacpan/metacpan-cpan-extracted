@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Metadata: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,34 +21,34 @@ no_index:
 provides:
   HTML::TableContent:
     file: lib/HTML/TableContent.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Element:
     file: lib/HTML/TableContent/Element.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Parser:
     file: lib/HTML/TableContent/Parser.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Table:
     file: lib/HTML/TableContent/Table.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Table::Caption:
     file: lib/HTML/TableContent/Table/Caption.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Table::Header:
     file: lib/HTML/TableContent/Table/Header.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Table::Row:
     file: lib/HTML/TableContent/Table/Row.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Table::Row::Cell:
     file: lib/HTML/TableContent/Table/Row/Cell.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Template:
     file: lib/HTML/TableContent/Template.pm
-    version: '1.00'
+    version: '1.01'
   HTML::TableContent::Template::Base:
     file: lib/HTML/TableContent/Template/Base.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Carp: '1.22'
   HTML::Parser: '3.71'
@@ -57,5 +57,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/HTML-TableContent.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

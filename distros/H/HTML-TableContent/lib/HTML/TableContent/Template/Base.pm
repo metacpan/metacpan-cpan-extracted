@@ -8,7 +8,7 @@ use Carp qw/croak/;
  
 use HTML::TableContent::Table;
  
-our $VERSION = '1.00';
+our $VERSION = '1.01';
  
 has table => (
     is => 'rw',
@@ -330,7 +330,7 @@ HTML::TableContent::Template::Base - Base for Templates.
  
 =head1 VERSION
  
-Version 1.00
+Version 1.01
  
 =cut
  
@@ -495,7 +495,7 @@ LNATION, C<< <email at lnation.org> >>
  
 =head1 LICENSE AND COPYRIGHT
  
-Copyright 2016->2020 LNATION.
+Copyright 2016->2025 LNATION.
  
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

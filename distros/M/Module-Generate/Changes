@@ -45,3 +45,7 @@ Revision history for Module-Generate
 
 0.27    2020-09-01
 	- Improve test coverage to 94.8%
+
+1.03    2025-04-22
+	- Remove AnnoCPAN and CPAN Rating links from generated modules
+	- Fix generated POD version to match module version

@@ -1,13 +1,12 @@
 #!/usr/bin/env perl
 
-# PERL_FUTURE_DEBUG=1 perl eg/control-change.pl
-
 use curry;
 use MIDI::RtController ();
 use MIDI::RtController::Filter::CC ();
 
 my $input_name  = shift || 'joystick';
 my $output_name = shift || 'usb';
+my $filter_name = shift || 'single';
 
 my $control = MIDI::RtController->new(
     input   => $input_name,
@@ -18,6 +17,7 @@ my $control = MIDI::RtController->new(
 my $filter = MIDI::RtController::Filter::CC->new(rtc => $control);
 
 $filter->control(1); # CC#01 = mod-wheel
+$filter->value(42);
 # $filter->range_bottom(10);
 # $filter->range_top(100);
 # $filter->range_step(2);
@@ -25,11 +25,8 @@ $filter->control(1); # CC#01 = mod-wheel
 # $filter->step_up(10);
 # $filter->step_down(2);
 
-$control->add_filter('breathe', ['all'], $filter->curry::breathe);
-
-# $control->add_filter('scatter', ['all'], $filter->curry::scatter);
-
-# $control->add_filter('stair_step', ['all'], $filter->curry::stair_step);
+my $method = "curry::$filter_name";
+$control->add_filter($filter_name, all => $filter->$method);
 
 $control->run;
 

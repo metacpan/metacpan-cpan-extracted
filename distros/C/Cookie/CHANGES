@@ -1,5 +1,8 @@
 Revision history for Perl module Cookie
 
+v0.3.6 2025-04-20T16:15:26+0900
+    - Corrected a bug in method 'load_as_mozilla'
+
 v0.3.5 2024-02-13T08:49:15+0900
     - Correction of a minor bug in Cookie::Domain::Result
 

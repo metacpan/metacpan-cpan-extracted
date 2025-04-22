@@ -385,7 +385,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/header/Alpha',
+          instanceLocation => '/response/header',
           keywordLocation => jsonp(qw(/paths /foo $ref post responses default headers Alpha required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item2/post/responses/default/headers/Alpha/required')->to_string,
           error => 'missing header: Alpha',
@@ -601,7 +601,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/header/Foo-Bar',
+          instanceLocation => '/response/header',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref headers Foo-Bar $ref required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/headers/foo-header/required')->to_string,
           error => 'missing header: Foo-Bar',
@@ -671,6 +671,7 @@ YAML
     },
     'headers that appear more than once are parsed into an array',
   );
+
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
@@ -917,7 +918,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/header/Content-Type',
+          instanceLocation => '/response/header',
           keywordLocation => jsonp(qw(/paths /foo post responses default content)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses default content)))->to_string,
           error => 'missing header: Content-Type',
@@ -984,7 +985,7 @@ YAML
           error => 'missing header: Content-Length',
         },
         {
-          instanceLocation => '/response/header/Content-Length',
+          instanceLocation => '/response/header',
           keywordLocation => jsonp(qw(/paths /foo post responses default headers Content-Length required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses default headers Content-Length required)))->to_string,
           error => 'missing header: Content-Length',
@@ -1091,7 +1092,7 @@ YAML
 subtest $::TYPE.': unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -1136,7 +1137,7 @@ YAML
 subtest $::TYPE.': writeOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -1178,7 +1179,7 @@ YAML
 subtest $::TYPE.': custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:

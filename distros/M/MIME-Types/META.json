@@ -51,6 +51,6 @@
          "web" : "https://github.com/markov2/perl5-MIME-Types"
       }
    },
-   "version" : "2.27",
+   "version" : "2.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

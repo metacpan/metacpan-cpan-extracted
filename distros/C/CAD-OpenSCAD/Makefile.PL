@@ -9,8 +9,9 @@ WriteMakefile
     AUTHOR       => 'Saif Ahmed <saiftynet { at } gmail.com>',
     ABSTRACT     => 'Module to generate 3D Objects as .scad files from Perl',
     LICENSE      =>  'Perl',
-    MIN_PERL_VERSION  => 5.008001,
+    MIN_PERL_VERSION  => 5.18,
     PREREQ_PM    => {
+        'Object::Pad'            => '0.801',
     },
     BUILD_REQUIRES => {
 		

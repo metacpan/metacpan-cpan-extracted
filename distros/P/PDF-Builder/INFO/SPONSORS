@@ -17,9 +17,15 @@ the sponsor! Rather, all results go into the public code repository for all
 to use immediately. You simply get the features sooner, and your name engraved
 on a plaque in this file (OK, just listed above).
 
+On the other hand, if you have code (or at least, good algorithms) instead of
+money to contribute, please see CONTRIBUTING.md for information on submitting
+code changes.
+
 If you wish to purchase new features for PDF::Builder (and/or PDF::Table or
 any other open source product we provide) that are NOT released to the public,
 that is, are your exclusive intellectual property, feel free to contact us for
 a discussion of scope, schedule, and cost. Note that the cost will be higher,
-as the world doesn't get to share in the benefits of this work! Please consider
-a sponsorship for work that will be released to the public, and benefit it.
+as the world doesn't get to share in the benefits of this work! In addition,
+it creates much more work for us if we need to maintain parallel versions of 
+PDF::Builder. Please consider a sponsorship for work that will be released to 
+the public, and benefit it.

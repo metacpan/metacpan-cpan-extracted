@@ -4,7 +4,7 @@ use MIDI::RtController ();
 
 my $input_names = shift || 'keyboard,pad,joystick'; # midi controller devices
 my $output_name = shift || 'usb'; # midi output
-my $verbose     = shift || 0;
+my $verbose     = shift || 1;
 
 my @inputs = split /,/, $input_names;
 

@@ -4,7 +4,7 @@
       "Elizabeth Mattijsen (liz@dijkmat.nl)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,23 +43,23 @@
    "provides" : {
       "Thread::Tie" : {
          "file" : "lib/Thread/Tie.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Thread::Tie::Array" : {
          "file" : "lib/Thread/Tie/Array.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Thread::Tie::Handle" : {
          "file" : "lib/Thread/Tie/Handle.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Thread::Tie::Hash" : {
          "file" : "lib/Thread/Tie/Hash.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Thread::Tie::Scalar" : {
          "file" : "lib/Thread/Tie/Scalar.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Thread::Tie::Thread" : {
          "file" : "lib/Thread/Tie/Thread.pm",
@@ -74,6 +74,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Thread-Tie"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

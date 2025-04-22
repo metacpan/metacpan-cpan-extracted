@@ -1,5 +1,9 @@
 Revision history for Math::Cephes
 
+0.5308  2025-04-22
+    - Update MANIFEST.SKIP
+        - Thanks to MAUKE
+
 0.5307  2025-03-31
     - Apply https://github.com/shlomif/Math-Cephes/pull/5
         - ExtUtils::MakeMaker fixes.

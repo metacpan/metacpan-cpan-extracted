@@ -8,7 +8,7 @@ use Data::GUID;
 use Autoload::AUTOCAN;
 use Switch::Again qw/switch/;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 our @ISA;
 BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -311,7 +311,7 @@ Moonshine::Element - Build some more html.
 
 =head1 VERSION
 
-Version 0.13 
+Version 0.14 
 
 =head1 DESCRIPTION
 
@@ -478,7 +478,7 @@ Robert Acock <ThisUsedToBeAnEmail@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
  
-Copyright 2016 Robert Acock.
+Copyright 2016->2025 Robert Acock.
  
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -3,7 +3,7 @@ package Moonshine::Template;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Moonshine::Element;
 use Ref::Util qw/:all/;
@@ -210,7 +210,7 @@ Moonshine::Template - Template some more html.
 
 =head1 VERSION
 
-Version 0.05 
+Version 0.06 
 
 =head1 SYNOPSIS
 
@@ -387,7 +387,7 @@ Robert Acock <ThisUsedToBeAnEmail@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
  
-Copyright 2016 Robert Acock.
+Copyright 2016->2025 Robert Acock.
  
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

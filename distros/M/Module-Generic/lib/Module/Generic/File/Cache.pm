@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.2.8
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.2.10
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2025/03/12
+## Modified 2025/04/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,23 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $CACHE_REPO $CACHE_TO_OBJECT $DEBUG $HAS_B64 );
+    use Config;
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    use constant IN_THREAD => ( HAS_THREADS && threads->can('tid') && threads->tid() != 0 );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+        our $CACHE_REPO;
+        our $CACHE_TO_OBJECT;
+    }
+    else
+    {
+        our $CACHE_REPO;
+        our $CACHE_TO_OBJECT;
+    }
     use Data::UUID;
     use Module::Generic::File qw( file sys_tmpdir );
     # use Nice::Try;
@@ -30,9 +47,10 @@ BEGIN
     $CACHE_REPO = [];
     $CACHE_TO_OBJECT = {};
     $DEBUG = 0;
-    our $VERSION = 'v0.2.8';
+    our $VERSION = 'v0.2.10';
 };
 
+use v5.26.1;
 use strict;
 use warnings;
 
@@ -270,9 +288,20 @@ sub open
     $new->id( Scalar::Util::refaddr( $new ) );
     $new->size( $opts->{size} );
     $new->{_cache_file} = $fo;
-    push( @$CACHE_REPO, $new );
-    $CACHE_TO_OBJECT->{ $cache_file } = [] if( !CORE::exists( $CACHE_TO_OBJECT->{ $cache_file } ) );
-    CORE::push( @{$CACHE_TO_OBJECT->{ $cache_file }}, $new );
+    if( IN_THREAD )
+    {
+        lock( $CACHE_REPO );
+        lock( $CACHE_TO_OBJECT );
+        push( @$CACHE_REPO, $new );
+        $CACHE_TO_OBJECT->{ $cache_file } = [] if( !CORE::exists( $CACHE_TO_OBJECT->{ $cache_file } ) );
+        CORE::push( @{$CACHE_TO_OBJECT->{ $cache_file }}, $new );
+    }
+    else
+    {
+        push( @$CACHE_REPO, $new );
+        $CACHE_TO_OBJECT->{ $cache_file } = [] if( !CORE::exists( $CACHE_TO_OBJECT->{ $cache_file } ) );
+        CORE::push( @{$CACHE_TO_OBJECT->{ $cache_file }}, $new );
+    }
     return( $new );
 }
 
@@ -312,7 +341,7 @@ sub read
             # Remove any possible remaining unwanted data
             substr( $buffer, $len, length( $buffer ), '' );
         }
-        
+
         # try-catch
         local $@;
         eval
@@ -359,13 +388,14 @@ sub read
     {
         $data = $buffer;
     }
-    
+
+
     # data decoded is not a reference and size was provided and is greater than 0
     if( !ref( $data ) && scalar( @_ ) > 2 && int( $_[2] ) > 0 )
     {
         $data = substr( $data, 0, $_[2] );
     }
-    
+
     if( scalar( @_ ) > 1 )
     {
         $_[1] = $data;
@@ -395,25 +425,53 @@ sub remove
     $self->removed( $rv ? 1 : 0 );
     if( $rv )
     {
-        OBJECT: for( my $i = 0; $i < scalar( @$CACHE_REPO ); $i++ )
+        if( IN_THREAD )
         {
-            my $obj = $CACHE_REPO->[$i];
-            # Somehow found an object, but without cache file associated. This would be weird
-            my $file = $obj->{_cache_file} || next;
-            # Should not happen, but let's not assume anything.
-            unless( $self->_is_a( $file => 'Module::Generic::File' ) )
+            lock( $CACHE_REPO );
+            OBJECT: for( my $i = 0; $i < scalar( @$CACHE_REPO ); $i++ )
             {
-                next;
+                my $obj = $CACHE_REPO->[$i];
+                # Somehow found an object, but without cache file associated. This would be weird
+                my $file = $obj->{_cache_file} || next;
+                # Should not happen, but let's not assume anything.
+                unless( $self->_is_a( $file => 'Module::Generic::File' ) )
+                {
+                    next;
+                }
+                my $fname = "$file";
+                next if( !CORE::exists( $CACHE_TO_OBJECT->{ $fname } ) );
+                my $ref = $CACHE_TO_OBJECT->{ $fname };
+                next unless( ref( $ref ) eq 'ARRAY' );
+                for( my $j = 0; $j <= $#$ref; $j++ )
+                {
+                    CORE::splice( @$CACHE_REPO, $i, 1 );
+                    CORE::splice( @$ref, $j, 1 );
+                    last OBJECT;
+                }
             }
-            my $fname = "$file";
-            next if( !CORE::exists( $CACHE_TO_OBJECT->{ $fname } ) );
-            my $ref = $CACHE_TO_OBJECT->{ $fname };
-            next unless( ref( $ref ) eq 'ARRAY' );
-            for( my $j = 0; $j <= $#$ref; $j++ )
+        }
+        else
+        {
+            OBJECT: for( my $i = 0; $i < scalar( @$CACHE_REPO ); $i++ )
             {
-                CORE::splice( @$CACHE_REPO, $i, 1 );
-                CORE::splice( @$ref, $j, 1 );
-                last OBJECT;
+                my $obj = $CACHE_REPO->[$i];
+                # Somehow found an object, but without cache file associated. This would be weird
+                my $file = $obj->{_cache_file} || next;
+                # Should not happen, but let's not assume anything.
+                unless( $self->_is_a( $file => 'Module::Generic::File' ) )
+                {
+                    next;
+                }
+                my $fname = "$file";
+                next if( !CORE::exists( $CACHE_TO_OBJECT->{ $fname } ) );
+                my $ref = $CACHE_TO_OBJECT->{ $fname };
+                next unless( ref( $ref ) eq 'ARRAY' );
+                for( my $j = 0; $j <= $#$ref; $j++ )
+                {
+                    CORE::splice( @$CACHE_REPO, $i, 1 );
+                    CORE::splice( @$ref, $j, 1 );
+                    last OBJECT;
+                }
             }
         }
         $self->{_cache_file} = '';
@@ -572,7 +630,7 @@ sub write
         }
         return( $self->pass_error ) if( !defined( $encoded ) );
     }
-    
+
     # For some reason, I get warning that $size is uninitialised despite having initialised it and ensured it is defined
     no warnings 'uninitialized';
     $size //= 0;
@@ -582,15 +640,19 @@ sub write
     {
         return( $self->error( "Data to write are ", length( $encoded ), " bytes long and exceed the maximum you have set of '$size'." ) );
     }
-    
+
     # We use simple encapsulation to later remove irrelevant null-bytes and ensuring our data integrity
     # FYI: MG = Module::Generic
     # substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
-    
+
     $file->lock;
     $file->seek(0,0);
     $file->print( $encoded );
-    $file->flush;
+    
+    # Ensure data is safely flushed to disk
+    $file->flush if( $file->can( 'flush' ) );
+    $file->sync  if( $file->can( 'sync' ) );
+    
     $file->truncate( $file->tell );
     $file->unlock;
     return( $self );
@@ -636,12 +698,11 @@ sub _decode_json
         return( $this );
     };
     
-    my $decoded;
     # try-catch
     local $@;
-    eval
+    my $decoded = eval
     {
-        $decoded = $j->decode( $data );
+        $j->decode( $data );
     };
     if( $@ )
     {
@@ -706,12 +767,11 @@ sub _encode_json
     };
     my $ref = $crawl->( $data );
     my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
-    my $encoded;
     # try-catch
     local $@;
-    eval
+    my $encoded = eval
     {
-        $encoded = $j->encode( $ref );
+        $j->encode( $ref );
     };
     if( $@ )
     {
@@ -848,44 +908,89 @@ sub THAW
 # NOTE: END
 END
 {
+    return unless( defined( $CACHE_REPO ) && ref( $CACHE_REPO ) eq 'ARRAY' );
+    
     my $prefix = __PACKAGE__ . '::END';
     printf( STDERR "${prefix}: %d objects in repo to check.\n", scalar( @$CACHE_REPO ) ) if( $DEBUG >= 4 );
-    no warnings;
-    foreach my $obj ( @$CACHE_REPO )
+
+    # Only allow the parent process to clean up
+    state $main_pid = $$;
+    return if( $$ != $main_pid );
+
+    foreach my $cache ( @$CACHE_REPO )
     {
-        if( !Scalar::Util::blessed( $obj ) || ref( $obj ) ne 'Module::Generic::File::Cache' )
+        if( !Scalar::Util::blessed( $cache // '' ) || 
+            ref( $cache // '' ) ne 'Module::Generic::File::Cache' )
         {
             warn( "${prefix}: Object found in object repo is not a Module::Generic::File::Cache object.\n" );
             next;
         }
-        elsif( !exists( $obj->{_cache_file} ) || !CORE::length( $obj->{_cache_file} ) )
+        elsif( !defined( $cache ) || !ref( $cache ) || ( Scalar::Util::blessed( $cache ) && !$cache->can( 'remove' ) ) )
         {
             next;
         }
-        elsif( !Scalar::Util::blessed( $obj->{_cache_file} ) ||
-               ( Scalar::Util::blessed( $obj->{_cache_file} ) && !$obj->{_cache_file}->isa( 'Module::Generic::File' ) ) )
+        elsif( !Scalar::Util::blessed( $cache->{_cache_file} ) ||
+               ( Scalar::Util::blessed( $cache->{_cache_file} ) && !$cache->{_cache_file}->isa( 'Module::Generic::File' ) ) )
         {
-            warn( "${prefix}: File object found in _cache_file (", overload::StrVal( $obj->{_cache_file} ), ") is actually not a Module::Generic::File, which is weird.\n" );
+            warn( "${prefix}: File object found in _cache_file (", overload::StrVal( $cache->{_cache_file} ), ") is actually not a Module::Generic::File, which is weird.\n" );
             next;
         }
-        my $fname = "$obj->{_cache_file}";
-        print( STDERR "\t${prefix}: Cache file is: \"${fname}\"\n" ) if( $DEBUG >= 4 );
-        next if( !defined( $fname ) || !length( $fname ) );
-        my $ref = $CACHE_TO_OBJECT->{ $fname } || next;
-        next if( ref( $ref ) ne 'ARRAY' );
-        printf( STDERR "\t${prefix}: %d objects associated with cache file \"${fname}\".\n", scalar( @$ref ) ) if( $DEBUG >= 4 );
-        my $addr = Scalar::Util::refaddr( $obj );
-        for( my $i = 0; $i <= $#$ref; $i++ )
+        
+        my $fname = "$cache->{_cache_file}";
+        print( STDERR "\t${prefix}: Cache file is: \"", ( $fname // 'undef' ), "\"\n" ) if( $DEBUG >= 4 );
+        next if( !length( $fname // '' ) );
+
+        # Check for other references to the same file
+        if( defined( $CACHE_TO_OBJECT ) && ref( $CACHE_TO_OBJECT ) eq 'HASH' )
         {
-            if( Scalar::Util::refaddr( $ref->[$i] ) eq $addr )
+            if( IN_THREAD )
             {
-                splice( @$ref, $i, 1 );
-                $i--;
+                lock( $CACHE_TO_OBJECT );
+                if( exists $CACHE_TO_OBJECT->{ $fname } )
+                {
+                    my $ref = $CACHE_TO_OBJECT->{ $fname } || next;
+                    next if( ref( $ref ) ne 'ARRAY' );
+                    printf( STDERR "\t${prefix}: %d objects associated with cache file \"${fname}\".\n", scalar( @$ref ) ) if( $DEBUG >= 4 );
+                    my $addr = Scalar::Util::refaddr( $cache );
+                    @$ref = grep{ ref( $_ // '' ) && Scalar::Util::refaddr( $_ ) != $addr } @$ref;
+                    # Only remove file if no one else is using it
+                    unless( @$ref )
+                    {
+                        if( $cache->destroy && $cache->id && !$cache->removed )
+                        {
+                            print( STDERR "\t${prefix}: Removing cache file \"${fname}\"\n" ) if( $DEBUG >= 4 );
+                            $cache->remove;
+                        }
+                        delete( $CACHE_TO_OBJECT->{ $fname } );
+                    }
+                }
+            }
+            else
+            {
+                if( exists $CACHE_TO_OBJECT->{ $fname } )
+                {
+                    my $ref = $CACHE_TO_OBJECT->{ $fname } || next;
+                    next if( ref( $ref ) ne 'ARRAY' );
+                    printf( STDERR "\t${prefix}: %d objects associated with cache file \"${fname}\".\n", scalar( @$ref ) ) if( $DEBUG >= 4 );
+                    my $addr = Scalar::Util::refaddr( $cache );
+                    @$ref = grep{ ref( $_ // '' ) && Scalar::Util::refaddr( $_ ) != $addr } @$ref;
+                    # Only remove file if no one else is using it
+                    unless( @$ref )
+                    {
+                        if( $cache->destroy && $cache->id && !$cache->removed )
+                        {
+                            print( STDERR "\t${prefix}: Removing cache file \"${fname}\"\n" ) if( $DEBUG >= 4 );
+                            $cache->remove;
+                        }
+                        delete( $CACHE_TO_OBJECT->{ $fname } );
+                    }
+                }
             }
         }
-        next if( $obj->removed || !$obj->id || !$obj->destroy );
-        print( STDERR "\t${prefix}: Removing cache file \"${fname}\"\n" ) if( $DEBUG >= 4 );
-        $obj->remove;
+        else
+        {
+            $cache->remove;
+        }
     }
 };
 
@@ -913,7 +1018,7 @@ Module::Generic::File::Cache - File-based Cache
 
 =head1 VERSION
 
-    v0.2.8
+    v0.2.10
 
 =head1 DESCRIPTION
 

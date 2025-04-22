@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Form::Hybrid';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -14,6 +14,8 @@ use PDF::Builder::Basic::PDF::Utils;
 =head1 NAME
 
 PDF::Builder::Resource::XObject::Form::BarCode - Base class for one-dimensional barcodes
+
+Inherits from L<PDF::Builder::Resource::XObject::Form::Hybrid>
 
 =head1 METHODS
 

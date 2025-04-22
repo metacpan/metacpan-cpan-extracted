@@ -1,7 +1,7 @@
 ---
 abstract: 'OMG IDL to symbol tree translator'
 author:
-  - 'Oliver M. Kellogg <okellogg@users.sourceforge.net>'
+  - 'Oliver M. Kellogg <olivermkellogg@gmail.com>'
 build_requires:
   Test::More: '0'
 configure_requires:
@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   perl: '5.008_003'
-version: '2.05'
+version: '2.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

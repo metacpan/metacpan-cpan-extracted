@@ -19,7 +19,7 @@ my $dom = Cookie::Domain->new( debug => $DEBUG );
 isa_ok( $dom, 'Cookie::Domain' );
 
 # To generate this list:
-# egrep -E '^sub ' ./lib/Cookies/Domain.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$dom, \"$m\" );"'
+# perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$dom, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/Cookies/Domain.pm
 can_ok( $dom, "init" );
 can_ok( $dom, "cron_fetch" );
 can_ok( $dom, "decode" );

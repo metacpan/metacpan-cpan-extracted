@@ -2,7 +2,7 @@ use v5.32;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::GameDir 1.06;
+class Archive::SCS::GameDir 1.07;
 
 use builtin 'trim';
 no warnings 'experimental::builtin';

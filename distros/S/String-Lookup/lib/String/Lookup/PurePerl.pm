@@ -1,6 +1,6 @@
 package String::Lookup::PurePerl;   # fake
 package String::Lookup;
-$VERSION= 0.14;
+$VERSION= 0.15;
 
 # what runtime features we need
 use 5.014;
@@ -343,10 +343,12 @@ Please see the documentation in L<String::Lookup>.
 
  Elizabeth Mattijsen
 
+maintained by LNATION <email@lnation.org>.
+
 =head1 COPYRIGHT
 
-Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.  All rights reserved.
-This program is free software; you can redistribute it and/or modify it under
+Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>
+All rights reserved. This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

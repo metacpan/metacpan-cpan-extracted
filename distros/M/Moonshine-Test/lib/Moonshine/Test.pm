@@ -26,11 +26,11 @@ Moonshine::Test - Test!
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -765,14 +765,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Moonshine-Test>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Moonshine-Test>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Moonshine-Test>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Moonshine-Test/>
@@ -783,7 +775,7 @@ L<http://search.cpan.org/dist/Moonshine-Test/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

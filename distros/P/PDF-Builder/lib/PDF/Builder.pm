@@ -5,8 +5,8 @@ use warnings;
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 # updated during CPAN build
 my $GrTFversion  = 19;       # minimum version of Graphics::TIFF
@@ -15,11 +15,13 @@ my $LpngVersion  = 0.57;     # minimum version of Image::PNG::Libpng
 my $TextMarkdown = 1.000031; # minimum version of Text::Markdown
 my $HTMLTreeBldr = 5.07;     # minimum version of HTML::TreeBuilder
 my $PodSimpleXHTML = 3.45;   # minimum version of Pod::Simple::XHTML
+my $SVGPDFver    = 0.087;    # minimum version of SVGPDF
 
 use Carp;
 use Encode qw(:all);
 use English;
 use FileHandle;
+use version;
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -169,11 +171,7 @@ release!
 
 =item * 
 
-5.26 current minimum supported version, until next PDF::Builder release after 23 June, 2024. This is currently the minimum tested version.
-
-=item * 
-
-5.28 future minimum supported version, until next PDF::Builder release after 22 May, 2025
+5.28 current minimum supported version, until next PDF::Builder release after 22 May, 2025. This is currently the minimum tested version.
 
 =item * 
 
@@ -240,19 +238,26 @@ The full source is on https://github.com/PhilterPaper/Perl-PDF-Builder.
 
 The release distribution is on CPAN: https://metacpan.org/pod/PDF::Builder.
 
+A formatted copy of the documentation (POD) may be found online, for your
+convenience, at https://www.catskilltech.com/Documentation/PDF/Builder.html.
+
+Copies of most of the output of "examples/" sample programs may be found 
+online at https://www.catskilltech.com/Examples/PDF/Builder.html.
+
 Bug reports are on https://github.com/PhilterPaper/Perl-PDF-Builder/issues?q=is%3Aissue+sort%3Aupdated-desc 
 (with "bug" label), feature requests have an "enhancement" label, and general 
 discussions (architecture, roadmap, etc.) have a "general discussion" label.
 
 Do B<not> under I<any> circumstances open a PR (Pull Request) to report a bug. 
-It is a waste of both your and our time and effort. Open a regular ticket 
+That's B<not> what a PR is for, and 
+is a waste of both your and our time and effort. Open a regular ticket 
 (issue), and attach a Perl (.pl) program illustrating the problem, if possible. 
 If you believe that you have a program patch, and offer to share it as a PR, we 
 may give the go-ahead. Unsolicited PRs may be closed without further action.
 
 =head2 LICENSE
 
-This software is Copyright (c) 2017-2023 by Phil M. Perry.
+This software is Copyright (c) 2017-2025 by Phil M. Perry.
 
 This is free software, licensed under:
 
@@ -446,14 +451,18 @@ sub new {
 
 =over
 
-Set the default physical size for pages in the PDF.  If called without
-arguments, return the coordinates of the rectangle describing the default
-physical page size.
+Set the default physical size for pages in the PDF. If called without
+arguments (Get), return an array of the coordinates of the rectangle 
+describing the default physical page size (the Media Box).
 
 This is essentially an alternate method of defining the C<mediabox()> call,
 and added for compatibility with PDF::API2.
 
 See L<PDF::Builder::Page/Page Sizes> for possible values.
+
+Note that this method is I<only> at the PDF (document) level. It is not
+implemented at the page level. If you want to set or get the page-level
+override of the media size, use the C<mediabox()> method.
 
 =back
 
@@ -464,25 +473,29 @@ sub default_page_size {
 
     # Set
     if (@_) {
-        return $self->default_page_boundaries(media => @_);
+        return $self->mediabox(@_);
     }
 
     # Get
-    my $boundaries = $self->default_page_boundaries();
-    return @{$boundaries->{'media'}};
+    # up to 5 hash elements of 4 number arrays
+    my %boundaries = $self->default_page_boundaries();
+    return @{$boundaries{'media'}};  # s/b 4 element array
 }
 
 =head2 default_page_boundaries
 
-    $pdf->default_page_boundaries(%boundaries); # Set
+    $pdf->default_page_boundaries('media' => [xmin, ymin, xmax, ymax]); 
+         # Set the media box
 
-    %boundaries = $pdf->default_page_boundaries(); # Get
+    %boundaries = $pdf->default_page_boundaries(); # Get (all five)
+    @media_rect = @{ $boundaries{'media'} }; # show 'media' box
 
 =over
 
-Set default prepress page boundaries for pages in the PDF.  If called without
-arguments, returns the coordinates of the rectangles describing each of the
-supported page boundaries.
+Set default prepress page boundaries ('boxes') for pages in the PDF. If called 
+without arguments, returns the coordinates of the rectangles describing each 
+of the supported page boundaries, as a hash of array refs. Each will be US 
+Letter size, unless it has been explicitly changed.
 
 See the equivalent C<page_boundaries> method in L<PDF::Builder::Page> for 
 details.
@@ -505,7 +518,8 @@ sub _bounding_box {
             return $self->_bounding_box('MediaBox') if $type eq 'CropBox';
             return $self->_bounding_box('CropBox');
         }
-        return map { $_->val() } $self->{'pages'}->{$type}->elements();
+        my @xxx = $self->{'pages'}->{$type}->elements();  # 4 element array of hashes
+        return (map { $_->val() } @xxx);
     }
 
     # Set
@@ -514,7 +528,9 @@ sub _bounding_box {
 }
 
 sub default_page_boundaries {
-    return PDF::Builder::Page::boundaries(@_);
+    my %xxx = PDF::Builder::Page::boundaries(@_);
+    # 5 element 'media' etc. hash of anonymous arrays each 4 numbers
+    return %xxx;
 }
 
 # Deprecated; use default_page_size or default_page_boundaries
@@ -703,7 +719,7 @@ sub from_string {
 		    $newVer = substr($newVer, 0, length($currentVer));
 		} 
 	        substr($content, $pos+5, length($newVer)) = $newVer;
-		$self->version($newVer);
+		$self->pdf_version($newVer);
             }
 	}
     }
@@ -883,10 +899,10 @@ sub _proc_pages {
     $pdf->{' apipagecount'} ||= 0;
     foreach my $page ($object->{'Kids'}->elements()) {
         $page->realise();
-        if ($page->{'Type'}->val() eq 'Pages') {
+       #if ($page->{'Type'}->val() eq 'Pages') {
+        if (defined $page->{'Type'} && $page->{'Type'}->val() eq 'Pages') {
             push @pages, _proc_pages($pdf, $page);
-        }
-        else {
+        } else {
             $pdf->{' apipagecount'}++;
             $page->{' pnum'} = $pdf->{' apipagecount'};
             if (defined $page->{'Resources'}) {
@@ -1787,9 +1803,9 @@ sub default {
 
 =head3 version
 
-    $version = $pdf->version() # Get
+    $version = $pdf->pdf_version() # Get
 
-    $version = $pdf->version($version) # Set (also returns newly set version)
+    $version = $pdf->pdf_version($version) # Set (also returns newly set version)
 
 =over
 
@@ -1807,10 +1823,14 @@ C<version> method.
 
 =cut
 
-sub version {
+sub pdf_version {
     my $self = shift();  # includes any %opts
 
-    return $self->{'pdf'}->version(@_); # just pass it over to the "real" one
+    if (!defined $self->{'pdf'}) {
+	carp "'pdf' element not defined in pdf_version() call";
+	return '1.4';
+    }
+    return $self->{'pdf'}->pdf_version(@_); # just pass it over to the "real" one
 }
 
 # when outputting a PDF feature, verCheckOutput(n, 'feature name') returns TRUE 
@@ -1830,13 +1850,13 @@ sub verCheckOutput {
     my ($self, $PDFver, $featureName) = @_;
 
     # check if feature required PDF version is higher than planned output
-    my $version = $self->version(); # current version
+    my $version = $self->pdf_version(); # current version
     if ($PDFver > $version) {
         if ($msgVer) {
 	    print "PDF version of requested feature '$featureName' is higher\n".                  "  than current output version $version ".
                   "(version reset to $PDFver)\n";
 	}
-        $self->version($PDFver);
+        $self->pdf_version($PDFver);
         return 1;
     } else {
         return 0;
@@ -1861,13 +1881,13 @@ sub verCheckOutput {
 sub verCheckInput {
     my ($self, $PDFver) = @_;
 
-    my $version = $self->version();
+    my $version = $self->pdf_version();
     # warning message and bump up version if read-in PDF level higher
     if ($PDFver > $version) {
         if ($msgVer) {
 	    print "PDF version just read in is higher than version of $version (version reset to $PDFver)\n";
 	}
-        $self->version($PDFver);
+        $self->pdf_version($PDFver);
         return 1;
     } else {
         return 0;
@@ -2348,7 +2368,8 @@ sub proc_pages {
     $pdf->{' apipagecount'} ||= 0;
     foreach my $page ($object->{'Kids'}->elements()) {
         $page->realise();
-        if ($page->{'Type'}->val() eq 'Pages') {
+       #if ($page->{'Type'}->val() eq 'Pages') {
+        if (defined $page->{'Type'} && $page->{'Type'}->val() eq 'Pages') {
             push @pages, proc_pages($pdf, $page);
         }
         else {
@@ -2990,11 +3011,12 @@ page_labels().
 =item 3.
 
 Many PDF readers do not support page labels; they simply (at most)
-label the sliding thumb with the physical page number. Adobe Acrobat Reader 
+label the sliding thumb with the physical page number. B<Adobe Acrobat Reader> 
 (free version) appears to have a bug in some versions, where if the only
 page label is 'decimal' (the default), it labels the thumb as though no page 
-labels were defined ("Page I<m> of I<n>"). You may be able to get around this
-problem by using an explicit B<start> option value, e.g., C<'start' =E<gt> 1>.
+labels were defined ("Page I<m> of I<n>"). You can get around this problem by 
+using an explicit B<start> option value, e.g., C<'start' =E<gt> 1>. However, 
+for your convenience, the B<start> option now defaults to 1.
 
 =back
 
@@ -3217,6 +3239,10 @@ sub pageLabel {
 
         if (defined $opts->{'start'}) {
             $d->{'St'} = PDFNum($opts->{'start'});
+	} else {
+	    # some PDF Readers (e.g., Adobe Acrobat Reader) ignore a decimal
+	    # label if no Start given, so default to 1
+            $d->{'St'} = PDFNum(1);
         }
 
         $nums->add_elements($d);
@@ -3516,6 +3542,8 @@ use the C<noembed> or C<nosubset> flags as appropriate. The PDF::Builder font
 routines currently have no means to automatically detect any embedding 
 limitations for a given font, and cannot default their behavior accordingly!
 
+=head2 Font-related Methods
+
 =head3 corefont
 
     $font = $pdf->corefont($fontname, %opts)
@@ -3523,10 +3551,12 @@ limitations for a given font, and cannot default their behavior accordingly!
 =over
 
 Returns a new Adobe core font object. For details, 
-see L<PDF::Builder::Docs/Core Fonts>. Note that this is an Adobe-standard
-corefont I<name>, and not a file name.
+including supported C<%opts>,
+see L<PDF::Builder::Resource::Font::CoreFont>. 
+Note that this is an Adobe-standard corefont I<name>, and not a file name.
 
-See also L<PDF::Builder::Resource::Font::CoreFont>.
+See also L<PDF::Builder::Docs/Core Fonts> for additional information,
+including Notes and Limitations.
 
 =back
 
@@ -3563,10 +3593,11 @@ sub corefont {
 
 =over
 
-Returns a new Adobe Type1 ("PostScript", "T1") font object.
-For details, see L<PDF::Builder::Docs/PS Fonts>.
+Returns a new Adobe Type1 ("PostScript", "T1") font object. For details, 
+including supported C<%opts>, see L<PDF::Builder::Resource::Font::Postscript>.
 
-See also L<PDF::Builder::Resource::Font::Postscript>.
+See also L<PDF::Builder::Docs/PS Fonts> for additional information,
+including Notes and Limitations.
 
 =back
 
@@ -3576,8 +3607,14 @@ sub psfont {
     my ($self, $psf, %opts) = @_;
     # copy dashed name options to preferred undashed format
     if (defined $opts{'-afmfile'} && !defined $opts{'afmfile'}) { $opts{'afmfile'} = delete($opts{'-afmfile'}); }
+    if (defined $opts{'-afm_file'} && !defined $opts{'afm_file'}) { $opts{'afm_file'} = delete($opts{'-afm_file'}); }
     if (defined $opts{'-pfmfile'} && !defined $opts{'pfmfile'}) { $opts{'pfmfile'} = delete($opts{'-pfmfile'}); }
+    if (defined $opts{'-pfm_file'} && !defined $opts{'pfm_file'}) { $opts{'pfm_file'} = delete($opts{'-pfm_file'}); }
     if (defined $opts{'-unicodemap'} && !defined $opts{'unicodemap'}) { $opts{'unicodemap'} = delete($opts{'-unicodemap'}); }
+
+    # preferred option names
+    if (defined $opts{'afm_file'}) { $opts{'afmfile'} = delete($opts{'afm_file'}); }
+    if (defined $opts{'pfm_file'}) { $opts{'pfmfile'} = delete($opts{'pfm_file'}); }
 
     foreach my $o (qw(afmfile pfmfile)) {
         next unless defined $opts{$o};
@@ -3600,7 +3637,11 @@ sub psfont {
 =over
 
 Returns a new TrueType (or OpenType) font object.
-For details, see L<PDF::Builder::Docs/TrueType Fonts>.
+For details, including supported C<%opts>, 
+see L<PDF::Builder::Resource::CIDFont::TrueType>.
+
+See also L<PDF::Builder::Docs/TrueType Fonts> for additional information,
+including Notes and Limitations.
 
 =back
 
@@ -3637,7 +3678,8 @@ sub ttfont {
 
 Returns a new BDF (bitmapped distribution format) font object, based on the 
 specified Adobe BDF file. These are very low resolution fonts that appear to
-have come off a dot-matrix printer.
+have come off a dot-matrix printer, and should only be used for decorative
+or novelty purposes.
 
 See also L<PDF::Builder::Resource::Font::BdFont>
 
@@ -3665,7 +3707,8 @@ sub bdfont {
 
 Returns a new CJK font object. These are TrueType-like fonts for East Asian
 languages (Chinese, Japanese, Korean).
-For details, see L<PDF::Builder::Docs/CJK Fonts>.
+For details, including supported C<%opts>, see L<PDF::Builder::Resource::CIDFont::CJKFont>,
+as well as L<PDF::Builder::Docs/CJK Fonts>.
 
 B<NOTE:> C<cjkfont> is quite old and is not well supported. We recommend that
 you try using C<ttfont> (or another font routine, if not TTF/OTF) with the
@@ -3678,8 +3721,6 @@ C<ttfont> instead.
 Among other things, C<cjkfont> selections are limited, as they require CMAP
 files; they may or may not subset correctly; and they can not be used as the
 base for synthetic fonts.
-
-See also L<PDF::Builder::Resource::CIDFont::CJKFont>
 
 =back
 
@@ -3710,7 +3751,7 @@ format. Returns the font object, to be used by L<PDF::Builder::Content>.
 
 The font C<$name> is either the name of one of the standard 14 fonts 
 (L<PDF::Builder::Resource::Font::CoreFont/STANDARD FONTS>), such as
-Helvetica or the path to a font file.
+C<Helvetica> or the path to a font file (including an extension/filetype).
 There are 15 additional core fonts on a Windows system.
 Note that the exact name of a core font needs to be given.
 The file extension (if path given) determines what type of font file it is.
@@ -3738,42 +3779,30 @@ The file extension (if path given) determines what type of font file it is.
 The path can be omitted if the font file is in the current directory or one of
 the directories returned by C<font_path>.
 
-TrueType (ttf/otf), Adobe PostScript Type 1 (pfa/pfb), and Adobe Glyph Bitmap
-Distribution Format (bdf) fonts are supported.
-
-The following options (C<%opts>) are available:
+Core, TrueType (ttf/otf), Adobe PostScript Type 1 (pfa/pfb/t1), and Adobe Glyph 
+Bitmap Distribution Format (bdf) fonts are supported.
 
 =back
+
+The following options (C<%opts>) are available:
 
 =over
 
 =item format
 
 The font format is normally detected automatically based on the file's
-extension.  If you're using a font with an atypical extension, you can set
+extension (if one is given, as in non-core fonts). If you're using a font with 
+an atypical extension, you can set
 C<format> to one of C<truetype> (TrueType or OpenType), C<type1> (PostScript
-Type 1), or C<bitmap> (Adobe Bitmap).
+Type 1), or C<bitmap> (Adobe Bitmap). There is no C<format> entry for Core
+fonts, as the name must be an exact match.
 
-=item dokern
+=item (other options)
 
-Kerning (automatic adjustment of space between pairs of characters) is enabled
-by default if the font includes this information.  Set this option to false to
-disable.
-
-=item afm_file (PostScript Type 1 fonts only)
-
-Specifies the location of the font metrics file.
-
-=item pfm_file (PostScript Type 1 fonts only)
-
-Specifies the location of the printer font metrics file.  This option overrides
-the encode option.
-
-=item embed (TrueType fonts only)
-
-Fonts are embedded in the PDF by default, which is required to ensure that they
-can be viewed properly on a device that doesn't have the font installed. Set
-this option to false to prevent the font from being embedded.
+The C<%opts> entries are passed on to the appropriate font format routine
+(C<corefont()>, C<ttfont()>, etc.), so they can be used here. These include 
+'encode', 'pdfname', 'pfmfile', 'dokern', etc. See the appropriate font routine 
+for a full list of the supported options.
 
 =back
 
@@ -3782,12 +3811,9 @@ this option to false to prevent the font from being embedded.
 sub font {
     my ($self, $name, %opts) = @_;
     # copy dashed name options to preferred undashed format
-    if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
     if (defined $opts{'-kerning'} && !defined $opts{'kerning'}) { $opts{'kerning'} = delete($opts{'-kerning'}); }
     if (defined $opts{'-dokern'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'-dokern'}); }
     if (defined $opts{'-embed'} && !defined $opts{'embed'}) { $opts{'embed'} = delete($opts{'-embed'}); }
-    if (defined $opts{'-afmfile'} && !defined $opts{'afmfile'}) { $opts{'afmfile'} = delete($opts{'-afmfile'}); }
-    if (defined $opts{'-pfmfile'} && !defined $opts{'pfmfile'}) { $opts{'pfmfile'} = delete($opts{'-pfmfile'}); }
 
     if (exists $opts{'kerning'}) {
         $opts{'dokern'} = delete $opts{'kerning'};
@@ -3808,18 +3834,14 @@ sub font {
     my $format = $opts{'format'};
     $format //= ($name =~ /\.[ot]tf$/i ? 'truetype' :
                  $name =~ /\.pf[ab]$/i ? 'type1'    :
+                 $name =~ /\.t1$/i ?     'type1'    :
                  $name =~ /\.bdf$/i    ? 'bitmap'   : '');
 
     if      ($format eq 'truetype') {
         $opts{'embed'} //= 1;
         return $self->ttfont($name, %opts);
     } elsif ($format eq 'type1') {
-        if (exists $opts{'afm_file'}) {
-            $opts{'afmfile'} = delete $opts{'afm_file'};
-        }
-        if (exists $opts{'pfm_file'}) {
-            $opts{'pfmfile'} = delete $opts{'pfm_file'};
-        }
+        # psfont routine will check for afmfile and pfmfile
         return $self->psfont($name, %opts);
     } elsif ($format eq 'bitmap') {
         return $self->bdfont($name, %opts);
@@ -3913,8 +3935,9 @@ sub set_font_path {
 sub _findFont {
     my $font = shift();
 
-    # Check the current directory
+    # Check the current directory or the path is absolute
     return $font if -f $font;
+    return if substr($font, 0, 1) eq '/';
 
     # Check the font search path
     foreach my $directory (@font_path) {
@@ -3987,16 +4010,6 @@ Returns a new uni-font object, based on the specified fonts and options.
 B<BEWARE:> This is not a true PDF-object, but a virtual/abstract font definition!
 
 See also L<PDF::Builder::Resource::UniFont>.
-
-Valid options (C<%opts>) are:
-
-=back
-
-=over
-
-=item encode
-
-Changes the encoding of the font from its default.
 
 =back
 
@@ -4146,8 +4159,8 @@ B<Caution:> Do not confuse this C<image> ($pdf-E<gt>) with the image method
 found in the graphics (gfx) class ($gfx-E<gt>), used to actually I<place> a
 read-in or decoded image on the page!
 
-See L<PDF::Builder::Content/image> for details about placing images on a page
-once they're imported.
+See L<PDF::Builder::Content/image> and L<PDF::Builder::Content/object> for 
+details about placing images on a page once they're imported.
 
 The image format is normally detected automatically based on the file's
 extension (.gif, .png, .tif/.tiff, .jpg/.jpeg, .pnm/.pbm/.pgm/.ppm). If passed 
@@ -4164,7 +4177,7 @@ C<gif>, C<jpeg>, C<png>, C<pnm>, or C<tiff>.
 B<Note:> PNG images that include an alpha (transparency) channel go through a
 relatively slow process of splitting the image into separate RGB and alpha
 components as is required by images in PDFs. If you're having performance
-issues, install Image::PNG::Libpng to speed this process up by
+issues, install Image::PNG::Libpng to speed up this process by
 an order of magnitude; either module will be used automatically if available.
 See the C<image_png> method for details.
 
@@ -4181,10 +4194,9 @@ sub image {
 
     my $format = lc($opts{'format'} // '');
 
-    if (ref($file) eq 'GD::Image') {
+    if      (ref($file) eq 'GD::Image') {
         return $self->image_gd($file, %opts);
-    }
-    elsif (ref($file)) {
+    } elsif (ref($file)) {
         $format ||= _detect_image_format($file);
 	# JPEG, PNG, GIF, and P*M files can be detected
 	# TIFF files cannot currently be detected
@@ -4195,35 +4207,30 @@ sub image {
                      $file =~ /\.png$/i      ? 'png'  :
                      $file =~ /\.gif$/i      ? 'gif'  :
                      $file =~ /\.tiff?$/i    ? 'tiff' :
+                     $file =~ /\.svg?$/i     ? 'svg'  :
                      $file =~ /\.p[bgpn]m$/i ? 'pnm'  : '');
 	# GD images are created on-the-fly and don't have files
     }
 
-    if ($format eq 'jpeg') {
+    if      ($format eq 'jpeg') {
         return $self->image_jpeg($file, %opts);
-    }
-    elsif ($format eq 'png') {
+    } elsif ($format eq 'png') {
         return $self->image_png($file, %opts);
-    }
-    elsif ($format eq 'gif') {
+    } elsif ($format eq 'gif') {
         return $self->image_gif($file, %opts);
-    }
-    elsif ($format eq 'tiff') {
+    } elsif ($format eq 'tiff') {
         return $self->image_tiff($file, %opts);
-    }
-    elsif ($format eq 'pnm') {
+    } elsif ($format eq 'svg') {
+        return $self->image_svg($file, %opts);
+    } elsif ($format eq 'pnm') {
         return $self->image_pnm($file, %opts);
-    }
-    elsif ($format) {
+    } elsif ($format) {
         croak "Unrecognized image format: $format";
-    }
-    elsif (ref($file)) {
+    } elsif (ref($file)) {
         croak "Unspecified image format";
-    }
-    elsif ($file =~ /(\..*)$/) {
+    } elsif ($file =~ /(\..*)$/) {
         croak "Unrecognized image extension: $1";
-    }
-    else {
+    } else {
         croak "Unrecognized image: $file";
     }
 }
@@ -4231,20 +4238,36 @@ sub image {
 # if passed a filehandle, attempt to read the format header to determine type
 sub _detect_image_format {
     my $fh = shift();
-    $fh->seek(0, 0);
-    binmode $fh, ':raw';
+    if (ref($fh) ne 'SCALAR') {
+        $fh->seek(0, 0);
+        binmode $fh, ':raw';
+    }
 
-    my $test;
-    my $bytes_read = $fh->read($test, 8);
-    $fh->seek(0, 0);
+    my ($test, $bytes_read);
+    if (ref($fh) eq 'SCALAR') {
+        $test = substr($$fh, 0, 8);
+        $bytes_read = length($test);
+    } else {
+        $bytes_read = $fh->read($test, 8);
+        $fh->seek(0, 0);
+    }
     return unless $bytes_read and $bytes_read == 8;
 
     return 'gif'  if $test =~ /^GIF\d\d[a-z]/;
     return 'jpeg' if $test =~ /^\xFF\xD8\xFF/;
     return 'png'  if $test =~ /^\x89PNG\x0D\x0A\x1A\x0A/;
     return 'pnm'  if $test =~ /^\s*P[1-6]/;
-    # potentially could handle TIFF, except that libtiff cannot accept
-    # a filehandle as input for image_tiff(). GD images do not have files.
+    # II4200 | MM0042 for TIFF
+    return 'tiff' if $test =~ /^II\x2A\x00/;
+    return 'tiff' if $test =~ /^MM\x00\x2A/;
+
+    # read up to 512 bytes for possible SVG file, expect to find '<svg\s'
+    $fh->seek(0, 0);
+    $bytes_read = $fh->read($test, 512);
+    $fh->seek(0, 0);
+    return 'svg'  if $test =~ /<svg\s/is;
+
+    # GD images do not have files.
     return;
 }
 
@@ -4291,8 +4314,9 @@ and C<examples/Content.pl>
 for some examples of placing an image on a page (JPEG, but the principle is
 the same). 
 There is an optional TIFF library (TIFF_GT) described, that gives more
-capability than the default one. However, note that C<$file> can only be
-a filename when using this library.
+capability than the default one.
+See the TIFF_GT documentation for further information on using this library, 
+particularly when passing a I<filehandle> for the file.
 
 =back
 
@@ -4374,7 +4398,8 @@ sub LA_GT {
     if (!defined $rc) { $rc = 0; }  # else is 1
     if ($rc) {
 	# installed, but not up to date?
-	if ($Graphics::TIFF::VERSION < $GrTFversion) { $rc = 0; }
+	if (version->parse("v$Graphics::TIFF::VERSION")->numify() < 
+	    version->parse("v$GrTFversion")->numify()) { $rc = 0; }
     }
 
     return $rc;
@@ -4427,8 +4452,9 @@ for some examples of placing an image on a page (JPEG, but the principle is
 the same). 
 
 There is an optional PNG library (PNG_IPL) described, that gives more
-capability than the default one. However, note that C<$file> can only be
-a filename when using this library.
+capability than the default one.
+See the PNG_IPL documentation for further information on using this library, 
+particularly when passing a I<filehandle> for the file.
 
 =back
 
@@ -4509,7 +4535,8 @@ sub LA_IPL {
     if (!defined $rc) { $rc = 0; }  # else is 1
     if ($rc) {
 	# installed, but not up to date?
-	if ($Image::PNG::Libpng::VERSION < $LpngVersion) { $rc = 0; }
+        if (version->parse("v$Image::PNG::Libpng::VERSION")->numify() < 
+            version->parse("v$LpngVersion")->numify()) { $rc = 0; }
     }
 
     return $rc;
@@ -4540,6 +4567,108 @@ sub image_gif {
     $self->{'pdf'}->out_obj($self->{'pages'});
 
     return $obj;
+}
+
+=head2 image_svg
+
+    $pnm = $pdf->image_svg($file, %opts)
+
+=over
+
+Imports and returns a new SVG image object. C<$file> may be a filename, a 
+string, or a filehandle.
+
+See L<PDF::Builder::Resource::XObject::Image::SVG> for additional information
+and C<examples/Content.pl> for some examples of placing an image on a page
+(JPEG, but the principle is the same). Note that C<object()> is preferably
+used rather than C<image()>. If C<image> determines that the image object is
+a processed SVG array, it simply passes it on to C<object>.
+
+B<CAUTIONS:> 
+1. If using C<image()>, the final two (optional) parameters are I<not> width 
+and height, but instead the horizontal scale and vertical scale.
+2. Results are unpredictable if allowing C<x> and C<y> positions to default
+to I<Lower Left> corner at C<(0,0)>, due to different scaling. It is best to
+explicitly give the C<x> and C<y> positions.
+3. Be aware that due to different scaling, some resulting images may be much
+larger than expected. Account for this when setting any C<scale> factor.
+
+=back
+
+=cut
+
+sub image_svg {
+    my ($self, $file, %opts) = @_;
+
+    my $rc;
+    $rc = eval {
+        require SVGPDF;
+	1;
+    };
+    if (!defined $rc) { $rc = 0; }  # else is 1
+    if ($rc) { 
+        # installed, but not up to date?
+	if (version->parse("v$SVGPDF::VERSION")->numify() <
+	    version->parse("v$SVGPDFver")->numify()) { $rc = 0; }
+    }
+    if (!$rc) {
+	carp "SVGPDF not available, so SVG image can not be processed";
+	return [];
+    }
+   
+    require PDF::Builder::Resource::XObject::Image::SVG;
+    my $obj = PDF::Builder::Resource::XObject::Image::SVG->new($self, $file, %opts);
+
+    if (defined $opts{'compress'} && $opts{'compress'} == 0) {
+        # suppress compression of stream
+        my $o = $obj->[0]->{'xo'};
+        delete $o->{'Filter'};
+        delete $o->{'-docompress'};
+    }
+
+    $self->{'pdf'}->out_obj($self->{'pages'});
+
+    return $obj;
+}
+
+=head3 LA_SVG
+
+    $rc = $pdf->LA_SVG()
+
+=over
+
+Returns 1 if the library name (package) SVGPDF is installed, and 
+0 otherwise. For this optional library, this call can be used to know if it 
+is safe to use certain functions. For example:
+
+=back
+
+    if ($pdf->LA_SVG() {
+        # is installed and usable
+    } else {
+        # not available. can't use image_svg or any other SVG function
+    }
+
+=cut
+
+# there doesn't seem to be a way to pass in a string (or bare) package name,
+# to make a generic check routine
+sub LA_SVG {
+    my ($self) = @_;
+
+    my ($rc);
+    $rc = eval {
+        require SVGPDF;
+        1;
+    };
+    if (!defined $rc) { $rc = 0; }  # else is 1
+    if ($rc) {
+	# installed, but not up to date?
+        if (version->parse("v$SVGPDF::VERSION")->numify() < 
+            version->parse("v$SVGPDFver")->numify()) { $rc = 0; }
+    }
+
+    return $rc;
 }
 
 =head2 image_gd

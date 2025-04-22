@@ -24,14 +24,14 @@ subtest 'upsert generate mock data' => sub {
 	$dbh = $obj->get_dbh();
 
 	my $sql_license = <<"SQL";
-INSERT INTO licenses (name, allows_commercial) VALUES ( ?, ? )
+INSERT INTO LICENSES (NAME, ALLOWS_COMMERCIAL) VALUES ( ?, ? )
 SQL
 
 	chomp $sql_license;
 	my $r = $dbh->do($sql_license, undef, 'test_license', 'no');
 	is($r, 1, 'one row inserted is ok');
 
-	my $update_sql = 'update licenses set allows_commercial = ? where id > ?';
+	my $update_sql = 'UPDATE LICENSES SET ALLOWS_COMMERCIAL = ? WHERE ID > ?';
 	$r = $dbh->do($update_sql, undef, 'yes', '3');
 	is($r, 2, 'update works ok');
 
@@ -39,7 +39,7 @@ SQL
 
 	is($r, '0E0', 'now rows updated');
 
-	my $delete_sql = 'DELETE FROM licenses WHERE id = ?';
+	my $delete_sql = 'DELETE FROM LICENSES WHERE ID = ?';
 	my $sth        = $dbh->prepare($delete_sql);
 	$sth->execute(3);
 
@@ -54,12 +54,14 @@ subtest 'upsert use mock data' => sub {
 	my $dbh_2 = $obj_2->get_dbh();
 
 	my $sql_license = <<"SQL";
-INSERT INTO licenses (name, allows_commercial) VALUES ( ?, ? )
+INSERT INTO LICENSES (NAME, ALLOWS_COMMERCIAL) VALUES ( ?, ? )
 SQL
 
 	chomp $sql_license;
 	is($dbh_2->do($sql_license, undef, 'test_license', 'no'), 1, 'one row inserted is ok');
-	my $update_sql = 'update licenses set allows_commercial = ? where id > ?';
+
+
+	my $update_sql = 'UPDATE LICENSES SET ALLOWS_COMMERCIAL = ? WHERE ID > ?';
 	my $r          = $dbh_2->do($update_sql, undef, 'yes', '3');
 
 	is($r, 2, 'update works ok');
@@ -67,7 +69,7 @@ SQL
 	$r = $dbh_2->do($update_sql, undef, 'yes', '100');
 	is($r, '0E0', 'now rows updated');
 
-	my $delete_sql = 'DELETE FROM licenses WHERE id = ?';
+	my $delete_sql = 'DELETE FROM LICENSES WHERE ID = ?';
 	my $sth        = $dbh_2->prepare($delete_sql);
 	$sth->execute(3);
 

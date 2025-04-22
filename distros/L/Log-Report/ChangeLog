@@ -7,6 +7,17 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.40: Fri 18 Apr 17:05:09 CEST 2025
+
+	Fixes:
+	- own translation tables contained stuff moved to Lexicon
+
+	Improvements:
+	- reduce number of textdomain lookups at import.
+	- refer to Dancer2::Template::TTLogReport
+	- show version of XML::LibXML for tests 42/43
+	- fix test for libxml2 use [cpantesters]
+
 version 1.39: Mon  9 Sep 19:57:06 CEST 2024
 
 	Fixes:

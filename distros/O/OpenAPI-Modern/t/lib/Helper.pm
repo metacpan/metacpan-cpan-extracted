@@ -71,6 +71,7 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
 
     if ($TYPE eq 'plack' or $TYPE eq 'catalyst') {
       test_needs('Plack::Request', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
+      die 'HTTP::Headers::Fast::XS is buggy and should not be used' if eval { HTTP::Headers::Fast::XS->VERSION };
 
       $req = Plack::Request->new($req->to_psgi);
 
@@ -129,6 +130,7 @@ sub response ($code, $headers = [], $body_content = undef) {
   }
   elsif ($TYPE eq 'plack') {
     test_needs('Plack::Response', 'HTTP::Message::PSGI', { 'HTTP::Headers::Fast' => 0.21 });
+    die 'HTTP::Headers::Fast::XS is buggy and should not be used' if eval { HTTP::Headers::Fast::XS->VERSION };
 
     $res = Plack::Response->new($code, $headers, $body_content);
     $res->headers->header('Content-Length' => length $body_content)

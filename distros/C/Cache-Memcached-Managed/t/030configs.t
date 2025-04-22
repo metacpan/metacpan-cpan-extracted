@@ -4,6 +4,7 @@ use Test::More tests => 1 + ( 4 * 5 ) + 1 + 5;
 use strict;
 use warnings;
 
+use lib '.';
 # initializations
 my $class= 'Cache::Memcached::Managed';
 my $memcached_class= $ENV{CACHE_MEMCACHED} || 'Cache::Memcached';

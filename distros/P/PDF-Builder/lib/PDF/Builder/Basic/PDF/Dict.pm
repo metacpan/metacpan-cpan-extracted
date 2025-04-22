@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -32,8 +32,9 @@ use PDF::Builder::Basic::PDF::Name;
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Dict - PDF Dictionaries and Streams. Inherits from 
-L<PDF::Builder::Basic::PDF::Objind>
+PDF::Builder::Basic::PDF::Dict - PDF Dictionaries and Streams
+
+Inherits from L<PDF::Builder::Basic::PDF::Objind>
 
 =head1 INSTANCE VARIABLES
 
@@ -105,6 +106,8 @@ sub type {
     return $self->{'Type'}->val();
 }
 
+# TBD per API2 PR #28, *may* need to copy sub find_prop from Page.pm to here
+
 =head2 filter
 
     @filters = $d->filter(@filters)
@@ -174,6 +177,8 @@ sub outobjdeep {
                      } keys %$self) {
         next if $key =~ m/^[\s\-]/o;
         next unless $self->{$key};
+	# some unblessed objects were sometimes getting through
+        next unless $self->{$key} =~ /^PDF::Builder/;
         $fh->print('/' . PDF::Builder::Basic::PDF::Name::string_to_name($key, $pdf) . ' ');
         $self->{$key}->outobj($fh, $pdf);
         $fh->print(' ');

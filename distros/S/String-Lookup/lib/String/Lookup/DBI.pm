@@ -1,5 +1,5 @@
 package String::Lookup::DBI;
-$VERSION= 0.14;
+$VERSION= 0.15;
 
 # what runtime features we need
 use 5.014;
@@ -107,7 +107,7 @@ String::Lookup::DBI - flush String::Lookup using DBI compatible database handle
 
 =head1 VERSION
 
-This documentation describes version 0.14.
+This documentation describes version 0.15.
 
 =head1 DESCRIPTION
 
@@ -158,10 +158,12 @@ Indicate the name of the column for storing strings.  Defaults to C<name>.
 
  Elizabeth Mattijsen
 
+maintained by LNATION <email@lnation.org>
+
 =head1 COPYRIGHT
 
-Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.  All rights reserved.
-This program is free software; you can redistribute it and/or modify it under
+Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>
+All rights reserved. This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

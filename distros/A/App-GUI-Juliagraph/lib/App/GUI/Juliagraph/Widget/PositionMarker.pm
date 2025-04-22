@@ -62,5 +62,4 @@ sub set_color {
     $self->Refresh;
 }
 
-
 1;

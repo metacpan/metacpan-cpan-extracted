@@ -3,7 +3,7 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 use Module::Generate;
 use Switch::Again qw/switch/;
 use Hades::Myths { as_keywords => 1 };
@@ -1323,7 +1323,7 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
@@ -2067,7 +2067,7 @@ Used in conjunction with Dict and Tuple to specify slots that are optional and m
 
 =head2 Macros
 
-Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.23/macro-fh.hades> for an example of how to extend via macros.
+Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.24/macro-fh.hades> for an example of how to extend via macros.
 
 	macro {
 		FH [ macro => [qw/read_file write_file/], alias => { read_file => [qw/rf/], write_file => [qw/wf/] } ]
@@ -2442,27 +2442,17 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hades>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hades>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hades>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Hades>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2025 by LNATION.
 
 This is free software, licensed under:
 

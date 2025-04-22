@@ -1,11 +1,11 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.027-4-gd0b3682
+package JSON::Schema::Tiny; # git description: v0.029-2-gf5663ad
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.028';
+our $VERSION = '0.030';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use stable 0.031 'postderef';
@@ -26,7 +26,7 @@ use Feature::Compat::Try;
 use JSON::PP ();
 use List::Util 1.33 qw(any none);
 use Scalar::Util 'looks_like_number';
-use builtin::compat qw(blessed created_as_number created_as_string);
+use builtin::compat qw(blessed created_as_number);
 use if "$]" >= 5.022, POSIX => 'isinf';
 use Math::BigFloat;
 use namespace::clean;
@@ -714,6 +714,8 @@ sub _eval_keyword_oneOf ($data, $schema, $state) {
 }
 
 sub _eval_keyword_not ($data, $schema, $state) {
+  return !$schema->{not} || E($state, 'subschema is true') if is_type('boolean', $schema->{not});
+
   return 1 if not _eval_subschema($data, $schema->{not},
     +{ %$state, schema_path => $state->{schema_path}.'/not', short_circuit => 1, errors => [] });
 
@@ -727,6 +729,10 @@ sub _eval_keyword_if ($data, $schema, $state) {
     ? 'then' : 'else';
 
   return 1 if not exists $schema->{$keyword};
+
+  return $schema->{$keyword} || E({ %$state, keyword => $keyword }, 'subschema is false')
+    if is_type('boolean', $schema->{$keyword});
+
   return 1 if _eval_subschema($data, $schema->{$keyword},
     +{ %$state, schema_path => $state->{schema_path}.'/'.$keyword });
   return E({ %$state, keyword => $keyword }, 'subschema is not valid');
@@ -1288,22 +1294,21 @@ sub assert_pattern ($state, $pattern) {
     local $SIG{__WARN__} = sub { die @_ };
     qr/$pattern/;
   }
-  catch ($e) { abort($state, $e); };
+  catch ($e) { abort($state, $e); }
   return 1;
 }
 
 # based on JSON::Schema::Modern::Utilities::assert_uri_reference
 sub assert_uri_reference ($state, $schema) {
-  my $ref = $schema->{$state->{keyword}};
-
+  my $string = $schema->{$state->{keyword}};
   abort($state, '%s value is not a valid URI reference', $state->{keyword})
     # see also uri-reference format sub
-    if fc(Mojo::URL->new($ref)->to_unsafe_string) ne fc($ref)
-      or $ref =~ /[^[:ascii:]]/
-      or $ref =~ /#/
-        and $ref !~ m{#$}                          # empty fragment
-        and $ref !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
-        and $ref !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
+    if fc(Mojo::URL->new($string)->to_unsafe_string) ne fc($string)
+      or $string =~ /[^[:ascii:]]/            # ascii characters only
+      or $string =~ /#/                       # no fragment, except...
+        and $string !~ m{#$}                          # allow empty fragment
+        and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # allow plain-name fragment
+        and $string !~ m{#/(?:[^~]|~[01])*$};         # allow json pointer fragment
 
   return 1;
 }
@@ -1316,9 +1321,9 @@ sub assert_uri ($state, $schema, $override = undef) {
   abort($state, '"%s" is not a valid URI', $string)
     # see also uri format sub
     if fc($uri->to_unsafe_string) ne fc($string)
-      or $string =~ /[^[:ascii:]]/
-      or not $uri->is_abs
-      or $string =~ /#/
+      or $string =~ /[^[:ascii:]]/            # ascii characters only
+      or not $uri->is_abs                     # must have a schema
+      or $string =~ /#/                       # no fragment, except...
         and $string !~ m{#$}                          # empty fragment
         and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
         and $string !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
@@ -1361,7 +1366,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.028
+version 0.030
 
 =head1 SYNOPSIS
 
@@ -1384,13 +1389,13 @@ version 0.028
 
 This module aims to be a slimmed-down L<JSON Schema|https://json-schema.org/> evaluator and
 validator, supporting the most popular keywords.
-(See L</UNSUPPORTED JSON-SCHEMA FEATURES> below for exclusions.)
+(See L</UNSUPPORTED JSON SCHEMA FEATURES> below for exclusions.)
 
 =head1 FUNCTIONS
 
 =for Pod::Coverage is_type get_type is_bool is_bignum is_equal is_elements_unique jsonp canonical_uri E abort
 assert_keyword_type assert_pattern assert_uri assert_non_negative_integer assert_array_schemas
-new assert_uri_reference sprintf_num
+new assert_uri_reference sprintf_num HAVE_BUILTIN
 
 =head2 evaluate
 
@@ -1445,7 +1450,7 @@ a hash, e.g.: C<< JSON::Schema::Tiny->new(boolean_result => 1, max_traversal_dep
 =head2 C<$BOOLEAN_RESULT>
 
 When true, L</evaluate> will return a true or false result only, with no error strings. This enables
-short-circuit mode internally as this cannot effect results except get there faster. Defaults to false.
+short-circuit mode internally as this cannot affect results except get there faster. Defaults to false.
 
 =head2 C<$SHORT_CIRCUIT>
 
@@ -1545,7 +1550,7 @@ L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, c
 
 Defaults to undef.
 
-=head1 UNSUPPORTED JSON-SCHEMA FEATURES
+=head1 UNSUPPORTED JSON SCHEMA FEATURES
 
 Unlike L<JSON::Schema::Modern>, this is not a complete implementation of the JSON Schema
 specification. Some features and keywords are left unsupported in order to keep the code small and
@@ -1610,11 +1615,13 @@ L<JSON::Schema::Modern>.
 =head2 Types
 
 Perl is a more loosely-typed language than JSON. This module delves into a value's internal
-representation in an attempt to derive the true "intended" type of the value. However, if a value is
-used in another context (for example, a numeric value is concatenated into a string, or a numeric
-string is used in an arithmetic operation), additional flags can be added onto the variable causing
-it to resemble the other type. This should not be an issue if data validation is occurring
-immediately after decoding a JSON (or YAML) payload.
+representation in an attempt to derive the true "intended" type of the value.
+This should not be an issue if data validation is occurring
+immediately after decoding a JSON payload, or if the JSON string itself is passed to this module.
+If you are having difficulties, make sure you are using Perl's fastest and most trusted and
+reliable JSON decoder, L<Cpanel::JSON::XS>.
+Other JSON decoders are known to produce data with incorrect data types,
+and data from other sources may also be problematic.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
 

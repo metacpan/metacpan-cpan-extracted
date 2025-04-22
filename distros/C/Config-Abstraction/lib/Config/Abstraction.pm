@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.10
+Version 0.13
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ formats (YAML, JSON, XML, and INI),
 it also allows levels of configuration, each of which overrides the lower levels.
 So, it also integrates environment variable
 overrides and command line arguments for runtime configuration adjustments.
-This module is designed to help developers manage layered configurations that can be loaded from files and overridden by at run-time for debugging,
+This module is designed to help developers manage layered configurations that can be loaded from files and overridden at run-time for debugging,
 offering a modern, robust and dynamic approach
 to configuration management.
 
@@ -165,7 +165,11 @@ checked and used to override any conflicting settings.
 
 Next, the command line arguments are checked and used to override any conflicting settings.
 
-=item 5. Accessing Values
+=item 5. Data Argument
+
+Finally the data passed into the constructor via the C<data> argument is merged in.
+
+=item 6. Accessing Values
 
 Values in the configuration can be accessed using a dotted notation
 (e.g., C<'database.user'>), regardless of the file format used.
@@ -195,6 +199,11 @@ Points to a configuration file of any format.
 An arrayref of files to look for in the configuration directories.
 Put the more important files later,
 since later files override earlier ones.
+
+=item * C<data>
+
+A hash ref of data to prime the configuration with.
+Any other data will be overwritten by this.
 
 =item * C<env_prefix>
 
@@ -239,16 +248,16 @@ sub new
 		} elsif($ENV{'DOCUMENT_ROOT'}) {
 			$params->{'config_dirs'} = [File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'conf')];
 		} else {
-			$params->{'config_durs'} = ['conf'];
+			$params->{'config_dirs'} = ['conf'];
 		}
 	}
 
 	my $self = bless {
+		sep_char => '.',
 		%{$params},
 		env_prefix => $params->{env_prefix} || 'APP_',
 		flatten	 => $params->{flatten} // 0,
 		config => {},
-		sep_char => '.'
 	}, $class;
 
 	$self->_load_config();
@@ -325,6 +334,9 @@ sub _load_config
 					if(($data =~ /^\s*<\?xml/) || ($data =~ /<\/.+>/)) {
 						$self->_load_driver('XML::Simple', ['XMLin']);
 						$data = XMLin($path, ForceArray => 0, KeyAttr => []);
+						if($data) {
+							$self->{'type'} = 'XML';
+						}
 					} elsif($data =~ /\{.+:.\}/s) {
 						$self->_load_driver('JSON::Parse');
 						# CPanel::JSON is very noisy, so be careful before attempting to use it
@@ -337,6 +349,9 @@ sub _load_config
 							}
 						} else {
 							undef $data;
+						}
+						if($data) {
+							$self->{'type'} = 'JSON';
 						}
 					} else {
 						undef $data;
@@ -361,6 +376,9 @@ sub _load_config
 									}
 								}
 							}
+							if($data) {
+								$self->{'type'} = 'YAML';
+							}
 						}
 						if((!$data) || (ref($data) ne 'HASH')) {
 							$self->_load_driver('Config::IniFiles');
@@ -369,6 +387,9 @@ sub _load_config
 									my $section = $_;
 									$section => { map { $_ => $ini->val($section, $_) } $ini->Parameters($section) }
 								} $ini->Sections() };
+								if($data) {
+									$self->{'type'} = 'INI';
+								}
 							}
 							if((!$data) || (ref($data) ne 'HASH')) {
 								# Maybe XML without the leading XML header
@@ -376,7 +397,10 @@ sub _load_config
 								eval { $data = XMLin($path, ForceArray => 0, KeyAttr => []) };
 								if((!$data) || (ref($data) ne 'HASH')) {
 									$self->_load_driver('Config::Auto');
-									$data = Config::Auto->new(source => $path)->parse();
+									my $ca = Config::Auto->new(source => $path);
+									if($data = $ca->parse()) {
+										$self->{'type'} = $ca->format();
+									}
 								}
 							}
 						}
@@ -386,7 +410,7 @@ sub _load_config
 					if($@) {
 						$logger->warn(ref($self), ' ', __LINE__, $@);
 					} else {
-						$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
+						$logger->debug(ref($self), ' ', __LINE__, ': Loaded data from', $self->{'type'}, "file $path");
 					}
 				}
 				if(scalar(keys %merged)) {
@@ -405,13 +429,20 @@ sub _load_config
 	}
 
 	# Merge ENV vars
+	my $prefix = $self->{env_prefix};
+	$prefix =~ s/_$//;
+	$prefix =~ s/::$//;
 	for my $key (keys %ENV) {
 		next unless $key =~ /^$self->{env_prefix}(.*)$/;
 		my $path = lc $1;
-		my @parts = split /__/, $path;
-		my $ref = \%merged;
-		$ref = ($ref->{$_} //= {}) for @parts[0..$#parts-1];
-		$ref->{ $parts[-1] } = $ENV{$key};
+		if($path =~ /__/) {
+			my @parts = split /__/, $path;
+			my $ref = \%merged;
+			$ref = ($ref->{$_} //= {}) for @parts[0..$#parts-1];
+			$ref->{ $parts[-1] } = $ENV{$key};
+		} else {
+			$merged{$prefix}->{$path} = $ENV{$key};
+		}
 	}
 
 	# Merge command line options
@@ -425,6 +456,10 @@ sub _load_config
 		my $ref = \%merged;
 		$ref = ($ref->{$_} //= {}) for @parts[0..$#parts-1];
 		$ref->{ $parts[-1] } = $value;
+	}
+
+	if($self->{'data'}) {
+		%merged = %{ merge( $self->{'data'}, \%merged ) };
 	}
 
 	if($self->{'flatten'}) {
@@ -465,7 +500,7 @@ sub get
 Returns the entire configuration hash,
 possibly flattened depending on the C<flatten> option.
 
-The entry C<config_path> contains a colon separated list of the files that the configuration was loaded from.
+The entry C<config_path> contains a colon-separated list of the files that the configuration was loaded from.
 
 =cut
 
@@ -486,6 +521,67 @@ sub _load_driver
 	eval "require $driver";
 	$driver->import(@{$imports});
 	$self->{'loaded'}{$driver} = 1;
+}
+
+=head2 AUTOLOAD
+
+This module supports dynamic access to configuration keys via AUTOLOAD.
+Nested keys are accessible using the separator,
+so C<$config-E<gt>database_user()> resolves to C<< $config->{database}->{user} >>,
+when C<sep_char> is set to '_'.
+
+    $config = Config::Abstraction->new(
+        data => {
+            database => {
+                user => 'alice',
+                pass => 'secret'
+            },
+            log_level => 'debug'
+        },
+        flatten   => 1,
+        sep_char  => '_'
+    );
+
+    my $user = $config->database_user();  # returns 'alice'
+
+    # or
+    $user = $config->database()->{'user'};  # returns 'alice'
+
+    # Attempting to call a nonexistent key
+    my $foo = $config->nonexistent_key();	# dies with error
+
+=cut
+
+sub AUTOLOAD
+{
+	our $AUTOLOAD;
+
+	my $self = shift;
+	my $key = $AUTOLOAD;
+
+	$key =~ s/.*:://;	# remove package name
+	return if $key eq 'DESTROY';
+
+	my $data = $self->{data};
+
+	# If flattening is ON, assume keys are pre-flattened
+	if ($self->{flatten}) {
+		return $data->{$key} if exists $data->{$key};
+	}
+
+	my $sep = $self->{'sep_char'};
+
+	# Fallback: try resolving nested structure dynamically
+	my @parts = split /\Q$sep\E/, $key;
+	my $val = $data;
+	for my $part (@parts) {
+		if (ref $val eq 'HASH' && exists $val->{$part}) {
+			$val = $val->{$part};
+		} else {
+			croak "No such config key '$key'";
+		}
+	}
+	return $val;
 }
 
 1;

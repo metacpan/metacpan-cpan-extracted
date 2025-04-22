@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -18,8 +18,9 @@ use Scalar::Util qw(weaken);
 
 =head1 NAME
 
-PDF::Builder::Resource::XObject::Image::PNG - support routines for PNG image 
-library (using pure Perl code). 
+PDF::Builder::Resource::XObject::Image::PNG - Support routines for PNG image 
+library (using pure Perl code)
+
 Inherits from L<PDF::Builder::Resource::XObject::Image>
 
 =head1 METHODS

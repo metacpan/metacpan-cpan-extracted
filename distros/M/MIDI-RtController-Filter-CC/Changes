@@ -1,5 +1,25 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0911 2025-04-22 12:17:51
+  - Correct documentation.
+
+0.0910 2025-04-22 12:06:10
+  - Turn off halt when halting.
+
+0.0909 2025-04-22 12:00:21
+  - Add the halt attribute to halt running filters.
+
+0.0908 2025-04-19 07:52:12
+  - Improve documentation.
+
+0.0907 2025-04-19 00:23:42
+  - Remove cruft, enhance, and fix the eg/* programs.
+  - Improve documentation.
+
+0.0906 2025-04-18 15:07:11
+  - Make add_filters() skip unknown filters.
+  - Actually use the Maybe type!
+
 0.0904 2025-04-16 10:46:18
   - Fix the eg/continuous.pl program.
 

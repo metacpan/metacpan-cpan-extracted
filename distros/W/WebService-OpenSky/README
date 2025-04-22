@@ -2,7 +2,7 @@ NAME
     WebService::OpenSky - Perl interface to the OpenSky Network API
 
 VERSION
-    version 0.4
+    version 0.5
 
 SYNOPSIS
         use WebService::OpenSky;
@@ -261,7 +261,7 @@ METHODS
 
     If you have not yet made a request, this method will return "undef".
 
-  "delay_remaining($method)"
+  delay_remaining($method)
             my $delay = $api->delay_remaining('get_states');
 
     When you call either "get_states" or "get_my_states", the your calls

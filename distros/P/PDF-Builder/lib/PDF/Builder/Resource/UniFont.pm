@@ -3,8 +3,8 @@ package PDF::Builder::Resource::UniFont;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -17,7 +17,7 @@ PDF::Builder::Resource::UniFont - Unicode Font Support
 
 =head2 new
 
-    $font = PDF::Builder::Resource::UniFont->new($pdf, @fontspecs, %options)
+    $font = PDF::Builder::Resource::UniFont->new($pdf, @fontspecs, %opts)
 
 =over
 
@@ -48,10 +48,16 @@ B<CODESPECS:>
 B<NOTE:> if you want to register a font for the entire unicode space
 (ie. U+0000 .. U+FFFF), then simply specify a font-object without the hash-ref.
 
-Valid %options are:
+=back
 
-  'encode' ... changes the encoding of the font from its default.
-    (see "perldoc Encode" for a list of valid tags)
+=head3 Valid options (%opts)
+
+=over
+
+=item encode
+
+Changes the encoding of the font from its default.
+See "perldoc Encode" for a list of valid tags.
 
 =back
 

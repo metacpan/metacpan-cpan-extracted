@@ -4,10 +4,12 @@ author:
   - 'Dragos Trif <drd.trif@gmail.com>'
 build_requires:
   DBD::SQLite: '1.74'
+  DBD::mysql: '5.012'
   DBI: '1.643'
   Exporter::NoWork: '0.03'
   ExtUtils::MakeMaker: 6.36
   Rose::DB: '0.786'
+  Rose::DB::MySQL: '0.774'
   Rose::DB::Object: '0.822'
   Rose::DB::Object::Loader: '0.799'
   Rose::DB::Object::Manager: '0.813'
@@ -44,4 +46,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DragosTrif/DBD-Fixtures
-version: 0.07
+version: 0.09

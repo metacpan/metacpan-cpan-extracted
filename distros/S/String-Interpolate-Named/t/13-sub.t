@@ -17,6 +17,7 @@ my $args = { title     => "Hi There!",
 	     key	      => [ "G" ],
 	     h	      => [ "Z" ],
 	     head      => [ "yes" ],
+	     customer  => [ "Smith", "Jones" ],
 	   };
 
 # Using callback.

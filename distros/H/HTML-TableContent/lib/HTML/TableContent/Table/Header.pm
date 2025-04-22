@@ -3,7 +3,7 @@ package HTML::TableContent::Table::Header;
 use Moo;
 use HTML::TableContent::Table::Row::Cell;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 extends 'HTML::TableContent::Element';
 
@@ -51,7 +51,7 @@ HTML::TableContent::Table::Header - base class for table headers.
 
 =head1 VERSION
 
-Version 1.00 
+Version 1.01 
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ L<HTML::TableContent::Table::Row::Cell>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016->2020 LNATION.
+Copyright 2016->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -3,6 +3,9 @@
 use v5.14;
 use warnings;
 
-use Test::More tests => 1;
+use Test2::V0;
 
-use_ok( "IO::Async::Loop::Epoll" );
+require IO::Async::Loop::Epoll;
+
+pass( 'Modules loaded' );
+done_testing;

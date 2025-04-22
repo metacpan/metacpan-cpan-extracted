@@ -4,7 +4,7 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -44,7 +44,7 @@
    "provides" : {
       "Moonshine::Template" : {
          "file" : "lib/Moonshine/Template.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Template"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

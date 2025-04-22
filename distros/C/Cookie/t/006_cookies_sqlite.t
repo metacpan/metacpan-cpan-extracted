@@ -134,7 +134,7 @@ SKIP:
     if( $db->exists )
     {
         diag( "Removing temporary SQLite database file ${db}" ) if( $DEBUG );
-        $db->remove;
+        # $db->remove;
     }
 };
 

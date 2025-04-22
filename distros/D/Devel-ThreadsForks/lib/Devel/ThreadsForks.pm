@@ -1,7 +1,7 @@
 package Devel::ThreadsForks;
 
 # set version information
-$VERSION= '0.08';
+$VERSION= '0.09';
 
 # make sure we do everything by the book from now on
 use strict;
@@ -147,7 +147,7 @@ Devel::ThreadsForks - check for availability of threads or forks
 
 =head1 VERSION
 
-This documentation describes version 0.08.
+This documentation describes version 0.09.
 
 =head1 SYNOPSIS
 

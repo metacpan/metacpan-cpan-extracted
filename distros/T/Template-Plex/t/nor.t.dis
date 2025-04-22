@@ -1,0 +1,13 @@
+use Template::Plex;
+use Test::More;
+
+# From v0.8.0 the nor option allows masking out if a tempalte has already been loaded/rendered/cached
+my $template1='$a $fields{a}';
+my $t=[$template1];
+my $res1=Template::Plex->immediate("", $t, {a=>12}, nor =>1);
+my $res2=Template::Plex->immediate("", $t, {a=>22}, nor =>1);
+
+ok $res1 eq "12 12", "Result was exclusive";
+ok $res2 eq "", "Result was not exclusive";
+done_testing;
+

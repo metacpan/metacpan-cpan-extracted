@@ -1,5 +1,5 @@
 package String::Lookup;
-$VERSION= 0.14;
+$VERSION= 0.15;
 
 # what runtime features we need
 use 5.014;
@@ -48,7 +48,7 @@ String::Lookup - convert strings to ID's authoritatively and vice-versa
 
 =head1 VERSION
 
-This documentation describes version 0.14.
+This documentation describes version 0.15.
 
 =head1 DESCRIPTION
 
@@ -391,12 +391,12 @@ later point in time.  Patches welcome!
 
  Elizabeth Mattijsen
 
-maintained by LNATION, <thisusedtobeanemail@gmail.com>
+maintained by LNATION, <email@lnation.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>, 2019 LNATION <thisusedtobeanemail@gmail.com>.  All rights reserved.
-This program is free software; you can redistribute it and/or modify it under
+Copyright (c) 2012 Elizabeth Mattijsen <liz@dijkmat.nl>, 2019, 2025LNATION <email@lnation.org>. 
+All rights reserved. This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut

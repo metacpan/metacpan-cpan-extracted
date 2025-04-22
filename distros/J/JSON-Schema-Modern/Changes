@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Modern
 
+0.609     2025-04-20 23:40:09Z
+          - validate_schema() (and the json-schema-eval --validate-schema
+            option) now detect more errors
+
 0.608     2025-04-11 20:57:16Z
           - documentation now makes a note of the special licence for JSON
             Schema schema files

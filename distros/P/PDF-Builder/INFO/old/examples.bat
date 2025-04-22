@@ -32,14 +32,19 @@ perl examples\031_color_hsv
 perl examples\032_separation
 perl examples\040_annotation
 perl examples\041_annot_fileattach
+perl examples\042_links
 perl examples\050_pagelabels
 perl examples\055_outlines
 perl examples\060_transparency
 perl examples\BarCode.pl
 perl examples\Boxes.pl
 perl examples\Bspline.pl
+perl examples\Column.pl
+perl examples\Column_lists.pl
+REM perl examples\Column_layouts.pl
 perl examples\Content.pl
 perl examples\ContentText.pl
+perl examples\FontManager.pl
 REM disable next line if HarfBuzz::Shaper is not installed, 
 REM and you will need to update font file paths
 perl examples\HarfBuzz.pl

@@ -3,8 +3,8 @@ package PDF::Builder::Util;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 # note: $a and $b are "Magic variables" according to perlcritic, and so it
 # has conniptions over using them as variable names (even with "my"). so, I
@@ -64,7 +64,7 @@ BEGIN {
 
 =head1 NAME
 
-PDF::Builder::Util - utility package for often-used methods across the package.
+PDF::Builder::Util - Utility package for often-used methods across the package
 
 =cut
 

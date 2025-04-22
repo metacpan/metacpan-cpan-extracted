@@ -13,13 +13,13 @@ use List::Util 'none';
 use List::MoreUtils 'pairwise';
 use Markdown::Perl::BlockParser;
 use Markdown::Perl::Inlines;
-use Markdown::Perl::HTML 'html_escape', 'decode_entities';
+use Markdown::Perl::HTML 'html_escape', 'decode_entities', 'parse_attributes';
 use Readonly;
 use Scalar::Util 'blessed';
 
 use parent 'Markdown::Perl::Options';
 
-our $VERSION = '1.10';  # Remember to also set the App::pmarkdown version.
+our $VERSION = '1.11';
 
 our @EXPORT_OK = qw(convert set_options set_mode set_hooks);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -207,6 +207,24 @@ sub _emit_html {  ## no critic (ProhibitExcessComplexity)
         $out .= '</tbody>';
       }
       $out .= '</table>';
+    } elsif ($bl->{type} eq 'directive') {
+      my $c = $this->_emit_html(0, 'directive', $linkrefs, @{$bl->{content}});
+      my %attr = parse_attributes($bl->{attributes}) if defined $bl->{attributes};  ## no critic (ProhibitConditionalDeclaration)
+      my @attr = ('div');
+      push @attr, 'id="'.$attr{id}.'"' if exists $attr{id};
+      unshift @{$attr{class}}, lc($bl->{name}) if defined $bl->{name};
+      push @attr, 'class="'.join(' ', @{$attr{class}}).'"' if exists $attr{class};
+      push @attr, map { sprintf 'data-%s="%s"', @{$_} } @{$attr{keys}} if exists $attr{keys};
+      my $tag = join(' ', @attr);
+      # TODO: the inline content is ignored for now
+      # TODO we should add a hook to process the directive in custom cases.
+      $out .= "<${tag}>\n${c}</div>\n";
+      if (defined $bl->{inline} && $this->get_warn_for_unused_input()) {
+        carp 'Unused inline content in a directive block: '.$bl->{inline};
+      }
+      if (defined $attr{junk} && $this->get_warn_for_unused_input()) {
+        carp 'Unused attribute content in a directive block: '.$attr{junk};
+      }
     } else {
       confess 'Unexpected block type when rendering HTML output: '.$bl->{type};
     }

@@ -22,7 +22,7 @@ is($width, '50.016', 'Advance Width Check');
 $text->charspace(2);
 is($text->charspace(), 2, 'Charspace is set');
 $width = $text->advancewidth('Test Text');
-is($width, '66.016', 'Advance width check with charspace added');
+is($width, '68.016', 'Advance width check with charspace added');
 
 $width = $text->advancewidth('Test Text', charspace => 0);
 is($width, '50.016', 'Advance width check with charspace 2 overridden to 0');
@@ -30,10 +30,10 @@ is($width, '50.016', 'Advance width check with charspace 2 overridden to 0');
 $text->wordspace(4);
 is($text->wordspace(), 4, 'Wordspace is set');
 $width = $text->advancewidth('Test Text');
-is($width, '70.016', 'Advance width check with wordspace added');
+is($width, '72.016', 'Advance width check with wordspace added');
 
 $width = $text->advancewidth('Test Text', wordspace => 0);
-is($width, '66.016', 'Advance width check with wordspace 4 overridden to 0');
+is($width, '68.016', 'Advance width check with wordspace 4 overridden to 0');
 
 # Check for death if text() is called without font()
 $text = $page->text();

@@ -6,6 +6,7 @@ use IPC::Cmd qw(can_run run);
 use File::Spec;
 use File::Temp;
 use version;
+#use Test::More tests => 8;
 use Test::More tests => 19;
 #use Test::More tests => 25;   when TIFF changes in
 
@@ -153,7 +154,7 @@ $gsX = exclude_version($gs, '-v', 'Ghostscript ([0-9.]+)',
 
 # 9
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" $tiff_f");
@@ -181,7 +182,7 @@ is($example, $expected, 'alpha + flate') or show_diag();
 
 # 10
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -compress Group4 $tiff_f");
@@ -209,7 +210,7 @@ is($example, $expected, 'G4 (not converted to flate)') or show_diag();
 
 # 11
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -compress lzw $tiff_f");
@@ -234,7 +235,7 @@ is($example, $expected, 'single-strip lzw (not converted to flate) with GT') or 
 
 # 12
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 system("$convert -depth 1 -gravity center -pointsize 78 -size ${width}x${height} caption:\"A caption for the image\" -background white -alpha off -define tiff:rows-per-strip=50 -compress lzw $tiff_f");
@@ -254,12 +255,13 @@ $example = `$convert $pngout -depth 1 -alpha off txt:-`;
 $expected = `$convert $tiff_f -depth 1 -alpha off txt:-`;
 # ----------
 
+#print "for 12, example =\n$example\n expected =\n$expected\n";
 is($example, $expected, 'multi-strip lzw (not converted to flate) with GT') or show_diag();
 }
 
 # 13
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gsX and $has_GT;
 
 $width = 20;
@@ -286,7 +288,7 @@ is($example, $expected, 'lzw+horizontal predictor (not converted to flate) with 
 
 # 14
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 $width = 1000;
@@ -394,7 +396,7 @@ is($example, $expected, 'multi-strip lzw (not converted to flate) without GT') o
 
 # 18
 SKIP: {
-    skip "Either ImageMagick or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and $has_GT;
 
 # .png file is temporary file (output, input, erased)
@@ -414,7 +416,7 @@ pass 'successfully read TIFF with colormap';
 
 # 19
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 $width = 6;
@@ -480,7 +482,7 @@ is($example, $expected, "bilevel and alpha when width not a whole number of byte
 
 # 21
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 $width = 6;
@@ -506,7 +508,7 @@ is($example, $expected, 'multi-strip group 3 (not converted to flate) with GT');
 
 # 22
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 $width = 6;
@@ -532,7 +534,7 @@ is($example, $expected, 'multi-strip g4 (not converted to flate) with GT');
 
 # 23
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 $width = 6;
@@ -558,7 +560,7 @@ is($example, $expected, 'multi-strip g3 min-is-black (not converted to flate) wi
 
 # 24
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 $width = 6;
@@ -584,7 +586,7 @@ is($example, $expected, 'multi-strip g4 min-is-black (not converted to flate) wi
 
 # 25
 SKIP: {
-    skip "Either ImageMagick, Ghostscript or Graphics::TIFF not available.", 1 unless
+    skip "ImageMagick, Ghostscript, and/or Graphics::TIFF is not available.", 1 unless
         defined $convert and defined $gs and $has_GT;
 
 $width = 6;
@@ -665,6 +667,7 @@ sub exclude_version {
 }
 
 sub show_diag { 
+   #$failed = 0;
     $failed = 1;
     return;
 }

@@ -6,7 +6,7 @@ use WebService::OpenSky::Moose;
 use WebService::OpenSky::Core::Flight;
 extends 'WebService::OpenSky::Response';
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 method _create_response_objects() {
     return [ map { WebService::OpenSky::Core::Flight->new($_) } $self->raw_response->@* ];
@@ -28,7 +28,7 @@ WebService::OpenSky::Response::Flights - A class representing a flights response
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 DESCRIPTION
 

@@ -19,6 +19,7 @@ my @show_versions =
     String::Print
     Sys::Syslog
     Test::Pod
+	XML::LibXML
    /;
 
 #   Log::Report::Optional

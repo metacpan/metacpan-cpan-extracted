@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v2.1.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v2.2.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2024/04/29
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,10 +13,12 @@
 package Module::Generic::Array;
 BEGIN
 {
+    use v5.26.1;
     use common::sense;
     use warnings;
     use warnings::register;
     use vars qw( $DEBUG $ERROR $ERRORS $RETURN $TRUE $FALSE );
+    use Config;
     use List::Util ();
     use Scalar::Util ();
     use Want;
@@ -32,20 +34,35 @@ BEGIN
         fallback => 1,
     );
     use constant BREAK_LOOP => \"BREAK";
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    our( $ERRORS, $RETURN );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    
+        my %err :shared;
+        my %ret :shared;
+    
+        $ERRORS = \%err;
+        $RETURN = \%ret;
+    }
+    else
+    {
+        $ERRORS = {};
+        $RETURN = {};
+    }
     $DEBUG  = 0;
-    $ERRORS = {};
-    $RETURN = {};
-    our $VERSION = 'v2.1.0';
+    our $VERSION = 'v2.2.1';
 };
 
+use v5.26.1;
 use strict;
 no warnings 'redefine';
 require Module::Generic::Boolean;
-# require Module::Generic::Hash;
-# require Module::Generic::Iterator;
-# require Module::Generic::Null;
-# require Module::Generic::Number;
-# require Module::Generic::Scalar;
+
 {
     no strict 'refs';
     $TRUE  = ${"Module::Generic::Boolean::true"};
@@ -90,7 +107,14 @@ sub as_hash
             $offsets->[ $i ] += $start;
         }
     }
-    require Module::Generic::Hash;
+    
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Hash;
+        $loaded = 1;
+    }
     # Since our array might contain reference, we instantiate first our special hash object, and then we add into it our elements
     # Module::Generic::Hash, that uses Module::Generic::TieHash, knows how to handle keys as reference
     my $ref = Module::Generic::Hash->new;
@@ -306,7 +330,17 @@ sub error
             # We have to die, because we have an error within another error
             die( "${class}\::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
         }
-        $o = $ERRORS->{ $addr } = $ERROR = $ex_class->new( $args );
+
+        $o = $ex_class->new( $args );
+        if( HAS_THREADS && is_shared( $ERRORS ) )
+        {
+            lock( $ERRORS );
+            $ERRORS->{ $addr } = $ERROR = $o;
+        }
+        else
+        {
+            $ERRORS->{ $addr } = $ERROR = $o;
+        }
         local $@;
         eval
         {
@@ -330,7 +364,13 @@ sub error
 
         if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
-            require Module::Generic::Null;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Null;
+                $loaded = 1;
+            }
             my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, has_error => 1 });
             rreturn( $null );
         }
@@ -338,7 +378,13 @@ sub error
     }
     if( !$ERRORS->{ $addr } && want( 'OBJECT' ) )
     {
-        require Module::Generic::Null;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Null;
+            $loaded = 1;
+        }
         my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, wants => 'object' });
         rreturn( $null );
     }
@@ -483,7 +529,13 @@ sub get
     # offset may be out of bound, which will lead Module::Generic::Scalar to hold an undefined value or the offset exists but contains an undef value which will lead to the same
     if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || ( Scalar::Util::reftype( $self->[ $offset ] ) // '' ) eq 'SCALAR' ) )
     {
-        require Module::Generic::Scalar;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Scalar;
+            $loaded = 1;
+        }
         rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
     }
     # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
@@ -501,7 +553,13 @@ sub get_null
     {
         if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || ( Scalar::Util::reftype( $self->[ $offset ] ) // '' ) eq 'SCALAR' ) )
         {
-            require Module::Generic::Scalar;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Scalar;
+                $loaded = 1;
+            }
             rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
         }
         # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
@@ -514,7 +572,13 @@ sub get_null
     {
         if( Want::want( 'OBJECT' ) )
         {
-            require Module::Generic::Null;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Null;
+                $loaded = 1;
+            }
             rreturn( Module::Generic::Null->new( wants => 'object' ) );
         }
         CORE::return( $self->[ $offset ] );
@@ -558,7 +622,13 @@ sub index
     my $pos  = CORE::int( CORE::shift( @_ ) );
     if( want( 'OBJECT' ) && ( !ref( $self->[ $pos ] ) || ( Scalar::Util::reftype( $self->[ $pos ] ) // '' ) eq 'SCALAR' ) )
     {
-        require Module::Generic::Scalar;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Scalar;
+            $loaded = 1;
+        }
         rreturn( Module::Generic::Scalar->new( $self->[ $pos ] ) );
     }
     else
@@ -581,7 +651,13 @@ sub is_empty { CORE::return( CORE::scalar( @{$_[0]} ) ? $FALSE : $TRUE ) }
 # sub iterator { CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) ); }
 sub iterator
 {
-    require Module::Generic::Iterator;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Iterator;
+        $loaded = 1;
+    }
     CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) );
 }
 
@@ -626,7 +702,13 @@ sub map
 sub max
 {
     my $self = CORE::shift( @_ );
-    require Module::Generic::Scalar;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Scalar;
+        $loaded = 1;
+    }
     return( Module::Generic::Scalar->new( List::Util::max( @$self ) ) );
 }
 
@@ -649,7 +731,13 @@ sub merge
 sub min
 {
     my $self = CORE::shift( @_ );
-    require Module::Generic::Scalar;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Scalar;
+        $loaded = 1;
+    }
     return( Module::Generic::Scalar->new( List::Util::min( @$self ) ) );
 }
 
@@ -694,7 +782,13 @@ sub pop
     my $self = CORE::shift( @_ );
     if( Want::want( 'OBJECT' ) && ( !ref( $self->[-1] ) || ( Scalar::Util::reftype( $self->[-1] ) // '' ) eq 'SCALAR' ) )
     {
-        require Module::Generic::Scalar;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Scalar;
+            $loaded = 1;
+        }
         rreturn( Module::Generic::Scalar->new( CORE::pop( @$self ) ) );
     }
     else
@@ -836,7 +930,15 @@ sub return
     my $id   = Scalar::Util::refaddr( $self );
     if( @_ )
     {
-        $RETURN->{ $id } = \( CORE::shift( @_ ) );
+        if( HAS_THREADS )
+        {
+            lock( $RETURN );
+            $RETURN->{ $id } = \( CORE::shift( @_ ) );
+        }
+        else
+        {
+            $RETURN->{ $id } = \( CORE::shift( @_ ) );
+        }
         CORE::return( '' ) if( !CORE::defined( ${$RETURN->{ $id }} ) );
     }
     CORE::return( $RETURN->{ $id } );
@@ -882,7 +984,13 @@ sub shift
     my $self = CORE::shift( @_ );
     if( Want::want( 'OBJECT' ) && ( !ref( $self->[0] ) || ( Scalar::Util::reftype( $self->[0] ) // '' ) eq 'SCALAR' ) )
     {
-        require Module::Generic::Scalar;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Scalar;
+            $loaded = 1;
+        }
         rreturn( Module::Generic::Scalar->new( CORE::shift( @$self ) ) );
     }
     else
@@ -1042,7 +1150,13 @@ sub _number
     my $num = CORE::shift( @_ );
     CORE::return if( !defined( $num ) );
     CORE::return( $num ) if( !CORE::length( $num ) );
-    require Module::Generic::Number;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Number;
+        $loaded = 1;
+    }
     CORE::return( Module::Generic::Number->new( $num ) );
 }
 
@@ -1076,7 +1190,13 @@ sub _scalar
     my $str  = CORE::shift( @_ );
     CORE::return if( !defined( $str ) );
     # Whether empty or not, return an object
-    require Module::Generic::Scalar;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Scalar;
+        $loaded = 1;
+    }
     CORE::return( Module::Generic::Scalar->new( $str ) );
 }
 
@@ -1089,6 +1209,18 @@ sub DESTROY
     my $id = Scalar::Util::refaddr( $self );
     CORE::delete( $ERRORS->{ $id } );
     CORE:delete( $RETURN->{ $id } );
+    if( HAS_THREADS && is_shared( $ERRORS ) )
+    {
+        lock( $ERRORS );
+        lock( $RETURN );
+        CORE::delete( $ERRORS->{ $id } );
+        CORE:delete( $RETURN->{ $id } );
+    }
+    else
+    {
+        CORE::delete( $ERRORS->{ $id } );
+        CORE:delete( $RETURN->{ $id } );
+    }
     return( $self );
 }
 

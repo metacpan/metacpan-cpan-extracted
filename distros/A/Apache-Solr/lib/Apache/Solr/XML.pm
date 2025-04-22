@@ -1,4 +1,4 @@
-# Copyrights 2012-2022 by [Mark Overmeer].
+# Copyrights 2012-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Apache::Solr::XML;
-use vars '$VERSION';
-$VERSION = '1.09';
+package Apache::Solr::XML;{
+our $VERSION = '1.10';
+}
 
 use base 'Apache::Solr';
 
@@ -61,8 +61,7 @@ sub _select($$)
     unshift @params, wt => 'xml' unless $params{wt};
 
     my $endpoint = $self->endpoint('select', params => \@params);
-    my $result   = Apache::Solr::Result->new(%$args,
-        params => \@params , endpoint => $endpoint, core => $self);
+    my $result   = Apache::Solr::Result->new(%$args, params => \@params, endpoint => $endpoint, core => $self);
     $self->request($endpoint, $result);
     $result;
 }
@@ -71,8 +70,7 @@ sub _extract($$$)
 {   my ($self, $params, $data, $ct) = @_;
     my @params   = (wt => 'xml', @$params);
     my $endpoint = $self->endpoint('update/extract', params => \@params);
-    my $result   = Apache::Solr::Result->new(params => \@params
-      , endpoint => $endpoint, core => $self);
+    my $result   = Apache::Solr::Result->new(params => \@params, endpoint => $endpoint, core => $self);
     $self->request($endpoint, $result, $data, $ct);
     $result;
 }
@@ -93,8 +91,7 @@ sub _add($$$)
 
     my @params   = (wt => 'xml', %$params);
     my $endpoint = $self->endpoint('update', params => \@params);
-    my $result   = Apache::Solr::Result->new(params => \@params
-      , endpoint => $endpoint, core => $self);
+    my $result   = Apache::Solr::Result->new(params => \@params, endpoint => $endpoint, core => $self);
     $self->request($endpoint, $result, $doc);
     $result;
 }
@@ -133,16 +130,14 @@ sub _terms($)
 
     my @params   = (wt => 'xml', @$terms);
     my $endpoint = $self->endpoint('terms', params => \@params);
-    my $result   = Apache::Solr::Result->new(params => \@params
-      , endpoint => $endpoint, core => $self);
+    my $result   = Apache::Solr::Result->new(params => \@params, endpoint => $endpoint, core => $self);
 
     $self->request($endpoint, $result);
 
     my $table = $result->decoded->{terms} || {};
     while(my ($field, $terms) = each %$table)
-    {   my @terms = map [ $_ => $terms->{$_} ]
-          , sort {$terms->{$b} <=> $terms->{$a}}
-              keys %$terms;
+    {   my @terms = map [ $_ => $terms->{$_} ],
+            sort {$terms->{$b} <=> $terms->{$a}} keys %$terms;
         $result->terms($field => \@terms);
     }
 
@@ -203,10 +198,11 @@ sub _cleanup_parsed($)
         foreach my $type (qw/int long float double bool date str text/)
         {   my $items = delete $d{$type} or next;
             foreach (ref $items eq 'ARRAY' ? @$items : $items)
-            {   my ($name, $value)
-                    = ref $_ eq 'HASH' ? ($_->{name}, $_->{_}) : ('', $_);
+            {   my ($name, $value) = ref $_ eq 'HASH' ? ($_->{name}, $_->{_}) : ('', $_);
+
                 $value = $value eq 'true' || $_->{_} eq 1
                     if $type eq 'bool';
+
                 $d{$name} = $value;
             }
         }
@@ -231,9 +227,7 @@ sub simpleUpdate($$;$)
     $attrs     ||= {};
     my @params   = (wt => 'xml', commit => delete $attrs->{commit});
     my $endpoint = $self->endpoint('update', params => \@params);
-    my $result   = Apache::Solr::Result->new(params => \@params
-      , endpoint => $endpoint, core => $self);
-
+    my $result   = Apache::Solr::Result->new(params => \@params, endpoint => $endpoint, core => $self);
     my $doc      = $self->simpleDocument($command, $attrs, $content);
     $self->request($endpoint, $result, $doc);
     $result;

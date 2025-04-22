@@ -1,5 +1,5 @@
 package Struct::Match;
-use 5.006; use strict; use warnings; no warnings qw(void); use utf8; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; no warnings qw(void); use utf8; our $VERSION = '1.01';
 use Combine::Keys qw/combine_keys/;
 use base 'Import::Export';
 our %STRUCT;
@@ -72,7 +72,7 @@ Struct::Match - Exact Match (SCALAR|HASH|ARRAY)'s.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -134,14 +134,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Struct-Match>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Struct-Match>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Struct-Match>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Struct-Match/>
@@ -152,7 +144,7 @@ L<http://search.cpan.org/dist/Struct-Match/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018->2021 LNATION.
+Copyright 2018->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

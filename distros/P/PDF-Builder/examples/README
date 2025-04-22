@@ -21,11 +21,11 @@ tested against 3.003 April 2017
 tested against 3.004 July 2017
 tested with each release thereafter
 
-=========== broken:
+=========== known to be broken:
 
 =========== possibly OK:
 
-BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
+ BarCode.pl      Demonstrate the bar code library, 1 page (11 one-dimensional
                  barcodes). It appears to mostly be there, but some heavy bars 
                  seem to be merging into their neighbors, AT LEAST ON LOW-TO-
                  MEDIUM RESOLUTION screens, and there may be other problems. On 
@@ -150,29 +150,39 @@ BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
 
 =========== other example material:
 
-Bspline.pl       show off splines which connect all given points.
+ Boxes.pl        demonstrates PDF "boxes" (mediabox, etc.).
 
-Content.pl       demonstrate Content.pm graphics and text calls, 5 pages.
+ Bspline.pl      show off splines which connect all given points.
 
-ContentText.pl   demonstrate Content-related text call, 10 pages.
+ Column.pl       demonstrate column() markup capability (Content::Text)
 
-RMtutorial.pl    Rich Measham's basic tutorial on using PDF::API2, updated
-                 for PDF::Builder.
+ Column_lists.pl demonstrate column() for various lists
 
-HarfBuzz.pl      show use with HarfBuzz::Shaper to shape complex scripts as
-                 well as ligatures and kerning in Latin fonts.
+ Content.pl      demonstrate Content.pm graphics and text calls, 5 pages.
 
-Rotated.pl       demonstrates how to rotate selected pages
+ ContentText.pl  demonstrate Content-related text call, 10 pages.
 
-Boxes.pl         demonstrates PDF "boxes".
-
-ShowFont.pl      list glyphs in a font. output varies by font, encoding(s),
-                 and font type.
-
-FontManager.pl   show the usage of the Font Manager, with some sample PDF
+ FontManager.pl  show the usage of the Font Manager, with some sample PDF
                  output.
 
-Windows/
+ HarfBuzz.pl     show use with HarfBuzz::Shaper to shape complex scripts as
+                 well as ligatures and kerning in Latin fonts.
+
+ RMtutorial.pl   Rich Measham's basic tutorial on using PDF::API2, updated
+                 for PDF::Builder.
+
+ Rotated.pl      demonstrates how to rotate selected pages
+
+ ShowFont.pl     list glyphs in a font. output varies by font, encoding(s),
+                 and font type.
+
+ SVG.pl          5 examples of SVG graphics output as PDF
+
+=========== not currently "live" (removed or TBD):
+
+ Column_layouts.pl   demonstrate column() with various column shapes
+
+ Windows/
   027_winfont  demo Windows registry access
   Win32.pm     glue routine (lib/PDF/Builder/Win32.pm) only used in 027_winfont.
                The Windows routines have been broken at least since Windows 7,

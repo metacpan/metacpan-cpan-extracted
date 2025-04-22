@@ -1,20 +1,28 @@
 Revision history for Proc-Forkmap
 
-0.1     2019-10-12
-        Fixed autoflush
+0.2305  2025-04
+        let File::Temp decide default temp directory.
 
-0.2     2019-10-12
-        New flag to set conditional blocking
-
-0.2005  2019-10-14
-        New functional interface
-
-0.2007  2019-10-16
-        Timeouts
-
-0.2100  2024-12-23
-        field name changes
+0.2304  2025-04
+        refactored. tempfiles. removed exported variables.
+        now update settings with forkmap_settings.
 
 0.2200  2024-12-24
         refactored. removed object interface. simplified functional
         interface. now supports non-blocking IPC with scalar return values.
+
+0.2100  2024-12-23
+        field name changes
+
+0.2007  2019-10-16
+        Timeouts
+
+0.2005  2019-10-14
+        New functional interface
+
+0.2     2019-10-12
+        New flag to set conditional blocking
+
+0.1     2019-10-12
+        Fixed autoflush
+

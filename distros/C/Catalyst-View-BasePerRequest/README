@@ -1,9 +1,9 @@
 This archive contains the distribution Catalyst-View-BasePerRequest,
-version 0.012:
+version 0.013:
 
   Catalyst base view for per request, strongly typed templates
 
-This software is copyright (c) 2024 by John Napiorkowski.
+This software is copyright (c) 202 by John Napiorkowski.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

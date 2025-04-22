@@ -4,7 +4,7 @@ package WebService::OpenSky::Core::Waypoint;
 
 use WebService::OpenSky::Moose;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 my @PARAMS = qw(
   time
@@ -37,7 +37,7 @@ WebService::OpenSky::Core::Waypoint - Waypoint class
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 

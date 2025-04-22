@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.5.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.6.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/09/05
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,17 +13,27 @@
 package Module::Generic::DateTime;
 BEGIN
 {
+    use v5.26.1;
     use strict;
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $ERROR $TS_RE $VERSION $HAS_LOCAL_TZ );
+    use Config;
     use DateTime 1.57;
     use DateTime::Format::Strptime 1.79;
     use DateTime::TimeZone 2.51;
     # use Nice::Try dont_want => 1;
     use Regexp::Common;
     use Scalar::Util ();
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    }
     use overload (
         q{""}   => sub{ $_[0]->{dt}->stringify },
         bool    => sub{1},
@@ -58,7 +68,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.6.1';
 };
 
 BEGIN
@@ -198,6 +208,7 @@ BEGIN
     Module::Generic->_implement_freeze_thaw( qw( DateTime::TimeZone::UTC ) );
 };
 
+use v5.26.1;
 # use strict;
 no warnings 'redefine';
 
@@ -342,18 +353,38 @@ sub op
     {
         if( !defined( $HAS_LOCAL_TZ ) )
         {
-            # try-catch
-            local $@;
-            eval
+            if( HAS_THREADS )
             {
-                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
-                $HAS_LOCAL_TZ = 1;
-            };
-            if( $@ )
+                lock( $HAS_LOCAL_TZ );
+                # try-catch
+                local $@;
+                eval
+                {
+                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
+                    $HAS_LOCAL_TZ = 1;
+                };
+                if( $@ )
+                {
+                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+                    $HAS_LOCAL_TZ = 0;
+                }
+            }
+            else
             {
-                warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
-                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
-                $HAS_LOCAL_TZ = 0;
+                # try-catch
+                local $@;
+                eval
+                {
+                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
+                    $HAS_LOCAL_TZ = 1;
+                };
+                if( $@ )
+                {
+                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+                    $HAS_LOCAL_TZ = 0;
+                }
             }
         }
         else
@@ -485,18 +516,38 @@ sub op_minus_plus
             
             if( !defined( $HAS_LOCAL_TZ ) )
             {
-                # try-catch
-                local $@;
-                eval
+                if( HAS_THREADS )
                 {
-                    $clone->set_time_zone( 'local' );
-                    $HAS_LOCAL_TZ = 1;
-                };
-                if( $@ )
+                    lock( $HAS_LOCAL_TZ );
+                    # try-catch
+                    local $@;
+                    eval
+                    {
+                        $clone->set_time_zone( 'local' );
+                        $HAS_LOCAL_TZ = 1;
+                    };
+                    if( $@ )
+                    {
+                        $clone->set_time_zone( 'UTC' );
+                        $HAS_LOCAL_TZ = 0;
+                        warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
+                    }
+                }
+                else
                 {
-                    $clone->set_time_zone( 'UTC' );
-                    $HAS_LOCAL_TZ = 0;
-                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
+                    # try-catch
+                    local $@;
+                    eval
+                    {
+                        $clone->set_time_zone( 'local' );
+                        $HAS_LOCAL_TZ = 1;
+                    };
+                    if( $@ )
+                    {
+                        $clone->set_time_zone( 'UTC' );
+                        $HAS_LOCAL_TZ = 0;
+                        warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
+                    }
                 }
             }
             else
@@ -731,7 +782,6 @@ BEGIN
         fallback => 1,
     );
     use DateTime;
-    # use Nice::Try;
     use Scalar::Util ();
     use Want;
 };
@@ -1155,7 +1205,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.5.0
+    v0.6.1
 
 =head1 DESCRIPTION
 

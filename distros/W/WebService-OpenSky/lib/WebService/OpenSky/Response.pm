@@ -12,7 +12,7 @@ use WebService::OpenSky::Types qw(
   Route
 );
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 param raw_response => (
     isa     => ArrayRef | HashRef,
@@ -104,7 +104,7 @@ WebService::OpenSky::Response - A class representing a response from the OpenSky
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 DESCRIPTION
 

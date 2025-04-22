@@ -32,19 +32,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Proc::Fork" : "0.71",
             "Test::More" : 0
          }
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "homepage" : "https://github.com/trski/proc-forkmap",
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/trski/proc-forkmap.git",
-         "web" : "https://github.com/trski/proc-forkmap"
-      }
-   },
-   "version" : "0.2201"
+   "version" : "0.2305"
 }

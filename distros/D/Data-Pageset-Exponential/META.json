@@ -79,7 +79,7 @@
    "provides" : {
       "Data::Pageset::Exponential" : {
          "file" : "lib/Data/Pageset/Exponential.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       }
    },
    "release_status" : "stable",
@@ -93,7 +93,7 @@
          "web" : "https://github.com/robrwo/Data-Pageset-Exponential"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",

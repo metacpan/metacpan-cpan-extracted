@@ -20,13 +20,14 @@ use base 'PDF::Builder::Basic::PDF::String';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Name - Inherits from L<PDF::Builder::Basic::PDF::String>
-and stores PDF names (things beginning with /)
+PDF::Builder::Basic::PDF::Name - Stores PDF names (things beginning with /)
+
+Inherits from L<PDF::Builder::Basic::PDF::String>
 
 =head1 METHODS
 

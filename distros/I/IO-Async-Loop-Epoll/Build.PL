@@ -17,8 +17,8 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004',  # test_requires
    },
    test_requires => {
-      'Test::More' => 0,
-      'IO::Async::LoopTests' => '0.76',
+      'IO::Async::LoopTests' => '0.804',
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

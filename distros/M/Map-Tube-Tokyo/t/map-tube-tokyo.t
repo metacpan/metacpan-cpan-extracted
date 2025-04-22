@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+#use Carp::Always;
+#use open ':std', ':encoding(UTF-8)';
 
 my $min_ver = 0.35;
 eval "use Test::Map::Tube $min_ver tests => 4";

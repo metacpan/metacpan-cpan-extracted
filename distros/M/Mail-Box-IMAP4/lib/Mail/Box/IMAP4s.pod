@@ -94,6 +94,7 @@ Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
   server_name        Mail::Box::Net    undef
   server_port        Mail::Box::Net    993
   ssl                                  { SSL_verify_mode => SSL_VERIFY_NONE }
+  starttls                             false
   trace              Mail::Reporter    'WARNINGS'
   transporter        Mail::Box::IMAP4  Mail::Transport::IMAP4
   trusted            Mail::Box         <false>
@@ -166,6 +167,8 @@ Extends L<"Constructors" in Mail::Box::IMAP4|Mail::Box::IMAP4/"Constructors">.
 =item ssl => HASH|ARRAY
 
 Parameters to initialize the SSL connection.
+
+=item starttls => BOOLEAN
 
 =item trace => LEVEL
 
@@ -611,12 +614,12 @@ to copy one of these.  Copying will proceed for all other sub-folders.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.008,
-built on August 09, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box-IMAP4 distribution version 3.009,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2023 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

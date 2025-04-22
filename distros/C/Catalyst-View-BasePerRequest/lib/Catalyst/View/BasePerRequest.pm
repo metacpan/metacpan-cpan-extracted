@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Lifecycle::Request';
 
 use Moose;
@@ -168,8 +168,22 @@ sub respond {
   
     $r->content_type($self->content_type) if !$r->content_type && $self->has_content_type;
     $r->headers->push_header(@{$headers}) if $headers;
-    $r->body($self->get_rendered(@args));
+
+    # In some cases this can be an object, like a 'safe for HTML' string object.
+    # TODO: I suppose this breaks using a filehandle, but that's pretty uncommon
+    # and has little advantage with the current Catalyst.
+
+    my $response_body = $self->get_rendered(@args);
+    if( Scalar::Util::blessed($response_body) ) {
+      $response_body = $self->can('stringify_response_body')
+        ? $self->stringify_response_body($response_body)
+        : "${response_body}"; # assume they are using overloading.
+    }
+
+    # Set the response.
+    $r->body($response_body);
   }
+  
   return $self; # allow chaining
 }
 

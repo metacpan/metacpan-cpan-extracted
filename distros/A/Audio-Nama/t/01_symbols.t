@@ -5,13 +5,9 @@ use Audio::Nama::Globals qw($ui);
 use Audio::Nama::Log;
 Audio::Nama::Log::initialize_logger();
 
-is($ui, 'bullwinkle', 'global variable import');
-
 package Foo;
 
 use Audio::Nama::Globals qw(:all);
-
-main::is($ui, 'bullwinkle', 'global variable-all-tag import');
 
 package main;
 

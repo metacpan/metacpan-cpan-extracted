@@ -18,13 +18,13 @@ use URI::Escape;
 use Encode;
 use Scalar::Util qw(weaken);
 use List::Util qw(all);
-use UUID::Tiny ':std';
 use DateTime::Format::ISO8601;
+use Data::Identifier::Generate;
 
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 use parent 'Data::URIID::Base';
 
@@ -542,7 +542,7 @@ sub _own_well_known {
     );
 
     foreach my $id (keys %{$own_well_known{'wikidata-identifier'}}) {
-        my $uuid = create_uuid_as_string(UUID_SHA1, '9e10aca7-4a99-43ac-9368-6cbfa43636df', lc $id);
+        my $uuid = Data::Identifier->new(wd => $id)->uuid;
         $own_well_known{uuid}{$uuid} = $own_well_known{'wikidata-identifier'}{$id};
     }
 
@@ -614,7 +614,7 @@ sub _own_well_known {
     }
 
     foreach my $language (keys %{$own_well_known{'language-tag-identifier'}}) {
-        my $uuid = create_uuid_as_string(UUID_SHA1, '47dd950c-9089-4956-87c1-54c122533219', lc $language);
+        my $uuid = Data::Identifier::Generate->generic(namespace => '47dd950c-9089-4956-87c1-54c122533219', style => 'id-based', request => $language)->uuid;
         $own_well_known{uuid}{$uuid} = $own_well_known{'language-tag-identifier'}{$language};
     }
     # Mix and match entries by identifiers to speed up lookups.
@@ -1498,7 +1498,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 

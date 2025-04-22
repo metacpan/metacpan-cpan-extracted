@@ -24,7 +24,7 @@ use constant E_EXP_HASH_ARR_REF => 'Expected a reference to a HASH or ARRAY';
 
 BEGIN {
     @DBIx::Squirrel::ISA            = 'DBI';
-    $DBIx::Squirrel::VERSION        = '1.6.4';
+    $DBIx::Squirrel::VERSION        = '1.6.5';
     @DBIx::Squirrel::EXPORT_OK      = @DBI::EXPORT_OK;
     %DBIx::Squirrel::EXPORT_TAGS    = %DBI::EXPORT_TAGS;
     *DBIx::Squirrel::err            = *DBI::err;

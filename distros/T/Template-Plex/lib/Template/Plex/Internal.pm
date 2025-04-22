@@ -145,7 +145,7 @@ $out.='
 
 		my ($id, $path, $var, @opts)=@args;
 		#we want to cache based on the caller
-		$id=$path.join "", caller;
+		$id//=$path.join "", caller;
 		#unshift @_, $id;
 		$self->cache($id,$path, $var,@opts);
 	}
@@ -165,7 +165,7 @@ $out.='
     }
 		my ($id, $path, $var, @opts)=@args;
 		#we want to cache based on the caller
-		$id=$path.join "", caller;
+		$id//=$path.join "", caller;
 		my $template=$self->cache($id, $path,$var, @opts);
 		if($template){
 			return $template->render($var);
@@ -372,7 +372,22 @@ sub new{
 	# Perform superfluous EOL removal
   #
 	_block_fix($data) unless $options{no_block_fix};
-	_init_fix($data) unless $options{no_init_fix};
+  #use feature ":all";
+  #say STDERR  $options{file};
+  # Only do an init fix if the file has plex|plx in the name
+  # of if it is an array?
+  if($options{file}=~/\.plex|\.plx|^ARRAY/){
+    # Actually a template
+    #say STDERR "ACTUAL TEMPLATE $options{file}";
+	  _init_fix($data) unless $options{no_init_fix};
+  }
+  else {
+    #say STDERR "NOT ACUTALLY A TEMPLATE $options{file}";
+    # Assume a raw file..
+    # enode into hex
+    $data='@{[pack "H*","'. unpack("H*", $data).'"]}';
+  }
+
   _comment_strip($data) if $options{use_comments};
 
 	if($args){

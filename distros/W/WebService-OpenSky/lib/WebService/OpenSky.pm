@@ -30,7 +30,7 @@ use Mojo::URL;
 use Mojo::JSON qw( decode_json );
 use Type::Params -sigs;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 param config => (
     is      => 'ro',
@@ -119,8 +119,8 @@ signature_for get_states => (
                 lamax => Latitude,
                 lomax => Longitude,
             ],
-            { default => {} },
         ],
+        { default => {} },
         extended => Optional [Bool],
     ],
     named_to_list => 1,
@@ -388,7 +388,7 @@ WebService::OpenSky - Perl interface to the OpenSky Network API
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 

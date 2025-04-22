@@ -275,7 +275,7 @@ sub _count_matching_blocks {
   for my $i (0 .. $#{$this->{blocks_stack}}) {
     local *::_ = $lr;
     my $r = $this->{blocks_stack}[$i]{cond}();
-    $this->{matched_prefix_size} += $r if $r;
+    $this->{matched_prefix_size} += $r if defined $r && $r > 0;  # $r < 0 means match but no prefix.
     return $i unless $r;
   }
   return @{$this->{blocks_stack}};
@@ -295,6 +295,13 @@ my $list_item_re =
 my $supported_html_tags = join('|',
   qw(address article aside base basefont blockquote body caption center col colgroup dd details dialog dir div dl dt fieldset figcaption figure footer form frame frameset h1 h2 h3 h4 h5 h6 head header hr html iframe legend li link main menu menuitem nav noframes ol optgroup option p param search section summary table tbody td tfoot th thead title tr track ul)
 );
+
+my $directive_name_re = qr/(?<name> [-\w]+ )?/x;
+my $directive_content_re = qr/(?: \s* \[ (?<content> [^\]]+ ) \] )?/x;
+my $directive_attribute_re = qr/(?: \s* \{ (?<attributes> .* ) \} )?/x;
+my $directive_data_re = qr/${directive_name_re} ${directive_content_re} ${directive_attribute_re}/x;
+my $directive_block_re = qr/^\ {0,3} (?<marker> :{3,} ) \s* ${directive_data_re} \s* :* \s* $/x;
+
 # TODO: Share these regex with the Inlines.pm file that has a copy of them.
 my $html_tag_name_re = qr/[a-zA-Z][-a-zA-Z0-9]*/;
 my $html_attribute_name_re = qr/[a-zA-Z_:][-a-zA-Z0-9_.:]*/;
@@ -356,6 +363,7 @@ sub _parse_blocks {  ## no critic (RequireArgUnpacking)
       || _do_html_block($this)
       || _do_block_quotes($this)
       || _do_list_item($this)
+      || _do_directive_block($this)
       || _do_link_reference_definition($this)
       || ($this->get_use_table_blocks && _do_table_block($this))
       || _do_paragraph($this)
@@ -716,6 +724,34 @@ sub _do_list_item {
   $item->{loose} =
       $this->_list_match($item) && $this->{last_line_was_blank};
   $this->_enter_child_block($item, $cond, qr/ {0,${indent}}/, $forced_next_line);
+  return 1;
+}
+
+# https://talk.commonmark.org/t/generic-directives-plugins-syntax/444
+# See also https://github.com/mkende/pmarkdown/issues/5
+sub _do_directive_block {
+  my ($this) = @_;
+  return unless $this->get_use_directive_blocks();
+  # marker, name, content, attributes
+  return unless $l =~ /${directive_block_re}/;  # TODO: add an option to allow this block type.
+  my $lm = length($+{marker});
+  my $cond = sub {
+    if (m/^\ {0,3} :{$lm,} \s* $/x) {
+      $_ = '';
+      return 0;
+    }
+    return -1;
+  };
+  # At rendering time, a hook should be able to intercept the name and
+  # attributes of the directive to do fancy things with it.
+  $this->_enter_child_block({
+      type => 'directive',
+      name => $+{name},
+      inline => $+{content},
+      attributes => $+{attributes}
+    },
+    $cond,
+    qr/ {0,3}/);  # Unclear if we need the continuation prefix here.
   return 1;
 }
 

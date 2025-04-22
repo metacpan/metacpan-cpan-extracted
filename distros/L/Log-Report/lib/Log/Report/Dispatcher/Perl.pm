@@ -1,4 +1,4 @@
-# Copyrights 2007-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report::Dispatcher::Perl;
-use vars '$VERSION';
-$VERSION = '1.39';
+package Log::Report::Dispatcher::Perl;{
+our $VERSION = '1.40';
+}
 
 use base 'Log::Report::Dispatcher';
 

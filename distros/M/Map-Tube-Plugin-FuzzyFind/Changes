@@ -1,12 +1,17 @@
 Revision history for Map::Tube::Plugin::FuzzyFind
 
+0.81.2 2025-xx-xx   NOT YET RELEASED
+  - Reworked tests, removing dependency on Map::Tube::London.
+  - Fixed typos in documentation.
+  - Bumped Perl version to 5.12.0.
+
 0.81.1 2024-11-20
-  - Relaxed overy zealous tests.
+  - Relaxed overly zealous tests.
 
 0.81.0 2024-11-13
-  - Adapted for use with Map::Tube 3.77 and Map::Tube::London 1.39
-  - Bumped Perl version to 5.10.0
-  - Use semantic versioning
+  - Adapted for use with Map::Tube 3.77 and Map::Tube::London 1.39.
+  - Bumped Perl version to 5.10.0.
+  - Use semantic versioning.
   - Added algorithms Phonix, Phonem, Koeln Phonetics, DoubleMetaphone,
     Levenshtein-Damerau, Daitch-Mokotoff, Jaro-Winkler
   - BREAKING CHANGE: By default, limit Metaphone encoding to 4 characters
@@ -16,12 +21,12 @@ Revision history for Map::Tube::Plugin::FuzzyFind
     using exact matching).
 
 0.08 2015-03-25
-  - Upgraded test 07 to work properly with Map::Tube 2.93
+  - Upgraded test 07 to work properly with Map::Tube 2.93.
 
 0.07 2015-03-24
-  - Removed "internal use only" remark in POD left over from test version
-  - Adapted test 05 to changed diagnostics as of v0.06
-  - Upgraded test 07 to work properly with Map::Tube 2.92 and M::T::London 0.71
+  - Removed "internal use only" remark in POD left over from test version.
+  - Adapted test 05 to changed diagnostics as of v0.06.
+  - Upgraded test 07 to work properly with Map::Tube 2.92 and M::T::London 0.71.
     (Thanks to Slaven for pointing this one out!)
 
 0.06 2015-03-12
@@ -30,21 +35,21 @@ Revision history for Map::Tube::Plugin::FuzzyFind
     the why and how of this bug.)
 
 0.05 2015-03-10
-  - fixed MANIFEST.SKIP and tests to cope with ExtUtils::MakeMaker 7.05+
-    (thanks to Slaven's tireless research)
+  - Fixed MANIFEST.SKIP and tests to cope with ExtUtils::MakeMaker 7.05+
+    (thanks to Slaven's tireless research).
 
 0.04  2015-02-25
-  - added pod coverage test.
-  - reworked Makefile.PL (based on hints from Slaven)
+  - Added pod coverage test.
+  - Reworked Makefile.PL (based on hints from Slaven).
 
 0.03  2015-02-23
-  - rewrote tests to cope with missing optional modules. (Thanks Slaven!)
-  - added ngram fuzzy matching.
+  - Rewrote tests to cope with missing optional modules. (Thanks Slaven!)
+  - Added ngram fuzzy matching.
 
 0.02  2015-02-18
-  - tidied code as per perltidy and perlcritic.
-  - fixed file permissions in tar ball. (Thanks Slaven!)
-  - added Soundex and Metaphone fizzy matching.
+  - Tidied code as per perltidy and perlcritic.
+  - Fixed file permissions in tar ball. (Thanks Slaven!)
+  - Added Soundex and Metaphone fuzzy matching.
 
 0.01  2015-02-14
-  - first public release.
+  - First public release.

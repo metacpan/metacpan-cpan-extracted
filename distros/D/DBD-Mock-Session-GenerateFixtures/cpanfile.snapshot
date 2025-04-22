@@ -1886,6 +1886,33 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       perl 5.008
+  autodie-2.37
+    pathname: T/TO/TODDR/autodie-2.37.tar.gz
+    provides:
+      Fatal 2.37
+      autodie 2.37
+      autodie::Scope::Guard 2.37
+      autodie::Scope::GuardStack 2.37
+      autodie::Util 2.37
+      autodie::exception 2.37
+      autodie::exception::system 2.37
+      autodie::hints 2.37
+      autodie::skip 2.37
+    requirements:
+      B 0
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      Fcntl 0
+      POSIX 0
+      Scalar::Util 0
+      Tie::RefHash 0
+      constant 0
+      overload 0
+      parent 0
+      perl 5.008004
+      strict 0
+      warnings 0
   namespace-autoclean-0.31
     pathname: E/ET/ETHER/namespace-autoclean-0.31.tar.gz
     provides:

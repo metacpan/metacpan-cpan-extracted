@@ -18,7 +18,7 @@ $gfx->stroke();
 
 my $string = $pdf->to_string();
 
-like($string, qr{obj \[ /Indexed /DeviceRGB 255},
+like($string, qr{\[ /Indexed /DeviceRGB 255},
      q{ColorSpace is present});
 
 like($string, qr{CS 3 SC 72 144 m 288 144 l S},

@@ -2,7 +2,7 @@ package Cache::Memcached::Managed;
 
 # Make sure we have version info for this module
 
-$VERSION= '0.26';
+$VERSION= '0.27';
 
 # Make sure we're as strict as possible
 # With as much feedback that we can get
@@ -1641,7 +1641,7 @@ Cache::Memcached::Managed - provide API for managing cached information
 
 =head1 VERSION
 
-This documentation describes version 0.22.
+This documentation describes version 0.27.
 
 =head1 DIFFERENCES FROM THE Cache::Memcached API
 
@@ -2918,6 +2918,7 @@ CPAN, for which Elizabeth Mattijsen would like to express her gratitude.
 (C) 2005, 2006 BOOKINGS
 (C) 2007, 2008 BOOKING.COM
 (C) 2012 Elizabeth Mattijsen
+(C) 2025 LNATION
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

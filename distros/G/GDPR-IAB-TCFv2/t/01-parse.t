@@ -695,14 +695,14 @@ subtest "invalid tcf consent string candidates" => sub {
     throws_ok {
         GDPR::IAB::TCFv2->Parse('COvcSpYOvcSpYC9AAAENAPCAAAAAAAAAAAAAAFAAAAA')
     }
-    qr/index out of bounds on offset 256/,
+    qr/invalid consent data: no legitimate interest start position/,
       'this test uses a crafted consent uses bit field, declares 10 vendors and legitimate interest without required content';
 
     throws_ok {
         GDPR::IAB::TCFv2->Parse(
             'COvcSpYOvcSpYC9AAAENAPCAAAAAAAAAAAAAAFQBgAAgABAACAAEAAQAAgAA')
     }
-    qr/index out of bounds on offset 360: can't read 1, only has: 360/,
+    qr/invalid consent data: no legitimate interest start position/,
       'this test uses a crafted consent uses range section, declares 10 vendors, 6 exceptions and legitimate interest without require';
 
 

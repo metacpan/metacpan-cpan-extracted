@@ -2,6 +2,7 @@ requires 'perl', '5.014004';
 
 requires 'Scope::Upper';
 requires 'Sub::Util';
+requires 'Exporter::Tiny';
 
 on 'configure' => sub {
     requires 'Module::Build::Tiny', '0.035';

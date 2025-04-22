@@ -13,6 +13,7 @@ lib/Archive/SCS/HashFS2.pm
 lib/Archive/SCS/InMemory.pm
 lib/Archive/SCS/Mountable.pm
 lib/Archive/SCS/TObj.pm
+lib/Archive/SCS/Zip.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -20,9 +21,12 @@ README.md
 script/scs_archive
 t/00-compile.t
 t/01-cityhash.t
+t/14-dirindex.t
+t/35-archive.t
 t/40-hashfs-roundtrip.t
 t/50-hashfs2.t
 t/55-directory.t
+t/57-zipfile.t
 t/60-game-dir.t
 t/61-game-dir-mount.t
 t/70-cli.t

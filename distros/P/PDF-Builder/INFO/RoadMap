@@ -63,17 +63,17 @@ A. ## DONE ## release 3.018
      the "st" ligature in the same word does not present any problem.
 
 B. Unification of font support: including character set and encoding support
-   improvements [see CTS 16 and CTS 23] to make more commonality between using 
-   UTF-8 and single byte encodings, across all the font types (core, TrueType, 
-   Type1/PS, etc.). One problem with core fonts is, even though most core fonts 
-   are already TrueType, that only the Latin-1 glyph set has widths defined, 
-   and only single byte encodings are possible (similar for Type1/PS fonts). To 
-   support UTF-8 for core and PS, the font might have to be built on the fly 
-   for a page (like a synthetic font), with translations to single bytes for 
-   all glyphs. If the resulting font exceeds 256 characters, something would 
-   have to be done to split the page internally into two or more sections, 
-   each with their own embedded virtual font. Glyph widths would have to be 
-   available for all characters.
+   improvements [see CTS 16/#81 and RT 120048] to make more commonality between 
+   using UTF-8 and single byte encodings, across all the font types (core, 
+   TrueType, Type1/PS, etc.). One problem with core fonts is, even though most 
+   core fonts are already TrueType, that only the Latin-1 glyph set has widths 
+   defined, and only single byte encodings are possible (similar for Type1/PS 
+   fonts). To support UTF-8 for core and PS, the font might have to be built on 
+   the fly for a page (like a synthetic font), with translations to single 
+   bytes for all glyphs. If the resulting font exceeds 256 characters, 
+   something would have to be done to split the page internally into two or 
+   more sections, each with their own embedded virtual font. Glyph widths would 
+   have to be available for all characters.
 
    Add: start a subfont with the ASCII set and empty top 128. Add new chars
    to it (from x80 to xFF) as single byte glyphs (not matching any standard
@@ -91,11 +91,11 @@ D. PDF/A (archival document management, RT 120375): this might be more than
    achieve recognition as a proper archival format (and there are apparently 
    several archival formats).
 
-E. JPEG2000 image file support (CTS 12): I don't know if this is worth it, as
-   there seems to be very little use of this, but if someone is interested,
+E. JPEG2000 image file support (CTS 12/#97): I don't know if this is worth it, 
+   as there seems to be very little use of this, but if someone is interested,
    have at it...  any other newish image formats that PDF can support?
 
-F. Fix Bar Code generation (CTS 1): there seems to be something quite wrong
+F. Fix Bar Code generation (CTS 1/#48): there seems to be something quite wrong
    with the current bar code generation, so it's possible that no one is using
    it in real documents yet. It's also possible that I'm not writing my test
    cases properly -- does anyone know if they work? I suspect that the use of 
@@ -129,7 +129,7 @@ F. Fix Bar Code generation (CTS 1): there seems to be something quite wrong
    code2/ in use BarCodes statement, as most users will just want to import a
    very small subset of available codes.
 
-G. Fix Small Caps (and capitalization in general) for ligatures (CTS 13):
+G. Fix Small Caps (and capitalization in general) for ligatures (CTS 13/#79):
    some ligatures given in Unicode or single byte encodings don't get properly
    uppercased. The probable solution would be to decompose ligatures to their
    individual letters before capitalization or Small/Petite Caps (if an 
@@ -145,14 +145,14 @@ G. Fix Small Caps (and capitalization in general) for ligatures (CTS 13):
      HarfBuzz::Shaper to replace lowercase letter sequences with true ligatures
      on the fly.
 
-H. Fallback glyphs (CTS 5) when a desired glyph is not found in one font,
+H. Fallback glyphs (CTS 5/#56) when a desired glyph is not found in one font,
    but can be found in another. This is similar to HTML when you give a font
    family list in CSS. Pango might help with this.
 
    UPDATE: This is being considered for Text::Layout, but nothing scheduled yet.
 
-I. Support for tagged structure (CTS 17 and RT 120375). At least, don't corrupt
-   an existing tagged PDF file when extracting pages.
+I. Support for tagged structure (CTS 17/#76 and RT 120375). At the least, don't 
+   corrupt an existing tagged PDF file when extracting pages.
 
 J. Adding comment fields to any object (and possibly standalone comments as
    their own objects). An example would be an image object with a comment
@@ -278,11 +278,12 @@ into possibly a separate module (dependent on PDF::Builder). Some of these
 things are getting into the realm of support for markup languages and word
 processing.
 
-A. Hyphenation and paragraph shaping: including CTS 20 (Hyphenation) and CTS 24 
-   (pseudo page objects). The idea is to use Knuth et al.'s line-splitting and 
-   paragraph shaping algorithms to flow text into a space in a visually 
-   pleasing manner, while obeying widows and orphans constraints (as well as
-   not orphaning headings). Pango may help here with line and word splitting.
+A. Hyphenation and paragraph shaping: including CTS 20/#183 (Hyphenation) and 
+   CTS 24/#95 (pseudo page objects). The idea is to use Knuth et al.'s line-
+   splitting and paragraph shaping algorithms to flow text into a space in a 
+   visually pleasing manner, while obeying widows and orphans constraints (as 
+   well as not orphaning headings). Pango may help here with line and word 
+   splitting.
    ** Look into item P in section I **
    Text::KnuthPlass might be usable for general paragraph setup (allows non-
    rectangular paragaph), uses Text::Hyphen internally, don't know yet if it 
@@ -333,7 +334,7 @@ C. General text flowing capability, to fill irregularly shaped columns (such
      iterations to reshape a line if its height results in a shift of the
      baseline into a wider or narrower area.
 
-D. Font Families: per CTS 22, make it easier to deal with switching fonts
+D. Font Families: per CTS 22/#94, make it easier to deal with switching fonts
    and variations within a font (bold, italic, size, color, underline, small
    caps, etc.), possibly with HTML tags inlined. The idea would be to only have 
    to specify a typeface and initial size, and then switch in and out of 

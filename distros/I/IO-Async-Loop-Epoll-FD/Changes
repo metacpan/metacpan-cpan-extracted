@@ -1,5 +1,8 @@
 Revision history for IO-Async-Loop-Epoll-FD
 
+0.004     2025-04-22 21:34:16+02:00 Europe/Brussels
+          - Inherit fixed post_fork implementation
+
 0.003     2024-01-27 21:13:38+01:00 Europe/Brussels
           - Handle fake-events in post_fork
           - Add version dependencies on Linux::FD and Linux::FD::Pid

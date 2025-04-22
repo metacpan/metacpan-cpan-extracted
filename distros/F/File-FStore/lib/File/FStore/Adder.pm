@@ -15,7 +15,11 @@ use Carp;
 use File::Spec;
 use Data::Identifier;
 
-our $VERSION = v0.03;
+use File::FStore::File;
+
+use parent 'File::FStore::Base';
+
+our $VERSION = v0.04;
 
 
 sub link_in {
@@ -101,8 +105,8 @@ sub done {
 
     $self->set(\%data);
 
-    {
-        my $contentise = $self->{contentise} = Data::Identifier->new(ise => $data{properties}{contentise}) if defined $data{properties}{contentise};
+    if (defined $data{properties}{contentise}) {
+        my $contentise = $self->{contentise} = Data::Identifier->new(ise => $data{properties}{contentise});
         my @res = $self->store->query(properties => contentise => $contentise->uuid);
         if (scalar @res) {
             croak 'File already in store';
@@ -169,49 +173,6 @@ sub insert {
     return $file;
 }
 
-
-sub contentise {
-    my ($self, %opts) = @_;
-    my $as = delete($opts{as}) // 'uuid';
-
-    croak 'Stray options passed' if scalar keys %opts;
-    croak 'No contentise available (done yet?)' unless defined $self->{contentise};
-
-    return $self->{contentise}->as($as,
-        db => $self->db(default => undef),
-        extractor => $self->extractor(default => undef),
-    );
-}
-
-
-#@returns File::FStore
-sub store {
-    my ($self) = @_;
-    return $self->{store};
-}
-
-
-#@returns Data::TagDB
-sub db {
-    my ($self, %opts) = @_;
-    return $self->{db} //= $self->store->db(%opts);
-}
-
-
-#@returns Data::URIID
-sub extractor {
-    my ($self, %opts) = @_;
-    return $self->{extractor} if defined $self->{extractor};
-    return $opts{default} if exists $opts{default};
-    croak 'No extractor known';
-}
-
-
-sub fii {
-    my ($self) = @_;
-    return $self->{fii} //= $self->store->fii;
-}
-
 # ---- Private helpers ----
 sub DESTROY {
     my ($self) = @_;
@@ -276,7 +237,7 @@ File::FStore::Adder - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -292,6 +253,8 @@ version v0.03
     my File::FStore::File $file = $adder->insert;
 
 This package implements an Adder, a helper object that can be used to add files to the store.
+
+This package inherits from L<File::FStore::Base>.
 
 =head1 METHODS
 
@@ -380,45 +343,6 @@ the freshly inserted file.
 B<Note:>
 This adder is in undefined state after this call.
 The only save method to call after this is L</reset>.
-
-=head2 contentise
-
-    my $ise = $file->contentise;
-    # or:
-    my $ise = $file->contentise(as => ...);
-
-Returns the content based ISE (identifier) for the file.
-See L<File::FStore::File/contentise> for details.
-
-This value is only available once L</done> is called.
-
-=head2 store
-
-    my File::FStore $store = $file->store;
-
-Returns the store this file belongs to.
-
-=head2 db
-
-    my Data::TagDB $db = $file->db;
-    # or:
-    my Data::TagDB $db = $file->db(default => $def);
-
-Proxy for L<File::FStore/db>.
-
-=head2 extractor
-
-    my Data::URIID $extractor = $file->extractor;
-    # or:
-    my Data::URIID $extractor = $file->extractor(default => $def);
-
-Proxy for L<File::FStore/extractor>.
-
-=head2 fii
-
-    my File::Information $fii = $file->fii;
-
-Proxy for L<File::FStore/fii>.
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package MIME::Types;{
-our $VERSION = '2.27';
+our $VERSION = '2.28';
 }
 
 
@@ -94,7 +94,7 @@ sub type($)
     return $record if ref $record;   # already extended
 
     my $simple   = $2;
-    my ($type, $ext, $enc) = split m/\;/, $record;
+    my ($type, $ext, $enc, $char) = split m/\;/, $record;
     my $os       = undef;   # XXX TODO
 
     $section->{$simple} = MIME::Type->new
@@ -102,6 +102,7 @@ sub type($)
       , extensions => [split /\,/, $ext]
       , encoding   => $enc
       , system     => $os
+      , charset    => $char
       );
 }
 

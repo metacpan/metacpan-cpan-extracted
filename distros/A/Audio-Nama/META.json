@@ -67,7 +67,7 @@
    "provides" : {
       "Audio::Nama" : {
          "file" : "lib/Audio/Nama.pm",
-         "version" : "1.505"
+         "version" : "1.506"
       },
       "Audio::Nama::AnalyseLV2" : {
          "file" : "lib/Audio/Nama/AnalyseLV2.pm",
@@ -421,6 +421,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.505",
+   "version" : "1.506",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

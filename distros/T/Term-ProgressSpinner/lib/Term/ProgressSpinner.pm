@@ -1,5 +1,5 @@
 package Term::ProgressSpinner; 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use 5.006; use strict; use warnings;
 use IO::Handle; use Term::ANSIColor; use Time::HiRes qw//;
 use Term::Size::Any qw/chars/;
@@ -1013,7 +1013,7 @@ Term::ProgressSpinner - Terminal Progress bars!
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -2196,7 +2196,7 @@ The following are valid colours that can be specified for rendering the progress
 
 =head1 AUTHOR
 
-LNATION, C<< <thisusedtobeanemail at gmail.com> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -2210,7 +2210,6 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Term::ProgressSpinner
 
-
 You can also look for information at:
 
 =over 4
@@ -2218,10 +2217,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Term-ProgressSpinner>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Term-ProgressSpinner>
 
 =item * Search CPAN
 
@@ -2233,7 +2228,7 @@ L<https://metacpan.org/release/Term-ProgressSpinner>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by LNATION.
+This software is Copyright (c) 2021->2025 by LNATION.
 
 This is free software, licensed under:
 

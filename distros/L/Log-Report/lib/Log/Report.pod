@@ -153,11 +153,11 @@ context with only one name, the one object is returned.
 example: play with dispatchers
 
  dispatcher Log::Dispatcher::File => mylog =>
-   , accept   => 'MISTAKE-'              # for wrapper
-   , locale   => 'pt_BR'                 # other language
-   , filename => 'logfile';              # for back-end
+   , accept   => 'MISTAKE-'    # for wrapper
+   , locale   => 'pt_BR'       # other language
+   , filename => 'logfile';    # for back-end
 
- dispatcher close => 'mylog';            # cleanup
+ dispatcher close => 'mylog';  # cleanup
  my $obj = dispatcher find => 'mylog'; 
  my @obj = dispatcher 'list';
  dispatcher disable => 'syslog';
@@ -172,7 +172,7 @@ example: play with dispatchers
 
  # Getopt::Long integration: see Log::Report::Dispatcher::mode()
  dispatcher PERL => 'default', mode => 'DEBUG', accept => 'ALL'
-     if $debug;
+    if $debug;
 
 =item B<report>( [%options], $reason, $message|<STRING,$params>, )
 
@@ -676,8 +676,8 @@ expensive, but for instance only required in debug mode.
 example: 
 
   if(Log::Report->needs('TRACE'))
-  {   my @args = ...expensive calculation...;
-      trace "your options are: @args";
+  {  my @args = ...expensive calculation...;
+     trace "your options are: @args";
   }
 
 =back
@@ -1159,12 +1159,12 @@ wishes to return a LIST of objects, not the count of them.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.39,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.40,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

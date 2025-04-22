@@ -61,7 +61,7 @@ subtest 'path parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/path/missing',
+          instanceLocation => '/request/path',
           keywordLocation => $schema_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing path parameter: missing',
@@ -75,7 +75,7 @@ subtest 'path parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/path/missing_json_content',
+          instanceLocation => '/request/path',
           keywordLocation => $schema_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing path parameter: missing_json_content',
@@ -284,7 +284,7 @@ subtest 'query parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/query/missing_encoded_required',
+          instanceLocation => '/request/query',
           keywordLocation => $schema_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing query parameter: missing_encoded_required',
@@ -434,7 +434,7 @@ subtest 'header parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/header/Missing',
+          instanceLocation => '/request/header',
           keywordLocation => $schema_path.'/required',,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
           error => 'missing header: Missing',

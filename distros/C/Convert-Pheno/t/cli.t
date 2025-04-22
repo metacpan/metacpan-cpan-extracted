@@ -9,8 +9,16 @@ use Test::More tests => 16;
 use File::Compare;
 use JSON::XS;
 use Test::Deep;
+use Config;
 use Convert::Pheno;
 use Convert::Pheno::IO::CSVHandler;
+
+# Skip all tests if running on an ld architecture
+# mrueda 012025
+if ( $Config{archname} =~ /-ld\b/ ) {
+    plan skip_all => 'Skipping tests on ld architectures due to known issues';
+    exit;
+}
 
 use constant IS_WINDOWS => ( $^O eq 'MSWin32' || $^O eq 'cygwin' ) ? 1 : 0;
 
@@ -111,7 +119,7 @@ my $input = {
     }
 };
 
-for my $method (sort keys %{$input}) {
+for my $method ( sort keys %{$input} ) {
 
     $method = $method eq 'pxf2bff_yaml' ? 'pxf2bff' : $method;
 
@@ -204,7 +212,6 @@ qq{Files <$input->{$method}{out}> <$tmp_file> are supposedly identical yet compa
 }
 
 sub read_file {
-
     my ($file) = @_;
     open my $fh, '<', $file or die "Could not open file '$file': $!";
     local $/;

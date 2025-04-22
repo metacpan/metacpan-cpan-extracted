@@ -1,11 +1,11 @@
+
+# read and writ .ini files with settings of a drawing
+
+package App::GUI::Juliagraph::Settings;
 use v5.12;
 use warnings;
 use FindBin;
 use File::Spec;
-
-# parameter of a drawing
-
-package App::GUI::Juliagraph::Settings;
 
 sub load {
     my ($file) = @_;

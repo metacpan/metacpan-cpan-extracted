@@ -3,7 +3,7 @@ package Thread::Bless;
 # Make sure we have version info for this module
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 use strict;
 
 # Make sure we can find out the refaddr of an object and weaken it
@@ -438,8 +438,8 @@ Stas Bekman for the initial impetus, comments and suggestions.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2004 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+Copyright (c) 2003-2004 Elizabeth Mattijsen <liz@dijkmat.nl>. 2019-2025 LNATION <email@lnation.org>.
+All rights reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO

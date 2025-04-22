@@ -5,12 +5,14 @@ use base 'PDF::Builder::Content::Text';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
 PDF::Builder::Content::Hyphenate_basic - Simple hyphenation capability
+
+Inherits from L<PDF::Builder::Content::Text>
 
 =head1 SYNOPSIS
 
@@ -207,6 +209,7 @@ sub splitWord {
 
     # sort final @splitLoc, remove any split points violating "min" settings
     # set $leftWord and $rightWord if find successful split
+    # TBD consider hierarchy of desirable splits, rather than equal weight
     if (@splitLoc) {
         @splitLoc = sort { $a <=> $b } @splitLoc;
 	# unnecessary to have unique values
@@ -255,11 +258,11 @@ sub splitWord {
 	    $len = $self->advancewidth("$trial$h", %opts);
 	    if ($len > $width) { next; }
 
-	    # any letter doubling needed?
+	    # TBD any letter doubling needed?
 	    $leftWord = $trial.$h;
 	    $rightWord = substr($word, $j+1); 
 	    last;
-	}
+	} # while splitLoc has content
 	# if fell through because no fragment was short enough, $leftWord and
 	# $rightWord were never reassigned, and effect is to leave the entire
 	# word for the next line.

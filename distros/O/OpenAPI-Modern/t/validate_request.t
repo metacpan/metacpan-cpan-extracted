@@ -233,7 +233,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/header/Alpha',
+          instanceLocation => '/request/header',
           keywordLocation => jsonp(qw(/paths /foo $ref post parameters 0 required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item2/post/parameters/0/required')->to_string,
           error => 'missing header: Alpha',
@@ -265,7 +265,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path/foo_id',
+          instanceLocation => '/request/uri/path',
           keywordLocation => jsonp(qw(/paths /foo get parameters 0 required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 0 required)))->to_string,
           error => 'missing path parameter: foo_id',
@@ -290,6 +290,7 @@ YAML
     },
     'extra path_capture value provided',
   );
+
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
@@ -510,6 +511,7 @@ YAML
     'operation can be empty',
   );
 
+
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -702,19 +704,19 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/query/alpha',
+          instanceLocation => '/request/uri/query',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 required)))->to_string,
           error => 'missing query parameter: alpha',
         },
         {
-          instanceLocation => '/request/header/Alpha',
+          instanceLocation => '/request/header',
           keywordLocation => jsonp(qw(/paths /foo post parameters 1 $ref required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/parameters/foo-header/required')->to_string,
           error => 'missing header: Alpha',
         },
         {
-          instanceLocation => '/request/header/Beta',
+          instanceLocation => '/request/header',
           keywordLocation => jsonp(qw(/paths /foo post parameters 7 $ref $ref required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/parameters/bar-header/required')->to_string,
           error => 'missing header: Beta',
@@ -991,7 +993,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo get requestBody $ref)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody $ref)))->to_string,
           error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
@@ -1047,7 +1049,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/body',
+          instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo post requestBody required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody required)))->to_string,
           error => 'request body is required but missing',
@@ -1458,6 +1460,7 @@ YAML
     'duplicate query parameters in path-item section',
   );
 
+
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
@@ -1515,7 +1518,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/header/Content-Type',
+          instanceLocation => '/request/header',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content)))->to_string,
           error => 'missing header: Content-Type',
@@ -1696,6 +1699,7 @@ YAML
     { valid => true },
     'all parameter and body values are parsed from the request as strings',
   );
+
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
@@ -2083,7 +2087,7 @@ YAML
 subtest $::TYPE.': max_depth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(max_traversal_depth => 15, validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new(max_traversal_depth => 15),
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
@@ -2119,7 +2123,7 @@ YAML
 subtest $::TYPE.': unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -2161,7 +2165,7 @@ YAML
 subtest $::TYPE.': readOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -2211,7 +2215,7 @@ YAML
 subtest $::TYPE.': no bodies in GET or HEAD requests without requestBody' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
@@ -2278,7 +2282,7 @@ SKIP: {
 subtest $::TYPE.': custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -2340,7 +2344,7 @@ YAML
 subtest $::TYPE.': multiple documents' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri_rel,
-    evaluator => JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => JSON::Schema::Modern->new,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -2374,12 +2378,203 @@ YAML
         {
           instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema minimum)),
-          absoluteKeywordLocation => Mojo::URL->new('http://mycorp.com/api')->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema minimum)))->to_string,
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema minimum)))->to_string,
           error => 'value is less than 4',
         },
       ],
     },
-    'correct error location is used when $ref goes to another document',
+    'correct error location is used when json schema $ref goes to another document',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/mydoc/api',  # intentionally relative, to see how uris resolve
+    evaluator => JSON::Schema::Modern->new,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /alpha:
+    $ref: /otherdoc/api/definitions#/components/pathItems/alpha_path
+  /beta:
+    get:
+      parameters:
+      - $ref: /otherdoc/api/definitions#/components/parameters/beta_parameter
+      requestBody:
+        $ref: /otherdoc/api/definitions#/components/requestBodies/beta_requestBody
+components:
+  requestBodies:
+    alpha_requestBody:
+      required: true
+      content:
+        'text/plain':
+          schema: {}
+YAML
+
+  $openapi->evaluator->add_schema({
+    '$id' => 'https://mymetaschema',
+    '$vocabulary' => {
+      'https://json-schema.org/draft/2020-12/vocab/core' => true,
+      'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
+    },
+  });
+
+  $openapi->evaluator->add_media_type('application/yaml' => sub ($dataref) { \ $yamlpp->load_string($$dataref) });
+
+  $openapi->evaluator->add_document(
+    JSON::Schema::Modern::Document::OpenAPI->new(
+      canonical_uri => '/otherdoc/api/definitions', # intentionally relative, to see how uris resolve
+      evaluator => $openapi->evaluator,
+      json_schema_dialect => 'https://mymetaschema',
+      metaschema_uri => DEFAULT_METASCHEMA, # more lax, as we use multiple different keyword syntaxes
+      schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML')));
+components:
+  pathItems:
+    alpha_path:
+      get:
+        parameters:
+        - name: Blah
+          in: header
+          required: true
+          schema: {}
+        requestBody:
+          $ref: '/mydoc/api#/components/requestBodies/alpha_requestBody'
+  parameters:
+    beta_parameter:
+      name: Blah
+      in: header
+      required: true
+      schema: {}
+  requestBodies:
+    beta_requestBody:
+      content:
+        'application/json':
+          schema:
+            $id: beta_subdir
+            type: object
+            properties:
+              a:
+                minLength: 10   # should not fail, as Validation vocabulary is not used here
+              b: false
+        'application/yaml':
+          schema:
+            $id: second_beta_subdir
+            $schema: https://json-schema.org/draft/2019-09/schema
+            type: array
+            items:              # array form of items is not valid in the latest draft
+              - minLength: 10   # should not fail, as Validation vocabulary is not used here
+              - false
+YAML
+
+  # path-item in main document refs to second document.
+  # now the path-item parameter starts here, a header has an error.
+  cmp_result(
+    $openapi->validate_request(request('GET', 'https://example.com/alpha', ['Content-Type' => 'text/plain'], 'hi'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header',
+          keywordLocation => jsonp(qw(/paths /alpha $ref get parameters 0 required)),
+          absoluteKeywordLocation => '/otherdoc/api/definitions#/components/pathItems/alpha_path/get/parameters/0/required',
+          error => 'missing header: Blah',
+        },
+      ],
+    },
+    'correct error location is used when path-item $ref goes to another document',
+  );
+
+  # path-item in main document
+  # we jump to a parameter in the second document
+  # that parameter has an error.
+  cmp_result(
+    $openapi->validate_request(request('GET', 'https://example.com/beta'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header',
+          keywordLocation => jsonp(qw(/paths /beta get parameters 0 $ref required)),
+          absoluteKeywordLocation => '/otherdoc/api/definitions#/components/parameters/beta_parameter/required',
+          error => 'missing header: Blah',
+        },
+      ],
+    },
+    'correct error location is used when parameter $ref goes to another document',
+  );
+
+  # path-item in main document refs to second document
+  # parameter passes validation
+  # but the requestBody is a $ref back to the main document, and it has an error.
+  cmp_result(
+    $openapi->validate_request(request('GET', 'https://example.com/alpha', [ Blah => 'a' ]))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => jsonp(qw(/paths /alpha $ref get requestBody $ref required)),
+          absoluteKeywordLocation => '/mydoc/api#/components/requestBodies/alpha_requestBody/required',
+          error => 'request body is required but missing',
+        },
+      ],
+    },
+    'correct error location is used when requestBody $ref goes back to the original document',
+  );
+
+  # $ref to a secondary document, in which we evaluate a json schema with an $id in it
+  # and this document uses a custom dialect via jsonSchemaDialect
+  cmp_result(
+    $openapi->validate_request(request('GET', 'https://example.com/beta',
+        [Blah => 1, 'Content-Type' => 'application/json'], '{"a":"hi","b":"oh noes"}'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        # no error for 'length is less than 10'
+        {
+          instanceLocation => '/request/body/b',
+          keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/json schema properties b)),
+          absoluteKeywordLocation => '/otherdoc/api/beta_subdir#/properties/b',
+          error => 'property not permitted',
+        },
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/json schema properties)),
+          absoluteKeywordLocation => '/otherdoc/api/beta_subdir#/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'correct dialect is used (via document\'s jsonSchemaDialect) in a secondary document',
+  );
+
+
+  # now we switch dialects via $schema in the subschema
+  cmp_result(
+    $openapi->validate_request(request('GET', 'https://example.com/beta',
+        [Blah => 1, 'Content-Type' => 'application/yaml'], '["hi","oh noes"]'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body/0',
+          keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/yaml schema items 0 minLength)),
+          absoluteKeywordLocation => '/otherdoc/api/second_beta_subdir#/items/0/minLength',
+          error => 'length is less than 10',
+        },
+        {
+          instanceLocation => '/request/body/1',
+          keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/yaml schema items 1)),
+          absoluteKeywordLocation => '/otherdoc/api/second_beta_subdir#/items/1',
+          error => 'item not permitted',
+        },
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /beta get requestBody $ref content application/yaml schema items)),
+          absoluteKeywordLocation => '/otherdoc/api/second_beta_subdir#/items',
+          error => 'not all items are valid',
+        },
+      ],
+    },
+  'correct dialect is used (via json schema\'s $schema keyword) in a secondary document',
   );
 };
 

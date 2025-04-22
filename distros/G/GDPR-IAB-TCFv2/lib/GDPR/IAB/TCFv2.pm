@@ -22,7 +22,7 @@ use GDPR::IAB::TCFv2::BitUtils qw<is_set
 use GDPR::IAB::TCFv2::Publisher;
 use GDPR::IAB::TCFv2::RangeSection;
 
-our $VERSION = "0.201";
+our $VERSION = "0.203";
 
 use constant {
     CONSENT_STRING_TCF_V2 => {
@@ -516,9 +516,17 @@ sub _parse_vendor_consents {
 sub _parse_vendor_legitimate_interests {
     my ( $self, $legitimate_interest_offset ) = @_;
 
+    my $data_size = length( $self->{core_data} );
+
     my ( $vendor_legitimate_interests, $pub_restriction_offset ) =
       $self->_parse_bitfield_or_range(
         $legitimate_interest_offset,
+        sub {
+            my $legitimate_interest_start = shift;
+
+            croak "invalid consent data: no legitimate interest start position"
+              if $legitimate_interest_start >= $data_size;
+        }
       );
 
     $self->{vendor_legitimate_interests} = $vendor_legitimate_interests;
@@ -545,11 +553,13 @@ sub _parse_publisher_section {
 }
 
 sub _parse_bitfield_or_range {
-    my ( $self, $offset ) = @_;
+    my ( $self, $offset, $validate_next_offset ) = @_;
 
     my $something;
 
     my ( $max_id, $next_offset ) = get_uint16( $self->{core_data}, $offset );
+
+    $validate_next_offset->($next_offset) if defined $validate_next_offset;
 
     my $is_range;
 

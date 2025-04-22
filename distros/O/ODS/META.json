@@ -4,7 +4,7 @@
       "LNATION <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "ODS" : {
          "file" : "lib/ODS.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "ODS::Angel" : {
          "file" : "lib/ODS/Angel.pm"
@@ -158,6 +158,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/ODS"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

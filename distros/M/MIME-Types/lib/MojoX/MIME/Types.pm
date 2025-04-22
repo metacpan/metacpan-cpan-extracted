@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package MojoX::MIME::Types;{
-our $VERSION = '2.27';
+our $VERSION = '2.28';
 }
 
 use Mojo::Base -base;

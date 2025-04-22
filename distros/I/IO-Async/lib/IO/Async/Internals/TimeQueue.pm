@@ -163,7 +163,6 @@ sub HEAP__fire
 package # hide from CPAN
   IO::Async::Internals::TimeQueue::Elem;
 
-use v5.14;
 our @ISA = qw( Heap::Elem );
 
 sub new

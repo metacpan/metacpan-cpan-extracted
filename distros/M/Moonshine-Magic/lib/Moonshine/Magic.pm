@@ -17,11 +17,11 @@ Moonshine::Magic - d[ o_0 ]b - has, extends, lazy_components
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -173,27 +173,17 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Moonshine-Magic>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Moonshine-Magic>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Moonshine-Magic>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Moonshine-Magic/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

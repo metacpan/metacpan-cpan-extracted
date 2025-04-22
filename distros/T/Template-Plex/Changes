@@ -1,9 +1,24 @@
 Revision history for Perl extension Template::Plex.
+v0.8.0 2024-12-09
+  [fixes]
+    - immediate load/render only forces id to path/caller combo when undefined
+      key is used. Prevents unneeded multiple loading
+
+  [improvements]
+    - If filename has plex or plx in the name (or be an array ref), processing
+      is normal. Otherwise the file is assumed to be not be template (ie could
+      be a binary file). The content is encode/decode as hex when the template
+      is executed. This avoids strange syntax errors and helps make it clear
+      which files are to be templates vs static resources.
+
+    - init_fix is only applied to templates not static resources
+
+
 v0.7.1 2024-04-23
   [fixes]
     -  { and } characters are now replaced with Perl escape equivalents \{ and
        \} for better code generation support (ie C, Perl, Javascript etc that
-       use  {} as block delimieters)
+       use  {} as block delimiters)
     -  Extra test for reference types in slot rendering
     -  use file_name_is_absolute for path testing instead of regex
 
@@ -20,11 +35,11 @@ v0.7.0 2024-01-10
     - absolute template paths no longer use prepend 'root' dir option
 
 
-  [depricated]
+  [deprecated]
     - 'including' templates will be removed from future versions in favour of
       sub templates  for better diagnostics.
     - 'comment' support will be removed from future versions in favour of
-      using the standard multiline form or @{[ # comment ]}
+      using the standard multi-line form or @{[ # comment ]}
 
 v0.6.3 2023-12-12
   [improvements]

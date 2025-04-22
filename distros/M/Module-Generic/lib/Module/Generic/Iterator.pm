@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Iterator.pm
-## Version v1.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.2.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,16 +13,27 @@
 package Module::Generic::Iterator;
 BEGIN
 {
+    use v5.12.0;
     use common::sense;
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use Config;
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    }
     use Module::Generic::Array;
     use Scalar::Util ();
     use Want;
-    our( $VERSION ) = 'v1.1.1';
+    our( $VERSION ) = 'v1.2.1';
 };
 
+use v5.12.0;
 use strict;
 no warnings 'redefine';
 
@@ -118,7 +129,15 @@ sub next
     else
     {
         return if( $self->eof );
-        $self->pos++;
+        if( HAS_THREADS )
+        {
+            lock( $self );
+            $self->pos++;
+        }
+        else
+        {
+            $self->pos++;
+        }
         $pos = $self->pos;
     }
     return( $self->elements->index( $pos ) );
@@ -155,14 +174,23 @@ sub prev
     my $pos;
     if( @_ )
     {
-        $pos  = $self->_find_pos( @_ );
+        $pos = $self->_find_pos( @_ );
         return if( !CORE::defined( $pos ) );
         return if ( $pos <= 0 );
         $pos--;
     }
     else
     {
-        $self->pos-- if( $self->pos > 0 );
+        if( HAS_THREADS )
+        {
+            lock( $self );
+            $self->pos-- if( $self->pos > 0 );
+        }
+        else
+        {
+            $self->pos-- if( $self->pos > 0 );
+        }
+
         # Position of the given element is at the beginning of our array, there is nothing more
         $pos = $self->pos;
         return if( $pos <= 0 );

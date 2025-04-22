@@ -24,7 +24,7 @@ no_index:
 provides:
   Moonshine::Component:
     file: lib/Moonshine/Component.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Moonshine::Element: '0.11'
   Moonshine::Magic: '0.07'
@@ -37,5 +37,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Component.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

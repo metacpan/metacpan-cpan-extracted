@@ -36,10 +36,10 @@ my $tests =
         name => 'hour',
         tests => [
             {
-                d1 => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'UTC' },
-                d2 => { year => 2024, month => 1, day => 1, hour => 5, minute => 0, second => 0, time_zone => 'UTC' },
+                d1 => { year => 2024, month => 1, day => 1, hour => 22, minute => 0, second => 0, time_zone => 'UTC' },
+                d2 => { year => 2024, month => 1, day => 1, hour => 23, minute => 0, second => 0, time_zone => 'UTC' },
                 pattern => 'Bh',
-                expects => '4 – 5 at night',
+                expects => '10 – 11 at night',
             },
         ],
     },

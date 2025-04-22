@@ -8,7 +8,9 @@ use CAD::OpenSCAD::Math;
 
 our $Math=new CAD::OpenSCAD::Math;
 
-our $VERSION='0.13';
+our $VERSION='0.14';
+
+=pod
 
 =head1 NAME
 
@@ -27,6 +29,8 @@ CAD::OpenSCAD
 
 =head2 DESCRIPTION
 
+*** B<From Version 0.14 the API change to make class the same name as module file
+means that the className is now OpenSCAD (was SCAD before> ***
 This module allows creation of OpenSCAD scripts for running through OpenSCAD,
 the "Programmers CAD Application". OpenSCAD can be scripted, having a
 fairly comprehensive language to create complex 3D objects.
@@ -67,7 +71,7 @@ class OpenSCAD{
    field $status :writer;
    field $extensions  ={};
 
-=head4 set_fs set_fa set_tab
+=head4 set_fs set_fa set_tab set_vpt set_vpd set_vpf set_vp set_preview
 
 Using these, one can set parameters for the surface generation and script
 outputs. e.g.
@@ -734,13 +738,13 @@ e.g. C<< $scad->save("extrusion","png") >>
 
 }
 
-
 class scadItem{
    field $name            :reader :param  ;
    field $description     :reader :writer :param  //="";
    field $script          :reader :param  //="";
+   field $nDim            :reader         //="3";         # number of dimensions
    field $insPoint        :reader :writer :param //=[0,0];
-   field $rotation        :reader :writer :param //=[0,0,0];
+   field $axis            :reader :writer :param //=[1,1,1];
    field $vertices  = [];
    field $faces  = [];
 }

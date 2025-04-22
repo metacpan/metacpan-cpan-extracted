@@ -1,5 +1,14 @@
 Revision history for IO-Async-Loop-Epoll
 
+0.23    2025-04-22
+        [CHANGES]
+         * Swap unit tests from `Test::More` to `Test2::V0`
+         * Minor module and Pod style updates
+
+        [BUGFIXES]
+         * Ensure the epoll handle gets correctly rebuilt in `->post_fork`
+           (RT152635) (thanks leont)
+
 0.22    2021-05-27
         [BUGFIXES]
          * Fix for zero timeout when using fakeevents

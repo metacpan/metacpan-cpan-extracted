@@ -6,7 +6,7 @@ BEGIN {
 	Module::Generate->lib('./t/lib')
 		->author('LNATION')
 		->email('email@lnation.org')
-		->version('0.01')
+		->version('0.05')
 		->macro('self', sub {
 			my ($self, $value) = @_;
 		})

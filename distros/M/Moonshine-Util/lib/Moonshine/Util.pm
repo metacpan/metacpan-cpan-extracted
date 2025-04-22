@@ -24,11 +24,11 @@ Moonshine::Util - Utils
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -183,14 +183,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Moonshine-Util>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Moonshine-Util>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Moonshine-Util>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Moonshine-Util/>
@@ -201,7 +193,7 @@ L<http://search.cpan.org/dist/Moonshine-Util/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

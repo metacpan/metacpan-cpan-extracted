@@ -1,5 +1,11 @@
 Revision history for OpenSky-API
 
+0.5       2025-04-20 09:39:58 CEST
+          - Fix bug with bad Optional[] spec. Type::Tiny 2.008 and above
+            exposes it. I had a `default` inside the Optional[] spec body
+            instead of after it. Thanks to https://github.com/andk for
+            spotting that.
+
 0.4       2023-06-12 12:42:54 CEST
 
           - Remove undeclared dependency on Syntax::Keyword::Try

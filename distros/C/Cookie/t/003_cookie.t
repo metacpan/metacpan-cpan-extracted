@@ -30,7 +30,7 @@ subtest 'methods' => sub
     isa_ok( $c, 'Cookie' );
 
     # To generate this list:
-    # egrep -E '^sub ' ./lib/Cookie.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$c, \"$m\" );"'
+    # perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$c, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/Cookie.pm
     can_ok( $c, "init" );
     can_ok( $c, "algo" );
     can_ok( $c, "apply" );

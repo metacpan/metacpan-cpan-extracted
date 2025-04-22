@@ -19,11 +19,12 @@ use lib 't/lib';
 use Helper;
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
-my $doc_uri = Mojo::URL->new('http://example.com/api');
+my $doc_uri_rel = Mojo::URL->new('/api');
+my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
 
 subtest 'full end-to-end test of transmitted request and response' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => $doc_uri_rel,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
@@ -76,13 +77,13 @@ YAML
             {
               instanceLocation => '/request/uri/path/foo_id',
               keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-              absoluteKeywordLocation => $doc_uri->clone->host($host)->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
+              absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
               error => 'pattern does not match',
             },
             {
-              instanceLocation => '/request/body',
+              instanceLocation => '/request',
               keywordLocation => jsonp(qw(/paths /foo/{foo_id} post requestBody required)),
-              absoluteKeywordLocation => $doc_uri->clone->host($host)->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody required)))->to_string,
+              absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody required)))->to_string,
               error => 'request body is required but missing',
             },
           ],
@@ -109,8 +110,6 @@ YAML
     ->status_is(400)
     ->json_is('/status', 'not ok');
 
-  my $doc_uri_full = $doc_uri->host($t->tx->req->headers->host);
-
   cmp_result(
     $openapi->validate_response($t->tx->res, { request => $t->tx->req })->TO_JSON,
     {
@@ -119,13 +118,13 @@ YAML
         {
           instanceLocation => '/response/body/status',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties status const)),
-          absoluteKeywordLocation => $doc_uri_full->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties status const)))->to_string,
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties status const)))->to_string,
           error => 'value does not match',
         },
         {
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties)),
-          absoluteKeywordLocation => $doc_uri_full->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties)))->to_string,
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties)))->to_string,
           error => 'not all properties are valid',
         },
       ],

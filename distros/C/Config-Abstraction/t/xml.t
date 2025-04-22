@@ -26,7 +26,7 @@ cmp_ok($config->get('UserName'), 'eq', 'njh', 'XML can be read in from a file wi
 
 $config = Config::Abstraction->new(
 	config_dirs => ['/'],
-	config_file => "$test_dir/xml_test"
+	config_file => File::Spec->catdir($test_dir, 'xml_test')
 );
 
 cmp_ok($config->get('UserName'), 'eq', 'njh', 'absolute path to config_file works');

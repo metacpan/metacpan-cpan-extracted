@@ -2,6 +2,7 @@
 
 use v5.34;
 use feature 'signatures';
+use warnings;
 no warnings 'experimental::signatures';
 
 use Archive::SCS;

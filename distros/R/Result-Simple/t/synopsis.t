@@ -1,54 +1,78 @@
-use Test2::V0;
+use Test2::V0 qw(is done_testing);
 use Test2::Require::Module 'Type::Tiny' => '2.000000';
 use Test2::Require::Module 'kura';
+use feature qw( state );
 
-# Enable type check. The default is false.
-BEGIN { $ENV{RESULT_SIMPLE_CHECK_ENABLED} = 1 }
+use Result::Simple qw( ok err result_for chain pipeline);
+use Types::Standard -types;
 
-use Result::Simple;
-use Types::Common -types;
+use kura Error   => Dict[message => Str];
+use kura Request => Dict[name => Str, age => Int];
 
-use kura ErrorMessage => StrLength[3,];
-use kura ValidName    => sub { my (undef, $e) = validate_name($_); !$e };
-use kura ValidAge     => sub { my (undef, $e) = validate_age($_); !$e };
-use kura ValidUser    => Dict[name => ValidName, age => ValidAge];
+result_for validate_name => Request, Error;
 
 sub validate_name {
-    my $name = shift;
-    return Err('No name') unless defined $name;
-    return Err('Empty name') unless length $name;
-    return Err('Reserved name') if $name eq 'root';
-    return Ok($name);
+    my $req = shift;
+    my $name = $req->{name};
+    return err({ message => 'No name'}) unless defined $name;
+    return err({ message => 'Empty name'}) unless length $name;
+    return err({ message => 'Reserved name'}) if $name eq 'root';
+    return ok($req);
 }
+
+result_for validate_age => Request, Error;
 
 sub validate_age {
-    my $age = shift;
-    return Err('No age') unless defined $age;
-    return Err('Invalid age') unless $age =~ /\A\d+\z/;
-    return Err('Too young age') if $age < 18;
-    return Ok($age);
+    my $req = shift;
+    my $age = $req->{age};
+    return err({ message => 'No age'}) unless defined $age;
+    return err({ message => 'Invalid age'}) unless $age =~ /\A\d+\z/;
+    return err({ message => 'Too young age'}) if $age < 18;
+    return ok($req);
 }
 
-sub new_user :Result(ValidUser, ArrayRef[ErrorMessage]) {
-    my $args = shift;
-    my @errors;
+result_for validate_req => Request, Error;
 
-    my ($name, $name_err) = validate_name($args->{name});
-    push @errors, $name_err if $name_err;
+sub validate_req {
+    my $req = shift;
+    my $err;
 
-    my ($age, $age_err) = validate_age($args->{age});
-    push @errors, $age_err if $age_err;
+    ($req, $err) = validate_name($req);
+    return err($err) if $err;
 
-    return Err(\@errors) if @errors;
-    return Ok({ name => $name, age => $age });
+    ($req, $err) = validate_age($req);
+    return err($err) if $err;
+
+    return ok($req);
 }
 
-my ($user1, $err1) = new_user({ name => 'taro', age => 42 });
-is $user1, { name => 'taro', age => 42 };
+# my $req = validate_req({ name => 'taro', age => 42 });
+# => Throw an exception, because `validate_req` requires calling in a list context to handle an error.
+
+my ($req1, $err1) = validate_req({ name => 'taro', age => 42 });
+is $req1, { name => 'taro', age => 42 };
 is $err1, undef;
 
-my ($user2, $err2) = new_user({ name => 'root', age => 1 });
-is $user2, undef;
-is $err2, ['Reserved name', 'Too young age'];
+my ($req2, $err2) = validate_req({ name => 'root', age => 20 });
+is $req2, undef;
+is $err2, { message => 'Reserved name' };
+
+# Following are the same as above but using `chain` and `pipeline` functions.
+
+sub validate_req_with_chain {
+    my $req = shift;
+
+    my @r = ok($req);
+    @r = chain(validate_name => @r);
+    @r = chain(validate_age => @r);
+    return @r;
+}
+
+sub validate_req_with_pipeline {
+    my $req = shift;
+
+    state $code = pipeline qw( validate_name validate_age );
+    $code->(ok($req));
+}
 
 done_testing

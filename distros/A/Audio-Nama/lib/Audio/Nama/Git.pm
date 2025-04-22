@@ -1,6 +1,7 @@
 # ---------- Git Support ----------
 package Audio::Nama;
 use Modern::Perl '2020';
+use Carp;
 sub git { 
 	return if is_test_script();
 	$config->{use_git} or warn("@_: git command, but git is not enabled.
@@ -18,7 +19,7 @@ sub initialize_project_repository {
 		"No repo created for project ", project_dir()), 
 		return if not $config->{use_git} or is_test_script();
 	if (not -d repo_git_dir()){
-		pager("Creating git repository in ", repo_git_dir()); 
+		pager("Creating git repository in ". repo_git_dir()); 
 		create_repo;
 		init_repo_obj();
 		create_file_stubs();
@@ -92,7 +93,7 @@ sub project_snapshot {
 	  	   or not $project->{name} 
 		   or not $project->{repo};
 
-	my $commit_message = shift() || "";
+	my $commit_message = shift() || "empty message";
 	git_commit($commit_message);
 }
 

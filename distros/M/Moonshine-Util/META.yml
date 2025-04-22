@@ -21,7 +21,7 @@ no_index:
 provides:
   Moonshine::Util:
     file: lib/Moonshine/Util.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Exporter::Tiny: '0.044'
   HTML::Valid: '0.07'
@@ -32,5 +32,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Util.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

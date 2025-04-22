@@ -20,12 +20,14 @@ use Data::Identifier::Generate;
 
 use File::FStore;
 
+use parent 'File::FStore::Base';
+
 use constant {
     WRITE_BITS  => S_IWUSR|S_IWGRP|S_IWOTH,
     RE_ISE      => qr<^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[1-3](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$>,
 };
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my @_xattr_hashes = qw(sha-1-160 sha-2-256 sha-3-512);
 
@@ -82,37 +84,6 @@ sub filename {
 }
 
 
-sub contentise {
-    my ($self, %opts) = @_;
-    my $as = delete($opts{as}) // 'uuid';
-
-    croak 'Stray options passed' if scalar keys %opts;
-
-    $self->{contentise} //= eval {Data::Identifier->new(ise => $self->get(properties => 'contentise'))};
-    $self->{contentise} //= $self->_calculate_contentise;
-
-    croak 'No contentise known for this file' unless defined $self->{contentise};
-
-    return $self->{contentise}->as($as,
-        db => $self->db(default => undef),
-        extractor => $self->extractor(default => undef),
-    );
-}
-
-
-sub ise {
-    my ($self, @args) = @_;
-    return $self->contentise(@args);
-}
-
-
-sub as {
-    my ($self, $as, %opts) = @_;
-    $opts{store} //= $self->{store};
-    return $self->Data::Identifier::as($as, %opts);
-}
-
-
 sub open {
     my ($self) = @_;
     my $fh = $self->_open;
@@ -139,7 +110,9 @@ sub symlink_out {
 sub update {
     my ($self, %opts) = @_;
     my File::FStore $store = $self->store;
-    my $no_digests = delete($opts{no_digests});
+    my $no_digests  = delete($opts{no_digests});
+    my $on_pre_set  = delete($opts{on_pre_set});
+    my $on_post_set = delete($opts{on_post_set});
     my $inode;
     my $properties;
     my $digests;
@@ -222,6 +195,7 @@ sub update {
                     croak 'Content ISE missmatch' if $properties->{contentise} ne $contentise;
                 }
 
+                $on_pre_set->($self) if defined $on_pre_set;
                 $self->set($data);
             }
 
@@ -289,6 +263,8 @@ sub update {
                     eval { chmod($n, $fh) }; # we don't care if it fails.
                 }
             }
+
+            $on_post_set->($self) if defined $on_post_set;
         });
 }
 
@@ -492,33 +468,16 @@ sub sync_with_db {
 }
 
 
-#@returns File::FStore
-sub store {
-    my ($self) = @_;
-    return $self->{store};
+# --- Overrides for Data::URIID::Base ---
+sub contentise {
+    my ($self, @args) = @_;
+
+    $self->{contentise} //= eval {Data::Identifier->new(ise => $self->get(properties => 'contentise'))};
+    $self->{contentise} //= $self->_calculate_contentise;
+
+    return $self->SUPER::contentise(@args);
 }
 
-
-#@returns Data::TagDB
-sub db {
-    my ($self, %opts) = @_;
-    return $self->{db} //= $self->store->db(%opts);
-}
-
-
-#@returns Data::URIID
-sub extractor {
-    my ($self, %opts) = @_;
-    return $self->{extractor} if defined $self->{extractor};
-    return $opts{default} if exists $opts{default};
-    croak 'No extractor known';
-}
-
-
-sub fii {
-    my ($self) = @_;
-    return $self->{fii} //= $self->store->fii;
-}
 
 # ---- Private helpers ----
 sub _valid_digests {
@@ -691,7 +650,7 @@ File::FStore::File - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -702,6 +661,8 @@ version v0.03
     my File::FStore::File $file = $store->query(...);
 
 This package provides access to file level values.
+
+This package inherits from L<File::FStore::Base>.
 
 =head1 METHODS
 
@@ -730,41 +691,6 @@ When possible L</open> should be preferred.
 
 See also:
 L</open>.
-
-=head2 contentise
-
-    my $ise = $file->contentise;
-    # or:
-    my $ise = $file->contentise(as => ...);
-
-Returns the content based ISE (identifier) for the file.
-This can be used as a primary key for the given file in databases.
-It is globally unique (so can be transfered to unrelated systems without worry of of collisions).
-
-Takes a single optional option C<as> which is documented in L<Data::Identifier/as>.
-Defaulting to C<uuid>.
-
-B<Note:>
-Calculation of this identifier requires the values for C<size> from the C<properties> domain
-and the values for C<sha-1-160> and C<sha-3-512> from the C<digests> domain.
-
-=head2 ise
-
-    my $ise = $file->ise;
-    # or:
-    my $ise = $file->ise(%opts);
-
-Returns an ISE (identifier) for this file.
-
-Currently an alias for L</contentise>. Later versions may add more logic.
-
-=head2 as
-
-    my $xxx = $base->as($as, [ %opts ] );
-
-Proxy for L<Data::Identifier/as>.
-
-Automatically adds C<store> to C<%opts> if any is known (see L</store>).
 
 =head2 open
 
@@ -817,6 +743,16 @@ The following (all optional) options are supported:
 =item C<no_digests>
 
 This will try to skip digest calculation.
+
+=item C<on_pre_set>
+
+A callback that is called before any data is set (see L</set>) on this file.
+C<$file> is passed as first argument.
+
+=item C<on_post_set>
+
+A callback that is called after all data is set (see L</set>) on this file.
+C<$file> is passed as first argument.
 
 =back
 
@@ -974,34 +910,6 @@ This may be anything that L<Data::Identifier/as> will accept.
 Defaults to C<undef>.
 
 =back
-
-=head2 store
-
-    my File::FStore $store = $file->store;
-
-Returns the store this file belongs to.
-
-=head2 db
-
-    my Data::TagDB $db = $file->db;
-    # or:
-    my Data::TagDB $db = $file->db(default => $def);
-
-Proxy for L<File::FStore/db>.
-
-=head2 extractor
-
-    my Data::URIID $extractor = $file->extractor;
-    # or:
-    my Data::URIID $extractor = $file->extractor(default => $def);
-
-Proxy for L<File::FStore/extractor>.
-
-=head2 fii
-
-    my File::Information $fii = $file->fii;
-
-Proxy for L<File::FStore/fii>.
 
 =head1 PROPERTIES
 

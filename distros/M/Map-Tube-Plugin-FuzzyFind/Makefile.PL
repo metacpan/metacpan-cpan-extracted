@@ -16,11 +16,10 @@ WriteMakefile(
     ABSTRACT_FROM      => $mod_file,
     LICENSE            => 'artistic_2',
 	PL_FILES		   => { },
-	MIN_PERL_VERSION   => 5.010,
+	MIN_PERL_VERSION   => 5.012,
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 6.64, },
     TEST_REQUIRES      => {
                             'Test::More'        => 0.82,
-							'Map::Tube::London' => 1.39,
 							'Map::Tube'         => 3.77,
                           },
     PREREQ_PM          => {

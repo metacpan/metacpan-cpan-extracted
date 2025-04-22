@@ -105,7 +105,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v2.2.0
+    v2.3.1
 
 =head1 DESCRIPTION
 

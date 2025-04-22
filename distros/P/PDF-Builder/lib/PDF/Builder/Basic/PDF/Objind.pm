@@ -19,13 +19,14 @@ use strict;
 use warnings;
 use Scalar::Util 'isweak';
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Objind - PDF indirect object reference. Also acts as an 
-abstract superclass for all elements in a PDF file.
+PDF::Builder::Basic::PDF::Objind - PDF indirect object reference
+
+Also acts as an abstract superclass for all elements in a PDF file
 
 =head1 INSTANCE VARIABLES
 

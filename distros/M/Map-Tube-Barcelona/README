@@ -15,10 +15,10 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 SUPPORT AND DOCUMENTATION
 
@@ -29,21 +29,18 @@ command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-Barcelona
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Map-Tube-Barcelona
+    BUG Report
+        https://github.com/manwar/Map-Tube-Barcelona/issues
 
     CPAN Ratings
         http://cpanratings.perl.org/d/Map-Tube-Barcelona
 
-    Search CPAN
-        http://search.cpan.org/dist/Map-Tube-Barcelona/
+    Search MetaCPAN
+        https://metacpan.org/dist/Map-Tube-Barcelona
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2016 Mohammad S Anwar
+Copyright (C) 2014 - 2025 Mohammad Sajid Anwar
 
 This program is free software; you can redistribute it and/or modify it under the
 terms of the the Artistic License (2.0).You may obtain a copy of the full license

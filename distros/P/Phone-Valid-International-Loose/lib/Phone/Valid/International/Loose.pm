@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base 'Import::Export';
 
@@ -40,7 +40,7 @@ Phone::Valid::International::Loose - loosely validate international phone number
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -101,23 +101,17 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Phone-Valid-International-Loose>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Phone-Valid-International-Loose>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Phone-Valid-International-Loose>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

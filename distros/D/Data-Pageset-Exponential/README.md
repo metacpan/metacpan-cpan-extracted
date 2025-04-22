@@ -4,7 +4,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 # VERSION
 
-version v0.4.0
+version v0.4.1
 
 # SYNOPSIS
 
@@ -192,6 +192,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -200,7 +205,7 @@ Test code was adapted from [Data::Page](https://metacpan.org/pod/Data%3A%3APage)
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2024 by Robert Rothenberg.
+This software is Copyright (c) 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

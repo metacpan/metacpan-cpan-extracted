@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Encode qw(:all);
 use IO::File qw();
@@ -16,7 +16,9 @@ use PDF::Builder::Basic::PDF::Utils;
 
 =head1 NAME
 
-PDF::Builder::Resource::Font::Postscript - support routines for using PostScript fonts. Inherits from L<PDF::Builder::Resource::Font>
+PDF::Builder::Resource::Font::Postscript - Support routines for using PostScript (Type 1) fonts
+
+Inherits from L<PDF::Builder::Resource::Font>
 
 =head1 METHODS
 
@@ -29,30 +31,84 @@ PDF::Builder::Resource::Font::Postscript - support routines for using PostScript
 Create an object for a PostScript font. Handles ASCII (.pfa), binary (.pfb), and
 T1 (.t1) font files, as well as ASCII (.afm) and binary (.pfm) metrics files.
 
+See L<PDF::Builder::Docs/PS Fonts> for additional information.
+
+Valid %opts are:
+
+=over
+
+=item encode
+
+Changes the encoding of the font from its default. Notice that the encoding
+(I<not> the entire font's glyph list) is shown in a PDF object (record), listing
+256 glyphs associated with this encoding (I<and> that are available in this 
+font). 
+
+=item afmfile
+
+Specifies the location of the I<ASCII> font metrics file (.afm). It may be used
+with either an ASCII (.pfa) or binary (.pfb) glyph file.
+
+C<afm_file> is still accepted as an (older) B<alternative> to C<afmfile>.
+
+=item pfmfile
+
+Specifies the location of the I<binary> font metrics file (.pfm). It may be used
+with either an ASCII (.pfa) or binary (.pfb) glyph file.
+
+C<pfm_file> is still accepted as an (older) B<alternative> to C<pfmfile>.
+
+=item pdfname
+
+Changes the reference-name of the font from its default.
+The reference-name is normally generated automatically and can be
+retrieved via $pdfname=$font->name().
+
+=item dokern
+
+Enables kerning if data is available.
+
+C<kerning> is still accepted as an (older) B<alternative> to C<dokern>.
+
+=back
+
 =back
 
 =cut
+
+# TBD what is an xfm file? was xfm_file option ever supported?
+#     currently, xfmfile is a dummy stub, and not listed in POD
 
 sub new {
     my ($class, $pdf, $psfile, %opts) = @_;
     # copy dashed option names to preferred undashed names
     if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
     if (defined $opts{'-afmfile'} && !defined $opts{'afmfile'}) { $opts{'afmfile'} = delete($opts{'-afmfile'}); }
+      if (defined $opts{'-afm_file'} && !defined $opts{'afm_file'}) { $opts{'afm_file'} = delete($opts{'-afm_file'}); }
     if (defined $opts{'-pfmfile'} && !defined $opts{'pfmfile'}) { $opts{'pfmfile'} = delete($opts{'-pfmfile'}); }
+      if (defined $opts{'-pfm_file'} && !defined $opts{'pfm_file'}) { $opts{'pfm_file'} = delete($opts{'-pfm_file'}); }
     if (defined $opts{'-xfmfile'} && !defined $opts{'xfmfile'}) { $opts{'xfmfile'} = delete($opts{'-xfmfile'}); }
+      if (defined $opts{'-xfm_file'} && !defined $opts{'xfm_file'}) { $opts{'xfm_file'} = delete($opts{'-xfm_file'}); }
     if (defined $opts{'-pdfname'} && !defined $opts{'pdfname'}) { $opts{'pdfname'} = delete($opts{'-pdfname'}); }
     if (defined $opts{'-nocomps'} && !defined $opts{'nocomps'}) { $opts{'nocomps'} = delete($opts{'-nocomps'}); }
     if (defined $opts{'-dokern'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'-dokern'}); }
+      if (defined $opts{'-kerning'} && !defined $opts{'kerning'}) { $opts{'kerning'} = delete($opts{'-kerning'}); }
 
     my ($self);
     my ($data);
+
+    # preferred option names
+    if (defined $opts{'kerning'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'kerning'}); }
+    if (defined $opts{'afm_file'} && !defined $opts{'afmfile'}) { $opts{'afmfile'} = delete($opts{'afm_file'}); }
+    if (defined $opts{'pfm_file'} && !defined $opts{'pfmfile'}) { $opts{'pfmfile'} = delete($opts{'pfm_file'}); }
+    if (defined $opts{'xfm_file'} && !defined $opts{'xfmfile'}) { $opts{'xfmfile'} = delete($opts{'xfm_file'}); }
 
     if (defined $opts{'afmfile'}) {
         $data = $class->readAFM($opts{'afmfile'});
     } elsif (defined $opts{'pfmfile'}) {
         $data = $class->readPFM($opts{'pfmfile'});
-    } elsif (defined $opts{'xfmfile'}) {
-        $data = $class->readXFM($opts{'xfmfile'});
+    } elsif (defined $opts{'xfmfile'}) { # TBD what is it?
+        $data = $class->readXFM($opts{'xfmfile'}); # dummy stub
     } else {
         die "No proper font-metrics file specified for PostScript file '$psfile'.";
     }

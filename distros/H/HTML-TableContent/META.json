@@ -4,7 +4,7 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -44,43 +44,43 @@
    "provides" : {
       "HTML::TableContent" : {
          "file" : "lib/HTML/TableContent.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Element" : {
          "file" : "lib/HTML/TableContent/Element.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Parser" : {
          "file" : "lib/HTML/TableContent/Parser.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Table" : {
          "file" : "lib/HTML/TableContent/Table.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Table::Caption" : {
          "file" : "lib/HTML/TableContent/Table/Caption.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Table::Header" : {
          "file" : "lib/HTML/TableContent/Table/Header.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Table::Row" : {
          "file" : "lib/HTML/TableContent/Table/Row.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Table::Row::Cell" : {
          "file" : "lib/HTML/TableContent/Table/Row/Cell.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Template" : {
          "file" : "lib/HTML/TableContent/Template.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "HTML::TableContent::Template::Base" : {
          "file" : "lib/HTML/TableContent/Template/Base.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -91,6 +91,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/HTML-TableContent"
       }
    },
-   "version" : "1.00",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "IO::Async::Loop::Epoll" : "0",
+            "IO::Async::Loop::Epoll" : "0.23",
             "Linux::FD" : "0.015",
             "Linux::FD::Pid" : "0.007",
             "Scalar::Util" : "0",
@@ -57,7 +57,7 @@
    "provides" : {
       "IO::Async::Loop::Epoll::FD" : {
          "file" : "lib/IO/Async/Loop/Epoll/FD.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -71,9 +71,9 @@
          "web" : "https://github.com/Leont/io-async-loop-epoll-fd"
       }
    },
-   "version" : "0.003",
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "version" : "0.004",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

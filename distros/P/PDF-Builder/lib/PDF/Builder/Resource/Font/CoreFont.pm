@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use File::Basename;
 
@@ -19,7 +19,9 @@ our $subs;
 
 =head1 NAME
 
-PDF::Builder::Resource::Font::CoreFont - Module for using the 14 standard PDF built-in Fonts (plus 15 Windows Fonts).
+PDF::Builder::Resource::Font::CoreFont - Module for using the 14 standard PDF built-in Fonts (plus 15 Windows Fonts)
+
+Inherits from L<PDF::Builder::Resource::Font>
 
 =head1 SYNOPSIS
 
@@ -46,63 +48,61 @@ PDF::Builder::Resource::Font::CoreFont - Module for using the 14 standard PDF bu
 
 Returns a corefont object.
 
-Valid %options are:
-
-=over
-
-=item encode
-
-Changes the encoding of the font from its default.
-See I<perl's Encode> for the supported values. B<Warning:> only single byte 
-encodings are permitted. Multibyte encodings such as 'utf8' are forbidden.
-
-=item pdfname
-
-Changes the reference-name of the font from its default.
-The reference-name is normally generated automatically and can be
-retrieved via C<$pdfname=$font->name()>.
-
-=back
-
 =back
 
 =head2 Supported typefaces
 
-B<standard PDF types>
+=head3 Standard PDF types
+
+See examples/020_corefonts for a list of each font's glyphs.
 
 =over
 
 =item * helvetica, helveticaoblique, helveticabold, helvetiaboldoblique
 
-May have Arial substituted on some systems (e.g., Windows)
+Sans-serif, may have Arial substituted on some systems (e.g., Windows).
 
 =item * courier, courieroblique, courierbold, courierboldoblique
 
-Fixed pitch, may have Courier New substituted on some systems (e.g., Windows)
+Fixed pitch, may have Courier New substituted on some systems (e.g., Windows).
 
 =item * timesroman, timesitalic, timesbold, timesbolditalic
 
-May have Times New Roman substituted on some systems (e.g., Windows)
+Serif, may have Times New Roman substituted on some systems (e.g., Windows).
 
 =item * symbol, zapfdingbats
 
+Various symbols, including the Greek alphabet (in Symbol).
+
 =back
 
-B<Primarily Windows typefaces>
+=head3 Primarily Windows typefaces
+
+See examples/022_truefonts /Windows/Fonts/<name>.ttf 
+for a list of each font's glyphs.
 
 =over
 
 =item * georgia, georgiaitalic, georgiabold, georgiabolditalic
 
+Serif proportional.
+
 =item * verdana, verdanaitalic, verdanabold, verdanabolditalic
+
+Sans-serif proportional with simple strokes.
 
 =item * trebuchet, trebuchetitalic, trebuchetbold, trebuchetbolditalic
 
+Sans-serif proportional with simple strokes.
+
 =item * bankgothic, bankgothicitalic, bankgothicbold, bankgothicitalic
 
+Sans-serif proportional with simple strokes.
 Free versions of Bank Gothic are often only medium weight Roman (bankgothic).
 
 =item * webdings, wingdings
+
+Various symbols, in the vein of Zapf Dingbats.
 
 =back
 
@@ -122,6 +122,43 @@ code points (single byte encodings only) and to look up the glyph widths for
 character positioning. There is no guarantee that a given font file includes
 all the desired glyphs, nor that the widths will be absolutely the same, even
 in different releases of the same font.
+
+=head2 Options
+
+=over
+
+=item encode
+
+Changes the encoding of the font from its default. Notice that the encoding
+(I<not> the entire font's glyph list) is shown in a PDF object (record), listing
+256 glyphs associated with this encoding (I<and> that are available in this 
+font). 
+
+See I<perl's Encode> for the supported values. B<Warning:> only single byte 
+encodings are permitted. Multibyte encodings such as 'utf8' are forbidden.
+
+=item dokern
+
+Enables kerning if data is available.
+
+C<kerning> is an older name for this option, and is still available as
+an B<alternative> to C<dokern>.
+
+=item pdfname
+
+Changes the reference-name of the font from its default.
+The reference-name is normally generated automatically and can be
+retrieved via $pdfname=$font->name().
+
+=item metrics
+
+If given, it is expected to be an anonymous hash of font file data. This is
+to be used instead of looking up the I<$fontname>.pm file for width and other
+data. You may need to use this option if your installed font happens to be
+out of synch with the PDF::Builder built-in core font metrics file (e.g.,
+I<helveticabold.pm>).
+
+=back
 
 =cut
 
@@ -182,6 +219,7 @@ sub new {
     if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
     if (defined $opts{'-metrics'} && !defined $opts{'metrics'}) { $opts{'metrics'} = delete($opts{'-metrics'}); }
     if (defined $opts{'-dokern'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'-dokern'}); }
+    if (defined $opts{'-kerning'} && !defined $opts{'kerning'}) { $opts{'kerning'} = delete($opts{'-dokern'}); }
     if (defined $opts{'-pdfname'} && !defined $opts{'pdfname'}) { $opts{'pdfname'} = delete($opts{'-pdfname'}); }
 
     $opts{'encode'} //= 'latin1';

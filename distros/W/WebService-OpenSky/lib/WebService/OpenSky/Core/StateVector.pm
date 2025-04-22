@@ -3,7 +3,7 @@ package WebService::OpenSky::Core::StateVector;
 # ABSTRACT: A class representing a state from the OpenSky Network API
 
 use WebService::OpenSky::Moose;
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 my @PARAMS = qw(
   icao24
@@ -89,7 +89,7 @@ WebService::OpenSky::Core::StateVector - A class representing a state from the O
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 

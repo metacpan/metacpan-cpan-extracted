@@ -1,5 +1,20 @@
+0.7    2025-04-20  lichtkind
+-------
+    * = major feature release
+    * * complete mouse navigation
+    * * rewritten drawing calculation
+    * * complete reworked color mapping tab
+    * * reworked constriants tab
+    * + add subgradient for smooth color gradients
+    * + smother changing of max iteraation and max (bailout) value
+    * + assigning pixel coordinates to any monomialfactor
+    * + assigning pixel coordinates to more than one destination
+    * + copied over color tab from hormonograph
+    * + monomials have 3 more options (log + sign + coordinates factor)
+
 0.5    2023-11-27  lichtkind
 -------
+    * = major feature release
     * * reworked constriants tab
         added options to use constant or coordinate values
     * * polynomial tab for more complex equations with more monomials
@@ -38,4 +53,4 @@
 TODO:
 
 # ! slow
-# optional color smoothing
+# more equations

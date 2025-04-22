@@ -77,6 +77,6 @@ sub acceptance_tests (%options) {
   );
 
   path('t/results/'.$options{output_file})->spew_utf8($accepter->results_text)
-    if -d '.git' or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
+    if $ENV{AUTHOR_TESTING};
 }
 1;

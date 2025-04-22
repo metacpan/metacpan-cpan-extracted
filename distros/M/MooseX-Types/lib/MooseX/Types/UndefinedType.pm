@@ -3,7 +3,7 @@ use strict;
 package MooseX::Types::UndefinedType;
 # ABSTRACT: a fallback type for when a type cannot be found
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 use Moose::Util::TypeConstraints ();
 use Carp::Clan '^MooseX::Types';
@@ -131,7 +131,7 @@ MooseX::Types::UndefinedType - a fallback type for when a type cannot be found
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

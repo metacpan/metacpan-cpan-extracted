@@ -3,7 +3,9 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical basslines
 
-our $VERSION = '0.0608';
+our $VERSION = '0.0609';
+
+use 5.024;
 
 use Moo;
 use strictures 2;
@@ -325,7 +327,7 @@ Music::Bassline::Generator - Generate musical basslines
 
 =head1 VERSION
 
-version 0.0608
+version 0.0609
 
 =head1 SYNOPSIS
 

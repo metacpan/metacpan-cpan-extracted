@@ -1,6 +1,6 @@
 package load;
 
-$VERSION= '0.25';
+$VERSION= '0.26';
 
 #-------------------------------------------------------------------------------
 # No, we're NOT using strict here.  There are several reasons, the most
@@ -457,7 +457,7 @@ load - control when subroutines will be loaded
 
 =head1 VERSION
 
-This documentation describes version 0.25.
+This documentation describes version 0.26.
 
 =head1 DESCRIPTION
 
@@ -855,14 +855,16 @@ Frank Tolstrup for helping ironing out all of the Windows related issues.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by lnation <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
 Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2010, 2012 Elizabeth
-Mattijsen <liz@dijkmat.nl>. All rights reserved.  This program is free
-software; you can redistribute it and/or modify it under the same terms
-as Perl itself.
+Mattijsen <liz@dijkmat.nl>. 2019->2025 LNATION <email@lnation.org>
+All rights reserved. This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

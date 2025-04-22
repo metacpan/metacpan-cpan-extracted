@@ -1,6 +1,6 @@
 package Map::Tube::Tokyo;
 
-$Map::Tube::Tokyo::VERSION   = '0.60';
+$Map::Tube::Tokyo::VERSION   = '0.63';
 $Map::Tube::Tokyo::AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -11,7 +11,7 @@ Map::Tube::Tokyo - Interface to the Tokyo Subway Map.
 
 =head1 VERSION
 
-Version 0.60
+Version 0.63
 
 =cut
 
@@ -50,11 +50,11 @@ given  stations. It covers the following Tokyo Subway Lines just yet:
 
 =item * Hibiya Line
 
-=item * Tōzai Line
+=item * Tozai Line
 
-=item * Yūrakuchō Line
+=item * Yurakucho Line
 
-=item * Hanzōmon Line
+=item * Hanzomon Line
 
 =item * Namboku Line
 
@@ -68,7 +68,9 @@ given  stations. It covers the following Tokyo Subway Lines just yet:
 
 =back
 
-For more information about Tokyo Map, click L<here|http://en.wikipedia.org/wiki/Tokyo_subway>.
+=head1 MAP DATA
+
+The map data collected from L<this website|http://en.wikipedia.org/wiki/Tokyo_subway>.
 
 =head1 CONSTRUCTOR
 
@@ -170,7 +172,7 @@ L<https://metacpan.org/dist/Map-Tube-Tokyo>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2014 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

@@ -9,7 +9,6 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 BEGIN {
     package MooseX::Types::Test::Recursion;
 
-    use Moose;
     use MooseX::Types::Moose qw(Str HashRef);
     use MooseX::Types -declare => [qw(
         RecursiveHashRef

@@ -3,4 +3,5 @@ requires 'Rose::DB::Object';
 requires 'Rose::DB::Object::Manager';
 requires 'Rose::DB::Object::Loader';
 requires 'DBD::Mock::Session::GenerateFixtures', '0.04';
-requires 'Test::mysqld', 1.0030;
+requires 'Rose::DB::MySQL', '0.774';
+requires 'Test::mysqld', '1.0030';

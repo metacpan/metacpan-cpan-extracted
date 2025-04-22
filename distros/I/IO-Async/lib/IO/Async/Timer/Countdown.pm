@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2012 -- leonerd@leonerd.org.uk
 
-package IO::Async::Timer::Countdown 0.803;
+package IO::Async::Timer::Countdown 0.804;
 
 use v5.14;
 use warnings;

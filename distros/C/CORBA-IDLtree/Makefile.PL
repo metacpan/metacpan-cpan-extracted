@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'CORBA::IDLtree',
-    AUTHOR           => q{Oliver M. Kellogg <okellogg@users.sourceforge.net>},
+    AUTHOR           => q{Oliver M. Kellogg <olivermkellogg@gail.com>},
     VERSION_FROM     => 'lib/CORBA/IDLtree.pm',
     ABSTRACT_FROM    => 'lib/CORBA/IDLtree.pm',
     LICENSE          => 'artistic_2',

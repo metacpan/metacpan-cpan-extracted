@@ -100,7 +100,7 @@ ok( $h2 < 10, 'HashB < 10' );
 ok( 7 >= $h2, '7 >= HashB' );
 
 
-$h->debug( 3 );
+$h->debug(3);
 is( $h->debug, 3, 'Internal method (debug)' );
 # without overwriting
 $h->merge( $hash2, { overwrite => 0 });

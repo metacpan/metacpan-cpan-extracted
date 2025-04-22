@@ -165,7 +165,7 @@ subtest 'anyOf keeps all errors for false paths when invalid, discards errors fo
         {
           instanceLocation => '',
           keywordLocation => '/not',
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },
@@ -363,7 +363,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
         {
           instanceLocation => '',
           keywordLocation => '/not',
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
         # these errors are discarded because /contains passes on instance /1
         #{
@@ -389,7 +389,7 @@ subtest 'applicators with non-boolean subschemas, discarding intermediary errors
         {
           instanceLocation => '',
           keywordLocation => '/not',
-          error => 'subschema is valid',
+          error => 'subschema is true',
         },
       ],
     },

@@ -28,6 +28,27 @@ The body (content) of a message can be stored in various ways.  In this
 manual-page you find the description of extra functionality you have
 when a message contains attachments (parts).
 
+The number of multipart alternatives is growing.  A full list is maintained
+by IANA af F<http://www.iana.org/assignments/media-types/media-types.xhtml#multipart>
+
+=over 4
+
+=item * multipart/mixed
+
+=item * multipart/alternative
+
+=item * multipart/related
+
+=item * multipart/report, RFC6522
+
+=item * multipart/signed, RFC1847
+
+=item * multipart/encrypted
+
+=item * multipart/multilingual, RFC8255 (unused)
+
+=back
+
 Extends L<"DESCRIPTION" in Mail::Message::Body|Mail::Message::Body/"DESCRIPTION">.
  
 =head1 OVERLOADED
@@ -83,6 +104,7 @@ Inherited, see L<Mail::Message::Body/"Constructors">
   epilogue                                ''
   file               Mail::Message::Body  undef
   filename           Mail::Message::Body  undef
+  language           Mail::Message::Body  undef
   log                Mail::Reporter       'WARNINGS'
   message            Mail::Message::Body  undef
   mime_type          Mail::Message::Body  'multipart/mixed'
@@ -127,6 +149,8 @@ into a C<text/plain> body.
 =item file => FILENAME|FILEHANDLE|IOHANDLE
 
 =item filename => FILENAME
+
+=item language => STRING|ARRAY|LIST|FIELD
 
 =item log => LEVEL
 
@@ -337,6 +361,10 @@ Inherited, see L<Mail::Message::Body::Encode/"About the payload">
 =item $obj-E<gt>B<isText>()
 
 Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<language>( [@langs|\@langs|$langs|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
 
 =item $obj-E<gt>B<mimeType>()
 
@@ -627,12 +655,12 @@ clearly not acceptable.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.016,
-built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.017,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

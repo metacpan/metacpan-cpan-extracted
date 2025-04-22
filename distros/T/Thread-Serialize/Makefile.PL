@@ -1,5 +1,6 @@
 require 5.008;
 
+use lib '.';
 BEGIN { eval "use Devel::ThreadsForks; 1" or do 'threadsforks' } #BEGIN
 
 $LIB_TREE= 'Thread';

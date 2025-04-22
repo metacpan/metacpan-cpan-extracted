@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -20,8 +20,9 @@ use Scalar::Util qw(weaken);
 
 =head1 NAME
 
-PDF::Builder::Resource::XObject::Image::PNG_IPL - support routines for PNG 
-image library (using Image::PNG::Libpng). 
+PDF::Builder::Resource::XObject::Image::PNG_IPL - Support routines for PNG 
+image library (using Image::PNG::Libpng) 
+
 Inherits from L<PDF::Builder::Resource::XObject::Image>
 
 =head1 METHODS
@@ -146,8 +147,9 @@ sub new {
     } else {
         open $fh, '<', $file or die "$!: $file";
     }
-    binmode($fh, ':raw');
-    $png->init_io($fh);
+    if (ref($fh) ne 'SCALAR') {
+        binmode($fh, ':raw');
+    }
 
     my ($w,$h, $bpc, $cs, $im, $palette, $trns);
     $self->{' stream'} = '';
@@ -165,8 +167,27 @@ sub new {
 	$xform |= PNG_TRANSFORM_STRIP_16;
 	# this reduces 16bps channels to 8bps
     }
-    $png->read_png($xform);
-    close($fh);
+
+    # IO::String form "filehandle" from SVG doesn't play well with IPL
+    # (wants C FILE *fh)
+    if (ref($fh) eq 'IO::String') {
+	# ref to GLOB (IO::String creation)
+	$png = read_from_scalar(${$fh->string_ref()});
+	$png->set_transforms($xform);
+    } elsif (ref($fh) eq 'IO::File' || ref($fh) eq 'GLOB') {
+	# an opened filename
+        $png->init_io($fh);  
+        $png->read_png($xform);
+    } elsif (ref($fh) eq 'SCALAR') {
+	# scalar ref with actual data
+	$png = read_from_scalar($$fh);
+	$png->set_transforms($xform);
+    } else {
+	die("unhandled input to LibPNG: ".ref($fh));
+    }
+    if (ref($fh) ne 'SCALAR') {
+        close($fh);
+    }
 
     # what chunks are available?
     my $valid = $png->get_valid();

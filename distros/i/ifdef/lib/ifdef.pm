@@ -1,6 +1,6 @@
 package ifdef;
 
-$VERSION= '0.10';
+$VERSION= '0.11';
 
 # be strict from now on
 use strict;
@@ -290,7 +290,7 @@ ifdef - conditionally enable text within pod sections as code
 
 =head1 VERSION
 
-This documentation describes version 0.10.
+This documentation describes version 0.11.
 
 =head1 DESCRIPTION
 
@@ -466,12 +466,14 @@ same itch I had when I implemented this module a long time ago.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, 2005, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+Copyright (c) 2004, 2005, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>
+All rights reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut

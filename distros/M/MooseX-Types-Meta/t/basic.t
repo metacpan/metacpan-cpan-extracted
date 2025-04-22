@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More 0.96;
 
 use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose ':all';
@@ -75,7 +75,6 @@ test TypeConstraint => sub {
 
 test Class => sub {
     check_is(Class, $_) for (
-        MooseX::Types::Meta->meta,
         TestClass->meta,
         Moose::Meta::Class->meta,
     );

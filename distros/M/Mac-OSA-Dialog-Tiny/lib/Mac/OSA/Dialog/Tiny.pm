@@ -1,6 +1,6 @@
 package Mac::OSA::Dialog::Tiny;
 
-use 5.010; use strict; use warnings;our $VERSION = '1.00';
+use 5.010; use strict; use warnings;our $VERSION = '1.01';
 
 use base 'Import::Export';
 
@@ -26,7 +26,7 @@ Mac::OSA::Dialog::Tiny - native mac dialogs
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

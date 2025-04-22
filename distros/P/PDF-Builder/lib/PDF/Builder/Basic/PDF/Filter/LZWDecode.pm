@@ -6,12 +6,14 @@ use Carp;
 use POSIX;
 use base 'PDF::Builder::Basic::PDF::Filter::FlateDecode';
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Filter::LZWDecode - compress and uncompress stream filters for Lempel-Ziv-Welch
+PDF::Builder::Basic::PDF::Filter::LZWDecode - Compress and uncompress stream filters for Lempel-Ziv-Welch
+
+Inherits from L<PDF::Builder::Basic::PDF::Filter::FlateDecode>
 
 =cut
 

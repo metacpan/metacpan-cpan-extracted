@@ -4,7 +4,7 @@
       "Tiago Peczenyj <tiago.peczenyj+gdpr-iab-tcfv2@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,7 @@
          "web" : "https://github.com/peczenyj/GDPR-IAB-TCFv2"
       }
    },
-   "version" : "0.201",
-   "x_authority" : "cpan:PACMAN"
+   "version" : "0.203",
+   "x_authority" : "cpan:PACMAN",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

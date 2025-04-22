@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.608';
+our $VERSION = '0.609';
 
 use 5.020;
 use strictures 2;
@@ -287,8 +287,10 @@ sub local_annotations ($state) {
   grep $_->{instance_location} eq $state->{data_path}, $state->{annotations}->@*;
 }
 
-# shorthand for finding the canonical uri of the present schema location
+# shorthand for finding the current uri of the present schema location
 # ensure that this code is kept consistent with the absolute_keyword_location builder in ResultNode
+# Note that this may not be canonical if schema_path has not yet been reset via the processing of a
+# local identifier keyword (e.g. '$id').
 sub canonical_uri ($state, @extra_path) {
   return $state->{initial_schema_uri} if not @extra_path and not length($state->{schema_path});
   my $uri = $state->{initial_schema_uri}->clone;
@@ -442,9 +444,9 @@ sub assert_uri ($state, $schema, $override = undef) {
   return E($state, '"%s" is not a valid URI', $string)
     # see also uri format sub
     if fc($uri->to_unsafe_string) ne fc($string)
-      or $string =~ /[^[:ascii:]]/
-      or not $uri->is_abs
-      or $string =~ /#/
+      or $string =~ /[^[:ascii:]]/            # ascii characters only
+      or not $uri->is_abs                     # must have a scheme
+      or $string =~ /#/                       # no fragment, except...
         and $string !~ m{#$}                          # empty fragment
         and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
         and $string !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
@@ -478,7 +480,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.608
+version 0.609
 
 =head1 SYNOPSIS
 

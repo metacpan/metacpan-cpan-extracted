@@ -76,6 +76,7 @@ Inherited, see L<Mail::Message::Body/"Constructors">
   eol                Mail::Message::Body  'NATIVE'
   file               Mail::Message::Body  undef
   filename           Mail::Message::Body  undef
+  language           Mail::Message::Body  undef
   log                Mail::Reporter       'WARNINGS'
   message            Mail::Message::Body  undef
   mime_type          Mail::Message::Body  'text/plain'
@@ -104,6 +105,8 @@ Inherited, see L<Mail::Message::Body/"Constructors">
 =item file => FILENAME|FILEHANDLE|IOHANDLE
 
 =item filename => FILENAME
+
+=item language => STRING|ARRAY|LIST|FIELD
 
 =item log => LEVEL
 
@@ -242,6 +245,10 @@ Inherited, see L<Mail::Message::Body::Encode/"About the payload">
 =item $obj-E<gt>B<isText>()
 
 Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<language>( [@langs|\@langs|$langs|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
 
 =item $obj-E<gt>B<mimeType>()
 
@@ -482,12 +489,12 @@ no copy to a temporary file can be made.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.016,
-built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.017,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

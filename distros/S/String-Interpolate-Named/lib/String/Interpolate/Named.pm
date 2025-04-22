@@ -7,6 +7,9 @@ use strict;
 use utf8;
 use Carp qw( carp croak );
 
+# Disable 'Unicode character 0xfddX is illegal' warnings.
+no if $] < 5.014, q|warnings|, qw(utf8);
+
 use parent 'Exporter';
 our @EXPORT = qw( interpolate );
 
@@ -16,7 +19,7 @@ String::Interpolate::Named - Interpolated named arguments in string
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 =head1 SYNOPSIS
 
@@ -101,13 +104,97 @@ index (period and a number) to the named argument.
 
 Assume C<customer> has value C<[ "Jones", "Smith" ]>, then:
 
-    "%{customer.1} will be Smith"
-    "%{customer.2} will be Jones"
     "%{customer} will be Jones Smith"
+    "%{customer.0} will be Jones Smith"
+    "%{customer.1} will be Jones"
+    "%{customer.2} will be Smith"
 
 When the value exceeds the number of elements in the list, an empty
 value is returned.
-When no element is selected the values are concatenated.
+Index zero, or no index, will return all values concatenated.
+
+=head2 Format modifiers
+
+A named variable may have I<format modifiers> attached to perform
+formatting operations on the substituted value.
+Format modifiers start with a colon C<:>.
+
+Assuming argument C<title> has the value C<"My Book">, then
+C<"%{title:lc}">
+will yield the title in lowercase C<"my book">.
+
+The following format modifiers are available:
+
+=over 6
+
+=item C<:lc>
+
+Yields the substituted value in all lower case.
+
+Using the example above, this will be C<"my book">.
+
+=item C<:uc>
+
+Yields the substituted value in all upper case.
+
+Using the example above, this will be C<"MY BOOK">.
+
+=item C<:ic>
+
+Yields the substituted value with initial caps, e.g. the first letter
+of each word is capitalized.
+
+Using the example above, this will be C<"My Book">.
+Indeed, no difference since the value is already correctly cased.
+
+To enforce lower case before applying initial case, use format modifiers
+C<:lc:ic>.
+
+=item C<:sc>
+
+Yields the substituted value with an initial cap and the rest lower case.
+
+Using the example above, this will be C<"My Book">.
+Again, no difference since the value already has an initial capital.
+
+To enforce lower case before applying initial case, use format modifiers
+C<:lc:sc>. Now the result will be C<"My book">.
+
+=item C<:lpad(>I<N>C<)>   C<:lpad(>I<N>C<,>I<S>C<)>
+
+Pads the value by repeatedly prepending the string I<S> until the
+total width is I<N>.
+
+If I<S> is omitted, uses spaces.
+
+=item C<:rpad(>I<N>C<)>   C<:rpad(>I<N>C<,>I<S>C<)>
+
+Pads the value by repeatedly appending the string I<S> until the
+total width is I<N>.
+
+If I<S> is omitted, uses spaces.
+
+=item C<:replace(>I<SRC>C<,>I<DST>C<)>
+
+Replaces all occurrences of I<STR> by I<DST>,
+
+If I<S> is omitted, uses spaces.
+
+=item C<:%>I<fmt>
+
+Apply standard printf() formatting, e.g. C<%{key:%03d}> yields the numeric
+value of C<key> as a 3-digit string, adding leading zeroes if necessary.
+
+=back
+
+Note that, when combining formatting and conditional interpolation,
+you must check for the I<formatted> value:
+
+    "This takes %{days:%02d=01|%{} day|%{} days}"
+
+You can prevent a colon from splitting formatters with a backslash:
+
+     %{title:replace( ,\:)}
 
 =head2 The Control Hash
 
@@ -265,6 +352,7 @@ sub interpolate {
 		     (?<pre> .*? )
 		     \x{fddf}
 		     (?<key> $keypat )
+		     (?: : (?<fmt> .*? ) )?
 		     (?: (?<op> \= )
 			 (?<test> [^|}\x{fddf}]*) )?
 		     (?: \| (?<then> [^|}\x{fddf}]*  )
@@ -323,9 +411,9 @@ sub _interpolate {
 	( $key, $inx ) = ( $1, $2 );
     }
 
-    my $t = ref($m) eq 'CODE' ? $m->($key) : $m->{$key};
-    if ( defined $t ) {
-	$val = $t;
+    my $newval = ref($m) eq 'CODE' ? $m->($key) : $m->{$key};
+    if ( defined $newval ) {
+	$val = $newval;
 
 	if ( UNIVERSAL::isa( $val, 'ARRAY' ) ) {
 	    # 1, 2, ... selects 1st, 2nd value; -1 counts from end.
@@ -353,6 +441,30 @@ sub _interpolate {
     }
 
     my $subst = '';
+    for ( split( /(?<!\\):/, $i->{fmt}//'' ) ) {
+	last unless defined $newval;
+	next unless my $fmt = $_;
+
+	# Simple formatters.
+	if    ( $fmt eq 'lc' ) { $val = lc($val) }
+	elsif ( $fmt eq 'uc' ) { $val = uc($val) }
+	elsif ( $fmt eq 'sc' ) { $val = ucfirst($val) }
+	elsif ( $fmt eq 'ic' ) { $val = f_ic($val) }
+
+	# Functions.
+	elsif ( $fmt =~ /^([lr])pad\((\d+)(?:,(.*?))?\)$/ ) {
+	    $val = f_pad( $val, $1, $2, $3 );
+	}
+
+	elsif ( $fmt =~ /^replace\((.+?),(.*?)\)$/ ) {
+	    $val = f_replace( $val, $1, $2 );
+	}
+
+	# Printf formatting.
+	elsif ( $fmt =~ /^%/ ) { $val = f_printf( $val, $fmt ) }
+
+	else { Carp::croak("Invalid format code '$fmt'"); }
+    }
     if ( $i->{op} ) {
 	my $test = $i->{test} // '';
 	if ( $i->{op} eq '=' && $val eq $test ) {
@@ -371,6 +483,40 @@ sub _interpolate {
 
     $subst =~ s/\x{fdde}/$val/g;
     return $subst;
+}
+
+# Formatter functions.
+# First arg = $val.
+# Return new value.
+
+sub f_ic {
+    my ( $val ) = @_;
+    join('', map { ucfirst } (split( /(^|\s+|-)/, $val )));
+}
+
+sub f_pad {
+    my ( $val, $lr, $len, $str ) = @_;
+    $str //= " ";
+    return $val unless ( my $need = $len - length($val) ) > 0;
+    my $pad = $str x (1+int(($len-1)/length($str)));
+    if ( $lr eq 'l' ) {
+	return substr( $pad, 0, $need ) . $val;
+    }
+    $val . substr( $pad, 0, $need );
+}
+
+sub f_replace {
+    my ( $val, $rep, $str ) = @_;
+    $val =~ s/\Q$rep\E/$str/g;
+    $val;
+}
+
+sub f_printf {
+    my ( $val, $fmt ) = @_;
+    # A common problem is when a numeric format does not
+    # have a value to format. Suppress the warning.
+    no warnings qw(numeric);
+    sprintf( $fmt, $val );
 }
 
 =head1 REQUIREMENTS
@@ -399,11 +545,11 @@ Many of the existing template / interpolate / substitute modules.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2018,2019 Johan Vromans, all rights reserved.
+Copyright 2018,2025 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
 
-1; # End of String::Interpolate::Named
+1;

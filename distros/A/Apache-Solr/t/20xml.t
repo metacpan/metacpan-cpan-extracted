@@ -24,7 +24,13 @@ require_ok('Apache::Solr::Document');
 my $format = $0 =~ m/xml/ ? 'xml' : 'json';
 my $FORMAT = uc $format;
 
-my $solr = Apache::Solr->new(format => $FORMAT, server => $server);
+my $solr = Apache::Solr->new
+  ( format     => $FORMAT
+  , server     => $server
+  , retry_max  => 3
+  , retry_wait => 2
+  );
+
 ok(defined $solr, "instantiated client in $format");
 
 isa_ok($solr, 'Apache::Solr::'.$FORMAT);

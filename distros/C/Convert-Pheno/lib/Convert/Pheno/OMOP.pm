@@ -4,84 +4,18 @@ use strict;
 use warnings;
 use autodie;
 use feature qw(say);
+use Convert::Pheno::OMOP::Definitions;
+use Convert::Pheno::Utils::Default qw(get_defaults);
+use Convert::Pheno::Utils::Mapping;
+use Exporter 'import';
 
 #use Data::Dumper;
-use Convert::Pheno::Default qw(get_defaults);
-use Convert::Pheno::Mapping;
-use Exporter 'import';
-our @EXPORT =
-  qw(do_omop2bff $omop_version $omop_main_table @omop_array_tables @omop_essential_tables @stream_ram_memory_tables);
+
+our @EXPORT = qw(do_omop2bff);
 
 my $DEFAULT = get_defaults();
 
 use constant DEVEL_MODE => 0;
-
-our $omop_version    = 'v5.4';
-our $omop_main_table = {
-    'v5.4' => [
-        qw(
-          PERSON
-          OBSERVATION_PERIOD
-          VISIT_OCCURRENCE
-          VISIT_DETAIL
-          CONDITION_OCCURRENCE
-          DRUG_EXPOSURE
-          PROCEDURE_OCCURRENCE
-          DEVICE_EXPOSURE
-          MEASUREMENT
-          OBSERVATION
-          NOTE
-          NOTE_NLP
-          SPECIMEN
-          FACT_RELATIONSHIP
-          SURVEY_CONDUCT
-        )
-    ],
-    'v6' => [
-        qw(
-          PERSON
-          OBSERVATION_PERIOD
-          VISIT_OCCURRENCE
-          VISIT_DETAIL
-          CONDITION_OCCURRENCE
-          DRUG_EXPOSURE
-          PROCEDURE_OCCURRENCE
-          DEVICE_EXPOSURE
-          MEASUREMENT
-          OBSERVATION
-          DEATH
-          NOTE
-          NOTE_NLP
-          SPECIMEN
-          FACT_RELATIONSHIP
-        )
-    ]
-};
-
-# NB: Direct export w/o encapsulation in subroutine
-our @omop_array_tables = qw(
-  MEASUREMENT
-  OBSERVATION
-  CONDITION_OCCURRENCE
-  PROCEDURE_OCCURRENCE
-  DRUG_EXPOSURE
-  VISIT_OCCURRENCE
-);
-
-# NB: Direct export w/o encapsulation in subroutine
-our @omop_essential_tables = qw(
-  CONCEPT
-  CONDITION_OCCURRENCE
-  PERSON
-  PROCEDURE_OCCURRENCE
-  MEASUREMENT
-  OBSERVATION
-  DRUG_EXPOSURE
-  VISIT_OCCURRENCE
-);
-
-# NB: Direct export w/o encapsulation in subroutine
-our @stream_ram_memory_tables = qw/CONCEPT PERSON VISIT_OCCURRENCE/;
 
 # Initialize global hash for seen_individual entries in --stream
 my %seen_individual = ();
@@ -93,7 +27,6 @@ my %seen_individual = ();
 ##############
 
 sub do_omop2bff {
-
     my ( $self, $participant ) = @_;
 
     my $ohdsi_dict = $self->{data_ohdsi_dict};
@@ -103,8 +36,8 @@ sub do_omop2bff {
     # START MAPPING TO BEACON V2 TERMS #
     ####################################
 
-    # Initiate BFF structure
-    my $individual;
+    # Initiate BFF structure as an empty hash reference
+    my $individual = {};
 
     # Get cursors for 1D terms
     my $person = $participant->{PERSON};
@@ -119,10 +52,153 @@ sub do_omop2bff {
  # Premature return as undef
     return unless defined $person->{gender_concept_id};
 
+    # 1) Map Person (id, info, sex, ethnicity, geographicOrigin)
+    _map_person( $self, $participant, $individual, $ohdsi_dict, $person );
+
+    # 2) Map Condition Occurrences => diseases
+    _map_diseases( $self, $participant, $individual, $person, $ohdsi_dict );
+
+    # 3) Map Observations => exposures
+    _map_exposures( $self, $participant, $individual, $person, $ohdsi_dict );
+
+    # 4) Map Observations => phenotypicFeatures (those NOT in exposures)
+    _map_phenotypicFeatures( $self, $participant, $individual, $person,
+        $ohdsi_dict );
+
+    # 5) Map geographicOrigin (already in person) – done in _map_person
+    #    (included above)
+
+    # 6) Map Procedures => interventionsOrProcedures
+    _map_interventionsOrProcedures( $self, $participant, $individual,
+        $person, $ohdsi_dict );
+
+    # 7) Map Measurements => measures
+    _map_measures( $self, $participant, $individual, $person, $ohdsi_dict );
+
+    # 8) Map Drug Exposures => treatments
+    _map_treatments( $self, $participant, $individual, $person, $ohdsi_dict );
+
+    ##################################
+    # END MAPPING TO BEACON V2 TERMS #
+    ##################################
+
+    return ( $self->{stream} && avoid_seen_individuals($individual) )
+      ? undef
+      : $individual;
+}
+
+################################################################################
+# Private conversion subs
+################################################################################
+
+sub _map_person {
+    my ( $self, $participant, $individual, $ohdsi_dict, $person ) = @_;
+
+    # =========
+    # ethnicity
+    # =========
+    $individual->{ethnicity} = map_ontology_term(
+        {
+            query => $person->{race_source_value}
+            ,    # not getting it from *_concept_id
+            column   => 'label',
+            ontology => 'ncit',
+            self     => $self
+        }
+    ) if defined $person->{race_source_value};
+
+    # ================
+    # geographicOrigin
+    # ================
+
+    $individual->{geographicOrigin} = map_ontology_term(
+        {
+            query    => $person->{ethnicity_source_value},
+            column   => 'label',
+            ontology => 'ncit',
+            self     => $self
+        }
+    ) if defined $person->{ethnicity_source_value};
+
+    # ==
+    # id
+    # ==
+
+    $individual->{id} = $person->{person_id};
+
+    # Forcing string w/o changing orig ref ($person)
+    $individual->{id} = qq/$individual->{id}/;
+
+    # ====
+    # info
+    # ====
+
+    my $table = 'PERSON';
+
+    # Table PERSON
+    #     1	birth_datetime
+    #     2	care_site_id
+    #     3	day_of_birth
+    #     4	ethnicity_concept_id
+    #     5	ethnicity_source_concept_id
+    #     6	ethnicity_source_value
+    #     7	gender_concept_id
+    #     8	gender_source_concept_id
+    #     9	gender_source_value
+    #    10	location_id
+    #    11	month_of_birth
+    #    12	person_id
+    #    13	person_source_value
+    #    14	provider_id
+    #    15	race_concept_id
+    #    16	race_source_concept_id
+    #    17	race_source_value
+    #    18	year_of_birth
+
+    # info (Autovivification)
+    $individual->{info}{$table}{OMOP_columns} = $person;
+
+    # Hard-coded $individual->{info}{dateOfBirth}
+    $individual->{info}{dateOfBirth} =
+      map_iso8601_date2timestamp( $person->{birth_datetime} );
+
+    # When we use --test we do not serialize changing (metaData) information
+    unless ( $self->{test} ) {
+        $individual->{info}{metaData}     = $self->{metaData};
+        $individual->{info}{convertPheno} = $self->{convertPheno};
+    }
+
+    # ===
+    # sex
+    # ===
+
+    # OHSDI CONCEPT.vocabulary_id = Gender (i.e., ad hoc)
+    my $sex = map2ohdsi(
+        {
+            ohdsi_dict => $ohdsi_dict,
+            concept_id => $person->{gender_concept_id},
+            self       => $self
+        }
+    );
+
+    # $sex = {id, label}, we need to use 'label'
+    $individual->{sex} = map_ontology_term(
+        {
+            query    => $sex->{label},
+            column   => 'label',
+            ontology => 'ncit',
+            self     => $self
+        }
+
+    ) if $sex;
+}
+
+sub _map_diseases {
+    my ( $self, $participant, $individual, $person, $ohdsi_dict ) = @_;
+
     # ========
     # diseases
     # ========
-
     my $table = 'CONDITION_OCCURRENCE';
 
     # Table CONDITION_OCCURRENCE
@@ -150,12 +226,8 @@ sub do_omop2bff {
 
             $disease->{ageOfOnset} = {
                 age => {
-                    iso8601duration => find_age(
-
-           #_birth_datetime => $person->{birth_datetime}, # Property not allowed
-           #_procedure_date => $field->{procedure_date},  # Property not allowed
+                    iso8601duration => get_age_from_date_and_birthday(
                         {
-
                             date      => $field->{condition_start_date},
                             birth_day => $person->{birth_datetime}
                         }
@@ -170,16 +242,6 @@ sub do_omop2bff {
                     self       => $self
                 }
             ) if defined $field->{condition_concept_id};
-
-            #$disease->{familyHistory} = convert2boolean(
-            #    map2redcap_dict(
-            #        {
-            #            redcap_dict  => $redcap_dict,
-            #            participant => $participant,
-            #            field       => 'family_history'
-            #        }
-            #    )
-            #) if $participant->{family_history} ne '';
 
             # notes MUST be string
             # _info (Autovivification)
@@ -214,52 +276,20 @@ sub do_omop2bff {
             push @{ $individual->{diseases} }, $disease;
         }
     }
+}
 
-    # =========
-    # ethnicity
-    # =========
-
-    $individual->{ethnicity} = map_ontology_term(
-        {
-            query => $person->{race_source_value}
-            ,    # not getting it from *_concept_id
-            column   => 'label',
-            ontology => 'ncit',
-
-            #ontology => 'ohdsi',
-            self => $self
-        }
-    ) if defined $person->{race_source_value};
+sub _map_exposures {
+    my ( $self, $participant, $individual, $person, $ohdsi_dict ) = @_;
 
     # =========
     # exposures
     # =========
-
-    #          'observation_concept_id' => 37017711,
-    #          'observation_date' => '1945-05-25',
-    #          'observation_datetime' => '1945-05-25 00:00:00',
-    #          'observation_id' => 919,
-    #          'observation_source_concept_id' => 37017711,
-    #          'observation_source_value' => 714035009,
-    #          'observation_type_concept_id' => 38000280,
-    #          'person_id' => 1476,
-    #          'provider_id' => 0,
-    #          'qualifier_concept_id' => 0,
-    #          'qualifier_source_value' => undef,
-    #          'unit_concept_id' => 0,
-    #          'unit_source_value' => undef,
-    #          'value_as_concept_id' => 0,
-    #          'value_as_number' => '\\N',
-    #          'value_as_string' => undef,
-    #          'visit_detail_id' => 0,
-    #          'visit_occurrence_id' => 98529
+    my $table = 'OBSERVATION';
 
     #**************************************************
     # *** IMPORTANT ***
     # We'll only process if exist in $self->{exposures};
     #*************************************************
-    #
-    $table = 'OBSERVATION';
 
     if ( defined $participant->{$table} ) {
 
@@ -278,16 +308,13 @@ sub do_omop2bff {
 
             $exposure->{ageAtExposure} = {
                 age => {
-                    iso8601duration => find_age(
-
+                    iso8601duration => get_age_from_date_and_birthday(
                         {
-
                             date      => $field->{observation_date},
                             birth_day => $person->{birth_datetime}
                         }
                     )
                 }
-
             };
 
             $exposure->{date}     = $field->{observation_date};
@@ -326,73 +353,88 @@ sub do_omop2bff {
             push @{ $individual->{exposures} }, $exposure;
         }
     }
+}
 
-    # ================
-    # geographicOrigin
-    # ================
+sub _map_phenotypicFeatures {
+    my ( $self, $participant, $individual, $person, $ohdsi_dict ) = @_;
 
-    $individual->{geographicOrigin} = map_ontology_term(
-        {
-            query    => $person->{ethnicity_source_value},
-            column   => 'label',
-            ontology => 'ncit',
-            self     => $self
+    # ==================
+    # phenotypicFeatures
+    # ==================
+    my $table = 'OBSERVATION';
+
+    # *** IMPORTANT ***
+    # We'll only process if not exist in $self->{exposures};
+
+    if ( defined $participant->{$table} ) {
+
+        $individual->{phenotypicFeatures} = [];
+
+        for my $field ( @{ $participant->{$table} } ) {
+
+# NB: Values in key hashes are stringfied so make a copy to keep them as integer
+            my $field_observation_concept_id = $field->{observation_concept_id};
+            next
+              if exists $self->{exposures}{$field_observation_concept_id};
+
+            my $phenotypicFeature;
+
+            #$phenotypicFeature->{evidence} = undef;
+            #$phenotypicFeature->{excluded} = undef;
+            $phenotypicFeature->{featureType} = map2ohdsi(
+                {
+                    ohdsi_dict => $ohdsi_dict,
+                    concept_id => $field->{observation_concept_id},
+                    self       => $self
+
+                }
+            ) if defined $field->{observation_concept_id};
+
+            #$phenotypicFeature->{modifiers} = undef;
+
+            # notes MUST be string
+            # _info (Autovivification)
+            $phenotypicFeature->{_info}{$table}{OMOP_columns} = $field;
+
+            $phenotypicFeature->{onset} = {
+                iso8601duration => get_age_from_date_and_birthday(
+                    {
+                        date      => $field->{observation_date},
+                        birth_day => $person->{birth_datetime}
+                    }
+                )
+            };
+
+            #$phenotypicFeature->{resolution} = undef;
+            #$phenotypicFeature->{severity} = undef;
+
+            # NB: PROVISIONAL
+            # Longitudinal data are not allowed yet in BFF/PXF
+            if ( exists $self->{visit_occurrence} ) {
+                my $visit = map_omop_visit_occurrence(
+                    {
+                        person_id           => $field->{person_id},
+                        visit_occurrence_id => $field->{visit_occurrence_id},
+                        self                => $self,
+                        ohdsi_dict          => $ohdsi_dict
+                    }
+                );
+                $phenotypicFeature->{_visit} = $visit if defined $visit;
+            }
+
+            push @{ $individual->{phenotypicFeatures} }, $phenotypicFeature;
         }
-    ) if defined $person->{ethnicity_source_value};
-
-    # ==
-    # id
-    # ==
-
-    $individual->{id} = $person->{person_id};
-
-    # Forcing string w/o changing orig ref ($person)
-    $individual->{id} = qq/$individual->{id}/;
-
-    # ====
-    # info
-    # ====
-
-    $table = 'PERSON';
-
-    # Table PERSON
-    #     1	birth_datetime
-    #     2	care_site_id
-    #     3	day_of_birth
-    #     4	ethnicity_concept_id
-    #     5	ethnicity_source_concept_id
-    #     6	ethnicity_source_value
-    #     7	gender_concept_id
-    #     8	gender_source_concept_id
-    #     9	gender_source_value
-    #    10	location_id
-    #    11	month_of_birth
-    #    12	person_id
-    #    13	person_source_value
-    #    14	provider_id
-    #    15	race_concept_id
-    #    16	race_source_concept_id
-    #    17	race_source_value
-    #    18	year_of_birth
-
-    # info (Autovivification)
-    $individual->{info}{$table}{OMOP_columns} = $person;
-
-    # Hard-coded $individual->{info}{dateOfBirth}
-    $individual->{info}{dateOfBirth} =
-      _map2iso8601( $person->{birth_datetime} );
-
-    # When we use --test we do not serialize changing (metaData) information
-    unless ( $self->{test} ) {
-        $individual->{info}{metaData}     = $self->{metaData};
-        $individual->{info}{convertPheno} = $self->{convertPheno};
     }
+}
+
+sub _map_interventionsOrProcedures {
+    my ( $self, $participant, $individual, $person, $ohdsi_dict ) = @_;
 
     # =========================
     # interventionsOrProcedures
     # =========================
 
-    $table = 'PROCEDURE_OCCURRENCE';
+    my $table = 'PROCEDURE_OCCURRENCE';
 
     #      1	modifier_concept_id
     #      2	modifier_source_value
@@ -418,13 +460,8 @@ sub do_omop2bff {
 
             $intervention->{ageAtProcedure} = {
                 age => {
-
-                    iso8601duration => find_age(
-
-           #_birth_datetime => $person->{birth_datetime}, # Property not allowed
-           #_procedure_date => $field->{procedure_date},  # Property not allowed
+                    iso8601duration => get_age_from_date_and_birthday(
                         {
-
                             date      => $field->{procedure_date},
                             birth_day => $person->{birth_datetime}
                         }
@@ -446,21 +483,33 @@ sub do_omop2bff {
                 }
             ) if defined $field->{procedure_concept_id};
 
+            # NB: PROVISIONAL
+            # Longitudinal data are not allowed yet in BFF/PXF
+            if ( exists $self->{visit_occurrence} ) {
+                my $visit = map_omop_visit_occurrence(
+                    {
+                        person_id           => $field->{person_id},
+                        visit_occurrence_id => $field->{visit_occurrence_id},
+                        self                => $self,
+                        ohdsi_dict          => $ohdsi_dict
+                    }
+                );
+                $intervention->{_visit} = $visit if defined $visit;
+            }
+
             push @{ $individual->{interventionsOrProcedures} }, $intervention;
         }
     }
+}
 
-    # =============
-    # karyotypicSex
-    # =============
-
-    # $individual->{karyotypicSex} = undef;
+sub _map_measures {
+    my ( $self, $participant, $individual, $person, $ohdsi_dict ) = @_;
 
     # ========
     # measures
     # ========
 
-    $table = 'MEASUREMENT';
+    my $table = 'MEASUREMENT';
 
     #      1	measurement_concept_id
     #      2	measurement_date
@@ -482,29 +531,6 @@ sub do_omop2bff {
     #     18	value_source_value
     #     19	visit_detail_id
     #     20	visit_occurrence_id
-
-    # Examples:
-
-    #  "measurement_concept_id" : 3006322,
-    #  "measurement_date" : "1943-02-03",
-    #  "measurement_datetime" : "1943-02-03 00:00:00",
-    #  "measurement_id" : 9852,
-    #  "measurement_source_concept_id" : 3006322,
-    #  "measurement_source_value" : "8331-1",
-    #  "measurement_time" : "1943-02-03",
-    #  "measurement_type_concept_id" : 5001,
-    #  "operator_concept_id" : 0,
-    #  "person_id" : 929,
-    #  "provider_id" : 0,
-    #  "range_high" : "\\N",
-    #  "range_low" : "\\N",
-    #  "unit_concept_id" : 0,
-    #  "unit_source_value" : null,
-    #  "value_as_concept_id" : 0,
-    #  "value_as_number" : "\\N",
-    #  "value_source_value" : null,
-    #  "visit_detail_id" : 0,
-    #  "visit_occurrence_id" : 61837
 
     if ( defined $participant->{$table} ) {
 
@@ -528,37 +554,29 @@ sub do_omop2bff {
                     }
                 );
             }
-
-            # Set default and move on
             else {
+                # Set default and move on
                 $measure = set_default_measure();
                 next;
             }
 
             $measure->{date} = $field->{measurement_date};
 
-            my $unit = $field->{unit_concept_id}
+            my $unit =
+              $field->{unit_concept_id}
               ? map2ohdsi(
                 {
                     ohdsi_dict => $ohdsi_dict,
                     concept_id => $field->{unit_concept_id},
                     self       => $self
-
                 }
-
-                #) : $DEFAULT->{ontology_term};
-
               )
               : {
                 id    => "NCIT:C126101",
                 label => "Not Available"
-              },
+              };
 
-              # *** IMPORTANT ***
-              # We can get value_as_concept_id or as value_as_number
-              # NB: EUNOMIA always -- $field->{value_as_concept_id} = 0;
-
-              my $measurement_value;
+            my $measurement_value;
 
             if ( $field->{value_as_concept_id} ) {
                 $measurement_value = map2ohdsi(
@@ -601,7 +619,7 @@ sub do_omop2bff {
             $measure->{_info}{$table}{OMOP_columns} = $field;
             $measure->{observationMoment} = {
                 age => {
-                    iso8601duration => find_age(
+                    iso8601duration => get_age_from_date_and_birthday(
                         {
                             date      => $field->{measurement_date},
                             birth_day => $person->{birth_datetime}
@@ -641,133 +659,16 @@ sub do_omop2bff {
             push @{ $individual->{measures} }, $measure;
         }
     }
+}
 
-    # =========
-    # pedigrees
-    # =========
-
-    # ==================
-    # phenotypicFeatures
-    # ==================
-
-    $table = 'OBSERVATION';
-
-    #          'observation_concept_id' => 37017711,
-    #          'observation_date' => '1945-05-25',
-    #          'observation_datetime' => '1945-05-25 00:00:00',
-    #          'observation_id' => 919,
-    #          'observation_source_concept_id' => 37017711,
-    #          'observation_source_value' => 714035009,
-    #          'observation_type_concept_id' => 38000280,
-    #          'person_id' => 1476,
-    #          'provider_id' => 0,
-    #          'qualifier_concept_id' => 0,
-    #          'qualifier_source_value' => undef,
-    #          'unit_concept_id' => 0,
-    #          'unit_source_value' => undef,
-    #          'value_as_concept_id' => 0,
-    #          'value_as_number' => '\\N',
-    #          'value_as_string' => undef,
-    #          'visit_detail_id' => 0,
-    #          'visit_occurrence_id' => 98529
-
-    # *** IMPORTANT ***
-    # We'll only process if not exist in $self->{exposures};
-
-    if ( defined $participant->{$table} ) {
-
-        $individual->{phenotypicFeatures} = [];
-
-        for my $field ( @{ $participant->{$table} } ) {
-
-# NB: Values in key hashes are stringfied so make a copy to keep them as integer
-            my $field_observation_concept_id = $field->{observation_concept_id};
-            next
-              if exists $self->{exposures}{$field_observation_concept_id};
-
-            my $phenotypicFeature;
-
-            #$phenotypicFeature->{evidence} = undef;
-            #$phenotypicFeature->{excluded} = undef;
-            $phenotypicFeature->{featureType} = map2ohdsi(
-                {
-                    ohdsi_dict => $ohdsi_dict,
-                    concept_id => $field->{observation_concept_id},
-                    self       => $self
-
-                }
-            ) if defined $field->{observation_concept_id};
-
-            #$phenotypicFeature->{modifiers} = undef;
-
-            # notes MUST be string
-            # _info (Autovivification)
-            $phenotypicFeature->{_info}{$table}{OMOP_columns} = $field;
-
-            $phenotypicFeature->{onset} = {
-
-        #_birth_datetime   => $person->{birth_datetime}, # property not allowed
-        #_observation_date => $field->{observation_date}, # property not allowed
-
-                iso8601duration => find_age(
-                    {
-
-                        date      => $field->{observation_date},
-                        birth_day => $person->{birth_datetime}
-                    }
-                )
-            };
-
-            #$phenotypicFeature->{resolution} = undef;
-            #$phenotypicFeature->{severity} = undef;
-
-            # NB: PROVISIONAL
-            # Longitudinal data are not allowed yet in BFF/PXF
-            if ( exists $self->{visit_occurrence} ) {
-                my $visit = map_omop_visit_occurrence(
-                    {
-                        person_id           => $field->{person_id},
-                        visit_occurrence_id => $field->{visit_occurrence_id},
-                        self                => $self,
-                        ohdsi_dict          => $ohdsi_dict
-                    }
-                );
-                $phenotypicFeature->{_visit} = $visit if defined $visit;
-            }
-
-            push @{ $individual->{phenotypicFeatures} }, $phenotypicFeature;
-        }
-    }
-
-    # ===
-    # sex
-    # ===
-
-    # OHSDI CONCEPT.vocabulary_id = Gender (i.e., ad hoc)
-    my $sex = map2ohdsi(
-        {
-            ohdsi_dict => $ohdsi_dict,
-            concept_id => $person->{gender_concept_id},
-            self       => $self
-        }
-    );
-
-    # $sex = {id, label), we need to use 'label'
-    $individual->{sex} = map_ontology_term(
-        {
-            query    => $sex->{label},
-            column   => 'label',
-            ontology => 'ncit',
-            self     => $self
-        }
-
-    ) if $sex;
+sub _map_treatments {
+    my ( $self, $participant, $individual, $person, $ohdsi_dict ) = @_;
 
     # ==========
     # treatments
     # ==========
 
-    $table = 'DRUG_EXPOSURE';
+    my $table = 'DRUG_EXPOSURE';
 
     #      1	days_supply
     #      2	dose_unit_source_value
@@ -793,33 +694,6 @@ sub do_omop2bff {
     #     22	visit_detail_id
     #     23	visit_occurrence_id
 
-    # Example:
-
-    #            'days_supply' => 35,
-    #            'dose_unit_source_value' => undef,
-    #            'drug_concept_id' => 19078461,
-    #            'drug_exposure_end_date' => '2014-11-19',
-    #            'drug_exposure_end_datetime' => '2014-11-19 00:00:00',
-    #            'drug_exposure_id' => 9656,
-    #            'drug_exposure_start_date' => '2014-10-15',
-    #            'drug_exposure_start_datetime' => '2014-10-15 00:00:00',
-    #            'drug_source_concept_id' => 19078461,
-    #            'drug_source_value' => 310965,
-    #            'drug_type_concept_id' => 38000177,
-    #            'lot_number' => 0,
-    #            'person_id' => 807,
-    #            'provider_id' => 0,
-    #            'quantity' => 0,
-    #            'refills' => 0,
-    #            'route_concept_id' => 0,
-    #            'route_source_value' => undef,
-    #            'sig' => undef,
-    #            'stop_reason' => undef,
-    #            'verbatim_end_date' => '2014-11-19',
-    #            'visit_detail_id' => 0,
-    #            'visit_occurrence_id' => 53547
-    #          },
-
     if ( defined $participant->{$table} ) {
 
         $individual->{treatments} = [];
@@ -829,10 +703,7 @@ sub do_omop2bff {
 
             $treatment->{ageAtOnset} = {
                 age => {
-
-# _birth_datetime               => $person->{birth_datetime}, # property not allowed
-# _drug_exposure_start_datetime => $field->{drug_exposure_start_date},
-                    iso8601duration => find_age(
+                    iso8601duration => get_age_from_date_and_birthday(
                         {
                             date      => $field->{drug_exposure_start_date},
                             birth_day => $person->{birth_datetime}
@@ -844,21 +715,9 @@ sub do_omop2bff {
             #$treatment->{cumulativeDose} = undef;
             $treatment->{doseIntervals} = [];
 
-            # #[{
-            #    #_days_supply => $field->{days_supply}, # Property not allowed
-            #    interval     => {
-            #        start => $field->{drug_exposure_start_date},
-            #        end   => $field->{drug_exposure_end_date}
-            #    },
-            #     quantity => {},
-            #     scheduleFrequency => {}
-            #}];
-
             # _info (Autovivification)
             $treatment->{_info}{$table}{OMOP_columns} = $field;
-
-            $treatment->{routeOfAdministration} =
-              { id => "NCIT:NA0000", label => "Fake" };
+            $treatment->{routeOfAdministration} = $DEFAULT->{ontology_term};
             $treatment->{treatmentCode} = map2ohdsi(
                 {
                     ohdsi_dict => $ohdsi_dict,
@@ -884,18 +743,13 @@ sub do_omop2bff {
             push @{ $individual->{treatments} }, $treatment;
         }
     }
-
-    ##################################
-    # END MAPPING TO BEACON V2 TERMS #
-    ##################################
-
-    return ( $self->{stream} && avoid_seen_individuals($individual) )
-      ? undef
-      : $individual;
 }
 
-sub avoid_seen_individuals {
+################################################################################
+# Helper subs
+################################################################################
 
+sub avoid_seen_individuals {
     my $individual = shift;
     my $id         = $individual->{id};
 
@@ -922,7 +776,6 @@ sub avoid_seen_individuals {
 }
 
 sub set_default_measure {
-
     return {
         assayCode        => $DEFAULT->{ontology_term},
         date             => $DEFAULT->{date},

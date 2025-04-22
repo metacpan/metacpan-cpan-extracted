@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Type::Params qw/compile_named_oo compile/;
 use Types::Standard qw/CodeRef/;
@@ -38,7 +38,7 @@ Compiled::Params::OO - compiled params object oriented.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -161,32 +161,21 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Compiled-Params-OO>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Compiled-Params-OO>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Compiled-Params-OO>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Compiled-Params-OO>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by lnation.
+This software is Copyright (c) 2021->2025 by lnation.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 

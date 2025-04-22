@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController
 
+0.0703 2025-04-19 07:52:51
+    - Fix documentation.
+
 0.0702 2025-04-15 10:39:44
     - Make the open_controllers() function accept an arrayref, not a CSV.
 

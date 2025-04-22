@@ -55,7 +55,7 @@ YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => my $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string($yaml),
   );
 
@@ -77,7 +77,7 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
   );
 

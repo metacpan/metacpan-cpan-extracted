@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Import::Export;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use base qw/Import::Export/;
 
@@ -34,7 +34,7 @@ Array::Merge::Unique - Merge those arrays uniquely
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -81,14 +81,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Array-Merge-Unique>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Array-Merge-Unique>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Array-Merge-Unique>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Array-Merge-Unique/>
@@ -99,7 +91,7 @@ L<http://search.cpan.org/dist/Array-Merge-Unique/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017->2020 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

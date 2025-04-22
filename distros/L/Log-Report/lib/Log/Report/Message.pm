@@ -1,4 +1,4 @@
-# Copyrights 2007-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report::Message;
-use vars '$VERSION';
-$VERSION = '1.39';
+package Log::Report::Message;{
+our $VERSION = '1.40';
+}
 
 
 use warnings;
@@ -92,13 +92,13 @@ sub fromTemplateToolkit($$;@)
 
 #----------------
 
-sub prepend() {shift->{_prepend}}
-sub msgid()   {shift->{_msgid}}
-sub append()  {shift->{_append}}
-sub domain()  {shift->{_domain}}
-sub count()   {shift->{_count}}
-sub context() {shift->{_context}}
-sub msgctxt() {shift->{_msgctxt}}
+sub prepend() { $_[0]->{_prepend}}
+sub msgid()   { $_[0]->{_msgid}  }
+sub append()  { $_[0]->{_append} }
+sub domain()  { $_[0]->{_domain} }
+sub count()   { $_[0]->{_count}  }
+sub context() { $_[0]->{_context}}
+sub msgctxt() { $_[0]->{_msgctxt}}
 
 
 sub classes()
@@ -114,8 +114,8 @@ sub to(;$)
 
 
 sub errno(;$)
-{	my $self = shift;
-	@_ ? $self->{_errno} = shift : $self->{_errno};
+{   my $self = shift;
+    @_ ? $self->{_errno} = shift : $self->{_errno};
 }
 
 
@@ -133,20 +133,17 @@ sub inClass($)
 
 sub toString(;$)
 {   my ($self, $locale) = @_;
-    my $count  = $self->{_count} || 0;
-	$locale    = $self->{_lang} if $self->{_lang};
 
+    my $count   = $self->{_count} || 0;
+    $locale     = $self->{_lang} if $self->{_lang};
     my $prepend = $self->{_prepend} // '';
     my $append  = $self->{_append}  // '';
 
-	if(blessed $prepend) {
-        $prepend = $prepend->isa(__PACKAGE__) ? $prepend->toString($locale)
-          : "$prepend";
-	}
-	if(blessed $append) {
-        $append  = $append->isa(__PACKAGE__) ? $append->toString($locale)
-          : "$append";
-	}
+    $prepend = $prepend->isa(__PACKAGE__) ? $prepend->toString($locale) : "$prepend"
+       if blessed $prepend;
+
+    $append  = $append->isa(__PACKAGE__)  ? $append->toString($locale)  : "$append"
+       if blessed $append;
 
     $self->{_msgid}   # no translation, constant string
         or return "$prepend$append";
@@ -157,15 +154,15 @@ sub toString(;$)
         if defined $locale && (!defined $oldloc || $locale ne $oldloc);
 
     # translate the msgid
-	my $domain = $self->{_domain};
-	$domain    = textdomain $domain
-        unless blessed $domain;
+    my $domain = $self->{_domain};
+    $domain    = textdomain $domain
+        unless blessed $domain && $domain->isa('Log::Report::Minimal::Domain');
 
     my $format = $domain->translate($self, $locale || $oldloc);
     defined $format or return ();
 
     # fill-in the fields
-	my $text = $self->{_expand}
+    my $text = $self->{_expand}
       ? $domain->interpolate($format, $self)
       : "$prepend$format$append";
 

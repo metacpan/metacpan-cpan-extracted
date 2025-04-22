@@ -102,7 +102,7 @@ sub _reexport {
   Socket::More::Interface->import;
 }
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.5.2';
 
 sub string_to_family;
 sub string_to_socktype;
@@ -144,6 +144,56 @@ sub socket {
   else{
     return &CORE::socket;
   }
+}
+
+
+# Creates sockets based on list of specifications
+sub sockets {
+
+  my @fifo=@_;
+
+  while(@fifo){
+    my $spec=shift @fifo;
+
+    if(ref($spec) eq "HASH"){
+      # process as a spec
+      my $sock;
+      my $res=Socket::More::socket $sock, $spec;
+      $spec->{fh}=$sock;
+    }
+    elsif(ref($spec) eq "ARRAY"){
+      # array of specs
+      unshift @fifo, @$spec;
+    }
+  }
+
+
+  # output the inputs as they came in
+  @_;
+}
+
+sub bind_spec {
+  my @fifo=@_;
+  while(@fifo){
+    
+  }
+}
+
+# Add an handlers for a passive specification. For stream type connections this means what to do when a new socket is accepted.
+# For datagram types it is what to do with the data
+sub handle_spec {
+  # For streams, we are expecting a list of sockets and peers
+  #
+
+
+  # For datagrams, we are expecting the list of socket (the passive one) and the peer of the message
+  #
+  #
+
+  # In both cases the handler is a sub which returns a sub. The returned sub
+  # ref is the code which will directly process data. The sub called will resolve  based on the passive spec  (tag) and an external table
+  # Note an acceptor class should bind/resolve this 
+
 }
 
 
@@ -258,6 +308,10 @@ sub sockaddr_passive{
 	require Scalar::Util;
 	my ($spec)=@_;
 
+  # v0.5.2 Copy the input specs
+  my %copy=%$spec;
+  $spec=\%copy;
+
   # v0.5.0 renamed type to socktype
   $spec->{socktype}=delete $spec->{type} if exists $spec->{type};
 
@@ -333,6 +387,7 @@ sub sockaddr_passive{
 	my $address=delete $spec->{address};
 	my $group=delete $spec->{group};
 	my $data=delete $spec->{data};
+  my $flags=(delete $spec->{flags})//0;
 
 	$address//=".*";
 	$group//=".*";
@@ -364,7 +419,7 @@ sub sockaddr_passive{
     Socket::More::Lookup::getaddrinfo(
       IPV4_ANY,
       "0",
-      {flags=>NI_NUMERICHOST|NI_NUMERICSERV, family=>AF_INET},
+      {flags=>AI_NUMERICHOST|AI_NUMERICSERV, family=>AF_INET},
       @results
     );
 
@@ -380,7 +435,7 @@ sub sockaddr_passive{
     Socket::More::Lookup::getaddrinfo(
       IPV6_ANY,
       "0",
-      {flags=>NI_NUMERICHOST|NI_NUMERICSERV, family=>AF_INET6},
+      {flags=>AI_NUMERICHOST|AI_NUMERICSERV, family=>AF_INET6},
       @results
     );
     push @new_interfaces, ({name=>IPV6_ANY, addr=>$results[0]{addr}});
@@ -426,7 +481,9 @@ sub sockaddr_passive{
 
 	#Validate Family and fill out port and path
   no warnings "uninitialized";
+
 	my @output;
+
 	for my $interface (@interfaces){
 		my $fam= sockaddr_family($interface->{addr});
 		for(@results){
@@ -448,16 +505,16 @@ sub sockaddr_passive{
 				&& ($_->{interface} ne "unix");
 
 			next;
+
 	CLONE:
-		
 			my %clone=$_->%*;			
 			my $clone=\%clone;
 			$clone{data}=$spec->{data};
+      $clone{flags}=$spec->{flags};
 
 			#A this point we have a valid family  and port/path combo
 			#
 			my ($err, $res, $service);
-
 
 			#Port or path needs to be set
 			if($fam == AF_INET){
@@ -473,7 +530,8 @@ sub sockaddr_passive{
         }
         else {
           my @results;
-          Socket::More::Lookup::getaddrinfo($_->{address},$_->{port},{flags=>NI_NUMERICHOST|NI_NUMERICSERV, family=>AF_INET,socktype=>$_->{socktype},protocol=>$_->{protocol}}, @results);
+          #Socket::More::Lookup::getaddrinfo($_->{address},$_->{port},{flags=>AI_NUMERICHOST|AI_NUMERICSERV, family=>AF_INET,socktype=>$_->{socktype},protocol=>$_->{protocol}}, @results);
+          Socket::More::Lookup::getaddrinfo($_->{address},$_->{port},$_, @results);
           $clone->{addr}=$results[0]{addr};
         }
 				$clone->{interface}=$interface->{name};
@@ -484,6 +542,7 @@ sub sockaddr_passive{
           $clone->{group}=Socket::More::IPRanges::ipv4_group($clone->{address});
         }
 			}
+
 			elsif($fam == AF_INET6){
         if(!exists $_->{address} or $_->{address} eq ".*"){
           my(undef, $ip, $scope, $flow_info)=unpack_sockaddr_in6($interface->{addr});
@@ -493,16 +552,19 @@ sub sockaddr_passive{
         }
         else {
           my @results;
-          Socket::More::Lookup::getaddrinfo($_->{address},$_->{port},{flags=>NI_NUMERICHOST|NI_NUMERICSERV, family=>AF_INET6,socktype=>$_->{socktype},protocol=>$_->{protocol}}, @results);
+          #Socket::More::Lookup::getaddrinfo($_->{address},$_->{port},{flags=>AI_NUMERICHOST|AI_NUMERICSERV, family=>AF_INET6,socktype=>$_->{socktype},protocol=>$_->{protocol}}, @results);
+          Socket::More::Lookup::getaddrinfo($_->{address},$_->{port}, $_, @results);
           $clone->{addr}=$results[0]{addr};
         }
 
 				$clone->{interface}=$interface->{name};
+        $clone->{if}=$interface;  # From v0.5.0
         if($enable_group){
           require Socket::More::IPRanges;
           $clone->{group}=Socket::More::IPRanges::ipv6_group($clone->{address});
         }
 			}
+
 			elsif($fam == AF_UNIX){
 				my $suffix=$_->{socktype}==SOCK_STREAM?"_S":"_D";
 
@@ -529,6 +591,7 @@ sub sockaddr_passive{
 
 			#copy data to clone
 			$clone->{data}=$data;
+      $clone->{flags}=$flags;
 			push @output, $clone;		
 		}
 	}

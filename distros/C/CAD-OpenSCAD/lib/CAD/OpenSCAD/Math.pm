@@ -2,7 +2,7 @@ use strict; use warnings;
 
 use Object::Pad;
 
-our $VERSION='0.13';
+our $VERSION='0.14';
 
 class CAD::OpenSCAD::Math{
 	field $pi  :reader;
@@ -144,7 +144,7 @@ class CAD::OpenSCAD::Math{
 		return sqrt($sum);
 	}
 	
-	method dot{ #dot product of two points
+	method dot{ # dot product of two points
 		my ($p1,$p2)=@_;	
 		die "Points not same dimensions in Math->dot product\n" if @$p1 !=  @$p2 ;
 		my $sum=0;
@@ -153,7 +153,7 @@ class CAD::OpenSCAD::Math{
 		
 	}
 	
-	method cross{#dot product of two 3d points
+	method cross{# cross product of two 3d points
 		my ($p1,$p2)=@_;	
 		die "Point(s) not 3d in Math->cross product\n" if((@$p1 !=  @$p2) &&( @$p1 !=3));
 		return [$p1->[1]*$p2->[2]-$p1->[2]* $p2->[1],
@@ -167,12 +167,12 @@ class CAD::OpenSCAD::Math{
 		return [map{$p1->[$_]/$mag} 0..$#$p1] ;
 	}
 		
-	method tan{
+	method tan{  # tangent of an angle 
 		my ($ang)=@_;
 		return sin($ang)/cos($ang);
 	}
 	
-	method serialise{
+	method serialise{ # simple serialiser
 		my $st=shift;
 		if (ref $st eq "ARRAY"){
 			return "[".join(",",map{$self->serialise($_)}@$st)."]"
@@ -185,7 +185,7 @@ class CAD::OpenSCAD::Math{
 		};
 	}
 	
-	method equal{
+	method equal{  # test equality between 2 vectors
 		my ($p1,$p2)=@_;	
 		if (! ref $p1){
 			return $p1==$p2?1:0};
@@ -194,5 +194,38 @@ class CAD::OpenSCAD::Math{
 		return 1;
 	}
 	
+	method closest{
+		my ($pt,$ptArray)=@_;	
+		my $closest={};my $index=0;
+		foreach my $tst (@$ptArray){
+			if (!$closest->{mag}||($self->distance($pt,$tst)<$closest->{mag})){
+				$closest={mag=>$self->distance($pt,$tst),index=>$index,point=>$tst}   
+			}
+		}
+		return $closest;
+	}
+	
+	method meanPoint{
+		my ($ptArray)=@_;	
+		my $sums=[(0)x@{$ptArray->[0]}];
+		$sums=$self->add($sums,$_) foreach @$ptArray;
+		$sums->[$_]=$sums->[$_]/@$ptArray foreach (0..$#$sums);
+		return $sums;
+	}
+	
+	method type{
+		my $v=shift;
+		if (ref $v eq "ARRAY"){
+			if (ref $v->[0]  eq "ARRAY"){
+				return "LIST of VECTORS";
+			}
+			elsif (ref $v->[0]  eq "HASH"){
+				return "LIST of HASHES";
+			}
+			else {
+				return "VECTOR";
+			}
+		}
+	}
 	
 }

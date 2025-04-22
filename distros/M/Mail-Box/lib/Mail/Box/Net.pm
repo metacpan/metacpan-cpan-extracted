@@ -1,4 +1,4 @@
-# Copyrights 2001-2023 by [Mark Overmeer].
+# Copyrights 2001-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Mail::Box::Net;
-use vars '$VERSION';
-$VERSION = '3.010';
+package Mail::Box::Net;{
+our $VERSION = '3.011';
+}
 
 
 use strict;
@@ -51,6 +51,10 @@ sub init($)
                (?: \: ([0-9]+)  )?       # port
                ( / .* )?                 # path
           !x;
+
+        defined && s/%([0-9a-fA-F]{2})/hex $1/ge
+            for $u, $pwd, $s, $port, $f;
+
         $args->{folderdir} =~ s!/$!!;
     }
 

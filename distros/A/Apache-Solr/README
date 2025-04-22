@@ -1,5 +1,5 @@
-=== README for Apache-Solr version 1.06
-=   Generated on Thu Jun  2 17:14:22 2022 by OODoc 2.03
+=== README for Apache-Solr version 1.10
+=   Generated on Fri Apr 18 09:43:44 2025 by OODoc 2.03
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d Apache-Solr-1.06.tar.gz
-       tar -xf Apache-Solr-1.06.tar
-       cd Apache-Solr-1.06
+       gzip -d Apache-Solr-1.10.tar.gz
+       tar -xf Apache-Solr-1.10.tar
+       cd Apache-Solr-1.10
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/Apache-Solr-1.06/
+    http://search.cpan.org/dist/Apache-Solr-1.10/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=Apache-Solr

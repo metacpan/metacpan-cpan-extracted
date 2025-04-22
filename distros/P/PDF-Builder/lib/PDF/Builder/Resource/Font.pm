@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -15,7 +15,9 @@ use PDF::Builder::Basic::PDF::Utils;
 
 =head1 NAME
 
-PDF::Builder::Resource::Font - some common support routines for font files. Inherits from L<PDF::Builder::Resource::BaseFont>
+PDF::Builder::Resource::Font - Some common support routines for font files
+
+Inherits from L<PDF::Builder::Resource::BaseFont>
 
 =head1 METHODS
 

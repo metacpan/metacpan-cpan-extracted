@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::ColorSpace::Indexed';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -14,7 +14,9 @@ use Scalar::Util qw(weaken);
 
 =head1 NAME
 
-PDF::Builder::Resource::ColorSpace::Indexed::Hue - colorspace support for Device RGB. Inherits from L<PDF::Builder::Resource::ColorSpace::Indexed>
+PDF::Builder::Resource::ColorSpace::Indexed::Hue - Colorspace support for Device RGB
+
+Inherits from L<PDF::Builder::Resource::ColorSpace::Indexed>
 
 =head1 METHODS
 

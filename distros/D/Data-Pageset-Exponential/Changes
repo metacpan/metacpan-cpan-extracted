@@ -1,5 +1,13 @@
 Revision history for Data-Pageset-Exponential:
 
+v0.4.1    2025-04-22 19:37:17+01:00 Europe/London
+  [Documentation]
+  - Add a security policy.
+
+  - Add a How to Contribute document.
+
+  - Bump copyright year.
+
 v0.4.0    2024-10-19 11:29:58+01:00 Europe/London
   [Incompatible Changes]
   - Bumped the minimum Perl to v5.20.

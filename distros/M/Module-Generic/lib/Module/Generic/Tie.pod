@@ -16,7 +16,7 @@ Module::Generic::Tie - Object Access Control Class
 
 =head1 VERSION
 
-    v1.1.0
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -27,6 +27,26 @@ This is used in L<Module::Generic/"new"> using your module global variable C<OBJ
 =head1 METHODS
 
 No method is available
+
+=head1 THREAD SAFETY
+
+This module does not implement locking or synchronization for tied hashes shared across threads.
+
+To avoid data races:
+
+=over 4
+
+=item *
+
+Do not share tied hash instances between threads
+
+=item *
+
+Or use external synchronization (e.g., C<lock()>) before accessing or modifying values
+
+=back
+
+This module is designed primarily for permission-based encapsulation, not concurrency control.
 
 =head1 AUTHOR
 

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2025 -- leonerd@leonerd.org.uk
 
-package IO::Async::LoopTests 0.803;
+package IO::Async::LoopTests 0.804;
 
 use v5.14;
 use warnings;
@@ -416,6 +416,25 @@ sub run_tests_io
          on_write_ready => 1,
       );
    }
+
+   {
+      my ( $S1, $S2 ) = IO::Async::OS->socketpair or die "Cannot create AF_INET/SOCK_DGRAM connected pair - $!";
+      $_->blocking( 0 ) for $S1, $S2;
+
+      my $readready = 0;
+      $loop->watch_io(
+         handle => $S1,
+         on_read_ready => sub { $readready = 1 },
+      );
+
+      $loop->post_fork;
+
+      $S2->syswrite( "Boo!" );
+
+      $loop->loop_once( 0.1 );
+
+      is( $readready, 1, 'socket invokes on_read_ready' );
+   }
 }
 
 =head2 timer
@@ -527,6 +546,25 @@ sub run_tests_timer
 
          is( $count, 1, "One ->loop_once(1) sufficient for a single $delay second timer" );
       }
+   }
+
+   # ->watch_time after post_fork
+   {
+      my $done;
+      $loop->watch_time( after => 2 * AUT, code => sub { $done = 1; } );
+      $loop->post_fork;
+
+      time_between {
+         my $now = time;
+         $loop->loop_once( 5 * AUT );
+
+         # poll might have returned just a little early, such that the TimerQueue
+         # doesn't think anything is ready yet. We need to handle that case.
+         while( !$done ) {
+            die "It should have been ready by now" if( time - $now > 5 * AUT );
+            $loop->loop_once( 0.1 * AUT );
+         }
+      } 1.5, 2.5, 'loop_once(5) while waiting for watch_time after';
    }
 }
 

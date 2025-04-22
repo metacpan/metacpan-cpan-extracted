@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.608';
+our $VERSION = '0.609';
 
 use 5.020;
 use Moo;
@@ -42,7 +42,7 @@ has canonical_uri => (
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
 );
 
-# this is also known as the retrieval uri in the OpenAPI::Modern specification
+# this is also known as the retrieval uri in the OpenAPI specification
 has original_uri => (
   is => 'rwp',
   isa => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
@@ -273,7 +273,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.608
+version 0.609
 
 =head1 SYNOPSIS
 

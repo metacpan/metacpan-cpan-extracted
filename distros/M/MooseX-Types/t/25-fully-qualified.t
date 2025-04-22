@@ -30,6 +30,8 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
     ::ok(MyApp->can('NonEmptyStr'), 'type is still available as a method on the importing class');
 
+    require Moose;
+
     for my $phase ('before', 'after')
     {
         ::note "$phase calling namespace::autoclean";

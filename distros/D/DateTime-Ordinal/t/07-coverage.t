@@ -1,6 +1,6 @@
 use Test::More;
 use DateTime::Ordinal;
-
+use utf8;
 sub yawn {
 	my ($format, $expected) = @_;
 	my %default_date = (
@@ -15,7 +15,9 @@ sub yawn {
 	);
 	%default_date = (%default_date, %{$data});
 	my $dt = DateTime::Ordinal->new(%default_date);
-	is ($dt->strftime($format), $expected, "expected - $expected");
+	my $f = $dt->strftime($format);
+	$f =~ s/\x{202f}/ /;
+	is ($f, $expected, "expected - $expected");
 }
 
 yawn('%a', 'Wed');

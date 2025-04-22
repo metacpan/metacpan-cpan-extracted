@@ -16,7 +16,7 @@ name: Audio-Nama
 provides:
   Audio::Nama:
     file: lib/Audio/Nama.pm
-    version: '1.505'
+    version: '1.506'
   Audio::Nama::AnalyseLV2:
     file: lib/Audio/Nama/AnalyseLV2.pm
     version: '1'
@@ -313,5 +313,5 @@ requires:
   perl: '5.030'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.505'
+version: '1.506'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

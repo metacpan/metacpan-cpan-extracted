@@ -32,15 +32,12 @@ use File::Compare;
 use File::Copy;
 use File::Spec::Functions;
 
-
 BEGIN
 { 
-   unless($ENV{MARKOV_DEVEL})
-   {   plan skip_all => 'Only tested on markov\'s platform';
-   }
+   $ENV{MARKOV_DEVEL}
+       or plan skip_all => 'Only tested on markov\'s platform';
 
    plan tests => 40;
-
 }
 
 my $user     = 'imaptest';
@@ -56,13 +53,13 @@ my $home     = "/tmp/$user";
 my $inbox    = "/var/mail/$user";
 
 # Prepare home directory
-   -d $home
-or mkdir $home
-or die "Cannot create $home: $!\n";
+-d $home or mkdir $home
+	or die "Cannot create $home: $!\n";
 
 # Prepare INBOX
-copy $unixsrc, $inbox
-or die "Cannot create $inbox: $!\n";
+my $src      = "../Mail-Box/$unixsrc";
+copy $src, $inbox
+	or die "Cannot create $inbox: $!\n";
 
 ok(Mail::Box::IMAP4->foundIn(folder => 'imap://'), 'check foundIn');
 

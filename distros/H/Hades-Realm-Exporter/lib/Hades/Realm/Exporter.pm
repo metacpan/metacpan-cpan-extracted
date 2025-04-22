@@ -2,7 +2,7 @@ package Hades::Realm::Exporter;
 use strict;
 use warnings;
 use base qw/Hades/;
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -629,7 +629,7 @@ Hades::Realm::Exporter - Hades realm for Exporter
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =cut
 
@@ -885,14 +885,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hades-Realm-Exporter>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hades-Realm-Exporter>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hades-Realm-Exporter>
 
 =item * Search CPAN
 

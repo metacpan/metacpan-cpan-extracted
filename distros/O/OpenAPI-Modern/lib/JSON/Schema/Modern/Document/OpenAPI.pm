@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 use 5.020;
 use Moo;
@@ -454,6 +454,7 @@ sub _traverse_schema ($self, $state) {
 # given a jsonSchemaDialect uri, generate a new schema that wraps the standard OAD schema
 # to set the jsonSchemaDialect value for the #meta dynamic reference.
 sub _dynamic_metaschema_uri ($self, $json_schema_dialect) {
+  $json_schema_dialect .= '';
   my $dialect_uri = 'https://custom-dialect.example.com/' . md5_hex($json_schema_dialect);
   return $dialect_uri if $self->evaluator->_get_resource($dialect_uri);
 
@@ -501,7 +502,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.084
+version 0.085
 
 =head1 SYNOPSIS
 
@@ -550,6 +551,7 @@ schemas in the document, either manually or perhaps via a web framework plugin (
 This is the identifier that the document is known by, which is used to resolve any relative C<$ref>
 keywords in the document (unless overridden by a subsequent C<$id> in a schema).
 See L<§4.6/https://spec.openapis.org/oas/v3.1.1#relative-references-in-api-description-uris>.
+It is strongly recommended that this URI is absolute.
 
 See also L</retrieval_uri>.
 

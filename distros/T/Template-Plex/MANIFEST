@@ -25,6 +25,7 @@ t/child.plex
 t/grandparent.plex
 t/immediate.t
 t/inherit.t
+t/nor.t.dis
 t/parent.plex
 t/relative.t
 t/sub1.plex

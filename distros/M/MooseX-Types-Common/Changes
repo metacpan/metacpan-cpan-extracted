@@ -1,5 +1,9 @@
 Revision history for MooseX-Types-Common
 
+0.001015  2025-04-20 16:59:58Z
+  - fix warnings caused by Moose no longer being loaded (since MooseX::Types
+    0.51)
+
 0.001014  2017-01-19 02:29:46Z
   - provide inlined version of NumericCode (Gregory Oschwald, GitHub PR#4)
 

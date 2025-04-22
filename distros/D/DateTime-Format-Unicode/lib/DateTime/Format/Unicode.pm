@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.1.6
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
-## Modified 2025/01/05
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util;
     use Want;
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -2039,7 +2039,7 @@ You can also override the C<locale>'s default number system, by another one, as 
 
 =head1 VERSION
 
-    v0.1.6
+    v0.2.0
 
 =head1 DESCRIPTION
 

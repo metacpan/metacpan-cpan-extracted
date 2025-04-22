@@ -1,4 +1,4 @@
-# Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Message::Body;{
-our $VERSION = '3.016';
+our $VERSION = '3.017';
 }
 
 use base 'Mail::Reporter';
@@ -20,7 +20,7 @@ use Mail::Message::Body::Lines;
 use Mail::Message::Body::File;
 
 use Carp;
-use Scalar::Util     qw/weaken refaddr/;
+use Scalar::Util     qw/weaken refaddr blessed/;
 use File::Basename   qw/basename/;
 
 use MIME::Types;
@@ -104,8 +104,8 @@ sub init($)
 
     # Set the content info
 
-    my ($transfer, $disp, $descr, $cid) = @$args{
-       qw/transfer_encoding disposition description content_id/ };
+    my ($transfer, $disp, $descr, $cid, $lang) = @$args{
+       qw/transfer_encoding disposition description content_id language/ };
 
     if(defined $filename)
     {   $disp //= Mail::Message::Field->new
@@ -124,6 +124,7 @@ sub init($)
         $transfer //= $based->transferEncoding;
         $disp     //= $based->disposition;
         $descr    //= $based->description;
+        $lang     //= $based->language;
         $cid      //= $based->contentId;
 
         $self->{MMB_checked}
@@ -146,6 +147,7 @@ sub init($)
     $self->transferEncoding($transfer) if defined $transfer;
     $self->disposition($disp)          if defined $disp;
     $self->description($descr)         if defined $descr;
+    $self->language($lang)             if defined $lang;
     $self->contentId($cid)             if defined $cid;
     $self->type($mime);
 
@@ -290,8 +292,23 @@ sub disposition(;$)
 
     my $disp = defined $_[0] ? shift : 'none';
 
-    $self->{MMB_disposition} = ref $disp ? $disp->clone
+    $self->{MMB_disposition} = blessed $disp ? $disp->clone
       : Mail::Message::Field->new('Content-Disposition' => $disp);
+}
+
+
+sub language(@)
+{	my $self = shift;
+	return $self->{MMB_lang} if !@_ && $self->{MMB_lang};
+
+	my $langs
+	  = @_ > 1        ? (join ', ', @_)
+	  : blessed $_[0] ? $_[0]
+	  : ref $_[0] eq 'ARRAY' ? (join ', ', @{$_[0]}) : $_[0];
+
+	$self->{MMB_lang} = ! defined $langs || ! length $langs ? undef
+	  : blessed $langs ? $langs->clone
+	  : Mail::Message::Field->new('Content-Language' => $langs);
 }
 
 
@@ -377,6 +394,7 @@ sub contentInfoTo($)
     $head->set($self->transferEncoding);
     $head->set($self->disposition);
     $head->set($self->description);
+    $head->set($self->language);
     $head->set($self->contentId);
     $self;
 }
@@ -387,15 +405,16 @@ sub contentInfoFrom($)
 
     $self->type($head->get('Content-Type', 0));
 
-    my ($te, $disp, $desc, $cid)
+    my ($te, $disp, $desc, $cid, $lang)
       = map { my $x = $head->get("Content-$_") || '';
               s/^\s+//,s/\s+$// for $x;
               length $x ? $x : undef
-            } qw/Transfer-Encoding Disposition Description ID/;
+            } qw/Transfer-Encoding Disposition Description ID Language/;
 
     $self->transferEncoding($te);
     $self->disposition($disp);
     $self->description($desc);
+    $self->language($lang);
     $self->contentId($cid);
 
     delete $self->{MMB_mime};

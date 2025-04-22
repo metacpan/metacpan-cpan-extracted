@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -20,6 +20,8 @@ use Graphics::TIFF ':all';  # have already confirmed the appropriate version exi
 
 PDF::Builder::Resource::XObject::Image::TIFF_GT - TIFF image support
 (Graphics::TIFF enabled)
+
+Inherits from L<PDF::Builder::Resource::XObject::Image>
 
 =head1 METHODS
 
@@ -70,6 +72,12 @@ invalid things. If we can find a switch to disable this behavior, we will
 look into adding it as an option. According to Graphic::TIFF's owner 
 (ticket RT 133955), this is coming directly from libtiff (as write to STDERR), 
 so he can't do anything about it!
+
+Finally, while Graphics::TIFF does not directly support passing in a filehandle
+(usually a GLOB), PDF::Builder will attempt to detect this issue and write the
+content (from the filehandle) to a temporary file, and pass that in as a
+normal file. Some operating systems appear to have trouble erasing this
+temporary file, so be aware that such files may build up over time!
 
 =back
 

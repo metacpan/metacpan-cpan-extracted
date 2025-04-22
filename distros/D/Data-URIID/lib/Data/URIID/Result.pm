@@ -16,11 +16,11 @@ use URI;
 use URI::Escape;
 use Scalar::Util qw(blessed);
 use List::Util qw(any);
-use UUID::Tiny ':std';
 use Math::BigInt;
 use MIME::Base64;
 
 use Data::Identifier;
+use Data::Identifier::Generate;
 
 use Data::URIID::Service;
 use Data::URIID::Digest;
@@ -33,7 +33,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 use parent 'Data::URIID::Base';
 
@@ -839,7 +839,7 @@ my %syntax = (
     'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}$/,
     'danbooru2chanjp-tag'           => qr/./,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier)),
 );
 
 my %fellig_tables = (
@@ -1571,17 +1571,12 @@ sub url {
 sub _media_subtype_to_uuid {
     my ($pkg, $media_subtype) = @_;
     state $uuids = {};
-    return $uuids->{$media_subtype} //= create_uuid_as_string(UUID_SHA1, '50d7c533-2d9b-4208-b560-bcbbf75ce3f9', lc $media_subtype);
-}
-
-sub _id_conv__uuid__wikidata_identifier {
-    my ($self, $type_want, $type_name_have, $id) = @_;
-    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, '9e10aca7-4a99-43ac-9368-6cbfa43636df', lc $id);
+    return $uuids->{$media_subtype} //= Data::Identifier::Generate->generic(namespace => '50d7c533-2d9b-4208-b560-bcbbf75ce3f9', input => lc $media_subtype)->uuid;
 }
 
 sub _id_conv__uuid__gtin {
     my ($self, $type_want, $type_name_have, $id) = @_;
-    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, 'd95d8b1f-5091-4642-a6b0-a585313915f1', lc $id);
+    $self->{id}{$type_want} = Data::Identifier::Generate->generic(namespace => 'd95d8b1f-5091-4642-a6b0-a585313915f1', style => 'id-based', request => $id)->uuid;
 }
 
 sub _id_conv__uuid__media_subtype_identifier {
@@ -1591,14 +1586,14 @@ sub _id_conv__uuid__media_subtype_identifier {
 
 sub _id_conv__uuid__language_tag_identifier {
     my ($self, $type_want, $type_name_have, $id) = @_;
-    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, '47dd950c-9089-4956-87c1-54c122533219', lc $id);
+    $self->{id}{$type_want} = Data::Identifier::Generate->generic(namespace => '47dd950c-9089-4956-87c1-54c122533219', style => 'id-based', request => $id)->uuid;
 }
 
 sub _id_conv__uuid__fellig_identifier {
     my ($self, $type_want, $type_name_have, $id) = @_;
     my ($table, $num) = $id =~ /^([A-Z]+)([1-9][0-9]*)$/;
-    my $table_id = create_uuid_as_string(UUID_SHA1, '7a287954-9156-402f-ac3d-92f71956f1aa', $fellig_tables{$table} // croak 'Not supported');
-    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, '7f9670af-21d9-4aa5-afd5-6e9e01261d6c', sprintf('%s/%u', $table_id, $num));
+    my $table_id = Data::Identifier::Generate->generic(namespace => '7a287954-9156-402f-ac3d-92f71956f1aa', input => $fellig_tables{$table} // croak 'Not supported')->uuid;
+    $self->{id}{$type_want} = Data::Identifier::Generate->generic(namespace => '7f9670af-21d9-4aa5-afd5-6e9e01261d6c', input => sprintf('%s/%u', $table_id, $num))->uuid;
 }
 
 sub _id_conv__uuid__oid {
@@ -1637,11 +1632,6 @@ sub _id_conv__doi__grove_art_online_identifier {
 sub _id_conv__uri__fefe_blog_post_identifier {
     my ($self, $type_want, $type_name_have, $id) = @_;
     $self->{id}{$type_want} = sprintf('https://blog.fefe.de/?ts=%s', $id);
-}
-
-sub _id_conv__uuid__e621_post_identifier {
-    my ($self, $type_want, $type_name_have, $id) = @_;
-    $self->{id}{$type_want} = create_uuid_as_string(UUID_SHA1, 'ac59062c-6ba2-44de-9f54-09e28f2c0b5c', lc $id);
 }
 
 # --- Overrides for Data::URIID::Base ---
@@ -1685,7 +1675,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 

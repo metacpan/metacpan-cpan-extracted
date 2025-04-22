@@ -4,7 +4,7 @@
       "Johan Vromans <jv@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.5503"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -46,13 +46,12 @@
       "bugtracker" : {
          "web" : "https://github.com/sciurius/perl-String-Interpolate-Named/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "https://github.com/sciurius/perl-String-Interpolate-Named"
+         "type" : "git",
+         "url" : "https://github.com/sciurius/perl-String-Interpolate-Named.git",
+         "web" : "https://github.com/sciurius/perl-String-Interpolate-Named"
       }
    },
-   "version" : "1.03",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -5,11 +5,15 @@
 # -s flag to run short lists for 020_corefonts, 021_synfonts, 023_cjkfonts
 # author: Phil M Perry
 
+# NOTE TO MAINTAINER;
+#  keep in sync with examples/README, examples/examples.output, and
+#  INFO/old/examples.bat
+
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 # dependent on optional packages:
 my $HS_installed = 1; # HarfBuzz::Shaper IS installed and you want to use it.
@@ -108,11 +112,21 @@ my (@example_list, @example_results);
   push @example_list, "Column.pl";
   push @example_results, "create examples/Column.pdf, showing multiple pages demonstrating the\n capabilities of the Content/Text.pm column() library methods\n";
 
+  push @example_list, "Column_lists.pl";
+  push @example_results, "create examples/Column_lists.pdf, showing examples of the various list\n capabilities of the Content/Text.pm column() library methods\n";
+
+ #push @example_list, "Column_layouts.pl";
+ #push @example_results, "create examples/Column_layouts.pdf, showing examples of various column layout\n (shape) capabilities of the Content/Text.pm column() library methods\n";
+
   push @example_list, "Content.pl";
   push @example_results, "create examples/Content.pdf, showing multiple pages demonstrating the\n capabilities of the Content.pm library methods (graphics and text).\n";
 
   push @example_list, "ContentText.pl";
   push @example_results, "create examples/ContentText.pdf, showing multiple pages demonstrating the\n capabilities of the Content/Text.pm library advanced text methods.\nAlso see Column.pl for additional material.\n";
+
+  # hard coded with a number of fonts you may need to change
+  push @example_list, "FontManager.pl";
+  push @example_results, "create examples/FontManager.pdf to demonstrate some switching between\n declared fonts within paragraphs.\n";
 
  if ($HS_installed) {
   push @example_list, "HarfBuzz.pl";
@@ -129,9 +143,8 @@ my (@example_list, @example_results);
   push @example_list, "ShowFont.pl";
   push @example_results, "create examples/ShowFont.<type>.<font name>.pdf, showing multiple pages\n demonstrating the display of various encodings.\n";
  
-  # hard coded with a number of fonts you may need to change
-  push @example_list, "FontManager.pl";
-  push @example_results, "create examples/FontManager.pdf to demonstrate some switching between\n declared fonts within paragraphs.\n";
+  push @example_list, "SVG.pl";
+  push @example_results, "create examples/SVG.pdf, showing examples of various SVG input files,\n including one with an image\n";
 
 # push @example_list, "examples/Windows/027_winfont.pl";
 # push @example_results, "create examples/Windows/027_winfont.<type>.<font name>.pdf, showing multiple pages\n demonstrating the display of various encodings.\n";

@@ -1,15 +1,14 @@
 package MooseX::Types::Wrapper;
 # ABSTRACT: Wrap exports from a library
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
-use Moose;
 use Carp::Clan      qw( ^MooseX::Types );
 use Module::Runtime 'use_module';
 
 use namespace::autoclean;
 
-extends 'MooseX::Types';
+use parent 'MooseX::Types';
 
 #pod =head1 DESCRIPTION
 #pod
@@ -56,7 +55,7 @@ MooseX::Types::Wrapper - Wrap exports from a library
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

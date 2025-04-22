@@ -20,7 +20,10 @@ my $rtc = MIDI::RtController->new(
 );
 
 my $rtf = MIDI::RtController::Filter::Tonal->new(rtc => $rtc);
-# $rtf->feedback(4);
+
+$rtf->feedback(4);
+$rtf->delay(0.15);
+# $rtf->factor(1.5);
 
 my $method = "curry::$filter_name";
 $rtc->add_filter($filter_name, [qw(note_on note_off)], $rtf->$method);

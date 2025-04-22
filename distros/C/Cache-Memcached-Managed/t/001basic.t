@@ -7,7 +7,7 @@ $Foo::VERSION = 'Foo::VERSION';
 use Test::More tests => 176;
 use strict;
 use warnings;
-
+use lib '.';
 # Add the termination code
 my $cache;
 END {

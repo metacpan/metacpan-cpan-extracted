@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '1.11';
+my $version = '1.12';
 
 my %prereq  =
   ( Test::More               => '0.86'
@@ -69,5 +69,4 @@ __POSTAMBLE
 
 # for translation tables
 #linkext::
-#	- PERL5LIB="lib:$PERL5LIB" bin/xgettext-perl --mode=VERBOSE \
-#	    -p lib/Log/Report/messages lib bin
+#	bin/xgettext-perl --mode=VERBOSE -p lib/Log/Report/messages lib bin

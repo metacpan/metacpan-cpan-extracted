@@ -1,15 +1,13 @@
 #!perl
-use 5.010;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
-use Test::More 0.82;
+use Test::More 0.82 tests => 10;
+use lib 't/';
+use Sample;
 use Try::Tiny;
 
-eval 'use Map::Tube::London';
-plan skip_all => 'Map::Tube::London required for this test' if $@;
-plan tests => 10;
-
-my $tube = Map::Tube::London->new( );
+my $tube = Sample->new( );
 
 my $ret;
 

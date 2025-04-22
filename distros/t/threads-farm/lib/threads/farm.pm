@@ -3,7 +3,7 @@ package threads::farm;
 # Set the version information
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 use strict;
 
 # Make sure we can do threads

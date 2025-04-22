@@ -7,7 +7,7 @@ use Dancer2::Plugin::CSRF::SPA;
 use Mxpress::PDF;
 use MetaCPAN::CLient::Pod::PDF;
 use Type::Params qw/compile_named/;
-use Types::Standard qw/Undef Str StrMatch Enum HashRef/;
+use Types::Standard qw/Undef Str StrMatch Enum HashRef Any/;
 
 prefix '/api';
 
@@ -73,7 +73,8 @@ our $generatePOD = compile_named(
 	name => StrMatch[ qr{([a-zA-Z0-9\-\:]+)} ],
 	module => Types::Standard::Optional->of(StrMatch[ qr{([a-zA-Z0-9\-\:]*)} ]|Undef),
 	distribution => Types::Standard::Optional->of(StrMatch[ qr{([a-zA-Z0-9\-\:]*)} ]|Undef),
-	raw => Types::Standard::Optional->of(Str|Undef)
+	raw => Types::Standard::Optional->of(Str|Undef),
+	save => Types::Standard::Optional->of(Any)
 );
 
 post '/generate/pod' => sub {

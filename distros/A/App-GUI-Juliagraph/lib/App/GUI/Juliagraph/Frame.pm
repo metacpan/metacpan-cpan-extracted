@@ -5,19 +5,15 @@ use Wx::AUI;
 
 package App::GUI::Juliagraph::Frame;
 use base qw/Wx::Frame/;
-use App::GUI::Juliagraph::Frame::Panel::Constraints;
-use App::GUI::Juliagraph::Frame::Panel::Polynomial;
-use App::GUI::Juliagraph::Frame::Panel::Mapping;
-use App::GUI::Juliagraph::Frame::Panel::Color;
-use App::GUI::Juliagraph::Frame::Part::Board;
-use App::GUI::Juliagraph::Dialog::About;
-use App::GUI::Juliagraph::Widget::ProgressBar;
-use App::GUI::Juliagraph::Settings;
 use App::GUI::Juliagraph::Config;
-
-my @interactive_tabs = qw/constraints polynomial mapping/;
-my @silent_tabs = qw/color/;
-my @settings_tabs = (@interactive_tabs, @silent_tabs);
+use App::GUI::Juliagraph::Settings;
+use App::GUI::Juliagraph::Dialog::About;
+use App::GUI::Juliagraph::Frame::Tab::Constraints;
+use App::GUI::Juliagraph::Frame::Tab::Polynomial;
+use App::GUI::Juliagraph::Frame::Tab::Mapping;
+use App::GUI::Juliagraph::Frame::Tab::Color;
+use App::GUI::Juliagraph::Frame::Panel::Board;
+use App::GUI::Juliagraph::Widget::ProgressBar;
 
 sub new {
     my ( $class, $parent, $title ) = @_;
@@ -33,20 +29,28 @@ sub new {
 
     # create GUI parts
     $self->{'tabs'}            = Wx::AuiNotebook->new($self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
-    $self->{'tab'}{'constraints'}  = App::GUI::Juliagraph::Frame::Panel::Constraints->new( $self->{'tabs'} );
-    $self->{'tab'}{'polynomial'}   = App::GUI::Juliagraph::Frame::Panel::Polynomial->new( $self->{'tabs'} );
-    $self->{'tab'}{'mapping'}      = App::GUI::Juliagraph::Frame::Panel::Mapping->new( $self->{'tabs'} );
-    $self->{'tab'}{'color'}        = App::GUI::Juliagraph::Frame::Panel::Color->new( $self->{'tabs'}, $self->{'config'} );
-    $self->{'tabs'}->AddPage( $self->{'tab'}{'constraints'},  'Constraints');
-    $self->{'tabs'}->AddPage( $self->{'tab'}{'polynomial'},   'Polynomial');
-    $self->{'tabs'}->AddPage( $self->{'tab'}{'mapping'},      'Color Mapping');
-    $self->{'tabs'}->AddPage( $self->{'tab'}{'color'},        'Color Selection');
+    $self->{'tab'}{'constraint'}  = App::GUI::Juliagraph::Frame::Tab::Constraints->new( $self->{'tabs'} );
+    $self->{'tab'}{'monomial'}    = App::GUI::Juliagraph::Frame::Tab::Polynomial->new( $self->{'tabs'} );
+    $self->{'tab'}{'mapping'}     = App::GUI::Juliagraph::Frame::Tab::Mapping->new( $self->{'tabs'}, $self->{'config'} );
+    $self->{'tab'}{'color'}       = App::GUI::Juliagraph::Frame::Tab::Color->new( $self->{'tabs'}, $self->{'config'} );
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'constraint'}, 'Constraints');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'monomial'},   'Monomials');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'mapping'},    'Color Mapping');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'color'},      'Colors');
+    $self->{'tab'}{'constraint'}->connect_polynome_tab( $self->{'tab'}{'monomial'} );
+    $self->{'tab'}{'constraint'}->connect_mapping_tab( $self->{'tab'}{'mapping'} );
+    $self->{'tab'}{'mapping'}->connect_color_tab( $self->{'tab'}{'color'} );
 
-    $self->{'tab'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for @interactive_tabs;
+    $self->{'tab_names'} = [keys %{ $self->{'tab'} }];
+    $self->{'tab'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for @{$self->{'tab_names'}};
 
-    $self->{'progress'}            = App::GUI::Juliagraph::Widget::ProgressBar->new( $self, 450, 5, [20, 20, 110]);
-    $self->{'board'}               = App::GUI::Juliagraph::Frame::Part::Board->new( $self , 600, 600 );
     $self->{'dialog'}{'about'}     = App::GUI::Juliagraph::Dialog::About->new();
+    $self->{'progress_bar'}        = App::GUI::Juliagraph::Widget::ProgressBar->new( $self, 430, 5, [20, 20, 110]);
+    $self->{'board'}               = App::GUI::Juliagraph::Frame::Panel::Board->new( $self , 600, 600 );
+    $self->{'board'}->connect_constrains_tab( $self->{'tab'}{'constraint'} );
+    App::GUI::Juliagraph::Compute::Image::add_progress_bar('pen', $self->{'progress_bar'});
+    App::GUI::Juliagraph::Compute::Image::add_progress_bar('preview', $self->{'tab'}{'mapping'}{'color_rainbow'});
+    App::GUI::Juliagraph::Compute::Image::add_progress_bar('background', $self->{'tab'}{'mapping'}{'background_rainbow'});
 
     my $btnw = 50; my $btnh     = 40;# button width and height
     $self->{'btn'}{'draw'}      = Wx::Button->new( $self, -1, '&Draw', [-1,-1],[$btnw, $btnh] );
@@ -101,7 +105,6 @@ sub new {
     $image_menu->Append( 12200, "&Format",  $image_format_menu, "set default image formate" );
     $image_menu->Append( 12400, "&Save\tCtrl+S", "save currently displayed image" );
 
-
     my $help_menu = Wx::Menu->new();
     $help_menu->Append( 13300, "&About\tAlt+A", "Dialog with general information about the program" );
 
@@ -119,7 +122,7 @@ sub new {
     Wx::Event::EVT_MENU( $self, 12400, sub { $self->save_image_dialog });
     Wx::Event::EVT_MENU( $self, 13300, sub { $self->{'dialog'}{'about'}->ShowModal });
 
-    my $std_attr = &Wx::wxALIGN_LEFT|&Wx::wxGROW|&Wx::wxALIGN_CENTER_HORIZONTAL;
+    my $std_attr = &Wx::wxALIGN_LEFT|&Wx::wxGROW|&Wx::wxALIGN_CENTER_VERTICAL;
     my $vert_attr = $std_attr | &Wx::wxTOP;
     my $vset_attr = $std_attr | &Wx::wxTOP| &Wx::wxBOTTOM;
     my $horiz_attr = $std_attr | &Wx::wxLEFT;
@@ -127,16 +130,16 @@ sub new {
     my $line_attr    = $std_attr | &Wx::wxLEFT | &Wx::wxRIGHT ;
 
     my $cmdi_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
-    my $image_lbl = Wx::StaticText->new( $self, -1, 'Image:' );
+    my $image_lbl = Wx::StaticText->new( $self, -1, 'Pen Color:' );
     $cmdi_sizer->Add( $image_lbl,     0, $all_attr, 15 );
-    $cmdi_sizer->Add( $self->{'progress'},         0, &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_VERTICAL| &Wx::wxALL, 10 );
+    $cmdi_sizer->Add( $self->{'progress_bar'},         0, &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_VERTICAL| &Wx::wxALL, 10 );
     $cmdi_sizer->AddSpacer(5);
     $cmdi_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
     $cmdi_sizer->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $board_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
-    $board_sizer->Add( $self->{'board'}, 0, $all_attr,  5);
-    $board_sizer->Add( $cmdi_sizer,      0, $vert_attr, 5);
+    $board_sizer->Add( $self->{'board'}, 0, $all_attr,   5);
+    $board_sizer->Add( $cmdi_sizer,      0, $vert_attr, 20);
     $board_sizer->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $setting_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
@@ -150,13 +153,14 @@ sub new {
     $self->SetSizer($main_sizer);
     $self->SetAutoLayout( 1 );
     $self->{'btn'}{'draw'}->SetFocus;
-    my $size = [1110, 815];
+    my $size = [1200, 810];
     $self->SetSize($size);
     $self->SetMinSize($size);
     $self->SetMaxSize($size);
 
     $self->update_recent_settings_menu();
-    $self->init();
+    # $self->init();
+    $self->sketch();
     $self;
 }
 
@@ -178,7 +182,7 @@ sub update_recent_settings_menu {
 
 sub init {
     my ($self) = @_;
-    $self->{'tab'}{$_}->init() for qw/constraints polynomial mapping color/;
+    $self->{'tab'}{$_}->init() for @{$self->{'tab_names'}};
     $self->sketch( );
     $self->SetStatusText( "all settings are set to default", 1);
     $self->show_settings_save(1);
@@ -202,18 +206,12 @@ sub sketch {
 
 sub get_settings {
     my $self = shift;
-    return {
-        $self->{'tab'}{'polynomial'}->get_settings,
-        constraints => $self->{'tab'}{'constraints'}->get_settings,
-        mapping     => $self->{'tab'}{'mapping'}->get_settings,
-        color       => $self->{'tab'}{'color'}->get_settings,
-    };
+    return { map { $_ => $self->{'tab'}{ $_ }->get_settings } @{$self->{'tab_names'}} };
 }
 sub set_settings {
-    my ($self, $data) = @_;
-    return unless ref $data eq 'HASH';
-    $self->{'tab'}{$_}->set_settings( $data->{$_} ) for qw/constraints mapping color/;
-    $self->{'tab'}{'polynomial'}->set_settings( $data );
+    my ($self, $settings) = @_;
+    return unless ref $settings eq 'HASH';
+    $self->{'tab'}{$_}->set_settings( $settings->{$_} ) for @{$self->{'tab_names'}};
 }
 
 sub show_settings_save {
@@ -284,13 +282,12 @@ sub open_setting_file {
     my ($self, $file ) = @_;
     my $settings = App::GUI::Juliagraph::Settings::load( $file );
     if (ref $settings) {
+        $settings->{'monomial'}{$_} = delete $settings->{'monomial_'.$_} for 1..4;
         $self->set_settings( $settings );
         $self->draw;
         my $dir = App::GUI::Juliagraph::Settings::extract_dir( $file );
         $self->{'config'}->set_value('open_dir', $dir);
         $self->{'config'}->add_setting_file( $file );
-        $self->{'tab'}{'color'}->set_state_count( exists $settings->{'mapping'}{'select'}
-                                                ? $settings->{'mapping'}{'select'} - 1 : 8);
         $self->update_recent_settings_menu();
         $self->show_settings_save(1);
         $settings;
@@ -301,7 +298,10 @@ sub open_setting_file {
 
 sub write_settings_file {
     my ($self, $file)  = @_;
-    my $ret = App::GUI::Juliagraph::Settings::write( $file, $self->get_settings );
+    my $settings = $self->get_settings;
+    my $monomial = delete $settings->{'monomial'};
+    $settings->{'monomial_'.$_} = $monomial->{$_} for 1..4;
+    my $ret = App::GUI::Juliagraph::Settings::write( $file, $settings );
     if ($ret){ $self->SetStatusText( $ret, 0 ) }
     else     {
         $self->{'config'}->add_setting_file( $file );

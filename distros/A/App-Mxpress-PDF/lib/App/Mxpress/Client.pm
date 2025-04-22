@@ -197,7 +197,7 @@ App::Mxpress::Client - Client for App::Mxpress::PDF::API
  
 =head1 VERSION
  
-Version 0.21
+Version 0.22
  
 =cut
 
@@ -290,14 +290,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
  
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Mxpress-PDF>
- 
-=item * AnnoCPAN: Annotated CPAN documentation
- 
-L<http://annocpan.org/dist/App-Mxpress-PDF>
- 
-=item * CPAN Ratings
- 
-L<https://cpanratings.perl.org/d/App-Mxpress-PDF>
  
 =item * Search CPAN
  

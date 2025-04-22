@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Mmap.pm
-## Version v0.1.4
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.1.5
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/07/26
-## Modified 2025/03/12
+## Modified 2025/04/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,9 +22,8 @@ BEGIN
     # use JSON 4.03 qw( -convert_blessed_universally );
     use JSON 4.03;
     use Module::Generic::File qw( file sys_tmpdir );
-    # use Nice::Try;
     our $HAS_CACHE_MMAP = 0;
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.1.5';
 };
 
 use strict;
@@ -54,6 +53,11 @@ sub init
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $tmpdir = sys_tmpdir();
     $self->{_cache_dir} = $tmpdir->child( 'mmap_data' );
+    if( $self->{_cache_dir}->exists && !$self->{_cache_dir}->can_write )
+    {
+        warn( "You do not have write permission to the mmap data directory $self->{_cache_dir}" );
+    }
+
     # A cache file will be provided either by the user, either by us with the open() method.
     if( my $f = $self->cache_file )
     {
@@ -806,7 +810,7 @@ Module::Generic::File::Mmap - MMap File Class
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.5
 
 L<Module::Generic::File::Mmap> implements a Mmap cache mechanism using L<Cache::FastMmap>, which is an XS module. The api is very similar to its counterpart with L<Module::Generic::File::Cache> and L<Module::Generic::SharedMem>, but has the advantage of sharing data over a file like L<Module::Generic::File::Cache>, but using Mmap and being very fast.
 
@@ -1106,6 +1110,28 @@ It returns the current object for chaining, or C<undef> if there was an error, w
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD SAFETY
+
+This module is thread-safe by design, provided that:
+
+=over 4
+
+=item *
+
+Each thread creates or uses its own C<Module::Generic::File::Mmap> instance.
+
+=item *
+
+Underlying mmap access is managed via L<Cache::FastMmap>, which internally supports safe access via file locks and mmap.
+
+=item *
+
+Thawing and serialization are protected against circular references and duplicated shared state.
+
+=back
+
+No global variables are used, and state-dependent logic is wrapped in thread-safe conditionals using C<HAS_THREADS> and C<lock()>.
 
 =head1 AUTHOR
 

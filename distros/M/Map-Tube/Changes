@@ -1,5 +1,10 @@
 Revision history for Map::Tube
 
+4.08  2025-04-22T20:10:00+00:00
+      - Added support for Unicode characters in station names.
+      - Added support for Unicode characters in line names.
+      - Added unit test for Unicode characters in station and line names.
+
 4.07  2025-04-17T15:50:00+00:00
       - Renamed Forked test to OtherLink test to be more explicit.
 

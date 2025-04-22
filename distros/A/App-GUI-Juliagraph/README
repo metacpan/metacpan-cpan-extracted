@@ -1,16 +1,18 @@
 NAME
-    App::GUI::Juliagraph - drawing Mandelbrot and Julia fractals
+    App::GUI::Juliagraph - drawing Mandelbrot and Julia fractals with
+    complex equations
 
 SYNOPSIS
     1.  read this POD
 
-    2.  start the program (juliagraph)
+    2.  start the program ins shell: > "juliagraph"
 
     3.  move knobs and observe how preview sketch reacts til you got an
         interesting image
 
-    4.  push "Draw" (below drawing board or Ctrl+D or *Draw* in *Image*
-        menu) to produce full resolution image
+    4.  push "Draw" (below drawing board) or Ctrl+D or *Draw* in *Image*
+        menu, or middle click of the drawing board, to produce full
+        resolution image
 
     5.  choose "Save" in Image menu (or Ctrl+S) to store image in a PNG /
         JPEG / SVG file
@@ -24,14 +26,14 @@ SYNOPSIS
     change it by editor or delet it to reset configs to default.
 
 DESCRIPTION
-    Mandelbrot (first thee) and Julia fractals (second three following) are
+    Mandelbrot (first two pictures) and Julia fractals (four after that) are
     just mathematical diagrams, showing you how iterating the equation
-    "z_n+1 = z_n ** 2 + C" behaves in the complex plane. The values at the
-    pixel coordinates or some chosen constant is taken as input (z_0) and
-    the count of iterations it took to exceed the stop/breakout value decide
-    which color this point will painted in. In Mandelbrot fraktals the
-    coordinates will be put into the variable C and in Julia fraktals into
-    the variable z_0 (initial values of the iterator variable).
+    "z_n+1 = z_n ** 2 + C" behaves on the complex plane. Our running
+    variable gets an initial value and gets squared each time, plus an
+    constant is added, also each time. Mandelbrot mean this constant are the
+    pixel coordinates, Julia means the coordinates are the starting value.
+    And the pixel color just contains the information how many iterations
+    (times) it took until z got greater than our bailout value.
 
     This program has additional capabilities/options:
 
@@ -48,122 +50,164 @@ DESCRIPTION
 GUI
     The general layout is very simple: the settings (which define the
     fractal) are on the right and the drawing board is left. The settings
-    are devided into several thematic tabs.
+    are devided into several thematic tabs. Every change of the settings
+    triggers a redraw of the fractal, but only in a blurry preview mode, so
+    it can be fast enough. To get a high resolution rendering, press
+    "Ctrl"+"D" or push the draw button down left center or click at the
+    drawing board with a middle mouse click. (The image menu has also a draw
+    item.) With a full rendering the progress bar beside the draw button
+    becomes colorful. It is white in preview mode.
 
     Please mind the tool tips - short help texts which appear if the mouse
     stands still over a button. Also helpful are messages in the status bar
-    at the bottom that appear while browsing the menu.
+    at the bottom that appear while browsing the menu. Please take also
+    special note at the *mouse* section since you can browse the fractals by
+    mouse.
 
   Constraints
-    The controls of the first tab are the settings that define most of the
-    math, but not the higher polynomials. The page is divided from top to
-    bottom in 4 sections for fractal type, scrolling and zooming, iteration
-    constant, and stop condition.
+    The controls on the first tab panel are the settings that define most of
+    the rules by which the equation is computed. The page is divided from
+    top to bottom into 5 sections that will be discussed in that order.
 
     The first section allows you to set the fractal type: *Mandelbrot*,
     *Julia*, of something in between (option *Any*). If you choose
-    *Mandelbrot* the complex value of the current dot in the coordinate
-    system becomes C in the above mentioned formula and the complex constant
-    of section 3 is the starting value Z_0. With *Julia* both these values
-    switch their usage and with *Any* you are free to choose their usage.
-    You could discard them of even use them as factor of the higher
-    monomials.
+    *Mandelbrot*, the sections 3 and 4 get blurred and set to zero, since
+    the play no role in computing this type of fractal. If chosen *Julia*
+    only section 4 is blurred and reset. On the right side of this sections
+    you can observe, how the checkboxes dance, when switching the fractal
+    type. There you can see that Mandelbrot means the pixel coordinates are
+    the constant added at each iteration. And *Julia* means that coordinates
+    turn to starting values, but you can choose the constant to get
+    different shapes. But these checkboxes can only reached, when type *Any*
+    is chosen. Only then you can select or deselect both options or even
+    choose a third one, that pixel coordinates can become a monomial factor.
 
-    The second section allows you to zoom in and out and to select the
-    central coordinates of the visible cutout. For this it has a three
-    partial_hash_deformat widget, which need a little more explanation. The
-    leftmost part is a text field, in which you could change the numbers
-    directly by pasting or typing. The ladder is not recommended, since
-    every change will trigger a redraw of the fractal preview. Instead of it
-    use the slider on the right and dial in the amount you want to see the
-    value on the left changed. If you hover the mouse over the slider, it
-    will show you the amount. Then push the buttons in the middle to add or
-    subtract the dialed in value. In the same way you can choose X and Y
-    position to move the visible window.
+    The second section contains the information that select the visible part
+    the image. These are zoom factor (its higher when you zoom in) and the
+    coordinates that are at the center of the visible section. Chenge them
+    to scroll left, right, up or down. Each of these values are controlled
+    by a slider step widget. It allows you to change the value in two
+    different ways. Either you type in the numbers directly (click first at
+    the widget). Or you change the value by clicking the plus and minus
+    buttons. The slider beside them determines the size of the value change,
+    done by the buttons. The buttons on the most right just reset the values
+    in case you got lost.
 
-    The third section works the same, but helps you to set the a complex
-    value, that will be used in the manner you have set in section 1. Just
-    note *A* is the real part of the constant and *B* is the imaginary part.
+    The third section is about the mentioned constant number, added to "z"
+    at each iteration. A is the real part corresponding to the X-axis and B
+    the imaginary part corresponding to Y. In same manner, section four is
+    holding the starting value. To both of these values the coordinates can
+    be added. Just click the checkbox in the upper right corner. If chosen
+    the constant or starting value is then the sum of pixel coordinates with
+    the displayed value.
 
-    The fourth section contains two choices. First the stop value. If the
-    iteration variable *Z* has a greater value than it, the iteration stops.
-    Because we compare an complex iteration variable with a real number, we
-    compute the absolute value of the iteration variable (displayed by
-    "|var|"). But other metrics are possible. Just keep in mind x is the
-    real part of the iteration variable *Z* and y is the imaginary part.
+    The fifth section holds all values that determine the end of the
+    computation on one spot. There are two conditions that can trigger that.
+    Either you run out of iterations (exceeded the maximal interation
+    *count*). Please note, that the actual number is the displayed number
+    squared. This gives you a wider range eof options and a little more
+    comfort while changing the value. When the computation runs out of
+    iterations, the current pixel will get the background color. The second
+    stop criterion is fulfilled when the value exceeds the bailout limit
+    (*Value*), which is also the displayed number squared. In the right
+    corner you got ten different ways how to compute the amount of z.
+    Mathematicians call them merics. They mostly influence the shape around
+    the main shape (the crwon - corona).
 
-  Polynomial
-    The second tab contains 4 identical sections which also work the same.
-    Each of them stand for a monomial of the iteration equation, but only if
-    the checkbox *On* is marked. A second checkbox allows you discard the
-    complex factor below which will be set in the same way as the constant
-    on the first tab/page. (Read there how to use the slider button widget.)
-    The maybe most important control of an monomial is the exponent, which
-    you select on the right side of the first row. A *Mandelbrot* or *Julia*
-    fractal is usually computed just with "Z_n+1 = Z_n ** 2 + C", but higher
-    exponents are gateways into other worlds with more symmetry. You could
-    select via this page a term like "Z_n+1 = F_1 * Z_n ** 5 + F_2 * Z_n **
-    2 + C" An exponent of one will just add a linear component which usually
-    smears the fractal in sometimes interesting ways. An exponent of zero
-    will make the factor of this monomial into a constant, same as one on
-    the first tab. If you you have several monomials with the same exponent,
-    the factors will be multiplied.
+  Monomials
+    The second tab contains 4 identical sections which also work the same
+    way. Each of them stand in for a monomial of the iteration equation, but
+    only if the checkbox *On* is marked. A second checkbox decides if this
+    monomial gets added or subtracted. The third allows you discard the
+    complex factor below the checkboxes. The fourth checkbox allows you to
+    use the current pixel coordinates as second factor in the monomial.
+    Please be aware this option can only be chosen if fractal type "Any" is
+    active and the *Monomial* checkbox in the upper right corner is on. Both
+    of these settings are on the previous "Constrains" page. This might seem
+    cumbersome, but I wanted to make it very clear that this is no longer a
+    "Julia" fractal as most people would understand it. The last and fifth
+    checkbox lets you calculate a complex logarithm of the power term z^n.
+    This is useful when combined with a very larg factor or another
+    monomial. This just mentioned power "n" ca be chosen right beside the
+    checkboxes. The higher this power is, the longer it takes to calculate
+    the picture, but it adds also a nice rotational symmetry. "Mandelbrot"
+    has a (n-1)-times rot symmetry and "Julia" a n-times rotational
+    symmetry.
 
   Color Mapping
-    On the second tab we have three rows of settings which determine how the
-    selected colors will be applied.
+    This page is about mapping the iteration number at bailout to a color.
+    To be able to do that better you can preview here the color rainbow
+    between the first and second section. Below the color rainbow is another
+    this monochrome strip. It displayes the currently active background
+    color. The rainbow is from left (low iteration number) to right (high).
 
-    The first checkbox selects if we use the colors at all or just the
-    default grey gradient. The combobox in the first row let you pick how
-    many of the selected colors will be used. If you choose for instance 6,
-    the first six (1..6) are used to display the fraktal, plus of course
-    black as the background color for the area where the iteration variable
-    never reaches the stop value. Never in this context mean the maximum
-    available amunt of iterations as computed by the product of the numbers
-    shown on this page except *Dynamics*.
+    The first section starts with a checkbox. When deselected, the fractal
+    gets a gray scale. When selected all color choices are in effect. The
+    rainbow goes from begin color number to end color number over every
+    color in between. So if you for instance selected 2 and 4, the rainbow
+    has a gradient from color 2 to color 3 and a second from 3 to 4. The
+    exact colors will be changes on the next page. The gradients might vary
+    dependant on chosen "dynamic" and color "space" in which they are
+    computed.
 
-    The second row defines how we proceed from one color to the next. If for
-    instance *Gradient* set to 5, there will be 5 additional colors between
-    each of the selected colors, to make the transition smoother. If
-    *Dynamics* is set to 0, this transition will be linear. Otherwise it
-    will tilt into one or the other side.
+    The second section is for people who want only a few color regions. Just
+    activate the custom checkbox and select the "Steps" count. If they are
+    at 20 only 20 differently colored reagions are drawn. The readonly
+    textbox below with the current iteration max is only for better
+    orientation. When it is at lets say 60 you know: this scale of one to 60
+    possible iteratons will be divided into 20 parts. If the distribution is
+    *linear* they all have the size of three. But you might want to skew the
+    color distribution. The mapping types are sorted by their skewness.
 
-    The third row has two more settings which will influence the shape of
-    these gradients. By setting the *Grouping* value higher than 1 you
-    stretch the gradient by a factor. If for instance *Grouping* is set to
-    three, three neighbouring areas which normally would have three
-    different colors will have the same color and just the next, forth area
-    will contain the next color. The *Repeat* value also multiplies the
-    number of used colors. As soon the painter runs out of colors it will
-    take the first again and repeat this process the ordered amount of
-    times.
+    If the second section is deactivated you are able to activate the third.
+    It is for folks that think that the color gradient is not dense enough.
+    That might makes sense if the iteration already stops at maximum of 5
+    but you want to get a long smooth gradient. Then you want to *Activate*
+    subgradients, based on the Value at iteration stop. The greater that is
+    the further on the subgradient the resulting color will be. The five
+    options here parallel what we already described. Subgradients will have
+    the amount of steps as dialed in under "Steps". The gradient will be
+    computed from 1 (above bailout value) up to the "Size" value. Everything
+    above just lands in the last bucket. The subgradient can again be skewed
+    by a "Distribution" and "Dynamic" value (as described above). Also the
+    resulting color change dependant in which color "Space" it is computed
+    in. *RBG* gives usually more smooth results and *HSL* more contrast.
 
   Colors
     This page helps you to select the color that will be used to paint the
-    fractal. Only the background color is currently fixed to black. You can
-    see these colors in the middle section named "Currently Used State
-    Colors". If you click on one - it will be selected which you can see
-    from_rgbthe arrow below the selected color.
+    fractal. You can see them in the middle row. The background color is
+    often the one at the most left. That is why it is marked by a vertical
+    bar. The colors are numbered from left to right with 1 to 11.
 
-    In the section below named "Selected State Color" you see the values in
-    RGB space and HSL space of the selected color. Yan change any of them
-    directly by slider, typing them in or pressing the plus and minus
-    buttons.
+    The first section on the pages is for loading and saving custom sets of
+    colors. Please use the delete button carefully. "New" saves the current
+    colors under a new name, "Save" under the current name. There are no
+    undo buttons yet.
 
-    The "Color Store" in the last row allows you store the selected color
-    for later reuse (just press save and type in its name). With the combo
-    box or the arrow buttons you can also select there a color and press
-    load to chhose it as the new currently selected color. Press there
-    Del(ete) to delete the visible color from the store.
+    The section below helps you to compute related colors beweet the second
+    and the currently selected. This can be either a gradient (with
+    "Gradient" button). Right beside is a text box to skew the gradient in
+    one or anotehr direction. To get complementary colors push the
+    "Complement" button. This also can be skewed on the saturation and
+    lightness axis (text boxes beside). The arrow butons there help oýou to
+    move colors to another position.
 
-    Analogues to that there is a color set store in the first row of this
-    page which enables you to store and load all currently used colors at
-    once. Please use there the *New* button to create a new color set to
-    avoid overwriting the currently seleced color set, when pressing *Save*.
+    To change a color you have to fist select it by clicking on it or the
+    marker below. After that the marker turns into an arrow pointing down.
+    Because below are the 6 slider to change the either RGB or HSL values of
+    the color. Each slider has a randomize button with a quastion mark.
 
-    The second row contains some color set functions to create gradients
-    between the leftmost and selected color or to compute colors that are
-    complementary to the selected.
+    The second method to change the selected color is to load one from the
+    store (last section below). Just select the color by drop down menu or
+    arrows. If you like the seen color push "Load". This single color store
+    has also Buttons to store your own favorite colors or delete the ones
+    you dont like. The only way to bring back deleted default colors is to
+    delete the config file: ~/.config/juliagraph.
+
+  Mouse
+    The drawing board responds to three types of clicks. A left click moves
+    the visible section. Double click means zoom in and right click is zoom
+    out.
 
   Menu
     The upmost menu bar has only three very simple menus. Please not that
@@ -192,12 +236,21 @@ SEE ALSO
 
     App::GUI::Sierpingraph
 
+    App::GUI::Spirograph
+
 AUTHOR
     Herbert Breunung (lichtkind@cpan.org)
 
 COPYRIGHT
-    Copyright(c) 2023 by Herbert Breunung
+    Copyright(c) 2023-25 by Herbert Breunung
 
     All rights reserved. This program is free software and can be used and
     distributed under the GPL 3 licence.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 289:
+        Non-ASCII character seen before =encoding in 'oýou'. Assuming CP1252
 

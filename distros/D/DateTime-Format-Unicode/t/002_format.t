@@ -241,7 +241,7 @@ my $tests =
             },
             # night1
             {
-                data => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'GMT' },
+                data => { year => 2024, month => 1, day => 1, hour => 23, minute => 0, second => 0, time_zone => 'GMT' },
                 pattern => 'b',
                 expects => 'night',
             },
@@ -278,7 +278,7 @@ my $tests =
             },
             # night1
             {
-                data => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'GMT' },
+                data => { year => 2024, month => 1, day => 1, hour => 23, minute => 0, second => 0, time_zone => 'GMT' },
                 pattern => 'bbbb',
                 expects => 'night',
             },
@@ -315,7 +315,7 @@ my $tests =
             },
             # night1
             {
-                data => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'GMT' },
+                data => { year => 2024, month => 1, day => 1, hour => 23, minute => 0, second => 0, time_zone => 'GMT' },
                 pattern => 'bbbbb',
                 expects => 'night',
             },
@@ -359,7 +359,7 @@ my $tests =
             },
             # night1
             {
-                data => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'GMT' },
+                data => { year => 2024, month => 1, day => 1, hour => 23, minute => 0, second => 0, time_zone => 'GMT' },
                 pattern => 'B',
                 expects => 'at night',
             },
@@ -396,7 +396,7 @@ my $tests =
             },
             # night1
             {
-                data => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'GMT' },
+                data => { year => 2024, month => 1, day => 1, hour => 23, minute => 0, second => 0, time_zone => 'GMT' },
                 pattern => 'BBBB',
                 expects => 'at night',
             },
@@ -433,7 +433,7 @@ my $tests =
             },
             # night1
             {
-                data => { year => 2024, month => 1, day => 1, hour => 4, minute => 0, second => 0, time_zone => 'GMT' },
+                data => { year => 2024, month => 1, day => 1, hour => 23, minute => 0, second => 0, time_zone => 'GMT' },
                 pattern => 'BBBBB',
                 expects => 'at night',
             },

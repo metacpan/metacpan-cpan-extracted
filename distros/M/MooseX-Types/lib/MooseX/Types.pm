@@ -1,9 +1,9 @@
-package MooseX::Types; # git description: v0.49-2-gc8f752e
-use Moose;
+package MooseX::Types; # git description: v0.50-19-ga14f8fd
+
 # ABSTRACT: Organise your Moose types in libraries
 # KEYWORDS: moose types classes objects constraints declare libraries
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 use Moose::Util::TypeConstraints      qw( find_type_constraint );
 use MooseX::Types::TypeDecorator;
@@ -12,7 +12,7 @@ use MooseX::Types::Util               qw( filter_tags );
 use MooseX::Types::UndefinedType;
 use MooseX::Types::CheckedUtilExports ();
 use Carp::Clan                        qw( ^MooseX::Types );
-use Sub::Name;
+use Sub::Util                         qw( set_subname );
 use Scalar::Util                      qw( reftype );
 use Sub::Exporter::ForMethods 0.100052 'method_installer';  # for 'rebless'
 
@@ -296,7 +296,7 @@ my $UndefMsg = q{Action for type '%s' not yet defined in library '%s'};
 #pod
 #pod =head1 RECURSIVE SUBTYPES
 #pod
-#pod As of version 0.08, L<Moose::Types> has experimental support for Recursive
+#pod As of version 0.08, L<MooseX::Types> has experimental support for Recursive
 #pod subtypes.  This will allow:
 #pod
 #pod     subtype Tree() => as HashRef[Str|Tree];
@@ -396,7 +396,7 @@ sub type_export_generator {
     ## Return an anonymous subroutine that will generate the proxied type
     ## constraint for you.
 
-    return subname "__TYPE__::$name" => sub {
+    return set_subname "__TYPE__::$name" => sub {
         my $type_constraint = $class->create_base_type_constraint($name);
 
         if(defined(my $params = shift @_)) {
@@ -530,7 +530,7 @@ MooseX::Types - Organise your Moose types in libraries
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -805,7 +805,7 @@ type does not yet exist.
 
 =head1 RECURSIVE SUBTYPES
 
-As of version 0.08, L<Moose::Types> has experimental support for Recursive
+As of version 0.08, L<MooseX::Types> has experimental support for Recursive
 subtypes.  This will allow:
 
     subtype Tree() => as HashRef[Str|Tree];
@@ -973,7 +973,7 @@ Robert "phaylon" Sedlacek <rs@474.at>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Dave Rolsky John Napiorkowski Robert 'phaylon' Sedlacek Rafael Kitover Florian Ragwitz Matt S Trout Tomas Doran (t0m) Jesse Luehrs Mark Fowler Hans Dieter Pearcey Graham Knop Paul Fenwick Kent Fredric Justin Hunter
+=for stopwords Karen Etheridge Dave Rolsky John Napiorkowski Robert 'phaylon' Sedlacek Rafael Kitover Florian Ragwitz Matt S Trout Graham Knop Hans Dieter Pearcey Jesse Luehrs Mark Fowler Tomas Doran (t0m) Justin Hunter Kent Fredric Paul Fenwick Tadeusz Sośnierz
 
 =over 4
 
@@ -1007,7 +1007,11 @@ Matt S Trout <mst@shadowcat.co.uk>
 
 =item *
 
-Tomas Doran (t0m) <bobtfish@bobtfish.net>
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Hans Dieter Pearcey <hdp@weftsoar.net>
 
 =item *
 
@@ -1019,15 +1023,11 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =item *
 
-Hans Dieter Pearcey <hdp@weftsoar.net>
+Tomas Doran (t0m) <bobtfish@bobtfish.net>
 
 =item *
 
-Graham Knop <haarg@haarg.org>
-
-=item *
-
-Paul Fenwick <pjf@perltraining.com.au>
+Justin Hunter <justin.d.hunter@gmail.com>
 
 =item *
 
@@ -1035,7 +1035,11 @@ Kent Fredric <kentfredric@gmail.com>
 
 =item *
 
-Justin Hunter <justin.d.hunter@gmail.com>
+Paul Fenwick <pjf@perltraining.com.au>
+
+=item *
+
+Tadeusz Sośnierz <tadeusz.sosnierz@onet.pl>
 
 =back
 

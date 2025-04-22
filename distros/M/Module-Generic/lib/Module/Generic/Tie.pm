@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Tie.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.2.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2025/04/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,7 +17,7 @@ BEGIN
     use strict;
     use warnings;
     our @ISA = qw( Tie::Hash );
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.2.0';
 };
 
 use strict;

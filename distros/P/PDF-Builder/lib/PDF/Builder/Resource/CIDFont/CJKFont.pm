@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::CIDFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -20,11 +20,16 @@ our $subs;
 
 PDF::Builder::Resource::CIDFont::CJKFont - Base class for CJK fonts
 
+Inherits from L<PDF::Builder::Resource::CIDFont>
+
+B<Note:> CJK font support is somewhat obsolete. Try directly using an
+up-to-date TTF or OTF font, with UTF-8 input, instead.
+
 =head1 METHODS
 
 =head2 new
 
-    $font = PDF::Builder::Resource::CIDFont::CJKFont->new($pdf, $cjkname, %options)
+    $font = PDF::Builder::Resource::CIDFont::CJKFont->new($pdf, $cjkname, %opts)
 
 =over
 
@@ -36,27 +41,27 @@ Returns a cjk-font object.
 
 =item * 
 
-Traditional Chinese: Ming, Ming-Bold, Ming-Italic, Ming-BoldItalic
+B<Traditional Chinese:> Ming, Ming-Bold, Ming-Italic, Ming-BoldItalic
 
 =item * 
 
-Simplified Chinese: Song, Song-Bold, Song-Italic, Song-BoldItalic
+B<Simplified Chinese:> Song, Song-Bold, Song-Italic, Song-BoldItalic
 
 =item * 
 
-Korean: MyungJo, MyungJo-Bold, MyungJo-Italic, MyungJo-BoldItalic
+B<Korean:> MyungJo, MyungJo-Bold, MyungJo-Italic, MyungJo-BoldItalic
 
 =item * 
 
-Japanese (Mincho): KozMin, KozMin-Bold, KozMin-Italic, KozMin-BoldItalic
+B<Japanese (Mincho):> KozMin, KozMin-Bold, KozMin-Italic, KozMin-BoldItalic
 
 =item * 
 
-Japanese (Gothic): KozGo, KozGo-Bold, KozGo-Italic, KozGo-BoldItalic
+B<Japanese (Gothic):> KozGo, KozGo-Bold, KozGo-Italic, KozGo-BoldItalic
 
 =back
 
-Defined Options:
+Defined Options (%opts):
 
 =over
 

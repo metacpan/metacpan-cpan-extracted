@@ -1,6 +1,6 @@
 package Mac::OSA::Notification::Tiny;
 
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 
 use base 'Import::Export';
 
@@ -26,7 +26,7 @@ Mac::OSA::Notification::Tiny - native mac notifications
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -117,10 +117,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Mac-OSA-Notification-Tiny>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Mac-OSA-Notification-Tiny>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Mac-OSA-Notification-Tiny>
@@ -131,7 +127,7 @@ L<https://metacpan.org/release/Mac-OSA-Notification-Tiny>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020->2021 by LNATION.
+This software is Copyright (c) 2020->2025 by LNATION.
 
 This is free software, licensed under:
 

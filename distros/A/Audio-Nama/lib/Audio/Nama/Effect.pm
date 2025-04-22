@@ -508,7 +508,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 
 					set_current_op
 					set_current_param
-					set_current_stepsize
+					set_param_stepsize
 					increment_param
 					decrement_param
 					set_parameter_value
@@ -1130,7 +1130,7 @@ sub set_current_param {
 	my $parameter = shift;
 	$project->{current_param}->{Audio::Nama::this_op()} = $parameter;
 }
-sub set_current_stepsize {
+sub set_param_stepsize {
 	my $stepsize = shift;
 	$project->{current_stepsize}->{Audio::Nama::this_op()}->[this_param()] = $stepsize;
 }

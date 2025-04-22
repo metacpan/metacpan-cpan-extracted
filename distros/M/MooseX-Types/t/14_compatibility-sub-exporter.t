@@ -4,7 +4,7 @@ use warnings;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
-use Test::Requires { 'Sub::Exporter' => '0' };
+use Test::Needs 'Sub::Exporter';
 use lib 't/lib';
 
 use SubExporterCompatibility qw(MyStr something);

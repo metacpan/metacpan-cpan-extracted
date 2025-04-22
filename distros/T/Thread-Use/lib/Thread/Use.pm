@@ -4,7 +4,7 @@ package Thread::Use;
 # Make sure we do everything by the book
 # Except for the dirty reference tricks (that's what this module is made of)
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 use strict;
 no strict 'refs';
 
@@ -159,12 +159,14 @@ without calling its "import" method, you should just use C<require>.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>
+All rights reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO

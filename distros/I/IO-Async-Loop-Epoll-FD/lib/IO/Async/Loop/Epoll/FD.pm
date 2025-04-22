@@ -1,5 +1,5 @@
 package IO::Async::Loop::Epoll::FD;
-$IO::Async::Loop::Epoll::FD::VERSION = '0.003';
+$IO::Async::Loop::Epoll::FD::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -48,30 +48,6 @@ sub unwatch_signal {
 	if (my $pair = delete $self->{watch_signal}{$signal}) {
 		$self->unwatch_io(handle => $pair->[0], on_read_ready => 1);
 		$Signal::Mask{$signal} = !!0;
-	}
-}
-
-sub post_fork {
-	my $self = shift;
-
-	$self->{epoll} = Linux::Epoll->new;
-	$self->{pid} = $$;
-
-	my $watches = $self->{iowatches} or return;
-	my $fakeevents = $self->{fakeevents};
-
-	foreach my $watch ( values %$watches ) {
-		my ($handle) = @$watch;
-		my $fd = $handle->fileno;
-		next if $fakeevents->{$fd};
-		my $mask = $self->{masks}->{$fd};
-		my @bits;
-		push @bits, 'in'  if $mask & IO::Async::Loop::Epoll::WATCH_READ;
-		push @bits, 'out' if $mask & IO::Async::Loop::Epoll::WATCH_WRITE;
-		push @bits, 'hup' if $mask & IO::Async::Loop::Epoll::WATCH_HUP;
-		my $cb = $self->{callbacks}->{$fd};
-
-		$self->{epoll}->add($handle, \@bits, $cb);
 	}
 }
 
@@ -168,7 +144,7 @@ IO::Async::Loop::Epoll::FD - Use IO::Async with Epoll and special filehandles
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,7 @@ BEGIN {
         Lingua::ITA::Numbers->new();
         1;
     } or do {
-        plan skip_all => "Moose is not available";
+        plan skip_all => "Lingua::ITA::Numbers is not available";
     };
 }
 use Data::Dumper;

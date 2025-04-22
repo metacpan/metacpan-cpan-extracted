@@ -1,13 +1,13 @@
 package Map::Tube::Delhi;
 $Map::Tube::Delhi::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Delhi::VERSION = '0.97';
+$Map::Tube::Delhi::VERSION = '0.99';
 =head1 NAME
 
 Map::Tube::Delhi - Interface to the Delhi Metro Map.
 
 =head1 VERSION
 
-version 0.97
+version 0.99
 
 =cut
 
@@ -43,7 +43,9 @@ given stations. It covers the following lines of Delhi Metro:
 
 =back
 
-For more information about Delhi Metro Map, get L<PDF|http://www.delhimetrorail.com/otherdocuments/route_map.pdf>.
+=head1 MAP DATA
+
+The map data collected from L<this document|http://www.delhimetrorail.com/otherdocuments/route_map.pdf>.
 
 There is a very handy tool provided by L<Map::Tube::CLI> called C<map-tube> which
 exposes the  map  (and all other maps) from command line. Please refer to its pod
@@ -106,7 +108,7 @@ The L<Delhi Metro Map|https://raw.githubusercontent.com/manwar/Map-Tube-Delhi/ma
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -118,9 +120,8 @@ L<Map::Tube::CLI>
 
 =head1 BUGS
 
-Please  report any bugs/feature requests to C<bug-map-tube-delhi at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube-Delhi>.
-I will be notified, and then you'll automatically be notified of progress on your
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-Delhi/issues>.
+I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
 =head1 SUPPORT
@@ -133,27 +134,23 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-Delhi>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Map-Tube-Delhi>
+L<https://github.com/manwar/Map-Tube-Delhi/issues>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Map-Tube-Delhi>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube-Delhi/>
+L<https://metacpan.org/dist/Map-Tube-Delhi/>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2019 Mohammad S Anwar.
+Copyright (C) 2014 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

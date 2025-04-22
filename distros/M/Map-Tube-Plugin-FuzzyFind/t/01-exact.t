@@ -1,17 +1,14 @@
 #!perl
-use 5.010;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
-use Test::More 0.82;
-
-eval 'use Map::Tube::London 1.39';
-plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
-
-plan tests => 13;
+use Test::More 0.82 tests => 13;
+use lib 't/';
+use Sample;
 
 sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 
-my $tube = new_ok( 'Map::Tube::London' );
+my $tube = new_ok( 'Sample' );
 my $ret;
 
 $ret = $tube->fuzzy_find( 'Bakerloo', objects => 'lines' );

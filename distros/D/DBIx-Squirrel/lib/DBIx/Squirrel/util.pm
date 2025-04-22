@@ -23,13 +23,15 @@ our @ISA = qw(Exporter);
 our @EXPORT;
 our %EXPORT_TAGS = ( all => [
     our @EXPORT_OK = qw(
+        callbacks
+        callbacks_args
         carpf
         cluckf
         confessf
         decrypt
         get_file_contents
         global_destruct_phase
-        isolate_callbacks
+        has_callbacks
         slurp
         uncompress
         unmarshal
@@ -53,6 +55,64 @@ if ( -e '.env' ) {
 =head2 EXPORTS
 
 Nothing is exported by default.
+
+=cut
+
+
+=head3 C<callbacks>
+
+    @callbacks = callbacks(\@array);
+    $count = callbacks(\@array);
+
+When called in list-context, this function removes and returns any trailing
+CODEREFs found in the array referenced by the only argument. Be mindful that
+this operation potentially alters the referenced array.
+
+When called in scalar-context then the function returns a non-zero count of
+the number of trailing CODEREFs found, or C<undef> if there were none. When
+called in scalar-context then the array is not altered, even if there were
+trailing CODEREFs.
+
+=cut
+
+sub callbacks {
+    return unless 1 == @_ && UNIVERSAL::isa( $_[0], 'ARRAY' );
+    goto &_callbacks;
+}
+
+sub _callbacks {
+    return unless my @splice = _has_callbacks( $_[0] );
+    return $splice[1] unless wantarray;
+    return splice @{ $_[0] }, $splice[0], $splice[1];
+}
+
+
+=head3 C<callbacks_args>
+
+    (\@callbacks, @arguments) = callbacks_args(@argments);
+
+When using C<DBIx::Squirrel>, some calls allow the caller to reshape results
+before they are returned, using transformation pipelines. A transformation
+pipeline is one or more contiguous code-references presented at the end of
+a call's argument list. 
+
+Th C<callbacks_args> function inspects an array of arguments, moving any
+trailing code-references from the source array into a separate array — the
+transformation pipeline. It returns a reference to that array, followed by
+any remaining arguments, to the caller.
+
+    (\@callbacks, @arguments) = &callbacks_args;
+
+The terse C<&>-sigil calling style causes C<callbacks_args> to use the
+calling function's C<@_> array.
+
+=cut
+
+sub callbacks_args {
+    return [], @_ unless my @callbacks = callbacks( \@_ );
+    return \@callbacks, @_;
+}
+
 
 =head3 C<carpf>
 
@@ -330,33 +390,31 @@ sub global_destruct_phase {
 }
 
 
-=head3 C<isolate_callbacks>
+=head3 C<has_callbacks>
 
-    (\@callbacks, @arguments) = isolate_callbacks(@argments);
+    ($position, $count) = has_callbacks(\@array);
 
-When using C<DBIx::Squirrel>, some calls allow the caller to reshape results
-before they are returned, using transformation pipelines. A transformation
-pipeline is one or more contiguous code-references presented at the end of
-a call's argument list. 
+When called in list-context, this function returns the starting position
+and a count of the trailing CODEREFs found in the array referenced in the
+only argument. If no trailing CODEREFs were found then the function will
+return an empty list.
 
-Th C<isolate_callbacks> function inspects an array of arguments, moving any
-trailing code-references from the source array into a separate array — the
-transformation pipeline. It returns a reference to that array, followed by
-any remaining arguments, to the caller.
-
-    (\@callbacks, @arguments) = &isolate_callbacks;
-
-The terse C<&>-sigil calling style causes C<isolate_callbacks> to use the
-calling function's C<@_> array.
+When called in scalar-context then a truthy value indicating the presence
+of callbacks will be returned.
 
 =cut
 
-sub isolate_callbacks {
-    my $n = my $s = scalar @_;
-    $n-- while $n && UNIVERSAL::isa( $_[ $n - 1 ], 'CODE' );
-    return [], @_ if $n == $s;
-    return [ @_[ $n .. $#_ ] ], @_[ 0 .. $n - 1 ] if $n;
-    return [@_];
+sub has_callbacks {
+    return unless 1 == @_ && UNIVERSAL::isa( $_[0], 'ARRAY' );
+    goto &_has_callbacks;
+}
+
+sub _has_callbacks {
+    my $n = my $s = scalar @{ $_[0] };
+    $n-- while $n && UNIVERSAL::isa( $_[0][ $n - 1 ], 'CODE' );
+    return                                  if $n == $s;
+    return $n ? ( $n, $s - $n ) : ( 0, $s ) if wantarray;
+    return $n;
 }
 
 

@@ -13,7 +13,7 @@ configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,10 @@ name: IO-Async-Loop-Epoll-FD
 provides:
   IO::Async::Loop::Epoll::FD:
     file: lib/IO/Async/Loop/Epoll/FD.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
-  IO::Async::Loop::Epoll: '0'
+  IO::Async::Loop::Epoll: '0.23'
   Linux::FD: '0.015'
   Linux::FD::Pid: '0.007'
   Scalar::Util: '0'
@@ -38,7 +38,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/io-async-loop-epoll-fd/issues
   repository: git://github.com/Leont/io-async-loop-epoll-fd.git
-version: '0.003'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.004'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

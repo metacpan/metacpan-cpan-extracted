@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0904';
+our $VERSION = '0.0911';
 
 use v5.36;
 
@@ -42,14 +42,14 @@ has control => (
 
 has value => (
     is      => 'rw',
-    isa     => Velocity, # no CC# in Types::MIDI yet
+    isa     => Maybe[Velocity], # no CC# in Types::MIDI yet
     default => undef,
 );
 
 
 has trigger => (
     is      => 'rw',
-    isa     => Velocity, # no CC# in Types::MIDI yet
+    isa     => Maybe[Velocity], # no CC# in Types::MIDI yet
     default => undef,
 );
 
@@ -110,15 +110,24 @@ has running => (
 );
 
 
+has halt => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
+
 sub add_filters ($filters, $controllers) {
     for my $params (@$filters) {
         my $port = delete $params->{port};
-        next unless $port; # skip unnamed entries
+        # skip unnamed and unknown entries
+        next if !$port || !exists $controllers->{$port};
         my $type = delete $params->{type} || 'single';
         my $event = delete $params->{event} || 'all';
         my $filter = __PACKAGE__->new(
             rtc => $controllers->{$port}
         );
+        # assume all remaining key/values are module attributes
         for my $param (keys %$params) {
             $filter->$param($params->{$param});
         }
@@ -135,7 +144,8 @@ sub single ($self, $device, $dt, $event) {
     my $value = $self->value || $val;
     my $cc = [ 'control_change', $self->channel, $self->control, $value ];
     $self->rtc->send_it($cc);
-    return 1;
+
+    return 0;
 }
 
 
@@ -158,9 +168,17 @@ sub breathe ($self, $device, $dt, $event) {
         IO::Async::Timer::Periodic->new(
             interval  => $self->time_step,
             on_tick => sub {
-                $it->iterate;
-                my $cc = [ 'control_change', $self->channel, $self->control, $it->i ];
-                $self->rtc->send_it($cc);
+                my ($c) = @_;
+                if ($self->halt) {
+                    $c->stop;
+                    $self->running(0);
+                    $self->halt(0);
+                }
+                else {
+                    $it->iterate;
+                    my $cc = [ 'control_change', $self->channel, $self->control, $it->i ];
+                    $self->rtc->send_it($cc);
+                }
             },
         )->start
     );
@@ -185,9 +203,17 @@ sub scatter ($self, $device, $dt, $event) {
         IO::Async::Timer::Periodic->new(
             interval  => $self->time_step,
             on_tick => sub {
-                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
-                $self->rtc->send_it($cc);
-                $value = $values[ int rand @values ];
+                my ($c) = @_;
+                if ($self->halt) {
+                    $c->stop;
+                    $self->running(0);
+                    $self->halt(0);
+                }
+                else {
+                    my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                    $self->rtc->send_it($cc);
+                    $value = $values[ int rand @values ];
+                }
             },
         )->start
     );
@@ -217,25 +243,33 @@ sub stair_step ($self, $device, $dt, $event) {
         IO::Async::Timer::Periodic->new(
             interval  => $self->time_step,
             on_tick => sub {
-                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
-                $self->rtc->send_it($cc);
-
-                # compute the stair-stepping
-                if ($direction) {
-                    $it->step($self->step_up);
+                my ($c) = @_;
+                if ($self->halt) {
+                    $c->stop;
+                    $self->running(0);
+                    $self->halt(0);
                 }
                 else {
-                    $it->step(- $self->step_down);
+                    my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                    $self->rtc->send_it($cc);
+
+                    # compute the stair-stepping
+                    if ($direction) {
+                        $it->step($self->step_up);
+                    }
+                    else {
+                        $it->step(- $self->step_down);
+                    }
+
+                    # toggle the stair-step direction
+                    $direction = !$direction;
+
+                    # iterate the breathing
+                    $it->iterate;
+                    $value = $it->i;
+                    $value = $self->range_top    if $value >= $self->range_top;
+                    $value = $self->range_bottom if $value <= $self->range_bottom;
                 }
-
-                # toggle the stair-step direction
-                $direction = !$direction;
-
-                # iterate the breathing
-                $it->iterate;
-                $value = $it->i;
-                $value = $self->range_top    if $value >= $self->range_top;
-                $value = $self->range_bottom if $value <= $self->range_bottom;
             },
         )->start
     );
@@ -258,19 +292,25 @@ sub ramp_up ($self, $device, $dt, $event) {
         IO::Async::Timer::Countdown->new(
             delay     => $self->time_step,
             on_expire => sub {
-                my $c = shift;
-
-                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
-                $self->rtc->send_it($cc);
-
-                $value += $self->range_step;
-
-                if ($value > $self->range_top) {
+                my ($c) = @_;
+                if ($self->halt) {
                     $c->stop;
                     $self->running(0);
+                    $self->halt(0);
                 }
                 else {
-                    $c->start;
+                    my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                    $self->rtc->send_it($cc);
+
+                    $value += $self->range_step;
+
+                    if ($value > $self->range_top) {
+                        $c->stop;
+                        $self->running(0);
+                    }
+                    else {
+                        $c->start;
+                    }
                 }
             },
         )->start
@@ -295,19 +335,25 @@ sub ramp_down ($self, $device, $dt, $event) {
         IO::Async::Timer::Countdown->new(
             delay     => $self->time_step,
             on_expire => sub {
-                my $c = shift;
-
-                my $cc = [ 'control_change', $self->channel, $self->control, $value ];
-                $self->rtc->send_it($cc);
-
-                $value -= $self->range_step;
-
-                if ($value < $self->range_bottom) {
+                my ($c) = @_;
+                if ($self->halt) {
                     $c->stop;
                     $self->running(0);
+                    $self->halt(0);
                 }
                 else {
-                    $c->start;
+                    my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                    $self->rtc->send_it($cc);
+
+                    $value -= $self->range_step;
+
+                    if ($value < $self->range_bottom) {
+                        $c->stop;
+                        $self->running(0);
+                    }
+                    else {
+                        $c->start;
+                    }
                 }
             },
         )->start
@@ -330,7 +376,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0904
+version 0.0911
 
 =head1 SYNOPSIS
 
@@ -363,6 +409,8 @@ control-change based L<MIDI::RtController> filters.
 
 Passing C<all> to the C<add_filter> method means that any MIDI event
 will trigger the filter.
+
+n.b. In order to stop a running filter, set the B<halt> attribute.
 
 =head2 Making filters
 
@@ -503,6 +551,15 @@ Are we running a filter?
 
 Default: C<0>
 
+=head2 halt
+
+  $halt = $filter->halt;
+  $filter->halt($boolean);
+
+Return or set B<halt>. This can be used to terminate B<running> filters.
+
+Default: C<0>
+
 =head1 METHODS
 
 =head2 new
@@ -522,12 +579,12 @@ example:
 
   [
     { # mod-wheel
-      port => 'keyboard',        # what is controlling it
+      port => 'keyboard',        # what device is controlling
       type => 'breathe',         # the type of filter
       event => 'control_change', # or [qw(note_on note_off)] etc
       control => 1,              # what CC# is being controlled
       trigger => 25,             # what CC# triggers the controlling
-      time_step => 0.25,         # a parameter
+      time_step => 0.25,         # a module attribute parameter
     },
     ...
   ]
@@ -537,8 +594,8 @@ optional. These keys are metadata, and all others are assumed to be
 object attributes to set.
 
 The B<controllers> come from L<MIDI::RtController/open_controllers>
-and is a hash reference of C<MIDI::RtController> instances keyed by a
-MIDI input device port name.
+and is a hash reference of C<MIDI::RtController> instances keyed by
+MIDI input device port names.
 
 =head1 FILTERS
 
@@ -547,7 +604,7 @@ MIDI input device port name.
   $control->add_filter('single', all => $filter->curry::single);
 
 This filter sets a single B<control> change message, over the MIDI
-B<channel> once.
+B<channel>.
 
 If B<trigger> is set, the filter checks that against the MIDI event
 C<note> to see if the filter should be applied.
@@ -567,6 +624,8 @@ If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
+If the B<halt> attribute is set to true, the running filter will stop.
+
 =head2 scatter
 
   $control->add_filter('scatter', all => $filter->curry::scatter);
@@ -582,6 +641,8 @@ If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
+If the B<halt> attribute is set to true, the running filter will stop.
+
 =head2 stair_step
 
   $control->add_filter('stair_step', all => $filter->curry::stair_step);
@@ -595,6 +656,8 @@ If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
+If the B<halt> attribute is set to true, the running filter will stop.
+
 =head2 ramp_up
 
   $control->add_filter('ramp_up', all => $filter->curry::ramp_up);
@@ -605,6 +668,8 @@ B<channel>, from B<range_bottom> until the B<range_top> is reached.
 If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
+
+If the B<halt> attribute is set to true, the running filter will stop.
 
 =head2 ramp_down
 
@@ -617,9 +682,17 @@ If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
+If the B<halt> attribute is set to true, the running filter will stop.
+
 =head1 SEE ALSO
 
 The F<eg/*.pl> program(s) in this distribution
+
+L<MIDI::RtController::Filter::Tonal> - Related module
+
+L<MIDI::RtController::Filter::Math> - Related module
+
+L<MIDI::RtController::Filter::Drums> - Related module
 
 L<IO::Async::Timer::Periodic>
 

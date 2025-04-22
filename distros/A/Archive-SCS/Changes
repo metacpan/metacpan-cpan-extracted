@@ -1,5 +1,13 @@
 Revision history for perl distribution Archive-SCS
 
+1.07 - 2025-04-22
+
+  - Add ZIP file format handler
+
+  - Fix error message when trying to mount files that don't exist
+
+  - Re-enable Perl warnings in the CLI tool (accidentally disabled in 1.00)
+
 1.06 - 2025-01-12
 
   - Add file system directory format handler

@@ -1,0 +1,147 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a93b27132b258e0df347b31ccfd32eb06631824cd1ee8a1c2329d59cf82c1835 .editorconfig
+SHA256 1766147e541c5ba8e321146373d989683f955142156c22d9a549457cea94c9b9 .gitmodules
+SHA256 2fcb9422b1513f61883ca236152082b9ca88e626bc96dc44fc99d78939a9dd0b Build.PL
+SHA256 7d32a523f3b214eb8e844622b4492d1555588c2ca85b3a1676baefa78b4772a3 COPYING
+SHA256 11648545683982a893e88306f48ae56b704633b3db190fdfddf36acfacbadf7b Changelog
+SHA256 fe8ce03129321556e833656dfdf60a18926eeb720c744f51cc64f18c21bfaacc Dockerfile
+SHA256 451470db542f3947d69e6d84959d668238bf2d4ecc4acab0b63211d7818bf558 MANIFEST
+SHA256 fc3d7fd8b3b8c8628fe7ae3ec104b2f0586b645de02e153e66fea8fdc1e1b20d META.json
+SHA256 d7e06eed9feec755e445a18307518cd94d9ed664818bd29659d13322e35e6593 META.yml
+SHA256 583b58fa340b63d19067642dbf113be36b8cb109107a150fc8b7b4e49f69f3dc README.md
+SHA256 291192725b958d615c6982a8d11080c9007ef832aedd9e7102f6935c51255234 bin/motis-m
+SHA256 26e2103d00d04f6b3852c324b82b0b03eaf21d5766192a058d451c3b5b9f7e43 cpanfile
+SHA256 ce327c25db721e95290b284f42cbfb28af7ff8e1611d5f9485f9c2f10cb359f8 ext/transport-apis/.editorconfig
+SHA256 a6e74774a0d8bcf1d5eb901ed9d7a395de4d5b9b7c24d11f012c30d4c9aff83a ext/transport-apis/.github/workflows/validate.yml
+SHA256 643977fa6628fd0ed2330db70456b6bf718bbfa25ee62a857f6682602e92f435 ext/transport-apis/code-of-conduct.md
+SHA256 629205ece1a03a9a9f376e7fbcbb8c422a3d1c74faff98644191d104347f6489 ext/transport-apis/data/at/ivb-hafas-mgate.json
+SHA256 ea11e290430b783584dbac369530bae3ffa6069eee3623c4d2872ac3c5f0b98d ext/transport-apis/data/at/linz-efa.json
+SHA256 17db7db6bbb92b8b7685135c6b9704a5d802a2ca16a66056f85af019f3ee082b ext/transport-apis/data/at/oebb-hafas-mgate.json
+SHA256 951a075cdcb736ed42f5a47ad199cd39516fb4940bdd25b2177daec5934ef88f ext/transport-apis/data/at/ooevv-hafas-mgate.json
+SHA256 6204aa096ff6f9c552804e0b3e1fc602f69273a0fe5640c42f1ac1a7c7023ef4 ext/transport-apis/data/at/salzburg-hafas-mgate.json
+SHA256 4b980d7dd96ae2d66ea3a20d02da41b2f1fdd0f07cd5e70c4f8b53cc1c92bc75 ext/transport-apis/data/at/stv-hafas-mgate.json
+SHA256 0bfc2555fcfae025072b81fbc7f6c3ea561d471ee317432d68766e1252480683 ext/transport-apis/data/at/svv-hafas-mgate.json
+SHA256 656bb2bc41ea87474e792daa9bfaccabca7ae6a6a0b1915189d2c6c788a7e8d7 ext/transport-apis/data/at/vkg-hafas-mgate.json
+SHA256 bf5ddc9fa38bb39f533bfdec9674849a195c2fd014857532ef493d960e331919 ext/transport-apis/data/at/vor-hafas-mgate.json
+SHA256 2ff376030243894e6a68d17108d16b2646234e87a2cbdd4f4e92985f66bf5720 ext/transport-apis/data/at/vvst-efa.json
+SHA256 f46851f4fba2f68260db25460c58ff338adab83f644eeed061c55d6b3c0afdbc ext/transport-apis/data/at/vvt-hafas-mgate.json
+SHA256 f3f41bc4b9f17e887fb9954cbcfd1a35556104ec862841b8b4d98828ee366d77 ext/transport-apis/data/at/vvv-hafas-mgate.json
+SHA256 b5ee24f2fc130357429f64150d491d32125103b053a9e65b415390662770dab8 ext/transport-apis/data/au/transportnsw-efa.json
+SHA256 91d410f50a4da3ad399288bd6db97498ef7dd2f7b21aecc61ce822ffba2be0f7 ext/transport-apis/data/be/nmbs-sncb-hafas-mgate.json
+SHA256 00991fde0c859fd68d79b7ef08e898c1e07c9009e36ed5128bf728ec55e69716 ext/transport-apis/data/ch/bls-hafas-mgate.json
+SHA256 6ed43731d0925257a91b75e244c7cba0b0051ba42e35fdd69a1e715a81d0788b ext/transport-apis/data/ch/sbb-cff-ffs-hafas-mgate.json
+SHA256 948f5694f4f7f1e46a5a1aeddb6e6891471cf2892591c1581b0579c571393998 ext/transport-apis/data/ch/tpg-hafas-mgate.json
+SHA256 cf4201ef823b79d5b8fe13acd0d79a5b6c3fcbfe4bd154ccae1f89043b4b0cce ext/transport-apis/data/ch/zvv-hafas-mgate.json
+SHA256 772db4927f3d485330329536a8c93253461692d5ead2caa3e8744cea58d65330 ext/transport-apis/data/de/avv-hafas-mgate.json
+SHA256 305d138443f3ab0daac31ad0fcb81450036bfb8125f2b6f546274eb5abf3c850 ext/transport-apis/data/de/bayernfahrplan-efa.json
+SHA256 22d04bb2bb9295f233ab45de1d5bf78057a2edff47a88fc931a92e61edd50e59 ext/transport-apis/data/de/bbnavi-angermuende-otp.json
+SHA256 26dde1842fa19c7f624774046119eaf32f96daf0f03a9f742dace6ce4f193c9c ext/transport-apis/data/de/bvg-hafas-mgate.json
+SHA256 904e2e043d003b915991273979b32a59bd97536991fa4044234fee2c363e0d9f ext/transport-apis/data/de/bwegt-efa.json
+SHA256 057cb8ebaa0c39f1d705a7b80ef76dd84d9eada49e755d65fd6d6a9040aa3ad1 ext/transport-apis/data/de/bwegt-trias.json
+SHA256 80ac42d394aed36898316784f5bbd3bc235ea96e797aaaab4fa1515b0b360148 ext/transport-apis/data/de/db-busradar-nrw-hafas-mgate.json
+SHA256 b6ee9847df78b8362a863130f6c57ab41ef9b7f1f71128b90e4aad64b997f717 ext/transport-apis/data/de/db-hafas-mgate.json
+SHA256 844e9744f296e1ad740d0466641a1bb24be47e578a6e4e33867a554900bfd601 ext/transport-apis/data/de/db-hafas-query.json
+SHA256 abfcea0dfbac4ba0c9763dcf2b48fcf750d5b0a49c7ea012e6fbc4df4043d01b ext/transport-apis/data/de/db-regio-hafas-mgate.json
+SHA256 9bd9f161741fd4ca82487fabcc76707a779eccd620312d351b291243dd74ae73 ext/transport-apis/data/de/db-sbahn-muenchen-hafas-mgate.json
+SHA256 f2deed935209fe95f2c730a10794afd9d6660b0df2e9127ce51f174ebc48bc21 ext/transport-apis/data/de/db-smartrbl-hafas-mgate.json
+SHA256 8a8234f33d1c2ccf148819caaccba961ff68ed27ebcc81fca37f64d728278679 ext/transport-apis/data/de/europe-motis.json
+SHA256 711b7ff4fdba8d1d4f48ee2927410f513ea7c90c848f23d9ead36e7501e14673 ext/transport-apis/data/de/gvh-efa.json
+SHA256 b1441a543cbf3330091eab353561fd598365e4fe28e907057e55df5273d98710 ext/transport-apis/data/de/gvh-hafas-mgate.json
+SHA256 f391c6c01f0baf0340ce8213eeb1ce3b17ad0005221f6673b15ab326ebe1560d ext/transport-apis/data/de/hvv-hafas-mgate.json
+SHA256 4b5cac5b37a8dc38f98900e79dc25759efc890c068729b1d4e6c3e4118ce7404 ext/transport-apis/data/de/invg-hafas-mgate.json
+SHA256 226d69d0448066d081ee3a140c3256650168c18ff568522425ffdf6a6542cc42 ext/transport-apis/data/de/kvb-hafas-mgate.json
+SHA256 c4f08fae15992c32f84d33e1c64d69dc959441e2a7af7926d3e2c6c44281f6e3 ext/transport-apis/data/de/kvv-efa.json
+SHA256 de7fcfea0368a8d3486e04cdd7f19c635be3506050e8f34a8cbe8c68d2c02f16 ext/transport-apis/data/de/mobil-nrw-hafas-mgate.json
+SHA256 9c70fef84b28a9b27d3becc2366b5d7f11e9c6d03c698cb4fc5439e6a710d155 ext/transport-apis/data/de/mvv-efa.json
+SHA256 3f68661854328bc749feab56e02222af8a1feaf02d3b62927cedc62d9afc7c01 ext/transport-apis/data/de/nahsh-hafas-mgate.json
+SHA256 7ea85b549bd9708a6bfbe8547b66cf687834e3ef87c73f805f0e1c4396aedb74 ext/transport-apis/data/de/nasa-hafas-mgate.json
+SHA256 7d9008fd6f9862dcb11af87a155c513b7c2a9381c5b634bb4eb0cc34b32751e6 ext/transport-apis/data/de/nvv-hafas-mgate.json
+SHA256 97f3c91e3cc8c288bce9c8a084c858782ca58e0734471d9a68a24efc08a77511 ext/transport-apis/data/de/rmv-hafas-mgate.json
+SHA256 e9323ec35c1782528f65e60b8e3c6d94c375a6c876454e403f7f98e7b65caa1a ext/transport-apis/data/de/rnv-motis.json
+SHA256 c55787fadce9d5b677e834762fef098b6ee474f80c15292b0ec2f576d5586c53 ext/transport-apis/data/de/rolph-efa.json
+SHA256 3be889f2b97b3635e72e114a1a35b56b75615c065724fe5632e00aad1254689e ext/transport-apis/data/de/rsag-hafas-mgate.json
+SHA256 0f0b5c5725aa2ef7ad4c3a7a9c026b78cd9e3e0ed97e704d3fa4d5a389db5212 ext/transport-apis/data/de/saarvv-hafas-mgate.json
+SHA256 3ab00f48aba188641abf92c464df6bde7a625cd3109a5e01b90e641c4e93eb3f ext/transport-apis/data/de/stadtnavi-otp.json
+SHA256 7c40e7cedc04b0156918fc7ff7d99329a396b8cbf60a1ef941ed4d8ca66ed961 ext/transport-apis/data/de/vbb-hafas-mgate.json
+SHA256 9137234594e85cfe9d919cae96a1297fe2f5e10f9b78e9ffd09bafe926c0d344 ext/transport-apis/data/de/vbn-hafas-mgate.json
+SHA256 9e2c0195603afe270f92b5ef6ba03243f1398b438b6aace78c6702e2734fe2ba ext/transport-apis/data/de/vgn-efa.json
+SHA256 701bbb395132ea5e2ba925572f1467dc9d21cdbe9f2b31495191defc52413fa1 ext/transport-apis/data/de/vmt-hafas-mgate.json
+SHA256 4826431f32c9f75ac660049252b7711251505f622dddab659e7c8dbef2841fe4 ext/transport-apis/data/de/vmv-efa.json
+SHA256 16489c6b98b7bf942e5894af21c925339a21790b3062ecc87b89933fe6b87bf6 ext/transport-apis/data/de/vos-hafas-mgate.json
+SHA256 1a4c7bcdc1d6adc8026a75156cf5e7a827e61128fbf77851e43a656be57c6913 ext/transport-apis/data/de/vrn-hafas-mgate.json
+SHA256 3d7f6c041cb9cf4462fa2e185dd5926aad5fa6a58c8492b217d6edeb9fd9399d ext/transport-apis/data/de/vrn-trias-test.json
+SHA256 aa110c3a84d54d3d39a44b5a0d2b052a6675a734ffb39fe02ec4750ff690eda6 ext/transport-apis/data/de/vrn-trias.json
+SHA256 157933a268925d5574ef3b1ae3c4cb373635c20bdc7360a0a237936b8e4a293d ext/transport-apis/data/de/vrr-efa.json
+SHA256 cbe88e1e89487a1fdff8a062b3b27b57c24ab64103b19752e0eaac073ac188b4 ext/transport-apis/data/de/vrt-efa.json
+SHA256 382f45cddfe45a9ba94b963445c236d869f6fbdecff163e433b7de9c0ba82739 ext/transport-apis/data/de/vsn-hafas-mgate.json
+SHA256 6a9f107368c75fe9998323d4bc9b0c03ac68ebbab89f567dfc1708efe3c7e499 ext/transport-apis/data/de/vvo-trias.json
+SHA256 188c158a80f786bd3927a496ecd9dc12cf3780175321919c2b2a2376220e7fd1 ext/transport-apis/data/de/vvs-efa.json
+SHA256 8715041e6eb1aae27e909ba008cfde94fe5a6e79a7f16485496459b7d7368cfd ext/transport-apis/data/dk/rejseplanen-hafas-mgate.json
+SHA256 83bfaec3110d757ec8858e95229b4732ca2c5685384fb8bbcafd334dde286571 ext/transport-apis/data/ee/peatus-otp.json
+SHA256 a358377c0e296d291ef280b863600f9bc24b9ce7808629635670d26cee8345da ext/transport-apis/data/fi/digitransit-otp.json
+SHA256 f60d7f1b48dc5bb11e97bbbf18ede7be4e4b83e02034f2dbe5bd0862be823abe ext/transport-apis/data/fi/helsinki-otp.json
+SHA256 7a177a770ba23f5f4346e4c0e43601e7e7482cc348092c27040cbbf6ca0e9e85 ext/transport-apis/data/fi/varely-otp.json
+SHA256 06f05d0662902bb1d9eaab7f1491c82e4385b03d4d9b23cb5fe09ea2e80bc411 ext/transport-apis/data/fi/waltti-otp.json
+SHA256 6d111076c0bc9807685e44c5b25dc72be2112344d4c8f06512ccf6cd96f85ac6 ext/transport-apis/data/ie/iarnrod-eireann-hafas-mgate.json
+SHA256 b901ec927ea263d2fbab6b888417ed54c4f96621f6a9bae218b1ea4f3323aa0f ext/transport-apis/data/it/piemonte-otp.json
+SHA256 3b94a7321c794342cf94cc58d44f935a624f83b45c52fd8b7d7ddf7f444405df ext/transport-apis/data/it/torino-otp.json
+SHA256 7adfa56a086471b037041254496877b6ab9499db008089583d7ee2857fad6c3a ext/transport-apis/data/lu/cfl-hafas-mgate.json
+SHA256 29483d132e439c7094198c45541e29c6137975dbe5f5f21b7f4a41618ff9914c ext/transport-apis/data/lu/mobiliteit-lu-hafas-mgate.json
+SHA256 7b92cbe1277d054fc29f57debd519bfa73bcbd9e9e1342201de07f52d46132b2 ext/transport-apis/data/nl/ns-hafas-query.json
+SHA256 011fa2341201f6897cb30c43f942d77e05f69c2d90b0edbe273e3f8e20369995 ext/transport-apis/data/no/entur-otp.json
+SHA256 6d39e1f5f4fb4f258d73db0c94ec5a4b2e9c0c60555974a97cd6798dc0e97eca ext/transport-apis/data/pl/pkp-hafas-mgate.json
+SHA256 73b57ed8ba94e09e35c19fa0301a079b6d1ae20ea20c8153f89fd4dc24f3b59a ext/transport-apis/data/se/resrobot-hafas-mgate.json
+SHA256 86cc1cc2b4543b700f918a3254b41ca95bd943fab6d034c83baab45f460e5aa2 ext/transport-apis/data/un/transitous.json
+SHA256 1fbfa041aa237fe8509a17cd311c67b923964bb0585be11c6d48295cadc67c2d ext/transport-apis/data/us/bart-hafas-mgate.json
+SHA256 3c86558a29f01e2fc908e26c0d19db229cc49853fadc98d16b9c8503ef905ccc ext/transport-apis/data/us/cmta-hafas-mgate.json
+SHA256 968d937c14525c800936a1e657fc38eaeab10b60fc47910d15785209476ecf2b ext/transport-apis/data/us/dart-hafas-mgate.json
+SHA256 44b07c4fa71c44170fe37480aa99713c42b591d8df07bfae5ac50bbff0c2e821 ext/transport-apis/data/us/la-metro-otp.json
+SHA256 bd5decc42ade7ef8d0645f1f73931d8c24d0692b06093766d3c4e588ea3c6155 ext/transport-apis/data/us/marta-otp.json
+SHA256 5133137389a1a31db25381edea0157b9d6f7d5c4a828adc1ae4bdc67abf727b4 ext/transport-apis/data/us/mbta-otp.json
+SHA256 a478cd174aa09a3890c4121420825a7736d59145ade637f69e7a7467b7e7307d ext/transport-apis/data/us/trimet-otp.json
+SHA256 4e8227f4d91c4cc5767a8f5be182c2eddb6b73169277a9816714343c7c44a121 ext/transport-apis/docs/TRIAS-Providers.md
+SHA256 3621bdbf32d5b1740a7c8e0db96375bef36f41cc4b0324bc795a185cbabbc68c ext/transport-apis/license
+SHA256 e5cfbe751b2270635f598cebe633c39c9f152924aebe7d295480938ddbb2bea1 ext/transport-apis/readme.md
+SHA256 a7c0b65f84cd61345a9766e76f7a9e3b6df4f2e85c2850e7ea66a2c3644b8717 ext/transport-apis/schema.json
+SHA256 dfdb563bb3b9647fb58db6af6304871064d6ddba3b395c68ff5cc395a63a0ceb ext/transport-apis/tools/README.md
+SHA256 1d1ce61f8f4fb608aeb8286212a45a3c01ed6faa2c7b2ea526e53e250693670c ext/transport-apis/tools/build.py
+SHA256 e391ffa66761378ceaf568a1dfd8808872872c069ca13dad602cd86579223013 ext/transport-apis/tools/coverage-to-geojson.py
+SHA256 253b8c472de09a4b176b00800a948b182e48e2b9189a8241ecff066db6d0a930 ext/transport-apis/tools/fill-coverage-area.py
+SHA256 809bb14823a6f9934c2fd90565839287a385924d9bc51a4d209581b52da73460 ext/transport-apis/tools/pretty-json.py
+SHA256 0e6f257c1bef307d0f15d41a366127c44b0e25d7e0e5e579d7861754c4b48015 ext/transport-apis/tools/requirements.txt
+SHA256 dcc2ac2a9b706afca31bbeb219bd57a64c3bfd6f00e3fba269e91c1f2501db60 lib/Travel/Status/MOTIS.pm
+SHA256 43c9a5c156d08dfd4286b09a058e333c82e79a7d2386c8e90d5a593b55a56614 lib/Travel/Status/MOTIS/Polyline.pm
+SHA256 bd6f01f42941942240e2672f39e1336fc197a79fe361a07c1c1b172d8084094e lib/Travel/Status/MOTIS/Services.pm
+SHA256 4a5e0ac701ab6a79531c781f0b44c338dc57c4765ba92ec014757f7676e9de64 lib/Travel/Status/MOTIS/Services.pm.PL
+SHA256 c4816a76af91358273fd0bbcb1a84a3a52404a83c38a9fac3a16d006886581a0 lib/Travel/Status/MOTIS/Stop.pm
+SHA256 cd1fa8b74ebc8a26e11294322b978cf884b3950ad473572aad81e645b5df1830 lib/Travel/Status/MOTIS/Stopover.pm
+SHA256 7b819aff8cf52115ae0178623af50eeafcce1928c0d32ee217d21a41c8e89519 lib/Travel/Status/MOTIS/Trip.pm
+SHA256 49cac07988e12080082144341ffdd1fe20dd8c488ba7cf7251e9e69b406dc69c lib/Travel/Status/MOTIS/TripAtStopover.pm
+SHA256 b7deb1cbefe309472a52b1644db0a6be379e8ab660b12ee0a51c428a7a6d5773 scripts/makedeb-docker
+SHA256 c2ddfd95a39ce943ce39400a046c4b491b203037086ede087e87222877b242d0 scripts/makedeb-docker-helper
+SHA256 8c1afa7b6856bfec911751998595217465dd34002c57cd1880babdcf6f1bd368 shell.nix
+SHA256 588a60b456403a9f2a901b11646918be3f2fe413d4b1b792dccd18a80bb264e9 xt/00-compile-pm.t
+SHA256 32c2f94b5292bcf6ef1994151a5d84b4581c5cf920418841c551d6f5489621cd xt/01-compile-pl.t
+SHA256 574e3508c4f991d21b61f06a070d71f04f4403b094f55423150cb5dbb18194a9 xt/10-pod-coverage.t
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYDAB0WIQRk/m7AVVYPnvE6MEQZ5uUk67F3ugUCaAS78AAKCRAZ5uUk67F3
+usulAQDFOCGDbqgI1cSMqNOpfFev8D25mNJKe/VbrPxg/CQC2QEAoj0CI4fiiWMz
+S2Ge6nXNDZjtYhPMXNlAf8RzCF0kYgE=
+=pkXC
+-----END PGP SIGNATURE-----

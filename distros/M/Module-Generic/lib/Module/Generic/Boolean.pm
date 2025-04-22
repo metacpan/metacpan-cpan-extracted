@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Boolean.pm
-## Version v1.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.2.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,6 +13,7 @@
 package Module::Generic::Boolean;
 BEGIN
 {
+    use v5.26.1;
     use common::sense;
     use vars qw( $true $false );
     use overload
@@ -22,9 +23,19 @@ BEGIN
       fallback => 1;
     $true  = do{ bless( \( my $dummy = 1 ) => 'Module::Generic::Boolean' ) };
     $false = do{ bless( \( my $dummy = 0 ) => 'Module::Generic::Boolean' ) };
-    our( $VERSION ) = 'v1.1.1';
+    use Config;
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    }
+    our( $VERSION ) = 'v1.2.1';
 };
 
+use v5.26.1;
 use strict;
 # require Module::Generic::Array;
 # require Module::Generic::Number;
@@ -35,21 +46,57 @@ sub new { return( $_[1] ? $true : $false ); }
 # sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
 sub as_array
 {
-    require Module::Generic::Array;
+    state $loaded;
+    if( HAS_THREADS && !$loaded )
+    {
+        lock( $loaded );
+        require Module::Generic::Array;
+        $loaded = 1;
+    }
+    elsif( !$loaded )
+    {
+        require Module::Generic::Array;
+        $loaded = 1;
+    }
+
     return( Module::Generic::Array->new( [ ${$_[0]} ] ) );
 }
 
 # sub as_number { return( Module::Generic::Number->new( ${$_[0]} ) ); }
 sub as_number
 {
-    require Module::Generic::Number;
+    state $loaded;
+    if( HAS_THREADS && !$loaded )
+    {
+        lock( $loaded );
+        require Module::Generic::Number;
+        $loaded = 1;
+    }
+    elsif( !$loaded )
+    {
+        require Module::Generic::Number;
+        $loaded = 1;
+    }
+
     return( Module::Generic::Number->new( ${$_[0]} ) );
 }
 
 # sub as_scalar { return( Module::Generic::Scalar->new( ${$_[0]} ) ); }
 sub as_scalar
 {
-    require Module::Generic::Scalar;
+    state $loaded;
+    if( HAS_THREADS && !$loaded )
+    {
+        lock( $loaded );
+        require Module::Generic::Scalar;
+        $loaded = 1;
+    }
+    elsif( !$loaded )
+    {
+        require Module::Generic::Scalar;
+        $loaded = 1;
+    }
+
     return( Module::Generic::Scalar->new( ${$_[0]} ) );
 }
 

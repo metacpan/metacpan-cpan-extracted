@@ -1,5 +1,5 @@
 package Audio::Nama;
-our $VERSION = "1.505";
+our $VERSION = "1.506";
 use Modern::Perl '2020';
 #use Carp::Always;
 no warnings qw(uninitialized syntax);
@@ -37,7 +37,6 @@ use Try::Tiny;
 # use Tk;           # loaded conditionally
 # use Event;		# loaded conditionally
 # use AnyEvent;		# loaded after Tk or Event
-# use AnyEvent::Term::TermKey; # --ditto--
 # use jacks;		# JACK server API
 # use Protocol::OSC;
 
@@ -164,7 +163,6 @@ sub bootstrap_environment {
 	process_command_line_options();
 	start_logging();
 	setup_grammar();
-	setup_hotkey_grammar();
 	initialize_interfaces();
 }
 sub kill_and_reap {
@@ -286,12 +284,12 @@ rewind:
   short: rw
   parameters: <float:decrement_seconds>
   example: rewind 6.5 # Move backwards 6.5 seconds from the current position.
-to_start:
+jump_to_start:
   type: transport
   what: Set the playback head to the start. A synonym for setpos 0.
   short: beg
   parameters: none
-to_end:
+jump_to_end:
   type: transport
   what: Set the playback head to end minus 10 seconds.
   short: end
@@ -1094,28 +1092,6 @@ list_effects:
   type: effect
   what: Print a short list of all effects on the current track, only including unique ID and effect name.
   short: lfx
-  parameters: none
-hotkeys:
-  type: general
-  what: |
-    Use this command to set the hotkey mode. (You may also use the hash symbol '#'.)
-    Hit the Escape key to return to command mode.
-  short: hk 
-  parameters: none
-hotkeys_always:
-  type: general 
-  what: Activate hotkeys mode after each command.
-  short: hka 
-  parameters: none
-hotkeys_off:
-  type: general
-  what: disable hotkeys always mode
-  short: hko
-  parameters: none
-hotkeys_list:
-  type: general
-  what: list hotkey bindings
-  short: hkl lhk
   parameters: none
 add_insert:
   type: effect 
@@ -2155,8 +2131,8 @@ samples: /\d+sa/ {
  	$return = $samples/$Audio::Nama::project->{sample_rate}
 }
 min_sec: /\d+/ ':' /\d+/ { $item[1] * 60 + $item[3] }
-to_start: _to_start { Audio::Nama::to_start(); 1 }
-to_end: _to_end { Audio::Nama::to_end(); 1 }
+jump_to_start: _jump_to_start { Audio::Nama::jump_to_start(); 1 }
+jump_to_end: _jump_to_end { Audio::Nama::jump_to_end(); 1 }
 add_track: _add_track new_track_name {
 	Audio::Nama::add_track($item{new_track_name});
     1
@@ -2498,24 +2474,11 @@ to_mark: _to_mark ident {
 	1;}
 modify_mark: _modify_mark sign value {
 	my $newtime = eval($Audio::Nama::this_mark->{time} . $item{sign} . $item{value});
-	$Audio::Nama::this_mark->set( time => $newtime );
-	Audio::Nama::pager($Audio::Nama::this_mark->name, ": set to ", Audio::Nama::d2( $newtime), "\n");
-	Audio::Nama::pager("adjusted to ",$Audio::Nama::this_mark->time, "\n") 
-		if $Audio::Nama::this_mark->time != $newtime;
-	Audio::Nama::set_position($Audio::Nama::this_mark->time);
-	Audio::Nama::request_setup();
-	1;
-	}
+	Audio::Nama::modify_mark($Audio::Nama::this_mark, $newtime); 1
+}
 modify_mark: _modify_mark value {
-	$Audio::Nama::this_mark->set( time => $item{value} );
-	my $newtime = $item{value};
-	Audio::Nama::pager($Audio::Nama::this_mark->name, ": set to ", Audio::Nama::d2($newtime),"\n");
-	Audio::Nama::pager("adjusted to ",$Audio::Nama::this_mark->time, "\n")
-		if $Audio::Nama::this_mark->time != $newtime;
-	Audio::Nama::set_position($Audio::Nama::this_mark->time);
-	Audio::Nama::request_setup();
-	1;
-	}		
+	Audio::Nama::modify_mark($Audio::Nama::this_mark, $item{value} ); 1
+}		
 remove_effect: _remove_effect remove_target(s) {
 	Audio::Nama::mute();
 	map{ 
@@ -3285,10 +3248,6 @@ remove_fader_effect: _remove_fader_effect fader_role {
 	1
 }
 fader_role: 'vol'|'pan'|'fader'
-hotkeys: _hotkeys { Audio::Nama::setup_hotkeys()}
-hotkeys_always: _hotkeys_always { $Audio::Nama::config->{hotkeys_always}++; Audio::Nama::setup_hotkeys(); }
-hotkeys_off: _hotkeys_off { undef $Audio::Nama::config->{hotkeys_always}; 1 }
-hotkeys_list: _hotkeys_list { Audio::Nama::list_hotkeys() ; 1 } 
 select_sequence: _select_sequence existing_sequence_name { 
 	$Audio::Nama::this_sequence = $Audio::Nama::bn{$item{existing_sequence_name}}
 } 
@@ -3455,6 +3414,8 @@ bus_off: _bus_off
 	print "bus_name: $bus_name\n";
 	$Audio::Nama::bn{$bus_name}->tracks_off 
 }
+seconds: value
+exp: /[-+]?\d/ 
 
 command: help
 command: help_effect
@@ -3468,8 +3429,8 @@ command: getpos
 command: setpos
 command: forward
 command: rewind
-command: to_start
-command: to_end
+command: jump_to_start
+command: jump_to_end
 command: ecasound_start
 command: ecasound_stop
 command: restart_ecasound
@@ -3572,10 +3533,6 @@ command: position_effect
 command: show_effect
 command: dump_effect
 command: list_effects
-command: hotkeys
-command: hotkeys_always
-command: hotkeys_off
-command: hotkeys_list
 command: add_insert
 command: set_insert_wetness
 command: remove_insert
@@ -3719,8 +3676,8 @@ _getpos: /getpos\b/ | /gp\b/ { "getpos" }
 _setpos: /setpos\b/ | /sp\b/ { "setpos" } 
 _forward: /forward\b/ | /fw\b/ { "forward" } 
 _rewind: /rewind\b/ | /rw\b/ { "rewind" } 
-_to_start: /to_start\b/ | /beg\b/ { "to_start" } 
-_to_end: /to_end\b/ | /end\b/ { "to_end" } 
+_jump_to_start: /jump_to_start\b/ | /beg\b/ { "jump_to_start" } 
+_jump_to_end: /jump_to_end\b/ | /end\b/ { "jump_to_end" } 
 _ecasound_start: /ecasound_start\b/ { "ecasound_start" } 
 _ecasound_stop: /ecasound_stop\b/ { "ecasound_stop" } 
 _restart_ecasound: /restart_ecasound\b/ { "restart_ecasound" } 
@@ -3823,10 +3780,6 @@ _position_effect: /position_effect\b/ | /pfx\b/ { "position_effect" }
 _show_effect: /show_effect\b/ | /sfx\b/ { "show_effect" } 
 _dump_effect: /dump_effect\b/ | /dfx\b/ { "dump_effect" } 
 _list_effects: /list_effects\b/ | /lfx\b/ { "list_effects" } 
-_hotkeys: /hotkeys\b/ | /hk\b/ { "hotkeys" } 
-_hotkeys_always: /hotkeys_always\b/ | /hka\b/ { "hotkeys_always" } 
-_hotkeys_off: /hotkeys_off\b/ | /hko\b/ { "hotkeys_off" } 
-_hotkeys_list: /hotkeys_list\b/ | /hkl\b/ | /lhk\b/ { "hotkeys_list" } 
 _add_insert: /add_insert\b/ | /ain\b/ { "add_insert" } 
 _set_insert_wetness: /set_insert_wetness\b/ | /wet\b/ { "set_insert_wetness" } 
 _remove_insert: /remove_insert\b/ | /rin\b/ { "remove_insert" } 
@@ -3958,24 +3911,6 @@ _select_track: /select_track\b/ { "select_track" }
 _edit_tempo_map: /edit_tempo_map\b/ | /etm\b/ { "edit_tempo_map" } 
 _set_tempo: /set_tempo\b/ | /tempo\b/ | /tp\b/ { "set_tempo" } 
 _set_sample_rate: /set_sample_rate\b/ | /ssr\b/ { "set_sample_rate" } 
-@@ hotkey_grammar
-command: set_current_effect
-command: set_stepsize
-command: set_jumpsize
-command: set_parameter
-command: cancel
-cancel: /.+Escape/
-foo: /./
-set_current_effect: 'f' effect_id 'Enter' {Audio::Nama::set_current_op($item{effect_id}) }
-effect_id: lower_case_effect_id { $return = uc $item{lower_case_effect_id} }
-lower_case_effect_id: /[a-z]+/
-set_stepsize: 'm' digit  { Audio::Nama::set_current_stepsize(10**$item{digit})}
-set_stepsize: 'm-' digit { Audio::Nama::set_current_stepsize(10**-$item{digit})}
-set_parameter: '=' value 'Enter' {Audio::Nama::set_parameter_value($item{value})}
-set_jumpsize: 'j' value 'Enter' {$Audio::Nama::text->{hotkey_playback_jumpsize} = $item{value}}
-digit: /\d/
-value: /[+-]?([\d_]+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/
-
 @@ ecasound_chain_operator_hints_yml
 ---
 -
@@ -4587,32 +4522,6 @@ compressor: sc4 0 3 16 0 1 3.25 0
 spatialiser: matrixSpatialiser 0
 
 limiter: tap_limiter 0 0
-
-hotkeys:
-  Escape: exit_hotkey_mode
-  Insert: previous_track
-  Delete: next_track
-  Home: previous_effect
-  End: next_effect
-  PageUp: previous_param
-  PageDown: next_param
-  Left: previous_param
-  Right: next_param
-  Up: increment_param
-  Down: decrement_param
-  j: decrement_param
-  k: increment_param
-  h: previous_param
-  l: next_param
-  a: previous_track
-  s: previous_effect
-  d: next_effect
-  f: next_track
-  i: previous_track
-  o: next_track
-  I: previous_effect
-  O: next_effect
-  Space: toggle_transport
 
 alias:
   command:

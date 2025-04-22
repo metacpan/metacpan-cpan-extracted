@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.42.0
+## Version v0.43.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/03/24
+## Modified 2025/04/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -30,6 +30,7 @@ BEGIN
     $PARSE_DATE_ONLY_JP_RE $PARSE_DATETIME_JP_RE $PARSE_DATE_TIMESTAMP_RE 
     $PARSE_DATETIME_RELATIVE_RE $PARSE_DATES_ALL_RE $PARSE_DATE_NON_STDANDARD2_RE
     );
+    use utf8;
     use Config;
     use Class::Load ();
     use Clone ();
@@ -38,11 +39,9 @@ BEGIN
     use Encode ();
     use File::Spec ();
     use Module::Metadata;
-    # use Nice::Try v1.3.4;
     use POSIX;
     use Scalar::Util qw( openhandle );
     use Sub::Util ();
-    # use B;
     # To get some context on what the caller expect. This is used in our error() method to allow chaining without breaking
     use version;
     use Want;
@@ -51,7 +50,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.42.0';
+    our $VERSION     = 'v0.43.3';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -79,7 +78,7 @@ BEGIN
     $DEBUG_LOG_IO = undef();
     # Can use Sereal also
     $SERIALISER = 'Storable::Improved';
-    $AUTOLOAD_SUBS = {};
+    our $AUTOLOAD_SUBS;
     $SUB_ATTR_LIST = qr{
         [[:blank:]\h]* : [[:blank:]\h]*
         (?:
@@ -101,24 +100,22 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    use constant HAS_THREADS  => ( $Config{useithreads} && $INC{'threads.pm'} );
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    }
 };
 
+use v5.26.1;
+use utf8;
 # use strict;
 
 # We put it here to avoid 'redefine' error
-# require Module::Generic::Array;
 require Module::Generic::Boolean;
-# require Module::Generic::DateTime;
-# require Module::Generic::Dynamic;
-# require Module::Generic::Exception;
-# require Module::Generic::File;
-# Module::Generic::File->import( qw( stderr ) );
-# require Module::Generic::Hash;
-# require Module::Generic::Iterator;
-# require Module::Generic::Null;
-# require Module::Generic::Number;
-# require Module::Generic::Scalar;
 
 require IO::File;
 our $stderr = IO::File->new;
@@ -183,6 +180,7 @@ sub new_file;
 sub new_glob;
 sub new_hash;
 sub new_json;
+sub new_json_safe;
 sub new_null;
 sub new_number;
 sub new_scalar;
@@ -336,7 +334,13 @@ sub new
     no strict 'refs';
     if( defined( ${ "${class}\::OBJECT_PERMS" } ) )
     {
-        require Module::Generic::Tie;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Tie;
+            $loaded = 1;
+        }
         my %hash  = ();
         my $obj   = tie(
         %hash, 
@@ -404,6 +408,24 @@ sub new_glob
         }
     };
     return( $new );
+}
+
+sub clear_error
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    if( HAS_THREADS )
+    {
+        lock( ${ $class . '::ERROR' } );
+        $this->{error} = ${ $class . '::ERROR' } = '';
+    }
+    else
+    {
+        $this->{error} = ${ $class . '::ERROR' } = '';
+    }
+    return( $self );
 }
 
 sub deserialise
@@ -774,7 +796,16 @@ sub deserialise
             # The latter would not have the necessary headers
             # As per Storable documentation, if the following return an hash it is a
             # valid file with header, otherwise it would return undef
-            my $info = &{"${class}\::file_magic"}( "$opts->{file}" );
+            my $info;
+            my $code = $class->can( 'file_magic' );
+            if( defined( $code ) )
+            {
+                $info = $code->( "$opts->{file}" );
+            }
+            else
+            {
+                return( $self->error( "The class $class does not support the method 'file_magic'." ) );
+            }
             if( ref( $info ) eq 'HASH' )
             {
                 if( $this->{debug} || $opts->{debug} )
@@ -806,12 +837,16 @@ EOT
                     $f->unlock;
                     return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
                     my $decoded = $base64->[1]->( $data );
-                    my $result;
                     # try-catch
                     local $@;
-                    eval
+                    my $result = eval
                     {
-                        $result = &{"${class}\::thaw"}( $decoded );
+                        my $code = $class->can( 'thaw' );
+                        if( !defined( $code ) )
+                        {
+                            die( "The class $class does not support the method 'thaw'." );
+                        }
+                        return( $code->( $decoded ) );
                     };
                     if( $@ )
                     {
@@ -821,12 +856,16 @@ EOT
                 }
                 elsif( $opts->{lock} )
                 {
-                    my $rv;
                     # try-catch
                     local $@;
-                    eval
+                    my $rv = eval
                     {
-                        $rv = &{"${class}\::lock_retrieve"}( "$opts->{file}" );
+                        my $code = $class->can( 'lock_retrieve' );
+                        if( !defined( $code ) )
+                        {
+                            die( "The class $class does not support the method 'lock_retrieve'." );
+                        }
+                        return( $code->( "$opts->{file}" ) );
                     };
                     if( $@ )
                     {
@@ -836,12 +875,16 @@ EOT
                 }
                 else
                 {
-                    my $rv;
                     # try-catch
                     local $@;
-                    eval
+                    my $rv = eval
                     {
-                        $rv = &{"${class}\::retrieve"}( "$opts->{file}" );
+                        my $code = $class->can( 'retrieve' );
+                        if( !defined( $code ) )
+                        {
+                            die( "The class $class does not support the method 'retrieve'." );
+                        }
+                        return( $code->( "$opts->{file}" ) );
                     };
                     if( $@ )
                     {
@@ -857,12 +900,16 @@ EOT
                 my $data = $f->load( binmode => 'raw' );
                 $f->unlock;
                 return( $data ) if( !defined( $data ) || !length( $data ) );
-                my $decoded;
                 # try-catch
                 local $@;
-                eval
+                my $decoded = eval
                 {
-                    $decoded = &{"${class}\::thaw"}( $data );
+                    my $code = $class->can( 'thaw' );
+                    if( !defined( $code ) )
+                    {
+                        die( "The class $class does not support the method 'thaw'." );
+                    }
+                    return( $code->( $data ) );
                 };
                 if( $@ )
                 {
@@ -875,19 +922,23 @@ EOT
         elsif( exists( $opts->{data} ) )
         {
             return( $self->error( "Data provided to deserialise with $class is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
-            my $rv;
             # try-catch
             local $@;
-            eval
+            my $rv = eval
             {
+                my $code = $class->can( 'thaw' );
+                if( !defined( $code ) )
+                {
+                    die( "The class $class does not support the method 'thaw'." );
+                }
                 if( defined( $base64 ) )
                 {
                     my $decoded = $base64->[1]->( $opts->{data} );
-                    $rv = &{"${class}\::thaw"}( $decoded );
+                    return( $code->( $decoded ) );
                 }
                 else
                 {
-                    $rv = &{"${class}\::thaw"}( $opts->{data} );
+                    return( $code->( "$opts->{data}" ) );
                 }
             };
             if( $@ )
@@ -907,12 +958,16 @@ EOT
                     $data .= $buff;
                 }
                 my $decoded = $base64->[1]->( $data );
-                my $rv;
                 # try-catch
                 local $@;
-                eval
+                my $rv = eval
                 {
-                    $rv = &{"${class}\::thaw"}( $decoded );
+                    my $code = $class->can( 'thaw' );
+                    if( !defined( $code ) )
+                    {
+                        die( "The class $class does not support the method 'thaw'." );
+                    }
+                    return( $code->( $decoded ) );
                 };
                 if( $@ )
                 {
@@ -922,12 +977,16 @@ EOT
             }
             else
             {
-                my $rv;
                 # try-catch
                 local $@;
-                eval
+                my $rv = eval
                 {
-                    $rv = &{"${class}\::fd_retrieve"}( $opts->{io} );
+                    my $code = $class->can( 'fd_retrieve' );
+                    if( !defined( $code ) )
+                    {
+                        die( "The class $class does not support the method 'fd_retrieve'." );
+                    }
+                    return( $code->( $opts->{io} ) );
                 };
                 if( $@ )
                 {
@@ -1045,7 +1104,13 @@ sub error
         },
         object => sub
         {
-            require Module::Generic::Null;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Null;
+                $loaded = 1;
+            }
             my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, has_error => 1, wants => 'object' });
             return( $null );
         },
@@ -1112,7 +1177,15 @@ sub error
 
         if( defined( $o ) )
         {
-            $this->{error} = ${ $class . '::ERROR' } = $o;
+            if( HAS_THREADS )
+            {
+                lock( ${ $class . '::ERROR' } );
+                $this->{error} = ${ $class . '::ERROR' } = $o;
+            }
+            else
+            {
+                $this->{error} = ${ $class . '::ERROR' } = $o;
+            }
         }
         else
         {
@@ -1133,7 +1206,17 @@ sub error
                 # We have to die, because we have an error within another error
                 die( __PACKAGE__ . "::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
             }
-            $o = $this->{error} = ${ $class . '::ERROR' } = $ex_class->new( $args );
+            $o = $ex_class->new( $args );
+
+            if( HAS_THREADS )
+            {
+                lock( ${ $class . '::ERROR' } );
+                $this->{error} = ${ $class . '::ERROR' } = $o;
+            }
+            else
+            {
+                $this->{error} = ${ $class . '::ERROR' } = $o;
+            }
         }
 
         my $err_callback = $self->_on_error;
@@ -1594,7 +1677,13 @@ sub log_handler { return( shift->_set_get_code( '_log_handler', @_ ) ); }
 sub new_array
 {
     my $self = shift( @_ );
-    require Module::Generic::Array;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Array;
+        $loaded = 1;
+    }
     my $v = Module::Generic::Array->new( @_ );
     return( $self->pass_error( Module::Generic::Array->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1603,7 +1692,13 @@ sub new_array
 sub new_datetime
 {
     my $self = shift( @_ );
-    require Module::Generic::DateTime;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::DateTime;
+        $loaded = 1;
+    }
     my $v = Module::Generic::DateTime->new( @_ );
     return( $self->pass_error( Module::Generic::DateTime->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1612,7 +1707,13 @@ sub new_datetime
 sub new_file
 {
     my $self = shift( @_ );
-    require Module::Generic::File;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::File;
+        $loaded = 1;
+    }
     my $v = Module::Generic::File->new( @_ );
     return( $self->pass_error( Module::Generic::File->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1621,7 +1722,13 @@ sub new_file
 sub new_hash
 {
     my $self = shift( @_ );
-    require Module::Generic::Hash;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Hash;
+        $loaded = 1;
+    }
     my $v = Module::Generic::Hash->new( @_ );
     return( $self->pass_error( Module::Generic::Hash->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1738,7 +1845,13 @@ sub new_null
     
     if( $what eq 'OBJECT' )
     {
-        require Module::Generic::Null;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Null;
+            $loaded = 1;
+        }
         return( Module::Generic::Null->new( @_ ) );
     }
     elsif( $what eq 'ARRAY' )
@@ -1766,7 +1879,13 @@ sub new_null
 sub new_number
 {
     my $self = shift( @_ );
-    require Module::Generic::Number;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Number;
+        $loaded = 1;
+    }
     my $v = Module::Generic::Number->new( @_ );
     return( $self->pass_error( Module::Generic::Number->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1775,7 +1894,13 @@ sub new_number
 sub new_scalar
 {
     my $self = shift( @_ );
-    require Module::Generic::Scalar;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Scalar;
+        $loaded = 1;
+    }
     my $v = Module::Generic::Scalar->new( @_ );
     return( $self->pass_error( Module::Generic::Scalar->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1784,14 +1909,26 @@ sub new_scalar
 sub new_tempdir
 {
     my $self = shift( @_ );
-    require Module::Generic::File;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::File;
+        $loaded = 1;
+    }
     return( Module::Generic::File::tempdir( @_ ) );
 }
 
 sub new_tempfile
 {
     my $self = shift( @_ );
-    require Module::Generic::File;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::File;
+        $loaded = 1;
+    }
     return( Module::Generic::File::tempfile( @_ ) );
 }
 
@@ -1890,7 +2027,16 @@ sub pass_error
              ( scalar( @_ ) == 2 && defined( $class ) ) 
            ) )
     {
-        $this->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        my $o = ( defined( $class ) ? bless( $err => $class ) : $err );
+        if( HAS_THREADS )
+        {
+            lock( ${ $pack . '::ERROR' } );
+            $this->{error} = ${ $pack . '::ERROR' } = $o;
+        }
+        else
+        {
+            $this->{error} = ${ $pack . '::ERROR' } = $o;
+        }
         $this->{error}->code( $code ) if( defined( $code ) );
         my $err_callback = $self->_on_error;
         $err_callback = $callback if( !defined( $err_callback ) && defined( $callback ) );
@@ -1919,7 +2065,13 @@ sub pass_error
     
     if( want( 'OBJECT' ) )
     {
-        require Module::Generic::Null;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Null;
+            $loaded = 1;
+        }
         my $null = Module::Generic::Null->new( $err, { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
@@ -1967,7 +2119,7 @@ sub serialise
             return( $self->error( "Value returned by _has_base64 is not an array reference containing two code references." ) );
         }
     }
-    
+
     if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
     {
         my @options = qw(
@@ -1983,24 +2135,23 @@ sub serialise
                 $code->( $cbor, $opts->{ $_ } );
             }
         }
-        
-        my $serialised;
+
         # try-catch
         local $@;
-        eval
+        my $serialised = eval
         {
-            $serialised = $cbor->encode( $data );
+            $cbor->encode( $data );
         };
         if( $@ )
         {
             return( $self->error( "Error trying to serialise data with $class: $@" ) );
         }
-        
+
         if( defined( $base64 ) )
         {
             $serialised = $base64->[0]->( $serialised );
         }
-        
+
         if( exists( $opts->{file} ) && $opts->{file} )
         {
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
@@ -2019,24 +2170,23 @@ sub serialise
             next unless( CORE::exists( $opts->{ $_ } ) );
             $params->{ $_ } = $opts->{ $_ };
         }
-        
+
         # try-catch
         local $@;
-        my $serialised;
-        eval
+        my $serialised = eval
         {
-            $serialised = CBOR::Free::encode( $data, ( scalar( keys( %$params ) ) ? %$params : () ) );
+            CBOR::Free::encode( $data, ( scalar( keys( %$params ) ) ? %$params : () ) );
         };
         if( $@ )
         {
             return( $self->error( "Error trying to serialise data with $class: $@" ) );
         }
-        
+
         if( defined( $base64 ) )
         {
             $serialised = $base64->[0]->( $serialised );
         }
-        
+
         if( exists( $opts->{file} ) && $opts->{file} )
         {
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
@@ -2063,16 +2213,15 @@ sub serialise
         
         # try-catch
         local $@;
-        my $serialised;
-        eval
+        my $serialised = eval
         {
-            $serialised = $json->encode( $data );
+            $json->encode( $data );
         };
         if( $@ )
         {
             return( $self->error( "Error trying to serialise data with $class: $@" ) );
         }
-        
+
         if( defined( $base64 ) )
         {
             $serialised = $base64->[0]->( $serialised );
@@ -2109,10 +2258,9 @@ sub serialise
             {
                 # try-catch
                 local $@;
-                my $rv;
-                eval
+                my $rv = eval
                 {
-                    $rv = $enc->encode_to_file( "$opts->{file}", $data, ( exists( $opts->{append} ) ? $opts->{append} : 0 ) );
+                    $enc->encode_to_file( "$opts->{file}", $data, ( exists( $opts->{append} ) ? $opts->{append} : 0 ) );
                 };
                 if( $@ )
                 {
@@ -2125,16 +2273,15 @@ sub serialise
         {
             # try-catch
             local $@;
-            my $serialised;
-            eval
+            my $serialised = eval
             {
-                $serialised = $enc->encode( $data );
+                $enc->encode( $data );
             };
             if( $@ )
             {
                 return( $self->error( "Error trying to serialise data with $class: $@" ) );
             }
-            
+
             if( defined( $base64 ) )
             {
                 return( $base64->[0]->( $serialised ) );
@@ -2148,7 +2295,15 @@ sub serialise
         {
             if( defined( $base64 ) )
             {
-                my $serialised = &{"${class}\::freeze"}( $data );
+                my $serialised;
+                if( defined( my $code = $class->can( 'freeze' ) ) )
+                {
+                    $serialised = $code->( $data );
+                }
+                else
+                {
+                    return( $self->error( "The class $class does not support the method 'freeze'." ) );
+                }
                 $serialised = $base64->[0]->( $serialised );
                 my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
                 $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
@@ -2158,10 +2313,14 @@ sub serialise
             {
                 # try-catch
                 local $@;
-                my $rv;
-                eval
+                my $rv = eval
                 {
-                    $rv = &{"${class}\::lock_store"}( $data => "$opts->{file}" );
+                    my $code = $class->can( 'lock_store' );
+                    if( !defined( $code ) )
+                    {
+                        die( "The class $class does not support the method 'lock_store'." );
+                    }
+                    return( $code->( $data => "$opts->{file}" ) );
                 };
                 if( $@ )
                 {
@@ -2173,10 +2332,14 @@ sub serialise
             {
                 # try-catch
                 local $@;
-                my $rv;
-                eval
+                my $rv = eval
                 {
-                    $rv = &{"${class}\::store"}( $data => "$opts->{file}" );
+                    my $code = $class->can( 'store' );
+                    if( !defined( $code ) )
+                    {
+                        die( "The class $class does not support the method 'store'." );
+                    }
+                    return( $code->( $data => "$opts->{file}" ) );
                 };
                 if( $@ )
                 {
@@ -2190,7 +2353,15 @@ sub serialise
             return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to serialise data to." ) ) if( ( Scalar::Util::reftype( $opts->{io} ) // '' ) ne 'GLOB' );
             if( defined( $base64 ) )
             {
-                my $serialised = &{"${class}\::freeze"}( $data );
+                my $serialised;
+                if( my $code = $class->can( 'freeze' ) )
+                {
+                    $serialised = $code->( $data );
+                }
+                else
+                {
+                    return( $self->error( "The class $class does not support the method 'freeze'." ) );
+                }
                 $serialised = $base64->[0]->( $serialised );
                 
                 my $bytes = syswrite( $opts->{io}, $serialised );
@@ -2201,10 +2372,14 @@ sub serialise
             {
                 # try-catch
                 local $@;
-                my $rv;
-                eval
+                my $rv = eval
                 {
-                    $rv = &{"${class}\::store_fd"}( $data => $opts->{io} );
+                    my $code = $class->can( 'store_fd' );
+                    if( !defined( $code ) )
+                    {
+                        die( "Class $class does not support the method 'store_fd'." );
+                    }
+                    return( $code->( $data => $opts->{io} ) );
                 };
                 if( $@ )
                 {
@@ -2217,10 +2392,14 @@ sub serialise
         {
             # try-catch
             local $@;
-            my $serialised;
-            eval
+            my $serialised = eval
             {
-                $serialised = &{"${class}\::freeze"}( $data );
+                my $code = $class->can( 'freeze' );
+                if( !defined( $code ) )
+                {
+                    die( "Class $class has no method 'freeze' to serialise data." );
+                }
+                return( $code->( $data ) );
             };
             if( $@ )
             {
@@ -2706,11 +2885,15 @@ sub _is_ip
     my $ip   = shift( @_ );
     return(0) if( !defined( $ip ) || !length( $ip ) );
     # Already loaded
-    unless( $RE{net}{IPv4} )
+    state $loaded;
+    unless( $loaded )
     {
+        lock( $loaded ) if( HAS_THREADS );
         $self->_load_class( 'Regexp::Common' ) || return( $self->pass_error );
         Regexp::Common->import( 'net' );
+        $loaded = 1;
     }
+
     # We need to return either 1 or 0. By default, perl return undef for false
     # supports IPv4 and IPv6 in CIDR notation or not
     my $ip4or6 = qr/($RE{net}{IPv4}(\/(3[0-2]|[1-2][0-9]|[0-9]))?)|($RE{net}{IPv6}(\/(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[0-9]))?)/;
@@ -2782,6 +2965,12 @@ sub _load_class
     {
         $pl .= ' ();';
     }
+
+    if( HAS_THREADS )
+    {
+        lock( ${"${class}::"} );
+    }
+
     local $SIG{__DIE__} = sub{};
     local $@;
     eval( $pl );
@@ -2874,16 +3063,16 @@ sub _message
         {
             if( ref( $opts->{message} ) eq 'ARRAY' )
             {
-                $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : ( $_ // '' ), @{$opts->{message}} ) );
+                $txt = join( '', map{ Encode::is_utf8( $_ ) ? $_ : Encode::decode_utf8( $_ ) } map{ ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : ( $_ // '' ) } @{$opts->{message}} );
             }
             else
             {
-                $txt = $opts->{message};
+                $txt = Encode::is_utf8( $opts->{message} ) ? $opts->{message} : Encode::decode_utf8( $opts->{message} );
             }
         }
         else
         {
-            $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} && !$opts->{no_exec} ) ? $_->() : ( $_ // '' ), @$ref ) );
+            $txt = join( '', map{ Encode::is_utf8( $_ ) ? $_ : Encode::decode_utf8( $_ ) } map{ ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} && !$opts->{no_exec} ) ? $_->() : ( $_ // '' ) } @$ref );
         }
         # Reset it
         $this->{_msg_no_exec_sub} = 0;
@@ -2938,7 +3127,13 @@ sub _message
         # Using ModPerl Server to log
         elsif( $MOD_PERL && !${ "${class}::LOG_DEBUG" } )
         {
-            require Apache2::ServerUtil;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Apache2::ServerUtil;
+                $loaded = 1;
+            }
             my $s = Apache2::ServerUtil->server;
             $s->log->debug( $mesg );
         }
@@ -3083,12 +3278,19 @@ sub _message_log
 {
     my $self = shift( @_ );
     my $io   = $self->_message_log_io;
-    return( undef() ) if( !$io );
-    return( undef() ) if( !Scalar::Util::openhandle( $io ) && $io );
+    return if( !$io );
+    return if( !Scalar::Util::openhandle( $io ) && $io );
+
+    if( HAS_THREADS && defined( $DEBUG_LOG_IO ) && $io == $DEBUG_LOG_IO )
+    {
+        lock( $DEBUG_LOG_IO );
+    }
+
     # 2019-06-14: I decided to remove this test, because if a log is provided it should print to it
     # If we are on the command line, we can easily just do tail -f log_file.txt for example and get the same result as
     # if it were printed directly on the console
-    my $rc = $io->print( scalar( localtime( time() ) ), " [$$]: ", @_ ) || return( $self->error( "Unable to print to log file: $!" ) );
+    my $rc = $io->print( scalar( localtime( time() ) ), " [$$]: ", @_ ) ||
+        return( $self->error( "Unable to print to log file: $!" ) );
     return( $rc );
 }
 
@@ -3109,9 +3311,18 @@ sub _message_log_io
         ${ "${class}::DEB_LOG" } )
     {
         our $DEB_LOG = ${ "${class}::DEB_LOG" };
+
+        lock( $DEBUG_LOG_IO ) if( HAS_THREADS );
+
         unless( $DEBUG_LOG_IO )
         {
-            require Module::Generic::File;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::File;
+                $loaded = 1;
+            }
             $DEB_LOG = Module::Generic::File::file( $DEB_LOG );
             $DEBUG_LOG_IO = $DEB_LOG->open( '>>', { binmode => 'utf-8', autoflush => 1 }) || 
                 die( "Unable to open debug log file $DEB_LOG in append mode: $!\n" );
@@ -3220,10 +3431,62 @@ sub _set_get
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            return( $self->error( "No field name was provided." ) );
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     if( @_ )
     {
         my $val = ( @_ == 1 ) ? shift( @_ ) : [ @_ ];
+        if( defined( $check ) )
+        {
+            # try-catch
+            local $@;
+            my $rv = eval{ $check->( $self, $val ) };
+            if( !defined( $rv ) && $self->error )
+            {
+                return( $self->pass_error );
+            }
+            return( $self->error( "Invalid value provided." ) ) if( !$rv );
+        }
         $data->{ $field } = $val;
+        $self->clear_error;
+        if( scalar( keys( %$callbacks ) ) && 
+            ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+        {
+            my $coderef;
+            foreach my $t ( qw( add set ) )
+            {
+                if( CORE::exists( $callbacks->{ $t } ) )
+                {
+                    $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                        ? $callbacks->{ $t }
+                        : $self->can( $callbacks->{ $t } );
+                    last if( defined( $coderef ) );
+                }
+            }
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                $coderef->( $self, $data->{ $field } );
+            }
+        }
     }
     if( wantarray() )
     {
@@ -3252,9 +3515,41 @@ sub _set_get_array
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            return( $self->error( "No field name was provided." ) )
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     if( @_ )
     {
         my $val = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
+        if( defined( $check ) )
+        {
+            # try-catch
+            local $@;
+            my $rv = eval{ $check->( $self, $val ) };
+            if( !defined( $rv ) && $self->error )
+            {
+                return( $self->pass_error );
+            }
+            return( $self->error( "Invalid value provided." ) ) if( !$rv );
+        }
         if( !defined( $data->{ $field } ) && want( 'ARRAY' ) )
         {
             # The call context is an array reference.
@@ -3262,6 +3557,26 @@ sub _set_get_array
             return( [] );
         }
         $data->{ $field } = $val;
+        $self->clear_error;
+        if( scalar( keys( %$callbacks ) ) && 
+            ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+        {
+            my $coderef;
+            foreach my $t ( qw( add set ) )
+            {
+                if( CORE::exists( $callbacks->{ $t } ) )
+                {
+                    $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                        ? $callbacks->{ $t }
+                        : $self->can( $callbacks->{ $t } );
+                    last if( defined( $coderef ) );
+                }
+            }
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                $coderef->( $self, $data->{ $field } );
+            }
+        }
     }
     return( $data->{ $field } );
 }
@@ -3274,6 +3589,7 @@ sub _set_get_array_as_object : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $callbacks = {};
+    my $check;
     my $def = {};
     # If this is set to true, this method will return a list in list context
     $def->{wantlist} //= 0;
@@ -3291,6 +3607,7 @@ sub _set_get_array_as_object : lvalue
             $field = undef;
         }
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     
     return( $self->_set_get_callback({
@@ -3301,7 +3618,13 @@ sub _set_get_array_as_object : lvalue
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
             {
-                require Module::Generic::Array;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Array;
+                    $loaded = 1;
+                }
                 my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
                 $data->{ $field } = $o;
             }
@@ -3321,7 +3644,24 @@ sub _set_get_array_as_object : lvalue
             my $ctx = $_;
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $val = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
-            require Module::Generic::Array;
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Array;
+                $loaded = 1;
+            }
             my $o = $data->{ $field };
             # Some existing data, like maybe default value
             if( $o )
@@ -3360,10 +3700,17 @@ sub _set_get_array_as_object : lvalue
             
             if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
             {
-                require Module::Generic::Array;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Array;
+                    $loaded = 1;
+                }
                 my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
                 $data->{ $field } = $o;
             }
+            $self->clear_error;
             
             if( $def->{wantlist} && $ctx->{list} )
             {
@@ -3386,6 +3733,7 @@ sub _set_get_boolean : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $callbacks = {};
+    my $check;
     my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
@@ -3401,8 +3749,9 @@ sub _set_get_boolean : lvalue
             $field = undef;
         }
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
-    
+
     return( $self->_set_get_callback({
         get => sub
         {
@@ -3439,6 +3788,17 @@ sub _set_get_boolean : lvalue
             my $val = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             $val //= '';
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
             no warnings 'uninitialized';
             if( Scalar::Util::blessed( $val ) && 
                 ( $val->isa( 'JSON::PP::Boolean' ) || $val->isa( 'Module::Generic::Boolean' ) ) )
@@ -3463,6 +3823,7 @@ sub _set_get_boolean : lvalue
                     ? Module::Generic::Boolean->true
                     : Module::Generic::Boolean->false;
             }
+            $self->clear_error;
 
             if( scalar( keys( %$callbacks ) ) && 
                 ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
@@ -3509,9 +3870,10 @@ sub _set_get_callback : lvalue
 {
     my $self = shift( @_ );
     my $def  = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $this = $self->_obj2h;
+    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     my( $getter, $setter, $field ) = @$def{qw( get set field )};
+
     if( defined( $getter ) )
     {
         die( "Getter code value provided is actually not a code reference." ) if( ref( $getter ) ne 'CODE' );
@@ -3530,6 +3892,7 @@ sub _set_get_callback : lvalue
         $setter = sub{};
     }
     die( "Field value specified is empty." ) if( defined( $field ) && !CORE::length( "$field" ) );
+
     my $context = {};
     my $args;
     my @rv;
@@ -3565,17 +3928,17 @@ sub _set_get_callback : lvalue
                         ? 'OBJECT'
                         : Want::want( 'CODE' )
                             ? 'CODE'
-                            : Want::want( 'REFSCALAR' )
-                                ? 'REFSCALAR'
-                                : Want::want( 'BOOL' )
-                                    ? 'BOOLEAN'
-                                    : Want::want( 'GLOB' )
-                                        ? 'GLOB'
-                                        : Want::want( 'SCALAR' )
-                                            ? 'SCALAR'
-                                            : Want::want( 'VOID' )
-                                                ? 'VOID'
-                                                : '';
+                        : Want::want( 'REFSCALAR' )
+                            ? 'REFSCALAR'
+                            : Want::want( 'BOOL' )
+                                ? 'BOOLEAN'
+                                : Want::want( 'GLOB' )
+                                    ? 'GLOB'
+                                    : Want::want( 'SCALAR' )
+                                        ? 'SCALAR'
+                                        : Want::want( 'VOID' )
+                                            ? 'VOID'
+                                            : '';
         $context->{ lc( $expect ) }++ if( length( $expect ) );
         $context->{count} = Want::want( 'COUNT' );
     }
@@ -3596,7 +3959,6 @@ sub _set_get_callback : lvalue
         }
         $self->error( $@ ) if( $@ );
         
-        
         if( ( !scalar( @rv ) || ( scalar( @rv ) == 1 && !defined( $rv[0] ) ) ) && 
             ( my $has_error = $self->error ) )
         {
@@ -3612,11 +3974,19 @@ sub _set_get_callback : lvalue
         }
         else
         {
-            if( $context->{assign} )
+            if( $context->{assign} || $context->{lvalue} )
             {
                 if( defined( $field ) )
                 {
-                    return( $data->{ $field } );
+                    $data->{ $field } = $rv[0]; # Store setter's result
+                    # return( $data->{ $field } );
+                    tie( my $scalar, 'Module::Generic::LvalueGuard',
+                        value => $data->{ $field },
+                        get   => $getter,
+                        set   => $setter,
+                        obj   => $self
+                    );
+                    return( $scalar );
                 }
                 else
                 {
@@ -3627,28 +3997,24 @@ sub _set_get_callback : lvalue
             {
                 return( @rv );
             }
-            elsif( $context->{lvalue} )
-            {
-                if( !$self->_is_object( $rv[0] ) && $context->{object} )
-                {
-                    require Module::Generic::Null;
-                    return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( $context->{lvalue} );
-                }
-                return( $rv[0] );
-            }
             else
             {
                 if( !$self->_is_object( $rv[0] ) && $context->{object} )
                 {
-                    require Module::Generic::Null;
+                    state $loaded;
+                    unless( $loaded )
+                    {
+                        lock( $loaded ) if( HAS_THREADS );
+                        require Module::Generic::Null;
+                        $loaded = 1;
+                    }
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
                 rreturn( $rv[0] );
             }
-            return;
         }
     }
-    
+
     # try-catch
     local $@;
     local $_ = $context;
@@ -3661,7 +4027,7 @@ sub _set_get_callback : lvalue
         eval{ $rv[0] = $getter->( $self ) };
     }
     $self->error( $@ ) if( $@ );
-    
+
     if( !scalar( @rv ) && 
         ( my $has_error = $self->error ) )
     {
@@ -3669,7 +4035,13 @@ sub _set_get_callback : lvalue
         {
             if( $context->{object} )
             {
-                require Module::Generic::Null;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Null;
+                    $loaded = 1;
+                }
                 rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
             }
             rreturn;
@@ -3678,7 +4050,13 @@ sub _set_get_callback : lvalue
         {
             if( $context->{object} )
             {
-                require Module::Generic::Null;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Null;
+                    $loaded = 1;
+                }
                 return( Module::Generic::Null->new( wants => 'OBJECT' ) );
             }
             return;
@@ -3686,7 +4064,17 @@ sub _set_get_callback : lvalue
     }
     else
     {
-        if( $context->{rvalue} )
+        if( $context->{lvalue} && defined( $field ) )
+        {
+            tie( my $scalar, 'Module::Generic::LvalueGuard',
+                value => $data->{ $field },
+                get   => $getter,
+                set   => $setter,
+                obj   => $self
+            );
+            return( $scalar );
+        }
+        elsif( $context->{rvalue} )
         {
             if( $context->{list} )
             {
@@ -3696,7 +4084,13 @@ sub _set_get_callback : lvalue
             {
                 if( !$self->_is_object( $rv[0] ) && $context->{object} )
                 {
-                    require Module::Generic::Null;
+                    state $loaded;
+                    unless( $loaded )
+                    {
+                        lock( $loaded ) if( HAS_THREADS );
+                        require Module::Generic::Null;
+                        $loaded = 1;
+                    }
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
                 rreturn( $rv[0] );
@@ -3712,12 +4106,16 @@ sub _set_get_callback : lvalue
             {
                 if( !$self->_is_object( $rv[0] ) && $context->{object} )
                 {
-                    require Module::Generic::Null;
-                    return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( $context->{lvalue} );
-                    rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
+                    state $loaded;
+                    unless( $loaded )
+                    {
+                        lock( $loaded ) if( HAS_THREADS );
+                        require Module::Generic::Null;
+                        $loaded = 1;
+                    }
+                    return( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
-                return( $rv[0] ) if( $context->{lvalue} );
-                rreturn( $rv[0] );
+                return( $rv[0] );
             }
         }
     }
@@ -3753,13 +4151,14 @@ sub _set_get_class
         $hash->{debug} = $self->debug if( ref( $hash ) eq 'HASH' && !exists( $hash->{debug} ) );
         # my $o = $class->new( $hash );
         # my $o = $self->__instantiate_object( $field, $class, ( %$hash, debug => $self->debug ) );
-        my $o = $self->__instantiate_object( $field, $class, $hash );
+        my $o = $self->__instantiate_object( $field, $class, $hash ) || return( $self->pass_error );
+        $self->clear_error;
         $data->{ $field } = $o;
     }
     
     if( !$data->{ $field } )
     {
-        my $o = $self->__instantiate_object( $field, $class );
+        my $o = $self->__instantiate_object( $field, $class ) || return( $self->pass_error );
         $o->debug( $self->debug ) if( $o && $o->can( 'debug' ) );
         $data->{ $field } = $o;
     }
@@ -3798,6 +4197,7 @@ sub _set_get_class_array
             CORE::push( @$arr, $o );
         }
         $data->{ $field } = $arr;
+        $self->clear_error;
     }
     return( $data->{ $field } );
 }
@@ -3854,6 +4254,7 @@ sub _set_get_code : lvalue
                 return( $self->error( "Value provided for \"$field\" ($v) is not an anonymous subroutine (code). You can pass as argument something like \$self->curry::my_sub or something like sub { some_code_here; }" ) );
             }
             $data->{ $field } = $v;
+            $self->clear_error;
 
             if( ( !defined( $data->{ $field } ) || !$data->{ $field } ) && 
                 !$opts->{return_undef} &&
@@ -3874,14 +4275,41 @@ sub _set_get_file : lvalue
     no overloading;
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    
+
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             if( $data->{ $field } && !$self->_is_a( $data->{ $field } => 'Module::Generic::File' ) )
             {
-                require Module::Generic::File;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::File;
+                    $loaded = 1;
+                }
                 $data->{ $field } = Module::Generic::File->new( $data->{ $field } . '' ) ||
                     return( $self->error( Module::Generic::File->error ) );
             }
@@ -3890,9 +4318,29 @@ sub _set_get_file : lvalue
         set => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
             my $arg = shift( @_ );
-            require Module::Generic::File;
+
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::File;
+                $loaded = 1;
+            }
             my $val;
             if( $self->_is_a( $arg => 'Module::Generic::File' ) )
             {
@@ -3903,7 +4351,28 @@ sub _set_get_file : lvalue
                 $val = Module::Generic::File->new( $arg ) || 
                     return( $self->pass_error( Module::Generic::File->error ) );
             }
-            return( $data->{ $field } = $val );
+            $data->{ $field } = $val;
+            $self->clear_error;
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+            return( $data->{ $field } );
         },
         field => $field,
     }, @_ ) );
@@ -3915,23 +4384,82 @@ sub _set_get_glob : lvalue
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    
+
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             return( $data->{ $field } );
         },
         set => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
             my $arg = shift( @_ );
+
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             if( defined( $arg ) && Scalar::Util::reftype( $arg ) ne 'GLOB' )
             {
                 return( $self->error( "Method $field takes only a glob, but value provided ($arg) is not supported" ) );
             }
-            return( $data->{ $field } = $arg );
+
+            $data->{ $field } = $arg;
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+
+            return( $data->{ $field } );
         },
         field => $field,
     }, @_ ) );
@@ -3944,15 +4472,37 @@ sub _set_get_hash : lvalue
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             return( $data->{ $field } );
         },
         set => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
             my $arg;
             if( @_ )
@@ -3970,11 +4520,47 @@ sub _set_get_hash : lvalue
                     $arg = shift( @_ );
                 }
             }
+
             if( defined( $arg ) && ref( $arg ) ne 'HASH' )
             {
                 return( $self->error( "Method $field takes only a hash or reference to a hash, but value provided ($arg) is not supported" ) );
             }
-            return( $data->{ $field } = $arg );
+
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
+            $data->{ $field } = $arg;
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+            return( $data->{ $field } );
         },
         field => $field,
     }, @_ ) );
@@ -3986,6 +4572,9 @@ sub _set_get_hash_as_mix_object : lvalue
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+
+    my $callbacks = {};
+    my $check;
     my $opts = {};
     
     if( ref( $field ) eq 'HASH' )
@@ -4001,6 +4590,8 @@ sub _set_get_hash_as_mix_object : lvalue
         {
             $field = undef;
         }
+        $callbacks = $opts->{callbacks} if( CORE::exists( $opts->{callbacks} ) && ref( $opts->{callbacks} ) eq 'HASH' );
+        $check = $opts->{check} if( CORE::exists( $opts->{check} ) && ref( $opts->{check} ) eq 'CODE' );
     }
     $opts->{undef_ok} //= 0;
     $opts->{return_undef} //= 0;
@@ -4017,7 +4608,13 @@ sub _set_get_hash_as_mix_object : lvalue
                 # but we do not affect the current property value of our object
                 if( $ctx->{object} || $ctx->{hash} )
                 {
-                    require Module::Generic::Hash;
+                    state $loaded;
+                    unless( $loaded )
+                    {
+                        lock( $loaded ) if( HAS_THREADS );
+                        require Module::Generic::Hash;
+                        $loaded = 1;
+                    }
                     local $Module::Generic::Hash::DEBUG = $self->debug;
                     my $o = Module::Generic::Hash->new( $data->{ $field } );
                     return( $o );
@@ -4026,7 +4623,13 @@ sub _set_get_hash_as_mix_object : lvalue
             }
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
             {
-                require Module::Generic::Hash;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Hash;
+                    $loaded = 1;
+                }
                 local $Module::Generic::Hash::DEBUG = $self->debug;
                 my $o = Module::Generic::Hash->new( $data->{ $field } );
                 $data->{ $field } = $o;
@@ -4065,17 +4668,37 @@ sub _set_get_hash_as_mix_object : lvalue
                 }
             }
             my $val = $arg;
+
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             if( !defined( $val ) )
             {
                 $data->{ $field } = undef;
             }
             elsif( ref( $val ) eq 'Module::Generic::Hash' )
             {
+                $self->clear_error;
                 return( $data->{ $field } = $val );
             }
             else
             {
-                require Module::Generic::Hash;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Hash;
+                    $loaded = 1;
+                }
                 local $Module::Generic::Hash::DEBUG = $self->debug;
                 $data->{ $field } = Module::Generic::Hash->new( $val );
             }
@@ -4086,19 +4709,54 @@ sub _set_get_hash_as_mix_object : lvalue
                 # but we do not affect the current property value of our object
                 if( $ctx->{object} || $ctx->{hash} )
                 {
-                    require Module::Generic::Hash;
+                    state $loaded;
+                    unless( $loaded )
+                    {
+                        lock( $loaded ) if( HAS_THREADS );
+                        require Module::Generic::Hash;
+                        $loaded = 1;
+                    }
                     local $Module::Generic::Hash::DEBUG = $self->debug;
                     my $o = Module::Generic::Hash->new( $data->{ $field } );
+                    $self->clear_error;
                     return( $o );
                 }
+                $self->clear_error;
                 return;
             }
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
             {
-                require Module::Generic::Hash;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Hash;
+                    $loaded = 1;
+                }
                 local $Module::Generic::Hash::DEBUG = $self->debug;
                 my $o = Module::Generic::Hash->new( $data->{ $field } );
                 $data->{ $field } = $o;
+            }
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
             }
             return( $data->{ $field } );
         },
@@ -4174,12 +4832,14 @@ EOT
         no warnings 'once';
         $Module::Generic::Dynamic::DEBUG = $self->debug unless( CORE::exists( $hash->{debug} ) );
         my $o = $self->__instantiate_object( $field, $class, $hash ) || return( $self->pass_error );
+        $self->clear_error;
         $data->{ $field } = $o;
     }
     
     if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
     {
-        my $o = $data->{ $field } = $self->__instantiate_object( $field, $class, $data->{ $field } );
+        $data->{ $field } = $self->__instantiate_object( $field, $class, $data->{ $field } ) ||
+            return( $self->pass_error );
     }
     return( $data->{ $field } );
 }
@@ -4191,10 +4851,31 @@ sub _set_get_ip : lvalue
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
                 ? $data->{ $field }
                 : $self->new_scalar( $data->{ $field } );
@@ -4210,9 +4891,23 @@ sub _set_get_ip : lvalue
         set => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $arg = shift( @_ );
             my $ctx = $_;
             my $v = $arg;
+
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             # If the user wants to remove it
             if( !defined( $v ) )
             {
@@ -4228,6 +4923,28 @@ sub _set_get_ip : lvalue
             $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
                 ? $data->{ $field }
                 : $self->new_scalar( $data->{ $field } );
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $v );
+                }
+            }
+
             if( !$v->defined )
             {
                 return;
@@ -4247,18 +4964,76 @@ sub _set_get_lvalue : lvalue
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             return( $data->{ $field } );
         },
         set => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
             my $val  = shift( @_ );
+
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             $data->{ $field } = $val;
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+
             # lnoreturn;
             return( $data->{ $field } );
         },
@@ -4276,6 +5051,7 @@ sub _set_get_number : lvalue
     my $opts = {};
     
     my $callbacks = {};
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         $opts = $field;
@@ -4290,9 +5066,10 @@ sub _set_get_number : lvalue
             $field = undef;
         }
         $callbacks = $opts->{callbacks} if( CORE::exists( $opts->{callbacks} ) && ref( $opts->{callbacks} ) eq 'HASH' );
+        $check = $opts->{check} if( CORE::exists( $opts->{check} ) && ref( $opts->{check} ) eq 'CODE' );
     }
     # $opts->{undef_ok} //= 0;
-    
+
     my $do_callback = sub
     {
         if( scalar( keys( %$callbacks ) ) && 
@@ -4316,7 +5093,13 @@ sub _set_get_number : lvalue
         }
     };
     
-    require Module::Generic::Number;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Number;
+        $loaded = 1;
+    }
 
     return( $self->_set_get_callback({
         get => sub
@@ -4334,7 +5117,19 @@ sub _set_get_number : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
-            if( ( !defined( $_[0] ) || !scalar( @_ ) ) )
+            my $val = shift( @_ );
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }            
+            if( !defined( $val ) )
             {
                 if( CORE::exists( $opts->{undef_ok} ) && !$opts->{undef_ok} )
                 {
@@ -4347,7 +5142,7 @@ sub _set_get_number : lvalue
             }
             else
             {
-                my $v = Module::Generic::Number->new( shift( @_ ) );
+                my $v = Module::Generic::Number->new( $val );
                 return( $self->pass_error( Module::Generic::Number->error ) ) if( !defined( $v ) );
                 $data->{ $field } = $v;
             }
@@ -4358,6 +5153,7 @@ sub _set_get_number : lvalue
                 my $v = Module::Generic::Number->new( $data->{ $field } );
                 $data->{ $field } = $v if( defined( $v ) );
             }
+            $self->clear_error;
             return( $data->{ $field } );
         },
         field => $field
@@ -4373,8 +5169,9 @@ sub _set_get_number_as_scalar : lvalue
     my $this  = $self->_obj2h;
     no overload;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    
+
     my $callbacks = {};
+    my $check;
     my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
@@ -4390,8 +5187,9 @@ sub _set_get_number_as_scalar : lvalue
             $field = undef;
         }
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
-    
+
     my $do_callback = sub
     {
         if( scalar( keys( %$callbacks ) ) && 
@@ -4428,7 +5226,24 @@ sub _set_get_number_as_scalar : lvalue
             my $arg = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $v = $arg;
-            require Regexp::Common;
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $v ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Regexp::Common;
+                $loaded = 1;
+            }
             Regexp::Common->import( 'number' );
             # If the user wants to remove it
             if( defined( $v ) && $v !~ /^$RE{num}{real}$/ )
@@ -4437,7 +5252,8 @@ sub _set_get_number_as_scalar : lvalue
             }
             $data->{ $field } = $v;
             $do_callback->();
-            
+
+            $self->clear_error;
             return( $data->{ $field } );
         },
         field => $field,
@@ -4451,22 +5267,48 @@ sub _set_get_number_or_object
     my $class = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
+
+    my $def;
+    if( ref( $field ) eq 'HASH' )
     {
-        if( ref( $_[0] ) eq 'HASH' || Scalar::Util::blessed( $_[0] ) )
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
         {
-            return( $self->_set_get_object( $field, $class, @_ ) );
+            $field = $def->{field};
         }
         else
         {
-            return( $self->_set_get_number( $field, @_ ) );
+            return( $self->error( "No field name was provided." ) )
         }
+    }
+
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( ref( $val // '' ) eq 'HASH' || Scalar::Util::blessed( $val // '' ) )
+        {
+            return( $self->_set_get_object( ( $def // $field ), $class, $val ) );
+        }
+        else
+        {
+            return( $self->_set_get_number( ( $def // $field ), $val ) );
+        }
+        $self->clear_error;
     }
     if( !CORE::length( $data->{ $field } // '' ) && want( 'OBJECT' ) )
     {
-        require Module::Generic::Null;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Null;
+            $loaded = 1;
+        }
         return( Module::Generic::Null->new( wants => 'OBJECT' ) );
     }
+    $self->clear_error;
     return( $data->{ $field } );
 }
 
@@ -4482,6 +5324,7 @@ sub _set_get_object
     my $def = {};
     # no_init
     my $callback;
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         $def = $field;
@@ -4502,6 +5345,7 @@ sub _set_get_object
         {
             $callback = $def->{callback};
         }
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     
     # Parameters are provided to instantiate the object
@@ -4509,6 +5353,19 @@ sub _set_get_object
     {
         if( scalar( @_ ) == 1 )
         {
+            if( defined( $check ) )
+            {
+                my $val = $_[0];
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             # User removed the value by passing it an undefined value
             if( !defined( $_[0] ) )
             {
@@ -4539,7 +5396,8 @@ sub _set_get_object
             else
             {
                 $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-                my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
+                my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ );
+                if( !defined( $o ) )
                 {
                     if( $class->can( 'error' ) )
                     {
@@ -4549,7 +5407,7 @@ sub _set_get_object
                     {
                         return( $self->error( "Unable to instantiate an object for class \"$class\" and values provided: '", join( "', '", @_ ), "'." ) );
                     }
-                };
+                }
                 $data->{ $field } = $o;
             }
         }
@@ -4566,7 +5424,8 @@ sub _set_get_object
                 warn( "Re-setting existing object '", overload::StrVal( $data->{ $field } // 'undef' ), "' for field '$field' and class '$class'\n" );
             }
             
-            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
+            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ );
+            if( !defined( $o ) )
             {
                 if( $class->can( 'error' ) )
                 {
@@ -4576,9 +5435,10 @@ sub _set_get_object
                 {
                     return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
                 }
-            };
+            }
             $data->{ $field } = $o;
         }
+        $self->clear_error;
     }
     # If nothing has been set for this field, ie no object, but we are called in chain
     # we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
@@ -4586,14 +5446,21 @@ sub _set_get_object
     {
         if( $def->{no_init} )
         {
-            require Module::Generic::Null;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Null;
+                $loaded = 1;
+            }
             my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
             return( $null );
         }
         else
         {
             $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
+            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ );
+            if( !defined( $o ) )
             {
                 if( $class->can( 'error' ) )
                 {
@@ -4603,7 +5470,7 @@ sub _set_get_object
                 {
                     return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
                 }
-            };
+            }
             $data->{ $field } = $o;
             return( $o );
         }        
@@ -4620,17 +5487,51 @@ sub _set_get_object_lvalue : lvalue
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
+    my $callbacks = {};
+    my $check;
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             return( $data->{ $field } );
         },
         set => sub
         {
             my $self = shift( @_ );
             my $arg = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $ctx = $_;
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             if( !defined( $arg ) )
             {
                 $data->{ $field } = undef();
@@ -4658,11 +5559,34 @@ sub _set_get_object_lvalue : lvalue
                     }
                 }
                 $data->{ $field } = $arg;
+                # We reset the error before the callback
+                $self->clear_error;
+
+                if( scalar( keys( %$callbacks ) ) && 
+                    ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+                {
+                    my $coderef;
+                    foreach my $t ( qw( add set ) )
+                    {
+                        if( CORE::exists( $callbacks->{ $t } ) )
+                        {
+                            $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                                ? $callbacks->{ $t }
+                                : $self->can( $callbacks->{ $t } );
+                            last if( defined( $coderef ) );
+                        }
+                    }
+                    if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                    {
+                        $coderef->( $self, $data->{ $field } );
+                    }
+                }
             }
             else
             {
                 return( $self->error( "Value provided (" . overload::StrVal( $arg // '' ) . " is not an object." ) );
             }
+            $self->clear_error;
             # We need to return something else than our object, or by virtue of perl's way of working
             # we would return our object as coded below, and that object will be assigned the
             # very value we will have passed in assignment !
@@ -4684,6 +5608,7 @@ sub _set_get_object_without_init
     
     my $def = {};
     my $callback;
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         $def = $field;
@@ -4705,12 +5630,26 @@ sub _set_get_object_without_init
         {
             $callback = $def->{callback};
         }
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
 
     if( @_ )
     {
         if( scalar( @_ ) == 1 )
         {
+            if( defined( $check ) )
+            {
+                my $val = $_[0];
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             # User removed the value by passing it an undefined value
             if( !defined( $_[0] ) )
             {
@@ -4741,7 +5680,8 @@ sub _set_get_object_without_init
             else
             {
                 # return( $self->error( "Only undef or an ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), " object can be provided." ) );
-                my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
+                my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ );
+                if( !defined( $o ) )
                 {
                     if( $class->can( 'error' ) )
                     {
@@ -4751,14 +5691,15 @@ sub _set_get_object_without_init
                     {
                         return( $self->error( "Unable to instantiate an object for class \"$class\" and values provided: '", join( "', '", @_ ), "'." ) );
                     }
-                };
+                }
                 $data->{ $field } = $o;
             }
         }
         else
         {
             # return( $self->error( "Only undef or an ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), " object can be provided." ) );
-            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ ) || do
+            my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ );
+            if( !defined( $o ) )
             {
                 if( $class->can( 'error' ) )
                 {
@@ -4768,9 +5709,10 @@ sub _set_get_object_without_init
                 {
                     return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
                 }
-            };
+            }
             $data->{ $field } = $o;
         }
+        $self->clear_error;
     }
     # If nothing has been set for this field, ie no object, but we are called in chain, this will fail on purpose.
     # To avoid this, use _set_get_object
@@ -4787,6 +5729,7 @@ sub _set_get_object_array2
     
     my $def = {};
     my $callback;
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         $def = $field;
@@ -4807,12 +5750,24 @@ sub _set_get_object_array2
         {
             $callback = $def->{callback};
         }
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     
     if( @_ )
     {
         my $data_to_process = shift( @_ );
         return( $self->error( "I was expecting an array ref, but instead got '$data_to_process'. _is_array returned: '", $self->_is_array( $data_to_process ), "'" ) ) if( !$self->_is_array( $data_to_process ) );
+        if( defined( $check ) )
+        {
+            # try-catch
+            local $@;
+            my $rv = eval{ $check->( $self, $data_to_process ) };
+            if( !defined( $rv ) && $self->error )
+            {
+                return( $self->pass_error );
+            }
+            return( $self->error( "Invalid value provided." ) ) if( !$rv );
+        }
         my $arr1 = [];
         foreach my $ref ( @$data_to_process )
         {
@@ -4851,6 +5806,7 @@ sub _set_get_object_array2
             push( @$arr1, $arr );
         }
         $data->{ $field } = $arr1;
+        $self->clear_error;
     }
     return( $data->{ $field } );
 }
@@ -4866,6 +5822,7 @@ sub _set_get_object_array
 
     my $def = {};
     my $callback;
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         $def = $field;
@@ -4886,6 +5843,7 @@ sub _set_get_object_array
         {
             $callback = $def->{callback};
         }
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     $def->{empty_ok} //= 0;
     $def->{skip_empty} //= 0;
@@ -4894,6 +5852,17 @@ sub _set_get_object_array
     {
         my $ref = shift( @_ );
         return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $ref ) );
+        if( defined( $check ) )
+        {
+            # try-catch
+            local $@;
+            my $rv = eval{ $check->( $self, $ref ) };
+            if( !defined( $rv ) && $self->error )
+            {
+                return( $self->pass_error );
+            }
+            return( $self->error( "Invalid value provided." ) ) if( !$rv );
+        }
         my $arr = [];
         for( my $i = 0; $i < scalar( @$ref ); $i++ )
         {
@@ -4931,12 +5900,13 @@ sub _set_get_object_array
     
     if( @_ )
     {
-        $data->{ $field } = $process->( @_ );
+        $data->{ $field } = $process->( @_ ) || return( $self->pass_error );
+        $self->clear_error;
     }
     # For example, if the object property is set at init, without using a method
     if( $data->{ $field } && ref( $data->{ $field } ) ne 'ARRAY' )
     {
-        $data->{ $field } = $process->( $data->{ $field } );
+        $data->{ $field } = $process->( $data->{ $field } ) || return( $self->pass_error );
     }
     return( $data->{ $field } );
 }
@@ -4949,10 +5919,17 @@ sub _set_get_object_array_object
     my $this = $self->_obj2h;
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    require Module::Generic::Array;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Array;
+        $loaded = 1;
+    }
     
     my $def = {};
     my $callback;
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         $def = $field;
@@ -4973,6 +5950,7 @@ sub _set_get_object_array_object
         {
             $callback = $def->{callback};
         }
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     else
     {
@@ -4982,13 +5960,25 @@ sub _set_get_object_array_object
     my $process = sub
     {
         my $that = ( scalar( @_ ) == 1 && UNIVERSAL::isa( $_[0], 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
+        if( defined( $check ) )
+        {
+            # try-catch
+            local $@;
+            my $rv = eval{ $check->( $self, $that ) };
+            if( !defined( $rv ) && $self->error )
+            {
+                return( $self->pass_error );
+            }
+            return( $self->error( "Invalid value provided." ) ) if( !$rv );
+        }
         my $ref = $self->_set_get_object_array( $def, $class, $that ) || return( $self->pass_error );
         return( Module::Generic::Array->new( $ref ) );
     };
     
     if( @_ )
     {
-        $data->{ $field } = $process->( @_ );
+        $data->{ $field } = $process->( @_ ) || return( $self->pass_error );
+        $self->clear_error;
     }
     ## Default value so that call to the caller's method like my_sub->length will not produce something like "Can't call method "length" on an undefined value"
     ## Also, this will make it possible to set default value in caller's object and we would turn it into array object.
@@ -5010,6 +6000,7 @@ sub _set_get_object_variant
     
     my $def = {};
     my $callback;
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         $def = $field;
@@ -5030,10 +6021,24 @@ sub _set_get_object_variant
         {
             $callback = $def->{callback};
         }
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
-    
+
     my $process = sub
     {
+        if( defined( $check ) )
+        {
+            my $val = $_[0];
+            # try-catch
+            local $@;
+            my $rv = eval{ $check->( $self, $val ) };
+            if( !defined( $rv ) && $self->error )
+            {
+                return( $self->pass_error );
+            }
+            return( $self->error( "Invalid value provided." ) ) if( !$rv );
+        }
+
         if( ref( $_[0] ) eq 'HASH' )
         {
             my $o = $self->_instantiate_object( $field, $class, @_ );
@@ -5055,7 +6060,8 @@ sub _set_get_object_variant
     
     if( @_ )
     {
-        $data->{ $field } = $process->( @_ );
+        $data->{ $field } = $process->( @_ ) || return( $self->pass_error );
+        $self->clear_error;
     }
     return( $data->{ $field } );
 }
@@ -5068,6 +6074,7 @@ sub _set_get_scalar : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $callbacks = {};
+    my $check;
     my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
@@ -5083,6 +6090,7 @@ sub _set_get_scalar : lvalue
             $field = undef;
         }
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
 
     return( $self->_set_get_callback({
@@ -5090,7 +6098,6 @@ sub _set_get_scalar : lvalue
         {
             my $self = shift( @_ );
             my $v = $data->{ $field };
-            # If we have a callback, call it and get the resulting value
             if( scalar( keys( %$callbacks ) ) && 
                 CORE::exists( $callbacks->{get} ) &&
                 ref( $callbacks->{get} ) eq 'CODE' )
@@ -5103,19 +6110,29 @@ sub _set_get_scalar : lvalue
         {
             my $self = shift( @_ );
             my $val = ( @_ == 1 ) ? shift( @_ ) : join( '', @_ );
-            # Just in case, we force stringification
-            # $val = "$val" if( defined( $val ) );
             if( ref( $val ) eq 'HASH' || ref( $val ) eq 'ARRAY' )
             {
                 return( $self->error( "Method $field takes only a scalar, but value provided ($val) is a reference" ) );
             }
-            # return( $data->{ $field } = $val );
-            $data->{ $field } = $val;
+            my $original_val = $val;
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $val ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+            $data->{ $field } = $val; # Store immediately
+            $self->clear_error;
 
+            my $coderef;
             if( scalar( keys( %$callbacks ) ) && 
                 ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
             {
-                my $coderef;
                 foreach my $t ( qw( add set ) )
                 {
                     if( CORE::exists( $callbacks->{ $t } ) )
@@ -5126,10 +6143,12 @@ sub _set_get_scalar : lvalue
                         last if( defined( $coderef ) );
                     }
                 }
-                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
-                {
-                    $coderef->( $self, $data->{ $field } );
-                }
+            }
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                my $rv = $coderef->( $self, $val );
+                # $data->{ $field } = $rv if( defined( $rv ) ); # Update with callback’s result if defined
+                $data->{ $field } = $rv; # Update with callback’s result if defined
             }
             return( $data->{ $field } );
         },
@@ -5145,6 +6164,7 @@ sub _set_get_scalar_as_object : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $callbacks = {};
+    my $check;
     my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
@@ -5160,6 +6180,7 @@ sub _set_get_scalar_as_object : lvalue
             $field = undef;
         }
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
 
     return( $self->_set_get_callback({
@@ -5170,7 +6191,13 @@ sub _set_get_scalar_as_object : lvalue
             my $ctx = $_;
             if( !$self->_is_object( $data->{ $field } ) || ( $self->_is_object( $data->{ $field } ) && ref( $data->{ $field } ) ne ref( $self ) ) )
             {
-                require Module::Generic::Scalar;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Scalar;
+                    $loaded = 1;
+                }
                 $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
             }
             my $v = $data->{ $field };
@@ -5206,6 +6233,17 @@ sub _set_get_scalar_as_object : lvalue
             my $self = shift( @_ );
             my $arg = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
             my $ctx = $_;
             my $val;
             if( defined( $arg ) && 
@@ -5241,9 +6279,16 @@ sub _set_get_scalar_as_object : lvalue
             }
             else
             {
-                require Module::Generic::Scalar;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Scalar;
+                    $loaded = 1;
+                }
                 $data->{ $field } = Module::Generic::Scalar->new( $val );
             }
+            $self->clear_error;
             
             if( scalar( keys( %$callbacks ) ) && 
                 ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
@@ -5267,7 +6312,13 @@ sub _set_get_scalar_as_object : lvalue
             
             if( !$self->_is_object( $data->{ $field } ) || ( $self->_is_object( $data->{ $field } ) && ref( $data->{ $field } ) ne ref( $self ) ) )
             {
-                require Module::Generic::Scalar;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require Module::Generic::Scalar;
+                    $loaded = 1;
+                }
                 $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
             }
             my $v = $data->{ $field };
@@ -5301,20 +6352,44 @@ sub _set_get_scalar_or_object
     my $class = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+
+    my $def;
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            return( $self->error( "No field name was provided." ) );
+        }
+    }
+
     if( @_ )
     {
         if( ref( $_[0] ) eq 'HASH' || Scalar::Util::blessed( $_[0] ) )
         {
-            return( $self->_set_get_object( $field, $class, @_ ) );
+            return( $self->_set_get_object( ( $def // $field ), $class, @_ ) );
         }
         else
         {
-            return( $self->_set_get_scalar( $field, @_ ) );
+            return( $self->_set_get_scalar( ( $def // $field ), @_ ) );
         }
+        $self->clear_error;
     }
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
-        require Module::Generic::Null;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Null;
+            $loaded = 1;
+        }
         my $null = Module::Generic::Null->new({ debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
@@ -5329,6 +6404,8 @@ sub _set_get_uri : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $uri_class = 'URI';
+    my $callbacks = {};
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         my $def = $field;
@@ -5343,6 +6420,8 @@ sub _set_get_uri : lvalue
             $field = undef;
         }
         $uri_class = $def->{class} if( CORE::exists( $def->{class} ) && ref( $def->{class} ) eq 'HASH' );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     
     return( $self->_set_get_callback({
@@ -5364,6 +6443,17 @@ sub _set_get_uri : lvalue
             my $self = shift( @_ );
             my $arg = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
             $self->_load_class( $uri_class ) || return( $self->pass_error );
             my $str = $arg;
             if( Scalar::Util::blessed( $str ) && $str->isa( $uri_class ) )
@@ -5406,6 +6496,28 @@ sub _set_get_uri : lvalue
                 # Force stringification if this is an overloaded value
                 $data->{ $field } = $uri_class->new( $data->{ $field } . '' );
             }
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+
             return( $data->{ $field } );
         },
         field => $field,
@@ -5420,10 +6532,29 @@ sub _set_get_uuid : lvalue
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
+    my $callbacks = {};
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
                 ? $data->{ $field }
                 : $self->new_scalar( $data->{ $field } );
@@ -5440,6 +6571,7 @@ sub _set_get_uuid : lvalue
         {
             my $self = shift( @_ );
             my $arg = shift( @_ );
+            return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $v = $arg;
             # If the user wants to remove it
             if( !defined( $v ) )
@@ -5452,6 +6584,28 @@ sub _set_get_uuid : lvalue
                 return( $self->error( "Value provided is not a valid uuid." ) );
             }
             $v = $data->{ $field } = $self->new_scalar( $v );
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+
             if( !$v->defined )
             {
                 return;
@@ -5473,6 +6627,8 @@ sub _set_get_version : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
     my $version_class = 'version';
+    my $callbacks = {};
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         my $def = $field;
@@ -5487,6 +6643,8 @@ sub _set_get_version : lvalue
             $field = undef;
         }
         $version_class = $def->{class} if( CORE::exists( $def->{class} ) );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     
     return( $self->_set_get_callback({
@@ -5524,6 +6682,17 @@ sub _set_get_version : lvalue
             my $self = shift( @_ );
             my $arg = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
             $self->_load_class( $version_class ) || return( $self->pass_error );
             my $v = $arg;
             my $version;
@@ -5560,7 +6729,28 @@ sub _set_get_version : lvalue
                 return( $self->error( $error ) ) if( defined( $error ) );
             }
             $data->{ $field } = $version;
-            
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+
             if( !CORE::defined( $data->{ $field } ) )
             {
                 return;
@@ -5624,7 +6814,7 @@ sub _warnings_is_registered
 
 sub _autoload_subs
 {
-    $AUTOLOAD_SUBS = 
+    my $subs = 
     {
     # NOTE: as_hash()
     as_hash => <<'PERL',
@@ -5817,18 +7007,6 @@ PERL
 sub clear
 {
     return( shift->clear_error );
-}
-PERL
-    # NOTE: clear_error()
-    clear_error => <<'PERL',
-sub clear_error
-{
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    $this->{error} = ${ "$class\::ERROR" } = '';
-    return( $self );
 }
 PERL
     # NOTE: clone()
@@ -6436,6 +7614,13 @@ sub dump_hex
     local $@;
     eval
     {
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Devel::Hexdump;
+            $loaded = 1;
+        }
         require Devel::Hexdump;
         $rv = Devel::Hexdump::xd( shift( @_ ) );
     };
@@ -6464,7 +7649,13 @@ sub dumper
     eval
     {
         no warnings 'once';
-        require Data::Dumper;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Data::Dumper;
+            $loaded = 1;
+        }
         # local $Data::Dumper::Sortkeys = 1;
         local $Data::Dumper::Terse = 1;
         local $Data::Dumper::Indent = 1;
@@ -6490,7 +7681,13 @@ sub dumpto_printer
 {
     my $self  = shift( @_ );
     my( $data, $file ) = @_;
-    require Module::Generic::File;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::File;
+        $loaded = 1;
+    }
     $file = Module::Generic::File::file( $file );
     my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
         die( "Unable to create file '$file': $!\n" );
@@ -6512,7 +7709,14 @@ sub dumpto_dumper
     local $@;
     eval
     {
-        require Data::Dumper;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Data::Dumper;
+            $loaded = 1;
+        }
+        no warnings 'once';
         local $Data::Dumper::Sortkeys = 1;
         local $Data::Dumper::Terse = 1;
         local $Data::Dumper::Indent = 1;
@@ -6614,7 +7818,13 @@ sub printer
     eval
     {
         local $SIG{__WARN__} = sub{ };
-        require Data::Printer;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Data::Printer;
+            $loaded = 1;
+        }
         if( scalar( keys( %$opts ) ) )
         {
             $rv = Data::Printer::np( @_, %$opts );
@@ -6646,7 +7856,13 @@ sub save
         $opts->{file} = shift( @_ );
     }
     return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
-    require Module::Generic::File;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::File;
+        $loaded = 1;
+    }
     $file = Module::Generic::File::file( $opts->{file} );
     my $fh = $file->open( '>', {
         ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
@@ -6673,7 +7889,13 @@ sub subclasses
     $base  =~ s,::,/,g;
     $base .= '.pm';
     
-    require IO::Dir;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require IO::Dir;
+        $loaded = 1;
+    }
     # remove '.pm'
     my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
     
@@ -6702,8 +7924,14 @@ sub __dbh
     if( !$this->{__dbh} )
     {
         return( '' ) if( !${ "$class\::DB_DSN" } );
-        require DBI;
-        ## Connecting to database
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require DBI;
+            $loaded = 1;
+        }
+        # Connecting to database
         my $db_opt = {};
         $db_opt->{RaiseError} = ${ "$class\::DB_RAISE_ERROR" } if( length( ${ "$class\::DB_RAISE_ERROR" } ) );
         $db_opt->{AutoCommit} = ${ "$class\::DB_AUTO_COMMIT" } if( length( ${ "$class\::DB_AUTO_COMMIT" } ) );
@@ -7727,6 +8955,8 @@ PERL
     _parse_timestamp => <<'PERL',
 # Ref:
 # <https://en.wikipedia.org/wiki/Date_format_by_country>
+# Ref:
+# <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
 {
     my $self = shift( @_ );
@@ -7746,20 +8976,40 @@ sub _parse_timestamp
     if( !defined( $HAS_LOCAL_TZ ) )
     {
         $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
-        # try-catch
-        local $@;
-        eval
+        if( HAS_THREADS )
         {
-            $tz = DateTime::TimeZone->new( name => 'local' );
-            $HAS_LOCAL_TZ = 1;
-        };
-        if( $@ )
-        {
-            $tz = DateTime::TimeZone->new( name => 'UTC' );
-            $HAS_LOCAL_TZ = 0;
-            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
+            lock( $HAS_LOCAL_TZ );
+            # try-catch
+            local $@;
+            eval
+            {
+                $tz = DateTime::TimeZone->new( name => 'local' );
+                $HAS_LOCAL_TZ = 1;
+            };
+            if( $@ )
+            {
+                $tz = DateTime::TimeZone->new( name => 'UTC' );
+                $HAS_LOCAL_TZ = 0;
+                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
+            }
         }
-        
+        else
+        {
+            # try-catch
+            local $@;
+            eval
+            {
+                $tz = DateTime::TimeZone->new( name => 'local' );
+                $HAS_LOCAL_TZ = 1;
+            };
+            if( $@ )
+            {
+                $tz = DateTime::TimeZone->new( name => 'UTC' );
+                $HAS_LOCAL_TZ = 0;
+                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
+            }
+        }
+
         # try-catch
         local $@;
         eval
@@ -7805,46 +9055,46 @@ sub _parse_timestamp
     use utf8;
     my $opt = 
     {
-    pattern   => '%Y-%m-%d %T',
-    time_zone => $tz->name,
-    on_error => 'croak',
+        pattern   => '%Y-%m-%d %T',
+        time_zone => $tz->name,
+        on_error => 'croak',
     };
     
     my $fmt =
     {
-    pattern   => '%Y-%m-%d %T',
-    locale    => 'en_GB',
-    time_zone => $tz->name,
+        pattern   => '%Y-%m-%d %T',
+        locale    => 'en_GB',
+        time_zone => $tz->name,
     };
     
     my $formatter = 'DateTime::Format::Strptime';
     
     my $roman2regular =
     {
-    I   => 1,
-    II  => 2,
-    III => 3,
-    IV  => 4,
-    V   => 5,
-    VI  => 6,
-    VII => 7,
-    VIII=> 8,
-    IX  => 9,
-    X   => 10,
-    XI  => 11,
-    XII => 12,
-    i   => 1,
-    ii  => 2,
-    iii => 3,
-    iv  => 4,
-    v   => 5,
-    vi  => 6,
-    vii => 7,
-    viii=> 8,
-    ix  => 9,
-    x   => 10,
-    xi  => 11,
-    xii => 12,
+        I   => 1,
+        II  => 2,
+        III => 3,
+        IV  => 4,
+        V   => 5,
+        VI  => 6,
+        VII => 7,
+        VIII=> 8,
+        IX  => 9,
+        X   => 10,
+        XI  => 11,
+        XII => 12,
+        i   => 1,
+        ii  => 2,
+        iii => 3,
+        iv  => 4,
+        v   => 5,
+        vi  => 6,
+        vii => 7,
+        viii=> 8,
+        ix  => 9,
+        x   => 10,
+        xi  => 11,
+        xii => 12,
     };
     # (^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$)
     # <https://stackoverflow.com/a/36576402/4814971>
@@ -8420,7 +9670,8 @@ sub _set_get_class_array_object
     my $def   = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $ref = $self->_set_get_class_array( $field, $def, @_ );
+    my $ref = $self->_set_get_class_array( $field, $def, @_ ) ||
+        return( $self->pass_error );
 
     if( ref( $def ) ne 'HASH' )
     {
@@ -8431,7 +9682,13 @@ sub _set_get_class_array_object
 
     if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
     {
-        require Module::Generic::Array;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Array;
+            $loaded = 1;
+        }
         my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
         $data->{ $field } = $o;
     }
@@ -8457,6 +9714,8 @@ sub _set_get_datetime : lvalue
     my $class = ref( $self ) || $self;
 
     my $opts;
+    my $callbacks = {};
+    my $check;
     if( ref( $field ) eq 'HASH' )
     {
         my $def = { %$field };
@@ -8468,6 +9727,8 @@ sub _set_get_datetime : lvalue
         {
             warn( "No 'field' parameter provided in calling _set_get_datetime\n" ) if( $self->_warnings_is_enabled );
         }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = CORE::delete( $def->{check} ) if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
         # The rest of the options are passed to _parse_timestamp() as parameters
         $opts = $def;
     }
@@ -8592,6 +9853,17 @@ sub _set_get_datetime : lvalue
         {
             my $self = shift( @_ );
             my $arg = shift( @_ );
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
             my $time = $arg;
             if( !defined( $time ) )
             {
@@ -8602,6 +9874,27 @@ sub _set_get_datetime : lvalue
                 return( $self->pass_error );
             };
             $data->{ $field } = $now;
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
 
             # So that a call to this field will not trigger an error: "Can't call method "xxx" on an undefined value"
             if( !$data->{ $field } )
@@ -8630,6 +9923,8 @@ sub _set_get_enum : lvalue
     my $class = ref( $self ) || $self;
     my( $field, $allowed );
     my $case_sensitive = 1;
+    my $callbacks = {};
+    my $check;
     if( scalar( @_ ) && 
         ref( $_[0] // '' ) eq 'HASH' )
     {
@@ -8655,6 +9950,8 @@ sub _set_get_enum : lvalue
         {
             $case_sensitive = CORE::delete( $def->{case} ) ? 1 : 0;
         }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
     elsif( scalar( @_ ) >= 2 )
     {
@@ -8685,6 +9982,18 @@ sub _set_get_enum : lvalue
         {
             my $self = shift( @_ );
             my $arg = shift( @_ );
+            if( defined( $check ) )
+            {
+                # try-catch
+                local $@;
+                my $rv = eval{ $check->( $self, $arg ) };
+                if( !defined( $rv ) && $self->error )
+                {
+                    return( $self->pass_error );
+                }
+                return( $self->error( "Invalid value provided." ) ) if( !$rv );
+            }
+
             if( defined( $arg ) )
             {
                 my $is_ok = $case_sensitive
@@ -8696,6 +10005,27 @@ sub _set_get_enum : lvalue
             else
             {
                 $data->{ $field } = undef;
+            }
+            $self->clear_error;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
             }
 
             # So that a call to this field will not trigger an error: "Can't call method "xxx" on an undefined value"
@@ -8854,6 +10184,22 @@ sub _set_symbol
 }
 PERL
     };
+    unless( $AUTOLOAD_SUBS )
+    {
+        if( HAS_THREADS )
+        {
+            my $shared_subs = shared_clone( $subs );
+            {
+                lock( $AUTOLOAD_SUBS );
+                $AUTOLOAD_SUBS = $shared_subs;
+            }
+        }
+        else
+        {
+            $AUTOLOAD_SUBS = $subs;
+        }
+    }
+    return(1);
 }
 
 sub DEBUG
@@ -9045,7 +10391,7 @@ EOT
                 return( $self->error( "The type provided for class '${class}' and method '${meth}' is unsupported: '", overload::StrVal( $info ), "'" ) );
             }
             my $type = lc( $def->{type} );
-            $info->{class} = $info->{package} if( $info->{package} && !length( $info->{class} ) );
+            $def->{class} = $def->{package} if( $def->{package} && !length( $def->{class} ) );
             if( !defined( $type ) )
             {
                 return( $self->error( "No type is defined for this class '${class}' and method '${meth}'" ) );
@@ -9082,9 +10428,9 @@ EOT
                 my $hash_str = Data::Dump::dump( $this_def );
                 CORE::push( @$code_lines, "sub ${meth} { return( shift->${func}( '${meth}', ${hash_str}, \@_ ) ); }" );
             }
-            elsif( $type eq 'version' && ( exists( $info->{def} ) || exists( $info->{definition} ) ) )
+            elsif( $type eq 'version' && ( exists( $def->{def} ) || exists( $def->{definition} ) ) )
             {
-                my $this_def = $info->{definition} // $info->{def};
+                my $this_def = $def->{definition} // $def->{def};
                 my $hash_str = Data::Dump::dump( $this_def );
                 CORE::push( @$code_lines, "sub ${meth} { return( shift->${func}( '${meth}', ${hash_str}, \@_ ) ); }" );
             }
@@ -9166,20 +10512,15 @@ sub AUTOLOAD : lvalue
         $meth  = substr( $meth, $idx + 2 );
     }
     
-    # printf( STDERR __PACKAGE__ . "::AUTOLOAD: %d autoload subs found.\n", scalar( keys( %$AUTOLOAD_SUBS ) ) ) if( $DEBUG >= 4 );
-    unless( scalar( keys( %$AUTOLOAD_SUBS ) ) )
+    unless( $AUTOLOAD_SUBS )
     {
         &Module::Generic::_autoload_subs();
-        # printf( STDERR __PACKAGE__ . "::AUTOLOAD: there are now %d autoload classes found: %s\n", scalar( keys( %$AUTOLOAD_SUBS ) ), join( ', ', sort( keys( %$AUTOLOAD_SUBS ) ) ) ) if( $DEBUG >= 4 );
     }
     
-    # print( STDERR "Checking if sub '$meth' from class '$class' ($AUTOLOAD) is within the autoload subroutines\n" ) if( $DEBUG >= 4 );
     my $code;
     if( CORE::exists( $AUTOLOAD_SUBS->{ $meth } ) )
     {
         $code = $AUTOLOAD_SUBS->{ $meth };
-        # $code = Nice::Try->implement( $code ) if( CORE::index( $code, 'try' ) != -1 );
-        # print( STDERR __PACKAGE__, "::AUTOLOAD: updated code for method \"$meth\" ($AUTOLOAD) and \$self '$self' is:\n$code\n" ) if( $DEBUG >= 4 );
         my $saved = $@;
         local $@;
         {
@@ -9192,11 +10533,7 @@ sub AUTOLOAD : lvalue
             die( $@ );
         }
         $@ = $saved;
-        # defined( &$AUTOLOAD ) || die( "AUTOLOAD inconsistency error for dynamic sub \"$meth\"." );
         my $ref = $class->can( $meth ) || die( "AUTOLOAD inconsistency error for dynamic sub \"$meth\"." );
-        # No need to keep it in the cache
-        # delete( $AUTOLOAD_SUBS->{ $meth } );
-        # goto( &$AUTOLOAD );
         return( &$meth( $self, @_ ) ) if( $self );
         return( &$AUTOLOAD( @_ ) );
     }
@@ -9417,6 +10754,89 @@ DESTROY
     # Do nothing
 };
 
+{
+    # Credits to the module Sentinel for the idea of using a tied scalar.
+    # NOTE: Module::Generic::LvalueGuard
+    package
+        Module::Generic::LvalueGuard;
+    use strict;
+    use warnings;
+    use Scalar::Util;
+
+    sub TIESCALAR
+    {
+        my( $class, %args ) = @_;
+        if( defined( $args{obj} ) &&
+            !Scalar::Util::blessed( $args{obj} ) )
+        {
+            die( "The object provided (", overload::StrVal( $args{obj} ), ") is not a class object." );
+        }
+        my $self = bless({
+            value => $args{value}, # Current value
+            get   => $args{get},   # Getter callback
+            set   => $args{set},   # Setter callback
+            obj   => $args{obj},   # Object associated
+        }, $class );
+        return( $self );
+    }
+
+    sub FETCH
+    {
+        my $self = shift( @_ );
+        my $get = $self->{get};
+        my $obj = $self->{obj};
+        # 'get' refers to a method name in the object class
+        if( defined( $get ) && !ref( $get ) && defined( $obj ) )
+        {
+            if( my $code = $obj->can( $get ) )
+            {
+                return( $code->( $obj ) );
+            }
+            else
+            {
+                die( "Method '$get' is not defined in the class ", ref( $obj ) );
+            }
+        }
+        # Callback
+        elsif( defined( $get ) && ref( $get ) eq 'CODE' )
+        {
+            return( $get->( defined( $obj ) ? ( $obj ) : () ) );
+        }
+        # Direct value
+        else
+        {
+            return( $self->{value} );
+        }
+    }
+
+    sub STORE
+    {
+        my $self = shift( @_ );
+        my( $value ) = @_;
+        my $set = $self->{set};
+        my $obj = $self->{obj};
+        # 'set' refers to a method name in the object class
+        if( defined( $set ) && !ref( $set ) && defined( $obj ) )
+        {
+            if( my $code = $obj->can( $set ) )
+            {
+                return( $code->( $obj, $value ) );
+            }
+            else
+            {
+                die( "Method '$set' is not defined in the class ", ref( $obj ) );
+            }
+        }
+        # Callback
+        elsif( defined( $set ) && ref( $set ) eq 'CODE' )
+        {
+            $set->( defined( $obj ) ? ( $obj ) : (), $value );
+        }
+        # Store the value
+        $self->{value} = $value;
+    }
+}
+
 1;
 # NOTE: POD
 __END__
@@ -9525,7 +10945,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.42.0
+    v0.43.3
 
 =head1 DESCRIPTION
 
@@ -9589,6 +11009,8 @@ This is a handy method to use at the beginning of other methods of calling packa
     }
 
 This way the end user may be sure that if C<$obj->error()> returns true something wrong has occured.
+
+Note that all helper method such as C<_set_get_*> use this method when used as mutator. This means that if those methods are used to set some value, and they do so successfully, they will reset any previous error. When used as accessor, any previous error set will remain.
 
 =head2 clone
 
@@ -11127,6 +12549,32 @@ The minimum version for this class to load. This value is passed directly to L<p
 
 =back
 
+=head3 THREAD SAFETY WARNING
+
+B<_load_class> is mostly thread-safe, but dynamic class loading using C<eval> and C<use> at runtime can pose risks in threaded environments.
+
+Perl caches loaded modules, but if two threads try to load the same module simultaneously, and the module performs initialization in C<BEGIN> blocks or via side effects in its import mechanism, this can lead to race conditions or partial loading.
+
+=head4 Safe Usage Recommendations
+
+=over 4
+
+=item *
+
+Call C<_load_class> during application startup or before any threads are spawned.
+
+=item *
+
+Avoid dynamically loading classes at runtime inside threads unless you are certain the modules being loaded are themselves thread-safe and have no side effects on import.
+
+=item *
+
+To ensure full safety, preload modules at initialization time using C<use> or call C<_load_class> during the main thread's setup phase.
+
+=back
+
+=cut
+
 =head2 _load_classes
 
 This will load multiple classes by providing it an array reference of class name to load and an optional hash or hash reference of options, similar to those provided to L</_load_class>
@@ -11260,11 +12708,69 @@ The word now will set the return value to the current date and time
 
     sub name { return( shift->_set_get( 'name', @_ ) ); }
 
+or
+
+    sub name { return( shift->_set_get({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name and some value and this will set or get that value for that property.
 
 However, if the value stored is an array and is called in list context, it will return the array as a list and not the array reference. Same thing for an hash reference. It will return an hash in list context. In scalar context, it returns whatever the value is, such as array reference, hash reference or string, etc.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=back
+
 =head2 _set_get_array
+
+    sub my_array { return( shift->_set_get_array( 'my_array', @_ ) ); }
+    my $ref = $self->my_array( @some_values );
+    my $ref = $self->my_array( $array_ref );
+
+or
+
+    sub name { return( shift->_set_get_array({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and some data and this will store the data as an array reference.
 
@@ -11274,7 +12780,47 @@ Example :
 
     sub products { return( shift->_set_get_array( 'products', @_ ) ); }
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=back
+
 =head2 _set_get_array_as_object
+
+    sub name { return( shift->_set_get_array_as_object( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_array_as_object({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and some data and this will store the data as an object of L<Module::Generic::Array>
 
@@ -11290,21 +12836,31 @@ And using your method:
     printf( "There are %d products\n", $object->products->length );
     $object->products->push( $new_product );
 
-Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
-
-This hash reference can contain the following properties:
+Alternatively, you can pass an hash reference instead of an object property to provide additional parameters, such as:
 
 =over 4
 
-=item callbacks
+=item * callbacks
 
 An hash reference of operation type C<add> (or C<set>)) to callback subroutine name or code reference pairs.
 
-=item field
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * field
 
 The object property name
 
-=item wantlist
+=item * wantlist
 
 Boolean. If true, then it will return a list in list context instead of the array object.
 
@@ -11326,6 +12882,22 @@ The value of the callback can be either a subroutine name or a code reference.
 
     sub is_true { return( shift->_set_get_boolean( 'is_true', @_ ) ); }
 
+or
+
+    sub name { return( shift->_set_get_boolean({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name and some data and this will store the data as a boolean value.
 
 If the data provided is a L<JSON::PP::Boolean> or L<Module::Generic::Boolean> object, the data is stored as is.
@@ -11344,13 +12916,25 @@ This hash reference can contain the following properties:
 
 =over 4
 
-=item field
+=item * C<field>
 
 The object property name
 
-=item callbacks
+=item * C<check>
 
-An hash reference of operation type C<add> (or C<set>) to callback subroutine name or code reference pairs.
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
 
 =back
 
@@ -11660,13 +13244,73 @@ When called in list context, it will return its values as a list, otherwise it w
 
 =head2 _set_get_code
 
+    sub name { return( shift->_set_get_code( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_code({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name and some code reference and this stores and retrieve the current value.
 
-It returns under and set an error if the provided value is not a code reference.
+It returns C<undef> and set an error if the provided value is not a code reference.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
 
 =head2 _set_get_datetime
 
     sub created_on { return( shift->_set_get_datetime( 'created_on', @_ ) ); }
+
+or
+
+    sub created_on { return( shift->_set_get_datetime({
+        field => 'created_on',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a L<DateTime> object.
 
@@ -11682,6 +13326,32 @@ Even if there is no value set, and this method is called in chain, it returns a 
 
 Of course, the value of C<iso8601> will be empty since this is a fake method produced by L<Module::Generic::Null>. The return value of a method should always be checked.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
+
 =head2 _set_get_enum
 
     sub choice { return( shift->_set_get_enum( 'choice', [qw( yes no )], @_ ) ); }
@@ -11691,6 +13361,16 @@ Of course, the value of C<iso8601> will be empty since this is a fake method pro
         allowed => [qw( yes no )],
         # case insensitive
         case    => 0,
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
     }, @_ ) ); }
 
 This support method handles C<enum> values, i.e. a list of allowed values that can be set.
@@ -11711,6 +13391,22 @@ Thus, if true, an hypothetical value C<yes> would match against the C<allowed> v
 
 Default is true.
 
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
 =item * C<field>
 
 The field name.
@@ -11721,23 +13417,123 @@ The field name.
 
     sub file { return( shift->_set_get_file( 'file', @_ ) ); }
 
+or
+
+    sub file { return( shift->_set_get_file({
+        field => 'file',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name and a file and this will store the given file as a L<Module::Generic::File> object.
 
 It returns C<undef> and set an L<error|/error> if the provided value is not a proper file.
 
 Note that the files does not need to exist and it can also be a directory or a symbolic link or any other file on the system.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
+
 =head2 _set_get_glob
 
     sub handle { return( shift->_set_get_glob( 'handle', @_ ) ); }
+
+or
+
+    sub handle { return( shift->_se_set_get_globt_get({
+        field => 'handle',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and a glob (file handle) and this will store the given glob.
 
 It returns C<undef> and set an L<error|/error> if the provided value is not a glob.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
+
 =head2 _set_get_hash
 
     sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
+
+or
+
+    sub metadata { return( shift->_set_get_hash({
+        field => 'metadata',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and an hash reference and this set the property name with this hash reference.
 
@@ -11750,13 +13546,81 @@ You can even pass it an associative array, and it will be saved as a hash refere
 
     my $hash = $object->metadata;
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
+
 =head2 _set_get_hash_as_mix_object
 
     sub metadata { return( shift->_set_get_hash_as_mix_object( 'metadata', @_ ) ); }
 
+or
+
+    sub metadata { return( shift->_set_get_hash_as_mix_object({
+        field => 'metadata',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name, and an optional hash reference and this returns a L<Module::Generic::Hash> object, which allows to manipulate the hash just like any regular hash, but it provides on top object oriented method described in details in L<Module::Generic::Hash>.
 
 This is different from L</_set_get_hash_as_object> below whose keys and values are accessed as dynamic methods and method arguments.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
 
 =head2 _set_get_hash_as_object
 
@@ -11778,15 +13642,63 @@ Then populating the data :
 
     printf( "Customer name is %s\n", $object->metadata->last_name );
 
+=head3 THREAD SAFETY
+
+This method uses L<Module::Generic::Dynamic>, and thus is not thread-safe. It should be invoked only during initialization, before any threads are spawned.
+
+For safe usage in multi-threaded environments, avoid using dynamic class creation features at runtime.
+
 =head2 _set_get_ip
 
     sub ip { return( shift->_set_get_ip( 'ip', @_ ) ); }
+
+or
+
+    sub ip { return( shift->_set_get_ip({
+        field => 'ip',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 This helper method takes a value and check if it is a valid IP address using L</_is_ip>. If C<undef> or zero-byte value is provided, it will merely accept it, as it can be used to reset the value by the caller.
 
 If a value is successfully set, it returns a L<Module::Generic::Scalar> object representing the string passed.
 
 From there you can pass the result to L<Net::IP> in your own code, assuming you have that module installed.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
 
 =head2 _set_get_lvalue
 
@@ -11796,7 +13708,7 @@ This is now an alias for L</_set_get_callback>
 
 Provided with an object property name and a number, and this will create a L<Module::Generic::Number> object and return it.
 
-As of version v0.13.0 it also works as a lvalue method. See L<perlsub>
+As of version C<v0.13.0> it also works as a lvalue method. See L<perlsub>
 
 In your module:
 
@@ -11804,6 +13716,22 @@ In your module:
     use parent qw( Module::Generic );
     
     sub level : lvalue { return( shift->_set_get_number( 'level', @_ ) ); }
+
+# or
+
+    sub level : lvalue { return( shift->_set_get_number({
+        field => 'level',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 In the script using module C<MyObject>:
 
@@ -11822,9 +13750,21 @@ This hash reference can contain the following properties:
 
 =over 4
 
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
 =item * C<callbacks>
 
-An hash reference of operation type C<add> (or C<set>) to callback subroutine name or code reference pairs.
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
 
 =item * C<field>
 
@@ -11848,6 +13788,54 @@ For example:
 
 The value of the callback can be either a subroutine name or a code reference.
 
+=head2 _set_get_number_as_scalar
+
+    sub name { return( shift->_set_get_number_as_scalar( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
+This sets or gets a number as a regular string, but checking the value is indeed a number by using L<Regexp::Common>
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
+
 =head2 _set_get_number_or_object
 
 Provided with an object property name and a number or an object and this call the value using L</"_set_get_number"> or L</"_set_get_object"> respectively
@@ -11863,6 +13851,10 @@ Provided with an object property name and a number or an object and this call th
         {
             my( $class, $args ) = @_;
             return( $class->new( $args->[0] ) );
+        },
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
         },
     }, My::Class, @_ ) ); }
 
@@ -11881,6 +13873,14 @@ A callback code reference that will be passed the module class name and the argu
 This is used to instantiate the module object in a particular way and/or to have finer control about object instantiation.
 
 Any fatal error during object instantiation is caught and an L<error|Module::Generic::Exception> would be set and C<undef> would be returned in scalar context, or an empty list in list context.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
 
 =item * C<field>
 
@@ -11915,6 +13915,11 @@ Same as L</_set_get_object_without_init> but with the possibility of setting the
             my( $class, $args ) = @_;
             return( $class->new( $args->[0] ) );
         },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
     }, 'Some::Module', @_ ) ); }
     # then
     my $this = $obj->mymethod; # possibly undef if it was never instantiated
@@ -11937,6 +13942,14 @@ Optional. A code reference like an anonymous subroutine that will be called with
 
 Whatever this returns will set the value for this object property.
 
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
 =back
 
 This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
@@ -11951,6 +13964,11 @@ This is a useful callback when the module instantiation either does not use the 
         {
             my( $class, $args ) = @_;
             return( $class->new( $args->[0] ) );
+        },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
         },
     }, 'Some::Module', @_ ) ); }
 
@@ -11968,6 +13986,14 @@ Mandatory. The object property name.
 
 Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
 
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
 =back
 
 This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
@@ -11982,6 +14008,11 @@ This is a useful callback when the module instantiation either does not use the 
         {
             my( $class, $args ) = @_;
             return( $class->new( $args->[0] ) );
+        },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
         },
     }, 'Some::Module', @_ ) ); }
 
@@ -11998,6 +14029,14 @@ Mandatory. The object property name.
 =item * C<callback>
 
 Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
 
 =back
 
@@ -12020,6 +14059,24 @@ This method accepts the same arguments as L</_set_get_object_array>
 
 =head2 _set_get_object_variant
 
+    sub name { return( shift->_set_get_object_variant( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_object_variant({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name, a class/package name and some data, and depending whether the data provided is an hash reference or an array reference, this will either instantiate an object for the given hash reference or an array of objects with the hash references in the given array.
 
 This means the value stored for the object property will vary between an hash or array reference.
@@ -12035,6 +14092,14 @@ Mandatory. The object property name.
 =item * C<callback>
 
 Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
 
 =back
 
@@ -12053,6 +14118,25 @@ This is a useful callback when the module instantiation either does not use the 
 
     sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
+or
+
+    sub name { return( shift->_set_get_scalar({
+        field => 'name',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks =>
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name, and a string, possibly a number or anything really and this will set the property value accordingly. Very straightforward.
 
 Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
@@ -12061,13 +14145,21 @@ This hash reference can contain the following properties:
 
 =over 4
 
-=item field
+=item * C<field>
 
 The object property name
 
-=item callbacks
+=item * C<callbacks>
 
 An hash reference of operation type C<add> (or C<set>), or C<get> to callback subroutine name or code reference pairs.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
 
 =back
 
@@ -12091,6 +14183,27 @@ The value of the callback can be either a subroutine name or a code reference.
 It returns the currently value stored.
 
 =head2 _set_get_scalar_as_object
+
+    sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_scalar_as_object({
+        field => 'name',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => 
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name, and a string or a scalar reference and this stores it as an object of L<Module::Generic::Scalar>
 
@@ -12117,13 +14230,21 @@ This hash reference can contain the following properties:
 
 =over 4
 
-=item field
+=item * C<field>
 
 The object property name
 
-=item callbacks
+=item * C<callbacks>
 
 An hash reference of operation type C<add> (or C<set>), or C<get> to callback subroutine name or code reference pairs.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
 
 =back
 
@@ -12150,6 +14271,25 @@ If no value has been set yet, this returns a L<Module::Generic::Null> object to 
     sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
     sub uri { return( shift->_set_get_uri( { field => 'uri', class => 'URI::Fast' }, @_ ) ); }
 
+or
+
+    sub uri { return( shift->_set_get_uri({
+        field => 'uri',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => 
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name, and an uri and this creates an L<URI> object and sets the property value accordingly.
 
 Alternatively, the property name can be an hash with the following properties:
@@ -12159,6 +14299,22 @@ Alternatively, the property name can be an hash with the following properties:
 =item * C<field>
 
 The object property name
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
 
 =item * C<class>
 
@@ -12172,11 +14328,58 @@ It returns the current value, if any, so the return value could be undef, thus i
 
 =head2 _set_get_uuid
 
+    sub id { return( shift->_set_get_uuid( 'id', @_ ) ); }
+
+or
+
+    sub id { return( shift->_set_get_uuid({
+        field => 'id',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks =>
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object, a property name, and an UUID (Universal Unique Identifier) and this stores it as an object of L<Module::Generic::Scalar>.
 
 If an empty or undefined value is provided, it will be stored as is.
 
 However, if there is no value and this method is called in object context, such as in chaining, this will return a special L<Module::Generic::Null> object that prevents perl error that whatever method follows was called on an undefined value.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+=over 4
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
+
+=item * C<field>
+
+The object property name
+
+=back
 
 =head2 _set_get_version
 
@@ -12185,6 +14388,24 @@ However, if there is no value and this method is called in object context, such 
     sub version : lvalue { return( shift->_set_get_version( 'version', @_ ) ); }
     # or
     sub version : lvalue { return( shift->_set_get_version( { field => 'version', class => 'Perl::Version' }, @_ ) ); }
+
+or
+
+    sub version { return( shift->_set_get_version({
+        field => 'version',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks =>
+        {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object, a property name, and a version string and this stores it as an object of L<version> by default.
 
@@ -12195,6 +14416,22 @@ Alternatively, the property name can be an hash with the following properties:
 =item * C<field>
 
 The object property name
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=item * C<callbacks>
+
+An hash reference of callbacks. You can use either C<set> or C<add> whichever you prefer.
+
+The callback will be called with the current object, and the value that has already been set.
+
+Any fatal exception during the callback will not be caught.
 
 =item * C<class>
 
@@ -12277,7 +14514,7 @@ When called in get mode, it will convert any value pre-set, if any, into a versi
         value => $a_code_reference,
     );
 
-This method is used to add a new symbol to a given class, a.k.a. package. A proper symbol type can only be an array reference, an hash reference, a scalar, a code reference, or a glob.
+This method is used to dynamically add a new symbol to a given class, a.k.a. package. A proper symbol type can only be an array reference, an hash reference, a scalar, a code reference, or a glob. This is useful for metaprogramming or creating dynamically extensible APIs.
 
 This takes the following options:
 
@@ -12307,11 +14544,11 @@ If no start line is provided, it will default to 0.
 
 =item * C<type>
 
-The optional variable type. This can be either C<array>, C<code>, C<glob>, C<hash>, or C<scalar>
+Optional. Explicitly define the type of the symbol: C<scalar>, C<array>, C<hash>, C<code>, or C<glob>. This can override the sigil detection logic.
 
 If this is not explicitly specified, the type will be derived from the sigil, i.e. the first character of the variable name.
 
-The sigil will determine how the variable will be accessed from the package name. Fer example:
+The sigil will determine how the variable will be accessed from the package name. For example:
 
     $o->_set_symbol(
         class => 'Foo::Bar',
@@ -12354,13 +14591,56 @@ Acceptable value types are: C<array>, C<code>, C<glob>, C<hash>, or C<scalar>, b
 
 =item * C<value>
 
-Specifies an appropriate value for this new symbol. If the value is not suitable for the new symbol, an error is returned.
+A reference to the value you want to assign to that new symbol. For example, a scalar reference, an arrayref, a coderef, etc.
+
+If the value is not suitable for the new symbol, an error is returned.
 
 =item * C<variable>
 
 A variable including its C<sigil>, i.e. the first character of a variable name, such as C<$>, C<%>, C<@>, or C<&>
 
 =back
+
+See also L</_get_symbol> to retrieve the symbol set.
+
+=head3 THREAD SAFETY WARNING
+
+B<_set_symbol is not thread-safe.> It modifies the package's symbol table (via C<*{...}> operations), which is global and shared across all threads.
+
+Injecting or redefining symbols dynamically after threads have been created can cause race conditions, unexpected behavior, or crashes.
+
+=head4 Safe Usage Recommendations
+
+=over 4
+
+=item *
+
+Call C<_set_symbol> I<only before> any threads are created (i.e., during startup/init phase).
+
+=item *
+
+Avoid calling this method at runtime inside threads or shared libraries if thread safety is a concern.
+
+=item *
+
+If using with threads, consider guarding symbol modification with external synchronization (e.g., a global mutex). However, this cannot prevent race conditions if the symbol is already in use.
+
+=back
+
+=head4 Possible Safer Alternatives
+
+Per-object or closure-based dispatch may be preferable if your use case allows:
+
+    $object->{some_accessor} = sub { ... };
+
+Or use a dynamic delegation pattern via AUTOLOAD:
+
+    sub AUTOLOAD {
+        my $method = our $AUTOLOAD;
+        return $self->{dynamic_methods}{$method}->(@_);
+    }
+
+However, if you truly need to define package-level symbols, this method remains appropriate — just observe the threading caveats above.
 
 =head2 _to_array_object
 
@@ -12453,6 +14733,8 @@ If, however, you wanted errors triggered to be fatal, you can set the object pro
 To catch fatal error you can use a C<try-catch> block such as implemented by L<Nice::Try>.
 
 Since L<perl version 5.33.7|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling> you can use the try-catch block using an experimental feature C<use feature 'try';>, but this does not support C<catch> by exception class.
+
+Note that all helper methods such as C<_set_get_*>. when used as mutator, meaning when some values are set successfully, will clear any previous error set. When used as accessor, any previous error set will remain.
 
 =head1 SERIALISATION
 

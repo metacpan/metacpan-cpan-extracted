@@ -333,6 +333,11 @@ sub render {
 
 		$ann->link($target);
 	    }
+	    # Named destination in other PDF.
+	    elsif ( $target =~ /^(?!\w{3,}:)(.*)(\#.+)$/ ) {
+		$ann->pdf( $1, $2 );
+	    }
+	    # Arbitrary document.
 	    else {
 		$ann->uri($target);
 	    }

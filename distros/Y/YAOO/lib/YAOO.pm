@@ -5,7 +5,7 @@ use Carp qw/croak/; use Tie::IxHash;
 use feature qw/state/;
 use Blessed::Merge;
 use Hash::Typed;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our (%TYPES, %object, $LAST);
 
@@ -477,7 +477,7 @@ YAOO - Yet Another Object Orientation
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -780,10 +780,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=YAOO>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/YAOO>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/YAOO>
@@ -794,7 +790,7 @@ L<https://metacpan.org/release/YAOO>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

@@ -18,7 +18,7 @@ use Readonly;
 use Data::Walk;
 use Try::Tiny;
 
-our $VERSION = 0.07;
+our $VERSION = 0.09;
 
 our $override;
 my $JSON_OBJ = Cpanel::JSON::XS->new()->utf8->pretty();
@@ -38,7 +38,7 @@ Readonly::Hash my %MOCKED_DBI_METHODS => (
 	fetch              => 'DBI::st::fetch',
 	prepare_cached     => 'DBI::db::prepare_cached',
 	prepare            => 'DBI::db::prepare',
-	mocked_prepare     => 'DBD::Mock::db::prepare'
+	mocked_prepare     => 'DBD::Mock::db::prepare',
 );
 
 sub new {
@@ -169,12 +169,14 @@ sub _override_dbi_execute {
 
 			my $sql    = $sth->{Statement};
 			my $retval = $orig_execute->($sth, @args);
+
 			my $col_names;
 			try {
-				$col_names = $sth->{NAME};
+				$col_names = $sth->{NAME}
+					if $sql !~ m/^INSERT|^UPDATE|^DELETE/i;
 			} catch {
 				my $error = $_;
-				say  $error;
+				say $error;
 			};
 
 			my $rows       = $sth->rows();
@@ -185,7 +187,8 @@ sub _override_dbi_execute {
 			};
 
 			my $result = [];
-			if ($rows > 0) {
+			if ($sql =~ m/^INSERT|^UPDATE|^DELETE/i) {
+				push @$result, ['rows'];
 				foreach my $row (1 .. $rows) {
 					push @{$result}, [];
 				}
@@ -724,7 +727,7 @@ sub DESTROY {
 
 =head1 NAME
 
-DBD::Mock::Session::GenerateFixtures
+DBD::Mock::Session::GenerateFixtures - A module to generate fixtures for DBD::Mock::Session
 
 =head1 SYNOPSIS
 

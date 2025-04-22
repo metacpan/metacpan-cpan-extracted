@@ -88,6 +88,8 @@ use Carp;
 	$hotkeys						$config->{hotkeys}
 	$new_track_rw					$config->{new_track_rw}
 	$hotkeys_always					$config->{hotkeys_always}
+	$hotkey_playback_jumpsize_seconds   $config->{hotkey_playback_jumpsize_seconds}
+	$seek_end_margin			   $config->{seek_end_margin}
 	$use_pager     					$config->{use_pager}
 	$use_placeholders  				$config->{use_placeholders}
     $edit_playback_end_margin  		$config->{edit_playback_end_margin}

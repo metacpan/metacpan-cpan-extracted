@@ -1,8 +1,8 @@
-package MooseX::Types::Common; # git description: v0.001013-15-gb03d3d2
+package MooseX::Types::Common; # git description: v0.001014-8-g70393d0
 # ABSTRACT: A library of commonly used type constraints
 # KEYWORDS: moose types classes objects constraints declare libraries strings numbers
 
-our $VERSION = '0.001014';
+our $VERSION = '0.001015';
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ MooseX::Types::Common - A library of commonly used type constraints
 
 =head1 VERSION
 
-version 0.001014
+version 0.001015
 
 =head1 SYNOPSIS
 
@@ -89,11 +89,11 @@ L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =item *
 
-Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>)
+Matt S Trout - mst (at) shadowcat.co.uk (L<https://www.shadowcat.co.uk/>)
 
 =item *
 
-K. James Cheetham <jamie@shadowcatsystems.co.uk>
+K. James Cheetham <jamie@shadowcat.co.uk>
 
 =item *
 
@@ -103,7 +103,7 @@ Guillermo Roditi <groditi@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Justin Hunter Dave Rolsky Tomas Doran Toby Inkster Gregory Oschwald Denis Ibaev Graham Knop Caleb Cushing
+=for stopwords Karen Etheridge Justin Hunter Dave Rolsky Gregory Oschwald Tomas Doran Caleb Cushing Denis Ibaev Graham Knop Toby Inkster
 
 =over 4
 
@@ -121,15 +121,15 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
+Gregory Oschwald <oschwald@gmail.com>
+
+=item *
+
 Tomas Doran <bobtfish@bobtfish.net>
 
 =item *
 
-Toby Inkster <tobyink@cpan.org>
-
-=item *
-
-Gregory Oschwald <oschwald@gmail.com>
+Caleb Cushing <xenoterracide@gmail.com>
 
 =item *
 
@@ -141,17 +141,13 @@ Graham Knop <haarg@haarg.org>
 
 =item *
 
-Gregory Oschwald <goschwald@maxmind.com>
-
-=item *
-
-Caleb Cushing <xenoterracide@gmail.com>
+Toby Inkster <tobyink@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
+This software is copyright (c) 2009 by Matt S Trout - mst (at) shadowcat.co.uk (L<https://www.shadowcat.co.uk/>).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -13,15 +13,16 @@ my @token = (
   '- ', "\n- ", '1. ', "\n1. ", '[', ']', '[]', '[foo]', '\n[foo]:', ':',
   '/url','http://url', '<', '>', '<http://url>', '(', ')', '(http://url)', '*',
   '*foo*', '**', '_', '`', '```', "\n```", '---', '--', '-', '#', '##', '<div>',
-  '</div>', "\n\n", '![', '](', '](http://url)', "  \n", "\\\n", '.',
-  'www.foo.fr', '&lt;', '&Amp;', '&', '+', '|', '| foo ', '| :--', ':', 'bar |',
-  '--: |',
+  '</div>', "\n\n", '![', '](', '](http://url)', "  \n", "\\\n", '.', '=',
+  'www.foo.fr', '&lt;', '&Amp;', '&', '+', '|', '| foo ', '| :--', ':', '::',
+  ':::', 'bar |', '--: |', '#id', '.class', '{#id}', '{.class}', '{key=value}',
+  '{', '}'
 );
 
 my $num_tests = $maxi_test ? 100000 : $ENV{EXTENDED_TESTING} ? 4000 : 500;
 my $max_tokens = 100;
 
-my @testers = map { Markdown::Perl->new(mode => $_) } @Markdown::Perl::Options::valid_modes;
+my @testers = map { Markdown::Perl->new(mode => $_, warn_for_unused_input => 0) } @Markdown::Perl::Options::valid_modes;
 
 for (1 .. $num_tests) {
   my $num_token = int(rand($max_tokens)) + 1;

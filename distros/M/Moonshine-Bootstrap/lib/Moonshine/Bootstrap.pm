@@ -1,6 +1,6 @@
 package Moonshine::Bootstrap;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
@@ -8,7 +8,7 @@ __END__
 
 =head1 NAME
 
-Moonshine::Bootstrap - Shine.
+Moonshine::Bootstrap - Bootstrap.
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ Moonshine::Bootstrap - Shine.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -83,27 +83,17 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Moonshine-Bootstrap>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Moonshine-Bootstrap>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Moonshine-Bootstrap>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Moonshine-Bootstrap/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

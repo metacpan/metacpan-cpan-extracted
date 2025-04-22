@@ -4,7 +4,7 @@ package Thread::Rand;
 use Thread::Tie ();
 
 # initializations
-$VERSION= '0.08';
+$VERSION= '0.09';
 
 # be as strict as possble
 use strict;
@@ -91,7 +91,7 @@ Thread::Rand - repeatable random sequences between threads
 
 =head1 VERSION
 
-This documentation describes version 0.08.
+This documentation describes version 0.09.
 
 =head1 SYNOPSIS
 
@@ -176,12 +176,14 @@ this problem fixed.  You can then take these circumventions out again.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002, 2003, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+Copyright (c) 2002, 2003, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>
+All rights reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO

@@ -70,3 +70,42 @@ X%{head|x%{foo|ab|f%{}g}z}Y	XxfgzY
 
 # Transpose.
 %{key}		G
+
+# Formatting
+%{capo:%02d}	01
+%{capo=1|%{capo:%02d}|no}	01
+%{capo:%02d=01|yes%{}|no}	yes01
+[%{capo:%6.2s}]	[     1]
+
+# Case changers
+%{title:uc}	HI THERE!
+%{title:lc}	hi there!
+%{title:ic}	Hi There!
+%{title:lc:ic}	Hi There!
+%{title:sc}	Hi There!
+%{title:lc:sc}	Hi there!
+
+# Formatting doesn't interfere with definedness
+X%{1:%02d}Y	XY
+X%{hexd:sc}Y	XY
+
+# Padding
+X%{key:lpad(0)}Y	XGY
+X%{key:lpad(4)}Y	X   GY
+X%{key:lpad(4,-)}Y	X---GY
+X%{key:lpad(4,xy)}Y	XxyxGY
+X%{head:lpad(2)}Y	XyesY
+X%{head:lpad(3)}Y	XyesY
+X%{key:rpad(4)}Y	XG   Y
+X%{key:rpad(4,-)}Y	XG---Y
+X%{key:rpad(4,xy)}Y	XGxyxY
+X%{head:rpad(2)}Y	XyesY
+X%{head:rpad(3)}Y	XyesY
+
+# Replace
+%{title:replace( ,_)}	Hi_There!
+%{title:replace( ,,)}	Hi,There!
+%{title:replace( ,,):replace(,, )}	Hi There!
+%{title:replace( ,\:):replace(\:, )}	Hi There!
+%{title:replace(!,)}	Hi There
+%{title:replace(!,\})}	Hi There}

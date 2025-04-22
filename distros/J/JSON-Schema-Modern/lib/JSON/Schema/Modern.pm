@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.607-9-g132f376e
+package JSON::Schema::Modern; # git description: v0.608-6-g0b0c26e9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.608';
+our $VERSION = '0.609';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -472,8 +472,19 @@ sub validate_schema ($self, $schema, $config_override = {}) {
   my $metaschema_uri = is_plain_hashref($schema) && $schema->{'$schema'} ? $schema->{'$schema'}
     : $self->METASCHEMA_URIS->{$self->specification_version // $self->SPECIFICATION_VERSION_DEFAULT};
 
-  return $self->evaluate($schema, $metaschema_uri,
+  my $result = $self->evaluate($schema, $metaschema_uri,
     { %$config_override, $self->strict || $config_override->{strict} ? (_strict_schema_data => 1) : () });
+
+  return $result if not $result->valid;
+
+  my $state = $self->traverse($schema, $config_override);
+  return JSON::Schema::Modern::Result->new(
+    output_format => $self->output_format,
+    valid => 0,
+    errors => $state->{errors},
+  ) if $state->{errors}->@*;
+
+  return $result; # valid: true
 }
 
 sub get ($self, $uri_reference) {
@@ -671,7 +682,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
   return 1 if not keys %$schema;
 
-  # find all schema locations in effect at this data path + canonical_uri combination
+  # find all schema locations in effect at this data path + uri combination
   # if any of them are absolute prefix of this schema location, we are in a loop.
   my $canonical_uri = canonical_uri($state);
   my $schema_location = $state->{traversed_schema_path}.$state->{schema_path};
@@ -811,7 +822,7 @@ my $path_type = Str->where('m{^(?:/|$)}');  # JSON pointer relative to the docum
 has _resource_index => (
   is => 'bare',
   isa => Map[my $resource_key_type = Str->where('!/#/'), my $resource_type = Dict[
-      # always stringwise-equal to the top level key
+      # may not be stringwise-equal to the top level key
       canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
       path => $path_type,
       specification_version => my $spec_version_type = Enum(SPECIFICATION_VERSIONS_SUPPORTED),
@@ -1250,7 +1261,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.608
+version 0.609
 
 =head1 SYNOPSIS
 
@@ -1510,7 +1521,7 @@ C<initial_schema_uri>: adjusts the recorded absolute keyword location as of the 
 
 =item *
 
-C<effective_base_uri>: locations in errors and annotations are resolved against this URI
+C<effective_base_uri>: locations in errors and annotations are resolved against this URI (only useful when providing an inline schema that does not declare an absolute base URI for itself)
 
 =back
 
@@ -1564,7 +1575,7 @@ C<traversed_schema_path>: adjusts the accumulated path as of the start of evalua
 
 =item *
 
-C<effective_base_uri>: locations in errors and annotations are resolved against this URI
+C<effective_base_uri>: locations in errors and annotations are resolved against this URI (only useful when providing an inline schema that does not declare an absolute base URI for itself)
 
 =back
 

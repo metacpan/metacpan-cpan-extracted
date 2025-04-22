@@ -1,5 +1,5 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.04';
+use 5.006; use strict; use warnings; our $VERSION = '1.05';
 use JSON; use base 'Import::Export';
 
 our ($JSON, $LINES, %EX);
@@ -184,7 +184,7 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =cut
 
@@ -408,7 +408,7 @@ L<https://metacpan.org/release/JSON-Lines>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020->2021 by LNATION.
+This software is Copyright (c) 2020->2025 by LNATION.
 
 This is free software, licensed under:
 

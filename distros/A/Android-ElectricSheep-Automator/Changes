@@ -1,0 +1,11 @@
+Revision history for Android-ADB-Automator
+
+0.01    2025/04/18
+        First version, released on an unsuspecting world.
+0.02    2025/04/18
+        Now viber_close_app() works ok.
+0.03    2025/04/19
+        Documentation corrections.
+	dump_current_screen_ui() was failing most likely because of race condition somewhere? So added some sleeps.
+        Now configuration hash or filename are not mandatory, there is a default to be used in this case.
+        Added 'adb-path-to-executable' parameter to the constructor of Automator.

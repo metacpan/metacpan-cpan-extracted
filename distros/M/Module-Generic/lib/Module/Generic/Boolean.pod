@@ -32,7 +32,7 @@ Module::Generic::Boolean - Boolean Representation Class
 
 =head1 VERSION
 
-    v1.1.1
+    v1.2.1
 
 =head1 DESCRIPTION
 
@@ -101,6 +101,18 @@ It returns C<\1> if true, or C<\0> otherwise. Those values are understood by L<J
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD SAFETY NOTE
+
+B<Module::Generic::Boolean> is thread-safe, provided that the C<$true> and C<$false> objects are immutable singletons and not modified at runtime.
+
+Conversion methods like C<as_array>, C<as_scalar>, and C<as_number> dynamically load external modules at runtime. To ensure maximum safety in multi-threaded environments, consider preloading those classes in the main thread:
+
+    use Module::Generic::Array;
+    use Module::Generic::Number;
+    use Module::Generic::Scalar;
+
+These methods do not share state and are otherwise safe.
 
 =head1 AUTHOR
 

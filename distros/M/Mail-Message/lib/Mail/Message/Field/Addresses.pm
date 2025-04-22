@@ -1,4 +1,4 @@
-# Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Message::Field::Addresses;{
-our $VERSION = '3.016';
+our $VERSION = '3.017';
 }
 
 use base 'Mail::Message::Field::Structured';
@@ -75,9 +75,7 @@ sub addAddress(@)
 
 sub addGroup(@)
 {   my $self  = shift;
-    my $group = @_ == 1 ? shift
-              : Mail::Message::Field::AddrGroup->new(@_);
-
+    my $group = @_ == 1 ? shift : Mail::Message::Field::AddrGroup->new(@_);
     push @{$self->{MMFF_groups}}, $group;
     $group;
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Unicode">
+    <lines>
+       <line id="L1" name="Èà" />
+       <line id="L2" name="Àé" />
+    </lines>
+
+    <stations>
+       <!-- Junction -->
+       <station id="J1" name="Ï" line="L1,L2" link="S1,S3,S4" />
+
+       <!-- Line 1: À <-> Ï <-> È -->
+       <station id="S1" name="À" line="L1"    link="J1"       />
+       <station id="S3" name="È" line="L1"    link="J1"       />
+
+       <!-- Line 2: Ù <-> Ï <-> È -->
+       <station id="S4" name="Ù" line="L2"    link="J1"       />
+    </stations>
+</tube>

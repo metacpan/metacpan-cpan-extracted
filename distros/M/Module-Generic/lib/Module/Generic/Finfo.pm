@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.4.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.5.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2023/09/05
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,17 +13,18 @@
 package Module::Generic::Finfo;
 BEGIN
 {
+    use v5.26.1;
     use strict;
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $VERSION $HAS_LOCAL_TZ $HAS_FILE_MMAGIC_XS );
+    use Config;
     use File::Basename ();
     local $@;
     eval( "use File::MMagic::XS 0.09008" );
     our $HAS_FILE_MMAGIC_XS = $@ ? 0 : 1;
     use Module::Generic::Null;
-    # use Nice::Try;
     use Want;
     use overload (
         q{""}    => sub    { $_[0]->{filepath} },
@@ -62,12 +63,21 @@ BEGIN
         FILETYPE_SOCK => 7,
         # a file is of some other unknown type or the type cannot be determined.
         FILETYPE_UNKFILE => 127,
+        HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} ),
     };
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    }
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.5.1';
 };
 
+use v5.26.1;
 use strict;
 no warnings 'redefine';
 
@@ -256,7 +266,13 @@ sub mime_type
         }
         else
         {
-            require File::MMagic;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require File::MMagic;
+                $loaded = 1;
+            }
             my $m = File::MMagic->new;
             $rv = $self->new_scalar( $m->checktype_filename( $file ) );
         }
@@ -411,18 +427,38 @@ sub _datetime
     my $dt;
     if( !defined( $HAS_LOCAL_TZ ) )
     {
-        # try-catch
-        local $@;
-        eval
+        if( HAS_THREADS )
         {
-            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
-            $HAS_LOCAL_TZ = 1;
-        };
-        if( $@ )
+            lock( $HAS_LOCAL_TZ );
+            # try-catch
+            local $@;
+            eval
+            {
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+                $HAS_LOCAL_TZ = 1;
+            };
+            if( $@ )
+            {
+                $HAS_LOCAL_TZ = 0;
+                warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+            }
+        }
+        else
         {
-            $HAS_LOCAL_TZ = 0;
-            warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
-            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+            # try-catch
+            local $@;
+            eval
+            {
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+                $HAS_LOCAL_TZ = 1;
+            };
+            if( $@ )
+            {
+                $HAS_LOCAL_TZ = 0;
+                warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+            }
         }
     }
     else
@@ -593,7 +629,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.4.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

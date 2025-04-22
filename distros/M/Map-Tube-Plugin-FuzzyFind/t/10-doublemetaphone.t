@@ -1,19 +1,19 @@
 #!perl
-use 5.010;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use Test::More 0.82;
+use lib 't/';
+use Sample;
 
-eval 'use Map::Tube::London 1.39';
-plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
 eval 'use Text::DoubleMetaphone';
-plan skip_all => 'Text::DoubleMetaphone required for this test'      if $@;
+plan skip_all => 'Text::DoubleMetaphone required for this test' if $@;
 
 plan tests => 16;
 
 sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 
-my $tube = new_ok( 'Map::Tube::London' );
+my $tube = new_ok( 'Sample' );
 my $ret;
 
 SKIP: {

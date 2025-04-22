@@ -30,6 +30,7 @@ use lib "$Bin/../lib";
 use Term::ANSIColor qw(:constants);
 use Convert::Pheno;
 use Convert::Pheno::IO::CSVHandler;
+use Convert::Pheno::OMOP::Definitions;
 
 $Data::Dumper::Sortkeys = 1;
 
@@ -54,6 +55,7 @@ GetOptions(
     'ocsv=s'                      => \my $out_csv,                             # string
     'ojsonf=s'                    => \my $out_jsonf,                           # string
     'ojsonld=s'                   => \my $out_jsonld,                          # string
+    'oomop=s'                     => \my $out_omop,                            # string
     'out-dir=s'                   => \$out_dir,                                # string
     'help|?'                      => \my $help,                                # flag
     'man'                         => \my $man,                                 # flag
@@ -62,6 +64,7 @@ GetOptions(
     'search=s'                    => \my $search,                              # string
     'text-similarity-method=s'    => \my $text_similarity_method,              # string
     'min-text-similarity-score=f' => \my $min_text_similarity_score,           # floating
+    'levenshtein-weight=f'        => \my $levenshtein_weight,                  # floating
     'debug=i'                     => \my $debug,                               # integer
     'verbose|v'                   => \my $verbose,                             # flag
     'color!'                      => \$color,                                  # flag
@@ -164,12 +167,29 @@ my @validation_checks = (
         message =>
 "Sorry, <--ocsv>, <--ojsonf> and <--ojsonf> are only compatible with <--ibff> or <--ipxf>\n",
     },
+    {
+        condition => sub { defined $out_omop && !$ohdsi_db },
+        message   =>
+          "Error: Please use --ohdsi-db when using OMOP CDM as an output"
+    },
+    {
+        condition => sub { defined($out_omop) && $out_omop =~ /^-/ },
+        message   =>
+"Error: The value for --oomop appears to be an option. Please supply a proper non-option string using --oomop=VALUE"
+    }
+
 );
 
 foreach my $check (@validation_checks) {
     if ( $check->{condition}->() ) {
         pod2usage( -message => $check->{message}, -exitval => 1 );
     }
+}
+
+# Validate that --oomop's argument doesn't look like another option.
+if ( defined($out_omop) && $out_omop =~ /^-/ ) {
+    die
+"Error: The value for --oomop ('$out_omop') appears to be an option. Please supply a proper non-option string using --oomop=VALUE\n";
 }
 
 # Turning color off if argument <--no-color>
@@ -182,6 +202,7 @@ my $out_file =
   : $out_csv    ? catfile( $out_dir, $out_csv )
   : $out_jsonf  ? catfile( $out_dir, $out_jsonf )
   : $out_jsonld ? catfile( $out_dir, $out_jsonld )
+  : $out_omop   ? catfile( $out_dir, $out_omop )
   :               catfile( $out_dir, 'individuals.json' );
 
 # Defining $log_file
@@ -203,6 +224,7 @@ my $out_type =
   : $out_csv    ? 'csv'
   : $out_jsonf  ? 'jsonf'
   : $out_jsonld ? 'jsonld'
+  : $out_omop   ? 'omop'
   :               'bff';
 my $method = $in_type . '2' . $out_type;
 
@@ -232,6 +254,7 @@ my $data = {
     username                  => $username,
     text_similarity_method    => $text_similarity_method,
     min_text_similarity_score => $min_text_similarity_score,
+    levenshtein_weight        => $levenshtein_weight,
     self_validate_schema      => $self_validate_schema,
     path_to_ohdsi_db          => $path_to_ohdsi_db,
     print_hidden_labels       => $print_hidden_labels,
@@ -264,7 +287,6 @@ convert( $out_file, $data );
 ###########################
 
 sub convert {
-
     my ( $o_file, $l_data ) = @_;
 
     # Before proceeding we ask the user what to do with $o_file
@@ -309,6 +331,21 @@ sub convert {
                 }
             );
         }
+        elsif ( $method =~ /2omop$/ ) {
+
+            for my $table ( keys %$data ) {
+                my $filepath = catfile( $o_file . "_$table.csv" );
+                my @headers  = @{ $omop_headers->{$table} };
+                write_csv(
+                    {
+                        sep      => ";",                # or the separator your CSV requires
+                        filepath => $filepath,
+                        headers  => \@headers,
+                        data     => $data->{$table},    # array-of-hashes
+                    }
+                );
+            }
+        }
         else {
             io_yaml_or_json(
                 {
@@ -325,7 +362,6 @@ sub convert {
 }
 
 sub program_header {
-
     my $version = shift;
     my $str     = <<EOF;
 ****************************************
@@ -340,7 +376,6 @@ EOF
 }
 
 sub program_footer {
-
     my $str = <<EOF;
 All done!
 
@@ -349,7 +384,6 @@ EOF
 }
 
 sub program_body {
-
     my $l_data = shift;
     my $file =
       $l_data->{method} =~ m/^omop/
@@ -363,33 +397,33 @@ EOF
 }
 
 sub write_log {
-
     my ( $log, $data ) = @_;
 
     # Detecting the number of logical CPUs across different OSes
     my $os = $^O;
     chomp(
-        my $ncpuhost =
-          lc($os) eq 'darwin' || lc($os) eq 'freebsd' ? qx{sysctl -n hw.ncpu}
-        : $os eq 'MSWin32' ? qx{wmic cpu get NumberOfLogicalProcessors}
-        :                    qx{/usr/bin/nproc} // 1
+        my $threadshost =
+          lc($os) eq 'darwin' ? qx{/usr/sbin/sysctl -n hw.logicalcpu}
+        : lc($os) eq 'freebsd' ? qx{sysctl -n hw.ncpu}
+        : $os eq 'MSWin32'     ? qx{wmic cpu get NumberOfLogicalProcessors}
+        :                        qx{/usr/bin/nproc} // 1
     );
 
     # For the Windows command, the result will also contain the string
     # "NumberOfLogicalProcessors" which is the header of the output.
     # So we need to extract the actual number from it:
     if ( $os eq 'MSWin32' ) {
-        ($ncpuhost) = $ncpuhost =~ /(\d+)/;
+        ($threadshost) = $threadshost =~ /(\d+)/;
     }
-    $ncpuhost = 0 + $ncpuhost;    # coercing it to be a number
+    $threadshost = 0 + $threadshost;    # coercing it to be a number
 
     my $info = {
-        date      => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
-        ncpuhost  => $ncpuhost,
-        hostname  => hostname,
-        id        => $data->{id},                                      # string
-        version   => $VERSION,
-             user => $ENV{'LOGNAME'}
+        date        => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
+        threadshost => $threadshost,
+        hostname    => hostname,
+        id          => $data->{id},                                      # string
+        version     => $VERSION,
+             user   => $ENV{'LOGNAME'}
           || $ENV{'USER'}
           || $ENV{'USERNAME'}
           || 'dummy-user'
@@ -407,7 +441,6 @@ sub write_log {
 }
 
 sub ask_overwrite {
-
     my $filepath = shift;
 
     # Check if the file exists
@@ -457,14 +490,11 @@ convert-pheno - A script to interconvert common data models for phenotypic data
 
              (Wish-list)
              #-iopenehr               openEHR
-             #-ifhir                  HL7/FHIR
 
        (output-type):
              -obff                    Beacon v2 Models ('individuals' JSON|YAML) file
              -opxf                    Phenopacket v2 (JSON|YAML) file
-
-             (Wish-list)
-             #-oomop                  OMOP-CDM PostgreSQL dump
+             -oomop   (experimental)  Prefix for OMOP-CDM tables (CSV)
 
              Compatible with -i(bff|pxf):
              -ocsv                    Flatten data to CSV
@@ -473,9 +503,10 @@ convert-pheno - A script to interconvert common data models for phenotypic data
 
      Options:
        -exposures-file <file>         CSV file with a list of 'concept_id' considered to be exposures (with -iomop)
+       -levenshtein-weight <weight>   Set the normalized Levenshtein weight for fuzzy search composite scoring (default: 0.1, range: 0-1)
        -mapping-file <file>           Fields mapping YAML (or JSON) file
        -max-lines-sql <number>        Maximum lines read per table from SQL dump [500]
-       -min-text-similarity-score <score> Minimum score for cosine similarity (or Sorensen-Dice coefficient) [0.8] (to be used with --search mixed)
+       -min-text-similarity-score <score> Minimum score for cosine similarity (or Sorensen-Dice coefficient) [0.8] (to be used with --search [mixed|fuzzy])
        -ohdsi-db                      Use Athena-OHDSI database (~2.2GB) with -iomop
        -omop-tables <tables>          OMOP-CDM tables to be processed. Tables <CONCEPT> and <PERSON> are always included.
        -out-dir <directory>           Output (existing) directory
@@ -484,7 +515,7 @@ convert-pheno - A script to interconvert common data models for phenotypic data
        -phl|print-hidden-labels       Print original values (before DB mapping) of text fields <_labels>
        -rcd|redcap-dictionary <file>  REDCap data dictionary CSV file
        -schema-file <file>            Alternative JSON Schema for mapping file
-       -search <type>                 Type of search [>exact|mixed]
+       -search <type>                 Type of search [>exact|mixed|fuzzy]
        -svs|self-validate-schema      Perform a self-validation of the JSON schema that defines mapping (requires IO::Socket::SSL)
        -sep|separator <char>          Delimiter character for CSV files [;] e.g., --sep $'\t'
        -stream                        Enable incremental processing with -iomop and -obff [>no-stream|stream]
@@ -525,14 +556,9 @@ First install system level dependencies:
 
   sudo apt-get install cpanminus libbz2-dev zlib1g-dev libperl-dev libssl-dev
 
-Now you have two choose between one of the 3 options below:
+Now you have two choose between one of the 2 options below:
 
-B<Option 1:> System-level installation:
-
-  cpanm --notest --sudo Convert::Pheno
-  convert-pheno -h
-
-B<Option 2:> Install Convert-Pheno and the dependencies at C<~/perl5>
+B<Option 1:> Install Convert-Pheno and the dependencies at C<~/perl5>
 
   cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
   cpanm --notest Convert::Pheno
@@ -542,7 +568,11 @@ To ensure Perl recognizes your local modules every time you start a new terminal
 
   echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
 
-B<Option 3:> Install Convert-Pheno and the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
+To B<update> to the newest version:
+
+  cpanm Convert::Pheno
+
+B<Option 2:> Install Convert-Pheno and the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
 
   mkdir local
   cpanm --notest --local-lib=local/ Carton
@@ -557,21 +587,22 @@ Please follow L<these instructions|https://cnag-biomedical-informatics.github.io
 
 =head3 Method 3: From Github
 
+To clone the repository for the first time:
+
   git clone https://github.com/cnag-biomedical-informatics/convert-pheno.git
   cd convert-pheno
+
+To update an existing clone, navigate to the repository folder and run:
+
+  git pull
 
 Install system level dependencies:
   
   sudo apt-get install cpanminus libbz2-dev zlib1g-dev libperl-dev libssl-dev
 
-Now you have two choose between one of the 3 options below:
+Now you have two choose between one of the 2 options below:
 
-B<Option 1:> Install dependencies (they're harmless to your system) as C<sudo>:
-
-  cpanm --notest --sudo --installdeps .
-  bin/convert-pheno --help            
-
-B<Option 2:> Install the dependencies at C<~/perl5>:
+B<Option 1:> Install the dependencies at C<~/perl5>:
 
   cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
   cpanm --notest --installdeps .
@@ -581,7 +612,7 @@ To ensure Perl recognizes your local modules every time you start a new terminal
 
   echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
 
-B<Option 3:> Install the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
+B<Option 2:> Install the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
 
   mkdir local
   cpanm --notest --local-lib=local/ Carton
@@ -593,6 +624,8 @@ B<Option 3:> Install the dependencies in a "virtual environment" (at C<local/>) 
 
 =head3 Method 4: From Docker Hub
 
+(Estimated Time: Approximately 15 seconds)
+
 Download the latest version of the Docker image (supports both amd64 and arm64 architectures) from L<Docker Hub|https://hub.docker.com/r/manuelrueda/convert-pheno> by executing:
 
   docker pull manuelrueda/convert-pheno:latest
@@ -601,6 +634,8 @@ Download the latest version of the Docker image (supports both amd64 and arm64 a
 See additional instructions below.
 
 =head3 Method 5: With Dockerfile
+
+(Estimated Time: Approximately 3 minutes)
 
 Please download the C<Dockerfile> from the repo:
 
@@ -653,7 +688,8 @@ Then I will do something like this:
 
 =head3 System requirements
 
-  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse, MacOS) should do as well.
+  - OS/ARCH supported: B<linux/amd64> and B<linux/arm64>.
+  - Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOS, OpenSUSE) should do as well (untested).
     (It should also work on macOS and Windows Server, but we are only providing information for Linux here)
   * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
   * >= 4GB of RAM
@@ -668,7 +704,9 @@ For executing convert-pheno you will need:
 
 =item Input file(s):
       
-A text file in one of the accepted formats. With C<--iomop> I/O files can be gzipped.
+A text file in one of the accepted formats.
+
+Note that when using C<--iomop>, I/O files can be gzipped.
 
 =item Optional: 
 
@@ -700,13 +738,19 @@ b) Use the option C<--path-to-ohdsi-db>
 
 B<Examples:>
 
- $ bin/convert-pheno -ipxf phenopackets.json -obff individuals.json
+Note that you can find input examples for all conversions within the C<t/> directory of this repository:
 
- $ $path/convert-pheno -ibff individuals.json -opxf phenopackets.yaml --out-dir my_out_dir 
+ $ bin/convert-pheno -ipxf t/pxf2bff/in/pxf.json -obff individuals.json
+
+ $ bin/convert-pheno -ibff t/bff2pxf/in/individuals.json -opxf phenopackets.yaml --out-dir my_out_dir 
+
+ $ bin/convert-pheno -iomop t/omop2bff/in/omop_cdm_eunomia.sql -opxf phenopackets.json -max-lines-sql 2694
+
+ $ bin/convert-pheno -ibff t/bff2omop/in/individuals.json -oomop my_prefix --ohdsi-db # Needs ohdsi.db
+
+Generic examples:
 
  $ $path/convert-pheno -iredcap redcap.csv -opxf phenopackets.json --redcap-dictionary redcap_dict.csv --mapping-file mapping_file.yaml
-
- $ $path/convert-pheno -iomop dump.sql -obff individuals.json
 
  $ $path/convert-pheno -iomop dump.sql.gz -obff individuals.json.gz --stream -omop-tables measurement -verbose
 
@@ -726,8 +770,9 @@ B<Examples:>
    Example for tab separator in CLI.
     --sep  $'\t' 
 
- * Error message: Foo
-   Solution: Bar
+ * Error message: Error: malformed UTF-8 character in JSON string, at character offses...
+   Solution:  iconv -f ISO-8859-1 -t UTF-8 yourfile.json -o yourfile-utf8.json
+
 
 =head1 CITATION
 
@@ -741,8 +786,6 @@ Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022-2025, Manuel Rueda - CNAG.
-
-This program is free software, you can redistribute it and/or modify it under the terms of the L<Artistic License version 2.0|perlartistic>.
+This PERL file is copyrighted. See the LICENSE file included in this distribution.
 
 =cut

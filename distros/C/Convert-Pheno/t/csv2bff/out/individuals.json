@@ -2,6 +2,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -21,6 +26,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -40,6 +50,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -66,6 +81,11 @@
       "exposures" : [
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P14Y"
@@ -74,8 +94,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -99,13 +119,14 @@
             "Ethnicity" : "Caucasian",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 16.9,
-            "PatientID" : "P001",
+            "PatientId" : "P001",
             "PhenotypicFeature_1" : "Abnormal heart valve morphology",
             "PhenotypicFeature_2" : "Emphysema",
             "Platelets (10^9/L)" : 288,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 62,
+            "VisitOccurrenceId" : 1,
             "WBC (10^9/L)" : 5.4
          },
          "project" : {
@@ -118,6 +139,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -148,6 +174,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -178,6 +209,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -208,6 +244,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -240,6 +281,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -248,6 +294,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -267,6 +318,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "1",
+               "id" : 1,
+               "occurrence_id" : "1"
             },
             "ageAtOnset" : {
                "age" : {
@@ -321,6 +377,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -340,6 +401,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -359,6 +425,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -385,6 +456,11 @@
       "exposures" : [
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P14Y"
@@ -393,8 +469,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -418,13 +494,14 @@
             "Ethnicity" : "Caucasian",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 12.6,
-            "PatientID" : "P001",
+            "PatientId" : "P001",
             "PhenotypicFeature_1" : "Abnormal heart valve morphology",
             "PhenotypicFeature_2" : "Emphysema",
             "Platelets (10^9/L)" : 272,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 62,
+            "VisitOccurrenceId" : 2,
             "WBC (10^9/L)" : 8.6
          },
          "project" : {
@@ -437,6 +514,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -467,6 +549,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -497,6 +584,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -527,6 +619,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -559,6 +656,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -567,6 +669,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -586,6 +693,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "2",
+               "id" : 2,
+               "occurrence_id" : "2"
             },
             "ageAtOnset" : {
                "age" : {
@@ -640,6 +752,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -659,6 +776,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -678,6 +800,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -716,13 +843,14 @@
             "Ethnicity" : "Hispanic",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 16.3,
-            "PatientID" : "P002",
+            "PatientId" : "P002",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 206,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 25,
+            "VisitOccurrenceId" : 3,
             "WBC (10^9/L)" : 10.9
          },
          "project" : {
@@ -735,6 +863,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -765,6 +898,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -795,6 +933,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -825,6 +968,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -857,6 +1005,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -865,6 +1018,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -884,6 +1042,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Metformin"
+            },
+            "_visit" : {
+               "composite" : "3",
+               "id" : 3,
+               "occurrence_id" : "3"
             },
             "ageAtOnset" : {
                "age" : {
@@ -938,6 +1101,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -957,6 +1125,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -976,6 +1149,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1014,13 +1192,14 @@
             "Ethnicity" : "Hispanic",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 12.9,
-            "PatientID" : "P002",
+            "PatientId" : "P002",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 244,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 25,
+            "VisitOccurrenceId" : 4,
             "WBC (10^9/L)" : 5.5
          },
          "project" : {
@@ -1033,6 +1212,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -1063,6 +1247,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -1093,6 +1282,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -1123,6 +1317,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -1155,6 +1354,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -1163,6 +1367,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -1182,6 +1391,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Metformin"
+            },
+            "_visit" : {
+               "composite" : "4",
+               "id" : 4,
+               "occurrence_id" : "4"
             },
             "ageAtOnset" : {
                "age" : {
@@ -1236,6 +1450,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1255,6 +1474,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1274,6 +1498,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1300,6 +1529,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P26Y"
@@ -1319,6 +1553,11 @@
          },
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P17Y"
@@ -1327,8 +1566,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -1352,13 +1591,14 @@
             "Ethnicity" : "Native American",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 14.3,
-            "PatientID" : "P003",
+            "PatientId" : "P003",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 247,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 36,
+            "VisitOccurrenceId" : 5,
             "WBC (10^9/L)" : 10.7
          },
          "project" : {
@@ -1371,6 +1611,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -1401,6 +1646,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -1431,6 +1681,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -1461,6 +1716,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -1493,6 +1753,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -1501,6 +1766,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -1520,6 +1790,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Albuterol"
+            },
+            "_visit" : {
+               "composite" : "5",
+               "id" : 5,
+               "occurrence_id" : "5"
             },
             "ageAtOnset" : {
                "age" : {
@@ -1574,6 +1849,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1593,6 +1873,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1612,6 +1897,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1638,6 +1928,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P26Y"
@@ -1657,6 +1952,11 @@
          },
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P17Y"
@@ -1665,8 +1965,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -1690,13 +1990,14 @@
             "Ethnicity" : "Native American",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 14.9,
-            "PatientID" : "P003",
+            "PatientId" : "P003",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 274,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 36,
+            "VisitOccurrenceId" : 6,
             "WBC (10^9/L)" : 4.7
          },
          "project" : {
@@ -1709,6 +2010,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -1739,6 +2045,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -1769,6 +2080,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -1799,6 +2115,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -1831,6 +2152,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -1839,6 +2165,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -1858,6 +2189,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Albuterol"
+            },
+            "_visit" : {
+               "composite" : "6",
+               "id" : 6,
+               "occurrence_id" : "6"
             },
             "ageAtOnset" : {
                "age" : {
@@ -1912,6 +2248,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1931,6 +2272,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1950,6 +2296,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -1988,13 +2339,14 @@
             "Ethnicity" : "Native American",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 12,
-            "PatientID" : "P004",
+            "PatientId" : "P004",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 194,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 7,
             "WBC (10^9/L)" : 10.2
          },
          "project" : {
@@ -2007,6 +2359,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -2037,6 +2394,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -2067,6 +2429,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -2097,6 +2464,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -2129,6 +2501,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -2137,6 +2514,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -2156,6 +2538,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Albuterol"
+            },
+            "_visit" : {
+               "composite" : "7",
+               "id" : 7,
+               "occurrence_id" : "7"
             },
             "ageAtOnset" : {
                "age" : {
@@ -2210,6 +2597,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2229,6 +2621,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2248,6 +2645,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2286,13 +2688,14 @@
             "Ethnicity" : "Native American",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 11.5,
-            "PatientID" : "P004",
+            "PatientId" : "P004",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 227,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 8,
             "WBC (10^9/L)" : 6.3
          },
          "project" : {
@@ -2305,6 +2708,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -2335,6 +2743,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -2365,6 +2778,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -2395,6 +2813,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -2427,6 +2850,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -2435,6 +2863,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -2454,6 +2887,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Albuterol"
+            },
+            "_visit" : {
+               "composite" : "8",
+               "id" : 8,
+               "occurrence_id" : "8"
             },
             "ageAtOnset" : {
                "age" : {
@@ -2508,6 +2946,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2527,6 +2970,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2546,6 +2994,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2572,6 +3025,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P41Y"
@@ -2605,13 +3063,14 @@
             "Ethnicity" : "African American",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 13.5,
-            "PatientID" : "P005",
+            "PatientId" : "P005",
             "PhenotypicFeature_1" : "Abnormal heart valve morphology",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 336,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 9,
             "WBC (10^9/L)" : 5.7
          },
          "project" : {
@@ -2624,6 +3083,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -2654,6 +3118,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -2684,6 +3153,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -2714,6 +3188,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -2746,6 +3225,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -2754,6 +3238,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -2773,6 +3262,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Atorvastatin"
+            },
+            "_visit" : {
+               "composite" : "9",
+               "id" : 9,
+               "occurrence_id" : "9"
             },
             "ageAtOnset" : {
                "age" : {
@@ -2827,6 +3321,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2846,6 +3345,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2865,6 +3369,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -2891,6 +3400,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P41Y"
@@ -2924,13 +3438,14 @@
             "Ethnicity" : "African American",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 16.8,
-            "PatientID" : "P005",
+            "PatientId" : "P005",
             "PhenotypicFeature_1" : "Abnormal heart valve morphology",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 345,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 10,
             "WBC (10^9/L)" : 9.1
          },
          "project" : {
@@ -2943,6 +3458,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -2973,6 +3493,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -3003,6 +3528,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -3033,6 +3563,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -3065,6 +3600,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -3073,6 +3613,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -3092,6 +3637,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Atorvastatin"
+            },
+            "_visit" : {
+               "composite" : "10",
+               "id" : 10,
+               "occurrence_id" : "10"
             },
             "ageAtOnset" : {
                "age" : {
@@ -3146,6 +3696,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3165,6 +3720,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3184,6 +3744,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3210,6 +3775,11 @@
       "exposures" : [
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P21Y"
@@ -3218,8 +3788,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -3243,13 +3813,14 @@
             "Ethnicity" : "Asian",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 12.5,
-            "PatientID" : "P006",
+            "PatientId" : "P006",
             "PhenotypicFeature_1" : "Abnormal heart valve morphology",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 220,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 25,
+            "VisitOccurrenceId" : 11,
             "WBC (10^9/L)" : 6.8
          },
          "project" : {
@@ -3262,6 +3833,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -3292,6 +3868,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -3322,6 +3903,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -3352,6 +3938,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -3384,6 +3975,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -3392,6 +3988,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -3411,6 +4012,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "11",
+               "id" : 11,
+               "occurrence_id" : "11"
             },
             "ageAtOnset" : {
                "age" : {
@@ -3465,6 +4071,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3484,6 +4095,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3503,6 +4119,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3529,6 +4150,11 @@
       "exposures" : [
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P21Y"
@@ -3537,8 +4163,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -3562,13 +4188,14 @@
             "Ethnicity" : "Asian",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 12.6,
-            "PatientID" : "P006",
+            "PatientId" : "P006",
             "PhenotypicFeature_1" : "Abnormal heart valve morphology",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 399,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 25,
+            "VisitOccurrenceId" : 12,
             "WBC (10^9/L)" : 8.8
          },
          "project" : {
@@ -3581,6 +4208,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -3611,6 +4243,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -3641,6 +4278,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -3671,6 +4313,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -3703,6 +4350,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -3711,6 +4363,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -3730,6 +4387,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "12",
+               "id" : 12,
+               "occurrence_id" : "12"
             },
             "ageAtOnset" : {
                "age" : {
@@ -3784,6 +4446,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3803,6 +4470,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3822,6 +4494,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -3848,6 +4525,11 @@
       "exposures" : [
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P49Y"
@@ -3856,8 +4538,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -3881,13 +4563,14 @@
             "Ethnicity" : "Asian",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 15.8,
-            "PatientID" : "P007",
+            "PatientId" : "P007",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 259,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 13,
             "WBC (10^9/L)" : 5.7
          },
          "project" : {
@@ -3900,6 +4583,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -3930,6 +4618,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -3960,6 +4653,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -3990,6 +4688,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -4022,6 +4725,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -4030,6 +4738,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -4049,6 +4762,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Albuterol"
+            },
+            "_visit" : {
+               "composite" : "13",
+               "id" : 13,
+               "occurrence_id" : "13"
             },
             "ageAtOnset" : {
                "age" : {
@@ -4103,6 +4821,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4122,6 +4845,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4141,6 +4869,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4167,6 +4900,11 @@
       "exposures" : [
          {
             "_info" : "TobaccoUse",
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P49Y"
@@ -4175,8 +4913,8 @@
             "date" : "1900-01-01",
             "duration" : "P999Y",
             "exposureCode" : {
-               "id" : "NCIT:C154329",
-               "label" : "Smoking"
+               "id" : "NCIT:C891",
+               "label" : "Tobacco"
             },
             "unit" : {
                "id" : "NCIT:C49488",
@@ -4200,13 +4938,14 @@
             "Ethnicity" : "Asian",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 16.8,
-            "PatientID" : "P007",
+            "PatientId" : "P007",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 243,
             "Sex" : "Male",
             "TobaccoUse" : "Yes",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 14,
             "WBC (10^9/L)" : 5.6
          },
          "project" : {
@@ -4219,6 +4958,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -4249,6 +4993,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -4279,6 +5028,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -4309,6 +5063,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -4341,6 +5100,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -4349,6 +5113,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -4368,6 +5137,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Albuterol"
+            },
+            "_visit" : {
+               "composite" : "14",
+               "id" : 14,
+               "occurrence_id" : "14"
             },
             "ageAtOnset" : {
                "age" : {
@@ -4422,6 +5196,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4441,6 +5220,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4460,6 +5244,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4498,13 +5287,14 @@
             "Ethnicity" : "Asian",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 13.2,
-            "PatientID" : "P008",
+            "PatientId" : "P008",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 385,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 15,
             "WBC (10^9/L)" : 8
          },
          "project" : {
@@ -4517,6 +5307,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -4547,6 +5342,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -4577,6 +5377,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -4607,6 +5412,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -4639,6 +5449,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -4647,6 +5462,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -4666,6 +5486,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "15",
+               "id" : 15,
+               "occurrence_id" : "15"
             },
             "ageAtOnset" : {
                "age" : {
@@ -4720,6 +5545,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4739,6 +5569,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4758,6 +5593,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -4796,13 +5636,14 @@
             "Ethnicity" : "Asian",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 12.1,
-            "PatientID" : "P008",
+            "PatientId" : "P008",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 372,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 16,
             "WBC (10^9/L)" : 6
          },
          "project" : {
@@ -4815,6 +5656,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -4845,6 +5691,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -4875,6 +5726,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -4905,6 +5761,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -4937,6 +5798,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -4945,6 +5811,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -4964,6 +5835,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "16",
+               "id" : 16,
+               "occurrence_id" : "16"
             },
             "ageAtOnset" : {
                "age" : {
@@ -5018,6 +5894,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5037,6 +5918,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5056,6 +5942,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5082,6 +5973,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P15Y"
@@ -5115,13 +6011,14 @@
             "Ethnicity" : "Native American",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 13.5,
-            "PatientID" : "P009",
+            "PatientId" : "P009",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 292,
             "Sex" : "Female",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 25,
+            "VisitOccurrenceId" : 17,
             "WBC (10^9/L)" : 8.3
          },
          "project" : {
@@ -5134,6 +6031,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -5164,6 +6066,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -5194,6 +6101,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -5224,6 +6136,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -5256,6 +6173,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -5264,6 +6186,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -5283,6 +6210,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Metformin"
+            },
+            "_visit" : {
+               "composite" : "17",
+               "id" : 17,
+               "occurrence_id" : "17"
             },
             "ageAtOnset" : {
                "age" : {
@@ -5337,6 +6269,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5356,6 +6293,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5375,6 +6317,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5401,6 +6348,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P15Y"
@@ -5434,13 +6386,14 @@
             "Ethnicity" : "Native American",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 11.4,
-            "PatientID" : "P009",
+            "PatientId" : "P009",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Limitation of joint mobility",
             "Platelets (10^9/L)" : 156,
             "Sex" : "Female",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 25,
+            "VisitOccurrenceId" : 18,
             "WBC (10^9/L)" : 10
          },
          "project" : {
@@ -5453,6 +6406,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -5483,6 +6441,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -5513,6 +6476,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -5543,6 +6511,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -5575,6 +6548,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -5583,6 +6561,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
+            },
             "excluded" : false,
             "excluded_ori" : "Limitation of joint mobility",
             "featureType" : {
@@ -5602,6 +6585,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Metformin"
+            },
+            "_visit" : {
+               "composite" : "18",
+               "id" : 18,
+               "occurrence_id" : "18"
             },
             "ageAtOnset" : {
                "age" : {
@@ -5656,6 +6644,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5675,6 +6668,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5694,6 +6692,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5720,6 +6723,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P28Y"
@@ -5753,13 +6761,14 @@
             "Ethnicity" : "Caucasian",
             "EventName" : "Baseline",
             "Hemoglobin (g/dL)" : 13.9,
-            "PatientID" : "P010",
+            "PatientId" : "P010",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 275,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 19,
             "WBC (10^9/L)" : 9.4
          },
          "project" : {
@@ -5772,6 +6781,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -5802,6 +6816,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -5832,6 +6851,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -5862,6 +6886,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -5894,6 +6923,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -5902,6 +6936,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -5921,6 +6960,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "19",
+               "id" : 19,
+               "occurrence_id" : "19"
             },
             "ageAtOnset" : {
                "age" : {
@@ -5975,6 +7019,11 @@
    {
       "diseases" : [
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -5994,6 +7043,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -6013,6 +7067,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "ageOfOnset" : {
                "age" : {
                   "iso8601duration" : "P999Y"
@@ -6039,6 +7098,11 @@
       "exposures" : [
          {
             "_info" : "AlcoholUse",
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "ageAtExposure" : {
                "age" : {
                   "iso8601duration" : "P28Y"
@@ -6072,13 +7136,14 @@
             "Ethnicity" : "Caucasian",
             "EventName" : "Treatment",
             "Hemoglobin (g/dL)" : 15.3,
-            "PatientID" : "P010",
+            "PatientId" : "P010",
             "PhenotypicFeature_1" : "Emphysema",
             "PhenotypicFeature_2" : "Abnormal heart valve morphology",
             "Platelets (10^9/L)" : 390,
             "Sex" : "Male",
             "TobaccoUse" : "No",
             "TreatmentDuration (weeks)" : 22,
+            "VisitOccurrenceId" : 20,
             "WBC (10^9/L)" : 6.7
          },
          "project" : {
@@ -6091,6 +7156,11 @@
       },
       "measures" : [
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "assayCode" : {
                "id" : "NCIT:C64848",
                "label" : "Hemoglobin Measurement"
@@ -6121,6 +7191,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "assayCode" : {
                "id" : "NCIT:C12529",
                "label" : "Leukocyte"
@@ -6151,6 +7226,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "assayCode" : {
                "id" : "NCIT:C51951",
                "label" : "Platelet Count"
@@ -6181,6 +7261,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "assayCode" : {
                "id" : "NCIT:C16358",
                "label" : "Body Mass Index"
@@ -6213,6 +7298,11 @@
       ],
       "phenotypicFeatures" : [
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "excluded" : false,
             "excluded_ori" : "Emphysema",
             "featureType" : {
@@ -6221,6 +7311,11 @@
             }
          },
          {
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
+            },
             "excluded" : false,
             "excluded_ori" : "Abnormal heart valve morphology",
             "featureType" : {
@@ -6240,6 +7335,11 @@
                "field" : "DrugName",
                "route" : "oral",
                "value" : "Lisinopril"
+            },
+            "_visit" : {
+               "composite" : "20",
+               "id" : 20,
+               "occurrence_id" : "20"
             },
             "ageAtOnset" : {
                "age" : {

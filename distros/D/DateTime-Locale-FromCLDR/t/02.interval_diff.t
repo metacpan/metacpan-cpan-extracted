@@ -200,7 +200,8 @@ diag( "Comparing ", $dt1->iso8601, " and ", $dt2->iso8601 ) if( $DEBUG );
 $diff = $locale->interval_greatest_diff( $dt1, $dt2 );
 BAIL_OUT( $locale->error ) if( !defined( $diff ) && $locale->error );
 diag( "Greatest difference is: '${diff}'" ) if( $DEBUG );
-is( $diff, 'B', 'B' );
+# is( $diff, 'B', 'B' );
+is( $diff, 'h', 'h' );
 
 # NOTE: Different hours
 diag( "Testing different hours" ) if( $DEBUG );

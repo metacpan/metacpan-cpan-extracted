@@ -20,12 +20,13 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Array - Corresponds to a PDF array. 
+PDF::Builder::Basic::PDF::Array - Corresponds to a PDF array
+
 Inherits from L<PDF::Builder::Basic::PDF::Objind>
 
 =head1 METHODS
@@ -71,6 +72,11 @@ sub outobjdeep {
 
     $fh->print('[ ');
     foreach my $obj (@{$self->{' val'}}) {
+	# if no graphics object (page->gfx), creates an invalid Contents object
+	# (unblessed HASH containing no keys) for this page's graphics, and
+	# this function blows up
+        if ($obj !~ /^PDF::Builder/) { next; }
+
         $obj->outobj($fh, $pdf);
         $fh->print(' ');
     }

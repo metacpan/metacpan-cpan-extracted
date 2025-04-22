@@ -40,6 +40,8 @@ t/Sample.pm
 t/OtherLink.pm
 t/other-link-map.xml
 t/sample.xml
+t/unicode-map.xml
+t/unicode-map.t
 t/lib/BadSample.pm
 t/lib/Sample.pm
 t/lib/SampleJson.pm

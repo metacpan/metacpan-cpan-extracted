@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use POSIX ();
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use overload fallback => 1, 
 	'""' => \&_num,
@@ -54,7 +54,7 @@ smallnum - Transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
@@ -109,32 +109,21 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=smallnum>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/smallnum>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/smallnum>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/smallnum>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020->2021 by LNATION.
+This software is Copyright (c) 2020->2025 by LNATION.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 

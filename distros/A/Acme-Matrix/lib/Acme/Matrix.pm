@@ -1,5 +1,5 @@
 package Acme::Matrix;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use 5.006; use strict; use warnings;
 use Term::ReadKey; 
 
@@ -93,7 +93,7 @@ Acme::Matrix - Heavenly digital rain
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
@@ -154,10 +154,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Matrix>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Acme-Matrix>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Acme-Matrix>
@@ -168,7 +164,7 @@ L<https://metacpan.org/release/Acme-Matrix>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by LNATION.
+This software is Copyright (c) 2023->2025 by LNATION.
 
 This is free software, licensed under:
 

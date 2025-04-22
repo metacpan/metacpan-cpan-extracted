@@ -3,12 +3,14 @@ package PDF::Builder::Resource::Font::CoreFont::helveticaboldoblique;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.019'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Resource::Font::CoreFont::helveticaboldoblique - font-specific information for bold weight + slanted Helvetica font. Metrics and glyph list from Arial font.
+PDF::Builder::Resource::Font::CoreFont::helveticaboldoblique - Font-specific information for bold weight + slanted Helvetica font
+
+Metrics and glyph list are from the Arial typeface
 
 =cut
 

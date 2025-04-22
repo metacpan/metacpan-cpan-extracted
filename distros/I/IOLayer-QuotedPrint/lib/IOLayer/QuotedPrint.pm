@@ -4,7 +4,7 @@ package IOLayer::QuotedPrint;
 # Set the version info
 
 use strict;
-$IOLayer::QuotedPrint::VERSION = 0.05;
+$IOLayer::QuotedPrint::VERSION = 0.06;
 
 # Make sure the encoding/decoding stuff is available
 
@@ -69,7 +69,7 @@ from a handle, and it will encode as quoted-printable while writing to a handle.
 
 =head1 COPYRIGHT
 
-maintained by LNATION, <thisusedtobeanemail@gmail.com>
+maintained by LNATION, <email@lnation.org> 2019 -> 2025>
 
 Copyright 2002 Elizabeth Mattijsen.  Based on example that was initially
 added to MIME::QuotedPrint.pm for the 5.8.0 distribution of Perl.

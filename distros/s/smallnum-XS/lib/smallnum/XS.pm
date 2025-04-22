@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use overload;
 require XSLoader;
 XSLoader::load('smallnum::XS', $VERSION);
@@ -27,7 +27,7 @@ smallnum::XS - faster transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -104,19 +104,13 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=smallnum-XS>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/smallnum-XS>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/smallnum-XS>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 

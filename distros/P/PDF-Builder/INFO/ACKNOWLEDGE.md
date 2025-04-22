@@ -11,7 +11,9 @@ inclined).
 
 - Starting with the origins of the package, **Alfred Reibenschuh** built the 
 original _PDF::API2_ library, drawing on work by **Martin Hosken** 
-(_Text::PDF_, via the _Text::PDF::API_ wrapper).
+(_Text::PDF_, via the _Text::PDF::API_ wrapper). Reibenschuh has also been
+actively participating in discussions about where _PDF::Builder_ can
+go in future developments.
 - **Steve Simms** took over _PDF::API2_ and has continued to maintain it and
 extend its functionality. Much of his work is incorporated into _PDF::Builder_
 after the latter was forked from the former.
@@ -19,12 +21,13 @@ after the latter was forked from the former.
 contributed much work to TIFF image support.
 - **Ben Bullock** added features to the PNG library to support the needs of
 this package.
-- **Johan Vromans** wrote a number of packages, which, while not used by (or 
-directly contributing code to) _PDF::Builder_, did inspire the Font Manager 
-and some aspects of markup language support. His _HarfBuzz::Shaper_ can be
-used by _PDF::Builder_ applications to support many text shaping features. He 
-also has discussed with us many aspects of text processing that may prove 
-useful in future code and may show up later.
+- **Johan Vromans** wrote the SVG-to-PDF library package (_SVGPDF_) for SVG 
+image support, and _HarfBuzz::Shaper_, which can be used by _PDF::Builder_ 
+applications to support many text shaping features. He also wrote a number of 
+other packages, which, while not used by (or directly contributing code to) 
+_PDF::Builder_, did inspire the Font Manager and some aspects of markup 
+language support. He also has discussed with us many aspects of text processing 
+that may prove useful in future code and may show up later.
 - **Vadim Repin** contributed a number of fixes and minor enhancements.
 - **Davide Cervone** contributed support for allowing _PDF::Builder_ to 
 interface with _MathJax_ (NodeJS) for equation support `(upcoming feature)`.

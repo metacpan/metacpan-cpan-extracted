@@ -20,15 +20,17 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;
 use PDF::Builder::Basic::PDF::Utils;
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Page - Represents a PDF page, inherits from L<PDF::Builder::Basic::PDF::Pages>
+PDF::Builder::Basic::PDF::Page - Represents a PDF page
+
+Inherits from L<PDF::Builder::Basic::PDF::Pages>
 
 =head1 DESCRIPTION
 

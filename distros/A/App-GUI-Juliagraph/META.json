@@ -1,5 +1,5 @@
 {
-   "abstract" : "drawing Mandelbrot and Julia fractals",
+   "abstract" : "drawing Mandelbrot and Julia fractals with complex equations",
    "author" : [
       "Herbert Breunung <lichtkind@cpan.org>"
    ],
@@ -53,7 +53,7 @@
    "provides" : {
       "App::GUI::Juliagraph" : {
          "file" : "lib/App/GUI/Juliagraph.pm",
-         "version" : "0.5"
+         "version" : "0.7"
       }
    },
    "release_status" : "stable",
@@ -64,7 +64,7 @@
          "web" : "https://github.com/lichtkind/App-GUI-Juliagraph"
       }
    },
-   "version" : "0.5",
+   "version" : "0.7",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "GPL-3.0-only"

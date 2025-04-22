@@ -171,10 +171,6 @@ sub new_from_header
     {
         my $header_val = shift( @parts );
         my( $n, $v ) = split( /[[:blank:]\h]*\=[[:blank:]\h]*/, $header_val, 2 );
-    #     if( $self->debug )
-    #     {
-    #         my $trace = $self->_get_stack_trace;
-    #     }
         $v =~ s/^\"|(?<!\\)\"$//g if( CORE::defined( $v ) );
         if( $opts->{decode} )
         {
@@ -476,7 +472,6 @@ sub THAW
 }
 
 1;
-
 # NOTE: POD
 __END__
 

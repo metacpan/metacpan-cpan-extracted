@@ -12,5 +12,10 @@ dist.ini
 examples/store.cgi
 lib/File/FStore.pm
 lib/File/FStore/Adder.pm
+lib/File/FStore/Base.pm
 lib/File/FStore/File.pm
+lib/File/FStore/Migration.pm
+t/01_load.t
+t/10_create.t
+t/20_add_and_query.t
 xt/author/pod-syntax.t

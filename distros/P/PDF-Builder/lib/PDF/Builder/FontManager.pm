@@ -3,7 +3,7 @@ package PDF::Builder::FontManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
+our $VERSION = '3.027'; # VERSION
 our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
 
 use Carp;

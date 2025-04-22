@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.11.0
+## Version v0.12.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/03/21
+## Modified 2025/04/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,9 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE $FILES_TO_REMOVE 
                  $MMAP_USE_FILE_MAP $GLOBBING $ILLEGAL_CHARACTERS );
+    use Config;
     use Data::UUID ();
+    use Encode ();
     use Fcntl qw( :DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END );
     use File::Copy ();
     use File::Glob ();
@@ -31,7 +33,6 @@ BEGIN
     use Module::Generic::Finfo;
     # constants are already exported with the use Fcntl
     use Module::Generic::File::IO ();
-    # use Nice::Try;
     use Scalar::Util ();
     use URI ();
     use URI::file ();
@@ -46,6 +47,24 @@ BEGIN
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    our $FILES_TO_REMOVE;
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    
+        my %files :shared;
+    
+        $FILES_TO_REMOVE = \%files;
+    }
+    else
+    {
+        $FILES_TO_REMOVE = {};
+    }
+
     # https://en.wikipedia.org/wiki/Path_(computing)
     # perlport
     our $OS2SEP  =
@@ -120,16 +139,16 @@ BEGIN
     $MMAP_USE_FILE_MAP = 0;
     # Bug #92 <https://github.com/libwww-perl/URI/issues/92>
     # $URI::file::DEFAULT_AUTHORITY = undef;
-    $FILES_TO_REMOVE = {};
     $GLOBBING = 0;
     # [\\/:"*?<>|]+ are illegal characters under Windows
     # <https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s25.html>
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.11.0';
+    our $VERSION = 'v0.12.2';
 };
 
+use v5.12.0;
 use strict;
 no warnings 'redefine';
 
@@ -175,6 +194,7 @@ sub init
     $self->{use_file_map}   = $MMAP_USE_FILE_MAP unless( CORE::exists( $self->{use_file_map} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( %$opts );
+    $self->{_is_utf8}       = Encode::is_utf8( $self->{file} ) ? 1 : 0;
     $self->{_handle}        = '';
     # Pervious location prior to chdir, so we can revert to it when necessary
     $self->{_prev_cwd}      = '';
@@ -216,7 +236,17 @@ sub init
     }
     $file = $self->filename( $file ) || return( $self->pass_error );
     # Idea borrowed from File::Temp
-    $FILES_TO_REMOVE->{ $$ }->{ $file } = $self->{auto_remove} = 1 if( defined( $autoremove ) && $autoremove );
+    if( HAS_THREADS && is_shared( $FILES_TO_REMOVE ) )
+    {
+        lock( $FILES_TO_REMOVE );
+        $FILES_TO_REMOVE->{ $$ } //= {};
+        $FILES_TO_REMOVE->{ $$ }->{ $file } = $self->{auto_remove} = 1 if( defined( $autoremove ) && $autoremove );
+    }
+    else
+    {
+        $FILES_TO_REMOVE->{ $$ } //= {};
+        $FILES_TO_REMOVE->{ $$ }->{ $file } = $self->{auto_remove} = 1 if( defined( $autoremove ) && $autoremove );
+    }
     $self->{_orig} = [CORE::caller(1)];
     return( $self );
 }
@@ -333,15 +363,32 @@ sub auto_remove
     if( @_ )
     {
         my $v = $self->_set_get_boolean( 'auto_remove', @_ );
-        $FILES_TO_REMOVE->{ $$ } = {} if( !exists( $FILES_TO_REMOVE->{ $$ } ) );
-        my $file = $self->filename;
-        if( $v )
+        if( HAS_THREADS && is_shared( $FILES_TO_REMOVE ) )
         {
-            $FILES_TO_REMOVE->{ $$ }->{ $file } = 1;
+            lock( $FILES_TO_REMOVE );
+            $FILES_TO_REMOVE->{ $$ } = {} if( !exists( $FILES_TO_REMOVE->{ $$ } ) );
+            my $file = $self->filename;
+            if( $v )
+            {
+                $FILES_TO_REMOVE->{ $$ }->{ $file } = 1;
+            }
+            else
+            {
+                CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+            }
         }
         else
         {
-            CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+            $FILES_TO_REMOVE->{ $$ } = {} if( !exists( $FILES_TO_REMOVE->{ $$ } ) );
+            my $file = $self->filename;
+            if( $v )
+            {
+                $FILES_TO_REMOVE->{ $$ }->{ $file } = 1;
+            }
+            else
+            {
+                CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+            }
         }
     }
     return( $self->_set_get_boolean( 'auto_remove' ) );
@@ -890,6 +937,7 @@ sub content
         }
         my $vol = $self->volume;
         $a = $self->new_array( [ map( $self->_spec_catpath( $vol, $file, $_ ), grep{ !/^\.{1,2}$/ } $io->read ) ] );
+        local $@;
         # Put it back where it was
         eval
         {
@@ -1301,6 +1349,10 @@ sub filename
             # $self->{filename} = URI::file->new( $newfile )->file( $^O );
             $self->{filename} = $self->_uri_file_new( $newfile );
         }
+        if( $self->{_is_utf8} && !Encode::is_utf8( "$self->{filename}" ) )
+        {
+            $self->{filename} = Encode::decode_utf8( $self->{filename} );
+        }
         
         # It potentially does not exist
         my $finfo = $self->finfo( $newfile );
@@ -1526,7 +1578,13 @@ sub glob
             my @files;
             if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
             {
-                require File::DosGlob;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require File::DosGlob;
+                    $loaded = 1;
+                }
                 @files = File::DosGlob::glob( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path );
             }
             else
@@ -1555,7 +1613,13 @@ sub glob
         {
             if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
             {
-                require File::DosGlob;
+                state $loaded;
+                unless( $loaded )
+                {
+                    lock( $loaded ) if( HAS_THREADS );
+                    require File::DosGlob;
+                    $loaded = 1;
+                }
                 $path = File::DosGlob::glob( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path );
             }
             else
@@ -3239,7 +3303,13 @@ sub realpath
     local $@;
     my $real = eval
     {
-        require Cwd;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Cwd;
+            $loaded = 1;
+        }
         return( Cwd::realpath( $path ) );
     };
     return( $self->error( "Error getting the real path for $path: $@" ) ) if( $@ );
@@ -3276,7 +3346,13 @@ sub resolve
     {
         if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
         {
-            require File::DosGlob;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require File::DosGlob;
+                $loaded = 1;
+            }
             $path = File::DosGlob::glob( $path );
         }
         else
@@ -4262,7 +4338,13 @@ sub unload_perl
     }
     else
     {
-        require Data::Dump;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Data::Dump;
+            $loaded = 1;
+        }
         local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
         local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
         local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
@@ -4896,16 +4978,16 @@ sub _uri_file_class
     $os = $^O if( !defined( $os ) );
     my $os_map =
     {
-    dos     => 'FAT',
-    freebsd => 'Unix',
-    linux   => 'Unix',
-    mac     => 'Mac',
-    macos   => 'Mac',
-    msdos   => 'FAT',
-    mswin32 => 'Win32',
-    os2     => 'OS2',
-    qnx     => 'QNX',
-    win32   => 'Win32',
+        dos     => 'FAT',
+        freebsd => 'Unix',
+        linux   => 'Unix',
+        mac     => 'Mac',
+        macos   => 'Mac',
+        msdos   => 'FAT',
+        mswin32 => 'Win32',
+        os2     => 'OS2',
+        qnx     => 'QNX',
+        win32   => 'Win32',
     };
     # Slightly different than what File::Spec does, because the os provided is provided
     # potentially by a user
@@ -4939,17 +5021,17 @@ sub _uri_file_os_map
     my $os = shift( @_ ) || return;
     my $os_map =
     {
-    dos     => 'dos',
-    freebsd => 'Unix',
-    linux   => 'Unix',
-    mac     => 'mac',
-    macos   => 'MacOS',
-    msdos   => 'msdos',
-    mswin32 => 'MSWin32',
-    os2     => 'os2',
-    qnx     => 'qnx',
-    unix    => 'Unix',
-    win32   => 'win32',
+        dos     => 'dos',
+        freebsd => 'Unix',
+        linux   => 'Unix',
+        mac     => 'mac',
+        macos   => 'MacOS',
+        msdos   => 'msdos',
+        mswin32 => 'MSWin32',
+        os2     => 'os2',
+        qnx     => 'qnx',
+        unix    => 'Unix',
+        win32   => 'win32',
     };
     return( $os_map->{lc( $os )} );
 }
@@ -4973,7 +5055,15 @@ sub DESTROY
     if( $self->auto_remove )
     {
         return unless( CORE::exists( $FILES_TO_REMOVE->{ $$ }->{ $file } ) );
-        CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+        if( HAS_THREADS && is_shared( $FILES_TO_REMOVE ) )
+        {
+            lock( $FILES_TO_REMOVE );
+            CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+        }
+        else
+        {
+            CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
+        }
         my @info = caller();
         my $sub = [caller(1)]->[3];
         return unless( -e( $file ) );
@@ -5349,7 +5439,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.11.0
+    v0.12.2
 
 =head1 DESCRIPTION
 

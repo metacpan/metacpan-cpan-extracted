@@ -1,13 +1,13 @@
 #!perl
-use 5.010;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use Test::More 0.82;
+use lib 't/';
+use Sample;
 
-eval 'use Map::Tube::London 1.39';
-plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
 eval 'use Text::Phonetic::DaitchMokotoff';
-plan skip_all => 'Text::Phonetic::DaitchMokotoff required for this test'      if $@;
+plan skip_all => 'Text::Phonetic::DaitchMokotoff required for this test' if $@;
 
 plan tests => 15;
 
@@ -16,7 +16,7 @@ sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 diag( "*** Expect many messages saying 'Negative repeat count does nothing at ...' -- ignore these, please! *** \n",
       "*** (They are coming from Text::Phonetic::DaitchMokotoff. They are ugly but functionally harmless.)  ***" );
 
-my $tube = new_ok( 'Map::Tube::London' );
+my $tube = new_ok( 'Sample' );
 my $ret;
 
 $ret = $tube->fuzzy_find( 'Bakerloo', objects => 'lines', method => 'daitchmokotoff' );

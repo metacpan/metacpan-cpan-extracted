@@ -3,13 +3,14 @@ package PDF::Builder::Resource::Font::CoreFont::trebuchetbold;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Resource::Font::CoreFont::trebuchetbold - font-specific information for bold-weight Trebuchet font
-(I<not> standard PDF core)
+PDF::Builder::Resource::Font::CoreFont::trebuchetbold - Font-specific information for bold-weight Trebuchet font
+
+I<Not> a standard PDF core font
 
 =cut
 

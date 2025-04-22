@@ -39,6 +39,7 @@ diag( "as_hash results in: ", $o->dump( $hash ) ) if( $DEBUG );
 my $expect_hash = {
     choice => 'yes',
     choice2 => 'no',
+    error => '',
     name => 'id',
     total => 12,
     type => 'attribute',
@@ -46,7 +47,7 @@ my $expect_hash = {
     value => 'hello',
     version => 'v1.2.3',
 };
-$expect_hash->{debug_level} = 1 if( $DEBUG );
+$expect_hash->{debug_level} = $DEBUG if( $DEBUG );
 is_deeply( $hash, $expect_hash);
 if( $DEBUG )
 {
@@ -570,6 +571,7 @@ subtest "serialisation" => sub
             skip( "$serialiser serialiser is not installed", ( $has_base64 ? 14 : 11 ) );
         }
         my $bin = $o->serialise( $test, serialiser => $serialiser );
+        diag( "Serialised data for serialiser $serialiser is: '", ( $serialiser // 'undef' ), "'" ) if( $DEBUG );
         if( !defined( $bin ) )
         {
             BAIL_OUT( $o->error );
@@ -639,25 +641,16 @@ subtest "on demand" => sub
         &Module::Generic::_autoload_subs();
     }
     
-#     mkdir( 'dev/on_demand', 0755 ) if( !-e( 'dev/on_demand' ) );
     foreach my $sub ( sort( keys( %$Module::Generic::AUTOLOAD_SUBS ) ) )
     {
-#         unless( -e( "dev/on_demand/$sub.pl" ) &&
-#             !-z( "dev/on_demand/$sub.pl" ) )
-#         {
-#             my $fh = IO::File->new( ">dev/on_demand/$sub.pl" ) ||
-#                 die( "Unable to write to file 'dev/on_demand/$sub.pl': $!" );
-#             $fh->binmode( ':utf-8' );
-#             $fh->print( $Module::Generic::AUTOLOAD_SUBS->{ $sub } ) ||
-#                 die( "Unable to write to file 'dev/on_demand/$sub.pl': $!" );
-#             $fh->close;
-#         }
-        my $code = "package Module::Generic;\n" . $Module::Generic::AUTOLOAD_SUBS->{ $sub };
-        local $@;
-        no warnings 'redefine';
-        eval( $code );
-        ok( !$@, $sub );
-        diag( "sub $sub -> $@" ) if( $@ );
+        my $code = $o->can( $sub );
+        ok( defined( $code ), "sub $sub" );
+        # my $code = "package Module::Generic;\n" . $Module::Generic::AUTOLOAD_SUBS->{ $sub };
+        # local $@;
+        # no warnings 'redefine';
+        # eval( $code );
+        # ok( !$@, $sub );
+        # diag( "sub $sub -> $@" ) if( $@ );
     }
 };
 
@@ -672,18 +665,21 @@ subtest "symbols" => sub
     my $vers = $obj->_get_symbol( '$VERSION' );
     ok( defined( $vers ), '_get_symbol' );
     is( $$vers, 'v0.1.0' );
-    my @all = sort( grep( !/^message$/, grep( /^[a-z]/, $obj->_list_symbols ) ) );
-#     require Data::Pretty;
-#     diag( Data::Pretty::dump( [sort( @all )] ) );
+    my @all = sort( grep( !/^(?:message|dump)$/, grep( /^[a-z]/, $obj->_list_symbols ) ) );
     my $expect = [qw(
-        array array_object as_hash callback can choice choice2 clone created
-        datetime debug deserialise error error_handler fatal
-        file hash id init io ip isa metadata name new
+        array array_object as_hash callback can choice choice2
+        clear clear_error clone colour_close colour_closest
+        colour_format colour_open colour_parse colour_to_rgb
+        coloured created datetime debug deserialise dump_hex
+        dump_print dumper dumpto_dumper dumpto_printer errno
+        error error_handler fatal file hash id init io ip isa
+        message_colour messagef_colour metadata name new
         new_array new_file new_hash new_number new_scalar
-        new_tempfile pass_error serialise setget setget_assign
-        total trigger_error type uri user_id value version
-    )];
-    splice( @$expect, 12, 0, 'dump' ) if( $DEBUG );
+        new_tempfile pass_error printer save serialise setget
+        setget_assign subclasses total trigger_error type uri
+        user_id value version
+    )]
+;
     is_deeply( \@all => $expect, '_list_symbols' );
 };
 

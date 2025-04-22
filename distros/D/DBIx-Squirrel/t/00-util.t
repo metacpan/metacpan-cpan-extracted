@@ -24,8 +24,10 @@ BEGIN {
         or print "Bail out!\n";
     use_ok( 'T::Squirrel', qw(:var diagdump) )
         or print "Bail out!\n";
-    use_ok( 'DBIx::Squirrel::util', qw(carpf cluckf confessf isolate_callbacks) )
-        or print "Bail out!\n";
+    use_ok(
+        'DBIx::Squirrel::util',
+        qw(callbacks carpf cluckf confessf has_callbacks callbacks_args),
+    ) or print "Bail out!\n";
 }
 
 diag join(
@@ -159,53 +161,53 @@ diag join(
 
     my @tests = (
         {
-            line => __LINE__, name => 'ok - isolate_callbacks (no arguments)',
-            got  => [ isolate_callbacks() ],
+            line => __LINE__, name => 'ok - callbacks_args (no arguments)',
+            got  => [ callbacks_args() ],
             exp  => [ [] ],
         },
         {
-            line => __LINE__, name => 'ok - isolate_callbacks (single argument)',
-            got  => [ isolate_callbacks(1) ],
+            line => __LINE__, name => 'ok - callbacks_args (single argument)',
+            got  => [ callbacks_args(1) ],
             exp  => [ [], 1 ],
         },
         {
-            line => __LINE__, name => 'ok - isolate_callbacks (multiple arguments)',
-            got  => [ isolate_callbacks( 1, 2 ) ],
+            line => __LINE__, name => 'ok - callbacks_args (multiple arguments)',
+            got  => [ callbacks_args( 1, 2 ) ],
             exp  => [ [], 1, 2 ],
         },
         {
-            line => __LINE__, name => 'ok - isolate_callbacks (single callback)',
-            got  => [ isolate_callbacks($sub1) ],
+            line => __LINE__, name => 'ok - callbacks_args (single callback)',
+            got  => [ callbacks_args($sub1) ],
             exp  => [ [$sub1] ],
         },
         {
-            line => __LINE__, name => 'ok - isolate_callbacks (multiple callbacks)',
-            got  => [ isolate_callbacks( $sub1, $sub2 ) ],
+            line => __LINE__, name => 'ok - callbacks_args (multiple callbacks)',
+            got  => [ callbacks_args( $sub1, $sub2 ) ],
             exp  => [ [ $sub1, $sub2 ] ],
         },
         {
             line => __LINE__,
-            name => 'ok - isolate_callbacks (single argument, single callback)',
-            got  => [ isolate_callbacks( 1 => $sub1 ) ],
+            name => 'ok - callbacks_args (single argument, single callback)',
+            got  => [ callbacks_args( 1 => $sub1 ) ],
             exp  => [ [$sub1], 1 ],
         },
         {
             line => __LINE__,
-            name => 'ok - isolate_callbacks (multiple arguments, single callback)',
-            got  => [ isolate_callbacks( 1, 2 => $sub1 ) ],
+            name => 'ok - callbacks_args (multiple arguments, single callback)',
+            got  => [ callbacks_args( 1, 2 => $sub1 ) ],
             exp  => [ [$sub1], 1, 2 ],
         },
         {
             line => __LINE__,
-            name => 'ok - isolate_callbacks (multiple arguments, multiple callbacks)',
-            got  => [ isolate_callbacks( 1, 2 => $sub1, $sub2 ) ],
+            name => 'ok - callbacks_args (multiple arguments, multiple callbacks)',
+            got  => [ callbacks_args( 1, 2 => $sub1, $sub2 ) ],
             exp  => [ [ $sub1, $sub2 ], 1, 2 ],
         },
         {
             line => __LINE__,
             name =>
-                'ok - isolate_callbacks (multiple arguments, multiple callbacks, non-callback argument)',
-            got => [ isolate_callbacks( 1, $sub1, 3 => $sub2, $sub3 ) ],
+                'ok - callbacks_args (multiple arguments, multiple callbacks, non-callback argument)',
+            got => [ callbacks_args( 1, $sub1, 3 => $sub2, $sub3 ) ],
             exp => [ [ $sub2, $sub3 ], 1, $sub1, 3 ],
         },
     );
@@ -216,5 +218,42 @@ diag join(
     }
 }
 
+
+{
+    for (
+        {
+            loc => __LINE__,
+            got => [ has_callbacks( [] ) ],
+            exp => [],
+        },
+        {
+            loc => __LINE__,
+            got => [ has_callbacks( [1] ) ],
+            exp => [],
+        },
+        {
+            loc => __LINE__,
+            got => [ has_callbacks( [ 1, 2, 3 ] ) ],
+            exp => [],
+        },
+        {
+            loc => __LINE__,
+            got => [ has_callbacks( [ sub { }, 1, 2, 3 ] ) ],
+            exp => [],
+        },
+        {
+            loc => __LINE__,
+            got => [ has_callbacks( [ sub { } ] ) ],
+            exp => [ 0, 1 ],
+        },
+        {
+            loc => __LINE__,
+            got => [ has_callbacks( [ 1, 2, 3, sub { } ] ) ],
+            exp => [ 3, 1 ],
+        },
+    ) {
+        is_deeply $_->{got}, $_->{exp}, "has_callbacks, line $_->{loc}";
+    }
+}
 
 done_testing();

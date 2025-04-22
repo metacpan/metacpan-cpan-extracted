@@ -5,20 +5,21 @@ use warnings;
 use autodie;
 use feature qw(say);
 use File::Basename;
-use Text::CSV_XS qw(csv);
-use Sort::Naturally qw(nsort);
-use List::Util qw(any);
-use File::Spec::Functions qw(catdir);
-use IO::Compress::Gzip qw($GzipError);
+use Text::CSV_XS           qw(csv);
+use Sort::Naturally        qw(nsort);
+use List::Util             qw(any);
+use File::Spec::Functions  qw(catdir);
+use IO::Compress::Gzip     qw($GzipError);
 use IO::Uncompress::Gunzip qw($GunzipError);
 
 use Data::Dumper;
 use Devel::Size qw(total_size);
 use Convert::Pheno;
 use Convert::Pheno::IO::FileIO;
+use Convert::Pheno::OMOP::Definitions;
 use Convert::Pheno::OMOP;
-use Convert::Pheno::Schema;
-use Convert::Pheno::Mapping;
+use Convert::Pheno::Utils::Schema;
+use Convert::Pheno::Utils::Mapping;
 use Exporter 'import';
 our @EXPORT =
   qw(read_csv read_csv_stream read_redcap_dict_file read_mapping_file read_sqldump read_sqldump_stream sqldump2csv transpose_omop_data_structure write_csv open_filehandle load_exposures get_headers convert_table_aoh_to_hoh);
@@ -32,7 +33,6 @@ use constant DEVEL_MODE => 0;
 #########################
 
 sub read_redcap_dictionary {
-
     my $filepath = shift;
 
     # Define split record separator from file extension
@@ -63,7 +63,6 @@ sub read_redcap_dictionary {
 }
 
 sub add_labels {
-
     my $value = shift;
 
     # *** IMPORTANT ***
@@ -82,7 +81,6 @@ sub add_labels {
 }
 
 sub read_redcap_dict_file {
-
     my $arg = shift;
 
     # Read and load REDCap CSV dictionary
@@ -90,7 +88,6 @@ sub read_redcap_dict_file {
 }
 
 sub read_mapping_file {
-
     my $arg = shift;
 
     # Read and load mapping file
@@ -98,7 +95,7 @@ sub read_mapping_file {
       io_yaml_or_json( { filepath => $arg->{mapping_file}, mode => 'read' } );
 
     # Validate mapping file against JSON schema
-    my $jv = Convert::Pheno::Schema->new(
+    my $jv = Convert::Pheno::Utils::Schema->new(
         {
             data        => $data_mapping_file,
             debug       => $arg->{self_validate_schema},
@@ -115,7 +112,6 @@ sub read_mapping_file {
 }
 
 sub read_sqldump {
-
     my $arg      = shift;
     my $filepath = $arg->{in};
     my $self     = $arg->{self};
@@ -151,6 +147,7 @@ sub read_sqldump {
     my $local_count = 0;
     my $total_count = 0;
     my @headers;
+    my $headers_data_structure;
     my $table_name;
 
     while ( my $line = <$fh> ) {
@@ -183,6 +180,9 @@ sub read_sqldump {
 
             # Initializing $data>key as empty arrayref
             $data->{$table_name} = [];
+
+            # Loading headers
+            $headers_data_structure->{$table_name} = [@headers];
 
             # Jump one line
             $line = <$fh>;
@@ -252,11 +252,10 @@ sub read_sqldump {
     say ram_usage_str( 'read_sqldump', $data )
       if ( DEVEL_MODE || $self->{verbose} );
 
-    return $data;
+    return ( $data, $headers_data_structure );
 }
 
 sub read_sqldump_stream {
-
     my $arg           = shift;
     my $filein        = $arg->{in};
     my $self          = $arg->{self};
@@ -359,7 +358,6 @@ sub read_sqldump_stream {
 }
 
 sub encode_omop_stream {
-
     my ( $table_name, $hash_slice, $person, $count, $self ) = @_;
 
     # *** IMPORTANT ***
@@ -385,29 +383,38 @@ sub encode_omop_stream {
 }
 
 sub sqldump2csv {
+    my ( $data, $dir, $sql_headers_data_structure ) = @_;
 
-    my ( $data, $dir ) = @_;
-
-    # CSV sep character
+    # CSV separator (tab character)
     my $sep = "\t";
 
-    # The idea is to save a CSV table for each $data->key
+    # Natural sort flag: set to 0 (off) by default.
+    my $sort = 0;
+
+    # Iterate over each table in the data hash.
     for my $table ( keys %{$data} ) {
 
-        # File path for CSV file
+        # Build the file path for the CSV file.
         my $filepath = catdir( $dir, "$table.csv" );
 
-        # We get header fields from row[0] and nsort them
-        # NB: The order will not be the same as that in <.sql>
-        my @headers = nsort keys %{ $data->{$table}[0] };
+        # Retrieve header fields for the current table.
+        my $table_headers = $sql_headers_data_structure->{$table};
+        die "No header data found for table '$table'"
+          unless defined $table_headers && @$table_headers;
 
-        # Print data as CSV
+        # Determine header order: natural sort if enabled, or as stored.
+        my $headers =
+          $sort
+          ? [ nsort( @{$table_headers} ) ]
+          : $table_headers;
+
+        # Write the CSV file using the specified separator, headers, and data.
         write_csv(
             {
                 sep      => $sep,
                 filepath => $filepath,
-                headers  => \@headers,
-                data     => $data->{$table}
+                headers  => $headers,
+                data     => $data->{$table},
             }
         );
     }
@@ -415,7 +422,6 @@ sub sqldump2csv {
 }
 
 sub transpose_omop_data_structure {
-
     my ( $self, $data ) = @_;
 
     # The situation is the following, $data comes in format:
@@ -542,7 +548,6 @@ sub transpose_omop_data_structure {
 }
 
 sub read_csv {
-
     my $arg      = shift;
     my $filepath = $arg->{in};
     my $sep      = $arg->{sep};
@@ -622,7 +627,6 @@ sub read_csv {
 }
 
 sub is_separator_incorrect {
-
     my $keys           = shift;
     my $max_delimiters = 5;
 
@@ -634,7 +638,6 @@ sub is_separator_incorrect {
 }
 
 sub read_csv_stream {
-
     my $arg     = shift;
     my $filein  = $arg->{in};
     my $self    = $arg->{self};
@@ -701,7 +704,6 @@ sub read_csv_stream {
 }
 
 sub write_csv {
-
     my $arg      = shift;
     my $sep      = $arg->{sep};
     my $data     = $arg->{data};
@@ -733,7 +735,6 @@ sub write_csv {
 }
 
 sub open_filehandle {
-
     my ( $filepath, $mode ) = @_;
     my $handle = $mode eq 'a' ? '>>' : $mode eq 'w' ? '>' : '<';
     my $fh;
@@ -754,7 +755,6 @@ sub open_filehandle {
 }
 
 sub define_separator {
-
     my ( $filepath, $sep ) = @_;
 
     # Define split record separator from file extension
@@ -779,7 +779,6 @@ sub define_separator {
 }
 
 sub to_gb {
-
     my $bytes = shift;
 
     # base 2 => 1,073,741,824
@@ -788,13 +787,11 @@ sub to_gb {
 }
 
 sub ram_usage_str {
-
     my ( $func, $data ) = @_;
     return qq/***RAM Usage***($func):/ . to_gb( total_size($data) ) . "\n";
 }
 
 sub load_exposures {
-
     my $data = read_csv( { in => shift, sep => "\t" } );
 
     # We will only use the key 'concept_id' and discard the rest
@@ -808,7 +805,6 @@ sub load_exposures {
 }
 
 sub get_headers {
-
     my $data = shift;
 
     # Ensure $data is an array reference, wrap it in an array if it's a hash reference.
@@ -845,7 +841,6 @@ sub remap_assignTermIdFromHeader {
 }
 
 sub array_ref_to_hash {
-
     my $array_ref = shift;
 
     # Check if the input is an array reference
@@ -862,7 +857,6 @@ sub array_ref_to_hash {
 }
 
 sub convert_table_aoh_to_hoh {
-
     my ( $data, $table, $self ) = @_;
 
     my %table_cursor =
@@ -952,7 +946,6 @@ sub convert_table_aoh_to_hoh {
 }
 
 sub get_print_interval {
-
     my $filepath = shift;
 
     # Determine file size

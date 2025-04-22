@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Carp qw(croak);
 use PDF::Builder::Basic::PDF::Utils;
@@ -15,6 +15,8 @@ use Scalar::Util qw(weaken);
 =head1 NAME
 
 PDF::Builder::Outline - Manage PDF outlines (a.k.a. I<bookmarks>)
+
+Inherits from L<PDF::Builder::Basic::PDF::Dict>
 
 =head1 SYNOPSIS
 
@@ -30,26 +32,30 @@ PDF::Builder::Outline - Manage PDF outlines (a.k.a. I<bookmarks>)
 
 =head2 new
 
-    $outline = PDF::Builder::Outline->new($api, $parent, $prev)
+    $outline = PDF::Builder::Outline->new($api, $parent)
+
+    $outline = PDF::Builder::Outline->new($api)
 
 =over
 
 Returns a new outline object (called from $outlines->outline()).
+
+By default, if C<$parent> is omitted, the new bookmark is
+placed at the end of any existing list of bookmarks. Otherwise, it becomes
+the child of the C<$parent> bookmark.
 
 =back
 
 =cut
 
 sub new {
-    my ($class, $api, $parent, $prev) = @_;
+    my ($class, $api, $parent) = @_;
     my $self = $class->SUPER::new();
 
     $self->{'Parent'} = $parent if defined $parent;
-    $self->{'Prev'}   = $prev   if defined $prev;
     $self->{' api'}   = $api;
     weaken $self->{' api'};
     weaken $self->{'Parent'} if defined $parent;
-   #weaken $self->{'Prev'} if defined $prev;   # not in API2
 
     return $self;
 }
@@ -115,6 +121,7 @@ sub count {
 
     return $count;
 }
+
 #sub count {  # older version
 #    my $self = shift();
 #
@@ -205,11 +212,14 @@ sub parent {
 
 =head3 prev
 
-    $sibling = $outline->prev()
+    $sibling = $outline->prev() # Get
+
+    $sibling = $outline->prev(outline_obj) # Set
 
 =over
 
-Return the previous item of the current level of the outline tree.
+Return the previous item of the current level of the outline tree 
+(C<undef> if already at the first item).
 
 =back
 
@@ -224,11 +234,14 @@ sub prev {
 
 =head3 next
 
-    $sibling = $outline->next()
+    $sibling = $outline->next() # Get
+
+    $sibling = $outline->next(outline_obj) # Set
 
 =over
 
-Return the next item of the current level of the outline tree.
+Return the next item of the current level of the outline tree 
+(C<undef> if already at the last item).
 
 =back
 
@@ -250,7 +263,8 @@ sub next {
 =over
 
 Returns a new sub-outline (nested outline) added at the end of the
-current outline's children.
+C<$parent_outline>'s children. If there are no existing children, create
+the first one.
 
 =back
 
@@ -278,7 +292,7 @@ sub outline {
 
 =over
 
-Add an outline item immediately following the current item.
+Add an outline item immediately following the C<$outline> item.
 
 =back
 
@@ -305,7 +319,7 @@ sub insert_after {
 
 =over
 
-Add an outline item immediately preceding the current item.
+Add an outline item immediately preceding the C<$outline> item.
 
 =back
 
@@ -378,6 +392,8 @@ sub delete {
 =over
 
 Get/set whether the outline is expanded (open) or collapsed (closed).
+C<$boolean> is 0/false to close (collapse) the outline (hide its children), or
+1/true to open (expand) it (make its children visible).
 
 =back
 
@@ -419,6 +435,7 @@ This is an B<alternate> method to using is_open(true).
 
 =cut
 
+# TBD consider implementing as is_open(1)
 # deprecated in API2
 sub open {
     my $self = shift();
@@ -440,6 +457,7 @@ This is an B<alternate> method to using is_open(false).
 
 =cut
 
+# TBD consider implementing as is_open(0)
 # deprecated in API2
 sub closed {
     my $self = shift();

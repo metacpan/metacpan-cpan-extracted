@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Music-Bassline-Generator",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "Music::Bassline::Generator",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0608",
+  "VERSION" => "0.0609",
   "test" => {
     "TESTS" => "t/*.t"
   }

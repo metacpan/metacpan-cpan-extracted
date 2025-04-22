@@ -1,4 +1,4 @@
-# Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Message::Head::Complete;{
-our $VERSION = '3.016';
+our $VERSION = '3.017';
 }
 
 use base 'Mail::Message::Head';
@@ -148,10 +148,12 @@ sub grepNames(@)
 my @skip_none = qw/content-transfer-encoding content-disposition
                    content-description content-id/;
 
-my %skip_none = map { ($_ => 1) } @skip_none;
+my %skip_none = map +($_ => 1), @skip_none;
 
 sub set(@)
 {   my $self = shift;
+    @_!=1 || defined $_[0] or return;
+
     my $type = $self->{MMH_field_type} || 'Mail::Message::Field::Fast';
     $self->{MMH_modified}++;
 

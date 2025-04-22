@@ -6,9 +6,9 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.5503'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,6 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/sciurius/perl-String-Interpolate-Named/issues
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/sciurius/perl-String-Interpolate-Named
-version: '1.03'
+  repository: https://github.com/sciurius/perl-String-Interpolate-Named.git
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

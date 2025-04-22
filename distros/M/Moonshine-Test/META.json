@@ -52,7 +52,7 @@
    "provides" : {
       "Moonshine::Test" : {
          "file" : "lib/Moonshine/Test.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Test"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

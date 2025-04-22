@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.10
+Version 0.13
 
 # SYNOPSIS
 
@@ -26,7 +26,7 @@ formats (YAML, JSON, XML, and INI),
 it also allows levels of configuration, each of which overrides the lower levels.
 So, it also integrates environment variable
 overrides and command line arguments for runtime configuration adjustments.
-This module is designed to help developers manage layered configurations that can be loaded from files and overridden by at run-time for debugging,
+This module is designed to help developers manage layered configurations that can be loaded from files and overridden at run-time for debugging,
 offering a modern, robust and dynamic approach
 to configuration management.
 
@@ -138,7 +138,11 @@ This will override any value set for `database.user` in the configuration files.
 
     Next, the command line arguments are checked and used to override any conflicting settings.
 
-- 5. Accessing Values
+- 5. Data Argument
+
+    Finally the data passed into the constructor via the `data` argument is merged in.
+
+- 6. Accessing Values
 
     Values in the configuration can be accessed using a dotted notation
     (e.g., `'database.user'`), regardless of the file format used.
@@ -164,6 +168,11 @@ Options:
     An arrayref of files to look for in the configuration directories.
     Put the more important files later,
     since later files override earlier ones.
+
+- `data`
+
+    A hash ref of data to prime the configuration with.
+    Any other data will be overwritten by this.
 
 - `env_prefix`
 
@@ -200,7 +209,34 @@ Retrieve a configuration value using dotted key notation (e.g.,
 Returns the entire configuration hash,
 possibly flattened depending on the `flatten` option.
 
-The entry `config_path` contains a colon separated list of the files that the configuration was loaded from.
+The entry `config_path` contains a colon-separated list of the files that the configuration was loaded from.
+
+## AUTOLOAD
+
+This module supports dynamic access to configuration keys via AUTOLOAD.
+Nested keys are accessible using the separator,
+so `$config->database_user()` resolves to `$config->{database}->{user}`,
+when `sep_char` is set to '\_'.
+
+    $config = Config::Abstraction->new(
+        data => {
+            database => {
+                user => 'alice',
+                pass => 'secret'
+            },
+            log_level => 'debug'
+        },
+        flatten   => 1,
+        sep_char  => '_'
+    );
+
+    my $user = $config->database_user();  # returns 'alice'
+
+    # or
+    $user = $config->database()->{'user'};  # returns 'alice'
+
+    # Attempting to call a nonexistent key
+    my $foo = $config->nonexistent_key();       # dies with error
 
 # BUGS
 

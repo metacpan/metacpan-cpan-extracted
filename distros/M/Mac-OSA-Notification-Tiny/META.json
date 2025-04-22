@@ -4,7 +4,7 @@
       "LNATION <email@lnation.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -45,7 +45,7 @@
    "provides" : {
       "Mac::OSA::Notification::Tiny" : {
          "file" : "lib/Mac/OSA/Notification/Tiny.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Mac-OSA-Notification-Tiny"
       }
    },
-   "version" : "1.00",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

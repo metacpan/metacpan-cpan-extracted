@@ -3,7 +3,7 @@ package Log::ForPerl;
 # Make sure we have version info for this module
 # Be strict from now on
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 use strict;
 
 # The logging dispatcher that should be used
@@ -165,12 +165,14 @@ inside an eval.  Whereas a normal
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+Copyright (c) 2004 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org>
+ All rights reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut

@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 ad24764469b44d0044565eda1d771db43a8d0fd5e7b636db7d5d01a0098959e8 Changes
+SHA256 32f2996749976e568a655dd072ed2762e92bfeae3bc10a25077b8d930bad892d INSTALL
+SHA256 c25fb0e9ac702faa31b87ecf5ac2426e4ad82b0416f120fbbca967569c6aa57b LICENSE
+SHA256 fd46084aba77163a13dc1c09952a13b8b164a7140382668ee4a900d75fae3c01 MANIFEST
+SHA256 995c7f9253ec5a158641ae96b6347cdb660f53bea4dc2f46ca2d1b2189dd6791 META.json
+SHA256 bdec11c9a82abdcd2ae5013b5c57d012c67da4801ad548b75395c541f9e448bb META.yml
+SHA256 ce4f349f2e9b33042bed259ef2156efef9a503762cb6ee7604839ec94fc08073 Makefile.PL
+SHA256 55d081f19836cbdca53cc834c535c62d58c085fd4f31e2d0c4ac8641579c8a79 README.md
+SHA256 7cae2f8ef0fb2f25223a1a119b109585b645a7a9cbf1e7357d1f2cb9d483dc13 SECURITY.md
+SHA256 7c2edace004168f47c874195d5782a2746b9449a58659e8f42bc53d1ae9fbdda cpanfile
+SHA256 e1970d4996b80b189189e92a4a184cbd81ec5d08c9b674e1b3c414d735d9e7ac dist.ini
+SHA256 4688fc7521795d870df9deec82fc3b06c76b022f42c00a95bd738f8ba74d5f79 lib/Crypt/URandom/MonkeyPatch.pm
+SHA256 1de5d23d07b92f0fba50ee060c24bf2caa4ac402717c20526853063c3fbb443a t/00-report-prereqs.dd
+SHA256 a09abf0f981c4a98250030a586579bd1ed1a78a2e3eecbcdaf9757213a18ca0f t/00-report-prereqs.t
+SHA256 c99330ad9c0226bdd0055f5f8c72ac92973d357e9952a2e6351125a73d2b1eff t/01-basic.t
+SHA256 7e14a95381449b0cd3ab672642d4577aef3ad58769699345ac55f1c53c5b4f6c t/02-String-Random.t
+SHA256 3a3ef835a0fd561db4cafdfeacafbd759c0a6afe7f84c6055d32bc24d5adc282 t/author-changes.t
+SHA256 e5bab84ea3bf87c793fd33295c79e6a96f9286dfb61e95658fc07f77323c6d11 t/author-critic.t
+SHA256 af290304e0a17fc909901c969b51598cbbc9264585e69bbda8fdca2f3ebf619a t/author-cve.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 fe4aa44e8ea02ca1e7210f9d20a342e6ce4191608fa623ce09b07c6477995dc7 t/author-eol.t
+SHA256 914bde9f0ea3cadd6afb992b32d87f5027d1a0921b6b8fec75db045bac31956e t/author-minimum-version.t
+SHA256 2d3bcf1ebc0eed92081ae7cc064ea2e67bfe639cb2cd7cd8c3b2f0d98ee916ec t/author-no-tabs.t
+SHA256 1ee64d4f8248deb3541453ec521ac8057c9a4ba365946b6a02ee760ad28ce164 t/author-pod-coverage.t
+SHA256 8835ccb71da79a1b53a576dd349e188d444fce139e1f9f62976458c066b8edf9 t/author-pod-linkcheck.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 da2b42d19f0e73aaab56a0bb5dffc2d761be48ee53e305c7fe9f0921279fa2a1 t/author-portability.t
+SHA256 e9404f6c11ca797db4a255b27f0f650a6dcc6e8f178d1717688efa57a9de1c2a t/etc/perlcritic.rc
+SHA256 6817b484798f726a44e9aee17da6e80979b4ace77349f0d0b4a13cd935172cba t/release-fixme.t
+SHA256 426c441a368792fa6be6a2e35ff0ac997faa48575d090646e9570e056109bb32 t/release-kwalitee.t
+SHA256 6157040bb26db4ca06dd9c19043099fe31004612d27961308558fa2e3e6a7bbe t/release-trailing-space.t
+SHA256 fa270029e5470b55008483d8c171bc2b2d7f105ec56aeaa0aa8253d9447e694e weaver.ini
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmgCWswACgkQHmWrcYGD
+C6xqCAv/e6Dr/8myhl9NjIbVAtWKAc9M24LL5J3syXfAsXBC5sjRe3iCvVFPRiKi
+yRXJkz0kn3iSX8PNZMffQbQO2CLLqiJD8AQeCoYjFBExFg6DIl+2GMX7p3hawfhT
+XhMcsSgBuv5ET9eV8TSk5d08VkDZq9tO8wEwI93GFle4P7sTbTE2WqCjbIm7e9CF
+QUbpTNTdRQZpOILLx6pn3VQ2aYVP4dwCbe3Sz1Pknd+BWbwPQ0JXGq2kjcnTLUAJ
+sr0s3XKMzxvh4QLq98dDM97I2X1JCy/eBxJLqre7AIW8O4jbiRvAsQOJysRSVEQz
+K9x0MWc2b+YsHbyupm/yuly5DHoVZaPOhQEtivx7GLUXV/uM/V+x7wvUsO7Wk+Ju
+O000UegSrs7NXlSnTOWP2CPt4hLFvU2nO+VZCiX0o6594O1SLek8rYm3/3yalydE
+Qyaag4IDFsP9+eTHlj8qA749yg/oeUvEvCdCUzlJ18+SmSF200pgSicQWq5WXB4s
+aOT44veH
+=ph3e
+-----END PGP SIGNATURE-----

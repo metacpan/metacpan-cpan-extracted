@@ -20,4 +20,6 @@ t/01_load.t
 t/02_wikidata.t
 t/03_uuid.t
 t/04_oid.t
+t/10_colour.t
+t/20_barcode.t
 xt/author/pod-syntax.t

@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Metadata: '1.000033'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +23,12 @@ no_index:
 provides:
   Devel::ThreadsForks:
     file: lib/Devel/ThreadsForks.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Config: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Devel-ThreadsForks.git
-version: '0.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

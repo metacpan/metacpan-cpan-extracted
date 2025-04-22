@@ -29,15 +29,14 @@ my %WriteMakefileArgs = (
     "MIME::Base64" => "3.15",
     "Math::BigInt" => "1.999816",
     "URI" => "1.5",
-    "URI::Escape" => "3.31",
-    "UUID::Tiny" => "1.04"
+    "URI::Escape" => "3.31"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.15",
+  "VERSION" => "v0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,8 +59,7 @@ my %FallbackPrereqs = (
   "Test::More" => "1.3",
   "Test::Warn" => "0.30",
   "URI" => "1.5",
-  "URI::Escape" => "3.31",
-  "UUID::Tiny" => "1.04"
+  "URI::Escape" => "3.31"
 );
 
 

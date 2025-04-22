@@ -21,7 +21,7 @@ no_index:
 provides:
   Moonshine::Element:
     file: lib/Moonshine/Element.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Autoload::AUTOCAN: '0.004'
   Data::GUID: '0.048'
@@ -34,5 +34,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Element.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

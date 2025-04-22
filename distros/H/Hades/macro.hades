@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.22
+version 0.24
 Hades::Macro {
 	abstract { Hades macro base class. }
 	synopsis {

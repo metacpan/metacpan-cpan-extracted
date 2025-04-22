@@ -1,10 +1,10 @@
 #!perl
-use 5.010;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
-use Test::More 0.82;
-eval 'use Map::Tube::London';
-plan skip_all => 'Map::Tube::London required for this test' if $@;
+use Test::More 0.82 tests => 3;
+use lib 't/';
+use Sample;
 
 BEGIN {
     use_ok('Map::Tube::Plugin::FuzzyFind') || print "Bail out!\n";
@@ -12,8 +12,6 @@ BEGIN {
 
 diag( "Testing Map::Tube::Plugin::FuzzyFind $Map::Tube::Plugin::FuzzyFind::VERSION, Perl $], $^X" );
 
-my $tube = new_ok( 'Map::Tube::London' );
+my $tube = new_ok( 'Sample' );
 can_ok( $tube, 'fuzzy_find' );
-
-plan tests => 3;
 

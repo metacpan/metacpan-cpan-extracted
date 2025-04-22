@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Compress::Zlib;
 #use Encode qw(:all);
@@ -17,6 +17,8 @@ use Scalar::Util qw(weaken);
 =head1 NAME
 
 PDF::Builder::Resource::BaseFont - Base class for font resources
+
+Inherits from L<PDF::Builder::Resource>
 
 =head1 METHODS
 
@@ -261,6 +263,25 @@ sub iscff {
 }
 
 =head1 TYPOGRAPHY-RELATED METHODS
+
+=head2 upem
+
+    $upem = $font->upem()
+
+=over
+
+Return the font's scaling factor (Units Per em). It is typically 1000 in most
+fonts, but more recent TTF and OTF fonts often use 2048 units.
+
+=back
+
+=cut
+
+sub upem { 
+    my $upem = $_[0]->data()->{'upem'}; 
+    if (!defined $upem) { $upem = 1000; }
+    return $upem;
+}
 
 =head2 fontbbox
 

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use YAML::XS qw/LoadFile/;
 use Data::LNPath qw/lnpath/, {
@@ -44,7 +44,7 @@ Config::LNPath - A Simple YAML Config Reader.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -104,14 +104,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-LNPath>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Config-LNPath>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Config-LNPath>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Config-LNPath/>
@@ -122,7 +114,7 @@ L<http://search.cpan.org/dist/Config-LNPath/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

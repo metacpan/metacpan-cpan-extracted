@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.3.1
+## Version v0.3.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2023/09/19
+## Modified 2025/04/20
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ BEGIN
     use Module::Generic::HeaderValue;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.2';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -1239,7 +1239,7 @@ EOT
         }
         
         $sql =~ s/\n/ /gs;
-        open( my $fh, '-|', $sqlite_bin, "${sqldb}", $sql ) ||
+        open( my $fh, '-|', $sqlite_bin, '-noheader', '-separator', '|', "${sqldb}", $sql ) ||
             return( $self->error( "Failed to execute sqlite3 binary with sql query to get all mozilla cookies from database ${sqldb}: $!" ) );
         # $cookies = [map{ [split( /\|/, $_ )] } <$fh>];
         while( defined( $_ = <$fh> ) )
@@ -1249,7 +1249,7 @@ EOT
         }
         close( $fh );
     }
-    
+
     foreach my $ref ( @$cookies )
     {
         my( $name, $value, $domain, $path, $expires, $secure, $same_site, $http_only, $accessed, $created ) = @$ref;
@@ -2419,7 +2419,7 @@ Cookie::Jar - Cookie Jar Class for Server & Client
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 

@@ -58,7 +58,7 @@ my %font = (
     },
     Times => {
     #   Bold   => $pdf->corefont( 'Times-Bold',   -encoding => 'latin1' ),
-        Roman  => $pdf->corefont( 'Times',        -encoding => 'latin1' ),
+        Roman  => $pdf->corefont( 'Times-Roman',  -encoding => 'latin1' ),
     #   Italic => $pdf->corefont( 'Times-Italic', -encoding => 'latin1' ),
     },
 );

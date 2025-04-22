@@ -1,12 +1,9 @@
+.editorconfig
 Build.PL
 Changes
 examples/synopsis.pl
 lib/IO/Async/Loop/Epoll.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01loop-io.t
 t/02loop-timer.t
@@ -17,3 +14,7 @@ t/06loop-control.t
 t/07loop-metrics.t
 t/10loop-fork.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

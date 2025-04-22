@@ -6,11 +6,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/30-basics.t
-t/auto.t
+t/autoload.t
 t/comment-spelling.t
 t/cover.t
 t/eof.t
 t/eol.t
+t/flatten.t
 t/manifest.t
 t/pod-cm.t
 t/pod-coverage.t

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.6008';
+our $VERSION = '0.6010';
 
 use 5.024;
 use strictures 2;
@@ -26,7 +26,6 @@ use Music::RhythmSet::Util qw(upsize);
 
 use MIDI::Drummer::Tiny::Types qw(:all);
 use Types::Standard            qw(InstanceOf);
-use Types::Path::Tiny          qw(assert_Path);
 
 use Data::Dumper::Compact qw(ddc);
 use namespace::clean;
@@ -174,11 +173,15 @@ has soundfont => (
 #pod =cut
 
 has score => (
-    is      => 'ro',
+    is      => 'lazy',
     isa     => InstanceOf ['MIDI::Simple'],
-    default => sub { MIDI::Simple->new_score },
     handles => { sync => 'synch' },
 );
+
+sub _build_score {
+    my ($self) = @_;
+    return MIDI::Simple->new_score;
+}
 
 #pod =attr reverb
 #pod
@@ -246,13 +249,13 @@ sub set_volume ( $self, $volume = 0 ) {
 #pod
 #pod   $d->set_bpm($bpm);
 #pod
-#pod Reset the L<beats per minute|MIDI::Drummer::Tiny::Types/BPM>.
+#pod Return or set the beats per minute.
 #pod
 #pod =cut
 
 has bpm => (
     is      => 'rw',
-    isa     => BPM,
+    isa     => PosInt,
     default => 120,
     writer  => 'set_bpm',
     trigger => 1,
@@ -1418,7 +1421,7 @@ sub timidity_cfg {
 
 sub play_with_timidity {
     my ($self, $config) = @_;
-    return play_timidity( $self->score, assert_Path( $self->file ),
+    return play_timidity( $self->score, $self->file,
         $self->soundfont, $config );
 }
 
@@ -1435,7 +1438,7 @@ sub play_with_timidity {
 
 sub play_with_fluidsynth {
     my ($self, $config) = @_;
-    return play_fluidsynth( $self->score, assert_Path( $self->file ),
+    return play_fluidsynth( $self->score, $self->file,
         $self->soundfont, $config );
 }
 
@@ -1467,7 +1470,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.6008
+version 0.6010
 
 =head1 SYNOPSIS
 
@@ -1653,7 +1656,7 @@ If not given a B<volume> argument, this method mutes (sets to C<0>).
 
   $d->set_bpm($bpm);
 
-Reset the L<beats per minute|MIDI::Drummer::Tiny::Types/BPM>.
+Return or set the beats per minute.
 
 =head2 new
 

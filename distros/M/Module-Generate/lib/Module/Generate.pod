@@ -4,7 +4,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =cut
 
@@ -444,14 +444,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Generate>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Module-Generate>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Module-Generate>
 
 =item * Search CPAN
 

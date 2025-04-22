@@ -1,4 +1,4 @@
-# Copyrights 2012-2022 by [Mark Overmeer].
+# Copyrights 2012-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,28 +6,42 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Apache::Solr::Tables;
-use vars '$VERSION';
-$VERSION = '1.09';
+package Apache::Solr::Tables;{
+our $VERSION = '1.10';
+}
 
 use base 'Exporter';
 
 our @EXPORT = qw/%boolparams %introduced %deprecated/;
 
+# Boolean parameters update to Solr 9.8 syntax.
+# %introduced and %deprecated tables probally incomplete.
+
 our %boolparams = map +($_ => 1), qw/
+allTermsRequired
+boost
+buildOnCommit
+buildOnOptimize
+buildOnStartup
+canCancel
 captureAttr
 clustering
 clustering.collection
+clustering.includeOtherTopics
 clustering.results
 collectElevatedDocsWhenCollapsing
 commit
 debug
 debug.explain.structured
+docValues
 echoHandler
+elevateOnlyDocsMatchingQuery
 enableElevation
+exactMatchFirst
 exclusive
 expand
 expand.nullGroup
+exactMatchFirst
 extractOnly
 facet
 facet.contains.ignoreCase
@@ -42,23 +56,39 @@ group.facet
 group.main
 group.ngroups
 group.truncate
+hardend
+highlight
 hl
+hl.defaultSummary
+hl.fragsizeIsMinimum
+hl.highlightAlternate
 hl.highlightMultiTerm
 hl.mergeContiguous
+hl.payloads
+hl.preserveMulti
 hl.requireFieldMatch
 hl.useFastVectorHighlighter
 hl.usePhraseHighlighter
+hl.weightMatches
 ignoreStopwords
 indent
 literalsOverride
 lowernames
+markExcludes
 matchText
 mlt
 mlt.boost
 mlt.match.include
+multiThreaded
 omitHeader
 overwrite
+partialResults
+preserveSep
+preservePositionIncrements
+segmentTerminateEarly
 skipAltTokens
+solr.alwaysOnTraceId
+solr.disableRequestId
 spellcheck
 spellcheck.build
 spellcheck.collate
@@ -78,6 +108,7 @@ terms.raw
 terms.stats
 terms.ttf
 terms.upper.incl
+transpositions
 tv
 tv.all
 tv.df
@@ -86,6 +117,8 @@ tv.payloads
 tv.positions
 tv.tf
 tv.tf_idf
+unicodeAware
+useConfiguredElevatedOrder
 xmlOffsetAdjust
  /;
 

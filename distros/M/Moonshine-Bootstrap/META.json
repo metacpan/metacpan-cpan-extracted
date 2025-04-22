@@ -1,5 +1,5 @@
 {
-   "abstract" : "Shine.",
+   "abstract" : "Bootstrap.",
    "author" : [
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
@@ -52,11 +52,11 @@
    "provides" : {
       "Moonshine::Bootstrap" : {
          "file" : "lib/Moonshine/Bootstrap.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Moonshine::Bootstrap::Component" : {
          "file" : "lib/Moonshine/Bootstrap/Component.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Moonshine::Bootstrap::Component::Abbr" : {
          "file" : "lib/Moonshine/Bootstrap/Component/Abbr.pm"
@@ -484,6 +484,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Bootstrap"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

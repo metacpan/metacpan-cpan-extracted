@@ -1,5 +1,10 @@
 Revision history for Net-Versa-Director
 
+0.003000  2025-04-22 17:03:27+02:00 Europe/Vienna
+    - add support for OAuth authentication
+      automatically detected when server is on port 9183
+      requires login and logout methods to be called
+
 0.002000  2023-10-11 14:34:40+02:00 Europe/Vienna
     - change get_director_info API endpoint
       because the previous isn't accessible with a tenant user

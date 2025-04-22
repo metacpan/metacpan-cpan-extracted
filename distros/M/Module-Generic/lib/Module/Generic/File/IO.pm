@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/IO.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/26
-## Modified 2022/11/12
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,14 +20,13 @@ BEGIN
     use IO::File ();
     use parent qw( Module::Generic IO::File );
     use vars qw( $VERSION @EXPORT $THAW_REOPENS_FILE );
-    # use Nice::Try;
     use Scalar::Util ();
     use Want;
     our @EXPORT = grep( /^(?:O_|F_GETFL|F_SETFL)/, @Fcntl::EXPORT );
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
     our @EXPORT_OK = qw( wraphandle );
     our $THAW_REOPENS_FILE = 1;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -425,7 +424,7 @@ Module::Generic::File::IO - File IO Object Wrapper
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -723,6 +722,24 @@ If you use L<Storable::Improved>, then serialisation and deserialisation will wo
 Failure to do use L<Storable::Improved>, and L<Storable> would instead return the L<Module::Generic::File::IO> as a C<SCALAR> object rather than a glob.
 
 Note that by default C<$THAW_REOPENS_FILE> is set to a true value, and this will have deserialisation recreate an object somewhat equivalent to the original one.
+
+=head1 THREAD SAFETY
+
+This module is designed for use in single-threaded or forked applications where filehandles are not shared across threads.
+
+It does not implement internal locking or reference counting.
+
+=over 4
+
+=item *
+
+Do not share filehandle objects between threads unless externally synchronized.
+
+=item *
+
+Serialized filehandles may not survive process or thread boundaries unless the underlying file is still available.
+
+=back
 
 =head1 AUTHOR
 

@@ -1,3 +1,12 @@
+v0.04   2025-04-20Z
+    - Added tests
+    - Fixed case with contentise being unknown
+    - Unified code in File::FStore::Base
+    - Added callbacks for scan/update
+    - Updated dependencies
+    - Added $store->attach() to support weak references of subobjects
+    - Added migration object to simplify importing larger amounts of data
+
 v0.03   2025-04-03Z
     - Improved input validation
     - Added property inodeise

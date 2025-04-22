@@ -2,8 +2,9 @@
 package Test::CheckGitStatus;
 use strict;
 use warnings;
+use Config;
 
-our $VERSION = 'v0.1.0'; # VERSION
+our $VERSION = 'v0.1.2'; # VERSION
 
 my $CHECK_GIT_STATUS = $ENV{CHECK_GIT_STATUS};
 
@@ -22,7 +23,6 @@ my $cwd;
 
 if ($CHECK_GIT_STATUS) {
     require Test::More;
-    require File::Which;
     require Cwd;
     $cwd = Cwd::cwd();
 }
@@ -37,7 +37,12 @@ sub check_status {
 
 sub _check_git {
     require File::Which;
-    return File::Which::which('git');
+    my $git = File::Which::which('git');
+    return unless $git;
+    if ($Config{osname} eq 'MSWin32') {
+        $git = qq{"$git"};
+    }
+    return $git;
 }
 
 sub _get_status {
@@ -45,12 +50,12 @@ sub _get_status {
     chdir $cwd;
     my $git = _check_git();
     return unless $git;
-    my $cmd = "$git rev-parse --git-dir";
+    my $cmd = qq{$git rev-parse --git-dir};
     my $out = qx{$cmd};
     return if $? != 0;
-    $cmd = 'git status --porcelain=v1 2>&1';
+    $cmd = qq{$git status --porcelain=v1 2>&1};
     my @lines = qx{$cmd};
-    die "Problem running git:\n" . join '', @lines if $? != 0;
+    die "Problem running '$git':\n" . join '', @lines if $? != 0;
     return @lines;
 }
 
@@ -164,8 +169,5 @@ try C<chmod -R a-w .> ;-)
 MIT License
 
 Copyright (c) SUSE LLC, Tina Müller
-
-This library is free software and may be distributed under the same terms
-as perl itself.
 
 =cut

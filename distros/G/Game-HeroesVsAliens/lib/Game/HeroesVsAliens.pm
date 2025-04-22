@@ -3,7 +3,7 @@ package Game::HeroesVsAliens;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Moo;
 
@@ -617,7 +617,7 @@ Game::HeroesVsAliens - A tower defense game.
 
 =head1 VERSION
 
-Version 0.01
+Version 1.01
 
 =cut
 
@@ -653,23 +653,18 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-HeroesVsAliens>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Game-HeroesVsAliens>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Game-HeroesVsAliens>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by lnation.
+This software is Copyright (c) 2021->2025 by lnation.
 
 This is free software, licensed under:
 

@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use lib '.';
 # set up tests
 my @tests;
 BEGIN {

@@ -138,6 +138,7 @@ got, and then call L<encode()|Mail::Message::Body::Encode/"Constructing a body">
   eol                                 'NATIVE'
   file                                undef
   filename                            undef
+  language                            undef
   log                Mail::Reporter   'WARNINGS'
   message                             undef
   mime_type                           'text/plain'
@@ -172,13 +173,13 @@ checked, and then set as body for a message, it will be.
 
 =item content_id => STRING
 
-In multipart/related MIME content, the content_id is required to
-allow access to the related content via a cid:<...> descriptor of
-an inline disposition.
+In C<multipart/related> MIME content, the C<content_id> is required to
+allow access to the related content via a C<< cid:<...> >> descriptor
+of an inline disposition.
 
 A C<Content-ID> is supposed to be globally unique.  As such, it
-is common to append '@computer.domain' to the end of some unique
-string.  As other content in the multipart/related container also
+is common to append C<@computer.domain'> to the end of some unique
+string.  As other content in the C<multipart/related> container also
 needs to know what this C<Content-ID> is, this should be left to
 the imagination of the person making the content (for now).
 
@@ -221,6 +222,10 @@ upon some further action of the user.
 The C<filename> attribute specifies a name to which is suggested to the
 reader of the message when it is extracted.
 
+[3.017] RFC9078 adds type C<reaction>.  This part content is restricted
+to a single line of emoji's.  For this kind, you need to pass the FIELD
+here, as well as mime-type C<text/plain>.
+
 =item eol => 'CR'|'LF'|'CRLF'|'NATIVE'
 
 Convert the message into having the specified string as line terminator
@@ -239,6 +244,11 @@ type C<IO::Handle>.
 =item filename => FILENAME
 
 [3.001] Overrule/set filename for content-disposition
+
+=item language => STRING|ARRAY|LIST|FIELD
+
+[3.017] RFC3282 C<Content-Language> field, containing a comma separated
+list of language codes.
 
 =item log => LEVEL
 
@@ -458,6 +468,9 @@ was specified.
 The argument can be a STRING (which is converted into a field), or a
 fully prepared header field.
 
+[3.017] RFC9078 adds type C<reaction>.  This part content is restricted
+to a single line of emoji's.
+
 =item $obj-E<gt>B<dispositionFilename>( [$directory] )
 
 Inherited, see L<Mail::Message::Body::Encode/"About the payload">
@@ -469,6 +482,12 @@ Inherited, see L<Mail::Message::Body::Encode/"About the payload">
 =item $obj-E<gt>B<isText>()
 
 Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<language>( [@langs|\@langs|$langs|$field] )
+
+[3.017] Returns (optionally after setting) the C<Content-Language> header,
+as specified in RFC3282.  Returns the field with a comma separated list of
+languages as body.
 
 =item $obj-E<gt>B<mimeType>()
 
@@ -1006,12 +1025,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.016,
-built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.017,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

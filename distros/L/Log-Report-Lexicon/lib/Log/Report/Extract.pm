@@ -1,14 +1,14 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Log-Report-Lexicon. Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report::Extract;
-use vars '$VERSION';
-$VERSION = '1.11';
+package Log::Report::Extract;{
+our $VERSION = '1.12';
+}
 
 
 use warnings;
@@ -26,7 +26,7 @@ sub new(@)
 
 sub init($)
 {   my ($self, $args) = @_;
-    my $lexi = $args->{lexicon}
+    my $lexi = $args->{lexicon} || $args->{lexicons}
         or error __"extractions require an explicit lexicon directory";
 
     -d $lexi or mkdir $lexi

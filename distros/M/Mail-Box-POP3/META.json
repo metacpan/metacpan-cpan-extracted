@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,6 +37,7 @@
             "File::Basename" : "0",
             "File::Spec" : "0",
             "IO::Socket" : "0",
+            "IO::Socket::IP" : "0",
             "List::Util" : "0",
             "Mail::Box::FastScalar" : "3",
             "Mail::Box::Net" : "3",
@@ -61,6 +62,6 @@
          "web" : "https://github.com/markov2/perl5-Mail-Box-POP3"
       }
    },
-   "version" : "3.006",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "3.007",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

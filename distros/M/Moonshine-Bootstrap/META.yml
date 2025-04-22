@@ -1,5 +1,5 @@
 ---
-abstract: Shine.
+abstract: Bootstrap.
 author:
   - 'Robert Acock <thisusedtobeanemail@gmail.com>'
 build_requires:
@@ -23,10 +23,10 @@ no_index:
 provides:
   Moonshine::Bootstrap:
     file: lib/Moonshine/Bootstrap.pm
-    version: '0.04'
+    version: '0.05'
   Moonshine::Bootstrap::Component:
     file: lib/Moonshine/Bootstrap/Component.pm
-    version: '0.04'
+    version: '0.05'
   Moonshine::Bootstrap::Component::Abbr:
     file: lib/Moonshine/Bootstrap/Component/Abbr.pm
   Moonshine::Bootstrap::Component::Alert:
@@ -319,5 +319,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Bootstrap.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

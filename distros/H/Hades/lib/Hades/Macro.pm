@@ -1,7 +1,7 @@
 package Hades::Macro;
 use strict;
 use warnings;
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -95,7 +95,7 @@ Hades::Macro - Hades macro base class.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.24
 
 =cut
 
@@ -166,19 +166,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hades-Macro>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hades-Macro>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hades-Macro>
 
 =item * Search CPAN
 

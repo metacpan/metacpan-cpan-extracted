@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.024"
          }
       },
       "develop" : {
@@ -48,7 +48,7 @@
             "Try::Tiny" : "0",
             "constant" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.006",
+            "perl" : "5.024",
             "strictures" : "2"
          }
       },
@@ -62,7 +62,7 @@
             "Music::Chord::Note" : "0.10",
             "Test::Exception" : "0",
             "Test::More" : "0.88",
-            "perl" : "5.006",
+            "perl" : "5.024",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -77,7 +77,7 @@
          "web" : "https://github.com/ology/MIDI-Bassline-Walk"
       }
    },
-   "version" : "0.0608",
+   "version" : "0.0609",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -10,7 +10,7 @@ use WebService::OpenSky::Types qw(
   PositiveOrZeroInt
 );
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 param rows => (
     isa    => ArrayRef [Defined],
@@ -60,7 +60,7 @@ WebService::OpenSky::Utils::Iterator - Internal iterator class for WebService::O
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-# Copyrights 2001-2023 by [Mark Overmeer].
+# Copyrights 2001-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Mail::Box::IMAP4;
-use vars '$VERSION';
-$VERSION = '3.008';
+package Mail::Box::IMAP4;{
+our $VERSION = '3.009';
+}
 
 use base 'Mail::Box::Net';
 
@@ -59,8 +59,8 @@ sub init($)
 	$args->{message_type} ||= 'Mail::Box::IMAP4::Message';
 
     if(my $client = $args->{imap_client}) {
-       $args->{server_name} = $client->PeerAddr;
-       $args->{server_port} = $client->PeerPort;
+       $args->{server_name} = $client->Socket->peerhost();
+       $args->{server_port} = $client->Socket->peerport();
        $args->{username}    = $client->User;
     }
 

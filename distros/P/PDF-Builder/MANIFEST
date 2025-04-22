@@ -25,11 +25,13 @@ INFO/Changes_2018
 INFO/Changes_2019
 INFO/Changes_2020
 INFO/Changes_2021
+INFO/Changes_2023
 INFO/Changes-ver_2
 INFO/CONVERSION
 INFO/DEPRECATED
 INFO/KNOWN_INCOMP
 INFO/PATENTS
+INFO/Prereq_fixes.md
 INFO/RoadMap
 INFO/SPONSORS
 INFO/SUPPORT
@@ -44,11 +46,18 @@ contrib/pdf-deoptimize.pl
 contrib/pdf-optimize.pl
 contrib/text2pdf.pl
 docs/buildDoc.pl
+examples/README
+examples/examples.output
 examples/resources/040_annotation.pdf
 examples/resources/aptfrontview.jpg
 examples/resources/sample_55.pdf
 examples/resources/sample.txt
 examples/resources/pod2htmd.temp
+examples/resources/SVG/ATS_flow.svg
+examples/resources/SVG/GIFfilein.svg
+examples/resources/SVG/GPscatter5.svg
+examples/resources/SVG/MJdisplayNoTag.svg
+examples/resources/SVG/QRcode.svg
 examples/011_open_update
 examples/012_pages
 examples/020_corefonts
@@ -62,7 +71,6 @@ examples/023_cjkfonts
 examples/024_bdffonts
 examples/025_unifonts
 examples/026_unifont2
-# examples/027_winfont
 examples/030_colorspecs
 examples/031_color_hsv
 examples/032_separation
@@ -76,15 +84,16 @@ examples/BarCode.pl
 examples/Boxes.pl
 examples/Bspline.pl
 examples/Column.pl
+examples/Column_lists.pl
+#examples/Column_layouts.pl
 examples/Content.pl
 examples/ContentText.pl
-examples/examples.output
+examples/FontManager.pl
 examples/HarfBuzz.pl
-examples/README
 examples/RMtutorial.pl
 examples/Rotated.pl
 examples/ShowFont.pl
-examples/FontManager.pl
+examples/SVG.pl
 examples/Windows/027_winfont
 examples/Windows/Win32.pm
 lib/PDF/Builder.pm
@@ -182,6 +191,7 @@ lib/PDF/Builder/Resource/XObject/Image/JPEG.pm
 lib/PDF/Builder/Resource/XObject/Image/PNG.pm
 lib/PDF/Builder/Resource/XObject/Image/PNG_IPL.pm
 lib/PDF/Builder/Resource/XObject/Image/PNM.pm
+lib/PDF/Builder/Resource/XObject/Image/SVG.pm
 lib/PDF/Builder/Resource/XObject/Image/TIFF.pm
 lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm
 lib/PDF/Builder/Resource/XObject/Form.pm
@@ -264,6 +274,7 @@ t/rt120397.t
 t/rt120450.t
 t/rt126274.t
 t/string.t
+t/svg.t
 t/text.t
 t/tiff.t
 t/version.t

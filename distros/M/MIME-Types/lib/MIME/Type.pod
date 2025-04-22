@@ -66,6 +66,7 @@ Create (I<instantiate>) a new MIME::Type object which manages one
 mime type.
 
  -Option    --Default
+  charset     undef
   encoding    <depends on type>
   extensions  []
   simplified  <derived from type>
@@ -73,6 +74,10 @@ mime type.
   type        <required>
 
 =over 2
+
+=item charset => $charset
+
+Specify the default charset for this type.
 
 =item encoding => '7bit'|'8bit'|'base64'|'quoted-printable'
 
@@ -109,6 +114,15 @@ upper-case.
 =head2 Attributes
 
 =over 4
+
+=item $obj-E<gt>B<charset>()
+
+[2.28] RFC6657 prescribes that IANA registrations for text category
+types explicitly state their default character-set.  MIME-Types contains
+a manually produced list of these defaults.
+
+This method may also return C<_REQUIRED>, when there is no default, or
+C<_FRAMED> when the charset is determined by the content.
 
 =item $obj-E<gt>B<encoding>()
 
@@ -152,6 +166,15 @@ Returns the long type of this object, for instance C<'text/plain'>
 =head2 Knowledge
 
 =over 4
+
+=item $obj-E<gt>B<defaultCharset>()
+
+As per RFC6657, all C<text/*> types must either specify a default charset
+in its IANA registration, or require the charset parameter.  Non-text
+types may require a charset as well.
+
+It is hard to extract this information from the IANA registration files
+automagically, so is manually maintained.
 
 =item $obj-E<gt>B<equals>($string|$mime)
 
@@ -225,8 +248,8 @@ specified with the C<type> option flag.
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.27,
-built on February 07, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types distribution version 2.28,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-# Copyrights 2007-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report;
-use vars '$VERSION';
-$VERSION = '1.39';
+package Log::Report;{
+our $VERSION = '1.40';
+}
 
 use base 'Exporter';
 
@@ -24,8 +24,7 @@ my $lrm = 'Log::Report::Message';
 ### if you change anything here, you also have to change Log::Report::Minimal
 my @make_msg   = qw/__ __x __n __nx __xn N__ N__n N__w __p __px __np __npx/;
 my @functions  = qw/report dispatcher try textdomain/;
-my @reason_functions = qw/trace assert info notice warning
-    mistake error fault alert failure panic/;
+my @reason_functions = qw/trace assert info notice warning mistake error fault alert failure panic/;
 
 our @EXPORT_OK = (@make_msg, @functions, @reason_functions);
 
@@ -61,114 +60,113 @@ my $default_dispatcher = dispatcher PERL => 'default', accept => 'NOTICE-';
 
 
 sub report($@)
-{   my $opts = ref $_[0] eq 'HASH' ? +{ %{ (shift) } } : {};
-    my ($reason, $message) = (shift, shift);
+{	my $opts = ref $_[0] eq 'HASH' ? +{ %{ (shift) } } : {};
+	my ($reason, $message) = (shift, shift);
 
-    my $stop = exists $opts->{is_fatal} ? $opts->{is_fatal} : is_fatal $reason;
-    my $try  = $nested_tries[-1];  # WARNING: overloaded boolean, use 'defined'
+	my $stop = exists $opts->{is_fatal} ? $opts->{is_fatal} : is_fatal $reason;
+	my $try  = $nested_tries[-1];  # WARNING: overloaded boolean, use 'defined'
 
-    my @disp;
-    if(defined $try)
-    {   push @disp, @{$reporter->{needs}{$reason} || []}
-            unless $stop || $try->hides($reason);
+	my @disp;
+	if(defined $try)
+	{	push @disp, @{$reporter->{needs}{$reason} || []}
+			unless $stop || $try->hides($reason);
 
-        push @disp, $try
-            if $try->needs($reason) || $opts->{is_fatal};
-    }
-    else
-    {   @disp = @{$reporter->{needs}{$reason} || []};
-    }
+		push @disp, $try
+			if $try->needs($reason) || $opts->{is_fatal};
+	}
+	else
+	{	@disp = @{$reporter->{needs}{$reason} || []};
+	}
 
-    is_reason $reason
-        or error __x"token '{token}' not recognized as reason", token=>$reason;
+	is_reason $reason
+		or error __x"token '{token}' not recognized as reason", token=>$reason;
 
-    # return when no-one needs it: skip unused trace() fast!
-    @disp || $stop
-        or return;
+	# return when no-one needs it: skip unused trace() fast!
+	@disp || $stop
+		or return;
 
-    my $to = delete $opts->{to};
-    if($to)
-    {   # explicit destination, still disp may not need it.
-        if(ref $to eq 'ARRAY')
-        {   my %disp = map +($_->name => $_), @disp;
-            @disp    = grep defined, @disp{@$to};
-        }
-        else
-        {   @disp    = grep $_->name eq $to, @disp;
-        }
-        push @disp, $try if defined $try;
+	my $to = delete $opts->{to};
+	if($to)
+	{	# explicit destination, still disp may not need it.
+		if(ref $to eq 'ARRAY')
+		{	my %disp = map +($_->name => $_), @disp;
+			@disp	= grep defined, @disp{@$to};
+		}
+		else
+		{	@disp	= grep $_->name eq $to, @disp;
+		}
+		push @disp, $try if defined $try;
 
-        @disp || $stop
-            or return;
-    }
+		@disp || $stop
+			or return;
+	}
 
-    unless(Log::Report::Dispatcher->can('collectLocation'))
-    {   # internal Log::Report error can result in "deep recursions".
-        eval "require Carp"; Carp::confess($message);
-    }
-    $opts->{location} ||= Log::Report::Dispatcher->collectLocation;
+	unless(Log::Report::Dispatcher->can('collectLocation'))
+	{	# internal Log::Report error can result in "deep recursions".
+		eval "require Carp"; Carp::confess($message);
+	}
+	$opts->{location} ||= Log::Report::Dispatcher->collectLocation;
 
-    my $exception;
-    if(!blessed $message)
-    {   # untranslated message into object
-        @_%2 and error __x"odd length parameter list with '{msg}'", msg => $message;
-        $message  = $lrm->new(_prepend => $message, @_);
-    }
-    elsif($message->isa('Log::Report::Exception'))
-    {   $exception = $message;
-        $message   = $exception->message;
-    }
-    elsif($message->isa('Log::Report::Message'))
-    {   @_==0 or error __x"a message object is reported with more parameters";
-    }
-    else
-    {   # foreign object
-        my $text = "$message";  # hope stringification is overloaded
-		$text    =~ s/\s*$//gs;
-        @_%2 and error __x"odd length parameter list with object '{msg}'",
-             msg => $text;
-        $message = $lrm->new(_prepend => $text, @_);
-    }
+	my $exception;
+	if(!blessed $message)
+	{	# untranslated message into object
+		@_%2 and error __x"odd length parameter list with '{msg}'", msg => $message;
+		$message  = $lrm->new(_prepend => $message, @_);
+	}
+	elsif($message->isa('Log::Report::Exception'))
+	{	$exception = $message;
+		$message   = $exception->message;
+	}
+	elsif($message->isa('Log::Report::Message'))
+	{	@_==0 or error __x"a message object is reported with more parameters";
+	}
+	else
+	{	# foreign object
+		my $text = "$message";  # hope stringification is overloaded
+		$text	=~ s/\s*$//gs;
+		@_%2 and error __x"odd length parameter list with object '{msg}'", msg => $text;
+		$message = $lrm->new(_prepend => $text, @_);
+	}
 
-    $message->to(undef) if $to;  # overrule destination of message
-    if(my $disp_name = $message->to)
-    {   @disp = grep $_->name eq $disp_name, @disp;
-        push @disp, $try if defined $try && $disp_name ne 'try';
-        @disp or return;
-    }
+	$message->to(undef) if $to;  # overrule destination of message
+	if(my $disp_name = $message->to)
+	{	@disp = grep $_->name eq $disp_name, @disp;
+		push @disp, $try if defined $try && $disp_name ne 'try';
+		@disp or return;
+	}
 
-    $opts->{errno} //= $message->errno //
+	$opts->{errno} //= $message->errno //
 		(use_errno($reason) ? ($!+0 || $?) : is_fatal($reason) ? 1 : undef);
 
-    my $domain = $message->domain;
-    if(my $filters = $reporter->{filters})
-    {
-      DISPATCHER:
-        foreach my $d (@disp)
-        {   my ($r, $m) = ($reason, $message);
-            foreach my $filter (@$filters)
-            {   next if keys %{$filter->[1]} && !$filter->[1]{$d->name};
-                ($r, $m) = $filter->[0]->($d, $opts, $r, $m, $domain);
-                $r or next DISPATCHER;
-            }
-            $d->log($opts, $r, $m, $domain);
-        }
-    }
-    else
-    {   $_->log($opts, $reason, $message, $domain) for @disp;
-    }
+	my $domain = $message->domain;
+	if(my $filters = $reporter->{filters})
+	{
+	  DISPATCHER:
+		foreach my $d (@disp)
+		{	my ($r, $m) = ($reason, $message);
+			foreach my $filter (@$filters)
+			{	next if keys %{$filter->[1]} && !$filter->[1]{$d->name};
+				($r, $m) = $filter->[0]->($d, $opts, $r, $m, $domain);
+				$r or next DISPATCHER;
+			}
+			$d->log($opts, $r, $m, $domain);
+		}
+	}
+	else
+	{	$_->log($opts, $reason, $message, $domain) for @disp;
+	}
 
-    if($stop)
-    {   # $^S = $EXCEPTIONS_BEING_CAUGHT; parse: undef, eval: 1, else 0
-        (defined($^S) ? $^S : 1) or exit($opts->{errno} || 0);
+	if($stop)
+	{	# $^S = $EXCEPTIONS_BEING_CAUGHT; parse: undef, eval: 1, else 0
+		(defined($^S) ? $^S : 1) or exit($opts->{errno} || 0);
 
-        $! = $opts->{errno} || 0;
-        $@ = $exception || Log::Report::Exception->new(report_opts => $opts
-          , reason => $reason, message => $message);
-        die;   # $@->PROPAGATE() will be called, some eval will catch this
-    }
+		$! = $opts->{errno} || 0;
+		$@ = $exception || Log::Report::Exception->new(report_opts => $opts
+		  , reason => $reason, message => $message);
+		die;   # $@->PROPAGATE() will be called, some eval will catch this
+	}
 
-    @disp;
+	@disp;
 }
 
 
@@ -179,97 +177,97 @@ my %disp_actions = map +($_ => 1), qw/
 my $reopen_disp = 1;
 
 sub dispatcher($@)
-{   if(! $disp_actions{$_[0]})
-    {   my ($type, $name) = (shift, shift);
+{	if(! $disp_actions{$_[0]})
+	{	my ($type, $name) = (shift, shift);
 
-        # old dispatcher with same name will be closed in DESTROY
-        my $disps = $reporter->{dispatchers};
+		# old dispatcher with same name will be closed in DESTROY
+		my $disps = $reporter->{dispatchers};
  
-        if(!$reopen_disp)
-        {   my $has = first {$_->name eq $name} @$disps;
-            if(defined $has && $has ne $default_dispatcher)
-            {   my $default = $name eq 'default'
-                   ? ' (refreshing configuration instead)' : '';
-                trace "not reopening $name$default";
-                return $has;
-            }
-        }
+		if(!$reopen_disp)
+		{	my $has = first {$_->name eq $name} @$disps;
+			if(defined $has && $has ne $default_dispatcher)
+			{	my $default = $name eq 'default'
+				   ? ' (refreshing configuration instead)' : '';
+				trace "not reopening $name$default";
+				return $has;
+			}
+		}
 
-        my @disps = grep $_->name ne $name, @$disps;
-        trace "reopening dispatcher $name" if @disps != @$disps;
+		my @disps = grep $_->name ne $name, @$disps;
+		trace "reopening dispatcher $name" if @disps != @$disps;
 
-        my $disp = Log::Report::Dispatcher
-           ->new($type, $name, mode => $default_mode, @_);
+		my $disp = Log::Report::Dispatcher
+		   ->new($type, $name, mode => $default_mode, @_);
 
-        push @disps, $disp if $disp;
-        $reporter->{dispatchers} = \@disps;
+		push @disps, $disp if $disp;
+		$reporter->{dispatchers} = \@disps;
 
-        _whats_needed;
-        return $disp ? ($disp) : undef;
-    }
+		_whats_needed;
+		return $disp ? ($disp) : undef;
+	}
 
-    my $command = shift;
-    if($command eq 'list')
-    {   mistake __"the 'list' sub-command doesn't expect additional parameters"
-           if @_;
-        my @disp = @{$reporter->{dispatchers}};
-        push @disp, $nested_tries[-1] if @nested_tries;
-        return @disp;
-    }
-    if($command eq 'needs')
-    {   my $reason = shift || 'undef';
-        error __"the 'needs' sub-command parameter '{reason}' is not a reason"
-            unless is_reason $reason;
-        my $disp = $reporter->{needs}{$reason};
-        return $disp ? @$disp : ();
-    }
-    if($command eq 'filter')
-    {   my $code = shift;
-        error __"the 'filter' sub-command needs a CODE reference"
-            unless ref $code eq 'CODE';
-        my %names = map +($_ => 1), @_;
-        push @{$reporter->{filters}}, [ $code, \%names ];
-        return ();
-    }
-    if($command eq 'active-try')
-    {   return $nested_tries[-1];
-    }
-    if($command eq 'do-not-reopen')
-    {   $reopen_disp = 0;
-        return ();
-    }
+	my $command = shift;
+	if($command eq 'list')
+	{	mistake __"the 'list' sub-command doesn't expect additional parameters"
+		   if @_;
+		my @disp = @{$reporter->{dispatchers}};
+		push @disp, $nested_tries[-1] if @nested_tries;
+		return @disp;
+	}
+	if($command eq 'needs')
+	{	my $reason = shift || 'undef';
+		error __"the 'needs' sub-command parameter '{reason}' is not a reason"
+			unless is_reason $reason;
+		my $disp = $reporter->{needs}{$reason};
+		return $disp ? @$disp : ();
+	}
+	if($command eq 'filter')
+	{	my $code = shift;
+		error __"the 'filter' sub-command needs a CODE reference"
+			unless ref $code eq 'CODE';
+		my %names = map +($_ => 1), @_;
+		push @{$reporter->{filters}}, [ $code, \%names ];
+		return ();
+	}
+	if($command eq 'active-try')
+	{	return $nested_tries[-1];
+	}
+	if($command eq 'do-not-reopen')
+	{	$reopen_disp = 0;
+		return ();
+	}
 
-    my $mode     = $command eq 'mode' ? shift : undef;
+	my $mode	 = $command eq 'mode' ? shift : undef;
 
-    my $all_disp = @_==1 && $_[0] eq 'ALL';
-    my $disps    = $reporter->{dispatchers};
-    my @disps;
-    if($all_disp) { @disps = @$disps }
-    else
-    {   # take the dispatchers in the specified order.  Both lists
-        # are small, so O(x²) is small enough
-        for my $n (@_) { push @disps, grep $_->name eq $n, @$disps }
-    }
+	my $all_disp = @_==1 && $_[0] eq 'ALL';
+	my $disps	= $reporter->{dispatchers};
+	my @disps;
+	if($all_disp) { @disps = @$disps }
+	else
+	{	# take the dispatchers in the specified order.  Both lists
+		# are small, so O(x²) is small enough
+		for my $n (@_) { push @disps, grep $_->name eq $n, @$disps }
+	}
 
-    error __"only one dispatcher name accepted in SCALAR context"
-        if @disps > 1 && !wantarray && defined wantarray;
+	error __"only one dispatcher name accepted in SCALAR context"
+		if @disps > 1 && !wantarray && defined wantarray;
 
-    if($command eq 'close')
-    {   my %kill = map +($_->name => 1), @disps;
-        @$disps  = grep !$kill{$_->name}, @$disps;
-        $_->close for @disps;
-    }
-    elsif($command eq 'enable')  { $_->_disabled(0) for @disps }
-    elsif($command eq 'disable') { $_->_disabled(1) for @disps }
-    elsif($command eq 'mode')
-    {    Log::Report::Dispatcher->defaultMode($mode) if $all_disp;
-         $_->_set_mode($mode) for @disps;
-    }
+	if($command eq 'close')
+	{	my %kill = map +($_->name => 1), @disps;
+		@$disps  = grep !$kill{$_->name}, @$disps;
+		$_->close for @disps;
+	}
+	elsif($command eq 'enable')  { $_->_disabled(0) for @disps }
+	elsif($command eq 'disable') { $_->_disabled(1) for @disps }
+	elsif($command eq 'mode')
+	{	Log::Report::Dispatcher->defaultMode($mode) if $all_disp;
+		 $_->_set_mode($mode) for @disps;
+	}
 
-    # find does require reinventarization
-    _whats_needed if $command ne 'find';
+	# find does require reinventarization
+	_whats_needed if $command ne 'find';
 
-    wantarray ? @disps : $disps[0];
+	wantarray ? @disps : $disps[0];
 }
 
 END { $_->close for @{$reporter->{dispatchers}} }
@@ -280,57 +278,57 @@ END { $_->close for @{$reporter->{dispatchers}} }
 # this method shall be called to re-investigate the back-ends.
 
 sub _whats_needed()
-{   my %needs;
-    foreach my $disp (@{$reporter->{dispatchers}})
-    {   push @{$needs{$_}}, $disp for $disp->needs;
-    }
-    $reporter->{needs} = \%needs;
+{	my %needs;
+	foreach my $disp (@{$reporter->{dispatchers}})
+	{	push @{$needs{$_}}, $disp for $disp->needs;
+	}
+	$reporter->{needs} = \%needs;
 }
 
 
 sub try(&@)
-{   my $code = shift;
+{	my $code = shift;
 
-    @_ % 2
-      and report {location => [caller 0]}, PANIC =>
-          __x"odd length parameter list for try(): forgot the terminating ';'?";
+	@_ % 2
+	  and report {location => [caller 0]}, PANIC =>
+		  __x"odd length parameter list for try(): forgot the terminating ';'?";
 
 	unshift @_, mode => 'DEBUG'
-        if $reporter->{needs}{TRACE};
+		if $reporter->{needs}{TRACE};
 
-    my $disp = Log::Report::Dispatcher::Try->new(TRY => 'try', @_);
+	my $disp = Log::Report::Dispatcher::Try->new(TRY => 'try', @_);
 
-    # L::R native messages are logged directly in $disp via @nested_tries
-    push @nested_tries, $disp;
+	# L::R native messages are logged directly in $disp via @nested_tries
+	push @nested_tries, $disp;
 
-    # user's __DIE__ handlers would frustrate the exception mechanism
-    local $SIG{__DIE__};
+	# user's __DIE__ handlers would frustrate the exception mechanism
+	local $SIG{__DIE__};
 
-    my ($ret, @ret);
-    if(!defined wantarray)  { eval { $code->() } } # VOID   context
-    elsif(wantarray) { @ret = eval { $code->() } } # LIST   context
-    else             { $ret = eval { $code->() } } # SCALAR context
+	my ($ret, @ret);
+	if(!defined wantarray)  { eval { $code->() } } # VOID   context
+	elsif(wantarray) { @ret = eval { $code->() } } # LIST   context
+	else			 { $ret = eval { $code->() } } # SCALAR context
 
-    my $err  = $@;
-    pop @nested_tries;   # remove $disp
+	my $err  = $@;
+	pop @nested_tries;   # remove $disp
 
-    my $is_exception = blessed $err && $err->isa('Log::Report::Exception');
-    if(!$is_exception && $err && !$disp->wasFatal)
-    {   # Decode errors which do not origin from Log::Report reports
-        # Native exceptions are already logged.
-        my ($opts, $reason, $text) = blessed $err
-          ? Log::Report::Die::exception_decode($err)
-          : Log::Report::Die::die_decode($err, on_die => $disp->die2reason);
+	my $is_exception = blessed $err && $err->isa('Log::Report::Exception');
+	if(!$is_exception && $err && !$disp->wasFatal)
+	{	# Decode errors which do not origin from Log::Report reports
+		# Native exceptions are already logged.
+		my ($opts, $reason, $text) = blessed $err
+		  ? Log::Report::Die::exception_decode($err)
+		  : Log::Report::Die::die_decode($err, on_die => $disp->die2reason);
 
-        $disp->log($opts, $reason, __$text);
-    }
+		$disp->log($opts, $reason, __$text);
+	}
 
-    $disp->died($err)
-        if $is_exception ? $err->isFatal : $err;
+	$disp->died($err)
+		if $is_exception ? $err->isFatal : $err;
 
-    $@ = $disp;
+	$@ = $disp;
 
-    wantarray ? @ret : $ret;
+	wantarray ? @ret : $ret;
 }
 
 #------------
@@ -351,73 +349,42 @@ sub panic(@)   {report PANIC   => @_}
 
 
 sub __($)
-{   my ($cpkg, $fn, $linenr) = caller;
-    $lrm->new
-      ( _msgid  => shift
-      , _domain => pkg2domain($cpkg)
-      , _use    => "$fn line $linenr"
-      );
+{	my ($cpkg, $fn, $linenr) = caller;
+	$lrm->new(_msgid  => shift, _domain => pkg2domain($cpkg), _use => "$fn line $linenr");
 } 
 
 
 # label "msgid" added before first argument
 sub __x($@)
-{   my ($cpkg, $fn, $linenr) = caller;
-    @_%2 or error __x"even length parameter list for __x at {where}",
-        where => "$fn line $linenr";
+{	my ($cpkg, $fn, $linenr) = caller;
+	@_%2 or error __x"even length parameter list for __x at {where}", where => "$fn line $linenr";
 
-    my $msgid = shift;
-    $lrm->new
-      ( _msgid  => $msgid
-      , _expand => 1
-      , _domain => pkg2domain($cpkg)
-      , _use    => "$fn line $linenr"
-      , @_
-      );
+	my $msgid = shift;
+	$lrm->new(_msgid => $msgid, _expand => 1, _domain => pkg2domain($cpkg), _use => "$fn line $linenr", @_);
 } 
 
 
 sub __n($$$@)
-{   my ($single, $plural, $count) = (shift, shift, shift);
-    my ($cpkg, $fn, $linenr) = caller;
-    $lrm->new
-     ( _msgid  => $single
-     , _plural => $plural
-     , _count  => $count
-     , _domain => pkg2domain($cpkg)
-     , _use    => "$fn line $linenr"
-     , @_
-     );
+{	my ($single, $plural, $count) = (shift, shift, shift);
+	my ($cpkg, $fn, $linenr) = caller;
+	$lrm->new(_msgid => $single, _plural => $plural, _count => $count, _domain => pkg2domain($cpkg),
+		_use => "$fn line $linenr" , @_);
 }
 
 
 sub __nx($$$@)
-{   my ($single, $plural, $count) = (shift, shift, shift);
-    my ($cpkg, $fn, $linenr) = caller;
-    $lrm->new
-     ( _msgid  => $single
-     , _plural => $plural
-     , _count  => $count
-     , _expand => 1
-     , _domain => pkg2domain($cpkg)
-     , _use    => "$fn line $linenr"
-     , @_
-     );
+{	my ($single, $plural, $count) = (shift, shift, shift);
+	my ($cpkg, $fn, $linenr) = caller;
+	$lrm->new(_msgid => $single, _plural => $plural, _count => $count, _expand => 1,
+		_domain => pkg2domain($cpkg), _use => "$fn line $linenr", @_);
 }
 
 
 sub __xn($$$@)   # repeated for prototype
-{   my ($single, $plural, $count) = (shift, shift, shift);
-    my ($cpkg, $fn, $linenr) = caller;
-    $lrm->new
-     ( _msgid  => $single
-     , _plural => $plural
-     , _count  => $count
-     , _expand => 1
-     , _domain => pkg2domain($cpkg)
-     , _use    => "$fn line $linenr"
-     , @_
-     );
+{	my ($single, $plural, $count) = (shift, shift, shift);
+	my ($cpkg, $fn, $linenr) = caller;
+	$lrm->new(_msgid => $single, _plural => $plural, _count => $count, _expand => 1,
+		_domain => pkg2domain($cpkg), _use => "$fn line $linenr", @_);
 }
 
 
@@ -434,143 +401,135 @@ sub N__w(@) {split " ", $_[0]}
 
 sub __p($$) { __($_[0])->_msgctxt($_[1]) }
 sub __px($$@)
-{   my ($ctxt, $msgid) = (shift, shift);
-    __x($msgid, @_)->_msgctxt($ctxt);
+{	my ($ctxt, $msgid) = (shift, shift);
+	__x($msgid, @_)->_msgctxt($ctxt);
 }
 
 sub __np($$$$)
-{   my ($ctxt, $msgid, $plural, $count) = @_;
-    __n($msgid, $msgid, $plural, $count)->_msgctxt($ctxt);
+{	my ($ctxt, $msgid, $plural, $count) = @_;
+	__n($msgid, $msgid, $plural, $count)->_msgctxt($ctxt);
 }
 
 sub __npx($$$$@)
-{   my ($ctxt, $msgid, $plural, $count) = splice @_, 0, 4;
-    __nx($msgid, $msgid, $plural, $count, @_)->_msgctxt($ctxt);
+{	my ($ctxt, $msgid, $plural, $count) = splice @_, 0, 4;
+	__nx($msgid, $msgid, $plural, $count, @_)->_msgctxt($ctxt);
 }
 
 #-------------
 
 sub import(@)
-{   my $class = shift;
+{	my $class = shift;
 
-    if($INC{'Log/Report/Minimal.pm'})
-    {    my ($pkg, $fn, $line) = caller;   # do not report on LR:: modules
-         if(index($pkg, 'Log::Report::') != 0)
-         {   # @pkgs empty during release testings of L::R distributions
-             my @pkgs = Log::Report::Optional->usedBy;
-             die "Log::Report loaded too late in $fn line $line, "
-               . "put in $pkg before ", (join ',', @pkgs) if @pkgs;
-         }
-    }
+	if($INC{'Log/Report/Minimal.pm'})
+	{	my ($pkg, $fn, $line) = caller;   # do not report on LR:: modules
+		if(index($pkg, 'Log::Report::') != 0)
+		{	# @pkgs empty during release testings of L::R distributions
+			my @pkgs = Log::Report::Optional->usedBy;
+			die "Log::Report loaded too late in $fn line $line, put in $pkg before ", (join ',', @pkgs) if @pkgs;
+		}
+	}
 
-    my $to_level   = ($_[0] && $_[0] =~ m/^\+\d+$/ ? shift : undef) || 0;
-    my $textdomain = @_%2 ? shift : undef;
-    my %opts       = @_;
+	my $to_level   = ($_[0] && $_[0] =~ m/^\+\d+$/ ? shift : undef) || 0;
+	my $textdomain = @_%2 ? shift : undef;
+	my %opts       = @_;
 
-    my ($pkg, $fn, $linenr) = caller $to_level;
-    my $domain;
+	my ($pkg, $fn, $linenr) = caller $to_level;
+
+	### Log::Report options
+
+	if(exists $opts{mode})
+	{	$default_mode = delete $opts{mode} || 0;
+		Log::Report::Dispatcher->defaultMode($default_mode);
+		dispatcher mode => $default_mode, 'ALL';
+	}
+
+	my @export;
+	if(my $in = delete $opts{import})
+	{	push @export, ref $in eq 'ARRAY' ? @$in : $in;
+	}
+	else
+	{	push @export, @functions, @make_msg;
+
+		my $syntax = delete $opts{syntax} || 'SHORT';
+		if($syntax eq 'SHORT')
+		{	push @export, @reason_functions
+		}
+		elsif($syntax ne 'REPORT' && $syntax ne 'LONG')
+		{	error __x"syntax flag must be either SHORT or REPORT, not `{flag}' in {fn} line {line}",
+				flag => $syntax, fn => $fn, line => $linenr;
+		}
+	}
+
+	if(my $msg_class = delete $opts{message_class})
+	{	$msg_class->isa($lrm)
+			or error __x"message_class {class} does not extend {base}"
+				 , base => $lrm, class => $msg_class;
+		$lrm = $msg_class;
+	}
+
+	$class->export_to_level(1+$to_level, undef, @export);
+
+	### Log::Report::Domain configuration
 
     if(defined $textdomain)
     {   pkg2domain $pkg, $textdomain, $fn, $linenr;
-        $domain = textdomain $textdomain;
+        my $domain = textdomain $textdomain;
+		$domain->configure(%opts, where => [$pkg, $fn, $linenr ]) if keys %opts;
     }
-
-    ### Log::Report options
-
-    if(exists $opts{mode})
-    {   $default_mode = delete $opts{mode} || 0;
-        Log::Report::Dispatcher->defaultMode($default_mode);
-        dispatcher mode => $default_mode, 'ALL';
-    }
-
-    my @export;
-    if(my $in = delete $opts{import})
-    {   push @export, ref $in eq 'ARRAY' ? @$in : $in;
-    }
-    else
-    {   push @export, @functions, @make_msg;
-
-        my $syntax = delete $opts{syntax} || 'SHORT';
-        if($syntax eq 'SHORT')
-        {   push @export, @reason_functions
-        }
-        elsif($syntax ne 'REPORT' && $syntax ne 'LONG')
-        {   error __x"syntax flag must be either SHORT or REPORT, not `{flag}' in {fn} line {line}"
-              , flag => $syntax, fn => $fn, line => $linenr;
-        }
-    }
-
-    if(my $msg_class = delete $opts{message_class})
-    {   $msg_class->isa($lrm)
-            or error __x"message_class {class} does not extend {base}"
-                 , base => $lrm, class => $msg_class;
-        $lrm = $msg_class;
-    }
-
-    $class->export_to_level(1+$to_level, undef, @export);
-
-    ### Log::Report::Domain configuration
-
-    if(!%opts) { }
-    elsif($domain)
-    {   $domain->configure(%opts, where => [$pkg, $fn, $linenr ]) }
-    else
-    {   error __x"no domain for configuration options in {fn} line {line}"
-          , fn => $fn, line => $linenr;
+    elsif(keys %opts)
+    {   error __x"no domain for configuration options in {fn} line {line}", fn => $fn, line => $linenr;
     }
 }
 
 # deprecated, since we have a ::Domain object in 1.00
 sub translator($;$$$$)
-{   # replaced by (textdomain $domain)->configure
+{	# replaced by (textdomain $domain)->configure
 
-    my ($class, $name) = (shift, shift);
-    my $domain = textdomain $name
-        or error __x"textdomain `{domain}' for translator not defined"
-             , domain => $name;
+	my ($class, $name) = (shift, shift);
+	my $domain = textdomain $name
+		or error __x"textdomain `{domain}' for translator not defined", domain => $name;
 
-    @_ or return $domain->translator;
+	@_ or return $domain->translator;
 
-    my ($translator, $pkg, $fn, $line) = @_;
-    ($pkg, $fn, $line) = caller    # direct call, not via import
-        unless defined $pkg;
+	my ($translator, $pkg, $fn, $line) = @_;
+	($pkg, $fn, $line) = caller   # direct call, not via import
+		unless defined $pkg;
 
-    $translator->isa('Log::Report::Translator')
-        or error __x"translator must be a {pkg} object for {domain}"
-              , pkg => 'Log::Report::Translator', domain => $name;
+	$translator->isa('Log::Report::Translator')
+		or error __x"translator must be a {pkg} object for {domain}", pkg => 'Log::Report::Translator', domain => $name;
 
-    $domain->configure(translator => $translator, where => [$pkg, $fn, $line]);
+	$domain->configure(translator => $translator, where => [$pkg, $fn, $line]);
 }
 
 
 sub textdomain(@)
-{   if(@_==1 && blessed $_[0])
-    {   my $domain = shift;
-        $domain->isa('Log::Report::Domain') or panic;
-        return $reporter->{textdomains}{$domain->name} = $domain;
-    }
+{
+	if(@_==1 && blessed $_[0])
+	{	my $domain = shift;
+		$domain->isa('Log::Report::Domain') or panic;
+		return $reporter->{textdomains}{$domain->name} = $domain;
+	}
 
-    if(@_==2)
-    {    # used for 'maintenance' and testing
-    	return delete $reporter->{textdomains}{$_[0]} if $_[1] eq 'DELETE';
-    	return $reporter->{textdomains}{$_[0]} if $_[1] eq 'EXISTS';
-    }
+	if(@_==2)
+	{	# used for 'maintenance' and testing
+		return delete $reporter->{textdomains}{$_[0]} if $_[1] eq 'DELETE';
+		return $reporter->{textdomains}{$_[0]} if $_[1] eq 'EXISTS';
+	}
 
-    my $name   = (@_%2 ? shift : pkg2domain((caller)[0])) || 'default';
-    my $domain = $reporter->{textdomains}{$name}
-        ||= Log::Report::Domain->new(name => $name);
-
-    $domain->configure(@_, where => [caller]) if @_;
-    $domain;
+	my $name   = (@_%2 ? shift : pkg2domain((caller)[0])) || 'default';
+	my $domain = $reporter->{textdomains}{$name} ||= Log::Report::Domain->new(name => $name);
+	$domain->configure(@_, where => [caller]) if @_;
+	$domain;
 }
 
 #--------------
 
 sub needs(@)
-{   my $thing = shift;
-    my $self  = ref $thing ? $thing : $reporter;
-    first {$self->{needs}{$_}} @_;
+{	my $thing = shift;
+	my $self  = ref $thing ? $thing : $reporter;
+	first {$self->{needs}{$_}} @_;
 }
 
+#--------------
 
 1;

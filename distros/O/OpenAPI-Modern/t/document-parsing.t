@@ -139,7 +139,7 @@ ERRORS
 subtest 'bad subschemas' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {
       $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
       jsonSchemaDialect => DEFAULT_DIALECT,
@@ -185,8 +185,7 @@ ERRORS
 subtest 'identify subschemas and other entities' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => my $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
@@ -268,8 +267,8 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
-    evaluator => $js = JSON::Schema::Modern->new(validate_formats => 1),
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',  # needed to override $schema
+    evaluator => $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
@@ -505,8 +504,7 @@ YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {
       $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
       %$servers,
@@ -582,8 +580,7 @@ ERRORS
 subtest 'disallowed fields adjacent to $refs in path-items' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
-    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
+    evaluator => my $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/alpha: {}
@@ -594,7 +591,6 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
     evaluator => $js,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:

@@ -8,7 +8,7 @@ use HTML::TableContent::Table;
 use HTML::TableContent::Table::Caption;
 use HTML::TableContent::Table::Header;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 my %TABLE = (
     caption => 'HTML::TableContent::Table::Caption',
@@ -145,7 +145,7 @@ HTML::TableContent::Template - MooX Template Tables.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -276,7 +276,7 @@ LNATION, C<< <email at lnation.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016->2020 LNATION.
+Copyright 2016->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

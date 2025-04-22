@@ -1,0 +1,91 @@
+{
+   "abstract" : "An interface to the MOTIS routing service",
+   "author" : [
+      "Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>",
+      "Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Travel-Status-MOTIS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cache::File" : "0",
+            "GIS::Distance" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0.16",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "URI" : "0",
+            "perl" : "v5.20.0"
+         }
+      }
+   },
+   "provides" : {
+      "Travel::Status::MOTIS" : {
+         "file" : "lib/Travel/Status/MOTIS.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::MOTIS::Polyline" : {
+         "file" : "lib/Travel/Status/MOTIS/Polyline.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::MOTIS::Services" : {
+         "file" : "lib/Travel/Status/MOTIS/Services.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::MOTIS::Stop" : {
+         "file" : "lib/Travel/Status/MOTIS/Stop.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::MOTIS::Stopover" : {
+         "file" : "lib/Travel/Status/MOTIS/Stopover.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::MOTIS::Trip" : {
+         "file" : "lib/Travel/Status/MOTIS/Trip.pm",
+         "version" : "0.01"
+      },
+      "Travel::Status::MOTIS::TripAtStopover" : {
+         "file" : "lib/Travel/Status/MOTIS/TripAtStopover.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/derf/Travel-Status-MOTIS"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

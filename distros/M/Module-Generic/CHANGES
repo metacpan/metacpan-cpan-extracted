@@ -1,5 +1,27 @@
 Revision history for Perl module Module::Generic
 
+v0.43.3 2025-04-22T21:08:25+0900
+    - Minor correction of _set_get_callback method in Module::Generic
+    - Corrected method 'clear_error' to make it thread safe.
+    - Corrected minor bug in methods '_set_get_object', and '_set_get_object_without_init' in Module::Generic
+    - Ensuring errors are cleared after further method calls
+    - Improved handling of lvalue methods
+    - Improved threads handling in Module::Generic::File
+    - Better handling of threads for Module::Generic::Scalar, Module::Generic::SharedMem, and Module::Generic::SharedMemXS
+
+v0.43.2 2025-04-20T19:45:24+0900
+    - Improvement and correction for 'check' callbacks in Module::Generic
+
+v0.43.1 2025-04-20T19:07:58+0900
+    - Minor improvement for threads
+
+v0.43.0 2025-04-20T17:34:37+0900
+    - Improved message debugging in handling utf8 characters
+    - Better handling of file with utf8 characters in Module::Generic::File
+    - Added support for check in most _set_get_* methods
+    - Added support for callbacks to more methods _set_get_*
+    - Improved modules for thread-safety
+
 v0.42.0 2025-03-24T22:15:34+0900
     - Added method new_json_safe in Module::Generic
     - Corrected unit tests for 25.file_csv.t

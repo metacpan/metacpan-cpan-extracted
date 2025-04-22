@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -15,7 +15,9 @@ our $BmpNum = 0;
 
 =head1 NAME
 
-PDF::Builder::Resource::Font::BdFont - Module for using bitmapped Fonts.
+PDF::Builder::Resource::Font::BdFont - Module for using bitmapped Fonts
+
+Inherits from L<PDF::Builder::Resource::Font>
 
 =head1 SYNOPSIS
 
@@ -42,7 +44,7 @@ for body text!
 
 =head2 new
 
-    $font = PDF::Builder::Resource::Font::BdFont->new($pdf, $font, %options)
+    $font = PDF::Builder::Resource::Font::BdFont->new($pdf, $font, %opts)
 
 =over
 
@@ -52,6 +54,7 @@ Returns a BmpFont object.
 
 =cut
 
+# TBD? not implemented
 #I<encode>
 #... changes the encoding of the font from its default.
 #See I<Perl's Encode> for the supported values.
@@ -62,14 +65,14 @@ Returns a BmpFont object.
 
 =pod
 
-Valid %options are:
+Valid options (%opts) are:
 
 =over
 
 =item I<style> 
 
-A value of 'block' (default) assembles a character from
-contiguous square blocks. A value of 'dot' assembles a character from 
+A value of 'B<block>' (the default) assembles a character from
+contiguous square blocks. A value of 'B<dot>' assembles a character from 
 overlapping filled circles, in the style of a dot matrix printer.
 
 =back

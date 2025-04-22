@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg height="512" width="640" xmlns="http://www.w3.org/2000/svg" 
+ xmlns:svg="http://www.w3.org/2000/svg" 
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="15" y="120" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="19" y="148" style="fill:black;font-family:Helvetica;font-size:13px;">config</text>
+<rect x="25" y="190" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<rect x="20" y="195" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<rect x="15" y="200" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="17" y="222" style="fill:black;font-family:Helvetica;font-size:13px;">images</text>
+<rect x="25" y="270" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<rect x="20" y="275" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<rect x="15" y="280" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="26" y="300" style="fill:black;font-family:Helvetica;font-size:13px;">tests</text>
+<rect x="175" y="25" width="75" height="50" style="stroke:black;stroke-width:5;fill:white;" />
+<text x="188" y="53" style="fill:black;font-family:Helvetica;font-size:13px;">testPlan</text>
+<rect x="175" y="350" width="75" height="50" style="stroke:black;stroke-width:5;fill:white;" />
+<text x="190" y="378" style="fill:black;font-family:Helvetica;font-size:13px;">runTest</text>
+<rect x="400" y="350" width="75" height="50" style="stroke:black;stroke-width:5;fill:white;" />
+<text x="405" y="378" style="fill:black;font-family:Helvetica;font-size:13px;">runReport</text>
+<rect x="174" y="402" width="77" height="30" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="182" y="422" style="fill:black;font-family:Helvetica;font-size:13px;">Selenium</text>
+<rect x="174" y="465" width="77" height="45" rx="10" ry="10" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="185" y="492" style="fill:black;font-family:Helvetica;font-size:13px;">Browser</text>
+<rect x="70" y="390" width="77" height="45" rx="10" ry="10" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="81" y="417" style="fill:black;font-family:Helvetica;font-size:13px;">Console</text>
+<rect x="320" y="340" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<rect x="315" y="345" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<rect x="310" y="350" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="320" y="370" style="fill:black;font-family:Helvetica;font-size:13px;">logs</text>
+<rect x="310" y="25" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="320" y="45" style="fill:black;font-family:Helvetica;font-size:13px;">plan</text>
+<rect x="405" y="25" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="415" y="45" style="fill:black;font-family:Helvetica;font-size:13px;">plan</text>
+<rect x="505" y="350" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="511" y="370" style="fill:black;font-family:Helvetica;font-size:13px;">report</text>
+<rect x="575" y="350" width="50" height="50" style="stroke:black;stroke-width:2;fill:white;" />
+<text x="580" y="370" style="fill:black;font-family:Helvetica;font-size:13px;">report</text>
+<text x="21" y="242" style="fill:black;font-family:Helvetica;font-style:italic;font-size:9px;">.jpg, etc.</text>
+<text x="19" y="320" style="fill:black;font-family:Helvetica;font-style:italic;font-size:9px;">.test, .txt</text>
+<text x="323" y="390" style="fill:black;font-family:Helvetica;font-style:italic;font-size:9px;">.log</text>
+<text x="320" y="65" style="fill:black;font-family:Helvetica;font-style:italic;font-size:9px;">.html</text>
+<text x="516" y="390" style="fill:black;font-family:Helvetica;font-style:italic;font-size:9px;">.html</text>
+<text x="419" y="65" style="fill:black;font-family:Helvetica;font-style:italic;font-size:9px;">.pdf</text>
+<text x="588" y="390" style="fill:black;font-family:Helvetica;font-style:italic;font-size:9px;">.pdf</text>
+<path d="M88,225 H505 A25,25 0 0,1 530,250 V336" style="stroke:black;stroke-width:15;fill:none;" />
+<path d="M310,225 A25,25 0 0,0 335,200 V89" style="stroke:black;stroke-width:15;fill:none;" />
+<path d="M0,7.5 h0 l6.2932472338296,7.5 v-30 l-6.2932472338296,7.5 h-0 z" style="stroke:none;stroke-width:1;fill:black;" transform="rotate(-180 88,225) translate(87,225)" />
+<path d="M0,7.5 h0 v7.5 l12.5864944676592,-15 -12.5864944676592,-15 v7.5 h-0 z" style="stroke:none;stroke-width:1;fill:black;" transform="rotate(90 530,336) translate(529,336)" />
+<path d="M0,7.5 h0 v7.5 l12.5864944676592,-15 -12.5864944676592,-15 v7.5 h-0 z" style="stroke:none;stroke-width:1;fill:black;" transform="rotate(-90 335,89) translate(334,89)" />
+<path d="M90,225 H505 A25,25 0 0,1 530,250 V336" style="stroke:yellow;stroke-width:11;fill:none;" />
+<path d="M310,225 A25,25 0 0,0 335,200 V89" style="stroke:yellow;stroke-width:11;fill:none;" />
+<path d="M0,5.5 h2 l4.61504797147504,5.5 v-22 l-4.61504797147504,5.5 h-2 z" style="stroke:none;stroke-width:1;fill:yellow;" transform="rotate(-180 90,225) translate(89,225)" />
+<path d="M0,5.5 h0.950258793822155 v5.5 l9.23009594295008,-11 -9.23009594295008,-11 v5.5 h-0.950258793822155 z" style="stroke:none;stroke-width:1;fill:yellow;" transform="rotate(90 530,336) translate(529,336)" />
+<path d="M0,5.5 h0.950258793822155 v5.5 l9.23009594295008,-11 -9.23009594295008,-11 v5.5 h-0.950258793822155 z" style="stroke:none;stroke-width:1;fill:yellow;" transform="rotate(-90 335,89) translate(334,89)" />
+<path d="M88,295 H395 A25,25 0 0,1 420,320 V334" style="stroke:#006000;stroke-width:15;fill:none;" />
+<path d="M170,295 A25,25 0 0,1 195,320 V334" style="stroke:#006000;stroke-width:15;fill:none;" />
+<path d="M170,295 A25,25 0 0,0 195,270 V91" style="stroke:#006000;stroke-width:15;fill:none;" />
+<path d="M0,7.5 h0 l6.2932472338296,7.5 v-30 l-6.2932472338296,7.5 h-0 z" style="stroke:none;stroke-width:1;fill:#006000;" transform="rotate(-180 88,295) translate(87,295)" />
+<path d="M0,7.5 h0 v7.5 l12.5864944676592,-15 -12.5864944676592,-15 v7.5 h-0 z" style="stroke:none;stroke-width:1;fill:#006000;" transform="rotate(90 420,334) translate(419,334)" />
+<path d="M0,7.5 h0 v7.5 l12.5864944676592,-15 -12.5864944676592,-15 v7.5 h-0 z" style="stroke:none;stroke-width:1;fill:#006000;" transform="rotate(90 195,334) translate(194,334)" />
+<path d="M0,7.5 h0 v7.5 l12.5864944676592,-15 -12.5864944676592,-15 v7.5 h-0 z" style="stroke:none;stroke-width:1;fill:#006000;" transform="rotate(-90 195,91) translate(194,91)" />
+<path d="M86,145 H430 A25,25 0 0,1 455,170 V341" style="stroke:#000060;stroke-width:4;fill:none;" />
+<path d="M205,145 A25,25 0 0,1 230,170 V341" style="stroke:#000060;stroke-width:4;fill:none;" />
+<path d="M205,145 A25,25 0 0,0 230,120 V84" style="stroke:#000060;stroke-width:4;fill:none;" />
+<path d="M0,2 h0 l3.35639852470912,4 v-12 l-3.35639852470912,4 h-0 z" style="stroke:none;stroke-width:1;fill:#000060;" transform="rotate(-180 86,145) translate(85,145)" />
+<path d="M0,2 h0 v4 l5.03459778706368,-6 -5.03459778706368,-6 v4 h-0 z" style="stroke:none;stroke-width:1;fill:#000060;" transform="rotate(90 455,341) translate(454,341)" />
+<path d="M0,2 h0 v4 l5.03459778706368,-6 -5.03459778706368,-6 v4 h-0 z" style="stroke:none;stroke-width:1;fill:#000060;" transform="rotate(90 230,341) translate(229,341)" />
+<path d="M0,2 h0 v4 l5.03459778706368,-6 -5.03459778706368,-6 v4 h-0 z" style="stroke:none;stroke-width:1;fill:#000060;" transform="rotate(-90 230,84) translate(229,84)" />
+<line x1="260" y1="50" x2="300" y2="50" style="stroke:black;stroke-width:2;" />
+<path d="m-4.56829012890868,7 l5.87369741824096,-7  -5.87369741824096,-7" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(0 300,50) translate(299,50)" />
+<line x1="367" y1="50" x2="396" y2="50" style="stroke:black;stroke-width:2;" />
+<path d="m-4.56829012890868,7 l5.87369741824096,-7  -5.87369741824096,-7" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(0 396,50) translate(395,50)" />
+<line x1="150" y1="390" x2="168" y2="375" style="stroke:black;stroke-width:2;" />
+<path d="m-5.59479772870485,6 l7.15052155556526,-6  -7.15052155556526,-6" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(140.2 150,390) translate(149,390)" />
+<path d="m-5.59479772870485,6 l7.15052155556526,-6  -7.15052155556526,-6" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(-39.8 168,375) translate(167,375)" />
+<line x1="213" y1="437" x2="213" y2="460" style="stroke:black;stroke-width:2;" />
+<path d="m-4.56829012890868,7 l5.87369741824096,-7  -5.87369741824096,-7" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(-90 213,437) translate(212,437)" />
+<path d="m-4.56829012890868,7 l5.87369741824096,-7  -5.87369741824096,-7" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(90 213,460) translate(212,460)" />
+<line x1="257" y1="350" x2="302" y2="360" style="stroke:black;stroke-width:2;" />
+<path d="m-4.40304413611064,5 l5.95876796297105,-5  -5.95876796297105,-5" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(12.5 302,360) translate(301,360)" />
+<line x1="257" y1="375" x2="302" y2="375" style="stroke:black;stroke-width:2;" />
+<path d="m-4.40304413611064,5 l5.95876796297105,-5  -5.95876796297105,-5" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(0 302,375) translate(301,375)" />
+<line x1="257" y1="400" x2="302" y2="390" style="stroke:black;stroke-width:2;" />
+<path d="m-4.40304413611064,5 l5.95876796297105,-5  -5.95876796297105,-5" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(-12 302,390) translate(301,390)" />
+<line x1="481" y1="375" x2="498" y2="375" style="stroke:black;stroke-width:2;" />
+<path d="m-4.56829012890868,7 l5.87369741824096,-7  -5.87369741824096,-7" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(0 498,375) translate(497,375)" />
+<line x1="559" y1="375" x2="569" y2="375" style="stroke:black;stroke-width:2;" />
+<path d="m-4.56829012890868,7 l5.87369741824096,-7  -5.87369741824096,-7" style="stroke:black;stroke-width:2;fill:none;" transform="rotate(0 569,375) translate(568,375)" />
+<line x1="374" y1="375" x2="389" y2="375" style="stroke:black;stroke-width:8;" />
+<path d="M0,4 h0 v4 l6.71279704941824,-8 -6.71279704941824,-8 v4 h-0 z" style="stroke:none;stroke-width:1;fill:black;" transform="rotate(0 389,375) translate(388,375)" />
+<line x1="100" y1="50" x2="100" y2="350" style="stroke:black;stroke-width:2;stroke-dasharray:8,6;" />
+<text x="22" y="60" style="fill:black;font-family:Helvetica;font-size:11px;">Provided</text>
+<text x="21" y="80" style="fill:black;font-family:Helvetica;font-size:11px;">by Tester</text>
+</svg>

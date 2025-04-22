@@ -1,7 +1,10 @@
 Revision history for MooseX-Types
 
+0.51      2025-04-19 18:55:03Z
+        - use Sub::Util rather than Sub::Name, since Sub::Util is in core
+
 0.50      2017-02-07 18:59:30Z
-        - reverted the is_Fo and to_Foo refactoring again temporarily to
+        - reverted the is_Foo and to_Foo refactoring again temporarily to
           resolve issues with Sub::Defer
 
 0.49      2016-12-23 00:12:12Z

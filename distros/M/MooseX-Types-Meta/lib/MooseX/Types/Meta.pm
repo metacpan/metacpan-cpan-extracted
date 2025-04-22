@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package MooseX::Types::Meta; # git description: 0.01-6-g107e523
+package MooseX::Types::Meta; # git description: v0.02-11-g05b102e
 # ABSTRACT: Moose types to check against Moose's meta objects
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use MooseX::Types -declare => [qw(
     TypeConstraint
@@ -201,7 +201,7 @@ MooseX::Types::Meta - Moose types to check against Moose's meta objects
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =for stopwords
 ParameterizableRole
@@ -282,7 +282,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHOR
 

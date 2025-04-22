@@ -6,7 +6,7 @@ use warnings;
 
 use parent 'DateTime';
 use POSIX qw( floor );
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our (%strftime_patterns, %sub_format, @ORDINALS, @NTT);
 BEGIN {
@@ -312,7 +312,7 @@ DateTime::Ordinal - The great new DateTime::Ordinal!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -590,27 +590,17 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Ordinal>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/DateTime-Ordinal>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/DateTime-Ordinal>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/DateTime-Ordinal>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019 by LNATION.
+This software is Copyright (c) 2019->2025 by LNATION.
 
 This is free software, licensed under:
 

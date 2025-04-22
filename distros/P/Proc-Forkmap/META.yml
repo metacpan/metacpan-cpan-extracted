@@ -18,6 +18,5 @@ no_index:
     - t
     - inc
 requires:
-  Proc::Fork: 0.71
   Test::More: 0
-version: 0.2201
+version: 0.2305

@@ -1,8 +1,21 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.13	Tue Apr 22 15:08:00 EDT 2025
+	Added the data option to new()
+	sep_char option to new() wasn't being remembered
+	Added AUTOLOAD support
+	Fix typo - 'durs' should read 'dirs'
+
+0.12	Mon Apr 21 10:29:54 EDT 2025
+	Allow environment variables to use '::' to separate fields
+
+0.11	Mon Apr 21 08:56:35 EDT 2025
+	Make the environment variable override simpler for simple cases
+
 0.10	Sun Apr 13 21:45:12 EDT 2025
 	Check with JSON::Parse first
 	Use Data::Reuse, but note RT#100461
+	Note the filetype
 
 0.09	Sat Apr 12 15:48:48 EDT 2025
 	Better fix for old Perls

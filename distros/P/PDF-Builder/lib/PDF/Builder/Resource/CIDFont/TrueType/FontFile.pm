@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.025'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -27,7 +27,9 @@ my @default_CMap = ('0/6 3/10 0/4 3/1 0/3', '0/6 0/4 3/10 0/3 3/1');
 
 =head1 NAME
 
-PDF::Builder::Resource::CIDFont::TrueType::FontFile - additional code support for TT font files. Inherits from L<PDF::Builder::Basic::PDF::Dict>
+PDF::Builder::Resource::CIDFont::TrueType::FontFile - Additional code support for TT font files
+
+Inherits from L<PDF::Builder::Basic::PDF::Dict>
 
 =cut
 

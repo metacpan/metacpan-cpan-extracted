@@ -1,14 +1,14 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Log-Report-Lexicon. Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report::Extract::Template;
-use vars '$VERSION';
-$VERSION = '1.11';
+package Log::Report::Extract::Template;{
+our $VERSION = '1.12';
+}
 
 use base 'Log::Report::Extract';
 
@@ -93,7 +93,7 @@ sub scanTemplateToolkit($$$$)
     my $msgs_found = 0;
 
     # pre-compile the regexes, for performance
-    my $pipe_func_block  = qr/^\s*\|\s*$function\b/;
+    my $pipe_func_block  = qr/^\s*(?:\|\s*|FILTER\s+)$function\b/;
     my $msgid_pipe_func  = qr/^\s*(["'])([^\r\n]+?)\1\s*\|\s*$function\b/;
     my $func_msgid_multi = qr/(\b$function\s*\(\s*)(["'])([^\r\n]+?)\2/s;
 
@@ -101,7 +101,7 @@ sub scanTemplateToolkit($$$$)
     {   my ($skip_text, $take) = (shift @frags, shift @frags);
         $linenr += $skip_text =~ tr/\n//;
         if($take =~ $pipe_func_block)
-        {   # [% | loc(...) %] $msgid [%END%]
+        {   # [% | loc(...) %] $msgid [%END%]  or [% FILTER ... %]...[% END %]
             if(@frags < 2 || $frags[1] !~ /^\s*END\s*$/)
             {   error __x"template syntax error, no END in {fn} line {line}"
                   , fn => $fn, line => $linenr;

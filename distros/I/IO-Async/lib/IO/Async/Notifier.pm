@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2006-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Notifier 0.803;
+package IO::Async::Notifier 0.804;
 
 use v5.14;
 use warnings;

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,11 +21,11 @@ no_index:
 provides:
   Mac::OSA::Notification::Tiny:
     file: lib/Mac/OSA/Notification/Tiny.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Import::Export: '1.00'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Mac-OSA-Notification-Tiny.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

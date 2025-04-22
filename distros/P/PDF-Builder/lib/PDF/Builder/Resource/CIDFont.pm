@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -16,6 +16,8 @@ use PDF::Builder::Util;
 =head1 NAME
 
 PDF::Builder::Resource::CIDFont - Base class for CID fonts
+
+Inherits from L<PDF::Builder::Resource::BaseFont>
 
 =head1 METHODS
 
@@ -226,9 +228,14 @@ sub text {
     #      1 (default) = x20 and same/longer spaces
     #      2 = all spaces
     #      the problem is, other font types handle only x20 in Reader
-    my $latest_page = $self->{' apipdf'}->{' outlist'}[0]->{'Pages'}->{'Kids'}->{' val'}[-1];
-    my $wordspace = $latest_page->{'Contents'}->{' val'}[0]->{' wordspace'};
-    my $fontsize = $latest_page->{'Contents'}->{' val'}[0]->{' fontsize'};
+    my ($latest_page, $wordspace, $fontsize);
+    $latest_page = $self->{' apipdf'}->{' outlist'}[0]->{'Pages'}->{'Kids'}->{' val'}[-1];
+    $wordspace = $latest_page->{'Contents'}->{' val'}->[1]->{' wordspace'};
+    $fontsize = $latest_page->{'Contents'}->{' val'}->[1]->{' fontsize'};
+if (!defined $wordspace || !defined $fontsize || $fontsize <= 0) {
+    $wordspace = $latest_page->{'Contents'}->{' val'}->[0]->{' wordspace'};
+    $fontsize = $latest_page->{'Contents'}->{' val'}->[0]->{' fontsize'};
+}
     my @fragments = ( $text ); # default for wordspace = 0
     # TBD: get list of different lengths of spaces found, split on all of them
     #      could have null fragments where two or more spaces in a row, or

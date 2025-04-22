@@ -1,7 +1,7 @@
 package App::Mxpress::PDF;
 use Dancer2;
 use App::Mxpress::PDF::API;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 prefix undef;
 
@@ -17,7 +17,7 @@ App::Mxpress::PDF - A utility application for generating PDFs
  
 =head1 VERSION
  
-Version 0.21
+Version 0.22
  
 =cut
 
@@ -131,15 +131,7 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
  
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Mxpress-PDF>
- 
-=item * AnnoCPAN: Annotated CPAN documentation
- 
-L<http://annocpan.org/dist/App-Mxpress-PDF>
- 
-=item * CPAN Ratings
- 
-L<https://cpanratings.perl.org/d/App-Mxpress-PDF>
- 
+
 =item * Search CPAN
  
 L<https://metacpan.org/release/App-Mxpress-PDF>

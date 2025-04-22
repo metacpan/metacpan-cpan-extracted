@@ -21,25 +21,25 @@ no_index:
 provides:
   Data::URIID:
     file: lib/Data/URIID.pm
-    version: v0.15.0
+    version: v0.16.0
   Data::URIID::Barcode:
     file: lib/Data/URIID/Barcode.pm
-    version: v0.15.0
+    version: v0.16.0
   Data::URIID::Base:
     file: lib/Data/URIID/Base.pm
-    version: v0.15.0
+    version: v0.16.0
   Data::URIID::Colour:
     file: lib/Data/URIID/Colour.pm
-    version: v0.15.0
+    version: v0.16.0
   Data::URIID::Digest:
     file: lib/Data/URIID/Digest.pm
-    version: v0.15.0
+    version: v0.16.0
   Data::URIID::Result:
     file: lib/Data/URIID/Result.pm
-    version: v0.15.0
+    version: v0.16.0
   Data::URIID::Service:
     file: lib/Data/URIID/Service.pm
-    version: v0.15.0
+    version: v0.16.0
 recommends:
   Barcode::ZBar: '0.04'
   GD::Barcode: '1.15'
@@ -59,11 +59,10 @@ requires:
   Math::BigInt: '1.999816'
   URI: '1.5'
   URI::Escape: '3.31'
-  UUID::Tiny: '1.04'
   perl: v5.16.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-URIID.git
-version: v0.15
+version: v0.16
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

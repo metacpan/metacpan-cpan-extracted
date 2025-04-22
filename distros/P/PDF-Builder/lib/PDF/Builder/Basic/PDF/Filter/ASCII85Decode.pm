@@ -5,12 +5,14 @@ use base 'PDF::Builder::Basic::PDF::Filter';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Filter::ASCII85Decode - compress and uncompress stream filters for ASCII-85
+PDF::Builder::Basic::PDF::Filter::ASCII85Decode - Compress and uncompress stream filters for ASCII-85
+
+Inherits from L<PDF::Builder::Basic::PDF::Filter>
 
 =cut
 

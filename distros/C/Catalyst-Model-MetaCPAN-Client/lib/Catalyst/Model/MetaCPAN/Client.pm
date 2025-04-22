@@ -1,5 +1,5 @@
 package Catalyst::Model::MetaCPAN::Client;
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use MetaCPAN::Client; use HTTP::Tiny::Mech; use WWW::Mechanize::Cached; use CHI;
 use base 'Catalyst::Model';
 
@@ -129,7 +129,7 @@ Catalyst::Model::MetaCPAN::Client - Catalyst Model for MetaCPAN
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -273,28 +273,21 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Model-MetaCPAN-Client>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Catalyst-Model-MetaCPAN-Client>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Catalyst-Model-MetaCPAN-Client>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 

@@ -240,7 +240,7 @@ Revision history for DBIx-Squirrel
 -   Added the “count_all” method back into the iterator class, as well
     as ensuring that “count” does not affect a future call to “next”.
 -   Addressed build failures revealed by the CPAN Testers Matrix:
-    -   Rewrote &DBIx::Squirrel::util::isolate_callbacks - failed on Perl
+    -   Rewrote &DBIx::Squirrel::util::callbacks_args - failed on Perl
         versions <= 5.18.4;
     -   Back to using “strict” and “warnings” - Modern::Perl having some
         issues with a bundle “all” in Perl versions <= 5.14.4.

@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 Travel::Status::DE::DBRIS::Location->mk_ro_accessors(
 	qw(eva id lat lon name products type is_cancelled is_additional is_separation display_priority

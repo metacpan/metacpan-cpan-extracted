@@ -21,7 +21,7 @@ BEGIN {
 
   plan skip_all => 'These tests may fail if the test suite continues to evolve! They should only be run with '
       .join(', ', map $_.'=1', head(-1, @variables)).' or '.$variables[-1].'=1'
-    if not -d '.git' and not grep $ENV{$_}, @variables;
+    if not grep $ENV{$_}, @variables;
 }
 
 my $version = 'draft7';
@@ -45,6 +45,9 @@ acceptance_tests(
           optional/content.json
         ) ] },
       { file => 'definitions.json', group_description => [ 'valid definition', 'validate definition against metaschema' ] },
+      # various edge cases that are difficult to accomodate
+      $Config{ivsize} < 8 ? { file => 'multipleOf.json', group_description => 'small multiple of large integer', test_description => 'any integer is a multiple of 1e-8' } : (),
+
       # only same-document, same-base JSON pointers are supported in $ref
       { file => 'ref.json', group_description => [
           '$ref prevents a sibling $id from changing the base uri',

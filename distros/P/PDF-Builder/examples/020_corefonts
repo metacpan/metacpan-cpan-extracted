@@ -70,16 +70,23 @@ my @fns=qw{
 #   bankgothicbolditalic
 #   bankgothicitalic
 
-my @ARGVcopy = @ARGV;
-# 'short' (-s flag)?
-if (@ARGVcopy > 0 && $ARGVcopy[0] eq '-s') {
-    @ARGVcopy = qw{
+# default to list of font name(s) given on command line. -s is special case
+# or can give specific list. MUTUALLY EXCLUSIVE
+if (@ARGV == 0) {
+    # use entire @fns list unchanged
+} elsif ($ARGV[0] eq '-s') {
+    # 'short' (-s flag)?  length is > 0
+    @fns = qw{
         Courier-Bold
 	Times-Italic
 	Symbol
     };
+} else {
+    # specified name(s)
+    @fns = @ARGV;
 }
 
+# TBD: -enc encoding(s)  on command line
 # use only with single byte encodings, as multibyte (including UTF-8) don't
 # appear to be compatible with these core fonts
 # there may be a number of aliases available for each encoding.
@@ -119,11 +126,6 @@ my @ecs = qw{
 @ecs = qw{ latin1 };
 
 my ($y, $pdf, $f1);
-
-# override default list with command line entries
-if (scalar @ARGVcopy && $ARGVcopy[0] ne '-s') {
-    @fns = @ARGVcopy;
-}
 
 # loop through list of font names
 foreach my $fn (@fns) {

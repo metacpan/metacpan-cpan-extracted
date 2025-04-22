@@ -1,13 +1,19 @@
 
 ===== history of distribution Mail-Box-POP3
 
+version 3.007: Fri Apr 18 08:59:39 PM CEST 2025
+
+	Changes:
+	- use IO::Socket::IP to replace IO::Socket::INET
+	  [J Plesnik] rt.cpan.org#149607
+
 version 3.006: Mon 28 Aug 13:35:25 CEST 2023
 
 	Improvements:
 	- Mail::Box::POP3 and Mail::Transport::POP3 can set SSL during
 	  construction.
 	  rt.cpan.org#140896 [Yanyan Yang]
-	- Add OUATH2 verification [Madha Prasad]
+	- Add OUATH2 verification [Medha Prasad]
 
 	Changes:
 	- Default SSL options disable verification.

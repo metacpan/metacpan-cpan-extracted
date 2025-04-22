@@ -18,7 +18,7 @@ Log::Report::Translator::POT - translation based on POT files
    );
 
  print Log::Report::Translator::POT
-    ->new(lexicon => $dir)
+    ->new(lexicons => $dir)
     ->translate($msg, 'nl-BE');
 
  # normal use (end-users view in the program's ::main)
@@ -117,12 +117,12 @@ Inherited, see L<Log::Report::Translator/"Translating">
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.11,
-built on March 22, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon distribution version 1.12,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

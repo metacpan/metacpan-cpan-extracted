@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/JSON.pm
-## Version v0.1.0
+## Version v0.2.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/03/24
-## Modified 2025/03/24
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,19 +13,30 @@
 package Module::Generic::JSON;
 BEGIN
 {
+    use v5.12.0;
     use strict;
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( @EXPORT @EXPORT_OK $AUTOLOAD $DEBUG $VERSION );
+    use Config;
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    }
     use JSON ();
     use Scalar::Util ();
     our @ISA         = qw( Module::Generic );
     our @EXPORT      = qw( from_json to_json encode_json decode_json );
     our @EXPORT_OK   = qw( new_json );
     our %EXPORT_TAGS = ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.1';
 };
 
+use v5.12.0;
 use strict;
 use warnings;
 
@@ -95,7 +106,16 @@ sub decode_json($)
 {
     my $rv = eval
     {
-        ( $JSON ||= __PACKAGE__->new->utf8 )->decode( @_ );
+        state $JSON;
+        if( HAS_THREADS )
+        {
+            lock( $JSON );
+            ( $JSON ||= __PACKAGE__->new->utf8 )->decode( @_ );
+        }
+        else
+        {
+            ( $JSON ||= __PACKAGE__->new->utf8 )->decode( @_ );
+        }
     };
     if( $@ )
     {
@@ -108,7 +128,16 @@ sub encode_json($)
 {
     my $rv = eval
     {
-        ( $JSON ||= __PACKAGE__->new->utf8 )->encode( @_ );
+        state $JSON;
+        if( HAS_THREADS )
+        {
+            lock( $JSON );
+            ( $JSON ||= __PACKAGE__->new->utf8 )->encode( @_ );
+        }
+        else
+        {
+            ( $JSON ||= __PACKAGE__->new->utf8 )->encode( @_ );
+        }
     };
     if( $@ )
     {
@@ -183,7 +212,11 @@ sub AUTOLOAD
         {
             local $@;
             my $wantlist = wantarray();
-            my @rv = eval{ ( $wantlist // '' ) ? ( $code->( $j, scalar( @args ) ? @args : () ) ) : scalar( $code->( $j, scalar( @args ) ? @args : () ) ) };
+            my @rv = eval
+            {
+                local $SIG{__DIE__} = sub{};
+                ( $wantlist // '' ) ? ( $code->( $j, scalar( @args ) ? @args : () ) ) : scalar( $code->( $j, scalar( @args ) ? @args : () ) )
+            };
             if( $@ )
             {
                 return( $self->error( $@ ) );
@@ -207,6 +240,7 @@ sub AUTOLOAD
         local $@;
         my @rv = eval
         {
+            local $SIG{__DIE__} = sub{};
             $code->( scalar( @args ) ? @args : () );
         };
         if( $@ )
@@ -263,7 +297,7 @@ Or, even simpler:
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

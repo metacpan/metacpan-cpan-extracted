@@ -20,8 +20,8 @@ package PDF::Builder::Basic::PDF::File;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -210,6 +210,7 @@ sub new {
         $root->{'Type'} = PDFName('Catalog');
     }
     $self->new_obj($root);
+
     $self->{'Root'} = $root;
 
     return $self;
@@ -244,8 +245,8 @@ even a program B<crash>) may happen further along. If you experience crashes
 when reading in a PDF file, try running with C<diags> and see what is reported.
 
 There are many PDF files out "in the wild" which, while failing to conform to
-Adobe's standards, appear to be tolerated by PDF Readers. Thus, Builder will no
-longer fail on them, but merely comment on their existence.
+Adobe's standards, appear to be tolerated by PDF Readers. Thus, Builder will 
+not fail on them, but merely comment on their existence.
 
 =back
 
@@ -270,8 +271,16 @@ sub open {
         }
         $fh = $filename;
     } else {
-        die "File '$filename' does not exist!" unless -f $filename;
-        $fh = IO::File->new(($update ? '+' : '') . "<$filename") || return;
+        die "PDF file '$filename' to open does not exist!"  unless -f $filename;
+        die "PDF file '$filename' to open is not readable!" unless -r $filename;
+	# requesting to update (write) to file? needs to be r/w
+        if ($update) {
+            die "PDF file '$filename' to update is not writable!" unless -w $filename;
+        }
+        $fh = IO::File->new(($update ? '+' : '') . "<$filename");
+	if (!$fh) {
+	    die "File '$filename' unable to open! $!";
+	}
         $self->{' INFILE'} = $fh;
         if ($update) {
             $self->{' update'} = 1;
@@ -305,7 +314,7 @@ sub open {
     }
     unless ($buffer =~ m/startxref[^\d]+([0-9]+)($cr|\s*)\%\%eof.*?/i) {
 	if ($options{'diags'} == 1) {
-            warn "Malformed PDF file $filename"; #orig 'die'
+            warn "Malformed PDF file $filename";
         }
     }
     my $xpos = $1; # offset given after 'startxref'
@@ -322,9 +331,9 @@ sub open {
 
 =head2 version
 
-    $new_version = $p->version($version, %opts) # Set 
+    $new_version = $p->pdf_version($version, %opts) # Set 
 
-    $ver = $p->version() # Get
+    $ver = $p->pdf_version() # Get
 
 =over
 
@@ -342,7 +351,7 @@ This message is suppressed if the 'silent' option is given with any value.
 
 =cut
 
-sub version {
+sub pdf_version {
     my $self = shift();
 
     # current version is the higher of trailer and header versions
@@ -515,8 +524,8 @@ Silently sets the version to the higher level.
 
 sub require_version {
     my ($self, $min_version) = @_;
-    my $current_version = $self->version();
-    $self->version($min_version) if $current_version < $min_version;
+    my $current_version = $self->pdf_version();
+    $self->pdf_version($min_version) if $current_version < $min_version;
     return $current_version;
 }
 
@@ -1284,7 +1293,7 @@ sub ship_out {
         map { $fh->print("\%   $_ \n") } split(/$cr/, $objind->{' comments'}) if $objind->{' comments'};
         $self->{' locs'}{$objind->uid()} = $fh->tell();
         my ($objnum, $objgen) = @{$self->{' objects'}{$objind->uid()}}[0..1];
-        $fh->printf('%d %d obj ', $objnum, $objgen);
+        $fh->printf("%d %d obj\n", $objnum, $objgen);
         $objind->outobjdeep($fh, $self);
         $fh->print("\nendobj\n");
 
@@ -1380,7 +1389,9 @@ sub locate_obj {
     my ($self, $num, $gen) = @_;
 
     my $tdict = $self;
+    my $seen = {};
     while (defined $tdict) {
+	$seen->{$tdict->{' loc'}} = 1;
         if (ref $tdict->{' xref'}{$num}) {
             my $ref = $tdict->{' xref'}{$num};
             return $ref unless scalar(@$ref) == 3;
@@ -1391,6 +1402,9 @@ sub locate_obj {
             }
         }
         $tdict = $tdict->{' prev'};
+	if ($seen->{$tdict->{' loc'}}) {
+	    die "Malformed PDF: trailer contains a loop or repeated object ID";
+	}
     }
 
     return;
@@ -1859,7 +1873,11 @@ sub out_trailer {
         $self->ship_out();
     }
 
-    $tdict->{'Size'} = PDFNum($self->{' maxobj'});
+    if (defined $self->{'Size'}) {
+        $tdict->{'Size'} = PDFNum($self->{' maxobj'} -1 );
+    } else {
+        $tdict->{'Size'} = PDFNum($self->{' maxobj'}    );
+    }
 
     my $tloc = $fh->tell();
 ##  $fh->print("xref\n");

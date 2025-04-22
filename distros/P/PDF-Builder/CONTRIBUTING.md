@@ -6,7 +6,8 @@ We would appreciate the community around us chipping in with code, tests,
 documentation, and even just bug reports and feature requests. It's better 
 knowing what users of PDF::Builder want and need, than for us to guess. It's 
 not good to spend a lot of time working on something that no one is interested 
-in!
+in! Of course, there's always that apocryphal quote from Henry Ford: "If I had
+asked people what they wanted, the would have said **faster horses**."
 
 You can contribute to the discussion by posting bug reports, feature requests, 
 observations, etc. to the [GitHub issues area](https://github.com/PhilterPaper/Perl-PDF-Builder/issues?q=is%3Aissue+sort%3Aupdated-desc "issues")
@@ -38,11 +39,12 @@ effort if we decline the offer.
 
 Do NOT under ANY circumstances open a PR (Pull Request) to **report a _bug_.** 
 It is a waste of both _your_ and _our_ time and effort. Instead, simply open a 
-regular ticket (_issue_) in GitHub, and attach a Perl (.pl) program that 
+regular ticket (_issue_) in GitHub, and _attach_ a Perl (.pl) program that 
 illustrates the problem, if possible.
 If you believe that you have a program patch (i.e., a permanent change to the
 code), and offer to share it as a PR, we may give the go-ahead. Unsolicited PRs
-may be closed without further action.
+may be closed without further action, especially if it goes in a direction we
+do not wish to go in.
 
 Please do not start on a massive project (especially, new function), without 
 discussing it with us first (via email or one of the discussion areas). This 
@@ -57,6 +59,12 @@ suggest that you release it as a separate package on CPAN (dependent on
 PDF::Builder), or as a new sub-package under PDF::Builder (e.g., like 
 PDF::API2::Ladder), under either our ownership or yours.
 
+## Contributing money instead of code
+
+You may wish to see new features in PDF::Builder, but are not up to coding 
+such. We have, from time to time, accepted payment to sponsor new features.
+See INFO/SPONSORS for more information.
+
 Good luck, and best wishes using and helping with PDF::Builder!
 
-May, 2023
+January, 2025

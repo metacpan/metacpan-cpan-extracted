@@ -1,8 +1,8 @@
-package MooseX::Types::LoadableClass; # git description: v0.014-7-g546ab28
+package MooseX::Types::LoadableClass; # git description: v0.015-8-g23151a4
 # ABSTRACT: ClassName type constraint with coercion to load the class.
 # KEYWORDS: moose types constraints class classes role roles module modules
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use strict;
 use warnings;
@@ -36,7 +36,6 @@ coerce LoadableRole, from Str, via { $_ };
 __PACKAGE__->type_storage->{ClassName}
     = __PACKAGE__->type_storage->{LoadableClass};
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -51,7 +50,7 @@ MooseX::Types::LoadableClass - ClassName type constraint with coercion to load t
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -109,7 +108,7 @@ Tomas Doran <bobtfish@bobtfish.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Dagfinn Ilmari Mannsåker Florian Ragwitz Gregory Oschwald Сергей Романов
+=for stopwords Karen Etheridge Dagfinn Ilmari Mannsåker Florian Ragwitz Graham Knop Gregory Oschwald Сергей Романов
 
 =over 4
 
@@ -124,6 +123,10 @@ Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 =item *
 
 Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 

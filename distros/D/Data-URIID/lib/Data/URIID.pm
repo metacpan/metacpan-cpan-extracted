@@ -23,7 +23,7 @@ use Data::Identifier;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 my %names = (
     service => {
@@ -482,7 +482,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 

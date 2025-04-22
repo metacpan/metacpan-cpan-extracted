@@ -14,7 +14,6 @@ requires "MIME::Base64" => "3.15";
 requires "Math::BigInt" => "1.999816";
 requires "URI" => "1.5";
 requires "URI::Escape" => "3.31";
-requires "UUID::Tiny" => "1.04";
 requires "perl" => "v5.16.0";
 recommends "Barcode::ZBar" => "0.04";
 recommends "GD::Barcode" => "1.15";

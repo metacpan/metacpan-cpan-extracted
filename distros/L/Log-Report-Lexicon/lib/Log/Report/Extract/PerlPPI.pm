@@ -1,14 +1,14 @@
-# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Log-Report-Lexicon. Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report::Extract::PerlPPI;
-use vars '$VERSION';
-$VERSION = '1.11';
+package Log::Report::Extract::PerlPPI;{
+our $VERSION = '1.12';
+}
 
 use base 'Log::Report::Extract';
 
@@ -43,8 +43,8 @@ sub process($@)
 
     my $charset = $opts{charset} || 'iso-8859-1';
 
-    $charset eq 'iso-8859-1'
-        or error __x"PPI only supports iso-8859-1 (latin-1) on the moment";
+#   $charset eq 'iso-8859-1'
+#       or error __x"PPI only supports iso-8859-1 (latin-1) on the moment";
 
     my $doc = PPI::Document->new($fn, readonly => 1)
         or fault __x"cannot read perl from file {filename}", filename => $fn;
@@ -107,6 +107,10 @@ sub process($@)
             my $def  = $msgids{$word}  # get __() description
                 or return 0;
 
+			# Avoid the declaration of the conversion routines in Log::Report
+			$domain ne 'log-report' || ! $node->parent->isa('PPI::Statement::Sub')
+				or return 0;
+
             my @msgids = $self->_get($node, $domain, $word, $def)
                 or return 0;
 
@@ -114,9 +118,7 @@ sub process($@)
 
             my $line = $node->location->[0];
             unless($domain)
-            {   mistake
-                    __x"no text-domain for translatable at {fn} line {line}"
-                  , fn => $fn, line => $line;
+            {   mistake __x"no text-domain for translatable at {fn} line {line}", fn => $fn, line => $line;
                 return 0;
             }
 

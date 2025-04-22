@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Carp;
 use POSIX qw(floor);
@@ -20,6 +20,8 @@ use PDF::Builder::Util;
 =head1 NAME
 
 PDF::Builder::Page - Methods to interact with individual pages
+
+Inherits from L<PDF::Builder::Basic::PDF::Pages>
 
 =head1 SYNOPSIS
 
@@ -645,11 +647,14 @@ The media box defines the boundaries of the physical medium on which the page is
 to be printed.  It may include any extended area surrounding the finished page
 for bleed, printing marks, or other such purposes. The default value is as
 defined for PDF, a US letter page (8.5" x 11").
+B<CAUTION:> Most printers can I<not> print all the way to the edge of the
+physical medium (paper, etc.). Some space around the edges will be reserved
+for pinch rollers, etc. to move the paper without smearing around toner or ink.
 
 =item crop
 
 The crop box defines the region to which the contents of the page shall be
-clipped (cropped) when displayed or printed.  The default value is the page's
+clipped (cropped) when displayed or printed. The default value is the page's
 media box.
 This is a historical page boundary. You'll likely want to set the bleed and/or
 trim boxes instead.
@@ -745,6 +750,7 @@ of a rectangle can be specified.
 
 =cut
 
+# returns ARRAY of 4 elements
 sub _to_rectangle {
     my $value = shift();
 
@@ -753,7 +759,7 @@ sub _to_rectangle {
         if      (@$value == 2) {
             return (0, 0, @$value);
         } elsif (@$value == 4) {
-            return @$value;
+            return (@$value);
         }
         croak "Page boundary array must contain two or four numbers";
     }
@@ -786,8 +792,9 @@ sub boundaries {
     # Get
     if      (@_ == 0) {  # empty list -- do all boxes
         my %boundaries;
-        foreach my $box (qw(Media Crop Bleed Trim Art)) {
-            $boundaries{lc($box)} = [$self->_bounding_box($box . 'Box')];
+        foreach my $box (qw( Media Crop Bleed Trim Art )) {
+            my @xxx = $self->_bounding_box($box . 'Box');
+            $boundaries{lc($box)} = \@xxx;
         }
         return %boundaries;
     } elsif (@_ == 1) {  # request one specific box
@@ -801,8 +808,8 @@ sub boundaries {
     }
 
     # Set
-    my %boxes = @_;
-    foreach my $box (qw(media crop bleed trim art)) {
+    my %boxes = @_; # should be even count
+    foreach my $box (qw( media crop bleed trim art )) {
         next unless exists $boxes{$box};
 
         # Special case: A single number as the value for anything other than
@@ -827,8 +834,7 @@ sub boundaries {
             $rectangle[1] += $value;
             $rectangle[2] -= $value;
             $rectangle[3] -= $value;
-        }
-        else {
+        } else {
             @rectangle = _to_rectangle($value);
         }
 
@@ -837,7 +843,7 @@ sub boundaries {
         $boxes{$box} = [@rectangle];
     }
 
-    return $self;
+    return %boxes;
 }
 
 sub _bounding_box {
@@ -954,7 +960,8 @@ are to be compressed. If not given, the default is for the overall PDF
 compression setting to be used (I<on> by default).
 
 You may have more than one I<gfx> object. They and I<text> objects will be 
-output as objects and streams I<in the order defined>, with all actions pertaining
+output as objects and streams I<in the order B<that the objects are>
+defined>, with all actions pertaining
 to this I<gfx> object appearing in one stream. However, note that graphics 
 and text objects are not fully independent of each other: the exit state 
 (linewidth, strokecolor, etc.) of one object is the entry state of the next 
@@ -990,6 +997,17 @@ after creating $I<type>:
       $text2->save();
     $grfx2 = $page->gfx();
       $grfx1->restore();
+
+I<Generally,> you will want to define the graphics object first, and then the
+text object after that. This defines the order in which the streams will be
+rendered (graphics first), which is usually desirable if you're setting a
+background color, or have other graphics with which you want to overlay text
+over. Sometimes, though, you may wish to overlay text with graphics, in which
+case you might either define the objects text and then graphics, or define a
+second graphics stream to lay over the text. Most of the time it really doesn't
+matter which comes first (as text and graphics don't interact or overlay), but
+in any case, be aware of states carried over from the end of one stream
+into the next.
 
 B<Alternate name:> C<graphics>
 
@@ -1078,8 +1096,10 @@ compression setting to be used (I<on> by default).
 
 Please see the discussion above in C<gfx()> regarding multiple graphics and
 text objects on one page, how they are grouped into PDF objects and streams, 
-and the rendering consequences of running through one entire object at a time,
-before moving on to the next.
+and the rendering consequences of running through one entire object (stream)
+at a time, before moving on to the next. Even if you have only one graphics
+and one text stream, the order in which they are defined has consequences for
+how text overlays graphics or vice-versa.
 
 The I<text> object has many settings and attributes of its own, but shares many
 with graphics (I<gfx>), such as strokecolor, fillcolor, linewidth, linedash,

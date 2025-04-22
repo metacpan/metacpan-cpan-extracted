@@ -1,5 +1,11 @@
 Revision history for Perl module Test::CheckGitStatus
 
+0.1.2 2025-04-19 00:13:52+02:00
+
+    - Fix calling git on Windows
+    - tests: Call the right perl
+    - tests: Support older git versions
+
 v0.1.0 2025-04-12 16:26:53+02:00
 
     - First Release

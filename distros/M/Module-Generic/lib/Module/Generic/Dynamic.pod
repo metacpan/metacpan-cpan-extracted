@@ -75,6 +75,42 @@ This would create a method using the helper method L<Module::Generic/"_set_get_b
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
+=head1 THREAD SAFETY WARNING
+
+B<This module is not thread-safe.>
+
+C<Module::Generic::Dynamic> dynamically creates packages and injects methods into symbol tables at runtime using C<eval>. In multi-threaded environments (Perl ithreads), this can cause:
+
+=over 4
+
+=item *
+
+Race conditions between threads attempting to create the same symbol
+
+=item *
+
+Corrupted symbol tables if a method is installed while another thread is reading or writing from the same class
+
+=back
+
+=head2 Recommended Usage
+
+=over 4
+
+=item *
+
+Use this module only during application initialization, before any threads are spawned.
+
+=item *
+
+Avoid invoking C<new()> or triggering C<AUTOLOAD()> from within a thread.
+
+=item *
+
+If used in a persistent environment (like mod_perl), precompile structures at startup.
+
+=back
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>

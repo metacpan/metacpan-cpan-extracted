@@ -2,7 +2,7 @@ package Hades::Myths;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 our ($STASH);
 
 sub new {
@@ -33,12 +33,13 @@ sub import {
 			    qq{Optional[HashRef]: invalid value $locales for variable \$locales in method import};
 		}
 	}
+
 	my $caller = caller();
 	$STASH = delete $locales->{stash} || 'Hades::Myths::Object';
 	eval "require $STASH";
 	my ( $locale, $lang, $fb ) = $STASH->convert_locale(
 		delete $locales->{locale} || setlocale(LC_CTYPE),
-		, delete $locales->{fb},
+		delete $locales->{fb},
 	);
 	my $as_keyword = delete $locales->{as_keywords};
 	$locales = undef if ( !ref $locales || !scalar keys %{$locales} );
@@ -80,7 +81,7 @@ Hades::Myths - error handling for hades.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.24
 
 =cut
 
@@ -136,19 +137,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hades-Myths>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hades-Myths>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hades-Myths>
 
 =item * Search CPAN
 

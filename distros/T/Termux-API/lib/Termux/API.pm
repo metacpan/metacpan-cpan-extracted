@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use JSON;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub new {
 	return bless( {
@@ -205,7 +205,7 @@ Termux::API - Termux::API wrapper
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -584,14 +584,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Termux-API>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Termux-API>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Termux-API>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Termux-API>
@@ -602,7 +594,7 @@ L<https://metacpan.org/release/Termux-API>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2025 by LNATION.
 
 This is free software, licensed under:
 

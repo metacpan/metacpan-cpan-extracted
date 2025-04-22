@@ -16,10 +16,11 @@ use DBI;
 use File::Spec;
 use Data::Identifier;
 use Data::Identifier::Generate;
+use Scalar::Util qw(weaken);
 
 use File::FStore::File;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -40,7 +41,7 @@ sub create {
     my %extra;
     my $dbh;
 
-    foreach my $key (qw(db extractor)) {
+    foreach my $key (keys(%_types), qw(weak)) {
         my $v = delete $opts{$key};
         $extra{$key} = $v if defined $v;
     }
@@ -92,6 +93,7 @@ SQL
 sub new {
     my ($pkg, %opts) = @_;
     my $path = delete $opts{path} // croak 'No path given';
+    my $weak = delete $opts{weak};
     my @used_digests;
     my $self = bless {
         path => $path,
@@ -104,6 +106,7 @@ sub new {
         next unless defined $v;
         croak 'Invalid type for key: '.$key unless eval {$v->isa($_types{$key})};
         $self->{$key} = $v;
+        weaken($self->{$key}) if $weak;
     }
 
     croak 'Stray options passed' if scalar keys %opts;
@@ -361,7 +364,7 @@ sub scan {
     my ($self, %opts) = @_;
     my %extra;
 
-    foreach my $key (qw(update no_digests)) {
+    foreach my $key (qw(update no_digests on_pre_set on_post_set)) {
         $extra{$key} = delete $opts{$key};
     }
 
@@ -393,13 +396,15 @@ sub fix {
     my ($self, @fixes) = @_;
     my %fixes = map {$_ => 1} @fixes;
 
-    foreach my $fix (qw(scrub remove-inode remove-mediasubtype remove-inodeise scan)) {
+    foreach my $fix (qw(upgrade scrub remove-inode remove-mediasubtype remove-inodeise scan)) {
         next unless delete $fixes{$fix};
 
         if ($fix eq 'scrub') {
             $self->scrub;
         } elsif ($fix eq 'scan') {
             $self->scan;
+        } elsif ($fix eq 'upgrade') {
+            $self->migration->upgrade;
         } elsif ($fix =~ /^remove-(inode|mediasubtype|inodeise)$/) {
             my $what = $1;
             my $sth = $self->{dbh}->prepare('DELETE FROM file_properties WHERE key = ?');
@@ -415,10 +420,19 @@ sub fix {
 }
 
 
+#@returns File::FStore::Adder
 sub new_adder {
     my ($self) = @_;
     require File::FStore::Adder;
     return File::FStore::Adder->_new(store => $self);
+}
+
+
+#@returns File::FStore::Migration
+sub migration {
+    my ($self) = @_;
+    require File::FStore::Migration;
+    return File::FStore::Migration->_new(store => $self);
 }
 
 
@@ -508,6 +522,23 @@ sub import_data {
                 croak 'Unsupported format given: '.$format;
             }
         });
+}
+
+
+sub attach {
+    my ($self, %opts) = @_;
+    my $weak = delete $opts{weak};
+
+    foreach my $key (keys %_types) {
+        my $v = delete $opts{$key};
+        next unless defined $v;
+        croak 'Invalid type for key: '.$key unless eval {$v->isa($_types{$key})};
+        $self->{$key} //= $v;
+        croak 'Missmatch for key: '.$key unless $self->{$key} == $v;
+        weaken($self->{$key}) if $weak;
+    }
+
+    croak 'Stray options passed' if scalar keys %opts;
 }
 
 
@@ -611,17 +642,19 @@ sub _scan_file {
     $file->_open(fh => $fh);
 
     if ($update eq 'all' || ($new && $update eq 'new')) {
-        $file->update(%opts{qw(no_digests)});
+        $file->update(%opts{qw(no_digests on_pre_set on_post_set)});
     } else {
         my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
             $atime,$mtime,$ctime,$blksize,$blocks) = $file->stat;
 
+        $opts{on_pre_set}->($file) if defined $opts{on_pre_set};
         $file->set({
                 properties => {
                     size => $size,
                     inode => $ino,
                 },
             });
+        $opts{on_post_set}->($file) if defined $opts{on_post_set};
     }
 }
 
@@ -639,7 +672,7 @@ File::FStore - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -710,6 +743,11 @@ A L<File::Information> object. See L</fii>.
 =item C<path>
 
 The path to the store.
+
+=item C<weak>
+
+Marks the value for C<db>, C<extractor>, C<fii> as weak.
+If only a specific one needs needs to be weaken use L</attach>.
 
 =back
 
@@ -873,6 +911,14 @@ This determines whether L<File::FStore::File/update> is called on all files, onl
 
 Passed to L<File::FStore::File/update>.
 
+=item C<on_pre_set>
+
+See L<File::FStore::File/update>. Also called on each file if no update is performed.
+
+=item C<on_post_set>
+
+See L<File::FStore::File/update>. Also called on each file if no update is performed.
+
 =back
 
 =head2 fix
@@ -918,6 +964,10 @@ Runs L</scan> with default options.
 
 Runs L</scrub>.
 
+=item C<upgrade>
+
+Runs L<File::FStore::Migration/upgrade>.
+
 =back
 
 =head2 new_adder
@@ -925,6 +975,12 @@ Runs L</scrub>.
     my File::FStore::Adder $adder = $store->new_adder;
 
 Create a new L<File::FStore::Adder>.
+
+=head2 migration
+
+    my File::FStore::Migration $migration = $self->migration;
+
+Returns a new L<File::FStore::Migration> object for this store.
 
 =head2 export
 
@@ -975,6 +1031,19 @@ The following (all optional) options are supported:
 The format to use. Currently supported is C<json> for the classic JSON format.
 
 =back
+
+=head2 attach
+
+    $self->attach(key => $obj, ...);
+    # or:
+    $self->attach(key => $obj, ..., weak => 1);
+
+Attaches objects of the given type.
+Takes the same list of objects as L</new>.
+
+If an object is allready attached for the given key this method C<die>s unless the object is actually the same.
+
+If C<weak> is set to a true value the object reference becomes weak.
 
 =head2 db
 

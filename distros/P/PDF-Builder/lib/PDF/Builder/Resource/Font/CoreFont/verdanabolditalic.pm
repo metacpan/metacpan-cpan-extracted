@@ -3,13 +3,14 @@ package PDF::Builder::Resource::Font::CoreFont::verdanabolditalic;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Resource::Font::CoreFont::verdanabolditalic - font-specific information for bold weight + italic Verdana font
-(I<not> standard PDF core)
+PDF::Builder::Resource::Font::CoreFont::verdanabolditalic - Font-specific information for bold weight + italic Verdana font
+
+I<Not> a standard PDF core font
 
 =cut
 

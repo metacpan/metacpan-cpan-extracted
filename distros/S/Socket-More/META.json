@@ -58,6 +58,6 @@
          "web" : "http://github.com/drclaw1394/perl-socket-more"
       }
    },
-   "version" : "v0.5.1",
+   "version" : "v0.5.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

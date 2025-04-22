@@ -1,10 +1,10 @@
 use 5.014;
-#package Thread::Queue::Any '1.16'; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Queue::Any '1.17'; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Queue::Any;         # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue );
-our $VERSION= '1.16';               # please remove if no longer needed
+our $VERSION= '1.17';               # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;
@@ -223,7 +223,7 @@ Thread::Queue::Any - thread-safe queues for any data-structure
 
 =head1 VERSION
 
-This documentation describes version 1.16.
+This documentation describes version 1.17.
 
 =head1 DESCRIPTION
 
@@ -391,11 +391,14 @@ underlying Makefile.PL processing.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
 Copyright (c) 2002, 2003, 2007, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
+2025 LNATION <email@lnation.org>
 All rights reserved.  This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 

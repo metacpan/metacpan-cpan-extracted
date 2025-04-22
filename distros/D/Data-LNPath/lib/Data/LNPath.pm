@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 our (%ERROR, %METH, $caller);
 
@@ -133,7 +133,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -237,27 +237,17 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-LNPath>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Data-LNPath>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Data-LNPath>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Data-LNPath/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017->2021 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

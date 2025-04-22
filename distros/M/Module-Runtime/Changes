@@ -1,5 +1,10 @@
 Revision history for Module-Runtime
 
+0.018   2025-04-21
+  - avoid xattr headers in release tarball
+
+  - minor code reformatting
+
 0.017   2025-04-06
   - fixed internal Pod links
 
@@ -8,6 +13,8 @@ Revision history for Module-Runtime
   - check for eval failures via return value, not $@
 
   - update packaging to remove Module::Build and set x_static_install
+
+  - removed broken SIGNATURE file
 
 0.016  2017-10-17
   - port t/taint.t to Perl 5.27.5, where re-requiring an already-loaded

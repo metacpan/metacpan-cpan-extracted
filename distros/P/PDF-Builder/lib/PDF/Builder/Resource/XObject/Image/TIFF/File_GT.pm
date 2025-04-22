@@ -3,15 +3,15 @@ package PDF::Builder::Resource::XObject::Image::TIFF::File_GT;
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use IO::File;
 use Graphics::TIFF ':all';  # already confirmed to be installed
 
 =head1 NAME
 
-PDF::Builder::Resource::XObject::Image::TIFF::File_GT - support routines for TIFF image library (Graphics::TIFF enabled)
+PDF::Builder::Resource::XObject::Image::TIFF::File_GT - Support routines for TIFF image library (Graphics::TIFF enabled)
 
 =head1 METHODS
 
@@ -33,9 +33,41 @@ sub new {
 
     my $self = {};
     bless ($self, $class);
-    die "Error: $file not found\n" unless -r $file;
+    my $file_is_temp = 0;
+    if (ref($file)) {
+	# if a file was requested, it wasn't found. if a GLOB (opened 
+	# filehandle), try outputting to a temp file and using that
+	if (ref($file) eq 'GLOB') {
+	    # treat $file as an open filehandle
+	    local $/;
+	    use File::Temp qw/ tempfile /;
+	    my $tempdata = <$file>;
+	    my ($fh, $tempname) = tempfile();
+	    binmode($fh);
+	    print $fh $tempdata;
+	    close($fh);
+	    $file->seek(0, 0);
+	    $file_is_temp = 1;
+	    $file = $tempname; # presumably existing $file no longer needed
+	} else {
+	    # presumably requested a real file, but couldn't find it
+	    die "Error: unknown handle type ".ref($file)."\n";
+	}
+    } else {
+	# presumably a file path sent in. see if exists and can read
+	if (! -r $file) {
+	    die "Error: requested TIFF file $file not found";
+	}
+    }
     $self->{'object'} = Graphics::TIFF->Open($file, 'r');
     $self->readTags();
+    # if temporary file, get rid of it
+    if ($file_is_temp) { 
+	$file =~ s#\\#/#g; # on Windows, \ separators may cause problems
+	if (!unlink($file)) {
+	    print "Note: failed to erase temporary file $file\n";
+	}
+    }
 
     return $self;
 }

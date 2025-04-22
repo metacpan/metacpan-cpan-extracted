@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder::Util qw(pdfkey);
 use PDF::Builder::Basic::PDF::Utils; # PDFName
@@ -15,7 +15,9 @@ use Scalar::Util qw(weaken);
 
 =head1 NAME
 
-PDF::Builder::Resource - Base class for PDF resources. Inherit from L<PDF::Builder::Basic::PDF::Dict>
+PDF::Builder::Resource - Base class for PDF resources
+
+Inherits from L<PDF::Builder::Basic::PDF::Dict>
 
 =head1 METHODS
 

@@ -38,6 +38,7 @@
             "DBD::SQLite" : "1.72",
             "DBI" : "1.643",
             "Data::Leaf::Walker" : "0.21",
+            "DateTime::Format::ISO8601" : "0.17",
             "Devel::Size" : "0.84",
             "File::ShareDir::ProjectDistDir" : "1.000009",
             "Hash::Fold" : "v1.0.0",
@@ -50,6 +51,7 @@
             "Sort::Naturally" : "1.03",
             "Term::ANSIColor" : "5.01",
             "Text::CSV_XS" : "1.50",
+            "Text::Levenshtein::XS" : "0.503",
             "Text::Similarity" : "0.13",
             "Types::Standard" : "2.004000",
             "XML::Fast" : "0.17",
@@ -81,7 +83,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

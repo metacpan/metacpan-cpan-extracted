@@ -414,12 +414,14 @@ interpreter with a lot of subroutines pre-loaded.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+Copyright (c) 2002-2003 Elizabeth Mattijsen <liz@dijkmat.nl>. 2019 - 2025 LNATION <email@lnation.org>
+All rights reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO

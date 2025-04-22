@@ -1,4 +1,4 @@
-# Copyrights 2001-2023 by [Mark Overmeer].
+# Copyrights 2001-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Mail::Transport::POP3;
-use vars '$VERSION';
-$VERSION = '3.006';
+package Mail::Transport::POP3;{
+our $VERSION = '3.007';
+}
 
 use base 'Mail::Transport::Receive';
 
@@ -16,7 +16,7 @@ use strict;
 use warnings;
 
 use IO::Socket       ();
-use IO::Socket::INET ();
+use IO::Socket::IP   ();
 use IO::Socket::SSL  qw(SSL_VERIFY_NONE);
 use Socket           qw/$CRLF/;
 use Digest::MD5      qw/md5_hex/;
@@ -274,7 +274,7 @@ sub login(;$)
         $socket  = eval { IO::Socket::SSL->new(PeerAddr => "$host:$port", %$opts) };
     }
     else
-    {   $socket  = eval { IO::Socket::INET->new("$host:$port") };
+    {   $socket  = eval { IO::Socket::IP->new("$host:$port") };
     }
 
     unless($socket)

@@ -11,7 +11,7 @@ use Syntax::Construct qw( ?<> /a );
 
 use parent 'Authen::Passphrase';
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our (%salts, %hashes, @argons);
 BEGIN {
@@ -195,7 +195,7 @@ Authen::Passphrase::Argon2 - Store and check password using Argon2
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -356,14 +356,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Authen-Passphrase-Argon2>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Authen-Passphrase-Argon2>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Authen-Passphrase-Argon2>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Authen-Passphrase-Argon2/>
@@ -374,7 +366,7 @@ L<http://search.cpan.org/dist/Authen-Passphrase-Argon2/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018->2020 lnation.
+Copyright 2018->2025 lnation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

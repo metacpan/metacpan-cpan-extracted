@@ -19,6 +19,7 @@ my $s = { args => { title     => "Hi There!",
 		    h	      => [ "Z" ],
 		    head      => [ "yes" ],
 		  },
+	  #  trace => 1,
 	};
 
 @ARGV = qw( 10-basic.dat );

@@ -8,8 +8,8 @@ use warnings;
 use Carp;
 use Encode qw(:all);
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 # TBD: do rect and border apply to Named Destinations (link, url, file)? 
 #      There is nothing to implement these options. Perhaps the code was copied 
@@ -22,6 +22,8 @@ use PDF::Builder::Basic::PDF::Utils;
 =head1 NAME
 
 PDF::Builder::NamedDestination - Add named destinations (views) to a PDF
+
+Inherits from L<PDF::Builder::Basic::PDF::Dict>
 
 =head1 METHODS
 

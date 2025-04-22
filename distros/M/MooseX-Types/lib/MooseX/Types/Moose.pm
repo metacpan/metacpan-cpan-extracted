@@ -3,7 +3,7 @@ use strict;
 package MooseX::Types::Moose;
 # ABSTRACT: Type exports that match the types shipped with L<Moose>
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 use MooseX::Types;
 use Moose::Util::TypeConstraints ();
@@ -80,7 +80,7 @@ MooseX::Types::Moose - Type exports that match the types shipped with L<Moose>
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 

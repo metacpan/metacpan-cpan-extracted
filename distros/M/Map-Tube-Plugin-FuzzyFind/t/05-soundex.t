@@ -1,11 +1,10 @@
 #!perl
-use 5.010;
+use 5.012;
 use strict;
 use warnings FATAL => 'all';
 use Test::More 0.82;
-
-eval 'use Map::Tube::London 1.39';
-plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
+use lib 't/';
+use Sample;
 for my $m ( qw(Text::Soundex Text::Unidecode) ) {
   eval "use $m";
   plan skip_all => "$m required for this test" if $@;
@@ -18,7 +17,7 @@ plan tests => 18;
 
 sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 
-my $tube = new_ok( 'Map::Tube::London' );
+my $tube = new_ok( 'Sample' );
 my $ret;
 
 $ret = $tube->fuzzy_find( 'Bakerloo', objects => 'lines', method => 'soundex' );

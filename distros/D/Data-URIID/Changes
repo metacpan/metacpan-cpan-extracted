@@ -1,3 +1,9 @@
+v0.16  2025-04-20Z
+    - Improved Barcode support
+    - Removed UUID::Tiny as dependency
+    - Added more tests
+    - Fixed typo in type names
+
 v0.15  2025-04-11Z
     - Added support to recognise and render barcodes
     - Improved e621 support

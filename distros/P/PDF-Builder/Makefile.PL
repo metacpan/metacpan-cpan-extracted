@@ -2,13 +2,13 @@
 
 use strict;
 use warnings;
-use 5.026000;
+use 5.028000;
 use ExtUtils::MakeMaker 6.66;
 
-my $PERL_version = '5.026000';  # Both here and in "use" statement above,
+my $PERL_version = '5.028000';  # Both here and in "use" statement above,
                                 # PDFbuild.pl updates from 'version' file
 my $MakeMaker_version = '6.66';
-my $version = '3.026';          # PDFbuild.pl updates from 'version' file
+my $version = '3.027';          # PDFbuild.pl updates from 'version' file
 
 # optional libraries... most users will attempt to install full set. they are
 # nice to have but not vital for many users. if one fails to install, it might 
@@ -70,6 +70,7 @@ my %WriteMakefileArgs =
     #"Unicode::UCD" => 0,
     #"utf8" => 0,
     #"vars" => 0,
+    #"version" => 0,
     #"warnings" => 0,
      
     # === NOT core, but not currently used
@@ -112,6 +113,8 @@ my %WriteMakefileArgs =
     #  HTML::TreeBuilder => 5.07,
     #  # use of buildDoc.pl to build HTML documentation from POD
     #  Pod::Simple::XHTML => 3.45,
+    #  # process SVG images
+    #  SVGPDF => 0.087,
     #},     
 
   }

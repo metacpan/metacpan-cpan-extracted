@@ -30,7 +30,7 @@ subtest 'methods' => sub
     isa_ok( $jar, 'Cookie::Jar' );
 
     # To generate this list:
-    # egrep -E '^sub ' ./lib/Cookie/Jar.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$jar, \"$m\" );"'
+    # perl -lnE '/^sub (?!init|[A-Z]|_)/ and say "can_ok( \$jar, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/Cookie/Jar.pm
     can_ok( $jar, "init" );
     can_ok( $jar, "add" );
     can_ok( $jar, "add_cookie_header" );

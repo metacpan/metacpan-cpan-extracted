@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.008';
+my $VERSION = '3.009';
 
 my %prereq =
   ( Date::Parse      => 0

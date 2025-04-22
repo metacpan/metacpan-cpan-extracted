@@ -23,7 +23,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Type::Tiny::XS
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 has total_entries => (
@@ -303,7 +303,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -513,6 +513,11 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -521,7 +526,7 @@ Test code was adapted from L<Data::Page> to ensure compatability.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2024 by Robert Rothenberg.
+This software is Copyright (c) 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

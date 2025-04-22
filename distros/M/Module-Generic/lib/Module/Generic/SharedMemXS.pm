@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.2.4
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2025/03/12
+## Modified 2025/04/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,6 +13,7 @@
 package Module::Generic::SharedMemXS;
 BEGIN
 {
+    use v5.26.1;
     use strict;
     use warnings;
     use warnings::register;
@@ -20,7 +21,6 @@ BEGIN
     use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64 );
     use Config;
     use File::Spec ();
-    # use Nice::Try;
     use Scalar::Util ();
     # This is disruptive for everybody. Bad idea.
     # use JSON 4.03 qw( -convert_blessed_universally );
@@ -37,6 +37,7 @@ BEGIN
     use constant LOCK_EX        =>  2;
     use constant LOCK_NB        =>  4;
     use constant LOCK_UN        =>  8;
+    use constant HAS_THREADS    => ( $Config{useithreads} && $INC{'threads.pm'} );
     $SUPPORTED_RE = qr/IPC\/SysV/;
     if( $Config{extensions} =~ /$SUPPORTED_RE/ && 
         $^O !~ /^(?:Android|dos|MSWin32|os2|VMS|riscos)/i &&
@@ -102,8 +103,24 @@ EOT
     $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
     # Array to maintain the order in which shared memory object were created, so they can
     # be removed in that order
-    $SHEM_REPO = [];
-    $ID2OBJ    = {};
+    our( $SHEM_REPO, $ID2OBJ );
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    
+        my @repo :shared;
+        my %id2objs :shared;
+        $SHEM_REPO = \@repo;
+        $ID2OBJ = \%id2objs;
+    }
+    else
+    {
+        $SHEM_REPO = [];
+        $ID2OBJ    = {};
+    }
     
     our @EXPORT_OK = qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN);
     our %EXPORT_TAGS = (
@@ -111,9 +128,10 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.2.4';
+    our $VERSION = 'v0.3.1';
 };
 
+use v5.26.1;
 use strict;
 use warnings;
 # no warnings 'redefine';
@@ -469,8 +487,19 @@ sub open
     $new->{_ipc_shared} = $shm;
     $new->{_sem} = $sem;
     my $id = $new->id;
-    CORE::push( @$SHEM_REPO, $id );
-    $ID2OBJ->{ $id } = $new;
+
+    if( HAS_THREADS && is_shared( $SHEM_REPO ) )
+    {
+        lock( $SHEM_REPO );
+        lock( $ID2OBJ );
+        CORE::push( @$SHEM_REPO, $id );
+        $ID2OBJ->{ $id } = $new;
+    }
+    else
+    {
+        CORE::push( @$SHEM_REPO, $id );
+        $ID2OBJ->{ $id } = $new;
+    }
 
     if( !defined( $sem->op( @{$SEMOP_ARGS->{(LOCK_SH)}} ) ) )
     {
@@ -712,15 +741,34 @@ sub remove
     }
     if( $rv )
     {
-        for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
+        if( HAS_THREADS && is_shared( $SHEM_REPO ) )
         {
-            my $this_id = $SHEM_REPO->[$i];
-            my $obj = $ID2OBJ->{ $this_id };
-            if( Scalar::Util::blessed( $obj ) && $this_id eq $id )
+            lock( $SHEM_REPO );
+            lock( $ID2OBJ );
+            for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
             {
-                CORE::splice( @$SHEM_REPO, $i, 1 );
-                CORE::delete( $ID2OBJ->{ $this_id } );
-                last;
+                my $this_id = $SHEM_REPO->[$i];
+                my $obj = $ID2OBJ->{ $this_id };
+                if( Scalar::Util::blessed( $obj ) && $this_id eq $id )
+                {
+                    CORE::splice( @$SHEM_REPO, $i, 1 );
+                    CORE::delete( $ID2OBJ->{ $this_id } );
+                    last;
+                }
+            }
+        }
+        else
+        {
+            for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
+            {
+                my $this_id = $SHEM_REPO->[$i];
+                my $obj = $ID2OBJ->{ $this_id };
+                if( Scalar::Util::blessed( $obj ) && $this_id eq $id )
+                {
+                    CORE::splice( @$SHEM_REPO, $i, 1 );
+                    CORE::delete( $ID2OBJ->{ $this_id } );
+                    last;
+                }
             }
         }
         $self->{_ipc_shared} = undef;
@@ -1209,7 +1257,13 @@ sub _str2key
     {
         # my $id = 0;
         # $id += $_ for( unpack( "C*", $key ) );
-        require Digest::SHA;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Digest::SHA;
+            $loaded = 1;
+        }
         my $hash = Digest::SHA::sha1_base64( $key );
         my $id = ord( substr( $hash, 0, 1 ) );
         # We use the root as a reliable and stable path.
@@ -1450,7 +1504,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.2.4
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -1860,6 +1914,26 @@ It returns the current object for chaining, or C<undef> if there was an error, w
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 PROCESS CLEANUP SAFETY
+
+This module attempts to automatically clean up shared memory and semaphore resources using an C<END> block. However, note that:
+
+=over 4
+
+=item *
+
+In multi-threaded programs, C<END> blocks may not execute for all threads.
+
+=item *
+
+If multiple processes share a memory segment, only the original owner should call C<remove()> or rely on auto-cleanup.
+
+=item *
+
+For best results, call C<remove()> manually if your lifecycle logic requires guaranteed cleanup.
+
+=back
 
 =head1 AUTHOR
 

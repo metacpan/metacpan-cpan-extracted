@@ -13,11 +13,11 @@ Moonshine::Parser - Parsed
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -50,14 +50,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Moonshine-Parser>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Moonshine-Parser>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Moonshine-Parser>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Moonshine-Parser/>
@@ -68,7 +60,7 @@ L<http://search.cpan.org/dist/Moonshine-Parser/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

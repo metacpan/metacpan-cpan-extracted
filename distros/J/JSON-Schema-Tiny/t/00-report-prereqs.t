@@ -64,7 +64,6 @@ my @include = qw(
   File::Temp
   JSON::PP
   Module::Runtime
-  Pod::Coverage
   Sub::Name
   YAML
   autodie
@@ -73,6 +72,7 @@ my @include = qw(
   JSON::XS
   Mojolicious
   builtin
+  builtin::Backport
 );
 
 my @exclude = qw(

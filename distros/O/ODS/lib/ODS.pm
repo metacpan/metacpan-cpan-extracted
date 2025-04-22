@@ -2,7 +2,7 @@ package ODS;
 
 use strict; use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use ODS::Table;
 use Blessed::Merge;
@@ -59,7 +59,7 @@ ODS - Object Data Store
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -176,10 +176,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=ODS>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/ODS>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/ODS>
@@ -192,7 +188,7 @@ L<https://metacpan.org/release/ODS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022-2025 by LNATION.
 
 This is free software, licensed under:
 

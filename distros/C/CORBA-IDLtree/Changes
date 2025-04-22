@@ -1,5 +1,15 @@
 Revision history for CORBA-IDLtree
 
+2.06  2025/04/20
+      * In the SUBORDINATES of ENUM, when $enable_comments is set
+        change the layout for a comment to conform to the REMARK
+        node layout.
+      * Change sub info to only print if $verbose is set.
+      * Fix handling of annotations applied on members of
+        constructed types.
+      * On encountering unknown annotation, downgrade severity
+        from error to warning.
+
 2.05  2021/06/13
       * Increase minimum required perl version to 5.8 due to
         addition of "use utf8".

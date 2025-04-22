@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter::Tiny" : "0",
             "Scope::Upper" : "0",
             "Sub::Util" : "0",
             "perl" : "5.014004"
@@ -56,7 +57,7 @@
    "provides" : {
       "Result::Simple" : {
          "file" : "lib/Result/Simple.pm",
-         "version" : "0.03"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/kfly8/Result-Simple"
       }
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

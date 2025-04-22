@@ -4,6 +4,15 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
+version 1.10: Fri 18 Apr 16:52:35 CEST 2025
+
+	Improvements:
+	- .gitignore [Gábor Szabó]  pull #4
+	- capitalize error messages
+	- add http_response to some errors. Requested by [Andy Beverley]
+	- add SOLR version display during test.
+	- Boolean parameters update to Solr 9.8 syntax.
+
 version 1.09: Tue  6 Dec 13:28:37 CET 2022
 
 	Improvements:

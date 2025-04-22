@@ -7,8 +7,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -20,7 +20,9 @@ use Scalar::Util qw(weaken);
 
 =head1 NAME
 
-PDF::Builder::Resource::XObject::Image::PNM - support routines for PNM (Portable aNy Map) image library. Inherits from L<PDF::Builder::Resource::XObject::Image>
+PDF::Builder::Resource::XObject::Image::PNM - Support routines for PNM (Portable aNy Map) image library
+
+Inherits from L<PDF::Builder::Resource::XObject::Image>
 
 =head2 METHODS
 

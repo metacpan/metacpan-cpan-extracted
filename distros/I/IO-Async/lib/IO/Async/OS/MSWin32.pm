@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2013 -- leonerd@leonerd.org.uk
 
-package IO::Async::OS::MSWin32 0.803;
+package IO::Async::OS::MSWin32 0.804;
 
 use v5.14;
 use warnings;

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use IO::Async::OS;
 use IO::Async::Loop::Epoll;
 

@@ -7,14 +7,14 @@ use base qw/Wx::Panel/;
 
 sub new {
     my ( $class, $parent, $x, $y, $color  ) = @_;
-    return unless ref $color eq 'ARRAY' and @$color == 3;
+    return unless ref $color eq 'ARRAY' and @{$color} == 3;
 
     my $self = $class->SUPER::new( $parent, -1, [-1,-1], [$x, $y]);
 
     $self->{'x'}     = $x;
     $self->{'y'}     = $y;
     $self->{'color'} = $color;
-    $self->{'percentage'} = [];
+    $self->{'rainbow'} = [];
 
     Wx::Event::EVT_PAINT( $self, sub {
         my( $cpanel, $event ) = @_;
@@ -26,44 +26,41 @@ sub new {
 
         my $l_pos = 0;
         my $l_color = Wx::Colour->new( @{$self->{'color'}} );
-        if (@{$self->{'percentage'}} > 1){
-            my $i = 1;
-            while (exists $self->{'percentage'}[$i]){
-                my $r_pos = $x * ($self->{'percentage'}[$i] / 100);
-                my $r_color = Wx::Colour->new( @{$self->{'percentage'}[$i-1]} );
-                $dc->GradientFillLinear( Wx::Rect->new( $l_pos, 0, $r_pos, $y ), $l_color, $r_color );
-                $i += 2;
-                $l_pos = $r_pos;
-                $l_color = $r_color;
-            }
+        for my $entry (@{$self->{'rainbow'}}) {
+            my $r_color = Wx::Colour->new( @{$entry->{'color'}} );
+            my $r_pos = $x * $entry->{'percent'} / 100;
+            $dc->GradientFillLinear( Wx::Rect->new( $l_pos, 0, $r_pos, $y ), $l_color, $r_color );
+            $l_pos = $r_pos;
+            $l_color = $r_color;
         }
     } );
+
     $self;
 }
 
 sub reset {
     my ( $self, $p, $color ) = @_;
-    $self->{'percentage'} = [];
-    $self->Refresh;
+    $self->{'color'} = [255, 255, 255];
+    $self->{'rainbow'} = [];
+    $self->paint;
 }
 
-sub set_color {
-    my ( $self, $color ) = @_;
-    return unless ref $color eq 'HASH' and exists $color->{'red'} and exists $color->{'green'} and exists $color->{'blue'};
-    $self->{'color'} = $color;
+sub set_start_color {
+    my ( $self, $r, $g, $b ) = @_;
+    return unless defined $b;
+    $self->{'color'} = [$r, $g, $b];
 }
 
 sub add_percentage {
-    my ( $self, $p, $color ) = @_;
-    return unless defined $p and $p <= 100 and $p >= 0 and $p != $self->{'percentage'};
-    push @{$self->{'percentage'}}, $color, $p;
+    my ( $self, $percent, $color ) = @_;
+    return unless defined $percent and $percent <= 100 and $percent >= 0
+        and $percent > $self->get_percentage and ref $color eq 'ARRAY' and @$color == 3;
+    push @{$self->{'rainbow'}}, {color => $color, percent => $percent};
 }
 
-sub get_percentage { $_[0]->{'percentage'} }
+sub get_percentage { (@{$_[0]->{'rainbow'}}) ? $_[0]->{'rainbow'}[-1]{'percent'} : 0 }
 
-sub full {
-    my ( $self ) = @_;
-    $self->Refresh;
-}
+sub paint          { $_[0]->Refresh }
+
 
 1;

@@ -31,5 +31,7 @@ t/54-signature.t
 t/60-pod.t
 t/61-pod-coverage.t
 t/62-changes.t
+t/Sample.pm
+t/sample.xml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

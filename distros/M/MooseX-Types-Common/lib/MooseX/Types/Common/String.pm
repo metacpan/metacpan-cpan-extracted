@@ -1,7 +1,7 @@
 package MooseX::Types::Common::String;
 # ABSTRACT:  Commonly used string types
 
-our $VERSION = '0.001014';
+our $VERSION = '0.001015';
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ use MooseX::Types -declare => [
      UpperCaseStr)
 ];
 
+use Moose ();
 use MooseX::Types::Moose qw/Str/;
 use if MooseX::Types->VERSION >= 0.42, 'namespace::autoclean';
 
@@ -179,7 +180,7 @@ MooseX::Types::Common::String - Commonly used string types
 
 =head1 VERSION
 
-version 0.001014
+version 0.001015
 
 =head1 SYNOPSIS
 
@@ -272,11 +273,11 @@ L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =item *
 
-Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>)
+Matt S Trout - mst (at) shadowcat.co.uk (L<https://www.shadowcat.co.uk/>)
 
 =item *
 
-K. James Cheetham <jamie@shadowcatsystems.co.uk>
+K. James Cheetham <jamie@shadowcat.co.uk>
 
 =item *
 
@@ -286,7 +287,7 @@ Guillermo Roditi <groditi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
+This software is copyright (c) 2009 by Matt S Trout - mst (at) shadowcat.co.uk (L<https://www.shadowcat.co.uk/>).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

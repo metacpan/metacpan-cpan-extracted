@@ -69,6 +69,6 @@
          "url" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.10",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

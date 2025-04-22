@@ -1,7 +1,7 @@
 {
    "abstract" : "OMG IDL to symbol tree translator",
    "author" : [
-      "Oliver M. Kellogg <okellogg@users.sourceforge.net>"
+      "Oliver M. Kellogg <olivermkellogg@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921, CPAN::Meta::Converter version 2.150010",
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.05",
+   "version" : "2.06",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

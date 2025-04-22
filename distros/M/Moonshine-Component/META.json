@@ -51,7 +51,7 @@
    "provides" : {
       "Moonshine::Component" : {
          "file" : "lib/Moonshine/Component.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Component"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

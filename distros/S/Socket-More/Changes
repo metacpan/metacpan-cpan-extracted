@@ -1,4 +1,10 @@
 Revision history for Perl extension Socket::More.
+v0.5.2  2024-07-01
+  [fixes]
+    - Specification input to sockaddr_passive now shallow copies the contents
+      of the input argument. Improves reuse of the same spec structure for
+      repeated calls
+
 v0.5.1  2024-01-20
   [fixes]
     - Address failing tests on FreeBSD.

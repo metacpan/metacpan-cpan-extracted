@@ -1,4 +1,4 @@
-# Copyrights 2012-2022 by [Mark Overmeer].
+# Copyrights 2012-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Apache::Solr::Result;
-use vars '$VERSION';
-$VERSION = '1.09';
+package Apache::Solr::Result;{
+our $VERSION = '1.10';
+}
 
 
 use warnings;
@@ -179,7 +179,7 @@ sub _docs($)
 sub selected($%)
 {   my ($self, $rank, %options) = @_;
     my $data   = $self->_responseData
-        or panic __x"there are no results in the answer";
+        or panic __x"There are no results in the answer";
 
 	# start for next
     $self->{ASR_next} = $rank +1;
@@ -216,7 +216,7 @@ sub highlighted($)
     my $rank   = $doc->rank;
     my $pagenr = $self->selectedPageNr($rank);
     my $hl     = $self->selectedPage($pagenr)->decoded->{highlighting}
-        or error __x"there is no highlighting information in the result";
+        or error __x"There is no highlighting information in the result";
     Apache::Solr::Document->fromResult($hl->{$doc->uniqueId}, $rank);
 }
 
@@ -227,7 +227,7 @@ sub terms($;$)
     return $self->{ASR_terms}{$field} = shift if @_;
 
     my $r = $self->{ASR_terms}{$field}
-        or error __x"no search for terms on field {field} requested"
+        or error __x"No search for terms on field {field} requested"
             , field => $field;
 
     $r;
@@ -306,7 +306,7 @@ sub _calc_page_size()
 sub selectedPageLoad($;$)
 {   my ($self, $pagenr, $client) = @_;
     $client
-        or error __x"cannot autoload page {nr}, no client provided"
+        or error __x"Cannot autoload page {nr}, no client provided"
              , nr => $pagenr;
 
     my $fpz    = $self->fullPageSize;

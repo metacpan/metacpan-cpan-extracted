@@ -34,7 +34,7 @@
       },
       "runtime" : {
          "requires" : {
-            "MIDI::Drummer::Tiny" : "0.6008",
+            "MIDI::Drummer::Tiny" : "0.6010",
             "parent" : "0",
             "perl" : "5.006"
          }
@@ -62,7 +62,7 @@
          "web" : "https://github.com/ology/Music-Drummer"
       }
    },
-   "version" : "0.6008",
+   "version" : "0.6010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

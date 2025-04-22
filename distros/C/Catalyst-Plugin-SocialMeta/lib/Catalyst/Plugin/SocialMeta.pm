@@ -1,6 +1,6 @@
 package Catalyst::Plugin::SocialMeta;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.03';
+use 5.006; use strict; use warnings; our $VERSION = '0.04';
 
 use HTML::SocialMeta;
 
@@ -62,7 +62,7 @@ Catalyst::Plugin::SocialMeta - Generate social media meta tags for your catalyst
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

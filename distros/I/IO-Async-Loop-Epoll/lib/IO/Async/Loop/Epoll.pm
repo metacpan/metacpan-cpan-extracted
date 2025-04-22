@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2021 -- leonerd@leonerd.org.uk
 
-package IO::Async::Loop::Epoll 0.22;
+package IO::Async::Loop::Epoll 0.23;
 
 use v5.14;
 use warnings;
@@ -37,6 +37,8 @@ struct SignalWatch => [qw( code pending orig )];
 C<IO::Async::Loop::Epoll> - use C<IO::Async> with C<epoll> on Linux
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use IO::Async::Loop::Epoll;
 
@@ -91,7 +93,7 @@ handle file IO and signals concurrently.
 
 =head2 new
 
-   $loop = IO::Async::Loop::Epoll->new()
+   $loop = IO::Async::Loop::Epoll->new();
 
 This function returns a new instance of a C<IO::Async::Loop::Epoll> object.
 
@@ -158,7 +160,7 @@ sub is_running
 
 =head2 loop_once
 
-   $count = $loop->loop_once( $timeout )
+   $count = $loop->loop_once( $timeout );
 
 This method calls C<epoll_pwait(2)>, and processes the results of that call.
 It returns the total number of C<IO::Async::Notifier> callbacks invoked, or
@@ -432,19 +434,26 @@ sub post_fork
 {
    my $self = shift;
 
-   $self->{epoll} = Linux::Epoll->new;
+   my $epoll = $self->{epoll} = Linux::Epoll->new;
    $self->{pid} = $$;
 
    my $watches = $self->{iowatches} or return;
+   my $fakeevents = $self->{fakeevents};
 
    foreach my $watch ( values %$watches ) {
-      my ( $handle, $on_read_ready, $on_write_ready, $on_hangup ) = @$watch;
-      $self->watch_io(
-         handle         => $handle,
-         on_read_ready  => $on_read_ready,
-         on_write_ready => $on_write_ready,
-         on_hangup      => $on_hangup,
-      );
+      my ( $handle ) = @$watch;
+      my $fd = $handle->fileno;
+
+      next if $fakeevents->{$fd};
+
+      my $mask = $self->{masks}->{$fd};
+      my @bits;
+      push @bits, 'in'  if $mask & WATCH_READ;
+      push @bits, 'out' if $mask & WATCH_WRITE;
+      push @bits, 'hup' if $mask & WATCH_HUP;
+
+      my $cb = $self->{callbacks}->{$fd};
+      $epoll->add( $handle, \@bits, $cb );
    }
 }
 

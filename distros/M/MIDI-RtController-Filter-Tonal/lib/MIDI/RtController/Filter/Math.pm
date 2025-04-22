@@ -1,5 +1,5 @@
 package MIDI::RtController::Filter::Math;
-$MIDI::RtController::Filter::Math::VERSION = '0.0302';
+$MIDI::RtController::Filter::Math::VERSION = '0.0305';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Math based RtController filters
@@ -15,15 +15,15 @@ use namespace::clean;
 
 
 has rtc => (
-    is  => 'ro',
-    isa => sub { die 'Invalid rtc' unless ref($_[0]) eq 'MIDI::RtController' },
+    is       => 'ro',
+    isa      => sub { die 'Invalid rtc' unless ref($_[0]) eq 'MIDI::RtController' },
     required => 1,
 );
 
 
 has channel => (
-    is  => 'rw',
-    isa => Channel,
+    is      => 'rw',
+    isa     => Channel,
     default => sub { 0 },
 );
 
@@ -43,29 +43,29 @@ has trigger => (
 
 
 has delay => (
-    is  => 'rw',
-    isa => Num,
+    is      => 'rw',
+    isa     => Num,
     default => sub { 0.1 },
 );
 
 
 has feedback => (
-    is  => 'rw',
-    isa => Num,
+    is      => 'rw',
+    isa     => Num,
     default => sub { 1 },
 );
 
 
 has up => (
-    is  => 'rw',
-    isa => Num,
+    is      => 'rw',
+    isa     => Num,
     default => sub { 2 },
 );
 
 
 has down => (
-    is  => 'rw',
-    isa => Num,
+    is      => 'rw',
+    isa     => Num,
     default => sub { -1 },
 );
 
@@ -115,7 +115,7 @@ MIDI::RtController::Filter::Math - Math based RtController filters
 
 =head1 VERSION
 
-version 0.0302
+version 0.0305
 
 =head1 SYNOPSIS
 

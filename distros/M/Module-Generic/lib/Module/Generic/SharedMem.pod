@@ -103,7 +103,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.4.2
+    v0.5.2
 
 =head1 DESCRIPTION
 
@@ -134,41 +134,41 @@ This instantiates a shared memory object. It takes the following parameters:
 
 =over 4
 
-=item I<cbor>
+=item * C<cbor>
 
 Provided with a value (true or false does not matter), and this will set L<CBOR::XS> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
-=item I<debug>
+=item * C<debug>
 
 A debug value will enable debugging output (equal or above 3 actually)
 
-=item I<create>
+=item * C<create>
 
 A boolean value to indicate whether the shared memory block should be created if it does not exist. Default to false.
 
-=item I<destroy>
+=item * C<destroy>
 
 A boolean value to indicate if the shared memory block should be removed when the object is destroyed upon end of the script process.
 See L<perlmod> for more about object destruction.
 
-=item I<destroy_semaphore>
+=item * C<destroy_semaphore>
 
 A boolean value to indicate if the semaphore should be removed when the object is destroyed upon end of the script process.
 See L<perlmod> for more about object destruction.
 
-I<destroy_semaphore> is automatically enabled if I<destroy> is set to true.
+C<destroy_semaphore> is automatically enabled if C<destroy> is set to true.
 
-Thus, one can deactive auto removal of the shared memory block, but enable auto removal of the semaphore. This is useful when there are two processes accessing the same shared memory block and one wants to give the first process the authority to create and remove the shared memory block, while the second only access and write to the shared memory block, but does not remove it. Still to avoid having semaphores surviving the process, by enabling this option and disabling I<destroy>, it will remove the semaphore and leave the shared memory.
+Thus, one can deactive auto removal of the shared memory block, but enable auto removal of the semaphore. This is useful when there are two processes accessing the same shared memory block and one wants to give the first process the authority to create and remove the shared memory block, while the second only access and write to the shared memory block, but does not remove it. Still to avoid having semaphores surviving the process, by enabling this option and disabling C<destroy>, it will remove the semaphore and leave the shared memory.
 
-=item I<exclusive>
+=item * C<exclusive>
 
 A boolean value to set the shared memory as exclusive. This will affect the flags set by L</flags> which are used by L</open>.
 
-=item I<json>
+=item * C<json>
 
 Provided with a value (true or false does not matter), and this will set L<JSON> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
-=item I<key>
+=item * C<key>
 
 The shared memory key identifier to use. It defaults to C<IPC::SysV::IPC_PRIVATE>
 
@@ -180,7 +180,7 @@ Otherwise, if you provide a key as string, the characters in the string will be 
 
 Either way, the resulting value is used to create a shared memory segment and a semaphore by L</open>.
 
-=item I<mode>
+=item * C<mode>
 
 The octal mode value to use when opening the shared memory block.
 
@@ -188,21 +188,21 @@ Shared memory are owned by system users and access to shared memory segment is r
 
 If you do not want to share it with any other user than yourself, setting mode to C<0600> is fine.
 
-=item I<sereal>
+=item * C<sereal>
 
 Provided with a value (true or false does not matter), and this will set L<Sereal> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
-=item I<serialiser>
+=item * C<serialiser>
 
 You can provide the serialiser with this option. Possible values are: C<cbor>, C<json>, C<sereal>, C<storable>
 
-=item I<size>
+=item * C<size>
 
 The size in byte of the shared memory.
 
 This is set once it is created. You can create again the shared memory segment with a smaller size, but not a bigger one. If you want to increase the size, you would need to remove it first.
 
-=item I<storable>
+=item * C<storable>
 
 Provided with a value (true or false does not matter), and this will set L<Storable::Improved> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
@@ -260,7 +260,7 @@ Set or get the boolean value to affect the open flags in exclusive mode.
 
 =head2 exists
 
-Checks if the shared memory identified with I<key> exists.
+Checks if the shared memory identified with C<key> exists.
 
 It takes the same arguments as L</open> and returns 1 if the shared memory exists or 0 otherwise.
 
@@ -431,7 +431,7 @@ When called, this will set L<Sereal> as the data serialisation mechanism when st
 
 Returns the serial number used to create or access the shared memory segment.
 
-This serial is created based on the I<key> parameter provided either upon object instantiation or upon using the L</open> method.
+This serial is created based on the C<key> parameter provided either upon object instantiation or upon using the L</open> method.
 
 The serial is created by calling L<IPC::SysV/ftok> to provide a reliable and repeatable numeric identifier.
 
@@ -507,6 +507,28 @@ It returns the current object for chaining, or C<undef> if there was an error, w
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD & PROCESS SAFETY
+
+C<Module::Generic::SharedMem> is designed to provide multi-process safe access to shared memory using System V IPC. It uses semaphores to guard concurrent access.
+
+However, please note:
+
+=over 4
+
+=item *
+
+Shared memory and semaphores are per-system resources — do not assume persistence across process restarts.
+
+=item *
+
+Always call C<remove()> manually if you want to explicitly clean up memory and semaphores, especially in daemonized or mod_perl environments.
+
+=item *
+
+Thread safety is supported where C<threads> is enabled, but this module is primarily designed for inter-process communication.
+
+=back
 
 =head1 AUTHOR
 

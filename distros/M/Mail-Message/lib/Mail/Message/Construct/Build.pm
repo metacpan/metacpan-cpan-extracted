@@ -1,4 +1,4 @@
-# Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Message;{
-our $VERSION = '3.016';
+our $VERSION = '3.017';
 }
 
 
@@ -39,7 +39,7 @@ sub build(@)
       :               ();
 
     my ($head, @headerlines);
-    my ($type, $transfenc, $dispose, $descr, $cid);
+    my ($type, $transfenc, $dispose, $descr, $cid, $lang);
     while(@_)
     {   my $key = shift;
         if(ref $key && $key->isa('Mail::Message::Field'))
@@ -48,6 +48,7 @@ sub build(@)
             elsif($name eq 'content-transfer-encoding') { $transfenc = $key }
             elsif($name eq 'content-disposition') { $dispose = $key }
             elsif($name eq 'content-description') { $descr   = $key }
+            elsif($name eq 'content-language')    { $lang    = $key }
             elsif($name eq 'content-id')          { $cid     = $key }
             else { push @headerlines, $key }
             next;
@@ -74,13 +75,13 @@ sub build(@)
                   : $c;
             }
         }
-        elsif($key =~
-           m/^content\-(type|transfer\-encoding|disposition|description|id)$/i )
+        elsif($key =~ m/^content\-(type|transfer\-encoding|disposition|language|description|id)$/i )
         {   my $k     = lc $1;
             my $field = Mail::Message::Field->new($key, $value);
                if($k eq 'type')        { $type    = $field }
             elsif($k eq 'disposition') { $dispose = $field }
             elsif($k eq 'description') { $descr   = $field }
+            elsif($k eq 'language')    { $lang    = $field }
             elsif($k eq 'id')          { $cid     = $field }
             else                     { $transfenc = $field }
         }
@@ -102,6 +103,7 @@ sub build(@)
     $body->type($type)           if defined $type;
     $body->disposition($dispose) if defined $dispose;
     $body->description($descr)   if defined $descr;
+    $body->language($lang)       if defined $lang;
     $body->contentId($cid)       if defined $cid;
     $body->transferEncoding($transfenc) if defined $transfenc;
 

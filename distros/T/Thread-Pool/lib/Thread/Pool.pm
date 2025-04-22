@@ -3,7 +3,7 @@ package Thread::Pool;
 # Set the version information
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.35';
+$VERSION = '0.36';
 use strict;
 
 # Make sure we only load stuff when we actually need it
@@ -1221,7 +1221,7 @@ Thread::Pool - group of threads for performing similar jobs
 
 =head1 VERSION
 
-This documentation describes version 0.35.
+This documentation describes version 0.36.
 
 =head1 SYNOPSIS
 
@@ -2215,12 +2215,14 @@ we're only showing that.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002, 2003, 2010 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+Copyright (c) 2002, 2003, 2010 Elizabeth Mattijsen <liz@dijkmat.nl>. 2025 LNATION <email@lnation.org> 
+All rights reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO

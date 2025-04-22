@@ -2,11 +2,11 @@ package Hades::Myths::Object;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
-	my $self = bless {}, $cls;
+	my $self      = bless {}, $cls;
 	my %accessors = (
 		locales => {
 			builder => sub {
@@ -15,7 +15,6 @@ sub new {
 				return $value;
 			}
 		},
-		fb     => { default => 'en', },
 		locale => {
 			builder => sub {
 				my ( $self, $value ) = @_;
@@ -23,6 +22,7 @@ sub new {
 				return $value;
 			}
 		},
+		fb       => { default => 'en', },
 		language => {},
 	);
 	for my $accessor ( keys %accessors ) {
@@ -255,7 +255,7 @@ sub debug_steps {
 		debug_step_13   => { en => 'Parsing class token.' },
 		debug_step_14   => { en => 'Setting last inheritance token: %s.' },
 		debug_step_14_b => { en => 'The last token was: %s.' },
-		debug_step_15 =>
+		debug_step_15   =>
 		    { en => 'Call Module::Generate\'s %s method with the value %s.' },
 		debug_step_16 =>
 		    { en => 'Build a accessor named %s with no arguments.' },
@@ -331,7 +331,7 @@ Hades::Myths::Object - display text locally.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.24
 
 =cut
 
@@ -480,19 +480,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hades-Myths-Object>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hades-Myths-Object>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hades-Myths-Object>
 
 =item * Search CPAN
 

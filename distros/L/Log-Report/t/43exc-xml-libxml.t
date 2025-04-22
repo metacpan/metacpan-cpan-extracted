@@ -41,7 +41,7 @@ is_deeply \@dec,
 
 # the message may vary over libxml2 versions
 $msg =~ s/\r?\n\s*/ /g;
-like $msg, qr/bad\-xml/, $msg;
+like $msg, qr/bad\-xml|Start tag expected/, $msg;
 
 done_testing;
 

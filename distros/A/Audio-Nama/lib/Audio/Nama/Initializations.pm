@@ -43,8 +43,6 @@ sub definitions {
 
 	$| = 1;     # flush STDOUT buffer on every write
 
-	$ui eq 'bullwinkle' or die "no \$ui, bullwinkle";
-
 	@global_effect_chain_vars  = qw(
 	@global_effect_chain_data 
 	$Audio::Nama::EffectChain::n 
@@ -226,9 +224,9 @@ sub definitions {
 				my $delay = shift();
 				modify_effect($id,2,undef,$delay)
 			},
-		hotkey_beep					=> 'beep -f 250 -l 200',
 	#	this causes beeping during make test
 	#	beep_command					=> 'beep -f 350 -l 700',
+		seek_end_margin	=>10,
 		midi_record_buffer => 'midi_record',
 		midi_default_input_channel => 'keyboard',
 		ecasound_channel_ops 		=> {map{$_,1} qw(chcopy chmove chorder chmix chmute)},
@@ -285,20 +283,19 @@ sub initialize_interfaces {
 	
 	logsub((caller(0))[3]);
 	
-	if ( ! $config->{opts}->{t} and Audio::Nama::Graphical::initialize_tk() ){ 
-		$ui = Audio::Nama::Graphical->new();
-	} else {
-		pager_newline( "Unable to load perl Tk module. Starting in console mode.") if $config->{opts}->{g};
+	if ( $config->{opts}->{g}){
+			Audio::Nama::Graphical::initialize_tk() and $ui = Audio::Nama::Graphical->new()
+			or pager_newline( "Unable to load perl Tk module. Starting in console mode.")
+	}
+	if ( not defined $ui ){
 		$ui = Audio::Nama::Text->new();
 		can_load( modules =>{ Event => undef})
 			or die "Perl Module 'Event' not found. Please install it and try again. Stopping.";
-;
 		import Event qw(loop unloop unloop_all);
 	}
 	
 	can_load( modules => {AnyEvent => undef})
 			or die "Perl Module 'AnyEvent' not found. Please install it and try again. Stopping.";
-	use AnyEvent::TermKey qw( FORMAT_VIM KEYMOD_CTRL ); 
 	can_load( modules => {jacks => undef})
 		and $jack->{use_jacks}++;
 	choose_sleep_routine();

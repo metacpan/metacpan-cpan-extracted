@@ -1,0 +1,5 @@
+Travel::Status::MOTIS 0.01 - Sun Apr 20 2025
+
+    * Initial release
+    * Supports stop board requests, trip details, and stop search
+    * Supports RNV and transitous backends

@@ -5,12 +5,14 @@ use base 'PDF::Builder::Resource::XObject::Form::BarCode';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Resource::XObject::Form::BarCode::code3of9 - specific information for 3-of-9 bar codes. Inherits from L<PDF::Builder::Resource::XObject::Form::BarCode>
+PDF::Builder::Resource::XObject::Form::BarCode::code3of9 - Specific information for 3-of-9 bar codes
+
+Inherits from L<PDF::Builder::Resource::XObject::Form::BarCode>
 
 =head1 METHODS
 

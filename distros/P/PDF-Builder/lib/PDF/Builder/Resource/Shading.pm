@@ -5,12 +5,14 @@ use base 'PDF::Builder::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Resource::Shading - support stub for shading patterns. Inherits from L<PDF::Builder::Resource>
+PDF::Builder::Resource::Shading - Support stub for fill shading patterns
+
+Inherits from L<PDF::Builder::Resource>
 
 =cut
 

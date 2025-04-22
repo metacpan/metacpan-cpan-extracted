@@ -3,7 +3,7 @@ package Template::Plex;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.7.1';
+our $VERSION = 'v0.8.0';
 use feature qw<say refaliasing>;
 no warnings "experimental";
 
@@ -89,7 +89,6 @@ sub cache {
     my $self=shift;
     my @args=@_;
 
-
     if(@args ==1){
         # Recalling implicit cache key with path only
         unshift @args, undef;
@@ -107,17 +106,29 @@ sub cache {
     #my ($self, $id, $path, $vars, %opts)=@_;
 		DEBUG and Log::OK::TRACE and log_trace __PACKAGE__." cache: $path";
 		$id//=$path.join "", caller;	#Set if undefined
+    #say STDERR "-=----IN CACHE id=$id, path=$path, vars=", %$vars, %opts;
+    #use Data::Dumper;
+    #say STDERR Dumper [$id, $path, $vars, \%opts];
+    #sleep 1;
 		if(ref($self)){
-			$self->[cache_]{$id} and return $self->[cache_]{$id};
-
-			my $template=$self->load($path, $vars, %opts);
-			$self->[cache_]{$id}//=$template;
+      my $c=$self->[cache_]{$id};
+      if($c){
+          return $c;
+      }
+      else {
+        my $template=$self->load($path, $vars, %opts);
+        $self->[cache_]{$id}//=$template;
+      }
 		}
 		else{
-			$top_level_cache{$id} and return $top_level_cache{$id};
-
-			my $template=$self->load($path, $vars, %opts);
-			$top_level_cache{$id}//=$template;
+      my $c=$top_level_cache{$id};
+      if($c){
+			    return $c 
+      }
+      else {
+        my $template=$self->load($path, $vars, %opts);
+        $top_level_cache{$id}//=$template;
+      }
 		}
 }
 
@@ -136,7 +147,7 @@ sub immediate {
       unshift @args, undef;
     }
     else{
-      # Expect explicit cache Id
+      # Expect explicit cache Id, path, vars and options
     }
 
 		my ($id, $path, $vars, @opts)=@args;
@@ -150,6 +161,7 @@ sub immediate {
 		"";
 
 }
+
 
 sub _plex_ {
 	$_[0][Template::Plex::plex_];

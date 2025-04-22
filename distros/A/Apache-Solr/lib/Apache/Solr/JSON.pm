@@ -1,4 +1,4 @@
-# Copyrights 2012-2022 by [Mark Overmeer].
+# Copyrights 2012-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Apache::Solr::JSON;
-use vars '$VERSION';
-$VERSION = '1.09';
+package Apache::Solr::JSON;{
+our $VERSION = '1.10';
+}
 
 use base 'Apache::Solr';
 
@@ -76,7 +76,7 @@ sub _add($$$)
     $params  ||= {};
 
     my $sv = $self->serverVersion;
-    $sv ge '3.1' or error __x"solr version too old for updates in JSON syntax";
+    $sv ge '3.1' or error __x"Solr version too old for updates in JSON syntax";
 
     my @params   = (wt => 'json', %$params);
     my $endpoint = $self->endpoint
@@ -99,7 +99,7 @@ sub _add($$$)
     {   $add = {add => {%$attrs, doc => $self->_doc2json($docs->[0])}} }
     elsif(keys %$attrs)
     {   # in combination with attributes only
-        error __x"unable to add more than one doc with JSON interface";
+        error __x"Unable to add more than one doc with JSON interface";
     }
     else
     {   $add = [ map $self->_doc2json($_), @$docs ] }
@@ -183,7 +183,7 @@ sub request($$;$$)
 
     # At least until Solr 4.0 response ct=text/plain while producing JSON
     # $ct =~ m/json/i
-    #     or error __x"answer from solr server is not json but {type}"
+    #     or error __x"Answer from solr server is not json but {type}"
     #          , type => $ct;
 
 #warn $resp->decoded_content;
@@ -200,7 +200,7 @@ sub simpleUpdate($$;$)
 {   my ($self, $command, $attrs, $content) = @_;
 
     my $sv       = $self->serverVersion;
-    $sv ge '3.1' or error __x"solr version too old for updates in JSON syntax";
+    $sv ge '3.1' or error __x"Solr version too old for updates in JSON syntax";
 
     $attrs     ||= {};
     my @params   = (wt => 'json', commit => delete $attrs->{commit});

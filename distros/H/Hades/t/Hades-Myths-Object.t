@@ -18,117 +18,117 @@ subtest 'new' => sub {
 	);
 	isa_ok( $obj, 'Hades::Myths::Object' );
 	ok( $obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => { 'test' => 'test' } },
-				fb      => 'nosoi',
-				locale  => 'thanatos'
+			{   locales => { 'gaudia' => { 'test' => 'test' } },
+				locale  => 'curae',
+				fb      => 'penthos'
 			}
 		),
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => { 'test' => 'test' } }, fb => 'nosoi', locale => 'thanatos' })}
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => { 'test' => 'test' } }, locale => 'curae', fb => 'penthos' })}
 	);
 	eval {
 		$obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => [] },
-				fb      => 'nosoi',
-				locale  => 'thanatos'
+			{   locales => { 'gaudia' => [] },
+				locale  => 'curae',
+				fb      => 'penthos'
 			}
 		);
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => [] }, fb => 'nosoi', locale => 'thanatos' })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => [] }, locale => 'curae', fb => 'penthos' })}
 	);
 	eval {
 		$obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => 'geras' },
-				fb      => 'nosoi',
-				locale  => 'thanatos'
+			{   locales => { 'gaudia' => 'penthos' },
+				locale  => 'curae',
+				fb      => 'penthos'
 			}
 		);
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => 'geras' }, fb => 'nosoi', locale => 'thanatos' })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => 'penthos' }, locale => 'curae', fb => 'penthos' })}
 	);
 	eval {
 		$obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => undef },
-				fb      => 'nosoi',
-				locale  => 'thanatos'
+			{   locales => { 'gaudia' => undef },
+				locale  => 'curae',
+				fb      => 'penthos'
 			}
 		);
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => undef }, fb => 'nosoi', locale => 'thanatos' })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => undef }, locale => 'curae', fb => 'penthos' })}
 	);
 	eval {
 		$obj = Hades::Myths::Object->new(
-			{ locales => [], fb => 'nosoi', locale => 'thanatos' } );
+			{ locales => [], locale => 'curae', fb => 'penthos' } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => [], fb => 'nosoi', locale => 'thanatos' })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => [], locale => 'curae', fb => 'penthos' })}
 	);
 	eval {
 		$obj = Hades::Myths::Object->new(
-			{ locales => 'geras', fb => 'nosoi', locale => 'thanatos' } );
+			{ locales => 'geras', locale => 'curae', fb => 'penthos' } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => 'geras', fb => 'nosoi', locale => 'thanatos' })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => 'geras', locale => 'curae', fb => 'penthos' })}
+	);
+	eval {
+		$obj = Hades::Myths::Object->new(
+			{   locales => { 'gaudia' => { 'test' => 'test' } },
+				locale  => [],
+				fb      => 'penthos'
+			}
+		);
+	};
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => { 'test' => 'test' } }, locale => [], fb => 'penthos' })}
+	);
+	eval {
+		$obj = Hades::Myths::Object->new(
+			{   locales => { 'gaudia' => { 'test' => 'test' } },
+				locale  => \1,
+				fb      => 'penthos'
+			}
+		);
+	};
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => { 'test' => 'test' } }, locale => \1, fb => 'penthos' })}
 	);
 	ok( $obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => { 'test' => 'test' } },
-				locale  => 'thanatos'
+			{   locales => { 'gaudia' => { 'test' => 'test' } },
+				locale  => 'curae'
 			}
 		),
-		q{$obj = Hades::Myths::Object->new({locales => { 'algea' => { 'test' => 'test' } }, locale => 'thanatos'})}
+		q{$obj = Hades::Myths::Object->new({locales => { 'gaudia' => { 'test' => 'test' } }, locale => 'curae'})}
 	);
 	ok( $obj = Hades::Myths::Object->new(
-			locales => { 'algea' => { 'test' => 'test' } },
-			locale  => 'thanatos'
+			locales => { 'gaudia' => { 'test' => 'test' } },
+			locale  => 'curae'
 		),
-		q{$obj = Hades::Myths::Object->new(locales => { 'algea' => { 'test' => 'test' } }, locale => 'thanatos')}
+		q{$obj = Hades::Myths::Object->new(locales => { 'gaudia' => { 'test' => 'test' } }, locale => 'curae')}
 	);
 	is_deeply( $obj->fb, 'en', q{$obj->fb} );
 	eval {
 		$obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => { 'test' => 'test' } },
-				fb      => [],
-				locale  => 'thanatos'
+			{   locales => { 'gaudia' => { 'test' => 'test' } },
+				locale  => 'curae',
+				fb      => []
 			}
 		);
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => { 'test' => 'test' } }, fb => [], locale => 'thanatos' })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => { 'test' => 'test' } }, locale => 'curae', fb => [] })}
 	);
 	eval {
 		$obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => { 'test' => 'test' } },
-				fb      => \1,
-				locale  => 'thanatos'
+			{   locales => { 'gaudia' => { 'test' => 'test' } },
+				locale  => 'curae',
+				fb      => \1
 			}
 		);
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => { 'test' => 'test' } }, fb => \1, locale => 'thanatos' })}
-	);
-	eval {
-		$obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => { 'test' => 'test' } },
-				fb      => 'nosoi',
-				locale  => []
-			}
-		);
-	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => { 'test' => 'test' } }, fb => 'nosoi', locale => [] })}
-	);
-	eval {
-		$obj = Hades::Myths::Object->new(
-			{   locales => { 'algea' => { 'test' => 'test' } },
-				fb      => 'nosoi',
-				locale  => \1
-			}
-		);
-	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Myths::Object->new({ locales => { 'algea' => { 'test' => 'test' } }, fb => 'nosoi', locale => \1 })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Myths::Object->new({ locales => { 'gaudia' => { 'test' => 'test' } }, locale => 'curae', fb => \1 })}
 	);
 };
 subtest 'fb' => sub {
@@ -137,14 +137,14 @@ subtest 'fb' => sub {
 		q{my $obj = Hades::Myths::Object->new({})}
 	);
 	can_ok( $obj, 'fb' );
-	is_deeply( $obj->fb('nosoi'), 'nosoi', q{$obj->fb('nosoi')} );
+	is_deeply( $obj->fb('aporia'), 'aporia', q{$obj->fb('aporia')} );
 	eval { $obj->fb( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->fb([])} );
 	eval { $obj->fb( \1 ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->fb(\1)} );
-	is_deeply( $obj->fb, 'nosoi', q{$obj->fb} );
+	is_deeply( $obj->fb, 'aporia', q{$obj->fb} );
 };
 subtest 'locale' => sub {
 	plan tests => 6;
@@ -152,14 +152,14 @@ subtest 'locale' => sub {
 		q{my $obj = Hades::Myths::Object->new({})}
 	);
 	can_ok( $obj, 'locale' );
-	is_deeply( $obj->locale('nosoi'), 'nosoi', q{$obj->locale('nosoi')} );
+	is_deeply( $obj->locale('geras'), 'geras', q{$obj->locale('geras')} );
 	eval { $obj->locale( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->locale([])} );
 	eval { $obj->locale( \1 ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->locale(\1)} );
-	is_deeply( $obj->locale, 'nosoi', q{$obj->locale} );
+	is_deeply( $obj->locale, 'geras', q{$obj->locale} );
 };
 subtest '_build_locale' => sub {
 	plan tests => 4;
@@ -168,10 +168,10 @@ subtest '_build_locale' => sub {
 	);
 	can_ok( $obj, '_build_locale' );
 	eval { $obj->_build_locale( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->_build_locale([])} );
 	eval { $obj->_build_locale( \1 ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->_build_locale(\1)} );
 };
 subtest '_set_language_from_locale' => sub {
@@ -183,17 +183,17 @@ subtest '_set_language_from_locale' => sub {
 	eval { $obj->_set_language_from_locale( [] ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
+		qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->_set_language_from_locale([])}
 	);
 	eval { $obj->_set_language_from_locale( \1 ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
+		qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->_set_language_from_locale(\1)}
 	);
 	eval { $obj->_set_language_from_locale() };
-	like( $@, qr/undef/, q{$obj->_set_language_from_locale()} );
+	like( $@, qr/undef/i, q{$obj->_set_language_from_locale()} );
 };
 subtest 'language' => sub {
 	plan tests => 4;
@@ -202,10 +202,10 @@ subtest 'language' => sub {
 	);
 	can_ok( $obj, 'language' );
 	eval { $obj->language( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->language([])} );
 	eval { $obj->language( \1 ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->language(\1)} );
 };
 subtest 'has_language' => sub {
@@ -218,7 +218,8 @@ subtest 'has_language' => sub {
 		q{do{ delete $obj->{language}; 1;}}
 	);
 	is( $obj->has_language, '', q{$obj->has_language} );
-	is_deeply( $obj->language('algea'), 'algea', q{$obj->language('algea')} );
+	is_deeply( $obj->language('gaudia'),
+		'gaudia', q{$obj->language('gaudia')} );
 	is( $obj->has_language, 1, q{$obj->has_language} );
 };
 subtest 'locales' => sub {
@@ -228,35 +229,35 @@ subtest 'locales' => sub {
 	);
 	can_ok( $obj, 'locales' );
 	is_deeply(
-		$obj->locales( { 'thanatos' => { 'test' => 'test' } } ),
-		{ 'thanatos' => { 'test' => 'test' } },
-		q{$obj->locales({ 'thanatos' => { 'test' => 'test' } })}
+		$obj->locales( { 'curae' => { 'test' => 'test' } } ),
+		{ 'curae' => { 'test' => 'test' } },
+		q{$obj->locales({ 'curae' => { 'test' => 'test' } })}
 	);
-	eval { $obj->locales( { 'thanatos' => [] } ) };
+	eval { $obj->locales( { 'curae' => [] } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->locales({ 'thanatos' => [] })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->locales({ 'curae' => [] })}
 	);
-	eval { $obj->locales( { 'thanatos' => 'curae' } ) };
+	eval { $obj->locales( { 'curae' => 'thanatos' } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->locales({ 'thanatos' => 'curae' })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->locales({ 'curae' => 'thanatos' })}
 	);
-	eval { $obj->locales( { 'thanatos' => undef } ) };
+	eval { $obj->locales( { 'curae' => undef } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->locales({ 'thanatos' => undef })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->locales({ 'curae' => undef })}
 	);
 	eval { $obj->locales( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->locales([])} );
-	eval { $obj->locales('algea') };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->locales('algea')} );
-	is_deeply( $obj->locales, { 'thanatos' => { 'test' => 'test' } },
+	eval { $obj->locales('aporia') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->locales('aporia')} );
+	is_deeply( $obj->locales, { 'curae' => { 'test' => 'test' } },
 		q{$obj->locales} );
 };
 subtest '_build_locales' => sub {
@@ -266,13 +267,13 @@ subtest '_build_locales' => sub {
 	);
 	can_ok( $obj, '_build_locales' );
 	eval { $obj->_build_locales( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->_build_locales([])} );
-	eval { $obj->_build_locales('thanatos') };
+	eval { $obj->_build_locales('penthos') };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_build_locales('thanatos')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->_build_locales('penthos')}
 	);
 };
 subtest 'convert_locale' => sub {
@@ -281,29 +282,29 @@ subtest 'convert_locale' => sub {
 		q{my $obj = Hades::Myths::Object->new({})}
 	);
 	can_ok( $obj, 'convert_locale' );
-	eval { $obj->convert_locale( [], 'gaudia' ) };
+	eval { $obj->convert_locale( [], 'geras' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->convert_locale([], 'gaudia')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->convert_locale([], 'geras')}
 	);
-	eval { $obj->convert_locale( \1, 'gaudia' ) };
+	eval { $obj->convert_locale( \1, 'geras' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->convert_locale(\1, 'gaudia')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->convert_locale(\1, 'geras')}
 	);
-	eval { $obj->convert_locale( 'hypnos', [] ) };
+	eval { $obj->convert_locale( 'nosoi', [] ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->convert_locale('hypnos', [])}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->convert_locale('nosoi', [])}
 	);
-	eval { $obj->convert_locale( 'hypnos', \1 ) };
+	eval { $obj->convert_locale( 'nosoi', \1 ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->convert_locale('hypnos', \1)}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->convert_locale('nosoi', \1)}
 	);
 };
 subtest 'add' => sub {
@@ -312,47 +313,47 @@ subtest 'add' => sub {
 		q{my $obj = Hades::Myths::Object->new({})}
 	);
 	can_ok( $obj, 'add' );
-	eval { $obj->add( [], { 'geras' => { 'test' => 'test' } } ) };
+	eval { $obj->add( [], { 'curae' => { 'test' => 'test' } } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->add([], { 'geras' => { 'test' => 'test' } })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->add([], { 'curae' => { 'test' => 'test' } })}
 	);
-	eval { $obj->add( \1, { 'geras' => { 'test' => 'test' } } ) };
+	eval { $obj->add( \1, { 'curae' => { 'test' => 'test' } } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->add(\1, { 'geras' => { 'test' => 'test' } })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->add(\1, { 'curae' => { 'test' => 'test' } })}
 	);
-	eval { $obj->add( 'phobos', { 'geras' => [] } ) };
+	eval { $obj->add( 'penthos', { 'curae' => [] } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->add('phobos', { 'geras' => [] })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->add('penthos', { 'curae' => [] })}
 	);
-	eval { $obj->add( 'phobos', { 'geras' => 'phobos' } ) };
+	eval { $obj->add( 'penthos', { 'curae' => 'thanatos' } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->add('phobos', { 'geras' => 'phobos' })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->add('penthos', { 'curae' => 'thanatos' })}
 	);
-	eval { $obj->add( 'phobos', { 'geras' => undef } ) };
+	eval { $obj->add( 'penthos', { 'curae' => undef } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->add('phobos', { 'geras' => undef })}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->add('penthos', { 'curae' => undef })}
 	);
-	eval { $obj->add( 'phobos', [] ) };
+	eval { $obj->add( 'penthos', [] ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->add('phobos', [])}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->add('penthos', [])}
 	);
-	eval { $obj->add( 'phobos', 'phobos' ) };
+	eval { $obj->add( 'penthos', 'geras' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->add('phobos', 'phobos')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->add('penthos', 'geras')}
 	);
 };
 subtest 'string' => sub {
@@ -361,53 +362,53 @@ subtest 'string' => sub {
 		q{my $obj = Hades::Myths::Object->new({})}
 	);
 	can_ok( $obj, 'string' );
-	eval { $obj->string( [], 'geras', 'hypnos', 'nosoi' ) };
+	eval { $obj->string( [], 'penthos', 'phobos', 'nosoi' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string([], 'geras', 'hypnos', 'nosoi')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string([], 'penthos', 'phobos', 'nosoi')}
 	);
-	eval { $obj->string( \1, 'geras', 'hypnos', 'nosoi' ) };
+	eval { $obj->string( \1, 'penthos', 'phobos', 'nosoi' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string(\1, 'geras', 'hypnos', 'nosoi')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string(\1, 'penthos', 'phobos', 'nosoi')}
 	);
-	eval { $obj->string( 'aporia', [], 'hypnos', 'nosoi' ) };
+	eval { $obj->string( 'algea', [], 'phobos', 'nosoi' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string('aporia', [], 'hypnos', 'nosoi')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string('algea', [], 'phobos', 'nosoi')}
 	);
-	eval { $obj->string( 'aporia', \1, 'hypnos', 'nosoi' ) };
+	eval { $obj->string( 'algea', \1, 'phobos', 'nosoi' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string('aporia', \1, 'hypnos', 'nosoi')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string('algea', \1, 'phobos', 'nosoi')}
 	);
-	eval { $obj->string( 'aporia', 'geras', [], 'nosoi' ) };
+	eval { $obj->string( 'algea', 'penthos', [], 'nosoi' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string('aporia', 'geras', [], 'nosoi')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string('algea', 'penthos', [], 'nosoi')}
 	);
-	eval { $obj->string( 'aporia', 'geras', \1, 'nosoi' ) };
+	eval { $obj->string( 'algea', 'penthos', \1, 'nosoi' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string('aporia', 'geras', \1, 'nosoi')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string('algea', 'penthos', \1, 'nosoi')}
 	);
-	eval { $obj->string( 'aporia', 'geras', 'hypnos', [] ) };
+	eval { $obj->string( 'algea', 'penthos', 'phobos', [] ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string('aporia', 'geras', 'hypnos', [])}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string('algea', 'penthos', 'phobos', [])}
 	);
-	eval { $obj->string( 'aporia', 'geras', 'hypnos', \1 ) };
+	eval { $obj->string( 'algea', 'penthos', 'phobos', \1 ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->string('aporia', 'geras', 'hypnos', \1)}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->string('algea', 'penthos', 'phobos', \1)}
 	);
 };
 subtest 'debug_steps' => sub {

@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,37 +34,37 @@ no_index:
 provides:
   WebService::OpenSky:
     file: lib/WebService/OpenSky.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Core::Flight:
     file: lib/WebService/OpenSky/Core/Flight.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Core::StateVector:
     file: lib/WebService/OpenSky/Core/StateVector.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Core::Waypoint:
     file: lib/WebService/OpenSky/Core/Waypoint.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Moose:
     file: lib/WebService/OpenSky/Moose.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Response:
     file: lib/WebService/OpenSky/Response.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Response::FlightTrack:
     file: lib/WebService/OpenSky/Response/FlightTrack.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Response::Flights:
     file: lib/WebService/OpenSky/Response/Flights.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Response::States:
     file: lib/WebService/OpenSky/Response/States.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Types:
     file: lib/WebService/OpenSky/Types.pm
-    version: '0.4'
+    version: '0.5'
   WebService::OpenSky::Utils::Iterator:
     file: lib/WebService/OpenSky/Utils/Iterator.pm
-    version: '0.4'
+    version: '0.5'
 requires:
   Config::INI::Reader: '0'
   Mojo::JSON: '0'
@@ -85,9 +85,10 @@ resources:
   bugtracker: https://github.com/Ovid/opensky-api/issues
   homepage: https://github.com/Ovid/opensky-api
   repository: https://github.com/Ovid/opensky-api.git
-version: '0.4'
+version: '0.5'
 x_contributors:
+  - 'ovid <curtis_ovid_poe@yahoo.com>'
   - 'Ovid <ovid@cpan.org>'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

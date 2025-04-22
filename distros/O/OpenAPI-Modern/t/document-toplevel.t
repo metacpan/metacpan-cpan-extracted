@@ -367,7 +367,7 @@ ERRORS
     '$id' => 'https://mymetaschema',
     '$vocabulary' => {
       'https://json-schema.org/draft/2020-12/vocab/core' => true,
-      'https://json-schema.org/draft/2020-12/vocab/applicator' => false,
+      'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
     },
   });
 

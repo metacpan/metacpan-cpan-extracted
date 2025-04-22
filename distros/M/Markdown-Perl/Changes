@@ -1,5 +1,11 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.11 - 2025-04-21
+
+ - Add support for directive container blocks, controlled by the
+   use_directive_blocks option, which is true in the default configuration (and
+   false in all the other ones) (fix #5).
+
 1.10 - 2025-04-17
 
  - Support YAML::PP and YAML::PP::LibYAML as YAML parsers as YAML::Tiny has

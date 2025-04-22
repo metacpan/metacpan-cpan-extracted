@@ -4,6 +4,7 @@ use Test::More tests => 23;
 use strict;
 use warnings;
 
+use lib '.';
 # Add stopping code, only to be executed in main process
 my $cache;
 my $filename;

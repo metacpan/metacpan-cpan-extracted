@@ -24,33 +24,33 @@ subtest 'new' => sub {
 		$obj = Hades::Macro->new(
 			{ alias => { test => {} }, macro => ['test'] } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
 		q{$obj = Hades::Macro->new({ alias => { test => {} }, macro => ['test'] })}
 	);
 	eval {
 		$obj = Hades::Macro->new(
-			{ alias => { test => 'phobos' }, macro => ['test'] } );
+			{ alias => { test => 'aporia' }, macro => ['test'] } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Macro->new({ alias => { test => 'phobos' }, macro => ['test'] })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Macro->new({ alias => { test => 'aporia' }, macro => ['test'] })}
 	);
 	eval {
 		$obj = Hades::Macro->new(
 			{ alias => { test => undef }, macro => ['test'] } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
 		q{$obj = Hades::Macro->new({ alias => { test => undef }, macro => ['test'] })}
 	);
 	eval { $obj = Hades::Macro->new( { alias => [], macro => ['test'] } ) };
 	like(
 		$@,
-		qr/invalid|type|constraint|greater|atleast/,
+		qr/invalid|type|constraint|greater|atleast/i,
 		q{$obj = Hades::Macro->new({ alias => [], macro => ['test'] })}
 	);
 	eval {
 		$obj = Hades::Macro->new( { alias => 'phobos', macro => ['test'] } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
 		q{$obj = Hades::Macro->new({ alias => 'phobos', macro => ['test'] })}
 	);
 	ok( $obj = Hades::Macro->new( { alias => { test => ['test'] } } ),
@@ -64,15 +64,15 @@ subtest 'new' => sub {
 		$obj = Hades::Macro->new(
 			{ alias => { test => ['test'] }, macro => {} } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
 		q{$obj = Hades::Macro->new({ alias => { test => ['test'] }, macro => {} })}
 	);
 	eval {
 		$obj = Hades::Macro->new(
-			{ alias => { test => ['test'] }, macro => 'gaudia' } );
+			{ alias => { test => ['test'] }, macro => 'algea' } );
 	};
-	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Macro->new({ alias => { test => ['test'] }, macro => 'gaudia' })}
+	like( $@, qr/invalid|type|constraint|greater|atleast/i,
+		q{$obj = Hades::Macro->new({ alias => { test => ['test'] }, macro => 'algea' })}
 	);
 };
 subtest 'macro' => sub {
@@ -83,11 +83,11 @@ subtest 'macro' => sub {
 	can_ok( $obj, 'macro' );
 	is_deeply( $obj->macro( ['test'] ), ['test'], q{$obj->macro(['test'])} );
 	eval { $obj->macro( {} ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->macro({})} );
-	eval { $obj->macro('hypnos') };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->macro('hypnos')} );
+	eval { $obj->macro('gaudia') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->macro('gaudia')} );
 	is_deeply( $obj->macro, ['test'], q{$obj->macro} );
 };
 subtest 'alias' => sub {
@@ -105,27 +105,27 @@ subtest 'alias' => sub {
 	eval { $obj->alias( { test => {} } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
+		qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->alias({ test => {} })}
 	);
 	eval { $obj->alias( { test => 'geras' } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
+		qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->alias({ test => 'geras' })}
 	);
 	eval { $obj->alias( { test => undef } ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
+		qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->alias({ test => undef })}
 	);
 	eval { $obj->alias( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->alias([])} );
-	eval { $obj->alias('geras') };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->alias('geras')} );
+	eval { $obj->alias('hypnos') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->alias('hypnos')} );
 	is_deeply( $obj->alias, { test => ['test'] }, q{$obj->alias} );
 };
 subtest 'has_alias' => sub {
@@ -150,10 +150,10 @@ subtest 'meta' => sub {
 	);
 	can_ok( $obj, 'meta' );
 	eval { $obj->meta( [] ) };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
 		q{$obj->meta([])} );
-	eval { $obj->meta('gaudia') };
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta('gaudia')} );
+	eval { $obj->meta('nosoi') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->meta('nosoi')} );
 };
 done_testing();

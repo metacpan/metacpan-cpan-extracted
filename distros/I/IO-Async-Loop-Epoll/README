@@ -55,7 +55,7 @@ CONSTRUCTOR
 
  new
 
-       $loop = IO::Async::Loop::Epoll->new()
+       $loop = IO::Async::Loop::Epoll->new();
 
     This function returns a new instance of a IO::Async::Loop::Epoll
     object.
@@ -68,7 +68,7 @@ METHODS
 
  loop_once
 
-       $count = $loop->loop_once( $timeout )
+       $count = $loop->loop_once( $timeout );
 
     This method calls epoll_pwait(2), and processes the results of that
     call. It returns the total number of IO::Async::Notifier callbacks

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $offset = 0.5555555;
 our $precision = 0;
@@ -117,7 +117,7 @@ Number::Equation - Track how a number is calculated progamically.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -179,23 +179,17 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-Equation>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Number-Equation>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Number-Equation>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

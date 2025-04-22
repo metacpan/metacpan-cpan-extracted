@@ -225,7 +225,7 @@ subtest 'getCollations' => sub
         },
         {
             test => 'zh',
-            expects => [qw( private-pinyin pinyin gb2312han stroke zhuyin big5han unihan )],
+            expects => [qw( private-pinyin pinyin stroke zhuyin unihan )],
         },
         {
             test => 'en',

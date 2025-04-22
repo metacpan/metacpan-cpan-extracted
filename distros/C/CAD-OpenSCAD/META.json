@@ -30,7 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
+            "Object::Pad" : "0.801",
+            "perl" : "5.18"
          }
       },
       "test" : {
@@ -40,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

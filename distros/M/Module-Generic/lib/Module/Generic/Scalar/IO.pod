@@ -48,6 +48,32 @@ Module::Generic::Scalar::IO - Generic Module Scalar IO Class
 
 This class L<Module::Generic::Scalar::IO> implements object oriented IO methods on a scalar reference. It inherits from L<Module::Generic::File::IO> and you can use all the methods from L<IO::Handle>
 
+Unlike the default Perl C<open()> behavior with a C<:scalar> layer, this class adds:
+
+=over 4
+
+=item *
+
+Automatic support for opening modes like C<r>, C<w>, C<w+>, C<r+>, C<a>, etc.
+
+=item *
+
+Access to low-level flags via L<fcntl>, which are usually unavailable with plain scalar handles
+
+=item *
+
+Convenient methods to inspect open mode (e.g. L</is_readonly>, L</is_append>, L</is_writeonly>)
+
+=item *
+
+Safe serialization support for use with Storable or Sereal
+
+=item *
+
+Automatic support for L<autoflush>, C<binmode>, and other standard I/O operations
+
+=back
+
 Thus, this makes it possible to use L<Module::Generic::Scalar> object as file handle to print and get data to and from it, and you can use it directly as well.
 
 This normally can be achieved with L<PerlIO>, like this:
@@ -55,20 +81,23 @@ This normally can be achieved with L<PerlIO>, like this:
     my $ref = \"Hello";
     open( my $fh, '+<:scalar', $ref ) || die( $! );
 
-However, this interface provides some additions such as setting filehandle flags based on opening mode, so that following calls work, which they normally do not if one uses directly L<perlfunc/open>
+However, this interface provides some additions such as automatically setting filehandle flags derived from the opening mode, allowing advanced features like C<fcntl> to work as expected.
 
     my $flags = $fh->fcntl( F_GETFL, 0 );
     $fh->fcntl( F_SETFL, O_RDWR );
 
 This, in turn, allows the methods L</can_read> and L</can_write> and L</is_append>, L</is_create>, L</is_readonly>, L</is_readwrite>, L</is_writeonly> to work.
 
-One shortcoming due to perl's own design, is if you call C<sysread( $fh, $buffer )> instead of C<$fh->sysread( $buffer )> or C<syswrite( $fh, $string )> instead of C<$fh->syswrite( $string )>. While the latter works of course, the former does not, so always make sure to call hose methods in an object oriented way.
+One shortcoming due to perl's own design, is if you call C<sysread( $fh, $buffer )> instead of C<$fh->sysread( $buffer )> or C<syswrite( $fh, $string )> instead of C<$fh->syswrite( $string )>. While the latter works of course, the former does not, so always make sure to call those methods in an object oriented way.
 
-=head1 METHODS
+=head1 CONSTRUCTOR
 
 =head2 new
 
-It takes an L<Module::Generic::Scalar> object or any other scalar reference, and some optional mode and calls L</open>. It returns a blessed file handle.
+    my $io = Module::Generic::Scalar::IO->new( \$scalar_ref, 'w' );
+    my $io = Module::Generic::Scalar::IO->new({ scalar => \$scalar_ref, mode => 'r+' });
+
+It takes a reference to a scalar, such as L<Module::Generic::Scalar> object or any other scalar reference, that will be treated as a memory buffer, and some optional mode and calls L</open>. It returns a blessed file handle.
 
 If no mode is provided, it defaults to C<< +< >> to allow for read and write, but without clobbering.
 
@@ -76,31 +105,53 @@ Supported modes are:
 
 =over 4
 
-=item C<< < >> or C<r>
+=item *  C<< < >> or C<r>
 
 Read-only
 
-=item C<< <+ >> or C<r+>
+=item *  C<< <+ >> or C<r+>
 
 Read and write. This is the default.
 
-=item C<< > >> or C<w>
+=item *  C<< > >> or C<w>
 
 Clobbering. This will empty the content of the scalar reference, before writing to it.
 
-=item C<< +> >> or C<w+>
+=item *  C<< +> >> or C<w+>
 
 Cloberring, and read and write.
 
-=item C<< >> >> or C<a>
+=item *  C<< >> >> or C<a>
 
 Append mode. This will allow for appending data to the underlying scalar reference, but not read from it.
 
-=item C<< +>> >> C<a+>
+=item *  C<< +>> >> C<a+>
 
 Append and read mode. This allows to append data and read from it.
 
+=item * C<r>
+
+Read-only
+
+=item * C<w>
+
+Write-only (truncate)
+
+=item * C<a>
+
+Append mode
+
+=item * C<r+>, C<w+>, C<a+>
+
+Read/write variants
+
 =back
+
+The mode will automatically be normalized to include C<:scalar> if not already present.
+
+On failure to open, this method returns C<undef> and sets an error accessible via C<< $obj->error >>.
+
+=head1 METHODS
 
 =head2 autoflush
 
@@ -368,6 +419,14 @@ It returns the number of bytes printed, or C<undef> if there was an error, in wh
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD SAFETY
+
+This module is thread-safe as long as each thread uses its own distinct scalar reference.
+
+If you share the same scalar reference across threads (e.g., using C<threads::shared>), then you must coordinate access using external locking mechanisms (e.g., C<lock()>).
+
+No internal locking is performed by this module, by design.
 
 =head1 SEE ALSO
 

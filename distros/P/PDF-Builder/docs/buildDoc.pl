@@ -15,10 +15,10 @@
 use strict;
 use warnings;
 use Getopt::Long;
-use Pod::Simple::XHTML;
+use Pod::Simple::XHTML 3.45;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 # =============
 # CONFIGURATION  these may be overridden by command-line flags. If reading from
@@ -359,7 +359,7 @@ do {
 
             # POD conversion errors reported? already in index section
 	    # empty string if no valid POD at all
-	    if ($htmlfile =~ m#id="POD_ERRORS"#) {
+	    if ($htmlfile =~ m#id="POD-ERRORS"#) {
 		print "$source ERROR  POD errors reported\n";
 		$file_list[$i]{'status'} = 3;
 	    }
@@ -685,12 +685,12 @@ sub update_HTML{
 			 "</ul>\n</div>";
             $string = substr($string, 0, $pos) . $newstring . substr($string, $pos+36);
 	}
-	$pos = index $string, "<h1 id=\"NAME\">";
+	$pos = index $string, "<ul id=\"index\">";
 	if ($pos < 0) {
 	    print "ERROR: can't find link index in file $fname.\n";
 	    next;
 	}
-	$pos -= 8; # new last item in top level list
+	$pos += 15; # new first item in top level list
 	
         $newstring =  "  <li><a href=\"#NAVIGATION-LINKS\">NAVIGATION LINKS</a>\n" .
 	              "    <ul>\n" .
@@ -1268,6 +1268,22 @@ CPAN or GitHub. See the following example:
 in Builder/docs (also on the Desktop), run
 
     buildDoc.pl --leading='' --libtop=../../SVG-2.87/lib -rootname=SVG
+
+  Another example would be HTML::Tree and HTML::TreeBuilder. Note that they are
+in 'vendor', not 'site', and comprise a number of distinct modules that must
+be handled separately:
+
+    buildDoc.pl --leading=HTML --libtop=/Strawberry/perl/vendor/lib -rootname=Tree
+    buildDoc.pl --leading=HTML --libtop=/Strawberry/perl/vendor/lib -rootname=TreeBuilder
+    buildDoc.pl --leading=HTML --libtop=/Strawberry/perl/vendor/lib -rootname=Parse
+    buildDoc.pl --leading=HTML --libtop=/Strawberry/perl/vendor/lib -rootname=Element
+    buildDoc.pl --leading=HTML --libtop=/Strawberry/perl/vendor/lib -rootname=Tagset
+    buildDoc.pl --leading=HTML --libtop=/Strawberry/perl/vendor/lib -rootname=AsSubs
+
+If you do not have a standalone spelling checker, to find typos in the 
+documentation, such as "lintian", you can bring up each HTML page in a browser, 
+copy and paste into an email client, and ask for a spelling check. This will 
+occasionally find a bona-fide spelling error that can be corrected.
 
   The .pod or .pm file(s) are fed to Pod::Simple::XHTML utility to produce 
 .html files stored in the current directory or below (see configuration 

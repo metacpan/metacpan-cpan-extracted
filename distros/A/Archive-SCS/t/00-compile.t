@@ -23,6 +23,7 @@ try {
   require Archive::SCS::HashFS;
   require Archive::SCS::HashFS2;
   require Archive::SCS::InMemory;
+  require Archive::SCS::Zip;
 
   require Archive::SCS;
 

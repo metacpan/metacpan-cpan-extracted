@@ -46,6 +46,11 @@ wrapping from RFC2231.  If you do not need the latter two, then the
 L<Mail::Message::Field::Fast|Mail::Message::Field::Fast> and L<Mail::Message::Field::Flex|Mail::Message::Field::Flex>
 are enough for your application.
 
+RFC5322 (F<https://www.rfc-editor.org/rfc/rfc5322.html>) describes a
+long list of obsolete syntax for structured header fields.  This mainly
+refers to disallowing white-spaces and folding on many inconvenient
+locations.  This matches MailBox's natural behavior.
+
 Extends L<"DESCRIPTION" in Mail::Message::Field|Mail::Message::Field/"DESCRIPTION">.
  
 =head1 OVERLOADED
@@ -677,12 +682,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.016,
-built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.017,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

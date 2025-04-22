@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.04
+version 0.05
 Hades::Realm::Exporter base Hades {
 	abstract { Hades realm for Exporter }
 	synopsis {

@@ -241,6 +241,16 @@ _make_option(use_setext_headings => 0, _boolean, (cmark => 1, markdown => 1, git
 
 =pod
 
+=head3 B<use_directive_blocks> I<(boolean, default: true)>
+
+This options controls whether directive blocks can be used.
+
+=cut
+
+_make_option(use_directive_blocks => 1, _boolean, (cmark => 0, markdown => 0, github => 0));
+
+=pod
+
 =head2 Options controlling the parsing of top-level blocks
 
 =head3 B<fenced_code_blocks_must_be_closed> I<(boolean, default: true)>

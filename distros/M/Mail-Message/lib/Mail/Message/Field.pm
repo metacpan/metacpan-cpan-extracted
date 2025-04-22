@@ -1,4 +1,4 @@
-# Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Message::Field;{
-our $VERSION = '3.016';
+our $VERSION = '3.017';
 }
 
 use base 'Mail::Reporter';
@@ -242,8 +242,6 @@ sub attribute($;$)
     $value;
 }
 
-#------------------------------------------
-
 
 sub attributes()
 {   my $self  = shift;
@@ -262,8 +260,6 @@ sub attributes()
     @attrs;
 }
 
-#------------------------------------------
-
 
 sub toInt()
 {   my $self = shift;
@@ -273,8 +269,6 @@ sub toInt()
 
     return undef;
 }
-
-#------------------------------------------
 
 
 my @weekday = qw/Sun Mon Tue Wed Thu Fri Sat Sun/;
@@ -304,12 +298,8 @@ sub _tz_offset($)
    sprintf( ($diff < 0 ? " -%02d%02d" : " +%02d%02d"), $hours, $minutes);
 }
 
-#------------------------------------------
-
 
 sub addresses() { Mail::Address->parse(shift->unfoldedBody) }
-
-#------------------------------------------
 
 
 sub study()
@@ -362,8 +352,6 @@ sub consume($;$)
     ($name, $body);
 }
 
-#------------------------------------------
-
 
 sub stringifyData($)
 {  my ($self, $arg) = (shift, shift);
@@ -399,8 +387,6 @@ sub stringifyData($)
    @addr ? join(', ',@addr) : undef;
 }
 
-#------------------------------------------
-
 
 sub setWrapLength(;$)
 {   my $self = shift;
@@ -411,15 +397,11 @@ sub setWrapLength(;$)
     $self;
 }
 
-#------------------------------------------
-
 
 sub defaultWrapLength(;$)
 {   my $self = shift;
     @_ ? ($default_wrap_length = shift) : $default_wrap_length;
 }
-
-#------------------------------------------
 
 
 sub fold($$;$)

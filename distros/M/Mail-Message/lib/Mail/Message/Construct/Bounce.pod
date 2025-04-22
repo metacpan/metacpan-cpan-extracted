@@ -14,6 +14,13 @@ Complex functionality on L<Mail::Message|Mail::Message> objects is implemented i
 different files which are autoloaded.  This file implements the
 functionality related to bouncing messages off to other destinations.
 
+B<Be warned:> bouncing messages was very common practice in the past,
+but does not play well together with SPF spam protection.  Unless you
+bounce messages which originate from inside your own infrastructure,
+you may get the message rejected by the spam-filters of the receivers.
+The way around it, is to implement ARC... which the MailBox suite did
+not try (yet).
+
 =head1 METHODS
 
 =head2 Constructing a message
@@ -70,12 +77,12 @@ L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.016,
-built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.017,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

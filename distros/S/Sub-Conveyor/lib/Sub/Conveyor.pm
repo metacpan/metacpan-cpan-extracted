@@ -3,7 +3,7 @@ package Sub::Conveyor;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub new {
 	my ($self) = shift;
@@ -46,6 +46,13 @@ sub call {
 	return wantarray ? @params : scalar @params == 1 ? $params[0] : \@params;
 }
 
+sub install {
+	my ($self, $class, $method) = @_;
+	no strict 'refs';
+	no warnings 'redefine';
+	*{"${class}::${method}"} = sub { shift; $self->call(@_) };
+}
+
 1;
 
 __END__
@@ -56,7 +63,7 @@ Sub::Conveyor - Subroutine chaining with types
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -71,7 +78,7 @@ Version 0.01
 		[ Int ] => sub { return $_[0] / 2 },
 	);
 
-	$conveyor->add('Any', sub {
+	$conveyor->add(Any, sub {
 		return sprintf "The result is %s", $_[0];
 	});
 	
@@ -80,20 +87,42 @@ Version 0.01
 
 	...
 
+	$conveyor->install('Test', 'testing');
+
+	Test->testing(100); # The result is 50
+
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new
 
+Instantiate a new L<Sub::Conveyor> chain.
+
+	my $conveyor = Sub::Conveyor->new();
+
 =cut
 
 =head2 add
+
+Add to the conveyor chain.
+
+	$conveyor->add(Any, Str, Int, \&cb);
 
 =cut
 
 =head2 call
 
+Call the conveyor chain.
+
+	$conveyor->call(@params);
+
 =cut
+
+=head2 install
+
+Install the conveyor chain into a package.
+
+	$conveyor->install($package, $method);
 
 =head1 AUTHOR
 
@@ -104,7 +133,6 @@ LNATION, C<< <email at lnation.org> >>
 Please report any bugs or feature requests to C<bug-sub-conveyor at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-Conveyor>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
 
 =head1 SUPPORT
 
@@ -126,9 +154,7 @@ L<https://metacpan.org/release/Sub-Conveyor>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 

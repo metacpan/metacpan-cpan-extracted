@@ -1,6 +1,6 @@
 #############################################################################
 #################         Easy Debugging Module        ######################
-################# Copyright 2013 - 2023 Richard Kelsch ######################
+################# Copyright 2013 - 2025 Richard Kelsch ######################
 #################          All Rights Reserved         ######################
 #############################################################################
 ####### Licensing information available near the end of this file. ##########
@@ -43,7 +43,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.14';
+    our $VERSION = '2.15';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -329,19 +329,20 @@ B<%D>
 sub new {
     my $class = shift;
     my ($filename, $dir, $suffix) = fileparse($0);
+	my $tm = time;
     my $self = {
         'LogLevel'           => 'ERR',                                                               # Default is errors only
         'Type'               => 'fh',                                                                # Default is a filehandle
         'Path'               => '/var/log',                                                          # Default path should type be unix
         'FileHandle'         => \*STDERR,                                                            # Default filehandle is STDERR
-        'MasterStart'        => time,
-        'ANY_LastStamp'      => time,                                                                # Initialize main benchmark
-        'ERR_LastStamp'      => time,                                                                # Initialize the ERR benchmark
-        'WARN_LastStamp'     => time,                                                                # Initialize the WARN benchmark
-        'INFO_LastStamp'     => time,                                                                # Initialize the INFO benchmark
-        'NOTICE_LastStamp'   => time,                                                                # Initialize the NOTICE benchmark
-        'DEBUG_LastStamp'    => time,                                                                # Initialize the DEBUG benchmark
-        'DEBUGMAX_LastStamp' => time,                                                                # Initialize the DEBUGMAX benchmark
+        'MasterStart'        => $tm,
+        'ANY_LastStamp'      => $tm,                                                                 # Initialize main benchmark
+        'ERR_LastStamp'      => $tm,                                                                 # Initialize the ERR benchmark
+        'WARN_LastStamp'     => $tm,                                                                 # Initialize the WARN benchmark
+        'INFO_LastStamp'     => $tm,                                                                 # Initialize the INFO benchmark
+        'NOTICE_LastStamp'   => $tm,                                                                 # Initialize the NOTICE benchmark
+        'DEBUG_LastStamp'    => $tm,                                                                 # Initialize the DEBUG benchmark
+        'DEBUGMAX_LastStamp' => $tm,                                                                 # Initialize the DEBUGMAX benchmark
         'Color'              => TRUE,                                                                # Default to colorized output
         'DateStamp'          => colored(['yellow'], '%date%'),
         'TimeStamp'          => colored(['yellow'], '%time%'),
@@ -470,7 +471,7 @@ sub debug {
 
     # Figure out the proper caller tree and line number ladder
     # But only if it's part of the prefix, else don't waste time.
-    if ($self->{'PREFIX'} =~ /\%(Subroutine|Module|Lines|Lastline)\%/) {    # %P = Subroutine, %l = Line number(s)
+    if ($self->{'PREFIX'} =~ /\%(Subroutine|Module|Lines|Lastline)\%/i) {    # %P = Subroutine, %l = Line number(s)
         my $package = '';
         my $count   = 1;
         my $nest    = 0;
@@ -521,8 +522,7 @@ sub debug {
     } ## end if ($self->{'PREFIX'} ...)
 
     # Figure out the benchmarks, but only if it is in the prefix
-    if ($self->{'PREFIX'} =~ /\%Benchmark\%/) {
-
+    if ($self->{'PREFIX'} =~ /\%Benchmark\%/i) {
         # For multiline output, only output the bench data on the first line.  Use padded spaces for the rest.
         #        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{$level . '_LASTSTAMP'}));
         $thisBench = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
@@ -570,35 +570,31 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $threaded = 'PT-';
     my $epoch    = time;
 
-    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) {    # Do eval so non-threaded perl's don't whine
-        eval(
-            q(
-				my $tid   = threads->tid();
-				$threaded = ($tid > 0) ? sprintf('T%02d',$tid) : 'PT-';
-			)
-        );
+    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) { # Gotta trust the Config vars
+		my $tid   = threads->tid();
+		$threaded = ($tid > 0) ? sprintf('T%02d',$tid) : 'PT-';
     } ## end if (exists($Config{'useithreads'...}))
 
-    $prefix =~ s/\%PID\%/$$/g;
-    $prefix =~ s/\%Loglevel\%/$self->{'ANSILEVEL'}->{$level}/g;
-    $prefix =~ s/\%Lines\%/$cline/g;
-    $prefix =~ s/\%Lastline\%/$sline/g;
-    $prefix =~ s/\%Subroutine\%/$shortsub/g;
-    $prefix =~ s/\%Date\%/$self->{'DATESTAMP'}/g;
-    $prefix =~ s/\%Time\%/$self->{'TIMESTAMP'}/g;
-    $prefix =~ s/\%Epoch\%/$self->{'EPOCH'}/g;
-    $prefix =~ s/\%date\%/$Date/g;
-    $prefix =~ s/\%time\%/$Time/g;
-    $prefix =~ s/\%epoch\%/$epoch/g;
-    $prefix =~ s/\%Filename\%/$self->{'FILENAME'}/g;
-    $prefix =~ s/\%Fork\%/$forked/g;
-    $prefix =~ s/\%Thread\%/$threaded/g;
-    $prefix =~ s/\%Module\%/$subroutine/g;
+    $prefix =~ s/\%PID\%/$$/gi;
+    $prefix =~ s/\%Loglevel\%/$self->{'ANSILEVEL'}->{$level}/gi;
+    $prefix =~ s/\%Lines\%/$cline/gi;
+    $prefix =~ s/\%Lastline\%/$sline/gi;
+    $prefix =~ s/\%Subroutine\%/$shortsub/gi;
+    $prefix =~ s/\%Date\%/$self->{'DATESTAMP'}/gi;
+    $prefix =~ s/\%Time\%/$self->{'TIMESTAMP'}/gi;
+    $prefix =~ s/\%Epoch\%/$self->{'EPOCH'}/gi;
+    $prefix =~ s/\%date\%/$Date/gi;
+    $prefix =~ s/\%time\%/$Time/gi;
+    $prefix =~ s/\%epoch\%/$epoch/gi;
+    $prefix =~ s/\%Filename\%/$self->{'FILENAME'}/gi;
+    $prefix =~ s/\%Fork\%/$forked/gi;
+    $prefix =~ s/\%Thread\%/$threaded/gi;
+    $prefix =~ s/\%Module\%/$subroutine/gi;
 
     if ($first) {
-        $prefix =~ s/\%Benchmark\%/$thisBench/g;
+        $prefix =~ s/\%Benchmark\%/$thisBench/gi;
     } else {
-        $prefix =~ s/\%Benchmark\%/$thisBench2/g;
+        $prefix =~ s/\%Benchmark\%/$thisBench2/gi;
     }
     my $fh = $self->{'FILEHANDLE'};
     if ($level eq 'INFO' && $self->{'LOGLEVEL'} eq 'VERBOSE') {    # Trap verbose flag and temporarily drop the prefix.
@@ -789,7 +785,7 @@ If you have any features you wish added, or functionality improved or changed, t
 
 =head1 B<LICENSE AND COPYRIGHT>
 
-Copyright 2013-2023 Richard Kelsch.
+Copyright 2013-2025 Richard Kelsch.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 

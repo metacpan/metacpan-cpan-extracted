@@ -171,6 +171,8 @@ subtest 'mock data from a real dbh to collect data' => sub {
 
 	is($num_rows_deleted, 2, 'DB::Media::Manager->delete_media works ok');
 
+	$db->dbh->disconnect();
+
 };
 
 subtest 'use a mocked dbh to test rose db support' => sub {
@@ -306,10 +308,5 @@ subtest 'use a mocked dbh to test rose db support' => sub {
 	$override->restore('Rose::DB::dbh');
 	$override->restore('DBD::Mock::db::last_insert_rowid');
 };
-
-
-rmtree './t/db_fixtures';
-rmtree './t/DB';
-unlink './t/rose_test_db';
 
 done_testing();

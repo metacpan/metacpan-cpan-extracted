@@ -4,6 +4,7 @@ use Test::More tests => 37;
 use strict;
 use warnings;
 
+use lib '.';
 # Make sure we have all the support routines
 require 'testlib';
 my $class = 'Cache::Memcached::Managed::Inactive';

@@ -7,6 +7,8 @@ version of libevent and/or memcached.  Please upgrade to the latest libevent
 if this test is taking more than a few minutes.
 DIAG
 
+
+use lib '.';
 # Make sure we have a version for the subroutine based checks
 $Foo::VERSION = 'Foo::VERSION';
 

@@ -1,15 +1,25 @@
 
 ===== history of Mail-Box-IMAP4
 
+version 3.009: Fri Apr 18 08:41:26 PM CEST 2025
+
+	Fixes:
+	- Get peer host and port from Socket object, not IMAPClient.
+	  github pull#3 [Jonathan Kamens]
+
+	Improvements:
+	- add .gitignore
+	- minor doc fix
+
 version 3.008: Wed  9 Aug 10:03:40 CEST 2023
 
 	Fixes:
 	- do not confuse multiple connections with own imap_client object
-	  rt.cpan.org#1036931 [Jonathan Kamens]
+	  rt.cpan.org#134898 [Jonathan Kamens]
 	- test fails for Mail::Message 3.013, which detects charset better
 
 	Improvements:
-	- github merge#1 fix example [Randolf Richardson]
+	- github pull#1 fix example [Randolf Richardson]
 	- run test in write only environment, github#2 [Petr Pisar]
 
 version 3.007: Thu 13 Jun 16:54:08 CEST 2019

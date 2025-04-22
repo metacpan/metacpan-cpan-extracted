@@ -1,11 +1,19 @@
 # CORBA/IDLtree.pm   IDL to symbol tree translator
 # This module is distributed under the same terms as Perl itself.
-# Copyright  (C) 1998-2021, O. Kellogg <okellogg@users.sourceforge.net>
+# Copyright  (C) 1998-2025, O. Kellogg <olivermkellogg@gail.com>
 # Main Authors:  Oliver Kellogg, Heiko Schroeder
 #
 # -----------------------------------------------------------------------------
 # Ver. |   Date   | Recent changes (for complete history see file Changes)
 # -----+----------+------------------------------------------------------------
+# 2.06  2025-04-20  * In the SUBORDINATES of ENUM, when $enable_comments is set
+#                     change the layout for a comment to conform to the REMARK
+#                     node layout.
+#                   * Change sub info to only print if $verbose is set.
+#                   * Fix handling of annotations applied on members of
+#                     constructed types.
+#                   * On encountering unknown annotation, downgrade severity
+#                     from error to warning.
 # 2.05  2021/06/13  * Increase minimum required perl version to 5.8 due to
 #                     addition of "use utf8".
 #                   * Add handling of Windows CP-1252 character encoding in
@@ -178,7 +186,7 @@ Version 2.05
 
 =cut
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 =head1 SYNOPSIS
 
@@ -289,13 +297,25 @@ For C<DEFAULT>, both the C<NAME> and the C<SUBORDINATES> are unused.
 
 =item ENUM
 
-Reference to an array describing the enum value literals.
-Each element in the array is a reference to a triplet
-(three element array): The first element in the triplet is
-the enum literal value.  The second element is a reference
-to an array of annotations as described in the C<ANNOTATIONS>
-documentation (see below).  The third element is a
-reference to the trailing comment list.
+Reference to an array where each element is a further reference to
+an array.
+In this array,
+
+=over
+
+=item * if C<$enable_comments> is set then the first element may be
+numeric. In that case the element represents a comment using the same
+layout as the REMARK node. The number is the starting line number of
+the comment; the second element is unused, and the third element is a
+reference to array containing the comment lines.
+
+=item * otherwise the element describes an enum value. It then consists
+of three elements: The first element is the enum literal value.  The
+second element is a reference to an array of annotations as described
+in the C<ANNOTATIONS> documentation (see below).  The third element is
+a reference to the trailing comment list.
+
+=back
 
 =item TYPEDEF
 
@@ -443,7 +463,7 @@ The C<ANNOTATIONS> element holds the reference to an array of annotation nodes
 if IDL4 style annotations are present (if no annotations are present then
 the ANNOTATIONS element holds 0).
 Each entry in this array is an array reference.  The first element in the
-array referenced is a reference to an entry in @annoDefs (see comments at
+array referenced is the index to an entry in @annoDefs (see comments at
 declaration of @annoDefs).  The following elements contain the concrete
 values for the parameters, in the order as defined by the entry in
 @annoDefs.  If the user omitted the value of the parameter then the
@@ -821,7 +841,7 @@ sub Dump_Symbols;
 
 sub Version ()
 {
-    for ('$Revision$') { #'){
+    for ('$Revision: 30679 $') { #'){
         /: *(\S+)/ and return $VERSION . "_" . $1;
     }
     return $VERSION;
@@ -1097,10 +1117,9 @@ my @annotations = ();
                 if ($existing != $value) {
                     # This happens when adding the reopening of a known module.
                     # The cache only holds the last reopening.
-                    warn("CORBA::IDLtree::Cache::add($name): replacing "
+                    CORBA::IDLtree::info("CORBA::IDLtree::Cache::add($name): replacing "
                          . "$existing (" . CORBA::IDLtree::typeof($existing)
-                         . ") by $value (" . CORBA::IDLtree::typeof($value) . ")\n")
-                      if $CORBA::IDLtree::verbose;
+                         . ") by $value (" . CORBA::IDLtree::typeof($value) . ")");
                 }
             }
             $this->{_cache}{$name} = $value;
@@ -1590,7 +1609,6 @@ sub parse_members {
     #            0 for success with enclosing scope still open;
     #            1 for success with enclosing scope closed (i.e. seen '};')
     my($symtreeref, $argref, $structref_or_vt_access, $comment) = @_;
-    my @arg = @{$argref};
     my $structref = 0;
     my $value_member_flag = 0;
     if (ref $structref_or_vt_access) {
@@ -1598,28 +1616,34 @@ sub parse_members {
     } else {
         $value_member_flag = $structref_or_vt_access;
     }
-    while (@arg) {    # We're up here for a TYPE name
-        my $first_thing = shift @arg;  # but it could also be '}'
+    while (@{$argref}) {    # We're up here for a TYPE name
+        my $first_thing = shift @{$argref};  # but it could also be '}'
+        while ($first_thing eq '@') {
+            my $ann = shift @{$argref};
+            parse_annotation_app($ann, $argref);
+            $first_thing = shift @{$argref};
+        }
         if ($first_thing eq '}') {
+            unshift @{$argref}, '}';
             return 1;   # return value signals closing of scope.
         }
-        my $component_type = parse_type($first_thing, \@arg, $symtreeref);
+        my $component_type = parse_type($first_thing, $argref, $symtreeref);
         if (! $component_type) {
             error "unknown type $first_thing";
             return -1;  # return value signals error.
         }
         if (in_annotation_def()) {
-            my $component_name = shift @arg;
+            my $component_name = shift @{$argref};
             my $default;
-            if (@arg) {
-                my $next = shift @arg;
+            if (@{$argref}) {
+                my $next = shift @{$argref};
                 if ($next eq 'default') {
-                    $default = shift @arg;
+                    $default = shift @{$argref};
                 }
             }
             push @{$structref}, [ $component_type, $component_name, $default ];
-            if (@arg) {
-                my $next = shift @arg;
+            if (@{$argref}) {
+                my $next = shift @{$argref};
                 unless ($next eq ';') {
                     error("parse_members($first_thing) : found '$next' (expecting ';')");
                     return -1;
@@ -1631,17 +1655,27 @@ sub parse_members {
             error "$first_thing is not a type";
             return -1;
         }
-        while (@arg) {    # We're here for VARIABLE name(s)
-            my $component_name = shift @arg;
-            last if ($component_name eq '}');
+        while (@{$argref}) {    # We're here for VARIABLE name(s)
+            $first_thing = shift @{$argref};
+            while ($first_thing eq '@') {
+                my $ann = shift @{$argref};
+                parse_annotation_app($ann, $argref);
+                $first_thing = shift @{$argref};
+            }
+            if ($first_thing eq '}') {
+                unshift @{$argref}, '}';
+                error "parse_members: unexpected '}'";
+                return 1;   # return value signals closing of scope.
+            }
+            my $component_name = $first_thing;
             $component_name = check_name($component_name);
             my @dimensions = ();
             my $nxtarg = "";
-            while (@arg) {    # We're here for a variable's DIMENSIONS
-                $nxtarg = shift @arg;
+            while (@{$argref}) {    # We're here for a variable's DIMENSIONS
+                $nxtarg = shift @{$argref};
                 if ($nxtarg eq '[') {
-                    my $dim = shift @arg;
-                    if (shift @arg ne ']') {
+                    my $dim = shift @{$argref};
+                    if (shift @{$argref} ne ']') {
                         error "expecting ']'";
                         return -1;
                     }
@@ -1754,8 +1788,8 @@ sub set_verbose {
 }
 
 sub emucppmsg {
-    if (! $did_emucppmsg && $verbose) {
-        print "// using preprocessor emulation\n";
+    if (! $did_emucppmsg) {
+        info("// using preprocessor emulation");
         $did_emucppmsg = 1;
     }
 }
@@ -2063,7 +2097,7 @@ sub get_items {  # returns empty list for end-of-file or fatal error
         emucppmsg;
         if (@tmp) {
             $value = join(' ', @tmp);
-            print("// defining $symbol as $value\n") if ($verbose);
+            info("// defining $symbol as $value");
         }
         if (exists $active_defines{$symbol} and
             $value ne $active_defines{$symbol}) {
@@ -2299,8 +2333,8 @@ sub Parse_File {
     }
     my $res = Parse_File_i($filename);
     if ($cache_statistics) {
-        print "Node cache: ".$findnode_cache->ratio()."\n";
-        print "Include cache: ".$includecache->ratio()."\n";
+        print "Node cache: " . $findnode_cache->ratio()."\n";
+        print "Include cache: " . $includecache->ratio()."\n";
     }
     if ($res && !@$res) {
         warn "Warning: CORBA::IDLtree::Parse_File: $filename is empty\n";
@@ -2356,13 +2390,27 @@ sub convert_to_valuetype {
 # Is expected to be called not too long after get_items (the sub may find
 # that too many args were returned by get_items and may therefore call
 # unget_items).
-# Returns 1 on success, 0 on error.
+# Returns 1 on success, 2 on unknown annotation, 0 on error.
 sub parse_annotation_app {
     my ($ann, $argref) = @_;
     my ($index) = grep { $annoDefs[$_]->[0] eq $ann } 0..$#annoDefs;
     unless (defined $index) {
-        error "Unknown annotation \@$ann";
-        return 0;
+        warn "Unknown annotation \@$ann\n";
+        if ($argref->[0] eq '(') {
+            my $seen_closing_parenth = 0;
+            while (@$argref) {
+                 if ($argref->[0] eq ')') {
+                     $seen_closing_parenth = 1;
+                     last;
+                 }
+                 shift @$argref;
+            }
+            unless ($seen_closing_parenth) {
+                error "Missing closing parenthesis for annotation arguments";
+                return 0;
+            }
+        }
+        return 2;
     }
     my @adef = @{$annoDefs[$index]};
     shift @adef;  # discard name
@@ -2456,9 +2504,6 @@ sub parse_annotation_app {
         push @anode, @anargs;
     }
     push @annotations, [ @anode ];
-    if (@$argref) {
-        unget_items(@$argref);
-    }
 }
 
 # Check whether the given union subordinates contain a DEFAULT branch.
@@ -2525,7 +2570,7 @@ sub Parse_File_i {
             open($in, "$cppcmd $cpp_args $file |")
                  or abort("Cannot open file $file");
         }
-        print("// processing: $file\n") if ($verbose);
+        info("// processing: $file");
     } elsif ("$input_filehandle") {
         $in = $input_filehandle;  # Process a module or interface within file.
     }
@@ -2544,9 +2589,9 @@ sub Parse_File_i {
     my $firstline = 1;
     while ((@arg = get_items($in, $firstline))) {
         $firstline = 0;
-        if ($verbose > 1) {
+        if ($verbose > 1) {   # "super verbose mode"
             my $line = join(' ', @arg);
-            print "IDLtree: parsing $line\n";   # "super verbose mode"
+            info("IDLtree: parsing $line");
         }
         if ($enable_comments && @remark) {
             my $remnode_ref = [ REMARK, $starting_line_number_of_remark, [ @remark ], 0, 0, curr_scope ];
@@ -2742,10 +2787,13 @@ sub Parse_File_i {
                 }
             } else {
                 parse_annotation_app($ann, \@arg);
+                if (@arg) {
+                    unget_items(@arg);
+                }
             }
             next;
 
-        } elsif ($kw eq '}') {
+        } elsif ($kw eq "\}") {
             if (shift @arg ne ';') {
                 error "missing ';'";
             }
@@ -2753,7 +2801,8 @@ sub Parse_File_i {
                 if (@scopestack) {
                     pop @scopestack;
                 } else {
-                    error('unexpected };');
+                    # did not see a '{'
+                    error("unexpected \};");
                 }
                 return $symbols;
             }
@@ -2994,7 +3043,8 @@ sub Parse_File_i {
                 unshift @prev_symroots, $symbols;
                 push @scopestack, $symnode;
                 Parse_File_i("", $in, $declarations, 1) or abort("can't go on, sorry");
-                # The closing "};" was seen in Parse_File_i and @scopestack was popped there.
+                # The closing brace and ";" was seen in Parse_File_i and @scopestack
+                # was popped there.
                 shift @prev_symroots;
             }
             $abstract = 0;
@@ -3093,11 +3143,18 @@ sub Parse_File_i {
                 error "union: expecting keyword 'switch'";
                 next;
             }
-            if (shift @arg ne '(') {
+            my $nxt = shift @arg;
+            if ($nxt ne '(') {
                 error "expecting '('";
                 next;
             }
-            my $switchtypename = shift @arg;
+            $nxt = shift @arg;
+            while ($nxt eq '@') {
+                my $annoName = shift @arg;
+                parse_annotation_app($annoName, \@arg);
+                $nxt = shift @arg;
+            }
+            my $switchtypename = $nxt;
             my $switchtype = find_node_i($switchtypename, $symbols);
             if (! $switchtype) {
                 error "unknown type of switch variable";
@@ -3208,7 +3265,7 @@ sub Parse_File_i {
             my $anno = annotation;
             my @values = ();
             @arg = get_items($in) unless @arg;
-            while (@arg) {
+            while (1) {
                 my $lit = shift @arg;
                 if (in_annotation_def()) {
                     unless ($lit =~ /^\w+$/) {
@@ -3218,20 +3275,20 @@ sub Parse_File_i {
                     push @values, $lit;
                 } else {
                     if ($enable_comments && @remark) {
-                        push @values, [ $starting_line_number_of_remark, [ @remark ]];
+                        push @values, [ $starting_line_number_of_remark, "", [ @remark ]];
                         $starting_line_number_of_remark = 0;
                         @remark = ();
                     }
-                    if ($lit eq '@') {
+                    while ($lit eq '@') {
                         my $annoName = shift @arg;
                         parse_annotation_app($annoName, \@arg);
-                    } else {
-                        $lit = check_name($lit);   # must be a literal
-                        unless ($lit =~ /^\w+$/) {
-                            last;  # error message was already produced by sub check_name
-                        }
-                        push @values, [ $lit, annotation, comment ];
+                        $lit = shift @arg;
                     }
+                    $lit = check_name($lit);   # must be a literal
+                    unless ($lit =~ /^\w+$/) {
+                        last;  # error message was already produced by sub check_name
+                    }
+                    push @values, [ $lit, annotation, comment ];
                 }
                 if (@arg) {
                     my $nxt = shift @arg;
@@ -3502,9 +3559,7 @@ sub Parse_File_i {
             }
         }
     }
-    if ($verbose) {
-        print "IDLtree: done with parsing $file\n";
-    }
+    info("IDLtree: done with parsing $file\n");
     if ($file) {
         close $in;
         pop @infilename;
@@ -3555,12 +3610,12 @@ sub isnode {
     ref($node_ref) eq "ARRAY" && defined($node_ref->[TYPE]) or return 0;
     if ($node_ref->[TYPE] >= BOOLEAN
         && $node_ref->[TYPE] < NUMBER_OF_TYPES) {
-        if (scalar(@$node_ref) == 5 && $verbose) {
+        if (scalar(@$node_ref) == 5) {
             # We give a warning here because element count 5 could indicate
             # that isnode() is called on a structured member (may indicate
             # misuse or latent bug).
-            warn("isnode(" . $node_ref->[NAME] . ") : element count is 5\n"
-                 . Carp::longmess() . "\n");
+            info("isnode(" . $node_ref->[NAME] . ") : element count is 5\n"
+                 . Carp::longmess());
         }
         return (scalar(@$node_ref) == 6);
     }
@@ -3848,18 +3903,24 @@ sub find_node_i {
 
 
 sub info {
+    $verbose or return;
     my $message = shift;
     if ($currfile >= 0 && $currfile < scalar(@infilename)) {
-        warn ($infilename[$currfile]  . " line " . $line_number[$currfile]
+        print($infilename[$currfile]  . " line " . $line_number[$currfile]
                   . ": $message\n");
     } else {
-        warn($message . "\n");
+        print($message . "\n");
     }
 }
 
 sub error {
     my $message = shift;
-    info($message);
+    if ($currfile >= 0 && $currfile < scalar(@infilename)) {
+        warn($infilename[$currfile]  . " line " . $line_number[$currfile]
+                  . ": $message\n");
+    } else {
+        warn($message . "\n");
+    }
     $n_errors++;
 }
 

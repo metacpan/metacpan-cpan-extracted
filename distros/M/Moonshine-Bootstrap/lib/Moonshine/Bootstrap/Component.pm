@@ -14,7 +14,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 extends ("Moonshine::Component");
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 BEGIN {
     my %grid = (
@@ -104,7 +104,7 @@ Moonshine::Bootstrap::Component - HTML Bootstrap Component base.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -146,7 +146,7 @@ LNATION, C<< <thisusedtobeanemail at gmail.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 LNATION.
+Copyright 2017->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

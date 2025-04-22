@@ -8,7 +8,7 @@ package Text::Layout::FontConfig;
 
 use Carp;
 
- our $VERSION = "0.042";
+ our $VERSION = "0.043";
 
 use Text::Layout::FontDescriptor;
 

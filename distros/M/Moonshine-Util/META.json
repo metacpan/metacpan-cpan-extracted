@@ -46,7 +46,7 @@
    "provides" : {
       "Moonshine::Util" : {
          "file" : "lib/Moonshine/Util.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Util"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

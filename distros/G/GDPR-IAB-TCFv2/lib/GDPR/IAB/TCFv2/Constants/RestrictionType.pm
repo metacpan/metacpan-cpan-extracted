@@ -13,7 +13,7 @@ use constant {
 
 use constant RestrictionTypeDescription => {
     NotAllowed                => "Purpose Flatly Not Allowed by Publisher",
-    RequireConsent            =>, "Require Consent",
+    RequireConsent            => "Require Consent",
     RequireLegitimateInterest => "Require Legitimate Interest",
 };
 

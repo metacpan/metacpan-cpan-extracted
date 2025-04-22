@@ -1239,6 +1239,10 @@ module isn't for you
 
 Using normal Perl comments requires spreading the @{\[\]} over multiple lines
 
+Perl is pretty smart with matching interpolation delimiters. However in the
+case your template is generating code, unmatched  '{' or '}' will need to be
+escaped  (ie '\\{' and '\\}')
+
 # TODO
 
 Extending the template system has been mentioned but not elaborated on.

@@ -1,5 +1,15 @@
 Revision history for MIDI-RtController-Filter-Tonal
 
+0.0305 2025-04-21 00:56:13
+  - Enhance the eg/tester.pl program.
+  - Add the eg/multi.pl program.
+
+0.0304 2025-04-20 18:41:29
+  - Use the factor for every filter with a delay.
+
+0.0303 2025-04-20 18:10:04
+  - Add the factor attribute and use it in the delay filter.
+
 0.0302 2025-04-17 01:15:56
   - Improve documentation.
   - Improve the eg/tester.pl program.

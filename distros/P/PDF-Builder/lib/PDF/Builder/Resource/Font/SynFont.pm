@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use Math::Trig;    # CAUTION: deg2rad(0) = deg2rad(360) = 0!
 use Unicode::UCD 'charinfo';
@@ -19,7 +19,9 @@ use PDF::Builder::Basic::PDF::Utils;
  
 =head1 NAME
 
-PDF::Builder::Resource::Font::SynFont - Module for creating temporary synthetic Fonts.
+PDF::Builder::Resource::Font::SynFont - Module for creating temporary synthetic Fonts
+
+Inherits from L<PDF::Builder::Resource::Font>
 
 =head1 SYNOPSIS
 
@@ -78,8 +80,8 @@ B<Alternate name:> C<name> (for PDF::API2 compatibility)
 
 =item I<condense>
 
-Condense/expand factor (0.1-0.9 = condense, 1 = normal, 1.1+ = expand).
-It's the multiplier for character widths vs. normal.
+Character width condense/expand factor (0.1-0.9 = condense, 1 = normal/default, 
+1.1+ = expand). It is the multiplier to apply to the width of each character.
 
 B<Alternate names:> C<hscale> and C<slant> (for PDF::API2 compatibility) 
 
@@ -91,10 +93,11 @@ B<Use only one (at most) of these three option names.>
 
 =item I<oblique>
 
-Italic angle (+/-) in degrees, where the character box is skewed. While 
-it's unlikely that anyone will want to slant characters at +/-360 degrees, they 
-should be aware that these will be treated as an angle of 0 degrees (deg2rad() 
-wraps around). 0 degrees of italic slant (obliqueness) is the default.
+Italic or slanted text angle (+/-) in degrees, where the character box is 
+skewed (sheared), top to the right. While it's unlikely that anyone will want 
+to slant characters at +/-360 degrees, they should be aware that these will be 
+treated as an angle of 0 degrees (deg2rad() wraps around). 0 degrees of italic 
+slant (obliqueness) is the default.
 
 B<Alternate name:> C<angle> (for PDF::API2 compatibility)
 
@@ -110,7 +113,7 @@ a thick outline. The units are in 1/100ths of a text unit.
 
 If used with the C<synthetic_font> alternate entry name, the unit is 1/1000th
 of a text unit, so you will need a value 10 times larger than with the 
-C<synfont> entry to get the same effect
+C<synfont> entry to get the same effect.
 
 =item I<space>
 
@@ -128,11 +131,22 @@ B<Alternate name:> C<smallcaps> (for PDF::API2 compatibility)
 
 B<Use only one (at most) of these two option names.>
 
+Note that only lower case letters which appear in the "standard" font (plane 0
+for core fonts and PS fonts) will be small-capped. This may include eszett
+(German sharp s), which becomes SS, and dotless i and j which become I and J
+respectively. There are many other accented Latin alphabet letters which I<may> 
+show up in planes 1 and higher. Ligatures (e.g., ij and ffl) do not have
+uppercase equivalents, nor does a long s. If you have text which includes such
+characters, you may want to consider preprocessing it to replace them with
+Latin character expansions (e.g., i+j and f+f+l) before small-capping.
+
 =back
 
 =back
 
 =cut
+
+# TBD 'name' as alt to 'pdfname'... other font types or just here?
 
 sub new {
     my ($class, $pdf, $font, %opts) = @_;

@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -523,7 +523,7 @@ sub _build_pod {
 		safename => $safename,
 		name => $class,
 		abstract => ($definition->{ABSTRACT} ? $definition->{ABSTRACT} : sprintf('The great new %s!', $class)),
-		version => $definition->{VERSION} || '0.01',
+		version => $CLASS{VERSION} || '0.01',
 		subs => join("\n\n", @subs),
 		synopsis => ($definition->{SYNOPSIS}
 			? $definition->{SYNOPSIS}
@@ -675,19 +675,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist={{safename}}>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/{{safename}}>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/{{safename}}>
 
 =item * Search CPAN
 
@@ -715,7 +707,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -1160,19 +1152,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Generate>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Module-Generate>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Module-Generate>
 
 =item * Search CPAN
 

@@ -50,7 +50,7 @@
    "provides" : {
       "Moonshine::Magic" : {
          "file" : "lib/Moonshine/Magic.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Magic"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

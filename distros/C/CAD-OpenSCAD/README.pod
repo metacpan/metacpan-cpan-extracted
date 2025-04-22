@@ -1,0 +1,388 @@
+=pod
+
+=head1 NAME
+
+CAD::OpenSCAD
+
+=head1 DESCRIPTION
+
+A simple OpenSCAD Generator, allowing programmable 3D design from Perl.
+This tool allows easy generation of OpenSCAD scripts that can be used
+to generate 3D Objects, in a fairly Perlish way. It is currently working
+its way through the tutorial and will hopefully have an incremental
+features that allow complex models to be generated and produce files
+that can fed into a 3D printer.  
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * L<OpenSCAD|https://openscad.org/documentation.html> 
+
+=item * L<Object::Pad|https://metacpan.org/pod/Object::Pad>
+
+=back
+
+=head1 SYNOPSIS
+
+  #!/usr/env perl
+  use lib "lib";
+  use CAD::OpenSCAD;
+
+  my $car=new OpenSCAD; # API Changed...was previously `new SCAD`
+  $car->cube("bodyBase",[60,20,10],1)
+      ->cube("bodyTop",[30,20,10],1)
+      ->translate("bodyTop",[0,0,5])
+      ->group("carBody","bodyBase","bodyTop")
+      ->color("carBody","blue");
+
+
+=head3 Introduction
+
+*** B<From Version 0.14 the API change to make class the same name as module file
+means that the className is now OpenSCAD (was SCAD before> ***
+CAD is not really something that has had significant recent Perl
+attention.  The OenSCAD framework allows the use of scripted generation
+and manipulation of 3D objects, and this module attempts to make this
+accessible in Perl. Object::Pad, a modern OOP paradigm, is used but
+deliberately not using its full features.  The OpenSCAD GUI can be
+used to display outputs, although  .STL, .PNG,and .SCAD files  (and
+others) may also be generated.  The example script L<car.pl|https://github.com/saiftynet/SCAD/blob/main/Examples/car.pl> 
+replicates one of the L<tutorial|https://en.wikibooks.org/wiki/OpenSCAD_Tutorial/Chapter_1>
+objects.  As you can see, the OpenSCAD object is returned after every
+operation, allowing daisy-chaining of operations.  The items within are
+named for easy identification and often appear in the .scad file
+generated as comments. These items can be collected, and built (to
+generate the OpenSCAD script), and potentially saved in various formats
+using OpenSCAD, or injected directly into the GUI tool for further 
+fine-tuning. (OpenSCAD is required to be installed for rendering)
+
+At this point the main goal is to have the ability to generate 3D
+objects within perl programs. With this tool one can use data acquired
+in perl programs to create 3D objects without having to know the OpenSCAD
+scripting language, although knowing this would allow fuller exploitation
+of the native OpenSCAD powers. One could use the output for
+
+=over
+
+=item * L<3D printing|https://github.com/saiftynet/SCAD/blob/main/Examples/box.pl>
+
+=item * L<charting|https://github.com/saiftynet/SCAD/tree/main/Examples#pichartpl>
+
+=item * L<graphical design|https://github.com/saiftynet/SCAD/tree/main/Examples#circletextpl>
+
+=item * L<mechanical design|https://github.com/saiftynet/SCAD/tree/main/Examples#gearpl>,
+
+=item * L<animations|https://github.com/saiftynet/SCAD/tree/main/Examples#animation-using-scad>
+
+=back
+
+=begin html
+
+<hr> <img src="https://github.com/saiftynet/dummyrepo/raw/main/SCAD/doublehelix%20rack%20and%20gear%20(1).gif?raw=true">
+
+=end html
+
+=head3 Methods implemented
+
+  use lib "lib";
+  use CAD::OpenSCAD;
+  my $scad=new OpenSCAD;
+  # optionally can add fs, fa and tab on intialisation
+  # e.g my $scad=new OpenSCAD(fs=>1, fa=>0.4, tab=>0);
+  
+ 
+After creating a OpenSCAD Object, elements can be added to the object,
+transformed etc.  **Note**: minimal error checking is done currently.
+This will happen in the future, but for now the module relies on error
+checking at the OpenSCAD tool.
+
+=over 
+
+
+=item * C<set_fs> C<set_fa> C<set_tab>
+  
+Using these, one can set parameters for the surface generation and
+script outputs. e.g. C<$scad->set_fa(10)> 
+
+=back 
+
+=head4 3D Primitives
+
+=over
+
+=item * C<cube> *new element created*
+  
+Creates a cube element e.g. C<< $scad->cube("bodyBase",[60,20,10],1) >>.
+The first parameter is the name of the element (if the named element
+exists already, it will be over-written). The second parameter is an
+arrayref of three dimensions. The third parameter defines whether the
+element is centered in the origin (a true value here centers the
+element)
+
+=item * C<cylinder> *new element created*
+  
+Creates a cylinder element e.g. C<< $scad->cylinder("wheel",{h=>2,r=>8},1) >>. 
+The first parameter is the name of the element (if the named element
+exists already, it will be over-written).The second parameter is a hashref
+defining radius and height. The third parameter defines whether the
+element is centered on the origin (a true value here centers the element)
+
+=item * C<sphere> *new element created*
+  
+Creates a sphere element e.g. C<< $scad->cylinder("ball",{r=>8}) >>.  The first parameter is the
+name of the element (if the named element exists already, it will be over-written).The second parameter
+is a hashref of defining radius of the sphere.
+
+=back
+
+=head4 Transformations
+
+=over
+
+=item * C<translate>  *element modified*
+  
+Moves an element by name a specified displacement in X,Y,Z directions.e.g.
+C<< $scad->cube("bodyTop",[30,20,10],1)->translate("bodyTop",[0,0,5]) >>  The first parameter is the
+name of the element (the element must exist already).The second parameter is an arrayref of three elements
+defining displacement.
+
+=item * C<scale>  *element modified*
+  
+Scales an element by name by specified ratios in X,Y,Z directions.e.g.
+C<< $scad->cube("bodyTop",[30,20,10],1)->scale("bodyTop",[1,2,0.5]) >>.  The first parameter is the
+name of the element (the element must exist already). The second parameter is an arrayref of three scale factors.
+
+=item * C<resize>  *element modified*
+  
+Resizes an element by name to specified dimensions in X,Y,Z directions.e.g.
+C<< $scad->cube("bodyTop",[30,20,10],1)->resize("bodyTop",[30,40,5]); >>.  The first parameter is the
+name of the element (the element must exist already). The second parameter is an arrayref of three new dimensions.
+
+=item * C<rotate>  *element modified*
+  
+Rotates an element by name around in  X,Y,Z axes.e.g.
+C<< $scad->cylinder("wheel",{h=>2,r=>8},1)->rotate("wheel",[90,0,0]); >>.  The first parameter is the
+name of the element (the element must exist already).The second parameter is an arrayref of three rotations
+in degrees.
+
+=item * C<hull> *new element created*
+
+Generates the convex hull of child nodes. Effectively lofts between two (or more) objects.  The example below
+draws randomly placed cubes and then draws a hull connecting them between consecutive pairs of cubes.  The first parameter
+is the name of the new element created, the second parameter refers to the item that all other elements are subtracted from.
+
+
+	my $chart=new OpenSCAD;
+	my $pos=[0,0,0]; my @cubes=(); my @hulls=();
+	for (0..100){   # a hundred randomly displaced cubes
+		$chart->cube("dot$_",3)->translate("dot$_",$pos);
+		$pos=[$pos->[0]+((-20..20)[rand()*40]),$pos->[1]+((-20..20)[rand()*40]),$pos->[2]+((-20..20)[rand()*40])];
+		push @cubes,"dot$_";
+	}   
+	for (0..100){  # hulls between sequential pairs 
+		$chart->hull("hull$_",$cubes[$_],$cubes[$_-1]);
+		push @hulls,"hull$_";
+	}   
+		 $chart->build(@hulls)->save("hull");
+
+
+=item * C<offset>
+
+Offset generates a new 2d interior or exterior outline from an existing outline.
+There are two modes of operation: radial and delta.
+  
+=item * C<multimatrix>
+
+Multiplies the geometry of all child elements with the given
+L<affine|https://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations>
+ transformation matrix, where the matrix is 4 x 3, or a 4 x 4 matrix
+with the 4th row always forced to [0,0,0,1].  
+
+
+=back
+
+=head4 Boolean Perocedures
+
+=over
+
+=item * C<union> *new element created*
+  
+Implicitly joins multiple elements into one element.e.g. C<< $scad->union("wheel",qw/wheel nut nut1 nut2 nut3/); >>
+the first item is the name of the new element created, the following elements are elements to be joined together.
+If an element with the name of the first parameter does not exist, it is created, otherwise it is over-written.
+  
+=item * C<difference> *new element created*
+  
+Subtracts one or more elements from one element and creates a new element.e.g. C<< $scad->difference("wheel",qw/wheel nut nut1 nut2 nut3/);  >>
+The first parameter C<"wheel"> in this example is the name of the new element created, the second parameter refers to the item that all other elements are subtracted from. If an element with the name of the first parameter does not exist, it is created, otherwise it is over-written.So this statement takes the item "wheel" (the scendond parameter), subtracts all the nuts, and overwrites the code in "wheel"(first parameter). 
+
+=item * C<intersection> *new element created*
+  
+creates an element representing the overlapping parts of 2 or more elements and creates a new element.e.g.
+C<< $scad->intersection("overlap",qw/item1  item2 item3/); >> The first parameter is the name of the new element created, the other names refer to elements which overlap neach other.
+
+=back
+
+=head4 2D Primitives
+
+=over
+
+=item * C<circle>  *new element created*
+  
+a 2D drawing primitive that creates a circle that may be extruded to create other 3D structures.
+e.g C<< $scad->circle("circle",{r=>5}); >>;
+
+=item * C<square> *new element created*
+  
+a 2D drawing primitive that creates a rectangle that may be extruded to create other 3D structures.
+e.g C<< $scad->square("square",[10,10]); >>.  Rectangles may be created using the same method, but squares
+may also be created using  C<< $scad->square("square",5); >>
+
+=item * C<polygon> *new element created*
+  
+a 2D drawing primitive that creates a polygon that may be extruded to create other 3D structures.
+The easiest way to do it in Perl is to create an arrayref of points. and pass that as a parameter.
+an example of this is the gear.pl in Examples.  the linear_extrude option below also provides an example
+using OpenSCAD variables.  A simple solution making a filled line chart is shown below :- 
+
+
+  # create a Filled Line Chart from values
+  my @values=(10,30,15,40,35,45,40,35,10);
+  my $separation =10; my $start=[0,0];my $count=0;
+
+  # starting corner of chart
+  my $points=[$start];
+  # add points to be plotted as a line graph                                   
+  push @$points, [$separation*$count++,$_] foreach @values;
+  # add end corner
+  push @$points, [$separation*(--$count),$start->[1]];
+
+  my $chart=new OpenSCAD;	
+  $chart->polygon("chart",$points)
+      ->build("chart")->save("filledline");
+
+
+=back
+
+=head4 Extrusions
+
+=over
+
+=item * C<linear_extrude> *new element created*
+  
+A method to extrude a 2D shape.  creates a new 3D objects from a 2d
+shape *: API CHANGED: method creates new item now* 
+  
+  my $extrusion=new OpenSCAD;
+  $extrusion->variable({p0=>[0, 0],p1 => [0, -30],p2 => [15, 30],p3=> [35, 20],p4 => [35, 0]});
+  $extrusion->variable("points",[qw/p0 p1 p2 p3 p4 /] );
+  $extrusion->polygon("poly","points");
+  $extrusion->linear_extrude("extrudedPoly","poly",{height=>100,twist=>180});
+
+
+=item * C<rotate_extrude> **new element created**
+A method to extrude a 2D shape while rotating invokes similar to liner_extrude *: API CHANGED: method creates new item now*
+
+  my $extrusion=new OpenSCAD;
+  $extrusion->circle("circle",{r=>5})
+          ->translate("circle",[10,0,0])
+          ->rotate_extrude("extrudedCircle","circle",{angle=>180})
+          ->build("extrudedCircle")->save("extrusion");
+          
+=back
+
+=head4 Item List manipulation
+
+=over
+
+=item * C<clone> *one or more new elements created*
+
+Creates copies of elements with same features. e.g.C<< $car->clone("axle",qw/frontaxle rearaxle/); >>   This just copies the code for the element into new elements, for subsequent transformation (otherwise all the elements are positioned in the same place overlying one another) 
+
+=back
+
+=head4 Build and Save
+
+=over
+
+=item * C<build>
+
+Collects the elements specified (i.e. not all the elements, just the items required for the build)
+and all the variables to generate a OpenSCAD file.  The OpenSCAD file generated include all the variables defined,
+the modules built and the libraries used
+   
+=item * C<save>
+
+Saves the C<.scad> file, and also uses openscad to generate images or 3D objects
+from the script, or open it in openSCAD directly after building the shape;
+C<$scad->build("ext")->save("extrusion");> builds a OpenSCAD file containing the item "ext",
+then saves the OpenSCAD file as "extrusion.scad", and automatically opens OpenSCAD with that file.
+If another parameter passed, the generates a corresponding file, from one of
+(stl|png|t|off|wrl|amf|3mf|csg|dxf|svg|pdf|png|echo|ast|term|nef3|nefdbg)
+e.g. C<< $scad->save("extrusion","png"); >>
+
+=back
+
+=head4 Experimental
+
+=over
+
+=item * C<makeModule> (v0.02) *experimental*
+  
+converts an object into a module to create other objects (see L<car.pl|https://github.com/saiftynet/SCAD/blob/main/car.pl> for an example ).  Using modules reduces code repetition in the generated .scad file.
+
+=item * C<runModule> (v0.02) *experimental*
+  
+Create an object using a predefined module (see L<car.pl|https://github.com/saiftynet/SCAD/blob/main/car.pl> for an example ).
+
+=item * C<variable>
+creates variables that OpenSCAD can use for customising objects easily
+
+
+=item * C<import> *experimental*
+  
+imports files. Valid files are STL|OFF|OBJ|AMF3MF|STL|DXF|SVG files
+
+=item * C<use> *experimental*
+  
+Uses library files.  These are external files in OpenSCAD paths and allow access to OpenSCADs extensive libraries.  The modules in these libraries are executed using C<$scad runModule($modulename,$name_for_item,$params_as_scalar_or_ref)>
+
+=back
+
+
+=head4 Planned Features
+
+The OpenSCAD language itself is very powerful, and some of these may be implemented in the module using a "raw" method.
+Indeed, as a mature framework, many modules exist that enhance to its capabilities.  To be able to use or extend these
+capabilities through Perl is one  goal of this module.  Complex things take some time to render, and having a tool that
+can allow the generation multiple scenes/structures separately quickly to be later rendered by OpenSCAD is one goal.
+
+=over
+
+=item * Analysis of Generated STL files. e.g. dimensions/bounding box of composite objects
+
+=item * Secondary Manipulation
+
+=item * Part interference detection
+
+=item * Simulations
+
+=item * Chart generation
+
+=back
+
+=head1 INSTALLATION
+
+   cpanm CAD-OpenSCAD-<version>.tar.gz
+
+=head1 AUTHOR
+
+SAIFTYNET
+
+=head1 CONTRIBUTORS
+
+L<jmlynesjr|https://github.com/jmlynesjr>
+
+
+=cut

@@ -21,7 +21,7 @@ BEGIN {
 
   plan skip_all => 'These tests may fail if the test suite continues to evolve! They should only be run with '
       .join(', ', map $_.'=1', head(-1, @variables)).' or '.$variables[-1].'=1'
-    if not -d '.git' and not grep $ENV{$_}, @variables;
+    if not grep $ENV{$_}, @variables;
 }
 
 my $version = 'draft2020-12';
@@ -43,6 +43,9 @@ acceptance_tests(
   output_file => $version.'-acceptance.txt',
   test => {
     $ENV{NO_TODO} ? () : ( todo_tests => [
+      # various edge cases that are difficult to accomodate
+      $Config{ivsize} < 8 ? { file => 'multipleOf.json', group_description => 'small multiple of large integer', test_description => 'any integer is a multiple of 1e-8' } : (),
+
       # unsupported keywords or subfeatures
       { file => [ qw(
           anchor.json

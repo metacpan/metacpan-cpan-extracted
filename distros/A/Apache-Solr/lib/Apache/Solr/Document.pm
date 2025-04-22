@@ -1,4 +1,4 @@
-# Copyrights 2012-2022 by [Mark Overmeer].
+# Copyrights 2012-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Apache::Solr::Document;
-use vars '$VERSION';
-$VERSION = '1.09';
+package Apache::Solr::Document;{
+our $VERSION = '1.10';
+}
 
 
 use warnings;

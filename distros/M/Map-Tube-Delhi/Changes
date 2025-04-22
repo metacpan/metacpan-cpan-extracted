@@ -1,5 +1,15 @@
 Revision history for Map::Tube::Delhi
 
+0.99  Sun Apr 20 19:55:00 2025
+      - Added map data source in the pod.
+
+0.98  Sun Apr 20 16:35:00 2025
+      - No longer use Dist::Zilla::Plugin::Test::Map::Tube.
+      - Added regular unit test for the map.
+      - Updated dependency on Map::Tube v4.07.
+      - Updated copyright year information.
+      - Updated README about installation steps.
+
 0.97  Wed Oct 30 16:40:00 2019
       - Proposed fix for no_files_to_be_skipped from CPANTS.
 

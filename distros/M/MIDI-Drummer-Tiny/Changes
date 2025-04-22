@@ -1,5 +1,11 @@
 Revision history for MIDI-Drummer
 
+0.6010 2025-04-21 16:07:12
+    - Fix undef score.
+
+0.6009 2025-04-21 14:29:18
+    - Fix BPM type.
+
 0.6008 2025-04-02 11:32:50
     - Add and use MIDI and soundfont file types.
 

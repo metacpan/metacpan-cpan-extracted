@@ -13,12 +13,12 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Matrix - matrix operations library
+PDF::Builder::Matrix - Matrix operations library
 
 =cut
 

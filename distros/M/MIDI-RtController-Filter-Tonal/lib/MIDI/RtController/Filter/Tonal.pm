@@ -5,9 +5,10 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0305';
 
 use strictures 2;
+use curry;
 use Array::Circular ();
 use List::SomeUtils qw(first_index);
 use List::Util qw(shuffle uniq);
@@ -48,14 +49,14 @@ has channel => (
 has value => (
     is      => 'rw',
     isa     => Maybe[Num],
-    default => undef,
+    default => sub { undef },
 );
 
 
 has trigger => (
     is      => 'rw',
     isa     => Maybe[Num],
-    default => undef,
+    default => sub { undef },
 );
 
 
@@ -63,6 +64,13 @@ has delay => (
     is  => 'rw',
     isa => Num,
     default => sub { 0.1 },
+);
+
+
+has factor => (
+    is  => 'rw',
+    isa => Maybe[Num],
+    default => sub { undef },
 );
 
 
@@ -129,6 +137,26 @@ has arp_type => (
 );
 
 
+sub add_filters ($filters, $controllers) {
+    for my $params (@$filters) {
+        my $port = delete $params->{port};
+        # skip unnamed and unknown entries
+        next if !$port || !exists $controllers->{$port};
+        my $type   = delete $params->{type}  || 'delay_tone';
+        my $event  = delete $params->{event} || 'all';
+        my $filter = __PACKAGE__->new(
+            rtc => $controllers->{$port}
+        );
+        # assume all remaining key/values are module attributes
+        for my $param (keys %$params) {
+            $filter->$param($params->{$param});
+        }
+        my $method = "curry::$type";
+        $controllers->{$port}->add_filter($type, $event => $filter->$method);
+    }
+}
+
+
 sub _pedal_notes ($self, $note) {
     return $self->pedal, $note, $note + 7;
 }
@@ -141,6 +169,7 @@ sub pedal_tone ($self, $device, $dt, $event) {
     my $delay_time = 0;
     for my $n (@notes) {
         $delay_time += $self->delay;
+        $delay_time *= $self->factor if defined $self->factor;
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
     return 0;
@@ -184,6 +213,7 @@ sub delay_tone ($self, $device, $dt, $event) {
     my $delay_time = 0;
     for my $n (@notes) {
         $delay_time += $self->delay;
+        $delay_time *= $self->factor if defined $self->factor;
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
         $val -= $self->velocity;
     }
@@ -238,6 +268,7 @@ sub walk_tone ($self, $device, $dt, $event) {
     my $delay_time = 0;
     for my $n (@$notes) {
         $delay_time += $self->delay;
+        $delay_time *= $self->factor if defined $self->factor;
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
     return 0;
@@ -275,6 +306,7 @@ sub arp_tone ($self, $device, $dt, $event) {
     for my $n (@notes) {
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
         $delay_time += $self->delay;
+        $delay_time *= $self->factor if defined $self->factor;
     }
     return 1;
 }
@@ -293,7 +325,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0302
+version 0.0305
 
 =head1 SYNOPSIS
 
@@ -377,6 +409,16 @@ The current delay time.
 
 Default: C<0.1> seconds
 
+=head2 factor
+
+  $factor = $filter->factor;
+  $filter->factor($number);
+
+This is a generic number that can be used in a calculation, like the
+L</delay_tone> filter.
+
+Default: C<undef>
+
 =head2 velocity
 
   $velocity = $filter->velocity;
@@ -454,6 +496,36 @@ Default: C<up>
 
 =head1 METHODS
 
+=head2 new
+
+  $filter = MIDI::RtController::Filter::CC->new(%arguments);
+
+Return a new C<MIDI::RtController::Filter::CC> object.
+
+=head1 UTILITIES
+
+=head2 add_filters
+
+  MIDI::RtController::Filter::Tonal::add_filters(\@filters, $controllers);
+
+Add an array reference of B<filters> to controller instances. For
+example:
+
+  [
+    {   port => 'keyboard',
+        event => [qw(note_on note_off)],
+        type => 'delay_tone',
+        delay => 0.15,
+    },
+    ...
+  ]
+
+In this list, C<port> is required, and C<event> is optional. These
+keys are metadata, and all others are assumed to be object attributes
+to set.
+
+=head1 FILTERS
+
 All filter methods must accept the object, a MIDI device name, a
 delta-time, and a MIDI event ARRAY reference, like:
 
@@ -479,6 +551,9 @@ If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
+If the B<factor> attribute is set, this is multiplied by the delay
+time before being sent to a MIDI output.
+
 =head2 chord_tone
 
 Play a diatonic chord based on the given event note, B<key> and
@@ -497,6 +572,9 @@ If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
+If the B<factor> attribute is set, this is multiplied by the delay
+time before being sent to a MIDI output.
+
 =head2 offset_tone
 
 Play a note and an offset note given the B<offset> value.
@@ -514,6 +592,9 @@ If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
+If the B<factor> attribute is set, this is multiplied by the delay
+time before being sent to a MIDI output.
+
 =head2 arp_tone
 
 Play a series of subsequently pressed notes based on the B<feedback>
@@ -522,6 +603,9 @@ setting.
 If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
+
+If the B<factor> attribute is set, this is multiplied by the delay
+time before being sent to a MIDI output.
 
 =head1 SEE ALSO
 

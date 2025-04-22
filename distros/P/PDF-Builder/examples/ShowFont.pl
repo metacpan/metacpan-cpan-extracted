@@ -7,8 +7,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use PDF::Builder;
 use Encode;
@@ -67,10 +67,12 @@ foreach ($i=0; $i<scalar @ARGV; $i++) {
 	    $fontname = $fontfile;
 	} else {
 	    $fontname = $fontfile;
+            # strip off path
 	    if ($fontfile =~ m#[/\\]([^/\\]+)$#) {
 		$fontname = $1;  # strip off any path
 	    }
-	    $fontname =~ s#\.pf[ab]$##i;  # strip off .pfa or .pfb extension
+            # strip off extension
+	    $fontname =~ s#\.[a-z0-9_]+$##i;  # strip off .pfa or .pfb extension
 	}
 	last;
     }
@@ -238,7 +240,7 @@ foreach my $encode (@encode_list) {
         @planes = ($cur_font, $cur_font->automap()); # 1 or more planes each 256
 
     } else {  # truetype/opentype
-        $cur_font = $pdf->ttfont($fontname, -encode => $encode);
+        $cur_font = $pdf->ttfont($fontfile, -encode => $encode);
 	@planes = ($cur_font);  # automap() not available
 
     }

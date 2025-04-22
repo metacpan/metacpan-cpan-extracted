@@ -7,32 +7,52 @@
 
 package Data::URIID::Barcode;
 
+use v5.16;
 use strict;
 use warnings;
 
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 use parent 'Data::URIID::Base';
 
-use constant {
-    TYPE_UNKNOWN    => ':unknown',
-    TYPE_OTHER      => ':other',
-    TYPE_QRCODE     => 'qrcode',
-    TYPE_EAN13      => 'ean-13',
-    TYPE_EAN8       => 'ean-8',
-};
+use constant {map {$_ => []} qw(TYPE_UNKNOWN TYPE_OTHER TYPE_QRCODE TYPE_EAN13 TYPE_EAN8)};
+
+my %_type_info = (
+    TYPE_UNKNOWN()  => {
+        type    => TYPE_UNKNOWN,
+        special => 1,
+    },
+    TYPE_OTHER()    => {
+        type    => TYPE_OTHER,
+        special => 1,
+    },
+    TYPE_QRCODE()   => {
+        type    => TYPE_QRCODE,
+        aliases => [qw(qrcode qr-code)],
+    },
+    TYPE_EAN13()    => {
+        type    => TYPE_EAN13,
+        aliases => [qw(ean13 ean-13)],
+    },
+    TYPE_EAN8()     => {
+        type    => TYPE_EAN8,
+        aliases => [qw(ean8 ean-8)],
+    },
+);
 
 
 
 sub sheet {
     my ($pkg, %opts) = @_;
-    my $from     = delete $opts{from};
-    my $filename = delete $opts{filename};
-    my $template = delete $opts{template};
-    my $values   = delete $opts{values};
+    my $from        = delete $opts{from};
+    my $filename    = delete $opts{filename};
+    my $template    = delete $opts{template};
+    my $values      = delete $opts{values};
+    my $filter_type = delete $opts{filter_type};
+    my $filter_data = delete $opts{filter_data};
     my %pass_opts;
     my @res;
     my $done;
@@ -106,6 +126,18 @@ sub sheet {
             }
         } else {
             croak 'From of invalid/unsupported type';
+        }
+    }
+
+    if (defined $filter_type) {
+        @res = grep {$_->{barcode}->has_type($filter_type)} @res;
+    }
+
+    if (defined $filter_data) {
+        if (ref($filter_data) eq 'CODE') {
+            @res = grep {$filter_data->($_->{barcode}->{data})} @res;
+        } else {
+            @res = grep {$_->{barcode}->{data} =~ $filter_data} @res;
         }
     }
 
@@ -202,7 +234,13 @@ sub has_type {
     croak 'Stray options passed' if scalar keys %opts;
     croak 'No type passed' unless defined $type;
 
-    return $self->{type} eq $type;
+    if (ref($type) && !exists $_type_info{$type}) {
+        foreach my $t (@{$type}) {
+            return 1 if $self->{type} == $t;
+        }
+    }
+
+    return $self->{type} == $type;
 }
 
 
@@ -219,7 +257,7 @@ sub render {
 
             my $qrcode = Imager::QRCode->new(level => 'H');
             my $img = $qrcode->plot($self->data);
-            $img->write(file => $filename, tyoe => 'png');
+            $img->write(file => $filename, type => 'png');
             $success = 1;
         }
     };
@@ -256,6 +294,44 @@ sub render {
 
     unless ($success) {
         croak 'Code not supported';
+    }
+}
+
+
+sub type_info {
+    my ($self, @args) = @_;
+    state $aliases;
+    my @ret;
+
+    unless (defined $aliases) {
+        $aliases = {};
+        foreach my $info (values %_type_info) {
+            my $type = $info->{type};
+            my $list = $info->{aliases} //= [];
+            $aliases->{fc($_)} = $type foreach @{$list};
+
+            $info->{special} //= undef;
+        }
+    }
+
+    if (!scalar(@args) && ref($self)) {
+        @args = ($self->type);
+    }
+
+    if (!scalar(@args)) {
+        @args = keys %_type_info;
+    }
+
+    foreach my $arg (@args) {
+        my $info = $_type_info{$arg} // $aliases->{fc($arg)} // croak 'No such type: '.$arg;
+        push(@ret, {%{$info}});
+    }
+
+    if (wantarray) {
+        return @ret;
+    } else {
+        croak 'Wrong number of results for scalar context' unless scalar(@ret) == 1;
+        return $ret[0];
     }
 }
 
@@ -326,7 +402,7 @@ Data::URIID::Barcode - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -369,6 +445,21 @@ The following options are supported:
 
 A file to read from.
 
+=item C<filter_type>
+
+Filters the barcodes based on their type.
+This takes the same values as L</has_type>.
+
+This value might also be used to hint any scanners.
+
+=item C<filter_data>
+
+Filters the barcodes based on their data.
+This is a regex or a function (coderef).
+
+If it's a function the data of the barcode is passed as first argument.
+All other arguments are undefined by this version and later versions may define values for them.
+
 =item C<from>
 
 A perl object to use.
@@ -385,6 +476,10 @@ A template (see L<perlfunc/sprintf>) that is applied to each value in C<values>.
 
 Defaults to no transformation.
 If defined, must not be used with values that are references.
+
+=item C<type>
+
+The type of the barcode to be used with C<values>.
 
 =back
 
@@ -451,8 +546,12 @@ See L</has_type> for a more convenient method.
 =head2 has_type
 
     my $bool = $barcode->has_type(Data::URIID::Barcode->TYPE_*);
+    # or:
+    my $bool = $barcode->has_type([Data::URIID::Barcode->TYPE_*, ...]);
 
 Returns whether or not this barcode is of the given type.
+
+If the type is given as an arrayref then it is checked if the type matches any of the elements.
 
 No options are supported. However the options C<default>, and C<no_defaults> are ignored.
 
@@ -467,6 +566,46 @@ This method is experimental. It may change completly or may be removed on future
 
 B<Note:>
 Currently this method exports as PNG. Later versions might support other formats.
+
+=head2 type_info
+
+    my @info    = Data::URIID::Barcode->type_info;
+    # or:
+    my @info    = Data::URIID::Barcode->type_info($type0, $type1, ...);
+    # or:
+    my $info    = Data::URIID::Barcode->type_info($type);
+    # or:
+    my $info    = $barcode->type_info;
+
+Returns information on a barcode type.
+If called in list context returns a list.
+If called in scalar context returns the only one result (or C<die>s if there is not exactly one result).
+
+Takes a list of C<TYPE_*> constants as arguments.
+If the provided value is not a C<TYPE_*> constant the value is checked against an internal alias list.
+If no types are given, returns information for all known types (if called on the package) or
+for the type of the current barcode (if called on an instance).
+
+Each element returned is an hash reference containing the following keys:
+
+=over
+
+=item C<type>
+
+The value of the C<TYPE_*> constant.
+
+=item C<special>
+
+Whether the type is a special one (not a real barcode type).
+Such include C<TYPE_OTHER>, and C<TYPE_UNKNOWN>.
+Later versions of this module might add more special types.
+
+=item C<aliases>
+
+An arrayref with alias names for the given type.
+B<Note:> This list might be empty.
+
+=back
 
 =head1 TYPES
 

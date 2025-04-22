@@ -60,27 +60,27 @@ like($string, qr/\(This is a test\)/,
 $pdf = PDF::Builder->new('compress' => 'none');
 $pdf->pageLabel(0, { 'style' => 'Roman' });
 
-like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /R >> \] >>},
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /R /St 1 >> \] >>},
      q{Page Numbering: Upper-case Roman Numerals});
 
 $pdf = PDF::Builder->new('compress' => 'none');
 $pdf->pageLabel(0, { 'style' => 'roman' });
-like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /r >> \] >>},
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /r /St 1 >> \] >>},
      q{Page Numbering: Upper-case Roman Numerals});
 
 $pdf = PDF::Builder->new('compress' => 'none');
 $pdf->pageLabel(0, { 'style' => 'Alpha' });
-like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /A >> \] >>},
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /A /St 1 >> \] >>},
      q{Page Numbering: Upper-case Alphabet Characters});
 
 $pdf = PDF::Builder->new('compress' => 'none');
 $pdf->pageLabel(0, { 'style' => 'alpha' });
-like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /a >> \] >>},
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /a /St 1 >> \] >>},
      q{Page Numbering: Lower-case Alphabet Characters});
 
 $pdf = PDF::Builder->new('compress' => 'none');
 $pdf->pageLabel(0, { 'style' => 'decimal' });
-like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D >> \] >>},
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D /St 1 >> \] >>},
      q{Page Numbering: Decimal Characters});
 
 $pdf = PDF::Builder->new('compress' => 'none');
@@ -90,7 +90,7 @@ like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D /St 11 >> \] >>},
 
 $pdf = PDF::Builder->new('compress' => 'none');
 $pdf->pageLabel(0, { 'prefix' => 'Test' });
-like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D >> \] >>},
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D /St 1 >> \] >>},
      q{Page Numbering: Decimal Characters (implicit), with prefix});
 
 ## 

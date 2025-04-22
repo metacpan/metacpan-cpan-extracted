@@ -405,7 +405,7 @@ ok(array_comp($sizes_page, @box),
     $pdf = PDF::Builder->new();
     local $SIG{__WARN__} = sub {};
     $pdf->pageLabel(0, { 'style' => 'arabic' });
-    like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D >> \] >>},
+    like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D /St 1 >> \] >>},
 	 q{pageLabel defaults to decimal if given invalid input});
 }
 

@@ -321,7 +321,7 @@ check_get
 
 my @ex = $@->exceptions;
 cmp_ok(scalar @ex, '==', 1, 'exceptions');
-is("$ex[0]","warning: deprecated solr main::check_get(facet.date) since 3.1\n");
+is("$ex[0]","warning: Deprecated solr main::check_get(facet.date) since 3.1\n");
 
 
 my $f7 = <<'_FACET_FIELDS7';

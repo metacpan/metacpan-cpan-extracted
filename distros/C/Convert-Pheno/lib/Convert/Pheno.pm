@@ -3,7 +3,7 @@ package Convert::Pheno;
 use strict;
 use warnings;
 use autodie;
-use feature qw(say);
+use feature               qw(say);
 use File::Spec::Functions qw(catdir catfile);
 use Data::Dumper;
 use Path::Tiny;
@@ -12,19 +12,20 @@ use File::ShareDir::ProjectDistDir;
 use List::Util qw(any uniq);
 use XML::Fast;
 use Moo;
-use Types::Standard qw(Str Int Num Enum ArrayRef Undef);
+use Types::Standard                qw(Str Int Num Enum ArrayRef Undef);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
-
 #use Devel::Size     qw(size total_size);
 use Convert::Pheno::IO::CSVHandler;
 use Convert::Pheno::IO::FileIO;
-use Convert::Pheno::SQLite;
-use Convert::Pheno::Mapping;
+use Convert::Pheno::OMOP::Definitions;
+use Convert::Pheno::DB::SQLite;
+use Convert::Pheno::Utils::Mapping;
 use Convert::Pheno::CSV;
 use Convert::Pheno::RDF qw(do_bff2jsonld do_pxf2jsonld);
 use Convert::Pheno::OMOP;
 use Convert::Pheno::PXF;
-use Convert::Pheno::BFF;
+use Convert::Pheno::Bff2Pxf;
+use Convert::Pheno::Bff2Omop;
 use Convert::Pheno::CDISC;
 use Convert::Pheno::REDCap;
 
@@ -41,12 +42,17 @@ $SIG{__WARN__} = sub { warn "Warn: ", @_ };
 $SIG{__DIE__}  = sub { die "Error: ", @_ };
 
 # Global variables:
-our $VERSION   = '0.27';
+our $VERSION   = '0.28';
 our $share_dir = dist_dir('Convert-Pheno');
 
 # SQLite database
 my @all_sqlites       = qw(ncit icd10 ohdsi cdisc omim hpo);
 my @non_ohdsi_sqlites = qw(ncit icd10 cdisc omim hpo);
+
+# Define a subroutine that computes the default username.
+my $default_username = sub {
+    return $ENV{'LOGNAME'} || $ENV{'USER'} || $ENV{'USERNAME'} || 'dummy-user';
+};
 
 ############################################
 # Start declaring attributes for the class #
@@ -54,24 +60,18 @@ my @non_ohdsi_sqlites = qw(ncit icd10 cdisc omim hpo);
 
 # Complex defaults here
 has search => (
-
-    default => 'exact',
-    is      => 'ro',
-    coerce  => sub { $_[0] // 'exact' },
-    isa     => Enum [qw(exact mixed)]
+    is     => 'ro',
+    coerce => sub { $_[0] // 'exact' },
+    isa    => Enum [qw(exact mixed fuzzy)]
 );
 
 has text_similarity_method => (
-
-    #default => 'cosine',
     is     => 'ro',
     coerce => sub { $_[0] // 'cosine' },
     isa    => Enum [qw(cosine dice)]
 );
 
 has min_text_similarity_score => (
-
-    #default => 0.8,
     is     => 'ro',
     coerce => sub { $_[0] // 0.8 },
     isa    => sub {
@@ -79,31 +79,31 @@ has min_text_similarity_score => (
           unless ( $_[0] >= 0.0 && $_[0] <= 1.0 );
     }
 );
+has levenshtein_weight => (
+    is     => 'ro',
+    coerce => sub { $_[0] // 0.1 },
+    isa    => sub {
+        die "Only values between 0 .. 1 supported!"
+          unless ( $_[0] >= 0.0 && $_[0] <= 1.0 );
+    }
+);
 
 has username => (
+    is      => 'ro',
+    isa     => Str,
+    default => $default_username,    # Use the subroutine for the default.
+    coerce  => sub {
 
-    #default => ( $ENV{LOGNAME} || $ENV{USER} || getpwuid($<) ) , # getpwuid not implemented in Windows
-    default => $ENV{'LOGNAME'}
-      || $ENV{'USER'}
-      || $ENV{'USERNAME'}
-      || 'dummy-user',
-    is     => 'ro',
-    coerce => sub {
-        $_[0] // ( $ENV{'LOGNAME'}
-              || $ENV{'USER'}
-              || $ENV{'USERNAME'}
-              || 'dummy-user' );
+        # If a defined value is provided, use it; otherwise, compute the default.
+        $_[0] // $default_username->();
     },
-    isa => Str
 );
 
 has id => (
-    default => time . substr( "00000$$", -5 ),
     is      => 'ro',
-    coerce  => sub {
-        $_[0] // time . substr( "00000$$", -5 );
-    },
-    isa => Str
+    isa     => Str,
+    default => sub { time . substr( "00000$$", -5 ) },
+    coerce  => sub { $_[0] // time . substr( "00000$$", -5 ) },
 );
 
 has max_lines_sql => (
@@ -131,7 +131,6 @@ has 'omop_tables' => (
 );
 
 has exposures_file => (
-
     default =>
       catfile( $share_dir, 'db', 'concepts_candidates_2_exposure.csv' ),
     coerce => sub {
@@ -178,8 +177,8 @@ sub BUILD {
 #############
 
 sub bff2pxf {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
 }
@@ -191,8 +190,8 @@ sub bff2pxf {
 #############
 
 sub bff2csv {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
 }
@@ -204,8 +203,8 @@ sub bff2csv {
 #############
 
 sub bff2jsonf {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
 }
@@ -216,10 +215,23 @@ sub bff2jsonf {
 ##############
 
 sub bff2jsonld {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
+}
+
+##############
+##############
+#  BFF2OMOP  #
+##############
+##############
+
+sub bff2omop {
+    my $self = shift;
+
+    # <array_dispatcher> will deal with JSON arrays
+    return merge_omop_tables( $self->array_dispatcher );
 }
 
 ################
@@ -229,7 +241,6 @@ sub bff2jsonld {
 ################
 
 sub redcap2bff {
-
     my $self = shift;
 
     # Read and load data from REDCap export
@@ -265,7 +276,6 @@ sub redcap2bff {
 ################
 
 sub redcap2pxf {
-
     my $self = shift;
 
     # First iteration: redcap2bff
@@ -281,6 +291,29 @@ sub redcap2pxf {
     return $self->array_dispatcher;
 }
 
+#################
+#################
+#  REDCAP2OMOP  #
+#################
+#################
+
+sub redcap2omop {
+    my $self = shift;
+
+    # First iteration: csv2bff
+    $self->{method} = 'redcap2bff';    # setter - we have to change the value of attr {method}
+    my $bff = redcap2bff($self);       # array
+
+    # Preparing for second iteration: bff2pxf
+    $self->{method}      = 'bff2omop';    # setter
+    $self->{data}        = $bff;          # setter
+    $self->{in_textfile} = 0;             # setter
+
+    # Run second iteration
+    return merge_omop_tables( $self->array_dispatcher );
+
+}
+
 ##############
 ##############
 #  OMOP2BFF  #
@@ -288,7 +321,6 @@ sub redcap2pxf {
 ##############
 
 sub omop2bff {
-
     my $self = shift;
 
     #############
@@ -376,7 +408,8 @@ sub omop2bff {
 
             if ( $ext =~ m/\.sql/i ) {
 
-                print "> Param: --max-lines-sql = $self->{max_lines_sql}\n" if $self->{verbose};
+                print "> Param: --max-lines-sql = $self->{max_lines_sql}\n"
+                  if $self->{verbose};
 
                 # --no-stream
                 if ( !$self->{stream} ) {
@@ -384,10 +417,13 @@ sub omop2bff {
                     print "> Mode : --no-stream\n\n" if $self->{verbose};
 
                     # We read all tables in memory
-                    $data = read_sqldump( { in => $file, self => $self } );
+                    my $sql_headers;    # Original order for the headers
+                    ( $data, $sql_headers ) =
+                      read_sqldump( { in => $file, self => $self } );
 
                     # Exporting to CSV if --sql2csv
-                    sqldump2csv( $data, $self->{out_dir} ) if $self->{sql2csv};
+                    sqldump2csv( $data, $self->{out_dir}, $sql_headers )
+                      if $self->{sql2csv};
                 }
 
                 # --stream
@@ -398,11 +434,14 @@ sub omop2bff {
                     # We'll ONLY load @stream_ram_memory_tables
                     # in RAM and the other tables as $fh
                     $self->{omop_tables} = [@stream_ram_memory_tables];    # setter
-                    $data = read_sqldump( { in => $file, self => $self } );
+                    ( $data, undef ) =
+                      read_sqldump( { in => $file, self => $self } );
                 }
 
                 # Misc print
-                print "> Parameter --max-lines-sql set to: $self->{max_lines_sql}\n\n" if $self->{verbose};
+                print
+"> Parameter --max-lines-sql set to: $self->{max_lines_sql}\n\n"
+                  if $self->{verbose};
 
                 # We keep the filepath for later
                 $filepath = $file;
@@ -434,7 +473,8 @@ sub omop2bff {
                     # We read all tables in memory
                     say $msg if ( $self->{verbose} || $self->{debug} );
                     $data->{$table_name} =
-                      read_csv( { in => $file, sep => $self->{sep}, self => $self } );
+                      read_csv(
+                        { in => $file, sep => $self->{sep}, self => $self } );
                 }
 
                 # --stream
@@ -442,7 +482,9 @@ sub omop2bff {
                     if ( any { $_ eq $table_name } @stream_ram_memory_tables ) {
                         say $msg if ( $self->{verbose} || $self->{debug} );
                         $data->{$table_name} =
-                          read_csv( { in => $file, sep => $self->{sep}, self => $self } );
+                          read_csv(
+                            { in => $file, sep => $self->{sep}, self => $self }
+                          );
                     }
                     else {
                         push @filepaths, $file;
@@ -467,17 +509,18 @@ sub omop2bff {
       unless exists $data->{CONCEPT};
 
     # We create a dictionary for $data->{CONCEPT}
-    $self->{data_ohdsi_dict} = convert_table_aoh_to_hoh( $data, 'CONCEPT', $self );   # Dynamically adding attributes (setter)
+    $self->{data_ohdsi_dict} =
+      convert_table_aoh_to_hoh( $data, 'CONCEPT', $self );    # Dynamically adding attributes (setter)
 
     # Transform Array of Hashes (AoH) to Hash of Hashes (HoH) for faster computation
     if ( $self->{stream} ) {
-        $self->{person} = convert_table_aoh_to_hoh( $data, 'PERSON', $self );         # Dynamically adding attributes (setter)
+        $self->{person} = convert_table_aoh_to_hoh( $data, 'PERSON', $self );  # Dynamically adding attributes (setter)
     }
 
     # We convert $self->{data}{VISIT_OCCURRENCE} if present
     if ( exists $data->{VISIT_OCCURRENCE} ) {
         $self->{visit_occurrence} =
-          convert_table_aoh_to_hoh( $data, 'VISIT_OCCURRENCE', $self );               # Dynamically adding attributes (setter)
+          convert_table_aoh_to_hoh( $data, 'VISIT_OCCURRENCE', $self );        # Dynamically adding attributes (setter)
         delete $data->{VISIT_OCCURRENCE};                                      # Anyway, $data->{VISIT_OCCURRENCE} = [] from convert_table_aoh_to_hoh
     }
 
@@ -488,14 +531,14 @@ sub omop2bff {
     # NB: Transformation is due ONLY IN $omop_main_table FIELDS, the rest of the tables are not used
     # The transformation is performed in --no-stream mode
     $self->{data} =
-      $self->{stream} ? $data : transpose_omop_data_structure($self, $data);    # Dynamically adding attributes (setter)
+      $self->{stream} ? $data : transpose_omop_data_structure( $self, $data ); # Dynamically adding attributes (setter)
 
     # Giving some memory back to the system
     $data = undef;
 
     # Adding miscellanea metadata
-    $self->{metaData}     = get_metaData($self);                         # setter
-    $self->{convertPheno} = get_info($self);                             # setter
+    $self->{metaData}     = get_metaData($self);                               # setter
+    $self->{convertPheno} = get_info($self);                                   # setter
 
     # --stream
     if ( $self->{stream} ) {
@@ -518,7 +561,6 @@ sub omop2bff {
 ##############
 
 sub omop2pxf {
-
     my $self = shift;
 
     # We have two possibilities:
@@ -564,7 +606,6 @@ sub omop2pxf {
 ###############
 
 sub cdisc2bff {
-
     my $self = shift;
     my $str  = path( $self->{in_file} )->slurp_utf8;
     my $hash = xml2hash $str, attr => '-', text => '~';
@@ -599,7 +640,6 @@ sub cdisc2bff {
 ###############
 
 sub cdisc2pxf {
-
     my $self = shift;
 
     # First iteration: cdisc2bff
@@ -615,6 +655,28 @@ sub cdisc2pxf {
     return $self->array_dispatcher;
 }
 
+################
+################
+#  CDISC2OMOP  #
+################
+################
+
+sub cdisc2omop {
+    my $self = shift;
+
+    # First iteration: cdisc2bff
+    $self->{method} = 'cdisc2bff';    # setter - we have to change the value of attr {method}
+    my $bff = cdisc2bff($self);       # array
+
+    # Preparing for second iteration: bff2pxf
+    $self->{method}      = 'bff2omop';    # setter
+    $self->{data}        = $bff;          # setter
+    $self->{in_textfile} = 0;             # setter
+
+    # Run second iteration
+    return merge_omop_tables( $self->array_dispatcher );
+}
+
 #############
 #############
 #  PXF2BFF  #
@@ -622,10 +684,33 @@ sub cdisc2pxf {
 #############
 
 sub pxf2bff {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
+}
+
+##############
+##############
+#  PXF2OMOP  #
+##############
+##############
+
+sub pxf2omop {
+    my $self = shift;
+
+    # First iteration: pxf2bff
+    $self->{method} = 'pxf2bff';    # setter - we have to change the value of attr {method}
+    my $bff = pxf2bff($self);       # array
+
+    # Preparing for second iteration: bff2pxf
+    $self->{method}      = 'bff2omop';    # setter
+    $self->{data}        = $bff;          # setter
+    $self->{in_textfile} = 0;             # setter
+
+    # Run second iteration
+    return merge_omop_tables( $self->array_dispatcher );
+
 }
 
 #############
@@ -635,7 +720,6 @@ sub pxf2bff {
 #############
 
 sub csv2bff {
-
     my $self = shift;
 
     # Read and load data from CSV
@@ -667,7 +751,6 @@ sub csv2bff {
 #############
 
 sub csv2pxf {
-
     my $self = shift;
 
     # First iteration: csv2bff
@@ -684,6 +767,29 @@ sub csv2pxf {
 
 }
 
+##############
+##############
+#  CSV2OMOP  #
+##############
+##############
+
+sub csv2omop {
+    my $self = shift;
+
+    # First iteration: csv2bff
+    $self->{method} = 'csv2bff';    # setter - we have to change the value of attr {method}
+    my $bff = csv2bff($self);       # array
+
+    # Preparing for second iteration: bff2pxf
+    $self->{method}      = 'bff2omop';    # setter
+    $self->{data}        = $bff;          # setter
+    $self->{in_textfile} = 0;             # setter
+
+    # Run second iteration
+    return merge_omop_tables( $self->array_dispatcher );
+
+}
+
 #############
 #############
 #  PXF2CSV  #
@@ -691,8 +797,8 @@ sub csv2pxf {
 #############
 
 sub pxf2csv {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
 }
@@ -704,8 +810,8 @@ sub pxf2csv {
 #############
 
 sub pxf2jsonf {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
 }
@@ -717,20 +823,19 @@ sub pxf2jsonf {
 ##############
 
 sub pxf2jsonld {
-
     my $self = shift;
+
     # <array_dispatcher> will deal with JSON arrays
     return $self->array_dispatcher;
 }
 
-######################
-######################
-#  MISCELLANEA SUBS  #
-######################
-######################
+#################
+#################
+#  HELPER SUBS  #
+#################
+#################
 
 sub array_dispatcher {
-
     my $self = shift;
 
     # Load the input data as Perl data structure
@@ -751,6 +856,7 @@ sub array_dispatcher {
         bff2csv    => \&do_bff2csv,
         bff2jsonf  => \&do_bff2csv,      # Not a typo, is the same as above
         bff2jsonld => \&do_bff2jsonld,
+        bff2omop   => \&do_bff2omop,
         pxf2bff    => \&do_pxf2bff,
         pxf2csv    => \&do_pxf2csv,
         pxf2jsonf  => \&do_pxf2csv,      # Not a typo, is the same as above
@@ -760,7 +866,7 @@ sub array_dispatcher {
     # Open connection to SQLlite databases ONCE
     open_connections_SQLite($self) if $self->{method} ne 'bff2pxf';
 
-    # Open filehandle if omop2bff
+    # Open filehandle if omop2bff (w/ CLI)
     my $fh_out;
     if ( $self->{method} eq 'omop2bff' && $self->{omop_cli} ) {
         $fh_out = open_filehandle( $self->{out_file}, 'a' );
@@ -768,7 +874,7 @@ sub array_dispatcher {
     }
 
     # *** IMPORTANT ***
-    # $out_data = Caution with RAM 
+    # $out_data = Caution with RAM
     # We store all in memory and serialize externally
     # except for omop2bff (larger) that we print to file here (item-by-item)
     my $out_data;
@@ -785,35 +891,31 @@ sub array_dispatcher {
         my $elements = scalar @{$in_data};
 
         # Start looping
-        # In $self->{data} we have all participants data, but,
-        # WE DELIBERATELY SEPARATE ARRAY ELEMENTS FROM $self->{data}
-
-        # We void items in $in_data to avoid data duplication in RAM
-        while ( my $item = shift @{ $in_data} ) {         # We want to keep order (!pop)
-
+        while ( my $item = shift @{$in_data} ) {    # We want to keep order (!pop)
             $count++;
-
-            # Print info
             say "[$count] ARRAY ELEMENT from $elements" if $self->{debug};
 
             # NB: If we get "null" participants the validator will complain
             # about not having "id" or any other required property
-            my $method_result = $func{ $self->{method} }->( $self, $item );    # Method
+            my $method_result = $func{ $self->{method} }->( $self, $item );
 
             # Only proceeding if we got value from method
             if ($method_result) {
                 $total++;
                 say " * [$count] ARRAY ELEMENT is defined" if $self->{debug};
 
-                # For omop2bff and omop2pxf we serialize by individual
+                # For omop2bff (or omop2pxf) in CLI mode, we serialize by individual
                 if ( exists $self->{omop_cli} && $self->{omop_cli} ) {
-                    my $out = omop_dispatcher( $self, $method_result );
-                    print $fh_out $$out;
-                    print $fh_out ",\n" unless ( $total == $elements || $total == $self->{max_lines_sql} );
-                }
 
-                # For the other we have array_ref $out_data and serialize at once
+                    # Check if it's the last item, so we don't add a trailing comma
+                    my $is_last_item =
+                      (      $total == $elements
+                          || $total == $self->{max_lines_sql} );
+                    _transform_item( $self, $method_result, $fh_out,
+                        $is_last_item );
+                }
                 else {
+                    # For the other transformations we accumulate in memory
                     push @{$out_data}, $method_result;
                 }
             }
@@ -826,13 +928,23 @@ sub array_dispatcher {
     # NOT ARRAY
     else {
         say "$self->{method}: NOT ARRAY" if $self->{debug};
-        $out_data = $func{ $self->{method} }->( $self, $in_data );    # Method
+        my $method_result = $func{ $self->{method} }->( $self, $in_data );
+
+        # For omop2bff in CLI mode, we print to file instead of returning
+        if ( $method_result && $self->{omop_cli} ) {
+
+            # Only one item, so it's definitely the last
+            _transform_item( $self, $method_result, $fh_out, 1 );
+        }
+        else {
+            $out_data = $method_result;
+        }
     }
 
     # Close connections ONCE
     close_connections_SQLite($self) unless $self->{method} eq 'bff2pxf';
 
-    # Close filehandle if omop2bff (w/ premature return)
+    # Close filehandle if omop2bff (w/ CLI)
     if ( exists $self->{omop_cli} && $self->{omop_cli} ) {
         say $fh_out "\n]";
         close $fh_out;
@@ -843,8 +955,34 @@ sub array_dispatcher {
     return $out_data;
 }
 
-sub omop_dispatcher {
+#
+# Helper sub to handle per-item encoding or conversion, plus optional trailing comma
+#
+sub _transform_item {
+    my ( $self, $method_result, $fh_out, $is_last_item ) = @_;
 
+    # For omop2bff or omop2pxf we do specialized serialization logic
+    my $out;
+
+    # omop2pxf scenario
+    if ( $self->{method_ori} && $self->{method_ori} eq 'omop2pxf' ) {
+        my $pxf = do_bff2pxf( $self, $method_result );
+        $out = JSON::XS->new->canonical->pretty->encode($pxf);
+    }
+
+    # Default scenario
+    else {
+        $out = JSON::XS->new->canonical->pretty->encode($method_result);
+    }
+
+    chomp $out;
+    print $fh_out $out;
+
+    # Avoid trailing comma on the very last item
+    print $fh_out ",\n" unless $is_last_item;
+}
+
+sub omop_dispatcher {
     my ( $self, $method_result ) = @_;
 
     # For omop2bff and omop2pxf we serialize by individual
@@ -868,7 +1006,6 @@ sub omop_dispatcher {
 }
 
 sub omop_stream_dispatcher {
-
     my $arg         = shift;
     my $self        = $arg->{self};
     my $filepath    = $arg->{filepath};
@@ -885,7 +1022,6 @@ sub omop_stream_dispatcher {
 }
 
 sub process_csv_files_stream {
-
     my ( $self, $filepaths ) = @_;
     my $person = $self->{person};
     for my $file (@$filepaths) {
@@ -903,7 +1039,6 @@ sub process_csv_files_stream {
 }
 
 sub process_sqldump_stream {
-
     my ( $self, $filepath, $omop_tables ) = @_;
     my $person = $self->{person};
 
@@ -921,7 +1056,6 @@ sub process_sqldump_stream {
 }
 
 sub omop2bff_stream_processing {
-
     my ( $self, $data ) = @_;
 
     # We have this subroutine here because the class was initiated in Pheno.pm

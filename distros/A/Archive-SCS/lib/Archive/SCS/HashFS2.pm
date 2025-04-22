@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::HashFS2 1.06
+class Archive::SCS::HashFS2 1.07
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -397,15 +397,14 @@ sub create_file ($pathname, $scs) {
 
 sub _compress_zlib ($data) {
   state $zlib_d = do {
-    my %opts = ( -CRC32 => 1, -WindowBits => 15, -Level => 9 );
+    my %opts = ( -CRC32 => 1, -WindowBits => 15, -Level => 9, -AppendOutput => 1 );
     Compress::Raw::Zlib::Deflate->new( %opts ) or die
   };
-  state $rfc1950header = chr( 8 | 15-8 << 4 ) . chr( 26 | 0 << 5 | 3 << 6 );
 
   $zlib_d->deflate( \($data), \(my $compressed = '') );
   $zlib_d->flush( \$compressed );
   $zlib_d->deflateReset;
-  return $rfc1950header . $compressed;
+  return $compressed;
 }
 
 1;

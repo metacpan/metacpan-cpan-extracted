@@ -13,10 +13,9 @@ use warnings;
 use overload '""' => \&rgb;
 
 use Carp;
-use UUID::Tiny ':std';
 use Scalar::Util qw(weaken blessed);
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 use parent 'Data::URIID::Base';
 
@@ -72,15 +71,8 @@ sub ise {
     my ($self, %opts) = @_;
 
     unless (defined $self->{ise}) {
-        my $req = lc($self->rgb);
-
-        $req = sprintf('#%s%s%s', $1 x 6, $2 x 6, $3 x 6) if $req =~ /^#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/;
-
-        if ($req =~ /^#[a-f0-9]{36}$/) {
-            $self->{ise} = create_uuid_as_string(UUID_SHA1, '88d3944f-a13b-4e35-89eb-e3c1fbe53e76', $req);
-        } else {
-            croak 'Bad format for colour';
-        }
+        require Data::Identifier::Generate;
+        $self->{ise} = Data::Identifier::Generate->colour($self->rgb)->ise;
     }
 
     return $self->SUPER::ise(%opts);
@@ -113,7 +105,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package Hades::Realm::Import::Export;
 use strict;
 use warnings;
 use base qw/Hades::Realm::Exporter/;
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -89,7 +89,7 @@ Hades::Realm::Import::Export - Hades realm for Import::Export
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =cut
 
@@ -100,7 +100,7 @@ Quick summary of what the module does:
 	Hades->run({
 		eval => 'Kosmos {
 			[curae penthos] :t(Int) :d(2) :p :pr :c :r :i(1, GROUP)
-			geras $nosoi :t(Int) :d(5) :i { if (£penthos == $nosoi) { return £curae; } } 
+			geras $nosoi :t(Int) :d(5) :i { if (Â£penthos == $nosoi) { return Â£curae; } } 
 		}',
 		realm => 'Import::Export',
 	});
@@ -232,19 +232,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hades-Realm-Import-Export>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hades-Realm-Import-Export>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hades-Realm-Import-Export>
 
 =item * Search CPAN
 

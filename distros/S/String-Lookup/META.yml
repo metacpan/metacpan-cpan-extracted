@@ -9,7 +9,7 @@ configure_requires:
   Module::Metadata: '1.000033'
   threads: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,16 +22,16 @@ no_index:
 provides:
   String::Lookup:
     file: lib/String/Lookup.pm
-    version: '0.14'
+    version: '0.15'
   String::Lookup::AsyncDBI:
     file: lib/String/Lookup/AsyncDBI.pm
-    version: '0.14'
+    version: '0.15'
   String::Lookup::DBI:
     file: lib/String/Lookup/DBI.pm
-    version: '0.14'
+    version: '0.15'
   String::Lookup::FlatFile:
     file: lib/String/Lookup/FlatFile.pm
-    version: '0.14'
+    version: '0.15'
   String::Lookup::PurePerl:
     file: lib/String/Lookup/PurePerl.pm
 requires:
@@ -43,5 +43,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/String-Lookup.git
-version: '0.14'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: 0.15
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

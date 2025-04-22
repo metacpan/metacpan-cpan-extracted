@@ -4,6 +4,11 @@
 
 Dancer2::Plugin::LogReport - logging and exceptions via Log::Report
 
+=head1 INHERITANCE
+
+ Dancer2::Plugin::LogReport
+   is a Dancer2::Plugin
+
 =head1 SYNOPSIS
 
   # Load the plugin into Dancer2
@@ -34,6 +39,8 @@ Dancer2::Plugin::LogReport - logging and exceptions via Log::Report
 =head1 DESCRIPTION
 
 [The Dancer2 plugin was contributed by Andrew Beverley]
+When you need to translate your templates as well (not only the messages
+in your code) then have a look at L<Dancer2::Template::TTLogReport|Dancer2::Template::TTLogReport>.
 
 This module provides easy access to the extensive logging facilities
 provided by L<Log::Report|Log::Report>. Along with L<Dancer2::Logger::LogReport|Dancer2::Logger::LogReport>,
@@ -374,6 +381,11 @@ Then in your template (for example the main layout):
 The C<bootstrap_color> of the message is compatible with Bootstrap contextual
 colors: C<success>, C<info>, C<warning> or C<danger>.
 
+When you use L<Dancer2::Template::TTLogReport|Dancer2::Template::TTLogReport> as well, which enables the
+translations of your whole templates, then add C<locale>:
+
+      [% message.toString(locale) | html_entity %]
+
 Now, anywhere in your application that you have used Log::Report, you can
 
   warning "Hey user, you should now about this";
@@ -508,12 +520,12 @@ configuration options and defaults.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.39,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report distribution version 1.40,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

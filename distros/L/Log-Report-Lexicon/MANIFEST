@@ -31,6 +31,7 @@ lib/Log/Report/Translator/POT.pm
 lib/Log/Report/Translator/POT.pod
 lib/Log/Report/Win32Locale.pm
 lib/Log/Report/Win32Locale.pod
+lib/Log/Report/messages/log-report-lexicon/nl_NL.po
 t/00use.t
 t/04locale.t
 t/10context.t

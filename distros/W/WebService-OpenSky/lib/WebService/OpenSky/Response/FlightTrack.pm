@@ -5,7 +5,7 @@ use WebService::OpenSky::Moose;
 use WebService::OpenSky::Core::Waypoint;
 extends 'WebService::OpenSky::Response';
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 my @ATTRS = qw(
   icao24
@@ -46,7 +46,7 @@ WebService::OpenSky::Response::FlightTrack - A class representing a flight track
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 DESCRIPTION
 

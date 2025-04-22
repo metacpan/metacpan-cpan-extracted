@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.3.4
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.4.2
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/03/12
+## Modified 2025/04/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,10 +13,12 @@
 package Module::Generic::Scalar;
 BEGIN
 {
+    use v5.26.1;
     use common::sense;
     use warnings;
     use warnings::register;
     use vars qw( $DEBUG $ERROR $ERRORS );
+    use Config;
     use Encode ();
     # So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
     # use parent -norequire, qw( Module::Generic::Scalar );
@@ -77,11 +79,28 @@ BEGIN
         },
         fallback => 1,
     );
+    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    our $ERRORS;
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+    
+        my %err :shared;
+    
+        $ERRORS = \%err;
+    }
+    else
+    {
+        $ERRORS = {};
+    }
     $DEBUG = 0;
-    $ERRORS = {};
-    our $VERSION = 'v1.3.4';
+    our $VERSION = 'v1.4.2';
 };
 
+use v5.26.1;
 use strict;
 no warnings 'redefine';
 require Module::Generic::Array;
@@ -330,7 +349,17 @@ sub error
             # We have to die, because we have an error within another error
             die( "${class}\::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
         }
-        $o = $ERRORS->{ $addr } = $ERROR = $ex_class->new( $args );
+        my $o = $ex_class->new( $args );
+        if( HAS_THREADS && is_shared( $ERRORS ) )
+        {
+            lock( $ERRORS );
+            lock( $ERROR );
+            $ERRORS->{ $addr } = $ERROR = $o;
+        }
+        else
+        {
+            $ERRORS->{ $addr } = $ERROR = $o;
+        }
         local $@;
         my $enc_str = eval
         {
@@ -341,7 +370,13 @@ sub error
 
         if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
-            require Module::Generic::Null;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Null;
+                $loaded = 1;
+            }
             my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, has_error => 1 });
             rreturn( $null );
         }
@@ -349,7 +384,13 @@ sub error
     }
     if( !$ERRORS->{ $addr } && want( 'OBJECT' ) )
     {
-        require Module::Generic::Null;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Null;
+            $loaded = 1;
+        }
         my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, wants => 'object' });
         rreturn( $null );
     }
@@ -468,7 +509,13 @@ sub object { return( $_[0] ); }
 sub open
 {
     my $self = shift( @_ );
-    require Module::Generic::Scalar::IO;
+    state $loaded;
+    unless( $loaded )
+    {
+        lock( $loaded ) if( HAS_THREADS );
+        require Module::Generic::Scalar::IO;
+        $loaded = 1;
+    }
     my $io = Module::Generic::Scalar::IO->new( $self, @_ ) || 
         return( $self->pass_error( Module::Generic::Scalar::IO->error ) );
     return( $io );
@@ -552,7 +599,17 @@ sub pass_error
              ( CORE::scalar( @_ ) == 2 && CORE::defined( $class ) ) 
            ) )
     {
-        $ERRORS->{ $addr } = $ERROR = ( CORE::defined( $class ) ? bless( $err => $class ) : $err );
+        my $o = ( CORE::defined( $class ) ? bless( $err => $class ) : $err );
+        if( HAS_THREADS && is_shared( $ERRORS ) )
+        {
+            lock( $ERRORS );
+            lock( $ERROR );
+            $ERRORS->{ $addr } = $ERROR = $o;
+        }
+        else
+        {
+            $ERRORS->{ $addr } = $ERROR = $o;
+        }
     }
     # If the error provided is not an object, we call error to create one
     else
@@ -562,7 +619,13 @@ sub pass_error
     
     if( want( 'OBJECT' ) )
     {
-        require Module::Generic::Null;
+        state $loaded;
+        unless( $loaded )
+        {
+            lock( $loaded ) if( HAS_THREADS );
+            require Module::Generic::Null;
+            $loaded = 1;
+        }
         my $null = Module::Generic::Null->new( $err, { debug => $ERRORS->{ $addr }, has_error => 1 });
         rreturn( $null );
     }
@@ -778,7 +841,13 @@ sub _array
         {
             # We might have need to specify, because I found a race condition where
             # even though the context is object, once in Null, the context became 'code'
-            require Module::Generic::Null;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Null;
+                $loaded = 1;
+            }
             return( Module::Generic::Null->new( wants => 'OBJECT' ) );
         }
         else
@@ -800,7 +869,13 @@ sub _number
         {
             # We might have need to specify, because I found a race condition where
             # even though the context is object, once in Null, the context became 'code'
-            require Module::Generic::Null;
+            state $loaded;
+            unless( $loaded )
+            {
+                lock( $loaded ) if( HAS_THREADS );
+                require Module::Generic::Null;
+                $loaded = 1;
+            }
             return( Module::Generic::Null->new( wants => 'OBJECT' ) );
         }
         else
@@ -839,7 +914,15 @@ sub DESTROY
     local( $., $@, $!, $^E, $? );
     my $self = shift( @_ );
     my $addr = Scalar::Util::refaddr( $self );
-    CORE::delete( $ERRORS->{ $addr } );
+    if( HAS_THREADS && is_shared( $ERRORS ) )
+    {
+        lock( $ERRORS );
+        CORE::delete( $ERRORS->{ $addr } );
+    }
+    else
+    {
+        CORE::delete( $ERRORS->{ $addr } );
+    }
 };
 
 sub FREEZE

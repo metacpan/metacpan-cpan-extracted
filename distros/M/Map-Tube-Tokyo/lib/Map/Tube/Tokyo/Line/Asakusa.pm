@@ -1,6 +1,6 @@
 package Map::Tube::Tokyo::Line::Asakusa;
 
-$Map::Tube::Tokyo::Line::Asakusa::VERSION   = '0.60';
+$Map::Tube::Tokyo::Line::Asakusa::VERSION   = '0.63';
 $Map::Tube::Tokyo::Line::Asakusa::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -14,7 +14,7 @@ Map::Tube::Tokyo::Line::Asakusa - Tokyo Subway Map: Asakusa Line.
 
 =head1 VERSION
 
-Version 0.60
+Version 0.63
 
 =head1 DESCRIPTION
 
@@ -68,6 +68,10 @@ Tokyo Subway Map: Asakusa Line.
 =item * The station "Oshiage" is also part of Hanzōmon Line.
 
 =back
+
+=head1 MAP DATA
+
+The map data for the line B<Asakusa> collected from L<this page|https://en.wikipedia.org/wiki/Toei_Asakusa_Line)>.
 
 =head1 MAP
 
@@ -129,7 +133,7 @@ L<https://metacpan.org/dist/Map-Tube-Tokyo>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2014 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

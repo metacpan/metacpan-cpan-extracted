@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="test">
+  <lines>
+    <line id="A" name="Bakerloo"          color="#800000"/>
+    <line id="B" name="Central"           color="#008000"/>
+    <line id="C" name="Circle"            color="#000080"/>
+    <line id="D" name="DLR"               color="#808000"/>
+    <line id="J" name="Jubilee"           color="#800080"/>
+    <line id="P" name="Piccadilly"        color="#008080"/>
+    <line id="T" name="Tunnel"            color="#808080"/>
+    <line id="W" name="Waterloo and City" color="#000000"/>
+  </lines>
+  <stations>
+    <station id="a" name="Baker Street"   line="A:1,B:1"  link="b"   />
+    <station id="b" name="Bank"           line="A:2,B:2"  link="c,a" />
+    <station id="c" name="Bayswater"      line="A:3,C:1"  link="d,b" />
+    <station id="d" name="Beckton"        line="A:4,C:2"  link="e,c" />
+    <station id="e" name="Becontree"      line="A:5,D:1"  link="f,d" />
+    <station id="f" name="Bond Street"    line="A:6,D:2"  link="g,e" />
+    <station id="g" name="Bushey"         line="A:7,J:1"  link="h,f" />
+    <station id="h" name="Canada Water"   line="A:8,J:2"  link="i,g" />
+    <station id="i" name="Cockfosters"    line="A:9,P:1"  link="j,h" />
+    <station id="j" name="Iver"           line="A:10,P:2" link="k,i" />
+    <station id="k" name="Old Street"     line="A:11,T:1" link="l,j" />
+    <station id="l" name="Plaistow"       line="A:12,T:2" link="m,k" />
+    <station id="m" name="Seven Sisters"  line="A:13,W:1" link="n,l" />
+    <station id="n" name="Silver Street"  line="A:14,W:2" link="o,m" />
+    <station id="o" name="Turkey Street"  line="A:15"     link="p,n" />
+    <station id="p" name="Upminster"      line="A:16"     link="q,o" />
+    <station id="q" name="Waterloo"       line="A:17"     link="p,r" />
+    <station id="r" name="Bow Church"     line="A:18"     link="q,s" />
+    <station id="s" name="Buckhurst Hill" line="A:19"     link="r,t" />
+    <station id="t" name="Brixton"        line="A:20"     link="s,u" />
+    <station id="u" name="Hoxton"         line="A:21"     link="t,v" />
+    <station id="v" name="Barbican"       line="A:22"     link="u,w" />
+    <station id="w" name="Barking"        line="A:23"     link="v"   />
+  </stations>
+</tube>

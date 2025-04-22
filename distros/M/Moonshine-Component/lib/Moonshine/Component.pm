@@ -12,7 +12,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 extends "UNIVERSAL::Object";
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 BEGIN {
 	my $fields = $Moonshine::Element::HAS{"attribute_list"}->();
@@ -144,7 +144,7 @@ Moonshine::Component - HTML Component base.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -215,7 +215,7 @@ LNATION, C<< <thisusedtobeanemail at gmail.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 LNATION.
+Copyright 2017->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

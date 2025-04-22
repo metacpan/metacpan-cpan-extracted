@@ -1428,3 +1428,25 @@ C<EXE_FILES: >
 
 =back
 
+=head2 Fri Apr 18 17:42:50 2025: C<Module> L<autodie|autodie>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dragos/projects/dbd_mock_dump_data/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.37>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

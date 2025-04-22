@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.3.1
+## Version v1.4.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2024/02/24
+## Modified 2025/04/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
     $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
-    our $VERSION = 'v1.3.1';
+    our $VERSION = 'v1.4.0';
 };
 
 BEGIN
@@ -328,26 +328,6 @@ sub _obj_eq
     return(0) ;
 }
 
-# NOTE: AUTOLOAD
-AUTOLOAD
-{
-    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    no overloading;
-    my $self = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $code;
-    if( $code = $self->can( $method ) )
-    {
-        return( $code->( @_ ) );
-    }
-    else
-    {
-        eval( "sub ${class}::${method} { return( shift->_set_get_scalar( '$method', \@_ ) ); }" );
-        die( $@ ) if( $@ );
-        return( $self->$method( @_ ) );
-    }
-};
-
 sub FREEZE
 {
     my $self = CORE::shift( @_ );
@@ -449,7 +429,7 @@ or, re-using an exception object:
 
 =head1 VERSION
 
-    v1.3.1
+    v1.4.0
 
 =head1 DESCRIPTION
 

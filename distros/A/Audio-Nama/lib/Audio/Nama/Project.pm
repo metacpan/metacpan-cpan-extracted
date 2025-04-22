@@ -106,7 +106,6 @@ sub initialize_project_data {
 	}
 
 	Audio::Nama::ChainSetup::initialize();
-	reset_hotkey_buffers();
 	reset_command_buffer();
 	$this_engine->reset_ecasound_selections_cache();
 

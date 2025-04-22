@@ -2,7 +2,7 @@ package Blessed::Merge;
 
 use 5.006;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use strict;
 use warnings;
 use Scalar::Util qw/reftype/;
@@ -107,7 +107,7 @@ Blessed::Merge - Merge Blessed Refs.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -238,14 +238,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Blessed-Merge>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Blessed-Merge>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Blessed-Merge>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Blessed-Merge/>
@@ -256,7 +248,7 @@ L<http://search.cpan.org/dist/Blessed-Merge/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017->2020 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

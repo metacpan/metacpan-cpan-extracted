@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.083-17-ga39ba29
+package OpenAPI::Modern; # git description: v0.084-14-g9a84772
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 use 5.020;
 use utf8;
@@ -173,8 +173,6 @@ sub validate_request ($self, $request, $options = {}) {
       if $request->body_size and not $request->headers->content_length
         and not $request->content->is_chunked;
 
-    $state->{data_path} = '/request/body';
-
     if (my $body_obj = $operation->{requestBody}) {
       $state->{schema_path} = $state->{schema_path}.'/requestBody';
 
@@ -183,6 +181,7 @@ sub validate_request ($self, $request, $options = {}) {
       }
 
       if ($request->body_size) {
+        $state->{data_path} = '/request/body';
         $self->_validate_body_content({ %$state, depth => $state->{depth}+1 }, $body_obj->{content}, $request);
       }
       elsif ($body_obj->{required}) {
@@ -190,6 +189,7 @@ sub validate_request ($self, $request, $options = {}) {
       }
     }
     else {
+      $state->{data_path} = '/request/body';
       # we presume that no body specification for GET and HEAD requests -> no body is expected
       ()= E($state, 'unspecified body is present in %s request', uc $method)
         if ($method eq 'get' or $method eq 'head')
@@ -317,6 +317,8 @@ sub validate_response ($self, $response, $options = {}) {
 }
 
 sub find_path ($self, $options, $state = {}) {
+  # there are many $state fields used by JSM that we do not set here because we do not use them for
+  # OpenAPI validation, such as document, document_path, vocabularies, spec_version, configs
   $state->{data_path} //= '';
   $state->{initial_schema_uri} = $self->openapi_uri;   # the canonical URI as of the start or last $id, or the last traversed $ref
   $state->{traversed_schema_path} = '';    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
@@ -328,10 +330,6 @@ sub find_path ($self, $options, $state = {}) {
   # now guaranteed to be a Mojo::Message::Request
   if ($options->{request}) {
     $options->{request} = _convert_request($options->{request});
-
-    $state->{effective_base_uri} = Mojo::URL->new
-      ->scheme($options->{request}->url->to_abs->scheme)
-      ->host($options->{request}->headers->host);
 
     # requests don't have response codes, so if 'error' is set, it is some sort of parsing error
     if (my $error = $options->{request}->error) {
@@ -414,7 +412,7 @@ sub find_path ($self, $options, $state = {}) {
     $options->{_path_item} = $self->openapi_document->get($path_item_path);
 
     # FIXME: this is not accurate if the operation lives in another document
-    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->to_abs($state->{effective_base_uri})->fragment($path_item_path.'/'.$method);
+    $options->{operation_uri} = $state->{initial_schema_uri}->clone->fragment($path_item_path.'/'.$method);
     return 1;
   }
 
@@ -474,7 +472,7 @@ sub find_path ($self, $options, $state = {}) {
     if not exists $path_item->{$method};
 
   # FIXME: this is not accurate if the operation lives in another document
-  $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->to_abs($state->{effective_base_uri})->fragment($path_item_path.'/'.$method);
+  $options->{operation_uri} = $state->{initial_schema_uri}->clone->fragment($path_item_path.'/'.$method);
   $options->{operation_id} = $path_item->{$method}{operationId} if exists $path_item->{$method}{operationId};
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
@@ -503,7 +501,7 @@ sub find_path ($self, $options, $state = {}) {
 
 # TODO: this should (also?) be available at JSON::Schema::Modern
 sub recursive_get ($self, $uri_reference, $entity_type = undef) {
-  my $base = $self->openapi_uri;
+  my $base = $self->openapi_document->canonical_uri;
   my $ref = $uri_reference;
   my ($depth, $schema);
 
@@ -556,7 +554,8 @@ sub _match_uri ($self, $uri, $path_template) {
 
 sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   # 'required' is always true for path parameters
-  return E({ %$state, keyword => 'required' }, 'missing path parameter: %s', $param_obj->{name})
+  return E({ %$state, data_path => $state->{data_path} =~ s{/$param_obj->{name}$}{}r, keyword => 'required' },
+      'missing path parameter: %s', $param_obj->{name})
     if not exists $path_captures->{$param_obj->{name}};
 
   my $value = $path_captures->{$param_obj->{name}};
@@ -581,7 +580,8 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   my $query_params = +{ $uri->query->pairs->@* };
 
   if (not exists $query_params->{$param_obj->{name}}) {
-    return E({ %$state, keyword => 'required' }, 'missing query parameter: %s', $param_obj->{name})
+    return E({ %$state, data_path => $state->{data_path} =~ s{/$param_obj->{name}$}{}r, keyword => 'required' },
+        'missing query parameter: %s', $param_obj->{name})
       if $param_obj->{required};
     return 1;
   }
@@ -620,7 +620,8 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   return 1 if grep fc $header_name eq fc $_, qw(Accept Content-Type Authorization);
 
   if (not $headers->every_header($header_name)->@*) {
-    return E({ %$state, keyword => 'required' }, 'missing header: %s', $header_name)
+    return E({ %$state, data_path => $state->{data_path} =~ s{/$header_name$}{}r,
+        keyword => 'required' }, 'missing header: %s', $header_name)
       if $header_obj->{required};
     return 1;
   }
@@ -685,7 +686,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   # strip charset from Content-Type
   my $content_type = (split(/;/, $message->headers->content_type//'', 2))[0] // '';
 
-  return E({ %$state, data_path => $state->{data_path} =~ s{body}{header/Content-Type}r, keyword => 'content' },
+  return E({ %$state, data_path => $state->{data_path} =~ s{body}{header}r, keyword => 'content' },
       'missing header: Content-Type')
     if not length $content_type;
 
@@ -824,17 +825,17 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
 
   return 1 if !keys(%$schema);  # schema is {}
 
-  my $canonical_uri = canonical_uri($state);
-  croak 'schema_path does not match canonical uri path fragment'
-    if substr($canonical_uri->fragment, -length($state->{schema_path})) ne $state->{schema_path};
+  # this is not necessarily the canonical uri of the location, but it is still a valid location
+  my $uri = $state->{initial_schema_uri}->clone;
+  $uri->fragment(($uri->fragment//'').$state->{schema_path});
 
   my $result = $self->evaluator->evaluate(
     $dataref->$*,
-    $canonical_uri,  # ensure the original document information is available to the evaluator
+    # reference by uri ensures all schema information is available to the evaluator, e.g. dialect
+    $uri,
     {
       data_path => $state->{data_path},
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
-      effective_base_uri => $state->{effective_base_uri},
       $state->{stringy_numbers} ? ( stringy_numbers => 1 ) : (),
     },
   );
@@ -940,12 +941,12 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.084
+version 0.085
 
 =head1 SYNOPSIS
 
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => '/api',
+    openapi_uri => 'https://production.example.com/api',
     openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
   openapi: 3.1.1
   info:
@@ -997,7 +998,7 @@ version 0.084
 
   say 'request:';
   my $request = POST '/foo/bar',
-    'My-Request-Header' => '123', 'Content-Type' => 'application/json', Host => 'example.com',
+    'My-Request-Header' => '123', 'Content-Type' => 'application/json', Host => 'dev.example.com',
     Content => '{"hello": 123}';
   my $results = $openapi->validate_request($request);
   say $results;
@@ -1023,13 +1024,13 @@ prints:
   {
     "errors" : [
       {
-        "absoluteKeywordLocation" : "https://example.com/api#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties/hello/type",
+        "absoluteKeywordLocation" : "https://production.example.com/api#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties/hello/type",
         "error" : "got integer, not string",
         "instanceLocation" : "/request/body/hello",
         "keywordLocation" : "/paths/~1foo~1{foo_id}/post/requestBody/content/application~1json/schema/properties/hello/type"
       },
       {
-        "absoluteKeywordLocation" : "https://example.com/api#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties",
+        "absoluteKeywordLocation" : "https://production.example.com/api#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties",
         "error" : "not all properties are valid",
         "instanceLocation" : "/request/body",
         "keywordLocation" : "/paths/~1foo~1{foo_id}/post/requestBody/content/application~1json/schema/properties"
@@ -1065,16 +1066,20 @@ object containing details.
 
 =head2 openapi_uri
 
-The URI that identifies the OpenAPI document.
+The URI that identifies the OpenAPI document; an alias to C<< ->openapi_document->canonical_uri >>.
+See L<JSON::Schema::Modern::Document::OpenAPI/canonical_uri>.
 Ignored if L</openapi_document> is provided.
 
-It is used at runtime as the base for absolute URIs used in L<JSON::Schema::Modern::Result> objects,
-along with the request's C<Host> header and scheme (e.g. C<https>), when available.
+It is used at runtime as the base for absolute URIs used in L<JSON::Schema::Modern::Result> objects.
+The value of C<$self> in the document (if present) is resolved against this value.
+It is strongly recommended that this URI is absolute.
 
 =head2 openapi_schema
 
 The data structure describing the OpenAPI v3.1 document (as specified at
-L<https://spec.openapis.org/oas/v3.1>). Ignored if L</openapi_document> is provided.
+L<https://spec.openapis.org/oas/v3.1>); an alias to C<< ->openapi_document->schema >>.
+See L<JSON::Schema::Modern::Document::OpenAPI/schema>.
+Ignored if L</openapi_document> is provided.
 
 =head2 openapi_document
 
@@ -1174,8 +1179,8 @@ corresponds to this response (as not all HTTP libraries link to the request in t
   $result = $self->find_path($options);
 
 Uses information in the request to determine the relevant parts of the OpenAPI specification.
-C<request> should be provided if available, but additional data can be used instead
-(which is populated by earlier L</validate_request> or L</find_path> calls to the same request).
+C<request> should be provided if available, but instead of or in addition to this,
+additional data can also be provided.
 
 The single argument is a hashref that contains information about the request. Possible values
 include:
@@ -1192,7 +1197,7 @@ C<path_template>: a string representing the request URI, with placeholders in br
 
 =item *
 
-C<operation_id>: a string corresponding to the L<operationId|https://learn.openapis.org/specification/paths.html#the-endpoints-list> at a particular path-template and HTTP location under C</paths>
+C<operation_id>: a string corresponding to the L<operationId|https://learn.openapis.org/specification/paths.html#the-endpoints-list> at a particular path-template and HTTP location under C</paths>. In the case of ambiguous matches (such as the possibility of more than one C<path_template> matching the request URI), providing this value will serve to unambiguously state which path-item and operation are intended, and is also more efficient as not all path-item entries need to be searched to find a match.
 
 =item *
 
@@ -1205,9 +1210,9 @@ C<method>: the HTTP method used by the request (used case-insensitively)
 =back
 
 All of these values are optional (unless C<request> is omitted), and will be derived from the
-request URI as needed (albeit less
+request as needed (albeit less
 efficiently than if they were provided). All passed-in values MUST be consistent with each other and
-the request URI.
+the request or the return value from this method is false.
 
 When successful, the options hash will be populated (or updated) with keys C<path_template>,
 C<path_captures>, C<method>, C<operation_id> and C<operation_uri> (see below), and the return value
@@ -1241,7 +1246,8 @@ the path templates under `/paths`.
 
 =head2 recursive_get
 
-Given a uri or uri-reference, get the definition at that location, following any C<$ref>s along the
+Given a uri or uri-reference (resolved against the main OpenAPI document's C<canonical_uri>),
+get the definition at that location, following any C<$ref>s along the
 way. Include the expected definition type
 (one of C<schema>, C<response>, C<parameter>, C<example>, C<request-body>, C<header>,
 C<security-scheme>, C<link>, C<callbacks>, or C<path-item>)

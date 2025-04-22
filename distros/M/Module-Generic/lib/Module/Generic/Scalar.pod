@@ -144,7 +144,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.3.4
+    v1.4.2
 
 =head1 DESCRIPTION
 
@@ -282,6 +282,30 @@ To remove a callback, pass C<undef>:
 By default, a scalar object is not tied to C<Module::Generic::Scalar::Tie> and no callback are set nor used. Be mindful when using callbacks since it will slow things down a little bit even though it is s very thin layer.
 
 See L<perltie> for more information on tieing data.
+
+=head3 THREAD SAFETY
+
+The C<callback> method installs internal hooks that are triggered on scalar value mutation (e.g., when a new value is assigned). These callbacks are enabled by tying the scalar to an internal package (not part of the public API).
+
+While this design is fully safe in single-threaded use, note the following if you are working in a multi-threaded environment:
+
+=over 4
+
+=item *
+
+Callbacks may be triggered by assignments to the scalar value — e.g., C<$$scalar = "new value">.
+
+=item *
+
+If the scalar object is accessed by multiple threads, and a callback mutates shared state, this may lead to race conditions unless external locking is applied.
+
+=item *
+
+It is recommended that each scalar object be thread-local, or that the callback logic be thread-safe.
+
+=back
+
+The internal tied object is not exposed, and should not be accessed directly.
 
 =head2 capitalise
 
@@ -681,6 +705,28 @@ See L<perlfunc/"substr"> for more information.
 Provided with a search list and a replacement list and this will perform just like the perl core L<perlfunc/tr> function.
 
 It also accepts options like C<cdsr> and returns the resulting value.
+
+=head3 THREAD SAFETY AND SECURITY WARNING
+
+The C<tr> method uses C<eval> to dynamically apply a transliteration pattern:
+
+    $$self =~ tr/$search/$replace/$opts/;
+
+This can be considered safe as long as the C<$search> and C<$replace> values come from a trusted source. However, if untrusted user input is passed to these arguments, it could result in a malformed or dangerous regular expression being compiled at runtime.
+
+To ensure safety:
+
+=over 4
+
+=item *
+
+Only use static or validated content in C<$search> and C<$replace>
+
+=item *
+
+Avoid using this method inside threads with shared objects unless the object is guarded externally
+
+=back
 
 =head2 trim
 

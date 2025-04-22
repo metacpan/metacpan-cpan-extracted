@@ -1,10 +1,10 @@
 use 5.014;
-#package Thread::Queue::Any::Monitored '1.04'; # not at PAUSE or MetaCPAN :-(
+#package Thread::Queue::Any::Monitored '1.05'; # not at PAUSE or MetaCPAN :-(
 package Thread::Queue::Any::Monitored;  # please remove if no longer needed
 
 # initializations
 our @ISA= qw( Thread::Queue::Any );
-our $VERSION= '1.04';                   # please remove if no longer needed
+our $VERSION= '1.05';                   # please remove if no longer needed
 
 # be as verbose as possible
 use warnings;
@@ -135,7 +135,7 @@ Thread::Queue::Any::Monitored - monitor a queue for any specific content
 
 =head1 VERSION
 
-This documentation describes version 1.04.
+This documentation describes version 1.05.
 
 =head1 DESCRIPTION
 
@@ -318,7 +318,7 @@ for a description of the options for using specific data serializers.
 
  Test::More (0.88)
  Thread::Queue::Any (1.13)
- Thread::Queue::Monitored (1.04)
+ Thread::Queue::Monitored (1.06)
 
 =head1 INSTALLATION
 

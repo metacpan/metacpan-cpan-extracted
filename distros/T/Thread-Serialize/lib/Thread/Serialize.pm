@@ -1,8 +1,8 @@
 use 5.014;
-#package Thread::Serialize '1.02'; # not supported by PAUSE or MetaCPAN :-(
+#package Thread::Serialize '1.03'; # not supported by PAUSE or MetaCPAN :-(
 package Thread::Serialize;         # please remove if no longer needed
 
-our $VERSION= '1.02';              # please remove if no longer needed
+our $VERSION= '1.03';              # please remove if no longer needed
 
 # be as verbose as possble
 use warnings;;
@@ -118,7 +118,7 @@ Thread::Serialize - serialize data-structures between threads
 
 =head1 VERSION
 
-This documentation describes version 1.02.
+This documentation describes version 1.03.
 
 =head1 DESCRIPTION
 
@@ -230,11 +230,14 @@ variable C<$Thread::Serialize::no_external_perl> (see L<OPTIMIZATIONS>).
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION, <email@lnation.org>
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
 Copyright (c) 2002, 2003, 2004, 2010, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
+2025 LNATION <email@lnation.org>
 All rights reserved.  This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 

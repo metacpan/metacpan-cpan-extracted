@@ -11,12 +11,12 @@ build_requires:
   Music::Chord::Note: '0.10'
   Test::Exception: '0'
   Test::More: '0.88'
-  perl: '5.006'
+  perl: '5.024'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.024'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -39,12 +39,12 @@ requires:
   Try::Tiny: '0'
   constant: '0'
   namespace::clean: '0'
-  perl: '5.006'
+  perl: '5.024'
   strictures: '2'
 resources:
   homepage: https://github.com/ology/MIDI-Bassline-Walk
   repository: https://github.com/ology/MIDI-Bassline-Walk.git
-version: '0.0608'
+version: '0.0609'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

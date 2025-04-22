@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package IO::Async::Protocol::LineStream 0.803;
+package IO::Async::Protocol::LineStream 0.804;
 
 use v5.14;
 use warnings;

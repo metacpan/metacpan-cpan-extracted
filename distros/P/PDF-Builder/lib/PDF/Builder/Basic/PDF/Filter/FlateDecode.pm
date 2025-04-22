@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Filter';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 use POSIX qw(ceil floor);
 
@@ -14,7 +14,9 @@ our $havezlib;
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::Filter::FlateDecode - compress and uncompress stream filters for Flate
+PDF::Builder::Basic::PDF::Filter::FlateDecode - Compress and uncompress stream filters for Flate
+
+Inherits from L<PDF::Builder::Basic::PDF::Filter>
 
 =cut
 

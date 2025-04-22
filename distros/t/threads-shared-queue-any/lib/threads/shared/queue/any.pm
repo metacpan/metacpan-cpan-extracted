@@ -5,7 +5,7 @@ package threads::shared::queue::any;
 # Make sure we do everything by the book from now on
 
 @ISA = qw(threads::shared::queue);
-$VERSION = '0.02';
+$VERSION = '0.03';
 use strict;
 
 # Make sure we have Storable

@@ -10,7 +10,7 @@ How to contribute to C<GDPR-IAB-TCFv2>?
 Patches are welcome!
 
 They must be built against the
-C<L<main|https://github.com/peczenyj/GDPR-IAB-TCFv2/tree/main>> branch,
+C<L<devel|https://github.com/peczenyj/GDPR-IAB-TCFv2/tree/devel>> branch,
 then submitted as pull requests at GitHub.
 
 The documentation is written using the

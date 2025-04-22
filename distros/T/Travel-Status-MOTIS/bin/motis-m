@@ -1,0 +1,554 @@
+#!perl
+use strict;
+use warnings;
+use 5.020;
+
+our $VERSION = '0.01';
+
+use utf8;
+use DateTime;
+use Encode qw(decode);
+use JSON;
+use Getopt::Long qw(:config no_ignore_case);
+use List::Util   qw(min max);
+
+use Travel::Status::MOTIS;
+
+use Data::Dumper;
+
+my ( $date, $time );
+my $modes_of_transit;
+my $developer_mode;
+my $show_trip_ids;
+my $use_cache = 1;
+my $cache;
+my ( $list_services, $service );
+my ( $json_output, $raw_json_output, $with_polyline );
+
+my %known_mode_of_transit
+  = map { $_ => 1 }
+  (
+	qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+  );
+
+binmode( STDOUT, ':encoding(utf-8)' );
+for my $arg (@ARGV) {
+	$arg = decode( 'UTF-8', $arg );
+}
+
+my $output_bold  = -t STDOUT ? "\033[1m" : q{};
+my $output_reset = -t STDOUT ? "\033[0m" : q{};
+
+my $cf_first  = "\e[38;5;11m";
+my $cf_mixed  = "\e[38;5;208m";
+my $cf_second = "\e[0m";          #"\e[38;5;9m";
+my $cf_reset  = "\e[0m";
+
+GetOptions(
+	'd|date=s'             => \$date,
+	'h|help'               => sub { show_help(0) },
+	'i|show-trip-ids'      => \$show_trip_ids,
+	'm|modes-of-transit=s' => \$modes_of_transit,
+	't|time=s'             => \$time,
+	's|service=s'          => \$service,
+	'V|version'            => \&show_version,
+	'cache!'               => \$use_cache,
+	'devmode'              => \$developer_mode,
+	'json'                 => \$json_output,
+	'raw-json'             => \$raw_json_output,
+	'list'                 => \$list_services,
+) or show_help(1);
+
+if ($list_services) {
+	printf(
+		"%-40s  %-14s %-15s\n\n",
+		'operator', 'abbr. (-s)', 'languages (-l)',
+	);
+
+	for my $service ( Travel::Status::MOTIS::get_services() ) {
+		printf(
+			"%-40s  %-14s %-15s\n",
+			$service->{name}, $service->{shortname},
+			join( q{ }, @{ $service->{languages} // [] } ),
+		);
+	}
+
+	exit 0;
+}
+
+$service //= 'transitous';
+
+if ($use_cache) {
+	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
+	  . '/Travel-Status-MOTIS';
+
+	eval {
+		require Cache::File;
+
+		$cache = Cache::File->new(
+			cache_root      => $cache_path,
+			default_expires => '90 seconds',
+			lock_level      => Cache::File::LOCK_LOCAL(),
+		);
+	};
+
+	if ($@) {
+		$cache = undef;
+	}
+}
+
+my ($input) = @ARGV;
+
+if ( not $input ) {
+	show_help(1);
+}
+
+my %opt = (
+	cache          => $cache,
+	service        => $service,
+	developer_mode => $developer_mode,
+);
+
+if ( $input =~ m{ ^ (?<lat> [0-9.]+ ) : (?<lon> [0-9].+ ) $ }x ) {
+	$opt{stops_by_coordinate} = {
+		lat => $+{lat},
+		lon => $+{lon},
+	};
+}
+
+# Format: yyyymmdd_hh:mm_feed_id
+elsif ( $input =~ m{^[0-9]{8}_[0-9]{2}:[0-9]{2}_} ) {
+	$opt{trip_id} = $input;
+}
+
+# Format: feed_id
+elsif ( $input =~ m{_} ) {
+	$opt{stop_id} = $input;
+}
+else {
+	$opt{stops_by_query} = $input;
+
+	my $status = Travel::Status::MOTIS->new(%opt);
+	if ( my $err = $status->errstr ) {
+		say STDERR
+		  "Request error while looking up '$opt{stops_by_query}': ${err}";
+		exit 2;
+	}
+
+	my $found;
+	for my $result ( $status->results ) {
+		if ( defined $result->id ) {
+			if ( lc( $result->name ) ne lc( $opt{stops_by_query} ) ) {
+				say $result->name;
+			}
+
+			$opt{stop_id} = $result->id;
+			$found = 1;
+			last;
+		}
+	}
+
+	if ( not $found ) {
+		say "Could not find stop '$opt{stops_by_query}'";
+		exit 1;
+	}
+}
+
+if ( $date or $time ) {
+	my $timestamp = DateTime->now( time_zone => 'local' );
+
+	if ($date) {
+		if ( $date
+			=~ m{ ^ (?<day> \d{1,2} ) [.] (?<month> \d{1,2} ) [.] (?<year> \d{4})? $ }x
+		  )
+		{
+			$timestamp->set(
+				day   => $+{day},
+				month => $+{month}
+			);
+			if ( $+{year} ) {
+				$timestamp->set( year => $+{year} );
+			}
+		}
+		else {
+			say '--date must be specified as DD.MM.[YYYY]';
+			exit 1;
+		}
+	}
+
+	if ($time) {
+		if ( $time =~ m{ ^ (?<hour> \d{1,2} ) : (?<minute> \d{1,2} ) $ }x ) {
+			$timestamp->set(
+				hour   => $+{hour},
+				minute => $+{minute},
+				second => 0,
+			);
+		}
+		else {
+			say '--time must be specified as HH:MM';
+			exit 1;
+		}
+	}
+
+	$opt{timestamp} = $timestamp;
+}
+
+if ( $modes_of_transit and $modes_of_transit eq 'help' ) {
+	say "Supported modes of transmit (-m / --modes-of-transit):";
+	for my $mot (
+		qw(TRANSIT TRAM SUBWAY FERRY AIRPLANE BUS COACH RAIL METRO HIGHSPEED_RAIL LONG_DISTANCE NIGHT_RAIL REGIONAL_FAST_RAIL REGIONAL_RAIL)
+	  )
+	{
+		say $mot;
+	}
+
+	exit 0;
+}
+
+if ($modes_of_transit) {
+
+	# Passing unknown MOTs to the backend results in HTTP 422 Unprocessable Entity
+	my @mots = split( qr{, *}, $modes_of_transit );
+
+	my $found_unknown;
+	for my $mot (@mots) {
+		if ( not $known_mode_of_transit{$mot} ) {
+			$found_unknown = 1;
+			say STDERR
+			  "-m / --modes-of-transit: unknown mode of transit '$mot'";
+		}
+	}
+
+	if ($found_unknown) {
+		say STDERR 'supported modes of transit are: '
+		  . join( q{, }, sort keys %known_mode_of_transit );
+		exit 1;
+	}
+
+	$opt{modes_of_transit} = [ grep { $known_mode_of_transit{$_} } @mots ];
+}
+
+sub show_help {
+	my ($code) = @_;
+
+	print
+	  "Usage: motis [-d dd.mm.yyy] [-t hh:mm] [-i] <stopId|tripId|lat:lon>\n"
+	  . "See also: man motis\n";
+
+	exit $code;
+}
+
+sub show_version {
+	say "motis version ${VERSION}";
+
+	exit 0;
+}
+
+sub spacer {
+	my ($len) = @_;
+	return ( $len % 2 ? q { } : q{} ) . ( q{ ·} x ( $len / 2 ) );
+}
+
+sub format_delay {
+	my ( $delay, $len ) = @_;
+	if ( $delay and $len ) {
+		return sprintf( "(%+${len}d)", $delay );
+	}
+	return q{};
+}
+
+my $status = Travel::Status::MOTIS->new(%opt);
+
+if ( my $err = $status->errstr ) {
+	say STDERR "Request error: ${err}";
+	exit 2;
+}
+
+if ($raw_json_output) {
+	say JSON->new->convert_blessed->encode( $status->{raw_json} );
+	exit 0;
+}
+
+if ($json_output) {
+	if ( $opt{journey} ) {
+		say JSON->new->convert_blessed->encode( $status->result );
+	}
+	else {
+		say JSON->new->convert_blessed->encode( [ $status->results ] );
+	}
+
+	exit 0;
+}
+
+if ( $opt{stop_id} ) {
+	my $max_route_name = max map { length( $_->route_name ) } $status->results;
+	my $max_headsign
+	  = max map { length( $_->headsign // q{} ) } $status->results;
+	my $max_delay = max map { length( $_->stopover->departure_delay // q{} ) }
+	  $status->results;
+	my $max_track = max map {
+		length( $_->stopover->track // $_->stopover->scheduled_track // q{} )
+	} $status->results;
+
+	$max_delay += 1;
+
+	my @results = map { $_->[1] }
+	  sort { $a->[0] <=> $b->[0] }
+	  map {
+		[ ( $_->stopover->departure // $_->stopover->arrival )->epoch, $_ ]
+	  } $status->results;
+
+	printf( "%s\n\n", $results[0]->stopover->stop->name );
+
+	for my $result (@results) {
+		printf(
+			"%s  %s  %${max_route_name}s  %${max_headsign}s  %${max_track}s\n",
+			$result->is_cancelled ? '--:--'
+			: $result->stopover->departure->strftime('%H:%M'),
+			$result->stopover->departure_delay ? sprintf(
+				"(%+${max_delay}d)", $result->stopover->departure_delay
+			  )
+			: q{ } x ( $max_delay + 2 ),
+			$result->route_name,
+			$result->headsign // q{???},
+			$result->stopover->track // q{}
+		);
+
+		if ($show_trip_ids) {
+			say $result->id;
+		}
+	}
+}
+elsif ( $opt{trip_id} ) {
+	my $trip = $status->result;
+
+	my $max_name  = max map { length( $_->stop->name ) } $trip->stopovers;
+	my $max_track = max map { length( $_->track // q{} ) } $trip->stopovers;
+	my $max_delay
+	  = max map { $_->delay ? length( $_->delay ) + 3 : 0 } $trip->stopovers;
+
+	my $mark_stop = 0;
+	my $now       = DateTime->now;
+
+	for my $i ( reverse 1 .. ( scalar $trip->stopovers // 0 ) ) {
+		my $stop = ( $trip->stopovers )[ $i - 1 ];
+
+		if (
+			not $stop->is_cancelled
+			and (  $stop->departure and $now <= $stop->departure
+				or $stop->arrival and $now <= $stop->arrival )
+		  )
+		{
+			$mark_stop = $stop;
+		}
+	}
+
+	printf( "%s am %s\n\n",
+		$trip->route_name, $trip->scheduled_arrival->strftime('%d.%m.%Y') );
+
+	for my $stop ( $trip->stopovers ) {
+		if ( $stop == $mark_stop ) {
+			print($output_bold);
+		}
+
+		if ( $stop->is_cancelled ) {
+			print('    --:--    ');
+		}
+		elsif ( $stop->arrival and $stop->departure ) {
+			printf( '%s → %s',
+				$stop->arrival->strftime('%H:%M'),
+				$stop->departure->strftime('%H:%M'),
+			);
+		}
+		elsif ( $stop->departure ) {
+			printf( '        %s', $stop->departure->strftime('%H:%M') );
+		}
+		elsif ( $stop->arrival ) {
+			printf( '%s        ', $stop->arrival->strftime('%H:%M') );
+		}
+		else {
+			print('             ');
+		}
+
+		printf( " %${max_delay}s",
+			format_delay( $stop->delay, $max_delay - 3 ) );
+		printf( "  %-${max_name}s  %${max_track}s\n",
+			$stop->stop->name, $stop->track // q{} );
+
+		if ( $stop == $mark_stop ) {
+			print($output_reset);
+		}
+	}
+}
+elsif ( $opt{stops_by_coordinate} ) {
+	for my $result ( $status->results ) {
+		if ( defined $result->id ) {
+			printf( "%8d  %s\n", $result->id, $result->name );
+		}
+	}
+}
+elsif ( $opt{stops_by_query} ) {
+	for my $result ( $status->results ) {
+		if ( defined $result->id ) {
+			printf( "%8d  %s\n", $result->id, $result->name );
+		}
+	}
+}
+
+__END__
+
+=head1 NAME
+
+motis-m - Interface to MOTIS public transit services
+
+=head1 SYNOPSIS
+
+B<motis-m> [B<-s> I<service>] [B<-d> I<DD.MM.>] [B<-t> I<HH:MM>] [B<-i>] [I<opt>] I<station>
+
+B<motis-m> [B<-s> I<service>] [I<opt>] I<station>
+
+B<motis-m> [B<-s> I<service>] I<trip_id>
+
+B<motis-m> [B<-s> I<service>] B<?>I<query>|I<lat>B<:>I<lon>
+
+=head1 VERSION
+
+version 0.01
+
+=head1 DESCRIPTION
+
+B<motis-m> is an interface to MOTIS routing services. It can serve as an
+arrival/departure board, request details about a specific trip, and
+look up public transport stops by name or geolocation. The operating
+mode depends on the contents of its non-option argument.
+
+=head2 Departure Board (I<stop>)
+
+Show departures at I<stop>. I<stop> may be given as a stop name or
+stop id. For each departure, B<motis-m> shows
+
+=over
+
+=item * estimated departure time,
+
+=item * delay, if known,
+
+=item * trip route name,
+
+=item * headsign / destination if known, and
+
+=item * track, if known.
+
+=back
+
+=head2 Trip details (I<trip_id>)
+
+List intermediate stops of I<trip_id> (as given by the departure board when
+invoked with B<-i> / B<--show-trip-ids>) with arrival/departure time, delay (if
+available), track (if available), and stop name. Also includes some generic
+trip information.
+
+=head2 Stop Search (B<?>I<query>|I<lat>B<:>I<lon>)
+
+List stop that match I<query> or that are located in the vicinity of
+I<lat>B<:>I<lon> geocoordinates with stop id and name.
+
+=head1 OPTIONS
+
+Values in brackets indicate options that only apply to the corresponding
+operating mode(s).
+
+=over
+
+=item B<-d>, B<--date> I<DD.MM.[YYYY]> (departure board)
+
+Request departures on the specified date.
+Default: today.
+
+=item B<-t>, B<--time> I<HH:MM> (departure board)
+
+Request departures on the specified time.
+Default: now.
+
+=item B<-i>, B<--show-trip-ids> (departure board)
+
+Show trip id for each listed arrival/departure.
+These can be used to obtain details on individual trips with subsequent
+B<motis-m> invocations.
+
+=item B<-m>, B<--modes-of-transit> I<mot1>[,I<mot2>,...] (departure board)
+
+Only return results for the specified modes of transit.
+Use C<<-m help>> to get a list of supported modes of transit.
+
+=item B<--json>
+
+Print result(s) as JSON and exit. This is a dump of internal data structures
+and not guaranteed to remain stable between minor versions. Please use the
+Travel::Status::MOTIS(3pm) module if you need a proper API.
+
+=item B<--no-cache>
+
+By default, if the Cache::File module is available, server replies are cached
+for 90 seconds in F<~/.cache/Travel-Status-MOTIS> (or a path relative to
+C<$XDG_CACHE_HOME>, if set). Use this option to disable caching. You can use
+B<--cache> to re-enable it.
+
+=item B<--raw-json>
+
+Print unprocessed API response as JSON and exit.
+Useful for debugging and development purposes.
+
+=item B<-t>, B<--date> I<HH:MM> (departure board)
+
+Request departures on or after the specified time.
+Default: now.
+
+=item B<-V>, B<--version>
+
+Show version information and exit.
+
+=back
+
+=head1 EXIT STATUS
+
+0 upon success, 1 upon internal error, 2 upon backend error.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * Class::Accessor(3pm)
+
+=item * DateTime(3pm)
+
+=item * LWP::UserAgent(3pm)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=over
+
+Currently, this script is mainly intended as a debugging aid for the
+Travel::Status::MOTIS(3pm) module, which is in turn designed for use in
+travelynx (L<https://finalrewind.org/projects/travelynx/>). It may not
+provide functionality needed for use as a proper CLI public transit client.
+
+=back
+
+=head1 AUTHOR
+
+Copyright (C) 2025 networkException E<lt>git@nwex.deE<gt>
+
+Copyright (C) 2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+
+Based on Travel::Status::DE::DBRIS, which is (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This program is licensed under the same terms as Perl itself.

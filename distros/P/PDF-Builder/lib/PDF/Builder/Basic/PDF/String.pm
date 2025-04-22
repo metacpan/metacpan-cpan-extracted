@@ -20,13 +20,16 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.026'; # VERSION
-our $LAST_UPDATE = '3.026'; # manually update whenever code is changed
+our $VERSION = '3.027'; # VERSION
+our $LAST_UPDATE = '3.027'; # manually update whenever code is changed
 
 =head1 NAME
 
-PDF::Builder::Basic::PDF::String - PDF String type objects and superclass
-for simple objects that are basically stringlike (Number, Name, etc.)
+PDF::Builder::Basic::PDF::String - PDF String type objects
+
+Superclass for simple objects that are basically stringlike (Number, Name, etc.)
+
+Inherits from L<PDF::Builder::Basic::PDF::Objind>
 
 =head1 METHODS
 

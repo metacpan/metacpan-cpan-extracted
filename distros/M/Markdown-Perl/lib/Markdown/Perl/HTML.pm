@@ -9,7 +9,8 @@ use Carp 'cluck';
 use English;
 use Exporter 'import';
 
-our @EXPORT_OK = qw(decode_entities html_escape http_escape remove_disallowed_tags);
+our @EXPORT_OK = qw(decode_entities html_escape http_escape remove_disallowed_tags
+    parse_attributes);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 our $VERSION = 0.01;
@@ -98,6 +99,35 @@ sub remove_disallowed_tags {
     $_[0] =~ s/<(\Q$t\E)/&lt;$1/gi;
   }
   return;
+}
+
+# This parses the attributes of the directive syntax. E.g. it receives the
+# attribute part in the :name[content]{attributes} syntax, where each part can
+# be missing.
+sub parse_attributes {
+  my ($attributes) = @_;
+  my %out;
+  my $id_re = qr/(?: \# (?<id> \w+ ))/x;
+  my $class_re = qr/(?: \. (?<class> \w+ ))/x;
+  my $key_value_re = qr/(?: (?<key> \w+ ) \s* = \s* (?<value> \w+ ))/x;
+  pos($attributes) = 0;  # so that it’s set even if we don’t match once to avoid a warning later.
+  while ($attributes =~ m/\G\s* (?: ${id_re} | ${class_re} | ${key_value_re} ) /gcx) {
+    if (defined ($+{id}) && !exists($out{id})) {
+      $out{id} = $+{id};
+    } elsif (defined ($+{class})) {
+      push(@{$out{class}}, $+{class});
+    } elsif (defined ($+{key})) {
+      push(@{$out{keys}}, [$+{key}, $+{value}]);
+    } else {
+      pos($attributes) = $LAST_MATCH_START[0];
+      last;
+    }
+  }
+  if ($attributes !~ m/\G \s* $/x) {
+    $out{junk} = substr($attributes, pos($attributes));
+  }
+
+  return %out;
 }
 
 1;

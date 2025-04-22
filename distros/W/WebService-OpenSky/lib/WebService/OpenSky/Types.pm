@@ -14,7 +14,7 @@ use Type::Library
   );
 
 use Type::Utils -all;
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 BEGIN {
     extends qw(
@@ -46,7 +46,7 @@ WebService::OpenSky::Types - Type library for WebService::OpenSky
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 DESCRIPTION
 

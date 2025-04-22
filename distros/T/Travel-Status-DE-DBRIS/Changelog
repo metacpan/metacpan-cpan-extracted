@@ -1,3 +1,7 @@
+Travel::Status::DE::DBRIS 0.10 - Sat Apr 19 2025
+
+    * Journey: Add train_no, line_no accessors
+
 Travel::Status::DE::DBRIS 0.09 - Sat Apr 05 2025
 
     * dbris-m: Handle departures with undefined destination

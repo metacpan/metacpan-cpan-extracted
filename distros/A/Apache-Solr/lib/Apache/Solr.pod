@@ -36,6 +36,12 @@ Apache::Solr - Apache Solr (Lucene) extension
   dispatcher SYSLOG => 'default';  # now all warnings/error to syslog
   try { $solr->select(...) }; print $@->wasFatal;
 
+  # [1.10] Information about communication errors 
+  try { $solr->...(...) };
+  if(my $ex = $@->wasFatal)
+  {  if(my $http = $ex->message->valueOf('http_response'))
+     {   warn $http->decoded_content;
+
 =head1 DESCRIPTION
 
 Solr is a stand-alone full-text search-engine (based on Lucent), with
@@ -125,6 +131,10 @@ instantiated as such.
 By default the latest version of the server software, currently 4.5.
 Try to get this setting right, because it will help you a lot in correct
 parameter use and support for the right features.
+
+We know now that this can be requested via C</admin/info/system>, but
+do not spend more development time on this module until it gets more
+users.
 
 =back
 
@@ -385,7 +395,7 @@ example:
 
 =head3 Core management
 
-See F<http://lucidworks.lucidimagination.com/display/solr/Configuring+solr.xml>
+See F<https://solr.apache.org/guide/6_6/coreadmin-api.html>
 The CREATE, SWAP, ALIAS, and RENAME actions are not yet supported, because
 they are not very useful, it seems.
 
@@ -632,12 +642,12 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.09,
-built on December 06, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.10,
+built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2012-2022 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2012-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

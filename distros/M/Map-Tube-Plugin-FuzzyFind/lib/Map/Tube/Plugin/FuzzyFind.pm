@@ -2,7 +2,7 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2015, 2024 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2015, 2025 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,7 +15,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.81.1');
+our $VERSION = version->declare('v0.81.2');
 
 =head1 NAME
 
@@ -160,7 +160,7 @@ may be preferable for Slavic and Yiddish names.
 =item 'koeln'
 
 All names matching according to the Koeln phonetic encoding
-(see L<Text::Phonetic::DaitchMotokoff>) will be returned. This alternative to soundex
+(see L<Text::Phonetic::Koeln>) will be returned. This alternative to soundex
 may work better for German names, as well as for longer names.
 
 =item 'metaphone'
@@ -366,7 +366,7 @@ sub fuzzy_find {    ## no critic(Subroutines::ProhibitExcessComplexity)
         $args{maxdist} = 0.5;    # so that exactly the matches will be retained in the map - sort - grep.
       } elsif ( $nmethod == 6 ) {
 
-		# Phonix, (claiming to be) "an improved Soundex". This variant keeps the first lettern (like original Soundex).
+		# Phonix, (claiming to be) "an improved Soundex". This variant keeps the first letter (like original Soundex).
 		$module = 'Text::Phonetic::Phonix';
         $loaded = eval qq{ require $module; 1 };
         croak unless $loaded;
@@ -593,7 +593,7 @@ L<http://search.cpan.org/dist/Map-Tube-Plugin-FuzzyFind/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015, 2024 Gisbert W. Selke, Tapirsoft Selke & Selke GbR
+Copyright (C) 2015, 2025 Gisbert W. Selke, Tapirsoft Selke & Selke GbR
 
 This  program  is  free software; you can redistribute it and/or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a copy of the full

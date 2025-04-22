@@ -9,7 +9,7 @@ DBIx::Squirrel - The little Perl DBI extension that makes working with databases
 
 =head1 VERSION
 
-Version 1.6.4
+Version 1.6.5
 
 =head1 SYNOPSIS
 

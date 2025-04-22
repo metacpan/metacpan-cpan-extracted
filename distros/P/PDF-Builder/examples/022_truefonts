@@ -18,6 +18,7 @@ use Getopt::Long;
 my $compress = 'none'; # uncompressed streams
 #my $compress = 'flate'; # compressed streams
 my $noembed = 0;  # 0 = allow embedding, 1 = don't allow
+my $fontsize = 18;  # for Lorem Ipsum text
 
 my $sx = 33;
 my $sy = 45;
@@ -66,7 +67,6 @@ foreach my $fn (@ARGV) {
         $page->mediabox(595,842); # A4
 
         my $gfx = $page->gfx();
-
         my $txt = $page->text();
         $txt->font($font, $fx);
 
@@ -249,12 +249,13 @@ foreach my $fn (@ARGV) {
     $tx = $page->text();
     $tx->transform(-translate => [50, 800]);
     $tx->fillcolor('black');
-    $tx->font($font, 18);
-    $tx->leading(18*1.25);
+    $tx->font($font, $fontsize);
+    $tx->leading($fontsize*1.25);
     my $toprint;
+    # split line on whole words, left aligned (ragged right)
     while ($textL ne '') {
     	($toprint, $textL) = $tx->_text_fill_line($textL, 500, 0);
-    	$tx->text($toprint);
+    	$tx->text($toprint); # default left align, no indent
     	$tx->nl();
     }
     

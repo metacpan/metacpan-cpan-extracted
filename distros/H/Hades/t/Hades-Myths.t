@@ -22,17 +22,17 @@ subtest 'import' => sub {
 		q{my $obj = Hades::Myths->new({})}
 	);
 	can_ok( $obj, 'import' );
-	eval { $obj->import( [], 'geras' ) };
+	eval { $obj->import( [], 'phobos' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->import([], 'geras')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->import([], 'phobos')}
 	);
-	eval { $obj->import( 'gaudia', 'geras' ) };
+	eval { $obj->import( 'curae', 'phobos' ) };
 	like(
 		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->import('gaudia', 'geras')}
+		qr/invalid|value|type|constraint|greater|atleast/i,
+		q{$obj->import('curae', 'phobos')}
 	);
 };
 subtest 'new_object' => sub {

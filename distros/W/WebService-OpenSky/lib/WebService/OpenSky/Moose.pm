@@ -4,7 +4,7 @@ package WebService::OpenSky::Moose;
 
 use MooseX::Extended::Custom;
 use PerlX::Maybe 'provided';
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 # If $^P is true, we're running under the debugger.
 #
@@ -32,7 +32,7 @@ WebService::OpenSky::Moose - MooseX::Extended::Custom for WebService::OpenSky
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 DESCRIPTION
 

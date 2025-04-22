@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 
@@ -20,7 +20,7 @@ Number::Equation::XS - Track how a number is calculated progamically.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -78,19 +78,13 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-Equation-XS>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Number-Equation-XS>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Number-Equation-XS>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
