@@ -14,67 +14,77 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Suse;
-$Sys::OsPackage::Driver::Suse::VERSION = '0.3.1';
-use base "Sys::OsPackage::Driver";
+$Sys::OsPackage::Driver::Suse::VERSION = '0.4.0';
+use parent "Sys::OsPackage::Driver";
 
 # check if packager command found (zypper)
 sub pkgcmd
 {
-    my ($class, $ospkg) = @_;
+    my ( $class, $ospkg ) = @_;
 
-    return (defined $ospkg->sysenv("zypper") ? 1 : 0);
+    return ( defined $ospkg->sysenv("zypper") ? 1 : 0 );
 }
 
 # find name of package for Perl module (zypper)
 sub modpkg
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     #return join("-", "perl", @{$args_ref->{mod_parts}}); # zypper/rpm format for Perl module packages
     my @querycmd = $ospkg->sysenv("zypper");
-    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), @querycmd,
+    my @pkglist  = sort $ospkg->capture_cmd(
+        { list => 1 },
+        $ospkg->sudo_cmd(), @querycmd,
         qw(--non-interactive --quiet --terse search --provides --type=package --match-exact),
-        "'perl(".$args_ref->{module}.")'");
+        "'perl(" . $args_ref->{module} . ")'"
+    );
     $ospkg->debug()
-        and print STDERR "debug(".__PACKAGE__."->modpkg): ".$args_ref->{module}." -> ".join(" ", @pkglist)."\n";
-    return if not scalar @pkglist; # empty list means nothing found
-    splice @pkglist, 0, 3; # remove table header in 3 leading lines
-    my $pkg_found = $pkglist[-1]; # get last entry from table
-    $pkg_found =~ s/^[^\|]*\|\s*//x; # remove 1st column
-    $pkg_found =~ s/\s*\|.*$//x; # remove 3rd & following columns
+        and print STDERR "debug("
+        . __PACKAGE__
+        . "->modpkg): "
+        . $args_ref->{module} . " -> "
+        . join( " ", @pkglist ) . "\n";
+    return if not scalar @pkglist;      # empty list means nothing found
+    splice @pkglist, 0, 3;              # remove table header in 3 leading lines
+    my $pkg_found = $pkglist[-1];       # get last entry from table
+    $pkg_found =~ s/^[^\|]*\|\s*//x;    # remove 1st column
+    $pkg_found =~ s/\s*\|.*$//x;        # remove 3rd & following columns
     return $pkg_found;
 }
 
 # find named package in repository (zypper)
 sub find
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     my @querycmd = $ospkg->sysenv("zypper");
-    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), @querycmd,
+    my @pkglist  = sort $ospkg->capture_cmd(
+        { list => 1 },
+        $ospkg->sudo_cmd(), @querycmd,
         qw(--non-interactive --quiet --terse search --provides --type=package --match-exact),
-        $args_ref->{pkg});
-    return if not scalar @pkglist; # empty list means nothing found
-    splice @pkglist, 0, 3; # remove table header in 3 leading lines
-    my $pkg_found = $pkglist[-1]; # get last entry from table
-    $pkg_found =~ s/^[^\|]*\|\s*//x; # remove 1st column
-    $pkg_found =~ s/\s*\|.*$//x; # remove 3rd & following columns
+        $args_ref->{pkg}
+    );
+    return if not scalar @pkglist;      # empty list means nothing found
+    splice @pkglist, 0, 3;              # remove table header in 3 leading lines
+    my $pkg_found = $pkglist[-1];       # get last entry from table
+    $pkg_found =~ s/^[^\|]*\|\s*//x;    # remove 1st column
+    $pkg_found =~ s/\s*\|.*$//x;        # remove 3rd & following columns
     return $pkg_found;
 }
 
 # install package (zypper)
 sub install
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     # determine packages to install
     my @packages;
-    if (exists $args_ref->{pkg}) {
-        if (ref $args_ref->{pkg} eq "ARRAY") {
-            push @packages, @{$args_ref->{pkg}};
+    if ( exists $args_ref->{pkg} ) {
+        if ( ref $args_ref->{pkg} eq "ARRAY" ) {
+            push @packages, @{ $args_ref->{pkg} };
         } else {
             push @packages, $args_ref->{pkg};
         }
@@ -82,19 +92,19 @@ sub install
 
     # install the packages
     my $pkgcmd = $ospkg->sysenv("zypper");
-    return $ospkg->run_cmd($ospkg->sudo_cmd(), $pkgcmd, qw(--non-interactive --quiet --terse install), @packages);
+    return $ospkg->run_cmd( $ospkg->sudo_cmd(), $pkgcmd, qw(--non-interactive --quiet --terse install), @packages );
 }
 
 # check if an OS package is installed locally
 sub is_installed
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     # check if package is installed
     my $querycmd = $ospkg->sysenv("rpm");
-    my @pkglist = $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), $querycmd, qw(--query), $args_ref->{pkg});
-    return (scalar @pkglist > 0) ? 1 : 0;
+    my @pkglist  = $ospkg->capture_cmd( { list => 1 }, $ospkg->sudo_cmd(), $querycmd, qw(--query), $args_ref->{pkg} );
+    return ( scalar @pkglist > 0 ) ? 1 : 0;
 }
 
 1;
@@ -109,7 +119,7 @@ Sys::OsPackage::Driver::Suse - SUSE/OpenSUSE Zypper packaging handler for Sys::O
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

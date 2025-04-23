@@ -1,5 +1,8 @@
 Revision history for Win32::LongPath
 
+2.3 April 22, 2025
+	- (xworld21) fixed append write-only error in tests
+
 2.2 January 21, 2022
 	- (ChrisTaylor123) added file attribute constants
 

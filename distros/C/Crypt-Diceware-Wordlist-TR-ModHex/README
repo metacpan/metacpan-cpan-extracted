@@ -1,0 +1,29 @@
+Crypt::Diceware::Wordlist::TR::ModHex is Copyright (C) 2025, Roland van Ipenburg
+
+Crypt::Diceware::Wordlist::TR::ModHex version v0.0.2
+====================================================
+
+This module provides a turkish wordlist limited to words using only ModHex
+characters for use with Diceware
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  version
+
+LICENSE INFORMATION
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.14.0 or, at your option,
+any later version of Perl 5 you may have available.  For more details, see
+the full text of the licenses in the directory LICENSES.

@@ -3,6 +3,9 @@ Revision history for Perl extension Net::MQTT::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
+1.32  2025-04-23 01:15
+        - Fix: shutdown before disconnect (Contributed by MASHtm via GitHub #28)
+
 1.31  2024-11-13 23:37
         - Fix: in one-shot, unsubscribe from same topic string
 

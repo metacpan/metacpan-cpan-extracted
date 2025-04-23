@@ -4,7 +4,7 @@
       "Ian Kluft <cpan-dev@iankluft.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -41,7 +41,7 @@
             "Term::ANSIColor" : "0",
             "Try::Tiny" : "0",
             "autodie" : "0",
-            "base" : "0",
+            "parent" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "utf8" : "0",
@@ -74,9 +74,9 @@
          "web" : "https://github.com/ikluft/Sys-OsPackage"
       }
    },
-   "version" : "0.3.1",
-   "x_generated_by_perl" : "v5.34.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "version" : "0.4.0",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

@@ -1,0 +1,9 @@
+--cuddled-else
+--maximum-line-length=120
+--utf8
+--output-line-ending=unix
+--continuation-indentation=4
+--opening-sub-brace-on-new-line
+--indent-block-comments
+--static-block-comments
+--nooutdent-long-lines

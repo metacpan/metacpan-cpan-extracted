@@ -4,8 +4,9 @@ use strict;
 use warnings;
 
 use IO::Socket::IP;
+use Socket ();
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -500,8 +501,11 @@ sub get {
 sub disconnect {
     my ($self) = @_;
 
-    $self->_send(pack "C x", 0xe0)
-        if $self->{socket} and $self->{socket}->connected;
+    if ($self->{socket} and $self->{socket}->connected) {
+        $self->_send(pack "C x", 0xe0);
+        $self->{socket}->shutdown(Socket::SHUT_WR);
+        $self->{socket}->close;
+    }
 
     $self->_drop_connection;
 }

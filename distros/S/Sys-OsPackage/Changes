@@ -1,6 +1,19 @@
 Change log for Sys::OsPackage
 
-0.3.1 2022-11-02T22:29:47-07:00 America/Los_Angeles
+0.4.0 2025-04-22T15:00:24-07:00 America/Los_Angeles
+ [API CHANGE]
+ [BUG FIXES]
+ [DOCS]
+ [ENHANCEMENTS]
+ [MAJOR]
+ [MINOR]
+ - add --without-recommends and --without-suggests to cpanm calls to
+   improve performance and reduce noise
+
+ [REVISION]
+ [SECURITY]
+
+0.3.1 2022-11-02T22:14:21-07:00 America/Los_Angeles
  [BUG FIXES]
  - Back off 010_fetch_reqs.t until it works from both desktop CLI and
    container environment. (GH-1)

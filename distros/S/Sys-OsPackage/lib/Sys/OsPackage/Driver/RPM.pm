@@ -14,82 +14,100 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::RPM;
-$Sys::OsPackage::Driver::RPM::VERSION = '0.3.1';
-use base "Sys::OsPackage::Driver";
+$Sys::OsPackage::Driver::RPM::VERSION = '0.4.0';
+use parent "Sys::OsPackage::Driver";
 
 # check if packager command found (rpm)
 sub pkgcmd
 {
-    my ($class, $ospkg) = @_;
+    my ( $class, $ospkg ) = @_;
 
-    return ((defined $ospkg->sysenv("dnf") or (defined $ospkg->sysenv("yum") and defined $ospkg->sysenv("repoquery"))) ? 1 : 0);
+    return (
+        ( defined $ospkg->sysenv("dnf") or ( defined $ospkg->sysenv("yum") and defined $ospkg->sysenv("repoquery") ) )
+        ? 1
+        : 0 );
 }
 
 # find name of package for Perl module (rpm)
 sub modpkg
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     #return join("-", "perl", @{$args_ref->{mod_parts}}); # rpm format for Perl module packages
-    my @querycmd = ((defined $ospkg->sysenv("dnf"))
-        ? ($ospkg->sysenv("dnf"), "repoquery")
-        : $ospkg->sysenv("repoquery"));
-    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), @querycmd,
-        qw(--available --quiet --whatprovides), "'perl(".$args_ref->{module}.")'");
+    my @querycmd = (
+          ( defined $ospkg->sysenv("dnf") )
+        ? ( $ospkg->sysenv("dnf"), "repoquery" )
+        : $ospkg->sysenv("repoquery")
+    );
+    my @pkglist = sort $ospkg->capture_cmd(
+        { list => 1 },
+        $ospkg->sudo_cmd(), @querycmd,
+        qw(--available --quiet --whatprovides),
+        "'perl(" . $args_ref->{module} . ")'"
+    );
     $ospkg->debug()
-        and print STDERR "debug(".__PACKAGE__."->modpkg): ".$args_ref->{module}." -> ".join(" ", @pkglist)."\n";
-    return if not scalar @pkglist; # empty list means nothing found
-    return $pkglist[-1]; # last of sorted list should be most recent version
+        and print STDERR "debug("
+        . __PACKAGE__
+        . "->modpkg): "
+        . $args_ref->{module} . " -> "
+        . join( " ", @pkglist ) . "\n";
+    return if not scalar @pkglist;    # empty list means nothing found
+    return $pkglist[-1];              # last of sorted list should be most recent version
 }
 
 # find named package in repository (rpm)
 sub find
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
-    my @querycmd = ((defined $ospkg->sysenv("dnf"))
-        ? ($ospkg->sysenv("dnf"), "repoquery")
-        : $ospkg->sysenv("repoquery"));
-    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), @querycmd, qw(--quiet --latest-limit=1),
-        $args_ref->{pkg});
-    return if not scalar @pkglist; # empty list means nothing found
-    return $pkglist[-1]; # last of sorted list should be most recent version
+    my @querycmd = (
+          ( defined $ospkg->sysenv("dnf") )
+        ? ( $ospkg->sysenv("dnf"), "repoquery" )
+        : $ospkg->sysenv("repoquery")
+    );
+    my @pkglist = sort $ospkg->capture_cmd(
+        { list => 1 },
+        $ospkg->sudo_cmd(), @querycmd, qw(--quiet --latest-limit=1),
+        $args_ref->{pkg}
+    );
+    return if not scalar @pkglist;    # empty list means nothing found
+    return $pkglist[-1];              # last of sorted list should be most recent version
 }
 
 # install package (rpm)
 sub install
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     # determine packages to install
     my @packages;
-    if (exists $args_ref->{pkg}) {
-        if (ref $args_ref->{pkg} eq "ARRAY") {
-            push @packages, @{$args_ref->{pkg}};
+    if ( exists $args_ref->{pkg} ) {
+        if ( ref $args_ref->{pkg} eq "ARRAY" ) {
+            push @packages, @{ $args_ref->{pkg} };
         } else {
             push @packages, $args_ref->{pkg};
         }
     }
 
     # install the packages
-    my $pkgcmd = (defined $ospkg->sysenv("dnf")) ? $ospkg->sysenv("dnf") : $ospkg->sysenv("yum");
-    return $ospkg->run_cmd($ospkg->sudo_cmd(), $pkgcmd,
-        qw(install --quiet --assumeyes --setopt=install_weak_deps=false), @packages);
+    my $pkgcmd = ( defined $ospkg->sysenv("dnf") ) ? $ospkg->sysenv("dnf") : $ospkg->sysenv("yum");
+    return $ospkg->run_cmd( $ospkg->sudo_cmd(), $pkgcmd,
+        qw(install --quiet --assumeyes --setopt=install_weak_deps=false), @packages );
 }
 
 # check if an OS package is installed locally
 sub is_installed
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     # check if package is installed
     my $querycmd = $ospkg->sysenv("rpm");
-    my @pkglist = $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), $querycmd, qw(--query), $args_ref->{pkg});
-    return (scalar @pkglist > 0) ? 1 : 0;
+    my @pkglist  = $ospkg->capture_cmd( { list => 1 }, $ospkg->sudo_cmd(), $querycmd, qw(--query), $args_ref->{pkg} );
+    return ( scalar @pkglist > 0 ) ? 1 : 0;
 }
 
 1;
@@ -104,7 +122,7 @@ Sys::OsPackage::Driver::RPM - RedHat/Fedora RPM packaging handler for Sys::OsPac
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

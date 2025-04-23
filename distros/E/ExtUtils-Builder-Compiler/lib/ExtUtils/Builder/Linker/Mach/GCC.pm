@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Mach::GCC;
-$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.028';
+$ExtUtils::Builder::Linker::Mach::GCC::VERSION = '0.029';
 use strict;
 use warnings;
 

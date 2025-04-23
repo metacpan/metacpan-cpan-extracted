@@ -1,0 +1,31 @@
+Build.PL
+Changes
+CONTRIBUTING
+inc/Crypt/Diceware/Wordlist/TR/ModHex/Module/Build.pm
+inc/Crypt/Diceware/Wordlist/TR/ModHex/Module/Build/LICENSE.txt
+inc/Crypt/Diceware/Wordlist/TR/ModHex/Module/Build/Standard.pm
+lib/Crypt/Diceware/Wordlist/TR/ModHex.pm
+LICENSE
+LICENSES/artistic.txt
+LICENSES/cc-by-sa-4.0.txt
+LICENSES/Copying
+LICENSES/gpl-1.0.txt
+LICENSES/gpl-2.0.txt
+LICENSES/gpl-3.0.txt
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00_base.t
+t/00_signature.t
+t/01_words.t
+script/diceware_modhex_wordlist.pl
+xt/91_pod.t
+xt/92_pod-coverage.t
+xt/93_test-coverage.t
+xt/94_manifest.t
+xt/95_critic.t
+xt/96_kwalitee.t
+xt/perlcriticrc
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

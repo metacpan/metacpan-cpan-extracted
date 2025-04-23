@@ -14,30 +14,30 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Alpine;
-$Sys::OsPackage::Driver::Alpine::VERSION = '0.3.1';
-use base "Sys::OsPackage::Driver";
+$Sys::OsPackage::Driver::Alpine::VERSION = '0.4.0';
+use parent "Sys::OsPackage::Driver";
 
 # check if packager command found (alpine)
 sub pkgcmd
 {
-    my ($class, $ospkg) = @_;
+    my ( $class, $ospkg ) = @_;
 
-    return (defined $ospkg->sysenv("apk") ? 1 : 0);
+    return ( defined $ospkg->sysenv("apk") ? 1 : 0 );
 }
 
 # find name of package for Perl module (alpine)
 sub modpkg
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     # search by alpine format for Perl module packages
-    my $pkgname = join("-", "perl", map {lc $_} @{$args_ref->{mod_parts}});
+    my $pkgname = join( "-", "perl", map { lc $_ } @{ $args_ref->{mod_parts} } );
     $args_ref->{pkg} = $pkgname;
-    if (not $class->find($ospkg, $args_ref)) {
+    if ( not $class->find( $ospkg, $args_ref ) ) {
         return;
     }
-    $ospkg->debug() and print STDERR "debug(".__PACKAGE__."->modpkg): $pkgname\n";
+    $ospkg->debug() and print STDERR "debug(" . __PACKAGE__ . "->modpkg): $pkgname\n";
 
     # package was found
     return $pkgname;
@@ -46,27 +46,27 @@ sub modpkg
 # find named package in repository (alpine)
 sub find
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     my $querycmd = $ospkg->sysenv("apk");
-    my @pkglist = sort map {substr($_,0,index($_," "))}
-        ($ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), $querycmd, qw(list --quiet), $args_ref->{pkg}));
-    return if not scalar @pkglist; # empty list means nothing found
-    return $pkglist[-1]; # last of sorted list should be most recent version
+    my @pkglist  = sort map { substr( $_, 0, index( $_, " " ) ) }
+        ( $ospkg->capture_cmd( { list => 1 }, $ospkg->sudo_cmd(), $querycmd, qw(list --quiet), $args_ref->{pkg} ) );
+    return if not scalar @pkglist;    # empty list means nothing found
+    return $pkglist[-1];              # last of sorted list should be most recent version
 }
 
 # install package (alpine)
 sub install
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     # determine packages to install
     my @packages;
-    if (exists $args_ref->{pkg}) {
-        if (ref $args_ref->{pkg} eq "ARRAY") {
-            push @packages, @{$args_ref->{pkg}};
+    if ( exists $args_ref->{pkg} ) {
+        if ( ref $args_ref->{pkg} eq "ARRAY" ) {
+            push @packages, @{ $args_ref->{pkg} };
         } else {
             push @packages, $args_ref->{pkg};
         }
@@ -74,19 +74,23 @@ sub install
 
     # install the packages
     my $pkgcmd = $ospkg->sysenv("apk");
-    return $ospkg->run_cmd($ospkg->sudo_cmd(), $pkgcmd, qw(add --quiet), @packages);
+    return $ospkg->run_cmd( $ospkg->sudo_cmd(), $pkgcmd, qw(add --quiet), @packages );
 }
 
 # check if an OS package is installed locally
 sub is_installed
 {
-    my ($class, $ospkg, $args_ref) = @_;
+    my ( $class, $ospkg, $args_ref ) = @_;
     return if not $class->pkgcmd($ospkg);
 
     # check if package is installed
     my $querycmd = $ospkg->sysenv("apk");
-    my @pkglist = $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), $querycmd, qw(list --installed --quiet), $args_ref->{pkg});
-    return (scalar @pkglist > 0) ? 1 : 0;
+    my @pkglist  = $ospkg->capture_cmd(
+        { list => 1 },
+        $ospkg->sudo_cmd(), $querycmd, qw(list --installed --quiet),
+        $args_ref->{pkg}
+    );
+    return ( scalar @pkglist > 0 ) ? 1 : 0;
 }
 
 1;
@@ -101,7 +105,7 @@ Sys::OsPackage::Driver::Alpine - Alpine APK packaging handler for Sys::OsPackage
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

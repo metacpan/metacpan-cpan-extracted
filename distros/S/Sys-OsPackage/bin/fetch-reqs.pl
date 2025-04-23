@@ -2,7 +2,7 @@
 # PODNAME: fetch-reqs.pl
 #        USAGE: ./fetch-reqs.pl [--debug] [--quiet] [--notest] [--sudo] [[file|module] ...]
 #  DESCRIPTION: install prerequisite modules for a Perl script with minimal prerequisites for this tool
-#       AUTHOR: Ian Kluft (IKLUFT), 
+#       AUTHOR: Ian Kluft (IKLUFT),
 #      CREATED: 04/14/2022 05:45:29 PM
 # As part of Sys::OsPackage, this must be maintained for minimal dependencies to build systems and containers.
 
@@ -21,33 +21,34 @@ sub init_params
 {
     # collect CLI parameters
     my %params;
-    GetOptions ( \%params, "debug", "quiet", "notest", "sudo" );
+    GetOptions( \%params, "debug", "quiet", "notest", "sudo" );
 
     # initialize Sys::OsPackage
-    Sys::OsPackage->init( (scalar keys %params > 0) ? \%params : () );
-    Sys::OsPackage->establish_cpan(); # make sure CPAN is available
+    Sys::OsPackage->init( ( scalar keys %params > 0 ) ? \%params : () );
+    Sys::OsPackage->establish_cpan();    # make sure CPAN is available
 
     return;
 }
-
 
 # process one item from command line
 # returns 1 for success, 0 for failure
 sub process
 {
-    my $target = shift;
+    my $target    = shift;
     my $ospackage = Sys::OsPackage->instance();
-    my $result = 1;
+    my $result    = 1;
 
     my $basename;
     my $filename = $target;
-    if (index($filename, '/') == -1) {
+    if ( index( $filename, '/' ) == -1 ) {
+
         # no directory provided so use pwd
         $basename = $filename;
-        $filename = $ospackage->pwd()."/".$filename;
+        $filename = $ospackage->pwd() . "/" . $filename;
     } else {
+
         # $filename is a path so keep it that way, and extract basename
-        $basename = substr($filename, rindex($filename, '/')+1);
+        $basename = substr( $filename, rindex( $filename, '/' ) + 1 );
     }
     $ospackage->debug() and print STDERR "debug(process): filename=$filename basename=$basename\n";
 
@@ -66,14 +67,14 @@ sub process
 
     # scan for dependencies
     require Perl::PrereqScanner::NotQuiteLite;
-    my $scanner = Perl::PrereqScanner::NotQuiteLite->new();
+    my $scanner  = Perl::PrereqScanner::NotQuiteLite->new();
     my $deps_ref = $scanner->scan_file($filename);
-    $ospackage->debug() and print STDERR "debug(process): deps_ref = ".Dumper($deps_ref)."\n";
+    $ospackage->debug() and print STDERR "debug(process): deps_ref = " . Dumper($deps_ref) . "\n";
 
     # load Perl modules for dependencies
     my $deps = $deps_ref->requires();
-    $ospackage->debug() and print STDERR "deps = ".Dumper($deps)."\n";
-    foreach my $module (sort keys %{$deps->{requirements}}) {
+    $ospackage->debug() and print STDERR "deps = " . Dumper($deps) . "\n";
+    foreach my $module ( sort keys %{ $deps->{requirements} } ) {
         next if $ospackage->mod_is_pragma($module);
         $ospackage->debug() and print STDERR "debug(process): install_module($module)\n";
         try {
@@ -103,29 +104,31 @@ sub main
 
     # process command line
     if (@ARGV) {
+
         # process elements from command line
         foreach my $arg (@ARGV) {
-            if ( not process($arg)) {
+            if ( not process($arg) ) {
                 $success = 0;
                 $ospackage->debug() and print STDERR "main: process($arg) failed\n";
             }
         }
     } else {
+
         # if empty command line, process lines from STDIN, similar to cpanm usage
-        while (my $target = <>) {
+        while ( my $target = <> ) {
             chomp $target;
-            if ( not process($target)) {
+            if ( not process($target) ) {
                 $success = 0;
                 $ospackage->debug() and print STDERR "main: process($target) failed\n";
             }
         }
     }
     $ospackage->debug() and print STDERR "main: end\n";
-    return ($success ? 0 : 1);
+    return ( $success ? 0 : 1 );
 }
 
 # exception-handling wrapper for main()
-my $rescode = 1; # assume failure until/unless success result is returned from main
+my $rescode = 1;    # assume failure until/unless success result is returned from main
 try {
     $rescode = main();
 } catch {
@@ -143,7 +146,7 @@ fetch-reqs.pl
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 DESCRIPTION
 

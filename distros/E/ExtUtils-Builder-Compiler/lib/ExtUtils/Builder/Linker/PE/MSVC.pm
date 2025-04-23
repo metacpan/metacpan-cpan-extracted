@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::MSVC;
-$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.028';
+$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.029';
 use strict;
 use warnings;
 
@@ -10,6 +10,7 @@ use parent qw/ExtUtils::Builder::Linker::COFF/;
 sub _init {
 	my ($self, %args) = @_;
 	$args{ld} //= ['link'];
+	$args{export} //= 'some';
 	$self->ExtUtils::Builder::Linker::COFF::_init(%args);
 	return;
 }
@@ -22,7 +23,7 @@ sub linker_flags {
 	push @ret, map { $self->new_argument(ranking => $_->{ranking}, value => [ "/libpath:$_->{value}" ]) } @{ $self->{library_dirs} };
 	push @ret, map { $self->new_argument(ranking => $_->{ranking}, value => [ "$_->{value}.lib" ]) } @{ $self->{libraries} };
 	push @ret, $self->new_argument(ranking => 50, value => [ @{$from} ]);
-	push @ret, $self->new_argument(ranking => 60, value => [ "/def:$opts{dl_file}" ]) if $opts{exports} eq 'some' && defined $opts{dl_file};
+	push @ret, $self->new_argument(ranking => 60, value => [ "/def:$opts{dl_file}" ]) if $self->export eq 'some' && defined $opts{dl_file};
 	push @ret, $self->new_argument(ranking => 80, value => ["/OUT:$to"]);
 	# map_file, implib, def_file?…
 	return @ret;

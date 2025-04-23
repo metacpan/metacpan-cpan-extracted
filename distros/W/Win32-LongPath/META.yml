@@ -34,4 +34,3 @@ resources:
   bugtracker: https://github.com/rdboisvert/Win32-LongPath/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rdboisvert/Win32-LongPath
-version: '2.0'
