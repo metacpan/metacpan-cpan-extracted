@@ -1,7 +1,7 @@
 package Nefarious; 
 use 5.006; use strict; use warnings;
 use Factory::Sub; use Tie::IxHash; our %META;
-our $VERSION = '0.03'; 
+our $VERSION = '0.04'; 
 
 BEGIN {
 	tie %META, 'Tie::IxHash';
@@ -36,9 +36,9 @@ sub parse_meta {
 		} elsif ($ref eq 'ARRAY') {
 			my $factory = Factory::Sub->new();
 			for my $fact (reverse @{ $package->{$key} }) {
-				$factory->add(ref $fact eq 'ARRAY' ? @{ $fact } : $fact);
+				$factory->add(sub { return $_[0]; }, (ref $fact eq 'ARRAY' ? @{ $fact } : $fact));
 			}	
-			$META{$name}{$key} = sub { shift; return $factory->(@_) };
+			$META{$name}{$key} = sub { return $factory->(@_) };
 		} elsif ($ref eq 'HASH') {
 			$package->{$key}->{EXTENDS} = $name;
 			parse_meta($key, $package->{$key});
@@ -57,7 +57,7 @@ sub create_package {
 	my ($name, $package) = @_;
 	my $extends = delete $package->{EXTENDS} || "";
 	$extends = qq|use base '$extends';| if ($extends);
-	$package->{new} = sub { bless {}, $name } if (! $package->{new});
+	$package->{new} = sub { bless {}, shift } if (! $package->{new} && ! $extends);
 	my $p = qq|
 		package $name;
 		use strict;
@@ -67,8 +67,9 @@ sub create_package {
 	|;
 	eval $p;
 	no strict 'refs';
+	no warnings 'redefine';
 	for my $method (keys %{$package}) {
-		*{"${name}::$method"} = $package->{$method};
+		*{"${name}::$method"} = sub { $package->{$method}->(@_) }
 	}
 }
 
@@ -82,7 +83,7 @@ Nefarious - wicked or criminal objects.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -92,22 +93,78 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
+	our $make_accessor;
+	BEGIN {
+		$make_accessor = sub {
+			my ($key) = shift;
+			return sub {
+				$_[0]->{$key} = $_[1] if $_[1];
+				$_[0]->{$key};
+			};
+		};
+	}
+
 	use Nefarious {
-		Good => {
-			fictional => 'Churchill',
-			Evil => {
-				character => 'Hitler',
-				Myself => {
-					contract => 'Not Found',
-					runners => 'Innocent',
-					eyes => 'Everywhere',
+		Properties => {
+			size => $make_accessor->('size'),			
+			colour => $make_accessor->('colour'),
+			material => $make_accessor->('material'),
+		},
+		Product => {
+			new => sub {
+				my $self = bless {}, shift;
+				$self->set(@_);
+				$self;
+			},
+			name => $make_accessor->('name'),
+			description => $make_accessor->('description'),
+			properties => sub {
+				my ($self, $props) = @_;
+				$self->{properties} //= Properties->new();
+				if ($props) {
+					$self->{properties}->$_($props->{$_}) for (keys %{$props});
+				}
+				$self->{properties};
+			},
+			set => [
+				[Str, Str, HashRef, sub {
+					$_[0]->name($_[1]);
+					$_[0]->description($_[2]);
+					$_[0]->properties($_[3]);
+				}],
+				[Str, Str, sub {
+					$_[0]->name($_[1]);
+					$_[0]->description($_[2]);
+				}],
+				[Str, sub {
+					$_[0]->name($_[1]);
+				}],
+				sub {
+					$_[0]->name('Set the name of the Product');
+					$_[0]->description('Set the description of the Product');
+				}
+			],
+			Hat => {
+				onesize => $make_accessor->('onesize'),
+				Bowler => {
+					onesize => 0,
 				}
 			}
 		}
 	};
 
-    	my $lnation = Myself->new();
-	$lnation->contract(); # Not Found
+
+	my $product = Bowler->new('Nefarious Brand', 'A bowler hat made from 100% wool', { 
+		size => '60cm', 
+		colour => 'black',
+		material => 'wool' 
+	});
+
+	$product->name; # Nefarious Brand
+	$product->description; # A bowler hat made from 100% wool
+	$product->properties->colour; # black
+	$product->onesize; # 0;
+
 
 =head1 AUTHOR
 
@@ -133,10 +190,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Nefarious>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Nefarious>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Nefarious>
@@ -147,7 +200,7 @@ L<https://metacpan.org/release/Nefarious>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by LNATION.
+This software is Copyright (c) 2023->2025 by LNATION.
 
 This is free software, licensed under:
 

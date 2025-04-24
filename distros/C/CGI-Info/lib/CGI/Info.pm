@@ -33,11 +33,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.98
+Version 0.99
 
 =cut
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 =head1 SYNOPSIS
 
@@ -126,20 +126,10 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args;
-	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
-		# If the first argument is a hash reference, dereference it
-		%args = %{$_[0]};
-	} elsif((scalar(@_) % 2) == 0) {
-		# If there is an even number of arguments, treat them as key-value pairs
-		%args = @_;
-	} else {
-		# If there is an odd number of arguments, treat it as an error
-		croak(__PACKAGE__, ': Invalid arguments passed to new()');
-	}
+	my $params = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
+		if((scalar keys %{$params}) > 0) {
 			# Using CGI::Info:new(), not CGI::Info->new()
 			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		}
@@ -148,32 +138,35 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		if($params) {
+			return bless { %{$class}, %{$params} }, ref($class);
+		}
+		return bless $class, ref($class);
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($args{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $args{'config_file'})->all())) {
-		# my $config = YAML::XS::LoadFile($args{'config_file'});
+	if(exists($params->{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $params->{'config_file'}, env_prefix => "${class}::")->all())) {
+		# my $config = YAML::XS::LoadFile($params->{'config_file'});
 		if($config->{$class}) {
 			$config = $config->{$class};
 		}
-		%args = (%{$config}, %args);
+		$params = { %{$config}, %{$params} };
 	}
 
-	if(defined($args{'expect'})) {
-		# if(ref($args{expect}) ne 'ARRAY') {
+	if(defined($params->{'expect'})) {
+		# if(ref($params->{expect}) ne 'ARRAY') {
 			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
 		Carp::croak(__PACKAGE__, ': expect has been deprecated, use allow instead');
 	}
 
-	if(my $logger = $args{'logger'}) {
+	if(my $logger = $params->{'logger'}) {
 		if(!Scalar::Util::blessed($logger)) {
-			$args{'logger'} = Log::Abstraction->new($logger);
+			$params->{'logger'} = Log::Abstraction->new($logger);
 		}
 	} else {
-		$args{'logger'} = Log::Abstraction->new();
+		$params->{'logger'} = Log::Abstraction->new();
 	}
 
 	# Return the blessed object
@@ -181,7 +174,7 @@ sub new
 		max_upload_size => 512 * 1024,
 		allow => undef,
 		upload_dir => undef,
-		%args	# Overwrite defaults with given arguments
+		%{$params}	# Overwrite defaults with given arguments
 	}, $class;
 }
 
@@ -574,6 +567,8 @@ sub params {
 	my $content_type = $ENV{'CONTENT_TYPE'};
 	my %FORM;
 
+	use IO::Interactive;
+
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
 		if(@ARGV) {
 			@pairs = @ARGV;
@@ -594,7 +589,7 @@ sub params {
 			}
 		} elsif($stdin_data) {
 			@pairs = split(/\n/, $stdin_data);
-		} elsif(!$self->{args_read}) {
+		} elsif(IO::Interactive::is_interactive() && !$self->{args_read}) {
 			my $oldfh = select(STDOUT);
 			print "Entering debug mode\n",
 				"Enter key=value pairs - end with quit\n";
@@ -865,6 +860,7 @@ sub params {
 			   ($value =~ /\sAND\s1=1/ix) ||
 			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
+			   ($value =~ /\/AND\/.+\(SELECT\//) ||	# United/**/States)/**/AND/**/(SELECT/**/6734/**/FROM/**/(SELECT(SLEEP(5)))lRNi)/**/AND/**/(8984=8984
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {

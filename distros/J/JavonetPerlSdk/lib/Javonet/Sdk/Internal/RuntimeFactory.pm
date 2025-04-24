@@ -99,6 +99,16 @@ sub python {
     );
 }
 
+#@override
+sub python27 {
+    return Javonet::Sdk::Internal::RuntimeContext::get_instance(
+        Javonet::Sdk::Core::RuntimeLib::get_runtime('Python27'),
+        $connection_type,
+        $tcp_address,
+        $path
+    );
+}
+
 
 no Moose;
 1;

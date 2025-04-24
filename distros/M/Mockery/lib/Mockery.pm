@@ -1,6 +1,6 @@
 package Mockery;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
 	return bless $_[1] || {}, $_[0];
@@ -68,7 +68,7 @@ Mockery - Mock objects for testing purposes
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -76,7 +76,7 @@ Version 0.01
 
 	use Mockery;
 
-    	my $mockery = Mockery->new();
+	my $mockery = Mockery->new();
 
 	$mockery->action(
 		class => 'Nefarious',
@@ -142,23 +142,17 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Mockery>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Mockery>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Mockery>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by LNATION.
+This software is Copyright (c) 2023->2025 by LNATION.
 
 This is free software, licensed under:
 

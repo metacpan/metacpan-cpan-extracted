@@ -7,10 +7,13 @@ use lib 'lib';
 
 use Scalar::Util::Numeric qw(isint);
 use autobox::universal qw(type);
-use aliased 'Javonet::Sdk::Core::Type' => 'Type', qw(get_type);
-use aliased 'Javonet::Sdk::Core::StringEncodingMode' => 'StringEncodingMode', qw(get_string_encoding_mode);
+use aliased 'Javonet::Sdk::Core::Type' => 'Type';
+use aliased 'Javonet::Sdk::Core::StringEncodingMode' => 'StringEncodingMode';
 
-sub serialize_primitive {
+use Exporter qw(import);
+our @EXPORT = qw(serializeCommand serializePrimitive serializeString serializeInt serializeBool serializeFloat serializeByte serializeChar serializeLongLong serializeDouble serializeUllong serializeUint serializeUndef);
+
+sub serializePrimitive {
     my $self = $_[0];
     my $payload_item = $_[1];
     if(!defined $payload_item) {

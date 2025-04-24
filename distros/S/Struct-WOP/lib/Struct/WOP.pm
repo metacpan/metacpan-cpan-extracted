@@ -7,7 +7,7 @@ use warnings;
 use Scalar::Util qw/reftype refaddr/;
 use Encode qw/decode encode/;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our (%HELP, @MAYBE, $caller, $destruct);
 BEGIN {
 	%HELP = (
@@ -66,7 +66,7 @@ Struct::WOP - deeply encode/decode a struct
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
@@ -120,19 +120,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Struct-WOP>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Struct-WOP>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Struct-WOP>
 
 =item * Search CPAN
 
@@ -144,7 +136,7 @@ L<http://search.cpan.org/dist/Struct-WOP/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Robert Acock.
+Copyright 2017-2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

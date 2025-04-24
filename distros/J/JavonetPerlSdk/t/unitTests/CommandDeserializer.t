@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More qw(no_plan);
 use lib 'lib';
-use aliased 'Javonet::Core::Protocol::CommandDeserializer' => 'CommandDeserializer', qw(decode);
+use aliased 'Javonet::Core::Protocol::CommandDeserializer' => 'CommandDeserializer';
 SKIP: {
     skip "To evaluate", 1 eq 1;
     cmp_ok(scalar test_command_deserialize(), '==', 0, 'Command deserialization success');

@@ -23,6 +23,7 @@ my @files = (
     't/06_fetcher_sources.t',
     't/data/sample_eu.xml',
     't/data/sample_hmt.csv',
+    't/data/sample_moha.xml',
     't/data/sample_ofac_consolidated.xml',
     't/data/sample_unsc.xml',
     't/data/sdn.xml',

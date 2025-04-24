@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 
+
 use strict;
 use warnings;
 use Test::Most;
@@ -24,6 +25,15 @@ subtest 'SQL Injection Detection' => sub {
 
 	ok(!defined $params, 'SQL injection attempt blocked');
 	is($info->status(), 403, 'Status set to 403 Forbidden');
+
+	$ENV{'QUERY_STRING'} = 'page=by_location&county=CA&country=United%2F%2A%2A%2FStates%29%2F%2A%2A%2FAND%2F%2A%2A%2F%28SELECT%2F%2A%2A%2F6734%2F%2A%2A%2FFROM%2F%2A%2A%2F%28SELECT%28SLEEP%285%29%29%29lRNi%29%2F%2A%2A%2FAND%2F%2A%2A%2F%288984%3D8984';
+
+	$info = new_ok('CGI::Info');
+	$params = $info->params();
+
+	ok(!defined $params, 'SQL injection attempt blocked 2');
+	is($info->status(), 403, 'Status set to 403 Forbidden');
+
 };
 
 subtest 'XSS Sanitization' => sub {
@@ -80,6 +90,7 @@ subtest 'Upload Directory Validation' => sub {
 	my $params = $info->params();
 
 	ok($params->{file} =~ /test\.txt/, 'File uploaded to valid directory');
+	unlink $params->{'file'};
 };
 
 subtest 'Parameter Sanitization' => sub {

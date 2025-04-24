@@ -1,3 +1,9 @@
+0.257.2 2025-04-23
+
+  Bug fix:
+    * read timer file when loading a service by name
+    * change some logs from warn to info
+
 0.257.1 2025-04-07
 
   Model update:

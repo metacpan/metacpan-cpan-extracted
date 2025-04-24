@@ -37,8 +37,6 @@ my $dump;
         ignore_priority => "info",
         [
             'User',
-            warn => qr/Loading/,
-            warn => qr/Reading/,
             warn =>  qr/Unexpected systemd parameter/
         ]
     );

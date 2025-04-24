@@ -3,6 +3,8 @@ use strict;
 use warnings FATAL => 'all';
 use lib 'lib';
 use Moose;
+use Exporter qw(import);
+our @EXPORT = qw(add_handler_to_dict get_handler);
 
 our %handler_dict;
 

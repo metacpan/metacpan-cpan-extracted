@@ -1,0 +1,5 @@
+[Timer]
+OnCalendar = 13:00
+
+[Unit]
+Description = Run duplicity

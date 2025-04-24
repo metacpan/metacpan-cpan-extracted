@@ -2,6 +2,8 @@ package Javonet::Sdk::Core::Type;
 use strict;
 use warnings FATAL => 'all';
 use Moose;
+use Exporter qw(import);
+our @EXPORT = qw(get_type);
 
 my %my_type = (
     'Command' => 0,

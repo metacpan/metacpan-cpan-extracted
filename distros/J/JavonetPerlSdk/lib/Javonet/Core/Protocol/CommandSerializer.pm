@@ -7,10 +7,12 @@ use lib 'lib';
 use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
 use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib', qw(get_runtime);
 use aliased 'Javonet::Sdk::Core::Type' => 'Type', qw(get_type);
-use aliased 'Javonet::Core::Protocol::TypeSerializer' => 'TypeSerializer', qw(serializePrimitive serializeCommand);
+use aliased 'Javonet::Core::Protocol::TypeSerializer' => 'TypeSerializer';
 use Javonet::Sdk::Internal::ConnectionType;
-
 use Thread::Queue;
+
+use Exporter qw(import);
+our @EXPORT = qw(encode serialize_tcp_address serialize_recursively insert_into_buffer);
 
 my @byte_buffer = ();
 my $queue = Thread::Queue->new();
@@ -56,7 +58,7 @@ sub serialize_recursively{
     my $payload_len = @cur_payload;
     if ($payload_len > 0){
         if (!defined $cur_payload[0]){
-            insert_into_buffer(TypeSerializer->serialize_primitive(undef));
+            insert_into_buffer(TypeSerializer->serializePrimitive(undef));
         }
         else {
             if ($cur_payload[0]->isa("Javonet::Sdk::Core::PerlCommand")) {
@@ -65,7 +67,7 @@ sub serialize_recursively{
                 $queue->insert(0, $inner_command);
             }
             else {
-                my @result = TypeSerializer->serialize_primitive($cur_payload[0]);
+                my @result = TypeSerializer->serializePrimitive($cur_payload[0]);
                 insert_into_buffer(@result);
             }
         }

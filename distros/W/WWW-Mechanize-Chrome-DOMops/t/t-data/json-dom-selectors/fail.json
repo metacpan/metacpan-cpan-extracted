@@ -1,0 +1,82 @@
+[
+   {
+      "element-class" : "share",
+      "&&" : 1
+      "element-tag" : "button"
+   },
+   {
+      "element-tag" : "nav",
+      "&&" => 1,
+      "element-class" : "select-satellite"
+   },
+   {
+      "&&" : 1,
+      "element-class" : "hit",
+      "element-tag" : "div",
+   }
+   {
+      "&&" : 1,
+      "element-class" : [
+         "panel",
+         "clock"
+      ],
+      "element-tag" : "div"
+   },
+   {
+      "element-class" : [
+         "panel",
+         "title"
+      ],
+      "&&" : 1,
+      "element-tag" : "nav"
+   },
+   {
+      "element-tag" : "button",
+      "element-class" : "search",
+      "&&" : 1
+   },
+   {
+      "element-tag" : "button",
+      "&&" : 1,
+      "element-class" : "settings"
+   },
+   {
+      "element-tag" : "button",
+      "element-class" : "about",
+      "&&" : 1
+   },
+   {
+      "&&" : 1,
+      "element-class" : "share",
+      "element-tag" : "button"
+   },
+   {
+      "element-tag" : "button",
+      "element-class" : "geolocation",
+      "&&" : 1
+   },
+   {
+      "element-class" : [
+         "group",
+         "measure"
+      ],
+      "&&" : 1,
+      "element-tag" : "div"
+   },
+   {
+      "&&" : 1,
+      "element-class" : [
+         "panel",
+         "search"
+      ],
+      "element-tag" : "aside"
+   },
+   {
+      "element-class" : [
+         "panel",
+         "storm-details"
+      ],
+      "&&" : 1,
+      "element-tag" : "article"
+   }
+]

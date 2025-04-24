@@ -6,7 +6,7 @@ use warnings;
 
 use parent 'DateTime';
 use POSIX qw( floor );
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 our (%strftime_patterns, %sub_format, @ORDINALS, @NTT);
 BEGIN {
@@ -312,7 +312,7 @@ DateTime::Ordinal - The great new DateTime::Ordinal!
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 

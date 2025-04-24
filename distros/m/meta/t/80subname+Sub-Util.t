@@ -8,7 +8,8 @@ use Test2::V0;
 use meta;
 no warnings qw( meta::experimental );
 
-# This is a core module
+# This is a core module since 5.22
+use Test2::Require::Module 'Sub::Util';
 use Sub::Util;
 
 # Values set by Sub::Util are readable by meta

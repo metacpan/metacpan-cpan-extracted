@@ -4,6 +4,9 @@ use warnings;
 use Config;
 use File::Basename;
 
+use Exporter qw(import);
+our @EXPORT = qw(heart_beat send_command get_runtime_info);
+
 my $perlLibDirJavonet;
 my $perlLibDirDeps;
 
@@ -15,9 +18,9 @@ BEGIN {
 
 use lib "$perlLibDirJavonet";
 use lib "$perlLibDirDeps";
-use aliased 'Javonet::Core::Interpreter::Interpreter' => 'Interpreter', qw(process);
-use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger', qw(get_runtime_info);
-
+use aliased 'Javonet::Core::Interpreter::Interpreter' => 'Interpreter';
+use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger';
+#
 sub heart_beat {
     my ($self, $message_byte_array_ref) = @_;
     my @response_byte_array = (49, 48);
@@ -32,7 +35,7 @@ sub send_command {
 }
 
 sub get_runtime_info {
-    return RuntimeLogger->get_runtime_info();
+    return RuntimeLogger->rl_get_runtime_info();
 }
 
 1;

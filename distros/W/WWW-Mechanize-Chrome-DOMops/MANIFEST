@@ -5,11 +5,22 @@ MANIFEST			This list of files
 README
 README.md
 t/000-load.t
-t/020-find.t
-t/030-zap.t
+t/100-domops_read_dom_element_selectors_from_JSON.t
+t/200-domops_wait_for_page_to_load-normal.t
+t/250-domops_wait_for_page_to_load-delayed-elements.t
+t/300-domops_wait_for_page_to_load-delayed-elements-inside-iframe.t.fails-because-of-cors
+t/500-domops_find.t
+t/600-domops_zap.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/t-data/json-dom-selectors/fail.json
+t/t-data/json-dom-selectors/success.json
+t/t-data/json-dom-selectors/success.perl
+t/t-data/site-with-delayed-items-inside-iframe/content.html
+t/t-data/site-with-delayed-items-inside-iframe/iframe.html
+t/t-data/site-with-delayed-items/content.html
 t/t-data/site1/content.html
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

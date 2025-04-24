@@ -4,12 +4,12 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 # VERSION
 
-Version 0.09
+Version 0.11
 
 # SYNOPSIS
 
 This module provides a set of tools to operate on the DOM
-loaded onto the provided <WWW::Mechanize::Chrome> object
+loaded onto the provided [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object
 after fetching a URL.
 
 Operating on the DOM is powerful but there are
@@ -20,19 +20,20 @@ Please read ["SECURITY WARNING"](#security-warning) before continuing on to the 
 
 Currently, [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) provides these tools:
 
-- `find()` : finds HTML elements,
-- `zap()` : deletes HTML elements.
+- `domops_find()` : finds HTML elements,
+- `domops_zap()` : deletes HTML elements.
 
-Both `find()` and `zap()` return some information from
+Both `domops_find()` and `domops_zap()` return some information from
 each match and its descendents (like `tag`, `id` etc.).
 This information can be tweaked by the caller.
-`find()` and `zap()` optionally execute javascript code on
+`domops_find()` and `domops_zap()` optionally execute javascript code on
 each match and its descendents and can return data back to
 the caller perl code.
 
 The selection of the HTML elements in the DOM
 can be done in various ways:
 
+- by **XPath selector**,
 - by **CSS selector**,
 - by **tag**,
 - by **class**.
@@ -43,10 +44,10 @@ There is more information about this in section ["ELEMENT SELECTORS"](#element-s
 
 Here are some usage scenaria:
 
-      use WWW::Mechanize::Chrome::DOMops qw/zap find VERBOSE_DOMops/;
+      use WWW::Mechanize::Chrome::DOMops qw/domops_zap domops_find domops_VERBOSITY/;
 
       # adjust verbosity: 0, 1, 2, 3
-      $WWW::Mechanize::Chrome::VERBOSE_DOMops = 3;
+      $WWW::Mechanize::Chrome::domops_VERBOSITY = 3;
 
       # First, create a mech object and load a URL on it
       # Note: you need google-chrome binary installed in your system!
@@ -56,9 +57,9 @@ Here are some usage scenaria:
       # fetch a page which will setup a DOM on which to operate:
       $mechobj->get('https://www.bbbbbbbbb.com');
 
-      # find elements in the DOM, select by id, tag, name, or 
-      # by CSS selector.
-      my $ret = find({
+      # find elements in the DOM, select by CSS selector,
+      # XPath selector, id, tag or name:
+      my $ret = domops_find({
          'mech-obj' => $mechobj,
          # find elements whose class is in the provided
          # scalar class name or array of class names
@@ -69,9 +70,10 @@ Here are some usage scenaria:
          'element-name' => ['aname', 'name2'],
          # *OR* their id is this:
          'element-id' => ['id1', 'id2'],
-         # *OR* just provide a CSS selector and get done with it already
-         # the best choice
+         # *OR* just provide a CSS selector
          'element-cssselector' => 'a-css-selector',
+         # *OR* just provide a XPath selector
+         'element-xpathselector' => 'a-xpath-selector',
          # specifies that we should use the union of the above sets
          # hence the *OR* in above comment
          '||' => 1,
@@ -95,7 +97,7 @@ Here are some usage scenaria:
              'code' =><<'EOJS',
     // the element to operate on is 'htmlElement'
     console.log("operating on this element "+htmlElement.tagName);
-    // this is returned back in the results of find() under
+    // this is returned back in the results of domops_find() under
     // key "cb-results"->"find-cb-on-matched"
     return 1;
   EOJS
@@ -109,7 +111,7 @@ Here are some usage scenaria:
              'code' =><<'EOJS',
     // the element to operate on is 'htmlElement'
     console.log("operating on this element "+htmlElement.tagName);
-    // this is returned back in the results of find() under
+    // this is returned back in the results of domops_find() under
     // key "cb-results"->"find-cb-on-matched" notice the complex data
     return {"abc":"123",{"xyz":[1,2,3]}};
   EOJS
@@ -130,13 +132,13 @@ Here are some usage scenaria:
 
 
       # Delete an element from the DOM
-      $ret = zap({
+      $ret = domops_zap({
          'mech-obj' => $mechobj,
          'element-id' => 'paragraph-123'
       });
 
       # Mass murder:
-      $ret = zap({
+      $ret = domops_zap({
          'mech-obj' => $mechobj,
          'element-tag' => ['div', 'span', 'p'],
          '||' => 1, # the union of all those matched with above criteria
@@ -157,23 +159,57 @@ Here are some usage scenaria:
       # the latter contains a recursive list of those
       # found AND ALL their children
 
+      # wait for page to load with catching the Page.loadEventFired
+      if( 0 == domops_wait_for_page_to_load() ){ print "page loaded\n" }
+      else { die "page did not load within the default timeout" }
+
+      domops_wait_for_page_to_load({
+        'timeout' => 50.5, # fractional seconds
+        'sleep' => 1.5, # fractional seconds to sleep between polling
+      });
+
+      # this waits for Page.loadEventFired AND for ALL
+      # DOM elements specified with the XPath selectors:
+      domops_wait_for_page_to_load({
+        'elements-must-be-present' => [
+          'div[@id="anid1"]',
+          'span[@id="anid2"]',
+        ],
+        'elements-must-be-present-op' => '&&'
+      });
+
 # EXPORT
 
-the sub to find element(s) in the DOM
+- the sub to find element(s) in the DOM
 
-    find()
+        domops_find()
 
-the sub to delete element(s) from the DOM
+- the sub to delete element(s) from the DOM
 
-    zap()
+        domops_zap()
 
-and the flag to denote verbosity (default is 0, no verbosity)
+- the sub to read element selectors from a JSON string
 
-    $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops
+        domops_read_dom_element_selectors_from_JSON_string()
+
+- the sub to read element selectors from a JSON file
+
+        domops_read_dom_element_selectors_from_JSON_file()
+
+- the sub to wait for the DOM to load not only via
+detecting the `DOMContentLoaded` event but by also
+waiting for specific DOM elements, specified via selectors including
+CSS and XPath selectors, to appear
+
+        domops_wait_for_page_to_load()
+
+    and the flag to denote verbosity (default is 0, no verbosity)
+
+        $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY
 
 # SUBROUTINES/METHODS
 
-## find($params)
+## domops\_find($params)
 
 It finds HTML elements in the DOM currently loaded on the
 parameters-specified [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object. The
@@ -207,17 +243,17 @@ its tag and its id (empty string) will be returned.
 By specifying this parameter (as a string, e.g. `_replacing_empty_ids`)
 all such elements matched will have their id set to
 `_replacing_empty_ids_X` where X is an incrementing counter
-value starting from a random number. By running `find()`
+value starting from a random number. By running `domops_find()`
 more than once on the same on the same DOM you are risking
 having the same ID. So provide a different prefix every time.
 Or use `insert-id-if-none-random`, see below.
-- `insert-id-if-none-random` : each time `find()` is called
+- `insert-id-if-none-random` : each time `domops_find()` is called
 a new random base id will be created formed by the specified prefix (as with
 `insert-id-if-none`) plus a long random string plus the incrementing
 counter, as above. This is supposed to be better at
 avoiding collisions but it can not guarantee it.
 If you are setting `rand()`'s seed to the same number
-before you call `find()` then you are guaranteed to
+before you call `domops_find()` then you are guaranteed to
 have collisions.
 - `find-cb-on-matched` : an array of
 user-specified javascript code
@@ -285,7 +321,7 @@ Most likely this syntax error is with user-specified callback code.
 Note that all the javascript code to be evaluated is dumped to stderr
 by increasing the verbosity. But also it can be saved to a local file
 for easier debugging by supplying the `js-outfile` parameter to
-`find()` or `zap()`.
+`domops_find()` or `domops_zap()`.
 - `-1` : there is a logical error while running the javascript code.
 For example a division by zero etc. This can be both in the callback code
 as well as in the internal javascript code for edge cases not covered
@@ -293,7 +329,7 @@ by my tests. Please report these.
 Note that all the javascript code to be evaluated is dumped to stderr
 by increasing the verbosity. But also it can be saved to a local file
 for easier debugging by supplying the `js-outfile` parameter to
-`find()` or `zap()`.
+`domops_find()` or `domops_zap()`.
 
 If `status` is not negative, then this is success and its value
 denotes the number of matched HTML elements. Which can be zero
@@ -376,14 +412,14 @@ you can get same ids. So, always supply a different
 value to this parameter if run more than once on the
 same DOM.
 
-## zap($params)
+## domops\_zap($params)
 
 It removes HTML element(s) from the DOM currently loaded on the
 parameters-specified [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) object. The params
-are exactly the same as with ["find($params)"](#find-params) except that
+are exactly the same as with ["domops\_find($params)"](#domops_find-params) except that
 `insert-id-if-none` is ignored.
 
-`zap()` is implemented as a `find()` with
+`domops_zap()` is implemented as a `domops_find()` with
 an additional callback for all elements matched
 in the first level (not their children) as:
 
@@ -394,9 +430,108 @@ in the first level (not their children) as:
 
 **RETURN VALUE**:
 
-Return value is exactly the same as with ["find($params)"](#find-params)
+Return value is exactly the same as with ["domops\_find($params)"](#domops_find-params)
 
-## $WWW::Mechanize::Chrome::DOMops::VERBOSE\_DOMops
+## domops\_wait\_for\_page\_to\_load($params)
+
+It waits for the page to load by detecting the `Page.loadEventFired`
+event. However, because the DOM may be altered at any time, even if
+said event has been fired, there is provision to wait for specific
+DOM elements as well via the `elements-must-be-present` input parameter.
+This can be a scalar or an ARRAY\_REF containing XPath selectors
+for DOM elements to wait for their appearance on the page. If this
+contains more than one selectors (i.e. it is an ARRAY\_REF), then
+input parameter `elements-must-be-present-op` can be set
+to `&&` or `||`, denoting the method to combine these. I.e.
+wait for all (`&&`) or wait for any (`||`).
+
+**INPUT PARAMETERS**:
+
+As a HASH\_REF:
+
+- **`elements-must-be-present`** : optionally specify XPath selector(s)
+either as a scalar or an ARRAY\_REF to wait for their appearance.
+- **`elements-must-be-present-op`** : optionally specify how to
+combine the XPath selectors, specified via `elements-must-be-present`
+which in this case must be an ARRAY\_REF, either as wait for all
+elements to appear (`&&`) or for any element to appear (`||`).
+- **`document`** : Checking for the appearance of
+specific DOM elements (via `elements-must-be-present`)
+is done for elements under the default `document`'s body.
+But, if frame
+elements are present (e.g. `iframe`) then you can optionally
+search in their `document`. Javascript's `document.evaluate()`
+(which is an XPath query function) allows to use any
+other node. E.g. the frame's document. In this case set `document`
+to Javascript code to return the element you want to search under it.
+For example, if you have an iframe and you want to search under
+it, then set '`document`' to this XPath selector: '`iframe[@id="myiframeid"]`'.
+If `elements-must-be-present` is an ARRAY\_REF then '`document`'
+can be a scalar or ARRAY\_REF. In the former case, the document will
+apply for each item of `elements-must-be-present`. In the latter case,
+each item of `document` will apply to the corresponding item of
+`elements-must-be-present`.
+
+    **WARNING**: accessing the document body of a frame element is
+    most likely forbidden because of the weird CORS rules. In
+    other words: an iframe is running on your browser but you are not allow
+    to know what it does or how! Only watch the rendered results.
+    Perfect! Note that test file `t/300-domops_wait_for_page_to_load-delayed-elements-inside-iframe.t.fails-because-of-cors`
+    is renamed so that it does not run because it fails because
+    of CORS which guards against, even, local pages.
+
+- **`timeout`** : fractional number of seconds to wait for
+the DOM loaded event and/or any DOM elements before returning,
+even without the conditions were satisfied and the page was
+most likely not loaded. The default value is 15 seconds.
+- **`sleep`** : fractional number of seconds to sleep
+between polling for the DOM elements, if any were specified.
+It does not apply when waiting for the `Page.loadEventFired`
+I could not find a way to use a timeout with [WWW::Mechanize::Chrome::\_collectEvents](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3A_collectEvents),
+which is used internally. Default is 0.5 seconds of sleep between polling.
+
+**RETURN VALUE**:
+
+- **`1`** : denotes failure. For example if required input
+parameters are missing.
+- **`0`** : denotes absolute success meaning all events and DOM
+elements requested to wait for, have appeared and page is
+considered to be loaded and ready.
+- **`2`** : denotes partial success in that all code
+was run but events and/or DOM elements had not appeared
+within the current timeout. Which most likely means that
+the page is not ready yet. Increase the timeout and see.
+Or correct your DOM element selectors.
+
+## domops\_read\_dom\_element\_selectors\_from\_JSON\_file($filename)
+
+It reads DOM element selectors, in their various forms
+as documented at ["ELEMENT SELECTORS"](#element-selectors),
+from specified filename and returns these
+as a Perl data structure which can then be passed on to
+["domops\_find($params)"](#domops_find-params) and ["domops\_zap($params)"](#domops_zap-params).
+
+**RETURN VALUE**:
+
+- **`undef`** : on failure, e.g. file not found or parsing errors.
+- a Perl data structure witht the selectors on success which can
+directly be passed on to ["domops\_find($params)"](#domops_find-params) and ["domops\_zap($params)"](#domops_zap-params).
+
+## domops\_read\_dom\_element\_selectors\_from\_JSON\_string($string)
+
+It reads DOM element selectors, in their various forms
+as documented at ["ELEMENT SELECTORS"](#element-selectors),
+from specified string and returns these
+as a Perl data structure which can then be passed on to
+["domops\_find($params)"](#domops_find-params) and ["domops\_zap($params)"](#domops_zap-params).
+
+**RETURN VALUE**:
+
+- **`undef`** : on failure, e.g. file not found or parsing errors.
+- a Perl data structure witht the selectors on success which can
+directly be passed on to ["domops\_find($params)"](#domops_find-params) and ["domops\_zap($params)"](#domops_zap-params).
+
+## $WWW::Mechanize::Chrome::DOMops::domops\_VERBOSITY
 
 Set this upon loading the module to `0, 1, 2, 3`
 to adjust verbosity. `0` implies no verbosity.
@@ -405,8 +540,9 @@ to adjust verbosity. `0` implies no verbosity.
 
 `Element selectors` are how one selects HTML elements from the DOM.
 There are 5 ways to select HTML elements: by class (`element-class`),
-tag (`element-tag`), id (`element-id`), name (`element-name`)
-or via a CSS selector (`element-cssselector`).
+tag (`element-tag`), id (`element-id`), name (`element-name`),
+a CSS selector (`element-cssselector`)
+or via an XPath selector (`element-xpathselector`).
 
 Multiple selectors can be specified
 by combining the various selector types, above.
@@ -430,6 +566,7 @@ These are the valid selectors:
 - `element-id` : find DOM element matching this element id
 - `element-name` : find DOM element matching this element name
 - `element-cssselector` : find DOM element matching this CSS selector
+- `element-xpathselector` : find DOM element matching this XPath selector
 
 And one of these two must be used to combine the results
 into a final list:
@@ -506,7 +643,7 @@ This is how I do it:
     die "failed to fetch $URL" unless defined $retmech;
     $mech_obj->sleep(1); # let it settle
     # now the mech object has loaded the URL and has a DOM hopefully.
-    # You can pass it on to find() or zap() to operate on the DOM.
+    # You can pass it on to domops_find() or domops_zap() to operate on the DOM.
 
 # SECURITY WARNING
 
@@ -559,7 +696,7 @@ If you allow
 unchecked user-specified (or copy-pasted from ChatGPT)
 javascript code in
 [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)'s
-`find()`, `zap()`, etc. then it is, theoretically,
+`domops_find()`, `domops_zap()`, etc. then it is, theoretically,
 possible that this javascript code
 initiates an XHR to yahoo and fetch your emails and
 pass them on to your perl code.
@@ -651,9 +788,9 @@ You can also look for information at:
 
     [http://annocpan.org/dist/WWW-Mechanize-Chrome-DOMops](http://annocpan.org/dist/WWW-Mechanize-Chrome-DOMops)
 
-- CPAN Ratings
+- Review this module at PerlMonks
 
-    [https://cpanratings.perl.org/d/WWW-Mechanize-Chrome-DOMops](https://cpanratings.perl.org/d/WWW-Mechanize-Chrome-DOMops)
+    [https://www.perlmonks.org/?node\_id=21144](https://www.perlmonks.org/?node_id=21144)
 
 - Search CPAN
 

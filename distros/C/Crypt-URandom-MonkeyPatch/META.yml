@@ -8,7 +8,6 @@ build_requires:
   Module::Metadata: '1.000015'
   Test::More: '0'
   Test::Output: '0'
-  strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -35,16 +34,18 @@ name: Crypt-URandom-MonkeyPatch
 provides:
   Crypt::URandom::MonkeyPatch:
     file: lib/Crypt/URandom/MonkeyPatch.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
   Crypt::URandom: '0'
   constant: '0'
-  perl: v5.16.0
+  perl: v5.8.0
+  strict: '0'
+  version: '0.77'
   warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch/issues
   repository: git://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git
-version: v0.1.0
+version: v0.1.1
 x_authority: cpan:RRWO
 x_deprecated: 1
 x_generated_by_perl: v5.34.3

@@ -2,6 +2,8 @@ package Javonet::Sdk::Core::PerlCommandType;
 use strict;
 use warnings;
 use Moose;
+use Exporter qw(import);
+our @EXPORT = qw(get_command_type);
 
 my %command_type = (
     'Value'                     => 0,

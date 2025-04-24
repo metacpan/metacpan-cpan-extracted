@@ -33,7 +33,9 @@ do { my $x = {
                       'requires' => {
                                       'Crypt::URandom' => '0',
                                       'constant' => '0',
-                                      'perl' => 'v5.16.0',
+                                      'perl' => 'v5.8.0',
+                                      'strict' => '0',
+                                      'version' => '0.77',
                                       'warnings' => '0'
                                     }
                     },
@@ -45,8 +47,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '1.000015',
                                    'Test::More' => '0',
-                                   'Test::Output' => '0',
-                                   'strict' => '0'
+                                   'Test::Output' => '0'
                                  }
                  }
      };

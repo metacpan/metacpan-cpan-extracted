@@ -21,6 +21,7 @@ t/boiler.t
 t/carp.t
 t/changes.t
 t/comment-spelling.t
+t/config_file.t
 t/cookies.t
 t/cover.t
 t/critic.t

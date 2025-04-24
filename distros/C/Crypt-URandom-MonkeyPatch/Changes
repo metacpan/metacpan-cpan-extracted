@@ -1,4 +1,13 @@
 Revision history for Crypt-URandom-MonkeyPatch:
 
+v0.1.1    2025-04-23 12:41:42+01:00 Europe/London
+  [Enhancements]
+  - The minimum Perl version was downgraded to v5.8.
+
+  [Documentation]
+  - Added reference to the security policy in the BUGS section.
+
+  - Added a How to Contribute document.
+
 v0.1.0    2025-04-18 14:59:36+01:00 Europe/London
   - Initial version released.

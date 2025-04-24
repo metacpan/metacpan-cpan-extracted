@@ -107,19 +107,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtendsBasicAttributes>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/ExtendsBasicAttributes>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/ExtendsBasicAttributes>
 
 =item * Search CPAN
 
@@ -135,7 +127,7 @@ L<http://search.cpan.org/dist/ExtendsBasicAttributes/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 lnation.
+Copyright 2025 lnation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

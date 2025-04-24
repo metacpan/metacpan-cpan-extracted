@@ -3,7 +3,7 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 use Keyword::Declare;
 our ($PREFIX, %MACROS);
 
@@ -205,22 +205,6 @@ sub _parse_role_attrs {
 	return %attrs;
 }
 
-=pod todo uncomment and remove above hack
-sub _parse_role_attrs {
-	my @roles = @_;
-	my %attrs;
-	for (@roles) {
-		if ($_ =~ m/\s*use\s*((?!qw)(?&PerlQualifiedIdentifier))\s*((?&PerlList)) $PPR::GRAMMAR/xms) {
-			push @{$attrs{use}}, sprintf "%s %s", $1, $2;
-			next;
-		}
-		$_ =~ m/(with|allow|is|use)(.*)/i;
-		push @{$attrs{$1}}, eval($2) || $2;
-	}
-	return %attrs;
-}
-=cut
-
 sub _set_class_role_attrs {
 	my ($body, %attrs, %args) = @_;
 	if ($attrs{allow}) {
@@ -258,7 +242,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
@@ -404,14 +388,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Purple>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/MooX-Purple>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/MooX-Purple>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/MooX-Purple/>
@@ -424,7 +400,7 @@ L<http://search.cpan.org/dist/MooX-Purple/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 lnation.
+Copyright 2019->2025 lnation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -5,7 +5,7 @@ use lib 'lib';
 use Moose;
 use Nice::Try;
 use aliased 'Javonet::Core::Exception::Exception' => 'Exception';
-use aliased 'Javonet::Core::Handler::ReferencesCache' => 'ReferencesCache', qw(get_instance resolve_reference);
+use aliased 'Javonet::Core::Handler::ReferencesCache' => 'ReferencesCache';
 extends 'Javonet::Core::Handler::CommandHandler::AbstractCommandHandler';
 
 

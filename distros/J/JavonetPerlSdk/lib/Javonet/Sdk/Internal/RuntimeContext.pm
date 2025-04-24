@@ -9,7 +9,7 @@ use aliased 'Javonet::Core::Handler::PerlHandler' => 'PerlHandler';
 use aliased 'Javonet::Core::Interpreter::Interpreter' => 'Interpreter', qw(execute_);
 use aliased 'Javonet::Core::Exception::ExceptionThrower' => 'ExceptionThrower';
 
-extends 'Javonet::Sdk::Internal::Abstract::AbstractModuleContext',
+extends 'Javonet::Sdk::Internal::Abstract::AbstractRuntimeContext',
     'Javonet::Sdk::Internal::Abstract::AbstractTypeContext';
 
 my $perl_handler = Javonet::Core::Handler::PerlHandler->new();

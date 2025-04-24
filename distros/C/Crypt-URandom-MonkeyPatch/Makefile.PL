@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.016000;
+use 5.008000;
 
 use ExtUtils::MakeMaker;
 
@@ -18,21 +18,22 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Crypt-URandom-MonkeyPatch",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.016000",
+  "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "Crypt::URandom::MonkeyPatch",
   "PREREQ_PM" => {
     "Crypt::URandom" => 0,
     "constant" => 0,
+    "strict" => 0,
+    "version" => "0.77",
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "Module::Metadata" => "1.000015",
     "Test::More" => 0,
-    "Test::Output" => 0,
-    "strict" => 0
+    "Test::Output" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "Test::Output" => 0,
   "constant" => 0,
   "strict" => 0,
+  "version" => "0.77",
   "warnings" => 0
 );
 

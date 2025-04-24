@@ -1,5 +1,28 @@
 Revision history for CatalystX::Test::MockContext
 
+0.000004  2025-04-23 21:59:23+01:00 Europe/London
+  [Enhancements]
+  - Added a cpanfile to the distribution.
+
+  [Documentation]
+  - Reformatted documentation.
+
+  - README.md is generated from POD.
+
+  - Added an INSTALL guide.
+
+  - Added a security policy (SECURITY.md).
+
+  - Added a How to Contribute guide (CONTRIBUTING.md).
+
+  - Updated copyright year.
+
+  [Other]
+  - New maintainer, updated documentation and metadata.
+
+  [Tests]
+  - Added more author tests.
+
 0.000003  2017-12-11 09:48:31+00:00 Europe/London
   - Add missing version number to release
 

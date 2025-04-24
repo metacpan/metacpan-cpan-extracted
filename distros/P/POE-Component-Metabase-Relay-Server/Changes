@@ -1,49 +1,22 @@
 ==================================================
-Changes from 2014-09-11 00:00:00 +0000 to present.
+Changes from 2020-04-24 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.38 at 2019-09-10 15:09:32 +0000
+version 0.40 at 2025-04-23 11:40:24 +0000
 -----------------------------------------
 
-  Change: 03bee8487fdb1e7c6544bc980ad30a8fd0fb6b03
+  Change: 8646bca712e1070b0618496a7ab9d054517ab3a0
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-09-10 16:09:32 +0000
+  Date : 2025-04-23 12:40:24 +0000
 
-    Bump to 0.38 
+    Switch to using JSON::MaybeXS
 
-  Change: 19c63f0ba716f8f1226fe1e7aa274f219e6b7081
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-09-10 14:37:43 +0000
+    JSON::XS is failing to install on quadmath perls. Switched to using
+    JSON::MaybeXS, this will pull in Cpanel::JSON::XS.
 
-    Added dsn to the generic db error output 
-
------------------------------------------
-version 0.36 at 2016-07-07 12:10:13 +0000
------------------------------------------
-
-  Change: 09f9898fb074edf2b91cfe0b9c25626843f2ac49
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-07-07 13:10:13 +0000
-
-    Bump to version 0.36 
-
-  Change: b85dd5c896ef25f5a2de4bbb31eb492f57179103
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-07-07 13:09:09 +0000
-
-    Fix no_curl option and require 0.08 of PoCo-Curl-Multi 
-
-  Change: 5bc47c7a9394cba7324fbd2262c22e0304c022cb
-  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
-  Date : 2016-07-07 12:54:11 +0000
-
-    Avoid warning message if name resolution fails (#1)
-
-    Testing if name resolution is OK before printing debug message
-    Avoiding name resolution if debug is off Replace sockaddr_in with
-    unpack_sockaddr_in as recommended in Socket documentation 
+    Removed JSON and JSON::XS from the prereqs and added JSON::MaybeXS 
 
 =================================================
-Plus 16 releases after 2014-09-11 00:00:00 +0000.
+Plus 19 releases after 2020-04-24 00:00:00 +0000.
 =================================================

@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 package CatalystX::Test::MockContext;
-$CatalystX::Test::MockContext::VERSION = '0.000003';
 use Plack::Test;
 use Class::Load ();
+
+our $VERSION = '0.000004';
 
 #ABSTRACT: Conveniently create $c objects for testing
 
@@ -44,6 +45,7 @@ sub mock_context {
   }
 }
 
+
 1;
 
 __END__
@@ -58,7 +60,7 @@ CatalystX::Test::MockContext - Conveniently create $c objects for testing
 
 =head1 VERSION
 
-version 0.000003
+version 0.000004
 
 =head1 SYNOPSIS
 
@@ -68,20 +70,43 @@ version 0.000003
   my $m = mock_context('MyApp');
   my $c = $m->(GET '/');
 
-=head1 METHODS
+=head1 EXPORTS
 
-=head2 my $sub = mock_context('MyApp');
+=head2 mock_context
 
-This method returns a closure that takes an HTTP::Request object and returns a
+ my $sub = mock_context('MyApp');
+
+This function returns a closure that takes an L<HTTP::Request> object and returns a
 L<Catalyst> context object for that request.
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/CatalystX-Test-MockContext>
+and may be cloned from L<git://github.com/robrwo/CatalystX-Test-MockContext.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/CatalystX-Test-MockContext/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities.
 
 =head1 AUTHOR
 
 Eden Cardim <edencardim@gmail.com>
 
+Currently maintained by Robert Rothenberg <rrwo@cpan.org>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Eden Cardim.
+This software is copyright (c) 2017, 2025 by Eden Cardim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.257.1';
+$Config::Model::Backend::Systemd::VERSION = '0.257.2';
 use strict;
 use warnings;
 use 5.020;
@@ -33,7 +33,7 @@ has config_dir => (
 has 'annotation' => ( is => 'ro', isa => 'Bool', default => 1 );
 
 # TODO: accepts other systemd suffixes
-my @service_types = qw/service socket/;
+my @service_types = qw/service socket timer/;
 my $joined_types = join('|', @service_types);
 my $filter = qr/\.($joined_types)(\.d)?$/;
 
@@ -79,7 +79,7 @@ sub read_systemd_files ($self, %args) {
         );
     }
 
-    $user_logger->warn( "Loading unit file '$file'");
+    $user_logger->info( "Loading unit file '$file'");
     my ($service_name, $unit_type) =  split /\./, path($file)->basename;
 
     my @to_create = $unit_type ? ($unit_type) : @service_types;
@@ -126,9 +126,9 @@ sub read_systemd_units ($self, %args) {
     }
 
     if ($select_unit ne '*') {
-        $user_logger->warn( "Loading unit matching '$select_unit'");
+        $user_logger->info( "Loading unit matching '$select_unit'");
     } else {
-        $user_logger->warn("Loading all units...")
+        $user_logger->info("Loading all units...")
     }
 
     my $root_path = $args{root} || path('/');
@@ -165,6 +165,7 @@ sub read_systemd_units ($self, %args) {
     $self->config_dir($dir);
     my $found = 0;
     foreach my $file ($dir->children($filter) ) {
+        $logger->trace("Scanning unit dir $dir with filter $filter");
         my ($unit_type,$dot_d) = ($file =~ $filter);
         my $file_name = $file->basename();
         my $unit_name = $file->basename($filter);
@@ -173,15 +174,15 @@ sub read_systemd_units ($self, %args) {
         $logger->trace( "checking $file against $select_unit");
 
         if ($file->realpath eq '/dev/null') {
-            $logger->warn("unit $unit_type name $unit_name from $file is disabled");
+            $logger->info("unit $unit_type name $unit_name from $file is disabled");
             $self->node->load(step => qq!$unit_type:"$unit_name" disable=1!, check => $args{check} ) ;
         }
         elsif ($dot_d and $file->child('override.conf')->exists) {
-            $logger->warn("registering unit $unit_type name $unit_name from override file");
+            $logger->info("registering unit $unit_type name $unit_name from override file");
             $self->node->load(step => qq!$unit_type:"$unit_name"!, check => $args{check} ) ;
         }
         else {
-            $logger->warn("registering unit $unit_type name $unit_name from $file");
+            $logger->info("registering unit $unit_type name $unit_name from $file");
             $self->node->load(step => qq!$unit_type:"$unit_name"!, check => $args{check} ) ;
         }
         $found++;
@@ -189,7 +190,7 @@ sub read_systemd_units ($self, %args) {
 
     if (not $found) {
         # no service exists, let's create them.
-        $user_logger->warn( "No unit '$select_unit' found in $dir, creating one...");
+        $user_logger->info( "No unit '$select_unit' found in $dir, creating one...");
         my ($service_name, $unit_type) =  split /\./, $select_unit;
         my @to_create = $unit_type ? ($unit_type) : @service_types;
         $service_name //= $select_unit;
@@ -232,7 +233,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.257.1
+version 0.257.2
 
 =head1 SYNOPSIS
 

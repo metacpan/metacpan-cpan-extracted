@@ -1,5 +1,9 @@
 Revision history for meta
 
+0.013   2025-04-23
+        [BUGFIXES]
+         * Skip t/80subname+Sub-Util.t on perls that don't have Sub::Util
+
 0.012   2024-10-14
         [BUGFIXES]
          * Make `$metasub->signature` work correctly on `method` subs of

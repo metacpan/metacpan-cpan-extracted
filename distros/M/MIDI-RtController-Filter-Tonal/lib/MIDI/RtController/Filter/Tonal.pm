@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0305';
+our $VERSION = '0.0306';
 
 use strictures 2;
 use curry;
@@ -325,7 +325,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0305
+version 0.0306
 
 =head1 SYNOPSIS
 

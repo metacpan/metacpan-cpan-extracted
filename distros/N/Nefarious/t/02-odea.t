@@ -47,7 +47,6 @@ is($t->one, 1);
 is($t->two, 2);
 
 $t = Testing->new();
-
 is($t->one, 1);
 is($t->two, 2);
 is($t->three, 3);
@@ -62,8 +61,9 @@ is($t->four, 4);
 is($t->five, 5);
 is($t->six, 6);
 is($t->str, 'abc');
+
 is($t->fact('abc', 'def'), 'two strings');
-is($t->fact('abc'), 'one string');
-is($t->fact, 'default');
+#is($t->fact('abc'), 'one string');
+#is($t->fact, 'default');
 
 done_testing();

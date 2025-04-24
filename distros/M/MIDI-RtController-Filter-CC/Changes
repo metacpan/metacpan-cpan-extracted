@@ -1,5 +1,12 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.0913 2025-04-23 12:09:15
+  - Improve documentation.
+  - Make the step values be 0-127, not "any number."
+
+0.0912 2025-04-23 11:59:14
+  - Improve documentation.
+
 0.0911 2025-04-22 12:17:51
   - Correct documentation.
 

@@ -25,6 +25,7 @@ my %args = (
     ofac_consolidated_url => "file://t/data/sample_ofac_consolidated.xml",
     hmt_url               => "file://t/data/sample_hmt.csv",
     unsc_url              => "file://t/data/sample_unsc.xml",
+    moha_url              => "file://t/data/sample_moha.xml",
     handler               => sub { },
 );
 
@@ -65,10 +66,13 @@ subtest 'source url arguments' => sub {
         'UNSC-Sanctions' => {
             error => ignore(),
         },
+        'MOHA-Sanctions' => {
+            error => ignore(),
+        },
         },
         'All sources return errors - no content';
 
-    is $calls, 3 * 5, 'the fetcher tried thrice per source and failed finally.';
+    is $calls, 3 * 6, 'the fetcher tried thrice per source and failed finally.';
 
 };
 
@@ -392,6 +396,35 @@ subtest 'UNSC Sanctions' => sub {
         ]
         },
         'Alias names as saved in a single entry';
+};
+
+subtest 'MOHA Sanctions' => sub {
+
+    my $fetcher = Data::Validate::Sanctions::Fetcher::run(%args);
+
+    my $source_name = 'MOHA-Sanctions';
+    my $parsed_data = $fetcher->{$source_name};
+
+    my $publish_date_string = "2024-09-09T01:52:15Z";
+    my $publish_date_epoch  = 1725846735;
+
+    ok $parsed_data, 'Sanctions are loaded from the sample file';
+
+    is $parsed_data->{updated}, $publish_date_epoch, "Sanctions update date matches the content of sample file";
+
+    my @data = $parsed_data->{content}->@*;
+    is scalar @data, 99, "Number of names matches the content of the sample file";
+
+    my $entry = find_entry_by_name($parsed_data, "Zahar bin Abdullah");
+    cmp_deeply $entry->{names}, ["Zahar bin Abdullah", "Abu Zahar"], "Multiple names extracted correctly";
+
+    cmp_deeply find_entry_by_name($parsed_data, "Abu Zahar") == $entry, 1, "Can find entry by alias name";
+
+    cmp_deeply $entry->{dob_text}, ["24.04.1981"], "Date of birth extracted correctly";
+
+    $entry = find_entry_by_name($parsed_data, "Mohamad Alsaied Alhmidan");
+    cmp_deeply $entry->{dob_text}, ["20.02.1976", "13.02.1975", "15.02.1976", "07.01.1977"], "Multiple Date of birth extracted correctly";
+
 };
 
 sub find_entry_by_name {

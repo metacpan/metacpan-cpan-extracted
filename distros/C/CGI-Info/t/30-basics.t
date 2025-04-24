@@ -41,7 +41,7 @@ sub mock_env {
 subtest 'CGI::Info' => sub {
 	subtest 'Constructor (new)' => sub {
 		subtest 'should handle invalid parameters gracefully' => sub {
-		throws_ok { CGI::Info->new('invalid_param', 'value', 'another parm') } qr/Invalid arguments/, 'Dies on invalid args';
+			throws_ok { CGI::Info->new('invalid_param', 'value', 'another parm') } qr/^Usage/, 'Dies on invalid args';
 		};
 
 		subtest 'should load config file if provided' => sub {
@@ -124,8 +124,9 @@ subtest 'CGI::Info' => sub {
 				local *STDIN;
 				open STDIN, '<', \"------boundary\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\n\ncontent\n------boundary--";
 				my $info = CGI::Info->new(upload_dir => File::Spec->tmpdir());
-				my $params = $info->params;
-				like $params->{file}, qr/test\.txt/, 'File upload handled';
+				my $params = $info->params();
+				like($params->{file}, qr/test\.txt/, 'File upload handled');
+				unlink $params->{'file'}
 			});
 		};
 

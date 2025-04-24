@@ -1,5 +1,5 @@
 package POE::Component::Metabase::Client::Submit;
-$POE::Component::Metabase::Client::Submit::VERSION = '0.14';
+$POE::Component::Metabase::Client::Submit::VERSION = '0.16';
 #ABSTRACT: a POE client that submits to Metabase servers
 
 use strict;
@@ -8,7 +8,7 @@ use Carp ();
 use HTTP::Status qw[:constants];
 use HTTP::Request::Common ();
 use HTTP::Message 5.814 (); # for HTTP::Message::decodable() support
-use JSON ();
+use JSON::MaybeXS;
 use POE qw[Component::Client::HTTP Component::Client::Keepalive];
 use URI;
 
@@ -307,7 +307,7 @@ POE::Component::Metabase::Client::Submit - a POE client that submits to Metabase
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -431,7 +431,7 @@ David A. Golden
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2025 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

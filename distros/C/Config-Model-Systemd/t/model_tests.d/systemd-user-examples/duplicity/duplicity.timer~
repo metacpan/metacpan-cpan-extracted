@@ -1,7 +1,10 @@
 ## This file was written by cme command.
-## You can run 'cme edit systemd-service-file' to modify this file.
+## You can run 'cme edit systemd-user' to modify this file.
 ## You may also modify the content of this file with your favorite editor.
 
 
+[Timer]
+OnCalendar = 13:00
+
 [Unit]
-Description = test single unit
+Description = Run duplicity

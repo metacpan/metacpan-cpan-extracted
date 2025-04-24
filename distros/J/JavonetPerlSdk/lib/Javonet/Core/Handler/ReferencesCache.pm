@@ -6,6 +6,8 @@ use Exporter;
 use Moose;
 use Data::UUID;
 use feature 'state';
+use Exporter qw(import);
+our @EXPORT = qw(cache_reference resolve_reference delete_reference);
 
 our %reference_cache;
 my $ug    = Data::UUID->new;

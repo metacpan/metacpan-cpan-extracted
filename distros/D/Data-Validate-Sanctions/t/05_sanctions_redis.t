@@ -87,6 +87,24 @@ my $sample_data = {
         ],
         error => ''
     },
+    'MOHA-Sanctions' => {
+        updated => 99,
+        content => [{
+                dob_text    => ["9.12.1961"],
+                names       => ["Halimah binti Hussein", "-"],
+                national_id => ["611209-01-5514"],
+                nationality => ["my"],
+                passport_no => ["A12114249"],
+            },
+            {
+                dob_text    => ["30.1.1984"],
+                names       => ["Muamar Gadaffi bin Mohamad Shafawi", "-"],
+                national_id => ["840130-08-6183"],
+                nationality => ["my"],
+                passport_no => ["A30793991"],
+            },
+        ],
+    },
 };
 
 subtest 'Class constructor' => sub {
@@ -127,6 +145,12 @@ subtest 'Class constructor' => sub {
             updated  => 0,
             error    => ''
         },
+        'MOHA-Sanctions' => {
+            content  => [],
+            verified => 0,
+            updated  => 0,
+            error    => ''
+        },
         },
         'There is no sanction data';
 };
@@ -140,6 +164,10 @@ subtest 'Update Data' => sub {
             content => []
         },
         'UNSC-Sanctions' => {
+            updated => 90,
+            content => []
+        },
+        'MOHA-Sanctions' => {
             updated => 90,
             content => []
         },
@@ -187,6 +215,11 @@ subtest 'Update Data' => sub {
             verified => 1500,
             updated  => 90,
         },
+        'MOHA-Sanctions' => {
+            content  => [],
+            verified => 1500,
+            updated  => 90
+        },
     };
     is_deeply $validator->data, $expected, 'Data is correctly loaded';
     check_redis_content('EU-Sanctions',      $mock_data->{'EU-Sanctions'},   1500);
@@ -194,6 +227,7 @@ subtest 'Update Data' => sub {
     check_redis_content('OFAC-Consolidated', {},                             1500);
     check_redis_content('OFAC-SDN',          {},                             1500);
     check_redis_content('UNSC-Sanctions',    $mock_data->{'UNSC-Sanctions'}, 1500);
+    check_redis_content('MOHA-Sanctions',    $mock_data->{'MOHA-Sanctions'}, 1500);
     is $index_call_counter, 1, 'index called after update';
     $validator->update_data();
     is $index_call_counter, 1, 'index not been called after update, due to unchanged data';
@@ -202,9 +236,11 @@ subtest 'Update Data' => sub {
     set_fixed_time(1600);
     $mock_data->{'EU-Sanctions'}->{updated}   = 91;
     $mock_data->{'UNSC-Sanctions'}->{updated} = 91;
+    $mock_data->{'MOHA-Sanctions'}->{updated} = 99;
     $validator->update_data();
     $expected->{'EU-Sanctions'}->{updated}   = 91;
     $expected->{'UNSC-Sanctions'}->{updated} = 91;
+    $expected->{'MOHA-Sanctions'}->{updated} = 99;
     $expected->{$_}->{verified}              = 1600 for keys %$expected;
     is_deeply $validator->data, $expected, 'Data is loaded with new update time';
     check_redis_content('EU-Sanctions', $mock_data->{'EU-Sanctions'}, 1600, 'Redis content changed by increased update time');
@@ -310,6 +346,12 @@ subtest 'load data' => sub {
             error    => ''
         },
         'UNSC-Sanctions' => {
+            content  => [],
+            verified => 0,
+            updated  => 0,
+            error    => ''
+        },
+        'MOHA-Sanctions' => {
             content  => [],
             verified => 0,
             updated  => 0,

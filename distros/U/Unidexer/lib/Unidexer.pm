@@ -1,6 +1,6 @@
 package Unidexer;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.01';
+use 5.006; use strict; use warnings; our $VERSION = '0.02';
 
 our $CHARS = 149186;
 
@@ -53,7 +53,7 @@ Unidexer - ...
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -103,15 +103,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Unidexer>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Unidexer>
 
 =item * Search CPAN
 
@@ -123,7 +119,7 @@ L<https://metacpan.org/release/Unidexer>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

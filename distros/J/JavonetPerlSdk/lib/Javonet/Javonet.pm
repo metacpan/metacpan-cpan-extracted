@@ -6,9 +6,11 @@ use lib 'lib';
 use Try::Tiny;
 use threads;
 use aliased 'Javonet::Sdk::Internal::RuntimeFactory' => 'RuntimeFactory';
-use aliased 'Javonet::Core::Transmitter::PerlTransmitter' => 'Transmitter', qw(activate send_command set_config_source set_javonet_working_directory);
+use aliased 'Javonet::Core::Transmitter::PerlTransmitter' => 'Transmitter';
 use aliased 'Javonet::Core::Exception::SdkExceptionHelper' => 'SdkExceptionHelper';
-use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger', qw(get_runtime_info);
+use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger';
+use Exporter qw(import);
+our @EXPORT = qw(activate in_memory tcp with_config get_runtime_info set_config_source set_javonet_working_directory);
 
 BEGIN {
     SdkExceptionHelper->send_exception_to_app_insights("SdkMessage", "Javonet Sdk initialized");
@@ -17,7 +19,7 @@ BEGIN {
 sub activate {
     my($self, $licenseKey) = @_;
     try {
-        return Transmitter->activate($licenseKey);
+        return Transmitter->t_activate($licenseKey);
     } catch {
         Javonet::Core::Exception::SdkExceptionHelper->send_exception_to_app_insights($_,"licenseFile");
         die($_);
@@ -37,7 +39,7 @@ sub tcp {
 sub with_config {
     my ($self, $config_path) = @_;
     try {
-        Transmitter->set_config_source($config_path);
+        Transmitter->t_set_config_source($config_path);
         return RuntimeFactory->new(Javonet::Sdk::Internal::ConnectionType::get_connection_type('WithConfig'), undef, $config_path);
     } catch {
         SdkExceptionHelper->send_exception_to_app_insights("SdkException", $_);
@@ -46,13 +48,13 @@ sub with_config {
 }
 
 sub get_runtime_info() {
-    RuntimeLogger->get_runtime_info();
+    RuntimeLogger->rl_get_runtime_info();
 }
 
 sub set_config_source {
     my ($self, $config_path) = @_;
     try {
-        Transmitter->set_config_source($config_path);
+        Transmitter->t_set_config_source($config_path);
     } catch {
         SdkExceptionHelper->send_exception_to_app_insights("SdkException", $_);
         die $_;
@@ -68,7 +70,7 @@ sub set_javonet_working_directory {
         $path .= '/' unless $path =~ m{/$};
         mkdir $path, 0700 unless -d $path;
         #ActivationHelper->working_directory($path);
-        Transmitter->set_javonet_working_directory($path);
+        Transmitter->t_set_javonet_working_directory($path);
     } catch {
         SdkExceptionHelper->send_exception_to_app_insights("SdkException", $_);
         die $_;

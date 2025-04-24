@@ -47,13 +47,13 @@ no_index:
 provides:
   Data::Validate::Sanctions:
     file: lib/Data/Validate/Sanctions.pm
-    version: '0.18'
+    version: '0.19'
   Data::Validate::Sanctions::Fetcher:
     file: lib/Data/Validate/Sanctions/Fetcher.pm
-    version: '0.18'
+    version: '0.19'
   Data::Validate::Sanctions::Redis:
     file: lib/Data/Validate/Sanctions/Redis.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   Carp: '0'
   Clone: '0'
@@ -91,7 +91,7 @@ resources:
   bugtracker: https://github.com/deriv-com/perl-Data-Validate-Sanctions/issues
   homepage: https://github.com/deriv-com/perl-Data-Validate-Sanctions
   repository: https://github.com/deriv-com/perl-Data-Validate-Sanctions.git
-version: '0.18'
+version: '0.19'
 x_authority: cpan:DERIV
 x_contributors:
   - 'Tazeek <tazeek.rakib@gmail.com>'
@@ -102,8 +102,9 @@ x_contributors:
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
   - 'Tom Molesworth <tom@binary.com>'
   - 'mat-fs <53427463+mat-fs@users.noreply.github.com>'
-  - 'chylli-deriv <chylli@deriv.com>'
+  - 'LQ <qiangliu@deriv.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'chylli-deriv <chylli@deriv.com>'
   - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
   - 'Mahdi Zarei <60599487+mehdi-fs@users.noreply.github.com>'
   - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
@@ -115,6 +116,7 @@ x_contributors:
   - 'heshan-deriv <109588077+heshan-deriv@users.noreply.github.com>'
   - 'jafrul-deriv <150781410+jafrul-deriv@users.noreply.github.com>'
   - 'lq <liuqiang1981@gmail.com>'
+  - 'naif-deriv <112558231+naif-deriv@users.noreply.github.com>'
   - 'ragheb <91007977+ragheb-deriv@users.noreply.github.com>'
   - 'saad-deriv <muhammad.saad@deriv.com>'
   - 'Zak B. Elep <zakame@zakame.net>'

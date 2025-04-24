@@ -42,4 +42,17 @@ Revision history for WWW-Mechanize-Chrome-DOMops
 0.09    20-12-2023/12:02
         Documentation.
 
+0.10    23-04-2025/13:45
+        Added 'domops_wait_for_page_to_load()' which waits for
+        the "dom-ready" event. It optionally waits for HTML elements
+        to be present in the DOM even if injected dynamically
+        after page has been loaded, which is very common.
+	Added XPath selection of elements for 'domops_find()' and 'domops_zap()'.
+        Switched to Test::TempDir::Tiny in test files.
+        Changed sub names 'zap()' to 'domops_zap()' and 'find()' to 'domops_find()' in order to avoid possible clashes with other modules.
+	Exported variable 'VERBOSE_DOMops' is now called 'domops_VERBOSITY'.
+        Now also optionally exporting: 'domops_read_dom_element_selectors_from_JSON_string()' and 'domops_read_dom_element_selectors_from_JSON_file()'
+
+0.11    23-04-2025/14:00
+        Added the headless option to launching mechanize in tests.
 

@@ -5,18 +5,25 @@ use strict;
 use warnings;
 
 use Exporter qw(import);
-our @EXPORT = qw(
-	zap
-	find
-	VERBOSE_DOMops
+our @EXPORT = (
+	# I wanted to distinguish find() from similar subs from foreign modules
+	# and domops_find() came. But for consistency now all are prefixed ...
+	'domops_zap',
+	'domops_find',
+	'domops_VERBOSITY',
+	'domops_read_dom_element_selectors_from_JSON_string',
+	'domops_read_dom_element_selectors_from_JSON_file',
+	'domops_wait_for_page_to_load'
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
-use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
- 
+use String::Escape qw/escape/;
+
+use Data::Roundtrip qw/perl2dump json2perl perl2json no-unicode-escape-permanently/;
+
 # caller can set this to 0,1,2,3
-our $VERBOSE_DOMops = 0;
+our $domops_VERBOSITY = 0;
 
 # Here are JS helpers. We use these in our own internal JS code.
 # They are visible to the user's JS callbacks.
@@ -26,7 +33,7 @@ const getAllChildren = (htmlElement) => {
 		console.log("getAllChildren() : warning null input");
 		return [];
 	}
-	if( VERBOSE_DOMops > 1 ){ console.log("getAllChildren() : called for element '"+htmlElement+"' with tag '"+htmlElement.tagName+"' and id '"+htmlElement.id+"' ..."); }
+	if( domops_VERBOSITY > 1 ){ console.log("getAllChildren() : called for element '"+htmlElement+"' with tag '"+htmlElement.tagName+"' and id '"+htmlElement.id+"' ..."); }
 
 	if (htmlElement.children.length === 0) return [htmlElement];
 
@@ -44,21 +51,31 @@ EOJ
 
 # The input is a hashref of parameters
 # the 'element-*' parameters specify some condition to be matched
-# for example id to be such and such.
+# for example id to be such and such or better use CSS or XPath selectors.
 # The conditions can be combined either as a union (OR)
 # or an intersection (AND). Default is intersection.
 # The param || => 1 changes this to Union.
-# 
-# returns -3 parameters error
-# returns -2 if javascript failed
-# returns -1 if one or more of the specified selectors failed to match
-# returns >=0 : the number of elements matched
-sub find {
+#
+# NOTE: the selector spec(s) are saved in an array and then
+#  are converted into JSON and then
+# passed on to javascript (via mech->eval()) to JSON.parse()
+# and then are array which we loop over. Quoting may be
+# wrong when you get problems, check quoting first.
+# it returns a hash which contains 'status' as following:
+#  -3 parameters error
+#  -2 if javascript failed
+#  -1 if one or more of the specified selectors failed to match
+#  >=0 : the number of elements matched
+# if 'status' is < 0, then there is a 'message' item with
+# the error message.
+# if 'status' is >= 0 then there is a 'found' array with
+# all the element ids matched.
+sub domops_find {
 	my $params = $_[0];
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
 
 	my $amech_obj = exists($params->{'mech-obj'}) ? $params->{'mech-obj'} : undef;
 	if( ! $amech_obj ){
@@ -73,14 +90,16 @@ sub find {
 
 	# html element selectors:
 	# e.g. params->{'element-name'} = ['a','b'] or params->{'element-name'} = 'a'
-	my @known_selectors = ('element-name', 'element-class', 'element-tag', 'element-id', 'element-cssselector');
+	my @known_selectors = ('element-name', 'element-class', 'element-tag', 'element-id', 'element-cssselector', 'element-xpathselector');
 	my (%selectors, $have_a_selector, $m);
 	for my $asel (@known_selectors){
 		next unless exists($params->{$asel}) and defined($params->{$asel});
-		if( ref($params->{$asel}) eq '' ){
-			$selectors{$asel} = '["' . $params->{$asel} . '"]';
-		} elsif( ref($params->{$asel}) eq 'ARRAY' ){
-			$selectors{$asel} = '["' . join('","', @{$params->{$asel}}) . '"]';
+		if( ref($params->{$asel}) eq '' ){ # Scalar a string selector, make it into an array
+			#$selectors{$asel} = '["' . $params->{$asel} . '"]';
+			$selectors{$asel} = [ $params->{$asel} ];
+		} elsif( ref($params->{$asel}) eq 'ARRAY' ){ # it's an array
+			#$selectors{$asel} = '["' . join('","', @{$params->{$asel}}) . '"]';
+			$selectors{$asel} = $params->{$asel};
 		} else {
 			my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error, parameter '$asel' expects a scalar or an ARRAYref and not '".ref($params->{$asel})."'.";
 			print STDERR $anerrmsg."\n";
@@ -90,7 +109,7 @@ sub find {
 			}
 		}
 		$have_a_selector = 1;
-		if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : found selector '$asel' with value '".$selectors{$asel}."'.\n" }
+		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ print STDOUT perl2dump($selectors{$asel})."$whoami (via $parent), line ".__LINE__." : found selector '$asel' with above content.\n" }
 	}
 	if( not $have_a_selector ){
 		my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : at least one selector must be specified by supplying one or more parameters from these: '".join("','", @known_selectors)."'.";
@@ -141,7 +160,7 @@ sub find {
 				}
 			}
 			$callbacks{$acbname} = $m;
-			if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : adding ".scalar(@$m)." callback(s) of type '$acbname' ...\n" }
+			if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : adding ".scalar(@$m)." callback(s) of type '$acbname' ...\n" }
 		}
 	}
 
@@ -159,7 +178,7 @@ sub find {
 		 || 0 # <<< default is intersection (superfluous but verbose)
 	;
 
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ print "$whoami (via $parent), line ".__LINE__." : using ".($Union?'UNION':'INTERSECTION')." to combine the matched elements.\n"; }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ print "$whoami (via $parent), line ".__LINE__." : using ".($Union?'UNION':'INTERSECTION')." to combine the matched elements.\n"; }
 	# there is no way to break a JS eval'ed via perl and return something back unless
 	# one uses gotos or an anonymous function, see
 	#    https://www.perlmonks.org/index.pl?node_id=1232479
@@ -176,7 +195,7 @@ sub find {
 		# there is no user-specified function for extracting info from each matched element, so use our own default:
 		$element_information_from_matched_function .= "\t" . 'return {"tag" : htmlElement.tagName, "id" : htmlElement.id};';
 	}
-	$element_information_from_matched_function .= "\n} // end element_information_from_matched_function\n";
+	$element_information_from_matched_function .= "\n}; // end element_information_from_matched_function\n";
 
 	# do we have user-specified JS code for callbacks?
 	# this falls under the 'find-cb-on-matched' and 'find-cb-on-matched-and-their-children' input parameters
@@ -199,10 +218,10 @@ EOJ
 	$cb_functions .= "\n};";
 
 	# This is the JS code to execute, we restrict its scope
-	# TODO: don't accumulate JS code for repeated find() calls on the same mech obj
+	# TODO: don't accumulate JS code for repeated domops_find() calls on the same mech obj
 	#       perhaps create a class which is overwritten on multiple calls?
 	my $jsexec = '{ /* our own scope */' # <<< run it inside its own scope because multiple mech->eval() accumulate and global vars are re-declared etc.
-	      . "\n\nconst VERBOSE_DOMops = ${WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops};\n\n"
+	      . "\n\nconst domops_VERBOSITY = ${WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY};\n\n"
 	      . $_aux_js_functions . "\n\n"
 	      . $element_information_from_matched_function . "\n\n"
 	      . $cb_functions . "\n\n"
@@ -211,6 +230,7 @@ EOJ
 // the return value of this anonymous function is what perl's eval will get back
 (function(){
 	var retval = -1; // this is what we return
+	// returns -2 for when selector JSON spec does not parse
 	// returns -1 for when one of the element searches matched nothing
 	// returns 0 if after intersection/union nothing was found to delete
 	// returns >0 : the number of elements deleted
@@ -218,6 +238,7 @@ EOJ
 	var allfound = [];
 	var allfound_including_children = [];
 	var elems = [];
+	var objselvalue;
 EOJ
 	for my $asel (@known_selectors){ $jsexec .= "\telems['${asel}'] = null;\n"; }
 	$jsexec .= <<EOJ;
@@ -230,31 +251,77 @@ EOJ
 		'element-tag' => 'document.getElementsByTagName',
 		'element-name' => 'document.getElementsByName',
 		'element-id' => 'document.getElementById',
-		'element-cssselector' => 'document.querySelectorAll'
+		'element-cssselector' => 'document.querySelectorAll',
+		'element-xpathselector' => 'document.evaluate'
 	);
 	for my $aselname (keys %selectors){
 		my $selfunc = $selfuncs{$aselname};
-		my $aselvalue = $selectors{$aselname};
-		$jsexec .= <<EOJ;
-	// selector '${aselname}' was specified: ${aselvalue}
-	for(let asel of ${aselvalue}){
+		my $_aselvalue = $selectors{$aselname};
+		my $aselvalue = String::Escape::escape('qprintable', perl2json($_aselvalue));
+		# we convert the selector(s) into json
+		# which 1) quotes it properly and 2) avoid pitfalls
+		# like comma at end of array.
+		if( ! defined $aselvalue ){
+			my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error, check the syntax of selector spec '$aselname' because it failed to be converted to JSON: ${_aselvalue}";
+			print STDERR $anerrmsg."\n";
+			return {
+				'status' => -3,
+				'message' => $anerrmsg
+			}
+		}
+		$jsexec .= <<EOJ; # ... appending to JS started above
+	/* selector '${aselname}' was specified as JSON: ${aselvalue} */
+	try { objselvalue = JSON.parse(${aselvalue}); }
+	catch(e){
+		msg = "error, selector spec passed as JSON string does not parse: "+${aselvalue};
+		console.log("$whoami (via $parent) via js-eval : "+msg);
+		return {"status":-2,"message":msg};
+	}
+	for(let asel of objselvalue){
 		// this can return an array or a single html element (e.g. in ById)
-		if( VERBOSE_DOMops > 1 ){ console.log("$whoami (via $parent) via js-eval : selecting elements with this function '${selfunc}' ..."); }
-		let tmp = ${selfunc}(asel);
-		// if getElementsBy return an HTMLCollection,
-		// getElementBy (e.g. ById) returns an html element
-		// and querySelectorAll returns NodeList
-		// convert them all to an array:
+		if( domops_VERBOSITY > 1 ){ console.log("$whoami (via $parent) via js-eval : selecting elements with this function '${selfunc}' ..."); }
+		let tmp;
+		// ALSO, searching within document.body may fail because body may not have already been
+		// settled, so we change document.evaluate()'s 2nd parameter from 'document.body' to 'document'
+		if( '${selfunc}'=='document.evaluate' ){
+			// special treatment for xpath...
+			tmp = document.evaluate(
+				asel,
+				document,
+				null,
+				XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
+				null
+			);
+		} else { tmp = ${selfunc}(asel); }
+
+		/* if getElementsBy return an HTMLCollection,
+		   getElementBy (e.g. ById) returns an html element
+		   and querySelectorAll returns NodeList
+		   convert them all to an array:
+		   NOTE: document.evaluate(XPath selector) returns
+		   an XPathResult object which needs special treatment
+		   to become an array. Additionally, use
+		     UNORDERED_NODE_SNAPSHOT_TYPE as the type, otherwise
+		   you will not get a size etc.
+		     see https://developer.mozilla.org/en-US/docs/Web/API/XPathResult/resultType
+		*/
 		if( (tmp === null) || (tmp === undefined) ){
-			if( VERBOSE_DOMops > 1 ){ console.log("$whoami (via $parent) : nothing matched."); }
+			if( domops_VERBOSITY > 1 ){ console.log("$whoami (via $parent) : nothing matched."); }
 			continue;
 		}
-		anelems = (tmp.constructor.name === 'HTMLCollection') || (tmp.constructor.name === 'NodeList')
-			? Array.prototype.slice.call(tmp) : [tmp]
-		;
+		if( tmp.constructor.name === 'XPathResult' ){
+			anelems = [];
+			for (let i=0;i<tmp.snapshotLength;i++){
+				anelems.push(tmp.snapshotItem(i));
+			}
+		} else {
+			anelems = (tmp.constructor.name === 'HTMLCollection') || (tmp.constructor.name === 'NodeList')
+				? Array.prototype.slice.call(tmp) : [tmp]
+			;
+		}
 		if( anelems == null ){
 			if( union == 0 ){
-				msg = "$whoami (via $parent) via js-eval : element(s) selected with ${aselname} '"+asel+"' not found, this specifier has failed and will not continue with the rest.";
+				msg = "$whoami (via $parent) via js-eval : element(s) selected with ${aselname} '"+asel+"' not found, this specifier has failed and will not continue with the rest (use '||' => 1 to the parameters in order to find as many as there are and not fail on the missing ones).";
 				console.log(msg);
 				return {"status":-1,"message":msg};
 			} else {
@@ -264,7 +331,7 @@ EOJ
 		}
 		if( anelems.length == 0 ){
 			if( union == 0 ){
-				msg = "$whoami (via $parent) via js-eval : element(s) selected with ${aselname} '"+asel+"' not found, this specifier has failed and will not continue with the rest.";
+				msg = "$whoami (via $parent) via js-eval : element(s) selected with ${aselname} '"+asel+"' not found, this specifier has failed and will not continue with the rest (use '||' => 1 to the parameters in order to find as many as there are and not fail on the missing ones).";
 				console.log(msg);
 				return {"status":-1,"message":msg};
 			} else {
@@ -279,9 +346,9 @@ EOJ
 			elems["${aselname}"] = elems["${aselname}"].length > 0 ? [...elems["${aselname}"], ...anelems] : anelems;
 		}
 		allfound = allfound.length > 0 ? [...allfound, ...anelems] : anelems;
-		if( VERBOSE_DOMops > 1 ){
+		if( domops_VERBOSITY > 1 ){
 			console.log("$whoami (via $parent) via js-eval : found "+elems["${aselname}"].length+" elements selected with ${aselname} '"+asel+"' (there may be duplicates which will be sorted later)");
-			if( (VERBOSE_DOMops > 2) && (elems["${aselname}"].length>0) ){
+			if( (domops_VERBOSITY > 2) && (elems["${aselname}"].length>0) ){
 				for(let el of elems["${aselname}"]){ console.log("  tag: '"+el.tagName+"', id: '"+el.id+"'"); }
 				console.log("--- end of the elements selected with ${aselname} (list may contain duplicate, they will be sorted out later).");
 			}
@@ -296,12 +363,12 @@ EOJ
 		# we just remove the duplicates from the allfound
 		# from https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array (by Christian Landgren)
 		$jsexec .= "\t// calculating the UNION of all elements found...\n";
-		if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ $jsexec .= "\t".'console.log("calculating the UNION of all elements found (without duplicates).\n");'."\n"; }
+		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ $jsexec .= "\t".'console.log("calculating the UNION of all elements found (without duplicates).\n");'."\n"; }
 		$jsexec .= "\t".'allfound.slice().sort(function(a,b){return a > b}).reduce(function(a,b){if (a.slice(-1)[0] !== b) a.push(b);return a;},[]);'."\n";
 	} else {
 		# intersection of all the elements matched individually
 		$jsexec .= "\t// calculating the INTERSECTION of all elements found...\n";
-		if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 1 ){ $jsexec .= "\t".'console.log("calculating the INTERSECTION of all elements found per selector category (if any).\n");'."\n"; }
+		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ $jsexec .= "\t".'console.log("calculating the INTERSECTION of all elements found per selector category (if any).\n");'."\n"; }
 		$jsexec .= "\tvar opts = ['".join("','", @known_selectors)."'];\n";
 		$jsexec .= <<'EOJ';
 	allfound = null;
@@ -357,9 +424,9 @@ EOJ
 		allfound_including_children = Object.values(unis);
 	}
 
-	if( VERBOSE_DOMops > 1 ){
+	if( domops_VERBOSITY > 1 ){
 		console.log("Eventually matched "+allfound.length+" elements");
-		if( (VERBOSE_DOMops > 2) && (allfound.length>0) ){
+		if( (domops_VERBOSITY > 2) && (allfound.length>0) ){
 			console.log("---begin matched elements:");
 			for(let el of allfound){ console.log("  tag: '"+el.tagName+"', id: '"+el.id+"'"); }
 			console.log("---end matched elements.");
@@ -371,14 +438,14 @@ EOJ
 		// this *crap* does not work: if( ! acbname in cb_functions ){ continue; }
 		// and caused me a huge waste of time
 		if( ! cb_functions[acbname] ){ continue; }
-		if( VERBOSE_DOMops > 1 ){ console.log("found callback for '"+acbname+"' and processing its code blocks ..."); }
+		if( domops_VERBOSITY > 1 ){ console.log("found callback for '"+acbname+"' and processing its code blocks ..."); }
 		let res1 = [];
 		let adata = acbname == 'find-cb-on-matched-and-their-children' ? allfound_including_children : allfound;
 		for(let acb of cb_functions[acbname]){
 			let res2 = [];
 			for(let i=0;i<adata.length;i++){
 				let el = adata[i];
-				if( VERBOSE_DOMops > 1 ){ console.log("executing callback of type '"+acbname+"' (name: '"+acb["name"]+"') on matched element tag '"+el.tagName+"' and id '"+el.id+"' ..."); }
+				if( domops_VERBOSITY > 1 ){ console.log("executing callback of type '"+acbname+"' (name: '"+acb["name"]+"') on matched element tag '"+el.tagName+"' and id '"+el.id+"' ..."); }
 				let ares;
 				try {
 					// calling the callback ...
@@ -389,7 +456,7 @@ EOJ
 					return {"status":-1,"message":msg};
 				}
 				res2.push({"name":acb["name"],"result":ares});
-				if( VERBOSE_DOMops > 1 ){ console.log("success executing callback of type '"+acbname+"' (name: '"+acb["name"]+"') on matched element tag '"+el.tagName+"' and id '"+el.id+"'. Result is '"+ares+"'."); }
+				if( domops_VERBOSITY > 1 ){ console.log("success executing callback of type '"+acbname+"' (name: '"+acb["name"]+"') on matched element tag '"+el.tagName+"' and id '"+el.id+"'. Result is '"+ares+"'."); }
 			}
 			res1.push(res2);
 		}
@@ -441,12 +508,14 @@ EOJ
 })(); // end of anonymous function and now execute it
 }; // end our eval scope
 EOJ
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 2 ){ print "--begin javascript code to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : evaluating above javascript code.\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 2 ){ print "--begin javascript code to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : evaluating above javascript code.\n" }
 
 	if( defined $js_outfile ){
 		if( open(my $FH, '>', $js_outfile) ){ print $FH $jsexec; close $FH }
 		else { print STDERR "$whoami (via $parent), line ".__LINE__." : warning, failed to open file '$js_outfile' for writing the output javascript code, skipping it ...\n" }
+		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : javascript code to be executed has been written to local file '${js_outfile}' for debugging.\n" }
 	}
+
 	my ($retval, $typ);
 	eval { ($retval, $typ) = $amech_obj->eval($jsexec) };
 	if( $@ ){
@@ -463,7 +532,10 @@ EOJ
 			'message' => "eval returned un undefined result."
 		};
 	}
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 2 ){ print "$whoami (via $parent), line ".__LINE__." : done evaluating javascript code with success.\n" }
 
+	# this contains 'status' and 'found' which contains all
+	# ids matched
 	return $retval; # success
 }
 
@@ -475,20 +547,28 @@ EOJ
 # The param || => 1 changes this to Union.
 # 
 # returns a hash of results, which contains status
+# status is -3 if general error occured, e.g. input parameters missing
 # status is -2 if javascript failed
 # status is -1 if one or more of the specified selectors failed to match
 # status is >=0 : the number of elements deleted
 # an error 'message' if status < 0
-# and various other items if status >= 0
-sub zap {
+# and 'found' with all element ids matched-and-zapped when status >= 0
+sub domops_zap {
 	my $params = $_[0];
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 
-	if( $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
 
 	my $amech_obj = exists($params->{'mech-obj'}) ? $params->{'mech-obj'} : undef;
-	if( ! $amech_obj ){ print STDERR "$whoami (via $parent), line ".__LINE__." : a mech-object is required via 'mech-obj'.\n"; return 0 }
+	if( ! $amech_obj ){
+		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY>2 ? perl2dump($params) : "")."$whoami (via $parent), line ".__LINE__." : error, input parameter 'mech-obj' is missing, see above parameters.";
+		print STDERR $anerrmsg."\n";
+		return {
+			'status' => -3,
+			'message' => $anerrmsg
+		}
+	}
 
 	my $cbex = exists($params->{'find-cb-on-matched'}) && defined($params->{'find-cb-on-matched'})
 		? [ @{$params->{'find-cb-on-matched'}} ] : [];
@@ -507,7 +587,9 @@ sub zap {
 		$myparams{'insert-id-if-none-random'} = '_domops_created_id';
 	}
 
-	my $ret = find({
+	# this contains 'status' and 'found' which contains all
+	# ids matched
+	my $ret = domops_find({
 		'mech-obj' => $amech_obj, 
 		%$params,
 		# overwrite anything like these the user specified:
@@ -515,7 +597,7 @@ sub zap {
 	});
 
 	if( ! defined $ret ){
-		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops>2 ? perl2dump($params) : "")."$whoami (via $parent), line ".__LINE__." : error, call to find()/1 has failed for above parameters.";
+		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY>2 ? perl2dump({%$params,'mech-obj'=>'<reducted>'}) : "")."$whoami (via $parent), line ".__LINE__." : error, call to domops_find()/1 has failed for above parameters.";
 		print STDERR $anerrmsg."\n";
 		return {
 			'status' => -2,
@@ -523,7 +605,7 @@ sub zap {
 		}
 	}
 	if( $ret->{'status'} < 0 ){
-		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops>2 ? perl2dump($params) : "")."$whoami (via $parent), line ".__LINE__." : error, call to find()/2 has failed for above parameters with this error message: ".$ret->{'message'};
+		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY>2 ? perl2dump({%$params,'mech-obj'=>'<reducted>'}) : "")."$whoami (via $parent), line ".__LINE__." : error, call to domops_find()/2 has failed for above parameters with this error message: ".$ret->{'message'};
 		print STDERR $anerrmsg."\n";
 		return {
 			'status' => -2,
@@ -531,7 +613,188 @@ sub zap {
 		}
 	}
 
+	# this contains 'status' and 'found' which contains all
+	# ids matched
 	return $ret; # success
+}
+
+# It calls domops_read_dom_element_selectors_from_JSON_string()
+# on the contents (JSON) of the specified file (as input parameter)
+# It returns undef on failure or the selectors as a Perl
+# data structure on success.
+sub domops_read_dom_element_selectors_from_JSON_file {
+	my $jsonfile = $_[0];
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $FH;
+	if( ! open($FH, '<:encoding(UTF-8)', $jsonfile) ){ print STDERR "$whoami (via $parent) : error, failed to open file '$jsonfile' for reading the DOM elements to be removed (as JSON): $!"; return undef }
+	my $jsonstr;
+	{ local $/ = undef; $jsonstr = <$FH> } close $FH;
+	my $ret = WWW::Mechanize::Chrome::DOMops::domops_read_dom_element_selectors_from_JSON_string($jsonstr);
+	if( ! defined $ret ){ print STDERR "$whoami (via $parent) : error, call to ".'domops_read_dom_element_selectors_from_JSON_string()'." has failed for input file '$jsonfile'.\n"; return undef }
+	return $ret;
+}
+# It parses a JSON string (the input parameter) which
+# should contain DOM element selectors in the various
+# forms accepted by this package and documented in the pod.
+# It returns undef on failure or the selectors as a Perl
+# data structure on success.
+sub domops_read_dom_element_selectors_from_JSON_string {
+	my $jsonstr = $_[0];
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $perld = json2perl($jsonstr);
+	if( ! defined $perld ){ print STDERR "${jsonstr}\n$whoami (via $parent) : error, specified dom elements to be removed (see above) failed to be parsed as JSON.\n"; return undef }
+	if( ref($perld) eq 'ARRAY' ){
+		for (@$perld){
+			if( ref($_) ne 'HASH' ){ print STDERR "$whoami (via $parent) : error, specified dom elements to be removed (as JSON) must either specify an ARRAY of hashes, each hash being the specification for selecting a dom element, OR a HASH containing the dom element selection specification. An array was specified but it contains at least one item of type '".ref($_)."' but only HASHes are allowed as the ARRAY elements. The spec was:\n".$jsonstr."\n"; return undef }
+		}
+		return $perld;
+	} elsif( ref($perld) eq 'HASH' ){
+		return [ $perld ];
+	}
+	print "$whoami (via $parent) : error, specified dom element selectors (as JSON) must either specify an ARRAY of hashes, each hash being the specification of a dom element selector, OR a HASH containing the dom element selection specification. The data type of what was specified was '".ref($perld)."' and the spec was:\n".$jsonstr."\n";
+	return undef
+}
+
+# wait for page to load (DOMReady) and optionally execute a callback (a sub).
+# Because of XHR calls, some elements of the page may keep coming
+# so, optionally, specify a list of elements XPATH selectors
+# that all must be present in the page using 'elements-must-be-present'
+# which can be a single XPATH or an array of XPATHs
+# 'elements-must-be-present-op' can be '&&' or '||', default is &&.
+# And there is a 'timeout' to stop waiting after exceeded and a 'sleep'
+# for the fractional secods to sleep between checking for DOM elements.
+# In case you have specified 'elements-must-be-present', then
+# you can specify any other 'document' source to search in (other than
+# the default document) which is useful in case your element is inside
+# an iFrame, for example, if your element is an iFrame within
+# the current document:
+#   'document' => 'iframe[@id="myiframeid"]'
+# if scalar, then it applies for all 'elements-must-be-present' selectors
+# if ARRAY_REF, then there must be as many items as in the
+# 'elements-must-be-present' ARRAY_REF, each corresponding to one
+# element of the other.
+# The above WILL MOST LIKELY FAIL
+# because CORS will not allow reading what the iFrame
+# contents are!
+# NOTE: test
+#  t/300-domops_wait_for_page_to_load-delayed-elements-inside-iframe.t.fails-because-of-cors
+# is renamed so that it does not run because if fails because of CORS.
+# returns 1 on failure (i.e. 'mech-obj' param not specified or a timeout on waiting)
+# returns 0 on success, after waiting for the page to load
+# returns 2 if it did not find elements (optional 'elements-must-be-present-all' / 'elements-must-be-present-any')
+#           after timeout - most likely page is not ready
+sub domops_wait_for_page_to_load {
+	my $params = $_[0] // {};
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+
+	my $mech_obj = (exists($params->{'mech-obj'}) && defined($params->{'mech-obj'})) ? $params->{'mech-obj'} : undef;
+	if( ! $mech_obj ){ print STDERR "$whoami (via $parent), line ".__LINE__." : a mech-object is required via 'mech-obj'.\n"; return 1 }
+
+	# wait for the page to load
+	if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : called and now waiting for event 'Page.loadEventFired' ...\n" }
+	my $events = $mech_obj->_collectEvents(
+		sub { $_[0]->{method} eq 'Page.loadEventFired' }
+	);
+	if( $domops_VERBOSITY > 1 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : detected event 'Page.loadEventFired'. Page is loaded.\n" }
+	# at this stage the event 'Page.loadEventFired' is fired
+
+	# optionally check for elements to be visible, perhaps dynamically injected?
+
+	# are there any elements to check if present? ALL
+	my $sleeptime = exists($params->{'sleep'}) && defined($params->{'sleep'}) ? $params->{'sleep'} : 0.5;
+	my $timeout = exists($params->{'timeout'}) && defined($params->{'timeout'}) ? $params->{'timeout'} : 15;
+	my $iters = int($timeout/$sleeptime) + 1;
+
+	if( exists($params->{'elements-must-be-present'}) && defined($params->{'elements-must-be-present'}) ){
+		if( $domops_VERBOSITY > 1 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : elements to check if present have been specified, checking them with timeout=${timeout}, sleep=${sleeptime}, iterations=${iters} ...\n" }
+		my @elems = (ref($params->{'elements-must-be-present'}) eq 'ARRAY') ? @{$params->{'elements-must-be-present'}} : ($params->{'elements-must-be-present'});
+		my %elems = map { $_ => 1 } @elems;
+		my $document_src;
+		my $have_document_src = 0;
+		my ($retval, $typ, $xpa, $adocsrc, $adocxpa);
+		if( exists($params->{'document'}) && defined($document_src=$params->{'document'}) ){
+			# we have a specified document source to search in, e.g. an iframe
+			# if an array then it must have the same length as the elems and
+			# the elements of both arrays are expected to correspond
+			# if it is a scalar then it's one document for all elements.
+			if( ref($document_src) eq '' ){
+				# scalar
+				$have_document_src = 1;
+			} elsif( (ref($document_src) eq 'ARRAY') && (scalar(@elems)==scalar(@$document_src)) ){
+				$have_document_src = 2;
+			} else { print STDERR "${whoami} (via $parent), line ".__LINE__." : error, input parameter 'document' must either be a scalar (denoting a document source for all elements in 'elements-must-be-present') or an ARRAYref with exactly the same number of elements as the elements specified in 'elements-must-be-present' (the latter has ".scalar(@elems)." items).\n"; return 1 }
+		} else { $adocsrc = 'var mydoc = document;' }
+		my $op = ( exists($params->{'elements-must-be-present-op'}) && defined($params->{'elements-must-be-present-op'}) && $params->{'elements-must-be-present-op'}=~/^&+|\|+$/ ) ? $params->{'elements-must-be-present-op'} : '&&';
+		my $success = 0;
+		ITERS:
+		for my $iter (1..$iters){
+			ELEMS:
+			for my $iElems (0..$#elems){
+				$xpa = $elems[$iElems];
+				next unless defined $xpa;
+
+				if( $have_document_src > 0 ){
+					$adocxpa = $have_document_src==1 ? $document_src: $document_src->[$iElems];
+					$adocsrc = 'var mydoc, r; r = document.evaluate('
+					  . String::Escape::escape('qprintable', $adocxpa)
+					  . ', document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);'
+					  . "\n"
+					  . 'if( r == null ){ throw("error, failed to find document element with XPath selector: "+'.String::Escape::escape('qprintable', $adocxpa).'+" (specified by input parameter \'document\')."); }'
+					  . 'else { '
+					  . "\n\t" . 'if( r.snapshotLength > 1 ){ throw("error, found "+r.snapshotLength+" document elements instead of exactly one, with  XPath selector: "+'.String::Escape::escape('qprintable', $adocxpa).'+" (specified by input parameter \'document\')."); }'
+					  . 'else { mydoc = r.snapshotItem(0); }'
+					  . "\n".'}'
+				}
+
+				# NOTE: depending on the last-but-one param
+				# into the js function 'document.evaluate()'
+				# it returns an object with different methods. With:
+				#   XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE
+				# you get the snapshotLength
+				# if you change it, it will complain it does not find method!
+				# ALSO, searching within document.body may fail because body may not have already been
+				# settled, so we change document.evaluate()'s 2nd parameter from 'document.body' to 'document'
+				my $jsexec =
+					$adocsrc
+					.' if( mydoc !== null ){ r=document.evaluate('.String::Escape::escape('qprintable', $xpa).', mydoc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);'
+					.'if( r == null ){ 0 } else { r.snapshotLength; }} else { 0 }'
+				;
+				if( $domops_VERBOSITY > 2 ){ print STDOUT "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n${whoami} (via $parent), line ".__LINE__." : iteration $iter : executing above JS code ...\n" }
+				eval { ($retval, $typ) = $mech_obj->eval($jsexec) };
+				if( $@ ){ print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : eval of above javascript has failed: $@\n"; return 1 }
+				if( $domops_VERBOSITY > 2 ){ print STDOUT "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : the value returned from executing above javascript (of type '$typ'): '${retval}'\n" }
+				if( $retval > 0 ){
+					# element found
+					if( $domops_VERBOSITY > 2 ){ print STDOUT "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : element found (operator '$op') : ${xpa}\n" }
+					if( $op eq '||' ){
+						$success = 1;
+						last ITERS;
+					}
+					$elems[$iElems] = undef;
+				}
+				$mech_obj->sleep($sleeptime);
+			} # for ELEMS:
+			if( ($success=(scalar(grep { defined $_ } @elems) == 0)) ){ last ITERS }
+		} # for ITERS:
+		if( $success > 0 ){ if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : all elements specified were found, page is ready.\n" } }
+		else {
+			# some elements not found (but dom-ready event was fired)
+			# the result depends on the timeout!
+			if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : (some) elements specified were NOT found, page is NOT ready on the specified timeout.\n" }
+			return 2;
+		}
+ 	}
+
+	# run the callback if any specified
+	my($e,$r) = (exists($params->{'callback'}) && defined($params->{'callback'}))
+		? Future->wait_all( $events, $params->{'callback'} )
+		: Future->wait_all( $events )
+	;
+	if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : page is now loaded!\n" }
+	return 0 # success
 }
 
 ## POD starts here
@@ -544,12 +807,12 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =head1 SYNOPSIS
 
 This module provides a set of tools to operate on the DOM
-loaded onto the provided <WWW::Mechanize::Chrome> object
+loaded onto the provided L<WWW::Mechanize::Chrome> object
 after fetching a URL.
 
 Operating on the DOM is powerful but there are
@@ -562,16 +825,16 @@ Currently, L<WWW::Mechanize::Chrome::DOMops> provides these tools:
 
 =over 4
 
-=item * C<find()> : finds HTML elements,
+=item * C<domops_find()> : finds HTML elements,
 
-=item * C<zap()> : deletes HTML elements.
+=item * C<domops_zap()> : deletes HTML elements.
 
 =back
 
-Both C<find()> and C<zap()> return some information from
+Both C<domops_find()> and C<domops_zap()> return some information from
 each match and its descendents (like C<tag>, C<id> etc.).
 This information can be tweaked by the caller.
-C<find()> and C<zap()> optionally execute javascript code on
+C<domops_find()> and C<domops_zap()> optionally execute javascript code on
 each match and its descendents and can return data back to
 the caller perl code.
 
@@ -579,6 +842,8 @@ The selection of the HTML elements in the DOM
 can be done in various ways:
 
 =over 4
+
+=item * by B<XPath selector>,
 
 =item * by B<CSS selector>,
 
@@ -596,10 +861,10 @@ There is more information about this in section L<ELEMENT SELECTORS>.
 
 Here are some usage scenaria:
 
-    use WWW::Mechanize::Chrome::DOMops qw/zap find VERBOSE_DOMops/;
+    use WWW::Mechanize::Chrome::DOMops qw/domops_zap domops_find domops_VERBOSITY/;
 
     # adjust verbosity: 0, 1, 2, 3
-    $WWW::Mechanize::Chrome::VERBOSE_DOMops = 3;
+    $WWW::Mechanize::Chrome::domops_VERBOSITY = 3;
 
     # First, create a mech object and load a URL on it
     # Note: you need google-chrome binary installed in your system!
@@ -609,9 +874,9 @@ Here are some usage scenaria:
     # fetch a page which will setup a DOM on which to operate:
     $mechobj->get('https://www.bbbbbbbbb.com');
 
-    # find elements in the DOM, select by id, tag, name, or 
-    # by CSS selector.
-    my $ret = find({
+    # find elements in the DOM, select by CSS selector,
+    # XPath selector, id, tag or name:
+    my $ret = domops_find({
        'mech-obj' => $mechobj,
        # find elements whose class is in the provided
        # scalar class name or array of class names
@@ -622,9 +887,10 @@ Here are some usage scenaria:
        'element-name' => ['aname', 'name2'],
        # *OR* their id is this:
        'element-id' => ['id1', 'id2'],
-       # *OR* just provide a CSS selector and get done with it already
-       # the best choice
+       # *OR* just provide a CSS selector
        'element-cssselector' => 'a-css-selector',
+       # *OR* just provide a XPath selector
+       'element-xpathselector' => 'a-xpath-selector',
        # specifies that we should use the union of the above sets
        # hence the *OR* in above comment
        '||' => 1,
@@ -648,7 +914,7 @@ EOJ
            'code' =><<'EOJS',
   // the element to operate on is 'htmlElement'
   console.log("operating on this element "+htmlElement.tagName);
-  // this is returned back in the results of find() under
+  // this is returned back in the results of domops_find() under
   // key "cb-results"->"find-cb-on-matched"
   return 1;
 EOJS
@@ -662,7 +928,7 @@ EOJS
            'code' =><<'EOJS',
   // the element to operate on is 'htmlElement'
   console.log("operating on this element "+htmlElement.tagName);
-  // this is returned back in the results of find() under
+  // this is returned back in the results of domops_find() under
   // key "cb-results"->"find-cb-on-matched" notice the complex data
   return {"abc":"123",{"xyz":[1,2,3]}};
 EOJS
@@ -683,13 +949,13 @@ EOJS
 
 
     # Delete an element from the DOM
-    $ret = zap({
+    $ret = domops_zap({
        'mech-obj' => $mechobj,
        'element-id' => 'paragraph-123'
     });
 
     # Mass murder:
-    $ret = zap({
+    $ret = domops_zap({
        'mech-obj' => $mechobj,
        'element-tag' => ['div', 'span', 'p'],
        '||' => 1, # the union of all those matched with above criteria
@@ -710,24 +976,62 @@ EOJS
     # the latter contains a recursive list of those
     # found AND ALL their children
 
+    # wait for page to load with catching the Page.loadEventFired
+    if( 0 == domops_wait_for_page_to_load() ){ print "page loaded\n" }
+    else { die "page did not load within the default timeout" }
+
+    domops_wait_for_page_to_load({
+      'timeout' => 50.5, # fractional seconds
+      'sleep' => 1.5, # fractional seconds to sleep between polling
+    });
+
+    # this waits for Page.loadEventFired AND for ALL
+    # DOM elements specified with the XPath selectors:
+    domops_wait_for_page_to_load({
+      'elements-must-be-present' => [
+        'div[@id="anid1"]',
+        'span[@id="anid2"]',
+      ],
+      'elements-must-be-present-op' => '&&'
+    });
+
+
 =head1 EXPORT
 
-the sub to find element(s) in the DOM
+=over 1
 
-    find()
+=item the sub to find element(s) in the DOM
 
-the sub to delete element(s) from the DOM
+    domops_find()
 
-    zap()
+=item the sub to delete element(s) from the DOM
+
+    domops_zap()
+
+=item the sub to read element selectors from a JSON string
+
+    domops_read_dom_element_selectors_from_JSON_string()
+
+=item the sub to read element selectors from a JSON file
+
+    domops_read_dom_element_selectors_from_JSON_file()
+
+=item the sub to wait for the DOM to load not only via
+detecting the C<DOMContentLoaded> event but by also
+waiting for specific DOM elements, specified via selectors including
+CSS and XPath selectors, to appear
+
+    domops_wait_for_page_to_load()
 
 and the flag to denote verbosity (default is 0, no verbosity)
 
-    $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops
+    $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY
 
+=back
 
 =head1 SUBROUTINES/METHODS
 
-=head2 find($params)
+=head2 domops_find($params)
 
 It finds HTML elements in the DOM currently loaded on the
 parameters-specified L<WWW::Mechanize::Chrome> object. The
@@ -764,18 +1068,18 @@ its tag and its id (empty string) will be returned.
 By specifying this parameter (as a string, e.g. C<_replacing_empty_ids>)
 all such elements matched will have their id set to
 C<_replacing_empty_ids_X> where X is an incrementing counter
-value starting from a random number. By running C<find()>
+value starting from a random number. By running C<domops_find()>
 more than once on the same on the same DOM you are risking
 having the same ID. So provide a different prefix every time.
 Or use C<insert-id-if-none-random>, see below.
 
-=item * C<insert-id-if-none-random> : each time C<find()> is called
+=item * C<insert-id-if-none-random> : each time C<domops_find()> is called
 a new random base id will be created formed by the specified prefix (as with
 C<insert-id-if-none>) plus a long random string plus the incrementing
 counter, as above. This is supposed to be better at
 avoiding collisions but it can not guarantee it.
 If you are setting C<rand()>'s seed to the same number
-before you call C<find()> then you are guaranteed to
+before you call C<domops_find()> then you are guaranteed to
 have collisions.
 
 =item * C<find-cb-on-matched> : an array of
@@ -855,7 +1159,7 @@ Most likely this syntax error is with user-specified callback code.
 Note that all the javascript code to be evaluated is dumped to stderr
 by increasing the verbosity. But also it can be saved to a local file
 for easier debugging by supplying the C<js-outfile> parameter to
-C<find()> or C<zap()>.
+C<domops_find()> or C<domops_zap()>.
 
 =item * C<-1> : there is a logical error while running the javascript code.
 For example a division by zero etc. This can be both in the callback code
@@ -864,7 +1168,7 @@ by my tests. Please report these.
 Note that all the javascript code to be evaluated is dumped to stderr
 by increasing the verbosity. But also it can be saved to a local file
 for easier debugging by supplying the C<js-outfile> parameter to
-C<find()> or C<zap()>.
+C<domops_find()> or C<domops_zap()>.
 
 =back
 
@@ -949,14 +1253,14 @@ you can get same ids. So, always supply a different
 value to this parameter if run more than once on the
 same DOM.
 
-=head2 zap($params)
+=head2 domops_zap($params)
 
 It removes HTML element(s) from the DOM currently loaded on the
 parameters-specified L<WWW::Mechanize::Chrome> object. The params
-are exactly the same as with L</find($params)> except that
+are exactly the same as with L</domops_find($params)> except that
 C<insert-id-if-none> is ignored.
 
-C<zap()> is implemented as a C<find()> with
+C<domops_zap()> is implemented as a C<domops_find()> with
 an additional callback for all elements matched
 in the first level (not their children) as:
 
@@ -968,19 +1272,143 @@ in the first level (not their children) as:
 
 B<RETURN VALUE>:
 
-Return value is exactly the same as with L</find($params)>
+Return value is exactly the same as with L</domops_find($params)>
 
-=head2 $WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops
+=head2 domops_wait_for_page_to_load($params)
+
+It waits for the page to load by detecting the C<Page.loadEventFired>
+event. However, because the DOM may be altered at any time, even if
+said event has been fired, there is provision to wait for specific
+DOM elements as well via the C<elements-must-be-present> input parameter.
+This can be a scalar or an ARRAY_REF containing XPath selectors
+for DOM elements to wait for their appearance on the page. If this
+contains more than one selectors (i.e. it is an ARRAY_REF), then
+input parameter C<elements-must-be-present-op> can be set
+to C<&&> or C<||>, denoting the method to combine these. I.e.
+wait for all (C<&&>) or wait for any (C<||>).
+
+B<INPUT PARAMETERS>:
+
+As a HASH_REF:
+
+=over 4
+
+=item * B<C<elements-must-be-present>> : optionally specify XPath selector(s)
+either as a scalar or an ARRAY_REF to wait for their appearance.
+
+=item * B<C<elements-must-be-present-op>> : optionally specify how to
+combine the XPath selectors, specified via C<elements-must-be-present>
+which in this case must be an ARRAY_REF, either as wait for all
+elements to appear (C<&&>) or for any element to appear (C<||>).
+
+=item * B<C<document>> : Checking for the appearance of
+specific DOM elements (via C<elements-must-be-present>)
+is done for elements under the default C<document>'s body.
+But, if frame
+elements are present (e.g. C<iframe>) then you can optionally
+search in their C<document>. Javascript's C<document.evaluate()>
+(which is an XPath query function) allows to use any
+other node. E.g. the frame's document. In this case set C<document>
+to Javascript code to return the element you want to search under it.
+For example, if you have an iframe and you want to search under
+it, then set 'C<document>' to this XPath selector: 'C<iframe[@id="myiframeid"]>'.
+If C<elements-must-be-present> is an ARRAY_REF then 'C<document>'
+can be a scalar or ARRAY_REF. In the former case, the document will
+apply for each item of C<elements-must-be-present>. In the latter case,
+each item of C<document> will apply to the corresponding item of
+C<elements-must-be-present>.
+
+B<WARNING>: accessing the document body of a frame element is
+most likely forbidden because of the weird CORS rules. In
+other words: an iframe is running on your browser but you are not allow
+to know what it does or how! Only watch the rendered results.
+Perfect! Note that test file C<t/300-domops_wait_for_page_to_load-delayed-elements-inside-iframe.t.fails-because-of-cors>
+is renamed so that it does not run because it fails because
+of CORS which guards against, even, local pages.
+
+=item * B<C<timeout>> : fractional number of seconds to wait for
+the DOM loaded event and/or any DOM elements before returning,
+even without the conditions were satisfied and the page was
+most likely not loaded. The default value is 15 seconds.
+
+=item * B<C<sleep>> : fractional number of seconds to sleep
+between polling for the DOM elements, if any were specified.
+It does not apply when waiting for the C<Page.loadEventFired>
+I could not find a way to use a timeout with L<WWW::Mechanize::Chrome::_collectEvents>,
+which is used internally. Default is 0.5 seconds of sleep between polling.
+
+=back
+
+B<RETURN VALUE>:
+
+=over 4
+
+=item B<C<1>> : denotes failure. For example if required input
+parameters are missing.
+
+=item B<C<0>> : denotes absolute success meaning all events and DOM
+elements requested to wait for, have appeared and page is
+considered to be loaded and ready.
+
+=item B<C<2>> : denotes partial success in that all code
+was run but events and/or DOM elements had not appeared
+within the current timeout. Which most likely means that
+the page is not ready yet. Increase the timeout and see.
+Or correct your DOM element selectors.
+
+=back
+
+=head2 domops_read_dom_element_selectors_from_JSON_file($filename)
+
+It reads DOM element selectors, in their various forms
+as documented at L</ELEMENT SELECTORS>,
+from specified filename and returns these
+as a Perl data structure which can then be passed on to
+L</domops_find($params)> and L</domops_zap($params)>.
+
+B<RETURN VALUE>:
+
+=over 4
+
+=item B<C<undef>> : on failure, e.g. file not found or parsing errors.
+
+=item a Perl data structure witht the selectors on success which can
+directly be passed on to L</domops_find($params)> and L</domops_zap($params)>.
+
+=back
+
+=head2 domops_read_dom_element_selectors_from_JSON_string($string)
+
+It reads DOM element selectors, in their various forms
+as documented at L</ELEMENT SELECTORS>,
+from specified string and returns these
+as a Perl data structure which can then be passed on to
+L</domops_find($params)> and L</domops_zap($params)>.
+
+B<RETURN VALUE>:
+
+=over 4
+
+=item B<C<undef>> : on failure, e.g. file not found or parsing errors.
+
+=item a Perl data structure witht the selectors on success which can
+directly be passed on to L</domops_find($params)> and L</domops_zap($params)>.
+
+=back
+
+=head2 $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY
 
 Set this upon loading the module to C<0, 1, 2, 3>
 to adjust verbosity. C<0> implies no verbosity.
+
 
 =head1 ELEMENT SELECTORS
 
 C<Element selectors> are how one selects HTML elements from the DOM.
 There are 5 ways to select HTML elements: by class (C<element-class>),
-tag (C<element-tag>), id (C<element-id>), name (C<element-name>)
-or via a CSS selector (C<element-cssselector>).
+tag (C<element-tag>), id (C<element-id>), name (C<element-name>),
+a CSS selector (C<element-cssselector>)
+or via an XPath selector (C<element-xpathselector>).
 
 Multiple selectors can be specified
 by combining the various selector types, above.
@@ -1011,6 +1439,8 @@ These are the valid selectors:
 =item * C<element-name> : find DOM element matching this element name
 
 =item * C<element-cssselector> : find DOM element matching this CSS selector
+
+=item * C<element-xpathselector> : find DOM element matching this XPath selector
 
 =back
 
@@ -1095,7 +1525,7 @@ This is how I do it:
     die "failed to fetch $URL" unless defined $retmech;
     $mech_obj->sleep(1); # let it settle
     # now the mech object has loaded the URL and has a DOM hopefully.
-    # You can pass it on to find() or zap() to operate on the DOM.
+    # You can pass it on to domops_find() or domops_zap() to operate on the DOM.
 
 
 =head1 SECURITY WARNING
@@ -1149,7 +1579,7 @@ If you allow
 unchecked user-specified (or copy-pasted from ChatGPT)
 javascript code in
 L<WWW::Mechanize::Chrome::DOMops>'s
-C<find()>, C<zap()>, etc. then it is, theoretically,
+C<domops_find()>, C<domops_zap()>, etc. then it is, theoretically,
 possible that this javascript code
 initiates an XHR to yahoo and fetch your emails and
 pass them on to your perl code.
@@ -1244,9 +1674,9 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Chrome-DOMops>
 
 L<http://annocpan.org/dist/WWW-Mechanize-Chrome-DOMops>
 
-=item * CPAN Ratings
+=item * Review this module at PerlMonks
 
-L<https://cpanratings.perl.org/d/WWW-Mechanize-Chrome-DOMops>
+L<https://www.perlmonks.org/?node_id=21144>
 
 =item * Search CPAN
 

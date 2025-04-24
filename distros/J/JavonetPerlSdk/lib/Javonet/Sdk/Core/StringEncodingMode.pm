@@ -2,6 +2,8 @@ package Javonet::Sdk::Core::StringEncodingMode;
 use strict;
 use warnings;
 use Moose;
+use Exporter qw(import);
+our @EXPORT = qw(get_string_encoding_mode);
 
 my %string_encoding_mode = (
     'ASCII'             => 0,

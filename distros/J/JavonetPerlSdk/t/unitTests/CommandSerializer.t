@@ -4,10 +4,10 @@ use Test::More qw(no_plan);
 use lib 'lib';
 
 use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
-use aliased 'Javonet::Core::Protocol::CommandSerializer' => 'CommandSerializer', qw(encode);
-use aliased 'Javonet::Core::Protocol::CommandDeserializer' => 'CommandDeserializer', qw(decode);
-use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib', qw(get_runtime);
-use aliased 'Javonet::Sdk::Core::PerlCommandType' => 'PerlCommandType', qw(get_command_type);
+use aliased 'Javonet::Core::Protocol::CommandSerializer' => 'CommandSerializer';
+use aliased 'Javonet::Core::Protocol::CommandDeserializer' => 'CommandDeserializer';
+use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib';
+use aliased 'Javonet::Sdk::Core::PerlCommandType' => 'PerlCommandType';
 
 my $command = PerlCommand->new(runtime => Javonet::Sdk::Core::RuntimeLib::get_runtime('Perl'),
     command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('GetStaticField'),

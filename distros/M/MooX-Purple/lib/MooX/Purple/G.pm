@@ -462,19 +462,11 @@ sub render_pod {
 
 	You can also look for information at:
 
-	=over 4
+	=over 2
 
 	=item * RT: CPAN's request tracker (report bugs here)
 
 	L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=$url_class>
-
-	=item * AnnoCPAN: Annotated CPAN documentation
-
-	L<http://annocpan.org/dist/$url_class>
-
-	=item * CPAN Ratings
-
-	L<http://cpanratings.perl.org/d/$url_class>
 
 	=item * Search CPAN
 
@@ -489,7 +481,7 @@ sub render_pod {
 
 			push @{$POD{$class}{DATA}}, "	=head1 LICENSE AND COPYRIGHT
 
-	Copyright 2019 $AUTHOR.
+	Copyright 2025 $AUTHOR.
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the the Artistic License (2.0). You may obtain a
@@ -834,14 +826,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Purple>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/MooX-Purple>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/MooX-Purple>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/MooX-Purple/>
@@ -854,7 +838,7 @@ L<http://search.cpan.org/dist/MooX-Purple/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 lnation.
+Copyright 2019->2025 lnation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

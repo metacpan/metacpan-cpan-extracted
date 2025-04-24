@@ -1,5 +1,5 @@
 package POE::Component::Metabase::Relay::Server::Queue;
-$POE::Component::Metabase::Relay::Server::Queue::VERSION = '0.38';
+$POE::Component::Metabase::Relay::Server::Queue::VERSION = '0.40';
 # ABSTRACT: Submission queue for the metabase relay
 
 use strict;
@@ -12,7 +12,7 @@ use CPAN::Testers::Report     ();
 use Metabase::User::Profile   ();
 use Metabase::User::Secret    ();
 use Module::Load::Conditional qw[can_load];
-use JSON ();
+use JSON::MaybeXS;
 use Params::Util qw[_HASH];
 use Time::HiRes ();
 use Data::UUID;
@@ -438,7 +438,7 @@ POE::Component::Metabase::Relay::Server::Queue - Submission queue for the metaba
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -513,7 +513,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Chris Williams.
+This software is copyright (c) 2025 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

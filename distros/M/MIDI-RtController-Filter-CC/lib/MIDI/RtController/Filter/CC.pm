@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0911';
+our $VERSION = '0.0913';
 
 use v5.36;
 
@@ -14,8 +14,8 @@ use IO::Async::Timer::Periodic ();
 use Iterator::Breathe ();
 use Moo;
 use Types::MIDI qw(Channel Velocity);
-use Types::Common::Numeric qw(NegativeNum PositiveNum);
-use Types::Standard qw(Bool Num Maybe);
+use Types::Common::Numeric qw(PositiveNum);
+use Types::Standard qw(Bool Maybe);
 use namespace::clean;
 
 
@@ -77,7 +77,7 @@ has range_top => (
 
 has range_step => (
     is      => 'rw',
-    isa     => NegativeNum | PositiveNum,
+    isa     => Velocity, # no CC# msg value in Types::MIDI yet
     default => 1,
 );
 
@@ -91,14 +91,14 @@ has time_step => (
 
 has step_up => (
     is      => 'rw',
-    isa     => Num,
+    isa     => Velocity, # no CC# in Types::MIDI yet
     default => 2,
 );
 
 
 has step_down => (
     is      => 'rw',
-    isa     => Num,
+    isa     => Velocity, # no CC# in Types::MIDI yet
     default => 1,
 );
 
@@ -376,7 +376,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0911
+version 0.0913
 
 =head1 SYNOPSIS
 
@@ -461,8 +461,8 @@ Default: C<1> (mod-wheel)
   $filter->value($number);
 
 Return or set the MIDI event value. This is a generic setting that can
-be used by filters to set or retrieve state. This often a whole number
-between C<0> and C<127>, but can take any number.
+be used by filters to set or retrieve state and can be any whole
+number between C<0> and C<127> or C<undef>.
 
 Default: C<undef>
 
@@ -471,9 +471,9 @@ Default: C<undef>
   $trigger = $filter->trigger;
   $filter->trigger($number);
 
-Return or set the trigger. This is a generic setting that
-can be used by filters to set or retrieve state. This often a whole
-number between C<0> and C<127>, but can take any number.
+Return or set the trigger. This is a generic setting that can be used
+by filters to set or retrieve state and can be any whole number
+between C<0> and C<127> or C<undef>.
 
 Default: C<undef>
 
@@ -482,8 +482,7 @@ Default: C<undef>
   $initial_point = $filter->initial_point;
   $filter->initial_point($number);
 
-Return or set the control change initial point number between C<0> and
-C<127>.
+Return or set the number of the initial point between C<0> and C<127>.
 
 Default: C<0>
 
@@ -492,7 +491,7 @@ Default: C<0>
   $range_bottom = $filter->range_bottom;
   $filter->range_bottom($number);
 
-The current iteration lowest number value.
+The lowest number value between C<0> and C<127>.
 
 Default: C<0>
 
@@ -501,7 +500,7 @@ Default: C<0>
   $range_top = $filter->range_top;
   $filter->range_top($number);
 
-The current iteration highest number value.
+The highest number value between C<0> and C<127>.
 
 Default: C<127>
 
@@ -510,8 +509,8 @@ Default: C<127>
   $range_step = $filter->range_step;
   $filter->range_step($number);
 
-A number greater than zero representing the current iteration step
-size between B<bottom> and B<top>.
+A number between C<0> and C<127> that is the current iteration step
+between the B<range_bottom> and B<range_top>.
 
 Default: C<1>
 
@@ -520,7 +519,8 @@ Default: C<1>
   $time_step = $filter->time_step;
   $filter->time_step($number);
 
-The current iteration step in seconds (probably fractions).
+A (probably fractional) positive number that is the current iteration
+step in seconds.
 
 Default: C<0.25> (a quarter of a second)
 
@@ -529,7 +529,8 @@ Default: C<0.25> (a quarter of a second)
   $step_up = $filter->step_up;
   $filter->step_up($number);
 
-The current iteration upward step.
+The current iteration upward step. This can be any whole number
+between C<0> and C<127>.
 
 Default: C<2>
 
@@ -538,7 +539,8 @@ Default: C<2>
   $step_down = $filter->step_down;
   $filter->step_down($number);
 
-The current iteration downward step.
+The current iteration downward step. This can be any whole number
+between C<0> and C<127>.
 
 Default: C<1>
 
@@ -556,7 +558,7 @@ Default: C<0>
   $halt = $filter->halt;
   $filter->halt($boolean);
 
-Return or set B<halt>. This can be used to terminate B<running> filters.
+This Boolean can be used to terminate B<running> filters.
 
 Default: C<0>
 
@@ -582,8 +584,8 @@ example:
       port => 'keyboard',        # what device is controlling
       type => 'breathe',         # the type of filter
       event => 'control_change', # or [qw(note_on note_off)] etc
-      control => 1,              # what CC# is being controlled
-      trigger => 25,             # what CC# triggers the controlling
+      control => 1,              # the CC# is being controlled
+      trigger => 25,             # the CC# that triggers the control
       time_step => 0.25,         # a module attribute parameter
     },
     ...

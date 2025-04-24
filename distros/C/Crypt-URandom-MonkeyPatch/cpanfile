@@ -3,7 +3,9 @@
 
 requires "Crypt::URandom" => "0";
 requires "constant" => "0";
-requires "perl" => "v5.16.0";
+requires "perl" => "v5.8.0";
+requires "strict" => "0";
+requires "version" => "0.77";
 requires "warnings" => "0";
 
 on 'build' => sub {
@@ -16,7 +18,6 @@ on 'test' => sub {
   requires "Module::Metadata" => "1.000015";
   requires "Test::More" => "0";
   requires "Test::Output" => "0";
-  requires "strict" => "0";
 };
 
 on 'test' => sub {

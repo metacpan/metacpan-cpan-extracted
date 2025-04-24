@@ -1,7 +1,11 @@
 Revision history for Data-Validate-Sanctions
 
+0.19      2025-04-24 08:58:41+00:00 UTC
+
+    - Add MOHA sanctions list
+
 0.18      2024-12-11 15:20:58+00:00 UTC
-       add sanction list providers
+       Add sanction list providers
 
 0.17      2024-05-27 12:42:34+00:00 UTC
        Cron sanction update failed for OFAC-SDN and OFAC-Consolidated

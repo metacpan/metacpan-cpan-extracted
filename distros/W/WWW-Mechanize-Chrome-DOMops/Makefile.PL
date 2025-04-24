@@ -5,8 +5,11 @@ use ExtUtils::MakeMaker;
 
 sub MY::libscan {
     my( $mm, $file ) = @_;
-    return if $file =~  /^push_to_GIT$/; # SKIP the git dir
-    return if $file =~ /\.lock.*$/; # SKIP editor files
+    return if $file =~ m!^bin/!; # SKIP the bin dir
+    return if $file =~ m!^push_to_GIT/!; # SKIP the git dir
+    return if $file =~ m!^experiments/!; # private folder
+    return if $file =~ m!\.lock.*$!; # SKIP editor files
+    return if $file =~ m!\.test-script-.*!; # SKIP editor files
     return $file;
 }
 
@@ -22,22 +25,25 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
-        'Test::More' => '0',
-	'Test2::Plugin::UTF8' => '0',
-	'FindBin' => '0',
-	'File::Temp' => '0',
-	'File::Spec' => '0',
-	'Log::Log4perl' => '0',
-	'WWW::Mechanize::Chrome' => '0',
+    },
+    TEST_REQUIRES => {
 	'Data::Roundtrip' => '0',
+	'File::Spec' => '0',
+	'FindBin' => '0',
+	'Log::Log4perl' => '0',
+	'Test2::Plugin::UTF8' => '0',
+	'Test::More' => '0',
+	'Test::TempDir::Tiny' => '0',
+	'WWW::Mechanize::Chrome' => '0',
     },
     PREREQ_PM => {
 	'Data::Roundtrip' => '0',
+	'String::Escape' => '0',
+	'Exporter' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WWW-Mechanize-Chrome-DOMops-*' },
     postamble => {
-        BENCHMARK_FILES => 'xt/benchmarks/*.b' },
 	# Thanks to marto @ Perlmonks.org
 	# see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
         META_MERGE => {
@@ -54,6 +60,7 @@ my %WriteMakefileArgs = (
             bugtracker => {
                 web => 'https://github.com/hadjiprocopis/www-mechanize-chrome-domops/issues',
             }
+          }
         },
     },
 );
@@ -77,15 +84,3 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
-
-sub MY::postamble {
-    my (undef,%h) = @_;
-    #require Data::Dumper; print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
-    return "BENCHMARK_FILES=$h{BENCHMARK_FILES}\n"
-	. <<'POSTAMBLE';
-TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
-
-benchmarks :: $(BENCHMARK_FILES)
-	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
-POSTAMBLE
-}

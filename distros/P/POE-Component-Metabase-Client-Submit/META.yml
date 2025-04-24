@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: POE-Component-Metabase-Client-Submit
 requires:
   HTTP::Message: '5.814'
   HTTP::Request::Common: '5.824'
-  JSON: '2.17'
+  JSON::MaybeXS: '1.004008'
   Metabase::Fact: '0.006'
   Metabase::User::Profile: '0.003'
   Metabase::User::Secret: '0.003'
@@ -36,5 +36,7 @@ requires:
 resources:
   homepage: https://github.com/bingos/poe-component-metabase-client-submit
   repository: https://github.com/bingos/poe-component-metabase-client-submit.git
-version: '0.14'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.16'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

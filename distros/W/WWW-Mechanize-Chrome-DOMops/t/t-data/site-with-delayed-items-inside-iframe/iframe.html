@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- an iframe with items, we will search inside the parent of
+     this iframe and see if items are picked from in here
+-->
+</head>
+<body>
+    <header id='iframe-header-id-1'>
+	<span><b>I am an iframe!</b></span>
+        <!-- needs a skip-to-content link -->
+        <nav id="iframe-nav-id-1" class="iframe-nav-class-1 extra-class1 extra-class2" name="iframe-nav-name-1">
+            <ul>
+                <li id="iframe-li-id-1"><span id="iframe-span-id-1">aa</span></li>
+                <li id="iframe-li-id-2"><span id="iframe-span-id-2">bb</span></li>
+            </ul>
+        </nav>
+    </header>
+
+  <div id="iframe-div-id-1" class="iframe-div-class-1" name="iframe-div-name-1">
+    <div id="iframe-div-id-1-1" class="iframe-div-row-1">xxx</div>
+  </div>
+
+  <div id="iframe-div-id-2" class="iframe-div-class-2" name="iframe-div-name-2">
+    <div id="iframe-div-id-2-1" class="iframe-div-row-2">yyy</div>
+  </div>
+
+  <div id='iframe-delayed-div'>
+    <ul id='iframe-delayed-ul'>
+	<li id='iframe-always-present-but-invisible-li'>always present but invisible for some time</li>
+        <!-- the delayed elements will appear below -->
+    </ul>
+  </div>
+  </div>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+	setTimeout(function(){
+		var anElem = document.createElement('li');
+		anElem.setAttribute("id", "iframe-present-after-5s");
+		anElem.innerHTML = "appearing after 5s";
+		document.getElementById('iframe-delayed-ul').appendChild(anElem)
+	},5000);
+	setTimeout(function(){
+		var anElem = document.createElement('li');
+		anElem.setAttribute("id", "iframe-present-after-7s");
+		anElem.innerHTML = "appearing after 7s";
+		document.getElementById('iframe-delayed-ul').appendChild(anElem)
+	},7000);
+	setTimeout(function(){
+		var anElem = document.createElement('li');
+		anElem.setAttribute("id", "iframe-present-after-9s");
+		anElem.innerHTML = "appearing after 9s";
+		document.getElementById('iframe-delayed-ul').appendChild(anElem)
+	},9000);
+}); // on dom loaded
+</script>
+
+</body>
+</html>

@@ -75,11 +75,12 @@ my @tests = (
         },
         load => "service:sshd Unit Description~",
 
-        # when loading sshd, no service or socker is found, so the backend create
-        # and empty socket and empty service to cme edit shows both to users.
-        # since they are not filled with data, no file is written
-        # but dump tree test shows the difference, so we remove the empty socket.
-        load2 => "socket:.rm(sshd)",
+        # when loading sshd, no service, timer or socket is found, so
+        # the backend creates empty socket, timer and service so cme
+        # edit can show them all both to users. Since these items are
+        # not filled with data, no file is written. But dump tree test
+        # shows the difference, so we remove the empty socket.
+        load2 => "socket:.rm(sshd) timer:.rm(sshd)",
 
         # file is removed because the load instruction above removes the only setting in there
         file_check_sub => sub {

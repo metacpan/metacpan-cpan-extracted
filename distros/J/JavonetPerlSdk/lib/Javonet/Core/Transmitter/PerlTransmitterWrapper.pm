@@ -8,6 +8,8 @@ use File::Spec;
 use Config;
 use Cwd;
 use POSIX qw(uname);
+use Exporter qw(import);
+our @EXPORT = qw(tw_initialize tw_send_command tw_activate tw_set_config_source tw_set_javonet_working_directory);
 
 my $ffi;
 
@@ -18,7 +20,8 @@ my $get_native_error_native;
 my $set_config_source_native;
 my $set_working_directory_native;
 
-sub initialize {
+
+sub tw_initialize {
     my $osname = $^O;
     {
         $ffi = FFI::Platypus->new(api => 1);
@@ -66,7 +69,7 @@ sub initialize {
     }
 }
 
-sub send_command {
+sub tw_send_command {
     my ($self, $message_ref) = @_;
     my @message_array = @$message_ref;
     my $response_array_len = $send_command_native->(\@message_array, scalar @message_array);
@@ -86,9 +89,9 @@ sub send_command {
     }
 }
 
-sub activate {
+sub tw_activate {
     my ($self, $licenseKey) = @_;
-    initialize();
+    tw_initialize();
     my $activation_result = $activate_native->($licenseKey);
     if ($activation_result < 0) {
         my $error_message = $get_native_error_native->();
@@ -99,9 +102,9 @@ sub activate {
     }
 }
 
-sub set_config_source {
+sub tw_set_config_source {
     my ($self, $config_path) = @_;
-    initialize();
+    tw_initialize();
     my $set_config_result = $set_config_source_native->($config_path);
     if ($set_config_result < 0) {
         my $error_message = $get_native_error_native->();
@@ -112,9 +115,9 @@ sub set_config_source {
     }
 }
 
-sub set_javonet_working_directory {
+sub tw_set_javonet_working_directory {
     my ($self, $working_directory) = @_;
-    initialize();
+    tw_initialize();
     my $set_working_directory_result = $set_working_directory_native->($working_directory);
     if ($set_working_directory_result < 0) {
         my $error_message = $get_native_error_native->();

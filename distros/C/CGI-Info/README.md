@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.98
+Version 0.99
 
 # SYNOPSIS
 

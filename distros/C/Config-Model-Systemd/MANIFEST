@@ -81,6 +81,10 @@ t/model_tests.d/systemd-user-examples/basic-service/gmail-imap-tunnel@.service
 t/model_tests.d/systemd-user-examples/basic-socket/gmail-imap-tunnel.socket
 t/model_tests.d/systemd-user-examples/delete-service/main-obex
 t/model_tests.d/systemd-user-examples/delete-service/user-obex
+t/model_tests.d/systemd-user-examples/duplicity/duplicity.service
+t/model_tests.d/systemd-user-examples/duplicity/duplicity.service~
+t/model_tests.d/systemd-user-examples/duplicity/duplicity.timer
+t/model_tests.d/systemd-user-examples/duplicity/duplicity.timer~
 t/model_tests.d/systemd-user-examples/override-service/main-obex
 t/model_tests.d/systemd-user-examples/override-service/user-obex
 t/model_tests.d/systemd-user-test-conf.pl
@@ -90,5 +94,3 @@ t/perlcriticrc
 t/pod.t
 t/systemd-service.t
 weaver.ini
-wr_root/cme-function/test.service
-wr_root/systemd-service/lib/systemd/system/transmission-daemon.service

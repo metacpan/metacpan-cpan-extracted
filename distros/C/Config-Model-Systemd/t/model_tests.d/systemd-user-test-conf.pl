@@ -95,6 +95,15 @@ my @tests = (
         file_contents_like => {
             "home/joe/.config/systemd/user/test.service" => qr/from scratch/ ,
         },
+    },
+    {
+        name => 'duplicity',
+        backend_arg => 'duplicity',
+        check => [
+            'service:duplicity Service ExecStart:0' => "my-backup",
+            'timer:duplicity Timer OnCalendar:0' => '13:00',
+            'timer:duplicity Unit Description'=>"Run duplicity",
+        ]
     }
 );
 

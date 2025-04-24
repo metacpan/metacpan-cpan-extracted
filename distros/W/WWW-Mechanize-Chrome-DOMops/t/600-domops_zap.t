@@ -1,10 +1,16 @@
 #!/usr/bin/env perl
 
 ###################################################################
-##### to DEBUG JS, set verbosity to 2
+#### NOTE env-var PERL_TEST_TEMPDIR_TINY_NOCLEANUP=1 will stop erasing tmp files
+###################################################################
+
+###################################################################
+##### to DEBUG JS, set verbosity to >=2
 ##### each test's params can contain a 'js-outfile' to save
 ##### the js-to-execute to a fail
-##### both find() and zap() understand the above option
+##### both domops_find() and domops_zap() understand the above option
+##### By default each JS script to be executed is saved
+##### in $js_outfile_tmp, for each test
 ###################################################################
 
 use strict;
@@ -12,9 +18,7 @@ use warnings;
 
 use lib 'blib/lib';
 
-#use utf8;
-
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 use Test::More;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
@@ -23,13 +27,12 @@ use FindBin;
 use WWW::Mechanize::Chrome;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 use Log::Log4perl qw(:easy);
-use File::Temp;
+use Test::TempDir::Tiny;
 use File::Spec;
 
 use WWW::Mechanize::Chrome::DOMops qw/
-	zap
-	find
-	VERBOSE_DOMops
+	domops_zap
+	domops_find
 /;
 
 # This is for the mech obj, Set priority of root logger to ERROR
@@ -52,16 +55,19 @@ my $curdir = $FindBin::Bin;
 # verbosity can be 0 (none), 1 (basic), 2 (JS), 3 (stupid)
 my $VERBOSITY = 2;
 
-$WWW::Mechanize::Chrome::DOMops::VERBOSE_DOMops = $VERBOSITY;
+$WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY = $VERBOSITY;
 
 # the URL to get
 my $URL = "file://${curdir}/t-data/site1/content.html";
 # then we look for some elements
 # WARNING: HTML from URL may change so these tests may start failing at some point!
 
-my $tmpdir = File::Temp::tempdir(CLEANUP=>1);      
+# if for debug you change this make sure that it has path in it e.g. ./xyz
+my $tmpdir = tempdir(); # will be erased unless a BAIL_OUT or env var set
+ok(-d $tmpdir, "output dir exists");
+
 my $js_outfile_tmp = File::Spec->catdir($tmpdir, 'outfile.js');
-diag "Using temp dir '$tmpdir' (in auto-cleanup mode) ...";
+diag "Using temp dir '$tmpdir' ...";
 
 my ($element_tagname, $element_id, $element_classname);
 my @known_selectors = ('element-name', 'element-class', 'element-tag', 'element-id', 'element-cssselector');
@@ -114,6 +120,10 @@ my %tests = (
 	# All html elements matched will be combined either with a Union ('||'=>1)
 	# or an Intersection ('&&'=>1)
 	# specify also what html element ids are expected and not expected for checking the result
+
+	# if you set a test to undef all following tests will be canceled
+	# js-outfile => ... will save the JS to a file for debugging
+
 	'test01' => {
 		'params' => {
 			'element-id' => ['nav-id-1'],
@@ -259,7 +269,7 @@ EOJ
 			    'name' => 'func22'
 			  },
 			],
-			#'js-outfile' => 'output.js'
+			#'js-stest2' => 'output.js'
 		},
 		'must-be-returned' => ['nav-id-1', 'li-id-1', 'span-id-1', 'li-id-2', 'span-id-2', '_domops_created_id_0'],
 		'must-not-be-returned' => ['header-id-1', 'div-id-1', 'div-id-1-1', 'div-id-2', 'div-id-2-1'],
@@ -305,39 +315,41 @@ for my $tk (sort keys %tests){
 	ok(defined($retmech), "mech_obj->get() : called.") or BAIL_OUT("test '${tk}' : failed to get() url '$URL'");
 	$mech_obj->sleep(1); # let it settle
 	my $tv = $tests{$tk};
-	my $ret = zap({
+	my $tparms = {
 		'mech-obj' => $mech_obj,
-		'js-outfile' => $js_outfile_tmp,
 		%{ $tv->{'params'} }
-	});
-	ok(defined($ret), 'zap()'." : test '${tk}' : called with these parameters: ".perl2dump($tv->{'params'})) or BAIL_OUT("test '${tk}' : failed.");
+	};
+	if( $VERBOSITY > 1 ){ $tparms->{'js-outfile'} = $js_outfile_tmp }
 
-	is(ref($ret), 'HASH', 'zap()'." : test '${tk}' : called and got defined returned value which is a HASHref.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-	ok(exists($ret->{'status'}), 'zap()'." : test '${tk}' : called and returned value contains key 'status'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+	my $ret = domops_zap($tparms);
+	ok(defined($ret), 'domops_zap()'." : test '${tk}' : called with these parameters: ".perl2dump($tv->{'params'})) or BAIL_OUT("test '${tk}' : failed.");
+
+	is(ref($ret), 'HASH', 'domops_zap()'." : test '${tk}' : called and got defined returned value which is a HASHref.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+	ok(exists($ret->{'status'}), 'domops_zap()'." : test '${tk}' : called and returned value contains key 'status'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	# some tests must throw an exception (there name must end in '-exception')
 	if( $tk =~ /-exception$/ ){
-		ok($ret->{'status'}<0, 'zap()'." : test '${tk}' : called and returned value contains key 'status' which is ".$ret->{'status'}." < 0 (meaning an exception was thrown as expected).") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok($ret->{'status'}<0, 'domops_zap()'." : test '${tk}' : called and returned value contains key 'status' which is ".$ret->{'status'}." < 0 (meaning an exception was thrown as expected).") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 		next; # skip the rest, we got an expected exception all is doomed
 	} else {
-		ok($ret->{'status'}>=0, 'zap()'." : test '${tk}' : called and returned value contains key 'status' which is ".$ret->{'status'}." >= 0 (meaning success).") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok($ret->{'status'}>=0, 'domops_zap()'." : test '${tk}' : called and returned value contains key 'status' which is ".$ret->{'status'}." >= 0 (meaning success).") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	}
-	ok(exists($ret->{'found'}), 'zap()'." : test '${tk}' : called and returned value contains key 'found'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-	ok(defined($ret->{'found'}), 'zap()'." : test '${tk}' : called and returned value contains key 'found' which has a defined value.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-	is(ref($ret->{'found'}), 'HASH', 'zap()'." : test '${tk}' : called and returned value contains key 'found' which is an HASHref.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+	ok(exists($ret->{'found'}), 'domops_zap()'." : test '${tk}' : called and returned value contains key 'found'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+	ok(defined($ret->{'found'}), 'domops_zap()'." : test '${tk}' : called and returned value contains key 'found' which has a defined value.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+	is(ref($ret->{'found'}), 'HASH', 'domops_zap()'." : test '${tk}' : called and returned value contains key 'found' which is an HASHref.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	my $found = $ret->{'found'};
 	my $exists_element_inform = exists $tv->{'params'}->{'element-information-from-matched'};
 	for my $aresname ('first-level', 'all-levels'){
-		ok(exists($found->{$aresname}), 'zap()'." : test '${tk}' : called and 'found' contains key '${aresname}'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-		ok(defined($found->{$aresname}), 'zap()'." : test '${tk}' : called and 'found' contains key '${aresname}' which has a defined value.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-		is(ref($found->{$aresname}), 'ARRAY', 'zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok(exists($found->{$aresname}), 'domops_zap()'." : test '${tk}' : called and 'found' contains key '${aresname}'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+		ok(defined($found->{$aresname}), 'domops_zap()'." : test '${tk}' : called and 'found' contains key '${aresname}' which has a defined value.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+		is(ref($found->{$aresname}), 'ARRAY', 'domops_zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 		# check that it contains the fields of our default info-extractor js code or some fields in case of user-specified
 		for my $afl (@{ $found->{$aresname} }){
-			is(ref($afl), 'HASH', 'zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-			ok(scalar(keys %$afl)>0, 'zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH which it has at least one entry.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+			is(ref($afl), 'HASH', 'domops_zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+			ok(scalar(keys %$afl)>0, 'domops_zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH which it has at least one entry.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 			if( $exists_element_inform ){
 				for my $ak (exists($tv->{'keys-in-found'}) ? @{ $tv->{'keys-in-found'} } : qw/tag id/){
-					ok(exists($afl->{$ak}), 'zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH which contains key '$ak'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-					ok(defined($afl->{$ak}), 'zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH which contains key '$ak' which is defined.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+					ok(exists($afl->{$ak}), 'domops_zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH which contains key '$ak'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+					ok(defined($afl->{$ak}), 'domops_zap()'." : test '${tk}' : called and result contains key '${aresname}' which is an ARRAYref which contains a HASH which contains key '$ak' which is defined.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 				}
 			}
 		}
@@ -347,18 +359,18 @@ for my $tk (sort keys %tests){
 	# check that those which were supposed to be removed are in the returned results and vice versa
 	my %expected_returnedids = map { $_ => 1 } @{ $tv->{'must-be-returned'} };
 	for my $anid (sort keys %expected_returnedids){
-		ok(exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was found in the returned results as expected.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok(exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was found in the returned results as expected.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	}
 	for my $anid (sort keys %returnedids){
-		ok(exists($expected_returnedids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is in the list of expected ids.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok(exists($expected_returnedids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is in the list of expected ids.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	}
 	# now check that those which were supposed not to be removed are not in the returned results and vice versa
 	my %expected_not_returnedids = map { $_ => 1 } @{ $tv->{'must-not-be-returned'} };
 	for my $anid (sort keys %expected_not_returnedids){
-		ok(! exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was not found in the returned results as it shouldn't.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok(! exists($returnedids{$anid}), "test '${tk}' : element with id '$anid' was not found in the returned results as it shouldn't.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	}
 	for my $anid (sort keys %returnedids){
-		ok(! exists($expected_not_returnedids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is not in the list of expected ids as it shouldn't.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		ok(! exists($expected_not_returnedids{$anid}), "test '${tk}' : element with id '$anid' of the returned results is not in the list of expected ids as it shouldn't.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	}
 
 	# check if there are duplicates if not supposed to be
@@ -367,31 +379,31 @@ for my $tk (sort keys %tests){
 		my $has_dups = scalar(keys %someids) < scalar(@{ $found->{'all-levels'} });
 		%someids =  map { $_ => 1 } map { $_->{'id'} } @{ $found->{'first-level'} };
 		$has_dups ||= scalar(keys %someids) < scalar(@{ $found->{'first-level'} });
-		is($tv->{'must-have-duplicates'}, $has_dups ? 1 : 0, "Returned results must ".($tv->{'must-have-duplicates'}==1?"":"not ")."have duplicates.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		is($tv->{'must-have-duplicates'}, $has_dups ? 1 : 0, "Returned results must ".($tv->{'must-have-duplicates'}==1?"":"not ")."have duplicates.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	}
 
-	# find() those deleted, they must all fail
+	# domops_find() those deleted, they must all fail
 	%returnedids = map { $_ => 1 } grep { not /^\s*$/ } map { $_->{'id'} } (@{ $found->{'all-levels'} }, @{ $found->{'first-level'} });
 	for my $anid (keys %returnedids){
-		my $tt = find({
+		my $tt = domops_find({
 			'mech-obj' => $mech_obj,
 			'element-id' => $anid
 		});
-		ok(defined($tt), 'zap()'." : test '${tk}' : calling find() to confirm deletions for id '$anid'") or BAIL_OUT("test '${tk}' : failed.");
+		ok(defined($tt), 'domops_zap()'." : test '${tk}' : calling domops_find() to confirm deletions for id '$anid'") or BAIL_OUT("test '${tk}' : failed.");
 
-		is(ref($tt), 'HASH', 'zap()'." : test '${tk}' : find() called and got defined returned value which is a HASHref.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-		ok(exists($tt->{'status'}), 'zap()'." : test '${tk}' : find() called and returned value contains key 'status'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-		ok($tt->{'status'}>=0, 'zap()'." : test '${tk}' : find() called and returned value contains key 'status' which is ".$tt->{'status'}." >= 0 (meaning success).") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-		ok(exists($tt->{'found'}), 'zap()'." : test '${tk}' : find() called and returned value contains key 'found'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-		ok(defined($tt->{'found'}), 'zap()'." : test '${tk}' : find() called and returned value contains key 'found' which has a defined value.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-		is(ref($tt->{'found'}), 'HASH', 'zap()'." : test '${tk}' : find() called and returned value contains key 'found' which is an HASHref.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		is(ref($tt), 'HASH', 'domops_zap()'." : test '${tk}' : domops_find() called and got defined returned value which is a HASHref.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+		ok(exists($tt->{'status'}), 'domops_zap()'." : test '${tk}' : domops_find() called and returned value contains key 'status'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+		ok($tt->{'status'}>=0, 'domops_zap()'." : test '${tk}' : domops_find() called and returned value contains key 'status' which is ".$tt->{'status'}." >= 0 (meaning success).") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+		ok(exists($tt->{'found'}), 'domops_zap()'." : test '${tk}' : domops_find() called and returned value contains key 'found'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+		ok(defined($tt->{'found'}), 'domops_zap()'." : test '${tk}' : domops_find() called and returned value contains key 'found' which has a defined value.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+		is(ref($tt->{'found'}), 'HASH', 'domops_zap()'." : test '${tk}' : domops_find() called and returned value contains key 'found' which is an HASHref.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 		my $found = $tt->{'found'};
 		for my $aresname ('first-level', 'all-levels'){
-			ok(exists($found->{$aresname}), 'zap()'." : test '${tk}' : find() called and 'found' contains key '${aresname}'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-			ok(defined($found->{$aresname}), 'zap()'." : test '${tk}' : find() called and 'found' contains key '${aresname}' which has a defined value.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
-			is(ref($found->{$aresname}), 'ARRAY', 'zap()'." : test '${tk}' : find() called and result contains key '${aresname}' which is an ARRAYref.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+			ok(exists($found->{$aresname}), 'domops_zap()'." : test '${tk}' : domops_find() called and 'found' contains key '${aresname}'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+			ok(defined($found->{$aresname}), 'domops_zap()'." : test '${tk}' : domops_find() called and 'found' contains key '${aresname}' which has a defined value.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
+			is(ref($found->{$aresname}), 'ARRAY', 'domops_zap()'." : test '${tk}' : domops_find() called and result contains key '${aresname}' which is an ARRAYref.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 		}
-		is(scalar(@{$found->{'first-level'}}), 0, 'zap()'." : test '${tk}' : find() called and 'found'->'first-level' contains exactly 0 items'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' : failed, above is what it was returned from the call to zap()");
+		is(scalar(@{$found->{'first-level'}}), 0, 'domops_zap()'." : test '${tk}' : domops_find() called and 'found'->'first-level' contains exactly 0 items'.") or BAIL_OUT(perl2dump($tt)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_zap()");
 	}
 
 	# check return of the callbacks if any
@@ -402,21 +414,21 @@ for my $tk (sort keys %tests){
 		# we must have a 'cb-results' in the returned value which must contain
 		# an array of results (one item for each html element found)
 		# under key $acbname (e.g. 'find-cb-on-matched' etc.)
-		ok(exists($ret->{'cb-results'}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
-		ok(defined($ret->{'cb-results'}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results' and it is defined.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
-		ok(exists($ret->{'cb-results'}->{$acbname}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
-		ok(defined($ret->{'cb-results'}->{$acbname}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is defined.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
-		is(ref($ret->{'cb-results'}->{$acbname}), 'ARRAY', 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
+		ok(exists($ret->{'cb-results'}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
+		ok(defined($ret->{'cb-results'}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results' and it is defined.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
+		ok(exists($ret->{'cb-results'}->{$acbname}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
+		ok(defined($ret->{'cb-results'}->{$acbname}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is defined.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
+		is(ref($ret->{'cb-results'}->{$acbname}), 'ARRAY', 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
 
 		# and now under it we must have an array for each function callback we declared
 		# and that array must have a size of as many html elements were returned
 		# and each item of the array must contain keys 'result' and 'name' (which is the func name declared)
-		# zap() adds one more callback under 'find-cb-on-matched' named '_thezapper' and it is the last in sequence
+		# domops_zap() adds one more callback under 'find-cb-on-matched' named '_thezapper' and it is the last in sequence
 		if( $acbname eq 'find-cb-on-matched' ){
-			is(scalar(@{$ret->{'cb-results'}->{$acbname}}), 1+scalar(@{$TV}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as there were callback functions for this specific cb type.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
+			is(scalar(@{$ret->{'cb-results'}->{$acbname}}), 1+scalar(@{$TV}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as there were callback functions for this specific cb type.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
 		} else {
 			# this does not contain _thezapper
-			is(scalar(@{$ret->{'cb-results'}->{$acbname}}), scalar(@{$TV}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as there were callback functions for this specific cb type.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
+			is(scalar(@{$ret->{'cb-results'}->{$acbname}}), scalar(@{$TV}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as there were callback functions for this specific cb type.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
 		}
 		# we make a special case for the _thezapper from the tests (it is the last)
 		for(my $i=scalar(@{$ret->{'cb-results'}->{$acbname}});$i-->0;){
@@ -425,18 +437,19 @@ for my $tk (sort keys %tests){
 				? {'name'=>'_thezapper'} : $TV->[$i]
 			;
 			if( $acbname eq 'find-cb-on-matched' ){
-				is(scalar(@$ares1), scalar(@{$found->{'first-level'}}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as the HTML elements matched (first-level).") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
+				is(scalar(@$ares1), scalar(@{$found->{'first-level'}}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as the HTML elements matched (first-level).") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
 			} else {
-				is(scalar(@$ares1), scalar(@{$found->{'all-levels'}}), 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as the HTML elements matched (all-levels).") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
+				is(scalar(@$ares1), scalar(@{$found->{'all-levels'}}), 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned value contains key 'cb-results'->$acbname and it is an ARRAY which has exactly as many items as the HTML elements matched (all-levels).") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
 			}
 			for my $ares2 (@$ares1){
-				is($ares2->{'name'}, $funcdata->{'name'}, 'find()'." : test '${tk}' : called with a '${acbname}' callback and verified function name it is as it was declared '".$funcdata->{'name'}."'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
-				is($ares2->{'result'}, 1, 'find()'." : test '${tk}' : called with a '${acbname}' callback and returned result is '1'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' : failed, above is what it was returned from the call to find()");
+				is($ares2->{'name'}, $funcdata->{'name'}, 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and verified function name it is as it was declared '".$funcdata->{'name'}."'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
+				is($ares2->{'result'}, 1, 'domops_find()'." : test '${tk}' : called with a '${acbname}' callback and returned result is '1'.") or BAIL_OUT(perl2dump($ret)."test '${tk}' (executed JS in '$js_outfile_tmp') : failed above is what it was returned from the call to domops_find()");
 			}
 		}
 	}	
 }
 
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
+
 # END
 done_testing();
-

@@ -1,6 +1,6 @@
 package PerlIO::via::UnPod;
 
-$VERSION= '0.08';
+$VERSION= '0.09';
 
 # be as strict as possible
 use strict;
@@ -94,7 +94,7 @@ PerlIO::via::UnPod - PerlIO layer for removing plain old documentation
 
 =head1 VERSION
 
-This documentation describes version 0.08.
+This documentation describes version 0.09.
 
 =head1 DESCRIPTION
 
@@ -139,7 +139,7 @@ L<PerlIO::via>, L<PerlIO::via::Pod> and any other PerlIO::via modules on CPAN.
 
 =head1 COPYRIGHT
 
-maintained by LNATION, <thisusedtobeanemail@gmail.com>
+maintained by LNATION, <thisusedtobeanemail@gmail.com> 2019->2025
 
 Copyright (c) 2002, 2003, 2004, 2012 Elizabeth Mattijsen.  All rights reserved.
 This library is free software; you can redistribute it and/or modify it under

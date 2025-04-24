@@ -1,5 +1,11 @@
 Revision history for CGI-Info
 
+0.99	Wed Apr 23 07:55:03 EDT 2025
+	Don't try to read from the terminal when not interactive
+	Added t/config.t
+	Use Params::Get in new()
+	Block SQL injections using /**/ instead of spaces to separate keywords
+
 0.98	Tue Apr 15 13:39:22 EDT 2025
 	Allow AUTOLOAD in subclasses
 	Use Config::Abstraction instead of Config::Auto

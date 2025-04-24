@@ -3,7 +3,7 @@ package Acme::Hospital::Bed;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
 	my ($package, %args) = @_;
@@ -155,7 +155,7 @@ Acme::Hospital::Bed - The great new Acme::Hospital::Bed!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -332,27 +332,17 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Hospital-Bed>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Acme-Hospital-Bed>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Acme-Hospital-Bed>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Acme-Hospital-Bed>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2025 by LNATION.
 
 This is free software, licensed under:
 

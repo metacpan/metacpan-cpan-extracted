@@ -2,27 +2,28 @@ package Javonet::Core::Transmitter::PerlTransmitter;
 use strict;
 use warnings;
 use Cwd;
-use aliased 'Javonet::Core::Transmitter::PerlTransmitterWrapper' => 'PerlTransmitterWrapper' , qw(send_command activate set_config_source set_javonet_working_directory);
+use aliased 'Javonet::Core::Transmitter::PerlTransmitterWrapper' => 'PerlTransmitterWrapper';
+use Exporter qw(import);
+our @EXPORT = qw(t_send_command t_activate t_set_config_source t_set_javonet_working_directory);
 
-sub send_command {
+sub t_send_command {
     my ($self, $message_byte_array_ref) = @_;
-    my $response_byte_array_ref = PerlTransmitterWrapper->send_command($message_byte_array_ref);
-    return $response_byte_array_ref;
+    return PerlTransmitterWrapper->tw_send_command($message_byte_array_ref);
 }
 
-sub activate {
+sub t_activate {
     my ($self, $licenseKey) = @_;
-    return PerlTransmitterWrapper->activate($licenseKey);
+    return PerlTransmitterWrapper->tw_activate($licenseKey);
 }
 
-sub set_config_source {
+sub t_set_config_source {
     my ($self, $config_path) = @_;
-    PerlTransmitterWrapper->set_config_source($config_path);
+    PerlTransmitterWrapper->tw_set_config_source($config_path);
 }
 
-sub set_javonet_working_directory {
+sub t_set_javonet_working_directory {
     my ($self, $working_directory) = @_;
-    PerlTransmitterWrapper->set_javonet_working_directory($working_directory);
+    PerlTransmitterWrapper->tw_set_javonet_working_directory($working_directory);
 }
 
 1;

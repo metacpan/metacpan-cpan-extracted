@@ -4,7 +4,7 @@ Crypt::URandom::MonkeyPatch - override core rand function to use system random s
 
 # VERSION
 
-version v0.1.0
+version v0.1.1
 
 # SYNOPSIS
 
@@ -71,6 +71,11 @@ Please report any bugs or feature requests on the bugtracker website
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
+report security vulnerabilities.
 
 # AUTHOR
 

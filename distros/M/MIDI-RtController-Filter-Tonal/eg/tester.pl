@@ -2,8 +2,6 @@
 use strict;
 use warnings;
 
-# PERL_FUTURE_DEBUG=1 perl eg/tester.pl
-
 use curry;
 use Future::IO::Impl::IOAsync;
 use MIDI::RtController ();

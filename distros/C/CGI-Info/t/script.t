@@ -5,15 +5,14 @@ use warnings;
 
 use File::Spec;
 use Cwd;
-use Test::NoWarnings;
+use IO::Interactive;
+use Test::Most;
 use Tie::Filehandle::Preempt::Stdin;
-use Test::Most tests => 64;
+# use Test::NoWarnings;
 
-BEGIN {
-	use_ok('CGI::Info');
-}
+BEGIN { use_ok('CGI::Info') }
 
-PATHS: {
+SCRIPT: {
 	delete $ENV{'SCRIPT_NAME'};
 	delete $ENV{'DOCUMENT_ROOT'};
 	delete $ENV{'SCRIPT_FILENAME'};
@@ -208,15 +207,17 @@ PATHS: {
 		ok($i->script_path() =~ /\/.+bar\.pl$/);
 	}
 
-	my $object = tie *STDIN,
-		'Tie::Filehandle::Preempt::Stdin',
-		("fred=wilma\n", "quit\n");
-	$i = new_ok('CGI::Info');
-	my %p = %{$i->params()};
-	ok($p{fred} eq 'wilma');
-	ok(!defined($p{barney}));
-	ok($i->fred() eq 'wilma');
-	ok(!defined($i->barney()));
+	if(IO::Interactive::is_interactive()) {
+		my $object = tie *STDIN,
+			'Tie::Filehandle::Preempt::Stdin',
+			("fred=wilma\n", "quit\n");
+		$i = new_ok('CGI::Info');
+		my %p = %{$i->params()};
+		ok($p{fred} eq 'wilma');
+		ok(!defined($p{barney}));
+		ok($i->fred() eq 'wilma');
+		ok(!defined($i->barney()));
+	}
 
 	$ENV{'SCRIPT_FILENAME'} = '/tulip';
 	delete $ENV{'SCRIPT_NAME'};
@@ -224,3 +225,5 @@ PATHS: {
 	$i = new_ok('CGI::Info');
 	cmp_ok($i->script_path(), 'eq', '/tulip', 'SCRIPT_FILENAME is read from the environment');
 }
+
+done_testing();

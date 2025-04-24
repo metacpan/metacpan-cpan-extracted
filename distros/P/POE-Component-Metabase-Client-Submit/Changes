@@ -1,41 +1,21 @@
 ==================================================
-Changes from 2012-02-18 00:00:00 +0000 to present.
+Changes from 2020-04-24 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.14 at 2017-02-16 15:11:39 +0000
+version 0.16 at 2025-04-23 11:36:20 +0000
 -----------------------------------------
 
-  Change: 867e7f9fa1f10843fdcc9771e57342cf28dfa24c
+  Change: 880447638698045f639422aee240c605c659adac
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-02-16 15:11:39 +0000
+  Date : 2025-04-23 12:36:20 +0000
 
-    Convert to Dist::Zilla 
+    Switch to using JSON::MaybeXS instead of vanilla JSON
 
-  Change: 10b09dcd7d2e6dac1cf1313c42078eb384bcd2a8
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-03-11 09:57:20 +0000
-
-    Remove trailing whitespace 
-
-  Change: 70a91d1d4a14acbbfe261801b4fd204b7c02d489
-  Author: Apocalypse <perl@0ne.us>
-  Date : 2011-03-11 07:12:59 +0000
-
-    add compress option 
-
-  Change: 7807db1582b7f72b1a18442b84c3c95ddf38388e
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-03-10 14:09:12 +0000
-
-    Add HTTP::Message as a prereq 
-
-  Change: 8b0d28b0b565cfbb8bb0e53b12b61f8420d215fc
-  Author: Apocalypse <perl@0ne.us>
-  Date : 2011-03-10 20:41:18 +0000
-
-    first stab at Accept-Encoding support 
+    JSON::XS is failing to install on quadmath perls and if the reference
+    client Metabase::Client::Simple is happy to use JSON::MaybeXS, so are
+    we. 
 
 ================================================
-Plus 6 releases after 2012-02-18 00:00:00 +0000.
+Plus 7 releases after 2020-04-24 00:00:00 +0000.
 ================================================

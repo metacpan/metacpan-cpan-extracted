@@ -18,7 +18,7 @@ use Digest::SHA qw(sha256_hex);
 use Encode      qw(encode);
 
 use constant MAX_REDIRECTS => 3;
-our $VERSION = '0.18';    # VERSION
+our $VERSION = '0.19';    # VERSION
 
 =head2 config
 
@@ -89,6 +89,12 @@ sub config {
             description => 'UN: United Nations Security Council Consolidated List',
             url         => $args{unsc_url} || 'https://scsanctions.un.org/resources/xml/en/consolidated.xml',
             parser      => \&_unsc_xml,
+        },
+        'MOHA-Sanctions' => {
+            description => 'MOHA: Sanction list made by the ministry of home affairs Malaysia',
+            url         => $args{moha_url}
+                || 'https://www.moha.gov.my/images/SenaraiKementerianDalamNegeri/September2024/ENG/SENARAI%20KDN%202024_5SEPTEMBER2024-ENG.xml',
+            parser => \&_moha_xml,
         },
     };
 }
@@ -523,6 +529,81 @@ sub _unsc_xml {
             national_id    => \@national_id,
             passport_no    => \@passport_no,
         );
+    }
+
+    return {
+        updated => $publish_epoch,
+        content => $dataset,
+    };
+}
+
+=head2 _moha_xml
+
+Parses the XML data from MOHA (Ministry of Home Affairs Malaysia) and returns a hash-ref of the parsed data.
+
+=cut
+
+sub _moha_xml {
+    my $raw_data = shift;
+
+    # Parse the XML data using XML::Fast
+    my $data = eval { xml2hash($raw_data) };
+
+    if ($@ || !$data) {
+        warn "Error parsing XML: $@\n";
+        return;
+    }
+
+    # Access the creation date for the publish timestamp
+    my $publish_date  = $data->{'TaggedPDF-doc'}{'x:xmpmeta'}{'rdf:RDF'}{'rdf:Description'}{'xmp:CreateDate'};
+    my $publish_epoch = _date_to_epoch($publish_date);
+    die "Invalid or missing creation date in XML\n" unless $publish_epoch;
+
+    # Access the relevant table structure
+    my $tables = $data->{'TaggedPDF-doc'}{'Part'}{'Table'};
+
+    my $dataset = [];
+    foreach my $table (@$tables) {
+        my $rows = $table->{'TBody'}{'TR'};
+        next unless ref $rows eq 'ARRAY';
+
+        # Skip the header row
+        foreach my $row (@$rows[1 .. $#$rows]) {
+            my $cells = $row->{'TD'};
+            next unless @$cells >= 13;
+
+            my $name                  = $cells->[2]{'P'};
+            my $date_of_birth         = $cells->[5]{'P'};
+            my $other_name            = $cells->[7]{'P'};
+            my $place_of_birth        = $cells->[6]{'P'};
+            my $nationality           = $cells->[8]{'P'};
+            my $passport_number       = $cells->[9]{'P'};
+            my $identification_number = $cells->[10]{'P'};
+
+            # Trim whitespace from values
+            for ($name, $date_of_birth, $other_name, $place_of_birth, $nationality, $passport_number, $identification_number) {
+                $_ =~ s/^\s+|\s+$//g if defined $_;
+            }
+
+            # if $name is array, convert it to a string
+            $name = join ' ', @$name if ref $name eq 'ARRAY';
+
+            # if multiple aliases (other_name) are present, convert them to an array
+            my @other_name = ref $other_name eq 'ARRAY' ? @$other_name : ($other_name);
+
+            # pass DOB as array
+            my @dob = ref $date_of_birth eq 'ARRAY' ? @$date_of_birth : ($date_of_birth);
+
+            _process_sanction_entry(
+                $dataset,
+                names          => [$name, @other_name],
+                date_of_birth  => [@dob],
+                place_of_birth => [$place_of_birth],
+                nationality    => [$nationality],
+                national_id    => [$identification_number],
+                passport_no    => [$passport_number],
+            );
+        }
     }
 
     return {

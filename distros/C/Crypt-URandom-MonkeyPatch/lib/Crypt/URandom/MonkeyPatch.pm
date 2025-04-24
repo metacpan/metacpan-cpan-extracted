@@ -2,7 +2,9 @@ package Crypt::URandom::MonkeyPatch;
 
 # ABSTRACT: override core rand function to use system random sources
 
-use v5.16;
+use v5.8.0;
+
+use strict;
 use warnings;
 
 use Crypt::URandom qw( urandom );
@@ -10,7 +12,9 @@ use Crypt::URandom qw( urandom );
 use constant SIZE => 1 << 31;
 use constant MASK => SIZE - 1;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
+
+use version 0.77; $VERSION = version->declare($VERSION);
 
 BEGIN {
 
@@ -42,7 +46,7 @@ Crypt::URandom::MonkeyPatch - override core rand function to use system random s
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
 
@@ -103,6 +107,11 @@ L<https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch/issues>
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities.
 
 =head1 AUTHOR
 

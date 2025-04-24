@@ -39,6 +39,7 @@
             "File::Basename" : "0",
             "File::Spec" : "3.4",
             "HTTP::BrowserDetect" : "3.1",
+            "IO::Interactive" : "0",
             "JSON::MaybeXS" : "0",
             "List::Util" : "1.33",
             "Log::Abstraction" : "0.05",
@@ -93,6 +94,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.98",
+   "version" : "0.99",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

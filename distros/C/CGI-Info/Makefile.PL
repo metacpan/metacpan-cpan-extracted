@@ -70,6 +70,7 @@ WriteMakefile(
 		'List::Util' => 1.33,
 		'HTTP::BrowserDetect' => 3.10,	# Include bingbot
 		'File::Basename' => 0,
+		'IO::Interactive' => 0,
 		'String::Clean::XSS' => 0,
 		'Log::Any' => 0,
 		'JSON::MaybeXS' => 0,

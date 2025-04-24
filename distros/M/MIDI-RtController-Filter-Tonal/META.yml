@@ -41,7 +41,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-Tonal
   repository: https://github.com/ology/MIDI-RtController-Filter-Tonal.git
-version: '0.0305'
+version: '0.0306'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

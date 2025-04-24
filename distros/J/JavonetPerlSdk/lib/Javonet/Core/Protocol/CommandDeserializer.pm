@@ -5,8 +5,10 @@ use Moose;
 use lib 'lib';
 use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
 use aliased 'Javonet::Sdk::Core::Type' => 'Type', qw(get_type);
-use aliased 'Javonet::Core::Protocol::TypeDeserializer' => 'TypeDeserializer', qw(deserializeInt deserializeString deserializeDouble deserializeFloat);
+use aliased 'Javonet::Core::Protocol::TypeDeserializer' => 'TypeDeserializer';
 
+use Exporter qw(import);
+our @EXPORT = qw(new isAtEnd decode readObject readCommand readCommandRecursively readString readInt readBool readFloat readByte readChar readLongLong readDouble readUnsignedLongLong readUnsignedInt readUndef);
 
 our $position = 0;
 our @buffer = [];
@@ -15,8 +17,8 @@ our $command;
 sub new {
     my ($self, $array_ref) = @_;
     @buffer = @$array_ref;
-    $command = PerlCommand->new(runtime =>$buffer[0],
-        command_type => $buffer[10], payload=>[]);
+    $command = PerlCommand->new(runtime => $buffer[0],
+        command_type                    => $buffer[10], payload => []);
     $position = 11;
     return $self;
 }
@@ -28,55 +30,55 @@ sub isAtEnd {
 
 sub decode {
     while (!isAtEnd()) {
-        $command = $command->addArgumentToPayload([readObject($buffer[$position])]);
+        $command = $command->addArgumentToPayload([ readObject($buffer[$position]) ]);
     }
     return $command;
 }
 
 sub readObject {
     my $type_num = $_[0];
-    if($type_num == Type->get_type('Command')){
+    if ($type_num == Type->get_type('Command')) {
         return readCommand();
     }
-    elsif($type_num == Type->get_type('JavonetString')){
+    elsif ($type_num == Type->get_type('JavonetString')) {
         return readString();
     }
-    elsif($type_num == Type->get_type('JavonetInteger')){
+    elsif ($type_num == Type->get_type('JavonetInteger')) {
         return readInt();
     }
-    elsif($type_num == Type->get_type('JavonetBool')){
+    elsif ($type_num == Type->get_type('JavonetBool')) {
         return readBool();
     }
-    elsif($type_num == Type->get_type('JavonetFloat')){
+    elsif ($type_num == Type->get_type('JavonetFloat')) {
         return readFloat();
     }
-    elsif($type_num == Type->get_type('JavonetByte')){
+    elsif ($type_num == Type->get_type('JavonetByte')) {
         return readByte();
     }
-    elsif($type_num == Type->get_type('JavonetChar')){
+    elsif ($type_num == Type->get_type('JavonetChar')) {
         return readChar();
     }
-    elsif($type_num == Type->get_type('JavonetLongLong')){
+    elsif ($type_num == Type->get_type('JavonetLongLong')) {
         return readLongLong();
     }
-    elsif($type_num == Type->get_type('JavonetDouble')){
+    elsif ($type_num == Type->get_type('JavonetDouble')) {
         return readDouble();
     }
-    elsif($type_num == Type->get_type('JavonetUnsignedLongLong')){
+    elsif ($type_num == Type->get_type('JavonetUnsignedLongLong')) {
         return readUnsignedLongLong();
     }
-    elsif($type_num == Type->get_type('JavonetUnsignedInteger')){
+    elsif ($type_num == Type->get_type('JavonetUnsignedInteger')) {
         return readUnsignedInt();
     }
-    elsif($type_num == Type->get_type('JavonetNull')){
+    elsif ($type_num == Type->get_type('JavonetNull')) {
         return readUndef();
     }
-    else{
+    else {
         die "Type is not supported: $type_num";
     }
 }
 
-sub readCommand{
+sub readCommand {
     my $p = $position;
     my @int_buffer = @buffer[$p + 1 .. $p + 4];
     my $numberOfArgumentInPayload = TypeDeserializer->deserializeInt(\@int_buffer);
@@ -99,12 +101,12 @@ sub readCommandRecursively {
         my $p = $position;
         my @int_buffer = @buffer[$p + 1 .. $p + 4];
         my $argSize = TypeDeserializer->deserializeInt(\@int_buffer);
-        $cmd = $cmd->addArgumentToPayload([readObject($buffer[$p])]);
+        $cmd = $cmd->addArgumentToPayload([ readObject($buffer[$p]) ]);
         return readCommandRecursively($numberOfArgumentInPayloadLeft - 1, $cmd);
     }
 }
 
-sub readString{
+sub readString {
     my $p = $position;
     my $string_encoding_mode = $buffer[$p + 1];
     my @int_buffer = @buffer[$p + 2 .. $p + 5];
@@ -118,7 +120,7 @@ sub readString{
     return $decodedString
 }
 
-sub readInt{
+sub readInt {
     $position += 2;
     my $p = $position;
     $position += 4;
@@ -126,7 +128,7 @@ sub readInt{
     return TypeDeserializer->deserializeInt(\@int_buffer);
 }
 
-sub readBool{
+sub readBool {
     $position += 2;
     my $p = $position;
     $position += 1;
@@ -134,7 +136,7 @@ sub readBool{
     return TypeDeserializer->deserializeBool($bool_buffer);
 }
 
-sub readFloat{
+sub readFloat {
     $position += 2;
     my $p = $position;
     $position += 4;
@@ -166,7 +168,7 @@ sub readLongLong {
     return TypeDeserializer->deserializeLongLong(\@longlong_buffer);
 }
 
-sub readDouble{
+sub readDouble {
     $position += 2;
     my $p = $position;
     $position += 8;
@@ -197,7 +199,6 @@ sub readUndef {
     my $undef_buffer = $buffer[$p];
     return TypeDeserializer->deserializeUndef($undef_buffer);
 }
-
 
 no Moose;
 1;

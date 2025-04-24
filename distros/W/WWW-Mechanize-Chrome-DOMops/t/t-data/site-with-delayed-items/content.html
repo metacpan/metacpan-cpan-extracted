@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- this will test domops_wait_for_page_to_load()
+by delaying three elements by 5s, 7s, 9s respectively.
+-->
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>CS 204 Dynamic DOM</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- CSS; should concatenate these into one file
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+  <!-- We load jQuery at the top so that we can intersperse examples in
+       the reading and lecture notes -->
+
+</head>
+<body>
+
+    <header id='header-id-1'>
+        <!-- needs a skip-to-content link -->
+        <nav id="nav-id-1" class="nav-class-1 extra-class1 extra-class2" name="nav-name-1">
+            <ul>
+                <li id="li-id-1"><span id="span-id-1">aa</span></li>
+                <li id="li-id-2"><span id="span-id-2">bb</span></li>
+            </ul>
+        </nav>
+    </header>
+
+  <div id="div-id-1" class="div-class-1" name="div-name-1">
+    <div id="div-id-1-1" class="div-row-1">xxx</div>
+  </div>
+
+  <div id="div-id-2" class="div-class-2" name="div-name-2">
+    <div id="div-id-2-1" class="div-row-2">yyy</div>
+  </div>
+
+  <div id='delayed-div'>
+    <ul id='delayed-ul'>
+	<li id='always-present-but-invisible-li'>always present but invisible for some time</li>
+        <!-- the delayed elements will appear below -->
+    </ul>
+  </div>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+	setTimeout(function(){
+		var anElem = document.createElement('li');
+		anElem.setAttribute("id", "present-after-5s");
+		anElem.innerHTML = "appearing after 5s";
+		document.getElementById('delayed-ul').appendChild(anElem)
+	},5000);
+	setTimeout(function(){
+		var anElem = document.createElement('li');
+		anElem.setAttribute("id", "present-after-7s");
+		anElem.innerHTML = "appearing after 7s";
+		document.getElementById('delayed-ul').appendChild(anElem)
+	},7000);
+	setTimeout(function(){
+		var anElem = document.createElement('li');
+		anElem.setAttribute("id", "present-after-9s");
+		anElem.innerHTML = "appearing after 9s";
+		document.getElementById('delayed-ul').appendChild(anElem)
+	},9000);
+}); // on dom loaded
+</script>
+
+</body>
+</html>

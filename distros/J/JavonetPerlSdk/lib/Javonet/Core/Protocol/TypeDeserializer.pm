@@ -5,6 +5,21 @@ use Moose;
 use Encode;
 use lib 'lib';
 
+use Exporter qw(import);
+our @EXPORT = qw(
+    deserializeString
+    deserializeInt
+    deserializeBool
+    deserializeFloat
+    deserializeByte
+    deserializeChar
+    deserializeLongLong
+    deserializeDouble
+    deserializeULongLong
+    deserializeUInt
+    deserializeUndef
+);
+
 sub deserializeString {
     my ($self, $string_encoding_mode, $acc_ref) = @_;
     my @string_array = @$acc_ref;

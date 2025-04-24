@@ -4,7 +4,7 @@ use warnings;
 use Test::More qw(no_plan);
 use lib 'lib';
 use aliased 'Javonet::Core::Protocol::TypeDeserializer' => 'TypeDeserializer';
-use aliased 'Javonet::Sdk::Core::StringEncodingMode' => 'StringEncodingMode', qw(get_string_encoding_mode);
+use aliased 'Javonet::Sdk::Core::StringEncodingMode' => 'StringEncodingMode';
 use lib 't/dataSeed';
 use ProtocolDataSeed;
 
