@@ -50,3 +50,9 @@ t/34_validate_allenes.t
 t/35_chirality_to_pseudograph.t
 t/36_kekulise.t
 t/37_elements.t
+t/38_rings.t
+t/39_reuse_ring_numbers.t
+t/40_unsprout_hydrogens.t
+t/41_unusual_valence.t
+t/42_tetrahedral_chirality.t
+t/43_roundtrip.t

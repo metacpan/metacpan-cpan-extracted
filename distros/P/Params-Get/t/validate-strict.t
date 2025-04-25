@@ -9,7 +9,7 @@ use Test::Needs 'Params::Validate::Strict';
 sub where_am_i
 {
 	my $params = Params::Validate::Strict::validate_strict({
-		args => Params::Get::get_params(undef, @_),
+		args => Params::Get::get_params(undef, \@_),
 		schema => {
 			'latitude' => {
 				type => 'number',

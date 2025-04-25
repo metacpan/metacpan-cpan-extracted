@@ -327,7 +327,7 @@ EOT
 
 {
     for my $stk ( qw(cbs upsk) ) {
-        my $infile = "test/$stk.stockholm";
+        my $infile = file('test', "$stk.stockholm");
         my $ali = $class->load_stockholm($infile);
         is $ali->filename, $infile, 'got expected filename from stockholm file';
         my $flag = $ali->is_protein;
@@ -343,7 +343,7 @@ EOT
 
 {
     for my $ks (0, 1) {
-        my $infile = "test/tinyseq.xml";
+        my $infile = file('test', 'tinyseq.xml');
         my $ali = $class->load_tinyseq($infile, { keep_strain => $ks } );
         is $ali->filename, $infile, 'got expected filename from tinyseq file';
         my $flag = not $ali->is_protein;

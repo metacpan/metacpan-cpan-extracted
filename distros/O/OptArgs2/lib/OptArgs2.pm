@@ -7,7 +7,7 @@ use Exporter::Tidy
   default => [qw/class_optargs cmd optargs subcmd arg opt/],
   other   => [qw/usage cols rows/];
 
-our $VERSION  = 'v2.0.13';
+our $VERSION  = 'v2.0.15';
 our @CARP_NOT = (
     qw/
       OptArgs2
@@ -250,7 +250,7 @@ package OptArgs2::CODEREF {
 }
 
 package OptArgs2::OptArgBase {
-    ### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:33 2025
+    ### START Class::Inline ### v0.0.1 Fri Apr 25 08:48:08 2025
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
 
@@ -333,7 +333,7 @@ package OptArgs2::Arg {
         'HashRef'  => '=s%',
         'SubCmd'   => '=s',
     );
-    ### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:33 2025
+    ### START Class::Inline ### v0.0.1 Fri Apr 25 08:48:08 2025
 require Scalar::Util;
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
@@ -498,7 +498,7 @@ package OptArgs2::Opt {
         'Num'      => '=f',
         'Str'      => '=s',
     );
-    ### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:33 2025
+    ### START Class::Inline ### v0.0.1 Fri Apr 25 08:48:08 2025
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
 
@@ -706,7 +706,7 @@ package OptArgs2::CmdBase {
       fallback => 1;
     use Getopt::Long qw/GetOptionsFromArray/;
     use List::Util   qw/max/;
-    ### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:33 2025
+    ### START Class::Inline ### v0.0.1 Fri Apr 25 08:48:08 2025
 require Scalar::Util;
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
@@ -1343,7 +1343,7 @@ sub _dump {
 
 package OptArgs2::Cmd {
     use parent -norequire, 'OptArgs2::CmdBase';
-    ### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:33 2025
+    ### START Class::Inline ### v0.0.1 Fri Apr 25 08:48:08 2025
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
 
@@ -1456,7 +1456,7 @@ sub _dump {
 
 package OptArgs2::SubCmd {
     use parent -norequire, 'OptArgs2::CmdBase';
-    ### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:33 2025
+    ### START Class::Inline ### v0.0.1 Fri Apr 25 08:48:08 2025
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
 
@@ -1560,7 +1560,7 @@ OptArgs2 - command-line argument and option processor
 
 =head1 VERSION
 
-v2.0.13 (2025-04-04)
+v2.0.15 (2025-04-25)
 
 =head1 SYNOPSIS
 
@@ -2353,11 +2353,11 @@ Code is tidied up on Git commit using githook-perltidy:
 
 =head1 AUTHOR
 
-Mark Lawrence <nomad@null.net>
+Mark Lawrence <mark@rekudos.net>
 
 =head1 LICENSE
 
-Copyright 2016-2022 Mark Lawrence <nomad@null.net>
+Copyright 2016-2025 Mark Lawrence <mark@rekudos.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

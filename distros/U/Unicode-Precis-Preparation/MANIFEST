@@ -1,5 +1,6 @@
 Changes
 data/makefile
+data/make_table.pl
 data/precis_preparation.pl
 Makefile.PL
 MANIFEST

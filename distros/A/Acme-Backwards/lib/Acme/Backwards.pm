@@ -1,5 +1,5 @@
 package Acme::Backwards; 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use Keyword::Declare;
 sub import {
 	keytype OKAY is m{(?:fisle (?&PerlNWS)(?&PerlExpression).*?;|esle (?&PerlNWS).*?;)?+}xms;
@@ -22,7 +22,7 @@ Acme::Backwards - One line fi, esle, fisle, sselnu, rof
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -89,7 +89,7 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
@@ -103,10 +103,9 @@ L<http://search.cpan.org/dist/Acme-Backwards/>
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 LNATION.
+Copyright 2019->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

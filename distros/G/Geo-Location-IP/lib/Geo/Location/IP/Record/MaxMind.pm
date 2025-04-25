@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Record::MaxMind;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 field $queries_remaining :param :reader = undef;
 
@@ -30,7 +30,7 @@ Geo::Location::IP::Record::MaxMind - MaxMind account data
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

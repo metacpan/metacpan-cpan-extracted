@@ -9,7 +9,7 @@ use Geoffrey::Exception::NotSupportedException;
 
 use parent 'Geoffrey::Role::Action';
 
-$Geoffrey::Action::Constraint::Default::VERSION = '0.000205';
+$Geoffrey::Action::Constraint::Default::VERSION = '0.000206';
 
 sub add {
    my ($self, $params) = @_;
@@ -60,7 +60,7 @@ Geoffrey::Action::Constraint::Default - Action handler for sequences
 
 =head1 VERSION
 
-Version 0.000205
+Version 0.000206
 
 =head1 DESCRIPTION
 

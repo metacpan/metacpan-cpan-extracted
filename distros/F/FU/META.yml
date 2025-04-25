@@ -1,5 +1,5 @@
 ---
-abstract: 'Framework Ultimatum: A Lean and Efficient Zero-Dependency Web Framework.'
+abstract: 'A Lean and Efficient Zero-Dependency Web Framework.'
 author:
   - 'Yorhel <projects@yorhel.nl>'
 build_requires:
@@ -21,6 +21,7 @@ requires:
   perl: '5.036000'
 resources:
   bugtracker: https://code.blicky.net/yorhel/fu/issues
+  homepage: https://dev.yorhel.nl/fu
   repository: https://code.blicky.net/yorhel/fu
-version: '0.4'
+version: '0.5'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

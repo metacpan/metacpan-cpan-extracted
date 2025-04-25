@@ -2,7 +2,7 @@ NAME
     OptArgs2 - command-line argument and option processor
 
 VERSION
-    v2.0.13 (2025-04-04)
+    v2.0.15 (2025-04-25)
 
 SYNOPSIS
         #!/usr/bin/env perl
@@ -674,10 +674,10 @@ SUPPORT & DEVELOPMENT
         http://github.com/mlawren/githook-perltidy
 
 AUTHOR
-    Mark Lawrence <nomad@null.net>
+    Mark Lawrence <mark@rekudos.net>
 
 LICENSE
-    Copyright 2016-2022 Mark Lawrence <nomad@null.net>
+    Copyright 2016-2025 Mark Lawrence <mark@rekudos.net>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

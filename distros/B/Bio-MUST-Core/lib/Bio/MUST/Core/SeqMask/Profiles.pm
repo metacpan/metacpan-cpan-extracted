@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Profiles;
 # ABSTRACT: Evolutionary profiles for sequence sites
-$Bio::MUST::Core::SeqMask::Profiles::VERSION = '0.250380';
+$Bio::MUST::Core::SeqMask::Profiles::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -29,6 +29,7 @@ has '+mask' => (
 # TODO: move this under PostPred instead of SeqMask?
 
 const my $AVERAGE => '<:AVERAGE:>';
+const my $PREC => 3;
 
 
 sub ppred_profiles {
@@ -157,10 +158,13 @@ sub store {
             next ID if $id eq $AVERAGE;         # skip averaged ppred freqs
             for my $aa (@aas) {
                 say {$out} join "\t", $site + 1, $id, $aa,
-                    $sim_freq_for->{$id}{$aa} // 0;
+                    defined $sim_freq_for->{$id}{$aa}
+                        ? sprintf "%.${PREC}f", $sim_freq_for->{$id}{$aa} : 0;
             }   # missing AAs are set to 0 (hence the alphabet)
         }
     }
+
+    close $out;
 
     return;
 }
@@ -178,7 +182,7 @@ Bio::MUST::Core::SeqMask::Profiles - Evolutionary profiles for sequence sites
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

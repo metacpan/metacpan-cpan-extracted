@@ -1,0 +1,1094 @@
+diff -rc cfitsio-4.6.2.orig/buffers.c cfitsio-4.6.2/buffers.c
+*** cfitsio-4.6.2.orig/buffers.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/buffers.c	2025-04-22 22:20:10.872556772 -0400
+***************
+*** 998,1007 ****
+  {
+      LONGLONG postemp;
+  
+! #if MACHINE == VAXVMS
+      long ii;
+  
+! #elif (MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      short *sptr;
+      long ii;
+  
+--- 998,1007 ----
+  {
+      LONGLONG postemp;
+  
+! #if CFITSIO_MACHINE == VAXVMS
+      long ii;
+  
+! #elif (CFITSIO_MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      short *sptr;
+      long ii;
+  
+***************
+*** 1030,1041 ****
+      }
+  
+  
+! #if MACHINE == VAXVMS
+  
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevur(values, values, &ii);     /* from  IEEE float -> F float       */
+  
+! #elif (MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+  
+      ffswap2( (short *) values, nvals * 2);  /* swap pairs of bytes */
+  
+--- 1030,1041 ----
+      }
+  
+  
+! #if CFITSIO_MACHINE == VAXVMS
+  
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevur(values, values, &ii);     /* from  IEEE float -> F float       */
+  
+! #elif (CFITSIO_MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+  
+      ffswap2( (short *) values, nvals * 2);  /* swap pairs of bytes */
+  
+***************
+*** 1067,1076 ****
+  {
+      LONGLONG  postemp;
+  
+! #if MACHINE == VAXVMS
+      long ii;
+  
+! #elif (MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      short *sptr;
+      long ii;
+  
+--- 1067,1076 ----
+  {
+      LONGLONG  postemp;
+  
+! #if CFITSIO_MACHINE == VAXVMS
+      long ii;
+  
+! #elif (CFITSIO_MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      short *sptr;
+      long ii;
+  
+***************
+*** 1097,1107 ****
+          ffgbytoff(fptr, 8, nvals, incre - 8, values, status);
+      }
+  
+! #if MACHINE == VAXVMS
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevud(values, values, &ii);     /* from  IEEE float -> D float       */
+  
+! #elif (MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      ffswap2( (short *) values, nvals * 4);  /* swap pairs of bytes */
+  
+      /* convert from IEEE float format to VMS GFLOAT float format */
+--- 1097,1107 ----
+          ffgbytoff(fptr, 8, nvals, incre - 8, values, status);
+      }
+  
+! #if CFITSIO_MACHINE == VAXVMS
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevud(values, values, &ii);     /* from  IEEE float -> D float       */
+  
+! #elif (CFITSIO_MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      ffswap2( (short *) values, nvals * 4);  /* swap pairs of bytes */
+  
+      /* convert from IEEE float format to VMS GFLOAT float format */
+***************
+*** 1305,1317 ****
+    format conversion (e.g. byte-swapping) if necessary.
+  */
+  {
+! #if MACHINE == VAXVMS
+      long ii;
+  
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevpr(values, values, &ii);     /* from F float -> IEEE float        */
+  
+! #elif (MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      long ii;
+  
+      /* convert from VMS FFLOAT float format to IEEE float format */
+--- 1305,1317 ----
+    format conversion (e.g. byte-swapping) if necessary.
+  */
+  {
+! #if CFITSIO_MACHINE == VAXVMS
+      long ii;
+  
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevpr(values, values, &ii);     /* from F float -> IEEE float        */
+  
+! #elif (CFITSIO_MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      long ii;
+  
+      /* convert from VMS FFLOAT float format to IEEE float format */
+***************
+*** 1345,1357 ****
+    format conversion (e.g. byte-swapping) if necessary.
+  */
+  {
+! #if MACHINE == VAXVMS
+      long ii;
+  
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevpd(values, values, &ii);     /* from D float -> IEEE float        */
+  
+! #elif (MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      long ii;
+  
+      /* convert from VMS GFLOAT float format to IEEE float format */
+--- 1345,1357 ----
+    format conversion (e.g. byte-swapping) if necessary.
+  */
+  {
+! #if CFITSIO_MACHINE == VAXVMS
+      long ii;
+  
+      ii = nvals;                      /* call VAX macro routine to convert */
+      ieevpd(values, values, &ii);     /* from D float -> IEEE float        */
+  
+! #elif (CFITSIO_MACHINE == ALPHAVMS) && (FLOATTYPE == GFLOAT)
+      long ii;
+  
+      /* convert from VMS GFLOAT float format to IEEE float format */
+diff -rc cfitsio-4.6.2.orig/cfileio.c cfitsio-4.6.2/cfileio.c
+*** cfitsio-4.6.2.orig/cfileio.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/cfileio.c	2025-04-22 22:20:10.960557119 -0400
+***************
+*** 4421,4427 ****
+      {
+        printf ("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        printf(" Byteswapping is not being done correctly on this system.\n");
+!       printf(" Check the MACHINE and BYTESWAPPED definitions in fitsio2.h\n");
+        printf(" Please report this problem to the CFITSIO developers.\n");
+        printf(  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        FFUNLOCK;
+--- 4421,4427 ----
+      {
+        printf ("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        printf(" Byteswapping is not being done correctly on this system.\n");
+!       printf(" Check the CFITSIO_MACHINE and BYTESWAPPED definitions in fitsio2.h\n");
+        printf(" Please report this problem to the CFITSIO developers.\n");
+        printf(  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        FFUNLOCK;
+diff -rc cfitsio-4.6.2.orig/ChangeLog cfitsio-4.6.2/ChangeLog
+*** cfitsio-4.6.2.orig/ChangeLog	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/ChangeLog	2025-04-22 22:20:10.988557229 -0400
+***************
+*** 1964,1970 ****
+      use the lexical parser to perform calculations on variable-length
+      array columns.
+  
+!   - added "#define MACHINE NATIVE" in fitsio2.h for all machines where
+      BYTESWAPPED == FALSE.  This may improve the file writing performance
+      by eliminating the need to allocate a temporary buffer in some cases.
+  
+--- 1964,1970 ----
+      use the lexical parser to perform calculations on variable-length
+      array columns.
+  
+!   - added "#define CFITSIO_MACHINE NATIVE" in fitsio2.h for all machines where
+      BYTESWAPPED == FALSE.  This may improve the file writing performance
+      by eliminating the need to allocate a temporary buffer in some cases.
+  
+***************
+*** 2164,2170 ****
+      with elliptical or rectangular regions.
+  
+    - cleaned up fitsio.h and fitsio2.h to make the definition of LONGLONG
+!     and BYTESWAPPED and MACHINE more logical.
+      
+    - removed HAVE_LONGLONG everywhere since it is no longer needed (the 
+      compiler now must have an 8-byte integer datatype to build CFITSIO).
+--- 2164,2170 ----
+      with elliptical or rectangular regions.
+  
+    - cleaned up fitsio.h and fitsio2.h to make the definition of LONGLONG
+!     and BYTESWAPPED and CFITSIO_MACHINE more logical.
+      
+    - removed HAVE_LONGLONG everywhere since it is no longer needed (the 
+      compiler now must have an 8-byte integer datatype to build CFITSIO).
+diff -rc cfitsio-4.6.2.orig/drvrfile.c cfitsio-4.6.2/drvrfile.c
+*** cfitsio-4.6.2.orig/drvrfile.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/drvrfile.c	2025-04-22 22:20:10.864556740 -0400
+***************
+*** 214,220 ****
+      }
+  #endif
+  
+! #if MACHINE == ALPHAVMS || MACHINE == VAXVMS
+          /* specify VMS record structure: fixed format, 2880 byte records */
+          /* but force stream mode access to enable random I/O access      */
+      *diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+--- 214,220 ----
+      }
+  #endif
+  
+! #if CFITSIO_MACHINE == ALPHAVMS || CFITSIO_MACHINE == VAXVMS
+          /* specify VMS record structure: fixed format, 2880 byte records */
+          /* but force stream mode access to enable random I/O access      */
+      *diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+***************
+*** 564,570 ****
+      }
+  #endif
+  
+! #if MACHINE == ALPHAVMS || MACHINE == VAXVMS
+          /* specify VMS record structure: fixed format, 2880 byte records */
+          /* but force stream mode access to enable random I/O access      */
+      diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+--- 564,570 ----
+      }
+  #endif
+  
+! #if CFITSIO_MACHINE == ALPHAVMS || CFITSIO_MACHINE == VAXVMS
+          /* specify VMS record structure: fixed format, 2880 byte records */
+          /* but force stream mode access to enable random I/O access      */
+      diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+***************
+*** 714,720 ****
+      /* perhaps others, so seek to original position to be sure. */
+      /* This seek will do no harm on other systems.   */
+  
+! #if MACHINE == IBMPC
+  
+      if (file_seek(handle, handleTable[handle].currentpos))
+              return(SEEK_ERROR);
+--- 714,720 ----
+      /* perhaps others, so seek to original position to be sure. */
+      /* This seek will do no harm on other systems.   */
+  
+! #if CFITSIO_MACHINE == IBMPC
+  
+      if (file_seek(handle, handleTable[handle].currentpos))
+              return(SEEK_ERROR);
+diff -rc cfitsio-4.6.2.orig/drvrmem.c cfitsio-4.6.2/drvrmem.c
+*** cfitsio-4.6.2.orig/drvrmem.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/drvrmem.c	2025-04-22 22:20:10.816556551 -0400
+***************
+*** 145,151 ****
+              return(FILE_NOT_CREATED); 
+          }
+  
+! #if MACHINE == ALPHAVMS || MACHINE == VAXVMS
+          /* specify VMS record structure: fixed format, 2880 byte records */
+          /* but force stream mode access to enable random I/O access      */
+          diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+--- 145,151 ----
+              return(FILE_NOT_CREATED); 
+          }
+  
+! #if CFITSIO_MACHINE == ALPHAVMS || CFITSIO_MACHINE == VAXVMS
+          /* specify VMS record structure: fixed format, 2880 byte records */
+          /* but force stream mode access to enable random I/O access      */
+          diskfile = fopen(filename, mode, "rfm=fix", "mrs=2880", "ctx=stm"); 
+diff -rc cfitsio-4.6.2.orig/fitscore.c cfitsio-4.6.2/fitscore.c
+*** cfitsio-4.6.2.orig/fitscore.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/fitscore.c	2025-04-22 22:20:10.844556661 -0400
+***************
+*** 9737,9743 ****
+      }
+  
+      sptr = (short *) fval;
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+      sptr++;       /* point to MSBs */
+  #endif
+      iret = fnan(*sptr);  /* if iret == 1, then the float value is a NaN */
+--- 9737,9743 ----
+      }
+  
+      sptr = (short *) fval;
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+      sptr++;       /* point to MSBs */
+  #endif
+      iret = fnan(*sptr);  /* if iret == 1, then the float value is a NaN */
+***************
+*** 9812,9818 ****
+      }
+  
+      sptr = (short *) dval;
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+      sptr += 3;       /* point to MSBs */
+  #endif
+      iret = dnan(*sptr);  /* if iret == 1, then the double value is a NaN */
+--- 9812,9818 ----
+      }
+  
+      sptr = (short *) dval;
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+      sptr += 3;       /* point to MSBs */
+  #endif
+      iret = dnan(*sptr);  /* if iret == 1, then the double value is a NaN */
+diff -rc cfitsio-4.6.2.orig/fitsio2.h cfitsio-4.6.2/fitsio2.h
+*** cfitsio-4.6.2.orig/fitsio2.h	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/fitsio2.h	2025-04-22 22:20:22.696603130 -0400
+***************
+*** 86,92 ****
+  #elif defined(__sparcv9) || (defined(__sparc__) && defined(__arch64__))
+                                 /*  SUN Solaris7 in 64-bit mode */
+  #define BYTESWAPPED FALSE
+! #define MACHINE NATIVE
+  #define LONGSIZE 64   
+  
+                              /* IBM System z mainframe support */ 
+--- 86,92 ----
+  #elif defined(__sparcv9) || (defined(__sparc__) && defined(__arch64__))
+                                 /*  SUN Solaris7 in 64-bit mode */
+  #define BYTESWAPPED FALSE
+! #define CFITSIO_MACHINE NATIVE
+  #define LONGSIZE 64   
+  
+                              /* IBM System z mainframe support */ 
+***************
+*** 106,112 ****
+  #elif defined(_SX)             /* Nec SuperUx */
+  
+  #define BYTESWAPPED FALSE
+! #define MACHINE NATIVE
+  #define LONGSIZE 64
+  
+  #elif defined(__powerpc64__) || defined(__64BIT__) || defined(__AARCH64EB__)  /* IBM 64-bit AIX powerpc*/
+--- 106,112 ----
+  #elif defined(_SX)             /* Nec SuperUx */
+  
+  #define BYTESWAPPED FALSE
+! #define CFITSIO_MACHINE NATIVE
+  #define LONGSIZE 64
+  
+  #elif defined(__powerpc64__) || defined(__64BIT__) || defined(__AARCH64EB__)  /* IBM 64-bit AIX powerpc*/
+***************
+*** 116,122 ****
+  #   define BYTESWAPPED TRUE
+  #  else
+  #   define BYTESWAPPED FALSE
+! #   define MACHINE NATIVE
+  #  endif
+  #  define LONGSIZE 64
+  
+--- 116,122 ----
+  #   define BYTESWAPPED TRUE
+  #  else
+  #   define BYTESWAPPED FALSE
+! #   define CFITSIO_MACHINE NATIVE
+  #  endif
+  #  define LONGSIZE 64
+  
+***************
+*** 136,142 ****
+  #    define BYTESWAPPED TRUE
+  #  else
+  #    define BYTESWAPPED FALSE
+! #    define MACHINE NATIVE
+  #  endif
+  
+  #  if _MIPS_SZLONG == 32
+--- 136,142 ----
+  #    define BYTESWAPPED TRUE
+  #  else
+  #    define BYTESWAPPED FALSE
+! #    define CFITSIO_MACHINE NATIVE
+  #  endif
+  
+  #  if _MIPS_SZLONG == 32
+***************
+*** 166,172 ****
+  
+  #elif defined(vax) && defined(VMS)
+   
+! #define MACHINE VAXVMS
+  #define BYTESWAPPED TRUE
+   
+  #elif defined(__alpha) && defined(__VMS)
+--- 166,172 ----
+  
+  #elif defined(vax) && defined(VMS)
+   
+! #define CFITSIO_MACHINE VAXVMS
+  #define BYTESWAPPED TRUE
+   
+  #elif defined(__alpha) && defined(__VMS)
+***************
+*** 174,192 ****
+  #if (__D_FLOAT == TRUE)
+  
+  /* this float option is the same as for VAX/VMS machines. */
+! #define MACHINE VAXVMS
+  #define BYTESWAPPED TRUE
+   
+  #elif  (__G_FLOAT == TRUE)
+   
+  /*  G_FLOAT is the default for ALPHA VMS systems */
+! #define MACHINE ALPHAVMS
+  #define BYTESWAPPED TRUE
+  #define FLOATTYPE GFLOAT
+   
+  #elif  (__IEEE_FLOAT == TRUE)
+   
+! #define MACHINE ALPHAVMS
+  #define BYTESWAPPED TRUE
+  #define FLOATTYPE IEEEFLOAT
+  
+--- 174,192 ----
+  #if (__D_FLOAT == TRUE)
+  
+  /* this float option is the same as for VAX/VMS machines. */
+! #define CFITSIO_MACHINE VAXVMS
+  #define BYTESWAPPED TRUE
+   
+  #elif  (__G_FLOAT == TRUE)
+   
+  /*  G_FLOAT is the default for ALPHA VMS systems */
+! #define CFITSIO_MACHINE ALPHAVMS
+  #define BYTESWAPPED TRUE
+  #define FLOATTYPE GFLOAT
+   
+  #elif  (__IEEE_FLOAT == TRUE)
+   
+! #define CFITSIO_MACHINE ALPHAVMS
+  #define BYTESWAPPED TRUE
+  #define FLOATTYPE IEEEFLOAT
+  
+***************
+*** 201,207 ****
+    || defined(_NI_mswin_) || defined(__EMX__)
+  
+  /*  generic 32-bit IBM PC */
+! #define MACHINE IBMPC
+  #define BYTESWAPPED TRUE
+  
+  #elif defined(__arm__)
+--- 201,207 ----
+    || defined(_NI_mswin_) || defined(__EMX__)
+  
+  /*  generic 32-bit IBM PC */
+! #define CFITSIO_MACHINE IBMPC
+  #define BYTESWAPPED TRUE
+  
+  #elif defined(__arm__)
+***************
+*** 233,245 ****
+  /*  assume all other machine uses the same IEEE formats as used in FITS files */
+  /*  e.g., Macs fall into this category  */
+  
+! #define MACHINE NATIVE
+  #define BYTESWAPPED FALSE
+   
+  #endif
+  
+! #ifndef MACHINE
+! #define MACHINE  OTHERTYPE
+  #endif
+  
+  /*  assume longs are 4 bytes long, unless previously set otherwise */
+--- 233,245 ----
+  /*  assume all other machine uses the same IEEE formats as used in FITS files */
+  /*  e.g., Macs fall into this category  */
+  
+! #define CFITSIO_MACHINE NATIVE
+  #define BYTESWAPPED FALSE
+   
+  #endif
+  
+! #ifndef CFITSIO_MACHINE
+! #define CFITSIO_MACHINE  OTHERTYPE
+  #endif
+  
+  /*  assume longs are 4 bytes long, unless previously set otherwise */
+***************
+*** 278,284 ****
+   
+  #endif
+   
+! #if MACHINE == CRAY
+      /*
+        Cray machines:   the large negative integer corresponds
+        to the 3 most sig digits set to 1.   If these
+--- 278,284 ----
+   
+  #endif
+   
+! #if CFITSIO_MACHINE == CRAY
+      /*
+        Cray machines:   the large negative integer corresponds
+        to the 3 most sig digits set to 1.   If these
+diff -rc cfitsio-4.6.2.orig/getcolb.c cfitsio-4.6.2/getcolb.c
+*** cfitsio-4.6.2.orig/getcolb.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcolb.c	2025-04-22 22:20:11.040557435 -0400
+***************
+*** 1609,1615 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1609,1615 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+***************
+*** 1776,1782 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1776,1782 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcold.c cfitsio-4.6.2/getcold.c
+*** cfitsio-4.6.2.orig/getcold.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcold.c	2025-04-22 22:20:10.836556630 -0400
+***************
+*** 1400,1406 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1400,1406 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+***************
+*** 1496,1502 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+  
+--- 1496,1502 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+  
+diff -rc cfitsio-4.6.2.orig/getcole.c cfitsio-4.6.2/getcole.c
+*** cfitsio-4.6.2.orig/getcole.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcole.c	2025-04-22 22:20:10.968557151 -0400
+***************
+*** 1402,1408 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 1402,1408 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 1532,1538 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1532,1538 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcoli.c cfitsio-4.6.2/getcoli.c
+*** cfitsio-4.6.2.orig/getcoli.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcoli.c	2025-04-22 22:20:10.936557024 -0400
+***************
+*** 1526,1532 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 1526,1532 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 1692,1698 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1692,1698 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcolj.c cfitsio-4.6.2/getcolj.c
+*** cfitsio-4.6.2.orig/getcolj.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcolj.c	2025-04-22 22:20:10.920556961 -0400
+***************
+*** 1510,1516 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 1510,1516 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 1676,1682 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1676,1682 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+***************
+*** 3419,3425 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 3419,3425 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 3585,3591 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 3585,3591 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcolk.c cfitsio-4.6.2/getcolk.c
+*** cfitsio-4.6.2.orig/getcolk.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcolk.c	2025-04-22 22:20:11.024557372 -0400
+***************
+*** 1519,1525 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 1519,1525 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 1685,1691 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1685,1691 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcolsb.c cfitsio-4.6.2/getcolsb.c
+*** cfitsio-4.6.2.orig/getcolsb.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcolsb.c	2025-04-22 22:20:10.928556993 -0400
+***************
+*** 1608,1614 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1608,1614 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+***************
+*** 1775,1781 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1775,1781 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcolui.c cfitsio-4.6.2/getcolui.c
+*** cfitsio-4.6.2.orig/getcolui.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcolui.c	2025-04-22 22:20:11.028557387 -0400
+***************
+*** 1531,1537 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 1531,1537 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 1697,1703 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1697,1703 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcoluj.c cfitsio-4.6.2/getcoluj.c
+*** cfitsio-4.6.2.orig/getcoluj.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcoluj.c	2025-04-22 22:20:10.880556804 -0400
+***************
+*** 1531,1537 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 1531,1537 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 1697,1703 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1697,1703 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+***************
+*** 3459,3465 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 3459,3465 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 3625,3631 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 3625,3631 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/getcoluk.c cfitsio-4.6.2/getcoluk.c
+*** cfitsio-4.6.2.orig/getcoluk.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/getcoluk.c	2025-04-22 22:20:10.856556709 -0400
+***************
+*** 1539,1545 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+--- 1539,1545 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr++;       /* point to MSBs */
+  #endif
+  
+***************
+*** 1705,1711 ****
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && MACHINE != VAXVMS && MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+--- 1705,1711 ----
+      {
+          sptr = (short *) input;
+  
+! #if BYTESWAPPED && CFITSIO_MACHINE != VAXVMS && CFITSIO_MACHINE != ALPHAVMS
+          sptr += 3;       /* point to MSBs */
+  #endif
+          if (scale == 1. && zero == 0.)  /* no scaling */
+diff -rc cfitsio-4.6.2.orig/putcold.c cfitsio-4.6.2/putcold.c
+*** cfitsio-4.6.2.orig/putcold.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/putcold.c	2025-04-22 22:20:10.828556598 -0400
+***************
+*** 393,399 ****
+        format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        MACHINE == NATIVE && tcode == TDOUBLE)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+--- 393,399 ----
+        format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        CFITSIO_MACHINE == NATIVE && tcode == TDOUBLE)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+diff -rc cfitsio-4.6.2.orig/putcole.c cfitsio-4.6.2/putcole.c
+*** cfitsio-4.6.2.orig/putcole.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/putcole.c	2025-04-22 22:20:10.980557198 -0400
+***************
+*** 407,413 ****
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        MACHINE == NATIVE && tcode == TFLOAT)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+--- 407,413 ----
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        CFITSIO_MACHINE == NATIVE && tcode == TFLOAT)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+diff -rc cfitsio-4.6.2.orig/putcoli.c cfitsio-4.6.2/putcoli.c
+*** cfitsio-4.6.2.orig/putcoli.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/putcoli.c	2025-04-22 22:20:10.852556692 -0400
+***************
+*** 394,400 ****
+        format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. &&
+!        MACHINE == NATIVE && tcode == TSHORT)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+--- 394,400 ----
+        format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. &&
+!        CFITSIO_MACHINE == NATIVE && tcode == TSHORT)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+diff -rc cfitsio-4.6.2.orig/putcolj.c cfitsio-4.6.2/putcolj.c
+*** cfitsio-4.6.2.orig/putcolj.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/putcolj.c	2025-04-22 22:20:11.048557467 -0400
+***************
+*** 394,400 ****
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        MACHINE == NATIVE && tcode == TLONG && LONGSIZE == 32)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+--- 394,400 ----
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        CFITSIO_MACHINE == NATIVE && tcode == TLONG && LONGSIZE == 32)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+***************
+*** 1398,1404 ****
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        MACHINE == NATIVE && tcode == TLONGLONG)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX/8) {
+--- 1398,1404 ----
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        CFITSIO_MACHINE == NATIVE && tcode == TLONGLONG)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX/8) {
+diff -rc cfitsio-4.6.2.orig/putcolk.c cfitsio-4.6.2/putcolk.c
+*** cfitsio-4.6.2.orig/putcolk.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/putcolk.c	2025-04-22 22:20:10.900556883 -0400
+***************
+*** 408,414 ****
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        MACHINE == NATIVE && tcode == TLONG)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+--- 408,414 ----
+         format in a temporary buffer that has been allocated for this purpose.
+      */
+      if (scale == 1. && zero == 0. && 
+!        CFITSIO_MACHINE == NATIVE && tcode == TLONG)
+      {
+          writeraw = 1;
+          if (nelem < (LONGLONG)INT32_MAX) {
+diff -rc cfitsio-4.6.2.orig/utilities/smem.c cfitsio-4.6.2/utilities/smem.c
+*** cfitsio-4.6.2.orig/utilities/smem.c	2025-03-26 14:19:36.000000000 -0400
+--- cfitsio-4.6.2/utilities/smem.c	2025-04-18 14:46:14.286524290 -0400
+***************
+*** 1,7 ****
+  #include <stdio.h>
+  #include <memory.h>
+  #include <string.h>
+! #ifdef __APPLE__
+  #include <stdlib.h>
+  #else
+  #include <malloc.h>
+--- 1,7 ----
+  #include <stdio.h>
+  #include <memory.h>
+  #include <string.h>
+! #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) 
+  #include <stdlib.h>
+  #else
+  #include <malloc.h>

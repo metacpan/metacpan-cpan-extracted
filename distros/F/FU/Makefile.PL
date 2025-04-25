@@ -17,6 +17,7 @@ WriteMakefile(
         dynamic_config => 0,
         'meta-spec' => { version => 2 },
         resources => {
+            homepage => 'https://dev.yorhel.nl/fu',
             repository => {
                 web => 'https://code.blicky.net/yorhel/fu',
                 type => 'git',

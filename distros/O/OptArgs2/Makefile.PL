@@ -8,7 +8,7 @@ WriteMakefile(
     NAME     => 'OptArgs2',
     ABSTRACT => 'CLI argument and option processing',
     AUTHOR   => 'Mark Lawrence <nomad@null.net>',
-    VERSION  => 'v2.0.13',
+    VERSION  => 'v2.0.15',
     LICENSE  => 'gpl_3',
     test => { RECURSIVE_TEST_FILES => 1, },
     META_MERGE => {

@@ -2,7 +2,7 @@ package Bio::MUST::Core::SeqMask;
 # ABSTRACT: Sequence mask for selecting specific sites
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
-$Bio::MUST::Core::SeqMask::VERSION = '0.250380';
+$Bio::MUST::Core::SeqMask::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -640,6 +640,8 @@ sub store {
     print {$out} $self->header;
     say {$out} join "\n", $self->all_states;
 
+    close $out;
+
     return;
 }
 
@@ -706,6 +708,8 @@ sub store_una {
         say {$out} join '-', @{$new_block};
     }
 
+    close $out;
+
     return;
 }
 
@@ -754,6 +758,8 @@ sub store_blocks {
         say {$out} join "\t", @{$block};
     }
 
+    close $out;
+
     return;
 }
 
@@ -770,7 +776,7 @@ Bio::MUST::Core::SeqMask - Sequence mask for selecting specific sites
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

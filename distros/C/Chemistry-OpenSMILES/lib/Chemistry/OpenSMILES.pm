@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.11.6'; # VERSION
+our $VERSION = '0.12.0'; # VERSION
 
 use strict;
 use warnings;
@@ -17,6 +17,7 @@ our @EXPORT_OK = qw(
     %bond_order_to_symbol
     %bond_symbol_to_order
     %normal_valence
+    can_unsprout_hydrogen
     clean_chiral_centers
     is_aromatic
     is_aromatic_bond
@@ -72,6 +73,37 @@ our %bond_symbol_to_order = (
     '#' => 3,
     '$' => 4,
 );
+
+sub can_unsprout_hydrogen
+{
+    my( $moiety, $atom ) = @_;
+
+    return undef unless $atom->{symbol} eq 'H';
+    return '' if any { exists $atom->{$_} } qw( chirality isotope );
+    return '' if $atom->{charge};
+    return '' if $atom->{class};
+    return '' unless $moiety->degree( $atom ) == 1;
+
+    my( $neighbour ) = $moiety->neighbours( $atom );
+    return '' if $neighbour->{symbol} eq 'H';
+
+    # Can unsprout only those H atoms with cis/trans bonds, where a substitution could be found.
+    if( is_cis_trans_bond( $moiety, $atom, $neighbour ) ) {
+        my $n_cis_trans =
+            grep { is_cis_trans_bond( $moiety, $neighbour, $_ ) }
+                 $moiety->neighbours( $neighbour );
+        return '' if $n_cis_trans == 1;
+    }
+
+    # TODO: Support other chiralities as well
+    if( is_chiral $neighbour ) {
+        return '' unless is_chiral_tetrahedral $neighbour;
+        return '' unless   $neighbour->{chirality_neighbours};
+        return '' unless @{$neighbour->{chirality_neighbours}} == 4;
+    }
+
+    return 1;
+}
 
 # Removes chiral setting from allenal, square planar, tetrahedral and trigonal bipyramidal chiral centers if deemed unimportant.
 # For allenal, tetrahedral and trigonal bipyramidal arrangements when not all the neighbours are distinct.
@@ -349,7 +381,31 @@ sub mirror($)
 
 sub toggle_cistrans($)
 {
+    return $_[0] unless $_[0] =~ /^[\\\/]$/;
     return $_[0] eq '/' ? '\\' : '/';
+}
+
+# TODO: The actual unsprouting has to happen during print.
+sub _unsprout_hydrogens($)
+{
+    my( $moiety ) = @_;
+
+    for my $atom ($moiety->vertices) {
+        next unless can_unsprout_hydrogen( $moiety, $atom );
+
+        my( $neighbour ) = $moiety->neighbours( $atom );
+
+        # TODO: Adjust other chiralities as well
+        if( is_chiral_tetrahedral $neighbour ) {
+            my $pos = first { $neighbour->{chirality_neighbours}[$_] == $atom } 0..3;
+            @{$neighbour->{chirality_neighbours}} =
+                grep { $_ != $atom } @{$neighbour->{chirality_neighbours}};
+            mirror $neighbour unless $pos % 2;
+        }
+
+        $neighbour->{hcount}++;
+        $moiety->delete_vertex( $atom );
+    }
 }
 
 sub valence($$)
@@ -631,8 +687,7 @@ sub _neighbours_per_bond_type
         } else {
             $bond_type = '';
         }
-        if( $bond_type =~ /^[\\\/]$/ &&
-            $atom->{number} > $neighbour->{number} ) {
+        if( $atom->{number} > $neighbour->{number} ) {
             $bond_type = toggle_cistrans $bond_type;
         }
         push @{$bond_types{$bond_type}}, $neighbour;
@@ -674,12 +729,11 @@ Chemistry::OpenSMILES provides support for SMILES chemical identifiers
 conforming to OpenSMILES v1.0 specification
 (L<http://opensmiles.org/opensmiles.html>).
 
-Chemistry::OpenSMILES::Parser reads in SMILES strings and returns them
-parsed to arrays of L<Graph::Undirected|Graph::Undirected> objects. Each
-atom is represented by a hash.
+L<Chemistry::OpenSMILES::Parser> reads in SMILES strings and returns them parsed to arrays of L<Graph::Undirected> objects.
+Each atom is represented by a hash.
 
-Chemistry::OpenSMILES::Writer performs the inverse operation. Generated
-SMILES strings are by no means optimal.
+L<Chemistry::OpenSMILES::Writer> performs the inverse operation.
+For SMILES writing conventions and options refer to its description.
 
 =head2 Molecular graph
 
@@ -706,8 +760,8 @@ Except for C<symbol>, C<class> and C<number>, all keys of hash are
 optional. Per OpenSMILES specification, default values for C<hcount>
 and C<class> are 0.
 
-For chiral atoms, the order of its neighbours in input is preserved in
-an array added as value for C<chirality_neighbours> key of the atom hash.
+For chiral atoms, the order of their neighbours in input is preserved in an array added as value for C<chirality_neighbours> key of the atom hash.
+The order of atoms there follow OpenSMILES convention.
 
 =head3 Bonds
 
@@ -716,66 +770,6 @@ L<Graph::Undirected|Graph::Undirected> internal representation. Bond
 orders other than single (C<->, which is also a default) are represented
 as values of edge attribute C<bond>. They correspond to the symbols used
 in OpenSMILES specification.
-
-=head2 Options
-
-C<parse> accepts the following options for key-value pairs in an
-anonymous hash for its second parameter:
-
-=over
-
-=item C<max_hydrogen_count_digits>
-
-In OpenSMILES specification the number of attached hydrogen atoms for
-atoms in square brackets is limited to 9. IUPAC SMILES+ has increased
-this number to 99. With the value of C<max_hydrogen_count_digits> the
-parser could be instructed to allow other than 1 digit for attached
-hydrogen count.
-
-=item C<raw>
-
-With C<raw> set to anything evaluating to true, the parser will not
-convert neither implicit nor explicit hydrogen atoms in square brackets
-to atom hashes of their own. Moreover, it will not attempt to unify the
-representations of chirality. It should be noted, though, that many of
-subroutines of Chemistry::OpenSMILES expect non-raw data structures,
-thus processing raw output may produce distorted results. In particular,
-C<write_SMILES()> calls from
-L<Chemistry::OpenSMILES::Writer|Chemistry::OpenSMILES::Writer> have to
-be instructed to expect raw data structure:
-
-    write_SMILES( \@moieties, { raw => 1 } );
-
-=back
-
-=head1 CAVEATS
-
-Deprecated charge notations (C<--> and C<++>) are supported.
-
-OpenSMILES specification mandates a strict order of ring bonds and
-branches:
-
-    branched_atom ::= atom ringbond* branch*
-
-Chemistry::OpenSMILES::Parser supports both the mandated, and inverted
-structure, where ring bonds follow branch descriptions.
-
-Whitespace is not supported yet. SMILES descriptors must be cleaned of
-it before attempting reading with Chemistry::OpenSMILES::Parser.
-
-The derivation of implicit hydrogen counts for aromatic atoms is not
-unambiguously defined in the OpenSMILES specification. Thus only
-aromatic carbon is accounted for as if having valence of 3.
-
-Chiral atoms with three neighbours are interpreted as having a lone
-pair of electrons as the fourth chiral neighbour. The lone pair is
-always understood as being the second in the order of neighbour
-enumeration, except when the atom with the lone pair starts a chain. In
-that case lone pair is the first.
-
-=head1 SEE ALSO
-
-perl(1)
 
 =head1 AUTHORS
 

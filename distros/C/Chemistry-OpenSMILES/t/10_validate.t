@@ -38,11 +38,12 @@ my %cases = (
 
 plan tests => scalar keys %cases;
 
+my $parser = Chemistry::OpenSMILES::Parser->new;
+
 for (sort keys %cases) {
     my $warning;
     local $SIG{__WARN__} = sub { $warning = $_[0] };
 
-    my $parser   = Chemistry::OpenSMILES::Parser->new;
     my( $graph ) = $parser->parse( $_ );
     Chemistry::OpenSMILES::_validate( $graph );
     $warning =~ s/\n$// if defined $warning;

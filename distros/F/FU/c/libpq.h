@@ -43,6 +43,8 @@ typedef enum { PQTRANS_IDLE, PQTRANS_ACTIVE, PQTRANS_INTRANS, PQTRANS_INERROR, P
     X(PQconnectdb, PGconn *, const char *) \
     X(PQenterPipelineMode, int, PGconn *) \
     X(PQerrorMessage, char *, const PGconn *) \
+    X(PQescapeIdentifier, char *, PGconn *, const char *, size_t) \
+    X(PQescapeLiteral, char *, PGconn *, const char *, size_t) \
     X(PQexec, PGresult *, PGconn *, const char *) \
     X(PQexecParams, PGresult *, PGconn *, const char *, int, const Oid *, const char * const *, const int *, const int *, int) \
     X(PQexecPrepared, PGresult *, PGconn *, const char *, int, const char * const *, const int *, const int *, int) \

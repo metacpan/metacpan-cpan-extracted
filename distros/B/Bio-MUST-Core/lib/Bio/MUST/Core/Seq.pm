@@ -2,8 +2,8 @@ package Bio::MUST::Core::Seq;
 # ABSTRACT: Nucleotide or protein sequence
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Seq::VERSION = '0.250380';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
+$Bio::MUST::Core::Seq::VERSION = '0.251140';
 use Moose;
 use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -454,7 +454,7 @@ Bio::MUST::Core::Seq - Nucleotide or protein sequence
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 
@@ -548,7 +548,7 @@ Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 
 =item *
 
-Valerian LUPO <valerian.lupo@doct.uliege.be>
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =back
 

@@ -5,7 +5,7 @@ use Carp ();
 use Exporter::Tidy other => [qw/page start_pager stop_pager/];
 use File::Which;
 use IO::Handle;
-### START Class::Inline ### v0.0.1 Fri Apr  4 17:18:35 2025
+### START Class::Inline ### v0.0.1 Fri Apr 25 08:48:09 2025
 require Carp;
 our ( @_CLASS, $_FIELDS, %_NEW );
 
@@ -124,7 +124,7 @@ sub _dump {
   },
   ;
 
-our $VERSION  = 'v2.0.13';
+our $VERSION  = 'v2.0.15';
 our @CARP_NOT = (__PACKAGE__);
 
 sub _build_pager {
@@ -230,7 +230,7 @@ OptArgs2::Pager - pipe output to a system (text) pager
 
 =head1 VERSION
 
-v2.0.13 (2025-04-04)
+v2.0.15 (2025-04-25)
 
 =head1 SYNOPSIS
 
@@ -362,11 +362,11 @@ decipher the code style enough to fix it.
 
 =head1 AUTHOR
 
-Mark Lawrence E<lt>nomad@null.netE<gt>
+Mark Lawrence E<lt>mark@rekudos.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014-2022 Mark Lawrence <nomad@null.net>
+Copyright 2014-2025 Mark Lawrence <mark@rekudos.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

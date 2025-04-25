@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Tiny::Chained" => 0,
-    "Crypt::URandom" => "0.37",
+    "Crypt::SysRandom" => 0,
     "Digest::SHA" => 0,
     "List::Util" => "1.33",
     "Module::Runtime" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "Test::Needs" => 0
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Tiny::Chained" => 0,
-  "Crypt::URandom" => "0.37",
+  "Crypt::SysRandom" => 0,
   "Data::Dumper" => 0,
   "Digest::SHA" => 0,
   "ExtUtils::MakeMaker" => 0,

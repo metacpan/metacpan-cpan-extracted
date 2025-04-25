@@ -7,11 +7,13 @@ use Sort::Versions;
 
 use alienfile;
 
+our $VERSION = 'v4.6.2.4'; # VERSION
+
 # tie versions of this module and CFITSIO.  CFITSIO's code is very
 # backwards compatible, but their build configuration may break, which
 # will cause the unnecessary failure to build this module.
 
-use constant CFITSIO_VERSION => '4.4.0';
+use constant CFITSIO_VERSION => '4.6.2';
 
 # allow tweaks for testing.
 # DON'T USE THIS UNLESS YOU LIKE TO PUT YOUR HAND ON A HOT STOVE.

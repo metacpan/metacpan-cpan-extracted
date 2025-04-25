@@ -51,8 +51,9 @@ my %cases = (
 
 plan tests => scalar keys %cases;
 
+my $parser = Chemistry::OpenSMILES::Parser->new;
+
 for (sort keys %cases) {
-    my $parser   = Chemistry::OpenSMILES::Parser->new;
     my( $graph ) = $parser->parse( $_ );
-    is( $graph->vertices, $cases{$_} );
+    is $graph->vertices, $cases{$_};
 }

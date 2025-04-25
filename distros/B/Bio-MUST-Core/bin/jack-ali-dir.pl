@@ -18,6 +18,7 @@ use Bio::MUST::Core::Constants qw(:dirs);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::SeqMask';
 
+# TODO: output FASTA or p80 files?
 
 for my $indir (@ARGV_indirs) {
 
@@ -89,7 +90,7 @@ jack-ali-dir.pl - Jackknife a directory of ALI files
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 USAGE
 

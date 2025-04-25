@@ -1,10 +1,10 @@
 # Internal module used by FU.pm
-package FU::DebugImpl 0.4;
+package FU::DebugImpl 0.5;
 use v5.36;
 use experimental 'for_list';
 use FU;
 use FU::XMLWriter ':html5_', 'fragment', 'xml_escape';
-use Time::HiRes 'time';
+use Time::HiRes 'time', 'clock_gettime', 'CLOCK_MONOTONIC';
 use POSIX 'strftime';
 
 sub fmtts { strftime '%Y-%m-%d %H:%M:%S UTC', gmtime shift }
@@ -15,7 +15,8 @@ sub loc_($loc) {
         br_ if $_;
         my $l = $loc->[$_];
         my $f = $_ == $#$loc ? '(main)' : $loc->[$_+1][3];
-        txt_ "$l->[1]:$l->[2] $f";
+        $f = "$l->[0]::$f" if $f !~ /^\Q$l->[0]/;
+        txt_ "$f @ $l->[1]:$l->[2]";
     }
 }
 
@@ -35,7 +36,7 @@ my @tabs = (
             tr_ sub { td_ 'Path'; td_ fu->path };
             tr_ sub { td_ 'Query'; td_ fu->query };
             tr_ sub { td_ 'Client IP'; td_ fu->ip };
-            tr_ sub { td_ 'Received'; td_ fmtts $FU::REQ->{trace_start} };
+            tr_ sub { td_ 'Received'; td_ fmtts(time - (($FU::REQ->{trace_end}||clock_gettime(CLOCK_MONOTONIC)) - $FU::REQ->{trace_start})) };
         };
         h2_ 'Headers';
         table_ sub {
@@ -75,10 +76,13 @@ my @tabs = (
         };
         h2_ 'Headers';
         table_ sub {
-            tr_ sub {
-                td_ $_;
-                td_ $r->{reshdr}{$_};
-            } for sort keys $r->{reshdr}->%*;
+            for my $k (sort keys $r->{reshdr}->%*) {
+                my $v = $r->{reshdr}{$k};
+                tr_ sub {
+                    td_ $k;
+                    td_ $_;
+                } for !defined $v ? () : ref $v ? @$v : ($v);
+            }
         };
         ('Response')
     },
@@ -342,7 +346,7 @@ sub save {
         return;
     };
     my $line = sprintf "%d %f %s %s %s\n",
-        time, time - $FU::REQ->{trace_start}, $FU::REQ->{status},
+        time, $FU::REQ->{trace_end} - $FU::REQ->{trace_start}, $FU::REQ->{status},
         fu->method, fu->path.(fu->query?'?'.fu->query:'');
     utf8::encode($line);
     print $fh $line;

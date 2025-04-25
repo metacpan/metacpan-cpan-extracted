@@ -10,9 +10,9 @@ use Data::Dumper;
 use Test::More;
 
 my @cases = (
-    [ 'N[C@SP1](Br)(O)C', 'N([C@SP1](Br)(O)(C))', 'C([C@SP1](O)(Br)(N))' ],
-    [ 'N[C@SP2](Br)(O)C', 'N([C@SP2](Br)(O)(C))', 'C([C@SP2](O)(Br)(N))' ],
-    [ 'N[C@SP3](Br)(O)C', 'N([C@SP3](Br)(O)(C))', 'C([C@SP3](O)(Br)(N))' ],
+    [ 'N[C@SP1](Br)(O)C', 'N[C@SP1](Br)(O)C', 'C[C@SP1](O)(Br)N' ],
+    [ 'N[C@SP2](Br)(O)C', 'N[C@SP2](Br)(O)C', 'C[C@SP2](O)(Br)N' ],
+    [ 'N[C@SP3](Br)(O)C', 'N[C@SP3](Br)(O)C', 'C[C@SP3](O)(Br)N' ],
 );
 
 eval 'use Graph::Nauty qw( are_isomorphic )';

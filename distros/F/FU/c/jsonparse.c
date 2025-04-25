@@ -272,7 +272,7 @@ static SV *fujson_parse_xs(pTHX_ I32 ax, I32 argc, SV *val) {
         r = ST(i);
         i++;
 
-        if (strcmp(arg, "utf8") == 0) decutf8 = SvPVXtrue(r);
+        if (strcmp(arg, "utf8") == 0) decutf8 = SvTRUEx(r);
         else if (strcmp(arg, "max_size") == 0) maxlen = SvUV(r);
         else if (strcmp(arg, "max_depth") == 0) ctx.depth = SvUV(r);
         else if (strcmp(arg, "offset") == 0) offset = r;

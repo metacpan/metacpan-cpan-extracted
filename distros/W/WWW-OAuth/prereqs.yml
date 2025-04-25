@@ -3,7 +3,7 @@ runtime:
     perl: '5.008001'
     Carp: 0
     Class::Tiny::Chained: 0
-    Crypt::URandom: '0.37'
+    Crypt::SysRandom: 0
     Digest::SHA: 0
     List::Util: '1.33'
     Module::Runtime: 0

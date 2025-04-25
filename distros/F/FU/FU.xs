@@ -18,7 +18,7 @@
 #define av_push_simple av_push
 #endif
 #ifndef BOOL_INTERNALS_sv_isbool_true
-#define BOOL_INTERNALS_sv_isbool_true(x) SvPVXtrue(x)
+#define BOOL_INTERNALS_sv_isbool_true(x) SvTRUEx(x)
 #endif
 
 /* Disable key/value struct packing in khashl, so we can safely take a pointer
@@ -55,7 +55,6 @@
         if (!ix) ix = FUPG_CACHE;\
         if (items == 1 || SvTRUE(ST(1))) x->stflags |= ix; \
         else x->stflags &= ~ix; \
-        XSRETURN(1); \
     } while(0)
 
 MODULE = FU
@@ -216,6 +215,24 @@ void status(fupg_conn *c)
   CODE:
     ST(0) = sv_2mortal(newSVpv(fupg_conn_status(c), 0));
 
+void escape_literal(fupg_conn *c, SV *v)
+  CODE:
+    STRLEN len;
+    const char *str = SvPVutf8(v, len);
+    char *r = PQescapeLiteral(c->conn, str, len);
+    if (!r) fupg_conn_croak(c, "escapeLiteral");
+    ST(0) = newSVpvn_flags(r, strlen(r), SVf_UTF8|SVs_TEMP);
+    PQfreemem(r);
+
+void escape_identifier(fupg_conn *c, SV *v)
+  CODE:
+    STRLEN len;
+    const char *str = SvPVutf8(v, len);
+    char *r = PQescapeIdentifier(c->conn, str, len);
+    if (!r) fupg_conn_croak(c, "escapeIdentifier");
+    ST(0) = newSVpvn_flags(r, strlen(r), SVf_UTF8|SVs_TEMP);
+    PQfreemem(r);
+
 void cache(fupg_conn *x, ...)
   ALIAS:
     FU::Pg::conn::text_params  = FUPG_TEXT_PARAMS
@@ -325,6 +342,7 @@ void cache(fupg_st *x, ...)
   CODE:
     if (ix == 0 && x->prepared) fu_confess("Invalid attempt to change statement configuration after it has already been prepared or executed");
     FUPG_STFLAGS;
+    XSRETURN(1);
 
 void exec(fupg_st *st)
   CODE:

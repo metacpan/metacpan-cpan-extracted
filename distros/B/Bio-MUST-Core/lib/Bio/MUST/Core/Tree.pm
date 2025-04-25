@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
-# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.250380';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
+$Bio::MUST::Core::Tree::VERSION = '0.251140';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -218,6 +218,7 @@ sub collapse_subtrees {
             }
 
             # collapse subtree if all attributes are defined and identical
+            # TODO: check consistency with group naming
             return if List::AllUtils::any { not defined $_ } @attrs;
             return if uniq(@attrs) > 1;
 
@@ -406,6 +407,8 @@ sub store {
     open my $out, '>', $outfile;
     say {$out} $self->newick_str( %{$args} );
 
+    close $out;
+
     return;
 }
 
@@ -482,6 +485,12 @@ sub store_itol_datasets {
         say {$range_out} join q{,}, $id, 'range', $color, $type, $size;
     }
 
+    close $color_out;
+    close $clade_out;
+    close $range_out;
+    close $label_out;
+    close $colps_out;
+
     return;
 }
 
@@ -525,6 +534,8 @@ begin trees;
 end;
 EOF
 
+    close $out;
+
     return;
 }
 
@@ -546,6 +557,8 @@ sub store_arb {
     open my $out, '>', $outfile;
     print {$out} $self->header;
     say   {$out} $self->newick_str( -nodelabels => 0 );
+
+    close $out;
 
     return;
 }
@@ -581,6 +594,8 @@ sub store_grp {
         say {$out} "$bip  $support";
     }
 
+    close $out;
+
     return;
 }
 
@@ -608,6 +623,8 @@ sub store_tpl {
         $node->set_branch_length( shift @branch_lengths );
     }
 
+    close $out;
+
     return;
 }
 
@@ -624,7 +641,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 
@@ -682,7 +699,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =for stopwords Valerian LUPO
 
-Valerian LUPO <valerian.lupo@doct.uliege.be>
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

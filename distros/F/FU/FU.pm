@@ -1,22 +1,29 @@
-package FU 0.4;
+package FU 0.5;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
 use POSIX ();
-use Time::HiRes 'time';
+use Time::HiRes 'clock_gettime', 'CLOCK_MONOTONIC';
 use FU::Log 'log_write';
 use FU::Util;
 use FU::Validate;
 
+my $procname;
+my $scriptpath = $0;
 
 sub import($pkg, @opt) {
     my $c = caller;
     no strict 'refs';
     *{$c.'::fu'} = \&fu;
+    my $spawn;
     for (@opt) {
-        if ($_ eq '-spawn') { _spawn() }
+        if (ref $procname eq 'FU::ARG') { $procname = $_ }
+        elsif ($_ eq '-procname') { $procname = bless {}, 'FU::ARG' }
+        elsif ($_ eq '-spawn') { $spawn = 1; }
         else { croak "Unknown import option: '$_'" }
     }
+    croak "Missing argument for -procname option" if ref $procname eq 'FU::ARG';
+    _spawn() if $spawn;
 }
 
 
@@ -123,6 +130,7 @@ sub query_trace($st,@) {
 sub _connect_db {
     $DB = ref $INIT_DB eq 'CODE' ? $INIT_DB->() : FU::Pg->connect($INIT_DB);
     $DB->query_trace(\&query_trace);
+    $DB
 }
 sub init_db($info) {
     require FU::Pg;
@@ -208,13 +216,13 @@ sub _monitor {
                 die if $m > $data{$_};
             },
             no_chdir => 1
-        }, $0, values %INC, @monitor_paths);
+        }, $scriptpath, values %INC, @monitor_paths);
         0
     } // 1;
 }
 
 
-our $debug_info = [];
+our $debug_info = {};
 sub debug_info($path, $storage=undef, $history=100) {
     $debug_info = { path => $path, storage => $storage, history => $history }
 }
@@ -299,13 +307,13 @@ sub _read_req($c) {
 }
 
 
-sub _is_done($e) { ref $@ eq 'FU::err' && $@->[0] == 200 }
+sub _is_done($e) { ref $e eq 'FU::err' && $e->[0] == 200 }
 
 sub _log_err($e) {
     return if !$e;
-    return if !debug && ref $@ eq 'FU::err' && $@->[0] != 500;
-    if (!$REQ->{full_err} && (ref $@ ne 'FU::err' || $@->[0] == 500)) {
-        $REQ->{full_err}++;
+    my $crit = $e isa 'FU::err' ? $e->[0] == 500 : !($e isa 'FU::Validate::err');
+    return if !debug && !$crit;
+    if ($crit && !$REQ->{full_err}++) {
         $e =~ s/^\s+//;
         $e =~ s/\s+$//;
         log_write join "\n",
@@ -319,7 +327,7 @@ sub _log_err($e) {
 }
 
 sub _do_req($c) {
-    local $REQ = { hdr => {}, trace_start => time, trace_id => sprintf('%010x%08x%04x', int time, $$, int rand 1<<16) };
+    local $REQ = { hdr => {}, trace_start => clock_gettime(CLOCK_MONOTONIC), trace_id => sprintf('%010x%08x%04x', int time, $$, int rand 1<<16) };
     local $fu = bless {}, 'FU::obj';
 
     $REQ->{ip} = $c->{client_sock} isa 'IO::Socket::INET' ? $c->{client_sock}->peerhost : '127.0.0.1';
@@ -327,7 +335,7 @@ sub _do_req($c) {
 
     my $ok = eval {
         _read_req $c;
-        $REQ->{trace_start} = time;
+        $REQ->{trace_start} = clock_gettime(CLOCK_MONOTONIC);
 
         my $path = fu->path;
         my $method = fu->method eq 'HEAD' ? 'GET' : fu->method;
@@ -376,16 +384,17 @@ sub _do_req($c) {
     }
 
     if ($err) {
-        my($code, $msg) = ref $err eq 'FU::err' ? $err->@* : (500, $err);
+        my($code, $msg) = $err isa 'FU::err' ? @$err : $err isa 'FU::Validate::err' ? (400, $err) : (500, $err);
         fu->reset;
         fu->status($code);
-        eval {
-            ($onerr{$code} || $onerr{500})->($code, $msg);
-            1;
-        } || _err_500();
+        my $ok = eval { ($onerr{$code} || $onerr{500})->($code, $msg) };
+        if (!$ok && !_is_done($@)) {
+            _log_err $@;
+            _err_500();
+        }
     }
 
-    $REQ->{trace_end} = time;
+    $REQ->{trace_end} = clock_gettime(CLOCK_MONOTONIC);
     fu->_flush($c->{fcgi_obj} || $c->{client_sock});
 
     if (debug && $REQ->{trace_id} && $debug_info->{history} && $debug_info->{storage}) {
@@ -407,6 +416,7 @@ sub _do_req($c) {
 
 sub _run_loop($c) {
     my $stop = 0;
+    my $count = 0;
     local $SIG{HUP} = 'IGNORE';
     local $SIG{TERM} = $SIG{INT} = sub { $stop = 1 };
 
@@ -416,7 +426,13 @@ sub _run_loop($c) {
         exit;
     }
 
+    my sub setstate($state) {
+        $0 = sprintf "%s: %s [#%d%s]", $procname, $state, $count, $c->{max_reqs} ? "/$c->{max_reqs}" : '' if $procname;
+    }
+
     while (!$stop) {
+        setstate 'idle';
+
         $c->{client_sock} ||= $c->{listen_sock}->accept || next;
         $c->{fcgi_obj} ||= $c->{listen_proto} eq 'fcgi' && FU::fcgi::new(fileno $c->{client_sock}, $c->{proc});
 
@@ -425,11 +441,13 @@ sub _run_loop($c) {
             passclient;
         }
 
+        setstate 'working';
         _do_req $c;
 
         $c->{client_sock} = $c->{fcgi_obj} = undef if !($c->{fcgi_obj} && $c->{fcgi_obj}->keepalive);
 
-        passclient if $c->{max_reqs} && !--$c->{max_reqs};
+        $count++;
+        passclient if $c->{max_reqs} && $count >= $c->{max_reqs};
     }
 }
 
@@ -473,28 +491,27 @@ sub _supervisor($c) {
         }
 
         # Don't bother spawning more than 1 at a time while in error state
-        my $spawn = !$err ? $c->{proc} - keys %childs : (grep $_ == 1, values %childs) ? 0 : 1;
+        my $spawn = !$err ? $c->{proc} - keys %childs : !@client_fd && (grep $_ == 1, values %childs) ? 0 : 1;
         for (1..$spawn) {
-            my $client = shift @client_fd;
+            my $client = @client_fd ? IO::Socket->new_from_fd(shift(@client_fd), 'r') : undef;
             my $pid = fork;
             die $! if !defined $pid;
             if (!$pid) { # child
                 $SIG{CHLD} = $SIG{HUP} = $SIG{INT} = $SIG{TERM} = undef;
+                # In error state, wait with loading the script until we've received a request.
+                # Otherwise we'll end up in an infinite spawning loop if the script doesn't start properly.
+                $client = $c->{listen_sock}->accept() or die $! if !$client && $err;
                 if ($client) {
-                    $ENV{FU_CLIENT_FD} = $client;
-                } elsif ($err) {
-                    # In error state, wait with loading the script until we've received a request.
-                    # Otherwise we'll end up in an infinite spawning loop if the script doesn't start properly.
-                    $client = $c->{listen_sock}->accept() or die $!;
                     fcntl $client, Fcntl::F_SETFD, 0;
                     $ENV{FU_CLIENT_FD} = fileno $client;
                 }
-                exec $^X, (map "-I$_", @INC), $0;
+                exec $^X, (map "-I$_", @INC), $scriptpath;
                 exit 1;
             }
-            $client && IO::Socket->new_from_fd($client, 'r'); # close() the fd if we have one
             $childs{$pid} = 1;
         }
+
+        $0 = sprintf "%s: supervisor [%d/%d]", $procname, scalar keys %childs, $c->{proc} if $procname;
 
         my ($fd, $msgadd) = FU::Util::fdpass_recv(fileno($rsock), 500);
         push @client_fd, $fd if $fd;
@@ -643,8 +660,7 @@ sub _getfield($data, @a) {
         return $data->{$a[0]};
     }
     my $schema = FU::Validate->compile(@a > 1 ? { keys => {@a} } : $a[0]);
-    my $res = eval { $schema->validate($data) };
-    fu->error(400, "Input validation failed: $@") if $@;
+    my $res = $schema->validate($data);
     return @a == 2 ? $res->{$a[0]} : $res;
 }
 
@@ -673,12 +689,11 @@ sub cookie {
 
 sub json {
     shift;
-    fu->error(400, "Invalid content type for json") if (fu->header('content-type')||'') ne 'application/json';
+    fu->error(400, "Invalid content type for json") if (fu->header('content-type')||'') !~ m{^application/json(?:;\s*charset=utf-?8)?$}i;
     return FU::Util::utf8_decode(my $x = $FU::REQ->{body}) if !@_;
     $FU::REQ->{json} ||= eval {
         FU::Util::json_parse($FU::REQ->{body}, utf8 => 1)
     } || fu->error(400, "JSON parse error: $@");
-    return $FU::REQ->{json} if !@_;
     _getfield $FU::REQ->{json}, @_;
 }
 
@@ -723,12 +738,13 @@ sub reset {
     $FU::REQ->{reshdr} = {
         'content-type', 'text/html',
     };
+    delete $FU::REQ->{rescookie};
 }
 
 
 sub _validate_header($hdr, $val) {
     confess "Invalid response header '$hdr'" if $hdr !~ /^$FU::hdrname_re$/;
-    confess "Invalid attempt to set response header containing a newline" if $val =~ /[\r\n]/;
+    confess "Invalid attempt to set response header containing a newline" if defined $val && $val =~ /[\r\n]/;
 }
 
 sub add_header($, $hdr, $val) {
@@ -863,14 +879,12 @@ sub _finalize {
         $r->{resbody} = '';
 
     } else {
+        my @vary = ref $r->{reshdr}{vary} eq 'ARRAY' ? $r->{reshdr}{vary}->@* : defined $r->{reshdr}{vary} ? ($r->{reshdr}{vary}) : ();
         if (($hasgzip || $hasbrotli) && length($r->{resbody}) > 256
                 && !defined $r->{reshdr}{'content-encoding'}
                 && FU::compress_mimes->{$r->{reshdr}{'content-type'}}
         ) {
-
-            $r->{reshdr}{'vary'} = ($r->{reshdr}{'vary'} ? $r->{reshdr}{'vary'}.', ' : '').'accept-encoding'
-                if ($r->{reshdr}{'vary'}||'') !~ /accept-encoding/i;
-
+            push @vary, 'accept-encoding';
             if ($hasbrotli && ($r->{hdr}{'accept-encoding'}||'') =~ /\bbr\b/) {
                 $r->{resbody} = FU::Util::brotli_compress(6, $r->{resbody});
                 $r->{reshdr}{'content-encoding'} = 'br';
@@ -880,6 +894,7 @@ sub _finalize {
                 $r->{reshdr}{'content-encoding'} = 'gzip';
             }
         }
+        $r->{reshdr}{vary} = @vary ? join ', ', @vary : undef;
         $r->{reshdr}{'content-length'} = length $r->{resbody};
         $r->{resbody} = '' if (fu->method//'') eq 'HEAD';
     }
@@ -929,7 +944,7 @@ __END__
 
 =head1 NAME
 
-FU - Framework Ultimatum: A Lean and Efficient Zero-Dependency Web Framework.
+FU - A Lean and Efficient Zero-Dependency Web Framework.
 
 =head1 EXPERIMENTAL
 
@@ -1040,15 +1055,21 @@ certainly not great if you plan to transfer large files.
 =back
 
 The rest of this document is reference documentation; there's no easy
-introductionary cookbook-style docs yet, sorry about that.
+introductory cookbook-style docs yet, sorry about that.
 
 Unless specifically mentioned otherwise, all methods and functions taking or
 returning strings deal with perl Unicode strings, not raw bytes.
 
 
-=head2 Framework Configuration
+=head1 Framework Configuration
 
 =over
+
+=item use FU -procname => $name
+
+When the C<-procname> import option is set, FU automatically updates the
+process name (as displayed in L<top(1)> and L<ps(1)>, see `$0`) with
+information about the current process, prefixed with the given C<$name>.
 
 =item FU::init_db($info)
 
@@ -1143,7 +1164,7 @@ restart loop.
 =back
 
 
-=head2 Handlers & Routing
+=head1 Handlers & Routing
 
 =over
 
@@ -1210,8 +1231,14 @@ for a certain error code, C<500> is used as fallback.
 
 =back
 
+All of the above C<$sub> callbacks are allowed to throw an error. Special
+handling is given to exceptions generated by C<< fu->error() >>, which are
+relegated to the appropriate C<on_error> handler, and errors thrown by the
+C<validate()> method of L<FU::Validate>, which result in the C<400> error
+handler being run. Any other exception is passed to the C<500> error handler.
 
-=head2 The 'fu' Object
+
+=head1 The 'fu' Object
 
 While the C<FU::> namespace is used for global configuration and utility
 functions, the C<fu> object is intended for methods that deal with request
@@ -1261,7 +1288,7 @@ Convenient short-hand for C<< fu->db->Q(@args) >>.
 
 =back
 
-=head2 Request Information
+=head1 Request Information
 
 =over
 
@@ -1304,8 +1331,17 @@ methods below to reliably handle all sorts of query strings.
 =item fu->query($name => $schema)
 
 Parse, validate and return the query parameter identified by C<$name> with the
-given L<FU::Validate> schema. Calls C<< fu->error(400) >> with a useful error
-message if validation fails.
+given L<FU::Validate> schema.
+
+To fetch a query parameter that may have multiple values, use:
+
+  my $arrayref = fu->query(q => {accept_scalar => 1});
+
+  # OR:
+  my $first_value = fu->query(q => {accept_array => 'first'});
+
+  # OR:
+  my $last_value = fu->query(q => {accept_array => 'last'});
 
 =item fu->query($schema)
 
@@ -1325,16 +1361,6 @@ Parse, validate and return multiple query parameters.
 To fetch all query paramaters as decoded by C<query_decode()>, use:
 
   my $data = fu->query({type=>'any'});
-
-To fetch a query parameter that may have multiple values, use:
-
-  my $arrayref = fu->query(q => {accept_scalar => 1});
-
-  # OR:
-  my $first_value = fu->query(q => {accept_array => 'first'});
-
-  # OR:
-  my $last_value = fu->query(q => {accept_array => 'last'});
 
 =item fu->cookie(...)
 
@@ -1365,7 +1391,7 @@ objects.  Refer to L<FU::MultipartFormData> for more information.
 =back
 
 
-=head2 Generating Responses
+=head1 Response Generation
 
 =over
 
@@ -1454,8 +1480,6 @@ Encode C<$data> as JSON (using C<json_format> in L<FU::Util>), set an
 appropriate C<Content-Type> header and send it to the client. Calls C<<
 fu->done >>.
 
-I<TODO:> Support schema-based normalization.
-
 =item fu->send_file($root, $path)
 
 If a file identified by C<"$root/$path"> exists, set that as response and call
@@ -1509,7 +1533,7 @@ one of the following status codes or an alias:
 
 
 
-=head2 Running the Site
+=head1 Running the Site
 
 When your script is done setting L</"Framework Configuration"> and registering
 L</"Handlers & Routing">, it should call C<FU::run> to actually start serving

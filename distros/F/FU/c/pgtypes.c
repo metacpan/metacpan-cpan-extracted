@@ -166,6 +166,7 @@ RECVFN(hex) {
         *out++ = PL_hexdigit[(in[i] >> 4) & 0x0f];
         *out++ = PL_hexdigit[in[i] & 0x0f];
     }
+    *out = 0;
     SvCUR_set(r, len * 2);
     return r;
 }

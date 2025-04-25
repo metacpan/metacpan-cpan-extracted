@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Tree::Splits;
 # ABSTRACT: Tree splits (bipartitions)
-$Bio::MUST::Core::Tree::Splits::VERSION = '0.250380';
+$Bio::MUST::Core::Tree::Splits::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -604,7 +604,7 @@ Bio::MUST::Core::Tree::Splits - Tree splits (bipartitions)
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

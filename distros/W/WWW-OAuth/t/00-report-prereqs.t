@@ -62,6 +62,7 @@ sub _merge_prereqs {
 my @include = qw(
   Mojolicious
   HTTP::Request
+  Crypt::SysRandom::XS
 );
 
 my @exclude = qw(

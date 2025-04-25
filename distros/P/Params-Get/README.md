@@ -4,7 +4,7 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -14,7 +14,7 @@ Version 0.02
     sub where_am_i
     {
         my $params = Params::Validate::Strict::validate_strict({
-            args => Params::Get::get_params(undef, @_),
+            args => Params::Get::get_params(undef, \@_),
             schema => {
                 'latitude' => {
                     type => 'number',
@@ -42,7 +42,13 @@ Parse the arguments given to a function.
 Processes arguments passed to methods and ensures they are in a usable format,
 allowing the caller to call the function in any way that they want
 e.g. \`foo('bar')\`, \`foo(arg => 'bar')\`, \`foo({ arg => 'bar' })\` all mean the same
-when called get\_params('arg', @\_);
+when called with
+
+    get_params('arg', @_);
+
+or
+
+    get_params('arg', \@_);
 
 # AUTHOR
 

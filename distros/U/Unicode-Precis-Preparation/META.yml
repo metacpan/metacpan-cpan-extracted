@@ -1,5 +1,5 @@
 ---
-abstract: 'RFC 7564 PRECIS Framework - Preparation'
+abstract: 'RFC 8264 PRECIS Framework - Preparation'
 author:
   - 'Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>'
 build_requires:
@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.26'
   Test::More: '0.45'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,4 +25,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/hatukanezumi/Unicode-Precis-Preparation/
-version: '0.01'
+version: '2025.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

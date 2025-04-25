@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 use MooX::ReturnModifiers;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub import {
 	my ( $self, @import ) = @_;
@@ -50,7 +50,7 @@ MooX::Pack - The great new MooX::Pack!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -146,10 +146,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Pack>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/MooX-Pack>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/MooX-Pack>
@@ -160,7 +156,7 @@ L<https://metacpan.org/release/MooX-Pack>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by lnation.
+This software is Copyright (c) 2024->2025 by lnation.
 
 This is free software, licensed under:
 

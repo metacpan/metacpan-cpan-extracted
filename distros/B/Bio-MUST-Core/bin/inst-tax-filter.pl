@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: inst-tax-filter.pl
 # ABSTRACT: Apply a taxonomic filter to a (UniProt) FASTA database (optimized)
-# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
@@ -77,7 +77,7 @@ inst-tax-filter.pl - Apply a taxonomic filter to a (UniProt) FASTA database (opt
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 USAGE
 
@@ -156,7 +156,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =for stopwords Valerian LUPO
 
-Valerian LUPO <valerian.lupo@doct.uliege.be>
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

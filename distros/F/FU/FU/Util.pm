@@ -1,4 +1,4 @@
-package FU::Util 0.4;
+package FU::Util 0.5;
 
 use v5.36;
 use FU::XS;
@@ -95,10 +95,7 @@ __END__
 
 =head1 NAME
 
-FU::Util - Miscellaneous utility functions that really should have been part of
-a core Perl installation but aren't for some reason because the Perl community
-doesn't believe in the concept of a "batteries included" standard library.
-</rant>
+FU::Util - Miscellaneous Utility Functions
 
 =head1 EXPERIMENTAL
 
@@ -113,7 +110,11 @@ changes, see the main L<FU> module for details.
 
 =head1 DESCRIPTION
 
-=head2 Boolean Stuff
+A bunch of functions that are too small (or I'm too lazy) to split out into
+separate modules. Some of these functions really ought to be part of Perl core.
+
+
+=head1 Boolean Stuff
 
 Perl has had a builtin boolean type since version 5.36 and FU uses that where
 appropriate, but there's still a lot of older code out there using different
@@ -137,7 +138,7 @@ value for C<$val>, due to C<\0> and C<\1> being considered booleans.
 
 =back
 
-=head2 JSON parsing & formatting
+=head1 JSON Parsing & Formatting
 
 This module comes with a custom C-based JSON parser and formatter. These
 functions conform strictly to L<RFC-8259|https://tools.ietf.org/html/rfc8259>,
@@ -281,7 +282,7 @@ functions, L<JSON::PP> and L<Cpanel::JSON::XS> are perfectly fine alternatives.
 L<JSON::SIMD> and L<JSON::Tiny> also look like good and maintained candidates.)
 
 
-=head2 URI-Related Functions
+=head1 URI-Related Functions
 
 While URIs are capable of encoding arbitrary binary data, the functions below
 assume you're only dealing with text. This makes them more robust against weird
@@ -343,7 +344,7 @@ then encoded.
 =back
 
 
-=head2 HTTP Date Formatting
+=head1 HTTP Date Formatting
 
 The HTTP date format is utter garbage, but with the right tools it doesn't
 require I<too> much code to work with.
@@ -368,7 +369,7 @@ This will not happen if your local timezone is UTC.
 =back
 
 
-=head2 Gzip Compression
+=head1 Gzip Compression
 
 Gzip compression can be done with a few different libraries. The canonical one
 is I<zlib>, which is old and not well optimized for modern systems. There's
@@ -408,10 +409,10 @@ This function is B<NOT> safe to use from multiple threads!
 This module does not currently implement decompression. If you need that, or
 streaming, or other functionality not provided here, there's
 L<Compress::Raw::Zlib> and L<Compress::Zlib> in the core Perl distribution and
-L<Gzip::Deflate> on CPAN.
+L<Gzip::Faster>, L<Gzip::Zopfli> and L<Gzip::Libdeflate> on CPAN.
 
 
-=head2 Brotli Compression
+=head1 Brotli Compression
 
 Just a small wrapper around C<libbrotlienc.so>'s one-shot compression
 interface.
@@ -428,7 +429,7 @@ Throws an error if C<libbrotlienc.so> could not be found or loaded.
 =back
 
 
-=head2 File Descriptor Passing
+=head1 File Descriptor Passing
 
 UNIX sockets (see L<IO::Socket::UNIX>) have the fancy property of letting you
 send file descriptors over them, allowing you to pass, for example, a socket
@@ -457,10 +458,9 @@ Like regular socket I/O, a single C<fdpass_send()> message may be split across
 multiple C<fdpass_recv()> calls; in that case the C<$fd> is only received on
 the first call.
 
-Don't use this function if the sender may include multiple file descriptors in
-a single message, weird things can happen. File descriptors received this way
-do not have the C<CLOEXEC> flag and will thus survive a call to C<exec()>.
-Refer to L<this wonderful
+The C<O_CLOEXEC> flag is set on received file descriptors. Don't use this
+function if the sender may include multiple file descriptors in a single
+message, weird things can happen. Refer to L<this wonderful
 discussion|https://gist.github.com/kentonv/bc7592af98c68ba2738f4436920868dc>
 for more weirdness and edge cases.
 

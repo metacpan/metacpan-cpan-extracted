@@ -11,17 +11,17 @@ use Data::Dumper;
 use Test::More;
 
 my @cases = (
-    [ 'N[C@](Br)(O)C', 'N([C@](Br)(O)(C))', 'C([C@](O)(Br)(N))' ],
-    [ 'Br[C@](O)(N)C', 'Br([C@](O)(N)(C))', 'C([C@](N)(O)(Br))' ],
-    [ 'O[C@](Br)(C)N', 'O([C@](Br)(C)(N))', 'N([C@](C)(Br)(O))' ],
-    [ 'Br[C@](C)(O)N', 'Br([C@](C)(O)(N))', 'N([C@](O)(C)(Br))' ],
-    [ 'C[C@](Br)(N)O', 'C([C@](Br)(N)(O))', 'O([C@](N)(Br)(C))' ],
-    [ 'Br[C@](N)(C)O', 'Br([C@](N)(C)(O))', 'O([C@](C)(N)(Br))' ],
-    [ 'C[C@@](Br)(O)N', 'C([C@@](Br)(O)(N))', 'N([C@@](O)(Br)(C))' ],
-    [ 'Br[C@@](N)(O)C', 'Br([C@@](N)(O)(C))', 'C([C@@](O)(N)(Br))' ],
-    [ '[C@@](C)(Br)(O)N', '[C@@](C)(Br)(O)(N)', 'N([C@@](O)(Br)(C))' ],
-    [ '[C@@](Br)(N)(O)C', '[C@@](Br)(N)(O)(C)', 'C([C@@](O)(N)(Br))' ],
-    [ 'C1OCC[C@]1(Cl)Br', 'C1(O(C(C([C@]1(Cl)(Br)))))', 'Br([C@@]1(Cl)(C(C(O(C1)))))' ],
+    [ 'N[C@](Br)(O)C', 'N[C@](Br)(O)C', 'C[C@](O)(Br)N' ],
+    [ 'Br[C@](O)(N)C', 'Br[C@](O)(N)C', 'C[C@](N)(O)Br' ],
+    [ 'O[C@](Br)(C)N', 'O[C@](Br)(C)N', 'N[C@](C)(Br)O' ],
+    [ 'Br[C@](C)(O)N', 'Br[C@](C)(O)N', 'N[C@](O)(C)Br' ],
+    [ 'C[C@](Br)(N)O', 'C[C@](Br)(N)O', 'O[C@](N)(Br)C' ],
+    [ 'Br[C@](N)(C)O', 'Br[C@](N)(C)O', 'O[C@](C)(N)Br' ],
+    [ 'C[C@@](Br)(O)N', 'C[C@@](Br)(O)N', 'N[C@@](O)(Br)C' ],
+    [ 'Br[C@@](N)(O)C', 'Br[C@@](N)(O)C', 'C[C@@](O)(N)Br' ],
+    [ '[C@@](C)(Br)(O)N', '[C@@](C)(Br)(O)N', 'N[C@@](O)(Br)C' ],
+    [ '[C@@](Br)(N)(O)C', '[C@@](Br)(N)(O)C', 'C[C@@](O)(N)Br' ],
+    [ 'C1OCC[C@]1(Cl)Br', 'C1OCC[C@]1(Cl)Br', 'Br[C@@]1(Cl)CCOC1' ],
 );
 
 eval 'use Graph::Nauty qw( are_isomorphic )';

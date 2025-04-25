@@ -1,5 +1,9 @@
 Revision history for Geo::Location::IP
 
+0.004  2025-04-25 03:33:45 CEST
+
+  - Fix the check for private IP addresses. Reported by klebom.
+
 0.003  2025-01-28 10:41:14 CET
 
   - Code refactoring

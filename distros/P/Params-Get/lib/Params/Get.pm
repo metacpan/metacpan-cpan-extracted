@@ -13,11 +13,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ our $VERSION = '0.02';
     sub where_am_i
     {
         my $params = Params::Validate::Strict::validate_strict({
-            args => Params::Get::get_params(undef, @_),
+            args => Params::Get::get_params(undef, \@_),
             schema => {
                 'latitude' => {
                     type => 'number',
@@ -55,7 +55,13 @@ Parse the arguments given to a function.
 Processes arguments passed to methods and ensures they are in a usable format,
 allowing the caller to call the function in any way that they want
 e.g. `foo('bar')`, `foo(arg => 'bar')`, `foo({ arg => 'bar' })` all mean the same
-when called get_params('arg', @_);
+when called with
+
+    get_params('arg', @_);
+
+or
+
+    get_params('arg', \@_);
 
 =cut
 
@@ -66,25 +72,32 @@ sub get_params
 	# Directly return hash reference if the first parameter is a hash reference
 	return $_[0] if(ref($_[0]) eq 'HASH');
 
-	my $num_args = scalar(@_);
+	my $args;
+	if((scalar(@_) == 1) && (ref($_[0]) eq 'ARRAY')) {
+		$args = $_[0];
+	} else {
+		$args = \@_;
+	}
+
+	my $num_args = scalar(@{$args});
 
 	# Populate %rc based on the number and type of arguments
 	if($num_args == 1) {
 		if(defined($default)) {
 			# %rc = ($default => shift);
-			return { $default => shift };
+			return { $default => $args->[0] };
 		}
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
 	if($num_args == 0) {
 		if(defined($default)) {
-			# No means to say that the default is optional
+			# FIXME: No means to say that the default is optional
 			Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
 		}
 		return;
 	}
 	if(($num_args % 2) == 0) {
-		my %rc = @_;
+		my %rc = @{$args};
 		return \%rc;
 	}
 

@@ -1,3 +1,20 @@
+0.5 - 2025-04-24
+	- FU::Util: Set O_CLOEXEC on fds received through `fdpass_recv()`
+	- FU::Util: Fix interpretation of false options in `json_format()` and
+	  `json_parse()`
+	- FU::Validate: Add `coerce()` and `empty()` utility methods
+	- FU::Validate: Limit values of int/uint input to 64 bits
+	- FU::Validate: Normalize num/int/uint inputs to Perl numeric types
+	- FU::Pg: Add `escape_literal()` and `escape_identifier()` methods
+	- FU::Pg: Use less memory for `kvv()`, `kva()` and `kvh()` methods
+	- FU::Pg: Disallow chaining of `cache()`, `text()`, `text_params()` and
+	  `text_results()` methods on connection and transaction objects
+	- FU: Throw and catch FU::Validate errors without wrapping in `fu->error()`
+	- FU: Add `-progname` option and add diagnostics to process names
+	- FU: Whole bunch of misc fixes
+	- Doc fixes
+	- Fix nul-termination of some XS-created strings
+
 0.4 - 2025-03-19
 	- FU::Validate: Support arrayref schemas
 	- FU::Validate: Rename 'values' option to 'elems'

@@ -3,7 +3,7 @@ package CPAN::Maker;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.41';
+our $VERSION = '1.5.43';
 
 1;
 
@@ -100,7 +100,7 @@ C<Makefile.PL> and before creating your CPAN distribution.
 
  See https://github.com/rlauer6/make-cpan-dist.git for more documentation.
 
- Version: 1.5.41
+ Version: 1.5.43
 
 =head1 USING THE BASH SCRIPT
 
@@ -293,7 +293,7 @@ main module being packaged.
 
 Example:
 
-  version: 1.5.41
+  version: 1.5.43
   project:
     git: https://github.com/rlauer6/perl-Amazon-Credentials
     description: "AWS credentials discoverer"

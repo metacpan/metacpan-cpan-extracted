@@ -1,3 +1,11 @@
+0.12.0 2025-04-25
+
+    - Ceasing to output aromatic bonds, excess parentheses and explicit
+      hydrogen atoms by default. These features can be re-enabled by
+      writer options.
+    - Reusing ring bond numbers immediately after their closure. The
+      old behavior can be brought back via an option.
+
 0.11.6 2025-02-14
 
     - Restoring incompatibility with Perl Graph package versions before

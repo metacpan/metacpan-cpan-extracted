@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.250380';
+$Bio::MUST::Core::SeqId::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -69,6 +69,7 @@ has 'parts' => (
 );
 
 # file-scope constants
+# TODO: consider forbidding '|' in full_ids
 
 # regexes for full_id (legacy and new) components
 const my $FAMILY     => qr{ # underscore allowed
@@ -643,9 +644,9 @@ const my @GENERA  => qw(
     acetamiprid-degrading
     Activation-tagging
     AD8-1
+    Adeno-Associated
     adeno-associated
     Adeno-associated
-    Adeno-Associated
     AE-B3A
     AE-B3B
     AEGEAN-183
@@ -693,8 +694,8 @@ const my @GENERA  => qw(
     Aksy-Durug
     AKYH767-A
     AL-N1
-    Alfalfa-associated
     alfalfa-associated
+    Alfalfa-associated
     Alg239-R122
     Alg240-R148
     alk-system
@@ -944,13 +945,13 @@ const my @GENERA  => qw(
     biocide-degrading
     biphenthrin-degrading
     biphenyl-degrading
-    birds-foot
     Birds-foot
+    birds-foot
     BK-30
     Black-and-white
     Black-eyed
-    black-headed
     Black-headed
+    black-headed
     Blackcurrant-associated
     Bo-Circo-like
     Bog-105
@@ -1551,8 +1552,8 @@ const my @GENERA  => qw(
     DC-out156
     DC-out160
     DCM-degrading
-    deep-sea
     Deep-sea
+    deep-sea
     Deinococcus-like
     Deinococcus-Thermus
     Delta-02
@@ -1832,8 +1833,8 @@ const my @GENERA  => qw(
     FEN-299
     FEN-33
     Fen-330
-    Fen-336
     FEN-336
+    Fen-336
     FEN-413
     Fen-455
     Fen-549
@@ -2959,8 +2960,8 @@ const my @GENERA  => qw(
     Non-geniculate
     Non-human
     non-mammal
-    non-primate
     Non-primate
+    non-primate
     Norovirus/GII.4/1993-6/UK
     Norovirus/Hu/GII.2/V1/09/18-Jan-2009/Slovenia
     Norovirus/Hu/GII.4/1732/07/07-Jun-2007/Slovenia
@@ -3049,14 +3050,14 @@ const my @GENERA  => qw(
     Palsa-1032
     Palsa-1033
     PALSA-1081
-    Palsa-1104
     PALSA-1104
+    Palsa-1104
     Palsa-1150
     PALSA-1152
     PALSA-1153
     PALSA-1176
-    PALSA-1178
     Palsa-1178
+    PALSA-1178
     Palsa-1180
     PALSA-1180
     Palsa-1188
@@ -3064,8 +3065,8 @@ const my @GENERA  => qw(
     Palsa-1233
     Palsa-1248
     PALSA-129
-    PALSA-1295
     Palsa-1295
+    PALSA-1295
     PALSA-1296
     Palsa-1315
     PALSA-1316
@@ -3142,8 +3143,8 @@ const my @GENERA  => qw(
     Partiti-like
     Partitiviridae-like
     Partitivirus-like
-    Parvo-like
     parvo-like
+    Parvo-like
     Pasla-948_A
     Passerine-like
     Passionfruit-associated
@@ -3165,8 +3166,8 @@ const my @GENERA  => qw(
     PCC-9228
     PCC-9333
     PD-1
-    Peach-associated
     peach-associated
+    Peach-associated
     Pechuel-loeschea
     Peixe-Boi
     Pepper-associated
@@ -4021,8 +4022,8 @@ const my @GENERA  => qw(
     Thrips-associated
     Ti-curing
     Tick-associated
-    Tick-borne
     tick-borne
+    Tick-borne
     TIM5-like
     TIUS-1
     TK10-74A
@@ -13898,11 +13899,10 @@ sub clean_ncbi_name {
     $org =~ s{uncultured \s+ candidatus \s+}{}xmsgi;
     $org =~ s{candidatus \s+}{}xmsgi;
 
-    # remove cf.
-    $org =~ s{\b cf \.? \s+}{}xmsgi
-        if $org =~ m/\b cf \.? \s+ \D+ \s+/xmsgi;
+    # remove cf. and aff.
+    $org =~ s{\b (:? cf|aff)\.? \s+ (?= \D+$ | \S+\s+)}{}xmsgi;
     # Note: delete only if followed by a word without digits (not a strain)
-    # hence when 'cf' does not stand for a species itself
+    # hence when 'cf' or 'aff' does not stand for a species itself
 
     # remove unwanted characters
     $org =~ s{[\[\]\']}{}xmsgi;
@@ -13972,7 +13972,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

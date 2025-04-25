@@ -460,9 +460,11 @@ static SV *fupg_st_kvv(pTHX_ fupg_st *st) {
     HV *hv = newHV();
     SV *sv = sv_2mortal(newRV_noinc((SV *)hv));
     for (i=0; i<nrows; i++) {
+        SAVETMPS;
         SV *key = sv_2mortal(fupg_st_getval(aTHX_ st, i, 0));
         if (hv_exists_ent(hv, key, 0)) fu_confess("Key '%s' is duplicated in $st->kvv() query results", SvPV_nolen(key));
         hv_store_ent(hv, key, st->nfields == 1 ? &PL_sv_yes : fupg_st_getval(aTHX_ st, i, 1), 0);
+        FREETMPS;
     }
     return sv;
 }
@@ -474,10 +476,12 @@ static SV *fupg_st_kva(pTHX_ fupg_st *st) {
     HV *hv = newHV();
     SV *sv = sv_2mortal(newRV_noinc((SV *)hv));
     for (i=0; i<nrows; i++) {
+        SAVETMPS;
         SV *key = sv_2mortal(fupg_st_getval(aTHX_ st, i, 0));
         if (hv_exists_ent(hv, key, 0)) fu_confess("Key '%s' is duplicated in $st->kva() query results", SvPV_nolen(key));
         AV *row = st->nfields == 1 ? newAV() : newAV_alloc_x(st->nfields-1);
         hv_store_ent(hv, key, newRV_noinc((SV *)row), 0);
+        FREETMPS;
         for (j=1; j<st->nfields; j++)
             av_push_simple(row, fupg_st_getval(aTHX_ st, i, j));
     }
@@ -492,10 +496,12 @@ static SV *fupg_st_kvh(pTHX_ fupg_st *st) {
     HV *hv = newHV();
     SV *sv = sv_2mortal(newRV_noinc((SV *)hv));
     for (i=0; i<nrows; i++) {
+        SAVETMPS;
         SV *key = sv_2mortal(fupg_st_getval(aTHX_ st, i, 0));
         if (hv_exists_ent(hv, key, 0)) fu_confess("Key '%s' is duplicated in $st->kvh() query results", SvPV_nolen(key));
         HV *row = newHV();
         hv_store_ent(hv, key, newRV_noinc((SV *)row), 0);
+        FREETMPS;
         for (j=1; j<st->nfields; j++) {
             const char *key = PQfname(st->result, j);
             hv_store(row, key, -strlen(key), fupg_st_getval(aTHX_ st, i, j), 0);

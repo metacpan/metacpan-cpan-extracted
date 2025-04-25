@@ -1,5 +1,65 @@
 Revision history for Alien-CFITSIO
 
+v4.6.2.4  2025-04-24 21:20:29-04:00 America/New_York
+
+    * No changes, promote to stable.
+
+v4.6.2.3  2025-04-23 11:49:29-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * revert experiment to avoid hard dependency on Alien::curl.  making it a
+      recommendation isn't good enough, as most installs most likely
+      won't install recommendations.
+
+v4.6.2.2  2025-04-22 22:29:56-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * update trial patch to rename preprocessor macro MACHINE to
+      CFITSIO_MACHINE to avoid collision on *BSD-aarch64 on CPAN
+      testers.
+
+v4.6.2.1  2025-04-18 14:55:52-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * missing test dependency on Package::Stash
+
+    * trial patch to use stdlib.h instead of malloc.h on FreeBSD & OpenBSD
+
+v4.6.2.0  2025-04-15 21:49:29-04:00 America/New_York (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+
+    * build CFITSIO v4.6.2
+
+
+  [DIST/BUILD FIX]
+
+    * revert back to Dist::Zilla::Plugin::Templates, as nothing
+      seems to do what it does. See 
+       * https://rt.cpan.org/Ticket/Display.html?id=148081
+       * https://rt.cpan.org/Ticket/Display.html?id=164110
+
+
+
+v4.5.0.0  2024-09-03 17:14:17-04:00 America/New_York (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+
+    * build CFITSIO v4.5.0.
+
+    * use Alien::curl to ensure that libcurl is available
+
+  [DIST/BUILD FIX]
+
+    * Dist::Zilla::Plugin::Templates was used when creating the
+      distribution hardwire CFITSIO_VERSION into the module and
+      alienfile, but one of its' dependencies
+      (Dist::Zilla::Tester::DieHard) no longer passes its tests.
+      CFITSIO_VERSION is now evaluated at compile time (boo).
+
 v4.4.0.2  2024-03-11 10:09:00-04:00 America/New_York
 
   [BUILD FIX]

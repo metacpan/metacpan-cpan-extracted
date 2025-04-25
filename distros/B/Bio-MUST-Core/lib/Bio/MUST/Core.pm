@@ -3,10 +3,10 @@ package Bio::MUST::Core;
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
-# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::VERSION = '0.250380';
+$Bio::MUST::Core::VERSION = '0.251140';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ Bio::MUST::Core - Core classes and utilities for Bio::MUST
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ Raphael LEONARD <rleonard@doct.uliege.be>
 
 =item *
 
-Valerian LUPO <valerian.lupo@doct.uliege.be>
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =item *
 

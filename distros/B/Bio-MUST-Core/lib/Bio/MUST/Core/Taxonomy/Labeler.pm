@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Labeler;
 # ABSTRACT: Helper class for simple labeler based on taxonomy
-$Bio::MUST::Core::Taxonomy::Labeler::VERSION = '0.250380';
+$Bio::MUST::Core::Taxonomy::Labeler::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -65,7 +65,7 @@ Bio::MUST::Core::Taxonomy::Labeler - Helper class for simple labeler based on ta
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

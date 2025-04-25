@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Perl::Version;
 
-$Geoffrey::Role::Converter::VERSION = '0.000205';
+$Geoffrey::Role::Converter::VERSION = '0.000206';
 
 sub new {
     my $class = shift;
@@ -20,62 +20,61 @@ sub changelog_table {
 }
 
 sub changelog_columns {
-    return [{
-            name       => 'id',
+    return [
+        {   name       => 'id',
             type       => 'varchar',
             lenght     => 64,
             primarykey => 1,
             notnull    => 1,
             default    => '\'\''
         },
-        {name => 'created_by', type => 'varchar', lenght => 128, notnull => 1, default => '\'\'',},
-        {name => 'filename',   type => 'varchar', lenght => 255,},
-        {name => 'md5sum',     type => 'varchar', lenght => 64,},
-        {name => 'description', type => 'varchar', lenght => 255,},
-        {name => 'comment',     type => 'varchar', lenght => 128,},
-        {
-            name    => 'geoffrey_version',
+        { name => 'created_by',  type => 'varchar', lenght => 128, notnull => 1, default => '\'\'', },
+        { name => 'filename',    type => 'varchar', lenght => 255, },
+        { name => 'md5sum',      type => 'varchar', lenght => 64, },
+        { name => 'description', type => 'varchar', lenght => 255, },
+        { name => 'comment',     type => 'varchar', lenght => 128, },
+        {   name    => 'geoffrey_version',
             type    => 'varchar',
             lenght  => 16,
             notnull => 1,
             default => '\'\''
         },
-        {name => 'created', type => 'timestamp', default => 'current_timestamp', notnull => 1,},
+        { name => 'created', type => 'timestamp', default => 'current_timestamp', notnull => 1, },
     ];
-}
+} ## end sub changelog_columns
 
 sub origin_types {
     return [
-        'abstime', 'aclitem',                                                      #Al
-        'bigint', 'bigserial', 'bit', 'varbit', 'blob', 'bool', 'box', 'bytea',    #B
-        'char', 'character', 'varchar', 'cid', 'cidr', 'circle',                   #C
-        'date', 'daterange', 'double', 'double_precision', 'decimal',              #D
-                                                                                   #E
-                                                                                   #F
-        'gtsvector',                                                               #G
-                                                                                   #H
-        'inet', 'int2vector', 'int4range', 'int8range', 'integer', 'interval',     #I
-        'json',                                                                    #J
-                                                                                   #K
-        'line',    'lseg',                                                         #L
-        'macaddr', 'money',                                                        #M
-        'name',    'numeric', 'numrange',                                          #N
-        'oid',     'oidvector',                                                    #O
-        'path',    'pg_node_tree', 'point', 'polygon',                             #P
-                                                                                   #Q
-        'real', 'refcursor', 'regclass', 'regconfig', 'regdictionary', 'regoper', 'regoperator',
-        'regproc', 'regprocedure', 'regtype',     'reltime',                       #R
-        'serial',  'smallint',     'smallserial', 'smgr',                          #S
-        'text', 'tid', 'timestamp', 'timestamp_tz', 'time', 'time_tz', 'tinterval', 'tsquery',
-        'tsrange', 'tstzrange', 'tsvector', 'txid_snapshot',                       #T
-        'uuid',                                                                    #U
-                                                                                   #V
-                                                                                   #W
-        'xid',                                                                     #X
-                                                                                   #Y
-                                                                                   #Z
+        'abstime', 'aclitem',                                                                     #Al
+        'bigint',  'bigserial', 'bit',     'varbit',           'blob', 'bool', 'box', 'bytea',    #B
+        'char',    'character', 'varchar', 'cid',              'cidr', 'circle',                  #C
+        'date',    'daterange', 'double',  'double_precision', 'decimal',                         #D
+                                                                                                  #E
+        'float',                                                                                  #F
+        'gtsvector',                                                                              #G
+                                                                                                  #H
+        'inet', 'int2vector', 'int4range', 'int8range', 'integer', 'interval',                    #I
+        'json',                                                                                   #J
+                                                                                                  #K
+        'line',    'lseg',                                                                        #L
+        'macaddr', 'money',                                                                       #M
+        'name',    'numeric', 'numrange',                                                         #N
+        'oid',     'oidvector',                                                                   #O
+        'path',    'pg_node_tree', 'point',       'polygon',                                      #P
+                                                                                                  #Q
+        'real',    'refcursor',    'regclass',    'regconfig', 'regdictionary', 'regoper', 'regoperator',
+        'regproc', 'regprocedure', 'regtype',     'reltime',                                      #R
+        'serial',  'smallint',     'smallserial', 'smgr',                                         #S
+        'text',    'tid',          'timestamp',   'timestamp_tz', 'time', 'time_tz', 'tinterval', 'tsquery',
+        'tsrange', 'tstzrange',    'tsvector',    'txid_snapshot',                                #T
+        'uuid',                                                                                   #U
+                                                                                                  #V
+                                                                                                  #W
+        'xid',                                                                                    #X
+                                                                                                  #Y
+                                                                                                  #Z
     ];
-}
+} ## end sub origin_types
 
 sub min_version { return shift->{min_version} }
 
@@ -84,70 +83,60 @@ sub max_version { return shift->{max_version} }
 sub can_create_empty_table;
 
 sub check_version {
-    my ($self, $s_version) = @_;
+    my ( $self, $s_version ) = @_;
     $s_version = Perl::Version->new($s_version);
-    my ($s_max_version, $s_min_version) = undef;
+    my ( $s_max_version, $s_min_version ) = undef;
     eval { $s_min_version = $self->min_version; } or do { };
     eval { $s_max_version = $self->max_version; } or do { };
     $s_min_version = Perl::Version->new($s_min_version);
     if ($s_max_version) {
         $s_max_version = Perl::Version->new($s_max_version);
-        return 1 if ($s_min_version <= $s_version && $s_version <= $s_max_version);
+        return 1 if ( $s_min_version <= $s_version && $s_version <= $s_max_version );
         require Geoffrey::Exception::NotSupportedException;
-        Geoffrey::Exception::NotSupportedException::throw_version($self, $s_min_version,
-            $s_version, $s_max_version);
-    }
-    elsif ($s_min_version <= $s_version) {
+        Geoffrey::Exception::NotSupportedException::throw_version( $self, $s_min_version, $s_version, $s_max_version );
+    } elsif ( $s_min_version <= $s_version ) {
         return 1;
     }
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_version($self, $s_min_version,
-        $s_version);
-}
+    return Geoffrey::Exception::NotSupportedException::throw_version( $self, $s_min_version, $s_version );
+} ## end sub check_version
 
 sub type {
-    my ($self, $hr_column_params) = @_;
-    if (!$hr_column_params->{type}) {
+    my ( $self, $hr_column_params ) = @_;
+    if ( !$hr_column_params->{type} ) {
         require Geoffrey::Exception::RequiredValue;
         Geoffrey::Exception::RequiredValue::throw_column_type($self);
     }
     my $s_column_type
-        = (grep {/^$hr_column_params->{type}$/sxm} @{$self->origin_types()})
-        ? $self->types()->{$hr_column_params->{type}}
+        = ( grep {/^$hr_column_params->{type}$/sxm} @{ $self->origin_types() } )
+        ? $self->types()->{ $hr_column_params->{type} }
         : undef;
-    if (!$s_column_type) {
+    if ( !$s_column_type ) {
         require Geoffrey::Exception::NotSupportedException;
-        Geoffrey::Exception::NotSupportedException::throw_column_type($hr_column_params->{type},
-            $self);
+        Geoffrey::Exception::NotSupportedException::throw_column_type( $hr_column_params->{type}, $self );
     }
-    $s_column_type .= $hr_column_params->{strict} ? '(strict)' : q//;
-    $s_column_type
-        .= defined $hr_column_params->{lenght} ? qq~($hr_column_params->{lenght})~ : q//;
+    $s_column_type .= $hr_column_params->{strict}         ? '(strict)'                        : q//;
+    $s_column_type .= defined $hr_column_params->{lenght} ? qq~($hr_column_params->{lenght})~ : q//;
     return $s_column_type;
-}
+} ## end sub type
 
 sub _get_table_hashref {
-    my ($self, $dbh, $s_name, $ar_columns, $s_schema) = @_;
+    my ( $self, $dbh, $s_name, $ar_columns, $s_schema ) = @_;
     my $s_select_get_table = $self->select_get_table;
     my $sth                = $dbh->prepare($s_select_get_table);
     if ($s_schema) {
-        $sth->execute($s_schema, $s_name) or Carp::confess $!;
-    }
-    else {
+        $sth->execute( $s_schema, $s_name ) or Carp::confess $!;
+    } else {
         $sth->execute($s_name) or Carp::confess $!;
     }
     my $hr_table = $sth->fetchrow_hashref();
     return if defined $hr_table;
-    return {name => $s_name, columns => $ar_columns,};
-}
+    return { name => $s_name, columns => $ar_columns, };
+} ## end sub _get_table_hashref
 
 sub get_changelog_table_hashref {
-    my ($self, $o_dbh, $s_schema) = @_;
-    return $self->_get_table_hashref(
-        $o_dbh,
-        $self->changelog_table(),
-        $self->changelog_columns(), $s_schema
-    );
+    my ( $self, $o_dbh, $s_schema ) = @_;
+    return $self->_get_table_hashref( $o_dbh, $self->changelog_table(), $self->changelog_columns(), $s_schema );
 }
 
 sub constraints {
@@ -202,50 +191,42 @@ sub unique {
 
 sub colums_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('colums_information',
-        shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'colums_information', shift );
 }
 
 sub index_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('index_information',
-        shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'index_information', shift );
 }
 
 sub view_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('view_information',
-        shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'view_information', shift );
 }
 
 sub sequence_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information(
-        'sequence_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'sequence_information', shift );
 }
 
 sub primary_key_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information(
-        'primary_key_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'primary_key_information', shift );
 }
 
 sub function_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information(
-        'function_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'function_information', shift );
 }
 
 sub unique_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information('unique_information',
-        shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'unique_information', shift );
 }
 
 sub trigger_information {
     require Geoffrey::Exception::NotSupportedException;
-    return Geoffrey::Exception::NotSupportedException::throw_list_information(
-        'trigger_information', shift);
+    return Geoffrey::Exception::NotSupportedException::throw_list_information( 'trigger_information', shift );
 }
 
 1;    # End of Geoffrey::converter
@@ -262,7 +243,7 @@ Geoffrey::Role::Converter - Abstract converter class.
 
 =head1 VERSION
 
-Version 0.000205
+Version 0.000206
 
 =head1 DESCRIPTION
 

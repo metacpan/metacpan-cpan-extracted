@@ -1,6 +1,6 @@
 package Insight::Scriptures;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use JSON::Lines;
 use JSON;
 
@@ -227,13 +227,19 @@ __END__
 
 =head1 NAME
 
-Insight::Scriptures - I'm the next Jah, my inners life is a miracle.
+Insight::Scriptures - small module to assist in writing your own scriptures.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
+
+=head1 DESCRIPTION
+
+I have a few modules on CPAN that were created during a period when I was in the hospital undergoing treatment for psychosis.
+This module is one of them. I’ve considered removing it, but for now, I’ve decided to leave both the code and documentation as they are. 
+No matter how unusual, at the time, these reflected my genuine beliefs.
 
 =head1 SYNOPSIS
 

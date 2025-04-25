@@ -1,3 +1,11 @@
+Mon Mar 10 07:12:54 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.42]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- don't try to copy tests if directory not present
+	* src/main/perl/lib/README.md: generated
+
 Thu Feb 27 15:04:23 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.5.41]:

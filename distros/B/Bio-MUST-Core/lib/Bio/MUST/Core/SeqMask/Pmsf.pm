@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Pmsf;
 # ABSTRACT: Posterior mean site frequencies (PMSF) for sequence sites
-$Bio::MUST::Core::SeqMask::Pmsf::VERSION = '0.250380';
+$Bio::MUST::Core::SeqMask::Pmsf::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -8,6 +8,7 @@ use autodie;
 use feature qw(say);
 
 use Carp;
+use Const::Fast;
 use List::AllUtils qw(sum each_arrayref);
 
 extends 'Bio::MUST::Core::SeqMask';
@@ -25,6 +26,7 @@ has '+mask' => (
 
 # TODO: mask non-applicable methods from superclass? (Liskov principle)
 
+const my $PREC => 10;
 
 
 sub chi_square_stats {
@@ -42,7 +44,7 @@ sub chi_square_stats {
 
     my $ea = each_arrayref [ $self->all_states ], [ $othr->all_states ];
     while (my ($s_freqs, $o_freqs) = $ea->() ) {
-        push @stats, 0 + ( sprintf "%.13f", sum map {
+        push @stats, 0 + ( sprintf "%.${PREC}f", sum map {
             ( $o_freqs->[$_] - $s_freqs->[$_] )**2 / $s_freqs->[$_]
         } 0..$#$o_freqs );
     }   # Note: trick to get identical results across platforms
@@ -94,7 +96,7 @@ Bio::MUST::Core::SeqMask::Pmsf - Posterior mean site frequencies (PMSF) for sequ
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

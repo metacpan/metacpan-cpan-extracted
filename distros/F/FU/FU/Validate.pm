@@ -1,4 +1,4 @@
-package FU::Validate 0.4;
+package FU::Validate 0.5;
 
 use v5.36;
 use experimental 'builtin', 'for_list';
@@ -61,6 +61,10 @@ our $re_weburl    = qr/^https?:\/\/$re_domain(?::[1-9][0-9]{0,5})?(?:\/[^\s<>"]*
 our $re_date      = qr/^(?:19[0-9][0-9]|20[0-9][0-9])-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$/;
 
 
+# There's a special '_scalartype' option used for coerce() and empty(), with the following values:
+#   0/undef/missing: string, 1:num, 2:int, 3:bool
+# The highest number, i.e. most restrictive type, is chosen when multiple validations exist.
+
 our %default_validations = (
     regex => sub($reg) {
         # Error objects should be plain data structures so that they can easily
@@ -78,12 +82,12 @@ our %default_validations = (
     maxlength => sub($v) { _length $v, undef, $v },
     length    => sub($v) { _length $v, ref $v eq 'ARRAY' ? @$v : ($v, $v) },
 
-    bool      => { type => 'any', func => sub { my $r = to_bool $_[0]; return {} if !defined $r; $_[0] = $r; 1 } },
-    anybool   => { type => 'any', default => false, func => sub { $_[0] = $_[0] ? true : false; 1 } },
+    bool      => { _scalartype => 3, type => 'any', func => sub { my $r = to_bool $_[0]; return {} if !defined $r; $_[0] = $r; 1 } },
+    anybool   => { _scalartype => 3, type => 'any', default => false, func => sub { $_[0] = $_[0] ? true : false; 1 } },
 
-    num   => { _reg $re_num },
-    int   => { _reg $re_int }, # implies num
-    uint  => { _reg $re_uint }, # implies num
+    num   => [ _scalartype => 1, _reg($re_num), func => sub { $_[0] = $_[0]*1; 1 } ],
+    int   => [ _scalartype => 2, _reg($re_int), func => sub { return { message => 'integer out of range' } if $_[0] < -9223372036854775808 || $_[0] > 9223372036854775807; $_[0] = int $_[0]; 1 } ],
+    uint  => [ _scalartype => 2, _reg($re_uint), func => sub { return { message => 'integer out of range' } if $_[0] > 18446744073709551615; $_[0] = int $_[0]; 1 } ],
     min   => sub($min) { +{ num => 1, func => sub { $_[0] >= $min ? 1 : { expected => $min, got => $_[0] } } } },
     max   => sub($max) { +{ num => 1, func => sub { $_[0] <= $max ? 1 : { expected => $max, got => $_[0] } } } },
     range => sub { [ min => $_[0][0], max => $_[0][1] ] },
@@ -149,6 +153,11 @@ sub _compile($schema, $custom, $rec, $top, $validations=$top->{validations}) {
         if ($name eq 'default') {
             $top->{default} = $val;
             delete $top->{default} if ref $val eq 'SCALAR' && $$val eq 'required';
+            next;
+        }
+
+        if ($name eq '_scalartype') {
+            $top->{_scalartype} = $val if ($top->{_scalartype}||0) < $val;
             next;
         }
 
@@ -353,6 +362,37 @@ sub validate($c, $input) {
 }
 
 
+sub coerce {
+    my $c = $_[0];
+    my %opt = @_[2..$#_];
+    if (!defined $_[1]) {
+        $_[1] = undef;
+    } elsif ($c->{_scalartype}) {
+        $_[1] = $c->{_scalartype} == 3 ? !!$_[1] : $c->{_scalartype} == 2 ? int $_[1] : $_[1]+0;
+    } elsif (!$c->{type} || $c->{type} eq 'scalar') {
+        $_[1] = "$_[1]";
+    } elsif ($c->{type} eq 'array' && $c->{elems} && ref $_[1] eq 'ARRAY') {
+        coerce($c->{elems}, $_, %opt) for $_[1]->@*;
+    } elsif ($c->{type} eq 'hash' && $c->{keys} && ref $_[1] eq 'HASH') {
+        $opt{unknown} ||= $c->{unknown};
+        delete @{$_[1]}{ grep !$c->{keys}{$_}, keys $_[1]->%* }
+            if $opt{unknown} && $opt{unknown} ne 'pass';
+        $_[1]{$_} = exists $_[1]{$_} ? coerce($c->{keys}{$_}, $_[1]{$_}, %opt) : empty($c->{keys}{$_})
+            for keys $c->{keys}->%*;
+    }
+    return $_[1];
+}
+
+
+sub empty($c) {
+    return ref $c->{default} eq 'CODE' ? $c->{default}->(undef) : $c->{default} if exists $c->{default};
+    return [] if $c->{type} && $c->{type} eq 'array';
+    return $c->{keys} ? +{ map +($_, empty($c->{keys}{$_})), keys $c->{keys}->%* } : {} if $c->{type} && $c->{type} eq 'hash';
+    return undef if $c->{type} && $c->{type} eq 'any';
+    # Only scalar types remain
+    return !$c->{_scalartype} ? '' : $c->{_scalartype} == 3 ? !1 : 0;
+}
+
 
 
 package FU::Validate::err;
@@ -419,15 +459,15 @@ parameters within Perl code. In fact, the correct answer to "how do I validate
 function parameters?" is "don't, document your assumptions instead".
 
 
-=head2 Validation API
+=head1 Validation API
 
 To validate some input, you first need a schema. A schema can be compiled as
 follows:
 
   my $validator = FU::Validate->compile($schema, $validations);
 
-C<$schema> is the schema that describes the data to be validated (see L</SCHEMA
-DEFINITION> below) and C<$validations> is an optional hashref containing
+C<$schema> is the schema that describes the data to be validated (see L</Schema
+Definition> below) and C<$validations> is an optional hashref containing
 L<custom validations|/Custom validations> that C<$schema> can refer to.  An
 error is thrown if the C<$validations> or C<$schema> are invalid.
 
@@ -443,10 +483,60 @@ An error is thrown if the input does not validate. The error object is a
 C<FU::Validate::err>-blessed hashref containing at least one key:
 I<validation>, which indicates the name of the validation that failed.
 Additional keys with more detailed information may be present, depending on the
-validation. These are documented in L</SCHEMA DEFINITION> below.
+validation. These are documented in L</Schema Definition> below.
+
+Additional utility methods:
+
+=over
+
+=item $validator->empty
+
+Returns an "empty" value that roughly follows the data structure described by
+the schema. The returned value does not necessarily validate but can still be
+useful as a template. Works roughly as follows:
+
+=over
+
+=item * If the schema has a I<default>, then that is returned.
+
+=item * If the schema describes a hash, then a hash is returned with each key
+in I<keys> initialized to an empty value.
+
+=item * If the schema describes an array, an empty array is returned.
+
+=item * If the schema describes a bool, return C<false>.
+
+=item * If the schema describes a number, return C<0>.
+
+=item * If the schema describes a string, return C<''>.
+
+=item * Otherwise, return C<undef>.
+
+=back
+
+=item $validator->coerce($input, %opt)
+
+Perform in-place coercion of C<$input> to the data types described by the
+schema. Also returns the modified C<$input> for convenience. This method assumes
+that C<$input> already has the general structure described by the schema and is
+mainly useful to ensure that encoding the value as JSON will end up with the
+correct data types. i.e. booleans are encoded as booleans, integers as integers
+(truncating if necessary), numbers as numbers, etc.
+
+If an input hash is missing keys described in the schema, then those are
+created with C<< ->empty >>. If the schema has I<unknown> set to either
+I<reject> or I<remove>, unknown keys are removed. This behavior can be
+overriden by passing different I<unknown> value in C<%opt>.
+
+This method does NOT perform any sort of validation and will happily pass
+through garbage if the given C<$input> does not follow the structure of the
+schema. It's basically a faster and lousier normalization-only alternative to
+C<< ->validate() >>.
+
+=back
 
 
-=head1 SCHEMA DEFINITION
+=head1 Schema Definition
 
 A schema is an arrayref or hashref, where each key is the name of a built-in
 option or of a validation to be performed and the values are the arguments to
@@ -473,7 +563,7 @@ Or to use the same validation multiple times:
 
   [ regex => qr/^a/, regex => qr/z$/ ]
 
-=head2 Built-in options
+=head1 Built-in options
 
 =over
 
@@ -730,7 +820,7 @@ reporting.
 
 =back
 
-=head2 Standard validations
+=head1 Standard validations
 
 Standard validations are provided by the module. It is possible to override,
 re-implement and supplement these with custom validations. Internally, these
@@ -780,17 +870,18 @@ Require the input to be a boolean type as per C<to_bool()> in L<FU::Util>.
 Implies C<< type => 'scalar' >>. Require the input to be a number formatted
 using the format permitted by JSON. Note that this is slightly more restrictive
 from Perl's number formatting, in that 'NaN', 'Inf' and thousand separators are
-not permitted.
+not permitted. The value is normalized to a Perl integer or floating point
+value, which means precision for large numbers may be lost.
 
 =item int => 1
 
-Implies C<< type => 'scalar' >>. Require the input to be an (arbitrarily large)
+Implies C<< type => 'scalar' >>. Require the input to be an (at most) 64-bit
 integer.
 
 =item uint => 1
 
-Implies C<< type => 'scalar' >>. Require the input to be an (arbitrarily large)
-positive integer.
+Implies C<< type => 'scalar' >>. Require the input to be an (at most) 64-bit
+unsigned integer.
 
 =item min => $num
 
@@ -855,7 +946,7 @@ given the year and month.
 =back
 
 
-=head2 Custom validations
+=head1 Custom validations
 
 Custom validations can be passed to C<compile()> as the C<$validations> hashref
 argument.  A custom validation is, in simple terms, either a schema or a
@@ -885,7 +976,7 @@ schema that contains the I<func> built-in option to do the actual validation.
   my $schema = { prefix => 'Hello, ' };
   my $result = FU::Validate->compile($schema, $validations)->validate('Hello, World!');
 
-=head3 Custom validations and built-in options
+=head2 Custom validations and built-in options
 
 Custom validations can also set built-in options, but the semantics differ a
 little depending on the option. First, be aware that many of the built-in
@@ -909,13 +1000,13 @@ error:
 
 The I<func> option is validated separately for each custom validation.
 
-Multiple I<keys> and I<elems> validations are merged into a single validation.
-So if you have multiple custom validations that set the I<elems> option, a
-single combined schema is created that validates all array elements. The same
-applies to I<keys>: if the same key is listed in multiple custom validations,
-then the key must conform to all schemas. With respect to the I<unknown>
-option, a key that is mentioned in any of the I<keys> options is considered
-"known".
+Multiple I<keys>, I<values> and I<elems> validations are merged into a single
+validation.  So if you have multiple custom validations that set the I<elems>
+option, a single combined schema is created that validates all array elements.
+The same applies to I<keys>: if the same key is listed in multiple custom
+validations, then the key must conform to all schemas. With respect to the
+I<unknown> option, a key that is mentioned in any of the I<keys> options is
+considered "known".
 
 All other built-in options follow inheritance semantics: These options can be
 set in a custom validation, and they are inherited by the top-level schema.  If
@@ -924,7 +1015,7 @@ inherited. The top-level schema can always override options set by custom
 validations.
 
 
-=head3 Global custom validations
+=head2 Global custom validations
 
 Instead of passing a C<$validations> argument every time you call C<compile()>,
 you can also add custom validations to the global list of built-in validations:

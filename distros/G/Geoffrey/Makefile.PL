@@ -33,8 +33,8 @@ WriteMakefile(
         resources   => {
             repository => {
                 type => 'git',
-                url  => 'https://gitlab.com/GeoffreyDB/Geoffrey.git',
-                web  => 'https://gitlab.com/GeoffreyDB/Geoffrey',
+                url  => 'https://codeberg.org/GeoffreyDB/Geoffrey.git',
+                web  => 'https://codeberg.org/GeoffreyDB/Geoffrey',
             },
         }
     },

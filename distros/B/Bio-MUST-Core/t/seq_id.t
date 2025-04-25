@@ -669,14 +669,24 @@ for my $exp_row (@strains2build) {
 }
 
 my @ids2clean = (
+
+    # Candidatus
     [ 'Candidatus Phytoplasma mali', 'Phytoplasma mali' ],
     [ 'Candidatus Arthromitus sp. SFB-rat-Yit', 'Arthromitus sp. SFB-rat-Yit' ],
 # TODO: check these
 #     [ 'uncultured cyanobacterium', 'cyanobacterium' ],
 #     [ 'uncultured actinobacterium WB039', 'actinobacterium WB039' ],
     [ 'uncultured Candidatus Hamiltonella sp.', 'Hamiltonella sp.' ],
+
+    # cf.
     [ 'cf. Stagonospora sp. S619', 'Stagonospora sp. S619' ],
     [ 'cf. Pavona sp. 2 DGL-2013', 'Pavona sp. 2 DGL-2013' ],
+    [ 'Deuterocohnia cf. haumanii NiSch 06/122', 'Deuterocohnia haumanii NiSch 06/122' ],
+    [ 'Pseudogekko cf. hungkag', 'Pseudogekko hungkag' ],
+    [ 'Tomoplagia cf. MG-4', 'Tomoplagia cf. MG-4' ],
+
+    # aff.
+    [ 'Pitcairnia aff. lopezii Goebel s.n.', 'Pitcairnia lopezii Goebel s.n.' ],
 );
 explain \@ids2clean;
 

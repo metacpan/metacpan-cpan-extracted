@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 use Exporter 'import';
 
@@ -55,7 +55,7 @@ MooX::ReturnModifiers - Returns Moo Modifiers as a Hash
 
 =head1 VERSION
 
-Version 1.000001
+Version 1.000002
 
 =head1 SYNOPSIS
 
@@ -149,19 +149,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-ReturnModifiers>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/MooX-ReturnModifiers>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/MooX-ReturnModifiers>
 
 =item * Search CPAN
 
@@ -169,13 +161,11 @@ L<http://search.cpan.org/dist/MooX-ReturnModifiers/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

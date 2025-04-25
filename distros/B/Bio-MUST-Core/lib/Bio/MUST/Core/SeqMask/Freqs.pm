@@ -1,12 +1,13 @@
 package Bio::MUST::Core::SeqMask::Freqs;
 # ABSTRACT: Arbitrary frequencies for sequence sites
-$Bio::MUST::Core::SeqMask::Freqs::VERSION = '0.250380';
+$Bio::MUST::Core::SeqMask::Freqs::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
+use Const::Fast;
 use List::AllUtils qw(sum);
 
 use Bio::MUST::Core::Types;
@@ -60,6 +61,7 @@ has '_avg_freq_for' => (
     },
 );
 
+const my $PREC => 3;
 
 ## no critic (ProhibitUnusedPrivateSubroutines)
 
@@ -117,21 +119,25 @@ sub store {
     say {$out} join "\t", 'site', 'f(i,.)', @ids;
 
     # output average freqs (over sites)
-    say {$out} join "\t", 'f(.,j)', q{}, map { $self->avg_freq_for($_) } @ids;
+    say {$out} join "\t", 'f(.,j)', q{},
+        map { sprintf "%.${PREC}f", $self->avg_freq_for($_) } @ids;
 
     # setup rows with site numbers and average freqs (over seqs)
     my @rows = 1..$self->mask_len;
-    my @avg_freqs_at = $self->all_freqs;
+    my @avg_freqs_at = map { sprintf "%.${PREC}f", $_ } $self->all_freqs;
     $_ .= "\t" . shift @avg_freqs_at for @rows;
 
     # assemble freqs by site (one site by row)
     for my $id (@ids) {
-        my @freqs_at = @{ $self->freqs_at_for($id) };
+        my @freqs_at
+            = map { sprintf "%.${PREC}f", $_ } @{ $self->freqs_at_for($id) };
         $_ .= "\t" . shift @freqs_at for @rows;
     }
 
     # output freqs for all sites
     say {$out} $_ for @rows;
+
+    close $out;
 
     return;
 }
@@ -149,7 +155,7 @@ Bio::MUST::Core::SeqMask::Freqs - Arbitrary frequencies for sequence sites
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

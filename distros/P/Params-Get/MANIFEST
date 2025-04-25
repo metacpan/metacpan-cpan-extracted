@@ -12,6 +12,7 @@ t/eol.t
 t/get_params.t
 t/pod-cm.t
 t/pod-coverage.t
+t/pod-synopsis.t
 t/pod.t
 t/validate-strict.t
 t/vars.t

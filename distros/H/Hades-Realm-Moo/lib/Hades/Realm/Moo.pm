@@ -2,7 +2,7 @@ package Hades::Realm::Moo;
 use strict;
 use warnings;
 use base qw/Hades::Realm::OO/;
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -79,7 +79,7 @@ Hades::Realm::Moo - Hades realm for Moo
 
 =head1 VERSION
 
-Version 0.01
+Version 0.08
 
 =cut
 
@@ -185,19 +185,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hades-Realm-Moo>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Hades-Realm-Moo>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hades-Realm-Moo>
 
 =item * Search CPAN
 

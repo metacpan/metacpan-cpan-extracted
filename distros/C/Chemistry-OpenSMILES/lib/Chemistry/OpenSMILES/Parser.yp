@@ -2,6 +2,30 @@
 
 %{
 
+=head1 NAME
+
+Chemistry::OpenSMILES::Parser - OpenSMILES format reader
+
+=head1 SYNOPSIS
+
+    use Chemistry::OpenSMILES::Parser;
+
+    my $parser = Chemistry::OpenSMILES::Parser->new;
+    my @moieties = $parser->parse( 'C#C.c1ccccc1' );
+
+    $\ = "\n";
+    for my $moiety (@moieties) {
+        #  $moiety is a Graph::Undirected object
+        print scalar $moiety->vertices;
+        print scalar $moiety->edges;
+    }
+
+=head1 DESCRIPTION
+
+C<Chemistry::OpenSMILES::Parser> is OpenSMILES format reader.
+
+=cut
+
 use warnings;
 use 5.0100;
 
@@ -15,6 +39,62 @@ use Chemistry::OpenSMILES qw(
 );
 use Graph::Undirected;
 use List::Util qw( any first sum0 );
+
+=head1 METHODS
+
+=head2 C<parse( $smiles, \%options )>
+
+Parses a SMILES string and returns an array of disconnected molecular entities as separate instances of L<Graph::Undirected>.
+Their interpretation is described in detail in L<Chemistry::OpenSMILES>.
+
+=head3 Options
+
+C<parse()> accepts the following options for key-value pairs in an anonymous hash for its second parameter:
+
+=over
+
+=item C<max_hydrogen_count_digits>
+
+In OpenSMILES specification the number of attached hydrogen atoms for atoms in square brackets is limited to 9.
+IUPAC SMILES+ has increased this number to 99.
+With the value of C<max_hydrogen_count_digits> the parser can be instructed to allow other than 1 digit for attached hydrogen count.
+
+=item C<raw>
+
+With C<raw> set to anything evaluating to true, the parser will not convert neither implicit nor explicit hydrogen atoms in square brackets to atom hashes of their own.
+Moreover, it will not attempt to unify the representations of chirality.
+It should be noted, though, that many of subroutines of Chemistry::OpenSMILES expect non-raw data structures, thus processing raw output may produce distorted results.
+In particular, C<write_SMILES()> calls from L<Chemistry::OpenSMILES::Writer|Chemistry::OpenSMILES::Writer> have to be instructed to expect raw data structure:
+
+    write_SMILES( \@moieties, { raw => 1 } );
+
+This option is now deprecated and may be removed in upcoming versions.
+
+=back
+
+=head1 CAVEATS
+
+Deprecated charge notations (C<--> and C<++>) are supported.
+
+OpenSMILES specification mandates a strict order of ring bonds and branches:
+
+    branched_atom ::= atom ringbond* branch*
+
+Chemistry::OpenSMILES::Parser supports both the mandated, and inverted
+structure, where ring bonds follow branch descriptions.
+
+Whitespace is not supported yet. SMILES descriptors must be cleaned of
+it before attempting reading with Chemistry::OpenSMILES::Parser.
+
+The derivation of implicit hydrogen counts for aromatic atoms is not
+unambiguously defined in the OpenSMILES specification. Thus only
+aromatic carbon is accounted for as if having valence of 3.
+
+Chiral atoms with three neighbours are interpreted as having a lone pair of electrons one of its chiral neighbours.
+The lone pair is always understood as being the second in the order of neighbour enumeration, except when the atom with the lone pair starts a chain.
+In that case lone pair is the first.
+
+=cut
 
 %}
 
@@ -34,7 +114,6 @@ chain: atom
 
             $_[1]->{graph} = $g;
             $_[1]->{index} = @{$_[0]->{USER}{GRAPHS}}-1;
-            $_[1]->{first_of_chain} = 1;
 
             return { first => $_[1],
                      last  => $_[1] };
@@ -52,8 +131,6 @@ chain: atom
                                                     'bond',
                                                     ':' );
             }
-
-            delete $_[2]->{first_of_chain};
 
             _push_chirality_neighbour( $_[1]->{last}, $_[2] );
             _push_chirality_neighbour( $_[2], $_[1]->{last} );
@@ -76,8 +153,6 @@ chain: atom
                 $_[3]->{graph}->add_edge( $_[1]->{last}, $_[3] );
             }
 
-            delete $_[3]->{first_of_chain};
-
             _push_chirality_neighbour( $_[1]->{last}, $_[3] );
             _push_chirality_neighbour( $_[3], $_[1]->{last} );
 
@@ -93,7 +168,6 @@ chain: atom
 
             $_[3]->{graph} = $g;
             $_[3]->{index} = @{$_[0]->{USER}{GRAPHS}}-1;
-            $_[3]->{first_of_chain} = 1;
 
             return { first => $_[3],
                      last  => $_[3] };
@@ -113,8 +187,6 @@ chain: atom
                                                           'bond',
                                                           ':' );
             }
-
-            delete $_[3]->{first}{first_of_chain};
 
             _push_chirality_neighbour( $_[1]->{last}, $_[3]->{first} );
             _unshift_chirality_neighbour( $_[3]->{first}, $_[1]->{last} );
@@ -137,8 +209,6 @@ chain: atom
                 $_[1]->{last}{graph}->add_edge( $_[1]->{last},
                                                 $_[4]->{first} );
             }
-
-            delete $_[4]->{first}{first_of_chain};
 
             _push_chirality_neighbour( $_[1]->{last}, $_[4]->{first} );
             _unshift_chirality_neighbour( $_[4]->{first}, $_[1]->{last} );
@@ -337,10 +407,18 @@ sub parse
                                      number => $self->{USER}{ATOMNO} };
                     $graph->add_edge( $atom, $hydrogen );
                     $self->{USER}{ATOMNO} ++;
-                    if( $atom->{first_of_chain} ) {
-                        _unshift_chirality_neighbour( $atom, $hydrogen );
-                    } else {
-                        _push_chirality_neighbour( $atom, $hydrogen );
+                    if( is_chiral $atom ) {
+                        if( $atom->{chirality_neighbours} ) {
+                            if( any { $_->{number} < $atom->{number} } @{$atom->{chirality_neighbours}} ) {
+                                splice @{$atom->{chirality_neighbours}}, 1, 0, $hydrogen;
+                            } else {
+                                _unshift_chirality_neighbour( $atom, $hydrogen );
+                            }
+                        } else {
+                            # This only happens if chiral atom does not have neighbours other than implicit hydrogens.
+                            # This is degenerate case anyway.
+                            _push_chirality_neighbour( $atom, $hydrogen );
+                        }
                     }
                 }
                 delete $atom->{hcount};
@@ -360,17 +438,7 @@ sub parse
                     $atom->{chirality} =~ s/^\@TH1$/@/;
                     $atom->{chirality} =~ s/^\@TH2$/@@/;
                 }
-
-                # Adjust chirality for centers having lone pairs
-                if( is_chiral $atom &&
-                    $atom->{first_of_chain} &&
-                    $atom->{chirality} =~ /^@@?$/ &&
-                    $atom->{chirality_neighbours} &&
-                    scalar @{$atom->{chirality_neighbours}} == 3 ) {
-                    $atom->{chirality} = $atom->{chirality} eq '@' ? '@@' : '@';
-                }
             }
-            delete $atom->{first_of_chain};
         }
     }
 
@@ -396,8 +464,7 @@ sub _add_ring_bond
         $bond = first { defined }
                       ( $self->{USER}{RINGBONDS}{$ring_bond}{bond}, $bond );
 
-        if( $bond && $bond =~ /^[\\\/]$/ &&
-            !defined $self->{USER}{RINGBONDS}{$ring_bond}{bond} ) {
+        if( $bond && !defined $self->{USER}{RINGBONDS}{$ring_bond}{bond} ) {
             # If cis/trans marker is not specified when cis/trans bond is
             # seen first, it has to be inverted:
             $bond = toggle_cistrans $bond;
@@ -476,3 +543,9 @@ sub _unshift_chirality_neighbour
 }
 
 1;
+
+=head1 AUTHORS
+
+Andrius Merkys, E<lt>merkys@cpan.orgE<gt>
+
+=cut

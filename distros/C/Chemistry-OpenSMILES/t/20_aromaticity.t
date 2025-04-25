@@ -8,13 +8,9 @@ use Chemistry::OpenSMILES::Writer qw( write_SMILES );
 use Test::More;
 
 my @cases = (
-    [ 'C1=CC=CC=C1',
-      'c:1(:c(:c(:c(:c(:c:1([H]))([H]))([H]))([H]))([H]))([H])',
-      'C=1(C(=C(C(=C(C=1([H]))([H]))([H]))([H]))([H]))([H])' ],
+    [ 'C1=CC=CC=C1', 'c1ccccc1', 'C=1C=CC=CC=1' ],
 
-    [ 'C1=CC=CC=C1C1=CC=CC=C1',
-      'c:1(:c(:c(:c(:c(:c:1(-c:1(:c(:c(:c(:c(:c:1([H]))([H]))([H]))([H]))([H]))))([H]))([H]))([H]))([H]))([H])',
-      'C=1(C(=C(C(=C(C=1(C=1(C(=C(C(=C(C=1([H]))([H]))([H]))([H]))([H]))))([H]))([H]))([H]))([H]))([H])' ],
+    [ 'C1=CC=CC=C1C1=CC=CC=C1', 'c1ccccc1-c1ccccc1', 'C=1C=CC=CC=1C=1C=CC=CC=1' ],
 );
 
 plan tests => 2 * scalar @cases;

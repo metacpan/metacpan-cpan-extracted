@@ -1,12 +1,12 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.250380';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.251140';
 use Moose::Role;
 
 use autodie;
 use feature qw(say);
 
-use Smart::Comments;
+use Smart::Comments '###';
 
 use Carp;
 use Const::Fast;
@@ -373,6 +373,8 @@ sub store_nbs {
     }
     say {$out} q{};
 
+    close $out;
+
     return;
 }
 
@@ -389,7 +391,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

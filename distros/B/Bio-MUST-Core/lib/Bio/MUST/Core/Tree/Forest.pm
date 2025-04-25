@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Tree::Forest;
 # ABSTRACT: Collection of (bootstrap) trees
-$Bio::MUST::Core::Tree::Forest::VERSION = '0.250380';
+$Bio::MUST::Core::Tree::Forest::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -65,6 +65,8 @@ sub store {
         $_->tree->to_newick( -nodelabels => 0 )     # This might be an issue!
     } $self->all_trees;
 
+    close $out;
+
     return;
 }
 
@@ -81,7 +83,7 @@ Bio::MUST::Core::Tree::Forest - Collection of (bootstrap) trees
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

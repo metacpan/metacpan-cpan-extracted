@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Database::SimpleReader;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 use Geo::Location::IP::Address;
 use Geo::Location::IP::Model::AnonymousIP;
@@ -141,7 +141,7 @@ Geo::Location::IP::Database::SimpleReader - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

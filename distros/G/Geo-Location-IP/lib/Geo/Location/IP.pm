@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 1;
 __END__
@@ -19,7 +19,7 @@ Geo::Location::IP - Map IP addresses to location information
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ None.
 =head1 BUGS AND LIMITATIONS
 
 The distribution uses L<Object::Pad> but will use L<Feature::Compat::Class> as
-soon as Perl supports roles, C<apply> statements and C<ADJUST :params>.
+soon as Perl supports roles.
 
 The differences to GeoIP2 are:
 
@@ -99,6 +99,18 @@ L<Geo::Location::IP::Error::AddressNotFound>.
 
 IP addresses are returned as L<Geo::Location::IP::Address> objects.  The
 objects stringify to the address.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to all who have contributed patches and reported bugs:
+
+=over
+
+=item *
+
+klebom
 
 =back
 

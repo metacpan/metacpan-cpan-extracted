@@ -8,22 +8,22 @@ use Chemistry::OpenSMILES::Writer qw(write_SMILES);
 use Test::More;
 
 my @cases = (
-    [ 'N[C@](Br)(O)C',    1, 1, 'N([C@@](Br)(O)(C))'   ],
-    [ 'N[C@@](Br)(O)C',   1, 1, 'N([C@](Br)(O)(C))'    ],
-    [ 'N(C)(Br)(O)C',     0, 0, 'N(C)(Br)(O)(C)'       ],
-    [ 'N(C)(Br)(O)C',     0, 0, 'N(C)(Br)(O)(C)'       ],
+    [ 'N[C@](Br)(O)C',    1, 1, 'N[C@@](Br)(O)C' ],
+    [ 'N[C@@](Br)(O)C',   1, 1, 'N[C@](Br)(O)C'  ],
+    [ 'N(C)(Br)(O)C',     0, 0, 'N(C)(Br)(O)C'   ],
+    [ 'N(C)(Br)(O)C',     0, 0, 'N(C)(Br)(O)C'   ],
     # Square brackets are retained as in raw mode the writer does not attempt to calculate the valence:
-    [ 'N[C@AL1](Br)(O)C', 1, 0, 'N([C](Br)(O)(C))' ],
+    [ 'N[C@AL1](Br)(O)C', 1, 0, 'N[C](Br)(O)C'   ],
 );
 
 plan tests => 3 * scalar @cases;
 
+my $parser = Chemistry::OpenSMILES::Parser->new;
+
 for my $case (@cases) {
-    my $parser;
     my $moiety;
     my $result;
 
-    $parser = Chemistry::OpenSMILES::Parser->new;
     ( $moiety ) = $parser->parse( $case->[0], { raw => 1 } );
 
     is is_chiral( $moiety ) + 0, $case->[1];

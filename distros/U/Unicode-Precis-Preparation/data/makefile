@@ -1,12 +1,14 @@
 
-UNICODE_VERSION = 6.3.0
+UNICODE_VERSION = 9.0.0
+PERL = perl5.26.0
 
-../precis_preparation.c: precis_preparation.pl
-	perl precis_preparation.pl \
-		precis-tables-$(UNICODE_VERSION).csv \
-		DerivedAge-$(UNICODE_VERSION).txt \
-		UnicodeData-$(UNICODE_VERSION).txt \
-		ArabicShaping-$(UNICODE_VERSION).txt \
-		Scripts-$(UNICODE_VERSION).txt \
+../precis_preparation.c: precis_preparation.pl precis-table.csv
+	$(PERL) precis_preparation.pl \
+		$(UNICODE_VERSION) \
+		precis-table.csv \
 		../precis_preparation.c
+
+precis-table.csv: make_table.pl
+	$(PERL) make_table.pl $(UNICODE_VERSION) > precis-table.csv || \
+	rm -f precis-table.csv
 

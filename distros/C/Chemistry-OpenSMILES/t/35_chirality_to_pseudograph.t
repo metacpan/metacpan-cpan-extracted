@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use Chemistry::OpenSMILES qw(clean_chiral_centers);
 use Chemistry::OpenSMILES::Parser;
 use Chemistry::OpenSMILES::Stereo qw(chirality_to_pseudograph);
 use Chemistry::OpenSMILES::Writer qw(write_SMILES);

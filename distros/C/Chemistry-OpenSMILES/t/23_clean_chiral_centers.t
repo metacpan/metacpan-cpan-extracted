@@ -15,7 +15,7 @@ sub depict
 {
     my( $vertex ) = @_;
     if( ref $vertex && exists $vertex->{symbol} ) {
-        return &write_SMILES;
+        return write_SMILES( $vertex, { chirality => undef } );
     } else {
         return '';
     }

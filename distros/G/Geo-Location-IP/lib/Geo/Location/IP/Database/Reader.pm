@@ -11,7 +11,7 @@ use Object::Pad;
 class Geo::Location::IP::Database::Reader
     :isa(Geo::Location::IP::Database::SimpleReader);
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 use Geo::Location::IP::Address;
 use Geo::Location::IP::Error::Generic;
@@ -83,13 +83,15 @@ method isp ($key, $ip) {
 
 our $private_ip_address_regex = qr{
     \A
-    10\.
-    |
-    172\.(?:1[6-9]|2[0-9]|3[01])\.
-    |
-    192\.168\.
-    |
-    f[cd]
+    (?:
+        10\.
+        |
+        172\.(?:1[6-9]|2[0-9]|3[01])\.
+        |
+        192\.168\.
+        |
+        f[cd]
+    )
 }xms;
 
 method _assert_database_type ($type_regex) {
@@ -110,7 +112,7 @@ method _assert_ip_address ($key, $ip) {
         my $method  = (caller(1))[3] =~ s{.+::}{}r;
         my $message = "Required param (ip) was missing when calling $method "
             . "on $class";
-            Geo::Location::IP::Error::Generic->throw(message => $message);
+        Geo::Location::IP::Error::Generic->throw(message => $message);
     }
     if ($ip eq 'me') {
         my $class   = ref $self;
@@ -162,7 +164,7 @@ Geo::Location::IP::Database::Reader - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

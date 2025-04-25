@@ -1,4 +1,4 @@
-package FU::SQL 0.4;
+package FU::SQL 0.5;
 use v5.36;
 use Exporter 'import';
 use Carp 'confess';
@@ -124,7 +124,7 @@ changes, see the main L<FU> module for details.
 
 =head1 DESCRIPTION
 
-=head2 Compiling SQL
+=head1 Compiling SQL
 
 All functions listed under L</"Constructing SQL"> return an object that can be
 passed to other construction functions or compiled into SQL and bind
@@ -165,7 +165,7 @@ for details.
 
 =back
 
-=head2 Constructing SQL
+=head1 Constructing SQL
 
 All of the functions below return an object with a C<compile()> method. All
 functions are exported by default.

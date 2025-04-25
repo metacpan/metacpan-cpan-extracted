@@ -7,11 +7,19 @@ use warnings;
 
 use base qw( Alien::Base );
 
-our $VERSION = 'v4.4.0.2';
-use constant
-  CFITSIO_VERSION => 4.04;
+our $VERSION = 'v4.6.2.4';
 
-  1;
+BEGIN {
+    our $VERSION = 'v4.6.2.4'; # VERSION is automatically inserted at dist create time; need it at compile time
+}
+
+use constant CFITSIO_VERSION => do {
+    my @V = $VERSION =~ /(\d+)(?:[.]|$)/g;
+    pop @V;
+    $V[0] + ( $V[1] + $V[2] / 100 ) / 100;
+};
+
+1;
 
 #
 # This file is part of Alien-CFITSIO
@@ -35,7 +43,7 @@ Alien::CFITSIO - Build and Install the CFITSIO library
 
 =head1 VERSION
 
-version v4.4.0.2
+version v4.6.2.4
 
 =head1 SYNOPSIS
 
@@ -44,7 +52,7 @@ version v4.4.0.2
 =head1 DESCRIPTION
 
 This module finds or builds the L<CFITSIO|https://heasarc.gsfc.nasa.gov/docs/software/fitsio/fitsio.html> library.  It supports CFITSIO
-version 4.4.0.
+version 4.6.2.
 
 =head1 USAGE
 
@@ -57,7 +65,7 @@ C<ALIEN_CFITSIO_ATLEAST_VERSION> may be used during installation to
 install a specific version of CFITSIO or any version greater or equal
 to a specific version.
 
-By default, B<Alien::CFITSIO> will install CFITSIO version 4.4.0.
+By default, B<Alien::CFITSIO> will install CFITSIO version 4.6.2.
 
 =head1 SUPPORT
 

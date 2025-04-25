@@ -1,4 +1,4 @@
-package FU::MultipartFormData 0.4;
+package FU::MultipartFormData 0.5;
 use v5.36;
 use Carp 'confess';
 use FU::Util 'utf8_decode';
@@ -77,7 +77,7 @@ sub syswrite($o, $fh) {
 
 sub save($o, $fn) {
     open my $F, '>', $fn or confess "Error opening '$fn': $!";
-    $o->syswrite($F) or confess "Error writing to '$fn': $!";
+    defined $o->syswrite($F) or confess "Error writing to '$fn': $!";
 }
 
 sub describe($o) {
@@ -121,7 +121,7 @@ C<multipart/form-data>, which is typically used to handle file uploads.
 The entire request body is assumed to be in memory as a Perl string, but this
 module makes an attempt to avoid any further copies of data values.
 
-=head2 Parsing
+=head1 Parsing
 
 =over
 
@@ -138,7 +138,7 @@ tried.
 
 =back
 
-=head2 Field Object
+=head1 Field Object
 
 Each field is parsed into a field object that supports the following methods:
 

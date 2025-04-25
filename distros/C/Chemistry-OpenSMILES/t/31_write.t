@@ -7,7 +7,7 @@ use Chemistry::OpenSMILES::Writer qw(write_SMILES);
 use Test::More;
 
 my @cases = (
-    [ '[CH:4](=[CH:3]/[C:2][O:1])\[C:5][O:6]', '[C:4](=[C:3](/[C:2]([O:1]))([H]))(\[C:5]([O:6]))([H])', '[H]([C:3](/[C:2]([O:1]))(=[C:4]([H])(\[C:5]([O:6]))))', '[O:1]([C:2](\[C:3](=[C:4](\[C:5]([O:6]))([H]))([H])))' ],
+    [ '[CH:4](=[CH:3]/[C:2][O:1])\[C:5][O:6]', '[C:4](=[C:3](/[C:2][O:1])[H])(\[C:5][O:6])[H]', '[H][C:3](/[C:2][O:1])=[C:4]([H])\[C:5][O:6]', '[O:1][C:2]\[C:3](=[C:4](\[C:5][O:6])[H])[H]' ],
 );
 
 plan tests => 3 * scalar @cases;
@@ -20,13 +20,15 @@ for my $case (@cases) {
     $parser = Chemistry::OpenSMILES::Parser->new;
     @moieties = $parser->parse( $case->[0] );
 
-    $result = write_SMILES( \@moieties );
+    $result = write_SMILES( \@moieties, { unsprout_hydrogens => '' } );
     is $result, $case->[1];
 
-    $result = write_SMILES( \@moieties, { order_sub => \&reverse_order } );
+    $result = write_SMILES( \@moieties, { unsprout_hydrogens => '',
+                                          order_sub => \&reverse_order } );
     is $result, $case->[2];
 
-    $result = write_SMILES( \@moieties, { order_sub => \&class_order } );
+    $result = write_SMILES( \@moieties, { unsprout_hydrogens => '',
+                                          order_sub => \&class_order } );
     is $result, $case->[3];
 }
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Hash::ExtendedKeys::Tie;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use overload '%{}' => sub { ${$_[0]}->{hash}; }, fallback => 1;
 
@@ -27,7 +27,7 @@ Hash::ExtendedKeys - Hash Keys
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -105,7 +105,7 @@ L<https://metacpan.org/release/Hash-ExtendedKeys>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021->2024 by LNATION.
+This software is Copyright (c) 2021->2025 by LNATION.
 
 This is free software, licensed under:
 

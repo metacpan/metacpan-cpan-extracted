@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use base 'Import::Export';
 
@@ -30,7 +30,7 @@ Data::LnArray::XS - Arrays
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -316,10 +316,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-LnArray-XS>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Data-LnArray-XS>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Data-LnArray-XS>
@@ -330,7 +326,7 @@ L<https://metacpan.org/release/Data-LnArray-XS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by LNATION.
+This software is Copyright (c) 2024->2025 by LNATION.
 
 This is free software, licensed under:
 

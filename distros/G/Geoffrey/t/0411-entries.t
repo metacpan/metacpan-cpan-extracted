@@ -38,13 +38,13 @@ is(
         [ { client => 1, name => 'test_name' } ],
 
     ),
-    q~UPDATE "user" SET client = ?, name = ? WHERE ( name = ? )~,
+    q~UPDATE "user" SET client = ?, name = ? WHERE name = ?~,
     'Alter entry test'
 );
 
 is(
     $object->drop( { table => '"user"', conditions => { name => q~'test'~ } } ),
-    q~DELETE FROM "user" WHERE ( name = ? )~,
+    q~DELETE FROM "user" WHERE name = ?~,
     'Delete entry test'
 );
 

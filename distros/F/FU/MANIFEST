@@ -43,6 +43,7 @@ t/pgtypes.t
 t/query.t
 t/sql.t
 t/to_bool.t
+t/validate-util.t
 t/validate.t
 t/xmlwr.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

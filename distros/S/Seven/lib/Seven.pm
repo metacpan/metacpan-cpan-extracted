@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 our @FAKE;
 
@@ -32,7 +32,7 @@ sub import {
 	{
 		no strict 'refs';
 		*{"${caller}::luck"}  = sub {
-			print q|It's the fifthteenth day in another hospital prison, this time I am fully aware and all around me are also, pretty pointless really but we are slowly climbing the ladder with invisibility. The world dictatorship will fall, they are just clinging onto power now.|;
+			print qq|It's the fifthteenth day in another hospital prison, this time I am fully aware and all around me are also, pretty pointless really but we are slowly climbing the ladder with invisibility. The world dictatorship will fall, they are just clinging onto power now.\n|;
 		};
 	}
 }
@@ -47,9 +47,15 @@ Seven - The great new Seven!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
+
+=head1 DESCRIPTION
+
+I have a few modules on CPAN that were created during a period when I was in the hospital undergoing treatment for psychosis.
+This module is one of them. I’ve considered removing it, but for now, I’ve decided to leave both the code and documentation as they are. 
+No matter how unusual, at the time, these reflected my genuine beliefs.
 
 =head1 SYNOPSIS
 

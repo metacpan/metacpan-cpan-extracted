@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.250380';
+$Bio::MUST::Core::IdList::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -266,6 +266,8 @@ sub store {
     print {$out} $self->header;
     say {$out} join "\n", $self->all_ids;
 
+    close $out;
+
     return;
 }
 
@@ -280,6 +282,8 @@ sub store_lis {
     print {$out} $self->header;
     say {$out} $self->count_ids;
     say {$out} join "\n", $self->all_ids;
+
+    close $out;
 
     return;
 }
@@ -297,7 +301,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

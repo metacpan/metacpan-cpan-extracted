@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Mojo::Base -base;
 use Module::Load qw/load/;
@@ -45,7 +45,7 @@ WebService::UK::Parliament - Query the UK Parliament API
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -179,10 +179,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-UK-Parliament>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/WebService-UK-Parliament>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/WebService-UK-Parliament>
@@ -195,7 +191,7 @@ L<https://metacpan.org/release/WebService-UK-Parliament>
 
 The first ticehurst bathroom experience
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

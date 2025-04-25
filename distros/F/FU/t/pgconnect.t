@@ -17,7 +17,9 @@ okerr FATAL => connect => qr/missing "=" after "invalid"/;
 
 ok FU::Pg::lib_version() > 100000;
 
-my $conn = FU::Pg->connect($ENV{FU_TEST_DB})->text->cache(0);
+my $conn = FU::Pg->connect($ENV{FU_TEST_DB});
+$conn->text;
+$conn->cache(0);
 $conn->_debug_trace(0);
 
 is ref $conn, 'FU::Pg::conn';
@@ -353,8 +355,20 @@ subtest 'txn', sub {
     is_deeply $st->val, [1,3], 'not deep copy';
 }
 
+
+{
+    # Exact format returned by escape_literal() can differ between Postgres versions and configurations.
+    my $x = q{"' \" \\};
+    is $conn->q('SELECT '.$conn->escape_literal($x))->val, $x;
+
+    # Format can also change, but unsure how to test this otherwise.
+    is $conn->escape_identifier('hel\l"o'), '"hel\l""o"';
+}
+
 subtest 'Prepared statement cache', sub {
-    my $txn = $conn->cache_size(2)->txn->cache;
+    $conn->cache_size(2);
+    my $txn = $conn->txn;
+    $txn->cache;
     my sub numexec($sql) {
         $txn->q('SELECT generic_plans + custom_plans FROM pg_prepared_statements WHERE statement = $1', $sql)->cache(0)->val
     }

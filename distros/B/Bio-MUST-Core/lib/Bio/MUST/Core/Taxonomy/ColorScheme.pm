@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Taxonomy::ColorScheme;
 # ABSTRACT: Helper class providing color scheme for taxonomic annotations
-# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.250380';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
+$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -232,6 +232,8 @@ sub store {
         say {$out} join "\t", $name, $color;
     }
 
+    close $out;
+
     return;
 }
 
@@ -248,7 +250,7 @@ Bio::MUST::Core::Taxonomy::ColorScheme - Helper class providing color scheme for
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 
@@ -276,7 +278,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =for stopwords Valerian LUPO
 
-Valerian LUPO <valerian.lupo@doct.uliege.be>
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

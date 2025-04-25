@@ -4,13 +4,13 @@
       "Mario Zieschang <mziescha@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geoffrey",
    "no_index" : {
@@ -56,10 +56,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com/GeoffreyDB/Geoffrey.git",
-         "web" : "https://gitlab.com/GeoffreyDB/Geoffrey"
+         "url" : "https://codeberg.org/GeoffreyDB/Geoffrey.git",
+         "web" : "https://codeberg.org/GeoffreyDB/Geoffrey"
       }
    },
-   "version" : "0.000205",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.000206",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

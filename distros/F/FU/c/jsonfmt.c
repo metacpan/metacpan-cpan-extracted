@@ -289,10 +289,10 @@ static SV *fujson_fmt_xs(pTHX_ I32 ax, I32 argc, SV *val) {
         r = ST(i);
         i++;
 
-        if (strcmp(arg, "canonical") == 0) ctx.canon = SvPVXtrue(r);
-        else if (strcmp(arg, "pretty") == 0) ctx.pretty = SvPVXtrue(r) ? 0 : INT_MIN;
-        else if (strcmp(arg, "html_safe") == 0) ctx.htmlsafe = !!SvPVXtrue(r);
-        else if (strcmp(arg, "utf8") == 0) encutf8 = SvPVXtrue(r);
+        if (strcmp(arg, "canonical") == 0) ctx.canon = SvTRUEx(r);
+        else if (strcmp(arg, "pretty") == 0) ctx.pretty = SvTRUEx(r) ? 0 : INT_MIN;
+        else if (strcmp(arg, "html_safe") == 0) ctx.htmlsafe = !!SvTRUEx(r);
+        else if (strcmp(arg, "utf8") == 0) encutf8 = SvTRUEx(r);
         else if (strcmp(arg, "max_size") == 0) out.maxlen = SvUV(r);
         else if (strcmp(arg, "max_depth") == 0) ctx.depth = SvUV(r);
         else croak("Unknown flag: '%s'", arg);

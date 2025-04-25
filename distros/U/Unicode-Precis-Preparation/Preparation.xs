@@ -64,7 +64,7 @@ _prepare(string, stringclass = 0, unicode_version = 0)
 	    XSRETURN_EMPTY;
 	}
 
-	if (unicode_version < 0 || 0xFF < unicode_version)
+	if (unicode_version < 0 || 0xFFFF < unicode_version)
 	    XSRETURN_EMPTY;
 
 	switch (GIMME_V) {

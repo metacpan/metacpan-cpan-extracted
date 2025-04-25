@@ -7,7 +7,7 @@ use JSON;
 use Colouring::In;
 use Image::Scale;
 use Cwd qw/abs_path/;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our (%TOOL, %MANIFEST_SCHEMA);
 BEGIN {
 	%TOOL = (
@@ -434,7 +434,7 @@ Progressive::Web::Application - Utility for making an application 'progressive'
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -1222,14 +1222,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Progressive-Web-Application>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Progressive-Web-Application>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Progressive-Web-Application>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Progressive-Web-Application/>
@@ -1240,7 +1232,7 @@ L<http://search.cpan.org/dist/Progressive-Web-Application/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 LNATION.
+Copyright 2019->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

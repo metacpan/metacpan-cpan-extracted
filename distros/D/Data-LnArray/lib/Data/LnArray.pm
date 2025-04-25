@@ -2,7 +2,7 @@ package Data::LnArray;
 use strict;
 no warnings;
 use base 'Import::Export';
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our %EX = (
         arr => [qw/all/],
@@ -389,7 +389,7 @@ Data::LnArray - The great new Data::LnArray!
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -670,19 +670,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-LnArray>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Data-LnArray>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Data-LnArray>
 
 =item * Search CPAN
 
@@ -697,7 +689,7 @@ L<https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objec
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2025 by LNATION.
 
 This is free software, licensed under:
 

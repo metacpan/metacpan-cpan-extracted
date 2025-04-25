@@ -1,5 +1,33 @@
 Revision history for Perl extension Unicode::Precis::Preparation.
 
+2025.004  Thu Apr 24 2025
+!Preparation.xs
+!data/precis_preparation.pl
+!lib/POD2/JA/Unicode/Precis/Preparation.pod
+!lib/Unicode/Precis/Preparation.pm
+!ppport.h
+!precis_preparation.c
+!precis_preparation.h
+!t/01utf8.t
+  - Fix: CPAN RT #164343: Unable to work with Unicode 16; tests will fail
+    with perl-5.42
+  - Applied Unicode 16.0.0.
+  - Small updates on docs.
+
+0.999_01  Sat Mar 24 2018
+! README
+! data/makefile
++ data/make_table.pl
+! data/precis_preparation.pl
+! lib/POD2/JA/Unicode/Precis/Preparation.pod
+! lib/Unicode/Precis/Preparation.pm
+! precis_preparation.c
+  - Caught up RFC 8264.
+  - Applied Unicode 9.0.0.
+  - Use properties provided by Perl to generate property maps.
+  - Fix: Correct misleadingly assigned Joining_Type property.
+  - Doc: Added "Unicode versions".
+
 0.01  Sat Jun 13 2015
 ! lib/POD2/JA/Unicode/Precis/Preparation.pod
 ! lib/Unicode/Precis/Preparation.pm

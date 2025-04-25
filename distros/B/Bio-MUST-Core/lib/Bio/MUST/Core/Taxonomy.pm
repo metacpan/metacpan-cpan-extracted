@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.250380';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -1697,6 +1697,7 @@ sub _make_gca_files {
             $name_for{$accession} = $org;
             $node_for{$accession} = $species_taxon_id;
         }
+
         close $fh;
     }
 
@@ -1714,6 +1715,8 @@ sub _make_gca_files {
             $rank_for{$fix_for{$taxon_id}{name_for}} = $rank_for{$taxon_id};
     }
 
+    close $names_out;
+
     # write nodes.dmp
     my $nodes_gca_file = file($tax_dir, 'gca0-nodes.dmp');
     open my $nodes_out, '>', $nodes_gca_file;
@@ -1726,6 +1729,8 @@ sub _make_gca_files {
         say {$nodes_out} join $FS, $taxon_id, $fix_for{$taxon_id}{node_for},
             $rank_for{$taxon_id};
     }
+
+    close $nodes_out;
 
     return;
 }
@@ -1996,6 +2001,11 @@ sub _setup_gtdb_taxdir {
         ### Successfully wrote GCA-based files!
     }
 
+    close $name_out;
+    close $node_out;
+    close $gcaname_out;
+    close $gcanode_out;
+
     return;
 }
 
@@ -2091,7 +2101,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

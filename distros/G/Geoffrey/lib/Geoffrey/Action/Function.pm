@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Action::Function::VERSION = '0.000205';
+$Geoffrey::Action::Function::VERSION = '0.000206';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -67,7 +67,7 @@ Geoffrey::Action::Function - Action for functions
 
 =head1 VERSION
 
-Version 0.000205
+Version 0.000206
 
 =head1 DESCRIPTION
 

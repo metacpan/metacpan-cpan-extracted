@@ -1,4 +1,4 @@
-package FU::Log 0.4;
+package FU::Log 0.5;
 use v5.36;
 use Exporter 'import';
 use POSIX 'strftime';
@@ -89,7 +89,7 @@ interface either; the entire point of this module is that it only handles
 process-global logging. This module mainly exists for users of the L<FU>
 framework.
 
-=head2 Configuration
+=head1 Configuration
 
 =over
 
@@ -119,7 +119,7 @@ is then used instead. This is to avoid recursion.
 
 =back
 
-=head2 Exportable function
+=head1 Exportable function
 
 =over
 

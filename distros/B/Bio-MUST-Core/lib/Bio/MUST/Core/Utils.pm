@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Utils;
 # ABSTRACT: Utility functions for enabling multiple file processing
-$Bio::MUST::Core::Utils::VERSION = '0.250380';
+$Bio::MUST::Core::Utils::VERSION = '0.251140';
 use strict;
 use warnings;
 use autodie;
@@ -61,8 +61,8 @@ sub append_suffix {
 
 sub cmp_store {
     my %args = @_;
-    my ($obj, $method, $file, $test, $args)
-        = @args{ qw(obj method file test args) };
+    my ($obj, $method, $file, $test, $args, $filter)
+        = @args{ qw(obj method file test args filter) };
 
     $args //= {};               # optional hash reference
 
@@ -78,7 +78,10 @@ sub cmp_store {
     $outfile //= $obj->$method($args);
 
     # compare file contents
-    compare_ok($outfile, file('test', $file), "$test: $file");
+    compare_ok(       $outfile, file('test', $file),          "$test: $file")
+        unless $filter;
+    compare_filter_ok($outfile, file('test', $file), $filter, "$test: $file")
+        if     $filter;
 
     return;
 }
@@ -105,7 +108,7 @@ Bio::MUST::Core::Utils - Utility functions for enabling multiple file processing
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

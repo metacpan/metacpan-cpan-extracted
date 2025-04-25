@@ -1,3 +1,6 @@
+1.003     2025-04-25 05:28:15 EDT
+  - Replace Crypt::URandom with Crypt::SysRandom for generating random bytes.
+
 1.002     2025-01-14 20:56:30 EST
   - Simpler generation of nonce from random bytes.
 

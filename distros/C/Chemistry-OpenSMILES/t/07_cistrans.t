@@ -7,17 +7,17 @@ use Chemistry::OpenSMILES::Writer qw(write_SMILES);
 use Test::More;
 
 my @cases = (
-    [ 'Br/C=C/F', 'Br(/C(=C(/F)))', 'F(\C(=C(\Br)))' ],
-    [ 'C(\Br)=C/F', 'C(\Br)(=C(/F))', 'F(\C(=C(\Br)))' ],
-    [ 'Br\C=C/F', 'Br(\C(=C(/F)))', 'F(\C(=C(/Br)))' ],
-    [ 'C(/Br)=C/F', 'C(/Br)(=C(/F))', 'F(\C(=C(/Br)))' ],
+    [ 'Br/C=C/F', 'Br/C=C/F', 'F\C=C\Br' ],
+    [ 'C(\Br)=C/F', 'C(\Br)=C/F', 'F\C=C\Br' ],
+    [ 'Br\C=C/F', 'Br\C=C/F', 'F\C=C/Br' ],
+    [ 'C(/Br)=C/F', 'C(/Br)=C/F', 'F\C=C/Br' ],
     # Adapted from COD entry 1100225:
     [ 'Cl/C(=C\1COCN1)C',
-      'Cl(/C(=C\1(C(O(C(N/1)))))(C))',
-      'C(C(=C1(\N(C(O(C1)))))(\Cl))' ],
+      'Cl/C(=C\1COCN/1)C',
+      'CC(=C1\NCOC1)\Cl' ],
     # The following two cases are synonymous:
-    [ 'C\1CCOC/1=C/O', 'C\1(C(C(O(C/1(=C(/O))))))', 'O(\C(=C/1(O(C(C(C\1))))))' ],
-    [ 'C1CCOC/1=C/O',  'C\1(C(C(O(C/1(=C(/O))))))', 'O(\C(=C/1(O(C(C(C\1))))))' ],
+    [ 'C\1CCOC/1=C/O', 'C\1CCOC/1=C/O', 'O\C=C/1OCCC\1' ],
+    [ 'C1CCOC/1=C/O',  'C\1CCOC/1=C/O', 'O\C=C/1OCCC\1' ],
 );
 
 plan tests => 2 * scalar @cases;

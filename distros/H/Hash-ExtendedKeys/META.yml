@@ -22,5 +22,5 @@ requires:
   Hash::Util: '0.25'
   Struct::Match: '1.00'
   perl: '5.010'
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

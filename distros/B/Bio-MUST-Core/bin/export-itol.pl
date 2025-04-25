@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: export-itol.pl
 # ABSTRACT: Download formatted trees from iTOL
-# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
@@ -145,7 +145,7 @@ export-itol.pl - Download formatted trees from iTOL
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 USAGE
 
@@ -231,7 +231,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =for stopwords Valerian LUPO
 
-Valerian LUPO <valerian.lupo@doct.uliege.be>
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

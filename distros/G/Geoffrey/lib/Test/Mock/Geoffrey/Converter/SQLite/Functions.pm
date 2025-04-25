@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Test::Mock::Geoffrey::Converter::SQLite::Functions::VERSION = '0.000205';
+$Test::Mock::Geoffrey::Converter::SQLite::Functions::VERSION = '0.000206';
 
 use parent 'Geoffrey::Role::ConverterType';
 

@@ -53,7 +53,7 @@ static int fufdpass_recv(pTHX_ I32 ax, int socket, size_t len) {
     msg.msg_controllen = sizeof(cmsgbuf.buf);
     msg.msg_flags = 0;
 
-    ssize_t r = recvmsg(socket, &msg, 0);
+    ssize_t r = recvmsg(socket, &msg, MSG_CMSG_CLOEXEC);
     if (r < 0) {
         ST(0) = &PL_sv_undef;
         ST(1) = &PL_sv_undef;
@@ -71,6 +71,7 @@ static int fufdpass_recv(pTHX_ I32 ax, int socket, size_t len) {
     }
 
     SvCUR_set(buf, r);
+    SvPVX(buf)[r] = 0;
     ST(1) = buf;
     return 2;
 }

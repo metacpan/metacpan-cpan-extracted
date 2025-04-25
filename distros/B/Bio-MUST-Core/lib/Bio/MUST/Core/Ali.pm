@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.250380';
+$Bio::MUST::Core::Ali::VERSION = '0.251140';
 use Moose;
 use namespace::autoclean;
 
@@ -464,6 +464,8 @@ sub store {                                 ## no critic (RequireArgUnpacking)
         say {$out} $seq->seq;
     }
 
+    close $out;
+
     return;
 }
 
@@ -497,6 +499,8 @@ sub store_fasta {
         $str =~ s{$GAP}{-}xmsg if $is_aligned;      # restore '-' when aligned
         print {$out} $str;
     }
+
+    close $out;
 
     return;
 }
@@ -700,6 +704,8 @@ sub store_phylip {
         }
     }
 
+    close $out;
+
     return;
 }
 
@@ -860,6 +866,8 @@ sub instant_store {
         print {$out} $coderef->($new_seq);
     }
 
+    close $out;
+
     return;
 }
 
@@ -889,7 +897,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 SYNOPSIS
 

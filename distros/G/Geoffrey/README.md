@@ -1,8 +1,5 @@
 Geoffrey - Continuous Database Migration 
 
-[![Build Status](https://travis-ci.org/GeoffreyDB/Geoffrey.svg?branch=master)](https://travis-ci.org/GeoffreyDB/Geoffrey)
-[![Coverage Status](https://coveralls.io/repos/github/GeoffreyDB/Geoffrey/badge.svg)](https://coveralls.io/github/GeoffreyDB/Geoffrey)
-
 A package which allows a continuous development with an application that hold the appropriate database system synchronously.
 
 MOTIVATION

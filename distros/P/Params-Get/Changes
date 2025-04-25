@@ -1,5 +1,8 @@
 Revision history for Params-Get
 
+0.03	Thu Apr 24 10:17:51 EDT 2025
+	Allow a ref to an array to be past to reduce size of the stack
+
 0.02	Mon Mar 24 07:43:54 EDT 2025
 	Fewer tests in the code
 

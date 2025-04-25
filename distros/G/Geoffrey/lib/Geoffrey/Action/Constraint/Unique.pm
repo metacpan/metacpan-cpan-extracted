@@ -7,7 +7,7 @@ use warnings;
 use Ref::Util;
 use Time::HiRes qw/ time /;
 
-$Geoffrey::Action::Constraint::Unique::VERSION = '0.000205';
+$Geoffrey::Action::Constraint::Unique::VERSION = '0.000206';
 
 use parent 'Geoffrey::Role::Action';
 
@@ -103,7 +103,7 @@ Geoffrey::Action::Constraint::Unique - Action handler for constraint
 
 =head1 VERSION
 
-Version 0.000205
+Version 0.000206
 
 =head1 DESCRIPTION
 

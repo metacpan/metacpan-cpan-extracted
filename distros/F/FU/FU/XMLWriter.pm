@@ -1,4 +1,4 @@
-package FU::XMLWriter 0.4;
+package FU::XMLWriter 0.5;
 use v5.36;
 use Carp 'confess';
 use Exporter 'import';
@@ -138,7 +138,7 @@ other XML writing modules on CPAN that I tried, but whether this approach is
 faster than typical templating solutions... I've no idea. Check out
 L<FU::Benchmarks> for some benchmarks.
 
-=head2 Top-level functions
+=head1 Top-level functions
 
 These functions all return a byte string with (UTF-8) encoded XML.
 
@@ -170,7 +170,7 @@ passed to the C<tag_()> call for the top-level C<< <html> >> element.
 
 =back
 
-=head2 Output functions
+=head1 Output functions
 
 =over
 
@@ -252,7 +252,7 @@ provided it defaults to C<undef>.
 
 =back
 
-=head2 Utility function
+=head1 Utility function
 
 =over
 
@@ -263,7 +263,7 @@ and C<"> are replaced with their XML entity.
 
 =back
 
-=head2 Import options
+=head1 Import options
 
 All of the functions mentioned in this document can be imported individually.
 There are also two import groups:

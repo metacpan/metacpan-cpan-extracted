@@ -5,7 +5,7 @@ use 5.016;
 use strict;
 use warnings;
 
-$Geoffrey::Template::VERSION = '0.000205';
+$Geoffrey::Template::VERSION = '0.000206';
 
 sub _handle_template {
     my ( $self, $hr_template ) = @_;
@@ -70,7 +70,7 @@ Geoffrey::Template - Allows to implement templates for tables
 
 =head1 VERSION
 
-Version 0.000205
+Version 0.000206
 
 =head1 DESCRIPTION
 

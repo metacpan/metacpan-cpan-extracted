@@ -12,15 +12,15 @@ use Test::More;
 
 my @cases = (
     # Tests from OpenSMILES specification
-    [ 'S[As@TB1](F)(Cl)(Br)N',  [ qw( S As Br Cl F N ) ], 'S([As@TB2](Br)(Cl)(F)(N))' ],
-    [ 'S[As@TB5](F)(N)(Cl)Br',  [ qw( F As S Cl N Br ) ], 'F([As@TB10](S)(Cl)(N)(Br))' ],
-    [ 'F[As@TB15](Cl)(S)(Br)N', [ qw( Br As Cl S F N ) ], 'Br([As@TB20](Cl)(S)(F)(N))' ],
+    [ 'S[As@TB1](F)(Cl)(Br)N',  [ qw( S As Br Cl F N ) ], 'S[As@TB2](Br)(Cl)(F)N'  ],
+    [ 'S[As@TB5](F)(N)(Cl)Br',  [ qw( F As S Cl N Br ) ], 'F[As@TB10](S)(Cl)(N)Br' ],
+    [ 'F[As@TB15](Cl)(S)(Br)N', [ qw( Br As Cl S F N ) ], 'Br[As@TB20](Cl)(S)(F)N' ],
 
     # Local tests
-    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As F Cl Br N ) ], 'S([As@TB20](F)(Cl)(Br)(N))' ],
-    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As Br Cl F N ) ], 'S([As@TB15](Br)(Cl)(F)(N))' ],
-    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As Br N F Cl ) ], 'S([As@TB20](Br)(N)(F)(Cl))' ],
-    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As F N Br Cl ) ], 'S([As@TB15](F)(N)(Br)(Cl))' ],
+    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As F Cl Br N ) ], 'S[As@TB20](F)(Cl)(Br)N' ],
+    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As Br Cl F N ) ], 'S[As@TB15](Br)(Cl)(F)N' ],
+    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As Br N F Cl ) ], 'S[As@TB20](Br)(N)(F)Cl' ],
+    [ 'S[As@TB20](F)(Cl)(Br)N', [ qw( S As F N Br Cl ) ], 'S[As@TB15](F)(N)(Br)Cl' ],
 );
 
 eval 'use Graph::Nauty qw( are_isomorphic )';

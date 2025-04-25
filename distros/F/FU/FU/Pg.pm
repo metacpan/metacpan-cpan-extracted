@@ -1,4 +1,4 @@
-package FU::Pg 0.4;
+package FU::Pg 0.5;
 use v5.36;
 use FU::XS;
 
@@ -61,7 +61,7 @@ FU::Pg is a client module for PostgreSQL with a convenient high-level API and
 support for flexible and complex type conversions. This module interfaces
 directly with C<libpq>.
 
-=head2 Connection setup
+=head1 Connection setup
 
 =over
 
@@ -123,6 +123,17 @@ Connection is dead or otherwise unusable.
 
 =back
 
+=item $conn->escape_literal($str)
+
+Return an escaped version of C<$str> suitable for use as a string literal in an
+SQL statement. You'll rarely need this, it's often better to pass data as bind
+parameters instead.
+
+=item $conn->escape_identifier($str)
+
+Return an escaped version of C<$str> suitable for use as an identifier (name of
+a table, column, function, etc) in an SQL statement.
+
 =item $conn->cache($enable)
 
 =item $conn->text_params($enable)
@@ -173,7 +184,7 @@ attempts to use C<$conn> throw an error.
 
 =back
 
-=head2 Querying
+=head1 Querying
 
 =over
 
@@ -420,7 +431,7 @@ Returns the respective configuration parameters.
 
 
 
-=head2 Transactions
+=head1 Transactions
 
 This module provides a convenient and safe API for I<scoped transactions> and
 I<subtransactions>. A new transaction can be started with C<< $conn->txn >>,
@@ -549,7 +560,7 @@ Just don't try to use transaction objects and manual transaction commands at
 the same time, that won't end well.
 
 
-=head2 Formats and Types
+=head1 Formats and Types
 
 The PostgreSQL wire protocol supports sending bind parameters and receiving
 query results in two different formats: text and binary. While the exact wire
@@ -752,7 +763,7 @@ I<TODO:> Methods to convert between the various formats.
 I<TODO:> Methods to query type info.
 
 
-=head2 COPY support
+=head1 COPY support
 
 You can use L<COPY
 statements|https://www.postgresql.org/docs/current/sql-copy.html> for efficient
@@ -816,7 +827,7 @@ silently discarded. An explicit C<close()> is recommended to catch errors.
 =back
 
 
-=head2 Errors
+=head1 Errors
 
 All methods can throw an exception on error. When possible, the error message
 is constructed using L<Carp>'s C<confess()>, including a full stack trace.

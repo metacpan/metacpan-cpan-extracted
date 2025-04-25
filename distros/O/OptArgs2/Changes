@@ -1,3 +1,20 @@
+v2.0.15 (2025-04-25)
+
+    No changes from v2.0.14.
+
+v2.0.14 (2025-04-24) TRIAL RELEASE
+
+    Enhancements:
+        - StatusLine: Colourable WARN marker for warnings
+
+    Code Maintenance
+        - StatusLine: New tests for localized $status
+        - StatusLine: Code and test refactoring for simplicity
+
+    Dependencies:
+        - Remove Test::Output
+        - Add Capture::Tiny
+
 v2.0.13 (2025-04-04)
 
     No change from v2.0.12.

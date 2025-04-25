@@ -1,7 +1,7 @@
 /*
  * Unicode-Precis-Preparation
  *
- * Copyright (C) 2015 by Hatuka*nezumi - IKEDA Soji
+ * Copyright (C) 2015, 2025 by Hatuka*nezumi - IKEDA Soji
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the same terms as Perl. For more details, see the full text of
@@ -29,5 +29,5 @@ typedef enum {
     PRECIS_DISALLOWED
 } precis_prop_t;
 
-extern int precis_prepare(U8 *, const STRLEN, int, U8, U8 **, STRLEN *,
+extern int precis_prepare(U8 *, const STRLEN, int, U16, U8 **, STRLEN *,
 			  STRLEN *, U32 *);

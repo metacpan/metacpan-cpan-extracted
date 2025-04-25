@@ -19,7 +19,7 @@ our %EXPORT_TAGS = (
 );
 our @EXPORT_OK = @{$EXPORT_TAGS{'all'}};
 
-our $VERSION    = '0.01';
+our $VERSION    = '2025.004';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;    # see L<perlmodstyle>
 
@@ -44,7 +44,7 @@ sub prepare {
         split /[.]/, ($options{UnicodeVersion} || $UnicodeVersion);
     $unicode_minor ||= 0;
 
-    _prepare($string, $stringclass, ($unicode_major << 4) + $unicode_minor);
+    _prepare($string, $stringclass, ($unicode_major << 8) + $unicode_minor);
 }
 
 1;
@@ -54,7 +54,7 @@ __END__
 
 =head1 NAME
 
-Unicode::Precis::Preparation - RFC 7564 PRECIS Framework - Preparation
+Unicode::Precis::Preparation - RFC 8264 PRECIS Framework - Preparation
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ as UTF-8 sequence.
 
 =item $stringclass
 
-One of the constants C<ValidUTF8> (default), C<IdentifierClass> (see RFC 7564)
+One of the constants C<ValidUTF8> (default), C<IdentifierClass> (see RFC 8264)
 or C<FreeFormClass> (ditto).
 
 =item UnicodeVersion =E<gt> $version
@@ -172,17 +172,39 @@ C<PVALID> means successful result.
 None are exported by default.
 prepare() and constants may be exported by C<:all> tag.
 
+=head1 CAVEATS
+
+=head2 Unicode versions
+
+=over
+
+=item String classes
+
+Derived properties are based on Unicode 6.3.0 or later.
+Some characters have imcompatible property values with Unicode prior to 6.0.0
+(See also RFC 6452).
+On the other hand, property values of characters added by Unicode version after
+6.3.0 can be changed in the future.
+
+=item Contextual rules
+
+Character properties referred by contextual rules are based on Unicode version
+that recent version of Perl supports.
+Some characters have imcompatible property values with Unicode 6.3.0.
+
+=back
+
 =head1 RESTRICTIONS
 
 prepare() can not check Unicode string on EBCDIC platforms.
 
 =head1 SEE ALSO
 
-L<Unicode::Precis> - coming late.
+L<Unicode::Precis>.
 
-RFC 7564 I<PRECIS Framework: Preparation, Enforcement, and Comparison of
+RFC 8264 I<PRECIS Framework: Preparation, Enforcement, and Comparison of
 Internationalized Strings in Application Protocols>.
-L<https://tools.ietf.org/html/rfc7564>.
+L<https://tools.ietf.org/html/rfc8264>.
 
 =head1 AUTHOR
 
@@ -190,7 +212,7 @@ Hatuka*nezumi - IKEDA Soji, E<lt>hatuka@nezumi.nuE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Hatuka*nezumi - IKEDA Soji
+Copyright (C) 2015, 2018, 2025 by Hatuka*nezumi - IKEDA Soji
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. For more details, see the full text of

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: import-itol.pl
 # ABSTRACT: Upload trees and associate metadata files to iTOL
-# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
@@ -118,7 +118,7 @@ import-itol.pl - Upload trees and associate metadata files to iTOL
 
 =head1 VERSION
 
-version 0.250380
+version 0.251140
 
 =head1 USAGE
 
@@ -192,7 +192,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =for stopwords Valerian LUPO
 
-Valerian LUPO <valerian.lupo@doct.uliege.be>
+Valerian LUPO <valerian.lupo@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

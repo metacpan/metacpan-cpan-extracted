@@ -28,4 +28,6 @@ ok(!defined $params, 'get_params returns undef with no arguments and no default'
 $params = get_params('key', 'value1', 'value2');
 is_deeply($params, { value1 => 'value2' });
 
+$params = get_params(undef, ['value1', 'value2']);
+is_deeply($params, { value1 => 'value2' });
 done_testing();

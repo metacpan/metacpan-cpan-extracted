@@ -163,7 +163,7 @@ is(
         [
             {
                 changeset =>
-'INSERT INTO geoffrey_changelogs ( comment, created_by, filename, geoffrey_version, id, md5sum) VALUES ( ?, ?, ?, ?, ?, ? )'
+'INSERT INTO geoffrey_changelogs (comment, created_by, filename, geoffrey_version, id, md5sum) VALUES (?, ?, ?, ?, ?, ?)'
             }
         ]
     )->Indent(0)->Terse(1)->Deparse(1)->Sortkeys(1)->Dump,

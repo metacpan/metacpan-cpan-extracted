@@ -1,5 +1,5 @@
 {
-   "abstract" : "Framework Ultimatum: A Lean and Efficient Zero-Dependency Web Framework.",
+   "abstract" : "A Lean and Efficient Zero-Dependency Web Framework.",
    "author" : [
       "Yorhel <projects@yorhel.nl>"
    ],
@@ -42,11 +42,12 @@
          "mailto" : "projects@yorhel.nl",
          "web" : "https://code.blicky.net/yorhel/fu/issues"
       },
+      "homepage" : "https://dev.yorhel.nl/fu",
       "repository" : {
          "type" : "git",
          "web" : "https://code.blicky.net/yorhel/fu"
       }
    },
-   "version" : "0.4",
+   "version" : "0.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

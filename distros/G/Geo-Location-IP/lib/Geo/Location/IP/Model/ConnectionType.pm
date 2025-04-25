@@ -10,7 +10,7 @@ use Object::Pad;
 
 class Geo::Location::IP::Model::ConnectionType;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 apply Geo::Location::IP::Role::HasIPAddress;
 
@@ -36,7 +36,7 @@ Geo::Location::IP::Model::ConnectionType - IP connection details
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

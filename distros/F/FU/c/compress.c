@@ -87,6 +87,7 @@ static SV *fugz_compress_ld(pTHX_ int level, const char *bytes, size_t inlen) {
     size_t len = libdeflate_gzip_compress(fugz_ld_ctx, bytes, inlen, SvPVX(out), outlen);
     if (!len) fu_confess("Libdeflate compression failed"); /* Shouldn't happen */
     SvCUR_set(out, len);
+    SvPVX(out)[len] = 0;
     return out;
 }
 
@@ -110,6 +111,7 @@ static SV *fugz_compress_zlib(pTHX_ int level, const char *bytes, size_t inlen) 
     if ((r = deflate(&stream, 4)) != 1) fu_confess("Zlib compression failed (%d)", r);
 
     SvCUR_set(out, stream.total_out);
+    SvPVX(out)[stream.total_out] = 0;
     deflateEnd(&stream);
     return out;
 }
@@ -157,5 +159,6 @@ static SV *fubr_compress(pTHX_ IV level, SV *in) {
     if (!BrotliEncoderCompress(level, 22, BROTLI_MODE_GENERIC, inlen, bytes, &outlen, SvPVX(out)))
         fu_confess("Brotli compression failed");
     SvCUR_set(out, outlen);
+    SvPVX(out)[outlen] = 0;
     return out;
 }

@@ -11,7 +11,7 @@ use Object::Pad;
 class Geo::Location::IP::Model::Insights
     :isa(Geo::Location::IP::Model::City);
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 1;
 __END__
@@ -24,7 +24,7 @@ Geo::Location::IP::Model::Insights - Records associated with a city
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

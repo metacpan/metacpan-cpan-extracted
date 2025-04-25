@@ -51,11 +51,13 @@ eval { $reader->city(ip => 'fd9e:21a7:a92c:2323::1') };
 like $@, qr{^The IP address you provided [^ ]+ is not a public IP address},
     'private IPv6 address throws exception';
 
-eval { $reader->city(ip => '192.0.2.1') };
-my $e = $@;
-like $e, qr{^No record found for IP address},
-    'unknown address throws exception';
-is $e->ip_address, '192.0.2.1', 'IP address is "192.0.2.1"';
+for my $ip (qw(1.10.0.1 12.172.31.12 123.192.168.123 1fc::1 12fd::1)) {
+    eval { $reader->city(ip => $ip) };
+    my $e = $@;
+    like $e, qr{^No record found for IP address},
+        'unknown address throws exception';
+    is $e->ip_address, $ip, qq{IP address is "$ip"};
+}
 
 ok defined $reader->city(ip => '176.9.54.163'), 'known address succeeds';
 

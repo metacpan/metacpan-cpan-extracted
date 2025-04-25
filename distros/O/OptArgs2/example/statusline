@@ -2,39 +2,46 @@
 use strict;
 use warnings;
 use lib 'lib';
-use OptArgs2::StatusLine '$status', 'RS';
+use OptArgs2::StatusLine '$status', 'RS', 'WARN';
 use Time::HiRes 'sleep';
 
-$|++;
-
 # Just a simple status line
-$status = 'working ... ';
-sleep .5;
+$status = 'start ... ';
+sleep .2;
+$status = '';
 
 my $i = 1;
-foreach ( 0 .. 2 ) {
-    $status .= ' ' . $i++;
-    sleep .8;
-    $status .= "\n" if $_ % 2;    # newlines hang around the terminal
+foreach ( 1 .. 9 ) {
+    $status .= ' ' . $_;
+    sleep .2;
+    $status .= "\n" if 0 == $_ % 5;    # newlines hang around the terminal
 }
 
 # You can localize messages
 {
     local $status = 'this is temporary';
-    sleep 0.9;
+    sleep 0.6;
+
+    $status = WARN . 'Whoops - A warning!';
 
     # You can change the prefix using the Record Separator RS
-    $status = 'My Cool Prefix: ' . RS . 'still temporary';
+    $status = 'My Cool Prefix: ' . RS . 'other work';
     sleep 0.9;
+    $status .= "\n";
 }
 
 # And the original returns automatically
 
-sleep 1.3;
+$status .= ' ..continuing.. ';
+foreach ( 11 .. 15 ) {
+    $status .= ' ' . $_;
+    sleep .15;
+}
+
+$status .= "\n";
 
 # A new prefix
 $status = 'example: ' . RS . "Sort of Done.\n";
-
 sleep 0.9;
 $status .= ' ....';
 $status .= "Really done.\n";

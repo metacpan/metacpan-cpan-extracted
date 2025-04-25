@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::SQLite::Tables::VERSION = '0.000205';
+$Geoffrey::Converter::SQLite::Tables::VERSION = '0.000206';
 
 use parent 'Geoffrey::Role::ConverterType';
 
@@ -48,7 +48,7 @@ Geoffrey::Converter::SQLite::Tables - SQLite converter type for Tables!
 
 =head1 VERSION
 
-Version 0.000205
+Version 0.000206
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -28,6 +28,7 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "Alien::patch" : "0.15",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -36,7 +37,8 @@
             "Alien::Build" : "2.3901",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::PkgConfig::Negotiate" : "1.53",
-            "Alien::patch" : "0.15",
+            "Alien::curl" : "0",
+            "Alien::zlib" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "Sort::Versions" : "0",
             "perl" : "5.010"
@@ -46,9 +48,9 @@
          "requires" : {
             "Alien::Base" : "0",
             "Alien::Build" : "2.3901",
+            "Alien::curl" : "0",
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::AlienBuild" : "0",
-            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
@@ -60,11 +62,13 @@
             "Dist::Zilla::Plugin::GatherDir::Template" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::MetaResources" : "0",
             "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
@@ -75,7 +79,7 @@
             "Dist::Zilla::Plugin::Regenerate" : "0",
             "Dist::Zilla::Plugin::RewriteVersion" : "0",
             "Dist::Zilla::Plugin::RunExtraTests" : "0",
-            "Dist::Zilla::Plugin::Templates" : "0",
+            "Dist::Zilla::Plugin::Templates" : "v0.6.501",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
             "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
@@ -96,19 +100,18 @@
             "Pod::Weaver::Section::Contributors" : "0",
             "Pod::Weaver::Section::GenerateSection" : "0",
             "Pod::Weaver::Section::SeeAlso" : "0",
-            "Pod::Wordlist" : "0",
             "Software::License::GPL_3" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::CleanNamespaces" : "0.15",
             "Test::DistManifest" : "0",
-            "Test::More" : "0.96",
+            "Test::More" : "0.88",
             "Test::NoBreakpoints" : "0.15",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::TrailingSpace" : "0.0203",
             "Test::Vars" : "0",
             "Test::Version" : "2.00"
@@ -116,11 +119,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0",
-            "base" : "0",
-            "constant" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "Alien::Base" : "0"
          }
       },
       "test" : {
@@ -132,18 +131,17 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Package::Stash" : "0",
+            "Package::Stash" : "0.40",
             "Test2::V0" : "0",
             "Test::Alien" : "2.3901",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Alien::CFITSIO" : {
          "file" : "lib/Alien/CFITSIO.pm",
-         "version" : "v4.4.0.2"
+         "version" : "v4.6.2.4"
       }
    },
    "release_status" : "stable",
@@ -158,7 +156,7 @@
          "web" : "https://gitlab.com/djerius/alien-cfitsio"
       }
    },
-   "version" : "v4.4.0.2",
+   "version" : "v4.6.2.4",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
@@ -166,10 +164,10 @@
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Archive::Tar" : "0",
             "Config" : "0",
+            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
-            "Mojo::DOM58" : "1.00",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
@@ -179,8 +177,8 @@
          "system" : {}
       }
    },
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

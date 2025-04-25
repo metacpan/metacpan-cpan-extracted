@@ -1,16 +1,16 @@
 {
-   "abstract" : "RFC 7564 PRECIS Framework - Preparation",
+   "abstract" : "RFC 8264 PRECIS Framework - Preparation",
    "author" : [
       "Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Unicode-Precis-Preparation",
    "no_index" : {
@@ -48,5 +48,6 @@
          "url" : "https://github.com/hatukanezumi/Unicode-Precis-Preparation/"
       }
    },
-   "version" : "0.01"
+   "version" : "2025.004",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

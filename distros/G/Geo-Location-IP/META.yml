@@ -17,94 +17,94 @@ name: Geo-Location-IP
 provides:
   Geo::Location::IP:
     file: lib/Geo/Location/IP.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Address:
     file: lib/Geo/Location/IP/Address.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Database::Reader:
     file: lib/Geo/Location/IP/Database/Reader.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Database::SimpleReader:
     file: lib/Geo/Location/IP/Database/SimpleReader.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Error::AddressNotFound:
     file: lib/Geo/Location/IP/Error/AddressNotFound.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Error::Generic:
     file: lib/Geo/Location/IP/Error/Generic.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::ASN:
     file: lib/Geo/Location/IP/Model/ASN.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::AnonymousIP:
     file: lib/Geo/Location/IP/Model/AnonymousIP.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::City:
     file: lib/Geo/Location/IP/Model/City.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::ConnectionType:
     file: lib/Geo/Location/IP/Model/ConnectionType.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::Country:
     file: lib/Geo/Location/IP/Model/Country.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::Domain:
     file: lib/Geo/Location/IP/Model/Domain.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::Enterprise:
     file: lib/Geo/Location/IP/Model/Enterprise.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::ISP:
     file: lib/Geo/Location/IP/Model/ISP.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Model::Insights:
     file: lib/Geo/Location/IP/Model/Insights.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Network:
     file: lib/Geo/Location/IP/Network.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::City:
     file: lib/Geo/Location/IP/Record/City.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::Continent:
     file: lib/Geo/Location/IP/Record/Continent.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::Country:
     file: lib/Geo/Location/IP/Record/Country.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::Location:
     file: lib/Geo/Location/IP/Record/Location.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::MaxMind:
     file: lib/Geo/Location/IP/Record/MaxMind.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::Postal:
     file: lib/Geo/Location/IP/Record/Postal.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::RepresentedCountry:
     file: lib/Geo/Location/IP/Record/RepresentedCountry.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::Subdivision:
     file: lib/Geo/Location/IP/Record/Subdivision.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Record::Traits:
     file: lib/Geo/Location/IP/Record/Traits.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Role::HasIPAddress:
     file: lib/Geo/Location/IP/Role/HasIPAddress.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Role::HasLocales:
     file: lib/Geo/Location/IP/Role/HasLocales.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Role::Record::HasConfidence:
     file: lib/Geo/Location/IP/Role/Record/HasConfidence.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Role::Record::HasGeoNameId:
     file: lib/Geo/Location/IP/Role/Record/HasGeoNameId.pm
-    version: '0.003'
+    version: '0.004'
   Geo::Location::IP::Role::Record::HasNames:
     file: lib/Geo/Location/IP/Role/Record/HasNames.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   IP::Geolocation::MMDB: '1.011'
   Object::Pad: '0.810'
@@ -118,7 +118,7 @@ resources:
   bugtracker: https://github.com/voegelas/Geo-Location-IP/issues
   homepage: https://github.com/voegelas/Geo-Location-IP/wiki
   repository: https://github.com/voegelas/Geo-Location-IP.git
-version: '0.003'
-x_generated_by_perl: v5.40.1
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.004'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

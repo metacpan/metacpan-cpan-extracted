@@ -31,7 +31,7 @@ dotest('Non-shortest', [result => DISALLOWED, offset => 0], @NONSHORTEST);
 # Incomplete
 my $ok       = 1;
 my @COMPLETE = (
-    "\xC2\x80", "\xDF\xBF", "\xE0\xA0\x80", "\xEF\xA0\x80",
+    "\xC2\x80", "\xDF\xBA", "\xE0\xA0\x80", "\xEF\xA0\x80",
     "\xF0\x90\x80\x80"
 );
 foreach my $uc (@COMPLETE) {

@@ -1,3 +1,9 @@
+0.251140  2025-04-24 20:39:26+02:00 Europe/Brussels
+    - Changes
+      - SeqId: improved generation of MUST ids from NCBI names
+    - Fixes
+      - distribution: tried to fix failing cross-platform tests (cpantesters.org)
+
 0.250380  2025-02-07 22:32:00+01:00 Europe/Brussels
     - Additions
       - binaries: new script resample-ali.pl (for bootstrap and jackknife)

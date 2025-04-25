@@ -28,7 +28,7 @@ on develop => sub {
 };
 
 on test => sub {
-    requires 'POSIX'        => 0;
-    requires 'Test2::V0'    => 0;
-    requires 'Test::Output' => 0;
+    requires 'POSIX'         => 0;
+    requires 'Test2::V0'     => 0;
+    requires 'Capture::Tiny' => 0;
 };

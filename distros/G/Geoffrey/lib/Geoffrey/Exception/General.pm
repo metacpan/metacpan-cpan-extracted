@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp qw/longmess/;
 
-$Geoffrey::Exception::General::VERSION = '0.000205';
+$Geoffrey::Exception::General::VERSION = '0.000206';
 
 use Exception::Class 1.23 (
     'Geoffrey::Exception::General'                   => { description => 'Unidentified exception', },

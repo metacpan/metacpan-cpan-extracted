@@ -722,7 +722,7 @@ if test -n "$testsdir"; then
     fi
 fi
 
-if test -n "$test_dependency_file"; then
+if test -n "$test_dependency_file" && test -e "$test_dependency_file"; then
     cp $test_dependency_file ${workdir}/test-requires.tmp
     cp ${workdir}/test-requires.tmp ${workdir}/test-requires
 else

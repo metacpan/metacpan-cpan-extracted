@@ -10,7 +10,7 @@ use Scalar::Util 'blessed';
 use Role::Tiny::With;
 with 'WWW::OAuth::Request';
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 sub method {
 	my $self = shift;

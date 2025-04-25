@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Types;
-$MIDI::Drummer::Tiny::Types::VERSION = '0.6010';
+$MIDI::Drummer::Tiny::Types::VERSION = '0.6011';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Type library for MIDI::Drummer::Tiny
@@ -64,7 +64,7 @@ MIDI::Drummer::Tiny::Types - Type library for MIDI::Drummer::Tiny
 
 =head1 VERSION
 
-version 0.6010
+version 0.6011
 
 =head1 TYPES
 

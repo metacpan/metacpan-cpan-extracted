@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 use MooX::ReturnModifiers;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub import {
     my ( $package, @import ) = @_;
@@ -91,7 +91,7 @@ MooX::VariantAttribute - a щ（ﾟДﾟщ）Attribute...
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -337,14 +337,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-VariantAttribute>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/MooX-VariantAttribute>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/MooX-VariantAttribute>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/MooX-VariantAttribute/>
@@ -355,7 +347,7 @@ L<http://search.cpan.org/dist/MooX-VariantAttribute/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2025 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

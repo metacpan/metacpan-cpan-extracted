@@ -9,11 +9,11 @@ use List::Util qw( first );
 use Test::More;
 
 my @cases = (
-    [ 'C[Co@](F)(Cl)(Br)(I)S',     [ qw( C Co F Cl Br I S ) ], 'C([Co@OH1](F)(Cl)(Br)(I)(S([H])))([H])([H])([H])'  ],
-    [ 'C[Co@](F)(Cl)(Br)(I)S',     [ qw( F Co S I C Cl Br ) ], 'F([Co@OH2](S([H]))(I)(C([H])([H])([H]))(Cl)(Br))'  ],
-    [ 'S[Co@OH5](F)(I)(Cl)(C)Br',  [ qw( Br Co C S Cl F I ) ], 'Br([Co@OH9](C([H])([H])([H]))(S([H]))(Cl)(F)(I))'  ],
-    [ 'Br[Co@OH12](Cl)(I)(F)(S)C', [ qw( Cl Co C Br F I S ) ], 'Cl([Co@OH15](C([H])([H])([H]))(Br)(F)(I)(S([H])))' ],
-    [ 'Cl[Co@OH19](C)(I)(F)(S)Br', [ qw( I Co Cl Br F S C ) ], 'I([Co@OH27](Cl)(Br)(F)(S([H]))(C([H])([H])([H])))' ],
+    [ 'C[Co@](F)(Cl)(Br)(I)S',     [ qw( C Co F Cl Br I S ) ], 'C([Co@OH1](F)(Cl)(Br)(I)S[H])([H])([H])[H]' ],
+    [ 'C[Co@](F)(Cl)(Br)(I)S',     [ qw( F Co S I C Cl Br ) ], 'F[Co@OH2](S[H])(I)(C([H])([H])[H])(Cl)Br'   ],
+    [ 'S[Co@OH5](F)(I)(Cl)(C)Br',  [ qw( Br Co C S Cl F I ) ], 'Br[Co@OH9](C([H])([H])[H])(S[H])(Cl)(F)I'   ],
+    [ 'Br[Co@OH12](Cl)(I)(F)(S)C', [ qw( Cl Co C Br F I S ) ], 'Cl[Co@OH15](C([H])([H])[H])(Br)(F)(I)S[H]'  ],
+    [ 'Cl[Co@OH19](C)(I)(F)(S)Br', [ qw( I Co Cl Br F S C ) ], 'I[Co@OH27](Cl)(Br)(F)(S[H])C([H])([H])[H]'  ],
 );
 
 eval 'use Graph::Nauty qw( are_isomorphic )';
@@ -41,7 +41,8 @@ for my $case (@cases) {
     $parser = Chemistry::OpenSMILES::Parser->new;
     my( $input_moiety ) = $parser->parse( $input );
 
-    $result = write_SMILES( [ $input_moiety ], { order_sub => $order_sub } );
+    $result = write_SMILES( [ $input_moiety ], { order_sub => $order_sub,
+                                                 unsprout_hydrogens => '' } );
     is $result, $output, $input;
 
     next unless $has_Graph_Nauty;

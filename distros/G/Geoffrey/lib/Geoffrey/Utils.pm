@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Utils::VERSION = '0.000205';
+$Geoffrey::Utils::VERSION = '0.000206';
 
 Readonly::Scalar our $INT_64BIT_SIGNED => 9_223_372_036_854_775_807;
 
@@ -97,7 +97,7 @@ Geoffrey::Utils - Helper snippets
 
 =head1 VERSION
 
-Version 0.000205
+Version 0.000206
 
 =head1 DESCRIPTION
 
