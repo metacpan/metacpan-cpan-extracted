@@ -7,7 +7,7 @@ use Exporter 'import';
 use Carp 'croak';
 
 our @EXPORT_OK = ('analyze');
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 
 
 # Analyzed ("flattened") object:
@@ -53,7 +53,7 @@ sub _merge {
 
 sub _merge_toplevel {
   my($c, $o) = @_;
-  $o->{required} ||= $c->{schema}{required};
+  $o->{required} ||= !exists $c->{schema}{default};
   $o->{unknown}  ||= $c->{schema}{unknown};
   $o->{default}  = $c->{schema}{default} if exists $c->{schema}{default};
   $o->{type} = $c->{schema}{type} if !$o->{type} || $o->{type} eq 'any';
@@ -150,7 +150,7 @@ sub html5_validation {
 sub elm_type {
   my($o, %opt) = @_;
   my $par = delete $opt{_need_parens} ? sub { "($_[0])" } : sub { $_[0] };
-  return $par->('Maybe ' . $o->elm_type(%opt, required => 1, _need_parens => 1)) if !$o->{required} && !defined $o->{default} && !$opt{required};
+  return $par->('Maybe ' . $o->elm_type(%opt, required => 1, _need_parens => 1)) if (ref $o->{default} eq 'CODE' || (!$o->{required} && !defined $o->{default})) && !$opt{required};
   delete $opt{required};
   return 'String' if $o->{type} eq 'scalar';
   return 'Bool'   if $o->{type} eq 'bool';
@@ -188,7 +188,7 @@ sub elm_encoder {
 
   return sprintf '(Maybe.withDefault %snull << Maybe.map %s)',
     $opt{json_encode}, $opt{values} || $o->elm_encoder(%opt, required => 1)
-    if !$o->{required} && !defined $o->{default} && !$opt{required};
+    if (ref $o->{default} eq 'CODE' || (!$o->{required} && !defined $o->{default})) && !$opt{required};
 
   delete $opt{required};
   return "$opt{json_encode}string" if $o->{type} eq 'scalar';

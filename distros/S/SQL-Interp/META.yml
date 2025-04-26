@@ -3,12 +3,12 @@ abstract: 'Interpolate Perl variables into SQL statements'
 author:
   - 'David Manura'
   - 'Mark Stosberg <mark@summersault.com>'
-  - 'Yoran Heling <projects@yorhel.nl>'
+  - 'Yorhel <projects@yorhel.nl>'
 build_requires: {}
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,14 +17,14 @@ name: SQL-Interp
 provides:
   DBIx::Interp:
     file: lib/DBIx/Interp.pm
-    version: '1.27'
+    version: '1.28'
   DBIx::Interp::STX:
     file: lib/DBIx/Interp.pm
   DBIx::Interp::db:
     file: lib/DBIx/Interp.pm
   SQL::Interp:
     file: lib/SQL/Interp.pm
-    version: '1.27'
+    version: '1.28'
   SQL::Interp::SQL:
     file: lib/SQL/Interp.pm
   SQL::Interp::Variable:
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://code.blicky.net/yorhel/SQL-Interp/issues
   license: http://dev.perl.org/licenses/
   repository: https://code.blicky.net/yorhel/SQL-Interp
-version: '1.27'
+version: '1.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

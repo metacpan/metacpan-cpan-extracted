@@ -1,0 +1,34 @@
+Revision history for Perl module gerr
+
+1.1.7  2025-04-25
+    - Fixed distro and title and trace message.
+
+1.1.2  2024-06-29
+    - Initial release to CPAN.
+    - Added error handling and stack trace generation functions.
+    - Ensured UTF-8 support throughout the module.
+    - Made the module compatible with CPAN and PAUSE standards:
+      - Added necessary metadata in Makefile.PL.
+      - Included documentation for all public functions.
+      - Created test suite to verify module functionality.
+      - Provided example usage in the examples directory.
+      - Packaged module with standard CPAN distribution structure.
+
+1.1.1  2017-06-28
+    - Improved error message formatting.
+    - Enhanced stack trace generation with additional details.
+    - Refactored code for better readability and maintainability.
+    - Added additional tests for various edge cases.
+    - Updated documentation for clarity and completeness.
+
+1.0.1  2016-06-27
+    - Fixed bugs related to error message handling.
+    - Added support for custom error types and trace depths.
+    - Improved performance of the trace function.
+    - Enhanced test coverage.
+
+1.0.0  2015-06-26
+    - Initial implementation of the error and trace functions.
+    - Basic tests for core functionality.
+    - Preliminary documentation.
+

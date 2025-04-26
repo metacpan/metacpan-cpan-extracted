@@ -1,0 +1,51 @@
+{
+   "abstract" : "Lightweight logging interface using glog::logger",
+   "author" : [
+      "OnEhIppY <domerosoftware@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "glog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "gerr" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/DomeroSoftware/glog.git"
+      }
+   },
+   "version" : "v1.0.5",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

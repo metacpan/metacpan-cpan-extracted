@@ -3,13 +3,14 @@ package UnidirectionMap;
 use Moo;
 use namespace::autoclean;
 
-has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'unidirection-map.xml') });
+has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'map-unidirection.xml') });
 with 'Map::Tube';
 
 package main;
 
-use 5.006;
-use strict; use warnings;
+use v5.14;
+use strict;
+use warnings;
 use Test::More;
 use Test::Exception tests => 11;
 

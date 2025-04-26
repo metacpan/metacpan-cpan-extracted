@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 use strict;
 use warnings;
@@ -799,7 +799,7 @@ PostgreSQL.  Please inform the author of any incompatibilities.
 
 David Manura is the author of the original L<SQL::Interpolate>, Mark Stosberg
 (L<http://mark.stosberg.com/>) created the SQL::Interp fork. It is now
-maintained by Yoran Heling (L<https://yorhel.nl/>).
+maintained by Yorhel (L<https://yorhel.nl/>).
 
 Also thanks to: Mark Tiefenbruck (syntax), Wojciech Pietron (Oracle compat),
 Jim Chromie (DBIx::Interp idea), Juerd Waalboer, Terrence Brannon (early
@@ -814,7 +814,7 @@ Copyright (c) 2004-2005 David Manura.
 
 Copyright (c) 2005-2019 Mark Stosberg.
 
-Copyright (c) 2019-2021 Yoran Heling.
+Copyright (c) 2019- Yorhel.
 
 This module is free software. It may be used, redistributed
 and/or modified under the same terms as Perl itself.
@@ -859,6 +859,22 @@ C<sql_interp()>-like interpolation list rather than the traditional
 using L<DBIx::Simple|DBIx::Simple> instead-- it even more user friendly.
 
 =head2 Related modules
+
+=head3 SQL::Interpol
+
+L<SQL::Interpol> is a cleaned up fork of this module, removing some lesser-used
+features, reducing implementation size and improving performance along the way
+(I suppose, I haven't benchmarked).
+
+=head3 FU::SQL
+
+L<FU::SQL> follows the same general philosophy as this module but takes a very
+different approach: instead of inferring context from the given SQL string, it
+uses separate functions to indicate context.  And instead of requiring bind
+parameters to be passed by reference, it inspects internal Perl flags to
+determine whether an argument should be an SQL string or a bind parameter.
+Supposedly that is less prone to accidental SQL injection by forgetting to
+C<\>-prefix a function argument.
 
 =head3 SQL::Abstract
 

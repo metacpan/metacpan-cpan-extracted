@@ -3,13 +3,14 @@ package CommonLinesMap;
 use Moo;
 use namespace::autoclean;
 
-has json => (is => 'ro', default => sub { File::Spec->catfile('t', 'common-lines-map.json') });
+has json => (is => 'ro', default => sub { File::Spec->catfile('t', 'map-common-lines.json') });
 with 'Map::Tube';
 
 package main;
 
-use 5.006;
-use strict; use warnings;
+use v5.14;
+use strict;
+use warnings;
 use Test::Map::Tube tests => 1;
 
 my @routes = <DATA>;

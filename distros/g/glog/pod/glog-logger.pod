@@ -1,0 +1,241 @@
+=pod
+
+=head1 NAME
+
+glog::logger - Object-Oriented Logging Implementation
+
+=head1 SYNOPSIS
+
+    use glog::logger;
+
+    # Create a logger instance
+    my $logger = glog::logger->new;
+
+    # Set log level
+    $logger->LogLevel(5);  # Enable debug logging
+
+    # Log messages
+    $logger->LogInfo("Application started");
+    $logger->LogDebug("Debug details: x=42");
+    $logger->LogWarn("Warning: low disk space");
+    $logger->LogErr("Error: cannot open file");
+    $logger->LogDie("Fatal error!");
+
+    # Formatted logging
+    $logger->LogFormat(3, "User %s logged in at %d", "alice", time);
+
+    # Log to a file
+    $logger->LogFile("app.log");
+    $logger->LogInfo("Logging to file");
+    $logger->LogFile(undef);  # Revert to STDERR
+
+=head1 DESCRIPTION
+
+C<glog::logger> is a robust, Pure Perl object-oriented logging module that forms the core of the logging system. It provides a flexible, high-performance logging mechanism for applications requiring structured output at various severity levels (ERROR, WARN, INFO, DEBUG). The module is designed to be lightweight, portable, and easy to integrate into both small scripts and large systems.
+
+C<glog::logger> handles all logging logic, including timestamp generation, message formatting, and output management (to C<STDERR> or a file). It is typically used indirectly through the C<glog> functional interface, but can be instantiated directly for applications needing multiple logger instances or custom configurations.
+
+C<glog::logger> is optimized for speed, reliability, and minimal dependencies, making it an ideal choice for Pure Perl environments.
+
+=head1 METHODS
+
+=over 4
+
+=item * new()
+
+Creates a new C<glog::logger> instance with default settings (log level 3, output to C<STDERR>).
+
+    my $logger = glog::logger->new;
+
+=item * LogLevel($level)
+
+Sets or retrieves the current log level (0-9). If C<$level> is provided, it updates the log level; otherwise, it returns the current level. The default level is 3 (INFO).
+
+    $logger->LogLevel(5);  # Enable DEBUG logging
+    my $current = $logger->LogLevel();  # Get current level
+
+=item * Log($level, $message)
+
+Logs a message at the specified level if it is less than or equal to the current log level. The message is prefixed with a timestamp and level name.
+
+    $logger->Log(3, "Processing started");
+
+=item * LogFormat($level, $format, @args)
+
+Logs a formatted message (using C<sprintf>) at the specified level if allowed by the current log level.
+
+    $logger->LogFormat(3, "Processed %d items in %s", 42, "2s");
+
+=item * LogFile($path)
+
+Configures logging to a file. If C<$path> is provided, logs are appended to the specified file. If C<undef> is passed, logging reverts to C<STDERR>.
+
+    $logger->LogFile("app.log");  # Log to app.log
+    $logger->LogFile(undef);      # Revert to STDERR
+
+=item * LogDie($message)
+
+Logs an ERROR message (level 1) and terminates the program with C<die>.
+
+    $logger->LogDie("Cannot connect to database");
+
+=item * LogWarn($message)
+
+Logs a WARN message (level 2).
+
+    $logger->LogWarn("Configuration file not found, using defaults");
+
+=item * LogInfo($message)
+
+Logs an INFO message (level 3).
+
+    $logger->LogInfo("Server started on port 8080");
+
+=item * LogDebug($message)
+
+Logs a DEBUG message (level 5).
+
+    $logger->LogDebug("Variable x = 42");
+
+=item * LogErr($message)
+
+Logs an ERROR message (level 1) without terminating the program.
+
+    $logger->LogErr("Failed to read input file");
+
+=back
+
+=head1 LOG LEVELS
+
+The module supports the following log levels:
+
+=over 4
+
+=item * 1: ERROR (critical errors)
+
+=item * 2: WARN (warnings)
+
+=item * 3: INFO (informational messages)
+
+=item * 5: DEBUG (detailed debugging information)
+
+=back
+
+Messages are only logged if their level is less than or equal to the current log level set by C<LogLevel>.
+
+=head1 OUTPUT FORMAT
+
+Log messages follow a consistent format:
+
+    [YYYY-MM-DD HH:MM:SS.mmm] LEVEL message
+
+Example output:
+
+    [2025-04-25 20:15:23.456] INFO Application started
+    [2025-04-25 20:15:23.789] ERROR Cannot open file
+
+The timestamp includes millisecond precision, generated using C<Time::HiRes>.
+
+=head1 PERFORMANCE OPTIMIZATIONS
+
+C<glog::logger> is engineered for high performance:
+
+=over 4
+
+=item * **Early Level Checks**: Skips logging if the message level exceeds the current log level, minimizing processing.
+
+=item * **Efficient Timestamps**: Uses C<Time::HiRes> for precise, low-overhead timestamp generation.
+
+=item * **Lightweight Object**: Minimal memory footprint with simple hash-based objects.
+
+=item * **File Handling**: Efficient append-mode file operations with error checking.
+
+=back
+
+=head1 TESTING
+
+The internal C<_test> function validates:
+
+=over 4
+
+=item * Logging at all levels (ERROR, WARN, INFO, DEBUG).
+
+=item * Formatted logging with C<LogFormat>.
+
+=item * File-based logging with C<LogFile>.
+
+=item * Error handling with C<LogDie>.
+
+=back
+
+To run the tests, use a test script that calls C<glog::logger::_test>. The test suite captures and verifies log output, ensuring correct formatting and behavior.
+
+Example test usage:
+
+    use Test::More;
+    ok(glog::logger->_test, "glog::logger internal tests passed");
+    done_testing();
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * No built-in log rotation or advanced file management.
+
+=item * No native threading support; use caution in multi-threaded environments.
+
+=item * File logging is append-only, without automatic size or rotation management.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * C<Time::HiRes> (for high-resolution timestamps)
+
+=item * C<POSIX> (for timestamp formatting)
+
+=item * C<gerr> (for error handling with C<Die>)
+
+=back
+
+No external CPAN dependencies are required beyond these standard modules.
+
+=head1 INTEGRATION WITH DOMERO TOOLS
+
+C<glog::logger> is the core logging engine for the Domero Tools suite, used by modules like C<glog>, C<G::CRC>, C<G::SHA>, and C<G::MD5>. It provides a standardized logging mechanism for debugging, monitoring, and error reporting across the ecosystem.
+
+Example with direct usage:
+
+    use glog::logger;
+    use G::CRC;
+
+    my $logger = glog::logger->new;
+    $logger->LogLevel(5);  # Enable debug
+    my $crc = G::CRC::create('CRC32', "Hello World");
+    $logger->LogInfo("Computed CRC32: $crc");
+    $logger->LogDebug("Validating CRC32...");
+    G::CRC::validate('CRC32', "Hello World", $crc) or $logger->LogDie("CRC mismatch");
+
+=head1 AUTHOR
+
+OnEhIppY <domerosoftware@gmail.com>, Domero Software
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * C<glog> - The functional logging interface built on C<glog::logger>.
+
+=back
+
+=head1 VERSION
+
+1.0.5
+
+=head1 LICENSE
+
+This module is distributed under the MIT License. See the LICENSE file in the distribution for details.
+
+=cut

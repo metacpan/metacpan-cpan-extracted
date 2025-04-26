@@ -7,20 +7,23 @@ use Exporter 'import';
 use Scalar::Util 'blessed';
 
 our @EXPORT_OK = qw/compile validate/;
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 
 
 # Unavailable as custom validation names
 my %builtin = map +($_,1), qw/
   type
-  required default
+  default
   onerror
   rmwhitespace
   values scalar sort unique
-  keys unknown
+  keys unknown missing
   func
 /;
 
+my %type_vals = map +($_,1), qw/scalar hash array any/;
+my %unknown_vals = map +($_,1), qw/remove reject pass/;
+my %missing_vals = map +($_,1), qw/create reject ignore/;
 
 sub _length {
   my($exp, $min, $max) = @_;
@@ -37,9 +40,9 @@ sub _reg {
 }
 
 
-our $re_num       = qr/^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
-my  $re_int       = qr/^-?(?:0|[1-9]\d*)$/;
-our $re_uint      = qr/^(?:0|[1-9]\d*)$/;
+our $re_num       = qr/^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?$/;
+my  $re_int       = qr/^-?(?:0|[1-9][0-9]*)$/;
+our $re_uint      = qr/^(?:0|[1-9][0-9]*)$/;
 my  $re_fqdn      = qr/(?:[a-zA-Z0-9][\w-]*\.)+[a-zA-Z][a-zA-Z0-9-]{1,25}\.?/;
 my  $re_ip4_digit = qr/(?:0|[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/;
 my  $re_ip4       = qr/($re_ip4_digit\.){3}$re_ip4_digit/;
@@ -71,8 +74,8 @@ our %default_validations = (
   maxlength => sub { _length $_[0], undef, $_[0] },
   length    => sub { _length($_[0], ref $_[0] eq 'ARRAY' ? @{$_[0]} : ($_[0], $_[0])) },
 
-  anybool   => { type => 'any', required => 0, default => 0, func => sub { $_[0] = $_[0] ? 1 : 0; 1 } },
-  undefbool => { type => 'any', required => 0, default => undef, func => sub { $_[0] = $_[0] ? 1 : 0; 1 } },
+  anybool   => { type => 'any', default => 0, func => sub { $_[0] = $_[0] ? 1 : 0; 1 } },
+  undefbool => { type => 'any', default => undef, func => sub { $_[0] = $_[0] ? 1 : 0; 1 } },
   jsonbool  => { type => 'any', func => sub {
     my $r = $_[0];
     blessed $r && (
@@ -144,7 +147,7 @@ sub _compile {
       croak "Incompatible types, '$t->[0]' requires '$t->{schema}{type}', but another validation requires '$top{type}'";
     }
     exists $t->{schema}{$_} and !exists $top{$_} and $top{$_} = delete $t->{schema}{$_}
-        for qw/required default onerror rmwhitespace type scalar unknown sort unique/;
+        for qw/default onerror rmwhitespace type scalar unknown missing sort unique/;
 
     push @keys, keys %{ delete $t->{known_keys} };
     push @keys, keys %{ $t->{schema}{keys} } if $t->{schema}{keys};
@@ -179,9 +182,20 @@ sub compile {
   my $c = _compile $validations, $schema, 64;
 
   $c->{schema}{type} //= 'scalar';
-  $c->{schema}{required} //= 1;
-  $c->{schema}{rmwhitespace} //= 1;
+  croak "Invalid value for 'type': $c->{schema}{type}" if !$type_vals{$c->{schema}{type}};
+
+  $c->{schema}{rmwhitespace} //= 1 if $c->{schema}{type} eq 'scalar';
+
   $c->{schema}{unknown} //= 'remove';
+  $c->{schema}{missing} //= 'create';
+  croak "Invalid value for 'unknown': $c->{schema}{unknown}" if !$unknown_vals{$c->{schema}{unknown}};
+  croak "Invalid value for 'missing': $c->{schema}{missing}" if !$missing_vals{$c->{schema}{missing}};
+
+  delete $c->{schema}{default} if ref $c->{schema}{default} eq 'SCALAR' && ${$c->{schema}{default}} eq 'required';
+  delete $c->{schema}{keys} if $c->{schema}{type} ne 'hash';
+  delete $c->{schema}{values} if $c->{schema}{type} ne 'array';
+  delete $c->{schema}{sort} if $c->{schema}{type} ne 'array';
+  delete $c->{schema}{unique} if $c->{schema}{type} ne 'array';
 
   if(exists $c->{schema}{sort}) {
     my $s = $c->{schema}{sort};
@@ -204,12 +218,13 @@ sub _validate_rec {
   if($c->{schema}{keys}) {
     my @err;
     for my $k (keys %{$c->{schema}{keys}}) {
-      # We need to overload the '!exists && !required && !default'
-      # scenario a bit, because in that case we should not create the key
-      # in the output. All other cases will be handled just fine by
-      # passing an implicit 'undef'.
       my $s = $c->{schema}{keys}{$k};
-      next if !exists $input->{$k} && !$s->{schema}{required} && !exists $s->{schema}{default};
+      if(!exists $input->{$k}) {
+        next if $s->{schema}{missing} eq 'ignore';
+        return [$input, { validation => 'missing', key => $k }] if $s->{schema}{missing} eq 'reject';
+        $input->{$k} = ref $s->{schema}{default} eq 'CODE' ? $s->{schema}{default}->() : $s->{schema}{default} // undef;
+        next if exists $s->{schema}{default};
+      }
 
       my $r = _validate($s, $input->{$k});
       $input->{$k} = $r->[0];
@@ -290,17 +305,16 @@ sub _validate_array {
 sub _validate_input {
   my($c, $input) = @_;
 
-  # rmwhitespace (needs to be done before the 'required' test)
+  # rmwhitespace (needs to be done before the 'default' test)
   if(defined $input && !ref $input && $c->{schema}{type} eq 'scalar' && $c->{schema}{rmwhitespace}) {
     $input =~ s/\r//g;
     $input =~ s/^\s*//;
     $input =~ s/\s*$//;
   }
 
-  # required & default
+  # default
   if(!defined $input || (!ref $input && $input eq '')) {
-    # XXX: This will return undef if !required and no default is set, even for hash and array types. Should those get an empty hash or array?
-    return [ref $c->{schema}{default} eq 'CODE' ? $c->{schema}{default}->($input) : exists $c->{schema}{default} ? $c->{schema}{default} : $input] if !$c->{schema}{required};
+    return [ref $c->{schema}{default} eq 'CODE' ? $c->{schema}{default}->($input) : $c->{schema}{default}] if exists $c->{schema}{default};
     return [$input, { validation => 'required' }];
   }
 

@@ -21,12 +21,12 @@ Options
 -C create buildspec - create a buildspec file
 -d description      - description to be included CPAN
 -D file             - use file as the dependency list
--T file             - use file as the test dependency list
 -e path             - path for extra .pl files to package
--h                  - help
--H project home     - project home, defaults to '..'
 -f file             - file containing a list of extra files to include
 -F postamble        - file containing additional make instructions
+-h                  - help
+-H project home     - project home, defaults to '..'
+-k                  - skip tests after building (or SKIP_TESTS=1)
 -l path             - path to Perl modules
 -L log level        - logging level 1=error, 5=trace
 -m name             - module name
@@ -36,10 +36,11 @@ Options
 -O overwrite        - overwrite the buildspec.yml file
 -p                  - preserve Makefile.PL
 -P file             - file that contains a list of modules to be packaged
--s                  - use scandeps.pl to find dependncies
--S                  - path for script files
 -r pgm              - script or program to list dependencies
 -R yes/no           - recurse directories for files to package (default: yes)
+-s                  - use scandeps.pl to find dependncies
+-S                  - path for script files
+-T file             - use file as the test dependency list
 -t path             - path to test files
 -v                  - more verbose output
 -V                  - version from module
@@ -71,7 +72,7 @@ function FATAL_ERROR {
 ########################################################################
 function ERROR {
 ########################################################################
-    [ "$LOG_LEVEL" -ge 1 ] && 2>&1 echo "ERROR: $1" && return
+    [ "$LOG_LEVEL" -ge 1 ] && 2>&1 echo "** ERROR: $1 **" && return
 }
 
 ########################################################################
@@ -156,13 +157,13 @@ function cleanup {
 ########################################################################
     test -n "$NOCLEANUP" && return;
     
-    test -n "$testsfile" && rm "$testsfile"
-    test -n "$tmp_gitdir" && rm -rf "$tmp_gitdir"
+    test -n "$testsfile"     && rm "$testsfile"
+    test -n "$tmp_gitdir"    && rm -rf "$tmp_gitdir"
     test -n "$package_files" && rm "$package_files"
-    test -n "$exe_files" && rm "$exe_files"
-    test -n "$scripts" && rm "$scripts"
-    test -n "$depfile" && rm "$depfile"
-    test -n "$resources" && rm "$resources"
+    test -n "$exe_files"     && rm "$exe_files"
+    test -n "$scripts"       && rm "$scripts"
+    test -n "$depfile"       && rm "$depfile"
+    test -n "$resources"     && rm "$resources"
     
     if test -n "$workdir"; then
         for a in *.tmp; do
@@ -232,7 +233,6 @@ function scan() {
     if [ "$PERL_REQUIRES" = "SCANDEPS" ]; then
         if test -z "/usr/local/bin/scandeps.pl"; then
             FATAL_ERROR "no scandeps.pl found!"
-            exit 1
         else
             set -o pipefail
             INFO "Scanning (/usr/local/bin/scandeps.pl) $scan_target..."
@@ -265,8 +265,7 @@ function executables() {
             if test -f "$executables"; then
                 cat $executables >> $filelist;
             else
-                echo "no such file $executables"
-                exit 1
+                FATAL_ERROR "no such file $executables"
             fi
         fi
     fi
@@ -284,7 +283,7 @@ PERLTIDY=$(command -v perltidy);
 PERL=$(command -v perl);
 MAKE_CPAN_DIST=$(command -v make-cpan-dist.pl)
 
-while getopts "?Aa:b:B:cC:d:D:e:f:F:g:hH:l:L:m:M:no:OpP:r:R:sS:t:T:vV:xy:zZ:" arg "$@"; do
+while getopts "?Aa:b:B:cC:d:D:e:f:F:g:hH:kl:L:m:M:no:OpP:r:R:sS:t:T:vV:xy:zZ:" arg "$@"; do
 
     case "${arg}" in
 
@@ -300,11 +299,7 @@ while getopts "?Aa:b:B:cC:d:D:e:f:F:g:hH:l:L:m:M:no:OpP:r:R:sS:t:T:vV:xy:zZ:" ar
            ;;
 
         B)
-            if test -e "$OPTARG"; then
-                BUILD_REQUIRES="--build-requires $OPTARG";
-            else
-                FATAL_ERROR "build dependency fil [$OPTARG] not found!"
-            fi
+            build_requires="$OPTARG";
             ;;
         
         c)
@@ -349,7 +344,10 @@ while getopts "?Aa:b:B:cC:d:D:e:f:F:g:hH:l:L:m:M:no:OpP:r:R:sS:t:T:vV:xy:zZ:" ar
         H)
             PROJECT_HOME="$OPTARG";
             ;;
-        
+
+        k)
+            SKIP_TESTS=1;
+            ;;
         l)
             perl5libdir="$OPTARG";
             ;;
@@ -435,8 +433,7 @@ done
 
 if test -n "$CREATE_BUILDSPEC" && test -z "$OVERWRITE"; then
     if test -e "$CREATE_BUILDSPEC"; then
-        echo "$CREATE_BUILDSPEC already exists"
-        exit 1
+        FATAL_ERROR "$CREATE_BUILDSPEC already exists"
     fi
 fi
 
@@ -481,15 +478,6 @@ if test -z "$author"; then
     test -z "$author" && usage "no author specified";
 fi
 
-if test -n "$dependency_file"; then
-    if test -z "$CORE_MODULES"; then
-        CORE_MODULES="--no-core-modules"
-    fi
-else
-    # default: do not include core modules
-    CORE_MODULES=${CORE_MODULES:---no-core-modules}
-fi
-
 recurse_directories=${recurse_directories:-yes}
 
 # tarball destination directory
@@ -514,11 +502,49 @@ elif test -z "$PROJECT_HOME"; then
     fi
 fi
 
-if test -z "$PROJECT_HOME"; then
-    usage "could not find project home"
+if test -n "$dependency_file"; then
+  if [[ "$dependency_file" != /* ]]; then
+      dependency_file="$PROJECT_HOME/$dependency_file"
+  fi
+  test -e $dependency_file || FATAL_ERROR "$dependency_file not found";
 fi
 
-echo "PROJECT_HOME: $PROJECT_HOME"
+if test -n "$test_dependency_file"; then
+  if [[ "$test_dependency_file" != /* ]]; then
+      test_dependency_file="$PROJECT_HOME/$test_dependency_file"
+  fi
+
+  test -e $test_dependency_file || FATAL_ERROR "$test_dependency_file not found";
+fi
+
+if test -n "$build_requires"; then
+  if [[ "$build_requires" != /* ]]; then
+      build_requires="$PROJECT_HOME/$build_requires"
+  fi
+
+  BUILD_REQUIRES="--build-requires $build_requires"
+  test -e $build_requires || FATAL_ERROR "$build_requires not found";
+fi
+
+if test -n "$dependency_file"; then
+    if test -z "$CORE_MODULES"; then
+        CORE_MODULES="--no-core-modules"
+    fi
+else
+    # default: do not include core modules
+    CORE_MODULES=${CORE_MODULES:---no-core-modules}
+fi
+
+if test -z "$PROJECT_HOME"; then
+    usage "PROJECT_HOME is not defined!"
+elif ! test -d "$PROJECT_HOME"; then
+    FATAL_ERROR "no such directory $PROJECT_HOME";
+fi
+
+echo "        PROJECT HOME: $PROJECT_HOME"
+echo "     DEPENDENCY FILE: $dependency_file"
+echo "TEST DEPENDENCY FILE: $test_dependency_file"
+echo "      BUILD REQUIRES: $build_requires"
 
 # typical directory within project tree containing Perl modules
 perl5libdir=${perl5libdir:-src/main/perl/lib}
@@ -567,7 +593,7 @@ package_files=$(mktemp)
 
 ########################################################################
 # gather executables - files must be executable if they are going to be packaged
-###################0#####################################################
+########################################################################
 exe_files=$(mktemp)
 
 if [ ! "$recurse_directories" = "yes" ]; then
@@ -584,7 +610,8 @@ SCRIPTS_PATH=$scriptsdir
 
 test -s $all_files && sort -u $all_files > $exe_files
 
-test -n $NOCLEANUP || rm $all_files
+test -z "$NOCLEANUP" && rm $all_files
+
 ########################################################################
 # resources
 if test -e "resources"; then
@@ -643,6 +670,7 @@ if test -s "$exe_files"; then
 fi
 
 if test -z "$dependency_file"; then
+    echo "NO dependency file scanning..."
 
     for a in $(cat $package_files | sort -u); do
         scan $a ${workdir}/requires.tmp;
@@ -662,11 +690,11 @@ else
             WARN "cpanfile-dump not found!"
         fi
     else
-        cat $dependency_file > ${workdir}/requires.tmp
+        cp $dependency_file ${workdir}/requires.tmp
     fi
 fi
 
-if ! test -s ${workdir}/requires.tmp; then
+if ! test -s "${workdir}/requires.tmp"; then
     WARN "no dependencies will be listed for this distribution!"
     touch ${workdir}/requires.tmp
 fi
@@ -686,15 +714,13 @@ depfile=$(mktemp)
 awk '{print $1}' ${workdir}/requires.tmp | sort -u | grep -v '^perl' > $depfile
 
 # remove provided files from required list
-
 comm -23 $depfile ${workdir}/provides > ${workdir}/requires.tmp
 
 # get the module versions we are currently using
-
 if test -z "$dependency_file"; then
     get_module_versions ${workdir}/requires.tmp > ${workdir}/requires
+    dependency_file="${workdir}/requires.tmp";
 fi
-
 
 if test -n "$testsdir"; then
 
@@ -722,10 +748,7 @@ if test -n "$testsdir"; then
     fi
 fi
 
-if test -n "$test_dependency_file" && test -e "$test_dependency_file"; then
-    cp $test_dependency_file ${workdir}/test-requires.tmp
-    cp ${workdir}/test-requires.tmp ${workdir}/test-requires
-else
+if test -z "$test_dependency_file"; then
     if test -n "$testsfile"; then
         for a in $(cat $testsfile); do
             scan $a ${workdir}/test-requires.tmp
@@ -736,15 +759,16 @@ else
         comm -23 ${workdir}/test-requires ${workdir}/provides > ${workdir}/test-requires.tmp
     
         # get module versions for test-requires
-        get_module_versions test-requires.tmp > ${workdir}/test-requires
+        get_module_versions ${workdir}/test-requires.tmp > ${workdir}/test-requires-versions.tmp
+        test_dependency_file=${workdir}/test-requires-versions.tmp
     fi
 fi
 
-test -n "$VERBOSE" && cat ${workdir}/requires
-test -n "$VERBOSE" && test -e ${workdir}/test-requires && cat ${workdir}/test-requires
+test -n "$VERBOSE" && cat "$dependency_file"
+test -n "$VERBOSE" && test -e "$test_dependency_file" cat "$test_dependency_file"
 
 if test -n "$testsfile"; then
-    TESTREQUIRES="-t ${workdir}/test-requires"
+    TEST_REQUIRES="-t $test_dependency_file"
 fi
 
 if test -n "$has_perl_version"; then
@@ -779,22 +803,20 @@ test -n "$RESOURCES" && RESOURCES="--resources $RESOURCES"
 test -n "$PL_FILES" && PL_FILES="--pl-files $PL_FILES"
 
 if ! PROJECT_HOME=$PROJECT_HOME $MAKE_CPAN_DIST \
-            $CORE_MODULES $BUILD_REQUIRES -r ${workdir}/requires \
-            -e $exe_files $TESTREQUIRES  $min_perl_version \
+            $CORE_MODULES $BUILD_REQUIRES -r "$dependency_file" \
+            -e $exe_files $TEST_REQUIRES  $min_perl_version \
             -w ${builddir} $EXTRA_OPTIONS $RECURSE \
             -l $LOG_LEVEL $PL_FILES $REQUIRE_VERSION \
             -m "$MODULE" $VERSION_FROM $OVERWRITE $CREATE_BUILDSPEC \
             -A "$description"  $RESOURCES \
             -a "$author" $EXTRA_PATH $MODULE_PATH $EXEC_PATH $SCRIPTS_PATH $TESTS_PATH \
             > $builddir/Makefile.PL; then
-    ERROR "could not create Makefile.PL"
-    exit 1
+    FATAL_ERROR "could not create Makefile.PL" 1
 fi
 
 # if that was successful, then try to build the distribution
 if ! test -e $builddir/Makefile.PL; then
-    FATAL_ERROR "failed to build Makefile.PL"
-    exit 1;
+    FATAL_ERROR "failed to build Makefile.PL" 1
 else
     cd $builddir
     test -n "$VERBOSE" && tree
@@ -810,7 +832,7 @@ else
         make manifest
         make dist
         cp *.tar.gz $destdir
-        make test
+        test -n "$SKIP_TESTS" || make test
         if test -n "$PRESERVE_MAKEFILE"; then
             cp Makefile.PL $destdir
         fi

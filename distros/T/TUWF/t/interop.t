@@ -18,7 +18,9 @@ sub h {
 }
 
 h {}, required => 'required';
-h { required => 0 };
+h { default => 1 };
+h { default => undef };
+h { default => sub{} };
 h { minlength => 1 },     required => 'required', minlength => 1;
 h { maxlength => 1 },     required => 'required', maxlength => 1;
 h { length    => 1 },     required => 'required', minlength => 1, maxlength => 1;
@@ -26,7 +28,7 @@ h { length    => [1,2] }, required => 'required', minlength => 1, maxlength => 2
 
 h { uint      => 1 },     required => 'required', pattern => TUWF::Validate::Interop::_re_compat($TUWF::Validate::re_uint);
 h { email     => 1 },     required => 'required', maxlength => 254, pattern => TUWF::Validate::Interop::_re_compat($TUWF::Validate::re_email);
-h { uint => 1, regex => qr/^.{3}$/ }, required => 'required', pattern => '(?=(?:^(?:0|[1-9]\d*)$))(?:^.{3}$)';
+h { uint => 1, regex => qr/^.{3}$/ }, required => 'required', pattern => '(?=(?:^(?:0|[1-9][0-9]*)$))(?:^.{3}$)';
 
 h { min => 1 },        required => 'required', pattern => TUWF::Validate::Interop::_re_compat($TUWF::Validate::re_num), min => 1;
 h { max => 1 },        required => 'required', pattern => TUWF::Validate::Interop::_re_compat($TUWF::Validate::re_num), max => 1;
@@ -54,18 +56,18 @@ my @serialized = (
   [ { type => 'hash' }, {a=>1,b=>'2'}, '{"a":1,"b":"2"}' ],
   [ { type => 'hash', keys => {b=>{}} }, {}, '{}' ],
   [ { type => 'hash', keys => {a=>{anybool=>1},b=>{int=>1}} }, {a=>1,b=>'10'}, '{"a":true,"b":10}' ],
-  [ { required => 0 }, undef, 'null' ],
-  [ { required => 0, jsonbool => 1 }, undef, 'null' ],
-  [ { required => 0, num => 1 }, undef, 'null' ],
-  [ { required => 0, int => 1 }, undef, 'null' ],
-  [ { required => 0, type => 'hash' }, undef, 'null' ],
-  [ { required => 0, type => 'array' }, undef, 'null' ],
+  [ { default => undef }, undef, 'null' ],
+  [ { default => undef, jsonbool => 1 }, undef, 'null' ],
+  [ { default => undef, num => 1 }, undef, 'null' ],
+  [ { default => undef, int => 1 }, undef, 'null' ],
+  [ { default => undef, type => 'hash' }, undef, 'null' ],
+  [ { default => undef, type => 'array' }, undef, 'null' ],
 );
 
 subtest 'JSON::XS coercion', sub {
   eval { require JSON::XS; 1 } or plan skip_all => 'JSON::XS not installed';
   my @extra = (
-    [ { type => 'num' }, '10', '10' ],
+    [ { num => 1 }, '10', '10' ],
     [ { type => 'hash', keys => {a=>{anybool=>1},b=>{int=>1}} }, {a=>1,b=>'10',c=>[]}, '{"a":true,"b":10}' ],
     [ { type => 'hash', unknown => 'pass', keys => {a=>{anybool=>1},b=>{int=>1}} }, {a=>1,b=>'10',c=>[]}, '{"a":true,"b":10,"c":[]}' ],
   );
@@ -83,7 +85,7 @@ subtest 'JSON::XS coercion', sub {
 subtest 'Cpanel::JSON::XS coercion', sub {
   eval { require Cpanel::JSON::XS; require Cpanel::JSON::XS::Type; 1 } or return plan skip_all => 'Cpanel::JSON::XS not installed or too old';
   my @extra = (
-    [ { type => 'num' }, '10', '10.0' ],
+    [ { num => 1 }, '10', '10.0' ],
   );
   for (@serialized, @extra) {
     my($schema, $in, $out) = @$_;

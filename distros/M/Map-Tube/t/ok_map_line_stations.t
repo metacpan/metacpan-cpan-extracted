@@ -1,7 +1,8 @@
-#!perl
+#!/usr/bin/env perl
 
-use 5.006;
-use strict; use warnings;
+use v5.14;
+use strict;
+use warnings;
 use Test::More;
 
 my $min_ver = '0.87';

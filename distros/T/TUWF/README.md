@@ -1,5 +1,9 @@
 # TUWF - The Ultimate Website Framework
 
+**Project status**: Passively maintained. This framework has been superseded by
+[FU](https://dev.yorhel.nl/fu), but TUWF remains available for those who prefer
+a more portable pure-Perl framework.
+
 This package provides the following set of modules:
 
 - [TUWF](https://dev.yorhel.nl/tuwf/man)

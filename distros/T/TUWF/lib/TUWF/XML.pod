@@ -223,7 +223,8 @@ closing tag.
 The tag name and attribute names are outputted as-is, after some very basic
 validation. If the attribute value is C<undef>, the attribute is ignored. If
 the attribute name starts with a C<+> sign, then multiple attributes with the
-same name are concatenated together with a space.
+same name are concatenated together with a space. If the attribute is a bare
+C<+>, then it is merged with the previous attribute.
 
 The attribute values and tag contents are passed through C<xml_escape()>.
 
@@ -256,6 +257,8 @@ Some example function calls and their output:
   # <div><a href="/">Home</a></div>
 
   tag 'span', '+class', 'strikethrough', '+class', undef, '+class', 'bold', 'text';
+  # equivalent to:
+  tag 'span', 'class', 'strikethrough', '+', undef, '+', 'bold', 'text';
   # <span class="strikethrough bold">text</span>
 
 =head2 end(name)
@@ -356,7 +359,7 @@ functions:
   button canvas caption cite code col colgroup command datagrid datalist dd
   del details dfn dialog div dl dt em embed fieldset figure footer form h1 h2
   h3 h4 h5 h6 head header hr i iframe img input ins kbd label legend li Link
-  main Map mark meta meter nav noscript object ol optgroup option output p
+  main Map mark menu meta meter nav noscript object ol optgroup option output p
   param pre progress Q rp rt ruby samp script section Select small source
   span strong style Sub summary sup table tbody td textarea tfoot th thead Time
   title Tr ul var video
@@ -403,6 +406,9 @@ TUWF modules on the same C<use> line.
 
 L<TUWF>.
 
+A faster XS version of this module is available as L<FU::XMLWriter>. It does
+have minor API differences.
+
 This module was inspired by L<XML::Writer|XML::Writer>, which is more powerful
 but less convenient.
 
@@ -420,7 +426,7 @@ instead of whatever is available on CPAN.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2019 Yoran Heling.
+Copyright (c) Yorhel.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the
@@ -429,7 +435,7 @@ details.
 
 =head1 AUTHOR
 
-Yoran Heling <projects@yorhel.nl>
+Yorhel <projects@yorhel.nl>
 
 =cut
 

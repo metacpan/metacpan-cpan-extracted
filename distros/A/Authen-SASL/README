@@ -15,11 +15,12 @@ PREREQUISITES
 The following modules must already be installed before attempting to
 build Authen::SASL:
 
-  * Perl, at least version 5.6.0
-  * Digest::MD5
+  * Perl, at least version 5.14.0, with its standard modules:
+    * Digest::MD5
+    * JSON::PP
+    * Test::More (for running tests only)
   * Digest::HMAC_MD5
-  * Test::More (only required to run the test suite)
-
+  * GSSAPI (optional; for Kerberos v5 support)
 
 INSTALLING
 ----------

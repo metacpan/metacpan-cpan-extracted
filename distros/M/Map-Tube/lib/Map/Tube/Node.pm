@@ -1,6 +1,6 @@
 package Map::Tube::Node;
 
-$Map::Tube::Node::VERSION   = '4.08';
+$Map::Tube::Node::VERSION   = '4.09';
 $Map::Tube::Node::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,11 +9,11 @@ Map::Tube::Node - Class to represent the station in the map.
 
 =head1 VERSION
 
-Version 4.08
+Version 4.09
 
 =cut
 
-use 5.006;
+use v5.14;
 use Data::Dumper;
 use Map::Tube::Types qw(Lines Nodes);
 

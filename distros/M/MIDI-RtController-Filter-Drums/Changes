@@ -1,5 +1,25 @@
 Revision history for MIDI-RtController-Filter-Drums
 
+0.0303 2025-04-25 14:50:20
+  - Improve documentation.
+
+0.0302 2025-04-25 12:29:35
+  - Add the common attribute.
+
+0.0301 2025-04-25 12:10:36
+  - Use the trigger properly.
+  - Improve documentation.
+
+0.0300 2025-04-25 11:52:55
+  - Add the all-important phrase attribute.
+
+0.0203 2025-04-25 06:59:38
+  - Add the missing bars setting to the eg/tester.pl program.
+
+0.0202 2025-04-25 06:33:21
+  - Improve documentation.
+  - Replace Future::IO::Impl::IOAsync in the eg/tester.pl program and the synopsis.
+
 0.0201 2025-04-14 10:13:14
   - Fix logic.
 

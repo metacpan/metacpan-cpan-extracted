@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use 5.006;
+use v5.14;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -15,7 +15,7 @@ WriteMakefile(
     ABSTRACT_FROM      => 'lib/Map/Tube.pm',
     LICENSE            => 'artistic_2',
     EXE_FILES          => [ 'script/map-data-converter' ],
-    MIN_PERL_VERSION   => 5.006,
+    MIN_PERL_VERSION   => 5.014,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => 0,
         'File::ShareDir::Install' => '0.13',
@@ -34,7 +34,7 @@ WriteMakefile(
         'Role::Tiny'           => '2.000000',
         'MooX::Options'        => '4.023',
         'namespace::autoclean' => '0.28',
-        'JSON'                 => '2.90',
+        'JSON::MaybeXS'        => 0,
         'File::Basename'       => '2.6',
         'XML::Twig'            => '3.48',
         'XML::Parser'          => '2.23',
@@ -42,7 +42,10 @@ WriteMakefile(
         'Map::Tube::Exception' => '3.24',
         'Type::Tiny'           => '1.000005',
         'File::ShareDir'       => '1.114',
-        'Taint::Util'          => '0.08',
+        'Try::Tiny'            => 0,
+        'Path::Tiny'           => 0,
+        'Scalar::Util'         => 0,
+        'Unicode::Normalize'   => 0,
         'Data::Compare'        => '1.25',
         'Map::Tube::Plugin::Formatter' => '0.16',
     },
@@ -52,16 +55,16 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube'            => { file => 'lib/Map/Tube.pm'          , version => '4.08' },
-            'Map::Tube::Node'      => { file => 'lib/Map/Tube/Node.pm'     , version => '4.08' },
-            'Map::Tube::Line'      => { file => 'lib/Map/Tube/Line.pm'     , version => '4.08' },
-            'Map::Tube::Table'     => { file => 'lib/Map/Tube/Table.pm'    , version => '4.08' },
-            'Map::Tube::Route'     => { file => 'lib/Map/Tube/Route.pm'    , version => '4.08' },
-            'Map::Tube::Utils'     => { file => 'lib/Map/Tube/Utils.pm'    , version => '4.08' },
-            'Map::Tube::Types'     => { file => 'lib/Map/Tube/Types.pm'    , version => '4.08' },
-            'Map::Tube::Cookbook'  => { file => 'lib/Map/Tube/Cookbook.pm' , version => '4.08' },
-            'Map::Tube::Pluggable' => { file => 'lib/Map/Tube/Pluggable.pm', version => '4.08' },
-            'Test::Map::Tube'      => { file => 'lib/Test/Map/Tube.pm'     , version => '4.08' },
+            'Map::Tube'            => { file => 'lib/Map/Tube.pm'          , version => '4.09' },
+            'Map::Tube::Node'      => { file => 'lib/Map/Tube/Node.pm'     , version => '4.09' },
+            'Map::Tube::Line'      => { file => 'lib/Map/Tube/Line.pm'     , version => '4.09' },
+            'Map::Tube::Table'     => { file => 'lib/Map/Tube/Table.pm'    , version => '4.09' },
+            'Map::Tube::Route'     => { file => 'lib/Map/Tube/Route.pm'    , version => '4.09' },
+            'Map::Tube::Utils'     => { file => 'lib/Map/Tube/Utils.pm'    , version => '4.09' },
+            'Map::Tube::Types'     => { file => 'lib/Map/Tube/Types.pm'    , version => '4.09' },
+            'Map::Tube::Cookbook'  => { file => 'lib/Map/Tube/Cookbook.pm' , version => '4.09' },
+            'Map::Tube::Pluggable' => { file => 'lib/Map/Tube/Pluggable.pm', version => '4.09' },
+            'Test::Map::Tube'      => { file => 'lib/Test/Map/Tube.pm'     , version => '4.09' },
         },
         prereqs => {
             test => {

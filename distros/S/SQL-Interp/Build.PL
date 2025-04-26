@@ -15,7 +15,7 @@ Module::Build->new(
     dist_author => [
         'David Manura',
         'Mark Stosberg <mark@summersault.com>',
-        'Yoran Heling <projects@yorhel.nl>'
+        'Yorhel <projects@yorhel.nl>'
     ],
     meta_merge => {
         resources => {

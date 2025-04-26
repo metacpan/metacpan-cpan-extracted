@@ -1,15 +1,14 @@
 package GoodMap;
 
-use 5.006;
 use Moo;
 use namespace::autoclean;
 
-has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'good-map.xml') });
+has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'map-good.xml') });
 with 'Map::Tube';
 
 package main;
 
-use 5.006;
+use v5.14;
 use strict; use warnings;
 use Test::Map::Tube tests => 3;
 

@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use Capture::Tiny ();
-use Command::Runner::Format ();
 use Command::Runner::LineBuffer;
 use Command::Runner::Quote ();
 use Command::Runner::Timeout;
@@ -15,22 +14,12 @@ use Time::HiRes ();
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 our $TICK = 0.02;
 
 sub new {
-    my ($class, %option) = @_;
-    my $command = delete $option{command};
-    my $commandf = delete $option{commandf};
-    die "Cannot specify both command and commandf" if $command && $commandf;
-    my $self = bless {
-        keep => 1,
-        _buffer => {},
-        %option,
-        ($command ? (command => $command) : ()),
-    }, $class;
-    $self->commandf(@$commandf) if $commandf;
-    $self;
+    my ($class, %argv) = @_;
+    bless { keep => 1, _buffer => {}, %argv }, $class;
 }
 
 for my $attr (qw(command cwd redirect timeout keep stdout stderr env)) {
@@ -40,14 +29,6 @@ for my $attr (qw(command cwd redirect timeout keep stdout stderr env)) {
         $self->{$attr} = $_[0];
         $self;
     };
-}
-
-# NOTE: commandf is derecated; do not use this. will be removed in the future version
-sub commandf {
-    my ($self, $format, @args) = @_;
-    require Command::Runner::Format;
-    $self->{command} = Command::Runner::Format::commandf($format, @args);
-    $self;
 }
 
 sub run {

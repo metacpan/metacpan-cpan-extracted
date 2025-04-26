@@ -28,6 +28,8 @@ So the plugin just needs to support
   service      # the service name passed to client_new
   host         # the hostname passed to client_new
   is_success   # returns true if authentication suceeded
+  _order       # returns rank number for order of preference
+  _acceptable  # returns true if all required properties are supplied
 
 Server API
 ----------

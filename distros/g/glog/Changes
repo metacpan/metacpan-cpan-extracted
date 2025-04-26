@@ -1,0 +1,22 @@
+Revision history for glog
+
+1.0.5  2025-04-25
+    - Fixed CPAN distro
+
+1.0.0  2025-04-26
+    - Initial release of glog and G::LOG
+    - Functional interface (glog.pm) providing:
+        Log, LogLevel, LogFormat, LogF, LogFile, LogDie, LogWarn, LogInfo, LogDebug, LogErr
+    - Object-oriented logger (G::LOG.pm) providing:
+        LogLevel, Log, LogFormat, LogFile, LogDie, LogWarn, LogInfo, LogDebug, LogErr
+    - Supports logging to STDERR and optional log file.
+    - High-resolution timestamps with millisecond precision.
+    - Basic log levels: ERROR, WARN, INFO, DEBUG.
+    - Lightweight, no non-core dependencies.
+    - Complete test coverage (t/glog.t and t/G-LOG.t).
+    - Added two example scripts under examples/ for demonstration.
+
+Future plans:
+    - Optional support for rotating log files.
+    - More flexible log formatting templates.
+    - Additional log levels (TRACE, NOTICE).

@@ -1,15 +1,14 @@
 package UnicodeMap;
 
-use strict;
-use warnings;
 use Moo;
 use namespace::clean;
 
-has xml => (is => 'ro', default => sub { return File::Spec->catfile('t/unicode-map.xml') });
+has xml => (is => 'ro', default => sub { return File::Spec->catfile('t/map-unicode.xml') });
 with 'Map::Tube';
 
 package main;
 
+use v5.14;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Test::More;

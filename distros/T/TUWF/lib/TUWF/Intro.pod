@@ -290,7 +290,7 @@ L<https://dev.yorhel.nl/tuwf|https://dev.yorhel.nl/tuwf>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2019 Yoran Heling.
+Copyright (c) Yorhel.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the
@@ -299,6 +299,6 @@ details.
 
 =head1 AUTHOR
 
-Yoran Heling <projects@yorhel.nl>
+Yorhek <projects@yorhel.nl>
 
 =cut

@@ -1,0 +1,235 @@
+=pod
+
+=head1 NAME
+
+glog - Simple, Fast Functional Logging Interface
+
+=head1 SYNOPSIS
+
+    use glog;
+
+    # Set log level
+    LogLevel(5);  # Enable debug logging
+
+    # Log messages
+    LogInfo("Application started");
+    LogDebug("Debug details: x=42");
+    LogWarn("Warning: low disk space");
+    LogErr("Error: cannot open file");
+    LogDie("Fatal error!");
+
+    # Formatted logging
+    LogF(3, "User %s logged in at %d", "alice", time);
+
+    # Log to a file
+    LogFile("app.log");
+    LogInfo("Logging to file");
+    LogFile(undef);  # Revert to STDERR
+
+=head1 DESCRIPTION
+
+C<glog> is a lightweight, Pure Perl functional logging interface. It serves as a simple, high-level proxy to the underlying C<G::Lgr> module, providing a drop-in solution for logging messages at various severity levels (ERROR, WARN, INFO, DEBUG). The module is optimized for minimal overhead, making it suitable for both small scripts and large-scale systems.
+
+C<glog> delegates all logging operations to a global C<G::Lgr> instance, ensuring consistency and ease of use. It exports a set of intuitive functions that allow developers to log messages without managing logger objects directly. The module is designed to provide robust, dependency-free utilities for Perl developers.
+
+=head1 EXPORTED FUNCTIONS
+
+The following functions are exported by default via C<@EXPORT>:
+
+=over 4
+
+=item * LogLevel($level)
+
+Sets or retrieves the current log level (0-9). If C<$level> is provided, it updates the log level; otherwise, it returns the current level. The default level is 3 (INFO).
+
+    LogLevel(5);  # Enable DEBUG logging
+    my $current = LogLevel();  # Get current level
+
+=item * Log($level, $message)
+
+Logs a message at the specified level if it is less than or equal to the current log level. The message is prefixed with a timestamp and level name.
+
+    Log(3, "Processing started");
+
+=item * LogFormat($level, $format, @args)
+
+Logs a formatted message (using C<sprintf>) at the specified level if allowed by the current log level.
+
+    LogFormat(3, "Processed %d items in %s", 42, "2s");
+
+=item * LogF($level, $format, @args)
+
+An alias for C<LogFormat>, provided for convenience.
+
+    LogF(3, "User %s logged in", "bob");
+
+=item * LogFile($path)
+
+Configures logging to a file. If C<$path> is provided, logs are appended to the specified file. If C<undef> is passed, logging reverts to C<STDERR>.
+
+    LogFile("app.log");  # Log to app.log
+    LogFile(undef);      # Revert to STDERR
+
+=item * LogDie($message)
+
+Logs an ERROR message (level 1) and terminates the program with C<die>.
+
+    LogDie("Cannot connect to database");
+
+=item * LogWarn($message)
+
+Logs a WARN message (level 2).
+
+    LogWarn("Configuration file not found, using defaults");
+
+=item * LogInfo($message)
+
+Logs an INFO message (level 3).
+
+    LogInfo("Server started on port 8080");
+
+=item * LogDebug($message)
+
+Logs a DEBUG message (level 5).
+
+    LogDebug("Variable x = 42");
+
+=item * LogErr($message)
+
+Logs an ERROR message (level 1) without terminating the program.
+
+    LogErr("Failed to read input file");
+
+=back
+
+=head1 LOG LEVELS
+
+The module supports the following log levels:
+
+=over 4
+
+=item * 1: ERROR (critical errors)
+
+=item * 2: WARN (warnings)
+
+=item * 3: INFO (informational messages)
+
+=item * 5: DEBUG (detailed debugging information)
+
+=back
+
+Messages are only logged if their level is less than or equal to the current log level set by C<LogLevel>. For example, setting C<LogLevel(2)> will log ERROR and WARN messages but ignore INFO and DEBUG.
+
+=head1 OUTPUT FORMAT
+
+Log messages follow a consistent format:
+
+    [YYYY-MM-DD HH:MM:SS.mmm] LEVEL message
+
+Example output:
+
+    [2025-04-25 20:15:23.456] INFO Application started
+    [2025-04-25 20:15:23.789] ERROR Cannot open file
+
+The timestamp includes millisecond precision, generated using C<Time::HiRes>.
+
+=head1 PERFORMANCE OPTIMIZATIONS
+
+C<glog> is designed for minimal overhead:
+
+=over 4
+
+=item * **Proxy Design**: All logic is delegated to C<G::Lgr>, reducing code duplication and ensuring fast function calls.
+
+=item * **Level Checks**: Logging is skipped early if the message level exceeds the current log level.
+
+=item * **Global Instance**: Uses a single C<G::Lgr> instance to avoid object creation overhead.
+
+=item * **Pure Perl**: No external dependencies, ensuring portability and fast execution.
+
+=back
+
+=head1 TESTING
+
+The internal C<_test> function validates:
+
+=over 4
+
+=item * Logging at all levels (ERROR, WARN, INFO, DEBUG).
+
+=item * Formatted logging with C<LogF>.
+
+=item * File-based logging with C<LogFile>.
+
+=item * Error handling with C<LogDie>.
+
+=back
+
+To run the tests, use a test script that calls C<glog::_test>. The test suite captures and verifies log output, ensuring correct formatting and behavior.
+
+Example test usage:
+
+    use Test::More;
+    ok(glog->_test, "glog internal tests passed");
+    done_testing();
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Relies on a single global C<G::Lgr> instance, which may not be suitable for applications requiring multiple logger configurations.
+
+=item * No built-in log rotation or advanced file management.
+
+=item * No native threading support; use caution in multi-threaded environments.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * C<G::Lgr> (required for all logging operations)
+
+=item * C<strict>, C<warnings>, C<Exporter> (standard Perl modules)
+
+=back
+
+No external CPAN dependencies are required, keeping the module lightweight and portable.
+
+=head1 INTEGRATION WITH DOMERO TOOLS
+
+C<glog> is designed to integrate seamlessly with other modules. It provides a consistent logging interface for debugging and monitoring, making it ideal for applications.
+
+Example with C<G::CRC>:
+
+    use glog;
+    use gcrc;
+
+    LogLevel(5);  # Enable debug
+    my $crc = enc_crc32("Hello World");
+    LogInfo("Computed CRC32: $crc");
+    LogDebug("Validating CRC32...");
+    valid_crc32("Hello World", $crc) or LogDie("CRC mismatch");
+
+=head1 AUTHOR
+
+OnEhIppY <domerosoftware@gmail.com>, Domero Software
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * C<G::Lgr> - The underlying object-oriented logging implementation.
+
+=back
+
+=head1 VERSION
+
+1.0.5
+
+=head1 LICENSE
+
+This module is distributed under the MIT License. See the LICENSE file in the distribution for details.
+
+=cut

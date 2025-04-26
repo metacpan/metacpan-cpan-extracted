@@ -1,10 +1,10 @@
 {
    "abstract" : "The Ultimate Website Framework",
    "author" : [
-      "Yoran Heling <projects@yorhel.nl>"
+      "Yorhel <projects@yorhel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "mit"
    ],
@@ -35,44 +35,44 @@
    "provides" : {
       "TUWF" : {
          "file" : "lib/TUWF.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::DB" : {
          "file" : "lib/TUWF/DB.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::Exception" : {
          "file" : "lib/TUWF.pm"
       },
       "TUWF::Misc" : {
          "file" : "lib/TUWF/Misc.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::Object" : {
          "file" : "lib/TUWF.pm"
       },
       "TUWF::Request" : {
          "file" : "lib/TUWF/Request.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::Response" : {
          "file" : "lib/TUWF/Response.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::Validate" : {
          "file" : "lib/TUWF/Validate.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::Validate::Interop" : {
          "file" : "lib/TUWF/Validate/Interop.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::Validate::Result" : {
          "file" : "lib/TUWF/Validate.pm"
       },
       "TUWF::XML" : {
          "file" : "lib/TUWF/XML.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "TUWF::func" : {
          "file" : "lib/TUWF.pm"
@@ -85,12 +85,12 @@
    "resources" : {
       "homepage" : "https://dev.yorhel.nl/tuwf",
       "license" : [
-         "http://opensource.org/licenses/mit-license.php"
+         "http://www.opensource.org/licenses/mit-license.php"
       ],
       "repository" : {
          "url" : "https://code.blicky.net/yorhel/tuwf"
       }
    },
-   "version" : "1.5",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.6",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

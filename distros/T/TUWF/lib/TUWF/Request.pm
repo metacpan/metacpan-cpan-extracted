@@ -6,27 +6,28 @@ use warnings;
 use Exporter 'import';
 use Carp 'croak';
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 our @EXPORT = qw|
   reqInit reqGets reqGet reqPosts reqPost reqParams reqParam reqJSON
   reqUploadMIMEs reqUploadMIME reqUploadRaws reqUploadRaw reqSaveUpload
   reqCookie reqMethod reqHeader reqPath reqQuery reqProtocol reqBaseURI reqURI reqHost reqIP reqFCGI
 |;
 
+our $RENV = \%ENV;
 
 sub reqInit {
   my $self = shift;
   $self->{_TUWF}{Req} = {};
 
   # lighttpd doesn't always split the query string from REQUEST_URI
-  if($ENV{SERVER_SOFTWARE}||'' =~ /lighttpd/) {
-    ($ENV{REQUEST_URI}, $ENV{QUERY_STRING}) = split /\?/, $ENV{REQUEST_URI}, 2
-      if ($ENV{REQUEST_URI}||'') =~ /\?/;
+  if($RENV->{SERVER_SOFTWARE}||'' =~ /lighttpd/) {
+    ($RENV->{REQUEST_URI}, $RENV->{QUERY_STRING}) = split /\?/, $RENV->{REQUEST_URI}, 2
+      if ($RENV->{REQUEST_URI}||'') =~ /\?/;
   }
 
   my $ok = eval {
-    $self->{_TUWF}{Req}{Cookies} = _parse_cookies($self, $ENV{HTTP_COOKIE} || $ENV{COOKIE});
-    $self->{_TUWF}{Req}{GET} = _parse_urlencoded($ENV{QUERY_STRING});
+    $self->{_TUWF}{Req}{Cookies} = _parse_cookies($self, $RENV->{HTTP_COOKIE} || $RENV->{COOKIE});
+    $self->{_TUWF}{Req}{GET} = _parse_urlencoded($RENV->{QUERY_STRING});
     $self->reqPath(); # let it croak when the path isn't valid UTF-8
     1;
   };
@@ -35,17 +36,17 @@ sub reqInit {
   my $meth = $self->reqMethod;
   die TUWF::Exception->new('method') if $meth !~ /^(GET|POST|HEAD|DELETE|OPTIONS|PUT|PATCH)$/;
 
-  if($meth =~ /^(POST|PUT|PATCH)$/ && $ENV{CONTENT_LENGTH}) {
-    die TUWF::Exception->new('maxpost') if $self->{_TUWF}{max_post_body} && $ENV{CONTENT_LENGTH} > $self->{_TUWF}{max_post_body};
+  if($meth =~ /^(POST|PUT|PATCH)$/ && $RENV->{CONTENT_LENGTH}) {
+    die TUWF::Exception->new('maxpost') if $self->{_TUWF}{max_post_body} && $RENV->{CONTENT_LENGTH} > $self->{_TUWF}{max_post_body};
 
     my $data;
-    die "Couldn't read all request data.\n" if $ENV{CONTENT_LENGTH} > read STDIN, $data, $ENV{CONTENT_LENGTH}, 0;
+    die "Couldn't read all request data.\n" if $RENV->{CONTENT_LENGTH} > read STDIN, $data, $RENV->{CONTENT_LENGTH}, 0;
 
     eval {
-      if(($ENV{'CONTENT_TYPE'}||'') =~ m{^application/json(?:;.*)?$}) {
+      if(($RENV->{'CONTENT_TYPE'}||'') =~ m{^application/json(?:;.*)?$}) {
         $self->{_TUWF}{Req}{JSON} = _parse_json($data);
         die TUWF::Exception->new('json') if !$self->{_TUWF}{Req}{JSON};
-      } elsif(($ENV{'CONTENT_TYPE'}||'') =~ m{^multipart/form-data; boundary=(.+)$}) {
+      } elsif(($RENV->{'CONTENT_TYPE'}||'') =~ m{^multipart/form-data; boundary=(.+)$}) {
         _parse_multipart($self, $data, $1);
       } else {
         $self->{_TUWF}{Req}{POST} = _parse_urlencoded($data);
@@ -261,7 +262,7 @@ sub reqCookie {
 
 
 sub reqMethod {
-  return $ENV{REQUEST_METHOD}||'GET';
+  return $RENV->{REQUEST_METHOD}||'GET';
 }
 
 
@@ -274,7 +275,7 @@ sub reqHeader {
   my($self, $name) = @_;
   if(@_ == 2) {
     (my $v = uc $_[1]) =~ tr/-/_/;
-    $v = $ENV{"HTTP_$v"}||'';
+    $v = $RENV->{"HTTP_$v"}||'';
     return _check_control _decode_utf8 $v;
   } else {
     return (map {
@@ -283,20 +284,20 @@ sub reqHeader {
         $h =~ s/^http-//;
         _check_control _decode_utf8 $h;
       } else { () }
-    } sort keys %ENV);
+    } sort keys %$RENV);
   }
 }
 
 
 # returns the path part of the current URI, including the leading slash
 sub reqPath {
-  (my $u = ($ENV{REQUEST_URI}||'')) =~ s{\?.*$}{};
+  (my $u = ($RENV->{REQUEST_URI}||'')) =~ s{\?.*$}{};
   return _check_control _decode_utf8 $u;
 }
 
 
 sub reqProtocol {
-  return $ENV{HTTPS} ? 'https' : 'http';
+  return $RENV->{HTTPS} ? 'https' : 'http';
 }
 
 
@@ -308,7 +309,7 @@ sub reqBaseURI {
 
 
 sub reqQuery {
-  my $u = $ENV{QUERY_STRING} ? '?'.$ENV{QUERY_STRING} : '';
+  my $u = $RENV->{QUERY_STRING} ? '?'.$RENV->{QUERY_STRING} : '';
   return _check_control _decode_utf8 $u;
 }
 
@@ -320,12 +321,12 @@ sub reqURI {
 
 
 sub reqHost {
-  return $ENV{HTTP_HOST}||'localhost';
+  return $RENV->{HTTP_HOST}||'localhost';
 }
 
 
 sub reqIP {
-  return $ENV{REMOTE_ADDR}||'0.0.0.0';
+  return $RENV->{REMOTE_ADDR}||'0.0.0.0';
 }
 
 

@@ -3,10 +3,10 @@
    "author" : [
       "David Manura",
       "Mark Stosberg <mark@summersault.com>",
-      "Yoran Heling <projects@yorhel.nl>"
+      "Yorhel <projects@yorhel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
    "provides" : {
       "DBIx::Interp" : {
          "file" : "lib/DBIx/Interp.pm",
-         "version" : "1.27"
+         "version" : "1.28"
       },
       "DBIx::Interp::STX" : {
          "file" : "lib/DBIx/Interp.pm"
@@ -44,7 +44,7 @@
       },
       "SQL::Interp" : {
          "file" : "lib/SQL/Interp.pm",
-         "version" : "1.27"
+         "version" : "1.28"
       },
       "SQL::Interp::SQL" : {
          "file" : "lib/SQL/Interp.pm"
@@ -65,6 +65,6 @@
          "url" : "https://code.blicky.net/yorhel/SQL-Interp"
       }
    },
-   "version" : "1.27",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.28",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

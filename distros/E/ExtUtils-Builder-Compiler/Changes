@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.030     2025-04-25 13:12:46+02:00 Europe/Brussels
+          - Only set MSVC export for shared-library and loadable-object
+
 0.029     2025-04-23 11:25:05+02:00 Europe/Brussels
           - Correctly set export value for MSVC
 

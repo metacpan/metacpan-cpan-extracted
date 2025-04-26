@@ -59,91 +59,91 @@
    "provides" : {
       "ExtUtils::Builder::ArgumentCollector" : {
          "file" : "lib/ExtUtils/Builder/ArgumentCollector.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::AutoDetect::C" : {
          "file" : "lib/ExtUtils/Builder/AutoDetect/C.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::AutoDetect::Cpp" : {
          "file" : "lib/ExtUtils/Builder/AutoDetect/Cpp.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Binary" : {
          "file" : "lib/ExtUtils/Builder/Binary.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Compiler" : {
          "file" : "lib/ExtUtils/Builder/Compiler.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Compiler::MSVC" : {
          "file" : "lib/ExtUtils/Builder/Compiler/MSVC.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Compiler::Unixy" : {
          "file" : "lib/ExtUtils/Builder/Compiler/Unixy.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Compiler::VMS" : {
          "file" : "lib/ExtUtils/Builder/Compiler/VMS.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Conf" : {
          "file" : "lib/ExtUtils/Builder/Conf.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker" : {
          "file" : "lib/ExtUtils/Builder/Linker.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::Ar" : {
          "file" : "lib/ExtUtils/Builder/Linker/Ar.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::COFF" : {
          "file" : "lib/ExtUtils/Builder/Linker/COFF.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::ELF::Any" : {
          "file" : "lib/ExtUtils/Builder/Linker/ELF/Any.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::ELF::GCC" : {
          "file" : "lib/ExtUtils/Builder/Linker/ELF/GCC.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::Mach::GCC" : {
          "file" : "lib/ExtUtils/Builder/Linker/Mach/GCC.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::PE::GCC" : {
          "file" : "lib/ExtUtils/Builder/Linker/PE/GCC.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::PE::MSVC" : {
          "file" : "lib/ExtUtils/Builder/Linker/PE/MSVC.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::Unixy" : {
          "file" : "lib/ExtUtils/Builder/Linker/Unixy.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Linker::XCOFF" : {
          "file" : "lib/ExtUtils/Builder/Linker/XCOFF.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::MultiLingual" : {
          "file" : "lib/ExtUtils/Builder/MultiLingual.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::ParseXS" : {
          "file" : "lib/ExtUtils/Builder/ParseXS.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "ExtUtils::Builder::Profile::Perl" : {
          "file" : "lib/ExtUtils/Builder/Profile/Perl.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       }
    },
    "release_status" : "stable",
@@ -157,7 +157,7 @@
          "web" : "https://github.com/Leont/extutils-builder-compiler"
       }
    },
-   "version" : "0.029",
+   "version" : "0.030",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '4.08';
+$Map::Tube::VERSION   = '4.09';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,14 +9,14 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 4.08
+Version 4.09
 
 =cut
 
 use Unicode::Normalize;
 use Encode qw(decode_utf8);
 
-use 5.006;
+use v5.14;
 use XML::Twig;
 use Data::Dumper;
 use Map::Tube::Node;
@@ -47,7 +47,7 @@ use Map::Tube::Exception::MalformedMapData;
 use Map::Tube::Exception::InvalidLineStructure;
 use Map::Tube::Exception::InvalidStationStructure;
 use Map::Tube::Exception::RouteNotFound;
-use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_valid_color);
+use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_tainted is_valid_color);
 use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap Color);
 
 use Moo::Role;
@@ -564,10 +564,12 @@ sub get_map_data {
     if ($xml ne '') {
         eval {
             $data = XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0);
-            # Handle if there is only one line.
-            my $lines = $data->{lines}->{line};
-            if (ref($lines) eq 'HASH') {
-                $data->{lines}->{line} = [ $lines ];
+            if (!is_tainted($data)) {
+                # Handle if there is only one line.
+                my $lines = $data->{lines}->{line};
+                if (ref($lines) eq 'HASH') {
+                    $data->{lines}->{line} = [ $lines ];
+                }
             }
         };
         unless ($@) {
@@ -951,12 +953,12 @@ sub _init_map {
 
         $_seen_nodes->{$id} = 1;
         my $name = $station->{name};
-
+        $name = _decode_utf8_if_needed($name);
         Map::Tube::Exception::DuplicateStationName->throw({
             method      => $method,
             message     => "ERROR: Duplicate Station Name [$name].",
             filename    => $caller[1],
-            line_number => $caller[2] }) if (defined $self->{name_to_id}->{uc($name)});
+            line_number => $caller[2] }) if (defined $self->{name_to_id}->{NFC(uc($name))});
 
         $self->_map_node_name($name, $id);
         $tables->{$id} = Map::Tube::Table->new({ id => $id });

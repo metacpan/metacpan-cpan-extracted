@@ -1,5 +1,8 @@
 Revision history for Command-Runner
 
+0.201  2025-04-26 17:06:19 JST
+    - Remove deprecated "commandf"
+
 0.200  2022-03-22 00:02:31 JST
     - Support cwd option (#9)
     - Use Time::HiRes::CLOCK_MONOTONIC if it is available (#10)

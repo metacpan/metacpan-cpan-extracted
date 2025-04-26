@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 
 
 # Store the object in a global variable for some functions that don't get it
@@ -46,6 +46,7 @@ our $OBJ = bless {
       aac    audio/aac
       atom   application/atom+xml
       avi    video/x-msvideo
+      avif   image/avif
       bin    application/octet-stream
       bmp    image/bmp
       bz     application/x-bzip2
@@ -59,6 +60,8 @@ our $OBJ = bless {
       jpg    image/jpeg
       js     application/javascript
       json   application/json
+      jxl    image/jxl
+      mjs    application/javascript
       mp3    audio/mpeg
       mp4    video/mp4
       mp4v   video/mp4
@@ -78,6 +81,7 @@ our $OBJ = bless {
       tiff   image/tiff
       ttf    font/ttf
       txt    text/plain
+      webp   image/webp
       webm   video/webm
       xhtml  text/html
       xml    application/xml
@@ -94,11 +98,13 @@ our $OBJ = bless {
 sub import {
   my $self = shift;
   my $pack = caller();
+
   # Always export 'tuwf'. This can still be excluded with a '!tuwf' in @_
-  my @arg = ('tuwf', @_);
+  # ':xmlxs' is a legacy option that does nothing.
+  my @arg = ('tuwf', grep $_ ne ':xmlxs', @_);
 
   # import requested functions from TUWF submodules
-  croak $@ if !eval "package $pack; import TUWF::func \@arg; 1";
+  croak $@ if !eval "package $pack; TUWF::func->import(\@arg); 1";
 }
 
 
@@ -138,7 +144,9 @@ sub run {
   } elsif($isfastcgi) {
     require FCGI;
     import FCGI;
-    my $r = FCGI::Request();
+    my %env;
+    my $r = FCGI::Request(\*STDIN, \*STDOUT, \*STDERR, \%env);
+    $TUWF::Request::RENV = \%env;
     $OBJ->{_TUWF}{fcgi_req} = $r;
     local $SIG{TERM} = local $SIG{INT} = sub { $r->LastCall() };
     while($r->Accept() >= 0) {
@@ -294,17 +302,17 @@ BEGIN {
   require TUWF::DB;
   require TUWF::Misc;
   require TUWF::XML;
-  import TUWF::DB   @TUWF::DB::EXPORT_OK;
-  import TUWF::Misc @TUWF::Misc::EXPORT_OK;
-  import TUWF::XML  @TUWF::XML::EXPORT_OK;
+  TUWF::DB->import(@TUWF::DB::EXPORT_OK);
+  TUWF::Misc->import(@TUWF::Misc::EXPORT_OK);
+  TUWF::XML->import(@TUWF::XML::EXPORT_OK);
 }
 our @EXPORT_OK = (
   @TUWF::DB::EXPORT_OK,
   @TUWF::Misc::EXPORT_OK,
-  @TUWF::XML::EXPORT_OK
+  @TUWF::XML::EXPORT_OK,
 );
-our %EXPORT_TAGS = %TUWF::XML::EXPORT_TAGS;
 our @EXPORT = ('tuwf');
+our %EXPORT_TAGS = %TUWF::XML::EXPORT_TAGS;
 
 sub tuwf() { $TUWF::OBJ }
 
@@ -351,13 +359,6 @@ sub _handle_request {
   my $eval = eval {
     # initialze response
     $self->resInit();
-
-    # initialize TUWF::XML
-    TUWF::XML->new(
-      write  => sub { print { $self->resFd } $_ for @_ },
-      pretty => $self->{_TUWF}{xml_pretty},
-      default => 1,
-    );
 
     # initialize request
     $self->reqInit();

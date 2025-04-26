@@ -1,3 +1,24 @@
+Fri Apr 25 09:38:51 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.44]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- SKIP_TESTS=1 to skip tests or -k
+	- fixes for vpath builds
+	- requires, test-requires, build-requires moved to root
+	- use FATAL_ERROR, not exit
+	* src/main/perl/lib/README.md: generated
+	* cpan/Makefile.am: exit immediately on error
+	* src/main/perl/lib/CPAN/Maker.pm.in: update docs
+	* build-github
+	- renamed from build
+	- *requires, not cpan/*requires
+
+	[1.5.43]:
+	* VERSION: bump
+	* cpan/requires: Module::ScanDeps::Static
+	* src/main/perl/lib/README.md: generated
+
 Mon Mar 10 07:12:54 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.5.42]:
@@ -32,7 +53,7 @@ Sun Nov 24 07:41:58 2024  Rob Lauer  <rlauer6@comcast.net>
 	- install packages for debian, redhat
 	* configure.ac
 	- add cpan/Makefile to build
-	- removed File::Proces from list of required modules
+	- removed File::Process from list of required modules
 	- add Pod::Find, removed Log::Log4perl::Level
 	- add Text::CSV_XS
 	- add Markdown::Render

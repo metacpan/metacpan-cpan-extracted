@@ -1,6 +1,6 @@
 package Map::Tube::Cookbook;
 
-$Map::Tube::Cookbook::VERSION   = '4.08';
+$Map::Tube::Cookbook::VERSION   = '4.09';
 $Map::Tube::Cookbook::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,11 +9,11 @@ Map::Tube::Cookbook - Cookbook for Map::Tube library.
 
 =head1 VERSION
 
-Version 4.08
+Version 4.09
 
 =cut
 
-use 5.006;
+use v5.14;
 use strict; use warnings;
 
 =head1 DESCRIPTION

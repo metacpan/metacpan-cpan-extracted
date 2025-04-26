@@ -10,6 +10,11 @@ functions to ease the creation of both small and large websites.
 
 For a gentle introduction to TUWF, see L<TUWF::Intro>.
 
+TUWF has been superseded by L<FU>, which is conceptually very similar but has a
+faster implementation, cleaned up API and uses modern Perl features. TUWF
+remains available for those who prefer a smaller and more portable pure-Perl
+solution.
+
 
 =head2 Main features and limitations
 
@@ -885,7 +890,7 @@ L<https://code.blicky.net/yorhel/tuwf|https://code.blicky.net/yorhel/tuwf>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2019 Yoran Heling.
+Copyright (c) Yorhel.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the
@@ -894,7 +899,7 @@ details.
 
 =head1 AUTHOR
 
-Yoran Heling <projects@yorhel.nl>
+Yorhel <projects@yorhel.nl>
 
 =cut
 

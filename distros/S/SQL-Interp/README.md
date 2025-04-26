@@ -23,7 +23,7 @@ Documentation is provided in the POD and is available online at [Metacpan](https
 
 Copyright (c) 2004-2005 David Manura.
 Copyright (c) 2005-2019 Mark Stosberg.
-Copyright (c) 2019-2021 Yoran Heling.
+Copyright (c) 2019- Yorhel
 
 This module is free software. It may be used, redistributed
 and/or modified under the same terms as Perl itself.

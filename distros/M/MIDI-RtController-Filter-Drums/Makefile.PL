@@ -7,7 +7,7 @@ use 5.036000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "RtController drum filters",
+  "ABSTRACT" => "Generic RtController drum filter",
   "AUTHOR" => "Gene Boggs <gene.boggs\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "MIDI::RtController::Filter::Drums",
   "PREREQ_PM" => {
     "List::SomeUtils" => 0,
-    "MIDI::Drummer::Tiny" => 0,
+    "MIDI::Drummer::Tiny" => "0.0611",
     "MIDI::RtController" => "0.0600",
     "MIDI::RtMidi::ScorePlayer" => 0,
     "Moo" => 2,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0201",
+  "VERSION" => "0.0303",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::SomeUtils" => 0,
-  "MIDI::Drummer::Tiny" => 0,
+  "MIDI::Drummer::Tiny" => "0.0611",
   "MIDI::RtController" => "0.0600",
   "MIDI::RtMidi::ScorePlayer" => 0,
   "Moo" => 2,

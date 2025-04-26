@@ -9,7 +9,7 @@ use POSIX 'strftime';
 use Carp 'croak', 'carp';
 
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 our @EXPORT = qw|
   resInit resHeader resCookie resBuffer resFd resStatus resRedirect
   resNotFound resJSON resBinary resFile resFinish
@@ -37,6 +37,13 @@ sub resInit {
 
   # open output buffer
   $self->resBuffer($self->{_TUWF}{content_encoding}||'auto');
+
+  # (re)initialize TUWF::XML
+  TUWF::XML->new(
+    write  => sub { print { $self->resFd } $_ for @_ },
+    pretty => $self->{_TUWF}{xml_pretty},
+    default => 1,
+  );
 }
 
 
@@ -189,7 +196,7 @@ sub resNotFound {
 my $_json_codec;
 sub resJSON {
   my($self, $obj) = @_;
-  $_json_codec ||= TUWF::Misc::_JSON()->new->utf8;
+  $_json_codec ||= TUWF::Misc::_JSON()->new->convert_blessed->utf8;
 
   $self->resHeader('Content-Type' => 'application/json; charset=UTF-8');
   $self->resBinary($_json_codec->encode($obj), 'clear');

@@ -1,7 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-use 5.006;
-use strict; use warnings;
+use v5.14;
+use strict;
+use warnings;
 use lib 't/';
 use Sample;
 use Test::Map::Tube tests => 1;

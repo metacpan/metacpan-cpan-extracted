@@ -1,25 +1,25 @@
 package MIDI::RtController::Filter::Drums;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: RtController drum filters
+# ABSTRACT: Generic RtController drum filter
 
 use v5.36;
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0303';
 
 use strictures 2;
 use List::SomeUtils qw(first_index);
 use MIDI::Drummer::Tiny ();
 use MIDI::RtMidi::ScorePlayer ();
 use Moo;
-use Types::Standard qw(ArrayRef Num Maybe);
+use Types::Standard qw(ArrayRef CodeRef HashRef Num Maybe);
 use namespace::clean;
 
 
 
 has rtc => (
     is  => 'ro',
-    isa => sub { die 'Invalid rtc' unless ref($_[0]) eq 'MIDI::RtController' },
+    isa => sub { die 'Invalid controller' unless ref($_[0]) eq 'MIDI::RtController' },
     required => 1,
 );
 
@@ -52,13 +52,31 @@ has bpm => (
 );
 
 
+has phrase => (
+    is      => 'rw',
+    isa     => CodeRef,
+    builder => 1,
+);
+
+sub _build_phrase {
+    return sub {
+        my (%args) = @_;
+        $args{drummer}->metronome4;
+    };
+}
+
+
+has common => (
+    is  => 'rw',
+    isa => HashRef,
+    default => sub { {} },
+);
+
+
 sub _drum_parts ($self, $note) {
     my $part;
-    if ($note == 99) {
-        $part = sub {
-            my (%args) = @_;
-            $args{drummer}->metronome4;
-        };
+    if (defined $self->trigger && $note == $self->trigger) {
+        $part = $self->phrase;
     }
     else {
         $part = sub {
@@ -70,19 +88,17 @@ sub _drum_parts ($self, $note) {
 }
 sub drums ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    return 0 if defined $self->trigger && $note != $self->trigger;
-    return 0 if defined $self->value && $val != $self->value;
-
-    return 1 unless $ev eq 'note_on';
     my $part = $self->_drum_parts($note);
     my $d = MIDI::Drummer::Tiny->new(
         bpm  => $self->bpm,
         bars => $self->bars,
     );
+    my $common = $self->common;
+    $common = { %$common, drummer => $d };
     MIDI::RtMidi::ScorePlayer->new(
       device   => $self->rtc->midi_out,
       score    => $d->score,
-      common   => { drummer => $d },
+      common   => $common,
       parts    => [ $part ],
       sleep    => 0,
       infinite => 0,
@@ -100,39 +116,56 @@ __END__
 
 =head1 NAME
 
-MIDI::RtController::Filter::Drums - RtController drum filters
+MIDI::RtController::Filter::Drums - Generic RtController drum filter
 
 =head1 VERSION
 
-version 0.0201
+version 0.0303
 
 =head1 SYNOPSIS
 
   use curry;
+  use Future::IO::Impl::IOAsync;
   use MIDI::RtController ();
   use MIDI::RtController::Filter::Drums ();
 
-  my $rtc = MIDI::RtController->new(
-    input  => 'keyboard',
-    output => 'usb',
+  my $controller = MIDI::RtController->new(
+    input   => 'keyboard',
+    output  => 'usb',
+    verbose => 1,
   );
 
-  my $filter = MIDI::RtController::Filter::Drums->new(rtc => $rtc);
+  my $filter = MIDI::RtController::Filter::Drums->new(rtc => $controller);
 
-  $rtc->add_filter('drums', note_on => $filter->curry::drums);
+  $filter->phrase(\&my_phrase);
+  $filter->trigger(99); # trigger the phrase with note 99
+  $filter->bars(8);
+  $filter->common({ foo => 42 });
 
-  $rtc->run;
+  $controller->add_filter('drums', note_on => $filter->curry::drums);
+
+  $controller->run;
+
+  sub my_phrase {
+    my (%args) = @_;
+    if ($args{foo} == 42) {
+      $args{drummer}->metronome4;
+    }
+    else {
+      $args{drummer}->metronome5;
+    }
+  }
 
 =head1 DESCRIPTION
 
-C<MIDI::RtController::Filter::Drums> is the L<MIDI::RtController>
-filter for the drums.
+C<MIDI::RtController::Filter::Drums> is a generic
+L<MIDI::RtController> drum filter.
 
 =head1 ATTRIBUTES
 
 =head2 rtc
 
-  $rtc = $filter->rtc;
+  $controller = $filter->rtc;
 
 The required L<MIDI::RtController> instance provided in the
 constructor.
@@ -177,6 +210,29 @@ The beats per minute.
 
 Default: C<120>
 
+=head2 phrase
+
+  $filter->phrase(\&your_phrase);
+  $part = $filter->phrase();
+
+The subroutine given to this attribute takes a collection of named
+parameters to do its thing. Primarily, this is a
+L<MIDI::Drummer::Tiny> instance named "drummer."
+
+=head2 common
+
+  $common = $filter->common;
+  $filter->common($common);
+
+These are custom arguments given to the phrase.
+
+A L<MIDI::Tiny::Drummer> instance, named "drummer" is added to this
+list when executing the B<phrase>.
+
+Default: C<{}> (no arguments)
+
+Default: C<120>
+
 =head1 METHODS
 
 All filter methods must accept the object, a MIDI device name, a
@@ -204,15 +260,17 @@ should be applied.
 
 The F<eg/*.pl> program(s) in this distribution
 
-L<MIDI::RtController::Filter::Tonal>
+L<MIDI::RtController::Filter::Tonal> - Related module
 
-L<MIDI::RtController::Filter::Math>
+L<MIDI::RtController::Filter::Math> - Related module
 
-L<MIDI::RtController::Filter::CC>
+L<MIDI::RtController::Filter::CC> - Related module
 
 L<List::SomeUtils>
 
 L<MIDI::Drummer::Tiny>
+
+L<MIDI::RtController>
 
 L<MIDI::RtMidi::ScorePlayer>
 

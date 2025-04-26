@@ -1,6 +1,6 @@
 package Map::Tube::Route;
 
-$Map::Tube::Route::VERSION   = '4.08';
+$Map::Tube::Route::VERSION   = '4.09';
 $Map::Tube::Route::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,12 +9,11 @@ Map::Tube::Route - Class to represent the route in the map.
 
 =head1 VERSION
 
-Version 4.08
+Version 4.09
 
 =cut
 
-use 5.006;
-use Data::Dumper;
+use v5.14;
 use Map::Tube::Types qw(Node Nodes);
 use Map::Tube::Utils qw(filter);
 

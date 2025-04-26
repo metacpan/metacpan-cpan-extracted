@@ -8,7 +8,7 @@ use base 'DBI';
 use Exporter 'import';
 
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 our %EXPORT_TAGS = (all => [qw(
     attr dbi_interp key_field

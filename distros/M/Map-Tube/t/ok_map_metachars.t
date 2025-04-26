@@ -3,13 +3,14 @@ package MetacharsMap;
 use Moo;
 use namespace::autoclean;
 
-has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'metachars-map.xml') });
+has xml => (is => 'ro', default => sub { File::Spec->catfile('t', 'map-metachars.xml') });
 with 'Map::Tube';
 
 package main;
 
-use 5.008;
-use strict; use warnings;
+use v5.14;
+use strict;
+use warnings;
 use Test::More tests => 10;
 use Test::Exception;
 

@@ -1,6 +1,6 @@
 package Map::Tube::Table;
 
-$Map::Tube::Table::VERSION   = '4.08';
+$Map::Tube::Table::VERSION   = '4.09';
 $Map::Tube::Table::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,11 +9,11 @@ Map::Tube::Table - Class to represent the table in the map.
 
 =head1 VERSION
 
-Version 4.08
+Version 4.09
 
 =cut
 
-use 5.006;
+use v5.14;
 use Moo;
 use namespace::autoclean;
 

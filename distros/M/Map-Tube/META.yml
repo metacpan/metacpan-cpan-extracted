@@ -24,55 +24,58 @@ no_index:
 provides:
   Map::Tube:
     file: lib/Map/Tube.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Cookbook:
     file: lib/Map/Tube/Cookbook.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Line:
     file: lib/Map/Tube/Line.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Node:
     file: lib/Map/Tube/Node.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Pluggable:
     file: lib/Map/Tube/Pluggable.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Route:
     file: lib/Map/Tube/Route.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Table:
     file: lib/Map/Tube/Table.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Types:
     file: lib/Map/Tube/Types.pm
-    version: '4.08'
+    version: '4.09'
   Map::Tube::Utils:
     file: lib/Map/Tube/Utils.pm
-    version: '4.08'
+    version: '4.09'
   Test::Map::Tube:
     file: lib/Test/Map/Tube.pm
-    version: '4.08'
+    version: '4.09'
 requires:
   Data::Compare: '1.25'
   File::Basename: '2.6'
   File::ShareDir: '1.114'
-  JSON: '2.90'
+  JSON::MaybeXS: '0'
   Map::Tube::Exception: '3.24'
   Map::Tube::Plugin::Formatter: '0.16'
   Module::Pluggable: '5.1'
   Moo: '2.000000'
   Moo::Role: '2.000000'
   MooX::Options: '4.023'
+  Path::Tiny: '0'
   Role::Tiny: '2.000000'
-  Taint::Util: '0.08'
+  Scalar::Util: '0'
   Throwable: '0'
+  Try::Tiny: '0'
   Type::Tiny: '1.000005'
+  Unicode::Normalize: '0'
   XML::Parser: '2.23'
   XML::Twig: '3.48'
   namespace::autoclean: '0.28'
   overload: '0'
-  perl: '5.006'
+  perl: '5.014'
 resources:
   repository: https://github.com/manwar/Map-Tube.git
-version: '4.08'
+version: '4.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

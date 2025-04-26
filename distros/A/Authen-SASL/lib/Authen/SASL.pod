@@ -4,7 +4,7 @@ Authen::SASL - SASL Authentication framework
 
 =head1 VERSION
 
-version 2.1700
+version 2.1800
 
 =head1 SYNOPSIS
 

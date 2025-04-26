@@ -31,7 +31,7 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny;
 use version;
 
-our $VERSION = '1.5.43';  ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.5.44';  ## no critic (RequireInterpolationOfMetachars)
 
 caller or __PACKAGE__->main();
 
@@ -1342,7 +1342,7 @@ sub main {
 
 __DATA__
 ---
-version: "1.5.43"
+version: "1.5.44"
 min_perl_version: "type:string"
 min-perl-version: "type:string"
 project:

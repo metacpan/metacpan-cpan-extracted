@@ -1,5 +1,17 @@
 Revision history for Dist-Zilla-Plugin-ReadmeFromPod
 
+0.39 2025-04-26 08:41:15
+  [Enhancements]
+  - Add a phase attribute to control when to build the README (Robert Rothenberg)
+
+  [Bug Fixes]
+  - Build the README from the content, so that it will work with Pod::Weaver (Robert Rothenberg)
+
+  [Documentation]
+  - Reorganized POD (Robert Rothenberg)
+
+  - Updated copyright year.
+
 0.38 2023-07-24 15:58:24
     - fix syntax of version check for Pod::Readme (@haarg)
 

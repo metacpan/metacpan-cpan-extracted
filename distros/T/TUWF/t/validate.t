@@ -14,7 +14,7 @@ BEGIN { use_ok 'TUWF::Validate', qw/compile validate/ };
 my %validations = (
   hex => { regex => qr/^[0-9a-f]*$/i },
   prefix => sub { my $p = shift; { func => sub { $_[0] =~ /^$p/ } } },
-  bool => { required => 0, default => 0, func => sub { $_[0] = $_[0]?1:0; 1 } },
+  bool => { default => 0, func => sub { $_[0] = $_[0]?1:0; 1 } },
   setundef => { func => sub { $_[0] = undef; 1 } },
   defaultsub1 => { default => sub { 2 } },
   defaultsub2 => { default => sub { defined $_[0] } },
@@ -25,10 +25,11 @@ my %validations = (
   uniquelength => { type => 'array', values => { type => 'array' }, unique => sub { scalar @{$_[0]} } },
   person => {
     type => 'hash',
-    unknown => 'accept',
+    unknown => 'pass',
     keys => {
       name => {},
-      age => { required => 0 }
+      age => { missing => 'ignore' },
+      sex => { missing => 'reject', default => 1 }
     }
   },
 );
@@ -59,16 +60,15 @@ sub t {
 }
 
 
-# required / default
+# default
 t {}, 0, 0, undef;
 t {}, '', '', { validation => 'required' };
 t {}, undef, undef, { validation => 'required' };
-t { required => 0 }, undef, undef, undef;
-t { required => 0 }, '', '', undef;
-t { required => 0, default => '' }, undef, '', undef;
-t { required => 0, defaultsub1 => 1 }, undef, 2, undef;
-t { required => 0, defaultsub2 => 1 }, undef, '', undef;
-t { required => 0, defaultsub2 => 1 }, '', 1, undef;
+t { default => undef }, undef, undef, undef;
+t { default => undef }, '', undef, undef;
+t { defaultsub1 => 1 }, undef, 2, undef;
+t { defaultsub2 => 1 }, undef, '', undef;
+t { defaultsub2 => 1 }, '', 1, undef;
 t { onerrorsub => 1 }, undef, 'TUWF::Validate::Result', undef;
 
 # rmwhitespace
@@ -102,12 +102,15 @@ t { type => 'hash' }, [], [], { validation => 'type', expected => 'hash', got =>
 t { type => 'hash' }, 'a', 'a', { validation => 'type', expected => 'hash', got => 'scalar' };
 t { type => 'hash' }, {a=>[],b=>undef,c=>{}}, {}, undef;
 t { type => 'hash', keys => { a=>{} } }, {}, {a=>undef}, { validation => 'keys', errors => [{ key => 'a', validation => 'required' }] }; # XXX: the key doesn't necessarily have to be created
-t { type => 'hash', keys => { a=>{required=>0} } }, {}, {}, undef;
-t { type => 'hash', keys => { a=>{required=>0,default=>undef} } }, {}, {a=>undef}, undef;
+t { type => 'hash', keys => { a=>{missing=>'ignore'} } }, {}, {}, undef;
+t { type => 'hash', keys => { a=>{default=>undef} } }, {}, {a=>undef}, undef;
+t { type => 'hash', keys => { a=>{missing=>'create',default=>undef} } }, {}, {a=>undef}, undef;
+t { type => 'hash', keys => { a=>{missing=>'reject'} } }, {}, {}, {key => 'a', validation => 'missing'};
+
 t { type => 'hash', keys => { a=>{} } }, {a=>' a '}, {a=>'a'}, undef; # Test against in-place modification
 t { type => 'hash', keys => { a=>{} }, unknown => 'remove' }, { a=>1,b=>1 }, { a=>1 }, undef;
 t { type => 'hash', keys => { a=>{} }, unknown => 'reject' }, { a=>1,b=>1 }, { a=>1,b=>1 }, { validation => 'unknown', keys => ['b'], expected => ['a'] };
-t { type => 'hash', keys => { a=>{} }, unknown => 'accept' }, { a=>1,b=>1 }, { a=>1,b=>1 }, undef;
+t { type => 'hash', keys => { a=>{} }, unknown => 'pass' }, { a=>1,b=>1 }, { a=>1,b=>1 }, undef;
 t { type => 'hash', setundef => 1 }, {}, undef, undef;
 t { type => 'hash', unknown => 'reject', keys => { a=>{ type => 'any', setundef => 1}} }, {a=>[]}, {a=>undef}, undef;
 
@@ -125,8 +128,8 @@ t { length => [1,3] }, 'abcd', 'abcd', { validation => 'length', expected => [1,
 t { type => 'array', length => 0 }, [], [], undef;
 t { type => 'array', length => 1 }, [1,2], [1,2], { validation => 'length', expected => 1, got => 2 };
 t { type => 'hash', length => 0 }, {}, {}, undef;
-t { type => 'hash', length => 1, unknown => 'accept' }, {qw/1 a 2 b/}, {qw/1 a 2 b/}, { validation => 'length', expected => 1, got => 2 };
-t { type => 'hash', length => 1, keys => {a => {required=>0}, b => {required=>0}} }, {a=>1}, {a=>1}, undef;
+t { type => 'hash', length => 1, unknown => 'pass' }, {qw/1 a 2 b/}, {qw/1 a 2 b/}, { validation => 'length', expected => 1, got => 2 };
+t { type => 'hash', length => 1, keys => {a => {missing=>'ignore'}, b => {missing=>'ignore'}} }, {a=>1}, {a=>1}, undef;
 t { regex => '^a' }, 'abc', 'abc', undef;  # XXX: Can't use qr// here because t() does dclone(). The 'hex' test covers that case anyway.
 t { regex => '^a' }, 'cba', 'cba', { validation => 'regex', regex => '^a', got => 'cba' };
 t { enum => [1,2] }, 1, 1, undef;
@@ -159,19 +162,18 @@ t { prefix => 'a' }, 'cba', 'cba', { validation => 'prefix', error => { validati
 t { bool => 1 }, 'abc', 1, undef;
 t { bool => 1 }, undef, 0, undef;
 t { bool => 1 }, '', 0, undef;
-t { bool => 1, required => 1 }, undef, undef, { validation => 'required' };
-t { bool => 1, required => 1 }, 0, 0, undef;
-t { collapsews => 1, required => 0 }, " \t\n ", ' ', undef;
+t { collapsews => 1 }, " \t\n ", ' ', undef;
 t { collapsews => 1 }, '   x  ', ' x ', undef;
 t { collapsews => 1, rmwhitespace => 1 }, '   x  ', 'x', undef;
 t { person => 1 }, 1, 1, { validation => 'type', expected => 'hash', got => 'scalar' };
-t { person => 1 }, {}, { name => undef }, { validation => 'person', error => { validation => 'keys', errors => [{ key => 'name', validation => 'required' }] } };
-t { person => 1 }, {name => 'x'}, { name => 'x' }, undef;
-t { person => 1, keys => {age => { required => 1 }} }, {name => 'x'}, { name => 'x', age => undef }, { validation => 'keys', errors => [{ key => 'age', validation => 'required' }] };
-t { person => 1, keys => {extra => {}} }, {name => 'x', extra => 1}, { name => 'x', extra => 1 }, undef;
-t { person => 1, keys => {extra => {}} }, {name => 'x', extra => ''}, { name => 'x', extra => '' }, { validation => 'keys', errors => [{ key => 'extra', validation => 'required' }] };
-t { person => 1 }, {name => 'x', extra => 1}, {name => 'x', extra => 1}, undef;
-t { person => 1, unknown => 'remove' }, {name => 'x', extra => 1}, {name => 'x'}, undef;
+t { person => 1, default => 1 }, undef, 1, undef;
+t { person => 1 }, { sex => 1 }, { sex => 1, name => undef }, { validation => 'person', error => { validation => 'keys', errors => [{ key => 'name', validation => 'required' }] } };
+t { person => 1 }, { sex => undef, name => 'y' }, { sex => 1, name => 'y' }, undef;
+t { person => 1, keys => {age => {default => \'required'}} }, {name => 'x', sex => 'y'}, { name => 'x', sex => 'y', age => undef }, { validation => 'keys', errors => [{ key => 'age', validation => 'required' }] };
+t { person => 1, keys => {extra => {}} }, {name => 'x', sex => 'y', extra => 1},  { name => 'x', sex => 'y', extra => 1 }, undef;
+t { person => 1, keys => {extra => {}} }, {name => 'x', sex => 'y', extra => ''}, { name => 'x', sex => 'y', extra => '' }, { validation => 'keys', errors => [{ key => 'extra', validation => 'required' }] };
+t { person => 1 }, {name => 'x', sex => 'y', extra => 1}, {name => 'x', sex => 'y', extra => 1}, undef;
+t { person => 1, unknown => 'remove' }, {name => 'x', sex => 'y', extra => 1}, {name => 'x', sex => 'y'}, undef;
 t { neverfails => 1, int => 1 }, undef, 'err', undef;
 t { neverfails => 1, int => 1 }, 'x', 'err', undef;
 t { neverfails => 1, int => 1, onerror => undef }, 'x', undef, undef; # XXX: no way to 'unset' an inherited onerror clause, hmm.

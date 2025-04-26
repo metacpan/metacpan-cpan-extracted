@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::MSVC;
-$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.029';
+$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.030';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use parent qw/ExtUtils::Builder::Linker::COFF/;
 sub _init {
 	my ($self, %args) = @_;
 	$args{ld} //= ['link'];
-	$args{export} //= 'some';
+	$args{export} //= $args{type} eq 'shared-library'  || $args{type} eq 'loadable-object' ? 'some' : 'none';
 	$self->ExtUtils::Builder::Linker::COFF::_init(%args);
 	return;
 }

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,16 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-ReadmeFromPod",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Dist::Zilla::Plugin::ReadmeFromPod",
   "PREREQ_PM" => {
     "Dist::Zilla" => "6.000",
     "Dist::Zilla::File::InMemory" => 0,
+    "Dist::Zilla::Role::AfterBuild" => 0,
+    "Dist::Zilla::Role::AfterRelease" => 0,
     "Dist::Zilla::Role::FilePruner" => 0,
-    "Dist::Zilla::Role::InstallTool" => 5,
     "IO::String" => 0,
     "List::Util" => "1.33",
     "Moose" => 0,
+    "Moose::Util::TypeConstraints" => 0,
     "Path::Tiny" => "0.004",
     "Pod::Readme" => "1.2.0"
   },
@@ -35,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.38",
+  "VERSION" => "0.39",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,14 +47,16 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Dist::Zilla" => "6.000",
   "Dist::Zilla::File::InMemory" => 0,
+  "Dist::Zilla::Role::AfterBuild" => 0,
+  "Dist::Zilla::Role::AfterRelease" => 0,
   "Dist::Zilla::Role::FilePruner" => 0,
-  "Dist::Zilla::Role::InstallTool" => 5,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IO::String" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.33",
   "Moose" => 0,
+  "Moose::Util::TypeConstraints" => 0,
   "Path::Tiny" => "0.004",
   "Pod::Readme" => "1.2.0",
   "Test::More" => 0,

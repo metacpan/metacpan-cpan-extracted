@@ -10,7 +10,7 @@ use Exporter 'import';
 use Carp 'carp', 'croak';
 
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 our(@EXPORT_OK, %EXPORT_TAGS, $OBJ);
 
 # List::Util provides a uniq() since 1.45, but for some reason my Perl comes
@@ -31,7 +31,7 @@ BEGIN {
     button canvas caption cite code col colgroup command datagrid datalist dd
     del details dfn dialog div dl dt em embed fieldset figure footer form h1 h2
     h3 h4 h5 h6 head header hr i iframe img input ins kbd label legend li Link
-    main Map mark meta meter nav noscript object ol optgroup option output p
+    main Map mark menu meta meter nav noscript object ol optgroup option output p
     param pre progress Q rp rt ruby samp script section Select small source
     span strong style Sub summary sup table tbody td textarea tfoot th thead
     Time title Tr ul var video
@@ -174,6 +174,7 @@ sub txt {
 #  'tagname', sub { .. }               <tagname>..</tagname>
 #  'tagname', class => undef           <tagname>
 #  'tagname', '+a' => 1, '+a' => 2     <tagname a="1 2">
+#  'tagname', a => 1, '+' => 2         <tagname a="1 2">
 #  'tagname', id => 'main', '<bar>'    <tagname id="main">&lt;bar&gt;</tagname>
 #  'tagname', id => 'main', sub { .. } <tagname id="main">..</tagname>
 #  'tagname', id => 'main', undef      <tagname id="main" />
@@ -186,15 +187,23 @@ sub tag {
   my $indent = $s->{pretty} ? "\n".(' 'x($s->{nesting}*$s->{pretty})) : '';
   my $t = $indent.'<'.$name;
   my %concat;
+  my $last;
   while(@_ > 1) {
     my $attr = shift;
     my $val = shift;
-    next if !defined $val;
     croak "Invalid XML attribute name" if $attr =~ /[\s'"&<>=]/; # Not comprehensive, just enough to prevent XSS-by-fucking-up-XML-structure
-    if($attr =~ /^\+(.+)/) {
-      $concat{$1} .= (length $concat{$1} ? ' ' : '') . $val;
+    if($attr =~ /^\+(.*)/) {
+      $last = $1 if $1;
+      $concat{$last} .= (length $concat{$last} ? ' ' : '') . $val if defined $val;
     } else {
-      $t .= qq{ $attr="}.xml_escape($val).'"';
+      if (defined $val) {
+          if (@_ && defined $_[0] && $_[0] eq '+') {
+              $concat{$attr} = $val;
+          } else {
+              $t .= qq{ $attr="}.xml_escape($val).'"';
+          }
+      }
+      $last = $attr;
     }
   }
   $t .= qq{ $_="}.xml_escape($concat{$_}).'"' for sort keys %concat;

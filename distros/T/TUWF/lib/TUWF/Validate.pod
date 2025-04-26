@@ -134,7 +134,8 @@ is actually equivalent to:
 
   { type         => 'scalar',
     rmwhitespace => 1,
-    required     => 1
+    default      => \'required',
+    missing      => 'create',
   }
 
 =head2 Built-in options
@@ -143,9 +144,9 @@ is actually equivalent to:
 
 =item type => $type
 
-Specify the required type of the input, this can be I<scalar>, I<array>,
-I<hash> or I<any>. If no type is specified or implied by other validations, the
-default type is I<scalar>.
+Specify the type of the input, this can be I<scalar>, I<array>, I<hash> or
+I<any>. If no type is specified or implied by other validations, the default
+type is I<scalar>.
 
 Upon failure, the error object will look something like:
 
@@ -154,27 +155,24 @@ Upon failure, the error object will look something like:
     got        => 'scalar'
   }
 
-=item required => 0/1
-
-Whether this input is required to have a value. Specifically, this means
-C<exists($x) && defined($x) && $x ne ''>. If the input is empty and this option
-is disabled, the I<default> option is returned when it is set, otherwise the
-input is simply returned as-is.
-
-As a corollary: Other validations will never get to validate undef or an empty
-string, these values are either rejected or substituted with a default.
-
-Note that this option is checked after I<rmwhitespace> and before any other
-validation. So a string containing only whitespace is considered an empty
-string, and will fail the I<required> test.
-
-Default: true.
-
 =item default => $val
 
-The value to return if I<required> is false and the input is empty or undef.
-If C<$val> is a CODE reference, the subroutine will be called with the original
-input as first argument and its return value will be used for this validation.
+If not set, or set to C<\'required'> (note: scalarref), then a value is required
+for this field. Specifically, this means that a value must exist and must not
+be C<undef> or an empty string, i.e. C<exists($x) && defined($x) && $x ne ''>.
+
+If set to any other value, then the input is considered optional and the given
+C<$val> will be returned instead. If C<$val> is a CODE reference, the
+subroutine will be called with the original value (which is either no argument,
+undef or an empty string) and the return value of the subroutine will be used
+as value instead.
+
+The empty check is performed after I<rmwhitespace> and before any other
+validations. So a string containing only whitespace is considered an empty
+string and will be treated according to this I<default> option. As an
+additional side effect, other validations will never get to validate undef or
+an empty string, as these values are either rejected or substituted with a
+default.
 
 =item onerror => $val
 
@@ -241,6 +239,23 @@ In the case of I<reject>, the error object will look like:
     # List of known keys (which may or may not be present
     # in the input - that is checked at a later stage)
     expected   => ['known1', .. ]
+  }
+
+=item missing => $option
+
+For C<< type => 'hash' >>, this option specifies what to do with keys that have
+been defined in the I<keys> option, but which are not present in the input
+data.  Possible values are I<create> to insert the key with a default value (if
+the I<default> option is set, otherwise undef), I<reject> to return an error if
+the option is missing or I<ignore> to leave the key out of the returned data.
+
+The default is I<create>, but if no I<default> option is set for this key then
+that is effectively the same as I<reject>.
+
+In the case of I<reject>, the error object will look like:
+
+  { validation => 'missing',
+    key        => 'field'
   }
 
 =item values => $schema
@@ -563,6 +578,9 @@ top-level schema can always override options set by custom validations.
 
 L<TUWF>.
 
+This module has been forked into L<FU::Validate>, which offers some additional
+features and is more actively maintained.
+
 TUWF::Validate has drawn inspiration from L<Brannigan>. Brannigan is very
 similar, but slightly more complex and more buggy (and, unfortunately,
 unmaintained). TUWF::Validate has more detailed error types and more powerful
@@ -579,7 +597,7 @@ the module has more dependencies than I'd prefer.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2019 Yoran Heling.
+Copyright (c) Yorhel.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the
@@ -588,6 +606,6 @@ details.
 
 =head1 AUTHOR
 
-Yoran Heling <projects@yorhel.nl>
+Yorhel <projects@yorhel.nl>
 
 =cut

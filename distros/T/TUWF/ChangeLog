@@ -1,3 +1,16 @@
+1.6 - 2025-04-23
+	- This module has been superseded by FU, there will likely not be much
+	  further development on TUWF after this release.
+	- TUWF::Validate: `default` option now implies `required => false`
+	- TUWF::Validate: Add `missing` option for hash keys
+	- TUWF::Validate: Reject unicode numbers in num/int validations
+	- TUWF::Validate: Perform more strict schema validation
+	- TUWF::XML: Add support for `<menu>`
+	- TUWF::XML: Add support for merging attributes with '+'
+	- FastCGI: Request parameters are no longer written to `%ENV`
+	- Add MIME types for .mjs, .avif, .jxl, .webp
+	- Set `convert_blessed` option in tuwf->resJSON()
+
 1.5 - 2023-01-18
 	- Add tuwf->req() method for storing request-local data
 	- Add tuwf->captures() as alternative to handler arguments

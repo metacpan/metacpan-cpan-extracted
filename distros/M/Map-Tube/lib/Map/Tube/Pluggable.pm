@@ -1,6 +1,6 @@
 package Map::Tube::Pluggable;
 
-$Map::Tube::Pluggable::VERSION   = '4.08';
+$Map::Tube::Pluggable::VERSION   = '4.09';
 $Map::Tube::Pluggable::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,11 +9,11 @@ Map::Tube::Pluggable - Class to load plugins for Map::Tube.
 
 =head1 VERSION
 
-Version 4.08
+Version 4.09
 
 =cut
 
-use 5.006;
+use v5.14;
 use strict; use warnings;
 use Module::Pluggable search_path => ['Map::Tube::Plugin'], require => 1, max_depth => 4;
 

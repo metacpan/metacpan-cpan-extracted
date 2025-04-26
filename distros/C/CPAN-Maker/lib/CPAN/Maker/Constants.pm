@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw{ Exporter };
 
-our $VERSION = '1.5.43';  ## no critic (RequireInterpolation)
+our $VERSION = '1.5.44';  ## no critic (RequireInterpolation)
 
 our @EXPORT_OK = ();
 
