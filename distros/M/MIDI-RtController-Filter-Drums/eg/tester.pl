@@ -18,9 +18,15 @@ my $filter = MIDI::RtController::Filter::Drums->new(rtc => $controller);
 
 $filter->phrase(\&my_phrase);
 $filter->bars(8);
+
+# for a note_on:
 $filter->trigger(99);
 
-$controller->add_filter('drums', note_on => $filter->curry::drums);
+# for a control-change:
+# $filter->trigger(25);
+# $filter->value(127);
+
+$controller->add_filter('drums', all => $filter->curry::drums);
 
 $controller->run;
 

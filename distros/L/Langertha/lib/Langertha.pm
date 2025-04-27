@@ -1,7 +1,7 @@
 package Langertha;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
-$Langertha::VERSION = '0.007';
+$Langertha::VERSION = '0.008';
 use utf8;
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -11,6 +11,7 @@ README
 README.md
 bin/langertha_chat_ollama
 bin/langertha_chat_openai
+bin/langertha_openai_list_models
 bin/langertha_whisper
 cpanfile
 dist.ini
@@ -31,6 +32,7 @@ lib/Langertha.pm
 lib/Langertha/Engine/Anthropic.pm
 lib/Langertha/Engine/DeepSeek.pm
 lib/Langertha/Engine/Groq.pm
+lib/Langertha/Engine/Mistral.pm
 lib/Langertha/Engine/Ollama.pm
 lib/Langertha/Engine/OpenAI.pm
 lib/Langertha/Engine/Whisper.pm
@@ -51,6 +53,7 @@ lib/Langertha/Role/Temperature.pm
 lib/Langertha/Role/Transcription.pm
 lib/LangerthaX.pm
 share/banner
+share/mistral.yaml
 share/ollama.yaml
 share/openai.yaml
 t/00_load.t

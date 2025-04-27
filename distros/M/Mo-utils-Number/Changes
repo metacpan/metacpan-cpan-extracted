@@ -1,2 +1,6 @@
+0.02 2025-04-26T13:15:28+02:00
+ - Add check_number(), moved from Mo::utils.
+ - Fix example in doc.
+
 0.01 2025-04-08T12:11:51+02:00
  - First version.

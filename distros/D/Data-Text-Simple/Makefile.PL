@@ -19,8 +19,9 @@ perl_version 5.008;
 readme_from 'Simple.pm';
 recursive_author_tests('xt');
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.09;
+requires 'Mo::utils' => 0;
 requires 'Mo::utils::Language' => 0.05;
+requires 'Mo::utils::Number' => 0;
 resources 'bugtracker' => 'https://github.com/commons-vote/Data-Text-Simple/issues';
 resources 'homepage' => 'https://github.com/commons-vote/Data-Text-Simple';
 resources 'repository' => 'git://github.com/commons-vote/Data-Text-Simple';
@@ -29,7 +30,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

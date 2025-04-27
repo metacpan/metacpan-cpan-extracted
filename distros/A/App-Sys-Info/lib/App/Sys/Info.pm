@@ -1,5 +1,5 @@
 package App::Sys::Info;
-$App::Sys::Info::VERSION = '0.25';
+$App::Sys::Info::VERSION = '0.26';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use Carp                 qw( croak    );
 use Format::Human::Bytes;
 use POSIX                qw( locale_h );
 use Text::Table          qw();
-use Time::Elapsed        qw( elapsed  );
+use Time::Duration       qw( duration_exact  );
 use Sys::Info            qw();
 use Sys::Info::Constants qw( NEW_PERL OSID );
 
@@ -109,8 +109,15 @@ sub _probe {
     my @rv;
 
     push @rv,
-        [ 'Sys::Info Version' => Sys::Info->VERSION ],
-        [  sprintf( '%s Driver Version', OSID ) => $driver->VERSION ],
+        [ 'Sys::Info Version' =>
+                sprintf(
+                    '%s (%s: %s - Base: %s)',
+                        Sys::Info->VERSION,
+                        OSID,
+                        $driver->VERSION,
+                        Sys::Info::Base->VERSION,
+                )
+        ],
         [ 'Perl Version'      => $i->perl_long      ],
         [ 'Host Name'         => $os->host_name     ],
         [ 'OS Name'           => $self->_os_name    ],
@@ -136,7 +143,7 @@ sub _probe {
 
     $self->_install_date( \@rv );
 
-    push @rv, [ 'System Up Time' => elapsed($tick) ] if $tick;
+    push @rv, [ 'System Up Time' => duration_exact($tick) ] if $tick;
 
     $self->_manufacturer( \@rv, $meta );
 
@@ -356,7 +363,7 @@ App::Sys::Info
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -394,7 +401,7 @@ App::Sys::Info - Application of Sys::Info to gather information from the system
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

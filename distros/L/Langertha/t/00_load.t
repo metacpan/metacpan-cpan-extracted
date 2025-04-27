@@ -10,6 +10,7 @@ my @modules = qw(
   Langertha
   Langertha::Engine::Anthropic
   Langertha::Engine::Groq
+  Langertha::Engine::Mistral
   Langertha::Engine::OpenAI
   Langertha::Engine::Ollama
   Langertha::Engine::vLLM

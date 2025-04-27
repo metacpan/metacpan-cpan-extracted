@@ -1,9 +1,9 @@
 package Parse::HTTP::UserAgent;
-$Parse::HTTP::UserAgent::VERSION = '0.42';
+$Parse::HTTP::UserAgent::VERSION = '0.43';
 use strict;
 use warnings;
 
-use base qw(
+use parent qw(
     Parse::HTTP::UserAgent::Base::IS
     Parse::HTTP::UserAgent::Base::Parsers
     Parse::HTTP::UserAgent::Base::Dumper
@@ -400,7 +400,7 @@ Parse::HTTP::UserAgent
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 SYNOPSIS
 
@@ -444,6 +444,10 @@ also a structure dumper, useful for debugging.
 =head1 NAME
 
 Parse::HTTP::UserAgent - Parser for the User Agent string
+
+=head1 DEPRECATION NOTICE
+
+This module is B<DEPRECATED>. Please use L<HTTP::BrowserDetect> instead.
 
 =head1 METHODS
 
@@ -516,6 +520,8 @@ If you pass a wrong parameter to the dumper, it'll croak.
 =back
 
 =head1 SEE ALSO
+
+This module is B<DEPRECATED>. Please use L<HTTP::BrowserDetect> instead.
 
 =head2 Similar Functionality
 
@@ -592,7 +598,7 @@ L<http://use.perl.org/~Burak/journal/39577> (4 September 2009).
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -10,7 +10,7 @@
 # ABSTRACT: Generates pod doc from model files
 
 package App::Cme::Command::gen_class_pod ;
-$App::Cme::Command::gen_class_pod::VERSION = '1.041';
+$App::Cme::Command::gen_class_pod::VERSION = '1.042';
 use strict;
 use warnings;
 use 5.10.1;
@@ -50,7 +50,7 @@ App::Cme::Command::gen_class_pod - Generates pod doc from model files
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 

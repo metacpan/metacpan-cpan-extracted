@@ -1,3 +1,7 @@
+0.03 2025-04-26T13:40:21+02:00
+ - Fix check of id.
+ - Update copyright years.
+
 0.02 2024-03-23T22:14:39+01:00
  - Rewrite to use of check_language_639_1().
 

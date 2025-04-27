@@ -38,7 +38,7 @@ subtest 'validate args' => sub {
     };
 
     try {
-        my $dbh = DBD::Mock::Session::GenerateFixtures->new({dbh => $dbh, file => './t/db_fixtures/14_upsert.t.json'})->get_dbh();
+        my $dbh = DBD::Mock::Session::GenerateFixtures->new({dbh => $dbh, file => 't/db_fixtures/14_upsert.t.json'})->get_dbh();
     } catch {
         my $error = $_;
         like($error, qr/to many args to new at/, 'to many args to new');

@@ -69,7 +69,7 @@ subtest 'selectrow generate mock data' => sub {
 };
 
 subtest 'selectrow use mock data' => sub {
-	my $obj = DBD::Mock::Session::GenerateFixtures->new({file => './t/db_fixtures/13_selectrow.t.json'});
+	my $obj = DBD::Mock::Session::GenerateFixtures->new({file => 't/db_fixtures/13_selectrow.t.json'});
 	my $dbh = $obj->get_dbh();
 
 	my $sth = $dbh->prepare($sql);

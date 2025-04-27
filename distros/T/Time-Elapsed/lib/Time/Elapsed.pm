@@ -1,5 +1,5 @@
 package Time::Elapsed;
-$Time::Elapsed::VERSION = '0.33';
+$Time::Elapsed::VERSION = '0.34';
 use strict;
 use warnings;
 use utf8;
@@ -16,7 +16,7 @@ use constant YEAR       => 365 * DAY;
 use constant INDEX      => 0;
 use constant MULTIPLIER => 1;
 use constant FIXER      => 2;
-use base qw( Exporter );
+use parent qw( Exporter );
 use Carp qw( croak );
 
 use constant T_SECOND => 60;
@@ -254,7 +254,7 @@ Time::Elapsed
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -284,6 +284,10 @@ See the L</CAVEATS> section for more information.
 =head1 NAME
 
 Time::Elapsed - Displays the elapsed time as a human readable string.
+
+=head1 DEPRECATION NOTICE
+
+This module is B<DEPRECATED>. Please use L<Time::Duration>.
 
 =head1 IMPORT PARAMETERS
 
@@ -394,7 +398,7 @@ L<Time::Duration>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

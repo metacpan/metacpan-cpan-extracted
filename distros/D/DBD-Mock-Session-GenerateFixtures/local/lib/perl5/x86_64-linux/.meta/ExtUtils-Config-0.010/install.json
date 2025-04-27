@@ -1,1 +1,0 @@
-{"target":"ExtUtils::Config","pathname":"L/LE/LEONT/ExtUtils-Config-0.010.tar.gz","provides":{"ExtUtils::Config":{"file":"lib/ExtUtils/Config.pm","version":"0.010"},"ExtUtils::Config::MakeMaker":{"file":"lib/ExtUtils/Config/MakeMaker.pm","version":"0.010"}},"version":"0.010","name":"ExtUtils::Config","dist":"ExtUtils-Config-0.010"}

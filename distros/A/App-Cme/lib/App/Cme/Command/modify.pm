@@ -10,7 +10,7 @@
 # ABSTRACT: Modify the configuration of an application
 
 package App::Cme::Command::modify ;
-$App::Cme::Command::modify::VERSION = '1.041';
+$App::Cme::Command::modify::VERSION = '1.042';
 use strict;
 use warnings;
 use 5.10.1;
@@ -83,7 +83,7 @@ App::Cme::Command::modify - Modify the configuration of an application
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 
@@ -100,11 +100,6 @@ Example:
 
    cme modify dpkg 'source format="(3.0) quilt"'
    cme modify multistrap my_mstrap.conf 'sections:base source="http://ftp.fr.debian.org"'
-
-Some application like dpkg-copyright allows you to override the
-configuration file name. You must then use C<-file> option:
-
-   cme modify dpkg-copyright -file ubuntu/copyright 'Comment="Silly example"'
 
 Finding the right instructions to perform a modification may be
 difficult when starting from scratch.
@@ -134,7 +129,7 @@ See L<cme/"Global Options">.
 
 =over
 
-=item -savek
+=item -save
 
 Force a save even if no change was done. Useful to reformat the configuration file.
 
@@ -143,6 +138,45 @@ Force a save even if no change was done. Useful to reformat the configuration fi
 Show effect of the modify instructions.
 
 =back
+
+=head1 Examples
+
+=head2 Set identity file for a domain
+
+ $ cme modify ssh 'Host:"*.work.com" IdentityFile:="~/.ssh/id_work"'
+
+This example requires L<Config::Model::OpenSsh>.
+
+=head2 Update Dpkg file
+
+To set C<Architecture> parameter for all binary packages:
+
+ $ cme modify dpkg-control 'binary:~".*" Architecture=any'
+
+This achieves the same result but can be slower since all package
+files are read:
+
+ $ cme modify dpkg 'control binary:~".*" Architecture=any'
+
+This Debian example requires C<libconfig-model-dpkg-perl>
+
+=head1 Re-use your one-liners
+
+These modification instructions can be re-used once they are stored in
+a run script (See L<App::Cme::Command::run> for details).
+
+The following one-liner:
+
+ $ cme modify dpkg 'control binary:~".*" Architecture=any'
+
+can be stored in C<~/.cme/scripts/set-arch-as-any>:
+
+  app: dpkg-control
+  load: binary:~".*" Architecture=any
+
+and then run with:
+
+  $ cme run set-arch-as-any
 
 =head1 SEE ALSO
 

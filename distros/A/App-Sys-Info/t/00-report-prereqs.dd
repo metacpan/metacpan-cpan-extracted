@@ -20,7 +20,7 @@ do { my $x = {
                                       'Sys::Info' => '0.73',
                                       'Sys::Info::Constants' => '0',
                                       'Text::Table' => '0',
-                                      'Time::Elapsed' => '0',
+                                      'Time::Duration' => '0',
                                       'constant' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',
@@ -37,7 +37,6 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.010'
                                  }
                  }

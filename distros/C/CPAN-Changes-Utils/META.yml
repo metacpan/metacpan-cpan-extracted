@@ -20,6 +20,7 @@ meta-spec:
 name: CPAN-Changes-Utils
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
@@ -33,4 +34,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/CPAN-Changes-Utils
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/CPAN-Changes-Utils
-version: '0.01'
+version: '0.02'

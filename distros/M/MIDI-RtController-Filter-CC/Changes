@@ -1,5 +1,17 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.1002 2025-04-26 17:49:40
+  - Improve documentation.
+
+0.1001 2025-04-26 17:13:22
+  - Improve documentation.
+
+0.1000 2025-04-26 15:52:57
+  - Use the parent filter class now.
+
+0.0914 2025-04-26 11:10:19
+  - Use defined-or in the single() filter.
+
 0.0913 2025-04-23 12:09:15
   - Improve documentation.
   - Make the step values be 0-127, not "any number."

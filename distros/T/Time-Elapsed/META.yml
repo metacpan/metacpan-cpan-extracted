@@ -1,19 +1,18 @@
 ---
 abstract: 'Displays the elapsed time as a human readable string.'
 author:
-  - 'Burak Gursoy <burak@cpan.org>'
+  - 'Burak Gursoy'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 keywords:
   - time
   - elapsed
@@ -28,8 +27,8 @@ requires:
   Exporter: '0'
   File::Spec: '0'
   Symbol: '0'
-  base: '0'
   constant: '0'
+  parent: '0'
   perl: '5.010'
   strict: '0'
   subs: '0'
@@ -39,7 +38,9 @@ requires:
 resources:
   bugtracker: https://github.com/burak/CPAN-Time-Elapsed/issues
   repository: git://github.com/burak/CPAN-Time-Elapsed.git
-version: '0.33'
+version: '0.34'
 x_contributors:
-  - 'Burak Gursoy <burak@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'Burak Gursoy'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

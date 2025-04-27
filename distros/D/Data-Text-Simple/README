@@ -17,7 +17,7 @@ METHODS
 
     *       "id"
 
-            Id of record. Id could be number.
+            Id of record. Id could be positive natural number.
 
             It's optional.
 
@@ -61,12 +61,13 @@ METHODS
 ERRORS
      new():
              From Mo::utils:
-                     Parameter 'id' must be a number.
-                             Value: %s
                      Parameter 'text' is required.
              From Mo::utils::Language:
                      Parameter 'lang' doesn't contain valid ISO 639-1 code.
                              Codeset: %s
+                             Value: %s
+             From Mo::utils::Number:
+                     Parameter 'id' must be a positive natural number.
                              Value: %s
 
 EXAMPLE
@@ -92,7 +93,7 @@ EXAMPLE
      # Text: This is a text.
 
 DEPENDENCIES
-    Mo, Mo::utils, Mo::utils::Language.
+    Mo, Mo::utils, Mo::utils::Language, Mo::utils::Number.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Data-Text-Simple>
@@ -103,10 +104,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

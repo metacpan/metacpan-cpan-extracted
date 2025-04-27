@@ -1,5 +1,5 @@
 package Parse::HTTP::UserAgent::Base::Dumper;
-$Parse::HTTP::UserAgent::Base::Dumper::VERSION = '0.42';
+$Parse::HTTP::UserAgent::Base::Dumper::VERSION = '0.43';
 use strict;
 use warnings;
 use Carp qw( croak );
@@ -109,7 +109,7 @@ Parse::HTTP::UserAgent::Base::Dumper
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 DESCRIPTION
 
@@ -118,6 +118,10 @@ The parsed structure can be dumped to a text table for debugging.
 =head1 NAME
 
 Parse::HTTP::UserAgent::Base::Dumper - Base class to dump parsed structure
+
+=head1 DEPRECATION NOTICE
+
+This module is B<DEPRECATED>. Please use L<HTTP::BrowserDetect> instead.
 
 =head1 METHODS
 
@@ -132,7 +136,7 @@ L<Parse::HTTP::UserAgent>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

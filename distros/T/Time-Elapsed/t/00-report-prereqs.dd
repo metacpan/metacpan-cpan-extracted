@@ -18,8 +18,8 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'File::Spec' => '0',
                                       'Symbol' => '0',
-                                      'base' => '0',
                                       'constant' => '0',
+                                      'parent' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',
                                       'subs' => '0',
@@ -38,7 +38,6 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.010'
                                  }
                  }

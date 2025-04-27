@@ -1,5 +1,5 @@
 package Parse::HTTP::UserAgent::Base::IS;
-$Parse::HTTP::UserAgent::Base::IS::VERSION = '0.42';
+$Parse::HTTP::UserAgent::Base::IS::VERSION = '0.43';
 use strict;
 use warnings;
 use Parse::HTTP::UserAgent::Constants qw(:all);
@@ -164,7 +164,7 @@ Parse::HTTP::UserAgent::Base::IS
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 DESCRIPTION
 
@@ -174,13 +174,17 @@ Internal module.
 
 Parse::HTTP::UserAgent::Base::IS - Base class
 
+=head1 DEPRECATION NOTICE
+
+This module is B<DEPRECATED>. Please use L<HTTP::BrowserDetect> instead.
+
 =head1 SEE ALSO
 
 L<Parse::HTTP::UserAgent>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

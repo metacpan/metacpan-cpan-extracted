@@ -20,6 +20,7 @@
 # Dave Plonka <plonka@doit.wisc.edu>
 # Philip Prindeville <philipp@redfish-solutions.com>
 # Anton Berezin <tobez@tobez.org>
+# Andreas Vögele <andreas@andreasvoegele.com>
 
 package Net::Patricia;
 
@@ -40,7 +41,7 @@ BEGIN {
   @EXPORT = qw(AF_INET AF_INET6);
 }
 
-'$Revision: 1.22 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
+'$Revision: 1.23 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
 
 bootstrap Net::Patricia $VERSION;
 
@@ -323,8 +324,9 @@ Net::Patricia - Patricia Trie perl module for fast IP address lookups
 
   use Net::Patricia;
 
-  my $pt = new Net::Patricia;
+  my $pt = Net::Patricia->new;
 
+  my $user_data;
   $pt->add_string('127.0.0.0/8', \$user_data);
   $pt->match_string('127.0.0.1');
   $pt->match_exact_string('127.0.0.0');
@@ -336,7 +338,7 @@ Net::Patricia - Patricia Trie perl module for fast IP address lookups
   undef $pt; # automatically destroys the Patricia Trie
 
   # IPv6 support:
-  $pt = new Net::Patricia AF_INET6;
+  $pt = Net::Patricia->new(AF_INET6);
   $pt->add_string('2001:db8::/32');
   $pt->add_string('2001:db8:0:dead::/64');
   $pt->add_string('2001:db8:0:beef::/64');
@@ -377,7 +379,7 @@ Routing Table for Berkeley Unix'' by Keith Sklower.
 
 =item B<new> - create a new Net::Patricia object
 
-   $pt = new Net::Patricia;
+   $pt = Net::Patricia->new;
 
 This is the class' constructor - it returns a C<Net::Patricia> object
 upon success or undef on failure.  The constructor takes an
@@ -551,8 +553,12 @@ subroutine return a non-zero value.
 =head1 AUTHOR
 
 Dave Plonka <plonka@doit.wisc.edu>
+
 Philip Prindeville <philipp@redfish-solutions.com>
+
 Anton Berezin <tobez@tobez.org>
+
+Andreas Vögele <andreas@andreasvoegele.com>
 
 Copyright (C) 2000-2005  Dave Plonka.  Copyright (C) 2009  Dave Plonka
 & Philip Prindeville.  This program is free software; you
@@ -568,20 +574,20 @@ patricialib, the C library used by this perl extension, is an extracted
 version of MRT's patricia code from radix.[ch], which was worked on by
 Masaki Hirabaru and Craig Labovitz.  For more info on MRT see:
 
-   http://www.mrtd.net/
+   https://github.com/deepfield/MRT
 
 The MRT patricia code owes some heritage to GateD's radix code, which
 in turn owes something to the BSD kernel.
 
 =head1 SEE ALSO
 
-perl(1), Socket, Net::Netmask, Text::Trie, Tree::Trie.
+perl(1), L<Socket>, L<Net::Netmask>, L<Text::Trie>, L<Tree::Trie>.
 
 Tree::Radix and Net::RoutingTable are modules by Daniel Hagerty
 <hag@linnaean.org> written entirely in perl, unlike this module.  At
 the time of this writing, they are works-in-progress but may be
 available at:
 
-   http://www.linnaean.org/~hag/
+   https://www.linnaean.org/~hag/
 
 =cut

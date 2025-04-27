@@ -26,7 +26,7 @@ my $loader = Rose::DB::Object::Loader->new(
 	class_prefix => 'DB'
 ) or die "Failed to create loader: $@";
 
-$loader->make_modules(module_dir => './t') or die 'Failed to make classes:';
+$loader->make_modules(module_dir => 't') or die 'Failed to make classes:';
 
 my $expected_rows = [{
 		'license_id'        => 1,

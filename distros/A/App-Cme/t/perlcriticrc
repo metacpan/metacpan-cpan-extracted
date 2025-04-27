@@ -4,7 +4,7 @@ severity = 3
 [-Subroutines::ProhibitSubroutinePrototypes]
 
 [TestingAndDebugging::ProhibitNoWarnings]
-allow = experimental::signatures experimental::smartmatch experimental::postderef
+allow = experimental::signatures experimental::postderef
 
 [-RegularExpressions::RequireExtendedFormatting]
 minimum_regex_length_to_complain_about = 25

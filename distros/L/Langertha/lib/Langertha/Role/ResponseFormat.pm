@@ -1,7 +1,7 @@
 package Langertha::Role::ResponseFormat;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for an engine where you can specify structured output
-$Langertha::Role::ResponseFormat::VERSION = '0.007';
+$Langertha::Role::ResponseFormat::VERSION = '0.008';
 use Moose::Role;
 
 has response_format => (
@@ -24,7 +24,7 @@ Langertha::Role::ResponseFormat - Role for an engine where you can specify struc
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

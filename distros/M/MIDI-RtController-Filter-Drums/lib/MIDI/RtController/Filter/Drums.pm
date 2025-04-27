@@ -5,49 +5,31 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0400';
 
 use strictures 2;
 use List::SomeUtils qw(first_index);
 use MIDI::Drummer::Tiny ();
 use MIDI::RtMidi::ScorePlayer ();
 use Moo;
-use Types::Standard qw(ArrayRef CodeRef HashRef Num Maybe);
+use Types::Common::Numeric qw(PositiveInt);
+use Types::Standard qw(CodeRef HashRef);
 use namespace::clean;
 
+extends 'MIDI::RtController::Filter';
 
-
-has rtc => (
-    is  => 'ro',
-    isa => sub { die 'Invalid controller' unless ref($_[0]) eq 'MIDI::RtController' },
-    required => 1,
-);
-
-
-has value => (
-    is      => 'rw',
-    isa     => Maybe[Num],
-    default => undef,
-);
-
-
-has trigger => (
-    is      => 'rw',
-    isa     => Maybe[Num],
-    default => undef,
-);
 
 
 has bars => (
     is  => 'rw',
-    isa => Num,
+    isa => PositiveInt,
     default => sub { 1 },
 );
 
 
 has bpm => (
     is  => 'rw',
-    isa => Num,
+    isa => PositiveInt,
     default => sub { 120 },
 );
 
@@ -73,7 +55,7 @@ has common => (
 );
 
 
-sub _drum_parts ($self, $note) {
+sub _drum_part ($self, $note) {
     my $part;
     if (defined $self->trigger && $note == $self->trigger) {
         $part = $self->phrase;
@@ -88,13 +70,20 @@ sub _drum_parts ($self, $note) {
 }
 sub drums ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
-    my $part = $self->_drum_parts($note);
+
+    return 0 unless $ev eq 'note_on'
+        || ($ev eq 'control_change' && defined $self->value && $val == $self->value);
+
+    my $part = $self->_drum_part($note);
+
     my $d = MIDI::Drummer::Tiny->new(
         bpm  => $self->bpm,
         bars => $self->bars,
     );
+
     my $common = $self->common;
     $common = { %$common, drummer => $d };
+
     MIDI::RtMidi::ScorePlayer->new(
       device   => $self->rtc->midi_out,
       score    => $d->score,
@@ -103,6 +92,7 @@ sub drums ($self, $device, $dt, $event) {
       sleep    => 0,
       infinite => 0,
     )->play_async->retain;
+
     return 1;
 }
 
@@ -120,12 +110,12 @@ MIDI::RtController::Filter::Drums - Generic RtController drum filter
 
 =head1 VERSION
 
-version 0.0303
+version 0.0400
 
 =head1 SYNOPSIS
 
   use curry;
-  use Future::IO::Impl::IOAsync;
+  use Future::IO::Impl::IOAsync; # because ScorePlayer is async
   use MIDI::RtController ();
   use MIDI::RtController::Filter::Drums ();
 
@@ -137,10 +127,16 @@ version 0.0303
 
   my $filter = MIDI::RtController::Filter::Drums->new(rtc => $controller);
 
-  $filter->phrase(\&my_phrase);
-  $filter->trigger(99); # trigger the phrase with note 99
   $filter->bars(8);
+  $filter->phrase(\&my_phrase);
   $filter->common({ foo => 42 });
+
+  # for triggering with a note_on message:
+  $filter->trigger(99); # note 99 (D#7/Eb7)
+
+  # or for triggering with a control_change:
+  # $filter->trigger(25); # CC 25
+  # $filter->value(127);
 
   $controller->add_filter('drums', note_on => $filter->curry::drums);
 
@@ -162,35 +158,6 @@ C<MIDI::RtController::Filter::Drums> is a generic
 L<MIDI::RtController> drum filter.
 
 =head1 ATTRIBUTES
-
-=head2 rtc
-
-  $controller = $filter->rtc;
-
-The required L<MIDI::RtController> instance provided in the
-constructor.
-
-=head2 value
-
-  $value = $filter->value;
-  $filter->value($number);
-
-Return or set the MIDI event value. This is a generic setting that can
-be used by filters to set or retrieve state. This often a whole number
-between C<0> and C<127>, but can take any number.
-
-Default: C<undef>
-
-=head2 trigger
-
-  $trigger = $filter->trigger;
-  $filter->trigger($number);
-
-Return or set the trigger. This is a generic setting that
-can be used by filters to set or retrieve state. This often a whole
-number between C<0> and C<127>, but can take any number.
-
-Default: C<undef>
 
 =head2 bars
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Time::Elapsed.
 
+0.34 2025-04-27 BURAK
+    - This module is DEPRECATED. Please use Time::Duration.
+
 0.33 2018-12-25 BURAK
      - Migrate to dzil.
      - Remove obsolete perl support

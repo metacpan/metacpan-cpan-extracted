@@ -1,5 +1,5 @@
 package Task::BeLike::BURAK;
-$Task::BeLike::BURAK::VERSION = '0.26';
+$Task::BeLike::BURAK::VERSION = '0.29';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Task::BeLike::BURAK
 
 =head1 VERSION
 
-version 0.26
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ None.
 
 =head1 DESCRIPTION
 
-This is a tool to install module I use.
+This is a tool to install the modules I like.
 
 =head1 NAME
 

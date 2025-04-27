@@ -1,3 +1,8 @@
+0.05 2025-04-26T13:56:39+02:00
+ - Add DESCRIPTION section to doc.
+ - Rewrite check of 'id' parameter to use of
+   Mo::utils::Number::check_positive_natural().
+
 0.04 2025-04-03T17:15:43+02:00
  - Add 'external_ids' parameter.
  - Update copyright years.

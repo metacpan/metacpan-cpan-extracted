@@ -1,0 +1,2 @@
+app: cme-app-test
+load: a_string="test ok"

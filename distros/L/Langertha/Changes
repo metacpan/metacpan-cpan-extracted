@@ -1,9 +1,26 @@
 ==================================================
-Changes from 1751-04-13 00:00:00 +0000 to present.
+Changes from 1751-07-14 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2025-01-25 18:30:09 +0000
+version 0.008 at 2025-04-27 01:04:03 +0000
+------------------------------------------
+
+  Change: 845501356fd53e6aa9eb4235c812ec2b1681a8ae
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2025-03-30 04:55:38 +0000
+
+    Adapt Mistral OpenAPI spec to actually be able to be used with our
+    parser. 
+
+  Change: 0702350504470ef922c3ab442cf9cd5e9b2092f8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2025-03-29 18:22:05 +0000
+
+    Starting for adding Mistral integration, still WIP 
+
+------------------------------------------
+version 0.007 at 2025-01-25 18:29:51 +0000
 ------------------------------------------
 
   Change: e458a79c69f5b4dd38fb59676e01898c94decfa3

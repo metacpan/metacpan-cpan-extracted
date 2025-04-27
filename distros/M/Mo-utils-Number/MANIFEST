@@ -3,6 +3,8 @@ examples/check_int_fail.pl
 examples/check_int_ok.pl
 examples/check_natural_fail.pl
 examples/check_natural_ok.pl
+examples/check_number_fail.pl
+examples/check_number_ok.pl
 examples/sub_check_percent.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -30,8 +32,9 @@ t/Mo-utils-Number/01-use.t
 t/Mo-utils-Number/02-version.t
 t/Mo-utils-Number/03-check_int.t
 t/Mo-utils-Number/04-check_natural.t
-t/Mo-utils-Number/05-check_percent.t
-t/Mo-utils-Number/06-check_positive_natural.t
+t/Mo-utils-Number/05-check_number.t
+t/Mo-utils-Number/06-check_percent.t
+t/Mo-utils-Number/07-check_positive_natural.t
 xt/Mo-utils-Number-Utils/01-pod_coverage.t
 xt/Mo-utils-Number-Utils/02-pod.t
 xt/Mo-utils-Number/01-pod_coverage.t

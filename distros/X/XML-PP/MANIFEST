@@ -1,0 +1,19 @@
+Changes
+lib/XML/PP.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/30-basics.t
+t/collapse.t
+t/entities.t
+t/eof.t
+t/eol.t
+t/no404s.t
+t/parse.t
+t/pod-cm.t
+t/pod-coverage.t
+t/pod-synopsis.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

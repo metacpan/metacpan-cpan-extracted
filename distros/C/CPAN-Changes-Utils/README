@@ -6,6 +6,10 @@ SYNOPSIS
 
      my $copyright_years = construct_copyright_years($changes);
 
+DESCRIPTION
+    Utilities for work with CPAN::Changes objects. One utility is subroutine
+    to construct copyright years (from-to) from CPAN::Changes instance.
+
 SUBROUTINES
   "construct_copyright_years"
      my $copyright_years = construct_copyright_years($changes);
@@ -71,5 +75,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

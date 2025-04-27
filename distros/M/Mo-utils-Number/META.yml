@@ -29,10 +29,11 @@ requires:
   Error::Pure: 0.15
   Exporter: 0
   Readonly: 0
+  Scalar::Util: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Mo-utils-Number/issues
   homepage: https://github.com/michal-josef-spacek/Mo-utils-Number
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-Number
-version: '0.01'
+version: '0.02'

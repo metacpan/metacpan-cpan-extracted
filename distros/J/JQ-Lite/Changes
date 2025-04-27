@@ -1,3 +1,17 @@
+0.39  2025-04-27
+    - Added compact() function to remove undef/null values from arrays
+
+0.38  2025-04-27
+    - Added del(key) function to delete specific keys from hash objects
+
+0.37  2025-04-27
+    - Added nth(n) function to extract the nth element from an array
+
+0.36  2025-04-27
+    - Added type() function to determine JSON value type (string, number, boolean, array, object, null)
+    - Improved handling of undefined values in type() function
+    - Added test file t/type.t
+
 0.35  2025-04-16
     - Added flatten() function to explicitly flatten arrays (equivalent to .[])
     - flatten() performs 1-layer array flattening like jq

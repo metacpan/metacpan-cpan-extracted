@@ -25,10 +25,10 @@ requires:
   IO::Async::Timer::Periodic: '0'
   Iterator::Breathe: '0'
   MIDI::RtController: '0.0602'
+  MIDI::RtController::Filter: '0.0100'
   Moo: '2'
   Types::Common::Numeric: '0'
   Types::MIDI: '0'
-  Types::Standard: '0'
   curry: '0'
   namespace::clean: '0'
   perl: v5.36.0
@@ -36,7 +36,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-CC
   repository: https://github.com/ology/MIDI-RtController-Filter-CC.git
-version: '0.0913'
+version: '0.1002'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

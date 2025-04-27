@@ -28,9 +28,9 @@ DESCRIPTION
 Availability
 ------------
 
-   My "home" site for Net::Patricia is:
+   Please find the latest version of Net::Patricia on CPAN:
 
-      http://net.doit.wisc.edu/~plonka/Net-Patricia/
+      https://metacpan.org/dist/Net-Patricia
 
 Installation
 ------------
@@ -50,4 +50,4 @@ Requirements
    * perl version 5
 
 -- 
-plonka@doit.wisc.edu  http://net.doit.wisc.edu/~plonka  ARS:N9HZF  Madison, WI
+plonka@doit.wisc.edu  https://pages.cs.wisc.edu/~plonka/  ARS:N9HZF  Madison, WI

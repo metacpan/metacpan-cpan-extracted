@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "bin/langertha_chat_ollama",
     "bin/langertha_chat_openai",
+    "bin/langertha_openai_list_models",
     "bin/langertha_whisper"
   ],
   "LICENSE" => "perl",
@@ -47,7 +48,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }

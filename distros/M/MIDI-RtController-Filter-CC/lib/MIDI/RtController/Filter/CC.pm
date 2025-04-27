@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.0913';
+our $VERSION = '0.1002';
 
 use v5.36;
 
@@ -13,44 +13,17 @@ use IO::Async::Timer::Countdown ();
 use IO::Async::Timer::Periodic ();
 use Iterator::Breathe ();
 use Moo;
-use Types::MIDI qw(Channel Velocity);
+use Types::MIDI qw(Velocity);
 use Types::Common::Numeric qw(PositiveNum);
-use Types::Standard qw(Bool Maybe);
 use namespace::clean;
 
-
-has rtc => (
-    is  => 'ro',
-    isa => sub { die 'Invalid rtc' unless ref($_[0]) eq 'MIDI::RtController' },
-    required => 1,
-);
-
-
-has channel => (
-    is      => 'rw',
-    isa     => Channel,
-    default => 0,
-);
+extends 'MIDI::RtController::Filter';
 
 
 has control => (
     is      => 'rw',
     isa     => Velocity, # no CC# in Types::MIDI yet
     default => 1,
-);
-
-
-has value => (
-    is      => 'rw',
-    isa     => Maybe[Velocity], # no CC# in Types::MIDI yet
-    default => undef,
-);
-
-
-has trigger => (
-    is      => 'rw',
-    isa     => Maybe[Velocity], # no CC# in Types::MIDI yet
-    default => undef,
 );
 
 
@@ -103,20 +76,6 @@ has step_down => (
 );
 
 
-has running => (
-    is      => 'rw',
-    isa     => Bool,
-    default => 0,
-);
-
-
-has halt => (
-    is      => 'rw',
-    isa     => Bool,
-    default => 0,
-);
-
-
 sub add_filters ($filters, $controllers) {
     for my $params (@$filters) {
         my $port = delete $params->{port};
@@ -141,7 +100,7 @@ sub single ($self, $device, $dt, $event) {
     my ($ev, $chan, $note, $val) = $event->@*;
     return 0 if defined $self->trigger && $note != $self->trigger;
 
-    my $value = $self->value || $val;
+    my $value = $self->value // $val;
     my $cc = [ 'control_change', $self->channel, $self->control, $value ];
     $self->rtc->send_it($cc);
 
@@ -376,7 +335,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.0913
+version 0.1002
 
 =head1 SYNOPSIS
 
@@ -407,44 +366,7 @@ version 0.0913
 C<MIDI::RtController::Filter::CC> is a (growing) collection of
 control-change based L<MIDI::RtController> filters.
 
-Passing C<all> to the C<add_filter> method means that any MIDI event
-will trigger the filter.
-
-n.b. In order to stop a running filter, set the B<halt> attribute.
-
-=head2 Making filters
-
-All filter methods must accept the object, a MIDI device name, a
-delta-time, and a MIDI event ARRAY reference, like:
-
-  sub breathe ($self, $device, $delta, $event) {
-    return 0 if $self->running;
-    my ($event_type, $chan, $control, $value) = $event->@*;
-    ...
-    return $boolean;
-  }
-
-A filter also must return a boolean value. This tells
-L<MIDI::RtController> to continue processing other known filters or
-not.
-
 =head1 ATTRIBUTES
-
-=head2 rtc
-
-  $rtc = $filter->rtc;
-
-The required L<MIDI::RtController> instance provided in the
-constructor.
-
-=head2 channel
-
-  $channel = $filter->channel;
-  $filter->channel($number);
-
-The current MIDI channel value between C<0> and C<15>.
-
-Default: C<0>
 
 =head2 control
 
@@ -454,28 +376,6 @@ Default: C<0>
 Return or set the control change number between C<0> and C<127>.
 
 Default: C<1> (mod-wheel)
-
-=head2 value
-
-  $value = $filter->value;
-  $filter->value($number);
-
-Return or set the MIDI event value. This is a generic setting that can
-be used by filters to set or retrieve state and can be any whole
-number between C<0> and C<127> or C<undef>.
-
-Default: C<undef>
-
-=head2 trigger
-
-  $trigger = $filter->trigger;
-  $filter->trigger($number);
-
-Return or set the trigger. This is a generic setting that can be used
-by filters to set or retrieve state and can be any whole number
-between C<0> and C<127> or C<undef>.
-
-Default: C<undef>
 
 =head2 initial_point
 
@@ -543,24 +443,6 @@ The current iteration downward step. This can be any whole number
 between C<0> and C<127>.
 
 Default: C<1>
-
-=head2 running
-
-  $running = $filter->running;
-  $filter->running($boolean);
-
-Are we running a filter?
-
-Default: C<0>
-
-=head2 halt
-
-  $halt = $filter->halt;
-  $filter->halt($boolean);
-
-This Boolean can be used to terminate B<running> filters.
-
-Default: C<0>
 
 =head1 METHODS
 
@@ -690,11 +572,11 @@ If the B<halt> attribute is set to true, the running filter will stop.
 
 The F<eg/*.pl> program(s) in this distribution
 
-L<MIDI::RtController::Filter::Tonal> - Related module
+L<curry>
 
-L<MIDI::RtController::Filter::Math> - Related module
+L<MIDI::RtController::Filter>
 
-L<MIDI::RtController::Filter::Drums> - Related module
+L<IO::Async::Timer::Countdown>
 
 L<IO::Async::Timer::Periodic>
 
@@ -707,8 +589,6 @@ L<Moo>
 L<Types::MIDI>
 
 L<Types::Common::Numeric>
-
-L<Types::Standard>
 
 =head1 AUTHOR
 

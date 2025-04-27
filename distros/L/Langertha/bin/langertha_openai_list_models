@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+# ABSTRACT: Simple script to check the model list on an OpenAI compatible API
+# PODNAME: langertha_list_models
+
+use strict;
+use warnings;
+use Langertha::Engine::OpenAI;
+use Carp qw( croak );
+use Time::HiRes qw( time );
+use Path::Tiny;
+use JSON::MaybeXS;
+use URI;
+
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
+
+my $base = shift @ARGV;
+my $api_key = shift @ARGV;
+
+die "Requires base url" unless $base;
+
+my $engine = Langertha::Engine::OpenAI->new(
+  url => $base,
+  api_key => ($api_key||""),
+);
+
+my $start = time;
+my $request = $engine->generate_request( listModels => sub {});
+my $response = $engine->user_agent->request($request);
+my $data = decode_json($response->content);
+if ($response->is_success) {
+  my @list = map { $_->{id} } @{$data->{data}};
+  print($_."\n") for sort { $a cmp $b } @list;
+} else {
+  print($data->{error}->{message}."\n");
+}
+my $end = time;
+printf("\n -- %.3f seconds (%s)\n", ($end - $start), (ref $engine)) unless $ENV{LANGERTHA_NO_TIME};
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+langertha_list_models - Simple script to check the model list on an OpenAI compatible API
+
+=head1 VERSION
+
+version 0.008
+
+=head1 SYNOPSIS
+
+  $ langertha_list_models https://api.openai.com $OPENAI_API_KEY
+
+  $ langertha_list_models https://api.mistral.ai $MISTRAL_API_KEY
+
+=head1 DESCRIPTION
+
+Simple transcription with a Whisper compatible server, Groq or OpenAI.
+
+=head1 HOW TO INSTALL FASTER WHISPER
+
+L<https://github.com/fedirz/faster-whisper-server>
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/langertha
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/langertha/issues
+
+Discord
+
+  https://discord.gg/Y2avVYpquV 🤖
+
+IRC
+
+  irc://irc.perl.org/ai 🤖
+
+=cut
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/langertha>
+
+  git clone https://github.com/Getty/langertha.git
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

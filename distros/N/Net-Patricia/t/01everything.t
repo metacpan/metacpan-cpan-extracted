@@ -16,7 +16,7 @@ plan tests => 48;
 # (correspondingly "not ok 13") depending on the success of chunk 13
 # of the test code):
 
-my $t = new Net::Patricia;
+my $t = Net::Patricia->new;
 
 isa_ok($t, 'Net::Patricia', 'creating base object');
 
@@ -35,8 +35,8 @@ for my $o ({ name => "original", obj => $t }, { name => "thawed", obj => $thawed
 }
 
 {
-   my $ten = new Thingy 10;
-   my $twenty = new Thingy 20;
+   my $ten = Thingy->new(10);
+   my $twenty = Thingy->new(20);
 ok($t->add_string("10.0.0.0/8", $ten), "adding 10.0.0.0/8");
 }
 
@@ -86,7 +86,7 @@ for my $o ({ name => "original", obj => $t }, { name => "thawed", obj => $thawed
 eval '$t->add_string("_")'; # invalid key
 like($@, qr/invalid/, 'adding "_"');
 
-ok($t->add_string("0/0"), "add 0/0");
+ok($t->add_string("0.0.0.0/0"), "add 0.0.0.0/0");
 
 $thawed = Storable::thaw(Storable::nfreeze($t));
 for my $o ({ name => "original", obj => $t }, { name => "thawed", obj => $thawed }) {
@@ -108,7 +108,7 @@ is(@a, 2, "removing cidr block");
 
 undef $t;
 
-$t = new Net::Patricia(AF_INET6);
+$t = Net::Patricia->new(AF_INET6);
 
 isa_ok($t, "Net::Patricia::AF_INET6", "constructing a Net::Patrica::AF_INET6");
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Mo::utils::Natural qw(check_natural);
+use Mo::utils::Number qw(check_natural);
 
 my $self = {
         'key' => 0,

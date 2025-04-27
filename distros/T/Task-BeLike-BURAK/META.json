@@ -4,7 +4,7 @@
       "Burak Gursoy"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "task",
       "belike"
@@ -34,10 +34,11 @@
       "runtime" : {
          "requires" : {
             "Acme::CPANAuthors::Turkish" : "0.20",
+            "App::Ack" : "0",
             "App::HTTPThis" : "0",
             "App::Sys::Info" : "0.13",
-            "CGI::Auth::Basic" : "1.21",
             "Capture::Tiny" : "0.22",
+            "Carp::Always" : "0",
             "Devel::Size" : "0.73",
             "Dist::Zilla" : "0",
             "Dist::Zilla::Plugin::DynamicPrereqs" : "0",
@@ -64,12 +65,17 @@
             "MP3::M3U::Parser" : "2.30",
             "Mojolicious" : "0",
             "Net::GitHub" : "0",
+            "Parallel::ForkManager" : "0",
             "Perl::Tidy" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Elemental::Transformer::List" : "0",
+            "Return::Type" : "0",
             "Software::License" : "0",
+            "Sub::Private" : "0",
+            "Sub::Talisman" : "0",
             "Task::CPAN::Reporter" : "0",
             "Task::Lingua::Any::Numbers" : "0.17",
+            "Template" : "3.102",
             "Term::ReadKey" : "0",
             "Term::ReadLine::Perl" : "0",
             "Test::CPAN::Meta" : "0",
@@ -77,7 +83,8 @@
             "Test::Pod::Coverage" : "0",
             "Text::Table" : "0",
             "Text::Template::Simple" : "0.83",
-            "Time::Elapsed" : "0.31",
+            "Throwable::Factory" : "0",
+            "Time::Duration" : "0",
             "Unicode::Casing" : "0.12",
             "criticism" : "1.02",
             "perl" : "5.012",
@@ -110,12 +117,12 @@
          "web" : "https://github.com/burak/CPAN-Task-BeLike-BURAK"
       }
    },
-   "version" : "0.26",
+   "version" : "0.29",
    "x_contributors" : [
       "Burak Gursoy"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

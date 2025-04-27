@@ -340,6 +340,7 @@ Supported Functions:
   match("pattern") - Match string using regex
   flatten          - Explicitly flatten arrays (same as .[])
   empty            - Discard all output (for side-effect use)
+  type()           - Return the type of value ("string", "number", "boolean", "array", "object", "null")
 
 EOF
 }

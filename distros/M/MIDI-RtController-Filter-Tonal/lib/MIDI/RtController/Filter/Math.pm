@@ -1,5 +1,5 @@
 package MIDI::RtController::Filter::Math;
-$MIDI::RtController::Filter::Math::VERSION = '0.0306';
+$MIDI::RtController::Filter::Math::VERSION = '0.0401';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Math based RtController filters
@@ -8,50 +8,24 @@ use v5.36;
 
 use strictures 2;
 use Moo;
-use Types::MIDI qw(Channel);
-use Types::Standard qw(Num Maybe);
+use Types::Standard qw(Num);
+use Types::Common::Numeric qw(PositiveInt PositiveNum);
 use namespace::clean;
 
+extends 'MIDI::RtController::Filter';
 
-
-has rtc => (
-    is       => 'ro',
-    isa      => sub { die 'Invalid rtc' unless ref($_[0]) eq 'MIDI::RtController' },
-    required => 1,
-);
-
-
-has channel => (
-    is      => 'rw',
-    isa     => Channel,
-    default => sub { 0 },
-);
-
-
-has value => (
-    is      => 'rw',
-    isa     => Maybe[Num],
-    default => undef,
-);
-
-
-has trigger => (
-    is      => 'rw',
-    isa     => Maybe[Num],
-    default => undef,
-);
 
 
 has delay => (
     is      => 'rw',
-    isa     => Num,
+    isa     => PositiveNum,
     default => sub { 0.1 },
 );
 
 
 has feedback => (
     is      => 'rw',
-    isa     => Num,
+    isa     => PositiveInt,
     default => sub { 1 },
 );
 
@@ -115,7 +89,7 @@ MIDI::RtController::Filter::Math - Math based RtController filters
 
 =head1 VERSION
 
-version 0.0306
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -143,44 +117,6 @@ C<MIDI::RtController::Filter::Math> is the collection of Math based
 L<MIDI::RtController> filters.
 
 =head1 ATTRIBUTES
-
-=head2 rtc
-
-  $rtc = $filter->rtc;
-
-The required L<MIDI::RtController> instance provided in the
-constructor.
-
-=head2 channel
-
-  $channel = $filter->channel;
-  $filter->channel($number);
-
-The current MIDI channel (0-15, drums=9).
-
-Default: C<0>
-
-=head2 value
-
-  $value = $filter->value;
-  $filter->value($number);
-
-Return or set the MIDI event value. This is a generic setting that can
-be used by filters to set or retrieve state. This often a whole number
-between C<0> and C<127>, but can take any number.
-
-Default: C<undef>
-
-=head2 trigger
-
-  $trigger = $filter->trigger;
-  $filter->trigger($number);
-
-Return or set the trigger. This is a generic setting that
-can be used by filters to set or retrieve state. This often a whole
-number between C<0> and C<127>, but can take any number.
-
-Default: C<undef>
 
 =head2 delay
 
@@ -245,17 +181,15 @@ should be applied.
 
 The eg/*.pl program(s) in this distribution
 
-L<MIDI::RtController::Filter::Tonal>
-
-L<MIDI::RtController::Filter::Drums>
-
-L<MIDI::RtController::Filter::CC>
+L<MIDI::RtController::Filter>
 
 L<Moo>
 
 L<Types::MIDI>
 
 L<Types::Standard>
+
+L<Types::Common::Numeric>
 
 =head1 AUTHOR
 

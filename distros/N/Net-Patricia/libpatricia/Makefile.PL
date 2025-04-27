@@ -12,6 +12,10 @@ all :: static
 
 test ::
 
+test_dynamic ::
+
+test_static ::
+
 static ::       libpatricia$(LIB_EXT)
 
 libpatricia$(LIB_EXT): $(O_FILES)

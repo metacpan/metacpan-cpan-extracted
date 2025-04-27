@@ -5,7 +5,7 @@ use warnings;
 use JSON::PP;
 use List::Util qw(sum min max);
 
-our $VERSION = '0.35';
+our $VERSION = '0.39';
 
 sub new {
     my ($class, %opts) = @_;
@@ -281,6 +281,81 @@ sub run_query {
             next;
         }
 
+        # support for type()
+        if ($part eq 'type()' || $part eq 'type') {
+            @next_results = map {
+                if (!defined $_) {
+                    'null';
+                }
+                elsif (ref($_) eq 'ARRAY') {
+                    'array';
+                }
+                elsif (ref($_) eq 'HASH') {
+                    'object';
+                }
+                elsif (ref($_) eq '') {
+                    if (/^-?\d+(?:\.\d+)?$/) {
+                        'number';
+                    } else {
+                        'string';
+                    }
+                }
+                elsif (ref($_) eq 'JSON::PP::Boolean') {
+                    'boolean';
+                }
+                else {
+                    'unknown';
+                }
+            } (@results ? @results : (undef)); 
+            @results = @next_results;
+            next;
+        }
+
+        # support for nth(n)
+        if ($part =~ /^nth\((\d+)\)$/) {
+            my $index = $1;
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    $_->[$index]
+                } else {
+                    undef
+                }
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for del(key)
+        if ($part =~ /^del\((.+?)\)$/) {
+            my $key = $1;
+            $key =~ s/^['"](.*?)['"]$/$1/;  # remove quotes
+
+            @next_results = map {
+                if (ref $_ eq 'HASH') {
+                    my %copy = %$_;  # shallow copy
+                    delete $copy{$key};
+                    \%copy
+                } else {
+                    $_
+                }
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for compact()
+        if ($part eq 'compact()' || $part eq 'compact') {
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    [ grep { defined $_ } @$_ ]
+                } else {
+                    $_
+                }
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
         # standard traversal
         for my $item (@results) {
             push @next_results, _traverse($item, $part);
@@ -547,7 +622,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 0.35
+Version 0.39
 
 =head1 SYNOPSIS
 
@@ -584,7 +659,7 @@ jq-like syntax — entirely within Perl, with no external binaries or XS modules
 
 =item * Pipe-style query chaining using | operator
 
-=item * Built-in functions: length, keys, values, first, last, reverse, sort, sort_by, unique, has, group_by, join, count, empty
+=item * Built-in functions: length, keys, values, first, last, reverse, sort, sort_by, unique, has, group_by, join, count, empty, type, nth, del, compact
 
 =item * Supports map(...) and limit(n) style transformations
 
@@ -668,6 +743,50 @@ Example:
   .users[] | select(.age > 25) | empty
 
 =item * .[] as alias for flattening top-level arrays
+
+=item * type()
+
+Returns the type of the value as a string:
+"string", "number", "boolean", "array", "object", or "null".
+
+Example:
+
+  .name | type     # => "string"
+  .tags | type     # => "array"
+  .profile | type  # => "object"
+
+=item * nth(n)
+
+Returns the nth element (zero-based) from an array.
+
+Example:
+
+  .users | nth(0)   # first user
+  .users | nth(2)   # third user
+
+=item * del(key)
+
+Deletes a specified key from a hash object and returns a new hash without that key.
+
+Example:
+
+  .profile | del("password")
+
+If the key does not exist, returns the original hash unchanged.
+
+If applied to a non-hash object, returns the object unchanged.
+
+=item * compact()
+
+Removes undef and null values from an array.
+
+Example:
+
+  .data | compact()
+
+Before: [1, null, 2, null, 3]
+
+After:  [1, 2, 3]
 
 =back
 

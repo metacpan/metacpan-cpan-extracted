@@ -10,7 +10,7 @@ use Readonly;
 # Constants.
 Readonly::Array our @EXPORT => qw(construct_copyright_years);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub construct_copyright_years {
 	my $changes = shift;
@@ -48,6 +48,11 @@ CPAN::Changes::Utils - Utilities for CPAN::Changes.
  use CPAN::Changes::Utils qw(construct_copyright_years);
 
  my $copyright_years = construct_copyright_years($changes);
+
+=head1 DESCRIPTION
+
+Utilities for work with CPAN::Changes objects. One utility is subroutine to
+construct copyright years (from-to) from L<CPAN::Changes> instance.
 
 =head1 SUBROUTINES
 
@@ -126,6 +131,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

@@ -16,14 +16,16 @@ use Langertha::Engine::OpenAI;
 use Langertha::Engine::Anthropic;
 use Langertha::Engine::vLLM;
 use Langertha::Engine::Groq;
+use Langertha::Engine::Mistral;
 use Langertha::Engine::DeepSeek;
 
-if ($ENV{OPENAI_API_KEY} || $ENV{ANTHROPIC_API_KEY} || $ENV{GROQ_API_KEY} || $ENV{DEEPSEEK_API_KEY}) {
+if ($ENV{OPENAI_API_KEY} || $ENV{ANTHROPIC_API_KEY} || $ENV{GROQ_API_KEY} || $ENV{DEEPSEEK_API_KEY} || $ENV{MISTRAL_API_KEY}) {
   my @keys;
   push @keys, 'OPENAI_API_KEY' if $ENV{OPENAI_API_KEY};
   push @keys, 'ANTHROPIC_API_KEY' if $ENV{ANTHROPIC_API_KEY};
   push @keys, 'GROQ_API_KEY' if $ENV{GROQ_API_KEY};
   push @keys, 'DEEPSEEK_API_KEY' if $ENV{DEEPSEEK_API_KEY};
+  push @keys, 'MISTRAL_API_KEY' if $ENV{MISTRAL_API_KEY};
   warn "Will be using your ".join(", ", @keys)." environment variable(s), which may produce cost.";
   sleep 5;
 }
@@ -48,7 +50,7 @@ __EOP__
 
     my $prompt = 'Do you wanna build a snowman?';
 
-    printf("\n\n%s\n\n", $prompt);
+    printf("\n\nTo ollama: %s\n\n", $prompt);
 
     print($ollama->simple_chat($prompt));
 
@@ -86,7 +88,7 @@ __EOP__
 
     my $prompt = 'Do you wanna build a snowman?';
 
-    printf("\n\n%s\n\n", $prompt);
+    printf("\n\nTo OpenAI: %s\n\n", $prompt);
 
     print($openai->simple_chat($prompt));
 
@@ -104,7 +106,7 @@ __EOP__
 
     my $prompt = 'Generate Perl Moose classes to represent GeoJSON data types';
 
-    printf("\n\n%s\n\n", $prompt);
+    printf("\n\nTo Anthropic: %s\n\n", $prompt);
 
     print($claude->simple_chat($prompt));
 
@@ -236,7 +238,7 @@ __EOP__
 
     my $prompt = 'Do you wanna build a snowman?';
 
-    printf("\n\n%s\n\n", $prompt);
+    printf("\n\nTo vLLM: %s\n\n", $prompt);
 
     print($vllm->simple_chat($prompt));
 
@@ -254,7 +256,7 @@ __EOP__
 
     my $prompt = 'Do you wanna build a snowman?';
 
-    printf("\n\n%s\n\n", $prompt);
+    printf("\n\nTo Groq: %s\n\n", $prompt);
 
     print($groq->simple_chat($prompt));
 
@@ -271,9 +273,26 @@ __EOP__
 
     my $prompt = 'Do you wanna build a snowman?';
 
-    printf("\n\n%s\n\n", $prompt);
+    printf("\n\nTo DeepSeek: %s\n\n", $prompt);
 
     print($deepseek->simple_chat($prompt));
+
+  }
+}
+
+{
+  if ($ENV{MISTRAL_API_KEY}) {
+
+    my $mistral = Langertha::Engine::Mistral->new(
+      api_key => $ENV{MISTRAL_API_KEY},
+      system_prompt => $system_prompt,
+    );
+
+    my $prompt = 'Do you wanna build a snowman?';
+
+    printf("\n\nTo Mistral: %s\n\n", $prompt);
+
+    print($mistral->simple_chat($prompt));
 
   }
 }

@@ -1,5 +1,15 @@
 Revision history for MIDI-RtController-Filter-Drums
 
+0.0400 2025-04-26 15:47:22
+  - Use the parent filter class now.
+
+0.0305 2025-04-26 12:28:19
+  - Only trigger on a note_on or CC message.
+  - Improve documentation.
+
+0.0304 2025-04-26 10:46:14
+  - OCD grammar.
+
 0.0303 2025-04-25 14:50:20
   - Improve documentation.
 

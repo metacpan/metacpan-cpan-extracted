@@ -33,17 +33,17 @@ no_index:
     - inc
     - t
 requires:
-  Carp: '1.52'
+  Carp: '1.50'
   Cpanel::JSON::XS: '4.37'
   DBD::Mock: '1.59'
   Data::Walk: '2.01'
   English: '1.11'
   File::Path: '2.18'
   File::Slurper: '0.014'
-  File::Spec: '3.84'
+  File::Spec: '3.75'
   Readonly: '2.05'
   Sub::Override: '0.12'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DragosTrif/DBD-Fixtures
-version: 0.09
+version: '0.11'

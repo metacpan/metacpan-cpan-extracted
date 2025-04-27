@@ -1,5 +1,5 @@
 package Time::Elapsed::Lang::EN;
-$Time::Elapsed::Lang::EN::VERSION = '0.33';
+$Time::Elapsed::Lang::EN::VERSION = '0.34';
 use strict;
 use warnings;
 use utf8;
@@ -50,7 +50,7 @@ Time::Elapsed::Lang::EN
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,10 @@ Private module.
 =head1 NAME
 
 Time::Elapsed::Lang::EN - English language file.
+
+=head1 DEPRECATION NOTICE
+
+This module is B<DEPRECATED>. Please use L<Time::Duration>.
 
 =head1 METHODS
 
@@ -78,7 +82,7 @@ L<Time::Elapsed>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

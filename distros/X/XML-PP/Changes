@@ -1,0 +1,16 @@
+Revision history for XML-PP
+
+0.04	Sat Apr 26 19:41:12 EDT 2025
+	Use Params::Get
+
+0.03	Sat Apr 26 15:11:21 EDT 2025
+	Handle the XML header
+	Added the logger option to new()
+
+0.02	Sat Apr 26 14:28:09 EDT 2025
+	More helpful error messages
+	Added META information to the repo
+	Added collapse_structure()
+
+0.01	Sat Apr 26 07:46:49 EDT 2025
+        First draft

@@ -1,3 +1,16 @@
+1.042 2025-04-26
+
+  New feature:
+    * cme run: add --foreach option
+    * cme run -list: provide more info
+
+  Bug fix:
+    * run: Improve error message when "app" parameter is missing
+
+  Doc:
+    * doc: add modify and run script examples
+    * remove mentions of defunct cpanratings site
+
 1.041 2024-11-23
 
   New feature:

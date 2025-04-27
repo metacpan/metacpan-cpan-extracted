@@ -50,7 +50,7 @@ SQL
 };
 
 subtest 'upsert use mock data' => sub {
-	my $obj_2 = DBD::Mock::Session::GenerateFixtures->new({file => './t/db_fixtures/14_upsert.t.json'});
+	my $obj_2 = DBD::Mock::Session::GenerateFixtures->new({file => 't/db_fixtures/14_upsert.t.json'});
 	my $dbh_2 = $obj_2->get_dbh();
 
 	my $sql_license = <<"SQL";

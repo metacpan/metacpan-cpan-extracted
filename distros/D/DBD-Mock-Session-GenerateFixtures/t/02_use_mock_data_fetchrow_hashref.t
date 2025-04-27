@@ -11,7 +11,7 @@ use feature 'say';
 
 note 'use mock data for fetchrow_hashref';
 
-my $dbh = DBD::Mock::Session::GenerateFixtures->new({file => './t/db_fixtures/01_fetchrow_hashref.t.json'})->get_dbh();
+my $dbh = DBD::Mock::Session::GenerateFixtures->new({file => 't/db_fixtures/01_fetchrow_hashref.t.json'})->get_dbh();
 
 
 my $sql = <<"SQL";

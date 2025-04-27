@@ -31,8 +31,11 @@ typedef void (*void_fn_t)();
 
 #include <errno.h> /* for EAFNOSUPPORT */
 #ifndef EAFNOSUPPORT
-#  defined EAFNOSUPPORT WSAEAFNOSUPPORT
-#  include <winsock.h>
+#  define EAFNOSUPPORT WSAEAFNOSUPPORT
+#endif
+#ifdef _WIN32
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
 #else
 #  include <netinet/in.h> /* for struct in_addr */
 #endif

@@ -21,6 +21,7 @@ recursive_author_tests('xt');
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Readonly' => 0;
+requires 'Scalar::Util' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Mo-utils-Number/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Mo-utils-Number';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Mo-utils-Number';
@@ -30,7 +31,7 @@ test_requires 'Readonly' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

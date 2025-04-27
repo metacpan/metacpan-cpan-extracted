@@ -1,16 +1,17 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Patricia Trie for fast IP address lookups",
    "author" : [
-      "unknown"
+      "Dave Plonka <plonka@doit.wisc.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "gpl_2",
+      "freebsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Patricia",
    "no_index" : {
@@ -32,13 +33,32 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
             "Net::CIDR::Lite" : "0.20",
+            "Socket" : "0",
             "Socket6" : "0",
-            "Test::More" : "0.88",
             "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Storable" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.22"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Patricia"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobez/Net-Patricia.git",
+         "web" : "https://github.com/tobez/Net-Patricia"
+      }
+   },
+   "version" : "1.23",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

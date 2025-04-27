@@ -16,11 +16,10 @@ use HTTP::Request;
 use HTTP::Response;
 use System::Info;
 use JSON;
-use Proc::Daemon;
 
 $Carp::Internal{__PACKAGE__} = 1;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 my %request_headers;
 our $cgi = CGI->new();

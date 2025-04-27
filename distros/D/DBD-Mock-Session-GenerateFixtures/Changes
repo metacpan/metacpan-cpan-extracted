@@ -12,3 +12,7 @@
     - fix Rose::DB::MySQL
     - update tests
     - prevent test to run if mysql is not installed
+0.10   2025-05-26
+    - Move the call to _override_dbi_mocked_prepare inside the set_dbh method to ensure that the query is normalized.
+0.11   2025-05-26
+    - remove junk from parent folder

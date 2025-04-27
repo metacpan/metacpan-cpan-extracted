@@ -1,5 +1,8 @@
 Revision history for Perl extension Parse::HTTP::UserAgent
 
+0.43 2025-04-27 BURAK
+    - DEPRECATED. Please use HTTP::BrowserDetect instead.
+
 0.42 2017-11-20 BURAK
     - Re-release after distro fixes.
 

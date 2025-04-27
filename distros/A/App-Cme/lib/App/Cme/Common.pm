@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.041';
+$App::Cme::Common::VERSION = '1.042';
 use strict;
 use warnings;
 use 5.10.1;
@@ -168,7 +168,7 @@ sub instance {
             config_dir      => $opt->{_config_dir},
     );
 
-    foreach my $param (qw/root_dir canonical backup/) {
+    foreach my $param (qw/root_dir canonical backup instance_name/) {
         $instance_args{$param} = $opt->{$param} if defined $opt->{$param};
     }
 
@@ -275,7 +275,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 

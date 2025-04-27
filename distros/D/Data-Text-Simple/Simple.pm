@@ -4,10 +4,11 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils 0.09 qw(check_number check_required);
+use Mo::utils qw(check_required);
 use Mo::utils::Language 0.05 qw(check_language_639_1);
+use Mo::utils::Number qw(check_positive_natural);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has id => (
 	is => 'ro',
@@ -25,7 +26,7 @@ sub BUILD {
 	my $self = shift;
 
 	# Check id.
-	check_number($self, 'id');
+	check_positive_natural($self, 'id');
 
 	# Check lang.
 	check_language_639_1($self, 'lang');
@@ -70,7 +71,7 @@ Constructor.
 =item * C<id>
 
 Id of record.
-Id could be number.
+Id could be positive natural number.
 
 It's optional.
 
@@ -120,12 +121,13 @@ Returns string.
 
  new():
          From Mo::utils:
-                 Parameter 'id' must be a number.
-                         Value: %s
                  Parameter 'text' is required.
          From Mo::utils::Language:
                  Parameter 'lang' doesn't contain valid ISO 639-1 code.
                          Codeset: %s
+                         Value: %s
+         From Mo::utils::Number:
+                 Parameter 'id' must be a positive natural number.
                          Value: %s
 
 =head1 EXAMPLE
@@ -157,7 +159,8 @@ Returns string.
 
 L<Mo>,
 L<Mo::utils>,
-L<Mo::utils::Language>.
+L<Mo::utils::Language>,
+L<Mo::utils::Number>.
 
 =head1 REPOSITORY
 
@@ -171,12 +174,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

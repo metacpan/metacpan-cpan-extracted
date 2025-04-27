@@ -8,9 +8,14 @@ extern "C" {
 }
 #endif
 
+/* memory for libpatricia must not be managed with redefined calloc() and
+ * free() routines from XSUB.h. Otherwise, DESTROY crashes on Perl releases
+ * such as Strawberry Perl that use their own memory management. */
+#undef calloc
+#undef free
+
 #include <sys/types.h>
 #include <stdint.h>
-#include <netinet/in.h>
 #include "libpatricia/patricia.h"
 
 /* frozen stuff is frozen in network byte order */
@@ -42,134 +47,6 @@ struct frozen_patricia
 	struct frozen_header header;
 	struct frozen_node node[1];
 } __attribute__((__packed__));
-
-static int
-not_here(s)
-char *s;
-{
-    croak("%s not implemented on this architecture", s);
-    return -1;
-}
-
-static double
-constant(name, arg)
-char *name;
-int arg;
-{
-    errno = 0;
-    switch (*name) {
-    case 'A':
-	break;
-    case 'B':
-	break;
-    case 'C':
-	break;
-    case 'D':
-	break;
-    case 'E':
-	break;
-    case 'F':
-	break;
-    case 'G':
-	break;
-    case 'H':
-	break;
-    case 'I':
-	break;
-    case 'J':
-	break;
-    case 'K':
-	break;
-    case 'L':
-	break;
-    case 'M':
-	break;
-    case 'N':
-	break;
-    case 'O':
-	break;
-    case 'P':
-	break;
-    case 'Q':
-	break;
-    case 'R':
-	break;
-    case 'S':
-	break;
-    case 'T':
-	break;
-    case 'U':
-	break;
-    case 'V':
-	break;
-    case 'W':
-	break;
-    case 'X':
-	break;
-    case 'Y':
-	break;
-    case 'Z':
-	break;
-    case 'a':
-	break;
-    case 'b':
-	break;
-    case 'c':
-	break;
-    case 'd':
-	break;
-    case 'e':
-	break;
-    case 'f':
-	break;
-    case 'g':
-	break;
-    case 'h':
-	break;
-    case 'i':
-	break;
-    case 'j':
-	break;
-    case 'k':
-	break;
-    case 'l':
-	break;
-    case 'm':
-	break;
-    case 'n':
-	break;
-    case 'o':
-	break;
-    case 'p':
-	break;
-    case 'q':
-	break;
-    case 'r':
-	break;
-    case 's':
-	break;
-    case 't':
-	break;
-    case 'u':
-	break;
-    case 'v':
-	break;
-    case 'w':
-	break;
-    case 'x':
-	break;
-    case 'y':
-	break;
-    case 'z':
-	break;
-    }
-    errno = EINVAL;
-    return 0;
-
-not_there:
-    errno = ENOENT;
-    return 0;
-}
 
 #define Fill_Prefix(p,f,a,b,mb) \
 	do { \
@@ -219,11 +96,6 @@ typedef patricia_node_t *Net__PatriciaNode;
 MODULE = Net::Patricia		PACKAGE = Net::Patricia
 
 PROTOTYPES: ENABLE
-
-double
-constant(name,arg)
-	char *		name
-	int		arg
 
 Net::Patricia
 _new(size)
@@ -359,7 +231,9 @@ climb_inorder(tree, ...)
 		} else if (2 < items) {
 	           croak("Usage: Net::Patricia::climb_inorder(tree[,CODEREF])");
 		}
-                n = patricia_walk_inorder_perl(tree->head, func);
+		if (NULL != tree->head) {
+                   n = patricia_walk_inorder_perl(tree->head, func);
+		}
 		RETVAL = n;
 	OUTPUT:	
 		RETVAL
@@ -534,4 +408,4 @@ void
 DESTROY(tree)
 	Net::Patricia			tree
 	CODE:
-	Destroy_Patricia(tree, deref_data);
+	Destroy_Patricia(tree, (void_fn_t)deref_data);

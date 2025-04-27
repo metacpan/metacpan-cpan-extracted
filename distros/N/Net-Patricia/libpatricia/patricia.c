@@ -16,6 +16,14 @@ static char copyright[] =
 "This product includes software developed by the University of Michigan, Merit"
 "Network, Inc., and their contributors.";
 
+/* inet_ntop() and inet_pton() require at least Windows Vista. */
+#ifdef _WIN32
+# undef WINVER
+# undef _WIN32_WINNT
+# define WINVER 0x0600
+# define _WIN32_WINNT 0x0600
+#endif
+
 #include <assert.h> /* assert */
 #include <ctype.h> /* isdigit */
 #include <errno.h> /* errno */
@@ -26,7 +34,6 @@ static char copyright[] =
 #include <string.h> /* memcpy, strchr, strlen */
 #include <sys/types.h> /* BSD: for inet_addr */
 #include <sys/socket.h> /* BSD, Linux: for inet_addr */
-#include <netinet/in.h> /* BSD, Linux: for inet_addr */
 #include <arpa/inet.h> /* BSD, Linux, Solaris: for inet_addr */
 
 #include "patricia.h"
@@ -378,7 +385,7 @@ Clear_Patricia (patricia_tree_t *patricia, void_fn_t func)
     	    if (Xrn->prefix) {
 		Deref_Prefix (Xrn->prefix);
 		if (Xrn->data && func)
-	    	    func (Xrn->data);
+	    	    ((void (*)(void *)) func) (Xrn->data);
     	    }
     	    else {
 		assert (Xrn->data == NULL);
@@ -425,7 +432,7 @@ patricia_process (patricia_tree_t *patricia, void_fn_t func)
     assert (func);
 
     PATRICIA_WALK (patricia->head, node) {
-	func (node->prefix, node->data);
+	((void (*)(prefix_t *, void *)) func) (node->prefix, node->data);
     } PATRICIA_WALK_END;
 }
 
@@ -440,7 +447,7 @@ patricia_walk_inorder(patricia_node_t *node, void_fn_t func)
     }
 
     if (node->prefix) {
-	func(node->prefix, node->data);
+	((void (*)(prefix_t *, void *)) func) (node->prefix, node->data);
 	n++;
     }
 	

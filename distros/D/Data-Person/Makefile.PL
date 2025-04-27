@@ -19,8 +19,9 @@ perl_version 5.008;
 readme_from 'Person.pm';
 recursive_author_tests('xt');
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.28;
+requires 'Mo::utils' => 0.21;
 requires 'Mo::utils::Email' => 0;
+requires 'Mo::utils::Number' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-Person/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-Person';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Data-Person';
@@ -31,7 +32,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

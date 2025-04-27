@@ -10,13 +10,14 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.041';
+$App::Cme::Command::run::VERSION = '1.042';
 use strict;
 use warnings;
 use v5.20;
 use File::HomeDir;
 use Path::Tiny;
 use Config::Model;
+use Config::Model::Lister;
 use Log::Log4perl qw(get_logger :levels);
 use YAML::PP;
 
@@ -26,8 +27,6 @@ use App::Cme -command ;
 
 use base qw/App::Cme::Common/;
 use feature qw/postderef signatures/;
-no warnings qw/experimental::postderef experimental::signatures experimental::smartmatch/;
-
 
 my $__test_home = '';
 # used only by tests
@@ -48,6 +47,8 @@ sub opt_spec {
     return ( 
         [ "arg=s@"  => "script argument. run 'cme run <script> -doc' for possible arguments" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
+        [ "foreach=s" => "Run script in several directories. The list of directories "
+          . "must be passed as a single argument, i.e. --foreach 'foo bar'" ],
         [ "commit|c:s" => "commit change with passed message" ],
         [ "cat" => "Show the script file" ],
         [ "no-commit|nc!" => "skip commit to git" ],
@@ -80,10 +81,15 @@ sub check_script_arguments ($self, $opt, $script_name) {
         my @scripts;
         foreach my $path ( @script_paths ) {
             next unless $path->is_dir;
-            push @scripts, grep { ! /~$/ } $path->children();
+            push @scripts, map {$_->basename} grep { ! /~$/ } $path->children();
         }
         say $opt->{list} ? "Available scripts:" : "Missing script argument. Choose one of:";
-        say map {"- ".$_->basename."\n"} @scripts ;
+        foreach my $script_path (sort @scripts) {
+            my $data = $self->get_script_data($script_path);
+            printf("- %s (app: %s)\n",$script_path, $data->{app} );
+        }
+        say "";
+        say "Run 'cme run <script> -doc' to get more details on a script.";
         return 0;
     }
     return 1;
@@ -192,6 +198,7 @@ sub parse_script_lines ($script, $lines) {
 }
 
 sub parse_command ($key, $parsed_data, $line_nb, $value) {
+    ## no critic (ControlStructures::ProhibitCascadingIfElse)
     if ( $key =~ /^app/ ) {
         $parsed_data->{app} = $value->[0];
     }
@@ -273,9 +280,10 @@ sub parse_script ($script, $content, $user_args) {
         return $data;
     }
 
+    my $data;
     if ($lines->[0] =~ /Format:\s*yaml/i) {
         my $ypp = YAML::PP->new;
-        my $data = $ypp->load_string($content);
+        $data = $ypp->load_string($content);
         foreach my $key (qw/doc code load var/) {
             next unless defined $data->{$key};
             next if ref $data->{$key} eq 'ARRAY';
@@ -286,19 +294,53 @@ sub parse_script ($script, $content, $user_args) {
         if ($data->{default} and ref $data->{default} ne 'HASH') {
             die "default spec must be a hash ref, not a ", ref $data->{default} // 'scalar', "\n";
         }
-        $data = process_script_vars ($user_args, $data);
-        return $data;
+    }
+    else {
+        $data = parse_script_lines ($script, $lines);
     }
 
-    my $data = parse_script_lines ($script, $lines);
-    $data = process_script_vars ($user_args, $data);
-    return $data;
+    my $processed_data = process_script_vars ($user_args, $data);
+
+    if (not $processed_data->{app}) {
+        die "Missing 'app' parameter in script $script.\n"
+    }
+
+    return $processed_data;
 }
 
 sub commit ($self, $root, $msg) {
     $msg =~ s/\{\{(.*?)\}\}/$root->grab_value($1)/e;
 
     system(qw/git commit -a -m/, $msg);
+
+    return;
+}
+
+# returns: script file name, script data if script is *not* Perl code
+sub get_script_data ($self, $script_name, $opt = {}) {
+    my $script_file = $self->find_script_file($script_name);
+
+    my $content = $script_file->slurp_utf8;
+
+    if ($content =~ m/^#!/ and -x $script_file) {
+        return $script_file, {};
+    }
+
+    # parse variables passed on command line
+    my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
+
+    return ($script_file, parse_script($script_file, $content, \%user_args));
+}
+
+sub run_script_as_code ($self, $script_name, $script_file) {
+    splice @ARGV, 0,2;          # remove 'run script' arguments
+    my $done = eval $script_file->slurp_utf8."\n1;\n"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    if (ref $done eq 'HASH') {
+        warn "script $script_name returns a hash but it's processed as a plain script.",
+            " This may not be what you want\n";
+    }
+    die "Error in script $script_name: $@\n" unless $done;
+    return;
 }
 
 sub execute {
@@ -313,30 +355,18 @@ sub execute {
 
     return unless $self->check_script_arguments($opt, $script_name);
 
-    my $script = $self->find_script_file($script_name);
-
-    my $content = $script->slurp_utf8;
+    my ($script_file, $script_data) = $self->get_script_data($script_name, $opt);
 
     if ($opt->{cat}) {
-        print $content;
+        print $script_file->slurp_utf8;
         return;
     }
 
-    # parse variables passed on command line
-    my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
-
-    if ($content =~ m/^#!/ and -x $script) {
-        splice @ARGV, 0,2; # remove 'run script' arguments
-        my $done = eval $script->slurp_utf8."\n1;\n"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
-        if (ref $done eq 'HASH') {
-            warn "script $script_name returns a hash but it's processed as a plain script.",
-                " This may not be what you want\n";
-        }
-        die "Error in script $script_name: $@\n" unless $done;
+    if (not defined $script_data->{app}) {
+        $self->run_script_as_code ($script_name, $script_file);
         return;
     }
 
-    my $script_data = parse_script($script, $content, \%user_args);
     my $commit_msg = $script_data->{commit_msg};
 
     if ($opt->doc) {
@@ -346,7 +376,8 @@ sub execute {
     }
 
     if (my @missing = sort keys $script_data->{missing}->%*) {
-        die "Error: Missing variables '". join("', '",@missing)."' in command arguments for script $script\n"
+        die "Error: Missing variables '". join("', '",@missing)
+            ."' in command arguments for script $script_file\n"
             ."Please use option '".join(' ', map { "-arg $_=xxx"} @missing)."'\n";
     }
 
@@ -368,6 +399,55 @@ sub execute {
 
     $opt->{_verbose} = 'Loader' if $opt->{verbose};
 
+    my ( $categories, $appli_info, $appli_map ) = Config::Model::Lister::available_models;
+    my $app = $script_data->{app};
+    if ($opt->{foreach} and $appli_info->{$app}{_category} ne 'application') {
+        die "Cannot use --foreach option with $app. This option can only be used with ".
+            join(' ', $categories->{application}->@*). ". Check your cme script.\n";
+    }
+
+    # parse variables passed on command line
+
+    if ($opt->{foreach}) {
+        $self->run_foreach_loop($opt,$app_args, $script_data);
+    }
+    else {
+        my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
+        $self->run_script ($opt, $app_args, $script_data, \%user_args);
+    }
+
+    return;
+}
+
+sub run_foreach_loop($self, $opt,$app_args, $script_data ) {
+    my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
+
+    my @dirs = $opt->{foreach} eq '-' ? <STDIN> : split /\s+/,$opt->{foreach};
+    chomp(@dirs);               # cleanup stdin
+    my $start = path('.')->absolute;
+
+    foreach my $d (@dirs) {
+        my $t_dir = $start->child($d);
+        if (not $t_dir->is_dir) {
+            die "Cannot run script in $d: not a directory\n";
+        }
+        say "Running script in $t_dir ...";
+        # instance is stored in Config::Model, so the name must be changed
+        $opt->{instance_name} = $d;
+        # instance is persisted in $self, so its ref must be removed
+        delete $self->{_instance};
+        # tell instance where is the config. This avoids a chdir
+        $opt->{root_dir} = $d;
+        $self->run_script ($opt, $app_args, $script_data, {%user_args});
+        # once we're done, remove instance from Model to avoid memory leaks
+        # TODO: use delete_instance method provided by Config::Model from version 2.156
+        delete $self->{_model}{instances}{$d};
+    }
+
+    return;
+}
+
+sub run_script ($self, $opt, $app_args, $script_data, $user_args){
     # call loads
     my ($model, $inst, $root) = $self->init_cme($opt,$app_args);
     foreach my $load_str ($script_data->{load}->@*) {
@@ -385,7 +465,7 @@ sub execute {
     }
 
     if ($script_data->{sub}) {
-        $script_data->{sub}->($root, \%user_args);
+        $script_data->{sub}->($root, $user_args);
     }
 
     unless ($inst->needs_save) {
@@ -394,6 +474,8 @@ sub execute {
     }
 
     $self->save($inst,$opt) ;
+
+    my $commit_msg = $script_data->{commit_msg};
 
     # commit if needed
     if ($commit_msg and not $opt->{no_commit}) {
@@ -404,7 +486,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.041';
+$App::Cme::Run::Var::VERSION = '1.042';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -432,7 +514,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.041
+version 1.042
 
 =head1 SYNOPSIS
 
@@ -468,6 +550,11 @@ version 1.041
  Available scripts:
  - update-copyright
  - add-me-to-uploaders
+
+ # mass modification
+ $ cme run add-me-to-uploaders --foreach "raku-log raku-zef"
+ # similar result
+ $ echo "raku-*" | cme run add-me-to-uploaders --foreach -
 
 =head1 DESCRIPTION
 
@@ -751,6 +838,21 @@ committed with the passed commit message.
 
 Don't commit to git (even if the above option is set)
 
+=head2 foreach
+
+Apply the script in specific directories. This option is available
+only when dealing with application (See the list returned by C<cme list>).
+
+For instance, if your directory contains several Debian packages and
+you want to apply the same modification to all packages, you can run
+something like:
+
+   cme run add-me-to-uploaders --foreach "raku-log raku-zef"
+
+or use C<STDIN> to send the package directories:
+
+   ls "raku-*" | cme run add-me-to-uploaders --foreach -
+
 =head2 verbose
 
 Show effect of the modify instructions.
@@ -828,6 +930,14 @@ This script can also be written using multi line instructions:
  
  load: ! source Vcs-Browser="$browser" Vcs-Git="$url"
  commit: control: update Vcs-Browser and Vcs-Git
+
+=head2 personal scripts
+
+You may create your own scripts in C<~/.cme/scripts>. Here's an example:
+
+ $ cat ~/.cme/scripts/set-any-arch
+ app: dpkg-control
+ load: binary:~".*" Architecture=any
 
 =head1 SEE ALSO
 

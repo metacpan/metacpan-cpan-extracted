@@ -21,7 +21,6 @@ do { my $x = {
                                       'Test::More' => '0',
                                       'XML::Simple' => '0',
                                       'YAML' => '0',
-                                      'base' => '0',
                                       'constant' => '0',
                                       'overload' => '0',
                                       'parent' => '0',

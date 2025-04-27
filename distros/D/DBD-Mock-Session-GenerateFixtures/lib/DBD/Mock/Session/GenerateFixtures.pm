@@ -18,7 +18,7 @@ use Readonly;
 use Data::Walk;
 use Try::Tiny;
 
-our $VERSION = 0.09;
+our $VERSION = '0.11';
 
 our $override;
 my $JSON_OBJ = Cpanel::JSON::XS->new()->utf8->pretty();
@@ -105,7 +105,7 @@ sub _set_mock_dbh {
 	);
 
 	my $dbh_session = DBD::Mock::Session->new($PROGRAM_NAME => @{$data});
-
+	$self->_override_dbi_mocked_prepare($MOCKED_DBI_METHODS{mocked_prepare});
 	$dbh->{mock_session} = $dbh_session;
 	$self->{dbh}         = $dbh;
 
@@ -129,7 +129,6 @@ sub _override_dbi_methods {
 	$self->_override_dbi_fecth($MOCKED_DBI_METHODS{fetch});
 	$self->_override_dbi_prepare_cached($MOCKED_DBI_METHODS{prepare_cached});
 	$self->_override_dbi_prepare($MOCKED_DBI_METHODS{prepare});
-	$self->_override_dbi_mocked_prepare($MOCKED_DBI_METHODS{mocked_prepare});
 
 	return $self;
 }
@@ -150,6 +149,7 @@ sub restore_all {
 	my $self = shift;
 
 	foreach my $key (keys %MOCKED_DBI_METHODS) {
+		next if $key eq 'mocked_prepare';
 		$self->get_override_object()->restore($MOCKED_DBI_METHODS{$key});
 	}
 
@@ -196,7 +196,7 @@ sub _override_dbi_execute {
 			}
 
 			$query_data->{bound_params} = $self->{bind_params}
-				if scalar @{$self->{bind_params}} > 0;
+				if ref $self->{bind_params} && scalar @{$self->{bind_params}} > 0;
 
 			push @{$self->{result}}, $query_data;
 			$self->_write_to_file();

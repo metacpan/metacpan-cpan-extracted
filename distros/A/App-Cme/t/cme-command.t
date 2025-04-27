@@ -1,4 +1,3 @@
-# -*- cperl -*-
 use strict;
 use warnings;
 use utf8;
@@ -7,15 +6,24 @@ use open ':std', ':encoding(utf8)';
 
 use Encode;
 
-use Path::Tiny;
+use Path::Tiny 0.125;
 use Term::ANSIColor 2.01 qw(colorstrip);
 
 use Test::More;
 use Test::File::Contents;
 
+# used by "foreach loop" test to find test script
+use lib 't/lib';
+
 use App::Cmd::Tester;
 use App::Cme ;
 use Config::Model 2.148 qw/initialize_log4perl/;
+
+# WARNING: these tests check the output of cme command. This output is
+# created with Log4Perl to User class with INFO level.
+# if present, ~/.log4config-model must containt the lines:
+#     log4perl.logger.User = INFO, PlainMsgOnScreen
+#     log4perl.additivity.User = 0
 
 # work around a problem in IO::TieCombine (used by App::Cmd::Tester)
 # to avoid messing up output of stderr of tested command (See
@@ -56,6 +64,26 @@ subtest "list command" => sub {
     my $result = test_app( 'App::Cme' => \@test_cmd );
     say "-- stdout --\n", $result->stdout,"-----"  if $trace;
     is($result->error, undef, 'threw no exceptions');
+};
+
+subtest "foreach option" => sub {
+    my @t_dirs = map {$wr_root->child($_)} qw/for1 for2 for3/;
+    foreach my $d (@t_dirs) {
+        $d->remove_tree;
+        $d->mkdir;
+    }
+    my @test_cmd = (qw!run t/lib/Config/Model/scripts/cme-test!,
+                    '--model-dir' => path("t/lib/Config/Model/models/")->absolute->stringify,
+                    '--foreach' => join(' ', @t_dirs));
+    my $ok = test_app( 'App::Cme' => \@test_cmd );
+    is( $ok->error, undef, 'threw no exceptions');
+    print $ok->stdout if $trace;
+    is( $ok->exit_code, 0, 'all went well' ) or diag("Failed command @test_cmd");
+
+    foreach my $d (@t_dirs) {
+        my $t_file = $d->child('cme-test.yml');
+        file_contents_like $t_file->stringify,   qr/test ok/, "check $t_file" ;
+    }
 };
 
 subtest "modification without config file" => sub {
@@ -354,6 +382,12 @@ foreach my $test ( @script_tests) {
 # test failure case for run script
 my @bad_script_tests = (
     {
+        label => "line ".__LINE__.": missing app",
+        script => [ 'load ! MY_HOSTID=dontcare'],
+        args => [],
+        error_regexp => qr/Missing 'app' parameter in script/
+    },
+    {
         label => "line ".__LINE__.": modification with a Perl script run by cme run with missing arg",
         script => [ "app:  popcon", 'load ! MY_HOSTID=\$name$name'],
         args => [],
@@ -389,7 +423,7 @@ my @bad_script_tests = (
 foreach my $test ( @bad_script_tests) {
     subtest $test->{label} => sub {
         $conf_file->spew_utf8(@orig);
-        my $script = $wr_dir->child('my-script.cme');
+        my $script = $wr_dir->child('my-script'.$i++.'.cme');
         $script->spew_utf8( map { "$_\n"} @{$test->{script}});
 
         my $cmd = [

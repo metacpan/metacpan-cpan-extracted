@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0306';
+our $VERSION = '0.0401';
 
 use strictures 2;
 use curry;
@@ -19,44 +19,19 @@ use Music::Chord::Note ();
 use Music::Note ();
 use Music::ToRoman ();
 use Music::VoiceGen ();
-use Types::MIDI qw(Channel);
+use Types::Common::Numeric qw(NegativeInt PositiveInt PositiveNum);
+use Types::MIDI qw(Velocity);
 use Types::Standard qw(ArrayRef Num Maybe Str);
 use namespace::clean;
 
+extends 'MIDI::RtController::Filter';
 
-
-has rtc => (
-    is  => 'ro',
-    isa => sub { die 'Invalid rtc' unless ref($_[0]) eq 'MIDI::RtController' },
-    required => 1,
-);
 
 
 has pedal => (
     is  => 'rw',
-    isa => Num,
+    isa => Velocity,
     default => sub { 55 },
-);
-
-
-has channel => (
-    is  => 'rw',
-    isa => Channel,
-    default => sub { 0 },
-);
-
-
-has value => (
-    is      => 'rw',
-    isa     => Maybe[Num],
-    default => sub { undef },
-);
-
-
-has trigger => (
-    is      => 'rw',
-    isa     => Maybe[Num],
-    default => sub { undef },
 );
 
 
@@ -76,21 +51,21 @@ has factor => (
 
 has velocity => (
     is  => 'rw',
-    isa => Num,
+    isa => Velocity,
     default => sub { 10 },
 );
 
 
 has feedback => (
     is  => 'rw',
-    isa => Num,
+    isa => PositiveInt,
     default => sub { 1 },
 );
 
 
 has offset => (
     is  => 'rw',
-    isa => Num,
+    isa => NegativeInt | PositiveInt,
     default => sub { -12 },
 );
 
@@ -111,14 +86,14 @@ has scale => (
 
 has intervals => (
     is  => 'rw',
-    isa => ArrayRef[Num],
+    isa => ArrayRef[NegativeInt | PositiveInt],
     default => sub { [qw(-3 -2 -1 1 2 3)] },
 );
 
 
 has arp => (
     is  => 'rw',
-    isa => ArrayRef[Num],
+    isa => ArrayRef[Velocity],
     default => sub { [] },
 );
 
@@ -325,7 +300,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0306
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -351,13 +326,6 @@ L<MIDI::RtController> filters.
 
 =head1 ATTRIBUTES
 
-=head2 rtc
-
-  $rtc = $filter->rtc;
-
-The required L<MIDI::RtController> instance provided in the
-constructor.
-
 =head2 pedal
 
   $pedal = $filter->pedal;
@@ -368,37 +336,6 @@ The B<note> used by the pedal-tone filter.
 Default: C<55>
 
 Which is the MIDI-number for G below middle-C.
-
-=head2 channel
-
-  $channel = $filter->channel;
-  $filter->channel($number);
-
-The current MIDI channel (0-15, drums=9).
-
-Default: C<0>
-
-=head2 value
-
-  $value = $filter->value;
-  $filter->value($number);
-
-Return or set the MIDI event value. This is a generic setting that can
-be used by filters to set or retrieve state. This often a whole number
-between C<0> and C<127>, but can take any number.
-
-Default: C<undef>
-
-=head2 trigger
-
-  $trigger = $filter->trigger;
-  $filter->trigger($number);
-
-Return or set the trigger. This is a generic setting that
-can be used by filters to set or retrieve state. This often a whole
-number between C<0> and C<127>, but can take any number.
-
-Default: C<undef>
 
 =head2 delay
 
@@ -611,17 +548,15 @@ time before being sent to a MIDI output.
 
 The F<eg/*.pl> program(s) in this distribution
 
-L<MIDI::RtController::Filter::Drums>
-
-L<MIDI::RtController::Filter::Math>
-
-L<MIDI::RtController::Filter::CC>
+L<curry>
 
 L<Array::Circular>
 
 L<List::SomeUtils>
 
 L<List::Util>
+
+L<MIDI::RtController::Filter>
 
 L<MIDI::RtMidi::ScorePlayer>
 
@@ -636,6 +571,8 @@ L<Music::Note>
 L<Music::ToRoman>
 
 L<Music::VoiceGen>
+
+L<Types::Common::Numeric>
 
 L<Types::MIDI>
 

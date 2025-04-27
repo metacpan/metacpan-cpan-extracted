@@ -1,8 +1,8 @@
 package Parse::HTTP::UserAgent::Constants;
-$Parse::HTTP::UserAgent::Constants::VERSION = '0.42';
+$Parse::HTTP::UserAgent::Constants::VERSION = '0.43';
 use strict;
 use warnings;
-use base qw( Exporter );
+use parent qw( Exporter );
 
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
@@ -194,7 +194,7 @@ Parse::HTTP::UserAgent::Constants
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 DESCRIPTION
 
@@ -204,13 +204,17 @@ Internal module
 
 Parse::HTTP::UserAgent::Constants - Various constants
 
+=head1 DEPRECATION NOTICE
+
+This module is B<DEPRECATED>. Please use L<HTTP::BrowserDetect> instead.
+
 =head1 SEE ALSO
 
 L<Parse::HTTP::UserAgent>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

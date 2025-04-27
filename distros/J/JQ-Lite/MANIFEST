@@ -8,8 +8,10 @@ README.md
 t/aggregate.t
 t/arithmetic.t
 t/basic.t
+t/compact.t
 t/contains.t
 t/count.t
+t/del.t
 t/empty.t
 t/first_last.t
 t/flatten.t
@@ -21,10 +23,12 @@ t/limit.t
 t/map.t
 t/match.t
 t/match_i.t
+t/nth.t
 t/pipe_select_name.t
 t/reverse.t
 t/sort_by.t
 t/sort_unique.t
+t/type.t
 t/values.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

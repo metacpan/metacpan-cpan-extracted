@@ -1,1 +1,0 @@
-{"pathname":"S/SA/SANKO/Readonly-2.05.tar.gz","provides":{"Readonly::Hash":{"file":"lib/Readonly.pm"},"Readonly::Scalar":{"file":"lib/Readonly.pm"},"Readonly":{"version":"2.05","file":"lib/Readonly.pm"},"Readonly::Array":{"file":"lib/Readonly.pm"}},"target":"Readonly","version":"2.05","name":"Readonly","dist":"Readonly-2.05"}

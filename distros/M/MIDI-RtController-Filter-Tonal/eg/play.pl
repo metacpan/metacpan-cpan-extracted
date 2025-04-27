@@ -21,16 +21,16 @@ my $rtf = MIDI::RtController::Filter::Tonal->new(rtc => $rtc);
 
 $rtc->send_it(['patch_change', $rtf->channel, 2]);
 
-$rtf->feedback(16);
+$rtf->feedback(4);
 $rtf->delay(0.5);
 # $rtf->factor(1.5);
 
 my $method = "curry::$filter_name";
 $rtc->add_filter($filter_name, [qw(note_on note_off)], $rtf->$method);
 
-my $micros = 500_000;
-$rtf->$filter_name('system', 0, ['note_on', $rtf->channel, 60, 100]);
-usleep($micros);
-$rtf->$filter_name('system', 0, ['note_off', $rtf->channel, 60, 100]);
+# my $micros = 500_000;
+# $rtf->$filter_name('system', 0, ['note_on', $rtf->channel, 60, 100]);
+# usleep($micros);
+# $rtf->$filter_name('system', 0, ['note_off', $rtf->channel, 60, 100]);
 
 $rtc->run;
