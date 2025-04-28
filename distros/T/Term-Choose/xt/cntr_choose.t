@@ -9,8 +9,9 @@ for my $file ( qw(
 lib/Term/Choose.pm
 lib/Term/Choose/Constants.pm
 lib/Term/Choose/LineFold.pm
-lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm
-lib/Term/Choose/LineFold/CharWidthDefault.pm
+lib/Term/Choose/LineFold/PP.pm
+lib/Term/Choose/LineFold/PP/CharWidthAmbiguousWide.pm
+lib/Term/Choose/LineFold/PP/CharWidthDefault.pm
 lib/Term/Choose/Linux.pm
 lib/Term/Choose/Opt/Mouse.pm
 lib/Term/Choose/Opt/Search.pm

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Parent class of RtController filters
 
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 use Moo;
 use strictures 2;
@@ -80,7 +80,7 @@ MIDI::RtController::Filter - Parent class of RtController filters
 
 =head1 VERSION
 
-version 0.0101
+version 0.0102
 
 =head1 SYNOPSIS
 
@@ -112,6 +112,7 @@ not. The B<continue> attribute is used for this purpose.
 
   $controller->add_filter('breathe', note_on => $filter->curry::breathe);
 
+Call the C<add_filter> method on an L<MIDI::RtController> instance.
 Passing C<all> to the C<add_filter> method means that any MIDI event
 will fire the filter. But C<note_on>, C<[qw(note_on note_off)]>, or
 C<control_change> works, as well.
@@ -179,8 +180,9 @@ Default: C<0>
   $continue = $filter->continue;
   $filter->continue($boolean);
 
-This Boolean can be used to either stop or continue processing other
-filters by L<MIDI::RtController> when returned from a filter.
+This Boolean can be used to either stop (C<1>) or continue (C<0>)
+processing other filters by L<MIDI::RtController> when returned from a
+filter.
 
 Default: C<0>
 
@@ -196,11 +198,11 @@ L<Moo>
 
 L<MIDI::RtController>
 
-L<MIDI::RtController::Filter-CC>
+L<MIDI::RtController::Filter::CC>
 
-L<MIDI::RtController::Filter-Drums>
+L<MIDI::RtController::Filter::Drums>
 
-L<MIDI::RtController::Filter-Tonal>
+L<MIDI::RtController::Filter::Tonal>
 
 L<Types::Standard>
 

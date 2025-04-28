@@ -16,6 +16,14 @@ if ( $^O eq 'MSWin32' ) {
     );
 }
 
+
+my $has_xs = eval { require Term::Choose::LineFold::XS };
+my %prereqs_xs;
+if ( $has_xs ) {
+    %prereqs_xs = ( 'Term::Choose::LineFold::XS' => '0.001', );
+}
+
+
 WriteMakefile(
     PL_FILES         => {},
     MIN_PERL_VERSION => '5.10.1',
@@ -40,6 +48,7 @@ WriteMakefile(
     EXE_FILES        => [],
     BUILD_REQUIRES   => {
         'lib'                   => 0,
+        'open'                  => 0,
         'File::Spec::Functions' => 0,
         'FindBin'               => 0,
         'Test::More'            => 0,
@@ -52,16 +61,9 @@ WriteMakefile(
         'Carp'              => 0,
         'Exporter'          => 0,
         %prereqs_os_specific,
+        %prereqs_xs,
     },
     test  => {
         TESTS => 't/*/*.t',
-    },
-    dist  => {
-        COMPRESS => 'gzip',
-        SUFFIX   => '.gz',
-        TARFLAGS => '--format=gnu -cvf',
-    },
-    clean => {
-        FILES => 'Term-Choose-*',
     },
 );

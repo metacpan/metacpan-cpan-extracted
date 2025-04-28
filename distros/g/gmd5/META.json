@@ -1,0 +1,62 @@
+{
+   "abstract" : "Pure Perl MD5 implementation for Perl 5.8+",
+   "author" : [
+      "OnEhIppY, Domero Software <domerosoftware@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "gmd5",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DomeroSoftware/gmd5/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/DomeroSoftware/gmd5.git",
+         "web" : "https://github.com/DomeroSoftware/gmd5"
+      }
+   },
+   "version" : "v2.4.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

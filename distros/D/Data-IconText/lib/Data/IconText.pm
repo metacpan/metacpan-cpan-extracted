@@ -13,10 +13,16 @@ use warnings;
 
 use Carp;
 use Scalar::Util qw(looks_like_number weaken);
+use Data::Identifier v0.12;
+
+use constant {
+    WK_UNICODE_CP   => Data::Identifier->new(uuid => '5f167223-cc9c-4b2f-9928-9fe1b253b560')->register, # unicode-code-point
+    WK_ASCII_CP     => Data::Identifier->new(uuid => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c')->register, # ascii-code-point
+};
 
 use overload '""' => sub {$_[0]->as_string};
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -44,12 +50,61 @@ my %_for_version = (
             regular             => 0x2299,
             regular_not_in_pool => 0x2298,
         },
+        identifier => {},
+    },
+    v0.02 => {
+        parent => v0.01,
+        identifier => {
+            '8be115d2-dc2f-4a98-91e1-a6e3075cbc31' => { # uuid
+                '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c' => 0x1F30D,
+                '7b177183-083c-4387-abd3-8793eb647373' => 0x21E5,
+                '4dc9fd07-7ef3-4215-8874-31d78ed55c22' => 0x21A3,
+                '3877b2ef-6c77-423f-b15f-76508fbd48ed' => 0x21A6,
+                'bccdaf71-0c82-422e-af44-bb8396bf90ed' => 0x1F331,
+                '0a24c834-90bd-4abd-ad97-4bd3ca7e784a' => 0x1F332,
+                '85061c8c-be7a-4171-a008-f2035a4b8b61' => 0x1F333,
+                'eba923c3-a425-425d-80ab-0064258d108a' => 0x1F334,
+                '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1' => 0x1F981,
+                '3694d8ca-c969-5705-beca-01f17b1487e8' => 0x2642,
+                'ae1072ef-0865-5104-b257-0d45441fa5e5' => 0x2642,
+                'd642eff3-bee6-5d09-aea9-7c47b181dd83' => 0x2642,
+                '25dfeb8e-ef9a-52a1-b5f1-073387734988' => 0x2640,
+                '3c4b6cdf-f5a8-50d6-8a3a-b0c0975f7e69' => 0x2640,
+                'db9b0db1-a451-59e8-aa3b-9994e683ded3' => 0x2640,
+                '310f2b49-73a8-5f27-aeaf-5f34bc8e583f' => 0x26A5,
+                '036c0fe8-5189-5134-99ec-0b1b05c7bbf4' => 0x26A5,
+            },
+        }
     },
 );
+
+while (1) {
+    my $found = 0;
+
+    foreach my $v (keys %_for_version) {
+        my $parent = $_for_version{$v}->{parent} // next;
+        next if defined $_for_version{$parent}->{parent};
+
+        delete $_for_version{$v}->{parent};
+
+        _merge(\%_for_version, \%_for_version, $v, $parent);
+
+        $found++;
+    }
+
+    last unless $found;
+}
 
 my %_type_to_special = (
     '577c3095-922b-4569-805d-a5df94686b35' => 'directory',
     'e6d6bb07-1a6a-46f6-8c18-5aa6ea24d7cb' => 'regular',
+);
+
+my %_idtype_to_uuid = (
+    uuid => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
+    oid  => 'd08dc905-bbf6-4183-b219-67723c3c8374',
+    uri  => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439',
+    sid  => 'f87a38cb-fd13-4e15-866c-e49901adbec5',
 );
 
 
@@ -65,6 +120,8 @@ sub new {
             $self->{unicode} //= int($unicode);
         } elsif ($unicode =~ /^U\+([0-9a-fA-F]{4,7})$/) {
             $self->{unicode} //= hex($1);
+        } elsif (scalar(eval {$unicode->isa('Data::Identifier')}) && $unicode->type->eq(WK_UNICODE_CP) && $unicode->id =~ /^U\+([0-9a-fA-F]{4,7})$/) { # XXX: Experimental!
+            $self->{unicode} //= hex($1);
         } else {
             croak 'Passed unicode value is in wrong format';
         }
@@ -75,80 +132,134 @@ sub new {
         $self->{unicode} //= ord($raw);
     }
 
+    if (defined(my $from = delete $opts{from})) {
+        my $type;
+        my $id;
+
+        unless (eval {$from->isa('Data::Identifier')}) {
+            $from = Data::Identifier->new(from => $from);
+        }
+
+        $type = $from->type;
+        $id   = $from->id // croak 'Bad identifier';
+
+        if ($type->eq(WK_UNICODE_CP) && $id =~ /^U\+([0-9a-fA-F]{4,7})$/) {
+            $self->{unicode} //= hex($1);
+        } elsif ($type->eq(WK_ASCII_CP) && int($id) >= 0 && int($id) <= 127) {
+            $self->{unicode} //= int($id);
+        }
+    }
+
     if (defined(my $for = delete $opts{for})) {
-        unless (ref $for) {
-            require Data::Identifier;
+        state $running = undef;
 
-            $for = Data::Identifier->new(from => $for);
-        }
+        unless ($running) {
+            local $@ = undef;
 
-        if ($for->isa('Data::URIID::Base') && !$for->isa('Data::URIID::Result')) {
-            $for = $for->as('Data::Identifier');
-        }
-
-        if ($for->isa('Data::Identifier')) {
-            if (defined(my $db = $opts{db})) {
-                my $f = eval { $db->tag_by_id($for) };
-                $for = $f if defined $f;
+            unless (ref $for) {
+                $for = Data::Identifier->new(from => $for);
             }
-        }
 
-        if ($for->isa('Data::Identifier')) {
-            if (defined(my $store = $opts{store})) {
-                my $f = eval {$store->query(ise => $for)};
-                $for = $f if defined $f;
+            if (defined(my $table = $for_version_info->{identifier}{$for->type->uuid})) {
+                $self->{unicode} //= $table->{$for->id};
             }
-        }
 
-        if ($for->isa('Data::Identifier')) {
-            if (defined(my $fii = $opts{fii})) {
-                my $f = eval {$fii->for_identifier($for)};
-                $for = $f if defined $f;
-            }
-        }
+            unless (defined $self->{unicode}) {
+                state $sid_forceloaded;
 
-        if ($for->isa('Data::Identifier')) {
-            if (defined(my $extractor = $opts{extractor})) {
-                my $f = $extractor->lookup($for);
-                $for = $f if defined $f;
-            }
-        }
+                if (!$sid_forceloaded && defined(my $sid = $for->sid(default => undef))) {
+                    unless (defined($for->uuid(default => undef))) {
+                        require Data::Identifier::Wellknown;
+                        Data::Identifier::Wellknown->import(':all');
+                        $for = Data::Identifier->new($for->type => $for->id);
+                        $sid_forceloaded = 1;
+                    }
+                }
 
-        if ($for->isa('File::FStore::File')) {
-            my $v;
-
-            push(@mimetypes, $v) if defined($v = eval {$for->get(properties => 'mediasubtype')});
-            $opts{special} //= 'regular';
-        } elsif ($for->isa('File::Information::Base')) {
-            my $type;
-            my $v;
-
-            push(@mimetypes, $v) if defined($v = $for->get('mediatype', default => undef));
-
-            unless (defined($opts{special})) {
-                require File::Spec;
-
-                if ($for->get('link_basename', default => '') eq File::Spec->updir) {
-                    $opts{special} //= 'parent-directory';
+                foreach my $type (keys %_idtype_to_uuid) {
+                    my $v = $for->as($type, default => undef) // next;
+                    if (defined(my $table = $for_version_info->{identifier}{$_idtype_to_uuid{$type}})) {
+                        $self->{unicode} //= $table->{$v};
+                    }
+                    last if defined $self->{unicode};
                 }
             }
 
-            unless (defined($opts{special})) {
-                $type   = $for->get('tagpool_inode_type', default => undef, as => 'uuid');
-                $type //= eval { $for->inode->get('tagpool_inode_type', default => undef, as => 'uuid') };
+            $running = 1;
+            eval {
+                if ($for->isa('Data::URIID::Base') && !$for->isa('Data::URIID::Result')) {
+                    $for = $for->as('Data::Identifier');
+                }
 
-                $opts{special} //= $_type_to_special{$type} if defined $type;
-            }
-        } elsif ($for->isa('Data::TagDB::Tag')) {
-            require Encode;
+                if ($for->isa('Data::Identifier')) {
+                    if (defined(my $db = $opts{db})) {
+                        my $f = eval { $db->tag_by_id($for) };
+                        $for = $f if defined $f;
+                    }
+                }
 
-            my $icontext = $for->icontext(default => undef);
-            $self->{unicode} //= ord(Encode::decode('UTF-8' => $icontext)) if defined $icontext;
-        } elsif ($for->isa('Data::URIID::Result')) {
-            my $icontext = $for->attribute('icon_text', default => undef);
-            $self->{unicode} //= ord($icontext) if defined $icontext;
-        } else {
-            croak 'Invalid object passed for "for"';
+                if ($for->isa('Data::Identifier')) {
+                    if (defined(my $store = $opts{store})) {
+                        my $f = eval {$store->query(ise => $for)};
+                        $for = $f if defined $f;
+                    }
+                }
+
+                if ($for->isa('Data::Identifier')) {
+                    if (defined(my $fii = $opts{fii})) {
+                        my $f = eval {$fii->for_identifier($for)};
+                        $for = $f if defined $f;
+                    }
+                }
+
+                if ($for->isa('Data::Identifier')) {
+                    if (defined(my $extractor = $opts{extractor})) {
+                        my $f = $extractor->lookup($for);
+                        $for = $f if defined $f;
+                    }
+                }
+
+                if ($for->isa('File::FStore::File')) {
+                    my $v;
+
+                    push(@mimetypes, $v) if defined($v = eval {$for->get(properties => 'mediasubtype')});
+                    $opts{special} //= 'regular';
+                } elsif ($for->isa('File::Information::Base')) {
+                    my $type;
+                    my $v;
+
+                    push(@mimetypes, $v) if defined($v = $for->get('mediatype', default => undef));
+
+                    unless (defined($opts{special})) {
+                        require File::Spec;
+
+                        if ($for->get('link_basename', default => '') eq File::Spec->updir) {
+                            $opts{special} //= 'parent-directory';
+                        }
+                    }
+
+                    unless (defined($opts{special})) {
+                        $type   = $for->get('tagpool_inode_type', default => undef, as => 'uuid');
+                        $type //= eval { $for->inode->get('tagpool_inode_type', default => undef, as => 'uuid') };
+
+                        $opts{special} //= $_type_to_special{$type} if defined $type;
+                    }
+                } elsif ($for->isa('Data::TagDB::Tag')) {
+                    require Encode;
+
+                    my $icontext = $for->icontext(default => undef);
+                    $self->{unicode} //= ord(Encode::decode('UTF-8' => $icontext)) if defined $icontext;
+                } elsif ($for->isa('Data::URIID::Result')) {
+                    my $icontext = $for->attribute('icon_text', default => undef);
+                    $self->{unicode} //= ord($icontext) if defined $icontext;
+                } elsif ($for->isa('Data::Identifier')) {
+                    # no-op, handled above.
+                } else {
+                    croak 'Invalid object passed for "for"';
+                }
+            };
+            $running = undef;
+            die $@ if $@;
         }
     }
 
@@ -265,6 +376,27 @@ sub _find_for_version_info {
     croak 'Unsupported version given: '.sprintf("v%u.%u", unpack("cc", $for_version));
 }
 
+sub _merge {
+    my ($d, $s, $dkey, $skey) = @_;
+
+    $skey //= $dkey;
+
+    if (exists $d->{$dkey}) {
+        my $nd = $d->{$dkey};
+        my $ns = $s->{$skey};
+
+        foreach my $key (keys %{$ns}) {
+            if (exists $nd->{$key}) {
+                _merge($nd, $ns, $key);
+            } else {
+                $nd->{$key} = $ns->{$key};
+            }
+        }
+    } else {
+        $d->{$dkey} = $s->{$skey};
+    }
+}
+
 1;
 
 __END__
@@ -279,7 +411,7 @@ Data::IconText - Work with icon text
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -313,6 +445,16 @@ The unicode value (e.g. C<0x1F981>). May also be a string in standard format (e.
 
 The character as a raw perl string. Must be exactly one character long.
 
+=item C<from>
+
+Another object that represents the character.
+If the object passed is not a L<Data::Identifier> it is passed via L<Data::Identifier/new> with C<from>.
+
+Currently only identifiers of type unicode code point or ascii code point are supported.
+
+See also:
+L<Data::Identifier::Generate/unicode_character>.
+
 =item C<for>
 
 An object to find the icon text for.
@@ -326,6 +468,9 @@ L<Data::Identifier>.
 If the value is a plain string it is tried to be converted to a L<Data::Identifier> first.
 
 If a L<Data::Identifier> is passed, a lookup is performed using the passed subobjects.
+
+If the value passed has a I<small-identifier> but no I<uuid> a force load of L<Data::Identifier::Wellknown> with C<:all> may happen.
+This can be be avoided by ensuring all objects that have a I<small-identifier> set also have a I<uuid> set.
 
 =item C<mediasubtype>
 
@@ -348,6 +493,10 @@ One of: C<directory>, C<parent-directory>, C<regular>, C<regular-not-in-pool>.
 The version of this module to use the rules for calculation of the icon text from.
 Defaults to the current version of this module.
 If a given version is not supported, this method C<die>s.
+
+B<Note:>
+This option alters only the rules for finding an icon text for a B<valid> input.
+If an input is invalid but was erroneously accepted in an earlier version newer versions may still C<die> or behave differently.
 
 =back
 

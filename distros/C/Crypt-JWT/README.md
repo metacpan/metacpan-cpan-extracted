@@ -418,6 +418,12 @@ Named arguments:
 
     `undef` (default) - do not verify 'typ' header parameter
 
+- tolerate\_padding
+
+    `0` (default) - ignore Base64 padding characters when validating signature
+
+    `1` - take account of Base64 padding characters when validating signature
+
 ## encode\_jwt
 
     my $token = encode_jwt(%named_args);

@@ -2,9 +2,7 @@ use 5.10.1;
 use strict;
 use warnings;
 use Time::Piece;
-use Test::More tests => 15;
-
-
+use Test::More;
 
 my $v = -1;
 my $v_pod = -1;
@@ -37,17 +35,19 @@ is( $v, $lf_v_pod, 'Version in POD Term::Choose::LineFold OK' );
 
 
 my @modules = qw(
-    lib/Term/Choose/Constants.pm
-    lib/Term/Choose/LineFold.pm
-    lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm
-    lib/Term/Choose/LineFold/CharWidthDefault.pm
-    lib/Term/Choose/Linux.pm
-    lib/Term/Choose/Opt/Mouse.pm
-    lib/Term/Choose/Opt/Search.pm
-    lib/Term/Choose/Opt/SkipItems.pm
-    lib/Term/Choose/Screen.pm
-    lib/Term/Choose/ValidateOptions.pm
-    lib/Term/Choose/Win32.pm
+lib/Term/Choose.pm
+lib/Term/Choose/Constants.pm
+lib/Term/Choose/LineFold.pm
+lib/Term/Choose/LineFold/PP.pm
+lib/Term/Choose/LineFold/PP/CharWidthAmbiguousWide.pm
+lib/Term/Choose/LineFold/PP/CharWidthDefault.pm
+lib/Term/Choose/Linux.pm
+lib/Term/Choose/Opt/Mouse.pm
+lib/Term/Choose/Opt/Search.pm
+lib/Term/Choose/Opt/SkipItems.pm
+lib/Term/Choose/Screen.pm
+lib/Term/Choose/ValidateOptions.pm
+lib/Term/Choose/Win32.pm
 );
 for my $module ( @modules ) {
     my $v_module = -1;
@@ -60,7 +60,6 @@ for my $module ( @modules ) {
     close $fh;
     is( $v, $v_module, 'Version in $module OK' );
 }
-
 
 
 
@@ -80,7 +79,10 @@ is( $v, $v_changes, 'Version in "Changes" OK' );
 
 
 
-
 my $t = localtime;
 my $today = $t->ymd;
 is( $release_date, $today, 'Release date in Changes is date from today' );
+
+
+
+done_testing();

@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Given Names and their Derivations</title>
+<link rel="stylesheet" type="text/css" href="<: $default_css :>">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<: $jquery :>
+</head>
+<body>
+
+<h3 class="global_toc_text"><a href="https://metacpan.org/module/Lingua::EN::GivenNames">Lingua::EN::GivenNames V <: $version :></a></h3>
+
+<h3 class="global_toc_text">Given Names and their Derivations</h3>
+
+<p>
+The data displayed here is shipped in the above module, in share/lingua.en.givennames.sqlite,
+and installed in a shared directory when you install the module. See the FAQ entry
+<a href="https://metacpan.org/module/Lingua::EN::GivenNames#Where-is-the-database-">Where is the database?</a>
+for details.
+</p>
+
+<p>
+The database structure is documented in the FAQ entry
+<a href="https://metacpan.org/module/Lingua::EN::GivenNames#What-is-the-database-schema-">What is the database schema?</a>
+</p>
+
+<p>
+The web source for the data is <a href="http://www.20000-names.com">20000-names.com</a>.
+The number of names in the database is: <: $name_count :>.
+</p>
+
+<h3 class="global_toc_text">Given Names</h3>
+
+: include "basic.table.tx" { border => $border, row => $name_data, thead => $thead };
+
+</body>
+</html>

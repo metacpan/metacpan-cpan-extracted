@@ -2,8 +2,9 @@ Changes
 lib/Term/Choose.pm
 lib/Term/Choose/Constants.pm
 lib/Term/Choose/LineFold.pm
-lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm
-lib/Term/Choose/LineFold/CharWidthDefault.pm
+lib/Term/Choose/LineFold/PP.pm
+lib/Term/Choose/LineFold/PP/CharWidthAmbiguousWide.pm
+lib/Term/Choose/LineFold/PP/CharWidthDefault.pm
 lib/Term/Choose/Linux.pm
 lib/Term/Choose/Opt/Mouse.pm
 lib/Term/Choose/Opt/Search.pm
@@ -19,7 +20,11 @@ t/00_load/00-load.t
 t/00_load/01-new.t
 t/01_arguments/01_new.t
 t/01_arguments/Data_Test_Arguments.pm
+t/LineFold/01-width.t
+t/LineFold/02-cut.t
 tools/build_TCF_char_width_table_modules.pl
+tools/update_verson.pl
+tools/xt_prereq.txt
 xt/01_option.t
 xt/02_option_error.t
 xt/cntr_choose.t

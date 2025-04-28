@@ -3,7 +3,7 @@ App::DBBrowser::Table;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
@@ -155,7 +155,13 @@ sub browse_the_table {
             return $statement;
         }
         elsif ( $sub_stmt eq $export ) {
-            $sf->__export( $sql );
+            if ( ! eval {
+                $sf->__export( $sql );
+                1 }
+            ) {
+                $ax->print_error_message( $@ );
+                next CUSTOMIZE;
+            }
         }
         elsif ( $sub_stmt eq $print_table || $sub_stmt eq $hidden_print ) {
             local $| = 1;
@@ -213,40 +219,33 @@ sub __selected_statement_result {
 
 sub __export {
     my ( $sf, $sql ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $file_fs = $sf->__get_filename_fs( $sql );
     if ( ! length $file_fs ) {
         return;
     }
-    if ( ! eval {
-        print 'Working ...' . "\r" if $sf->{o}{table}{progress_bar};
-        my $all_arrayref = $sf->__selected_statement_result( $sql );
-        my $open_mode;
-        if ( length $sf->{o}{export}{file_encoding} ) {
-            $open_mode = '>:encoding(' . $sf->{o}{export}{file_encoding} . ')';
-        }
-        else {
-            $open_mode = '>';
-        }
-        open my $fh, $open_mode, $file_fs or die $!;
-        require String::Unescape;
-        my $options = {
-            map { $_ => String::Unescape::unescape( $sf->{o}{csv_out}{$_} ) }
-            grep { length $sf->{o}{csv_out}{$_} } # keep the default value if the option is set to ''
-            keys %{$sf->{o}{csv_out}}
-        };
-        if ( ! length $options->{eol} ) {
-            $options->{eol} = $/; # for `eol` use `$/` as the default value
-        }
-        require Text::CSV_XS;
-        my $csv = Text::CSV_XS->new( $options ) or die Text::CSV_XS->error_diag();
-        $csv->print( $fh, $_ ) for @$all_arrayref;
-        close $fh;
-        1 }
-    ) {
-        $ax->print_error_message( $@ );
-        return;
+    print 'Working ...' . "\r" if $sf->{o}{table}{progress_bar};
+    my $all_arrayref = $sf->__selected_statement_result( $sql );
+    my $open_mode;
+    if ( length $sf->{o}{export}{file_encoding} ) {
+        $open_mode = '>:encoding(' . $sf->{o}{export}{file_encoding} . ')';
     }
+    else {
+        $open_mode = '>';
+    }
+    open my $fh, $open_mode, $file_fs or die "$file_fs: $!";
+    require String::Unescape;
+    my $options = {
+        map { $_ => String::Unescape::unescape( $sf->{o}{csv_out}{$_} ) }
+        grep { length $sf->{o}{csv_out}{$_} } # keep the default value if the option is set to ''
+        keys %{$sf->{o}{csv_out}}
+    };
+    if ( ! length $options->{eol} ) {
+        $options->{eol} = $/; # for `eol` use `$/` as the default value
+    }
+    require Text::CSV_XS;
+    my $csv = Text::CSV_XS->new( $options ) or die Text::CSV_XS->error_diag();
+    $csv->print( $fh, $_ ) for @$all_arrayref;
+    close $fh;
     return 1;
 }
 
@@ -282,9 +281,9 @@ sub __get_filename_fs {
             if ( $sf->{o}{export}{add_extension} && $file_name !~ /\.csv\z/i ) {
                 $file_name_plus .= '.csv';
             }
-            my $dir = $sf->{o}{export}{export_dir};
-            $file_name_plus = catfile $dir, $file_name_plus;
-            my $file_fs = realpath encode( 'locale_fs', $file_name_plus );
+            my $export_dir = $sf->{o}{export}{export_dir};
+            my $dir_fs = realpath( encode( 'locale_fs', $export_dir ) ) or die "$export_dir: $!";
+            my $file_fs = catfile $dir_fs, encode( 'locale_fs', $file_name_plus );
             my ( $new_name, $overwrite ) = ( '- New name', '- Overwrite' );
             my $chosen;
             if ( -e $file_fs ) {

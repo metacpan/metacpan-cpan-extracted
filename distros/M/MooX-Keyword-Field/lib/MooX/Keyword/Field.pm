@@ -1,6 +1,6 @@
 package MooX::Keyword::Field;
 
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use Moo;
 
 our %FIELDS;
@@ -35,7 +35,7 @@ MooX::Keyword::Field - field attributes that cannot be set via the constructor
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -116,7 +116,7 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
@@ -132,7 +132,7 @@ L<https://metacpan.org/release/MooX-Keyword-Field>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022->2024 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

@@ -15,7 +15,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my %_valid_new_opts = (
     db          => 'Data::TagDB',
@@ -194,7 +194,7 @@ Data::Identifier::Cloudlet - format independent identifier object
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -207,6 +207,8 @@ version v0.12
 
     my $bool = $cl->is_root($entry);
     my $bool = $cl->is_entry($entry);
+
+(since v0.10)
 
 This module implements a cloudlet. A cloudlet is a often a collection of tags (represented by identifiers).
 

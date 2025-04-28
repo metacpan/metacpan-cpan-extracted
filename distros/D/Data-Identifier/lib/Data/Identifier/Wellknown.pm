@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -225,7 +225,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -377,6 +377,7 @@ $type uuid
 .   f6249973-59a9-47e2-8314-f7cf9a5f77bf    person                      sid=77
 .   5501e545-f39a-4d62-9f65-792af6b0ccba    body                        sid=78
 .   a331f2c5-20e5-4aa2-b277-8e63fd03438d    character                   sid=79
+.   63c1da19-0dd6-4181-b3fa-742b9ceb2903    filesystem                  sid=98
 .   83e3acbb-eb8d-4dfb-8f2f-ae81cc436d4b    batch                       sid=109
 .   b17f36c6-c397-4e84-bd32-1eccb3f00671    set                         sid=110
 .   aa9d311a-89b7-44cc-a356-c3fc93dfa951    category                    sid=111
@@ -396,6 +397,14 @@ $type uuid
 
 .   84402088-2d3b-49c2-af16-f7715b54f051    creative-work
 .   68aa9198-110c-43bb-a8cc-e0a533e2341e    spacetime-subject
+
+.   2a105a7d-c39c-4958-a7a2-f2bef3e84428    state
+.   323146d5-17e4-4d05-8fa6-f7235d91e8c1    abstract-state
+.   7b0ae21d-8d0a-4af1-8b0c-c2d0ab77c20d    specific-state
+
+.   63da70a8-78a4-51b0-8b87-86872b474a5d    specific-proto-file-state
+.   0406b78b-741d-48f4-9acd-5e27b5e29d48    directory
+.   61fba55f-1ba3-460d-85a7-9262557f41c9    hardlink
 
 $extra_classes identifier
 .   8be115d2-dc2f-4a98-91e1-a6e3075cbc31    uuid                        sid=2
@@ -702,6 +711,13 @@ $type uuid
 .   87c4892f-ae39-476e-8ed0-d9ed321dafe9    default-type
 .   8440eabd-5d73-4679-8f06-abaa06cf04ac    default-encoding
 .   0ad7f760-8ee7-4367-97f2-ada06864325e    tag-owned-by
+
+.   4c426c3c-900e-4350-8443-e2149869fbc9    also-has-state
+.   55e0384d-842a-48e5-869f-eb0c196e0ab3    has-inital-state
+.   54d30193-2000-4d8a-8c28-3fa5af4cad6b    has-final-state
+.   2b7e341c-2397-4903-95d4-991c04f7b6f3    other-state
+.   03d22b14-5094-46d3-9516-aecaa7ee565c    derived-from
+.   689e0d21-1581-4c56-a2f4-87fc91ad63e7    derived-by-transformation
 
 .   ed73cac4-a9b7-40ee-bad1-54e8eaa259ce    begins-after-beginning-of
 .   9e6a2d96-e6db-46f7-924f-cf55d1582432    begins-after-end-of
@@ -1342,8 +1358,7 @@ $type uuid
 .   115c1bcf-02cd-4a57-bd02-1d9f1ea8dd01    any-taxon                   sid=95
 .   d2526d8b-25fa-4584-806b-67277c01c0db    inode-number                sid=96
 .   cd5bfb11-620b-4cce-92bd-85b7d010f070    also-on-filesystem          sid=97
-.   63c1da19-0dd6-4181-b3fa-742b9ceb2903    filesystem                  sid=98
-% Handled above: 99 - 101
+% Handled above: 98 - 101
 % Reserved: 102
 % Handled above: 103 - 107
 % Reserved: 108

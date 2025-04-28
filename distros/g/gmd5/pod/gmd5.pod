@@ -1,0 +1,94 @@
+=head1 NAME
+
+gmd5 - Pure Perl implementation of MD5 hashing
+
+=head1 SYNOPSIS
+
+  use gmd5 qw(md5 md5_hex);
+
+  # Direct hash
+  my $binary = md5("Hello World");
+  my $hex = md5_hex("Hello World");
+
+  # Streaming hash
+  my $md5 = gmd5->new;
+  $md5->add("Hello ");
+  $md5->add("World");
+  $hex = $md5->hexdigest;
+
+=head1 DESCRIPTION
+
+C<gmd5> provides a fast and lightweight MD5 hashing library in Pure Perl,
+with no XS or C dependencies. It supports both one-shot hashing and streaming
+for large datasets, optimized with efficient buffering and bitwise operations.
+The implementation is compliant with RFC 1321.
+
+=head1 METHODS
+
+=over 4
+
+=item new()
+
+Creates a new gmd5 object.
+
+  my $md5 = gmd5->new;
+
+=item add($data)
+
+Adds data to the MD5 computation.
+
+  $md5->add("Hello World");
+
+=item digest()
+
+Returns the binary MD5 digest.
+
+  my $binary = $md5->digest;
+
+=item hexdigest()
+
+Returns the hexadecimal MD5 digest.
+
+  my $hex = $md5->hexdigest;
+
+=item reset()
+
+Resets the MD5 object to its initial state.
+
+  $md5->reset;
+
+=back
+
+=head1 EXPORTABLE FUNCTIONS
+
+=over 4
+
+=item md5($data)
+
+Computes the binary MD5 digest of $data.
+
+  my $binary = md5("Hello World");
+
+=item md5_hex($data)
+
+Computes the hexadecimal MD5 digest of $data.
+
+  my $hex = md5_hex("Hello World");
+
+=back
+
+=head1 AUTHOR
+
+OnEhIppY, Domero Software <domerosoftware@gmail.com>
+
+=head1 LICENSE
+
+This module is released under the Perl 5 license.
+
+=head1 SEE ALSO
+
+L<RFC 1321|https://www.ietf.org/rfc/rfc1321.txt> - The MD5 Message-Digest Algorithm
+
+L<Digest::MD5>
+
+=cut

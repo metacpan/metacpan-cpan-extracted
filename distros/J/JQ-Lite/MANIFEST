@@ -11,6 +11,7 @@ t/basic.t
 t/compact.t
 t/contains.t
 t/count.t
+t/default.t
 t/del.t
 t/empty.t
 t/first_last.t
@@ -18,12 +19,14 @@ t/flatten.t
 t/friends.t
 t/group_by.t
 t/has.t
+t/is_empty.t
 t/join.t
 t/limit.t
 t/map.t
 t/match.t
 t/match_i.t
 t/nth.t
+t/path.t
 t/pipe_select_name.t
 t/reverse.t
 t/sort_by.t

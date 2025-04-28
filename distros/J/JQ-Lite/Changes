@@ -1,3 +1,17 @@
+0.42  2025-04-28
+    - Added new function: default(value)
+      * default() returns the specified value if the current value is undef or null.
+
+0.41  2025-04-28
+    - Added new function: is_empty()
+      * is_empty() returns true if a value is an empty array or an empty object.
+
+0.40  2025-04-28
+    - Added new function: path()
+      * path() returns the keys of a hash or the indices of an array.
+      * Returns an empty string for scalars or null values.
+    - Bump version to 0.40
+
 0.39  2025-04-27
     - Added compact() function to remove undef/null values from arrays
 

@@ -3,7 +3,7 @@ App::DBBrowser::Table::Extensions::WindowFunctions;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use Term::Choose qw();
 
@@ -164,7 +164,7 @@ sub window_function {
     my @func_with_offset = ( 'LAG', 'LEAD', 'NTH_VALUE' );
     my $rx_func_with_offset = join( '|', map { quotemeta } @func_with_offset );
 
-    my @func_with_offset_and_default = ( 'LAG', 'LEAD' ); ##
+    my @func_with_offset_and_default = ( 'LAG', 'LEAD' ); # not if MariaDB ##
     my $rx_func_with_offset_and_default = join( '|', map { quotemeta } @func_with_offset_and_default );
 
     my $info_sql = $ax->get_sql_info( $sql );

@@ -1,5 +1,9 @@
 Revision history for MIDI-RtController-Filter-Drums
 
+0.0401 2025-04-27 13:47:02
+  - Improve documentation.
+  - Actually use the continue attribute.
+
 0.0400 2025-04-26 15:47:22
   - Use the parent filter class now.
 

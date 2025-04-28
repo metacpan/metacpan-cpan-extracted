@@ -1,134 +1,134 @@
 statements. Attributes: {}
-   |--- :default. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":default"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- action. Attributes: {bracketed_name => "0", quantifier => "", real_name => "action"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- [values]. Attributes: {bracketed_name => "0", quantifier => "", real_name => "[values]"}
-   |--- :start. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":start"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- graph_grammar. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_grammar"}
-   |--- graph_grammar. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_grammar"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
-   |   |--- action. Attributes: {bracketed_name => "0", quantifier => "", real_name => "action"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- graph. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph"}
-   |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- node_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_definition"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- edge_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_definition"}
-   |--- node_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_definition"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
-   |   |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
-   |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- node_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_name"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- node_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_name"}
-   |   |--- attribute_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_definition"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
-   |   |--- (','). Attributes: {bracketed_name => "0", quantifier => "", real_name => "(',')"}
-   |   |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
-   |--- node_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_name"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
-   |   |--- end_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_node"}
-   |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
-   |   |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
-   |   |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
-   |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- '['. Attributes: {bracketed_name => "0", quantifier => "", real_name => "'['"}
-   |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- end_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_node"}
-   |--- end_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_node"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- ']'. Attributes: {bracketed_name => "0", quantifier => "", real_name => "']'"}
-   |--- edge_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_definition"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
-   |   |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
-   |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- edge_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_name"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- edge_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_name"}
-   |   |--- attribute_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_definition"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
-   |   |--- (','). Attributes: {bracketed_name => "0", quantifier => "", real_name => "(',')"}
-   |   |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
-   |--- edge_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_name"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
-   |   |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
-   |   |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
-   |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
-   |   |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
-   |   |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
-   |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- '->'. Attributes: {bracketed_name => "0", quantifier => "", real_name => "'->'"}
-   |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
-   |   |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
-   |   |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
-   |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- '--'. Attributes: {bracketed_name => "0", quantifier => "", real_name => "'--'"}
-   |--- attribute_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_definition"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- attribute_statement. Attributes: {bracketed_name => "0", quantifier => "*", real_name => "attribute_statement"}
-   |--- attribute_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_statement"}
-   |   |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
-   |   |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
-   |   |--- end_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_attributes"}
-   |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
-   |   |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
-   |   |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
-   |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- '{'. Attributes: {bracketed_name => "0", quantifier => "", real_name => "'{'"}
-   |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- end_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_attributes"}
-   |--- end_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_attributes"}
-   |   |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-   |   |--- '}'. Attributes: {bracketed_name => "0", quantifier => "", real_name => "'}'"}
-   |--- :discard. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":discard"}
-   |   |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
-   |   |--- whitespace. Attributes: {bracketed_name => "0", quantifier => "", real_name => "whitespace"}
-   |--- whitespace. Attributes: {bracketed_name => "0", quantifier => "", real_name => "whitespace"}
-       |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
-       |--- [\s]. Attributes: {bracketed_name => "0", quantifier => "+", real_name => "[\s]"}
+    |--- :default. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":default"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- action. Attributes: {bracketed_name => "0", quantifier => "", real_name => "action"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- [values]. Attributes: {bracketed_name => "0", quantifier => "", real_name => "[values]"}
+    |--- :start. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":start"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- graph_grammar. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_grammar"}
+    |--- graph_grammar. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_grammar"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
+    |    |--- action. Attributes: {bracketed_name => "0", quantifier => "", real_name => "action"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- graph. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph"}
+    |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- node_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_definition"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- edge_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_definition"}
+    |--- node_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_definition"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
+    |    |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
+    |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- node_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_name"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- node_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_name"}
+    |    |--- attribute_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_definition"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
+    |    |--- (','). Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |    |--- node_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_statement"}
+    |--- node_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "node_name"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
+    |    |--- end_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_node"}
+    |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
+    |    |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
+    |    |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
+    |--- start_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_node"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- '['. Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- end_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_node"}
+    |--- end_node. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_node"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- ']'. Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |--- edge_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_definition"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
+    |    |--- graph_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "graph_definition"}
+    |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- edge_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_name"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- edge_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_name"}
+    |    |--- attribute_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_definition"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
+    |    |--- (','). Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |    |--- edge_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_statement"}
+    |--- edge_name. Attributes: {bracketed_name => "0", quantifier => "", real_name => "edge_name"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
+    |    |--- |. Attributes: {bracketed_name => "0", quantifier => "", real_name => "|"}
+    |    |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
+    |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
+    |    |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
+    |    |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
+    |--- directed_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "directed_edge"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- '->'. Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
+    |    |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
+    |    |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
+    |--- undirected_edge. Attributes: {bracketed_name => "0", quantifier => "", real_name => "undirected_edge"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- '--'. Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |--- attribute_definition. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_definition"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- attribute_statement. Attributes: {bracketed_name => "0", quantifier => "*", real_name => "attribute_statement"}
+    |--- attribute_statement. Attributes: {bracketed_name => "0", quantifier => "", real_name => "attribute_statement"}
+    |    |--- ::=. Attributes: {bracketed_name => "0", quantifier => "", real_name => "::="}
+    |    |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
+    |    |--- end_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_attributes"}
+    |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
+    |    |--- pause. Attributes: {bracketed_name => "0", quantifier => "", real_name => "pause"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- before. Attributes: {bracketed_name => "0", quantifier => "", real_name => "before"}
+    |    |--- event. Attributes: {bracketed_name => "0", quantifier => "", real_name => "event"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
+    |--- start_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "start_attributes"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- '{'. Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |--- :lexeme. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":lexeme"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- end_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_attributes"}
+    |--- end_attributes. Attributes: {bracketed_name => "0", quantifier => "", real_name => "end_attributes"}
+    |    |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+    |    |--- '}'. Attributes: {bracketed_name => "0", quantifier => "", real_name => ""}
+    |--- :discard. Attributes: {bracketed_name => "0", quantifier => "", real_name => ":discard"}
+    |    |--- =>. Attributes: {bracketed_name => "0", quantifier => "", real_name => "=>"}
+    |    |--- whitespace. Attributes: {bracketed_name => "0", quantifier => "", real_name => "whitespace"}
+    |--- whitespace. Attributes: {bracketed_name => "0", quantifier => "", real_name => "whitespace"}
+         |--- ~. Attributes: {bracketed_name => "0", quantifier => "", real_name => "~"}
+         |--- [\s]. Attributes: {bracketed_name => "0", quantifier => "+", real_name => "[\s]"}

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.773';
+our $VERSION = '1.774';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1280,7 +1280,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.773
+Version 1.774
 
 =cut
 
@@ -1900,9 +1900,14 @@ list context.
 
 =head2 Perl version
 
-Requires Perl version 5.10.1 or greater.
+Requires Perl version 5.10.1 or higher.
 
 =head2 Optional modules
+
+=head3 Term::Choose::LineFold::XS
+
+If L<Term::Choose::LineFold::XS> is installed, its functions will be used automatically in place of the pure-Perl
+implementations, providing faster performance. C<Term::Choose::LineFold::XS> requires Perl version 5.16.0 or higher.
 
 =head3 Term::ReadKey
 

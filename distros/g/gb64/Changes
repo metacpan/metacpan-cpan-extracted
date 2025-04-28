@@ -1,0 +1,14 @@
+Revision history for gb64
+
+1.0.0  2025-04-27
+    - Initial release for CPAN and GitHub
+    - High-performance pure Perl implementation of Base64 encoding and decoding
+    - Compliant with RFC 4648 Base64 specification
+    - Features both functional (enc_b64, dec_b64) and streaming interfaces
+    - Optimized with unpack, pack, and array-based lookups for speed
+    - Up to 97.7% faster than MIME::Base64::Perl for large inputs (110k bytes)
+    - Achieves 26.4 iterations/second for encoding and 24.5 iterations/second for decoding large inputs
+    - Robust error handling for invalid inputs (undefined data, invalid length, non-Base64 characters)
+    - Compatible with Perl 5.8.8 and later, no XS or C dependencies
+    - Comprehensive test suite using Test::More and MIME::Base64 for validation
+    - Licensed under the Perl 5 license (GPL or Artistic License)

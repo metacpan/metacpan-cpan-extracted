@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package MooseX::Types::URI; # git description: v0.08-13-gb4d8e96
+package MooseX::Types::URI; # git description: v0.09-3-ge61243d
 # ABSTRACT: URI related types and coercions for Moose
 # KEYWORDS: moose types constraints coercions uri path web
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Scalar::Util qw(blessed);
 
@@ -26,10 +26,7 @@ my $uri = Moose::Meta::TypeConstraint->new(
             class_type( _UriWithBase, { class => "URI::WithBase" } ),
         ],
     ),
-    ($Moose::VERSION >= 2.0100
-        ? (inline_as => sub { 'local $@; blessed('.$_[1].') && ( '.$_[1].'->isa("URI") || '.$_[1].'->isa("URI::WithBase") )' })
-        : (optimized => sub { local $@; blessed($_[0]) && ( $_[0]->isa("URI") || $_[0]->isa("URI::WithBase") ) })
-    ),
+    inline_as => sub { 'local $@; blessed('.$_[1].') && ( '.$_[1].'->isa("URI") || '.$_[1].'->isa("URI::WithBase") )' },
 );
 
 register_type_constraint($uri);
@@ -81,7 +78,7 @@ MooseX::Types::URI - URI related types and coercions for Moose
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

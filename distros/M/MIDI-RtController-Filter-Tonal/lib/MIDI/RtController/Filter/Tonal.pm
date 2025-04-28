@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0403';
 
 use strictures 2;
 use curry;
@@ -100,7 +100,7 @@ has arp => (
 
 has arp_types => (
     is  => 'rw',
-    isa => sub { die 'Invalid rtc' unless ref($_[0]) eq 'Array::Circular' },
+    isa => sub { die 'Invalid controller' unless ref($_[0]) eq 'Array::Circular' },
     default => sub { Array::Circular->new(qw(up down random)) },
 );
 
@@ -147,7 +147,7 @@ sub pedal_tone ($self, $device, $dt, $event) {
         $delay_time *= $self->factor if defined $self->factor;
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
-    return 0;
+    return $self->continue;
 }
 
 
@@ -172,7 +172,7 @@ sub chord_tone ($self, $device, $dt, $event) {
 
     my @notes = $self->_chord_notes($note);
     $self->rtc->send_it([ $ev, $self->channel, $_, $val ]) for @notes;
-    return 0;
+    return $self->continue;
 }
 
 
@@ -192,7 +192,7 @@ sub delay_tone ($self, $device, $dt, $event) {
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
         $val -= $self->velocity;
     }
-    return 0;
+    return $self->continue;
 }
 
 
@@ -208,7 +208,7 @@ sub offset_tone ($self, $device, $dt, $event) {
 
     my @notes = $self->_offset_notes($note);
     $self->rtc->send_it([ $ev, $self->channel, $_, $val ]) for @notes;
-    return 0;
+    return $self->continue;
 }
 
 
@@ -246,7 +246,7 @@ sub walk_tone ($self, $device, $dt, $event) {
         $delay_time *= $self->factor if defined $self->factor;
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
-    return 0;
+    return $self->continue;
 }
 
 
@@ -283,7 +283,7 @@ sub arp_tone ($self, $device, $dt, $event) {
         $delay_time += $self->delay;
         $delay_time *= $self->factor if defined $self->factor;
     }
-    return 1;
+    return $self->continue;
 }
 
 1;
@@ -300,7 +300,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0401
+version 0.0403
 
 =head1 SYNOPSIS
 
@@ -308,20 +308,20 @@ version 0.0401
   use MIDI::RtController ();
   use MIDI::RtController::Filter::Tonal ();
 
-  my $rtc = MIDI::RtController->new(
+  my $controller = MIDI::RtController->new(
     input  => 'keyboard',
     output => 'usb',
   );
 
-  my $filter = MIDI::RtController::Filter::Tonal->new(rtc => $rtc);
+  my $filter = MIDI::RtController::Filter::Tonal->new(rtc => $controller);
 
-  $rtc->add_filter('pedal', note_on => $filter->curry::pedal_tone);
+  $controller->add_filter('pedal', note_on => $filter->curry::pedal_tone);
 
-  $rtc->run;
+  $controller->run;
 
 =head1 DESCRIPTION
 
-C<MIDI::RtController::Filter::Tonal> is the collection of tonal
+C<MIDI::RtController::Filter::Tonal> is a collection of tonal
 L<MIDI::RtController> filters.
 
 =head1 ATTRIBUTES

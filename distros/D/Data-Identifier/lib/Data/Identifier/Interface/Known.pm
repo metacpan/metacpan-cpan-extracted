@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my @_subobjects = qw(db extractor store fii);
 
@@ -76,7 +76,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,8 @@ version v0.12
 Interface for modules implementing C<known()>.
 
 B<Note:>
-This is an B<experimental> interface. It may be changed, renamed, or removed without notice.
+This interface is considered B<stable since v0.13> but for the details marked as experimental below.
+Ignoring experimental details and considering the C<store> parameter to L</known> being C<undef> this interface has not changed between v0.08 and v0.13.
 
 =head1 METHODS
 

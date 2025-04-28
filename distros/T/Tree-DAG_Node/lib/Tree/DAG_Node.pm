@@ -5,7 +5,7 @@ use warnings;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 our $Debug   = 0;
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 use File::Slurper 'read_lines';
 
@@ -688,7 +688,7 @@ sub format_node
 {
 	my($self, $options, $node) = @_;
 	my($s) = $node -> name;
-	$s     .= '. Attributes: ' . $self -> hashref2string($node -> attributes) if (! $$options{no_attributes});
+	$s     .= $$options{no_attributes} ? '. Attributes: {}' : '. Attributes: ' . $self -> hashref2string($node -> attributes);
 
 	return $s;
 
@@ -1113,8 +1113,12 @@ sub read_tree
 	my(@stack);
 	my($tos);
 
-	for my $line (read_lines($file_name, 'UTF-8', 0) )
+	for my $line (read_lines($file_name) )
 	{
+		# Ensure inter-OS compatability.
+
+		$line =~ s/\r$//g;
+
 		$count++;
 
 		if ($count == 1)

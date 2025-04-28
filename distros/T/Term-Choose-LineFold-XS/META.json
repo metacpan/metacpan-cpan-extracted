@@ -1,0 +1,57 @@
+{
+   "abstract" : "XS acceleration for Term-Choose-LineFold",
+   "author" : [
+      "Matthaeus Kiem <cuer2s@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Term-Choose-LineFold-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "open" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.016000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kuerbis/Term-Choose-LineFold-XS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kuerbis/Term-Choose-LineFold-XS.git",
+         "web" : "https://github.com/kuerbis/Term-Choose-LineFold-XS"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

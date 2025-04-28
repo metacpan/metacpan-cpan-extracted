@@ -3,7 +3,7 @@ App::DBBrowser::Table::Extensions::ScalarFunctions::Other;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use App::DBBrowser::Auxil;
 

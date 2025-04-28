@@ -37,8 +37,8 @@
             "IO::Async::Timer::Countdown" : "0",
             "IO::Async::Timer::Periodic" : "0",
             "Iterator::Breathe" : "0",
-            "MIDI::RtController" : "0.0602",
-            "MIDI::RtController::Filter" : "0.0100",
+            "MIDI::RtController" : "0.0703",
+            "MIDI::RtController::Filter" : "0.0102",
             "Moo" : "2",
             "Types::Common::Numeric" : "0",
             "Types::MIDI" : "0",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/MIDI-RtController-Filter-CC"
       }
    },
-   "version" : "0.1002",
+   "version" : "0.1102",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

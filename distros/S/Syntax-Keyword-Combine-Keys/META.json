@@ -40,7 +40,7 @@
    "provides" : {
       "Syntax::Keyword::Combine::Keys" : {
          "file" : "lib/Syntax/Keyword/Combine/Keys.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

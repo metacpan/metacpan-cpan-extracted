@@ -1,3 +1,9 @@
+v0.09  2025-04-27Z
+    - Ported to PostgreSQL
+    - Removed dependency to UUID::Tiny
+    - Fixed bug resulting in decoder errors if the database is incomplete
+    - Support taking Data::Identifier in create_metadata()/create_relation()
+
 v0.08  2025-01-13Z
     - Added tag_by_specification() allowing for user tag lookups
     - Added cache cleanup code

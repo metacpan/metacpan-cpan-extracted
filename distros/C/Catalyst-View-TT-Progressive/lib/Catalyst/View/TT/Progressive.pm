@@ -5,7 +5,7 @@ use warnings;
 
 use Moose; # Catalyst::View;
 extends 'Catalyst::View::TT';
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use JSON;
 
 around 'render' => sub {
@@ -74,7 +74,7 @@ Catalyst::View::TT::Progressive - Control the wrapper
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -246,19 +246,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-View-TT-Progressive>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Catalyst-View-TT-Progressive>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Catalyst-View-TT-Progressive>
 
 =item * Search CPAN
 
@@ -266,13 +258,12 @@ L<http://search.cpan.org/dist/Catalyst-View-TT-Progressive/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 LNATION.
+Copyright 2019->2025 LNATION.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

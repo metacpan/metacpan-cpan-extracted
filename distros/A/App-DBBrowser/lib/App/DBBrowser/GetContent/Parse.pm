@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Parse;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use Encode qw( decode );
 

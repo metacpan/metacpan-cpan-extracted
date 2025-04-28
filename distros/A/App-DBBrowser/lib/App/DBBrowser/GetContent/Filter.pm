@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Filter;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use List::MoreUtils qw( any );
 
@@ -101,7 +101,7 @@ sub input_filter {
         elsif ( $filter eq $confirm ) {
             if ( $sf->{empty_to_null} ) {
                 no warnings 'uninitialized';
-                $sql->{insert_args} = [ map { [ map { length ? $_ : undef } @$_ ] } @{$sql->{insert_args}} ];
+                $sql->{insert_args} = [ map { [ map { length $_ ? $_ : undef } @$_ ] } @{$sql->{insert_args}} ];
             }
             return 1;
         }

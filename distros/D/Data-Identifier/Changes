@@ -1,3 +1,13 @@
+v0.13  2025-04-27Z
+    - Added generators for multiplicity, and simple GTE
+    - Added properties generator and request to Data::Identifier
+    - Improved argument validation and error handling
+    - Allow "default" and "no_defaults" for $id->namespace
+    - Improved POD
+    - Marked Data::Identifier::Interface::Known as stable
+    - Marked Data::Identifier->wellknown() as deprecated
+    - Updated list of well known tags
+
 v0.12  2025-04-16Z
     - Added better support for File::FStore::Base
     - Let $identifier->register return $identifier

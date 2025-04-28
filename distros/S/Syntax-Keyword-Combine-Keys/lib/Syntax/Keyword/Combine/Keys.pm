@@ -8,7 +8,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = 0.11; 
+our $VERSION = 0.12; 
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -43,7 +43,7 @@ Syntax::Keyword::Combine::Keys - ckeys keyword
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -103,10 +103,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Syntax-Keyword-Combine-Keys>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Syntax-Keyword-Combine-Keys>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Syntax-Keyword-Combine-Keys>
@@ -117,7 +113,7 @@ L<https://metacpan.org/release/Syntax-Keyword-Combine-Keys>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by LNATION.
+This software is Copyright (c) 2021->2025 by LNATION.
 
 This is free software, licensed under:
 

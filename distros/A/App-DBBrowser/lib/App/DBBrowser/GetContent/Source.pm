@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Source;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
@@ -170,13 +170,13 @@ sub files_in_dir {
         $sf->__remove_from_history( $dir );
         return [];
     }
-    my $dir_fs = realpath encode( 'locale_fs', $dir );
+    my $dir_fs = realpath( encode( 'locale_fs', $dir ) ) or die "$dir: $!";
     my @tmp_files_fs;
     if ( length $sf->{o}{insert}{file_filter} ) {
         @tmp_files_fs = map { basename $_} grep { -e $_ } glob( catfile( $dir_fs, $sf->{o}{insert}{file_filter} ) );
     }
     else {
-        opendir( my $dh, $dir_fs ) or die $!;
+        opendir( my $dh, $dir_fs ) or die "$dir_fs: $!";
         @tmp_files_fs = readdir $dh;
         closedir $dh;
     }

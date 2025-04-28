@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+README.md
+example/gmd5.pl
+lib/gmd5.pm
+pod/gmd5.pod
+t/gmd5.t

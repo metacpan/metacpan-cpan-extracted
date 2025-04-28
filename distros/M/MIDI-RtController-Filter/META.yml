@@ -30,7 +30,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter
   repository: https://github.com/ology/MIDI-RtController-Filter.git
-version: '0.0101'
+version: '0.0102'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

@@ -18,11 +18,11 @@ name: Syntax-Keyword-Combine-Keys
 provides:
   Syntax::Keyword::Combine::Keys:
     file: lib/Syntax/Keyword/Combine/Keys.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   XS::Parse::Keyword: '0.08'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@
       "Matthaeus Kiem <cuer2s@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,15 +55,15 @@
             "Storable" : "0",
             "String::Substitution" : "0",
             "String::Unescape" : "0",
-            "Term::Choose" : "1.773",
+            "Term::Choose" : "1.774",
             "Term::Choose::Util" : "0.145",
             "Term::Form" : "0.561",
             "Term::Form::ReadLine" : "0.561",
-            "Term::TablePrint" : "0.169",
+            "Term::TablePrint" : "0.170",
             "Text::CSV_XS" : "0",
             "bytes" : "0",
             "open" : "0",
-            "perl" : "5.014",
+            "perl" : "5.016",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -80,6 +80,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.427",
+   "version" : "2.428",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

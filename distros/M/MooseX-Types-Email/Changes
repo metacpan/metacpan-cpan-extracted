@@ -1,7 +1,10 @@
 Revision history for MooseX-Types-Email
 
-0.008     2018-11-12 00:39:13Z
+0.009     2025-04-27 14:58:23Z
+  - resolve warnings by removing a check for a Moose version that is 14 years
+    old
 
+0.008     2018-11-12 00:39:13Z
   - inline all types
 
 0.007     2015-08-16 01:23:10Z

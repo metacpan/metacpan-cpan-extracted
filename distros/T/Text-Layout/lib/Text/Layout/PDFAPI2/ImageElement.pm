@@ -222,6 +222,31 @@ method render( $fragment, $gfx, $x, $y ) {
 
     $gfx->object( $img, @a );
 
+    if ( $fragment->{href} ) {
+	my $ann = $gfx->{' apipage'}->annotation;
+	my $target = $fragment->{href};
+
+	if ( $target =~ /^#(.+)/ ) { # named destination
+	    # Augmented API for apps that keep track of bookmarks.
+	    my $pdf = $gfx->{' api'};
+	    if ( my $c = $pdf->can("named_dest_fiddle") ) {
+		$target = $pdf->$c($1);
+	    }
+
+	    $ann->link($target);
+	}
+	# Named destination in other PDF.
+	elsif ( $target =~ /^(?!\w{3,}:)(.*)(\#.+)$/ ) {
+	    $ann->pdf( $1, $2 );
+	}
+	# Arbitrary document.
+	else {
+	    $ann->uri($target);
+	}
+	# $ann->border( 0, 0, 1 );
+	$ann->rect( $x + $bb[0], $y + $bb[1], $x + $bb[2], $y + $bb[3] );
+    }
+
     return { abox => \@abox };
 }
 

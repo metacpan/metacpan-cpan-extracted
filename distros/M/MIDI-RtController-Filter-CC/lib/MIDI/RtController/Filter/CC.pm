@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.1002';
+our $VERSION = '0.1102';
 
 use v5.36;
 
@@ -104,7 +104,7 @@ sub single ($self, $device, $dt, $event) {
     my $cc = [ 'control_change', $self->channel, $self->control, $value ];
     $self->rtc->send_it($cc);
 
-    return 0;
+    return $self->continue;
 }
 
 
@@ -142,7 +142,7 @@ sub breathe ($self, $device, $dt, $event) {
         )->start
     );
 
-    return 0;
+    return $self->continue;
 }
 
 
@@ -177,7 +177,7 @@ sub scatter ($self, $device, $dt, $event) {
         )->start
     );
 
-    return 0;
+    return $self->continue;
 }
 
 
@@ -232,7 +232,7 @@ sub stair_step ($self, $device, $dt, $event) {
             },
         )->start
     );
-    return 0;
+    return $self->continue;
 }
 
 
@@ -275,7 +275,7 @@ sub ramp_up ($self, $device, $dt, $event) {
         )->start
     );
 
-    return 0;
+    return $self->continue;
 }
 
 
@@ -318,7 +318,42 @@ sub ramp_down ($self, $device, $dt, $event) {
         )->start
     );
 
-    return 0;
+    return $self->continue;
+}
+
+
+sub flicker ($self, $device, $dt, $event) {
+    return 0 if $self->running;
+
+    my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 if defined $self->trigger && $note != $self->trigger;
+    return 0 if defined $self->value && $val != $self->value;
+
+    $self->running(1);
+
+    my $value = $self->range_bottom;
+
+    $self->rtc->loop->add(
+        IO::Async::Timer::Countdown->new(
+            delay     => $self->time_step,
+            on_expire => sub {
+                my ($c) = @_;
+                if ($self->halt) {
+                    $c->stop;
+                    $self->running(0);
+                    $self->halt(0);
+                }
+                else {
+                    my $cc = [ 'control_change', $self->channel, $self->control, $value ];
+                    $self->rtc->send_it($cc);
+                    $value = $value == $self->range_top ? $self->range_bottom : $self->range_top;
+                    $c->start;
+                }
+            },
+        )->start
+    );
+
+    return $self->continue;
 }
 
 1;
@@ -335,7 +370,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.1002
+version 0.1102
 
 =head1 SYNOPSIS
 
@@ -343,12 +378,12 @@ version 0.1002
   use MIDI::RtController ();
   use MIDI::RtController::Filter::CC ();
 
-  my $control = MIDI::RtController->new(
+  my $controller = MIDI::RtController->new(
     input  => 'keyboard',
     output => 'usb',
   );
 
-  my $filter = MIDI::RtController::Filter::CC->new(rtc => $control);
+  my $filter = MIDI::RtController::Filter::CC->new(rtc => $controller);
 
   $filter->control(1); # CC#01 = mod-wheel
   $filter->channel(0);
@@ -357,9 +392,9 @@ version 0.1002
   $filter->range_step(2);
   $filter->time_step(0.25);
 
-  $control->add_filter('breathe', all => $filter->curry::breathe);
+  $controller->add_filter('breathe', all => $filter->curry::breathe);
 
-  $control->run;
+  $controller->run;
 
 =head1 DESCRIPTION
 
@@ -561,6 +596,20 @@ If the B<halt> attribute is set to true, the running filter will stop.
 
 This filter ramps-down a B<control> change message, over the MIDI
 B<channel>, from B<range_top> until the B<range_bottom> is reached.
+
+If B<trigger> or B<value> is set, the filter checks those against the
+MIDI event C<note> or C<value>, respectively, to see if the filter
+should be applied.
+
+If the B<halt> attribute is set to true, the running filter will stop.
+
+=head2 flicker
+
+  $control->add_filter('flicker', all => $filter->curry::flicker);
+
+This filter toggles a B<control> change message, over the MIDI
+B<channel>, between the B<range_bottom> ("off") and the B<range_top>
+("on").
 
 If B<trigger> or B<value> is set, the filter checks those against the
 MIDI event C<note> or C<value>, respectively, to see if the filter

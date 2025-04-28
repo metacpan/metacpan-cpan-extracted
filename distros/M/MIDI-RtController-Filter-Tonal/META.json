@@ -37,8 +37,8 @@
             "Array::Circular" : "0",
             "List::SomeUtils" : "0",
             "List::Util" : "0",
-            "MIDI::RtController" : "0.0600",
-            "MIDI::RtController::Filter" : "0.0100",
+            "MIDI::RtController" : "0.0703",
+            "MIDI::RtController::Filter" : "0.0102",
             "MIDI::RtMidi::ScorePlayer" : "0",
             "Moo" : "2",
             "Music::Chord::Note" : "0",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/ology/MIDI-RtController-Filter-Tonal"
       }
    },
-   "version" : "0.0401",
+   "version" : "0.0403",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

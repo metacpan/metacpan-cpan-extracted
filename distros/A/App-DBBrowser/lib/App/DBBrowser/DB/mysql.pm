@@ -3,7 +3,7 @@ App::DBBrowser::DB::mysql;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use DBD::mysql 4.041 qw();  # mysql_enable_utf8mb4 requires 4.041 or greater
 use DBI              qw();

@@ -22,5 +22,5 @@ requires:
   Moo: '0'
   MooX::Keyword: '0.05'
   perl: '5.006'
-version: '1.00'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

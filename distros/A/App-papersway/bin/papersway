@@ -498,7 +498,7 @@ sub normalise_ws_cols {
 {
     # Simple class to batch up commands before sending them.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '2.000';
+$App::papersway::cmds::VERSION = '2.001';
 sub new {
 	bless { cmds => [], need_ignore => 0, need_signal => 0 } => shift
     };
@@ -702,7 +702,7 @@ sub process_msg {
 	$ws->{ncols} += $1 eq "incr" ? 1 : -1;
 	normalise_ws_cols();
 	$cmds->need_signal;
-    } elsif ($cmd =~ /^other-column$/ && !widep($ws->{focused_col})) {
+    } elsif ($cmd =~ /^other-column$/ && @$cols > 1) {
 	# This is meant to be similar to my custom Emacs C-x o.
 	if ($i == 0 || $ws->{last_dir} == -1 && $i < $#$cols) {
 	    $mv->($i+1);
@@ -1072,7 +1072,7 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 2.000
+version 2.001
 
 =head1 SYNOPSIS
 

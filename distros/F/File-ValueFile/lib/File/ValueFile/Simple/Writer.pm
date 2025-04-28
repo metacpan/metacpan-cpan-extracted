@@ -23,7 +23,7 @@ use constant TLv1_ISE   => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa'; # tagpool-tag
 use constant F_M_L_ISE  => 'f06c2226-b33e-48f2-9085-cd906a3dcee0'; # tagpool-source-format-modern-limited
 use constant F_M_F_ISE  => '1c71f5b1-216d-4a9b-81a1-54dc22d8a067'; # tagpool-source-format-modern-full
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 
 
@@ -233,6 +233,8 @@ sub write_tag_ise {
     my $displayname;
     my %collected = (uuid => {}, oid => {}, uri => {});
 
+    @ids = map {ref($_) eq 'ARRAY' ? @{$_} : $_} @ids;
+
     foreach my $id (@ids) {
         my $found_for_id;
 
@@ -375,6 +377,13 @@ sub write_tag_metadata {
 
 sub write_tag_generator_hint {
     my ($self, $tag, $generator, $hint) = @_;
+
+    $generator //= Data::Identifier->new(from => $tag)->generator(default => undef);
+    $hint      //= Data::Identifier->new(from => $tag)->request(default => undef);
+
+    croak 'No generator given' unless defined $generator;
+    croak 'No hint given' unless defined $hint;
+
     if (
         defined($self->{features}{F_M_L_ISE()}) ||  # tagpool-source-format-modern-limited
         defined($self->{features}{F_M_F_ISE()})     # tagpool-source-format-modern-full
@@ -403,7 +412,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -536,6 +545,8 @@ L<File::ValueFile::Simple::Reader/read_as_taglist>.
 =head2 write_tag_ise
 
     $writer->write_tag_ise(@ids);
+    # or:
+    $writer->write_tag_ise([@ids]);
 
 Writes a C<tag-ise> line for the given identifiers.
 L<@ids> can include raw ISEs or instances of L<Data::Identifier>.
@@ -591,10 +602,14 @@ Each method must also tolerable the options C<default>, C<no_defaults>, and C<as
 =head2 write_tag_generator_hint
 
     $writer->write_tag_generator_hint($tag, $generator, $hint);
+    # or:
+    $writer->write_tag_generator_hint($tag); # requires Data::Identifier v0.13
 
 Write a generator hint for the given C<$generator> and C<$hint> values.
 C<$tag> and C<$generator> may be an ISE or an instances of L<Data::Identifier>.
 C<$hint> is the raw hint.
+
+If only C<$tag> is given the other values will be extracted if $tag is a L<Data::Identifier> and includes them.
 
 This method automatically selects the best command to write depending on the format and features.
 

@@ -3,7 +3,7 @@ App::DBBrowser::Table::Substatement::Condition;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use List::MoreUtils qw( any uniq );
 

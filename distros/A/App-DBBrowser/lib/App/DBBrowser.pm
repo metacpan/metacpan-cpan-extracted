@@ -2,9 +2,9 @@ package App::DBBrowser;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
-our $VERSION = '2.427';
+our $VERSION = '2.428';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -535,7 +535,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.427
+Version 2.428
 
 =head1 DESCRIPTION
 

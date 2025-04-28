@@ -3,7 +3,7 @@ App::DBBrowser::Opt::DBSet;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use File::Spec::Functions qw( catfile );
 

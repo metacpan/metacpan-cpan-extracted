@@ -28,24 +28,51 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my %table_defs = (
-    tag      => 'CREATE TABLE IF NOT EXISTS tag (id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT);',
-    hint     => 'CREATE TABLE IF NOT EXISTS hint (name VARCHAR(32) NOT NULL UNIQUE PRIMARY KEY, tag INTEGER NOT NULL REFERENCES tag(id));',
-    metadata => 'CREATE TABLE IF NOT EXISTS metadata (tag INTEGER NOT NULL REFERENCES tag(id), relation INTEGER NOT NULL REFERENCES tag(id), context INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, type INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, encoding INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, data BLOB, UNIQUE(tag, relation, context, type, encoding, data));',
-    relation => 'CREATE TABLE IF NOT EXISTS relation (tag INTEGER NOT NULL REFERENCES tag(id), relation INTEGER NOT NULL REFERENCES tag(id), context INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, related INTEGER NOT NULL REFERENCES tag(id), filter INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, UNIQUE(tag, relation, context, related, filter));',
+    SQLite => {
+        tag      => 'CREATE TABLE IF NOT EXISTS tag (id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT);',
+        metadata => 'CREATE TABLE IF NOT EXISTS metadata (tag INTEGER NOT NULL REFERENCES tag(id), relation INTEGER NOT NULL REFERENCES tag(id), context INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, type INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, encoding INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, data BLOB, UNIQUE(tag, relation, context, type, encoding, data));',
+        relation => 'CREATE TABLE IF NOT EXISTS relation (tag INTEGER NOT NULL REFERENCES tag(id), relation INTEGER NOT NULL REFERENCES tag(id), context INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, related INTEGER NOT NULL REFERENCES tag(id), filter INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, UNIQUE(tag, relation, context, related, filter));',
+    },
+    Pg => {
+        tag      => 'CREATE TABLE IF NOT EXISTS tag (id SERIAL UNIQUE PRIMARY KEY);',
+        metadata => 'CREATE TABLE IF NOT EXISTS metadata (tag INTEGER NOT NULL REFERENCES tag(id), relation INTEGER NOT NULL REFERENCES tag(id), context INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, type INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, encoding INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, data BYTEA, UNIQUE(tag, relation, context, type, encoding, data));',
+    },
+    _default => {
+        hint     => 'CREATE TABLE IF NOT EXISTS hint (name VARCHAR(32) NOT NULL UNIQUE PRIMARY KEY, tag INTEGER NOT NULL REFERENCES tag(id));',
+        relation => 'CREATE TABLE IF NOT EXISTS relation (tag INTEGER NOT NULL REFERENCES tag(id), relation INTEGER NOT NULL REFERENCES tag(id), context INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, related INTEGER NOT NULL REFERENCES tag(id), filter INTEGER NOT NULL REFERENCES tag(id) DEFAULT 0, UNIQUE(tag, relation, context, related, filter));',
+    },
 );
 
-my @indices = (
-    [tag      => qw(id)],
-    [hint     => qw(name)],
-    [metadata => qw(tag)],
-    [metadata => qw(tag relation)],
-    [metadata => qw(data)],
-    [relation => qw(tag)],
-    [relation => qw(tag relation)],
-    [relation => qw(related)],
+my %extra_sql = (
+    SQLite => {
+        insert_hint     => 'INSERT OR IGNORE INTO hint (name,tag) VALUES (?,?)',
+        insert_tag      => 'INSERT INTO tag DEFAULT VALUES',
+        insert_metadata => 'INSERT OR IGNORE INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,0,?,0,?)',
+    },
+    Pg => {
+        insert_hint     => 'INSERT INTO hint (name,tag) VALUES (?,?) ON CONFLICT DO NOTHING',
+        insert_tag      => 'INSERT INTO tag DEFAULT VALUES RETURNING id',
+        insert_metadata => 'INSERT INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,0,?,0,?) ON CONFLICT DO NOTHING',
+    },
+);
+
+my %indices = (
+    _all => [
+        [tag      => qw(id)],
+        [hint     => qw(name)],
+        [metadata => qw(tag)],
+        [metadata => qw(tag relation)],
+        [metadata => qw(data)],
+        [relation => qw(tag)],
+        [relation => qw(tag relation)],
+        [relation => qw(related)],
+    ],
+    SQLite => [
+        [metadata => 'data COLLATE NOCASE']
+    ],
 );
 
 my %indispensable = (
@@ -215,9 +242,19 @@ sub _new {
     return $pkg->SUPER::_new(%opts);
 }
 
+sub _DBI_name {
+    my ($self) = @_;
+    return $self->{_DBI_name} //= $self->{dbh}{Driver}{Name}
+}
+
+sub _prepare_extra {
+    my ($self, $query) = @_;
+    return $self->{dbh}->prepare($extra_sql{$self->_DBI_name}{$query});
+}
+
 sub _create_table {
     my ($self, $name) = @_;
-    my $query = $self->dbh->prepare($table_defs{$name});
+    my $query = $self->dbh->prepare($table_defs{$self->_DBI_name}{$name} // $table_defs{_default}{$name});
     $query->execute;
     $query->finish;
 }
@@ -236,6 +273,19 @@ sub _create_tag_null {
     $query->finish;
 }
 
+sub _last_insert_id {
+    my ($self, $query) = @_;
+    my $dbi_name = $self->_DBI_name;
+
+    if ($dbi_name eq 'Pg') {
+        my $row = $query->fetchrow_arrayref;
+        return $row->[0];
+    }
+
+    # Default:
+    return $query->last_insert_id;
+}
+
 sub _create_hints_indispensable {
     my ($self) = @_;
     my DBI $dbh = $self->dbh;
@@ -252,14 +302,17 @@ sub _create_hints_indispensable {
         $row = $query->fetchrow_arrayref;
         $query->finish;
 
-        next if defined($row) && defined($row->[0]) && $row->[0] > 0;
+        if (defined($row) && defined($row->[0]) && $row->[0] > 0) {
+            $ids{$name} = $row->[0];
+            next;
+        }
 
-        $query = $dbh->prepare('INSERT INTO tag DEFAULT VALUES');
+        $query = $self->_prepare_extra('insert_tag');
         $query->execute;
-        $dbid = $query->last_insert_id;
+        $dbid = $self->_last_insert_id($query);
         $query->finish;
 
-        $query = $dbh->prepare('INSERT OR IGNORE INTO hint (name,tag) VALUES (?,?)');
+        $query = $self->_prepare_extra('insert_hint');
         $query->execute($name, $dbid);
         $query->finish;
 
@@ -267,7 +320,7 @@ sub _create_hints_indispensable {
     }
 
     {
-        my $query = $dbh->prepare('INSERT OR IGNORE INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,0,?,0,?)');
+        my $query = $self->_prepare_extra('insert_metadata');
         foreach my $name (keys %indispensable) {
             my $dbid = $ids{$name};
             my $uuid = $indispensable{$name};
@@ -281,13 +334,12 @@ sub _create_hints_indispensable {
 # This requies the database being fully up, so we have a $self->db.
 sub _create_hints {
     my ($self) = @_;
-    my DBI $dbh = $self->dbh;
     my Data::TagDB $db = $self->db;
     my Data::TagDB::WellKnown $wk = $db->wk;
+    my $query = $self->_prepare_extra('insert_hint');
 
     foreach my $name (keys %hints) {
         my Data::TagDB::Tag $tag = $wk->_call($name, 1);
-        my $query = $dbh->prepare('INSERT OR IGNORE INTO hint (name,tag) VALUES (?,?)');
         $query->execute($hints{$name}, $tag->dbid);
         $query->finish;
     }
@@ -300,14 +352,16 @@ sub _create_index {
 
     die 'Bad parameters' unless scalar @fields;
 
-    $query = $dbh->prepare('CREATE INDEX IF NOT EXISTS '.$table.'_'.join('_', @fields).' ON '.$table.' ('.join(',', @fields).');');
+    $query = $dbh->prepare('CREATE INDEX IF NOT EXISTS '.$table.'_'.join('_', map {s/\s/_/gr} @fields).' ON '.$table.' ('.join(',', @fields).');');
     $query->execute;
     $query->finish;
 }
 
 sub _create_indices {
     my ($self) = @_;
-    $self->_create_index(@{$_}) foreach @indices;
+    foreach my $type ('_all', $self->_DBI_name) {
+        $self->_create_index(@{$_}) foreach @{$indices{$type}//$indices{_default}//[]};
+    }
 }
 
 sub _ingest_file {
@@ -442,7 +496,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

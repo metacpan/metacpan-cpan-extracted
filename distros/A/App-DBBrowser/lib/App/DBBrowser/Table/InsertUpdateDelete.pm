@@ -3,7 +3,7 @@ App::DBBrowser::Table::InsertUpdateDelete;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use Term::Choose       qw();
 use Term::Choose::Util qw();

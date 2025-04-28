@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Filter::ConvertDate;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use DateTime::Format::Strptime;
 

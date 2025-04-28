@@ -13,14 +13,15 @@ use warnings;
 
 use Carp;
 use Encode;
-use UUID::Tiny ':std';
+
+use Data::Identifier::Generate;
 
 use parent 'Data::TagDB::WeakBaseObject';
 
 use constant NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416';
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
 
@@ -467,7 +468,7 @@ sub generate {
 
     croak 'No input' unless defined $input;
 
-    $uuid = create_uuid_as_string(UUID_SHA1, $ns_uuid, $input);
+    $uuid = Data::Identifier::Generate->generic(namespace => $ns_uuid, input => $input)->uuid;
 
     $tag = $db->create_tag([$wk->uuid => $uuid], [(map {$tagname => $_} @tagnames)]);
 
@@ -509,7 +510,7 @@ Data::TagDB::Factory - Work with Tag databases
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

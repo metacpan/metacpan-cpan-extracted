@@ -3,7 +3,7 @@ App::DBBrowser::DB::SQLite;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use Encode                qw( encode decode );
 use File::Find            qw( find );

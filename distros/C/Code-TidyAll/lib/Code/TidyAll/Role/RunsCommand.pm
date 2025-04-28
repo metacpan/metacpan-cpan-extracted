@@ -12,7 +12,7 @@ use Try::Tiny;
 
 use Moo::Role;
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 has ok_exit_codes => (
     is      => 'ro',
@@ -74,7 +74,7 @@ Code::TidyAll::Role::RunsCommand - A role for plugins which run external command
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2023 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2025 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

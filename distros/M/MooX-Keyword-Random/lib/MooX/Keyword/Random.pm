@@ -1,6 +1,6 @@
 package MooX::Keyword::Random;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 use Moo;
 use MooX::Keyword {
 	random => {
@@ -26,7 +26,7 @@ MooX::Keyword::Random - return a random result!
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -75,7 +75,7 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
@@ -91,7 +91,7 @@ L<https://metacpan.org/release/MooX-Keyword-Random>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023->2024 by LNATION.
+This software is Copyright (c) 2023->2025 by LNATION.
 
 This is free software, licensed under:
 

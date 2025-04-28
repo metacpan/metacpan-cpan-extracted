@@ -7,7 +7,7 @@
 
 package Data::Identifier::Generate;
 
-use v5.14;
+use v5.20;
 use strict;
 use warnings;
 
@@ -17,7 +17,68 @@ use Digest;
 
 use Data::Identifier;
 
-our $VERSION = v0.12;
+use constant {
+    NS_GTE                              => '90355e77-6942-4d82-a0b6-3a6de65bf948',
+
+    WK_UNSIGNED_INTEGER_GENERATOR       => '53863a15-68d4-448d-bd69-a9b19289a191',
+    WK_SIGNED_INTEGER_GENERATOR         => 'e8aa9e01-8d37-4b4b-8899-42ca0a2a906f',
+    WK_UNICODE_CHARACTER_GENERATOR      => 'd74f8c35-bcb8-465c-9a77-01010e8ed25c',
+    WK_RGB_COLOUR_GENERATOR             => '55febcc4-6655-4397-ae3d-2353b5856b34',
+    WK_DATE_GENERATOR                   => '97b7f241-e1c5-4f02-ae3c-8e31e501e1dc',
+    WK_MULTIPLICITY_GENERATOR           => '19659233-0a22-412c-bdf1-8ee9f8fc4086',
+    WK_MINIMUM_MULTIPLICITY_GENERATOR   => '5ec197c3-1406-467c-96c7-4b1a6ec2c5c9',
+};
+
+
+our $VERSION = v0.13;
+
+my %_multiplicity_prefix = (
+    total   => '4.1',
+    minimum => '4.3',
+);
+
+my %_multiplicity_names = (
+    0 => 'noone',
+    1 => 'solo',
+    2 => 'duo',
+    3 => 'trio',
+);
+
+my %_multiplicity_generators = (
+    total   => WK_MULTIPLICITY_GENERATOR,
+    minimum => WK_MINIMUM_MULTIPLICITY_GENERATOR,
+);
+
+my %_gte_simple_profiles = (
+    'ab332382-a6f8-4a24-914d-5f823dd866c1' => {
+        namespace       => 'a13377a3-88d4-484e-90a8-245afb22a793',
+        order           => 'MFHCSmfhcs',
+        case_folding    => undef,
+        strip_slash     => undef,
+        strip_spaces    => undef,
+    },
+    'e537db94-85b9-4125-972a-cc2ea1fdf51d' => {
+        namespace       => '52f20647-1dc7-4234-81ad-0639ab6cef60',
+        order           => 'FAfa',
+        case_folding    => undef,
+        strip_slash     => undef,
+        strip_spaces    => undef,
+    },
+    '60764502-18cb-41c9-8531-e4c8b43140b9' => {
+        namespace       => '1e2edf8d-d459-47cb-9d6e-0690f404fadf',
+        order           => 'MFHCSmfhcs',
+        case_folding    => undef,
+        strip_slash     => undef,
+        strip_spaces    => undef,
+    },
+    '5aad9d75-7020-41a4-8ec6-2bf09566f985' => {
+        namespace       => 'fc9741b4-2ac7-412b-9d36-2b675fc0482b',
+        order           => 'NDTBndtb',
+        case_folding    => undef,
+        strip_slash     => undef,
+        strip_spaces    => undef,
+    },
+);
 
 
 #@returns Data::Identifier
@@ -27,6 +88,7 @@ sub integer {
     $opts{style}        = 'integer-based';
     $opts{namespace}    = Data::Identifier->NS_INT();
     $opts{displayname}//= $request;
+    $opts{generator}    = $request >= 0 ? WK_UNSIGNED_INTEGER_GENERATOR : WK_SIGNED_INTEGER_GENERATOR;
 
     return $pkg->generic(%opts);
 }
@@ -59,7 +121,7 @@ sub unicode_character {
         croak 'Rejected use of special character: '.$unicode_cp_str unless $opts{allow_special};
     }
 
-    return Data::Identifier->new(unicodecp => $unicode_cp_str, displayname => $opts{displayname});
+    return Data::Identifier->new(unicodecp => $unicode_cp_str, displayname => $opts{displayname}, generator => WK_UNICODE_CHARACTER_GENERATOR, request => $unicode_cp_str);
 }
 
 
@@ -69,6 +131,7 @@ sub colour {
     $opts{request}      = $colour;
     $opts{style}        = 'colour';
     $opts{namespace}    = '88d3944f-a13b-4e35-89eb-e3c1fbe53e76';
+    $opts{generator}    = WK_RGB_COLOUR_GENERATOR;
     return $pkg->generic(%opts);
 }
 
@@ -133,7 +196,90 @@ sub date {
     $opts{style}        = undef;
     $opts{namespace}    = Data::Identifier->NS_DATE();
     $opts{displayname}//= $request;
+    $opts{generator}    = WK_DATE_GENERATOR;
 
+    return $pkg->generic(%opts);
+}
+
+
+sub multiplicity {
+    my ($pkg, $subtype, $request, %opts) = @_;
+    my $prefix = $_multiplicity_prefix{$subtype} // croak 'Invalid subtype: '.$subtype;
+    my $identifier;
+    my $oid;
+
+    croak 'Invalid value: '.$request unless $request eq '0' || $request =~ /^[1-9][0-9]*$/;
+
+    $oid = '1.3.6.1.4.1.46942.16.2.'.$prefix.'.'.$request;
+
+    $opts{request}      = $request;
+    $opts{input}        = $prefix.'.'.$request;
+    $opts{namespace}    = NS_GTE;
+    $opts{displayname}//= $_multiplicity_names{$request};
+    $opts{displayname}//= $request;
+    $opts{generator}    = $_multiplicity_generators{$subtype};
+    $identifier = $pkg->generic(%opts);
+
+    $identifier->{id_cache} //= {};
+    $identifier->{id_cache}->{Data::Identifier->WK_OID} //= $oid;
+
+    if (defined $_multiplicity_names{$request}) {
+        $identifier->register;
+    }
+
+    return $identifier;
+}
+
+
+sub gte_simple {
+    my ($pkg, $profile, $request, %opts) = @_;
+    my %order;
+    my $normal;
+
+    croak 'Called in list context' if wantarray;
+
+    $profile = $profile->ise if eval {$profile->can('ise')};
+    $profile = $_gte_simple_profiles{$profile} // $profile;
+
+    {
+        my $i = 0;
+        %order = map {$_ => $i++} split(//, $profile->{order});
+    }
+
+    if (defined(my $folding = $profile->{case_folding})) {
+        if ($folding eq 'none') {
+            # no-op
+        } elsif ($folding eq 'upper') {
+            $request = uc($request);
+        } elsif ($folding eq 'lower') {
+            $request = lc($request);
+        } else {
+            croak 'Unsupported/invalid folding rule: '.$folding;
+        }
+    }
+
+    if ($profile->{strip_slash}) {
+        $request =~ s#/+##g;
+    }
+
+    if ($profile->{strip_spaces}) {
+        $request =~ s#\s+##g;
+    }
+
+    $normal = join('',
+        sort {$order{$a} <=> $order{$b}}
+        map {croak 'Invalid input element: '.$_ unless defined $order{$_}; $_}
+        split //, $request);
+
+    if (defined(my $info = delete $opts{info})) {
+        $info->{count}   = length($normal);
+        $info->{request} = $normal;
+    }
+
+    $opts{input}        = $normal;
+    $opts{request}      = $normal;
+    $opts{namespace}  //= $profile->{namespace};
+    $opts{displayname}//= $normal;
     return $pkg->generic(%opts);
 }
 
@@ -219,7 +365,7 @@ sub generic {
     {
         my $ns = ref($opts{namespace}) ? $opts{namespace}->uuid(no_defaults => 1) : $opts{namespace};
         my $uuid = $pkg->_uuid_v5($ns, $opts{input});
-        return Data::Identifier->new(uuid => $uuid, displayname => $opts{displayname});
+        return Data::Identifier->new(uuid => $uuid, displayname => $opts{displayname}, %opts{qw(generator request)});
     }
 }
 
@@ -320,7 +466,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -482,6 +628,118 @@ Defaults to the highest possible precision available with the given date.
 
 =back
 
+=head2 multiplicity
+
+    my Data::Identifier $identifier = Data::Identifier::Generate->multiplicity($subtype => $number, %opts);
+    # e.g.:
+    my Data::Identifier $identifier = Data::Identifier::Generate->multiplicity(minimum => 5);
+
+(since v0.13)
+
+Generates an identifier for a specific number of entities to be used with e.g. the C<tagpool-tagged-as> relation.
+This type of identifier should be avoided if a better relation can be used.
+
+There are currently two subtypes defined:
+
+=over
+
+=item C<total>
+
+The total number of entities in a given work.
+This includes background characters and entities often not noticed (e.g. flies).
+
+It its B<strongly recommended not> to use this type unless the value can be proven.
+It is recommended to use C<minimum> when in doubt.
+
+=item C<minimum>
+
+The minimum number of entities in a given work.
+It is safe to set this to a lower value than the actual value.
+E.g. tag a file with this type of identifier and only count foreground characters.
+
+=back
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<displayname>
+
+The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+Defaults to a name from a build in list or C<$number> if no entry is found.
+
+=back
+
+=head2 gte_simple
+
+    my Data::Identifier $identifier = Data::Identifier::Generate->gte_simple($profile => $request, %opts);
+
+(since v0.13)
+
+Generates an identifier using simple GTE rules.
+This method must not be called in list context.
+
+This is an B<experimental> method. It may be changed, renamed, or removed without notice.
+
+The profile is a hashref with the parameters for the profile or
+the name of a well known profile or
+an L<Data::Identifier> of a well known profile.
+Other types might also be supported.
+
+Currently this module does not define any well known profiles.
+
+If it is a hashref it contains the following keys:
+
+=over
+
+=item C<case_folding>
+
+Optional. The case folding rule to use. One of C<undef> or C<'none'>, C<'upper'>, and C<'lower'>.
+This is applied to the request as first part of normalisation.
+See also L<perlfunc/uc>, L<perlfunc/lc>, and L<perlfunc/fc>.
+
+Defaults to C<undef>.
+
+=item C<generator>
+
+Optional. The same as the C<generator> option of L</generic>.
+
+=item C<namespace>
+
+Required. The same as the C<namespace> option of L</generic>.
+
+=item C<order>
+
+Required. The normal order of the subelements. This is used as part of normalisation.
+The value is a string with each character being a single element.
+
+=item C<strip_slash>
+
+Optional. Strip all slashes (C</>) from the request as part of normalisation.
+
+Defaults to false.
+
+=item C<strip_spaces>
+
+Optional. Strip all spaces (C<\s>) from the request as part of normalisation.
+
+Defaults to false.
+
+=back
+
+The following, all optional, options are supported:
+
+=over
+
+=item C<info>
+
+This is an B<experimental> option.
+It holds a hashref that is used to pass information on the generated identifier back to the caller.
+
+=back
+
 =head2 generic
 
     my Data::Identifier $identifier = Data::Identifier::Generate->generate(%opts);
@@ -495,6 +753,13 @@ The following options are supported:
 =item C<displayname>
 
 The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+This option is optional.
+
+=item C<generator>
+
+The identifier for this generator.
 This is the same as defined by L<Data::Identifier/new>.
 
 This option is optional.

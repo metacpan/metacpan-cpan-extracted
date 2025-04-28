@@ -1,5 +1,25 @@
 Revision history for Perl module Tree::DAG_Node.
 
+1.34  2025-04-23T17:01:00
+	- Thanx to Shawn Laffan for reporting a problem with line-endings in files read and written,
+		by both Tree::DAG_Node and t/read.tree.t, when he tests under Strawberry Perl.
+	- The 2 test files t/tree.with*.txt ship as ISO-8859-1 while t/tree.utf8.attributes.txt ships
+		as UTF-8. So...
+	- Don't explicitly use UTF-8 encoding in DAG_Node.pm's sub read_tree(). Rather, use a regexp
+		to standardize line endings after reading. Likewise, in t/read.tree.t, do the same.
+	- I have un-commented the 2 extra tests at the end of t/read.tree.t. Specifically,
+		line 50 was 'for (qw/utf8/)# with without/)'. It now says 'for (qw/utf8 with without/)'
+	- Reformat test data files t/tree.*.attributes.txt
+		This was done with the new files share/read.write.tree.(pl, sh).
+		And it was done because some of the test data files had been written
+		by old code with slightly different indenting.
+	- Add a new test data file, t/metag.cooked.tree.txt
+		It's a copy of MarpaX::Grammar::Parser's share/metag.cooked.tree.
+		The test program t/read.tree.t was edited to include this new file.
+	- Patch tree::DAG_Node.format_node() to output 'Attributes: {}' and not just 'Attributes:'
+		when the user does not want attributes reported. This makes the code match the sample
+		trees shipped in t/.
+
 1.33  2025-03-20T11:16:00
 	- Replace the discouraged File::Slurp::Tiny with File::Slurper.
 		Thanx to Marcel Telka for the report.
@@ -52,7 +72,7 @@ Revision history for Perl module Tree::DAG_Node.
 		'use Tree::DAG_Node'. That's no good when code is expecting a different encoding
 		(raw, etc.)". See RT#105798. Karen Etheridge followed up with a comment about it appearing
 		in another module of mine. Then I checked all my modules (including some not intended for
-		publication - Local::*) and found about 28 offenders, with some using it inn multiple files.
+		publication - Local::*) and found about 28 offenders, with some using it in multiple files.
 		The original idea came from adopting what Tom Christiansen calls his 'Standard Preamble':
 		http://www.perl.com/pub/2012/04/perlunicook-standard-preamble.html
 		All tests still work after removing that line.
@@ -157,7 +177,7 @@ Revision history for Perl module Tree::DAG_Node.
 	- Add method read_tree(), for text files. It uses Perl6::Slurp (which supports utf8).
 	- Add methods read_attributes() and string2hashref($s) for use by read_tree().
 	- Add t/read.tree.t to test read_tree().
-	- Add t/tree.utf8.attrbiutes.txt, in utf8, for use by t/read.tree.t.
+	- Add t/tree.utf8.attributes.txt, in utf8, for use by t/read.tree.t.
 	- Add t/tree.with.attributes.txt and t/tree.without.attributes.txt for use by t/read.tree.t.
 	- Make Perl V 5.8.1 a pre-req so we have access to the utf8 pragma.
 

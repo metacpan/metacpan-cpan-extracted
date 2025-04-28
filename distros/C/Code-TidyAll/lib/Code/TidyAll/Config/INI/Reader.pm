@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Config::INI::Reader);
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 my %multi_value = map { $_ => 1 } qw( ignore inc ok_exit_codes select shebang );
 
@@ -40,7 +40,7 @@ Code::TidyAll::Config::INI::Reader - A L<Config::INI::Reader> subclass which can
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SUPPORT
 
@@ -66,7 +66,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2023 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2025 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

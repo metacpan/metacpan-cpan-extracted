@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.84';
+our $VERSION = '0.85';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -403,8 +403,12 @@ sub _read_conf_file {
 sub _dump_params {
     my $p = shift;
 
-    return Data::Dumper->new( [ _recurse_dump($p) ] )->Indent(0)->Sortkeys(1)->Quotekeys(0)
-        ->Terse(1)->Dump;
+    return Data::Dumper->new( [ _recurse_dump($p) ] )
+        ->Indent(0)
+        ->Sortkeys(1)
+        ->Quotekeys(0)
+        ->Terse(1)
+        ->Dump;
 }
 
 # This is all a ridiculous workaround around the fact that there is no good
@@ -856,7 +860,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.84
+version 0.85
 
 =head1 SYNOPSIS
 
@@ -1072,7 +1076,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Herzog Andreas Vögele Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner mauke Mohammad S Anwar Nick Tonkin Olaf Alders Paulo Custodio Pavel Dostál Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
+=for stopwords Adam Herzog Andreas Vögele Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop gregor herrmann Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner mauke Mohammad S Anwar Nick Tonkin Olaf Alders Paulo Custodio Pavel Dostál Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
 
 =over 4
 
@@ -1103,6 +1107,10 @@ George Hartzell <georgewh@gene.com>
 =item *
 
 Graham Knop <haarg@haarg.org>
+
+=item *
+
+gregor herrmann <gregoa@debian.org>
 
 =item *
 
@@ -1176,7 +1184,7 @@ timgimyee <tim.gim.yee@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2023 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2025 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package MIDI::RtController::Filter::Math;
-$MIDI::RtController::Filter::Math::VERSION = '0.0401';
+$MIDI::RtController::Filter::Math::VERSION = '0.0403';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Math based RtController filters
@@ -72,7 +72,7 @@ sub stair_step ($self, $device, $dt, $event) {
         $delay_time += $self->delay;
         $self->rtc->delay_send($delay_time, [ $ev, $self->channel, $n, $val ]);
     }
-    return 0;
+    return $self->continue;
 }
 
 1;
@@ -89,7 +89,7 @@ MIDI::RtController::Filter::Math - Math based RtController filters
 
 =head1 VERSION
 
-version 0.0401
+version 0.0403
 
 =head1 SYNOPSIS
 
@@ -97,19 +97,19 @@ version 0.0401
   use MIDI::RtController ();
   use MIDI::RtController::Filter::Math ();
 
-  my $rtc = MIDI::RtController->new(
+  my $controller = MIDI::RtController->new(
     input  => 'keyboard',
     output => 'usb',
   );
 
-  my $filter = MIDI::RtController::Filter::Math->new(rtc => $rtc);
+  my $filter = MIDI::RtController::Filter::Math->new(rtc => $controller);
 
   $filter->control(1); # CC#01 = mod-wheel
   $filter->channel(0);
 
-  $rtc->add_filter('stair_step', note_on => $filter->curry::stair_step);
+  $controller->add_filter('stair_step', note_on => $filter->curry::stair_step);
 
-  $rtc->run;
+  $controller->run;
 
 =head1 DESCRIPTION
 
@@ -156,18 +156,8 @@ Default: C<-1>
 
 =head1 METHODS
 
-All filter methods must accept the object, a MIDI device name, a
-delta-time, and a MIDI event ARRAY reference, like:
-
-  sub stair_step ($self, $device, $delta, $event) {
-    my ($event_type, $chan, $note, $value) = $event->@*;
-    ...
-    return $boolean;
-  }
-
-A filter also must return a boolean value. This tells
-L<MIDI::RtController> to continue processing other known filters or
-not.
+To make and use filters, please see the documentation in
+L<MIDI::RtController::Filter>.
 
 =head2 stair_step
 
@@ -184,8 +174,6 @@ The eg/*.pl program(s) in this distribution
 L<MIDI::RtController::Filter>
 
 L<Moo>
-
-L<Types::MIDI>
 
 L<Types::Standard>
 

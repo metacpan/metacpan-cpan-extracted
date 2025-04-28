@@ -1,0 +1,9 @@
+<table align="center" class="display" id="result_table" cellpadding="0" cellspacing="0" border="<: $border :>">
+<: $thead :>
+: for $row -> $item {
+<tr>
+		: include "basic.column.tx" { column => $item };
+</tr>
+: }
+</table>
+

@@ -21,21 +21,21 @@ no_index:
 provides:
   File::ValueFile:
     file: lib/File/ValueFile.pm
-    version: v0.4.0
+    version: v0.5.0
   File::ValueFile::Simple::Reader:
     file: lib/File/ValueFile/Simple/Reader.pm
-    version: v0.4.0
+    version: v0.5.0
   File::ValueFile::Simple::Writer:
     file: lib/File/ValueFile/Simple/Writer.pm
-    version: v0.4.0
+    version: v0.5.0
 requires:
   Carp: '1.35'
-  Data::Identifier: v0.6.0
+  Data::Identifier: v0.8.0
   URI::Escape: '5.08'
   perl: v5.16.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/File-ValueFile.git
-version: v0.04
+version: v0.05
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

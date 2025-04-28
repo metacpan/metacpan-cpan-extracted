@@ -15,7 +15,7 @@ use Scalar::Util qw(weaken);
 
 use Carp;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
 # ---- Private helpers ----
@@ -42,7 +42,7 @@ Data::TagDB::WeakBaseObject - Work with Tag databases
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

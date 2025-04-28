@@ -23,8 +23,8 @@ name: MIDI-RtController-Filter-Drums
 requires:
   List::SomeUtils: '0'
   MIDI::Drummer::Tiny: '0.0611'
-  MIDI::RtController: '0.0600'
-  MIDI::RtController::Filter: '0.0100'
+  MIDI::RtController: '0.0703'
+  MIDI::RtController::Filter: '0.0102'
   MIDI::RtMidi::ScorePlayer: '0'
   Moo: '2'
   Types::Common::Numeric: '0'
@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-Drums
   repository: https://github.com/ology/MIDI-RtController-Filter-Drums.git
-version: '0.0400'
+version: '0.0401'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

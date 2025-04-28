@@ -8,7 +8,7 @@ package Text::Layout;
 
 use Carp;
 
- our $VERSION = "0.043";
+ our $VERSION = "0.044";
 
 =head1 NAME
 
@@ -222,9 +222,28 @@ Also supported but not part of the official Pango Markup specification.
 
 =over 8
 
-=item href="C<URL>"
+=item href="C<TARGET>"
 
-Creates a clickable target that activates the I<URL>.
+Creates a clickable target that activates the I<TARGET>.
+
+The I<TARGET> can be:
+
+=over 4
+
+=item *
+
+The name of an external PDF document, e.g. C<"that.pdf">.
+
+=item *
+
+A named destination in the document, e.g. C<"#there">.
+See L<Strut attributes>.
+
+=item *
+
+a named destination in an external document, e.g. C<"that.pdf#there">.
+
+=back
 
 =back
 
@@ -284,6 +303,10 @@ i.e., C<< <strut/> >>.
 =item label="I<LABEL>"
 
 An optional identifying label.
+
+When a label is used, this will create a I<named destination>, a
+symbolic name for a location in the document.
+See the C<span> C<href> attribute,
 
 =item width="I<WIDTH>" (short w="I<WIDTH>")
 

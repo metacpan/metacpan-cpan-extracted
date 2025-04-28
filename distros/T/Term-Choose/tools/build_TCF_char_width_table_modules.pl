@@ -4,6 +4,7 @@ use 5.014;
 use utf8;
 use open qw(:std :utf8);
 use Data::Dumper;
+# cpanm --notest Net::SSLeay
 use LWP::Protocol::https;
 use WWW::Mechanize::Cached;
 use Term::Choose;
@@ -170,6 +171,10 @@ sub build_ranges {
 }
 
 
+
+
+# # # # #   Perl PP   # # # # #
+
 for my $file_name ( "CharWidthAmbiguousWide.pm", "CharWidthDefault.pm" ) {
     my $ranges;
     my $amb;
@@ -184,8 +189,8 @@ for my $file_name ( "CharWidthAmbiguousWide.pm", "CharWidthDefault.pm" ) {
     open my $fh, '>', $file_name or die $!;
     my $module = $file_name =~ s/\.pm\z//r;
 
-print $fh
-qq|package Term::Choose::LineFold::$module;
+    print $fh <<"PP_HEADER";
+package Term::Choose::LineFold::$module;
 
 use warnings;
 use strict;
@@ -204,22 +209,109 @@ our \@EXPORT_OK = qw( table_char_width );
 
 
 sub table_char_width { [
-|;
+PP_HEADER
 
-    my $number_of_ranges = 0;
     for my $r ( @$ranges ) {
-        my $cm = '#';
-        # less than 0 is Cc and Cs
-        if ( $r->{width} >= 0 ) {
-            $cm = '';
-            $number_of_ranges++;
-        }
+        my $cm = $r->{width} < 0 ? '#' : ''; # comment out entries with a width of -1: Cc and Cs
         printf $fh "${cm}[%8s, %8s, %d],\n", sprintf( "0x%x", $r->{begin} ), sprintf( "0x%x", $r->{end} ), $r->{width};
     }
-
-    print $fh "]\n}\n\n\n1;\n";
+    print $fh "] }\n\n\n1;\n";
     close $fh;
 }
+
+
+
+
+# # # # #   Perl XS   # # # # #
+
+for my $file_name ( "charwidth_default.h", "charwidth_ambiguous_is_wide.h" ) {
+    my $ranges;
+    my $macro_name = uc $file_name =~ s/\./_/r;
+    if ( $file_name eq "charwidth_default.h" ) {
+        $ranges = build_ranges( $width_normal );
+    }
+    else {
+        $ranges = build_ranges( $width_ambiguous );
+    }
+    open my $fh, '>', $file_name or die $!;
+
+    print $fh <<"XS_HEADER";
+#ifndef $macro_name
+#define $macro_name
+
+typedef struct {
+    unsigned int start;
+    unsigned int end;
+    int width;
+} WidthRange;
+
+static const WidthRange width_table[] = {
+XS_HEADER
+
+    for my $r ( @$ranges ) {
+        my $cm = $r->{width} < 0 ? '//' : ''; # comment out entries with a width of -1: Cc and Cs
+        printf $fh "${cm}    { %s, %s, %d },\n", sprintf( "0x%x", $r->{begin} ), sprintf( "0x%x", $r->{end} ), $r->{width};
+    }
+
+    print $fh <<"XS_FOOTER";
+};
+
+static const int width_table_len = sizeof(width_table) / sizeof(width_table[0]);
+
+#endif
+
+XS_FOOTER
+
+    close $fh;
+}
+
+
+
+
+# # # # #   Rakudo   # # # # #
+
+for my $file_name ( "CharWidthAmbiguousWide.pm6", "CharWidthDefault.pm6" ) {
+    my $ranges;
+    my $amb;
+    if ( $file_name eq "CharWidthDefault.pm" ) {
+        $amb = 'narrow';
+        $ranges = build_ranges( $width_normal );
+    }
+    else {
+        $amb = 'wide';
+        $ranges = build_ranges( $width_ambiguous );
+    }
+    open my $fh, '>', $file_name or die $!;
+    my $module = $file_name =~ s/\.pm\z//r;
+
+    print $fh <<"RAKU_HEADER";
+use v6;
+unit module Term::Choose::LineFold::$module;
+
+
+# test with gnome-terminal - ambiguous characters set to $amb
+
+# Control characters, non-characters and surrogates are removed before using this table.
+# To have less ranges in table_char_width non-characters return 1.
+
+
+sub table_char_width is export { [
+RAKU_HEADER
+
+    for my $r ( @$ranges ) {
+        my $cm = $r->{width} < 0 ? '#' : ''; # comment out entries with a width of -1: Cc and Cs
+        printf $fh "${cm}[%8s, %8s, %d],\n", sprintf( "0x%x", $r->{begin} ), sprintf( "0x%x", $r->{end} ), $r->{width};
+      }
+    print $fh "] }\n";
+    close $fh;
+}
+
+
+
+
+
+
+
 
 
 

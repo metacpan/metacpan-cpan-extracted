@@ -50,7 +50,7 @@
    "provides" : {
       "Data::IconText" : {
          "file" : "lib/Data/IconText.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
          "url" : "git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-IconText.git"
       }
    },
-   "version" : "v0.01",
+   "version" : "v0.02",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

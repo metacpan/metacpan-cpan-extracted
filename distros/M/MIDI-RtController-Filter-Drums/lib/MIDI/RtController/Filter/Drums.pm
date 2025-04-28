@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0401';
 
 use strictures 2;
 use List::SomeUtils qw(first_index);
@@ -93,7 +93,7 @@ sub drums ($self, $device, $dt, $event) {
       infinite => 0,
     )->play_async->retain;
 
-    return 1;
+    return $self->continue;
 }
 
 1;
@@ -110,7 +110,7 @@ MIDI::RtController::Filter::Drums - Generic RtController drum filter
 
 =head1 VERSION
 
-version 0.0400
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -202,19 +202,6 @@ Default: C<120>
 
 =head1 METHODS
 
-All filter methods must accept the object, a MIDI device name, a
-delta-time, and a MIDI event ARRAY reference, like:
-
-  sub drums ($self, $device, $delta, $event) {
-    my ($event_type, $chan, $note, $value) = $event->@*;
-    ...
-    return $boolean;
-  }
-
-A filter also must return a boolean value. This tells
-L<MIDI::RtController> to continue processing other known filters or
-not.
-
 =head2 drums
 
 Play the drums.
@@ -227,11 +214,7 @@ should be applied.
 
 The F<eg/*.pl> program(s) in this distribution
 
-L<MIDI::RtController::Filter::Tonal> - Related module
-
-L<MIDI::RtController::Filter::Math> - Related module
-
-L<MIDI::RtController::Filter::CC> - Related module
+L<MIDI::RtController::Filter>
 
 L<List::SomeUtils>
 
@@ -242,6 +225,8 @@ L<MIDI::RtController>
 L<MIDI::RtMidi::ScorePlayer>
 
 L<Moo>
+
+L<Types::Common::Numeric>
 
 L<Types::Standard>
 

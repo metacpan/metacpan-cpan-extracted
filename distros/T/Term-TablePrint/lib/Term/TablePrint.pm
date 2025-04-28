@@ -2,9 +2,9 @@ package Term::TablePrint;
 
 use warnings;
 use strict;
-use 5.10.1;
+use 5.16.0;
 
-our $VERSION = '0.169';
+our $VERSION = '0.170';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -285,7 +285,7 @@ sub __write_table {
         }
     }
     my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $self->{_search_regex} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
-    my $auto_jumped_to_first_row = 0;
+    my $auto_jumped_to_row_0 = 0;
     my $row_was_expanded = 0;
 
     while ( 1 ) {
@@ -326,21 +326,24 @@ sub __write_table {
             return $return if $row == 0;
             next;
         }
-        if ( $ENV{TC_RESET_AUTO_UP} ) { # name
-            $auto_jumped_to_first_row = 0;
+        if ( $ENV{TC_RESET_AUTO_UP} ) { # any key other than Return/Enter resets 'auto_jumped_to_row_0' and 'row_was_expanded'
+            $auto_jumped_to_row_0 = 0;
             $row_was_expanded = 0;
         }
-        if ( $old_row == $row ) {
-            if ( $row > 0 && $row_was_expanded ) {
+        #if ( $old_row == $row ) {
+            if ( $row_was_expanded ) {
+                if ( $row == 0 ) {
+                    return $return;
+                }
                 $old_row = 0;
-                $auto_jumped_to_first_row = 1;
+                $auto_jumped_to_row_0 = 1;
                 $row_was_expanded = 0;
                 next;
             }
-            elsif ( $row == 0 && ( $row_was_expanded || $auto_jumped_to_first_row ) ) {
+            if ( $auto_jumped_to_row_0 ) {
                 return $return;
             }
-        }
+        #}
         $old_row = $row;
         $row_was_expanded = 1;
         if ( $self->{_info_row} && $row == $#{$tbl_print} ) {
@@ -890,7 +893,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.169
+Version 0.170
 
 =cut
 
@@ -1253,7 +1256,7 @@ if an invalid option value is passed.
 
 =head2 Perl version
 
-Requires Perl version 5.10.1 or greater.
+Requires Perl version 5.16.0 or greater.
 
 =head2 Decoded strings
 

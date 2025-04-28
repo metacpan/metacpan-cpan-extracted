@@ -3,7 +3,7 @@ App::DBBrowser::DB::DB2;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use DBI qw();
 

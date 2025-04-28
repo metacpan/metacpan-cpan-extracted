@@ -1,4 +1,10 @@
-v0.01  XXXZ
+v0.02  2025-04-27Z
+    - Added support for "from"
+    - Added protection against deep recursion
+    - Updated POD
+    - Added a few more icon texts for well known subjects
+
+v0.01  2025-04-16Z
     - Initial release
     - Basic API
     - Imported default/backup values from tagpool

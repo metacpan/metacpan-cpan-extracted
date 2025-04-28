@@ -12,9 +12,10 @@ use strict;
 use warnings;
 
 use Carp;
-use Data::Identifier v0.04;
+use Data::Identifier v0.08;
+use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my @wellknown = (
     Data::Identifier->new(uuid => '54bf8af4-b1d7-44da-af48-5278d11e8f32', displayname => 'ValueFile'),
@@ -40,30 +41,6 @@ $_->register foreach @wellknown;
 
 
 
-sub known {
-    my ($pkg, $class, %opts) = @_;
-    my $as = $opts{as} // 'ise';
-    my @list;
-
-    unless ($class eq ':all') {
-        return @{$opts{default}} if exists $opts{default};
-        croak 'Invalid class given';
-    }
-
-    foreach my $ent (@wellknown) {
-        if ($as =~ /::/ && $ent->DOES($as)) {
-            push(@list, $ent);
-        } elsif ($as eq 'ise' || $as eq 'uuid' || $as eq 'oid' || $as eq 'uri') {
-            my $func = $ent->can($as);
-            push(@list, $ent->$func(as => $as));
-        } else {
-            croak 'Cannot create object for as='.$as;
-        }
-    }
-
-    return @list;
-}
-
 
 sub add_utf8_marker {
     my ($pkg, $class, $id) = @_;
@@ -86,6 +63,13 @@ sub _is_utf8 {
     return exists $_is_utf8{Data::Identifier->new(from => $id)->ise};
 }
 
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+    return (\@wellknown, rawtype => 'uuid') if $class eq ':all';
+    croak 'Unsupported class';
+}
+
 1;
 
 __END__
@@ -100,7 +84,7 @@ File::ValueFile - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -117,30 +101,10 @@ For reading and writing ValueFiles see L<File::ValueFile::Simple::Reader> and L<
     my @list = File::ValueFile->known($class [, %opts ] );
 
 This method will return a list of well known tags of the given class C<$class>.
+It is an implementation of L<Data::Identifier::Interface::Known/known>.
+See there for details
 
 Currently no specific classes is defined. The pseudo class C<:all> is however supported.
-
-B<Note:> This method might soon be reimplemented to implement the interface defined by
-L<Data::Identifier::Interface::Known>.
-
-The following options are supported (all optional):
-
-=over
-
-=item C<as>
-
-The type to be used to return tags in. Currently supported values are: C<uuid>, C<oid>, C<uri>, C<ise>, L<Data::Identifier>.
-
-B<Note:> The default is not yet defined and may change in future versions of this module.
-
-B<Note:> All entries for the given class must support to be returned in the type given here.
-
-=item C<default>
-
-The value to be returned when the given class is not supported. This must be an array reference.
-This can be set to C<[]> to switching C<die>ing off for unsupported classes.
-
-=back
 
 =head2 add_utf8_marker
 

@@ -20,7 +20,7 @@ use Math::BigInt lib => 'GMP';
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -193,6 +193,13 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         '06aff30f-70e8-48b4-8b20-9194d22fc460'  => 'SEEK_END',
         '59a5691a-6a19-4051-bc26-8db82c019df3'  => 'inode',
         '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 'chat-0-word-identifier',
+        '53863a15-68d4-448d-bd69-a9b19289a191'  => 'unsigned-integer-generator',
+        'e8aa9e01-8d37-4b4b-8899-42ca0a2a906f'  => 'signed-integer-generator',
+        'd74f8c35-bcb8-465c-9a77-01010e8ed25c'  => 'unicode-character-generator',
+        '55febcc4-6655-4397-ae3d-2353b5856b34'  => 'rgb-colour-generator',
+        '97b7f241-e1c5-4f02-ae3c-8e31e501e1dc'  => 'date-generator',
+        '19659233-0a22-412c-bdf1-8ee9f8fc4086'  => 'multiplicity-generator',
+        '5ec197c3-1406-467c-96c7-4b1a6ec2c5c9'  => 'minimum-multiplicity-generator',
     );
 
     foreach my $ise (keys %displaynames) {
@@ -241,6 +248,9 @@ __PACKAGE__->_known_provider('wellknown');
 sub new {
     my ($pkg, $type, $id, %opts) = @_;
     my $self = bless {};
+
+    croak 'No type given' unless defined $type;
+    croak 'No id given'   unless defined $id;
 
     if (!ref($type) && $type eq 'from') {
         if (ref($id)) {
@@ -372,15 +382,15 @@ sub new {
     $self->{type} = $type;
     $self->{id} = $id;
 
-    foreach my $key (qw(validate namespace generate displayname)) {
+    foreach my $key (qw(validate namespace generator request generate displayname)) {
         next unless defined $opts{$key};
         $self->{$key} //= $opts{$key};
     }
 
-    foreach my $key (qw(namespace)) {
+    foreach my $key (qw(namespace generator)) {
         if (defined(my $v = $self->{$key})) {
             unless (ref $v) {
-                $self->{$key} = $pkg->new(ise => $v);
+                $self->{$key} = $pkg->new(from => $v);
             }
         }
     }
@@ -412,6 +422,7 @@ sub random {
 
 
 
+#@deprecated
 sub wellknown {
     my ($pkg, @args) = @_;
     return $pkg->known('wellknown', @args);
@@ -655,8 +666,54 @@ sub cmp {
 
 #@returns __PACKAGE__
 sub namespace {
-    my ($self) = @_;
-    return $self->{namespace} // croak 'No namespace';
+    my ($self, %opts) = @_;
+    my $has_default = exists $opts{default};
+    my $default = delete $opts{default};
+
+    delete $opts{no_defaults};
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $self->{namespace} if defined $self->{namespace};
+
+    return $default if $has_default;
+
+    croak 'No namespace';
+}
+
+
+#@returns __PACKAGE__
+sub generator {
+    my ($self, %opts) = @_;
+    my $has_default = exists $opts{default};
+    my $default = delete $opts{default};
+
+    delete $opts{no_defaults};
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $self->{generator} if defined $self->{generator};
+
+    return $default if $has_default;
+
+    croak 'No generator';
+}
+
+
+sub request {
+    my ($self, %opts) = @_;
+    my $has_default = exists $opts{default};
+    my $default = delete $opts{default};
+
+    delete $opts{no_defaults};
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $self->{request} if defined $self->{request};
+
+    return $default if $has_default;
+
+    croak 'No request';
 }
 
 
@@ -787,7 +844,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -934,6 +991,16 @@ A regex that should be used to validate identifiers if this identifier is used a
 
 The namespace used by a type. Must be a L<Data::Identifier> or an ISE. Must also resolve to an UUID.
 
+=item C<generator>
+
+The generator used for this identifier. Must be a L<Data::Identifier> or a value suitable for C<from>.
+
+=item C<request>
+
+The generator request used for this identifier. The meaning of this value depends on the generator used.
+This value is used by the generator to regenerate this identifier, but also other information.
+Therefore it is often the same or a similar value as the id, but sometimes it may also be completely different.
+
 =item C<displayname>
 
 The name as to be returned by L</displayname>.
@@ -999,6 +1066,8 @@ A L<Data::Identifier> or one of the special values C<uuid> or C<ise>.
 
     my @list = Data::Identifier->known($class [, %opts ] );
 
+(since v0.06)
+
 This module implements L<Data::Identifier::Interface::Known/known>. See there for details.
 
 Supported classes:
@@ -1029,7 +1098,10 @@ This is an alias for:
 
     my @wellknown = Data::Identifier->known('wellknown', %opts);
 
+(deprecated since v0.13)
+
 See also L</known>.
+This method will be removed in a future version.
 
 =head2 type
 
@@ -1204,10 +1276,75 @@ The order is the same for C<$a-E<gt>cmp($b)> as for C<- $b-E<gt>cmp($a)>.
 
 =head2 namespace
 
-    my Data::Identifier $namespace = $identifier->namespace;
+    my Data::Identifier $namespace = $identifier->namespace( [ %opts ] );
 
-Gets the namespace for the type C<$identifier> or dies.
+Gets the namespace for the type C<$identifier> or C<die>s.
 This call is only valid for identifiers that are types.
+
+The following, all optional, options are supported:
+
+=over
+
+=item C<default>
+
+The default value to return if no other value is available.
+This can be set to C<undef> to let this method return C<undef> (not C<die>).
+
+(since v0.13)
+
+=item C<no_defaults>
+
+This option is ignored.
+
+(since v0.13)
+
+=back
+
+=head2 generator
+
+    my Data::Identifier $generator = $identifier->generator( [ %opts ] );
+
+(since v0.13)
+
+Gets the generator used to generate this identifier or C<die>s.
+This call is only valid for identifiers that are generated.
+
+The following, all optional, options are supported:
+
+=over
+
+=item C<default>
+
+The default value to return if no other value is available.
+This can be set to C<undef> to let this method return C<undef> (not C<die>).
+
+=item C<no_defaults>
+
+This option is ignored.
+
+=back
+
+=head2 request
+
+    my Data::Identifier $generator = $identifier->request( [ %opts ] );
+
+(since v0.13)
+
+Gets the generator request used to generate this identifier or C<die>s.
+This call is only valid for identifiers that are generated.
+
+=over
+
+=item C<default>
+
+The default value to return if no other value is available.
+This can be set to C<undef> to let this method return undef (not die).
+
+=item C<no_defaults>
+
+This option is ignored.
+
+=back
 
 =head2 register
 

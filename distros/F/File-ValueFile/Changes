@@ -1,3 +1,8 @@
+v0.05   2025-04-27Z
+    - Allow arrayref as argument to $writer->write_tag_ise()
+    - Reimplemented File::Valuefile->known() using Data::Identifier::Interface::Known
+    - Added support for $writer->write_tag_generator_hint() to take a single argument
+
 v0.04   2025-01-09Z
     - Corrected bug in 5 argument write_tag_metadata()
     - Added write_tag_generator_hint()

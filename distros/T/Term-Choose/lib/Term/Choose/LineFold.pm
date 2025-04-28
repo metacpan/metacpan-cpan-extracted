@@ -4,11 +4,11 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.773';
+our $VERSION = '1.774';
 
 use Exporter qw( import );
 
-our @EXPORT_OK = qw( char_width print_columns cut_to_printwidth line_fold adjust_to_printwidth );
+our @EXPORT_OK = qw( char_width print_columns cut_to_printwidth adjust_to_printwidth line_fold );
 
 use Carp qw( croak );
 
@@ -16,118 +16,37 @@ use Term::Choose::Constants qw( PH SGR_ES EXTRA_W );
 use Term::Choose::Screen    qw( get_term_size );
 
 
+#BEGIN {
+#    my $module;
+#    eval {
+#        require Term::Choose::LineFold::XS;
+#        Term::Choose::LineFold::XS->VERSION( 0.001 );
+#        $module = 'Term::Choose::LineFold::XS';
+#        1;
+#    } or do {
+#        require Term::Choose::LineFold::PP;
+#        $module = 'Term::Choose::LineFold::PP';
+#    };
+#    no strict qw( refs );
+#    for my $func ( qw( char_width print_columns cut_to_printwidth adjust_to_printwidth ) ) {
+#        *{"Term::Choose::LineFold::$func"} = \&{"${module}::$func"};
+#    }
+#}
 BEGIN {
-    if ( exists $ENV{TC_AMBIGUOUS_WIDTH_IS_WIDE} ) {                                       # 24.03.2025
-        if ( $ENV{TC_AMBIGUOUS_WIDTH_IS_WIDE} ) {
-            require Term::Choose::LineFold::CharWidthAmbiguousWide;
-            Term::Choose::LineFold::CharWidthAmbiguousWide->import( 'table_char_width' );
-        }
-        else {
-            require Term::Choose::LineFold::CharWidthDefault;
-            Term::Choose::LineFold::CharWidthDefault->import( 'table_char_width' );
-        }
-    }                                                                                       #
-    else {                                                                                  #
-        if ( $ENV{TC_AMBIGUOUS_WIDE} ) {                                                    #
-            require Term::Choose::LineFold::CharWidthAmbiguousWide;                         #
-            Term::Choose::LineFold::CharWidthAmbiguousWide->import( 'table_char_width' );   #
-        }                                                                                   #
-        else {                                                                              #
-            require Term::Choose::LineFold::CharWidthDefault;                               #
-            Term::Choose::LineFold::CharWidthDefault->import( 'table_char_width' );         #
-        }                                                                                   #
-    }                                                                                       #
-}
-
-
-my $table = table_char_width();
-
-my $cache = {};
-
-
-sub char_width {
-    #my $c = $_[0];
-    my $min = 0;
-    my $mid;
-    my $max = $#$table;
-    if ( $_[0] < $table->[0][0] || $_[0] > $table->[$max][1] ) {
-        return 1;
-    }
-    while ( $max >= $min ) {
-        $mid = int( ( $min + $max ) / 2 );
-        if ( $_[0] > $table->[$mid][1] ) {
-            $min = $mid + 1;
-        }
-        elsif ( $_[0] < $table->[$mid][0] ) {
-            $max = $mid - 1;
-        }
-        else {
-            return $table->[$mid][2];
-        }
-    }
-    return 1;
-}
-
-sub print_columns {
-    #my $str = $_[0];
-    my $width = 0;
-    my $c;
-    if ( length( $_[0] ) < 120 ) {
-        for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
-            $c = ord substr $_[0], $i, 1;
-            $width += ( $cache->{$c} //= char_width( $c ) );
-        }
-        return $width;
-    }
-    for ( $_[0] =~ /./gs) {
-        $c = ord;
-        $width += ( $cache->{$c} //= char_width( $c ) );
-    }
-    return $width;
-}
-
-
-sub cut_to_printwidth {
-    #my ( $str, $avail_width ) = @_;
-    my $str_w = 0;
-    my $c;
-    for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
-        $c = ord substr $_[0], $i, 1;
-        if ( ( $str_w += ( $cache->{$c} //= char_width( $c ) ) ) > $_[1] ) {
-            if ( ( $str_w - $cache->{$c} ) < $_[1] ) {
-                return substr( $_[0], 0, $i ) . ' ', substr( $_[0], $i ) if wantarray;
-                return substr( $_[0], 0, $i ) . ' ';
-            }
-            return substr( $_[0], 0, $i ), substr( $_[0], $i ) if wantarray;
-            return substr( $_[0], 0, $i );
-        }
-    }
-    return $_[0], '' if wantarray;
-    return $_[0];
-}
-
-
-sub adjust_to_printwidth {
-#    my ( $str, $width, $opt ) = @_;
-    my $str_w = 0;
-    my $c;
-    for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
-        $c = ord substr $_[0], $i, 1;
-        if ( ( $str_w += ( $cache->{$c} //= char_width( $c ) ) ) > $_[1] ) {
-            if ( ( $str_w - $cache->{$c} ) < $_[1] ) {
-                return ' ' . substr( $_[0], 0, $i ) if $_[2];
-                return substr( $_[0], 0, $i ) . ' ';
-            }
-            return substr( $_[0], 0, $i );
-        }
-    }
-    if ( $str_w == $_[1] ) {
-        return $_[0];
-    }
-    elsif ( $_[2] ) {
-        return( ( ' ' x ( $_[1] - $str_w ) ) .  $_[0] );
-    }
-    return $_[0] . ' ' x ( $_[1] - $str_w );
+    my $module;
+    eval {
+        require Term::Choose::LineFold::XS;
+        Term::Choose::LineFold::XS->VERSION( 0.001 );
+        $module = 'Term::Choose::LineFold::XS';
+        1;
+    } or do {
+        require Term::Choose::LineFold::PP;
+        $module = 'Term::Choose::LineFold::PP';
+    };
+    *Term::Choose::LineFold::char_width = \&{"${module}::char_width"};
+    *Term::Choose::LineFold::print_columns = \&{"${module}::print_columns"};
+    *Term::Choose::LineFold::cut_to_printwidth = \&{"${module}::cut_to_printwidth"};
+    *Term::Choose::LineFold::adjust_to_printwidth = \&{"${module}::adjust_to_printwidth"};
 }
 
 
@@ -277,7 +196,7 @@ Term::Choose::LineFold
 
 =head1 VERSION
 
-Version 1.773
+Version 1.774
 
 =cut
 
@@ -288,6 +207,9 @@ font.
 
 By default ambiguous width characters are treated as half width. If the environment variable
 C<TC_AMBIGUOUS_WIDTH_IS_WIDE> is set to a true value, ambiguous width characters are treated as full width.
+
+If the optional L<Term::Choose::LineFold::XS> module is installed, its functions will be used automatically in place of
+the pure-Perl implementations, providing faster performance.
 
 =head1 EXPORT
 

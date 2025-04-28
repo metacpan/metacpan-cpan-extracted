@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.773';
+our $VERSION = '1.774';
 
 use Term::Choose::Constants qw( :all );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );
@@ -263,11 +263,6 @@ sub __get_cursor_row {
     }
     return $abs_curs_y || 1;
 }
-
-
-
-
-
 
 
 

@@ -8,15 +8,16 @@ my $input_name  = shift || 'joystick';
 my $output_name = shift || 'usb';
 my $filter_name = shift || 'single';
 
-my $control = MIDI::RtController->new(
+my $controller = MIDI::RtController->new(
     input   => $input_name,
     output  => $output_name,
     verbose => 1,
 );
 
-my $filter = MIDI::RtController::Filter::CC->new(rtc => $control);
+my $filter = MIDI::RtController::Filter::CC->new(rtc => $controller);
 
 $filter->control(1); # CC#01 = mod-wheel
+# $filter->trigger(25);
 # $filter->value(0);
 # $filter->range_bottom(0);
 # $filter->range_top(70);
@@ -26,8 +27,8 @@ $filter->control(1); # CC#01 = mod-wheel
 # $filter->step_down(2);
 
 my $method = "curry::$filter_name";
-$control->add_filter($filter_name, all => $filter->$method);
+$controller->add_filter($filter_name, all => $filter->$method);
 
-$control->run;
+$controller->run;
 
 # ...and now trigger a MIDI message!

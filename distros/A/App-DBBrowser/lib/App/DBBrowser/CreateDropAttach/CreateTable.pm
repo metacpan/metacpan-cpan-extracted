@@ -3,7 +3,7 @@ App::DBBrowser::CreateDropAttach::CreateTable;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use Encode         qw( decode );
 use File::Basename qw( basename );
@@ -317,7 +317,7 @@ sub __get_column_names {
         }
         elsif ( $menu->[$idx] eq $first_row ) {
             $header_row = shift @{$sql->{insert_args}};
-            $header_row = [ map { defined ? "$_" : '' } @$header_row ];
+            $header_row = [ map { defined $_ ? "$_" : '' } @$header_row ];
         }
         else {
             $header_row = [ ( '' ) x @{$sql->{insert_args}[0]} ];

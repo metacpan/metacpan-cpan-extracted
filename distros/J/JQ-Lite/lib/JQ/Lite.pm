@@ -5,7 +5,7 @@ use warnings;
 use JSON::PP;
 use List::Util qw(sum min max);
 
-our $VERSION = '0.39';
+our $VERSION = '0.42';
 
 sub new {
     my ($class, %opts) = @_;
@@ -356,6 +356,48 @@ sub run_query {
             next;
         }
 
+        # support for path()
+        if ($part eq 'path') {
+            @next_results = map {
+                if (ref $_ eq 'HASH') {
+                    [ sort keys %$_ ]
+                }
+                elsif (ref $_ eq 'ARRAY') {
+                    [ 0..$#$_ ]
+                }
+                else {
+                    ''
+                }
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for is_empty
+        if ($part eq 'is_empty') {
+            @next_results = map {
+                (ref $_ eq 'ARRAY' && !@$_) || (ref $_ eq 'HASH' && !%$_)
+                    ? JSON::PP::true
+                    : JSON::PP::false
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for default(value)
+        if ($part =~ /^default\((.+)\)$/) {
+            my $default_value = $1;
+            $default_value =~ s/^['"](.*?)['"]$/$1/; 
+        
+            @results = @results ? @results : (undef);
+        
+            @next_results = map {
+                defined($_) ? $_ : $default_value
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
         # standard traversal
         for my $item (@results) {
             push @next_results, _traverse($item, $part);
@@ -622,7 +664,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 0.39
+Version 0.42
 
 =head1 SYNOPSIS
 

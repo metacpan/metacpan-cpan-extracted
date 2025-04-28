@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.170   2025-04-27
+        - Added new dependency: Term::Choose::LineFold::XS.
+        - Term::Choose minimum version 1.774.
+        - Raised Perl minimum version to 5.16.0.
+
 0.169   2025-04-10
         - Removed redundant check.
         - Use 'adjust_to_printwidth' and updated 'print_columns' for less slowdown with large field values.

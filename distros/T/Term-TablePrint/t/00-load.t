@@ -1,4 +1,4 @@
-use 5.10.1;
+use 5.16.0;
 use strict;
 use warnings;
 use Test::More tests => 1;

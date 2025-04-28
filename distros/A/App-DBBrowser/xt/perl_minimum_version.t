@@ -1,4 +1,4 @@
-use 5.010000;
+use 5.016;
 use warnings;
 use strict;
 use Perl::MinimumVersion;

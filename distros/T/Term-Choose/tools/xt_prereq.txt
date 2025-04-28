@@ -1,0 +1,18 @@
+cpanm Perl::MinimumVersion
+cpanm Perl::Version
+cpanm Pod::Coverage
+cpanm Pod::Coverage::TrustMe
+cpanm Test::CheckManifest
+cpanm Test::Fatal
+cpanm Test::More
+cpanm Test::Perl::Critic
+cpanm Test::Pod
+cpanm Test::Pod::Coverage
+cpanm Test::Pod::Coverage::TrustMe
+cpanm Test::Prereq
+cpanm --force Test::Spelling
+cpanm Test::Synopsis
+cpanm Test::Vars
+cpanm Test::Version
+cpanm Test::Whitespaces
+cpanm Time::Piece

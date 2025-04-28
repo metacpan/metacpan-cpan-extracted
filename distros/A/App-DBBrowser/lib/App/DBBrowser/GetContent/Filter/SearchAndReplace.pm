@@ -3,7 +3,7 @@ App::DBBrowser::GetContent::Filter::SearchAndReplace;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use List::MoreUtils      qw( any );
 use String::Substitution qw( sub_modify gsub_modify );

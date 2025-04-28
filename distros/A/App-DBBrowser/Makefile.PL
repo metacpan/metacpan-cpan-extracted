@@ -1,4 +1,4 @@
-use 5.014;
+use 5.016;
 use warnings;
 use strict;
 use ExtUtils::MakeMaker;
@@ -14,7 +14,7 @@ if ( $^O eq 'MSWin32' ) {
 
 WriteMakefile(
     PL_FILES         => {},
-    MIN_PERL_VERSION => '5.014',
+    MIN_PERL_VERSION => '5.016',
     LICENSE          => 'perl',
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -65,20 +65,12 @@ WriteMakefile(
         'String::Substitution'       => 0,
         'String::Unescape'           => 0,
         'SQL::Type::Guess'           => 0,
-        'Term::Choose'               => '1.773',
+        'Term::Choose'               => '1.774',
         'Term::Choose::Util'         => '0.145',
         'Term::Form'                 => '0.561',
         'Term::Form::ReadLine'       => '0.561',
-        'Term::TablePrint'           => '0.169',
+        'Term::TablePrint'           => '0.170',
         'Text::CSV_XS'               => 0,
         %prereqs_os_specific,
-    },
-    dist  => {
-        COMPRESS => 'gzip',
-        SUFFIX   => '.gz',
-        TARFLAGS => '--format=gnu -cvf',
-    },
-    clean => {
-        FILES => 'App-DBBrowser-*',
     },
 );

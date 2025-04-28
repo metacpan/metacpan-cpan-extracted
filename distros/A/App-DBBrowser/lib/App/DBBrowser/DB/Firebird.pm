@@ -3,7 +3,7 @@ App::DBBrowser::DB::Firebird;
 
 use warnings;
 use strict;
-use 5.014;
+use 5.016;
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );

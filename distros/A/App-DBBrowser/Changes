@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.428  2025-04-27
+        - Perl minimum version 5.16.0.
+        - Term::TablePrint minimum version 0.170.
+        - Bugfix for Perls prior to 5.26.0: do not use ternary operator with bare length.
+        - Check the 'realpath' return value.
+
 2.427  2025-04-10
         - Term::TablePrint minimum version 0.169.
         - Term::Choose::Util minimum version 0.145.

@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-use 5.014;
-our $VERSION = '2.427';
+use 5.016;
+our $VERSION = '2.428';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.427
+Version 2.428
 
 =head1 SYNOPSIS
 
@@ -1510,7 +1510,7 @@ To locate the configuration files, run C<db-browser -h> and select I<Path>. The 
 
 =head2 Perl Version
 
-Requires Perl version 5.14.0 or later.
+Requires Perl version 5.16.0 or later.
 
 =head2 Decoded Strings
 

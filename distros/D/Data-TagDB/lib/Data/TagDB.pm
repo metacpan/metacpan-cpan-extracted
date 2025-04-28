@@ -15,7 +15,6 @@ use Scalar::Util qw(weaken blessed);
 
 use Carp;
 use DBI;
-use UUID::Tiny ();
 
 use Data::TagDB::Tag;
 use Data::TagDB::Relation;
@@ -26,7 +25,7 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 
 
@@ -50,12 +49,19 @@ sub new {
         cache_default_encoding => {},
         backup_type => {},
         query => {
-            tag_by_hint => $dbh->prepare('SELECT tag FROM hint WHERE name = ?'),
-            _tag_simple_identifier => $dbh->prepare('SELECT data FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = (SELECT tag FROM hint WHERE name = ?) AND context = 0 AND encoding = 0 AND tag = ? ORDER BY data DESC'),
-            _tag_by_dbid_type_and_data => $dbh->prepare('SELECT tag FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = ? AND context = 0 AND encoding = 0 AND data = ?'),
-            _create_tag => $dbh->prepare('INSERT INTO tag DEFAULT VALUES'),
-            _create_metadata => $dbh->prepare('INSERT OR IGNORE INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,?,?,?,?)'),
-            _create_relation => $dbh->prepare('INSERT OR IGNORE INTO relation (tag,relation,related,context,filter) VALUES (?,?,?,?,?)'),
+            _default => {
+                tag_by_hint => $dbh->prepare('SELECT tag FROM hint WHERE name = ?'),
+                _tag_simple_identifier => $dbh->prepare('SELECT data FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = (SELECT tag FROM hint WHERE name = ?) AND context = 0 AND encoding = 0 AND tag = ? ORDER BY data DESC'),
+                _tag_by_dbid_type_and_data => $dbh->prepare('SELECT tag FROM metadata WHERE relation = (SELECT tag FROM hint WHERE name = \'also-shares-identifier\') AND type = ? AND context = 0 AND encoding = 0 AND data = ?'),
+                _create_tag => $dbh->prepare('INSERT INTO tag DEFAULT VALUES'),
+                _create_metadata => $dbh->prepare('INSERT OR IGNORE INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,?,?,?,?)'),
+                _create_relation => $dbh->prepare('INSERT OR IGNORE INTO relation (tag,relation,related,context,filter) VALUES (?,?,?,?,?)'),
+            },
+            Pg => {
+                _create_tag => $dbh->prepare('INSERT INTO tag DEFAULT VALUES RETURNING id'),
+                _create_metadata => $dbh->prepare('INSERT INTO metadata (tag,relation,context,type,encoding,data) VALUES (?,?,?,?,?,?) ON CONFLICT DO NOTHING'),
+                _create_relation => $dbh->prepare('INSERT INTO relation (tag,relation,related,context,filter) VALUES (?,?,?,?,?) ON CONFLICT DO NOTHING'),
+            },
         },
     }, $pkg;
 }
@@ -150,8 +156,10 @@ sub tag_by_specification {
         } elsif ($specification eq '*') {
             @candidates = ($opts{sirtx_local_ids}{0});
         } elsif ($specification =~ /^\'([0-9]+)$/) {
-            my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', int($1));
-            @candidates = ($self->tag_by_id(uuid => $uuid));
+            my $num = int($1);
+            require Data::Identifier::Generate;
+            my $id = Data::Identifier::Generate->integer($num);
+            @candidates = ($self->tag_by_id($id));
         } elsif ($specification eq '\'') {
             @candidates = ($wk->zero);
         } elsif ($specification =~ /^\&([0-9a-zA-Z_]+)$/) {
@@ -299,7 +307,12 @@ sub create_tag {
     } else {
         $query = $self->_query('_create_tag');
         $query->execute;
-        $tag = $self->tag_by_dbid($query->last_insert_id);
+        if ($self->_DBI_name eq 'Pg') {
+            my $row = $query->fetchrow_arrayref;
+            $tag = $self->tag_by_dbid($row->[0]);
+        } else {
+            $tag = $self->tag_by_dbid($query->last_insert_id);
+        }
         $query->finish;
     }
 
@@ -329,11 +342,11 @@ sub create_metadata {
     my ($self, %opts) = @_;
     my $query = $self->_query('_create_metadata');
     my @bind = (
-        $opts{tag}->dbid,
-        $opts{relation}->dbid,
-        Data::TagDB::Tag::dbid($opts{context}),
-        Data::TagDB::Tag::dbid($opts{type}),
-        Data::TagDB::Tag::dbid($opts{encoding}),
+        $self->_as_tag($opts{tag}, 1)->dbid,
+        $self->_as_tag($opts{relation}, 1)->dbid,
+        Data::TagDB::Tag::dbid($self->_as_tag($opts{context}, 1)),
+        Data::TagDB::Tag::dbid($self->_as_tag($opts{type}, 1)),
+        Data::TagDB::Tag::dbid($self->_as_tag($opts{encoding}, 1)),
         $opts{data_raw},
     );
 
@@ -348,11 +361,11 @@ sub create_relation {
     my ($self, %opts) = @_;
     my $query = $self->_query('_create_relation');
     my @bind = (
-        $opts{tag}->dbid,
-        $opts{relation}->dbid,
-        $opts{related}->dbid,
-        Data::TagDB::Tag::dbid($opts{context}),
-        Data::TagDB::Tag::dbid($opts{filter}),
+        $self->_as_tag($opts{tag}, 1)->dbid,
+        $self->_as_tag($opts{relation}, 1)->dbid,
+        $self->_as_tag($opts{related}, 1)->dbid,
+        Data::TagDB::Tag::dbid($self->_as_tag($opts{context}), 1),
+        Data::TagDB::Tag::dbid($self->_as_tag($opts{filter}), 1),
     );
 
     $query->execute(@bind);
@@ -512,6 +525,13 @@ sub _cache_clear {
     %{$self->{cache_ise}} = ();
 }
 
+sub _as_tag {
+    my ($self, $id, $autocreate) = @_;
+    return undef unless defined $id;
+    return $id if eval {$id->isa('Data::TagDB::Tag')};
+    return $self->tag_by_id(Data::Identifier->new(from => $id, db => $self), $autocreate);
+}
+
 sub _default_type {
     my ($self, $relation) = @_;
     my $relation_dbid = $relation->dbid;
@@ -556,18 +576,21 @@ sub _register_basic_decoders {
     my $decode_int    = sub { my $v = $_[0]->data_raw; croak 'Bad data' unless $v =~ /^[0-9]+$/; int($v) };
     my $decode_colour = sub { Data::URIID::Colour->new(rgb => $_[0]->data_raw) };
 
-    $self->register_decoder($wk->uuid,                  $wk->string_ise_uuid_encoding,          $decode_string);
-    $self->register_decoder($wk->oid,                   $wk->string_ise_oid_encoding,           $decode_string);
-    $self->register_decoder($wk->uri,                   $wk->ascii_uri_encoding,                $decode_uri);
-    $self->register_decoder($wk->tagname,               $wk->utf_8_string_encoding,             $decode_string);
-    $self->register_decoder($wk->x11_colour_name,       $wk->utf_8_string_encoding,             $decode_string);
-    $self->register_decoder($wk->wikidata_identifier,   $wk->utf_8_string_encoding,             $decode_string);
-    $self->register_decoder($wk->small_identifier,      $wk->ascii_decimal_integer_encoding,    $decode_int);
-    $self->register_decoder($wk->unicode_string,        $wk->utf_8_string_encoding,             $decode_string);
-    $self->register_decoder($wk->colour_value,          $wk->hex_rgb_encoding,                  $decode_colour);
+    eval { $self->register_decoder($wk->uuid,                  $wk->string_ise_uuid_encoding,          $decode_string) };
+    eval { $self->register_decoder($wk->oid,                   $wk->string_ise_oid_encoding,           $decode_string) };
+    eval { $self->register_decoder($wk->uri,                   $wk->ascii_uri_encoding,                $decode_uri) };
+    eval { $self->register_decoder($wk->tagname,               $wk->utf_8_string_encoding,             $decode_string) };
+    eval { $self->register_decoder($wk->x11_colour_name,       $wk->utf_8_string_encoding,             $decode_string) };
+    eval { $self->register_decoder($wk->wikidata_identifier,   $wk->utf_8_string_encoding,             $decode_string) };
+    eval { $self->register_decoder($wk->small_identifier,      $wk->ascii_decimal_integer_encoding,    $decode_int) };
+    eval { $self->register_decoder($wk->unsigned_integer,      $wk->ascii_decimal_integer_encoding,    $decode_int) };
+    eval { $self->register_decoder($wk->unicode_string,        $wk->utf_8_string_encoding,             $decode_string) };
+    eval { $self->register_decoder($wk->colour_value,          $wk->hex_rgb_encoding,                  $decode_colour) };
 
-    $self->_register_backup_type($wk->wd_unicode_character, $wk->unicode_string);
-    $self->_register_backup_type($wk->also_has_description, $wk->unicode_string);
+    eval { $self->_register_backup_type($wk->wd_unicode_character, $wk->unicode_string) };
+    eval { $self->_register_backup_type($wk->tagpool_tag_icontext, $wk->unicode_string) };
+    eval { $self->_register_backup_type($wk->also_has_description, $wk->unicode_string) };
+    eval { $self->_register_backup_type($wk->final_file_size,      $wk->unsigned_integer) };
 
     return $decoders;
 }
@@ -579,10 +602,15 @@ sub _get_decoder {
     return $for_type->{$metadata->encoding_evaluated->dbid} // croak 'No matching decoder found';
 }
 
+sub _DBI_name {
+    my ($self) = @_;
+    return $self->{_DBI_name} //= $self->dbh->{Driver}{Name}
+}
+
 sub _query {
     my ($self, $name) = @_;
     $self->assert_connected;
-    return $self->{query}{$name} // confess 'No such query: '.$name;
+    return $self->{query}{$self->_DBI_name}{$name} // $self->{query}{_default}{$name} // confess 'No such query: '.$name;
 }
 
 sub _get_data {
@@ -733,7 +761,7 @@ sub AUTOLOAD {
     my ($self, @args) = @_;
     our $AUTOLOAD;
     my $function = $AUTOLOAD =~ s/^.*:://r;
-    my $query = $self->{query}->{$function} or confess 'Bad function: '.$function;
+    my $query = $self->{query}{$self->_DBI_name}{$function} // $self->{query}{_default}{$function} // confess 'Bad function: '.$function;
 
     if ($function =~ /^tag_by_/) {
         my $row;
@@ -764,7 +792,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 
@@ -796,6 +824,9 @@ Applications should therefore consider to group requests into transactions. This
 
 B<Note:>
 Future versions of this module will depend on L<Data::Identifier>.
+
+B<Note:>
+This module supports SQLite and PostgreSQL (experimental).
 
 =head1 METHODS
 

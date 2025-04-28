@@ -5,6 +5,8 @@ use utf8;
 use Test::More;
 use Test::Fatal;
 
+use Term::ReadKey; ##
+
 use lib 'lib';
 use Term::Choose qw( choose );
 
@@ -44,9 +46,12 @@ my $int = {
     layout              => [ 0, 1, 2 ],
 };
 
+
+my $f;
+
 for my $opt ( sort keys %$int ) {
     for my $val ( @{$int->{$opt}}, undef ) {
-        ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }
 
@@ -62,7 +67,7 @@ my @val_one_or_greater = ( 1, 2, 100, 999999, undef );
 
 for my $opt ( sort keys %$one_or_greater ) {
     for my $val ( @val_one_or_greater ) {
-        ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }
 
@@ -75,7 +80,7 @@ my @val_zero_or_greater = ( 0, 1, 2, 100, 999999, undef );
 
 for my $opt ( sort keys %$zero_or_greater ) {
     for my $val ( @val_zero_or_greater ) {
-        ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }
 
@@ -89,10 +94,9 @@ my $string = {
     busy_string => '',
 };
 my @val_string = ( 0, 'Hello' x 50, '', ' ', '☻☮☺', "\x{263a}\x{263b}", '한글', undef, 'æða' );
-my $fail;
 for my $opt ( sort keys %$string ) {
     for my $val ( @val_string ) {
-        ok( ! defined( $fail = exception { $d = choose( $choices, { $opt => $val } ) } ), $fail // 'OK' );
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }
 
@@ -105,7 +109,7 @@ my @val_tabs = ( [ 2, 4 ], [ 8 ], [], undef );
 
 for my $opt ( sort keys %$tabs ) {
     for my $val ( @val_tabs ) {
-        ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }
 
@@ -120,7 +124,7 @@ my @val_list_opt = ( [ 0, 1, 2, 100, 999999 ], [ 1 ], undef );
 
 for my $opt ( sort keys %$list_opt ) {
     for my $val ( @val_list_opt ) {
-        ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }
 
@@ -132,7 +136,7 @@ my @val_regex_opt = ( qr/^\s+\z/, qr/abc/ );
 
 for my $opt ( sort keys %$regex_opt ) {
     for my $val ( @val_regex_opt ) {
-        ok( ! defined( exception { $d = choose( $choices, { $opt => $val } ) } ) );
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }
 

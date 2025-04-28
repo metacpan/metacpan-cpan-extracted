@@ -342,7 +342,7 @@ sub render {
 		$ann->uri($target);
 	    }
 	    # $ann->border( 0, 0, 1 );
-	    $ann->rect( $x0, $y0, $x, $y0 - $sz );
+	    $ann->rect( $x0, $y0, $x, $y0 + $bb[2] );
 	}
     }
 }

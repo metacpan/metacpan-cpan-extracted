@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.774   2025-04-27
+    - Undone the last 'print_columns' update.
+    - Optional module 'Term::Choose::LineFold::XS'.
+    - New tests for 'Term::Choose::LineFold'.
+    - Update documentation.
+
 1.773   2025-04-10
     - Removed expensive shortcut in 'line_fold'.
     - Updated 'print_columns': less slowdown with long strings.

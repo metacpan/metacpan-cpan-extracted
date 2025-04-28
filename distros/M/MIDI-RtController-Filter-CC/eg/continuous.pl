@@ -23,19 +23,19 @@ my @filters = (
 );
 
 # open the inputs
-my $control = MIDI::RtController->new(
+my $controller = MIDI::RtController->new(
     input   => $in,
     output  => $out,
     verbose => 1,
 );
 
-MIDI::RtController::Filter::CC::add_filters(\@filters, { $in => $control });
+MIDI::RtController::Filter::CC::add_filters(\@filters, { $in => $controller });
 
-$control->run;
+$controller->run;
 
 # ...and now trigger a MIDI message!
 
 # XXX maybe needed?
 END: {
-    Object::Destroyer->new($control, 'delete');
+    Object::Destroyer->new($controller, 'delete');
 }

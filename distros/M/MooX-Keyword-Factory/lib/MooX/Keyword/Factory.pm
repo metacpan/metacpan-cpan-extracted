@@ -1,6 +1,6 @@
 package MooX::Keyword::Factory;
 
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use Factory::Sub; use Moo;
 
 our %FACTORY;
@@ -32,7 +32,7 @@ MooX::Keyword::Factory - Moo attribute factories
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -103,10 +103,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Keyword-Factory>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/MooX-Keyword-Factory>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/MooX-Keyword-Factory>
@@ -117,7 +113,7 @@ L<https://metacpan.org/release/MooX-Keyword-Factory>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

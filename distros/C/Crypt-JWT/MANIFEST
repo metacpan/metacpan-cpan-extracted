@@ -9,6 +9,7 @@ t/compile.t
 t/flattened.t
 t/jws_empty_payload.t
 t/jws_no_key.t
+t/jws_with_padding.t
 t/jwt_decode_tv.t
 t/jwt_encode_decode.t
 t/jwt_params.t
