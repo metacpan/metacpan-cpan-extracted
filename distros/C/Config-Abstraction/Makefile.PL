@@ -51,6 +51,7 @@ WriteMakefile(
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::TempDir::Tiny' => 0,
+		'Test::Without::Module' => 0,
 	}, clean => { FILES => 'Config-Abstraction-*' },
 	dist => $dist
 );

@@ -13,11 +13,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -73,8 +73,10 @@ sub get_params
 	return $_[0] if(ref($_[0]) eq 'HASH');
 
 	my $args;
+	my $array_ref;
 	if((scalar(@_) == 1) && (ref($_[0]) eq 'ARRAY')) {
 		$args = $_[0];
+		$array_ref = 1;
 	} else {
 		$args = \@_;
 	}
@@ -95,6 +97,10 @@ sub get_params
 			Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
 		}
 		return;
+	}
+
+	if($array_ref && defined($default)) {
+		return { $default => $args };
 	}
 	if(($num_args % 2) == 0) {
 		my %rc = @{$args};

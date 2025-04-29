@@ -10,7 +10,7 @@ use Cwd;
 use File::Path;
 our @ISA = qw( Module::Build );
 
-our $VERSION ='0.92';
+our $VERSION ='0.93';
 
 sub process_xs_files {
 	my $self = shift;
@@ -163,12 +163,6 @@ sub hipi_build_xs {
             $self->hipi_run_command( \@cmd );
         }
     }
-}
-
-sub hipi_build_data {
-    my $self = shift;
-    require File::Copy::Recursive;
-    File::Copy::Recursive::dircopy('mylib/auto/share','blib/lib/auto/share');
 }
 
 1;

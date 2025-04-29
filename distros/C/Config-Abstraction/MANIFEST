@@ -12,9 +12,11 @@ t/cover.t
 t/eof.t
 t/eol.t
 t/flatten.t
+t/logger.t
 t/manifest.t
 t/pod-cm.t
 t/pod-coverage.t
+t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
@@ -26,5 +28,6 @@ t/strict.t
 t/unused.t
 t/vars.t
 t/xml.t
+t/xml_pp.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -30,4 +30,5 @@ is_deeply($params, { value1 => 'value2' });
 
 $params = get_params(undef, ['value1', 'value2']);
 is_deeply($params, { value1 => 'value2' });
+
 done_testing();

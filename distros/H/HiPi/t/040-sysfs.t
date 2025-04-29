@@ -9,13 +9,16 @@ my $sleepwait = 5000;
 
 SKIP: {
       skip 'not in dist testing', 45 unless ( $ENV{HIPI_MODULES_DIST_TEST_SYSFS} );
-
-my $syspin36 = HiPi::RaspberryPi::has_rp1() ? RPI_PIN_36 + 399 : RPI_PIN_36;
-my $syspin37 = HiPi::RaspberryPi::has_rp1() ? RPI_PIN_37 + 399 : RPI_PIN_37;
       
 diag('DEVICE GPIO (sysfs) tests are running');
 
 use_ok( 'HiPi::Device::GPIO' );
+
+my $syspin36 = RPI_PIN_36 + HiPi::Device::GPIO::get_pin_offset();
+my $syspin37 = RPI_PIN_37 + HiPi::Device::GPIO::get_pin_offset();
+
+diag('SYSPIN 36 IS ' . $syspin36);
+diag('SYSPIN 37 IS ' . $syspin37);
 
 my $gpio = HiPi::Device::GPIO->new;
 

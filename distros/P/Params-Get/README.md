@@ -4,7 +4,7 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 

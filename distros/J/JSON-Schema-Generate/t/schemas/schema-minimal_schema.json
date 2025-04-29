@@ -1,0 +1,124 @@
+{
+   "$id" : "https://metacpan.org/author.json",
+   "$schema" : "http://json-schema.org/draft-07/schema#",
+   "description" : "A representation of a cpan author.",
+   "properties" : {
+      "asciiname" : {
+         "type" : "string"
+      },
+      "city" : {
+         "type" : "string"
+      },
+      "country" : {
+         "type" : "string"
+      },
+      "email" : {
+         "items" : {
+            "type" : "string"
+         },
+         "type" : [
+            "array",
+            "string"
+         ]
+      },
+      "gravatar_url" : {
+         "type" : "string"
+      },
+      "is_pause_custodial_account" : {
+         "type" : "boolean"
+      },
+      "links" : {
+         "properties" : {
+            "backpan_directory" : {
+               "type" : "string"
+            },
+            "cpan_directory" : {
+               "type" : "string"
+            },
+            "cpantesters_matrix" : {
+               "type" : "string"
+            },
+            "cpantesters_reports" : {
+               "type" : "string"
+            },
+            "cpants" : {
+               "type" : "string"
+            },
+            "metacpan_explorer" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "backpan_directory",
+            "cpan_directory",
+            "cpantesters_matrix",
+            "cpantesters_reports",
+            "cpants",
+            "metacpan_explorer"
+         ],
+         "type" : "object"
+      },
+      "name" : {
+         "type" : "string"
+      },
+      "other" : {
+         "items" : {
+            "type" : [
+               "boolean",
+               "null",
+               "string",
+               "integer"
+            ]
+         },
+         "type" : "array"
+      },
+      "pauseid" : {
+         "type" : "string"
+      },
+      "region" : {
+         "type" : "string"
+      },
+      "release_count" : {
+         "properties" : {
+            "backpan-only" : {
+               "type" : "integer"
+            },
+            "cpan" : {
+               "type" : "integer"
+            },
+            "latest" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "backpan-only",
+            "cpan",
+            "latest"
+         ],
+         "type" : "object"
+      },
+      "updated" : {
+         "type" : "string"
+      },
+      "website" : {
+         "items" : {
+            "type" : "string"
+         },
+         "type" : "array"
+      }
+   },
+   "required" : [
+      "asciiname",
+      "email",
+      "gravatar_url",
+      "is_pause_custodial_account",
+      "links",
+      "name",
+      "other",
+      "pauseid",
+      "release_count",
+      "website"
+   ],
+   "title" : "The CPAN Author Schema",
+   "type" : "object"
+}

@@ -7,7 +7,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi;
 
-our $VERSION ='0.81';
+our $VERSION ='0.93';
 
 my $requires = {
         'Try::Tiny'             => '0',
@@ -36,9 +36,6 @@ my $build = Module::Build::HiPi->new(
         'perl'          => '5.14.0',
 	    'Module::Build' => '0',
 	},
-    build_requires  => {
-        'File::Copy::Recursive' => '0'
-    },
     requires            => $requires,
 	add_to_cleanup => [
         '*.o',

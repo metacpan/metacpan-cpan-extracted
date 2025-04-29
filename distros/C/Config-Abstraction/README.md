@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 
@@ -186,7 +186,11 @@ Options:
     &#x3d;item \* `logger`
 
     Used for warnings and traces.
-    An object that understands warn(), debug() and trace() messages.
+    It can be an object that understands warn() and trace() messages,
+    such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
+    a reference to code,
+    a reference to an array,
+    or a filename.
 
 - `path`
 
@@ -209,7 +213,7 @@ Retrieve a configuration value using dotted key notation (e.g.,
 Returns the entire configuration hash,
 possibly flattened depending on the `flatten` option.
 
-The entry `config_path` contains a colon-separated list of the files that the configuration was loaded from.
+The entry `config_path` contains a list of the files that the configuration was loaded from.
 
 ## AUTOLOAD
 

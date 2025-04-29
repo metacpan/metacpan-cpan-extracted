@@ -1,11 +1,7 @@
 Revision history for JSON-Schema-Generate
 
-0.12	2025/04/02
-	- Fix the generated $id's so they pass JSON::Schema::Modern validation.
-	- Update documentation
-
-0.08    2022/05/31
-	- Increase test coverage to 100%
+0.01    Date/time
+        First version, released on an unsuspecting world.
 
 0.04    2020/05/31
 	Adds Options:
@@ -13,7 +9,5 @@ Revision history for JSON-Schema-Generate
 	- none_required - Do not analyse required keys in properties
 	- no_id - do not add $id(s) to properties and items
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
-
-
+0.13	2025/04/28
+	- Adding new parameters (no_title, no_description, no_example and minimal_schema) James Pattie (JAMESP)

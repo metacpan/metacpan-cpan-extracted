@@ -4,7 +4,7 @@
       "Jos Boumans <kane[at]cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,6 +50,6 @@
          "url" : "https://github.com/Perl-Toolchain-Gang/File-Fetch"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

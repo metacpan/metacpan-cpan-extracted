@@ -1,3 +1,4 @@
+use strict;
 use Test::More;
 
 use JSON::Schema::Generate;
@@ -74,9 +75,22 @@ my $schema = JSON::Schema::Generate->new(
 	description => 'A representation of a cpan author.',
 )->learn($data1)->learn($data2)->generate;
 
-open my $fh, '>', 'schema.json';
-print $fh $schema;
-close $fh;
+my $schema_file = 't/schemas/schema-merged-examples.json';
+if ($ENV{GENERATE_SCHEMA_FILES} == 1) {
+  open my $fh, '>', $schema_file;
+  print $fh $schema;
+  close $fh;
+}
+
+my $schema_from_file;
+{
+  local($/) = undef;
+  open my $fh, "<", $schema_file or die "Failed to open '$schema_file'... $!";
+  $schema_from_file = <$fh>;
+  close $fh;
+}
+
+is ($schema, $schema_from_file, "schema matched previously generated");
 
 use JSON::Schema;
 my $validator = JSON::Schema->new($schema);

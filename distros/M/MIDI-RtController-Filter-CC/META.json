@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/MIDI-RtController-Filter-CC"
       }
    },
-   "version" : "0.1102",
+   "version" : "0.1103",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

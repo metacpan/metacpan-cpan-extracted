@@ -3,15 +3,27 @@ ignore.txt
 lib/JSON/Schema/Generate.pm
 Makefile.PL
 MANIFEST			This list of files
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-basic.t
 t/02-no-required.t
 t/03-merged-examples.t
 t/04-coverage.t
+t/04-json-schema-draft201909.t
+t/05-no_title.t
+t/06-no_description.t
+t/07-no_example.t
+t/08-minimal_schema.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/schemas/schema-full.json
+t/schemas/schema-merged-examples.json
+t/schemas/schema-minimal_schema.json
+t/schemas/schema-no_description.json
+t/schemas/schema-no_example.json
+t/schemas/schema-no_title.json
+t/schemas/schema-none_required.json
 xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

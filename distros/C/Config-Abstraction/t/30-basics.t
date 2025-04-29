@@ -76,15 +76,15 @@ my $config = Config::Abstraction->new(
 );
 
 # YAML + JSON
-is $config->get('database.user'), 'env_user', 'ENV override on database.user';
+is($config->get('database.user'), 'env_user', 'ENV override on database.user');
 is $config->get('database.pass'), 'local_pass', 'local.json overrides base.yaml';
 ok $config->get('feature.enabled'), 'feature.enabled from JSON';
 is $config->get('extra.debug'), '1', 'extra.debug from ENV';
 is($config->all()->{'database'}{'user'}, 'env_user', 'all() works, when not flattened');
 
 # XML merge
-is $config->get('api.url'), 'https://api.example.com', 'API URL from base.xml';
-is $config->get('api.timeout'), '60', 'local.xml overrides base.xml';
+is($config->get('api.url'), 'https://api.example.com', 'API URL from base.xml');
+is($config->get('api.timeout'), '60', 'local.xml overrides base.xml');
 
 # Check INI merging
 is $config->get('logging.level'), 'debug', 'local.ini overrides base.ini';

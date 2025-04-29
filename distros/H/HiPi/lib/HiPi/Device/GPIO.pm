@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Device::GPIO
 # Description:   Wrapper for GPIO
-# Copyright    : Copyright (c) 2013-2023 Mark Dootson
+# Copyright    : Copyright (c) 2013-2025 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -18,11 +18,11 @@ use HiPi::RaspberryPi;
 use HiPi::Device::GPIO::Pin;
 use Fcntl;
 
-our $VERSION ='0.90';
+our $VERSION ='0.93';
 
 my $sysroot = '/sys/class/gpio';
 
-my $pinoffset = ( HiPi::RaspberryPi::has_rp1() ) ? 399 : 0;
+my $pinoffset = HiPi::Device::GPIO::Pin::get_pin_offset();
 
 sub new {
     my ($class, %userparams) = @_;
@@ -232,6 +232,10 @@ sub set_pin_slew {
 sub get_pin_slew {
     warn q(HiPi::Device::GPIO does not support slew actions);
     return undef;
+}
+
+sub get_pin_offset {
+    return $pinoffset;
 }
 
 sub _do_export {

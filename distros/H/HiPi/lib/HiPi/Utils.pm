@@ -21,7 +21,7 @@ use XSLoader;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.92';
+our $VERSION ='0.93';
 
 our $defaultuser = 'pi';
 
@@ -38,8 +38,11 @@ our @EXPORT_OK = qw(
     is_unix
     is_raspberry
     is_mac
+    is_raspberry_1
     is_raspberry_2
     is_raspberry_3
+    is_raspberry_4
+    is_raspberry_5
     uses_device_tree
     system_type
 );
@@ -47,8 +50,11 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 sub is_raspberry { HiPi::RaspberryPi::is_raspberry; }
-sub is_raspberry_2 { HiPi::RaspberryPi::is_raspberry; }
-sub is_raspberry_3 { HiPi::RaspberryPi::is_raspberry_2; }
+sub is_raspberry_1 { HiPi::RaspberryPi::is_raspberry_1; }
+sub is_raspberry_2 { HiPi::RaspberryPi::is_raspberry_2; }
+sub is_raspberry_3 { HiPi::RaspberryPi::is_raspberry_3; }
+sub is_raspberry_4 { HiPi::RaspberryPi::is_raspberry_4; }
+sub is_raspberry_5 { HiPi::RaspberryPi::is_raspberry_5; }
 sub uses_device_tree { HiPi::RaspberryPi::has_device_tree; }
 sub is_windows { HiPi::RaspberryPi::os_is_windows; }
 sub is_mac { HiPi::RaspberryPi::os_is_osx; }

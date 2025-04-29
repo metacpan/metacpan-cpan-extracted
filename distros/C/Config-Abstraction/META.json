@@ -55,7 +55,8 @@
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::TempDir::Tiny" : "0"
+            "Test::TempDir::Tiny" : "0",
+            "Test::Without::Module" : "0"
          }
       }
    },
@@ -69,6 +70,6 @@
          "url" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

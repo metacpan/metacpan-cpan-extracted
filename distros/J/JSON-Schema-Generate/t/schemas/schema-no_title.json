@@ -1,0 +1,357 @@
+{
+   "$id" : "https://metacpan.org/author.json",
+   "$schema" : "http://json-schema.org/draft-07/schema#",
+   "description" : "A representation of a cpan author.",
+   "examples" : [
+      {
+         "asciiname" : "Robert Acock",
+         "city" : "PLUTO",
+         "country" : "WO",
+         "email" : [
+            "lnation@cpan.org"
+         ],
+         "gravatar_url" : "https://secure.gravatar.com/avatar/8e509558181e1d2a0d3a5b55dec0b108?s=130&d=identicon",
+         "is_pause_custodial_account" : false,
+         "links" : {
+            "backpan_directory" : "https://cpan.metacpan.org/authors/id/L/LN/LNATION",
+            "cpan_directory" : "http://cpan.org/authors/id/L/LN/LNATION",
+            "cpantesters_matrix" : "http://matrix.cpantesters.org/?author=LNATION",
+            "cpantesters_reports" : "http://cpantesters.org/author/L/LNATION.html",
+            "cpants" : "http://cpants.cpanauthors.org/author/LNATION",
+            "metacpan_explorer" : "https://explorer.metacpan.org/?url=/author/LNATION"
+         },
+         "name" : "Robert Acock",
+         "other" : [
+            true,
+            null,
+            "string",
+            10
+         ],
+         "pauseid" : "LNATION",
+         "region" : "GHANDI",
+         "release_count" : {
+            "backpan-only" : 34,
+            "cpan" : 378,
+            "latest" : 114
+         },
+         "updated" : "2020-02-16T16:43:51",
+         "website" : [
+            "https://www.lnation.org"
+         ]
+      },
+      {
+         "asciiname" : "",
+         "email" : "damian@conway.org",
+         "gravatar_url" : "https://secure.gravatar.com/avatar/3d4a6a089964a744d7b3cf2415f81951?s=130&d=identicon",
+         "is_pause_custodial_account" : false,
+         "links" : {
+            "backpan_directory" : "https://cpan.metacpan.org/authors/id/D/DC/DCONWAY",
+            "cpan_directory" : "http://cpan.org/authors/id/D/DC/DCONWAY",
+            "cpantesters_matrix" : "http://matrix.cpantesters.org/?author=DCONWAY",
+            "cpantesters_reports" : "http://cpantesters.org/author/D/DCONWAY.html",
+            "cpants" : "http://cpants.cpanauthors.org/author/DCONWAY",
+            "metacpan_explorer" : "https://explorer.metacpan.org/?url=/author/DCONWAY"
+         },
+         "name" : "Damian Conway",
+         "other" : [
+            null,
+            false
+         ],
+         "pauseid" : "DCONWAY",
+         "release_count" : {
+            "backpan-only" : 358,
+            "cpan" : 190,
+            "latest" : 56
+         },
+         "website" : [
+            "http://damian.conway.org/"
+         ]
+      }
+   ],
+   "properties" : {
+      "asciiname" : {
+         "$id" : "#properties-asciiname",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "Robert Acock",
+            ""
+         ],
+         "type" : "string"
+      },
+      "city" : {
+         "$id" : "#properties-city",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "PLUTO"
+         ],
+         "type" : "string"
+      },
+      "country" : {
+         "$id" : "#properties-country",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "WO"
+         ],
+         "type" : "string"
+      },
+      "email" : {
+         "$id" : "#properties-email",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "damian@conway.org"
+         ],
+         "items" : {
+            "$id" : "#properties-email-items",
+            "description" : "An explanation about the purpose of this instance.",
+            "examples" : [
+               "lnation@cpan.org"
+            ],
+            "type" : "string"
+         },
+         "type" : [
+            "array",
+            "string"
+         ]
+      },
+      "gravatar_url" : {
+         "$id" : "#properties-gravatar_url",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "https://secure.gravatar.com/avatar/8e509558181e1d2a0d3a5b55dec0b108?s=130&d=identicon",
+            "https://secure.gravatar.com/avatar/3d4a6a089964a744d7b3cf2415f81951?s=130&d=identicon"
+         ],
+         "type" : "string"
+      },
+      "is_pause_custodial_account" : {
+         "$id" : "#properties-is_pause_custodial_account",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            true,
+            false
+         ],
+         "type" : "boolean"
+      },
+      "links" : {
+         "$id" : "#properties-links",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            {
+               "backpan_directory" : "https://cpan.metacpan.org/authors/id/L/LN/LNATION",
+               "cpan_directory" : "http://cpan.org/authors/id/L/LN/LNATION",
+               "cpantesters_matrix" : "http://matrix.cpantesters.org/?author=LNATION",
+               "cpantesters_reports" : "http://cpantesters.org/author/L/LNATION.html",
+               "cpants" : "http://cpants.cpanauthors.org/author/LNATION",
+               "metacpan_explorer" : "https://explorer.metacpan.org/?url=/author/LNATION"
+            },
+            {
+               "backpan_directory" : "https://cpan.metacpan.org/authors/id/D/DC/DCONWAY",
+               "cpan_directory" : "http://cpan.org/authors/id/D/DC/DCONWAY",
+               "cpantesters_matrix" : "http://matrix.cpantesters.org/?author=DCONWAY",
+               "cpantesters_reports" : "http://cpantesters.org/author/D/DCONWAY.html",
+               "cpants" : "http://cpants.cpanauthors.org/author/DCONWAY",
+               "metacpan_explorer" : "https://explorer.metacpan.org/?url=/author/DCONWAY"
+            }
+         ],
+         "properties" : {
+            "backpan_directory" : {
+               "$id" : "#properties-links-properties-backpan_directory",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  "https://cpan.metacpan.org/authors/id/L/LN/LNATION",
+                  "https://cpan.metacpan.org/authors/id/D/DC/DCONWAY"
+               ],
+               "type" : "string"
+            },
+            "cpan_directory" : {
+               "$id" : "#properties-links-properties-cpan_directory",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  "http://cpan.org/authors/id/L/LN/LNATION",
+                  "http://cpan.org/authors/id/D/DC/DCONWAY"
+               ],
+               "type" : "string"
+            },
+            "cpantesters_matrix" : {
+               "$id" : "#properties-links-properties-cpantesters_matrix",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  "http://matrix.cpantesters.org/?author=LNATION",
+                  "http://matrix.cpantesters.org/?author=DCONWAY"
+               ],
+               "type" : "string"
+            },
+            "cpantesters_reports" : {
+               "$id" : "#properties-links-properties-cpantesters_reports",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  "http://cpantesters.org/author/L/LNATION.html",
+                  "http://cpantesters.org/author/D/DCONWAY.html"
+               ],
+               "type" : "string"
+            },
+            "cpants" : {
+               "$id" : "#properties-links-properties-cpants",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  "http://cpants.cpanauthors.org/author/LNATION",
+                  "http://cpants.cpanauthors.org/author/DCONWAY"
+               ],
+               "type" : "string"
+            },
+            "metacpan_explorer" : {
+               "$id" : "#properties-links-properties-metacpan_explorer",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  "https://explorer.metacpan.org/?url=/author/LNATION",
+                  "https://explorer.metacpan.org/?url=/author/DCONWAY"
+               ],
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "backpan_directory",
+            "cpan_directory",
+            "cpantesters_matrix",
+            "cpantesters_reports",
+            "cpants",
+            "metacpan_explorer"
+         ],
+         "type" : "object"
+      },
+      "name" : {
+         "$id" : "#properties-name",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "Robert Acock",
+            "Damian Conway"
+         ],
+         "type" : "string"
+      },
+      "other" : {
+         "$id" : "#properties-other",
+         "description" : "An explanation about the purpose of this instance",
+         "items" : {
+            "$id" : "#properties-other-items",
+            "description" : "An explanation about the purpose of this instance.",
+            "examples" : [
+               true,
+               false,
+               null,
+               "string",
+               10
+            ],
+            "type" : [
+               "boolean",
+               "null",
+               "string",
+               "integer"
+            ]
+         },
+         "type" : "array"
+      },
+      "pauseid" : {
+         "$id" : "#properties-pauseid",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "LNATION",
+            "DCONWAY"
+         ],
+         "type" : "string"
+      },
+      "region" : {
+         "$id" : "#properties-region",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "GHANDI"
+         ],
+         "type" : "string"
+      },
+      "release_count" : {
+         "$id" : "#properties-release_count",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            {
+               "backpan-only" : 34,
+               "cpan" : 378,
+               "latest" : 114
+            },
+            {
+               "backpan-only" : 358,
+               "cpan" : 190,
+               "latest" : 56
+            }
+         ],
+         "properties" : {
+            "backpan-only" : {
+               "$id" : "#properties-release_count-properties-backpan-only",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  34,
+                  358
+               ],
+               "type" : "integer"
+            },
+            "cpan" : {
+               "$id" : "#properties-release_count-properties-cpan",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  378,
+                  190
+               ],
+               "type" : "integer"
+            },
+            "latest" : {
+               "$id" : "#properties-release_count-properties-latest",
+               "description" : "An explanation about the purpose of this instance",
+               "examples" : [
+                  114,
+                  56
+               ],
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "backpan-only",
+            "cpan",
+            "latest"
+         ],
+         "type" : "object"
+      },
+      "updated" : {
+         "$id" : "#properties-updated",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            "2020-02-16T16:43:51"
+         ],
+         "type" : "string"
+      },
+      "website" : {
+         "$id" : "#properties-website",
+         "description" : "An explanation about the purpose of this instance",
+         "items" : {
+            "$id" : "#properties-website-items",
+            "description" : "An explanation about the purpose of this instance.",
+            "examples" : [
+               "https://www.lnation.org",
+               "http://damian.conway.org/"
+            ],
+            "type" : "string"
+         },
+         "type" : "array"
+      }
+   },
+   "required" : [
+      "asciiname",
+      "email",
+      "gravatar_url",
+      "is_pause_custodial_account",
+      "links",
+      "name",
+      "other",
+      "pauseid",
+      "release_count",
+      "website"
+   ],
+   "title" : "The CPAN Author Schema",
+   "type" : "object"
+}

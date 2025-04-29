@@ -67,3 +67,4 @@
 Config-.*
 .test-script-*
 typescript
+tmp/*

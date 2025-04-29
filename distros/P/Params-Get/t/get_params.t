@@ -7,6 +7,15 @@ use Params::Get qw(get_params);
 
 use Error qw(:try);
 
+my @args = [ 'Hello', 'Goodbye' ];
+my $params = get_params('foo', @args);
+
+diag(Data::Dumper->new([$params])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+cmp_deeply($params, { 'foo' => [ 'Hello', 'Goodbye' ] }, 'Simple test, array');
+$params = get_params('foo', \@args);
+cmp_deeply($params, { 'foo' => [ 'Hello', 'Goodbye' ] }, 'Simple test, array ref');
+
 # Hash reference input
 my $hash_input = { key1 => 'value1', key2 => 'value2' };
 is_deeply(get_params(undef, $hash_input), $hash_input, 'Direct hash reference input works');
@@ -35,7 +44,7 @@ try {
 like($msg, qr/Usage/, 'Throws an error for zero arguments with default');
 
 # Test 6: Zero arguments without default
-my $params = get_params();
+$params = get_params();
 is_deeply($params, undef, 'Zero arguments without default returns undef');
 
 done_testing();

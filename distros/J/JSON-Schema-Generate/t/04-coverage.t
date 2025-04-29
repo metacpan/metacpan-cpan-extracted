@@ -29,11 +29,6 @@ my $schem = JSON::Schema::Generate->new(
 	}
 )->learn($data)->generate(1);
 
-
-open my $fh, '>', 'schema.json';
-print $fh $schem;
-close $fh;
-
 use JSON::Schema;
 my $validator = JSON::Schema->new($schem);
 my $result = $validator->validate($data);

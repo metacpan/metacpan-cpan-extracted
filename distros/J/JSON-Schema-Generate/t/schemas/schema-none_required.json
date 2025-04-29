@@ -1,0 +1,34 @@
+{
+   "$id" : "https://example.com/arrays.schema.json",
+   "$schema" : "http://json-schema.org/draft-07/schema#",
+   "description" : "A representation of a person, company, organization, or place",
+   "examples" : [
+      {
+         "checked" : false,
+         "id" : 1
+      }
+   ],
+   "properties" : {
+      "checked" : {
+         "$id" : "#properties-checked",
+         "description" : "An explanation about the purpose of this instance",
+         "examples" : [
+            true,
+            false
+         ],
+         "title" : "The title",
+         "type" : "boolean"
+      },
+      "id" : {
+         "$id" : "#properties-id",
+         "description" : "This section represents the id of the door.",
+         "examples" : [
+            1
+         ],
+         "title" : "The ID of the door",
+         "type" : "integer"
+      }
+   },
+   "title" : "The Root Schema",
+   "type" : "object"
+}

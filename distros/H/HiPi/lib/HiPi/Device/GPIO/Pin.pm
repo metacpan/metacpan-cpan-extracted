@@ -2,7 +2,7 @@
 # Package        HiPi::Device::GPIO::Pin
 # Description:   Pin
 # Created        Wed Feb 20 04:37:38 2013
-# Copyright    : Copyright (c) 2013-2013 Mark Dootson
+# Copyright    : Copyright (c) 2013-2025 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -18,11 +18,15 @@ use Fcntl;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 
-my $pinoffset = ( HiPi::RaspberryPi::has_rp1() ) ? 399 : 0;
+my $pinoffset = _calculate_sysfs_pin_offset();
 
-our $VERSION ='0.90';
+our $VERSION ='0.93';
 
 __PACKAGE__->create_accessors();
+
+sub get_pin_offset {
+    return $pinoffset;
+}
 
 sub _open {
     my ($class, %params) = @_;
@@ -117,6 +121,17 @@ sub _do_activelow {
     }
     
     return $result;
-} 
+}
+
+sub _calculate_sysfs_pin_offset {
+    my $offset = 0;
+    {
+        my $result = qx(cat /sys/kernel/debug/gpio 2>&1 | grep 'ID_SDA');
+        if ( $result && $result =~ /gpio-([0-9]+)/ ) {
+            $offset = $1;
+        }
+    }
+    return $offset;
+}
 
 1;

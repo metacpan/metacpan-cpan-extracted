@@ -1,5 +1,5 @@
 package JSON::Schema::Generate;
-use 5.006; use strict; use warnings; our $VERSION = '0.12';
+use 5.006; use strict; use warnings; our $VERSION = '0.13';
 use Tie::IxHash; use Types::Standard qw/Str HashRef Bool/;
 use Compiled::Params::OO qw/cpo/; use JSON; use Blessed::Merge;
 
@@ -46,10 +46,26 @@ BEGIN {
 			no_id => {
 				type => Bool,
 				default => sub { !!0 }
-			}
+			},
+			no_title => {
+				type => Bool,
+				default => sub { !!0 }
+			},
+			no_description => {
+				type => Bool,
+				default => sub { !!0 }
+			},
+			no_example => {
+				type => Bool,
+				default => sub { !!0 }
+			},
+			minimal_schema => {
+				type => Bool,
+				default => sub { !!0 }
+			},
 		}
 	);
-	$JSON = JSON->new->pretty;
+	$JSON = JSON->new->canonical->pretty;
 }
 
 sub new {
@@ -61,7 +77,7 @@ sub new {
 	$self->{schema}{'$id'} = $args->id;
 	$self->{schema}{title} = $args->title;
 	$self->{schema}{description} = $args->description;
-	$self->{$_} = $args->$_ for qw/spec merge_examples none_required no_id/;
+	$self->{$_} = $args->$_ for qw/spec merge_examples none_required no_id no_title no_description no_example minimal_schema/;
 	if ($args->merge_examples) {
 		$self->{merge} = Blessed::Merge->new(
 			blessed => 0,
@@ -69,6 +85,10 @@ sub new {
 			unique_hash => 1,
 			same => 0
 		);
+	}
+	if ($self->{minimal_schema}) {
+	  # make sure all the other no_* features are turned on
+	  $self->{$_} = 1 for qw/no_id no_title no_description no_example/;
 	}
 	return $self;
 }
@@ -113,7 +133,7 @@ sub _build_props {
 		$self->_unique_examples($props, $data);
 		return if ref $props->{type};
 		if (!$props->{properties}) {
-			$props->{required} = {} unless $self->{none_required};
+			$props->{required} = _tie_hash() unless $self->{none_required};
 			$props->{properties} = _tie_hash();
 		}
 		for my $key (sort keys %{$data}) {
@@ -123,8 +143,8 @@ sub _build_props {
 				$props->{properties}{$key} = _tie_hash();
 				%{$props->{properties}{$key}} = (
 					($self->{no_id} ? () : ('$id' => $id)),
-					title => 'The title',
-					description => 'An explanation about the purpose of this instance',
+					($self->{no_title} ? () : (title => 'The title')),
+					($self->{no_description} ? () : (description => 'An explanation about the purpose of this instance')),
 					($self->{spec}->{$key} ? %{$self->{spec}->{$key}} : ())
 				);
 			}
@@ -136,30 +156,30 @@ sub _build_props {
 		unless ($props->{items}) {
 			$props->{items} = _tie_hash();
 			$props->{items}{'$id'} = $id unless $self->{no_id};
-			$props->{items}{title} = 'The Items Schema';
-			$props->{items}{description} = 'An explanation about the purpose of this instance.';
+			$props->{items}{title} = 'The Items Schema' unless $self->{no_title};
+			$props->{items}{description} = 'An explanation about the purpose of this instance.' unless $self->{no_description};
 		}
 		map {
 			$self->_build_props($props->{items}, $_, $id);
 		} @{$data}
 	} elsif (! defined $data) {
 		$self->_add_type($props, 'null');
-		$self->_unique_examples($props, undef);
-	} elsif ($ref eq 'SCALAR' or $ref =~ m/Boolean$/i) {
+		$self->_unique_examples($props, undef) unless $self->{no_example};
+	} elsif ($ref eq 'SCALAR' || $ref =~ m/Boolean$/) {
 		$self->_add_type($props, 'boolean');
-		$self->_unique_examples($props, \1, \0);
+		$self->_unique_examples($props, \1, \0) unless $self->{no_example};
 	} elsif ($data =~ m/^\d+$/) {
 		$self->_add_type($props, 'integer');
-		$self->_unique_examples($props, $data);
+		$self->_unique_examples($props, $data) unless $self->{no_example};
 	} elsif ($data =~ m/^\d+\.\d+$/) {
 		$self->_add_type($props, 'number');
-		$self->_unique_examples($props, $data);
+		$self->_unique_examples($props, $data) unless $self->{no_example};
 	} elsif ($data =~ m/\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}\+\d{2}\:\d{2}/) {
 		$self->_add_type($props, 'date-time');
-		$self->_unique_examples($props, $data);
+		$self->_unique_examples($props, $data) unless $self->{no_example};
 	} else {
 		$self->_add_type($props, 'string');
-		$self->_unique_examples($props, $data);
+		$self->_unique_examples($props, $data) unless $self->{no_example};
 	}
 
 	return $props;
@@ -183,6 +203,8 @@ sub _add_type {
 
 sub _unique_examples {
 	my ($self, $props, @examples) = @_;
+	return if ($self->{no_example});
+	
 	for my $example (@examples) {
 		if ((ref($example) || 'SCALAR') ne 'SCALAR' && $props->{examples} && $self->{merge_examples}) {
 			$props->{examples}->[0] = $self->{merge}->merge($props->{examples}->[0], $example);
@@ -204,7 +226,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -321,6 +343,22 @@ Do not analyse required keys in properties. default: false.
 =item no_id
 
 Do not add $id(s) to properties and items. default: false. 
+
+=item no_title
+
+Do not add title(s) to properties and items.  default: false.
+
+=item no_description
+
+Do not add description(s) to properties and items.  default: false.
+
+=item no_example
+
+Do not add example(s) to properties and items.  default: false.
+
+=item minimal_schema
+
+Turns on no_id, no_title, no_description, no_example.  default: false.
 
 =back
 
@@ -800,6 +838,7 @@ L<https://metacpan.org/release/JSON-Schema-Generate>
 =back
 
 =head1 ACKNOWLEDGEMENTS
+
 
 =head1 LICENSE AND COPYRIGHT
 

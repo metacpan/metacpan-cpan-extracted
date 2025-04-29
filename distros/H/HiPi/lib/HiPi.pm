@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi.pm
 # Description  : Pepi module for Raspberry Pi
-# Copyright    : Copyright (c) 2013-2023 Mark Dootson
+# Copyright    : Copyright (c) 2013-2025 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -19,7 +19,7 @@ use constant hipi_export_constants();
 use Scalar::Util qw( weaken isweak refaddr );
 use Carp;
 
-our $VERSION ='0.92';
+our $VERSION ='0.93';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
@@ -204,7 +204,7 @@ peripherals.
 
 Documentation and details are available at
 
-L<https://raspberry.znix.com>
+L<https://www.hipiperl.com>
 
 =head1 AUTHOR
 
@@ -212,7 +212,7 @@ Mark Dootson, C<< mdootson@cpan.org >>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 - 2023 Mark Dootson
+Copyright (c) 2013 - 2024 Mark Dootson
 
 =cut
 

@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -217,7 +217,11 @@ If true, returns a flat hash structure like C<{database.user}> (default: C<0>) i
 =item * C<logger>
 
 Used for warnings and traces.
-An object that understands warn(), debug() and trace() messages.
+It can be an object that understands warn() and trace() messages,
+such as a L<Log::Log4perl> or L<Log::Any> object,
+a reference to code,
+a reference to an array,
+or a filename.
 
 =item * C<path>
 
@@ -260,6 +264,12 @@ sub new
 		config => {},
 	}, $class;
 
+	if(my $logger = $self->{'logger'}) {
+		if(!Scalar::Util::blessed($logger)) {
+			$self->_load_driver('Log::Abstraction');
+			$self->{'logger'} = Log::Abstraction->new($logger);
+		}
+	}
 	$self->_load_config();
 
 	return $self;
@@ -271,6 +281,9 @@ sub _load_config
 	my %merged;
 
 	my $logger = $self->{'logger'};
+	if($logger) {
+		$logger->trace(ref($self), ' ', __LINE__, ': Entered _load_config');
+	}
 
 	for my $dir (@{$self->{'config_dirs'}}) {
 		for my $file (qw/base.yaml base.yml base.json base.xml base.ini local.yaml local.yml local.json local.xml local.ini/) {
@@ -293,35 +306,61 @@ sub _load_config
 			} elsif ($file =~ /\.json$/) {
 				$data = eval { decode_json(read_file($path)) };
 				croak "Failed to load JSON from $path: $@" if $@;
-			} elsif ($file =~ /\.xml$/) {
-				$self->_load_driver('XML::Simple', ['XMLin']);
-				$data = eval { XMLin($path, ForceArray => 0, KeyAttr => []) };
-				croak "Failed to load XML from $path: $@" if $@;
+			} elsif($file =~ /\.xml$/) {
+				my $rc;
+				if($self->_load_driver('XML::Simple', ['XMLin'])) {
+					eval { $rc = XMLin($path, ForceArray => 0, KeyAttr => []) };
+					if($@) {
+						if($logger) {
+							$logger->notice("Failed to load XML from $path: $@");
+						} else {
+							Carp::carp("Failed to load XML from $path: $@");
+						}
+						undef $rc;
+					} elsif($rc) {
+						$data = $rc;
+					}
+				}
+				if((!defined($rc)) && $self->_load_driver('XML::PP')) {
+					my $xml_pp = XML::PP->new();
+					$data = read_file($path);
+					if(my $tree = $xml_pp->parse(\$data)) {
+						if($data = $xml_pp->collapse_structure($tree)) {
+							$self->{'type'} = 'XML';
+							if($data->{'config'}) {
+								$data = $data->{'config'};
+							}
+						}
+					}
+				}
 			} elsif ($file =~ /\.ini$/) {
 				$self->_load_driver('Config::IniFiles');
-				my $ini = Config::IniFiles->new(-file => $path);
-				croak "Failed to load INI from $path" unless $ini;
-				$data = { map {
-					my $section = $_;
-					$section => { map { $_ => $ini->val($section, $_) } $ini->Parameters($section) }
-				} $ini->Sections() };
+				if(my $ini = Config::IniFiles->new(-file => $path)) {
+					$data = { map {
+						my $section = $_;
+						$section => { map { $_ => $ini->val($section, $_) } $ini->Parameters($section) }
+					} $ini->Sections() };
+				} else {
+					if($logger) {
+						$logger->notice("Failed to load INI from $path: $@");
+					} else {
+						Carp::carp("Failed to load INI from $path: $@");
+					}
+				}
 			}
 			if($data) {
 				if($logger) {
 					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
 				}
 				%merged = %{ merge( $data, \%merged ) };
-				if($merged{'config_path'}) {
-					$merged{'config_path'} .= ':';
-				}
-				$merged{'config_path'} .= $path;
+				push @{$self->{'config_path'}}, $path;
 			}
 		}
 
 		# Put $self->{config_file} through all parsers, ignoring all errors, then merge that in
 		for my $config_file ($self->{'config_file'}, @{$self->{'config_files'}}) {
 			next unless defined($config_file);
-			my $path = File::Spec->catfile($dir, $config_file);
+			my $path = length($dir) ? File::Spec->catfile($dir, $config_file) : $config_file;
 			if($logger) {
 				$logger->debug(ref($self), ' ', __LINE__, ": Looking for configuration $path");
 			}
@@ -332,10 +371,20 @@ sub _load_config
 				}
 				eval {
 					if(($data =~ /^\s*<\?xml/) || ($data =~ /<\/.+>/)) {
-						$self->_load_driver('XML::Simple', ['XMLin']);
-						$data = XMLin($path, ForceArray => 0, KeyAttr => []);
-						if($data) {
-							$self->{'type'} = 'XML';
+						if($self->_load_driver('XML::Simple', ['XMLin'])) {
+							if($data = XMLin($path, ForceArray => 0, KeyAttr => [])) {
+								$self->{'type'} = 'XML';
+							}
+						} elsif($self->_load_driver('XML::PP')) {
+							my $xml_pp = XML::PP->new();
+							if(my $tree = $xml_pp->parse(\$data)) {
+								if($data = $xml_pp->collapse_structure($tree)) {
+									$self->{'type'} = 'XML';
+									if($data->{'config'}) {
+										$data = $data->{'config'};
+									}
+								}
+							}
 						}
 					} elsif($data =~ /\{.+:.\}/s) {
 						$self->_load_driver('JSON::Parse');
@@ -393,13 +442,14 @@ sub _load_config
 							}
 							if((!$data) || (ref($data) ne 'HASH')) {
 								# Maybe XML without the leading XML header
-								$self->_load_driver('XML::Simple', ['XMLin']);
-								eval { $data = XMLin($path, ForceArray => 0, KeyAttr => []) };
-								if((!$data) || (ref($data) ne 'HASH')) {
-									$self->_load_driver('Config::Auto');
-									my $ca = Config::Auto->new(source => $path);
-									if($data = $ca->parse()) {
-										$self->{'type'} = $ca->format();
+								if($self->_load_driver('XML::Simple', ['XMLin'])) {
+									eval { $data = XMLin($path, ForceArray => 0, KeyAttr => []) };
+									if((!$data) || (ref($data) ne 'HASH')) {
+										$self->_load_driver('Config::Auto');
+										my $ca = Config::Auto->new(source => $path);
+										if($data = $ca->parse()) {
+											$self->{'type'} = $ca->format();
+										}
 									}
 								}
 							}
@@ -408,22 +458,23 @@ sub _load_config
 				};
 				if($logger) {
 					if($@) {
-						$logger->warn(ref($self), ' ', __LINE__, $@);
+						$logger->warn(ref($self), ' ', __LINE__, ": $@");
+						undef $data;
 					} else {
 						$logger->debug(ref($self), ' ', __LINE__, ': Loaded data from', $self->{'type'}, "file $path");
 					}
 				}
 				if(scalar(keys %merged)) {
 					if($data) {
-						%merged = %{ merge( $data, \%merged ) };
+						%merged = %{ merge($data, \%merged) };
 					}
-				} elsif($data) {
+				} elsif($data && (ref($data) eq 'HASH')) {
 					%merged = %{$data};
+				} elsif((!$@) && $logger) {
+					$logger->debug(ref($self), ' ', __LINE__, ': No configuration file loaded');
 				}
-				if($merged{'config_path'}) {
-					$merged{'config_path'} .= ':';
-				}
-				$merged{'config_path'} .= $path;
+
+				push @{$self->{'config_path'}}, $path;
 			}
 		}
 	}
@@ -500,7 +551,7 @@ sub get
 Returns the entire configuration hash,
 possibly flattened depending on the C<flatten> option.
 
-The entry C<config_path> contains a colon-separated list of the files that the configuration was loaded from.
+The entry C<config_path> contains a list of the files that the configuration was loaded from.
 
 =cut
 
@@ -516,11 +567,20 @@ sub _load_driver
 {
 	my($self, $driver, $imports) = @_;
 
-	return if($self->{'loaded'}{$driver});
+	return 1 if($self->{'loaded'}{$driver});
+	return 0 if($self->{'failed'}{$driver});
 
 	eval "require $driver";
+	if($@) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->warn(ref($self), ": $driver failed to load: $@");
+		}
+		$self->{'failed'}{$driver} = 1;
+		return;
+	}
 	$driver->import(@{$imports});
 	$self->{'loaded'}{$driver} = 1;
+	return 1;
 }
 
 =head2 AUTOLOAD
@@ -566,16 +626,15 @@ sub AUTOLOAD
 
 	# If flattening is ON, assume keys are pre-flattened
 	if ($self->{flatten}) {
-		return $data->{$key} if exists $data->{$key};
+		return $data->{$key} if(exists $data->{$key});
 	}
 
 	my $sep = $self->{'sep_char'};
 
 	# Fallback: try resolving nested structure dynamically
-	my @parts = split /\Q$sep\E/, $key;
 	my $val = $data;
-	for my $part (@parts) {
-		if (ref $val eq 'HASH' && exists $val->{$part}) {
+	foreach my $part(split /\Q$sep\E/, $key) {
+		if((ref($val) eq 'HASH') && (exists $val->{$part})) {
 			$val = $val->{$part};
 		} else {
 			croak "No such config key '$key'";

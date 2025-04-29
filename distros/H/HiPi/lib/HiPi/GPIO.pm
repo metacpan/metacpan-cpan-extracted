@@ -19,7 +19,7 @@ use HiPi 0.80;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.92';
+our $VERSION ='0.93';
 
 __PACKAGE__->create_accessors( );
 

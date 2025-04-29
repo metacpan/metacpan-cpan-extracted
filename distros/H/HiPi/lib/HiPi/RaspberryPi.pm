@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi/RaspberryPi.pm
 # Description  : Information about host Raspberry Pi
-# Copyright    : Copyright (c) 2013-2023 Mark Dootson
+# Copyright    : Copyright (c) 2013-2024 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.91';
+our $VERSION ='0.93';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -254,6 +254,7 @@ my %_revinfostash = (
         '3' => 2048,
         '4' => 4096,
         '5' => 8192,
+        '6' => 16284,
     },
     manufacturer => {
         '0' => 'Sony UK',
@@ -338,7 +339,10 @@ my %_revinfostash = (
         '20' => 'Raspberry Pi Compute Module 4',        # 14
         '21' => 'Raspberry Pi Compute Module 4S',       # 15
         '22' => 'UNKOWN Rasberry Pi Model 22',          # 16
-        '23' => 'Rasberry Pi 5',                        # 17
+        '23' => 'Rasberry Pi 5 Model B',                # 17
+        '24' => 'Rasberry Pi Compute Module 5',         # 18
+        '25' => 'Rasberry Pi Model 500',                # 19
+        '26' => 'Rasberry Pi Compute Module 5 Lite',    # 1A
     },
     board_type => {
         '0'  => $btype2,
@@ -365,6 +369,9 @@ my %_revinfostash = (
         '21' => $btype4,
         '22' => $btype3,
         '23' => $btype3,
+        '24' => $btype4,
+        '25' => $btype3,
+        '26' => $btype4,
     },
     release => {
         '0'  => 'Q1 2013',
@@ -391,6 +398,9 @@ my %_revinfostash = (
         '21' => 'Q4 2020',
         '22' => 'unknown',
         '23' => 'Q4 2023',
+        '24' => 'Q3 2024',
+        '25' => 'Q4 2024',
+        '26' => 'Q3 2024',
     },
     extended_release => {
         'a03111' => 'Q2 2019', #	4B	1.1	1GB	Sony UK
@@ -401,18 +411,31 @@ my %_revinfostash = (
         'b03114' => 'Q3 2020', #	4B	1.4	2GB	Sony UK
         'b03115' => 'Q1 2022', #	4B	1.5	2GB	Sony UK
         
+        'b04170' => 'Q3 2024', #    5B  1.0 2GB Sony UK
+        'b04171' => 'Q4 2024', #    5B  1.1 2GB Sony UK
+        
         'c03111' => 'Q2 2019', # 	4B	1.1	4GB	Sony UK
         'c03112' => 'Q1 2020', #	4B	1.2	4GB	Sony UK
         'c03114' => 'Q2 2020', #	4B	1.4	4GB	Sony UK
         'c03115' => 'Q1 2022', #	4B	1.5	4GB	Sony UK
         
+        'c03130' => 'Q3 2020', #    400 1.0 4GB Sony UK
+        
         'c04170' => 'Q4 2023', #	5B	1.0	4GB	Sony UK
+        'c04171' => 'Q4 2023', #	5B	1.1	4GB	Sony UK
         
         'd03114' => 'Q2 2020', #	4B	1.4	8GB	Sony UK
         'd03115' => 'Q1 2022', #	4B	1.5	8GB	Sony UK
         
         'd04170' => 'Q4 2023', #	5B	1.0	8GB	Sony UK
+        'd04171' => 'Q4 2024', #	5B	1.1	8GB	Sony UK
+        
+        
+        'd04190' => 'Q4 2024', #    500 1.0 8GB Sony UK
+        
+        'e04171' => 'Q1 2025', #    5B  1.1 16GB Sony UK
     },
+        
 );
 
 my $_config = $_revstash{unknownex};
@@ -628,7 +651,7 @@ sub _configure {
             $_config->{processor} = 'BCM2835';
             $_config->{revisionnumber} = 0;
             $_config->{processor_info} = $_revinfostash{processor_info}->{'BCM2835'};
-            $israspberry = exists($_revstash{$rev}) ? 1 : 0;
+            $israspberry1 = $israspberry = exists($_revstash{$rev}) ? 1 : 0;
         }
         
     }    

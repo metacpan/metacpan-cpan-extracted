@@ -1,0 +1,202 @@
+{
+   "$id" : "https://metacpan.org/author.json",
+   "$schema" : "http://json-schema.org/draft-07/schema#",
+   "description" : "A representation of a cpan author.",
+   "properties" : {
+      "asciiname" : {
+         "$id" : "#properties-asciiname",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "city" : {
+         "$id" : "#properties-city",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "country" : {
+         "$id" : "#properties-country",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "email" : {
+         "$id" : "#properties-email",
+         "description" : "An explanation about the purpose of this instance",
+         "items" : {
+            "$id" : "#properties-email-items",
+            "description" : "An explanation about the purpose of this instance.",
+            "title" : "The Items Schema",
+            "type" : "string"
+         },
+         "title" : "The title",
+         "type" : [
+            "array",
+            "string"
+         ]
+      },
+      "gravatar_url" : {
+         "$id" : "#properties-gravatar_url",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "is_pause_custodial_account" : {
+         "$id" : "#properties-is_pause_custodial_account",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "boolean"
+      },
+      "links" : {
+         "$id" : "#properties-links",
+         "description" : "An explanation about the purpose of this instance",
+         "properties" : {
+            "backpan_directory" : {
+               "$id" : "#properties-links-properties-backpan_directory",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "string"
+            },
+            "cpan_directory" : {
+               "$id" : "#properties-links-properties-cpan_directory",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "string"
+            },
+            "cpantesters_matrix" : {
+               "$id" : "#properties-links-properties-cpantesters_matrix",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "string"
+            },
+            "cpantesters_reports" : {
+               "$id" : "#properties-links-properties-cpantesters_reports",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "string"
+            },
+            "cpants" : {
+               "$id" : "#properties-links-properties-cpants",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "string"
+            },
+            "metacpan_explorer" : {
+               "$id" : "#properties-links-properties-metacpan_explorer",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "backpan_directory",
+            "cpan_directory",
+            "cpantesters_matrix",
+            "cpantesters_reports",
+            "cpants",
+            "metacpan_explorer"
+         ],
+         "title" : "The title",
+         "type" : "object"
+      },
+      "name" : {
+         "$id" : "#properties-name",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "other" : {
+         "$id" : "#properties-other",
+         "description" : "An explanation about the purpose of this instance",
+         "items" : {
+            "$id" : "#properties-other-items",
+            "description" : "An explanation about the purpose of this instance.",
+            "title" : "The Items Schema",
+            "type" : [
+               "boolean",
+               "null",
+               "string",
+               "integer"
+            ]
+         },
+         "title" : "The title",
+         "type" : "array"
+      },
+      "pauseid" : {
+         "$id" : "#properties-pauseid",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "region" : {
+         "$id" : "#properties-region",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "release_count" : {
+         "$id" : "#properties-release_count",
+         "description" : "An explanation about the purpose of this instance",
+         "properties" : {
+            "backpan-only" : {
+               "$id" : "#properties-release_count-properties-backpan-only",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "integer"
+            },
+            "cpan" : {
+               "$id" : "#properties-release_count-properties-cpan",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "integer"
+            },
+            "latest" : {
+               "$id" : "#properties-release_count-properties-latest",
+               "description" : "An explanation about the purpose of this instance",
+               "title" : "The title",
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "backpan-only",
+            "cpan",
+            "latest"
+         ],
+         "title" : "The title",
+         "type" : "object"
+      },
+      "updated" : {
+         "$id" : "#properties-updated",
+         "description" : "An explanation about the purpose of this instance",
+         "title" : "The title",
+         "type" : "string"
+      },
+      "website" : {
+         "$id" : "#properties-website",
+         "description" : "An explanation about the purpose of this instance",
+         "items" : {
+            "$id" : "#properties-website-items",
+            "description" : "An explanation about the purpose of this instance.",
+            "title" : "The Items Schema",
+            "type" : "string"
+         },
+         "title" : "The title",
+         "type" : "array"
+      }
+   },
+   "required" : [
+      "asciiname",
+      "email",
+      "gravatar_url",
+      "is_pause_custodial_account",
+      "links",
+      "name",
+      "other",
+      "pauseid",
+      "release_count",
+      "website"
+   ],
+   "title" : "The CPAN Author Schema",
+   "type" : "object"
+}
