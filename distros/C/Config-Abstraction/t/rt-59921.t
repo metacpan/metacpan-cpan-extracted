@@ -18,6 +18,8 @@ my $config = Config::Abstraction->new(
 	config_dirs => [$test_dir],
 	config_file => 'test',
 );
+
+ok(defined($config));
 diag(Data::Dumper->new([$config])->Dump()) if($ENV{'TEST_VERBOSE'});
 cmp_ok(@{$config->get('files')}[0], 'eq', '/etc/group', 'testing');
 

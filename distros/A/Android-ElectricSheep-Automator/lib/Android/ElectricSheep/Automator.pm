@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -43,7 +43,7 @@ use Android::ElectricSheep::Automator::ScreenLayout;
 use Android::ElectricSheep::Automator::XMLParsers;
 
 my $_DEFAULT_CONFIG = <<'EODC';
-</* $VERSION = '0.03'; */>
+</* $VERSION = '0.04'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -238,14 +238,36 @@ sub dump_current_screen_ui {
 	# WARNING, you need to wake up the phone before dumping !!!!
 	my $devicefile = File::Spec->catfile('/', 'data', 'local', 'tmp', $$.'.xml');
 
-	my @cmd = ('uiautomator', 'dump', $devicefile);
-	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : sending command to adb: @cmd") }
-	my $res = $self->adb->shell(@cmd);
-	if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return undef }
-	if( $res->[0] != 0 ){ $log->error("--begin result:\n".perl2dump($res)."--end result.\n--begin command:\n".join(" ", @cmd)."\n--end command.\n\n"."${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+	my (@cmd, $res);
 
-	# BUG: this sometimes complains that the devicefile is not present
-	# we have increased the timeout on the device
+	my $maxiters = 7;
+	WMA:
+	while( $maxiters-- > 0 ){
+		@cmd = ('uiautomator', 'dump', $devicefile);
+		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : maxiters $maxiters : sending command to adb: @cmd") }
+		my $res = $self->adb->shell(@cmd);
+		if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return undef }
+		if( $res->[0] != 0 ){ $log->error("--begin result:\n".perl2dump($res)."--end result.\n--begin command:\n".join(" ", @cmd)."\n--end command.\n\n"."${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+
+		# check twice with a sleep if the dump is there, else
+		# we are repeating the previous command to dump the ui
+		for(1..2){
+			# now check if the dump file is there, sometimes it is not. repeat if not
+			if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : maxiters $maxiters : in order to find if the uiautomator dump succeeded : sending command to adb: @cmd") }
+			@cmd = ('if', '[', '-f', $devicefile, ']', ';', 'then', 'echo', 'found', ';', 'else', 'echo', 'notfound', ';', 'fi');
+			$res = $self->adb->shell(@cmd);
+			if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return undef }
+			if( $res->[0] != 0 ){ $log->error("--begin result:\n".perl2dump($res)."--end result.\n--begin command:\n".join(" ", @cmd)."\n--end command.\n\n"."${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+			if( $res->[1] =~ /^found/ ){
+				if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : maxiters $maxiters : found the dump file '$devicefile' on device, stopping the loop.") }
+				last WMA
+			} else { if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : maxiters $maxiters : DID NOT FIND the dump file '$devicefile' on device, continue the loop until iters reach 0.") } }
+			usleep(0.5);
+		}
+	}
+	# This may fail because above dump sometimes fails, no error
+	# just not producing any output file. If this persists we
+	# can try dumping to stdout.
 
 	# pull the output
 	$res = $self->adb->pull($devicefile, $filename);
@@ -1832,21 +1854,26 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 WARNING
 
 Current distribution is extremely alpha. API may change. 
 
-
 =head1 SYNOPSIS
 
 The present package fascilitates the control
 of a USB-debugging-enabled
-Android smartphone from a desktop computer
-using Perl. It's basically a thickishly thin wrapper
+Android device, e.g. a smartphone,
+from a desktop computer using Perl.
+It's basically a thickishly thin wrapper
 to the omnipotent Android Debug Bridge (adb)
 program.
+
+B<Note that absolutely nothing is
+installed on the connected device,
+neither any of its settings are modified>.
+See L</WILL ANYTHING BE INSTALLED ON THE DEVICE?>.
 
     use Android::ElectricSheep::Automator;
 
@@ -2956,6 +2983,36 @@ Create virtual device: C<avdmanager create avd -d "Nexus 6" -n myavd -k "system-
 See L<https://stackoverflow.com/a/77599934>
 
 =head1 USING YOUR REAL SMARTPHONE
+
+Using your real smartphone
+with such a powerful tool may not be such
+a good idea.
+
+One can only imagine what
+kind of viruses MICROSOFT WINDOWS can pass on to an
+Android device connected to it. Refrain from doing
+so unless you are using a more secure OS.
+
+Start with an emulator.
+
+=head1 WILL ANYTHING BE INSTALLED ON THE DEVICE?
+
+Absolutely NOTHING!
+
+This package
+B<does not mess with the connected device,
+neither it installs anything on it
+neither it modifies
+any of its settings>. Unless the user explicitly
+does something, e.g. explicitly
+a user installs / uninstalls apps
+programmatically using this package.
+
+Unlike this Python library:
+L<https://github.com/openatx/uiautomator2>,
+(not to be confused with google's namesake),
+which sneakily installs their ADB server to your device!
+
 
 =head1 AUTHOR
 

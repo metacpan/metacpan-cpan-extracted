@@ -9,12 +9,12 @@
 # Mail: gws@cpan.org
 #
 package Map::Tube::KoelnBonn;
-use 5.12.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.92.3');
+our $VERSION = version->declare('v0.92.4');
 
 =encoding utf8
 

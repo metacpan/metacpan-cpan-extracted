@@ -11,12 +11,12 @@
 #
 
 package Map::Tube::Beijing;
-use 5.12.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.12.5');
+our $VERSION = version->declare('v0.12.6');
 
 =encoding utf8
 

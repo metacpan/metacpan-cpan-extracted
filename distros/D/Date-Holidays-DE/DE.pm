@@ -14,7 +14,7 @@ require Exporter;
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(holidays);
-our $VERSION   = '2.06';
+our $VERSION   = '2.07';
 
 sub holidays{
 	my %parameters = (
@@ -118,7 +118,7 @@ sub holidays{
 	if ($year >= 2019) {
 		push @{$holidays{'be'}}, qw(frau);
 	}
-	if ($year == 2020) {
+	if ($year == 2020 || $year == 2025) {
 		push @{$holidays{'be'}}, qw(befr);
 	}
 

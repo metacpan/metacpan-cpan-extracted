@@ -4,7 +4,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # WARNING
 
@@ -14,10 +14,16 @@ Current distribution is extremely alpha. API may change.
 
 The present package fascilitates the control
 of a USB-debugging-enabled
-Android smartphone from a desktop computer
-using Perl. It's basically a thickishly thin wrapper
+Android device, e.g. a smartphone,
+from a desktop computer using Perl.
+It's basically a thickishly thin wrapper
 to the omnipotent Android Debug Bridge (adb)
 program.
+
+**Note that absolutely nothing is
+installed on the connected device,
+neither any of its settings are modified**.
+See ["WILL ANYTHING BE INSTALLED ON THE DEVICE?"](#will-anything-be-installed-on-the-device).
 
     use Android::ElectricSheep::Automator;
 
@@ -1022,6 +1028,35 @@ Create virtual device: `avdmanager create avd -d "Nexus 6" -n myavd -k "system-i
 See [https://stackoverflow.com/a/77599934](https://stackoverflow.com/a/77599934)
 
 # USING YOUR REAL SMARTPHONE
+
+Using your real smartphone
+with such a powerful tool may not be such
+a good idea.
+
+One can only imagine what
+kind of viruses MICROSOFT WINDOWS can pass on to an
+Android device connected to it. Refrain from doing
+so unless you are using a more secure OS.
+
+Start with an emulator.
+
+# WILL ANYTHING BE INSTALLED ON THE DEVICE?
+
+Absolutely NOTHING!
+
+This package
+**does not mess with the connected device,
+neither it installs anything on it
+neither it modifies
+any of its settings**. Unless the user explicitly
+does something, e.g. explicitly
+a user installs / uninstalls apps
+programmatically using this package.
+
+Unlike this Python library:
+[https://github.com/openatx/uiautomator2](https://github.com/openatx/uiautomator2),
+(not to be confused with google's namesake),
+which sneakily installs their ADB server to your device!
 
 # AUTHOR
 

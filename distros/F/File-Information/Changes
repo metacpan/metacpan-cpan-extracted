@@ -1,3 +1,10 @@
+v0.09  2025-04-29Z
+    - Added a number of useful options to file-information-dump
+    - Added experimental link stream feature
+    - Added support for File::FStore
+    - Support converting timestamps to Data::Identifier
+    - Cleanup and documentation improvements
+
 v0.08  2025-04-15Z
     - Added property "boring"
     - Removed dependency on UUID::Tiny

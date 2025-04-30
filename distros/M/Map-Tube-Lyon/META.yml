@@ -22,7 +22,7 @@ no_index:
 provides:
   Map::Tube::Lyon:
     file: lib/Map/Tube/Lyon.pm
-    version: v0.62.3
+    version: v0.62.4
 requires:
   File::Share: '0'
   Map::Tube: '4.04'
@@ -30,5 +30,5 @@ requires:
   namespace::clean: '0'
   perl: '5.012'
 resources: {}
-version: v0.62.3
+version: v0.62.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

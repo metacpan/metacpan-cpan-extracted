@@ -11,3 +11,6 @@ Revision history for JSON-Schema-Generate
 
 0.13	2025/04/28
 	- Adding new parameters (no_title, no_description, no_example and minimal_schema) James Pattie (JAMESP)
+
+0.14	2025/04/29
+	- Attempt to failing tests - use is_deeply when comparing the generated schema against what is expected.

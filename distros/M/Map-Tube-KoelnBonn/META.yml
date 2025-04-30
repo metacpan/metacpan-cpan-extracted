@@ -22,13 +22,13 @@ no_index:
 provides:
   Map::Tube::KoelnBonn:
     file: lib/Map/Tube/KoelnBonn.pm
-    version: v0.92.3
+    version: v0.92.4
 requires:
   File::Share: '0'
-  Map::Tube: '4.04'
+  Map::Tube: '4.09'
   Moo: '0'
   namespace::clean: '0'
-  perl: '5.012'
+  perl: '5.014'
 resources: {}
-version: v0.92.3
+version: v0.92.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

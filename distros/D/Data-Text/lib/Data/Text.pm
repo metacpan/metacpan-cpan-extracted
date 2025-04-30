@@ -7,7 +7,6 @@ use Carp;
 use Lingua::Conjunction;
 use Params::Get;
 use Scalar::Util;
-use String::Clean;
 use String::Util;
 
 =head1 NAME
@@ -16,11 +15,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use overload (
 	'==' => \&equal,
@@ -30,9 +29,16 @@ use overload (
 	fallback => 1	# So that boolean tests don't cause as_string to be called
 );
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Handle text in an OO way.
+C<Data::Text> provides an object-oriented interface for managing and manipulating text content in Perl.
+It wraps string operations in a class-based structure,
+enabling clean chaining of methods like appending, trimming, replacing words, and joining text with conjunctions.
+It supports flexible input types,
+including strings, arrays, and other C<Data::Text> objects,
+and overloads common operators to allow intuitive comparisons and stringification.
+
+=head1 SYNOPSIS
 
     use Data::Text;
 
@@ -161,10 +167,10 @@ sub append
 	@{$self}{'file', 'line'} = (caller(0))[1, 2];
 
 	# Process if text is a reference
-	if(ref $text) {
-		if(ref $text eq 'ARRAY') {
-			return Carp::carp(__PACKAGE__, ': no text given') unless @$text;
-			$self->append($_) for @$text;
+	if(ref($text)) {
+		if(ref($text) eq 'ARRAY') {
+			return Carp::carp(__PACKAGE__, ': no text given') unless @{$text};
+			$self->append($_) for @{$text};
 			return $self;
 		}
 		$text = $text->as_string();
@@ -181,6 +187,54 @@ sub append
 
 	# Append text
 	$self->{'text'} .= $text;
+
+	return $self;
+}
+
+=head2 uppercase
+
+Converts the text to uppercase.
+
+    $d->uppercase();
+
+=cut
+
+sub uppercase {
+	my $self = shift;
+
+	$self->{'text'} = uc($self->{'text'}) if(defined($self->{'text'}));
+
+	return $self;
+}
+
+=head2 lowercase
+
+Converts the text to lowercase.
+
+    $d->lowercase();
+
+=cut
+
+sub lowercase {
+	my $self = shift;
+
+	$self->{'text'} = lc($self->{'text'}) if(defined($self->{'text'}));
+
+	return $self;
+}
+
+=head2 clear
+
+Clears the text and resets internal state.
+
+    $d->clear();
+
+=cut
+
+sub clear {
+	my $self = shift;
+
+	delete @$self{qw(text file line)};
 
 	return $self;
 }
@@ -275,26 +329,24 @@ sub rtrim {
 	return $self;
 }
 
-=head2	replace
+=head2 replace
 
-Replaces words.
+Replaces multiple words in the text.
 
-    use Data::Text;
-
-    my $dt = Data::Text->new();
     $dt->append('Hello World');
-    $dt->replace({ 'Hello' => 'Goodbye dear' });
+    $dt->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
     print $dt->as_string(), "\n";	# Outputs "Goodbye dear world"
 
 =cut
 
 sub replace {
-	my $self = shift;
+	my ($self, $replacements) = @_;
 
-	# avoid assert failure in String::Clean
-	if($self->{'text'}) {
-		$self->{'clean'} ||= String::Clean->new();
-		$self->{'text'} = $self->{'clean'}->replace(shift, $self->{'text'}, shift);
+	if($self->{'text'} && (ref($replacements) eq 'HASH')) {
+		foreach my $search (keys %$replacements) {
+			my $replace = $replacements->{$search};
+			$self->{'text'} =~ s/\b\Q$search\E\b/$replace/g;
+		}
 	}
 
 	return $self;
@@ -330,11 +382,15 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
+There is no Unicode or UTF-8 support.
+
 =head1 SEE ALSO
 
-L<String::Clean>, L<String::Util>, L<Lingua::String>
+L<String::Util>, L<Lingua::String>
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 

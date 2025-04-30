@@ -149,9 +149,10 @@ sub send_message {
 	my $ui;
 	my $repeatsUI = 3;
 	do {
+		if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : calling ".'dump_current_screen_ui()'." for at repeat $repeatsUI ...") }
 		$ui = $self->mother->dump_current_screen_ui({'filename'=>$outfile});
 		usleep(0.75);
-	} while( ($repeatsUI-- > 0) && ! defined($ui) );
+	} while( ($repeatsUI-- > 0) && (! defined($ui)) );
 	if( ! defined $ui ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to dump the UI, call to ".'dump_current_screen_ui()'." has failed after a number of repeats. I am not sure what the problem is, most likely a race condition ..."); return undef }
 
 	$dom = $ui->{'XML::LibXML'};
@@ -267,7 +268,7 @@ Android::ElectricSheep::Automator::Plugins::Viber - Control the Viber app from y
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 WARNING
 

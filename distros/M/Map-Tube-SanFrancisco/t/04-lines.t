@@ -1,8 +1,9 @@
 #!perl
-use 5.12.0;
-use utf8;
+use 5.14.0;
 use strict;
 use warnings FATAL => 'all';
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Test::More tests => 14;
 use Map::Tube::SanFrancisco;
 
@@ -14,7 +15,7 @@ like($@, qr/\QMap::Tube::get_line_by_name(): ERROR: Invalid Line Name [XYZ]\E/, 
 {
   my $ret = $map->get_line_by_name('Blue Line');
   isa_ok( $ret,       'Map::Tube::Line' );
-  is( $ret->id( ),    'SF_BLUE',  'Line id not correct for line named Blue Line' );
+  is( $ret->id( ),    'SF_BLUE',   'Line id not correct for line named Blue Line' );
   is( $ret->name( ),  'Blue Line', 'Line name not correct for line named Blue Line' );
   is( $ret->color( ), '#009AD9',   'Color not correct for line named Blue Line' );
   my $stationref = $ret->get_stations( );
@@ -26,7 +27,7 @@ like($@, qr/\QMap::Tube::get_line_by_name(): ERROR: Invalid Line Name [XYZ]\E/, 
 {
   my $ret = $map->get_line_by_id('SF_BLUE');
   isa_ok( $ret,      'Map::Tube::Line' );
-  is( $ret->id( ),   'SF_BLUE',  'Line id not correct for line id SF_BLUE' );
+  is( $ret->id( ),   'SF_BLUE',   'Line id not correct for line id SF_BLUE' );
   is( $ret->name( ), 'Blue Line', 'Line name not correct for line id SF_BLUE' );
 }
 

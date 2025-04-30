@@ -50,7 +50,7 @@
    "provides" : {
       "JSON::Schema::Generate" : {
          "file" : "lib/JSON/Schema/Generate.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/JSON-Schema-Generate"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

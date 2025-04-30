@@ -1,7 +1,9 @@
-#!/usr/bin/perl
-
+#!perl
+use 5.14.0;
 use strict;
 use warnings FATAL => 'all';
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Map::Tube::KoelnBonn;
 use Test::More;
 plan skip_all => 'these tests are for authors only!' unless ( $ENV{AUTHOR_TESTING} ||  $ENV{RELEASE_TESTING} );

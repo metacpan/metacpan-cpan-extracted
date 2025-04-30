@@ -15,7 +15,7 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my %_properties = (
     data_uriid_attr_displayname     => {loader => \&_load_data_uriid},
@@ -25,6 +25,7 @@ my %_properties = (
     data_uriid_ise                  => {loader => \&_load_data_uriid, rawtype => 'ise'},
     data_uriid_type                 => {loader => \&_load_data_uriid, rawtype => 'ise'},
     data_uriid_result               => {loader => \&_load_data_uriid, rawtype => 'Data::URIID::Result'},
+    store_file                      => {loader => \&_load_fstore,     rawtype => 'File::FStore::File'},
 );
 
 # ----------------
@@ -61,6 +62,31 @@ sub _load_data_uriid {
     }
 }
 
+sub _load_fstore {
+    my ($self, $key, %opts) = @_;
+    my $ise;
+    my @candidates;
+
+    return if $self->{_loaded_fstore};
+    $self->{_loaded_fstore} = 1;
+
+    $ise    = $self->get('data_uriid_ise', default => undef);
+
+    return unless defined $ise;;
+
+    foreach my $store ($self->instance->store(as => 'File::FStore')) {
+        push(@candidates, $store->query(ise => $ise));
+    }
+
+    if (scalar(@candidates)) {
+        my $pv_current = ($self->{properties_values} //= {})->{current} //= {};
+        my $pv_final   = ($self->{properties_values} //= {})->{final} //= {};
+
+        $pv_current->{store_file} = [map {{raw => $_}} @candidates];
+        $pv_final->{store_file} = [map {{raw => $_}} @candidates];
+    }
+}
+
 1;
 
 __END__
@@ -75,7 +101,7 @@ File::Information::Remote - generic module for extracting information from files
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

@@ -14,6 +14,7 @@ t/eol.t
 t/flatten.t
 t/logger.t
 t/manifest.t
+t/perl.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-snippets.t

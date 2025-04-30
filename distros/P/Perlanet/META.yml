@@ -29,7 +29,7 @@ name: Perlanet
 provides:
   Perlanet:
     file: lib/Perlanet.pm
-    version: v3.3.2
+    version: v3.3.3
   Perlanet::Entry:
     file: lib/Perlanet/Entry.pm
   Perlanet::Feed:
@@ -67,6 +67,7 @@ requires:
   Encode: '0'
   HTML::Scrubber: '0'
   HTML::T5: '0'
+  LWP::Protocol::https: '0'
   List::Util: '0'
   Moose: '0'
   MooseX::ConfigFromFile: '0'
@@ -82,5 +83,5 @@ resources:
   homepage: http://perlanet.mag-sol.com/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg-cpan/perlanet.git
-version: v3.3.2
+version: v3.3.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

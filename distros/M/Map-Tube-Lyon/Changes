@@ -1,5 +1,11 @@
 Revision history for Perl extension Map::Tube::Lyon.
 
+0.62.3 2025-04-30
+  - Require Map::Tube 4.09.
+  - Require Perl 5.14 (in accordance with Map::Tube 4.09).
+  - Remove -T from shebangs in tests (in accordance with Map::Tube 4.09).
+  - Facilitate Unicode output in tests in case of failures.
+
 0.62.3 2025-04-17
   - Fix typo in station name.
   - Added one station.

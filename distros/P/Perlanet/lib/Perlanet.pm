@@ -4,8 +4,7 @@ use 5.34.0;
 use strict;
 use warnings;
 
-use feature 'try';
-no warnings 'experimental::try';
+use experimental 'try';
 
 use Moose;
 use namespace::autoclean;
@@ -19,7 +18,7 @@ use XML::Feed;
 
 use Perlanet::Types;
 
-our $VERSION = '3.3.2';
+our $VERSION = '3.3.3';
 
 with 'MooseX::Traits';
 
@@ -187,20 +186,35 @@ collect data from.
 
 =head1 METHODS
 
-=head2 fetch_page
+=head2 fetch_feed
 
-Attempt to fetch a web page and a returns a L<URI::Fetch::Response> object.
+Attempt to fetch a web feed. Returns the response object
+(or "undef").
 
 =cut
 
-sub fetch_page {
+sub fetch_feed {
   my $self = shift;
   my ($url) = @_;
-  return URI::Fetch->fetch(
+
+  my $response = URI::Fetch->fetch(
     $url,
     UserAgent     => $self->ua,
     ForceResponse => 1,
   );
+
+  if ($response->is_error) {
+    warn "Error retrieving $url\n";
+    warn $response->http_response->status_line, "\n";
+    return;
+  }
+
+  unless (length $response->content) {
+    warn "No data returned from $url\n";
+    return;
+  }
+
+  return $response;
 }
 
 =head2 fetch_feeds
@@ -223,20 +237,8 @@ sub fetch_feeds {
   for my $feed (@$feeds) {
     next unless $feed->feed;
 
-    my $response = $self->fetch_page($feed->feed);
-
-    if ($response->is_error) {
-      warn 'Error retrieving ' . $feed->feed, "\n";
-      warn $response->http_response->status_line, "\n";
-      next;
-    }
-
-    unless (length $response->content) {
-      warn 'No data returned from ' . $feed->feed, "\n";
-      next;
-    }
-
     try {
+      my $response = $self->fetch_feed($feed->feed);
       my $data = $response->content;
 
       die 'No data from ' . $feed->feed . "\n" unless $data;
@@ -278,47 +280,75 @@ sub select_entries {
   my $self = shift;
   my ($feeds) = @_;
 
-
-  my $date_zero = DateTime->from_epoch(epoch => 0);
-
   my @feed_entries;
   for my $feed (@$feeds) {
-    my @entries = grep { ! $self->is_spam_entry($_) } $feed->_xml_feed->entries;
-
-    for (@entries) {
-      # "Fix" entries with no dates
-      unless ($_->issued or $_->modified) {
-        $_->issued($date_zero);
-        $_->modified($date_zero);
-      }
-
-      # Problem with XML::Feed's conversion of RSS to Atom
-      if ($_->issued && ! $_->modified) {
-        $_->modified($_->issued);
-      }
-    }
-
-    @entries = $self->sort_entries(\@entries)->@*;
-    @entries = $self->cutoff_entries(\@entries)->@*;
-
-    my $number_of_entries =
-      defined $feed->max_entries ? $feed->max_entries
-                                 : $self->entries_per_feed;
-
-    if ($number_of_entries and @entries > $number_of_entries) {
-      $#entries = $number_of_entries - 1;
-    }
-
-    for (@entries) {
+    for ($self->select_feed_entries($feed)->@*) {
       push @feed_entries,
         Perlanet::Entry->new(
           _entry => $_,
-          feed => $feed
+          feed   => $feed,
         );
     }
   }
 
   return \@feed_entries;
+}
+
+=head2 select_feed_entries
+
+Called by L</select_entries> and passed one of the feeds from
+L</fetch_feeds>.
+
+Returns a list of the required entries from that feed.
+
+=cut
+
+sub select_feed_entries {
+  my $self   = shift;
+  my ($feed) = @_;
+
+  my @entries = grep { ! $self->is_spam_entry($_) } $feed->_xml_feed->entries;
+
+  $self->fixup_entry($_) for @entries;
+
+  @entries = $self->sort_entries(\@entries)->@*;
+  @entries = $self->cutoff_entries(\@entries)->@*;
+
+  my $number_of_entries =
+    defined $feed->max_entries ? $feed->max_entries
+                               : $self->entries_per_feed;
+
+  if ($number_of_entries and @entries > $number_of_entries) {
+    $#entries = $number_of_entries - 1;
+  }
+
+  return \@entries;
+}
+
+=head2 fixup_entry
+
+Apply a couple of standard fix-ups to a feed entry.
+
+=cut
+
+sub fixup_entry {
+  my $self    = shift;
+  my ($entry) = @_;
+
+  state $date_zero = DateTime->from_epoch(epoch => 0);
+
+  # "Fix" entries with no dates
+  unless ($entry->issued or $entry->modified) {
+    $entry->issued($date_zero);
+    $entry->modified($date_zero);
+  }
+
+  # Problem with XML::Feed's conversion of RSS to Atom
+  if ($entry->issued && ! $entry->modified) {
+    $entry->modified($_->issued);
+  }
+
+  return $entry;
 }
 
 =head2 is_spam_entry
@@ -340,9 +370,12 @@ sub is_spam_entry {
 
   my $re = $self->spam_regex;
   my $title   = $entry->title;
-  my $content = $entry->content;
+  my $content = $entry->content->{body} // $entry->summary->{body};
 
   return 1 if $title   =~ /$re/;
+
+  return unless defined $content;
+
   return 1 if $content =~ /$re/;
 
   return;
@@ -367,22 +400,26 @@ sub sort_entries {
   my @entries;
 
   if ($self->entry_sort_order eq 'modified') {
-    @entries = sort {
-      ($b->modified || $b->issued)
-          <=>
-      ($a->modified || $a->issued)
-    } @$entries;
+    @entries = sort _sort_by_modified $entries->@*;
   } elsif ($self->entry_sort_order eq 'issued') {
-    @entries = sort {
-      ($b->issued || $b->modified)
-          <=>
-      ($a->issued || $a->modified)
-    } @$entries;
+    @entries = sort _sort_by_issued $entries->@*;
   } else {
     die 'Invalid entry sort order: ' . $self->entry_sort_order;
   }
 
   return \@entries;
+}
+
+sub _sort_by_modified ($$) {
+  ($_[1]->modified || $_[1]->issued)
+    <=>
+  ($_[0]->modified || $_[0]->issued)
+}
+
+sub _sort_by_issued ($$) {
+  ($_[1]->issued || $_[1]->modified)
+    <=>
+  ($_[0]->issued || $_[0]->modified)
 }
 
 =head2 cutoff_entries

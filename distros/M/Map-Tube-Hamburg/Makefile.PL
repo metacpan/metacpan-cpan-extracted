@@ -18,7 +18,7 @@ WriteMakefile(
     ABSTRACT_FROM      => $mod_file,
     LICENSE            => 'artistic_2',
     PL_FILES           => { },
-	MIN_PERL_VERSION   => 5.012,
+	MIN_PERL_VERSION   => 5.014,
     CONFIGURE_REQUIRES => {
                             'ExtUtils::MakeMaker'     => 6.64,
                             'File::ShareDir::Install' => 0,
@@ -30,7 +30,7 @@ WriteMakefile(
                             'Moo'              => 0,
                             'namespace::clean' => 0,
                             'File::Share'      => 0,
-							'Map::Tube'        => 3.94,
+							'Map::Tube'        => 4.09,
                           },
 	( MM->can('signature_target') ? ( SIGN => 1 ) : ( ) ),
     dist               => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

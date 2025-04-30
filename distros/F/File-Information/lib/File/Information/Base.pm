@@ -17,15 +17,40 @@ use Scalar::Util qw(blessed);
 use Data::Identifier v0.08;
 
 use constant { # Taken from Data::Identifier
-    RE_UUID     => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
-    RE_OID      => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
-    RE_URI      => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+/,
+    RE_UUID                         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
+    RE_OID                          => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
+    RE_URI                          => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+/,
 
-    WK_WM_NONE  => '7b177183-083c-4387-abd3-8793eb647373',
-    WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
+    WK_WM_RANDOM_ACCESS             => '4dc9fd07-7ef3-4215-8874-31d78ed55c22',
+    WK_WM_READ_ONLY                 => '3877b2ef-6c77-423f-b15f-76508fbd48ed',
+    WK_WM_NONE                      => '7b177183-083c-4387-abd3-8793eb647373',
+    WK_FINAL                        => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
+    WK_ALSO_HAS_ROLE                => 'd2750351-aed7-4ade-aa80-c32436cc6030',
+    WK_SPECIFIC_PROTO_FILE_STATE    => '63da70a8-78a4-51b0-8b87-86872b474a5d',
+    WK_FINAL_FILE_ENCODING          => '448c50a8-c847-4bc7-856e-0db5fea8f23b',
+    WK_FINAL_FILE_SIZE              => '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d',
+    WK_FINAL_FILE_HASH              => '79385945-0963-44aa-880a-bca4a42e9002',
+    WK_FETCH_FILE_URI               => '96674c6c-cf5e-40cd-af1e-63b86e741f4f',
+    WK_PROTO_FILE                   => '52a516d0-25d8-47c7-a6ba-80983e576c54',
+    WK_TAGPOOL_FILE                 => '4e4bbe45-f783-442d-8804-ac729f5cdec5',
+    WK_ALSO_HAS_STATE               => '4c426c3c-900e-4350-8443-e2149869fbc9',
+    WK_HAS_FINAL_STATE              => '54d30193-2000-4d8a-8c28-3fa5af4cad6b',
+    WK_SEE_ALSO                     => 'a75f9010-9db3-4d78-bd78-0dd528d6b55d',
+    WK_ALSO_SHARES_IDENTIFIER       => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633',
+    WK_TAGNAME                      => 'bfae7574-3dae-425d-89b1-9c087c140c23',
+
+    WK_NEEDSTAGGING                 => '92292a4e-b060-417e-a90c-a270331259e9',
+
+    WK_TAGPOOL_TITLE                => '361fda18-50ce-4421-b378-881179b0318a',
+    WK_TAGPOOL_DESCRIPTION          => 'ca33b058-b4ce-4059-9f0b-61ca0fd39c35',
+    WK_TAGPOOL_COMMENT              => '06706809-207b-4287-9775-6efa07f807dd',
+    WK_TAGPOOL_TAGGED_AS            => '703cbb5d-eb4a-4718-9e60-adbef6f71869',
+
+    WK_FILESYSTEM                   => '63c1da19-0dd6-4181-b3fa-742b9ceb2903',
+    WK_TAGPOOL_POOL                 => '1f30649d-eb55-48cb-93d7-6d6fcba23909',
 };
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -45,6 +70,8 @@ our %_digest_info_extra = (
     'sha-2-256' => {rfc9530 => 'sha-256'},
     'sha-2-512' => {rfc9530 => 'sha-512'},
 );
+
+my %_important_digests = map {$_ => 1} qw(sha-1-160 sha-3-512);
 
 our %_mediatypes = ( # Copied from tags-universal
     'application/gzip'                                          => 'a8bb3d20-e983-5060-8c63-95b35e9ca56a',
@@ -110,25 +137,31 @@ my %_known_digest_algos = map {$_ => undef} (
 my %_ise_keys = map {$_ => 1} qw(ise uuid oid uri);
 my %_data_identifier_keys = map {$_ => 1} keys %_ise_keys;
 
-my %_properties = (
-    uuid        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) uuid(db_inode_tag) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
-    oid         => {loader => \&_load_aggregate, sources => [qw(::Inode oid(xattr_utag_ise) oid(db_inode_tag))], rawtype => 'oid'},
-    uri         => {loader => \&_load_aggregate, sources => [qw(::Inode uri(xattr_utag_ise) uri(db_inode_tag))], rawtype => 'uri'},
-    ise         => {loader => \&_load_aggregate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise ::Base data_uriid_ise)], rawtype => 'ise'},
-    inodeise    => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag xattr_utag_ise db_inode_tag)], rawtype => 'ise'},
-    contentise  => {loader => \&_load_aggregate, sources => [qw(::Inode content_sha_1_160_sha_3_512_uuid content_sha_3_512_uuid)], rawtype => 'ise'},
+my %_tagpool_relations = (
+    tagpool_file_title          => WK_TAGPOOL_TITLE,
+    tagpool_file_comment        => WK_TAGPOOL_COMMENT,
+    tagpool_file_description    => WK_TAGPOOL_DESCRIPTION,
+);
 
-    size        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size xattr_utag_final_file_hash_size st_size ::Base data_tagdb_size)]},
+my %_properties = (
+    uuid        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) uuid(store_inodeise) uuid(db_inode_tag) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
+    oid         => {loader => \&_load_aggregate, sources => [qw(::Inode oid(xattr_utag_ise) oid(store_inodeise) oid(db_inode_tag))], rawtype => 'oid'},
+    uri         => {loader => \&_load_aggregate, sources => [qw(::Inode uri(xattr_utag_ise) uri(store_inodeise) uri(db_inode_tag))], rawtype => 'uri'},
+    ise         => {loader => \&_load_aggregate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise ::Base data_uriid_ise store_inodeise)], rawtype => 'ise'},
+    inodeise    => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag xattr_utag_ise store_inodeise db_inode_tag)], rawtype => 'ise'},
+    contentise  => {loader => \&_load_aggregate, sources => [qw(::Inode content_sha_1_160_sha_3_512_uuid content_sha_3_512_uuid store_contentise)], rawtype => 'ise'},
+
+    size        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size xattr_utag_final_file_hash_size st_size ::Base store_size data_tagdb_size)]},
     title       => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_title        tagpool_directory_title         xattr_dublincore_title dotcomments_caption ::Deep pdf_info_title odf_info_title audio_scan_title)]},
     comment     => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_comment      tagpool_directory_comment       xattr_xdg_comment      dotcomments_note)]},
     description => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_description  tagpool_directory_description   xattr_dublincore_description)]},
     displayname => {loader => \&_load_aggregate, sources => [qw(:self   title link_basename_clean dev_disk_by_label dev_mapper_name dev_name data_uriid_attr_displayname)]},
-    mediatype   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype ::Base data_uriid_attr_media_subtype data_tagdb_encoding)], rawtype => 'mediatype'},
-    writemode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_write_mode xattr_utag_write_mode)], rawtype => 'ise'},
+    mediatype   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype ::Base data_uriid_attr_media_subtype store_mediasubtype data_tagdb_encoding)], rawtype => 'mediatype'},
+    writemode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_write_mode xattr_utag_write_mode ::Base store_writemode)], rawtype => 'ise'},
     pages       => {loader => \&_load_aggregate, sources => [qw(::Deep pdf_pages odf_stats_meta_page_count)]},
 
     thumbnail   => {loader => \&_load_aggregate, sources => [qw(::Link link_thumbnail ::Inode tagpool_file_thumbnail)], rawtype => 'filename'},
-    finalmode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_finalmode xattr_utag_final_mode)], rawtype => 'ise'},
+    finalmode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_finalmode xattr_utag_final_mode ::Base store_finalmode)], rawtype => 'ise'},
     hidden      => {loader => \&_load_aggregate, sources => [qw(::Link link_dotfile ::Inode ntfs_file_attribute_hidden)], rawtype => 'bool', towards => 1},
     system      => {loader => \&_load_aggregate, sources => [qw(::Inode ntfs_file_attribute_system)], rawtype => 'bool', towards => 1},
     readonly    => {loader => \&_load_readonly, rawtype => 'bool'},
@@ -146,6 +179,15 @@ my %_properties = (
     data_tagdb_fetch_uri    => {loader => \&_load_data_tagdb, rawtype => 'uri'},
     data_tagdb_encoding     => {loader => \&_load_data_tagdb, rawtype => 'Data::TagDB::Tag'},
     data_tagdb_charset      => {loader => \&_load_data_tagdb, rawtype => 'Data::TagDB::Tag'},
+
+    store_size              => {loader => \&_load_fstore},
+    store_inode             => {loader => \&_load_fstore},
+    store_mediasubtype      => {loader => \&_load_fstore, rawtype => 'mediatype'},
+    store_contentise        => {loader => \&_load_fstore, rawtype => 'ise'},
+    store_inodeise          => {loader => \&_load_fstore, rawtype => 'ise'},
+    store_final             => {loader => \&_load_fstore, rawtype => 'bool'},
+    store_finalmode         => {loader => \&_load_fstore, rawtype => 'ise'},
+    store_writemode         => {loader => \&_load_fstore, rawtype => 'ise'},
 );
 
 my @_digest_preload_properties = qw(xattr_utag_final_file_hash xattr_utag_final_file_size tagpool_file_size);
@@ -246,6 +288,9 @@ sub get {
         } elsif ($rawtype eq 'unixts' && $as eq 'DateTime') {
             require DateTime;
             $res = DateTime->from_epoch(epoch => $raw, time_zone => 'UTC');
+        } elsif ($rawtype eq 'unixts' && $as eq 'Data::Identifier') {
+            require Data::Identifier::Generate;
+            $res = Data::Identifier::Generate->date($raw);
         } elsif ($rawtype eq 'ise' && defined(my $re = $_ise_re{$as})) {
             $res = $raw if $raw =~ $re;
         } elsif ($_data_identifier_keys{$rawtype} && $as eq 'Data::Identifier') {
@@ -462,6 +507,134 @@ sub verify {
 }
 
 
+sub link_stream {
+    my ($self, $cb, %opts) = @_;
+    my File::Information $instance = $self->instance;
+    my $extractor = eval {$self->extractor};
+    my @subobjects = map {lc s/^File::Information:://r} ref($opts{subobjects}) eq 'ARRAY' ? @{$opts{subobjects}} : ($opts{subobjects} // ref($self));
+    my $inode = $self->isa('File::Information::Inode') ? $self : eval {$self->inode};
+    my @lifecycle;
+    my %contentise;
+    my @cleanup = (
+        WK_NEEDSTAGGING,
+        WK_FINAL,
+        WK_WM_RANDOM_ACCESS, WK_WM_READ_ONLY, WK_WM_NONE,
+    );
+
+    if (ref($opts{lifecycle}) eq 'ARRAY') {
+        @lifecycle = @{$opts{lifecycle}};
+    } elsif (defined $opts{lifecycle}) {
+        @lifecycle = ($opts{lifecycle});
+    } else {
+        @lifecycle = $instance->lifecycles;
+    }
+
+    foreach my $subobject (@subobjects) {
+        my $base = $self->isa('File::Information::'.ucfirst($subobject)) ? $self : undef;
+
+        foreach my $lifecycle (@lifecycle) {
+            if ($subobject eq 'inode') {
+                $base //= $self->inode;
+
+                if (defined(my $contentise = $base->get('contentise', default => undef, as => 'Data::Identifier', lifecycle => $lifecycle))) {
+                    $contentise{$lifecycle} = $contentise;
+
+                    $cb->('tag-ise', [$contentise]);
+                    $cb->('tag-relation', {tag => $contentise, relation => _to_di(WK_ALSO_HAS_ROLE), related => _to_di(WK_SPECIFIC_PROTO_FILE_STATE)});
+
+                    if (defined(my $mediatype = $base->get('mediatype', default => undef, as => 'Data::Identifier', lifecycle => $lifecycle))) {
+                        $cb->('tag-relation', {tag => $contentise, relation => _to_di(WK_FINAL_FILE_ENCODING), related => $mediatype});
+                        push(@cleanup, $mediatype);
+                    }
+
+                    if (defined(my $size = $base->get('size', default => undef, lifecycle => $lifecycle))) {
+                        $cb->('tag-metadata', {tag => $contentise, relation => _to_di(WK_FINAL_FILE_SIZE), data => $size});
+                    }
+
+                    foreach my $algo (map {$_->{name}} $instance->digest_info) {
+                        my $hash = $base->digest($algo, as => 'utag', default => undef, lifecycle => $lifecycle, no_defaults => !$_important_digests{$algo}) // next;
+                        $cb->('tag-metadata', {tag => $contentise, relation => _to_di(WK_FINAL_FILE_HASH), data => $hash});
+                    }
+
+                    if (defined(my $size = $base->get('fetchurl', default => undef, lifecycle => $lifecycle))) {
+                        $cb->('tag-metadata', {tag => $contentise, relation => _to_di(WK_FETCH_FILE_URI), data => $size});
+                    }
+
+                }
+
+                if (defined(my $tagpoolise = $base->get('tagpool_file_uuid', as => 'Data::Identifier', default => undef, lifecycle => $lifecycle))) {
+                    my %tags = map {$_->ise => $_} $base->get('tagpool_file_tags', as => 'Data::Identifier', list => 1, default => [], lifecycle => $lifecycle);
+                    my %states;
+
+                    $cb->('tag-ise', [$tagpoolise]);
+
+                    $cb->('tag-relation', {tag => $tagpoolise, relation => _to_di(WK_ALSO_HAS_ROLE), related => _to_di(WK_PROTO_FILE)});
+                    $cb->('tag-relation', {tag => $tagpoolise, relation => _to_di(WK_ALSO_HAS_ROLE), related => _to_di(WK_TAGPOOL_FILE)});
+
+                    foreach my $l ('final', @lifecycle) {
+                        my $contentise = $contentise{$l} // next;
+                        my $relation = $l eq 'final' ? WK_HAS_FINAL_STATE : WK_ALSO_HAS_STATE;
+
+                        # skip duplicates.
+                        next if $states{$contentise->ise};
+                        $states{$contentise->ise} = 1;
+
+                        $cb->('tag-relation', {tag => $tagpoolise, relation => _to_di($relation), related => $contentise});
+                    }
+
+                    foreach my $key (keys %_tagpool_relations) {
+                        if (defined(my $value = $base->get($key, default => undef, lifecycle => $lifecycle))) {
+                            $cb->('tag-metadata', {tag => $tagpoolise, relation => _to_di($_tagpool_relations{$key}), data => $value});
+                        }
+                    }
+
+                    if (defined(my $description_url = $base->get('tagpool_file_original_description_url', default => undef, lifecycle => $lifecycle))) {
+                        if (defined(my $result = eval { $extractor->lookup(qrcode => $description_url)->as('Data::Identifier') })) {
+                            $cb->('tag-relation', {tag => $tagpoolise, relation => _to_di(WK_SEE_ALSO), related => $result});
+                        }
+                    }
+
+                    # Clean up tags:
+                    foreach my $tag (@cleanup) {
+                        if (ref $tag) {
+                            delete $tags{$tag->ise};
+                        } else {
+                            delete $tags{$tag};
+                        }
+                    }
+
+                    foreach my $related (values %tags) {
+                        $cb->('tag-relation', {tag => $tagpoolise, relation => _to_di(WK_TAGPOOL_TAGGED_AS), related => $related});
+                    }
+                }
+            } elsif ($subobject eq 'filesystem') {
+                $base //= $self->filesystem;
+
+                if (defined(my $ise = $base->get('ise', default => undef, as => 'Data::Identifier', lifecycle => $lifecycle))) {
+                    $cb->('tag-ise', [$ise]);
+                    $cb->('tag-relation', {tag => $ise, relation => _to_di(WK_ALSO_HAS_ROLE), related => _to_di(WK_FILESYSTEM)});
+
+                    if (defined(my $label = $base->get('dev_disk_by_label', default => undef, lifecycle => $lifecycle))) {
+                        $cb->('tag-metadata', {tag => $ise, relation => _to_di(WK_ALSO_SHARES_IDENTIFIER), type => _to_di(WK_TAGNAME), data => $label});
+                    }
+                }
+            } elsif ($subobject eq 'tagpool') {
+                foreach my $tagpool ($base ? ($base) : $self->tagpool) {
+                    if (defined(my $ise = $tagpool->get('ise', default => undef, as => 'Data::Identifier', lifecycle => $lifecycle))) {
+                        $cb->('tag-ise', [$ise]);
+                        $cb->('tag-relation', {tag => $ise, relation => _to_di(WK_ALSO_HAS_ROLE), related => _to_di(WK_TAGPOOL_POOL)});
+                    }
+                }
+            } else {
+                if (defined(my $ise = $base->get('ise', default => undef, as => 'Data::Identifier', lifecycle => $lifecycle))) {
+                    $cb->('tag-ise', [$ise]);
+                }
+            }
+        }
+    }
+}
+
+
 sub uuid            { return $_[0]->get('uuid',             @_[1..$#_]); }
 sub oid             { return $_[0]->get('oid',              @_[1..$#_]); }
 sub uri             { return $_[0]->get('uri',              @_[1..$#_]); }
@@ -477,6 +650,22 @@ sub description     { return $_[0]->get('description',      @_[1..$#_]); }
 sub instance {
     my ($self) = @_;
     return $self->{instance};
+}
+
+
+sub store {
+    my ($self, %opts) = @_;
+    my $as = delete $opts{as};
+    my %stores; # simple deduplication.
+
+    croak 'Invalid as parameter' unless ($as // '') eq 'File::FStore';
+    croak 'Stray options passed' if scalar keys %opts;
+
+    foreach my $store ($self->get('store_file', list => 1, default => [])) {
+        $stores{$store} = $store;
+    }
+
+    return values %stores;
 }
 
 
@@ -505,6 +694,13 @@ sub editor {
 }
 
 # ----------------
+sub _to_di {
+    my ($uuid) = @_;
+    state $cache = {};
+
+    return $cache->{$uuid} //= Data::Identifier->new(uuid => $uuid);
+}
+
 sub _set_digest_utag {
     my ($self, $lifecycle, $v, $given_size) = @_;
     my %digest;
@@ -717,6 +913,59 @@ sub _load_data_tagdb {
     }
 }
 
+sub _load_fstore {
+    my ($self, $key, %opts) = @_;
+
+    return if $self->{_loaded_fstore_base};
+    $self->{_loaded_fstore_base} = 1;
+
+    {
+        my $pv_current   = ($self->{properties_values} //= {})->{current} //= {};
+        my $pv_final     = ($self->{properties_values} //= {})->{final} //= {};
+        my $digest_final = $self->{digest}{final} //= {};
+
+        foreach my $candidate ($self->get('store_file', list => 1, default => [])) {
+            my $properties = $candidate->get('properties');
+            my $digests    = $candidate->get('digests');
+
+            push(@{$pv_final->{store_size} //=[]}, {raw => $properties->{size}}) if defined $properties->{size};
+            push(@{$pv_final->{store_inode} //=[]}, {raw => $properties->{inode}}) if defined $properties->{inode};
+            push(@{$pv_final->{store_mediasubtype} //=[]}, {raw => $properties->{mediasubtype}}) if defined $properties->{mediasubtype};
+            push(@{$pv_final->{store_contentise} //=[]}, {raw => $properties->{contentise}}) if defined $properties->{contentise};
+            push(@{$pv_final->{store_inodeise} //=[]}, {raw => $properties->{inodeise}}) if defined $properties->{inodeise};
+
+            push(@{$pv_final->{store_final} //=[]}, {raw => 1});
+
+            foreach my $algo (keys %{$digests}) {
+                $digest_final->{$algo} = $digests->{$algo};
+            }
+        }
+
+        foreach my $key (qw(store_size store_inode store_mediasubtype store_contentise store_inodeise store_final store_finalmode store_writemode)) {
+            if (defined(my $v = $pv_final->{$key})) {
+                if (scalar(@{$v}) > 1) {
+                    my %values = map {$_->{raw} => $_->{raw}} @{$v};
+                    $v = [map {{raw => $_}} values %values];
+                }
+
+                if (scalar(@{$v}) == 1) {
+                    $v = $v->[0];
+                    $pv_final->{$key} = $v;
+                }
+            }
+        }
+
+        if (defined($pv_final->{store_final}) && $pv_final->{store_final}{raw}) {
+            $pv_final->{store_finalmode} = {raw => WK_FINAL};
+            $pv_final->{store_writemode} = {raw => WK_WM_NONE};
+        }
+
+        foreach my $key (qw(store_final store_finalmode store_writemode)) {
+            $pv_current->{$key} = $pv_final->{$key};
+        }
+    }
+}
+
 1;
 
 __END__
@@ -731,7 +980,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 
@@ -804,6 +1053,8 @@ The following keys for B<aggregated values> are supported:
 
 =item C<boring>
 
+(since v0.08)
+
 Whether the file is boring or not.
 A boring file is a file a user normally don't want to interact with.
 Such files include very small files, generated files (such as thumbnails, or object files)
@@ -866,6 +1117,8 @@ The media type of the document.
 The OID of the document.
 
 =item C<pages>
+
+(since v0.06)
 
 The number of pages in the document.
 
@@ -1020,6 +1273,37 @@ This is an experimental option.
 
 =back
 
+=head2 link_stream
+
+    $base->link_stream($cb, %opts);
+
+(since v0.09)
+
+Transforms the object into a stream of singe links.
+
+For each link the callback C<$cb> is called.
+The type of the link is passed as first parameter, the data of the link as second parameter.
+
+B<Note:>
+This is a B<highly experimental> method. It may be removed or changed at any version.
+
+The following options are supported:
+
+=over
+
+=item C<lifecycle>
+
+The lifecycle this method should use.
+In contrast to other methods this can take a single value or a list (as arrayref).
+
+=item C<subobjects>
+
+The subobjects to export data from.
+This is a single value or an arrayref with the package names of the subobjects to take into account.
+Defaults to only the current object.
+
+=back
+
 =head2 uuid, oid, uri, ise, displayname, displaycolour, icontext, description
 
     my $uuid          = $obj->uuid;
@@ -1046,6 +1330,20 @@ There availability depends on the type of object.
     my File::Information $instance = $obj->instance;
 
 Returns the instance that was used to create this object.
+
+=head2 store
+
+    my @store = $base->store(as => 'File::FStore');
+
+(since v0.09)
+
+Returns the list of file stores C<$base> is in if any (see L<File::FStore>).
+
+B<Note:>
+There is no order to the returned values. The order may change between any two calls.
+
+B<Note:>
+Currently the C<as> option must be set to C<File::FStore>. No other values nor options are supported.
 
 =head2 extractor, db
 

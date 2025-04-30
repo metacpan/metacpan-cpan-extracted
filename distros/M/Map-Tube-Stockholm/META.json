@@ -34,10 +34,10 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "4.04",
+            "Map::Tube" : "4.09",
             "Moo" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.012"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Map::Tube::Stockholm" : {
          "file" : "lib/Map/Tube/Stockholm.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.1.3"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "mailto" : "bug-Map-Tube-Stockholm@rt.cpan.org"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

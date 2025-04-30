@@ -11,7 +11,7 @@ use Path::Class qw(dir file);
 use URI::db;
 use namespace::autoclean;
 
-our $VERSION = 'v1.5.1'; # VERSION
+our $VERSION = 'v1.5.2'; # VERSION
 
 has name => (
     is       => 'ro',
@@ -194,6 +194,9 @@ for my $script (qw(deploy revert verify)) {
             my $self = shift;
             if ( my $dir = $self->_fetch("reworked_$script\_dir") ) {
                 return dir $dir;
+            }
+            if ( my $dir = $self->_fetch("$script\_dir") ) {
+                return $self->reworked_dir->subdir($dir)->cleanup;
             }
             $self->reworked_dir->subdir($script)->cleanup;
         },

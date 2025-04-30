@@ -1,0 +1,1110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Paris Métro, RER, Transilien and Tram">
+  <lines>
+    <!-- check foot25, foot27, foot28, foot29 -->
+    <!-- Metro -->
+    <line id="P_1" name="1" color="#FFBE00"/>
+    <line id="P_10" name="10" color="#DC9600"/>
+    <line id="P_11" name="11" color="#6E491E"/>
+    <line id="P_12" name="12" color="#00643C"/>
+    <line id="P_13" name="13" color="#82C8E6"/>
+    <line id="P_14" name="14" color="#640082"/>
+    <!-- Metro -->
+    <line id="P_2" name="2" color="#0055C8"/>
+    <!-- Metro -->
+    <line id="P_3" name="3" color="#6E6E00"/>
+    <!-- Metro -->
+    <line id="P_31" name="3 bis" color="#82C8E6"/>
+    <!-- Metro -->
+    <line id="P_4" name="4" color="#A0006E"/>
+    <!-- Metro -->
+    <line id="P_5" name="5" color="#FF5A00"/>
+    <!-- Metro -->
+    <line id="P_6" name="6" color="#82DC73"/>
+    <line id="P_7" name="7" color="#FF82B4"/>
+    <line id="P_71" name="7 bis" color="#82DC73"/>
+    <line id="P_8" name="8" color="#D282BE"/>
+    <line id="P_9" name="9" color="#D2D200"/>
+    <!-- RER -->
+    <line id="P_A" name="A" color="#FF1400"/>
+    <!-- RER -->
+    <line id="P_B" name="B" color="#3C91DC"/>
+    <!-- RER -->
+    <line id="P_C" name="C" color="#FFBE00"/>
+    <!-- Metro -->
+    <line id="P_CDGVAL" name="CDGVal" color="#FFCD0D"/>
+    <!-- RER -->
+    <line id="P_D" name="D" color="#00643C"/>
+    <!-- RER -->
+    <line id="P_E" name="E" color="#A0006E"/>
+    <!-- Funicular -->
+    <line id="P_FUNICU" name="Funiculaire de Montmartre" color="#662D91"/>
+    <!-- Transilien -->
+    <line id="P_H" name="H" color="#6E491E"/>
+    <!-- Transilien -->
+    <line id="P_J" name="J" color="#D2D200"/>
+    <!-- Transilien -->
+    <line id="P_K" name="K" color="#6E6E00"/>
+    <!-- Transilien -->
+    <line id="P_L" name="L" color="#D282BE"/>
+    <!-- Transilien -->
+    <line id="P_N" name="N" color="#00A092"/>
+    <!-- Metro -->
+    <!-- :15:#XXXXXX -->
+    <!-- Partial opening expected: end of 2025; rest to follow until 2030s -->
+    <line id="P_ORLYVA" name="OrlyVal" color="#FFCD0D"/>
+    <!-- Transilien -->
+    <line id="P_P" name="P" color="#FF5A00"/>
+    <!-- Transilien -->
+    <line id="P_R" name="R" color="#FF82B4"/>
+    <!-- Tram -->
+    <line id="P_T1" name="T1" color="#0055C8"/>
+    <!-- Tram -->
+    <line id="P_T10" name="T10" color="#6E6E00"/>
+    <!-- Tram -->
+    <line id="P_T11" name="T11" color="#FF5A00"/>
+    <!-- Tram -->
+    <line id="P_T12" name="T12" color="#A50034"/>
+    <!-- Tram -->
+    <line id="P_T13" name="T13" color="#6E491E"/>
+    <!-- Tram -->
+    <line id="P_T14" name="T14" color="#00A092"/>
+    <!-- Tram -->
+    <line id="P_T2" name="T2" color="#A0006E"/>
+    <!-- Tram -->
+    <line id="P_T3A" name="T3a" color="#FF5A00"/>
+    <!-- Tram -->
+    <line id="P_T3B" name="T3b" color="#00643C"/>
+    <!-- Tram -->
+    <line id="P_T4" name="T4" color="#DC9600"/>
+    <!-- Tram -->
+    <line id="P_T5" name="T5" color="#640082"/>
+    <!-- Tram -->
+    <line id="P_T6" name="T6" color="#FF0000"/>
+    <!-- Tram -->
+    <line id="P_T7" name="T7" color="#6E491E"/>
+    <!-- Tram -->
+    <line id="P_T8" name="T8" color="#6E6E00"/>
+    <!-- Tram -->
+    <line id="P_T9" name="T9" color="#3C91DC"/>
+    <!-- Transilien -->
+    <line id="P_U" name="U" color="#A50034"/>
+    <!-- Transilien -->
+    <line id="P_V" name="V" color="#6E6E00"/>
+  </lines>
+  <stations>
+    <!-- 1 -->
+    <station id="p_101" name="La Défense" line="P_1:1,P_A:18,P_E:2,P_L:19,P_T2:8,P_U:1" link="p_102,p_106,p_a17,p_c15,p_e01,p_l18,p_t207,p_t209"/>
+    <station id="p_102" name="Esplanade de La Défense" line="P_1:2" link="p_101,p_103"/>
+    <station id="p_103" name="Pont de Neuilly" line="P_1:3" link="p_102,p_104"/>
+    <station id="p_104" name="Porte Maillot" line="P_1:4,P_T3B:31" link="p_103,p_105,p_t3b30,p_t3b32" other_link="foot01:p_c15"/>
+    <station id="p_105" name="Argentine" line="P_1:5" link="p_104,p_106"/>
+    <station id="p_106" name="Charles de Gaulle - Étoile" line="P_1:6,P_2:3,P_6:1,P_A:19" link="p_101,p_105,p_107,p_202,p_204,p_602,p_a20"/>
+    <station id="p_107" name="George V" line="P_1:7" link="p_106,p_108"/>
+    <station id="p_108" name="Franklin D. Roosevelt" line="P_1:8,P_9:14" link="p_107,p_109,p_913,p_915"/>
+    <station id="p_109" name="Champs Élysées - Clemenceau" line="P_1:9,P_13:20" link="p_108,p_110,p_809,p_916"/>
+    <station id="p_110" name="Concorde" line="P_1:10,P_12:16,P_8:10" link="p_109,p_111,p_1215,p_809,p_811"/>
+    <station id="p_111" name="Tuileries" line="P_1:11" link="p_110,p_112"/>
+    <station id="p_112" name="Palais Royal - Musée du Louvre" line="P_1:12,P_7:18" link="p_111,p_113,p_717,p_719"/>
+    <station id="p_113" name="Louvre - Rivoli" line="P_1:13" link="p_112,p_114"/>
+    <station id="p_114" name="Châtelet" line="P_1:14,P_11:1,P_14:9,P_4:13,P_7:20,P_A:21,P_B:31" link="p_113,p_115,p_118,p_406,p_412,p_414,p_717,p_719,p_721,p_a20,p_b30" other_link="foot02:p_d15"/>
+    <station id="p_115" name="Hôtel de Ville" line="P_1:15,P_11:2" link="p_1103,p_114,p_116"/>
+    <station id="p_116" name="Saint-Paul" line="P_1:16" link="p_115,p_117"/>
+    <station id="p_117" name="Bastille" line="P_1:17,P_5:16,P_8:21" link="p_116,p_118,p_515,p_517,p_820,p_822"/>
+    <station id="p_118" name="Gare de Lyon" line="P_1:18,P_14:10,P_A:22,P_D:16,P_R:1" link="p_114,p_117,p_119,p_120,p_623,p_d15,p_d17,p_d37" other_link="foot03:p_518"/>
+    <station id="p_119" name="Reuilly - Diderot" line="P_1:19,P_8:24" link="p_118,p_120,p_823,p_825"/>
+    <station id="p_120" name="Nation" line="P_1:20,P_2:25,P_6:27,P_9:30,P_A:23" link="p_118,p_119,p_121,p_224,p_626,p_929,p_931,p_a24"/>
+    <station id="p_121" name="Porte de Vincennes" line="P_1:21,P_T3A:25,P_T3B:1" link="p_120,p_122,p_933,p_t3a24"/>
+    <station id="p_122" name="Saint-Mandé" line="P_1:22" link="p_121,p_123"/>
+    <station id="p_123" name="Bérault" line="P_1:23" link="p_122,p_124"/>
+    <station id="p_124" name="Château de Vincennes" line="P_1:24" link="p_123"/>
+    <!-- 10 -->
+    <station id="p_1001" name="Boulogne - Pont de Saint-Cloud" line="P_10:1" link="p_1002" other_link="foot16:p_t214"/>
+    <station id="p_1002" name="Boulogne - Jean Jaurès" line="P_10:2" link="p_1001,p_906"/>
+    <station id="p_906" name="Michel Ange - Molitor" line="P_10:3,P_9:6" link="p_1004,p_905,p_907"/>
+    <station id="p_1004" name="Chardon Lagache" line="P_10:4" link="p_1005"/>
+    <station id="p_1005" name="Javel - André Citroën" line="P_10:5" link="p_1006,p_1020" other_link="foot17:p_c38"/>
+    <station id="p_1006" name="Charles Michels" line="P_10:6" link="p_1005,p_1007"/>
+    <station id="p_1007" name="Avenue Émile Zola" line="P_10:7" link="p_1006,p_608"/>
+    <station id="p_608" name="La Motte Picquet - Grenelle" line="P_10:8,P_6:8,P_8:6" link="p_1007,p_1009,p_607,p_609,p_805,p_807"/>
+    <station id="p_1009" name="Ségur" line="P_10:9" link="p_1010,p_608"/>
+    <station id="p_1010" name="Duroc" line="P_10:10,P_13:24" link="p_1009,p_1011,p_1323,p_420"/>
+    <station id="p_1011" name="Vaneau" line="P_10:11" link="p_1010,p_1012"/>
+    <station id="p_1012" name="Sèvres - Babylone" line="P_10:12,P_12:12" link="p_1011,p_1013,p_1211,p_1213"/>
+    <station id="p_1013" name="Mabillon" line="P_10:13" link="p_1012,p_416"/>
+    <station id="p_416" name="Odéon" line="P_10:14,P_4:16" link="p_1013,p_1015,p_415,p_417"/>
+    <station id="p_1015" name="Cluny - La Sorbonne" line="P_10:15" link="p_1016,p_416" other_link="foot09:p_b30"/>
+    <station id="p_1016" name="Maubert - Mutualité" line="P_10:16" link="p_1015,p_1017"/>
+    <station id="p_1017" name="Cardinal Lemoine" line="P_10:17" link="p_1016,p_723"/>
+    <station id="p_723" name="Jussieu" line="P_10:18,P_7:23" link="p_1017,p_518,p_722,p_724"/>
+    <station id="p_518" name="Gare d'Austerlitz" line="P_10:19,P_5:18,P_C:25" link="p_1413,p_517,p_519,p_723,p_b30" other_link="foot03:p_118"/>
+    <station id="p_1020" name="Église d'Auteuil" line="P_10:20" link="p_907"/>
+    <station id="p_907" name="Michel Ange - Auteuil" line="P_10:21,P_9:7" link="p_1022,p_906,p_908"/>
+    <station id="p_1022" name="Porte d'Auteuíls" line="P_10:22" link="p_1002"/>
+    <!-- 11 -->
+    <station id="p_1103" name="Rambuteau" line="P_11:3" link="p_115,p_317"/>
+    <station id="p_317" name="Arts et Métiers" line="P_11:4,P_3:17" link="p_1103,p_316,p_318"/>
+    <station id="p_318" name="Temple" line="P_11:5,P_3:18" link="p_317,p_319"/>
+    <station id="p_319" name="République" line="P_11:6,P_3:19,P_5:12,P_8:17,P_9:24" link="p_1107,p_318,p_320,p_409,p_511,p_513,p_818"/>
+    <station id="p_1107" name="Goncourt" line="P_11:7" link="p_218,p_319"/>
+    <station id="p_218" name="Belleville" line="P_11:8,P_2:18" link="p_1107,p_1109,p_217,p_219"/>
+    <station id="p_1109" name="Pyrénées" line="P_11:9" link="p_1110,p_218"/>
+    <station id="p_1110" name="Jourdain" line="P_11:10" link="p_1109,p_7106"/>
+    <station id="p_7106" name="Place des Fêtes" line="P_11:11,P_71:6" link="p_1110,p_1112,p_7107"/>
+    <station id="p_1112" name="Télégraphe" line="P_11:12" link="p_3101,p_7106"/>
+    <station id="p_3101" name="Porte des Lilas" line="P_11:13,P_31:1,P_T3B:7" link="p_1112,p_1114,p_3102,p_t3b06,p_t3b08"/>
+    <station id="p_1114" name="Mairie de Lilas" line="P_11:14" link="p_1115,p_3101"/>
+    <station id="p_1115" name="Serge Gainsbourg" line="P_11:15" link="p_1114,p_1116"/>
+    <station id="p_1116" name="Romainville - Carnot" line="P_11:16" link="p_1115,p_1117"/>
+    <station id="p_1117" name="Rosny - Bois-Perrier" line="P_11:17,P_E:9" link="p_1116,p_e10,p_t137"/>
+    <!-- 12 -->
+    <station id="p_1201" name="Mairie d'Issy" line="P_12:1" link="p_1202"/>
+    <station id="p_1202" name="Corentin - Celton" line="P_12:2" link="p_1201,p_1203"/>
+    <station id="p_1203" name="Porte de Versailles" line="P_12:3,P_T2:24,P_T3A:4" link="p_1202,p_1204,p_t223,p_t3a03,p_t3a05"/>
+    <station id="p_1204" name="Convention" line="P_12:4" link="p_1203,p_1205"/>
+    <station id="p_1205" name="Vaugirard" line="P_12:5" link="p_1204,p_1206"/>
+    <station id="p_1206" name="Volontaires" line="P_12:6" link="p_1205,p_611"/>
+    <station id="p_611" name="Pasteur" line="P_12:7,P_6:11" link="p_1206,p_1208,p_420,p_610"/>
+    <station id="p_1208" name="Falguière" line="P_12:8" link="p_420,p_611"/>
+    <station id="p_420" name="Montparnasse - Bienvenüe" line="P_12:9,P_13:25,P_4:20,P_6:12" link="p_1010,p_1208,p_1210,p_1326,p_419,p_421,p_611,p_613" other_link="foot10:p_n01"/>
+    <station id="p_1210" name="Notre-Dame-des-Champs" line="P_12:10" link="p_1211,p_420"/>
+    <station id="p_1211" name="Rennes" line="P_12:11" link="p_1012,p_1210"/>
+    <station id="p_1213" name="Rue du Bac" line="P_12:13" link="p_1012,p_1214"/>
+    <station id="p_1214" name="Solférino" line="P_12:14" link="p_1213,p_1215" other_link="foot18:p_c23"/>
+    <station id="p_1215" name="Assemblée Nationale" line="P_12:15" link="p_110,p_1214"/>
+    <station id="p_811" name="Madeleine" line="P_12:17,P_14:7,P_8:11" link="p_110,p_310,p_312,p_717"/>
+    <station id="p_310" name="Saint-Lazare" line="P_12:18,P_13:18,P_14:6,P_3:10" link="p_1219,p_1317,p_1405,p_309,p_311,p_811,p_916" other_link="foot07:p_917,foot07:p_e04,foot07:p_j27"/>
+    <station id="p_1219" name="Trinité d'Estienne d'Orves" line="P_12:19" link="p_1220,p_310"/>
+    <station id="p_1220" name="Notre-Dame-de-Lorette" line="P_12:20" link="p_1219,p_1221"/>
+    <station id="p_1221" name="Saint-Georges" line="P_12:21" link="p_1220,p_211"/>
+    <station id="p_211" name="Pigalle" line="P_12:22,P_2:11" link="p_1221,p_210,p_funicu01,p_funicu02"/>
+    <station id="p_funicu02" name="Abbesses" line="P_12:23,P_FUNICU:2" link="p_1224,p_211,p_funicu01"/>
+    <station id="p_1224" name="Lamarck - Caulaincourt" line="P_12:24" link="p_1225,p_funicu02"/>
+    <station id="p_1225" name="Simplon - Jules Joffrin" line="P_12:25" link="p_1224,p_403"/>
+    <station id="p_403" name="Marcadet - Poissonniers" line="P_12:26,P_4:3" link="p_1225,p_1227,p_402,p_404"/>
+    <station id="p_1227" name="Marx - Dormoy" line="P_12:27" link="p_1228,p_403"/>
+    <station id="p_1228" name="Porte de la Chapelle" line="P_12:28,P_T3B:18" link="p_1227,p_1229,p_t3b17,p_t3b19"/>
+    <station id="p_1229" name="Front Populaire" line="P_12:29" link="p_1228,p_1230"/>
+    <station id="p_1230" name="Aimé Césaire" line="P_12:30" link="p_1229,p_1231"/>
+    <station id="p_1231" name="Mairie d'Aubervilliers" line="P_12:31" link="p_1230"/>
+    <!-- 13 -->
+    <station id="p_1301" name="Les Courtilles" line="P_13:1,P_T1:2" link="p_1302,p_t101,p_t103"/>
+    <station id="p_1302" name="Les Agnettes" line="P_13:2" link="p_1301,p_1303"/>
+    <station id="p_1303" name="Gabriel Péri" line="P_13:3" link="p_1302,p_1304"/>
+    <station id="p_1304" name="Mairie de Clichy" line="P_13:4" link="p_1303,p_1305"/>
+    <station id="p_1305" name="Porte de Clichy" line="P_13:5,P_14:4,P_C:13,P_T3B:25" link="p_1304,p_1306,p_1403,p_1405,p_c14,p_t3b24,p_t3b26"/>
+    <station id="p_1306" name="Brochant" line="P_13:6" link="p_1305,p_1315"/>
+    <station id="p_1307" name="Saint-Denis - Université" line="P_13:7" link="p_1308" other_link="foot19:p_t504"/>
+    <station id="p_1308" name="Basilique de Saint-Denis" line="P_13:8,P_T1:15" link="p_1307,p_1309,p_t114,p_t116"/>
+    <station id="p_1309" name="Saint-Denis - Porte de Paris" line="P_13:9,P_T8:1" link="p_1308,p_1310,p_t802"/>
+    <station id="p_1310" name="Carrefour Pleyel" line="P_13:10" link="p_1309,p_1311"/>
+    <station id="p_1311" name="Mairie de Saint-Ouen" line="P_13:11,P_14:2" link="p_1310,p_1312,p_1401,p_1403"/>
+    <station id="p_1312" name="Garibaldi" line="P_13:12" link="p_1311,p_1313"/>
+    <station id="p_1313" name="Porte de Saint-Ouen" line="P_13:13,P_T3B:22" link="p_1312,p_1314,p_t3b21,p_t3b23"/>
+    <station id="p_1314" name="Guy Môquet" line="P_13:14" link="p_1313,p_1315"/>
+    <station id="p_1315" name="La Fourche" line="P_13:15" link="p_1306,p_1314,p_209"/>
+    <station id="p_209" name="Place de Clichy" line="P_13:16,P_2:9" link="p_1315,p_1317,p_208,p_210"/>
+    <station id="p_1317" name="Liège" line="P_13:17" link="p_209,p_310"/>
+    <station id="p_916" name="Miromesnil" line="P_13:19,P_9:16" link="p_109,p_310,p_915,p_917"/>
+    <station id="p_809" name="Invalides" line="P_13:21,P_8:9,P_C:22" link="p_109,p_110,p_1322,p_808,p_c21,p_c23"/>
+    <station id="p_1322" name="Varenne" line="P_13:22" link="p_1323,p_809"/>
+    <station id="p_1323" name="Saint-François-Xavier" line="P_13:23" link="p_1010,p_1322"/>
+    <station id="p_1326" name="Gaîté" line="P_13:26" link="p_1327,p_420"/>
+    <station id="p_1327" name="Pernety" line="P_13:27" link="p_1326,p_1328"/>
+    <station id="p_1328" name="Plaisance" line="P_13:28" link="p_1327,p_1329"/>
+    <station id="p_1329" name="Porte de Vanves" line="P_13:29,P_T3A:7" link="p_1328,p_1330,p_t3a06,p_t3a08"/>
+    <station id="p_1330" name="Malakoff - Plateau de Vanves" line="P_13:30" link="p_1329,p_1331"/>
+    <station id="p_1331" name="Malakoff - Rue Étienne Dolet" line="P_13:31" link="p_1330,p_1332"/>
+    <station id="p_1332" name="Châtillon - Montrouge" line="P_13:32,P_T6:21" link="p_1331,p_t620"/>
+    <!-- 14 -->
+    <station id="p_1401" name="Saint-Denis - Pleyel" line="P_14:1" link="p_1311"/>
+    <station id="p_1403" name="Saint-Ouen" line="P_14:3,P_C:12" link="p_1305,p_1311,p_c11"/>
+    <station id="p_1405" name="Pont Cardinet" line="P_14:5,P_L:16" link="p_1305,p_310,p_j27,p_l15"/>
+    <station id="p_717" name="Pyramides" line="P_14:8,P_7:17" link="p_112,p_114,p_312,p_811"/>
+    <station id="p_623" name="Bercy" line="P_14:11,P_6:23" link="p_118,p_1412,p_622,p_624"/>
+    <station id="p_1412" name="Cour Saint-Émilion" line="P_14:12" link="p_1413,p_623"/>
+    <station id="p_1413" name="Bibliothèque François Mitterrand" line="P_14:13,P_C:26" link="p_1412,p_1414,p_518,p_c27" other_link="foot21:p_t3a19"/>
+    <station id="p_1414" name="Olympiades" line="P_14:14" link="p_1413,p_729"/>
+    <station id="p_729" name="Maison Blanche" line="P_14:15,P_7:29" link="p_1414,p_1416,p_728,p_730,p_734"/>
+    <station id="p_1416" name="Hôpital Bicêtre" line="P_14:16" link="p_1417,p_729"/>
+    <station id="p_1417" name="Villejuif - Gustave Roussy" line="P_14:17" link="p_1416,p_1418"/>
+    <station id="p_1418" name="L'Haÿ-les-Roses" line="P_14:18" link="p_1417,p_1419"/>
+    <station id="p_1419" name="Chevilly-Larue" line="P_14:19" link="p_1418,p_1420" other_link="foot27:p_t707"/>
+    <station id="p_1420" name="Thiais - Orly" line="P_14:20" link="p_1419,p_1421" other_link="foot22:p_c33"/>
+    <station id="p_1421" name="Aéroport d'Orly" line="P_14:21" link="p_1420"/>
+    <!-- 2 -->
+    <station id="p_201" name="Porte Dauphine" line="P_2:1,P_T3B:33" link="p_202,p_t3b32" other_link="foot04:p_c16"/>
+    <station id="p_202" name="Victor Hugo" line="P_2:2" link="p_106,p_201"/>
+    <station id="p_204" name="Ternes" line="P_2:4" link="p_106,p_205"/>
+    <station id="p_205" name="Courcelles" line="P_2:5" link="p_204,p_206"/>
+    <station id="p_206" name="Monceau" line="P_2:6" link="p_205,p_207"/>
+    <station id="p_207" name="Villiers" line="P_2:7,P_3:8" link="p_206,p_208,p_307,p_309"/>
+    <station id="p_208" name="Rome" line="P_2:8" link="p_207,p_209"/>
+    <station id="p_210" name="Blanche" line="P_2:10" link="p_209,p_211"/>
+    <station id="p_funicu01" name="Anvers" line="P_2:12,P_FUNICU:1" link="p_211,p_213,p_funicu02"/>
+    <station id="p_213" name="Barbès - Rochechouart" line="P_2:13,P_4:5" link="p_214,p_404,p_406,p_funicu01"/>
+    <station id="p_214" name="La Chapelle" line="P_2:14" link="p_213,p_215" other_link="foot05:p_406"/>
+    <station id="p_215" name="Stalingrad" line="P_2:15,P_5:8,P_7:8" link="p_214,p_216,p_406,p_707,p_709"/>
+    <station id="p_216" name="Jaurès" line="P_2:16,P_5:7,P_71:2" link="p_215,p_217,p_506,p_709,p_7103"/>
+    <station id="p_217" name="Colonel Fabien" line="P_2:17" link="p_216,p_218"/>
+    <station id="p_219" name="Couronnes" line="P_2:19" link="p_218,p_220"/>
+    <station id="p_220" name="Ménilmontant" line="P_2:20" link="p_219,p_221"/>
+    <station id="p_221" name="Père Lachaise" line="P_2:21,P_3:22" link="p_220,p_222,p_321,p_323"/>
+    <station id="p_222" name="Philippe Auguste" line="P_2:22" link="p_221,p_223"/>
+    <station id="p_223" name="Alexandre Dumas" line="P_2:23" link="p_222,p_224"/>
+    <station id="p_224" name="Avron" line="P_2:24" link="p_120,p_223"/>
+    <!-- 3 -->
+    <station id="p_301" name="Pont de Levallois Bécon" line="P_3:1" link="p_302"/>
+    <station id="p_302" name="Anatole France" line="P_3:2" link="p_301,p_303"/>
+    <station id="p_303" name="Louise Michel" line="P_3:3" link="p_302,p_304"/>
+    <station id="p_304" name="Porte de Champerret" line="P_3:4,P_T3B:28" link="p_303,p_305,p_t3b27,p_t3b29"/>
+    <station id="p_305" name="Pereire" line="P_3:5" link="p_304,p_306" other_link="foot06:p_c14"/>
+    <station id="p_306" name="Wagram" line="P_3:6" link="p_305,p_307"/>
+    <station id="p_307" name="Malesherbes" line="P_3:7,P_D:58" link="p_207,p_306,p_d57"/>
+    <station id="p_309" name="Europe" line="P_3:9" link="p_207,p_310"/>
+    <station id="p_311" name="Havre Comartin" line="P_3:11" link="p_310,p_312" other_link="foot07:p_a20,foot07:p_e04"/>
+    <station id="p_312" name="Opéra" line="P_3:12,P_7:16,P_8:12" link="p_311,p_313,p_715,p_717,p_811,p_813" other_link="foot07:p_a20"/>
+    <station id="p_313" name="Quatre Septembre" line="P_3:13" link="p_312,p_314"/>
+    <station id="p_314" name="Bourse" line="P_3:14" link="p_313,p_315"/>
+    <station id="p_315" name="Sentier" line="P_3:15" link="p_314,p_316"/>
+    <station id="p_316" name="Réaumur - Sébastopol" line="P_3:16,P_4:10" link="p_315,p_317,p_409,p_411"/>
+    <station id="p_320" name="Parmentier" line="P_3:20" link="p_319,p_321"/>
+    <station id="p_321" name="Rue Saint-Maur" line="P_3:21" link="p_221,p_320"/>
+    <station id="p_323" name="Gambetta" line="P_3:23,P_31:4" link="p_221,p_3103,p_324"/>
+    <station id="p_324" name="Porte de Bagnolet" line="P_3:24,P_T3B:4" link="p_323,p_325,p_t3b03,p_t3b05"/>
+    <station id="p_325" name="Gallieni" line="P_3:25" link="p_324"/>
+    <!-- 3 bis -->
+    <station id="p_3102" name="Saint-Fargeau" line="P_31:2,P_D:33" link="p_3101,p_3103,p_d32,p_d34"/>
+    <station id="p_3103" name="Pelleport" line="P_31:3" link="p_3102,p_323"/>
+    <!-- 4 -->
+    <station id="p_401" name="Porte de Clignancourt" line="P_4:1,P_T3B:20" link="p_402,p_t3b19,p_t3b21"/>
+    <station id="p_402" name="Simplon" line="P_4:2" link="p_401,p_403"/>
+    <station id="p_404" name="Château Rouge" line="P_4:4" link="p_213,p_403"/>
+    <station id="p_406" name="Gare du Nord" line="P_4:6,P_5:9,P_B:32,P_D:14,P_H:14,P_K:1" link="p_114,p_213,p_215,p_407,p_b33,p_d13,p_d15,p_t112,p_t411" other_link="foot05:p_214,foot31:p_e05"/>
+    <station id="p_407" name="Gare de l'Est" line="P_4:7,P_5:10,P_7:11,P_P:1" link="p_406,p_408,p_511,p_710,p_712,p_e20,p_e25,p_p26"/>
+    <station id="p_408" name="Château d'Eau" line="P_4:8" link="p_407,p_409"/>
+    <station id="p_409" name="Strasbourg - Saint-Denis" line="P_4:9,P_8:16,P_9:23" link="p_316,p_319,p_408,p_815"/>
+    <station id="p_411" name="Étienne Marcel" line="P_4:11" link="p_316,p_412"/>
+    <station id="p_412" name="Les Halles" line="P_4:12" link="p_114,p_411" other_link="foot02:p_d15"/>
+    <station id="p_414" name="Cité" line="P_4:14" link="p_114,p_415"/>
+    <station id="p_415" name="Saint-Michel" line="P_4:15" link="p_414,p_416" other_link="foot09:p_b30"/>
+    <station id="p_417" name="Saint-Germain-des-Prés" line="P_4:17" link="p_416,p_418"/>
+    <station id="p_418" name="Saint-Sulpice" line="P_4:18" link="p_417,p_419"/>
+    <station id="p_419" name="Saint-Placide" line="P_4:19" link="p_418,p_420"/>
+    <station id="p_421" name="Vavin" line="P_4:21" link="p_420,p_422"/>
+    <station id="p_422" name="Raspail" line="P_4:22,P_6:14" link="p_421,p_423,p_613"/>
+    <station id="p_423" name="Denfert - Rochereau" line="P_4:23,P_6:15,P_B:27" link="p_422,p_424,p_616,p_b28,p_t3a12"/>
+    <station id="p_424" name="Mouton - Duvernet" line="P_4:24" link="p_423,p_425"/>
+    <station id="p_425" name="Alésia" line="P_4:25" link="p_424,p_426"/>
+    <station id="p_426" name="Porte d'Orléans" line="P_4:26,P_T3A:10" link="p_425,p_427,p_t3a09,p_t3a11"/>
+    <station id="p_427" name="Mairie de Montrouge" line="P_4:27" link="p_426,p_428"/>
+    <station id="p_428" name="Barbara" line="P_4:28" link="p_427,p_429"/>
+    <station id="p_429" name="Bagneux - Lucie Aubrac" line="P_4:29" link="p_428"/>
+    <!-- 5 -->
+    <station id="p_501" name="Bobigny - Pablo Picasso" line="P_5:1,P_T1:32" link="p_502,p_t131,p_t133"/>
+    <station id="p_502" name="Bobigny-Pantin - Raymond Queneau" line="P_5:2" link="p_501,p_503"/>
+    <station id="p_503" name="Église de Pantin" line="P_5:3" link="p_502,p_504"/>
+    <station id="p_504" name="Porte de Pantin" line="P_5:4,P_T3B:10" link="p_503,p_505,p_t3b09,p_t3b11"/>
+    <station id="p_505" name="Ourcq" line="P_5:5" link="p_504,p_506"/>
+    <station id="p_506" name="Laumière" line="P_5:6" link="p_216,p_505"/>
+    <station id="p_511" name="Jacques Bonsergent" line="P_5:11" link="p_319,p_407"/>
+    <station id="p_513" name="Oberkampf" line="P_5:13,P_9:25" link="p_319,p_514,p_926"/>
+    <station id="p_514" name="Richard Lenoir" line="P_5:14" link="p_513,p_515"/>
+    <station id="p_515" name="Bréguet - Sabin" line="P_5:15" link="p_117,p_514"/>
+    <station id="p_517" name="Quai de la Rapée" line="P_5:17" link="p_117,p_518"/>
+    <station id="p_519" name="Saint-Marcel" line="P_5:19" link="p_518,p_520"/>
+    <station id="p_520" name="Campo Formio" line="P_5:20" link="p_519,p_521"/>
+    <station id="p_521" name="Place d'Italie" line="P_5:21,P_6:19,P_7:27" link="p_520,p_618,p_620,p_726,p_728"/>
+    <!-- 6 -->
+    <station id="p_602" name="Kléber" line="P_6:2" link="p_106,p_603"/>
+    <station id="p_603" name="Boissière" line="P_6:3" link="p_602,p_604"/>
+    <station id="p_604" name="Trocadéro" line="P_6:4,P_9:12" link="p_603,p_605,p_911,p_913"/>
+    <station id="p_605" name="Passy" line="P_6:5" link="p_604,p_606"/>
+    <station id="p_606" name="Bir-Hakeim" line="P_6:6" link="p_605,p_607" other_link="foot23:p_c20"/>
+    <station id="p_607" name="Dupleix" line="P_6:7" link="p_606,p_608"/>
+    <station id="p_609" name="Cambronne" line="P_6:9" link="p_608,p_610"/>
+    <station id="p_610" name="Sèvres - Lecourbe" line="P_6:10" link="p_609,p_611"/>
+    <station id="p_613" name="Edgar Quinet" line="P_6:13" link="p_420,p_422"/>
+    <station id="p_616" name="Saint-Jacques" line="P_6:16" link="p_423,p_617"/>
+    <station id="p_617" name="Glacière" line="P_6:17" link="p_616,p_618"/>
+    <station id="p_618" name="Corvisart" line="P_6:18" link="p_521,p_617"/>
+    <station id="p_620" name="Nationale" line="P_6:20" link="p_521,p_621"/>
+    <station id="p_621" name="Chevaleret" line="P_6:21" link="p_620,p_622"/>
+    <station id="p_622" name="Quai de la Gare" line="P_6:22" link="p_621,p_623"/>
+    <station id="p_624" name="Daumesnil" line="P_6:24,P_8:26" link="p_623,p_625,p_825,p_827"/>
+    <station id="p_625" name="Bel-Air" line="P_6:25" link="p_624,p_626"/>
+    <station id="p_626" name="Picpus" line="P_6:26" link="p_120,p_625"/>
+    <!-- 7 -->
+    <station id="p_701" name="La Courneuve - 8 Mai 1945" line="P_7:1,P_T1:23" link="p_702,p_t122,p_t124"/>
+    <station id="p_702" name="Fort d'Aubervilliers" line="P_7:2" link="p_701,p_703"/>
+    <station id="p_703" name="Aubervilliers - Pantin Quatre Chemins" line="P_7:3" link="p_702,p_704"/>
+    <station id="p_704" name="Porte de la Villette" line="P_7:4,P_T3B:13" link="p_703,p_705,p_t3b12,p_t3b14"/>
+    <station id="p_705" name="Corentin - Cariou" line="P_7:5" link="p_704,p_706"/>
+    <station id="p_706" name="Crimée" line="P_7:6" link="p_705,p_707"/>
+    <station id="p_707" name="Riquet" line="P_7:7" link="p_215,p_706"/>
+    <station id="p_709" name="Louis Blanc" line="P_7:9,P_71:1" link="p_215,p_216,p_710"/>
+    <station id="p_710" name="Château - Landon" line="P_7:10" link="p_407,p_709"/>
+    <station id="p_712" name="Poissonière" line="P_7:12" link="p_407,p_713"/>
+    <station id="p_713" name="Cadet" line="P_7:13" link="p_712,p_714"/>
+    <station id="p_714" name="Le Peletier" line="P_7:14" link="p_713,p_715"/>
+    <station id="p_715" name="Chaussée d'Antin - La Fayette" line="P_7:15,P_9:19" link="p_312,p_714,p_813,p_918"/>
+    <station id="p_719" name="Pont Neuf" line="P_7:19" link="p_112,p_114"/>
+    <station id="p_721" name="Pont Marie" line="P_7:21" link="p_114,p_722"/>
+    <station id="p_722" name="Sully - Morland" line="P_7:22" link="p_721,p_723"/>
+    <station id="p_724" name="Place Monge" line="P_7:24" link="p_723,p_725"/>
+    <station id="p_725" name="Censier - Daubenton" line="P_7:25" link="p_724,p_726"/>
+    <station id="p_726" name="Les Gobelins" line="P_7:26" link="p_521,p_725"/>
+    <station id="p_728" name="Tolbiac" line="P_7:28" link="p_521,p_729"/>
+    <station id="p_730" name="Le Kremlin - Bicêtre" line="P_7:30" link="p_729,p_731"/>
+    <station id="p_731" name="Villejuif - Léo Lagrange" line="P_7:31" link="p_730,p_732"/>
+    <station id="p_732" name="Villejuif - Paul Vaillant-Couturier" line="P_7:32" link="p_731,p_733"/>
+    <station id="p_733" name="Villejuif - Louis Aragon" line="P_7:33,P_T7:1" link="p_732,p_t702"/>
+    <station id="p_734" name="Porte d'Italie" line="P_7:34,P_T3A:15" link="p_729,p_735,p_t3a14"/>
+    <station id="p_735" name="Porte de Choisy" line="P_7:35,P_T3A:16,P_T9:1" link="p_734,p_736,p_t902"/>
+    <station id="p_736" name="Porte d'Ivry" line="P_7:36,P_T3A:17" link="p_735,p_737,p_t3a18"/>
+    <station id="p_737" name="Pierre et Marie Curie" line="P_7:37" link="p_736,p_738"/>
+    <station id="p_738" name="Mairie d'Ivry" line="P_7:38" link="p_737"/>
+    <!-- 7 bis -->
+    <station id="p_7103" name="Bolivar" line="P_71:3" link="p_216,p_7104"/>
+    <station id="p_7104" name="Buttes Chaumont" line="P_71:4" link="p_7103,p_7105"/>
+    <station id="p_7105" name="Botzaris" line="P_71:5" link="p_7104,p_7106"/>
+    <station id="p_7107" name="Pré Saint-Gervais" line="P_71:7" link="p_7108" other_link="foot11:p_t3b08"/>
+    <station id="p_7108" name="Danube" line="P_71:8" link="p_7105"/>
+    <!-- 8 -->
+    <station id="p_801" name="Balard" line="P_8:1,P_T3A:2" link="p_802,p_t3a01,p_t3a03" other_link="foot12:p_t222"/>
+    <station id="p_802" name="Lourmel" line="P_8:2" link="p_801,p_803"/>
+    <station id="p_803" name="Boucicaut" line="P_8:3" link="p_802,p_804"/>
+    <station id="p_804" name="Félix Faure" line="P_8:4" link="p_803,p_805"/>
+    <station id="p_805" name="Commerce" line="P_8:5" link="p_608,p_804"/>
+    <station id="p_807" name="École Militaire" line="P_8:7" link="p_608,p_808"/>
+    <station id="p_808" name="La Tour - Maubourg" line="P_8:8" link="p_807,p_809"/>
+    <station id="p_813" name="Richelieu - Drouot" line="P_8:13,P_9:20" link="p_312,p_715,p_814"/>
+    <station id="p_814" name="Grands Boulevards" line="P_8:14,P_9:21" link="p_813,p_815"/>
+    <station id="p_815" name="Bonne Nouvelle" line="P_8:15,P_9:22" link="p_409,p_814"/>
+    <station id="p_818" name="Filles du Calvaire" line="P_8:18" link="p_319,p_819"/>
+    <station id="p_819" name="Saint-Sébastien - Froissart" line="P_8:19" link="p_818,p_820"/>
+    <station id="p_820" name="Chemin Vert" line="P_8:20" link="p_117,p_819"/>
+    <station id="p_822" name="Ledru-Rollin" line="P_8:22" link="p_117,p_823"/>
+    <station id="p_823" name="Faidherbe - Chaligny" line="P_8:23" link="p_119,p_822"/>
+    <station id="p_825" name="Montgallet" line="P_8:25" link="p_119,p_624"/>
+    <station id="p_827" name="Michel Bizot" line="P_8:27" link="p_624,p_828"/>
+    <station id="p_828" name="Porte Dorée" line="P_8:28,P_T3A:22" link="p_827,p_829,p_t3a23"/>
+    <station id="p_829" name="Porte de Charenton" line="P_8:29,P_T3A:21" link="p_828,p_830,p_t3a20"/>
+    <station id="p_830" name="Liberté" line="P_8:30" link="p_829,p_831"/>
+    <station id="p_831" name="Charenton - Écoles" line="P_8:31" link="p_830,p_832"/>
+    <station id="p_832" name="École Vétérinaire de Maisons-Alfort" line="P_8:32" link="p_831,p_833"/>
+    <station id="p_833" name="Maisons-Alfort - Stade" line="P_8:33" link="p_832,p_834"/>
+    <station id="p_834" name="Maisons-Alfort - Les Juilliottes" line="P_8:34" link="p_833,p_835"/>
+    <station id="p_835" name="Créteil - L'Échat" line="P_8:35" link="p_834,p_836"/>
+    <station id="p_836" name="Créteil - Université" line="P_8:36" link="p_835,p_837"/>
+    <station id="p_837" name="Créteil - Préfecture" line="P_8:37" link="p_836,p_838"/>
+    <station id="p_838" name="Créteil - Pointe du Lac" line="P_8:38" link="p_837"/>
+    <!-- 9 -->
+    <station id="p_901" name="Pont de Sèvres" line="P_9:1" link="p_902" other_link="foot13:p_t215"/>
+    <station id="p_902" name="Billancourt" line="P_9:2" link="p_901,p_903"/>
+    <station id="p_903" name="Marcel Sembat" line="P_9:3" link="p_902,p_904"/>
+    <station id="p_904" name="Porte de Saint-Cloud" line="P_9:4" link="p_903,p_905"/>
+    <station id="p_905" name="Exelmans" line="P_9:5" link="p_904,p_906"/>
+    <station id="p_908" name="Jasmin" line="P_9:8" link="p_907,p_909"/>
+    <station id="p_909" name="Ranelagh" line="P_9:9" link="p_908,p_910"/>
+    <station id="p_910" name="La Muette" line="P_9:10" link="p_909,p_911" other_link="foot24:p_c18"/>
+    <station id="p_911" name="Rue de la Pompe" line="P_9:11" link="p_604,p_910" other_link="foot14:p_c17"/>
+    <station id="p_913" name="Alma - Marceau" line="P_9:13" link="p_108,p_604" other_link="foot15:p_c21"/>
+    <station id="p_915" name="Saint-Philippe-du-Roule" line="P_9:15" link="p_108,p_916"/>
+    <station id="p_917" name="Saint-Augustin" line="P_9:17" link="p_916,p_918" other_link="foot07:p_310"/>
+    <station id="p_918" name="Havre - Caumartin" line="P_9:18" link="p_715,p_917"/>
+    <station id="p_926" name="Saint-Ambroise" line="P_9:26" link="p_513,p_927"/>
+    <station id="p_927" name="Voltaire" line="P_9:27" link="p_926,p_928"/>
+    <station id="p_928" name="Charonne" line="P_9:28" link="p_927,p_929"/>
+    <station id="p_929" name="Rue des Boulets" line="P_9:29" link="p_120,p_928"/>
+    <station id="p_931" name="Buzenval" line="P_9:31" link="p_120,p_932"/>
+    <station id="p_932" name="Maraîchers" line="P_9:32" link="p_931,p_933"/>
+    <station id="p_933" name="Porte de Montreuil" line="P_9:33,P_T3B:2" link="p_121,p_932,p_934,p_t3b03"/>
+    <station id="p_934" name="Robespierre" line="P_9:34" link="p_933,p_935"/>
+    <station id="p_935" name="Crois de Chavaux" line="P_9:35" link="p_934,p_936"/>
+    <station id="p_936" name="Mairie de Montreuil" line="P_9:36" link="p_935"/>
+    <!-- A -->
+    <station id="p_a01" name="Cergy - Le Haut" line="P_A:1,P_L:1" link="p_a02"/>
+    <station id="p_a02" name="Cergy - Saint-Christophe" line="P_A:2,P_L:2" link="p_a01,p_a03"/>
+    <station id="p_a03" name="Cergy - Préfecture" line="P_A:3,P_L:3" link="p_a02,p_a04"/>
+    <station id="p_a04" name="Neuville - Université" line="P_A:4,P_L:4" link="p_a03,p_a05"/>
+    <station id="p_a05" name="Conflans - Fin d'Oise" line="P_A:5,P_J:52,P_L:5" link="p_a04,p_a06,p_j17,p_j51"/>
+    <station id="p_a06" name="Achères Ville" line="P_A:6,P_L:6" link="p_a05,p_a07"/>
+    <station id="p_a07" name="Maisons Laffitte" line="P_A:7,P_L:7" link="p_a06,p_a08"/>
+    <station id="p_a08" name="Sartrouville" line="P_A:8,P_L:8" link="p_a07,p_a09"/>
+    <station id="p_a09" name="Houilles - Carrières-sur-Seine" line="P_A:9,P_J:28,P_L:9" link="p_a08,p_a16,p_a17,p_j26,p_j29"/>
+    <station id="p_t1301" name="Saint-Germain-en-Laye" line="P_A:10,P_T13:1" link="p_a11,p_t1302"/>
+    <station id="p_a11" name="Le Vésinet - Le Pecq" line="P_A:11" link="p_a12,p_t1301"/>
+    <station id="p_a12" name="Le Vésinet - Centre" line="P_A:12" link="p_a11,p_a13"/>
+    <station id="p_a13" name="Chatou - Croissy" line="P_A:13" link="p_a12,p_a14"/>
+    <station id="p_a14" name="Rueil - Malmaison" line="P_A:14" link="p_a13,p_a15"/>
+    <station id="p_a15" name="Nanterre Ville" line="P_A:15" link="p_a14,p_a16"/>
+    <station id="p_a16" name="Nanterre - Université" line="P_A:16,P_L:10" link="p_a09,p_a15,p_a17,p_l11"/>
+    <station id="p_a17" name="Nanterre - Préfecture" line="P_A:17" link="p_101,p_a09,p_a16" other_link="foot30:p_e01"/>
+    <station id="p_a20" name="Auber" line="P_A:20" link="p_106,p_114" other_link="foot07:p_311,foot07:p_312,foot07:p_e04"/>
+    <station id="p_a24" name="Vincennes" line="P_A:24" link="p_120,p_a25,p_a35"/>
+    <station id="p_a25" name="Val de Fontenay" line="P_A:25,P_E:11" link="p_a24,p_a26,p_e10,p_e12"/>
+    <station id="p_a26" name="Neuilly - Plaisance" line="P_A:26" link="p_a25,p_a27"/>
+    <station id="p_a27" name="Bry-sur-Marne" line="P_A:27" link="p_a26,p_a28"/>
+    <station id="p_a28" name="Noisy-le-Grand - Mont d'Est" line="P_A:28" link="p_a27,p_a29"/>
+    <station id="p_a29" name="Noisiel" line="P_A:29" link="p_a28,p_a30"/>
+    <station id="p_a30" name="Lognes" line="P_A:30" link="p_a29,p_a31"/>
+    <station id="p_a31" name="Torcy" line="P_A:31" link="p_a30,p_a32"/>
+    <station id="p_a32" name="Bussy - Saint-Georges" line="P_A:32" link="p_a31,p_a33"/>
+    <station id="p_a33" name="Val d'Europe" line="P_A:33" link="p_a32,p_a34"/>
+    <station id="p_a34" name="Marne-la-Vallée - Chessy" line="P_A:34" link="p_a33"/>
+    <station id="p_a35" name="Fontenay-sous-Bois" line="P_A:35" link="p_a24,p_a36"/>
+    <station id="p_a36" name="Nogent-sur-Marne" line="P_A:36" link="p_a35,p_a37"/>
+    <station id="p_a37" name="Joinville-le-Pont" line="P_A:37" link="p_a36,p_a38"/>
+    <station id="p_a38" name="Saint-Maur - Créteil" line="P_A:38" link="p_a37,p_a39"/>
+    <station id="p_a39" name="Le Parc de Saint-Maur" line="P_A:39" link="p_a38,p_a40"/>
+    <station id="p_a40" name="Champigny" line="P_A:40" link="p_a39,p_a41"/>
+    <station id="p_a41" name="La Varenne - Chennevières" line="P_A:41" link="p_a40,p_a42"/>
+    <station id="p_a42" name="Sucy - Bonneuil" line="P_A:42" link="p_a41,p_a43"/>
+    <station id="p_a43" name="Boissy - Saint-Leger" line="P_A:43" link="p_a42"/>
+    <!-- B -->
+    <station id="p_b01" name="Saint-Rémy - Lès-Chevreuse" line="P_B:1" link="p_b02"/>
+    <station id="p_b02" name="Courcelle-sur-Yvette" line="P_B:2" link="p_b01,p_b03"/>
+    <station id="p_b03" name="Gif-sur-Yvette" line="P_B:3" link="p_b02,p_b04"/>
+    <station id="p_b04" name="La Hacquinière" line="P_B:4" link="p_b03,p_b05"/>
+    <station id="p_b05" name="Bures-sur-Yvette" line="P_B:5" link="p_b04,p_b06"/>
+    <station id="p_b06" name="Orsay Ville" line="P_B:6" link="p_b05,p_b07"/>
+    <station id="p_b07" name="Le Guichet" line="P_B:7" link="p_b06,p_b08"/>
+    <station id="p_b08" name="Lozère" line="P_B:8" link="p_b07,p_b09"/>
+    <station id="p_b09" name="Palaiseau - Villebon" line="P_B:9" link="p_b08,p_b10"/>
+    <station id="p_b10" name="Palaiseau" line="P_B:10" link="p_b09,p_t1201"/>
+    <station id="p_t1201" name="Massy - Palaiseau" line="P_B:11,P_C:37,P_T12:1,P_V:1" link="p_b10,p_b12,p_t1202,p_v02"/>
+    <station id="p_b12" name="Massy - Verrières" line="P_B:12,P_C:36" link="p_b13,p_c35,p_t1201"/>
+    <station id="p_b13" name="Les Baconnets" line="P_B:13" link="p_b12,p_b14"/>
+    <station id="p_b14" name="Fontaine Michalon" line="P_B:14" link="p_b13,p_orlyva01"/>
+    <station id="p_orlyva01" name="Antony" line="P_B:15,P_ORLYVA:1" link="p_b14,p_orlyva02,p_t1013"/>
+    <station id="p_t1013" name="La Croix de Berny" line="P_B:16,P_T10:13" link="p_b17,p_orlyva01,p_t1012"/>
+    <station id="p_b17" name="Parc de Sceaux" line="P_B:17" link="p_b21,p_t1013"/>
+    <station id="p_b18" name="Robinson" line="P_B:18" link="p_b19"/>
+    <station id="p_b19" name="Fontenay-aux-Roses" line="P_B:19" link="p_b18,p_b20"/>
+    <station id="p_b20" name="Sceaux" line="P_B:20" link="p_b19,p_b21"/>
+    <station id="p_b21" name="Bourg-la-Reine" line="P_B:21" link="p_b17,p_b20,p_b22"/>
+    <station id="p_b22" name="Bagneux" line="P_B:22" link="p_b21,p_b23"/>
+    <station id="p_b23" name="Arcueil - Cachan" line="P_B:23" link="p_b22,p_b24"/>
+    <station id="p_b24" name="Laplace" line="P_B:24" link="p_b23,p_b25"/>
+    <station id="p_b25" name="Gentilly" line="P_B:25" link="p_b24,p_t3a12"/>
+    <station id="p_t3a12" name="Cité Universitaire" line="P_B:26,P_T3A:12" link="p_423,p_b25,p_t3a11,p_t3a13"/>
+    <station id="p_b28" name="Port Royal" line="P_B:28" link="p_423,p_b29"/>
+    <station id="p_b29" name="Luxembourg" line="P_B:29" link="p_b28,p_b30"/>
+    <station id="p_b30" name="Saint-Michel - Notre Dame" line="P_B:30,P_C:24" link="p_114,p_518,p_b29,p_c23" other_link="foot09:p_1015,foot09:p_415"/>
+    <station id="p_b33" name="La Pleine - Stade de France" line="P_B:33" link="p_406,p_b34"/>
+    <station id="p_b34" name="La Courneuve - Aubervilliers" line="P_B:34" link="p_b33,p_t1107"/>
+    <station id="p_t1107" name="Le Bourget" line="P_B:35,P_T11:7" link="p_b34,p_b36,p_t1106"/>
+    <station id="p_b36" name="Drancy" line="P_B:36" link="p_b37,p_t1107"/>
+    <station id="p_b37" name="Le Blanc - Mesnil" line="P_B:37" link="p_b36,p_t411"/>
+    <station id="p_t411" name="Aulnay-sous-Bois" line="P_B:38,P_K:2,P_T4:11" link="p_406,p_b37,p_b39,p_b42,p_b43,p_t410"/>
+    <station id="p_b39" name="Sevran - Livry" line="P_B:39" link="p_b40,p_t411"/>
+    <station id="p_b40" name="Vert Galant" line="P_B:40" link="p_b39,p_b41"/>
+    <station id="p_b41" name="Villeparisis - Mitry-le-Neuf" line="P_B:41" link="p_b40,p_b42"/>
+    <station id="p_b42" name="Mitry - Claye" line="P_B:42,P_K:3" link="p_b41,p_k04,p_t411"/>
+    <station id="p_b43" name="Sevran Beaudottes" line="P_B:43" link="p_b44,p_t411"/>
+    <station id="p_b44" name="Villepinte" line="P_B:44" link="p_b43,p_b45"/>
+    <station id="p_b45" name="Parc des Expositions" line="P_B:45" link="p_b44,p_cdgval03"/>
+    <station id="p_cdgval03" name="Aéroport Charles de Gaulle Terminal 3" line="P_B:46,P_CDGVAL:3" link="p_b45,p_b47,p_cdgval02,p_cdgval04"/>
+    <station id="p_b47" name="Aéroport Charles de Gaulle Terminal 2 TGV" line="P_B:47" link="p_cdgval03"/>
+    <!-- C -->
+    <station id="p_c01" name="Pontoise" line="P_C:1,P_H:1,P_J:14" link="p_c02,p_j13,p_j15"/>
+    <station id="p_c02" name="Saint-Ouen l'Aumône" line="P_C:2,P_H:2" link="p_c01,p_c03,p_h15"/>
+    <station id="p_c03" name="Saint-Ouen l'Aumône - Liesse" line="P_C:3,P_H:3" link="p_c02,p_c04"/>
+    <station id="p_c04" name="Pierrelaye" line="P_C:4,P_H:4" link="p_c03,p_c05"/>
+    <station id="p_c05" name="Montigny - Beauchamp" line="P_C:5,P_H:5" link="p_c04,p_c06"/>
+    <station id="p_c06" name="Franconville-le-Plessis - Bouchard" line="P_C:6,P_H:6" link="p_c05,p_c07"/>
+    <station id="p_c07" name="Cernay" line="P_C:7,P_H:7" link="p_c06,p_c08"/>
+    <station id="p_c08" name="Ermont Eaubonne" line="P_C:8,P_H:8" link="p_c07,p_c09,p_h09,p_h35"/>
+    <station id="p_c09" name="Saint-Gratien" line="P_C:9" link="p_c08,p_t812"/>
+    <station id="p_t812" name="Épinay-sur-Seine" line="P_C:10,P_T11:1,P_T8:12" link="p_c09,p_c11,p_t1102,p_t811,p_t813"/>
+    <station id="p_c11" name="Les Grésillons" line="P_C:11" link="p_1403,p_t812"/>
+    <station id="p_c14" name="Pereire - Levallois" line="P_C:14" link="p_1305,p_c15" other_link="foot06:p_305"/>
+    <station id="p_c15" name="Neuilly - Porte Maillot" line="P_C:15,P_E:3" link="p_101,p_c14,p_c16,p_e04" other_link="foot01:p_104"/>
+    <station id="p_c16" name="Avenue Foch" line="P_C:16" link="p_c15,p_c17" other_link="foot04:p_201"/>
+    <station id="p_c17" name="Avenue Henri Martin" line="P_C:17" link="p_c16,p_c18" other_link="foot14:p_911"/>
+    <station id="p_c18" name="Boulainvilliers" line="P_C:18" link="p_c17,p_c19" other_link="foot24:p_910"/>
+    <station id="p_c19" name="Avenue du Président Kennedy" line="P_C:19" link="p_c18,p_c20"/>
+    <station id="p_c20" name="Champ de Mars - Tour Eiffel" line="P_C:20" link="p_c19,p_c21,p_c38" other_link="foot23:p_606"/>
+    <station id="p_c21" name="Pont de l'Alma" line="P_C:21" link="p_809,p_c20" other_link="foot15:p_913"/>
+    <station id="p_c23" name="Musée d'Orsay" line="P_C:23" link="p_809,p_b30" other_link="foot18:p_1214"/>
+    <station id="p_c27" name="Ivry-sur-Seine" line="P_C:27" link="p_1413,p_c28"/>
+    <station id="p_c28" name="Vitry-sur-Seine" line="P_C:28" link="p_c27,p_c29"/>
+    <station id="p_c29" name="Les Ardoines" line="P_C:29" link="p_c28,p_c30"/>
+    <station id="p_c30" name="Choisy-le-Roi" line="P_C:30" link="p_c29,p_c50,p_t918" other_link="foot28:p_t914"/>
+    <station id="p_t918" name="Les Saules" line="P_C:31,P_T9:18" link="p_c30,p_c32,p_t917,p_t919"/>
+    <station id="p_c32" name="Orly Ville" line="P_C:32" link="p_c33,p_t918" other_link="foot29:p_t919"/>
+    <station id="p_c33" name="Pont de Rungis" line="P_C:33" link="p_c32,p_t713" other_link="foot22:p_1420"/>
+    <station id="p_t713" name="La Fraternelle" line="P_C:34,P_T7:13" link="p_c33,p_c35,p_t712,p_t714"/>
+    <station id="p_c35" name="Chemin d'Antony" line="P_C:35" link="p_b12,p_t713"/>
+    <station id="p_c38" name="Javel" line="P_C:38" link="p_c20,p_c39" other_link="foot17:p_1005"/>
+    <station id="p_c39" name="Pont du Garigliano" line="P_C:39" link="p_c38,p_t220"/>
+    <station id="p_t220" name="Issy - Val de Seine" line="P_C:40,P_T2:20" link="p_c39,p_c41,p_t219,p_t221"/>
+    <station id="p_c41" name="Issy" line="P_C:41" link="p_c42,p_t220"/>
+    <station id="p_c42" name="Meudon - Val Fleury" line="P_C:42" link="p_c41,p_c43"/>
+    <station id="p_c43" name="Chaville - Vélizy" line="P_C:43" link="p_c42,p_t602"/>
+    <station id="p_t602" name="Viroflay Rive Gauche" line="P_C:44,P_N:8,P_T6:2" link="p_c43,p_c45,p_c47,p_n07,p_t601,p_t603"/>
+    <station id="p_c45" name="Porchefontaine" line="P_C:45" link="p_c46,p_t602"/>
+    <station id="p_c46" name="Versailles Château" line="P_C:46" link="p_c45"/>
+    <station id="p_c47" name="Versailles - Chantiers" line="P_C:47,P_N:9,P_U:7,P_V:7" link="p_l33,p_t1312,p_t602,p_v06"/>
+    <station id="p_t1312" name="Saint-Cyr" line="P_C:48,P_N:10,P_T13:12,P_U:8" link="p_c47,p_c49,p_n18,p_t1311"/>
+    <station id="p_c49" name="Saint-Quentin-en-Yvelines" line="P_C:49,P_N:11,P_U:9" link="p_n12,p_t1312"/>
+    <station id="p_c50" name="Villeneuve-le-Roi" line="P_C:50" link="p_c30,p_c51"/>
+    <station id="p_c51" name="Ablon" line="P_C:51" link="p_c50,p_c52"/>
+    <station id="p_c52" name="Athis-Mons" line="P_C:52" link="p_c51,p_c53"/>
+    <station id="p_c53" name="Juvisy" line="P_C:53,P_D:22" link="p_c52,p_c54,p_d21,p_d23"/>
+    <station id="p_c54" name="Savigny-sur-Orge" line="P_C:54" link="p_c53,p_t1208"/>
+    <station id="p_t1208" name="Épinay-sur-Orge" line="P_C:55,P_T12:8" link="p_c54,p_c56,p_t1207,p_t1209"/>
+    <station id="p_c56" name="Sainte-Geneviève-des-Bois" line="P_C:56" link="p_c57,p_t1208"/>
+    <station id="p_c57" name="Saint-Michel-sur-Orge" line="P_C:57" link="p_c56,p_c58"/>
+    <station id="p_c58" name="Brétigny" line="P_C:58" link="p_c57,p_c59,p_c68"/>
+    <station id="p_c59" name="La Norville - Saint-Germain-lès-Arpajon" line="P_C:59" link="p_c58,p_c60"/>
+    <station id="p_c60" name="Arpajon" line="P_C:60" link="p_c59,p_c61"/>
+    <station id="p_c61" name="Égly" line="P_C:61" link="p_c60,p_c62"/>
+    <station id="p_c62" name="Breuillet - Bruyères-le-Châtel" line="P_C:62" link="p_c61,p_c63"/>
+    <station id="p_c63" name="Breuillet Village" line="P_C:63" link="p_c62,p_c64"/>
+    <station id="p_c64" name="Saint-Chéron" line="P_C:64" link="p_c63,p_c65"/>
+    <station id="p_c65" name="Sermaise" line="P_C:65" link="p_c64,p_c66"/>
+    <station id="p_c66" name="Dourdan" line="P_C:66" link="p_c65,p_c67"/>
+    <station id="p_c67" name="Dourdan - la Forêt" line="P_C:67" link="p_c66"/>
+    <station id="p_c68" name="Marolles-en-Hurepoix" line="P_C:68" link="p_c58,p_c69"/>
+    <station id="p_c69" name="Bouray" line="P_C:69" link="p_c68,p_c70"/>
+    <station id="p_c70" name="Lardy" line="P_C:70" link="p_c69,p_c71"/>
+    <station id="p_c71" name="Chamarande" line="P_C:71" link="p_c70,p_c72"/>
+    <station id="p_c72" name="Étréchy" line="P_C:72" link="p_c71,p_c73"/>
+    <station id="p_c73" name="Étampes" line="P_C:73" link="p_c72,p_c74"/>
+    <station id="p_c74" name="Saint-Martin-d'Étampes" line="P_C:74" link="p_c73"/>
+    <!-- CDGVal -->
+    <station id="p_cdgval01" name="Aéroport Charles de Gaulle Terminal 1" line="P_CDGVAL:1" link="p_cdgval02"/>
+    <station id="p_cdgval02" name="Parc PR" line="P_CDGVAL:2" link="p_cdgval01,p_cdgval03"/>
+    <station id="p_cdgval04" name="Parc PX" line="P_CDGVAL:4" link="p_cdgval03,p_cdgval05"/>
+    <station id="p_cdgval05" name="Aéroport Charles de Gaulle Terminal 2" line="P_CDGVAL:5" link="p_cdgval04"/>
+    <!-- D -->
+    <station id="p_d01" name="Creil" line="P_D:1,P_H:26" link="p_d02,p_h25"/>
+    <station id="p_d02" name="Chantilly - Gouvieux" line="P_D:2" link="p_d01,p_d03"/>
+    <station id="p_d03" name="Orry-la-Ville - Coye-la-Forêt" line="P_D:3" link="p_d02,p_d04"/>
+    <station id="p_d04" name="La Borne Blanche" line="P_D:4" link="p_d03,p_d05"/>
+    <station id="p_d05" name="Survilliers Fosses" line="P_D:5" link="p_d04,p_d06"/>
+    <station id="p_d06" name="Louvres" line="P_D:6" link="p_d05,p_d07"/>
+    <station id="p_d07" name="Les Noues" line="P_D:7" link="p_d06,p_d08"/>
+    <station id="p_d08" name="Goussainville" line="P_D:8" link="p_d07,p_d09"/>
+    <station id="p_d09" name="Villiers-le-Bel - Gonesse - Arnouville" line="P_D:9" link="p_d08,p_d10"/>
+    <station id="p_d10" name="Garges - Sarcelles" line="P_D:10" link="p_d09,p_t1104"/>
+    <station id="p_t1104" name="Pierrefitte - Stains" line="P_D:11,P_T11:4" link="p_d10,p_t1105,p_t112,p_t817"/>
+    <station id="p_t112" name="Saint-Denis" line="P_D:12,P_H:13,P_T1:12,P_T8:3" link="p_406,p_d13,p_t1102,p_t1104,p_t111,p_t113,p_t802,p_t804"/>
+    <station id="p_d13" name="Stade de France - Saint-Denis" line="P_D:13" link="p_406,p_t112"/>
+    <station id="p_d15" name="Châtelet Les Halles" line="P_D:15" link="p_118,p_406" other_link="foot02:p_114,foot02:p_412"/>
+    <station id="p_d17" name="Maisons-Alfort - Alfortville" line="P_D:17" link="p_118,p_d18"/>
+    <station id="p_d18" name="Le Vert de Maisons" line="P_D:18" link="p_d17,p_d19"/>
+    <station id="p_d19" name="Créteil - Pompadour" line="P_D:19" link="p_d18,p_d20"/>
+    <station id="p_d20" name="Villeneuve - Triage" line="P_D:20" link="p_d19,p_d21"/>
+    <station id="p_d21" name="Villeneuve - Saint-Georges" line="P_D:21" link="p_c53,p_d20,p_d46"/>
+    <station id="p_d23" name="Viry-Châtillon" line="P_D:23" link="p_c53,p_d24,p_d47"/>
+    <station id="p_d24" name="Grigny" line="P_D:24" link="p_d23,p_d25"/>
+    <station id="p_d25" name="Orangis - Bois de l'Épine" line="P_D:25" link="p_d24,p_t1216"/>
+    <station id="p_t1216" name="Évry - Courcouronnes" line="P_D:26,P_T12:16" link="p_d25,p_d27,p_t1215"/>
+    <station id="p_d27" name="Le Bras de Fer" line="P_D:27" link="p_d28,p_t1216"/>
+    <station id="p_d28" name="Corbeil - Essonnes" line="P_D:28" link="p_d27,p_d29,p_d49,p_d50"/>
+    <station id="p_d29" name="Essonnes - Robinson" line="P_D:29" link="p_d28,p_d30"/>
+    <station id="p_d30" name="Villabé" line="P_D:30" link="p_d29,p_d31"/>
+    <station id="p_d31" name="Le Plessis - Chenet" line="P_D:31" link="p_d30,p_d32"/>
+    <station id="p_d32" name="Le Coudray - Montceaux" line="P_D:32" link="p_3102,p_d31"/>
+    <station id="p_d34" name="Ponthierry Pringy" line="P_D:34" link="p_3102,p_d35"/>
+    <station id="p_d35" name="Boissise-le-Roi" line="P_D:35" link="p_d34,p_d36"/>
+    <station id="p_d36" name="Vosves" line="P_D:36" link="p_d35,p_d37"/>
+    <station id="p_d37" name="Melun" line="P_D:37,P_R:2" link="p_118,p_d36,p_d38,p_r03,p_r15"/>
+    <station id="p_d38" name="Le Mée-sur-Seine" line="P_D:38" link="p_d37,p_d39"/>
+    <station id="p_d39" name="Cesson" line="P_D:39" link="p_d38,p_d40"/>
+    <station id="p_d40" name="Savigny-le-Temple - Nandy" line="P_D:40" link="p_d39,p_d41"/>
+    <station id="p_d41" name="Lieusaint - Moissy" line="P_D:41" link="p_d40,p_d42"/>
+    <station id="p_d42" name="Combs-la-Ville - Quincy" line="P_D:42" link="p_d41,p_d43"/>
+    <station id="p_d43" name="Boussy - Saint-Antoine" line="P_D:43" link="p_d42,p_d44"/>
+    <station id="p_d44" name="Brunoy" line="P_D:44" link="p_d43,p_d45"/>
+    <station id="p_d45" name="Yerres" line="P_D:45" link="p_d44,p_d46"/>
+    <station id="p_d46" name="Montgeron - Crosne" line="P_D:46" link="p_d21,p_d45"/>
+    <station id="p_d47" name="Ris-Orangis" line="P_D:47" link="p_d23,p_d48"/>
+    <station id="p_d48" name="Grand Bourg" line="P_D:48" link="p_d47,p_d49"/>
+    <station id="p_d49" name="Évry - Val de Seine" line="P_D:49" link="p_d28,p_d48"/>
+    <station id="p_d50" name="Moulin Galant" line="P_D:50" link="p_d28,p_d51"/>
+    <station id="p_d51" name="Mennecy" line="P_D:51" link="p_d50,p_d52"/>
+    <station id="p_d52" name="Ballancourt" line="P_D:52" link="p_d51,p_d53"/>
+    <station id="p_d53" name="La Ferté Alais" line="P_D:53" link="p_d52,p_d54"/>
+    <station id="p_d54" name="Boutigny" line="P_D:54" link="p_d53,p_d55"/>
+    <station id="p_d55" name="Maisse" line="P_D:55" link="p_d54,p_d56"/>
+    <station id="p_d56" name="Buno - Gironville" line="P_D:56" link="p_d55,p_d57"/>
+    <station id="p_d57" name="Boigneville" line="P_D:57" link="p_307,p_d56"/>
+    <!-- E -->
+    <station id="p_e01" name="Nanterre - La Folie" line="P_E:1" link="p_101" other_link="foot30:p_a17"/>
+    <station id="p_e04" name="Haussmann - Saint-Lazare" line="P_E:4" link="p_c15,p_e05" other_link="foot07:p_310,foot07:p_311,foot07:p_a20"/>
+    <station id="p_e05" name="Magenta" line="P_E:5" link="p_e04,p_t3b15" other_link="foot31:p_406"/>
+    <station id="p_t3b15" name="Rosa Parks" line="P_E:6,P_T3B:15" link="p_e05,p_e07,p_t3b14,p_t3b16"/>
+    <station id="p_e07" name="Pantin" line="P_E:7" link="p_t137,p_t3b15" other_link="foot26:p_t3b12"/>
+    <station id="p_t137" name="Noisy-le-Sec" line="P_E:8,P_T1:37" link="p_1117,p_e07,p_t136,p_t401"/>
+    <station id="p_e10" name="Rosny-sous-Bois" line="P_E:10" link="p_1117,p_a25"/>
+    <station id="p_e12" name="Nogent - Le Perreux" line="P_E:12" link="p_a25,p_e13"/>
+    <station id="p_e13" name="Le Boullereaux - Champigny" line="P_E:13" link="p_e12,p_e14"/>
+    <station id="p_e14" name="Villiers-sur-Marne - Le Plessis-Trévise" line="P_E:14" link="p_e13,p_e15"/>
+    <station id="p_e15" name="Les Yvris - Noisy-le-Grand" line="P_E:15" link="p_e14,p_e16"/>
+    <station id="p_e16" name="Émerainville - Pontault - Combault" line="P_E:16" link="p_e15,p_e17"/>
+    <station id="p_e17" name="Roissy-en-Brie" line="P_E:17" link="p_e16,p_e18"/>
+    <station id="p_e18" name="Ozoir-la-Ferrière" line="P_E:18" link="p_e17,p_e19"/>
+    <station id="p_e19" name="Gretz - Armainvilliers" line="P_E:19" link="p_e18,p_e20"/>
+    <station id="p_e20" name="Tournan" line="P_E:20,P_P:19" link="p_407,p_e19,p_p20"/>
+    <station id="p_t401" name="Bondy" line="P_E:21,P_T4:1" link="p_e22,p_t137,p_t402"/>
+    <station id="p_e22" name="Le Raincy - Villemomble - Montfermeil" line="P_E:22" link="p_e23,p_t401"/>
+    <station id="p_e23" name="Gagny" line="P_E:23" link="p_e22,p_e24"/>
+    <station id="p_e24" name="Le Chénay - Gagny" line="P_E:24" link="p_e23,p_e25"/>
+    <station id="p_e25" name="Chelles - Gournay" line="P_E:25,P_P:2" link="p_407,p_e24,p_p03"/>
+    <!-- Funiculaire de Montmartre -->
+    <!-- H -->
+    <station id="p_h09" name="Champ de Courses d'Enghien" line="P_H:9" link="p_c08,p_h10"/>
+    <station id="p_h10" name="Enghien-les-Bains" line="P_H:10" link="p_h09,p_h11"/>
+    <station id="p_h11" name="La Barre - Ormesson" line="P_H:11" link="p_h10,p_t1102"/>
+    <station id="p_t1102" name="Épinay - Villetaneuse" line="P_H:12,P_T11:2" link="p_h11,p_h44,p_t112,p_t812,p_t817"/>
+    <station id="p_h15" name="Épluches" line="P_H:15" link="p_c02,p_h16"/>
+    <station id="p_h16" name="Pont Petit" line="P_H:16" link="p_h15,p_h17"/>
+    <station id="p_h17" name="Chaponval" line="P_H:17" link="p_h16,p_h18"/>
+    <station id="p_h18" name="Auvers-sur-Oise" line="P_H:18" link="p_h17,p_h19"/>
+    <station id="p_h19" name="Valmondois" line="P_H:19" link="p_h18,p_h20,p_h27"/>
+    <station id="p_h20" name="L'Isle Adam - Parmain" line="P_H:20" link="p_h19,p_h21"/>
+    <station id="p_h21" name="Champagne-sur-Oise" line="P_H:21" link="p_h20,p_h22"/>
+    <station id="p_h22" name="Persan Beaumont" line="P_H:22" link="p_h21,p_h23,p_h36"/>
+    <station id="p_h23" name="Bruyères-sur-Oise" line="P_H:23" link="p_h22,p_h24"/>
+    <station id="p_h24" name="Boran-sur-Oise" line="P_H:24" link="p_h23,p_h25"/>
+    <station id="p_h25" name="Précy-sur-Oise" line="P_H:25" link="p_d01,p_h24"/>
+    <station id="p_h27" name="Mériel" line="P_H:27" link="p_h19,p_h28"/>
+    <station id="p_h28" name="Méry-sur-Oise" line="P_H:28" link="p_h27,p_h29"/>
+    <station id="p_h29" name="Frépillon" line="P_H:29" link="p_h28,p_h30"/>
+    <station id="p_h30" name="Bessancourt" line="P_H:30" link="p_h29,p_h31"/>
+    <station id="p_h31" name="Taverny" line="P_H:31" link="p_h30,p_h32"/>
+    <station id="p_h32" name="Vaucelles" line="P_H:32" link="p_h31,p_h33"/>
+    <station id="p_h33" name="Saint-Leu-la-Forêt" line="P_H:33" link="p_h32,p_h34"/>
+    <station id="p_h34" name="Gros Noyer Saint-Prix" line="P_H:34" link="p_h33,p_h35"/>
+    <station id="p_h35" name="Ermont Halte" line="P_H:35" link="p_c08,p_h34"/>
+    <station id="p_h36" name="Nointel Mours" line="P_H:36" link="p_h22,p_h37"/>
+    <station id="p_h37" name="Presles Courcelles" line="P_H:37" link="p_h36,p_h38"/>
+    <station id="p_h38" name="Montsoult Maffliers" line="P_H:38" link="p_h37,p_h39,p_h45"/>
+    <station id="p_h39" name="Bouffémont Moisselles" line="P_H:39" link="p_h38,p_h40"/>
+    <station id="p_h40" name="Domont" line="P_H:40" link="p_h39,p_h41"/>
+    <station id="p_h41" name="Écouen Ézanville" line="P_H:41" link="p_h40,p_h42"/>
+    <station id="p_h42" name="Sarcelles Saint-Brice" line="P_H:42" link="p_h41,p_h43"/>
+    <station id="p_h43" name="Groslay" line="P_H:43" link="p_h42,p_h44"/>
+    <station id="p_h44" name="Deuil - Montmagny" line="P_H:44" link="p_h43,p_t1102"/>
+    <station id="p_h45" name="Villaines" line="P_H:45" link="p_h38,p_h46"/>
+    <station id="p_h46" name="Belloy - Saint-Martin" line="P_H:46" link="p_h45,p_h47"/>
+    <station id="p_h47" name="Viarmes" line="P_H:47" link="p_h46,p_h48"/>
+    <station id="p_h48" name="Seugy" line="P_H:48" link="p_h47,p_h49"/>
+    <station id="p_h49" name="Luzarches" line="P_H:49" link="p_h48"/>
+    <!-- J -->
+    <station id="p_j01" name="Ermont Eaubonnne" line="P_J:1" link="p_j02"/>
+    <station id="p_j02" name="Sannois" line="P_J:2" link="p_j01,p_j22"/>
+    <station id="p_j03" name="Gisors" line="P_J:3" link="p_j04"/>
+    <station id="p_j04" name="Trie Château" line="P_J:4" link="p_j03,p_j05"/>
+    <station id="p_j05" name="Chaumont-en-Vexin" line="P_J:5" link="p_j04,p_j06"/>
+    <station id="p_j06" name="Liancourt - Saint-Pierre" line="P_J:6" link="p_j05,p_j07"/>
+    <station id="p_j07" name="La Villetertre" line="P_J:7" link="p_j06,p_j08"/>
+    <station id="p_j08" name="Chars" line="P_J:8" link="p_j07,p_j09"/>
+    <station id="p_j09" name="Santeuil - Le Perchay" line="P_J:9" link="p_j08,p_j10"/>
+    <station id="p_j10" name="Us" line="P_J:10" link="p_j09,p_j11"/>
+    <station id="p_j11" name="Montgeroult Courcelles" line="P_J:11" link="p_j10,p_j12"/>
+    <station id="p_j12" name="Boissy l'Aillerie" line="P_J:12" link="p_j11,p_j13"/>
+    <station id="p_j13" name="Osny" line="P_J:13" link="p_c01,p_j12"/>
+    <station id="p_j15" name="Saint-Ouen l'Aumône - Quartier de l'Église" line="P_J:15" link="p_c01,p_j16"/>
+    <station id="p_j16" name="Éragny - Neuville" line="P_J:16" link="p_j15,p_j17"/>
+    <station id="p_j17" name="Conflans - Sainte-Honorine" line="P_J:17" link="p_a05,p_j16,p_j18"/>
+    <station id="p_j18" name="Herblay" line="P_J:18" link="p_j17,p_j19"/>
+    <station id="p_j19" name="La Frette - Montigny" line="P_J:19" link="p_j18,p_j20"/>
+    <station id="p_j20" name="Cormeilles-en-Parisis" line="P_J:20" link="p_j19,p_j21"/>
+    <station id="p_j21" name="Val d'Argenteuil" line="P_J:21" link="p_j20,p_j22"/>
+    <station id="p_j22" name="Argenteuil" line="P_J:22" link="p_j02,p_j21,p_j23"/>
+    <station id="p_j23" name="Le Stade" line="P_J:23" link="p_j22,p_j24"/>
+    <station id="p_j24" name="Colombes" line="P_J:24" link="p_j23,p_j25"/>
+    <station id="p_j25" name="Bois-Colombes" line="P_J:25" link="p_j24,p_j26"/>
+    <station id="p_j26" name="Asnières-sur-Seine" line="P_J:26,P_L:14" link="p_a09,p_j25,p_j27,p_l13,p_l15"/>
+    <station id="p_j27" name="Gare Saint-Lazare" line="P_J:27,P_L:17" link="p_1405,p_j26" other_link="foot07:p_310"/>
+    <station id="p_j29" name="Poissy" line="P_J:29" link="p_a09,p_j30"/>
+    <station id="p_j30" name="Villennes-sur-Seine" line="P_J:30" link="p_j29,p_j31"/>
+    <station id="p_j31" name="Vernouillet - Verneuil" line="P_J:31" link="p_j30,p_j32"/>
+    <station id="p_j32" name="Les Clairières - Verneuil" line="P_J:32" link="p_j31,p_j33"/>
+    <station id="p_j33" name="Les Mureaux" line="P_J:33" link="p_j32,p_j34"/>
+    <station id="p_j34" name="Aubergenville - Élisabethville" line="P_J:34" link="p_j33,p_j35"/>
+    <station id="p_j35" name="Épône - Mézières" line="P_J:35,P_N:34" link="p_j34,p_j36,p_n33"/>
+    <station id="p_j36" name="Mantes Station" line="P_J:36,P_N:35" link="p_j35,p_j37,p_j41"/>
+    <station id="p_j37" name="Mantes-la-Jolie" line="P_J:37,P_N:36" link="p_j36,p_j38"/>
+    <station id="p_j38" name="Rosny-sur-Seine" line="P_J:38" link="p_j37,p_j39"/>
+    <station id="p_j39" name="Bonnières" line="P_J:39" link="p_j38,p_j40"/>
+    <station id="p_j40" name="Vernon - Giverny" line="P_J:40" link="p_j39"/>
+    <station id="p_j41" name="Limay" line="P_J:41" link="p_j36,p_j42"/>
+    <station id="p_j42" name="Issou - Porcheville" line="P_J:42" link="p_j41,p_j43"/>
+    <station id="p_j43" name="Gargenville" line="P_J:43" link="p_j42,p_j44"/>
+    <station id="p_j44" name="Juziers" line="P_J:44" link="p_j43,p_j45"/>
+    <station id="p_j45" name="Meulan - Hardricourt" line="P_J:45" link="p_j44,p_j46"/>
+    <station id="p_j46" name="Thun-le-Paradis" line="P_J:46" link="p_j45,p_j47"/>
+    <station id="p_j47" name="Vaux-sur-Seine" line="P_J:47" link="p_j46,p_j48"/>
+    <station id="p_j48" name="Triel-sur-Seine" line="P_J:48" link="p_j47,p_j49"/>
+    <station id="p_j49" name="Chanteloup les Vignes" line="P_J:49" link="p_j48,p_j50"/>
+    <station id="p_j50" name="Andrésy" line="P_J:50" link="p_j49,p_j51"/>
+    <station id="p_j51" name="Maurecourt" line="P_J:51" link="p_a05,p_j50"/>
+    <!-- K -->
+    <station id="p_k04" name="Compans" line="P_K:4" link="p_b42,p_k05"/>
+    <station id="p_k05" name="Thieux Nantouillet" line="P_K:5" link="p_k04,p_k06"/>
+    <station id="p_k06" name="Dammartin - Juilly Saint-Mard" line="P_K:6" link="p_k05,p_k07"/>
+    <station id="p_k07" name="Le Plessis - Belleville" line="P_K:7" link="p_k06,p_k08"/>
+    <station id="p_k08" name="Nanteuil-le-Haudouin" line="P_K:8" link="p_k07,p_k09"/>
+    <station id="p_k09" name="Ormoy Villers" line="P_K:9" link="p_k08,p_k10"/>
+    <station id="p_k10" name="Crépy-en-Valois" line="P_K:10" link="p_k09"/>
+    <!-- L -->
+    <station id="p_l11" name="La Garenne - Colombes" line="P_L:11" link="p_a16,p_l12" other_link="foot25:p_t205"/>
+    <station id="p_l12" name="Les Vallées" line="P_L:12" link="p_l11,p_l13"/>
+    <station id="p_l13" name="Bécon les Bruyères" line="P_L:13" link="p_j26,p_l12,p_l18"/>
+    <station id="p_l15" name="Clichy - Levallois" line="P_L:15" link="p_1405,p_j26"/>
+    <station id="p_l18" name="Courbevoie" line="P_L:18" link="p_101,p_l13"/>
+    <station id="p_t209" name="Puteaux" line="P_L:20,P_T2:9,P_U:2" link="p_101,p_l21,p_t210"/>
+    <station id="p_l21" name="Suresnes - Mont-Valérien" line="P_L:21,P_U:3" link="p_l22,p_l23,p_t209"/>
+    <station id="p_l22" name="Le Val d'Or" line="P_L:22" link="p_l21,p_l23"/>
+    <station id="p_l23" name="Saint-Cloud" line="P_L:23,P_U:4" link="p_l21,p_l22,p_l24,p_l32"/>
+    <station id="p_l24" name="Garches - Marnes-la-Coquette" line="P_L:24" link="p_l23,p_l25"/>
+    <station id="p_l25" name="Vaucresson" line="P_L:25" link="p_l24,p_l26"/>
+    <station id="p_l26" name="La Celle - Saint-Cloud" line="P_L:26" link="p_l25,p_l27"/>
+    <station id="p_l27" name="Bougival" line="P_L:27" link="p_l26,p_l28"/>
+    <station id="p_l28" name="Louveciennes" line="P_L:28" link="p_l27,p_l29"/>
+    <station id="p_l29" name="Marly-le-Roi" line="P_L:29" link="p_l28,p_l30"/>
+    <station id="p_l30" name="L'Étang-la-Ville" line="P_L:30" link="p_l29,p_t1307"/>
+    <station id="p_t1307" name="Saint-Nom-la-Bretèche - Forêt de Marly" line="P_L:31,P_T13:7" link="p_l30,p_t1306,p_t1308"/>
+    <station id="p_l32" name="Sèvres - Ville d'Avray" line="P_L:32,P_U:5" link="p_l23,p_l33"/>
+    <station id="p_l33" name="Chaville Rive Droite" line="P_L:33,P_U:6" link="p_c47,p_l32,p_t601"/>
+    <station id="p_t601" name="Viroflay Rive Droite" line="P_L:34,P_T6:1" link="p_l33,p_l35,p_t602"/>
+    <station id="p_l35" name="Montreuil" line="P_L:35" link="p_l36,p_t601"/>
+    <station id="p_l36" name="Versailles Rive Droite" line="P_L:36" link="p_l35"/>
+    <!-- N -->
+    <station id="p_n01" name="Gare Montparnasse" line="P_N:1" link="p_n02" other_link="foot10:p_420"/>
+    <station id="p_n02" name="Vanves - Malakoff" line="P_N:2" link="p_n01,p_n03"/>
+    <station id="p_n03" name="Clamart" line="P_N:3" link="p_n02,p_n04"/>
+    <station id="p_n04" name="Meudon" line="P_N:4" link="p_n03,p_n05"/>
+    <station id="p_n05" name="Bellevue" line="P_N:5" link="p_n04,p_n06"/>
+    <station id="p_n06" name="Sèvres Rive Gauche" line="P_N:6" link="p_n05,p_n07"/>
+    <station id="p_n07" name="Chaville Rive Gauche" line="P_N:7" link="p_n06,p_t602"/>
+    <station id="p_n12" name="Trappes" line="P_N:12,P_U:10" link="p_c49,p_n13"/>
+    <station id="p_n13" name="La Verrière" line="P_N:13,P_U:11" link="p_n12,p_n14"/>
+    <station id="p_n14" name="Coignières" line="P_N:14" link="p_n13,p_n15"/>
+    <station id="p_n15" name="Les Essarts-le-Roi" line="P_N:15" link="p_n14,p_n16"/>
+    <station id="p_n16" name="Le Perray" line="P_N:16" link="p_n15,p_n17"/>
+    <station id="p_n17" name="Rambouillet" line="P_N:17" link="p_n16"/>
+    <station id="p_n18" name="Fontenay-le-Fleury" line="P_N:18" link="p_n19,p_t1312"/>
+    <station id="p_n19" name="Villepreux - Les Clayes" line="P_N:19" link="p_n18,p_n20"/>
+    <station id="p_n20" name="Plaisir - Les Clayes" line="P_N:20" link="p_n19,p_n21"/>
+    <station id="p_n21" name="Plaisir - Grignon" line="P_N:21" link="p_n20,p_n22,p_n30"/>
+    <station id="p_n22" name="Villiers - Neauphle - Pontchartrain" line="P_N:22" link="p_n21,p_n23"/>
+    <station id="p_n23" name="Montfort-l'Amaury - Méré" line="P_N:23" link="p_n22,p_n24"/>
+    <station id="p_n24" name="Garancières - La Queue" line="P_N:24" link="p_n23,p_n25"/>
+    <station id="p_n25" name="Orgerus - Béhoust" line="P_N:25" link="p_n24,p_n26"/>
+    <station id="p_n26" name="Tacoignières - Richebourg" line="P_N:26" link="p_n25,p_n27"/>
+    <station id="p_n27" name="Houdan" line="P_N:27" link="p_n26,p_n28"/>
+    <station id="p_n28" name="Marchezais - Broué" line="P_N:28" link="p_n27,p_n29"/>
+    <station id="p_n29" name="Dreux" line="P_N:29" link="p_n28"/>
+    <station id="p_n30" name="Beynes" line="P_N:30" link="p_n21,p_n31"/>
+    <station id="p_n31" name="Mareil-sur-Mauldre" line="P_N:31" link="p_n30,p_n32"/>
+    <station id="p_n32" name="Maule" line="P_N:32" link="p_n31,p_n33"/>
+    <station id="p_n33" name="Nézel Aulnay" line="P_N:33" link="p_j35,p_n32"/>
+    <!-- OrlyVal -->
+    <station id="p_orlyva02" name="Orly 1, 2, 3" line="P_ORLYVA:2" link="p_orlyva01,p_orlyva03"/>
+    <station id="p_orlyva03" name="Orly 4" line="P_ORLYVA:3" link="p_orlyva02"/>
+    <!-- P -->
+    <station id="p_p03" name="Vaires - Torcy" line="P_P:3" link="p_e25,p_p04"/>
+    <station id="p_p04" name="Lagny - Thorigny" line="P_P:4" link="p_p03,p_t1401"/>
+    <station id="p_t1401" name="Esbly" line="P_P:5,P_T14:1" link="p_p04,p_p06,p_t1402"/>
+    <station id="p_p06" name="Meaux" line="P_P:6" link="p_p07,p_t1401"/>
+    <station id="p_p07" name="Trilport" line="P_P:7" link="p_p06,p_p08,p_p13"/>
+    <station id="p_p08" name="Isles Armentières - Congis" line="P_P:8" link="p_p07,p_p09"/>
+    <station id="p_p09" name="Lizy-sur-Ourcq" line="P_P:9" link="p_p08,p_p10"/>
+    <station id="p_p10" name="Crouy-sur-Ourcq" line="P_P:10" link="p_p09,p_p11"/>
+    <station id="p_p11" name="Mareuil-sur-Ourcq" line="P_P:11" link="p_p10,p_p12"/>
+    <station id="p_p12" name="La Ferté - Milon" line="P_P:12" link="p_p11"/>
+    <station id="p_p13" name="Changis - Saint-Jean" line="P_P:13" link="p_p07,p_p14"/>
+    <station id="p_p14" name="La Ferté-sous-Jouarre" line="P_P:14" link="p_p13,p_p15"/>
+    <station id="p_p15" name="Nanteuil Saâcy" line="P_P:15" link="p_p14,p_p16"/>
+    <station id="p_p16" name="Nogent l'Artaud - Charly" line="P_P:16" link="p_p15,p_p17"/>
+    <station id="p_p17" name="Chézy-sur-Marne" line="P_P:17" link="p_p16,p_p18"/>
+    <station id="p_p18" name="Château Thierry" line="P_P:18" link="p_p17"/>
+    <station id="p_p20" name="Marles-en-Brie" line="P_P:20" link="p_e20,p_p21"/>
+    <station id="p_p21" name="Mortcerf" line="P_P:21" link="p_p20,p_p22"/>
+    <station id="p_p22" name="Guérard - La Celle-sur-Morin" line="P_P:22" link="p_p21,p_p23"/>
+    <station id="p_p23" name="Faremoutiers - Pommeuse" line="P_P:23" link="p_p22,p_p24"/>
+    <station id="p_p24" name="Mouroux" line="P_P:24" link="p_p23,p_p25"/>
+    <station id="p_p25" name="Coulommiers" line="P_P:25" link="p_p24"/>
+    <station id="p_p26" name="Verneuil-l'Étang" line="P_P:26" link="p_407,p_p27"/>
+    <station id="p_p27" name="Mormant" line="P_P:27" link="p_p26,p_p28"/>
+    <station id="p_p28" name="Nangis" line="P_P:28" link="p_p27,p_p29"/>
+    <station id="p_p29" name="Longueville" line="P_P:29" link="p_p28,p_p30"/>
+    <station id="p_p30" name="Sainte-Colombe - Septveilles" line="P_P:30" link="p_p29,p_p31"/>
+    <station id="p_p31" name="Champbenoist - Poigny" line="P_P:31" link="p_p30,p_p32"/>
+    <station id="p_p32" name="Provins" line="P_P:32" link="p_p31"/>
+    <!-- R -->
+    <station id="p_r03" name="Bois-le-Roi" line="P_R:3" link="p_d37,p_r04"/>
+    <station id="p_r04" name="Fontainebleau - Avon" line="P_R:4" link="p_r03,p_r05"/>
+    <station id="p_r05" name="Thomery" line="P_R:5" link="p_r04,p_r06"/>
+    <station id="p_r06" name="Moret - Veneux-les-Sablons" line="P_R:6" link="p_r05,p_r07,p_r24"/>
+    <station id="p_r07" name="Montigny-sur-Loing" line="P_R:7" link="p_r06,p_r08"/>
+    <station id="p_r08" name="Bouuron Marlotte Grez" line="P_R:8" link="p_r07,p_r09"/>
+    <station id="p_r09" name="Nemours - Saint-Pierre" line="P_R:9" link="p_r08,p_r10"/>
+    <station id="p_r10" name="Bagneaux-sur-Loing" line="P_R:10" link="p_r09,p_r11"/>
+    <station id="p_r11" name="Souppes - Château-Landon" line="P_R:11" link="p_r10,p_r12"/>
+    <station id="p_r12" name="Ferrières - Fontenay" line="P_R:12" link="p_r11,p_r13"/>
+    <station id="p_r13" name="Dordives" line="P_R:13" link="p_r12,p_r14"/>
+    <station id="p_r14" name="Montargis" line="P_R:14" link="p_r13"/>
+    <station id="p_r15" name="Livry-sur-Seine" line="P_R:15" link="p_d37,p_r16"/>
+    <station id="p_r16" name="Chartrettes" line="P_R:16" link="p_r15,p_r17"/>
+    <station id="p_r17" name="Fontaine-le-Port" line="P_R:17" link="p_r16,p_r18"/>
+    <station id="p_r18" name="Héricy" line="P_R:18" link="p_r17,p_r19"/>
+    <station id="p_r19" name="Vulaines-sur-Seine" line="P_R:19" link="p_r18,p_r20"/>
+    <station id="p_r20" name="Champagne-sur-Seine" line="P_R:20" link="p_r19,p_r21"/>
+    <station id="p_r21" name="Vernou-sur-Seine" line="P_R:21" link="p_r20,p_r22"/>
+    <station id="p_r22" name="La Grande Paroissse" line="P_R:22" link="p_r21,p_r23"/>
+    <station id="p_r23" name="Montereau" line="P_R:23" link="p_r22,p_r24"/>
+    <station id="p_r24" name="Saint-Mammès" line="P_R:24" link="p_r06,p_r23"/>
+    <!-- T1 -->
+    <station id="p_t101" name="Asnières - Quatre Routes" line="P_T1:1" link="p_1301"/>
+    <station id="p_t103" name="Le Luth" line="P_T1:3" link="p_1301,p_t104"/>
+    <station id="p_t104" name="Le Village" line="P_T1:4" link="p_t103,p_t105"/>
+    <station id="p_t105" name="Timbaud" line="P_T1:5" link="p_t104,p_t106"/>
+    <station id="p_t106" name="Gennevilliers" line="P_T1:6" link="p_t105,p_t107"/>
+    <station id="p_t107" name="Parc des Chantereines" line="P_T1:7" link="p_t106,p_t108"/>
+    <station id="p_t108" name="Chemin des Reniers" line="P_T1:8" link="p_t107,p_t109"/>
+    <station id="p_t109" name="La Noue" line="P_T1:9" link="p_t108,p_t110"/>
+    <station id="p_t110" name="Mairie de Villeneuve-la-Garenne" line="P_T1:10" link="p_t109,p_t111"/>
+    <station id="p_t111" name="L'Île Saint-Denis" line="P_T1:11" link="p_t110,p_t112"/>
+    <station id="p_t113" name="Théâtre Gérard Philipe" line="P_T1:13" link="p_t112,p_t114"/>
+    <station id="p_t114" name="Marché de Saint-Denis" line="P_T1:14,P_T5:1" link="p_1308,p_t113,p_t502"/>
+    <station id="p_t116" name="Cimetière de Saint-Denis" line="P_T1:16" link="p_1308,p_t117"/>
+    <station id="p_t117" name="Hôpital Delafontaine" line="P_T1:17" link="p_t116,p_t118"/>
+    <station id="p_t118" name="Cosmonautes" line="P_T1:18" link="p_t117,p_t119"/>
+    <station id="p_t119" name="La Courneuve - 6 Routes" line="P_T1:19" link="p_t118,p_t120"/>
+    <station id="p_t120" name="Hôtel de Ville de La Courneuve" line="P_T1:20" link="p_t119,p_t121"/>
+    <station id="p_t121" name="Stade Géo André" line="P_T1:21" link="p_t120,p_t122"/>
+    <station id="p_t122" name="Danton" line="P_T1:22" link="p_701,p_t121"/>
+    <station id="p_t124" name="Maurice Lachâtre" line="P_T1:24" link="p_701,p_t125"/>
+    <station id="p_t125" name="Drancy - Avenir" line="P_T1:25" link="p_t124,p_t126"/>
+    <station id="p_t126" name="Hôpital Avicenne" line="P_T1:26" link="p_t125,p_t127"/>
+    <station id="p_t127" name="Gaston Roulaud" line="P_T1:27" link="p_t126,p_t128"/>
+    <station id="p_t128" name="Escadrille Normandie-Niémen" line="P_T1:28" link="p_t127,p_t129"/>
+    <station id="p_t129" name="La Ferme" line="P_T1:29" link="p_t128,p_t130"/>
+    <station id="p_t130" name="Libération" line="P_T1:30" link="p_t129,p_t131"/>
+    <station id="p_t131" name="Hôtel de Ville de Bobigny" line="P_T1:31" link="p_501,p_t130"/>
+    <station id="p_t133" name="Jean Rostand" line="P_T1:33" link="p_501,p_t134"/>
+    <station id="p_t134" name="Auguste Delaune" line="P_T1:34" link="p_t133,p_t135"/>
+    <station id="p_t135" name="Pont de Bondy" line="P_T1:35" link="p_t134,p_t136"/>
+    <station id="p_t136" name="Petit Noisy" line="P_T1:36" link="p_t135,p_t137"/>
+    <!-- T10 -->
+    <station id="p_t1001" name="Jardin Parisien" line="P_T10:1" link="p_t615"/>
+    <station id="p_t615" name="Hôpital Béclère" line="P_T10:2,P_T6:15" link="p_t1001,p_t1003,p_t614,p_t616"/>
+    <station id="p_t1003" name="Le Hameau" line="P_T10:3" link="p_t1004,p_t615"/>
+    <station id="p_t1004" name="Parc des Sports" line="P_T10:4" link="p_t1003,p_t1005"/>
+    <station id="p_t1005" name="Noveos" line="P_T10:5" link="p_t1004,p_t1006"/>
+    <station id="p_t1006" name="Malabry" line="P_T10:6" link="p_t1005,p_t1007"/>
+    <station id="p_t1007" name="Vallée aux Loups" line="P_T10:7" link="p_t1006,p_t1008"/>
+    <station id="p_t1008" name="Cité Jardin" line="P_T10:8" link="p_t1007,p_t1009"/>
+    <station id="p_t1009" name="Les Peintres" line="P_T10:9" link="p_t1008,p_t1010"/>
+    <station id="p_t1010" name="Théâtre La Piscine" line="P_T10:10" link="p_t1009,p_t1011"/>
+    <station id="p_t1011" name="Petit Châtenay" line="P_T10:11" link="p_t1010,p_t1012"/>
+    <station id="p_t1012" name="La Vallée" line="P_T10:12" link="p_t1011,p_t1013"/>
+    <!-- T11 -->
+    <station id="p_t817" name="Villetaneuse - Université" line="P_T11:3,P_T8:17" link="p_t1102,p_t1104,p_t816"/>
+    <station id="p_t1105" name="Stains - La Cerisaie" line="P_T11:5" link="p_t1104,p_t1106"/>
+    <station id="p_t1106" name="Dugny - La Courneuve" line="P_T11:6" link="p_t1105,p_t1107"/>
+    <!-- T12 -->
+    <station id="p_t1202" name="Massy - Europe" line="P_T12:2" link="p_t1201,p_t1203"/>
+    <station id="p_t1203" name="Champlan" line="P_T12:3" link="p_t1202,p_t1204"/>
+    <station id="p_t1204" name="Longjumeau" line="P_T12:4" link="p_t1203,p_t1205"/>
+    <station id="p_t1205" name="Chilly - Mazarin" line="P_T12:5" link="p_t1204,p_t1206"/>
+    <station id="p_t1206" name="Gravigny - Balizy" line="P_T12:6" link="p_t1205,p_t1207"/>
+    <station id="p_t1207" name="Petit Vaux" line="P_T12:7" link="p_t1206,p_t1208"/>
+    <station id="p_t1209" name="Parc du Château" line="P_T12:9" link="p_t1208,p_t1210"/>
+    <station id="p_t1210" name="Coteaux de l'Orge" line="P_T12:10" link="p_t1209,p_t1211"/>
+    <station id="p_t1211" name="Amédée Gordini" line="P_T12:11" link="p_t1210,p_t1212"/>
+    <station id="p_t1212" name="Ferme Neuve" line="P_T12:12" link="p_t1211,p_t1213"/>
+    <station id="p_t1213" name="Bois de Saint-Eutrope" line="P_T12:13" link="p_t1212,p_t1214"/>
+    <station id="p_t1214" name="Traité de Rome" line="P_T12:14" link="p_t1213,p_t1215"/>
+    <station id="p_t1215" name="Bois Briard" line="P_T12:15" link="p_t1214,p_t1216"/>
+    <!-- T13 -->
+    <station id="p_t1302" name="Camp des Loges" line="P_T13:2" link="p_t1301,p_t1303"/>
+    <station id="p_t1303" name="Lisière Pereire" line="P_T13:3" link="p_t1302,p_t1304"/>
+    <station id="p_t1304" name="Fourqueux - Bel Air" line="P_T13:4" link="p_t1303,p_t1305"/>
+    <station id="p_t1305" name="Mareil-Marly" line="P_T13:5" link="p_t1304,p_t1306"/>
+    <station id="p_t1306" name="L'Étang - Les Sablons" line="P_T13:6" link="p_t1305,p_t1307"/>
+    <station id="p_t1308" name="Noisy-le-Roi" line="P_T13:8" link="p_t1307,p_t1309"/>
+    <station id="p_t1309" name="Bailly" line="P_T13:9" link="p_t1308,p_t1310"/>
+    <station id="p_t1310" name="Allée Royale" line="P_T13:10" link="p_t1309,p_t1311"/>
+    <station id="p_t1311" name="Les Portes de Saint-Cyr" line="P_T13:11" link="p_t1310,p_t1312"/>
+    <!-- T14 -->
+    <station id="p_t1402" name="Montry - Condé" line="P_T14:2" link="p_t1401,p_t1403"/>
+    <station id="p_t1403" name="Couilly - Saint-Germain - Quincy" line="P_T14:3" link="p_t1402,p_t1404"/>
+    <station id="p_t1404" name="Villiers Montbarbin" line="P_T14:4" link="p_t1403,p_t1405"/>
+    <station id="p_t1405" name="Crécy-la-Chapelle" line="P_T14:5" link="p_t1404"/>
+    <!-- T2 -->
+    <station id="p_t201" name="Pont de Bezons" line="P_T2:1" link="p_t202"/>
+    <station id="p_t202" name="Parc Pierre Lagravère" line="P_T2:2" link="p_t201,p_t203"/>
+    <station id="p_t203" name="Victor Basch" line="P_T2:3" link="p_t202,p_t204"/>
+    <station id="p_t204" name="Jacqueline Auriol" line="P_T2:4" link="p_t203,p_t205"/>
+    <station id="p_t205" name="Charlebourg" line="P_T2:5" link="p_t204,p_t206" other_link="foot25:p_l11"/>
+    <station id="p_t206" name="Les Fauvelles" line="P_T2:6" link="p_t205,p_t207"/>
+    <station id="p_t207" name="Faubourg de l'Arche" line="P_T2:7" link="p_101,p_t206"/>
+    <station id="p_t210" name="Belvédère" line="P_T2:10" link="p_t209,p_t211"/>
+    <station id="p_t211" name="Suresnes - Longchamp" line="P_T2:11" link="p_t210,p_t212"/>
+    <station id="p_t212" name="Les Coteaux" line="P_T2:12" link="p_t211,p_t213"/>
+    <station id="p_t213" name="Les Milons" line="P_T2:13" link="p_t212,p_t214"/>
+    <station id="p_t214" name="Parc de Saint-Cloud" line="P_T2:14" link="p_t213,p_t215" other_link="foot16:p_1001"/>
+    <station id="p_t215" name="Musée de Sèvres" line="P_T2:15" link="p_t214,p_t216" other_link="foot13:p_901"/>
+    <station id="p_t216" name="Brimborion" line="P_T2:16" link="p_t215,p_t217"/>
+    <station id="p_t217" name="Meudon-sur-Seine" line="P_T2:17" link="p_t216,p_t218"/>
+    <station id="p_t218" name="Les Moulineaux" line="P_T2:18" link="p_t217,p_t219"/>
+    <station id="p_t219" name="Jacques-Henri Lartigue" line="P_T2:19" link="p_t218,p_t220"/>
+    <station id="p_t221" name="Henri Farman" line="P_T2:21" link="p_t220,p_t222"/>
+    <station id="p_t222" name="Suzanne Lengien" line="P_T2:22" link="p_t221,p_t223" other_link="foot12:p_801"/>
+    <station id="p_t223" name="Porte d'Issy" line="P_T2:23" link="p_1203,p_t222"/>
+    <!-- T3a -->
+    <station id="p_t3a01" name="Porte de Garigliano" line="P_T3A:1" link="p_801"/>
+    <station id="p_t3a03" name="Desnouettes" line="P_T3A:3" link="p_1203,p_801"/>
+    <station id="p_t3a05" name="Georges Brassens" line="P_T3A:5" link="p_1203,p_t3a06"/>
+    <station id="p_t3a06" name="Brancion" line="P_T3A:6" link="p_1329,p_t3a05"/>
+    <station id="p_t3a08" name="Didot" line="P_T3A:8" link="p_1329,p_t3a09"/>
+    <station id="p_t3a09" name="Jean Moulin" line="P_T3A:9" link="p_426,p_t3a08"/>
+    <station id="p_t3a11" name="Montsouris" line="P_T3A:11" link="p_426,p_t3a12"/>
+    <station id="p_t3a13" name="Stade Charlétydes" line="P_T3A:13" link="p_t3a12,p_t3a14"/>
+    <station id="p_t3a14" name="Poterne - Peupliers" line="P_T3A:14" link="p_734,p_t3a13"/>
+    <station id="p_t3a18" name="Maryse Bastié" line="P_T3A:18" link="p_736,p_t3a19"/>
+    <station id="p_t3a19" name="Avenue de France" line="P_T3A:19" link="p_t3a18,p_t3a20" other_link="foot21:p_1413"/>
+    <station id="p_t3a20" name="Baron Le Roy" line="P_T3A:20" link="p_829,p_t3a19"/>
+    <station id="p_t3a23" name="Montempoivre" line="P_T3A:23" link="p_828,p_t3a24"/>
+    <station id="p_t3a24" name="Alexandra David-Néel" line="P_T3A:24" link="p_121,p_t3a23"/>
+    <!-- T3b -->
+    <station id="p_t3b03" name="Marie de Miribel" line="P_T3B:3" link="p_324,p_933"/>
+    <station id="p_t3b05" name="Séverine" line="P_T3B:5" link="p_324,p_t3b06"/>
+    <station id="p_t3b06" name="Adrienne Bolland" line="P_T3B:6" link="p_3101,p_t3b05"/>
+    <station id="p_t3b08" name="Hôpital Robert Debré" line="P_T3B:8" link="p_3101,p_t3b09" other_link="foot11:p_7107"/>
+    <station id="p_t3b09" name="Butte du Chapeau Rouge" line="P_T3B:9" link="p_504,p_t3b08"/>
+    <station id="p_t3b11" name="Delphine Seyrig" line="P_T3B:11" link="p_504,p_t3b12"/>
+    <station id="p_t3b12" name="Ella Fitzgerald" line="P_T3B:12" link="p_704,p_t3b11" other_link="foot26:p_e07"/>
+    <station id="p_t3b14" name="Canal Saint-Denis" line="P_T3B:14" link="p_704,p_t3b15"/>
+    <station id="p_t3b16" name="Porte d'Aubervilliers" line="P_T3B:16" link="p_t3b15,p_t3b17"/>
+    <station id="p_t3b17" name="Colette Besson" line="P_T3B:17" link="p_1228,p_t3b16"/>
+    <station id="p_t3b19" name="Diane Arbus" line="P_T3B:19" link="p_1228,p_401"/>
+    <station id="p_t3b21" name="Angélique Compoint" line="P_T3B:21" link="p_1313,p_401"/>
+    <station id="p_t3b23" name="Épinettes Pouchet" line="P_T3B:23" link="p_1313,p_t3b24"/>
+    <station id="p_t3b24" name="Honoré de Balzac" line="P_T3B:24" link="p_1305,p_t3b23"/>
+    <station id="p_t3b26" name="Marguerite Long" line="P_T3B:26" link="p_1305,p_t3b27"/>
+    <station id="p_t3b27" name="Square Sainte-Odile" line="P_T3B:27" link="p_304,p_t3b26"/>
+    <station id="p_t3b29" name="Thérèse Pierre" line="P_T3B:29" link="p_304,p_t3b30"/>
+    <station id="p_t3b30" name="Anny Flore" line="P_T3B:30" link="p_104,p_t3b29"/>
+    <station id="p_t3b32" name="Anna de Noailles" line="P_T3B:32" link="p_104,p_201"/>
+    <!-- T4 -->
+    <station id="p_t402" name="La Remise à Jorelle" line="P_T4:2" link="p_t401,p_t403"/>
+    <station id="p_t403" name="Les Coquetiers" line="P_T4:3" link="p_t402,p_t404"/>
+    <station id="p_t404" name="Allée de la Tour - Rendez-Vous" line="P_T4:4" link="p_t403,p_t405"/>
+    <station id="p_t405" name="Les Pavillons sous Bois" line="P_T4:5" link="p_t404,p_t406"/>
+    <station id="p_t406" name="Gargan" line="P_T4:6" link="p_t405,p_t407,p_t412"/>
+    <station id="p_t407" name="Lycée Henri Sellier" line="P_T4:7" link="p_t406,p_t408"/>
+    <station id="p_t408" name="L'Abbaye" line="P_T4:8" link="p_t407,p_t409"/>
+    <station id="p_t409" name="Freinville - Sevran" line="P_T4:9" link="p_t408,p_t410"/>
+    <station id="p_t410" name="Rougemont - Chanteloup" line="P_T4:10" link="p_t409,p_t411"/>
+    <station id="p_t412" name="République Marx Dormoy" line="P_T4:12" link="p_t406,p_t413"/>
+    <station id="p_t413" name="Léon Blum" line="P_T4:13" link="p_t412,p_t414"/>
+    <station id="p_t414" name="Maurice Audin" line="P_T4:14" link="p_t413,p_t415"/>
+    <station id="p_t415" name="Clichy sous Bois - Mairie" line="P_T4:15" link="p_t414,p_t416"/>
+    <station id="p_t416" name="Romain Rolland" line="P_T4:16" link="p_t415,p_t417"/>
+    <station id="p_t417" name="Clichy - Montfermeil" line="P_T4:17" link="p_t416,p_t418"/>
+    <station id="p_t418" name="Notre Dame des Anges" line="P_T4:18" link="p_t417,p_t419"/>
+    <station id="p_t419" name="Arboretum" line="P_T4:19" link="p_t418,p_t420"/>
+    <station id="p_t420" name="Hôpital de Montfermeil" line="P_T4:20" link="p_t419"/>
+    <!-- T5 -->
+    <station id="p_t502" name="Baudelaire" line="P_T5:2" link="p_t114,p_t503"/>
+    <station id="p_t503" name="Roger Sémat" line="P_T5:3" link="p_t502,p_t504"/>
+    <station id="p_t504" name="Guynemer" line="P_T5:4" link="p_t503,p_t505" other_link="foot19:p_1307"/>
+    <station id="p_t505" name="Petit Pierrefitte" line="P_T5:5" link="p_t504,p_t506"/>
+    <station id="p_t506" name="Joncherolles" line="P_T5:6" link="p_t505,p_t507"/>
+    <station id="p_t507" name="Suzanne Valadon" line="P_T5:7" link="p_t506,p_t508"/>
+    <station id="p_t508" name="Mairie de Pierrefitte" line="P_T5:8" link="p_t507,p_t509"/>
+    <station id="p_t509" name="Alcide d'Orbigny" line="P_T5:9" link="p_t508,p_t510"/>
+    <station id="p_t510" name="Jacques Prévert" line="P_T5:10" link="p_t509,p_t511"/>
+    <station id="p_t511" name="Butte Pinson" line="P_T5:11" link="p_t510,p_t512"/>
+    <station id="p_t512" name="Les Cholettes" line="P_T5:12" link="p_t511,p_t513"/>
+    <station id="p_t513" name="Les Flanades" line="P_T5:13" link="p_t512,p_t514"/>
+    <station id="p_t514" name="Paul Valéry" line="P_T5:14" link="p_t513,p_t515"/>
+    <station id="p_t515" name="Lochères" line="P_T5:15" link="p_t514,p_t516"/>
+    <station id="p_t516" name="Garges-Sarcelles" line="P_T5:16" link="p_t515"/>
+    <!-- T6 -->
+    <station id="p_t603" name="Robert Wagner" line="P_T6:3" link="p_t602,p_t604"/>
+    <station id="p_t604" name="L'Onde" line="P_T6:4" link="p_t603,p_t605"/>
+    <station id="p_t605" name="Mairie de Vélizy" line="P_T6:5" link="p_t604,p_t606"/>
+    <station id="p_t606" name="Louvois" line="P_T6:6" link="p_t605,p_t607"/>
+    <station id="p_t607" name="Inovel Parc Nord" line="P_T6:7" link="p_t606,p_t608"/>
+    <station id="p_t608" name="Dewoitine" line="P_T6:8" link="p_t607,p_t609"/>
+    <station id="p_t609" name="Vélizy 2" line="P_T6:9" link="p_t608,p_t610"/>
+    <station id="p_t610" name="Meudon-la-Forêt" line="P_T6:10" link="p_t609,p_t611"/>
+    <station id="p_t611" name="Georges Millandy" line="P_T6:11" link="p_t610,p_t612"/>
+    <station id="p_t612" name="Georges Pompidou" line="P_T6:12" link="p_t611,p_t613"/>
+    <station id="p_t613" name="Pavé Blanc" line="P_T6:13" link="p_t612,p_t614"/>
+    <station id="p_t614" name="Mail de la Plaine" line="P_T6:14" link="p_t613,p_t615"/>
+    <station id="p_t616" name="Soleil Levant" line="P_T6:16" link="p_t615,p_t617"/>
+    <station id="p_t617" name="Division Leclerc" line="P_T6:17" link="p_t616,p_t618"/>
+    <station id="p_t618" name="Parc André Malraux" line="P_T6:18" link="p_t617,p_t619"/>
+    <station id="p_t619" name="Centre de Châtillon" line="P_T6:19" link="p_t618,p_t620"/>
+    <station id="p_t620" name="Vauban" line="P_T6:20" link="p_1332,p_t619"/>
+    <!-- T7 -->
+    <station id="p_t702" name="Lamartine" line="P_T7:2" link="p_733,p_t703"/>
+    <station id="p_t703" name="Domaine Chérioux" line="P_T7:3" link="p_t702,p_t704"/>
+    <station id="p_t704" name="Moulin Vert" line="P_T7:4" link="p_t703,p_t705"/>
+    <station id="p_t705" name="Bretagne" line="P_T7:5" link="p_t704,p_t706"/>
+    <station id="p_t706" name="Auguste Perret" line="P_T7:6" link="p_t705,p_t707"/>
+    <station id="p_t707" name="Porte de Thiais" line="P_T7:7" link="p_t706,p_t708" other_link="foot27:p_1419"/>
+    <station id="p_t708" name="La Belle Épine" line="P_T7:8" link="p_t707,p_t709"/>
+    <station id="p_t709" name="Place de la Logistique" line="P_T7:9" link="p_t708,p_t710"/>
+    <station id="p_t710" name="Porte de Rungis" line="P_T7:10" link="p_t709,p_t711"/>
+    <station id="p_t711" name="Saarinen" line="P_T7:11" link="p_t710,p_t712"/>
+    <station id="p_t712" name="Robert Schuman" line="P_T7:12" link="p_t711,p_t713"/>
+    <station id="p_t714" name="Hélène Boucher" line="P_T7:14" link="p_t713,p_t715"/>
+    <station id="p_t715" name="Caroline Aigle" line="P_T7:15" link="p_t714,p_t716"/>
+    <station id="p_t716" name="Cœur d'Orly" line="P_T7:16" link="p_t715,p_t717"/>
+    <station id="p_t717" name="Aéroport d'Orly (Terminal 4)" line="P_T7:17" link="p_t716,p_t718"/>
+    <station id="p_t718" name="Athis-Mons - Porte de l'Essonne" line="P_T7:18" link="p_t717"/>
+    <!-- T8 -->
+    <station id="p_t802" name="Pierre de Geyter" line="P_T8:2" link="p_1309,p_t112"/>
+    <station id="p_t804" name="Paul Éluard" line="P_T8:4" link="p_t112,p_t805"/>
+    <station id="p_t805" name="Delaunay - Belleville" line="P_T8:5" link="p_t804,p_t806,p_t814"/>
+    <station id="p_t806" name="Blumenthal" line="P_T8:6" link="p_t805,p_t807"/>
+    <station id="p_t807" name="Les Mobiles" line="P_T8:7" link="p_t806,p_t808"/>
+    <station id="p_t808" name="Les Béatus" line="P_T8:8" link="p_t807,p_t809"/>
+    <station id="p_t809" name="Rose Bertin" line="P_T8:9" link="p_t808,p_t810"/>
+    <station id="p_t810" name="Lacépède" line="P_T8:10" link="p_t809,p_t811"/>
+    <station id="p_t811" name="Gilbert Bonnemaison" line="P_T8:11" link="p_t810,p_t812"/>
+    <station id="p_t813" name="Épinay Orgemont" line="P_T8:13" link="p_t812"/>
+    <station id="p_t814" name="César" line="P_T8:14" link="p_t805,p_t815"/>
+    <station id="p_t815" name="Jean Vilar" line="P_T8:15" link="p_t814,p_t816"/>
+    <station id="p_t816" name="Pablo Neruda" line="P_T8:16" link="p_t815,p_t817"/>
+    <!-- T9 -->
+    <station id="p_t902" name="Châteaudun - Barbès" line="P_T9:2" link="p_735,p_t903"/>
+    <station id="p_t903" name="Cimetière Parisien d'Ivry" line="P_T9:3" link="p_t902,p_t904"/>
+    <station id="p_t904" name="La Briqueterie" line="P_T9:4" link="p_t903,p_t905"/>
+    <station id="p_t905" name="Germaine Tailleferre" line="P_T9:5" link="p_t904,p_t906"/>
+    <station id="p_t906" name="Beethoven - Concorde" line="P_T9:6" link="p_t905,p_t907"/>
+    <station id="p_t907" name="Musée MAC VAL" line="P_T9:7" link="p_t906,p_t908"/>
+    <station id="p_t908" name="Mairie de Vitry-sur-Seine" line="P_T9:8" link="p_t907,p_t909"/>
+    <station id="p_t909" name="Camille Groult" line="P_T9:9" link="p_t908,p_t910"/>
+    <station id="p_t910" name="Constant Coquelin" line="P_T9:10" link="p_t909,p_t911"/>
+    <station id="p_t911" name="Watteau - Rondenay" line="P_T9:11" link="p_t910,p_t912"/>
+    <station id="p_t912" name="Trois Communes" line="P_T9:12" link="p_t911,p_t913"/>
+    <station id="p_t913" name="Verdun - Hoche" line="P_T9:13" link="p_t912,p_t914"/>
+    <station id="p_t914" name="Rouget de Lisle" line="P_T9:14" link="p_t913,p_t915" other_link="foot28:p_c30"/>
+    <station id="p_t915" name="Carle - Darthé" line="P_T9:15" link="p_t914,p_t916"/>
+    <station id="p_t916" name="Four - Peary" line="P_T9:16" link="p_t915,p_t917"/>
+    <station id="p_t917" name="Christophe Colomb" line="P_T9:17" link="p_t916,p_t918"/>
+    <station id="p_t919" name="Orly - Gaston Viens" line="P_T9:19" link="p_t918" other_link="foot29:p_c32"/>
+    <!-- U -->
+    <!-- V -->
+    <station id="p_v02" name="Igny" line="P_V:2" link="p_t1201,p_v03"/>
+    <station id="p_v03" name="Bièvres" line="P_V:3" link="p_v02,p_v04"/>
+    <station id="p_v04" name="Vauboyen" line="P_V:4" link="p_v03,p_v05"/>
+    <station id="p_v05" name="Jouy-en-Josas" line="P_V:5" link="p_v04,p_v06"/>
+    <station id="p_v06" name="Petit Jouy - Les Loges" line="P_V:6" link="p_c47,p_v05"/>
+  </stations>
+</tube>

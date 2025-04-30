@@ -1,8 +1,9 @@
 #!perl
-use 5.12.0;
-use utf8;
+use 5.14.0;
 use strict;
 use warnings FATAL => 'all';
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Test::More tests => 14;
 use Map::Tube::Brussels;
 

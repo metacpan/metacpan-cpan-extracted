@@ -11,7 +11,7 @@ use Pod::Find;
 use Moo;
 extends 'App::Sqitch::Command';
 
-our $VERSION = 'v1.5.1'; # VERSION
+our $VERSION = 'v1.5.2'; # VERSION
 
 has guide => (
     is      => 'ro',

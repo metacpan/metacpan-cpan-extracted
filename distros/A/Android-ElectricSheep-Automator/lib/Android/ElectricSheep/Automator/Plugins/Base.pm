@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -22,7 +22,6 @@ use Android::ElectricSheep::Automator::ScreenLayout;
 use Android::ElectricSheep::Automator::XMLParsers;
 
 my $_DEFAULT_CONFIG = <<'EODC';
-</* $VERSION = '0.01'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -306,7 +305,7 @@ Android::ElectricSheep::Automator::Plugins::Base - The great new Android::Electr
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 
 =head1 SYNOPSIS

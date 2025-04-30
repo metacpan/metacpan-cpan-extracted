@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Define and roll musical dice
 
-our $VERSION = '0.0203';
+our $VERSION = '0.0204';
 
 use Moo;
 use strictures 2;
@@ -698,7 +698,7 @@ Music::Dice - Define and roll musical dice
 
 =head1 VERSION
 
-version 0.0203
+version 0.0204
 
 =head1 SYNOPSIS
 
@@ -1378,7 +1378,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Gene Boggs.
+This software is copyright (c) 2024-2025 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

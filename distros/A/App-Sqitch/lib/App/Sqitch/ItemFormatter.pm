@@ -24,7 +24,7 @@ BEGIN {
     $ENV{ANSI_COLORS_DISABLED} = 1 unless CAN_OUTPUT_COLOR;
 }
 
-our $VERSION = 'v1.5.1'; # VERSION
+our $VERSION = 'v1.5.2'; # VERSION
 
 has abbrev => (
     is      => 'ro',

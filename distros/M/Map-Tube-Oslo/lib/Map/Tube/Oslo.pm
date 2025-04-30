@@ -9,12 +9,12 @@
 # Mail: gws@cpan.org
 #
 package Map::Tube::Oslo;
-use 5.12.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.2');
+our $VERSION = version->declare('v0.1.3');
 
 =encoding utf8
 

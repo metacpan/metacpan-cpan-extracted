@@ -22,13 +22,13 @@ no_index:
 provides:
   Map::Tube::Brussels:
     file: lib/Map/Tube/Brussels.pm
-    version: v0.2.0
+    version: v0.2.1
 requires:
   File::Share: '0'
-  Map::Tube: '4.04'
+  Map::Tube: '4.09'
   Moo: '0'
   namespace::clean: '0'
-  perl: '5.012'
+  perl: '5.014'
 resources: {}
-version: v0.2.0
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

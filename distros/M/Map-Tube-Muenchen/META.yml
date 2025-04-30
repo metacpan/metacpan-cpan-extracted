@@ -22,13 +22,13 @@ no_index:
 provides:
   Map::Tube::Muenchen:
     file: lib/Map/Tube/Muenchen.pm
-    version: v0.1.1
+    version: v0.1.2
 requires:
   File::Share: '0'
-  Map::Tube: '4.04'
+  Map::Tube: '4.09'
   Moo: '0'
   namespace::clean: '0'
-  perl: '5.012'
+  perl: '5.014'
 resources: {}
-version: v0.1.1
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

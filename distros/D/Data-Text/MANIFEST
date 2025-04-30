@@ -9,6 +9,8 @@ t/00-load.t
 t/10-compile.t
 t/20-new.t
 t/30-basics.t
+t/case.t
+t/clear.t
 t/comment-spelling.t
 t/conjunction.t
 t/coverage.t
@@ -33,6 +35,7 @@ t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/port.t
+t/replace.t
 t/strict.t
 t/unused.t
 t/vars.t

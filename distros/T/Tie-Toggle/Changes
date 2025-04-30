@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Toggle
 
+1.088 2025-04-29T12:15:42Z
+	* minor internal improvements
+
 1.087 2025-04-13T23:42:25Z
 	* require a newer version.pm for v5.10.1 tests
 

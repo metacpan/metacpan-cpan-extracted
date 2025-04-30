@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ the file contents.
 
 Optionally supports flattening the configuration structure. This converts deeply
 nested configuration keys into a flat key-value format (e.g., C<database.user>
-instead of C<database->{user}>). This makes accessing values easier for
+instead of C<database-E<gt>{user}>). This makes accessing values easier for
 applications that prefer flat structures or need compatibility with flat
 key-value stores.
 
@@ -260,7 +260,6 @@ sub new
 		sep_char => '.',
 		%{$params},
 		env_prefix => $params->{env_prefix} || 'APP_',
-		flatten	 => $params->{flatten} // 0,
 		config => {},
 	}, $class;
 
@@ -272,7 +271,10 @@ sub new
 	}
 	$self->_load_config();
 
-	return $self;
+	if($self->{'config'} && scalar(keys %{$self->{'config'}})) {
+		return $self;
+	}
+	return undef;
 }
 
 sub _load_config
@@ -444,12 +446,30 @@ sub _load_config
 								# Maybe XML without the leading XML header
 								if($self->_load_driver('XML::Simple', ['XMLin'])) {
 									eval { $data = XMLin($path, ForceArray => 0, KeyAttr => []) };
-									if((!$data) || (ref($data) ne 'HASH')) {
-										$self->_load_driver('Config::Auto');
-										my $ca = Config::Auto->new(source => $path);
-										if($data = $ca->parse()) {
-											$self->{'type'} = $ca->format();
+								}
+								if((!$data) || (ref($data) ne 'HASH')) {
+									if($self->_load_driver('Config::Abstract')) {
+										# Handle RT#164587
+										open my $oldSTDERR, ">&STDERR";
+										close STDERR;
+										eval { $data = Config::Abstract->new($path) };
+										if($@) {
+											undef $data;
+										} elsif($data) {
+											$data = $data->get_all_settings();
+											if(scalar(keys %{$data}) == 0) {
+												undef $data;
+											}
 										}
+										open STDERR, ">&", $oldSTDERR;
+										$self->{'type'} = 'Perl';
+									}
+								}
+								if((!$data) || (ref($data) ne 'HASH')) {
+									$self->_load_driver('Config::Auto');
+									my $ca = Config::Auto->new(source => $path);
+									if($data = $ca->parse()) {
+										$self->{'type'} = $ca->format();
 									}
 								}
 							}
@@ -559,7 +579,7 @@ sub all
 {
 	my $self = shift;
 
-	return $self->{'config'};
+	return($self->{'config'} && scalar(keys %{$self->{'config'}})) ? $self->{'config'} : undef;
 }
 
 # Helper routine to load a driver
@@ -602,10 +622,10 @@ when C<sep_char> is set to '_'.
         sep_char  => '_'
     );
 
-    my $user = $config->database_user();  # returns 'alice'
+    my $user = $config->database_user();	# returns 'alice'
 
     # or
-    $user = $config->database()->{'user'};  # returns 'alice'
+    $user = $config->database()->{'user'};	# returns 'alice'
 
     # Attempting to call a nonexistent key
     my $foo = $config->nonexistent_key();	# dies with error

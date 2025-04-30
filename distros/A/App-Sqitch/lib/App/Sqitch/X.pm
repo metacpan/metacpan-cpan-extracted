@@ -9,7 +9,7 @@ use Throwable 0.200009;
 use Sub::Exporter -setup => [qw(hurl)];
 use overload '""' => 'as_string';
 
-our $VERSION = 'v1.5.1'; # VERSION
+our $VERSION = 'v1.5.2'; # VERSION
 
 has message => (
     is       => 'ro',
@@ -22,7 +22,6 @@ has exitval => (
     isa     => Int,
     default => 2,
 );
-
 
 with qw(
     Throwable

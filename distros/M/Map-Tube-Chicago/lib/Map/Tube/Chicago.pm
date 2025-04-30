@@ -9,12 +9,12 @@
 # Mail: gws@cpan.org
 #
 package Map::Tube::Chicago;
-use 5.12.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.2.0');
+our $VERSION = version->declare('v0.2.1');
 
 =encoding utf8
 

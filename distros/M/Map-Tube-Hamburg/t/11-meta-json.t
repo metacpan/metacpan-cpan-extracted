@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!perl
 use strict;
 use warnings FATAL => 'all';
 use Map::Tube::Hamburg;

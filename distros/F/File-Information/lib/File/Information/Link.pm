@@ -24,7 +24,7 @@ use Data::Identifier::Generate v0.08;
 use File::Information::Inode;
 use File::Information::Deep;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
@@ -278,7 +278,7 @@ File::Information::Link - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

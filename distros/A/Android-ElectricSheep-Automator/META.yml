@@ -46,5 +46,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/perl-android-electricsheep-automator/issues
   homepage: https://metacpan.org/module/Android::ElectricSheep::Automator
   repository: https://github.com/hadjiprocopis/perl-android-electricsheep-automator
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

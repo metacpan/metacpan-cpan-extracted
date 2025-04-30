@@ -9,12 +9,12 @@
 # Mail: gws@cpan.org
 #
 package Map::Tube::RheinRuhr;
-use 5.12.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.2.2');
+our $VERSION = version->declare('v0.2.3');
 
 =encoding utf8
 

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -36,7 +36,6 @@
             "Lingua::Conjunction" : "0",
             "Params::Get" : "0",
             "Scalar::Util" : "0",
-            "String::Clean" : "0",
             "String::Util" : "0",
             "overload" : "0"
          }
@@ -66,6 +65,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Text"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

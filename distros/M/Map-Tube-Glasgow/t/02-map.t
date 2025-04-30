@@ -1,5 +1,5 @@
 #!perl
-use 5.12.0;
+use 5.14.0;
 use strict;
 use utf8;
 use warnings FATAL => 'all';

@@ -11,11 +11,17 @@ use File::Information;
 # Check which types we, only request data for installed modules.
 my @as_types = qw(bool mediatype raw);
 unshift(@as_types, 'DateTime')          if eval { require DateTime;         1 };
-unshift(@as_types, 'Data::Identifier')  if eval { require Data::Identifier; 1 };
+unshift(@as_types, 'Data::Identifier');
+
+my %config = (
+    digest_as => undef,
+    key_length => undef,
+);
 
 my $instance;
 {
     my %settings;
+
     while (scalar(@ARGV) && $ARGV[0] =~ /^--./) {
         my $opt = shift(@ARGV);
 
@@ -24,6 +30,45 @@ my $instance;
             require Data::TagDB;
             $settings{db} = Data::TagDB->new($dsn);
             unshift(@as_types, 'Data::TagDB::Tag');
+        } elsif ($opt eq '--extractor') {
+            require Data::URIID;
+            $settings{extractor} = Data::URIID->new;
+        } elsif ($opt eq '--digest-as' && scalar(@ARGV)) {
+            $config{digest_as} = shift(@ARGV);
+        } elsif ($opt eq '--key-length' && scalar(@ARGV)) {
+            $config{key_length} = int(shift(@ARGV));
+        } elsif ($opt =~ /^--skip-(?:inode|deep|filesystem|tagpool)$/) {
+            $config{$opt =~ s/^--//r =~ s/-/_/gr} = 1;
+        } elsif ($opt eq '--tagpool-rc' && scalar(@ARGV)) {
+            push(@{$settings{tagpool_rc} //= []}, shift(@ARGV));
+        } elsif ($opt eq '--tagpool-path' && scalar(@ARGV)) {
+            push(@{$settings{tagpool_path} //= []}, shift(@ARGV));
+        } elsif ($opt eq '--digest-sizelimit' && scalar(@ARGV)) {
+            $settings{digest_sizelimit} = int(shift(@ARGV));
+        } elsif ($opt eq '--store-path' && scalar(@ARGV)) {
+            push(@{$settings{store} //= []}, shift(@ARGV));
+        } elsif ($opt eq '--help') {
+            say 'Usage: ', $0, ' [OPTIONS] file...';
+            say '';
+            say 'OPTIONS:';
+            say '   --database DSN              - Opens the given database via Data::TagDB';
+            say '   --extractor                 - Creates an extractor (experimental!)';
+            say '   --digest-as TYPE            - Selects the digest rendering';
+            say '                                 Common values are: hex (default), b64, and utag';
+            say '   --key-length NUM            - The assumed length for all keys';
+            say '                                 Set to 0 for most diff-able output.';
+            say ' * --skip-{inode|deep|filesystem|tagpool}';
+            say '                               - Skips display of the named subobject';
+            say ' * --tagpool-rc FILE           - Selects the tagpool config to use';
+            say ' * --tagpool-path PATH         - Selects the tagpool paths to use';
+            say '   --digest-sizelimit SIZE     - Sets the size limit for digest calculation';
+            say '                                 The value is in bytes.';
+            say ' * --store-path PATH           - Sets the path to a file store';
+            say '                                 Will be opened via File::FStore';
+            say '   --help                      - Show this help';
+            say '';
+            say 'Options marked with * can be given multiple times.';
+            exit;
         } else {
             die 'Invalid option: '.$opt;
         }
@@ -43,10 +88,12 @@ foreach my $filename (@ARGV) {
     eval {$link->deep};
 
     dump_base($link);
-    dump_base(scalar eval {$link->inode});
-    dump_base(scalar eval {$link->deep});
-    dump_base(scalar eval {$link->filesystem});
-    dump_base($_) foreach eval {$link->tagpool};
+    dump_base(scalar eval {$link->inode})       unless $config{skip_inode};
+    dump_base(scalar eval {$link->deep})        unless $config{skip_deep};
+    dump_base(scalar eval {$link->filesystem})  unless $config{skip_filesystem};
+    unless ($config{skip_tagpool}) {
+        dump_base($_) foreach eval {$link->tagpool};
+    }
 }
 
 sub dump_base {
@@ -54,7 +101,7 @@ sub dump_base {
     my File::Information $instance;
     my @hashes;
     my @properties;
-    my $max_len = 0;
+    my $max_len = $config{key_length};
     my %verify_a_b;
 
     return unless defined $base;
@@ -68,8 +115,10 @@ sub dump_base {
         say ' ', '-' x length($title);
     }
 
-    {
+    unless (defined $max_len) {
         # Figure out the witdh of the key column.
+
+        $max_len = 0;
 
         outer:
         foreach my $key (@properties) {
@@ -127,6 +176,8 @@ sub dump_base {
                         }
                     } elsif ($value->isa('Data::URIID::Barcode')) {
                         $value = sprintf('Barcode <%s>', $value->data);
+                    } elsif ($value->isa('File::FStore::File')) {
+                        $value = sprintf('Store File <%s>', $value->dbname);
                     }
                 } elsif ($type eq 'bool') {
                     $value = $value ? 'true' : 'false';
@@ -152,7 +203,7 @@ sub dump_base {
         $key .= ' unsafe' if $instance->digest_info($algo)->{unsafe};
 
         foreach my $lifecycle ($instance->lifecycles) {
-            my $value = $base->digest($algo, lifecycle => $lifecycle, default => undef);
+            my $value = $base->digest($algo, lifecycle => $lifecycle, default => undef, as => $config{digest_as});
             next unless defined $value;
             printf("  %7s :: %-*s = %s\n", $lifecycle, $max_len, $key, $value);
         }

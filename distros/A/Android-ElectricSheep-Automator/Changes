@@ -9,3 +9,6 @@ Revision history for Android-ADB-Automator
 	dump_current_screen_ui() was failing most likely because of race condition somewhere? So added some sleeps.
         Now configuration hash or filename are not mandatory, there is a default to be used in this case.
         Added 'adb-path-to-executable' parameter to the constructor of Automator.
+0.04    2025/04/29
+        dump_current_screen_ui() sometimes could not find the dump to a device file, so checking if the file is there and repeating and sleeping for some iterations. Hopefully this fixes this issue.
+	Pod changes.

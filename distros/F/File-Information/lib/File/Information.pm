@@ -20,7 +20,7 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -42,7 +42,20 @@ sub new {
         }
     }
 
-    $self->{$_} = $opts{$_} foreach qw(tagpool_rc tagpool_path device_path digest_sizelimit mountinfo_path boring_sizelimit boring_extension);
+    $self->{$_} = $opts{$_} foreach qw(tagpool_rc tagpool_path device_path digest_sizelimit mountinfo_path boring_sizelimit boring_extension store);
+
+    $self->{store} //= [];
+    $self->{store} = [$self->{store}] unless ref($self->{store}) eq 'ARRAY';
+
+    foreach my $store (@{$self->{store}}) {
+        unless (eval {$store->isa('File::FStore')}) {
+
+            require File::FStore;
+            $store = File::FStore->new(path => $store);
+        }
+
+        $store->attach(db => $self->{db}, extractor => $self->{extractor}, fii => $self, weak => 1);
+    }
 
     $self->{digest_sizelimit} //= 512*1024*1024; # 512MB
 
@@ -218,6 +231,15 @@ sub db {
     my ($self) = @_;
 
     return $self->{db} // croak 'No database available';
+}
+
+
+sub store {
+    my ($self, %opts) = @_;
+    my $as = delete $opts{as};
+    croak 'Invalid as parameter' unless ($as // '') eq 'File::FStore';
+    croak 'Stray options passed' if scalar keys %opts;
+    return @{$self->{store}};
 }
 
 
@@ -518,7 +540,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 
@@ -570,6 +592,11 @@ An instance of L<Data::URIID> used to create related objects.
 =item C<db>
 
 An instance of L<Data::TagDB> used to interact with a database.
+
+=item C<store>
+
+One or more instances of L<File::FStore> or paths to such stores.
+A scalar value or an arrayref if multiple.
 
 =item C<boring_extension>
 
@@ -710,6 +737,20 @@ Returns the extractor given via the configuration. Will die if no extractor is a
     my Data::TagDB $db = $instance->db;
 
 Returns the database given via the configuration. Will die if no database is available.
+
+=head2 store
+
+    my @store = $instance->store(as => 'File::FStore');
+
+(since v0.09)
+
+Returns the list of file stores if any (see L<File::FStore>).
+
+B<Note:>
+There is no order to the returned values. The order may change between any two calls.
+
+B<Note:>
+Currently the C<as> option must be set to C<File::FStore>. No other values nor options are supported.
 
 =head2 lifecycles
 

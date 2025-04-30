@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-
+#!perl
+use 5.14.0;
 use strict;
 use warnings FATAL => 'all';
 use Map::Tube::KoelnBonn;

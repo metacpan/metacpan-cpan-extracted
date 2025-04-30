@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
@@ -49,7 +49,7 @@ to configuration management.
 
     Optionally supports flattening the configuration structure. This converts deeply
     nested configuration keys into a flat key-value format (e.g., `database.user`
-    instead of `database-`{user}>). This makes accessing values easier for
+    instead of `database->{user}`). This makes accessing values easier for
     applications that prefer flat structures or need compatibility with flat
     key-value stores.
 
@@ -234,10 +234,10 @@ when `sep_char` is set to '\_'.
         sep_char  => '_'
     );
 
-    my $user = $config->database_user();  # returns 'alice'
+    my $user = $config->database_user();        # returns 'alice'
 
     # or
-    $user = $config->database()->{'user'};  # returns 'alice'
+    $user = $config->database()->{'user'};      # returns 'alice'
 
     # Attempting to call a nonexistent key
     my $foo = $config->nonexistent_key();       # dies with error

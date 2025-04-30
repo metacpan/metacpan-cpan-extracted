@@ -1,8 +1,10 @@
 #!perl
-use 5.12.0;
+use 5.14.0;
 use strict;
 use utf8;
 use warnings FATAL => 'all';
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Test::More 0.82;
 use Map::Tube::Hamburg;
 

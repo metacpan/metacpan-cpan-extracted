@@ -31,9 +31,10 @@ WriteMakefile(
 		'JSON::MaybeXS'	=> 0,
 		'Params::Get' => 0,
 		'YAML::XS' => 0,
-		'XML::Parser::Expat' => 0,	# Seems to be needed for Windows
-		'XML::LibXML' => 0,	# do.
-		'XML::Simple' => 0,
+		# 'XML::Parser::Expat' => 0,	# Seems to be needed for Windows
+		# 'XML::LibXML' => 0,	# do.
+		# 'XML::Simple' => 0,
+		'XML::PP' => 0,
 		'File::Slurp' => 0,
 		'File::Spec' => 0,
 		'Hash::Merge'	=> 0,

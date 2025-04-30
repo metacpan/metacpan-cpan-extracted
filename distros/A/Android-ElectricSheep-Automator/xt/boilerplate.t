@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-my $VERSION = '0.03';
+my $VERSION = '0.04';
 
 plan tests => 3;
 

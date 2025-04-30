@@ -1,5 +1,5 @@
 package JSON::Schema::Generate;
-use 5.006; use strict; use warnings; our $VERSION = '0.13';
+use 5.006; use strict; use warnings; our $VERSION = '0.14';
 use Tie::IxHash; use Types::Standard qw/Str HashRef Bool/;
 use Compiled::Params::OO qw/cpo/; use JSON; use Blessed::Merge;
 
@@ -226,7 +226,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 

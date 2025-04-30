@@ -11,6 +11,7 @@ README.md
 bin/sqitch
 dist/cpanfile
 dist/sqitch.spec
+etc/templates/deploy/cockroach.tmpl
 etc/templates/deploy/exasol.tmpl
 etc/templates/deploy/firebird.tmpl
 etc/templates/deploy/mysql.tmpl
@@ -19,6 +20,7 @@ etc/templates/deploy/pg.tmpl
 etc/templates/deploy/snowflake.tmpl
 etc/templates/deploy/sqlite.tmpl
 etc/templates/deploy/vertica.tmpl
+etc/templates/revert/cockroach.tmpl
 etc/templates/revert/exasol.tmpl
 etc/templates/revert/firebird.tmpl
 etc/templates/revert/mysql.tmpl
@@ -27,6 +29,7 @@ etc/templates/revert/pg.tmpl
 etc/templates/revert/snowflake.tmpl
 etc/templates/revert/sqlite.tmpl
 etc/templates/revert/vertica.tmpl
+etc/templates/verify/cockroach.tmpl
 etc/templates/verify/exasol.tmpl
 etc/templates/verify/firebird.tmpl
 etc/templates/verify/mysql.tmpl
@@ -243,6 +246,7 @@ t/mooseless.t
 t/multiplan.conf
 t/mysql.t
 t/odbc/odbcinst.ini
+t/odbc/snowflake.ini
 t/odbc/vertica.ini
 t/options.t
 t/oracle.t

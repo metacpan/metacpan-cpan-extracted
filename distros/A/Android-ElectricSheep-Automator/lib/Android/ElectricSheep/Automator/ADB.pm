@@ -4,7 +4,7 @@ use 5.014000;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Android::ElectricSheep::Automator::ADB::Device;
 use Carp;

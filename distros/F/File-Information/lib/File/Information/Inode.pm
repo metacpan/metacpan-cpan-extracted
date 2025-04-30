@@ -20,7 +20,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 use Data::Identifier v0.08;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.08;
+our $VERSION = v0.09;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
@@ -78,6 +78,7 @@ my %_properties = (
     db_inode_tag            => {loader => \&_load_db,    rawtype => 'Data::TagDB::Tag'},
     content_sha_3_512_uuid  => {loader => \&_load_contentise, rawtype => 'uuid'},
     content_sha_1_160_sha_3_512_uuid => {loader => \&_load_contentise, rawtype => 'uuid'},
+    store_file              => {loader => \&_load_fstore, rawtype => 'File::FStore::File'},
 );
 
 $_properties{$_}{rawtype} = 'unixts' foreach qw(st_atime st_mtime st_ctime);
@@ -904,6 +905,43 @@ sub _load_ntfs_xattr {
     }
 }
 
+sub _load_fstore {
+    my ($self, $key, %opts) = @_;
+    my $dev;
+    my $inode;
+    my @candidates;
+
+    return if $self->{_loaded_fstore};
+    $self->{_loaded_fstore} = 1;
+
+    $dev    = $self->get('st_dev', default => undef);
+    $inode  = $self->get('st_ino', default => undef);
+
+    return unless defined($dev) && defined($inode);
+
+    foreach my $store ($self->instance->store(as => 'File::FStore')) {
+        foreach my $candidate ($store->query(properties => inode => $inode)) {
+            my @stat = $candidate->stat;
+
+            if (defined($stat[0]) && length($stat[0]) && $stat[0] != 0) {
+                if (defined($stat[1]) && length($stat[1]) && $stat[1] > 0) {
+                    if ($stat[0] == $dev && $stat[1] == $inode) {
+                        push(@candidates, $candidate);
+                    }
+                }
+            }
+        }
+    }
+
+    if (scalar(@candidates)) {
+        my $pv_current = ($self->{properties_values} //= {})->{current} //= {};
+        my $pv_final   = ($self->{properties_values} //= {})->{final} //= {};
+
+        $pv_current->{store_file} = [map {{raw => $_}} @candidates];
+        $pv_final->{store_file} = [map {{raw => $_}} @candidates];
+    }
+}
+
 1;
 
 __END__
@@ -918,7 +956,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.08
+version v0.09
 
 =head1 SYNOPSIS
 

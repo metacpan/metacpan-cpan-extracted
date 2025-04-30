@@ -55,7 +55,7 @@
    "provides" : {
       "Map::Tube::Lyon" : {
          "file" : "lib/Map/Tube/Lyon.pm",
-         "version" : "v0.62.3"
+         "version" : "v0.62.4"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "mailto" : "bug-Map-Tube-Lyon@rt.cpan.org"
       }
    },
-   "version" : "v0.62.3",
+   "version" : "v0.62.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

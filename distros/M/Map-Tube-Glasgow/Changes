@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Glasgow.
 
+0.72.3 2025-04-30
+  - Require Map::Tube 4.09.
+  - Require Perl 5.14 (in accordance with Map::Tube 4.09).
+  - Remove -T from shebangs in tests (in accordance with Map::Tube 4.09).
+
 0.72.2 2025-02-17
   - Require Map::Tube 3.94 and adapt tests accordingly.
   - Remove support for Perl 5.10 because of test failing for Perl < 5.11.

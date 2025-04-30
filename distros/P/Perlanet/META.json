@@ -53,6 +53,7 @@
             "Encode" : "0",
             "HTML::Scrubber" : "0",
             "HTML::T5" : "0",
+            "LWP::Protocol::https" : "0",
             "List::Util" : "0",
             "Moose" : "0",
             "MooseX::ConfigFromFile" : "0",
@@ -69,7 +70,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v3.3.2"
+         "version" : "v3.3.3"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -123,6 +124,6 @@
          "web" : "https://github.com/davorg-cpan/perlanet"
       }
    },
-   "version" : "v3.3.2",
+   "version" : "v3.3.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

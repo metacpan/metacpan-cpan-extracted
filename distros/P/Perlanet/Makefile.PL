@@ -14,6 +14,7 @@ WriteMakefile
                    'File::Path' => 0,
                    'HTML::Scrubber' => 0,
                    'HTML::T5' => 0,
+                   'LWP::Protocol::https' => 0,
                    'List::Util' => 0,
                    'Moose' => 0,
                    'MooseX::ConfigFromFile' => 0,

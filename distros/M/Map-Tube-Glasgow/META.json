@@ -4,7 +4,7 @@
       "Gisbert W. Selke <gws@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,10 +34,10 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "3.94",
+            "Map::Tube" : "4.09",
             "Moo" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.012"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Map::Tube::Glasgow" : {
          "file" : "lib/Map/Tube/Glasgow.pm",
-         "version" : "v0.72.2"
+         "version" : "v0.72.3"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "mailto" : "bug-Map-Tube-Glasgow@rt.cpan.org"
       }
    },
-   "version" : "v0.72.2",
+   "version" : "v0.72.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

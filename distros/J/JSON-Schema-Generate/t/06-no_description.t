@@ -2,6 +2,8 @@ use Test::More;
 
 use strict;
 use JSON::Schema::Generate;
+use JSON qw/decode_json/;
+
 
 my $data1 = '{
 	"links" : {
@@ -91,7 +93,7 @@ my $schema_from_file;
   close $fh;
 }
 
-is ($schema, $schema_from_file, "schema matched previously generated");
+is_deeply (decode_json($schema), decode_json($schema_from_file), "schema matched previously generated");
 
 use JSON::Schema;
 my $validator = JSON::Schema->new($schema);

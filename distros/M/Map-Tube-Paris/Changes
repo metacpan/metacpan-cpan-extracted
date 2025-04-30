@@ -1,0 +1,8 @@
+Revision history for Perl extension Map::Tube::Paris
+
+0.1.1 2025-04-30
+  - Require Map::Tube 4.09.
+  - Remove -T from shebangs in tests (in accordance with Map::Tube 4.09).
+
+0.1.0 2025-04-29
+  - Initial release

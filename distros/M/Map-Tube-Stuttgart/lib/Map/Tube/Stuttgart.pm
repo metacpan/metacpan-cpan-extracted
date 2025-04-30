@@ -11,12 +11,12 @@
 #
 
 package Map::Tube::Stuttgart;
-use 5.12.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.0');
+our $VERSION = version->declare('v0.1.1');
 
 =encoding utf8
 

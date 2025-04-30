@@ -4,11 +4,18 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.15
+Version 0.16
+
+# DESCRIPTION
+
+`Data::Text` provides an object-oriented interface for managing and manipulating text content in Perl.
+It wraps string operations in a class-based structure,
+enabling clean chaining of methods like appending, trimming, replacing words, and joining text with conjunctions.
+It supports flexible input types,
+including strings, arrays, and other `Data::Text` objects,
+and overloads common operators to allow intuitive comparisons and stringification.
 
 # SYNOPSIS
-
-Handle text in an OO way.
 
     use Data::Text;
 
@@ -47,6 +54,24 @@ Successive calls to append() can be daisy chained.
 The argument can be a reference to an array of strings, or an object.
 If called with an object, the message as\_string() is sent to it for its contents.
 
+## uppercase
+
+Converts the text to uppercase.
+
+    $d->uppercase();
+
+## lowercase
+
+Converts the text to lowercase.
+
+    $d->lowercase();
+
+## clear
+
+Clears the text and resets internal state.
+
+    $d->clear();
+
 ## equal
 
 Are two texts the same?
@@ -81,13 +106,10 @@ Removes trailing spaces from the text.
 
 ## replace
 
-Replaces words.
+Replaces multiple words in the text.
 
-    use Data::Text;
-
-    my $dt = Data::Text->new();
     $dt->append('Hello World');
-    $dt->replace({ 'Hello' => 'Goodbye dear' });
+    $dt->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
     print $dt->as_string(), "\n";       # Outputs "Goodbye dear world"
 
 ## appendconjunction
@@ -109,11 +131,15 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
+There is no Unicode or UTF-8 support.
+
 # SEE ALSO
 
-[String::Clean](https://metacpan.org/pod/String%3A%3AClean), [String::Util](https://metacpan.org/pod/String%3A%3AUtil), [Lingua::String](https://metacpan.org/pod/Lingua%3A%3AString)
+[String::Util](https://metacpan.org/pod/String%3A%3AUtil), [Lingua::String](https://metacpan.org/pod/Lingua%3A%3AString)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 

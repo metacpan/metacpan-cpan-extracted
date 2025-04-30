@@ -1,5 +1,11 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.15	Tue Apr 29 20:24:10 EDT 2025
+	Makefile.PL: Prefer XML::PP, since XML::Simple can have loading problems on Windows
+	Improved the fallback to Config::Auto when XML::Simple isn't working
+	new() now fails, silently, if there's no config file
+	Use Config::Abstract to load .pl files, but note RT#164587
+
 0.14	Mon Apr 28 11:17:20 EDT 2025
 	Allow logger to be an array ref
 	Fail more gracefully

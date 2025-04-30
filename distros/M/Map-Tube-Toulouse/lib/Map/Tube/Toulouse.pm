@@ -9,12 +9,12 @@
 # Mail: gws@cpan.org
 #
 package Map::Tube::Toulouse;
-use 5.12.0;
+use 5.14.0;
 use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.1.1');
+our $VERSION = version->declare('v0.1.2');
 
 =encoding utf8
 
