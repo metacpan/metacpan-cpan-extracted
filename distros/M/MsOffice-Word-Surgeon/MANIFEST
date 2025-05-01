@@ -15,6 +15,7 @@ t/etc/MsOffice-Word-Surgeon.docx
 t/msoffice-word-surgeon.t
 t/replace_fields.t
 t/reveal_bookmarks.t
+t/zip_from_filehandle.t
 xt/manifest.t
 xt/pod.t
 META.yml

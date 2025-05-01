@@ -1,3 +1,11 @@
+v0.05   2025-05-01Z
+    - Implement Data::Identifier::Interface::Known in File::FStore and File::FStore::File
+    - Deprecated $store->export(), and $store->import_data(), now primary way is via migration
+    - Support link styles (currently: none, 1-level, 2-level)
+    - Support store styles (currently: 1-level-contentise, 2-level-contentise)
+    - Support getting a File::Information::* from a File::FStore::File
+    - Marked Digest::SHA3 required to ensure consistant user experience
+
 v0.04   2025-04-20Z
     - Added tests
     - Fixed case with contentise being unknown

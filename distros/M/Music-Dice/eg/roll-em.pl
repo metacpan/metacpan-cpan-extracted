@@ -12,15 +12,19 @@ my %opt = (
     tonic     => 'C',
     scale     => 'major',
     octave    => 4,
+    patch     => 0,
     soundfont => $ENV{HOME} . '/Music/soundfont/FluidR3_GM.sf2',
     midi_file => "$0.mid",
+    quality   => 0,
 );
 GetOptions(\%opt,
     'tonic=s',
     'scale=s',
     'octave=i',
+    'patch=i',
     'soundfont=s',
     'midi_file=s',
+    'quality',
 );
 
 my $d = Music::Dice->new(
@@ -28,7 +32,7 @@ my $d = Music::Dice->new(
     scale_name => $opt{scale},
 );
 
-my $score = setup_score(patch => 4);
+my $score = setup_score(patch => $opt{patch});
 
 my $cn = Music::Chord::Note->new;
 
@@ -40,7 +44,9 @@ for (1 .. 4) {
     my @midi;
     for my $i (0 .. $#$phrase) {
         my $notes;
-        my $quality = $d->chord_quality_triad_roll($notes[$i], $triads[$i]);
+        my $quality = $opt{quality}
+            ? $d->chord_quality_triad_roll($notes[$i], $triads[$i])
+            : '';
         push @midi, [ $phrase->[$i], "$notes[$i]$quality" ];
     }
     for my $spec (@midi) {

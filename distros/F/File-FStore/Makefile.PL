@@ -21,18 +21,18 @@ my %WriteMakefileArgs = (
     "DBD::SQLite" => "1.72",
     "DBI" => "1.643",
     "Data::Identifier" => "0.11.0",
+    "Digest::SHA3" => "1.05",
     "Fcntl" => "1.15",
     "File::Information" => "0.8.0",
     "File::Spec" => "3.84"
   },
   "TEST_REQUIRES" => {
-    "Digest::SHA3" => "1.05",
     "File::Temp" => "0.2311",
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.04",
+  "VERSION" => "v0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }

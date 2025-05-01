@@ -19,7 +19,7 @@ use File::FStore::File;
 
 use parent 'File::FStore::Base';
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 
 sub link_in {
@@ -185,6 +185,7 @@ sub _new {
 
     croak 'No store is given' unless defined $self->{store};
 
+    $self->store->_init_store_style;
     $self->reset;
 
     return $self;
@@ -209,13 +210,28 @@ sub _temp_filename {
 
 sub _target_dirname {
     my ($self) = @_;
-    return 'by-contentise';
+    my $store_style = $self->store->setting('store_style') // File::FStore->DEFAULT_STORE_STYLE;
+
+    if ($store_style eq '1-level-contentise') {
+        return 'by-contentise';
+    } elsif ($store_style eq '2-level-contentise') {
+        my $contentise = $self->contentise;
+        return File::Spec->catdir('by-contentise', substr($contentise, 0, 2));
+    }
+
+    croak 'BUG: Invalid store style';
 }
 
 sub _target_filename {
     my ($self) = @_;
-    my $contentise = $self->contentise;
-    return $self->{target_filename} //= File::Spec->catfile($self->_target_dirname, $contentise);
+    my $store_style = $self->store->setting('store_style') // File::FStore->DEFAULT_STORE_STYLE;
+
+    if ($store_style eq '1-level-contentise' || $store_style eq '2-level-contentise') {
+        my $contentise = $self->contentise;
+        return $self->{target_filename} //= File::Spec->catfile($self->_target_dirname, $contentise);
+    }
+
+    croak 'BUG: Invalid store style';
 }
 
 sub _used_digests {
@@ -237,7 +253,7 @@ File::FStore::Adder - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

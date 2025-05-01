@@ -13,6 +13,8 @@ use warnings;
 
 use Carp;
 
+our $VERSION = v0.05;
+
 
 sub contentise {
     my ($self, %opts) = @_;
@@ -58,9 +60,7 @@ sub db {
 #@returns Data::URIID
 sub extractor {
     my ($self, %opts) = @_;
-    return $self->{extractor} if defined $self->{extractor};
-    return $opts{default} if exists $opts{default};
-    croak 'No extractor known';
+    return $self->{extractor} //= $self->store->extractor(%opts);
 }
 
 
@@ -83,7 +83,7 @@ File::FStore::Base - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

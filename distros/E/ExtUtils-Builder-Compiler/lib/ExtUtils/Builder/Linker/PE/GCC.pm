@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::GCC;
-$ExtUtils::Builder::Linker::PE::GCC::VERSION = '0.030';
+$ExtUtils::Builder::Linker::PE::GCC::VERSION = '0.031';
 use strict;
 use warnings;
 

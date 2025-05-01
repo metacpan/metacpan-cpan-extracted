@@ -1,5 +1,10 @@
 Revision history for experimental
 
+0.035     2025-05-01 11:35:41+02:00 Europe/Berlin
+          - regex_sets no longer experimental
+          - switch/smartmatch were deprecated then undeprecated
+          - Properly handle the win32_perlio warning
+
 0.034     2025-01-09 22:11:31+01:00 Europe/Brussels
           - Rerelease to deal with illegal core update
 

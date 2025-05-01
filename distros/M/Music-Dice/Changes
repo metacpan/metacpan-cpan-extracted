@@ -1,5 +1,12 @@
 Revision history for Music-Dice
 
+0.0206 2025-04-30 20:56:03
+    - Improve documentation.
+    - Enhance the eg/interactive.pl program.
+
+0.0205 2025-04-30 19:49:36
+    - Enhance the eg/*.pl programs.
+
 0.0204 2025-04-29 16:40:34
     - Fix copyright.
     - Enhance the eg/*.pl programs.

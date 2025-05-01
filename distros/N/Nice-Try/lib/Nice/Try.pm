@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.15
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.3.16
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2024/11/07
+## Modified 2025/05/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.15';
+    our $VERSION = 'v1.3.16';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -2280,7 +2280,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.15
+    v1.3.16
 
 =head1 DESCRIPTION
 
@@ -3126,7 +3126,7 @@ And, if you mix POD, it will ignore it to only make available in the C<DATA> glo
     Comme à cette fleur, la vieillesse
     Fera ternir votre beauté.
 
-This would yield the entire poem of 3 paragraph, while skipping the POD in-between. Of course, the same would work with C<__DATA__>
+This would yield the entire poem of 3 paragraphs, while skipping the POD in-between. Of course, the same would work with C<__DATA__>
 
 The C<DATA> is actually an C<IO::File> object generated with C<Symbol::geniosym()>
 
@@ -3233,6 +3233,24 @@ For example:
     EOT
 
 You can also pass an optional hash or hash reference of options to L</implement> and it will be used to instantiate a new L<Nice::Try> method. The options accepted are the same ones that can be passed when using C<use Nice::Try>
+
+=head1 THREAD-SAFETY
+
+L<Nice::Try> is thread-safe for both compile-time and runtime operations. During compilation, source filtering is isolated per thread/process. At runtime, transformed code uses C<local> variables (e.g., C<$Nice::Try::EXCEPTION>, C<$Nice::Try::DIED>) to ensure thread isolation. The C<finally> block, implemented via C<Nice::Try::ScopeGuard>, is thread-safe due to per-object state.
+
+Context awareness with L<Want> is disabled in threaded environments to avoid known issues, reverting to L<perlfunc/wantarray> for safety:
+
+    use threads;
+    use Nice::Try;
+
+    try
+    {
+        print "In thread ", threads->tid, "\n";
+    }
+    catch( $e )
+    {
+        print "Error: $e\n";
+    }
 
 =head1 CREDITS
 

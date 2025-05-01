@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use Data::Dumper::Compact qw(ddc);
 use Getopt::Long qw(GetOptions);
 use MIDI::Util qw(setup_score midi_format play_fluidsynth);
 use Music::Dice ();
@@ -36,12 +37,16 @@ my $score = setup_score(
 );
 
 my $phrase = $d->rhythmic_phrase->roll;
+print 'Rolled phrase: ', ddc($phrase);
 
 for (1 .. 4) {
+    my @notes;
     for my $i (0 .. $#$phrase) {
         my $note = $d->note->roll;
-        $score->n($phrase->[$i], midi_format($note))
+        $score->n($phrase->[$i], midi_format($note));
+        push @notes, $note;
     }
+    print 'Rolled notes: ', ddc(\@notes);
 }
 
 # $score->write_score($opt{midi_file});

@@ -40,157 +40,157 @@ optional_features: {}
 provides:
   Devel::TypeTiny::Perl58Compat:
     file: lib/Devel/TypeTiny/Perl58Compat.pm
-    version: '2.008001'
+    version: '2.008002'
   Error::TypeTiny:
     file: lib/Error/TypeTiny.pm
-    version: '2.008001'
+    version: '2.008002'
   Error::TypeTiny::Assertion:
     file: lib/Error/TypeTiny/Assertion.pm
-    version: '2.008001'
+    version: '2.008002'
   Error::TypeTiny::Compilation:
     file: lib/Error/TypeTiny/Compilation.pm
-    version: '2.008001'
+    version: '2.008002'
   Error::TypeTiny::WrongNumberOfParameters:
     file: lib/Error/TypeTiny/WrongNumberOfParameters.pm
-    version: '2.008001'
+    version: '2.008002'
   Eval::TypeTiny:
     file: lib/Eval/TypeTiny.pm
-    version: '2.008001'
+    version: '2.008002'
   Eval::TypeTiny::CodeAccumulator:
     file: lib/Eval/TypeTiny/CodeAccumulator.pm
-    version: '2.008001'
+    version: '2.008002'
   Reply::Plugin::TypeTiny:
     file: lib/Reply/Plugin/TypeTiny.pm
-    version: '2.008001'
+    version: '2.008002'
   Test::TypeTiny:
     file: lib/Test/TypeTiny.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Coercion:
     file: lib/Type/Coercion.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Coercion::FromMoose:
     file: lib/Type/Coercion/FromMoose.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Coercion::Union:
     file: lib/Type/Coercion/Union.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Library:
     file: lib/Type/Library.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Params:
     file: lib/Type/Params.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Params::Alternatives:
     file: lib/Type/Params/Alternatives.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Params::Parameter:
     file: lib/Type/Params/Parameter.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Params::Signature:
     file: lib/Type/Params/Signature.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Parser:
     file: lib/Type/Parser.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Parser::AstBuilder:
     file: lib/Type/Parser.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Parser::Token:
     file: lib/Type/Parser.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Parser::TokenStream:
     file: lib/Type/Parser.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Registry:
     file: lib/Type/Registry.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tie:
     file: lib/Type/Tie.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tie::ARRAY:
     file: lib/Type/Tie.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tie::BASE:
     file: lib/Type/Tie.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tie::HASH:
     file: lib/Type/Tie.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tie::SCALAR:
     file: lib/Type/Tie.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny:
     file: lib/Type/Tiny.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::Bitfield:
     file: lib/Type/Tiny/Bitfield.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::Class:
     file: lib/Type/Tiny/Class.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::ConstrainedObject:
     file: lib/Type/Tiny/ConstrainedObject.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::Duck:
     file: lib/Type/Tiny/Duck.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::Enum:
     file: lib/Type/Tiny/Enum.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::Intersection:
     file: lib/Type/Tiny/Intersection.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::Role:
     file: lib/Type/Tiny/Role.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Tiny::Union:
     file: lib/Type/Tiny/Union.pm
-    version: '2.008001'
+    version: '2.008002'
   Type::Utils:
     file: lib/Type/Utils.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Common:
     file: lib/Types/Common.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Common::Numeric:
     file: lib/Types/Common/Numeric.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Common::String:
     file: lib/Types/Common/String.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard:
     file: lib/Types/Standard.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::ArrayRef:
     file: lib/Types/Standard/ArrayRef.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::CycleTuple:
     file: lib/Types/Standard/CycleTuple.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::Dict:
     file: lib/Types/Standard/Dict.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::HashRef:
     file: lib/Types/Standard/HashRef.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::Map:
     file: lib/Types/Standard/Map.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::ScalarRef:
     file: lib/Types/Standard/ScalarRef.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::StrMatch:
     file: lib/Types/Standard/StrMatch.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::Tied:
     file: lib/Types/Standard/Tied.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::Standard::Tuple:
     file: lib/Types/Standard/Tuple.pm
-    version: '2.008001'
+    version: '2.008002'
   Types::TypeTiny:
     file: lib/Types/TypeTiny.pm
-    version: '2.008001'
+    version: '2.008002'
 recommends:
   Class::XSAccessor: '1.17'
   Devel::LexAlias: '0.05'
@@ -209,7 +209,7 @@ resources:
   homepage: https://typetiny.toby.ink/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-type-tiny.git
-version: '2.008001'
+version: '2.008002'
 x_breaks:
   Kavorka: '<= 0.013'
   Types::ReadOnly: '<= 0.001'

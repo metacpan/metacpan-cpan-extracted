@@ -6,7 +6,9 @@ use warnings;
 use Test::More 0.89;
 
 use Config;
+use Cwd 'getcwd';
 use ExtUtils::Builder::Planner;
+use File::Temp 'tempdir';
 use IPC::Open2 qw/open2/;
 use File::Basename qw/basename dirname/;
 use File::Spec::Functions qw/catfile/;
@@ -19,6 +21,12 @@ sub capturex {
 	waitpid $pid, 0;
 	return $ret;
 }
+
+my $olddir = getcwd;
+my $dir = tempdir(CLEANUP => 1);
+
+chdir $dir;
+mkdir 't';
 
 my $planner = ExtUtils::Builder::Planner->new;
 $planner->load_extension('ExtUtils::Builder::AutoDetect::C', undef,
@@ -59,16 +67,7 @@ ok(-e $exe_file, "lib file $exe_file has been created");
 my $output = eval { capturex($exe_file) };
 is ($output, "Dubrovnik\n", 'Output is "Dubrovnik"') or diag("Error: $@");
 
-END {
-	for ($source_file, $object_file, $exe_file) {
-		next if not defined;
-		1 while unlink;
-	}
-	if ($^O eq 'VMS') {
-		1 while unlink 'EXECUTABLE.LIS';
-		1 while unlink 'EXECUTABLE.OPT';
-	}
-}
+chdir $olddir;
 
 done_testing;
 

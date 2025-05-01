@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Define and roll musical dice
 
-our $VERSION = '0.0204';
+our $VERSION = '0.0206';
 
 use Moo;
 use strictures 2;
@@ -698,22 +698,22 @@ Music::Dice - Define and roll musical dice
 
 =head1 VERSION
 
-version 0.0204
+version 0.0206
 
 =head1 SYNOPSIS
 
   use Music::Dice ();
   my $d = Music::Dice->new;
-  # basics
-  my $roll = $d->note->roll;
+
+  my $roll = $d->note->roll;        # given scale_name
   $roll = $d->interval->roll;
-  $roll = $d->note_chromatic->roll;
+  $roll = $d->note_chromatic->roll; # particular scale rolls
   $roll = $d->interval_chromatic->roll;
   $roll = $d->note_major->roll;
   $roll = $d->interval_major->roll;
   $roll = $d->note_minor->roll;
   $roll = $d->interval_minor->roll;
-  $roll = $d->chord_triad->roll;
+  $roll = $d->chord_triad->roll;    # chord flavor rolls
   $roll = $d->chord_quality_major->roll;
   $roll = $d->chord_quality_major_7->roll;
   $roll = $d->chord_quality_minor->roll;
@@ -722,7 +722,7 @@ version 0.0204
   $roll = $d->chord_quality_augmented->roll;
   $roll = $d->chord_quality_augmented_7->roll;
   $roll = $d->chord_quality_triad_roll('C', 'major');
-  $roll = $d->mode->roll;
+  $roll = $d->mode->roll;           # mode rolls given scale_note
   $roll = $d->ionian->roll;
   $roll = $d->dorian->roll;
   $roll = $d->phrygian->roll;
@@ -730,9 +730,9 @@ version 0.0204
   $roll = $d->mixolydian->roll;
   $roll = $d->aeolian->roll;
   $roll = $d->locrian->roll;
-  $roll = $d->tonnetz->roll;
+  $roll = $d->tonnetz->roll;        # neo-riemannian tonnetz
   $roll = $d->tonnetz_7->roll;
-  $roll = $d->rhythm->roll;
+  $roll = $d->rhythm->roll;         # rhythmic phrase rolls
   $roll = $d->rhythmic_phrase->roll;
   $roll = $d->rhythmic_phrase_constrained->roll;
 

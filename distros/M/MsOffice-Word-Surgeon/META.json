@@ -27,6 +27,7 @@
             "Exporter" : "0",
             "List::Util" : "0",
             "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
             "MooseX::StrictConstructor" : "0",
             "POSIX" : "0",
             "XML::LibXML" : "0",
@@ -44,38 +45,31 @@
    "provides" : {
       "MsOffice::Word::Surgeon" : {
          "file" : "lib/MsOffice/Word/Surgeon.pm",
-         "version" : "2.09"
+         "version" : "2.10"
       },
       "MsOffice::Word::Surgeon::BookmarkBoundary" : {
-         "file" : "lib/MsOffice/Word/Surgeon/BookmarkBoundary.pm",
-         "version" : "2.09"
+         "file" : "lib/MsOffice/Word/Surgeon/BookmarkBoundary.pm"
       },
       "MsOffice::Word::Surgeon::Carp" : {
          "file" : "lib/MsOffice/Word/Surgeon/Carp.pm"
       },
       "MsOffice::Word::Surgeon::Field" : {
-         "file" : "lib/MsOffice/Word/Surgeon/Field.pm",
-         "version" : "2.09"
+         "file" : "lib/MsOffice/Word/Surgeon/Field.pm"
       },
       "MsOffice::Word::Surgeon::PackagePart" : {
-         "file" : "lib/MsOffice/Word/Surgeon/PackagePart.pm",
-         "version" : "2.09"
+         "file" : "lib/MsOffice/Word/Surgeon/PackagePart.pm"
       },
       "MsOffice::Word::Surgeon::Revision" : {
-         "file" : "lib/MsOffice/Word/Surgeon/Revision.pm",
-         "version" : "2.09"
+         "file" : "lib/MsOffice/Word/Surgeon/Revision.pm"
       },
       "MsOffice::Word::Surgeon::Run" : {
-         "file" : "lib/MsOffice/Word/Surgeon/Run.pm",
-         "version" : "2.09"
+         "file" : "lib/MsOffice/Word/Surgeon/Run.pm"
       },
       "MsOffice::Word::Surgeon::Text" : {
-         "file" : "lib/MsOffice/Word/Surgeon/Text.pm",
-         "version" : "2.09"
+         "file" : "lib/MsOffice/Word/Surgeon/Text.pm"
       },
       "MsOffice::Word::Surgeon::Utils" : {
-         "file" : "lib/MsOffice/Word/Surgeon/Utils.pm",
-         "version" : "2.09"
+         "file" : "lib/MsOffice/Word/Surgeon/Utils.pm"
       }
    },
    "release_status" : "stable",
@@ -87,6 +81,6 @@
          "url" : "https://github.com/damil/MsOffice-Word-Surgeon"
       }
    },
-   "version" : "2.09",
+   "version" : "2.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.031     2025-04-30 15:33:08+02:00 Europe/Brussels
+          - Remove nologo argument to MSVC
+          - Use File::Temp in autodetect tests
+
 0.030     2025-04-25 13:12:46+02:00 Europe/Brussels
           - Only set MSVC export for shared-library and loadable-object
 

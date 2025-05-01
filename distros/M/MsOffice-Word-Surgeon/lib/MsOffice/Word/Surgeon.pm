@@ -2,8 +2,10 @@ package MsOffice::Word::Surgeon;
 use 5.24.0;
 use Moose;
 use MooseX::StrictConstructor;
+use Moose::Util::TypeConstraints          qw(union);
 use Archive::Zip                          qw(AZ_OK);
 use Encode                                qw(encode_utf8 decode_utf8);
+use Scalar::Util                          qw(openhandle);
 use MsOffice::Word::Surgeon::Carp;
 use MsOffice::Word::Surgeon::Revision;
 use MsOffice::Word::Surgeon::PackagePart;
@@ -15,15 +17,17 @@ sub has_inner ($@) {my $attr = shift; has_lazy($attr => @_, init_arg => undef)}
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 
 #======================================================================
-# ATTRIBUTES
+# TYPES AND ATTRIBUTES
 #======================================================================
+
+my $DocxSource = union([qw/Str FileHandle/]);
 
 # how to access the document
-has      'docx'           => (is => 'ro', isa => 'Str');          # the filename, or ..
+has      'docx'           => (is => 'ro', isa => $DocxSource);    # filename or filehandle, or ..
 has_lazy 'zip'            => (is => 'ro', isa => 'Archive::Zip'); # .. an already opened zip archive
 
 # syntax to show embedded fields -- used by PackagePart::replace_field
@@ -54,12 +58,9 @@ around BUILDARGS => sub {
   my $orig  = shift;
   my $class = shift;
 
-  if ( @_ == 1 && !ref $_[0] ) {
-    return $class->$orig(docx => $_[0]);
-  }
-  else {
-    return $class->$orig(@_);
-  }
+  unshift @_, 'docx' if scalar(@_) % 2 and $DocxSource->check($_[0]);
+
+  $class->$orig(@_);
 };
 
 
@@ -83,12 +84,12 @@ sub BUILD {
 sub _zip {
   my $self = shift;
 
-  -f $self->{docx}
-    or croak "file $self->{docx} does not exist";
-
-  my $zip = Archive::Zip->new;
-  $zip->read($self->{docx}) == AZ_OK
-    or croak "cannot unzip $self->{docx}";
+  my $docx = $self->docx;
+  my ($meth, $source_name) = openhandle($docx) ? (readFromFileHandle => 'filehandle')
+                                               : (read               => $docx);
+  my $zip                  = Archive::Zip->new;
+  my $result               = $zip->$meth($docx);
+  $result == AZ_OK  or croak "cannot unzip from $source_name";
 
   return $zip;
 }
@@ -227,7 +228,8 @@ sub save_as {
   my ($self, $docx) = @_;
 
   $self->_update_contents_in_zip;
-  $self->zip->writeToFileNamed($docx) == AZ_OK
+  my $method = openhandle($docx) ? 'writeToFileHandle' : 'writeToFileNamed';
+  $self->zip->$method($docx) == AZ_OK
     or croak "error writing zip archive to $docx";
 }
 
@@ -373,10 +375,10 @@ reassembling the whole document after having modified some text nodes.
 
 =head3 new
 
-  my $surgeon = MsOffice::Word::Surgeon->new(docx => $filename);
+  my $surgeon = MsOffice::Word::Surgeon->new(docx => $filename_or_filehandle);
   # or simply : ->new($filename);
 
-Builds a new surgeon instance, initialized with the contents of the given filename.
+Builds a new surgeon instance, initialized with the contents of the given filename or filehandle.
 
 =head2 Accessors
 
@@ -449,9 +451,9 @@ Reads or writes the given member name in the ZIP file, with utf8 decoding or enc
 
 =head3 save_as
 
-  $surgeon->save_as($docx_file);
+  $surgeon->save_as($docx_file_or_filehandle);
 
-Writes the ZIP archive into the given file.
+Writes the ZIP archive into the given file or filehandle.
 
 
 =head3 overwrite
@@ -459,7 +461,7 @@ Writes the ZIP archive into the given file.
   $surgeon->overwrite;
 
 Writes the updated ZIP archive into the initial file.
-
+If the initial C<docx> was given as a filehandle, use the L</save_as> method instead.
 
 =head3 new_revision
 

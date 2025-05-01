@@ -9,6 +9,7 @@ README
 README.md
 cpanfile
 dist.ini
+eg/interactive.pl
 eg/melody.pl
 eg/modal.pl
 eg/roll-em.pl

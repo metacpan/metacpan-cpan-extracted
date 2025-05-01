@@ -37,11 +37,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Cwd" => 0,
     "ExtUtils::Builder::Planner" => "0.007",
     "IPC::Open2" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.030",
+  "VERSION" => "0.031",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Cwd" => 0,
   "DynaLoader" => 0,
   "ExtUtils::Builder" => "0.016",
   "ExtUtils::Builder::Action::Command" => 0,

@@ -7,6 +7,13 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.008002	2025-04-30
+
+ [ Bug Fixes ]
+ - MooseX-Types 0.51 broke Type::Tiny's ability to reliably detect if Moose
+   types were being used. This release fixes that.
+   Graham Knop++
+
 2.008001	2025-04-15
 
  [ Bug Fixes ]

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::MSVC;
-$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.030';
+$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.031';
 use strict;
 use warnings;
 
@@ -18,7 +18,6 @@ sub _init {
 sub linker_flags {
 	my ($self, $from, $to, %opts) = @_;
 	my @ret;
-	push @ret, $self->new_argument(ranking =>  5, value => ['/nologo']);
 	push @ret, $self->new_argument(ranking => 10, value => ['/dll']) if $self->type eq 'shared-library' or $self->type eq 'loadable-object';
 	push @ret, map { $self->new_argument(ranking => $_->{ranking}, value => [ "/libpath:$_->{value}" ]) } @{ $self->{library_dirs} };
 	push @ret, map { $self->new_argument(ranking => $_->{ranking}, value => [ "$_->{value}.lib" ]) } @{ $self->{libraries} };

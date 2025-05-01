@@ -5,14 +5,13 @@ requires "Carp" => "1.35";
 requires "DBD::SQLite" => "1.72";
 requires "DBI" => "1.643";
 requires "Data::Identifier" => "v0.11.0";
+requires "Digest::SHA3" => "1.05";
 requires "Fcntl" => "1.15";
 requires "File::Information" => "v0.8.0";
 requires "File::Spec" => "3.84";
 requires "perl" => "v5.16.0";
-recommends "Digest::SHA3" => "1.05";
 
 on 'test' => sub {
-  requires "Digest::SHA3" => "1.05";
   requires "File::Temp" => "0.2311";
   requires "Test::Exception" => "0.30";
   requires "Test::More" => "1.3";

@@ -77,10 +77,10 @@ resources:
   bugtracker: https://github.com/perl-ide/App-perlimports/issues
   homepage: https://github.com/perl-ide/App-perlimports
   repository: https://github.com/perl-ide/App-perlimports.git
-version: '0.000056'
+version: '0.000057'
 x_Dist_Zilla:
   perl:
-    version: '5.038002'
+    version: '5.040000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -162,7 +162,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000038'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200014'
@@ -403,7 +403,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@Author::OALDERS/Git::Contributors'
-      version: '0.037'
+      version: '0.038'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -502,7 +502,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000056
+          tag: v0.000057
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -650,7 +650,7 @@ x_contributors:
   - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Peter Oliver <git@mavit.org.uk>'
-x_generated_by_perl: v5.38.2
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

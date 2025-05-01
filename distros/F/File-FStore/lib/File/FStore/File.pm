@@ -20,14 +20,14 @@ use Data::Identifier::Generate;
 
 use File::FStore;
 
-use parent 'File::FStore::Base';
+use parent qw(File::FStore::Base Data::Identifier::Interface::Known);
 
 use constant {
     WRITE_BITS  => S_IWUSR|S_IWGRP|S_IWOTH,
     RE_ISE      => qr<^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[1-3](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$>,
 };
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my @_xattr_hashes = qw(sha-1-160 sha-2-256 sha-3-512);
 
@@ -119,12 +119,14 @@ sub update {
 
     croak 'Stray options passed' if scalar keys %opts;
 
+    $store->_init_link_style;
+
     $store->in_transaction(rw => sub {
             my $fh = $self->_open;
 
             delete $self->{stat}; #clear stat cache.
 
-            $inode = $self->_fii_inode;
+            $inode = $self->as('File::Information::Inode');
 
             # Perform a verify via File::Information
             unless ($no_digests) {
@@ -200,11 +202,13 @@ sub update {
             }
 
             # Create symlinks:
-            {
+            if ((my $link_style = $store->setting('link_style')) ne 'none') {
+                state $up = File::Spec->updir;
                 my $dbname = $self->dbname;
-                my $filename = File::Spec->catfile('..', '..', 'store', $dbname);
+                my $level = $link_style =~ /^([0-9]+)-level$/ ? int($1): 1;
+                my $filename = File::Spec->catfile(( map {$up} 0 .. $level), 'store', $dbname);
 
-                foreach my $fn ($self->_linknames($digests)) {
+                foreach my $fn ($self->_linknames($digests, $link_style)) {
                     next if -l $fn;
                     symlink($filename, $fn) or croak $!;
                 }
@@ -386,7 +390,7 @@ sub delete {
 
     $store->in_transaction(rw => sub {
             my $filename = $self->filename;
-            my @linknames = $self->_linknames;
+            my @linknames = $self->_linknames(undef, 'all');
             my $sth;
 
             unlink($filename) or croak 'Cannot unlink file: '.$!;
@@ -407,7 +411,7 @@ sub delete {
 sub sync_with_db {
     my ($self, %opts) = @_;
     my $db = $opts{db} // $self->db;
-    my $fii_inode = $self->_fii_inode;
+    my $fii_inode = $self->as('File::Information::Inode');
     $db->in_transaction(rw => sub {
             my $data = $self->get;
             my %ids = (
@@ -478,6 +482,46 @@ sub contentise {
     return $self->SUPER::contentise(@args);
 }
 
+sub as {
+    my ($self, $as, %opts) = @_;
+
+    if ($as eq 'File::Information::Inode' || $as eq 'File::Information::Base') {
+        if (defined $opts{fii}) {
+            return $opts{fii}->for_handle($self->_open);
+        } else {
+            return $self->{fii_inode} //= $self->fii->for_handle($self->_open);
+        }
+    } elsif ($as eq 'File::Information::Link') {
+        if (defined $opts{fii}) {
+            return $opts{fii}->for_link($self->filename);
+        } else {
+            return $self->{fii_inode} //= $self->fii->for_link($self->filename);
+        }
+    }
+
+    return $self->SUPER::as($as, %opts);
+}
+
+
+# --- Overrides for Data::Identifier::Interface::Known ---
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    state $classes = {
+        properties      => [[keys %_valid_properties], not_identifiers => 1],
+        digests         => [[keys %File::FStore::_valid_digests], not_identifiers => 1],
+        link_styles     => [[keys %File::FStore::_valid_link_styles], not_identifiers => 1],
+        store_styles    => [[keys %File::FStore::_valid_store_styles], not_identifiers => 1],
+        domains         => [[qw(properties digests)], not_identifiers => 1],
+        other_tags      => [[values %_db_tags], rawtype => 'Data::Identifier'],
+    };
+    croak 'Unsupported options passed' if scalar(keys %opts);
+    $class =~ tr/-/_/;
+    return @{$classes->{$class}} if defined $classes->{$class};
+    return ([map {@{$_->[0]}} values %{$classes}], not_identifiers => 1) if $class eq ':all';
+    croak 'Unsupported class';
+}
+
+
 
 # ---- Private helpers ----
 sub _valid_digests {
@@ -519,11 +563,6 @@ sub _open {
 sub _detach_fh {
     my ($self) = @_;
     $self->{fh} = undef;
-}
-
-sub _fii_inode {
-    my ($self) = @_;
-    return $self->{fii_inode} //= $self->fii->for_handle($self->_open);
 }
 
 sub _used_digests {
@@ -586,7 +625,7 @@ sub _ext {
 }
 
 sub _linknames {
-    my ($self, $digests) = @_;
+    my ($self, $digests, $link_style) = @_;
     my File::FStore $store = $self->store;
     my $ext = $self->_ext;
     my @res;
@@ -594,15 +633,19 @@ sub _linknames {
     $ext = '.'.$ext if defined $ext;
 
     $digests //= $self->get('digests');
+    $link_style //= $store->setting('link_style');
 
     foreach my $digest (keys %{$digests}) {
         my $v = $digests->{$digest} // next;
-        my $fn;
 
         $v .= $ext if defined $ext;
-        $fn = $store->_file(v2 => by => $digest => $v);
 
-        push(@res, $fn);
+        if ($link_style eq '1-level' || $link_style eq 'all') {
+            push(@res, $store->_file(v2 => by => $digest => $v));
+        }
+        if ($link_style eq '2-level' || $link_style eq 'all') {
+            push(@res, $store->_file(v2 => by => $digest => substr($v, 0, 2) => $v));
+        }
     }
 
     return @res;
@@ -650,7 +693,7 @@ File::FStore::File - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -662,7 +705,7 @@ version v0.04
 
 This package provides access to file level values.
 
-This package inherits from L<File::FStore::Base>.
+This package inherits from L<File::FStore::Base>, and L<Data::Identifier::Interface::Known>.
 
 =head1 METHODS
 
@@ -908,6 +951,49 @@ The tag to be used as proto tag (if any).
 This may be anything that L<Data::Identifier/as> will accept.
 
 Defaults to C<undef>.
+
+=back
+
+=head2 known
+
+    my @list = File::FStore::File->known($class [, %opts ] );
+    # or:
+    my @list = $file->known($class [, %opts ] );
+
+(since v0.05)
+
+Lists known objects. See L<Data::Identifier::Interface::Known/known> for details.
+
+The following classes are defined:
+
+=over
+
+=item C<domains>
+
+The list of domains this module supports.
+
+=item C<properties>
+
+The list of keys for the C<properties> domain this module knows.
+
+=item C<digests>
+
+The list of keys for the C<domains> domain this module knows.
+Note that actual support of those digests depend on installed modules and is not reflected by this list.
+
+=item C<link_styles>
+
+The list of supported link styles. See L<File::FStore/new>.
+
+=item C<store_styles>
+
+The list of supported store styles. See L<File::FStore/new>.
+
+=item C<other-tags>
+
+A list of other tags this module knows about.
+This list is hardly useful for most operations.
+However it can be used to prime a database.
 
 =back
 

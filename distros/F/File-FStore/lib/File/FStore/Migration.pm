@@ -16,6 +16,8 @@ use File::Spec;
 
 use parent 'File::FStore::Base';
 
+our $VERSION = v0.05;
+
 
 sub upgrade {
     my ($self, @args) = @_;
@@ -32,14 +34,92 @@ sub new_adder {
 
 
 sub import_data {
-    my ($self, @args) = @_;
-    return $self->store->import_data(@args);
+    my ($self, $handle, %opts) = @_;
+    my $store = $self->store;
+    my $format = delete($opts{format}) // 'json';
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    $store->in_transaction(rw => sub {
+            if ($format eq 'json') {
+                require JSON;
+                my $json = do {
+                    local $/ = undef;
+                    JSON::decode_json(<$handle>);
+                }->{files};
+                foreach my $dbname (keys %{$json}) {
+                    my $file = $store->query(dbname => $dbname);
+                    my $d = $json->{$dbname};
+                    $d = {
+                        properties  => $d->{properties} // {},
+                        digests     => $d->{hashes}     // {},
+                    };
+                    $file->set($d);
+                }
+            } else {
+                croak 'Unsupported format given: '.$format;
+            }
+        });
 }
 
 
 sub export_data {
-    my ($self, @args) = @_;
-    return $self->store->export(@args);
+    my ($self, $handle, %opts) = @_;
+    my $format = delete($opts{format}) // 'json';
+    my $list = delete($opts{list});
+    my $query = delete($opts{query});
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    $list //= do {
+        $query //= ['all'];
+        [$self->store->query(@{$query})];
+    };
+
+    if ($format eq 'json') {
+        require JSON;
+        $handle->say(JSON::encode_json({
+                    files => {
+                        map {
+                            my $res = $_->get;
+                            $res->{hashes} = delete $res->{digests};
+                            $_->dbname => $res
+                        } @{$list}
+                    },
+                }));
+    } elsif ($format eq 'valuefile') {
+        require File::ValueFile::Simple::Writer;
+        my $writer = File::ValueFile::Simple::Writer->new($handle, format => 'e5da6a39-46d5-48a9-b174-5c26008e208e');
+        my %mediasubtype_cache;
+
+        foreach my $file (@{$list}) {
+            my Data::Identifier $ise = Data::Identifier->new(uuid => $file->contentise(as => 'uuid'), displayname => $file->dbname);
+            my $size = eval {$file->get(properties => 'size')};
+            my $mediasubtype = eval {$file->get(properties => 'mediasubtype')};
+            my $digests = $file->get('digests');
+
+            if (defined $mediasubtype) {
+                $mediasubtype = $mediasubtype_cache{$mediasubtype} //= Data::Identifier::Generate->generic(
+                    namespace => '50d7c533-2d9b-4208-b560-bcbbf75ce3f9',
+                    input => $mediasubtype,
+                );
+            }
+
+            $writer->write;
+            $writer->write_tag_ise($ise);
+
+            if (defined $size) {
+                $writer->write_tag_metadata($ise, '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d', $size);
+                foreach my $digest (sort keys %{$digests}) {
+                    $writer->write_tag_metadata($ise, '79385945-0963-44aa-880a-bca4a42e9002', sprintf('v0 %s bytes 0-%u/%u %s', $digest, $size - 1, $size, $digests->{$digest}));
+                }
+            }
+            $writer->write_tag_relation($ise, '448c50a8-c847-4bc7-856e-0db5fea8f23b', $mediasubtype) if defined $mediasubtype;
+            $writer->write_tag_relation($ise, 'd2750351-aed7-4ade-aa80-c32436cc6030', '52a516d0-25d8-47c7-a6ba-80983e576c54'); # also-has-role: proto-file
+        }
+    } else {
+        croak 'Unsupported format given: '.$format;
+    }
 }
 
 
@@ -137,7 +217,7 @@ File::FStore::Migration - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -167,15 +247,57 @@ Proxy for L<File::FStore/new_adder>.
 
 =head2 import_data
 
-    $migration->import_data(...);
+    $migration->import_data($handle);
+    # or:
+    $migration->import_data($handle, format => ...);
 
-Proxy for L<File::FStore/import_data>.
+(since v0.04)
+
+This method allows importing data into the database from an open handle.
+
+The data is imported the same way as per L<File::FStore::File/set> including all safety checks.
+
+The following (all optional) options are supported:
+
+=over
+
+=item C<format>
+
+The format to use. Currently supported is C<json> for the classic JSON format.
+
+=back
 
 =head2 export_data
 
-    $migration->export_data(...);
+    $migration->export_data($handle, %opts);
 
-Proxy for L<File::FStore/export>.
+(since v0.04)
+
+Exports the store metadata.
+
+The following (all optional) options are supported:
+
+=over
+
+=item C<format>
+
+The format to use.
+Currently supported is C<json> for the classic JSON format.
+And C<valuefile> for universal tag based ValueFile output.
+
+=item C<list>
+
+A arrayref to a list of files to include.
+
+=item C<query>
+
+A arrayref with a query in the same format as L</query> takes it.
+
+=back
+
+B<Note:>
+If you want a stringified result you can use a memory handle as documented in L<perlfunc/open>.
+E.g.: C<open(my $fh, 'E<gt>', \$result)>.
 
 =head2 insert_directory
 

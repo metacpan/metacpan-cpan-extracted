@@ -7,15 +7,23 @@ use Test::More 0.89;
 
 use Config;
 plan(skip_all => 'No dynamic linking') if not $Config{usedl};
+use Cwd 'getcwd';
 use ExtUtils::Builder::Planner 0.007;
 use File::Basename qw/basename dirname/;
 use File::Spec::Functions qw/catfile/;
+use File::Temp 'tempdir';
+
+my $olddir = getcwd;
+my $dir = tempdir(CLEANUP => 1);
+
+chdir $dir;
 
 my $planner = ExtUtils::Builder::Planner->new;
 $planner->load_extension('ExtUtils::Builder::AutoDetect::C', undef,
 	profile => '@Perl', type => 'loadable-object',
 );
 
+mkdir 't';
 my $source_file = File::Spec->catfile('t', 'compilet.c');
 {
 	open my $fh, '>', $source_file or die "Can't create $source_file: $!";
@@ -94,6 +102,8 @@ END {
 		1 while unlink 'COMPILET.OPT';
 	}
 }
+
+chdir $olddir;
 
 done_testing;
 

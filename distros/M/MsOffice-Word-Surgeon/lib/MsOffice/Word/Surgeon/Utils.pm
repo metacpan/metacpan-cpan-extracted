@@ -7,8 +7,6 @@ use Exporter    qw/import/;
 
 our @EXPORT = qw/maybe_preserve_spaces is_at_run_level parse_attrs decode_entities encode_entities/;
 
-our $VERSION = '2.09';
-
 sub maybe_preserve_spaces {
   my ($txt) = @_;
   return $txt =~ /^\s/ || $txt =~ /\s$/ ? ' xml:space="preserve"' : '';

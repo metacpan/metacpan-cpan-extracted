@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,11 +45,11 @@
    "provides" : {
       "experimental" : {
          "file" : "lib/experimental.pm",
-         "version" : "0.034"
+         "version" : "0.035"
       },
       "stable" : {
          "file" : "lib/stable.pm",
-         "version" : "0.034"
+         "version" : "0.035"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/Dual-Life/experimental"
       }
    },
-   "version" : "0.034",
+   "version" : "0.035",
    "x_contributors" : [
       "brian greenfield <0briang0@gmail.com>",
       "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
@@ -78,9 +78,10 @@
       "Ricardo Signes <rjbs@cpan.org>",
       "Ricardo Signes <rjbs@semiotic.systems>",
       "Sawyer X <xsawyerx@cpan.org>",
-      "Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>"
+      "Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>",
+      "Tony Cook <tony@develop-help.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
+   "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

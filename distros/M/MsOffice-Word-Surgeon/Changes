@@ -1,5 +1,7 @@
 Revision history for MsOffice-Word-Surgeon
 
+2.10    30.04.2025
+  - new() and save_as() can take a filehandle as docx argument
 
 2.09    21.12.2024
   - plain_text() should decode XML entities

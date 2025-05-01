@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::Cpp;
-$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.030';
+$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.031';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ ExtUtils::Builder::AutoDetect::Cpp
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 AUTHOR
 

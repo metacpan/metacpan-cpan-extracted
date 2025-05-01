@@ -20,7 +20,14 @@ use Scalar::Util qw(weaken);
 
 use File::FStore::File;
 
-our $VERSION = v0.04;
+use parent 'Data::Identifier::Interface::Known';
+
+our $VERSION = v0.05;
+
+use constant {
+    DEFAULT_LINK_STYLE  => '1-level',
+    DEFAULT_STORE_STYLE => '1-level-contentise',
+};
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -32,6 +39,11 @@ our %_valid_digests = map {$_ => int((/^[^-]+-[^-]-([0-9]+)$/)[0]/4)} (
     qw(md-5-128 sha-1-160),
     (map {'sha-2-'.$_, 'sha-3-'.$_} 224, 256, 384, 512),
 );
+
+our %_valid_link_styles = map {$_ => 1} qw(none 1-level 2-level);
+our %_valid_store_styles = map {$_ => 1} qw(1-level-contentise 2-level-contentise);
+
+my %_flat_settings = map {$_ => $_} qw(link_style store_style);
 
 
 sub create {
@@ -99,6 +111,8 @@ sub new {
         path => $path,
         used_digests => \@used_digests,
         transaction_count => 0,
+        link_style => DEFAULT_LINK_STYLE,
+        store_style => DEFAULT_STORE_STYLE,
     }, $pkg;
 
     foreach my $key (keys %_types) {
@@ -107,6 +121,18 @@ sub new {
         croak 'Invalid type for key: '.$key unless eval {$v->isa($_types{$key})};
         $self->{$key} = $v;
         weaken($self->{$key}) if $weak;
+    }
+
+    if (defined(my $link_style = delete $opts{link_style})) {
+        $link_style = DEFAULT_LINK_STYLE if $link_style eq 'default';
+        croak 'Not a valid link style: '.$link_style unless defined $_valid_link_styles{$link_style};
+        $self->{link_style} = $link_style;
+    }
+
+    if (defined(my $store_style = delete $opts{store_style})) {
+        $store_style = DEFAULT_STORE_STYLE if $store_style eq 'default';
+        croak 'Not a valid store style: '.$store_style unless defined $_valid_store_styles{$store_style};
+        $self->{store_style} = $store_style;
     }
 
     croak 'Stray options passed' if scalar keys %opts;
@@ -128,6 +154,19 @@ sub new {
 sub close {
     my ($self) = @_;
     $self->DESTROY;
+}
+
+
+sub setting {
+    my ($self, $key) = @_;
+
+    croak 'No key given' unless defined $key;
+
+    if (defined(my $flatkey = $_flat_settings{$key})) {
+        return $self->{$flatkey};
+    }
+
+    croak 'Unknown key: '.$key;
 }
 
 
@@ -316,44 +355,7 @@ sub scrub {
             opendir(my $algodir, $self->_directory('v2' => 'by')) or croak $!;
             while (defined(my $algoent = readdir($algodir))) {
                 next if $algoent =~ /^\./;
-                opendir(my $dir, $self->_directory(v2 => by => $algoent)) or croak $!;
-                while (defined(my $ent = readdir($dir))) {
-                    my $fullname;
-                    my $hash;
-                    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-                        $atime,$mtime,$ctime,$blksize,$blocks);
-                    my $bad = 1;
-
-                    next if $ent =~ /^\./;
-
-                    $fullname = $self->_file(v2 => by => $algoent => $ent);
-
-                    ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-                        $atime,$mtime,$ctime,$blksize,$blocks) = stat($fullname);
-
-                    if (defined $size) {
-                        my ($hash) = $ent =~ /^([0-9a-fA-F]+)(?:\..+)?$/;
-                        if (defined $hash) {
-                            my $file;
-
-                            $hash = lc($hash);
-                            $file = eval {$self->query(digests => $algoent => $hash)};
-
-                            if (defined $file) {
-                                my $want_size = eval { $file->get(properties => 'size') } // $size;
-                                if ($size == $want_size) {
-                                    $bad = 0;
-                                }
-                            }
-                        }
-                    }
-
-                    #warn $algoent.' -> '.$ent.' -> '.$bad;
-                    if ($bad) {
-                        unlink($fullname) or croak $!;
-                    }
-                }
-                closedir($dir);
+                $self->_scrub_dir($algoent => $self->_directory(v2 => by => $algoent));
             }
             closedir($algodir);
         });
@@ -437,91 +439,14 @@ sub migration {
 
 
 sub export {
-    my ($self, $handle, %opts) = @_;
-    my $format = delete($opts{format}) // 'json';
-    my $list = delete($opts{list});
-    my $query = delete($opts{query});
-
-    croak 'Stray options passed' if scalar keys %opts;
-
-    $list //= do {
-        $query //= ['all'];
-        [$self->query(@{$query})];
-    };
-
-    if ($format eq 'json') {
-        require JSON;
-        $handle->say(JSON::encode_json({
-                    files => {
-                        map {
-                            my $res = $_->get;
-                            $res->{hashes} = delete $res->{digests};
-                            $_->dbname => $res
-                        } @{$list}
-                    },
-                }));
-    } elsif ($format eq 'valuefile') {
-        require File::ValueFile::Simple::Writer;
-        my $writer = File::ValueFile::Simple::Writer->new($handle, format => 'e5da6a39-46d5-48a9-b174-5c26008e208e');
-        my %mediasubtype_cache;
-
-        foreach my $file (@{$list}) {
-            my Data::Identifier $ise = Data::Identifier->new(uuid => $file->contentise(as => 'uuid'), displayname => $file->dbname);
-            my $size = eval {$file->get(properties => 'size')};
-            my $mediasubtype = eval {$file->get(properties => 'mediasubtype')};
-            my $digests = $file->get('digests');
-
-            if (defined $mediasubtype) {
-                $mediasubtype = $mediasubtype_cache{$mediasubtype} //= Data::Identifier::Generate->generic(
-                    namespace => '50d7c533-2d9b-4208-b560-bcbbf75ce3f9',
-                    input => $mediasubtype,
-                );
-            }
-
-            $writer->write;
-            $writer->write_tag_ise($ise);
-
-            if (defined $size) {
-                $writer->write_tag_metadata($ise, '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d', $size);
-                foreach my $digest (sort keys %{$digests}) {
-                    $writer->write_tag_metadata($ise, '79385945-0963-44aa-880a-bca4a42e9002', sprintf('v0 %s bytes 0-%u/%u %s', $digest, $size - 1, $size, $digests->{$digest}));
-                }
-            }
-            $writer->write_tag_relation($ise, '448c50a8-c847-4bc7-856e-0db5fea8f23b', $mediasubtype) if defined $mediasubtype;
-            $writer->write_tag_relation($ise, 'd2750351-aed7-4ade-aa80-c32436cc6030', '52a516d0-25d8-47c7-a6ba-80983e576c54'); # also-has-role: proto-file
-        }
-    } else {
-        croak 'Unsupported format given: '.$format;
-    }
+    my ($self, @args) = @_;
+    return $self->migration->export_data(@args);
 }
 
 
 sub import_data {
-    my ($self, $handle, %opts) = @_;
-    my $format = delete($opts{format}) // 'json';
-
-    croak 'Stray options passed' if scalar keys %opts;
-
-    $self->in_transaction(rw => sub {
-            if ($format eq 'json') {
-                require JSON;
-                my $json = do {
-                    local $/ = undef;
-                    JSON::decode_json(<$handle>);
-                }->{files};
-                foreach my $dbname (keys %{$json}) {
-                    my $file = $self->query(dbname => $dbname);
-                    my $d = $json->{$dbname};
-                    $d = {
-                        properties  => $d->{properties} // {},
-                        digests     => $d->{hashes}     // {},
-                    };
-                    $file->set($d);
-                }
-            } else {
-                croak 'Unsupported format given: '.$format;
-            }
-        });
+    my ($self, @args) = @_;
+    return $self->migration->import_data(@args);
 }
 
 
@@ -573,6 +498,14 @@ sub fii {
     );
 }
 
+# --- Overrides for Data::Identifier::Interface::Known ---
+sub _known_provider {
+    my ($pkg, @args) = @_;
+    return $pkg->File::FStore::File::_known_provider(@args);
+}
+
+
+
 # ---- Private helpers ----
 
 sub _placeholders {
@@ -603,6 +536,44 @@ sub _directory {
 sub _used_digests {
     my ($self) = @_;
     return $self->{used_digests};
+}
+
+sub _init_link_style {
+    my ($self) = @_;
+
+    unless ($self->{_init_link_style}) {
+        my $link_style = $self->setting('link_style');
+
+        $self->{_init_link_style} = 1;
+
+        if ($link_style eq '2-level') {
+            foreach my $digest (@{$self->_used_digests}) {
+                for (my $i = 0; $i < 0x100; $i++) {
+                    mkdir($self->_directory(v2 => by => $digest => sprintf('%02x', $i)));
+                }
+            }
+        }
+    }
+}
+
+sub _init_store_style {
+    my ($self) = @_;
+
+    unless ($self->{_init_store_style}) {
+        my $store_style = $self->setting('store_style');
+
+        $self->{_init_store_style} = 1;
+
+        if ($store_style eq '2-level-contentise' || $store_style eq '1-level-contentise') {
+            mkdir($self->_directory(v2 => store => 'by-contentise'));
+        }
+
+        if ($store_style eq '2-level-contentise') {
+            for (my $i = 0; $i < 0x100; $i++) {
+                mkdir($self->_directory(v2 => store => 'by-contentise' => sprintf('%02x', $i)));
+            }
+        }
+    }
 }
 
 sub _scan_subdir {
@@ -658,6 +629,54 @@ sub _scan_file {
     }
 }
 
+sub _scrub_dir {
+    my ($self, $algoent, $dirname) = @_;
+
+    opendir(my $dir, $dirname) or croak $!;
+    while (defined(my $ent = readdir($dir))) {
+        my $fullname;
+        my $hash;
+        my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+            $atime,$mtime,$ctime,$blksize,$blocks);
+        my $bad = 1;
+
+        next if $ent =~ /^\./;
+
+        $fullname = File::Spec->catdir($dirname, $ent);
+        if (-d $fullname) {
+            $self->_scrub_dir($algoent => $fullname);
+            next;
+        }
+
+        $fullname = File::Spec->catfile($dirname, $ent);
+        ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+            $atime,$mtime,$ctime,$blksize,$blocks) = stat($fullname);
+
+        if (defined $size) {
+            my ($hash) = $ent =~ /^([0-9a-fA-F]+)(?:\..+)?$/;
+            if (defined $hash) {
+                my $file;
+
+                $hash = lc($hash);
+                $file = eval {$self->query(digests => $algoent => $hash)};
+
+                if (defined $file) {
+                    my $want_size = eval { $file->get(properties => 'size') } // $size;
+                    if ($size == $want_size) {
+                        $bad = 0;
+                    }
+                }
+            }
+        }
+
+        #warn $algoent.' -> '.$ent.' -> '.$bad;
+        if ($bad) {
+            unlink($fullname) or croak $!;
+        }
+    }
+    closedir($dir);
+}
+
 1;
 
 __END__
@@ -672,7 +691,7 @@ File::FStore - Module for interacting with file stores
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -692,6 +711,8 @@ This metadata is mainly used to ensure the integrity of the store.
 Other metadata is intentionally not supported.
 For storage of other metadata see L<Data::TagDB> and L</db>.
 For reading metadata and file analysis see L<File::Information> and L</fii>.
+
+This package inherits from L<Data::Identifier::Interface::Known>.
 
 =head1 METHODS
 
@@ -740,9 +761,27 @@ A L<Data::URIID> object. See L</extractor>.
 
 A L<File::Information> object. See L</fii>.
 
+=item C<link_style>
+
+(since v0.05)
+
+The style to use for links. One of: C<none>, C<1-level>, or C<2-level>.
+
+B<Note:>
+This does not affect already existing links unless one of the relevant calls is made.
+
 =item C<path>
 
 The path to the store.
+
+=item C<store_style>
+
+(since v0.05)
+
+The style to use for storing files. One of: C<1-level-contentise>, or C<1-level-contentise>.
+
+B<Note:>
+This does not affect already existing files.
 
 =item C<weak>
 
@@ -756,6 +795,16 @@ If only a specific one needs needs to be weaken use L</attach>.
     $store->close;
 
 Closes the store. Any interaction with this object or any related objects after this call is invalid.
+
+=head2 setting
+
+    my $value = $store->setting($key);
+
+(since v0.05)
+
+Gets a setting of the store.
+
+The type of the returned value depends on the key.
 
 =head2 in_transaction
 
@@ -984,53 +1033,23 @@ Returns a new L<File::FStore::Migration> object for this store.
 
 =head2 export
 
-    $store->export($handle, %opts);
+    $migration->export_data(...);
 
-Exports the store metadata.
+(since v0.01, deprecated since v0.05).
 
-The following (all optional) options are supported:
+Deprecated proxy for L<File::FStore/export_data>.
 
-=over
-
-=item C<format>
-
-The format to use.
-Currently supported is C<json> for the classic JSON format.
-And C<valuefile> for universal tag based ValueFile output.
-
-=item C<list>
-
-A arrayref to a list of files to include.
-
-=item C<query>
-
-A arrayref with a query in the same format as L</query> takes it.
-
-=back
-
-B<Note:>
-If you want a stringified result you can use a memory handle as documented in L<perlfunc/open>.
-E.g.: C<open(my $fh, 'E<gt>', \$result)>.
+This proxy will be removed in version v0.10. Future versions of this proxy may C<warn> about it's usage.
 
 =head2 import_data
 
-    $store->import_data($handle);
-    # or:
-    $store->import_data($handle, format => ...);
+    $store->import_data(...);
 
-This method allows importing data into the database from an open handle.
+(since v0.01, deprecated since v0.05).
 
-The data is imported the same way as per L<File::FStore::File/set> including all safety checks.
+Deprecated proxy for L<File::FStore::Migration/import_data>.
 
-The following (all optional) options are supported:
-
-=over
-
-=item C<format>
-
-The format to use. Currently supported is C<json> for the classic JSON format.
-
-=back
+This proxy will be removed in version v0.10. Future versions of this proxy may C<warn> about it's usage.
 
 =head2 attach
 
@@ -1073,6 +1092,16 @@ Returns the instance of L<File::Information> passed via L</new> or a internally 
 
 B<Note:>
 If the option C<default> is passed, it is ignored with no error.
+
+=head2 known
+
+    my @list = File::FStore->known($class [, %opts ] );
+    # or:
+    my @list = $store->known($class [, %opts ] );
+
+(since v0.05)
+
+Proxy for L<File::FStore::File/known>.
 
 =head1 AUTHOR
 

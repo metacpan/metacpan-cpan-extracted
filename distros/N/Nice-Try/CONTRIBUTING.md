@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Nice-Try-v1.3.14/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Nice-Try-v1.3.15/README.md)
 
 ## Author
 
