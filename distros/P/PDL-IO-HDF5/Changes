@@ -1,3 +1,6 @@
+0.762 2025-05-01
+- fix Dataset::set not working with scalar ndarrays (#9) - thanks @arodland for report
+
 0.761 2025-01-12
 - build issues fixed (#6) - thanks @a-shahba
 

@@ -1,17 +1,8 @@
 use strict;
 use warnings;
 
-use File::Temp 'tempfile';
-
-my (@compiler_flags, @linker_flags);
-
-if ($^O ne 'MSWin32') {
-	unshift @compiler_flags, '-pthread';
-	unshift @linker_flags  , '-pthread';
-}
-
-load_module('Dist::Build::XS');
-load_module('Dist::Build::XS::Conf');
+load_extension('Dist::Build::XS');
+load_extension('Dist::Build::XS::Conf');
 
 my @sources = map { "src/$_.c" } qw{argon2 core encoding thread blake2/blake2b switch};
 
@@ -86,9 +77,12 @@ int main() {
 EOF
 }
 
+if (is_os_type('Unix')) {
+	push_extra_compiler_flags('-pthread');
+	push_extra_linker_flags('-pthread');
+}
+
 add_xs(
 	include_dirs         => [ 'include' ],
 	extra_sources        => \@sources,
-	extra_compiler_flags => \@compiler_flags,
-	extra_linker_flags   => \@linker_flags,
 );

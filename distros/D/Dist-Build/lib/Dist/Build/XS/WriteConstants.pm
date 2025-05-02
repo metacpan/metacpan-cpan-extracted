@@ -1,5 +1,5 @@
 package Dist::Build::XS::WriteConstants;
-$Dist::Build::XS::WriteConstants::VERSION = '0.019';
+$Dist::Build::XS::WriteConstants::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Dist::Build::XS::WriteConstants - Dist::Build extension integrating ExtUtils::Co
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

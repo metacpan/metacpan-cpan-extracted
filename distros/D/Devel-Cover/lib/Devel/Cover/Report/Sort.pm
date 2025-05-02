@@ -1,4 +1,4 @@
-# Copyright 2004-2024, Paul Johnson (paul@pjcj.net)
+# Copyright 2004-2025, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Report::Sort;
 use strict;
 use warnings;
 
-our $VERSION = '1.44'; # VERSION
+our $VERSION = '1.45'; # VERSION
 
 use Devel::Cover::DB;
 
@@ -71,7 +71,7 @@ Devel::Cover::Report::Sort - backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2004-2024, Paul Johnson (paul@pjcj.net)
+Copyright 2004-2025, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

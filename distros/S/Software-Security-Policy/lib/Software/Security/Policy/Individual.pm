@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Software::Security::Policy::Individual;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 use parent 'Software::Security::Policy';
 # ABSTRACT: The Individual Security Policy
@@ -50,6 +50,8 @@ sub _dotless_maintainer {
   $maintainer =~ s/\.$//;
   return $maintainer;
 }
+
+sub report_url { $_[0]->{report_url}     }
 
 
 sub program { $_[0]->{program} || $_[0]->{Program} || 'this program' }
@@ -130,6 +132,23 @@ EOF
     return '';
   }
 }
+
+sub _how_to_report {
+    my $self = shift;
+    if ( my $url = $self->report_url ) {
+        if ( $url eq $self->git_url . "/security/advisories" ) {
+            return "via the project\n[Security Advisories](${url})";
+        }
+        else {
+            return "using " . $url;
+        }
+    }
+    else {
+       return "by email to " . $self->maintainer;
+    }
+}
+
+
 1;
 
 =pod
@@ -142,7 +161,7 @@ Software::Security::Policy::Individual - The Individual Security Policy
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -209,6 +228,10 @@ a url where the most current security policy can be found.
 
 a git url where the most current security policy can be found.
 
+=item report_url
+
+the URL where you can report security issues.
+
 =item perl_support_years
 
 the number of years for which past major versions of Perl would be
@@ -247,9 +270,9 @@ us undefined.
 
 Get the maintainer that should be contacted for security issues.
 
-=head2 url
+=head2 report_url
 
-Get the URL of the latest security policy version.
+Get the URL where you can report security issues.
 
 These methods are attribute readers.
 
@@ -325,19 +348,18 @@ __DATA__
 __SUMMARY__
 # Security Policy for the {{ $self->program }} distribution.
 
-Report issues via email at: {{ $self->maintainer }}.
-
+Report security issues {{ $self->_how_to_report }}.
 __SECURITY-POLICY__
 This is the Security Policy for {{ $self->program }}.
 {{ $self->_latest_policy_location }}
 This text is based on the CPAN Security Group's Guidelines for Adding
-a Security Policy to Perl Distributions (version 1.0.0)
+a Security Policy to Perl Distributions (version 1.3.0)
 https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability
 
-Security vulnerabilities can be reported by e-mail to the current
-project maintainers at {{ $self->maintainer }}.
+Security vulnerabilities can be reported to the current {{ $self->program }}
+maintainers {{ $self->_how_to_report }}.
 
 Please include as many details as possible, including code samples
 or test cases, so that we can reproduce the issue.  Check that your
@@ -384,13 +406,16 @@ They may also forward this issue to CPANSec.
 
 Any security vulnerabilities in {{ $self->program }} are covered by this policy.
 
+Security vulnerabilities in versions of any libraries that are
+included in {{ $self->program }} are also covered by this policy.
+
 Security vulnerabilities are considered anything that allows users
 to execute unauthorised code, access unauthorised resources, or to
 have an adverse impact on accessibility or performance of a system.
 
-Security vulnerabilities in upstream software (embedded libraries,
-prerequisite modules or system libraries, or in Perl), are not
-covered by this policy unless they affect {{ $self->program }}, or {{ $self->program }} can
+Security vulnerabilities in upstream software (prerequisite modules
+or system libraries, or in Perl), are not covered by this policy
+unless they affect {{ $self->program }}, or {{ $self->program }} can
 be used to exploit vulnerabilities in them.
 
 Security vulnerabilities in downstream software (any software that

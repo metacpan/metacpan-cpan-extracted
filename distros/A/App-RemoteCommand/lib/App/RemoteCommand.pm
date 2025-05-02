@@ -1,4 +1,4 @@
-package App::RemoteCommand 0.993;
+package App::RemoteCommand 0.994;
 use v5.16;
 use warnings;
 

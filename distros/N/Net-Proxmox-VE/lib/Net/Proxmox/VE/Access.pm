@@ -1,5 +1,5 @@
 #!/bin/false
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Access
 # ABSTRACT: Functions for the 'access' portion of the API
 
@@ -7,34 +7,33 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Access;
-$Net::Proxmox::VE::Access::VERSION = '0.38';
+$Net::Proxmox::VE::Access::VERSION = '0.40';
 use parent 'Exporter';
 
-use Carp qw( croak );
+use Net::Proxmox::VE::Exception;
 
 use JSON::MaybeXS qw(decode_json);
 
-our @EXPORT =
-  qw(
+our @EXPORT = qw(
   access
   access_domains access_groups access_roles
   create_access_domains create_access_groups create_access_roles create_access_users
   delete_access_domains delete_access_groups delete_access_roles delete_access_users
   get_access_domains get_access_groups get_access_roles get_access_users
   update_access_domains update_access_groups update_access_roles update_access_users
-  login check_login_ticket clear_login_ticket
+  sync_access_domains
   get_access_acl update_access_acl
   update_access_password
-  );
+);
 
 
-my $base = '/access';
+my $BASEPATH = '/access';
 
 sub access {
 
     my $self = shift or return;
 
-    return $self->get($base);
+    return $self->get($BASEPATH);
 
 }
 
@@ -43,7 +42,7 @@ sub access_domains {
 
     my $self = shift or return;
 
-    return $self->get( $base, 'domains' )
+    return $self->get( $BASEPATH, 'domains' );
 
 }
 
@@ -51,23 +50,27 @@ sub access_domains {
 sub create_access_domains {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for create_access_domains()' unless @p;
+    Net::Proxmox::VE::Exception->throw(
+        'No arguments for create_access_domains()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for create_access_domains()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for create_access_domains()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for create_access_domains()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for create_access_domains()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->post( $base, 'domains', \%args )
+    return $self->post( $BASEPATH, 'domains', \%args );
 
 }
 
@@ -76,36 +79,49 @@ sub get_access_domains {
 
     my $self = shift or return;
 
-    my $a = shift or croak 'No realm for get_access_domains()';
-    croak 'realm must be a scalar for get_access_domains()' if ref $a;
+    my $realm = shift
+      or
+      Net::Proxmox::VE::Exception->throw('No realm for get_access_domains()');
+    Net::Proxmox::VE::Exception->throw(
+        'realm must be a scalar for get_access_domains()')
+      if ref $realm;
 
-    return $self->get( $base, 'domains', $a )
+    return $self->get( $BASEPATH, 'domains', $realm );
 
 }
 
 
 sub update_access_domains {
 
-    my $self   = shift or return;
-    my $realm = shift or croak 'No realm provided for update_access_domains()';
-    croak 'realm must be a scalar for update_access_domains()' if ref $realm;
+    my $self = shift or return;
+
+    my $realm = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No realm provided for update_access_domains()');
+    Net::Proxmox::VE::Exception->throw(
+        'realm must be a scalar for update_access_domains()')
+      if ref $realm;
     my @p = @_;
 
-    croak 'No arguments for update_access_domains()' unless @p;
+    Net::Proxmox::VE::Exception->throw(
+        'No arguments for update_access_domains()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_access_domains()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_access_domains()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_access_domains()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_access_domains()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, 'domains', $realm, \%args )
+    return $self->put( $BASEPATH, 'domains', $realm, \%args );
 
 }
 
@@ -113,9 +129,53 @@ sub update_access_domains {
 sub delete_access_domains {
 
     my $self = shift or return;
-    my $a    = shift or croak 'No argument given for delete_access_domains()';
 
-    return $self->delete( $base, 'domains', $a )
+    my $realm = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No realm provided for delete_access_domains()');
+    Net::Proxmox::VE::Exception->throw(
+        'realm must be a scalar for delete_access_domains()')
+      if ref $realm;
+
+    return $self->delete( $BASEPATH, 'domains', $realm );
+
+}
+
+###
+#
+
+
+sub sync_access_domains {
+
+    my $self = shift or return;
+
+    my $realm = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No realm provided for sync_access_groups()');
+    Net::Proxmox::VE::Exception->throw(
+        'realm must be a scalar for sync_access_groups()')
+      if ref $realm;
+
+    my @p = @_;
+
+    Net::Proxmox::VE::Exception->throw('No arguments for sync_access_domains()')
+      unless @p;
+    my %args;
+
+    if ( @p == 1 ) {
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for sync_access_domains()')
+          unless ref $p[0] eq 'HASH';
+        %args = %{ $p[0] };
+    }
+    else {
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for sync_access_domains()')
+          if ( scalar @p % 2 != 0 );
+        %args = @p;
+    }
+
+    return $self->post( $BASEPATH, 'domains', \%args );
 
 }
 
@@ -124,7 +184,7 @@ sub access_groups {
 
     my $self = shift or return;
 
-    return $self->get( $base, 'groups' )
+    return $self->get( $BASEPATH, 'groups' );
 
 }
 
@@ -132,23 +192,27 @@ sub access_groups {
 sub create_access_groups {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for create_access_groups()' unless @p;
+    Net::Proxmox::VE::Exception->throw(
+        'No arguments for create_access_groups()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for create_access_groups()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for create_access_groups()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for create_access_groups()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for create_access_groups()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->post( $base, 'groups', \%args )
+    return $self->post( $BASEPATH, 'groups', \%args );
 
 }
 
@@ -157,56 +221,71 @@ sub get_access_groups {
 
     my $self = shift or return;
 
-    my $a = shift or croak 'No groupid for get_access_groups()';
-    croak 'groupid must be a scalar for get_access_groups()' if ref $a;
+    my $groupid = shift
+      or
+      Net::Proxmox::VE::Exception->throw('No groupid for get_access_groups()');
+    Net::Proxmox::VE::Exception->throw(
+        'groupid must be a scalar for get_access_groups()')
+      if ref $groupid;
 
-    return $self->get( $base, 'groups', $a )
+    return $self->get( $BASEPATH, 'groups', $groupid );
 
 }
 
 
 sub update_access_groups {
 
-    my $self   = shift or return;
-    my $realm = shift or croak 'No realm provided for update_access_groups()';
-    croak 'realm must be a scalar for update_access_groups()' if ref $realm;
+    my $self = shift or return;
+
+    my $realm = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No realm provided for update_access_groups()');
+    Net::Proxmox::VE::Exception->throw(
+        'realm must be a scalar for update_access_groups()')
+      if ref $realm;
+
     my @p = @_;
 
-    croak 'No arguments for update_access_groups()' unless @p;
+    Net::Proxmox::VE::Exception->throw(
+        'No arguments for update_access_groups()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_access_groups()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_access_groups()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_access_groups()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_access_groups()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, 'groups', $realm, \%args )
+    return $self->put( $BASEPATH, 'groups', $realm, \%args );
 
 }
 
 
 sub delete_access_groups {
 
-    my $self = shift or return;
-    my $a    = shift or croak 'No argument given for delete_access_groups()';
+    my $self    = shift or return;
+    my $groupid = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No argument given for delete_access_groups()');
 
-    return $self->delete( $base, 'groups', $a )
+    return $self->delete( $BASEPATH, 'groups', $groupid );
 
 }
-
 
 
 sub access_roles {
 
     my $self = shift or return;
 
-    return $self->get( $base, 'roles' )
+    return $self->get( $BASEPATH, 'roles' );
 
 }
 
@@ -214,23 +293,26 @@ sub access_roles {
 sub create_access_roles {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for create_access_roles()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for create_access_roles()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for create_access_roles()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for create_access_roles()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for create_access_roles()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for create_access_roles()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->post( $base, 'roles', \%args )
+    return $self->post( $BASEPATH, 'roles', \%args );
 
 }
 
@@ -239,56 +321,67 @@ sub get_access_roles {
 
     my $self = shift or return;
 
-    my $a = shift or croak 'No roleid for get_access_roles()';
-    croak 'roleid must be a scalar for get_access_roles()' if ref $a;
+    my $roleid = shift
+      or Net::Proxmox::VE::Exception->throw('No roleid for get_access_roles()');
+    Net::Proxmox::VE::Exception->throw(
+        'roleid must be a scalar for get_access_roles()')
+      if ref $roleid;
 
-    return $self->get( $base, 'roles', $a )
+    return $self->get( $BASEPATH, 'roles', $roleid );
 
 }
 
 
 sub update_access_roles {
 
-    my $self   = shift or return;
-    my $realm = shift or croak 'No realm provided for update_access_roles()';
-    croak 'realm must be a scalar for update_access_roles()' if ref $realm;
+    my $self  = shift or return;
+    my $realm = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No realm provided for update_access_roles()');
+    Net::Proxmox::VE::Exception->throw(
+        'realm must be a scalar for update_access_roles()')
+      if ref $realm;
     my @p = @_;
 
-    croak 'No arguments for update_access_roles()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for update_access_roles()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_access_roles()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_access_roles()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_access_roles()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_access_roles()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, 'roles', $realm, \%args )
+    return $self->put( $BASEPATH, 'roles', $realm, \%args );
 
 }
 
 
 sub delete_access_roles {
 
-    my $self = shift or return;
-    my $a    = shift or croak 'No argument given for delete_access_roles()';
+    my $self   = shift or return;
+    my $roleid = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No argument given for delete_access_roles()');
 
-    return $self->delete( $base, 'roles', $a )
+    return $self->delete( $BASEPATH, 'roles', $roleid );
 
 }
-
 
 
 sub access_users {
 
     my $self = shift or return;
 
-    return $self->get( $base, 'users' )
+    return $self->get( $BASEPATH, 'users' );
 
 }
 
@@ -296,23 +389,26 @@ sub access_users {
 sub create_access_users {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for create_access_users()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for create_access_users()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for create_access_users()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for create_access_users()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for create_access_users()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for create_access_users()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->post( $base, 'users', \%args )
+    return $self->post( $BASEPATH, 'users', \%args );
 
 }
 
@@ -321,86 +417,58 @@ sub get_access_users {
 
     my $self = shift or return;
 
-    my $a = shift or croak 'No userid for get_access_users()';
-    croak 'userid must be a scalar for get_access_users()' if ref $a;
+    my $userid = shift
+      or Net::Proxmox::VE::Exception->throw('No userid for get_access_users()');
+    Net::Proxmox::VE::Exception->throw(
+        'userid must be a scalar for get_access_users()')
+      if ref $userid;
 
-    return $self->get( $base, 'users', $a )
+    return $self->get( $BASEPATH, 'users', $userid );
 
 }
 
 
 sub update_access_users {
 
-    my $self   = shift or return;
-    my $realm = shift or croak 'No realm provided for update_access_users()';
-    croak 'realm must be a scalar for update_access_users()' if ref $realm;
+    my $self  = shift or return;
+    my $realm = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No realm provided for update_access_users()');
+    Net::Proxmox::VE::Exception->throw(
+        'realm must be a scalar for update_access_users()')
+      if ref $realm;
     my @p = @_;
 
-    croak 'No arguments for update_access_users()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for update_access_users()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_access_users()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_access_users()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_access_users()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_access_users()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, 'users', $realm, \%args )
+    return $self->put( $BASEPATH, 'users', $realm, \%args );
 
 }
 
 
 sub delete_access_users {
 
-    my $self = shift or return;
-    my $a    = shift or croak 'No argument given for delete_access_users()';
+    my $self   = shift or return;
+    my $userid = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No argument given for delete_access_users()');
 
-    return $self->delete( $base, 'users', $a )
-
-}
-
-
-sub check_login_ticket {
-
-    my $self = shift or return;
-
-    if (   $self->{ticket}
-        && ref $self->{ticket} eq 'HASH'
-        && $self->{ticket}
-        && $self->{ticket}->{ticket}
-        && $self->{ticket}->{CSRFPreventionToken}
-        && $self->{ticket}->{username} eq $self->{params}->{username} . '@'
-        . $self->{params}->{realm}
-        && $self->{ticket_timestamp}
-        && ( $self->{ticket_timestamp} + $self->{ticket_life} ) > time() )
-    {
-        return 1;
-    }
-    else {
-        $self->clear_login_ticket;
-    }
-
-    return
-
-}
-
-
-sub clear_login_ticket {
-
-    my $self = shift or return;
-
-    if ( $self->{ticket} or $self->{timestamp} ) {
-        $self->{ticket}           = undef;
-        $self->{ticket_timestamp} = undef;
-        return 1;
-    }
-
-    return
+    return $self->delete( $BASEPATH, 'users', $userid );
 
 }
 
@@ -409,74 +477,34 @@ sub get_access_acl {
 
     my $self = shift or return;
 
-    return $self->get( $base, 'acl' );
+    return $self->get( $BASEPATH, 'acl' );
 
-}
-
-
-sub login {
-    my $self = shift or return;
-
-    # Prepare login request
-    my $url = $self->url_prefix . '/api2/json/access/ticket';
-
-    # Perform login request
-    my $request_time = time();
-    my $response     = $self->{ua}->post(
-        $url,
-        {
-            'username' => $self->{params}->{username} . '@'
-              . $self->{params}->{realm},
-            'password' => $self->{params}->{password},
-        },
-    );
-
-    if ( $response->is_success ) {
-        # my $content           = $response->decoded_content;
-        my $login_ticket_data = decode_json( $response->decoded_content );
-        $self->{ticket} = $login_ticket_data->{data};
-
-        # We use request time as the time to get the json ticket is undetermined,
-        # id rather have a ticket a few seconds shorter than have a ticket that incorrectly
-        # says its valid for a couple more
-        $self->{ticket_timestamp} = $request_time;
-        print "DEBUG: login successful\n"
-          if $self->{params}->{debug};
-        return 1;
-    }
-    else {
-
-        print "DEBUG: login not successful\n"
-          if $self->{params}->{debug};
-        print "DEBUG: " . $response->status_line . "\n"
-          if $self->{params}->{debug};
-
-    }
-
-    return;
 }
 
 
 sub update_access_acl {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for update_acl()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for update_acl()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_acl()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_acl()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_acl()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_acl()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, 'acl', \%args )
+    return $self->put( $BASEPATH, 'acl', \%args );
 
 }
 
@@ -484,23 +512,26 @@ sub update_access_acl {
 sub update_access_password {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for update_password()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for update_password()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_password()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_password()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_password()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_password()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, 'password', \%args )
+    return $self->put( $BASEPATH, 'password', \%args );
 
 }
 
@@ -519,7 +550,7 @@ Net::Proxmox::VE::Access - Functions for the 'access' portion of the API
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -534,9 +565,9 @@ version 0.38
 
 =head2 access
 
-Without arguments, returns the 'Directory index':
+Without arguments, returns the 'Directory index'.
 
-Note: Accessible by all authententicated users.
+Note: Accessible by all authenticated users.
 
 =head2 access_domains
 
@@ -546,9 +577,37 @@ Gets a list of access domains (aka the Authentication domain index)
 
 Note: Anyone can access that, because we need that list for the login box (before the user is authenticated).
 
+No arguments are available.
+
+A hash will be returned which will include the following:
+
+=over 4
+
+=item realm
+
+String.
+
+=item string
+
+String.
+
+=item comment
+
+A comment. The GUI use this text when you select a domain (Realm) on the login window.
+
+Optional.
+
+=item tfa
+
+Enum. Available options: yubico, oath
+
+Optional.
+
+=back
+
 =head2 create_access_domains
 
-Creates a new access domain
+Adds an authentication server. i.e. creates a new access domain
 
   $ok = $obj->create_access_domains( %args );
   $ok = $obj->create_access_domains( \%args );
@@ -563,7 +622,9 @@ String. The id of the authentication domain you wish to add, in pve-realm format
 
 =item type
 
-Enum. This is the server type and is either 'ad' or 'ldap'. This is required.
+Enum. This is the server type and is one of: ad, ldap, openid, pam, or pve
+
+This is required.
 
 =item base_dn
 
@@ -599,18 +660,18 @@ String. LDAP user attribute name. Optional.
 
 Gets a single access domain
 
-  $ok = $obj->get_access_domains('realm')
+  $ok = $obj->get_access_domains( $realm )
 
-realm is a string in pve-realm format
+Where $realm is a string in pve-realm format
 
 =head2 update_access_domains
 
 Updates (sets) a access domain's data
 
-  $ok = $obj->update_access_domains( 'realm', %args );
-  $ok = $obj->update_access_domains( 'realm', \%args );
+  $ok = $obj->update_access_domains( $realm, %args );
+  $ok = $obj->update_access_domains( $realm, \%args );
 
-realm is a string in pve-realm format
+Where $realm is a string in pve-realm format
 
 I<%args> may items contain from the following list
 
@@ -650,9 +711,48 @@ String. LDAP user attribute name. Optional.
 
 Deletes a single access domain
 
-  $ok = $obj->delete_access_domains('realm')
+  $ok = $obj->delete_access_domains( $realm )
 
-realm is a string in pve-realm format
+Where $realm is a string in pve-realm format
+
+=head2 sync_access_domains
+
+Syncs users and/or groups from the configured LDAP to user.cfg.
+
+  $ok = $obj->sync_access_domains( $realm, %args );
+  $ok = $obj->sync_access_domains( $realm, \%args );
+
+NOTE: Synced groups will have the name 'name-$realm', so make sure those groups do not exist to prevent overwriting.
+
+I<%args> may items contain from the following list
+
+=over 4
+
+=item realm
+
+String. The id of the authentication domain you wish to add, in pve-realm format. This is required.
+
+=item dry-run
+
+Boolean. If set, does not write anything. Default 0
+
+=item enable-new
+
+Boolean. Enable newly synced users immediately. Default 1
+
+=item remove-vanished
+
+String. A semicolon-seperated list of things to remove when they or the user vanishes during a sync. The following values are possible: 'entry' removes the user/group when not returned from the sync. 'properties' removes the set properties on existing user/group that do not appear in the source (even custom ones). 'acl' removes acls when the user/group is not returned from the sync. Instead of a list it also can be 'none' (the default).
+
+Format: ([acl];[properties];[entry]) | none
+
+=item scope
+
+Enum. Select what to sync.
+
+Possible values: users, groups, both
+
+=back
 
 =head2 access_groups
 
@@ -687,18 +787,18 @@ String. This is a comment associated with the new group, this is optional.
 
 Gets a single access group
 
-  $ok = $obj->get_access_groups('groupid')
+  $ok = $obj->get_access_groups( $groupid )
 
-groupid is a string in pve-groupid format
+Where I<$groupid> is a string in pve-groupid format
 
 =head2 update_access_groups
 
 Updates (sets) a access group's data
 
-  $ok = $obj->update_access_groups( 'groupid', %args );
-  $ok = $obj->update_access_groups( 'groupid', \%args );
+  $ok = $obj->update_access_groups( $groupid, %args );
+  $ok = $obj->update_access_groups( $groupid, \%args );
 
-groupid is a string in pve-groupid format
+Where I<$groupid> is a string in pve-groupid format
 
 I<%args> may items contain from the following list
 
@@ -714,9 +814,9 @@ String. This is a comment associated with the group, this is optional.
 
 Deletes a single access group
 
-  $ok = $obj->delete_access_groups('groupid')
+  $ok = $obj->delete_access_groups( $groupid )
 
-groupid is a string in pve-groupid format
+Where I<$groupid> is a string in pve-groupid format
 
 =head2 access_roles
 
@@ -751,18 +851,18 @@ String. A string in pve-string-list format. Optional.
 
 Gets a single access role
 
-  $ok = $obj->get_access_roles('roleid')
+  $ok = $obj->get_access_roles( $roleid )
 
-roleid is a string in pve-roleid format
+Where I<$roleid> is a string in pve-roleid format
 
 =head2 update_access_roles
 
 Updates (sets) a access role's data
 
-  $ok = $obj->update_access_roles( 'roleid', %args );
-  $ok = $obj->update_access_roles( 'roleid', \%args );
+  $ok = $obj->update_access_roles( $roleid, %args );
+  $ok = $obj->update_access_roles( $roleid, \%args );
 
-roleid is a string in pve-roleid format
+Where I<$roleid> is a string in pve-roleid format
 
 I<%args> may items contain from the following list
 
@@ -782,9 +882,9 @@ Booelean. Append privileges to existing. Optional.
 
 Deletes a single access role
 
-  $ok = $obj->delete_access_roles('roleid')
+  $ok = $obj->delete_access_roles( $roleid )
 
-roleid is a string in pve-roleid format
+Where I<$roleid> is a string in pve-roleid format
 
 =head2 access_users
 
@@ -847,18 +947,18 @@ String. The users initial passowrd. Optional.
 
 Gets a single user
 
-  $ok = $obj->get_access_users('userid')
+  $ok = $obj->get_access_users( $userid )
 
-userid is a string in pve-userid format
+Where I<$userid> is a string in pve-userid format
 
 =head2 update_access_users
 
 Updates (sets) a user's configuration
 
-  $ok = $obj->update_access_users( 'userid', %args );
-  $ok = $obj->update_access_users( 'userid', \%args );
+  $ok = $obj->update_access_users( $userid, %args );
+  $ok = $obj->update_access_users( $userid, \%args );
 
-userid is a string in pve-userid format
+Where I<$userid> is a string in pve-userid format
 
 I<%args> may items contain from the following list
 
@@ -902,20 +1002,9 @@ String. Optional.
 
 Deletes a single user
 
-  $ok = $obj->delete_access_users('userid')
+  $ok = $obj->delete_access_users( $userid )
 
-userid is a string in pve-userid format
-
-=head2 check_login_ticket
-
-Verifies if the objects login ticket is valid and not expired
-
-Returns true if valid
-Returns false and clears the the login ticket details inside the object if invalid
-
-=head2 clear_login_ticket
-
-Clears the login ticket inside the object
+Where I<$userid> is a string in pve-userid format
 
 =head2 get_access_acl
 
@@ -924,12 +1013,6 @@ The returned list is restricted to objects where you have rights to modify permi
   $pool = $obj->get_access_acl();
 
 Note: The returned list is restricted to objects where you have rights to modify permissions.
-
-=head2 login
-
-Initiates the log in to the PVE Server using JSON API, and potentially obtains an Access Ticket.
-
-Returns true if success
 
 =head2 update_access_acl
 
@@ -1003,7 +1086,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Dean Hamstad.
+This software is Copyright (c) 2025 by Dean Hamstad.
 
 This is free software, licensed under:
 

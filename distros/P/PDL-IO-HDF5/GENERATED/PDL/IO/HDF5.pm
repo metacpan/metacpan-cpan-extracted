@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.761';
+   our $VERSION = '0.762';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::HDF5 $VERSION;
@@ -1055,7 +1055,7 @@ sub DESTROY {
 #  to be interpreted as a C array of long longs. This code is build
 #  during the make process to do the Right Thing for big and little
 #  endian machines
-sub packList{
+sub packList {
 
 	my @list = @_;
 	

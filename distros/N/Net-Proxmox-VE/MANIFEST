@@ -15,6 +15,7 @@ TODO
 cpanfile
 doap.xml
 examples/generate_boilerplate.pl
+examples/list_lxc.pl
 examples/list_nodes.pl
 examples/list_openvz.pl
 examples/list_qemus.pl
@@ -23,6 +24,7 @@ examples/pve.pl
 lib/Net/Proxmox/VE.pm
 lib/Net/Proxmox/VE/Access.pm
 lib/Net/Proxmox/VE/Cluster.pm
+lib/Net/Proxmox/VE/Exception.pm
 lib/Net/Proxmox/VE/Nodes.pm
 lib/Net/Proxmox/VE/Pools.pm
 lib/Net/Proxmox/VE/Storage.pm

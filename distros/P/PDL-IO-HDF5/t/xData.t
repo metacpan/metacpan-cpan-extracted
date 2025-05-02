@@ -7,8 +7,7 @@ use Test::More;
 use File::Spec::Functions;
 
 my $filename = "xData.hdf5";
-# get rid of filename if it already exists
-unlink $filename if( -e $filename);
+unlink $filename if -e $filename; # get rid of file if it already exists
 
 my $hdf5 = new PDL::IO::HDF5($filename);
 
@@ -32,14 +31,20 @@ $dataset->set($data2, unlimited => 1);
 $xdata = $group->dataset("xdata")->get();
 $expected = '[2 3 4 5 6 7 8 9 10 11 12 13 14]';
 is( "$xdata", $expected);
-
-# clean up file
-unlink $filename if( -e $filename);
+unlink $filename if -e $filename; # clean up file
 
 $hdf5 = PDL::IO::HDF5->new(catfile(qw(t sbyte.hdf5)));
 $dataset = $hdf5->dataset('data2');
 my $got = $dataset->get;
 $expected = pdl(-127, 127); # deliberately type double
-ok( (($got - $expected)->sum) < .001 ) or diag "got=$got\nexpected=$expected";
+ok +(($got - $expected)->sum) < .001 or diag "got=$got\nexpected=$expected";
+unlink $filename if -e $filename; # clean up file
+
+$hdf5 = PDL::IO::HDF5->new($filename);
+$dataset = $hdf5->dataset('data');
+$dataset->set(pdl(42), unlimited => 1);
+$got = $dataset->get;
+ok +(($got - 42)->sum) < .001 or diag "got=$got\nexpected=$expected";
+unlink $filename if -e $filename; # clean up file
 
 done_testing;

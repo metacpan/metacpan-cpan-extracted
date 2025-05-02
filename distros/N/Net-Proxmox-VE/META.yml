@@ -1,5 +1,5 @@
 ---
-abstract: 'Pure perl API for Proxmox virtualisation'
+abstract: 'Pure Perl API for Proxmox Virtual Environment'
 author:
   - 'Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>'
 build_requires:
@@ -27,38 +27,40 @@ name: Net-Proxmox-VE
 provides:
   Net::Proxmox::VE:
     file: lib/Net/Proxmox/VE.pm
-    version: '0.38'
+    version: '0.40'
   Net::Proxmox::VE::Access:
     file: lib/Net/Proxmox/VE/Access.pm
-    version: '0.38'
+    version: '0.40'
   Net::Proxmox::VE::Cluster:
     file: lib/Net/Proxmox/VE/Cluster.pm
-    version: '0.38'
+    version: '0.40'
+  Net::Proxmox::VE::Exception:
+    file: lib/Net/Proxmox/VE/Exception.pm
+    version: '0.40'
   Net::Proxmox::VE::Nodes:
     file: lib/Net/Proxmox/VE/Nodes.pm
-    version: '0.38'
+    version: '0.40'
   Net::Proxmox::VE::Pools:
     file: lib/Net/Proxmox/VE/Pools.pm
-    version: '0.38'
+    version: '0.40'
   Net::Proxmox::VE::Storage:
     file: lib/Net/Proxmox/VE/Storage.pm
-    version: '0.38'
+    version: '0.40'
 requires:
-  Carp: '0'
   HTTP::Headers: '0'
   HTTP::Request::Common: '0'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   parent: '0'
-  perl: '5.008'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/mrproper/proxmox-ve-api-perl/issues
-  homepage: https://github.com/mrproper/proxmox-ve-api-perl
-  repository: https://github.com/mrproper/proxmox-ve-api-perl.git
-version: '0.38'
+  bugtracker: https://github.com/djzort/proxmox-ve-api-perl/issues
+  homepage: https://github.com/djzort/proxmox-ve-api-perl
+  repository: https://github.com/djzort/proxmox-ve-api-perl.git
+version: '0.40'
 x_author_pledge:
   version: 1
 x_contributors:

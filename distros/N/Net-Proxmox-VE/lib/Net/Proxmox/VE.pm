@@ -1,46 +1,50 @@
 #!/bin/false
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE
-# ABSTRACT: Pure perl API for Proxmox virtualisation
+# ABSTRACT: Pure Perl API for Proxmox Virtual Environment
 
 use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.38';
-
-use Carp qw( croak );
+$Net::Proxmox::VE::VERSION = '0.40';
 use HTTP::Headers;
 use HTTP::Request::Common qw(GET POST DELETE);
-use JSON::MaybeXS qw(decode_json);
+use JSON::MaybeXS         qw(decode_json);
 use LWP::UserAgent;
 
+use Net::Proxmox::VE::Exception;
+
 # done
-use Net::Proxmox::VE::Pools;
-use Net::Proxmox::VE::Storage;
 use Net::Proxmox::VE::Access;
 use Net::Proxmox::VE::Cluster;
+use Net::Proxmox::VE::Pools;
+use Net::Proxmox::VE::Storage;
 
 # wip
 use Net::Proxmox::VE::Nodes;
 
+my $API2_BASE_URL = 'https://%s:%s/api2/json/';
+
 
 sub action {
 
-    my $self = shift or return;
+    my $self   = shift or return;
     my %params = @_;
 
     unless (%params) {
-        croak 'new requires a hash for params';
+        Net::Proxmox::VE::Exception->throw(
+            'action() requires a hash for params');
     }
-    croak 'path param is required' unless $params{path};
+    Net::Proxmox::VE::Exception->throw('path param is required')
+      unless $params{path};
 
-    $params{method} ||= 'GET';
+    $params{method}    ||= 'GET';
     $params{post_data} ||= {};
 
-    # Check its a valid method
-
-    croak "invalid http method specified: $params{method}"
+    # Check for a valid method
+    Net::Proxmox::VE::Exception->throw(
+        "invalid http method specified: $params{method}")
       unless $params{method} =~ m/^(GET|PUT|POST|DELETE)$/;
 
     # Strip prefixed / to path if present
@@ -57,7 +61,7 @@ sub action {
         return unless $self->login();
     }
 
-    my $url = $self->url_prefix . '/api2/json/' . $params{path};
+    my $url = $self->url_prefix . $params{path};
 
     # Grab the useragent
     my $ua = $self->{ua};
@@ -68,8 +72,6 @@ sub action {
     $request->header( 'Cookie' => 'PVEAuthCookie=' . $self->{ticket}->{ticket} )
       if defined $self->{ticket};
 
-    my $response;
-
     # all methods other than get require the prevention token
     # (ie anything that makes modification)
     unless ( $params{method} eq 'GET' ) {
@@ -77,6 +79,7 @@ sub action {
             'CSRFPreventionToken' => $self->{ticket}->{CSRFPreventionToken} );
     }
 
+    my $response;
     if ( $params{method} =~ m/^(PUT|POST)$/ ) {
         $request->method( $params{method} );
         my $content = join '&', map { $_ . '=' . $params{post_data}->{$_} }
@@ -86,25 +89,25 @@ sub action {
     }
     elsif ( $params{method} =~ m/^(GET|DELETE)$/ ) {
         $request->method( $params{method} );
-        if ( %{$params{post_data}} ) {
+        if ( %{ $params{post_data} } ) {
             my $qstring = join '&', map { $_ . '=' . $params{post_data}->{$_} }
-                sort keys %{ $params{post_data} };
-            $request->uri( "$url?$qstring" );
+              sort keys %{ $params{post_data} };
+            $request->uri("$url?$qstring");
         }
         $response = $ua->request($request);
     }
     else {
 
         # this shouldnt happen
-        croak 'this shouldnt happen';
+        Net::Proxmox::VE::Exception->throw(
+            'This shouldnt happen. Unknown method: ' . $params{method} );
     }
 
     if ( $response->is_success ) {
         print "DEBUG: successful request: " . $request->as_string . "\n"
           if $self->{params}->{debug};
 
-        # my $content = $response->decoded_content;
-        my $data    = decode_json( $response->decoded_content );
+        my $data = decode_json( $response->decoded_content );
 
         if ( ref $data eq 'HASH'
             && exists $data->{data} )
@@ -117,19 +120,22 @@ sub action {
 
             }
 
-            return $data->{data}
+            return $data->{data};
 
         }
 
         # just return true
-        return 1
+        return 1;
 
     }
     else {
-        croak "WARNING: request failed: "  . $request->as_string . "\n" .
-              "WARNING: response status: " . $response->status_line . "\n";
+        Net::Proxmox::VE::Exception->throw( "WARNING: request failed: "
+              . $request->as_string . "\n"
+              . "WARNING: response status: "
+              . $response->status_line
+              . "\n" );
     }
-    return
+    return;
 
 }
 
@@ -154,9 +160,45 @@ sub api_version_check {
 }
 
 
+sub check_login_ticket {
+
+    my $self = shift or return;
+
+    my $ticket = $self->{ticket} // return;
+    return unless ref $ticket eq 'HASH';
+
+    my $is_valid =
+         $ticket->{ticket}
+      && $ticket->{CSRFPreventionToken}
+      && $ticket->{username} eq
+      "$self->{params}{username}\@$self->{params}{realm}"
+      && $self->{ticket_timestamp}
+      && ( $self->{ticket_timestamp} + $self->{ticket_life} ) > time();
+
+    $self->clear_login_ticket unless $is_valid;
+    return $is_valid;
+
+}
+
+
+sub clear_login_ticket {
+
+    my $self = shift or return;
+
+    if ( $self->{ticket} or $self->{timestamp} ) {
+        $self->{ticket}           = undef;
+        $self->{ticket_timestamp} = undef;
+        return 1;
+    }
+
+    return;
+
+}
+
+
 sub debug {
     my $self = shift or return;
-    my $d = shift;
+    my $d    = shift;
 
     if ($d) {
         $self->{params}->{debug} = 1;
@@ -166,7 +208,7 @@ sub debug {
     }
 
     return 1 if $self->{params}->{debug};
-    return
+    return;
 
 }
 
@@ -178,22 +220,73 @@ sub delete {
     if ( $self->nodes ) {
         return $self->action( path => join( '/', @path ), method => 'DELETE' );
     }
-    return
+    return;
 }
 
+
+sub _get {
+    my $self      = shift;
+    my $post_data = pop @_;
+    my @path      = @_;
+    return $self->action(
+        path      => join( '/', @path ),
+        method    => 'GET',
+        post_data => $post_data
+    );
+}
 
 sub get {
     my $self = shift or return;
     my $post_data;
     $post_data = pop
-        if ref $_[-1];
-    my @path = @_    or return;    # using || breaks this
+      if ref $_[-1];
+    my @path = @_ or return;    # using || breaks this
 
     # Calling nodes method here would call get method itself and so on
     # Commented out to avoid an infinite loop
-    #if ( $self->nodes ) {
-        return $self->action( path => join( '/', @path ), method => 'GET', post_data => $post_data );
-    #}
+    if ( $self->nodes ) {
+        return $self->_get( @path, $post_data );
+    }
+    return;
+}
+
+
+sub login {
+    my $self = shift or return;
+
+    # Prepare login request
+    my $url = $self->url_prefix . 'access/ticket';
+
+    # Perform login request
+    my $request_time = time();
+    my $response     = $self->{ua}->post(
+        $url,
+        {
+            'username' => $self->{params}->{username} . '@'
+              . $self->{params}->{realm},
+            'password' => $self->{params}->{password},
+        },
+    );
+
+    if ( $response->is_success ) {
+        my $login_ticket_data = decode_json( $response->decoded_content );
+        $self->{ticket} = $login_ticket_data->{data};
+
+# We use request time as the time to get the json ticket is undetermined,
+# id rather have a ticket a few seconds shorter than have a ticket that incorrectly
+# says its valid for a couple more
+        $self->{ticket_timestamp} = $request_time;
+        print "DEBUG: login successful\n"
+          if $self->{params}->{debug};
+        return 1;
+    }
+    else {
+        if ( $self->{params}->{debug} ) {
+            print "DEBUG: login not successful\n";
+            print "DEBUG: " . $response->status_line . "\n";
+        }
+    }
+
     return;
 }
 
@@ -208,40 +301,46 @@ sub new {
 
     if ( scalar @p == 1 ) {
 
-        croak 'new() requires a hash for params'
+        Net::Proxmox::VE::Exception->throw('new() requires a hash for params')
           unless ref $p[0] eq 'HASH';
 
         %params = %{ $p[0] };
 
     }
     elsif ( scalar @p % 2 != 0 ) {    # 'unless' is better than != but anyway
-        croak 'new() called with an odd number of parameters'
+        Net::Proxmox::VE::Exception->throw(
+            'new() called with an odd number of parameters');
 
     }
     else {
         %params = @p
-          or croak 'new() requires a hash for params';
+          or
+          Net::Proxmox::VE::Exception->throw('new() requires a hash for params');
     }
 
-    my $host     = delete $params{host}     || croak 'host param is required';
-    my $password = delete $params{password} || croak 'password param is required';
+    my $host = delete $params{host}
+      || Net::Proxmox::VE::Exception->throw('host param is required');
+    my $password = delete $params{password}
+      || Net::Proxmox::VE::Exception->throw('password param is required');
     my $port     = delete $params{port}     || 8006;
     my $username = delete $params{username} || 'root';
     my $realm    = delete $params{realm}    || 'pam';
     my $debug    = delete $params{debug};
-    my $timeout  = delete $params{timeout}  || 10;
+    my $timeout  = delete $params{timeout} || 10;
     my $ssl_opts = delete $params{ssl_opts};
-    croak 'unknown parameters to new: ' . join(', ', keys %params) if keys %params;
+    Net::Proxmox::VE::Exception->throw(
+        'unknown parameters to new: ' . join( ', ', keys %params ) )
+      if keys %params;
 
     my $self->{params} = {
-            host => $host,
-            password => $password,
-            port => $port,
-            username => $username,
-            realm => $realm,
-            debug => $debug,
-            timeout => $timeout,
-            ssl_opts => $ssl_opts,
+        host     => $host,
+        password => $password,
+        port     => $port,
+        username => $username,
+        realm    => $realm,
+        debug    => $debug,
+        timeout  => $timeout,
+        ssl_opts => $ssl_opts,
     };
 
     $self->{'ticket'}           = undef;
@@ -253,23 +352,22 @@ sub new {
         $lwpUserAgentOptions{ssl_opts} = $ssl_opts;
     }
 
-    my $ua = LWP::UserAgent->new( %lwpUserAgentOptions );
+    my $ua = LWP::UserAgent->new(%lwpUserAgentOptions);
     $ua->timeout($timeout);
     $self->{ua} = $ua;
 
-    bless $self, $class;
-    return $self
+    return bless $self, $class;
 
 }
 
 
 sub post {
 
-    my $self      = shift or return;
+    my $self = shift or return;
     my $post_data;
     $post_data = pop
-        if ref $_[-1];
-    my @path = @_    or return;    # using || breaks this
+      if ref $_[-1];
+    my @path = @_ or return;    # using || breaks this
 
     if ( $self->nodes ) {
 
@@ -277,10 +375,10 @@ sub post {
             path      => join( '/', @path ),
             method    => 'POST',
             post_data => $post_data
-          )
+        );
 
     }
-    return
+    return;
 }
 
 
@@ -289,8 +387,8 @@ sub put {
     my $self = shift or return;
     my $post_data;
     $post_data = pop
-        if ref $_[-1];
-    my @path = @_    or return;    # using || breaks this
+      if ref $_[-1];
+    my @path = @_ or return;    # using || breaks this
 
     if ( $self->nodes ) {
 
@@ -298,12 +396,11 @@ sub put {
             path      => join( '/', @path ),
             method    => 'PUT',
             post_data => $post_data
-          )
+        );
 
     }
-    return
+    return;
 }
-
 
 
 sub url_prefix {
@@ -311,11 +408,11 @@ sub url_prefix {
     my $self = shift or return;
 
     # Prepare prefix for request
-    my $url_prefix = sprintf( 'https://%s:%s',
+    my $url_prefix = sprintf( $API2_BASE_URL,
         $self->{params}->{host},
         $self->{params}->{port} );
 
-    return $url_prefix
+    return $url_prefix;
 
 }
 
@@ -330,38 +427,37 @@ __END__
 
 =head1 NAME
 
-Net::Proxmox::VE - Pure perl API for Proxmox virtualisation
+Net::Proxmox::VE - Pure Perl API for Proxmox Virtual Environment
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 
-    use Net::Proxmox::VE;
+  use Net::Proxmox::VE;
 
-    %args = (
-        host     => 'proxmox.local.domain',
-        password => 'barpassword',
-        username => 'root', # optional
-        port     => 8006,   # optional
-        realm    => 'pam',  # optional
-    );
+  %args = (
+      host     => 'proxmox.local.domain',
+      password => 'barpassword',
+      username => 'root', # optional
+      port     => 8006,   # optional
+      realm    => 'pam',  # optional
+  );
 
-    $host = Net::Proxmox::VE->new(%args);
+  $host = Net::Proxmox::VE->new(%args);
 
-    $host->login() or die ('Couldn\'t log in to proxmox host');
+  $host->login() or die ('Couldn\'t log in to proxmox host');
 
 =head1 DESCRIPTION
 
-This Class provides the framework for talking to Proxmox VE 2.0 API instances.
-This just provides a get/delete/put/post abstraction layer as methods on Proxmox VE REST API
-This also handles the ticket headers required for authentication
+This Class provides a framework for talking to Proxmox VE 2.0 API instances including ticket headers required for authentication.
+You can use just the get/delete/put/post abstraction layer or use the api function methods.
+This class provides the building blocks for someone wanting to use
+Perl to talk to Proxmox PVE.
+It provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
 
-More details on the API can be found at L<http://pve.proxmox.com/wiki/Proxmox_VE_API> and
-L<http://pve.proxmox.com/pve2-api-doc/>
-
-This class provides the building blocks for someone wanting to use Perl to talk to Proxmox 2.0. Relatively simple piece of code, just provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
+Object representations of the Proxmox VE REST API are included in seperate modules.
 
 =head1 WARNING
 
@@ -370,18 +466,12 @@ that makes sense. We havent yet implemented all the API functions,
 so far we only have a basic internal abstraction of the REST interface
 and a few modules for each function tree within the API.
 
-Any enchancements are greatly appreciated ! (use github, link below)
+Any enhancements are greatly appreciated ! (use github, link below)
 
 Please dont be offended if we refactor and rework submissions.
 Perltidy with default settings is prefered style.
 
 Oh, our tests are all against a running server. Care to help make them better?
-
-=head1 DESIGN NOTE
-
-This API would be far nicer if it returned nice objects representing different aspects of the system.
-Such an arrangement would be far better than how this module is currently layed out. It might also be
-less repetitive code.
 
 =head1 METHODS
 
@@ -392,13 +482,51 @@ Ideally you don't use this directly.
 
 =head2 api_version
 
-Returns the API version of the proxmox server we are talking to
+Returns the API version of the proxmox server we are talking to,
+including some parts of the global datacenter config.
+
+No arguments are available.
+
+A hash will be returned which will include the following:
+
+=over 4
+
+=item release
+
+String. The current Proxmox VE point release in `x.y` format.
+
+=item repoid
+
+String. The short git revision from which this version was build.
+
+=item version
+
+String. The full pve-manager package version of this node.
+
+=item console
+
+Enum. The default console viewer to use. Optional.
+
+Available values: applet, vv, html5, xtermjs
+
+=back
 
 =head2 api_version_check
 
 Checks that the api we are talking to is at least version 2.0
 
 Returns true if the api version is at least 2.0 (perl style true or false)
+
+=head2 check_login_ticket
+
+Verifies if the objects login ticket is valid and not expired
+
+Returns true if valid
+Returns false and clears the the login ticket details inside the object if invalid
+
+=head2 clear_login_ticket
+
+Clears the login ticket inside the object
 
 =head2 debug
 
@@ -417,6 +545,12 @@ value of action() with the DELETE method
 
 An action helper method that just takes a path as an argument and returns the
 value of action with the GET method
+
+=head2 login
+
+Initiates the log in to the PVE Server using JSON API, and potentially obtains an Access Ticket.
+
+Returns true if success
 
 =head2 new
 
@@ -497,6 +631,36 @@ You are returned what action() with the PUT method returns
 
 Returns the url prefix used in the rest api calls
 
+=head1 PVE VERSIONS SUPPORT
+
+Firstly, there isn't currently any handling of different versions of the API.
+
+Secondly, Proxmox API reference documentation is also, frustratingly, published only alongside the current release. This makes it difficult to support older versions of the API or different versions of the API concurrently.
+
+Fortunately the API is relatively stable.
+
+Based on the above the bug reporting policy is as follows:
+
+=over 2
+
+=item A function in this module doesn't work against the current published API? This a bug and hope to fix it. Pull requests welcome.
+
+=item A function in this module doesn't exist in the current published API? Pull requests welcomes and promptly merged.
+
+=item A function in this module doesn't work against a previous version of the API? A note will be made in the pod only.
+
+=item A function in this module doesn't exist against a previous version of the API? Pull requests will be merged on a case per case basis.
+
+=back
+
+As such breaking changes may be made to this module to support the current API when necessary.
+
+=head1 DESIGN NOTE
+
+This API would be far nicer if it returned nice objects representing different aspects of the system.
+Such an arrangement would be far better than how this module is currently layed out. It might also be
+less repetitive code.
+
 =head1 SEE ALSO
 
 =over 4
@@ -505,9 +669,10 @@ Returns the url prefix used in the rest api calls
 
 http://www.proxmox.com
 
-=item API reference
+=item API Reference
 
-https://pve.proxmox.com/pve-docs/api-viewer/
+More details on the API can be found at L<http://pve.proxmox.com/wiki/Proxmox_VE_API> and
+L<http://pve.proxmox.com/pve-docs/api-viewer/index.html>
 
 =back
 
@@ -517,7 +682,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Dean Hamstad.
+This software is Copyright (c) 2025 by Dean Hamstad.
 
 This is free software, licensed under:
 

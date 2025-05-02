@@ -22,7 +22,8 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
-    't/basic.t'
+    't/basic.t',
+    't/report_url.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

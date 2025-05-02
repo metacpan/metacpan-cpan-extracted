@@ -1,5 +1,5 @@
 #!/bin/false
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Storage
 # ABSTRACT: Store object
 
@@ -7,22 +7,22 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Storage;
-$Net::Proxmox::VE::Storage::VERSION = '0.38';
+$Net::Proxmox::VE::Storage::VERSION = '0.40';
 use parent 'Exporter';
 
-use Carp qw( croak );
+use Net::Proxmox::VE::Exception;
 
 
-our @EXPORT  = qw( storages );
+our @EXPORT = qw( storages );
 
-my $base = '/storages';
+my $BASEPATH = '/storages';
 
 
 sub storage {
 
     my $self = shift or return;
 
-    return $self->get($base);
+    return $self->get($BASEPATH);
 
 }
 
@@ -31,10 +31,13 @@ sub get_storage {
 
     my $self = shift or return;
 
-    my $a = shift or croak 'No storageid for get_storage()';
-    croak 'storageid must be a scalar for get_storage()' if ref $a;
+    my $storageid = shift
+      or Net::Proxmox::VE::Exception->throw('No storageid for get_storage()');
+    Net::Proxmox::VE::Exception->throw(
+        'storageid must be a scalar for get_storage()')
+      if ref $storageid;
 
-    return $self->get( $base, $a );
+    return $self->get( $BASEPATH, $storageid );
 
 }
 
@@ -42,59 +45,71 @@ sub get_storage {
 sub create_storage {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for create_storage()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for create_storage()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for create_storage()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for create_storage()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for create_storage()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for create_storage()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->post( $base, \%args )
+    return $self->post( $BASEPATH, \%args );
 
 }
 
 
 sub delete_storage {
 
-    my $self = shift or return;
-    my $a    = shift or croak 'No argument given for delete_storage()';
+    my $self      = shift or return;
+    my $storageid = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No argument given for delete_storage()');
 
-    return $self->delete( $base, $a );
+    return $self->delete( $BASEPATH, $storageid );
 
 }
 
 
 sub update_storage {
 
-    my $self   = shift or return;
-    my $storageid = shift or croak 'No storageid provided for update_storage()';
-    croak 'storageid must be a scalar for update_storage()' if ref $storageid;
+    my $self      = shift or return;
+    my $storageid = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No storageid provided for update_storage()');
+    Net::Proxmox::VE::Exception->throw(
+        'storageid must be a scalar for update_storage()')
+      if ref $storageid;
     my @p = @_;
 
-    croak 'No arguments for update_storage()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for update_storage()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_storage()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_storage()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_storage()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_storage()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, $storageid, \%args );
+    return $self->put( $BASEPATH, $storageid, \%args );
 
 }
 
@@ -113,7 +128,7 @@ Net::Proxmox::VE::Storage - Store object
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -176,7 +191,43 @@ String. The id of the storage you wish to access in pve-storageid format. Requir
 
 =item type
 
-Emum. This is the type of storage, options are dir, nfs, lvm, isci. Required.
+Enum. This is the type of storage, options are:
+
+=over 4
+
+=item btrfs
+
+=item cephfs
+
+=item cifs
+
+=item dir
+
+=item esxi
+
+=item glusterfs
+
+=item iscsi
+
+=item iscsidir
+
+=item lvm
+
+=item lvmthin
+
+=item nfs
+
+=item pbs
+
+=item rbd
+
+=item zfs
+
+=item zfspool
+
+=back
+
+Required.
 
 =item base
 
@@ -188,7 +239,7 @@ String. A pve-storage-content-list. Optional.
 
 =item disable
 
-Boolean. See the PVE documetnation. Optional.
+Boolean. See the PVE documentation. Optional.
 
 =item export
 
@@ -293,7 +344,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Dean Hamstad.
+This software is Copyright (c) 2025 by Dean Hamstad.
 
 This is free software, licensed under:
 

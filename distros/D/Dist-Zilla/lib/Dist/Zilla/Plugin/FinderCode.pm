@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FinderCode 6.032;
+package Dist::Zilla::Plugin::FinderCode 6.033;
 # ABSTRACT: a callback-based FileFinder plugin
 
 use Moose;
@@ -59,7 +59,7 @@ Dist::Zilla::Plugin::FinderCode - a callback-based FileFinder plugin
 
 =head1 VERSION
 
-version 6.032
+version 6.033
 
 =head1 PERL VERSION
 
@@ -80,7 +80,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2025 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

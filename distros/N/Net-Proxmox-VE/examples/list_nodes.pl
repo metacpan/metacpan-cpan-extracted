@@ -11,7 +11,8 @@ use warnings;
 
 use lib './lib';
 use Net::Proxmox::VE;
-use Data::Dumper;
+use IO::Socket::SSL qw(SSL_VERIFY_NONE);
+use Data::Printer;
 use Getopt::Long;
 
 my $host     = 'host';
@@ -25,7 +26,7 @@ GetOptions (
     'username=s' => \$username,
     'password=s' => \$password,
     'debug'      => \$debug,
-    'realm'      => \$realm,
+    'realm=s'    => \$realm,
 );
 
 my $pve = Net::Proxmox::VE->new(
@@ -34,24 +35,27 @@ my $pve = Net::Proxmox::VE->new(
     password => $password,
     debug    => $debug,
     realm    => $realm,
+    ssl_opts => {
+        SSL_verify_mode => SSL_VERIFY_NONE,
+        verify_hostname => 0
+    },
 );
 
 die "login failed\n"          unless $pve->login;
 die "invalid login ticket\n"  unless $pve->check_login_ticket;
 die "unsupport api version\n" unless $pve->api_version_check;
 
-my $nodes = $pve->get('/nodes');
+my $nodes = $pve->nodes();
 
-foreach my $item( @$nodes ) {
-    print "id: " .      $item->{id} . "\n"; 
-    print "cpu: " .     $item->{cpu} . "\n";
-    print "disk: " .    $item->{disk} . "\n";
-    print "level: " .   $item->{level} . "\n";
-    print "maxcpu: " .  $item->{maxcpu} . "\n";
-    print "maxdisk: " . $item->{maxdisk} . "\n";
-    print "maxmem: " .  $item->{maxmem} . "\n";
-    print "mem: " .     $item->{mem} . "\n";
-    print "node: " .    $item->{node} . "\n";
-    print "type: " .    $item->{type} . "\n";
-    print "uptime: " .  $item->{uptime} . "\n";
+for my $item ( @$nodes ) {
+
+    print "# Node\n";
+    p $item;
+    print "\n";
+
+    print "# Get_Node\n";
+    my $node = $pve->get_node($item->{node});
+    p $node;
+
+
 }

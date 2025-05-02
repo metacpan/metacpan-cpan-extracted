@@ -27,6 +27,10 @@ $dist->add_file('script/simple', undent(<<'    ---'));
     use Foo::Bar;
     print Foo::Bar->VERSION . "\n";
     ---
+$dist->add_file('planner/scripts.pl', undent(<<'	---'));
+	load_extension("Dist::Build::Core");
+	script_dir('script');
+	---
 $dist->add_file('planner/shared.pl', undent(<<'	---'));
 	load_extension("Dist::Build::ShareDir");
 	dist_sharedir('share', 'Foo-Bar');

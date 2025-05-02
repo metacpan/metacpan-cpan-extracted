@@ -1,5 +1,9 @@
 Revision history for Crypt-Argon2
 
+0.030     2025-05-01 15:00:07+02:00 Europe/Brussels
+          - Simplify argon2_pass and argon2_raw
+          - Adapt to script files no longer being installed by default
+
 0.029     2024-08-05 23:18:21+02:00 Europe/Brussels
           - Add runtime CPU checks to compile time checks
 

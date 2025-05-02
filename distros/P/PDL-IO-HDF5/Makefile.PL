@@ -94,15 +94,6 @@ if( -e "$hdf5_include_path/H5config.h"){
 	}
 }
 
-# The following code was originally in the PDL::netCDF Makefile.PL
-#  (Not sure if it is really needed here)
-# Check if compiled under gcc/Linux.  In which case, define bool for the compiler
-my $define_bool = '';
-if ($Config{'osname'} =~ /linux/) {
-  $define_bool = '-Dbool=int';
-  print "Defining bool=int (linux seems to need this)\n";
-}
-
 #If in win32, add the required defined for the HDF5 libs to work:
 my $define_win32HDF = '';
 if ($Config{'osname'} =~ /win32/i) {
@@ -176,7 +167,7 @@ my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDL::Core::Dev -e pdlpp_m
 
 WriteMakefile(
   'NAME'  	     => 'PDL::IO::HDF5',
-  'CCFLAGS'      => "$Config{ccflags} $define_bool $define_win32HDF -DH5_USE_16_API -g",
+  'CCFLAGS'      => "$Config{ccflags} $define_win32HDF -DH5_USE_16_API -g",
   'CONFIGURE_REQUIRES' => { PDL => '2.004' },
   'BUILD_REQUIRES'     => { PDL => '2.004' },
    # 'TEST_REQUIRES'      => { PDL => '2.004' },

@@ -14,24 +14,23 @@ my %module_build_args = (
     "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Pure perl API for Proxmox virtualisation",
+  "dist_abstract" => "Pure Perl API for Proxmox Virtual Environment",
   "dist_author" => [
     "Brendan Beveridge <brendan\@nodeintegration.com.au>, Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Net-Proxmox-VE",
-  "dist_version" => "0.38",
+  "dist_version" => "0.40",
   "license" => "mit",
   "module_name" => "Net::Proxmox::VE",
   "recursive_test_files" => 1,
   "requires" => {
-    "Carp" => 0,
     "HTTP::Headers" => 0,
     "HTTP::Request::Common" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
     "parent" => 0,
-    "perl" => "5.008",
+    "perl" => "5.010",
     "strict" => 0,
     "warnings" => 0
   },

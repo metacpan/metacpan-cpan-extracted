@@ -1,4 +1,4 @@
-# Copyright 2014-2024, Paul Johnson (paul@pjcj.net)
+# Copyright 2014-2025, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,17 +10,17 @@ package Devel::Cover::Collection;
 use 5.38.0;
 use warnings;
 
-our $VERSION = '1.44'; # VERSION
+our $VERSION = '1.45'; # VERSION
 
-use Devel::Cover::DB;
-use Devel::Cover::DB::IO::JSON;
-use Devel::Cover::Dumper;
+use Devel::Cover::DB           ();
+use Devel::Cover::DB::IO::JSON ();
+use Devel::Cover::Dumper       qw( Dumper );
 
-use JSON::MaybeXS ();
-use Parallel::Iterator "iterate_as_array";
-use POSIX "setsid";
-use Template;
-use Time::HiRes "time";
+use JSON::MaybeXS      ();
+use Parallel::Iterator qw( iterate_as_array );
+use POSIX              qw( setsid );
+use Template           ();
+use Time::HiRes        qw( alarm time );
 
 use Class::XSAccessor ();
 use Moo;
@@ -28,10 +28,10 @@ use namespace::clean;
 use warnings FATAL => "all";  # be explicit since Moo sets this
 
 my %A = (
-  ro => [ qw( bin_dir cpancover_dir cpan_dir results_dir dryrun force
-    output_file report timeout verbose workers docker local            ) ],
-  rwp => [qw( build_dirs local_timeout modules module_file              )],
-  rw  => [qw( dir file                                                  )],
+  ro => [ qw( bin_dir cpancover_dir cpan_dir results_dir dryrun env
+    force output_file report timeout verbose workers docker local ) ],
+  rwp => [qw( build_dirs modules module_file                       )],
+  rw  => [qw( dir file                                             )],
 );
 while (my ($type, $names) = each %A) { has $_ => (is => $type) for @$names }
 
@@ -40,26 +40,24 @@ sub BUILDARGS ($class, %args) { {
   cpan_dir      => [ grep -d, glob "~/.cpan ~/.local/share/.cpan" ],
   docker        => "docker",
   dryrun        => 0,
+  env           => "prod",
   force         => 0,
   local         => 0,
-  local_timeout => 0,
   modules       => [],
   output_file   => "index.html",
   report        => "html_basic",
-  timeout       => 1800,  # half an hour
+  timeout       => 30 * 60,      # half an hour
   verbose       => 0,
   workers       => 0,
   %args,
 } }
-
-sub get_timeout ($self) { $self->local_timeout || $self->timeout || 30 * 60 }
 
 # display $non_buffered characters, then buffer
 sub _sys ($self, $non_buffered, @command) {
   # system @command; return ".";
   my ($output1, $output2) = ("", "");
   $output1 = "dc -> @command\n" if $self->verbose;
-  my $timeout = $self->get_timeout;
+  my $timeout = $self->timeout;
   my $max     = 4e4;
   # say "Setting alarm for $timeout seconds";
   my $ok = 0;
@@ -133,48 +131,41 @@ sub process_module_file ($self) {
 sub build_modules ($self) {
   my @command = qw( cpan -Ti );
   push @command, "-f" if $self->force;
-  # my @command = qw( cpan );
-  # $ENV{CPAN_OPTS} = "-i -T";
-  # $ENV{CPAN_OPTS} .= " -f" if $self->force;
-  # $self->_set_local_timeout(300);
   my %m;
   for my $module (sort grep !$m{$_}++, $self->modules->@*) {
     say "Building $module";
     my $output = $self->fsys(@command, $module);
     say $output;
   }
-  $self->_set_local_timeout(0);
 }
 
 sub add_build_dirs ($self) {
-  # say "add_build_dirs"; say for @{$self->build_dirs};
-  # say && system "ls -al $_" for "/remote_staging",
-  # map "$_/build", @{$self->cpan_dir};
   my $exists = sub {
-    # say "exists [$_]";
     my $dir   = "/remote_staging/" . (s|.*/||r =~ s/-\d+$/*/r);
     my @files = glob $dir;
-    # say "checking [$dir] -> [@files]";
     @files
   };
   push $self->build_dirs->@*, grep { !$exists->() } grep -d,
     map glob("$_/build/*"), $self->cpan_dir->@*;
-  # say "add_build_dirs:"; say for @{$self->build_dirs};
+}
+
+sub made_res_dir ($self, $sub_dir = undef) {
+  my $dir = $self->results_dir // die "No results dir";
+  $dir .= "/$sub_dir" if defined $sub_dir;
+  my $output = $self->fsys("mkdir", "-p", $dir);
+  $dir, $output
 }
 
 sub run ($self, $build_dir) {
-
-  my ($module)    = $build_dir =~ m|.*/([^/]+?)(?:-\d+)$| or return;
-  my $db          = "$build_dir/cover_db";
-  my $line        = "=" x 80;
-  my $output      = "**** Checking coverage of $module ****\n";
-  my $results_dir = $self->results_dir // die "No results dir";
-
-  $output      .= $self->fsys("mkdir", "-p", $results_dir);
-  $results_dir .= "/$module";
-
   chdir $build_dir or die "Can't chdir $build_dir: $!\n";
+  my ($module) = $build_dir =~ m|.*/([^/]+?)(?:-\d+)$| or return;
   say "Checking coverage of $module";
+
+  my $db   = "$build_dir/cover_db";
+  my $line = "=" x 80;
+  my ($res_dir, $out) = $self->made_res_dir;
+  my $results_dir = "$res_dir/$module";
+  my $output      = "**** Checking coverage of $module ****\n$out";
 
   if (-d $db || -d "$build_dir/structure" || -d $results_dir) {
     $output .= "Already analysed\n";
@@ -185,14 +176,11 @@ sub run ($self, $build_dir) {
   }
 
   $output .= "Testing $module in $build_dir\n";
-  # say "\n$line\n$output$line\n"; return;
 
-  # $output .= $self->sys($^X, "-V");
-  # $output .= $self->sys("pwd");
   my @cmd;
   if ($self->local) {
     $ENV{DEVEL_COVER_OPTIONS}   = "-ignore,/usr/local/lib/perl5";
-    $ENV{DEVEL_COVER_TEST_OPTS} = "-Mblib=" . $self->bin_dir;
+    $ENV{DEVEL_COVER_TEST_OPTS} = "-Mblib=" . $self->bin_dir . "/..";
     @cmd = ($^X, $ENV{DEVEL_COVER_TEST_OPTS}, $self->bin_dir . "/cover");
   } else {
     @cmd = ($^X, $self->bin_dir . "/cover");
@@ -205,6 +193,7 @@ sub run ($self, $build_dir) {
   # TODO - option to merge DB with existing one
   # TODO - portability
   $output .= $self->fsys("rm", "-rf", $results_dir);
+  $output .= `rm -f $db/structure/*.lock`;
   $output .= $self->fsys("mv", $db,   $results_dir);
   $output .= $self->fsys("rm", "-rf", $db);
 
@@ -212,9 +201,6 @@ sub run ($self, $build_dir) {
 }
 
 sub run_all ($self) {
-  my $results_dir = $self->results_dir // die "No results dir";
-  $self->fsys("mkdir", "-p", $results_dir);
-
   my @res = iterate_as_array(
     { workers => $self->workers },
     sub {
@@ -224,7 +210,6 @@ sub run_all ($self) {
     },
     $self->build_dirs
   );
-  # print Dumper \@res;
 }
 
 sub write_json ($self, $vars) {
@@ -248,8 +233,9 @@ sub write_json ($self, $vars) {
   }
   # print Dumper $vars, $results;
 
-  my $io   = Devel::Cover::DB::IO::JSON->new(options => "pretty");
-  my $file = $self->results_dir . "/cpancover.json";
+  my $io            = Devel::Cover::DB::IO::JSON->new(options => "pretty");
+  my ($results_dir) = $self->made_res_dir;
+  my $file          = "$results_dir/cpancover.json";
   $io->write($results, $file);
   say "Wrote json output to $file";
 }
@@ -260,7 +246,7 @@ sub class {
     : $pc < 75     ? "c0"
     : $pc < 90     ? "c1"
     : $pc < 100    ? "c2"
-    : "c3"
+    :                "c3"
 }
 
 sub write_summary($self, $vars) {
@@ -292,7 +278,7 @@ sub write_summary($self, $vars) {
 }
 
 sub generate_html ($self) {
-  my $d = $self->results_dir;
+  my ($d) = $self->made_res_dir;
   chdir $d or die "Can't chdir $d: $!\n";
   $self->dir($d);
 
@@ -317,7 +303,7 @@ sub generate_html ($self) {
   my $n = 0;
   for my $module (@modules) {
     my $cover = "$d/$module/cover.json";
-    next                 unless -e $cover;
+    next unless -e $cover;
     say "Adding $module" if $self->verbose;
 
     my $io   = Devel::Cover::DB::IO::JSON->new;
@@ -339,7 +325,7 @@ sub generate_html ($self) {
     $m->{module} = $mod;
     $m->{link} = "/$module/index.html" if $json->{summary}{Total}{total}{total};
 
-    for my $criterion ($vars->{criteria}->%*) {
+    for my $criterion ($vars->{criteria}->@*) {
       my $summary = $json->{summary}{Total}{$criterion};
       # print "summary:", Dumper $summary;
       my $pc = $summary->{percentage};
@@ -371,7 +357,7 @@ sub generate_html ($self) {
 }
 
 sub compress_old_versions ($self, $versions) {
-  my $dir = $self->results_dir;
+  my ($dir) = $self->made_res_dir;
   opendir my $fh, $dir or die "Can't opendir $dir: $!";
   my @dirs = sort grep -d, map "$dir/$_", readdir $fh;
   closedir $fh or die "Can't closedir $dir: $!";
@@ -436,12 +422,7 @@ sub local_build ($self) {
   $self->run_all;
 }
 
-sub failed_dir ($self) {
-  my $dir = $self->results_dir . "/__failed__";
-  -d $dir or mkdir $dir or die "Can't mkdir $dir: $!";
-  $dir
-}
-
+sub failed_dir  ($self)       { ($self->made_res_dir("__failed__"))[0] }
 sub covered_dir ($self, $dir) { $self->results_dir . "/$dir" }
 sub failed_file ($self, $dir) { $self->failed_dir . "/$dir" }
 sub is_covered  ($self, $dir) { -d $self->covered_dir($dir) }
@@ -465,10 +446,9 @@ sub cover_modules ($self) {
   $self->process_module_file;
   # say "modules: ", Dumper $self->modules;
 
-  my @cmd = $self->dc_file;
-  push @cmd, "--local" if $self->local;
+  my @cmd = ($self->dc_file, "--env", $self->env);
+  push @cmd, "--verbose" if $self->verbose;
   my @command = (@cmd, "cpancover-docker-module");
-  $self->_set_local_timeout(0);
   my @res = iterate_as_array(
     { workers => $self->workers },
     sub {
@@ -479,13 +459,13 @@ sub cover_modules ($self) {
       if ($self->is_covered($dir)) {
         $self->set_covered($dir);
         say "$module already covered" if $self->verbose;
-        return                        unless $self->force;
+        return unless $self->force;
       } elsif ($self->is_failed($dir)) {
         say "$module already failed" if $self->verbose;
-        return                       unless $self->force;
+        return unless $self->force;
       }
 
-      my $timeout = $self->get_timeout;
+      my $timeout = $self->timeout;
       # say "Setting alarm for $timeout seconds";
       my $name = sprintf("%s-%18.6f", $module, time) =~ tr/a-zA-Z0-9_./-/cr;
       say "$dir -> $name";
@@ -513,7 +493,6 @@ sub cover_modules ($self) {
     },
     do { my %m; [ sort grep !$m{$_}++, @{ $self->modules } ] }
   );
-  $self->_set_local_timeout(0);
 }
 
 sub get_latest ($self) {
@@ -534,7 +513,7 @@ sub get_latest ($self) {
 }
 
 sub write_stylesheet ($self) {
-  my $css = $self->results_dir . "/collection.css";
+  my $css = ($self->made_res_dir)[0] . "/collection.css";
   open my $fh, ">", $css or die "Can't open $css: $!\n";
   print $fh <<EOF;
 /* Stylesheet for Devel::Cover collection reports */
@@ -631,13 +610,13 @@ package Devel::Cover::Collection::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.44'; # VERSION
+our $VERSION = '1.45'; # VERSION
 
 use base "Template::Provider";
 
 my %Templates;
 
-sub fetch ($self, $name) {
+sub fetch ($self, $name, $) {
   # print "Looking for <$name>\n";
   $self->SUPER::fetch(exists $Templates{$name} ? \$Templates{$name} : $name)
 }
@@ -665,7 +644,7 @@ $Templates{html} = <<'EOT';
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!--
 This file was generated by Devel::Cover Version $VERSION
-Devel::Cover is copyright 2001-2024, Paul Johnson (paul\@pjcj.net)
+Devel::Cover is copyright 2001-2025, Paul Johnson (paul\@pjcj.net)
 Devel::Cover is free. It is licensed under the same terms as Perl itself.
 The latest version of Devel::Cover should be available from my homepage:
 http://www.pjcj.net
@@ -809,7 +788,7 @@ Devel::Cover::Collection - Code coverage for a collection of modules
 
 =head1 VERSION
 
-version 1.44
+version 1.45
 
 =head1 SYNOPSIS
 
@@ -825,7 +804,7 @@ Almost certainly.
 
 =head1 LICENCE
 
-Copyright 2014-2024, Paul Johnson (paul@pjcj.net)
+Copyright 2014-2025, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

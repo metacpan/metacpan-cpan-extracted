@@ -33,14 +33,14 @@ no_index:
 provides:
   Mojolicious::Plugin::WithCSRFProtection:
     file: lib/Mojolicious/Plugin/WithCSRFProtection.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Mojo::Base: '0'
 resources:
   bugtracker: https://github.com/charsbar/Mojolicious-Plugin-WithCSRFProtection/issues
   homepage: https://github.com/charsbar/Mojolicious-Plugin-WithCSRFProtection
   repository: https://github.com/charsbar/Mojolicious-Plugin-WithCSRFProtection.git
-version: '1.01'
+version: '1.02'
 x_contributors:
   - 'Greg Oschwald <goschwald@maxmind.com>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'

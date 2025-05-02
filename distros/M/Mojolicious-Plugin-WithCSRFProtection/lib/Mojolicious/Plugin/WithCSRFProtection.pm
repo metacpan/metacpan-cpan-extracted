@@ -4,7 +4,7 @@ package Mojolicious::Plugin::WithCSRFProtection;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub register {
     my ( $self, $app ) = @_;
@@ -29,7 +29,7 @@ sub register {
                 || $c->param('csrf_token');
 
             unless ( $csrf && $csrf eq $c->csrf_token ) {
-                $c->reply->bad_csrf;
+                $c->reply->bad_csrf unless $c->stash->{'mojo.finished'};
                 return;
             }
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Util::AuthorDeps 6.032;
+package Dist::Zilla::Util::AuthorDeps 6.033;
 # ABSTRACT: Utils for listing your distribution's author dependencies
 
 use Dist::Zilla::Pragmas;
@@ -107,24 +107,38 @@ sub extract_author_deps {
   if ($missing) {
     require Module::Runtime;
 
-    @packages =
-      grep {
-        $_ eq 'perl'
-        ? ! ($vermap->{perl} && eval "use $vermap->{perl}; 1")
-        : do {
-            my $m = $_;
-            ! eval {
-              local @INC = @INC; push @INC, "$root";
-              # This will die if module is missing
-              Module::Runtime::require_module($m);
-              my $v = $vermap->{$m};
-              # This will die if VERSION is too low
-              !$v || $m->VERSION($v);
-              # Success!
-              1
-            }
-          }
-      } @packages;
+    my @new_packages;
+    PACKAGE: for my $package (@packages) {
+      if ($package eq 'perl') {
+        # This is weird, perl can never really be a prereq to fulfill but...
+        # it was like this. -- rjbs, 2024-06-02
+        if ($vermap->{perl} && ! eval "use $vermap->{perl}; 1") {
+          push @new_packages, 'perl';
+        }
+
+        next PACKAGE;
+      }
+
+      my $ok = eval {
+        local @INC = (@INC, "$root");
+
+        # This will die if module is missing
+        Module::Runtime::require_module($package);
+        my $v = $vermap->{$package};
+
+        # This will die if VERSION is too low
+        !$v || $package->VERSION($v);
+
+        # Success!
+        1;
+      };
+
+      unless ($ok) {
+        push @new_packages, $package;
+      }
+    }
+
+    @packages = @new_packages;
   }
 
   # Now that we have a sorted list of packages, use that to build an array of
@@ -146,7 +160,7 @@ Dist::Zilla::Util::AuthorDeps - Utils for listing your distribution's author dep
 
 =head1 VERSION
 
-version 6.032
+version 6.033
 
 =head1 PERL VERSION
 
@@ -167,7 +181,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2025 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

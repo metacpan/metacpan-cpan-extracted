@@ -50,17 +50,14 @@ static Argon2_type S_XS_unpack_Argon2_type(pTHX_ SV* name_sv) {
 }
 #define XS_unpack_Argon2_type(name) S_XS_unpack_Argon2_type(aTHX_ name)
 
-static SV* S_argon2_pass(pTHX_ Argon2_type type, SV* password, SV* salt, int t_cost, SV* m_factor, int parallelism, size_t output_length) {
+static SV* S_argon2_pass(pTHX_ Argon2_type type, const char* password, size_t password_len, const char* salt, size_t salt_len, int t_cost, SV* m_factor, int parallelism, size_t output_length) {
 	int m_cost = parse_size(m_factor, type);
-	STRLEN password_len, salt_len;
-	const char* password_raw = SvPVbyte(password, password_len);
-	const char* salt_raw = SvPVbyte(salt, salt_len);
 	size_t encoded_length = argon2_encodedlen(t_cost, m_cost, parallelism, salt_len, output_length, type);
 	SV* result = newSV(encoded_length - 1);
 	SvPOK_only(result);
 	int rc = argon2_hash(t_cost, m_cost, parallelism,
-		password_raw, password_len,
-		salt_raw, salt_len,
+		password, password_len,
+		salt, salt_len,
 		NULL, output_length,
 		SvPVX(result), encoded_length,
 		type, ARGON2_VERSION_NUMBER
@@ -72,7 +69,10 @@ static SV* S_argon2_pass(pTHX_ Argon2_type type, SV* password, SV* salt, int t_c
 	SvCUR(result) = encoded_length - 1;
 	return result;
 }
-#define argon2_pass(type, password, salt, t_cost, m_factor, parallelism, output_length) S_argon2_pass(aTHX_ type, password, salt, t_cost, m_factor, parallelism, output_length)
+#define argon2_pass(...) S_argon2_pass(aTHX_ __VA_ARGS__)
+#define argon2d_pass(...) S_argon2_pass(aTHX_ Argon2_d, __VA_ARGS__)
+#define argon2i_pass(...) S_argon2_pass(aTHX_ Argon2_i, __VA_ARGS__)
+#define argon2id_pass(...) S_argon2_pass(aTHX_ Argon2_id, __VA_ARGS__)
 
 static SV* S_argon2_raw(pTHX_ Argon2_type type, SV* password, SV* salt, int t_cost, SV* m_factor, int parallelism, size_t output_length) {
 	int m_cost = parse_size(m_factor, type);
@@ -95,22 +95,17 @@ static SV* S_argon2_raw(pTHX_ Argon2_type type, SV* password, SV* salt, int t_co
 	SvCUR(result) = output_length;
 	return result;
 }
-#define argon2_raw(type, password, salt, t_cost, m_factor, parallelism, output_length) S_argon2_raw(aTHX_ type, password, salt, t_cost, m_factor, parallelism, output_length)
+#define argon2_raw(...) S_argon2_raw(aTHX_ __VA_ARGS__)
 
 MODULE = Crypt::Argon2	PACKAGE = Crypt::Argon2
 
-SV* argon2_pass(Argon2_type type, SV* password, SV* salt, int t_cost, SV* m_factor, int parallelism, size_t output_length)
+SV* argon2_pass(Argon2_type type, const char* password, size_t length(password), const char* salt, size_t length(salt), int t_cost, SV* m_factor, int parallelism, size_t output_length)
 
-SV* argon2id_pass(SV* password, SV* salt, int t_cost, SV* m_factor, int parallelism, size_t output_length)
-ALIAS:
-	argon2d_pass = Argon2_d
-	argon2i_pass = Argon2_i
-	argon2id_pass = Argon2_id
-CODE:
-	RETVAL = argon2_pass(ix, password, salt, t_cost, m_factor, parallelism, output_length);
-OUTPUT:
-	RETVAL
+SV* argon2d_pass(const char* password, size_t length(password), const char* salt, size_t length(salt), int t_cost, SV* m_factor, int parallelism, size_t output_length)
 
+SV* argon2i_pass(const char* password, size_t length(password), const char* salt, size_t length(salt), int t_cost, SV* m_factor, int parallelism, size_t output_length)
+
+SV* argon2id_pass(const char* password, size_t length(password), const char* salt, size_t length(salt), int t_cost, SV* m_factor, int parallelism, size_t output_length)
 
 SV* argon2_raw(Argon2_type type, SV* password, SV* salt, int t_cost, SV* m_factor, int parallelism, size_t output_length)
 

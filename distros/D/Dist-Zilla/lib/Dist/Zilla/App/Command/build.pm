@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::build 6.032;
+package Dist::Zilla::App::Command::build 6.033;
 # ABSTRACT: build your dist
 
 use Dist::Zilla::Pragmas;
@@ -124,7 +124,7 @@ Dist::Zilla::App::Command::build - build your dist
 
 =head1 VERSION
 
-version 6.032
+version 6.033
 
 =head1 SYNOPSIS
 
@@ -212,7 +212,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2025 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

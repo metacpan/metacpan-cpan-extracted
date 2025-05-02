@@ -7,7 +7,7 @@
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   >
   <name>Net-Proxmox-VE</name>
-  <shortdesc>Pure perl API for Proxmox virtualisation</shortdesc>
+  <shortdesc>Pure Perl API for Proxmox Virtual Environment</shortdesc>
   <developer>
     <foaf:Person>
       <foaf:name>Brendan Beveridge &lt;brendan@nodeintegration.com.au&gt;, Dean Hamstead</foaf:name>
@@ -99,12 +99,12 @@
     </foaf:Person>
   </helper>
   <license rdf:resource="http://www.opensource.org/licenses/mit-license.php" />
-  <homepage rdf:resource="https://github.com/mrproper/proxmox-ve-api-perl" />
-  <bug-database rdf:resource="https://github.com/mrproper/proxmox-ve-api-perl/issues" />
+  <homepage rdf:resource="https://github.com/djzort/proxmox-ve-api-perl" />
+  <bug-database rdf:resource="https://github.com/djzort/proxmox-ve-api-perl/issues" />
   <repository>
     <GitRepository>
-      <browse rdf:resource="https://github.com/mrproper/proxmox-ve-api-perl" />
-      <location rdf:resource="https://github.com/mrproper/proxmox-ve-api-perl.git" />
+      <browse rdf:resource="https://github.com/djzort/proxmox-ve-api-perl" />
+      <location rdf:resource="https://github.com/djzort/proxmox-ve-api-perl.git" />
     </GitRepository>
   </repository>
   <programming-language>Perl</programming-language>

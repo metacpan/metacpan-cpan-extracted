@@ -16,6 +16,16 @@
 
     $host->login() or die ('Couldn\'t log in to proxmox host');
 
+=head1 DESCRIPTION
+
+This Class provides the framework for talking to Proxmox VE 2.0 API instances.
+This just provides a get/delete/put/post abstraction layer as methods on Proxmox VE REST API
+This also handles the ticket headers required for authentication
+
+This class provides the building blocks for someone wanting to use Perl to talk to Proxmox PVE. It provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
+
+Object representations of the Proxmox VE REST API are included in seperate modules.
+
 =head1 WARNING
 
 We are still moving things around and trying to come up with something
@@ -30,24 +40,6 @@ Perltidy with default settings is prefered style.
 
 Oh, our tests are all against a running server. Care to help make them better?
 
-=head1 DESIGN NOTE
-
-This API would be far nicer if it returned nice objects representing different aspects of the system.
-Such an arrangement would be far better than how this module is currently layed out. It might also be
-less repetitive code.
-
-=head1 DESCRIPTION
-
-This Class provides the framework for talking to Proxmox VE 2.0 API instances.
-This just provides a get/delete/put/post abstraction layer as methods on Proxmox VE REST API
-This also handles the ticket headers required for authentication
-
-More details on the API can be found here:
-http://pve.proxmox.com/wiki/Proxmox_VE_API
-http://pve.proxmox.com/pve2-api-doc/
-
-This class provides the building blocks for someone wanting to use Perl to talk to Proxmox 2.0. Relatively simple piece of code, just provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
-
 =head1 METHODS
 
 =head2 action
@@ -55,24 +47,15 @@ This class provides the building blocks for someone wanting to use Perl to talk 
 This calls raw actions against your proxmox server.
 Ideally you don't use this directly.
 
-
-=cut
-
 =head2 api_version
 
 Returns the API version of the proxmox server we are talking to
-
-
-=cut
 
 =head2 api_version_check
 
 Checks that the api we are talking to is at least version 2.0
 
 Returns true if the api version is at least 2.0 (perl style true or false)
-
-
-=cut
 
 =head2 debug
 
@@ -82,24 +65,15 @@ Undef (ie no argument) leaves the debug status untouched, making this method cal
 
 Returns the resultant debug status (perl style true or false)
 
-
-=cut
-
 =head2 delete
 
 An action helper method that just takes a path as an argument and returns the
 value of action() with the DELETE method
 
-
-=cut
-
 =head2 get
 
 An action helper method that just takes a path as an argument and returns the
 value of action with the GET method
-
-
-=cut
 
 =head2 new
 
@@ -162,35 +136,53 @@ Enabling debugging of this API (not related to proxmox debugging in any way). De
 
 =back
 
-
-=cut
-
 =head2 post
 
 An action helper method that takes two parameters: $path, \%post_data
-$path to post to,  hash ref to %post_data
+$path to post to, hash ref to %post_data
 
 You are returned what action() with the POST method returns
-
-
-=cut
 
 =head2 put
 
 An action helper method that takes two parameters:
-path
-hash ref to post data
-your returned what post returns
+$path, hash ref to \%put_data
 
-
-=cut
+You are returned what action() with the PUT method returns
 
 =head2 url_prefix
 
-returns the url prefix used in the rest api calls
+Returns the url prefix used in the rest api calls
 
+=head1 PVE VERSIONS SUPPORT
 
-=cut
+Firstly, there isn't currently any handling of different versions of the API.
+
+Secondly, Proxmox API reference documentation is also, frustratingly, published only alongside the current release. This makes it difficult to support older versions of the API or different versions of the API concurrently.
+
+Fortunately the API is relatively stable.
+
+Based on the above the bug reporting policy is as follows:
+
+=over 2
+
+=item A function in this module doesn't work against the current published API? This a bug and hope to fix it. Pull requests welcome.
+
+=item A function in this module doesn't exist in the current published API? Pull requests welcomes and promptly merged.
+
+=item A function in this module doesn't work against a previous version of the API? A note will be made in the pod only.
+
+=item A function in this module doesn't exist against a previous version of the API? Pull requests will be merged on a case per case basis.
+
+=back
+
+As such breaking changes may be made to this module to support the current API when necessary.
+
+=head1 DESIGN NOTE
+
+This API would be far nicer if it returned nice objects representing different aspects of the system.
+Such an arrangement would be far better than how this module is currently layed out. It might also be
+less repetitive code.
 
 =head1 SEE ALSO
 
@@ -200,29 +192,11 @@ returns the url prefix used in the rest api calls
 
 http://www.proxmox.com
 
-=item API reference
+=item API Reference
 
-http://pve.proxmox.com/pve2-api-doc
+More details on the API can be found at L<http://pve.proxmox.com/wiki/Proxmox_VE_API> and
+L<https://pve.proxmox.com/pve-docs/api-viewer/>
+
 
 =back
-
-=head1 SUPPORT
-
- Contribute at http://github.com/mrproper/proxmox-ve-api-perl
-
-=head1 LICENSE
-
- This program is free software; you can redistribute it and/or modify it under
- the same terms as Perl itself.
-
-=head1 VERSION
-
- 0.33
-
-=head1 AUTHORS
-
- Brendan Beveridge <brendan@nodeintegration.com.au>
- Dean Hamstead <dean@bytefoundry.com.au>
-
-=cut
 

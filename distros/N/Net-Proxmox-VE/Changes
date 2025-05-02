@@ -1,5 +1,23 @@
 Revision history for perl Net::Proxmox::VE
 
+0.40 2025-05-02
+- Many POD updates
+- Cluster: Add get_cluster_nextid function
+- Update examples
+- VE: refactor url_prefix
+- Access: Add sync_access_domains and some other refactors
+- Nodes: Variety of refactoring and pod improvements
+- Node: Rename methods from _nodes_ to _node_ which is more sensible. Export get_node
+- VE: Update get() to check nodes
+- Move login ticket handling in to VE.pm
+- Cluster: Minor corrections
+- VE: Minor corrections
+- Pools: Minor adjustments
+- Cluster: Minor adjustments
+- Exception: New exception class
+- Swap from croak to our own Exception class
+- Refactor check_login_ticket and run perltidy on VE.pm
+
 0.38 2023-09-11
 - fix/use correct parameter name for user in tests thanks to MartijnLivaart
 - Feat/check new arguments thanks to MartijnLivaart

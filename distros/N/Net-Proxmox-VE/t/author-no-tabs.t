@@ -18,6 +18,7 @@ my @files = (
     'lib/Net/Proxmox/VE.pm',
     'lib/Net/Proxmox/VE/Access.pm',
     'lib/Net/Proxmox/VE/Cluster.pm',
+    'lib/Net/Proxmox/VE/Exception.pm',
     'lib/Net/Proxmox/VE/Nodes.pm',
     'lib/Net/Proxmox/VE/Pools.pm',
     'lib/Net/Proxmox/VE/Storage.pm',

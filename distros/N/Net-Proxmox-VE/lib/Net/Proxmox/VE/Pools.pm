@@ -1,5 +1,5 @@
 #!/bin/false
-# vim: softtabstop=2 tabstop=2 shiftwidth=2 ft=perl expandtab smarttab
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: Net::Proxmox::VE::Pools
 # ABSTRACT: Presents a pool object
 
@@ -7,22 +7,22 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Pools;
-$Net::Proxmox::VE::Pools::VERSION = '0.38';
+$Net::Proxmox::VE::Pools::VERSION = '0.40';
 use parent 'Exporter';
 
-use Carp qw( croak );
+use Net::Proxmox::VE::Exception;
 
 
-our @EXPORT  = qw( pools get_pool create_pool delete_pool update_pool );
+our @EXPORT = qw( pools get_pool create_pool delete_pool update_pool );
 
-my $base = '/pools';
+my $BASEPATH = '/pools';
 
 
 sub pools {
 
     my $self = shift or return;
 
-    return $self->get($base);
+    return $self->get($BASEPATH);
 
 }
 
@@ -31,10 +31,12 @@ sub get_pool {
 
     my $self = shift or return;
 
-    my $a = shift or croak 'No poolid for get_pool()';
-    croak 'poolid must be a scalar for get_pool()' if ref $a;
+    my $poolid = shift
+      or Net::Proxmox::VE::Exception->throw('No poolid for get_pool()');
+    Net::Proxmox::VE::Exception->throw('poolid must be a scalar for get_pool()')
+      if ref $poolid;
 
-    return $self->get( $base, $a );
+    return $self->get( $BASEPATH, $poolid );
 
 }
 
@@ -42,33 +44,38 @@ sub get_pool {
 sub create_pool {
 
     my $self = shift or return;
-    my @p = @_;
+    my @p    = @_;
 
-    croak 'No arguments for create_pool()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for create_pool()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for create_pool()'
-          unless ref $a eq 'HASH';
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for create_pool()')
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for create_pool()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for create_pool()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->post( $base, \%args )
+    return $self->post( $BASEPATH, \%args );
 
 }
 
 
 sub delete_pool {
 
-    my $self = shift or return;
-    my $a    = shift or croak 'No argument given for delete_pool()';
+    my $self   = shift or return;
+    my $poolid = shift
+      or
+      Net::Proxmox::VE::Exception->throw('No argument given for delete_pool()');
 
-    return $self->delete( $base, $a );
+    return $self->delete( $BASEPATH, $poolid );
 
 }
 
@@ -76,25 +83,32 @@ sub delete_pool {
 sub update_pool {
 
     my $self   = shift or return;
-    my $poolid = shift or croak 'No poolid provided for update_pool()';
-    croak 'poolid must be a scalar for update_pool()' if ref $poolid;
+    my $poolid = shift
+      or Net::Proxmox::VE::Exception->throw(
+        'No poolid provided for update_pool()');
+    Net::Proxmox::VE::Exception->throw(
+        'poolid must be a scalar for update_pool()')
+      if ref $poolid;
     my @p = @_;
 
-    croak 'No arguments for update_pool()' unless @p;
+    Net::Proxmox::VE::Exception->throw('No arguments for update_pool()')
+      unless @p;
     my %args;
 
     if ( @p == 1 ) {
-        croak 'Single argument not a hash for update_pool()'
+        Net::Proxmox::VE::Exception->throw(
+            'Single argument not a hash for update_pool()')
           unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
-        croak 'Odd number of arguments for update_pool()'
+        Net::Proxmox::VE::Exception->throw(
+            'Odd number of arguments for update_pool()')
           if ( scalar @p % 2 != 0 );
         %args = @p;
     }
 
-    return $self->put( $base, $poolid, \%args )
+    return $self->put( $BASEPATH, $poolid, \%args );
 
 }
 
@@ -113,20 +127,20 @@ Net::Proxmox::VE::Pools - Presents a pool object
 
 =head1 VERSION
 
-version 0.38
+version 0.40
 
 =head1 SYNOPSIS
 
   @pools = $obj->pools();
-  $pool  = $obj->get_pool('poolid');
+  $pool  = $obj->get_pool( $poolid );
 
   $ok = $obj->create_pool(%args);
   $ok = $obj->create_pool(\%args);
 
-  $ok = $obj->delete_pool('poolid');
+  $ok = $obj->delete_pool( $poolid );
 
-  $ok = $obj->update_pool('poolid', %args);
-  $ok = $obj->update_pool('poolid', \%args);
+  $ok = $obj->update_pool( $poolid, %args);
+  $ok = $obj->update_pool( $poolid, \%args);
 
 =head1 DESCRIPTION
 
@@ -155,9 +169,9 @@ Gets a list of pools (aka the a Pool Index)
 
 Gets a single pool's configuration details
 
-  $pool = $obj->get_pool('poolid');
+  $pool = $obj->get_pool( $poolid );
 
-poolid is a string in pve-poolid format
+Where $poolid is a string in pve-poolid format
 
 =head2 create_pool
 
@@ -184,18 +198,18 @@ String. This is a comment associated with the new pool, this is optional
 
 Deletes a single pool
 
-  $ok = $obj->delete_pool('poolid')
+  $ok = $obj->delete_pool( $poolid )
 
-poolid is a string in pve-poolid format
+Where $poolid is a string in pve-poolid format
 
 =head2 update_pool
 
 Updates (sets) a pool's data
 
-  $ok = $obj->update_pool( 'poolid', %args );
-  $ok = $obj->update_pool( 'poolid', \%args );
+  $ok = $obj->update_pool( $poolid, %args );
+  $ok = $obj->update_pool( $poolid, \%args );
 
-poolid is a string in pve-poolid format
+Where $poolid is a string in pve-poolid format
 
 I<%args> may items contain from the following list
 
@@ -229,7 +243,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Dean Hamstad.
+This software is Copyright (c) 2025 by Dean Hamstad.
 
 This is free software, licensed under:
 

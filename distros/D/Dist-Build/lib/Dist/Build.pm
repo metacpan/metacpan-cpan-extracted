@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.019';
+$Dist::Build::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -113,7 +113,6 @@ sub Build_PL {
 	$core->mkdir($_) for @blibs;
 	$core->create_phony('config', @blibs);
 	$core->lib_dir('lib');
-	$core->script_dir('script');
 	$core->add_seen(unix_to_native_path($_)) for sort keys %{ maniread() };
 
 	$core->tap_harness('test', dependencies => [ 'pure_all' ], test_dir => 't');
@@ -179,7 +178,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 

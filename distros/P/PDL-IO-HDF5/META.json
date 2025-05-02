@@ -6,7 +6,7 @@
       "Andrew Benson <abenson AT obs.carnegiescience.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5",
       "perl_5"
@@ -60,7 +60,7 @@
          "web" : "https://github.com/PDLPorters/pdl-io-hdf5"
       }
    },
-   "version" : "0.761",
+   "version" : "0.762",
    "x_meta_spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"

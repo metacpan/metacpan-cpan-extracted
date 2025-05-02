@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::TextTemplate 6.032;
+package Dist::Zilla::Role::TextTemplate 6.033;
 # ABSTRACT: something that renders a Text::Template template string
 
 use Moose::Role;
@@ -85,7 +85,7 @@ Dist::Zilla::Role::TextTemplate - something that renders a Text::Template templa
 
 =head1 VERSION
 
-version 6.032
+version 6.033
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo SIGNES.
+This software is copyright (c) 2025 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

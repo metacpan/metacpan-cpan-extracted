@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Pure perl API for Proxmox virtualisation",
+  "ABSTRACT" => "Pure Perl API for Proxmox Virtual Environment",
   "AUTHOR" => "Brendan Beveridge <brendan\@nodeintegration.com.au>, Dean Hamstead <dean\@fragfest.com.au>",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28"
@@ -18,10 +18,9 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Net-Proxmox-VE",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Net::Proxmox::VE",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "HTTP::Headers" => 0,
     "HTTP::Request::Common" => 0,
     "JSON::MaybeXS" => 0,
@@ -43,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Trap" => 0,
     "Test::Vars" => 0
   },
-  "VERSION" => "0.38",
+  "VERSION" => "0.40",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +50,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTTP::Headers" => 0,

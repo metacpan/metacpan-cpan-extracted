@@ -1,5 +1,8 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.16	Thu May  1 07:25:25 EDT 2025
+	Handle mixed case environments a bit better
+
 0.15	Tue Apr 29 20:24:10 EDT 2025
 	Makefile.PL: Prefer XML::PP, since XML::Simple can have loading problems on Windows
 	Improved the fallback to Config::Auto when XML::Simple isn't working

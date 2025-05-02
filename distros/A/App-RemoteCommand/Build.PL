@@ -1,2 +1,2 @@
-use Dist::Build;
-Build_PL(\@ARGV, \%ENV);
+use Module::Build::Tiny;
+Build_PL();

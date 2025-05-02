@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Proxmox/VE.pm',
     'Net/Proxmox/VE/Access.pm',
     'Net/Proxmox/VE/Cluster.pm',
+    'Net/Proxmox/VE/Exception.pm',
     'Net/Proxmox/VE/Nodes.pm',
     'Net/Proxmox/VE/Pools.pm',
     'Net/Proxmox/VE/Storage.pm'

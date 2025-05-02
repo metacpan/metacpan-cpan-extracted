@@ -2,7 +2,7 @@ use Test::More tests => 2;
 
 note 'Checking Changes';
 my $changes_file = 'Changes';
-my $newver = '6.032';
+my $newver = '6.033';
 my $trial_token = '-TRIAL';
 my $encoding = 'UTF-8';
 

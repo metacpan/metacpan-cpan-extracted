@@ -96,6 +96,15 @@ is $config->get('extra.debug'), '1', 'extra.debug from ENV';
 # Undefined value
 is($config->get('extra.foo'), undef, 'Undefined keys return undef');
 
+$ENV{App_FOO} = 'bar';
+$config = Config::Abstraction->new(
+	config_dirs => [$test_dir],
+	env_prefix => 'App_',
+	flatten => 0,
+);
+
+is($config->get('App.foo'), 'bar', 'Lower case environment');
+
 # Flattened test
 my $flat = Config::Abstraction->new(
 	config_dirs => [$test_dir],
