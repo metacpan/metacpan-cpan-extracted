@@ -2,7 +2,7 @@ package Math::BigInt::LTM;
 
 use strict;
 use warnings;
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 use CryptX;
 use Carp;
@@ -1000,6 +1000,24 @@ sub _as_hex {
     # convert the number to a string of hexadecimal digits with prefix
     my ($class, $x) = @_;
     return '0x' . $class -> _to_hex($x);
+}
+
+sub _scmp {
+    # Compare two signed values. Return -1, 0, or 1.
+    my ($class, $xa, $xs, $ya, $ys) = @_;
+    if ($xs eq '+') {
+        if ($ys eq '+') {
+            return $class -> _acmp($xa, $ya);
+        } else {
+            return 1;
+        }
+    } else {
+        if ($ys eq '+') {
+            return -1;
+        } else {
+            return $class -> _acmp($ya, $xa);
+        }
+    }
 }
 
 1;

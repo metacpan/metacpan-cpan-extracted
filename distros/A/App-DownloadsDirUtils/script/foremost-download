@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-12'; # DATE
+our $DATE = '2025-05-03'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DownloadsDirUtils/foremost_download",
@@ -39,7 +39,7 @@ foremost-download - Return the foremost file(s) in the downloads directories
 
 =head1 VERSION
 
-This document describes version 0.007 of foremost-download (from Perl distribution App-DownloadsDirUtils), released on 2023-12-12.
+This document describes version 0.008 of foremost-download (from Perl distribution App-DownloadsDirUtils), released on 2025-05-03.
 
 =head1 SYNOPSIS
 
@@ -465,7 +465,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

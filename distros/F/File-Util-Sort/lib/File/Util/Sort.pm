@@ -11,9 +11,9 @@ use File::chdir;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-26'; # DATE
+our $DATE = '2025-05-03'; # DATE
 our $DIST = 'File-Util-Sort'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our %SPEC;
 
@@ -195,7 +195,7 @@ sub sort_files {
 
     my $code_get_recs;
     $code_get_recs = sub {
-        my $dir = shift;
+        my ($dir, $prefix) = @_;
 
         opendir my $dh, $dir or return [500, "Can't opendir '$dir': $!"];
 
@@ -222,7 +222,7 @@ sub sort_files {
                     next FILE;
                 }
             }
-            my $rec = {name=>$e, dir=>$dir};
+            my $rec = {name=>$e, dir=>(defined $prefix ? "$prefix/$dir" : $dir)};
             my @st = lstat $e or do {
                 warn "Can't stat '$e' in '$dir': $!, skipped";
                 next;
@@ -254,7 +254,7 @@ sub sort_files {
           SKIP_ADD_FILE:
             if ($recursive && $rec->{mode} & S_IFDIR) {
                 log_trace "Recursing into $dir/$e ...";
-                my $subres = $code_get_recs->($e);
+                my $subres = $code_get_recs->($e, $dir);
                 if ($subres->[0] == 200) {
                     push @recs, @{ $subres->[2] };
                 } else {
@@ -695,7 +695,7 @@ File::Util::Sort - Routines related to sorting files in one or more directories
 
 =head1 VERSION
 
-This document describes version 0.010 of File::Util::Sort (from Perl distribution File-Util-Sort), released on 2023-11-26.
+This document describes version 0.011 of File::Util::Sort (from Perl distribution File-Util-Sort), released on 2025-05-03.
 
 =head1 DESCRIPTION
 
@@ -1572,7 +1572,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

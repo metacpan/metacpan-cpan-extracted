@@ -1,0 +1,78 @@
+<tube name="Leipzig Rail">
+  <lines>
+      <line id="S3" name="S3" color="red"    />
+      <line id="S7" name="S7" color="purple" />
+  </lines>
+
+  <stations>
+    <station id="TROTHA"
+             name="Trotha"
+             line="S3,S7"
+             link="WOHNSTADT-NORD,S7-13" />
+
+    <station id="WOHNSTADT-NORD"
+             name="Wohnstadt Nord"
+             line="S3,S7"
+             link="TROTHA,ZOO" />
+
+    <station id="ZOO"
+             name="Zoo"
+             line="S3,S7"
+             link="WOHNSTADT-NORD,DESSAUER-BRUCKE" />
+
+    <station id="DESSAUER-BRUCKE"
+             name="Dessauer Brücke"
+             line="S3,S7"
+             link="ZOO,STEINTORBRUCKE" />
+
+    <station id="STEINTORBRUCKE"
+             name="Steintorbrücke"
+             line="S3,S7"
+             link="DESSAUER-BRUCKE,HALLE-HBF" />
+
+    <station id="HALLE-HBF"
+             name="Halle Hbf"
+             line="S3,S7"
+             link="STEINTORBRUCKE,S3-07,S7-06" />
+
+    <!-- Line S3 -->
+    <station id="S3-07" name="Halle Messe"               line="S3" link="HALLE-HBF,S3-08" />
+    <station id="S3-08" name="Dieskau"                   line="S3" link="S3-07,S3-09"     />
+    <station id="S3-09" name="Gröbers"                   line="S3" link="S3-08,S3-10"     />
+    <station id="S3-10" name="Großkugel"                 line="S3" link="S3-09,S3-11"     />
+    <station id="S3-11" name="Schkeuditz"                line="S3" link="S3-10,S3-12"     />
+    <station id="S3-12" name="Lützschena"                line="S3" link="S3-11,S3-13"     />
+    <station id="S3-13" name="Wahren"                    line="S3" link="S3-12,S3-14"     />
+    <station id="S3-14" name="Slevogt-str"               line="S3" link="S3-13,S3-15"     />
+    <station id="S3-15" name="Olbritch-str"              line="S3" link="S3-14,S3-16"     />
+    <station id="S3-16" name="Gohlis"                    line="S3" link="S3-15,S3-17"     />
+    <station id="S3-17" name="Leipzig Hbf"               line="S3" link="S3-16,S3-18"     />
+    <station id="S3-18" name="Markt"                     line="S3" link="S3-17,S3-19"     />
+    <station id="S3-19" name="Wilhelm-Leuschner-PI."     line="S3" link="S3-18,S3-20"     />
+    <station id="S3-20" name="Bayerischer Bf"            line="S3" link="S3-19,S3-21"     />
+    <station id="S3-21" name="MDR"                       line="S3" link="S3-20,S3-22"     />
+    <station id="S3-22" name="Connetwitz"                line="S3" link="S3-21,S3-23"     />
+    <station id="S3-23" name="Markkleeberg"              line="S3" link="S3-22,S3-24"     />
+    <station id="S3-24" name="Markkleeberg-Großstädtein" line="S3" link="S3-23,S3-25"     />
+    <station id="S3-25" name="Großdeuben"                line="S3" link="S3-24,S3-26"     />
+    <station id="S3-26" name="Böhlen Werke"              line="S3" link="S3-25,S3-27"     />
+    <station id="S3-27" name="NeuKieritzsch"             line="S3" link="S3-26,S3-28"     />
+    <station id="S3-28" name="Lobstädt"                  line="S3" link="S3-27,S3-29"     />
+    <station id="S3-29" name="Borna"                     line="S3" link="S3-28,S3-30"     />
+    <station id="S3-30" name="Petergrube"                line="S3" link="S3-29,S3-31"     />
+    <station id="S3-31" name="Neukirchen-Wyrha"          line="S3" link="S3-30,S3-32"     />
+    <station id="S3-32" name="Frohburg"                  line="S3" link="S3-31,S3-33"     />
+    <station id="S3-33" name="Geithan"                   line="S3" link="S3-32"           />
+
+    <!-- Line S7 -->
+    <station id="S7-01" name="Neitleben"                 line="S7" link="S7-02"           />
+    <station id="S7-02" name="Neustadt"                  line="S7" link="S7-01,S7-03"     />
+    <station id="S7-03" name="Zscherbener Str."          line="S7" link="S7-02,S7-04"     />
+    <station id="S7-04" name="Süd-stadt"                 line="S7" link="S7-03,S7-05"     />
+    <station id="S7-05" name="Suber-höhe"                line="S7" link="S7-04,S7-06"     />
+    <station id="S7-06" name="Rosen-garten"              line="S7" link="S7-05,HALLE-HBF" />
+    <station id="S7-13" name="Beidersee"                 line="S7" link="TROTHA,S7-14"    />
+    <station id="S7-14" name="Gimritz"                   line="S7" link="S7-13,S7-15"     />
+    <station id="S7-15" name="Wettin"                    line="S7" link="S7-14"           />
+  </stations>
+</tube>

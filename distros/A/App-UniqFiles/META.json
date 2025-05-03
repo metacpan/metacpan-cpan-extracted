@@ -37,10 +37,13 @@
             "Data::Sah::Compiler::perl::TH::float" : "0.914",
             "Data::Sah::Compiler::perl::TH::int" : "0.914",
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
-            "File::FindUniq" : "0.002",
+            "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : "0",
+            "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : "0",
+            "File::FindUniq" : "0.004",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
+            "Sah::Schema::dirname" : "0",
             "Sah::Schema::filesize" : "0",
             "Sah::Schema::true" : "0",
             "strict" : "0"
@@ -58,7 +61,7 @@
    "provides" : {
       "App::UniqFiles" : {
          "file" : "lib/App/UniqFiles.pm",
-         "version" : "v0.143.1"
+         "version" : "0.144"
       }
    },
    "release_status" : "stable",
@@ -73,10 +76,10 @@
          "web" : "https://github.com/perlancar/perl-App-UniqFiles"
       }
    },
-   "version" : "0.143.1",
+   "version" : "0.144",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.040000"
+         "version" : "5.040001"
       },
       "plugins" : [
          {
@@ -86,7 +89,27 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript dupe-filenames",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript dupe-filenames-between-two-dirs",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript uniq-files",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript uniq-filenames",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript uniq-filenames-between-two-dirs",
             "version" : "0.425"
          },
          {
@@ -241,7 +264,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.45.2",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -249,7 +272,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Git::Contributors",
-            "version" : "0.037"
+            "version" : "0.038"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
@@ -660,8 +683,8 @@
    "x_contributors" : [
       "Steven Haryanto <stevenharyanto@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

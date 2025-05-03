@@ -11,9 +11,9 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-12'; # DATE
+our $DATE = '2025-05-03'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -129,7 +129,7 @@ MARKDOWN
                 $i++;
                 my $targetpath = $to_dir . '/' . ($args{as} // File::Basename::basename($file));
                 if (-e $targetpath && !$args{overwrite}) {
-                    $envres->add_result(409, "File already exist '$targetpath', please choose another name or specify -O to overwrite", {item_id=>$file});
+                    $envres->add_result(409, "File already exists '$targetpath', please specify -O to overwrite", {item_id=>$file});
                 } elsif ($args{-dry_run}) {
                     log_info "DRY-RUN: [%d/%d] Moving %s to %s ...", $i, scalar(@{ $res->[2] }), $file, $targetpath;
                     $envres->add_result(200, "OK (dry-run)", {item_id=>$file});
@@ -165,7 +165,7 @@ App::DownloadsDirUtils - Utilities related to downloads directories
 
 =head1 VERSION
 
-This document describes version 0.007 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2023-12-12.
+This document describes version 0.008 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2025-05-03.
 
 =head1 DESCRIPTION
 
@@ -1342,7 +1342,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,9 @@
-# Math::Polygon
+# distribution Math-Polygon
 
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
-  * Development via GitHub: <https://github.com/markov2/perl-Math-Polygon>
+  * Development via GitHub: <https://github.com/markov2/perl5-Math-Polygon>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Math-Polygon/>
-    and <https://metacpan.org/release/Math-Polygon>
+  * Indexed from CPAN: <https://metacpan.org/release/Math-Polygon>
 
 This module supports simple manipulation of 2D polygons, via two interfaces:
 
@@ -16,8 +15,8 @@ This module supports simple manipulation of 2D polygons, via two interfaces:
 
 2. Function interface via Math::Polygon::Calc and friends
 
-   When you prefer to use plain functions and ARRAYs of ARRAYs of
-   coordinates.
+   When you prefer to use plain functions and juggle with ARRAYs of ARRAYs
+   of coordinates.
 
 ## Development &rarr; Release
 
@@ -30,8 +29,11 @@ the code and translated into real POD and clean HTML.  This reformatting
 is implemented with the OODoc distribution (A name I chose before OpenOffice
 existed, sorry for the confusion)
 
-Clone git for the "raw" version.  On github, you can find the processed
-version for each release.  But the better source is CPAN:
+Clone from github for the "raw" version.  For instance, when you want
+to contribute a new feature.
+
+On github, you can find the processed version for each release.  But the
+better source is CPAN; to get it installed simply run:
 
 ```sh
    cpan -i Math::Polygon
@@ -50,12 +52,12 @@ When you submit an extension, please contribute a set with
 
 2. code documentation
 
-3. regression test in t/
+3. regression tests in t/
 
 **Please note:**
 When you contribute in any way, you agree to transfer the copyrights to
 Mark Overmeer (you will get the honors in the code and/or ChangeLog).
-Your also automatically agree that your contribution is released under
+You also automatically agree that your contribution is released under
 the same license as this project: licensed as perl itself.
 
 ## Copyright and License

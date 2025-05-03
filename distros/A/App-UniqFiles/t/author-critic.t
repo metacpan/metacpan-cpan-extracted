@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/UniqFiles.pm','script/dupe-files','script/uniq-files'];
+my $filenames = ['lib/App/UniqFiles.pm','script/dupe-filenames','script/dupe-filenames-between-two-dirs','script/dupe-files','script/uniq-filenames','script/uniq-filenames-between-two-dirs','script/uniq-files'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

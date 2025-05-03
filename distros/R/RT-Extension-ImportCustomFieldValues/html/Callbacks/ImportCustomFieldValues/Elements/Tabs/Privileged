@@ -9,6 +9,10 @@ if ( $request_path =~ qr{^/Admin/CustomFields/} && $m->request_args->{'id'} &&  
          || $session{CurrentUser}->HasRight( Right => 'AdminCustomField', Object => $CustomField ) )
         ) {
         $tabs->child(
+            'cf-export-values' => title => loc('Export to CSV'),
+            path => '/Admin/CustomFields/ExportValues.html?id=' . $m->request_args->{'id'}
+        );
+        $tabs->child(
             'cf-import-values' => title => loc('Import from CSV'),
             path => '/Admin/CustomFields/ImportValues.html?id=' . $m->request_args->{'id'}
         );

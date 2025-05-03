@@ -10,7 +10,7 @@ package Devel::Cover::DB::IO;
 use strict;
 use warnings;
 
-our $VERSION = '1.45'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 my $Format;
 
@@ -45,7 +45,7 @@ Devel::Cover::DB::IO - IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.45
+version 1.46
 
 =head1 SYNOPSIS
 

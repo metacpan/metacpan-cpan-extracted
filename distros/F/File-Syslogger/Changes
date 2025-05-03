@@ -1,5 +1,9 @@
 Revision history for File-Syslogger
 
+0.0.3    2025-05-02/14:50
+         - misc cleanup
+         - now use Pod::Usage
+
 0.0.2    2021-11-27/09:05
          -Actually update the README.
          -Correct switches in POD for the script.

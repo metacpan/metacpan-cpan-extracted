@@ -6,7 +6,7 @@ repository 'http://git.home-dn.net/?p=manu/RT-Extension-ImportCustomFieldValues'
 
 requires('Text::CSV');
 requires_rt('4.2.0');
-rt_too_new('4.6.0');
+rt_too_new('6.1.0');
 
 readme_from 'lib/RT/Extension/ImportCustomFieldValues.pm', 0;
 

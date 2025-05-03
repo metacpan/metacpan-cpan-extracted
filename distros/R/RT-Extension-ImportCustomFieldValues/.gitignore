@@ -1,7 +1,0 @@
-*~
-MYMETA.json
-MYMETA.yml
-Makefile
-blib/
-lib/RT/Extension/ImportCustomFieldValues/Test.pm
-pm_to_blib

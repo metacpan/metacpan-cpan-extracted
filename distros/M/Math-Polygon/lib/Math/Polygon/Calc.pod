@@ -7,7 +7,7 @@ Math::Polygon::Calc - Simple polygon calculations
 =head1 INHERITANCE
 
  Math::Polygon::Calc
-   is a Exporter
+   is an Exporter
 
 =head1 SYNOPSIS
 
@@ -71,11 +71,15 @@ removed.
 
 =item B<polygon_centroid>(@points)
 
-Returns the centroid location of the polygon.  The last point of the list
-must be the same as the first to produce a correct result.
+Returns the centroid location of the polygon.
+
+The last point of the list must be the same as the first (must be
+'closed') to produce a correct result.  When the polygon is very flat,
+it will not produce a stable result: minor changes in single coordinates
+will move the centroid too far.
 
 The algorithm was found at
-F<http://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon>
+F<http://en.wikipedia.org/wiki/Centroid#Of_a_polygon>
 
 =item B<polygon_clockwise>(@points)
 
@@ -141,12 +145,12 @@ corner of the bounding box is made first.
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.10,
-built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Polygon distribution version 1.11,
+built on May 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

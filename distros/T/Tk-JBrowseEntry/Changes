@@ -220,7 +220,7 @@ Revision history for "ptkftp".
       - Fix bug causing right-arrow list search in text field to always fail.
       - Fix failure of setPalette to properly update the "-highlightcolor" in 
       the text field.
-5.30  Sat Jun 24, 2022
+5.30  Sat Jun 24, 2023
       - Fix entry-field up and down-arrow bindings to properly traverse the 
       values in the listbox value list - wasn't always working properly 
       particularly with the up-arrow option.
@@ -231,7 +231,8 @@ Revision history for "ptkftp".
       KeepList will also now keep list popped up if <spacebar> used to select.
       - Add "-tabcomplete => 3" option to just update the text field to 
       what is selected in the listbox when tabbing off of it back to the text 
-      field (The other 2 tabcomplete options also do this).
+      field (The other 2 tabcomplete options also do this in addition to their
+      normal functions).
       - Tweak the button icons' height slightly to make the widget height 
       consistant with standard text entry fields (Linux versions, as this was 
       already correct on M$-Windows systems.
@@ -245,3 +246,11 @@ Revision history for "ptkftp".
       values (found or observed during coding and testing).  None of them 
       were bugs (as Perl was already defaulting to zero or '' as needed).
       - Some general pod doc. cleanups.
+5.31  --NOT RELEASED--
+      - Fix some widget-focusing issues when taking focus.
+      - Fix some issues with the old "-colorstate" option.
+      - Fix some color issues when setting the widget to "readonly" mode.
+5.32  - Fri May 2, 2025
+      - Fix clobbering of the PRIMARY past-buffer contents when selecting 
+      entries from the dropdown list even when -noselecttext is set.  This was 
+      due to the faulure to pass "-exportselection => 0" to the listbox widget.

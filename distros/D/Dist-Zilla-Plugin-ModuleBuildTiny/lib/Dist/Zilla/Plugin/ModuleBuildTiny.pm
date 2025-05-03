@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::ModuleBuildTiny;
-$Dist::Zilla::Plugin::ModuleBuildTiny::VERSION = '0.019';
+$Dist::Zilla::Plugin::ModuleBuildTiny::VERSION = '0.020';
 use 5.020;
 
 use Moose;
@@ -11,14 +11,14 @@ with qw/
 	Dist::Zilla::Role::MetaProvider
 /;
 
-use experimental qw/signatures postderef/;
-
 use Dist::Zilla 4.300039;
 use Module::Metadata;
 use Moose::Util::TypeConstraints 'enum';
 use MooseX::Types::Perl qw/StrictVersionStr/;
 use MooseX::Types::Moose qw/Bool Str ArrayRef/;
 use List::Util 1.33 qw/first any/;
+
+use experimental qw/signatures postderef/;
 
 sub mvp_multivalue_args { qw(header_strs footer_strs) }
 
@@ -284,7 +284,7 @@ Dist::Zilla::Plugin::ModuleBuildTiny - Build a Build.PL that uses Module::Build:
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 

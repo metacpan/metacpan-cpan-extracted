@@ -1,3 +1,9 @@
+0.144   2025-05-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: {uniq,dupe}-filenames,
+          {uniq,dupe}_filenames-between-two-dirs.
+
+
 0.143.1 2024-12-05  Released-By: PERLANCAR; Urgency: medium
 
         - Merge changes 0.142 & 0.142.1.

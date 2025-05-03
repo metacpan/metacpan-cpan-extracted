@@ -14,7 +14,7 @@ use base "Devel::Cover::DB::IO::Base";
 
 use JSON::MaybeXS ();
 
-our $VERSION = '1.45'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 sub new {
   my $class = shift;
@@ -63,7 +63,7 @@ Devel::Cover::DB::IO::JSON - JSON based IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.45
+version 1.46
 
 =head1 SYNOPSIS
 

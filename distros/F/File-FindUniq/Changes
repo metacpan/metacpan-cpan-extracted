@@ -1,3 +1,13 @@
+0.004   2025-05-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add routines: {uniq,dupe}_filenames_between_two_dirs.
+
+
+0.003   2025-05-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add routines: uniq_filenames, dupe_filenames.
+
+
 0.002   2024-12-05  Released-By: PERLANCAR; Urgency: high
 
         - [bugfix] Allow arguments prefixed by /^-/, so it can be used by

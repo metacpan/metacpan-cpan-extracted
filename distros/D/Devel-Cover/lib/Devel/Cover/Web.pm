@@ -12,7 +12,7 @@ package Devel::Cover::Web;
 use strict;
 use warnings;
 
-our $VERSION = '1.45'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 use Exporter;
 
@@ -897,7 +897,7 @@ Devel::Cover::Web - Files for JavaScript or CSS
 
 =head1 VERSION
 
-version 1.45
+version 1.46
 
 =head1 SYNOPSIS
 

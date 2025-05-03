@@ -28,7 +28,7 @@ This class provides an Object Oriented interface around
 L<Math::Polygon::Calc|Math::Polygon::Calc>, L<Math::Polygon::Clip|Math::Polygon::Clip>, and other.  Together,
 these modules provide basic transformations on 2D polygons in pure perl.
 
-B<WARNING:> these computations may show platform dependent ronding
+B<WARNING:> these computations may show platform dependent rounding
 differences.  These may also originate from compilation options of
 the Perl version you installed.
 
@@ -489,12 +489,12 @@ first.  This may hide platform dependent rounding differences.
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.10,
-built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Polygon distribution version 1.11,
+built on May 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

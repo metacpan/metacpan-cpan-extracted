@@ -1,8 +1,23 @@
-Revision history for Perl extension Math::Polygon
+== Revision history for Perl extension Math::Polygon
+
+All changes are made by Mark Overmeer <markov@cpan.org> unless
+explicitly stated differently.
 
 20070425 Request by Christian Sauer: polygon intersection
    paper with nice algorithm: http://citeseer.ist.psu.edu/cache/papers/cs/25021/http:zSzzSzfractal.dam.fmph.uniba.skzSz~sccgzSzproceedingszSz1998zSzZalik.pdf/zalik98quick.pdf
 20121024 Request by Rick Rutgers: widening polygon contour
+
+version 1.11: Fri  2 May 16:57:09 CEST 2025
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+	- polygon_same broken tolerance parameter [Graham Knop]
+
+	Improvements:
+	- link to github distributions in meta-data.
+	- centroid of line will result in middle.  For longer flat polys, it
+	  will produce a clean error i.s.o "divide by zero". [Alex Sudakov]
+	- add .gitignore
 
 version 1.10: Wed  3 Jan 11:04:43 CET 2018
 	Another release, to test releasing to github.

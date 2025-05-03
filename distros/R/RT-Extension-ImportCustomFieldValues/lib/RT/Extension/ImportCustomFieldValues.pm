@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ImportCustomFieldValues;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 RT->AddStyleSheets('importcustomfieldvalues.css');
 

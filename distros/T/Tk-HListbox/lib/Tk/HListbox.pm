@@ -432,6 +432,64 @@ in I<Tk::Listbox>, and its index may be retrieved with the index B<"active">.
 
 NOTE:  Not supported by I<Tk::HList>.
 
+=item I<$listbox>-E<gt>B<add>(I<$entryPath ?,option> => I<value, ...?index>)
+
+Creates a new list entry with the pathname $entryPath. A list entry must be 
+created after its parent is created (unless this entry is a top-level entry, 
+which has no parent). See also "BUGS" below. This method returns the entryPath 
+of the newly created list entry. The following configuration options can be 
+given to configure the list entry:
+
+=over
+
+=item B<-at> => I<position>
+
+Insert the new list at the position given by position. position must be a 
+valid integer. The position 0 indicates the first position, 1 indicates 
+the second position, and so on.
+
+=item B<-after> => I<afterWhich>
+
+Insert the new list entry after the entry identified by I<afterWhich>, 
+which must be a valid list entry and it mush have the same parent as the 
+new list entry.
+
+=item B<-before> => I<beforeWhich>
+
+Insert the new list entry before the entry identified by I<beforeWhich>, 
+which must be a valid list entry and it mush have the same parent as the 
+new list entry.
+
+=item B<-data> => I<string>
+
+Specifies a string to associate with this list entry.  This string can be 
+queried by the info method. The application programmer can use the I<-data> 
+option to associate the list entry with the data it represents.
+
+=item B<-itemtype> => I<type>
+
+Specifies the type of display item to be display for the new list entry.  
+I<type> must be a valid display item type.  Currently the available 
+display item types are imagetext, text, and $widget.  If this option is 
+not specified, then by default the type specified by this HList widget's 
+I<-itemtype> option is used.
+
+=item B<-state> => I<state>
+
+Specifies whether this entry can be selected or invoked by the user.  
+Must be either normal or disabled.
+
+=back
+
+The I<add()> method accepts additional configuration options to configure the 
+display item associated with this list entry.  The set of additional 
+configuration options depends on the type of the display item given by the 
+I<-itemtype> option.  Please see L<Tk::DItem> for a list of the configuration 
+options for each of the display item types.  This method is associated with 
+L<Tk::HList> and will accept strings as I<entryPath>s.  Unlike HList, 
+entrypaths containing dots are not added as "children" because Tk::HListbox 
+does not support "tree" lists (multi-level lists).
+
 =item I<$listbox>-E<gt>B<bbox>(I<index>)
 
 Returns a list of four numbers describing the bounding box of the text in the 
@@ -1295,8 +1353,8 @@ use Carp;
 use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
-use vars qw($VERSION @Selection $Prev $tixIndicatorArmed $DEFAULTFONT);
-$VERSION = '2.71';
+use vars qw($VERSION $DEFAULTFONT);
+$VERSION = '3.00';
 
 Tk::Widget->Construct('HListbox');
 
@@ -1314,10 +1372,10 @@ sub ClassInit
 # $mw->bind($class, '<Double-1>' => \&Tk::NoOp);
 	$mw->bind($class,'<Double-1>' => ['DoubleButton1',Ev('index',Ev('@'))]);
 	$mw->bind($class,'<B1-Motion>',['Motion',Ev('index',Ev('@'))]);
+	$mw->bind($class,'<Alt-ButtonRelease-1>',['jwtAltButtonRelease_1', Ev('index',Ev('@'))]);
 	$mw->bind($class,'<ButtonRelease-1>','ButtonRelease_1');
 	$mw->bind($class,'<Shift-1>',['ShiftButton1',Ev('index',Ev('@'))]);  #JWT:ADDED 20091020!
 	$mw->bind($class,'<Control-ButtonPress-1>',['BeginToggle',Ev('index',Ev('@'))]);
-	$mw->bind($class,'<Alt-ButtonPress-1>',['AltButtonPress_1', Ev('index',Ev('@'))]);
 	$mw->bind($class,'<ButtonPress-1>',['ButtonPress_1', Ev('index',Ev('@'))]);
 	$mw->bind($class,'<B1-Leave>',['AutoScan',Ev('x'),Ev('y')]);
 	$mw->bind($class,'<B1-Enter>','CancelRepeat');
@@ -1339,6 +1397,9 @@ sub ClassInit
  # Additional Tk bindings that aren't part of the Motif look and feel:
 	if ($JWTLISTBOXHACK) {
 		$mw->bind($class,'<Shift-space>',['ShiftSpace',Ev('index','active')]);  #JWT:ADDED 20091020!
+		$mw->bind($class,'<Alt-space>',['jwtAltSpace',Ev('index','active')]);  #JWT:ADDED 20091020!
+		$mw->bind($class,'<plus>',['KeyboardToggleIndicator','<Activate>',Ev('index','active')]);
+		$mw->bind($class,'<minus>',['KeyboardToggleIndicator','<Disarm>',Ev('index','active')]);
 	}
 	$mw->bind($class,'<Shift-Select>',['BeginExtend',Ev('index','active')]);  #JWT:ADDED 20091020!
 	$mw->bind($class, '<Escape>', 'Cancel');
@@ -1392,6 +1453,8 @@ sub Populate {
 			-font          => [qw/METHOD  font         Font/,   $DEFAULTFONT],
 			-showcursoralways => [qw/PASSIVE showcursoralways showcursoralways/, 0],
 			-takefocus     => ['METHOD', 'takeFocus', 'TakeFocus', ''],  #JWT:MUST BE METHOD SINCE SCROLLED EATS IT OTHERWISE!
+			-Prev          => [qw/PASSIVE/],
+			-Selection     => [qw/PASSIVE/],
 	);
 
 	my $Palette = $w->Palette;
@@ -1877,7 +1940,6 @@ sub SpaceSelect   #JWT:THIS WORKS SLIGHTLY DIFFERENT THAN NORMAL LISTBOX B/C THE
 	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	$w->BeginSelect(@_);
-	$w->Callback(-indicatorcmd => $_[0])  if ($w->cget('-indicator') && $w->indicator('exists', $w->getEntry($_[0])));
 	$w->activate($_[0]);
 	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
 		$w->Callback(-browsecmd);
@@ -1917,6 +1979,30 @@ sub get {
 				if (defined($first) && !$w->info('hidden', $first));
 		return $data;
 	}
+}
+
+#HList CONVERTS ENTRY TEXTS CONTAINING DOTS TO CHILDREN (TREE-LIKE LISTS), SO WE MUST PREVENT
+#THAT IN ORDER TO ENSURE WE GET A SINGLE-LEVEL "LIST", SINCE WE'RE A "Listbox" WIDGET THAT
+#SUPPORTS SOME "HList-LIKE" FEATURES, *NOT* AN "HList" (WANT TREES, USE HList)!!!:
+sub add {  #ADDED W/v3.00
+	my $w = shift;
+	my $e = shift;
+	my %args = @_;
+	if ($e =~ /\./o) {
+		(my $erenamed = $e) =~ s/\./\-/go;
+		$args{-text} = $e  unless (defined $args{-text});
+		$e = $erenamed;
+	}
+	my $indx = 'end';
+	foreach my $arg ('-at','-before','-after') {
+		if (defined $args{$arg}) {
+			$indx = $w->indexOf($args{$arg});
+			$indx++  if ($arg eq '-after');
+			delete $args{$arg};
+			last;
+		}
+	}
+	$w->insert($indx, {%args});
 }
 
 sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
@@ -2147,14 +2233,12 @@ sub fixListSize {
 	# The width is set OK when -width=0   # NOT TRUE WHEN CHANGING FONT SIZE
 	unless ($w <= 0) {
 		$w_chars = $self->_getwidth($w, 'characters');
-#x print "--fixing width:=$w_chars=\n";
 		$self->configure(-width => $w_chars);
 	}
 
 	# The height is set OK when -height=0
 	unless ($h <= 0) {
 		$h_chars = $self->_getheight($h, 'characters');
-#x print "--fixing height:=$h_chars=\n";
 		$self->configure(-height => $h_chars);
 	}
 }
@@ -2307,7 +2391,6 @@ sub _getwidth {
 		if ($indicator == 1) {
 			if ($self->indicator('exists', $path) ) {
 				($indicatorw, undef) = $self->indicator('size', $path);
-
 			} else {# Option -indicator=1, but no indicator defined.
 				# HList will provide a gap so we need get width
 				$indicatorw = 20;
@@ -2413,6 +2496,12 @@ sub indexOf {  #GIVEN A VALID HList "ENTRY", RETURN IT'S RELATIVE (TO ZERO=1ST) 
 	my $indx = 0;
 	foreach my $entrypath (@{$entrypaths_ref}) {
 		return $indx  if ($entry eq $entrypath);
+		if ($entry =~ /[a-zA-Z]/o) {  #v3.00+ ALSO RETURN INDEX FOR "HListy" TEXT STRING ENTRYPATHS!:
+			my $entrypath = $w->get($entrypath);
+no strict "refs";
+			return $indx  if (defined($entrypath) && defined($entrypath->{-text})
+					&& $entry eq $entrypath->{-text});
+		}
 		$indx++;
 	}
 	return undef;   #ENTRY DOES NOT EXIST!
@@ -2517,8 +2606,6 @@ sub DoubleButton1    #USER DOUBLE-CLICKED LEFT MOUSE-BUTTON (has already done a 
 	return  if ($_[0]->{Configure}{'-state'} =~ /d/o);
 
 	$_[0]->InvokeCommand;
-	$_[0]->selectionClear('0','end');
-	$_[0]->selectionSet($_[0]->index('active'));
 	$_[0]->eventGenerate("<<ListboxSelect>>");
 }
 
@@ -2548,9 +2635,9 @@ sub ShiftUpDown {    #USER PRESSED UP OR DOWN ARROW WHILST HOLDING <SHIFT> KEY D
 			$w->selectionSet($active);
 		}
 	} else {
-		if (!@Selection) {
+		if (!@{$w->{-selection}}) {
 			$w->selectionSet($active);
-			@Selection = $w->curselection;
+			@{$w->{-selection}} = $w->curselection;
 		}
 	}
 
@@ -2631,8 +2718,8 @@ sub UpDown   #USER PRESSED AN UP OR DOWN ARROW KEY:
 		$w->selectionClear(0,'end');
 		$w->selectionSet('active');
 		$w->selectionAnchor('active');
-		$Prev = $w->index('active');
-		@Selection = ();
+		$w->{-Prev} = $w->index('active');
+		@{$w->{-selection}} = ();
 		$w->eventGenerate("<<ListboxSelect>>");
 	}
 }
@@ -2741,7 +2828,7 @@ sub BeginSelect   #Mouse button-press (button 1)
 				$w->selectionSet($el);
 			}
 		}
-		@Selection = ();
+		@{$w->{-selection}} = ();
 	} elsif ($mode =~ /^multiple/o) {
 		if ($w->selectionIncludes($el)) {
 			$w->selectionClear($el);
@@ -2752,9 +2839,9 @@ sub BeginSelect   #Mouse button-press (button 1)
 		$w->selectionClear(0,'end');
 		$w->selectionSet($el);
 		$w->selectionAnchor($el);
-		@Selection = ();
+		@{$w->{-selection}} = ();
 	}
-	$Prev = $el;
+	$w->{-Prev} = $el;
 	$w->eventGenerate("<<ListboxSelect>>");
 }
 
@@ -3090,29 +3177,13 @@ sub SPLICE {
 sub ButtonPress_1
 {
 	my $w = shift;
-
-	if (Tk::Exists($w)) {
-		$tixIndicatorArmed = -1;
-		return  if ($w->{Configure}{'-state'} =~ /d/o);
-
-		$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
-		$w->BeginSelect(@_);
-	}
-}
-
-sub AltButtonPress_1
-{
-	my $w = shift;
 	my $clickedon = shift;
 
 	if (Tk::Exists($w)) {
-		$tixIndicatorArmed = -1;
 		return  if (!defined($clickedon) || $w->{Configure}{'-state'} =~ /d/o || scalar($w->size) <= 0);
 
-		$w->Tk::HList::anchorSet($w->getEntry($clickedon));
 		$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
-		#WE'LL LET ButtonRelease1 ACTIVATE.
-		$w->BeginSelect(@_);
+		$w->BeginSelect($clickedon, @_);
 	}
 }
 
@@ -3148,6 +3219,22 @@ sub ButtonRelease_1
 	}
 }
 
+sub jwtAltButtonRelease_1 {  #Alt-mousebutton1 released:  Set selection to only this item, & activate:
+	my $w = shift;
+	return  if ($w->{Configure}{'-state'} =~ /d/o || scalar($w->size) <= 0);  #patch by Jeff Stephens.
+
+	if ($JWTLISTBOXHACK && !exists $w->{tixindicator}) {
+		my $Ev = $w->XEvent;
+		my $index = $w->index('@' . $Ev->x . ',' . $Ev->y);
+		$w->selectionClear(0,'end');
+		$w->selectionSet($index);
+		$w->selectionAnchor($index);
+		$w->focus  if ($w->cget('-takefocus'));
+		$w->eventGenerate("<<ListboxSelect>>");
+	}
+	$w->ButtonRelease_1();
+}
+
 # Motion --
 #
 # This procedure is called to process mouse motion events while
@@ -3163,12 +3250,15 @@ sub Motion
 	my $el = shift;
 	#HANDLE THIS SILLY "TIX" STUFF:
 	my $Ev = $w->XEvent;
-	my @info = $w->info('item',$Ev->x, $Ev->y);
+	return  unless (defined $Ev);
+
+	my $mode = $w->cget('-selectmode');
+	return  if ($mode eq 'dragdrop');
 
 	return  if ($w->{Configure}{'-state'} =~ /d/o);
 	return  if (exists($w->{tixindicator}));
 	return  unless (defined $el);
-	return  if (defined($Prev) && $el == $Prev);
+	return  if (defined($w->{-Prev}) && $el == $w->{-Prev});
 
 	my $anchor = $w->index('anchor');
 	if ($JWTLISTBOXHACK) {
@@ -3178,14 +3268,13 @@ sub Motion
 			$w->selectionSet($el);
 		}
 	}
-	my $mode = $w->cget('-selectmode');
 	if ($mode =~ /^browse/o) {
 		$w->selectionClear(0,'end');
 		$w->selectionSet($el);
-		$Prev = $el;
+		$w->{-Prev} = $el;
 		$w->eventGenerate("<<ListboxSelect>>");
 	} elsif ($mode =~ /^extended/o) {
-		my $i = $Prev;
+		my $i = $w->{-Prev};
 		if (!defined $i || $i eq '') {
 			$i = $el;
 			$w->selectionSet($el);
@@ -3197,22 +3286,22 @@ sub Motion
 			$w->selectionClear($i,$el);
 			$w->selectionClear('anchor',$el);
 		}
-		if (!@Selection) {
-			@Selection = $w->curselection;
+		if (!@{$w->{-selection}}) {
+			@{$w->{-selection}} = $w->curselection;
 		}
 		while ($i < $el && $i < $anchor) {
-			if (Tk::lsearch(\@Selection,$i) >= 0) {
+			if (Tk::lsearch(\@{$w->{-selection}},$i) >= 0) {
 				$w->selectionSet($i);
 			}
 			$i++
 		}
 		while ($i > $el && $i > $anchor) {
-			if (Tk::lsearch(\@Selection,$i) >= 0) {
+			if (Tk::lsearch(\@{$w->{-selection}},$i) >= 0) {
 				$w->selectionSet($i);
 			}
 			$i--;
 		}
-		$Prev = $el;
+		$w->{-Prev} = $el;
 		$w->eventGenerate("<<ListboxSelect>>");
 	}
 }
@@ -3291,6 +3380,39 @@ sub ShiftSpace  #(jwtlistboxhack only!) Shift-spacebar pressed:  Select from anc
 	$w->eventGenerate("<<ListboxSelect>>");
 }
 
+sub jwtAltSpace  #Shift-spacebar pressed:  Select from anchor to active inclusive:
+{
+	my $w = shift;
+	my $el = shift;
+
+	my $anchor = $w->index('anchor');
+	my $mode = $w->cget('-selectmode');
+	$w->selectionClear(0, 'end');
+	$w->selectionSet($el);
+	$w->selectionAnchor($el);
+	$w->activate($el);
+	$w->eventGenerate("<<ListboxSelect>>");
+}
+
+sub KeyboardToggleIndicator   #<"+" or "-" KEY PRESSED:
+{
+	my $w = shift;
+	my $indcmd = shift;
+	my $el = shift;
+
+	my @info = $w->info('anchor');
+	return  unless (defined $info[0]);
+
+	$w->{tixindicator} = $w->indexOf($info[0]);
+	if ($w->indicator('exists', $info[0])) {
+		my @ops = $w->indicator('configure', $info[0]);
+		$w->Callback(-indicatorcmd => $w->indexOf($info[0]), $indcmd)  if ($#ops > 0);
+		$w->Callback(-indicatorcmd => $w->indexOf($info[0]), $indcmd)  if ($#ops > 0);
+	}
+	delete $w->{tixindicator};
+
+}
+
 # BeginToggle --
 #
 # This procedure is typically invoked on control-button-1 presses. It
@@ -3310,8 +3432,8 @@ sub BeginToggle
 	my $el = shift;
 
 	if ($w->cget('-selectmode') =~ /^extended/o) {
-		@Selection = $w->curselection();
-		$Prev = $el;
+		@{$w->{-selection}} = $w->curselection();
+		$w->{-Prev} = $el;
 		$w->selectionAnchor($el);
 		if ($w->selectionIncludes($el)) {
 	 		$w->selectionClear($el)
@@ -3371,15 +3493,15 @@ sub Cancel
 	if ($JWTLISTBOXHACK) {
 		$w->selectionClear('0', 'end')  if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o);
 	} else {
-		return if ($w->cget('-selectmode') ne 'extended' || !defined $Prev);
+		return if ($w->cget('-selectmode') ne 'extended' || !defined $w->{-Prev});
 
 		my $first = $w->index('anchor');
 		my $active = $w->index('active');
-		my $last = $Prev;
+		my $last = $w->{-Prev};
 		($first, $last) = ($last, $first)  if ($first > $last);
 		$w->selectionClear($first,$last);
 		while ($first <= $last) {
-			if (Tk::lsearch(\@Selection,$first) >= 0) {
+			if (Tk::lsearch(\@{$w->{-selection}},$first) >= 0) {
 				$w->selectionSet($first)
 			}
 			$first++

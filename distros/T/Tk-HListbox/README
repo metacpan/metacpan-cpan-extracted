@@ -344,6 +344,57 @@ WIDGET METHODS
 
         NOTE: Not supported by *Tk::HList*.
 
+    *$listbox*->add(*$entryPath ?,option* => *value, ...?index*)
+        Creates a new list entry with the pathname $entryPath. A list entry
+        must be created after its parent is created (unless this entry is a
+        top-level entry, which has no parent). See also "BUGS" below. This
+        method returns the entryPath of the newly created list entry. The
+        following configuration options can be given to configure the list
+        entry:
+
+        -at => *position*
+            Insert the new list at the position given by position. position
+            must be a valid integer. The position 0 indicates the first
+            position, 1 indicates the second position, and so on.
+
+        -after => *afterWhich*
+            Insert the new list entry after the entry identified by
+            *afterWhich*, which must be a valid list entry and it mush have
+            the same parent as the new list entry.
+
+        -before => *beforeWhich*
+            Insert the new list entry before the entry identified by
+            *beforeWhich*, which must be a valid list entry and it mush have
+            the same parent as the new list entry.
+
+        -data => *string*
+            Specifies a string to associate with this list entry. This
+            string can be queried by the info method. The application
+            programmer can use the *-data* option to associate the list
+            entry with the data it represents.
+
+        -itemtype => *type*
+            Specifies the type of display item to be display for the new
+            list entry. *type* must be a valid display item type. Currently
+            the available display item types are imagetext, text, and
+            $widget. If this option is not specified, then by default the
+            type specified by this HList widget's *-itemtype* option is
+            used.
+
+        -state => *state*
+            Specifies whether this entry can be selected or invoked by the
+            user. Must be either normal or disabled.
+
+        The *add()* method accepts additional configuration options to
+        configure the display item associated with this list entry. The set
+        of additional configuration options depends on the type of the
+        display item given by the *-itemtype* option. Please see Tk::DItem
+        for a list of the configuration options for each of the display item
+        types. This method is associated with Tk::HList and will accept
+        strings as *entryPath*s. Unlike HList, entrypaths containing dots
+        are not added as "children" because Tk::HListbox does not support
+        "tree" lists (multi-level lists).
+
     *$listbox*->bbox(*index*)
         Returns a list of four numbers describing the bounding box of the
         text in the element given by *index*. The first two elements of the

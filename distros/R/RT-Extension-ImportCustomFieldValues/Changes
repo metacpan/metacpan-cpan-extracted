@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ImportCustomFieldValues
 
+0.04 2025-05-02
+ - Makes it compatible with RT 5.x and 6.0.x
+ - Add link to export current values to a csv file
+
 0.03 2022-02-11
  - Fix handling of utf-8 chars
 

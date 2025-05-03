@@ -14,7 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-UniqFiles",
   "EXE_FILES" => [
+    "script/dupe-filenames",
+    "script/dupe-filenames-between-two-dirs",
     "script/dupe-files",
+    "script/uniq-filenames",
+    "script/uniq-filenames-between-two-dirs",
     "script/uniq-files"
   ],
   "LICENSE" => "perl",
@@ -28,10 +32,13 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::float" => "0.914",
     "Data::Sah::Compiler::perl::TH::int" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
-    "File::FindUniq" => "0.002",
+    "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
+    "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
+    "File::FindUniq" => "0.004",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
+    "Sah::Schema::dirname" => 0,
     "Sah::Schema::filesize" => 0,
     "Sah::Schema::true" => 0,
     "strict" => 0
@@ -42,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.143.1",
+  "VERSION" => "0.144",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,13 +65,16 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::float" => "0.914",
   "Data::Sah::Compiler::perl::TH::int" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
-  "File::FindUniq" => "0.002",
+  "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
+  "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
+  "File::FindUniq" => "0.004",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
+  "Sah::Schema::dirname" => 0,
   "Sah::Schema::filesize" => 0,
   "Sah::Schema::true" => 0,
   "Test::More" => 0,

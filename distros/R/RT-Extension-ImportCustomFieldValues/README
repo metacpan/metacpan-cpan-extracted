@@ -3,7 +3,7 @@ NAME
     values from CSV file
 
 RT VERSION
-    Works with RT 4.2 and 4.4.
+    Works with RT >= 4.2 < 6.1.0
 
 INSTALLATION
     "perl Makefile.PL"
@@ -12,7 +12,7 @@ INSTALLATION
         May need root permissions
 
     Edit your /opt/rt4/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
+        Add this line:
 
             Plugin('RT::Extension::ImportCustomFieldValues');
 
@@ -31,8 +31,10 @@ DETAILS
 
     CSV file must a consist of a text file with:
 
-    - File encoding: UTF-8 - Fields separated by ";" - No headers - Using
-    the following columns and order: SortOrder, Name, Description, Category
+    - File encoding: UTF-8 
+    - Fields separated by ";" 
+    - No headers or the following one: "SortOrder;Name;Description;Category"
+    - Using the following columns and order: SortOrder, Name, Description, Category
     - Column "Name" is mandatory, other columns may be empty but must exists
 
 AUTHOR
@@ -48,7 +50,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ImportCustomFieldValues>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2022 by Emmanuel Lacour.
+    This software is Copyright (c) 2022-2025 by Emmanuel Lacour.
 
     This is free software, licensed under:
 

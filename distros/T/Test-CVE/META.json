@@ -4,7 +4,7 @@
       "H.Merijn Brand <hmbrand@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,6 +35,7 @@
             "HTTP::Tiny" : "0",
             "JSON::MaybeXS" : "0",
             "Module::CoreList" : "0",
+            "Test::Builder::Module" : "0",
             "Text::Wrap" : "0",
             "YAML::PP" : "0",
             "perl" : "5.014",
@@ -44,12 +45,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/CPAN-Security/Test-CVE/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/CPAN-Security/Test-CVE.git",
          "web" : "https://github.com/CPAN-Security/Test-CVE"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

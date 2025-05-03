@@ -36,21 +36,27 @@ Test::CVE - Test against known CVE's
  print $cve->report (width => $ENV{COLUMNS} || 80);
  my $csv = $cve->csv;
 
+ has_no_cves (....);
+
 =cut
 
 use 5.014000;
 use warnings;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use version;
 use Carp;
 use HTTP::Tiny;
+use Text::Wrap;
 use JSON::MaybeXS;
 use Module::CoreList;
-use Text::Wrap;
-use YAML::PP ();
+use YAML::PP     ();
 use List::Util qw( first );
+use base       qw( Test::Builder::Module );
+
+use parent "Exporter";
+our @EXPORT  = qw( has_no_cves );
 
 # TODO:
 # * NEW! https://fastapi.metacpan.org/cve/CPANSA-YAML-LibYAML-2012-1152
@@ -479,6 +485,14 @@ sub cve {
     @cve;
     } # cve
 
+sub has_no_cves {
+    my $cve = Test::CVE->new (@_);
+    $cve->test;
+    my @cve = $cve->cve;
+    my $tb = __PACKAGE__->builder;
+    $tb->ok (@cve == 0, "This release found no open CVEs");
+    } # has_no_cves
+
 1;
 
 __END__
@@ -694,6 +708,26 @@ Date for this CVE
 Severity. Most entries doe not have a severity
 
 =back
+
+=head3 has_no_cves
+
+ use Test::More;
+ use Test::CVE;
+
+ has_no_cves ();
+ done_testing;
+
+Will return C<ok> is no open CVE's are detected for the current build
+environment.
+
+C<has_no_cves> will accept all arguments that C<new> accepts.
+
+ has_no_cves (@args);
+
+is identical to
+
+ my @cve = @{Test::CVE->new (@args)->test-cve // []};
+ ok (@cve == 0, "This release found no open CVEs");
 
 =head1 TODO and IDEAS
 

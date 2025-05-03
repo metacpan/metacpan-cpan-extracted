@@ -1,14 +1,14 @@
-# Copyrights 2004-2018 by [Mark Overmeer].
+# Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Math::Polygon.  Meta-POD processed with
+# Pod stripped from pm file by OODoc 2.03.
+# This code is part of distribution Math-Polygon.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Math::Polygon;
-use vars '$VERSION';
-$VERSION = '1.10';
+package Math::Polygon;{
+our $VERSION = '1.11';
+}
 
 
 use strict;
@@ -86,6 +86,7 @@ sub area()
     return $self->{MP_area} if defined $self->{MP_area};
     $self->{MP_area} = polygon_area $self->points;
 }
+
 
 sub centroid()
 {   my $self = shift;

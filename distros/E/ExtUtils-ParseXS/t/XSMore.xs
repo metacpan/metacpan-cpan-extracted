@@ -30,6 +30,10 @@ This parts are ignored.
 #  define PERL_UNUSED_VAR(x) ((void)x)
 #endif
 
+/* Newx was introduced in 5.8.8, would also be in ppport.h */
+#ifndef Newx
+#  define Newx(v,n,t)                    New(0,v,n,t)
+#endif
 
 
 STATIC void
@@ -251,3 +255,17 @@ INCLUDE: XSInclude.xsh
 # for testing #else directive
 
 #endif
+
+MODULE=XSMore PACKAGE=XSMore::More
+
+void
+dummy()
+PROTOTYPE: $$$$$
+CODE:
+  NOOP;
+
+void
+should_not_have_prototype()
+OVERLOAD: +
+CODE:
+  NOOP;

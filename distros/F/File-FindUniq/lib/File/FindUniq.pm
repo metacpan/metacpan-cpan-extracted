@@ -10,9 +10,9 @@ use Exporter qw(import);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-05'; # DATE
+our $DATE = '2025-05-03'; # DATE
 our $DIST = 'File-FindUniq'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub _glob {
     require File::Find;
@@ -637,6 +637,7 @@ sub uniq_files {
     [200, "OK", \@rows, \%resmeta];
 }
 
+# dupe_files
 gen_modified_sub(
     base_name => 'uniq_files',
     output_name => 'dupe_files',
@@ -673,6 +674,178 @@ MARKDOWN
     },
 );
 
+# uniq_filenames
+gen_modified_sub(
+    base_name => 'uniq_files',
+    output_name => 'uniq_filenames',
+    description => <<'MARKDOWN',
+
+This is a thin wrapper for <prog:uniq-files>. It sets `algorithm` to `name`.
+
+MARKDOWN
+    remove_args => ['algorithm'],
+    modify_meta => sub {
+        $_[0]{examples} = [
+            {
+                summary   => 'Find unique filenames in two directories',
+                src       => 'uniq-filenames -uR dir1 dir2',
+                src_plang => 'bash',
+                test      => 0,
+                'x.doc.show_result' => 0,
+            },
+        ];
+    },
+    output_code => sub {
+        my %args = @_;
+        uniq_files(%args, algorithm => 'name');
+    },
+);
+
+# dupe_filenames
+gen_modified_sub(
+    base_name => 'uniq_files',
+    output_name => 'dupe_filenames',
+    description => <<'MARKDOWN',
+
+This is a thin wrapper for <prog:uniq-files>. It sets `algorithm` to `name`,
+defaults `report_unique` to 0 and `report_duplicate` to 1.
+
+MARKDOWN
+    remove_args => ['algorithm'],
+    modify_args => {
+        report_unique => sub {
+            $_[0]{schema} = [bool => {default=>0}];
+        },
+        report_duplicate => sub {
+            $_[0]{schema} = [int => {in=>[0,1,2,3], default=>1}];
+        },
+    },
+    modify_meta => sub {
+        $_[0]{examples} = [
+            {
+                summary   => 'Find duplicate filenames in two directories',
+                src       => 'dupe-filenames -R dir1 dir2',
+                src_plang => 'bash',
+                test      => 0,
+                'x.doc.show_result' => 0,
+            },
+        ];
+    },
+    output_code => sub {
+        my %args = @_;
+        $args{report_unique} //= 0;
+        $args{report_duplicate} //= 1;
+        uniq_files(%args, algorithm=>'name');
+    },
+);
+
+# uniq_filenames_between_two_dirs
+gen_modified_sub(
+    base_name => 'uniq_files',
+    output_name => 'uniq_filenames_between_two_dirs',
+    description => <<'MARKDOWN',
+
+This is a thin wrapper for <prog:uniq-files>. It sets `algorithm` to `name`,
+`recurse` to true. It also accepts two directory names instead of one+ dir/file
+names.
+
+MARKDOWN
+    add_args => {
+        dir1 => {
+            schema => 'dirname*',
+            req => 1,
+            pos => 0,
+        },
+        dir2 => {
+            schema => 'dirname*',
+            req => 1,
+            pos => 1,
+        },
+    },
+    remove_args => ['algorithm', 'files', 'recurse'],
+    modify_meta => sub {
+        $_[0]{examples} = [
+            {
+                summary   => 'Find unique filenames in two directories',
+                src       => 'uniq-filenames-between-two-dirs -u dir1 dir2',
+                src_plang => 'bash',
+                test      => 0,
+                'x.doc.show_result' => 0,
+            },
+        ];
+    },
+    output_code => sub {
+        my %args = @_;
+        my $dir1 = delete $args{dir1};
+        my $dir2 = delete $args{dir2};
+        uniq_files(
+            %args,
+            files => [$dir1, $dir2],
+            algorithm => 'name',
+            recurse => 1,
+        );
+    },
+);
+
+# dupe_filenames_between_two_dirs
+gen_modified_sub(
+    base_name => 'uniq_files',
+    output_name => 'dupe_filenames_between_two_dirs',
+    description => <<'MARKDOWN',
+
+This is a thin wrapper for <prog:uniq-files>. It sets `algorithm` to `name`,
+`recurse` to true, defaults `report_unique` to 0 and `report_duplicate` to 1. It
+also accepts two directory names instead of one+ dir/file names.
+
+MARKDOWN
+    add_args => {
+        dir1 => {
+            schema => 'dirname*',
+            req => 1,
+            pos => 0,
+        },
+        dir2 => {
+            schema => 'dirname*',
+            req => 1,
+            pos => 1,
+        },
+    },
+    remove_args => ['algorithm', 'files', 'recurse'],
+    modify_args => {
+        report_unique => sub {
+            $_[0]{schema} = [bool => {default=>0}];
+        },
+        report_duplicate => sub {
+            $_[0]{schema} = [int => {in=>[0,1,2,3], default=>1}];
+        },
+    },
+    modify_meta => sub {
+        $_[0]{examples} = [
+            {
+                summary   => 'Find duplicate filenames in two directories',
+                src       => 'dupe-filenames-between-two-dirs dir1 dir2',
+                src_plang => 'bash',
+                test      => 0,
+                'x.doc.show_result' => 0,
+            },
+        ];
+    },
+    output_code => sub {
+        my %args = @_;
+        my $dir1 = delete $args{dir1};
+        my $dir2 = delete $args{dir2};
+        $args{report_unique} //= 0;
+        $args{report_duplicate} //= 1;
+        uniq_files(
+            %args,
+            files => [$dir1, $dir2],
+            algorithm => 'name',
+            recurse => 1,
+        );
+    },
+);
+
+
 1;
 # ABSTRACT: Find unique or duplicate file {contents,names}
 
@@ -688,7 +861,7 @@ File::FindUniq - Find unique or duplicate file {contents,names}
 
 =head1 VERSION
 
-This document describes version 0.002 of File::FindUniq (from Perl distribution File-FindUniq), released on 2024-12-05.
+This document describes version 0.004 of File::FindUniq (from Perl distribution File-FindUniq), released on 2025-05-03.
 
 =head1 SYNOPSIS
 
@@ -743,6 +916,255 @@ names.
 =head1 NOTES
 
 =head1 FUNCTIONS
+
+
+=head2 dupe_filenames
+
+Usage:
+
+ dupe_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Report duplicate or unique files, optionally perform action on them.
+
+This is a thin wrapper for L<uniq-files>. It sets C<algorithm> to C<name>,
+defaults C<report_unique> to 0 and C<report_duplicate> to 1.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<authoritative_dirs> => I<array[str]>
+
+Denote director(yE<verbar>ies) where authoritativeE<sol>"Original" copies are found.
+
+=item * B<detail> => I<true>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+=item * B<digest_args> => I<array>
+
+Some Digest algorithms require arguments, you can pass them here.
+
+=item * B<exclude_empty_files> => I<bool>
+
+(No description)
+
+=item * B<exclude_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to include.
+
+=item * B<files>* => I<array[str]>
+
+(No description)
+
+=item * B<group_by_digest> => I<bool>
+
+Sort files by its digest (or size, if not computing digest), separate each different digest.
+
+=item * B<include_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to exclude.
+
+=item * B<max_size> => I<filesize>
+
+Maximum file size to consider.
+
+=item * B<min_size> => I<filesize>
+
+Minimum file size to consider.
+
+=item * B<recurse> => I<bool>
+
+If set to true, will recurse into subdirectories.
+
+=item * B<report_duplicate> => I<int> (default: 1)
+
+Whether to return duplicate items.
+
+Can be set to either 0, 1, 2, or 3.
+
+If set to 0, duplicate items will not be returned.
+
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. For example: C<file1> contains text 'a', C<file2> 'b', C<file3> 'a'. Then
+C<file1> and C<file3> will be returned.
+
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. Continuing from previous example, only C<file1> will be returned
+because C<file2> is unique and C<file3> contains 'a' (already represented by
+C<file1>). If one or more C<--authoritative-dir> (C<-O>) options are specified,
+files under these directories will be preferred.
+
+If set to 3, will return all but the first of duplicate items. Continuing from
+previous example: C<file3> will be returned. This is useful if you want to keep
+only one copy of the duplicate content. You can use the output of this routine
+to C<mv> or C<rm>. Similar to the previous case, if one or more
+C<--authoritative-dir> (C<-O>) options are specified, then files under these
+directories will not be listed if possible.
+
+=item * B<report_unique> => I<bool> (default: 0)
+
+Whether to return unique items.
+
+=item * B<show_count> => I<bool> (default: 0)
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
+
+=item * B<show_digest> => I<true>
+
+Show the digest value (or the size, if not computing digest) for each file.
+
+Note that this routine does not compute digest for files which have unique
+sizes, so they will show up as empty.
+
+=item * B<show_size> => I<true>
+
+Show the size for each file.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 dupe_filenames_between_two_dirs
+
+Usage:
+
+ dupe_filenames_between_two_dirs(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Report duplicate or unique files, optionally perform action on them.
+
+This is a thin wrapper for L<uniq-files>. It sets C<algorithm> to C<name>,
+C<recurse> to true, defaults C<report_unique> to 0 and C<report_duplicate> to 1. It
+also accepts two directory names instead of one+ dir/file names.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<authoritative_dirs> => I<array[str]>
+
+Denote director(yE<verbar>ies) where authoritativeE<sol>"Original" copies are found.
+
+=item * B<detail> => I<true>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+=item * B<digest_args> => I<array>
+
+Some Digest algorithms require arguments, you can pass them here.
+
+=item * B<dir1>* => I<dirname>
+
+(No description)
+
+=item * B<dir2>* => I<dirname>
+
+(No description)
+
+=item * B<exclude_empty_files> => I<bool>
+
+(No description)
+
+=item * B<exclude_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to include.
+
+=item * B<group_by_digest> => I<bool>
+
+Sort files by its digest (or size, if not computing digest), separate each different digest.
+
+=item * B<include_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to exclude.
+
+=item * B<max_size> => I<filesize>
+
+Maximum file size to consider.
+
+=item * B<min_size> => I<filesize>
+
+Minimum file size to consider.
+
+=item * B<report_duplicate> => I<int> (default: 1)
+
+Whether to return duplicate items.
+
+Can be set to either 0, 1, 2, or 3.
+
+If set to 0, duplicate items will not be returned.
+
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. For example: C<file1> contains text 'a', C<file2> 'b', C<file3> 'a'. Then
+C<file1> and C<file3> will be returned.
+
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. Continuing from previous example, only C<file1> will be returned
+because C<file2> is unique and C<file3> contains 'a' (already represented by
+C<file1>). If one or more C<--authoritative-dir> (C<-O>) options are specified,
+files under these directories will be preferred.
+
+If set to 3, will return all but the first of duplicate items. Continuing from
+previous example: C<file3> will be returned. This is useful if you want to keep
+only one copy of the duplicate content. You can use the output of this routine
+to C<mv> or C<rm>. Similar to the previous case, if one or more
+C<--authoritative-dir> (C<-O>) options are specified, then files under these
+directories will not be listed if possible.
+
+=item * B<report_unique> => I<bool> (default: 0)
+
+Whether to return unique items.
+
+=item * B<show_count> => I<bool> (default: 0)
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
+
+=item * B<show_digest> => I<true>
+
+Show the digest value (or the size, if not computing digest) for each file.
+
+Note that this routine does not compute digest for files which have unique
+sizes, so they will show up as empty.
+
+=item * B<show_size> => I<true>
+
+Show the size for each file.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 
 
 =head2 dupe_files
@@ -849,6 +1271,254 @@ C<--authoritative-dir> (C<-O>) options are specified, then files under these
 directories will not be listed if possible.
 
 =item * B<report_unique> => I<bool> (default: 0)
+
+Whether to return unique items.
+
+=item * B<show_count> => I<bool> (default: 0)
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
+
+=item * B<show_digest> => I<true>
+
+Show the digest value (or the size, if not computing digest) for each file.
+
+Note that this routine does not compute digest for files which have unique
+sizes, so they will show up as empty.
+
+=item * B<show_size> => I<true>
+
+Show the size for each file.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 uniq_filenames
+
+Usage:
+
+ uniq_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Report duplicate or unique files, optionally perform action on them.
+
+This is a thin wrapper for L<uniq-files>. It sets C<algorithm> to C<name>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<authoritative_dirs> => I<array[str]>
+
+Denote director(yE<verbar>ies) where authoritativeE<sol>"Original" copies are found.
+
+=item * B<detail> => I<true>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+=item * B<digest_args> => I<array>
+
+Some Digest algorithms require arguments, you can pass them here.
+
+=item * B<exclude_empty_files> => I<bool>
+
+(No description)
+
+=item * B<exclude_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to include.
+
+=item * B<files>* => I<array[str]>
+
+(No description)
+
+=item * B<group_by_digest> => I<bool>
+
+Sort files by its digest (or size, if not computing digest), separate each different digest.
+
+=item * B<include_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to exclude.
+
+=item * B<max_size> => I<filesize>
+
+Maximum file size to consider.
+
+=item * B<min_size> => I<filesize>
+
+Minimum file size to consider.
+
+=item * B<recurse> => I<bool>
+
+If set to true, will recurse into subdirectories.
+
+=item * B<report_duplicate> => I<int> (default: 2)
+
+Whether to return duplicate items.
+
+Can be set to either 0, 1, 2, or 3.
+
+If set to 0, duplicate items will not be returned.
+
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. For example: C<file1> contains text 'a', C<file2> 'b', C<file3> 'a'. Then
+C<file1> and C<file3> will be returned.
+
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. Continuing from previous example, only C<file1> will be returned
+because C<file2> is unique and C<file3> contains 'a' (already represented by
+C<file1>). If one or more C<--authoritative-dir> (C<-O>) options are specified,
+files under these directories will be preferred.
+
+If set to 3, will return all but the first of duplicate items. Continuing from
+previous example: C<file3> will be returned. This is useful if you want to keep
+only one copy of the duplicate content. You can use the output of this routine
+to C<mv> or C<rm>. Similar to the previous case, if one or more
+C<--authoritative-dir> (C<-O>) options are specified, then files under these
+directories will not be listed if possible.
+
+=item * B<report_unique> => I<bool> (default: 1)
+
+Whether to return unique items.
+
+=item * B<show_count> => I<bool> (default: 0)
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
+
+=item * B<show_digest> => I<true>
+
+Show the digest value (or the size, if not computing digest) for each file.
+
+Note that this routine does not compute digest for files which have unique
+sizes, so they will show up as empty.
+
+=item * B<show_size> => I<true>
+
+Show the size for each file.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 uniq_filenames_between_two_dirs
+
+Usage:
+
+ uniq_filenames_between_two_dirs(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Report duplicate or unique files, optionally perform action on them.
+
+This is a thin wrapper for L<uniq-files>. It sets C<algorithm> to C<name>,
+C<recurse> to true. It also accepts two directory names instead of one+ dir/file
+names.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<authoritative_dirs> => I<array[str]>
+
+Denote director(yE<verbar>ies) where authoritativeE<sol>"Original" copies are found.
+
+=item * B<detail> => I<true>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+=item * B<digest_args> => I<array>
+
+Some Digest algorithms require arguments, you can pass them here.
+
+=item * B<dir1>* => I<dirname>
+
+(No description)
+
+=item * B<dir2>* => I<dirname>
+
+(No description)
+
+=item * B<exclude_empty_files> => I<bool>
+
+(No description)
+
+=item * B<exclude_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to include.
+
+=item * B<group_by_digest> => I<bool>
+
+Sort files by its digest (or size, if not computing digest), separate each different digest.
+
+=item * B<include_file_patterns> => I<array[str]>
+
+Filename (including path) regex patterns to exclude.
+
+=item * B<max_size> => I<filesize>
+
+Maximum file size to consider.
+
+=item * B<min_size> => I<filesize>
+
+Minimum file size to consider.
+
+=item * B<report_duplicate> => I<int> (default: 2)
+
+Whether to return duplicate items.
+
+Can be set to either 0, 1, 2, or 3.
+
+If set to 0, duplicate items will not be returned.
+
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. For example: C<file1> contains text 'a', C<file2> 'b', C<file3> 'a'. Then
+C<file1> and C<file3> will be returned.
+
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. Continuing from previous example, only C<file1> will be returned
+because C<file2> is unique and C<file3> contains 'a' (already represented by
+C<file1>). If one or more C<--authoritative-dir> (C<-O>) options are specified,
+files under these directories will be preferred.
+
+If set to 3, will return all but the first of duplicate items. Continuing from
+previous example: C<file3> will be returned. This is useful if you want to keep
+only one copy of the duplicate content. You can use the output of this routine
+to C<mv> or C<rm>. Similar to the previous case, if one or more
+C<--authoritative-dir> (C<-O>) options are specified, then files under these
+directories will not be listed if possible.
+
+=item * B<report_unique> => I<bool> (default: 1)
 
 Whether to return unique items.
 
@@ -1079,7 +1749,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

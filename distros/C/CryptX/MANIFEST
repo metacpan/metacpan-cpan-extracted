@@ -225,6 +225,7 @@ src/ltc/encauth/ocb3/ocb3_encrypt_last.c
 src/ltc/encauth/ocb3/ocb3_init.c
 src/ltc/encauth/ocb3/ocb3_int_ntz.c
 src/ltc/encauth/ocb3/ocb3_int_xor_blocks.c
+src/ltc/encauth/siv/siv.c
 src/ltc/hashes/blake2b.c
 src/ltc/hashes/blake2s.c
 src/ltc/hashes/chc/chc.c
@@ -532,9 +533,17 @@ src/ltc/pk/ecc/ecc_set_curve_internal.c
 src/ltc/pk/ecc/ecc_set_key.c
 src/ltc/pk/ecc/ecc_shared_secret.c
 src/ltc/pk/ecc/ecc_sign_hash.c
+src/ltc/pk/ecc/ecc_sign_hash_eth27.c
+src/ltc/pk/ecc/ecc_sign_hash_internal.c
+src/ltc/pk/ecc/ecc_sign_hash_rfc5656.c
+src/ltc/pk/ecc/ecc_sign_hash_rfc7518.c
 src/ltc/pk/ecc/ecc_sizes.c
 src/ltc/pk/ecc/ecc_ssh_ecdsa_encode_name.c
 src/ltc/pk/ecc/ecc_verify_hash.c
+src/ltc/pk/ecc/ecc_verify_hash_eth27.c
+src/ltc/pk/ecc/ecc_verify_hash_internal.c
+src/ltc/pk/ecc/ecc_verify_hash_rfc5656.c
+src/ltc/pk/ecc/ecc_verify_hash_rfc7518.c
 src/ltc/pk/ecc/ltc_ecc_export_point.c
 src/ltc/pk/ecc/ltc_ecc_import_point.c
 src/ltc/pk/ecc/ltc_ecc_is_point.c
@@ -1120,6 +1129,7 @@ t/mbi_ltm_bugs.t
 t/mbi_ltm_mbi-from-big-scalar.t
 t/mbi_ltm_since_1.999837.t
 t/mbi_ltm_since_1.999842.t
+t/mbi_ltm_since_2.005003.t
 t/mbi_ltm_storable.t
 t/mode_cbc.t
 t/mode_cfb.t

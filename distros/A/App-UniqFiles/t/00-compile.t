@@ -6,14 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/UniqFiles.pm'
 );
 
 my @scripts = (
+    'script/dupe-filenames',
+    'script/dupe-filenames-between-two-dirs',
     'script/dupe-files',
+    'script/uniq-filenames',
+    'script/uniq-filenames-between-two-dirs',
     'script/uniq-files'
 );
 

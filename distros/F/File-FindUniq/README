@@ -2,8 +2,8 @@ NAME
     File::FindUniq - Find unique or duplicate file {contents,names}
 
 VERSION
-    This document describes version 0.002 of File::FindUniq (from Perl
-    distribution File-FindUniq), released on 2024-12-05.
+    This document describes version 0.004 of File::FindUniq (from Perl
+    distribution File-FindUniq), released on 2025-05-03.
 
 SYNOPSIS
     Given this directory content:
@@ -55,6 +55,256 @@ DESCRIPTION
 
 NOTES
 FUNCTIONS
+  dupe_filenames
+    Usage:
+
+     dupe_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Report duplicate or unique files, optionally perform action on them.
+
+    This is a thin wrapper for uniq-files. It sets "algorithm" to "name",
+    defaults "report_unique" to 0 and "report_duplicate" to 1.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   authoritative_dirs => *array[str]*
+
+        Denote director(y|ies) where authoritative/"Original" copies are
+        found.
+
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+    *   digest_args => *array*
+
+        Some Digest algorithms require arguments, you can pass them here.
+
+    *   exclude_empty_files => *bool*
+
+        (No description)
+
+    *   exclude_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to include.
+
+    *   files* => *array[str]*
+
+        (No description)
+
+    *   group_by_digest => *bool*
+
+        Sort files by its digest (or size, if not computing digest),
+        separate each different digest.
+
+    *   include_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to exclude.
+
+    *   max_size => *filesize*
+
+        Maximum file size to consider.
+
+    *   min_size => *filesize*
+
+        Minimum file size to consider.
+
+    *   recurse => *bool*
+
+        If set to true, will recurse into subdirectories.
+
+    *   report_duplicate => *int* (default: 1)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2, or 3.
+
+        If set to 0, duplicate items will not be returned.
+
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. For example: "file1" contains text 'a', "file2"
+        'b', "file3" 'a'. Then "file1" and "file3" will be returned.
+
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. Continuing from previous example, only
+        "file1" will be returned because "file2" is unique and "file3"
+        contains 'a' (already represented by "file1"). If one or more
+        "--authoritative-dir" ("-O") options are specified, files under
+        these directories will be preferred.
+
+        If set to 3, will return all but the first of duplicate items.
+        Continuing from previous example: "file3" will be returned. This is
+        useful if you want to keep only one copy of the duplicate content.
+        You can use the output of this routine to "mv" or "rm". Similar to
+        the previous case, if one or more "--authoritative-dir" ("-O")
+        options are specified, then files under these directories will not
+        be listed if possible.
+
+    *   report_unique => *bool* (default: 0)
+
+        Whether to return unique items.
+
+    *   show_count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   show_digest => *true*
+
+        Show the digest value (or the size, if not computing digest) for
+        each file.
+
+        Note that this routine does not compute digest for files which have
+        unique sizes, so they will show up as empty.
+
+    *   show_size => *true*
+
+        Show the size for each file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  dupe_filenames_between_two_dirs
+    Usage:
+
+     dupe_filenames_between_two_dirs(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Report duplicate or unique files, optionally perform action on them.
+
+    This is a thin wrapper for uniq-files. It sets "algorithm" to "name",
+    "recurse" to true, defaults "report_unique" to 0 and "report_duplicate"
+    to 1. It also accepts two directory names instead of one+ dir/file
+    names.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   authoritative_dirs => *array[str]*
+
+        Denote director(y|ies) where authoritative/"Original" copies are
+        found.
+
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+    *   digest_args => *array*
+
+        Some Digest algorithms require arguments, you can pass them here.
+
+    *   dir1* => *dirname*
+
+        (No description)
+
+    *   dir2* => *dirname*
+
+        (No description)
+
+    *   exclude_empty_files => *bool*
+
+        (No description)
+
+    *   exclude_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to include.
+
+    *   group_by_digest => *bool*
+
+        Sort files by its digest (or size, if not computing digest),
+        separate each different digest.
+
+    *   include_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to exclude.
+
+    *   max_size => *filesize*
+
+        Maximum file size to consider.
+
+    *   min_size => *filesize*
+
+        Minimum file size to consider.
+
+    *   report_duplicate => *int* (default: 1)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2, or 3.
+
+        If set to 0, duplicate items will not be returned.
+
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. For example: "file1" contains text 'a', "file2"
+        'b', "file3" 'a'. Then "file1" and "file3" will be returned.
+
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. Continuing from previous example, only
+        "file1" will be returned because "file2" is unique and "file3"
+        contains 'a' (already represented by "file1"). If one or more
+        "--authoritative-dir" ("-O") options are specified, files under
+        these directories will be preferred.
+
+        If set to 3, will return all but the first of duplicate items.
+        Continuing from previous example: "file3" will be returned. This is
+        useful if you want to keep only one copy of the duplicate content.
+        You can use the output of this routine to "mv" or "rm". Similar to
+        the previous case, if one or more "--authoritative-dir" ("-O")
+        options are specified, then files under these directories will not
+        be listed if possible.
+
+    *   report_unique => *bool* (default: 0)
+
+        Whether to return unique items.
+
+    *   show_count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   show_digest => *true*
+
+        Show the digest value (or the size, if not computing digest) for
+        each file.
+
+        Note that this routine does not compute digest for files which have
+        unique sizes, so they will show up as empty.
+
+    *   show_size => *true*
+
+        Show the size for each file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   dupe_files
     Usage:
 
@@ -161,6 +411,254 @@ FUNCTIONS
         be listed if possible.
 
     *   report_unique => *bool* (default: 0)
+
+        Whether to return unique items.
+
+    *   show_count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   show_digest => *true*
+
+        Show the digest value (or the size, if not computing digest) for
+        each file.
+
+        Note that this routine does not compute digest for files which have
+        unique sizes, so they will show up as empty.
+
+    *   show_size => *true*
+
+        Show the size for each file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  uniq_filenames
+    Usage:
+
+     uniq_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Report duplicate or unique files, optionally perform action on them.
+
+    This is a thin wrapper for uniq-files. It sets "algorithm" to "name".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   authoritative_dirs => *array[str]*
+
+        Denote director(y|ies) where authoritative/"Original" copies are
+        found.
+
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+    *   digest_args => *array*
+
+        Some Digest algorithms require arguments, you can pass them here.
+
+    *   exclude_empty_files => *bool*
+
+        (No description)
+
+    *   exclude_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to include.
+
+    *   files* => *array[str]*
+
+        (No description)
+
+    *   group_by_digest => *bool*
+
+        Sort files by its digest (or size, if not computing digest),
+        separate each different digest.
+
+    *   include_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to exclude.
+
+    *   max_size => *filesize*
+
+        Maximum file size to consider.
+
+    *   min_size => *filesize*
+
+        Minimum file size to consider.
+
+    *   recurse => *bool*
+
+        If set to true, will recurse into subdirectories.
+
+    *   report_duplicate => *int* (default: 2)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2, or 3.
+
+        If set to 0, duplicate items will not be returned.
+
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. For example: "file1" contains text 'a', "file2"
+        'b', "file3" 'a'. Then "file1" and "file3" will be returned.
+
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. Continuing from previous example, only
+        "file1" will be returned because "file2" is unique and "file3"
+        contains 'a' (already represented by "file1"). If one or more
+        "--authoritative-dir" ("-O") options are specified, files under
+        these directories will be preferred.
+
+        If set to 3, will return all but the first of duplicate items.
+        Continuing from previous example: "file3" will be returned. This is
+        useful if you want to keep only one copy of the duplicate content.
+        You can use the output of this routine to "mv" or "rm". Similar to
+        the previous case, if one or more "--authoritative-dir" ("-O")
+        options are specified, then files under these directories will not
+        be listed if possible.
+
+    *   report_unique => *bool* (default: 1)
+
+        Whether to return unique items.
+
+    *   show_count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   show_digest => *true*
+
+        Show the digest value (or the size, if not computing digest) for
+        each file.
+
+        Note that this routine does not compute digest for files which have
+        unique sizes, so they will show up as empty.
+
+    *   show_size => *true*
+
+        Show the size for each file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  uniq_filenames_between_two_dirs
+    Usage:
+
+     uniq_filenames_between_two_dirs(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Report duplicate or unique files, optionally perform action on them.
+
+    This is a thin wrapper for uniq-files. It sets "algorithm" to "name",
+    "recurse" to true. It also accepts two directory names instead of one+
+    dir/file names.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   authoritative_dirs => *array[str]*
+
+        Denote director(y|ies) where authoritative/"Original" copies are
+        found.
+
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+    *   digest_args => *array*
+
+        Some Digest algorithms require arguments, you can pass them here.
+
+    *   dir1* => *dirname*
+
+        (No description)
+
+    *   dir2* => *dirname*
+
+        (No description)
+
+    *   exclude_empty_files => *bool*
+
+        (No description)
+
+    *   exclude_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to include.
+
+    *   group_by_digest => *bool*
+
+        Sort files by its digest (or size, if not computing digest),
+        separate each different digest.
+
+    *   include_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to exclude.
+
+    *   max_size => *filesize*
+
+        Maximum file size to consider.
+
+    *   min_size => *filesize*
+
+        Minimum file size to consider.
+
+    *   report_duplicate => *int* (default: 2)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2, or 3.
+
+        If set to 0, duplicate items will not be returned.
+
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. For example: "file1" contains text 'a', "file2"
+        'b', "file3" 'a'. Then "file1" and "file3" will be returned.
+
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. Continuing from previous example, only
+        "file1" will be returned because "file2" is unique and "file3"
+        contains 'a' (already represented by "file1"). If one or more
+        "--authoritative-dir" ("-O") options are specified, files under
+        these directories will be preferred.
+
+        If set to 3, will return all but the first of duplicate items.
+        Continuing from previous example: "file3" will be returned. This is
+        useful if you want to keep only one copy of the duplicate content.
+        You can use the output of this routine to "mv" or "rm". Similar to
+        the previous case, if one or more "--authoritative-dir" ("-O")
+        options are specified, then files under these directories will not
+        be listed if possible.
+
+    *   report_unique => *bool* (default: 1)
 
         Whether to return unique items.
 
@@ -386,7 +884,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

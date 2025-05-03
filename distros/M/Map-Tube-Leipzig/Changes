@@ -1,0 +1,10 @@
+Revision history for Map::Tube::Leipzig
+
+0.03  Sat May 03 09:45:00 2025
+      - Fixed encoding error in the pod.
+
+0.02  Sat May 03 01:55:00 2025
+      - Fixed typo in the pod.
+
+0.01  Sat May 03 01:50:00 2025
+      - First version, released.

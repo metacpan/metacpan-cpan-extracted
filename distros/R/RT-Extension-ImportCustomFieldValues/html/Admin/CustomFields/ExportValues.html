@@ -1,0 +1,28 @@
+<%init>
+my $CustomField = RT::CustomField->new( $session{'CurrentUser'} );
+unless ( $CustomField->Load( $id ) ) {
+    Abort(loc("CustomField not found"));
+}
+unless ( $session{CurrentUser}->HasRight( Right => 'AdminCustomFieldValues', Object => $CustomField )
+         || $session{CurrentUser}->HasRight( Right => 'AdminCustomField', Object => $CustomField ) ) {
+    Abort(loc("No permissions to edit this customfield values"));
+}
+unless ( $CustomField->Type =~ m/^Select/ ) {
+    Abort(loc("CustomField is not of type select values"));
+}
+my $filename =  'export-'. $CustomField->Id . '.csv';
+
+$r->content_type('application/vnd.ms-excel');
+$r->header_out( 'Content-disposition' => "attachment; filename=$filename" );
+$m->out("\"SortOrder\";\"Name\";\"Description\";\"Category\"\n");
+my $Values = $CustomField->Values;
+my $i = 0;
+while (my $Value = $Values->Next) {
+    $m->out(sprintf("\"%s\";\"%s\";\"%s\";\"%s\"\n", $Value->SortOrder || '', $Value->Name || '', $Value->Description || '', $Value->Category || ''));
+    $m->flush_buffer unless ++$i % 10;
+}
+$m->abort();
+</%init>
+<%args>
+$id => undef
+</%args>

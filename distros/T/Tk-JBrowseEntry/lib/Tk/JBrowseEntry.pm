@@ -437,8 +437,8 @@ listbox I<above> the rest of the widget.
 
 Default:  B<0> (false) - drop-down list is not fixed (pre-v5.10 behavior).
 
-NOTE:  A list can be set to both "fixed" (I<-fixedlist => ...>) and "bouncy" 
-(I<-altbinding => 'list=bouncy'>) at the same time.  This will ensure that 
+NOTE:  A list can be set to both "fixed" (I<-fixedlist> => ...) and "bouncy" 
+(I<-altbinding> => <'list=bouncy'>) at the same time.  This will ensure that 
 the focus always jumps right back to the text field whenever the user 
 selects an entry from the list.  Otherwise, "fixed" lists alternate 
 focus between the list and the entry field when the user clicks on 
@@ -904,7 +904,7 @@ package Tk::JBrowseEntry;
 #BEGIN
 #{
 	use vars qw($VERSION $haveHListbox);
-	$VERSION = '5.30';
+	$VERSION = '5.32';
 
 	use strict;
 	use warnings;
@@ -1079,7 +1079,7 @@ sub Populate
 	$w->{'-indicator'} = defined($args->{'-indicator'}) ? delete($args->{'-indicator'}) : '0';
 	$w->{'-activestyle'} = defined($args->{'-activestyle'}) ? delete($args->{'-activestyle'}) : 'underline';
 	$w->{'-activestyle'} = defined($args->{'-activestyle'}) ? delete($args->{'-activestyle'}) : 'underline';
-	$w->{'-colorstate'} = defined($args->{'-colorstate'}) ? delete($args->{'-colorstate'}) : 0;
+	$w->{'-colorstate'} = defined($args->{'-colorstate'}) ? delete($args->{'-colorstate'}) : '0';
 	my $lpack = delete $args->{-labelPack};   #MOVED ABOVE SUPER:POPULATE 20050120.
 
 	$w->SUPER::Populate($args);
@@ -1146,10 +1146,16 @@ sub Populate
 				unless ($w->{'-fixedlist'} =~ /top/);
 		my $height = $w->{'-height'} ||= 3;
 		$c = $w->Frame(-bd => 0, -relief => 'flat', -takefocus => 0);
-		$sl = $c->Scrolled($w->{'-listboxtype'}, '-takefocus' => 0, '-selectmode' => 'browse', '-height' => $height, '-scrollbars' => 'oe', '-activestyle' => $w->{'-activestyle'}
+		$sl = $c->Scrolled($w->{'-listboxtype'},
+				-takefocus => 0,
+				-selectmode => 'browse',
+				-height => $height,
+				-scrollbars => 'oe',
+				-activestyle => $w->{'-activestyle'},
+				-exportselection => ($w->{'-noselecttext'} ? 0 : 1),
 		)->pack(-fill => 'x', -expand => 1);
 		(my $lbtype = $w->{'-listboxtype'}) =~ tr/A-Z/a-z/;
-		$sl->Subwidget($lbtype)->configure('-takefocus' => 0);
+		$sl->Subwidget($lbtype)->configure(-takefocus => 0);
 		$w->update;
 		$c->pack(-side => 'top', -padx => 0, -pady => 0, -fill => 'both', -expand => 1);
 		$tf->pack(-side => 'top', -padx => 0, -pady => 0, -fill => 'x', -expand => 1)
@@ -1173,7 +1179,10 @@ sub Populate
 		$c = $w->Toplevel(-bd => 0, -relief => 'raised');
 		$c->overrideredirect(1);
 		$c->withdraw;
-		$sl = $c->Scrolled($w->{'-listboxtype'}, '-selectmode' => 'browse', '-scrollbars' => 'oe');
+		$sl = $c->Scrolled($w->{'-listboxtype'},
+				-selectmode => 'browse',
+				-exportselection => ($w->{'-noselecttext'} ? 0 : 1),
+				-scrollbars => 'oe');
 	}
 
 	$w->{'-listboxtype'} =~ tr/A-Z/a-z/;
@@ -1267,17 +1276,24 @@ sub focus   #CALLED WHENEVER MAIN WIDGET TAKES FOCUS:
 		$w->{'_ignorefocus'} = 0;
 		return;
 	}
-	my ($state) = $w->cget( "-state" );
-	my $fw = ($state eq 'readonly') ? 'frame' : 'entry';
-	$w->Subwidget($fw)->configure(-highlightcolor => $w->Subwidget('frame')->cget('-background'))
-			if ($fw eq 'entry');  #CLEAN UP ANY MESS MADE BY setPalette!
-	$w->Subwidget($fw)->focus;
+	my $state = $w->cget( "-state" );
+	my $fw = (defined($state) && $state eq 'readonly') ? 'frame' : 'entry';
+	my $e = $w->Subwidget('entry');  #FOR SOME REASON ON RARE OCCASIONS THESE SUBWIDGETS ERROR OUT AS NOT DEFINED?!
+	my $f = $w->Subwidget('frame');  #IE. THE "Select To Mark" DDLIST IN e.pl IS KNOWN TO SILENTLY FAIL HERE!
+	my $b = $w->Subwidget('arrow');  #PBLY B/C THE SURROUNDING DIALOG HAS ALREADY CLOSED, PERHAPS?
+	my $eORf = $w->Subwidget($fw);
+#CHGD. TO NEXT:  202407 TO FIX ERROR:	$w->Subwidget($fw)->configure(-highlightcolor => $w->Subwidget('frame')->cget('-background'))
+	$w->Subwidget($fw)->configure(-highlightcolor => $f->cget('-background'))
+			if (defined($f) && defined($e) && $fw eq 'entry');  #CLEAN UP ANY MESS MADE BY setPalette!
+	$w->Subwidget($fw)->focus  if (defined $eORf);
 
 	#BUTTON GETS FOCUS IF BUTTON TAKES FOCUS, BUT WIDGET ITSELF DOESN'T.
-	$w->Subwidget('arrow')->focus  if (!$w->{'takefocus'} && $w->{'btntakesfocus'});
-	$w->Subwidget('entry')->icursor('end');
-	$w->Subwidget('entry')->selectionRange(0,'end')
+	$w->Subwidget('arrow')->focus  if (defined($b) && !$w->{'takefocus'} && $w->{'btntakesfocus'});
+	if (defined $e) {
+		$w->Subwidget('entry')->icursor('end');
+		$w->Subwidget('entry')->selectionRange(0,'end')
  				unless ($w->{'-noselecttext'} || !$w->Subwidget('entry')->index('end'));
+ 	}
 	########Tk->break   #DON'T, IT WON'T RUN!
 }
 
@@ -2666,26 +2682,34 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 	my $label  = $w->Subwidget('label');
 	my $button = $w->Subwidget('arrow');
 	my $slistbox = $w->Subwidget('slistbox');
-	my $txtfg = ($w->{'-colorstate'} == 1) ? 'black' : $w->{'-textforeground'} || $frame->cget('-foreground');
-	my $txtbg = ($w->{'-colorstate'} == 1) ? 'gray95' : $w->{'-textbackground'} || $frame->cget('-background');
+	my $txtfg = ($w->{'-colorstate'} eq '1') ? 'black' : $w->{'-textforeground'} || $frame->cget('-foreground');
+	my $txtbg = ($w->{'-colorstate'} eq '1') ? 'gray95' : $w->{'-textbackground'} || $frame->cget('-background');
 	my $texthlcolor = $frame->cget('-background');
 	my $framehlcolor = $frame->cget('-foreground');
 	my $framehlbg = $texthlcolor;
 	if( $state eq 'readonly')
 	{
 		$framehlcolor = $frame->cget('-foreground') || $entry->cget( '-foreground' );
-		if ($w->{'-colorstate'} == 1)
+		if ($w->{'-colorstate'} eq '1')
 		{
 			$txtbg = 'lightgray';
 		}
 		elsif ($w->{'-colorstate'} =~ /^(?:2|dark|readonlydark)$/io)
-#x?				|| !defined $Tk::Widget::TwilightThreshold)  #DEFINED IF USING OUR MODIFIED "setPalette.pl"!
 		{
 			$txtfg = ($txtbg eq $entry->cget('-readonlybackground')) ? 'gray30' : 'black';
 		}
 		elsif ($bummer)  #WINDOWS SETPALETTE DOESN'T "SHADE" THE READONLY TEXT FIELD BG, SO WE NEED TO MAKE FG LOOK DIFFERENT FROM NORMAL STATE!:
 		{
 			$txtfg = ($txtfg =~ /black/io) ? 'gray30' : 'lightgray';
+		}
+		else  #USE DISABLED FOREGROUND AS DEFAULT, ONLY IF THE READONLY BG IS NOT SET (IS THE DEFAULT):
+		{
+			my $txrobg = $w->cget('-textreadonlybackground');
+			if ($txrobg eq '#d9d9d9' && $w->cget('-textreadonlybackground') eq '#d9d9d9')
+			{
+				my $txtDisabledFg = $w->cget('-textdisabledforeground');
+				$txtfg = $txtDisabledFg  unless ($txtDisabledFg eq '#d9d9d9');
+			} 
 		}
 		$txtfg = $w->{'-textreadonlyforeground'}  if ($w->{'-textreadonlyforeground'});
 		$txtbg = $w->{'-textreadonlybackground'}  if ($w->{'-textreadonlybackground'});
@@ -2694,7 +2718,8 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 				-highlightcolor => $texthlcolor,
 				-highlightbackground => $texthlcolor);
 		#PROGRAMMER NOTE:  ONCE THIS PARAMETER IS "SET", SWITCHING PALETTES WILL *NOT* UPDATE IT!:
-		$entryHash{'-readonlybackground'} = $w->{'-textreadonlybackground'} || 'lightgray'  if ($w->{'-colorstate'} == 1);
+		$entryHash{'-readonlybackground'} = $w->{'-textreadonlybackground'} || 'lightgray'
+				if ($w->{'-colorstate'} eq '1');
 		$entry->configure(%entryHash);
 
 		$button->configure(-state => 'normal', -takefocus => $w->{'btntakesfocus'}, -relief => 'raised',

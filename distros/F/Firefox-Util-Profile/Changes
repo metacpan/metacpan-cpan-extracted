@@ -1,3 +1,8 @@
+0.006   2025-04-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Also search in snap directory.
+
+
 0.005   2020-11-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Support Windows.

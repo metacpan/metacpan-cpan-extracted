@@ -129,3 +129,12 @@ Revision history for Perl extension Tk::HListbox.
 	  Listbox's default of 1 for more consistant appearance, particularly when 
 	  used by Tk::JBrowseEntry.
 	- Some minor doc. cleanups.
+3.00	  Sat May 3, 2025
+	- Fix Double-click action to not clear selection & return proper selected 
+	  list (to work like Tk::Listbox.  Not sure why this was the way it was.
+	- Move a cpl. global variables to object variables.
+	- Remove Alt-Button1Press binding - not sure why that was there.
+	- Fix mouse-dragging to work properly, particularly of of tix indicators 
+	  and reducing or eliminating redundant <Arm>, <Activate> & <Disarm> 
+	  events.
+	- Several misc. code refactoring fixes & improvements.

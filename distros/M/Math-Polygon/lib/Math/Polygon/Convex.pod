@@ -7,7 +7,7 @@ Math::Polygon::Convex - Collection of convex algorithms
 =head1 INHERITANCE
 
  Math::Polygon::Convex
-   is a Exporter
+   is an Exporter
 
 =head1 SYNOPSIS
 
@@ -40,12 +40,12 @@ F<http://geometryalgorithms.com/Archive/algorithm_0109/algorithm_0109.htm>
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.10,
-built on January 03, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Polygon distribution version 1.11,
+built on May 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

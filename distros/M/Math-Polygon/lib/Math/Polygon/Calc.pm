@@ -1,14 +1,14 @@
-# Copyrights 2004-2018 by [Mark Overmeer].
+# Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Math::Polygon.  Meta-POD processed with
+# Pod stripped from pm file by OODoc 2.03.
+# This code is part of distribution Math-Polygon.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Math::Polygon::Calc;
-use vars '$VERSION';
-$VERSION = '1.10';
+package Math::Polygon::Calc;{
+our $VERSION = '1.11';
+}
 
 use base 'Exporter';
 
@@ -242,7 +242,7 @@ sub polygon_same($$;$)
 {   return 0 if @{$_[0]} != @{$_[1]};
     my @f = polygon_start_minxy @{ (shift) };
     my @s = polygon_start_minxy @{ (shift) };
-    polygon_equal \@f, \@s, @_;
+    polygon_equal \@f, \@s, $_[0];
 }
 
 
@@ -318,13 +318,20 @@ sub polygon_centroid(@)
     polygon_is_closed(@_)
         or croak "ERROR: polygon must be closed: begin==end";
 
+	return [ ($_[0][0] + $_[1][0])/2, ($_[0][1] + $_[1][1])/2 ]
+		if @_==3;  # line
+
     my ($cx, $cy, $a) = (0, 0, 0);
     foreach my $i (0..@_-2)
-    {    my $ap = $_[$i][0]*$_[$i+1][1] - $_[$i+1][0]*$_[$i][1];
-         $cx   += ($_[$i][0]+$_[$i+1][0]) * $ap;
-         $cy   += ($_[$i][1]+$_[$i+1][1]) * $ap;
+    {    my $ap =   $_[$i][0] * $_[$i+1][1] - $_[$i+1][0] * $_[$i][1];
+         $cx   += ( $_[$i][0] + $_[$i+1][0]) * $ap;
+         $cy   += ( $_[$i][1] + $_[$i+1][1]) * $ap;
          $a    += $ap;
     }
+
+    $a != 0
+        or croak "ERROR: polygon points on a line, so no centroid";
+
     my $c = 3*$a; # 6*$a/2;
     [ $cx/$c, $cy/$c ];
 }

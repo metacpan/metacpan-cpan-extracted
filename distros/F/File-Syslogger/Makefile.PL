@@ -4,13 +4,14 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-	NAME             => 'File::Syslogger',
-	AUTHOR           => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
-	VERSION_FROM     => 'lib/File/Syslogger.pm',
-	ABSTRACT_FROM    => 'lib/File/Syslogger.pm',
-	LICENSE          => 'artistic_2',
-	MIN_PERL_VERSION => '5.006',
-	INST_SCRIPT      => 'bin',
+	NAME               => 'File::Syslogger',
+	AUTHOR             => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
+	VERSION_FROM       => 'lib/File/Syslogger.pm',
+	ABSTRACT_FROM      => 'lib/File/Syslogger.pm',
+	LICENSE            => 'artistic_2',
+	MIN_PERL_VERSION   => '5.006',
+	INST_SCRIPT        => 'bin',
+	EXE_FILES          => [ 'src_bin/filesyslogger', ],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 	},

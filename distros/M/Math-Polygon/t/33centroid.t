@@ -4,7 +4,7 @@ use Math::Polygon::Calc 'polygon_centroid';
 use warnings;
 use strict;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 sub compare_point($$)
 {   my ($a, $b) = @_;
@@ -25,3 +25,10 @@ ok(compare_point($centroid3, [7,4]));
 my $centroid4 = polygon_centroid [3,2], [10,2], [12,8], [5,8], [3,2];
 ok(compare_point($centroid4, [7.5,5]));
 
+# line piece
+my $c5 = polygon_centroid [1,2], [5,6], [1,2];
+ok(compare_point($c5, [3,4]));
+
+# longer line
+#my $c6 = polygon_centroid [1,2], [5,6], [9,10], [1,2];
+#ok(compare_point($c6, [5,6]));

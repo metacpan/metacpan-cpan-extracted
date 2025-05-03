@@ -1,6 +1,6 @@
-#!/usr/bin/env perl
+#!perl
 #
-#This software is Copyright (c) 2021 by Zane C. Bowers-Hadley.
+#This software is Copyright (c) 2025 by Zane C. Bowers-Hadley.
 #
 #This is free software, licensed under:
 #
@@ -8,38 +8,47 @@
 
 use strict;
 use warnings;
-use TOML qw(from_toml);
-use File::Syslogger;
-use File::Slurp qw(read_file);
-use Getopt::Long qw(:config pass_through);
+use TOML            qw(from_toml);
+use File::Syslogger ();
+use File::Slurp     qw(read_file);
+use Getopt::Long    qw( GetOptions );
+use Pod::Usage      qw(pod2usage);
 
 my $version = '0.0.1';
 
-my $help;
+sub main::VERSION_MESSAGE {
+	print 'filesyslogger v. ' . $File::Syslogger::VERSION . "\n";
+	exit 255;
+}
+
+sub main::HELP_MESSAGE {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+}
+
+my $help_flag;
 my $toml_file = '/usr/local/etc/filesyslogger.toml';
 my $pri;
 my $fac;
 my $socket;
 my $program;
 my $version_flag;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
 GetOptions(
 	'c=s'     => \$toml_file,
-	'h'       => \$help,
-	'help'    => \$help,
+	'h'       => \$help_flag,
+	'help'    => \$help_flag,
 	'v'       => \$version_flag,
 	'version' => \$version_flag,
 );
 
 if ($version_flag) {
-	print 'filesyslogger v. ' . $version . "\n";
+	main::VERSION_MESSAGE;
 	exit 255;
 }
 
-if ($help) {
-	print 'filesyslogger v. ' . $version . '
-
--c <config>    Config to use.
-';
+if ($help_flag) {
+	main::HELP_MESSAGE;
 	exit 255;
 }
 
@@ -85,7 +94,7 @@ while ( defined( $toml_keys[$int] ) ) {
 	}
 
 	$int++;
-}
+} ## end while ( defined( $toml_keys[$int] ) )
 
 File::Syslogger->run(
 	facility => $fac,
@@ -114,19 +123,24 @@ The file format used is TOML.
 
 The primary and optional keys are as below.
 
-    priority - The priority of the logged item.
-               Default is 'notice'.
-    
-    facility - The facility for logging.
-               Default is 'daemon'.
-    
-    program - Name of the program logging.
-              Default is 'fileSyslogger'.
-    
-    socket - The syslogd socket.
-             Default is "/var/run/log"
+    - priority :: The priority of the logged item.
+          Default :: notice
 
-Each file defined in a TOML table. The keys are as below.
+    - facility :: The facility for logging.
+          Default :: daemon
+
+    - program :: Name of the program logging.
+          Default :: fileSyslogger
+
+    - socket :: The syslogd socket.
+        Default :: /var/run/log
+
+
+Each file defined in a TOML table. `priority`, `facility`, and `program`
+can be used like above.
+
+    - file :: The file to follow. This must be specified
+        Default :: undef
 
 Each TOML table is used for specifying what files to tail
 and forward to syslog. It uses the same keys as above, minus

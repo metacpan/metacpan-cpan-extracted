@@ -5,6 +5,7 @@ requires   "Module::CoreList";
 requires   "Text::Wrap";
 requires   "YAML::PP";
 requires   "version";
+requires   "Test::Builder::Module";
 
 recommends "HTTP::Tiny"               => "0.083";
 recommends "IO::Socket::SSL"          => "1.36";

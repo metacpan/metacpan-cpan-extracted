@@ -1,9 +1,11 @@
 Changes
+INSTALL
 lib/ExtUtils/ParseXS.pm
 lib/ExtUtils/ParseXS.pod
 lib/ExtUtils/ParseXS/Constants.pm
 lib/ExtUtils/ParseXS/CountLines.pm
 lib/ExtUtils/ParseXS/Eval.pm
+lib/ExtUtils/ParseXS/Node.pm
 lib/ExtUtils/ParseXS/Utilities.pm
 lib/ExtUtils/Typemaps.pm
 lib/ExtUtils/Typemaps/Cmd.pm
@@ -11,8 +13,14 @@ lib/ExtUtils/Typemaps/InputMap.pm
 lib/ExtUtils/Typemaps/OutputMap.pm
 lib/ExtUtils/Typemaps/Type.pm
 lib/ExtUtils/xsubpp
+lib/perlxs.pod
+lib/perlxstut.pod
+lib/perlxstypemap.pod
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
 t/001-basic.t
 t/002-more.t
 t/003-usage.t
@@ -24,7 +32,6 @@ t/105-valid_proto_string.t
 t/106-process_typemaps.t
 t/108-map_type.t
 t/109-standard_XS_defs.t
-t/110-assign_func_args.t
 t/111-analyze_preprocessor_statements.t
 t/112-set_cond.t
 t/113-check_cond_preproc_statements.t
@@ -54,13 +61,16 @@ t/lib/PrimitiveCapture.pm
 t/lib/TypemapTest/Foo.pm
 t/pseudotypemap1
 t/typemap
+t/XSAlias.xs
 t/XSBroken.xs
+t/XSFalsePositive.xs
+t/XSFalsePositive2.xs
 t/XSInclude.xsh
 t/XSMore.xs
+t/XSNoMap.xs
 t/XSTest.pm
 t/XSTest.xs
+t/XSTightDirectives.xs
 t/XSUsage.pm
 t/XSUsage.xs
 t/XSWarn.xs
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

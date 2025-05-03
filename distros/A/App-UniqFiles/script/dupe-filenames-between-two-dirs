@@ -1,0 +1,433 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /File/FindUniq/dupe_filenames_between_two_dirs
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-05-03'; # DATE
+our $DIST = 'App-UniqFiles'; # DIST
+our $VERSION = '0.144'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/File/FindUniq/dupe_filenames_between_two_dirs",
+    program_name => "dupe-filenames-between-two-dirs",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Report duplicate or unique files, optionally perform action on them
+# PODNAME: dupe-filenames-between-two-dirs
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dupe-filenames-between-two-dirs - Report duplicate or unique files, optionally perform action on them
+
+=head1 VERSION
+
+This document describes version 0.144 of dupe-filenames-between-two-dirs (from Perl distribution App-UniqFiles), released on 2025-05-03.
+
+=head1 SYNOPSIS
+
+B<dupe-filenames-between-two-dirs> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<dupe-filenames-between-two-dirs> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<dupe-filenames-between-two-dirs> [(B<L<--authoritative-dir|/"--authoritative-dirs-json=s">>=I<str>)+|B<L<--authoritative-dirs-json|/"--authoritative-dirs-json=s">>=I<json>|(B<L<-O|/"--authoritative-dirs-json=s">>=I<str>)+] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [B<L<--digest-args|/"--digest-args=s">>=I<s>|B<L<--digest-args-json|/"--digest-args=s">>=I<json>|B<L<-A|/"--digest-args=s">>=I<s>] [B<L<--exclude-empty-files|/"--exclude-empty-files, -Z">>|B<L<-Z|/"--exclude-empty-files, -Z">>|B<L<--include-empty-files|/"--exclude-empty-files, -Z">>] [(B<L<--exclude-file-pattern|/"--exclude-file-patterns-json=s">>=I<str>)+|B<L<--exclude-file-patterns-json|/"--exclude-file-patterns-json=s">>=I<json>|(B<L<-X|/"--exclude-file-patterns-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--group-by-digest|/"--group-by-digest">>|B<L<--no-group-by-digest|/"--group-by-digest">>|B<L<--nogroup-by-digest|/"--group-by-digest">>] [(B<L<--include-file-pattern|/"--include-file-patterns-json=s">>=I<str>)+|B<L<--include-file-patterns-json|/"--include-file-patterns-json=s">>=I<json>|(B<L<-I|/"--include-file-patterns-json=s">>=I<str>)+] [B<L<--max-size|/"--max-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--min-size|/"--min-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--report-duplicate|/"--report-duplicate=s">>=I<int>] [B<L<--report-unique|/"-u">>|B<L<-D|/"-u">>|B<L<-a|/"-u">>|B<L<-d|/"-u">>|B<L<-u|/"-u">>|B<L<--no-report-unique|/"-u">>|B<L<--noreport-unique|/"-u">>] [B<L<--show-count|/"--show-count, --count, -c">>|B<L<-c|/"--show-count, --count, -c">>|B<L<--count|/"--show-count, --count, -c">>|B<L<--no-show-count|/"--show-count, --count, -c">>|B<L<--noshow-count|/"--show-count, --count, -c">>] [B<L<--show-digest|/"--show-digest">>] [B<L<--show-size|/"--show-size">>] -- E<lt>I<L<dir1|/"--dir1=s*">>E<gt> E<lt>I<L<dir2|/"--dir2=s*">>E<gt>
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This is a thin wrapper for L<uniq-files>. It sets C<algorithm> to C<name>,
+C<recurse> to true, defaults C<report_unique> to 0 and C<report_duplicate> to 1. It
+also accepts two directory names instead of one+ dir/file names.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--authoritative-dir>=I<s@>, B<-O>
+
+Denote director(y|ies) where authoritative/"Original" copies are found.
+
+Can be specified multiple times.
+
+=item B<--authoritative-dirs-json>=I<s>
+
+Denote director(y|ies) where authoritative/"Original" copies are found (JSON-encoded).
+
+See C<--authoritative-dir>.
+
+=item B<--detail>, B<-l>
+
+Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+=item B<--digest-args-json>=I<s>, B<-A>
+
+See C<--digest-args>.
+
+=item B<--digest-args>=I<s>
+
+Some Digest algorithms require arguments, you can pass them here.
+
+
+=item B<--dir1>=I<s>*
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--dir2>=I<s>*
+
+(No description)
+
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--exclude-empty-files>, B<-Z>
+
+(No description)
+
+
+=item B<--exclude-file-pattern>=I<s@>, B<-X>
+
+Filename (including path) regex patterns to include.
+
+Can be specified multiple times.
+
+=item B<--exclude-file-patterns-json>=I<s>
+
+Filename (including path) regex patterns to include (JSON-encoded).
+
+See C<--exclude-file-pattern>.
+
+=item B<--group-by-digest>
+
+Sort files by its digest (or size, if not computing digest), separate each different digest.
+
+=item B<--include-file-pattern>=I<s@>, B<-I>
+
+Filename (including path) regex patterns to exclude.
+
+Can be specified multiple times.
+
+=item B<--include-file-patterns-json>=I<s>
+
+Filename (including path) regex patterns to exclude (JSON-encoded).
+
+See C<--include-file-pattern>.
+
+=item B<--max-size>=I<s>
+
+Maximum file size to consider.
+
+=item B<--min-size>=I<s>
+
+Minimum file size to consider.
+
+=item B<--report-duplicate>=I<s>
+
+Whether to return duplicate items.
+
+Default value:
+
+ 1
+
+Valid values:
+
+ [0,1,2,3]
+
+Can be set to either 0, 1, 2, or 3.
+
+If set to 0, duplicate items will not be returned.
+
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. For example: C<file1> contains text 'a', C<file2> 'b', C<file3> 'a'. Then
+C<file1> and C<file3> will be returned.
+
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. Continuing from previous example, only C<file1> will be returned
+because C<file2> is unique and C<file3> contains 'a' (already represented by
+C<file1>). If one or more C<--authoritative-dir> (C<-O>) options are specified,
+files under these directories will be preferred.
+
+If set to 3, will return all but the first of duplicate items. Continuing from
+previous example: C<file3> will be returned. This is useful if you want to keep
+only one copy of the duplicate content. You can use the output of this routine
+to C<mv> or C<rm>. Similar to the previous case, if one or more
+C<--authoritative-dir> (C<-O>) options are specified, then files under these
+directories will not be listed if possible.
+
+
+=item B<--report-unique>
+
+Whether to return unique items.
+
+=item B<--show-count>, B<--count>, B<-c>
+
+Whether to return each file content's number of occurence.
+
+1 means the file content is only encountered once (unique), 2 means there is one
+duplicate, and so on.
+
+
+=item B<--show-digest>
+
+Show the digest value (or the size, if not computing digest) for each file.
+
+Note that this routine does not compute digest for files which have unique
+sizes, so they will show up as empty.
+
+
+=item B<--show-size>
+
+Show the size for each file.
+
+=item B<-a>
+
+Alias for --report-unique --report-duplicate=1 (report all files).
+
+See C<--report-unique>.
+
+=item B<-d>
+
+Alias for --noreport-unique --report-duplicate=1.
+
+See C<--report-unique>.
+
+=item B<-D>
+
+Alias for --noreport-unique --report-duplicate=3.
+
+See C<--report-unique>.
+
+=item B<-u>
+
+Alias for --report-unique --report-duplicate=0.
+
+See C<--report-unique>.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C dupe-filenames-between-two-dirs dupe-filenames-between-two-dirs
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete dupe-filenames-between-two-dirs 'p/*/`dupe-filenames-between-two-dirs`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Find duplicate filenames in two directories
+
+ % dupe-filenames-between-two-dirs dir1 dir2
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-UniqFiles>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-UniqFiles>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-UniqFiles>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut
