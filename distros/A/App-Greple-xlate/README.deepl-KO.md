@@ -4,17 +4,19 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 # SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9909
+Version 0.9910
 
 # DESCRIPTION
 
-**그림** **엑스레이트** 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (`deepl.pm`) 및 ChatGPT (`gpt3.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다. gpt-4 및 gpt-4o에 대한 실험적 지원도 포함되어 있습니다.
+**Greple** **xlate** 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (`deepl.pm`) 및 ChatGPT 4.1 (`gpt4.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다.
 
 Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면 다음과 같이 **greple** 명령과 `xlate::deepl` 및 `perl` 모듈을 사용합니다:
 
@@ -106,7 +108,7 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
     - **deepl**: DeepL API
     - **gpt3**: gpt-3.5-turbo
-    - **gpt4**: gpt-4-turbo
+    - **gpt4**: gpt-4.1
     - **gpt4o**: gpt-4o-mini
 
         **gpt-4o**의 인터페이스는 불안정하며 현재로서는 제대로 작동한다고 보장할 수 없습니다.
@@ -124,7 +126,7 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
     원본 및 번역 텍스트의 출력 형식을 지정합니다.
 
-    `xtxt` 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 가정합니다. 실제로는 한 줄의 일부만 번역할 수 있으며, `xtxt` 이외의 형식을 지정하면 의미 있는 결과가 나오지 않습니다.
+    `xtxt` 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 가정합니다. 실제로는 한 줄의 일부만 번역할 수 있지만 `xtxt` 이외의 형식을 지정하면 의미 있는 결과가 나오지 않습니다.
 
     - **conflict**, **cm**
 
@@ -214,6 +216,13 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
     파일의 전체 텍스트를 대상 영역으로 설정합니다.
 
+- **--lineify-cm**
+- **--lineify-colon**
+
+    `cm` 및 `colon` 형식의 경우 출력이 한 줄씩 분할되어 형식이 지정됩니다. 따라서 한 줄의 일부만 번역해야 하는 경우 예상되는 결과를 얻을 수 없습니다. 이 필터는 한 줄의 일부를 정상적인 줄 단위 출력으로 번역하여 손상된 출력을 수정합니다.
+
+    현재 구현에서는 한 줄의 여러 부분이 번역되는 경우 독립된 줄로 출력됩니다.
+
 # CACHE OPTIONS
 
 **엑스레이트** 모듈은 각 파일에 대한 번역 텍스트를 캐시하여 저장하고 실행 전에 읽어들여 서버에 요청하는 오버헤드를 없앨 수 있습니다. 기본 캐시 전략 `auto`를 사용하면 대상 파일에 대한 캐시 파일이 존재할 때만 캐시 데이터를 유지합니다.
@@ -302,7 +311,7 @@ DeepL 및 ChatGPT용 명령줄 도구를 설치해야 합니다.
 
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
-[App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
+[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

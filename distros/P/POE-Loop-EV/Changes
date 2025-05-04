@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension POE::Loop::EV.
 
+0.15      2025-05-04 05:24:09 EDT
+        - Update LICENSE text
+
 0.14      2017-02-11 20:06:15 EST
         - Use warnings (lorn)
         - Various testing improvements

@@ -5,20 +5,21 @@ App::Greple::xlate - translation support module for greple
 
 # SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9909
+Version 0.9910
 
 # DESCRIPTION
 
 **Greple** **xlate** module find desired text blocks and replace them by
-the translated text.  Currently DeepL (`deepl.pm`) and ChatGPT
-(`gpt3.pm`) module are implemented as a back-end engine.
-Experimental support for gpt-4 and gpt-4o are also included.
+the translated text.  Currently DeepL (`deepl.pm`) and ChatGPT 4.1
+(`gpt4.pm`) module are implemented as a back-end engine.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use **greple** command with `xlate::deepl` and
@@ -159,7 +160,7 @@ This interface is experimental and subject to change in the future.
 
     - **deepl**: DeepL API
     - **gpt3**: gpt-3.5-turbo
-    - **gpt4**: gpt-4-turbo
+    - **gpt4**: gpt-4.1
     - **gpt4o**: gpt-4o-mini
 
         **gpt-4o**'s interface is unstable and cannot be guaranteed to work
@@ -184,7 +185,7 @@ This interface is experimental and subject to change in the future.
 
     The following formats other than `xtxt` assume that the part to be
     translated is a collection of lines.  In fact, it is possible to
-    translate only a portion of a line, and specifying a format other than
+    translate only a portion of a line, but specifying a format other than
     `xtxt` will not produce meaningful results.
 
     - **conflict**, **cm**
@@ -292,6 +293,18 @@ This interface is experimental and subject to change in the future.
 
     Set the whole text of the file as a target area.
 
+- **--lineify-cm**
+- **--lineify-colon**
+
+    In the case of the `cm` and `colon` formats, the output is split and
+    formatted line by line.  Therefore, if only a portion of a line is to
+    be translated, the expected result cannot be obtained.  These filters
+    fix output that is corrupted by translating part of a line into normal
+    line-by-line output.
+
+    In the current implementation, if multiple parts of a line are
+    translated, they are output as independent lines.
+
 # CACHE OPTIONS
 
 **xlate** module can store cached text of translation for each file and
@@ -398,7 +411,7 @@ You have to install command line tools for DeepL and ChatGPT.
 
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
-[App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
+[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

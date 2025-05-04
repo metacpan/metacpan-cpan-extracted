@@ -16,6 +16,8 @@ my %examples=(
     q{m xfoox} => undef, #unsupported by PPIx::Regexp
     #q{/(\?>I)/} => undef,
     #q{/(\?:I)/} => undef,
+    q{y/a/b/r} => '5.013007',
+    q{tr/a/b/r} => '5.013007',
     
 );
 plan tests => scalar(keys %examples);

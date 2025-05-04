@@ -2,146 +2,140 @@ package App::Yath::Plugin::Cover;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use Test2::Harness::Util qw/clean_path mod2file/;
+use Test2::Harness::Util qw/clean_path mod2file fqmod/;
 use Test2::Harness::Util::JSON qw/encode_json stream_json_l/;
-use Test2::Harness::Util::UUID qw/gen_uuid/;
+use Test2::Util::UUID qw/gen_uuid/;
 
 use parent 'App::Yath::Plugin';
 use Test2::Harness::Util::HashBase qw/-aggregator -no_aggregate +metrics +outfile/;
 
-use App::Yath::Options;
+use Getopt::Yath;
 
-option_group {prefix => 'cover', category => "Cover Options"} => sub {
-    post \&post_process;
+option_group {prefix => 'cover', group => 'cover', category => "Cover Options"} => sub {
+    option_post_process \&post_process;
 
     option types => (
-        alt => ['cover-type'],
-        type => 'm',
-        default => sub { [qw/pl pm/] },
+        alt => ['type'],
+        type => 'List',
+        default => sub { qw/pl pm/ },
     );
 
     option dirs => (
-        alt => ['cover-dir'],
-        type => 'm',
-        default => sub { ['lib'] },
-
-        action => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
-            push @$$slot => glob($norm);
-        },
+        alt => ['dir'],
+        type => 'List',
+        default => sub { qw{ lib } },
+        normalize => sub { glob($_[0]) },
     );
 
     option exclude_private => (
-        type => 'b',
+        type => 'Bool',
         default => 0,
-        description => "",
+        description => "Exclude subs prefixed with '_' from coverage metrics",
     );
 
     option files => (
-        type => 'b',
+        type => 'Bool',
         description => "Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)",
     );
 
     option metrics => (
-        type => 'b',
-        description => '',
+        type => 'Bool',
+        description => 'Build the metrics data',
     );
 
     option write => (
-        type => 'd',
+        type => 'Auto',
         normalize => \&clean_path,
         long_examples => ['', '=coverage.jsonl', '=coverage.json'],
         description => "Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).",
-        action      => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
 
-            return $$slot = clean_path("coverage.jsonl") if $raw eq '1';
-            return $$slot = $norm;
-        },
+        autofill => sub { clean_path("coverage.jsonl") },
     );
 
     option aggregator => (
-        alt => ['cover-agg'],
-        type => 's',
+        type => 'Scalar',
+        alt => ['agg'],
         long_examples => [' ByTest', ' ByRun', ' +Custom::Aggregator'],
         description => 'Choose a custom aggregator subclass',
-        normalize => sub {
-            my ($agg) = @_;
-            return $agg if $agg =~ s/^\+//;
-            return "Test2::Harness::Log::CoverageAggregator::$agg";
-        },
+        normalize => sub { fqmod($_[0], 'Test2::Harness::Log::CoverageAggregator') },
     );
 
     option class => (
-        type => 's',
+        type => 'Scalar',
         description => 'Choose a Test2::Plugin::Cover subclass',
         default => 'Test2::Plugin::Cover',
     );
 
     option manager => (
-        type => 's',
+        type => 'Scalar',
         description => "Coverage 'from' manager to use when coverage data does not provide one",
         long_examples => [ ' My::Coverage::Manager'],
         applicable => \&changes_applicable,
     );
 
     option from_type => (
-        type => 's',
+        type => 'Scalar',
         description => 'File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.',
         long_examples => [' json', ' jsonl', ' log' ],
     );
 
     option maybe_from_type => (
-        type => 's',
+        type => 'Scalar',
         'description' => 'Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect',
         long_examples => [' json', ' jsonl', ' log' ],
     );
 
     option from => (
-        type => 's',
+        type => 'Scalar',
         description => "This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.",
         long_examples => [' path/to/log.jsonl', ' http://example.com/coverage', ' path/to/coverage.jsonl']
     );
 
     option maybe_from => (
-        type => 's',
+        type => 'Scalar',
         description => "This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.",
         long_examples => [' path/to/log.jsonl', ' http://example.com/coverage', ' path/to/coverage.jsonl']
     );
 };
 
 sub changes_applicable {
-    my ($option, $options) = @_;
+    my ($option, $options, $settings) = @_;
+
+    return 0 unless $settings;
+    return 0 unless $settings->check_group('yath');
+
+    my $yath = $settings->yath;
+    return 0 unless $yath->check_option('command');
+    my $command = $yath->command or return 0;
 
     # Cannot use this options with projects
-    return 0 if $options->command_class && $options->command_class->isa('App::Yath::Command::projects');
+    return 0 if $command->isa('App::Yath::Command::projects');
     return 1;
 }
 
-sub spawn_args {
-    my $self = shift;
-    my ($settings) = @_;
-
-    return () unless $settings->cover->files || $settings->cover->metrics || $settings->cover->write;
-
-    my $class = $settings->cover->class;
-    return ('-M' . $class . '=disabled,1');
-}
-
 sub post_process {
-    my %params   = @_;
-    my $settings = $params{settings};
+    my ($options, $state) = @_;
+    my $settings = $state->{settings};
 
     my $cover = $settings->cover;
 
     if ($cover->files || $cover->write || $cover->metrics) {
+        my $tests = $settings->tests;
         my $cover_class = $cover->class // 'Test2::Plugin::Cover';
 
         eval { require(mod2file($cover_class)); 1 } or die "Could not enable file coverage, could not load '$cover_class': $@";
-        push @{$settings->run->load_import->{'@'}} => $cover_class;
-        $settings->run->load_import->{$cover_class} = [];
+        $tests->option(load_import => {}) unless $tests->load_import;
+        push @{$tests->load_import->{'@'}} => $cover_class;
+        $tests->load_import->{$cover_class} = [];
+
+        if ($settings->check_group('runner')) {
+            my $runner = $settings->runner;
+            $runner->option(preload_early => {}) unless $runner->preload_early;
+            unshift @{$runner->preload_early->{'@'}} => $cover_class;
+            $runner->preload_early->{$cover_class} = [disabled => 1];
+        }
     }
 }
 
@@ -170,9 +164,8 @@ sub annotate_event {
                     $agg = 'Test2::Harness::Log::CoverageAggregator::ByTest';
                 }
             }
-            else {
-                $agg = 'Test2::Harness::Log::CoverageAggregator::ByTest';
-            }
+
+            $agg //= 'Test2::Harness::Log::CoverageAggregator::ByTest';
         }
 
         my $encode;
@@ -268,9 +261,11 @@ sub _percentages {
     return \@out;
 }
 
-sub finalize {
+sub client_finalize {
     my $self = shift;
-    my ($settings) = @_;
+    my (%params) = @_;
+
+    my $settings = $params{settings};
 
     my $cover   = $settings->cover;
     my $file    = $cover->write;
@@ -385,11 +380,11 @@ sub coverage_handler {
     my ($agg, $data);
     if (my $fd = $set->{facet_data}) {
         if ($data = $fd->{job_coverage}) {
-            require 'Test2/Harness/Log/CoverageAggregator/ByTest.pm' unless $INC{'Test2/Harness/Log/CoverageAggregator/ByTest.pm'};
+            require Test2::Harness::Log::CoverageAggregator::ByTest unless $INC{'Test2/Harness/Log/CoverageAggregator/ByTest.pm'};
             $agg = 'Test2::Harness::Log::CoverageAggregator::ByTest';
         }
         elsif($data = $fd->{run_coverage}) {
-            require 'Test2/Harness/Log/CoverageAggregator/ByRun.pm' unless $INC{'Test2/Harness/Log/CoverageAggregator/ByRun.pm'};
+            require Test2::Harness::Log::CoverageAggregator::ByRun unless $INC{'Test2/Harness/Log/CoverageAggregator/ByRun.pm'};
             $agg = 'Test2::Harness::Log::CoverageAggregator::ByRun';
         }
         else {
@@ -426,23 +421,21 @@ want deep coverage stats.
 
 =head1 PROVIDED OPTIONS
 
-=head2 COMMAND OPTIONS
-
-=head3 Cover Options
+=head2 Cover Options
 
 =over 4
 
-=item --cover-aggregator ByTest
-
-=item --cover-aggregator ByRun
-
-=item --cover-aggregator +Custom::Aggregator
+=item --cover-agg ByRun
 
 =item --cover-agg ByTest
 
-=item --cover-agg ByRun
+=item --cover-aggregator ByRun
+
+=item --cover-aggregator ByTest
 
 =item --cover-agg +Custom::Aggregator
+
+=item --cover-aggregator +Custom::Aggregator
 
 =item --no-cover-aggregator
 
@@ -458,26 +451,42 @@ Choose a custom aggregator subclass
 Choose a Test2::Plugin::Cover subclass
 
 
+=item --cover-dir ARG
+
+=item --cover-dir=ARG
+
 =item --cover-dirs ARG
 
 =item --cover-dirs=ARG
 
-=item --cover-dir ARG
+=item --cover-dir '["json","list"]'
 
-=item --cover-dir=ARG
+=item --cover-dir='["json","list"]'
+
+=item --cover-dirs '["json","list"]'
+
+=item --cover-dirs='["json","list"]'
+
+=item --cover-dir :{ ARG1 ARG2 ... }:
+
+=item --cover-dir=:{ ARG1 ARG2 ... }:
+
+=item --cover-dirs :{ ARG1 ARG2 ... }:
+
+=item --cover-dirs=:{ ARG1 ARG2 ... }:
 
 =item --no-cover-dirs
 
 NO DESCRIPTION - FIX ME
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --cover-exclude-private
 
 =item --no-cover-exclude-private
 
-
+Exclude subs prefixed with '_' from coverage metrics
 
 
 =item --cover-files
@@ -489,20 +498,20 @@ Use Test2::Plugin::Cover to collect coverage data for what files are touched by 
 
 =item --cover-from path/to/log.jsonl
 
-=item --cover-from http://example.com/coverage
-
 =item --cover-from path/to/coverage.jsonl
+
+=item --cover-from http://example.com/coverage
 
 =item --no-cover-from
 
 This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
 
 
+=item --cover-from-type log
+
 =item --cover-from-type json
 
 =item --cover-from-type jsonl
-
-=item --cover-from-type log
 
 =item --no-cover-from-type
 
@@ -518,20 +527,20 @@ Coverage 'from' manager to use when coverage data does not provide one
 
 =item --cover-maybe-from path/to/log.jsonl
 
-=item --cover-maybe-from http://example.com/coverage
-
 =item --cover-maybe-from path/to/coverage.jsonl
+
+=item --cover-maybe-from http://example.com/coverage
 
 =item --no-cover-maybe-from
 
 This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
 
 
+=item --cover-maybe-from-type log
+
 =item --cover-maybe-from-type json
 
 =item --cover-maybe-from-type jsonl
-
-=item --cover-maybe-from-type log
 
 =item --no-cover-maybe-from-type
 
@@ -542,29 +551,45 @@ Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is spe
 
 =item --no-cover-metrics
 
+Build the metrics data
 
-
-
-=item --cover-types ARG
-
-=item --cover-types=ARG
 
 =item --cover-type ARG
 
 =item --cover-type=ARG
 
+=item --cover-types ARG
+
+=item --cover-types=ARG
+
+=item --cover-type '["json","list"]'
+
+=item --cover-type='["json","list"]'
+
+=item --cover-types '["json","list"]'
+
+=item --cover-types='["json","list"]'
+
+=item --cover-type :{ ARG1 ARG2 ... }:
+
+=item --cover-type=:{ ARG1 ARG2 ... }:
+
+=item --cover-types :{ ARG1 ARG2 ... }:
+
+=item --cover-types=:{ ARG1 ARG2 ... }:
+
 =item --no-cover-types
 
 NO DESCRIPTION - FIX ME
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --cover-write
 
-=item --cover-write=coverage.jsonl
-
 =item --cover-write=coverage.json
+
+=item --cover-write=coverage.jsonl
 
 =item --no-cover-write
 
@@ -573,10 +598,11 @@ Create a json or jsonl file of all coverage data seen during the run (This impli
 
 =back
 
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -596,11 +622,11 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut

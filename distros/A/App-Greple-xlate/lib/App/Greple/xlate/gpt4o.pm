@@ -1,6 +1,6 @@
 package App::Greple::xlate::gpt4o;
 
-our $VERSION = "0.9909";
+our $VERSION = "0.9910";
 
 use v5.14;
 use warnings;
@@ -20,10 +20,16 @@ our $auth_key;
 our $method = __PACKAGE__ =~ s/.*://r;
 
 my %param = (
-    gpt4o => { engine => 'gpt-4o-mini', temp => '0.0', max => 3000, sub => \&gpty,
-	       prompt => "Translate following entire text into %s, line-by-line.\n"
-		       . "Leave XML style tag as it is.\n"
-		       ,
+    gpt4o => { engine => 'gpt-4o-mini', temp => '0.0', max => 10000, sub => \&gpty,
+	      prompt => <<END
+Translate the following text into %s, preserving the line structure.
+For each input line, output only the corresponding translated line in the same line position.
+Leave blank lines and any XML-style tags (e.g., <m id=1 />, <tag>, </tag>) unchanged and do not translate them.
+Do not output the original (pre-translation) text under any circumstances.
+The number and order of output lines must always match the input exactly: output line n must correspond to input line n.
+Output only the translated lines or unchanged tags/blank lines.
+**Before finishing, carefully check that there are absolutely no omissions or duplicate content of any kind in your output.**
+END
 	  },
 );
 

@@ -6,17 +6,19 @@ App::Greple::xlate - greple için çeviri destek modülü
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> modülü istenen metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (F<deepl.pm>) ve ChatGPT (F<gpt3.pm>) modülü bir arka uç motoru olarak uygulanmaktadır. Gpt-4 ve gpt-4o için deneysel destek de dahil edilmiştir.
+B<Greple> B<xlate> modülü istenen metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (F<deepl.pm>) ve ChatGPT 4.1 (F<gpt4.pm>) modülü bir arka uç motoru olarak uygulanmaktadır.
 
 Perl'ün pod stilinde yazılmış bir belgedeki normal metin bloklarını çevirmek istiyorsanız, B<greple> komutunu C<xlate::deepl> ve C<perl> modülü ile aşağıdaki gibi kullanın:
 
@@ -126,7 +128,7 @@ Kullanılacak çeviri motorunu belirtir. Motor modülünü C<-Mxlate::deepl> gib
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ Hedef dili belirtin. B<DeepL> motorunu kullanırken C<deepl languages> komutu il
 
 Orijinal ve çevrilmiş metin için çıktı formatını belirtin.
 
-C<xtxt> dışındaki aşağıdaki biçimler çevrilecek parçanın bir satır koleksiyonu olduğunu varsayar. Aslında, bir satırın yalnızca bir bölümünü çevirmek mümkündür ve C<xtxt> dışında bir biçim belirtmek anlamlı sonuçlar üretmeyecektir.
+C<xtxt> dışındaki aşağıdaki biçimler çevrilecek parçanın bir satır koleksiyonu olduğunu varsayar. Aslında, bir satırın yalnızca bir kısmını çevirmek mümkündür, ancak C<xtxt> dışında bir biçim belirtmek anlamlı sonuçlar üretmeyecektir.
 
 =over 4
 
@@ -242,6 +244,14 @@ Maskeleme işlevini gerçekleştirin ve dönüştürülen metni geri yükleme ya
 =item B<--match-all>
 
 Dosyanın tüm metnini hedef alan olarak ayarlayın.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+C<cm> ve C<colon> biçimleri söz konusu olduğunda, çıktı satır satır bölünür ve biçimlendirilir. Bu nedenle, bir satırın yalnızca bir kısmı çevrilecekse, beklenen sonuç elde edilemez. Bu filtreler, bir satırın bir kısmının normal satır satır çıktıya çevrilmesiyle bozulan çıktıyı düzeltir.
+
+Mevcut uygulamada, bir satırın birden fazla parçası çevrilirse, bunlar bağımsız satırlar olarak çıkarılır.
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

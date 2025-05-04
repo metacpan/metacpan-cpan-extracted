@@ -1,22 +1,14 @@
 # NAME
 
-App::Yath - Yet Another Test Harness (Test2-Harness) Command Line Interface
-(CLI)
+Test2::Harness - AKA 'yath' Yet Another Test Harness, A modern alternative to prove.
 
 # DESCRIPTION
 
-This is the primary documentation for `yath`, [App::Yath](https://metacpan.org/pod/App%3A%3AYath), [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness).
+This is the primary documentation for the `yath` command, [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness),
+[App::Yath](https://metacpan.org/pod/App%3A%3AYath) and all other related components.
 
-The canonical source of up-to-date command options are the help output when
-using `$ yath help` and `$ yath help COMMAND`.
-
-This document is mainly an overview of `yath` usage and common recipes.
-
-[App::Yath](https://metacpan.org/pod/App%3A%3AYath) is an alternative to [App::Prove](https://metacpan.org/pod/App%3A%3AProve), and [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness) is an alternative to [Test::Harness](https://metacpan.org/pod/Test%3A%3AHarness). It is not designed to
-replace [Test::Harness](https://metacpan.org/pod/Test%3A%3AHarness)/prove. [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness) is designed to take full
-advantage of the rich data [Test2](https://metacpan.org/pod/Test2) can provide. [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness) is also able to
-use non-core modules and provide more functionality than prove can achieve with
-its restrictions.
+The `yath` command is an alternative to the `prove` command and
+[Test::Harness](https://metacpan.org/pod/Test%3A%3AHarness).
 
 # PLATFORM SUPPORT
 
@@ -33,229 +25,209 @@ install on windows. Patches are be welcome, and it would be great if someone
 wanted to take on the windows-support role, but it is not a primary goal for
 the project.
 
-# OVERVIEW
+# QUICK START
 
-To use [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness), you use the `yath` command. Yath will find the tests
-(or use the ones you specify) and run them. As it runs, it will output
-diagnostic information such as failures. At the end, yath will print a summary
-of the test run.
+You can use `yath` to run all the tests for your repo:
 
-`yath` can be thought of as a more powerful alternative to `prove`
-([Test::Harness](https://metacpan.org/pod/Test%3A%3AHarness))
+    $ yath test
 
-# RECIPES
+Some important notes for those used to the `prove` command:
 
-These are common recipes for using `yath`.
+- yath is recursive by default.
 
-## RUN PROJECT TESTS
+    You do not need to add the `-r` flag to reach tests in subdirectories of
+    `t/` and `t2/`.
 
-    $ yath
+- The 'lib/', 'blib/lib', snd 'blib/arch' paths are added to your tests @INC for you.
 
-Simply running yath with no arguments means "Run all tests for the current
-project". Yath will look for tests in `./t`, `./t2`, and `./test.pl` and
-run any which are found.
+    No need to add '-Ilib', '-l', or '-b', as these are added automatically. They
+    can be disabled if desired, but in most cases you want them.
 
-Normally this implies the `test` command but will instead imply the `run`
-command if a persistent test runner is detected.
+- Yath will run tests concurrently by default
 
-## PRELOAD MODULES
+    By default yath will run tests with multiple processes. If you have
+    [System::Info](https://metacpan.org/pod/System%3A%3AInfo) installed it will use half of your processors/cores, otherwise
+    it defaults to 2 processes.
 
-Yath has the ability to preload modules. Yath normally forks to start new
-tests, so preloading can reduce the time spent loading modules over and over in
-each test.
+    Yoy can disable concurrency with the `-j1` flag, or specify a custom
+    concurrency value with `-j#`.
 
-Note that some tests may depend on certain modules not being loaded. In these
-cases you can add the `# HARNESS-NO-PRELOAD` directive to the top of the test
-files that cannot use preload.
+# COMMAND LINE HELP
 
-### SIMPLE PRELOAD
+There are a couple useful things to be aware of:
 
-Any module can be preloaded:
+- yath help - Get a list of commands
 
-    $ yath -PMoose
+    This will provide you with a list of available yath commands, and a brief
+    description of what they do.
 
-You can preload as many modules as you want:
+- yath COMMAND --help
+- yath help COMMAND
 
-    $ yath -PList::Util -PScalar::Util
+    These are both effectively the same thing, they let you get command specific
+    help.
 
-### COMPLEX PRELOAD
+- yath COMMAND --help=SECTION
 
-If your preload is a subclass of [Test2::Harness::Runner::Preload](https://metacpan.org/pod/Test2%3A%3AHarness%3A%3ARunner%3A%3APreload) then more
-complex preload behavior is possible. See those docs for more info.
+    Sometimes a command may have an overwhelming number of options. You can filter
+    it to specific sections to make it easier to find what you are looking for. At
+    the very end of the help dialogue is a list of sections to help you get start.
 
-## LOGGING
+- yath COMMAND \[OPTIONS\] --show-opts
+- yath COMMAND \[OPTIONS\] --show-opts=GROUP
 
-### RECORDING A LOG
+    This will show you what yath interpreted all your config and command line args
+    to mean in a tree view. This is useful if you suspect a command line flag is
+    not being handled properly.
 
-You can turn on logging with a flag. The filename of the log will be printed at
-the end.
+# CONFIGURATION FILES
 
-    $ yath -L
-    ...
-    Wrote log file: test-logs/2017-09-12~22:44:34~1505281474~25709.jsonl
+Yath will read from the following configuration files when you run it.
 
-The event log can be quite large. It can be compressed with bzip2.
+**Note:** These should be located in your projects root directory, yath will
+search parent directories to find them.
 
-    $ yath -B
-    ...
-    Wrote log file: test-logs/2017-09-12~22:44:34~1505281474~25709.jsonl.bz2
+- .yath.rc
 
-gzip compression is also supported.
+    This should contain project specific flags you always want used regardless of
+    the machine. This file **SHOULD** be commited to your project repository.
 
-    $ yath -G
-    ...
-    Wrote log file: test-logs/2017-09-12~22:44:34~1505281474~25709.jsonl.gz
+- .yath.user.rc
 
-`-B` and `-G` both imply `-L`.
+    This should contain user specific flags that you onyl want to apply when you
+    run tests. This file **SHOULD NOT** be commited to yor project repository.
 
-### REPLAYING FROM A LOG
+The format of the config files is:
 
-You can replay a test run from a log file:
+    # GLOBAL OPTIONS FOR ALL COMMANDS
+    -D/path/to/my/spcial/libs
 
-    $ yath test-logs/2017-09-12~22:44:34~1505281474~25709.jsonl.bz2
-
-This will be significantly faster than the initial run as no tests are actually
-being executed. All events are simply read from the log, and processed by the
-harness.
-
-You can change display options and limit rendering/processing to specific test
-jobs from the run:
-
-    $ yath test-logs/2017-09-12~22:44:34~1505281474~25709.jsonl.bz2 -v [TEST UUID(S)]
-
-Note: This is done using the `$ yath replay ...` command. The `replay`
-command is implied if the first argument is a log file.
-
-## PER-TEST TIMING DATA
-
-The `-T` option will cause each test file to report how long it took to run.
-
-    $ yath -T
-
-    ( PASSED )  job  1    t/yath_script.t
-    (  TIME  )  job  1    Startup: 0.07692s | Events: 0.01170s | Cleanup: 0.00190s | Total: 0.09052s
-
-## PERSISTENT RUNNER
-
-yath supports starting a yath session that waits for tests to run. This is very
-useful when combined with preload.
-
-### STARTING
-
-This starts the server. Many options available to the 'test' command will work
-here but not all. See `$ yath help start` for more info.
-
-    $ yath start
-
-### RUNNING
-
-This will run tests using the persistent runner. By default, it will search for
-tests just like the 'test' command. Many options available to the `test`
-command will work for this as well. See `$ yath help run` for more details.
-
-    $ yath run
-
-### STOPPING
-
-Stopping a persistent runner is easy.
-
-    $ yath stop
-
-### INFORMATIONAL
-
-The `which` command will tell you which persistent runner will be used. Yath
-searches for the persistent runner in the current directory, then searches in
-parent directories until it either hits the root directory, or finds the
-persistent runner tracking file.
-
-    $ yath which
-
-The `watch` command will tail the runner's log files.
-
-    $ yath watch
-
-### PRELOAD + PERSISTENT RUNNER
-
-You can use preloads with the `yath start` command. In this case, yath will
-track all the modules pulled in during preload. If any of them change, the
-server will reload itself to bring in the changes. Further, modified modules
-will be blacklisted so that they are not preloaded on subsequent reloads. This
-behavior is useful if you are actively working on a module that is normally
-preloaded.
-
-## MAKING YOUR PROJECT ALWAYS USE YATH
-
-    $ yath init
-
-The above command will create `test.pl`. `test.pl` is automatically run by
-most build utils, in which case only the exit value matters. The generated
-`test.pl` will run `yath` and execute all tests in the `./t` and/or `./t2`
-directories. Tests in `./t` will ALSO be run by prove but tests in `./t2`
-will only be run by yath.
-
-## PROJECT-SPECIFIC YATH CONFIG
-
-You can write a `.yath.rc` file. The file format is very simple. Create a
-`[COMMAND]` section to start the configuration for a command and then
-provide any options normally allowed by it. When `yath` is run inside your
-project, it will use the config specified in the rc file, unless overridden
-by command line options.
-
-**Note:** You can also add pre-command options by placing them at the top of
-your config file _BEFORE_ any `[cmd]` markers.
-
-Comments start with a semi-colon.
-
-Example .yath.rc:
-
-    -pFoo ; Load the 'foo' plugin before dealing with commands.
-
-    [test]
-    -B ;Always write a bzip2-compressed log
+    [test]              # Options for the 'test' command
+    -j32                # Always use 32 processes for concurrency
+    -Irel(foo/bar)      # Always include this path relative to the location of the .rc file
+    -Irel(foo/bar/*)    # Wildcard expanded to multiple -I.. options
 
     [start]
-    -PMoose ;Always preload Moose with a persistent runner
+    ...
 
-This file is normally committed into the project's repo.
+- Any option that is valid at the command line can be put into the .rc file.
+- Anything listed before a command section applies to all commands.
+- Anything after a `[COMMAND]` section applies only to that command
+- rel(...) can be used to provide paths relative to the location of the .rc file.
+- rel(..\*) wildcards will be expanded
+- # starts a comment
 
-### SPECIAL PATH PSEUDO-FUNCTIONS
+# PRELOADING AND CONCURRENCY FOR FASTER TEST RUNS
 
-Sometimes you want to specify files relative to the .yath.rc so that the config
-option works from any subdirectory of the project. Other times you may wish to
-use a shell expansion. Sometimes you want both!
+You can preload modules that are expensive to load, then yath will launch tests
+from these preloaded states. In some cases this can provide a massive speedup:
 
-- rel(path/to/file)
+    yath test -PMoose -PList::Util -PScalar::Util
 
-        -I rel(path/to/extra_lib)
-        -I=rel(path/to/extra_lib)
+In addition yath can run multiple concurrent jobs (specified with the `-j#`
+command line option.
 
-    This will take the path to `.yath.rc` and prefix it to the path inside
-    `rel(...)`. If for example you have `/project/.yath.rc` then the path would
-    become `/project/path/to/extra_lib`.
+    yath test -j16
 
-- glob(path/\*/file)
+You can combine these for a compounding performance boost:
 
-        --default-search glob(subprojects/*/t)
-        --default-search=glob(subprojects/*/t)
+    yath test -j16 -PMoose
 
-    This will add a `--default-search $_` for every item found in the glob. This
-    uses the perl builtin function `glob()` under the hood.
+## BENCHMARKING WITH THE MOOSE TEST SUITE:
 
-- relglob(path/\*/file)
+- No concurrency, no preload (85s):
 
-        --default-search relglob(subprojects/*/t)
-        --default-search=relglob(subprojects/*/t)
+        $ yath test -j1
+        [...]
+             File Count: 478
+        Assertion Count: 19546
+              Wall Time: 85.10 seconds
+               CPU Time: 53.33 seconds (usr: 3.61s | sys: 0.17s | cusr: 44.85s | csys: 4.70s)
+              CPU Usage: 62%
 
-    Same as `glob()` except paths are relative to the `.yath.rc` file.
+- No concurrency, but preload (26s):
 
-## PROJECT-SPECIFIC YATH CONFIG USER OVERRIDES
+        $ yath test -j1 -PMoose
+        [...]
+             File Count: 478
+        Assertion Count: 19545
+              Wall Time: 26.84 seconds
+               CPU Time: 18.39 seconds (usr: 2.71s | sys: 0.58s | cusr: 12.45s | csys: 2.65s)
+              CPU Usage: 68%
 
-You can add a `.yath.user.rc` file. Format is the same as the regular
-`.yath.rc` file. This file will be read in addition to the regular config
-file. Directives in this file will come AFTER the directives in the primary
-config so it may be used to override config.
+- Just concurrency, no preload (27s):
 
-This file should not normally be committed to the project repo.
+        $ yath test -j16
+        [...]
+             File Count: 478
+        Assertion Count: 19546
+              Wall Time: 27.25 seconds
+               CPU Time: 58.62 seconds (usr: 4.24s | sys: 0.18s | cusr: 49.73s | csys: 4.47s)
+              CPU Usage: 215%
+
+- Concurrency + Preload (7s):
+
+        $ yath test -j16 -PMoose
+        [...]
+             File Count: 478
+        Assertion Count: 19545
+              Wall Time: 7.12 seconds
+               CPU Time: 18.26 seconds (usr: 2.14s | sys: 0.10s | cusr: 13.93s | csys: 2.09s)
+              CPU Usage: 256%
+
+As you can see concurrency and preloading make a huge difference in test run times!
+
+See ["ADVANCED CONCURRENCY"](#advanced-concurrency) and ["ADVANCED PRELOADING"](#advanced-preloading) for more information.
+
+# USING A WEB INTERFACE
+
+**Note:** It is better to create a standalone yath web server, rather than
+creating a new instance for each run, Documentation on doing that will be
+linked here when it is written.
+
+    $ yath test --server
+
+This will launch a web server (usually on [http://127.0.0.1:8080](http://127.0.0.1:8080), but the url
+will be printed for you at the start and end of the run) that allows you to
+view the results and filter/inspect the output in full detail.
+
+**NOTE:** this requires installaction of one of the following sets of optional
+modules:
+
+- [DBD::Pg](https://metacpan.org/pod/DBD%3A%3APg) and [DateTime::Format::Pg](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3APg)
+
+    PostgreSQL, the database engine [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness) is primarily written against.
+
+    You can specify this one directly if you want to avoid database roulette:
+
+        $ yath test --server=PostgreSQL
+
+- [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite) and [DateTime::Format::SQLite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ASQLite)
+
+    SQLite, the easiest option if you do not want to install a larger database engine.
+
+    You can specify this one directly if you want to avoid database roulette:
+
+        $ yath test --server=SQLite
+
+- [DBD::MariaDB](https://metacpan.org/pod/DBD%3A%3AMariaDB), [DBD::mysql](https://metacpan.org/pod/DBD%3A%3Amysql) and [DateTime::Format::MySQL](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AMySQL)
+
+    These modules will let you use direct MariaDB support instead of falling back
+    to a generic MySQL implementation.
+
+        $ yath test --server=MariaDB
+
+- [DBD::mysql](https://metacpan.org/pod/DBD%3A%3Amysql) and [DateTime::Format::MySQL](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AMySQL)
+
+    With these modules installed you can choose to use generic MySQL, or a specific flavor of MySQL such as Percona.
+
+    You can specify this one directly if you want to avoid database roulette:
+
+        $ yath test --server=MySQL
+        $ yath test --server=Percona
+
+    **Note:** Percona has no built-in UUID type, as such it will be slow to handle
+    operations that require UUIDs such as looking up specific events.
 
 ## HARNESS DIRECTIVES INSIDE TESTS
 
@@ -447,73 +419,163 @@ and is equivalent to HARNESS-RETRY.
 
 Use this to avoid this test being retried regardless of your retry settings.
 
-# MODULE DOCS
+# ADVANCED CONCURRENCY
 
-This section documents the [App::Yath](https://metacpan.org/pod/App%3A%3AYath) module itself.
+You can design your tests to use concurrency internally that is managed by yath!
 
-## SYNOPSIS
+You can sub-divide concurrency slots by specifying `-j#:#`. This will set the
+`$ENV{T2_HARNESS_MY_JOB_CONCURRENCY}` env var to the number of concurrency
+slots assigned to the test.
 
-In practice you should never need to write your own yath script, or construct
-an [App::Yath](https://metacpan.org/pod/App%3A%3AYath) instance, or even access themain instance when yath is running.
-However some aspects of doing so are documented here for completeness.
+**Note:** Tests are normally only assigned 1 concurrency slot unless they have
+the `# HARNESS-JOB-SLOTS MIN` or `#HARNESS-JOB-SLOTS MIN MAX` headers at the
+top of the file (they can be after the shbang or use statements, but must be
+befor eany other code).
 
-A minimum yath script looks like this:
+Here is an example of a test written to use anywhere from 1 to 5 slots
+depending on how much yath gives it. Implementation of wait() and
+start\_child\_process() is left to the reader.
 
-    BEGIN {
-        package App::Yath:Script;
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+    use Test2::V0;
+    use Test2::IPC;
+    # HARNESS-JOB-SLOTS 1 5
 
-        require Time::HiRes;
-        require App::Yath;
-        require Test2::Harness::Settings;
+    my @kids;
 
-        my $settings = Test2::Harness::Settings->new(
-            harness => {
-                orig_argv       => [@ARGV],
-                orig_inc        => [@INC],
-                script          => __FILE__,
-                start           => Time::HiRes::time(),
-                version         => $App::Yath::VERSION,
-            },
-        );
-
-        my $app = App::Yath->new(
-            argv    => \@ARGV,
-            config  => {},
-            settings => $settings,
-        );
-
-        $app->generate_run_sub('App::Yath::Script::run');
+    for my (1 .. $ENV{T2_HARNESS_MY_JOB_CONCURRENCY}) {
+        push @kids => start_child_process(...);
     }
 
-    exit(App::Yath::Script::run());
+    wait($_) for @kids;
 
-It is important that most logic live in a BEGIN block. This is so that
-[goto::file](https://metacpan.org/pod/goto%3A%3Afile) can be used post-fork to execute a test script.
+    done_testing;
 
-The actual yath script is significantly more complicated with the following behaviors:
+# ADVANCED PRELOADING
 
-- pre-process essential arguments such as -D and no-scan-plugins
-- re-exec with a different yath script if in developer mode and a local copy is found
-- Parse the yath-rc config files
-- gather and store essential startup information
+You can create custom preload classes (still loaded with `-PClass`) that
+define advanced preload behavior:
 
-## METHODS
+    package MyPreload;
+    use strict;
+    use warnings;
 
-App::Yath does not provide many methods to use externally.
+    # Using this class will turn this into an advanced preload class
+    use Test2::Harness::Preload;
 
-- $app->generate\_run\_sub($symbol\_name)
+    stage ONLY_MOOSE => sub {
+        preload 'Moose';
+    };
 
-    This tells App::Yath to generate a subroutine at the specified symbol name
-    which can be run and be expected to return an exit value.
+    stage ORGANIZATION_COMMON_MODULES => sub {
+        eager();
+        default();
 
-- $lib\_path = $app->app\_path()
+        preload 'Moose';
+        preload 'My::Common::Foo';
+        preload 'My::Common::Bar';
 
-    Get the include directory App::Yath was loaded from.
+        preload sub { ... };
+
+        stage APP_A => sub {
+            preload 'My::App::A';
+
+            post_fork sub { do_this_before_each_test_after_fork() };
+        };
+
+        stage APP_B => sub {
+            preload 'My::APP::B;
+        };
+    };
+
+    1;
+
+Custom preload classes use the [Test2::Harness::Preload](https://metacpan.org/pod/Test2%3A%3AHarness%3A%3APreload) module to set up some
+key meta-information, then you can define preload "stages".
+
+A "stage" is a process with a preloaded state waiting for tests to run, when it
+gets a test it will fork and the test will run in the fork. These stages/forks
+are smart and use [goto::file](https://metacpan.org/pod/goto%3A%3Afile) to insure no stack frames or undesired state
+contamination will be introduced into your test process.
+
+Stages may be nested, that is you can build a parent stage, then have child
+stages forked from that stage that inherit the state but also make independent
+changes.
+
+There are also several hooks available to inject behavior pre-fork, post-fork
+and pre-launch.
+
+## FUNCTIONS AVAILABLE TO PRELOADS
+
+- stage NAME => sub { ... }
+- stage("NAME", sub { ... })
+
+    Defines a stage, call hooks or other methods within the sub.
+
+- preload "Module::Name"
+- preload sub { ... }
+
+    This designates modules that should be loaded in any given stage. They will be
+    loaded in order. You may also provide a sub to do the loading if a simple
+    module name is not sufficient such as if you need localized env vars or other
+    clever tricks.
+
+- eager()
+
+    This designates a stage as eager. If a stage is eager then it will run tests
+    that usually ask for a nested/child stage. This is useful if a nested stage
+    takes a long time to load and you want tests that ask for it to start anyway
+    without waiting longer than they have to.
+
+- default()
+
+    This desginates a stage as the default one. This means it will be used if the
+    test does not request a specific stage. There can only be 1 default stage.
+
+- pre\_fork sub { ... }
+
+    This sub will be called just before forking every time a test is forked off of
+    the stage. This is run in the parent process.
+
+- post\_fork sub { ... }
+
+    This will be called immedietly after forking every time a test if forked off of
+    the stage. This is run in the child process.
+
+- pre\_launch sub { ... }
+
+    This will be called in the child process after state has been manipulated just
+    before execution is handed off to the test file.
+
+## SPECIFYING WHICH PRELOADS SHOULD BE USED FOR WHICH TESTS
+
+The easiest way is to add a specific header comment to your test files:
+
+    #!/usr/bin/perl
+    use strict;
+    use warnings
+    # HARNESS-STAGE-MYSTAGE
+
+You can also configure plugins (See ["Plugins"](#plugins)) to assign tests to stages.
+
+# PLUGINS
+
+TODO: WRITE ME!
+
+# RENDERERS
+
+TODO: WRITE ME!
+
+# RESOURCES
+
+TODO: WRITE ME!
 
 # SOURCE
 
 The source code repository for Test2-Harness can be found at
-`http://github.com/Test-More/Test2-Harness/`.
+[http://github.com/Test-More/Test2-Harness/](http://github.com/Test-More/Test2-Harness/).
 
 # MAINTAINERS
 
@@ -525,9 +587,9 @@ The source code repository for Test2-Harness can be found at
 
 # COPYRIGHT
 
-Copyright 2020 Chad Granum <exodist7@gmail.com>.
+Copyright Chad Granum <exodist7@gmail.com>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See `http://dev.perl.org/licenses/`
+See [http://dev.perl.org/licenses/](http://dev.perl.org/licenses/)

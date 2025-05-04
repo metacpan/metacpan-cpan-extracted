@@ -2,19 +2,19 @@ package App::Yath::Command::spawn;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
-
-use App::Yath::Options;
+our $VERSION = '2.000005';
 
 use Time::HiRes qw/sleep time/;
 use File::Temp qw/tempfile/;
 
 use Test2::Harness::Util qw/parse_exit/;
 
-use parent 'App::Yath::Command::run';
+use App::Yath::Client;
+
+use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
 
-sub group { 'persist' }
+sub group { 'daemon' }
 
 sub summary { "Launch a perl script from the preloaded environment" }
 sub cli_args { "[--] path/to/script.pl [options and args]" }
@@ -29,19 +29,24 @@ you care about.
     EOT
 }
 
-option_group {prefix => 'spawn', category => 'spawn options'} => sub {
+sub load_plugins   { 0 }
+sub load_resources { 0 }
+sub load_renderers { 0 }
+
+use Getopt::Yath;
+option_group {group => 'spawn', category => 'spawn options'} => sub {
     option stage => (
         short => 's',
-        type => 's',
+        type => 'Scalar',
         description => 'Specify the stage to be used for launching the script',
         long_examples => [ ' foo'],
         short_examples => [ ' foo'],
-        default => 'default',
+        default => 'BASE',
     );
 
     option copy_env => (
         short => 'e',
-        type => 'm',
+        type => 'List',
         description => "Specify environment variables to pass along with their current values, can also use a regex",
         long_examples => [ ' HOME', ' SHELL', ' /PERL_.*/i' ],
         short_examples => [ ' HOME', ' SHELL', ' /PERL_.*/i' ],
@@ -50,151 +55,66 @@ option_group {prefix => 'spawn', category => 'spawn options'} => sub {
     option env_var => (
         field          => 'env_vars',
         short          => 'E',
-        type           => 'h',
+        type           => 'Map',
         long_examples  => [' VAR=VAL'],
         short_examples => ['VAR=VAL', ' VAR=VAL'],
         description    => 'Set environment variables for the spawn',
     );
 };
 
-sub read_line {
-    my ($fh, $timeout) = @_;
-
-    $timeout //= 300;
-
-    my $start = time;
-    while (1) {
-        if ($timeout < (time - $start)) {
-            my @caller = caller;
-            die "Timed out at $caller[1] line $caller[2].\n";
-        }
-        seek($fh, 0,1) if eof($fh);
-        my $out = <$fh> // next;
-        chomp($out);
-        return $out;
-    }
-}
-
-# This is here for subclasses
-sub queue_spawn {
-    my $self = shift;
-    my ($args) = @_;
-
-    $self->state->queue_spawn($args);
-}
-
-sub run_script { shift @ARGV // die "No script specified" }
-
-sub stage { $_[0]->settings->spawn->stage }
-
-sub env_vars {
-    my $self = shift;
-
-    my $settings = $self->settings;
-
-    my $env = {};
-
-    for my $var (@{$settings->spawn->copy_env}) {
-        if ($var =~ m{^/(.*)/(\w*)$}s) {
-            my ($re, $opts) = ($1, $2);
-            my $pattern = length($opts) ? "(?$opts)$re" : $re;
-            $env->{$_} = $ENV{$_} for grep { m/$pattern/ } keys %ENV;
-        }
-        else {
-            $env->{$var} = $ENV{$var};
-        }
-    }
-
-    my $set = $settings->spawn->env_vars;
-    $env->{$_} = $set->{$_} for keys %$set;
-
-    return $env;
-}
-
-sub set_pname {
-    my $self = shift;
-    my ($run) = @_;
-
-    $0 = "yath-" . $self->name . " $run " . join (' ', @ARGV);
-}
-
-sub pre_process_argv {
-    shift @ARGV if @ARGV && $ARGV[0] eq '--';
-}
-
-sub sig_handlers { qw/INT TERM HUP QUIT USR1 USR2 STOP WINCH/ }
-
-sub set_sig_handlers {
-    my $self = shift;
-    my ($wpid) = @_;
-
-    local $@;
-    eval { my $s = $_; $SIG{$s} = sub { kill($s, $wpid) } } for $self->sig_handlers;
-}
-
-sub clear_sig_handlers {
-    my $self = shift;
-
-    local $@;
-    eval { my $s = $_; $SIG{$s} = 'DEFAULT' } for $self->sig_handlers;
-}
-
-sub pre_exit_hook {}
+include_options(
+    'App::Yath::Options::IPC',
+    'App::Yath::Options::Yath',
+);
 
 sub run {
     my $self = shift;
 
-    $self->pre_process_argv;
+    my $args = $self->args;
+    shift(@$args) if @$args && $args->[0] eq '--';
 
-    my $run = $self->run_script;
-    $self->set_pname($run);
+    my ($script, @argv) = @$args;
 
-    my ($fh, $name) = tempfile(UNLINK => 1);
-    close($fh);
+    my $settings = $self->settings;
+    my $client = App::Yath::Client->new(settings => $settings);
 
-    $self->queue_spawn({
-        stage    => $self->stage // 'default',
-        file     => $run,
-        owner    => $$,
-        ipcfile  => $name,
-        args     => [@ARGV],
-        env_vars => $self->env_vars,
-    });
+    $client->spawn(
+        script => $script,
+        argv   => \@argv,
+        stage  => $settings->spawn->stage,
+        env    => $self->env,
+        io_pid => $$,
+    );
 
-    open($fh, '<', $name) or die "Could not open ipcfile: $!";
-    my $mpid = read_line($fh);
-    my $wpid = read_line($fh);
-    my $win  = read_line($fh);
+    my $pid = $client->get_message(blocking => 1)->{'pid'};
 
-    $self->set_sig_handlers($wpid);
+    local $SIG{TERM} = sub { kill('TERM', $pid) };
+    local $SIG{INT}  = sub { kill('INT',  $pid) };
+    local $SIG{HUP}  = sub { kill('HUP',  $pid) };
 
-    open(my $wfh, '>>', "/proc/$mpid/fd/$win") or die "Could not open /proc/$wpid/fd/$win: $!";
-    $wfh->autoflush(1);
-    STDIN->blocking(0);
-    while (0 < kill(0, $mpid)) {
-        my $line = <STDIN>;
-        if (defined $line) {
-            print $wfh $line;
-        }
-        else {
-            sleep 0.2;
-        }
+    my $exit = $client->get_message(blocking => 1)->{'exit'};
+
+    kill($exit->{sig}, $$) if $exit->{sig};
+
+    return $exit->{err} // 0;
+}
+
+sub env {
+    my $self = shift;
+
+    my $settings = $self->settings;
+
+    my %env;
+
+    for my $var (@{$settings->spawn->copy_env // []}) {
+        $env{$var} = $ENV{$var} if exists $ENV{$var};
     }
 
-    $self->clear_sig_handlers();
-
-    my $exit = read_line($fh) // die "Could not get exit code";
-    $exit = parse_exit($exit);
-    if ($exit->{sig}) {
-        print STDERR "Terminated with signal: $exit->{sig}.\n";
-        kill($exit->{sig}, $$);
+    if (my $set = $settings->spawn->env_vars) {
+        $env{$_} = $set->{$_} for keys %$set;
     }
 
-    print STDERR "Exited with code: $exit->{err}.\n" if $exit->{err};
-
-    $self->pre_exit_hook($exit);
-
-    exit($exit->{err});
+    return \%env;
 }
 
 1;
@@ -220,57 +140,244 @@ you care about.
 
 =head1 USAGE
 
-    $ yath [YATH OPTIONS] spawn [COMMAND OPTIONS]
+    $ yath [YATH OPTIONS] spawn [COMMAND OPTIONS] [COMMAND ARGUMENTS]
 
-=head2 YATH OPTIONS
+=head2 OPTIONS
 
-=head3 Developer
+=head3 Harness Options
 
 =over 4
+
+=item -d
+
+=item --dummy
+
+=item --no-dummy
+
+Dummy run, do not actually execute anything
+
+Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
+
+The following environment variables will be cleared after arguments are processed: C<T2_HARNESS_DUMMY>
+
+
+=item --procname-prefix ARG
+
+=item --procname-prefix=ARG
+
+=item --no-procname-prefix
+
+Add a prefix to all proc names (as seen by ps).
+
+The following environment variables will be set after arguments are processed: C<T2_HARNESS_PROC_PREFIX>
+
+
+=back
+
+=head3 IPC Options
+
+=over 4
+
+=item --ipc-address ARG
+
+=item --ipc-address=ARG
+
+=item --no-ipc-address
+
+IPC address to use (usually auto-generated or discovered)
+
+
+=item --ipc-allow-multiple
+
+=item --no-ipc-allow-multiple
+
+Normally yath will prevent you from starting multiple persistent runners in the same project, this option will allow you to start more than one.
+
+
+=item --ipc-dir ARG
+
+=item --ipc-dir=ARG
+
+=item --no-ipc-dir
+
+Directory for ipc files
+
+Can also be set with the following environment variables: C<T2_HARNESS_IPC_DIR>, C<YATH_IPC_DIR>
+
+
+=item --ipc-dir-order ARG
+
+=item --ipc-dir-order=ARG
+
+=item --ipc-dir-order '["json","list"]'
+
+=item --ipc-dir-order='["json","list"]'
+
+=item --ipc-dir-order :{ ARG1 ARG2 ... }:
+
+=item --ipc-dir-order=:{ ARG1 ARG2 ... }:
+
+=item --no-ipc-dir-order
+
+When finding ipc-dir automatically, search in this order, default: ['base', 'temp']
+
+Note: Can be specified multiple times
+
+
+=item --ipc-file ARG
+
+=item --ipc-file=ARG
+
+=item --no-ipc-file
+
+IPC file used to locate instances (usually auto-generated or discovered)
+
+
+=item --ipc-peer-pid ARG
+
+=item --ipc-peer-pid=ARG
+
+=item --no-ipc-peer-pid
+
+Optionally a peer PID may be provided
+
+
+=item --ipc-port ARG
+
+=item --ipc-port=ARG
+
+=item --no-ipc-port
+
+Some IPC protocols require a port, otherwise this should be left empty
+
+
+=item --ipc-prefix ARG
+
+=item --ipc-prefix=ARG
+
+=item --no-ipc-prefix
+
+Prefix for ipc files
+
+
+=item --ipc-protocol IPSocket
+
+=item --ipc-protocol AtomicPipe
+
+=item --ipc-protocol UnixSocket
+
+=item --ipc-protocol +Test2::Harness::IPC::Protocol::AtomicPipe
+
+=item --no-ipc-protocol
+
+Specify what IPC Protocol to use. Use the "+" prefix to specify a fully qualified namespace, otherwise Test2::Harness::IPC::Protocol::XXX namespace is assumed.
+
+
+=back
+
+=head3 Yath Options
+
+=over 4
+
+=item --base-dir ARG
+
+=item --base-dir=ARG
+
+=item --no-base-dir
+
+Root directory for the project being tested (usually where .yath.rc lives)
+
+
+=item -D
+
+=item -Dlib
+
+=item -Dlib
+
+=item -D=lib
+
+=item -D"lib/*"
 
 =item --dev-lib
 
 =item --dev-lib=lib
 
-=item -D
-
-=item -D=lib
-
-=item -Dlib
+=item --dev-lib="lib/*"
 
 =item --no-dev-lib
 
-Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
 
-Can be specified multiple times
+Note: This option can cause yath to use exec() to reload itself with the correct libraries in place. Each occurence of this argument can cause an additional exec() call. Use --dev-libs-verbose BEFORE any -D calls to see the exec() calls.
 
-
-=back
-
-=head3 Environment
-
-=over 4
-
-=item --persist-dir ARG
-
-=item --persist-dir=ARG
-
-=item --no-persist-dir
-
-Where to find persistence files.
+Note: Can be specified multiple times
 
 
-=item --persist-file ARG
+=item --dev-libs-verbose
 
-=item --persist-file=ARG
+=item --no-dev-libs-verbose
 
-=item --pfile ARG
+Be verbose and announce that yath will re-exec in order to have the correct includes (normally yath will just call exec() quietly)
 
-=item --pfile=ARG
 
-=item --no-persist-file
+=item -h
 
-Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
+=item -h=Group
+
+=item --help
+
+=item --help=Group
+
+=item --no-help
+
+exit after showing help information
+
+
+=item -p key=val
+
+=item -p=key=val
+
+=item -pkey=value
+
+=item -p '{"json":"hash"}'
+
+=item -p='{"json":"hash"}'
+
+=item -p:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -p :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -p=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugin key=val
+
+=item --plugin=key=val
+
+=item --plugins key=val
+
+=item --plugins=key=val
+
+=item --plugin '{"json":"hash"}'
+
+=item --plugin='{"json":"hash"}'
+
+=item --plugins '{"json":"hash"}'
+
+=item --plugins='{"json":"hash"}'
+
+=item --plugin :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugin=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugins :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugins=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-plugins
+
+Load a yath plugin.
+
+Note: Can be specified multiple times
 
 
 =item --project ARG
@@ -283,25 +390,57 @@ Where to find the persistence file. The default is /{system-tempdir}/project-yat
 
 =item --no-project
 
-This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file.
 
 
-=back
+=item --scan-options key=val
 
-=head3 Help and Debugging
+=item --scan-options=key=val
 
-=over 4
+=item --scan-options '{"json":"hash"}'
+
+=item --scan-options='{"json":"hash"}'
+
+=item --scan-options(?^:^--(no-)?(?^:scan-(.+))$)
+
+=item --scan-options :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --scan-options=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-scan-options
+
+=item /^--(no-)?scan-(.+)$/
+
+Yath will normally scan plugins for options. Some commands scan other libraries (finders, resources, renderers, etc) for options. You can use this to disable all scanning, or selectively disable/enable some scanning.
+
+Note: This is parsed early in the argument processing sequence, before options that may be earlier in your argument list.
+
+Note: Can be specified multiple times
+
 
 =item --show-opts
+
+=item --show-opts=group
 
 =item --no-show-opts
 
 Exit after showing what yath thinks your options mean
 
 
-=item --version
+=item --user ARG
+
+=item --user=ARG
+
+=item --no-user
+
+Username to associate with logs, database entries, and yath servers.
+
+Can also be set with the following environment variables: C<YATH_USER>, C<USER>
+
 
 =item -V
+
+=item --version
 
 =item --no-version
 
@@ -310,344 +449,9 @@ Exit after showing a helpful usage message
 
 =back
 
-=head3 Plugins
-
-=over 4
-
-=item --no-scan-plugins
-
-=item --no-no-scan-plugins
-
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
-
-
-=item --plugins PLUGIN
-
-=item --plugins +App::Yath::Plugin::PLUGIN
-
-=item --plugins PLUGIN=arg1,arg2,...
-
-=item --plugin PLUGIN
-
-=item --plugin +App::Yath::Plugin::PLUGIN
-
-=item --plugin PLUGIN=arg1,arg2,...
-
-=item -pPLUGIN
-
-=item --no-plugins
-
-Load a yath plugin.
-
-Can be specified multiple times
-
-
-=back
-
-=head2 COMMAND OPTIONS
-
-=head3 Cover Options
-
-=over 4
-
-=item --cover-aggregator ByTest
-
-=item --cover-aggregator ByRun
-
-=item --cover-aggregator +Custom::Aggregator
-
-=item --cover-agg ByTest
-
-=item --cover-agg ByRun
-
-=item --cover-agg +Custom::Aggregator
-
-=item --no-cover-aggregator
-
-Choose a custom aggregator subclass
-
-
-=item --cover-class ARG
-
-=item --cover-class=ARG
-
-=item --no-cover-class
-
-Choose a Test2::Plugin::Cover subclass
-
-
-=item --cover-dirs ARG
-
-=item --cover-dirs=ARG
-
-=item --cover-dir ARG
-
-=item --cover-dir=ARG
-
-=item --no-cover-dirs
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-exclude-private
-
-=item --no-cover-exclude-private
-
-
-
-
-=item --cover-files
-
-=item --no-cover-files
-
-Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
-
-
-=item --cover-from path/to/log.jsonl
-
-=item --cover-from http://example.com/coverage
-
-=item --cover-from path/to/coverage.jsonl
-
-=item --no-cover-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
-
-
-=item --cover-from-type json
-
-=item --cover-from-type jsonl
-
-=item --cover-from-type log
-
-=item --no-cover-from-type
-
-File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.
-
-
-=item --cover-manager My::Coverage::Manager
-
-=item --no-cover-manager
-
-Coverage 'from' manager to use when coverage data does not provide one
-
-
-=item --cover-maybe-from path/to/log.jsonl
-
-=item --cover-maybe-from http://example.com/coverage
-
-=item --cover-maybe-from path/to/coverage.jsonl
-
-=item --no-cover-maybe-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
-
-
-=item --cover-maybe-from-type json
-
-=item --cover-maybe-from-type jsonl
-
-=item --cover-maybe-from-type log
-
-=item --no-cover-maybe-from-type
-
-Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect
-
-
-=item --cover-metrics
-
-=item --no-cover-metrics
-
-
-
-
-=item --cover-types ARG
-
-=item --cover-types=ARG
-
-=item --cover-type ARG
-
-=item --cover-type=ARG
-
-=item --no-cover-types
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-write
-
-=item --cover-write=coverage.jsonl
-
-=item --cover-write=coverage.json
-
-=item --no-cover-write
-
-Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).
-
-
-=back
-
-=head3 Git Options
-
-=over 4
-
-=item --git-change-base master
-
-=item --git-change-base HEAD^
-
-=item --git-change-base df22abe4
-
-=item --no-git-change-base
-
-Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
-
-
-=back
-
-=head3 Help and Debugging
-
-=over 4
-
-=item --dummy
-
-=item -d
-
-=item --no-dummy
-
-Dummy run, do not actually execute anything
-
-Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
-
-
-=item --help
-
-=item -h
-
-=item --no-help
-
-exit after showing help information
-
-
-=item --interactive
-
-=item -i
-
-=item --no-interactive
-
-Use interactive mode, 1 test at a time, stdin forwarded to it
-
-
-=item --keep-dirs
-
-=item --keep_dir
-
-=item -k
-
-=item --no-keep-dirs
-
-Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
-
-
-=item --procname-prefix ARG
-
-=item --procname-prefix=ARG
-
-=item --no-procname-prefix
-
-Add a prefix to all proc names (as seen by ps).
-
-
-=back
-
-=head3 YathUI Options
-
-=over 4
-
-=item --yathui-api-key ARG
-
-=item --yathui-api-key=ARG
-
-=item --no-yathui-api-key
-
-Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
-
-
-=item --yathui-grace
-
-=item --no-yathui-grace
-
-If yath cannot connect to yath-ui it normally throws an error, use this to make it fail gracefully. You get a warning, but things keep going.
-
-
-=item --yathui-long-duration 10
-
-=item --no-yathui-long-duration
-
-Minimum duration length (seconds) before a test goes from MEDIUM to LONG
-
-
-=item --yathui-medium-duration 5
-
-=item --no-yathui-medium-duration
-
-Minimum duration length (seconds) before a test goes from SHORT to MEDIUM
-
-
-=item --yathui-mode summary
-
-=item --yathui-mode qvf
-
-=item --yathui-mode qvfd
-
-=item --yathui-mode complete
-
-=item --no-yathui-mode
-
-Set the upload mode (default 'qvfd')
-
-
-=item --yathui-project ARG
-
-=item --yathui-project=ARG
-
-=item --no-yathui-project
-
-The Yath-UI project for your test results
-
-
-=item --yathui-retry
-
-=item --no-yathui-retry
-
-How many times to try an operation before giving up
-
-Can be specified multiple times
-
-
-=item --yathui-url http://my-yath-ui.com/...
-
-=item --uri http://my-yath-ui.com/...
-
-=item --no-yathui-url
-
-Yath-UI url
-
-
-=back
-
 =head3 spawn options
 
 =over 4
-
-=item --copy-env HOME
-
-=item --copy-env SHELL
-
-=item --copy-env /PERL_.*/i
 
 =item -e HOME
 
@@ -655,29 +459,35 @@ Yath-UI url
 
 =item -e /PERL_.*/i
 
+=item --copy-env HOME
+
+=item --copy-env SHELL
+
+=item --copy-env /PERL_.*/i
+
 =item --no-copy-env
 
 Specify environment variables to pass along with their current values, can also use a regex
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
-
-=item --env-var VAR=VAL
 
 =item -EVAR=VAL
 
 =item -E VAR=VAL
 
+=item --env-var VAR=VAL
+
 =item --no-env-var
 
 Set environment variables for the spawn
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
-
-=item --stage foo
 
 =item -s foo
+
+=item --stage foo
 
 =item --no-stage
 
@@ -686,10 +496,11 @@ Specify the stage to be used for launching the script
 
 =back
 
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -709,12 +520,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2025 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
 

@@ -2,96 +2,103 @@ package App::Yath::Command::watch;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use Time::HiRes qw/sleep/;
 
-use Test2::Harness::Util::File::JSON;
+use App::Yath::Client;
 
-use App::Yath::Util qw/find_pfile/;
-use Test2::Harness::Util qw/open_file/;
+use Test2::Harness::Util::LogFile;
+
+use Test2::Harness::IPC::Util qw/pid_is_running set_procname/;
+use Test2::Harness::Util::JSON qw/decode_json/;
 
 use parent 'App::Yath::Command';
-use Test2::Harness::Util::HashBase;
+use Test2::Harness::Util::HashBase qw{
+    +client
+    +renderers
+};
 
-sub group { 'persist' }
+use Getopt::Yath;
+include_options(
+    'App::Yath::Options::Yath',
+    'App::Yath::Options::IPC',
+    'App::Yath::Options::Renderer',
+);
 
-sub summary { "Monitor the persistent test runner" }
-sub cli_args { "" }
+sub args_include_tests { 0 }
+
+sub load_renderers { 1 }
+
+sub group { 'daemon' }
+
+sub summary { "Watch/Tail a test runner" }
 
 sub description {
     return <<"    EOT";
-This command will tail the logs from a persistent instance of yath. STDOUT and
-STDERR will be printed as seen, so may not be in proper order.
+Tails the log from a running yath daemon
     EOT
+}
+
+sub process_name { "watcher" }
+
+sub client {
+    my $self = shift;
+    return $self->{+CLIENT} //= App::Yath::Client->new(settings => $self->settings);
+}
+
+sub renderers {
+    my $self = shift;
+
+    return $self->{+RENDERERS} if $self->{+RENDERERS};
+
+    my $settings = $self->settings;
+
+    my $verbose = 2;
+    $verbose = 0 if $settings->renderer->quiet;
+    return $self->{+RENDERERS} //= App::Yath::Options::Renderer->init_renderers($settings, verbose => $verbose, progress => 0);
 }
 
 sub run {
     my $self = shift;
 
-    my $args     = $self->args;
-    shift @$args if @$args && $args->[0] eq '--';
-    my $stop;
-    $stop = 1 if @$args && $args->[0] eq 'STOP';
+    set_procname(
+        set => [$self->process_name],
+        prefix => $self->{+SETTINGS}->harness->procname_prefix,
+    );
 
-    my $pfile = find_pfile($self->settings, no_fatal => 1)
-        or die "No persistent harness was found for the current path.\n";
+    return $self->render_log();
+}
 
-    print "\nFound: $pfile\n";
-    my $data = Test2::Harness::Util::File::JSON->new(name => $pfile)->read();
-    print "  PID: $data->{pid}\n";
-    print "  Dir: $data->{dir}\n";
-    print "\n";
+sub render_log {
+    my $self = shift;
+    my ($cb) = @_;
 
-    my $err_f = File::Spec->catfile($data->{dir}, 'error.log');
-    my $out_f = File::Spec->catfile($data->{dir}, 'output.log');
+    my $renderers = $self->renderers;
+    my $client    = $self->client;
+    my $pid       = $client->send_and_get('pid');
 
-    my $err_fh = open_file($err_f, '<');
-    my $out_fh = open_file($out_f, '<');
+    my $lf = Test2::Harness::Util::LogFile->new(client => $client);
 
-    my $auxdir = File::Spec->catdir($data->{dir}, 'aux_logs');
-    my %aux;
+    my $sig = 0;
+    $SIG{INT} = sub { $sig++ };
 
-    while (1) {
-        my $count = 0;
-        while (my $line = <$out_fh>) {
-            $count++;
-            print STDOUT $line;
-        }
-        while (my $line = <$err_fh>) {
-            $count++;
-            print STDERR $line;
+    while (!$sig && pid_is_running($pid)) {
+        $cb->() if $cb;
+
+        my @events = $lf->poll;
+        for my $event (@events) {
+            $_->render_event($event) for @$renderers;
         }
 
-        if (-d $auxdir) {
-            opendir(my $dh, $auxdir) or die "Could not open auxdir: $!";
-            for my $file (readdir($dh)) {
-                next if $aux{$file};
-                next unless $file =~ m/\.log$/;
-                my $full = File::Spec->catfile($auxdir, $file);
-                next unless -f $full;
-                $aux{$file} = open_file($full, '<');
-                $count++;
-            }
-        }
+        next if @events;
 
-        for my $file (sort keys %aux) {
-            my $fh = $aux{$file};
-            my $ofh = $file =~ m/STDERR/ ? \*STDERR : \*STDOUT;
-            while (my $line = <$fh>) {
-                print $ofh $line;
-            }
-        }
-
-        next if $count;
-        last if $stop;
-        last unless -f $pfile;
-        sleep 0.02;
+        last if $self->{+ARGS} && grep { m/STOP/i } @{$self->{+ARGS}};
+        sleep(0.2);
     }
 
     return 0;
 }
-
 
 1;
 
@@ -103,67 +110,455 @@ __END__
 
 =head1 NAME
 
-App::Yath::Command::watch - Monitor the persistent test runner
+App::Yath::Command::watch - Watch/Tail a test runner
 
 =head1 DESCRIPTION
 
-This command will tail the logs from a persistent instance of yath. STDOUT and
-STDERR will be printed as seen, so may not be in proper order.
+Tails the log from a running yath daemon
 
 
 =head1 USAGE
 
     $ yath [YATH OPTIONS] watch [COMMAND OPTIONS]
 
-=head2 YATH OPTIONS
+=head2 OPTIONS
 
-=head3 Developer
+=head3 Harness Options
 
 =over 4
+
+=item -d
+
+=item --dummy
+
+=item --no-dummy
+
+Dummy run, do not actually execute anything
+
+Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
+
+The following environment variables will be cleared after arguments are processed: C<T2_HARNESS_DUMMY>
+
+
+=item --procname-prefix ARG
+
+=item --procname-prefix=ARG
+
+=item --no-procname-prefix
+
+Add a prefix to all proc names (as seen by ps).
+
+The following environment variables will be set after arguments are processed: C<T2_HARNESS_PROC_PREFIX>
+
+
+=back
+
+=head3 IPC Options
+
+=over 4
+
+=item --ipc-address ARG
+
+=item --ipc-address=ARG
+
+=item --no-ipc-address
+
+IPC address to use (usually auto-generated or discovered)
+
+
+=item --ipc-allow-multiple
+
+=item --no-ipc-allow-multiple
+
+Normally yath will prevent you from starting multiple persistent runners in the same project, this option will allow you to start more than one.
+
+
+=item --ipc-dir ARG
+
+=item --ipc-dir=ARG
+
+=item --no-ipc-dir
+
+Directory for ipc files
+
+Can also be set with the following environment variables: C<T2_HARNESS_IPC_DIR>, C<YATH_IPC_DIR>
+
+
+=item --ipc-dir-order ARG
+
+=item --ipc-dir-order=ARG
+
+=item --ipc-dir-order '["json","list"]'
+
+=item --ipc-dir-order='["json","list"]'
+
+=item --ipc-dir-order :{ ARG1 ARG2 ... }:
+
+=item --ipc-dir-order=:{ ARG1 ARG2 ... }:
+
+=item --no-ipc-dir-order
+
+When finding ipc-dir automatically, search in this order, default: ['base', 'temp']
+
+Note: Can be specified multiple times
+
+
+=item --ipc-file ARG
+
+=item --ipc-file=ARG
+
+=item --no-ipc-file
+
+IPC file used to locate instances (usually auto-generated or discovered)
+
+
+=item --ipc-peer-pid ARG
+
+=item --ipc-peer-pid=ARG
+
+=item --no-ipc-peer-pid
+
+Optionally a peer PID may be provided
+
+
+=item --ipc-port ARG
+
+=item --ipc-port=ARG
+
+=item --no-ipc-port
+
+Some IPC protocols require a port, otherwise this should be left empty
+
+
+=item --ipc-prefix ARG
+
+=item --ipc-prefix=ARG
+
+=item --no-ipc-prefix
+
+Prefix for ipc files
+
+
+=item --ipc-protocol IPSocket
+
+=item --ipc-protocol AtomicPipe
+
+=item --ipc-protocol UnixSocket
+
+=item --ipc-protocol +Test2::Harness::IPC::Protocol::AtomicPipe
+
+=item --no-ipc-protocol
+
+Specify what IPC Protocol to use. Use the "+" prefix to specify a fully qualified namespace, otherwise Test2::Harness::IPC::Protocol::XXX namespace is assumed.
+
+
+=back
+
+=head3 Renderer Options
+
+=over 4
+
+=item --hide-runner-output
+
+=item --no-hide-runner-output
+
+Hide output from the runner, showing only test output. (See Also truncate_runner_output)
+
+
+=item -q
+
+=item --quiet
+
+=item --no-quiet
+
+Be very quiet.
+
+
+=item --qvf
+
+=item --no-qvf
+
+Replaces App::Yath::Theme::Default with App::Yath::Theme::QVF which is quiet for passing tests and verbose for failing ones.
+
+
+=item --renderer +My::Renderer
+
+=item --renderers +My::Renderer
+
+=item --renderer MyRenderer=opt1,opt2
+
+=item --renderers MyRenderer=opt1,opt2
+
+=item --renderer MyRenderer,MyOtherRenderer
+
+=item --renderers MyRenderer,MyOtherRenderer
+
+=item --renderer=:{ MyRenderer opt1,opt2,... }:
+
+=item --renderers=:{ MyRenderer opt1,opt2,... }:
+
+=item --renderer :{ MyRenderer :{ opt1 opt2 }: }:
+
+=item --renderers :{ MyRenderer :{ opt1 opt2 }: }:
+
+=item --no-renderers
+
+Specify renderers. Use "+" to give a fully qualified module name. Without "+" "App::Yath::Renderer::" will be prepended to your argument.
+
+Note: Can be specified multiple times
+
+
+=item --server
+
+=item --server=ARG
+
+=item --no-server
+
+Start an ephemeral yath database and web server to view results
+
+
+=item --show-job-end
+
+=item --no-show-job-end
+
+Show output when a job ends. (Default: on)
+
+
+=item --show-job-info
+
+=item --no-show-job-info
+
+Show the job configuration when a job starts. (Default: off, unless -vv)
+
+
+=item --show-job-launch
+
+=item --no-show-job-launch
+
+Show output for the start of a job. (Default: off unless -v)
+
+
+=item --show-run-fields
+
+=item --no-show-run-fields
+
+Show run fields. (Default: off, unless -vv)
+
+
+=item --show-run-info
+
+=item --no-show-run-info
+
+Show the run configuration when a run starts. (Default: off, unless -vv)
+
+
+=item -T
+
+=item --show-times
+
+=item --no-show-times
+
+Show the timing data for each job.
+
+
+=item -tARG
+
+=item -t ARG
+
+=item -t=ARG
+
+=item --theme ARG
+
+=item --theme=ARG
+
+=item --no-theme
+
+Select a theme for the renderer (not all renderers use this)
+
+
+=item --truncate-runner-output
+
+=item --no-truncate-runner-output
+
+Only show runner output that was generated after the current command. This is only useful with a persistent runner.
+
+
+=item -v
+
+=item -vv
+
+=item -vvv..
+
+=item -v=COUNT
+
+=item --verbose
+
+=item --verbose=COUNT
+
+=item --no-verbose
+
+Be more verbose
+
+The following environment variables will be set after arguments are processed: C<T2_HARNESS_IS_VERBOSE>, C<HARNESS_IS_VERBOSE>
+
+Note: Can be specified multiple times, counter bumps each time it is used.
+
+
+=item --wrap
+
+=item --no-wrap
+
+When active (default) renderers should try to wrap text in a human-friendly way. When this is turned off they should just throw text at the terminal.
+
+
+=back
+
+=head3 Terminal Options
+
+=over 4
+
+=item -c
+
+=item --color
+
+=item --no-color
+
+Turn color on, default is true if STDOUT is a TTY.
+
+Can also be set with the following environment variables: C<YATH_COLOR>, C<CLICOLOR_FORCE>
+
+The following environment variables will be set after arguments are processed: C<YATH_COLOR>
+
+
+=item --progress
+
+=item --no-progress
+
+Toggle progress indicators. On by default if STDOUT is a TTY. You can use --no-progress to disable the 'events seen' counter and buffered event pre-display
+
+
+=item --term-size 80
+
+=item --term-width 80
+
+=item --term-size 200
+
+=item --term-width 200
+
+=item --no-term-width
+
+Alternative to setting $TABLE_TERM_SIZE. Setting this will override the terminal width detection to the number of characters specified.
+
+Can also be set with the following environment variables: C<TABLE_TERM_SIZE>
+
+The following environment variables will be set after arguments are processed: C<TABLE_TERM_SIZE>
+
+
+=back
+
+=head3 Yath Options
+
+=over 4
+
+=item --base-dir ARG
+
+=item --base-dir=ARG
+
+=item --no-base-dir
+
+Root directory for the project being tested (usually where .yath.rc lives)
+
+
+=item -D
+
+=item -Dlib
+
+=item -Dlib
+
+=item -D=lib
+
+=item -D"lib/*"
 
 =item --dev-lib
 
 =item --dev-lib=lib
 
-=item -D
-
-=item -D=lib
-
-=item -Dlib
+=item --dev-lib="lib/*"
 
 =item --no-dev-lib
 
-Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
 
-Can be specified multiple times
+Note: This option can cause yath to use exec() to reload itself with the correct libraries in place. Each occurence of this argument can cause an additional exec() call. Use --dev-libs-verbose BEFORE any -D calls to see the exec() calls.
 
-
-=back
-
-=head3 Environment
-
-=over 4
-
-=item --persist-dir ARG
-
-=item --persist-dir=ARG
-
-=item --no-persist-dir
-
-Where to find persistence files.
+Note: Can be specified multiple times
 
 
-=item --persist-file ARG
+=item --dev-libs-verbose
 
-=item --persist-file=ARG
+=item --no-dev-libs-verbose
 
-=item --pfile ARG
+Be verbose and announce that yath will re-exec in order to have the correct includes (normally yath will just call exec() quietly)
 
-=item --pfile=ARG
 
-=item --no-persist-file
+=item -h
 
-Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
+=item -h=Group
+
+=item --help
+
+=item --help=Group
+
+=item --no-help
+
+exit after showing help information
+
+
+=item -p key=val
+
+=item -p=key=val
+
+=item -pkey=value
+
+=item -p '{"json":"hash"}'
+
+=item -p='{"json":"hash"}'
+
+=item -p:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -p :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -p=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugin key=val
+
+=item --plugin=key=val
+
+=item --plugins key=val
+
+=item --plugins=key=val
+
+=item --plugin '{"json":"hash"}'
+
+=item --plugin='{"json":"hash"}'
+
+=item --plugins '{"json":"hash"}'
+
+=item --plugins='{"json":"hash"}'
+
+=item --plugin :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugin=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugins :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugins=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-plugins
+
+Load a yath plugin.
+
+Note: Can be specified multiple times
 
 
 =item --project ARG
@@ -176,25 +571,57 @@ Where to find the persistence file. The default is /{system-tempdir}/project-yat
 
 =item --no-project
 
-This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file.
 
 
-=back
+=item --scan-options key=val
 
-=head3 Help and Debugging
+=item --scan-options=key=val
 
-=over 4
+=item --scan-options '{"json":"hash"}'
+
+=item --scan-options='{"json":"hash"}'
+
+=item --scan-options(?^:^--(no-)?(?^:scan-(.+))$)
+
+=item --scan-options :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --scan-options=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-scan-options
+
+=item /^--(no-)?scan-(.+)$/
+
+Yath will normally scan plugins for options. Some commands scan other libraries (finders, resources, renderers, etc) for options. You can use this to disable all scanning, or selectively disable/enable some scanning.
+
+Note: This is parsed early in the argument processing sequence, before options that may be earlier in your argument list.
+
+Note: Can be specified multiple times
+
 
 =item --show-opts
+
+=item --show-opts=group
 
 =item --no-show-opts
 
 Exit after showing what yath thinks your options mean
 
 
-=item --version
+=item --user ARG
+
+=item --user=ARG
+
+=item --no-user
+
+Username to associate with logs, database entries, and yath servers.
+
+Can also be set with the following environment variables: C<YATH_USER>, C<USER>
+
 
 =item -V
+
+=item --version
 
 =item --no-version
 
@@ -203,339 +630,11 @@ Exit after showing a helpful usage message
 
 =back
 
-=head3 Plugins
-
-=over 4
-
-=item --no-scan-plugins
-
-=item --no-no-scan-plugins
-
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
-
-
-=item --plugins PLUGIN
-
-=item --plugins +App::Yath::Plugin::PLUGIN
-
-=item --plugins PLUGIN=arg1,arg2,...
-
-=item --plugin PLUGIN
-
-=item --plugin +App::Yath::Plugin::PLUGIN
-
-=item --plugin PLUGIN=arg1,arg2,...
-
-=item -pPLUGIN
-
-=item --no-plugins
-
-Load a yath plugin.
-
-Can be specified multiple times
-
-
-=back
-
-=head2 COMMAND OPTIONS
-
-=head3 Cover Options
-
-=over 4
-
-=item --cover-aggregator ByTest
-
-=item --cover-aggregator ByRun
-
-=item --cover-aggregator +Custom::Aggregator
-
-=item --cover-agg ByTest
-
-=item --cover-agg ByRun
-
-=item --cover-agg +Custom::Aggregator
-
-=item --no-cover-aggregator
-
-Choose a custom aggregator subclass
-
-
-=item --cover-class ARG
-
-=item --cover-class=ARG
-
-=item --no-cover-class
-
-Choose a Test2::Plugin::Cover subclass
-
-
-=item --cover-dirs ARG
-
-=item --cover-dirs=ARG
-
-=item --cover-dir ARG
-
-=item --cover-dir=ARG
-
-=item --no-cover-dirs
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-exclude-private
-
-=item --no-cover-exclude-private
-
-
-
-
-=item --cover-files
-
-=item --no-cover-files
-
-Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
-
-
-=item --cover-from path/to/log.jsonl
-
-=item --cover-from http://example.com/coverage
-
-=item --cover-from path/to/coverage.jsonl
-
-=item --no-cover-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
-
-
-=item --cover-from-type json
-
-=item --cover-from-type jsonl
-
-=item --cover-from-type log
-
-=item --no-cover-from-type
-
-File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.
-
-
-=item --cover-manager My::Coverage::Manager
-
-=item --no-cover-manager
-
-Coverage 'from' manager to use when coverage data does not provide one
-
-
-=item --cover-maybe-from path/to/log.jsonl
-
-=item --cover-maybe-from http://example.com/coverage
-
-=item --cover-maybe-from path/to/coverage.jsonl
-
-=item --no-cover-maybe-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
-
-
-=item --cover-maybe-from-type json
-
-=item --cover-maybe-from-type jsonl
-
-=item --cover-maybe-from-type log
-
-=item --no-cover-maybe-from-type
-
-Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect
-
-
-=item --cover-metrics
-
-=item --no-cover-metrics
-
-
-
-
-=item --cover-types ARG
-
-=item --cover-types=ARG
-
-=item --cover-type ARG
-
-=item --cover-type=ARG
-
-=item --no-cover-types
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-write
-
-=item --cover-write=coverage.jsonl
-
-=item --cover-write=coverage.json
-
-=item --no-cover-write
-
-Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).
-
-
-=back
-
-=head3 Git Options
-
-=over 4
-
-=item --git-change-base master
-
-=item --git-change-base HEAD^
-
-=item --git-change-base df22abe4
-
-=item --no-git-change-base
-
-Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
-
-
-=back
-
-=head3 Help and Debugging
-
-=over 4
-
-=item --dummy
-
-=item -d
-
-=item --no-dummy
-
-Dummy run, do not actually execute anything
-
-Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
-
-
-=item --help
-
-=item -h
-
-=item --no-help
-
-exit after showing help information
-
-
-=item --interactive
-
-=item -i
-
-=item --no-interactive
-
-Use interactive mode, 1 test at a time, stdin forwarded to it
-
-
-=item --keep-dirs
-
-=item --keep_dir
-
-=item -k
-
-=item --no-keep-dirs
-
-Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
-
-
-=item --procname-prefix ARG
-
-=item --procname-prefix=ARG
-
-=item --no-procname-prefix
-
-Add a prefix to all proc names (as seen by ps).
-
-
-=back
-
-=head3 YathUI Options
-
-=over 4
-
-=item --yathui-api-key ARG
-
-=item --yathui-api-key=ARG
-
-=item --no-yathui-api-key
-
-Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
-
-
-=item --yathui-grace
-
-=item --no-yathui-grace
-
-If yath cannot connect to yath-ui it normally throws an error, use this to make it fail gracefully. You get a warning, but things keep going.
-
-
-=item --yathui-long-duration 10
-
-=item --no-yathui-long-duration
-
-Minimum duration length (seconds) before a test goes from MEDIUM to LONG
-
-
-=item --yathui-medium-duration 5
-
-=item --no-yathui-medium-duration
-
-Minimum duration length (seconds) before a test goes from SHORT to MEDIUM
-
-
-=item --yathui-mode summary
-
-=item --yathui-mode qvf
-
-=item --yathui-mode qvfd
-
-=item --yathui-mode complete
-
-=item --no-yathui-mode
-
-Set the upload mode (default 'qvfd')
-
-
-=item --yathui-project ARG
-
-=item --yathui-project=ARG
-
-=item --no-yathui-project
-
-The Yath-UI project for your test results
-
-
-=item --yathui-retry
-
-=item --no-yathui-retry
-
-How many times to try an operation before giving up
-
-Can be specified multiple times
-
-
-=item --yathui-url http://my-yath-ui.com/...
-
-=item --uri http://my-yath-ui.com/...
-
-=item --no-yathui-url
-
-Yath-UI url
-
-
-=back
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -555,12 +654,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2025 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
 

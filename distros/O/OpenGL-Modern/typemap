@@ -88,7 +88,9 @@ GLuint64EXT *               T_PTR
 const GLuint64EXT *         T_PTR
 GLhandleARB                 T_U_INT
 GLvdpauSurfaceNV            T_PTR
+const GLvoid *              T_PTR
 GLvoid *                    T_PTR
+GLeglClientBufferEXT        T_PTR
 const GLvdpauSurfaceNV      T_PTR
 const GLvdpauSurfaceNV *    T_PTR
 void *                      T_PTR

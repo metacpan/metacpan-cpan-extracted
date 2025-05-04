@@ -1,113 +1,117 @@
-#!perl -w
 use strict;
 use ExtUtils::MakeMaker;
-use ExtUtils::MakeMaker::CPANfile;
-use Config '%Config';
-use Devel::CheckOS 'os_is';
-use lib 'lib';
-use OpenGL::Modern::NameLists::MakefileAll;
-use Capture::Tiny 'capture';
-use ExtUtils::Constant ();
 use Devel::CheckLib 'assert_lib';
+use Config;
 
-my $include = "-I. -Iinclude -Isrc";
+my $include = "-I. -Iinclude";
 my $libs;
-my $define;
+my $define = "-DGLEW_NO_GLU -DGLEW_STATIC";
 my $DYNS;
+if ( $^O eq 'MSWin32' ) {
+  $libs   = '-lopengl32 -lgdi32 -lmsimg32';
+  $define .= " -D_WIN32",
+} elsif ( $^O eq 'cygwin' ) {
+  $libs = '-lGL -lX11';
+} elsif ( $^O eq 'darwin' ) {
+  $DYNS = { 'OTHERLDFLAGS' => '-framework OpenGL' };
+  $define .= " -Wno-compound-token-split-by-macro -DGL_SILENCE_DEPRECATION";
+} else {
+  $libs = '-lGL -lX11';
+}
+my %buildargs = (
+  LIBS             => $libs,
+  DEFINE           => $define,
+  INC              => $include,
+  $DYNS ? ( dynamic_lib => $DYNS ) : (),
+);
+die "$@\nOS unsupported\n" if !eval { assert_lib %buildargs; 1 };
+WriteConfigPM({ LIBS => $libs || $DYNS->{OTHERLDFLAGS} });
 
-if ( os_is( 'MSWin32' ) ) {
-    $libs   = '-lopengl32 -lgdi32 -lmsimg32';
-    $define = "-D_WIN32",                       # XXX Platform specific
-}
-elsif ( os_is( 'Cygwin' ) ) {
-    $libs = '-lGL -lX11';
-}
-elsif ( os_is( 'MacOSX' ) ) {
-    $DYNS = { 'OTHERLDFLAGS' => '-framework OpenGL' };
-}
-else {
-    $libs = '-lGL -lX11';
-}
-
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile1(
-    NAME          => 'OpenGL::Modern',
-    VERSION_FROM  => 'lib/OpenGL/Modern.pm',
-    ABSTRACT_FROM => 'lib/OpenGL/Modern.pm',            # retrieve abstract from module
-    AUTHOR        => 'Chris Marshall <chm@cpan.org>',
-    LICENSE       => 'perl',
-    META_MERGE    => {
-        "meta-spec" => { version => 2 },
-        resources   => {
-            repository => {
-                web  => 'https://github.com/devel-chm/OpenGL-Modern',
-                url  => 'https://github.com/devel-chm/OpenGL-Modern.git',
-                type => 'git',
-            }
-        },
+WriteMakefile(
+  NAME => 'OpenGL::Modern',
+  VERSION_FROM => 'lib/OpenGL/Modern.pm',
+  ABSTRACT_FROM => 'lib/OpenGL/Modern.pod',
+  AUTHOR => 'Chris Marshall <chm@cpan.org>',
+  LICENSE => 'perl',
+  PREREQ_PM => {
+  },
+  CONFIGURE_REQUIRES => {
+    'ExtUtils::MakeMaker' => '7.72',
+    'Devel::CheckLib' => 0,
+  },
+  TEST_REQUIRES => {
+    'Capture::Tiny' => 0,
+    'Test::More' => '0.88',
+  },
+  META_MERGE => {
+    "meta-spec" => { version => 2 },
+    dynamic_config => 0,
+    resources => {
+      bugtracker  => {web=>'https://github.com/Perl-GPU/OpenGL-Modern/issues'},
+      repository => {
+        web  => 'https://github.com/Perl-GPU/OpenGL-Modern',
+        url  => 'https://github.com/Perl-GPU/OpenGL-Modern.git',
+        type => 'git',
+      },
+      x_IRC => 'irc://irc.perl.org/#pogl',
     },
-    MIN_PERL_VERSION => '5.006',
-    LIBS             => $libs,           # e.g., '-lm'
-    DEFINE           => $define,
-    INC              => $include,
-    XSPROTOARG       => '-prototypes',
-    depend           => {
-        'Modern.c' => 'Modern.xs auto-xs.inc src/glew.c include/GL/glew.h include/GL/wglew.h',
+  },
+  MIN_PERL_VERSION => '5.016',
+  XSPROTOARG       => '-noprototypes',
+  XSMULTI => 1,
+  XSBUILD => {
+    xs => {
+      'lib/OpenGL/Modern' => {
+        OBJECT => 'lib/OpenGL/Modern$(OBJ_EXT) glew$(OBJ_EXT)',
+      },
     },
-    $DYNS ? ( dynamic_lib => $DYNS ) : (),
+  },
+  depend           => {
+    'lib/OpenGL/Modern$(OBJ_EXT)' => 'glew-context.c include/GL/glew.h include/GL/wglew.h gl_errors.h auto-xs.inc', # last is not accurate but forced by XSMULTI which has no intermediate .c target
+    'lib/OpenGL/Modern/Const$(OBJ_EXT)' => 'include/GL/glew.h include/GL/wglew.h const.h',
+  },
+  clean => { FILES => 'auto-xs.inc const.h lib/OpenGL/Modern/Config.pm' },
+  %buildargs,
 );
 
-# If you edit these definitions to change the constants used by this module,
-# you will need to use the generated const-c.inc and const-xs.inc
-# files to replace their "fallback" counterparts before distributing your
-# changes.
-my @names = OpenGL::Modern::NameLists::MakefileAll::makefile_all();
+{
+package MY; # so that "SUPER" works right
+sub postamble {
+  my ($self) = @_;
+  my $deps = join ' ', 'lib/OpenGL/Modern/Registry.pm utils/generate-XS.pl utils/common.pl', glob 'include/GL/*.h';
+  my $const_cmd = $self->oneliner(
+    'print " OGL_CONST_i($_)\n" for @OpenGL::Modern::Registry::glconstants;',
+    [qw(-Ilib -MOpenGL::Modern::Registry)],
+  );
+  <<EOF;
+auto-xs.inc : $deps
+\t\$(PERLRUN) -Ilib utils/generate-XS.pl
 
-ExtUtils::Constant::WriteConstants(
-    NAME         => 'OpenGL::Modern',
-    NAMES        => \@names,
-    DEFAULT_TYPE => 'UV',
-    C_FILE       => 'const-c.inc',
-    XS_FILE      => 'const-xs.inc',
-);
-
-generate_auto_xs();
-
-sub generate_auto_xs {
-    my ( $out, $err, $res ) = capture { system "perl utils/generate-XS.pl" };
-    die "auto xs generation failed:\n$err" if $err;
-    die "auto xs generation failed:\n$out" if $res;
-    print $out;
-    return;
+const.h : lib/OpenGL/Modern/Registry.pm
+\t$const_cmd >\$@
+EOF
+}
+sub init_PM {
+  my ($eumm) = @_;
+  $eumm->SUPER::init_PM;
+  my $pm = $eumm->{PM};
+  delete @$pm{grep /(?:\.(?:c|xs|bs)|\Q$::Config{obj_ext}\E)$/, keys %$pm};
+  delete @$pm{grep /\.pl$/, keys %$pm};
+}
 }
 
-sub WriteMakefile1 {    #Written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
-    my %params       = @_;
-    my $eumm_version = $ExtUtils::MakeMaker::VERSION;
-    $eumm_version = eval $eumm_version;
-    die "EXTRA_META is deprecated" if exists $params{EXTRA_META};
-    die "License not specified" if not exists $params{LICENSE};
-    if ( $params{BUILD_REQUIRES} and $eumm_version < 6.5503 ) {
-
-        #EUMM 6.5502 has problems with BUILD_REQUIRES
-        $params{PREREQ_PM} = { %{ $params{PREREQ_PM} || {} }, %{ $params{BUILD_REQUIRES} } };
-        delete $params{BUILD_REQUIRES};
-    }
-    if ( $params{TEST_REQUIRES} and $eumm_version < 6.64 ) {
-        $params{PREREQ_PM} = { %{ $params{PREREQ_PM} || {} }, %{ $params{TEST_REQUIRES} } };
-        delete $params{TEST_REQUIRES};
-    }
-    delete $params{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
-    delete $params{MIN_PERL_VERSION}   if $eumm_version < 6.48;
-    delete $params{META_MERGE}         if $eumm_version < 6.46;
-    delete $params{META_ADD}           if $eumm_version < 6.46;
-    delete $params{LICENSE}            if $eumm_version < 6.31;
-    delete $params{AUTHOR}             if $] < 5.005;
-    delete $params{ABSTRACT_FROM}      if $] < 5.005;
-    delete $params{BINARY_LOCATION}    if $] < 5.005;
-
-    die "$@\nOS unsupported\n" if not eval { assert_lib %params; 1 };
-
-    WriteMakefile( %params );
+sub WriteConfigPM {
+  my($config) = @_;
+  die "Unable to write to Config.pm\n" if !open my $fh, ">", "lib/OpenGL/Modern/Config.pm";
+  print $fh q{# This is the Perl OpenGL build configuration file.
+# It contains the final OpenGL build arguments from
+# the configuration process.  Access the values by
+# use OpenGL::Modern::Config which defines the variable
+# $OpenGL::Modern::Config containing the hash arguments needed for
+# WriteMakefile()
+};
+  require Data::Dumper;
+  { no warnings; $Data::Dumper::Sortkeys = 1; } # deterministic output
+  print $fh Data::Dumper->Dump( [$config], [qw(OpenGL::Modern::Config)] );
+  print $fh qq{1;\n};
 }

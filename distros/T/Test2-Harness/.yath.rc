@@ -5,4 +5,5 @@
 
 [test]
 -Irel(t2/lib)
---default-search glob(t/*)
+--default-search rel(t)
+--default-search rel(t2)

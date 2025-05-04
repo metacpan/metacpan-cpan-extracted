@@ -6,17 +6,19 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Praegu on tagasiside mootorina rakendatud DeepL (F<deepl.pm>) ja ChatGPT (F<gpt3.pm>) moodul. Eksperimentaalne tugi gpt-4 ja gpt-4o on samuti lisatud.
+B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Hetkel on rakendatud DeepL (F<deepl.pm>) ja ChatGPT 4.1 (F<gpt4.pm>) moodulit kui back-end mootorit.
 
 Kui soovite tõlkida tavalisi tekstiplokke Perli pod-stiilis kirjutatud dokumendis, kasutage käsku B<greple> koos C<xlate::deepl> ja C<perl> mooduliga niimoodi:
 
@@ -126,7 +128,7 @@ Praegu on saadaval järgmised mootorid
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ Määrake sihtkeel. B<DeepL> mootori kasutamisel saate saadaval olevad keeled k�
 
 Määrake originaal- ja tõlgitud teksti väljundformaat.
 
-Järgmised vormingud, välja arvatud C<xtxt>, eeldavad, et tõlgitav osa on ridade kogum. Tegelikult on võimalik tõlkida ainult osa reast ja muu formaadi kui C<xtxt> määramine ei anna mõttekaid tulemusi.
+Järgmised vormingud, välja arvatud C<xtxt>, eeldavad, et tõlgitav osa on ridade kogum. Tegelikult on võimalik tõlkida ainult osa reast, kuid muu formaadi kui C<xtxt> määramine ei anna mõttekaid tulemusi.
 
 =over 4
 
@@ -242,6 +244,14 @@ Sooritage maskeerimisfunktsioon ja kuvage teisendatud tekst sellisena, nagu see 
 =item B<--match-all>
 
 Määrake kogu faili tekst sihtkohaks.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+Formaatide C<cm> ja C<colon> puhul jagatakse ja vormistatakse väljund rida-realt. Seega, kui tõlgitakse ainult osa reast, ei saa oodatud tulemust. Need filtrid parandavad väljundi, mis on rikutud, kui osa reast tõlgitakse tavalise rea kaupa väljundiks.
+
+Praeguses rakenduses, kui rea mitu osa tõlgitakse, väljastatakse need sõltumatute ridadega.
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

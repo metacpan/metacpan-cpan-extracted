@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-package Software::License::GPL_1 0.104006;
+package Software::License::GPL_1 0.104007;
 
 use parent 'Software::License';
 # ABSTRACT: GNU General Public License, Version 1
 
 sub name { 'The GNU General Public License, Version 1, February 1989' }
 sub url  { 'http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt' }
-sub meta_name  { 'gpl' }
+sub meta_name  { 'open_source' }
 sub meta2_name { 'gpl_1' }
 sub spdx_expression  { 'GPL-1.0-only' }
 
@@ -23,7 +23,7 @@ Software::License::GPL_1 - GNU General Public License, Version 1
 
 =head1 VERSION
 
-version 0.104006
+version 0.104007
 
 =head1 PERL VERSION
 
@@ -45,7 +45,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -58,7 +58,7 @@ __LICENSE__
                      Version 1, February 1989
 
  Copyright (C) 1989 Free Software Foundation, Inc.
- 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+                    <https://fsf.org/>
 
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
@@ -272,8 +272,7 @@ the exclusion of warranty; and each file should have at least the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
+    along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 
 Also add information on how to contact you by electronic and paper mail.
@@ -300,7 +299,7 @@ necessary.  Here a sample; alter the names:
   program `Gnomovision' (a program to direct compilers to make passes
   at assemblers) written by James Hacker.
 
-  <signature of Ty Coon>, 1 April 1989
-  Ty Coon, President of Vice
+  <signature of Moe Ghoul>, 1 April 1989
+  Moe Ghoul, President of Vice
 
 That's all there is to it!

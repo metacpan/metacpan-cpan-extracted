@@ -2,7 +2,7 @@ package Test2::Harness::Util::File::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use Carp qw/croak/;
 use Test2::Harness::Util qw/lock_file unlock_file/;
@@ -177,7 +177,7 @@ Append @content to the file.
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -197,11 +197,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

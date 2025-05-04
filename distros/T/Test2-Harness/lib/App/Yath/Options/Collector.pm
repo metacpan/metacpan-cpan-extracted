@@ -2,45 +2,13 @@ package App::Yath::Options::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use App::Yath::Options;
-
-option_group {prefix => 'collector', category => "Collector Options"} => sub {
-    option max_open_jobs => (
-        type => 's',
-        description => 'Maximum number of jobs a collector can process at a time, if more jobs are pending their output will be delayed until the earlier jobs have been processed. (Default: double the -j value)',
-        long_examples  => [' 18'],
-        short_examples => [' 18'],
-    );
-
-    option max_poll_events => (
-        type => 's',
-        description => 'Maximum number of events to poll from a job before jumping to the next job. (Default: 1000)',
-        default => 1000,
-        long_examples  => [' 1000'],
-        short_examples => [' 1000'],
-    );
-
-    post \&collector_post;
-};
-
-sub collector_post {
-    my %params   = @_;
-    my $settings = $params{settings};
-
-    unless ($settings->collector->max_open_jobs) {
-        my $j = $settings->runner->job_count // 1;
-        my $max_open = 2 * $j;
-        $settings->collector->field(max_open_jobs => $max_open);
-    }
-}
-
+use Test2::Harness::Util::Deprecated;
 
 1;
 
 __END__
-
 
 =pod
 
@@ -48,40 +16,22 @@ __END__
 
 =head1 NAME
 
-App::Yath::Options::Collector - collector options for Yath.
+App::Yath::Options::Collector - DEPRECATED
 
 =head1 DESCRIPTION
 
-This is where the command line options for the collector are defined.
+=head1 SYNOPSIS
 
-=head1 PROVIDED OPTIONS
-
-=head2 COMMAND OPTIONS
-
-=head3 Collector Options
+=head1 EXPORTS
 
 =over 4
-
-=item --max-open-jobs 18
-
-=item --no-max-open-jobs
-
-Maximum number of jobs a collector can process at a time, if more jobs are pending their output will be delayed until the earlier jobs have been processed. (Default: double the -j value)
-
-
-=item --max-poll-events 1000
-
-=item --no-max-poll-events
-
-Maximum number of events to poll from a job before jumping to the next job. (Default: 1000)
-
 
 =back
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -101,11 +51,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+

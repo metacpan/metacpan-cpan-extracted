@@ -1,0 +1,49 @@
+TDB_CONTEXT *					T_PTROBJ_CLASS
+TDB_DATA					T_TDB_DATA
+mone_on_fail					T_TDB_MONE_ON_FAIL
+const char *					T_PV
+enum TDB_ERROR					T_UV
+tdb_traverse_func				T_SV
+
+#############################################################################
+
+INPUT
+
+T_PTROBJ_CLASS
+	if (!sv_derived_from ($arg, \"$Package\"))
+	  croak (\"$var is not of type $Package\");
+
+	$var = INT2PTR ($type, SvIV ((SV*)SvRV ($arg)));
+
+T_TDB_DATA
+	if (SvOK ($arg))
+	  {
+	    STRLEN len;
+	    $var.dptr  = SvPVbyte ($arg, len);
+	    $var.dsize = len;
+	  }
+	else
+	  {
+	    $var.dptr  = 0;
+	    $var.dsize = 0;
+	  }
+
+#############################################################################
+
+OUTPUT
+
+T_PTROBJ_CLASS
+        sv_setref_pv ($arg, class, (void*)$var);
+
+T_TDB_DATA
+	if ($var.dptr)
+	  {
+            /* TODO: reuse data, if perl uses malloc */
+	    sv_setpvn ((SV*)$arg, $var.dptr, $var.dsize);
+	    free ($var.dptr);
+	  }
+	else
+	  $arg = &PL_sv_undef;
+
+T_TDB_MONE_ON_FAIL
+	$arg = ($var == -1) ? &PL_sv_no : &PL_sv_yes;

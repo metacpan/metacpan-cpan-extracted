@@ -6,17 +6,19 @@ App::Greple::xlate - modul dukungan penerjemahan untuk greple
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-Modul B<Greple> B<xlate> menemukan blok teks yang diinginkan dan menggantinya dengan teks yang telah diterjemahkan. Saat ini modul DeepL (F<deepl.pm>) dan ChatGPT (F<gpt3.pm>) diimplementasikan sebagai mesin back-end. Dukungan eksperimental untuk gpt-4 dan gpt-4o juga disertakan.
+Modul B<Greple> B<xlate> menemukan blok teks yang diinginkan dan menggantinya dengan teks terjemahan. Saat ini modul DeepL (F<deepl.pm>) dan ChatGPT 4.1 (F<gpt4.pm>) diimplementasikan sebagai mesin back-end.
 
 Jika Anda ingin menerjemahkan blok teks normal dalam dokumen yang ditulis dengan gaya pod Perl, gunakan perintah B<greple> dengan modul C<xlate::deepl> dan C<perl> seperti ini:
 
@@ -126,7 +128,7 @@ Pada saat ini, mesin berikut ini tersedia
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ Tentukan bahasa target. Anda bisa mendapatkan bahasa yang tersedia dengan perint
 
 Tentukan format output untuk teks asli dan terjemahan.
 
-Format berikut ini selain C<xtxt> mengasumsikan bahwa bagian yang akan diterjemahkan adalah kumpulan baris. Pada kenyataannya, dimungkinkan untuk menerjemahkan hanya sebagian dari sebuah baris, dan menentukan format selain C<xtxt> tidak akan menghasilkan hasil yang berarti.
+Format berikut ini selain C<xtxt> mengasumsikan bahwa bagian yang akan diterjemahkan adalah kumpulan baris. Pada kenyataannya, dimungkinkan untuk menerjemahkan hanya sebagian dari sebuah baris, tetapi menentukan format selain C<xtxt> tidak akan menghasilkan hasil yang berarti.
 
 =over 4
 
@@ -242,6 +244,14 @@ Lakukan fungsi masking dan tampilkan teks yang dikonversi apa adanya tanpa pemul
 =item B<--match-all>
 
 Mengatur seluruh teks file sebagai area target.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+Dalam kasus format C<cm> dan C<colon>, output dibagi dan diformat baris demi baris. Oleh karena itu, jika hanya sebagian dari suatu baris yang akan diterjemahkan, hasil yang diharapkan tidak dapat diperoleh. Filter ini memperbaiki output yang rusak dengan menerjemahkan bagian dari sebuah baris menjadi output baris per baris yang normal.
+
+Dalam implementasi saat ini, jika beberapa bagian dari suatu baris diterjemahkan, maka akan dikeluarkan sebagai baris independen.
 
 =back
 
@@ -345,7 +355,7 @@ L <App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

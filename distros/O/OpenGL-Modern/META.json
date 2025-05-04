@@ -1,16 +1,16 @@
 {
-   "abstract" : "Perl extension to Modern OpenGL API up to 4.5",
+   "abstract" : "Perl extension to Modern OpenGL API up to 4.6",
    "author" : [
       "Chris Marshall <chm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OpenGL-Modern",
    "no_index" : {
@@ -27,37 +27,34 @@
       },
       "configure" : {
          "requires" : {
-            "Capture::Tiny" : "0",
-            "Data::Dumper" : "0",
             "Devel::CheckLib" : "0",
-            "Devel::CheckOS" : "0",
-            "ExtUtils::Constant" : "0",
-            "ExtUtils::MakeMaker" : "6.17",
-            "ExtUtils::MakeMaker::CPANfile" : "0.07"
+            "ExtUtils::MakeMaker" : "7.72"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Import::Into" : "0",
-            "perl" : "5.006"
+            "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
-            "IO::All" : "0.86",
-            "Test::InDistDir" : "0",
+            "Capture::Tiny" : "0",
             "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perl-GPU/OpenGL-Modern/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/devel-chm/OpenGL-Modern.git",
-         "web" : "https://github.com/devel-chm/OpenGL-Modern"
-      }
+         "url" : "https://github.com/Perl-GPU/OpenGL-Modern.git",
+         "web" : "https://github.com/Perl-GPU/OpenGL-Modern"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pogl"
    },
-   "version" : "0.04"
+   "version" : "0.0401",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -2,18 +2,27 @@ package App::Yath::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use parent 'Test2::Harness::Plugin';
+use Test2::Harness::Util::HashBase qw{
+    settings
+};
 
-# We do not want this defined by default, but it should be documented
-#sub handle_event {}
+#FIXME Document this!
+sub args_from_settings { () }
+
+# We do not want these defined by default, but it should be documented
 #sub sort_files {}
 #sub sort_files_2 {}
+#sub changed_files {}
+#sub changed_diff {}
+#FIXME Document this!
+#sub annotate_event();
 
-sub finish {}
-
-sub finalize {}
+sub claim_file {}
+sub munge_search {}
+sub munge_files {}
 
 1;
 
@@ -71,12 +80,6 @@ get passed around.
 B<Note:> See L<Test2::Harness::Plugin> for additional method you can implement/override
 
 =over 4
-
-=item $plugin->handle_event($event, $settings)
-
-Called for every single event that yath sees. Note that this method is not
-defined by default for performance reasons, however it will be called if you
-define it.
 
 =item @sorted = $plugin->sort_files_2(settings => $settings, files => \@unsorted)
 
@@ -150,7 +153,7 @@ at the end of output.
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -170,11 +173,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

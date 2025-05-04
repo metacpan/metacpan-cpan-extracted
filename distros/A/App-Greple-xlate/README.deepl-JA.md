@@ -4,17 +4,19 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 # SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9909
+Version 0.9910
 
 # DESCRIPTION
 
-**Greple** **xlate**モジュールは目的のテキストブロックを見つけ、翻訳されたテキストに置き換えます。現在、DeepL (`deepl.pm`) と ChatGPT (`gpt3.pm`) モジュールがバックエンドエンジンとして実装されています。gpt-4 と gpt-4o も実験的にサポートされています。
+**Greple** **xlate** モジュールは目的のテキストブロックを見つけ、翻訳されたテキストに置き換えます。現在、DeepL (`deepl.pm`) と ChatGPT 4.1 (`gpt4.pm`) モジュールがバックエンドエンジンとして実装されています。
 
 PerlのPodスタイルで書かれた文書中の通常のテキストブロックを翻訳したい場合は、`xlate::deepl`と`perl`モジュールを使って、次のように**greple**コマンドを使います：
 
@@ -106,7 +108,7 @@ PerlのPodスタイルで書かれた文書中の通常のテキストブロッ�
 
     - **deepl**: DeepL API
     - **gpt3**: gpt-3.5-turbo
-    - **gpt4**: gpt-4-turbo
+    - **gpt4**: gpt-4.1
     - **gpt4o**: gpt-4o-mini
 
         **gpt-4o**のインターフェイスは不安定で、現時点では正しく動作することを保証できません。
@@ -124,7 +126,7 @@ PerlのPodスタイルで書かれた文書中の通常のテキストブロッ�
 
     原文と訳文の出力形式を指定します。
 
-    `xtxt`以外の以下の書式は、翻訳される部分が行の集まりであることを前提としています。実際には、行の一部だけを翻訳することも可能であり、`xt`以外の書式を指定しても意味のある結果は得られないです。
+    `xtxt`以外の以下の書式は、翻訳される部分が行の集まりであることを前提としています。実際、行の一部だけを翻訳することは可能ですが、 `xtxt`以外の書式を指定しても意味のある結果は得られません。
 
     - **conflict**, **cm**
 
@@ -214,6 +216,13 @@ PerlのPodスタイルで書かれた文書中の通常のテキストブロッ�
 
     ファイルの全文を対象領域に設定します。
 
+- **--lineify-cm**
+- **--lineify-colon**
+
+    `cm`と`colon`形式の場合、出力は一行ごとに分割され、整形されます。従って、行の一部だけが変換される場合、期待された結果は得られません。これらのフィルタは、行の一部を通常の行単位の出力に変換することによって破損した出力を修正します。
+
+    現在の実装では、行の複数の部分が翻訳された場合、それらは独立した行として出力されます。
+
 # CACHE OPTIONS
 
 **xlate**モジュールは、各ファイルの翻訳テキストをキャッシュしておき、実行前に読み込むことで、サーバーに問い合わせるオーバーヘッドをなくすことができます。デフォルトのキャッシュ戦略`auto`では、対象ファイルに対してキャッシュファイルが存在する場合にのみキャッシュデータを保持します。
@@ -302,7 +311,7 @@ DeepLおよびChatGPT用のコマンドラインツールをインストール�
 
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) (英語)
 
-[App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3) です。
+&lt;m id=5
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

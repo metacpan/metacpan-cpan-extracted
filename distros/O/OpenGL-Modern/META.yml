@@ -1,22 +1,16 @@
 ---
-abstract: 'Perl extension to Modern OpenGL API up to 4.5'
+abstract: 'Perl extension to Modern OpenGL API up to 4.6'
 author:
   - 'Chris Marshall <chm@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
-  IO::All: '0.86'
-  Test::InDistDir: '0'
   Test::More: '0.88'
 configure_requires:
-  Capture::Tiny: '0'
-  Data::Dumper: '0'
   Devel::CheckLib: '0'
-  Devel::CheckOS: '0'
-  ExtUtils::Constant: '0'
-  ExtUtils::MakeMaker: '6.17'
-  ExtUtils::MakeMaker::CPANfile: '0.07'
+  ExtUtils::MakeMaker: '7.72'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,9 +21,10 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
-  Import::Into: '0'
-  perl: '5.006'
+  perl: '5.016'
 resources:
-  repository: https://github.com/devel-chm/OpenGL-Modern.git
-version: '0.04'
+  IRC: irc://irc.perl.org/#pogl
+  bugtracker: https://github.com/Perl-GPU/OpenGL-Modern/issues
+  repository: https://github.com/Perl-GPU/OpenGL-Modern.git
+version: '0.0401'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

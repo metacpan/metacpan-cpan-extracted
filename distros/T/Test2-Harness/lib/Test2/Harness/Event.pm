@@ -2,9 +2,10 @@ package Test2::Harness::Event;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use Carp qw/confess/;
+use List::Util qw/min/;
 use Time::HiRes qw/time/;
 use Test2::Harness::Util::JSON qw/encode_json/;
 
@@ -45,28 +46,46 @@ sub init {
 
     my $data = $self->{+FACET_DATA} || confess "'facet_data' is a required attribute";
 
-    for my $field (RUN_ID(), JOB_ID(), JOB_TRY(), EVENT_ID()) {
-        my $v1 = $self->{$field};
-        my $v2 = $data->{harness}->{$field};
-
-        my $d1 = defined($v1);
-        my $d2 = defined($v2);
-
-        confess "'$field' is a required attribute"
-            unless $d1 || $d2 || ($field eq +JOB_TRY && !$self->{+JOB_ID});
-
-        confess "'$field' has different values between attribute and facet data"
-            if $d1 && $d2 && $v1 ne $v2;
-
-        $self->{$field} = $data->{harness}->{$field} = $v1 // $v2;
-    }
-
-    delete $data->{facet_data};
+    $self->{+JOB_ID} //= 0;
 
     # Original trace wins.
     if (my $trace = delete $self->{+TRACE}) {
-        $self->{+FACET_DATA}->{trace} //= $trace;
+        $data->{trace} //= $trace;
     }
+
+    my $other = {stamp => $data->{trace}->{stamp} // time};
+
+    for my $field (RUN_ID(), JOB_ID(), JOB_TRY(), EVENT_ID(), STAMP()) {
+        my $v1 = $self->{$field};
+        my $v2 = $data->{harness}->{$field};
+        my $v3 = $other->{$field};
+
+        my %seen;
+        for my $v ($v1, $v2, $v3) {
+            next unless defined($v);
+            $seen{$v}++;
+        }
+
+        my $count = keys %seen;
+
+        confess "'$field' is a required attribute"
+            unless $count || ($field eq +JOB_TRY && !$self->{+JOB_ID});
+
+        if ($count > 1) {
+            # Some things maybe overzelous in enforcing a stamp, if that happens just take the lowest one.
+            if ($field eq +STAMP) {
+                my ($stamp) = min(keys %seen);
+                $data->{trace}->{stamp} = $stamp;
+            }
+            else {
+                confess "'$field' has different values between attribute and facet data: " . join(', ' => map { "'$_'" } keys %seen);
+            }
+        }
+
+        $self->{$field} = $data->{harness}->{$field} = $v1 // $v2 // $v3;
+    }
+
+    delete $data->{facet_data};
 }
 
 sub as_json { $_[0]->{+JSON} //= encode_json($_[0]) }
@@ -186,7 +205,7 @@ essential and used everywhere.
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -206,11 +225,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

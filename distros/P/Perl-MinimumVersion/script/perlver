@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package perlver;
-$perlver::VERSION = '1.40';
+$perlver::VERSION = '1.44';
 =pod
 
 =head1 NAME
@@ -190,12 +190,7 @@ sub summary {
 	my $len3          = List::Util::max map { length $_->[3] } @outputs;
 	my $len_all       = $len0 + $len1 + $len2 + $len3 + 9;
 	my $len_totals    = $len1 + $len2 + $len3 + 6;
-	my $line_format   = " | %-${len0}s | %-${len1}s | %-${len2}s | %-${len3}s |\n";
-	if ($EXPLAIN) {
-	  chomp($line_format);
-	  $line_format.="  (%s)\n";
-	}
-	my $spacer        = '-' x $len_all;
+
 	my $error_message = "ERROR DETECTED : ACTUAL DEPENDENCY HIGHER THAN SPECIFIED";
 	my $error_length  = length $error_message;
 	if ( $error_length > $len_all ) {
@@ -205,6 +200,12 @@ sub summary {
 	}
 
 	# Prepare formatting parts
+	my $line_format   = " | %-${len0}s | %-${len1}s | %-${len2}s | %-${len3}s |\n";
+	if ($EXPLAIN) {
+	  chomp($line_format);
+	  $line_format.="  (%s)\n";
+	}
+	my $spacer        = '-' x $len_all;
 	my $divider = " | $spacer |\n";
 	my $capline = "   $spacer  \n";
 	my $rowline = " | %-${len_all}s |\n";

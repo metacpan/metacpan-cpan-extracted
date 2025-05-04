@@ -9,11 +9,11 @@ use Test::More 0.47;
 use Perl::MinimumVersion;
 
 my %examples=(
-    q/ $x = 0;                          /   => '5.004',
-    q/ LABEL1: $x = 0;                  /   => '5.004',
+    q/ $x = 0;                          /   => '5.006',
+    q/ LABEL1: $x = 0;                  /   => '5.006',
     # q/ LABEL1: LABEL2: $x = 0;          /   => '5.014',
     # q/ LABEL1:LABEL2: $x = 0;           /   => '5.014',
-    q/ LABEL1: $x = 0; LABEL2: $y = 0;  /   => '5.004',
+    q/ LABEL1: $x = 0; LABEL2: $y = 0;  /   => '5.006',
 );
 
 plan tests => scalar(keys %examples);

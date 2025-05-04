@@ -4,17 +4,19 @@ App::Greple::xlate - greple的翻译支持模块
 
 # SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9909
+Version 0.9910
 
 # DESCRIPTION
 
-**Greple** **xlate** 模块查找所需的文本块，并用翻译文本替换它们。目前，DeepL (`deepl.pm`) 和 ChatGPT (`gpt3.pm`) 模块被用作后端引擎。此外，还包括对 gpt-4 和 gpt-4o 的实验性支持。
+**Greple** **xlate** 模块可找到所需的文本块，并将其替换为翻译文本。目前，DeepL (`deepl.pm`)和 ChatGPT 4.1 (`gpt4.pm`)模块是作为后端引擎实现的。
 
 如果要翻译以 Perl 的 pod 风格编写的文档中的普通文本块，请使用 **greple** 命令，并像这样使用 `xlate::deepl` 和 `perl` 模块：
 
@@ -106,7 +108,7 @@ Version 0.9909
 
     - **deepl**: DeepL API
     - **gpt3**: gpt-3.5-turbo
-    - **gpt4**: gpt-4-turbo
+    - **gpt4**: gpt-4.1
     - **gpt4o**: gpt-4o-mini
 
         **gpt-4o** 的接口不稳定，目前无法保证正常工作。
@@ -124,7 +126,7 @@ Version 0.9909
 
     指定原始和翻译文本的输出格式。
 
-    除 `xtxt` 以外的下列格式假定要翻译的部分是行的集合。事实上，有可能只翻译一行的一部分，因此指定 `xtxt` 以外的格式不会产生有意义的结果。
+    除 `xtxt` 以外的以下格式都假定要翻译的部分是行的集合。事实上，可以只翻译一行的一部分，但指定 `xtxt` 以外的格式不会产生有意义的结果。
 
     - **conflict**, **cm**
 
@@ -214,6 +216,13 @@ Version 0.9909
 
     将文件的整个文本设置为目标区域。
 
+- **--lineify-cm**
+- **--lineify-colon**
+
+    对于 `cm` 和 `colon` 格式，输出是逐行分割和格式化的。因此，如果只翻译一行的一部分，就无法获得预期的结果。这些过滤器可以修复将一行的部分内容翻译成正常的逐行输出而损坏的输出。
+
+    在当前的实现中，如果一行的多个部分被翻译，它们将作为独立的行输出。
+
 # CACHE OPTIONS
 
 **xlate**模块可以存储每个文件的翻译缓存文本，并在执行前读取它，以消除向服务器请求的开销。在默认的缓存策略`auto`下，它只在目标文件的缓存文件存在时才维护缓存数据。
@@ -302,7 +311,7 @@ Version 0.9909
 
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
-[App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
+[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

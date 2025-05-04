@@ -2,24 +2,15 @@ package App::Yath::Options::Persist;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use Test2::Util qw/IS_WIN32/;
-use Test2::Harness::Util qw/clean_path/;
-
-use App::Yath::Options;
-
-option_group {prefix => 'runner', category => "Runner Options"} => sub {
-    option daemon => (
-        description => 'Start the runner as a daemon (Default: True)',
-        default => 1,
-    );
-};
+use Test2::Harness::Util::Deprecated(
+    append => "This is now handled via flags on specific yath commands.",
+);
 
 1;
 
 __END__
-
 
 =pod
 
@@ -27,33 +18,16 @@ __END__
 
 =head1 NAME
 
-App::Yath::Options::Persist - Persistent Runner options for Yath.
+App::Yath::Options::Persist - DEPRECATED
 
 =head1 DESCRIPTION
 
-This is where the command line options for the persistent runner are defined.
-
-=head1 PROVIDED OPTIONS
-
-=head2 COMMAND OPTIONS
-
-=head3 Runner Options
-
-=over 4
-
-=item --daemon
-
-=item --no-daemon
-
-Start the runner as a daemon (Default: True)
-
-
-=back
+=head1 SYNOPSIS
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -73,11 +47,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+

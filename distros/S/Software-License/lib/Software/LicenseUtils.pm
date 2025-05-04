@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Carp;
 
-package Software::LicenseUtils 0.104006;
+package Software::LicenseUtils 0.104007;
 # ABSTRACT: little useful bits of code for licensey things
 
 use File::Spec;
@@ -52,10 +52,10 @@ my @phrases = (
   'has dedicated the work to the Commons' => 'CC0_1_0',
   'waiving all of his or her rights to the work worldwide under copyright law' => 'CC0_1_0',
   'has waived all copyright and related or neighboring rights to' => 'CC0_1_0',
-  'apache(?: |-)1.1' => "Apache_1_1",
-  "Apache Software License(\\s)+Version 1.1" => "Apache_1_1",
-  'apache(?: |-)2.0' => "Apache_2_0",
-  "Apache License(\\s)+Version 2.0" => "Apache_2_0",
+  'apache[- ]1.1' => "Apache_1_1",
+  "Apache Software License[,\\s]+Version 1.1" => "Apache_1_1",
+  'apache[- ]2.0' => "Apache_2_0",
+  "Apache License[,\\s]+Version 2.0" => "Apache_2_0",
   'No license is granted to other entities' => 'None',
 );
 
@@ -277,7 +277,7 @@ Software::LicenseUtils - little useful bits of code for licensey things
 
 =head1 VERSION
 
-version 0.104006
+version 0.104007
 
 =head1 PERL VERSION
 
@@ -353,7 +353,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

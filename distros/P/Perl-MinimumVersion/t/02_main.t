@@ -8,13 +8,14 @@ BEGIN {
 	$^W = 1;
 }
 
-use Test::More 0.47 tests => 116;
+use Test::More 0.47 tests => 90;
 use version 0.76;
 use File::Spec::Functions ':ALL';
-use PPI 1.215;
+use PPI 1.252;
 use Perl::MinimumVersion 'PMV';
 
 sub version_is {
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	my $Document = PPI::Document->new( \$_[0] );
 	isa_ok( $Document, 'PPI::Document' );
 	my $v = Perl::MinimumVersion->new( $Document );
@@ -106,33 +107,6 @@ SCOPE: {
 	}
 }
 
-SCOPE: {
-my $v = version_is( <<'END_PERL', '5.004', 'Hello World matches expected version' );
-print "Hello World!\n";
-END_PERL
-is( $v->_any_our_variables, '', '->_any_our_variables returns false' );
-
-# This first time, lets double check some assumptions
-isa_ok( $v->Document, 'PPI::Document'  );
-isa_ok( $v->minimum_version, 'version' );
-}
-
-# Try one with an 'our' in it
-SCOPE: {
-my $v = version_is( <<'END_PERL', '5.006', '"our" matches expected version' );
-our $foo = 'bar';
-END_PERL
-ok( $v->_any_our_variables, '->_any_our_variables returns true' );
-}
-
-# Try with attributes
-SCOPE: {
-my $v = version_is( <<'END_PERL', '5.006', '"attributes" matches expected version' );
-sub foo : attribute { 1 };
-END_PERL
-ok( $v->_any_attributes, '->_any_attributes returns true' );
-}
-
 # Check with a complex explicit
 SCOPE: {
 my $v = version_is( <<'END_PERL', '5.008', 'explicit versions are detected' );
@@ -144,8 +118,8 @@ END_PERL
 
 # Check with syntax higher than explicit
 SCOPE: {
-my $v = version_is( <<'END_PERL', '5.006', 'Used syntax higher than low explicit' );
-sub foo : attribute { 1 };
+my $v = version_is( <<'END_PERL', '5.010', 'Used syntax higher than low explicit' );
+state $foo = 1;
 require 5.005;
 END_PERL
 }
@@ -178,7 +152,7 @@ END_PERL
 
 # Check regular use of constants
 SCOPE: {
-my $v = version_is( <<'END_PERL', '5.004', 'normal constant use has no dep' );
+my $v = version_is( <<'END_PERL', '5.006', 'normal constant use has no dep' );
 use constant FOO => 1;
 1;
 END_PERL
@@ -192,28 +166,12 @@ END_PERL
 ok( $v->_perl_5010_pragmas, '->_perl_5010_pragmas returns true' );
 }
 
-# Check "version number"
-SCOPE: {
-my $v = version_is( <<'END_PERL', '5.006', '"version number" detected' );
-my $a=v1.1.1;
-END_PERL
-ok( $v->_any_version_literals, '->_any_version_literals returns true' );
-}
-
 # Check the localized soft refernence pragma
 SCOPE: {
 my $v = version_is( <<'END_PERL', '5.008', 'Localized soft reference matched expected version' );
 local ${ "${class}::DIE" } = 1;
 END_PERL
 ok( $v->_local_soft_reference, '->_local_soft_reference returns true' );
-}
-
-# Check variables added in 5.5
-SCOPE: {
-my $v = version_is( <<'END_PERL', '5.005', 'variables added in 5.5' );
-$! + $^R;
-END_PERL
-ok( $v->_5005_variables, '->_5005_variables returns true' );
 }
 
 
@@ -229,25 +187,25 @@ is( $v->_bugfix_magic_errno->symbol, '$^E','->_bugfix_magic_errno returns $^E' )
 
 # Check that minimum_syntax_version's limit param is respected
 SCOPE: {
-my $doc = PPI::Document->new(\'our $x'); # requires 5.006 syntax
+my $doc = PPI::Document->new(\'state $x'); # requires 5.010 syntax
 my $minver = Perl::MinimumVersion->new($doc);
 is(
   $minver->minimum_syntax_version,
-  5.006,
+  '5.010',
   "5.006 syntax found when no limit supplied",
 );
 is(
-  $minver->minimum_syntax_version(5.005),
-  5.006,
+  $minver->minimum_syntax_version(5.008),
+  '5.010',
   "5.006 syntax found when 5.005 limit supplied",
 );
 is(
-  $minver->minimum_syntax_version(version->new(5.008)),
+  $minver->minimum_syntax_version(version->new(5.018)),
   '',
   "no syntax constraints found when 5.008 limit supplied",
 );
 is(
-  Perl::MinimumVersion->minimum_syntax_version($doc, version->new(5.008)),
+  Perl::MinimumVersion->minimum_syntax_version($doc, version->new(5.018)),
   '',
   "also works as object method with limit: no constraints found",
 );
@@ -274,7 +232,7 @@ END_PERL
 
 # Check regexes
 SCOPE: {
-my $v = version_is( <<'END_PERL', '5.005', '\z in regex matches expected version' );
+my $v = version_is( <<'END_PERL', '5.006', '\z in regex matches expected version' );
 m/a\z/
 END_PERL
 }
@@ -286,11 +244,6 @@ END_PERL
 SCOPE: {
 my $v = version_is( <<'END_PERL', '5.015008', '\F' );
 s/\Fa//;
-END_PERL
-}
-SCOPE: {
-my $v = version_is( <<'END_PERL', '5.004', '/c regex modifier' );
-s//c;
 END_PERL
 }
 SCOPE: {
@@ -318,15 +271,12 @@ SCOPE: {
 my $perl = <<'END_PERL';
 use 5.005;
 use mro 'dfs';
-our $VERSION;
-sub example : Sufficies { }
 END_PERL
 my @result = PMV->version_markers(\$perl);
-is(@result, 6, "we find three versioned marked in the result");
+is(@result, 4, "we find three versioned marked in the result");
 
 my @expect = (
 	'5.010' => [ qw(_perl_5010_pragmas) ],
-	'5.006' => [ qw(_any_our_variables _any_attributes) ],
 	'5.005' => [ qw(explicit) ],
 );
 
@@ -342,18 +292,18 @@ for my $i (map { $_ * 2 } 0 .. $#result / 2) {
 
 #check _checks2skip
 SCOPE: {
-my $doc = PPI::Document->new(\'our $x;s/a//u;$^R;');
+my $doc = PPI::Document->new(\'s/a//u;');
 my $minver = Perl::MinimumVersion->new($doc);
-$minver->_set_checks2skip([qw/_any_our_variables _regex/]);
+$minver->_set_checks2skip([qw/_regex/]);
 is(
   $minver->minimum_syntax_version,
-  '5.005',
+  '',
   "5.6 checks not run when _checks2skip was used",
 );
 }
 #check _checks2skip
 SCOPE: {
-my $doc = PPI::Document->new(\'our $x;s/a//u;$^R;');
+my $doc = PPI::Document->new(\'s/a//u;');
 my $minver = Perl::MinimumVersion->new($doc);
 $minver->_set_collect_all_reasons();
 like(
@@ -363,8 +313,8 @@ like(
 );
 is(
   scalar(@{ $minver->{_all_reasons} }),
-  3,
-  "3 checks met",
+  1,
+  "1 check met",
 );
 }
 

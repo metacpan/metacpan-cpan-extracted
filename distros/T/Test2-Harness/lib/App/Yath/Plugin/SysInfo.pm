@@ -2,7 +2,7 @@ package App::Yath::Plugin::SysInfo;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use Sys::Hostname qw/hostname/;
 use Test2::Util qw/CAN_THREAD CAN_REALLY_FORK CAN_FORK CAN_SIGSYS/;
@@ -11,18 +11,24 @@ use Config qw/%Config/;
 use parent 'App::Yath::Plugin';
 use Test2::Harness::Util::HashBase qw/-host_short_pattern/;
 
-sub inject_run_data {
-    my $self  = shift;
-    my %params = @_;
+use Getopt::Yath;
+option_group {prefix => 'sysinfo', group => 'sysinfo', category => "SysInfo Options"} => sub {
+    option 'sysinfo' => (
+        type => 'Bool',
+        prefix => undef,
+        description => "Enable the SysInfo plugin",
+    );
+};
 
-    my $meta   = $params{meta};
-    my $fields = $params{fields};
+sub run_fields {
+    my $self = shift;
 
     my %data = (
         env => {
             user  => $ENV{USER},
             shell => $ENV{SHELL},
             term  => $ENV{TERM},
+            (map { m/(YATH|T2|TEST2|HARNESS|PERL|CPAN|TAP)/i ? ($_ => $ENV{$_}) : ()} keys %ENV),
         },
 
         ipc => {
@@ -36,9 +42,9 @@ sub inject_run_data {
     my ($short, $raw) = ('sys', 'system info');
 
     if (my $hostname = hostname()) {
-        $short = undef;
+        $short          = undef;
         $data{hostname} = $hostname;
-        $raw = $hostname;
+        $raw            = $hostname;
 
         if (my $pattern = $self->{+HOST_SHORT_PATTERN}) {
             if ($hostname =~ /($pattern)/) {
@@ -55,12 +61,22 @@ sub inject_run_data {
     my @fields = qw/uselongdouble use64bitall version use64bitint usemultiplicity osname useperlio useithreads archname/;
     @{$data{config}}{@fields} = @Config{@fields};
 
-    push @$fields => {
+    return ({
         name    => 'sys',
         details => $short,
         raw     => $raw,
         data    => \%data,
-    };
+    });
+}
+
+sub run_queued {
+    my $self = shift;
+    my ($run) = @_;
+
+    my @fields = $self->run_fields;
+    return unless @fields;
+
+    $run->send_event(facet_data => {harness_run_fields => \@fields});
 }
 
 sub TO_JSON { ref($_[0]) }
@@ -79,13 +95,13 @@ App::Yath::Plugin::SysInfo - Plugin to attach system information to a run.
 
 =head1 DESCRIPTION
 
-This plugin attaches a lot of system information to the yath log. This is
-mainly useful if you intend to view the log in L<Test2::Harness::UI>.
+This plugin attaches a lot of system information to the yath log. This is most
+useful when using a database or server.
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -105,11 +121,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

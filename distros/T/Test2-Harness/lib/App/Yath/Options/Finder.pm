@@ -2,172 +2,214 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use Test2::Harness::Util qw/mod2file/;
-
-use App::Yath::Options;
+use Test2::Harness::Util qw/fqmod/;
+use List::Util qw/first/;
+use Getopt::Yath;
 
 my %RERUN_MODES = (
-    all     => "Re-Run all tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
-    failed  => "Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
-    retried => "Re-Run retried tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
-    passed  => "Re-Run passed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
-    missed  => "Run missed tests from a previously aborted/stopped run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
+    all     => "Re-Run all tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.",
+    failed  => "Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.",
+    retried => "Re-Run retried tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.",
+    passed  => "Re-Run passed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.",
+    missed  => "Run missed tests from a previously aborted/stopped run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.",
 );
 
-option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2::Harness::Finder'} => sub {
-    option finder => (
-        type          => 's',
-        default       => 'Test2::Harness::Finder',
-        description   => 'Specify what Finder subclass to use when searching for files/processing the file list. Use the "+" prefix to specify a fully qualified namespace, otherwise Test2::Harness::Finder::XXX namespace is assumed.',
-        long_examples => [' MyFinder', ' +Test2::Harness::Finder::MyFinder'],
-        pre_command   => 1,
-        adds_options  => 1,
-        pre_process   => \&finder_pre_process,
-        action        => \&finder_action,
+option_group {group => 'finder', category => "Finder Options"} => sub {
+    option class => (
+        name    => 'finder',
+        field   => 'class',
+        type    => 'Scalar',
+        default => 'App::Yath::Finder',
 
-        builds => undef,    # This option is not for the build
+        mod_adds_options => 1,
+        long_examples    => [' MyFinder', ' +App::Yath::Finder::MyFinder'],
+        description      => 'Specify what Finder subclass to use when searching for files/processing the file list. Use the "+" prefix to specify a fully qualified namespace, otherwise App::Yath::Finder::XXX namespace is assumed.',
+
+        normalize => sub { fqmod($_[0], 'App::Yath::Finder') },
     );
 
-    option extension => (
-        field       => 'extensions',
-        type        => 'm',
-        alt         => ['ext'],
+    option extensions => (
+        type => 'List',
+        alt  => ['ext', 'extension'],
+        split_on => ',',
+
         description => 'Specify valid test filename extensions, default: t and t2',
-    );
-
-    option search => (
-        type => 'm',
-
-        description => 'List of tests and test directories to use instead of the default search paths. Typically these can simply be listed as command line arguments without the --search prefix.',
+        normalize   => sub { $_[0] =~ s/^\.+//g; $_[0] },
+        default     => sub { qw/t t2/ },
     );
 
     option no_long => (
+        type => 'Bool',
+
         description => "Do not run tests that have their duration flag set to 'LONG'",
     );
 
     option only_long => (
+        type => 'Bool',
+
         description => "Only run tests that have their duration flag set to 'LONG'",
     );
 
     option show_changed_files => (
+        type => 'Bool',
+
         description => "Print a list of changed files if any are found",
-        applicable => \&changes_applicable,
     );
 
     option changed_only => (
+        type => 'Bool',
+
         description => "Only search for tests for changed files (Requires a coverage data source, also requires a list of changes either from the --changed option, or a plugin that implements changed_files() or changed_diff())",
-        applicable => \&changes_applicable,
     );
 
     option rerun => (
-        type => 'd',
-        description => "Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.",
+        type => 'Auto',
+
+        description   => "Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.",
         long_examples => ['', '=path/to/log.jsonl', '=plugin_specific_string'],
+
+        autofill => sub {
+            my $log = first { -e $_ } qw{ ./lastlog.jsonl ./lastlog.jsonl.bz2 ./lastlog.jsonl.gz };
+            return $log // -1;
+        },
     );
 
-    option rerun_plugin => (
-        type => 'm',
-        description => "What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used ot set an order of priority)",
+    option rerun_plugins => (
+        type => 'List',
+        alt => ['rerun-plugin'],
+
+        description   => "What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used to set an order of priority)",
         long_examples => [' Foo', ' +App::Yath::Plugin::Foo'],
+
+        mod_adds_options => 1,
+        normalize => sub { fqmod($_[0], 'App::Yath::Plugin') },
     );
 
+    my $modes = join '|' => sort keys %RERUN_MODES;
     option rerun_modes => (
-        alt => ['rerun-mode'],
-        type => 'm',
-        description => "Pick which test categories to run",
-        long_examples => [' failed,missed,...', map {" $_"} sort keys %RERUN_MODES],
-    );
+        type => 'BoolMap',
 
-    for my $mode (keys %RERUN_MODES) {
-        option "rerun_$mode" => (
-            type             => 'd',
-            description      => $RERUN_MODES{$mode},
-            long_examples    => ['', '=path/to/log.jsonl', '=plugin_specific_string'],
-            ignore_for_build => 1,
-        );
-    }
+        default => sub { all => 1 },
+
+        pattern => qr/rerun-($modes)(=.+)?/,
+
+        long_examples => [' ' . join(',', sort keys %RERUN_MODES)],
+
+        requires_arg => 1,
+
+        normalize => sub {
+            map { die "'$_' is not a valid run mode" unless $RERUN_MODES{$_}; $_ => 1 } split /[\s,]+/, $_[0];
+        },
+
+        description => join(" " => "Pick which test categories to run.", map { sprintf("%-8s %s", "$_:", $RERUN_MODES{$_}) } sort keys %RERUN_MODES),
+
+        trigger => sub {
+            my $opt = shift;
+            my %params = @_;
+            return unless $params{action} eq 'set';
+            $params{settings}->finder->rerun(1) unless $params{settings}->finder->rerun;
+        },
+
+        custom_matches => sub {
+            my $opt = shift;
+            my ($input, $state) = @_;
+
+            my $pattern = $opt->pattern;
+
+            return unless $input =~ $pattern;
+
+            my ($no, $key, $val) = ($1, $2, $3);
+
+            if ($val) {
+                $val =~ s/^=//;
+                $state->{settings}->finder->rerun($val);
+            }
+
+            return ($opt, 1, [$key => $no ? 0 : 1]);
+        },
+
+        notes => "This will turn on the 'rerun' option. If the --rerun-MODE form is used, you can specify the log file with --rerun-MODE=logfile.",
+    );
 
     option changed => (
-        type => 'm',
-        description => "Specify one or more files as having been changed.",
+        type          => 'PathList',
+        split_on      => ',',
+        description   => "Specify one or more files as having been changed.",
         long_examples => [' path/to/file'],
-        applicable => \&changes_applicable,
     );
 
-    option changes_exclude_file => (
-        type => 'm',
-        description => 'Specify one or more files to ignore when looking at changes',
+    option changes_exclude_files => (
+        alt           => ['changes-exclude-file'],
+        type          => 'PathList',
+        split_on      => ',',
+        description   => 'Specify one or more files to ignore when looking at changes',
         long_examples => [' path/to/file'],
-        applicable => \&changes_applicable,
     );
 
-    option changes_exclude_pattern => (
-        type => 'm',
-        description => 'Ignore files matching this pattern when looking for changes. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.',
+    option changes_exclude_patterns => (
+        alt           => ['changes-exclude-pattern'],
+        type          => 'PathList',
+        split_on      => ',',
+        description   => 'Ignore files matching this pattern when looking for changes. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.',
         long_examples => [" '(apple|pear|orange)'"],
-        applicable => \&changes_applicable,
     );
 
-    option changes_filter_file => (
-        type => 'm',
-        description => 'Specify one or more files to check for changes. Changes to other files will be ignored',
+    option changes_filter_files => (
+        alt           => ['changes-filter-file'],
+        type          => 'PathList',
+        split_on      => ',',
+        description   => 'Specify one or more files to check for changes. Changes to other files will be ignored',
         long_examples => [' path/to/file'],
-        applicable => \&changes_applicable,
     );
 
-    option changes_filter_pattern => (
-        type => 'm',
-        description => 'Specify a pattern for change checking. When only running tests for changed files this will limit which files are checked for changes. Only files that match this pattern will be checked. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.',
+    option changes_filter_patterns => (
+        alt           => ['changes-filter-pattern'],
+        type          => 'List',
+        split_on      => ',',
+        description   => 'Specify a pattern for change checking. When only running tests for changed files this will limit which files are checked for changes. Only files that match this pattern will be checked. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.',
         long_examples => [" '(apple|pear|orange)'"],
-        applicable => \&changes_applicable,
     );
 
     option changes_diff => (
-        type => 's',
-        description => "Path to a diff file that should be used to find changed files for use with --changed-only. This must be in the same format as `git diff -W --minimal -U1000000`",
+        type          => 'Scalar',
+        description   => "Path to a diff file that should be used to find changed files for use with --changed-only. This must be in the same format as `git diff -W --minimal -U1000000`",
         long_examples => [' path/to/diff.diff'],
-        applicable => \&changes_applicable,
     );
 
     option changes_plugin => (
-        type => 's',
+        type => 'Scalar',
         description => "What plugin should be used to detect changed files.",
         long_examples => [' Git', ' +App::Yath::Plugin::Git'],
-        applicable => \&changes_applicable,
     );
 
     option changes_include_whitespace => (
-        type => 'b',
+        type => 'Bool',
         description => "Include changed lines that are whitespace only (default: off)",
-        applicable => \&changes_applicable,
         default => 0,
     );
 
     option changes_exclude_nonsub => (
-        type => 'b',
+        type => 'Bool',
         description => "Exclude changes outside of subroutines (perl files only) (default: off)",
-        applicable => \&changes_applicable,
         default => 0,
     );
 
     option changes_exclude_loads => (
-        type => 'b',
+        type => 'Bool',
         description => "Exclude coverage tests which only load changed files, but never call code from them. (default: off)",
-        applicable => \&changes_applicable,
         default => 0,
     );
 
     option changes_exclude_opens => (
-        type => 'b',
+        type => 'Bool',
         description => "Exclude coverage tests which only open() changed files, but never call code from them. (default: off)",
-        applicable => \&changes_applicable,
         default => 0,
     );
 
     option durations => (
-        type => 's',
+        type => 'Scalar',
 
         long_examples  => [' file.json', ' http://example.com/durations.json'],
         short_examples => [' file.json', ' http://example.com/durations.json'],
@@ -176,7 +218,7 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
     );
 
     option maybe_durations => (
-        type => 's',
+        type => 'Scalar',
 
         long_examples  => [' file.json', ' http://example.com/durations.json'],
         short_examples => [' file.json', ' http://example.com/durations.json'],
@@ -185,15 +227,16 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
     );
 
     option durations_threshold => (
-        alt => ['Dt'],
-        type => 's',
-        default => undef,
-        description => "Only fetch duration data if running at least this number of tests. Default (-j value + 1)"
+        type        => 'Scalar',
+        alt         => ['Dt'],
+        default     => 0,
+        description => "Only fetch duration data if running at least this number of tests. Default: 0"
     );
 
-    option exclude_file => (
-        field => 'exclude_files',
-        type  => 'm',
+    option exclude_files => (
+        alt => ['exclude-file'],
+        type  => 'PathList',
+        field => 'exclude-files',
 
         long_examples  => [' t/nope.t'],
         short_examples => [' t/nope.t'],
@@ -201,19 +244,20 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
         description => "Exclude a file from testing",
     );
 
-    option exclude_pattern => (
-        field => 'exclude_patterns',
-        type  => 'm',
+    option exclude_patterns => (
+        alt => ['exclude-pattern'],
+        type  => 'List',
+        field => 'exclude-patterns',
 
-        long_examples  => [' t/nope.t'],
-        short_examples => [' t/nope.t'],
+        long_examples  => [' nope'],
+        short_examples => [' nope'],
 
         description => "Exclude a pattern from testing, matched using m/\$PATTERN/",
     );
 
-    option exclude_list => (
-        field => 'exclude_lists',
-        type => 'm',
+    option exclude_lists => (
+        alt  => ['exclude-list'],
+        type => 'PathList',
 
         long_examples  => [' file.txt', ' http://example.com/exclusions.txt'],
         short_examples => [' file.txt', ' http://example.com/exclusions.txt'],
@@ -222,123 +266,19 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
     );
 
     option default_search => (
-        type => 'm',
+        type    => 'PathList',
+        default => sub { './t', './t2', './test.pl' },
 
         description => "Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line",
     );
 
     option default_at_search => (
-        type => 'm',
+        type    => 'PathList',
+        default => sub { './xt' },
 
         description => "Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line",
     );
-
-    post \&_post_process;
 };
-
-sub _post_process {
-    my %params   = @_;
-    my $settings = $params{settings};
-    my $options  = $params{options};
-
-    my $finder = $settings->finder;
-
-    my $rerun = $finder->rerun;
-
-    for my $mode (sort keys %RERUN_MODES) {
-        my $val = $finder->remove_field("rerun_$mode") or next;
-
-        push @{$finder->rerun_modes} => $mode;
-
-        next if $val eq '1';
-
-        $rerun //= $val;
-        $rerun = $val if $rerun eq '1';
-
-        die "Multiple runs specified for rerun ($val and $rerun). Please pick one.\n" if $val ne $rerun;
-    }
-
-    $finder->field(rerun => $rerun);
-
-    my (%seen, @keep);
-    for my $mode (sort map { split /,/ } @{$finder->rerun_modes}) {
-        next if $seen{$mode}++;
-        die "Invalid rerun-mode '$mode'.\n" unless $RERUN_MODES{$mode};
-        push @keep => $mode;
-    }
-    push @keep => 'all' unless @keep;
-
-    @{$finder->rerun_modes} = @keep;
-
-    if (!defined($settings->finder->durations_threshold)) {
-        if ($settings->check_prefix('runner')) {
-            my $jc = $settings->runner->job_count // 1;
-            $settings->finder->field(durations_threshold => $jc + 1);
-        }
-
-        $settings->finder->field(durations_threshold => 1);
-    }
-
-    $settings->finder->field(default_search => ['./t', './t2', 'test.pl'])
-        unless $settings->finder->default_search && @{$settings->finder->default_search};
-
-    $settings->finder->field(default_at_search => ['./xt'])
-        unless $settings->finder->default_at_search && @{$settings->finder->default_at_search};
-
-    @{$settings->finder->extensions} = ('t', 't2')
-        unless @{$settings->finder->extensions};
-
-    s/^\.//g for @{$settings->finder->extensions};
-}
-
-sub normalize_class {
-    my ($class) = @_;
-
-    $class = "Test2::Harness::Finder::$class"
-        unless $class =~ s/^\+//;
-
-    my $file = mod2file($class);
-    require $file;
-
-    return $class;
-}
-
-sub finder_pre_process {
-    my %params = @_;
-
-    my $class = $params{val} or return;
-
-    $class = normalize_class($class);
-
-    return unless $class->can('options');
-
-    $params{options}->include_from($class);
-}
-
-sub finder_action {
-    my ($prefix, $field, $raw, $norm, $slot, $settings, $handler, $options) = @_;
-
-    my $class = $norm;
-
-    $class = normalize_class($class);
-
-    if ($class->can('options')) {
-        $options->populate_pre_defaults();
-        $options->populate_cmd_defaults();
-    }
-
-    $class->munge_settings($settings, $options) if $class->can('munge_settings');
-
-    $handler->($slot, $class);
-}
-
-sub changes_applicable {
-    my ($option, $options) = @_;
-
-    # Cannot use this options with projects
-    return 0 if $options->command_class && $options->command_class->isa('App::Yath::Command::projects');
-    return 1;
-}
 
 1;
 
@@ -350,34 +290,13 @@ __END__
 
 =head1 NAME
 
-App::Yath::Options::Finder - Finder options for Yath.
+App::Yath::Options::Finder - FIXME
 
 =head1 DESCRIPTION
 
-This is where the command line options for discovering test files are defined.
-
 =head1 PROVIDED OPTIONS
 
-=head2 YATH OPTIONS (PRE-COMMAND)
-
-=head3 Finder Options
-
-=over 4
-
-=item --finder MyFinder
-
-=item --finder +Test2::Harness::Finder::MyFinder
-
-=item --no-finder
-
-Specify what Finder subclass to use when searching for files/processing the file list. Use the "+" prefix to specify a fully qualified namespace, otherwise Test2::Harness::Finder::XXX namespace is assumed.
-
-
-=back
-
-=head2 COMMAND OPTIONS
-
-=head3 Finder Options
+=head2 Finder Options
 
 =over 4
 
@@ -387,7 +306,7 @@ Specify what Finder subclass to use when searching for files/processing the file
 
 Specify one or more files as having been changed.
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --changed-only
@@ -406,11 +325,13 @@ Path to a diff file that should be used to find changed files for use with --cha
 
 =item --changes-exclude-file path/to/file
 
-=item --no-changes-exclude-file
+=item --changes-exclude-files path/to/file
+
+=item --no-changes-exclude-files
 
 Specify one or more files to ignore when looking at changes
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --changes-exclude-loads
@@ -436,29 +357,35 @@ Exclude coverage tests which only open() changed files, but never call code from
 
 =item --changes-exclude-pattern '(apple|pear|orange)'
 
-=item --no-changes-exclude-pattern
+=item --changes-exclude-patterns '(apple|pear|orange)'
+
+=item --no-changes-exclude-patterns
 
 Ignore files matching this pattern when looking for changes. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --changes-filter-file path/to/file
 
-=item --no-changes-filter-file
+=item --changes-filter-files path/to/file
+
+=item --no-changes-filter-files
 
 Specify one or more files to check for changes. Changes to other files will be ignored
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --changes-filter-pattern '(apple|pear|orange)'
 
-=item --no-changes-filter-pattern
+=item --changes-filter-patterns '(apple|pear|orange)'
+
+=item --no-changes-filter-patterns
 
 Specify a pattern for change checking. When only running tests for changed files this will limit which files are checked for changes. Only files that match this pattern will be checked. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --changes-include-whitespace
@@ -481,22 +408,46 @@ What plugin should be used to detect changed files.
 
 =item --default-at-search=ARG
 
+=item --default-at-search '*.*'
+
+=item --default-at-search='*.*'
+
+=item --default-at-search '["json","list"]'
+
+=item --default-at-search='["json","list"]'
+
+=item --default-at-search :{ ARG1 ARG2 ... }:
+
+=item --default-at-search=:{ ARG1 ARG2 ... }:
+
 =item --no-default-at-search
 
 Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --default-search ARG
 
 =item --default-search=ARG
 
+=item --default-search '*.*'
+
+=item --default-search='*.*'
+
+=item --default-search '["json","list"]'
+
+=item --default-search='["json","list"]'
+
+=item --default-search :{ ARG1 ARG2 ... }:
+
+=item --default-search=:{ ARG1 ARG2 ... }:
+
 =item --no-default-search
 
 Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --durations file.json
@@ -508,61 +459,106 @@ Can be specified multiple times
 Point at a json file or url which has a hash of relative test filenames as keys, and 'SHORT', 'MEDIUM', or 'LONG' as values. This will override durations listed in the file headers. An exception will be thrown if the durations file or url does not work.
 
 
-=item --durations-threshold ARG
-
-=item --durations-threshold=ARG
-
 =item --Dt ARG
 
 =item --Dt=ARG
 
+=item --durations-threshold ARG
+
+=item --durations-threshold=ARG
+
 =item --no-durations-threshold
 
-Only fetch duration data if running at least this number of tests. Default (-j value + 1)
+Only fetch duration data if running at least this number of tests. Default: 0
 
 
 =item --exclude-file t/nope.t
 
-=item --no-exclude-file
+=item --exclude-files t/nope.t
+
+=item --no-exclude-files
 
 Exclude a file from testing
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --exclude-list file.txt
 
+=item --exclude-lists file.txt
+
 =item --exclude-list http://example.com/exclusions.txt
 
-=item --no-exclude-list
+=item --exclude-lists http://example.com/exclusions.txt
+
+=item --no-exclude-lists
 
 Point at a file or url which has a new line separated list of test file names to exclude from testing. Starting a line with a '#' will comment it out (for compatibility with Test2::Aggregate list files).
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
-=item --exclude-pattern t/nope.t
+=item --exclude-pattern nope
 
-=item --no-exclude-pattern
+=item --exclude-patterns nope
+
+=item --no-exclude-patterns
 
 Exclude a pattern from testing, matched using m/$PATTERN/
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
-
-=item --extension ARG
-
-=item --extension=ARG
 
 =item --ext ARG
 
 =item --ext=ARG
 
-=item --no-extension
+=item --extension ARG
+
+=item --extension=ARG
+
+=item --extensions ARG
+
+=item --extensions=ARG
+
+=item --ext '["json","list"]'
+
+=item --ext='["json","list"]'
+
+=item --ext :{ ARG1 ARG2 ... }:
+
+=item --ext=:{ ARG1 ARG2 ... }:
+
+=item --extension '["json","list"]'
+
+=item --extension='["json","list"]'
+
+=item --extensions '["json","list"]'
+
+=item --extensions='["json","list"]'
+
+=item --extension :{ ARG1 ARG2 ... }:
+
+=item --extension=:{ ARG1 ARG2 ... }:
+
+=item --extensions :{ ARG1 ARG2 ... }:
+
+=item --extensions=:{ ARG1 ARG2 ... }:
+
+=item --no-extensions
 
 Specify valid test filename extensions, default: t and t2
 
-Can be specified multiple times
+Note: Can be specified multiple times
+
+
+=item --finder MyFinder
+
+=item --finder +App::Yath::Finder::MyFinder
+
+=item --no-finder
+
+Specify what Finder subclass to use when searching for files/processing the file list. Use the "+" prefix to specify a fully qualified namespace, otherwise App::Yath::Finder::XXX namespace is assumed.
 
 
 =item --maybe-durations file.json
@@ -596,115 +592,35 @@ Only run tests that have their duration flag set to 'LONG'
 
 =item --no-rerun
 
-Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+Re-Run tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.
 
 
-=item --rerun-all
-
-=item --rerun-all=path/to/log.jsonl
-
-=item --rerun-all=plugin_specific_string
-
-=item --no-rerun-all
-
-Re-Run all tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
-
-
-=item --rerun-failed
-
-=item --rerun-failed=path/to/log.jsonl
-
-=item --rerun-failed=plugin_specific_string
-
-=item --no-rerun-failed
-
-Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
-
-
-=item --rerun-missed
-
-=item --rerun-missed=path/to/log.jsonl
-
-=item --rerun-missed=plugin_specific_string
-
-=item --no-rerun-missed
-
-Run missed tests from a previously aborted/stopped run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
-
-
-=item --rerun-modes failed,missed,...
-
-=item --rerun-modes all
-
-=item --rerun-modes failed
-
-=item --rerun-modes missed
-
-=item --rerun-modes passed
-
-=item --rerun-modes retried
-
-=item --rerun-mode failed,missed,...
-
-=item --rerun-mode all
-
-=item --rerun-mode failed
-
-=item --rerun-mode missed
-
-=item --rerun-mode passed
-
-=item --rerun-mode retried
+=item --rerun-modes all,failed,missed,passed,retried
 
 =item --no-rerun-modes
 
-Pick which test categories to run
+=item /^--(no-)?rerun-(all|failed|missed|passed|retried)(=.+)?$/
 
-Can be specified multiple times
+Pick which test categories to run. all:     Re-Run all tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that. failed:  Re-Run failed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that. missed:  Run missed tests from a previously aborted/stopped run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that. passed:  Re-Run passed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that. retried: Re-Run retried tests from a previous run from a log file (or last log file). Plugins can intercept this, such as the database plugin which will grab a run UUID and derive tests to re-run from that.
 
+Note: This will turn on the 'rerun' option. If the --rerun-MODE form is used, you can specify the log file with --rerun-MODE=logfile.
 
-=item --rerun-passed
-
-=item --rerun-passed=path/to/log.jsonl
-
-=item --rerun-passed=plugin_specific_string
-
-=item --no-rerun-passed
-
-Re-Run passed tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
+Note: Can be specified multiple times
 
 
 =item --rerun-plugin Foo
 
+=item --rerun-plugins Foo
+
 =item --rerun-plugin +App::Yath::Plugin::Foo
 
-=item --no-rerun-plugin
+=item --rerun-plugins +App::Yath::Plugin::Foo
 
-What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used ot set an order of priority)
+=item --no-rerun-plugins
 
-Can be specified multiple times
+What plugin(s) should be used for rerun (will fallback to other plugins if the listed ones decline the value, this is just used to set an order of priority)
 
-
-=item --rerun-retried
-
-=item --rerun-retried=path/to/log.jsonl
-
-=item --rerun-retried=plugin_specific_string
-
-=item --no-rerun-retried
-
-Re-Run retried tests from a previous run from a log file (or last log file). Plugins can intercept this, such as YathUIDB which will grab a run UUID and derive tests to re-run from that.
-
-
-=item --search ARG
-
-=item --search=ARG
-
-=item --no-search
-
-List of tests and test directories to use instead of the default search paths. Typically these can simply be listed as command line arguments without the --search prefix.
-
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
 =item --show-changed-files
@@ -716,10 +632,11 @@ Print a list of changed files if any are found
 
 =back
 
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -739,11 +656,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+

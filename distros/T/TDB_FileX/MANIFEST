@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+COPYING
+t/01_basic.t
+t/02_tie.t
+t/03_callbacks.t
+t/04_persistent.t
+TDB_FileX.pm
+TDB_FileX.xs
+xxHash/xxhash.h
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

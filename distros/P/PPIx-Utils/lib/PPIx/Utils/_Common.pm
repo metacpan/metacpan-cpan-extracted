@@ -6,7 +6,7 @@ use warnings;
 use Exporter 'import';
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 our @EXPORT_OK = qw(
     is_ppi_expression_or_generic_statement

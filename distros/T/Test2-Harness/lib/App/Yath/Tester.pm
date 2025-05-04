@@ -2,7 +2,7 @@ package App::Yath::Tester;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use Test2::API qw/context run_subtest/;
 use Test2::Tools::Compare qw/is/;
@@ -15,8 +15,9 @@ use Fcntl qw/SEEK_CUR/;
 
 use App::Yath::Util qw/find_yath/;
 use Test2::Harness::Util qw/clean_path apply_encoding/;
-use Test2::Harness::Util::IPC qw/run_cmd/;
 use Test2::Harness::Util::File::JSONL;
+
+use Test2::Harness::IPC::Util qw/start_process swap_io/;
 
 use Importer Importer => 'import';
 our @EXPORT = qw/yath make_example_dir/;
@@ -44,6 +45,9 @@ sub yath {
     my $enc = delete $params{encoding};
     my $prefix = delete $params{prefix};
 
+    my $timeout = delete $params{timeout};
+    my $timeout_cb = delete $params{timeout_cb};
+
     my $subtest  = delete $params{test} // delete $params{tests} // delete $params{subtest};
     my $exittest = delete $params{exit};
 
@@ -54,6 +58,8 @@ sub yath {
 
     my $no_app_path = delete $params{no_app_path};
     my $lib = delete $params{lib} // [];
+
+    push @$lib => map { "-I$_" } @INC;
 
     if (keys %params) {
         croak "Unexpected parameters: " . join (', ', sort keys %params);
@@ -96,45 +102,51 @@ sub yath {
 
     print "DEBUG: Command = " . join(' ' => @cmd) . "\n" if $debug;
 
-    local %ENV = %ENV;
+#    local %ENV = %ENV;
+    $ENV{YATH_IPC_DIR} = $pdir;
     $ENV{YATH_PERSISTENCE_DIR} = $pdir;
     $ENV{YATH_CMD} = $cmd;
     $ENV{NESTED_YATH} = 1;
+    $ENV{T2_HARNESS_PROC_PREFIX} = "nested";
     $ENV{'YATH_SELF_TEST'} = 1;
     $ENV{$_} = $env->{$_} for keys %$env;
-    my $pid = run_cmd(
-        no_set_pgrp => 1,
-        $capture ? (stderr => $wh, stdout => $wh) : (),
-        command => \@cmd,
-        run_in_parent => [sub { close($wh) }],
-    );
+    $ENV{YATH_COLOR} = 0;
+    my $pid = start_process \@cmd => sub {
+        return unless $capture;
+        swap_io(\*STDOUT, $wh);
+        swap_io(\*STDERR, $wh);
+    };
 
-    my (@lines, $exit);
+    local $SIG{ALRM};
+    if ($timeout) {
+        $SIG{ALRM} = sub {
+            $timeout_cb->($pid) if $timeout_cb;
+            kill('TERM', $pid);
+        };
+
+        alarm($timeout);
+    }
+
+    my $our_pid = $$;
+    eval "END{ kill('TERM', \$pid) if \$pid && \$\$ == $our_pid }; 1" or die $@;
+
+    close($wh);
+
+    print "DEBUG: Waiting for $pid\n" if $debug;
+    waitpid($pid, 0);
+    my $exit = $?;
+
+    my (@lines);
     if ($capture) {
         open(my $rh, '<', $cfile) or die "Could not open output file: $!";
         apply_encoding($rh, $enc) if $enc;
-        $rh->blocking(0);
-        while (1) {
-            seek($rh, 0, SEEK_CUR); # CLEAR EOF
-            my @new = <$rh>;
-            push @lines => @new;
-            print map { chomp($_); "DEBUG: > $_\n" } @new if $debug > 1;
-
-            waitpid($pid, WNOHANG) or next;
-            $exit = $?;
-            last;
-        }
-
-        while (my @new = <$rh>) {
-            push @lines => @new;
-            print map { chomp($_); "DEBUG: > $_\n" } @new if $debug > 1;
-        }
+        @lines = <$rh>;
+        print map { chomp($_); "DEBUG: > $_\n" } @lines if $debug > 1; ## no critic
     }
-    else {
-        print "DEBUG: Waiting for $pid\n" if $debug;
-        waitpid($pid, 0);
-        $exit = $?;
-    }
+
+    alarm(0) if $timeout;
+
+    $pid = undef;
 
     print "DEBUG: Exit: $exit\n" if $debug;
 
@@ -421,7 +433,7 @@ each of which will contain a single passing test.
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -441,11 +453,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

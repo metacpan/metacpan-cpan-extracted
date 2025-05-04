@@ -1,5 +1,5 @@
 package Perl::MinimumVersion;
-$Perl::MinimumVersion::VERSION = '1.40';
+$Perl::MinimumVersion::VERSION = '1.44';
 =pod
 
 =head1 NAME
@@ -23,7 +23,7 @@ version of perl required to be able to run it. Because it is based on
 L<PPI>, it can do this without having to actually load the code.
 
 Currently it tests both the syntax of your code, and the use of explicit
-version dependencies such as C<require 5.005>.
+version dependencies such as C<require 5.008>.
 
 Future plans are to also add support for tracing module dependencies.
 
@@ -50,12 +50,12 @@ use Exporter                    ();
 use List::Util          1.20    qw(max first);
 use Params::Util        0.25    ('_INSTANCE', '_CLASS');
 use PPI::Util                   ('_Document');
-use PPI                 1.215   ();
+use PPI                 1.252   ();
 use PPIx::Utils                 qw{
 	:classification
 	:traversal
 };
-use PPIx::Regexp        0.033;
+use PPIx::Regexp        0.051;
 use Perl::MinimumVersion::Reason ();
 
 our (@ISA, @EXPORT_OK, %CHECKS, @CHECKS_RV ,%MATCHES);
@@ -66,6 +66,10 @@ BEGIN {
 
 	# The primary list of version checks
 	%CHECKS = (
+		_heredoc_indent          => version->new('5.025.007'),
+		_double_diamond_operator => version->new('5.021.005'),
+		_postfix_deref           => version->new('5.020'),
+
         # _stacked_labels         => version->new('5.014'),
 
 		_yada_yada_yada         => version->new('5.012'),
@@ -93,36 +97,10 @@ BEGIN {
 
 		# Included in 5.6. Broken until 5.8
 		_pragma_utf8            => version->new('5.008'),
-
-		_perl_5006_pragmas      => version->new('5.006'),
-		_any_our_variables      => version->new('5.006'),
-		_any_binary_literals    => version->new('5.006'),
-		_any_version_literals   => version->new('5.006'), #v-string
-		_magic_version          => version->new('5.006'),
-		_any_attributes         => version->new('5.006'),
-		_any_CHECK_blocks       => version->new('5.006'),
-		_three_argument_open    => version->new('5.006'),
-		_weaken                 => version->new('5.006'),
-		_mkdir_1_arg            => version->new('5.006'),
-		_exists_subr            => version->new('5.006'),
-		_sort_subref            => version->new('5.006'),
-
-		_any_qr_tokens          => version->new('5.005.03'),
-		_perl_5005_pragmas      => version->new('5.005'),
-		_perl_5005_modules      => version->new('5.005'),
-		_any_tied_arrays        => version->new('5.005'),
-		_any_quotelike_regexp   => version->new('5.005'),
-		_any_INIT_blocks        => version->new('5.005'),
-		_substr_4_arg           => version->new('5.005'),
-		_splice_negative_length => version->new('5.005'),
-		_5005_variables         => version->new('5.005'),
-		_bareword_double_colon  => version->new('5.005'),
-
-		_postfix_foreach        => version->new('5.004.05'),
 	);
 	@CHECKS_RV = ( #subs that return version
-	    '_feature_bundle','_regex','_each_argument','_binmode_2_arg',
-        '_scheduled_blocks', '_experimental_bundle'
+		'_feature_bundle', '_regex', '_re_flags', '_each_argument', '_binmode_2_arg',
+		'_scheduled_blocks', '_experimental_bundle',
 	);
 
 	# Predefine some indexes needed by various check methods
@@ -148,20 +126,6 @@ BEGIN {
 			'threads::shared' => 1,
 			sort              => 1,
 			encoding          => 1,
-		},
-		_perl_5006_pragmas => {
-			warnings             => 1, #may be ported into older version
-			'warnings::register' => 1,
-			attributes           => 1,
-			open                 => 1,
-			filetest             => 1,
-			charnames            => 1,
-			bytes                => 1,
-		},
-		_perl_5005_pragmas => {
-			re     => 1,
-			fields => 1, # can be installed from CPAN, with base.pm
-			attr   => 1,
 		},
 	);
 }
@@ -195,7 +159,7 @@ Returns a new C<Perl::MinimumVersion> object, or C<undef> on error.
 sub new {
 	my $class    = ref $_[0] ? ref shift : shift;
 	my $Document = _Document(shift) or return undef;
-	my $default  = _INSTANCE(shift, 'version') || version->new('5.004');
+	my $default  = _INSTANCE(shift, 'version') || version->new('5.006');
 
 	# Create the object
 	my $self = bless {
@@ -706,19 +670,57 @@ sub _scheduled_blocks
 }
 
 sub _regex {
-    my @versions;
-    my ($version, $obj);
-	shift->Document->find( sub {
-	    return '' unless
+	my $self = shift;
+	my @versions;
+	my ($version, $obj);
+	$self->Document->find( sub {
+		return '' unless
 			grep { $_[1]->isa($_) }
 			qw/PPI::Token::QuoteLike::Regexp PPI::Token::Regexp::Match PPI::Token::Regexp::Substitute/;
 			my $re = PPIx::Regexp->new( $_[1] );
-        	my $v = $re->perl_version_introduced;
+			my $v = $re->perl_version_introduced;
 			if ($v and $v > ($version || 0) ) {
 				$version = $v;
 				$obj = $_[1];
 			}
 		return '';
+	} );
+	my $tr_r_version = version->new('5.013.007');
+	$self->Document->find( sub {
+		return '' unless
+			$_[1]->isa(q/PPI::Token::Regexp::Transliterate/);
+			if( exists $_[1]->get_modifiers->{r}
+				&& $tr_r_version > ( $version || 0 )
+			) {
+				$version = $tr_r_version;
+				$obj = $_[1];
+			}
+		return '';
+	} );
+	$version = undef if ($version and $version eq '5.000');
+	return ($version, $obj);
+}
+
+# Check for use re "/flags";
+sub _re_flags {
+	my ($version, $obj);
+	shift->Document->find( sub {
+		return '' unless $_[1]->isa('PPI::Statement::Include')
+			and ($_[1]->module eq 're' or $_[1]->pragma eq 're');
+		my $included = $_[1]->schild(2);
+		my @literal = $included->can('literal') ? $included->literal() : $included->string();
+		my $v = "5.005";
+		my @flags = grep {index($_, '/') == 0} @literal;
+		$v = '5.014' if @flags;
+		$v = max $v, map {
+			my $empty_regex_w_flag = "/$_";
+			PPIx::Regexp->new( $empty_regex_w_flag )->perl_version_introduced;
+		} @flags;
+		if ($v and $v > ($version || 0) ) {
+			$version = $v;
+			$obj = $_[1];
+		}
+
 	} );
 	$version = undef if ($version and $version eq '5.000');
 	return ($version, $obj);
@@ -848,24 +850,6 @@ sub _perl_5012_pragmas {
 	} );
 }
 
-sub _sort_subref {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Token::Word') or return '';
-		$_[1]->content eq 'sort' or return '';
-		is_function_call($_[1]) or return '';
-		my $e1 = $_[1]->next_sibling;
-		$e1->isa('PPI::Token::Whitespace') or return '';
-		$e1 = $e1->next_sibling;
-		_get_resulting_sigil($e1) || '' eq '$' or return '';
-		$e1 = $e1->next_sibling;
-		$e1->isa('PPI::Token::Whitespace') or return '';
-		$e1 = $e1->next_sibling;
-		$e1->isa('PPI::Token::Word') or $e1->isa('PPI::Token::Symbol')
-			or $e1->isa('PPI::Token::Cast') or $e1->isa('PPI::Structure::List') or return '';
-		return 1;
-	} );
-}
-
 sub _open_temp {
 	shift->Document->find_first( sub {
 		$_[1]->isa('PPI::Statement') or return '';
@@ -904,23 +888,6 @@ sub _open_scalar {
 	} );
 }
 
-# exists(&subr) new in 5.6.0 #
-sub _exists_subr {
-	my ($pmv) = @_;
-	$pmv->Document->find_first(sub {
-		my ($document, $elem) = @_;
-		if ($elem->isa('PPI::Token::Word')
-			&& $elem eq 'exists'
-			&& is_function_call($elem)
-			&& ($elem = first_arg($elem))
-			&& (_get_resulting_sigil($elem) || '') eq '&') {
-				return 1;
-		} else {
-			return 0;
-		}
-	});
-}
-
 sub _get_resulting_sigil {
 	my $elem = shift;
 	if ($elem->isa('PPI::Token::Cast')) {
@@ -932,6 +899,58 @@ sub _get_resulting_sigil {
 	}
 }
 
+sub _heredoc_indent {
+	shift->Document->find_first( sub {
+		my $main_element = $_[1];
+		$main_element->isa('PPI::Token::HereDoc') or return '';
+		$main_element->content =~ /^\Q<<~\E/ or return '';
+		return 1;
+	});
+}
+
+# Postfix dereference new (and experimental) in 5.20, mainstream in 5.24.
+# THIS CODE ASSUMES PPI 1.237_001 OR ABOVE -- i.e. support for postfix
+# dereferencing.
+#
+my %postfix_deref = (
+	'$*'	=> \&_postfix_deref_entire,
+	'@*'	=> \&_postfix_deref_entire,
+	'$#*'	=> \&_postfix_deref_entire,
+	'%*'	=> \&_postfix_deref_entire,
+	'&*'	=> \&_postfix_deref_entire,
+	'**'	=> \&_postfix_deref_entire,
+	'@'	=> \&_postfix_deref_slice,
+	'%'	=> \&_postfix_deref_slice,
+);
+
+sub _postfix_deref_slice {
+	my ( $elem ) = @_;
+	my $next = $elem->snext_sibling()
+		or return;
+	return $next->isa( 'PPI::Structure::Subscript' );
+}
+
+sub _postfix_deref_entire {
+	return 1;
+}
+
+sub _postfix_deref {
+	shift->Document->find_first( sub {
+		my $main_element=$_[1];
+		$main_element->isa('PPI::Token::Cast') or return '';
+		my $prev = $main_element->sprevious_sibling()
+			or return '';
+		return '' unless $prev->isa('PPI::Token::Operator') &&
+			$prev->content() eq '->';
+		$prev = $prev->sprevious_sibling()
+			or return '';
+		return '' unless $prev->isa('PPI::Token::Symbol') &&
+			(_get_resulting_sigil($prev) || '') eq '$';
+		my $code = $postfix_deref{ $main_element->content() }
+			or return '';
+		return $code->( $main_element ) || '';
+	} );
+}
 
 sub _postfix_when {
 	shift->Document->find_first( sub {
@@ -1115,111 +1134,6 @@ sub _constant_hash {
 	} );
 }
 
-sub _perl_5006_pragmas {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement::Include')
-		and
-		$MATCHES{_perl_5006_pragmas}->{$_[1]->pragma}
-	} );
-}
-
-sub _any_our_variables {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement::Variable')
-		and
-		$_[1]->type eq 'our'
-	} );
-}
-
-sub _any_binary_literals {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Token::Number::Binary')
-	} );
-}
-
-sub _any_version_literals {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Token::Number::Version')
-	} );
-}
-
-
-sub _magic_version {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Token::Magic')
-		and
-		$_[1]->symbol eq '$^V'
-	} );
-}
-
-sub _any_attributes {
-	shift->Document->find_first( 'Token::Attribute' );
-}
-
-sub _any_CHECK_blocks {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement::Scheduled')
-		and
-		$_[1]->type eq 'CHECK'
-	} );
-}
-
-sub _any_qr_tokens {
-	shift->Document->find_first( 'Token::QuoteLike::Regexp' );
-}
-
-sub _perl_5005_pragmas {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement::Include')
-		and
-		$MATCHES{_perl_5005_pragmas}->{$_[1]->pragma}
-	} );
-}
-
-# A number of modules are highly indicative of using techniques
-# that are themselves version-dependent.
-sub _perl_5005_modules {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement::Include')
-		and
-		$_[1]->module
-		and (
-			$_[1]->module eq 'Tie::Array'
-			or
-			($_[1]->module =~ /\bException\b/ and
-				$_[1]->module !~ /^(?:CPAN)::/)
-			or
-			$_[1]->module =~ /\bThread\b/
-			or
-			$_[1]->module =~ /^Error\b/
-			or
-			$_[1]->module eq 'base'
-			or
-			$_[1]->module eq 'Errno'
-		)
-	} );
-}
-
-sub _any_tied_arrays {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement::Sub')
-		and
-		$_[1]->name eq 'TIEARRAY'
-	} )
-}
-
-sub _any_quotelike_regexp {
-	shift->Document->find_first( 'Token::QuoteLike::Regexp' );
-}
-
-sub _any_INIT_blocks {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement::Scheduled')
-		and
-		$_[1]->type eq 'INIT'
-	} );
-}
-
 # You can't localize a soft reference
 sub _local_soft_reference {
 	shift->Document->find_first( sub {
@@ -1258,150 +1172,15 @@ sub _use_carp_version {
 	} );
 }
 
-sub _three_argument_open {
+# Double-diamond operator.
+# Detecting this requires at least PPI 1.252
+sub _double_diamond_operator {
 	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Statement') or return '';
-		my @children = $_[1]->children;
-		#@children >= 7                or return '';
-		my $main_element = $children[0];
-		$main_element->isa('PPI::Token::Word') or return '';
-		$main_element->content eq 'open'       or return '';
-		my @arguments = parse_arg_list($main_element);
-		if ( scalar @arguments > 2 ) {
-			return 1;
-		}
-		return '';
-	} );
-}
-
-sub _substr_4_arg {
-	shift->Document->find_first( sub {
-		my $main_element=$_[1];
-		$main_element->isa('PPI::Token::Word') or return '';
-		$main_element->content eq 'substr'     or return '';
-		return '' if is_hash_key($main_element);
-		return '' if is_method_call($main_element);
-		return '' if is_subroutine_name($main_element);
-		return '' if is_included_module_name($main_element);
-		return '' if is_package_declaration($main_element);
-		my @arguments = parse_arg_list($main_element);
-		if ( scalar @arguments > 3 ) {
-			return 1;
-		}
-		return '';
-	} );
-}
-
-sub _mkdir_1_arg {
-	shift->Document->find_first( sub {
-		my $main_element=$_[1];
-		$main_element->isa('PPI::Token::Word') or return '';
-		$main_element->content eq 'mkdir'       or return '';
-		return '' if is_hash_key($main_element);
-		return '' if is_method_call($main_element);
-		return '' if is_subroutine_name($main_element);
-		return '' if is_included_module_name($main_element);
-		return '' if is_package_declaration($main_element);
-		my @arguments = parse_arg_list($main_element);
-		if ( scalar @arguments != 2 ) {
-			return 1;
-		}
-		return '';
-	} );
-}
-
-sub _splice_negative_length {
-	shift->Document->find_first( sub {
-		my $main_element=$_[1];
-		$main_element->isa('PPI::Token::Word') or return '';
-		$main_element->content eq 'splice'     or return '';
-		return '' if is_hash_key($main_element);
-		return '' if is_method_call($main_element);
-		return '' if is_subroutine_name($main_element);
-		return '' if is_included_module_name($main_element);
-		return '' if is_package_declaration($main_element);
-
-		my @arguments = parse_arg_list($main_element);
-		if ( scalar @arguments < 3 ) {
-			return '';
-		}
-		my $arg=$arguments[2];
-		if (ref($arg) eq 'ARRAY') {
-		  $arg=$arg->[0];
-		}
-		if ($arg->isa('PPI::Token::Number')) {
-			if ($arg->literal<0) {
-				return 1;
-			} else {
-				return '';
-			}
-		}
-		return '';
-	} );
-
-}
-
-sub _postfix_foreach {
-	shift->Document->find_first( sub {
-		my $main_element=$_[1];
-		$main_element->isa('PPI::Token::Word') or return '';
-		$main_element->content eq 'foreach'    or return '';
-		return '' if is_hash_key($main_element);
-		return '' if is_method_call($main_element);
-		return '' if is_subroutine_name($main_element);
-		return '' if is_included_module_name($main_element);
-		return '' if is_package_declaration($main_element);
-		my $stmnt = $main_element->statement();
-		return '' if !$stmnt;
-		return '' if $stmnt->isa('PPI::Statement::Compound');
+		$_[1]->isa('PPI::Token::QuoteLike::Readline') or return '';
+		$_[1]->content eq '<<>>'		or return '';
 		return 1;
 	} );
 }
-
-# weak references require perl 5.6
-# will not work in case of importing several
-sub _weaken {
-	shift->Document->find_first( sub {
-		(
-			$_[1]->isa('PPI::Statement::Include')
-			and
-			$_[1]->module eq 'Scalar::Util'
-			and
-			$_[1]->content =~ /[^:]\b(?:weaken|isweak)\b[^:]/
-		)
-		or
-		(
-			$_[1]->isa('PPI::Token::Word')
-			and
-			(
-				$_[1]->content eq 'Scalar::Util::isweak'
-				or
-				$_[1]->content eq 'Scalar::Util::weaken'
-			)
-			#and
-			#is_function_call($_[1])
-		)
-	} );
-}
-
-sub _5005_variables {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Token::Magic')
-		and
-		($_[1]->symbol eq '$!' or $_[1]->symbol eq '$^R')
-	} );
-}
-
-#added in 5.5
-sub _bareword_double_colon {
-	shift->Document->find_first( sub {
-		$_[1]->isa('PPI::Token::Word')
-		and
-		$_[1]->content =~ /::$/
-	} );
-}
-
-
 
 #####################################################################
 # Support Functions

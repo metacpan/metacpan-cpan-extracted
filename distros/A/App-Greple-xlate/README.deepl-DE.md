@@ -4,17 +4,19 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 # SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9909
+Version 0.9910
 
 # DESCRIPTION
 
-**Greple** **xlate** Modul findet die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die Module DeepL (`deepl.pm`) und ChatGPT (`gpt3.pm`) als Backend-Engine implementiert. Experimentelle Unterstützung für gpt-4 und gpt-4o sind ebenfalls enthalten.
+**Greple** **xlate** Modul findet die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die Module DeepL (`deepl.pm`) und ChatGPT 4.1 (`gpt4.pm`) als Backend-Engine implementiert.
 
 Wenn Sie normale Textblöcke in einem Dokument übersetzen wollen, das im Pod-Stil von Perl geschrieben ist, verwenden Sie den Befehl **greple** mit dem Modul `xlate::deepl` und `perl` wie folgt:
 
@@ -106,7 +108,7 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
     - **deepl**: DeepL API
     - **gpt3**: gpt-3.5-turbo
-    - **gpt4**: gpt-4-turbo
+    - **gpt4**: gpt-4.1
     - **gpt4o**: gpt-4o-mini
 
         Die Schnittstelle von **gpt-4o** ist instabil und es kann nicht garantiert werden, dass sie im Moment korrekt funktioniert.
@@ -124,7 +126,7 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
     Legen Sie das Ausgabeformat für den ursprünglichen und den übersetzten Text fest.
 
-    Die folgenden Formate mit Ausnahme von `xtxt` gehen davon aus, dass der zu übersetzende Teil eine Sammlung von Zeilen ist. Tatsächlich ist es möglich, nur einen Teil einer Zeile zu übersetzen, und die Angabe eines anderen Formats als `xtxt` liefert keine sinnvollen Ergebnisse.
+    Die folgenden Formate mit Ausnahme von `xtxt` gehen davon aus, dass der zu übersetzende Teil eine Sammlung von Zeilen ist. In der Tat ist es möglich, nur einen Teil einer Zeile zu übersetzen, aber die Angabe eines anderen Formats als `xtxt` führt zu keinen sinnvollen Ergebnissen.
 
     - **conflict**, **cm**
 
@@ -214,6 +216,13 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
     Legen Sie den gesamten Text der Datei als Zielbereich fest.
 
+- **--lineify-cm**
+- **--lineify-colon**
+
+    Im Falle der Formate `cm` und `colon` wird die Ausgabe zeilenweise aufgeteilt und formatiert. Wenn also nur ein Teil einer Zeile übersetzt werden soll, kann das erwartete Ergebnis nicht erzielt werden. Diese Filter korrigieren die Ausgabe, die durch die Übersetzung eines Teils einer Zeile in die normale zeilenweise Ausgabe verfälscht wird.
+
+    Werden in der derzeitigen Implementierung mehrere Teile einer Zeile übersetzt, werden sie als unabhängige Zeilen ausgegeben.
+
 # CACHE OPTIONS
 
 Das Modul **xlate** kann den Text der Übersetzung für jede Datei im Cache speichern und vor der Ausführung lesen, um den Overhead durch die Anfrage an den Server zu vermeiden. Bei der Standard-Cache-Strategie `auto` werden die Cache-Daten nur dann beibehalten, wenn die Cache-Datei für die Zieldatei existiert.
@@ -302,7 +311,7 @@ Sie müssen die Befehlszeilentools für DeepL und ChatGPT installieren.
 
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
-[Anwendung::Greple::xlate::gpt3](https://metacpan.org/pod/Anwendung%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
+[App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

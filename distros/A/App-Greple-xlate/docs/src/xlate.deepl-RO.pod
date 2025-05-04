@@ -6,17 +6,19 @@ App::Greple::xlate - modul de suport pentru traducere pentru Greple
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-Modulul B<Greple> B<xlate> găsește blocurile de text dorite și le înlocuiește cu textul tradus. În prezent, modulul DeepL (F<deepl.pm>) și ChatGPT (F<gpt3.pm>) sunt implementate ca un motor back-end. Suportul experimental pentru gpt-4 și gpt-4o este, de asemenea, inclus.
+Modulul B<Greple> B<xlate> găsește blocurile de text dorite și le înlocuiește cu textul tradus. În prezent, modulul DeepL (F<deepl.pm>) și ChatGPT 4.1 (F<gpt4.pm>) sunt implementate ca un motor de back-end.
 
 Dacă doriți să traduceți blocuri de text normale într-un document scris în stilul Perl's pod, utilizați comanda B<greple> cu modulul C<xlate::deepl> și C<perl> astfel:
 
@@ -126,7 +128,7 @@ Specifică motorul de traducere care urmează să fie utilizat. Dacă specifica�
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ Specificați limba țintă. Puteți obține limbile disponibile prin comanda C<d
 
 Specificați formatul de ieșire pentru textul original și cel tradus.
 
-Următoarele formate, altele decât C<xtxt>, presupun că partea care urmează să fie tradusă este o colecție de linii. De fapt, este posibil să se traducă doar o parte a unei linii, iar specificarea unui alt format decât C<xtxt> nu va produce rezultate semnificative.
+Următoarele formate, altele decât C<xtxt>, presupun că partea care urmează să fie tradusă este o colecție de linii. De fapt, este posibil să se traducă doar o parte a unei linii, dar specificarea unui alt format decât C<xtxt> nu va produce rezultate semnificative.
 
 =over 4
 
@@ -242,6 +244,14 @@ Efectuați funcția de mascare și afișați textul convertit ca atare, fără r
 =item B<--match-all>
 
 Setați întregul text al fișierului ca zonă țintă.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+În cazul formatelor C<cm> și C<colon>, rezultatul este împărțit și formatat linie cu linie. Prin urmare, dacă trebuie tradusă doar o parte a unei linii, rezultatul așteptat nu poate fi obținut. Aceste filtre fixează ieșirea care este coruptă prin traducerea unei părți a unei linii în ieșire normală linie cu linie.
+
+În implementarea actuală, dacă mai multe părți ale unei linii sunt traduse, acestea sunt emise ca linii independente.
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>.
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

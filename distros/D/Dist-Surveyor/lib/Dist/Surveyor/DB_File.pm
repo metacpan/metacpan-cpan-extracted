@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Storable qw(freeze thaw);
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 our @ISA;
 if    (eval { require DB_File;   1; }) {

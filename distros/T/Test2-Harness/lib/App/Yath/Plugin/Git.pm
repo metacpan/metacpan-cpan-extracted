@@ -2,17 +2,24 @@ package App::Yath::Plugin::Git;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use IPC::Cmd qw/can_run/;
-use Test2::Harness::Util::IPC qw/run_cmd/;
+use Capture::Tiny qw/capture/;
+
 use parent 'App::Yath::Plugin';
 
-use App::Yath::Options;
+use Getopt::Yath;
 
-option_group {prefix => 'git', category => "Git Options"} => sub {
+option_group {prefix => 'git', group => 'git', category => "Git Options"} => sub {
+    option 'git' => (
+        type => 'Bool',
+        prefix => undef,
+        description => "Enable the git plugin",
+    );
+
     option change_base => (
-        type => 's',
+        type => 'Scalar',
         description => "Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.",
         long_examples  => [" master", " HEAD^", " df22abe4"],
     );
@@ -25,88 +32,68 @@ sub git_output {
     my $class = shift;
     my (@args) = @_;
 
-    my $cmd = $class->git_cmd or return sub {()};
+    my $cmd = $class->git_cmd or return undef;
 
-    my ($rh, $wh, $irh, $iwh);
-    pipe($rh, $wh) or die "No pipe: $!";
-    pipe($irh, $iwh) or die "No pipe: $!";
-    my $pid = run_cmd(stderr => $iwh, stdout => $wh, command => [$cmd, @args]);
+    my ($stdout, $stderr, $exit) = capture { system($cmd, @args) };
+    die "git command failed: $stderr\n" if $exit;
 
-    close($wh);
-    close($iwh);
-
-    $rh->blocking(1);
-    $irh->blocking(0);
-
-    my $waited = 0;
-    return sub {
-        my $line = <$rh>;
-        return $line if defined $line;
-
-        unless ($waited++) {
-            local $?;
-            waitpid($pid, 0);
-            print STDERR <$irh> if $?;
-            close($irh);
-
-            # Try again
-            $line = <$rh>;
-            return $line if defined $line;
-        }
-
-        close($rh);
-        return;
-    };
+    return $stdout;
 }
 
-sub inject_run_data {
-    my $class  = shift;
-    my %params = @_;
-
-    my $meta   = $params{meta};
-    my $fields = $params{fields};
+sub run_fields {
+    my $class = shift;
 
     my $long_sha  = $ENV{GIT_LONG_SHA};
     my $short_sha = $ENV{GIT_SHORT_SHA};
     my $status    = $ENV{GIT_STATUS};
     my $branch    = $ENV{GIT_BRANCH};
 
-        my @sets = (
-            [\$long_sha, 'rev-parse', 'HEAD'],
-            [\$short_sha, 'rev-parse', '--short', 'HEAD'],
-            [\$status, 'status', '-s'],
-            [\$branch, 'rev-parse', '--abbrev-ref', 'HEAD'],
-        );
+    my @sets = (
+        [\$long_sha,  'rev-parse', 'HEAD'],
+        [\$short_sha, 'rev-parse', '--short', 'HEAD'],
+        [\$status,    'status',    '-s'],
+        [\$branch,    'rev-parse', '--abbrev-ref', 'HEAD'],
+    );
 
-        for my $set (@sets) {
-            my ($var, @args) = @$set;
-            next if $$var; # Already set
-            my $output = $class->git_output(@args);
-
-            my @lines;
-            while (my $line = $output->()) {
-                push @lines => $line;
-            }
-
-            chomp($$var = join "\n" => @lines);
-        }
+    for my $set (@sets) {
+        my ($var, @args) = @$set;
+        next if $$var;    # Already set
+        $$var = $class->git_output(@args) or next;
+        chomp($$var);
+    }
 
     return unless $long_sha;
 
-    $meta->{git}->{sha}    = $long_sha;
-    $meta->{git}->{status} = $status if $status;
+    my %data;
+    $data{sha}    = $long_sha;
+    $data{status} = $status if $status;
+
+    my $field = {
+        name => 'git',
+        data => \%data,
+    };
 
     if ($branch) {
-        $meta->{git}->{branch} = $branch;
-
-        my $short = length($branch) > 20 ? substr($branch, 0, 20) : $branch;
-
-        push @$fields => {name => 'git', details => $short, raw => $branch, data => $meta->{git}};
+        $data{branch} = $branch;
+        $field->{details} = $branch;
+        $field->{raw} = $long_sha;
     }
     else {
         $short_sha ||= substr($long_sha, 0, 16);
-        push @$fields => {name => 'git', details => $short_sha, raw => $long_sha, data => $meta->{git}};
+        $field->{details} = $short_sha;
+        $field->{raw} = $long_sha;
     }
+
+    return ($field);
+}
+
+sub run_queued {
+    my $class = shift;
+    my ($run) = @_;
+
+    my @fields = $class->run_fields();
+
+    $run->send_event(facet_data => {harness_run_fields => \@fields}) if @fields;
 
     return;
 }
@@ -142,7 +129,7 @@ sub _diff_from {
     my ($from) = @_;
     my $cmd = $class->git_cmd or return;
 
-    return (line_sub => $class->git_output('diff', '-U1000000', '-W', '--minimal', $from));
+    return (diff => $class->git_output('diff', '-U1000000', '-W', '--minimal', $from));
 }
 
 1;
@@ -168,22 +155,26 @@ This plugin will attach git data to your test logs if any is available.
 =head1 READING THE DATA
 
 The data is attached to the 'run' entry in the log file. This can be seen
-directly in the json data. The data is also easily accessible with
-L<Test2::Harness::UI>.
+directly in the json data, database, or server.
 
 The data will include the long sha, short sha, branch name, and a brief status.
 
 =head1 PROVIDED OPTIONS
 
-=head2 COMMAND OPTIONS
-
-=head3 Git Options
+=head2 Git Options
 
 =over 4
 
-=item --git-change-base master
+=item --git
+
+=item --no-git
+
+Enable the git plugin
+
 
 =item --git-change-base HEAD^
+
+=item --git-change-base master
 
 =item --git-change-base df22abe4
 
@@ -194,10 +185,11 @@ Find files changed by all commits in the current branch from most recent stoppin
 
 =back
 
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -217,11 +209,11 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut

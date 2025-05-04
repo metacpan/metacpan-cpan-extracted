@@ -6,17 +6,19 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate>モジュールは目的のテキストブロックを見つけ、翻訳されたテキストに置き換えます。現在、DeepL (F<deepl.pm>) と ChatGPT (F<gpt3.pm>) モジュールがバックエンドエンジンとして実装されています。gpt-4 と gpt-4o も実験的にサポートされています。
+B<Greple> B<xlate> モジュールは目的のテキストブロックを見つけ、翻訳されたテキストに置き換えます。現在、DeepL (F<deepl.pm>) と ChatGPT 4.1 (F<gpt4.pm>) モジュールがバックエンドエンジンとして実装されています。
 
 PerlのPodスタイルで書かれた文書中の通常のテキストブロックを翻訳したい場合は、C<xlate::deepl>とC<perl>モジュールを使って、次のようにB<greple>コマンドを使います：
 
@@ -126,7 +128,7 @@ B<--xlate-fold> オプションを指定すると、変換されたテキスト�
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ B<gpt-4o>のインターフェイスは不安定で、現時点では正しく�
 
 原文と訳文の出力形式を指定します。
 
-C<xtxt>以外の以下の書式は、翻訳される部分が行の集まりであることを前提としています。実際には、行の一部だけを翻訳することも可能であり、C<xt>以外の書式を指定しても意味のある結果は得られないです。
+C<xtxt>以外の以下の書式は、翻訳される部分が行の集まりであることを前提としています。実際、行の一部だけを翻訳することは可能ですが、 C<xtxt>以外の書式を指定しても意味のある結果は得られません。
 
 =over 4
 
@@ -242,6 +244,14 @@ L<App::Greple::stripe>モジュールを使うと、一致した部分をゼブ�
 =item B<--match-all>
 
 ファイルの全文を対象領域に設定します。
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+C<cm>とC<colon>形式の場合、出力は一行ごとに分割され、整形されます。従って、行の一部だけが変換される場合、期待された結果は得られません。これらのフィルタは、行の一部を通常の行単位の出力に変換することによって破損した出力を修正します。
+
+現在の実装では、行の複数の部分が翻訳された場合、それらは独立した行として出力されます。
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate> とします。
 
 L<App::Greple::xlate::deepl> (英語)
 
-L<App::Greple::xlate::gpt3> です。
+<m id=5
 
 =over 2
 

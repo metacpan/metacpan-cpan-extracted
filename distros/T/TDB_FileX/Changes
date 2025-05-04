@@ -1,0 +1,109 @@
+Revision history for Perl extension TDB_FileX.
+
+TODO: perlmulticore?
+
+0.97 Sat 03 May 2025 21:24:41 CEST
+	- put this under LGPL license, as (hopefully) the original
+          author intended.
+	- a lot of functionality hasn't been tested thoroughly yet.
+	- rename to TDB_FileX, maybe temporarily.
+        - many functions croak on errors. The nonblock variants return success
+          status, but croak on unexpected errors.
+        - use key/value pairs for open parameters.
+        - new open parameter "mutex".
+        - new open parameter "nocow".
+        - support up to four custom hash functions.
+	- fixed various undefined types.
+        - fix the perl unicode bug.
+        - port to current versions of tdb, remove support for antique tdb versions.
+        - removed tdb_chain*lock.
+        - replaced logging_function by set_logging_function.
+        - store logging function callback in tdb context.
+        - added methods:
+          lockall_nonblock
+          lockall_read
+          lockall_read_nonblock
+          unlockall_read
+          lockall_mark
+          lockall_unmark
+          transaction_start
+          transaction_start_nonblock
+          transaction_cancel
+          transaction_commit
+          transaction_prepare_commit
+          transaction_active
+          enable_seqnum
+          get_seqnum
+          increment_seqnum_nonblock
+          hash_size
+          map_size
+          add_flags
+          remove_flags
+          set_max_dead
+          fd
+          name
+          wipe_all
+          repack
+          freelist_size
+          validate_freelist
+          summary
+          runtime_check_for_robust_mutexes (function)
+	- don't export anything by default, rework
+          export tags, remove TDB_ prefix for all exports,
+          do not use AUTOLOAD for constants.
+        - add constants:
+          TDB_NOSYNC
+          TDB_SEQNUM
+          TDB_VOLATILE
+          TDB_ALLOW_NESTING
+          TDB_DISALLOW_NESTING
+          TDB_INCOMPATIBLE_HASH
+          TDB_MUTEX_LOCKING
+          TDB_ERR_EINVAL
+          TDB_ERR_RDONLY
+	  TDB_DEBUG_FATAL
+          TDB_DEBUG_ERROR
+          TDB_DEBUG_WARNING
+          TDB_DEBUG_TRACE}
+        - use modern xs syntax.
+        - add fnv1ax and xxh3 hash options.
+        - use wipe_all for CLEAR.
+        - switch to XSLoader.
+        - remove Carp, Errno dependencies.
+        - reduce (perl interface) memory usage and code size.
+        - callbacks gernerally are called with G_EVAL, for some added bit of protection.
+
+Older changes are for TDB_File, form which this module was cloned.
+
+0.96a Mon Mar 17 21:36:52 2008
+	- Remove bogus (and unused) stop() macro on freebsd.
+
+0.96  Tue Jun  5 00:14:02 2007
+	- Fix memory leak in TDB_DATA typemap.  Thanks nigelw.
+
+0.95  Tue Jun  5 00:12:02 2007
+	- Makefile.PL now attempts to determine various tdb
+	  differences.
+	- tdb_open_ex with a hash_fn arg now generates a warning if
+	  TDB_File was compiled against a tdb version that lacks this
+	  argument.
+	- Change tdb_printfreelist to return void, since the
+	  sourceforge 1.0.6 version has this, and we don't care about
+	  the return value in other versions.
+	- Protect TDB_ERR_LOCK_TIMEOUT, since that constant doesn't
+	  exist in some versions.
+
+0.90  Tue Jun 21 09:02:15 2005
+	- Support a log callback for each TDB_File object
+	- Pass logging function to tdb_open_ex()
+	- Remove tdb_lockkeys/tdb_unlockkeys functions, since they
+	  seem to have gone from TDB
+	- Use ExtUtils::Constant to build constant() function
+
+0.50  Sat Jun 29 15:29:20 2002
+	- initial release to CPAN
+
+0.01  Tue Mar 26 17:02:46 2002
+	- original version; created by h2xs 1.21 with options
+	   -x -n TDB_File -p tdb_ /home/gus/projects/tdb-perl/tdb-perl/tdb.h
+

@@ -1,87 +1,96 @@
-Revision history for Perl extension OpenGL::Modern.
+0.0401 2025-05-03
+- document glpSetAutoCheckErrors (#44)
+- croak if auto-glewInit fails (#43 #36)
+- update to GLEW 2.1.0 which captures OpenGL 4.6
+- minimum Perl 5.16
+- add OpenGL::Modern::Config like OpenGL::Config
+- add glpErrorString
+- add export tags :glewfunctions :glpfunctions :glfunctions :glconstants :glcompat
+- gl{Create,Gen,Delete}* now have POGL-like _p variants
+- string input (i.e. const) arguments now don't force a `_c` binding
 
 0.04     2017-08-06 12:06:13-04:00
-        - Add module to allow OpenGL::Image to work with OpenGL::Modern
-        - Add error checking and glpSetAutoCheckErrors to control
-        - Various fixes to make app-shadertoy work with OpenGL::Modern
-        - New tests and perltidy support
+- Add module to allow OpenGL::Image to work with OpenGL::Modern
+- Add error checking and glpSetAutoCheckErrors to control
+- Various fixes to make app-shadertoy work with OpenGL::Modern
+- New tests and perltidy support
 
 0.03     2017-02-25 17:08:07-05:00
-        - Use Devel::CheckLib to generate NA for missing libraries
-	- Fix automatic calls for glewInit() and done_glewInit()
-	- Implement accessor function for GLEW_* state variables
-	- Now builds on Mac OS X
+- Use Devel::CheckLib to generate NA for missing libraries
+- Fix automatic calls for glewInit() and done_glewInit()
+- Implement accessor function for GLEW_* state variables
+- Now builds on Mac OS X
 
 0.02_03  2017-02-25 15:47:35-05:00
-        - final check before 0.03 release
-        - use Devel::CheckLib to generate NA on missing libs
-	- fix implementation of done_glewInit()
+- final check before 0.03 release
+- use Devel::CheckLib to generate NA on missing libs
+- fix implementation of done_glewInit()
 
 0.02_02  2017-02-20 09:20:17-05:00
-        - Fix bad code generated for GLEW_* variable accessors
+- Fix bad code generated for GLEW_* variable accessors
 
 0.02_01  2017-02-19 11:18:52-05:00
-        - Implemented accessor routines for GLEW_VERSION_N_M and others
-	- fixes for Travis-CI integration
-	- more conditions for tests to skip
-	- MacOSX fixes for build
+- Implemented accessor routines for GLEW_VERSION_N_M and others
+- fixes for Travis-CI integration
+- more conditions for tests to skip
+- MacOSX fixes for build
 
 0.02     2017-02-12 09:10:44-05:00
-        - First offical release of OpenGL::Modern
+- First offical release of OpenGL::Modern
 
 0.01_10  2017-02-11 12:44:57-05:00
-        - Added done_glewInit() to determine if glewInit() has been called
-        - Automatically call glewInit() if not called (doesn't handle context check)
-        - new tests and cleanup re perltidy
+- Added done_glewInit() to determine if glewInit() has been called
+- Automatically call glewInit() if not called (doesn't handle context check)
+- new tests and cleanup re perltidy
 
 0.01_09  2017-02-08 10:00:50-05:00
-        - Update prerequisite modules in Makefile.PL
+- Update prerequisite modules in Makefile.PL
 
 0.01_08  2017-02-08 09:46:18-05:00
-        - Run perltidy on "messy" files
-        - add helpers needed for microidium (#31)
-        - deduplicate info log calls in Helpers
-        - apply system-specific pack semantics to pointer sizes
-        - prevent generate xs from aborting when generated files don't exist (#28)
-        - don't put info output on the STDERR channel (#29)
-        - remove autoloader (#27)
-        - add perltidy test (optional, purely for informative purposes) (#13)
-        - Add SKIP for glewCreateContext not returing GLEW_OK
+- Run perltidy on "messy" files
+- add helpers needed for microidium (#31)
+- deduplicate info log calls in Helpers
+- apply system-specific pack semantics to pointer sizes
+- prevent generate xs from aborting when generated files don't exist (#28)
+- don't put info output on the STDERR channel (#29)
+- remove autoloader (#27)
+- add perltidy test (optional, purely for informative purposes) (#13)
+- Add SKIP for glewCreateContext not returing GLEW_OK
 
 0.01_07  2017-02-06 18:06:40-05:00
-        - Fix return values from glewCreateContext
-        - Add conditional skips to tests
+- Fix return values from glewCreateContext
+- Add conditional skips to tests
 
 0.01_06  2017-02-05 11:22:40-05:00
-        - Remove MYMETA.* from MANIFEST to clean up distribution files
-        - fix t/02_glGetShaderInfoLog.t to handle ptrsize=4
-        - split lists of constants, function names, exports to separate files
-          (thanks Mithaldu!)
+- Remove MYMETA.* from MANIFEST to clean up distribution files
+- fix t/02_glGetShaderInfoLog.t to handle ptrsize=4
+- split lists of constants, function names, exports to separate files
+  (thanks Mithaldu!)
 
 0.01_05  2017-01-31 12:08:46-05:00
-        - Add missing dependencies to Makefile.PL
-        - Remove OpenGL as a dependency (we should be standalone)
+- Add missing dependencies to Makefile.PL
+- Remove OpenGL as a dependency (we should be standalone)
 
 0.01_04  2017-01-29 18:22:01-05:00
-        - implement glShaderSource_p and use it in
-          t/02_glGetShaderInfoLog.t
-        - this appears to work on Strawberry Perl
+- implement glShaderSource_p and use it in
+  t/02_glGetShaderInfoLog.t
+- this appears to work on Strawberry Perl
 
 0.01_03  2017-01-28 18:29:02-05:00
-        - fix breakage in linux/freebsd link line
-        - more release cleanup
-        - have test fails on Strawberry perl
+- fix breakage in linux/freebsd link line
+- more release cleanup
+- have test fails on Strawberry perl
 
 0.01_02  2017-01-27 10:35:02-05:00
-        - make glShaderSource bindings use auto-xs.inc versions
-        - use T_PTR for typemaps for all pointers except char or strings
-        - preparation for native perl argument handling
+- make glShaderSource bindings use auto-xs.inc versions
+- use T_PTR for typemaps for all pointers except char or strings
+- preparation for native perl argument handling
 
 
 0.01_01  2016-12-18 16:17:31-05:00
-        - CPAN alpha release
-        - Cleaned up files to remove unnecessary ones
+- CPAN alpha release
+- Cleaned up files to remove unnecessary ones
 
 0.00_01  2016-11-26 14:13:41-05:00
-        - original version; created from app-shadertoy sources
-          extracting OpenGL::Glew as OpenGL::Modern
+- original version; created from app-shadertoy sources
+  extracting OpenGL::Glew as OpenGL::Modern

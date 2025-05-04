@@ -2,183 +2,147 @@ package App::Yath::Options::Run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use Test2::Harness::Util::UUID qw/gen_uuid/;
+use Test2::Harness::Util::JSON qw/decode_json/;
+use Test2::Util::UUID qw/gen_uuid/;
+use Test2::Harness::Util qw/fqmod/;
+use List::Util qw/mesh/;
 
-use App::Yath::Options;
+use Getopt::Yath;
 
-option_group {prefix => 'run', category => "Run Options", builds => 'Test2::Harness::Run'} => sub {
-    post \&post_process;
+include_options(
+    'App::Yath::Options::Tests',
+);
 
-    option link => (
-        field => 'links',
-        type => 'm',
-        long_examples  => [
+option_group {group => 'run', category => "Run Options"} => sub {
+    option links => (
+        alt  => ['link'],
+        type => 'List',
+
+        description => "Provide one or more links people can follow to see more about this run.",
+
+        long_examples => [
             " 'https://travis.work/builds/42'",
             " 'https://jenkins.work/job/42'",
             " 'https://buildbot.work/builders/foo/builds/42'",
         ],
-        description => "Provide one or more links people can follow to see more about this run."
-    );
-
-    option test_args => (
-        type => 'm',
-        description => 'Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the \'::\' argument separator.'
-    );
-
-    option input => (
-        type        => 's',
-        description => 'Input string to be used as standard input for ALL tests. See also: --input-file',
-    );
-
-    option input_file => (
-        type        => 's',
-        description => 'Use the specified file as standard input to ALL tests',
-        action      => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings, $handler) = @_;
-
-            die "Input file not found: $norm\n" unless -f $norm;
-            if ($settings->run->input) {
-                warn "Input file is overriding another source of input.\n";
-                $settings->run->field(input => undef);
-            }
-
-            $handler->($slot, $norm);
-        },
     );
 
     option dbi_profiling => (
-        type => 'b',
+        type    => 'Bool',
+        default => 0,
+
         description => "Use Test2::Plugin::DBIProfile to collect database profiling data",
+
+        trigger => sub {
+            my $opt = shift;
+            my %params = @_;
+
+            return unless $params{action} eq 'set';
+
+            eval { require Test2::Plugin::DBIProfile; 1 } or die "Could not enable DBI Profiling: $@";
+
+            my $load_import = $params{settings}->tests->load_import;
+
+            unless ($load_import->{'Test2::Plugin::DBIProfile'}) {
+                $load_import->{'Test2::Plugin::DBIProfile'} //= [];
+                push @{$load_import->{'@'}} => 'Test2::Plugin::DBIProfile';
+            }
+        },
     );
 
     option author_testing => (
-        short        => 'A',
-        description  => 'This will set the AUTHOR_TESTING environment to true',
-    );
+        type  => "Bool",
+        short => 'A',
 
-    option use_stream => (
-        name        => 'stream',
-        description => "Use the stream formatter (default is on)",
-        default     => 1,
-    );
+        set_env_vars  => ['AUTHOR_TESTING'],
+        from_env_vars => ['AUTHOR_TESTING'],
+        description   => 'This will set the AUTHOR_TESTING environment to true',
 
-    option tap => (
-        field       => 'use_stream',
-        alt         => ['TAP', '--no-stream'],
-        normalize   => sub { $_[0] ? 0 : 1 },
-        description => "The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help."
+        trigger => sub {
+            my $opt = shift;
+            my %params = @_;
+
+            $params{settings}->tests->option(env_vars => {}) unless $params{settings}->tests->env_vars;
+
+            if ($params{action} eq 'set') {
+                $params{settings}->tests->env_vars->{AUTHOR_TESTING} = 1;
+            }
+            else {
+                delete $params{settings}->tests->env_vars->{AUTHOR_TESTING};
+            }
+        },
+
     );
 
     option fields => (
-        type           => 'm',
-        short          => 'f',
-        long_examples  => [' name:details', ' JSON_STRING'],
-        short_examples => [' name:details', ' JSON_STRING'],
-        description    => "Add custom data to the harness run",
-        action         => \&fields_action,
-    );
+        alt  => ['field'],
+        type  => 'List',
+        short => 'f',
 
-    option env_var => (
-        field          => 'env_vars',
-        short          => 'E',
-        type           => 'h',
-        long_examples  => [' VAR=VAL'],
-        short_examples => ['VAR=VAL', ' VAR=VAL'],
-        description    => 'Set environment variables to set when each test is run.',
+        long_examples  => [' name=details', qq[ '{"name":"NAME","details":"DETAILS"}' ]],
+        short_examples => [' name=details', qq[ '{"name":"NAME","details":"DETAILS"}' ]],
+        description    => "Add custom data to the harness run",
+        normalize      => sub { m/^\s*\{.*\}\s*$/s ? decode_json($_[0]) : {mesh(['name', 'details'], [split /[=]/, $_[0]])} },
     );
 
     option run_id => (
-        alt         => ['id'],
+        type    => 'Scalar',
+        alt     => ['id'],
+        initialize => \&gen_uuid,
+
         description => 'Set a specific run-id. (Default: a UUID)',
-        default     => \&gen_uuid,
     );
 
-    option load => (
-        type        => 'm',
-        short       => 'm',
-        alt         => ['load-module'],
-        description => 'Load a module in each test (after fork). The "import" method is not called.',
+    option abort_on_bail => (
+        type        => 'Bool',
+        default     => 1,
+        description => "Abort all testing if a bail-out is encountered (default: on)",
     );
 
-    option load_import => (
-        type  => 'H',
-        short => 'M',
-        alt   => ['loadim'],
-
-        long_examples  => [' Module', ' Module=import_arg1,arg2,...'],
-        short_examples => [' Module', ' Module=import_arg1,arg2,...'],
-
-        description => 'Load a module in each test (after fork). Import is called.',
+    option nytprof => (
+        type => 'Bool',
+        description => "Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.",
+        long_examples => [''],
     );
 
-    option event_uuids => (
-        default => 1,
-        alt => ['uuids'],
-        description => 'Use Test2::Plugin::UUID inside tests (default: on)',
+    option run_auditor => (
+        type => 'Scalar',
+        default => 'Test2::Harness::Collector::Auditor::Run',
+        normalize => sub { fqmod($_[0], 'Test2::Harness::Collector::Auditor::Run') },
+        description => 'Auditor class to use when auditing the overall test run',
     );
 
-    option mem_usage => (
-        default => 1,
-        description => 'Use Test2::Plugin::MemUsage inside tests (default: on)',
-    );
+    option interactive => (
+        type  => 'Bool',
+        short => 'i',
 
-    option io_events => (
-        default => 0,
-        description => 'Use Test2::Plugin::IOEvents inside tests to turn all prints into test2 events (default: off)',
-    );
-
-    option retry => (
-        default => 0,
-        short => 'r',
-        type => 's',
-        description => 'Run any jobs that failed a second time. NOTE: --retry=1 means failing tests will be attempted twice!',
-    );
-
-    option retry_isolated => (
-        default => 0,
-        alt => ['retry-iso'],
-        type => 'b',
-        description => 'If true then any job retries will be done in isolation (as though -j1 was set)',
+        description   => 'Use interactive mode, 1 test at a time, stdin forwarded to it',
+        set_env_vars  => ['YATH_INTERACTIVE'],
+        from_env_vars => ['YATH_INTERACTIVE'],
     );
 };
 
-sub post_process {
-    my %params   = @_;
-    my $settings = $params{settings};
+option_post_process 0 => sub {
+    my ($options, $state) = @_;
 
-    $settings->run->env_vars->{AUTHOR_TESTING} = 1 if $settings->run->author_testing;
+    my $settings = $state->{settings};
+    my $run   = $settings->run;
 
-    if ($settings->run->dbi_profiling) {
-        eval { require Test2::Plugin::DBIProfile; 1 } or die "Could not enable DBI profiling, could not load 'Test2::Plugin::DBIProfile': $@";
-        push @{$settings->run->load_import->{'@'}} => 'Test2::Plugin::DBIProfile';
-        $settings->run->load_import->{'Test2::Plugin::DBIProfile'} = [];
-    }
-}
+    return unless $run->interactive;
 
-sub fields_action {
-    my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
-
-    my $fields = ${$slot} //= [];
-
-    if ($norm =~ m/^{/) {
-        my $field = {};
-        my $ok    = eval { $field = Test2::Harness::Util::JSON::decode_json($norm); 1 };
-        chomp(my $error = $@ // '');
-
-        die "Error parsing field specification '$field': $error\n" unless $ok;
-        die "Fields must have a 'name' key (error in '$raw')\n"    unless $field->{name};
-        die "Fields must habe a 'details' key (error in '$raw')\n" unless $field->{details};
-
-        return push @$fields => $field;
-    }
-    elsif ($norm =~ m/([^:]+):([^:]+)/) {
-        return push @$fields => {name => $1, details => $2};
+    if ($settings->check_group('renderer')) {
+        my $r = $settings->renderer;
+        $r->verbose(1) unless $r->verbose;
     }
 
-    die "'$raw' is not a valid field specification.\n";
-}
+    if ($settings->check_group('resource')) {
+        my $r = $settings->resource;
+        $r->job_slots(1);
+        $r->slots(1);
+    }
+};
 
 1;
 
@@ -198,19 +162,28 @@ This is where command lines options for a single test run are defined.
 
 =head1 PROVIDED OPTIONS
 
-=head2 COMMAND OPTIONS
-
-=head3 Run Options
+=head2 Run Options
 
 =over 4
 
-=item --author-testing
+=item --abort-on-bail
+
+=item --no-abort-on-bail
+
+Abort all testing if a bail-out is encountered (default: on)
+
 
 =item -A
+
+=item --author-testing
 
 =item --no-author-testing
 
 This will set the AUTHOR_TESTING environment to true
+
+Can also be set with the following environment variables: C<AUTHOR_TESTING>
+
+The following environment variables will be set after arguments are processed: C<AUTHOR_TESTING>
 
 
 =item --dbi-profiling
@@ -220,41 +193,221 @@ This will set the AUTHOR_TESTING environment to true
 Use Test2::Plugin::DBIProfile to collect database profiling data
 
 
-=item --env-var VAR=VAL
+=item -f name=details
 
-=item -EVAR=VAL
+=item -f '{"name":"NAME","details":"DETAILS"}'
 
-=item -E VAR=VAL
+=item --field name=details
 
-=item --no-env-var
+=item --fields name=details
 
-Set environment variables to set when each test is run.
+=item --field '{"name":"NAME","details":"DETAILS"}'
 
-Can be specified multiple times
+=item --fields '{"name":"NAME","details":"DETAILS"}'
+
+=item --no-fields
+
+Add custom data to the harness run
+
+Note: Can be specified multiple times
+
+
+=item -i
+
+=item --interactive
+
+=item --no-interactive
+
+Use interactive mode, 1 test at a time, stdin forwarded to it
+
+Can also be set with the following environment variables: C<YATH_INTERACTIVE>
+
+The following environment variables will be set after arguments are processed: C<YATH_INTERACTIVE>
+
+
+=item --link 'https://jenkins.work/job/42'
+
+=item --links 'https://jenkins.work/job/42'
+
+=item --link 'https://travis.work/builds/42'
+
+=item --links 'https://travis.work/builds/42'
+
+=item --link 'https://buildbot.work/builders/foo/builds/42'
+
+=item --links 'https://buildbot.work/builders/foo/builds/42'
+
+=item --no-links
+
+Provide one or more links people can follow to see more about this run.
+
+Note: Can be specified multiple times
+
+
+=item --nytprof
+
+=item --no-nytprof
+
+Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.
+
+
+=item --run-auditor ARG
+
+=item --run-auditor=ARG
+
+=item --no-run-auditor
+
+Auditor class to use when auditing the overall test run
+
+
+=item --id ARG
+
+=item --id=ARG
+
+=item --run-id ARG
+
+=item --run-id=ARG
+
+=item --no-run-id
+
+Set a specific run-id. (Default: a UUID)
+
+
+=back
+
+=head2 Test Options
+
+=over 4
+
+=item --allow-retry
+
+=item --no-allow-retry
+
+Toggle retry capabilities on and off (default: on)
+
+
+=item -b
+
+=item --blib
+
+=item --no-blib
+
+(Default: include if it exists) Include 'blib/lib' and 'blib/arch' in your module path (These will come after paths you specify with -D or -I)
+
+
+=item --cover
+
+=item --cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
+
+=item --no-cover
+
+Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
+
+Can also be set with the following environment variables: C<T2_DEVEL_COVER>
+
+The following environment variables will be set after arguments are processed: C<T2_DEVEL_COVER>
+
+
+=item -E key=val
+
+=item -E=key=val
+
+=item -Ekey=value
+
+=item -E '{"json":"hash"}'
+
+=item -E='{"json":"hash"}'
+
+=item -E:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -E :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -E=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-var key=val
+
+=item --env-var=key=val
+
+=item --env-vars key=val
+
+=item --env-vars=key=val
+
+=item --env-var '{"json":"hash"}'
+
+=item --env-var='{"json":"hash"}'
+
+=item --env-vars '{"json":"hash"}'
+
+=item --env-vars='{"json":"hash"}'
+
+=item --env-var :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-var=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-vars :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-vars=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-env-vars
+
+Set environment variables
+
+Note: Can be specified multiple times
+
+
+=item --et SECONDS
+
+=item --event-timeout SECONDS
+
+=item --no-event-timeout
+
+Kill test if no output is received within timeout period. (Default: 60 seconds). Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis. This prevents a hung test from running forever.
 
 
 =item --event-uuids
-
-=item --uuids
 
 =item --no-event-uuids
 
 Use Test2::Plugin::UUID inside tests (default: on)
 
 
-=item --fields name:details
+=item -I ARG
 
-=item --fields JSON_STRING
+=item -I=ARG
 
-=item -f name:details
+=item -I '*.*'
 
-=item -f JSON_STRING
+=item -I='*.*'
 
-=item --no-fields
+=item -I '["json","list"]'
 
-Add custom data to the harness run
+=item -I='["json","list"]'
 
-Can be specified multiple times
+=item -I :{ ARG1 ARG2 ... }:
+
+=item -I=:{ ARG1 ARG2 ... }:
+
+=item --include ARG
+
+=item --include=ARG
+
+=item --include '*.*'
+
+=item --include='*.*'
+
+=item --include '["json","list"]'
+
+=item --include='["json","list"]'
+
+=item --include :{ ARG1 ARG2 ... }:
+
+=item --include=:{ ARG1 ARG2 ... }:
+
+=item --no-include
+
+Add a directory to your include paths
+
+Note: Can be specified multiple times
 
 
 =item --input ARG
@@ -275,25 +428,26 @@ Input string to be used as standard input for ALL tests. See also: --input-file
 Use the specified file as standard input to ALL tests
 
 
-=item --io-events
+=item -l
 
-=item --no-io-events
+=item --lib
 
-Use Test2::Plugin::IOEvents inside tests to turn all prints into test2 events (default: off)
+=item --no-lib
+
+(Default: include if it exists) Include 'lib' in your module path (These will come after paths you specify with -D or -I)
 
 
-=item --link 'https://travis.work/builds/42'
+=item -m ARG
 
-=item --link 'https://jenkins.work/job/42'
+=item -m=ARG
 
-=item --link 'https://buildbot.work/builders/foo/builds/42'
+=item -m '["json","list"]'
 
-=item --no-link
+=item -m='["json","list"]'
 
-Provide one or more links people can follow to see more about this run.
+=item -m :{ ARG1 ARG2 ... }:
 
-Can be specified multiple times
-
+=item -m=:{ ARG1 ARG2 ... }:
 
 =item --load ARG
 
@@ -303,34 +457,52 @@ Can be specified multiple times
 
 =item --load-module=ARG
 
-=item -m ARG
+=item --load '["json","list"]'
 
-=item -m=ARG
+=item --load='["json","list"]'
+
+=item --load :{ ARG1 ARG2 ... }:
+
+=item --load=:{ ARG1 ARG2 ... }:
+
+=item --load-module '["json","list"]'
+
+=item --load-module='["json","list"]'
+
+=item --load-module :{ ARG1 ARG2 ... }:
+
+=item --load-module=:{ ARG1 ARG2 ... }:
 
 =item --no-load
 
 Load a module in each test (after fork). The "import" method is not called.
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
-
-=item --load-import Module
-
-=item --load-import Module=import_arg1,arg2,...
-
-=item --loadim Module
-
-=item --loadim Module=import_arg1,arg2,...
 
 =item -M Module
 
 =item -M Module=import_arg1,arg2,...
 
+=item -M '{"Data::Dumper":["Dumper"]}'
+
+=item --loadim Module
+
+=item --load-import Module
+
+=item --loadim Module=import_arg1,arg2,...
+
+=item --loadim '{"Data::Dumper":["Dumper"]}'
+
+=item --load-import Module=import_arg1,arg2,...
+
+=item --load-import '{"Data::Dumper":["Dumper"]}'
+
 =item --no-load-import
 
 Load a module in each test (after fork). Import is called.
 
-Can be specified multiple times. If the same key is listed multiple times the value lists will be appended together.
+Note: Can be specified multiple times
 
 
 =item --mem-usage
@@ -340,72 +512,169 @@ Can be specified multiple times. If the same key is listed multiple times the va
 Use Test2::Plugin::MemUsage inside tests (default: on)
 
 
-=item --retry ARG
+=item --pet SECONDS
 
-=item --retry=ARG
+=item --post-exit-timeout SECONDS
+
+=item --no-post-exit-timeout
+
+Stop waiting post-exit after the timeout period. (Default: 15 seconds) Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exits it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
+
+
+=item -rARG
 
 =item -r ARG
 
 =item -r=ARG
+
+=item --retry ARG
+
+=item --retry=ARG
 
 =item --no-retry
 
 Run any jobs that failed a second time. NOTE: --retry=1 means failing tests will be attempted twice!
 
 
-=item --retry-isolated
-
 =item --retry-iso
+
+=item --retry-isolated
 
 =item --no-retry-isolated
 
 If true then any job retries will be done in isolation (as though -j1 was set)
 
 
-=item --run-id
+=item --stream
 
-=item --id
+=item --use-stream
 
-=item --no-run-id
+=item --no-stream
 
-Set a specific run-id. (Default: a UUID)
+=item --TAP
 
+The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
+
+
+=item -S ARG
+
+=item -S=ARG
+
+=item -S '["json","list"]'
+
+=item -S='["json","list"]'
+
+=item -S :{ ARG1 ARG2 ... }:
+
+=item -S=:{ ARG1 ARG2 ... }:
+
+=item --switch ARG
+
+=item --switch=ARG
+
+=item --switches ARG
+
+=item --switches=ARG
+
+=item --switch '["json","list"]'
+
+=item --switch='["json","list"]'
+
+=item --switches '["json","list"]'
+
+=item --switches='["json","list"]'
+
+=item --switch :{ ARG1 ARG2 ... }:
+
+=item --switch=:{ ARG1 ARG2 ... }:
+
+=item --switches :{ ARG1 ARG2 ... }:
+
+=item --switches=:{ ARG1 ARG2 ... }:
+
+=item --no-switches
+
+Pass the specified switch to perl for each test. This is not compatible with preload.
+
+Note: Can be specified multiple times
+
+
+=item --test-arg ARG
+
+=item --test-arg=ARG
 
 =item --test-args ARG
 
 =item --test-args=ARG
 
+=item --test-arg '["json","list"]'
+
+=item --test-arg='["json","list"]'
+
+=item --test-args '["json","list"]'
+
+=item --test-args='["json","list"]'
+
+=item --test-arg :{ ARG1 ARG2 ... }:
+
+=item --test-arg=:{ ARG1 ARG2 ... }:
+
+=item --test-args :{ ARG1 ARG2 ... }:
+
+=item --test-args=:{ ARG1 ARG2 ... }:
+
 =item --no-test-args
 
 Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument separator.
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
-=item --stream
+=item --tlib
 
-=item --no-stream
+=item --no-tlib
 
-Use the stream formatter (default is on)
+(Default: off) Include 't/lib' in your module path (These will come after paths you specify with -D or -I)
 
 
-=item --tap
+=item --unsafe-inc
 
-=item --TAP
+=item --no-unsafe-inc
 
-=item ----no-stream
+perl is removing '.' from @INC as a security concern. This option keeps things from breaking for now.
 
-=item --no-tap
+Can also be set with the following environment variables: C<PERL_USE_UNSAFE_INC>
 
-The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
+The following environment variables will be set after arguments are processed: C<PERL_USE_UNSAFE_INC>
+
+
+=item --fork
+
+=item --use-fork
+
+=item --no-use-fork
+
+(default: on, except on windows) Normally tests are run by forking, which allows for features like preloading. This will turn off the behavior globally (which is not compatible with preloading). This is slower, it is better to tag misbehaving tests with the '# HARNESS-NO-PRELOAD' comment in their header to disable forking only for those tests.
+
+Can also be set with the following environment variables: C<!T2_NO_FORK>, C<T2_HARNESS_FORK>, C<!T2_HARNESS_NO_FORK>, C<YATH_FORK>, C<!YATH_NO_FORK>
+
+
+=item --timeout
+
+=item --use-timeout
+
+=item --no-use-timeout
+
+(default: on) Enable/disable timeouts
 
 
 =back
 
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -425,11 +694,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+

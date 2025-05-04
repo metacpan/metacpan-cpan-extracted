@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Software::License::CC0_1_0 0.104006;
+package Software::License::CC0_1_0 0.104007;
 
 use parent 'Software::License';
 # ABSTRACT: the "public domain"-like CC0 license, version 1.0
@@ -37,7 +37,7 @@ Software::License::CC0_1_0 - the "public domain"-like CC0 license, version 1.0
 
 =head1 VERSION
 
-version 0.104006
+version 0.104007
 
 =head1 PERL VERSION
 
@@ -70,7 +70,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

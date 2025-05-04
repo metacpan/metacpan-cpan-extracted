@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Software::License 0.104006;
+package Software::License 0.104007;
 # ABSTRACT: packages that provide templated software licenses
 
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
@@ -268,7 +268,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.104006
+version 0.104007
 
 =head1 SYNOPSIS
 
@@ -727,7 +727,7 @@ Wesley Schwengle <wesley@schwengle.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

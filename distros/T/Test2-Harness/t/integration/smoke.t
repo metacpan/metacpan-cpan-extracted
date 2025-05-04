@@ -7,6 +7,8 @@ use App::Yath::Tester qw/yath/;
 use Test2::Harness::Util::File::JSONL;
 
 use Test2::Harness::Util::JSON qw/decode_json/;
+use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
+
 
 my $dir = __FILE__;
 $dir =~ s{\.t$}{}g;
@@ -14,7 +16,7 @@ $dir =~ s{^\./}{};
 
 yath(
     command => 'test',
-    pre     => ['-p+SmokePlugin'],
+    pre     => ["-D=$dir/lib", '-p+SmokePlugin'],
     args    => [$dir, '--ext=tx'],
     log     => 1,
     exit    => 0,
@@ -23,7 +25,7 @@ yath(
 
 yath(
     command => 'test',
-    pre     => ['-p+SmokePlugin'],
+    pre     => ["-D=$dir/lib", '-p+SmokePlugin'],
     args    => [$dir, '-j3', '--ext=tx'],
     log     => 1,
     exit    => 0,

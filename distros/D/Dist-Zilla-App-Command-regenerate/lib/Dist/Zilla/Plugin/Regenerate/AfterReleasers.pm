@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Regenerate::AfterReleasers;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 # ABSTRACT: Tickle plugins that do "AfterRelease" from regenerate
 
@@ -69,7 +69,7 @@ Dist::Zilla::Plugin::Regenerate::AfterReleasers - Tickle plugins that do "AfterR
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 SYNOPSIS
 

@@ -6,17 +6,19 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> Modul findet die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die Module DeepL (F<deepl.pm>) und ChatGPT (F<gpt3.pm>) als Backend-Engine implementiert. Experimentelle Unterstützung für gpt-4 und gpt-4o sind ebenfalls enthalten.
+B<Greple> B<xlate> Modul findet die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die Module DeepL (F<deepl.pm>) und ChatGPT 4.1 (F<gpt4.pm>) als Backend-Engine implementiert.
 
 Wenn Sie normale Textblöcke in einem Dokument übersetzen wollen, das im Pod-Stil von Perl geschrieben ist, verwenden Sie den Befehl B<greple> mit dem Modul C<xlate::deepl> und C<perl> wie folgt:
 
@@ -126,7 +128,7 @@ Zur Zeit sind die folgenden Engines verfügbar
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ Geben Sie die Zielsprache an. Sie können die verfügbaren Sprachen mit dem Befe
 
 Legen Sie das Ausgabeformat für den ursprünglichen und den übersetzten Text fest.
 
-Die folgenden Formate mit Ausnahme von C<xtxt> gehen davon aus, dass der zu übersetzende Teil eine Sammlung von Zeilen ist. Tatsächlich ist es möglich, nur einen Teil einer Zeile zu übersetzen, und die Angabe eines anderen Formats als C<xtxt> liefert keine sinnvollen Ergebnisse.
+Die folgenden Formate mit Ausnahme von C<xtxt> gehen davon aus, dass der zu übersetzende Teil eine Sammlung von Zeilen ist. In der Tat ist es möglich, nur einen Teil einer Zeile zu übersetzen, aber die Angabe eines anderen Formats als C<xtxt> führt zu keinen sinnvollen Ergebnissen.
 
 =over 4
 
@@ -242,6 +244,14 @@ Führen Sie die Maskierungsfunktion aus und zeigen Sie den umgewandelten Text so
 =item B<--match-all>
 
 Legen Sie den gesamten Text der Datei als Zielbereich fest.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+Im Falle der Formate C<cm> und C<colon> wird die Ausgabe zeilenweise aufgeteilt und formatiert. Wenn also nur ein Teil einer Zeile übersetzt werden soll, kann das erwartete Ergebnis nicht erzielt werden. Diese Filter korrigieren die Ausgabe, die durch die Übersetzung eines Teils einer Zeile in die normale zeilenweise Ausgabe verfälscht wird.
+
+Werden in der derzeitigen Implementierung mehrere Teile einer Zeile übersetzt, werden sie als unabhängige Zeilen ausgegeben.
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<Anwendung::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

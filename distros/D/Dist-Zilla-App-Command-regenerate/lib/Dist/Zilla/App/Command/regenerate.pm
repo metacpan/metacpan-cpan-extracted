@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::App::Command::regenerate;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 # ABSTRACT: Write content into your source tree from your release staging
 
@@ -53,7 +53,7 @@ Dist::Zilla::App::Command::regenerate - Write content into your source tree from
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 SYNOPSIS
 

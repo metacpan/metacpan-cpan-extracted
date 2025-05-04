@@ -2,71 +2,109 @@ package App::Yath::Options::Workspace;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use File::Spec();
+
+use Test2::Harness::Util qw/find_libraries mod2file clean_path chmod_tmp/;
 use File::Path qw/remove_tree/;
 use File::Temp qw/tempdir/;
 
-use Test2::Harness::Util qw/clean_path chmod_tmp/;
-
-use App::Yath::Options;
-
-option_group {prefix => 'workspace', category => "Workspace Options"} => sub {
-    option tmp_dir => (
-        type        => 's',
-        short       => 't',
-        alt         => ['tmpdir'],
-        description => 'Use a specific temp directory (Default: use system temp dir)',
-        env_vars => [qw/T2_HARNESS_TEMP_DIR YATH_TEMP_DIR TMPDIR TEMPDIR TMP_DIR TEMP_DIR/],
-        default     => sub { File::Spec->tmpdir },
+use Getopt::Yath;
+option_group {group => 'workspace', category => 'Workspace Options'} => sub {
+    option keep_dirs => (
+        type        => 'Bool',
+        short       => 'k',
+        alt         => ['keep-dir'],
+        description => 'Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.',
+        default     => 0,
     );
 
     option workdir => (
-        type         => 's',
-        short        => 'w',
-        description  => 'Set the work directory (Default: new temp directory)',
-        env_vars => [qw/T2_WORKDIR YATH_WORKDIR/],
-        clear_env_vars => 1,
-        normalize    => \&clean_path,
+        type           => 'Scalar',
+        description    => 'Set the work directory (Default: new temp directory)',
+        from_env_vars  => [qw/T2_WORKDIR YATH_WORKDIR/],
+        clear_env_vars => [qw/T2_WORKDIR YATH_WORKDIR/],
+        normalize      => \&clean_path,
+
+        trigger => sub {
+            my $opt    = shift;
+            my %params = @_;
+
+            return unless $params{action} eq 'set';
+
+            my $val = $params{val} or return;
+            my ($workdir) = @$val;
+
+            unless (-d $workdir) {
+                mkdir($workdir) or die "Could not create workdir: $!";
+            }
+
+            chmod_tmp($workdir);
+
+            return;
+        },
+
+        default => sub {
+            my $opt = shift;
+            my ($settings) = @_;
+
+            my $template = join '-' => ("yath", $$, "XXXX");
+
+            my $workdir = tempdir(
+                $template,
+                TMPDIR => 1,
+                CLEANUP => 0,
+            );
+
+            chmod_tmp($workdir);
+
+            return $workdir;
+        },
+    );
+
+    option tmpdir => (
+        type           => 'Scalar',
+        alt            => ['tmp-dir'],
+        description    => 'Use a specific temp directory (Default: create a temp dir under the system one)',
+        from_env_vars  => [qw/T2_HARNESS_TEMP_DIR YATH_TEMP_DIR/],
+        clear_env_vars => [qw/T2_HARNESS_TEMP_DIR YATH_TEMP_DIR/],
+        set_env_vars   => [qw/TMPDIR TEMPDIR TMP_DIR TEMP_DIR/],
+
+        default => sub {
+            my $opt = shift;
+            my ($settings) = @_;
+
+            my $dir = File::Spec->catdir($settings->workspace->workdir, 'tmp');
+
+            unless(-d $dir) {
+                mkdir($dir) or die "Could not mkdir($dir): $!";
+            }
+
+            chmod_tmp($dir);
+            return $dir;
+        },
     );
 
     option clear => (
+        type    => 'Bool',
         short       => 'C',
         description => 'Clear the work directory if it is not already empty',
     );
 
-    post sub {
-        my %params   = @_;
-        my $settings = $params{settings};
+};
 
-        if (my $workdir = $settings->workspace->workdir) {
-            if (-d $workdir) {
-                remove_tree($workdir, {safe => 1, keep_root => 1}) if $settings->workspace->clear;
-            }
-            else {
-                mkdir($workdir) or die "Could not create workdir: $!";
-                chmod_tmp($workdir);
-            }
+option_post_process sub {
+    my ($options, $state) = @_;
 
-            return;
-        }
+    my $settings = $state->{settings};
 
-        my $project = $settings->harness->project;
-        my $template = join '-' => ( "yath", $$, "XXXXXX");
-
-        my $tmpdir = tempdir(
-            $template,
-            DIR     => $settings->workspace->tmp_dir,
-            CLEANUP => !($settings->debug->keep_dirs || $params{command}->always_keep_dir),
-        );
-        chmod_tmp($tmpdir);
-
-        $settings->workspace->field(workdir => $tmpdir);
-    };
+    remove_tree($settings->workspace->workdir, {safe => 1, keep_root => 1}) if $settings->workspace->clear;
 };
 
 1;
+
+__END__
 
 =pod
 
@@ -74,55 +112,60 @@ option_group {prefix => 'workspace', category => "Workspace Options"} => sub {
 
 =head1 NAME
 
-App::Yath::Options::Workspace - Options for specifying the yath work dir.
+App::Yath::Options::Workspace - FIXME
 
 =head1 DESCRIPTION
 
-Options regarding the yath working directory.
+=head1 SYNOPSIS
 
 =head1 PROVIDED OPTIONS
 
-=head2 COMMAND OPTIONS
-
-=head3 Workspace Options
+=head2 Workspace Options
 
 =over 4
 
-=item --clear
-
 =item -C
+
+=item --clear
 
 =item --no-clear
 
 Clear the work directory if it is not already empty
 
 
-=item --tmp-dir ARG
+=item -k
 
-=item --tmp-dir=ARG
+=item --keep-dir
+
+=item --keep-dirs
+
+=item --no-keep-dirs
+
+Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+
 
 =item --tmpdir ARG
 
 =item --tmpdir=ARG
 
-=item -t ARG
+=item --tmp-dir ARG
 
-=item -t=ARG
+=item --tmp-dir=ARG
 
-=item --no-tmp-dir
+=item --no-tmpdir
 
-Use a specific temp directory (Default: use system temp dir)
+Use a specific temp directory (Default: create a temp dir under the system one)
 
-Can also be set with the following environment variables: C<T2_HARNESS_TEMP_DIR>, C<YATH_TEMP_DIR>, C<TMPDIR>, C<TEMPDIR>, C<TMP_DIR>, C<TEMP_DIR>
+Can also be set with the following environment variables: C<T2_HARNESS_TEMP_DIR>, C<YATH_TEMP_DIR>
+
+The following environment variables will be cleared after arguments are processed: C<T2_HARNESS_TEMP_DIR>, C<YATH_TEMP_DIR>
+
+The following environment variables will be set after arguments are processed: C<TMPDIR>, C<TEMPDIR>, C<TMP_DIR>, C<TEMP_DIR>
 
 
 =item --workdir ARG
 
 =item --workdir=ARG
-
-=item -w ARG
-
-=item -w=ARG
 
 =item --no-workdir
 
@@ -130,13 +173,16 @@ Set the work directory (Default: new temp directory)
 
 Can also be set with the following environment variables: C<T2_WORKDIR>, C<YATH_WORKDIR>
 
+The following environment variables will be cleared after arguments are processed: C<T2_WORKDIR>, C<YATH_WORKDIR>
+
 
 =back
+
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -156,11 +202,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+

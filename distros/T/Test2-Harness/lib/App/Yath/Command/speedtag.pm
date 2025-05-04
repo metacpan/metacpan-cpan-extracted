@@ -2,41 +2,52 @@ package App::Yath::Command::speedtag;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
+use Test2::Harness::Util qw/clean_path/;
 use Test2::Harness::Util::File::JSONL;
-
-use App::Yath::Options;
+use Test2::Harness::Util::File::JSON;
 
 use Cwd qw/getcwd/;
 
 use parent 'App::Yath::Command';
-use Test2::Harness::Util::HashBase qw/-log_file -max_short -max_medium/;
-use Test2::Harness::Util qw/clean_path/;
+use Test2::Harness::Util::HashBase qw{
+    <log_file
+    <max_short
+    <max_medium
+};
 
+use Getopt::Yath;
 include_options(
-    'App::Yath::Options::Debug',
+    'App::Yath::Options::Yath',
 );
 
-option_group {prefix => 'speedtag', category => 'speedtag options'} => sub {
+option_group {group => 'speedtag', category => 'Speedtag Options'} => sub {
     option generate_durations_file => (
-        type => 'd',
-        alt         => ['durations', 'duration'],
+        type => 'Auto',
+        alt  => ['durations', 'duration'],
+
         description => "Write out a duration json file, if no path is provided 'duration.json' will be used. The .json extension is added automatically if omitted.",
 
-        long_examples  => ['', '=/path/to/durations.json'],
+        long_examples => ['', '=/path/to/durations.json'],
 
-        normalize => \&normalize_duration,
-        action    => \&duration_action,
+        autofill => sub { clean_path('durations.json') },
+
+        normalize => sub {
+            my $val = shift;
+            $val .= '.json' unless $val =~ m/\.json$/;
+            return clean_path($val);
+        },
     );
 
     option pretty => (
+        type        => 'Bool',
         description => "Generate a pretty 'durations.json' file when combined with --generate-durations-file. (sorted and multilines)",
         default     => 0,
     );
 };
 
-sub group { 'log' }
+sub group { 'log parsing' }
 
 sub summary { "Tag tests with duration (short medium long) using a source log" }
 
@@ -56,27 +67,6 @@ sub init {
     $self->{+MAX_MEDIUM} //= 30;
 }
 
-sub normalize_duration {
-    my $val = shift;
-
-    return $val if $val eq '1';
-
-    $val =~ s/\.json$//g;
-    $val .= '.json';
-
-    return clean_path($val);
-}
-
-sub duration_action {
-    my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
-
-    return $$slot = clean_path($norm)
-        unless $norm eq '1';
-
-    return if $$slot;
-    return $$slot = clean_path('durations.json');
-}
-
 sub run {
     my $self = shift;
 
@@ -88,13 +78,13 @@ sub run {
     my $initial_dir = clean_path(getcwd());
 
     $self->{+LOG_FILE} = shift @$args or die "You must specify a log file";
-    die "'$self->{+LOG_FILE}' is not a valid log file" unless -f $self->{+LOG_FILE};
+    die "'$self->{+LOG_FILE}' is not a valid log file"       unless -f $self->{+LOG_FILE};
     die "'$self->{+LOG_FILE}' does not look like a log file" unless $self->{+LOG_FILE} =~ m/\.jsonl(\.(gz|bz2))?$/;
 
     $self->{+MAX_SHORT}  = shift @$args if @$args;
     $self->{+MAX_MEDIUM} = shift @$args if @$args;
 
-    die "max short duration must be an integer, got '$self->{+MAX_SHORT}'"  unless $self->{+MAX_SHORT}  && $self->{+MAX_SHORT} =~ m/^\d+$/;
+    die "max short duration must be an integer, got '$self->{+MAX_SHORT}'"  unless $self->{+MAX_SHORT}  && $self->{+MAX_SHORT}  =~ m/^\d+$/;
     die "max short duration must be an integer, got '$self->{+MAX_MEDIUM}'" unless $self->{+MAX_MEDIUM} && $self->{+MAX_MEDIUM} =~ m/^\d+$/;
 
     my $stream = Test2::Harness::Util::File::JSONL->new(name => $self->{+LOG_FILE});
@@ -102,7 +92,7 @@ sub run {
     my $durations_file = $self->settings->speedtag->generate_durations_file;
     my %durations;
 
-    while(1) {
+    while (1) {
         my @events = $stream->poll(max => 1000) or last;
 
         for my $event (@events) {
@@ -113,7 +103,7 @@ sub run {
             next unless $f->{harness_job_end};
 
             my $job = {};
-            $job->{file} = clean_path( $f->{harness_job_end}->{file} ) if $f->{harness_job_end} && $f->{harness_job_end}->{file};
+            $job->{file} = clean_path($f->{harness_job_end}->{file})         if $f->{harness_job_end} && $f->{harness_job_end}->{file};
             $job->{time} = $f->{harness_job_end}->{times}->{totals}->{total} if $f->{harness_job_end} && $f->{harness_job_end}->{times};
 
             next unless $job->{file} && $job->{time};
@@ -137,13 +127,17 @@ sub run {
 
             my @lines;
             my $injected;
+            my ($old, $new);
             for my $line (<$fh>) {
                 if ($line =~ m/^(\s*)#(\s*)HARNESS-(CAT(EGORY)?|DUR(ATION))-(LONG|MEDIUM|SHORT)$/i) {
                     next if $injected++;
+                    $old  = $line;
                     $line = "${1}#${2}HARNESS-DURATION-" . uc($dur) . "\n";
+                    $new  = $line;
                 }
                 push @lines => $line;
             }
+
             unless ($injected) {
                 my $new_line = "# HARNESS-DURATION-" . uc($dur) . "\n";
                 my @header;
@@ -152,9 +146,27 @@ sub run {
                 }
 
                 unshift @lines => (@header, $new_line);
+
+                $old = "<NO TAG FOUND>";
+                $new = $new_line;
             }
 
             close($fh);
+
+            if ($durations_file) {
+                my $tfile = $job->{file};
+                $tfile =~ s{^\Q$initial_dir\E/+}{};
+                $durations{$tfile} = uc($dur);
+            }
+
+            if ($settings->harness->dummy) {
+                print "Would tag (dummy) file $job->{file} with duration '$dur'\n";
+                chomp($old);
+                chomp($new);
+                print "Old Header: $old\nNew Header: $new\n\n";
+                next;
+            }
+
             unless (open($fh, '>', $job->{file})) {
                 warn "Could not open file $job->{file} for writing\n";
                 next;
@@ -163,19 +175,13 @@ sub run {
             print $fh @lines;
             close($fh);
 
-            if ( $durations_file ) {
-                my $tfile = $job->{file};
-                $tfile =~ s{^\Q$initial_dir\E/+}{};
-                $durations{ $tfile } = uc( $dur );
-            }
-
             print "Tagged '$dur': $job->{file}\n";
         }
     }
 
-    if ( $durations_file ) {
-        my $jfile = Test2::Harness::Util::File::JSON->new(name => $durations_file, pretty => $self->settings->speedtag->pretty );
-        $jfile->write( \%durations );
+    if ($durations_file) {
+        my $jfile = Test2::Harness::Util::File::JSON->new(name => $durations_file, pretty => $self->settings->speedtag->pretty);
+        $jfile->write(\%durations);
     }
 
     return 0;
@@ -201,301 +207,17 @@ from the log based on the max durations for each type.
 
 =head1 USAGE
 
-    $ yath [YATH OPTIONS] speedtag [COMMAND OPTIONS]
+    $ yath [YATH OPTIONS] speedtag [COMMAND OPTIONS] [COMMAND ARGUMENTS]
 
-=head2 YATH OPTIONS
+=head2 OPTIONS
 
-=head3 Developer
-
-=over 4
-
-=item --dev-lib
-
-=item --dev-lib=lib
-
-=item -D
-
-=item -D=lib
-
-=item -Dlib
-
-=item --no-dev-lib
-
-Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
-
-Can be specified multiple times
-
-
-=back
-
-=head3 Environment
+=head3 Harness Options
 
 =over 4
-
-=item --persist-dir ARG
-
-=item --persist-dir=ARG
-
-=item --no-persist-dir
-
-Where to find persistence files.
-
-
-=item --persist-file ARG
-
-=item --persist-file=ARG
-
-=item --pfile ARG
-
-=item --pfile=ARG
-
-=item --no-persist-file
-
-Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
-
-
-=item --project ARG
-
-=item --project=ARG
-
-=item --project-name ARG
-
-=item --project-name=ARG
-
-=item --no-project
-
-This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
-
-
-=back
-
-=head3 Help and Debugging
-
-=over 4
-
-=item --show-opts
-
-=item --no-show-opts
-
-Exit after showing what yath thinks your options mean
-
-
-=item --version
-
-=item -V
-
-=item --no-version
-
-Exit after showing a helpful usage message
-
-
-=back
-
-=head3 Plugins
-
-=over 4
-
-=item --no-scan-plugins
-
-=item --no-no-scan-plugins
-
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
-
-
-=item --plugins PLUGIN
-
-=item --plugins +App::Yath::Plugin::PLUGIN
-
-=item --plugins PLUGIN=arg1,arg2,...
-
-=item --plugin PLUGIN
-
-=item --plugin +App::Yath::Plugin::PLUGIN
-
-=item --plugin PLUGIN=arg1,arg2,...
-
-=item -pPLUGIN
-
-=item --no-plugins
-
-Load a yath plugin.
-
-Can be specified multiple times
-
-
-=back
-
-=head2 COMMAND OPTIONS
-
-=head3 Cover Options
-
-=over 4
-
-=item --cover-aggregator ByTest
-
-=item --cover-aggregator ByRun
-
-=item --cover-aggregator +Custom::Aggregator
-
-=item --cover-agg ByTest
-
-=item --cover-agg ByRun
-
-=item --cover-agg +Custom::Aggregator
-
-=item --no-cover-aggregator
-
-Choose a custom aggregator subclass
-
-
-=item --cover-class ARG
-
-=item --cover-class=ARG
-
-=item --no-cover-class
-
-Choose a Test2::Plugin::Cover subclass
-
-
-=item --cover-dirs ARG
-
-=item --cover-dirs=ARG
-
-=item --cover-dir ARG
-
-=item --cover-dir=ARG
-
-=item --no-cover-dirs
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-exclude-private
-
-=item --no-cover-exclude-private
-
-
-
-
-=item --cover-files
-
-=item --no-cover-files
-
-Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
-
-
-=item --cover-from path/to/log.jsonl
-
-=item --cover-from http://example.com/coverage
-
-=item --cover-from path/to/coverage.jsonl
-
-=item --no-cover-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
-
-
-=item --cover-from-type json
-
-=item --cover-from-type jsonl
-
-=item --cover-from-type log
-
-=item --no-cover-from-type
-
-File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.
-
-
-=item --cover-manager My::Coverage::Manager
-
-=item --no-cover-manager
-
-Coverage 'from' manager to use when coverage data does not provide one
-
-
-=item --cover-maybe-from path/to/log.jsonl
-
-=item --cover-maybe-from http://example.com/coverage
-
-=item --cover-maybe-from path/to/coverage.jsonl
-
-=item --no-cover-maybe-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
-
-
-=item --cover-maybe-from-type json
-
-=item --cover-maybe-from-type jsonl
-
-=item --cover-maybe-from-type log
-
-=item --no-cover-maybe-from-type
-
-Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect
-
-
-=item --cover-metrics
-
-=item --no-cover-metrics
-
-
-
-
-=item --cover-types ARG
-
-=item --cover-types=ARG
-
-=item --cover-type ARG
-
-=item --cover-type=ARG
-
-=item --no-cover-types
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-write
-
-=item --cover-write=coverage.jsonl
-
-=item --cover-write=coverage.json
-
-=item --no-cover-write
-
-Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).
-
-
-=back
-
-=head3 Git Options
-
-=over 4
-
-=item --git-change-base master
-
-=item --git-change-base HEAD^
-
-=item --git-change-base df22abe4
-
-=item --no-git-change-base
-
-Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
-
-
-=back
-
-=head3 Help and Debugging
-
-=over 4
-
-=item --dummy
 
 =item -d
+
+=item --dummy
 
 =item --no-dummy
 
@@ -503,34 +225,7 @@ Dummy run, do not actually execute anything
 
 Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
 
-
-=item --help
-
-=item -h
-
-=item --no-help
-
-exit after showing help information
-
-
-=item --interactive
-
-=item -i
-
-=item --no-interactive
-
-Use interactive mode, 1 test at a time, stdin forwarded to it
-
-
-=item --keep-dirs
-
-=item --keep_dir
-
-=item -k
-
-=item --no-keep-dirs
-
-Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+The following environment variables will be cleared after arguments are processed: C<T2_HARNESS_DUMMY>
 
 
 =item --procname-prefix ARG
@@ -541,100 +236,26 @@ Do not delete directories when done. This is useful if you want to inspect the d
 
 Add a prefix to all proc names (as seen by ps).
 
-
-=back
-
-=head3 YathUI Options
-
-=over 4
-
-=item --yathui-api-key ARG
-
-=item --yathui-api-key=ARG
-
-=item --no-yathui-api-key
-
-Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
-
-
-=item --yathui-grace
-
-=item --no-yathui-grace
-
-If yath cannot connect to yath-ui it normally throws an error, use this to make it fail gracefully. You get a warning, but things keep going.
-
-
-=item --yathui-long-duration 10
-
-=item --no-yathui-long-duration
-
-Minimum duration length (seconds) before a test goes from MEDIUM to LONG
-
-
-=item --yathui-medium-duration 5
-
-=item --no-yathui-medium-duration
-
-Minimum duration length (seconds) before a test goes from SHORT to MEDIUM
-
-
-=item --yathui-mode summary
-
-=item --yathui-mode qvf
-
-=item --yathui-mode qvfd
-
-=item --yathui-mode complete
-
-=item --no-yathui-mode
-
-Set the upload mode (default 'qvfd')
-
-
-=item --yathui-project ARG
-
-=item --yathui-project=ARG
-
-=item --no-yathui-project
-
-The Yath-UI project for your test results
-
-
-=item --yathui-retry
-
-=item --no-yathui-retry
-
-How many times to try an operation before giving up
-
-Can be specified multiple times
-
-
-=item --yathui-url http://my-yath-ui.com/...
-
-=item --uri http://my-yath-ui.com/...
-
-=item --no-yathui-url
-
-Yath-UI url
+The following environment variables will be set after arguments are processed: C<T2_HARNESS_PROC_PREFIX>
 
 
 =back
 
-=head3 speedtag options
+=head3 Speedtag Options
 
 =over 4
-
-=item --generate-durations-file
-
-=item --generate-durations-file=/path/to/durations.json
-
-=item --durations
-
-=item --durations=/path/to/durations.json
 
 =item --duration
 
+=item --durations
+
+=item --generate-durations-file
+
 =item --duration=/path/to/durations.json
+
+=item --durations=/path/to/durations.json
+
+=item --generate-durations-file=/path/to/durations.json
 
 =item --no-generate-durations-file
 
@@ -650,10 +271,185 @@ Generate a pretty 'durations.json' file when combined with --generate-durations-
 
 =back
 
+=head3 Yath Options
+
+=over 4
+
+=item --base-dir ARG
+
+=item --base-dir=ARG
+
+=item --no-base-dir
+
+Root directory for the project being tested (usually where .yath.rc lives)
+
+
+=item -D
+
+=item -Dlib
+
+=item -Dlib
+
+=item -D=lib
+
+=item -D"lib/*"
+
+=item --dev-lib
+
+=item --dev-lib=lib
+
+=item --dev-lib="lib/*"
+
+=item --no-dev-lib
+
+This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
+
+Note: This option can cause yath to use exec() to reload itself with the correct libraries in place. Each occurence of this argument can cause an additional exec() call. Use --dev-libs-verbose BEFORE any -D calls to see the exec() calls.
+
+Note: Can be specified multiple times
+
+
+=item --dev-libs-verbose
+
+=item --no-dev-libs-verbose
+
+Be verbose and announce that yath will re-exec in order to have the correct includes (normally yath will just call exec() quietly)
+
+
+=item -h
+
+=item -h=Group
+
+=item --help
+
+=item --help=Group
+
+=item --no-help
+
+exit after showing help information
+
+
+=item -p key=val
+
+=item -p=key=val
+
+=item -pkey=value
+
+=item -p '{"json":"hash"}'
+
+=item -p='{"json":"hash"}'
+
+=item -p:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -p :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -p=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugin key=val
+
+=item --plugin=key=val
+
+=item --plugins key=val
+
+=item --plugins=key=val
+
+=item --plugin '{"json":"hash"}'
+
+=item --plugin='{"json":"hash"}'
+
+=item --plugins '{"json":"hash"}'
+
+=item --plugins='{"json":"hash"}'
+
+=item --plugin :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugin=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugins :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --plugins=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-plugins
+
+Load a yath plugin.
+
+Note: Can be specified multiple times
+
+
+=item --project ARG
+
+=item --project=ARG
+
+=item --project-name ARG
+
+=item --project-name=ARG
+
+=item --no-project
+
+This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file.
+
+
+=item --scan-options key=val
+
+=item --scan-options=key=val
+
+=item --scan-options '{"json":"hash"}'
+
+=item --scan-options='{"json":"hash"}'
+
+=item --scan-options(?^:^--(no-)?(?^:scan-(.+))$)
+
+=item --scan-options :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --scan-options=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-scan-options
+
+=item /^--(no-)?scan-(.+)$/
+
+Yath will normally scan plugins for options. Some commands scan other libraries (finders, resources, renderers, etc) for options. You can use this to disable all scanning, or selectively disable/enable some scanning.
+
+Note: This is parsed early in the argument processing sequence, before options that may be earlier in your argument list.
+
+Note: Can be specified multiple times
+
+
+=item --show-opts
+
+=item --show-opts=group
+
+=item --no-show-opts
+
+Exit after showing what yath thinks your options mean
+
+
+=item --user ARG
+
+=item --user=ARG
+
+=item --no-user
+
+Username to associate with logs, database entries, and yath servers.
+
+Can also be set with the following environment variables: C<YATH_USER>, C<USER>
+
+
+=item -V
+
+=item --version
+
+=item --no-version
+
+Exit after showing a helpful usage message
+
+
+=back
+
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -673,12 +469,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2025 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
 

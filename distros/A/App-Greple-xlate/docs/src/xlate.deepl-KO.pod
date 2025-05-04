@@ -6,17 +6,19 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-B<그림> B<엑스레이트> 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (F<deepl.pm>) 및 ChatGPT (F<gpt3.pm>) 모듈이 백엔드 엔진으로 구현되어 있습니다. gpt-4 및 gpt-4o에 대한 실험적 지원도 포함되어 있습니다.
+B<Greple> B<xlate> 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (F<deepl.pm>) 및 ChatGPT 4.1 (F<gpt4.pm>) 모듈이 백엔드 엔진으로 구현되어 있습니다.
 
 Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면 다음과 같이 B<greple> 명령과 C<xlate::deepl> 및 C<perl> 모듈을 사용합니다:
 
@@ -126,7 +128,7 @@ B<--xlate-fold> 옵션을 사용하면 변환된 텍스트가 지정된 너비�
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ B<gpt-4o>의 인터페이스는 불안정하며 현재로서는 제대로 작동
 
 원본 및 번역 텍스트의 출력 형식을 지정합니다.
 
-C<xtxt> 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 가정합니다. 실제로는 한 줄의 일부만 번역할 수 있으며, C<xtxt> 이외의 형식을 지정하면 의미 있는 결과가 나오지 않습니다.
+C<xtxt> 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 가정합니다. 실제로는 한 줄의 일부만 번역할 수 있지만 C<xtxt> 이외의 형식을 지정하면 의미 있는 결과가 나오지 않습니다.
 
 =over 4
 
@@ -242,6 +244,14 @@ C<xtxt> 이외의 다음 형식은 번역할 부분이 줄의 모음이라고 �
 =item B<--match-all>
 
 파일의 전체 텍스트를 대상 영역으로 설정합니다.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+C<cm> 및 C<colon> 형식의 경우 출력이 한 줄씩 분할되어 형식이 지정됩니다. 따라서 한 줄의 일부만 번역해야 하는 경우 예상되는 결과를 얻을 수 없습니다. 이 필터는 한 줄의 일부를 정상적인 줄 단위 출력으로 번역하여 손상된 출력을 수정합니다.
+
+현재 구현에서는 한 줄의 여러 부분이 번역되는 경우 독립된 줄로 출력됩니다.
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

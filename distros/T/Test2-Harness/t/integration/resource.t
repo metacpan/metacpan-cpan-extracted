@@ -8,6 +8,8 @@ use Test2::Harness::Util::File::JSONL;
 
 use Test2::Harness::Util::JSON qw/decode_json/;
 
+use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
+
 my $dir = __FILE__;
 $dir =~ s{\.t$}{}g;
 $dir =~ s{^\./}{};
@@ -29,7 +31,7 @@ yath(
             my $f = $event->{facet_data};
             my $info = $f->{info} or next;
             for my $i (@$info) {
-                next unless $i->{tag} eq 'INTERNAL';
+                next unless uc($i->{tag}) eq 'STDERR';
                 if ($i->{details} =~ m/^(\S+) - (yath-\S+)$/) {
                     $pids{$1} = $2;
                     next;
@@ -50,49 +52,28 @@ yath(
         }
 
         is(
-            $msgs{"yath-nested-runner"},
-            {
-                1 => [
-                    'Record',
-                    'Release',
-                    'Record',
-                    'Release',
-                    'RESOURCE CLEANUP',
-                ],
-                2 => [
-                    'Record',
-                    'Release',
-                    'Record',
-                    'Release',
-                    'RESOURCE CLEANUP',
-                ],
-            },
-            "The nested runner saw the records and releases, and then cleaned up at the end."
-        );
-
-        is(
-            $msgs{'yath-nested-scheduler'},
+            $msgs{"yath-instance"},
             {
                 1 => [
                     'Assigned',
-                    'Record',
                     'No Slots',
                     'Release',
                     'Assigned',
-                    'Record',
                     'Release',
+                    'RESOURCE CLEANUP',
+                    'RESOURCE CLEANUP',
                 ],
                 2 => [
                     'Assigned',
-                    'Record',
                     'No Slots',
                     'Release',
                     'Assigned',
-                    'Record',
                     'Release',
+                    'RESOURCE CLEANUP',
+                    'RESOURCE CLEANUP',
                 ],
             },
-            "The scheduler handled assigning slots, knew when it was out, then knew when more were ready",
+            "The yath instance saw all the necessary messages"
         );
     },
 );

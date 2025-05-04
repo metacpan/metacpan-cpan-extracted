@@ -1,5 +1,27 @@
 Revision history for Perl module Perl::MinimumVersion
 
+1.44 2025-05-04
+    - Update LICENSE text (for real this time)
+
+1.43 2025-05-04
+    - Update LICENSE text
+    - Promoting trial changes to stable release
+
+1.42 2023-09-30 (TRIAL RELEASE)
+    - Restore detection for Perl version 5.008, which means that 5.006 is now the minimum
+      required version that will be reported.
+    - Recognize the minimum required Perl versions for:
+      - the "use re '/flags'" pragma (GH#29)
+      - postfix dereferences (GH#30)
+      - the <<>> operator (GH#31)
+
+1.41 2023-05-17 (TRIAL RELEASE)
+    - Remove detection for Perl versions 5.008 and older. This means that 5.008 is now the
+      minimum required version that will be reported. (GH#7)
+    - Fix formatting of the summary printed by the perlver script (GH#14)
+    - Recognize the minimum required version for the tr///r flag (GH#25)
+      and indented heredocs (GH#27)
+
 1.40 2021-04-21
     - No changes from 1.39
 

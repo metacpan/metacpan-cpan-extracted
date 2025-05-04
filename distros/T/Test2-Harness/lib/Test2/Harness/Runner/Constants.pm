@@ -2,14 +2,9 @@ package Test2::Harness::Runner::Constants;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use Importer Importer => 'import';
-
-our @EXPORT = qw/CATEGORIES DURATIONS/;
-
-use constant CATEGORIES => {general => 1, isolation => 1, immiscible => 1};
-use constant DURATIONS  => {long    => 1, medium    => 1, short      => 1};
+use Test2::Harness::Util::Deprecated;
 
 1;
 
@@ -21,28 +16,22 @@ __END__
 
 =head1 NAME
 
-Test2::Harness::Runner::Constants - Constants shared between multiple runner
-modules.
+Test2::Harness::Runner::Constants - FIXME
 
 =head1 DESCRIPTION
 
-Export some common structures.
-
 =head1 SYNOPSIS
 
-    use Test2::Harness::Runner::Constants qw/CATEGORIES DURATIONS/;
+=head1 EXPORTS
 
-    if (CATEGORIES->{$cat}) {
-        print "$cat is valid\n";
-    }
-    else {
-        print "$cat is not valid\n";
-    }
+=over 4
+
+=back
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -62,11 +51,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+

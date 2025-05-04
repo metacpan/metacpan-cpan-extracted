@@ -2,7 +2,7 @@ package Test2::Harness::Log::CoverageAggregator::ByRun;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 use Scalar::Util qw/blessed/;
 use Test2::Harness::Util qw/mod2file/;
@@ -87,7 +87,7 @@ sub get_coverage_tests {
     my $testmeta = $coverage_data->{testmeta} // {};
 
     my ($changes_exclude_loads, $changes_exclude_opens);
-    if ($settings->check_prefix('finder')) {
+    if ($settings->check_group('finder')) {
         my $finder = $settings->finder;
         $changes_exclude_loads = $finder->changes_exclude_loads;
         $changes_exclude_opens = $finder->changes_exclude_opens;
@@ -190,7 +190,7 @@ Test2::Harness::Log::CoverageAggregator::ByRun - Aggregate test data by run
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -210,11 +210,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

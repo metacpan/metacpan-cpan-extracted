@@ -6,7 +6,7 @@ module-starter - creates a skeleton module distribution
 
 =head1 VERSION
 
-version 1.77
+version 1.78
 
 =cut
 
@@ -15,7 +15,7 @@ use strict;
 
 use Module::Starter::App;
 
-our $VERSION = '1.77';
+our $VERSION = '1.78';
 
 Module::Starter::App->run;
 

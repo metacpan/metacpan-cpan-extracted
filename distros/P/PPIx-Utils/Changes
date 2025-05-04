@@ -1,3 +1,6 @@
+0.004     2025-05-04 05:14:24 EDT
+  - Update LICENSE text
+
 0.003     2019-04-26 10:48:35 EDT
   - Fix test for corrected parsing in PPI 1.248 (#2)
 

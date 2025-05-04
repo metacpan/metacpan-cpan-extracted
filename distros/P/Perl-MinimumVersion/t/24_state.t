@@ -12,8 +12,8 @@ my %examples=(
     q{state $x;}                => '5.010',
     q{state @x;}                => '5.010',
     q{state($x,$y);}            => '5.010',
-    q{%hash = (state => 3);}    => '5.004',
-    q{print 'state $x;';}       => '5.004',
+    q{%hash = (state => 3);}    => '5.006',
+    q{print 'state $x;';}       => '5.006',
 );
 
 plan tests => scalar(keys %examples);

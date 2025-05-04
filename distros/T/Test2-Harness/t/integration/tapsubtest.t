@@ -1,6 +1,8 @@
 use Test2::V0;
 
 use App::Yath::Tester qw/yath/;
+use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
+
 
 my $dir = __FILE__;
 $dir =~ s{\.t$}{}g;
@@ -11,18 +13,24 @@ yath(
     args    => [$dir, '--ext=tx', '-v'],
     exit    => 0,
     test    => sub {
-        my $todo = todo "FIXME #216";
-        my $out  = shift;
+        my $out = shift;
 
-        chomp(my $want = <<'        EOT');
-[  PASS  ]  job  1  +~buffered
-[  PASS  ]  job  1    + buffered ok
-[  PLAN  ]  job  1    | Expected assertions: 1
-            job  1    ^
-[  PLAN  ]  job  1    Expected assertions: 1
-        EOT
+        my @lines = split /\n/, $out->{output};
 
-        like($out->{output}, qr{\Q$want\E}, "Got the desired output");
+        like(
+            \@lines,
+            subset {
+                item '[  PASS  ]  job 1 +~buffered';
+                item '[  PASS  ]  job 1   +~nested';
+                item '[  PASS  ]  job 1   | + buffered ok';
+                item '[  PLAN  ]  job 1   | | Expected assertions: 1';
+                item '            job 1   | ^';
+                item '[  PLAN  ]  job 1   | Expected assertions: 1';
+                item '            job 1   ^';
+                item '[  PLAN  ]  job 1   Expected assertions: 1';
+            },
+            "Got the desired output"
+        );
     },
 );
 

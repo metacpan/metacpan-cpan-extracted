@@ -10,6 +10,7 @@ use_ok $_ for qw(
     App::Greple::xlate::gpt4o
     App::Greple::xlate::Cache
     App::Greple::xlate::Mask
+    App::Greple::xlate::Filter
 );
 
 done_testing;

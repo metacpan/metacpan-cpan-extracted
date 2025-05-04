@@ -1,0 +1,12 @@
+runtime:
+  requires:
+    perl: '5.006'
+    B::Keywords: '1.09'
+    Exporter: 0
+    PPI: '1.250'
+    Scalar::Util: 0
+test:
+  requires:
+    Test::More: '0.88'
+    Data::Dumper: 0
+    PPI::Dumper: 0

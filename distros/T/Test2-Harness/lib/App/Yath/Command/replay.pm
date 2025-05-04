@@ -2,22 +2,44 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use App::Yath::Options;
-require App::Yath::Command::test;
+use Test2::Harness::Util::File::JSONL;
 
-use parent 'App::Yath::Command';
-use Test2::Harness::Util::HashBase qw/+renderers <final_data <log_file <tests_seen <asserts_seen/;
+use parent 'App::Yath::Command::run';
+use Test2::Harness::Util::HashBase qw{
+    +renderers
+    <final_data
+    <log_file
+    <tests_seen
+    <asserts_seen
+};
+
+use Getopt::Yath;
 
 include_options(
-    'App::Yath::Options::Debug',
-    'App::Yath::Options::Display',
-    'App::Yath::Options::PreCommand',
+    'App::Yath::Options::Renderer',
 );
 
+include_options(
+    'App::Yath::Options::Renderer',
+);
 
-sub group { 'log' }
+option_group {group => 'run', category => "Run Options"} => sub {
+    option run_auditor => (
+        type => 'Scalar',
+        default => 'Test2::Harness::Collector::Auditor::Run',
+        normalize => sub { fqmod($_[0], 'Test2::Harness::Collector::Auditor::Run') },
+        description => 'Auditor class to use when auditing the overall test run',
+    );
+};
+
+sub load_renderers     { 1 }
+sub load_plugins       { 0 }
+sub load_resources     { 0 }
+sub args_include_tests { 0 }
+
+sub group { 'log parsing' }
 
 sub summary { "Replay a test run from an event log" }
 
@@ -35,20 +57,11 @@ command accepts.
     EOT
 }
 
-sub init {
-    my $self = shift;
-    $self->SUPER::init() if $self->can('SUPER::init');
-
-    $self->{+TESTS_SEEN}   //= 0;
-    $self->{+ASSERTS_SEEN} //= 0;
-}
-
 sub run {
     my $self = shift;
 
-    my $args      = $self->args;
-    my $settings  = $self->settings;
-    my $renderers = $self->App::Yath::Command::test::renderers;
+    my $args     = $self->args;
+    my $settings = $self->settings;
 
     shift @$args if @$args && $args->[0] eq '--';
 
@@ -56,18 +69,29 @@ sub run {
     die "'$self->{+LOG_FILE}' is not a valid log file" unless -f $self->{+LOG_FILE};
     die "'$self->{+LOG_FILE}' does not look like a log file" unless $self->{+LOG_FILE} =~ m/\.jsonl(\.(gz|bz2))?$/;
 
-    my $jobs = @$args ? {map {$_ => 1} @$args} : undef;
-
     my $stream = Test2::Harness::Util::File::JSONL->new(name => $self->{+LOG_FILE});
+    while (1) {
+        my ($e) = $stream->poll(max => 1);
+        die "Could not find run_id in log.\n" unless $e;
+
+        my $run_id = Test2::Harness::Event->new($e)->run_id or next;
+
+        $settings->run->create_option(run_id => $run_id);
+        last;
+    }
+
+    # Reset the stream
+    $stream = Test2::Harness::Util::File::JSONL->new(name => $self->{+LOG_FILE});
+
+    $self->start_plugins_and_renderers();
+
+    my $jobs = @$args ? {map {$_ => 1} @$args} : undef;
 
     while (1) {
         my @events = $stream->poll(max => 1000) or last;
 
         for my $e (@events) {
             last unless defined $e;
-
-            $self->{+TESTS_SEEN}++   if $e->{facet_data}->{harness_job_launch};
-            $self->{+ASSERTS_SEEN}++ if $e->{facet_data}->{assert};
 
             if ($jobs) {
                 my $f = $e->{facet_data}->{harness_job_start} // $e->{facet_data}->{harness_job_queued};
@@ -79,26 +103,16 @@ sub run {
                         last;
                     }
                 }
+
+                next unless $jobs->{$e->{job_id}};
             }
 
-            if (my $final = $e->{facet_data}->{harness_final}) {
-                $self->{+FINAL_DATA} = $final;
-            }
-            else {
-                next if $jobs && !$jobs->{$e->{job_id}};
-                $_->render_event($e) for @$renderers;
-            }
+            $self->handle_event($e);
         }
     }
 
-    $_->finish() for @$renderers;
-
-    my $final_data = $self->{+FINAL_DATA} or die "Log did not contain final data!\n";
-
-    $self->App::Yath::Command::test::render_final_data($final_data);
-    $self->App::Yath::Command::test::render_summary($final_data->{pass});
-
-    return $final_data->{pass} ? 0 : 1;
+    my $exit = $self->stop_plugins_and_renderers();
+    return $exit;
 }
 
 1;
@@ -126,287 +140,13 @@ command accepts.
 
 =head1 USAGE
 
-    $ yath [YATH OPTIONS] replay [COMMAND OPTIONS]
+    $ yath [YATH OPTIONS] replay [COMMAND OPTIONS] [COMMAND ARGUMENTS]
 
-=head2 YATH OPTIONS
+=head2 OPTIONS
 
-=head3 Developer
-
-=over 4
-
-=item --dev-lib
-
-=item --dev-lib=lib
-
-=item -D
-
-=item -D=lib
-
-=item -Dlib
-
-=item --no-dev-lib
-
-Add paths to @INC before loading ANYTHING. This is what you use if you are developing yath or yath plugins to make sure the yath script finds the local code instead of the installed versions of the same code. You can provide an argument (-Dfoo) to provide a custom path, or you can just use -D without and arg to add lib, blib/lib and blib/arch.
-
-Can be specified multiple times
-
-
-=back
-
-=head3 Environment
+=head3 Renderer Options
 
 =over 4
-
-=item --persist-dir ARG
-
-=item --persist-dir=ARG
-
-=item --no-persist-dir
-
-Where to find persistence files.
-
-
-=item --persist-file ARG
-
-=item --persist-file=ARG
-
-=item --pfile ARG
-
-=item --pfile=ARG
-
-=item --no-persist-file
-
-Where to find the persistence file. The default is /{system-tempdir}/project-yath-persist.json. If no project is specified then it will fall back to the current directory. If the current directory is not writable it will default to /tmp/yath-persist.json which limits you to one persistent runner on your system.
-
-
-=item --project ARG
-
-=item --project=ARG
-
-=item --project-name ARG
-
-=item --project-name=ARG
-
-=item --no-project
-
-This lets you provide a label for your current project/codebase. This is best used in a .yath.rc file. This is necessary for a persistent runner.
-
-
-=back
-
-=head3 Help and Debugging
-
-=over 4
-
-=item --show-opts
-
-=item --no-show-opts
-
-Exit after showing what yath thinks your options mean
-
-
-=item --version
-
-=item -V
-
-=item --no-version
-
-Exit after showing a helpful usage message
-
-
-=back
-
-=head3 Plugins
-
-=over 4
-
-=item --no-scan-plugins
-
-=item --no-no-scan-plugins
-
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
-
-
-=item --plugins PLUGIN
-
-=item --plugins +App::Yath::Plugin::PLUGIN
-
-=item --plugins PLUGIN=arg1,arg2,...
-
-=item --plugin PLUGIN
-
-=item --plugin +App::Yath::Plugin::PLUGIN
-
-=item --plugin PLUGIN=arg1,arg2,...
-
-=item -pPLUGIN
-
-=item --no-plugins
-
-Load a yath plugin.
-
-Can be specified multiple times
-
-
-=back
-
-=head2 COMMAND OPTIONS
-
-=head3 Cover Options
-
-=over 4
-
-=item --cover-aggregator ByTest
-
-=item --cover-aggregator ByRun
-
-=item --cover-aggregator +Custom::Aggregator
-
-=item --cover-agg ByTest
-
-=item --cover-agg ByRun
-
-=item --cover-agg +Custom::Aggregator
-
-=item --no-cover-aggregator
-
-Choose a custom aggregator subclass
-
-
-=item --cover-class ARG
-
-=item --cover-class=ARG
-
-=item --no-cover-class
-
-Choose a Test2::Plugin::Cover subclass
-
-
-=item --cover-dirs ARG
-
-=item --cover-dirs=ARG
-
-=item --cover-dir ARG
-
-=item --cover-dir=ARG
-
-=item --no-cover-dirs
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-exclude-private
-
-=item --no-cover-exclude-private
-
-
-
-
-=item --cover-files
-
-=item --no-cover-files
-
-Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
-
-
-=item --cover-from path/to/log.jsonl
-
-=item --cover-from http://example.com/coverage
-
-=item --cover-from path/to/coverage.jsonl
-
-=item --no-cover-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will not be run if the file/url is invalid.
-
-
-=item --cover-from-type json
-
-=item --cover-from-type jsonl
-
-=item --cover-from-type log
-
-=item --no-cover-from-type
-
-File type for coverage source. Usually it can be detected, but when it cannot be you should specify. "json" is old style single-blob coverage data, "jsonl" is the new by-test style, "log" is a logfile from a previous run.
-
-
-=item --cover-manager My::Coverage::Manager
-
-=item --no-cover-manager
-
-Coverage 'from' manager to use when coverage data does not provide one
-
-
-=item --cover-maybe-from path/to/log.jsonl
-
-=item --cover-maybe-from http://example.com/coverage
-
-=item --cover-maybe-from path/to/coverage.jsonl
-
-=item --no-cover-maybe-from
-
-This can be a test log, a coverage dump (old style json or new jsonl format), or a url to any of the previous. Tests will coninue if even if the coverage file/url is invalid.
-
-
-=item --cover-maybe-from-type json
-
-=item --cover-maybe-from-type jsonl
-
-=item --cover-maybe-from-type log
-
-=item --no-cover-maybe-from-type
-
-Same as "from_type" but for "maybe_from". Defaults to "from_type" if that is specified, otherwise auto-detect
-
-
-=item --cover-metrics
-
-=item --no-cover-metrics
-
-
-
-
-=item --cover-types ARG
-
-=item --cover-types=ARG
-
-=item --cover-type ARG
-
-=item --cover-type=ARG
-
-=item --no-cover-types
-
-NO DESCRIPTION - FIX ME
-
-Can be specified multiple times
-
-
-=item --cover-write
-
-=item --cover-write=coverage.jsonl
-
-=item --cover-write=coverage.json
-
-=item --no-cover-write
-
-Create a json or jsonl file of all coverage data seen during the run (This implies --cover-files).
-
-
-=back
-
-=head3 Display Options
-
-=over 4
-
-=item --color
-
-=item --no-color
-
-Turn color on, default is true if STDOUT is a TTY.
-
 
 =item --hide-runner-output
 
@@ -415,106 +155,56 @@ Turn color on, default is true if STDOUT is a TTY.
 Hide output from the runner, showing only test output. (See Also truncate_runner_output)
 
 
-=item --no-wrap
-
-=item --no-no-wrap
-
-Do not do fancy text-wrapping, let the terminal handle it
-
-
-=item --progress
-
-=item --no-progress
-
-Toggle progress indicators. On by default if STDOUT is a TTY. You can use --no-progress to disable the 'events seen' counter and buffered event pre-display
-
+=item -q
 
 =item --quiet
-
-=item -q
 
 =item --no-quiet
 
 Be very quiet.
-
-Can be specified multiple times
-
-
-=item --renderers +My::Renderer
-
-=item --renderers Renderer=arg1,arg2,...
-
-=item --renderer +My::Renderer
-
-=item --renderer Renderer=arg1,arg2,...
-
-=item --no-renderers
-
-Specify renderers, (Default: "Formatter=Test2"). Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Renderer::" will be prepended to your argument.
-
-Can be specified multiple times. If the same key is listed multiple times the value lists will be appended together.
-
-
-=item --show-times
-
-=item -T
-
-=item --no-show-times
-
-Show the timing data for each job
-
-
-=item --term-width 80
-
-=item --term-width 200
-
-=item --term-size 80
-
-=item --term-size 200
-
-=item --no-term-width
-
-Alternative to setting $TABLE_TERM_SIZE. Setting this will override the terminal width detection to the number of characters specified.
-
-
-=item --truncate-runner-output
-
-=item --no-truncate-runner-output
-
-Only show runner output that was generated after the current command. This is only useful with a persistent runner.
-
-
-=item --verbose
-
-=item -v
-
-=item --no-verbose
-
-Be more verbose
-
-Can be specified multiple times
-
-
-=back
-
-=head3 Formatter Options
-
-=over 4
-
-=item --formatter ARG
-
-=item --formatter=ARG
-
-=item --no-formatter
-
-NO DESCRIPTION - FIX ME
 
 
 =item --qvf
 
 =item --no-qvf
 
-[Q]uiet, but [V]erbose on [F]ailure. Hide all output from tests when they pass, except to say they passed. If a test fails then ALL output from the test is verbosely output.
+Replaces App::Yath::Theme::Default with App::Yath::Theme::QVF which is quiet for passing tests and verbose for failing ones.
+
+
+=item --renderer +My::Renderer
+
+=item --renderers +My::Renderer
+
+=item --renderer MyRenderer=opt1,opt2
+
+=item --renderers MyRenderer=opt1,opt2
+
+=item --renderer MyRenderer,MyOtherRenderer
+
+=item --renderers MyRenderer,MyOtherRenderer
+
+=item --renderer=:{ MyRenderer opt1,opt2,... }:
+
+=item --renderers=:{ MyRenderer opt1,opt2,... }:
+
+=item --renderer :{ MyRenderer :{ opt1 opt2 }: }:
+
+=item --renderers :{ MyRenderer :{ opt1 opt2 }: }:
+
+=item --no-renderers
+
+Specify renderers. Use "+" to give a fully qualified module name. Without "+" "App::Yath::Renderer::" will be prepended to your argument.
+
+Note: Can be specified multiple times
+
+
+=item --server
+
+=item --server=ARG
+
+=item --no-server
+
+Start an ephemeral yath database and web server to view results
 
 
 =item --show-job-end
@@ -538,6 +228,13 @@ Show the job configuration when a job starts. (Default: off, unless -vv)
 Show output for the start of a job. (Default: off unless -v)
 
 
+=item --show-run-fields
+
+=item --no-show-run-fields
+
+Show run fields. (Default: off, unless -vv)
+
+
 =item --show-run-info
 
 =item --no-show-run-info
@@ -545,160 +242,130 @@ Show output for the start of a job. (Default: off unless -v)
 Show the run configuration when a run starts. (Default: off, unless -vv)
 
 
+=item -T
+
+=item --show-times
+
+=item --no-show-times
+
+Show the timing data for each job.
+
+
+=item -tARG
+
+=item -t ARG
+
+=item -t=ARG
+
+=item --theme ARG
+
+=item --theme=ARG
+
+=item --no-theme
+
+Select a theme for the renderer (not all renderers use this)
+
+
+=item --truncate-runner-output
+
+=item --no-truncate-runner-output
+
+Only show runner output that was generated after the current command. This is only useful with a persistent runner.
+
+
+=item -v
+
+=item -vv
+
+=item -vvv..
+
+=item -v=COUNT
+
+=item --verbose
+
+=item --verbose=COUNT
+
+=item --no-verbose
+
+Be more verbose
+
+The following environment variables will be set after arguments are processed: C<T2_HARNESS_IS_VERBOSE>, C<HARNESS_IS_VERBOSE>
+
+Note: Can be specified multiple times, counter bumps each time it is used.
+
+
+=item --wrap
+
+=item --no-wrap
+
+When active (default) renderers should try to wrap text in a human-friendly way. When this is turned off they should just throw text at the terminal.
+
+
 =back
 
-=head3 Git Options
+=head3 Run Options
 
 =over 4
 
-=item --git-change-base master
+=item --run-auditor ARG
 
-=item --git-change-base HEAD^
+=item --run-auditor=ARG
 
-=item --git-change-base df22abe4
+=item --no-run-auditor
 
-=item --no-git-change-base
-
-Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
+Auditor class to use when auditing the overall test run
 
 
 =back
 
-=head3 Help and Debugging
+=head3 Terminal Options
 
 =over 4
 
-=item --dummy
+=item -c
 
-=item -d
+=item --color
 
-=item --no-dummy
+=item --no-color
 
-Dummy run, do not actually execute anything
+Turn color on, default is true if STDOUT is a TTY.
 
-Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
+Can also be set with the following environment variables: C<YATH_COLOR>, C<CLICOLOR_FORCE>
 
-
-=item --help
-
-=item -h
-
-=item --no-help
-
-exit after showing help information
+The following environment variables will be set after arguments are processed: C<YATH_COLOR>
 
 
-=item --interactive
+=item --progress
 
-=item -i
+=item --no-progress
 
-=item --no-interactive
-
-Use interactive mode, 1 test at a time, stdin forwarded to it
+Toggle progress indicators. On by default if STDOUT is a TTY. You can use --no-progress to disable the 'events seen' counter and buffered event pre-display
 
 
-=item --keep-dirs
+=item --term-size 80
 
-=item --keep_dir
+=item --term-width 80
 
-=item -k
+=item --term-size 200
 
-=item --no-keep-dirs
+=item --term-width 200
 
-Do not delete directories when done. This is useful if you want to inspect the directories used for various commands.
+=item --no-term-width
 
+Alternative to setting $TABLE_TERM_SIZE. Setting this will override the terminal width detection to the number of characters specified.
 
-=item --procname-prefix ARG
+Can also be set with the following environment variables: C<TABLE_TERM_SIZE>
 
-=item --procname-prefix=ARG
-
-=item --no-procname-prefix
-
-Add a prefix to all proc names (as seen by ps).
+The following environment variables will be set after arguments are processed: C<TABLE_TERM_SIZE>
 
 
 =back
 
-=head3 YathUI Options
-
-=over 4
-
-=item --yathui-api-key ARG
-
-=item --yathui-api-key=ARG
-
-=item --no-yathui-api-key
-
-Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
-
-
-=item --yathui-grace
-
-=item --no-yathui-grace
-
-If yath cannot connect to yath-ui it normally throws an error, use this to make it fail gracefully. You get a warning, but things keep going.
-
-
-=item --yathui-long-duration 10
-
-=item --no-yathui-long-duration
-
-Minimum duration length (seconds) before a test goes from MEDIUM to LONG
-
-
-=item --yathui-medium-duration 5
-
-=item --no-yathui-medium-duration
-
-Minimum duration length (seconds) before a test goes from SHORT to MEDIUM
-
-
-=item --yathui-mode summary
-
-=item --yathui-mode qvf
-
-=item --yathui-mode qvfd
-
-=item --yathui-mode complete
-
-=item --no-yathui-mode
-
-Set the upload mode (default 'qvfd')
-
-
-=item --yathui-project ARG
-
-=item --yathui-project=ARG
-
-=item --no-yathui-project
-
-The Yath-UI project for your test results
-
-
-=item --yathui-retry
-
-=item --no-yathui-retry
-
-How many times to try an operation before giving up
-
-Can be specified multiple times
-
-
-=item --yathui-url http://my-yath-ui.com/...
-
-=item --uri http://my-yath-ui.com/...
-
-=item --no-yathui-url
-
-Yath-UI url
-
-
-=back
 
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -718,12 +385,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2025 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
 

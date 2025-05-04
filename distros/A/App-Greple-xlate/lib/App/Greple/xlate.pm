@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.9909";
+our $VERSION = "0.9910";
 
 =encoding utf-8
 
@@ -10,20 +10,21 @@ App::Greple::xlate - translation support module for greple
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
 B<Greple> B<xlate> module find desired text blocks and replace them by
-the translated text.  Currently DeepL (F<deepl.pm>) and ChatGPT
-(F<gpt3.pm>) module are implemented as a back-end engine.
-Experimental support for gpt-4 and gpt-4o are also included.
+the translated text.  Currently DeepL (F<deepl.pm>) and ChatGPT 4.1
+(F<gpt4.pm>) module are implemented as a back-end engine.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use B<greple> command with C<xlate::deepl> and
@@ -182,7 +183,7 @@ At this time, the following engines are available
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -211,7 +212,7 @@ Specify the output format for original and translated text.
 
 The following formats other than C<xtxt> assume that the part to be
 translated is a collection of lines.  In fact, it is possible to
-translate only a portion of a line, and specifying a format other than
+translate only a portion of a line, but specifying a format other than
 C<xtxt> will not produce meaningful results.
 
 =over 4
@@ -323,6 +324,19 @@ restoration.
 =item B<--match-all>
 
 Set the whole text of the file as a target area.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+In the case of the C<cm> and C<colon> formats, the output is split and
+formatted line by line.  Therefore, if only a portion of a line is to
+be translated, the expected result cannot be obtained.  These filters
+fix output that is corrupted by translating part of a line into normal
+line-by-line output.
+
+In the current implementation, if multiple parts of a line are
+translated, they are output as independent lines.
 
 =back
 
@@ -444,7 +458,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 
@@ -842,6 +856,12 @@ option --xlate-stripe-light -Mstripe
 option --xlate-stripe-dark  -Mstripe::config=darkmode
 option --xlate-stripe-auto \
 	-Mtermcolor::bg(light=-Mstripe,dark=-Mstripe::config=darkmode)
+
+option --lineify-cm \
+	-Mxlate::Filter --of &lineify_cm
+
+option --lineify-colon \
+	-Mxlate::Filter --of &lineify_colon
 
 #  LocalWords:  deepl ifdef unifdef Greple greple perl DeepL ChatGPT
 #  LocalWords:  gpt html img src xlabor

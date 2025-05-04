@@ -2,9 +2,9 @@ package Test2::Tools::HarnessTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use Test2::Harness::Util::UUID qw/gen_uuid/;
+use Test2::Util::UUID qw/gen_uuid/;
 
 use App::Yath::Tester qw/make_example_dir/;
 
@@ -21,8 +21,13 @@ sub summarize_events {
     my $run_id = "run-$id";
     my $job_id = "job-$id";
 
-    require Test2::Harness::Auditor::Watcher;
-    my $watcher = Test2::Harness::Auditor::Watcher->new(job => 1, try => 0);
+    require Test2::Harness::Collector::Auditor::Job;
+    my $watcher = Test2::Harness::Collector::Auditor::Job->new(
+        run_id  => $run_id,
+        job_id  => $job_id,
+        job_try => 0,
+        file    => $id,
+    );
 
     require Test2::Harness::Event;
     for my $e (@$events) {
@@ -36,7 +41,7 @@ sub summarize_events {
             job_try    => 0,
         );
 
-        $watcher->process($he);
+        $watcher->audit($he);
     }
 
     return {
@@ -149,7 +154,7 @@ This is re-exported from L<App::Yath::Tester>.
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -169,11 +174,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

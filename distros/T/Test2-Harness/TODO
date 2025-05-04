@@ -1,0 +1,46 @@
+Yath:
+ * Improve test coverage
+ * Use Module::Refresh for in-place reloading
+  * (Fix Moose reloading)
+ * Use YAMLScript for config files?
+ * Improve coverage plugin to catch nested perl calls inside tests
+ + Audit Commands
+ + Audit Plugins
+ + Audit Renderers
+
+Server:
+ * Add export button to export a dump that can be loaded into another db
+ * Add user-project associations (owner and maintainers)
+ * Audit user settings
+ * Custom views
+  * Global custom views
+ * Pager for dashboards
+ * Pause authentication?
+ * Security Audit
+ * Single-page?
+ * User creation?
+ * Verify coverage data link works (it does not via wget?)
+ * Verify log download where applicable
+ * Verify upload via API key
+ * refresh interval instead of steady connection
+ * Better way to see retried jobs (instead of each try having its own row)
+ * When showing jobs, show more of the name (Maybe add a current dir to the run, and strip it from the display?)
+  * Add an expand all option to expand the filenames?
+ * Coverage navigator
+ * Do not show/allow delete or reports when not logged in (single user is logged in)
+ * Make sure upload controller requires login (except in single-user)
+ * Audit user page
+ * Fix email
+ * Fix permissions
+ * Remove time based durations, only use sorted by duration (median)
+ * WebClient plugin (same as DB plugin but using web interfaces instead of db interface)
+
+Database
+ * Ask Ilamri for another look at the schema
+
+Console:
+ * Write it
+
+=====
+DONE!
+

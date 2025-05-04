@@ -9,6 +9,8 @@ use Test2::Harness::Util::File::JSONL;
 
 use Test2::Harness::Util       qw/clean_path/;
 use Test2::Harness::Util::JSON qw/decode_json/;
+use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
+
 
 my $dir = __FILE__;
 $dir =~ s{\.t$}{}g;
@@ -56,10 +58,9 @@ yath(
     test => sub {
         my $out = shift;
 
-        like($out->{output}, qr/No tests were seen!/, "Got error message");
+        like($out->{output}, qr/Nothing to do, no tests to run!/, "Got error message");
     },
 );
-
 
 note q[Checking --exclude-file option when a file is provided on the command line];
 
@@ -229,7 +230,7 @@ if ("$]" >= 5.026) {
     note q[Checking %INC and @INC setup];
 
     local @INC =  map { clean_path( $_ ) } grep { $_ ne '.' } @INC;
-    local $ENV{PERL5LIB} = join $Config{path_sep}, map { clean_path( $_ ) } grep { $_ ne '.' } split( $Config{path_sep}, $ENV{PERL5LIB} );
+    local $ENV{PERL5LIB} = join $Config{path_sep}, map { clean_path( $_ ) } grep { $_ ne '.' } split( $Config{path_sep}, $ENV{PERL5LIB} // '' );
     local $ENV{PERL_USE_UNSAFE_INC};
     delete $ENV{PERL_USE_UNSAFE_INC};
 

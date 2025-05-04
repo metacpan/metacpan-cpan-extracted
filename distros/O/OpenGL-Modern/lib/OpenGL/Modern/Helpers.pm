@@ -1,9 +1,7 @@
 package    # not an official package
   OpenGL::Modern::Helpers;
 
-# Update version number with each change
-our $VERSION = '0.03_01';
-$VERSION = eval $VERSION;
+our $VERSION = '0.0401';
 
 use strict;
 use Exporter 'import';
@@ -20,18 +18,18 @@ use OpenGL::Modern qw(
   GL_OUT_OF_MEMORY
   GL_TABLE_TOO_LARGE
   GL_VERSION
+  glGenTextures_p
+  glGenFramebuffers_p
+  glGenVertexArrays_p
+  glGenBuffers_p
   glGetString
   glGetError
   glGetShaderInfoLog_c
   glGetProgramInfoLog_c
-  glGenTextures_c
   glGetProgramiv_c
   glGetShaderiv_c
-  glShaderSource_c
-  glGenFramebuffers_c
-  glGenVertexArrays_c
-  glGenBuffers_c
   glGetIntegerv_c
+  glShaderSource_c
   glBufferData_c
   glUniform2f
   glUniform4f
@@ -56,7 +54,7 @@ use from perl.
 
 OpenGL::Modern is an XS module providings bindings to the
 C OpenGL library for graphics.  As such, it needs to handle
-conversion of input arguements from perl into the required
+conversion of input arguments from perl into the required
 datatypes for the C OpenGL API, it then calls the OpenGL
 routine, and then converts the return value (if any) from
 the C API datatype into an appropriate Perl type.
@@ -143,10 +141,7 @@ a final version of Helpers.pm will be released.
 
 =cut
 
-use vars qw(@EXPORT_OK $VERSION %glErrorStrings);
-$VERSION = '0.01_02';
-
-@EXPORT_OK = qw(
+our @EXPORT_OK = qw(
   pack_GLuint
   pack_GLfloat
   pack_GLdouble
@@ -174,7 +169,7 @@ $VERSION = '0.01_02';
   glUniform4f_p
 );
 
-%glErrorStrings = (
+our %glErrorStrings = (
     GL_NO_ERROR()          => 'No error has been recorded.',
     GL_INVALID_ENUM()      => 'An unacceptable value is specified for an enumerated argument.',
     GL_INVALID_VALUE()     => 'A numeric argument is out of range.',
@@ -281,14 +276,6 @@ sub gen_thing_p {
     my @ids = unpack 'I*', $new_ids;
     return wantarray ? @ids : $ids[0];
 }
-
-sub glGenTextures_p { gen_thing_p \&glGenTextures_c, @_ }
-
-sub glGenFramebuffers_p { gen_thing_p \&glGenFramebuffers_c, @_ }
-
-sub glGenVertexArrays_p { gen_thing_p \&glGenVertexArrays_c, @_ }
-
-sub glGenBuffers_p { gen_thing_p \&glGenBuffers_c, @_ }
 
 sub get_iv_p {
     my ( $call, $id, $pname, $count ) = @_;

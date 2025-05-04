@@ -6,17 +6,19 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-De module B<Greple> B<xlate> vindt de gewenste tekstblokken en vervangt ze door de vertaalde tekst. Momenteel zijn DeepL (F<deepl.pm>) en ChatGPT (F<gpt3.pm>) module geïmplementeerd als een back-end engine. Experimentele ondersteuning voor gpt-4 en gpt-4o zijn ook inbegrepen.
+B<Greple> B<xlate> module vindt de gewenste tekstblokken en vervangt ze door de vertaalde tekst. Momenteel zijn DeepL (F<deepl.pm>) en ChatGPT 4.1 (F<gpt4.pm>) module geïmplementeerd als back-end engine.
 
 Als je normale tekstblokken wilt vertalen in een document dat geschreven is in de pod-stijl van Perl, gebruik dan het commando B<greple> met de module C<xlate::deepl> en C<perl> als volgt:
 
@@ -126,7 +128,7 @@ Op dit moment zijn de volgende engines beschikbaar
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ Geef de doeltaal op. U kunt de beschikbare talen krijgen met het commando C<deep
 
 Specificeer het uitvoerformaat voor originele en vertaalde tekst.
 
-De volgende indelingen anders dan C<xtxt> gaan ervan uit dat het te vertalen deel een verzameling regels is. In feite is het mogelijk om slechts een deel van een regel te vertalen, en het specificeren van een ander formaat dan C<xtxt> zal geen zinvolle resultaten opleveren.
+De volgende indelingen anders dan C<xtxt> gaan ervan uit dat het te vertalen deel een verzameling regels is. In feite is het mogelijk om slechts een deel van een regel te vertalen, maar het specificeren van een andere opmaak dan C<xtxt> zal geen zinvolle resultaten opleveren.
 
 =over 4
 
@@ -242,6 +244,14 @@ Voer de maskeerfunctie uit en geef de geconverteerde tekst weer zoals hij is, zo
 =item B<--match-all>
 
 Stel de hele tekst van het bestand in als doelgebied.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+In het geval van de C<cm> en C<colon> opmaak wordt de uitvoer regel voor regel opgesplitst en opgemaakt. Daarom kan het verwachte resultaat niet worden verkregen als slechts een deel van een regel moet worden vertaald. Deze filters herstellen uitvoer die beschadigd is door het vertalen van een deel van een regel naar normale regel-voor-regel uitvoer.
+
+In de huidige implementatie, als meerdere delen van een regel worden vertaald, worden ze uitgevoerd als onafhankelijke regels.
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

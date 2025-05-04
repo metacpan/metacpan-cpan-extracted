@@ -5,6 +5,8 @@ use File::Spec;
 
 use App::Yath::Tester qw/yath/;
 use Test2::Harness::Util::File::JSONL;
+use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
+
 
 use Test2::Harness::Util::JSON qw/decode_json/;
 
@@ -14,10 +16,10 @@ $dir =~ s{^\./}{};
 
 sub clean_output {
     my $out = shift;
-
     $out->{output} =~ s/^.*duration.*$//m;
     $out->{output} =~ s/^.*Wrote log file:.*$//m;
     $out->{output} =~ s/^.*Symlinked to:.*$//m;
+    $out->{output} =~ s/^.*Linked log file:.*$//m;
     $out->{output} =~ s/^\s*Wall Time:.*seconds//m;
     $out->{output} =~ s/^\s*CPU Time:.*s\)//m;
     $out->{output} =~ s/^\s*CPU Usage:.*%//m;
@@ -25,6 +27,22 @@ sub clean_output {
     $out->{output} =~ s/^\s+$//m;
     $out->{output} =~ s/\n+/\n/g;
     $out->{output} =~ s/^\s+//mg;
+    $out->{output} =~ s/\e\[0m//mg;
+
+    # Can remove this once the fixme is removed
+    $out->{output} =~ s/^FIXME: publish should send log to server$//gm;
+
+    my @lines;
+    my $start;
+    for my $line (split /\n/, $out->{output}) {
+        $start++ if $line =~ m/^(\[|\()/;
+
+        next unless $start;
+
+        push @lines => $line;
+    }
+
+    $out->{output} = join "\n" => @lines;
 }
 
 my $out1 = yath(

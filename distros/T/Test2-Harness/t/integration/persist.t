@@ -1,10 +1,13 @@
 use Test2::V0;
+# HARNESS-DURATION-LONG
 
 use File::Temp qw/tempdir/;
 use File::Spec;
 
 use App::Yath::Tester qw/yath/;
 use Test2::Harness::Util::File::JSONL;
+use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
+
 
 use Test2::Harness::Util::JSON qw/decode_json/;
 
@@ -14,6 +17,9 @@ skip_all "This test is not run under automated testing"
 my $dir = __FILE__;
 $dir =~ s{\.t$}{}g;
 $dir =~ s{^\./}{};
+
+my $pid = $$;
+END { yath(command => 'kill') if $pid == $$ }
 
 yath(command => 'start', exit => 0);
 
@@ -27,7 +33,6 @@ yath(
         like($out->{output}, qr{PASSED.*pass\.tx}, "'pass.tx' was not seen as a failure when reading the output");
     },
 );
-
 
 yath(
     command => 'run',
@@ -45,9 +50,8 @@ yath(
     exit    => 0,
     test    => sub {
         my $out = shift;
-        like($out->{output}, qr/^\s*Found: .*yath-persist\.json$/m, "Found the persist file");
-        like($out->{output}, qr/^\s*PID: /m,                        "Found the PID");
-        like($out->{output}, qr/^\s*Dir: /m,                        "Found the Dir");
+        like($out->{output}, qr/Found a persistent runner/, "Found the persistant runner");
+        like($out->{output}, qr/peer_pid: /m,               "Found the PID");
     },
 );
 
@@ -57,10 +61,6 @@ yath(
     command => 'watch',
     args    => ['STOP'],
     exit    => 0,
-    test    => sub {
-        my $out = shift;
-        like($out->{output}, qr{yath-nested-runner \(default\) Runner caught SIGHUP, reloading}, "Reloaded runner");
-    },
 );
 
 yath(
@@ -82,7 +82,7 @@ yath(
     test => sub {
         my $out = shift;
 
-        like($out->{output}, qr/No tests were seen!/, "Got error message");
+        like($out->{output}, qr/Nothing to do, no tests to run!/, "Got error message");
     },
 );
 
@@ -93,7 +93,7 @@ yath(
     exit    => 0,
     test    => sub {
         my $out = shift;
-        like($out->{output}, qr/No persistent harness was found for the current path\./, "No active runner");
+        like($out->{output}, qr/No persistent harness was found/, "No active runner");
     },
 );
 

@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Role::Regenerator;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 our $AUTHORITY = 'cpan:DBOOK'; # AUTHORITY
 
@@ -40,7 +40,7 @@ Dist::Zilla::Role::Regenerator - A package which can regenerate source files
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 SYNOPSIS
 

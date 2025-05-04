@@ -1,35 +1,37 @@
-.perltidyrc
 Changes
-MANIFEST			This list of files
-MANIFEST.SKIP
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
-Makefile.PL
-Modern.xs
-README.md
-cpanfile
 gl_errors.h
+glew-context.c
+glew.c
 include/GL/eglew.h
 include/GL/glew.h
 include/GL/glxew.h
 include/GL/wglew.h
 lib/OpenGL/Modern.pm
+lib/OpenGL/Modern.pod
+lib/OpenGL/Modern.xs
+lib/OpenGL/Modern/Const.pm
+lib/OpenGL/Modern/Const.xs
 lib/OpenGL/Modern/Helpers.pm
 lib/OpenGL/Modern/ImageHack.pm
-lib/OpenGL/Modern/NameLists/MakefileAll.pm
-lib/OpenGL/Modern/NameLists/Modern.pm
+lib/OpenGL/Modern/Registry.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
 ppport.h
-src/glew-context.c
-src/glew.c
-src/glewinfo.c
-src/visualinfo.c
+README.md
 t/00-report-prereqs.t
 t/00_basic.t
 t/01_context.t
 t/02_auto_error_check.t
-t/02_glGetShaderInfoLog.t
 t/02_glew_version_accessors.t
-t/0999_tidy.t
-t/lib/PerlTidyCheck.pm
+t/02_glGetShaderInfoLog.t
 typemap
+utils/aliases.txt
+utils/common.pl
+utils/feature-reuse.txt
+utils/generate-registry.pl
 utils/generate-XS.pl
+utils/len-args.txt
+utils/removed.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9910 2025-05-03T11:09:27Z
+
+    - use gpt4.1 as gpt4 engine
+    - update prompt for ChatGPT to improve translation quality
+    - introduce -Mxlate::Filter module
+    - requires perl v5.26
+
 0.9909 2025-04-16T08:51:03Z
 
     - make sure to use GNU Make

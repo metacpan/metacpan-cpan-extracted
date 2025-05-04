@@ -1,0 +1,13 @@
+runtime:
+  requires:
+    perl: '5.006'
+    EV: '4.0'
+    POE: '1.366'
+configure:
+  requires:
+    POE::Test::Loops: '1.360'
+    File::Spec: 0
+test:
+  requires:
+    POE::Test::Loops: '1.360'
+    Test::More: '0.88'

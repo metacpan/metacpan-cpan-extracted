@@ -1,5 +1,6 @@
 use Test2::V0;
 use Test2::Require::AuthorTesting;
+# HARNESS-DURATION-LONG
 
 use File::Temp qw/tempdir/;
 use File::Spec;
@@ -9,6 +10,8 @@ use Test2::Harness::Util::File::JSONL;
 use Test2::Harness::Util qw/clean_path/;
 
 use Test2::Harness::Util::JSON qw/decode_json/;
+
+use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
 
 use Test2::Util qw/CAN_REALLY_FORK/;
 skip_all "Cannot fork, skipping preload test"
@@ -26,7 +29,7 @@ package Preload;
 use strict;
 use warnings;
 
-use Test2::Harness::Runner::Preload;
+use Test2::Harness::Preload;
 
 stage A => sub {
     default();
@@ -43,7 +46,6 @@ sub touch {
     my ($inject) = @_;
     my $path = "$tmpdir/Preload/Flux.pm";
     note "Touching $path...";
-    sleep 1;
 
     open(my $fh, '>', $path) or die $!;
 
@@ -61,7 +63,7 @@ $inject
 
     close($fh);
 
-    sleep 2;
+    sleep 5;
 }
 
 touch('$Preload::Flux::VAR = "initial";');
@@ -70,8 +72,19 @@ yath(
     command => 'start',
     pre     => ["-D$tmpdir"],
     args    => ["-I$tmpdir", '-PPreload'],
-    debug   => 2,
     exit    => 0,
+);
+
+yath(
+    command => 'status',
+    test    => sub {
+        my $out = shift;
+        like(
+            $out->{output},
+            qr{A\s*\|\s*UP},
+            "Stage A is UP"
+        );
+    },
 );
 
 yath(
@@ -83,12 +96,30 @@ yath(
 touch('$Preload::Flux::VAR = "Syntax Error $bob";');
 
 yath(
-    command => 'run',
-    args => [$tx], # no arg, so undef
-    exit => 0,
+    command => 'status',
+    test    => sub {
+        my $out = shift;
+        like(
+            $out->{output},
+            qr{A\s*\|\s*DOWN},
+            "Stage A is DOWN"
+        );
+    },
 );
 
 touch('$Preload::Flux::VAR = "fixed";');
+
+yath(
+    command => 'status',
+    test    => sub {
+        my $out = shift;
+        like(
+            $out->{output},
+            qr{A\s*\|\s*UP},
+            "Stage A is UP"
+        );
+    },
+);
 
 yath(
     command => 'run',

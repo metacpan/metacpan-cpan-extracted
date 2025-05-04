@@ -2,318 +2,108 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
-use List::Util qw/min/;
 use Test2::Util qw/IS_WIN32/;
-use App::Yath::Util qw/find_in_updir/;
-use Test2::Harness::Util qw/clean_path mod2file/;
-use Test2::Harness::Util::UUID qw/gen_uuid/;
-use File::Spec;
 
-use App::Yath::Options;
+use Test2::Harness::Util qw/mod2file fqmod clean_path/;
 
-my $DEFAULT_COVER_ARGS = '-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl';
+use Getopt::Yath;
 
-option_group {prefix => 'runner', category => "Runner Options"} => sub {
-    option use_fork => (
-        alt         => ['fork'],
-        description => "(default: on, except on windows) Normally tests are run by forking, which allows for features like preloading. This will turn off the behavior globally (which is not compatible with preloading). This is slower, it is better to tag misbehaving tests with the '# HARNESS-NO-PRELOAD' comment in their header to disable forking only for those tests.",
-        env_vars => [qw/!T2_NO_FORK T2_HARNESS_FORK !T2_HARNESS_NO_FORK YATH_FORK !YATH_NO_FORK/],
-        default     => sub {
-            return 0 if IS_WIN32;
-            return 1;
-        },
-    );
+include_options(
+    'App::Yath::Options::Tests',
+);
 
-    option abort_on_bail => (
-        type => 'b',
-        default => 1,
-        description => "Abort all testing if a bail-out is encountered (default: on)",
-    );
-
-    option use_timeout => (
-        alt         => ['timeout'],
-        description => "(default: on) Enable/disable timeouts",
-        default     => 1,
-    );
-
-    option shared_jobs_config => (
-        type => 's',
-        description => 'Where to look for a shared slot config file. If a filename with no path is provided yath will search the current and all parent directories for the name.',
-        default => '.sharedjobslots.yml',
-        long_examples => [ ' .sharedjobslots.yml', ' relative/path/.sharedjobslots.yml', ' /absolute/path/.sharedjobslots.yml' ],
-    );
-
-    post \&jobs_post_process;
-    option job_count => (
-        type           => 's',
-        short          => 'j',
-        alt            => ['jobs'],
-        description    => 'Set the number of concurrent jobs to run. Add a :# if you also wish to designate multiple slots per test. 8:2 means 8 slots, but each test gets 2 slots, so 4 tests run concurrently. Tests can find their concurrency assignemnt in the "T2_HARNESS_MY_JOB_CONCURRENCY" environment variable.',
-        env_vars       => [qw/YATH_JOB_COUNT T2_HARNESS_JOB_COUNT HARNESS_JOB_COUNT/],
-        clear_env_vars => 1,
-        long_examples  => [' 4', ' 8:2'],
-        short_examples => ['4', '8:2'],
-
-        action => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings, $handler) = @_;
-
-            my ($jobs, $slots) = split /:/, $norm;
-
-            $$slot = $jobs;
-
-            $settings->runner->slots_per_job($slots) if defined $slots;
-
-            fix_job_resources($settings);
-        },
-    );
-
-    option slots_per_job => (
-        type => 's',
-        short => 'x',
-        description => "This sets the number of slots each job will use (default 1). This is normally set by the ':#' in '-j#:#'.",
-        env_vars => ['T2_HARNESS_JOB_CONCURRENCY'],
-        clear_env_vars => 1,
-        long_examples => [' 2'],
-        short_examples => ['2'],
-    );
-
-    option dump_depmap => (
-        type => 'b',
-        description => "When using staged preload, dump the depmap for each stage as json files",
-        default => 0,
-    );
-
-    option includes => (
-        name        => 'include',
-        short       => 'I',
-        type        => 'm',
-        description => "Add a directory to your include paths",
-    );
-
-    option resources => (
-        name => 'resource',
-        short => 'R',
-        type => 'm',
-        description => "Use a resource module to assign resource assignments to individual tests",
-        long_examples  => [' Port', ' +Test2::Harness::Runner::Resource::Port'],
-        short_examples => [' Port'],
-
-        normalize => sub {
-            my $val = shift;
-
-            $val = "Test2::Harness::Runner::Resource::$val"
-            unless $val =~ s/^\+//;
-
-            return $val;
-        },
-    );
-
-    option tlib => (
-        description => "(Default: off) Include 't/lib' in your module path",
-        default     => 0,
-        action => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings, $handler) = @_;
-            push @{$settings->runner->includes} => File::Spec->catdir('t', 'lib');
-        },
-    );
-
-    option lib => (
-        short => 'l',
-        description => "(Default: include if it exists) Include 'lib' in your module path",
-        default     => 1,
-        action => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings, $handler) = @_;
-            push @{$settings->runner->includes} => 'lib';
-            $settings->runner->lib(0);
-            $settings->runner->blib(0);
-        },
-    );
-
-    option blib => (
-        short => 'b',
-        description => "(Default: include if it exists) Include 'blib/lib' and 'blib/arch' in your module path",
-        default     => 1,
-        action => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings, $handler) = @_;
-
-            push @{$settings->runner->includes} => (
-                File::Spec->catdir('blib', 'lib'),
-                File::Spec->catdir('blib', 'arch'),
-            );
-
-            $settings->runner->lib(0);
-            $settings->runner->blib(0);
-        },
-    );
-
-    option unsafe_inc => (
-        description => "perl is removing '.' from \@INC as a security concern. This option keeps things from breaking for now.",
-        env_vars    => [qw/PERL_USE_UNSAFE_INC/],
-        default     => 0,
+option_group {group => 'runner', category => "Runner Options"} => sub {
+    option preload_early => (
+        type => 'Map',
+        description => 'Preload a module when spawning perl to launch the preload stages, before any other preload.',
     );
 
     option preloads => (
-        type        => 'm',
-        alt         => ['preload'],
-        short       => 'P',
+        type  => 'List',
+        alt   => ['preload'],
+        short => 'P',
+
         description => 'Preload a module before running tests',
     );
 
-    option preload_threshold => (
-        short => 'W',
-        alt => ['Pt'],
-        type => 's',
-        default => 0,
-        description => "Only do preload if at least N tests are going to be run. In some cases a full preload takes longer than simply running the tests, this lets you specify a minimum number of test jobs that will be run for preload to happen. This has no effect for a persistent runner. The default is 0, and it means always preload."
+    option preload_retry_delay => (
+        type => 'Scalar',
+        default => 5,
+        description => "Time in seconds to wait before trying to load a preload/stage after a failed attempt",
     );
 
-    option nytprof => (
-        type => 'b',
-        description => "Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.",
-        long_examples => [''],
-    );
+    option class => (
+        name    => 'runner',
+        field   => 'class',
+        type    => 'Scalar',
 
-    post \&cover_post_process;
-    option cover => (
-        type        => 'd',
-        description => "Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: $DEFAULT_COVER_ARGS",
-        long_examples => ['', '=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl'],
-        action      => sub {
-            my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
+        default => sub {
+            my ($opt, $settings) = @_;
 
-            return $$slot = $DEFAULT_COVER_ARGS if $norm eq '1';
-            return $$slot = $norm;
+            return 'Test2::Harness::Runner' if IS_WIN32;
+            return 'Test2::Harness::Runner::Preloading' if @{$settings->runner->preloads // []};
+            return 'Test2::Harness::Runner';
         },
+
+        mod_adds_options => 1,
+        long_examples    => [' MyRunner', ' +Test2::Harness::Runner::MyRunner'],
+        description      => 'Specify what Runner subclass to use. Use the "+" prefix to specify a fully qualified namespace, otherwise Test2::Harness::Runner::XXX namespace is assumed.',
+
+        normalize => sub { fqmod($_[0], 'Test2::Harness::Runner') },
     );
 
-    option switch => (
-        field        => 'switches',
-        short        => 'S',
-        type         => 'm',
-        description  => 'Pass the specified switch to perl for each test. This is not compatible with preload.',
+    option dump_depmap => (
+        type        => 'Bool',
+        default     => 0,
+        description => "When using staged preload, dump the depmap for each stage as json files",
     );
 
-    option event_timeout => (
-        alt => ['et'],
-
-        type => 's',
-        default => 60,
-
-        long_examples  => [' SECONDS'],
-        short_examples => [' SECONDS'],
-        description    => 'Kill test if no output is received within timeout period. (Default: 60 seconds). Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis. This prevents a hung test from running forever.',
+    option reload_in_place => (
+        type        => 'Bool',
+        alt         => ['reload'],
+        default     => 0,
+        description => "Reload modules in-place when possible (Not recommended)",
     );
 
-    option post_exit_timeout => (
-        alt => ['pet'],
+    option reloader => (
+        type => 'Auto',
 
-        type => 's',
-        default => 15,
+        autofill  => 'Test2::Harness::Reloader',
+        normalize => sub { fqmod($_[0], 'Test2::Harness::Reloader') },
 
-        long_examples  => [' SECONDS'],
-        short_examples => [' SECONDS'],
-        description    => 'Stop waiting post-exit after the timeout period. (Default: 15 seconds) Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exits it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.'
+        description => "Use a reloader (default Test2::Harness::Reloader) to detect module changes, and reload stages as necessary.",
     );
 
-    option runner_id => (
-        type => 's',
-        default => sub { gen_uuid() },
-        description => 'Runner ID (usually a generated uuid)',
+    option restrict_reload => (
+        type => 'AutoList',
+        normalize => sub { clean_path($_[0]) },
+        autofill => sub {
+            my ($opt, $settings) = @_;
+
+            require Test2::Harness::TestSettings;
+            my $ts = Test2::Harness::TestSettings->new($settings->tests->all);
+
+            return map { clean_path($_) } @{$ts->includes};
+        },
     );
 };
 
-sub jobs_post_process {
-    my %params   = @_;
-    my $settings = $params{settings};
+option_post_process \&runner_post_process;
 
-    my $runner = $settings->runner or return;
+sub runner_post_process {
+    my ($options, $state) = @_;
 
-    fix_job_resources($settings);
+    my $settings = $state->{settings};
+    my $runner   = $settings->runner;
+    my $tests    = $settings->tests;
 
-    $ENV{T2_HARNESS_MY_JOB_COUNT}           = $runner->job_count;
-    $ENV{T2_HARNESS_MY_MAX_JOB_CONCURRENCY} = $runner->slots_per_job;
-}
-
-sub fix_job_resources {
-    my ($settings) = @_;
-
-    my $runner = $settings->runner;
-
-    require Test2::Harness::Runner::Resource::SharedJobSlots::Config;
-    my $sconf = Test2::Harness::Runner::Resource::SharedJobSlots::Config->find(settings => $settings);
-
-    my %found;
-    for my $r (@{$runner->resources}) {
-        require(mod2file($r));
-        next unless $r->job_limiter;
-        $found{$r}++;
-    }
-
-    if ($sconf && !$found{'Test2::Harness::Runner::Resource::SharedJobSlots'} && !$sconf->disabled) {
-        if (delete $found{'Test2::Harness::Runner::Resource::JobCount'}) {
-            @{$settings->runner->resources} = grep { $_ ne 'Test2::Harness::Runner::Resource::JobCount' } @{$runner->resources};
-        }
-
-        if (!keys %found) {
-            require Test2::Harness::Runner::Resource::SharedJobSlots;
-            unshift @{$runner->resources} => 'Test2::Harness::Runner::Resource::SharedJobSlots';
-            $found{'Test2::Harness::Runner::Resource::SharedJobSlots'}++;
-        }
-    }
-    elsif (!keys %found) {
-        require Test2::Harness::Runner::Resource::JobCount;
-        unshift @{$runner->resources} => 'Test2::Harness::Runner::Resource::JobCount';
-    }
-
-    if ($found{'Test2::Harness::Runner::Resource::SharedJobSlots'} && $sconf) {
-        $runner->field(job_count     => $sconf->default_slots_per_run || $sconf->max_slots_per_run) if $runner && !$runner->job_count;
-        $runner->field(slots_per_job => $sconf->default_slots_per_job || $sconf->max_slots_per_job) if $runner && !$runner->slots_per_job;
-
-        my $run_slots = $runner->job_count;
-        my $job_slots = $runner->slots_per_job;
-
-        die "Requested job count ($run_slots) exceeds the system shared limit (" . $sconf->max_slots_per_run . ").\n"
-            if $run_slots > $sconf->max_slots_per_run;
-
-        die "Requested job concurrency ($job_slots) exceeds the system shared limit (" . $sconf->max_slots_per_job . ").\n"
-            if $job_slots > $sconf->max_slots_per_job;
-    }
-
-    $runner->field(job_count     => 1) if $runner && !$runner->job_count;
-    $runner->field(slots_per_job => 1) if $runner && !$runner->slots_per_job;
-
-    my $run_slots = $runner->job_count;
-    my $job_slots = $runner->slots_per_job;
-
-    die "The slots_per_job (set to $job_slots) must not be larger than the job_count (set to $run_slots).\n" if $job_slots > $run_slots;
-}
-
-sub cover_post_process {
-    my %params   = @_;
-    my $settings = $params{settings};
-
-    if ($ENV{T2_DEVEL_COVER} && !$settings->runner->cover) {
-        $settings->runner->field(cover => $ENV{T2_DEVEL_COVER} eq '1' ? $ENV{T2_DEVEL_COVER} : $DEFAULT_COVER_ARGS);
-    }
-
-    return unless $settings->runner->cover;
-
-    # For nested things
-    $ENV{T2_NO_FORK} = 1;
-    $ENV{T2_DEVEL_COVER} = $settings->runner->cover;
-    $settings->runner->field(use_fork => 0);
-
-    return unless $settings->check_prefix('run');
-    push @{$settings->run->load_import->{'@'}} => 'Devel::Cover';
-    $settings->run->load_import->{'Devel::Cover'} = [split(/,/, $settings->runner->cover)];
-}
-
-1;
+    warn "WARNING: Combining preload and switches will render preloads useless...\n"
+        if @{$runner->preloads // []} && @{$tests->switches // []};
+};
 
 __END__
-
 
 =pod
 
@@ -321,34 +111,158 @@ __END__
 
 =head1 NAME
 
-App::Yath::Options::Runner - Runner options for Yath.
+App::Yath::Options::Runner - FIXME
 
 =head1 DESCRIPTION
 
-This is where command line options for the runner are defined.
+=head1 SYNOPSIS
 
 =head1 PROVIDED OPTIONS
 
-=head2 COMMAND OPTIONS
-
-=head3 Runner Options
+=head2 Runner Options
 
 =over 4
 
-=item --abort-on-bail
+=item --dump-depmap
 
-=item --no-abort-on-bail
+=item --no-dump-depmap
 
-Abort all testing if a bail-out is encountered (default: on)
+When using staged preload, dump the depmap for each stage as json files
 
 
-=item --blib
+=item --preload-early key=val
+
+=item --preload-early=key=val
+
+=item --preload-early '{"json":"hash"}'
+
+=item --preload-early='{"json":"hash"}'
+
+=item --preload-early :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --preload-early=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-preload-early
+
+Preload a module when spawning perl to launch the preload stages, before any other preload.
+
+Note: Can be specified multiple times
+
+
+=item --preload-retry-delay ARG
+
+=item --preload-retry-delay=ARG
+
+=item --no-preload-retry-delay
+
+Time in seconds to wait before trying to load a preload/stage after a failed attempt
+
+
+=item -P ARG
+
+=item -P=ARG
+
+=item -P '["json","list"]'
+
+=item -P='["json","list"]'
+
+=item -P :{ ARG1 ARG2 ... }:
+
+=item -P=:{ ARG1 ARG2 ... }:
+
+=item --preload ARG
+
+=item --preload=ARG
+
+=item --preloads ARG
+
+=item --preloads=ARG
+
+=item --preload '["json","list"]'
+
+=item --preload='["json","list"]'
+
+=item --preloads '["json","list"]'
+
+=item --preloads='["json","list"]'
+
+=item --preload :{ ARG1 ARG2 ... }:
+
+=item --preload=:{ ARG1 ARG2 ... }:
+
+=item --preloads :{ ARG1 ARG2 ... }:
+
+=item --preloads=:{ ARG1 ARG2 ... }:
+
+=item --no-preloads
+
+Preload a module before running tests
+
+Note: Can be specified multiple times
+
+
+=item --reload
+
+=item --reload-in-place
+
+=item --no-reload-in-place
+
+Reload modules in-place when possible (Not recommended)
+
+
+=item --reloader
+
+=item --reloader=ARG
+
+=item --no-reloader
+
+Use a reloader (default Test2::Harness::Reloader) to detect module changes, and reload stages as necessary.
+
+
+=item --restrict-reload
+
+=item --restrict-reload=ARG
+
+=item --restrict-reload='["json","list"]'
+
+=item --restrict-reload=:{ ARG1 ARG2 ... }:
+
+=item --no-restrict-reload
+
+NO DESCRIPTION - FIX ME
+
+Note: Can be specified multiple times
+
+
+=item --runner MyRunner
+
+=item --runner +Test2::Harness::Runner::MyRunner
+
+=item --no-runner
+
+Specify what Runner subclass to use. Use the "+" prefix to specify a fully qualified namespace, otherwise Test2::Harness::Runner::XXX namespace is assumed.
+
+
+=back
+
+=head2 Test Options
+
+=over 4
+
+=item --allow-retry
+
+=item --no-allow-retry
+
+Toggle retry capabilities on and off (default: on)
+
 
 =item -b
 
+=item --blib
+
 =item --no-blib
 
-(Default: include if it exists) Include 'blib/lib' and 'blib/arch' in your module path
+(Default: include if it exists) Include 'blib/lib' and 'blib/arch' in your module path (These will come after paths you specify with -D or -I)
 
 
 =item --cover
@@ -359,182 +273,338 @@ Abort all testing if a bail-out is encountered (default: on)
 
 Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
 
+Can also be set with the following environment variables: C<T2_DEVEL_COVER>
 
-=item --dump-depmap
-
-=item --no-dump-depmap
-
-When using staged preload, dump the depmap for each stage as json files
+The following environment variables will be set after arguments are processed: C<T2_DEVEL_COVER>
 
 
-=item --event-timeout SECONDS
+=item -E key=val
+
+=item -E=key=val
+
+=item -Ekey=value
+
+=item -E '{"json":"hash"}'
+
+=item -E='{"json":"hash"}'
+
+=item -E:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -E :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item -E=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-var key=val
+
+=item --env-var=key=val
+
+=item --env-vars key=val
+
+=item --env-vars=key=val
+
+=item --env-var '{"json":"hash"}'
+
+=item --env-var='{"json":"hash"}'
+
+=item --env-vars '{"json":"hash"}'
+
+=item --env-vars='{"json":"hash"}'
+
+=item --env-var :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-var=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-vars :{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --env-vars=:{ KEY1 VAL KEY2 :{ VAL1 VAL2 ... }: ... }:
+
+=item --no-env-vars
+
+Set environment variables
+
+Note: Can be specified multiple times
+
 
 =item --et SECONDS
+
+=item --event-timeout SECONDS
 
 =item --no-event-timeout
 
 Kill test if no output is received within timeout period. (Default: 60 seconds). Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis. This prevents a hung test from running forever.
 
 
-=item --include ARG
+=item --event-uuids
 
-=item --include=ARG
+=item --no-event-uuids
+
+Use Test2::Plugin::UUID inside tests (default: on)
+
 
 =item -I ARG
 
 =item -I=ARG
 
+=item -I '*.*'
+
+=item -I='*.*'
+
+=item -I '["json","list"]'
+
+=item -I='["json","list"]'
+
+=item -I :{ ARG1 ARG2 ... }:
+
+=item -I=:{ ARG1 ARG2 ... }:
+
+=item --include ARG
+
+=item --include=ARG
+
+=item --include '*.*'
+
+=item --include='*.*'
+
+=item --include '["json","list"]'
+
+=item --include='["json","list"]'
+
+=item --include :{ ARG1 ARG2 ... }:
+
+=item --include=:{ ARG1 ARG2 ... }:
+
 =item --no-include
 
 Add a directory to your include paths
 
-Can be specified multiple times
+Note: Can be specified multiple times
 
 
-=item --job-count 4
+=item --input ARG
 
-=item --job-count 8:2
+=item --input=ARG
 
-=item --jobs 4
+=item --no-input
 
-=item --jobs 8:2
-
-=item -j4
-
-=item -j8:2
-
-=item --no-job-count
-
-Set the number of concurrent jobs to run. Add a :# if you also wish to designate multiple slots per test. 8:2 means 8 slots, but each test gets 2 slots, so 4 tests run concurrently. Tests can find their concurrency assignemnt in the "T2_HARNESS_MY_JOB_CONCURRENCY" environment variable.
-
-Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T2_HARNESS_JOB_COUNT>, C<HARNESS_JOB_COUNT>
+Input string to be used as standard input for ALL tests. See also: --input-file
 
 
-=item --lib
+=item --input-file ARG
+
+=item --input-file=ARG
+
+=item --no-input-file
+
+Use the specified file as standard input to ALL tests
+
 
 =item -l
 
+=item --lib
+
 =item --no-lib
 
-(Default: include if it exists) Include 'lib' in your module path
+(Default: include if it exists) Include 'lib' in your module path (These will come after paths you specify with -D or -I)
 
 
-=item --nytprof
+=item -m ARG
 
-=item --no-nytprof
+=item -m=ARG
 
-Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.
+=item -m '["json","list"]'
+
+=item -m='["json","list"]'
+
+=item -m :{ ARG1 ARG2 ... }:
+
+=item -m=:{ ARG1 ARG2 ... }:
+
+=item --load ARG
+
+=item --load=ARG
+
+=item --load-module ARG
+
+=item --load-module=ARG
+
+=item --load '["json","list"]'
+
+=item --load='["json","list"]'
+
+=item --load :{ ARG1 ARG2 ... }:
+
+=item --load=:{ ARG1 ARG2 ... }:
+
+=item --load-module '["json","list"]'
+
+=item --load-module='["json","list"]'
+
+=item --load-module :{ ARG1 ARG2 ... }:
+
+=item --load-module=:{ ARG1 ARG2 ... }:
+
+=item --no-load
+
+Load a module in each test (after fork). The "import" method is not called.
+
+Note: Can be specified multiple times
 
 
-=item --post-exit-timeout SECONDS
+=item -M Module
+
+=item -M Module=import_arg1,arg2,...
+
+=item -M '{"Data::Dumper":["Dumper"]}'
+
+=item --loadim Module
+
+=item --load-import Module
+
+=item --loadim Module=import_arg1,arg2,...
+
+=item --loadim '{"Data::Dumper":["Dumper"]}'
+
+=item --load-import Module=import_arg1,arg2,...
+
+=item --load-import '{"Data::Dumper":["Dumper"]}'
+
+=item --no-load-import
+
+Load a module in each test (after fork). Import is called.
+
+Note: Can be specified multiple times
+
+
+=item --mem-usage
+
+=item --no-mem-usage
+
+Use Test2::Plugin::MemUsage inside tests (default: on)
+
 
 =item --pet SECONDS
+
+=item --post-exit-timeout SECONDS
 
 =item --no-post-exit-timeout
 
 Stop waiting post-exit after the timeout period. (Default: 15 seconds) Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exits it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
 
 
-=item --preload-threshold ARG
+=item -rARG
 
-=item --preload-threshold=ARG
+=item -r ARG
 
-=item --Pt ARG
+=item -r=ARG
 
-=item --Pt=ARG
+=item --retry ARG
 
-=item -W ARG
+=item --retry=ARG
 
-=item -W=ARG
+=item --no-retry
 
-=item --no-preload-threshold
-
-Only do preload if at least N tests are going to be run. In some cases a full preload takes longer than simply running the tests, this lets you specify a minimum number of test jobs that will be run for preload to happen. This has no effect for a persistent runner. The default is 0, and it means always preload.
+Run any jobs that failed a second time. NOTE: --retry=1 means failing tests will be attempted twice!
 
 
-=item --preloads ARG
+=item --retry-iso
 
-=item --preloads=ARG
+=item --retry-isolated
 
-=item --preload ARG
+=item --no-retry-isolated
 
-=item --preload=ARG
-
-=item -P ARG
-
-=item -P=ARG
-
-=item --no-preloads
-
-Preload a module before running tests
-
-Can be specified multiple times
+If true then any job retries will be done in isolation (as though -j1 was set)
 
 
-=item --resource Port
+=item --stream
 
-=item --resource +Test2::Harness::Runner::Resource::Port
+=item --use-stream
 
-=item -R Port
+=item --no-stream
 
-=item --no-resource
+=item --TAP
 
-Use a resource module to assign resource assignments to individual tests
+The TAP format is lossy and clunky. Test2::Harness normally uses a newer streaming format to receive test results. There are old/legacy tests where this causes problems, in which case setting --TAP or --no-stream can help.
 
-Can be specified multiple times
-
-
-=item --runner-id ARG
-
-=item --runner-id=ARG
-
-=item --no-runner-id
-
-Runner ID (usually a generated uuid)
-
-
-=item --shared-jobs-config .sharedjobslots.yml
-
-=item --shared-jobs-config relative/path/.sharedjobslots.yml
-
-=item --shared-jobs-config /absolute/path/.sharedjobslots.yml
-
-=item --no-shared-jobs-config
-
-Where to look for a shared slot config file. If a filename with no path is provided yath will search the current and all parent directories for the name.
-
-
-=item --slots-per-job 2
-
-=item -x2
-
-=item --no-slots-per-job
-
-This sets the number of slots each job will use (default 1). This is normally set by the ':#' in '-j#:#'.
-
-Can also be set with the following environment variables: C<T2_HARNESS_JOB_CONCURRENCY>
-
-
-=item --switch ARG
-
-=item --switch=ARG
 
 =item -S ARG
 
 =item -S=ARG
 
-=item --no-switch
+=item -S '["json","list"]'
+
+=item -S='["json","list"]'
+
+=item -S :{ ARG1 ARG2 ... }:
+
+=item -S=:{ ARG1 ARG2 ... }:
+
+=item --switch ARG
+
+=item --switch=ARG
+
+=item --switches ARG
+
+=item --switches=ARG
+
+=item --switch '["json","list"]'
+
+=item --switch='["json","list"]'
+
+=item --switches '["json","list"]'
+
+=item --switches='["json","list"]'
+
+=item --switch :{ ARG1 ARG2 ... }:
+
+=item --switch=:{ ARG1 ARG2 ... }:
+
+=item --switches :{ ARG1 ARG2 ... }:
+
+=item --switches=:{ ARG1 ARG2 ... }:
+
+=item --no-switches
 
 Pass the specified switch to perl for each test. This is not compatible with preload.
 
-Can be specified multiple times
+Note: Can be specified multiple times
+
+
+=item --test-arg ARG
+
+=item --test-arg=ARG
+
+=item --test-args ARG
+
+=item --test-args=ARG
+
+=item --test-arg '["json","list"]'
+
+=item --test-arg='["json","list"]'
+
+=item --test-args '["json","list"]'
+
+=item --test-args='["json","list"]'
+
+=item --test-arg :{ ARG1 ARG2 ... }:
+
+=item --test-arg=:{ ARG1 ARG2 ... }:
+
+=item --test-args :{ ARG1 ARG2 ... }:
+
+=item --test-args=:{ ARG1 ARG2 ... }:
+
+=item --no-test-args
+
+Arguments to pass in as @ARGV for all tests that are run. These can be provided easier using the '::' argument separator.
+
+Note: Can be specified multiple times
 
 
 =item --tlib
 
 =item --no-tlib
 
-(Default: off) Include 't/lib' in your module path
+(Default: off) Include 't/lib' in your module path (These will come after paths you specify with -D or -I)
 
 
 =item --unsafe-inc
@@ -545,10 +615,12 @@ perl is removing '.' from @INC as a security concern. This option keeps things f
 
 Can also be set with the following environment variables: C<PERL_USE_UNSAFE_INC>
 
+The following environment variables will be set after arguments are processed: C<PERL_USE_UNSAFE_INC>
 
-=item --use-fork
 
 =item --fork
+
+=item --use-fork
 
 =item --no-use-fork
 
@@ -557,9 +629,9 @@ Can also be set with the following environment variables: C<PERL_USE_UNSAFE_INC>
 Can also be set with the following environment variables: C<!T2_NO_FORK>, C<T2_HARNESS_FORK>, C<!T2_HARNESS_NO_FORK>, C<YATH_FORK>, C<!YATH_NO_FORK>
 
 
-=item --use-timeout
-
 =item --timeout
+
+=item --use-timeout
 
 =item --no-use-timeout
 
@@ -568,10 +640,11 @@ Can also be set with the following environment variables: C<!T2_NO_FORK>, C<T2_H
 
 =back
 
+
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -591,11 +664,12 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+

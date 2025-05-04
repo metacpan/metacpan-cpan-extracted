@@ -6,14 +6,14 @@ Module::Starter::App - the code behind the command line program
 
 =head1 VERSION
 
-version 1.77
+version 1.78
 
 =cut
 
 use warnings;
 use strict;
 
-our $VERSION = '1.77';
+our $VERSION = '1.78';
 
 use File::Spec;
 use Getopt::Long;

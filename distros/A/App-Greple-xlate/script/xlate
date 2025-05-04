@@ -65,7 +65,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.9909
+    Version 0.9910
 
 =cut
 
@@ -723,6 +723,7 @@ Specify the output format.
 =item B<-x> I<file>
 
 Specify a file containing mask patterns.
+See L<App::Greple::xlate/MASKING>.
 
 =item B<-w> I<width>
 
@@ -849,6 +850,9 @@ Repeatable.
 
 Specify Docker image name.  If it begins with a colon (C<:>), it is
 treated as a version of the default image.
+
+Setting an empty string will invalidate any previous settings and use
+the default image.
 
 =begin comment
 

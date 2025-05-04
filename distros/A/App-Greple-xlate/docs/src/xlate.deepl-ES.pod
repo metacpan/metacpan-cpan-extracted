@@ -6,17 +6,19 @@ App::Greple::xlate - módulo de traducción para greple
 
 =head1 SYNOPSIS
 
-    greple -Mxlate -e ENGINE --xlate pattern target-file
-
     greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9909
+Version 0.9910
 
 =head1 DESCRIPTION
 
-El módulo B<Greple> B<xlate> encuentra los bloques de texto deseados y los sustituye por el texto traducido. Actualmente se implementan los módulos DeepL (F<deepl.pm>) y ChatGPT (F<gpt3.pm>) como motor back-end. También se incluye soporte experimental para gpt-4 y gpt-4o.
+El módulo B<Greple> B<xlate> encuentra los bloques de texto deseados y los sustituye por el texto traducido. Actualmente DeepL (F<deepl.pm>) y ChatGPT 4.1 (F<gpt4.pm>) módulo se implementan como un motor de back-end.
 
 Si desea traducir bloques de texto normal en un documento escrito en el estilo vaina de Perl, utilice el comando B<greple> con el módulo C<xlate::deepl> y C<perl> de la siguiente manera:
 
@@ -126,7 +128,7 @@ En este momento, están disponibles los siguientes motores
 
 =item * B<gpt3>: gpt-3.5-turbo
 
-=item * B<gpt4>: gpt-4-turbo
+=item * B<gpt4>: gpt-4.1
 
 =item * B<gpt4o>: gpt-4o-mini
 
@@ -148,7 +150,7 @@ Especifique el idioma de destino. Puede obtener los idiomas disponibles mediante
 
 Especifique el formato de salida del texto original y traducido.
 
-Los siguientes formatos distintos de C<xtxt> asumen que la parte a traducir es una colección de líneas. De hecho, es posible traducir sólo una parte de una línea, y especificar un formato distinto de C<xtxt> no producirá resultados significativos.
+Los siguientes formatos distintos de C<xtxt> asumen que la parte a traducir es una colección de líneas. De hecho, es posible traducir sólo una parte de una línea, pero especificar un formato distinto de C<xtxt> no producirá resultados significativos.
 
 =over 4
 
@@ -242,6 +244,14 @@ Realiza la función de enmascaramiento y muestra el texto convertido tal cual si
 =item B<--match-all>
 
 Establece todo el texto del fichero como área de destino.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+En el caso de los formatos C<cm> y C<colon>, la salida se divide y formatea línea por línea. Por lo tanto, si sólo se quiere traducir una parte de una línea, no se puede obtener el resultado esperado. Estos filtros corrigen la salida que se corrompe al traducir parte de una línea a la salida normal línea por línea.
+
+En la implementación actual, si se traducen varias partes de una línea, se emiten como líneas independientes.
 
 =back
 
@@ -345,7 +355,7 @@ L<App::Greple::xlate>
 
 L<App::Greple::xlate::deepl>
 
-L<App::Greple::xlate::gpt3>
+L<App::Greple::xlate::gpt4>
 
 =over 2
 

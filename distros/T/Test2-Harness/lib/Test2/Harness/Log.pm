@@ -2,7 +2,7 @@ package Test2::Harness::Log;
 use strict;
 use warnings;
 
-our $VERSION = '1.000156';
+our $VERSION = '2.000005';
 
 1;
 
@@ -156,10 +156,6 @@ This will contain the final summary data from the end of the test run.
         ],
     }
 
-=item harness_watcher
-
-Internal use only, subject to change, do not rely on it.
-
 =item harness_job
 
 A hash representation of an L<Test2::Harness::Runner::Job> object.
@@ -184,7 +180,7 @@ stored in this hash when the original object does not directly store them.
     }
 
 The C<times> field is populated by calling C<data_dump()> on an
-L<Test2::Harness::Auditor::TimeTracker> Object.
+L<Test2::Harness::Log::TimeTracker> Object.
 
 =item harness_job_exit
 
@@ -199,7 +195,7 @@ This represents when the test job exited.
 =item harness_job_fields
 
 Extra data attached to the harness job, usually from an
-L<Test2::Harness::Plugin> via C<inject_run_data()>.
+L<Test2::Harness::Plugin>.
 
 =item harness_job_launch
 
@@ -259,7 +255,7 @@ A hash representation of an L<Test2::Harness::Run> object.
 =head1 SOURCE
 
 The source code repository for Test2-Harness can be found at
-F<http://github.com/Test-More/Test2-Harness/>.
+L<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 MAINTAINERS
 
@@ -279,11 +275,16 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See L<http://dev.perl.org/licenses/>
 
 =cut
+
+=pod
+
+=cut POD NEEDS AUDIT
+

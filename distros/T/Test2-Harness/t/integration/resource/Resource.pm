@@ -2,14 +2,16 @@ package Resource;
 use strict;
 use warnings;
 
-use parent 'Test2::Harness::Runner::Resource';
+use parent 'App::Yath::Resource';
 
 my $limit = 2;
+
+sub applicable { 1 }
 
 my $no_slots_msg = 0;
 sub available {
     my $self = shift;
-    my ($task) = @_;
+    my ($id, $job) = @_;
 
     for my $slot (1 .. $limit) {
         return 1 unless defined $self->{$slot};
@@ -21,38 +23,30 @@ sub available {
 
 sub assign {
     my $self = shift;
-    my ($task, $state) = @_;
+    my ($id, $job, $env) = @_;
 
     for my $slot (1 .. $limit) {
         next if defined $self->{$slot};
 
-        $self->message("Assigned: $task->{job_id} - $slot");
-        $state->{record} = $slot;
-        $state->{env_vars}->{RESOURCE_TEST} = $slot;
-        push @{$state->{args}} => $slot;
+        $self->message("Assigned: $id - $slot");
+        $env->{RESOURCE_TEST} = $slot;
+        push @{$job->args} => $slot;
 
-        return;
+        $self->{$slot} = $id;
+        $self->{$id} = $slot;
+        return $env;
     }
 
     die "Error, no slots to assign";
 }
 
-sub record {
-    my $self = shift;
-    my ($job_id, $slot) = @_;
-
-    $self->message("Record: $job_id - $slot");
-    $self->{$slot} = $job_id;
-    $self->{$job_id} = $slot;
-}
-
 sub release {
     my $self = shift;
-    my ($job_id) = @_;
+    my ($id, $job) = @_;
 
-    my $slot = delete $self->{$job_id};
+    my $slot = delete $self->{$id};
     delete $self->{$slot};
-    $self->message("Release: $job_id - $slot");
+    $self->message("Release: $id - $slot");
 }
 
 sub cleanup {
@@ -69,10 +63,10 @@ sub message {
     if (!$pid || $$ != $pid) {
         $pid = $$;
 
-        print "$$ - $0\n";
+        print STDERR "$$ - $0\n";
     }
 
-    print "$$ - $msg\n";
+    print STDERR "$$ - $msg\n";
 }
 
 1;

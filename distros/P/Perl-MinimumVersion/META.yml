@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +27,10 @@ no_index:
 provides:
   Perl::MinimumVersion:
     file: lib/Perl/MinimumVersion.pm
-    version: '1.40'
+    version: '1.44'
   Perl::MinimumVersion::Reason:
     file: lib/Perl/MinimumVersion/Reason.pm
-    version: '1.40'
+    version: '1.44'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -39,9 +39,9 @@ requires:
   File::Spec: '0'
   Getopt::Long: '0'
   List::Util: '1.20'
-  PPI: '1.215'
+  PPI: '1.252'
   PPI::Util: '0'
-  PPIx::Regexp: '0.033'
+  PPIx::Regexp: '0.051'
   PPIx::Utils: '0'
   Params::Util: '0.25'
   perl: '5.006'
@@ -52,20 +52,24 @@ requires:
 resources:
   homepage: https://github.com/neilb/Perl-MinimumVersion
   repository: https://github.com/neilb/Perl-MinimumVersion.git
-version: '1.40'
+version: '1.44'
 x_contributors:
   - 'Adam Kennedy <adam@ali.as>'
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Chris Dolan <chris+github@chrisdolan.net>'
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'
+  - 'de Werk, Paul-Joseph <dewerk@gmail.com>'
   - 'Elliot Shank <elliotjs@cpan.org>'
   - 'Jakub Wilk <jwilk@jwilk.net>'
   - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Nathan Mills <38995150+Quipyowert2@users.noreply.github.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Ricardo Signes <rjbs@cpan.org>'
   - 'Steffen Müller <smueller@cpan.org>'
+  - 'Tom Wyant <wyant@cpan.org>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  - 'Zakariyya Mughal <zaki.mughal@gmail.com>'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

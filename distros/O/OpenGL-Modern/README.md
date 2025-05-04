@@ -1,15 +1,15 @@
-# OpenGL-Modern 0.03_01
+# OpenGL-Modern
 
 
 ## STATUS
 
-[![Build Status](https://travis-ci.org/devel-chm/OpenGL-Modern.svg?branch=master)](https://travis-ci.org/devel-chm/OpenGL-Modern)
+[![Build Status](https://github.com/Perl-GPU/OpenGL-Modern/actions/workflows/ci.yml/badge.svg)](https://github.com/PDLPorters/pdl/actions?query=branch%3Amaster)
 
 ## DESCRIPTION
 
 This is the first official release of OpenGL::Modern
 supporting OpenGL API bindings for OpenGL versions up to
-version 4.5.
+version 4.6.
 
 Bindings have been generated for all API routines but
 any pointer value arguments or return values are
@@ -48,28 +48,6 @@ To install this module type the following:
 ```
 
 or cpan or cpanm.
-
-
-
-## DEPENDENCIES
-
-This module requires these other modules and libraries:
-
-    Carp                          => 0,
-    Capture::Tiny                 => 0,
-    Data::Dumper                  => 0,
-    Devel::CheckOS                => 0,
-    Devel::CheckLib               => 0,
-    ExtUtils::Constant            => 0,
-    ExtUtils::MakeMaker           => 6.17,
-    ExtUtils::MakeMaker::CPANfile => 0,
-    IO::All                       => 0,
-    Test::InDistDir               => 0,
-    Test::More                    => 0.88,
-
-not *required* but needed for currently unimplemented features:
-
-    OpenGL 0.70  (for unimplemented functions)
 
 ## COPYRIGHT AND LICENCE
 

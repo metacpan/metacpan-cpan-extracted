@@ -17,7 +17,7 @@ DESCRIPTION
     PPI, it can do this without having to actually load the code.
 
     Currently it tests both the syntax of your code, and the use of explicit
-    version dependencies such as "require 5.005".
+    version dependencies such as "require 5.008".
 
     Future plans are to also add support for tracing module dependencies.
 
