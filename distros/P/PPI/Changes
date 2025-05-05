@@ -1,5 +1,10 @@
 Revision history for Perl extension PPI
 
+1.283   2025-05-04 09:52:43Z
+	- Allow zero byte documents to have a location
+	- handle simple lists in feature arg decomposing
+	- warn on unknown feature arg decompose instead of die
+
 1.281   2024-12-27 14:44:47Z
 	Summary:
 	- Implement support for signatures and other parsing features

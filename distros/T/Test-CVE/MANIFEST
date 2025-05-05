@@ -10,6 +10,7 @@ lib/Test/CVE.pm		Test CVE functionality
 Makefile.PL		Makefile generator
 t/10_base.t		Base tests (combine and parse only)
 t/12_options.t		Accessor methods
+t/13_want.t		Requested modules
 t/20_cpanfile.t		Reading a cpanfile
 t/30_makefile.t		Makefile.PL layouts
 scripts/cpan-cve.pl	CLI to Test::CVE

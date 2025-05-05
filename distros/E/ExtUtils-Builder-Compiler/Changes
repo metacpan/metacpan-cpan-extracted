@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.032     2025-05-04 16:57:26+02:00 Europe/Brussels
+          - Fix compilet.def extension handling
+          - Enable static install
+
 0.031     2025-04-30 15:33:08+02:00 Europe/Brussels
           - Remove nologo argument to MSVC
           - Use File::Temp in autodetect tests

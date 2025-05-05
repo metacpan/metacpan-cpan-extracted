@@ -217,6 +217,10 @@ config file, as in
   my $dsn = 'DBI:MariaDB:test;mariadb_read_default_file=/home/joe/my.cnf';
   my $dbh = DBI->connect($dsn, $user, $password);
 
+If the config file specifies the password, you need to use C<undef> in
+C<connect>, not just an empty string, to have it replaced by the config value.
+All other attributes replace even the empty string.
+
 The option I<mariadb_read_default_group> can be used to specify the default
 group in the config file: Usually this is the C<client> group, but see the
 following example:
@@ -364,15 +368,20 @@ Example:
 
   use DBI;
   my $datadir = '/var/lib/mysql/';
-  my $langdir = '/usr/share/mysql/english';
+  my $langdir = '/usr/share/mysql/';
   my $dsn = 'DBI:MariaDB:host=embedded;database=test;'
-          . "mariadb_embedded_options=--datadir=$datadir,--language=$langdir";
+          . "mariadb_embedded_options=--datadir=$datadir,'
+          .                          '--language=$langdir,'
+          .                          '--log-error=/dev/null";
   my $dbh = DBI->connect($dsn, undef, undef);
 
 This would start embedded server with language directory C<$langdir>, database
-directory C<$datadir> and connects to database C<test>. Embedded server does not
-have to be supported by configured MariaDB or MySQL library. In that case
-L<C<< DBI->connect() >>|/connect> returns an error.
+directory C<$datadir>, drop error messages and connects to database C<test>.
+It is suggested to specify C<--log-error=> option which defines location for
+warning messages because by default Embedded server prints its warning and
+error messages to C<STDOUT> which is not expected by Perl or application.
+Embedded server does not have to be supported by configured MariaDB or MySQL
+library. In that case L<C<< DBI->connect() >>|/connect> returns an error.
 
 =item mariadb_embedded_groups
 

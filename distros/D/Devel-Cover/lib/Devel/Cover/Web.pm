@@ -5,14 +5,14 @@
 # except where otherwise noted.
 
 # The latest version of this software should be available from my homepage:
-# http://www.pjcj.net
+# https://pjcj.net
 
 package Devel::Cover::Web;
 
 use strict;
 use warnings;
 
-our $VERSION = '1.46'; # VERSION
+our $VERSION = '1.47'; # VERSION
 
 use Exporter;
 
@@ -257,7 +257,7 @@ fixEvent.stopPropagation = function() {
  **/
 function createElement(element) {
     if (typeof document.createElementNS != 'undefined') {
-        return document.createElementNS('http://www.w3.org/1999/xhtml', element);
+        return document.createElementNS('https://www.w3.org/1999/xhtml', element);
     }
     if (typeof document.createElement != 'undefined') {
         return document.createElement(element);
@@ -267,8 +267,8 @@ function createElement(element) {
 
 /**
  * "targ" is the element which caused this function to be called
- * from http://www.quirksmode.org/js/events_properties.html
- * see http://www.quirksmode.org/about/copyright.html
+ * from https://www.quirksmode.org/js/events_properties.html
+ * see https://www.quirksmode.org/about/copyright.html
  **/
 function getEventTarget(e) {
     var targ;
@@ -897,7 +897,7 @@ Devel::Cover::Web - Files for JavaScript or CSS
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 
@@ -936,6 +936,6 @@ This software is free.  It is licensed under the same terms as Perl itself,
 except where otherwise noted.
 
 The latest version of this software should be available from my homepage:
-http://www.pjcj.net
+https://pjcj.net
 
 =cut

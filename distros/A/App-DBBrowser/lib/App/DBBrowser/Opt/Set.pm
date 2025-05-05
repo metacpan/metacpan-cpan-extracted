@@ -97,6 +97,7 @@ sub _options {
             { name => '_warningss',        text => "- Warnings",            section => 'G'     },
             { name => 'progress_bar',      text => "- Progress bar",        section => 'table' },
             { name => 'tab_width',         text => "- Tab width",           section => 'table' },
+            { name => '_pad_row_edges',    text => "- Pad row edges",       section => 'table' },
             { name => '_color',            text => "- Color",               section => 'table' },
             { name => 'trunc_fract_first', text => "- Trunc fract first",   section => 'table' },
             { name => 'min_col_width',     text => "- Trunc col threshold", section => 'table' },
@@ -435,6 +436,13 @@ sub set_options {
                 my $digits = 3;
                 my $prompt = 'Set the tab width ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );
+            }
+            elsif ( $opt eq '_pad_row_edges' ) {
+                my $prompt = '"Pad row edges"';
+                my $sub_menu = [
+                    [ 'pad_row_edges', "- Pad row edges with a space.", [ $no, $yes ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_color' ) {
                 my $prompt = '"ANSI color escapes"';

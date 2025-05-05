@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.16.0;
 
-our $VERSION = '0.170';
+our $VERSION = '0.171';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -55,6 +55,7 @@ sub _valid_options {
         squash_spaces     => '[ 0 1 ]',
         table_expand      => '[ 0 1 ]',
         trunc_fract_first => '[ 0 1 ]',
+        pad_row_edges     => '[ 0 1 ]',
         binary_filter     => '[ 0 1 2 ]',
         color             => '[ 0 1 2 ]',
         page              => '[ 0 1 2 ]', # undocumented
@@ -89,6 +90,7 @@ sub _defaults {
         max_rows          => 0,
         min_col_width     => 30,
         mouse             => 0,
+        pad_row_edges     => 0,
         page              => 2, ##
         progress_bar      => 40000,
         prompt            => '',
@@ -129,6 +131,8 @@ my $last_write_table     = 0;
 my $window_width_changed = 1;
 my $enter_search_string  = 2;
 my $from_filtered_table  = 3;
+my $tab_w;
+my $edge_w = 0;
 
 
 sub print_table {
@@ -148,9 +152,12 @@ sub print_table {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
     }
-    $self->{tab_w} = $self->{tab_width};
+    $tab_w = $self->{tab_width};
     if ( ! ( $self->{tab_width} % 2 ) ) {
-        ++$self->{tab_w};
+        ++$tab_w;
+    }
+    if ( $self->{pad_row_edges} ) {
+        $edge_w = 1;
     }
     local $| = 1;
     local $SIG{INT} = sub {
@@ -193,7 +200,6 @@ sub print_table {
     }
     $self->{_search_regex} = '';
     $self->{_idx_search_matches} = [];
-    $self->{_regex_number} = "^([^.EeNn]*)(\Q$self->{decimal_separator}\E[0-9]+)?\\z";
     my ( $term_w, $tbl_print, $tbl_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig );
     if ( ! defined $term_w ) {
         $self->__reset();
@@ -245,7 +251,7 @@ sub __get_data {
     if ( ! defined $w_cols_calc ) {
         return;
     }
-    my $tbl_w = sum( @{$w_cols_calc}, $self->{tab_w} * $#{$w_cols_calc} );
+    my $tbl_w = sum( @{$w_cols_calc}, $tab_w * $#{$w_cols_calc}, 2 * $edge_w );
     my $tbl_print = $self->__cols_to_string( $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $progress );
     my @tmp_header_rows;
     if ( length $self->{prompt} ) {
@@ -371,18 +377,14 @@ sub __copy_table {
     my ( $self, $tbl_orig, $progress ) = @_;
     my $tbl_copy = [];
     $progress->set_progress_bar();
+    my $str;
 
     ROW: for my $i ( 0 .. $self->{_last_index} ) {
         my $tmp_row = [];
         COL: for ( @{$tbl_orig->[$i]} ) {
-            my $str = $_; # this is where the copying happens
+            $str = $_; # this is where the copying happens
             $str = $self->{undef}            if ! defined $str;
             $str = _handle_reference( $str ) if ref $str;
-            if ( $self->{squash_spaces} ) {
-                $str =~ s/^\p{Space}+//;
-                $str =~ s/\p{Space}+\z//;
-                $str =~ s/\p{Space}+/ /g;
-            }
             if ( $self->{color} ) {
                 $str =~ s/${\PH}//g;
                 $str =~ s/${\SGR_ES}/${\PH}/g;
@@ -390,14 +392,23 @@ sub __copy_table {
             if ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ /[\x00-\x08\x0B-\x0C\x0E-\x1F]/ ) {
                 if ( $self->{binary_filter} == 2 ) {
                     ( $str = sprintf("%v02X", $_ // $self->{undef} ) ) =~ tr/./ /;
+                    push @$tmp_row, $str;
                 }
                 else {
-                    $str = $self->{binary_string};
+                    push @$tmp_row, $self->{binary_string};
                 }
+                next COL;
             }
-            $str =~ s/\t/ /g;
-            $str =~ s/\v+/\ \ /g;
-            $str =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+            if ( $str =~ /[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]/ ) {
+                $str =~ s/\t/ /g;
+                $str =~ s/\v+/\ \ /g;
+                $str =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+            }
+            if ( $self->{squash_spaces} ) {
+                $str =~ s/^\p{Space}+//;
+                $str =~ s/\p{Space}+\z//;
+                $str =~ s/\p{Space}+/ /g;
+            }
             push @$tmp_row, $str;
         }
         push @$tbl_copy, $tmp_row;
@@ -414,6 +425,8 @@ sub __copy_table {
 sub __calc_col_width {
     my ( $self, $tbl_copy, $progress ) = @_;
     $progress->set_progress_bar();            #
+    my $ds = $self->{decimal_separator};
+    my $regex_int_fract = "^([^${ds}EeNn]*)(\Q${ds}\E[0-9]+)?\\z";
     my @col_idx = ( 0 .. $#{$tbl_copy->[0]} );
     my $col_count = @col_idx;
     my $w_col_names = [];
@@ -431,7 +444,7 @@ sub __calc_col_width {
                 # nothing to do
             }
             elsif ( looks_like_number $tbl_copy->[$row][$col] ) {
-                if ( $tbl_copy->[$row][$col] =~ /$self->{_regex_number}/ ) {
+                if ( $tbl_copy->[$row][$col] =~ /$regex_int_fract/ ) {
                     if ( ( length $1 // 0 ) > $w_int->[$col] ) {
                         $w_int->[$col] = length $1;
                     }
@@ -472,7 +485,7 @@ sub __calc_col_width {
 sub __calc_avail_col_width {
     my ( $self, $term_w, $tbl_copy, $w_col_names, $w_cols, $w_int, $w_fract ) = @_;
     my $w_cols_calc = [ @{$w_cols} ];
-    my $avail_w = $term_w - $self->{tab_w} * $#$w_cols_calc;
+    my $avail_w = $term_w - ( $tab_w * $#$w_cols_calc + 2 * $edge_w );
     my $sum = sum( @$w_cols_calc );
     if ( $sum < $avail_w ) {
 
@@ -578,49 +591,43 @@ sub __calc_avail_col_width {
     return $w_cols_calc;
 }
 
+
 sub __cols_to_string {
     my ( $self, $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $progress ) = @_;
     $progress->set_progress_bar();
-    my $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
+    my $tab = ( ' ' x int( $tab_w / 2 ) ) . '|' . ( ' ' x int( $tab_w / 2 ) );
     my $one_precision_w = length sprintf "%.1e", 123;
+    my $ds = $self->{decimal_separator};
+    my $regex_fract = "(\Q${ds}\E[0-9]+)\\z";
+    my $lrb = ' ' x $edge_w;
+    my $str;
 
     ROW: for my $row ( 0 .. $#{$tbl_copy} ) {
-        my $str = '';
+        $str = $lrb;
+
         COL: for my $col ( 0 .. $#{$w_cols_calc} ) {
             if ( ! length $tbl_copy->[$row][$col] ) {
                 $str = $str . ' ' x $w_cols_calc->[$col];
             }
             elsif ( looks_like_number $tbl_copy->[$row][$col] ) {
-                my $number = '';
                 if ( $w_fract->[$col] ) {
-                    my $fract = '';
-                    if ( $tbl_copy->[$row][$col] =~ /$self->{_regex_number}/ ) {
-                        if ( length $2 ) {
-                            if ( length $2 > $w_fract->[$col] ) {
-                                $fract = substr( $2, 0, $w_fract->[$col] );
-                            }
-                            elsif ( length $2 < $w_fract->[$col] ) {
-                                $fract = $2 . ' ' x ( $w_fract->[$col] - length $2 );
-                            }
-                            else {
-                                $fract = $2;
-                            }
+                    if ( $tbl_copy->[$row][$col] =~ /$regex_fract/ ) {
+                        if ( length $1 > $w_fract->[$col] ) {
+                            $tbl_copy->[$row][$col] = substr( $tbl_copy->[$row][$col], 0,  -( length( $1 ) - $w_fract->[$col] ) );
                         }
-                        else {
-                            $fract = ' ' x $w_fract->[$col];
+                        elsif ( length $1 < $w_fract->[$col] ) {
+                            $tbl_copy->[$row][$col] .= ' ' x ( $w_fract->[$col] - length $1 );
                         }
-                        $number = ( length $1 ? $1 : '' ) . $fract;
                     }
                     else {
-                        # scientific notation, NaN, Inf, Infinity, '0 but true'
-                        $number = $tbl_copy->[$row][$col];
+                        $tbl_copy->[$row][$col] .= ' ' x $w_fract->[$col];
                     }
                 }
-                else {
-                    $number = $tbl_copy->[$row][$col];
-                }
-                if ( length $number > $w_cols_calc->[$col] ) {
-                    my $signed_one_precision_w = $one_precision_w + ( $number =~ /^-/ ? 1 : 0 );
+                #else {
+                #    # integer, scientific notation (3.45e12), 'NaN', 'Inf', 'Infinity', '0 but true'
+                #}
+                if ( length $tbl_copy->[$row][$col] > $w_cols_calc->[$col] ) {
+                    my $signed_one_precision_w = $one_precision_w + ( $tbl_copy->[$row][$col] =~ /^-/ ? 1 : 0 );
                     my $precision;
                     if ( $w_cols_calc->[$col] < $signed_one_precision_w ) {
                         # special treatment because zero precision has no dot
@@ -630,25 +637,25 @@ sub __cols_to_string {
                         $precision = $w_cols_calc->[$col] - ( $signed_one_precision_w - 1 );
                         # -1 because $signed_one_precision_w contains already one precision
                     }
-                    $number = sprintf "%.*e", $precision, $number;
-                    # if $number is a scientific-notation-string which is to big for a conversation to a number
-                    # 'sprintf' returns 'Inf' instead of reducing the precision.
-                    if ( length( $number ) > $w_cols_calc->[$col] ) {
-                        $str = $str . ( '-' x $w_cols_calc->[$col] );
+                    $tbl_copy->[$row][$col] = sprintf "%.*e", $precision, $tbl_copy->[$row][$col];
+                    # if $tbl_copy->[$row][$col] is a scientific-notation-string which is to big for a conversation to a number
+                    # 'sprintf' returns 'Inf'.
+                    if ( length( $tbl_copy->[$row][$col] ) > $w_cols_calc->[$col] ) {
+                        $str .= ( '-' x $w_cols_calc->[$col] );
                     }
-                    elsif ( length $number < $w_cols_calc->[$col] ) {
-                        # if $w_cols_calc->[$col] == zero_precision_w + 1 or if $number == Inf
-                        $str = $str . ' ' x ( $w_cols_calc->[$col] - length $number ) . $number;
+                    elsif ( length $tbl_copy->[$row][$col] < $w_cols_calc->[$col] ) {
+                        # $w_cols_calc->[$col] == zero_precision_w + 1  or  $tbl_copy->[$row][$col] == Inf
+                        $str .= ' ' x ( $w_cols_calc->[$col] - length $tbl_copy->[$row][$col] ) . $tbl_copy->[$row][$col];
                     }
                     else {
-                        $str = $str . $number;
+                        $str .= $tbl_copy->[$row][$col];
                     }
                 }
-                elsif ( length $number < $w_cols_calc->[$col] ) {
-                    $str = $str . ' ' x ( $w_cols_calc->[$col] - length $number ) . $number;
+                elsif ( length $tbl_copy->[$row][$col] < $w_cols_calc->[$col] ) {
+                    $str .= ' ' x ( $w_cols_calc->[$col] - length $tbl_copy->[$row][$col] ) . $tbl_copy->[$row][$col];
                 }
                 else {
-                    $str = $str . $number;
+                    $str .= $tbl_copy->[$row][$col];
                 }
             }
             else {
@@ -672,9 +679,7 @@ sub __cols_to_string {
                     #}
                 }
             }
-            if ( $col != $#$w_cols_calc ) {
-                $str = $str . $tab;
-            }
+            $str .= $col == $#$w_cols_calc ? $lrb : $tab;
         }
         $tbl_copy->[$row] = $str;   # overwrite $tbl_copy to save memory
         if ( $progress->{show_progress_bar} ) {
@@ -688,7 +693,6 @@ sub __cols_to_string {
     }
     return $tbl_copy; # $tbl_copy is now $tbl_print
 }
-
 
 sub __print_single_row {
     my ( $self, $tbl_orig, $row, $w_col_names, $footer ) = @_;
@@ -722,10 +726,17 @@ sub __print_single_row {
                 @key_color = ();
             }
         }
-        $key =~ s/\t/ /g;
-        $key =~ s/\v+/\ \ /g;
-        $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-        $key = adjust_to_printwidth( $key, $max_key_w );
+        elsif ( $key =~ /[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]/ ) {
+            $key =~ s/\t/ /g;
+            $key =~ s/\v+/\ \ /g;
+            $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+        }
+        if ( $self->{pad_row_edges} ) { ##
+            $key = adjust_to_printwidth( ' ' . $key, $max_key_w );
+        }
+        else {
+            $key = adjust_to_printwidth( $key, $max_key_w );
+        }
         if ( @key_color ) {
             $key =~ s/${\PH}/shift @key_color/ge;
             $key .= "\e[0m";
@@ -828,14 +839,13 @@ sub __reset_search {
 
 sub __header_sep {
     my ( $self, $w_cols_calc ) = @_;
-    my $tab = ( '-' x int( $self->{tab_w} / 2 ) ) . '|' . ( '-' x int( $self->{tab_w} / 2 ) );
-    my $header_sep = '';
-    for my $col ( 0 .. $#$w_cols_calc ) {
-        $header_sep .= '-' x $w_cols_calc->[$col];
-        if ( $col != $#$w_cols_calc ) {
-            $header_sep .= $tab;
-        }
+    my $tab = ( '-' x int( $tab_w / 2 ) ) . '|' . ( '-' x int( $tab_w / 2 ) );
+    my $lrb = '-' x $edge_w;
+    my $header_sep = $lrb;
+    for my $col ( 0 .. $#$w_cols_calc - 1 ) {
+        $header_sep .= '-' x $w_cols_calc->[$col] . $tab;
     }
+    $header_sep .=  '-' x $w_cols_calc->[$#$w_cols_calc] . $lrb;
     return $header_sep;
 }
 
@@ -874,11 +884,6 @@ sub _minus_x_percent {
 
 
 
-
-
-
-
-
 1;
 
 __END__
@@ -893,7 +898,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.170
+Version 0.171
 
 =cut
 
@@ -1165,6 +1170,15 @@ Default: 30
 Set the I<mouse> mode (see option C<mouse> in L<Term::Choose/OPTIONS>).
 
 Default: 0
+
+
+=head3 pad_row_edges
+
+Add a space at the beginning and end of each row.
+
+0 - off (default)
+
+1 - enabled
 
 =head3 progress_bar
 

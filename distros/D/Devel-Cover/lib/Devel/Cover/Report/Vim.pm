@@ -3,7 +3,7 @@
 # This software is free.  It is licensed under the same terms as Perl itself.
 
 # The latest version of this software should be available from my homepage:
-# http://www.pjcj.net
+# https://pjcj.net
 
 package Devel::Cover::Report::Vim;
 
@@ -13,7 +13,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.46'; # VERSION
+  our $VERSION = '1.47'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -79,7 +79,7 @@ package Devel::Cover::Report::Vim::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.46'; # VERSION
+our $VERSION = '1.47'; # VERSION
 
 use base "Template::Provider";
 
@@ -97,7 +97,7 @@ $Templates{vim} = <<'EOT';
 " Devel::Cover is copyright 2001-2025, Paul Johnson (paul@pjcj.net)
 " Devel::Cover is free. It is licensed under the same terms as Perl itself.
 " The latest version of Devel::Cover should be available from my homepage:
-" http://www.pjcj.net
+" https://pjcj.net
 
 [% FOREACH r = runs %]
 " Run:          [% r.run    %]
@@ -139,7 +139,7 @@ endfunction
 " The signs definitions can be overridden.  To do this add a file called
 " devel-cover.vim at some appropriate point in your ~/.vim directory and add
 " your local configuration commands there.
-" For example, I use the vim solarized theme and I have the following comamnds
+" For example, I use the vim solarized theme and I have the following commands
 " in my local configuration file ~/.vim/local/devel-cover.vim:
 "
 " ----------------------------------------------------------------------------
@@ -307,7 +307,7 @@ Devel::Cover::Report::Vim - Backend for displaying coverage data in Vim
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 
@@ -339,7 +339,7 @@ displayed.  Correctly covered criteria are shown in green.  Incorrectly
 covered criteria are shown in red.  Any incorrectly covered criterion will
 override a correctly covered criterion.
 
-If the coverage for the file being displayed is out of date the a function
+If the coverage for the file being displayed is out of date the function
 called CoverageOld() is called and passed the name of the file.  Similarly,
 for current coverage data file CoverageValid is called.
 
@@ -406,7 +406,7 @@ Copyright 2012-2025, Paul Johnson (paul@pjcj.net)
 This software is free.  It is licensed under the same terms as Perl itself.
 
 The latest version of this software should be available from my homepage:
-http://www.pjcj.net
+https://pjcj.net
 
 The template is copied from Simplecov-Vim
 (https://github.com/nyarly/Simplecov-Vim) and is under the MIT Licence.

@@ -2,7 +2,7 @@ package App::ModuleBuildTiny::Dist;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 use CPAN::Meta;
 use Config;
@@ -33,7 +33,7 @@ sub find {
 }
 
 sub mbt_version {
-	return -f 'dynamic-prereqs.yml' ? '0.048' : '0.039';
+	return -f 'dynamic-prereqs.yml' ? '0.048' : '0.044';
 }
 
 sub prereqs_for {
@@ -460,8 +460,8 @@ sub run {
 	local $CWD = $dir;
 	my $ret = !!1;
 	if ($opts{build}) {
-		system $Config{perlpath}, 'Build.PL';
-		system $Config{perlpath}, 'Build';
+		system $Config{perlpath}, 'Build.PL' and ($opts{allow_failure} or die "Could not run Build.PL");
+		system $Config{perlpath}, 'Build' and ($opts{allow_failure} or die "Could not run Build");
 		my @extralib = map { rel2abs("blib/$_") } 'arch', 'lib';
 		local @PERL5LIB = (@extralib, @PERL5LIB);
 		local @PATH = (rel2abs(catdir('blib', 'script')), @PATH);

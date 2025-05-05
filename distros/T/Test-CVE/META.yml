@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/CPAN-Security/Test-CVE/issues
   repository: https://github.com/CPAN-Security/Test-CVE.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

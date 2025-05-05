@@ -250,5 +250,8 @@
 4018	2023-03-04	Kevin Kamel <kamelkev@underprint.com>
 	* Apply path from Sunnavy related to retaining the order of CSS rules; addresses various unreported bugs
 
-4024	2024-03-13	Kevin Kamel <kamelkev@underprint.com>
+4024	2025-03-13	Kevin Kamel <kamelkev@underprint.com>
 	* Apply patch from Sunnavy related to ignore style tag attributes with the ignore_style_type_attr arg
+
+4027	2025-05-04	Kevin Kamel <kamelkev@underprint.com>
+	* Apply test related patch from Sunnavy related to tests failing/passing incorrectly, reported in RT 163010

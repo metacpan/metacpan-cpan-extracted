@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -165,20 +165,30 @@ my %prompt_for = (
 );
 
 my @config_items = (
-	[ 'author'       , 'What is the author\'s name?', 'open' ],
-	[ 'email'        , 'What is the author\'s email?', 'open',  ],
-	[ 'license'      , 'What license do you want to use?', 'open', 'Perl_5' ],
+	[ 'author'        , 'What is the author\'s name?', 'open' ],
+	[ 'email'         , 'What is the author\'s email?', 'open',  ],
+	[ 'license'       , 'What license do you want to use?', 'open', 'Perl_5' ],
 
-	[ 'write_build'  , 'Do you want to write your build files to your filesystem?', 'yn', !!1],
-	[ 'write_license', 'Do you want to write your LICENSE file to your filesystem?', 'yn', !!1],
-	[ 'write_readme' , 'Do you want to write your README file to your filesystem?', 'yn', !!1],
+	[ 'write_buildpl' , 'Do you want to write your Build.PL file to your filesystem?', 'yn', !!1],
+	[ 'write_meta'    , 'Do you want to write your meta files to your filesystem?', 'yn', !!1],
+	[ 'write_manifest', 'Do you want to write your manifest files to your filesystem?', 'yn', !!1],
+	[ 'write_license' , 'Do you want to write your LICENSE file to your filesystem?', 'yn', !!1],
+	[ 'write_readme'  , 'Do you want to write your README file to your filesystem?', 'yn', !!1],
 
-	[ 'auto_git'     , 'Do you want mbtiny to automatically handle git for you?', 'yn', !!1 ],
-	[ 'auto_bump'    , 'Do you want mbtiny to automatically bump on regenerate for you?', 'yn', !!1 ],
-	[ 'auto_scan'    , 'Do you want mbtiny to automatically scan dependencies for you?', 'yn', !!1 ],
-	[ 'auto_repo'    , 'Do you want mbtiny to automatically add a repository link to the metadata', 'yn', !!1 ],
-	[ 'auto_tracker' , 'Do you want mbtiny to automatically add a bugtracker link to the metadata', 'yn', !!1 ],
+	[ 'auto_git'      , 'Do you want mbtiny to automatically handle git for you?', 'yn', !!1 ],
+	[ 'auto_bump'     , 'Do you want mbtiny to automatically bump on regenerate for you?', 'yn', !!1 ],
+	[ 'auto_scan'     , 'Do you want mbtiny to automatically scan dependencies for you?', 'yn', !!1 ],
+	[ 'auto_repo'     , 'Do you want mbtiny to automatically add a repository link to the metadata', 'yn', !!1 ],
+	[ 'auto_tracker'  , 'Do you want mbtiny to automatically add a bugtracker link to the metadata', 'yn', !!1 ],
 );
+
+my %fallback_config = (
+	'write_buildpl'  => 'write_build',
+	'write_meta'     => 'write_build',
+	'write_manifest' => 'write_build',
+);
+
+my @delete_config = qw/write_build/;
 
 sub ask {
 	my ($config, $item, $local_default) = @_;
@@ -186,7 +196,7 @@ sub ask {
 	my $value = $prompt_for{$type}->($description, $local_default // $global_default);
 
 	if ($value ne '-') {
-		$config->{$key} = $type eq 'open' ? $value : $value ? $JSON::MaybeXS::true : $JSON::MaybeXS::false;
+		$config->{$key} = $type eq 'open' ? $value : $value ? JSON::MaybeXS::true : JSON::MaybeXS::false;
 	}
 	else {
 		delete $config->{$key};
@@ -250,14 +260,16 @@ sub extra_tests {
 	return grep -e, @dirs;
 }
 
-my @build_files = qw/Build.PL META.json META.yml MANIFEST/;
+my @meta_files = qw/META.json META.yml/;
 
 sub regenerate_files {
 	my $config = shift;
 	my @result;
-	push @result, @build_files if $config->{write_build}   // 1;
-	push @result, 'LICENSE'    if $config->{write_license} // 1;
-	push @result, 'README'     if $config->{write_readme}  // 1;
+	push @result, 'Build.PL'   if $config->{write_buildpl}  // $config->{write_build} // 1;
+	push @result, @meta_files  if $config->{write_meta}     // $config->{write_build} // 1;
+	push @result, 'MANIFEST'   if $config->{write_manifest} // $config->{write_build} // 1;
+	push @result, 'LICENSE'    if $config->{write_license}  // 1;
+	push @result, 'README'     if $config->{write_readme}   // 1;
 	return @result;
 }
 
@@ -347,17 +359,17 @@ my %actions = (
 	run => sub {
 		my @arguments = @_;
 		die "No arguments given to run\n" if not @arguments;
-		GetOptionsFromArray(\@arguments, 'build!' => \(my $build = 1)) or return 2;
+		GetOptionsFromArray(\@arguments, 'build!' => \(my $build = 1), 'allow_failure|allow-failure!' => \my $allow_failure) or return 2;
 		insert_options(\my %opts, get_config);
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
-		return $dist->run(commands => [ \@arguments ], build => $build, verbose => 1);
+		return $dist->run(commands => [ [ $SHELL ] ], build => $build, verbose => 0, allow_failure => $allow_failure);
 	},
 	shell => sub {
 		my @arguments = @_;
-		GetOptionsFromArray(\@arguments, 'build!' => \my $build) or return 2;
+		GetOptionsFromArray(\@arguments, 'build!' => \my $build, 'allow_failure|allow-failure!' => \my $allow_failure) or return 2;
 		insert_options(\my %opts, get_config);
 		my $dist = App::ModuleBuildTiny::Dist->new(%opts);
-		return $dist->run(commands => [ [ $SHELL ] ], build => $build, verbose => 0);
+		return $dist->run(commands => [ [ $SHELL ] ], build => $build, verbose => 0, allow_failure => $allow_failure);
 	},
 	listdeps => sub {
 		my @arguments = @_;
@@ -424,8 +436,10 @@ my %actions = (
 		if ($mode eq 'upgrade') {
 			for my $item (@config_items) {
 				next if defined $config->{ $item->[0] };
-				ask($config, $item);
+				my $default = $config->{ $fallback_config{ $item->[0] } // '' };
+				ask($config, $item, $default);
 			}
+			# delete $config->{$_} for @delete_config;
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'minimal') {
@@ -437,12 +451,15 @@ my %actions = (
 					ask($config, $item);
 				}
 			}
+			delete $config->{$_} for @delete_config;
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'all') {
 			for my $item (@config_items) {
-				ask($config, $item, $config->{ $item->[0] });
+				my $default = $config->{ $item->[0] } // $config->{ $fallback_config{ $item->[0] } // '' };
+				ask($config, $item, $default);
 			}
+			delete $config->{$_} for @delete_config;
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'get') {
@@ -454,7 +471,7 @@ my %actions = (
 		}
 		elsif ($mode eq 'set') {
 			my ($key, $value) = @arguments;
-			my $item = grep { $_->[0] eq $key } @config_items;
+			my $item = grep { $_->[0] eq lc $key } @config_items;
 			die "No such known key $key" if not $item;
 			if ($item->[2] eq 'yn') {
 				$config->{$key} = $boolean{$value} // die "Unknown boolean value '$value'\n";
@@ -466,7 +483,7 @@ my %actions = (
 		elsif ($mode eq 'list') {
 			for my $item (@config_items) {
 				my ($key, $description, $type, $default) = @{$item};
-				say "\u$key: " . show_item($config, $key, $type);
+				say "$key: " . show_item($config, $key, $type);
 			}
 		}
 		elsif ($mode eq 'reset') {
@@ -485,15 +502,18 @@ my %actions = (
 		if ($mode eq 'upgrade') {
 			for my $item (@items) {
 				next if defined $config->{ $item->[0] };
-				ask($config, $item, $settings->{ $item->[0] });
+				my $default = $config->{ $fallback_config{ $item->[0] } // '' };
+				ask($config, $item, $default);
 			}
+			delete $config->{$_} for @delete_config;
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'all') {
 			for my $item (@items) {
-				my $default = $config->{ $item->[0] } // $settings->{ $item->[0] };
+				my $default = $config->{ $item->[0] } // $config->{ $fallback_config{ $item->[0] } // '' } // $settings->{ $item->[0] };
 				ask($config, $item, $default);
 			}
+			delete $config->{$_} for @delete_config;
 			write_json($config_file, $config);
 		}
 		elsif ($mode eq 'copy') {
@@ -512,7 +532,7 @@ my %actions = (
 		}
 		elsif ($mode eq 'set') {
 			my ($key, $value) = @arguments;
-			my $item = grep { $_->[0] eq $key } @config_items;
+			my $item = grep { $_->[0] eq lc $key } @config_items;
 			die "No such known key $key" if not $item;
 			$config->{$key} = $boolean{$value} // die "Unknown boolean value '$value'\n";
 			write_json($config_file, $config);
@@ -520,7 +540,7 @@ my %actions = (
 		elsif ($mode eq 'list') {
 			for my $item (@items) {
 				my ($key, $description, $type, $default) = @{$item};
-				say "\u$key: " . show_item($config, $key, $type);
+				say "$key: " . show_item($config, $key, $type);
 			}
 		}
 		elsif ($mode eq 'reset') {

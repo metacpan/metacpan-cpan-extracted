@@ -52,7 +52,7 @@ use Safe::Isa '$_call_if_object';
 use PPI::Statement                 ();
 use PPI::Statement::Include::Perl6 ();
 
-our $VERSION = '1.281';
+our $VERSION = '1.283';
 
 our @ISA = "PPI::Statement";
 
@@ -319,7 +319,11 @@ sub _decompose_argument {
 	  or $arg->isa("PPI::Statement::Expression");
 	my $as_text = $arg->can("literal") || $arg->can("string");
 	return $as_text->($arg) if $as_text;
-	die "unknown arg decompose type: $arg , " . ref $arg;
+	return if $arg->isa("PPI::Token::Operator")
+	  or $arg->content eq ",";
+	warn "possibly unrecognized feature because of unknown arg decompose"
+	 . " type: '$arg' : " . ref $arg;
+	return;
 }
 
 sub _custom_feature_includes {

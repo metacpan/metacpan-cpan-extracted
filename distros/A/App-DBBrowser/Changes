@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.429  2025-05-05
+        - Term::TablePrint minimum version 0.171.
+        - Added 'List::MoreUtils::XS' to prereq_pm.
+        - New option 'Pad Row Edges'.
+
 2.428  2025-04-27
         - Perl minimum version 5.16.0.
         - Term::TablePrint minimum version 0.170.

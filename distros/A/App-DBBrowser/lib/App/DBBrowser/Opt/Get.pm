@@ -90,6 +90,7 @@ sub defaults {
             color             => 0,
             min_col_width     => 30,
             mouse             => 0,
+            pad_row_edges     => 0,
             progress_bar      => 40_000,
             search            => 1,
             squash_spaces     => 0,

@@ -3,23 +3,23 @@
 # This software is free.  It is licensed under the same terms as Perl itself.
 
 # The latest version of this software should be available from my homepage:
-# http://www.pjcj.net
+# https://pjcj.net
 
 package Devel::Cover::Annotation::Svk;
 
 use strict;
 use warnings;
 
-our $VERSION = '1.46'; # VERSION
+our $VERSION = '1.47'; # VERSION
 
 use Getopt::Long;
 use Digest::MD5;
 
 sub md5_fh {
   my $fh  = shift;
-  my $ctx = Digest::MD5->new;
-  $ctx->addfile($fh);
-  $ctx->hexdigest
+  my $md5 = Digest::MD5->new;
+  $md5->addfile($fh);
+  $md5->hexdigest
 }
 
 sub new {
@@ -144,7 +144,7 @@ Devel::Cover::Annotation::Svk - Annotate with svk information
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 
@@ -170,6 +170,6 @@ Copyright 2005-2025, Paul Johnson (paul@pjcj.net)
 This software is free.  It is licensed under the same terms as Perl itself.
 
 The latest version of this software should be available from my homepage:
-http://www.pjcj.net
+https://pjcj.net
 
 =cut

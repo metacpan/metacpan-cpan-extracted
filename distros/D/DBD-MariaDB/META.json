@@ -98,7 +98,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Alexey Molchanov <alexey.molchanov@portaone.com>",
@@ -117,7 +117,7 @@
       "Damyan Ivanov <dmn@debian.org>",
       "Dan Book <grinnz@gmail.com>",
       "Daniël van Eeden <daniel.vaneeden@booking.com>",
-      "Dave Lambley <davel@isosceles.(none)>",
+      "Dave Lambley <dave@lambley.me.uk>",
       "David Farrell <davidnmfarrell@gmail.com>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Dominik Sauer <dominik.sauer@gooddata.com>",

@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.171   2025-05-05
+        - Code refactoring.
+        - New option 'pad_row_edges'.
+
 0.170   2025-04-27
         - Added new dependency: Term::Choose::LineFold::XS.
         - Term::Choose minimum version 1.774.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.16.0;
 
-our $VERSION = '0.170';
+our $VERSION = '0.171';
 
 use Term::Choose::Constants qw( EXTRA_W );
 use Term::Choose::Screen    qw( clear_screen clear_to_end_of_line );
@@ -67,7 +67,7 @@ Term::TablePrint::ProgressBar - Show a progress bar.
 
 =head1 VERSION
 
-Version 0.170
+Version 0.171
 
 =cut
 

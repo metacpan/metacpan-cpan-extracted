@@ -33,7 +33,7 @@ resources:
   IRC: irc://irc.perl.org/#redis
   bugtracker: https://github.com/dgl/protocol-redis-xs/issues
   repository: https://github.com/dgl/protocol-redis-xs.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - '5c30 <10b39ae0@13os.net>'
   - 'Dan Book <grinnz@grinnz.com>'

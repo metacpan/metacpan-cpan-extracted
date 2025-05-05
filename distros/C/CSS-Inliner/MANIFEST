@@ -31,6 +31,7 @@ t/html/charset.html
 t/html/charset_result.html
 t/html/embedded_style.html
 t/html/embedded_style_result.html
+t/html/embedded_style_result_encoded.html
 t/html/linebreaktest.html
 t/html/linebreaktest_result.html
 t/html/linktest.html

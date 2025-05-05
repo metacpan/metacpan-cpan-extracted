@@ -67,7 +67,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#redis"
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "5c30 <10b39ae0@13os.net>",
       "Dan Book <grinnz@grinnz.com>",

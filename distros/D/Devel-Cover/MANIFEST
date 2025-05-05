@@ -186,7 +186,6 @@ test_output/cover/trivial.5.012000
 test_output/cover/uncoverable.5.012000
 test_output/cover/uncoverable_error.5.012000
 test_output/cover/uncoverable_error_ignore.5.012000
-test_output/cover/v-58x.5.012000
 test_output/cover/xor_constant_fold.5.012000
 tests/.uncoverable
 tests/Accessor_maker.pm
@@ -284,7 +283,6 @@ tests/trivial
 tests/uncoverable
 tests/uncoverable_error
 tests/uncoverable_error_ignore
-tests/v-58x
 tests/xor_constant_fold
 utils/Devel/Cover/BuildUtils.pm
 utils/all_versions

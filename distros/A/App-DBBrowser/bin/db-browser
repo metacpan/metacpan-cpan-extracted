@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.428';
+our $VERSION = '2.429';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.428
+Version 2.429
 
 =head1 SYNOPSIS
 
@@ -1168,6 +1168,10 @@ while preparing the data for output.
 =head3 Tab Width
 
 Set the number of spaces between columns.
+
+=head3 Pad row edges
+
+Add a space at the beginning and end of each table row.
 
 =head3 Color
 

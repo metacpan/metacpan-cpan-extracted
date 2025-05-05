@@ -1,3 +1,9 @@
+0.11	- 2025-05-04, H.Merijn Brand
+    * Fix documentation
+    * Run has_no_cves only in author mode and advice against using it
+      in standard test suites
+    * Make want uniq
+
 0.10	- 2025-05-02, H.Merijn Brand
     * has_no_cves (issue#4)
     * fix issue tracker (garu PR#5)

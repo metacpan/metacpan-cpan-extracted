@@ -4,7 +4,9 @@
    "auto_repo" : true,
    "auto_scan" : true,
    "auto_tracker" : true,
-   "write_build" : true,
+   "write_buildpl" : true,
    "write_license" : true,
+   "write_manifest" : true,
+   "write_meta" : true,
    "write_readme" : true
 }

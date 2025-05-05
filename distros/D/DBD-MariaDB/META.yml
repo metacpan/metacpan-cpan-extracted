@@ -56,7 +56,7 @@ resources:
   homepage: https://github.com/perl5-dbi/DBD-MariaDB
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-MariaDB.git
-version: '1.23'
+version: '1.24'
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alexey Molchanov <alexey.molchanov@portaone.com>'
@@ -75,7 +75,7 @@ x_contributors:
   - 'Damyan Ivanov <dmn@debian.org>'
   - 'Dan Book <grinnz@gmail.com>'
   - 'Daniël van Eeden <daniel.vaneeden@booking.com>'
-  - 'Dave Lambley <davel@isosceles.(none)>'
+  - 'Dave Lambley <dave@lambley.me.uk>'
   - 'David Farrell <davidnmfarrell@gmail.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Dominik Sauer <dominik.sauer@gooddata.com>'

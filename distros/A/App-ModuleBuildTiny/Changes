@@ -1,5 +1,11 @@
 Revision history for App-ModuleBuildTiny
 
+0.051     2025-05-04 18:16:29+0200
+          - Don't uppercase configuration keys
+          - Make 0.044 the default minimum Module::Build::Tiny
+          - Don't continue run if the build fails
+          - Split write_build into 3 options
+
 0.050     2025-04-11 13:37:32+0200
           - Correctly set dynamic_config if dynamic requirements are detected
           - Add x_generated_by_perl to metadata

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.031';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.032';
 use strict;
 use warnings;
 
@@ -48,7 +48,7 @@ sub process_linker {
 			$opts{dl_name} //= $opts{module_name} if $opts{module_name};
 			$opts{dl_file} //= do {
 				(my $short = $opts{dl_name}) =~ s/.*:://;
-				catdir(dirname($from), "$short.def");
+				catdir(dirname($to), "$short");
 			};
 			return ($from, $to, %opts);
 		});
@@ -86,7 +86,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.031
+version 0.032
 
 =head1 SYNOPSIS
 

@@ -8,9 +8,9 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.044'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.050, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.051, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ name: App-ModuleBuildTiny
 provides:
   App::ModuleBuildTiny:
     file: lib/App/ModuleBuildTiny.pm
-    version: '0.050'
+    version: '0.051'
   App::ModuleBuildTiny::Dist:
     file: lib/App/ModuleBuildTiny/Dist.pm
-    version: '0.050'
+    version: '0.051'
 requires:
   App::RewriteVersion: '0'
   Archive::Tar: '0'
@@ -67,7 +67,7 @@ resources:
   IRC: irc://irc.perl.org/#toolchain
   bugtracker: https://github.com/Leont/App-ModuleBuildTiny/issues
   repository: https://github.com/Leont/App-ModuleBuildTiny.git
-version: '0.050'
-x_generated_by_perl: v5.40.0
+version: '0.051'
+x_generated_by_perl: v5.40.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
