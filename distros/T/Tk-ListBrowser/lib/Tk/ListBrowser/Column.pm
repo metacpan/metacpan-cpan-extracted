@@ -43,7 +43,7 @@ sub nextPosition {
 	my $newy = $y + ($cellheight * 2);
 	my ($cwidth, $cheight) = $self->canvasSize;
 	if ($newy >= $cheight) {
-		$y = 0;
+		$y = $self->cget('-margintop');
 		$x = $x + $cellwidth + 1;
 		$row = 0;
 		$column ++;
@@ -62,8 +62,6 @@ sub type {
 	return 'column'
 }
 
-=back
-
 =head1 LICENSE
 
 Same as Perl.
@@ -81,12 +79,6 @@ Hans Jeuken (hanje at cpan dot org)
 =head1 BUGS AND CAVEATS
 
 If you find any bugs, please report them here: L<https://github.com/haje61/Tk-ListBrowser/issues>.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item L<Tk::ListBrowser::Item>
 
 =back
 

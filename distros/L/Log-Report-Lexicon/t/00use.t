@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 10;
+use Test::More;
 
 # The versions of the following packages are reported to help understanding
 # the environment in which the tests are run.  This is certainly not a
@@ -27,7 +27,6 @@ foreach my $package (sort @show_versions)
 
 use_ok('Log::Report');
 use_ok('Log::Report::Extract');
-use_ok('Log::Report::Extract::Template');
 use_ok('Log::Report::Lexicon::Index');
 use_ok('Log::Report::Lexicon::PO');
 use_ok('Log::Report::Lexicon::POT');
@@ -37,3 +36,5 @@ use_ok('Log::Report::Translator');
 use_ok('Log::Report::Translator::POT');
 
 # Log::Report::Extract::PerlPPI         requires optional PPI
+
+done_testing;

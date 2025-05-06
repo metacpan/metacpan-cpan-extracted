@@ -3,3 +3,9 @@ Revision history for Const-XS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.08    2025-05-05
+	- Throw an error when trying to set odd number of elements in hash assignment.
+        - Fix/Add additional tests for combining/merging Const::XS variables.
+
+0.09    2025-05-05
+        - Add additional tests for exporting Const::XS variables.

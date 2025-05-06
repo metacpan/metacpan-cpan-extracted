@@ -2,7 +2,7 @@ NAME
     image-generator - Script to generate video.
 
 SYNOPSIS
-     image-generator [-h] [-i input_dir] [-s size] [-v] [--version] output_file
+     image-generator [-h] [-i input_dir] [-p pattern] [-s size] [-v] [--version] output_file
 
 DESCRIPTION
      image-generator script uses Image::Random or Image::Select classes to create image.
@@ -16,6 +16,11 @@ ARGUMENTS
 
              Input directory with images.
              Default value is nothing, then generates random images.
+
+    *       "-p pattern"
+
+             Use pattern.
+             Default value is 'checkerboard'.
 
     *       "-s size"
 
@@ -40,11 +45,12 @@ EXAMPLE1
      image-generator
 
      # Output:
-     # Usage: /home/skim/perl5/bin/image-generator [-h] [-i input_dir] [-s size] [-v]
+     # Usage: /home/skim/perl5/bin/image-generator [-h] [-i input_dir] [-p pattern] [-s size] [-v]
      #         [--version] output_file
      # 
      #         -h              Print help.
      #         -i input_dir    Input directory with images (default value is nothing).
+     #         -p pattern      Pattern (checkerboard).
      #         -s size         Size (default value is 1920x1080).
      #         -v              Verbose mode.
      #         --version       Print version.
@@ -79,10 +85,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2015-2023 Michal Josef Špaček
+    © 2015-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

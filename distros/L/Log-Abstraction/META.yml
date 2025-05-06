@@ -4,15 +4,17 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   File::Temp: '0'
   Test::DescribeMe: '0'
   Test::More: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  YAML::XS: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,11 +26,11 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Config::Auto: '0'
+  Config::Abstraction: '0'
   ExtUtils::MakeMaker: '6.64'
-  Params::Get: '0'
+  Params::Get: '0.04'
   Scalar::Util: '0'
   Sys::Syslog: '0'
 resources: {}
-version: 0.07
+version: 0.08
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

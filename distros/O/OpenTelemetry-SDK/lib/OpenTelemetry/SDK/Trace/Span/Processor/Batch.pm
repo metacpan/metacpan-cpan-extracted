@@ -3,11 +3,12 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Span::Processor::Batch;
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     :does(OpenTelemetry::Trace::Span::Processor)
 {
+    use Log::Any;
     use Feature::Compat::Defer;
     use Feature::Compat::Try;
     use Future::AsyncAwait;
@@ -19,7 +20,7 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     use OpenTelemetry::X;
     use OpenTelemetry;
 
-    my $logger = OpenTelemetry->logger;
+    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
 
     use Metrics::Any '$metrics', strict => 1,
         name_prefix => [qw( otel bsp )];
@@ -66,7 +67,7 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
         ) unless $exporter && $exporter->DOES('OpenTelemetry::Exporter');
 
         if ( $batch_size > $max_queue_size ) {
-            OpenTelemetry->logger->warn(
+            $logger->warn(
                 'Max export batch size cannot be greater than maximum queue size when instantiating batch processor',
                 {
                     batch_size => $batch_size,

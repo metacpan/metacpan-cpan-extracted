@@ -5,7 +5,7 @@ use warnings;
 
 use App::Image::Generator;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Run.
 exit App::Image::Generator->new->run;
@@ -28,7 +28,7 @@ image-generator - Script to generate video.
 
 =head1 SYNOPSIS
 
- image-generator [-h] [-i input_dir] [-s size] [-v] [--version] output_file
+ image-generator [-h] [-i input_dir] [-p pattern] [-s size] [-v] [--version] output_file
 
 =head1 DESCRIPTION
 
@@ -46,6 +46,11 @@ image-generator - Script to generate video.
 
  Input directory with images.
  Default value is nothing, then generates random images.
+
+=item * C<-p pattern>
+
+ Use pattern.
+ Default value is 'checkerboard'.
 
 =item * C<-s size>
 
@@ -73,11 +78,12 @@ image-generator - Script to generate video.
  image-generator
 
  # Output:
- # Usage: /home/skim/perl5/bin/image-generator [-h] [-i input_dir] [-s size] [-v]
+ # Usage: /home/skim/perl5/bin/image-generator [-h] [-i input_dir] [-p pattern] [-s size] [-v]
  #         [--version] output_file
  # 
  #         -h              Print help.
  #         -i input_dir    Input directory with images (default value is nothing).
+ #         -p pattern      Pattern (checkerboard).
  #         -s size         Size (default value is 1920x1080).
  #         -v              Verbose mode.
  #         --version       Print version.
@@ -118,12 +124,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2023 Michal Josef Špaček
+© 2015-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -188,7 +188,7 @@ December 2007
 	tab character ("\t"), (ie. if -indentchar is set to spaces);
 	* Major documentation overhaul to include all the methods and options.
 	* Misc. general minor code fixes and cleanups.
-
+30 July 2024
 	Update to version 2.1
 	* Exclude escaped (preceeded by a backslash - "\") brace characters and 
 	those contained in quoted strings from matching when doing brace-matching. 
@@ -199,3 +199,14 @@ December 2007
 	lieu of "Syntax::Highlight::Perl::Improved" (an ancient, unmaintained 
 	syntax-parsing module), when it is installed.  The new module will offer 
 	better here-doc highlighting and improved efficiency (speed).
+
+	Update to version 2.2
+	* Prevent crash if opened with "-ansicolor" opt specified and a SuperText 
+	module is not being used.
+	* Fix issue where the viewer wasn't always completely "readonly" (no user-
+	edits of text) when a file was first opened in a ROTextHighlight widget due 
+	to failure to properly initialize the field.
+	* Add overriding bindings for <space> and <backspace> in order to make work 
+	as desired regardless of which underlying Text widget was chosen/loaded.
+	* Move POD documentation to bottom of source-file b/c it was driving me 
+	crazy working on the source with it all at the top!

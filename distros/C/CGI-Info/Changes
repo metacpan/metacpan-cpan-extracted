@@ -1,5 +1,12 @@
 Revision history for CGI-Info
 
+0.101
+	Try hard to find the config files - should be in Config::Abstraction
+	Called 1.00 to work around version control which things 'dot' is the same as 'decimal point'
+
+0.100	Sat May  3 21:16:56 EDT 2025
+	Pave the way for the latest Config::Abstraction
+
 0.99	Wed Apr 23 07:55:03 EDT 2025
 	Don't try to read from the terminal when not interactive
 	Added t/config.t

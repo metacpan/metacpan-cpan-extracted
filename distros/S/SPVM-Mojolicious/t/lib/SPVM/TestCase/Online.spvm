@@ -1,0 +1,72 @@
+class TestCase::Online {
+  use TestUtil::HTTP::Tiny;
+  use Fn;
+  use Go;
+  use Array;
+  
+  use Mojo::Transaction;
+  use Mojo::Transaction::HTTP;
+  use Mojo::Content::Single;
+  
+  our $RESULT : IntList;
+  
+  static method test_http_tiny : int () {
+    
+    my $url = "http://google.com";
+    
+    my $http = TestUtil::HTTP::Tiny->new;
+    
+    my $res = $http->get($url);
+    
+    my $content = $res->content;
+    
+    unless (Fn->contains($content, "www.google.com")) {
+      return 0;
+    }
+    
+    unless ($res->status == 200 || $res->status == 301) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method go_http_tiny : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      my $url = "http://google.com";
+      
+      my $http = TestUtil::HTTP::Tiny->new;
+      
+      my $res = $http->get($url);
+      
+      my $content = $res->content;
+      
+      $RESULT->push(Fn->contains($content, "www.google.com"));
+    });
+    
+    Go->go(method : void () {
+      my $url = "http://google.com";
+      
+      my $http = TestUtil::HTTP::Tiny->new;
+      
+      my $res = $http->get($url);
+      
+      my $content = $res->content;
+      
+      $RESULT->push(Fn->contains($content, "www.google.com"));
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 1])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+}

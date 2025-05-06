@@ -1,5 +1,5 @@
-=== README for Log-Report-Template version 0.13
-=   Generated on Tue Jan 23 22:25:42 2018 by OODoc 2.02
+=== README for Log-Report-Template version 0.90
+=   Generated on Thu Apr 10 10:49:22 2025 by OODoc 2.03
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d Log-Report-Template-0.13.tar.gz
-       tar -xf Log-Report-Template-0.13.tar
-       cd Log-Report-Template-0.13
+       gzip -d Log-Report-Template-0.90.tar.gz
+       tar -xf Log-Report-Template-0.90.tar
+       cd Log-Report-Template-0.90
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/Log-Report-Template-0.13/
+    http://search.cpan.org/dist/Log-Report-Template-0.90/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=Log-Report-Template

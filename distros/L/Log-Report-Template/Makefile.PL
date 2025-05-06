@@ -2,13 +2,13 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '0.13';
+my $version = '1.00';
 
 my %prereq  =
   ( Test::More               => 0.86
   , Scalar::Util             => 0
-  , Log::Report              => 1.20
-  , Log::Report::Lexicon     => 1.08
+  , Log::Report              => 1.40
+  , Log::Report::Lexicon     => 1.13
   , Template                 => 2.26
   , String::Print            => 0.91
   , File::Find               => 0
@@ -19,9 +19,9 @@ WriteMakefile
   , VERSION   => $version
   , PREREQ_PM => \%prereq
 
-  , AUTHOR    => 'Mark Overmeer'
+  , AUTHOR    => 'Mark Overmeer <markov@cpan.org>'
   , ABSTRACT  => 'template toolkit with translations'
-  , LICENSE   => 'perl'
+  , LICENSE   => 'perl_5'
 
   , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -31,9 +31,9 @@ WriteMakefile
             , url  => 'https://github.com/markov2/perl5-Log-Report-Template.git'
             , web  => 'https://github.com/markov2/perl5-Log-Report-Template'
             }
+         , homepage => 'http://perl.overmeer.net/CPAN/'
+         , license  => [ 'http://dev.perl.org/licenses/' ]
          }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
 
   );
@@ -49,11 +49,10 @@ SKIP_LINKS      = Dancer2::Config
 FIRST_YEAR      = 2017
 EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/CPAN/
-EXTENDS         = ../../perl/LogOpt:../String-Print:../../perl/LogLex:../../perl/LogReport
+EXTENDS         = ../Log-Report-Optional:../String-Print:../Log-Report-Lexicon:../Log-Report
 
 __POSTAMBLE
 
 # for translation tables
 #linkext::
-#	- PERL5LIB="lib:$PERL5LIB" bin/xgettext-perl --mode=VERBOSE \
-#	    -p lib/Log/Report/messages lib bin
+#	- PERL5LIB="lib:$PERL5LIB" bin/xgettext-perl --mode=VERBOSE -p lib/Log/Report/messages lib

@@ -3,8 +3,11 @@ use Test::More;
 
 use Crypt::OpenSSL::Random;
 use Crypt::OpenSSL::RSA;
+use Crypt::OpenSSL::Guess qw(openssl_version);
 
-BEGIN { plan tests => 43 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 4 * 5 : 0 ) }
+BEGIN {
+    plan tests => 43 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 4 * 5 : 0 ) + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ? 1 * 5 : 0 );
+}
 
 sub _Test_Encrypt_And_Decrypt {
     my ( $p_plaintext_length, $p_rsa, $p_check_private_encrypt ) = @_;
@@ -29,19 +32,22 @@ sub _Test_Encrypt_And_Decrypt {
 }
 
 sub _Test_Sign_And_Verify {
-    my ( $plaintext, $rsa, $rsa_pub ) = @_;
+    my ( $plaintext, $rsa, $rsa_pub, $hash ) = @_;
 
-    my $sig = $rsa->sign($plaintext);
-    ok( $rsa_pub->verify( $plaintext, $sig ) );
+    my $sig = eval { $rsa->sign($plaintext) };
+  SKIP: {
+        skip "OpenSSL error: illegal or unsupported padding mode - $hash", 5 if $@ =~ /illegal or unsupported padding mode/i;
+        ok( $rsa_pub->verify( $plaintext, $sig ) );
 
-    my $false_sig = unpack "H*", $sig;
-    $false_sig =~ tr/[a-f]/[0a-d]/;
-    ok( !$rsa_pub->verify( $plaintext, pack( "H*", $false_sig ) ) );
-    ok( !$rsa->verify( $plaintext, pack( "H*", $false_sig ) ) );
+        my $false_sig = unpack "H*", $sig;
+        $false_sig =~ tr/[a-f]/[0a-d]/;
+        ok( !$rsa_pub->verify( $plaintext, pack( "H*", $false_sig ) ) );
+        ok( !$rsa->verify( $plaintext, pack( "H*", $false_sig ) ) );
 
-    my $sig_of_other = $rsa->sign("different");
-    ok( !$rsa_pub->verify( $plaintext, $sig_of_other ) );
-    ok( !$rsa->verify( $plaintext, $sig_of_other ) );
+        my $sig_of_other = $rsa->sign("different");
+        ok( !$rsa_pub->verify( $plaintext, $sig_of_other ) );
+        ok( !$rsa->verify( $plaintext, $sig_of_other ) );
+    }
 }
 
 sub _check_for_croak {
@@ -121,38 +127,46 @@ $plaintext .= $plaintext x 5;
 # check signature algorithms
 $rsa->use_md5_hash();
 $rsa_pub->use_md5_hash();
-_Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub );
+_Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "md5" );
 
 $rsa->use_sha1_hash();
 $rsa_pub->use_sha1_hash();
-_Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub );
+_Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha1" );
 
 if ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ) {
     $rsa->use_sha224_hash();
     $rsa_pub->use_sha224_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha224" );
 
     $rsa->use_sha256_hash();
     $rsa_pub->use_sha256_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha256" );
 
     $rsa->use_sha384_hash();
     $rsa_pub->use_sha384_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha384" );
 
     $rsa->use_sha512_hash();
     $rsa_pub->use_sha512_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha512" );
 }
 
-$rsa->use_ripemd160_hash();
-$rsa_pub->use_ripemd160_hash();
-_Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub );
+my ( $major, $minor, $patch ) = openssl_version();
 
-if (UNIVERSAL::can("Crypt::OpenSSL::RSA", "use_whirlpool_hash")) {
+SKIP: {
+    skip "ripemd160 in legacy provider between 3.02 and 3.07", 5
+      if $major eq '3.0'
+      && ( $minor ge '2' && $minor le '6' );
+
+    $rsa->use_ripemd160_hash();
+    $rsa_pub->use_ripemd160_hash();
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "ripemd160" );
+}
+
+if ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ) {
     $rsa->use_whirlpool_hash();
     $rsa_pub->use_whirlpool_hash();
-    _Test_Sign_And_Verify($plaintext, $rsa, $rsa_pub);
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "whirlpool" );
 }
 
 # check subclassing

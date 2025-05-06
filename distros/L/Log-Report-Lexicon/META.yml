@@ -27,7 +27,7 @@ requires:
   File::Temp: '0'
   IO::File: '0'
   List::Util: '0'
-  Log::Report: '1.22'
+  Log::Report: '1.4'
   POSIX: '0'
   Pod::Usage: '0'
   Scalar::Util: '0'
@@ -36,5 +36,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Log-Report-Lexicon.git
-version: '1.12'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

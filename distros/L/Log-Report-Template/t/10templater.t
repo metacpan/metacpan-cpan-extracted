@@ -18,17 +18,12 @@ my $lexicon = dirname($incl) .'/lexicons';
 
 use_ok 'Log::Report::Template';
 
-my $templater = Log::Report::Template->new
-  ( INCLUDE_PATH => $incl
-  );
+my $templater = Log::Report::Template->new(INCLUDE_PATH => $incl);
 isa_ok $templater, 'Log::Report::Template';
 
 ### Construct textdomain 'first'
 
-my $first = $templater->addTextdomain
-  ( name    => 'first'
-  , lexicon => $lexicon
-  );
+my $first = $templater->addTextdomain(name => 'first', lexicon => $lexicon);
 isa_ok $first, 'Log::Report::Template::Textdomain';
 
 is $first->function, 'loc', 'default function';
@@ -48,9 +43,9 @@ eval { $templater->addTextdomain(name => 'error1', only_in_directory => '/tmp')}
 is $@, "error: directory /tmp not in INCLUDE_PATH, used by addTextdomain(only_in_directory)\n"
   , 'outside INCLUDE_PATH';
 
-eval { $templater->addTextdomain(name => 'error2') };
-is $@, "error: textdomain 'error2' does not specify the lexicon directory\n"
-  , 'no lexicon';
+#eval { $templater->addTextdomain(name => 'error2') };
+#is $@, "error: textdomain 'error2' does not specify the lexicon directory\n"
+#  , 'no lexicon';
 
 eval { $templater->addTextdomain(name => 'error3', lexicon => $lexicon) };
 is $@, "error: translation function 'loc' already in use by textdomain 'first'\n"

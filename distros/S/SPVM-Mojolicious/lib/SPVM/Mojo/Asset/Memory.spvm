@@ -1,0 +1,160 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Asset::Memory extends Mojo::Asset {
+  version_from Mojo;
+  
+  use Mojo::Asset::File;
+  use IO;
+  
+  # Fields
+  has auto_upgrade : ro byte;
+  
+  has max_memory_size : ro int;
+  
+  has mtime : rw long;
+  
+  has content_buffer : StringBuffer;
+  
+  has frozen : byte;
+  
+  # Class Methods
+  static method new : Mojo::Asset::Memory ($options : object[] = undef) {
+    
+    my $self = new Mojo::Asset::Memory;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init;
+    
+    my $options_h = Hash->new($options);
+    
+    $self->{auto_upgrade} = (byte)$options_h->get_or_default_int("auto_upgrade", 0);
+    
+    $self->{max_memory_size} = $options_h->get_or_default_int("max_memory_size", 262144);
+    
+    $self->{mtime} = $options_h->get_or_default_long("mtime", CommandInfo->BASETIME);
+    
+    $self->{content_buffer} = StringBuffer->new;
+    
+  }
+  
+  method add_chunk : Mojo::Asset ($chunk : string) {
+    
+    unless ($chunk) {
+      die "The chunk \$chunk must be defined.";
+    }
+    
+    if ($self->{frozen}) {
+      die "Asset has been upgraded and is now frozen.";
+    }
+    
+    if ($self->auto_upgrade && ($self->size + length $chunk) > $self->max_memory_size) {
+      my $file = Mojo::Asset::File->new;
+      
+      # TODO
+      # $self->emit(upgrade => $file);
+      
+      $self->{frozen} = 1;
+      
+      $file->add_chunk($self->slurp . $chunk);
+      
+      return $file;
+    }
+    
+    $self->{content_buffer}->push($chunk);
+    
+    return $self;
+  }
+  
+  method contains : int ($string : string) {
+    
+    my $start = $self->start_range;
+    
+    unless ($start <= Fn->INT_MAX) {
+      die "The start_range field must be less than or equal to Fn->INT_MAX.";
+    }
+    
+    my $end = $self->end_range;
+    
+    unless ($end <= Fn->INT_MAX) {
+      die "The end_range field must be less than or equal to Fn->INT_MAX.";
+    }
+    
+    my $pos = Fn->index($self->{content_buffer}->to_string, $string, (int)$start);
+    
+    if ($start && $pos >= 0) {
+      $pos -= $start;
+    }
+    
+    if ($end >= 0 && ($pos + length $string) >= $end) {
+      $pos = -1;
+    }
+    
+    return $pos;
+  }
+  
+  method get_chunk : string ($offset : long, $max : int = 131072) {
+    
+    my $start = $self->start_range;
+    
+    unless ($start <= Fn->INT_MAX) {
+      die "The start_range field must be less than or equal to Fn->INT_MAX.";
+    }
+    
+    my $end = $self->end_range;
+    
+    unless ($end <= Fn->INT_MAX) {
+      die "The end_range field must be less than or equal to Fn->INT_MAX.";
+    }
+    
+    unless ($offset <= Fn->INT_MAX) {
+      die "The offset \$offset must be less than or equal to Fn->INT_MAX.";
+    }
+    
+    $offset += $start;
+    
+    if ($end >= 0) {
+      if (($offset + $max) > $end) {
+        $max = (int)$end + 1 - (int)$offset;
+      }
+    }
+    
+    return $self->{content_buffer}->substr((int)$offset, $max);
+  }
+  
+  method move_to : void ($file : string) {
+    
+    my $content = $self->{content_buffer}->to_string;
+    
+    my $fh = IO->open(">", $file);
+    
+    $fh->print($content);
+  }
+  
+  method size : long () {
+    return $self->{content_buffer}->length;
+  }
+  
+  method slurp : string () {
+    
+    my $content = $self->{content_buffer}->to_string;
+    
+    return $content;
+  }
+  
+  method to_file : Mojo::Asset::File () {
+    
+    my $file = Mojo::Asset::File->new;
+    
+    $file->add_chunk($self->slurp);
+    
+    return $file;
+  }
+  
+}

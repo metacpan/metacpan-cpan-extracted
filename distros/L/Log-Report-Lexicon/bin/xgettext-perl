@@ -20,7 +20,7 @@ my ($char_in, $char_out) = ('utf-8', 'utf-8');
 my ($default_domain, $mode, $template);
 
 GetOptions
-   'cleanup!'          => $cleanup   # kill transl from removed files, def true
+   'cleanup!'          => \$cleanup  # kill transl from removed files, def true
  , 'config|c=s'        => \%configs  # domain configurations
  , 'domain|d=s'        => \$default_domain    # for templates
  , 'files-from|f=s'    => \$from     # file with filenames (MANIFEST?) or '-'
@@ -98,14 +98,14 @@ my $extr;
 my %processed;
 
 if($template)
-{   # process from template
-    eval "require Log::Report::Extract::Template";
+{   # process from template toolkit
+    eval "require Log::Report::Template::Extract";
     panic $@ if $@;
 
     $default_domain
         or error __x"specify a text-domain (-d) for the templates";
 
-    $extr = Log::Report::Extract::Template->new
+    $extr = Log::Report::Template::Extract->new
       ( lexicon => $output
       , charset => $char_out
       , domain  => $default_domain
@@ -144,6 +144,7 @@ else
     }
 }
 
+warn "CLEANUP KEEP=$cleanup";
 $extr->cleanup(keep => \%processed)
     if $cleanup;
 
@@ -174,11 +175,11 @@ xgettext-perl - extract translatable strings
   TEMPLATE OPTIONS
   --domain      -d $domain    domain to be used
   --template    -t $notation  how to recognize the strings to be taken
-  --files-match -m $regex     filter filenames, default .pm and .pl
+  --files-match -m $regex     filter filenames, default .tt and .tt2
 
   SCRIPT OPTIONS
   --language    -L $proglang  programming language syntax (now only perl)
-  --files-match -m $regex     filter filenames, default .tt and .tt2
+  --files-match -m $regex     filter filenames, default .pm and .pl
 
 =head1 DESCRIPTION
 
@@ -198,7 +199,7 @@ context sensitive translations, which require a configuration file.
 See Log::Report::Context
 
 Say, your scripts and templates use textdomain name-spaces C<domain1>
-and C<domain2> (plase use better names), then you can pass their
+and C<domain2> (please use better names), then you can pass their
 respective configuration files as:
 
   --config domain1=filename domain2=filename    # or
@@ -221,6 +222,6 @@ notation (with leading '__' to mean gettext)
 
 =head2 Extracting from Template::Toolkit
 
-See L<Log::Report::Extract::Template>
+		See L<Log::Report::Template::Extract>
 
 =cut

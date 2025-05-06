@@ -1,0 +1,149 @@
+=encoding utf8
+
+=head1 NAME
+
+Dancer2::Template::TTLogReport - Template toolkit engine with Log::Report translations for Dancer2
+
+=head1 INHERITANCE
+
+ Dancer2::Template::TTLogReport
+   is a Moo::Object
+
+=head1 SYNOPSIS
+
+To use this engine, you may configure L<Dancer2> via C<config.yaml>:
+
+ template:   "TTLogReport"
+
+Or you may also change the rendering engine on a per-route basis by
+setting it manually with C<set>:
+
+  set template => 'TTLogReport';
+
+Application:
+
+  # In your daemon startup
+  my $pot    = Log::Report::Translator::POT->new(lexicon => $poddir);
+  my $domain = (engine 'template')->addTextdomain(name => $mydomain);
+  $domain->configure(translator => $pot);
+
+  # Use it:
+  get '/' => sub {
+    template index => {
+        title        => 'my webpage',
+
+        # The actual language is stored in the user session.
+        translate_to => 'nl_NL.utf-8',
+    };
+  };
+
+=head1 DESCRIPTION
+
+This template engine allows you to use L<Template>::Toolkit in L<Dancer2>,
+including the translation extensions offered by L<Log::Report::Template>.
+
+=head1 METHODS
+
+=head2 Constructors
+
+Standard Moo with Dancer2::Core::Role::Template extensions.
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<tt>()
+
+Returns the L<Log::Report::Template|Log::Report::Template> object which is performing the
+template processing.  This object gets instantiated based on values
+found in the Dancer2 configuration file.
+
+=back
+
+=head2 Action
+
+=over 4
+
+=item $obj-E<gt>B<addTextDomain>(%options)
+
+Forwards the C<%options> to L<Log::Report::Template::addTextdomain()|Log::Report::Template/"Handling text domains">.
+
+example: 
+
+  my $lexicon = $directory;  # f.i. $directory/<domain>/nl_NL.utf-8.po
+  my $tables  = Log::Report::Translator::POT->new(lexicon => $lexicon);
+  (engine 'template')->addTextdomain(name => 'mydomain')->configure(translator => $tables);
+
+=item $obj-E<gt>B<render>($template, \%tokens)
+
+Renders the template.  The first arg is a filename for the template file
+or a reference to a string that contains the template. The second arg
+is a hashref for the tokens that you wish to pass to
+L<Template::Toolkit> for rendering.
+
+When a translation language is set, then this renderer adds the following
+variables: C<language> (like "nl"), C<language_territory> (like "nl_BE"),
+and C<locale> (like "nl_BE.utf8").
+
+=back
+
+=head1 DETAILS
+
+=head2 Dancer2 Configuration
+
+Most configuration variables are available when creating a new instance
+of a L<Template>::Toolkit object can be declared in your config.yml file.
+For example:
+
+  template: TTLogReport
+
+  engines:
+    template:
+      TTLogReport:
+        start_tag: '<%'
+        end_tag:   '%>'
+
+(Note: C<start_tag> and C<end_tag> are regexes.  If you want to use PHP-style
+tags, you will need to list them as C<< <\? >> and C<< \?> >>.)
+See L<Template::Manual::Config> for the configuration variables.
+
+In addition to the standard configuration variables, the option C<show_private_variables>
+is also available. Template::Toolkit, by default, does not render private variables
+(the ones starting with an underscore). If in your project it gets easier to disable
+this feature than changing variable names, add this option to your configuration.
+
+  show_private_variables: true
+
+B<Warning:> Given the way Template::Toolkit implements this option, different Dancer2
+applications running within the same interpreter will share this option!
+
+=head2 Advanced Customization
+
+Module L<Dancer2::Template::TemplateToolkit> describes how to extend the Template
+by wrapping the C<_build_engine> method.  The instantiation trick is insufficient
+for a bit more complex modules, like our Log::Report translation feature.  You may
+be able to extend this module with your own templater, however.
+
+    # in config.yml
+    engines:
+      template:
+        TTLogReport:
+          start_tag: '<%'
+          end_tag:   '%>'
+          templater: Log::Report::Template  # default
+
+=encoding utf-8
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Template distribution version 1.00,
+built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

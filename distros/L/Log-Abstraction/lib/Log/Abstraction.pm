@@ -3,22 +3,22 @@ package Log::Abstraction;
 use strict;
 use warnings;
 use Carp;	# Import Carp for warnings
-use Config::Auto;
-use Params::Get;	# Import Params::Get for parameter handling
+use Config::Abstraction;
+use Params::Get 0.04;	# Import Params::Get for parameter handling
 use Sys::Syslog;	# Import Sys::Syslog for syslog support
 use Scalar::Util 'blessed';	# Import Scalar::Util for object reference checking
 
 =head1 NAME
 
-Log::Abstraction - Logging abstraction layer
+Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ our $VERSION = 0.07;
 
 =head1 DESCRIPTION
 
-The C<Log::Abstraction> class provides a flexible logging layer that can handle different types of loggers,
+The C<Log::Abstraction> class provides a flexible logging layer on top of different types of loggers,
 including code references, arrays, file paths, and objects.
 It also supports logging to syslog if configured.
 
@@ -46,10 +46,6 @@ It also supports logging to syslog if configured.
 
 Creates a new C<Log::Abstraction> object.
 
-Clones existing objects with or without modifications.
-
-    my $clone = $logger->new();
-
 The argument can be a hash,
 a reference to a hash or the C<logger> value.
 The following arguments can be provided:
@@ -59,16 +55,33 @@ The following arguments can be provided:
 =item * C<config_file>
 
 Points to a configuration file which contains the parameters to C<new()>.
-The file can be in any common format including C<YAML>, C<XML>, and C<INI>.
+The file can be in any common format,
+including C<YAML>, C<XML>, and C<INI>.
 This allows the parameters to be set at run time.
+
+On non-Windows system,
+the class can be configured using environment variables starting with C<"Log::Abstraction::">.
+For example:
+
+  export Log::Abstraction::script_name=foo
+
+It doesn't work on Windows because of the case-insensitive nature of that system.
 
 =item * C<logger> - A logger can be a code reference, an array reference, a file path, or an object.
 
 =item * C<syslog> - A hash reference for syslog configuration.
 
-=item * C<script_name> - Name of the script, needed when C<syslog> is given
+=item * C<script_name>
+
+The name of the script.
+It's needed when C<syslog> is given,
+if none is passed, the value is guessed.
 
 =back
+
+Clone existing objects with or without modifications:
+
+    my $clone = $logger->new();
 
 =cut
 
@@ -94,9 +107,19 @@ sub new {
 
 	# Load the configuration from a config file, if provided
 	if(exists($args{'config_file'})) {
-		my $config = Config::Auto::parse($args{'config_file'});
-		# my $config = YAML::XS::LoadFile($args{'config_file'});
-		%args = (%{$config}, %args);
+		# my $config = YAML::XS::LoadFile($params->{'config_file'});
+		if(!-r $args{'config_file'}) {
+			croak("$class: ", $args{'config_file'}, ': File not readable');
+		}
+		if(my $config = Config::Abstraction->new(config_dirs => [''], config_file => $args{'config_file'}, env_prefix => "${class}::")) {
+			$config = $config->all();
+			if($config->{$class}) {
+				$config = $config->{$class};
+			}
+			%args = (%{$config}, %args);
+		} else {
+			croak("$class: Can't load configuration from ", $args{'config_file'});
+		}
 	}
 
 	if(!defined($class)) {
@@ -114,7 +137,12 @@ sub new {
 	}
 
 	if($args{'syslog'} && !$args{'script_name'}) {
-		croak(__PACKAGE__, ' syslog needs to know the script name');
+		require File::Basename && File::Basename->import() unless File::Basename->can('basename');
+
+		# Determine script name
+		$args{'script_name'} = File::Basename::basename($ENV{'SCRIPT_NAME'} || $0);
+
+		# croak(__PACKAGE__, ' syslog needs to know the script name');
 	}
 
 	my $self = {

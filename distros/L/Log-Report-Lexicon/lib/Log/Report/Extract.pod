@@ -8,7 +8,7 @@ Log::Report::Extract - Collect translatable strings
 
  Log::Report::Extract is extended by
    Log::Report::Extract::PerlPPI
-   Log::Report::Extract::Template
+   Log::Report::Template::Extract
 
 =head1 SYNOPSIS
 
@@ -120,19 +120,21 @@ the 'mode':
 Register the existence of a ($msg, $msg_plural) in all POTs of
 the $domain.
 
-=item $obj-E<gt>B<write>( [$domain] )
+=item $obj-E<gt>B<write>( [$domain], %options )
 
 Update the information of the files related to $domain, by default all
 processed DOMAINS.
 
 All information known about the written $domain is removed from the cache.
+The %options are passed to the C<write()> of the specific lexicon
+manager.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.12,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon distribution version 1.13,
+built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

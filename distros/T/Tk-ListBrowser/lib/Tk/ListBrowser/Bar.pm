@@ -17,7 +17,7 @@ Tk::ListBrowser::Bar - Bar organizer for Tk::ListBrowser.
 =head1 DESCRIPTION
 
 Contains all the drawing routines for L<Tk::ListBrowser> to
-draw and navigate the list in a column organized manner.
+draw and navigate the list in a bar organized manner.
 
 No user serviceable parts inside.
 
@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.02;
+$VERSION =  0.04;
 
 use base qw(Tk::ListBrowser::Row);
 
@@ -53,8 +53,6 @@ sub type {
 	return 'bar'
 }
 
-=back
-
 =head1 LICENSE
 
 Same as Perl.
@@ -72,22 +70,6 @@ Hans Jeuken (hanje at cpan dot org)
 =head1 BUGS AND CAVEATS
 
 If you find any bugs, please report them here: L<https://github.com/haje61/Tk-ListBrowser/issues>.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item L<Tk::ListBrowser>
-
-=item L<Tk::ListBrowser::Column>
-
-=item L<Tk::ListBrowser::Item>
-
-=item L<Tk::ListBrowser::List>
-
-=item L<Tk::ListBrowser::Row>
-
-=back
 
 =cut
 

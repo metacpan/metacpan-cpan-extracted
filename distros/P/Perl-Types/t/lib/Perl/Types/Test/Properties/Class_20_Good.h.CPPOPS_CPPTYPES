@@ -1,0 +1,81 @@
+// [[[ HEADER ]]]
+using std::cout;  using std::cerr;  using std::endl;
+
+#ifndef __CPP__INCLUDED__Perl::Types__Test__Properties__Class_20_Good_h
+#define __CPP__INCLUDED__Perl::Types__Test__Properties__Class_20_Good_h 0.001_000
+
+// [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
+#include <Perl::Types.cpp>  // -> Perl::Types.h -> (rperltypes_mode.h; rperloperations.h; rperltypes.h; HelperFunctions.cpp)
+#include "Perl::Types/Test.cpp"
+
+# ifdef __PERL__TYPES
+
+Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# elif defined __CPP__TYPES
+
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+
+// [[[ OO INHERITANCE ]]]
+class Perl::Types__Test__Properties__Class_20_Good : public Perl::Types__Test {
+public:
+    // [[[ OO PROPERTIES ]]]
+    integer_hashref test_property;
+
+    // [[[ OO METHODS ]]]
+
+    // <<< OO PROPERTIES, ACCESSORS & MUTATORS >>>
+    string_arrayref get_test_property_keys() { string_arrayref keys; keys.reserve(this->test_property.size()); for(auto const& hash_entry : this->test_property) { keys.push_back(hash_entry.first); } return keys; }  // call from Perl or C++
+    integer_hashref get_test_property() { return test_property; }
+    void set_test_property(integer_hashref test_property_new) { test_property = test_property_new; }
+    integer get_test_property_entry_value(string key) { return test_property[key]; }  // call from C++
+    void set_test_property_entry_value(string key, integer value_new) { test_property[key] = value_new; }  // call from C++
+
+
+    // <<< CONSTRUCTOR & DESTRUCTOR >>>
+    Perl::Types__Test__Properties__Class_20_Good() {}
+    ~Perl::Types__Test__Properties__Class_20_Good() {}
+
+    // <<< CLASS NAME REPORTER >>>
+    virtual string myclassname() { return (const string) "Perl::Types::Test::Properties::Class_20_Good"; }
+
+    // <<< USER-DEFINED METHODS >>>
+    integer_hashref test_method(integer input_integer);
+};  // end of class
+
+// [[[ OO SUBCLASSES ]]]
+#define Perl::Types__Test__Properties__Class_20_Good_rawptr Perl::Types__Test__Properties__Class_20_Good*
+typedef std::unique_ptr<Perl::Types__Test__Properties__Class_20_Good> Perl::Types__Test__Properties__Class_20_Good_ptr;
+typedef std::vector<Perl::Types__Test__Properties__Class_20_Good_ptr> Perl::Types__Test__Properties__Class_20_Good_arrayref;
+typedef std::unordered_map<string, Perl::Types__Test__Properties__Class_20_Good_ptr> Perl::Types__Test__Properties__Class_20_Good_hashref;
+typedef std::unordered_map<string, Perl::Types__Test__Properties__Class_20_Good_ptr>::iterator Perl::Types__Test__Properties__Class_20_Good_hashref_iterator;
+
+// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]
+class NEW_Perl::Types__Test__Properties__Class_20_Good {
+public:
+    Perl::Types__Test__Properties__Class_20_Good_ptr wrapped_object;
+    NEW_Perl::Types__Test__Properties__Class_20_Good() : wrapped_object{new Perl::Types__Test__Properties__Class_20_Good()} {}
+    Perl::Types__Test__Properties__Class_20_Good_ptr&& NEW() { return std::move(wrapped_object); }
+
+    // <<< OO PROPERTIES, INITIALIZERS >>>
+    NEW_Perl::Types__Test__Properties__Class_20_Good& test_property(integer_hashref test_property_init) { wrapped_object->test_property = test_property_init; return *this; }
+};
+
+// <<< OPERATIONS & DATA TYPES REPORTER >>>
+integer Perl::Types__Test__Properties__Class_20_Good__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2
+
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+
+# else
+
+Purposefully_die_from_a_compile-time_error,_due_to_neither___PERL__TYPES_nor___CPP__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# endif
+
+#endif
+
+// end of class

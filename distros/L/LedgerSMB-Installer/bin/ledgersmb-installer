@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+
+
+BEGIN {
+   local $SIG{__DIE__} = sub { warn @_; exit 1; };
+   if ($] < 5.020) {
+     die "Perl version too low ($^V); v5.20 required\n";
+   }
+}
+
+use v5.20; # because of signatures
+
+
+my $failed_validate_msg = <<'EOF';
+
+You may need to install complete Perl support for your environment (some
+distributions install the interpreter without modules by default); for Linux,
+you need to install one of the following packages, depending on your
+distribution:
+
+- perl (Debian, Ubuntu and derivatives)
+- perl (Fedora 27+, RedHat 8+ and derivatives)
+- perl-core (Fedora before 27, RedHat before 8 and derivatives)
+
+
+(Submit an issue to https://github.com/ledgersmb/ledgersmb-installer/issues
+   to expand the above list with the package name for your favorite distribution)
+
+
+EOF
+
+sub validate_perl_env {
+    my (@missing);
+    for my $mod (qw( experimental lib parent
+                     File::Path File::Spec File::Temp
+                     Getopt::Long HTTP::Tiny)) {
+        my $have_mod = eval "require $mod";
+        unless ($have_mod) {
+            if ($@ =~ /^Can't locate \S+ in \@INC/) {
+                push @missing, $mod;
+            }
+            else {
+                warn $@;
+            }
+        }
+    }
+
+    if (@missing) {
+        say 'Your installation is missing - or unable to load - these modules:';
+        say "   $_" for (@missing);
+        say $failed_validate_msg;
+
+        die "Aborting installation...\n";
+    }
+
+    unless (eval "require IO::Socket::SSL") {
+        say <<~'EOF';
+
+          The installer depends on IO::Socket::SSL, which isn't loadable. Please
+          install it; the library name on the various distributions is:
+
+          - libio-socket-ssl-perl (Debian, Ubuntu, Mint and derivatives)
+          - perl-IO-Socket-SSL (Fedora, RedHat, and derivatives)
+
+          (Submit an issue to https://github.com/ledgersmb/ledgersmb-installer/issues
+             to expand the above list with the package name for your favorite distribution)
+
+          EOF
+
+        die "Aborting installation...\n";
+    }
+}
+
+validate_perl_env();
+if (require LedgerSMB::Installer) {
+    exit LedgerSMB::Installer->run(@ARGV);
+}
+
+say "Failed to load the installer:\n\n$@";
+exit 1;

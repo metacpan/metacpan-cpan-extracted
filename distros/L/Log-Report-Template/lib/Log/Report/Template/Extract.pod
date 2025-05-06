@@ -1,0 +1,296 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Template::Extract - collect translatable strings from template files
+
+=head1 INHERITANCE
+
+ Log::Report::Template::Extract
+   is a Log::Report::Extract
+
+=head1 SYNOPSIS
+
+ # Added Log-Report-Template v0.90
+ # First use of this module: extract msgids from various kinds
+ # of text-files, usually web templates.
+ # See script "xgettext-perl" for standard wrapper script
+
+ my $extr = Log::Report::Template::Extract->new
+   ( lexicon => '/usr/share/locale'
+   , domain  => 'my-web-site'
+   , pattern => 'TT2-loc'
+   );
+ $extr->process('website/page.html');  # many times
+ $extr->showStats;
+ $extr->write;
+
+ # Second use: connect to Template::Toolkit
+ # See DETAILS chapter below
+
+ [% loc("Greetings {name},", name => client.name) %]
+ [% | loc(name => client.name) %]Greetings {name}[% END %]
+ [% 'Greetings {name}' | loc(name => client.name) %]
+
+=head1 DESCRIPTION
+
+This module helps maintaining the POT files which list translatable
+strings from template files (or other flat text files) by updating the
+list of message-ids which are kept in them.
+
+After initiation, the L<process()|Log::Report::Template::Extract/"Processors"> method needs to be called for each file
+in the domain  and the existing PO files will get updated accordingly.
+
+If no translations exist yet, one C<$textdomain.po> file will be
+created as point to start.  Copy that file into C<$textdomain/$lang.po>
+
+Extends L<"DESCRIPTION" in Log::Report::Extract|Log::Report::Extract/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Log::Report::Extract|Log::Report::Extract/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Log::Report::Extract|Log::Report::Extract/"Constructors">.
+ 
+=over 4
+
+=item Log::Report::Template::Extract-E<gt>B<new>(%options)
+
+ -Option --Defined in          --Default
+  charset  Log::Report::Extract  'utf-8'
+  domain                         <required>
+  lexicon  Log::Report::Extract  <required>
+  pattern                        <undef>
+
+=over 2
+
+=item charset => STRING
+
+=item domain => DOMAIN
+
+There is no syntax for specifying domains in templates (yet), so you
+must be explicit about the collection we are making now.
+
+=item lexicon => DIRECTORY
+
+=item pattern => PREDEFINED|CODE
+
+See the DETAILS section below for a detailed explenation.
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Log::Report::Extract|Log::Report::Extract/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addPot>($domain, $pot, %options)
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<charset>()
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<domain>()
+
+=item $obj-E<gt>B<domains>()
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<index>()
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<pattern>()
+
+=item $obj-E<gt>B<pots>($domain)
+
+Inherited, see L<Log::Report::Extract/"Accessors">
+
+=back
+
+=head2 Processors
+
+Extends L<"Processors" in Log::Report::Extract|Log::Report::Extract/"Processors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<cleanup>(%options)
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<process>($filename, %options)
+
+Update the domains mentioned in the $filename.  All textdomains defined
+in the file will get updated automatically, but not written before
+all files where processed.
+
+ -Option --Default
+  charset  'utf-8'
+  pattern  <from new(pattern)>
+
+=over 2
+
+=item charset => STRING
+
+The character encoding used in this template file.
+
+=item pattern => PREDEFINED|CODE
+
+Read the DETAILS section about this.
+
+=back
+
+=item $obj-E<gt>B<showStats>( [$domains] )
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<store>( $domain, $filename, $linenr, $context, $msg, [$msg_plural] )
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<write>( [$domain], %options )
+
+Inherited, see L<Log::Report::Extract/"Processors">
+
+=back
+
+=head1 DETAILS
+
+=head2 Scan Patterns
+
+Various template systems use different conventions for denoting strings
+to be translated.
+
+=head3 Predefined for Template-Toolkit
+
+There is not a single convention for translations in C<Template-Toolkit>
+(see Template), so you need to specify which version TT you use and
+which function name you want to use.  In extreme cases, you may even build
+separate translation tables by simply providing using functions.
+
+For instance
+
+   pattern => 'TT2-loc'
+
+will scan for
+
+  [% loc("msgid", key => value, ...) %]
+  [% loc('msgid', key => value, ...) %]
+  [% loc("msgid|plural", count, key => value, ...) %]
+ 
+  [% INCLUDE
+       title = loc('something')
+   %]
+ 
+  [% | loc(n => name) %]hi {n}[% END %]
+  [% 'hi {n}' | loc(n => name) %]
+
+For C<TT1>, the brackets can either be '[%...%]' or '%%...%%'.  The function
+name is treated case-sensitive.  Some people prefer 'l()' or 'L()'.
+
+The code needed
+
+  # during initiation of the webserver, once in your script (before fork)
+  my $lexicons   = 'some-directory-for-translation-tables';
+  my $translator = Log::Report::Translator::POT->new(lexicons => $lexicons);
+  my $domain     = textdomain $textdomain;
+  $domain->configure(translator => $translator);
+
+  # your standard template driver
+  sub handler {
+     ...
+     my $vars      = { ...all kinds of values... };
+     $vars->{loc}  = \&translate;           # <--- this is extra
+
+     my $output    = '';
+     my $templater = Template->new(...);
+     $templater->process($template_fn, $vars, \$output);
+     print $output;
+  }
+
+  # anywhere in the same file
+  sub translate {
+    my $textdomain = ...;   # your choice when running xgettext-perl
+    my $lang       = ...;   # how do you figure that out?
+    my $msg = Log::Report::Message->fromTemplateToolkit($textdomain, @_);
+    $msg->toString($lang);
+  }
+
+To generate the pod tables, run in the shell something like
+
+  xgettext-perl -p $lexicons --template TT2-loc \
+      --domain $textdomain  $templates_dir
+
+If you want to implement your own extractor --to avoid C<xgettext-perl>--
+you need to run something like this:
+
+  my $extr = Log::Report::Template::Extract->new
+    ( lexicon => $output
+    , charset => 'utf-8'
+    , domain  => $domain
+    , pattern => 'TT2-loc'
+    );
+  $extr->process($_) for @filenames;
+  $extr->write;
+
+=head2 Use in combination with contexts
+
+This example extends the previous with using context sensitive translations,
+as implemented by L<Log::Report::Translator::Context|Log::Report::Translator::Context>.
+
+Let's say that the translation of some of the sentences on the website depend
+on the gender of the addressed person.  An example of the use in a TT2
+template:
+
+  [% loc("{name<gender} forgot his key", name => person.name) %]
+
+The extraction script F<xgettext-perl> will expand this into two records
+in the PO file, respectively with msgctxt attribute 'gender=male' and
+'gender=female'.
+
+When your PO-files are not generated by 'xgettext-perl', you do not need
+a separate domain configuration file:
+
+  $domain->configure
+    ( context_rules => +{gender => ['male','female']}
+    , translator    => $translator
+    );
+
+When your PO-files are generated by 'xgettext-perl', you need to share
+the context-rules between that msgid extractor and your runtime code. That
+same file needs to be passed with the 'domain' parameter to the script.
+
+  # add context_rules either explicit or via 'config' filename
+  $domain->configure
+    ( config     => 'my/own/$domain.conf'
+    , translator => $translator
+    );
+
+Now, when you generate the pages, you need to set-up the right context.
+In this case, we set-up the gender of the person who gets addressed.
+(The name 'gender' is good for examples, but quite non-descriptive.
+Maybe 'user_gender' is more maintainable)
+
+  $domain->setContext( +{gender => 'male'} );  # or ('gender=male')
+  $domain->setContext( "gender=male" );        # same
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Template distribution version 1.00,
+built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

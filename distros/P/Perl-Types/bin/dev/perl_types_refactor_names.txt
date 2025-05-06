@@ -1,0 +1,35 @@
+Refactoring Summary: Changes since test-passing milestone commit 9fb763300058926db240b94179772753f642cd2a
+
+1. Compound Type Name Reversal
+   - All compound type names reversed from suffix-first (e.g. integer_arrayref)
+     to prefix-first underscore naming (e.g. arrayref_integer).
+
+2. Typemap Updates
+   - lib/typemap.perl entries adjusted to reference new prefix-first type names.
+
+3. C++ SubTypes Refactoring
+   - Refactored 1D, 2D, and 3D Array and Hash SubTypes modules in C++:
+     * Updated typedefs for prefix-first underscore names.
+     * Renamed CHECK, CHECKTRACE, XS_unpack, XS_pack, and to_string routines accordingly.
+
+4. Perl Wrapper Module Updates
+   - Updated Perl packages under lib/Perl/Structure to export and wrap new
+     prefix-first underscore names for type-checking, stringification,
+     and typetest functions in SubTypes*.pm files.
+
+5. Test Suite Adjustments
+   - Core t/*.t scripts and all t/lib/Perl/Types/Test/** files updated to use
+     the new prefix-first underscore type names across scalar, array,
+     hash, and nested compound type tests.
+
+6. Iterative Nested Type Passes (P36–P39)
+   - Refined multi-dimensional nested types (e.g. arrayref_arrayref_integer,
+     hashref_hashref_arrayref_string) through successive commits,
+     ensuring consistent reversal of all combinations.
+
+7. Final Polishing (P40–P42)
+   - Cleaned up remaining suffix-first names in GSLMatrix, GMPInteger,
+     and various SubTypes modules for complete consistency.
+
+Note: C++ namespace integration and scope-resolution operator changes
+will be introduced in later stages and are not covered here.

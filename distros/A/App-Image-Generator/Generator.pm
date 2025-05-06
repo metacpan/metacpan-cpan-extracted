@@ -7,14 +7,17 @@ use English;
 use Error::Pure qw(err);
 use File::Basename qw(fileparse);
 use Getopt::Std;
+use Image::Checkerboard 0.05;
 use Image::Random;
 use Image::Select;
+use List::Util 1.33 qw(none);
 use Readonly;
 
 # Constants.
 Readonly::Scalar our $EMPTY_STR => q{};
+Readonly::Array our @PATTERNS => qw(checkerboard);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -35,17 +38,20 @@ sub run {
 	$self->{'_opts'} = {
 		'h' => 0,
 		'i' => $EMPTY_STR,
+		'p' => undef,
 		's' => '1920x1080',
 		'v' => 0,
 	};
-	if (! getopts('hi:s:v', $self->{'_opts'}) || @ARGV < 1
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('hi:p:s:v', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 1) {
 
-		print STDERR "Usage: $0 [-h] [-i input_dir] [-s size] [-v]".
+		print STDERR "Usage: $0 [-h] [-i input_dir] [-p pattern] [-s size] [-v]".
 			"\n\t[--version] output_file\n\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t-i input_dir\tInput directory with ".
 			"images (default value is nothing).\n";
+		print STDERR "\t-p pattern\tPattern (checkerboard).\n";
 		print STDERR "\t-s size\t\tSize (default value is ".
 			"1920x1080).\n";
 		print STDERR "\t-v\t\tVerbose mode.\n";
@@ -61,6 +67,12 @@ sub run {
 	}
 	$self->{'_width'} = $1;
 	$self->{'_height'} = $2;
+
+	if (defined $self->{'_opts'}->{'p'}
+		&& none { $self->{'_opts'}->{'p'} eq $_ } @PATTERNS) {
+
+		err 'Bad pattern.';
+	}
 
 	# Run.
 	eval {
@@ -79,6 +91,16 @@ sub run {
 				'debug' => ($self->{'_opts'}->{'v'} ? 1 : 0),
 				'height' => $self->{'_height'},
 				'path_to_images' => $self->{'_opts'}->{'i'},
+				'type' => $type,
+				'width' => $self->{'_width'},
+			);
+
+		# Patterns.
+		} elsif (defined $self->{'_opts'}->{'p'}
+			&& $self->{'_opts'}->{'p'} eq 'checkerboard') {
+
+			$ig = Image::Checkerboard->new(
+				'height' => $self->{'_height'},
 				'type' => $type,
 				'width' => $self->{'_width'},
 			);
@@ -202,12 +224,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2023 Michal Josef Špaček
+© 2015-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

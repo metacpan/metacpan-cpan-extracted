@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Log-Report-Template>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Log-Report-Template/>
-    and <https://metacpan.org/release/Log-Report-Template>
+  * Indexed from CPAN: <https://metacpan.org/release/Log-Report-Template>
 
 This module extends "Template", which is the core of Template Toolkit.
 The main addition is support for translations via the translation

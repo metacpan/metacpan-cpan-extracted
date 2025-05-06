@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '1.12';
+my $version = '1.13';
 
 my %prereq  =
   ( Test::More               => '0.86'
@@ -15,7 +15,7 @@ my %prereq  =
   , IO::File                 => 0
   , List::Util               => 0
   , Scalar::Util             => 0
-  , Log::Report              => 1.22
+  , Log::Report              => 1.40
   , Pod::Usage               => 0
   , POSIX                    => 0
   , Encode                   => 0

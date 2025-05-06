@@ -4,7 +4,8 @@ use warnings;
 use strict;
 
 use Test::More;
-#use Log::Report mode => 'DEBUG';
+# use Log::Report mode => 'DEBUG';  # DEBUG to see stats
+
 use File::Basename qw(dirname);
 
 (my $incl) = grep -d, 't/templates', 'templates';
@@ -17,32 +18,32 @@ my $lexicon = dirname($incl) .'/lexicons';
 
 use_ok 'Log::Report::Template';
 
-my $templater = Log::Report::Template->new
-  ( INCLUDE_PATH => $incl
-# , DEBUG => 255
-  );
+my $templater = Log::Report::Template->new(INCLUDE_PATH => $incl,
+#	DEBUG => 255
+);
+
 isa_ok $templater, 'Log::Report::Template';
 
-my $first = $templater->addTextdomain
-  ( name => 'first'
-  , lexicon              => $lexicon
-  );
+### Define first, default function loc()
 
+my $first = $templater->addTextdomain(name => 'first', lexicon => $lexicon);
 isa_ok $first, 'Log::Report::Template::Textdomain';
+
+is $first->name, 'first';
 
 #dispatcher close => 'default';
 
-my $second = $templater->addTextdomain
-  ( name                 => 'second'
-  , translation_function => 'S'
-  , only_in_directory    => $incl
-  , lexicon              => $lexicon
-  );
+### Define second, translation function S()
+
+my $second = $templater->addTextdomain(
+	name                 => 'second',
+	translation_function => 'S',
+	only_in_directory    => $incl,
+	lexicon              => $lexicon,
+);
 
 ### Extract from the template files
 
-$templater->extract
-  (  show_stats => 1
-  );
+$templater->extract;
 
 done_testing;

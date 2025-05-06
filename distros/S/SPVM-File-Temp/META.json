@@ -35,7 +35,7 @@
             "SPVM" : "0.990048",
             "SPVM::Errno" : "0.07",
             "SPVM::File::Path" : "0.011001",
-            "SPVM::File::Spec" : "0.081003",
+            "SPVM::File::Spec" : "0.086",
             "SPVM::IO" : "0.235",
             "SPVM::Sys" : "0.513"
          }
@@ -50,6 +50,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.026",
+   "version" : "0.027",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

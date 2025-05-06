@@ -9,7 +9,6 @@ t/01-basic.t
 t/02-no-required.t
 t/03-merged-examples.t
 t/04-coverage.t
-t/04-json-schema-draft201909.t
 t/05-no_title.t
 t/06-no_description.t
 t/07-no_example.t

@@ -48,6 +48,8 @@ class TestCase::File::Temp {
         unless ($content eq "Hello") {
           return 0;
         }
+        
+        $fh = undef;
       }
       
       if (Sys->f($filename)) {

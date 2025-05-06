@@ -5,10 +5,7 @@ use warnings;
 
 use Carp;    # Removing carp will break the XS code.
 
-our $VERSION = '0.33';
-
-our $AUTOLOAD;
-use AutoLoader 'AUTOLOAD';
+our $VERSION = '0.34';
 
 use XSLoader;
 XSLoader::load 'Crypt::OpenSSL::RSA', $VERSION;
@@ -19,6 +16,34 @@ BEGIN {
         require Crypt::OpenSSL::Bignum;
     };
 }    ## no critic qw(RequireCheckingReturnValueOfEval);
+
+sub new_public_key {
+    my ( $proto, $p_key_string ) = @_;
+    if ( $p_key_string =~ /^-----BEGIN RSA PUBLIC KEY-----/ ) {
+        return $proto->_new_public_key_pkcs1($p_key_string);
+    }
+    elsif ( $p_key_string =~ /^-----BEGIN PUBLIC KEY-----/ ) {
+        return $proto->_new_public_key_x509($p_key_string);
+    }
+    else {
+        croak "unrecognized key format";
+    }
+}
+
+sub new_key_from_parameters {
+    my ( $proto, $n, $e, $d, $p, $q ) = @_;
+    return $proto->_new_key_from_parameters( map { $_ ? $_->pointer_copy() : 0 } $n, $e, $d, $p, $q );
+}
+
+sub import_random_seed {
+    until ( _random_status() ) {
+        _random_seed( Crypt::OpenSSL::Random::random_bytes(20) );
+    }
+}
+
+sub get_key_parameters {
+    return map { $_ ? Crypt::OpenSSL::Bignum->bless_pointer($_) : undef } shift->_get_key_parameters();
+}
 
 1;
 
@@ -40,7 +65,7 @@ Crypt::OpenSSL::RSA - RSA encoding and decoding, using the openSSL libraries
   $ciphertext = $rsa->encrypt($plaintext);
 
   $rsa_priv = Crypt::OpenSSL::RSA->new_private_key($key_string);
-  $plaintext = $rsa->encrypt($ciphertext);
+  $plaintext = $rsa->decrypt($ciphertext);
 
   $rsa = Crypt::OpenSSL::RSA->generate_key(1024); # or
   $rsa = Crypt::OpenSSL::RSA->generate_key(1024, $prime);
@@ -80,20 +105,6 @@ C<-----BEGIN...-----> and C<-----END...-----> lines.
 The padding is set to PKCS1_OAEP, but can be changed with the
 C<use_xxx_padding> methods.
 
-=cut
-sub new_public_key {
-    my ( $proto, $p_key_string ) = @_;
-    if ( $p_key_string =~ /^-----BEGIN RSA PUBLIC KEY-----/ ) {
-        return $proto->_new_public_key_pkcs1($p_key_string);
-    }
-    elsif ( $p_key_string =~ /^-----BEGIN PUBLIC KEY-----/ ) {
-        return $proto->_new_public_key_x509($p_key_string);
-    }
-    else {
-        croak "unrecognized key format";
-    }
-}
-
 =item new_private_key
 
 Create a new C<Crypt::OpenSSL::RSA> object by loading a private key in
@@ -130,24 +141,11 @@ provided and d is undef, d is computed.  Note that while p and q are
 not necessary for a private key, their presence will speed up
 computation.
 
-=cut
-sub new_key_from_parameters {
-    my ( $proto, $n, $e, $d, $p, $q ) = @_;
-    return $proto->_new_key_from_parameters( map { $_ ? $_->pointer_copy() : 0 } $n, $e, $d, $p, $q );
-}
-
 =item import_random_seed
 
 Import a random seed from L<Crypt::OpenSSL::Random>, since the OpenSSL
 libraries won't allow sharing of random structures across perl XS
 modules.
-
-=cut
-sub import_random_seed {
-    until ( _random_status() ) {
-        _random_seed( Crypt::OpenSSL::Random::random_bytes(20) );
-    }
-}
 
 =back
 
@@ -324,11 +322,6 @@ C<Crypt::OpenSSL::Bignum> module must be installed for this to work.
 =item is_private
 
 Return true if this is a private key, and false if it is private only.
-
-=cut
-sub get_key_parameters {
-    return map { $_ ? Crypt::OpenSSL::Bignum->bless_pointer($_) : undef } shift->_get_key_parameters();
-}
 
 =back
 

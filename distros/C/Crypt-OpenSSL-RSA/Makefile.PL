@@ -1,12 +1,20 @@
 use strict;
 use warnings;
+use Config;
 
 use 5.006;
 use ExtUtils::MakeMaker 6.48;
-use Crypt::OpenSSL::Guess qw(openssl_inc_paths openssl_lib_paths);
+use Crypt::OpenSSL::Guess qw(openssl_inc_paths openssl_lib_paths openssl_version);
 
+my ($major, $minor, $patch) = openssl_version(); 
+print "OpenSSL version: $major.$minor $patch", "\n";
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+
+my $libs = ' -lssl -lcrypto';
+if ( $Config{osname} eq 'aix' ) {
+  $libs = $libs . ' -lz';
+}
 
 WriteMakefile(
     'NAME'             => 'Crypt::OpenSSL::RSA',
@@ -22,7 +30,8 @@ WriteMakefile(
         'Test::More'             => 0,
     },
     'OBJECT' => 'RSA.o',
-    'LIBS'   => [openssl_lib_paths() . ' -lssl -lcrypto'],
+    'LIBS'   => [openssl_lib_paths() . $libs],
+    'LDDLFLAGS' => openssl_lib_paths() . ' ' . $Config{lddlflags},
     'DEFINE' => '-DPERL5 -DOPENSSL_NO_KRB5',
 
     # perl-5.8/gcc-3.2 needs -DPERL5, and redhat9 likes -DOPENSSL_NO_KRB5
@@ -42,9 +51,9 @@ WriteMakefile(
         },
         resources => {
             'license'    => 'http://dev.perl.org/licenses/',
-            'homepage'   => 'http://github.com/toddr/Crypt-OpenSSL-RSA',
-            'bugtracker' => 'https://github.com/toddr/Crypt-OpenSSL-RSA/issues',
-            'repository' => 'http://github.com/toddr/Crypt-OpenSSL-RSA',
+            'homepage'   => 'http://github.com/cpan-authors/Crypt-OpenSSL-RSA',
+            'bugtracker' => 'https://github.com/cpan-authors/Crypt-OpenSSL-RSA/issues',
+            'repository' => 'http://github.com/cpan-authors/Crypt-OpenSSL-RSA',
         }
     }
 );

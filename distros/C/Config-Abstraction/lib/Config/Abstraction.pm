@@ -9,7 +9,7 @@ use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
 use File::Slurp qw(read_file);
 use File::Spec;
 use Hash::Merge qw(merge);
-use Params::Get;
+use Params::Get 0.04;
 
 =head1 NAME
 
@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -151,6 +151,8 @@ C<local.xml>, C<base.ini>, and C<local.ini>.
 
 If C<config_file> or C<config_files> is set, those files are loaded last.
 
+If no C<config_dirs> is given, try hard to find the files in various places.
+
 =item 2. Merging and Resolving
 
 The module merges the contents of these files, with more specific configurations
@@ -246,13 +248,23 @@ sub new
 	$params->{'config_dirs'} //= $params->{'path'};	# Compatibility with Config::Auto
 
 	if(!defined($params->{'config_dirs'})) {
-		# Set up the default value for config_dirs
-		if($ENV{'HOME'}) {
-			$params->{'config_dirs'} = [File::Spec->catdir($ENV{'HOME'}, '.conf')];
-		} elsif($ENV{'DOCUMENT_ROOT'}) {
-			$params->{'config_dirs'} = [File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'conf')];
+		if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
+			$params->{'config_dirs'} = [''];
 		} else {
-			$params->{'config_dirs'} = ['conf'];
+			# Set up the default value for config_dirs
+			if($^O ne 'MSWin32') {
+				push @{$params->{'config_dirs'}}, '/etc', '/usr/local/etc';
+			}
+			if($ENV{'HOME'}) {
+				push @{$params->{'config_dirs'}},
+					File::Spec->catdir($ENV{'HOME'}, '.conf'),
+					File::Spec->catdir($ENV{'HOME'}, '.config');
+			} elsif($ENV{'DOCUMENT_ROOT'}) {
+				push @{$params->{'config_dirs'}},
+					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'conf'),
+					File::Spec->catdir($ENV{'HOME'}, 'config');
+			}
+			push @{$params->{'config_dirs'}}, 'conf', 'config';
 		}
 	}
 
@@ -279,6 +291,10 @@ sub new
 
 sub _load_config
 {
+	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
+		Carp::croak('Illegal Operation: This method can only be called by a subclass');
+	}
+
 	my $self = shift;
 	my %merged;
 
@@ -670,7 +686,7 @@ sub AUTOLOAD
 It should be possible to escape the separator character either with backslashes or quotes.
 
 Due to the case-insensitive nature of environment variables on Windows,
-it may be challenging to override values using environment variables on that platorm.
+it may be challenging to override values using environment variables on that platform.
 
 =head1 SUPPORT
 

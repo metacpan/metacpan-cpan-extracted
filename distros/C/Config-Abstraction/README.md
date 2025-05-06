@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.16
+Version 0.17
 
 # SYNOPSIS
 
@@ -123,6 +123,8 @@ This will override any value set for `database.user` in the configuration files.
     `local.xml`, `base.ini`, and `local.ini`.
 
     If `config_file` or `config_files` is set, those files are loaded last.
+
+    If no `config_dirs` is given, try hard to find the files in various places.
 
 - 2. Merging and Resolving
 

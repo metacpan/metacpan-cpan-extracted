@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base qw/Import::Export/;
 
@@ -30,7 +30,7 @@ Math::Basic::XS - basic math faster
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -138,15 +138,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Basic-XS>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Math-Basic-XS>
 
 =item * Search CPAN
 
@@ -154,9 +150,7 @@ L<https://metacpan.org/release/Math-Basic-XS>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 

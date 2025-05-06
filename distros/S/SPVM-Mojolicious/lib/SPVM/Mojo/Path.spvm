@@ -1,0 +1,244 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Path {
+  version_from Mojo;
+  
+  use Mojo::Util;
+  use Re;
+  
+  # Fields
+  has path : string;
+  
+  has parts_list : StringList;
+  
+  has leading_slash : byte;
+  
+  has trailing_slash : byte;
+  
+  # Class Methods
+  static method new : Mojo::Path ($path_string : string = undef) {
+    
+    my $self = new Mojo::Path;
+    
+    if ($path_string) {
+      $self->parse($path_string);
+    }
+    
+    return $self;
+  }
+  
+  method canonicalize : void () {
+    
+    $self->_parse;
+    
+    my $parts_list = $self->{parts_list};
+    
+    my $i = 0;
+    while ($i < $parts_list->length) {
+      if    (!length $parts_list->get($i) || $parts_list->get($i) eq "." || $parts_list->get($i) eq "...") {
+        $parts_list->replace($i, 1, undef);
+      }
+      elsif ($i < 1 || $parts_list->get($i) ne ".." || $parts_list->get($i - 1) eq "..")           {
+        $i++;
+      }
+      else {
+        --$i;
+        $parts_list->replace($i, 2, undef);
+      }
+    }
+    
+    if ($parts_list->length == 0) {
+      $self->set_trailing_slash(0);
+    }
+    
+  }
+  
+  method parse : void ($path : string) {
+    
+    # This method does not parse $path, parts method parse path field by calling _parse method.
+    $self->{path} = $path;
+    $self->{parts_list} = undef;
+  }
+  
+  method to_string : string () {
+    # Path
+    if (my $path = $self->{path}) {
+      return Mojo::Util->url_escape($path, "^A-Za-z0-9\-._~!\$&\'()*+,;=%:@/");
+    }
+    
+    # Build path
+    my $parts = $self->parts;
+    
+    my $path = Fn->join("/", (string[])Fn->map(method : string ($part : string) { return Mojo::Util->url_escape($part, "^A-Za-z0-9\-._~!\$&\'()*+,;=:@"); }, $parts));
+    
+    if ($self->leading_slash) {
+      $path = "/$path";
+    }
+    
+    if ($self->trailing_slash) {
+      $path = "$path/";
+    }
+    
+    return $path;
+  }
+  
+  method to_abs_string : string () {
+    
+    my $abs_path = $self->to_string;
+    
+    unless (Re->m($abs_path, "^/")) {
+      $abs_path = "/$abs_path";
+    }
+    
+    return $abs_path;
+  }
+  
+  method leading_slash : int () {
+    $self->_parse;
+    return $self->{leading_slash};
+  }
+  
+  method set_leading_slash : void ($bool : int) {
+    $self->_parse;
+    $self->{leading_slash} = (byte)$bool;
+  }
+  
+  method trailing_slash : int () {
+    $self->_parse;
+    return $self->{trailing_slash};
+  }
+  
+  method set_trailing_slash : void ($bool : int) {
+    $self->_parse;
+    $self->{trailing_slash} = (byte)$bool;
+  }
+  
+  method parts : string[] () {
+    $self->_parse;
+    return $self->{parts_list}->to_array;
+  }
+  
+  method set_parts : void ($parts : string[]) {
+    $self->_parse;
+    $self->{parts_list} = StringList->new($parts);
+  }
+  
+  private method _parse : void (){
+    
+    my $parts_list = $self->{parts_list};
+    
+    unless ($parts_list) {
+      my $path_url_encoded = $self->{path};
+      $self->{path} = undef;
+      unless ($path_url_encoded) {
+        $path_url_encoded = "";
+      }
+      my $path = Mojo::Util->url_unescape($path_url_encoded);
+      $self->{leading_slash} = (byte)!!Re->s($path, "^/", "");
+      $self->{trailing_slash} = (byte)!!Re->s($path, "/$", "");
+      $self->{parts_list} = StringList->new(Fn->split("/", $path, -1));
+    }
+    
+  }
+  
+  method contains : int ($string : string) {
+    
+    unless ($string) {
+      die "The string \$string must be defined.";
+    }
+    
+    my $contains = 0;
+    if ($string eq "/") {
+      $contains = 1;
+    }
+    else {
+      if (Fn->contains($self->to_route, $string)) {
+        $contains = 1;
+      }
+    }
+    
+    return $contains;
+  }
+  
+  method to_route : string () {
+    
+    my $clone = $self->clone;
+    
+    my $route = "/";
+    
+    $route .= Fn->join("/", $clone->parts);
+    
+    if ($clone->trailing_slash) {
+      $route .= "/";
+    }
+    
+    return $route;
+  }
+  
+  method clone : Mojo::Path () {
+    
+    my $clone = Mojo::Path->new;
+    
+    if (my $parts_list = $self->{parts_list}) {
+      $clone->{leading_slash} = $self->{leading_slash};
+      $clone->{trailing_slash} = $self->{trailing_slash};
+      
+      $clone->{parts_list} = StringList->new($parts_list->to_array);
+    }
+    else {
+      $clone->{path} = copy $self->{path};
+    }
+    
+    return $clone;
+  }
+  
+  method merge : void ($path : object of string|Mojo::Path) {
+    
+    unless ($path) {
+      die "The path \$path must be defined.";
+    }
+    
+    my $path_string = (string)undef;
+    if ($path isa string) {
+      # Do nothing
+    }
+    elsif ($path isa Mojo::Path) {
+      $path_string = $path->(Mojo::Path)->to_string;
+    }
+    else {
+      die "Tha type of the path \$path must be string or Mojo::Path.";
+    }
+    
+    if (Re->m($path_string, "^/")) {
+      $self->parse($path_string);
+      return;
+    }
+    
+    # Merge
+    unless ($self->trailing_slash) {
+      $self->{parts_list}->pop;
+    }
+    
+    my $path_obj = Mojo::Path->new($path_string);
+    
+    for my $part (@{$path_obj->parts}) {
+      $self->{parts_list}->push($part);
+    }
+    
+    $self->set_trailing_slash($path_obj->trailing_slash);
+  }
+  
+  method to_dir : Mojo::Path () {
+    
+    my $clone = $self->clone;
+    
+    unless ($clone->trailing_slash) {
+      $clone->{parts_list}->pop;
+    }
+    
+    $clone->set_trailing_slash(!!@{$clone->parts});
+    
+    return $clone;
+  }
+}

@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::TracerProvider;
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use OpenTelemetry;
 
@@ -36,6 +36,9 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
 
     field $lock          //= Mutex->new;
     field $registry_lock //= Mutex->new;
+
+    use Log::Any;
+    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
 
     ADJUST {
         try {
@@ -148,10 +151,10 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
             };
 
             unless ( $args{name} ) {
-                OpenTelemetry->logger->warn(
-                    'Invalid name when retrieving tracer. Setting to empty string',
-                    { value => $args{name} },
-                );
+                $logger->warn(
+                        'Invalid name when retrieving tracer. Setting to empty string',
+                        { value => $args{name} },
+                    );
 
                 $args{name} //= '';
                 delete $args{version};
@@ -225,18 +228,18 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
 
     method add_span_processor ($processor) {
         $lock->enter( sub {
-            return OpenTelemetry->logger
+            return $logger
                 ->warn('Attempted to add a span processor to a TraceProvider after shutdown')
                 if $stopped;
 
-            return OpenTelemetry->logger
+            return $logger
                 ->warn('Attempted to add an object that does not do the OpenTelemetry::Trace::Span::Processor role as a span processor to a TraceProvider')
                 unless $processor->DOES('OpenTelemetry::Trace::Span::Processor');
 
             my %seen = map { ref, 1 } @processors;
             my $candidate = ref $processor;
 
-            return OpenTelemetry->logger
+            return $logger
                 ->warn("Attempted to add a $candidate span processor to a TraceProvider more than once") if $seen{$candidate};
 
             push @processors, $processor;

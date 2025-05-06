@@ -73,71 +73,71 @@
    "provides" : {
       "OpenTelemetry::SDK" : {
          "file" : "lib/OpenTelemetry/SDK.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Exporter::Console" : {
          "file" : "lib/OpenTelemetry/SDK/Exporter/Console.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::InstrumentationScope" : {
          "file" : "lib/OpenTelemetry/SDK/InstrumentationScope.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Resource" : {
          "file" : "lib/OpenTelemetry/SDK/Resource.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Sampler" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Sampler::AlwaysOff" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOff.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Sampler::AlwaysOn" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOn.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Sampler::ParentBased" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/ParentBased.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Sampler::Result" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/Result.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/TraceIDRatioBased.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Span" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Span::Processor::Batch" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Span::Processor::Simple" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Processor/Simple.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Span::Readable" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Readable.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::SpanLimits" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/SpanLimits.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::Tracer" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Tracer.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "OpenTelemetry::SDK::Trace::TracerProvider" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/TracerProvider.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       }
    },
    "release_status" : "stable",
@@ -151,7 +151,7 @@
          "web" : "https://github.com/jjatria/perl-opentelemetry-sdk"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -381,7 +381,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.025",
+                  "tag" : "0.026",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },

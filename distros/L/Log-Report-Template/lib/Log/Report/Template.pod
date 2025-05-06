@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Log::Report::Template - template toolkit with translations
+Log::Report::Template - Template Toolkit with translations
 
 =head1 INHERITANCE
 
@@ -13,7 +13,7 @@ Log::Report::Template - template toolkit with translations
 
   use Log::Report::Template;
   my $templater = Log::Report::Template->new(%config);
-  $templater->addTextdomain(name => "Tic", lexicon => ...);
+  $templater->addTextdomain(name => "Tic", lexicons => ...);
   $templater->process('template_file.tt', \%vars);
 
 =head1 DESCRIPTION
@@ -23,7 +23,7 @@ The main addition is support for translations via the translation
 framework offered by L<Log::Report|Log::Report>.
 
 You add translations to a template system, by adding calls to some
-translation function (by default called 'loc()') to your template text.
+translation function (by default called C<loc()>) to your template text.
 That function will perform dark magic to collect the translation from
 translation tables, and fill in values.  For instance:
 
@@ -41,10 +41,10 @@ Please read the L</DETAILS> section before you start using this module.
 
 =item Log::Report::Template-E<gt>B<new>(%options)
 
-Create a new translator object.  You may pass the options as HASH or
-PAIRS.  By convension, all Template Toolkit options are in capitals.
-Read Template::Config about what they mean.  Extension options are
-all in lower-case.
+Create a new translator object.  You may pass the C<%options> as HASH or
+PAIRS.  By convension, all basic Template Toolkit options are in capitals.
+Read Template::Config about what they mean.  Extension options provided
+by this module are all in lower-case.
 
 In a web-environment, you want to start this before your webserver starts
 forking.
@@ -53,6 +53,7 @@ forking.
   modifiers          []
   processing_errors  'NATIVE'
   template_syntax    'HTML'
+  translate_to       undef
 
 =over 2
 
@@ -64,13 +65,20 @@ Read L</"Formatter value modifiers">.
 
 =item processing_errors => 'NATIVE'|'EXCEPTION'
 
-The Template toolkit infrastructure handles errors carefully: C<undef> is
+The Template Toolkit infrastructure handles errors carefully: C<undef> is
 returned and you need to call L<error()|Log::Report::Template/"Template (Toolkit) base-class"> to collect it.
 
 =item template_syntax => 'UNKNOWN'|'HTML'
 
 Linked to L<String::Print::new(encode_for)|String::Print/"Constructors">: the output of the translation
-is HTML encoded.  Read L</"Translation into HTML">
+is HTML encoded unless the inserted value name ends on C<_html>.
+Read L</"Translation into HTML">
+
+=item translate_to => LANGUAGE
+
+Globally set the output language of template processing.  Usually, this
+is derived from the logged-in user setting or browser setting.
+See L<translateTo()|Log::Report::Template/"Attributes">.
 
 =back
 
@@ -83,6 +91,8 @@ is HTML encoded.  Read L</"Translation into HTML">
 =item $obj-E<gt>B<formatter>()
 
 Get the C<String::Print> object which formats the messages.
+
+=item $obj-E<gt>B<translateTo>( [$language] )
 
 =back
 
@@ -104,19 +114,28 @@ example:
   my $domain = $templater->addTextdomain(
     name     => 'my-project',
     function => 'loc',   # default
-    lexicon  => $dir,    # location of translation tables
   );
+
+=item $obj-E<gt>B<domain>($name)
+
+Returns the textdomain with the specified C<$name>.
+
+=item $obj-E<gt>B<domains>()
+
+Returns a LIST with all defined textdomains, unsorted.
 
 =item $obj-E<gt>B<extract>(%options)
 
 Extract message ids from the templates, and register them to the lexicon.
 Read section L</"Extracting PO-files"> how to use this method.
 
+Show statistics will be show when the Log::Report more is VERBOSE or
+DEBUG.
+
  -Option        --Default
   charset         'UTF-8'
   filename_match  qr/\.tt2?$/
   filenames       undef
-  show_stats      <false>
   write_tables    <true>
 
 =over 2
@@ -133,10 +152,6 @@ regular expression.
 By default, all filenames from the INCLUDE_PATH directories which match
 the C<filename_match> are processed, but you may explicitly create a
 subset by hand.
-
-=item show_stats => BOOLEAN
-
-Show statistics about the processing of the template files.
 
 =item write_tables => BOOLEAN
 
@@ -162,7 +177,7 @@ A typical example of an HTML component which needs translation is
 Both the price text as value need to be translated.  In plain perl
 (with Log::Report) you would write
 
-  __x"Price: {price £}", price => $product->price    # or
+  __x"Price: {price £}", price => $product->price   # or
   __x"Price: {p.price £}", p => $product;
 
 In HTML, there seems to be the need for two separate translations,
@@ -206,6 +221,7 @@ Some translations will produce more than one line of text.  Add
 
   [% loc('intro-text') | br %]
   [% | br %][% intro_text %][% END %]
+  [% FILTER br %][% intro_text %][% END %]
 
 =back
 
@@ -288,8 +304,8 @@ manual page.  They are included here for reference only.
 If the 'processing_errors' option is 'NATIVE' (default), you have to
 collect the error like this:
 
- $tt->process($template_fn, $vars, ...)
-    or die $tt->error;
+  $tt->process($template_fn, $vars, ...)
+     or die $tt->error;
 
 When the 'procesing_errors' option is set to 'EXCEPTION', the error is
 translated into a L<Log::Report::Exception|Log::Report::Exception>:
@@ -515,12 +531,12 @@ tool or CPAN module.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 0.13,
-built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template distribution version 1.00,
+built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2017-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

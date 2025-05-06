@@ -12,6 +12,7 @@ Test::Spelling::Comment->import();
 Test::Spelling::Comment->new()->add_stopwords(<DATA>)->all_files_ok();
 
 __DATA__
+CPanel
 dirs
 ENV
 TODO

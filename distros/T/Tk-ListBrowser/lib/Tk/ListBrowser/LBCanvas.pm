@@ -5,38 +5,37 @@ use strict;
 use vars qw ($VERSION);
 use Carp;
 
-$VERSION = 0.02;
+$VERSION = 0.04;
 
 use base qw(Tk::Derived Tk::Canvas);
 
 Construct Tk::Widget 'LBCanvas';
 
-my $gself; #global self, I know I am cursing here.
-
 sub Populate {
 	my ($self,$args) = @_;
-	
 	$self->SUPER::Populate($args);
 	$self->ConfigSpecs(
 		-keycall => ['CALLBACK'],
 		DEFAULT => [ $self ],
 	);
-	$gself = $self;
 }
 
 sub ClassInit {
 	my ($class,$mw) = @_;
 	$class->SUPER::ClassInit($mw);
-	for (qw/Escape Return space/) {
+	for (qw/Escape Return space Down Left Right Up End Home/) {
 		my $bnd = $_;
-		$mw->bind($class, "<$bnd>", sub { $gself->KeyPress($bnd) });
+		$mw->bind($class, "<$bnd>", ['KeyPress', $bnd]);
 	}
-	for (qw/Down End Home Left Right Up/) {
+	for (qw/Down Left Right Up End Home/) {
 		my $bnd = $_;
-		$mw->bind($class, "<$bnd>", sub { $gself->KeyPress($bnd) });
-		$mw->bind($class, "<Shift-$bnd>", sub { $gself->KeyPress("Shift-$bnd") });
-		$mw->bind($class, "<Control-$bnd>", sub { $gself->KeyPress("Control-$bnd") });
-		$mw->bind($class, "<Control-Shift-$bnd>", sub { $gself->KeyPress("Control-Shift-$bnd") });
+		$mw->bind($class, "<Shift-$bnd>", ['KeyPress', "Shift-$bnd"]);
+	}
+	for (qw/End Home/) {
+		my $bnd = $_;
+		$mw->bind($class, "<Shift-$bnd>", ['KeyPress', "Shift-$bnd"]);
+		$mw->bind($class, "<Control-$bnd>", ['KeyPress', "Control-$bnd"]);
+		$mw->bind($class, "<Control-Shift-$bnd>", ['KeyPress', "Control-Shift-$bnd"]);
 	}
 }
 

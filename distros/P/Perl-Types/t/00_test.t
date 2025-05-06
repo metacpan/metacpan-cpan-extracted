@@ -1,7 +1,7 @@
 #
 # This file is part of Perl-Types
 #
-# This software is copyright (c) 2023 by Auto-Parallel Technologies, Inc.
+# This software is copyright (c) 2025 by Auto-Parallel Technologies, Inc.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.

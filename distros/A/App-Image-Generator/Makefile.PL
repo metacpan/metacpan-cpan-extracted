@@ -20,8 +20,10 @@ requires 'English' => 0;
 requires 'Error::Pure' => 0.16;
 requires 'File::Basename' => 0;
 requires 'Getopt::Std' => 0;
+requires 'Image::Checkerboard' => 0.05;
 requires 'Image::Random' => 0.06;
 requires 'Image::Select' => 0.03;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Image-Generator/issues';
@@ -34,7 +36,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

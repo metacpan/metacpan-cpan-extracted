@@ -2,24 +2,16 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 4;
+use Test::Most tests => 2;
+use Test::Needs 'Log::Abstraction';
 
-BEGIN { use_ok('CGI::Info') }
+BEGIN { use_ok('Config::Abstraction') }
+
+Log::Abstraction->import();
 
 my @messages;
-my $info = new_ok('CGI::Info');
-
-$info->set_logger(\@messages);
-
-my $name = $info->script_name();
+my $config = Config::Abstraction->new(logger => \@messages);
 
 diag(Data::Dumper->new([\@messages])->Dump()) if($ENV{'TEST_VERBOSE'});
 
-is_deeply(\@messages, [
-	{
-		'level' => 'trace',
-		'message' => 'CGI::Info: entering _find_paths'
-	}
-]);
-
-cmp_deeply(\@messages, $info->messages(), 'messages() works');
+cmp_ok(scalar(@messages), '>', 0, 'Logger logs messages to an array');

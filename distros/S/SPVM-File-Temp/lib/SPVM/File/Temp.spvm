@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Temp extends IO::File {
-  version "0.026";
+  version "0.027";
   
   allow File::Temp::Dir;
   
@@ -174,10 +174,10 @@ class File::Temp extends IO::File {
     my $template_path = (string)undef;
     if ($template) {
       if ($dir) {
-        $template_path = File::Spec->catfile([$dir], $template);
+        $template_path = File::Spec->catfile([$dir, $template]);
       }
       elsif ($tmpdir) {
-        $template_path = File::Spec->catfile([File::Spec->tmpdir], $template);
+        $template_path = File::Spec->catfile([File::Spec->tmpdir, $template]);
       }
       # Current working directory
       else {
@@ -187,10 +187,10 @@ class File::Temp extends IO::File {
     else {
       my $tempxxx = Fn->repeat("X", 10);
       if ($dir) {
-        $template_path = File::Spec->catfile([$dir], $tempxxx);
+        $template_path = File::Spec->catfile([$dir, $tempxxx]);
       }
       else {
-        $template_path = File::Spec->catfile([File::Spec->tmpdir], $tempxxx);
+        $template_path = File::Spec->catfile([File::Spec->tmpdir, $tempxxx]);
       }
     }
     

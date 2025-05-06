@@ -2,7 +2,7 @@ package Tk::ListBrowser;
 
 =head1 NAME
 
-Tk::ListBrowser - Tk::IconList like mega widget.
+Tk::ListBrowser - Tk::IconList inspired chameleon list box.
 
 =cut
 
@@ -10,28 +10,49 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'ListBrowser';
 
 use Math::Round;
-use Tie::Watch;
 use Tk;
+require Tk::Pane;
+require Tk::ListBrowser::Data;
 require Tk::ListBrowser::Item;
 require Tk::ListBrowser::LBCanvas;
-
-#used in formatText
-my $dlmreg = qr/\.|\(|\)|\:|\!|\+|\,|\-|\<|\=|\>|\%|\&|\*|\"|\'|\/|\;|\?|\[|\]|\^|\{|\||\}|\~|\\|\$|\@|\#|\`|\s/;
+require Tk::ListBrowser::LBHeader;
+require Tk::ListBrowser::SideColumn;
 
 #available refresh handlers
 my %handlers = (
 	bar => 'Bar',
 	column => 'Column',
 	list => 'List',
+	hlist => 'HList',
 	row => 'Row',
+	tree => 'Tree',
 );
+my %columnCapable = (
+	list => 1,
+	hlist => 1,
+	tree => 1,
+);
+
+my $minusimg = '#define indicatorclose_width 11
+#define indicatorclose_height 11
+static unsigned char indicatorclose_bits[] = {
+   0xff, 0x07, 0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0xfd, 0x05,
+   0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0xff, 0x07 };
+';
+
+my $plusimg = '#define indicatoropen_width 11
+#define indicatoropen_height 11
+static unsigned char indicatoropen_bits[] = {
+   0xff, 0x07, 0x01, 0x04, 0x21, 0x04, 0x21, 0x04, 0x21, 0x04, 0xfd, 0x05,
+   0x21, 0x04, 0x21, 0x04, 0x21, 0x04, 0x01, 0x04, 0xff, 0x07 };
+';
 
 =head1 SYNOPSIS
 
@@ -43,17 +64,53 @@ my %handlers = (
 
 =head1 DESCRIPTION
 
-B<Tk::ListBrowser> is inspired on L<Tk::IconList> but with added features
-like row as well as column, list and bar oriented display. There are plenty
-of options to set the presentation of text items.
+B<Tk::ListBrowser> began as an inspiration on L<Tk::IconList>.
+Nice, column oriented arrangement, but how about row oriented
+arrangement. And while we are at it, also list bar hlist and tree
+oriented arrangement. Scrollbars work automatically. Efforts have been
+made to follow the conventions of the Tk hierarchical list
+family as close as possible.
 
-Scrollbars are automatically shown when needed.
+Screenshots:
+L<https://www.perlgui.org/all/tklistbrowser-screenshots/>
 
-Screenshots: L<https://github.com/haje61/Tk-ListBrowser/tree/main/screenshots>
+This module features:
+
+=head3 Arrange modes
+
+Available arrange modes are 'bar', 'column', 'hlist', 'list'
+and 'tree'. You can switch between arrange modes through the
+I<-arrange> option while retaining data.
+
+The 'hlist' and 'tree' modes provide a hierarchical list
+interface. For it to work properly the I<-separator> option
+must be set to a non empty string of one character.
+
+=head3 Sorting
+
+This module allows sorting your list on all kinds of paramenters,
+like sorting on column, ascending or descending. Furthemore you 
+can choose sort fields like '-data', '-name', or '-text'.
+
+=head3 Headers
+
+Headers are shown in the 'hlist', 'list' and 'tree' modes. You can
+create and configure them in any mode. They are resizable and can
+be made sortable.
+
+=head3 Side columns
+
+Side columns are shown in the 'hlist', 'list' and tree modes. You can create and configure them in any mode.
+
+=head3 Filtering
+
+The keyboard shortcut CTFL+F opens a filter entry at the bottom of the widget. Filtering is case insensitive.
+The filter will start updating when I<-filterdelay> milliseconds have past after your last keystroke.
+You can choose which data to filter with the I<-filterfield> option.
 
 =head1 OPTIONS
 
-Tk::ListBrowser uses the following standardoptions: B<-background>, B<-font>,
+Tk::ListBrowser uses the following standard options: B<-background>, B<-font>,
 B<-foreground>, B<-selectbackground>, B<-selectforeground>. In addition the
 following options are supported.
 
@@ -75,6 +132,10 @@ Presents a one row, horizontal list.
 
 Presents a column centered two dimensional list.
 
+=item B<hlist>
+
+Presents a L<Tk::HList> like hierarchical interface.
+
 =item B<list>
 
 Presents a one column vertical list.
@@ -82,6 +143,10 @@ Presents a one column vertical list.
 =item B<row>
 
 Presents a row centered two dimensional list.
+
+=item B<tree>
+
+Presents a L<Tk::Tree> like hierarchical interface.
 
 =back
 
@@ -112,9 +177,99 @@ Specifies on what data the filter should work.
 
 Default value I<false>. If set the filter entry will allways be visible.
 
+=item Name B<headerBorderWidth>
+
+=item Class B<headerBorderWidth>
+
+=item Switch B<-headerborderwidth>
+
+Default value 2.
+
+=item Name B<headerHeight>
+
+=item Class B<HeaderHeight>
+
+=item Switch B<-headerheight>
+
+Default value 32.
+
+=item Name B<headerRelief>
+
+=item Class B<HeaderRelief>
+
+=item Switch B<-headerrelief>
+
+Default value 'raised'.
+
+=item Switch B<-indicatorminusimg>
+
+Specifies the image of the minus indicator when I<-arrange> is set to 'tree'.
+By default an internal image is loaded.
+
+=item Switch B<-indicatorplusimg>
+
+Specifies the image of the plus indicator when I<-arrange> is set to 'tree'.
+By default an internal image is loaded.
+
+=item Name B<indent>
+
+=item Class B<Indent>
+
+=item Switch B<-indent>
+
+Default value 22. Specifies the indent with  when I<-arrange> is set to 'hlist' or 'tree'.
+
+=item Name B<itemPadX>
+
+=item Class B<ItemPadX>
+
+=item Switch B<-itempadx>
+
+Internal padding in x direction in entries and column items.
+
+=item Name B<itemPadY>
+
+=item Class B<ItemPadY>
+
+=item Switch B<-itempady>
+
+Internal padding in y direction in entries and column items.
+
 =item Switch B<-itemtype>
 
 Default value I<imagetext>. Can be I<image>, I<imagetext> or I<text>.
+
+=item Name B<marginBottom>
+
+=item Class B<MarginBottom>
+
+=item Switch B<-marginbottom>
+
+Default value 0. Expands the scrollable canvas size on the bottom.
+
+=item Name B<marginLeft>
+
+=item Class B<MarginLeft>
+
+=item Switch B<-marginleft>
+
+Default value 0. Expands the scrollable canvas size to the left.
+
+=item Name B<marginRight>
+
+=item Class B<MarginRight>
+
+=item Switch B<-marginright>
+
+Default value 0. Expands the scrollable canvas size to the right.
+
+=item Name B<marginTop>
+
+=item Class B<MarginTop>
+
+=item Switch B<-margintop>
+
+Default value 0. Expands the scrollable canvas size to the top.
 
 =item Switch B<-motionselect>
 
@@ -134,12 +289,46 @@ Default value I<single>. Can either be I<single> or I<multiple>.
 In single mode only one entry in the list can be selected at all times.
 In multiple mode more than one entry can be selected.
 
+=item Switch B<-separator>
+
+Default value is an empty string. When set to one character, hierarchy mode is enabled.
+When I<-arrange> is set to any other than 'hlist' or 'tree', only the root list is shown when hierarchy
+mode is enabled.
+
+=item Switch B<-sortbottom>
+
+Default value -(10**32). Used while sorting whenever a column item is found that requires
+numerical sort, but the item itself is not defined. A ridiculous low value is used instead.
+Are you handling even lower numbers? You can adjust it here.
+
+=item Switch B<-sortcase>
+
+Default value false. You can set it if you require case independent sort.
+
+=item Switch B<-sortfield>
+
+Default value '-name'. Possible values are '-name', '-text' and '-data'.
+Specifies which attribute of an entry is used for sorting.
+
+=item Switch B<-sortnumerical>
+
+Default value false. You can set it if you require numerical sorting.
+
+=item Switch B<-sorton>
+
+Default value is an empty string. That means sorting is done on the main entry list.
+You can set it to a column name for sorting on column content.
+
+=item Switch B<-sortorder>
+
+Default value 'ascending'.
+
 =item Switch B<-textanchor>
 
 Default value empty string. This value centers the text in it's cativy.
-Besides an empty string the possible values are I<n>, I<ne>, I<nw>, I<s>, I<se>, I<sw>, I<e> and I<w>.
-The letters stand for the first letter of the wind directions. They tell where to position the text in
-it's cavity.
+Besides an empty string the possible values are I<n>, I<ne>, I<nw>, I<s>,
+I<se>, I<sw>, I<e> and I<w>. The letters stand for the first letter of the
+wind directions. They tell where to position the text in it's cavity.
 
 =item Switch B<-textjustify>
 
@@ -155,9 +344,9 @@ to see the changes. This option only has meaning when I<-itemtype> is set to 'im
 
 =item Switch B<-wraplength>
 
-Default value 0. You can set it to a positive integer of at least 40 to invoke word or character wrapping.
-The value determines the maximum width in pixels of a text block. It will attempt a word
-wrap and will do a character wrap if that fails.
+Default value 0. You can set it to a positive integer of at least 40 to invoke word or
+character wrapping. The value determines the maximum width in pixels of a text block. It
+will attempt a word wrap and will do a character wrap if that fails.
 
 If you change this option on the fly you have to call I<refresh> to see the changes. 
 
@@ -168,6 +357,14 @@ would freeze you application. This also means watching out for using very big fo
 =back
 
 =cut
+
+=head1 STANDARD OPTIONS
+
+A number of the options above can also be used when you call the
+I<add>, I<columnCreate>, I<headerCreate> and I<itemCreate> methods.
+These are I<-background>, I<-font>, I<-foreground>, I<-itempadx>,
+I<-itempady>, I<-itemtype>, I<sortfield>, I<-sortnumerical>, 
+I<-textanchor>, I<-textjustify>, I<-textside>, and I<-wraplength>, 
 
 =head1 METHODS
 
@@ -183,14 +380,31 @@ sub Populate {
 	
 	$self->SUPER::Populate($args);
 	
+	#create the canvas
 	my $canv = $self->Scrolled('LBCanvas',
 		-keycall => ['KeyPress', $self],
 		-scrollbars => 'osoe',
 	)->pack(-expand => 1, -fill => 'both');
 	my $c = $canv->Subwidget('scrolled');
-	$c->configure(-takefocus => 1);
+	$c->configure(
+		-takefocus => 1,
+	);
+
+	#horizontal scroll for headers
+	my $xscroll = $canv->Subwidget('xscrollbar');
+	my $call = $xscroll->cget('-command');
+	$xscroll->configure(
+		-command => sub {
+			$call->Call(@_);
+			$self->headerPlace;
+		}
+	);
+
 	$self->Advertise('Canvas', $c);
-	$self->bind('<Configure>', [ $self, 'refresh' ]);
+	
+	#create the header frame;
+	my $hf = $c->Pane(-sticky => 'ew');
+	$self->Advertise('HeaderFrame', $hf);
 
 	#mouse bindings
 	$c->Tk::bind('<Button-1>', [ $self, 'Button1', Ev('x'), Ev('y') ]);
@@ -220,33 +434,79 @@ sub Populate {
 	}
 
 	$self->{ARRANGE} = undef;
+	$self->{COLUMNS} = [];
 	$self->{HANDLER} = undef;
-	$self->{POOL} = [];
+	$self->{INDENT} = 0;
+	$self->{DATA} = Tk::ListBrowser::Data->new($self);
 	$self->{ROWS} = 0;
 	$self->{WRAPLENGTH} = 0;
 
+	$self->bind('<Configure>', [ $self, 'OnConfigure' ]);
+
+	my $minusbmp = $self->Bitmap(-data => $minusimg);
+	my $plusbmp = $self->Bitmap(-data => $plusimg);
 	$self->ConfigSpecs(
+		#general
 		-arrange => ['METHOD', undef, undef, 'row'],
-		-background => [$c, 'background', 'Background', '#E8E8E8'],
 		-browsecmd => ['CALLBACK'],
 		-command => ['CALLBACK'],
-		-filterdelay => ['PASSIVE', 'filterDelay', 'FilterDelay', 300],
-		-filterfield => ['PASSIVE', undef, undef, 'name'],
-		-filteron => ['PASSIVE', undef, undef, ''],
-		-font => ['PASSIVE', 'font', 'Font', 'Monotype 10'],
-		-foreground => ['PASSIVE', 'foreground', 'foreground', '#3C3C3C'],
-		-itemtype => ['PASSIVE', undef, undef, 'imagetext'],
+		-font => ['PASSIVE', 'font', 'Font', 'Arial 9'],
+		-indent => ['PASSIVE', 'indent', 'Indent', 22],
 		-motionselect => ['PASSIVE', undef, undef, ''],
+		-scrollregion => [$c],
+		-selectmode => ['PASSIVE', undef, undef, 'single'],
+		-separator => ['PASSIVE', undef, undef, ''],
+
+		#colors
+		-background => [$c, 'background', 'Background', '#E8E8E8'],
+		-foreground => [$c, 'foreground', 'Foreground', '#3C3C3C'],
 		-selectbackground => ['PASSIVE', 'selectBackground', 'SelectBackground', '#A0A0FF'],
 		-selectforeground => ['PASSIVE', 'selectForeground', 'SelectForeground', '#FAF9EA'],
-		-selectmode => ['PASSIVE', undef, undef, 'single'],
+
+		#filter
+		-filterdelay => ['PASSIVE', 'filterDelay', 'FilterDelay', 300],
+		-filterfield => ['PASSIVE', undef, undef, 'name'],
+		-filteron => ['PASSIVE', undef, undef, ''], #boolean
+
+		#headers
+		-headerborderwidth => ['PASSIVE', 'headerBorderWidth', 'HeaderBorderWidth', 2],
+		-headerheight => ['PASSIVE', 'headerHeight', 'HeaderHeight', 32],
+		-headerrelief => ['PASSIVE', 'headerRelief', 'HeaderRelief', 'raised'],
+
+		#indicators
+		-indicatorminusimg => ['PASSIVE', undef, undef, $minusbmp],
+		-indicatorplusimg => ['PASSIVE', undef, undef, $plusbmp],
+
+		#items
+		-itempadx => ['PASSIVE', 'itemPadX', 'ItemPadX', 3],
+		-itempady => ['PASSIVE', 'itemPadY', 'ItemPadY', 0],
+		-itemtype => ['PASSIVE', undef, undef, 'imagetext'],
+
+		#margins
+		-marginleft => ['PASSIVE', 'marginLeft', 'MarginLeft', 0],
+		-marginright => ['PASSIVE', 'marginRight', 'MarginRight', 0],
+		-margintop => ['PASSIVE', 'marginTop', 'MarginTop', 0],
+		-marginbottom => ['PASSIVE', 'marginBottom', 'MarginBottom', 0],
+
+		#sort
+		-sortbottom => ['PASSIVE', undef, undef, -(10**32)],
+		-sortcase => ['PASSIVE', undef, undef, 'name'],
+		-sortfield => ['PASSIVE', undef, undef, 'name'],
+		-sorton => ['PASSIVE', undef, undef, ''],
+		-sortnumerical => ['PASSIVE', undef, undef, ''], #boolean
+		-sortorder => ['PASSIVE', undef, undef, 'ascending'],
+
+		#text
 		-textanchor => ['PASSIVE', undef, undef, ''],
 		-textjustify => ['PASSIVE', undef, undef, 'center'],
 		-textside => ['PASSIVE', undef, undef, 'bottom'],
 		-wraplength => ['METHOD', undef, undef, 0],
-		DEFAULT => [ $c ],
+
+		DEFAULT => [ $self ],
 	);
 	$self->Delegates(
+
+		#canvas
 		CanvasFocus => $c,
 		canvasx => $c,
 		canvasy => $c,
@@ -257,18 +517,64 @@ sub Populate {
 		yview => $c,
 		xviewScroll => $c,
 		yviewScroll => $c,
+
+		#data
+		add => $self->data,
+		get => $self->data,
+		getAll => $self->data,
+		getColumn => $self->data,
+		getIndex => $self->data,
+		getRow => $self->data,
+		hide => $self->data,
+		index => $self->data,
+		indexColumnRow => $self->data,
+		indexLast => $self->data,
+		infoChildren => $self->data,
+		infoData => $self->data,
+		infoExists => $self->data,
+		infoFirst => $self->data,
+		infoFirstVisible => $self->data,
+		infoHidden => $self->data,
+		infoList => $self->data,
+		infoLast => $self->data,
+		infoLastVisible => $self->data,
+		infoNext => $self->data,
+		infoNextVisible => $self->data,
+		infoParent => $self->data,
+		infoPrev => $self->data,
+		infoPrevVisible => $self->data,
+		infoRoot => $self->data,
+		lastColumnInRow => $self->data,
+		lastRowInColumn => $self->data,
+		selectAll => $self->data,
+		selectionClear => $self->data,
+		selectionGet => $self->data,
+		selectionFlip => $self->data,
+		selectionIndex => $self->data,
+		selectionSet => $self->data,
+		selectionUnset => $self->data,
+		show => $self->data,
+
 		DEFAULT => $self,
 	);
-	$self->after(10, sub { $self->filterFlip if $self->cget('-filteron') });
-#	$c->CanvasFocus
+	$self->after(1, sub {
+		$self->filterFlip if $self->cget('-filteron');
+		for ($minusbmp, $plusbmp) {
+			$_->configure(-background => $c->cget('-background'));
+			$_->configure(-foreground => $c->cget('-foreground'));
+		}
+	});
+
 }
 
 sub _handler { return $_[0]->{HANDLER} }
 
+sub data { return $_[0]->{DATA} }
+
 =item B<add>I<(?$name?, %options)>
 
 Adds I<$name> to the list with I<%options>. I<$name> must not yet exist.
-Possible options are:
+Besides the standard options you can also use:
 
 =over 4
 
@@ -304,33 +610,19 @@ Returns a reference to the created item object.
 
 =cut
 
-sub add {
-	my ($self, $name, %options) = @_;
-	if ($self->infoExists($name)) {
-		croak "Entry '$name' already exists";
-		return
+sub anchor {
+	my $self = shift;
+	my $a = $self->{ANCHOR};
+	unless (defined $a) {
+		$a = $self->createRectangle(0, 0, 1, 1,
+			-fill => undef,
+			-dash => [3, 2],
+		);
+		$self->{ANCHOR} = $a
 	}
-	my $after = delete $options{'-after'};
-	my $before = delete $options{'-before'};
-	my $item = new Tk::ListBrowser::Item(
-		%options,
-		-canvas => $self,
-		-name => $name,
-	);
-	my $pool = $self->pool;
-	if (defined $after) {
-		my $index = $self->index($after);
-		splice(@$pool, $index + 1, 0, $item) if defined $index;
-		croak "Entry for -after '$after' not found" unless defined $index;
-	} elsif (defined $before) {
-		my $index = $self->index($before);
-		splice(@$pool, $index, 0, $item) if defined $index;
-		croak "Entry for -before '$before' not found" unless defined $index;
-	} else {
-		push @$pool, $item
-	}
-	return $item
+	return $a
 }
+
 
 =item B<anchorClear>
 
@@ -340,9 +632,9 @@ Clears the keyboard anchor.
 
 sub anchorClear {
 	my $self = shift;
-	my $pool = $self->pool;
+	my $pool = $self->data->pool;
 	for (@$pool) {
-		$_->anchor(0)
+			$_->anchor(0)
 	}
 }
 
@@ -355,9 +647,9 @@ that currently holds the anchor.
 
 sub anchorGet {
 	my $self = shift;
-	my $pool = $self->pool;
-	for (0 .. @$pool - 1) {
-		my $obj = $pool->[$_];
+	my @pool = $self->data->getAll;
+	for (0 .. @pool - 1) {
+		my $obj = $pool[$_];
 		return $obj if $obj->anchored
 	}
 	return undef
@@ -367,6 +659,7 @@ sub anchorInitialize {
 	my $self = shift;
 	my $i = $self->anchorGet;
 	unless (defined $i) {
+		my $a = $self->anchor;
 		my $name = $self->infoFirstVisible;
 		$self->anchorSet($name) unless defined $self->anchorGet;
 		$self->see($name);
@@ -387,24 +680,17 @@ sub anchorSet {
 	if ((defined $item) and (not $item->hidden)) {
 		$self->anchorClear;
 		$item->anchor(1);
-#		$self->anchor($item);
 		return 1
 	}
 	return ''
 }
 
-=item B<anchorSetColumnRow>I<($column, $row)>
-
-Sets the anchor in $column and $row
-
-=cut
-
 sub anchorSetColumnRow {
 	my ($self, $column, $row) = @_;
-	my $pool = $self->pool;
 	my $index = $self->indexColumnRow($column, $row);
+	my @list = $self->data->infoList;
 	if (defined $index) {
-		return $self->anchorSet($pool->[$index]->name);
+		return $self->anchorSet($list[$index]);
 	}
 	return ''
 }
@@ -422,6 +708,12 @@ sub arrange {
 		my $modname = "Tk::ListBrowser::$mod";
 		my $error = '';
 		eval "use $modname;";
+		my $hf = $self->Subwidget('HeaderFrame');
+		if (($arr eq 'row') or ($arr eq 'column')) {
+			$self->headerClear;
+		} else {
+			$self->headerPlace;
+		}
 		$error = $@;
 		unless ($error) {
 			$self->clear;
@@ -436,6 +728,7 @@ sub arrange {
 
 sub Button1 {
 	my ($self, $x, $y) = @_;
+	$self->CanvasFocus;
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
 		$self->selectionClear;
@@ -477,7 +770,7 @@ sub Button1Shift {
 	return $self->Button1($x, $y) if $self->cget('-selectmode') eq 'single';
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
-		my $pool = $self->pool;
+		my $pool = $self->data->pool;
 		my @sel = $self->selectionGet;
 		unless (@sel) {
 			my $start = $pool->[0]->name;
@@ -522,12 +815,6 @@ sub Button2Release {
 	delete $self->{'mouse_pos'};
 }
 
-=item B<canvasSize>
-
-Returns the available width and height of the Danvas widget.
-
-=cut
-
 sub canvasSize {
 	my $self = shift;
 	my $c = $self->Subwidget('Canvas');
@@ -535,9 +822,54 @@ sub canvasSize {
 	return ($c->width - $offset, $c->height - $offset);
 }
 
+sub cellHeight {
+	my $self = shift;
+	$self->{CELLHEIGHT} = shift if @_;
+	return $self->{CELLHEIGHT}
+}
+
+sub cellImageHeight {
+	my $self = shift;
+	$self->{IMAGEHEIGHT} = shift if @_;
+	return $self->{IMAGEHEIGHT}
+}
+
+sub cellImageWidth {
+	my $self = shift;
+	$self->{IMAGEWIDTH} = shift if @_;
+	return $self->{IMAGEWIDTH}
+}
+
+sub cellTextHeight {
+	my $self = shift;
+	$self->{TEXTHEIGHT} = shift if @_;
+	return $self->{TEXTHEIGHT}
+}
+
+sub cellTextWidth {
+	my $self = shift;
+	$self->{TEXTWIDTH} = shift if @_;
+	return $self->{TEXTWIDTH}
+}
+
+
+sub cellWidth {
+	my $self = shift;
+	$self->{CELLWIDTH} = shift if @_;
+	my $fw = $self->forceWidth;
+	return $fw if defined $fw;
+	return $self->{CELLWIDTH}
+}
+
+sub cheader{
+	my $self = shift;
+	$self->{CHEADER} = shift if @_;
+	return $self->{CHEADER}
+}
+
 =item B<clear>
 
-Clears the canvas.
+Clears the display. Does not delete data.
 
 =cut
 
@@ -547,13 +879,256 @@ sub clear {
 	$self->anchorClear;
 	$self->selectionClear;
 
-	my $pool = $self->pool;
-	grep { $_->clear } @$pool;
+	$self->data->clear;
+
+#	$self->Subwidget('HeaderFrame')->packForget;
+	$self->cheader(undef);
+	my @columns = $self->columnList;
+	for (@columns) {
+		$self->columnGet($_)->clear;
+	}
 
 	my $c = $self->Subwidget('Canvas');
 	$c->xview(moveto => 0);
 	$c->yview(moveto => 0);
 	$c->configure(-scrollregion => [0, 0, 0, 0]);
+}
+
+=item B<close>I<($entry)>
+
+Hides all children of $entry.
+
+=cut
+
+sub close {
+	my ($self, $entry) = @_;
+	my $i = $self->get($entry);
+	unless (defined $i) {
+		croak "Entry $entry not found";
+		return
+	}
+	$i->opened(0);
+}
+
+=item B<columnCapable>
+
+Returns true if I<-arrange> is set to 'hlist', 'list' or 'tree'.
+
+=cut
+
+sub columnCapable {
+	my $self = shift;
+	return exists $columnCapable{$self->cget('-arrange')}
+}
+
+=item B<columnCget>I<($name, $option)>
+
+Returns the value of $option in column $name
+
+=cut
+
+sub columnCget {
+	my ($self, $name, $option) = @_;
+	my $col = $self->columnGet($name);
+	unless (defined $col) {
+		croak "Column '$name' not found";
+		return
+	}
+	return $col->cget($option)
+}
+
+=item B<columnConfigure>I<($name, %options)>
+
+Configures options in column I<$name>.
+
+=cut
+
+sub columnConfigure {
+	my ($self, $name, %options) = @_;
+	my $col = $self->columnGet($name);
+	unless (defined $col) {
+		croak "Column '$name' not found";
+		return
+	}
+	for (keys %options) {
+		$col->configure($_, $options{$_})
+	}
+}
+
+=item B<columnCreate>I<($name, %options)>
+
+Creates a new side column object. Besides the standard options
+you can use the following:
+
+=over 4
+
+=item B<-after>
+
+Specify a column name.
+
+=item B<-before>
+
+Specify a column name.
+
+=back
+
+=cut
+
+sub columnCreate {
+	my ($self, $name, %options) = @_;
+
+	if ($self->columnExists($name)) {
+		croak "Column '$name' already exists";
+		return
+	}
+
+	my $after = delete $options{'-after'};
+	my $before = delete $options{'-before'};
+	my $item = new Tk::ListBrowser::SideColumn(
+		%options,
+		-listbrowser => $self,
+		-name => $name,
+	);
+	my $columns = $self->{COLUMNS};
+	if (defined $after) {
+		my $index = $self->columnIndex($after);
+		splice(@$columns, $index + 1, 0, $item) if defined $index;
+		croak "Column for -after '$after' not found" unless defined $index;
+	} elsif (defined $before) {
+		my $index = $self->columnIndex($before);
+		splice(@$columns, $index, 0, $item) if defined $index;
+		croak "Column for -before '$before' not found" unless defined $index;
+	} else {
+		push @$columns, $item
+	}
+	return $item
+}
+
+=item B<columnExists>I<($name)>
+
+Returns true if column $name exists.
+
+=cut
+
+sub columnExists {
+	my ($self, $name) = @_;
+	my $columns = $self->{COLUMNS};
+	my @hit = grep { $_->name eq $name } @$columns;
+	return defined $hit[0]
+}
+
+=item B<columnGet>I<($name)>
+
+Returns a reference to the L<Tk::ListBrowser::SideColumn> object of I<$name>.
+
+=cut
+
+sub columnGet {
+	my ($self, $name) = @_;
+	my $columns = $self->{COLUMNS};
+	my @hit = grep { $_->name eq $name } @$columns;
+	croak "Column '$name' not found" unless @hit;
+	return $hit[0]
+}
+
+=item B<columnIndex>I<($name)>
+
+Returns the place of column I<$name> inf the viewing order. The first one has index 0.
+
+=cut
+
+sub columnIndex {
+	my ($self, $name) = @_;
+	my $columns = $self->{COLUMNS};
+	my ($index) = grep { $columns->[$_]->name eq $name } 0 .. @$columns - 1;
+	return $index
+}
+
+=item B<columnList>
+
+Returns the names all available columns.
+
+=cut
+
+sub columnList {
+	my $self = shift;
+	my $columns = $self->{COLUMNS};
+	my @l;
+	for (@$columns) {
+		push @l, $_->name
+	}
+	return @l
+}
+
+=item B<columnMove>I<($column, $index)>
+
+Moves $column to $index.
+
+=cut
+
+sub columnMove {
+	my ($self, $column, $index) = @_;
+	my $columns = $self->{COLUMNS};
+	return if $index > @$columns - 1;
+	return if $index < 0;
+	my $place = $self->columnIndex($column);
+	my $t = splice(@$columns, $place, 1);
+	splice(@$columns, $index, 0, $t);
+}
+
+sub columnNext {
+	my ($self, $name) = @_;
+	my $columns = $self->{COLUMNS};
+	my $next;
+	if ($name eq '') {
+		my $col = $columns->[0];
+		$next = $col->name if defined $col;
+	} else {
+		my $i = $self->columnIndex($name);
+		$next = $columns->[$i + 1];
+		$next = $next->name if defined $next
+	}
+	return $next;
+}
+
+=item B<columnRemove>I<($name)>
+
+Removes column I<$name> and all its associated data.
+
+=cut
+
+sub columnRemove {
+	my ($self, $name) = @_;
+	my $columns = $self->{COLUMNS};
+	my $index = $self->columnIndex($name);
+	if (defined $index) {
+		my ($del) = splice(@$columns, $index, 1);
+		$del->clear;
+		return
+	}
+	croak "Column '$name' not found"
+}
+
+=item B<columnWidth>I<($name, $width)>
+
+By default the main list and all side columns are sized so no information
+is lost and no unused space is created. The widths may vary when you add,
+remove or modify data. Once you make a call to this method the width of
+the column or main list becomes fixed. This works exactly as in L<Tk::HList>.
+
+Specify I<$name> as an empty string for the main list. Otherwise specify a
+column name.
+
+=cut
+
+sub columnWidth {
+	my ($self, $col, $width) = @_;
+	if ($col eq '') {
+		$self->forceWidth($width)
+	} else {
+		my $c = $self->columnGet($col);
+		$c->forceWidth($width)
+	}
 }
 
 =item B<delete>I<(?$name?)>
@@ -564,11 +1139,13 @@ Deletes entry I<$name>. You must call I<refresh> to see your changes.
 
 sub delete {
 	my ($self, $name) = @_;
-	my $pool = $self->pool;
 	my $index = $self->index($name);
 	if (defined $index) {
-		my ($del) = splice(@$pool, $index, 1);
-		$del->clear;
+		$self->data->delete($name);
+		my @columns = $self->columnList;
+		for (@columns) {
+			$self->itemRemove($name, $_);
+		}
 		return
 	}
 	croak "Entry '$name' not found"
@@ -582,17 +1159,11 @@ Deletes all entries. You must call refresh to see your changes.
 
 sub deleteAll {
 	my $self = shift;
-	my $pool = $self->pool;
-	grep { $self->delete($_->name) } @$pool;
-	$self->clear;
+	my @list = $self->data->infoList(1);
+	for (@list) {
+		$self->delete($_)
+	}
 }
-
-my %validconfigs = (
-	-data => 1,
-	-hidden => 1,
-	-image => 1,
-	-text => 1
-);
 
 =item B<entryCget>I<($name, $option)>
 
@@ -602,18 +1173,18 @@ options are I<-data>, I<-hidden>, I<-image> and I<-text>.
 =cut
 
 sub entryCget {
-	my ($self, $name, $option) = @_;
-	my $i = $self->get($name);
-	unless (defined $i) {
-		croak "Entry '$name' not found";
-		return
+	my $self = shift;
+	my $val = $self->data->itemCget(@_);
+	if (exists $self->{'insort'}) {
+		unless (defined $val) {
+			if ($self->cget('-sortnumerical')) {
+				$val = $self->cget('-sortbottom')
+			} else {
+				$val = ''
+			}
+		}
 	}
-	unless (exists $validconfigs{$option}) {
-		croak "Invalid option '$option'";
-		return
-	}
-	$option =~ s/^\-//;
-	return $i->$option
+	return $val
 }
 
 =item B<entryConfigure>I<($name, %options)>
@@ -626,22 +1197,7 @@ You can specify multiple options.
 
 sub entryConfigure {
 	my $self = shift;
-	my $name = shift;
-	my $i = $self->get($name);
-	unless (defined $i) {
-		croak "Entry '$name' not found";
-		return
-	}
-	while (@_) {
-		my $option = shift;
-		my $value = shift;
-		unless (exists $validconfigs{$option}) {
-			croak "Invalid option '$option'";
-			return
-		}
-		$option =~ s/^\-//;
-		$i->$option($value)
-	}
+	$self->data->itemConfigure(@_)
 }
 
 sub filter {
@@ -669,12 +1225,6 @@ sub filterActivate {
 	$self->{'filter_id'} = $filter_id;
 }
 
-=item B<filterFlip>
-
-Hides the filter bar if it is shown. Shows it if it is hidden.
-
-=cut
-
 sub filterFlip {
 	my $self = shift;
 	my $f = $self->Subwidget('FilterFrame');
@@ -695,7 +1245,7 @@ sub filterFlip {
 
 sub filterRefresh {
 	my $self = shift;
-	my $pool = $self->pool;
+	my $pool = $self->data->pool;
 	my $filter = $self->Subwidget('FilterEntry')->get;
 	my $filterfield = $self->cget('-filterfield');
 	for (@$pool) {
@@ -711,72 +1261,276 @@ sub filterRefresh {
 
 sub focus { $_[0]->CanvasFocus }
 
+sub forceWidth {
+	my $self = shift;
+	$self->{FORCEWIDTH} = shift if @_;
+	return $self->{FORCEWIDTH}
+}
+
 =item B<get>I<(?$name?)>
 
 Returns a reference to the L<Tk::ListBrowser::Icon> object of I<$name>.
 
-=cut
+=item B<getAll>I<(?$name?)>
 
-sub get {
-	my ($self, $name) = @_;
-	my $pool = $self->pool;
-	my @hit = grep { $_->name eq $name } @$pool;
-	return $hit[0]
-}
-
-=item B<get>I<(?$name?)>
-
-Returns a list of all L<Tk::ListBrowser::Icon> objects.
-
-=cut
-
-sub getAll {
-	my $self = shift;
-	my $pool = $self->pool;
-	return @$pool
-}
+Returns a list of all L<Tk::ListBrowser::Item> objects.
 
 =item B<getColumn>I<($column)>
 
-Returns a list of referencec to all L<Tk::ListBrowser::Icon> objects in column I<$column>.
-
-=cut
-
-sub getColumn {
-	my ($self, $col) = @_;
-	my $pool = $self->pool;
-	my @hits = grep { (defined $_->column) and ($_->column eq $col) } @$pool;
-	return @hits
-}
+Returns a reference to the L<Tk::ListBrowser::Item> object of column I<$column>.
+Only practical when I<-arrange> is set to 'column' or 'row'.
 
 =item B<getIndex>I<($index)>
 
-Returns a reference to the L<Tk::ListBrowser::Icon> object at index I<$index>
-
-=cut
-
-sub getIndex {
-	my ($self, $index) = @_;
-	return undef unless defined $index;
-	my $pool = $self->pool;
-	if (($index < 0) or ($index > @$pool - 1)) {
-		croak "Index '$index' out of range";
-		return undef ;
-	}
-	return $pool->[$index];
-}
+Returns a reference to the L<Tk::ListBrowser::Item> object at index I<$index>
 
 =item B<getRow>I<($row)>
 
-Returns a list of referencec to all L<Tk::ListBrowser::Icon> objects in row I<$row>.
+Returns a list of references to all L<Tk::ListBrowser::Icon> objects in row I<$row>.
+Only practical when I<-arrange> is set to 'column' or 'row'.
 
 =cut
 
-sub getRow {
-	my ($self, $row) = @_;
-	my $pool = $self->pool;
-	my @hits = grep { (defined $_->row ) and ($_->row eq $row) } @$pool;
-	return @hits
+sub header {
+	my $self = shift;
+	$self->{HEADER} = shift if @_;
+	return $self->{HEADER}
+}
+
+
+=item B<headerAvailable>
+
+Returns true if headers have been defined.
+
+=cut
+
+sub headerAvailable {
+	my $self = shift;
+	my $a = $self->cget('-arrange');
+	return '' if (($a eq 'column') or ($a eq 'row'));
+	return 1 if defined $self->header;
+	my @columns = $self->columnList;
+	for (@columns) {
+		return 1 if defined $self->headerGet($_)
+	}
+	return ''
+}
+
+=item B<headerCget>I<($column, $option)>
+
+Returns the value of $option in header $name.
+
+Specify I<$column> as an empty string for the main list. Otherwise specify a column name.
+
+=cut
+
+sub headerCget {
+	my ($self, $col, $option) = @_;
+	my $h;
+	if ($col eq '') {
+		$h = $self->header
+	} else {
+		my $c = $self->columnGet($col);
+		$h = $c->header
+	}
+	return $h->cget($option) if defined $h
+}
+
+sub headerClear {
+	my $self = shift;
+	$self->Subwidget('HeaderFrame')->packForget;
+}
+
+=item B<headerConfigure>I<($column, $option, $value)>
+
+Configures options in header $name.
+
+Specify $name as an empty string for the main list. Otherwise specify a column name.
+
+=cut
+
+sub headerConfigure {
+	my ($self, $col, $option, $value) = @_;
+	my $h;
+	if ($col eq '') {
+		$h = $self->header
+	} else {
+		my $c = $self->columnGet($col);
+		$h = $c->header
+	}
+	$h->configure($option, $value) if defined $h
+}
+
+=item B<headerCreate>I<($column, %options)>
+
+Creates a new header object. You can use the following options:
+
+=over 4
+
+=item B<-contextcall>
+
+Callback executed when you right click the header.
+
+=item B<-image>
+
+Image to display on the header. This option precedes the I<-text> option.
+
+=item B<-sortable>
+
+Only available at create time. If set to true the list is sorted by clicking on the header.
+By default sorting is disabled.
+
+=item B<-text>
+
+Text to display on the header.
+
+=back
+
+Specify I<$column> as an empty string for the main list. Otherwise specify a column name.
+
+=cut
+
+sub headerCreate {
+	my ($self, $col, %options) = @_;
+	if ($self->headerExists($col)) {
+		croak "Header '$col' already exists";
+		return
+	}
+	
+	my $sortable = delete $options{'-sortable'};
+	$options{'-sortcall'} = ['sortMode', $self] if (defined $sortable) and $sortable;
+	my $hf= $self->Subwidget('HeaderFrame');
+	my $h = $hf->LBHeader(
+		-relief => $self->cget('-headerrelief'),
+		-borderwidth => $self->cget('-headerborderwidth'),
+		-listbrowser => $self,
+		-column => $col,
+		%options,
+	);
+	if ($col eq '') {
+		$self->header($h)
+	} else {
+		my $c = $self->columnGet($col);
+		$c->header($h) if defined $c
+	}
+}
+
+=item B<headerExists>I<($column)>
+
+Returns true if column I<$name> exists.
+
+Specify I<$column> as an empty string for the main list. Otherwise specify a column name.
+
+=cut
+
+sub headerExists {
+	my ($self, $col) = @_;
+	return defined $self->headerGet($col)
+}
+
+sub headerGet {
+	my ($self, $col) = @_;
+	my $h;
+	if ($col eq '') {
+		$h = $self->header
+	} else {
+		my $c = $self->columnGet($col);
+		$h = $c->header if defined $c
+	}
+	return $h
+}
+
+sub headerPlace {
+	my $self = shift;
+	return unless $self->columnCapable;
+	return unless $self->headerAvailable;
+
+	my $hf = $self->Subwidget('HeaderFrame');
+	my $hheight = $self->cget('-headerheight');
+	$hf->configure(-height => $hheight);
+	$hf->pack(-fill, 'x');
+
+	my $width = $self->cget('-scrollregion');
+	$width = $width->[2];
+
+	my ($fract) = $self->Subwidget('Canvas')->xview;
+	my $x = - int($width * $fract);
+
+	#configure left margin
+	my $lm = $self->cget('-marginleft');
+	if ($lm > 0) {
+		my $frame = $self->Subwidget("LMFrame");
+		unless (defined $frame) {
+			$frame = $hf->Frame(
+				-borderwidth => $self->cget('-headerborderwidth'),
+				-relief => $self->cget('-headerrelief'),
+			);
+			$self->Advertise('LMFrame', $frame)
+		}
+		$frame->place(-x => $x, -y => 0, -height => $hheight, -width => $lm - 1);
+		$x = $x + $lm;
+	} else {
+		my $frame = $self->Subwidget("LMFrame");
+		$frame->placeForget if defined $frame
+	}
+
+	#configure main header
+	if (my $h = $self->headerGet('')) {
+		$h->place(-x => $x, -y => 0, -height => $hheight, -width => $self->listWidth);
+	}
+	$x = $x + $self->listWidth + 1;
+
+	#configure columns
+	my @columns = $self->columnList;
+	for (@columns) {
+		my $col = $self->columnGet($_);
+		if (my $h = $self->headerGet($_)) {
+			$h->place(-x => $x, -y => 0, -height => $hheight, -width => $col->cellWidth);
+		}
+		$x = $x + $col->cellWidth + 1;
+	}
+
+	#configure right margin
+	my ($cw) = $self->canvasSize;
+	my $rm = $self->cget('-marginright');
+	if ($x < $cw) {
+		my $frame = $self->Subwidget("RMFrame");
+		unless (defined $frame) {
+			$frame = $hf->Frame(
+				-borderwidth => $self->cget('-headerborderwidth'),
+				-relief => $self->cget('-headerrelief'),
+			);
+			$self->Advertise('RMFrame', $frame)
+		}
+		$frame->place(-x => $x, -y => 0, -height => $hheight, -width => $cw - $x - 1);
+	} else {
+		my $frame = $self->Subwidget("RMFrame");
+		$frame->placeForget if defined $frame
+	}
+}
+
+=item B<headerRemove>I<($column)>
+
+Removes the header for column I<$column>.
+
+Specify I<$column> as an empty string for the main list. Otherwise specify a column name.
+
+=cut
+
+sub headerRemove {
+	my ($self, $col) = @_;
+	my $h;
+	if ($col eq '') {
+		$h = $self->header;
+		$self->header(undef);
+	} else {
+		my $c = $self->columnGet($col);
+		if (defined $c) {
+			$h = $c->header;
+			$c->header(undef)
+		}
+	}
+	$h->destroy if defined $h;
 }
 
 =item B<hide>I<($name)>
@@ -785,55 +1539,19 @@ Hides entry I<$name>. Call I<refresh> to see changes.
 
 =cut
 
-sub hide {
-	my ($self, $name) = @_;
-	my $a = $self->get($name);
-	$a->hidden(1) if defined $a
-}
+sub hierarchy { return $_[0]->cget('-separator') ne '' }
 
 =item B<index>
 
 Returns the numerical index of entry I<$name>.
 
-=cut
-
-sub index {
-	my ($self, $name) = @_;
-	my $pool = $self->pool;
-	my ($index) = grep { $pool->[$_]->name eq $name } 0 .. @$pool - 1;
-	return $index
-}
-
 =item B<indexColumnRow>I<($column, $row)>
 
 Returns the numerical index of the entry at I<$column>, I<$row>.
 
-=cut
-
-sub indexColumnRow {
-	my ($self, $column, $row) = @_;
-	my $pool = $self->pool;
-	my ($index) = grep {
-		(defined $pool->[$_]->column) and
-		(defined $pool->[$_]->row) and
-		($pool->[$_]->column eq $column) and
-		($pool->[$_]->row eq $row)
-	} 0 .. @$pool - 1;
-	return $index
-}
-
 =item B<indexLast>
 
 Returns the numerical index of the last entry in the list.
-
-=cut
-
-sub indexLast {
-	my $self = shift;
-	my $pool = $self->pool;
-	my $last = @$pool - 1;
-	return $last
-}
 
 =item B<infoAnchor>
 
@@ -853,191 +1571,53 @@ sub infoAnchor {
 
 Returns the data associated with entry I<$name>
 
-=cut
-
-sub infoData {
-	my ($self, $name) = @_;
-	my $a = $self->get($name);
-	return $a->data if defined $a;
-	croak "Entry '$name' not found";
-	return undef
-}
-
 =item B<infoExists>I<($name)>
 
 Returns a boolean value indicating if entry I<$name> exists.
-
-=cut
-
-sub infoExists {
-	my ($self, $name) = @_;
-	my $a = $self->get($name);
-	return defined $a;
-}
 
 =item B<infoFirst>
 
 Returns the name of the first entry in the list.
 
-=cut
-
-sub infoFirst {
-	my $self = shift;
-	my $pool = $self->pool;
-	return undef unless @$pool;
-	return $pool->[0]->name
-}
-
 =item B<infoFirstVisible>
 
 Returns the name of the first entry in the list that is not hidden.
-
-=cut
-
-sub infoFirstVisible {
-	my $self = shift;
-	my $pool = $self->pool;
-	for (@$pool) {
-		return $_->name unless $_->hidden
-	}
-}
 
 =item B<infoHidden>I<($name)>
 
 Returns the boolean hidden state of entry I<$name>.
 
-=cut
-
-sub infoHidden {
-	my ($self, $name) = @_;
-	my $a = $self->get($name);
-	if (defined $a) {
-		my $flag = $a->hidden;
-		$flag = '' if $flag eq 0;
-		return $flag
-	}
-	croak "Entry '$name' not found";
-	return undef
-}
-
 =item B<infoLast>
 
 Returns the name of the last entry in the list.
-
-=cut
-
-sub infoLast {
-	my $self = shift;
-	my $pool = $self->pool;
-	return undef unless @$pool;
-	return $pool->[@$pool - 1]->name
-}
 
 =item B<infoLastVisible>
 
 Returns the name of the last entry in the list that is not hidden.
 
-=cut
-
-sub infoLastVisible {
-	my $self = shift;
-	my $pool = $self->pool;
-	for (reverse @$pool) {
-		return $_->name unless $_->hidden
-	}
-}
-
 =item B<infoList>
 
 Returns a list of all entry names in the list.
-
-=cut
-
-sub infoList {
-	my $self = shift;
-	my $pool = $self->pool;
-	my @list;
-	for (@$pool) { push @list, $_->name }
-	return @list
-}
 
 =item B<infoNext>I<($name)>
 
 Returns the name of the next entry of I<$name>.
 Returns undef if I<$name> is the last entry in the list.
 
-=cut
-
-sub infoNext {
-	my ($self, $name) = @_;
-	my $pool = $self->pool;
-	my $a = $self->index($name);
-	unless (defined $a) {
-		croak "Entry '$name' not found";
-		return
-	}
-	return undef if $a eq @$pool - 1;
-	return $pool->[$a + 1]->name;
-}
-
 =item B<infoNextVisible>I<($name)>
 
 Returns the name of the first next entry of I<$name> that is not hidden.
 Returns undef if I<$name> is the last entry in the list.
-
-=cut
-
-sub infoNextVisible {
-	my ($self, $name) = @_;
-	my $pool = $self->pool;
-	my $a = $self->index($name);
-	unless (defined $a) {
-		croak "Entry '$name' not found";
-		return
-	}
-	for ($a .. @$pool - 1) {
-		return $pool->[$_]->name unless $pool->[$_]->hidden
-	}
-}
 
 =item B<infoPev>I<($name)>
 
 Returns the name of the previous entry of I<$name>.
 Returns undef if I<$name> is the first entry in the list.
 
-=cut
-
-sub infoPrev {
-	my ($self, $name) = @_;
-	my $pool = $self->pool;
-	my $a = $self->index($name);
-	unless (defined $a) {
-		croak "Entry '$name' not found";
-		return
-	}
-	return undef if $a eq 0;
-	return $pool->[$a - 1]->name;
-}
-
 =item B<infoPrevVisible>I<($name)>
 
 Returns the name of the first previous entry of I<$name> that is not hidden.
 Returns undef if I<$name> is the first entry in the list.
-
-=cut
-
-sub infoPrevVisible {
-	my ($self, $name) = @_;
-	my $pool = $self->pool;
-	my $a = $self->index($name);
-	unless (defined $a) {
-		croak "Entry '$name' not found";
-		return
-	}
-	for (reverse 0 .. $a) {
-		return $pool->[$_]->name unless $pool->[$_]->hidden
-	}
-}
 
 =item B<infoSelection>
 
@@ -1047,24 +1627,134 @@ Same as I<selectionGet>.
 
 sub infoSelection {	return $_[0]->selectionGet }
 
+sub indent {
+	my $self = shift;
+	$self->{INDENT} = shift if @_;
+	return $self->{INDENT}
+}
+
 sub initem {
 	my ($self, $x, $y) = @_;
-	$self->CanvasFocus;
 	$x = int($self->canvasx($x));
 	$y = int($self->canvasy($y));
-	my $pool = $self->pool;
-	for (@$pool) {
-		if ($_->inregion($x, $y)) {
-			return $_;
+	return $self->data->initem($x, $y)
+}
+
+=item B<itemCget>I<($name, $column, $option)>
+
+Returns the value of $option of item I<$name> in column I<$column>.
+
+=cut
+
+sub itemCget {
+	my ($self, $entry, $column, $option) = @_;
+	my $i = $self->itemGet($entry, $column);
+	my $val;
+	if (defined $i) {
+		$val = $i->cget($option);
+	}
+	if (exists $self->{'insort'}) {
+		unless (defined $val) {
+			if ($i->owner->cget('-sortnumerical')) {
+				$val = $self->cget('-sortbottom');
+			} else {
+				$val = ''
+			}
 		}
 	}
-	return undef
+	return $val
+}
+
+=item B<itemConfigure>I<($name, $column, %options)>
+
+Configures the options item of I<$name> in column I<$column>.
+
+=cut
+
+sub itemConfigure {
+	my ($self, $entry, $column, %options) = @_;
+	my $i = $self->itemGet($entry, $column);
+	if (defined $i) {
+		$i->configure(%options)
+	}
+}
+
+=item B<itemCreate>I<($name, $column, %options)>
+
+Creates a new item object for I<$name> in column I<$column>. You can use the standard options as well as:
+
+=over 4
+
+=item B<-data>
+
+Data to be assigned to this item item. This options preceeds the I<-text> option.
+
+=item B<-image>
+
+Image to display in the item. This options preceeds the I<-text> option.
+
+=item B<-text>
+
+Text to display in the item.
+
+=back
+
+Once an item has been created there is no need to call I<refresh> when you update it's text or image.
+
+=cut
+
+sub itemCreate {
+	my ($self, $entry, $column, %options) = @_;
+	my $col = $self->columnGet($column);
+	my $item = new Tk::ListBrowser::Item(
+		%options,
+		-listbrowser => $self,
+		-name => $entry,
+		-owner => $col,
+	);
+	$col->itemAdd($entry, $item)
+}
+
+=item B<itemExists>I<($name, $column)>
+
+Returns true if item for I<$name> in column I<$column> has been created.
+
+=cut
+
+sub itemExists {
+	my ($self, $entry, $column) = @_;
+	my $col = $self->columnGet($column);
+	return $col->itemExists($entry)
+}
+
+=item B<itemGet>I<($name, $column)>
+
+Returns a reference to the L<Tk::ListBrowser::Item> object for I<$name> in column I<$column>.
+
+=cut
+
+sub itemGet {
+	my ($self, $entry, $column) = @_;
+	my $col = $self->columnGet($column);
+	return $col->itemGet($entry)
+}
+
+=item B<itemRemove>I<($name, $column)>
+
+Removes the item for I<$name> in column I<$column> and it's data.
+
+=cut
+
+sub itemRemove {
+	my ($self, $entry, $column) = @_;
+	my $col = $self->columnGet($column);
+	$col->itemRemove($entry)
 }
 
 sub KeyArrowNavig {
 	my ($self, $dcol, $drow) = @_;
 	return undef if $self->anchorInitialize;
-	my $pool = $self->pool;
+	my $pool = $self->data->pool;
 	my $i = $self->anchorGet;
 	my $target;
 	if ($drow eq 0) { #horizontal move
@@ -1124,7 +1814,7 @@ sub KeyLastColumn {
 		while ((not $flag) and ($col >= 0)) {
 			$col --;
 			my $index = $self->indexColumnRow($col, $row);
-			my $name = $self->pool->[$index]->name;
+			my $name = $self->data->pool->[$index]->name;
 			$flag = $self->anchorSet($name);
 			$self->see($name) if $flag;
 		}
@@ -1133,7 +1823,7 @@ sub KeyLastColumn {
 
 sub KeyPress {
 	my ($self, $key) = @_;
-	my $pool = $self->pool;
+	my $pool = $self->data->pool;
 	my $h = $self->_handler;
 	return unless @$pool;
 	my @sel = $self->selectionGet;
@@ -1287,7 +1977,7 @@ Returns the number of the last column in I<$row>.
 
 sub lastColumnInRow {
 	my ($self, $row) = @_;
-	my $pool = $self->pool;
+	my $pool = $self->data->pool;
 	my @row = $self->getRow($row);
 	return $row[@row - 1]->column;
 }
@@ -1298,11 +1988,12 @@ Returns the number of the last row in I<$column>.
 
 =cut
 
-sub lastRowInColumn {
-	my ($self, $column) = @_;
-	my $pool = $self->pool;
-	my @column = $self->getColumn($column);
-	return $column[@column - 1]->row;
+sub listWidth {
+	my $self = shift;
+	$self->{LISTWIDTH} = shift if @_;
+	my $fw = $self->forceWidth;
+	return $fw if defined $fw;
+	return $self->{LISTWIDTH}
 }
 
 sub Motion {
@@ -1359,12 +2050,47 @@ sub moveRow {
 	return $target;
 }
 
-sub pool { return $_[0]->{POOL} }
+sub OnConfigure {
+	my ($self, $timer) = @_;
+	if (my $id = $self->{'timer_id'}) {
+		$self->afterCancel($id);
+		my $nid = $self->after(50, ['OnConfigureTimer', $self]);
+		$self->{'timer_id'} = $nid;
+	}
+	unless (defined $timer) {
+		$self->update;
+		my $id = $self->after(50, ['OnConfigureTimer', $self]);
+		$self->{'timer_id'} = $id;
+		return
+	}
 
-sub refreshTimer {
+	#need to refresh if arrange is column or row
+	my $arrange = $self->cget('-arrange');
+	my %a = (qw/column 1 row 1/);
+	$self->refresh if exists $a{$arrange};
+	$self->headerPlace; # TODO do not know why this is needed.
+}
+
+sub OnConfigureTimer {
 	my $self = shift;
 	delete $self->{'timer_id'};
-	$self->refresh(1);
+	$self->OnConfigure(1);
+}
+
+=item B<open>I<($name)>
+
+Shows all children of I<$name>.
+
+=cut
+
+sub open {
+	my ($self, $entry) = @_;
+	my $i = $self->get($entry);
+	unless (defined $i) {
+		croak "Entry $entry not found";
+		return
+	}
+	$i->opened(1);
 }
 
 =item B<refresh>
@@ -1374,18 +2100,17 @@ Clears the canvas and rebuilds it. Call this method after you are done making ch
 =cut
 
 sub refresh {
-	my ($self, $timer) = @_;
-	if (my $id = $self->{'timer_id'}) {
-		$self->afterCancel($id);
-		my $nid = $self->after(50, ['refreshTimer', $self]);
-		$self->{'timer_id'} = $nid;
-	}
-	unless (defined $timer) {
-		my $id = $self->after(50, ['refreshTimer', $self]);
-		$self->{'timer_id'} = $id;
-		return
-	}
+	my $self = shift;
+
+	my @sel = $self->selectionGet;
+	my $anch = $self->anchorGet;
+
 	$self->_handler->refresh;
+
+	for (@sel) {
+		$self->selectionSet($_)
+	}
+	$self->anchorSet($anch) if defined $anch;
 }
 
 =item B<see>I<($name)>
@@ -1422,6 +2147,9 @@ sub see {
 	if ($h->scroll eq 'vertical') {
 		my ($vt, $vb) = $self->yview;
 		my $div = $cy2 - $cy1;
+		if ($self->headerAvailable) {
+			$iy1 = $iy1 - $self->cget('-headerheight')
+		}
 		if (($div > 0) and ($iy1/$div < $vt)) { #going up
 			$self->yview(moveto => $iy1/$div);
 		} elsif (($div > 0) and ($iy2/$div > $vb)){	#going down.
@@ -1435,107 +2163,23 @@ sub see {
 
 Selects all entries.
 
-=cut
-
-sub selectAll {
-	my $self = shift;
-	return if $self->cget('-selectmode') eq 'single';
-	my $pool = $self->pool;
-	grep { $_->select } @$pool;
-}
-
 =item B<selectionClear>
 
 Clears the entire selection.
 
-=cut
-
-sub selectionClear {
-	my $self = shift;
-	my $pool = $self->pool;
-	grep { $_->select(0) } @$pool;
-}
-
-sub selectionFlip {
-	my ($self, $begin, $end) = @_;
-	($begin, $end) = $self->selectionIndex($begin, $end);
-	my $pool = $self->pool;
-	for ($begin .. $end) {
-		my $i = $pool->[$_];
-		if ($i->selected) {
-			$self->selectionClear if $self->cget('-selectmode') eq 'single';
-			$i->select(0);
-		} else {
-			$self->selectionClear if $self->cget('-selectmode') eq 'single';
-			$i->select;
-		}
-	}
-}
-
 =item B<selectionGet>
 
 Returns a list of entry names contained in the selection.
-
-=cut
-
-sub selectionGet {
-	my $self = shift;
-	my @list;
-	my $pool = $self->pool;
-	for (@$pool) { push @list, $_->name  if $_->selected }
-	return @list;
-}
-
-sub selectionIndex {
-	my ($self, $begin, $end) = @_;
-	$end = $begin unless defined $end;
-	$begin = $self->index($begin);
-	$end = $self->index($end);
-	if ($begin > $end) {
-		my $t = $begin;
-		$begin = $end;
-		$end = $t;
-	}
-	return ($begin, $end)
-}
 
 =item B<selectionSet>I<($begin, ?$end?)>
 
 Selects entry I<$begin>. If you specify I<$end> the
 range from I<$begin> to I<$end> will be selected.
 
-=cut
-
-sub selectionSet {
-	my ($self, $begin, $end) = @_;
-	($begin, $end) = $self->selectionIndex($begin, $end);
-	my $pool = $self->pool;
-	for ($begin .. $end) {
-		my $i = $pool->[$_];
-		unless ($i->hidden) {
-			$self->selectionClear if $self->cget('-selectmode') eq 'single';
-			$i->select #unless $i->selected;
-		}
-	}
-}
-
 =item B<selectionUnSet>I<($begin, $end)>
 
 Clears the selection of entry I<$begin>. If you specify I<$end> the
 range from I<$begin> to I<$end> will be cleared from the selection.
-
-=cut
-
-sub selectionUnSet {
-	my ($self, $begin, $end) = @_;
-	$end = $begin unless defined $end;
-	($begin, $end) = $self->selectionIndex($begin, $end);
-	my $pool = $self->pool;
-	for ($begin .. $end) {
-		my $i = $pool->[$_];
-		$i->select(0) unless $i->hidden;
-	}
-}
 
 =item B<show>I<($name)>
 
@@ -1543,89 +2187,146 @@ Shows entry I<$name>. Call I<refresh> to see changes.
 
 =cut
 
-sub show {
-	my ($self, $name) = @_;
-	my $a = $self->get($name);
-	$a->hidden(0) if defined $a
-}
-
-=item B<textFormat>I<($text)>
-
-Formats, basically wraps, I<$text> taking the option I<-wraplength> into account.
-I<$text> can be a multi line string.
-
-=cut
-
-sub textFormat {
-	my ($self, $text) = @_;
-	my $wraplength = $self->cget('-wraplength');
-	my $font = $self->cget('-font');
-	return $text if $wraplength <= 0;
-	my @lines = split (/\n/, $text);
-	my @out;
-	for (@lines) {
-		my $line = $_;
-		my $length = $self->fontMeasure($font, $line);
-		if ($length > $wraplength) {
-			my $res = $length / length($line);
-			my $oklength = int($wraplength/$res);
-			while (length($line) > $oklength) {
-				my $t = substr($line, 0, $oklength, '');
-				if ($t =~ s/([$dlmreg])([^$dlmreg]+$)//) {
-					$line = "$2$line";
-					$t = "$t$1";
+sub sortArray {
+	my $self = shift;
+	my @pool = @_;
+	$self->{'insort'} = 1;
+	my $on = $self->cget('-sorton');
+	my $order = $self->cget('-sortorder');;
+	my $col;
+	if ($on eq '') {
+		$col = $self
+	} else {
+		$col = $self->columnGet($on);
+	}
+	my ($numsort, $sortcase, $sortfield);
+	$numsort = $col->cget('-sortnumerical');
+	$sortcase = $col->cget('-sortcase');
+	$sortfield = $col->cget('-sortfield');
+	
+	my @sorted;
+	if ($on eq '') {
+		if ($numsort) {
+				if ($order eq 'ascending') {
+					@sorted = sort { $self->entryCget($a->name, $sortfield) <=> $self->entryCget($b->name, $sortfield) } @pool
+				} else {
+					@sorted = sort { $self->entryCget($b->name, $on, $sortfield) <=> $self->entryCget($a->name, $sortfield) } @pool
 				}
-				push @out, $t;
-			}
-			push @out, $line;
 		} else {
-			push @out, $line;
+			if ($sortcase) {
+				if ($order eq 'ascending') {
+					@sorted = sort { lc($self->entryCget($a->name, $sortfield)) cmp lc($self->entryCget($b->name, $sortfield)) } @pool
+				} else {
+					@sorted = sort { lc($self->entryCget($b->name, $sortfield)) cmp lc($self->entryCget($a->name, $sortfield)) } @pool
+				}
+			} else {
+				if ($order eq 'ascending') {
+					@sorted = sort { $self->entryCget($a->name, $sortfield) cmp $self->entryCget($b->name, $sortfield) } @pool
+				} else {
+					@sorted = sort { $self->entryCget($b->name, $on, $sortfield) cmp $self->entryCget($a->name, $sortfield) } @pool
+				}
+			}
+		}
+	} else {
+		if ($numsort) {
+			if ($order eq 'ascending') {
+				@sorted = sort { $self->itemCget($a->name, $on, $sortfield) <=> $self->itemCget($b->name, $on, $sortfield) } @pool
+			} else {
+				@sorted = sort { $self->itemCget($b->name, $on, $sortfield) <=> $self->itemCget($a->name, $on, $sortfield) } @pool
+			}
+		} else {
+			if ($sortcase) {
+				if ($order eq 'ascending') {
+					@sorted = sort { lc($self->itemCget($a->name, $on, $sortfield)) cmp lc($self->itemCget($b->name, $on, $sortfield)) } @pool
+				} else {
+					@sorted = sort { lc($self->itemCget($b->name, $on, $sortfield)) cmp lc($self->itemCget($a->name, $on, $sortfield)) } @pool
+				}
+			} else {
+				if ($order eq 'ascending') {
+					@sorted = sort { $self->itemCget($a->name, $on, $sortfield) cmp $self->itemCget($b->name, $on, $sortfield) } @pool
+				} else {
+					@sorted = sort { $self->itemCget($b->name, $on, $sortfield) cmp $self->itemCget($a->name, $on, $sortfield) } @pool
+				}
+			}
 		}
 	}
-	my $result = '';
-	while (@out) {
-		$result = $result . shift @out;
-		$result = "$result\n" if @out
-	}
-	return $result
+	delete $self->{'insort'};
+	return @sorted
 }
 
-=item B<textHeight>I<($text)>
+=item B<sortList>
 
-Returns the display height of I<$text> in pixels.
-I<$text> can be a multi line string.
+Sorts the list and refreshes the display. Make a call to I<sortMode> first
+to specify how to sort or configure the options I<-sorton> and I<sortorder>.
 
 =cut
 
-sub textHeight {
-	my ($self, $text) = @_;
-	return 0 if $text eq '';
-	my $height = 1;
-	while ($text =~ /\n/g) { $height ++ }
-	my $font = $self->cget('-font');
-	return ($height * $self->fontMetrics($font, '-linespace')) #+ $self->fontMetrics($font, '-descent');;
+sub sortList {
+	my $self = shift;
+	my @sorted;
+	$self->clear;
+	my $pool = $self->data->pool;
+	if ($self->hierarchy) {
+		my @root = $self->infoRoot;
+		my @sr;
+		for (@root) {
+			push @sr, $self->get($_)
+		}
+		@sr = $self->sortArray(@sr);
+		for (@sr) {
+			push @sorted, $self->sortRecursive($_);
+		}
+	} else {
+		@sorted = $self->sortArray(@$pool);
+	}
+	$self->data->pool(\@sorted);
+	$self->refresh;
 }
 
-=item B<textWidth>I<($text)>
+=item B<sortMode>I<($column, $order)>
 
-Returns the display width of I<$text> in pixels.
-I<$text> can be a multi line string.
+Specify on which column to sort with I<$column>.
+I<$order> can be 'ascending' or 'descending'.
+This method changes the options I<-sorton> and I<-sortorder>.
+It is called after a mouse click on a sortable header.
+
+Specify $column as an empty string for the main list. Otherwise specify a column name.
 
 =cut
 
-sub textWidth {
-	my ($self, $text) = @_;
-	return $self->fontMeasure($self->cget('-font'), $text) unless $text =~ /\n/;
-	my $width = 0;
-	while ($text =~ s/^([^\n]*)\n//) {
-		my $w = $self->fontMeasure($self->cget('-font'), $1);
-		$width = $w if $w > $width;
+sub sortMode {
+	my ($self, $column, $order) = @_;
+	$self->configure(-sorton => $column);
+	$self->configure(-sortorder => $order);
+	for ('', $self->columnList) {
+		my $name = $_;
+		my $widget = $self->headerGet($name);
+		if ($name eq $column) {
+			$widget->configure('-sortorder', $order);
+		} else {
+			$widget->configure('-sortorder', 'none');
+		}
 	}
-	if ($text ne '') {
-		my $w = $self->fontMeasure($self->cget('-font'), $text);
-		$width = $w if $w > $width;
+}
+
+sub sortRecursive {
+	my ($self, $item) = @_;
+	my @sorted;
+	push @sorted, $item;
+	my @children = $self->infoChildren($item->name);
+	if (@children) {
+		my @sr;
+		for (@children) {
+			push @sr, $self->get($_)
+		}
+		@sr = $self->sortArray(@sr);
+		for (@sr) {
+			my $i = $_;
+			push @sorted, $self->sortRecursive($_);
+		}
 	}
-	return $width
+
+	return @sorted
 }
 
 sub wraplength {
@@ -1645,7 +2346,7 @@ sub wraplength {
 =head1 USING THE KEYBOARD
 
 Before you can manipulate the list using the keyboard, the anchor must be initialized first. You do
-that by pressing any of the keys below. After that you can start navigating and manipulate selections.
+that by pressing any of the navigation keys. After that you can start navigating and manipulate selections.
 
 The spacebar selects or deselects the entry that is currently held by the anchor. The I<-browsecmd>
 callback is called if the entry is selected.
@@ -1657,8 +2358,8 @@ Holding shift while pressing these keys manipulates the selection.
 
 The escape key clears the selection and anchor or hides the filter entry if it is visible.
 
-Control-f pops a filter entry. Clicking Control-f again hides it. Filtering is done instantly upon entering
-text in. This is influenced by the I<-filteron> and I<-nofilter> options.
+CTRL+F pops a filter entry. Clicking CTRL+F again hides it. Filtering is done instantly upon entering
+text. This is influenced by the I<-filteron> and I<-nofilter> options.
 
 =head1 USING THE MOUSE
 
@@ -1678,10 +2379,11 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 TODO
 
-Work out Tk::ListBrowser::Hlist and Tk::ListBrowser::Tree addons. Add side columns.
-Add headers.
+Not having to call I<refresh> all the time would be nice.
 
 =head1 BUGS AND CAVEATS
+
+Setting a custom font greatly decreases the speed of refresh.
 
 If you find any bugs, please report them here: L<https://github.com/haje61/Tk-ListBrowser/issues>.
 
@@ -1689,15 +2391,9 @@ If you find any bugs, please report them here: L<https://github.com/haje61/Tk-Li
 
 =over 4
 
-=item L<Tk::ListBrowser::Bar>
-
-=item L<Tk::ListBrowser::Column>
-
 =item L<Tk::ListBrowser::Item>
 
-=item L<Tk::ListBrowser::List>
-
-=item L<Tk::ListBrowser::Row>
+=item L<Tk::ListBrowser::SideColumn>
 
 =back
 

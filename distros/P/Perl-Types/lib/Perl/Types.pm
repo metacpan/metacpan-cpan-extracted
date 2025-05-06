@@ -1,7 +1,7 @@
 #
 # This file is part of Perl-Types
 #
-# This software is copyright (c) 2023 by Auto-Parallel Technologies, Inc.
+# This software is copyright (c) 2025 by Auto-Parallel Technologies, Inc.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -51,6 +51,9 @@ package character; 1;
 package string; 1;
 package arrayref; 1;
 package hashref; 1;
+package object; 1;
+
+package integer::method; 1;
 
 package string::arrayref; 1;
 package string::hashref; 1;
@@ -62,6 +65,8 @@ package hashref::hashref::hashref; 1;
 package string::hashref::arrayref; 1;
 
 package filehandleref; 1;
+
+package void::method; 1;
 
 package Perl::Types;
 

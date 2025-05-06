@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Lexicon::POT;{
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 }
 
 use base 'Log::Report::Lexicon::Table';

@@ -8,5 +8,5 @@ use Test::Most;
 use Test::Needs { 'warnings::unused' => '0.04' };
 
 use_ok('Config::Abstraction');
-new_ok('Config::Abstraction');
+new_ok('Config::Abstraction' => [ data => { 'foo' => 'bar' } ]);
 plan(tests => 2);

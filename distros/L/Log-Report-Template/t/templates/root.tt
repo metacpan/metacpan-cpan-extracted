@@ -9,7 +9,9 @@
 [% "<test filters>" | html %]<br>
 
 [% loc("This is the {count TH} test", count => 1) %]<br>
-[% | loc(count => 2) %]This is the {count TH} test[% END %]<br>
+[% | loc(count => 2) %]This is the {count TH} test, in a pipe[% END %]<br>
+[% FILTER loc(count => 3) %]The FILTER test, number {count},
+   is here[% END %]<br>
 [% S("second table") %]
 
 </body>

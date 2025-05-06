@@ -1,5 +1,5 @@
 {
-   "abstract" : "Tk::IconList like mega widget.",
+   "abstract" : "Tk::IconList inspired chameleon list box.",
    "author" : [
       "Hans Jeuken <hanje at cpan dot org>"
    ],
@@ -49,6 +49,6 @@
          "web" : "https://github.com/haje61/Tk-ListBrowser"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

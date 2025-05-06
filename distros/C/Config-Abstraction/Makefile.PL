@@ -29,7 +29,7 @@ WriteMakefile(
 		'Config::IniFiles' => 0,
 		'Data::Reuse' => 0,	# Fails installation tests on recent Perls, RT#100461
 		'JSON::MaybeXS'	=> 0,
-		'Params::Get' => 0,
+		'Params::Get' => 0.04,
 		'YAML::XS' => 0,
 		# 'XML::Parser::Expat' => 0,	# Seems to be needed for Windows
 		# 'XML::LibXML' => 0,	# do.

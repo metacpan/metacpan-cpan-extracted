@@ -1,5 +1,14 @@
 Revision history for Perl-Types.
 
+0.100     2025-05-05 22:00:11-05:00 America/Chicago
+
+  - HOLIDAY EDITION: ¡Feliz Cinco de Mayo!
+  - Codename Zaragoza
+  - Beta version
+  - Support left-to-right type names
+  - Support composable type names via '::' scope resolution operator
+  - Tests, run extensive data type & data structure tests
+
 0.001     2023-04-09 22:40:05-05:00 America/Chicago
 
   - HOLIDAY EDITION: Happy Easter!

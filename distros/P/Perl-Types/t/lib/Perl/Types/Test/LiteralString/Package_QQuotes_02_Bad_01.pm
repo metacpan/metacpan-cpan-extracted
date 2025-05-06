@@ -1,0 +1,15 @@
+# [[[ PREPROCESSOR ]]]
+# <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
+# <<< PARSE_ERROR: 'Unexpected Token:  {' >>>
+
+# [[[ HEADER ]]]
+use Perl::Types;
+package Perl::Types::Test::LiteralString::Package_QQuotes_02_Bad_01;
+use strict;
+use warnings;
+our $VERSION = 0.001_000;
+
+# [[[ SUBROUTINES ]]]
+sub empty_sub { { my string $RETURN_TYPE }; return q{foo\ n}; }
+
+1;    # end of package

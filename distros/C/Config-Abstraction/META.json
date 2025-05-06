@@ -42,7 +42,7 @@
             "Hash::Merge" : "0",
             "JSON::MaybeXS" : "0",
             "JSON::Parse" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.04",
             "XML::PP" : "0",
             "YAML::XS" : "0",
             "perl" : "5.010000"
@@ -68,6 +68,6 @@
          "url" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

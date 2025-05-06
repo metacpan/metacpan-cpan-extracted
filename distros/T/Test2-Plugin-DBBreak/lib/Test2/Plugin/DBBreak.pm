@@ -2,7 +2,7 @@ package Test2::Plugin::DBBreak;
 use strict;
 use warnings;
 
-our $VERSION = '0.100001';
+our $VERSION = '0.200000';
 
 our $disable = 0;
 
@@ -77,13 +77,13 @@ To disable the breakpoint temporarily, set the $disable variable to 1:
 =head1 SOURCE
 
 The source code repository for Test2-Plugin-DBBreak can be found at
-F<http://github.com/kcaran/Test2-Plugin-DBBreak/>.
+F<https://github.com/kcaran/Test2-Plugin-DBBreak/>.
 
 =head1 MAINTAINERS
 
 =over 4
 
-=item Keith Carangelo <lt>kcaran@gmail.com<gt>
+=item Keith Carangelo <kcaran@gmail.com>
 
 =back
 
@@ -91,17 +91,17 @@ F<http://github.com/kcaran/Test2-Plugin-DBBreak/>.
 
 =over 4
 
-=item Keith Carangelo <lt>kcaran@gmail.com<gt>
+=item Keith Carangelo <kcaran@gmail.com>
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright 2024 Keith Carangelo<lt>kcaran@gmail.com<gt>.
+Copyright 2025 Keith Carangelo <kcaran@gmail.com>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See F<http://dev.perl.org/licenses/>
+See F<https://dev.perl.org/licenses/>
 
 =cut

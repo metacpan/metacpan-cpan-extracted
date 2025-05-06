@@ -1,0 +1,10 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::EventEmitter::Callback : interface_t {
+  version_from Mojo;
+  
+  # Interface Methods
+  method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);
+  
+}

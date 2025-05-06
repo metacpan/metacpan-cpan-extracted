@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: second 0.01\n"
 "Report-Msgid-Bugs-To:\n"
 "POT-Creation-Date: 2017-06-21 20:03+0200\n"
-"PO-Revision-Date: 2018-01-23 22:27+0100\n"
+"PO-Revision-Date: 2025-05-06 09:57+0200\n"
 "Last-Translator:\n"
 "Language-Team:\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
-#: t/templates/root.tt:13
+#: t/templates/root.tt:15
 #, fuzzy
 msgid "second table"
 msgstr ""

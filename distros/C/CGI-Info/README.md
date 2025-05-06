@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.99
+Version 1.00
 
 # SYNOPSIS
 
@@ -67,12 +67,30 @@ It takes other optional parameters:
     Enable/disable the AUTOLOAD feature.
     The default is to have it enabled.
 
+- `config_dirs`
+
+    Where to look for `config_file`
+
 - `config_file`
 
     Points to a configuration file which contains the parameters to `new()`.
     The file can be in any common format,
     including `YAML`, `XML`, and `INI`.
     This allows the parameters to be set at run time.
+
+    On non-Windows system,
+    the class can be configured using environment variables starting with "CGI::Info::".
+    For example:
+
+        export CGI::Info::max_upload_size=65536
+
+    It doesn't work on Windows because of the case-insensitive nature of that system.
+
+    If the configuration file has a section called `CGI::Info`,
+    only that section,
+    and the `global` section,
+    if any exists,
+    is used.
 
 - `syslog`
 

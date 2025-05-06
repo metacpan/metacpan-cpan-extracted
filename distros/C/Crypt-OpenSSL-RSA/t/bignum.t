@@ -48,7 +48,7 @@ sub check_key_parameters    # runs 8 tests
 
     $rsa->use_no_padding();
 
-    my $plaintext = pack( 'C*', 100, 100, 100, 12 );
+    my $plaintext  = pack( 'C*', 100, 100, 100, 12 );
     my $ciphertext = Crypt::OpenSSL::Bignum->new_from_bin($plaintext)->mod_exp( $e, $n, $ctx )->to_bin();
     check_key_parameters( $rsa, $n, $e, $d, $p, $q, $dmp1, $dmq1, $iqmp );
 

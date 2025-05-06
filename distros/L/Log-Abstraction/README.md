@@ -1,10 +1,10 @@
 # NAME
 
-Log::Abstraction - Logging abstraction layer
+Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.07
+0.08
 
 # SYNOPSIS
 
@@ -20,7 +20,7 @@ Log::Abstraction - Logging abstraction layer
 
 # DESCRIPTION
 
-The `Log::Abstraction` class provides a flexible logging layer that can handle different types of loggers,
+The `Log::Abstraction` class provides a flexible logging layer on top of different types of loggers,
 including code references, arrays, file paths, and objects.
 It also supports logging to syslog if configured.
 
@@ -32,10 +32,6 @@ It also supports logging to syslog if configured.
 
 Creates a new `Log::Abstraction` object.
 
-Clones existing objects with or without modifications.
-
-    my $clone = $logger->new();
-
 The argument can be a hash,
 a reference to a hash or the `logger` value.
 The following arguments can be provided:
@@ -43,12 +39,29 @@ The following arguments can be provided:
 - `config_file`
 
     Points to a configuration file which contains the parameters to `new()`.
-    The file can be in any common format including `YAML`, `XML`, and `INI`.
+    The file can be in any common format,
+    including `YAML`, `XML`, and `INI`.
     This allows the parameters to be set at run time.
+
+    On non-Windows system,
+    the class can be configured using environment variables starting with `"Log::Abstraction::"`.
+    For example:
+
+        export Log::Abstraction::script_name=foo
+
+    It doesn't work on Windows because of the case-insensitive nature of that system.
 
 - `logger` - A logger can be a code reference, an array reference, a file path, or an object.
 - `syslog` - A hash reference for syslog configuration.
-- `script_name` - Name of the script, needed when `syslog` is given
+- `script_name`
+
+    The name of the script.
+    It's needed when `syslog` is given,
+    if none is passed, the value is guessed.
+
+Clone existing objects with or without modifications:
+
+    my $clone = $logger->new();
 
 ## debug
 

@@ -11,6 +11,7 @@ void make_readonly (SV * val) {
 			int i = 0;
 			AV * arr = (AV*)SvRV(val);
 			int len = av_len(arr);
+			SvREADONLY_off((SV*)arr);
 			for (i = 0; i <= len; i++) {
 				SV * value = newSVsv(*av_fetch(arr, i, 0));
 				make_readonly(value);
@@ -21,6 +22,7 @@ void make_readonly (SV * val) {
 			HV * hash = (HV*)SvRV(val);
 			HE * entry;
 			(void)hv_iterinit(hash);
+			SvREADONLY_off((SV*)hash);
 			while ((entry = hv_iternext(hash)))  {
 				char * key =  SvPV_nolen(hv_iterkeysv(entry));
 				SV * value = newSVsv(*hv_fetch(hash, key, strlen(key), 0));	
@@ -55,6 +57,9 @@ const(...)
 			}
 			make_readonly(ST(0));
 		} else if ( SvTYPE(SvRV(ST(0))) == SVt_PVHV) {
+			if ((items - 1) % 2 != 0) {
+				croak("Odd number of elements in hash assignment");
+			}
 			HV * ret = (HV*)SvRV(ST(0));
 			for (i = 1; i < items; i += 2) {
 				char * key = SvPV_nolen(ST(i));

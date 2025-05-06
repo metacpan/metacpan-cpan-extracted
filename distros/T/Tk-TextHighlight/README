@@ -2,8 +2,6 @@ NAME
     Tk::TextHighlight - a Tk::TextUndo/Tk::Text::SuperText widget with
     syntax highlighting capabilities, can also use Kate languages.
 
-    Tk::ROTextHighlight - a Read-only version of this widget.
-
 SYNOPSIS
          use Tk;
          my $haveKateInstalled = 0;
@@ -35,7 +33,7 @@ DESCRIPTION
     comments), language-specific text color-highlighting, and a "readonly"
     option for simply viewing text one doesn't want changed. Besides syntax
     highlighting, methods and bindings are provided for commenting and
-    uncommenting as well as reindenting and unindenting a selected area,
+    uncommenting as well as reindenting and unindenting a selected area, and
     automatic intelligent indenting of new lines.
 
     Setting the *-readonly* flag or creating a symlink to the
@@ -212,7 +210,7 @@ WIDGET-SPECIFIC OPTIONS
         widget content is editable. The default is 0 (false), unless a copy
         of or symlink to the TextHighlight.pm module file named
         *"ROTextHighlight.pm"*, and the module is "used" as
-        "Tk::Text::ROTextHighlight", in which case the value is fixed as 1
+        "Tk::ROTextHighlight", in which case the value is fixed as 1
         (*true*), regardless of this setting, and can not be changed to
         false.
 
@@ -277,7 +275,7 @@ WIDGET-SPECIFIC OPTIONS
     Switch: -syntaxcomments
         Boolean, when set to *true*, the *-commentchar* will be set
         (overridden) to the comment string for the specific language
-        (<I-syntax>) for certain supported languages (C, C++, CSS, HTML,
+        (*-syntax*) for certain supported languages (C, C++, CSS, HTML,
         Modula-II, Pascal, Perl, and XML).
 
         Default: false (use the preset string in -commentchar.
@@ -290,10 +288,10 @@ WIDGET-SPECIFIC OPTIONS
         application can keep track of position etc. Don't make this callback
         to heavy, the widget will get sluggish quickly!
 
-        Default: none (sub {}
+        Default: none (sub {})
 
 METHODS
-    addKate2ViewMenu(<sections)>
+    addKate2ViewMenu(*sections*)
         Inserts the list of Kate-supported languages to the widget's Syntax.
         View right-mousebutton popup menu along with the basic
         TextHight-supported choices. These choices can then be selected to
@@ -302,6 +300,12 @@ METHODS
         the list returned by fetchKateInfo. NOTE: No menu items will be
         added if Kate is not installed or if -noRulesMenu or -noSyntaxMenu
         are set!
+
+    Backspace()
+        Mostly for internal use - Handles user-pressing of the [backspace]
+        key so that it's not passed down to the underlying *Text* widgets.
+        This is so we can have consistant behavior regardless of which one
+        us chosen/loaded.
 
     beginUndoBlock
         Used in application programs when wishing to group together a series
@@ -364,7 +368,7 @@ METHODS
         Resets the widget to an empty state (ie. $w->delete('0.0', 'end'),
         except is actionable even if the widget is readonly!
 
-    extendSelect
+    extendSelect()
         Selects text between the insert cursor to the current mouse position
         when pressed, then adjusted again if the mouse is released in a
         different place than when pressed. The insert cursor should remain
@@ -373,13 +377,13 @@ METHODS
         Default bindings: Shift-ButtonPress-3, and ButtonPress-3 if the
         *-noPopupMenu* option is set to *true*.
 
-    endUndoBlock
+    endUndoBlock()
         Used in application programs when wishing to group together a series
         of edits that, in the event of a call to Undo() should be undone
         together as a group. This method should be called after the last
         insertion or deletion. See also beginUndoBlock.
 
-    fetchKateInfo
+    fetchKateInfo()
         Returns 3 hashrefs containing information about the installed Kate
         highlight engine (if installed). The three hashrefs contain in
         order: The first can be passed to the addkate2viewmenu() method to
@@ -405,35 +409,35 @@ METHODS
         with empty strings in the list. The ranges are returned in the order
         passed to get.
 
-    getViewMenu
+    getViewMenu()
         Returns the "View" submenu of the Popup menu, which the application
         can clone and include in their application's menu, particularly if
         they do not wish to use the normal mouse button-3 popup menu. Note,
         this may not work (untested) if *-noPopupMenu* is set to *true*, but
         will if *-disablemenu* is (See *-disablemenu* and *-noPopupMenu*).
 
-    highlight(*$begin*, *$end*)
-        Does syntax highlighting on the section of text indicated by $begin
-        and $end. $begin and $end are linenumbers not indexes!
+    highlight(*begin*, *end*)
+        Does syntax highlighting on the section of text indicated by *begin*
+        and *end*. *begin* and *end* are linenumbers not indexes!
 
-    highlightCheck(*$begin*, *$end*)
+    highlightCheck(*begin*, *end*)
         An insert or delete has taken place affecting the section of text
-        between $begin and $end. highlightCheck is being called after and
-        insert or delete operation. $begin and $end (again, linenumbers, not
-        indexes) indicate the section of text affected. highlightCheck
+        between *begin* and *end*. highlightCheck is being called after and
+        insert or delete operation. *begin* and *end* (again, linenumbers,
+        not indexes) indicate the section of text affected. highlightCheck
         checks what needs to be highlighted again and does the highlighting.
 
-    highlightLine(*$line*)
-        Does syntax highlighting on linenumber $line.
+    highlightLine(*line*)
+        Does syntax highlighting on linenumber *line*.
 
-    highlightPlug
+    highlightPlug()
         Checks whether the appropriate highlight plugin has been loaded. If
         none or the wrong one is loaded, it loads the correct plugin. It
         returns a reference to the plugin loaded. It also checks wether the
         rules have changed. If so, it restarts highlighting from the
         beginning of the text.
 
-    highlightPlugInit
+    highlightPlugInit()
         Loads and initalizes a highlighting plugin. First it checks the
         value of the -syntax option to see which plugin should be loaded.
         Then it checks wether a set of rules is defined to this plugin in
@@ -441,11 +445,11 @@ METHODS
         disk using rulesFetch. If this fails as well it will use the
         hardcoded rules from the syntax plugin.
 
-    highlightPurge(*$line*)
+    highlightPurge(*line*)
         Tells the widget that the text from linenumber $line to the end of
         the text is not to be considered highlighted any more.
 
-    highlightVisual
+    highlightVisual()
         Calls visualEnd to see what part of the text is visible on the
         display, and adjusts highlighting accordingly.
 
@@ -466,28 +470,28 @@ METHODS
         argument may be omitted.
 
     Insert(string)
-        Do NOT confuse this with the lower-case insert method. Insert string
-        at the point of the insertion cursor. If there is a selection in the
-        text, and it covers the point of the insertion cursor, then it
-        deletes the selection before inserting.
+        Do NOT confuse this with the lower-case insert method. Insert
+        *string* at the point of the insertion cursor. If there is a
+        selection in the text, and it covers the point of the insertion
+        cursor, then it deletes the selection before inserting.
 
     InsertKeypress(character)
         Inserts character at the insert mark. If in overstrike mode, it
         firsts deletes the character at the insert mark.
 
-    insertTab
+    insertTab()
         Inserts the -indentchar string (Default is *tab* character. See
         *-indentchar*
 
         Default bindings: Tab key
 
-    insertTabChar
+    insertTabChar()
         Inserts a *tab* character (always). See *-indentchar*
 
         Default bindings: Alt-Tab
 
-    linenumber(*$index*)
-        Returns the linenumber part of an index. You may also specify
+    linenumber(*index*)
+        Returns the linenumber part of an *index*. You may also specify
         indexes like 'end' or 'insert' etc.
 
     jumpToMatchingChar(*boolean*)
@@ -499,26 +503,26 @@ METHODS
         Control-p (jump only), and Control-P (jump and select eveything
         inbetween).
 
-    Load(*$filename*)
+    Load(*filename*)
         Replaces the content of the widget with the content of file
-        $filename. Returns 1 (*true*) if successful, 0 (*false*) otherwise.
+        *filename*. Returns 1 (*true*) if successful, 0 (*false*) otherwise.
         One can check the Perl variable $! for error message on failure.
 
-    matchCheck
+    matchCheck()
         Checks wether the character that is just before the 'insert'-mark
         should be matched, and if so, should it match forwards or backwards.
         It then calls matchFind.
 
-    matchFind(*$direction*, *$char*, *$match*, *$start*, *$stop*)
-        Matches $char to $match, skipping nested $char/$match pairs, and
+    matchFind(*direction*, *char*, *match*, *start*, *stop*)
+        Matches *char* to *match*, skipping nested *char*/*match* pairs, and
         displays the match found (if any).
 
-    pastePrimaryAtMouse
+    pastePrimaryAtMouse()
         Paste the primary selection at the current mouse position.
 
         Default bindings: ButtonRelease-2
 
-    PostPopupMenu
+    PostPopupMenu()
         Pops up the menu associated with Tk::Text* widgets, including
         submenu items associated with TextHighlight, ie. the language
         plugins, rules editor, etc. Note: both *-noPopupMenu* and
@@ -534,48 +538,54 @@ METHODS
         using via "use ROTextHighlight" (copy or symlink), then the readonly
         state is fixed and any changes here will be ignored.
 
-    Redo
+    Redo()
         Reapply the last change (or block of changes) undone by the last
         call to Undo.
 
-    ResetUndo
+    ResetUndo()
         Reset (clear) the Undo history stack.
 
-    rulesEdit
+    rulesEdit()
         Pops up a window that enables the user to set the color and font
         options for the current syntax.
 
-    rulesFetch
+    rulesFetch()
         Checks whether the file:
 
          $text->cget('-rulesdir') . '/' . $text->cget('-syntax') . '.rules'
 
         exists, and if so attempts to load this as a set of rules.
 
-    rulesSave
+    rulesSave()
         Saves the currently loaded rules as
 
          $text->cget('-rulesdir') . '/' . $text->cget('-syntax') . '.rules'
 
-    selectionComment
+    selectionComment()
         Comment currently selected text.
 
-    selectionIndent
+    selectionIndent()
         Indent currently selected text.
 
-    selectionModify
+    selectionModify()
         Used by the other selection... methods to do the actual work.
 
-    selectionUnComment
+    selectionUnComment()
         Uncomment currently selected text.
 
-    selectionUnIndent
+    selectionUnIndent()
         Unindent currently selected text.
 
     setRule(*rulename, colorattribute, color*)
         Allows altering of individual rules by the programmer.
 
-    Undo
+    Space()
+        Mostly for internal use - Handles user-pressing of the [spacebar]
+        key so that it's not passed down to the underlying *Text* widgets.
+        This is so we can have consistant behavior regardless of which one
+        us chosen/loaded.
+
+    Undo()
         Undo the last change (or block of changes) to the text (the top of
         the Undo stack).
 
@@ -835,10 +845,12 @@ BUGS
 TODO
     Consider adding some of the Tk::TextUndo methods not currently provided
     by either this module Tk::Text, or Tk::Text::SuperText.
+
     Add additional language modules. I am going to need help on this one. We
     currently support all the original Tk::CodeText languages (included)
     plus all those supported by Syntax::Highlight::Engine::Kate, if it's
     installed.
+
     The sample files in the test suite should be set up so that conformity
     with the language specification can actually be verified.
 

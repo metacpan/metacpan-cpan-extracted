@@ -1,6 +1,13 @@
 Revision history for Perl extension Tk::ListBrowser.
 
-0.02  Wed Mar 19 2025
+0.04  Mon May 05 2025
+	- Selection remains intact on refresh.
+	- Overhaul of code base.
+	- Added columns and headers, hlist and tree arrange mode.
+	- Added sorting.
+	- Streamlined handling of options.
+
+0.03  Wed Mar 19 2025
 	- Deactivated experiment in test file.
 
 0.02  Wed Mar 19 2025

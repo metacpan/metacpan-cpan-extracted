@@ -13,6 +13,7 @@ const my $factory2 => {
 	two => sub { 2 },
 };
 
+
 eval {
 	const my $undefined = 1;
 };

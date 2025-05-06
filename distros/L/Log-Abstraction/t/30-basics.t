@@ -71,12 +71,18 @@ is_deeply(
 	'Logged messages to code reference'
 );
 
-# Test logging to syslog
-$logger = Log::Abstraction->new(syslog => { type => 'unix' }, script_name => 'test');
+# Not sure what to do to test this on Haiku.
+# It says that the type 'unix' is not supported
+if($^O ne 'haiku') {
+	# Test logging to syslog
+	$logger = Log::Abstraction->new(syslog => { type => 'unix' }, script_name => 'test');
 
-$logger->warn({ warning => 'Syslog warning message' });
+	$logger->warn({ warning => 'Syslog warning message' });
 
-# Note: Verifying syslog output requires checking the syslog file, not done here
+	# Note: Verifying syslog output requires checking the syslog file, not done here
+} else {
+	diag('TODO: unix type not supported on Haiku - what is it instead?');
+}
 
 # Test logging an array
 @log_array = ();
@@ -95,5 +101,11 @@ is_deeply(
 	],
 	'Logged list messages to array'
 );
+
+# Determine script name if not given
+$logger = Log::Abstraction->new(syslog => { facility => 'local0' });
+cmp_ok($logger->{'script_name'}, 'eq', '30-basics.t', 'Set a sensible value for script_name');
+
+# Test illegal call to _log()
 
 done_testing();

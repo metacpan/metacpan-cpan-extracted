@@ -3,8 +3,12 @@ MANIFEST
 Makefile.PL
 README
 README.md
+lib/Dancer2/Template/TTLogReport.pm
+lib/Dancer2/Template/TTLogReport.pod
 lib/Log/Report/Template.pm
 lib/Log/Report/Template.pod
+lib/Log/Report/Template/Extract.pm
+lib/Log/Report/Template/Extract.pod
 lib/Log/Report/Template/Textdomain.pm
 lib/Log/Report/Template/Textdomain.pod
 t/01use.t
@@ -14,6 +18,8 @@ t/12filters.t
 t/13modifiers.t
 t/14missing.t
 t/20examples.t
+t/40extract.t
+t/41double.t
 t/lexicons/first.utf-8.po
 t/lexicons/second.utf-8.po
 t/templates/root.tt

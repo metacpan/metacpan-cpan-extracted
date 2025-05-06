@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use base qw/Import::Export/;
 
@@ -25,18 +25,40 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =cut
 
 =head1 SYNOPSIS
 
+
+	package MyApp::Constants;
+
 	use Const::XS qw/all/;
+	
+	use base 'Import::Export';
 
-	const my $scalar => 'Hello World';
-	const my @array => qw/welcome to paradise/;
-	const my %hash => ( one => 1, two => 2, three => 3 );
+	our %EX = (
+		'$SCALAR' => [qw/all/],
+		'@ARRAY' => [qw/all/],
+		'%HASH' => [qw/all/],
+	);
 
+	const our $SCALAR => 'Hello World';
+	const our @ARRAY => qw/welcome to paradise/;
+	const our %HASH => ( one => 1, two => [ ... ], three => { ... }, four => sub { } );
+
+	1;
+
+...
+
+	package MyApp::Controller::Logic;
+
+	use MyApp::Constants qw/$SCALAR @ARRAY %HASH/;
+
+	...
+
+	1;
 
 =head1 EXPORTS
 

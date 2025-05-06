@@ -4,7 +4,7 @@
       "Ian Robertson <iroberts@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,16 +46,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/Crypt-OpenSSL-RSA/issues"
+         "web" : "https://github.com/cpan-authors/Crypt-OpenSSL-RSA/issues"
       },
-      "homepage" : "http://github.com/toddr/Crypt-OpenSSL-RSA",
+      "homepage" : "http://github.com/cpan-authors/Crypt-OpenSSL-RSA",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/toddr/Crypt-OpenSSL-RSA"
+         "url" : "http://github.com/cpan-authors/Crypt-OpenSSL-RSA"
       }
    },
-   "version" : "0.33",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.34",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

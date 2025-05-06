@@ -2,7 +2,7 @@ use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: Represents the entity producing OpenTelemetry data
 package OpenTelemetry::SDK::Resource;
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 class OpenTelemetry::SDK::Resource :does(OpenTelemetry::Attributes) {
     use File::Basename 'basename';

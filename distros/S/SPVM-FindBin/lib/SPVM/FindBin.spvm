@@ -3,7 +3,7 @@
 
 class FindBin {
   
-  version "0.033";
+  version "0.034";
   
   use Sys;
   use Cwd;
@@ -29,7 +29,7 @@ class FindBin {
     }
     
     unless (File::Spec->file_name_is_absolute($script)) {
-      $script = File::Spec->catfile([Cwd->getcwd], $script);
+      $script = File::Spec->catfile([Cwd->getcwd, $script]);
     }
     
     my $fileparse_ret = File::Basename->fileparse($script);
@@ -56,7 +56,7 @@ class FindBin {
         $script = $link_text;
       }
       else {
-        $script = File::Spec->catfile([$RealBin], $link_text);
+        $script = File::Spec->catfile([$RealBin, $link_text]);
       }
     }
     

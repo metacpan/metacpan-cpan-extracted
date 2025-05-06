@@ -1,0 +1,166 @@
+// [[[ HEADER ]]]
+using std::cout;  using std::cerr;  using std::endl;
+
+#ifndef __CPP__INCLUDED__Perl::Types__Test__OO__MyClass01Good_h
+#define __CPP__INCLUDED__Perl::Types__Test__OO__MyClass01Good_h 0.001_000
+
+// [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
+#include <Perl::Types.cpp>  // -> Perl::Types.h -> (rperltypes_mode.h; rperloperations.h; rperltypes.h; HelperFunctions.cpp)
+#include <Perl::Types/CompileUnit/Module/Class.cpp>
+
+# ifdef __PERL__TYPES
+
+Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# elif defined __CPP__TYPES
+
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+
+// [[[ OO INHERITANCE ]]]
+class Perl::Types__Test__OO__MyClass01Good : public Perl::Types__CompileUnit__Module__Class__CPP {
+public:
+    // [[[ OO PROPERTIES ]]]
+    integer bar = 23;
+
+    // [[[ OO METHODS ]]]
+
+    // <<< OO PROPERTIES, ACCESSORS & MUTATORS >>>
+    integer get_bar() { return bar; }
+    void set_bar(integer bar_new) { bar = bar_new; }
+
+    // <<< CONSTRUCTOR & DESTRUCTOR >>>
+    Perl::Types__Test__OO__MyClass01Good() {}
+    ~Perl::Types__Test__OO__MyClass01Good() {}
+
+    // <<< CLASS NAME REPORTER >>>
+    virtual string myclassname() { return (const string) "Perl::Types::Test::OO::MyClass01Good"; }
+
+    // <<< USER-DEFINED METHODS >>>
+    void double_bar_save();
+    integer double_bar_return();
+};  // end of class
+
+// [[[ OO SUBCLASSES ]]]
+#define Perl::Types__Test__OO__MyClass01Good_rawptr Perl::Types__Test__OO__MyClass01Good*
+typedef std::unique_ptr<Perl::Types__Test__OO__MyClass01Good> Perl::Types__Test__OO__MyClass01Good_ptr;
+typedef std::vector<Perl::Types__Test__OO__MyClass01Good_ptr> Perl::Types__Test__OO__MyClass01Good_arrayref;
+typedef std::unordered_map<string, Perl::Types__Test__OO__MyClass01Good_ptr> Perl::Types__Test__OO__MyClass01Good_hashref;
+typedef std::unordered_map<string, Perl::Types__Test__OO__MyClass01Good_ptr>::iterator Perl::Types__Test__OO__MyClass01Good_hashref_iterator;
+
+// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]
+class NEW_Perl::Types__Test__OO__MyClass01Good {
+public:
+    Perl::Types__Test__OO__MyClass01Good_ptr wrapped_object;
+    NEW_Perl::Types__Test__OO__MyClass01Good() : wrapped_object{new Perl::Types__Test__OO__MyClass01Good()} {}
+    Perl::Types__Test__OO__MyClass01Good_ptr&& NEW() { return std::move(wrapped_object); }
+
+    // <<< OO PROPERTIES, INITIALIZERS >>>
+    NEW_Perl::Types__Test__OO__MyClass01Good& bar(integer bar_init) { wrapped_object->bar = bar_init; return *this; }
+};
+
+// <<< OPERATIONS & DATA TYPES REPORTER >>>
+integer Perl::Types__Test__OO__MyClass01Good__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2
+
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+
+# else
+
+Purposefully_die_from_a_compile-time_error,_due_to_neither___PERL__TYPES_nor___CPP__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# endif
+
+#endif
+
+// end of class
+
+
+// [[[ ADDITIONAL CLASSES ]]]
+
+// [[[ HEADER ]]]
+using std::cout;  using std::cerr;  using std::endl;
+
+#ifndef __CPP__INCLUDED__Perl::Types__Test__OO__MySubclass01Good_h
+#define __CPP__INCLUDED__Perl::Types__Test__OO__MySubclass01Good_h 0.001_000
+
+// [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
+//#include "Perl::Types/Test/OO/MyClass01Good.cpp" // DISABLED: do not recursively load the same .cpp/.h file from within itself
+
+# ifdef __PERL__TYPES
+
+Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# elif defined __CPP__TYPES
+
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+// [[[<<< BEGIN CPP TYPES >>>]]]
+
+// [[[ OO INHERITANCE ]]]
+class Perl::Types__Test__OO__MySubclass01Good : public Perl::Types__Test__OO__MyClass01Good {
+public:
+    // [[[ OO PROPERTIES ]]]
+    integer bax = 123;
+
+    // [[[ OO METHODS ]]]
+
+    // <<< OO PROPERTIES, ACCESSORS & MUTATORS >>>
+    integer get_bax() { return bax; }
+    void set_bax(integer bax_new) { bax = bax_new; }
+    integer get_bar() { return bar; }  // inherited from Perl::Types::Test::OO::MyClass01Good::
+    void set_bar(integer bar_new) { bar = bar_new; }  // inherited from Perl::Types::Test::OO::MyClass01Good::
+
+    // <<< CONSTRUCTOR & DESTRUCTOR >>>
+    Perl::Types__Test__OO__MySubclass01Good() {}
+    ~Perl::Types__Test__OO__MySubclass01Good() {}
+
+    // <<< CLASS NAME REPORTER >>>
+    virtual string myclassname() { return (const string) "Perl::Types::Test::OO::MySubclass01Good"; }
+
+    // <<< USER-DEFINED METHODS >>>
+    void triple_bax_save();
+    integer triple_bax_return();
+    integer add_bax_return(integer addend);
+    integer subtract_bax_return(integer subtrahend);
+    integer multiply_bax_return(integer multiplier);
+    integer multiply_multiply_bax_return(integer multiplier, integer multiplier2);
+};  // end of class
+
+// [[[ OO SUBCLASSES ]]]
+#define Perl::Types__Test__OO__MySubclass01Good_rawptr Perl::Types__Test__OO__MySubclass01Good*
+typedef std::unique_ptr<Perl::Types__Test__OO__MySubclass01Good> Perl::Types__Test__OO__MySubclass01Good_ptr;
+typedef std::vector<Perl::Types__Test__OO__MySubclass01Good_ptr> Perl::Types__Test__OO__MySubclass01Good_arrayref;
+typedef std::unordered_map<string, Perl::Types__Test__OO__MySubclass01Good_ptr> Perl::Types__Test__OO__MySubclass01Good_hashref;
+typedef std::unordered_map<string, Perl::Types__Test__OO__MySubclass01Good_ptr>::iterator Perl::Types__Test__OO__MySubclass01Good_hashref_iterator;
+
+// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]
+class NEW_Perl::Types__Test__OO__MySubclass01Good {
+public:
+    Perl::Types__Test__OO__MySubclass01Good_ptr wrapped_object;
+    NEW_Perl::Types__Test__OO__MySubclass01Good() : wrapped_object{new Perl::Types__Test__OO__MySubclass01Good()} {}
+    Perl::Types__Test__OO__MySubclass01Good_ptr&& NEW() { return std::move(wrapped_object); }
+
+    // <<< OO PROPERTIES, INITIALIZERS >>>
+    NEW_Perl::Types__Test__OO__MySubclass01Good& bax(integer bax_init) { wrapped_object->bax = bax_init; return *this; }
+    NEW_Perl::Types__Test__OO__MySubclass01Good& bar(integer bar_init) { wrapped_object->bar = bar_init; return *this; }  // inherited from Perl::Types::Test::OO::MyClass01Good::
+};
+
+// <<< OPERATIONS & DATA TYPES REPORTER >>>
+integer Perl::Types__Test__OO__MySubclass01Good__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2
+
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+// [[[<<< END CPP TYPES >>>]]]
+
+# else
+
+Purposefully_die_from_a_compile-time_error,_due_to_neither___PERL__TYPES_nor___CPP__TYPES_being_defined.__We_need_to_define_only___CPP__TYPES_in_this_file!
+
+# endif
+
+#endif
+
+// end of class

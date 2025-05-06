@@ -3,14 +3,18 @@ abstract: 'enable Perl data types'
 author:
   - 'William N. Braswell, Jr. <wbraswell@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
+  Cwd: '0'
+  Inline::C: '0.80'
+  Inline::CPP: '0.80'
+  Inline::Filters: '0.20'
   Test2::V0: '0'
+  Test::Exception: '0'
   Test::More: '0'
+  Test::Number::Delta: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,70 +29,449 @@ no_index:
     - t
     - xt
 provides:
-  Perl::Type::Class:
-    file: lib/Perl/Type/Class.pm
-    version: '0.0022'
+  Perl:
+    file: lib/Perl.pm
+    version: '0.001'
+  Perl::AfterSubclass:
+    file: lib/Perl/Config.pm
+    version: '0.100'
+  Perl::Class:
+    file: lib/Perl/Class.pm
+    version: '0.003'
+  Perl::Config:
+    file: lib/Perl/Config.pm
+    version: '0.012'
+  Perl::HelperFunctions_cpp:
+    file: lib/Perl/HelperFunctions_cpp.pm
+    version: '0.007'
+  Perl::Inline:
+    file: lib/Perl/Inline.pm
+    version: '0.0221'
+  Perl::Object:
+    file: lib/Perl/Object.pm
+    version: '0.003'
+  Perl::Structure:
+    file: lib/Perl/Structure.pm
+    version: '0.002'
+  Perl::Structure::Array:
+    file: lib/Perl/Structure/Array.pm
+    version: '0.009'
+  Perl::Structure::Array::Reference:
+    file: lib/Perl/Structure/Array/Reference.pm
+    version: '0.005'
+  Perl::Structure::Array::SubTypes:
+    file: lib/Perl/Structure/Array/SubTypes.pm
+    version: '0.017'
+  Perl::Structure::Array::SubTypes1D:
+    file: lib/Perl/Structure/Array/SubTypes1D.pm
+    version: '0.021'
+  Perl::Structure::Array::SubTypes2D:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.0171'
+  Perl::Structure::Array::SubTypes3D:
+    file: lib/Perl/Structure/Array/SubTypes3D.pm
+    version: '0.017'
+  Perl::Structure::Array_cpp:
+    file: lib/Perl/Structure/Array_cpp.pm
+    version: '0.005'
+  Perl::Structure::CodeReference:
+    file: lib/Perl/Structure/CodeReference.pm
+    version: '0.001'
+  Perl::Structure::GSLMatrix:
+    file: lib/Perl/Structure/GSLMatrix.pm
+    version: '0.001'
+  Perl::Structure::GSLMatrix_cpp:
+    file: lib/Perl/Structure/GSLMatrix_cpp.pm
+    version: '0.002'
+  Perl::Structure::Graph:
+    file: lib/Perl/Structure/Graph.pm
+    version: '0.001'
+  Perl::Structure::Graph::Tree:
+    file: lib/Perl/Structure/Graph/Tree.pm
+    version: '0.001'
+  Perl::Structure::Graph::Tree::Binary:
+    file: lib/Perl/Structure/Graph/Tree/Binary.pm
+    version: '0.001'
+  Perl::Structure::Graph::Tree::Binary::Node:
+    file: lib/Perl/Structure/Graph/Tree/Binary/Node.pm
+    version: '0.001'
+  Perl::Structure::Graph::Tree::Binary::NodeReference:
+    file: lib/Perl/Structure/Graph/Tree/Binary/Node.pm
+    version: '0.100'
+  Perl::Structure::Graph::Tree::BinaryReference:
+    file: lib/Perl/Structure/Graph/Tree/Binary.pm
+    version: '0.100'
+  Perl::Structure::Graph::TreeReference:
+    file: lib/Perl/Structure/Graph/Tree.pm
+    version: '0.100'
+  Perl::Structure::GraphReference:
+    file: lib/Perl/Structure/GraphReference.pm
+    version: '0.001'
+  Perl::Structure::Hash:
+    file: lib/Perl/Structure/Hash.pm
+    version: '0.009'
+  Perl::Structure::Hash::Properties:
+    file: lib/Perl/Structure/Hash/Properties.pm
+    version: '0.0011'
+  Perl::Structure::Hash::Reference:
+    file: lib/Perl/Structure/Hash/Reference.pm
+    version: '0.004'
+  Perl::Structure::Hash::SubTypes:
+    file: lib/Perl/Structure/Hash/SubTypes.pm
+    version: '0.016'
+  Perl::Structure::Hash::SubTypes1D:
+    file: lib/Perl/Structure/Hash/SubTypes1D.pm
+    version: '0.018'
+  Perl::Structure::Hash::SubTypes2D:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.025'
+  Perl::Structure::Hash::SubTypes3D:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.002'
+  Perl::Structure::Hash_cpp:
+    file: lib/Perl/Structure/Hash_cpp.pm
+    version: '0.005'
+  Perl::Structure::LinkedList:
+    file: lib/Perl/Structure/LinkedList.pm
+    version: '0.001'
+  Perl::Structure::LinkedList::Node:
+    file: lib/Perl/Structure/LinkedList/Node.pm
+    version: '0.0011'
+  Perl::Structure::LinkedList::NodeReference:
+    file: lib/Perl/Structure/LinkedList/Node.pm
+    version: '0.100'
+  Perl::Structure::LinkedListReference:
+    file: lib/Perl/Structure/LinkedList.pm
+    version: '0.100'
+  Perl::Structure::MongoDBBSON:
+    file: lib/Perl/Structure/MongoDBBSON.pm
+    version: '0.001'
+  Perl::Structure::SSENumberPair:
+    file: lib/Perl/Structure/SSENumberPair.pm
+    version: '0.004'
+  Perl::Structure::SSENumberPair::method:
+    file: lib/Perl/Structure/SSENumberPair.pm
+    version: '0.100'
+  Perl::Type:
+    file: lib/Perl/Type.pm
+    version: '0.002'
+  Perl::Type::Boolean:
+    file: lib/Perl/Type/Boolean.pm
+    version: '0.01'
+  Perl::Type::Boolean_cpp:
+    file: lib/Perl/Type/Boolean_cpp.pm
+    version: '0.001'
+  Perl::Type::Character:
+    file: lib/Perl/Type/Character.pm
+    version: '0.011'
+  Perl::Type::Character_cpp:
+    file: lib/Perl/Type/Character_cpp.pm
+    version: '0.002'
+  Perl::Type::FileHandle:
+    file: lib/Perl/Type/FileHandle.pm
+    version: '0.006'
+  Perl::Type::GMPInteger:
+    file: lib/Perl/Type/GMPInteger.pm
+    version: '0.006'
+  Perl::Type::GMPInteger_cpp:
+    file: lib/Perl/Type/GMPInteger_cpp.pm
+    version: '0.002'
+  Perl::Type::Integer:
+    file: lib/Perl/Type/Integer.pm
+    version: '0.013'
+  Perl::Type::Integer_cpp:
+    file: lib/Perl/Type/Integer_cpp.pm
+    version: '0.0021'
+  Perl::Type::Modifier:
+    file: lib/Perl/Type/Modifier.pm
+    version: '0.00101'
+  Perl::Type::Modifier::Reference:
+    file: lib/Perl/Type/Modifier/Reference.pm
+    version: '0.002'
+  Perl::Type::NonsignedInteger:
+    file: lib/Perl/Type/NonsignedInteger.pm
+    version: '0.008'
+  Perl::Type::NonsignedInteger_cpp:
+    file: lib/Perl/Type/NonsignedInteger_cpp.pm
+    version: '0.002'
+  Perl::Type::Number:
+    file: lib/Perl/Type/Number.pm
+    version: '0.0141'
+  Perl::Type::Number_cpp:
+    file: lib/Perl/Type/Number_cpp.pm
+    version: '0.002'
+  Perl::Type::Scalar:
+    file: lib/Perl/Type/Scalar.pm
+    version: '0.006'
+  Perl::Type::String:
+    file: lib/Perl/Type/String.pm
+    version: '0.015'
+  Perl::Type::String_cpp:
+    file: lib/Perl/Type/String_cpp.pm
+    version: '0.002'
+  Perl::Type::Unknown:
+    file: lib/Perl/Type/Unknown.pm
+    version: '0.004'
+  Perl::Type::Void:
+    file: lib/Perl/Type/Void.pm
+    version: '0.003'
   Perl::Types:
     file: lib/Perl/Types.pm
     version: '0.005'
+  array:
+    file: lib/Perl/Structure/Array/SubTypes.pm
+    version: '0.100'
   arrayref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
+  arrayref::arrayref:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::arrayref:
+    file: lib/Perl/Structure/Array/SubTypes3D.pm
+    version: '0.100'
+  arrayref::arrayref::arrayref::integer:
+    file: lib/Perl/Structure/Array/SubTypes3D.pm
+    version: '0.100'
+  arrayref::arrayref::arrayref::number:
+    file: lib/Perl/Structure/Array/SubTypes3D.pm
+    version: '0.100'
+  arrayref::arrayref::arrayref::scalartype:
+    file: lib/Perl/Structure/Array/SubTypes3D.pm
+    version: '0.100'
+  arrayref::arrayref::arrayref::string:
+    file: lib/Perl/Structure/Array/SubTypes3D.pm
+    version: '0.100'
+  arrayref::arrayref::integer:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::integer::method:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::number:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::number::method:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::scalartype:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::scalartype::method:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::string:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::arrayref::string::method:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::character:
+    file: lib/Perl/Structure/Array/SubTypes1D.pm
+    version: '0.100'
+  arrayref::hashref:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::integer:
+    file: lib/Perl/Structure/Array/SubTypes1D.pm
+    version: '0.100'
+  arrayref::number:
+    file: lib/Perl/Structure/Array/SubTypes1D.pm
+    version: '0.100'
+  arrayref::object:
+    file: lib/Perl/Structure/Array/SubTypes2D.pm
+    version: '0.100'
+  arrayref::scalartype:
+    file: lib/Perl/Structure/Array/SubTypes1D.pm
+    version: '0.100'
+  arrayref::string:
+    file: lib/Perl/Structure/Array/SubTypes1D.pm
+    version: '0.100'
   boolean:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   character:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   filehandleref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   hashref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   hashref::arrayref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
+  hashref::arrayref::arrayref:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::arrayref::integer:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::arrayref::number:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::arrayref::scalartype:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::arrayref::string:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::hashref:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::hashref::integer:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::hashref::number:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::hashref::scalartype:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::hashref::string:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::arrayref::integer:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::arrayref::number:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::arrayref::string:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::character:
+    file: lib/Perl/Structure/Hash/SubTypes1D.pm
+    version: '0.100'
   hashref::hashref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
+  hashref::hashref::arrayref:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::arrayref::integer:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::arrayref::number:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::arrayref::scalartype:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::arrayref::string:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
   hashref::hashref::hashref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
+  hashref::hashref::hashref::integer:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::hashref::number:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::hashref::scalartype:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::hashref::string:
+    file: lib/Perl/Structure/Hash/SubTypes3D.pm
+    version: '0.100'
+  hashref::hashref::integer:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::hashref::number:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::hashref::scalartype:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::hashref::string:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::integer:
+    file: lib/Perl/Structure/Hash/SubTypes1D.pm
+    version: '0.100'
+  hashref::number:
+    file: lib/Perl/Structure/Hash/SubTypes1D.pm
+    version: '0.100'
+  hashref::object:
+    file: lib/Perl/Structure/Hash/SubTypes2D.pm
+    version: '0.100'
+  hashref::scalartype:
+    file: lib/Perl/Structure/Hash/SubTypes1D.pm
+    version: '0.100'
+  hashref::string:
+    file: lib/Perl/Structure/Hash/SubTypes1D.pm
+    version: '0.100'
   integer:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
+  integer::method:
+    file: lib/Perl/Types.pm
+    version: '0.100'
   number:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
+  object:
+    file: lib/Perl/Types.pm
+    version: '0.100'
+  perltypes:
+    file: lib/perltypes.pm
+    version: '0.018'
   string:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   string::arrayref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   string::hashref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   string::hashref::arrayref:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
   void:
     file: lib/Perl/Types.pm
-    version: '0.001'
+    version: '0.100'
+  void::method:
+    file: lib/Perl/Types.pm
+    version: '0.100'
 requires:
+  Alien::GMP: '0'
+  Alien::GSL: '0'
   Carp: '0'
   Data::Dumper: '0'
   English: '0'
   Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  IPC::Cmd: '0'
+  IPC::Run3: '0'
+  Math::BigInt: '0'
+  Math::GSL::BLAS: '0'
+  Math::GSL::CBLAS: '0'
+  Math::GSL::Matrix: '0'
+  POSIX: '0'
   Scalar::Util: '0'
+  Term::ReadLine: '0'
+  constant: '0'
+  lib: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.012'
   strict: '0'
   warnings: '0'
 resources:
   IRC: irc://irc.perl.org/#perl11
-  bugtracker: https://gitlab.com/scienceperl/perl-types/-/issues
-  repository: https://gitlab.com/scienceperl/perl-types
-version: '0.001'
-x_generated_by_perl: v5.22.1
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  bugtracker: https://gitlab.com/perl-types/perl-types/-/issues
+  homepage: https://perlcommunity.org/types
+  repository: https://gitlab.com/perl-types/perl-types
+version: '0.100'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

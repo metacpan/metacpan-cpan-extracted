@@ -1,0 +1,44 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Asset {
+  version_from Mojo;
+  
+  # Fields
+  has end_range : rw long;
+  
+  has start_range : rw long;
+  
+  # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->{start_range} = -1;
+    
+    $self->{end_range} = -1;
+  }
+  
+  method add_chunk : Mojo::Asset ($chunk : string) { die "Not implemented."; }
+  
+  method contains : int ($string : string) { die "Not implemented."; }
+  
+  method get_chunk : string ($offset : long, $max : int = -1)  { die "Not implemented."; }
+  
+  method is_file : int () { die "Not implemented."; }
+  
+  method is_range : int () {
+    return !!($self->end_range >= 0 || $self->start_range >= 0);
+  }
+  
+  method move_to : void ($file : string) { die "Not implemented."; }
+  
+  method mtime : long () { die "Not implemented."; }
+  
+  method set_mtime : void ($mtime : long) { die "Not implemented."; }
+  
+  method size : long () { die "Not implemented."; }
+  
+  method slurp : string () { die "Not implemented."; }
+  
+  method to_file : Mojo::Asset::File () { die "Not implemented."; }
+  
+}

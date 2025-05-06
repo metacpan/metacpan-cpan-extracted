@@ -79,12 +79,12 @@ ok( $PUBLIC_KEY_PKCS1_STRING eq $public_key->get_public_key_string() );
 ok( $PUBLIC_KEY_X509_STRING eq $public_key->get_public_key_x509_string() );
 
 my $passphase = '123456';
-ok( $private_key = Crypt::OpenSSL::RSA->new_private_key($ENCRYPT_PRIVATE_KEY_STRING, $passphase) );
+ok( $private_key = Crypt::OpenSSL::RSA->new_private_key( $ENCRYPT_PRIVATE_KEY_STRING, $passphase ) );
 ok( $DECRYPT_PRIVATE_KEY_STRING eq $private_key->get_private_key_string() );
-ok( $private_key = Crypt::OpenSSL::RSA->new_private_key($DECRYPT_PRIVATE_KEY_STRING) );
-ok( $private_key2 = Crypt::OpenSSL::RSA->new_private_key($private_key->get_private_key_string($passphase), $passphase) );
+ok( $private_key  = Crypt::OpenSSL::RSA->new_private_key($DECRYPT_PRIVATE_KEY_STRING) );
+ok( $private_key2 = Crypt::OpenSSL::RSA->new_private_key( $private_key->get_private_key_string($passphase), $passphase ) );
 ok( $DECRYPT_PRIVATE_KEY_STRING eq $private_key2->get_private_key_string() );
-ok( $private_key2 = Crypt::OpenSSL::RSA->new_private_key($private_key->get_private_key_string($passphase, 'des3'), $passphase) );
+ok( $private_key2 = Crypt::OpenSSL::RSA->new_private_key( $private_key->get_private_key_string( $passphase, 'des3' ), $passphase ) );
 ok( $DECRYPT_PRIVATE_KEY_STRING eq $private_key2->get_private_key_string() );
-ok( $private_key2 = Crypt::OpenSSL::RSA->new_private_key($private_key->get_private_key_string($passphase, 'aes-128-cbc'), $passphase) );
+ok( $private_key2 = Crypt::OpenSSL::RSA->new_private_key( $private_key->get_private_key_string( $passphase, 'aes-128-cbc' ), $passphase ) );
 ok( $DECRYPT_PRIVATE_KEY_STRING eq $private_key2->get_private_key_string() );

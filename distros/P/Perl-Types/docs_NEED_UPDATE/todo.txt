@@ -1,0 +1,497 @@
+DONE
+
+
+DOING
+
+    RPerl tests, arrayref_arrayref_number & arrayref_arrayref_string
+
+    test $return_whole_value accessors & mutators for RPerl-defined data types in Class INIT block
+    test $return_whole_value accessors & mutators for  user-defined data types in Class INIT block
+
+    Installer, CentOS 7 Support, copy from LAMP Installer to RPerl Installer
+    MongoDB C++ driver in installer
+    MongoDB documentation
+
+    manual IS file changes
+
+    3D data structures
+        *_arrayref_hashref_hashref
+            stringify
+            typetest
+            t/06_hash
+        *_*ref_*ref_hashref
+        *_*ref_*ref_arrayref
+
+    2D data structures
+        *_*ref_*ref
+        To_string() for each data structure in C++, to_string() in Perl
+
+    # DEV NOTE, CORRELATION #rp031: NEED UPGRADE: implement proper @array vs $arrayref, %hash vs $hashref, dereferencing, etc.
+    Scalar.pm, ArrayDereference.pm, Keys.pm, HashDereference.pm, etc.
+    add support for non-reference @arrays and %hashes
+        re-align PERLOPS_PERLTYPES w/ CPPOPS_CPPTYPES behavior for pass-by-value vs pass-by-reference
+        figure out how to add data types to PERLOPS_PERLTYPES @array and %hash variable declarations
+        std::vector should be array and std::unique_ptr<std::vector> should be arrayref, etc.
+        ArrayDereference & HashDerefence operators should actually dereference (unwrap) std::unique_ptr in CPPOPS_CPPTYPES, deref AVRV to AV in CPPOPS_PERLTYPES, etc. 
+        implement pertinent operators: scalar, keys, values
+
+    foreach() loop and keys() operator in CPPOPS_CPPTYPES
+
+    .travis.yml, disable dev version of Alien::Base::ModuleBuild v1.01_01, update min version required in Makefile.PL
+    .travis.yml, disable Alien::GSL testing, update min version required in Makefile.PL
+
+
+    META files in MANIFEST.SKIP???
+
+    Moo(se) support
+        Always
+            better subroutine/method return types; GRAMMAR
+            new() accept properties init values; GRAMMAR
+            subroutine arguments received via 'shift' instead of @ARG only; GRAMMAR
+            package 'integer' exports sub 'integer()' to check type, and friends
+            accessors & mutators available (only?) w/out using 'get_' & 'set_' prefixes; Class.pm PERLOPS_PERLTYPES, Properties.pm? CPPOPS_CPPTYPES
+        When Moo(se) is enabled
+            'use parent' should not exist, replaced by 'extends'; GRAMMAR
+            $properties should not exist, replaced by 'has'; GRAMMAR
+            new() from Moo(se) instead of RPerl
+    RPerl::Exporter
+        re-enable t/10 & t/11  <<< ==== DO THIS FIRST!!! === >>>
+        Class/Generator.pm, error if class name from 'use parent Foo' does not match class name from following 'use Foo' or '{ Foo->import(); }'
+        Class/Generator.pm & Package.pm & Include.pm: CPPOPS_CPPTYPES
+        fix & test *_CHECK*() exporting in perlgmp.pm & perlsse.pm, as hard-coded in perlgsl.pm
+        enable qw(:all)
+        Learning RPerl
+    new subroutine headers
+        Learning RPerl
+        PhysicsPerl
+        MathPerl
+    Quick-Start Guide
+        finish
+
+    Alien::zlib???       for SDL dependency on zlib.h, get SDL to add Alien::zlib as CPAN dependency; Alien::zlib::Static already exists but is it applicable?
+    Alien::PkgConfig???  for MongoDB driver build support
+    Alien::MongoDB???
+    Alien::MongoCXX???
+    Alien::Pluto
+        CPAN testers stability
+    Alien::Texinfo
+        add minimum version checking when Alien subsystem supports it in non-PkgConfig software like Texinfo
+    Alien::astyle upgrade to EU::MM
+    Alien::bison
+    Alien::flex
+    Alien::GSL
+        Program.pm: convert rperl*.h to RPerl/Support/*.h and RPerl/Support/*StandAlone.h, as in RPerl/Support/MongoDB.h  [ SSE GMP GSL ]
+        make pull request for Math::GSL to use Alien::GSL    https://github.com/leto/math--gsl/issues/99
+        add 'apt-get install libgsl-dev' (or libgsl0-dev) & 'cpanm Math::GSL::Matrix' in RPerl & LAMP Installers, document in INSTALL?
+        gsl_matrix_CHECK*() CPPOPS_CPPTYPES
+        tests for all EMAV00 - EMAV09
+        enable gsl_linalg.h & other gsl friends
+    Alien::GMP
+        detect non-C++ system install (missing gmpxx.h) and force Alien::GMP share install instead
+    Alien::PCRE2
+        ensure tests pass on both share & system installs
+        replace mirrored DEV version (Windows bug fix) w/ new official version when released
+            same as cygwin failure below???
+            warning: "FWRITE" redefined ... error: _O_BINARY undeclared
+            https://bugs.exim.org/show_bug.cgi?id=2152
+        extend XS test
+        CPAN testers failures
+    Alien::JPCRE2
+        update tests to Test::Alien
+        fix AppVeyor Windows failures
+        add XS test
+        CPAN testers failures
+    regex support
+        substitution LHS must be variable
+        non-destructive regex /r
+        !~ logic
+
+    allow non-standard shebangs
+
+    Learning RPerl exercises, check on CloudForFree.org
+    RPerl-calling-Perl support
+    MySQL
+    PostgreSQL
+    MongoDB
+        ConstructorCall.pm: add support for MongoDB::MongoClient constructor parameters other than 'host'
+        Inline.pm: add Alien::PkgConfig & Alien::Mongo* dependencies; add error checking for missing pkg-config or bad return value
+        Makefile.PL: handle "v1.8.0" v-string properly in PREREQ_PM
+
+    KICKSTARTER:
+    DONE??? Monolithic Modules, Fix Deps Warning & Create Tests
+    DONE! Parse::Eyapp regex fix & CPAN upload
+    DONE??? implement 10 ops in CPPOPS_CPPTYPES
+    CODE GENERATION, CPPOPS_CPPTYPES MODE
+        ForEach.pm
+        finish .pl body generation
+        subroutines, final operation must be return operator
+        WHAT ELSE?!?
+
+    Inline::RPerl
+    update tests to emit more useful failure info, for CPAN testers debugging
+    update CPPOPS_DUALTYPES reference files
+    remove explicit properties inheritance, Generator.pm & Grammar.eyp
+    OO class properties, detect user-defined init() subroutine & call from C++ constructor 
+
+    do not rearrange subs & methods in CPPOPS_CPPTYPES output code, as occurs w/ Bubble.pm, 
+        or is rearranging necessary due to division of subs & methods in Bubble.h output file?
+
+    replace @_ with @ARG in system code
+    'cannot' -> 'can not' in all docs & source files
+    uncompile w/ corrupted or missing PMC, CPP, H files
+    uncompile delete EXE files
+    disable variable declaration w/out initial value, grammar & tests & docs
+    Learning RPerl
+                              names can NOT include double-underscore, C++ standard
+                              names can NOT start with     underscore uppercase, C++ standard
+                   variable   names can NOT start with     underscore, defined by VARIABLE_SYMBOL in Grammar.eyp
+            global subroutine names can NOT start with     underscore, C++ standard
+        non-global subroutine names can     start with     underscore, C++ standard
+                   method     names ???
+                   property   names ???
+        
+        upgrade install instructions
+        add chapter 1 bonus exercise, create stand-alone executable for Hello World
+        add missing operator tables as with 2.4.13 chop & chomp, etc
+        add bitstrings to 2.1.15, mentioned in LP189
+        EAR17 & Exxx & any other new errors
+        update appendix with grammar changes: bitwise_negation_lparen, additional operators?
+        abs & mako's other new ops are no longer "Coming Soon"
+    print dot-to-comma in lib/RPerl/Test/*
+    templateperl
+    mv sort to standardperl
+    all servers online
+        rperl
+        shiny
+        sites
+    enable loop parallelization
+        handle gauss_seidel.openmp.cpp.pluto.cloog files
+        enable num_cores
+        fix print
+        fix loop labels
+        fix min/max
+    enable shorthand classes
+    add copyright notices to all files
+    pass tests on appveyor strawberry
+    ExtUtils::CppGuess bug fix w/ davido
+    update requirement for EU::MM to v7.14?
+        https://github.com/ingydotnet/inline-c-pm/issues/51
+    ...
+    explain difference between .a, .o, and .so
+        .o can be combined into .so or .exe?
+        .a is "just a tarball of .o files"?
+        .so must always be stand-alone, like a .exe w/out a main()?
+    append 'L' to all numeric literals to force long int?
+    create macro to replace all conditional truth value checks with extra logic to include RPerl false values of '0', q{0}, and q{}, in both character and string type
+    INSTALL notes, update step 3 examples
+    travis enable dev Perl
+    fix dev Perl via P5P
+    chmod a-x *.so output if not on HP-UX
+    print comma-vs-dot to correct output
+    cpp output file post-processing for source code text alignment
+    split author tests (checking Changes file, etc) into xt/ directory, 
+        split deps in Makefile.PL, possibly utilize AUTHOR_TESTING in travis-perl/helpers
+
+
+CLOUDFORFREE.ORG
+
+    release Apache2::FileManager v0.3 based on current github code
+
+
+INSTALLERS
+    Linux DEB (Debian, Ubuntu, Xubuntu, etc)
+    Linux RPM (RedHat, CentOS, etc)
+    Linux Portage
+    Android
+    iOS
+    Mac
+    Windows ActiveRPerl
+    Windows Strawberry RPerl
+    Tarball
+    CPAN
+    GitHub
+
+OPERATORS, CPPOPS_CPPTYPES MODE
+    NAMED: croak chomp join keys pop push reverse sort split values wait
+    NAMED_UNARY: chdir cos defined exists -e -r -f -T length rand scalar sin sqrt (need create)
+    Perl "features"  http://perldoc.perl.org/feature.html
+        NOT YET SUPPORTED, requires at least Perl v5.16: fc
+    POSIX
+        ceil, floor, modf
+        NOT YET SUPPORTED, C99 functions require at least Perl v5.22: trunc, cbrt, fmax, round, lround, etc.
+    Math::Trig & Math::Complex
+        new, make, emake, cplx, cplxe
+        cbrt, root 
+        tan; csc, cosec, sec, sec, cot, cotan; asin, acos, atan; acsc, acosec, asec, acot, acotan; sinh, cosh, tanh; csch, cosech, sech, coth, cotanh; 
+        asinh, acosh, atanh; acsch, acosech, asech, acoth, acotanh; pi, pi2, pi4, pip2, pip4
+        overloaded complex arithmetic
+        +, -, *, /, **
+        ~
+        abs, sqrt, exp, log
+
+LEARNING RPERL
+    new subroutine headers!!!
+    tables on metacpan, fix headers and borders CSS
+    fix <noncode> on metacpan, elsewhere
+    check X<break_code_blocks> everywhere other than pod2rperlhtml
+    use nonsigned_integer instead of integer in ex2.6 & 2.7, check all other exercises as well, change error checking accordingly
+    croak or die in exercise solutions?
+    L<> hyperlinks broken or missing in some outputs?
+    metacpan list newline fix, section 1.1
+    BEGIN INLINE CSS DIV comment should not appear in any output
+    docbook2html & sgmltools & sgml2html: Section 2.3 "Perl's Built-In Warnings" single-quote vs apostrophe
+    docbook2pdf segfault
+    sgml table cell padding
+    foreword
+    chapters 5 - 17
+    illustrations: images & ASCII art
+    covers
+    publish
+    video series
+
+BOOK OF RPERL
+    chapter 5
+
+MISC DOCUMENTATION
+    update https://en.wikipedia.org/wiki/List_of_compilers#Perl_Compilers
+
+RPERL.ORG
+    Book of RPerl tome graphic
+    Roadie Roadrunner, add eye circle to website
+    shiny
+
+RPERL COMMAND-LINE FRONT-END
+    --noWarnings option does not suppress WEXRP00, `export PERL_WARNINGS=0` does
+    CORRELATION #rp140: `rperl ./some_program.pl` fails to run binary executable after compile, when PATH does not include '.'
+
+UNSIGNED INTEGER FIX
+    full boolean support via Boolean.cpp/h, rperltypes.pm, SvBOKp(), etc.
+    char type-testing subroutines in Character.pm
+    full character support via Character.cpp/h, rperltypes.pm, SvCOKp(), etc.
+    full nonsigned_integer support via NonsignedInteger.cpp/h, rperltypes.pm, SvUIOKp(), etc.
+    CPPOPS_CPPTYPES conversion routines
+
+TESTS 
+    DatabaseMongoDB: errors, additional test cases
+    create EXECUTE_WARNING & PARSE_WARNING & GENERATE_WARNING for t/*, begin by testing for WCOPR00 & WCOPR01 in RPerl/Test/SubroutineArguments/*_10_*
+    split author (developer) tests from normal user tests
+    TypeConversion, all 42 normal conversions plus to_string()
+    add EXECUTE_SUCCESS to *good*.pl
+    uncompile w/ corrupted or missing PMC, CPP, H files
+    RPerl::EPSILON()
+    array size declaration compensation
+    package/subroutine/method names starting w/ underscore
+    variable redeclaration (masking)
+    properties & hash type-inner type-vs-key name mismatch (ECOGEASRP021: PERLOPS Class.pm properties accessors/mutators; CPPOPS entry & entrytyped)
+    accessors/mutators including get_*_element() & get_*_value()
+    subclasses Foo_raw type
+    $properties & VariableDeclaration array size on non-arrayref type
+    $properties array size PERLOPS_PERLTYPES generation
+    variable & retrieval type mismatches, etc (including ECOGEASCP030?)
+    get_raw() & set_raw()
+    t/13_compile_execute.t (?) for proper functionality
+    *_arrayref_arrayref_arrayref
+    while (my FOO)
+    <$FILEHANDLE>
+    @ARGV
+    %ENV
+    ERROR ECOGEASRP016... named operator [SOMEOP] requires exactly one argument, dying
+    ERROR ECOGEASRP017... named operator [SOMEOP] requires one or more arguments, dying
+    all currently-implemented named ops
+    all currently-implemented named_unary ops
+    invalid hash key starting with non-lowercase-letter ECOGEASRP023
+    invalid OO property name (hash key) starting with non-lowercase-letter ECOGEASRP024
+    invalid type inner redundant name starting with non-lowercase-letter ECOGEASRP025
+    CONSTANT_CALL_SCOPED
+    *_to_*() data type conversion functions
+    text literals, backslash vs double-backslash
+    string_to_NUMERIC*() (AKA all string conversion subroutines), test that underscores are accepted in numbers & non-numerics are rejected, in the following files:
+       String.pm, String.cpp, GMPInteger.pm, GMPInteger.cpp
+    fix RPerl/Test/ScopeTypeNameValue/program_5*_good.pl.DISABLED_PERL_V5_22
+    fix RPerl/Test/Expression/program_*_good.pl.DISABLED_NEED_FIX
+    fix lib/RPerl/Test/OperatorVoid01NamedVoidReturn/*.DISABLED_NEED_FIX
+    	https://github.com/wbraswell/rperl/issues/25
+    t/04 t/05 t/06 directly test *_CHECKTRACE() and *_CHECK() 
+
+KICKSTARTER
+    determine remaining items
+        10 builtins?
+        1 New Benchmark Application?
+        Finish All CPPOPS_CPPTYPES Code Generation?
+
+PARALLEL
+    manual loop test
+    automate
+
+QUALITY ASSURANCE
+    Fix CPAN Testers Bugs
+    cpants
+    kwalitee
+    Devel::Cover
+    Devel::Cover::Report::Coveralls
+    coveralls.io
+
+MEDIUM-MAGIC
+    start GrammarMedium.pm
+    start TestMedium/
+    start 30_parse_medium.t
+    pack "f*"
+    unpack same as above
+    sysopen
+    sysread
+    syswrite
+
+STDPERL
+    merge sort
+    quick sort
+
+MATHPERL
+    log_base_x
+    tan, cot, sec, csc
+    Math::Trig support
+    Math::Complex support
+    fractal, hsv coloring
+
+PHYSICSPERL
+    n_body, add command-line option for SystemGasGiants.pm & SystemSSEGasGiants.pm
+    n_body, optimize graphics speed
+
+WEB BACK-END
+    asm.js and/or webassembly backend
+
+INSTALL NOTES
+    update to use installed dirs, ~/perl5/lib/perl5 for local::lib
+
+DEV NOTES
+    warning & error codes
+        general code legend
+        specific codes
+    perlall
+
+WINDOWS
+    Makefile.PL, replace pm_to_blib() with usage of File::Temp, do not modify files under lib/ or blib/lib or t/ etc.
+    gmp in windows
+    pass tests on vc2013
+    pass tests on appveyor activperl
+    pass tests on activestate activeperl
+    Appveyor  http://blogs.perl.org/users/eserte/2016/04/testing-with-appveyor.html
+    fix EU::MM + GNU make, missing slash; test building all of Perl & RPerl using gmake, CORRELATION #rp200
+        gmake: No rule to make target 'C:\...\libConfig.pm', needed by 'Makefile'.  Stop.
+        http://www.perlmonks.org/bare/?node_id=843384
+        https://rt.cpan.org/Public/Bug/Display.html?id=21129
+        http://stackoverflow.com/questions/9454961/extutilsmakemaker-and-supported-make-programs-on-windows
+
+MOBILEPERL
+    Android   http://blogs.perl.org/users/flavio_s_glock/2016/04/android-app-with-perl5-to-java-compiler.html
+
+MACINTOSH
+    TEMP DISABLE Failed test 'Inline::CPP, call Airplane methods, return correct value 1' at t/03_inline_cpp.t line 146.   '' doesn't match '/Object\ \(0x\w*\)/'
+    unknown warning option '-Wno-literal-suffix'; did you mean '-Wno-literal-range'? [-Wunknown-warning-option]
+    duplicate 'extern' declaration specifier [-Wduplicate-decl-specifier] XS_EXTERNAL(boot_eval_412_3a53); /* prototype to pass -Wmissing-prototypes */
+        /System/Library/Perl/5.18/darwin-thread-multi-2level/CORE/XSUB.h:145:33: note: expanded from macro 'XS_EXTERNAL'
+        #      define XS_EXTERNAL(name) extern "C" XSPROTO(name)
+
+OPENBENCHMARKS.ORG
+    shiny
+    content
+
+AUTOPARALLEL.COM
+    shiny
+    content
+
+PARALLELAPPSTORE.COM
+    shiny
+    content
+
+DATA TYPES & STRUCTURES
+    enable subroutine argument type-checking of user-defined Class types, see "NEED UPGRADE" in Class.pm create_symtab_entries_and_accessors_mutators()
+    disable use of 'constant_FOO' data types?  currently converted in RPerl::Generator::type_convert_perl_to_cpp(), possible 'const const' conflict in RPerl::CompileUnit::Constant
+    sort hash keys when generating string output in *hashref_to_string() CPPOPS Hash.cpp, as is done with 'sort keys' in PERLOPS Hash/Subtypes.pm
+    determine if 'long long' or 'long double' can be used at all???
+        DEV NOTE, CORRELATION #rp041: GMP does not support 'long long' or 'long double', will cause t/07_type_gmp.t to fail
+    scalar, scalar_arrayref, scalar_hashref, scalar_*
+    implement 3-D arrays & hashes
+    implement *OPS_*TYPES *_arrayref_arrayref_to_string()
+    implement *OPS_*TYPES boolean_arrayref_to_string(), nonsigned_integer_arrayref_to_string(), gmp_integer_arrayref_to_string(), character_arrayref_to_string()
+    implement CPPOPS_*TYPES *arrayref_to_string()
+    enable semi-dynamic auto-config of number format code for printf & friends in CPPOPS modes, replace %f by %"NUMBER"
+    add remaining generic overloaded type conversion subroutines to_boolean(), to_integer(), to_nonsigned_integer(), to_gmp_integer(), to_character() in rperltypes.*
+    enable config of RPerl::NUMBER_EPSILON in RPerl/Config.pm to use either POSIX::FLT_EPSILON() or POSIX::DBL_EPSILON() http://perldoc.perl.org/POSIX.html#FLOAT
+    PERLOPS_CPPTYPES conversion routines
+    boolean_arrayref, nonsigned_integer_arrayref, character_arrayref
+    boolean_hashref, nonsigned_integer_hashref, character_hashref
+    gmp_integer_arrayref, gmp_integer_hashref
+    sse_number_pair_arrayref, sse_number_pair_hashref
+    enable looks_like_number() in *OPS_*TYPES (AKA all modes)
+        use in string_to_NUMERIC*() (AKA all string conversion subroutines) to reject non-numeric characters with RPerl error instead of Perl error
+        http://perldoc.perl.org/perlapi.html#looks_like_number
+    export ::*_*ref_to_*() conversion subroutines the same as ::*_to_*() subs in perltypesconv.pm, remove leading scopes in all calls
+    remove all object* types
+    add arrayref::grow_capacity() as safe version of std::vector::resize()
+    Dumper() in C++, use as default overload for <<
+    implement remaining *_arrayref_arrayref_CHECK*() in lib/DataStructure/Array/SubTypes.cpp
+    pre-declare RPerl::DataTypes and RPerl::DataStructures, as discussed in RPerl/DataStructure/Array.pm $properties, so this works: 'use RPerl::DataStructure::Array;'
+    constant hashrefs and arrayrefs, via "use constant" pragma OR ":const" Perl internals attribute OR "constant_integer_hashref" data types
+        :const supported in cperl only at this time
+            add a sub integer::MODIFY_SCALAR_ATTRIBUTE, which handles :const
+            `my integer $i :const = 1;`
+            http://perldoc.perl.org/attributes.html
+            integer class need only to accept or reject attributes. new() is not needed, neither @ISA
+            the stash must exists. I do %int::; that creates the stash, so its valid syntax
+            for :const I added the MODIFY_SCALAR_ATTRIBUTE function (into xsutils.c?)
+            also MODIFY_HASH_ATTRIBUTE and so on, for every reftype, _ARRAY_, _CODE_, …
+
+VARIABLES
+    allow block-scoped variables; currently supported for unique variable names, triggers false error ECOGEASCP012 "already declared in this scope" for non-unique variable names in the same subroutine
+
+PERL::CRITIC BUGS
+    Eclipse EPIC Integration, Silent Failure    https://github.com/Perl-Critic/Perl-Critic/issues/582
+    ProhibitMagicNumbers False Positive    https://github.com/Perl-Critic/Perl-Critic/issues/631
+    Subroutines::RequireFinalReturn False Positive On Typed Loop Iterator    https://github.com/Perl-Critic/Perl-Critic/issues/636
+    ControlStructures::ProhibitPostfixControls False Positives on Typed Loop Iterator    https://github.com/Perl-Critic/Perl-Critic/issues/639
+    Argument "-" isn't numeric in exponentiation (**) at .../PPI/Token/Number/Exp.pm line 55    https://github.com/Perl-Critic/Perl-Critic/issues/665
+    InputOutput::RequireCheckedSyscalls False Positive On Typed Loop Iterator Without Final Newline    https://github.com/Perl-Critic/Perl-Critic/issues/671
+    Perl::Critic::Policy::Subroutines::ProtectPrivateSubs, false trigger on 'my Foo::Bar::_MyClass $foo;', presumably thinks _MyClass is a private sub
+
+INLINE::CPP BUGS
+    remove all usage of double-underscore in identifiers, including auto-generated class names where '::' is replaced by '__'
+    file bug, I::CPP comments, 7 lines okay, 8 lines broken
+    file bug, I::CPP std::array
+    file bug, I::CPP when attempting to return object type, CORRELATION #pp04
+        In function ‘void XS_PhysicsPerl__Astro__System_get_bodies_element(PerlInterpreter*, CV*)’: ... 
+        error: ‘CLASS’ was not declared in this scope ... sv_setref_pv( ST(0), CLASS, (void*)RETVAL );
+        hand-patched code below allows one-time use, then segfault
+        vi build/eval_637_3400/eval_637_3400.c
+        char *  CLASS = (char *)"PhysicsPerl::Astro::Body"
+        chmod a-w build/eval_637_3400/eval_637_3400.c
+    
+PERLOPS_PERLTYPES
+    build each class' properties_inherited() once at compile time in Class::INIT{}, will optimize runtime performance
+    C++ subclasses using AV* instead of std::vector, etc?
+    add symtab building and checking
+    real SSE support (faster, not slower)
+
+ERROR CODES
+    RPerl::CompileUnit::Module::Class (global base class) needs error codes added for all croak() or die() statements
+    fix all mis-matching *RPxx vs *CPxx error codes, compare all numeric error codes to ensure RPerl matches C++
+    sort all error codes according to dev_notes.txt code ranges
+
+GRAMMAR
+    allow comments with 3 or more chained octothorpe characters ### like this comment
+    undef values, either remove from all possible locations in grammar for C++ compatibility, OR enable in C++ by special strings, numeric values, etc.
+    fix 'x' string repeat operator vs 'x' string or bareword hash key, already fixed???
+    add WORD_LPAREN & WORD_SCOPED_LPAREN to become WordScopedLParen, and friends, to disallow space between subroutine name and parens in subroutine call
+        update Learning RPerl section 4.2.1 & lib/RPerl/Test/Subroutine/program_* accordingly
+    should VARIABLE_SYMBOL be allowing scoped variable identifiers, since these are not currently supported by the compiler?
+
+COMPILER
+    uncompile, store list of compiled dependencies inside compiled files themselves, for optional use during uncompile
+    figure out <> vs "" and also long-path-deps in includes in Bubble.cpp & Bubble.h
+    compile Foo.pm
+    add mutators pass-by-reference for scalars?  see SystemRenderer2D::show()
+ 
+INTERPRETER
+    Class.pm, remove auto-export of subroutines from their package's namespace into main:: namespace?
+    RPerl::filter()
+        update to properly handle *.pl files
+        collapse newline characters from all added code to avoid artificially increasing line numbers in error messages, `rperl -t lib/RPerl/Test/Properties/Class_00_Bad_09.pm`

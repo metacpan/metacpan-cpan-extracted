@@ -1,5 +1,9 @@
 Revision history for Log-Abstraction
 
+0.08	Mon May  5 11:39:58 EDT 2025
+	Use Config::Abstraction instead of Config::Auto
+	Guess the value if script_name if it's not given
+
 0.07	Mon Mar 24 08:36:01 EDT 2025
 	Handle "Socket operation on non-socket" on Solaris
 	Calling new on an object now returns a clone rather than setting the defaults in the new object

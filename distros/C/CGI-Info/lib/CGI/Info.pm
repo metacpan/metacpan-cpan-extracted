@@ -33,11 +33,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =cut
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 
@@ -90,12 +90,30 @@ It takes other optional parameters:
 Enable/disable the AUTOLOAD feature.
 The default is to have it enabled.
 
+=item * C<config_dirs>
+
+Where to look for C<config_file>
+
 =item * C<config_file>
 
 Points to a configuration file which contains the parameters to C<new()>.
 The file can be in any common format,
 including C<YAML>, C<XML>, and C<INI>.
 This allows the parameters to be set at run time.
+
+On non-Windows system,
+the class can be configured using environment variables starting with "CGI::Info::".
+For example:
+
+  export CGI::Info::max_upload_size=65536
+
+It doesn't work on Windows because of the case-insensitive nature of that system.
+
+If the configuration file has a section called C<CGI::Info>,
+only that section,
+and the C<global> section,
+if any exists,
+is used.
 
 =item * C<syslog>
 
@@ -126,7 +144,7 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my $params = Params::Get::get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, @_) || {};
 
 	if(!defined($class)) {
 		if((scalar keys %{$params}) > 0) {
@@ -138,19 +156,45 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		if($params) {
-			return bless { %{$class}, %{$params} }, ref($class);
-		}
-		return bless $class, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($params->{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $params->{'config_file'}, env_prefix => "${class}::")->all())) {
+	if(exists($params->{'config_file'})) {
 		# my $config = YAML::XS::LoadFile($params->{'config_file'});
-		if($config->{$class}) {
-			$config = $config->{$class};
+		if((!exists $params->{'config_dirs'}) && (!-r $params->{'config_file'})) {
+			croak("$class: ", $params->{'config_file'}, ': File not readable');
 		}
-		$params = { %{$config}, %{$params} };
+		# Try hard to find the config files
+		# TODO: Config::Abstraction 0.17 has this built in
+		my $config_dirs = $params->{'config_dirs'};
+		if(!$config_dirs) {
+			if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
+				$config_dirs = [''];
+			} else {
+				my $dir = File::Spec->catdir($ENV{'HOME'}, '.conf');
+				if(-d $dir) {
+					$config_dirs = [$dir];
+				} else {
+					# TODO: Apache dirs, /etc, /usr/local/etc, etc
+					$config_dirs = [''];
+				}
+			}
+		}
+
+		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+			$config = $config->all();
+			if($config->{'global'}) {
+				$params = { %{$config->{'global'}}, %{$params} };
+				delete $config->{'global'};
+			}
+			if($config->{$class}) {
+				$config = $config->{$class};
+			}
+			$params = { %{$config}, %{$params} };
+		} else {
+			croak("$class: Can't load configuration from ", $params->{'config_file'});
+		}
 	}
 
 	if(defined($params->{'expect'})) {
@@ -158,7 +202,7 @@ sub new
 			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak(__PACKAGE__, ': expect has been deprecated, use allow instead');
+		Carp::croak("$class: expect has been deprecated, use allow instead");
 	}
 
 	if(my $logger = $params->{'logger'}) {
@@ -205,6 +249,10 @@ sub script_name
 
 sub _find_paths {
 	my $self = shift;
+
+	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
+		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
+	}
 
 	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 

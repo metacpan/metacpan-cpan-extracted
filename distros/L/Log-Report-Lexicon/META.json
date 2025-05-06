@@ -41,7 +41,7 @@
             "File::Temp" : "0",
             "IO::File" : "0",
             "List::Util" : "0",
-            "Log::Report" : "1.22",
+            "Log::Report" : "1.4",
             "POSIX" : "0",
             "Pod::Usage" : "0",
             "Scalar::Util" : "0",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/markov2/perl5-Log-Report-Lexicon"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

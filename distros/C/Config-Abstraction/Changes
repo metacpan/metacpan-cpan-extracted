@@ -1,5 +1,8 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.17	Mon May  5 07:45:21 EDT 2025
+	Try harder to find the files
+
 0.16	Thu May  1 07:25:25 EDT 2025
 	Handle mixed case environments a bit better
 

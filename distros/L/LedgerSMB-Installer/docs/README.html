@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Documentation - ledgersmb-installer</title>
+    <style>
+      .todo {
+          color: red;
+      }
+      code {
+          background-color: #e0e0e0;
+          font-family: Monaco, monospace;
+          line-height: 1em;
+      }
+      code.block {
+          display: block;
+          margin: 0 20px;
+          padding: 1em;
+      }
+      body {
+          border-left: 1px solid darkgrey;
+          border-right: 1px solid darkgrey;
+          font-family: sans-serif;
+          line-height: 1.7em;
+          margin: 0 auto;
+          min-width: 80 ex;
+          padding: 2em 2em 6em 2em;
+          width: 100ex;
+      }
+      dl {
+          margin-left: 40px;
+      }
+      dt:first-child {
+          margin-top: initial;
+      }
+      dt {
+          font-weight: bold;
+          margin-top: 0.5em;
+      }
+      dt.default {
+          font-style: italic;
+          text-decoration: underline;
+      }
+      h1 {
+          border-bottom: 2px solid black;
+      }
+      h2 {
+          border-bottom: 2px solid lightgrey;
+      }
+      ul ul, ul ol, ol ul, ol ol {
+          padding-left: 1em;
+      }
+      ol ol {
+          list-style-type: lower-latin;
+      }
+      ul ul {
+          list-style-type: square;
+      }
+      ol ul {
+          list-style-type: disc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Documentation - ledgersmb-installer</h1>
+
+
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#quickstart">Quickstart</a></li>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#download">Download</a></li>
+      <li><a href="#commands">Commands</a></li>
+      <li><a href="#options">Options</a></li>
+      <li><a href="#bugs">Bugs and questions</a></li>
+      <li><a href="#contributing">Contributing</a></li>
+      <li><a href="#details">Detailed description</a></li>
+    </ol>
+
+
+    <h2 id="quickstart">Quickstart</h2>
+    <p>To install the latest LedgerSMB release with all the default options, run:</p>
+    <code class="block">
+      $ curl -s -o ledgersmb-installer -L https://get.ledgersmb.org/ledgersmb-installer <br />
+      $ chmod +x ledgersmb-installer <br />
+      $ ./ledgersmb-installer install
+    </code>
+    <p>You'll want to add a version number at the end to install a specific version; e.g., to
+      install 1.12.1:</p>
+    <code class="block">
+      $ ./ledgersmb-installer install 1.12.1
+    </code>
+
+
+    <h2 id="overview">Overview</h2>
+    <p>
+      The installer supports installation of LedgerSMB on a wide range of
+      operating systems and platforms. When the installer is allowed to
+      install packages through the system package manager, it will do so
+      to satisfy missing dependencies. The package managers of the following
+      systems are supported at the moment:</p>
+    <ul>
+      <li>Debian (apt) and its derivatives</li>
+      <li>Fedora (dnf) and its derivatives</li>
+    </ul>
+    <p>
+      Perl dependencies which
+      can't be installed from the system's package repository will be installed
+      from <a href="https://www.cpan.org/">CPAN</a>. This means that installation
+      on a system with an unrecognized package manager, <em>all</em> modules will be
+      installed from CPAN. OpenSUSE was used to test that the installer works on
+      platforms without a supported package manager.
+    </p>
+
+
+    <h2 id="download">Installer download</h2>
+    <p>Download the installer and make it executable using these commands:</p>
+    <code class="block">
+      $ curl -s -o ledgersmb-installer -L https://get.ledgersmb.org/ledgersmb-installer <br />
+      $ chmod +x ledgersmb-installer
+    </code>
+    <p>Or, download the content of https://get.ledgersmb.org/ledgersmb-installer using your
+      favorite browser.</p>
+
+
+    <h2 id="commands">Commands</h2>
+    <dl>
+      <dt><code>ledgersmb-installer install [options] &lt;version&gt;</code></dt>
+      <dd>Installs the indicated LedgerSMB version, or the latest release if no
+        version was specified, building on the host
+        operating system provided packages -- when on a supported platforms.</dd>
+
+      <dt><code>ledgersmb-installer help</code></dt>
+      <dd>Shows a short help message and the installer version.</dd>
+
+      <dt><code>ledgersmb-installer compute [options] &lt;version&gt;</code></dt>
+      <dd>Computes the mapping of Perl module dependencies to their
+        distribution package equivalents for the version specified. When
+        no version is given, the latest release is used.</dd>
+
+<!--      <dt>download</dt>
+      <dd>Downloads the indicated LedgerSMB tarball and signature, verifying
+        the signature after download.</dd>-->
+
+      <dt><code>ledgersmb-installer system-id [options]</code></dt>
+      <dd>Prints the identifier of the system. This identifier is used to name
+        the file containing the mapping of the Perl modules to the system packages.</dd>
+
+    </dl>
+
+
+    <h2 id="options">Options</h2>
+
+
+    <h3>General</h3>
+    <p>Options applicable to all commands.</p>
+    <dl>
+      <dt><code>--log-level=&lt;level&gt;</code></dt>
+      <dd>Default value: <code>info</code><br />
+        Available values (in increasing verbosity): <code>fatal</code>,
+        <code>error</code>, <code>warning</code>, <code>info</code>,
+        <code>debug</code> and <code>trace</code></dd>
+
+      <dt><code>--[no-]prepare-env</code></dt>
+      <dd>Default value: (ask)<br />
+        Enables installation of system tools required for installation of Perl packages,
+        such as <code>make</code> and <code>gcc</code>. Additional dependencies may
+        apply based on <code>--compute-packages</code>. Installed dependencies are removed
+        after installation. This may be prevented using <code>--no-uninstall-env</code></dd>
+
+      <dt><code>--target=&lt;path&gt;</code></dt>
+      <dd>Default value: <code>./ledgersmb/</code><br />
+        The path to use to unpack the release tarball; used with the
+        <code>install</code> <em>and</em> <code>compute</code> commands</dd>
+
+      <dt class="todo"><code>--[no-]verify-sig</code></dt>
+      <dd>Default value: <code>--no-verify-sig</code><br />
+        Use <code>gpg</code> to verify the release signature of the downloaded tarball</dd>
+
+      <dt><code>--[no-]uninstall-env</code></dt>
+      <dd>Default value: <code>--uninstall-env</code><br />
+        Uninstalls packages that were installed to prepare the environment for computation
+        of the "Perl distribution to system package" mapping and the installation of
+        Perl distributions from CPAN.</dd>
+
+      <dt><code>--yes</code></dt>
+      <dd>Automatically answer &quot;yes&quot; to installer questions, allowing
+        non-interactive use. (Shorthand: <code>-y</code>)</dd>
+    </dl>
+
+
+    <h3 id="compute-options">compute</h3>
+    <p>There are no options specific to this command.</p>
+
+
+    <h3 id="install-options">install</h3>
+    <dl>
+      <dt><code>--yes</code></dt>
+      <dd>Automatically answers 'yes' to any yes/no questions the installer may ask the user.
+        Especially practical for automation purposes.</dd>
+
+      <dt class="todo"><code>--[no-]compute-packages</code></dt>
+      <dd>Default value: <code>--compute-packages</code><br />
+        Enables computing the mapping of Perl dependencies to system packages, if no
+        mapping could be downloaded from the precomputed repository. This behaviour is
+        only supported when a supported package manager could be detected.</dd>
+
+      <dt><code>--local-lib=&lt;path&gt;</code></dt>
+      <dd>Default value: <code>local</code><br />
+        The location to install modules from CPAN;
+        relative values are expanded relative to the <code>target</code> path.</dd>
+
+      <dt><code>--[no-]system-packages</code></dt>
+      <dd>Default value: <code>--system-packages</code> if running as a user with package
+        installation rights (usually <code>root</code>).</dd>
+
+      <dt>
+    </dl>
+
+
+    <h3 id="system-id-options">system-id</h3>
+    <p>There are no options specific to this command.</p>
+
+
+    <h2 id="bugs">Bugs and general discussion</h2>
+    <p>The project is hosted on GitHub, as part of the <a href="https://github.com/ledgersmb">
+        LedgerSMB organization</a>. Please file any bugs you run into <a href="https://github.com/ledgersmb/ledgersmb-installer/issues/new?template=bug_report.md">
+        using the provided template</a>.
+    </p>
+    <p>For improvement ideas, general questions and other conversations, please use
+      <a href="https://github.com/ledgersmb/ledgersmb-installer/discussions">GitHub Discussions</a>.</p>
+
+
+    <h2 id="contributing">Contributing</h2>
+    <p>Contributions take many forms: reporting bugs, helping other users with their installation problems,
+      describing enhancement ideas and finally, submitting code changes. All of these contributions are
+      equally valued.
+    </p>
+    <p>If you want to add support for your favorate platform, please check out <a href="https://github.com/ledgersmb/ledgersmb-installer/blob/main/lib/LedgerSMB/Installer/OS/linux/debian.pm">
+        Debian support</a> which provides a great example to get started.
+    </p>
+
+
+    <h2 id="details">Detailed description</h2>
+    <p>The installer prepares a system for running LedgerSMB. This includes:</p>
+    <ol>
+      <li>Installation of
+        <ul>
+          <li>PostgreSQL client library (libpq)</li>
+          <li>LaTeX and XeTeX</li>
+          <li>XML parsers (libxml2 <em>and</em> libexpat)</li>
+        </ul>
+      </li>
+      <li>Download and installation of LedgerSMB</li>
+      <li>Download and installation of Perl modules from
+        <ol>
+          <li>the operating system package repositories (when possible)</li>
+          <li>CPAN as the fallback</li>
+        </ol>
+      </li>
+      <li class="todo" title="To be done">Install system start-up configuration</li>
+    </ol>
+    <p>In case the installed system Perl isn't new enough for the LedgerSMB version
+      being installed, the installer can be instructed to compile and install a suitable
+      Perl version using Perlbrew.
+    </p>
+    <p>Installation of the system dependencies listed in step (1) requires support for
+      the specific operating system or (linux) distribution. Current support is available
+      <em>Debian</em> and <em>Fedora</em> and their derivatives (e.g., Ubuntu, Mint and RedHat).
+      Installation on other platforms requires the dependencies to be available beforehand. If
+      this condition is met, the process should succeed. Otherwise, the lacking dependencies
+      will be reported as missing and the installation will be undone.
+    </p>
+
+    <h3 id="dependency-installation">Dependency installation</h3>
+    <p>Modules that are not available as system packages will be
+      installed from <a href="https://metacpan.org">CPAN</a> distributions.
+      Platforms without package manager support (including non-system Perl
+      installations) will install <em>all</em> dependencies from CPAN. This
+      process depends on developer tools being available. On supported platforms
+      the installer will temporarily add these tools (and remove them after the
+      installation completes).</p>
+    <p>Some dependencies (most notably libpq [PostgreSQL client library])
+      cannot be installed by the installer on systems without package manager support.
+      In such cases, the dependencies must exist on the system before starting
+      installation. The same applies to the <code>latex</code> dependency; without it,
+      it's impossible to install the <code>LaTeX::Driver</code> module from CPAN.</p>
+
+  </body>
+</html>

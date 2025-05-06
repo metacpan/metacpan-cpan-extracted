@@ -1,0 +1,162 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Date {
+  version_from Mojo;
+  
+  use Time::Local;
+  use Sys;
+  
+  has epoch : rw long;
+  
+  # Class Variables
+  our $DAYS : string[];
+  INIT { $DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; }
+  
+  our $MONTHS : string[];
+  INIT { $MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; }
+  
+  our $MONTHS_H : Hash;
+  INIT {
+    $MONTHS_H = Hash->new;
+    
+    for (my $i = 0; $i < 12; $i++) {
+      $MONTHS_H->set("$i", $MONTHS->[$i]);
+    }
+  }
+  
+  # Class Methods
+  static method new : Mojo::Date ($date : string = undef) {
+    
+    my $self = new Mojo::Date;
+    
+    if ($date) {
+      $self->parse($date);
+    }
+    
+    return $self;
+  }
+  
+  static method new_from_epoch : Mojo::Date ($epoch : long) {
+    
+    my $self = new Mojo::Date;
+    
+    unless ($epoch >= 0) {
+      die "The epoch \$epoch must be a non-negative value.";
+    }
+    
+    $self->{epoch} = $epoch;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method parse : void ($date : string) {
+    
+    unless ($date) {
+      die "The HTTP date \$date must be defined.";
+    }
+    
+    my $rfc3339_re_pattern = ["^(\d+)-(\d+)-(\d+)\D+(\d+):(\d+):(\d+(?:\.\d+)?)(?:Z|([+-])(\d+):(\d+))?$", "i"];
+    
+    # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
+    # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
+    my $offset = 0;
+    my $day = 0;
+    my $month = 0;
+    my $year = 0;
+    my $h = 0;
+    my $m = 0;
+    my $s = 0;
+    
+    if (my $match = Re->m($date, "^\w+\W+(\d+)\W+(\w+)\W+(\d+)\W+(\d+):(\d+):(\d+)\W*\w+$")) {
+      $day = (int)$match->cap1;
+      $month = (int)$MONTHS_H->get_string($match->cap2);
+      $year = (int)$match->cap3;
+      $h = (int)$match->cap4;
+      $m = (int)$match->cap5;
+      $s = (int)$match->cap6;
+    }
+    # RFC 3339 (1994-11-06T08:49:37Z)
+    elsif (my $macth = Re->m($date, $rfc3339_re_pattern)) {
+      $year = (int)$match->cap1;
+      $month = (int)$match->cap2 - 1;
+      $day = (int)$match->cap3;
+      $h = (int)$match->cap4;
+      $m = (int)$match->cap5;
+      $s = (int)$match->cap6;
+      
+      if (length $match->cap7) {
+        $offset = (((int)$match->cap8 * 3600) + ((int)$match->cap9 * 60));
+        
+        if ($match->cap7 eq "+") {
+          $offset *= -1;
+        }
+      }
+    }
+    # ANSI C asctime() (Sun Nov  6 08:49:37 1994)
+    elsif (Re->m($date, "^\w+\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+(\d+)$")) {
+      $month = (int)$MONTHS_H->get_string($match->cap1);
+      $day = (int)$match->cap2;
+      $h = (int)$match->cap3;
+      $m = (int)$match->cap4;
+      $s = (int)$match->cap5;
+      $year = (int)$match->cap6;
+    }
+    # Invalid
+    else {
+      die "Invalid HTTP date format";
+    }
+    
+    my $tm = Sys::Time::Tm->new;
+    $tm->set_tm_year($year);
+    $tm->set_tm_mon($month);
+    $tm->set_tm_mday($day);
+    $tm->set_tm_hour($h);
+    $tm->set_tm_min($m);
+    $tm->set_tm_sec($s);
+    
+    my $epoch = 0L;
+    eval { $epoch = Time::Local->timegm($tm); }
+    
+    if ($@) {
+      die "The HTTP date is invalid epoch time.";
+    }
+    
+    $epoch += $offset;
+    
+    unless ($epoch >= 0) {
+      die "The HTTP date is invalid epoch time and offset.";
+    }
+    
+    $self->{epoch} = $epoch;
+  }
+  
+  method to_datetime : string () {
+    
+    my $epoch = $self->{epoch};
+    
+    # RFC 3339 (1994-11-06T08:49:37Z)
+    my $tm = Sys->gmtime($epoch);
+    my $string = Fn->sprintf("%04d-%02d-%02dT%02d:%02d:%02d", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
+    
+    if (my $match = Re->m($epoch, "(\.\d+)$")) {
+      $string .= $match->cap1;
+    }
+    
+    $string .= "Z";
+    
+    return $string;
+  }
+  
+  method to_string : string () {
+    
+    my $epoch = $self->{epoch};
+    
+    # RFC 7231 (Sun, 06 Nov 1994 08:49:37 GMT)
+    my $tm = Sys->gmtime($epoch);
+    my $string = Fn->sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", [(object)$DAYS->[$tm->tm_wday], $tm->tm_mday, $MONTHS->[$tm->tm_mon], $tm->tm_year + 1900,  $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
+    
+    return $string;
+  }
+}

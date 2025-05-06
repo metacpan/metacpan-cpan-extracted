@@ -1,5 +1,5 @@
 ---
-abstract: 'Tk::IconList like mega widget.'
+abstract: 'Tk::IconList inspired chameleon list box.'
 author:
   - 'Hans Jeuken <hanje at cpan dot org>'
 build_requires:
@@ -24,5 +24,5 @@ requires:
 resources:
   bugtracker: https://github.com/haje61/Tk-ListBrowser/issues
   repository: git://github.com/haje61/Tk-ListBrowser.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

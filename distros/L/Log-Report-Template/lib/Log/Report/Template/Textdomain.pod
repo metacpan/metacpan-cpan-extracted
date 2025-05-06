@@ -13,7 +13,7 @@ Log::Report::Template::Textdomain - template translation with one domain
 =head1 SYNOPSIS
 
  my $templater = Log::Report::Template->new(...);
- my $domain    = $templater->newTextdomain(%options);
+ my $domain    = $templater->addTextdomain(%options);
 
 =head1 DESCRIPTION
 
@@ -37,6 +37,7 @@ Extends L<"Constructors" in Log::Report::Domain|Log::Report::Domain/"Constructor
   lexicon                                             undef
   name                  Log::Report::Minimal::Domain  <required>
   only_in_directory                                   undef
+  templater                                           <required>
   translation_function                                'loc'
 
 =over 2
@@ -50,6 +51,8 @@ Extends L<"Constructors" in Log::Report::Domain|Log::Report::Domain/"Constructor
 The textdomain can only be used in the indicated directories: if found
 anywhere else, it's an error.  When not specified, the function is
 allowed everywhere.
+
+=item templater => L<Log::Report::Template|Log::Report::Template>-object
 
 =item translation_function => STRING
 
@@ -92,6 +95,8 @@ Returns the name of the function which is used for translations.
 
 Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
 
+=item $obj-E<gt>B<lang>()
+
 =item $obj-E<gt>B<lexicon>()
 
 Directory where the translation tables are kept.
@@ -113,6 +118,8 @@ Inherited, see L<Log::Report::Domain/"Attributes">
 =item $obj-E<gt>B<setContext>(STRING|HASH|ARRAY|PAIRS)
 
 Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<templater>()
 
 =item $obj-E<gt>B<translator>()
 
@@ -144,12 +151,14 @@ Inherited, see L<Log::Report::Domain/"Action">
 
 =over 4
 
+=item $obj-E<gt>B<translateTo>($lang)
+
 =item $obj-E<gt>B<translationFunction>()
 
 This method returns a CODE which is able to handle a call for
 translation by Template Toolkit.
 
-=encoding utf-8
+=encoding UTF-8
 
 =back
 
@@ -159,12 +168,12 @@ Extends L<"DETAILS" in Log::Report::Domain|Log::Report::Domain/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 0.13,
-built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template distribution version 1.00,
+built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2017-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

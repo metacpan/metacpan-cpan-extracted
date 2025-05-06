@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Extract;{
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 }
 
 
@@ -122,8 +122,10 @@ sub showStats(;$)
 }
 
 
-sub write(;$)
-{   my ($self, $domain) = @_;
+sub write(;$%)
+{   my $self = shift;
+	my ($domain, %args) = @_ % 2 ? @_ : (undef, @_);
+
     unless(defined $domain)  # write all
     {   $self->write($_) for $self->domains;
         return;
@@ -134,7 +136,7 @@ sub write(;$)
 
     for my $pot (@$pots)
     {   $pot->updated;
-        $pot->write;
+        $pot->write(%args);
     }
 
     $self;
@@ -210,7 +212,6 @@ sub store($$$$;$)
     MSGCTXT:
         foreach my $msgctxt (@$msgctxts)
         {
-#warn "($stripped, $msgctxt)";
             if(my $po = $pot->msgid($stripped, $msgctxt))
             {   $po->addReferences( ["$fn:$linenr"]);
                 $po->plural($plural) if $plural;

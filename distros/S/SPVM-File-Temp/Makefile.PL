@@ -49,7 +49,7 @@ WriteMakefile(
     %configure_and_runtime_requires,
     'SPVM::Sys' => '0.513',
     'SPVM::File::Path' => '0.011001',
-    'SPVM::File::Spec' => '0.081003',
+    'SPVM::File::Spec' => '0.086',
     'SPVM::IO' => '0.235',
     'SPVM::Errno' => '0.07',
   },

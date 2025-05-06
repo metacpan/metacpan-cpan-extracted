@@ -3,7 +3,7 @@ package Import::Export;
 use Carp;
 use namespace::clean ();
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 our %EX;
 
@@ -75,7 +75,7 @@ Import::Export - Exporting
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

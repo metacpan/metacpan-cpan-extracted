@@ -34,7 +34,7 @@
          "requires" : {
             "SPVM" : "0.990042",
             "SPVM::File::Basename" : "0.02",
-            "SPVM::File::Spec" : "0.03",
+            "SPVM::File::Spec" : "0.086",
             "SPVM::Sys" : "0.509"
          }
       },
@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-FindBin"
       }
    },
-   "version" : "0.033",
+   "version" : "0.034",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

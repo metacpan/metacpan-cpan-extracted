@@ -1,5 +1,25 @@
 Revision history for Perl extension Crypt::OpenSSL::RSA.
 
+0.34 May 5 2025
+    - Production release.
+
+0.34_03 May 4 2025
+    - Fix bug in rsa_crypt. Need to pass NULL
+
+0.34_02 May 4 2025
+    - t/rsa.t needs to tolerate sha1 being disabled on rhel.
+
+0.34_01 May 3 2025
+    - docs - plaintext = decrypt(cyphertext)
+    - #44 - Fix issue when libz is not linked on AIX
+    - #50 - Correct openssl version may not be found
+    - #52 - Out of memory on openssl 1.1.1w hpux
+    - #47 - Update FSF address and LGPL name in LICENSE
+    - #55 - stop using AutoLoader
+    - #48 - Whirlpool is missing the header
+    - Move github repo to cpan-authors
+    - Fully support openSSL 3.x API
+
 0.33 July 7 2022
     - Update for windows github CI
     - Remove duplicit 'LICENSE' key

@@ -1,0 +1,21 @@
+bin/ledgersmb-installer
+Changes
+cpanfile
+docs/README.html
+lib/LedgerSMB/Installer/Configuration.pm
+lib/LedgerSMB/Installer/OS/linux/debian.pm
+lib/LedgerSMB/Installer/OS/linux/fedora.pm
+lib/LedgerSMB/Installer/OS/linux.pm
+lib/LedgerSMB/Installer/OS.pm
+lib/LedgerSMB/Installer/OS/unix.pm
+lib/LedgerSMB/Installer/PkgMan/APT.pm
+lib/LedgerSMB/Installer/PkgMan/dnf.pm
+lib/LedgerSMB/Installer/PkgMan/yum.pm
+lib/LedgerSMB/Installer.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00_load.t
+t/01_configuration.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

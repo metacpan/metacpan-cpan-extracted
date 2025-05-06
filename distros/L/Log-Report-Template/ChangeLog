@@ -3,6 +3,21 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 1.00: Tue  6 May 09:57:31 CEST 2025
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+	- removed extract(show_stats): they will be displayed when the
+	  Log::Report mode is DEBUG or VERBOSE.
+
+	Improvements:
+	- indentation style tab.
+	- add gitignore
+	- publish domains()
+	- add Dancer2 template plugin
+	- move Log::Report::Extract::Template from distro Log-Report-Lexicon
+	  to Log::Report::Template::Extract
+
 version 0.13: Tue Jan 23 22:26:21 CET 2018
 
 	Improvements:

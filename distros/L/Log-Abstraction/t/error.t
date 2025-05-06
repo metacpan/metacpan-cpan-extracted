@@ -8,9 +8,6 @@ BEGIN { use_ok('Log::Abstraction') }
 # Test invalid arguments to new()
 throws_ok { Log::Abstraction->new(1, 2, 3) } qr/Invalid arguments passed to new()/, 'Odd number of arguments should throw error';
 
-throws_ok { Log::Abstraction->new(syslog => { facility => 'local0' }) } qr/syslog needs to know the script name/, 'Missing script_name when syslog is provided should throw error';
-
-# Test illegal call to _log()
 my $logger = Log::Abstraction->new(logger => []);
 throws_ok { $logger->_log('info', 'Test message') } qr/Illegal Operation/, '_log() should only be called internally';
 

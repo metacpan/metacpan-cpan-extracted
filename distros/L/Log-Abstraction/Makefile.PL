@@ -19,18 +19,20 @@ WriteMakefile(
 		: ()),
 	PREREQ_PM => {
 		'Carp'	 => 0,
-		'Config::Auto' => 0,
+		'Config::Abstraction' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'Params::Get' => 0,
+		'Params::Get' => 0.04,
 		'Sys::Syslog' => 0,
-		'Scalar::Util'=> 0,
+		'Scalar::Util'=> 0
 	},
 	TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,
 		'Test::More' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
+		'File::Spec' => 0,
 		'File::Temp' => 0,
+		'YAML::XS' => 0
 	},
 	META_MERGE => {
 		resources => {

@@ -31,8 +31,10 @@ requires:
   Error::Pure: 0.16
   File::Basename: 0
   Getopt::Std: 0
+  Image::Checkerboard: 0.05
   Image::Random: 0.06
   Image::Select: 0.03
+  List::Util: 1.33
   Readonly: 0
   perl: 5.6.0
 resources:
@@ -40,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Image-Generator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Image-Generator
-version: '0.05'
+version: '0.06'

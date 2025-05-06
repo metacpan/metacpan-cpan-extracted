@@ -14,3 +14,7 @@ Revision history for JSON-Schema-Generate
 
 0.14	2025/04/29
 	- Attempt to failing tests - use is_deeply when comparing the generated schema against what is expected.
+
+0.15	2025/05/05
+	- remove PAX headers
+	- fix manifest

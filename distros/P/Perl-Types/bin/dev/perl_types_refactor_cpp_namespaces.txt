@@ -1,0 +1,28 @@
+Work plan for C++ namespace refactoring
+
+1. Load the existing hot-name map from bin/dev/perl_types_refactor_names_map.pm:
+   - Use only the 'cpp' and 'h' sections (all C++ and header-level type mappings).
+
+2. Update C++ source and header files:
+   a. Recursively scan lib/Perl/Structure for all .cpp and .h files.
+   b. For each file:
+      i.  Read its entire contents.
+      ii. For each old underscored type name (sorted longest→shortest), replace only whole-token matches
+          with the corresponding new namespace name (double-colon separated).
+      iii.If any replacements occurred, write the updated content back (optionally backing up the original).
+
+3. Update lib/typemap.perl:
+   a. Compute a typemap symbol name mapping by taking each new namespace name and replacing '::' with '__'.
+   b. Read lib/typemap.perl, and for each old underscored name, replace whole-token matches with the
+      new double-underscore symbol.
+   c. Write the modified typemap file back, preserving comments and layout.
+
+4. Verification:
+   - Rebuild the C++ components to catch any compile errors.
+   - Run the Perl test suite (e.g. dzil test) to ensure XS glue and Perl wrappers still function.
+
+Notes:
+- C++ typedefs currently use underscores because 'typedef Name may not be a nested-name-specifier'.
+  After this step, follow-up migration can convert typedef blocks into real 'namespace foo { using bar = ... }'.
+- This script only renames type identifiers; it does not restructure code or introduce namespace blocks.
+- All replacements use look-arounds to avoid partial or substrings inside longer identifiers.
