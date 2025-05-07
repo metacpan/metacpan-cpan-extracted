@@ -70,18 +70,26 @@ sub mask {
 
 sub unmask {
     my $obj = shift;
+    my @tags = map $_->[0], @{$obj->{TABLE}};
+    my %tags = map { $_ => 1 } @tags;
     # edit parameters in place
     for (@_) {
 	for my $fromto (reverse @{$obj->{TABLE}}) {
 	    my($from, $to) = @$fromto;
 	    # update the first one
-	    if (s/\Q$from/$to/) {
-		# check the rest
-		if (s/\Q$from/$to/g) {
+	    if (my $n = s/\Q$from/$to/) {
+		if ($n > 1 or not exists $tags{$from}) {
 		    warn "Masking error: \"$from\" duplicated.\n";
 		}
+		delete $tags{$from};
 	    }
 	}
+    }
+    if (%tags) {
+	die sprintf("Masking error: \"%s\" missing in the output(%s).\n",
+		    join('", "', keys %tags),
+		    join('', @_),
+		);
     }
     $obj->reset if $obj->{AUTORESET};
     return $obj;

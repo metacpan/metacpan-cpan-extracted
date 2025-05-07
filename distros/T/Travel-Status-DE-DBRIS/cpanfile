@@ -7,6 +7,10 @@ requires 'List::Util';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
 
+recommends 'GIS::Distance';
+
+suggests 'Cache::File';
+
 on test => sub {
 	requires 'File::Slurp';
 	requires 'Test::Compile';

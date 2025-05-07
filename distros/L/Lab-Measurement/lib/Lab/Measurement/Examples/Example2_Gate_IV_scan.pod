@@ -13,7 +13,7 @@ Lab::Measurement::Examples::Example2_Gate_IV_scan - Lab::Measurement for DUMMIES
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 Abstract
 

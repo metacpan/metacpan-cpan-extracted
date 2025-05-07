@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Bluefors_Temp;
-$Lab::Moose::Instrument::Bluefors_Temp::VERSION = '3.930';
+$Lab::Moose::Instrument::Bluefors_Temp::VERSION = '3.931';
 #ABSTRACT: Bluefors temperature control
 
 use v5.20;
@@ -20,7 +20,7 @@ use Time::HiRes qw/time usleep/;
 
 # HTTP request JSON stuff
 use DateTime;
-use JSON;
+use JSON::PP;
 use Data::Dumper;
 
 
@@ -50,7 +50,7 @@ has json => (
     builder => '_build_json',
 );
 sub _build_json {
-    return JSON->new;
+    return JSON::PP->new;
 }
 
 around default_connection_options => sub {
@@ -137,9 +137,9 @@ sub set_heater {
     );
     if (exists $args{'active'} and defined $args{'active'}) {
         if ( $args{"active"} eq 1 ) {
-            $args{"active"} = JSON::true;
+            $args{"active"} = JSON::PP::true;
         } else {
-            $args{"active"} = JSON::false;
+            $args{"active"} = JSON::PP::false;
         }
     }
     my $json = $self->json->encode(\%args);
@@ -167,9 +167,9 @@ sub set_channel {
     );
     if (exists $args{'active'} and defined $args{'active'}) {
         if ( $args{"active"} eq 1 ) {
-            $args{"active"} = JSON::true;
+            $args{"active"} = JSON::PP::true;
         } else {
-            $args{"active"} = JSON::false;
+            $args{"active"} = JSON::PP::false;
         }
     }
     my $json = $self->json->encode(\%args);
@@ -310,7 +310,7 @@ Lab::Moose::Instrument::Bluefors_Temp - Bluefors temperature control
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 SYNOPSIS
 
@@ -428,6 +428,7 @@ Use the set_heater function for all other use cases.
 This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2023       Andreas K. Huettel, Mia Schambeck
+            2024       Ed J
 
 
 This is free software; you can redistribute it and/or modify it under

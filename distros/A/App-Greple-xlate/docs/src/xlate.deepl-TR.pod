@@ -14,7 +14,7 @@ App::Greple::xlate - greple için çeviri destek modülü
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -40,9 +40,9 @@ Varsayılan olarak, orijinal ve çevrilmiş metin L<git(1)> ile uyumlu "conflict
 
 Eğer metnin tamamını çevirmek istiyorsanız, B<--match-all> seçeneğini kullanın. Bu, metnin tamamıyla eşleşen C<(?s).+> kalıbını belirtmek için kısa yoldur.
 
-Çatışma işaretleyici formatı verileri, C<-V> seçeneği ile C<sdif> komutu ile yan yana tarzda görüntülenebilir. Dize bazında karşılaştırma yapmanın bir anlamı olmadığından, C<--no-cdif> seçeneği önerilir. Metni renklendirmeniz gerekmiyorsa, C<--no-textcolor> (veya C<--no-tc>) seçeneğini belirtin.
+Çakışma işaretleyici biçimi verileri L<sdif|App::sdif> komutu ve C<-V> seçeneği ile yan yana görüntülenebilir. Dize bazında karşılaştırma yapmanın bir anlamı olmadığından, C<--no-cdif> seçeneği önerilir. Metni renklendirmeniz gerekmiyorsa, C<--no-textcolor> (veya C<--no-tc>) belirtin.
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">

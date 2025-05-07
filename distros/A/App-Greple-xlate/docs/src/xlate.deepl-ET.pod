@@ -14,7 +14,7 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -40,9 +40,9 @@ Vaikimisi trükitakse algne ja tõlgitud tekst L<git(1)>-ga ühilduvas "konflikt
 
 Kui soovite tõlkida kogu teksti, kasutage valikut B<--match-all>. See on otsetee, et määrata muster C<(?s).+>, mis vastab kogu tekstile.
 
-Konfliktimärgistuse formaadis andmeid saab vaadata külg-üles stiilis käsuga C<sdif> koos valikuga C<-V>. Kuna sõnepõhiselt pole mõtet võrrelda, on soovitatav kasutada valikut C<--no-cdif>. Kui teil ei ole vaja teksti värvida, määrake C<--no-textcolor> (või C<--no-tc>).
+Konfliktimärkide formaadis andmeid saab vaadata kõrvuti, kasutades käsku L<sdif|App::sdif> koos valikuga C<-V>. Kuna stringide kaupa pole mõtet võrrelda, on soovitatav kasutada C<--no-cdif> valikut. Kui teil ei ole vaja teksti värvida, määrake C<--no-textcolor> (või C<--no-tc>).
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">

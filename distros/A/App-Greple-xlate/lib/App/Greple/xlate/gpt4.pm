@@ -1,12 +1,17 @@
 package App::Greple::xlate::gpt4;
 
-our $VERSION = "0.9910";
+our $VERSION = "0.9912";
 
 use v5.14;
 use warnings;
 use utf8;
 use Encode;
 use Data::Dumper;
+{
+    no warnings 'redefine';
+    *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
+    $Data::Dumper::Useperl = 1;
+}
 
 use List::Util qw(sum);
 use App::cdif::Command;
@@ -20,18 +25,21 @@ our $auth_key;
 our $method = __PACKAGE__ =~ s/.*://r;
 
 my %param = (
-    gpt3 => { engine => 'gpt-3.5-turbo', temp => '0.0', max => 3000, sub => \&gpty,
-	      prompt => 'Translate following entire text into %s, line-by-line.',
-	  },
-    gpt4 => { engine => 'gpt-4.1', temp => '0.0', max => 10000, sub => \&gpty,
+    gpt4 => { engine => 'gpt-4.1', temp => '0.0', max => 3000, sub => \&gpty,
 	      prompt => <<END
-Translate the following text into %s, preserving the line structure.
-For each input line, output only the corresponding translated line in the same line position.
-Leave blank lines and any XML-style tags (e.g., <m id=1 />, <tag>, </tag>) unchanged and do not translate them.
+Translate the following JSON array into %s.
+For each input array element, output only the corresponding translated element at the same array index.
+If an element is a blank string or an XML-style marker tag (e.g., "<m id=1 />"), leave it unchanged and do not translate it.
 Do not output the original (pre-translation) text under any circumstances.
-The number and order of output lines must always match the input exactly: output line n must correspond to input line n.
-Output only the translated lines or unchanged tags/blank lines.
-**Before finishing, carefully check that there are absolutely no omissions or duplicate content of any kind in your output.**
+The number and order of output elements must always match the input exactly: output element n must correspond to input element n.
+Output only the translated elements or unchanged tags/blank strings as a JSON array.
+Do not leave any unnecessary spaces or tabs at the end of any array element in your output.
+Before finishing, carefully check that there are absolutely no omissions, duplicate content, or trailing spaces of any kind in your output.
+
+Return the result as a JSON array and nothing else.
+Your entire output must be valid JSON.
+Do not include any explanations, code blocks, or text outside of the JSON array.
+If you cannot produce a valid JSON array, return an empty JSON array ([]).
 END
 	  },
 );
@@ -69,15 +77,22 @@ sub _progress {
     print STDERR @_ if opt('progress');
 }
 
+use JSON;
+my $json = JSON->new->canonical->pretty;
+
 sub xlate_each {
     my $call = $param{$method}->{sub} // die;
     my @count = map { int tr/\n/\n/ } @_;
     _progress("From:\n", map s/^/\t< /mgr, @_);
-    my $to = $call->(join '', @_);
-    my @out = $to =~ /^.+\n/mg;
+    my($in, $out);
+    my @in = map { m/.*\n/mg } @_;
+    my $obj = $json->decode($out = $call->($in = $json->encode(\@in)));
+    my @out = map { s/(?<!\n)\z/\n/r } @$obj;
     _progress("To:\n", map s/^/\t> /mgr, @out);
-    if (@out < sum @count) {
-	die "Unexpected response:\n\n$to\n";
+    if (@out < @in) {
+	my $to = join '', @out;
+	die sprintf("Unexpected response (%d < %d):\n\n%s\n",
+		    int(@out), int(@in), $to);
     }
     map { join '', splice @out, 0, $_ } @count;
 }

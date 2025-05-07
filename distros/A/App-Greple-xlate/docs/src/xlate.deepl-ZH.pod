@@ -14,7 +14,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -40,9 +40,9 @@ B<Greple> B<xlate> 模块可找到所需的文本块，并将其替换为翻译�
 
 如果要翻译整个文本，请使用 B<--match-all> 选项。这是指定匹配整个文本的模式 C<(?s).+> 的快捷方式。
 
-冲突标记格式数据可以通过带有 C<-V> 选项的 C<sdif> 命令并排查看。由于按字符串进行比较毫无意义，因此建议使用 C<--no-cdif> 选项。如果不需要给文本着色，可指定 C<--no-textcolor>（或 C<--no-tc>）。
+冲突标记格式数据可以通过 L<sdif|App::sdif> 命令和 C<-V> 选项并排查看。由于按字符串进行比较毫无意义，因此建议使用 C<--no-cdif> 选项。如果不需要给文本着色，可指定 C<--no-textcolor>（或 C<--no-tc>）。
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">

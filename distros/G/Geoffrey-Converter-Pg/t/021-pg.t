@@ -28,7 +28,7 @@ throws_ok { $o_converter->type(); } 'Geoffrey::Exception::RequiredValue::ColumnT
     'plain type call test without param';
 
 is($o_converter->type({type => 'bigint'}), 'bigint', 'plain type call test without param');
-is(scalar keys %{$o_converter->types}, 70, 'plain types call test');
+is(scalar keys %{$o_converter->types}, 71, 'plain types call test');
 is(
     $o_converter->select_get_table,
     q~SELECT t.table_name AS table_name FROM information_schema.tables t WHERE t.table_type = 'BASE TABLE' AND t.table_schema = ? AND t.table_name = ?~,

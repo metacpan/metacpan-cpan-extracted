@@ -12,7 +12,7 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 0.9910
+Version 0.9912
 
 # DESCRIPTION
 
@@ -42,9 +42,9 @@ Par défaut, les textes originaux et traduits sont imprimés dans le format "mar
 
 Si vous souhaitez traduire un texte entier, utilisez l'option **--match-all**. Il s'agit d'un raccourci pour spécifier le modèle `(?s).+` qui correspond à un texte entier.
 
-Les données du format de marqueur de conflit peuvent être visualisées côte à côte par la commande `sdif` avec l'option `-V`. Étant donné qu'il est absurde de comparer les données par chaîne, il est recommandé d'utiliser l'option `--no-cdif`. Si vous n'avez pas besoin de colorer le texte, spécifiez `--no-textcolor` (ou `--no-tc`).
+Les données au format marqueur de conflit peuvent être visualisées côte à côte par la commande [sdif](https://metacpan.org/pod/App%3A%3Asdif) avec l'option `-V`. Étant donné qu'il n'est pas utile de comparer chaque chaîne de caractères, il est recommandé d'utiliser l'option `--no-cdif`. Si vous n'avez pas besoin de colorer le texte, spécifiez `--no-textcolor` (ou `--no-tc`).
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>

@@ -6,7 +6,7 @@ use strict;
 use Readonly;
 use warnings;
 
-$Geoffrey::Converter::Pg::VERSION = '0.000203';
+$Geoffrey::Converter::Pg::VERSION = '0.000204';
 
 use parent 'Geoffrey::Role::Converter';
 
@@ -31,7 +31,7 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
             check       => 'CHECK',
             default     => 'DEFAULT',
         ), $class;
-    }
+    } ## end sub new
 }
 {
 
@@ -44,7 +44,7 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
     sub drop { return 'DROP VIEW {0}'; }
 
     sub list {
-        my ($self, $schema) = @_;
+        my ( $self, $schema ) = @_;
         return q~SELECT * FROM pg_views WHERE schemaname NOT IN('information_schema', 'pg_catalog')~;
     }
 }
@@ -87,7 +87,7 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
                 AND target_attr.attrelid = target_table
                 AND source_attr.attnum = source_constraints
                 AND source_attr.attrelid = source_table~;
-    }
+    } ## end sub list
 }
 {
 
@@ -117,7 +117,7 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
         AND kc.table_name = tc.table_name 
         AND kc.table_schema = tc.table_schema
         AND kc.constraint_name = tc.constraint_name~;
-    }
+    } ## end sub list
 }
 {
 
@@ -154,7 +154,7 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
                         NOT nspname LIKE 'pg%'
                     AND NOT idx.indisprimary
                     AND idx.indisunique;~;
-    }
+    } ## end sub list
 }
 {
 
@@ -186,7 +186,7 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
                         pg_catalog.pg_function_is_visible( p.oid )
                     AND n.nspname <> 'pg_catalog'
                     AND n.nspname <> 'information_schema'~;
-    }
+    } ## end sub list
 }
 {
 
@@ -194,7 +194,7 @@ Readonly::Scalar my $I_CONST_DEFAULT_VALUE     => 5;
     use parent 'Geoffrey::Role::ConverterType';
 
     sub add {
-        my ($self, $options) = @_;
+        my ( $self, $options ) = @_;
         my $s_sql_standard = <<'EOF';
 CREATE TRIGGER {0} UPDATE OF {1} ON {2}
 BEGIN
@@ -208,7 +208,7 @@ BEGIN
 END
 EOF
         return $options->{for_view} ? $s_sql_view : $s_sql_standard;
-    }
+    } ## end sub add
 
     sub drop { return 'DROP TRIGGER IF EXISTS {1}'; }
 }
@@ -218,23 +218,20 @@ sub new {
     my $self  = $class->SUPER::new(@_);
     $self->{min_version} = '9.1';
     return bless $self, $class;
-}
+} ## end sub new
 
 sub defaults {
-    return {current_timestamp => 'CURRENT_TIMESTAMP', autoincrement => 'SERIAL',};
+    return { current_timestamp => 'CURRENT_TIMESTAMP', autoincrement => 'SERIAL', };
 }
 
 sub type {
-    my ($self, $hr_column_params) = @_;
-    if ($hr_column_params->{default} && $hr_column_params->{default} eq 'autoincrement') {
-        $hr_column_params->{type}
-            = lc $hr_column_params->{type} eq 'bigint'   ? 'bigserial'
-            : lc $hr_column_params->{type} eq 'smallint' ? 'smallserial'
-            :                                              'serial';
-        delete $hr_column_params->{default};
+    my ( $self, $hr_column_params ) = @_;
+    if ( $hr_column_params->{default} && $hr_column_params->{default} eq 'autoincrement' ) {
+        $hr_column_params->{type}    = lc $hr_column_params->{type} eq 'bigint' ? 'bigserial' : lc $hr_column_params->{type} eq 'smallint' ? 'smallserial' : 'serial';
+        $hr_column_params->{default} = '';
     }
     return $self->SUPER::type($hr_column_params);
-}
+} ## end sub type
 
 sub types {
     return {
@@ -257,6 +254,7 @@ sub types {
         daterange        => 'daterange',
         decimal          => 'decimal',
         double_precision => 'double precision',
+        float            => 'float',
         gtsvector        => 'gtsvector',
         inet             => 'inet',
         int2vector       => 'int2vector',
@@ -309,130 +307,129 @@ sub types {
         xid              => 'xid',
         xml              => 'xml',
     };
-}
+} ## end sub types
 
 sub select_get_table {
-    return
-        q~SELECT t.table_name AS table_name FROM information_schema.tables t WHERE t.table_type = 'BASE TABLE' AND t.table_schema = ? AND t.table_name = ?~;
+    return q~SELECT t.table_name AS table_name FROM information_schema.tables t WHERE t.table_type = 'BASE TABLE' AND t.table_schema = ? AND t.table_name = ?~;
 }
 
 sub convert_defaults {
-    my ($self, $params) = @_;
+    my ( $self, $params ) = @_;
     $params->{default} ? $params->{default} =~ s/^'(.*)'$/$1/ : undef;
-    if ($params->{default} && $params->{type} eq 'bit') {
+    if ( $params->{default} && $params->{type} eq 'bit' ) {
         return qq~$params->{default}::bit~;
     }
     return $params->{default};
-}
+} ## end sub convert_defaults
 
 sub parse_default {
-    my ($self, $default_value) = @_;
-    return $1 * 1 if ($default_value =~ m/\w+\s*(?:\((\d+)\))::(.*)(?:\;|\s)/);
+    my ( $self, $default_value ) = @_;
+    return $1 * 1 if ( $default_value =~ m/\w+\s*(?:\((\d+)\))::(.*)(?:\;|\s)/ );
     return $default_value;
 }
 
 sub can_create_empty_table { return 1 }
 
 sub colums_information {
-    my ($self, $ar_raw_data) = @_;
+    my ( $self, $ar_raw_data ) = @_;
     return [] if scalar @{$ar_raw_data} == 0;
     my $table_row = shift @{$ar_raw_data};
     $table_row->{sql} =~ s/^.*(CREATE|create) .*\(//g;
     my $columns = [];
-    for (split m/,/, $table_row->{sql}) {
+    for ( split m/,/, $table_row->{sql} ) {
         s/^\s*(.*)\s*$/$1/g;
         my $rx_not_null      = 'NOT NULL';
         my $rx_primary_key   = 'PRIMARY KEY';
         my $rx_default       = 'SERIAL|DEFAULT';
         my $rx_column_values = qr/($rx_not_null)*\s($rx_primary_key)*.*($rx_default \w{1,})*/;
         my @column           = m/^(\w+)\s([[:upper:]]+)(\(\d*\))*\s$rx_column_values$/;
-        next if scalar @column == 0;
+        next                                            if scalar @column == 0;
         $column[$I_CONST_LENGTH_VALUE] =~ s/([\(\)])//g if $column[$I_CONST_LENGTH_VALUE];
         push @{$columns},
             {
             name => $column[0],
             type => $column[1],
-            ($column[$I_CONST_LENGTH_VALUE]      ? (length      => $column[$I_CONST_LENGTH_VALUE])      : ()),
-            ($column[$I_CONST_NOT_NULL_VALUE]    ? (not_null    => $column[$I_CONST_NOT_NULL_VALUE])    : ()),
-            ($column[$I_CONST_PRIMARY_KEY_VALUE] ? (primary_key => $column[$I_CONST_PRIMARY_KEY_VALUE]) : ()),
-            ($column[$I_CONST_DEFAULT_VALUE]     ? (default     => $column[$I_CONST_DEFAULT_VALUE])     : ()),
+            ( $column[$I_CONST_LENGTH_VALUE]      ? ( length      => $column[$I_CONST_LENGTH_VALUE] )      : () ),
+            ( $column[$I_CONST_NOT_NULL_VALUE]    ? ( not_null    => $column[$I_CONST_NOT_NULL_VALUE] )    : () ),
+            ( $column[$I_CONST_PRIMARY_KEY_VALUE] ? ( primary_key => $column[$I_CONST_PRIMARY_KEY_VALUE] ) : () ),
+            ( $column[$I_CONST_DEFAULT_VALUE]     ? ( default     => $column[$I_CONST_DEFAULT_VALUE] )     : () ),
             };
-    }
+    } ## end for ( split m/,/, $table_row...)
     return $columns;
-}
+} ## end sub colums_information
 
 sub index_information {
-    my ($self, $ar_raw_data) = @_;
+    my ( $self, $ar_raw_data ) = @_;
     my @mapped = ();
-    for (@{$ar_raw_data}) {
+    for ( @{$ar_raw_data} ) {
         next if !$_->{sql};
         my ($s_columns) = $_->{sql} =~ m/\((.*)\)$/;
-        my @columns = split m/,/, $s_columns;
+        my @columns     = split m/,/, $s_columns;
         s/^\s+|\s+$//g for @columns;
-        push @mapped, {name => $_->{name}, table => $_->{tbl_name}, columns => \@columns};
-    }
+        push @mapped, { name => $_->{name}, table => $_->{tbl_name}, columns => \@columns };
+    } ## end for ( @{$ar_raw_data} )
     return \@mapped;
-}
+} ## end sub index_information
 
 sub view_information {
-    my ($self, $ar_raw_data) = @_;
+    my ( $self, $ar_raw_data ) = @_;
     return [] unless $ar_raw_data;
-    return [map { {name => $_->{name}, sql => $_->{sql}} } @{$ar_raw_data}];
+    return [ map { { name => $_->{name}, sql => $_->{sql} } } @{$ar_raw_data} ];
 }
 
 sub constraints {
-    return shift->_get_value('constraints', 'Geoffrey::Converter::Pg::Constraints', 1);
+    return shift->_get_value( 'constraints', 'Geoffrey::Converter::Pg::Constraints', 1 );
 }
 
 sub index {
-    my ($self, $new_value) = @_;
+    my ( $self, $new_value ) = @_;
     $self->{index} = $new_value if defined $new_value;
-    return $self->_get_value('index', 'Geoffrey::Converter::Pg::Index');
+    return $self->_get_value( 'index', 'Geoffrey::Converter::Pg::Index' );
 }
 
 sub table {
-    return shift->_get_value('table', 'Geoffrey::Converter::Pg::Tables');
+    return shift->_get_value( 'table', 'Geoffrey::Converter::Pg::Tables' );
 }
 
 sub view {
-    return shift->_get_value('view', 'Geoffrey::Converter::Pg::View', 1);
+    return shift->_get_value( 'view', 'Geoffrey::Converter::Pg::View', 1 );
 }
 
 sub foreign_key {
-    my ($self, $new_value) = @_;
+    my ( $self, $new_value ) = @_;
     $self->{foreign_key} = $new_value if defined $new_value;
-    return $self->_get_value('foreign_key', 'Geoffrey::Converter::Pg::ForeignKey', 1);
+    return $self->_get_value( 'foreign_key', 'Geoffrey::Converter::Pg::ForeignKey', 1 );
 }
 
 sub trigger {
-    return shift->_get_value('trigger', 'Geoffrey::Converter::Pg::Trigger', 1);
+    return shift->_get_value( 'trigger', 'Geoffrey::Converter::Pg::Trigger', 1 );
 }
 
 sub primary_key {
-    return shift->_get_value('primary_key', 'Geoffrey::Converter::Pg::PrimaryKey', 1);
+    return shift->_get_value( 'primary_key', 'Geoffrey::Converter::Pg::PrimaryKey', 1 );
 }
 
 sub unique {
-    return shift->_get_value('unique', 'Geoffrey::Converter::Pg::UniqueIndex', 1);
+    return shift->_get_value( 'unique', 'Geoffrey::Converter::Pg::UniqueIndex', 1 );
 }
 
 sub sequence {
-    return shift->_get_value('sequence', 'Geoffrey::Converter::Pg::Sequence', 1);
+    return shift->_get_value( 'sequence', 'Geoffrey::Converter::Pg::Sequence', 1 );
 }
 
 sub _get_value {
-    my ($self, $key, $s_package_name, $b_ignore_require) = @_;
-    $self->{$key} //= $self->_set_value($key, $s_package_name, $b_ignore_require);
+    my ( $self, $key, $s_package_name, $b_ignore_require ) = @_;
+    $self->{$key} //= $self->_set_value( $key, $s_package_name, $b_ignore_require );
     return $self->{$key};
 }
 
 sub _set_value {
-    my ($self, $key, $s_package_name, $b_ignore_require) = @_;
+    my ( $self, $key, $s_package_name, $b_ignore_require ) = @_;
     require Geoffrey::Utils;
     $self->{$key} = $b_ignore_require ? $s_package_name->new(@_) : Geoffrey::Utils::obj_from_name($s_package_name);
     return $self->{$key};
 
-}
+} ## end sub _set_value
 
 1;    # End of Geoffrey::Converter::Pg
 
@@ -446,7 +443,7 @@ Geoffrey::Converter::Pg - PostgreSQL converter for Geoffrey
 
 =head1 VERSION
 
-Version 0.000203
+Version 0.000204
 
 =head1 DESCRIPTION
 

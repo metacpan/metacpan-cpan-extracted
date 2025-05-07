@@ -12,7 +12,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 # VERSION
 
-Version 0.9910
+Version 0.9912
 
 # DESCRIPTION
 
@@ -42,9 +42,9 @@ PerlのPodスタイルで書かれた文書中の通常のテキストブロッ�
 
 テキスト全体を翻訳したい場合は、**--match-all**オプションを使います。これはテキスト全体にマッチするパターン`(?s).+`を指定するショートカットです。
 
-`sdif`コマンドに`-V`オプションを指定すると、コンフリクトマーカー形式のデータを並べて表示することができます。文字列単位で比較するのは意味がないので、`--no-cdif`オプションを推奨します。テキストに色をつける必要がない場合は、`--no-textcolor`（または`--no-tc`）を指定します。
+[sdif](https://metacpan.org/pod/App%3A%3Asdif)コマンドに`-V`オプションをつけると、競合マーカーフォーマットのデータを並べて表示することができます。文字列ごとに比較するのは意味がないので、`--no-cdif`オプションの使用をお勧めします。テキストに色をつける必要がない場合は`--no-textcolor`（または`--no-tc`）を指定してください。
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>

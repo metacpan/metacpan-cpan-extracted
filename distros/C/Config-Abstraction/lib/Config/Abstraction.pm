@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.17
+Version 0.20
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -142,9 +142,14 @@ This will override any value set for C<database.user> in the configuration files
 
 =over 4
 
-=item 1. Loading Files
+=item 1. Data Argument
 
-The module first looks for configuration files in the specified directories.
+The data passed into the constructor via the C<data> argument is the starting point.
+Essentially this contains the default values.
+
+=item 2. Loading Files
+
+The module then looks for configuration files in the specified directories.
 It loads the following files in order of preference:
 C<base.yaml>, C<local.yaml>, C<base.json>, C<local.json>, C<base.xml>,
 C<local.xml>, C<base.ini>, and C<local.ini>.
@@ -153,23 +158,19 @@ If C<config_file> or C<config_files> is set, those files are loaded last.
 
 If no C<config_dirs> is given, try hard to find the files in various places.
 
-=item 2. Merging and Resolving
+=item 3. Merging and Resolving
 
 The module merges the contents of these files, with more specific configurations
 (e.g., C<local.*>) overriding general ones (e.g., C<base.*>).
 
-=item 3. Environment Overrides
+=item 4. Environment Overrides
 
 After loading and merging the configuration files, environment variables are
 checked and used to override any conflicting settings.
 
-=item 4. Command Line
+=item 5. Command Line
 
 Next, the command line arguments are checked and used to override any conflicting settings.
-
-=item 5. Data Argument
-
-Finally the data passed into the constructor via the C<data> argument is merged in.
 
 =item 6. Accessing Values
 
@@ -190,7 +191,8 @@ Options:
 
 =item * C<config_dirs>
 
-An arrayref of directories to look for configuration files (default: C<[$HOME/.conf]>, C<[$DOCUMENT_ROOT/conf]>, or C<['conf']>).
+An arrayref of directories to look for configuration files (default: C<$CONFIG_DIR>, C<[$HOME/.conf]>, C<[$DOCUMENT_ROOT/conf]>, or C<['conf']>).
+Considers the file C<default> before looking at C<config_file> and C<config_files>.
 
 =item * C<config_file>
 
@@ -262,9 +264,13 @@ sub new
 			} elsif($ENV{'DOCUMENT_ROOT'}) {
 				push @{$params->{'config_dirs'}},
 					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'conf'),
-					File::Spec->catdir($ENV{'HOME'}, 'config');
+					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'config');
 			}
-			push @{$params->{'config_dirs'}}, 'conf', 'config';
+			if(my $dir = $ENV{'CONFIG_DIR'}) {
+				push @{$params->{'config_dirs'}}, $dir;
+			} else {
+				push @{$params->{'config_dirs'}}, 'conf', 'config';
+			}
 		}
 	}
 
@@ -283,6 +289,10 @@ sub new
 	}
 	$self->_load_config();
 
+	if(my $data = $params->{'data'}) {
+		$self->merge_defaults(defaults => $data) if(scalar keys(%{$data}));
+	}
+
 	if($self->{'config'} && scalar(keys %{$self->{'config'}})) {
 		return $self;
 	}
@@ -297,6 +307,9 @@ sub _load_config
 
 	my $self = shift;
 	my %merged;
+	if($self->{'data'}) {
+		%merged = %{$self->{'data'}};
+	}
 
 	my $logger = $self->{'logger'};
 	if($logger) {
@@ -376,7 +389,7 @@ sub _load_config
 		}
 
 		# Put $self->{config_file} through all parsers, ignoring all errors, then merge that in
-		for my $config_file ($self->{'config_file'}, @{$self->{'config_files'}}) {
+		for my $config_file ('default', $self->{'config_file'}, @{$self->{'config_files'}}) {
 			next unless defined($config_file);
 			my $path = length($dir) ? File::Spec->catfile($dir, $config_file) : $config_file;
 			if($logger) {
@@ -545,10 +558,6 @@ sub _load_config
 		$ref->{ $parts[-1] } = $value;
 	}
 
-	if($self->{'data'}) {
-		%merged = %{ merge( $self->{'data'}, \%merged ) };
-	}
-
 	if($self->{'flatten'}) {
 		$self->_load_driver('Hash::Flatten', ['flatten']);
 	}
@@ -596,6 +605,39 @@ sub all
 	my $self = shift;
 
 	return($self->{'config'} && scalar(keys %{$self->{'config'}})) ? $self->{'config'} : undef;
+}
+
+=head2 merge_defaults
+
+Merge the configuration hash into the given hash.
+What's in the object will overwrite what's in the defaults hash.
+
+=cut
+
+sub merge_defaults
+{
+	my $self = shift;
+	my $config = $self->all();
+
+	return $config if(scalar(@_) == 0);
+
+	my $params = Params::Get::get_params('defaults', @_);
+	my $defaults = $params->{'defaults'};
+	return $config if(!defined($defaults));
+	my $section = $params->{'section'};
+
+	if($config->{'global'}) {
+		if($params->{'deep'}) {
+			$defaults = merge($config->{'global'}, $defaults);
+		} else {
+			$defaults = { %{$defaults}, %{$config->{'global'}} };
+		}
+		delete $config->{'global'};
+	}
+	if($section && $config->{$section}) {
+		$config = $config->{$section};
+	}
+	return { %{$defaults}, %{$config} };
 }
 
 # Helper routine to load a driver

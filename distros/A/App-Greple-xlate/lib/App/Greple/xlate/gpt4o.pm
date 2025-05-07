@@ -1,6 +1,6 @@
 package App::Greple::xlate::gpt4o;
 
-our $VERSION = "0.9910";
+our $VERSION = "0.9912";
 
 use v5.14;
 use warnings;

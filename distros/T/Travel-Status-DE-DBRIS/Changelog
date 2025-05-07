@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.11 - Tue May 06 2025
+
+    * Journey: Fix type/train_no handling when they are not separated by
+      whitespace (Patch by Cassidy Dingenskirchen)
+
 Travel::Status::DE::DBRIS 0.10 - Sat Apr 19 2025
 
     * Journey: Add train_no, line_no accessors

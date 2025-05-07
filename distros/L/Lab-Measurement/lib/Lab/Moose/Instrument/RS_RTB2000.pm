@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_RTB2000;
-$Lab::Moose::Instrument::RS_RTB2000::VERSION = '3.930';
+$Lab::Moose::Instrument::RS_RTB2000::VERSION = '3.931';
 #ABSTRACT: Rohde & Schwarz RTB 2000 oscilloscope (work in progress)
 
 use v5.20;
@@ -60,7 +60,7 @@ Lab::Moose::Instrument::RS_RTB2000 - Rohde & Schwarz RTB 2000 oscilloscope (work
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 SYNOPSIS
 

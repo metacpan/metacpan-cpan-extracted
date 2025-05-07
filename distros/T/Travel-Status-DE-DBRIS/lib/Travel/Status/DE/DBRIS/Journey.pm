@@ -8,8 +8,10 @@ use parent 'Class::Accessor';
 
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
+# ->number is deprecated
+# TODO: Rename ->train, ->train_no to ->trip, ->trip_no
 Travel::Status::DE::DBRIS::Journey->mk_ro_accessors(
 	qw(day id train train_no line_no type number is_cancelled));
 
@@ -40,6 +42,14 @@ sub new {
 		( $ref->{type}, $ref->{number} ) = split( qr{\s+}, $ref->{train} );
 	}
 
+	# For some trains, the train type also contains the train number like "MEX19161"
+	# If we can detect this, remove the number from the train type
+	if ( $ref->{train_no} and $ref->{type}
+		and $ref->{type} =~ qr{ (?<actualtype> [^\d]+ ) $ref->{train_no} $ }x )
+	{
+		$ref->{type} = $+{actualtype};
+	}
+
 	# The line number seems to be encoded in the trip ID
 	if ( not defined $ref->{number}
 		and $opt{id} =~ m{ [#] ZE [#] (?<line> [^#]+ ) [#] ZB [#] }x )
@@ -47,7 +57,10 @@ sub new {
 		$ref->{number} = $+{line};
 	}
 
-	if (defined $ref->{number} and defined $ref->{train_no} and $ref->{number} ne $ref->{train_no}) {
+	if (    defined $ref->{number}
+		and defined $ref->{train_no}
+		and $ref->{number} ne $ref->{train_no} )
+	{
 		$ref->{line_no} = $ref->{number};
 	}
 
@@ -173,3 +186,150 @@ sub TO_JSON {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Travel::Status::DE::DBRIS::Journey - Information about a single
+journey received by Travel::Status::DE::DBRIS
+
+=head1 SYNOPSIS
+
+	my $status = Travel::Status::DE::DBRIS->new(journey => ...);
+	my $journey = $status->result;
+
+=head1 VERSION
+
+version 0.11
+
+=head1 DESCRIPTION
+
+Travel::Status::DE::DBRIS::Journey describes a single journey that was obtained
+by passing the B<journey> key to Travel::Status::DE::DBRIS->new or ->new_p.
+
+=head1 METHODS
+
+=head2 ACCESSORS
+
+=over
+
+=item $journey->day
+
+DateTime(3pm) object encoding the day on which this journey departs at its
+origin station.
+
+=item $journey->id
+
+Trip ID / journey ID, i.e., the argument passed to
+Travel::Status::DE::DBRIS->new's B<journey> key.
+
+=item $journey->train
+
+Textual description of the departure, typically consisting of type identifier
+(e.g. C<< S >>, C<< U >>) and line or trip number.
+
+=item $journey->train_no
+
+Trip number, if available. undef otherwise.
+
+=item $journey->line_no
+
+Line identifier, if available. undef otherwise. Note that the line identifier
+is not necessarily numeric.
+
+=item $journey->type
+
+Trip type, e.g. C<< S >> (S-Bahn) or C<< U >> (U-Bahn / subway).
+undef if unknown.
+
+=item $journey->is_cancelled
+
+True if this trip has been cancelled, false/undef otherwise.
+
+=item $journey->polyline
+
+List of geocoordinates that describe the trip's route. Only available if the
+DBRIS constructor was called with B<with_polyline> set to a true value.  Each
+list entry is a hash with the following keys.
+
+=over
+
+=item * lon (longitude)
+
+=item * lat (latitude)
+
+=item * stop (Travel::Status::DE::DBRIS::Location(3pm) object describing the stop at this location, if any)
+
+=back
+
+The B<stop> keys are only available if the optional dependency
+GIS::Distance(3pm) is available. Note that the B<lon> and B<lat> keys in a
+referenced stop may differ from the B<lon> and B<lat> keys in a polyline entry.
+
+=item $journey->route
+
+List of Travel::Status::DE::DBRIS::Location(3pm) objects that describe
+individual stops along the trip.
+
+=item $journey->attributes
+
+List of attributes associated with this trip.
+Each list entry is a hashref with some or all of the following keys.
+
+=over
+
+=item * value (textual description of attribute)
+
+=item * teilstreckenHinweis (text describing that this attribute only applies to part of the trip's route)
+
+=back
+
+=item $journey->messages
+
+List of attributes associated with this trip.
+Each list entry is a hashref with some or all of the following keys.
+
+=over
+
+=item * prioritaet (priority, e.g. HOCH or NIEDRIG)
+
+=item * ueberschrift (headline)
+
+=item * text (message text)
+
+=back
+
+=back
+
+=head1 DIAGNOSTICS
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Class::Accessor(3pm)
+
+=item GIS::Distance(3pm)
+
+Optional, required for B<stop> keys in B<polyline> entries.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
+=head1 SEE ALSO
+
+Travel::Status::DE::DBRIS(3pm).
+
+=head1 AUTHOR
+
+Copyright (C) 2025 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+
+=head1 LICENSE
+
+This module is licensed under the same terms as Perl itself.

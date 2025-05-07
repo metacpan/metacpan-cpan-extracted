@@ -12,7 +12,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für greple
 
 # VERSION
 
-Version 0.9910
+Version 0.9912
 
 # DESCRIPTION
 
@@ -42,9 +42,9 @@ Standardmäßig werden Original- und Übersetzungstext im "Konfliktmarker"-Forma
 
 Wenn Sie den gesamten Text übersetzen möchten, verwenden Sie die Option **--match-all**. Dies ist eine Abkürzung für das Muster `(?s).+`, das auf den gesamten Text passt.
 
-Konfliktmarker-Formatdaten können im Side-by-Side-Stil mit dem `sdif`-Befehl und der Option `-V` angezeigt werden. Da ein Vergleich auf Zeichenkettenbasis keinen Sinn ergibt, wird die Option `--no-cdif` empfohlen. Wenn Sie den Text nicht einfärben möchten, geben Sie `--no-textcolor` (oder `--no-tc`) an.
+Konfliktmarkierungsformatdaten können im Nebeneinander-Stil mit dem Befehl [sdif](https://metacpan.org/pod/App%3A%3Asdif) und der Option `-V` angezeigt werden. Da ein Vergleich auf Zeichenkettenbasis keinen Sinn ergibt, wird die Option `--no-cdif` empfohlen. Wenn Sie den Text nicht einfärben müssen, geben Sie `--no-textcolor` (oder `--no-tc`) an.
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>

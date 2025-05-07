@@ -14,7 +14,7 @@ App::Greple::xlate - modul de suport pentru traducere pentru Greple
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -40,9 +40,9 @@ Apoi se adaugă opțiunea C<--xlate> pentru a traduce zona selectată. Apoi, se 
 
 Dacă doriți să traduceți întregul text, utilizați opțiunea B<--match-all>. Aceasta este o scurtătură pentru a specifica modelul C<(?s).+> care se potrivește cu întregul text.
 
-Datele din formatul markerilor de conflict pot fi vizualizate în stil paralel prin comanda C<sdif> cu opțiunea C<-V>. Deoarece nu are sens să comparați fiecare șir de caractere, este recomandată opțiunea C<--no-cdif>. Dacă nu trebuie să colorați textul, specificați C<--no-textcolor> (sau C<--no-tc>).
+Datele din formatul markerului de conflict pot fi vizualizate în stil paralel prin comanda L<sdif|App::sdif> cu opțiunea C<-V>. Deoarece nu are sens să comparați fiecare șir de caractere, este recomandată opțiunea C<--no-cdif>. Dacă nu trebuie să colorați textul, specificați C<--no-textcolor> (sau C<--no-tc>).
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">

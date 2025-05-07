@@ -14,7 +14,7 @@ App::Greple::xlate - μονάδα υποστήριξης μετάφρασης γ
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -40,9 +40,9 @@ B<Greple> B<xlate> η μονάδα εντοπίζει τα επιθυμητά μ
 
 Αν θέλετε να μεταφράσετε ολόκληρο το κείμενο, χρησιμοποιήστε την επιλογή B<--match-all>. Αυτή είναι μια συντόμευση για να καθορίσετε το μοτίβο C<(?s).+> που ταιριάζει με ολόκληρο το κείμενο.
 
-Τα δεδομένα σε μορφή conflict marker μπορούν να προβληθούν σε στυλ δίπλα-δίπλα με την εντολή C<sdif> και την επιλογή C<-V>. Επειδή δεν έχει νόημα η σύγκριση ανά συμβολοσειρά, συνιστάται η επιλογή C<--no-cdif>. Αν δεν χρειάζεστε χρωματισμό του κειμένου, καθορίστε C<--no-textcolor> (ή C<--no-tc>).
+Τα δεδομένα μορφής δεικτών σύγκρουσης μπορούν να προβληθούν σε στυλ δίπλα-δίπλα με την εντολή L<sdif|App::sdif> και την επιλογή C<-V>. Επειδή δεν έχει νόημα η σύγκριση ανά συμβολοσειρά, συνιστάται η επιλογή C<--no-cdif>. Αν δεν χρειάζεται να χρωματίσετε το κείμενο, ορίστε C<--no-textcolor> (ή C<--no-tc>).
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">

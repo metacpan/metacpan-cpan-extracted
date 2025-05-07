@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::AMI_430;
-$Lab::Moose::Instrument::AMI_430::VERSION = '3.930';
+$Lab::Moose::Instrument::AMI_430::VERSION = '3.931';
 #ABSTRACT: American Magnetics magnet power supply
 use v5.20;
 
@@ -358,7 +358,7 @@ Lab::Moose::Instrument::AMI_430 - American Magnetics magnet power supply
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,20 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9912 2025-05-07T06:49:43Z
+
+    - fix mask/unmask behabior
+    - use JSON format for translation interface
+    - udpate examples/Makefile
+    - use deepl and gpt4 (gpt-4.1) for example translations
+    - update examples/README
+
+0.9911 2025-05-06T10:45:43Z
+
+    - module dies when the masking tag is missing in the output
+    - require greple@9.23 to fix the behavior of --of filter
+    - remove trailing spaces from the XLATE output
+    - improve gpt-4.1 prompt
+
 0.9910 2025-05-03T11:09:27Z
 
     - use gpt4.1 as gpt4 engine

@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.9910";
+our $VERSION = "0.9912";
 
 =encoding utf-8
 
@@ -18,7 +18,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -59,12 +59,12 @@ is a short-cut to specify the pattern C<(?s).+> which matches entire
 text.
 
 Conflict marker format data can be viewed in side-by-side style by
-C<sdif> command with C<-V> option.  Since it makes no sense to compare
-on a per-string basis, the C<--no-cdif> option is recommended.  If you
-do not need to color the text, specify C<--no-textcolor> (or
-C<--no-tc>).
+L<sdif|App::sdif> command with C<-V> option.  Since it makes no sense
+to compare on a per-string basis, the C<--no-cdif> option is
+recommended.  If you do not need to color the text, specify
+C<--no-textcolor> (or C<--no-tc>).
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
@@ -531,7 +531,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-use v5.14;
+use v5.26;
 use warnings;
 use utf8;
 
@@ -685,6 +685,7 @@ sub _progress {
 	@m[0,-1] = qw(┌ └) if $i > 1;
 	s/^/sprintf "%7s ", shift(@m)/mge;
 	s/(?<!\n)\z/\n/;
+	s/( +)$/"␣" x length($1)/mge;
 	print STDERR $_;
     }
 }
@@ -698,7 +699,7 @@ sub cache_update {
 
     $maskobj->mask(@from) if $maskobj;
     my @chop = grep { $from[$_] =~ s/(?<!\n)\z/\n/ } keys @from;
-    my @to = &XLATE(@from);
+    my @to = map { s/ +$//mgr } &XLATE(@from);
     chop @to[@chop];
     $maskobj->unmask(@to)->reset if $maskobj;
 
@@ -722,7 +723,7 @@ sub fold_lines {
 
 sub xlate {
     my $param = { @_ };
-    my($index, $text) = @{$param}{qw(index match)};
+    my($index, $text) = $param->@{qw(index match)};
     my $obj = App::Greple::xlate::Text->new($text,
 					    paragraph => ($index % 2 == 0));
     my $s = $cache{$obj->normalized} // "!!! TRANSLATION ERROR !!!\n";

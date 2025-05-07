@@ -1,5 +1,5 @@
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.930';
+$Lab::Measurement::VERSION = '3.931';
 #ABSTRACT: Temporary blocker module, errors out when used
 
 use v5.20;
@@ -36,7 +36,7 @@ Lab::Measurement - Temporary blocker module, errors out when used
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,15 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.20	Tue May  6 20:07:40 EDT 2025
+	Added merge_defaults()
+
+0.19	Tue May  6 13:48:46 EDT 2025
+	Make the data passed to the contructor be the default values
+
+0.18	Tue May  6 08:17:31 EDT 2025
+	Use the file config_dirs/default as the base
+	Honour CONFIG_DIR
+
 0.17	Mon May  5 07:45:21 EDT 2025
 	Try harder to find the files
 

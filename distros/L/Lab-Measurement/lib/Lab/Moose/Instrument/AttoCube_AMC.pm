@@ -1,5 +1,7 @@
 package Lab::Moose::Instrument::AttoCube_AMC;
-$Lab::Moose::Instrument::AttoCube_AMC::VERSION = '3.930';
+$Lab::Moose::Instrument::AttoCube_AMC::VERSION = '3.931';
+#ABSTRACT: AttoCube Motion Controller
+
 use 5.020;
 
 use Moose;
@@ -2703,11 +2705,11 @@ __END__
 
 =head1 NAME
 
-Lab::Moose::Instrument::AttoCube_AMC
+Lab::Moose::Instrument::AttoCube_AMC - AttoCube Motion Controller
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 AttoCube AMC300
 
@@ -5108,6 +5110,7 @@ Upload new license file in format base 64
 This software is copyright (c) 2025 by the Lab::Measurement team; in detail:
 
   Copyright 2024       Andreas K. Huettel, Robin Schock
+            2025       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

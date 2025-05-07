@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::xlate:
     file: lib/App/Greple/xlate.pm
-    version: '0.9910'
+    version: '0.9912'
   App::Greple::xlate::Cache:
     file: lib/App/Greple/xlate/Cache.pm
   App::Greple::xlate::Filter:
@@ -39,21 +39,21 @@ provides:
     file: lib/App/Greple/xlate/Text.pm
   App::Greple::xlate::deepl:
     file: lib/App/Greple/xlate/deepl.pm
-    version: '0.9910'
+    version: '0.9912'
   App::Greple::xlate::gpt3:
     file: lib/App/Greple/xlate/gpt3.pm
-    version: '0.9910'
+    version: '0.9912'
   App::Greple::xlate::gpt4:
     file: lib/App/Greple/xlate/gpt4.pm
-    version: '0.9910'
+    version: '0.9912'
   App::Greple::xlate::gpt4o:
     file: lib/App/Greple/xlate/gpt4o.pm
-    version: '0.9910'
+    version: '0.9912'
   App::Greple::xlate::null:
     file: lib/App/Greple/xlate/null.pm
-    version: '0.9910'
+    version: '0.9912'
 requires:
-  App::Greple: '9.22'
+  App::Greple: '9.23'
   App::Greple::msdoc: '1.06'
   App::Greple::stripe: '1.02'
   App::optex::textconv: '1.07'
@@ -70,7 +70,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-Greple-xlate/issues
   homepage: https://github.com/kaz-utashiro/App-Greple-xlate
   repository: https://github.com/kaz-utashiro/App-Greple-xlate.git
-version: '0.9910'
+version: '0.9912'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

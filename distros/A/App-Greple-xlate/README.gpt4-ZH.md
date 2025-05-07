@@ -12,7 +12,7 @@ App::Greple::xlate - greple 的翻译支持模块
 
 # VERSION
 
-Version 0.9910
+Version 0.9912
 
 # DESCRIPTION
 
@@ -42,9 +42,9 @@ Version 0.9910
 
 如果你想翻译全部文本，请使用 **--match-all** 选项。这是指定匹配整个文本的模式 `(?s).+` 的快捷方式。
 
-冲突标记格式的数据可以通过 `sdif` 命令结合 `-V` 选项以并排样式查看。由于逐字符串比较没有意义，推荐使用 `--no-cdif` 选项。如果不需要为文本着色，请指定 `--no-textcolor`（或 `--no-tc`）。
+冲突标记格式的数据可以通过 [sdif](https://metacpan.org/pod/App%3A%3Asdif) 命令配合 `-V` 选项以并排样式查看。由于逐字符串比较没有意义，建议使用 `--no-cdif` 选项。如果不需要为文本着色，请指定 `--no-textcolor`（或 `--no-tc`）。
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>

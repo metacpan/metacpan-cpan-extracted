@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ProStep4;
-$Lab::Moose::Instrument::ProStep4::VERSION = '3.930';
+$Lab::Moose::Instrument::ProStep4::VERSION = '3.931';
 #ABSTRACT: ProStep4 step motor
 #TODO: Documentation!!!
 
@@ -724,7 +724,7 @@ Lab::Moose::Instrument::ProStep4 - ProStep4 step motor
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -76,7 +76,7 @@ manual.pl - Example of custom sweep without Sweep framework
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 COPYRIGHT AND LICENSE
 

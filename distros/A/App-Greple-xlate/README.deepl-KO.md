@@ -12,7 +12,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 # VERSION
 
-Version 0.9910
+Version 0.9912
 
 # DESCRIPTION
 
@@ -42,9 +42,9 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
 전체 텍스트를 번역하려면 **--match-all** 옵션을 사용합니다. 이는 전체 텍스트와 일치하는 `(?s).+` 패턴을 지정하는 단축키입니다.
 
-충돌 마커 형식 데이터는 `sdif` 명령과 `-V` 옵션을 사용하여 나란히 정렬된 스타일로 볼 수 있습니다. 문자열 단위로 비교하는 것은 의미가 없으므로 `--no-cdif` 옵션을 사용하는 것이 좋습니다. 텍스트에 색상을 지정할 필요가 없는 경우 `--no-textcolor`(또는 `--no-tc`)를 지정합니다.
+충돌 마커 형식 데이터는 [sdif](https://metacpan.org/pod/App%3A%3Asdif) 명령과 `-V` 옵션을 사용하여 나란히 나란히 볼 수 있습니다. 문자열 단위로 비교하는 것은 의미가 없으므로 `--no-cdif` 옵션을 사용하는 것이 좋습니다. 텍스트에 색상을 지정할 필요가 없는 경우 `--no-textcolor`(또는 `--no-tc`)를 지정합니다.
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>

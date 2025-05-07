@@ -14,7 +14,7 @@ App::Greple::xlate - greple 用の翻訳サポートモジュール
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -40,9 +40,9 @@ PerlのPodスタイルで書かれた文書中の通常のテキストブロッ�
 
 テキスト全体を翻訳したい場合は、B<--match-all>オプションを使います。これはテキスト全体にマッチするパターンC<(?s).+>を指定するショートカットです。
 
-C<sdif>コマンドにC<-V>オプションを指定すると、コンフリクトマーカー形式のデータを並べて表示することができます。文字列単位で比較するのは意味がないので、C<--no-cdif>オプションを推奨します。テキストに色をつける必要がない場合は、C<--no-textcolor>（またはC<--no-tc>）を指定します。
+L<sdif|App::sdif>コマンドにC<-V>オプションをつけると、競合マーカーフォーマットのデータを並べて表示することができます。文字列ごとに比較するのは意味がないので、C<--no-cdif>オプションの使用をお勧めします。テキストに色をつける必要がない場合はC<--no-textcolor>（またはC<--no-tc>）を指定してください。
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">

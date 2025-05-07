@@ -14,7 +14,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.9910
+Version 0.9912
 
 =head1 DESCRIPTION
 
@@ -55,12 +55,12 @@ is a short-cut to specify the pattern C<(?s).+> which matches entire
 text.
 
 Conflict marker format data can be viewed in side-by-side style by
-C<sdif> command with C<-V> option.  Since it makes no sense to compare
-on a per-string basis, the C<--no-cdif> option is recommended.  If you
-do not need to color the text, specify C<--no-textcolor> (or
-C<--no-tc>).
+L<sdif|App::sdif> command with C<-V> option.  Since it makes no sense
+to compare on a per-string basis, the C<--no-cdif> option is
+recommended.  If you do not need to color the text, specify
+C<--no-textcolor> (or C<--no-tc>).
 
-    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">

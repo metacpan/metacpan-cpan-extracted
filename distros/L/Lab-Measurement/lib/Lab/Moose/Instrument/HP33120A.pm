@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP33120A;
-$Lab::Moose::Instrument::HP33120A::VERSION = '3.930';
+$Lab::Moose::Instrument::HP33120A::VERSION = '3.931';
 #ABSTRACT: HP 33120A 15 MHz Arbitrary Waveform Generator, also as voltage source
 
 use v5.20;
@@ -209,7 +209,7 @@ Lab::Moose::Instrument::HP33120A - HP 33120A 15 MHz Arbitrary Waveform Generator
 
 =head1 VERSION
 
-version 3.930
+version 3.931
 
 =head1 SYNOPSIS
 
