@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.07';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -20,6 +20,7 @@ use Math::Round;
 use Tk;
 require Tk::Pane;
 require Tk::ListBrowser::Data;
+require Tk::ListBrowser::FilterEntry;
 require Tk::ListBrowser::Item;
 require Tk::ListBrowser::LBCanvas;
 require Tk::ListBrowser::LBHeader;
@@ -289,6 +290,13 @@ Default value I<single>. Can either be I<single> or I<multiple>.
 In single mode only one entry in the list can be selected at all times.
 In multiple mode more than one entry can be selected.
 
+=item Switch B<-selectstyle>
+
+Default value I<anchor>. Can either be I<anchor> or I<simple>.
+This option specifies how the arrow keys work. When set to anchor,
+the arrow keys only move the anchor, space or enter will select. 
+When set to simple the arrow keys also make a single mode selection.
+
 =item Switch B<-separator>
 
 Default value is an empty string. When set to one character, hierarchy mode is enabled.
@@ -375,9 +383,6 @@ I<-textanchor>, I<-textjustify>, I<-textside>, and I<-wraplength>,
 sub Populate {
 	my ($self,$args) = @_;
 	
-	my $nofilter = delete $args->{'-nofilter'};
-	$nofilter = '' unless defined $nofilter;
-	
 	$self->SUPER::Populate($args);
 	
 	#create the canvas
@@ -392,6 +397,7 @@ sub Populate {
 
 	#horizontal scroll for headers
 	my $xscroll = $canv->Subwidget('xscrollbar');
+	$self->Advertise('XScrollbar', $xscroll);
 	my $call = $xscroll->cget('-command');
 	$xscroll->configure(
 		-command => sub {
@@ -399,6 +405,10 @@ sub Populate {
 			$self->headerPlace;
 		}
 	);
+	
+	#keep track of verticle scroll
+	my $yscroll = $canv->Subwidget('yscrollbar');
+	$self->Advertise('YScrollbar', $yscroll);
 
 	$self->Advertise('Canvas', $c);
 	
@@ -418,33 +428,30 @@ sub Populate {
 	$c->Tk::bind('<Motion>', [ $self, 'Motion', Ev('x'), Ev('y') ]);
 
 	#setting up the filter
-	unless ($nofilter) {
-		my $filter = '';
-		$self->Advertise('Filter', \$filter);
-		my $fframe = $self->Frame;
-		$self->Advertise('FilterFrame', $fframe);
-		my $fentry = $fframe->Entry(
-			-textvariable => \$filter,
-		)->pack(-side => 'left', -pady => 2, -expand => 1, -fill => 'x');
-		$self->Advertise('FilterEntry', $fentry);
-		$fentry->bind('<Control-f>', [$self, 'filterFlip']);
-		$fentry->bind('<Escape>', [$self, 'filterFlip']);
-		$fentry->bind('<Button-1>', [$self, 'filterClick']);
-		$fentry->bind('<KeyRelease>', [$self, 'filterActivate']);
-	}
+	my $filter = '';
+	$self->Advertise('Filter', \$filter);
+	my $fframe = $self->Frame;
+	$self->Advertise('FilterFrame', $fframe);
+	my $fentry = $fframe->FilterEntry(
+		-command => ['filterRefresh', $self],
+		-textvariable => \$filter,
+	)->pack(-side => 'left', -pady => 2, -expand => 1, -fill => 'x');
+	$self->Advertise('FilterEntry', $fentry);
+	$fentry->bind('<Control-f>', [$self, 'filterFlip']);
+	$fentry->bind('<Escape>', [$self, 'filterFlip']);
 
 	$self->{ARRANGE} = undef;
 	$self->{COLUMNS} = [];
 	$self->{HANDLER} = undef;
 	$self->{INDENT} = 0;
 	$self->{DATA} = Tk::ListBrowser::Data->new($self);
-	$self->{ROWS} = 0;
-	$self->{WRAPLENGTH} = 0;
+#	$self->{WRAPLENGTH} = 0;
 
 	$self->bind('<Configure>', [ $self, 'OnConfigure' ]);
 
-	my $minusbmp = $self->Bitmap(-data => $minusimg);
-	my $plusbmp = $self->Bitmap(-data => $plusimg);
+	my @bmpopt = (-foreground => $c->cget('-foreground'), -background => $c->cget('-background'));
+	my $minusbmp = $self->Bitmap(-data => $minusimg, @bmpopt);
+	my $plusbmp = $self->Bitmap(-data => $plusimg, @bmpopt);
 	$self->ConfigSpecs(
 		#general
 		-arrange => ['METHOD', undef, undef, 'row'],
@@ -455,6 +462,7 @@ sub Populate {
 		-motionselect => ['PASSIVE', undef, undef, ''],
 		-scrollregion => [$c],
 		-selectmode => ['PASSIVE', undef, undef, 'single'],
+		-selectstyle => ['PASSIVE', undef, undef, 'anchor'],
 		-separator => ['PASSIVE', undef, undef, ''],
 
 		#colors
@@ -464,7 +472,8 @@ sub Populate {
 		-selectforeground => ['PASSIVE', 'selectForeground', 'SelectForeground', '#FAF9EA'],
 
 		#filter
-		-filterdelay => ['PASSIVE', 'filterDelay', 'FilterDelay', 300],
+		-nofilter => ['PASSIVE', undef, undef, ''],
+		-filterdelay => [$fentry],
 		-filterfield => ['PASSIVE', undef, undef, 'name'],
 		-filteron => ['PASSIVE', undef, undef, ''], #boolean
 
@@ -552,17 +561,16 @@ sub Populate {
 		selectionFlip => $self->data,
 		selectionIndex => $self->data,
 		selectionSet => $self->data,
+		selectionSingle => $self->data,
 		selectionUnset => $self->data,
 		show => $self->data,
 
 		DEFAULT => $self,
 	);
 	$self->after(1, sub {
-		$self->filterFlip if $self->cget('-filteron');
-		for ($minusbmp, $plusbmp) {
-			$_->configure(-background => $c->cget('-background'));
-			$_->configure(-foreground => $c->cget('-foreground'));
-		}
+		$self->filterShow if $self->cget('-filteron');
+		my $fentry = $self->Subwidget('FilterEntry');
+		$fentry->configure(-background => $c->cget('-background')) if defined $fentry;
 	});
 
 }
@@ -662,10 +670,17 @@ sub anchorInitialize {
 		my $a = $self->anchor;
 		my $name = $self->infoFirstVisible;
 		$self->anchorSet($name) unless defined $self->anchorGet;
+		$self->selectionSingle($name) if $self->cget('-selectstyle') eq 'simple';
 		$self->see($name);
 		return 1
 	}
 	return ''
+}
+
+sub anchorRefresh {
+	my $self = shift;
+	my $a = $self->anchorGet;
+	$a->drawAnchor if defined $a;
 }
 
 =item B<anchorSet>I<($name)>
@@ -819,7 +834,7 @@ sub canvasSize {
 	my $self = shift;
 	my $c = $self->Subwidget('Canvas');
 	my $offset = $c->cget('-highlightthickness') + $c->cget('-borderwidth');
-	return ($c->width - $offset, $c->height - $offset);
+	return ($self->width - $offset, $self->height - $offset);
 }
 
 sub cellHeight {
@@ -1208,39 +1223,39 @@ sub filter {
 	return $value =~ /$filter/i;
 }
 
-sub filterClick {
-	my $self = shift;
-	my $e = $self->Subwidget('FilterEntry');
-	my $text = $e->get;
-	$e->delete(0, 'end') if $text eq 'Filter';
-}
-
-sub filterActivate {
-	my $self = shift;
-	my $filter_id = $self->{'filter_id'};
-	if (defined $filter_id) {
-		$self->afterCancel($filter_id);
-	}
-	$filter_id = $self->after($self->cget('-filterdelay'), ['filterRefresh', $self]);
-	$self->{'filter_id'} = $filter_id;
-}
-
 sub filterFlip {
 	my $self = shift;
+	return if $self->cget('-nofilter');
+	my $e = $self->Subwidget('FilterEntry');
 	my $f = $self->Subwidget('FilterFrame');
-	if (defined $f) {
-		my $e = $self->Subwidget('FilterEntry');
-		if ($f->ismapped) {
-			unless ($self->cget('-filteron')) {
-				$f->packForget;
-				$e->delete(0, 'end');
-				$self->CanvasFocus;
-			}
-		} else {
-			$e->insert('end', 'Filter');
-			$f->pack(-fill => 'x');
+	if ($f->ismapped) {
+		unless ($self->cget('-filteron')) {
+			$self->filterHide;
+			$self->CanvasFocus;
 		}
+	} else {
+		$self->filterShow;
+		$e->focus;
 	}
+}
+
+sub filterHide {
+	my $self = shift;
+	return if $self->cget('-nofilter');
+	my $e = $self->Subwidget('FilterEntry');
+	my $f = $self->Subwidget('FilterFrame');
+	$e->delete(0, 'end');
+	$self->filterRefresh;
+	$f->packForget;
+}
+
+sub filterShow {
+	my $self = shift;
+	return if $self->cget('-nofilter');
+	my $e = $self->Subwidget('FilterEntry');
+	my $f = $self->Subwidget('FilterFrame');
+	$e->reset;
+	$f->pack(-fill => 'x');
 }
 
 sub filterRefresh {
@@ -1502,6 +1517,8 @@ sub headerPlace {
 			);
 			$self->Advertise('RMFrame', $frame)
 		}
+		my $yscroll = $self->Subwidget('YScrollbar');
+		$cw = $cw - $yscroll->width if $yscroll->ismapped;
 		$frame->place(-x => $x, -y => 0, -height => $hheight, -width => $cw - $x - 1);
 	} else {
 		my $frame = $self->Subwidget("RMFrame");
@@ -1751,6 +1768,9 @@ sub itemRemove {
 	$col->itemRemove($entry)
 }
 
+sub KeyArrowSet {
+}
+
 sub KeyArrowNavig {
 	my ($self, $dcol, $drow) = @_;
 	return undef if $self->anchorInitialize;
@@ -1758,15 +1778,40 @@ sub KeyArrowNavig {
 	my $i = $self->anchorGet;
 	my $target;
 	if ($drow eq 0) { #horizontal move
-		my $rown = $i->row;
-		my @row = $self->getRow($rown);
-		if (($dcol > 0) and ($i->column >= @row - 1)) {
-			$target = $self->moveRow(1);
-		} elsif (($dcol < 0) and ($i->column <= 0)) {
-			$target = $self->moveRow(-1);
-		} else {
-			my $ti = $self->indexColumnRow($i->column + $dcol, $rown);
-			$target = $self->getIndex($ti)  if defined $ti;
+		my $flag = 1;
+		if ($self->hierarchy) {
+			my $a = $self->anchorGet;
+			if ($a->selected) {
+				my $n = $a->name;
+				my $o = $a->opened;
+				my @ch = $self->infoChildren($a->name);
+				if ($dcol eq 1) { #move to the right
+					if ((! $a->opened) and (@ch)) {
+						$self->open($a->name);
+						$self->refresh;
+						$flag = '';
+					}
+				} else { #move to the left
+					if (($a->opened) and (@ch)) {
+						$self->close($a->name);
+						$self->refresh;
+						$flag = '';
+					}
+				}
+				$self->anchorSet($a->name);
+			}
+		}
+		if ($flag) {
+			my $rown = $i->row;
+			my @row = $self->getRow($rown);
+			if (($dcol > 0) and ($i->column >= @row - 1)) {
+				$target = $self->moveRow(1);
+			} elsif (($dcol < 0) and ($i->column <= 0)) {
+				$target = $self->moveRow(-1);
+			} else {
+				my $ti = $self->indexColumnRow($i->column + $dcol, $rown);
+				$target = $self->getIndex($ti)  if defined $ti;
+			}
 		}
 	} else { #vertical move
 		my $coln = $i->column;
@@ -1783,6 +1828,7 @@ sub KeyArrowNavig {
 	if (defined $target) {
 		my $name = $target->name;
 		$self->anchorSet($name);
+		$self->selectionSingle($name) if $self->cget('-selectstyle') eq 'simple';
 		$self->see($name);
 		return 1
 	}
@@ -1802,6 +1848,7 @@ sub KeyArrowSelect {
 		}
 	}
 }
+
 
 sub KeyLastColumn {
 	my $self = shift;
@@ -1988,6 +2035,12 @@ Returns the number of the last row in I<$column>.
 
 =cut
 
+sub listMode {
+	my $self = shift;
+	my $arr = $self->cget('-arrange');
+	return (($arr ne 'column') and ($arr ne 'row') and ($arr ne 'bar'));
+}
+
 sub listWidth {
 	my $self = shift;
 	$self->{LISTWIDTH} = shift if @_;
@@ -2068,7 +2121,13 @@ sub OnConfigure {
 	my $arrange = $self->cget('-arrange');
 	my %a = (qw/column 1 row 1/);
 	$self->refresh if exists $a{$arrange};
-	$self->headerPlace; # TODO do not know why this is needed.
+
+	#redraw headers, anchor and selection in list mode
+	if ($self->listMode) {
+		$self->headerPlace;
+		$self->anchorRefresh;
+		$self->selectionRefresh;
+	}
 }
 
 sub OnConfigureTimer {
@@ -2171,6 +2230,16 @@ Clears the entire selection.
 
 Returns a list of entry names contained in the selection.
 
+=cut
+
+sub selectionRefresh {
+	my $self = shift;
+	my @sel = $self->selectionGet;
+	for (@sel) {
+		my $i = $self->get($_);
+		$i->drawSelect;
+	}
+}
 =item B<selectionSet>I<($begin, ?$end?)>
 
 Selects entry I<$begin>. If you specify I<$end> the

@@ -1,3 +1,9 @@
+v0.06   2025-05-07Z
+    - Support for dot repeats in files
+    - Require Data::Identifier version v0.14 (or newer)
+    - Register well known identifiers
+    - Let reader and writer inherit from Data::Identifier::Interface::Userdata
+
 v0.05   2025-04-27Z
     - Allow arrayref as argument to $writer->write_tag_ise()
     - Reimplemented File::Valuefile->known() using Data::Identifier::Interface::Known

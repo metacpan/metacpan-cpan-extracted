@@ -5,7 +5,7 @@ use warnings;
 
 use App::Image::Generator;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Run.
 exit App::Image::Generator->new->run;
@@ -32,7 +32,7 @@ image-generator - Script to generate video.
 
 =head1 DESCRIPTION
 
- image-generator script uses Image::Random or Image::Select classes to create image.
+image-generator script uses Image::Random or Image::Select classes to create image.
 
 =head1 ARGUMENTS
 
@@ -40,36 +40,39 @@ image-generator - Script to generate video.
 
 =item * C<-h>
 
- Print help.
+Print help.
 
 =item * C<-i input_dir>
 
- Input directory with images.
- Default value is nothing, then generates random images.
+Input directory with images.
+
+Default value is nothing, then generates random images.
 
 =item * C<-p pattern>
 
- Use pattern.
- Default value is 'checkerboard'.
+Use pattern.
+
+Default value is 'checkerboard'.
 
 =item * C<-s size>
 
- Image size.
- Default value is 1920x1080.
+Image size.
+
+Default value is 1920x1080.
 
 =item * C<-v>
 
- Verbose mode.
+Verbose mode.
 
 =item * C<--version>
 
- Print version of script.
+Print version of script.
 
 =item * C<output_file>
 
- Output file.
- e.g. foo.jpg
- e.g. foo.bmp
+Output file.
+
+e.g. foo.jpg, foo.bmp
 
 =back
 
@@ -130,6 +133,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

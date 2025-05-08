@@ -80,8 +80,6 @@ Hans Jeuken (hanje at cpan dot org)
 
 If you find any bugs, please report them here: L<https://github.com/haje61/Tk-ListBrowser/issues>.
 
-=back
-
 =cut
 
 1;

@@ -26,7 +26,7 @@ Apache::Solr - Apache Solr (Lucene) extension
 
   my $results = $solr->select(q => "really", hl => {fl=>'content'});
   while(my $doc = $results->nextSelected)
-  {   my $hldoc = $results->highlighted($doc);
+  {    my $hldoc = $results->highlighted($doc);
       print $hldoc->_content;
       ...
   }
@@ -36,11 +36,12 @@ Apache::Solr - Apache Solr (Lucene) extension
   dispatcher SYSLOG => 'default';  # now all warnings/error to syslog
   try { $solr->select(...) }; print $@->wasFatal;
 
-  # [1.10] Information about communication errors 
-  try { $solr->...(...) };
+  # [1.11] Information about communication errors 
+  my $result = try { $solr->select(...) };
   if(my $ex = $@->wasFatal)
-  {  if(my $http = $ex->message->valueOf('http_response'))
-     {   warn $http->decoded_content;
+  {  $result = $ex->message->valueOf('result');
+     if(defined $result)   #!! defined !!
+     {    warn Dumper $result->decoded;
 
 =head1 DESCRIPTION
 
@@ -188,8 +189,8 @@ example:
 
   my $r = $self->queryTerms(fl => 'subject', limit => 100);
   if($r->success)
-  {   foreach my $hit ($r->terms('subject'))
-      {   my ($term, $count) = @$hit;
+  {    foreach my $hit ($r->terms('subject'))
+      {    my ($term, $count) = @$hit;
           print "term=$term, count=$count\n";
       }
   }
@@ -358,8 +359,8 @@ also specify the C<file> option with a filename.
 
 example: 
 
-   my $r = $solr->extractDocument(file => 'design.pdf'
-     , literal_id => 'host');
+   my $r = $solr->extractDocument(file => 'design.pdf',
+       literal_id => 'host');
 
 =item $obj-E<gt>B<optimize>(%options)
 
@@ -503,12 +504,12 @@ HASH (or ARRAY-of-PAIRS).  [0.97] the value in each PAIR may be a SCALAR
 
 example: 
 
-  my $result = $solr->extractDocument(string => $document
-     , resource_name => $fn, extractOnly => 1
-     , literals => { id => 5, b => 'tic' }, literal_xyz => 42
-     , fmap => { id => 'doc_id' }, fmap_subject => 'mysubject'
-     , boost => { abc => 3.5 }, boost_xyz => 2.0);
-);
+  my $result = $solr->extractDocument(string => $document,
+      resource_name => $fn, extractOnly => 1,
+      literals => { id => 5, b => 'tic' }, literal_xyz => 42,
+      fmap => { id => 'doc_id' }, fmap_subject => 'mysubject',
+      boost => { abc => 3.5 }, boost_xyz => 2.0
+  );
 
 =item $obj-E<gt>B<expandSelect>(PAIRS)
 
@@ -527,7 +528,7 @@ by the backend abbreviation.
 
 =item * hl (highlight) -> F<http://wiki.apache.org/solr/HighlightingParameters>
 
-=item * mtl -> F<https://solr.apache.org/guide/8_11/morelikethis.html>
+=item * mlt -> F<https://solr.apache.org/guide/8_11/morelikethis.html>
 
 =item * stats -> F<http://wiki.apache.org/solr/StatsComponent>
 
@@ -541,15 +542,15 @@ You may use WebService::Solr::Query to construct the query ('q').
 
 example: 
 
-  my @r = $solr->expandSelect
-    ( q => 'inStock:true', rows => 10
-    , facet => {limit => -1, field => [qw/cat inStock/], mincount => 1}
-    , f_cat_facet => {missing => 1}
-    , hl    => {}
-    , mlt   => { fl => 'manu,cat', mindf => 1, mintf => 1 }
-    , stats => { field => [ 'price', 'popularity' ] }
-    , group => { query => 'price:[0 TO 99.99]', limit => 3 }
-    );
+  my @r = $solr->expandSelect(
+      q => 'inStock:true', rows => 10,
+      facet => {limit => -1, field => [qw/cat inStock/], mincount => 1},
+      f_cat_facet => {missing => 1},
+      hl    => {},
+      mlt   => { fl => 'manu,cat', mindf => 1, mintf => 1 },
+      stats => { field => [ 'price', 'popularity' ] },
+      group => { query => 'price:[0 TO 99.99]', limit => 3 },
+  );
 
   # becomes (one line)
   ...?rows=10&q=inStock:true
@@ -607,6 +608,14 @@ is passed; you never know for a HASH.
 
 =back
 
+=item $obj-E<gt>B<request>($url, $result, $body, $ct)
+
+Send a request to the server C<$url> and return the response
+(an HTTP::Response object).  A trace of the activity is
+added to the C<$result> object.  The C<$body> of the request
+can be provided as bytes or reference to bytes (SCALAR). The
+content-type C<$ct> must match the body bytes.
+
 =back
 
 =head1 DETAILS
@@ -642,8 +651,8 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.10,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.11,
+built on May 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

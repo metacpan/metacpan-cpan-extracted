@@ -10,6 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Debug/CodeBlock.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

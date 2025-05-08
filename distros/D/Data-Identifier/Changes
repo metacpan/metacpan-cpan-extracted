@@ -1,3 +1,9 @@
+v0.14  2025-05-07Z
+    - Added Data::Identifier::Interface::Userdata (still experimental)
+    - Updated tests
+    - Improved loading times by only loading Data::Identifier::Generate on demand
+    - Added more identifiers to the well known list (dot-repeat-marker, and digest related)
+
 v0.13  2025-04-27Z
     - Added generators for multiplicity, and simple GTE
     - Added properties generator and request to Data::Identifier

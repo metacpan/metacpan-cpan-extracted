@@ -11,6 +11,8 @@ use v5.10;
 use strict;
 use warnings;
 
+use parent 'Data::Identifier::Interface::Userdata';
+
 use Carp;
 use Fcntl qw(SEEK_SET);
 use URI::Escape qw(uri_unescape);
@@ -19,13 +21,16 @@ use Encode ();
 use Data::Identifier v0.06;
 use File::ValueFile;
 
-use constant RE_ISE         => qr/^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[0-2](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$/;
-use constant KEYWORD_OK     => qr/^[a-zA-Z0-9\-:\._~]*$/;
-use constant FORMAT_ISE     => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
-use constant ASI_ISE        => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633';
-use constant TAGNAME_ISE    => 'bfae7574-3dae-425d-89b1-9c087c140c23';
+use constant {
+    RE_ISE         => qr/^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[0-2](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$/,
+    KEYWORD_OK     => qr/^[a-zA-Z0-9\-:\._~]*$/,
+    FORMAT_ISE     => '54bf8af4-b1d7-44da-af48-5278d11e8f32',
+    ASI_ISE        => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633',
+    TAGNAME_ISE    => 'bfae7574-3dae-425d-89b1-9c087c140c23',
+    DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
+};
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 
 
@@ -54,12 +59,18 @@ sub new {
         }
     }
 
+    if (ref($self->{supported_features})) {
+        push(@{$self->{supported_features}}, Data::Identifier->new(ise => DOT_REPEAT_ISE));
+    }
+
     $self->{utf8} = $opts{utf8} //= 'auto';
     if ($opts{utf8} && $opts{utf8} ne 'auto') {
         $self->{unescape} = \&_unescape_utf8;
     } else {
         $self->{unescape} = \&uri_unescape;
     }
+
+    $self->{dot_repreat} = 0;
 
     return $self;
 }
@@ -117,6 +128,7 @@ sub _handle_special {
 
         $self->_check_supported(supported_features => $id) if $type eq '!';
         $self->_check_utf8($marker => $id) if $self->{utf8} eq 'auto';
+        $self->{dot_repreat} ||= $id->eq(DOT_REPEAT_ISE);
 
         return;
     }
@@ -137,6 +149,7 @@ sub read_to_cb {
     my ($self, $cb) = @_;
     my $fh = $self->{fh};
     my $unescape = $self->{unescape};
+    my @last_line;
 
     $fh->seek(0, SEEK_SET);
     $fh->input_line_number(0);
@@ -156,10 +169,33 @@ sub read_to_cb {
 
         if ($line =~ s/^\!([\!\?\&])//) {
             my $type = $1;
-            $self->_handle_special($type, map{
-                    $_ =~ KEYWORD_OK ? $_ :
-                    $_ =~ /^\!/ ? _special($_) : $unescape->($_)
-                }(split(/\s+/, $line)));
+
+            if ($self->{dot_repreat}) {
+                my @line = split(/\s+/, $line);
+                my $x = 0;
+                foreach my $e (@line) {
+                    if ($e eq '.') {
+                        $e = $last_line[$x];
+                    } elsif ($e =~ s/^\.\.+$//) {
+                        # done in match
+                    } elsif ($e =~ KEYWORD_OK) {
+                        # no-op
+                    } elsif ($e =~ /^\!/) {
+                        $e = _special($_);
+                    } else {
+                        $e = $unescape->($e);
+                    }
+                    $x++;
+                }
+
+                $self->_handle_special($type, @line);
+                @last_line = @line;
+            } else {
+                $self->_handle_special($type, map{
+                        $_ =~ KEYWORD_OK ? $_ :
+                        $_ =~ /^\!/ ? _special($_) : $unescape->($_)
+                    }(split(/\s+/, $line)));
+            }
 
             # Reload:
             $unescape = $self->{unescape};
@@ -167,10 +203,32 @@ sub read_to_cb {
             next;
         }
 
-        $self->$cb(map{
-                $_ =~ KEYWORD_OK ? $_ :
-                $_ =~ /^\!/ ? _special($_) : $unescape->($_)
-            }(split(/\s+/, $line)));
+        if ($self->{dot_repreat}) {
+            my @line = split(/\s+/, $line);
+            my $x = 0;
+            foreach my $e (@line) {
+                if ($e eq '.') {
+                    $e = $last_line[$x];
+                } elsif ($e =~ /^\.+$/) {
+                    $e =~ s/^\.//;
+                } elsif ($e =~ KEYWORD_OK) {
+                    # no-op
+                } elsif ($e =~ /^\!/) {
+                    $e = _special($e);
+                } else {
+                    $e = $unescape->($e);
+                }
+                $x++;
+            }
+
+            $self->$cb(@line);
+            @last_line = @line;
+        } else {
+            $self->$cb(map{
+                    $_ =~ KEYWORD_OK ? $_ :
+                    $_ =~ /^\!/ ? _special($_) : $unescape->($_)
+                }(split(/\s+/, $line)));
+        }
     }
 }
 
@@ -342,13 +400,15 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
     use File::ValueFile::Simple::Reader;
 
 This module provides a simple way to read ValueFile files.
+
+This module inherit from L<Data::Identifier::Interface::Userdata>.
 
 =head1 METHODS
 

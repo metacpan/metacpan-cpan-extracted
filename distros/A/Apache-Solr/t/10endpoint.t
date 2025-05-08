@@ -19,5 +19,5 @@ isa_ok($solr, 'Apache::Solr');
 
 my $uri1 = $solr->endpoint('update', params => [tic => 1, tac => '&']);
 isa_ok($uri1, 'URI');
-is($uri1->as_string, "$server/$core/update?tic=1&tac=%26");
+is($uri1->as_string, "$server/$core/update?wt=xml&tic=1&tac=%26");
 

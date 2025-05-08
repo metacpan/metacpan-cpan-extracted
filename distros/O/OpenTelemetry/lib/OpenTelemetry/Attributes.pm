@@ -3,11 +3,13 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Attributes;
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 class OpenTelemetry::AttributeMap {
     use Log::Any;
-    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+    use OpenTelemetry::Common ();
+
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     use List::Util qw( any pairs );
     use Ref::Util qw( is_hashref is_arrayref );

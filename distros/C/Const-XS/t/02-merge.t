@@ -17,10 +17,14 @@ const my %hash3 => (
 	%hash2,
 	three => 3
 );
-const $ref => {
+const my $ref => {
 	test => $foo,
 	%hash3
 };
+
+const my @deeep => (
+	{ one => qr/abc/, cb => sub { 111 } }
+);
 
 is_deeply(\@merge, ['a scalar value', 'another value']);
 is_deeply(\@copy, ['a scalar value', 'another value']);

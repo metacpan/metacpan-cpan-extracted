@@ -925,7 +925,7 @@ void
 use_pkcs1_padding(p_rsa)
     rsaData* p_rsa;
   CODE:
-    p_rsa->padding = RSA_PKCS1_PADDING;
+    croak("PKCS#1 1.5 is disabled as it is known to be vulnerable to marvin attacks.");
 
 void
 use_pkcs1_oaep_padding(p_rsa)

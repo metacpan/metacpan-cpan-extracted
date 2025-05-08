@@ -13,10 +13,12 @@ lib/Data/Identifier.pm
 lib/Data/Identifier/Cloudlet.pm
 lib/Data/Identifier/Generate.pm
 lib/Data/Identifier/Interface/Known.pm
+lib/Data/Identifier/Interface/Userdata.pm
 lib/Data/Identifier/Wellknown.pm
 t/01_load.t
 t/02_uuid.t
 t/10_mixandmatch.t
 t/20_generate.t
 t/30_cloudlet.t
+t/80_userdata.t
 xt/author/pod-syntax.t

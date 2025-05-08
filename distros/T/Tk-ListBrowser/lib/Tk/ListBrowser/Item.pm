@@ -10,6 +10,8 @@ use strict;
 use warnings;
 use vars qw ($VERSION);
 use Carp;
+require Tk::ListBrowser::SelectXPM;
+use Math::Round qw(round);
 
 $VERSION = 0.04;
 
@@ -61,23 +63,9 @@ sub anchor {
 	$flag = 1 unless defined $flag;
 	$self->{ANCHOR} = $flag;
 	if ($flag) {
-		my @coords;
-		my @region = $self->region;
-		if ($self->hierarchy) {
-			my $lb = $self->listbrowser;
-			my $sr = $lb->cget('-scrollregion');
-			@coords = ($lb->cget('-marginleft'), $region[1], $sr->[2], $region[3]);
-		} else {
-			@coords = @region;
-		}
-		my $a = $c->createRectangle(@coords,
-			-fill => undef,
-			-dash => [3, 2],
-		);
-		$self->canchor($a);
+		$self->drawAnchor
 	} else {
-		my $a = $self->canchor;
-		$c->delete($a) if defined $a;
+		$self->deleteAnchor
 	}
 	return $self->{ANCHOR}
 }
@@ -157,6 +145,16 @@ sub data {
 	return $self->{DATA}
 }
 
+sub deleteAnchor {
+	my $self = shift;
+	my $r = $self->canchor;
+	return unless defined $r;
+	
+	my $c = $self->Subwidget('Canvas');
+	$c->delete($r);
+	$self->canchor(undef);
+}
+
 sub deleteImage {
 	my $self = shift;
 	my $i = $self->cimage;
@@ -175,6 +173,29 @@ sub deleteRect {
 	my $c = $self->Subwidget('Canvas');
 	$c->delete($r);
 	$self->crect(undef);
+}
+
+sub deleteSelect {
+	my $self = shift;
+	my $r = $self->cselect;
+	return unless defined $r;
+	
+	my $c = $self->Subwidget('Canvas');
+	$c->delete($r);
+	$self->cselect(undef);
+
+	my $t = $self->ctext;
+	$c->itemconfigure($t,
+		-fill => $self->cget('-foreground'),
+	) if defined $t;
+
+	my @columns = $self->columnList;
+	for (@columns) {
+		my $i = $self->itemGet($self->name, $_);
+		$c->itemconfigure($i->ctext, 
+			-fill => $self->cget('-foreground'),
+		) if (defined $i) and (defined $i->ctext);
+	}
 }
 
 sub deleteText {
@@ -301,6 +322,27 @@ sub draw {
 	$self->ismapped(1);
 }
 
+sub drawAnchor {
+	my $self = shift;
+	return unless $self->ismapped;
+	my @coords = $self->region;
+	$self->deleteAnchor;
+	my $c = $self->Subwidget('Canvas');
+	if ($self->listMode) {
+		my $lb = $self->listbrowser;
+		my ($cw) = $self->canvasSize;
+		my $yscroll = $self->Subwidget('YScrollbar');
+		$cw = $cw - $yscroll->width if $yscroll->ismapped;
+		$coords[0] = 0;
+		$coords[2] = $cw - 4;
+	}
+	my $a = $c->createRectangle(@coords,
+		-fill => undef,
+		-dash => [3, 2],
+	);
+	$self->canchor($a);
+}
+
 sub drawImage {
 	my $self = shift;
 	my $image = $self->image;
@@ -347,6 +389,54 @@ sub drawRect {
 
 	$c->raise($self->cimage) if defined $self->cimage;
 	$c->raise($self->ctext) if defined $self->ctext;
+}
+
+sub drawSelect {
+	my $self = shift;
+	return unless $self->ismapped;
+	$self->deleteSelect;
+	my $c = $self->Subwidget('Canvas');
+	my $r = $self->crect;
+	my $t = $self->ctext;
+	my @columns = $self->columnList;
+	my @coords = $self->region;
+	if ($self->listMode) {
+		my $lb = $self->listbrowser;
+		my ($cw) = $self->canvasSize;
+		my $yscroll = $self->Subwidget('YScrollbar');
+		$cw = $cw - $yscroll->width if $yscroll->ismapped;
+		$coords[0] = 0;
+		$coords[2] = $cw - 4;
+	}
+
+	my $lb = $self->listbrowser;
+	my $si = Tk::ListBrowser::SelectXPM->new($lb);
+	my $a = $si->selectimage(@coords);
+	$self->cselect($a);
+	$c->raise($self->cimage, $a);
+	$c->raise($t, $a);
+	$c->raise($self->cindicator, $a);
+	$c->raise($self->cguideH, $a);
+	$c->raise($self->cguideV, $a);
+	$c->raise($self->canchor, $a) if defined $self->canchor;
+	my $next = $self->infoNext($self->name);
+	if (defined $next) {
+		my $n = $self->get($next);
+		$c->raise($n->cguideV, $a);
+	}
+	$c->itemconfigure($t,
+		-fill => $lb->cget('-selectforeground'),
+	);
+	for (@columns) {
+		my $i = $self->itemGet($self->name, $_);
+		if ((defined $i) and (defined $i->ctext)) {
+			$c->raise($i->ctext, $a) if defined $i->ctext;
+			$c->raise($i->cimage, $a) if defined $i->cimage;
+			$c->itemconfigure($i->ctext, 
+				-fill => $lb->cget('-selectforeground'),
+			);
+		}
+	}
 }
 
 sub drawText {
@@ -498,62 +588,11 @@ sub select {
 	my ($self, $flag) = @_;
 	$flag = 1 unless defined $flag;
 	my $lb = $self->listbrowser;
-	my $c = $self->Subwidget('Canvas');
-	my $r = $self->crect;
-	my $t = $self->ctext;
-	my @columns = $self->columnList;
 	if ($flag) {
 		return if $self->selected;
-		my @coords;
-		my @region = $self->region;
-		if ($self->hierarchy) {
-			my $lb = $self->listbrowser;
-			my $sr = $lb->cget('-scrollregion');
-			@coords = ($lb->cget('-marginleft'), $region[1], $sr->[2], $region[3]);
-		} else {
-			@coords = @region;
-		}
-		my $a = $c->createRectangle(@coords,
-			-fill => $lb->cget('-selectbackground'),
-			-outline => $lb->cget('-selectbackground'),
-			-tags => ['sel'],
-		);
-		$self->cselect($a);
-		$c->raise($self->cimage, $a);
-		$c->raise($t, $a);
-		$c->raise($self->cindicator, $a);
-		$c->raise($self->cguideH, $a);
-		$c->raise($self->cguideV, $a);
-		my $next = $self->infoNext($self->name);
-		if (defined $next) {
-			my $n = $self->get($next);
-			$c->raise($n->cguideV, $a);
-		}
-		$c->itemconfigure($t,
-			-fill => $lb->cget('-selectforeground'),
-		);
-		for (@columns) {
-			my $i = $self->itemGet($self->name, $_);
-			if ((defined $i) and (defined $i->ctext)) {
-				$c->raise($i->ctext, $a) if defined $i->ctext;
-				$c->itemconfigure($i->ctext, 
-					-fill => $lb->cget('-selectforeground'),
-				);
-			}
-		}
+		$self->drawSelect
 	} else {
-		my $a = $self->cselect;
-		$c->delete($a);
-		$self->cselect(undef);
-		$c->itemconfigure($t, 
-			-fill => $self->cget('-foreground'),
-		);
-		for (@columns) {
-			my $i = $self->itemGet($self->name, $_);
-			$c->itemconfigure($i->ctext, 
-				-fill => $self->cget('-foreground'),
-			) if (defined $i) and (defined $i->ctext);
-		}
+		$self->deleteSelect
 	}
 	$self->{SELECTED} = $flag;
 }

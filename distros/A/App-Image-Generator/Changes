@@ -1,3 +1,7 @@
+0.07 2025-05-08T11:02:16+02:00
+ - Fix test dependencies.
+ - Improve doc.
+
 0.06 2025-05-06T09:43:59+02:00
  - Add help() helper to run test.
  - Add support for checkerboard pattern.

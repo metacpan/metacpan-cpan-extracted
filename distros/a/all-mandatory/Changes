@@ -1,4 +1,9 @@
 ------------------------------------------------------------------------
+0.03 | Dondi Michael Stroma <dstroma@cpan.org> | 2025-05-07
+
+* Use GNU tar to avoid extraction warnings
+
+------------------------------------------------------------------------
 0.02 | Dondi Michael Stroma <dstroma@gmail.com> | 2025-03-31
 
 * First release of all::mandatory, based on all

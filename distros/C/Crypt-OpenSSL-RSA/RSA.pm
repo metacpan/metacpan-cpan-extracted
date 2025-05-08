@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;    # Removing carp will break the XS code.
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use XSLoader;
 XSLoader::load 'Crypt::OpenSSL::RSA', $VERSION;
@@ -79,6 +79,13 @@ Crypt::OpenSSL::RSA - RSA encoding and decoding, using the openSSL libraries
   $rsa_priv->use_md5_hash(); # insecure. use_sha256_hash or use_sha1_hash are the default
   $signature = $rsa_priv->sign($plaintext);
   print "Signed correctly\n" if ($rsa->verify($plaintext, $signature));
+
+=head1 SECURITY
+
+Version 0.35 makes the use of PKCS#1 v1.5 padding a fatal error.  It is
+very difficult to implement PKCS#1 v1.5 padding securely.  If you are still
+using RSA in in general, you should be looking at alternative encryption
+algorithms.
 
 =head1 DESCRIPTION
 
@@ -236,8 +243,11 @@ Encrypting user data directly with RSA is insecure.
 
 =item use_pkcs1_padding
 
-Use PKCS #1 v1.5 padding. This currently is the most widely used mode
-of padding.
+PKCS #1 v1.5 padding has been disabled as it is nearly impossible to use this
+padding method in a secure manner.  It is known to be vulnerable to timing
+based side channel attacks.  use_pkcs1_padding() results in a fatal error. 
+
+L<Marvin Attack|https://github.com/tomato42/marvin-toolkit/blob/master/README.md>
 
 =item use_pkcs1_oaep_padding
 

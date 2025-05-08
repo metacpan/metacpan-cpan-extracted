@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Apache::Solr::Tables;{
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 }
 
 use base 'Exporter';
@@ -188,12 +188,11 @@ timeAllowed		1.3
 tv.all			1.4
 tv.fl			3.1
 tv.tf			1.4
-
 /;
 
 our %deprecated = qw/
- facet.date		3.1
- facet.zeros		1.2
- carrot.lexicalResourcesDir 4.5
+facet.date		3.1
+facet.zeros		1.2
+carrot.lexicalResourcesDir 4.5
 /;
 

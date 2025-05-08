@@ -11,11 +11,13 @@ use v5.14;
 use strict;
 use warnings;
 
+use parent qw(Data::Identifier::Interface::Userdata);
+
 use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my %_valid_new_opts = (
     db          => 'Data::TagDB',
@@ -194,7 +196,7 @@ Data::Identifier::Cloudlet - format independent identifier object
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -222,6 +224,8 @@ But they could also be used for example to provide a directory listing.
 
 B<Note:>
 Two tags are considered equal if their ISE string equals (C<eq>), see L</new> for details.
+
+This package inherits from L<Data::Identifier::Interface::Userdata> (since v0.14).
 
 =head1 METHODS
 

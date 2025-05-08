@@ -13,14 +13,13 @@ use v5.20;
 use strict;
 use warnings;
 
-use parent qw(Data::Identifier::Interface::Known);
+use parent qw(Data::Identifier::Interface::Known Data::Identifier::Interface::Userdata);
 
 use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
-use Data::Identifier::Generate;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -416,6 +415,7 @@ sub random {
         croak 'Invalid/Unsupported type';
     }
 
+    require Data::Identifier::Generate;
     my $uuid = Data::Identifier::Generate->_random(%opts{'sources'});
     return $pkg->new(uuid => $uuid, %opts{'displayname'});
 }
@@ -732,13 +732,6 @@ sub register {
 }
 
 
-sub userdata {
-    my ($self, $package, $key, $value) = @_;
-    $self->{userdata} //= {};
-    $self->{userdata}{$package} //= {};
-    return $self->{userdata}{$package}{$key} = $value // $self->{userdata}{$package}{$key};
-}
-
 
 sub displayname {
     my ($self, %opts) = @_;
@@ -803,6 +796,7 @@ sub _generate {
                 }
 
                 if (defined $input) {
+                    require Data::Identifier::Generate;
                     $self->{id_cache}{WK_UUID()} = Data::Identifier::Generate->_uuid_v5($ns, $input);
                 }
             }
@@ -844,7 +838,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -879,7 +873,8 @@ might not always get back exactly the identifier you passed in but an equivalent
 Also note that deduplication is done with performance in mind. This means that there is no
 guarantee for two equal identifiers to become deduplicated. See also L</register>.
 
-This package inherits from L<Data::Identifier::Interface::Known>.
+This package inherits from L<Data::Identifier::Interface::Known> (since v0.06),
+and L<Data::Identifier::Interface::Userdata> (since v0.14).
 
 =head2 OPTIONS
 
@@ -1365,11 +1360,7 @@ This method returns C<$identifier> (since v0.12).
     my $value = $identifier->userdata(__PACKAGE__, $key);
     $identifier->userdata(__PACKAGE__, $key => $value);
 
-Get or set user data to be used with this identifier. The data is stored using the given C<$key>.
-The package of the caller is given to provide namespaces for the userdata, so two independent packages
-can use the same C<$key>.
-
-The meaning of C<$key>, and C<$value> is up to C<__PACKAGE__>.
+Implements L<Data::Identifier::Interface::Userdata/userdata>.
 
 =head2 displayname
 

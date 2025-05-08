@@ -3,14 +3,14 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Trace::Span::Status;
 
-our $VERSION = '0.029';
-
-use Log::Any;
-my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+our $VERSION = '0.030';
 
 class OpenTelemetry::Trace::Span::Status {
+    use OpenTelemetry::Common ();
     use OpenTelemetry::Constants
         -span_status => { -as => sub { shift =~ s/^SPAN_STATUS_//r } };
+
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     field $code        :param :reader = UNSET;
     field $description :param :reader = undef;

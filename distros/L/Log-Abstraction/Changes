@@ -1,5 +1,15 @@
 Revision history for Log-Abstraction
 
+0.11	Wed May  7 15:37:37 EDT 2025
+	Fixed calling can() on an unblessed variable
+	Honour carp_on_warn when syslog is set
+
+0.10	Tue May  6 20:43:48 EDT 2025
+	Added carp_on_warn
+
+0.09	Tue May  6 08:15:36 EDT 2025
+	If no logger is given, use Log4perl
+
 0.08	Mon May  5 11:39:58 EDT 2025
 	Use Config::Abstraction instead of Config::Auto
 	Guess the value if script_name if it's not given

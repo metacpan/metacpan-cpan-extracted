@@ -16,6 +16,8 @@ $Data::Dumper::Quotekeys = 0;
 BEGIN {
     $server = $ENV{SOLR_TEST_SERVER}
         or plan skip_all => "no SOLR_TEST_SERVER provided";
+
+	$server .= '/markov';
 }
 
 require_ok('Apache::Solr');
@@ -52,13 +54,11 @@ ok($r0->success, 'delete succeeded');
 
 ### test $solr->addDocument()
 my $d1a = Apache::Solr::Document->new
-  ( fields => [ id => 'A', subject => '1 2 3', content => "<html>tic tac"
-              , content_type => 'text/html' ]
+  ( fields => [ id => 'A', subject => '1 2 3', content => "<html>tic tac", content_type => 'text/html' ]
   );
 
 my $d1b = Apache::Solr::Document->new
-  ( fields => [ id => 'B', content => "<body>tac too"
-              , content_type => 'text/html' ]
+  ( fields => [ id => 'B', content => "<body>tac too", content_type => 'text/html' ]
   , boost  => '5'
   );
 

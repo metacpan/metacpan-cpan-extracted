@@ -1,9 +1,12 @@
 package Log::Abstraction;
 
+# TODO: add a minimum logging level
+
 use strict;
 use warnings;
 use Carp;	# Import Carp for warnings
 use Config::Abstraction;
+use Log::Log4perl;
 use Params::Get 0.04;	# Import Params::Get for parameter handling
 use Sys::Syslog;	# Import Sys::Syslog for syslog support
 use Scalar::Util 'blessed';	# Import Scalar::Util for object reference checking
@@ -14,11 +17,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.08
+0.11
 
 =cut
 
-our $VERSION = 0.08;
+our $VERSION = 0.11;
 
 =head1 SYNOPSIS
 
@@ -52,6 +55,12 @@ The following arguments can be provided:
 
 =over
 
+=item * C<carp_on_warn>
+
+If set to 1,
+and C<logger> is not given,
+call C<Carp:carp> on C<warn()>.
+
 =item * C<config_file>
 
 Points to a configuration file which contains the parameters to C<new()>.
@@ -67,7 +76,10 @@ For example:
 
 It doesn't work on Windows because of the case-insensitive nature of that system.
 
-=item * C<logger> - A logger can be a code reference, an array reference, a file path, or an object.
+=item * C<logger>
+
+A logger can be a code reference, an array reference, a file path, or an object.
+Defaults to L<Log::Log4perl>
 
 =item * C<syslog> - A hash reference for syslog configuration.
 
@@ -142,14 +154,21 @@ sub new {
 		# Determine script name
 		$args{'script_name'} = File::Basename::basename($ENV{'SCRIPT_NAME'} || $0);
 
-		# croak(__PACKAGE__, ' syslog needs to know the script name');
+		croak(__PACKAGE__, ' syslog needs to know the script name') if(!defined($args{'script_name'}));
+	}
+
+	if(!defined($args{logger})) {
+		# Default to Log4perl
+		# FIXME: add default minimum logging level
+		Log::Log4perl->easy_init($args{verbose} ? $Log::Log4perl::DEBUG : $Log::Log4perl::ERROR);
+		$args{'logger'} = Log::Log4perl->get_logger();
 	}
 
 	my $self = {
-		messages => [],  # Initialize messages array
+		messages => [],	# Initialize messages array
 		%args,
 	};
-	return bless $self, $class;  # Bless and return the object
+	return bless $self, $class;	# Bless and return the object
 }
 
 # Internal method to log messages. This method is called by other logging methods.
@@ -191,8 +210,9 @@ sub _log {
 				print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n";
 				close $fout;
 			}
-		} else {
+		} elsif(Scalar::Util::blessed($logger) && ($logger->can($level))) {
 			# If logger is an object, call the appropriate method on the object
+			# The test is because Log::Log4perl doesn't understand notice()
 			$logger->$level(@messages);
 		}
 	}
@@ -302,10 +322,12 @@ sub warn {
 		};
 		my $err = $@;
 		closelog();
-		if($err)  {
+		if($err) {
 			Carp::carp($err);
+		} elsif($self->{'carp_on_warn'}) {
+			Carp::carp($warning);
 		}
-	} elsif(!defined($self->{logger})) {
+	} elsif($self->{'carp_on_warn'} || !defined($self->{logger})) {
 		# Fallback to Carp if no logger or syslog is defined
 		Carp::carp($warning);
 	}

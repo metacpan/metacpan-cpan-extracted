@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::TracerProvider;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use OpenTelemetry;
 
@@ -37,8 +37,7 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
     field $lock          //= Mutex->new;
     field $registry_lock //= Mutex->new;
 
-    use Log::Any;
-    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     ADJUST {
         try {

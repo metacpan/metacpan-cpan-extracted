@@ -1,7 +1,7 @@
 package OpenTelemetry::SDK;
 # ABSTRACT: An implementation of the OpenTelemetry SDK for Perl
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use strict;
 use warnings;
@@ -9,7 +9,6 @@ use experimental qw( signatures lexical_subs );
 use feature 'state';
 
 use Feature::Compat::Try;
-use Log::Any;
 use Module::Runtime;
 use OpenTelemetry::Common 'config';
 use OpenTelemetry::Propagator::Composite;
@@ -19,7 +18,7 @@ use OpenTelemetry::X;
 use isa 'OpenTelemetry::X';
 
 my sub configure_propagators {
-    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     state %map = (
         b3           => 'B3',
@@ -63,7 +62,7 @@ my sub configure_propagators {
 }
 
 my sub configure_span_processors {
-    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     state %map = (
         jaeger  => '::Jaeger',

@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Convert::Color" : "0.18",
             "Math::Round" : "0.08",
             "Test::Tk" : "3.04",
             "Tk" : "804.033"
@@ -49,6 +50,6 @@
          "web" : "https://github.com/haje61/Tk-ListBrowser"
       }
    },
-   "version" : "0.04",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Exporter::Console;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 class OpenTelemetry::SDK::Exporter::Console
     :does(OpenTelemetry::Exporter)

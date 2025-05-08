@@ -59,6 +59,6 @@
          "web" : "https://github.com/markov2/perl5-Apache-Solr"
       }
    },
-   "version" : "1.10",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

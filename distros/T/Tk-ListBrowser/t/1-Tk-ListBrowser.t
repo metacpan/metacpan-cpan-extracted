@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 97;
+use Test::More tests => 99;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
@@ -13,12 +13,14 @@ BEGIN {
 	use_ok('Tk::ListBrowser::BaseItem');
 	use_ok('Tk::ListBrowser::Column');
 	use_ok('Tk::ListBrowser::Data');
+	use_ok('Tk::ListBrowser::FilterEntry');
 	use_ok('Tk::ListBrowser::HList');
 	use_ok('Tk::ListBrowser::Item');
 	use_ok('Tk::ListBrowser::LBCanvas');
 	use_ok('Tk::ListBrowser::LBHeader');
 	use_ok('Tk::ListBrowser::List');
 	use_ok('Tk::ListBrowser::Row');
+	use_ok('Tk::ListBrowser::SelectXPM');
 	use_ok('Tk::ListBrowser::SideColumn');
 	use_ok('Tk::ListBrowser::Tree');
 };
@@ -430,7 +432,5 @@ push @tests, (
 		}, 0, 'indexColumnRow' ],
 );
 
-my $font = $ib->cget('-font');
-print "font $font\n";
 starttesting;
 

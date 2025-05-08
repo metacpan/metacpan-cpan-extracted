@@ -2,16 +2,15 @@ use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: Represents the entity producing OpenTelemetry data
 package OpenTelemetry::SDK::Resource;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 class OpenTelemetry::SDK::Resource :does(OpenTelemetry::Attributes) {
     use File::Basename 'basename';
-    use Log::Any;
     use OpenTelemetry::Common 'config';
 
     use isa 'OpenTelemetry::SDK::Resource';
 
-    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     require OpenTelemetry::SDK; # For VERSION
 

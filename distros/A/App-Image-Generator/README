@@ -5,41 +5,45 @@ SYNOPSIS
      image-generator [-h] [-i input_dir] [-p pattern] [-s size] [-v] [--version] output_file
 
 DESCRIPTION
-     image-generator script uses Image::Random or Image::Select classes to create image.
+    image-generator script uses Image::Random or Image::Select classes to
+    create image.
 
 ARGUMENTS
     *       "-h"
 
-             Print help.
+            Print help.
 
     *       "-i input_dir"
 
-             Input directory with images.
-             Default value is nothing, then generates random images.
+            Input directory with images.
+
+            Default value is nothing, then generates random images.
 
     *       "-p pattern"
 
-             Use pattern.
-             Default value is 'checkerboard'.
+            Use pattern.
+
+            Default value is 'checkerboard'.
 
     *       "-s size"
 
-             Image size.
-             Default value is 1920x1080.
+            Image size.
+
+            Default value is 1920x1080.
 
     *       "-v"
 
-             Verbose mode.
+            Verbose mode.
 
     *       "--version"
 
-             Print version of script.
+            Print version of script.
 
     *       "output_file"
 
-             Output file.
-             e.g. foo.jpg
-             e.g. foo.bmp
+            Output file.
+
+            e.g. foo.jpg, foo.bmp
 
 EXAMPLE1
      image-generator
@@ -90,5 +94,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

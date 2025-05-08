@@ -3,14 +3,10 @@ use Object::Pad;
 
 package OpenTelemetry::Trace::Tracer;
 
-our $VERSION = '0.029';
-
-use Log::Any;
-my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+our $VERSION = '0.030';
 
 class OpenTelemetry::Trace::Tracer {
     use Feature::Compat::Try;
-    use Feature::Compat::Defer;
     use Syntax::Keyword::Dynamically;
     use Ref::Util 'is_coderef';
 

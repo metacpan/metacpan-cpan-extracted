@@ -9,6 +9,7 @@ my $git = 'Tk-ListBrowser';
 
 my %prereq = (
 	#package          =>  version
+	'Convert::Color'    => '0.18',
 	'Math::Round'       => '0.08',
 	'Tk'                => '804.033',
 	'Test::Tk'          => '3.04',

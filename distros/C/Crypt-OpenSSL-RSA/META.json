@@ -56,6 +56,6 @@
          "url" : "http://github.com/cpan-authors/Crypt-OpenSSL-RSA"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

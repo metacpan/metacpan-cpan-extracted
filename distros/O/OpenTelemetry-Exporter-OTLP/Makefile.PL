@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0,
     "Metrics::Any" => 0,
     "Object::Pad" => "0.74",
-    "OpenTelemetry" => "0.010",
+    "OpenTelemetry" => "0.030",
     "Path::Tiny" => 0,
     "Syntax::Keyword::Dynamically" => 0,
     "Syntax::Keyword::Match" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t t/OpenTelemetry/*.t t/OpenTelemetry/Exporter/OTLP/*.t t/OpenTelemetry/Exporter/OTLP/Encoder/*.t"
   }
@@ -61,7 +61,7 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "Metrics::Any" => 0,
   "Object::Pad" => "0.74",
-  "OpenTelemetry" => "0.010",
+  "OpenTelemetry" => "0.030",
   "Path::Tiny" => 0,
   "Syntax::Keyword::Dynamically" => 0,
   "Syntax::Keyword::Match" => 0,

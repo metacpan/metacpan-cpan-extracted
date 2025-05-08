@@ -39,7 +39,7 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
  -Option    --Default
   core        undef
   endpoint    <required>
-  params      <required>
+  params      []
   request     undef
   response    undef
   sequential  false
@@ -50,7 +50,9 @@ Apache::Solr::Result - Apache Solr (Lucene) result container
 
 =item endpoint => URI
 
-=item params => ARRAY
+=item params => ARRAY|HASH
+
+The parameters used for the query.  [1.11] not required anymore.
 
 =item request => HTTP::Request object
 
@@ -80,6 +82,9 @@ of a repeat of a message exchange between this client and the database.
 
 =item $obj-E<gt>B<decoded>( [HASH] )
 
+Set/get the decoded content of the Solr server response.  In some cases,
+even error responses contain a valid Solr server data.
+
 =item $obj-E<gt>B<elapse>()
 
 Number of seconds used to receive a decoded answer.
@@ -100,7 +105,11 @@ List of (expanded) parameters used to call the solr server.
 
 =item $obj-E<gt>B<request>( [$request] )
 
+Set/get the HTTP::Request object used in this query.
+
 =item $obj-E<gt>B<response>( [$response] )
+
+Set/get the HTTP::Response object received from this query action.
 
 =item $obj-E<gt>B<sequential>()
 
@@ -193,7 +202,7 @@ example:
    $r or die $r->errors;
 
    if(my $last = $r->selected(9)) {...}
-   my $doc = $r->selected(11);         # auto-request more
+   my $doc = $r->selected(11);     # auto-request more
 
 =back
 
@@ -259,8 +268,8 @@ file-handle (probably STDOUT).
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.10,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.11,
+built on May 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

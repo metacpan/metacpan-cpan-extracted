@@ -112,20 +112,28 @@ subtest 'Merge' => sub {
         [ warning => OpenTelemetry => match qr/Incompatible.*Ignoring new one/ ],
     ] => 'Logged mismatched schema URL';
 
-    is $bar->merge($foo), object {
-        call schema_url => 'bar';
-        call attributes => { %default, a => 1, b => 1, c => 2 };
-    }, 'Confirm preference';
+    is messages {
+        is $bar->merge($foo), object {
+            call schema_url => 'bar';
+            call attributes => { %default, a => 1, b => 1, c => 2 };
+        }, 'Confirm preference';
+    } => [
+        [ warning => OpenTelemetry => match qr/Incompatible.*Ignoring new one/ ],
+    ] => 'Logged mismatched schema URL';
 
-    is $non->merge($foo), object {
-        call schema_url => 'foo';
-        call attributes => { %default, a => 1, b => 1 };
-    }, 'No schema URL is updated';
+    no_messages {
+        is $non->merge($foo), object {
+            call schema_url => 'foo';
+            call attributes => { %default, a => 1, b => 1 };
+        }, 'No schema URL is updated';
+    };
 
-    is $foo->merge($non), object {
-        call schema_url => 'foo';
-        call attributes => { %default, a => 1, b => 1 };
-    }, 'Existing schema URL stays if new is unset';
+    no_messages {
+        is $foo->merge($non), object {
+            call schema_url => 'foo';
+            call attributes => { %default, a => 1, b => 1 };
+        }, 'Existing schema URL stays if new is unset';
+    };
 };
 
 done_testing;

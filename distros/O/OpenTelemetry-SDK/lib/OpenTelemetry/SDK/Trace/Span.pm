@@ -2,7 +2,7 @@ use Object::Pad ':experimental( init_expr mop )';
 
 package OpenTelemetry::SDK::Trace::Span;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use OpenTelemetry::Attributes;
 
@@ -11,13 +11,13 @@ class OpenTelemetry::SDK::Trace::Span
     :does(OpenTelemetry::Attributes)
 {
     use List::Util qw( any pairs );
-    use Log::Any;
     use Ref::Util qw( is_arrayref is_hashref );
     use Time::HiRes 'time';
 
     use OpenTelemetry::Constants
         -span_kind => { -as => sub { shift =~ s/^SPAN_KIND_//r } };
 
+    use OpenTelemetry::Common ();
     use OpenTelemetry::SDK::Trace::SpanLimits;
     use OpenTelemetry::SDK::Trace::Span::Readable;
     use OpenTelemetry::Trace::Event;
@@ -32,7 +32,7 @@ class OpenTelemetry::SDK::Trace::Span
         OpenTelemetry::Trace::SpanContext
     );
 
-    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     field $dropped_events      = 0;
     field $dropped_links       = 0;

@@ -9,3 +9,34 @@ Revision history for Const-XS
 
 0.09    2025-05-05
         - Add additional tests for exporting Const::XS variables.
+
+0.10    2025-05-07
+        - Export a make_readonly function + add additional tests
+
+0.11    2025-05-07
+        - Export a make_readonly function + add additional tests
+
+0.12    2025-05-07
+        - Add a unmake_readonly function + add additional tests
+	- Add a is_readonly function + add additional tests
+
+0.13    2025-05-07
+        - Small refactor of _make_readwrite function.
+
+0.14	2025-05-07
+	- Give up for now on trying to make is_readonly compatible with make_readonly scalar variables.
+	- Explicitly say in documentations is_readonly is for references
+	- Tidy is_readonly, make_readonly, unmake_readonly XSSUBS.
+
+0.15	2025-05-07
+	- another attempt at making is_readonly compatible with make_readonly scalar variables.
+
+0.16	2025-05-08
+	- Fix is_readonly, make_readonly, unmake_readonly on list variables
+	- Add new function make_readonly_ref based on supporting above
+	- Add additional tests for list variables
+
+0.17	2025-05-08
+	- Fix is_readonly, make_readonly, unmake_readonly on list variables
+	- Add new function make_readonly_ref based on supporting above
+	- Add additional tests for list variables

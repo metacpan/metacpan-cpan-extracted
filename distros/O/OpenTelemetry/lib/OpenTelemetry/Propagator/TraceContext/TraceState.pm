@@ -3,13 +3,13 @@ use Object::Pad;
 
 package OpenTelemetry::Propagator::TraceContext::TraceState;
 
-our $VERSION = '0.029';
-
-use Log::Any;
-my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+our $VERSION = '0.030';
 
 class OpenTelemetry::Propagator::TraceContext::TraceState {
     use List::Util;
+    use OpenTelemetry::Common ();
+
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     my $MAX_MEMBERS = 32 * 2; # The member list is a flat list of pairs
     my $VALID_KEY = qr/

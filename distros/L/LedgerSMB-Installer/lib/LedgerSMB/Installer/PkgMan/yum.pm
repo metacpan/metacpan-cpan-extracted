@@ -1,3 +1,3 @@
-package LedgerSMB::Installer::PkgMan::yum v0.999.0;
+package LedgerSMB::Installer::PkgMan::yum v0.999.1;
 
 1;

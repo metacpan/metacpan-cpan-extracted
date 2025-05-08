@@ -7,7 +7,7 @@ use warnings;
 use File::Spec ();
 use File::Find ();
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub import {
   my $class = shift;

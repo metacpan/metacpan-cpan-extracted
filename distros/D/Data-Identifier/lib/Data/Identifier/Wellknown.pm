@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -72,6 +72,7 @@ sub import {
     while (my $line = <DATA>) {
         my ($classes, $id, $displayname, $special);
         my @classes;
+        my $found;
 
         $line =~ s/\s{2,}%.*$//;
         $line =~ s/^\s*%.*$//;
@@ -119,18 +120,15 @@ sub import {
 
         push(@classes, @extra_classes);
 
-        {
-            my $found;
-            foreach my $class_a (@classes) {
-                foreach my $class_b (@args) {
-                    if ($class_a eq $class_b || $class_b eq ':all') {
-                        $found = 1;
-                        last;
-                    }
+        foreach my $class_a (@classes) {
+            foreach my $class_b (@args) {
+                if ($class_a eq $class_b || $class_b eq ':all') {
+                    $found = 1;
+                    last;
                 }
             }
-            next unless $found;
         }
+        next unless $found;
 
         {
             my $identifier;
@@ -225,7 +223,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 
@@ -425,6 +423,10 @@ $extra_classes identifier
 .   5e80c7b7-215e-4154-b310-a5387045c336    sirtx-logical
 .   b1418262-6bc9-459c-b4b0-a054d77db0ea    iban
 .   c8a3a132-f160-473c-b5f3-26a748f37e62    bic
+
+.   8db88212-69df-40f3-a5cf-105dcd853d44    standard-digest-algorithm-identifier
+.   8238da08-ca93-4d67-bf40-54818aa94405    rfc9530-digest-identifier
+.   0d4ef6fa-0f9a-4bc8-9fc1-e4f00725397e    openpgp-digest-identifier
 
 .   95bd826b-bd3e-4b40-b16a-aa20c9f673e4    musicbrainz-identifier
 .   310776dc-1433-4623-9ffa-42d038d400a4    british-museum-term
@@ -842,6 +844,26 @@ $generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99
 .   2   two     sid=50
 .   3   three   sid=144
 .   4   four    sid=145
+
+
+$class digest-algorithm
+$type uuid=8db88212-69df-40f3-a5cf-105dcd853d44
+$namespace 34f1f1d2-51be-4754-9585-83e33c5cb7e8
+
+.   md-4-128
+.   md-5-128
+.   ripemd-1-160
+.   tiger-1-192
+.   tiger-2-192
+.   sha-1-160
+.   sha-2-224
+.   sha-2-256
+.   sha-2-384
+.   sha-2-512
+.   sha-3-224
+.   sha-3-256
+.   sha-3-384
+.   sha-3-512
 
 
 $class rdf
@@ -1304,6 +1326,7 @@ $type uuid
 .   f7674607-ae49-4a5a-bb2c-6392beeb9928    nowhere
 .   92292a4e-b060-417e-a90c-a270331259e9    needstagging
 .   7e5d56d4-98e6-4205-89c0-763e1d729531    utf-8-marker
+.   2ec67bbe-4698-4a0c-921d-1f0951923ee6    dot-repeat-marker
 
 $extra_classes generator
 .   97b7f241-e1c5-4f02-ae3c-8e31e501e1dc    gregorian-date-generator

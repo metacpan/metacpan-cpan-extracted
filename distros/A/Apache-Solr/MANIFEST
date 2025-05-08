@@ -22,6 +22,7 @@ t/12facet.t
 t/20xml.t
 t/21json.t
 t/30result.t
+t/31sequential.t
 t/32version.t
 t/a.pdf
 META.yml                                 Module YAML meta-data (added by MakeMaker)

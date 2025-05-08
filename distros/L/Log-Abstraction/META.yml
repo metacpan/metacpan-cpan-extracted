@@ -28,9 +28,10 @@ requires:
   Carp: '0'
   Config::Abstraction: '0'
   ExtUtils::MakeMaker: '6.64'
+  Log::Log4perl: '0'
   Params::Get: '0.04'
   Scalar::Util: '0'
   Sys::Syslog: '0'
 resources: {}
-version: 0.08
+version: 0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

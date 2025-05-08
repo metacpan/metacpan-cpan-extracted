@@ -4,6 +4,19 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
+version 1.11!  Thu  8 May 11:48:43 CEST 2025
+
+	Changes:
+	- replace http_response from 1.10 by 'result'.
+
+	Improvements:
+	- error results also get parsed.
+	- from blanks to tabs in the source.
+	- correctly decode JSON communication.
+	- ::Result::new(params) optional and can be HASH
+	- t/31sequential.t was not distributed.
+	- simplify param handling wrt the 'wt' parameter.
+
 version 1.10: Fri 18 Apr 16:52:35 CEST 2025
 
 	Improvements:

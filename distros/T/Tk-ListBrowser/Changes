@@ -1,5 +1,21 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.07  Wed May 07 2025
+	- Fixed error in testfile.
+	- Fixed package name in Tk::ListBrowser::SelectXPM.
+
+0.06  Wed May 07 2025
+	- Fixed missing prerequisite.
+	- Fixed redirect of -filterdelay option.
+
+0.05  Wed May 07 2025
+	- Fixed POD error.
+	- Beautified selection by changing selection area to an image with relief.
+	- Selection and anchor span whole window width in list modes.
+	- Left and right arrow keys open and close entries in hierarchical mode.
+	- Added option '-selectstyle'.
+	- Filter entry takes focus when popping up.
+
 0.04  Mon May 05 2025
 	- Selection remains intact on refresh.
 	- Overhaul of code base.

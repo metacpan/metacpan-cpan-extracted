@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::fedora v0.999.0;
+package LedgerSMB::Installer::OS::linux::fedora v0.999.1;
 
 use v5.20;
 use experimental qw(signatures);

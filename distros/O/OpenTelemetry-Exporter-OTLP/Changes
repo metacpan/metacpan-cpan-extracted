@@ -1,5 +1,17 @@
 Revision history for OpenTelemetry-Exporter-OTLP
 
+0.021     2025-05-08 08:49:59 BST
+
+    * Switch to the internal logger added to OpenTelemetry v0.030.
+      This logger defaults to carping to STDERR at a warning level
+      for internal messages only. The log level can be adjusted by setting
+      the OTEL_PERL_INTERNAL_LOG_LEVEL environment variable to a suitable
+      value. This internal logger is weaker than a regular
+      Log::Any::Adapter and can be modified either by setting a
+      Log::Any::Adapter or the LOG_ANY_DEFAULT_ADAPTER environment
+      variable appropriately. Note that OTEL_PERL_INTERNAL_LOG_LEVEL will
+      be ignored if an adapter is manually set.
+
 0.020     2024-12-20 22:56:46+00:00 Europe/London
 
     * Add 'isa' as a dependency and reduce the minimum supported Perl

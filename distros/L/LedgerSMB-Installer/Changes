@@ -1,5 +1,12 @@
 ---
 
+2025-05-07   0.999.1
+   [Fixed]
+       * Tests were testing the --version option argument
+         which was removed just before release
+       * Tests were not adapted for changes in the return
+         value(s) of "retrieve_precomputed_deps"
+
 2025-05-05   0.999.0
    [Added]
        * Initial release

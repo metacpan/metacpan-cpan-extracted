@@ -4,12 +4,14 @@ lib/Tk/ListBrowser/Bar.pm
 lib/Tk/ListBrowser/BaseItem.pm
 lib/Tk/ListBrowser/Column.pm
 lib/Tk/ListBrowser/Data.pm
+lib/Tk/ListBrowser/FilterEntry.pm
 lib/Tk/ListBrowser/HList.pm
 lib/Tk/ListBrowser/Item.pm
 lib/Tk/ListBrowser/LBCanvas.pm
 lib/Tk/ListBrowser/LBHeader.pm
 lib/Tk/ListBrowser/List.pm
 lib/Tk/ListBrowser/Row.pm
+lib/Tk/ListBrowser/SelectXPM.pm
 lib/Tk/ListBrowser/SideColumn.pm
 lib/Tk/ListBrowser/Tree.pm
 LICENSE

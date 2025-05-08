@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::OpenSSL::RSA.
 
+0.35 May 7 2025
+    - Disable PKCS#1 v1.5 padding. It's not practical to mitigate marvin attacks so we will instead disable this and require alternatives to address the issue.
+      - Resolves #42 - CVE-2024-2467.
+
 0.34 May 5 2025
     - Production release.
 

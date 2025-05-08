@@ -3,13 +3,13 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Trace::Event;
 
-our $VERSION = '0.029';
-
-use Log::Any;
-my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+our $VERSION = '0.030';
 
 class OpenTelemetry::Trace::Event :does(OpenTelemetry::Attributes) {
     use Time::HiRes;
+    use OpenTelemetry::Common ();
+
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     field $name      :param :reader   = undef;
     field $timestamp :param :reader //= Time::HiRes::time;

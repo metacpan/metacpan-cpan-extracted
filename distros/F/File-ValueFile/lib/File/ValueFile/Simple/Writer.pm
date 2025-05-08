@@ -11,19 +11,24 @@ use v5.10;
 use strict;
 use warnings;
 
+use parent 'Data::Identifier::Interface::Userdata';
+
 use Carp;
 use URI::Escape qw(uri_escape uri_escape_utf8);
 use Data::Identifier v0.03;
 
 use File::ValueFile;
 
-use constant FORMAT_ISE => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
-use constant SF_ISE     => 'e5da6a39-46d5-48a9-b174-5c26008e208e'; # tagpool-source-format
-use constant TLv1_ISE   => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa'; # tagpool-taglist-format-v1
-use constant F_M_L_ISE  => 'f06c2226-b33e-48f2-9085-cd906a3dcee0'; # tagpool-source-format-modern-limited
-use constant F_M_F_ISE  => '1c71f5b1-216d-4a9b-81a1-54dc22d8a067'; # tagpool-source-format-modern-full
+use constant {
+    FORMAT_ISE     => '54bf8af4-b1d7-44da-af48-5278d11e8f32',
+    SF_ISE         => 'e5da6a39-46d5-48a9-b174-5c26008e208e', # tagpool-source-format
+    TLv1_ISE       => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa', # tagpool-taglist-format-v1
+    F_M_L_ISE      => 'f06c2226-b33e-48f2-9085-cd906a3dcee0', # tagpool-source-format-modern-limited
+    F_M_F_ISE      => '1c71f5b1-216d-4a9b-81a1-54dc22d8a067', # tagpool-source-format-modern-full
+    DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
+};
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 
 
@@ -56,6 +61,8 @@ sub new {
         $list = [$list] unless ref($list) eq 'ARRAY';
         foreach my $entry (@{$list}) {
             my $feature = Data::Identifier->new(from => $entry);
+
+            $self->{dot_repreat} ||= $feature->eq(DOT_REPEAT_ISE);
 
             $self->_write_marker($type, 'Feature', $feature);
             $_is_utf8 ||= File::ValueFile->_is_utf8($feature);
@@ -100,6 +107,9 @@ sub _escape {
 
 sub _write_marker {
     my ($self, $type, @line) = @_;
+
+    $self->{last_line} = undef;
+
     if ($type eq 'required') {
         $self->{fh}->print('!!');
     } elsif ($type eq 'copy') {
@@ -125,7 +135,37 @@ sub write {
         return;
     }
 
-    @line = map {$self->_escape($_)} map {ref($_) ? $_->ise : $_} @line;
+    @line = map {ref($_) ? $_->ise : $_} @line;
+
+    if ($self->{dot_repreat}) {
+        my $line = [@line];
+        if (defined(my $last_line = $self->{last_line})) {
+            my $x = 0;
+            foreach my $e (@line) {
+                if (defined $e) {
+                    if (defined($last_line->[$x]) && $e eq $last_line->[$x]) {
+                        $e = '.';
+                    } elsif ($e =~ /^\.+$/) {
+                        $e .= '.';
+                    }
+                } elsif (!defined($last_line->[$x])) {
+                    $e = '.';
+                }
+                $x++;
+            }
+        } else {
+            foreach my $e (@line) {
+                if (defined $e) {
+                    if ($e =~ /^\.+$/) {
+                        $e .= '.';
+                    }
+                }
+            }
+        }
+        $self->{last_line} = $line;
+    }
+
+    @line = map {$self->_escape($_)} @line;
 
     {
         my $l = length($line[0]);
@@ -412,13 +452,15 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
     use File::ValueFile::Simple::Writer;
 
 This module provides a simple way to write ValueFile files.
+
+This module inherit from L<Data::Identifier::Interface::Userdata>.
 
 =head1 METHODS
 

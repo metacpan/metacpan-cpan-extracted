@@ -1,5 +1,5 @@
 package Debug::CodeBlock;
-use 5.006; use strict; use warnings; our $VERSION = '1.02';
+use 5.006; use strict; use warnings; our $VERSION = '1.03';
 use base 'Import::Export';
 use Data::Dumper qw//;
 our %EX = ( DEBUG => [qw/all/] );
@@ -23,7 +23,7 @@ Debug::CodeBlock - Add DEBUG codeblocks to your code.
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -107,7 +107,7 @@ L<https://metacpan.org/release/Debug-CodeBlock>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2025 by LNATION.
 
 This is free software, licensed under:
 

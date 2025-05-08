@@ -1,6 +1,8 @@
 package One;
 
 use Const::XS qw/const/;
+use strict;
+use warnings;
 
 use base 'Import::Export';
 

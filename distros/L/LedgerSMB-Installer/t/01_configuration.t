@@ -124,9 +124,12 @@ $get_result = {
     content => '<html><body><h1>Not Found</h1></body></html>',
 };
 
+# undo built-in caching by creatign a new configuration object
+$c = new_config();
 ok lives {
-    is( $c->retrieve_precomputed_deps( 'debian', 'sarge' ),
-        undef,
+    my @computed = $c->retrieve_precomputed_deps( 'debian', 'sarge' );
+    is( \@computed,
+        [ undef, undef ],
         q{Nonexisting precomputed dependencies return undef} );
 }, q{Precomputed dependency retrieval runs without exceptions};
 
@@ -140,7 +143,7 @@ ok lives {
         [],
         $c->option_callbacks(
             [ 'yes|y!', 'system-packages!', 'prepare-env!', 'target=s',
-              'local-lib=s', 'log-level=s', 'verify-sig!', 'version=s' ])
+              'local-lib=s', 'log-level=s', 'verify-sig!' ])
         );
 }, q{};
 
@@ -150,10 +153,10 @@ ok lives {
     GetOptionsFromArray(
         [ qw(--yes -y --system-packages --no-system-packages --prepare-env
              --no-prepare-env --target /srv/ledgersmb --local-lib cpan-libs
-             --log-level debug --verify-sig --no-verify-sig --version 1.12.1) ],
+             --log-level debug --verify-sig --no-verify-sig) ],
         $c->option_callbacks(
             [ 'yes|y!', 'system-packages!', 'prepare-env!', 'target=s',
-              'local-lib=s', 'log-level=s', 'verify-sig!', 'version=s' ])
+              'local-lib=s', 'log-level=s', 'verify-sig!' ])
         );
 }, q{};
 

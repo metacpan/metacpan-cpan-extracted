@@ -497,8 +497,7 @@ sub selectionSet {
 	my ($self, $begin, $end) = @_;
 	my @pool = $self->getAll;
 	if ($self->listbrowser->cget('-selectmode') eq 'single') {
-		$self->selectionClear;
-		my $index = $self->index($begin);
+		$self->selectionSingle($begin);
 	} else {
 		($begin, $end) = $self->selectionIndex($begin, $end);
 		for ($begin .. $end) {
@@ -506,6 +505,12 @@ sub selectionSet {
 			$i->select(1) unless $i->hidden;
 		}
 	}
+}
+
+sub selectionSingle {
+	my ($self, $name) = @_;
+	$self->selectionClear;
+	$self->selectionSet($name);
 }
 
 sub selectionUnSet {

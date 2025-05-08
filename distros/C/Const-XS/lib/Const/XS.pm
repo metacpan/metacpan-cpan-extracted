@@ -1,15 +1,20 @@
 package Const::XS;
 
 use 5.006;
+
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.17';
 
 use base qw/Import::Export/;
 
 our %EX = (
-        const => [qw/all/]
+        const => [qw/all/],
+	make_readonly => [qw/all/],
+	make_readonly_ref => [qw/all/],
+	unmake_readonly => [qw/all/],
+	is_readonly => [qw/all/],
 );
 
 require XSLoader;
@@ -25,7 +30,7 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 0.09
+Version 0.17
 
 =cut
 
@@ -34,7 +39,7 @@ Version 0.09
 
 	package MyApp::Constants;
 
-	use Const::XS qw/all/;
+	use Const::XS qw/const/;
 	
 	use base 'Import::Export';
 
@@ -64,7 +69,7 @@ Version 0.09
 
 =head2 const
 
-This is the only function of this module. It takes a scalar, array or hash lvalue as the first argument, and a list of one or more values depending on the type of the first argument as the value for the variable. It will set the variable to that value and subsequently make it readonly. Arrays and hashes will be made deeply readonly.
+This is the one of five functions of this module. It takes a scalar, array or hash lvalue as the first argument, and a list of one or more values depending on the type of the first argument as the value for the variable. It will set the variable to that value and subsequently make it readonly. Arrays and hashes will be made deeply readonly.
 
 	const my %factory => (
 		workers => 5,
@@ -77,6 +82,46 @@ This is the only function of this module. It takes a scalar, array or hash lvalu
 	$factory{not_set}; # errors
 	exists $factory{not_set}; # false
 
+=head2 make_readonly
+
+The second function exported by this module is make_readonly. It will take a perl variable and deeply make it readonly. 
+
+	my $string = "abc";
+	make_readonly($string);
+	$string = 'def'; # errors
+
+	my %hash = ( a => 1, b => 2, c => 3 );
+	make_readonly(%hash);
+	$hash{d}; # errors
+	%hash = ( new => 1 ); # errors 
+
+=head2 make_readonly_ref
+
+The third function exported by this module is make_readonly_ref. It will take a perl struct and deeply make it readonly. Please note that if you call make_readonly_ref the struct will be deeply made readonly however it is 'copied' into the variable and that does not get set as readonly. Take the following example.
+
+	my $ref = make_readonly_ref({a => 1, b => 2, c => 3 }; # we copy into $ref
+	$ref->{d}; # errors
+	$ref = { new => 1 };  # is okay
+
+=head2 unmake_readonly
+
+The fourth function exported by this module is unmake_readonly. It will take a perl variable that has been through make_readonly/make_readonly_ref and deeply make it writeable again.
+
+	my $string = "abc";
+	make_readonly($string);
+	$string = 'def'; # errors
+	unmake_readonly($string);
+	$string = 'def'; # is okay
+
+=head2 is_readonly
+
+The fifth function exported by this module is is_readonly. It will deeply check a variable to see if it is readonly.
+
+	my %hash = ( one => "abc" );
+	is_readonly(%hash); # 0;
+	make_readonly(%hash);
+	is_readonly(%hash); # 1;
+	
 =head2 BENCHMARK
 
 	use Benchmark qw(:all);

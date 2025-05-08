@@ -30,7 +30,7 @@ use constant {
 };
 
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -466,7 +466,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 

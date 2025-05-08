@@ -6,7 +6,7 @@ use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::Guess qw(openssl_version);
 
 BEGIN {
-    plan tests => 43 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 4 * 5 : 0 ) + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ? 1 * 5 : 0 );
+    plan tests => 37 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 4 * 5 : 0 ) + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ? 1 * 5 : 0 );
 }
 
 sub _Test_Encrypt_And_Decrypt {
@@ -75,9 +75,6 @@ ok( $rsa->check_key() );
 
 $rsa->use_no_padding();
 _Test_Encrypt_And_Decrypt( $rsa->size(), $rsa, 1 );
-
-$rsa->use_pkcs1_padding();
-_Test_Encrypt_And_Decrypt( $rsa->size() - 11, $rsa, 1 );
 
 $rsa->use_pkcs1_oaep_padding();
 

@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.08
+0.11
 
 # SYNOPSIS
 
@@ -36,6 +36,12 @@ The argument can be a hash,
 a reference to a hash or the `logger` value.
 The following arguments can be provided:
 
+- `carp_on_warn`
+
+    If set to 1,
+    and `logger` is not given,
+    call `Carp:carp` on `warn()`.
+
 - `config_file`
 
     Points to a configuration file which contains the parameters to `new()`.
@@ -51,7 +57,11 @@ The following arguments can be provided:
 
     It doesn't work on Windows because of the case-insensitive nature of that system.
 
-- `logger` - A logger can be a code reference, an array reference, a file path, or an object.
+- `logger`
+
+    A logger can be a code reference, an array reference, a file path, or an object.
+    Defaults to [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl)
+
 - `syslog` - A hash reference for syslog configuration.
 - `script_name`
 

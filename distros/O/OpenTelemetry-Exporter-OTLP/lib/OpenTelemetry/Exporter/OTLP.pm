@@ -3,13 +3,12 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Exporter::OTLP;
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
     use Feature::Compat::Try;
     use Future::AsyncAwait;
     use HTTP::Tiny;
-    use Log::Any;
     use Module::Runtime 'require_module';
     use OpenTelemetry::Common qw( config maybe_timeout timeout_timestamp );
     use OpenTelemetry::Constants -trace_export;
@@ -34,7 +33,7 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
         'gzip';
     } // 'none';
 
-    my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+    my $logger = OpenTelemetry::Common::internal_logger;
 
     use Metrics::Any '$metrics', strict => 1,
         name_prefix => [qw( otel exporter otlp )];

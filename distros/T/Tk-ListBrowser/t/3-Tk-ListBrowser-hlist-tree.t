@@ -132,10 +132,27 @@ if (defined $app) {
 			},
 		)->pack(-side => 'left');
 	}
+	my $sf = $app->LabFrame(
+		-label => 'Select style',
+		-labelside => 'acrosstop',
+	)->pack(-fill => 'x');
+	my $sstyle = $ib->cget('-selectstyle');
+	for (qw/anchor simple/) {
+		$sf->Radiobutton(
+			-text => $_,
+			-variable => \$sstyle,
+			-value => $_,
+			-command => sub {
+				$ib->clear;
+				$ib->configure('-selectstyle', $sstyle);
+				$ib->refresh;
+			},
+		)->pack(-side => 'left');
+	}
 
 	pause(10);
 	$handler = $ib->{HANDLER};
-	$app->geometry('500x500+200+200');
+	$app->geometry('500x600+200+200');
 }
 
 testaccessors($handler, qw/stack/);

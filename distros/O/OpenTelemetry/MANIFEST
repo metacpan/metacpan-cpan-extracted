@@ -10,6 +10,7 @@ examples/collector/README.md
 examples/collector/collector.yaml
 examples/collector/docker-compose.yaml
 examples/collector/prometheus.yaml
+examples/instrumentations/http-tiny
 examples/instrumentations/lwp
 examples/quickstart/Dice
 examples/quickstart/Dockerfile
