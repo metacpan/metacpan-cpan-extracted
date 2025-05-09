@@ -4,7 +4,8 @@ use Test::XML::Sig;
 my $xmlsec = get_xmlsec_features;
 my $openssl = get_openssl_features;
 
-my @hash = qw/sha1 sha224 sha256 sha384 sha512 ripemd160/;
+my @hash = qw/sha1 sha224 sha256 sha384 sha512/;
+push @hash, 'ripemd160' if $xmlsec->{ripemd160};
 
 # DSA key size determinst the signature length and therfore the signature hashing algorithm
 foreach my $key ('t/dsa.private.key', 't/dsa.private-2048.key', 't/dsa.private-3072.key') {
@@ -34,6 +35,8 @@ foreach my $key ('t/dsa.private.key', 't/dsa.private-2048.key', 't/dsa.private-3
             skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 1
                 if ( ! $openssl->{ripemd160} and
                     ($sig->{sig_hash} eq 'ripemd160' or $digalg eq 'ripemd160'));
+
+            skip "xmlsec1 does not support DSAKeyValue", 1 if (! $xmlsec->{dsakeyvalue});
 
             test_xmlsec1_ok(
                 "$sig->{sig_hash} with $digalg verified by xmlsec1", $signed, qw(
@@ -72,6 +75,8 @@ foreach my $key ('t/dsa.private.key', 't/dsa.private-2048.key', 't/dsa.private-3
             skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 1
                 if ( ! $openssl->{ripemd160} and
                     ($sig->{sig_hash} eq 'ripemd160' or $digalg eq 'ripemd160'));
+
+            skip "xmlsec1 does not support DSAKeyValue", 1 if (! $xmlsec->{dsakeyvalue});
 
             test_xmlsec1_ok(
                 "$sig->{sig_hash} with $digalg verified by xmlsec1", $signed, qw(
@@ -117,6 +122,8 @@ foreach my $sigalg (@hash) {
             skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 1
                 if ( ! $openssl->{ripemd160} and
                     ($sig->{sig_hash} eq 'ripemd160' or $digalg eq 'ripemd160'));
+
+            skip "xmlsec1 does not support DSAKeyValue", 1 if (! $xmlsec->{dsakeyvalue});
 
             test_xmlsec1_ok(
                 "$sigalg with $digalg verified by xmlsec1 - no X509", $signed,

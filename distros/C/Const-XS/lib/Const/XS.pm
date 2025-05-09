@@ -5,7 +5,16 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+BEGIN {
+	our $VERSION = '0.21';
+	
+	if ($] >= 5.016) {
+		require XSLoader;
+		XSLoader::load("Const::XS", $VERSION);
+	} else {
+		require Const::XS::PP;
+	}
+}
 
 use base qw/Import::Export/;
 
@@ -17,12 +26,10 @@ our %EX = (
 	is_readonly => [qw/all/],
 );
 
-require XSLoader;
-XSLoader::load("Const::XS", $VERSION);
-
-__END__
 
 1;
+
+__END__
 
 =head1 NAME
 
@@ -30,7 +37,7 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 0.17
+Version 0.21
 
 =cut
 
@@ -215,4 +222,3 @@ This is free software, licensed under:
 
 =cut
 
-1; # End of Const::XS

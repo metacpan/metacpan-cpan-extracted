@@ -18,6 +18,7 @@ const my %hash3 => (
 	three => 3
 );
 const my $ref => {
+	ref => \%hash,
 	test => $foo,
 	%hash3
 };
@@ -57,11 +58,17 @@ eval { $hash{four} = 4; };
 
 like($@, qr/Attempt to access disallowed key 'four' in a restricted hash/); 
 
-is_deeply($ref, { test => 'a scalar value',  one => 1, two => 2, three => 3 });
+is_deeply($ref, { test => 'a scalar value',  one => 1, two => 2, three => 3, ref => { one => 1 } });
 
 eval { $ref->{four} = 4; };
 
 like($@, qr/Attempt to access disallowed key 'four' in a restricted hash/); 
+
+eval { $ref->{ref}->{four} = 4; };
+
+like($@, qr/Attempt to access disallowed key 'four' in a restricted hash/); 
+
+
 
 
 done_testing();

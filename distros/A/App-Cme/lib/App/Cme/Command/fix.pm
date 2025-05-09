@@ -10,7 +10,7 @@
 # ABSTRACT: Fix the configuration of an application
 
 package App::Cme::Command::fix ;
-$App::Cme::Command::fix::VERSION = '1.042';
+$App::Cme::Command::fix::VERSION = '1.043';
 use strict;
 use warnings;
 use 5.10.1;
@@ -18,8 +18,6 @@ use 5.10.1;
 use App::Cme -command ;
 
 use base qw/App::Cme::Common/;
-
-use Config::Model::ObjTreeScanner;
 
 sub validate_args {
     my ($self, $opt, $args) = @_;
@@ -32,7 +30,6 @@ sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
         [ "from=s@"  => "fix only a subset of a configuration tree" ],
-        [ "backup:s"  => "Create a backup of configuration files before saving." ],
         [ "filter=s" => "pattern to select the element name to be fixed"],
         $class->cme_global_options,
     );
@@ -82,7 +79,7 @@ App::Cme::Command::fix - Fix the configuration of an application
 
 =head1 VERSION
 
-version 1.042
+version 1.043
 
 =head1 SYNOPSIS
 

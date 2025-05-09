@@ -1,3 +1,12 @@
+1.043 2025-05-08
+
+  New feature:
+    * run: stash modification before running cme script
+
+  Bug fix:
+    * run: fix parsing of --foreach option value
+    * run with foreach: run git status in the right directory
+
 1.042 2025-04-26
 
   New feature:

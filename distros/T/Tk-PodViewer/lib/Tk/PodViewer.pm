@@ -3,7 +3,7 @@ package Tk::PodViewer;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'PodViewer';
@@ -282,6 +282,7 @@ sub configureTags {
 	#configuring item tags
 	$self->tagConfigure('item-text', -font => $tfont);
 	$self->tagConfigure('item-bullet', -font => $tfont);
+	$self->tagConfigure('item-number', -font => $tfont);
 	$self->tagConfigure('over-text', -font => $tfont);
 	$self->tagConfigure('over-bullet', -font => $tfont);
 

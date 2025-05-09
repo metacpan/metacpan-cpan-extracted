@@ -17,7 +17,7 @@ use Readonly;
 Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Array our @PATTERNS => qw(checkerboard);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -183,11 +183,12 @@ Returns exit code.
  App::Image::Generator->new->run;
 
  # Output like:
- # Usage: __SCRIPT__ [-h] [-i input_dir] [-s size] [-v]
+ # Usage: __SCRIPT__ [-h] [-i input_dir] [-p pattern] [-s size] [-v]
  #         [--version] output_file
  # 
  #         -h              Print help.
  #         -i input_dir    Input directory with images (default value is nothing).
+ #         -p pattern      Pattern (checkerboard).
  #         -s size         Size (default value is 1920x1080).
  #         -v              Verbose mode.
  #         --version       Print version.
@@ -198,8 +199,10 @@ L<English>,
 L<Error::Pure>,
 L<File::Basename>,
 L<Getopt::Std>,
+L<Image::Checkerboard>,
 L<Image::Random>,
 L<Image::Select>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -230,6 +233,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

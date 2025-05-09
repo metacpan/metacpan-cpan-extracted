@@ -4,7 +4,7 @@ XML::PP - A simple XML parser
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 

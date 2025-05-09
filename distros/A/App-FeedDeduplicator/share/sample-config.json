@@ -1,0 +1,13 @@
+{
+  "output_format": "Atom",
+  "max_items": 10,
+  "feeds": [{
+    "name": "Sample Feed",
+    "feed": "https://example.com/sample-feed.xml",
+    "web": "https://example.com/sample-feed",
+  }, {
+    "name": "Another Feed",
+    "feed": "https://example.com/another-feed.xml",
+    "web": "https://example.com/another-feed",
+  }]
+}

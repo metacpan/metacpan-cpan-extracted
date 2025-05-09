@@ -1,3 +1,10 @@
+0.08 2025-05-09T09:24:39+02:00
+ - Add test for bad pattern name.
+ - Add test for bad size of generated file.
+ - Fix DEPENDENCIES section in doc.
+ - Fix minimal version of Test::Warn to 0.31.
+ - Fix output of EXAMPLE in doc.
+
 0.07 2025-05-08T11:02:16+02:00
  - Fix test dependencies.
  - Improve doc.

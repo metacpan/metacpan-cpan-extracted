@@ -32,8 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Abstraction" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.04",
             "Scalar::Util" : "0",
             "perl" : "5.008"
          }
@@ -61,6 +60,6 @@
          "x_repository" : "https://github.com/nigelhorne/XML-PP"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use vars qw($VERSION);
+$VERSION="0.08";
+
+my $appname = shift @ARGV;
+
+use Tk::GtkSettings qw(appName initDefaults export2Xdefaults);
+appName($appname) if defined $appname;
+initDefaults;
+export2Xdefaults;
+
+
+
+

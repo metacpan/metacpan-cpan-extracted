@@ -1,6 +1,9 @@
 Revision history for CGI-Info
 
-0.101
+0.102	Thu May  8 21:39:31 EDT 2025
+	Use Class::Debug
+
+0.101	Mon May  5 11:09:29 EDT 2025
 	Try hard to find the config files - should be in Config::Abstraction
 	Called 1.00 to work around version control which things 'dot' is the same as 'decimal point'
 

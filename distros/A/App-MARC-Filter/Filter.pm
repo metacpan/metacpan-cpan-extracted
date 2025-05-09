@@ -7,14 +7,17 @@ use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
 use Getopt::Std;
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(any none);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
+use MARC::Leader;
+use MARC::Leader::Utils qw(material_type);
 use Readonly;
 use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
+Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 $| = 1;
 
@@ -53,7 +56,10 @@ sub run {
 	}
 	$self->{'_marc_xml_file'} = shift @ARGV;
 	$self->{'_marc_field'} = shift @ARGV;
-	if ($self->{'_marc_field'} ne 'leader') {
+	if ($self->{'_marc_field'} ne 'leader'
+		&& $self->{'_marc_field'} ne 'material_type'
+		&& none { $_ eq $self->{'_marc_field'} } @CONTROL_FIELDS) {
+
 		$self->{'_marc_subfield'} = shift @ARGV;
 	}
 	$self->{'_marc_value'} = shift @ARGV;
@@ -97,9 +103,24 @@ sub run {
 		}
 		$previous_record = $record;
 
+		# Leader.
 		if ($self->{'_marc_field'} eq 'leader') {
 			my $leader = $record->leader;
 			push @ret, $self->_match($record, $leader);
+
+		# Material type.
+		} elsif ($self->{'_marc_field'} eq 'material_type') {
+			my $leader_string = $record->leader;
+			my $leader = MARC::Leader->new->parse($leader_string);
+			my $material_type = material_type($leader);
+			push @ret, $self->_match($record, $material_type);
+
+		# Control fields.
+		} elsif (any { $self->{'_marc_field'} eq $_ } @CONTROL_FIELDS) {
+			my $control_field = $record->field($self->{'_marc_field'});
+			push @ret, $self->_match($record, $control_field->as_string);
+
+		# Other.
 		} else {
 			my @fields = $record->field($self->{'_marc_field'});
 			foreach my $field (@fields) {
@@ -168,7 +189,7 @@ sub _match {
 sub _usage {
 	my $self = shift;
 
-	print STDERR "Usage: $0 [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file field [subfield] value\n";
+	print STDERR "Usage: $0 [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file search_item [sub_search_item] value\n";
 	print STDERR "\t-h\t\tPrint help.\n";
 	print STDERR "\t-n num\t\tNumber of records to output (default value is all records).\n";
 	print STDERR "\t-o format\tOutput MARC format. Possible formats are ascii, xml.\n";
@@ -176,9 +197,9 @@ sub _usage {
 	print STDERR "\t-v\t\tVerbose mode.\n";
 	print STDERR "\t--version\tPrint version.\n";
 	print STDERR "\tmarc_xml_file\tMARC XML file.\n";
-	print STDERR "\tfield\t\tMARC field (field number or 'leader' string).\n";
-	print STDERR "\tsubfield\tMARC subfield (optional in case of leader).\n";
-	print STDERR "\tvalue\t\tMARC field/subfield value to filter.\n";
+	print STDERR "\tsearch_item\tSearch item.\n";
+	print STDERR "\tsub_search_item\tSearch sub item (required in case of MARC field).\n";
+	print STDERR "\tvalue\t\tValue to filter.\n";
 
 	return;
 }
@@ -484,7 +505,7 @@ L<Class::Utils>,
 L<English>,
 L<Error::Pure>,
 L<Getopt::Std>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<MARC::File::XML>,
 L<Readonly>,
 L<Unicode::UTF8>.
@@ -507,6 +528,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

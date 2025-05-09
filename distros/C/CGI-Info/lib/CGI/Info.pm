@@ -8,9 +8,10 @@ use strict;
 
 use boolean;
 use Carp;
-use Config::Abstraction;
+use Class::Debug 0.02;
+use Config::Abstraction 0.20;
 use File::Spec;
-use Log::Abstraction;
+use Log::Abstraction 0.10;
 use Params::Get;
 use Params::Validate::Strict;
 use Scalar::Util;
@@ -33,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 
@@ -160,42 +161,7 @@ sub new
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($params->{'config_file'})) {
-		# my $config = YAML::XS::LoadFile($params->{'config_file'});
-		if((!exists $params->{'config_dirs'}) && (!-r $params->{'config_file'})) {
-			croak("$class: ", $params->{'config_file'}, ': File not readable');
-		}
-		# Try hard to find the config files
-		# TODO: Config::Abstraction 0.17 has this built in
-		my $config_dirs = $params->{'config_dirs'};
-		if(!$config_dirs) {
-			if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
-				$config_dirs = [''];
-			} else {
-				my $dir = File::Spec->catdir($ENV{'HOME'}, '.conf');
-				if(-d $dir) {
-					$config_dirs = [$dir];
-				} else {
-					# TODO: Apache dirs, /etc, /usr/local/etc, etc
-					$config_dirs = [''];
-				}
-			}
-		}
-
-		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
-			$config = $config->all();
-			if($config->{'global'}) {
-				$params = { %{$config->{'global'}}, %{$params} };
-				delete $config->{'global'};
-			}
-			if($config->{$class}) {
-				$config = $config->{$class};
-			}
-			$params = { %{$config}, %{$params} };
-		} else {
-			croak("$class: Can't load configuration from ", $params->{'config_file'});
-		}
-	}
+	$params = Class::Debug::setup($class, $params);
 
 	if(defined($params->{'expect'})) {
 		# if(ref($params->{expect}) ne 'ARRAY') {
@@ -203,14 +169,6 @@ sub new
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
 		Carp::croak("$class: expect has been deprecated, use allow instead");
-	}
-
-	if(my $logger = $params->{'logger'}) {
-		if(!Scalar::Util::blessed($logger)) {
-			$params->{'logger'} = Log::Abstraction->new($logger);
-		}
-	} else {
-		$params->{'logger'} = Log::Abstraction->new();
 	}
 
 	# Return the blessed object

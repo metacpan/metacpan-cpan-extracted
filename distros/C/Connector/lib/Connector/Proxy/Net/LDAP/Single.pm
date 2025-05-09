@@ -89,6 +89,46 @@ sub get_hash {
 
 }
 
+sub get_list {
+    my $self = shift;
+    my $args = shift;
+    my $params = shift;
+
+    my @args = $self->_build_path( $args );
+
+    # compose a list of command arguments
+    my $template_vars = {
+       ARGS => \@args,
+    };
+
+    my $mesg = $self->_run_search($template_vars);
+
+    if ($mesg->is_error()) {
+        $self->log()->error("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
+        return $self->_node_not_exists( \@args );
+    }
+
+    my @entries = $mesg->entries;
+
+    my @result;
+  ENTRY:
+    foreach my $entry (@entries) {
+	# check if any of the wanted attributes is present in the returned entry
+	foreach my $wantedattribute (@{$self->attrs}) {
+	    $self->log()->debug("Checking for attribute " . $wantedattribute);
+	    if ($entry->exists($wantedattribute)) {
+		$self->log()->debug("  Using wanted attribute " . $entry->get_value($wantedattribute));
+		push @result, $entry->get_value($wantedattribute);
+		# use the first attribute found in the entry
+		next ENTRY;
+	    }
+	}
+    }
+
+    return @result;
+}
+
+
 sub get_keys {
     my $self = shift;
 
@@ -256,6 +296,10 @@ B<Warning: Do not set the attr property>
 =head2 get
 
 Not supported.
+
+=head2 get_list
+
+Get a list of the ldap result attributes.
 
 =head2 get_hash
 

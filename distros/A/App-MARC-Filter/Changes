@@ -1,3 +1,11 @@
+0.05 2025-05-08T18:50:03+02:00
+ - Add support for filtering by control fields.
+ - Add support for filtering by material type.
+ - Improve abstract and description.
+ - Regen README file.
+ - Rename usage() of tool.
+ - Move from List::MoreUtils to List::Util.
+
 0.04 2025-04-13T09:05:18+02:00
  - Add -n option to number of output records.
  - Add support for leader filtering.

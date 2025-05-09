@@ -1,16 +1,25 @@
 NAME
-    marc-filter - Script to filter records in MARC dataset.
+    marc-filter - Tool to filter records in MARC dataset.
 
 SYNOPSIS
-     marc-filter [-h] [-o format] [-r] [--version] marc_xml_file field [subfield] value
+     marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_xml_file field [subfield] value
 
 DESCRIPTION
+    Tool to filter MARC records in big datasets. Could filter by
+    field/subfield or leader and/or by number of output records.
+
     It supports MARC XML files now.
 
 ARGUMENTS
     *       "-h"
 
             Print help.
+
+    *       "-n num"
+
+            Number of records to output,
+
+            Default value is all records to output.
 
     *       "-o format"
 
@@ -34,7 +43,23 @@ ARGUMENTS
 
             MARC field.
 
-            Field number or 'leader' string.
+            Field number or 'leader' string or material type string.
+
+            Possible material type strings are:
+
+            *   book
+
+            *   computer_file
+
+            *   continuing_resource
+
+            *   map
+
+            *   mixed_material
+
+            *   music
+
+            *   visual_material
 
     *       "subfield"
 
@@ -60,5 +85,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

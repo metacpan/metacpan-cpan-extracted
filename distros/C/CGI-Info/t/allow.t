@@ -43,18 +43,21 @@ ALLOWED: {
 
 	%allowed = ('foo' => qr(\d+));
 	$i = new_ok('CGI::Info' => [
-		allow => \%allowed
+		allow => \%allowed,
+		# logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
 	]);
 	ok(!defined($i->params()));
 	ok($i->as_string() eq '');
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval { $i->param('fred') };
+	diag($@);
 	ok($@ =~ /fred isn't in the allow list at/);
 
 	$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma';
 
 	$i = new_ok('CGI::Info' => [
-		allow => \%allowed
+		allow => \%allowed,
+		logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
 	]);
 	%p = %{$i->params()};
 	ok($p{foo} eq '123');
@@ -70,6 +73,7 @@ ALLOWED: {
 
 	$ENV{'QUERY_STRING'} = 'foo=123&fred=wilma&admin=1';
 	$i = new_ok('CGI::Info');
+	$i->set_logger(sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} });
 	ok($i->param('fred') eq 'wilma');
 	ok($i->param('admin') == 1);
 	%p = %{$i->params(allow => \%allowed)};

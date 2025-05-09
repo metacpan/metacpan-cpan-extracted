@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 14;
+use Test::More 'tests' => 16;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -140,6 +140,38 @@ stdout_is(
 # Test.
 @ARGV = (
 	$data_dir->file('ex1.xml')->s,
+	'001',
+	'ck8300078',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (001 = \'ck8300078\').',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'material_type',
+	'book',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (material_type = book).',
+);
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
 	'015',
 	'a',
 	'cnb',
@@ -209,7 +241,7 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file field [subfield] value
+Usage: $script [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file search_item [sub_search_item] value
 	-h		Print help.
 	-n num		Number of records to output (default value is all records).
 	-o format	Output MARC format. Possible formats are ascii, xml.
@@ -217,9 +249,9 @@ Usage: $script [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file fie
 	-v		Verbose mode.
 	--version	Print version.
 	marc_xml_file	MARC XML file.
-	field		MARC field (field number or 'leader' string).
-	subfield	MARC subfield (optional in case of leader).
-	value		MARC field/subfield value to filter.
+	search_item	Search item.
+	sub_search_item	Search sub item (required in case of MARC field).
+	value		Value to filter.
 END
 
 	return $help;

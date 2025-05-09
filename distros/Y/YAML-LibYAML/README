@@ -6,8 +6,15 @@ SYNOPSIS
 
         use YAML::XS;
     
+        # Classic functional interface
         my $yaml = Dump [ 1..4 ];
         my $array = Load $yaml;
+    
+        # EXPERIMENTAL: Object Oriented interface for YAML 1.2
+        # Incompatible to functional interface!
+        my $xs = YAML::XS->new;
+        my $yaml = $xs->dump([ 1..4 ]);
+        my $array = $xs->load($yaml);
 
 DESCRIPTION
 
@@ -23,6 +30,9 @@ DESCRIPTION
     corresponding functions. Only Load and Dump are exported by default.
 
 CONFIGURATION
+
+    The object oriented interface is described below: "OBJECT ORIENTED
+    INTERFACE"
 
       * $YAML::XS::LoadBlessed (since v0.69)
 
@@ -149,6 +159,189 @@ USING YAML::XS WITH UNICODE
     you are having problems, use Devel::Peek on all the possible data
     points.
 
+OBJECT ORIENTED INTERFACE
+
+    Since version v0.904.0, EXPERIMENTAL
+
+    +++NOTE: This is incompatible with the functional interface and will
+    treat YAML values in a different way.+++
+
+    This has two MAJOR differences to the old functional interface:
+
+    Object with options
+
+      This provides an interface where you create a YAML::XS object with
+      options (instead of the old interface with global variables).
+
+    YAML 1.2 Core Schema
+
+      It implements the YAML 1.2 Core Schema.
+
+      (Note that the functional interface does not implement YAML 1.1, when
+      it comes to loading numbers, booleans, null etc. It implements its
+      own set of rules.)
+
+      Here is an (incomplete!) example of values that are treated
+      differently than with the functional interface. YAML values that
+      match a certain pattern, are not loaded as strings, but as other
+      types:
+
+          # Functional interface: special values (not compatible to other YAML modules)
+          - [true, false]                             # booleans
+          - [null, ~]                                 # undef
+          - [inf, INF, iNf, iNF, InF, INf, -inf, ...] # Inf
+          - [100_000]                                 # 100000
+          - # anything that looks_like_number()       # number
+      
+          # OOP YAML 1.2 special values
+          - [true, True, TRUE, false, False, FALSE]   # booleans
+          - [null, Null, NULL, ~]                     # undef
+          - [.inf, .Inf, .INF, -.inf, -.Inf, -.INF]   # Inf
+          - [.nan, .NAN, .NaN]                        # nan
+          - [42, 0x10, 0o10]                          # dec 42, hex 16, oct 8
+
+      For more subtle differences regarding numbers checkout the
+      comprehensive data here:
+
+      YAML 1.1 / 1.2 definitions:
+      https://perlpunk.github.io/yaml-test-schema/schemas.html
+
+      Test data: https://perlpunk.github.io/yaml-test-schema/data.html
+
+      This way the OOP interface is compatible to YAML::PP and YAML
+      processors in other languages supporting YAML 1.2.
+
+    load will return the first document in scalar context
+
+      The functional interface returns the last.
+
+    Numbers don't have string flags
+
+    Booleans currently are only preserved for the new builtin booleans
+
+      Adding a JSON::PP boolean option for older perls is planned
+
+    References, objects, globs, regexes and coderefs cannot be loaded or
+    dumped
+
+      This is planned.
+
+ Usage
+
+        use YAML::XS ();
+        my $xs = YAML::XS->new;
+        my $yaml = "foo: bar";
+    
+        # Load single (first) document:
+        my $data = $xs->load($yaml);
+        $yaml = $xs->dump($data);
+    
+        # Or to load all documents:
+        my @data = $xs->load($yaml);
+        $yaml = $xs->dump(@data);
+
+ METHODS
+
+  new
+
+        use YAML::XS;
+        my $xs = YAML::XS->new(
+            # load options
+            # require_footer => 0,
+    
+            # dump options
+            # indent => 2,
+            # header => 1,
+            # footer => 0,
+            # width => 80,
+            # anchor_prefix => '',
+    
+            # load and dump options
+            # utf8 => 0,
+        );
+
+    Options:
+
+    indent
+
+      Default: 2
+
+      Sets the number of spaces for indentation for dumping.
+
+    utf8
+
+      Default: false
+
+      When false, the loader will accept unencoded character strings, and
+      the dumper returns unencoded character strings.
+
+      When true, the loader accepts a UTF-8 encoded string of bytes, and
+      the dumper returns a UTF-8 encoded string of bytes. This typically
+      makes sense when you read from / write to a file directly.
+
+    header
+
+      Default: 1
+
+      Writes a --- before every document
+
+    footer
+
+      Default: 0
+
+      Writes a ... at the end of every document.
+
+    width
+
+      Set the maximum number of colums for dumping. If a value has too many
+      characters, it will be split into multiple lines.
+
+    require_footer
+
+      Default: 0
+
+      Can be useful in a use case where you want to make sure you received
+      the complete document from the sender.
+
+    anchor_prefix
+
+      Default: ''
+
+      If set to a string like ANCHOR, anchors and aliases will be prefixed
+      with this instead of just being numbers:
+
+          # my $xs = YAML::XS->new( anchor_prefix => 'ANCHOR' );
+          # my $hash = { some => "mapping" };
+          # say $xs->dump([$hash, $hash]);
+          - &ANCHOR1
+            some: mapping
+          - *ANCHOR1
+
+  load
+
+        my $yaml = <<'EOM';
+        ---
+        - 23
+        ---
+        some: mapping
+        EOM
+        my $array = $xs->load($yaml);
+        # [23]
+        my @documents = $xs->load($yaml);
+        # (
+        #   [23],
+        #   { some => "mapping" }
+        # )
+
+    In scalar context, if the YAML string contains more than one document,
+    it will return the first document.
+
+  dump
+
+        $yaml = $xs->dump($data);
+        $yaml = $xs->dump($data1, $data2, $data3);
+        $yaml = $xs->dump(@data);
+
 LIBYAML
 
     You can find out (since v.079) which libyaml version this module was
@@ -168,13 +361,15 @@ SEE ALSO
 
       * YAML::PP::LibYAML
 
-AUTHOR
+AUTHORS
 
     Ingy döt Net ingy@ingy.net <mailto:ingy@ingy.net>
 
+    Tina Müller <tinita@cpan.org>
+
 COPYRIGHT AND LICENSE
 
-    Copyright 2007-2024 - Ingy döt Net
+    Copyright 2007-2025 - Ingy döt Net
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

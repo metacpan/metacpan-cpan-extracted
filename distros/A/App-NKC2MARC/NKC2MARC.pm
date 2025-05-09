@@ -16,7 +16,7 @@ use ZOOM;
 
 Readonly::Array our @OUTPUT_FORMATS => qw(usmarc xml);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 $| = 1;
 
@@ -44,15 +44,15 @@ sub run {
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 1) {
 
-		print STDERR "Usage: $0 [-h] [-o output_format] [--version] id_of_book\n";
+		print STDERR "Usage: $0 [-h] [-o output_format] [--version] id_of_book ..\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
 		print STDERR "\t-o output_format\tOutput format (usmarc, xml - default).\n";
 		print STDERR "\t--version\t\tPrint version.\n";
-		print STDERR "\tid_of_book\t\tIdentifier of book e.g. Czech ".
+		print STDERR "\tid_of_book ..\t\tIdentifier of book e.g. Czech ".
 			"national bibliography id or ISBN\n";
 		return 1;
 	}
-	$self->{'_id_of_book'} = shift @ARGV;
+	my @book_ids = @ARGV;
 
 	if (none { $self->{'_opts'}->{'o'} eq $_ } @OUTPUT_FORMATS) {
 		err 'Bad output format.',
@@ -83,40 +83,42 @@ sub run {
 	}
 	$conn->option(preferredRecordSyntax => $c->{'record'});
 
-	# Get MARC record from library.
-	my ($rs, $ccnb);
-	## CCNB
-	if ($self->{'_id_of_book'} =~ m/^cnb\d+$/ms) {
-		$rs = $conn->search_pqf('@attr 1=48 '.$self->{'_id_of_book'});
-		if (! defined $rs || ! $rs->size) {
-			print STDERR encode_utf8("Edition with ČČNB '$self->{'_id_of_book'}' doesn't exist.\n");
-			return 1;
+	foreach my $book_id (@book_ids) {
+		# Get MARC record from library.
+		my ($rs, $ccnb);
+		## CCNB
+		if ($book_id =~ m/^cnb\d+$/ms) {
+			$rs = $conn->search_pqf('@attr 1=48 '.$book_id);
+			if (! defined $rs || ! $rs->size) {
+				print STDERR encode_utf8("Edition with ČČNB '$book_id' doesn't exist.\n");
+				return 1;
+			}
+			$ccnb = $book_id;
+		## ISBN
+		} else {
+			$rs = $conn->search_pqf('@attr 1=7 '.$book_id);
+			if (! defined $rs || ! $rs->size) {
+				print STDERR "Edition with ISBN '$book_id' doesn't exist.\n";
+				return 1;
+			}
 		}
-		$ccnb = $self->{'_id_of_book'};
-	## ISBN
-	} else {
-		$rs = $conn->search_pqf('@attr 1=7 '.$self->{'_id_of_book'});
-		if (! defined $rs || ! $rs->size) {
-			print STDERR "Edition with ISBN '$self->{'_id_of_book'}' doesn't exist.\n";
-			return 1;
+		my $raw_record = $rs->record(0)->raw;
+		my $usmarc = MARC::Record->new_from_usmarc($raw_record);
+		if (! defined $ccnb) {
+			$ccnb = $self->_subfield($usmarc, '015', 'a');
 		}
-	}
-	my $raw_record = $rs->record(0)->raw;
-	my $usmarc = MARC::Record->new_from_usmarc($raw_record);
-	if (! defined $ccnb) {
-		$ccnb = $self->_subfield($usmarc, '015', 'a');
-	}
-	my $output_file;
-	if ($self->{'_opts'}->{'o'} eq 'xml') {
-		$output_file = $ccnb.'.xml';
-		my $marc_xml = encode_utf8($usmarc->as_xml);
-		barf($output_file, $marc_xml);
-	} else {
-		$output_file = $ccnb.'.mrc';
-		barf($output_file, $raw_record);
-	}
+		my $output_file;
+		if ($self->{'_opts'}->{'o'} eq 'xml') {
+			$output_file = $ccnb.'.xml';
+			my $marc_xml = encode_utf8($usmarc->as_xml);
+			barf($output_file, $marc_xml);
+		} else {
+			$output_file = $ccnb.'.mrc';
+			barf($output_file, $raw_record);
+		}
 
-	print "MARC record for '".$self->{'_id_of_book'}."' was saved to '$output_file'.\n";
+		print "MARC record for '".$book_id."' was saved to '$output_file'.\n";
+	}
 
 	return 0;
 }
@@ -215,12 +217,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2024 Michal Josef Špaček
+© 2024-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

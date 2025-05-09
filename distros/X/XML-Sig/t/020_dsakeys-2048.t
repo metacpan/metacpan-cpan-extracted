@@ -15,6 +15,8 @@ SKIP: {
     skip "xmlsec1 not installed", 1 unless $xmlsec->{installed};
     skip "xmlsec1 too old",       1 unless $xmlsec->{version} gt '1.2.23';
 
+    skip "xmlsec1 does not support DSAKeyValue", 1 if (! $xmlsec->{dsakeyvalue});
+
     test_xmlsec1_ok(
         "verified using xmlsec1 and X509Certificate", $signed, qw(
             --verify

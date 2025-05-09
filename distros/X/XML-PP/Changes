@@ -1,5 +1,10 @@
 Revision history for XML-PP
 
+0.05	Thu May  8 12:23:15 EDT 2025
+	Simplify new()
+	Needs Params::Get >= 0.04
+	Fixed circular dependancy
+
 0.04	Sat Apr 26 19:41:12 EDT 2025
 	Use Params::Get
 

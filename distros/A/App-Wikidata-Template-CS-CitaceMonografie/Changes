@@ -1,3 +1,10 @@
+0.04 2025-05-09T09:52:12+02:00
+ - Add tests for check of edition.
+ - Fix DEPENDENCIES section in doc.
+ - Fix check of P31 property.
+ - Fix minimal version of Test::Warn to 0.31.
+ - Rewrite code for fetching Wikidata item to callback. For better testing.
+
 0.03 2025-02-17T13:53:04+01:00
  - Add basic run() tests.
  - Add constructor tests.

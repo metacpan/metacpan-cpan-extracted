@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::PodViewer.
 
+0.08  Thu May 08 2025
+	- Added support for item-number tokens.
+
 0.07  Sun Feb 09 2025
 	- Added support for over-bullet and item-bullet tokens.
 	- Changed bug tracker.

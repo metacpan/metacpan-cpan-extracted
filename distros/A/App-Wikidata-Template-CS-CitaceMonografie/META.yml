@@ -11,7 +11,11 @@ build_requires:
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
-  Test::Warn: 0
+  Test::Warn: 0.31
+  Wikibase::Datatype::Item: 0
+  Wikibase::Datatype::Snak: 0
+  Wikibase::Datatype::Statement: 0
+  Wikibase::Datatype::Value: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -43,4 +47,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceMonografie
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceMonografie
-version: '0.03'
+version: '0.04'

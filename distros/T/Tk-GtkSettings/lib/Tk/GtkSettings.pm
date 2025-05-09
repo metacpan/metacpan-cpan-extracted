@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Config;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -156,6 +156,7 @@ my @basegtkeys = qw(
 
 my @contentwidgets = qw(
 	Entry
+	FilterEntry
 	FloatEntry
 	Spinbox
 	Text

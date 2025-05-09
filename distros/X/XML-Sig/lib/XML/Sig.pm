@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -1174,7 +1174,7 @@ sub _load_rsa_key {
     my $rsaKey = Crypt::OpenSSL::RSA->new_private_key( $key_text );
 
     if ( $rsaKey ) {
-        $rsaKey->use_pkcs1_padding();
+        $rsaKey->use_pkcs1_oaep_padding();
         $self->{ key_obj }  = $rsaKey;
         $self->{ key_type } = 'rsa';
 
@@ -1247,7 +1247,7 @@ sub _load_x509_key {
     my $x509Key = Crypt::OpenSSL::X509->new_private_key( $key_text );
 
     if ( $x509Key ) {
-        $x509Key->use_pkcs1_padding();
+        $x509Key->use_pkcs1_oaep_padding();
         $self->{ key_obj } = $x509Key;
         $self->{key_type} = 'x509';
     }
@@ -1278,7 +1278,7 @@ sub _load_cert_file {
     confess "Crypt::OpenSSL::X509 needs to be installed so that we can handle X509 certs." if $@;
 
     my $file = $self->{ cert };
-    if ( open my $CERT, '<', $file ) {
+    if ( open my $CERT, '<', "$file" ) {
         my $text = '';
         local $/ = undef;
         $text = <$CERT>;
@@ -1351,7 +1351,7 @@ sub _load_key {
     my $self = shift;
     my $file = $self->{ key };
 
-    if ( open my $KEY, '<', $file ) {
+    if ( open my $KEY, '<', "$file" ) {
         my $text = '';
         local $/ = undef;
         $text = <$KEY>;
@@ -1685,7 +1685,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.65
+version 0.66
 
 =head1 SYNOPSIS
 
@@ -2027,23 +2027,13 @@ Net::SAML2 embedded version amended by Chris Andrews <chris@nodnol.org>.
 
 Maintainer: Timothy Legge <timlegge@cpan.org>
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
-
-=item *
-
-Byrne Reese <byrne@cpan.org>
-
-=item *
-
-Timothy Legge <timlegge@cpan.org>
-
-=back
+Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Byrne Reese, Chris Andrews and Others; in detail:
+This software is copyright (c) 2025 by Byrne Reese, Chris Andrews and Others; in detail:
 
   Copyright 2009       Byrne, Michael Hendricks
             2010       Chris Andrews
@@ -2054,6 +2044,7 @@ This software is copyright (c) 2023 by Byrne Reese, Chris Andrews and Others; in
             2017       Mike Wisener, xmikew
             2019-2021  Timothy Legge
             2022-2023  Timothy Legge, Wesley Schwengle
+            2025       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

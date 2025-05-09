@@ -9,8 +9,13 @@ use Moose;
 
 extends 'Connector::Builtin::Memory';
 
-has '+_config' => (
-    init_arg => 'data',
+sub _build_config {
+    my $self = shift;
+    return $self->data();
+}
+
+has 'data' => (
+    is => 'ro',
     required => 1,
 );
 
@@ -28,7 +33,7 @@ Connector::Builtin::Inline
 =head1 Description
 
 Inherits from Memory and loads the structure given to I<data> as
-innitial value.
+initial value.
 
 =head1 Parameters
 

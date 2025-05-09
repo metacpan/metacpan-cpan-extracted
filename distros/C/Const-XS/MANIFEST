@@ -2,6 +2,7 @@ Changes
 ignore.txt
 lib/Const/XS.pm
 lib/Const/XS.xs
+lib/Const/XS/PP.pm
 Makefile.PL
 MANIFEST			This list of files
 META.json			Module JSON meta-data (added by MakeMaker)
@@ -16,6 +17,7 @@ t/05-readonly.t
 t/06-is_readonly.t
 t/07-unmake_readonly.t
 t/08-list.t
+t/09-deep.t
 t/lib/One.pm
 t/lib/Two.pm
 t/manifest.t

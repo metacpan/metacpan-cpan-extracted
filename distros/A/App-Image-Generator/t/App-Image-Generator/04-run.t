@@ -3,12 +3,13 @@ use warnings;
 
 use App::Image::Generator;
 use English;
+use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 use Test::Output;
-use Test::Warn;
+use Test::Warn 0.31;
 
 # Test.
 @ARGV = (
@@ -50,6 +51,28 @@ stderr_is(
 	$right_ret,
 	'Run help (-x - bad option).',
 );
+
+# Test.
+@ARGV = (
+	'-s 100',
+	'output_file.png',
+);
+eval {
+	App::Image::Generator->new->run;
+};
+is($EVAL_ERROR, "Bad size value.\n", "Bad size value (-s 100).");
+clean();
+
+# Test.
+@ARGV = (
+	'-p bad_pattern',
+	'output_file.png',
+);
+eval {
+	App::Image::Generator->new->run;
+};
+is($EVAL_ERROR, "Bad pattern.\n", "Bad pattern (-p bad_pattern).");
+clean();
 
 sub help {
 	my $script = abs2rel(File::Object->new->file('04-run.t')->s);

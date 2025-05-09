@@ -59,6 +59,8 @@ SKIP: {
     skip "xmlsec1 no sha1 support", 1
         if ($dsasig->{ sig_hash } eq 'sha1' and $xmlsec->{sha1_support} ne 1);
 
+    skip "xmlsec1 does not support DSAKeyValue", 1 if (! $xmlsec->{dsakeyvalue});
+
     test_xmlsec1_ok(
         "DSA verify XML:Sig signed: xmlsec1 Response is OK",
         $dsa_signed_xml,

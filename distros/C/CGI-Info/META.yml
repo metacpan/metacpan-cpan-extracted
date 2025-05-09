@@ -37,7 +37,8 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Config::Abstraction: '0'
+  Class::Debug: '0.02'
+  Config::Abstraction: '0.19'
   Cwd: '0'
   ExtUtils::MakeMaker: '6.64'
   File::Basename: '0'
@@ -46,7 +47,7 @@ requires:
   IO::Interactive: '0'
   JSON::MaybeXS: '0'
   List::Util: '1.33'
-  Log::Abstraction: '0.05'
+  Log::Abstraction: '0.1'
   Log::Any: '0'
   Params::Get: '0'
   Params::Validate::Strict: '0.02'
@@ -62,5 +63,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

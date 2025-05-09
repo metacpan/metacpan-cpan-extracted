@@ -3,9 +3,10 @@ use warnings;
 
 use App::NKC2MARC;
 use English;
+use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -51,6 +52,18 @@ stderr_is(
 	'Run help (-x - bad option).',
 );
 
+# Test.
+@ARGV = (
+	'-o bad',
+	'cnb000703274',
+);
+eval {
+	App::NKC2MARC->new->run;
+};
+is($EVAL_ERROR, "Bad output format.\n",
+	"Bad output format (bad).");
+clean();
+
 sub help {
 	my $script = abs2rel(File::Object->new->file('04-run.t')->s);
 	# XXX Hack for missing abs2rel on Windows.
@@ -58,11 +71,11 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [-o output_format] [--version] id_of_book
+Usage: $script [-h] [-o output_format] [--version] id_of_book ..
 	-h			Print help.
 	-o output_format	Output format (usmarc, xml - default).
 	--version		Print version.
-	id_of_book		Identifier of book e.g. Czech national bibliography id or ISBN
+	id_of_book ..		Identifier of book e.g. Czech national bibliography id or ISBN
 END
 
 	return $help;

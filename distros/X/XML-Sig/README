@@ -3,7 +3,7 @@ NAME
     Signatures
 
 VERSION
-    version 0.65
+    version 0.66
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -300,13 +300,11 @@ AUTHORS and CREDITS
 
     Maintainer: Timothy Legge <timlegge@cpan.org>
 
-AUTHORS
-    *   Byrne Reese <byrne@cpan.org>
-
-    *   Timothy Legge <timlegge@cpan.org>
+AUTHOR
+    Timothy Legge <timlegge@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by Byrne Reese, Chris Andrews and
+    This software is copyright (c) 2025 by Byrne Reese, Chris Andrews and
     Others; in detail:
 
       Copyright 2009       Byrne, Michael Hendricks
@@ -318,6 +316,7 @@ COPYRIGHT AND LICENSE
                 2017       Mike Wisener, xmikew
                 2019-2021  Timothy Legge
                 2022-2023  Timothy Legge, Wesley Schwengle
+                2025       Timothy Legge
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

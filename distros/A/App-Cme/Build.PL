@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "App-Cme",
-  "dist_version" => "1.042",
+  "dist_version" => "1.043",
   "license" => "lgpl",
   "module_name" => "App::Cme",
   "recommends" => {

@@ -13,7 +13,9 @@ HMAC
 my $xmlsec  = get_xmlsec_features;
 my $openssl = get_openssl_features;
 
-my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512 ripemd160/;
+my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512/;
+push @hash_alg, 'ripemd160' if $xmlsec->{ripemd160};
+
 foreach my $alg (@hash_alg) {
     my $xml = '<?xml version="1.0"?>'."\n".'<foo ID="XML-SIG_1">'."\n".'    <bar>123</bar>'."\n".'</foo>';
     my $sig = XML::Sig->new( { hmac_key => $hmac_key, key_name => $key_name, sig_hash => $alg } );
@@ -28,7 +30,6 @@ foreach my $alg (@hash_alg) {
 
         skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 1
             if ( ! $openssl->{ripemd160} and $alg eq 'ripemd160');
-
 
         test_xmlsec1_ok(
             "xmlsec1 response ok", $signed, qw(

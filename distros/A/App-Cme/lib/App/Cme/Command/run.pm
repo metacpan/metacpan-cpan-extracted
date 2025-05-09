@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.042';
+$App::Cme::Command::run::VERSION = '1.043';
 use strict;
 use warnings;
 use v5.20;
@@ -311,7 +311,8 @@ sub parse_script ($script, $content, $user_args) {
 sub commit ($self, $root, $msg) {
     $msg =~ s/\{\{(.*?)\}\}/$root->grab_value($1)/e;
 
-    system(qw/git commit -a -m/, $msg);
+    system(qw/git commit -a -m/, $msg) == 0
+        or die "git commit failed: $?\n";
 
     return;
 }
@@ -389,14 +390,6 @@ sub execute {
         $commit_msg = $opt->{commit};
     }
 
-    # check if workspace and index are clean
-    if ($commit_msg and not $opt->{no_commit}) {
-        ## no critic(InputOutput::ProhibitBacktickOperators)
-        my $r = `git status --porcelain --untracked-files=no`;
-        die "Cannot run commit command in a non clean repo. Please commit or stash pending changes: $r\n"
-            if $r;
-    }
-
     $opt->{_verbose} = 'Loader' if $opt->{verbose};
 
     my ( $categories, $appli_info, $appli_map ) = Config::Model::Lister::available_models;
@@ -422,8 +415,9 @@ sub execute {
 sub run_foreach_loop($self, $opt,$app_args, $script_data ) {
     my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
 
-    my @dirs = $opt->{foreach} eq '-' ? <STDIN> : split /\s+/,$opt->{foreach};
-    chomp(@dirs);               # cleanup stdin
+    my @dirs = map { chomp ; split /\s+/; }
+        ($opt->{foreach} eq '-' ? <STDIN> : ($opt->{foreach}));
+
     my $start = path('.')->absolute;
 
     foreach my $d (@dirs) {
@@ -436,18 +430,35 @@ sub run_foreach_loop($self, $opt,$app_args, $script_data ) {
         $opt->{instance_name} = $d;
         # instance is persisted in $self, so its ref must be removed
         delete $self->{_instance};
-        # tell instance where is the config. This avoids a chdir
-        $opt->{root_dir} = $d;
+        chdir $t_dir->stringify;
         $self->run_script ($opt, $app_args, $script_data, {%user_args});
         # once we're done, remove instance from Model to avoid memory leaks
         # TODO: use delete_instance method provided by Config::Model from version 2.156
         delete $self->{_model}{instances}{$d};
     }
 
+    chdir $start->stringify;
     return;
 }
 
 sub run_script ($self, $opt, $app_args, $script_data, $user_args){
+    my $commit_msg = $script_data->{commit_msg};
+    my $stashed;
+
+    # check if workspace and index are clean
+    if ($commit_msg and not $opt->{no_commit}) {
+        ## no critic(InputOutput::ProhibitBacktickOperators)
+        my $r = `git status --porcelain --untracked-files=no`;
+        if ($?) {
+            die "git status command failed: $?\n";
+        }
+        if ($r) {
+            system(qw/git stash push --quiet --message/, "cme run auto stash") == 0
+                or die "git stash push failed: $?\n";
+            $stashed = 1;
+        };
+    }
+
     # call loads
     my ($model, $inst, $root) = $self->init_cme($opt,$app_args);
     foreach my $load_str ($script_data->{load}->@*) {
@@ -468,25 +479,28 @@ sub run_script ($self, $opt, $app_args, $script_data, $user_args){
         $script_data->{sub}->($root, $user_args);
     }
 
-    unless ($inst->needs_save) {
+    if ($inst->needs_save) {
+        $self->save($inst,$opt) ;
+
+        # commit if needed
+        if ($commit_msg and not $opt->{no_commit}) {
+            $self->commit($root, $commit_msg);
+        }
+    } else {
         say "No change were applied";
-        return;
     }
 
-    $self->save($inst,$opt) ;
 
-    my $commit_msg = $script_data->{commit_msg};
-
-    # commit if needed
-    if ($commit_msg and not $opt->{no_commit}) {
-        $self->commit($root, $commit_msg);
+    if ($stashed) {
+        system(qw/git stash pop --quiet/) == 0
+            or die "git stash pop failed: $?\n";
     }
 
     return;
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.042';
+$App::Cme::Run::Var::VERSION = '1.043';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -514,7 +528,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.042
+version 1.043
 
 =head1 SYNOPSIS
 
@@ -686,8 +700,9 @@ Specify Perl code to run. See L</code section> for details.
 =item commit
 
 Specify that the change must be committed with the passed commit
-message. When this option is used, C<cme> raises an error if used on a
-non-clean workspace. This option works only with L<git>.
+message. When this option is used, C<cme> stashes and restores all
+modifications if used on a non-clean workspace. This option works only
+with L<git>.
 
 Strings like C<{{ load path }}> are substituted with a value extracted
 from configuration tree with the specified load path. See

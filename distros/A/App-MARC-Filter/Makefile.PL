@@ -5,7 +5,7 @@ use warnings;
 use inc::Module::Install;
 
 # Definition.
-abstract 'Base class and script for filter MARC records.';
+abstract 'Tool to filter records in MARC dataset.';
 author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.05;
@@ -23,7 +23,9 @@ requires 'Class::Utils' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
 requires 'Getopt::Std' => 0;
-requires 'List::MoreUtils' => 0;
+requires 'List::Util' => 1.33;
+requires 'MARC::Leader' => 0;
+requires 'MARC::Leader::Utils' => 0;
 requires 'MARC::File::XML' => '1.0.4';
 requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
@@ -40,7 +42,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

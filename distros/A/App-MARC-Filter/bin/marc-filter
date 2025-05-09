@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Filter;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Run.
 exit App::MARC::Filter->new->run;
@@ -24,13 +24,16 @@ __END__
 
 =head1 NAME
 
-marc-filter - Script to filter records in MARC dataset.
+marc-filter - Tool to filter records in MARC dataset.
 
 =head1 SYNOPSIS
 
- marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_xml_file field [subfield] value
+ marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_xml_file search_item [sub_search_item] value
 
 =head1 DESCRIPTION
+
+Tool to filter MARC records in big datasets. Could filter by control field or field/subfield or
+leader or material type. Tool could filter by number of output records.
 
 It supports MARC XML files now.
 
@@ -66,21 +69,38 @@ Print version of script.
 
 MARC XML file name.
 
-=item * C<field>
+=item * C<search_item>
 
-MARC field.
+Search item could be MARC control field or MARC field or 'leader' string or
+material type string.
 
-Field number or 'leader' string.
+Possible material type strings are:
 
-=item * C<subfield>
+=over
 
-MARC subfield.
+=item * book
 
-It's optional in case of 'leader'.
+=item * computer_file
+
+=item * continuing_resource
+
+=item * map
+
+=item * mixed_material
+
+=item * music
+
+=item * visual_material
+
+=back
+
+=item * C<sub_search_item>
+
+In the case of MARC field this could be a subfield.
 
 =item * C<value>
 
-MARC field/subfield or leader value to filter.
+Value to filter.
 
 =back
 
@@ -102,6 +122,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

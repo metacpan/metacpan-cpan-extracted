@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use v5.38;
+use App::FeedDeduplicator;
+
+my $config_file = shift;
+my $deduplicator = App::FeedDeduplicator->new($config_file ? (config_file => $config_file) : ());
+$deduplicator->run();

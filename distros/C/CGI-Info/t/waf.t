@@ -23,7 +23,7 @@ subtest 'SQL Injection Detection' => sub {
 	$info = new_ok('CGI::Info');
 	my $params = $info->params();
 
-	ok(!defined $params, 'SQL injection attempt blocked');
+	ok(!defined($params), 'SQL injection attempt blocked');
 	is($info->status(), 403, 'Status set to 403 Forbidden');
 
 	$ENV{'QUERY_STRING'} = 'page=by_location&county=CA&country=United%2F%2A%2A%2FStates%29%2F%2A%2A%2FAND%2F%2A%2A%2F%28SELECT%2F%2A%2A%2F6734%2F%2A%2A%2FFROM%2F%2A%2A%2F%28SELECT%28SLEEP%285%29%29%29lRNi%29%2F%2A%2A%2FAND%2F%2A%2A%2F%288984%3D8984';

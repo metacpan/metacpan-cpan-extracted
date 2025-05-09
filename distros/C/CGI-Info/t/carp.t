@@ -7,9 +7,7 @@ use Carp;
 use Test::Carp;
 use Test::Most tests => 16;
 
-BEGIN {
-	use_ok('CGI::Info');
-}
+BEGIN { use_ok('CGI::Info') }
 
 CARP: {
 	local $ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';

@@ -10,6 +10,7 @@ build_requires:
   FindBin: '0'
   IO::File: '0'
   IO::Pipe: '0'
+  JSON::PP: '0'
   Test::More: '0.9'
   Tie::Array: '0'
   Tie::Hash: '0'
@@ -35,10 +36,10 @@ no_index:
 provides:
   YAML::LibYAML:
     file: lib/YAML/LibYAML.pm
-    version: v0.903.0
+    version: v0.904.0
   YAML::XS:
     file: lib/YAML/XS.pm
-    version: v0.903.0
+    version: v0.904.0
 requires:
   B::Deparse: '0'
   Exporter: '0'
@@ -52,7 +53,7 @@ resources:
   bugtracker: https://github.com/ingydotnet/yaml-libyaml-pm/issues
   homepage: https://github.com/ingydotnet/yaml-libyaml-pm
   repository: https://github.com/ingydotnet/yaml-libyaml-pm.git
-version: v0.903.0
+version: v0.904.0
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

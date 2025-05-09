@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More;
 
 use Data::Dumper;
+use Test::Most;
 
 BEGIN { use_ok('XML::PP') }
 
@@ -94,4 +94,3 @@ is_deeply($xml_pp->collapse_structure($input4), $expected4, 'Skipping empty node
 
 # --- Done ---
 done_testing();
-

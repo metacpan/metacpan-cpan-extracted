@@ -40,3 +40,17 @@ Revision history for Const-XS
 	- Fix is_readonly, make_readonly, unmake_readonly on list variables
 	- Add new function make_readonly_ref based on supporting above
 	- Add additional tests for list variables
+
+0.18	2025-05-08
+	- If reference is already readonly do not re-make it readonly. This improves performance when "merging" readonly arrays and hashes.
+
+0.19 	2025-05-08
+	- Remove the use of SvPV_nolen
+	- Write a test for deep recursion and fix the code to die with a nice error message
+
+0.20	2025-05-09
+	- Remove the last use of SvPV_nolen
+	- Reduce the recursion_limit variable 
+
+0.21	2025-05-09
+	- Fallback to a pure perl implementation < v5.16

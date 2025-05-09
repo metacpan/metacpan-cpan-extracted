@@ -3,8 +3,7 @@ package XML::PP;
 use strict;
 use warnings;
 
-use Log::Abstraction;
-use Params::Get;
+use Params::Get 0.04;
 use Scalar::Util;
 
 =head1 NAME
@@ -13,11 +12,11 @@ XML::PP - A simple XML parser
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -76,22 +75,24 @@ or a filename.
 sub new
 {
 	my $class = shift;
-
-	my $params = Params::Get::get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, @_) || {};
 
 	# strict implies warn_on_error
 	if($params->{strict}) {
 		$params->{warn_on_error} = 1;
 	}
 
-	my $self = bless {
-		strict => $params->{strict} // 0,
-		warn_on_error => $params->{warn_on_error} // 0,
-		$params ? %{$params} : {},
-	}, $class;
+	my $self = bless { %{$params} }, $class;
 
 	if(my $logger = $self->{'logger'}) {
 		if(!Scalar::Util::blessed($logger)) {
+			# Don't "use" at the top, because of circular dependancy:
+			#	Log::Abstraction->Config::Abstraction->XML::PP
+			eval { require Log::Abstraction };
+			if($@) {
+				die $@;
+			}
+			Log::Abstraction->import();
 			$self->{'logger'} = Log::Abstraction->new($logger);
 		}
 	}
@@ -140,7 +141,7 @@ sub parse
 		return {};
 	}
 
-	$xml_string =~ s/<\?xml.+?>//;	# Ignore the header
+	$xml_string =~ s/<\?xml.+\?>//;	# Ignore the header
 
 	$xml_string =~ s/^\s+|\s+$//g;	# Trim whitespace
 	return $self->_parse_node(\$xml_string, {});
@@ -294,6 +295,10 @@ It also manages namespaces and handles self-closing tags.
 # Internal method to parse an individual XML node
 sub _parse_node {
 	my ($self, $xml_ref, $nsmap) = @_;
+
+	if(!defined($xml_ref)) {
+		die 'BUG: _parse_node, xml_ref not defined';
+	}
 
 	# Match the start of a tag (self-closing or regular)
 	$$xml_ref =~ s{^\s*<([^\s/>]+)([^>]*)\s*(/?)>}{}s or do {

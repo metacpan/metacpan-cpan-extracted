@@ -12,7 +12,7 @@ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use Wikibase::API;
 use Wikibase::Datatype::Query;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 Readonly::Array our @LANGUAGES => ('mul', 'cs', 'en');
 
@@ -22,6 +22,16 @@ sub new {
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Callback to fetch item from Wikidata.
+	$self->{'cb_wikidata'} = sub {
+		my ($self, $wd_id) = @_;
+
+		# Get item.
+		my $item = $self->{'_api'}->get_item($wd_id);
+
+		return $item;
+	};
 
 	# Process parameters.
 	set_params($self, @params);
@@ -64,10 +74,13 @@ sub run {
 	);
 
 	# Get item.
-	my $item = $self->{'_api'}->get_item($wd_id);
+	my $item = $self->{'cb_wikidata'}->($self, $wd_id);
 
 	# Check for edition.
-	if (none { $self->{'_q'}->query($item, 'P31') eq $_ } ('Q3331189', 'Q21112633')) {
+	my $item_p31 = $self->{'_q'}->query($item, 'P31');
+	if (! defined $item_p31
+		|| none { $item_p31 eq $_ } ('Q3331189', 'Q21112633')) {
+
 		err "This item isn't book edition.";
 	}
 
@@ -360,6 +373,7 @@ Returns 1 for error, 0 for success.
 L<Class::Utils>,
 L<Error::Pure>,
 L<Getopt::Std>,
+L<List::Util>,
 L<Readonly>,
 L<Unicode::UTF8>,
 L<Wikibase::API>,
@@ -383,6 +397,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

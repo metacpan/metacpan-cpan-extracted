@@ -33,7 +33,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Abstraction" : "0",
+            "Class::Debug" : "0.02",
+            "Config::Abstraction" : "0.19",
             "Cwd" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "File::Basename" : "0",
@@ -42,7 +43,7 @@
             "IO::Interactive" : "0",
             "JSON::MaybeXS" : "0",
             "List::Util" : "1.33",
-            "Log::Abstraction" : "0.05",
+            "Log::Abstraction" : "0.1",
             "Log::Any" : "0",
             "Params::Get" : "0",
             "Params::Validate::Strict" : "0.02",
@@ -94,6 +95,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

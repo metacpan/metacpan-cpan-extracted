@@ -4,7 +4,8 @@ use Test::XML::Sig;
 my $xmlsec  = get_xmlsec_features;
 my $openssl = get_openssl_features;
 
-my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512 ripemd160/;
+my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512/;
+push @hash_alg, 'ripemd160' if $xmlsec->{ripemd160};
 foreach my $alg (@hash_alg) {
     my $sig = XML::Sig->new(
         {
@@ -26,6 +27,8 @@ foreach my $alg (@hash_alg) {
         skip "xmlsec1 not installed", 1 unless $xmlsec->{installed};
         skip "OpenSSL does not support ripemd160", 1
             unless $openssl->{ripemd160};
+
+        skip "xmlsec1 does not support DSAKeyValue", 1 if (! $xmlsec->{dsakeyvalue});
 
         test_xmlsec1_ok("Verified by XMLsec",
             $signed, qw(--verify --id-attr:ID "foo"));
@@ -51,6 +54,8 @@ foreach my $alg (@hash_alg) {
         skip "xmlsec1 not installed", 1 unless $xmlsec->{installed};
         skip "OpenSSL does not support ripemd160", 1
             unless $openssl->{ripemd160};
+
+        skip "xmlsec1 does not support DSAKeyValue", 1 if (! $xmlsec->{dsakeyvalue});
 
         test_xmlsec1_ok(
             "RSA is verified using xmlsec1 - no X509", $signed, qw(

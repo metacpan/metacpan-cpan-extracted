@@ -19,6 +19,7 @@ is(is_readonly(%buz), 1);
 
 is(is_readonly($sub), 1);
 
+=pod
 my $other_sub = sub { return 2 };
 
 is(is_readonly($other_sub), 0);
@@ -53,5 +54,25 @@ make_readonly($array);
 is(is_readonly($array), 1);
 unmake_readonly($array);
 is(is_readonly($array), 0);
+
+
+const my $ref => { a => 1, b => 2, c => 3 };
+
+is(is_readonly($ref), 1);
+
+my $copy = $ref;
+
+is(&Internals::SvREADONLY($copy), 1);
+is(Internals::SvREADONLY($copy), '');
+
+is(&is_readonly($copy), 1);
+is(is_readonly($copy), 0);
+
+my $wow = { a => 'one' };
+
+is(&is_readonly($wow), 0);
+
+is(&Internals::SvREADONLY($wow), '');
+=cut
 
 done_testing();

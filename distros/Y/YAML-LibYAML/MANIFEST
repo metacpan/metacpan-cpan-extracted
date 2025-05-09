@@ -75,6 +75,12 @@ t/magic.t
 t/native.t
 t/null.t
 t/numbers.t
+t/oop/10-basic.t
+t/oop/11-schema.t
+t/oop/12-alias.t
+t/oop/13-utf8.t
+t/oop/14-options.pl
+t/oop/schema-core.yaml
 t/path-class.t
 t/pl_sv_undef.t
 t/private.t

@@ -40,26 +40,33 @@ sub _get_node {
 
     my $ptr = $self->_config();
 
-    # Top Level Node requested
-    if (!@path) {
-        return $ptr;
-    }
-
-    while ( scalar @path > 1 ) {
+    while ( scalar @path ) {
         my $entry = shift @path;
-        if ( exists $ptr->{$entry} ) {
-            if ( ref $ptr->{$entry} eq 'HASH' ) {
+        if ( ref $ptr eq 'HASH' && exists $ptr->{$entry} ) {
+            my $type = ref $ptr->{$entry};
+            if ( $type eq 'HASH' || $type eq 'ARRAY' || scalar @path == 0) {
                 $ptr = $ptr->{$entry};
             }
             else {
-                return $self->_node_not_exists( ref $ptr->{$entry} );
+                $self->log()->debug("tried to walk over unexpected node type: $type");
+                return $self->_node_not_exists( $entry );
+            }
+        }
+        elsif ( ref $ptr eq 'ARRAY' && $entry =~ m{\A\d+\z} && exists $ptr->[$entry] ) {
+            my $type = ref $ptr->[$entry];
+            if ( $type eq 'HASH' || $type eq 'ARRAY' || scalar @path == 0) {
+                $ptr = $ptr->[$entry];
+            }
+            else {
+                $self->log()->debug("tried to walk over unexpected node type: $type");
+                return $self->_node_not_exists( $entry );
             }
         } else {
             return $self->_node_not_exists($entry);
         }
     }
 
-    return $ptr->{ shift @path };
+    return $ptr;
 
 }
 
