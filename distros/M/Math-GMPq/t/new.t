@@ -171,20 +171,26 @@ else {print "not ok 4 $ok\n"}
 
 eval { require Math::MPFR;};
 unless($@) {
-  my $fr = Math::MPFR::Rmpfr_init2(113);
-  Math::MPFR::Rmpfr_set_str($fr, "1.3", 10, 0);
-  Math::MPFR::Rmpfr_div_ui($fr, $fr, 10,  0);
-  my $q1 = Math::GMPq->new($fr);
-  my $q2 = Math::GMPq->new(Math::MPFR::decimalize($fr));
+  if($Math::MPFR::VERSION >= 4.15) {  # Test needs decimalize()
+    my $fr = Math::MPFR::Rmpfr_init2(113);
+    Math::MPFR::Rmpfr_set_str($fr, "1.3", 10, 0);
+    Math::MPFR::Rmpfr_div_ui($fr, $fr, 10,  0);
+    my $q1 = Math::GMPq->new($fr);
+    my $q2 = Math::GMPq->new(Math::MPFR::decimalize($fr));
 
-  if($q1 == $q2) { print "ok 5\n" }
+    if($q1 == $q2) { print "ok 5\n" }
+    else {
+      warn "$q1\n$q2\n";
+      print "not ok 5\n";
+    }
+  }
   else {
-    warn "$q1\n$q2\n";
-    print "not ok 5\n";
+    warn "Test 5 needs Math-MPFR-4.15 or later - we have only version $Math::MPFR::VERSION\n";
+    print "ok 5\n";
   }
 }
 else {
-  warn "Could not load Math::MPFR";
+  warn "Could not load Math::MPFR\n";
   print "ok 5\n";
 }
 

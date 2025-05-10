@@ -19,6 +19,9 @@ my $strninf = $strinf * -1;
 my $strnan = $strinf / $strinf;
 my ($ret, $x);
 
+my $insane = 0;
+$insane = 1 if($^O =~ /MSWin/i && $strnan =~ /#/);
+
 eval{$ret = Math::GMPq->new(10) *  $inf };
 if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 1\n"}
 else {
@@ -41,10 +44,19 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) * "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_mul/) {print "ok 4\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 4\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 4\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 4\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_mul/) {print "ok 4\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 4\n";
+  }
 }
 
 $ret = Math::GMPq->new(10) * "61.2";
@@ -90,10 +102,19 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) + "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_add/) {print "ok 10\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 10\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 10\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 10\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_add/) {print "ok 10\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 10\n";
+  }
 }
 
 $ret = Math::GMPq->new(10) + "61.2";
@@ -140,10 +161,19 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) / "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_div/) {print "ok 16\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 16\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 16\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 16\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_div/) {print "ok 16\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 16\n";
+  }
 }
 
 $ret = Math::GMPq->new(10) / "61.2";
@@ -190,10 +220,19 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) - "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_sub/) {print "ok 22\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 22\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 22\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 22\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_sub/) {print "ok 22\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 22\n";
+  }
 }
 
 $ret = Math::GMPq->new(10) - "61.2";
@@ -242,10 +281,19 @@ else {
 }
 
 eval{$ret *= "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_mul_eq/) {print "ok 28\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 28\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 28\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 28\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_mul/) {print "ok 28\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 28\n";
+  }
 }
 
 $ret *= "61.2";
@@ -285,10 +333,19 @@ else {
 }
 
 eval{$ret += "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_add_eq/) {print "ok 34\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 34\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 34\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 34\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_add_eq/) {print "ok 34\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 34\n";
+  }
 }
 
 $ret += "2.5";
@@ -329,10 +386,19 @@ else {
 }
 
 eval{$ret -= "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_sub_eq/) {print "ok 40\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 40\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 40\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 40\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_sub_eq/) {print "ok 40\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 40\n";
+  }
 }
 
 $ret -= 60.5;
@@ -372,10 +438,19 @@ else {
 }
 
 eval{$ret /= "$strnan"};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_div_eq/) {print "ok 46\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 46\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 46\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 46\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_div_eq/) {print "ok 46\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 46\n";
+  }
 }
 
 $ret /= "6.25";
@@ -428,10 +503,19 @@ else {
   print "not ok 52\n";
 }
 eval{$x = (Math::GMPq->new(10) == "$strnan")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_equiv/) {print "ok 53\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 53\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 53\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 53\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_equiv/) {print "ok 53\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 53\n";
+  }
 }
 
 if(Math::GMPq->new(10) == "61.2") { print "not ok 54\n" }
@@ -480,10 +564,19 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) != "$strnan")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_not_equiv/) {print "ok 60\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 60\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 60\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 60\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_not_equiv/) {print "ok 60\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 60\n";
+  }
 }
 
 if(Math::GMPq->new(10) != "61.2") { print "ok 61\n" }
@@ -532,10 +625,19 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) < "$strnan")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_lt/) {print "ok 67\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 67\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 67\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 67\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_lt/) {print "ok 67\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 67\n";
+  }
 }
 
 if(Math::GMPq->new(10) < "61.2") { print "ok 68\n" }
@@ -585,10 +687,19 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <= "$strnan")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_lte/) {print "ok 74\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 74\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 74\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 74\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_lte/) {print "ok 74\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 74\n";
+  }
 }
 
 if(Math::GMPq->new(10) <= "61.2") { print "ok 75\n" }
@@ -637,10 +748,19 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) >= "$strnan")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_gte/) {print "ok 81\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 81\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 81\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 81\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_gte/) {print "ok 81\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 81\n";
+  }
 }
 
 if(Math::GMPq->new(10) >= "61.2") { print "not ok 82\n" }
@@ -690,10 +810,19 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) > "$strnan")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_gt/) {print "ok 88\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 88\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 88\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 88\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_gt/) {print "ok 88\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 88\n";
+  }
 }
 
 if(Math::GMPq->new(10) > "61.2") { print "not ok 89\n" }
@@ -793,14 +922,22 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <=> "$strnan")};
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_spaceship/) {print "ok 103\n"}
+if($insane) {
+  if($@ =~ /String supplied to Rmpq_set_str function \(/) {print "ok 103\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 103\n";
+  }
+}
 else {
-  warn "\n\$\@: $@\n";
-  print "not ok 103\n";
+  if($@ =~ /Invalid string supplied to Math::GMPq::overload_spaceship/) {print "ok 103\n"}
+  else {
+    warn "\n\$\@: $@\n";
+    print "not ok 103\n";
+  }
 }
 
-if((Math::GMPq->new(10) <=> "61.2") > 0) { print "ok 104\n" }
-if($@ =~ /Invalid string supplied to Math::GMPq::overload_spaceship/) {print "ok 104\n"}
+if((Math::GMPq->new(10) <=> "61.2") < 0) { print "ok 104\n" }
 else {  print "not ok 104\n" }
 
 if((Math::GMPq->new(10) <=> $inf) < 0){print "ok 105\n"}

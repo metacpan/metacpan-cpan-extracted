@@ -35,13 +35,17 @@ if($nv_2) {      # True
 
   cmp_ok(_ITSA($nv_2), '==', 4, "PV slot will be used");   # Test 5
 
-  eval {my $q = Math::GMPq->new($nv_2);};
-  like($@, qr/^String supplied to Rmpq_set_str function is not a valid/,
+  {
+    my $q = Math::GMPq->new($nv_2);
+    cmp_ok("$q", 'eq', '23/16',
        "PV slot was used by new()");                       # Test 6
 
- eval {my $q = Math::GMPq->new(3) * $nv_2;};
-  like($@, qr/^Invalid string supplied to Math::GMPq::overload_mul/,
-       "PV slot was used by overload_mul()");              # Test 7
+
+    my $q_ = Math::GMPq->new(3) * $nv_2;
+    cmp_ok("$q_", 'eq', '69/16',
+         "PV slot was used by overload_mul()");              # Test 7
+
+  }
 }
 
 

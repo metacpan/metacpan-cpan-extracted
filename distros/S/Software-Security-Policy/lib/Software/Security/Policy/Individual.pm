@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Software::Security::Policy::Individual;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 use parent 'Software::Security::Policy';
 # ABSTRACT: The Individual Security Policy
@@ -161,7 +161,7 @@ Software::Security::Policy::Individual - The Individual Security Policy
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

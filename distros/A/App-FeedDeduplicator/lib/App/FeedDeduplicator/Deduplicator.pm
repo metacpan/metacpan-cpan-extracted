@@ -47,7 +47,7 @@ It is used during the deduplication process to determine the unique identifier f
 
 package App::FeedDeduplicator::Deduplicator; # For MetaCPAN
 
-use v5.38;
+use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 

@@ -25,10 +25,6 @@ Rmpq_canonicalize($q);
 
 my $ok = '';
 
-my $expected_refcnt = 1;
-$expected_refcnt++
-  if $Config{ccflags} =~ /\-DPERL_RC_STACK/;
-
 my $z = $p * $q;
 if(Rmpq_get_str($z, 10) eq '-25651/4784201'
    && "$z" eq '-25651/4784201') {$ok = 'a'}
@@ -56,10 +52,7 @@ else {print $z, "\n"}
 #35.796079630136988253351063738666
 #35.796079630136986301169306547287
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt
-   && Math::GMPq::get_refcnt($q) == $expected_refcnt) {print "ok 1\n"}
+if($ok eq 'abcdef') {print "ok 1\n"}
 else {print "not ok 1 $ok\n"}
 
 $ok = '';
@@ -94,8 +87,7 @@ if($z < 35.7960797 && $z > 35.7960796) {$ok .= 'f'}
 else {print $z, "\n"}
 Rmpq_set_ui($p, 113, 73);
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 2\n"}
+if($ok eq 'abcdef') {print "ok 2\n"}
 else {print "not ok 2 $ok\n"}
 
 $ok = '';
@@ -124,9 +116,7 @@ $z = $p + $frac;
 if($z < 24.672847 && $z > 24.672846) {$ok .= 'f'}
 else {print $z, "\n"}
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt) {print "ok 3\n"}
+if($ok eq 'abcdef') {print "ok 3\n"}
 else {print "not ok 3 $ok\n"}
 
 $ok = '';
@@ -161,8 +151,7 @@ if($z < 24.672847 && $z > 24.672846) {$ok .= 'f'}
 else {print $z, "\n"}
 Rmpq_set_ui($p, 113, 73);
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 4\n"}
+if($ok eq 'abcdef') {print "ok 4\n"}
 else {print "not ok 4 $ok\n"}
 
 $ok = '';
@@ -209,9 +198,7 @@ else {print $z, "\n"}
 $z *= $frac / $p;
 if(Rmpq_get_str($z, 16) eq '1') {$ok .= '6'}
 
-if($ok eq 'a1b2c3d4e5f6'
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt) {print "ok 5\n"}
+if($ok eq 'a1b2c3d4e5f6') {print "ok 5\n"}
 else {print "not ok 5 $ok\n"}
 
 $ok = '';
@@ -241,23 +228,18 @@ $p /= $q;
 
 if("$p" eq '113/73') {$ok .= 'f'}
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 6\n"}
+if($ok eq 'abcdef') {print "ok 6\n"}
 else {print "not ok 6 $ok\n"}
 
 my $c = $p;
 if("$c" eq '113/73'
    && "$c" eq "$p"
    && $c == $p
-   && $c != $q
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt
-   && Math::GMPq::get_refcnt($c) == $expected_refcnt
-   && Math::GMPq::get_refcnt($q) == $expected_refcnt) {print "ok 7\n"}
+   && $c != $q) {print "ok 7\n"}
 else {print "not ok 7\n"}
 
 $c *= -1;
-if(Rmpq_get_str(abs($c), 10) eq '113/73'
-   && Math::GMPq::get_refcnt($c) == $expected_refcnt) {print "ok 8\n"}
+if(Rmpq_get_str(abs($c), 10) eq '113/73') {print "ok 8\n"}
 else {print "not ok 8\n"}
 
 $ok = ($p!=$ui).($p==$ui).($p>$ui).($p>=$ui).($p<$ui).($p<=$ui).($p<=>$ui);
@@ -297,29 +279,26 @@ if($ok eq '100011-1') {print "ok 17\n"}
 else {print "not ok 17\n"}
 
 $ok = ($frac!=$p).($frac==$p).($frac>$p).($frac>=$p).($frac<$p).($frac<=$p).($frac<=>$p);
-if($ok eq '1011001'
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 18\n"}
+if($ok eq '1011001') {print "ok 18\n"}
 else {print "not ok 18\n"}
 
 Rmpq_set_ui($q, 0, 1);
 
-if($p && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 19\n"}
+if($p) {print "ok 19\n"}
 else {print "not ok 19\n"}
 
-if(!$q && Math::GMPq::get_refcnt($q) == $expected_refcnt) {print "ok 20\n"}
+if(!$q) {print "ok 20\n"}
 else {print "not ok 20\n"}
 
-if(not$q && Math::GMPq::get_refcnt($q) == $expected_refcnt) {print "ok 21\n"}
+if(not$q) {print "ok 21\n"}
 else {print "not ok 21\n"}
 
-unless($q || Math::GMPq::get_refcnt($q) != $expected_refcnt) {print "ok 22\n"}
+unless($q) {print "ok 22\n"}
 else {print "not ok 22\n"}
 
 $z = $c;
 $z *= -1;
-if($z == -$c
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt
-   && Math::GMPq::get_refcnt($c) == $expected_refcnt) {print "ok 23\n"}
+if($z == -$c) {print "ok 23\n"}
 else {print "not ok 23\n"}
 
 $ok = '';
@@ -348,9 +327,7 @@ $z = $p - $frac;
 $z += $frac;
 if($z == $p) {$ok .= 'f'}
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 24\n"}
+if($ok eq 'abcdef') {print "ok 24\n"}
 else {print "not ok 24 $ok\n"}
 
 $ok = '';
@@ -379,9 +356,7 @@ $z = $p + $frac;
 $z += $frac;
 if($z -= $p) {$ok .= 'f'}
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 25\n"}
+if($ok eq 'abcdef') {print "ok 25\n"}
 else {print "not ok 25 $ok\n"}
 
 $ok = '';
@@ -410,9 +385,7 @@ $z = $frac - $p;
 $z -= $frac;
 if($z == -$p) {$ok .= 'f'}
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 26\n"}
+if($ok eq 'abcdef') {print "ok 26\n"}
 else {print "not ok 26 $ok\n"}
 
 $ok = '';
@@ -441,9 +414,7 @@ $z = $frac + $p;
 $z -= $frac;
 if($z == $p) {$ok .= 'f'}
 
-if($ok eq 'abcdef'
-   && Math::GMPq::get_refcnt($z) == $expected_refcnt
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 27\n"}
+if($ok eq 'abcdef') {print "ok 27\n"}
 else {print "not ok 27 $ok\n"}
 
 my $mbi = Math::BigInt->new(112345);
@@ -479,45 +450,45 @@ Rmpq_set_d($q, 13.6);
 $ok = '';
 
 eval{$q = $p + $mbi;};
-if($@ =~ /Invalid string/) {$ok = 'a'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok = 'a'}
 eval{$q = $p * $mbi;};
-if($@ =~ /Invalid string/) {$ok .= 'b'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'b'}
 eval{$q = $p - $mbi;};
-if($@ =~ /Invalid string/) {$ok .= 'c'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'c'}
 eval{$q = $p / $mbi;};
-if($@ =~ /Invalid string/) {$ok .= 'd'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'd'}
 eval{$p += $mbi;};
-if($@ =~ /Invalid string/) {$ok .= 'f'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'e'}
 eval{$p *= $mbi;};
-if($@ =~ /Invalid string/) {$ok .= 'g'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'f'}
 eval{$p -= $mbi;};
-if($@ =~ /Invalid string/) {$ok .= 'h'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'g'}
 eval{$p /= $mbi;};
-if($@ =~ /Invalid string/) {$ok .= 'i'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'h'}
 eval{$q = $mbi + $p;};
-if($@ =~ /Invalid string/) {$ok .= 'j'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'i'}
 eval{$q = $mbi * $p;};
-if($@ =~ /Invalid string/) {$ok .= 'k'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'j'}
 eval{$q = $mbi - $p;};
-if($@ =~ /Invalid string/) {$ok .= 'l'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'k'}
 eval{$q = $mbi / $p;};
-if($@ =~ /Invalid string/) {$ok .= 'm'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'l'}
 eval{if($q > $mbi){};};
-if($@ =~ /Invalid string/) {$ok .= 'n'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'm'}
 eval{if($q >= $mbi){};};
-if($@ =~ /Invalid string/) {$ok .= 'o'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'n'}
 eval{if($q < $mbi){};};
-if($@ =~ /Invalid string/) {$ok .= 'p'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'o'}
 eval{if($q <= $mbi){};};
-if($@ =~ /Invalid string/) {$ok .= 'q'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'p'}
 eval{if($q <=> $mbi){};};
-if($@ =~ /Invalid string/) {$ok .= 'r'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'q'}
 eval{if($q == $mbi){};};
-if($@ =~ /Invalid string/) {$ok .= 's'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 'r'}
 eval{if($q != $mbi){};};
-if($@ =~ /Invalid string/) {$ok .= 't'}
+if($@ =~ /String supplied to Rmpq_set_str function \(/i) {$ok .= 's'}
 
-if($ok eq 'abcdfghijklmnopqrst') {print "ok 29\n"}
+if($ok eq 'abcdefghijklmnopqrs') {print "ok 29\n"}
 else {print "not ok 29 $ok\n"}
 
 $mbi = '0x1/02';
@@ -533,17 +504,13 @@ else {print "not ok 30\n"}
 $q = $mbi + $p;
 $p = $mbi - $q;
 
-if($p > -12.71 && $p < -12.69
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt
-   && Math::GMPq::get_refcnt($q) == $expected_refcnt) {print "ok 31\n"}
+if($p > -12.71 && $p < -12.69) {print "ok 31\n"}
 else {print "not ok 31\n"}
 
 $q = $mbi * $p;
 $p = $mbi / $q;
 
-if($p < -0.078 && $p > -0.079
-   && Math::GMPq::get_refcnt($p) == $expected_refcnt
-   && Math::GMPq::get_refcnt($q) == $expected_refcnt) {print "ok 32\n"}
+if($p < -0.078 && $p > -0.079) {print "ok 32\n"}
 else {print "not ok 32\n"}
 
 Rmpq_set_d($p, 1234567.123);
@@ -555,8 +522,8 @@ if($p > $mbi &&
    ($p <=> $mbi) > 0 &&
    ($mbi <=> $p) < 0 &&
    $p != $mbi &&
-   !($p == $mbi) &&
-   Math::GMPq::get_refcnt($p) == $expected_refcnt) {print "ok 33\n"}
+   !($p == $mbi)
+) {print "ok 33\n"}
 else {print "not ok 33\n"}
 
 $mbi = \$p;

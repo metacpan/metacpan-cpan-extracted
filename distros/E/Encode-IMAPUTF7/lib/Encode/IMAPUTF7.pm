@@ -6,7 +6,7 @@ use strict;
 no warnings 'redefine';
 use base qw(Encode::Encoding);
 __PACKAGE__->Define('IMAP-UTF-7', 'imap-utf-7');
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 use MIME::Base64;
 use Encode;
 
@@ -79,6 +79,8 @@ sub decode($$;$) {
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Encode::IMAPUTF7 - modification of UTF-7 encoding for IMAP
@@ -88,11 +90,11 @@ Encode::IMAPUTF7 - modification of UTF-7 encoding for IMAP
   use Encode qw/encode decode/;
 
   print encode('IMAP-UTF-7', 'Répertoire');
-  print decode('IMAP-UTF-7', R&AOk-pertoire');
+  print decode('IMAP-UTF-7', 'R&AOk-pertoire');
 
 =head1 ABSTRACT
 
-IMAP mailbox names are encoded in a modified UTF7 when names contains 
+IMAP mailbox names are encoded in a modified UTF7 when names contains
 international characters outside of the printable ASCII range. The
 modified UTF-7 encoding is defined in RFC2060 (section 5.1.3).
 
@@ -100,8 +102,8 @@ There is another CPAN module with same purpose, Unicode::IMAPUtf7. However, it
 works correctly only with strings, which encoded form does not
 contain plus sign. For example, the Cyrillic string
 \x{043f}\x{0440}\x{0435}\x{0434}\x{043b}\x{043e}\x{0433} is represented in UTF-7 as
-+BD8EQAQ1BDQEOwQ+BDM- Note the second plus sign 4 characters before the end. 
-Unicode::IMAPUtf7 encodes the above string as +BD8EQAQ1BDQEOwQ&BDM- 
++BD8EQAQ1BDQEOwQ+BDM- Note the second plus sign 4 characters before the end.
+Unicode::IMAPUtf7 encodes the above string as +BD8EQAQ1BDQEOwQ&BDM-
 which is not valid modified UTF-7 (the ampersand and
 the plus are swapped). The problem is solved by the current module,
 which is slightly modified Encode::Unicode::UTF7 and has nothing common with
@@ -152,11 +154,11 @@ and Chinese text: ~peter/mail/&ZeVnLIqe-/&U,BTFw-
 
 =head1 REQUESTS & BUGS
 
-Please report any requests, suggestions or bugs via the RT bug-tracking system 
-at http://rt.cpan.org/ or email to bug-Encode-IMAPUTF7@rt.cpan.org. 
+Please report any requests, suggestions or bugs via the RT bug-tracking system
+at http://rt.cpan.org/ or email to bug-Encode-IMAPUTF7@rt.cpan.org.
 
 http://rt.cpan.org/NoAuth/Bugs.html?Dist=Encode-IMAPUTF7 is the RT queue for Encode::IMAPUTF7.
-Please check to see if your bug has already been reported. 
+Please check to see if your bug has already been reported.
 
 =head1 COPYRIGHT
 

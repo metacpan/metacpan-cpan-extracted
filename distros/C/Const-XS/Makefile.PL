@@ -10,7 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Const/XS.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
-    ($] >= 5.016 ? (XSMULTI => 1) : ()),
+    XSMULTI => 1,
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

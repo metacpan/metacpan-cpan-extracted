@@ -1,5 +1,11 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.22	Fri May  9 14:31:28 EDT 2025
+	Fix CI tests
+
+0.21	Fri May  9 13:55:23 EDT 2025
+	Handle YAML crashes on reading an INI file
+
 0.20	Tue May  6 20:07:40 EDT 2025
 	Added merge_defaults()
 

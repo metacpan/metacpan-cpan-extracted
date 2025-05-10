@@ -8,3 +8,4 @@ t/0-test.t
 t/1-ampersand.t
 t/ksc5601.utf
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

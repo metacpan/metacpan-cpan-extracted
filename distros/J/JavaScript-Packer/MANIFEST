@@ -7,6 +7,8 @@ t/00-load.t
 t/01-interface.t
 t/02-io.t
 t/03-leaks.t
+t/08-ternary-operators.t
+t/jquery-ui-test.js
 t/pod.t
 t/scripts/s1-expected.js
 t/scripts/s1.js

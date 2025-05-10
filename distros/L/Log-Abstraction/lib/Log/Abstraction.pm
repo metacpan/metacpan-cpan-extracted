@@ -17,11 +17,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 =head1 SYNOPSIS
 
@@ -78,8 +78,25 @@ It doesn't work on Windows because of the case-insensitive nature of that system
 
 =item * C<logger>
 
-A logger can be a code reference, an array reference, a file path, or an object.
-Defaults to L<Log::Log4perl>
+A logger can be one or more of:
+
+=over
+
+=item * a code reference
+
+=item * an array reference
+
+=item * a file path
+
+=item * a file descriptor
+
+=item * an object
+
+=item * a hash of options, e.g. 'file' containing the filename, or 'fd' containing a file descriptor to log to
+
+=back
+
+Defaults to L<Log::Log4perl>.
 
 =item * C<syslog> - A hash reference for syslog configuration.
 
@@ -103,11 +120,11 @@ sub new {
 	# Handle hash or hashref arguments
 	my %args;
 	if(@_ == 1) {
-		if(ref $_[0] eq 'HASH') {
+		if(ref($_[0]) eq 'HASH') {
 			# If the first argument is a hash reference, dereference it
 			%args = %{$_[0]};
 		} else {
-			$args{'logger'} = shift;
+			$args{'logger'} = shift;	# Just a string as an argument, which will be a file to output to
 		}
 	} elsif((scalar(@_) % 2) == 0) {
 		# If there is an even number of arguments, treat them as key-value pairs
@@ -204,6 +221,18 @@ sub _log {
 		} elsif(ref($logger) eq 'ARRAY') {
 			# If logger is an array reference, push the log message to the array
 			push @{$logger}, { level => $level, message => join('', grep defined, @messages) };
+		} elsif(ref($logger) eq 'HASH') {
+			if($logger->{'file'}) {
+				if(open(my $fout, '>>', $logger->{'file'})) {
+					print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
+						die "ref($self): Can't write to ", $logger->{'file'}, ": $!";
+					close $fout;
+				}
+			}
+			if(my $fout = $logger->{'fd'}) {
+				print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
+					die "ref($self): Can't write to file descriptor: $!";
+			}
 		} elsif(!ref($logger)) {
 			# If logger is a file path, append the log message to the file
 			if(open(my $fout, '>>', $logger)) {
@@ -215,6 +244,17 @@ sub _log {
 			# The test is because Log::Log4perl doesn't understand notice()
 			$logger->$level(@messages);
 		}
+	}
+	if($self->{'file'}) {
+		if(open(my $fout, '>>', $self->{'file'})) {
+			print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
+				die "ref($self): Can't write to ", $self->{'file'}, ": $!";
+			close $fout;
+		}
+	}
+	if(my $fout = $self->{'fd'}) {
+		print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
+			die "ref($self): Can't write to file descriptor: $!";
 	}
 }
 

@@ -23,12 +23,14 @@ t/cmp_z.t
 t/divby0.t
 t/get_set_cmp_IV_NV.t
 t/longdouble.t
+t/mpfr2mpq.t
 t/NV_overloading.t
 t/NOK_and_POK.t
 t/overload.t
 t/overload_cross_class.t
 t/overload_mod.t
 t/overload_op_eq.t
+t/overload_str.t
 t/overload_switch.t
 t/use64bitint.t
 t/new.t
@@ -39,6 +41,7 @@ t/TRmpq_out_str.t
 t/pod.t
 t/PV_NV_BUG.t
 t/Rmpq_integer_p.t
+t/Rmpq_set_str.t
 t/snprintf.t
 t/sprintf.t
 t/test1.t

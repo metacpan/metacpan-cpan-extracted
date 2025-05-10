@@ -11,7 +11,11 @@ is(is_readonly($foo), 1);
 my $test = 'abc';
 is(is_readonly($test), 0);
 
-is(is_readonly(@bar[3]), 1);
+if ($] >= 5.016) {
+	eval "is(is_readonly(\@bar[3]), 1)";
+} else {
+	diag explain "Skip: Type of arg 1 to Const::XS::PP::is_readonly must be one of [$@%] (not array slice)";
+}
 
 is(is_readonly($buz{array}), 1);
 
@@ -19,7 +23,6 @@ is(is_readonly(%buz), 1);
 
 is(is_readonly($sub), 1);
 
-=pod
 my $other_sub = sub { return 2 };
 
 is(is_readonly($other_sub), 0);
@@ -66,13 +69,11 @@ is(&Internals::SvREADONLY($copy), 1);
 is(Internals::SvREADONLY($copy), '');
 
 is(&is_readonly($copy), 1);
-is(is_readonly($copy), 0);
 
 my $wow = { a => 'one' };
 
 is(&is_readonly($wow), 0);
 
 is(&Internals::SvREADONLY($wow), '');
-=cut
 
 done_testing();

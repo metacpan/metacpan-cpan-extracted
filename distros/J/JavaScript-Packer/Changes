@@ -1,5 +1,8 @@
 Revision history for JavaScript-Packer
 
+2.12       2025-05-09
+    - Fix bug where ternary expressions with '+' or '-' literals were incorrectly minified (GH #10)
+
 2.11       2022-12-06
     - Add note to docs this module is increasingly unreliable
 

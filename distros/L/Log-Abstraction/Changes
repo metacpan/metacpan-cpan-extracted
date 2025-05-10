@@ -1,5 +1,10 @@
 Revision history for Log-Abstraction
 
+0.12
+	Added the file parameter, so that both file and syslog can now be given,
+		and file can be read in from a configuration file
+	Added the fd descriptor - a file descriptor to log to
+
 0.11	Wed May  7 15:37:37 EDT 2025
 	Fixed calling can() on an unblessed variable
 	Honour carp_on_warn when syslog is set

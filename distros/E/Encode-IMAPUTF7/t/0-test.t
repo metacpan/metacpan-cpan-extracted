@@ -6,7 +6,7 @@ use warnings;
 use Test::More tests => 2;
 use Test::NoWarnings;
 
-use Encode::IMAPUTF7 qw(encode decode);
+use Encode::IMAPUTF7;
 
 use File::Spec;
 use File::Basename;

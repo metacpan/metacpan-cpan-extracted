@@ -3,7 +3,7 @@
 #include "perl.h"           // Perl symbols, structures and constants definition
 #include "XSUB.h"           // xsubpp functions and macros
 
-int const RECURSION_LIMIT = 1001;
+int const RECURSION_LIMIT = 10000;
 
 void _make_readonly (SV * val, int recursion) {
 	dTHX;
@@ -20,9 +20,8 @@ void _make_readonly (SV * val, int recursion) {
 				int i = 0;
 				int len = av_len(arr);
 				for (i = 0; i <= len; i++) {
-					SV * value = newSVsv(*av_fetch(arr, i, 0));
+					SV * value = *av_fetch(arr, i, 0);
 					_make_readonly(value, recursion);
-					av_store(arr, i, value);
 				}
 				_make_readonly((SV*)arr, recursion);
 			}
@@ -34,9 +33,8 @@ void _make_readonly (SV * val, int recursion) {
 				while ((entry = hv_iternext(hash)))  {
 					STRLEN retlen;
 					char * key =  SvPV(hv_iterkeysv(entry), retlen);
-					SV * value = newSVsv(*hv_fetch(hash, key, retlen, 0));	
+					SV * value = *hv_fetch(hash, key, retlen, 0);	
 					_make_readonly(value, recursion);
-					hv_store(hash, key, retlen, value, 0);
 				}
 				_make_readonly((SV*)hash, recursion);
 			}
@@ -61,9 +59,8 @@ void _make_readwrite (SV * val, int recursion) {
 			int len = av_len(arr);
 			_make_readwrite((SV*)arr, recursion);
 			for (i = 0; i <= len; i++) {
-				SV * value = newSVsv(*av_fetch(arr, i, 0));
+				SV * value = *av_fetch(arr, i, 0);
 				_make_readwrite(value, recursion);
-				av_store(arr, i, value);
 			}
 		} else if (SvTYPE(SvRV(val)) == SVt_PVHV) {
 			HV * hash = (HV*)SvRV(val);
@@ -73,9 +70,8 @@ void _make_readwrite (SV * val, int recursion) {
 			while ((entry = hv_iternext(hash)))  {
 				STRLEN retlen;
 				char * key =  SvPV(hv_iterkeysv(entry), retlen);
-				SV * value = newSVsv(*hv_fetch(hash, key, retlen, 0));	
+				SV * value = *hv_fetch(hash, key, retlen, 0);	
 				_make_readwrite(value, recursion);
-				hv_store(hash, key, retlen, value, 0);
 			}
 		}
 	}
@@ -115,7 +111,7 @@ int _is_readonly (SV * val, int recursion) {
 			while ((entry = hv_iternext(hash)))  {
 				STRLEN retlen;
 				char * key = SvPV(hv_iterkeysv(entry), retlen);
-				SV * value = *hv_fetch(hash, key, strlen(key), 0);	
+				SV * value = *hv_fetch(hash, key, retlen, 0);	
 				if (! _is_readonly(value, recursion) ) {
 					return 0;
 				}

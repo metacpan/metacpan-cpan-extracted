@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.11
+0.12
 
 # SYNOPSIS
 
@@ -59,8 +59,16 @@ The following arguments can be provided:
 
 - `logger`
 
-    A logger can be a code reference, an array reference, a file path, or an object.
-    Defaults to [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl)
+    A logger can be one or more of:
+
+    - a code reference
+    - an array reference
+    - a file path
+    - a file descriptor
+    - an object
+    - a hash of options, e.g. 'file' containing the filename, or 'fd' containing a file descriptor to log to
+
+    Defaults to [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl).
 
 - `syslog` - A hash reference for syslog configuration.
 - `script_name`

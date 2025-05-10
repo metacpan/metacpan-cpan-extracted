@@ -1,6 +1,49 @@
 Revision history for Perl extension Software::Security::Policy
 
+0.11 -- Fri May 09 21:48:11 ADT 2025
+
+    [Version 0.11 Changes]
+    - Re-release 0.10 with the change log
+    - 5b16acc Update Version
+    - 956a342 Forgot to update Changes in version 0.10
+
+    [Version 0.10 Changes]
+    - A number of improvements from Robert Rothenberg
+
+    - 45ec347 v0.10
+    - b1b5ca0 Update version for a release
+    - b6db522 Comment out the SecurityPolicy for Dist::Zilla
+    - 52991c2 Merge pull request #15 from timlegge/updates-to-license
+    - cb9aa71 Update version of SECURITY.md
+    - a913d68 Add missing report_url pod and remove duplicate url
+    - 6c0fd47 Add tests for the report_url
+    - f7d84a3 Adjust wording to be less repetative
+    - 84010b4 Wrap longer line
+    - 3a9bb56 Remove extra newline from the report
+    - 0850ce7 Recognise GitHub security advisories links
+    - 3f540a8 Add a report_url for reporting via a form
+    - 44eb566 Bump the policy version to v1.3.0
+    - 83c8810 v0.09
+
 0.10 -- Fri May 02 04:31:25 ADT 2025
+
+    [Major items]
+    - A number of improvements from Robert Rothenberg
+
+    - 45ec347 v0.10
+    - b1b5ca0 Update version for a release
+    - b6db522 Comment out the SecurityPolicy for Dist::Zilla
+    - 52991c2 Merge pull request #15 from timlegge/updates-to-license
+    - cb9aa71 Update version of SECURITY.md
+    - a913d68 Add missing report_url pod and remove duplicate url
+    - 6c0fd47 Add tests for the report_url
+    - f7d84a3 Adjust wording to be less repetative
+    - 84010b4 Wrap longer line
+    - 3a9bb56 Remove extra newline from the report
+    - 0850ce7 Recognise GitHub security advisories links
+    - 3f540a8 Add a report_url for reporting via a form
+    - 44eb566 Bump the policy version to v1.3.0
+    - 83c8810 v0.09
 
 0.09 -- Tue Feb 04 22:42:18 AST 2025
 

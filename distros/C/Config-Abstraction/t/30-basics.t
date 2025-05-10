@@ -9,6 +9,10 @@ use Test::TempDir::Tiny;
 
 BEGIN { use_ok('Config::Abstraction') }
 
+subtest 'return undef when there is no configuration data' => sub {
+	ok(!defined(Config::Abstraction->new(data => { })));
+};
+
 my $test_dir = tempdir();
 
 # base.yaml

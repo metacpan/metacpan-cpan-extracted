@@ -7,10 +7,14 @@ eval {
 
 like($@, qr/Odd number of elements in hash assignment/, 'Odd number of elements in hash assignment');
 
-eval {
-	const my $direct = 'abc';
-};
+if ($] >= 5.016) {
+	eval "
+		const my \$direct = 'abc';
+	";
 
-like($@, qr/No value for readonly variable/, 'No value for readonly variable');
+	like($@, qr/No value for readonly variable/, 'No value for readonly variable');
+} else {
+	diag explain 'Skip: Type of arg 1 to must be one of [$@%]';
+}
 
 done_testing();

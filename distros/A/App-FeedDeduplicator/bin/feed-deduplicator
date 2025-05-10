@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use v5.38;
+use v5.40;
 use App::FeedDeduplicator;
 
 my $config_file = shift;

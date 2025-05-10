@@ -15,6 +15,7 @@ our @EXPORT = qw(
    backup_files
    cgi_bin
    cms_prefixes
+   config_scripts
    document_extensions
    dot_files
    exchange_prefixes
@@ -34,7 +35,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.12.1';
+our $VERSION = 'v0.13.0';
 
 
 
@@ -65,10 +66,17 @@ sub cgi_bin {
 
 
 sub cms_prefixes {
-    my $re = qr{/(?:docroot|drupal|ftproot|include|inetpub|joomla|laravel|lib|magento|plugin|plus|vendor|webroot|wp|wordpress|yii|zend)};
+    my $re = qr{/(?:docroot|drupal|ftproot|include|inetpub|joomla|laravel|lib|magento|plugin|plus|swagger|vendor|webroot|wp|wordpress|yii|zend)};
     return (
         PATH_INFO    => $re,
     );
+}
+
+
+sub config_scripts {
+    my $re =
+qr{/(?:Dockerfile|alienfile|composer\.json|config(?:uration)?|cpanfile|deployment-config|live_env|local\.(?:json|xml)|package\.(?:json|xml)|robomongo|sendgrid|settings|storage|twilio)};
+    return ( PATH_INFO => $re, );
 }
 
 
@@ -123,7 +131,7 @@ sub ip_address_referer {
 
 
 sub misc_extensions {
-    my $re = qr{[.](?:backup|bak|bck|bkp|cfg|conf(?:ig)?|dat|ibz|in[ci]|npb|old|ps[bc]|rdg|to?ml|yml)\b};
+    my $re = qr{[.](?:backup|bak|bck|bkp|cfg|conf(?:ig)?|dat|dist|env|ibz|in[ci]|lo?ck|npb|old|ps[bc]|rdg|save?|swa?p|te?mp|to?ml|ya?ml)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -226,7 +234,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.12.1
+version v0.13.0
 
 =head1 SYNOPSIS
 
@@ -312,6 +320,10 @@ applications, libraries, or web servers.
 
 Added in v0.8.0.
 
+=head2 config_scripts
+
+This blocks various package and configuration scripts.
+
 =head2 document_extensions
 
 This blocks requests for file extensions associated with common document formats, e.g. Office documents or spreadsheets.
@@ -361,8 +373,8 @@ Added in v0.5.0.
 This blocks requests with miscellenious extensions in the path or
 query string.
 
-This includes common extensions and suffixes for backups, includes or
-configuration files.
+This includes common extensions and suffixes for backups, includes,
+configuration files, or temporary files.
 
 =head2 non_printable_chars
 

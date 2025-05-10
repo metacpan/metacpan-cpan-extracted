@@ -4,7 +4,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 # VERSION
 
-version v0.12.1
+version v0.13.0
 
 # SYNOPSIS
 
@@ -103,7 +103,7 @@ feature.
 ## Reporting Security Vulnerabilities
 
 Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
-report security vulnerabilities
+report security vulnerabilities.
 
 # AUTHOR
 

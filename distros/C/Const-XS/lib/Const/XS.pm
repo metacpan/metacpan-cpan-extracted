@@ -5,16 +5,10 @@ use 5.006;
 use strict;
 use warnings;
 
-BEGIN {
-	our $VERSION = '0.21';
-	
-	if ($] >= 5.016) {
-		require XSLoader;
-		XSLoader::load("Const::XS", $VERSION);
-	} else {
-		require Const::XS::PP;
-	}
-}
+our $VERSION = '0.28';
+
+require XSLoader;
+XSLoader::load("Const::XS", $VERSION);
 
 use base qw/Import::Export/;
 
@@ -37,7 +31,7 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 0.21
+Version 0.28
 
 =cut
 
@@ -71,6 +65,11 @@ Version 0.21
 	...
 
 	1;
+
+
+=head1 DESCRIPTION
+
+The Const::XS module facilitates the creation of high-performance read-only variables in Perl. It’s implemented in XS/C and delivers a 4x+ performance improvement compared to L<Const::PP>, a pure Perl version of this module that maintains full backward compatibility.
 
 =head1 EXPORTS
 
@@ -134,51 +133,91 @@ The fifth function exported by this module is is_readonly. It will deeply check 
 	use Benchmark qw(:all);
 	use Const::Fast;
 	use Const::XS;
+	use Const::PP;
 	use Readonly;
 
-	timethese(5000000, {
+	my $r = timethese(5000000, {
 		'Readonly' => sub {
-			Readonly my $string => "Hello World";
-			Readonly my %hash => (
-				a => 1,
-				b => 2,
-				c => 3
+			Readonly::Scalar my $string => "Hello World";
+			Readonly::Hash my %hash => (
+				a => $string,
+				b => $string,
+				c => $string
 			);
-			Readonly my @array => (
-				qw/1 2 3/
+			Readonly::Array my @array => (
+				qw/1 2 3/, $string, \%hash
 			);
+			die unless $string eq "Hello World";
+			die unless $hash{a} eq "Hello World";
+			die unless $array[3] eq "Hello World";
 		},
 		'Const::Fast' => sub {
 			Const::Fast::const my $string => "Hello World";
 			Const::Fast::const my %hash => (
-				a => 1,
-				b => 2,
-				c => 3
+				a => $string,
+				b => $string,
+				c => $string
 			);
 			Const::Fast::const my @array => (
-				qw/1 2 3/
+				qw/1 2 3/, $string, \%hash
 			);
+			die unless $string eq "Hello World";
+			die unless $hash{a} eq "Hello World";
+			die unless $array[3] eq "Hello World";
+		},
+		'Const::PP' => sub {
+			Const::XS::PP::const my $string => "Hello World";
+			Const::XS::PP::const my %hash => (
+				a => $string,
+				b => $string,
+				c => $string
+			);
+			Const::XS::PP::const my @array => (
+				qw/1 2 3/, $string, \%hash
+			);
+			die unless $string eq "Hello World";
+			die unless $hash{a} eq "Hello World";
+			die unless $array[3] eq "Hello World";
 		},
 		'XS' => sub {
 			Const::XS::const my $string => "Hello World";
 			Const::XS::const my %hash => (
-				a => 1,
-				b => 2,
-				c => 3
+				a => $string,
+				b => $string,
+				c => $string
 			);
 			Const::XS::const my @array => (
-				qw/1 2 3/
+				qw/1 2 3/, $string, \%hash
 			);
+			die unless $string eq "Hello World";
+			die unless $hash{a} eq "Hello World";
+			die unless $array[3] eq "Hello World";
 		}
 	});
 
+	cmpthese $r;
+
 ...
 
-	Benchmark: timing 5000000 iterations of Const::Fast, Readonly, XS...
-	Const::Fast: 18 wallclock secs (19.00 usr +  0.00 sys = 19.00 CPU) @ 263157.89/s (n=5000000)
-	  Readonly: 20 wallclock secs (19.77 usr +  0.01 sys = 19.78 CPU) @ 252780.59/s (n=5000000)
-		XS:  4 wallclock secs ( 3.31 usr +  0.03 sys =  3.34 CPU) @ 1497005.99/s (n=5000000)
+	Const::Fast: 22.5694 wallclock secs (22.53 usr +  0.01 sys = 22.54 CPU) @ 221827.86/s (n=5000000)
+	 Const::PP: 19.7015 wallclock secs (19.66 usr +  0.01 sys = 19.67 CPU) @ 254194.20/s (n=5000000)
+	  Readonly: 34.829 wallclock secs (34.78 usr +  0.01 sys = 34.79 CPU) @ 143719.46/s (n=5000000)
+		XS: 3.92774 wallclock secs ( 3.89 usr +  0.03 sys =  3.92 CPU) @ 1275510.20/s (n=5000000)
+			 Rate    Readonly Const::Fast   Const::PP          XS
+	Readonly     143719/s          --        -35%        -43%        -89%
+	Const::Fast  221828/s         54%          --        -13%        -83%
+	Const::PP    254194/s         77%         15%          --        -80%
+	XS          1275510/s        787%        475%        402%          --
+	
 
+
+=head2 SEE ALSO
+
+L<Const::PP>
+
+L<Const::Fast>
+
+L<Readonly>
 
 =head1 AUTHOR
 

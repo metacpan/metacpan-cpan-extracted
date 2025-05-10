@@ -4,13 +4,13 @@
       "LNATION <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Data-LnArray-XS",
    "no_index" : {
@@ -43,6 +43,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.10"
 }

@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.20
+Version 0.22
 
 # SYNOPSIS
 
@@ -176,7 +176,7 @@ Options:
 - `data`
 
     A hash ref of data to prime the configuration with.
-    Any other data will be overwritten by this.
+    Any other data will overwrite by this.
 
 - `env_prefix`
 

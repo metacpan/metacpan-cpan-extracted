@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 
@@ -207,7 +207,7 @@ since later files override earlier ones.
 =item * C<data>
 
 A hash ref of data to prime the configuration with.
-Any other data will be overwritten by this.
+Any other data will overwrite by this.
 
 =item * C<env_prefix>
 
@@ -289,10 +289,6 @@ sub new
 	}
 	$self->_load_config();
 
-	if(my $data = $params->{'data'}) {
-		$self->merge_defaults(defaults => $data) if(scalar keys(%{$data}));
-	}
-
 	if($self->{'config'} && scalar(keys %{$self->{'config'}})) {
 		return $self;
 	}
@@ -307,7 +303,9 @@ sub _load_config
 
 	my $self = shift;
 	my %merged;
+
 	if($self->{'data'}) {
+		# The data argument given to 'new' contains defaults that this routine will override
 		%merged = %{$self->{'data'}};
 	}
 
@@ -438,7 +436,7 @@ sub _load_config
 					}
 					if(!$data) {
 						$self->_load_driver('YAML::XS', ['LoadFile']);
-						if(($data = LoadFile($path)) && (ref($data) eq 'HASH')) {
+						if((eval { $data = LoadFile($path) }) && (ref($data) eq 'HASH')) {
 							# Could be colon file, could be YAML, whichever it is, break the configuration fields
 							# foreach my($k, $v) (%{$data}) {
 							foreach my $k (keys %{$data}) {

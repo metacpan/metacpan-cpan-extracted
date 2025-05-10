@@ -181,25 +181,22 @@
     will return a non-zero value if and only if the IOK flag is set.
 
    Rmpq_set_d ($rop, $double);
-   Rmpq_set_f ($rop, $f); # $f is a Math::GnumMPf object
+   Rmpq_set_f ($rop, $f); # $f is a Math::GMPf object
    Rmpq_set_d ($rop, $op);
    Rmpq_set_NV($rop, $nv);
+   $rop = mpfr2mpq($fr); # $fr is a Math::MPFR object
     Set $rop to the value of the 2nd arg, without rounding.
     Assigning an Inf or NaN is a fatal error.
     With Rmpq_set_NV, $nv must have its NOK flag set, or the function
     will croak. Best to first check NOK_flag($nv), which will return a
     non-zero value if and only if the NOK flag is set.
 
+
+
    Rmpq_set_str($rop, $str, $base);
-    Set $rop from $str in the given base $base. The string can be
-    an integer like "41" or a fraction like "41/152".  The fraction
-    must be in canonical form, or if not then `Rmpq_canonicalize'
-    must be called. The numerator and optional denominator are
-    parsed the same as in `Rmpz_set_str'. $base can vary from 2 to
-    62, or if $base is 0 then the leading characters are used: `0x'
-    for hex, `0' for octal, or decimal otherwise.  Note that this
-    is done separately for the numerator and denominator, so for
-    instance `0xEF/100' is 239/100, whereas `0xEF/0x100' is 239/256.
+    Set $rop from $str in the given base $base.
+    Allowed strings, and their interpretations, are specified below
+    in the COMBINED INITIALIZATION AND ASSIGNMENT section.
 
    Rmpq_swap($rop1, $rop2);
     Swap the values.
@@ -229,6 +226,41 @@
     Note that this is done separately for the numerator and denominator,
     so, for instance 0xEF/100 is 239/100, whereas 0xEF/0x100 is 239/256.
     Legal values for the base are 0 and 2..62.
+
+    Beginning with version 0.65, the new() and Rmpq_set_str()
+    functions, and the operator-overloading functions all
+    handle certain strings that GMP's mpq_set_set_str() deems illegal.
+    For these additional strings, if base is '0' (or not provided) then
+    octal strings are signified with either the '0o' or '0O' prefix.
+    The plain '0' prefix is interpreted here as simply a leading 0.
+    A prefix should NOT be included if a base other than 0 is provided
+    as an argument.
+    Eg. we handle the following, though GMP's mpq_set_str() does not:
+     new('0.1', $base);  # 1/$base (or 1/10 if $base is 0)
+     new('0.9e-2');      # 9/1000
+     new('9@-3');        # 9/1000
+     new('9@-3', 16);    # 9/4096
+     new('0x1.7p-1');    # 23/32
+     new('0x1.7p-1', 16) # invalid as non hex characters are included
+     new('0o1.34p-1);    # 23/32 but '01.34p-1' is invalid
+     new('0b1.0111p-1'); # 23/32
+     new('F@10', 16);    # same as '0xFp+64' (276701161105643274240);
+                         # the exponent is read as 0x10 (== 16).
+     new('F@16', -16);   # same as '0xFp+64' (276701161105643274240);
+                         # the exponent is read as the decimal 16.
+     new('12@4', 61);    # 872287983
+     new('-12@-5', 61)   # 64/844596301
+     And the same applies to Rmpq_set_str.
+     Note: When using the "mantissa@exponent" notation, both "mantissa"
+     (aka significand) and "exponent" must be integers, and must be
+     expressed in their full integer form (ie not in scientific notation).
+     Specifying a negative value for the base indicates that the exponent
+     is to be read as a decimal value.
+
+    And similarly for overloaded operations, except that they make no
+    provision for specifying the base of the given string. Allowable
+    bases are therefore limited to 16 (via 0x prefix), 8 (via 0o prefix),
+    2 (via 0b prefix) and 10 (no prefix).
 
    ####################
 
@@ -511,8 +543,9 @@
    Math::GMPz objects and Math::MPFR objects.
    There is also some limited support for using Math::GMP objects.
    Strings are first converted to Math::GMPq objects, then canonicalized.
-   See the Rmpq_set_str documentation (above) in the section "ASSIGNMENT
-   FUNCTIONS" regarding permissible string formats.
+   See the new() documentation (above) in the section "COMBINED
+   INITIALIZATION AND ASSIGNMENT FUNCTIONS" regarding permissible string
+   formats - the range of which has been extended beginning Math-GMPq-0.65.
    The following operators are overloaded:
 
     + - * / % **
@@ -525,7 +558,6 @@
 
     NOTE: Overloading of '**' and '**=' accepts only a positive integer
           (IV) or a Math::MPFR object.
-          (The GMP library does not provide an mpq_pow() function.)
 
     NOTE: Making use of the '=' overloading is not recommended unless
           you understand its caveats. See 'perldoc overload' and
@@ -540,12 +572,15 @@
     have been blessed into some package other than 'Math::GMPq'
     or 'Math::MPFR'/'Math::GMPz'/'Math::GMP' will not work.
 
-    YMMV with older versions of Math::MPFR but, if you use Math-MPFR-4.35
+    YMMV with older versions of Math::MPFR but, if you use Math-MPFR-4.19
     or later, then Math::MPFR objects can be provided as the second arg
     with '+', '+=', '-', '-=', '*', '*=',  '/', '/=', '%', '%=', '**'
     and '**=' operators. In these cases, the operation will return a
-    Math::MPFR object (calculated using default Math::MPFR precision and
-    default Math::MPFR rounding mode).
+    Math::MPFR object, rounded in accordance with the current Math::MPFR
+    default precision and the current Math::MPFR default rounding mode.
+    For the '%', '%=', '**' and '**=' overloading, the  value of the
+    Math::GMPq object is first set to a Math::MPFR object using the
+    same default precision and defauilt rounding mode.
 
     Comparisons between Math::GMPq and Math::GMPz objects can be performed
     using either the Math::GMPz or Math::GMPq overloading.

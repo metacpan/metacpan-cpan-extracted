@@ -7,7 +7,7 @@ use warnings;
 use Test::More tests => 6;
 use Test::NoWarnings;
 
-use Encode::IMAPUTF7 qw(encode decode);
+use Encode::IMAPUTF7;
 
 is(Encode::IMAPUTF7->encode("&"), "&-", "Single ampersand");
 is(Encode::IMAPUTF7->encode("A&B"), "A&-B", "Ampersand surrounded by two US-ASCII chars");

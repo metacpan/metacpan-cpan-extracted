@@ -17,7 +17,7 @@ use Plack::Util::Accessor qw( rules handler status );
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.12.1';
+our $VERSION = 'v0.13.0';
 
 
 sub prepare_app {
@@ -79,7 +79,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 =head1 VERSION
 
-version v0.12.1
+version v0.13.0
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ feature.
 =head2 Reporting Security Vulnerabilities
 
 Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities
+report security vulnerabilities.
 
 =head1 AUTHOR
 

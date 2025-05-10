@@ -112,11 +112,10 @@ void Rmpq_set_si(mpq_t * p1, long p2, long p3) {
      mpq_set_si(*p1, p2, p3);
 }
 
-void _Rmpq_set_str(pTHX_ mpq_t * p1, SV * p2, SV * base) {
-     unsigned long b = (unsigned long)SvUV(base);
-     if(b == 1 || b > 62) croak ("%u is not a valid base in Rmpq_set_str", (int)b);
-     if(mpq_set_str(*p1, SvPV_nolen(p2), (int)SvIV(base)))
-       croak("String supplied to Rmpq_set_str function is not a valid base %u number", (int)SvUV(base));
+void _Rmpq_set_str(pTHX_ mpq_t * p1, SV * p2, int base) {
+     if(base < 0 || base == 1 || base > 62) croak ("%d is not a valid base in Rmpq_set_str", base);
+     if(mpq_set_str(*p1, SvPV_nolen(p2), base))
+       croak("String supplied to Rmpq_set_str function (%s) is not a valid base %d number", SvPV_nolen(p2), base);
 }
 
 
@@ -374,15 +373,14 @@ void Rmpq_set_f(mpq_t * p, mpf_t * f) {
      mpq_set_f(*p, *f);
 }
 
-SV * Rmpq_get_str(pTHX_ mpq_t * p, SV * base){
+SV * Rmpq_get_str(pTHX_ mpq_t * p, int base){
      char * out;
      SV * outsv;
-     unsigned long b = (unsigned long)SvUV(base);
 
-     New(123, out, mpz_sizeinbase(mpq_numref(*p), b) + mpz_sizeinbase(mpq_denref(*p), b) + 3, char);
+     New(123, out, mpz_sizeinbase(mpq_numref(*p), base) + mpz_sizeinbase(mpq_denref(*p), base) + 3, char);
      if(out == NULL) croak ("Failed to allocate memory in Rmpq_get_str function");
 
-     mpq_get_str(out, b, *p);
+     mpq_get_str(out, base, *p);
      outsv = newSVpv(out, 0);
      Safefree(out);
      return outsv;
@@ -1999,17 +1997,21 @@ SV * _overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::GMPq")) {
          mpq_mul(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(b)))));
          return a;
        }
+
        if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          Rmpq_mul_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
        }
+
        if(strEQ(h, "Math::MPFR")) {
          _overload_callback("Math::MPFR::overload_mul", "Math::GMPq::overload_mul", newSViv(0));
        }
+
      }
 
      SvREFCNT_dec(a);
@@ -2059,10 +2061,12 @@ SV * _overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::GMPq")) {
          mpq_add(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(b)))));
          return a;
        }
+
        if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          Rmpq_add_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
@@ -2120,14 +2124,17 @@ SV * _overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::GMPq")) {
          mpq_sub(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(b)))));
          return a;
        }
+
        if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          Rmpq_sub_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
        }
+
        if(strEQ(h, "Math::MPFR")) {
          _overload_callback("Math::MPFR::overload_sub", "Math::GMPq::overload_sub", &PL_sv_yes);
        }
@@ -2190,17 +2197,20 @@ SV * _overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::GMPq")) {
          if(!mpq_cmp_ui(*(INT2PTR(mpq_t *, SvIVX(SvRV(b)))), 0, 1))
            croak("Division by 0 not allowed in Math::GMPq::overload_div_eq");
          mpq_div(*(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpq_t *, SvIVX(SvRV(b)))));
          return a;
        }
+
        if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
          /* Rmpq_div_z will catch divby0 */
          Rmpq_div_z(INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpq_t *, SvIVX(SvRV(a))), INT2PTR(mpz_t *, SvIVX(SvRV(b))));
          return a;
        }
+
        if(strEQ(h, "Math::MPFR")) {
          _overload_callback("Math::MPFR::overload_div", "Math::GMPq::overload_div", &PL_sv_yes);
        }
@@ -2771,6 +2781,25 @@ SV * _overload_fmod_eq (pTHX_ SV * a, mpq_t *b, SV * third) {
      return a;
 }
 
+SV * _to_base(pTHX_ SV * str, int base) {
+    /* Convert the value held in the string *
+     * from the specified base to base 10   */
+
+    char buf[16];
+    mpz_t t;
+
+    if(mpz_init_set_str(t, SvPV_nolen(str), base))
+      croak("Exponent portion of string supplied to Rmpq_set_str function (%s) is not a valid base %d number", SvPV_nolen(str), base);
+    gmp_sprintf (buf, "%Zd", t);
+
+    mpz_clear(t);
+    return newSVpv(buf, 0);
+}
+
+
+
+
+
 
 MODULE = Math::GMPq  PACKAGE = Math::GMPq
 
@@ -2876,7 +2905,7 @@ void
 _Rmpq_set_str (p1, p2, base)
 	mpq_t *	p1
 	SV *	p2
-	SV *	base
+	int	base
         PPCODE:
         _Rmpq_set_str(aTHX_ p1, p2, base);
         XSRETURN_EMPTY; /* return empty stack */
@@ -2928,7 +2957,7 @@ Rmpq_set_f (p, f)
 SV *
 Rmpq_get_str (p, base)
 	mpq_t *	p
-	SV *	base
+	int	base
 CODE:
   RETVAL = Rmpq_get_str (aTHX_ p, base);
 OUTPUT:  RETVAL
@@ -3841,5 +3870,13 @@ _overload_fmod_eq (a, b, third)
 	SV *	third
 CODE:
   RETVAL = _overload_fmod_eq (aTHX_ a, b, third);
+OUTPUT:  RETVAL
+
+SV *
+_to_base (str, base)
+	SV *	str
+	int	base
+CODE:
+  RETVAL = _to_base (aTHX_ str, base);
 OUTPUT:  RETVAL
 

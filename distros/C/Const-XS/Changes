@@ -54,3 +54,28 @@ Revision history for Const-XS
 
 0.21	2025-05-09
 	- Fallback to a pure perl implementation < v5.16
+
+0.22	2025-05-09
+	- Make the pure perl implementation an exporter so you can use it directly.
+
+0.23	2025-05-09
+	- Fix the pure perl is_readonly sub
+
+0.24	2025-05-09
+	- align recursion_limit between XS and PP
+
+0.25	2025-05-09
+	- In XS when un/making variables readonly do not create new SVs
+
+0.26	2025-05-09
+	- Add DESCRIPTION section to documentation
+	- Add SEE ALSO section to documentation
+	- Update benchmark in documentation based on latest code.
+	- replace the strlen(key) with the retlen I now have available from SvPV
+
+0.27	2025-05-09
+	- Make some tests conditional on perl version as they blow up at compile time in early versions of perl
+
+0.28 	2025-05-09
+	- Move out the PP implementation into it's own distribution
+	- update benchmark

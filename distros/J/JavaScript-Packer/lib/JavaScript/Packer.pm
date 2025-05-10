@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.11";
+our $VERSION = "2.12";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -126,6 +126,16 @@ our $WHITESPACE = [
     {
         regexp      => '\b\s+\b',
         replacement => ' '
+    },
+    {
+        # Handle ternary operator with plus/minus literal in quotes
+        regexp      => '(\?)\s*(["\'])([+\-])(["\'])\s*(:)',
+        replacement => sub { return sprintf( "%s%s%s%s%s", $_[0]->{submatches}->[0], $_[0]->{submatches}->[1], $_[0]->{submatches}->[2], $_[0]->{submatches}->[3], $_[0]->{submatches}->[4] ); }
+    },
+    {
+        # Keep space between quoted strings (handle the case of "string" + "string")
+        regexp      => '(["\'])\s+\+\s+(["\'])',
+        replacement => sub { return sprintf( "%s+%s", $_[0]->{submatches}->[0], $_[0]->{submatches}->[1] ); }
     },
     {
         regexp      => '\s+',
@@ -757,7 +767,7 @@ JavaScript::Packer - Perl version of Dean Edwards' Packer.js
 
 =head1 VERSION
 
-Version 2.10
+Version 2.12
 
 =head1 DESCRIPTION
 

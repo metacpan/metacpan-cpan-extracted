@@ -40,7 +40,7 @@ It is designed to be used in conjunction with the Deduplicator and Publisher cla
 
 =cut 
 
-use v5.38;
+use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 

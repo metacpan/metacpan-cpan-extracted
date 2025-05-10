@@ -47,11 +47,11 @@
    "provides" : {
       "Software::Security::Policy" : {
          "file" : "lib/Software/Security/Policy.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Software::Security::Policy::Individual" : {
          "file" : "lib/Software/Security/Policy/Individual.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/CPAN-Security/Software-Security-Policy"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_generated_by_perl" : "v5.38.2",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"

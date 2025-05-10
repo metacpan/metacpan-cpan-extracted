@@ -43,6 +43,39 @@ like($log_lines[0], qr/File debug message/, 'Logged correct debug message to fil
 like($log_lines[1], qr/INFO: Log::Abstraction/, 'Logged info message to file');
 like($log_lines[1], qr/File info message/, 'Logged correct info message to file');
 
+# As above but with the file argument
+($fh, $filename) = tempfile();
+$logger = Log::Abstraction->new(logger => { file => $filename });
+
+$logger->debug('File debug message2');
+$logger->info('File info message2');
+
+open $log_fh, '<', $filename or die "Could not open log file: $!";
+@log_lines = <$log_fh>;
+close $log_fh;
+
+like($log_lines[0], qr/DEBUG: Log::Abstraction/, 'Logged debug message to file');
+like($log_lines[0], qr/File debug message2/, 'Logged correct debug message to file');
+like($log_lines[1], qr/INFO: Log::Abstraction/, 'Logged info message to file');
+like($log_lines[1], qr/File info message2/, 'Logged correct info message to file');
+
+# Test logging to a file descriptor
+($fh, $filename) = tempfile();
+$logger = Log::Abstraction->new({ fd => $fh });
+
+$logger->debug('File debug message');
+$logger->info('File info message');
+close $fh;
+
+open($log_fh, '<', $filename) or die "Could not open log file: $!";
+@log_lines = <$log_fh>;
+close $log_fh;
+
+like($log_lines[0], qr/DEBUG: Log::Abstraction/, 'Logged debug message to file descriptor');
+like($log_lines[0], qr/File debug message/, 'Logged correct debug message to file descriptor');
+like($log_lines[1], qr/INFO: Log::Abstraction/, 'Logged info message to file descriptor');
+like($log_lines[1], qr/File info message/, 'Logged correct info message to file descriptor');
+
 # Test logging to a code reference
 my @code_log;
 $logger = Log::Abstraction->new(logger => sub { push @code_log, @_ });
@@ -57,13 +90,13 @@ is_deeply(
 		{
 			class => 'Log::Abstraction',
 			file => 't/30-basics.t',
-			line => 50,  # Adjust line number if needed
+			line => 83,	# Adjust line number if needed
 			level => 'debug',
 			message => ['Code debug message']
 		}, {
 			class => 'Log::Abstraction',
 			file => 't/30-basics.t',
-			line => 51,  # Adjust line number if needed
+			line => 84,	# Adjust line number if needed
 			level => 'info',
 			message => ['Code info message']
 		}

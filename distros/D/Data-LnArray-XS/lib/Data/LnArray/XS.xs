@@ -108,6 +108,7 @@ length(self)
 SV *
 from (...)
 	CODE:
+		int i = 0;
 		SV * self = ST(0);
 		SV * from = ST(1);
 		AV * array = newAV();
@@ -116,13 +117,13 @@ from (...)
 				croak("currently cannot handle");
 			}
 			int len = SvIV(*hv_fetch((HV*)SvRV(from), "length", 6, 0));
-			for (int i = 0; i < len; i++) {
+			for (i = 0; i < len; i++) {
 				av_push(array, newSViv(i));
 			}
 		} else if ( SvTYPE(SvRV(from)) != SVt_PVAV ) {
-			char * str = SvPV_nolen(from);
-			int len = strlen(str);
-			for (int i = 0; i < len; i++) {
+			STRLEN retlen;
+			char * str = SvPV(from, retlen);
+			for (i = 0; i < retlen; i++) {
 				SV *sv = newSVpvn(str, 1);
 				av_push(array, sv);
 				str += 1;
@@ -133,7 +134,7 @@ from (...)
 	
 		if (items > 2) {	
 			SV * cb = ST(2);
-			for (int i = 0; i <= av_len(array); i++) {
+			for (i = 0; i <= av_len(array); i++) {
 				dSP;
 				GvSV(PL_defgv) = *av_fetch(array, i, 0);
 				PUSHMARK(SP);
@@ -363,8 +364,8 @@ filter(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
 		AV * new_array = newAV();
-    		int len = av_len(array);
-		for (int i = 0; i <= len; i++) {
+    		int len = av_len(array), i = 0;
+		for (i = 0; i <= len; i++) {
                   	dSP;
 			SV * val = *av_fetch(array, i, 0);
                         PUSHMARK(SP);
@@ -385,12 +386,15 @@ includes(self, find)
 	SV * find
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
+		int len = av_len(array), i = 0;
 		RETVAL = newRV_inc((SV*)newSViv(0));
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			SV * val = *av_fetch(array, i, 0);
 			if ( SvTYPE(val) == SVt_PV ) {
-				if ( strcmp(SvPV_nolen(val), SvPV_nolen(find)) == 0 ) {
+				STRLEN r1, r2;
+				char * v1 = SvPV(val, r1);
+				char * v2 = SvPV(find, r2);
+				if ( strcmp(v1, v2) == 0 ) {
 					RETVAL = newRV_inc((SV*)newSViv(1));
 					break;
 				}
@@ -405,12 +409,15 @@ indexOf(self, find)
 	SV * find
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
+		int len = av_len(array), i = 0;
 		RETVAL = (SV*)newSViv(-1);
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			SV * val = *av_fetch(array, i, 0);
 			if ( SvTYPE(val) == SVt_PV ) {
-				if ( strcmp(SvPV_nolen(val), SvPV_nolen(find)) == 0 ) {
+				STRLEN r1, r2;
+				char * v1 = SvPV(val, r1);
+				char * v2 = SvPV(find, r2);
+				if ( strcmp(v1, v2) == 0 ) {
 					RETVAL = (SV*)newSViv(i);
 					break;
 				}
@@ -426,13 +433,14 @@ join(self, join)
 	CODE:
 		AV * array = (AV*)SvRV(self);
 		int len = av_len(array);
-		char * joiner = SvPV_nolen(join);
+		STRLEN retlen;
+		char * joiner = SvPV(join, retlen);
 		RETVAL = newSVpv("", 0);
 		for (int i = 0; i <= len; i++) {
 			if (i > 0) {
 				sv_catpv(RETVAL, joiner);
 			}
-			sv_catpv(RETVAL, SvPV_nolen(*av_fetch(array, i, 0)));
+			sv_catpv(RETVAL, SvPV(*av_fetch(array, i, 0), retlen));
 		}
 	OUTPUT:
 		RETVAL
@@ -444,12 +452,15 @@ lastIndexOf(self, find)
 	SV * find
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
+		int len = av_len(array), i = 0;
 		RETVAL = (SV*)newSViv(-1);
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			SV * val = *av_fetch(array, i, 0);
 			if ( SvTYPE(val) == SVt_PV ) {
-				if ( strcmp(SvPV_nolen(val), SvPV_nolen(find)) == 0 ) {
+				STRLEN r1, r2;
+				char * v1 = SvPV(val, r1);
+				char * v2 = SvPV(find, r2);
+				if ( strcmp(v1, v2) == 0 ) {
 					RETVAL = (SV*)newSViv(i);
 				}
 			}
@@ -480,14 +491,15 @@ toString(self, join)
 	SV * join
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
-		char * joiner = SvPV_nolen(join);
+		int len = av_len(array), i = 0;
+		STRLEN retlen;
+		char * joiner = SvPV(join, retlen);
 		RETVAL = newSVpv("", 0);
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			if (i > 0) {
 				sv_catpv(RETVAL, joiner);
 			}
-			sv_catpv(RETVAL, SvPV_nolen(*av_fetch(array, i, 0)));
+			sv_catpv(RETVAL, SvPV(*av_fetch(array, i, 0), retlen));
 		}
 	OUTPUT:
 		RETVAL
@@ -515,9 +527,9 @@ every(self, cb)
 	SV * cb
 	CODE:
 		AV * array = (AV*)SvRV(self);
-    		int len = av_len(array);
+    		int len = av_len(array), i = 0;
 		RETVAL = newRV_inc((SV*)newSViv(1));	
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
                   	dSP;
 			SV * val = *av_fetch(array, i, 0);
                         PUSHMARK(SP);
@@ -539,9 +551,9 @@ find(self, cb)
 	SV * cb
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
+		int len = av_len(array), i = 0;
 		RETVAL = (SV*) 0;
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			SV * val = *av_fetch(array, i, 0);
 			PUSHMARK(SP);
                         XPUSHs(val);
@@ -561,9 +573,9 @@ findIndex(self, cb)
 	SV * cb
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
+		int len = av_len(array), i = 0;
 		RETVAL = (SV*) 0;
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			SV * val = *av_fetch(array, i, 0);
 			PUSHMARK(SP);
                         XPUSHs(val);
@@ -583,9 +595,9 @@ forEach(self, cb)
 	SV * cb
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
+		int len = av_len(array), i = 0, j = 0;
 		AV * into = newAV();
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			dSP;
 			GvSV(PL_defgv) = *av_fetch(array, i, 0);
 			PUSHMARK(SP);
@@ -593,17 +605,16 @@ forEach(self, cb)
 			SPAGAIN;
 			if (SvTRUEx(*PL_stack_sp)) {
 				AV * temp = newAV();
-				for (int j = 0; j < p; j++) {
+				for (j = 0; j < p; j++) {
 					av_push(temp, newSVsv(POPs));
 				}
 				temp = reverse(temp);
-				for (int j = 0; j < p; j++) {
+				for (j = 0; j < p; j++) {
 					av_push(into, *av_fetch(temp, j, 0));
 				}	
 			}
 			PUTBACK;	
 		}
-		int i = 0;
 		len = av_len(into);
 		for (i = 0; i <= len; i++) {
 			ST(i) = newSVsv(*av_fetch(into, i, 0));
@@ -631,9 +642,9 @@ map(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
 		AV * new_array = newAV();
-    		int len = av_len(array);
+    		int len = av_len(array), i = 0, j = 0;
 		int offset = 0;
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
                   	dSP;
 			SV * val = *av_fetch(array, i, 0);
                         PUSHMARK(SP);
@@ -643,11 +654,11 @@ map(self, cb)
 			SPAGAIN;
 			if (SvTRUEx(*PL_stack_sp)) {
 				AV * temp = newAV();
-				for (int j = 0; j < p; j++) {
+				for (j = 0; j < p; j++) {
 					av_push(temp, newSVsv(POPs));
 				}
 				temp = reverse(temp);
-				for (int j = 0; j < p; j++) {
+				for (j = 0; j < p; j++) {
 					av_push(new_array, *av_fetch(temp, j, 0));
 				}
 			}
@@ -686,9 +697,9 @@ some(self, cb)
 	SV * cb
 	CODE:
 		AV * array = (AV*)SvRV(self);
-    		int len = av_len(array);
+    		int len = av_len(array), i = 0;
 		RETVAL = newRV_inc((SV*)newSViv(0));	
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
                   	dSP;
 			SV * val = *av_fetch(array, i, 0);
                         PUSHMARK(SP);

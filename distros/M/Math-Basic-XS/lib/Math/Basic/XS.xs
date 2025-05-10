@@ -63,7 +63,7 @@ min(...)
 	CODE:
 		SV * callback = ST(0);
 		int min = 0, i = 1;
-		bool set = false;
+		int set = 0;
 		for (i = 1; i < items; i++) {
 			dSP;
 			GvSV(PL_defgv) = newSVsv(ST(i));
@@ -74,7 +74,7 @@ min(...)
 			double ret = SvNV(val);
 			if (!set || ret < min) {
 				min = ret;
-				set = true;
+				set = 1;
 			}
 			PUTBACK;
 		}
@@ -88,7 +88,7 @@ max(...)
 	CODE:
 		SV * callback = ST(0);
 		int max = 0, i = 1;
-		bool set = false;
+		int set = 0;
 		for (i = 1; i < items; i++) {
 			dSP;
 			GvSV(PL_defgv) = newSVsv(ST(i));
@@ -99,7 +99,7 @@ max(...)
 			int ret = SvNV(val);
 			if (!set || ret > max) {
 				max = ret;
-				set = true;
+				set = 1;
 			}
 			PUTBACK;	
 		}

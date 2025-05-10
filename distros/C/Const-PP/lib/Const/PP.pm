@@ -1,12 +1,23 @@
-package Const::XS;
+package Const::PP;
 
 use 5.006;
-
 use strict;
 use warnings;
 no warnings 'recursion';
 
+our $VERSION = '0.02';
+
 use Scalar::Util qw/reftype/;
+
+use base qw/Import::Export/;
+
+our %EX = (
+        const => [qw/all/],
+	make_readonly => [qw/all/],
+	make_readonly_ref => [qw/all/],
+	unmake_readonly => [qw/all/],
+	is_readonly => [qw/all/],
+);
 
 our $RECURSION_LIMIT = 10000;
 
@@ -43,7 +54,7 @@ sub _make_readwrite {
 		die "Bailing on making the variable writeable, Looks like you are in deep recursion";
 	}
 
-        if (my $type = reftype $_[0]) {        
+        if (my $type = reftype $_[0]) {
                	&Internals::SvREADONLY($_[0], 0);
 	        if ($type eq 'ARRAY') {
                         _make_readwrite($_, $recurse) for @{ $_[0] };
@@ -68,17 +79,17 @@ sub _is_readonly {
 
         if (my $type = reftype $_[0]) {
 		if ($type eq 'ARRAY') {
-                       _is_readonly($_, $recurse) or return 0 for @{ $_[0] };
-                }
-                elsif ($type eq 'HASH') {
-		      _is_readonly($_, $recurse) or return 0 for values %{ $_[0] };
+			_is_readonly($_, $recurse) or return 0 for @{ $_[0] };
+			return &Internals::SvREADONLY($_[0]) ? 1 : 0;
 		}
-		return &Internals::SvREADONLY($_[0]) ? 1 : 0;
+                elsif ($type eq 'HASH') {
+		      	_is_readonly($_, $recurse) or return 0 for values %{ $_[0] };
+			return &Internals::SvREADONLY($_[0]) ? 1 : 0;
+		}
 	}
 
 	return Internals::SvREADONLY($_[0]) ? 1 : 0;
 }
-
 
 sub const (\[$@%]@) {
         my (undef, @args) = @_;
@@ -136,7 +147,7 @@ sub unmake_readonly (\[$@%]@)  {
 
 sub is_readonly (\[$@%]@) {
 	my $ref= reftype($_[0]) || "";
-	if ( $ref ) {
+	if ($ref eq 'HASH' || $ref eq 'ARRAY' ) {
 		return _is_readonly($_[0], 0);
 	} else {
 		return _is_readonly(${$_[0]}, 0);
@@ -144,3 +155,93 @@ sub is_readonly (\[$@%]@) {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Const::PP - Facility for creating read-only scalars, arrays, hashes
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+	package MyApp::Constants;
+
+	use Const::PP qw/const/;
+
+	use base 'Import::Export';
+
+	our %EX = (
+		'$SCALAR' => [qw/all/],
+		'@ARRAY' => [qw/all/],
+		'%HASH' => [qw/all/],
+	);
+
+	const our $SCALAR => 'Hello World';
+	const our @ARRAY => qw/welcome to paradise/;
+	const our %HASH => ( one => 1, two => [ ... ], three => { ... }, four => sub { } );
+
+	1;
+
+...
+
+	package MyApp::Controller::Logic;
+
+	use MyApp::Constants qw/$SCALAR @ARRAY %HASH/;
+
+	...
+
+	1;
+
+=head1 DESCRIPTION
+
+The Const::PP module facilitates the creation of read-only variables in Perl. This module serves as a sister implementation to L<Const::XS>, providing full backward compatibility and is implemented entirely in "pure perl".
+
+For further documentation see L<Const::XS>.
+
+=head1 AUTHOR
+
+LNATION, C<< <email at lnation.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-const-pp at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Const-PP>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Const::PP
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Const-PP>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Const-PP>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+

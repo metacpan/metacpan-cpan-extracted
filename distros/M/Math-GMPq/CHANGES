@@ -1,5 +1,13 @@
 Revision history for Perl module Math::GMPq
 
+0.65
+ - Enhancements added to Rmpq_set_str - allow some more strings that mpq_set_str will not
+   accept to be passed to Rmpq_set_str. (Details in POD.)
+ - Clarification of OPERATOR OVERLOADING in POD.
+ - Modify t/new.t to allow for old versions (pre 4.15) of Math::MPFR. Fixes:
+   http://www.cpantesters.org/cpan/report/df6770b4-043e-11f0-8390-311d6e8775ea
+  - Add (utility) function mpfr2mpq().
+
 0.64
  - Allow new() to accept a Math::MPFR object as its argument.
  - Make correction to t/overload_cross_class.t.

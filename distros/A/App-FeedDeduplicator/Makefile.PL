@@ -13,4 +13,18 @@ WriteMakefile(
         'File::Spec'           => 0,
         'Getopt::Long'         => 0,
     },
+    MIN_PERL_VERSION => 5.040,
+    META_MERGE    => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/davorg-cpan/app-feeddeduplicator.git',
+                web  => 'https://github.com/davorg-cpan/app-feeddeduplicator',
+            },
+            bugtracker => {
+                web  => 'https://github.com/davorg-cpan/app-feeddeduplicator/issues',
+            },
+        },
+    },
 );

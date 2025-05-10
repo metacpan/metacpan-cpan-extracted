@@ -16,11 +16,15 @@ const my $factory2 => {
 
 const my $scalar => \1234;
 
-eval {
-	const my $undefined = 1;
-};
+if ($] >= 5.016) {
+	eval "
+		const my \$undefined = 1;
+	";
 
-like($@, qr/No value for readonly variable/);
+	like($@, qr/No value for readonly variable/, 'No value for readonly variable');
+} else {
+	diag explain 'Skip: Type of arg 1 to must be one of [$@%]';
+}
 
 is($foo, 'a scalar value');
 
