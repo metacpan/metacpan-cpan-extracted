@@ -81,6 +81,7 @@ t/53-variant-alias.t
 t/54-lazier.t
 t/55-lazier-props.t
 t/56-private-property.t
+t/57-readonly-property.t
 t/lib/Custom.pm
 t/lib/One.pm
 t/lib/Role.pm

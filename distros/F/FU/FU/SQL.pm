@@ -1,4 +1,4 @@
-package FU::SQL 0.5;
+package FU::SQL 1.0;
 use v5.36;
 use Exporter 'import';
 use Carp 'confess';
@@ -102,11 +102,6 @@ __END__
 =head1 NAME
 
 FU::SQL - Small and Safe SQL Query Builder
-
-=head1 EXPERIMENTAL
-
-This module is still in development and there will likely be a few breaking API
-changes, see the main L<FU> module for details.
 
 =head1 SYNOPSIS
 

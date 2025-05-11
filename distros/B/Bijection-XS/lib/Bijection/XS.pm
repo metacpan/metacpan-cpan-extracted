@@ -9,7 +9,7 @@ use base qw/Import::Export/;
 our %EX = (biject => [qw/all main/], inverse => [qw/all main/], bijection_set => [qw/all set/], offset_set => [qw/all set/]);
 
 BEGIN {
-	our $VERSION = '0.08';
+	our $VERSION = '0.09';
 	require XSLoader;
 	XSLoader::load("Bijection::XS", $VERSION);
 	bijection_set(qw/b c d f g h j k l m n p q r s t v w x y z B C D F G H J K L M N P Q R S T V W X Y Z 0 1 2 3 4 5 6 7 8 9/);
@@ -26,7 +26,7 @@ Bijection::XS - Bijection of an integer faster
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

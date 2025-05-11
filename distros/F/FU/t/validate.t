@@ -119,7 +119,7 @@ f { type => 'hash', keys => { a=>{missing=>'reject'} } }, {}, {key => 'a', valid
 
 t { type => 'hash', keys => { a=>{} } }, {a=>' a '}, {a=>'a'}; # Test against in-place modification
 t { type => 'hash', keys => { a=>{} }, unknown => 'remove' }, { a=>1,b=>1 }, { a=>1 };
-f { type => 'hash', keys => { a=>{} }, unknown => 'reject' }, { a=>1,b=>1 }, { validation => 'unknown', keys => ['b'], expected => ['a'] }, "unknown key 'b'";
+f { type => 'hash', keys => { a=>{} }, unknown => 'reject' }, { a=>1,b=>1 }, { validation => 'unknown', keys => ['b'], expected => ['a'] }, "unknown key: b";
 t { type => 'hash', keys => { a=>{} }, unknown => 'pass' }, { a=>1,b=>1 }, { a=>1,b=>1 };
 t { type => 'hash', setundef => 1 }, {}, undef;
 t { type => 'hash', unknown => 'reject', keys => { a=>{ type => 'any', setundef => 1}} }, {a=>[]}, {a=>undef};
@@ -132,20 +132,20 @@ t { values => { int => 1 } }, { a => -1, b => 1 }, { a => -1, b => 1 };
 f { values => { int => 1 } }, { a => undef }, { validation => 'values', errors => [{ key => 'a', validation => 'required' }] }, '.a: required value missing';
 
 # default validations
-f { minlength => 3 }, 'ab', { validation => 'minlength', expected => 3, got => 2 }, "failed validation 'minlength'";
+f { minlength => 3 }, 'ab', { validation => 'minlength', expected => 3, got => 2 }, "input too short, expected minimum of 3 but got 2";
 t { minlength => 3 }, 'abc', 'abc';
-f { maxlength => 3 }, 'abcd', { validation => 'maxlength', expected => 3, got => 4 }, "failed validation 'maxlength'";
+f { maxlength => 3 }, 'abcd', { validation => 'maxlength', expected => 3, got => 4 }, "input too long, expected maximum of 3 but got 4";
 t { maxlength => 3 }, 'abc', 'abc';
 t { minlength => 3, maxlength => 3 }, 'abc', 'abc';
-f { length => 3 }, 'ab',   { validation => 'length', expected => 3, got => 2 }, "failed validation 'length'";
-f { length => 3 }, 'abcd', { validation => 'length', expected => 3, got => 4 }, "failed validation 'length'";
+f { length => 3 }, 'ab',   { validation => 'length', expected => 3, got => 2 }, 'invalid input length, expected 3 but got 2';
+f { length => 3 }, 'abcd', { validation => 'length', expected => 3, got => 4 }, 'invalid input length, expected 3 but got 4';
 t { length => 3 }, 'abc',  'abc';
 t { length => [1,3] }, 'abc',  'abc';
-f { length => [1,3] }, 'abcd', { validation => 'length', expected => [1,3], got => 4 }, "failed validation 'length'";
+f { length => [1,3] }, 'abcd', { validation => 'length', expected => [1,3], got => 4 }, "invalid input length, expected between 1 and 3 but got 4";
 t { type => 'array', length => 0 }, [], [];
-f { type => 'array', length => 1 }, [1,2], { validation => 'length', expected => 1, got => 2 }, "failed validation 'length'";
+f { type => 'array', length => 1 }, [1,2], { validation => 'length', expected => 1, got => 2 }, "invalid input length, expected 1 but got 2";
 t { type => 'hash', length => 0 }, {}, {};
-f { type => 'hash', length => 1, unknown => 'pass' }, {qw/1 a 2 b/}, { validation => 'length', expected => 1, got => 2 }, "failed validation 'length'";
+f { type => 'hash', length => 1, unknown => 'pass' }, {qw/1 a 2 b/}, { validation => 'length', expected => 1, got => 2 }, "invalid input length, expected 1 but got 2";
 t { type => 'hash', length => 1, keys => {a => {missing=>'ignore'}, b => {missing=>'ignore'}} }, {a=>1}, {a=>1};
 t { regex => '^a' }, 'abc', 'abc';  # XXX: Can't use qr// here because t() does dclone(). The 'hex' test covers that case anyway.
 f { regex => '^a' }, 'cba', { validation => 'regex', regex => '^a', got => 'cba' }, "failed validation 'regex'";
@@ -201,7 +201,7 @@ t { doublefunc => 1 }, 0, 2;
 f { doublefunc => 1 }, 1, { validation => 'doublefunc', error => { validation => 'func', result => '' } }, "validation 'doublefunc': failed validation 'func'";
 
 # numbers
-sub nerr { ({ validation => 'num', got => $_[0] }, "failed validation 'num'") }
+sub nerr { ({ validation => 'num', got => $_[0] }, "invalid number: \"$_[0]\"") }
 t { num => 1 }, 0, 0;
 f { num => 1 }, '-', nerr '-';
 f { num => 1 }, '00', nerr '00';
@@ -219,16 +219,16 @@ t { uint => 1 }, 0, 0;
 t { uint => 1 }, 123, 123;
 f { uint => 1 }, -123, { validation => 'uint', got => -123 }, "failed validation 'uint'";
 t { min => 1 }, 1, 1;
-f { min => 1 }, 0.9, { validation => 'min', expected => 1, got => 0.9 }, "failed validation 'min'";
-f { min => 1 }, 'a', { validation => 'min', error => (nerr 'a')[0] }, "validation 'min': failed validation 'num'";
+f { min => 1 }, 0.9, { validation => 'min', expected => 1, got => 0.9 }, "expected minimum 1 but got 0.9";
+f { min => 1 }, 'a', { validation => 'min', error => (nerr 'a')[0] }, 'invalid number: "a"';
 t { max => 1 }, 1, 1;
-f { max => 1 }, 1.1, { validation => 'max', expected => 1, got => 1.1 }, "failed validation 'max'";
-f { max => 1 }, 'a', { validation => 'max', error => (nerr 'a')[0] }, "validation 'max': failed validation 'num'";
+f { max => 1 }, 1.1, { validation => 'max', expected => 1, got => 1.1 }, "expected maximum 1 but got 1.1";
+f { max => 1 }, 'a', { validation => 'max', error => (nerr 'a')[0] }, 'invalid number: "a"';
 t { range => [1,2] }, 1, 1;
 t { range => [1,2] }, 2, 2;
-f { range => [1,2] }, 0.9, { validation => 'range', error => { validation => 'min', expected => 1, got => 0.9 } }, "validation 'range': failed validation 'min'";
-f { range => [1,2] }, 2.1, { validation => 'range', error => { validation => 'max', expected => 2, got => 2.1 } }, "validation 'range': failed validation 'max'";
-f { range => [1,2] }, 'a', { validation => 'range', error => { validation => 'min', error => (nerr 'a')[0] } }, "validation 'range': validation 'min': failed validation 'num'";
+f { range => [1,2] }, 0.9, { validation => 'range', error => { validation => 'min', expected => 1, got => 0.9 } }, 'expected minimum 1 but got 0.9';
+f { range => [1,2] }, 2.1, { validation => 'range', error => { validation => 'max', expected => 2, got => 2.1 } }, 'expected maximum 2 but got 2.1';
+f { range => [1,2] }, 'a', { validation => 'range', error => { validation => 'min', error => (nerr 'a')[0] } }, 'invalid number: "a"';
 
 # email template
 use utf8;
@@ -253,7 +253,7 @@ t { email => 1 }, $_, $_ for (
   'abc@x-y_z.example',
 );
 my $long = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@xxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxx.xxxxx';
-f { email => 1 }, $long, { validation => 'email', error => { validation => 'maxlength', got => 255, expected => 254 } }, "validation 'email': failed validation 'maxlength'";
+f { email => 1 }, $long, { validation => 'email', error => { validation => 'maxlength', got => 255, expected => 254 } }, "validation 'email': input too long, expected maximum of 254 but got 255";
 
 # weburl template
 f { weburl => 1 }, $_, { validation => 'weburl', got => $_ }, "failed validation 'weburl'" for (

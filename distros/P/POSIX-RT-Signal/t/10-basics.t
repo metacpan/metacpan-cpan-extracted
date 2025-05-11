@@ -29,7 +29,7 @@ setlocale(LC_ALL, 'C');
 	alarm .2;
 	ok(!defined sigtimedwait($sigset, 0.1), 'Nothing yet');
 
-	my $ret = sigwaitinfo('ALRM');
+	my $ret = sigwaitinfo($sigset);
 	isa_ok($ret, 'Signal::Info', 'Return value is a hash');
 	sigprocmask(SIG_UNBLOCK, $sigset);
 }

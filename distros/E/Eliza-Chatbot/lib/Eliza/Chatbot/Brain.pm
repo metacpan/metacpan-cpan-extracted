@@ -222,7 +222,7 @@ Eliza::Chatbot::Brain
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SUBROUTINES/METHODS
 

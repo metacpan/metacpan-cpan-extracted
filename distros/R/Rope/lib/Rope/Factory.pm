@@ -1,5 +1,6 @@
 package Rope::Factory;
 
+use strict; use warnings;
 use Factory::Sub;
 use Coerce::Types::Standard;
 use Rope::Pro;
@@ -69,7 +70,7 @@ Rope::Factory - Rope factory properties
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 

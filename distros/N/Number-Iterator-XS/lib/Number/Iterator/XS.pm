@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 require XSLoader;
 XSLoader::load('Number::Iterator::XS', $VERSION);
@@ -19,7 +19,7 @@ Number::Iterator::XS - iterate numbers faster
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 

@@ -1,18 +1,17 @@
 package Monitoring::Livestatus;
 
-use 5.006;
-use strict;
 use warnings;
-use Data::Dumper qw/Dumper/;
+use strict;
 use Carp qw/carp confess/;
 use Cpanel::JSON::XS ();
-use Storable qw/dclone/;
+use Data::Dumper qw/Dumper/;
 use IO::Select ();
+use Storable qw/dclone/;
 
 use Monitoring::Livestatus::INET ();
 use Monitoring::Livestatus::UNIX ();
 
-our $VERSION = '0.84';
+our $VERSION = '0.86';
 
 
 # list of allowed options
@@ -68,7 +67,7 @@ path to the UNIX socket of check_mk livestatus
 
 =item server
 
-uses this server for a TCP connection
+server address when using a TCP connection
 
 =item peer
 
@@ -151,8 +150,8 @@ sub new {
       'errors_are_fatal'            => 1,       # die on errors
       'backend'                     => undef,   # should be keept undef, used internally
       'timeout'                     => undef,   # timeout for tcp connections
-      'query_timeout'               => 60,      # query timeout for tcp connections
-      'connect_timeout'             => 5,       # connect timeout for tcp connections
+      'query_timeout'               => undef,   # query timeout for tcp connections
+      'connect_timeout'             => 30,      # connect timeout for tcp connections
       'warnings'                    => 1,       # show warnings, for example on querys without Column: Header
       'logger'                      => undef,   # logger object used for statistical informations and errors / warnings
       'deepcopy'                    => undef,   # copy result set to avoid errors with tied structures
@@ -163,6 +162,7 @@ sub new {
       'key'                         => undef,
       'ca_file'                     => undef,
       'verify'                      => undef,
+      'verifycn_name'               => undef,
     };
 
     my %old_key = (
@@ -776,8 +776,11 @@ sub _send {
         # for querys with column header, no seperate columns will be returned
         if($statement =~ m/^Columns:\ (.*)$/mx) {
             ($statement,$keys) = $self->_extract_keys_from_columns_header($statement);
-        } elsif($statement =~ m/^Stats:\ (.*)$/mx or $statement =~ m/^StatsGroupBy:\ (.*)$/mx) {
+        }
+        if($statement =~ m/^Stats:\ (.*)$/mx or $statement =~ m/^StatsGroupBy:\ (.*)$/mx) {
+            my $has_columns = defined $keys ? join(",", @{$keys}) : undef;
             ($statement,$keys) = extract_keys_from_stats_statement($statement);
+            unshift @{$keys}, $has_columns if $has_columns;
         }
 
         # Offset header (currently naemon only)
@@ -847,8 +850,6 @@ sub _send {
     # return a empty result set if nothing found
     return({ keys => [], result => []}) if !defined $body;
 
-    my $limit_start = 0;
-    if(defined $opt->{'limit_start'}) { $limit_start = $opt->{'limit_start'}; }
     # body is already parsed
     my $result;
     if($status == 200) {
@@ -864,7 +865,7 @@ sub _send {
         # surrogate pair expected
         if($@) {
             # replace u+D800 to u+DFFF (reserved utf-16 low/high surrogates)
-            $body =~ s/\\ud[89a-f]\w{2}/\\ufffd/gmxi;
+            $body =~ s/\\ud[89a-f][0-9a-f]{2}/\\ufffd/gmxio;
             eval {
                 $result = $json_decoder->decode($body);
             };
@@ -916,7 +917,7 @@ sub post_processing {
     my $orig_result;
     if($opt->{'wrapped_json'}) {
         $orig_result = $result;
-        $result = $result->{'data'};
+        $result = delete $orig_result->{'data'};
     }
 
     # add peer information?
@@ -946,10 +947,7 @@ sub post_processing {
         'result_count' => scalar @{$result},
     };
     if($opt->{'wrapped_json'}) {
-        for my $key (keys %{$orig_result}) {
-            next if $key eq 'data';
-            $self->{'meta_data'}->{$key} = $orig_result->{$key};
-        }
+        $self->{'meta_data'} = $orig_result;
     }
 
     return({ keys => $keys, result => $result });
@@ -1002,8 +1000,8 @@ adds the peers name, addr and key to the result set:
 
 =head2 Backend
 
-send the query only to some specific backends. Only
-useful when using multiple backends.
+send the query only to some specific backends.
+Only useful when using multiple backends.
 
  my $hosts = $ml->selectall_arrayref(
    "GET hosts\nColumns: name alias state",
@@ -1092,16 +1090,18 @@ sub _send_socket {
     # https://riptutorial.com/posix/example/17424/handle-sigpipe-generated-by-write---in-a-thread-safe-manner
     local $SIG{PIPE} = 'IGNORE';
 
+    my $maxretries = $ENV{'LIVESTATUS_RETRIES'} // $self->{'retries_on_connection_error'};
+
     # try to avoid connection errors
     eval {
-        if($self->{'retries_on_connection_error'} <= 0) {
+        if($maxretries <= 0) {
             ($sock, $msg, $recv) = &_send_socket_do($self, $statement);
             return($sock, $msg, $recv) if $msg;
             ($status, $msg, $recv) = &_read_socket_do($self, $sock, $statement);
             return($status, $msg, $recv);
         }
 
-        while((!defined $status || ($status == 491 || $status == 497 || $status == 500)) && $retries < $self->{'retries_on_connection_error'}) {
+        while((!defined $status || ($status == 491 || $status == 497 || $status == 500)) && $retries < $maxretries) {
             $retries++;
             ($sock, $msg, $recv) = &_send_socket_do($self, $statement);
             return($status, $msg, $recv) if $msg;
@@ -1110,23 +1110,24 @@ sub _send_socket {
             if($status == 491 or $status == 497 or $status == 500) {
                 $self->{'logger'}->debug('got status '.$status.' retrying in '.$self->{'retry_interval'}.' seconds') if $self->{'verbose'};
                 $self->_close();
-                sleep($self->{'retry_interval'}) if $retries < $self->{'retries_on_connection_error'};
+                sleep($self->{'retry_interval'}) if $retries < $maxretries;
             }
         }
     };
-    if($@) {
-        $self->{'logger'}->debug("try 1 failed: $@") if $self->{'verbose'};
-        if(defined $@ and $@ =~ /broken\ pipe/mx) {
+    my $err = $@;
+    if($err) {
+        $self->{'logger'}->debug("try 1 failed: $err") if $self->{'verbose'};
+        if($err =~ /broken\ pipe/mx) {
             ($sock, $msg, $recv) = &_send_socket_do($self, $statement);
             return($status, $msg, $recv) if $msg;
             return(&_read_socket_do($self, $sock, $statement));
         }
-        confess($@) if $self->{'errors_are_fatal'};
+        _die_or_confess($err) if $self->{'errors_are_fatal'};
     }
 
     $status = $sock unless $status;
     $msg =~ s/^$status:\s+//gmx;
-    confess($status.": ".$msg) if($status >= 400 and $self->{'errors_are_fatal'});
+    _die_or_confess($status.": ".$msg) if($status >= 400 and $self->{'errors_are_fatal'});
 
     return($status, $msg, $recv);
 }
@@ -1135,10 +1136,9 @@ sub _send_socket {
 sub _send_socket_do {
     my($self, $statement) = @_;
     my $sock = $self->_open() or return(491, $self->_get_error(491, $@ || $!), $@ || $!);
-    utf8::decode($statement);
-    utf8::encode($statement);
-    print $sock $statement or return($self->_socket_error($statement, $sock, 'write to socket failed: '.($@ || $!)));
-    print $sock "\n";
+    utf8::decode($statement); # make sure
+    utf8::encode($statement); # query is utf8
+    $sock->printflush($statement,"\n") || return($self->_socket_error($statement, 'write to socket failed'.($! ? ': '.$! : '')));
     return $sock;
 }
 
@@ -1147,12 +1147,13 @@ sub _read_socket_do {
     my($self, $sock, $statement) = @_;
     my($recv,$header);
 
+    my $s = IO::Select->new();
+    $s->add($sock);
+
     # COMMAND statements might return a error message
     if($statement && $statement =~ m/^COMMAND/mx) {
         shutdown($sock, 1);
-        my $s = IO::Select->new();
-        $s->add($sock);
-        if($s->can_read(0.5)) {
+        if($s->can_read(3)) {
             $recv = <$sock>;
         }
         if($recv) {
@@ -1165,7 +1166,25 @@ sub _read_socket_do {
         return('200', $self->_get_error(200), undef);
     }
 
-    $sock->read($header, 16) or return($self->_socket_error($statement, $sock, 'reading header from socket failed, check your livestatus logfile: '.$!));
+    my $timeout = 180;
+    if($statement) {
+        # status requests should not take longer than 20 seconds
+        $timeout = 20  if($statement =~ m/^GET\s+status/mx);
+        $timeout = 300 if($statement =~ m/^GET\s+log/mx);
+    }
+    $timeout = $self->{'query_timeout'} if $self->{'query_timeout'};
+
+    local $! = undef;
+    my @ready = $s->can_read($timeout);
+    if(scalar @ready == 0) {
+        my $err = $!;
+        if($err) {
+            return($self->_socket_error($statement, 'socket error '.$err));
+        }
+        return($self->_socket_error($statement, 'timeout ('.$timeout.'s) while waiting for socket'));
+    }
+
+    $sock->read($header, 16) || return($self->_socket_error($statement, 'reading header from socket failed'.($! ? ': '.$! : '')));
     $self->{'logger'}->debug("header: $header") if $self->{'verbose'};
     my($status, $msg, $content_length) = &_parse_header($self, $header, $sock);
     return($status, $msg, undef) if !defined $content_length;
@@ -1182,15 +1201,15 @@ sub _read_socket_do {
             if($remaining < $length) { $length = $remaining; }
             while($length > 0 && $sock->read(my $buf, $length)) {
                 # replace u+D800 to u+DFFF (reserved utf-16 low/high surrogates)
-                $buf =~ s/\\ud[89a-f]\w{2}/\\ufffd/gmxio;
+                $buf =~ s/\\ud[89a-f][0-9a-f]{2}/\\ufffd/gmxio;
                 $json_decoder->incr_parse($buf);
                 $remaining = $remaining -$length;
                 if($remaining < $length) { $length = $remaining; }
             }
-            $recv = $json_decoder->incr_parse or return($self->_socket_error($statement, $sock, 'reading remaining '.$length.' bytes from socket failed: '.$!));
+            $recv = $json_decoder->incr_parse or return($self->_socket_error($statement, 'reading remaining '.$length.' bytes from socket failed'.($! ? ': '.$! : '')));
             $json_decoder->incr_reset;
         } else {
-            $sock->read($recv, $content_length) or return($self->_socket_error($statement, $sock, 'reading body from socket failed'));
+            $sock->read($recv, $content_length) or return($self->_socket_error($statement, 'reading body from socket failed'.($! ? ': '.$! : '')));
         }
     }
 
@@ -1203,26 +1222,24 @@ sub _read_socket_do {
 
 ########################################
 sub _socket_error {
-    #my($self, $statement, $sock, $body)...
-    my($self, $statement, undef, $body) = @_;
+    my($self, $statement, $err) = @_;
 
     my $message = "\n";
     $message   .= "peer                ".Dumper($self->peer_name);
     $message   .= "statement           ".Dumper($statement);
-    $message   .= "message             ".Dumper($body);
 
     $self->{'logger'}->error($message) if $self->{'verbose'};
 
     if($self->{'retries_on_connection_error'} <= 0) {
         if($self->{'errors_are_fatal'}) {
-            confess($message);
+            _die_or_confess($message);
         }
         else {
             carp($message);
         }
     }
     $self->_close();
-    return(500, $self->_get_error(500), $message);
+    return(500, $self->_get_error(500).($err ? " - ".$err : ""), $message);
 }
 
 ########################################
@@ -1539,6 +1556,16 @@ sub _log_statement {
     $cleanstatement =~ s/\n/\\n/gmx;
     $self->{'logger'}->debug('selectall_arrayref("'.$cleanstatement.'", '.$optstring.', '.$limit.')');
     return 1;
+}
+
+########################################
+sub _die_or_confess {
+    my($msg) = @_;
+    my @lines = split/\n/mx, $msg;
+    if(scalar @lines > 2) {
+        die($msg);
+    }
+    confess($msg);
 }
 
 ########################################

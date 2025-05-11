@@ -23,5 +23,5 @@ requires:
   Import::Export: '1.00'
   Scalar::Util: '0'
   perl: '5.006'
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

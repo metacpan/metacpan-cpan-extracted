@@ -10,6 +10,8 @@ is_deeply
 ok !eval { query_decode('%10'); 1 };
 like $@, qr/Invalid control character/;
 
+is_deeply query_decode('&&&a=b'), { a => 'b' };
+
 is query_encode
     { a => builtin::true, b => undef, c => builtin::false, d => 'string', e => "&=\xfe" },
     'a&d=string&e=%26%3d%c3%be';

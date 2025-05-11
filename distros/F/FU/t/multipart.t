@@ -14,12 +14,17 @@ Content-Type: text
 Content-Disposition: form-data; filename="example.txt"; name=field2
 
 value2
+--delimiter12345
+Content-Type: something; charset = " a b \\ c "
+Content-Disposition: form-data; name = "field \"  name" ;filename= "月姫.jpg"
+
+
 --delimiter12345--
 _
 
 
 my $l = FU::MultipartFormData->parse('multipart/form-data;boundary="delimiter12345"', $t);
-is scalar @$l, 2;
+is scalar @$l, 3;
 
 my $v = $l->[0];
 is $v->name, 'field1';
@@ -43,5 +48,13 @@ is $v->mime, 'text';
 is $v->charset, undef;
 is $v->length, 6;
 is $v->data, 'value2';
+
+$v = $l->[2];
+is $v->name, 'field "  name';
+is $v->filename, "\x{6708}\x{59eb}.jpg";
+is $v->mime, 'something';
+is $v->charset, ' a b \ c ';
+is $v->length, 0;
+is $v->data, '';
 
 done_testing;

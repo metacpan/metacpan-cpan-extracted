@@ -20,6 +20,12 @@
 #ifndef BOOL_INTERNALS_sv_isbool_true
 #define BOOL_INTERNALS_sv_isbool_true(x) SvTRUEx(x)
 #endif
+#ifndef newSV_true
+#define newSV_true() newSVsv(&PL_sv_yes)
+#endif
+#ifndef newSV_false
+#define newSV_false() newSVsv(&PL_sv_no)
+#endif
 
 /* Disable key/value struct packing in khashl, so we can safely take a pointer
  * to values inside the hash table. */
@@ -279,6 +285,22 @@ void _set_type(fupg_conn *c, SV *name, SV *sendsv, SV *recvsv)
   CODE:
     fupg_set_type(aTHX_ c, name, sendsv, recvsv);
     XSRETURN(1);
+
+void perl2bin(fupg_conn *c, int oid, SV *sv)
+  CODE:
+    ST(0) = fupg_perl2bin(aTHX_ c, oid, sv);
+
+void bin2perl(fupg_conn *c, int oid, SV *sv)
+  CODE:
+    ST(0) = fupg_bin2perl(aTHX_ c, oid, sv);
+
+void bin2text(fupg_conn *c, ...)
+  CODE:
+    XSRETURN(fupg_bintext(aTHX_ c, 0, ax, items));
+
+void text2bin(fupg_conn *c, ...)
+  CODE:
+    XSRETURN(fupg_bintext(aTHX_ c, 1, ax, items));
 
 
 MODULE = FU   PACKAGE = FU::Pg::txn

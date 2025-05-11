@@ -1,4 +1,4 @@
-package FU::Pg 0.5;
+package FU::Pg 1.0;
 use v5.36;
 use FU::XS;
 
@@ -34,11 +34,6 @@ __END__
 =head1 NAME
 
 FU::Pg - The Ultimate (synchronous) Interface to PostgreSQL
-
-=head1 EXPERIMENTAL
-
-This module is still in development and there will likely be a few breaking API
-changes, see the main L<FU> module for details.
 
 =head1 SYNOPSYS
 
@@ -758,7 +753,46 @@ C<set_type()> to configure appropriate conversions for these types.
 
 =back
 
-I<TODO:> Methods to convert between the various formats.
+Utility functions:
+
+=over
+
+=item $conn->perl2bin($oid, $val)
+
+=item $conn->bin2perl($oid, $bin)
+
+Convert the value for a specific type between the Perl representation and the
+PostgreSQL binary format, using the current type configuration of the
+connection. This is the same conversion used internally by this module to send
+bind parameters and receive query results, and map to the C<send> and C<recv>
+functions of C<< $conn->set_type() >>.
+
+These methods throw an error if C<$oid> is not a known type or if the given
+data is not valid for the type. However, these methods should not be used for
+strict validation: the conversion routines are usually written under the
+assumption that the data has been received directly from Postgres or is about
+to be sent to (and further validated by) Postgres.  For some types,
+C<perl2bin()> may return invalid data on invalid input and C<bin2perl()> may
+accept invalid binary data.
+
+=item $conn->bin2text($oid, $bin, ...)
+
+=item $conn->text2bin($oid, $text, ...)
+
+Convert between the binary format and the PostgreSQL text format. This
+conversion requires a round-trip to the server and throws an error if the
+connection state is not I<idle> or I<txn_idle>. Since it is Postgres doing the
+conversion, the input is properly validated and, in the case of C<bin2text()>,
+the result is guaranteed to be suitable for use as a textual bind parameter or
+for inclusion in an SQL query (but don't forget to use C<escape_literal()> in
+that case).
+
+Calling these methods many times can be pretty slow. If you have several values
+to convert, you can do that in a single call to speed things up:
+
+  my($text1, $text2, ..) = $conn->bin2text($oid1, $bin1, $oid2, $bin2, ..);
+
+=back
 
 I<TODO:> Methods to query type info.
 

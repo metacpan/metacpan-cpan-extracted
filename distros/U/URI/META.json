@@ -47,7 +47,7 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::Version" : "1"
          }
       },
@@ -96,215 +96,219 @@
    "provides" : {
       "URI" : {
          "file" : "lib/URI.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::Escape" : {
          "file" : "lib/URI/Escape.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::Heuristic" : {
          "file" : "lib/URI/Heuristic.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::IRI" : {
          "file" : "lib/URI/IRI.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::QueryParam" : {
          "file" : "lib/URI/QueryParam.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::Split" : {
          "file" : "lib/URI/Split.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::URL" : {
          "file" : "lib/URI/URL.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::WithBase" : {
          "file" : "lib/URI/WithBase.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::data" : {
          "file" : "lib/URI/data.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file" : {
          "file" : "lib/URI/file.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file::Base" : {
          "file" : "lib/URI/file/Base.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file::FAT" : {
          "file" : "lib/URI/file/FAT.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file::Mac" : {
          "file" : "lib/URI/file/Mac.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file::OS2" : {
          "file" : "lib/URI/file/OS2.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file::QNX" : {
          "file" : "lib/URI/file/QNX.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file::Unix" : {
          "file" : "lib/URI/file/Unix.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::file::Win32" : {
          "file" : "lib/URI/file/Win32.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ftp" : {
          "file" : "lib/URI/ftp.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ftpes" : {
          "file" : "lib/URI/ftpes.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ftps" : {
          "file" : "lib/URI/ftps.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::geo" : {
          "file" : "lib/URI/geo.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::gopher" : {
          "file" : "lib/URI/gopher.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::http" : {
          "file" : "lib/URI/http.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::https" : {
          "file" : "lib/URI/https.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::icap" : {
          "file" : "lib/URI/icap.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::icaps" : {
          "file" : "lib/URI/icaps.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::irc" : {
          "file" : "lib/URI/irc.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ircs" : {
          "file" : "lib/URI/ircs.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ldap" : {
          "file" : "lib/URI/ldap.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ldapi" : {
          "file" : "lib/URI/ldapi.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ldaps" : {
          "file" : "lib/URI/ldaps.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::mailto" : {
          "file" : "lib/URI/mailto.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::mms" : {
          "file" : "lib/URI/mms.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::news" : {
          "file" : "lib/URI/news.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::nntp" : {
          "file" : "lib/URI/nntp.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::nntps" : {
          "file" : "lib/URI/nntps.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::otpauth" : {
          "file" : "lib/URI/otpauth.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::pop" : {
          "file" : "lib/URI/pop.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::rlogin" : {
          "file" : "lib/URI/rlogin.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::rsync" : {
          "file" : "lib/URI/rsync.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::rtsp" : {
          "file" : "lib/URI/rtsp.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::rtspu" : {
          "file" : "lib/URI/rtspu.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::scp" : {
          "file" : "lib/URI/scp.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::sftp" : {
          "file" : "lib/URI/sftp.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::sip" : {
          "file" : "lib/URI/sip.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::sips" : {
          "file" : "lib/URI/sips.pm",
-         "version" : "5.31"
+         "version" : "5.32"
+      },
+      "URI::smb" : {
+         "file" : "lib/URI/smb.pm",
+         "version" : "5.32"
       },
       "URI::snews" : {
          "file" : "lib/URI/snews.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::ssh" : {
          "file" : "lib/URI/ssh.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::telnet" : {
          "file" : "lib/URI/telnet.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::tn3270" : {
          "file" : "lib/URI/tn3270.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::urn" : {
          "file" : "lib/URI/urn.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::urn::isbn" : {
          "file" : "lib/URI/urn/isbn.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       },
       "URI::urn::oid" : {
          "file" : "lib/URI/urn/oid.pm",
-         "version" : "5.31"
+         "version" : "5.32"
       }
    },
    "release_status" : "stable",
@@ -321,10 +325,10 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "5.31",
+   "version" : "5.32",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.034000"
+         "version" : "5.040000"
       },
       "plugins" : [
          {
@@ -382,7 +386,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -413,7 +417,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -421,7 +425,7 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.037"
+            "version" : "0.038"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -514,7 +518,7 @@
                }
             },
             "name" : "Test::Portability",
-            "version" : "2.001001"
+            "version" : "2.001003"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaTests",
@@ -529,7 +533,7 @@
                }
             },
             "name" : "Test::MinimumVersion",
-            "version" : "2.000010"
+            "version" : "2.000011"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -570,6 +574,7 @@
                      "Tatsuhiko",
                      "UDP",
                      "UNC",
+                     "authdomain",
                      "cryptographic",
                      "etype",
                      "evalue",
@@ -577,6 +582,7 @@
                      "lon",
                      "lowercasing",
                      "relativize",
+                     "sharename",
                      "totp",
                      "unicode",
                      "uppercasing",
@@ -586,7 +592,7 @@
                }
             },
             "name" : "Test::PodSpelling",
-            "version" : "2.007005"
+            "version" : "2.007006"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -605,7 +611,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
@@ -616,7 +622,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
@@ -627,7 +633,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
@@ -684,7 +690,7 @@
             "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -727,7 +733,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -744,12 +750,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.31",
+                  "tag" : "v5.32",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -799,7 +805,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -819,7 +825,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
@@ -899,8 +905,8 @@
       "Gisle Aas <gisle@aas.no>",
       "Karen Etheridge <ether@cpan.org>",
       "Olaf Alders <olaf@wundersolutions.com>",
-      "Chase Whitener <capoeirab@cpan.org>",
       "Julien Fiegehenn <simbabque@cpan.org>",
+      "Chase Whitener <capoeirab@cpan.org>",
       "Ville Skytt\u00e4 <ville.skytta@iki.fi>",
       "Brendan Byrd <Perl@ResonatorSoft.org>",
       "David Dick <ddick@cpan.org>",
@@ -924,6 +930,7 @@
       "Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>",
       "gregor herrmann <gregoa@debian.org>",
       "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
+      "I. M. Bur <dev@lty.cz>",
       "Jan Dubois <jand@activestate.com>",
       "Joenio Costa <joenio@colivre.coop.br>",
       "John Karr <brainbuz@brainbuz.org>",
@@ -931,6 +938,7 @@
       "Kaitlyn Parkhurst <symkat@symkat.com>",
       "Kenichi Ishigaki <ishigaki@cpan.org>",
       "Kent Fredric <kentfredric@gmail.com>",
+      "Lester Hightower <lester.hightower@gmail.com>",
       "Masahiro Honma <hiratara@cpan.org>",
       "Matt Lawrence <matthewlawrence@venda.com>",
       "Peter Rabbitson <ribasushi@cpan.org>",
@@ -941,8 +949,8 @@
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Torsten F\u00f6rtsch <torsten.foertsch@gmx.net>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

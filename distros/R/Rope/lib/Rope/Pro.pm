@@ -1,5 +1,6 @@
 package Rope::Pro;
 
+use strict; use warnings;
 my (%PRO);
 
 BEGIN {
@@ -7,6 +8,7 @@ BEGIN {
 		keyword => sub {
 			my ($caller, $method, $cb) = @_;
 			no strict 'refs';
+			no warnings 'redefine';
 			*{"${caller}::${method}"} = $cb;
 		}
 	);

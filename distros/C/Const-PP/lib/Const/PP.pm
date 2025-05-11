@@ -5,7 +5,7 @@ use strict;
 use warnings;
 no warnings 'recursion';
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 use Scalar::Util qw/reftype/;
 
@@ -22,23 +22,16 @@ our %EX = (
 our $RECURSION_LIMIT = 10000;
 
 sub _make_readonly {
-	my (undef, $recurse) = @_;
-
-	$recurse++;
-	if ($recurse > $RECURSION_LIMIT) {
-		die "Bailing on making the readonly variable, Looks like you are in deep recursion";
-	}
 
         if (my $type = reftype $_[0] and not &Internals::SvREADONLY($_[0])) {
-                if ($type eq 'ARRAY') {
-                        _make_readonly($_, $recurse) for @{ $_[0] };
+               	&Internals::SvREADONLY($_[0], 1);
+	        if ($type eq 'ARRAY') {
+                        _make_readonly($_) for @{ $_[0] };
                 }
                 elsif ($type eq 'HASH') {
                         &Internals::hv_clear_placeholders($_[0]);
-                        _make_readonly($_, $recurse) for values %{ $_[0] };
+                        _make_readonly($_) for values %{ $_[0] };
                 }
-
-               	&Internals::SvREADONLY($_[0], 1);
         }
 
         Internals::SvREADONLY($_[0], 1);
@@ -47,43 +40,23 @@ sub _make_readonly {
 }
 
 sub _make_readwrite {
-	my (undef, $recurse) = @_;
-
-	$recurse++;
-	if ($recurse > $RECURSION_LIMIT) {
-		die "Bailing on making the variable writeable, Looks like you are in deep recursion";
-	}
-
-        if (my $type = reftype $_[0]) {
+        if (my $type = reftype $_[0] and &Internals::SvREADONLY($_[0])) {
                	&Internals::SvREADONLY($_[0], 0);
 	        if ($type eq 'ARRAY') {
-                        _make_readwrite($_, $recurse) for @{ $_[0] };
+                        _make_readwrite($_) for @{ $_[0] };
                 }
                 elsif ($type eq 'HASH') {
                         &Internals::hv_clear_placeholders($_[0]);
-                        _make_readwrite($_, $recurse) for values %{ $_[0] };
+                        _make_readwrite($_) for values %{ $_[0] };
                 }
+
         }
         Internals::SvREADONLY($_[0], 0);
-
-        return;
 }
 
 sub _is_readonly {
-	my (undef, $recurse) = @_;
-
-	$recurse++;
-	if ($recurse > $RECURSION_LIMIT) {
-		die "Bailing on checking whether the variable is readonly, Looks like you are in deep recursion";
-	}
-
         if (my $type = reftype $_[0]) {
-		if ($type eq 'ARRAY') {
-			_is_readonly($_, $recurse) or return 0 for @{ $_[0] };
-			return &Internals::SvREADONLY($_[0]) ? 1 : 0;
-		}
-                elsif ($type eq 'HASH') {
-		      	_is_readonly($_, $recurse) or return 0 for values %{ $_[0] };
+		if ($type eq 'HASH' || $type eq 'ARRAY') {
 			return &Internals::SvREADONLY($_[0]) ? 1 : 0;
 		}
 	}
@@ -115,7 +88,7 @@ sub const (\[$@%]@) {
 		}
         }
 
-        _make_readonly($_[0], 0);
+        _make_readonly($_[0]);
 
         return $_[0];
 }
@@ -123,24 +96,24 @@ sub const (\[$@%]@) {
 sub make_readonly (\[$@%]@) {
 	my $ref= reftype($_[0]) || "";
 	if ( $ref eq 'HASH' || $ref eq 'ARRAY' ) {
-		_make_readonly($_[0], 0);
+		_make_readonly($_[0]);
 	} else {
-		_make_readonly(${$_[0]}, 0);
+		_make_readonly(${$_[0]});
 	}
 	$_[0];
 }
 
 sub make_readonly_ref {
-	_make_readonly($_[0], 0);
+	_make_readonly($_[0]);
 	return $_[0];
 }
 
 sub unmake_readonly (\[$@%]@)  {
 	my $ref= reftype($_[0]) || "";
 	if ( $ref eq 'HASH' || $ref eq 'ARRAY' ) {
-		_make_readwrite($_[0], 0);
+		_make_readwrite($_[0]);
 	} else {
-		_make_readwrite(${$_[0]}, 0);
+		_make_readwrite(${$_[0]});
 	}
 	$_[0];
 }
@@ -148,9 +121,9 @@ sub unmake_readonly (\[$@%]@)  {
 sub is_readonly (\[$@%]@) {
 	my $ref= reftype($_[0]) || "";
 	if ($ref eq 'HASH' || $ref eq 'ARRAY' ) {
-		return _is_readonly($_[0], 0);
+		return _is_readonly($_[0]);
 	} else {
-		return _is_readonly(${$_[0]}, 0);
+		return _is_readonly(${$_[0]});
 	}
 }
 
@@ -164,37 +137,9 @@ Const::PP - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
-
-	package MyApp::Constants;
-
-	use Const::PP qw/const/;
-
-	use base 'Import::Export';
-
-	our %EX = (
-		'$SCALAR' => [qw/all/],
-		'@ARRAY' => [qw/all/],
-		'%HASH' => [qw/all/],
-	);
-
-	const our $SCALAR => 'Hello World';
-	const our @ARRAY => qw/welcome to paradise/;
-	const our %HASH => ( one => 1, two => [ ... ], three => { ... }, four => sub { } );
-
-	1;
-
-...
-
-	package MyApp::Controller::Logic;
-
-	use MyApp::Constants qw/$SCALAR @ARRAY %HASH/;
-
-	...
-
-	1;
 
 =head1 DESCRIPTION
 

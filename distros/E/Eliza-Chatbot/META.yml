@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.143240'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 provides:
   Eliza::Chatbot:
     file: lib/Eliza/Chatbot.pm
-    version: '0.11'
+    version: '0.12'
   Eliza::Chatbot::Brain:
     file: lib/Eliza/Chatbot/Brain.pm
   Eliza::Chatbot::Option:
@@ -30,6 +30,7 @@ provides:
   Eliza::Chatbot::ScriptParser:
     file: lib/Eliza/Chatbot/ScriptParser.pm
 requires:
+  Const::XS: '1.00'
   Moo: '1.0010001'
   MooX::LazierAttributes: '0.07'
   Ref::Util: '0.002'
@@ -38,5 +39,4 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Eliza-Chatbot.git
-version: '0.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.12'

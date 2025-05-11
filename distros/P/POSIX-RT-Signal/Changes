@@ -1,5 +1,9 @@
           Revision history for POSIX-RT-Signal
 
+0.019     2025-05-10 16:59:14+02:00 Europe/Brussels
+          - Allow sigqueue to thread
+          - Adapt to new T_OPAQUEOBJ output map
+
 0.018     2025-02-04 04:34:38+01:00 Europe/Brussels
           - Use Signal::Info objects in sigwaitinfo/sigtimedinfo
           - Simplify error handling in sigwaitinfo/sigtimedwait

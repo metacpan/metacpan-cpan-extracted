@@ -1,4 +1,4 @@
-package FU::Util 0.5;
+package FU::Util 1.0;
 
 use v5.36;
 use FU::XS;
@@ -20,7 +20,7 @@ our @EXPORT_OK = qw/
 sub utf8_decode :prototype($) {
     return if !defined $_[0];
     confess 'Invalid UTF-8' if !utf8::decode($_[0]);
-    confess 'Invalid control character' if $_[0] =~ /[\x00-\x08\x0b\x0c\x0e-\x1f]/;
+    confess 'Invalid control character' if $_[0] =~ /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/;
     $_[0]
 }
 
@@ -41,6 +41,7 @@ sub uri_unescape :prototype($) ($s) {
 sub query_decode :prototype($) ($s) {
     my %o;
     for (split /&/, $s//'') {
+        next if !length;
         my($k,$v) = map uri_unescape($_), split /=/, $_, 2;
         $v //= builtin::true;
         if (ref $o{$k}) { push $o{$k}->@*, $v }
@@ -96,11 +97,6 @@ __END__
 =head1 NAME
 
 FU::Util - Miscellaneous Utility Functions
-
-=head1 EXPERIMENTAL
-
-This module is still in development and there will likely be a few breaking API
-changes, see the main L<FU> module for details.
 
 =head1 SYNOPSIS
 

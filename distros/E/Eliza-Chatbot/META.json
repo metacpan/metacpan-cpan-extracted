@@ -4,13 +4,13 @@
       "Robert Acock <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Eliza-Chatbot",
    "no_index" : {
@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Const::XS" : "1.00",
             "Moo" : "1.0010001",
             "MooX::LazierAttributes" : "0.07",
             "Ref::Util" : "0.002",
@@ -46,7 +47,7 @@
    "provides" : {
       "Eliza::Chatbot" : {
          "file" : "lib/Eliza/Chatbot.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Eliza::Chatbot::Brain" : {
          "file" : "lib/Eliza/Chatbot/Brain.pm"
@@ -66,6 +67,5 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Eliza-Chatbot"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.12"
 }

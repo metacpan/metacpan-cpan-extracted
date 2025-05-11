@@ -3,6 +3,8 @@ package Rope::Object;
 use strict;
 use warnings;
 
+use Const::XS qw/make_readonly_ref/;
+
 sub TIEHASH {
         my ($class, $obj) = @_;
         my $self = bless $obj || {}, $class;
@@ -68,6 +70,10 @@ sub set_value {
 			}
 			die sprintf("Cannot set property (%s) in object (%s) failed type validation on line %s file %s: %s", $key, $self->{name}, $caller[2], $caller[1], $@);
 		}
+	}	
+
+	if ($spec->{readonly}) {
+		$value = make_readonly_ref(ref $value eq 'HASH' ? {%{$value}} : ref $value eq 'ARRAY' ? [@{$value}] : $value);
 	}
 
 	if ($spec->{handles_via}) {
@@ -77,6 +83,7 @@ sub set_value {
 	} else {
 		$spec->{value} = $value;
 	}
+
 	if ($spec->{required} && ! defined $spec->{value}) {
 		die sprintf "Required property (%s) in object (%s) not set", $key, $self->{name};
 	}

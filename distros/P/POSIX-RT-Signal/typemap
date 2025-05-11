@@ -30,19 +30,33 @@ T_SIGSET
 T_SIGNO
 	$var = (SvIOK($arg) || looks_like_number($arg)) && SvIV($arg) ? SvIV($arg) : whichsig(SvPV_nolen($arg));
 T_TIMESPEC
-	{
-	NV input = SvNV($arg);
-	$var.tv_sec  = (time_t) floor(input);
-	$var.tv_nsec = (long) ((input - $var.tv_sec) * 1000000000);
+	if (SvROK($arg) && sv_derived_from($arg, \"Time::Spec\")) {
+		$var = *(struct timespec*)SvPV_nolen(SvRV($arg));
+	} else {
+		NV input = SvNV($arg);
+		$var.tv_sec  = (time_t) floor(input);
+		$var.tv_nsec = (long) ((input - $var.tv_sec) * 1000000000);
 	}
 T_OPAQUEOBJ
     {
 		SV * sv = $arg;
-		if (SvROK(sv) && sv_derived_from(sv, \"$ntype\"))
+		if (SvROK(sv) && SvPOK(SvRV(sv)) && SvCUR(SvRV(sv)) == sizeof(*$var))
 			$var = ($type)SvPV_nolen(SvRV(sv));
 		else
 			croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
     }
+
+T_OPAQUEOBJ_MAYBE
+	{
+		SV * sv = $arg;
+		if (SvOK(sv)) {
+			if (SvROK(sv) && SvPOK(SvRV(sv)) && SvCUR(SvRV(sv)) == sizeof(*$var))
+				$var = ($type)SvPV_nolen(SvRV(sv));
+			else
+				croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
+		} else
+			$var = NULL;
+	}
 
 
 OUTPUT
@@ -50,7 +64,13 @@ T_TIMESPEC
 	sv_setnv($arg, $var.tv_sec + $var.tv_nsec / 1000000000.0);
 T_OPAQUEOBJ
 	{
-		sv_setref_pvn($arg, \"$ntype\", (const char*)$var, sizeof(*$var));
+		sv_usepvn(newSVrv($arg, \"$ntype\"), (char*)$var, sizeof(*$var));
+		SvREADONLY_on(SvRV($arg));
+	}
+
+T_OPAQUEOBJ_MAYBE
+	if (SvOK($var)) {
+		sv_usepvn(newSVrv($arg, \"$ntype\"), (char*)$var, sizeof(*$var));
 		SvREADONLY_on(SvRV($arg));
 	}
 

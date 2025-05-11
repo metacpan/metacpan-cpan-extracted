@@ -463,7 +463,7 @@ static SV *fupg_st_kvv(pTHX_ fupg_st *st) {
         SAVETMPS;
         SV *key = sv_2mortal(fupg_st_getval(aTHX_ st, i, 0));
         if (hv_exists_ent(hv, key, 0)) fu_confess("Key '%s' is duplicated in $st->kvv() query results", SvPV_nolen(key));
-        hv_store_ent(hv, key, st->nfields == 1 ? &PL_sv_yes : fupg_st_getval(aTHX_ st, i, 1), 0);
+        hv_store_ent(hv, key, st->nfields == 1 ? newSV_true() : fupg_st_getval(aTHX_ st, i, 1), 0);
         FREETMPS;
     }
     return sv;

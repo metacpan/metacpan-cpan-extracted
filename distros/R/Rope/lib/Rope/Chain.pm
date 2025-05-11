@@ -1,5 +1,6 @@
 package Rope::Chain;
 
+use strict; use warnings;
 my (%PRO);
 
 use Rope::Pro;
@@ -45,7 +46,7 @@ Rope::Chain - Rope chained properties
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 

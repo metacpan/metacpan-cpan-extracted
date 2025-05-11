@@ -65,6 +65,7 @@ lib/URI/scp.pm
 lib/URI/sftp.pm
 lib/URI/sip.pm
 lib/URI/sips.pm
+lib/URI/smb.pm
 lib/URI/snews.pm
 lib/URI/ssh.pm
 lib/URI/telnet.pm
@@ -128,6 +129,7 @@ t/scheme-exceptions.t
 t/scp.t
 t/sftp.t
 t/sip.t
+t/smb.t
 t/sort-hash-query-form.t
 t/split.t
 t/sq-brackets-legacy.t

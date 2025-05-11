@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.028     2025-05-10 19:51:04Z
+        - now passing the specification_version to the add_resource sub, when
+          documents are in draft-specific subdirectories
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/e524505b8ac4a61c5dc162b51d68c2385a134706...9f256c8811c9c6d181db049d1e69bad35156bf60
+
 1.027     2025-02-02 18:40:55Z
         - fix double json-encoding of schema and data diagnostics
         - fix a test for latest Test2::*

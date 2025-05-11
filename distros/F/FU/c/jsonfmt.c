@@ -244,7 +244,7 @@ static void fujson_fmt(pTHX_ fujson_fmt_ctx *ctx, SV *val) {
         if (isinfnan(nv)) croak("unable to format floating point NaN or Inf as JSON");
         /* XXX: Cpanel::JSON::XS appears to always append a ".0" for round numbers, other modules do not. */
         /* XXX#2: This doesn't support quadmath. Makefile.PL checks for that */
-        fustr_reserve(ctx->out, NV_DIG+1);
+        fustr_reserve(ctx->out, NV_DIG+32);
         Gconvert(nv, NV_DIG, 0, ctx->out->cur);
         ctx->out->cur += strlen(ctx->out->cur);
     } else if (SvIOKp(val)) {

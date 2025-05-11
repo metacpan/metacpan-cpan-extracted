@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.026-9-g3ff6b2c
+package Test::JSON::Schema::Acceptance; # git description: v1.027-5-gbfefa4c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 
 use 5.020;
 use Moo;
@@ -150,6 +150,7 @@ sub acceptance {
       sub ($path, @) {
         return if not $path->is_file or $path !~ /\.json$/;
 
+        # version-specific resources are stored in a subdirectory by version:
         # skip resource files that are marked as being for an unsupported draft
         my $relative_path = $path->relative($self->additional_resources);
         my ($topdir) = split qr{/}, $relative_path, 2;
@@ -158,7 +159,9 @@ sub acceptance {
         my $data = $self->json_deserialize($path->slurp_raw);
         my $file = $path->relative($self->additional_resources);
         my $uri = $base.'/'.$file;
-        $options->{add_resource}->($uri => $data);
+        $options->{add_resource}->($uri => $data,
+          # ensure the evaluator parses this resource using its specified version
+          $topdir =~ /^draft/ ? (specification_version => $topdir) : ());
       },
       { recurse => 1 },
     );
@@ -545,7 +548,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -776,8 +779,25 @@ Exactly one of L</validate_data> or L</validate_json_string> is required.
 =head3 add_resource
 
 Optional. A subroutine reference, which will be called at the start of L</acceptance> multiple
-times, with two arguments: a URI (string), and a data structure containing schema data to be
-associated with that URI, for use in some tests that use additional resources (see above). If you do
+times, with the arguments:
+
+=over 4
+
+=item *
+
+a URI (string): the canonical uri to use for the new resource
+
+=item *
+
+a data structure containing schema data to be associated with that URI, for use in some tests that use additional resources (see above).
+
+=item *
+
+a list of key-value pairs (optional), containing additional options to be passed to the subroutine: keys currently limited to C<specification_version>.
+
+=back
+
+If you do
 not provide this option, you will be responsible for ensuring that those additional resources are
 made available to your implementation for the successful execution of the tests that rely on them.
 
@@ -898,6 +918,6 @@ distribution have specific expectations as to the contents of this test data dep
 If it is desired to use a different dataset at runtime, please refer to the L</test_dir>
 configuration option.
 
-=for Pod::Coverage BUILDARGS BUILD json_decoder
+=for Pod::Coverage BUILDARGS BUILD json_decoder METASCHEMA
 
 =cut

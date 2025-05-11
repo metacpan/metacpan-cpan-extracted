@@ -1,4 +1,4 @@
-package FU::Validate 0.5;
+package FU::Validate 1.0;
 
 use v5.36;
 use experimental 'builtin', 'for_list';
@@ -395,32 +395,47 @@ sub empty($c) {
 
 
 
+sub _fmtkey($k) { $k =~ /^[a-zA-Z0-9_-]+$/ ? $k : FU::Util::json_format($k); }
+sub _fmtval($v) { eval { $v = FU::Util::json_format($v) }; "$v" }
+sub _inval($t,$v) { sprintf 'invalid %s: %s', $t, _fmtval $v }
+
+# validation name => formatting sub
+# TODO: document.
+our %error_format = (
+    required  => sub { 'required value missing' },
+    type      => sub($e) { "invalid type, expected '$e->{expected}' but got '$e->{got}'" },
+    unknown   => sub($e) { sprintf 'unknown key%s: %s', $e->{keys}->@* == 1 ? '' : 's', join ', ', map _fmtkey($_), $e->{keys}->@* },
+    minlength => sub($e) { sprintf "input too short, expected minimum of %d but got %d", $e->{expected}, $e->{got} },
+    maxlength => sub($e) { sprintf "input too long, expected maximum of %d but got %d", $e->{expected}, $e->{got} },
+    length    => sub($e) {
+        !ref $e->{expected}
+        ? sprintf 'invalid input length, expected %d but got %d', $e->{expected}, $e->{got}
+        : sprintf 'invalid input length, expected between %d and %d but got %d', $e->{expected}->@*, $e->{got}
+    },
+    num       => sub($e) { _inval 'number', $e->{got} },
+    min       => sub($e) { $e->{error} ? _inval 'number', $e->{error}{got} : sprintf 'expected minimum %s but got %s', $e->{expected}, $e->{got} },
+    max       => sub($e) { $e->{error} ? _inval 'number', $e->{error}{got} : sprintf 'expected maximum %s but got %s', $e->{expected}, $e->{got} },
+    range     => sub($e) { FU::Validate::err::errors($e->{error}) },
+);
+
+
 package FU::Validate::err;
 use v5.36;
-use FU::Util;
 
 use overload '""' => sub { $_[0]{longmess} || join "\n", $_[0]->errors };
 
-sub _fmtkey($k) {
-    $k =~ /^[a-zA-Z0-9_-]+$/ ? $k : FU::Util::json_format($k);
-}
-
-sub _fmtval($v) {
-    eval { $v = FU::Util::json_format($v) }; "$v"
-}
-
+# TODO: document.
 sub errors($e, $prefix='') {
     my $val = $e->{validation};
     my $p = $prefix ? "$prefix: " : '';
-    $val eq 'keys'     ? map errors($_, $prefix.'.'._fmtkey($_->{key})), $e->{errors}->@* :
-    $val eq 'values'   ? map errors($_, $prefix.'.'._fmtkey($_->{key})), $e->{errors}->@* :
-    $val eq 'missing'  ? $prefix.'.'._fmtkey($e->{key}).': required key missing' :
+    $FU::Validate::error_format{$val} ? map "$p$_", $FU::Validate::error_format{$val}->($e) :
+    $val eq 'keys'     ? map errors($_, $prefix.'.'.FU::Validate::_fmtkey($_->{key})), $e->{errors}->@* :
+    $val eq 'values'   ? map errors($_, $prefix.'.'.FU::Validate::_fmtkey($_->{key})), $e->{errors}->@* :
+    $val eq 'missing'  ? $prefix.'.'.FU::Validate::_fmtkey($e->{key}).': required key missing' :
     $val eq 'elems'    ? map errors($_, $prefix."[$_->{index}]"), $e->{errors}->@* :
-    $val eq 'unique'   ? $prefix."[$e->{index_b}] value '"._fmtval($e->{value_a})."' duplicated" :
-    $val eq 'required' ? "${p}required value missing" :
-    $val eq 'type'     ? "${p}invalid type, expected '$e->{expected}' but got '$e->{got}'" :
-    $val eq 'unknown'  ? ($e->{keys}->@* > 1 ? "${p}unknown keys: ".join(', ', _fmtkey($e->{keys})) : "${p}unknown key '"._fmtkey($e->{keys}[0])."'") :
+    $val eq 'unique'   ? $prefix."[$e->{index_b}] value '".FU::Validate::_fmtval($e->{value_a})."' duplicated" :
     $e->{error}        ? errors($e->{error}, "${p}validation '$val'") :
+    $e->{message}      ? "${p}validation '$val': $e->{message}" :
                          "${p}failed validation '$val'";
 }
 
@@ -431,11 +446,6 @@ __END__
 =head1 NAME
 
 FU::Validate - Data and form validation and normalization
-
-=head1 EXPERIMENTAL
-
-This module is still in development and there will likely be a few breaking API
-changes, see the main L<FU> module for details.
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,6 @@
 package Rope::Type;
 
+use strict; use warnings;
 use Types::Standard;
 use Rope::Pro;
 my (%PRO);
@@ -25,7 +26,8 @@ sub import {
 
 	@types = keys %{$PRO{type_map}} unless scalar @types;
 
-	for (@types) { 
+	for (@types) {
+		no strict 'refs'; 
 		my $type = &{"Types::Standard::$PRO{type_map}{$_}"};
 		$PRO{keyword}($caller, $_, sub {
 			my (@params) = @_;
@@ -58,7 +60,7 @@ Rope::Type - Rope with Type::Tiny
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 

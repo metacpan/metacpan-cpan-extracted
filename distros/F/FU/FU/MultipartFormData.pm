@@ -1,9 +1,9 @@
-package FU::MultipartFormData 0.5;
+package FU::MultipartFormData 1.0;
 use v5.36;
 use Carp 'confess';
 use FU::Util 'utf8_decode';
 
-sub _arg($d) { $d =~ s/^\s+//r =~ s/\s+$//r =~ s/^"(.+)"$/$1/r }
+sub _arg($d) { $d =~ s{^"(.+)"$}{$1 =~ s/\\([\\"])/$1/rg}er }
 
 sub parse($pkg, $header, $data) {
     confess "Invalid multipart header '$header'"
@@ -26,13 +26,14 @@ sub parse($pkg, $header, $data) {
             start => pos $data,
         }, $pkg;
 
-        confess "Missing content-disposition header" if $hdrs !~ /content-disposition:\s*form-data;(.+)/i;
+        confess "Missing content-disposition header" if $hdrs !~ /content-disposition:\s*form-data(.+)/i;
         my $v = $1;
-        confess "Missing 'name' parameter" if $v !~ /[;\s]name=([^[;\s]+)/;
+        my $pvalue = qr/("(?:\\[\\"]|[^\\"\r\n]+)*"|[^\s;"]*)/;
+        confess "Missing 'name' parameter" if $v !~ /;\s*name\s*=\s*$pvalue/;
         $d->{name} = utf8_decode _arg $1;
-        $d->{filename} = utf8_decode _arg $1 if $v =~ /[;\s]filename=([^;\s]+)/;
+        $d->{filename} = utf8_decode _arg $1 if $v =~ /;\s*filename\s*=\s*$pvalue/;
 
-        if ($hdrs =~ /content-type:\s*([^;\s]+)(?:\s*;\s*charset=([^;\s]+))?/i) {
+        if ($hdrs =~ /content-type:\s*$pvalue(?:\s*;\s*charset\s*=\s*$pvalue)?/i) {
             $d->{mime} = utf8_decode _arg $1;
             $d->{charset} = utf8_decode _arg $2 if $2;
         }

@@ -96,10 +96,15 @@ subtest 'custom types', sub {
         );
     _
 
-    is_deeply $txn->q(q{SELECT '{"(\"(2,{},bb)\",)","(\"(,,)\",bb)"}'::fupg_test_table[]})->val, [
+    $val = $txn->q(q{SELECT '{"(\"(2,{},bb)\",)","(\"(,,)\",bb)"}'::fupg_test_table[]})->val;
+    is_deeply $val, [
         { rec => { a => 2, aenum => [], domain => 'bb' }, dom => undef },
         { rec => { a => undef, aenum => undef, domain => undef }, dom => 'bb' },
     ];
+    $val->[0] = 0;
+    $val->[1]{rec}{a} = 0;
+    $val->[1]{rec} = 0;
+    $val->[1]{dom} = 0;
 
     is $txn->q('SELECT $1::fupg_test_table[]', [
         { rec => { a => 2, aenum => [], domain => 'bb' }, dom => undef },

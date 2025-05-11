@@ -197,6 +197,7 @@ subtest '$st->kvv', sub {
     is_deeply $conn->q('SELECT 1 WHERE false')->kvv, {};
     is_deeply $conn->q('SELECT 1')->kvv, {1=>1};
     is_deeply $conn->q('SELECT 1, null UNION ALL SELECT 3, 2')->kvv, {1=>undef,3=>2};
+    $conn->q('SELECT 1')->kvv->{1} = 0;
 };
 
 subtest '$st->kva', sub {

@@ -1,5 +1,7 @@
 package Rope::Conditional;
 
+use strict; use warnings;
+
 my (%PRO);
 
 use Rope::Pro;
@@ -46,7 +48,7 @@ Rope::Conditional - Rope conditional properties
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 

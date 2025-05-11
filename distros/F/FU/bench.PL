@@ -25,7 +25,10 @@ my %modules = map +($_, eval "require $_; \$${_}::VERSION"), qw/
     TUWF::XML
     HTML::Tiny
     XML::Writer
+    DBD::Pg
+    Pg::PQ
 /;
+use FU::Pg;
 
 my %data; # "id x y" => { id x y rate exists }
 my %oldmodules;
@@ -196,6 +199,32 @@ def 'xml/a', 'HTML fragment', [ 'Rate' ],
 
 
 
+{
+    die "FU_TEST_DB not set.\n" if !$ENV{FU_TEST_DB};
+    my $pq = Pg::PQ::Conn->new($ENV{FU_TEST_DB});
+    my $fu = FU::Pg->connect($ENV{FU_TEST_DB});
+    # XXX: Doesn't support all connection params this way
+    my $dbi = DBI->connect("dbi:Pg:dbname=".$pq->db, $pq->user, $pq->pass, {RaiseError => 1, PrintError => 0});
+
+    my $small = 'SELECT x, x+1, x+2, x+3, x+4, x+5, x+6, x+7, x+8, x+9 FROM generate_series(-10000::smallint, 9999, 10) x(x)';
+    my $big = 'SELECT x<<5, x<<10, x<<15, x<<20, x<<25, x<<30, x<<35, x<<40, x<<45, x<<50 FROM generate_series(1::bigint, 20000, 1) x(x)';
+
+    my sub dbi { my $sum = 0; my $st = $dbi->prepare_cached($_[0]); for my $row ($dbi->selectall_arrayref($st)->@*) { $sum ^= $_ for @$row; } }
+    my sub pq  { my $sum = 0; $pq->prepare('' => $_[0]); for my $row ($pq->execQueryPrepared('')->rows) { $sum ^= $_ for @$row; } }
+    my sub fub { my $sum = 0; for my $row ($fu->q($_[0])->alla->@*) { $sum ^= $_ for @$row; } }
+    my sub fut { my $sum = 0; for my $row ($fu->q($_[0])->text->alla->@*) { $sum ^= $_ for @$row; } }
+
+    def 'pg/ints', 'Fetch and bitwise-or 20k integers', [ 'Smallint', 'Bigint' ],
+        [ 'DBD::Pg', undef, sub { dbi($small) }, sub { dbi($big) } ],
+        [ 'Pg::PQ', undef, sub { pq($small) }, sub { pq($big) } ],
+        [ 'FU::Pg (bin)', 'FU', sub { fub($small) }, sub { fub($big) } ],
+        [ 'FU::Pg (text)', 'FU', sub { fut($small) }, sub { fut($big) } ];
+}
+
+
+
+
+
 delete @data{ grep !$data{$_}{exists}, keys %data };
 
 sub fmtbench($id, $text, $xs, $ys) {
@@ -276,14 +305,26 @@ These benchmarks run on large-ish arrays with repeated values. JSON encoding is
 sufficiently fast that Perl function calling overhead tends to dominate for
 smaller inputs, but I don't find that overhead very interesting.
 
-Also worth noting that JSON::SIMD formatting code is forked from JSON::XS, the
-SIMD parts are only used for parsing.
+Also worth noting that L<JSON::SIMD> formatting code is forked from
+L<JSON::XS>, the SIMD parts are only used for parsing.
 
 :benches ^json
 
 %head2 XML Writing
 
+L<FU::XMLWriter> is the only XS-based XML DSL that I'm aware of, so all direct
+competition is inherently slower by virtue of being pure perl. I'm sure some
+templating modules will perform better, though.
+
 :benches ^xml
+
+%head2 PostgreSQL client
+
+Fetching query results is highly unlikely to be a bottleneck in your code, this
+benchmark is mainly here to verify that L<FU::Pg> is not introducing a
+bottleneck where there shouldn't be one.
+
+:benches ^pg
 
 %cut
 

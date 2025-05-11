@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '1.00';
 
 require XSLoader;
 XSLoader::load("Const::XS", $VERSION);
@@ -20,7 +20,6 @@ our %EX = (
 	is_readonly => [qw/all/],
 );
 
-
 1;
 
 __END__
@@ -31,7 +30,7 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 0.28
+Version 1.00
 
 =cut
 
@@ -69,7 +68,7 @@ Version 0.28
 
 =head1 DESCRIPTION
 
-The Const::XS module facilitates the creation of high-performance read-only variables in Perl. It’s implemented in XS/C and delivers a 4x+ performance improvement compared to L<Const::PP>, a pure Perl version of this module that maintains full backward compatibility.
+The Const::XS module facilitates the creation of high-performance read-only variables in Perl. It's implemented in XS/C and delivers a 4x+ performance improvement compared to L<Const::PP>, a pure Perl version of this module that maintains full backward compatibility.
 
 =head1 EXPORTS
 
@@ -121,7 +120,7 @@ The fourth function exported by this module is unmake_readonly. It will take a p
 
 =head2 is_readonly
 
-The fifth function exported by this module is is_readonly. It will deeply check a variable to see if it is readonly.
+The fifth function exported by this module is is_readonly. It can be used to validate if a variable is readonly.
 
 	my %hash = ( one => "abc" );
 	is_readonly(%hash); # 0;
@@ -209,7 +208,6 @@ The fifth function exported by this module is is_readonly. It will deeply check 
 	Const::PP    254194/s         77%         15%          --        -80%
 	XS          1275510/s        787%        475%        402%          --
 	
-
 
 =head2 SEE ALSO
 

@@ -2,8 +2,6 @@
 #include "EXTERN.h"         // globals/constant import locations
 #include "perl.h"           // Perl symbols, structures and constants definition
 #include "XSUB.h"           // xsubpp functions and macros
-#include <stdlib.h>         // rand()
-#include <string.h>
 
 MODULE = Number::Iterator::XS  PACKAGE = Number::Iterator::XS
 PROTOTYPES: ENABLE
@@ -14,9 +12,11 @@ new(...)
         CODE:
                 HV * hash = newHV();;
                 SV * class = newSVsv(ST(0));
-		for (int i = 1; i < items; i += 2) {
-			char * key = SvPV_nolen(ST(i));
-			*hv_store(hash, key, strlen(key), newSVsv(ST(i + 1)), 0);
+		int i = 1;
+		for (i = 1; i < items; i += 2) {
+			STRLEN retlen;
+			char * key = SvPV(ST(i), retlen);
+			*hv_store(hash, key, retlen, newSVsv(ST(i + 1)), 0);
 		}
 		if (SvTYPE(class) != SVt_PV) {
 			char * name = HvNAME(SvSTASH(SvRV(class)));

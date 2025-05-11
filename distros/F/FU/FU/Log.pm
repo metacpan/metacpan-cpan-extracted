@@ -1,4 +1,4 @@
-package FU::Log 0.5;
+package FU::Log 1.0;
 use v5.36;
 use Exporter 'import';
 use POSIX 'strftime';
@@ -64,11 +64,6 @@ __END__
 =head1 NAME
 
 FU::Log - Extremely Basic Process-Wide Logging Infrastructure
-
-=head1 EXPERIMENTAL
-
-This module is still in development and there will likely be a few breaking API
-changes, see the main L<FU> module for details.
 
 =head1 SYNOPSIS
 

@@ -193,6 +193,7 @@ SV * exp (self, num, ...)
 SV * equation (self, ...)
 	SV * self
 	CODE:
+		STRLEN retlen;
 		AV * s = (AV*)SvRV(self);
 		char query[4321] = "";
 		int closing = 0;
@@ -203,10 +204,11 @@ SV * equation (self, ...)
 			for (int x = 0; x < el / 2; x++) {
 				strcat(query, "(");
 			}
-			strcat(query, SvPV_nolen(*av_fetch(equation, 0, 0)));
+			strcat(query, SvPV(*av_fetch(equation, 0, 0), retlen));
 			for (int x = 1; x <= el - 1; x++) {
-				char * operator = SvPV_nolen(*av_fetch(equation, x++, 0));
-				char * val = x <= el - 1 ? SvPV_nolen(*av_fetch(equation, x, 0)) : "";
+				char * operator = SvPV(*av_fetch(equation, x, 0), retlen);
+				x++;
+				char * val = x <= el - 1 ? SvPV(*av_fetch(equation, x, 0), retlen) : "";
 				strcat(query, " ");
 				strcat(query, operator);
 				strcat(query, " ");
@@ -231,8 +233,7 @@ SV * equation (self, ...)
 
 		double p = precise(SvNV(*av_fetch(s, 0, 0)));
 		SV * fun = newSVnv(p);	
-
-		strcat(query, SvPV_nolen(fun));
+		strcat(query, SvPV(fun, retlen));
 
 		RETVAL = newSVpv(query, strlen(query));
 	OUTPUT:

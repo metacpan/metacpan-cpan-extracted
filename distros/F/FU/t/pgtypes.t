@@ -19,12 +19,17 @@ sub v($type, $p_in, @args) {
     my $s_out = @args > 2 && defined $args[2] ? $args[2] : $s_in;
 
     my $test = "$type $s_in" =~ s/\n/\\n/rg;
+    my $oid;
     utf8::encode($test);
     {
-        my $res = $conn->q("SELECT \$1::$type", $s_in)->text_params->val;
+        my $st = $conn->q("SELECT \$1::$type", $s_in)->text_params;
+        $oid = $st->param_types->[0];
+        my $array = $st->flat;
+        my $res = $array->[0];
         ok is_bool($res), "$test is bool" if $type eq 'bool';
         ok created_as_number($res), "$test is number" if $type =~ /^(int|float)\d/;
         is_deeply $res, $p_out, "$test text->bin";
+        $array->[0] = 0; # Must be writable
     }
     {
         my $res = $conn->q("SELECT \$1::$type", $p_in)->text_results->val;
@@ -34,6 +39,15 @@ sub v($type, $p_in, @args) {
         my $res = $conn->q("SELECT \$1::$type", $p_in)->val;
         is_deeply $res, $p_out, "$test bin->bin";
     }
+    {
+        my $bin = $conn->perl2bin($oid, $p_in);
+        ok defined $bin;
+        if ($type !~ /\(/) {
+            is_deeply $conn->bin2perl($oid, $bin), $p_out;
+            is $conn->bin2text($oid, $bin), $s_out;
+            is $conn->text2bin($oid, $s_out), $bin if $type ne 'jsonb'; # jsonb pretty-prints for some reason
+        }
+    }
 }
 sub f($type, $p_in) {
     my $test = "$type $p_in" =~ s/\n/\\n/rg;
@@ -41,7 +55,11 @@ sub f($type, $p_in) {
     ok !eval { $conn->q("SELECT \$1::$type", $p_in)->val; 1 }, "$test fail";
 }
 
-ok !defined $conn->q('SELECT pg_sleep(0)')->val; # void
+{ # void
+    my $array = $conn->q('SELECT pg_sleep(0)')->flat;
+    ok !defined $array->[0];
+    $array->[0] = 0;
+}
 
 v bool => true,  undef, 1, 't';
 v bool => false, undef, 0, 'f';
@@ -165,5 +183,24 @@ is_deeply $conn->q("SELECT '[1:1][-2:-1][3:5]={{{1,2,3},{4,5,6}}}'::int[]")->val
 is $conn->q('SELECT ($1::int2[])[2]', [1,2,3,4])->val, 2;
 is $conn->q('SELECT ($1::int2vector)[1]', [1,2,3,4])->val, 2;
 is $conn->q('SELECT ($1::oidvector)[1]', [1,2,3,4])->val, 2;
+
+is_deeply [$conn->bin2text(
+    16, $conn->perl2bin(16, 1),
+    25, 'Hello',
+    1007, $conn->perl2bin(1007, [-3,1,undef])
+)], ['t', 'Hello', '{-3,1,NULL}'];
+
+{
+    my($b,$s,$a) = $conn->text2bin(16, 't', 25, 'Hello', 1007, '{-3,1,NULL}');
+    is $conn->bin2perl(16, $b), 1;
+    is $conn->bin2perl(25, $s), 'Hello';
+    is_deeply $conn->bin2perl(1007, $a), [-3,1,undef];
+}
+
+{
+    my $v = $conn->q("SELECT '{t,f,NULL}'::bool[]")->val;
+    is_deeply $v, [true, false, undef];
+    $_ = 0 for @$v;
+}
 
 done_testing;

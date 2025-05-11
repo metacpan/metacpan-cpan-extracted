@@ -1,3 +1,22 @@
+1.0 - 2025-05-11
+	- FU::Util: Fix parsing of empty sections in query_decode()
+	- FU::Util: Fix buffer overflow in json_format() float formatting
+	- FU::Util: Reject `0x1f` in utf8_decode()
+	- FU::Pg: Add perl<->text and bin<->text type conversion methods
+	- FU::Validate: Improved error messages
+	- FU::MultipartFormData: Various parser fixes
+	- FU: Include request body in verbose error logs
+	- FU: Add fu->log_verbose()
+	- FU: Extend debug_info pages with request body, response body, 'fu'
+	  object dump, expandable query parameters and interpolated SQL queries
+	- FU: Improve styling of debug_info pages
+	- FU: Preserve headers on fu->redirect
+	- FU: Ignore HTTP_CONTENT_LENGTH and HTTP_CONTENT_TYPE FastCGI parameters
+	- FU: Suppress warning about missing files in FU::monitor_path
+	- FU: Reject hash character and newlines in request path
+	- Fix creating read-only undef/true/false in json_parse() and FU::Pg
+	- Benchmark updates
+
 0.5 - 2025-04-24
 	- FU::Util: Set O_CLOEXEC on fds received through `fdpass_recv()`
 	- FU::Util: Fix interpretation of false options in `json_format()` and

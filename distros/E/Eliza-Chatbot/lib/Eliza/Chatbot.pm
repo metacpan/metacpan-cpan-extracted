@@ -7,10 +7,10 @@ use Moo;
 use MooX::LazierAttributes;
 use Eliza::Chatbot::Option;
 use Eliza::Chatbot::Brain;
+use Const::XS qw/const/;
+our $VERSION = '0.12';
 
-our $VERSION = '0.11';
-
-our @user_options = qw(name script_file debug prompts_on memory_on);
+const our @user_options => qw(name script_file debug prompts_on memory_on);
 
 attributes (
     [@user_options] => [rw],
@@ -104,7 +104,7 @@ Eliza::Chatbot - Eliza chatbot
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package POSIX::RT::Signal;
-$POSIX::RT::Signal::VERSION = '0.018';
+$POSIX::RT::Signal::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -47,7 +47,7 @@ POSIX::RT::Signal - POSIX Real-time signal handling functions
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ This module exposes several advanced features and interfaces of POSIX real-time 
 
 =head2 sigqueue($pid, $sig, $value = 0)
 
-Queue a signal $sig to process C<$pid>, optionally with the additional argument C<$value>. On error an exception is thrown. C<$sig> must be either a signal number(C<14>) or a signal name (C<'ALRM'>). If the signal queue is full, it returns undef and sets C<$!> to EAGAIN.
+Queue a signal $sig to process C<$pid> (or the thread if passed a thread handle), optionally with the additional argument C<$value>. On error an exception is thrown. C<$sig> must be either a signal number(C<14>) or a signal name (C<'ALRM'>). If the signal queue is full, it returns undef and sets C<$!> to EAGAIN.
 
 =head2 sigwaitinfo($signals)
 

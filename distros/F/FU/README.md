@@ -7,10 +7,6 @@ collection of handy utility modules.
 
 *Contributing:* Refer to my [contribution guidelines](https://dev.yorhel.nl/contributing).
 
-## Project Status
-
-**EXPERIMENTAL**; expect breaking changes.
-
 ## Build & Install
 
 ```sh

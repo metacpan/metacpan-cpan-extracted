@@ -28,18 +28,18 @@ $accepter->acceptance(
   validate_data => sub ($schema, $data) {
     return 1; # all schemas evaluate to true here
   },
-  add_resource => sub ($uri, $schema) {
-    $additional_resources{$uri} = $schema;
+  add_resource => sub ($uri, $schema, %options) {
+    $additional_resources{$uri} = [ $schema, \%options ];
   },
 );
 
 cmp_deeply(
   \%additional_resources,
   {
-    'http://localhost:1234/remote1.json' => { '$defs' => { foo => bool(1) } },
-    'http://localhost:1234/subfolder/remote2.json' => { '$defs' => { bar => bool(0) } },
-    'http://localhost:1234/draft2020-12/remote3.json' => { '$defs' => { baz => bool(0) } },
-    'http://localhost:1234/draft2019-09/remote4.json' => { '$defs' => { quux => bool(0) } },
+    'http://localhost:1234/remote1.json' => [ { '$defs' => { foo => bool(1) } }, {} ],
+    'http://localhost:1234/subfolder/remote2.json' => [ { '$defs' => { bar => bool(0) } }, {} ],
+    'http://localhost:1234/draft2020-12/remote3.json' => [ { '$defs' => { baz => bool(0) } }, { specification_version => 'draft2020-12' } ],
+    'http://localhost:1234/draft2019-09/remote4.json' => [ { '$defs' => { quux => bool(0) } }, { specification_version => 'draft2019-09' } ],
     # but not http://localhost:1234/draft6/remote5.json
   },
   'user-supplied subref is called with additional resources found in test directory',

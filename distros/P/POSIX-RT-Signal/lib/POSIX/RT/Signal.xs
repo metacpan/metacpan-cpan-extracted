@@ -26,12 +26,23 @@ static void get_sys_error(char* buffer, size_t buffer_size, int errnum) {
 #endif
 }
 
-static void S_die_sys(pTHX_ const char* format, int errnum) {
-	char buffer[128];
-	get_sys_error(buffer, sizeof buffer, errnum);
-	Perl_croak(aTHX_ format, buffer);
+#if defined(USE_ITHREADS) && (defined(__linux) || defined(__FreeBSD__))
+#define THREAD_SCHED
+static pthread_t S_get_pthread(pTHX_ SV* thread_handle) {
+	SV* tmp;
+	pthread_t* ret;
+	dSP;
+	PUSHMARK(SP);
+	PUSHs(thread_handle);
+	PUTBACK;
+	call_method("_handle", G_SCALAR);
+	SPAGAIN;
+	tmp = POPs;
+	ret = INT2PTR(pthread_t* ,SvUV(tmp));
+	return *ret;
 }
-#define die_sys(format, errnum) S_die_sys(aTHX_ format, errnum)
+#define get_pthread(handle) S_get_pthread(aTHX_ handle)
+#endif
 
 #define undef &PL_sv_undef
 
@@ -53,36 +64,43 @@ int sigwait(sigset_t* sigset)
 Signal::Info sigwaitinfo(sigset_t* set)
 	PREINIT:
 		int val;
-		siginfo_t info;
 	CODE:
-		val = sigwaitinfo(set, &info);
+		RETVAL = safecalloc(1, sizeof(siginfo_t));
+		val = sigwaitinfo(set, RETVAL);
 
-		if (val < 0)
+		if (val < 0) {
+			Safefree(RETVAL);
 			XSRETURN_UNDEF;
-		RETVAL = &info;
+		}
 	OUTPUT:
 		RETVAL
 
 Signal::Info sigtimedwait(sigset_t* set, struct timespec timeout)
 	PREINIT:
 		int val;
-		siginfo_t info;
 	CODE:
-		val = sigtimedwait(set, &info, &timeout);
+		RETVAL = safecalloc(1, sizeof(siginfo_t));
+		val = sigtimedwait(set, RETVAL, &timeout);
 
-		if (val < 0)
+		if (val < 0) {
+			Safefree(RETVAL);
 			XSRETURN_UNDEF;
-		RETVAL = &info;
+		}
 	OUTPUT:
 		RETVAL
 
-bool sigqueue(int pid, signo_t signo, int number = 0)
+bool sigqueue(SV* pid, signo_t signo, int number = 0)
 	PREINIT:
 		int ret;
 		union sigval number_val;
 	CODE:
 		number_val.sival_int = number;
-		ret = sigqueue(pid, signo, number_val);
+#ifdef THREAD_SCHED
+		if (SvOK(pid) && SvROK(pid) && sv_derived_from(pid, "threads"))
+			ret = pthread_sigqueue(get_pthread(pid), signo, number_val);
+		else
+#endif
+			ret = sigqueue(SvIV(pid), signo, number_val);
 		RETVAL = ret == 0;
 	OUTPUT:
 		RETVAL

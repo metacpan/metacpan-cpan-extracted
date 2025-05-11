@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use base 'Import::Export';
 
@@ -30,7 +30,7 @@ Data::LnArray::XS - Arrays
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

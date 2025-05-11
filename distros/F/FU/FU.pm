@@ -1,9 +1,9 @@
-package FU 0.5;
+package FU 1.0;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
 use POSIX ();
-use Time::HiRes 'clock_gettime', 'CLOCK_MONOTONIC';
+use Time::HiRes 'time', 'clock_gettime', 'CLOCK_MONOTONIC';
 use FU::Log 'log_write';
 use FU::Util;
 use FU::Validate;
@@ -121,11 +121,24 @@ sub query_trace($st,@) {
     $REQ->{trace_nsqldirect}++ if !defined $st->prepare_time;
     $REQ->{trace_sqlexec} += $st->exec_time;
     $REQ->{trace_sqlprep} += $st->prepare_time if $st->prepare_time;
-    push $REQ->{trace_sql}->@*, {
-        query => $st->query, nrows => $st->nrows,
-        param_types => $st->param_types, param_values => $st->param_values,
-        exec_time => $st->exec_time, prepare_time => $st->prepare_time,
-    } if FU::debug;
+    if (FU::debug) {
+        my $t = $st->param_types;
+        my $v = $st->param_values;
+        my $txt = $st->get_text_params;
+        push $REQ->{trace_sql}->@*, {
+            query => $st->query, nrows => $st->nrows,
+            exec_time => $st->exec_time, prepare_time => $st->prepare_time,
+            # Store the binary value when we're in binary params mode, that way
+            # we don't have to keep a reference to the original perl value and
+            # we can defer & batch the conversion to text.
+            params => [ map +{
+                type => $t->[$_],
+                !defined $v->[$_] ? (text => undef) :
+                             $txt ? (text => "$v->[$_]")
+                                  : (bin => $DB->perl2bin($t->[$_], $v->[$_]))
+            }, 0..$#$v ],
+        };
+    }
 }
 sub _connect_db {
     $DB = ref $INIT_DB eq 'CODE' ? $INIT_DB->() : FU::Pg->connect($INIT_DB);
@@ -216,7 +229,7 @@ sub _monitor {
                 die if $m > $data{$_};
             },
             no_chdir => 1
-        }, $scriptpath, values %INC, @monitor_paths);
+        }, grep -e, $scriptpath, values %INC, @monitor_paths);
         0
     } // 1;
 }
@@ -300,10 +313,12 @@ sub _read_req($c) {
     # Decode these into Unicode strings and check for special characters.
     eval { FU::Util::utf8_decode($_); 1} || fu->error(400, $@)
         for ($REQ->{path}, $REQ->{qs}, values $REQ->{hdr}->%*);
+    fu->error(400, 'Invalid character in path') if $REQ->{path} =~ /#/; # Some bots don't correctly split off the fragment
 
     ($REQ->{path}, my $qs) = split /\?/, $REQ->{path}//'', 2;
     $REQ->{qs} //= $qs;
-    $REQ->{path} = FU::Util::uri_unescape($REQ->{path});
+    eval { $REQ->{path} = FU::Util::uri_unescape($REQ->{path}); 1; } || fu->error(400, $@);
+    fu->error(400, 'Invalid character in path') if $REQ->{path} =~ /[\r\n\t]/; # There are plenty other questionable characters, but newlines and tabs are definitely out
 }
 
 
@@ -313,21 +328,16 @@ sub _log_err($e) {
     return if !$e;
     my $crit = $e isa 'FU::err' ? $e->[0] == 500 : !($e isa 'FU::Validate::err');
     return if !debug && !$crit;
-    if ($crit && !$REQ->{full_err}++) {
-        $e =~ s/^\s+//;
-        $e =~ s/\s+$//;
-        log_write join "\n",
-            'IP: '.($REQ->{ip}||'-'),
-            'Headers:', (map "  $_: $REQ->{hdr}{$_}", sort keys $REQ->{hdr}->%*),
-            'ERROR:'.($e =~ s/(^|\n)/\n  /rg);
-            # TODO: decoded body, if we have that.
-    } else {
-        log_write $e;
-    }
+    return fu->log_verbose($e) if $crit;
+    log_write $e;
 }
 
 sub _do_req($c) {
-    local $REQ = { hdr => {}, trace_start => clock_gettime(CLOCK_MONOTONIC), trace_id => sprintf('%010x%08x%04x', int time, $$, int rand 1<<16) };
+    local $REQ = {
+        hdr => {},
+        trace_start => clock_gettime(CLOCK_MONOTONIC),
+        trace_id => sprintf('%012x%06x%04x', int(time*10000) % (1<<(12*4)), $$ % (1<<(6*4)), int rand 1<<16)
+    };
     local $fu = bless {}, 'FU::obj';
 
     $REQ->{ip} = $c->{client_sock} isa 'IO::Socket::INET' ? $c->{client_sock}->peerhost : '127.0.0.1';
@@ -643,6 +653,27 @@ sub db {
 sub sql { shift->db->q(@_) }
 sub SQL { shift->db->Q(@_) }
 
+sub _fmt_section($s) { $s =~ s/^\s*/  /r =~ s/\s+$//r =~ s/\n/\n  /rg }
+
+sub log_verbose($,$msg) {
+    my $r = $FU::REQ;
+    return FU::Log::log_write($msg) if $r->{log_verbose}++;
+    FU::Log::log_write(join "\n",
+        'IP: '.($r->{ip}||'-'),
+        'Headers:', (map "  $_: $r->{hdr}{$_}", sort keys $r->{hdr}->%*),
+        $r->{multipart} ? ('Body (multipart):', _fmt_section join "\n", map $_->describe, $r->{multipart}->@*) :
+        $r->{json} ? ('Body (JSON):', _fmt_section FU::Util::json_format($r->{json}, pretty => 1, canonical => 1)) :
+        $r->{formdata} ? ('Body (formdata):', _fmt_section FU::Util::json_format($r->{formdata}, pretty => 1, canonical => 1)) :
+        length $r->{body} ? do {
+            my $b = substr $r->{body}, 0, 4096;
+            my $trunc = length $r->{body} > 4096 ? ', truncated' : '';
+            utf8::decode($b) ? ("Body (utf8$trunc):", _fmt_section($b =~ s/\r//rg =~ s/\n{4,}/\n[..]\n/rg))
+                             : ("Body (hex$trunc):", _fmt_section(unpack('H*', $b) =~ s/(.{128})/$1\n/rg))
+        } : (),
+        'Message:', _fmt_section $msg
+    );
+}
+
 
 
 
@@ -833,7 +864,6 @@ sub send_file($, $root, $path) {
 
 sub redirect($, $code, $location) {
     state $alias = {qw/ perm 301  temp 302  tempget 303  tempsame 307  permsame 308 /};
-    fu->reset;
     fu->status($alias->{$code} // $code);
     fu->set_header(location => "$location");
     fu->set_header('content-type', 'text/plain');
@@ -886,10 +916,12 @@ sub _finalize {
         ) {
             push @vary, 'accept-encoding';
             if ($hasbrotli && ($r->{hdr}{'accept-encoding'}||'') =~ /\bbr\b/) {
+                $r->{resbody_orig} = $r->{resbody};
                 $r->{resbody} = FU::Util::brotli_compress(6, $r->{resbody});
                 $r->{reshdr}{'content-encoding'} = 'br';
 
             } elsif ($hasgzip && ($r->{hdr}{'accept-encoding'}||'') =~ /\bgzip\b/) {
+                $r->{resbody_orig} = $r->{resbody};
                 $r->{resbody} = FU::Util::gzip_compress(6, $r->{resbody});
                 $r->{reshdr}{'content-encoding'} = 'gzip';
             }
@@ -946,14 +978,6 @@ __END__
 
 FU - A Lean and Efficient Zero-Dependency Web Framework.
 
-=head1 EXPERIMENTAL
-
-This module is still in development: it's missing important functionality and
-there will likely be a few breaking API changes. This framework currently
-powers manned.org as a test. I'll do a stable 1.0 release once FU is used in
-production for vndb.org, which will take a few months in the best case
-scenario.
-
 =head1 SYNOPSIS
 
   use v5.36;
@@ -978,6 +1002,11 @@ scenario.
   FU::run;
 
 =head1 DESCRIPTION
+
+FU is the backend web framework developed for L<VNDB.org|https://vndb.org/> and
+L<Manned.org|https://manned.org/>, but is also perfectly suitable for other
+projects. Besides a web framework, this distrubion also includes a bunch of
+handy utility functions and modules.
 
 =head2 Distribution Overview
 
@@ -1285,6 +1314,14 @@ Convenient short-hand for C<< fu->db->q($query, @params) >>.
 =item fu->SQL(@args)
 
 Convenient short-hand for C<< fu->db->Q(@args) >>.
+
+=item fu->log_verbose($message)
+
+Write a verbose multi-line message to the log, including a full dump of
+information about the request: IP, headers and (potentially reformatted and/or
+truncated) body. This extra info is only written once per request, further
+calls to C<log_verbose()> just go directly to L<FU::Log>'s C<log_write()>
+instead.
 
 =back
 

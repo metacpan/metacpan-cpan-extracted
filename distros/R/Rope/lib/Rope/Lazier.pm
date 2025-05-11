@@ -1,5 +1,6 @@
 package Rope::Lazier;
 
+use strict; use warnings;
 use Types::Standard;
 use Rope::Pro;
 
@@ -13,6 +14,7 @@ BEGIN {
 			props => 'properties',
 			fun => 'function',
 			pri => 'private',
+			ro => 'readonly',
 			ar => 'around',
 			af => 'after',
 			be => 'before'
@@ -24,6 +26,7 @@ BEGIN {
 			c => 'configurable',
 			e => 'enumerable',
 			p => 'private',
+			o => 'readonly',
 			r => 'required',
 			t => 'type',
 			b => 'builder',
@@ -68,7 +71,7 @@ Rope::Lazier - Rope done lazier
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 
@@ -125,6 +128,14 @@ properties
 
 function
 
+=head2 pri
+
+private
+
+=head2 ro
+
+readonly
+
 =cut
 
 =head2 be
@@ -168,6 +179,10 @@ enumerable
 =head2 p
 
 private
+
+=head2 o
+
+readonly
 
 =head2 r
 

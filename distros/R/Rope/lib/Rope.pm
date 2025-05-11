@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 use Rope::Object;
 use Rope::Pro;
 my (%META, %PRO);
@@ -16,6 +16,7 @@ BEGIN {
 					my $cb = $props{properties}{$prop}{value};
 					$props{properties}{$prop}{value} = sub { $cb->($META{initialised}{$caller}{${$self}->{identifier}}, @_) };
 				}
+
 				for (qw/predicate clearer/) {	
 					if ($props{properties}->{$prop}->{$_}) {
 						my $prep = $_ eq 'predicate' ? 'has_' : 'clear_';
@@ -131,6 +132,23 @@ BEGIN {
 				shift @_ if $_[0] && $_[0] eq $caller;
 				my (@requires) = @_;
 				$META{$caller}{requires}{$_}++ for (@requires);
+			};
+		},
+		readonly => sub {
+			my ($caller) = shift;
+			return sub {
+				shift @_ if $_[0] eq $caller;
+				my ($prop, @options) = @_;
+				$prop = shift @options if ( @options > 1 );
+				$PRO{set_prop}(
+					$caller,
+					$prop,
+					value => $options[0],
+					enumerable => 0,
+					writeable => 0,
+					initable => 1,
+					readonly => 1,
+				);
 			};
 		},
 		private => sub {
@@ -456,7 +474,7 @@ sub import {
 	$PRO{keyword}($caller, $_, $PRO{$_}($caller))
 		for $options->{import} 
 			? @{$options->{import}} 
-			: qw/function property properties prototyped private extends with requires before around after locked destroy DESTROY new/;
+			: qw/function property properties prototyped private readonly extends with requires before around after locked destroy DESTROY new/;
 }
 
 sub new {
@@ -643,7 +661,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 
@@ -751,6 +769,10 @@ A predicate allows you to define an accessor to check whether a property is set.
 
 A clearer allows you to define an accessor to clear a property (set it to undef).  You have a few options, you can pass a positive integer or code reference and that will default the clearer to "clear_$prop". You can also pass a string to name the accessor like "clear_my_thing" or finally if you would like more customisation you can pass a hash that defines the object properties. You cannot create triggers or hooks on clearers. when using clearers and type checking in conjuction you need to ensure the type supports undef or you need to create your own custom clearer using a code ref or hash ref.
 
+=head2 readonly
+
+If set to a true value then the property value will be made deeply readonly when instantiated/set.
+
 =head2 index
 
 The index property/key expects an integer, if you do not set then this integer it's automatically generated and associated to the property. You will only want to set this is you always want to have a property last when itterating
@@ -830,6 +852,16 @@ Extends the current object definition with a new property that is private and on
 	private five => sub {
 		my ($self, $param) = @_;
 		...
+	};
+
+=head2 readonly
+
+Extends the current object definition with a new property that is readonly and cannot be written to. A readonly property has initable, writeable, enumerable and configurable all set to false so it cannot be changed/set once the object is instantiated.
+
+	readonly six => {
+		a => 1,
+		b => 2,
+		c => 3
 	};
 
 =head2 extends

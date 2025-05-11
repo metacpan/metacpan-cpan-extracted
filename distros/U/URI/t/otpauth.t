@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use URI;
-use Test::More tests => 86;
+use Test::More tests => 90;
 
 {
   my $uri = URI->new( 'otpauth://totp/Example:alice@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example' );
@@ -61,7 +61,7 @@ use Test::More tests => 86;
   is $issuer_uri->digits(),  6,                                                            'digits';
   is $issuer_uri->period(),  30,                                                           'period';
   is $issuer_uri->fragment(),   undef,                                                     'fragment';
-  my $issuer2_uri = URI->new( 'otpauth://hotp/Example:alice@google.com?&issuer=Example2&counter=23&period=15' );
+  my $issuer2_uri = URI->new( 'otpauth://hotp/Example2:alice@google.com?&issuer=Example2&counter=23&period=15' );
   ok $issuer2_uri,                                                                          "created $issuer2_uri";
   isa_ok $issuer2_uri, 'URI::otpauth';
   is $issuer2_uri->type(),    'hotp',                                                       'type';
@@ -121,6 +121,7 @@ for my $case ( @case ) {
   ok $uri, "created $uri";
   is $uri->scheme(), 'otpauth', "$name: scheme";
   is $uri->type(),  $type, "$name: type";
+  is $uri->authority(),  $type, "$name: authority";
   is $uri->secret(), $secret, "$name: secret";
   is $uri->issuer(),  $issuer, "$name: issuer";
   if (defined $issuer) {
@@ -137,9 +138,6 @@ eval {
 like $@, qr/^secret is a mandatory parameter for URI::otpauth/,   "missing secret";
 my $doc1_uri = URI->new( 'otpauth://totp/Example:alice@google.com?secret=NFZS25DINFZV643VOAZXELLTGNRXEM3UH4&issuer=Example' );
 my $doc2_uri = URI::otpauth->new( type => 'totp', issuer => 'Example', account_name => 'alice@google.com', secret => 'is-this_sup3r-s3cr3t?' );
-diag "doc1_uri is $doc1_uri";
-diag "doc2_uri is $doc2_uri";
 is "$doc1_uri", "$doc2_uri", "$doc1_uri: matches";
 
-# vim:ts=2:sw=2:et:ft=perl
-
+is $doc1_uri->type(), $doc2_uri->authority(), "type and authority match";

@@ -169,6 +169,13 @@ isrec {'content-type','somet'}, {body => ''}, -6;
 
 start;
 begin;
+record 1, 4, "\x13\x01HTTP_CONTENT_LENGTH3\x0e\x01CONTENT_LENGTH0\x13\x01HTTP_CONTENT_LENGTH5";
+record 1, 4, "";
+record 1, 5, "";
+isrec {'content-length','0'}, {body => ''};
+
+start;
+begin;
 record 1, 4, "\x0e\x05CONTENT_LENGTH65536";
 record 1, 4, '';
 if (!fork) {

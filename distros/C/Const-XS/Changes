@@ -79,3 +79,9 @@ Revision history for Const-XS
 0.28 	2025-05-09
 	- Move out the PP implementation into it's own distribution
 	- update benchmark
+
+0.29 	2025-05-09
+	- Remove the recursion limit logic and handle circular references transparently
+
+1.00	2025-05-10
+	- Version bump to declare interface now stable.

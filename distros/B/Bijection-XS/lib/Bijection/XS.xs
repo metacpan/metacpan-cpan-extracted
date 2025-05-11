@@ -35,8 +35,8 @@ static char * _biject (int id) {
 
 static int _inverse (char * id) {
 	dTHX;
-	int out = 0;
-	for (int i = 0; i < strlen(id); i++) {
+	int out = 0, i = 0;
+	for (i = 0; i < strlen(id); i++) {
 		out = out * COUNT + INDEX[(int)id[i]];
 	}
 	return out - OFFSET;
@@ -50,9 +50,9 @@ SV *
 bijection_set(...)
 	CODE:
 		AV * args = av_make(items, MARK+1);
-		
 		SV * first = *av_fetch(args, 0, 0);
-	
+		int i = 0;
+		
 		if (SvTYPE(first) == SVt_IV &&  SvIV(first) > 0) {
 			OFFSET = SvIV(first);
 			av_shift(args);
@@ -61,8 +61,9 @@ bijection_set(...)
 		}
 
 		COUNT = av_len(args) + 1;
-		for (int i = 0; i < COUNT; i++) {
-			char * key = SvPV_nolen(*av_fetch(args, i, 0));
+		for (i = 0; i < COUNT; i++) {
+			STRLEN retlen;
+			char * key = SvPV(*av_fetch(args, i, 0), retlen);
 			ALPHA[i] = key;
 			INDEX[(int)key[0]] = i;
 		}
@@ -94,7 +95,8 @@ SV *
 inverse(str)
 	SV * str
 	CODE:
-		RETVAL = newSViv(_inverse(SvPV_nolen(str)));
+		STRLEN retlen;
+		RETVAL = newSViv(_inverse(SvPV(str, retlen)));
 	OUTPUT:
 		RETVAL
 

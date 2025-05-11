@@ -319,8 +319,11 @@ static int fufcgi_read_params(pTHX_ fufcgi *ctx, fufcgi_rec *rec) {
                 p.name += 5;
                 for (r=0; r<p.namelen; r++)
                     p.name[r] = p.name[r] == '_' ? '-' : p.name[r] >= 'A' && p.name[r] <= 'Z' ? p.name[r] | 0x20 : p.name[r];
-                valsv = newSV(p.vallen+1);
-                hv_store(ctx->headers, p.name, p.namelen, valsv, 0);
+                if (!(p.namelen == 14 && memcmp(p.name, "content-length", 14) == 0)
+                        && !(p.namelen == 12 && memcmp(p.name, "content-type", 12) == 0)) {
+                    valsv = newSV(p.vallen+1);
+                    hv_store(ctx->headers, p.name, p.namelen, valsv, 0);
+                }
 
             } else if (p.namelen == 14 && memcmp(p.name, "CONTENT_LENGTH", 14) == 0) {
                 valsv = newSV(p.vallen+1);

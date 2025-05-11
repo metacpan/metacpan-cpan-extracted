@@ -78,7 +78,7 @@ SENDFN(domain) { (void)out; SERR("domain type should not be handled by this func
 
 RECVFN(bool) {
     RLEN(1);
-    return *buf ? &PL_sv_yes : &PL_sv_no;
+    return *buf ? newSV_true() : newSV_false();
 }
 
 SENDFN(bool) {
@@ -89,7 +89,7 @@ SENDFN(bool) {
 RECVFN(void) {
     RLEN(0);
     (void)buf;
-    return &PL_sv_undef;
+    return newSV(0);
 }
 
 SENDFN(void) {
@@ -269,7 +269,7 @@ SENDFN(jsonpath) {
 #define ARRAY_MAXDIM 100
 
 static SV *fupg_recv_array_elem(pTHX_ const fupg_tio *elem, const char *header, U32 dim, U32 ndim, const char **buf, const char *end) {
-    SV *r = &PL_sv_undef;
+    SV *r;
     if (dim == ndim) {
         if (end - *buf < 4) fu_confess("Invalid array format");
         I32 len = fu_frombeI(32, *buf);
@@ -279,6 +279,8 @@ static SV *fupg_recv_array_elem(pTHX_ const fupg_tio *elem, const char *header, 
         if (len >= 0) {
             r = elem->recv(aTHX_ elem, *buf, len);
             *buf += len;
+        } else {
+            r = newSV(0);
         }
 
     } else {
@@ -403,12 +405,14 @@ RECVFN(record) {
         if (oid != ctx->record.info->attrs[i].oid)
             RERR("expected field %d to be of type %u but got %u", i, ctx->record.info->attrs[i].oid, oid);
         I32 vlen = fu_frombeI(32, buf+4);
-        SV *r = &PL_sv_undef;
+        SV *r;
         buf += 8; len -= 8;
         if (vlen > len) RERR("input data too short");
         if (vlen >= 0) {
             r = ctx->record.tio[i].recv(aTHX_ ctx->record.tio+i, buf, vlen);
             buf += vlen; len -= vlen;
+        } else {
+            r = newSV(0);
         }
         hv_store(hv, ctx->record.info->attrs[i].name.n, -strlen(ctx->record.info->attrs[i].name.n), r, 0);
     }

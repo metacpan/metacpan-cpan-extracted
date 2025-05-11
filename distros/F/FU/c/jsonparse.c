@@ -236,12 +236,12 @@ static SV *fujson_parse(pTHX_ fujson_parse_ctx *ctx) {
             if (ctx->end - ctx->buf < 4) return NULL;
             if (memcmp(ctx->buf, "true", 4) != 0) return NULL;
             ctx->buf += 4;
-            return &PL_sv_yes;
+            return newSV_true();
         case 'f':
             if (ctx->end - ctx->buf < 5) return NULL;
             if (memcmp(ctx->buf, "false", 5) != 0) return NULL;
             ctx->buf += 5;
-            return &PL_sv_no;
+            return newSV_false();
         case 'n':
             if (ctx->end - ctx->buf < 4) return NULL;
             if (memcmp(ctx->buf, "null", 4) != 0) return NULL;

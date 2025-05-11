@@ -2,7 +2,7 @@ use v5.36;
 use Test::More;
 use FU::Util 'json_parse';
 no warnings 'experimental::builtin';
-use builtin 'is_bool', 'created_as_number';
+use builtin 'is_bool', 'created_as_number', 'true', 'false';
 use Config;
 
 my @error = (
@@ -235,5 +235,11 @@ ok !eval { json_parse '{"":{"":{"":{"":1}}}}', max_depth => 4; 1 };
     is json_parse('"string"', max_size => 8), 'string';
     ok !eval { json_parse '"string"', max_size => 7 };
 }
+
+# Mutable hashes/arrays
+my $d = json_parse('[true,false,null,{"a":true,"b":false,"c":null}]');
+is_deeply $d, [true,false,undef,{a => true, b => false, c => undef}];
+$_ = 1 for @{$d}[0,1,2], values $d->[3]->%*;
+is_deeply $d, [1,1,1,{a => 1, b => 1, c => 1}];
 
 done_testing;

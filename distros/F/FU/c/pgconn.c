@@ -626,3 +626,80 @@ static void fupg_tio_free(fupg_tio *tio) {
         safefree(tio->record.tio);
     }
 }
+
+
+
+
+static SV *fupg_perl2bin(pTHX_ fupg_conn *conn, Oid oid, SV *sv) {
+    int refresh_done = 0;
+    fupg_tio tio;
+    fustr buf;
+    memset(&tio, 0, sizeof(tio));
+    fupg_tio_setup(aTHX_ conn, &tio, FUPGT_SEND, oid, &refresh_done);
+    fustr_init(&buf, sv_newmortal(), SIZE_MAX);
+    tio.send(aTHX_ &tio, sv, &buf); /* XXX: Leaks 'tio' on error */
+    fupg_tio_free(&tio);
+    return fustr_done(&buf);
+}
+
+static SV *fupg_bin2perl(pTHX_ fupg_conn *conn, Oid oid, SV *sv) {
+    int refresh_done = 0;
+    fupg_tio tio;
+    STRLEN len;
+    const char *buf = SvPVbyte(sv, len);
+    memset(&tio, 0, sizeof(tio));
+    fupg_tio_setup(aTHX_ conn, &tio, FUPGT_RECV, oid, &refresh_done);
+    SV *r = tio.recv(aTHX_ &tio, buf, len); /* XXX: Leaks 'tio' on error */
+    fupg_tio_free(&tio);
+    return r;
+}
+
+
+static I32 fupg_bintext(pTHX_ fupg_conn *conn, int format, I32 ax, I32 argc) {
+    int vals = argc/2;
+
+    if (argc == 1 || argc % 2 == 0) croak("Usage: $conn->%s(oid, data, ...)", format ? "text2bin" : "bin2text");
+    if (vals > 1 && GIMME_V != G_LIST) {
+        ST(0) = sv_2mortal(newSViv(vals));
+        return 1;
+    }
+
+    Oid *paramtypes = safemalloc(vals * sizeof(*paramtypes));
+    const char **paramvalues = safemalloc(vals * sizeof(*paramvalues));
+    int *paramlengths = safemalloc(vals * sizeof(*paramlengths));
+    int *paramformats = safemalloc(vals * sizeof(*paramformats));
+
+    fustr sql;
+    fustr_init(&sql, NULL, SIZE_MAX);
+    fustr_write(&sql, "SELECT ", 7);
+
+    STRLEN len;
+    int i;
+    for (i=0; i<vals; i++) {
+        paramtypes[i] = SvIV(ST(i*2+1));
+        paramvalues[i] = format ? SvPVutf8(ST(i*2+2), len) : SvPVbyte(ST(i*2+2), len);
+        paramlengths[i] = len;
+        paramformats[i] = format ? 0 : 1;
+        if (i) fustr_write_ch(&sql, ',');
+        sql.cur -= 8 - sprintf(fustr_write_buf(&sql, 8), "$%d", i+1);
+    }
+    fustr_write_ch(&sql, 0);
+
+    PGresult *r = PQexecParams(conn->conn, fustr_start(&sql), vals,
+            paramtypes, paramvalues, paramlengths, paramformats, format);
+    safefree(paramtypes);
+    safefree(paramvalues);
+    safefree(paramlengths);
+    safefree(paramformats);
+    SvREFCNT_dec(sql.sv);
+
+    if (!r) fupg_conn_croak(conn, "exec");
+    if (PQresultStatus(r) != PGRES_TUPLES_OK) fupg_result_croak(r, "exec", sql.sv ? "SELECT $1, ..." : sql.sbuf);
+
+    /* The stack is guaranteed to be large enough, since we received 1+2*vals arguments */
+    for (i=0; i<vals; i++)
+        ST(i) = newSVpvn_flags(PQgetvalue(r, 0, i), PQgetlength(r, 0, i), SVs_TEMP | (format ? 0 : SVf_UTF8));
+
+    PQclear(r);
+    return vals;
+}

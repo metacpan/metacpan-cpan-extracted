@@ -11,6 +11,7 @@ WriteMakefile(
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -22,10 +23,11 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'              => 1.0010001,
         'MooX::LazierAttributes' => 0.07,
-        'Ref::Util'        => 0.0020,
-    	'strict'		   => 0,
-		'warnings'		   => 0,
-	},
+        'Ref::Util' => 0.0020,
+        'strict' => 0,
+        'warnings' => 0,
+        'Const::XS' => '1.00'
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Eliza-Chatbot-*' },
     META_MERGE => {

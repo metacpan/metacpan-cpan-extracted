@@ -56,10 +56,17 @@ class App::FeedDeduplicator::Aggregator {
 
         for (@$feeds) {
             my $response = $ua->get($_->{feed});
-            next unless $response->is_success;
+            unless ($response->is_success) {
+              warn "$_->{feed}\n";
+              warn $response->status_line, "\n";
+              next;
+            }
 
             my $feed = XML::Feed->parse(\$response->decoded_content);
-            next unless $feed;
+            unless ($feed) {
+              warn "Unable to parse $_->{feed}\n";
+              next;
+            }
 
             for my $entry ($feed->entries) {
                 push @$entries, {

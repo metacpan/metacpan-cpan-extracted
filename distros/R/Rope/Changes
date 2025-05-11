@@ -93,3 +93,7 @@ Revision history for Rope
 0.40	2024-05-25
 	- Extends Rope with a private keyword that assists in creating private properties
 	- Extends Rope::Lazier with pri(vate)
+
+0.41	2024-05-25
+	- Extends Rope with a readonly keyword that assists in creating readonly properties
+	- Extends Rope::Lazier with ro and o for readonly

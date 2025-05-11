@@ -17,8 +17,8 @@ static SV * new (SV * class, AV * array) {
 static AV * reverse (AV * current) {
 	dTHX;
 	AV * array = newAV();
-	int len = av_len(current);
-	for (int i = 0; i <= len; i++) {
+	int len = av_len(current), i = 0;
+	for (i = 0; i <= len; i++) {
 		av_unshift(array, 1);
 		av_store(array, 0, newSVsv(*av_fetch(current, i, 0)));
 	}
@@ -27,8 +27,8 @@ static AV * reverse (AV * current) {
 
 static SV * reduce (AV * array, SV * red, SV * cb) {
 	dTHX;
-	int len = av_len(array);
-	for (int i = 0; i <= len; i++) {
+	int len = av_len(array), i = 0;
+	for (i = 0; i <= len; i++) {
 		dSP;
 		SV * val = *av_fetch(array, i, 0);
 		PUSHMARK(SP);
@@ -303,7 +303,7 @@ sort(self, cb)
 	CODE:
 		AV * array = (AV*)SvRV(self);
 		AV * new_array = newAV();
-    		int len = av_len(array), i = 0;
+    		int len = av_len(array), i = 0, j = 0;
 		GV * aa = gv_fetchpv("a", GV_ADD, SVt_PV);
 		GV * bb = gv_fetchpv("b", GV_ADD, SVt_PV);
 		SAVESPTR(GvSV(aa));
@@ -312,7 +312,7 @@ sort(self, cb)
 			av_push(new_array, newSVsv(*av_fetch(array, i, 0)));
 		}
 		for (i = 0; i <= len; i++) {
-			for (int j=0; j < len; j++) {
+			for (j = 0; j < len; j++) {
 				dSP;
 				SV * a = GvSV(aa) = newSVsv(*av_fetch(new_array, j, 0));
 				SV * b = GvSV(bb) = newSVsv(*av_fetch(new_array, j + 1, 0));
@@ -336,7 +336,8 @@ unshift(self, ...)
 	SV * self
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		for (int i = 1; i < items; i++) {
+		int i = 1;
+		for (i = 1; i < items; i++) {
 			av_unshift(array, 1);
 			av_store(array, 0, newSVsv(ST(i)));
 		}
@@ -349,8 +350,8 @@ concat(self, array)
 	SV * self
 	AV * array
 	CODE:
-    		int len = av_len(array);
-		for (int i = 0; i <= len; i++) {
+    		int len = av_len(array), i = 0;
+		for (i = 0; i <= len; i++) {
 			av_push((AV*)SvRV(self), newSVsv(*av_fetch(array, i, 0)));
 		}
 		RETVAL = newSVsv(self);
@@ -432,11 +433,11 @@ join(self, join)
 	SV * join
 	CODE:
 		AV * array = (AV*)SvRV(self);
-		int len = av_len(array);
+		int len = av_len(array), i = 0;
 		STRLEN retlen;
 		char * joiner = SvPV(join, retlen);
 		RETVAL = newSVpv("", 0);
-		for (int i = 0; i <= len; i++) {
+		for (i = 0; i <= len; i++) {
 			if (i > 0) {
 				sv_catpv(RETVAL, joiner);
 			}

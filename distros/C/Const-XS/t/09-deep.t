@@ -12,17 +12,22 @@ use Const::XS qw/all/;
 
 ok(1);
 
-eval {
-	make_readonly($deeper);
-};
+make_readonly($deeper);
 
-like($@, qr/Looks like you are in deep recursion/);
+is(is_readonly($deeper), 1);
 
 eval {
-	unmake_readonly($deeper);
+	$deeper->{deep}->{deep} = 2;
+
 };
 
-like($@, qr/Looks like you are in deep recursion/);
+like($@, qr/Modification of a read-only value/);
+
+unmake_readonly($deeper);
+
+ok($deeper->{deep}->{deep} = 2);
+
+is($deeper->{deep}->{deep}, 2);
 
 my $i = 0;
 my (%keys) = (

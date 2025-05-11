@@ -10,6 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Rope.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.018',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
 	'Type::Tiny' => '0',
@@ -24,7 +25,8 @@ my %WriteMakefileArgs = (
         'Struct::Conditional' => 1.01,
         'Coerce::Types::Standard' => 0.000008,
 	'Data::LnArray' => 0.04,
-	'Combine::Keys' => 0.09
+	'Combine::Keys' => 0.09,
+	'Const::XS' => 1.00
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Rope-*' },
