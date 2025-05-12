@@ -37,6 +37,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	bless $self, $class;
 
+	$self->filterfield('text') unless defined $self->filterfield;
 	$self->itemtype('text') unless defined $self->itemtype;
 	$self->sortcase('') unless defined $self->sortcase;
 	$self->sortfield('text') unless defined $self->sortfield;
@@ -129,6 +130,12 @@ sub draw {
 	);
 	$c->lower($rtag);
 	$self->crect($rtag);
+}
+
+sub filterfield {
+	my $self = shift;
+	$self->{FILTERFIELD} = shift if @_;
+	return $self->{FILTERFIELD}
 }
 
 sub forceWidth {

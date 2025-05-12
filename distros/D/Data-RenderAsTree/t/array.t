@@ -15,9 +15,9 @@ my(%source) =
 	{
 		data     => ['a'],
 		expected => <<EOS,
-Array Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- 0 = a [SCALAR 2]
+Array Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- 0 = a [SCALAR 2]. Attributes: {}
 EOS
 		literal => q|['a']|,
 	},
@@ -25,10 +25,10 @@ EOS
 	{
 		data     => ['a', 'b'],
 		expected => <<EOS,
-Array Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- 0 = a [SCALAR 2]
-         |--- 1 = b [SCALAR 3]
+Array Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- 0 = a [SCALAR 2]. Attributes: {}
+         |--- 1 = b [SCALAR 3]. Attributes: {}
 EOS
 		literal => q|['a', 'b']|,
 	},
@@ -36,12 +36,12 @@ EOS
 	{
 		data     => ['a', 'b', ['c'] ],
 		expected => <<EOS,
-Array Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- 0 = a [SCALAR 2]
-         |--- 1 = b [SCALAR 3]
-         |--- 2 = [] [ARRAY 4]
-              |--- 0 = c [SCALAR 5]
+Array Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- 0 = a [SCALAR 2]. Attributes: {}
+         |--- 1 = b [SCALAR 3]. Attributes: {}
+         |--- 2 = [] [ARRAY 4]. Attributes: {}
+              |--- 0 = c [SCALAR 5]. Attributes: {}
 EOS
 		literal => q|['a', 'b', ['c'] ]|,
 	},
@@ -49,25 +49,25 @@ EOS
 	{
 		data     => ['a', 'b', ['c', 'd'], 'e', ['f', ['g', 'h', ['i'], 'j'], 'k', 'l'], 'm'],
 		expected => <<EOS,
-Array Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- 0 = a [SCALAR 2]
-         |--- 1 = b [SCALAR 3]
-         |--- 2 = [] [ARRAY 4]
-         |    |--- 0 = c [SCALAR 5]
-         |    |--- 1 = d [SCALAR 6]
-         |--- 3 = e [SCALAR 7]
-         |--- 4 = [] [ARRAY 8]
-         |    |--- 0 = f [SCALAR 9]
-         |    |--- 1 = [] [ARRAY 10]
-         |    |    |--- 0 = g [SCALAR 11]
-         |    |    |--- 1 = h [SCALAR 12]
-         |    |    |--- 2 = [] [ARRAY 13]
-         |    |    |    |--- 0 = i [SCALAR 14]
-         |    |    |--- 3 = j [SCALAR 15]
-         |    |--- 2 = k [SCALAR 16]
-         |    |--- 3 = l [SCALAR 17]
-         |--- 5 = m [SCALAR 18]
+Array Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- 0 = a [SCALAR 2]. Attributes: {}
+         |--- 1 = b [SCALAR 3]. Attributes: {}
+         |--- 2 = [] [ARRAY 4]. Attributes: {}
+         |    |--- 0 = c [SCALAR 5]. Attributes: {}
+         |    |--- 1 = d [SCALAR 6]. Attributes: {}
+         |--- 3 = e [SCALAR 7]. Attributes: {}
+         |--- 4 = [] [ARRAY 8]. Attributes: {}
+         |    |--- 0 = f [SCALAR 9]. Attributes: {}
+         |    |--- 1 = [] [ARRAY 10]. Attributes: {}
+         |    |    |--- 0 = g [SCALAR 11]. Attributes: {}
+         |    |    |--- 1 = h [SCALAR 12]. Attributes: {}
+         |    |    |--- 2 = [] [ARRAY 13]. Attributes: {}
+         |    |    |    |--- 0 = i [SCALAR 14]. Attributes: {}
+         |    |    |--- 3 = j [SCALAR 15]. Attributes: {}
+         |    |--- 2 = k [SCALAR 16]. Attributes: {}
+         |    |--- 3 = l [SCALAR 17]. Attributes: {}
+         |--- 5 = m [SCALAR 18]. Attributes: {}
 EOS
 		literal => q|['a', 'b', ['c', 'd'], 'e', ['f', ['g', 'h', ['i'], 'j'], 'k', 'l'], 'm']|,
 	},
@@ -75,10 +75,10 @@ EOS
 	{
 		data     => [ ['a'] ],
 		expected => <<EOS,
-Array Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- 0 = [] [ARRAY 2]
-              |--- 0 = a [SCALAR 3]
+Array Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- 0 = [] [ARRAY 2]. Attributes: {}
+              |--- 0 = a [SCALAR 3]. Attributes: {}
 EOS
 		literal => q|[ ['a'] ]|,
 	},

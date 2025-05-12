@@ -1,5 +1,17 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.08  Sun May 11 2025
+	- Selection is retained when clicking an indicator.
+	- Fixed filtering in hierarchy mode.
+	- Fixed browsing in hierarchy mode.
+	- Fixed -selectstyle simple.
+	- Added hierarchy awareness to infoNext and infoPrev.
+	- Modified anchor setting when selecting with mouse.
+	- Headers can be slided horizontally using the mouse.
+	- Implemented filtering on side columns.
+	- Created separate Tk::ListBrowser::Entry module, to separate entries from column items.
+	- Updated documentation.
+
 0.07  Wed May 07 2025
 	- Fixed error in testfile.
 	- Fixed package name in Tk::ListBrowser::SelectXPM.

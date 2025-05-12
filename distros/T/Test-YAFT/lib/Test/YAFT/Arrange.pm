@@ -33,7 +33,7 @@ package Test::YAFT::Arrange {
 
 	1;
 }
-$Test::YAFT::Arrange::VERSION = '1.0.1';;
+$Test::YAFT::Arrange::VERSION = '1.0.2';;
 
 __END__
 

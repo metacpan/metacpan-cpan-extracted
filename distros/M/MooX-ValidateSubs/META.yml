@@ -20,7 +20,7 @@ no_index:
 provides:
   MooX::ValidateSubs:
     file: lib/MooX/ValidateSubs.pm
-    version: '1.012009'
+    version: '1.012010'
   MooX::ValidateSubs::Role:
     file: lib/MooX/ValidateSubs/Role.pm
 requires:
@@ -32,7 +32,7 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/MooX-ValidateSubs.git
-version: '1.012009'
+version: '1.012010'
 x_contributors:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

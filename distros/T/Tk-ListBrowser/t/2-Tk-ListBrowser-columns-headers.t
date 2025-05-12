@@ -56,6 +56,7 @@ if (defined $app) {
 		-textside => 'right',
 		-textjustify => 'left',
 		-selectmode => 'multiple',
+		-filtercolumns => 1,
 
 #		-marginleft => 80,
 #		-margintop => 80,
@@ -301,6 +302,8 @@ push @tests, (
 			-sortable => 1,
 		);
 		$ib->configure('sorton' => '');
+		$ib->sortMode('', 'ascending');
+		$ib->sortList;
 		$ib->refresh;
 	}, '', 'refresh' ],
 );

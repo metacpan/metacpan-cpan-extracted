@@ -14,10 +14,10 @@ my(%source) =
 	{
 		data     => [{a => 'b'}],
 		expected => <<EOS,
-Mixup Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- {} [HASH 2]
-              |--- a = b [VALUE 3]
+Mixup Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- {} [HASH 2]. Attributes: {}
+              |--- a = b [VALUE 3]. Attributes: {}
 EOS
 		literal => q||,
 	},
@@ -25,12 +25,12 @@ EOS
 	{
 		data     => [{a => 'b'}, {c => 'd'}],
 		expected => <<EOS,
-Mixup Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- {} [HASH 2]
-         |    |--- a = b [VALUE 3]
-         |--- {} [HASH 4]
-              |--- c = d [VALUE 5]
+Mixup Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- {} [HASH 2]. Attributes: {}
+         |    |--- a = b [VALUE 3]. Attributes: {}
+         |--- {} [HASH 4]. Attributes: {}
+              |--- c = d [VALUE 5]. Attributes: {}
 EOS
 		literal => q|[{a => 'b'}, {c => 'd'}]|,
 	},
@@ -38,13 +38,13 @@ EOS
 	{
 		data     => [{a => 'b'}, ['c' => 'd'] ],
 		expected => <<EOS,
-Mixup Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- {} [HASH 2]
-         |    |--- a = b [VALUE 3]
-         |--- 1 = [] [ARRAY 4]
-              |--- 0 = c [SCALAR 5]
-              |--- 1 = d [SCALAR 6]
+Mixup Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- {} [HASH 2]. Attributes: {}
+         |    |--- a = b [VALUE 3]. Attributes: {}
+         |--- 1 = [] [ARRAY 4]. Attributes: {}
+              |--- 0 = c [SCALAR 5]. Attributes: {}
+              |--- 1 = d [SCALAR 6]. Attributes: {}
 EOS
 		literal => q|[{a => 'b'}, ['c' => 'd'] ]|,
 	},
@@ -52,12 +52,12 @@ EOS
 	{
 		data     => {a => ['b', 'c'] },
 		expected => <<EOS,
-Mixup Demo
-    |--- {} [HASH 1]
-         |--- a [ARRAY 2]
-         |    |--- 0 = [] [ARRAY 3]
-         |         |--- 0 = b [SCALAR 4]
-         |         |--- 1 = c [SCALAR 5]
+Mixup Demo. Attributes: {}
+    |--- {} [HASH 1]. Attributes: {}
+         |--- a [ARRAY 2]. Attributes: {}
+              |--- 0 = [] [ARRAY 3]. Attributes: {}
+                   |--- 0 = b [SCALAR 4]. Attributes: {}
+                   |--- 1 = c [SCALAR 5]. Attributes: {}
 EOS
 		literal => q|{a => ['b', 'c'] }|,
 	},
@@ -65,20 +65,22 @@ EOS
 	{
 		data     => {a => ['b', 'c'], d => {e => 'f'} },
 		expected => <<EOS,
-Mixup Demo
-    |--- {} [HASH 1]
-         |--- a [ARRAY 2]
-         |    |--- 0 = [] [ARRAY 3]
-         |         |--- 0 = b [SCALAR 4]
-         |         |--- 1 = c [SCALAR 5]
-         |--- d = {} [HASH 6]
-              |--- {} [HASH 7]
-                   |--- e = f [VALUE 8]
+Mixup Demo. Attributes: {}
+    |--- {} [HASH 1]. Attributes: {}
+         |--- a [ARRAY 2]. Attributes: {}
+         |    |--- 0 = [] [ARRAY 3]. Attributes: {}
+         |         |--- 0 = b [SCALAR 4]. Attributes: {}
+         |         |--- 1 = c [SCALAR 5]. Attributes: {}
+         |--- d = {} [HASH 6]. Attributes: {}
+              |--- {} [HASH 7]. Attributes: {}
+                   |--- e = f [VALUE 8]. Attributes: {}
 EOS
 		literal => q|{a => ['b', 'c'], d => {e => 'f'} }|,
 	},
 );
-my($renderer) = Data::RenderAsTree -> new
+my($count)		= 0;
+my($successes)	= 0;
+my($renderer)	= Data::RenderAsTree -> new
 	(
 		attributes       => 0,
 		max_key_length   => 25,
@@ -90,12 +92,25 @@ my($renderer) = Data::RenderAsTree -> new
 my($expected);
 my($got);
 my($i);
+my($result);
+my($x1, $x2);
 
 for $i (sort keys %source)
 {
+	$count++;
+
 	$got      = $renderer -> render($source{$i}{data});
 	$expected = [split(/\n/, $source{$i}{expected})];
+	$x1			= Dumper($got);
+	$x2			= Dumper($expected);
+	$result		= $x1 eq $x2;
+
+	$successes++ if ($result);
 
 	print "$i: $source{$i}{literal}\n";
-	print Dumper($got);
+	print "Got: \n", Dumper($got), "Expected: \n", Dumper($expected);
+	print "# $count: " . ($result ? "OK\n" : "Not OK\n");
 }
+
+print "Test count:    $count\n";
+print "Success count: $successes\n";

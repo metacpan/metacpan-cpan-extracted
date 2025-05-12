@@ -95,7 +95,7 @@ has verbose =>
 	required => 0,
 );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # ------------------------------------------------
 
@@ -530,6 +530,8 @@ This is scripts/synopsis.pl:
 
 	# ------------------------------------------------
 
+	print "Code refs are always be different, so we do not use \$expected\n";
+
 	my($sub) = sub {};
 	my($s)   =
 	{
@@ -572,43 +574,44 @@ See the L</FAQ> for a discussion as to whether you should call L</render($s)> or
 
 This is the output of scripts/synopsis.pl:
 
-	Synopsis
-	    |--- {} [HASH 1]
-	         |--- A = {} [HASH 2]
-	         |    |--- {} [HASH 3]
-	         |         |--- a = {} [HASH 4]
-	         |         |    |--- {} [HASH 5]
-	         |         |--- bbbbbb = CODE(0x1c93e30) [CODE 6]
-	         |         |--- c123 [CODE 7 -> CODE 6]
-	         |         |--- d [REF 8 -> CODE 6]
-	         |--- B [ARRAY 9]
-	         |    |--- 1 = [] [ARRAY 10]
-	         |         |--- 0 = element_1 [SCALAR 11]
-	         |         |--- 1 = element_2 [SCALAR 12]
-	         |         |--- 2 = element_3 [SCALAR 13]
-	         |--- C = {} [HASH 14]
-	         |    |--- {} [HASH 15]
-	         |         |--- b = {} [HASH 16]
-	         |              |--- {} [HASH 17]
-	         |                   |--- a = {} [HASH 18]
-	         |                        |--- {} [HASH 19]
-	         |                             |--- a = {} [HASH 20]
-	         |                             |    |--- {} [HASH 21]
-	         |                             |--- b = CODE(0x2475c68) [CODE 22]
-	         |                             |--- c = 42999999999999999... [VALUE 23]
-	         |--- DDDDDDDDDDDDDDDDDDDDDD... = d [VALUE 24]
-	         |--- Object = {} [HASH 25]
-	         |    |--- Class = Tree::DAG_Node [BLESS 26]
-	         |         |--- {} [HASH 27]
-	         |              |--- attributes = {} [HASH 28]
-	         |              |    |--- {} [HASH 29]
-	         |              |         |--- one = 1 [VALUE 30]
-	         |              |--- daughters [ARRAY 31]
-	         |              |    |--- 1 = [] [ARRAY 32]
-	         |              |--- mother = undef [VALUE 33]
-	         |              |--- name = A tree [VALUE 34]
-	         |--- Ref2Scalar = SCALAR(0x230a230) [SCALAR 35]
-	              |--- SCALAR(0x230a230) = A shortish string [SCALAR 36]
+	Code refs are always be different, so we do not use $expected
+	Synopsis. Attributes: {}
+	    |--- {} [HASH 1]. Attributes: {}
+	         |--- A = {} [HASH 2]. Attributes: {}
+	         |    |--- {} [HASH 3]. Attributes: {}
+	         |         |--- a = {} [HASH 4]. Attributes: {}
+	         |         |    |--- {} [HASH 5]. Attributes: {}
+	         |         |--- bbbbbb = CODE(0x55d5168d1b18) [CODE 6]. Attributes: {}
+	         |         |--- c123 [CODE 7 -> CODE 6]. Attributes: {}
+	         |         |--- d [REF 8 -> CODE 6]. Attributes: {}
+	         |--- B [ARRAY 9]. Attributes: {}
+	         |    |--- 1 = [] [ARRAY 10]. Attributes: {}
+	         |         |--- 0 = element_1 [SCALAR 11]. Attributes: {}
+	         |         |--- 1 = element_2 [SCALAR 12]. Attributes: {}
+	         |         |--- 2 = element_3 [SCALAR 13]. Attributes: {}
+	         |--- C = {} [HASH 14]. Attributes: {}
+	         |    |--- {} [HASH 15]. Attributes: {}
+	         |         |--- b = {} [HASH 16]. Attributes: {}
+	         |              |--- {} [HASH 17]. Attributes: {}
+	         |                   |--- a = {} [HASH 18]. Attributes: {}
+	         |                        |--- {} [HASH 19]. Attributes: {}
+	         |                             |--- a = {} [HASH 20]. Attributes: {}
+	         |                             |    |--- {} [HASH 21]. Attributes: {}
+	         |                             |--- b = CODE(0x55d51702db90) [CODE 22]. Attributes: {}
+	         |                             |--- c = 42999999999999999... [VALUE 23]. Attributes: {}
+	         |--- DDDDDDDDDDDDDDDDDDDDDD... = d [VALUE 24]. Attributes: {}
+	         |--- Object = {} [HASH 25]. Attributes: {}
+	         |    |--- Class = Tree::DAG_Node [BLESS 26]. Attributes: {}
+	         |         |--- {} [HASH 27]. Attributes: {}
+	         |              |--- attributes = {} [HASH 28]. Attributes: {}
+	         |              |    |--- {} [HASH 29]. Attributes: {}
+	         |              |         |--- one = 1 [VALUE 30]. Attributes: {}
+	         |              |--- daughters [ARRAY 31]. Attributes: {}
+	         |              |    |--- 1 = [] [ARRAY 32]. Attributes: {}
+	         |              |--- mother = undef [VALUE 33]. Attributes: {}
+	         |              |--- name = A tree [VALUE 34]. Attributes: {}
+	         |--- Ref2Scalar = SCALAR(0x55d51703... [SCALAR 35]. Attributes: {}
+	              |--- SCALAR(0x55d51703bc20) = A shortish string [SCALAR 36]. Attributes: {}
 
 =head1 Description
 
@@ -638,6 +641,8 @@ For sample code, see these programs in the scripts/ directory of the distro:
 
 =item o bless.pl
 
+=item o empty.pl
+
 =item o hash.pl
 
 =item o mixup.pl
@@ -646,12 +651,16 @@ For sample code, see these programs in the scripts/ directory of the distro:
 
 =item o synopsis.pl
 
+=item o undef.pl
+
+=item o zero.pl
+
 =back
 
 See also the test files t/*.t, which are basically copies of the above. And that means, like the
 *.pl above, all expected output is given in the source code.
 
-Lastly, see the L</FAQ> for details such as how to process the output tree yourself.
+Lastly, see the L</FAQ> below for details such as how to process the output tree yourself.
 
 =head1 Distributions
 

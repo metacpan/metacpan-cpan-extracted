@@ -6,7 +6,7 @@
 void _make_readonly (SV * val) {
 	dTHX;
 
-	if (SvOK(val) && SvTYPE(val) == SVt_RV && SvROK(val)) {
+	if (SvOK(val) && SvROK(val)) {
 		if (SvTYPE(SvRV(val)) == SVt_PVAV) {
 			AV * arr = (AV*)SvRV(val);
 			if (!SvREADONLY((SV*)arr)) {
@@ -27,7 +27,7 @@ void _make_readonly (SV * val) {
 				while ((entry = hv_iternext(hash)))  {
 					STRLEN retlen;
 					char * key =  SvPV(hv_iterkeysv(entry), retlen);
-					SV * value = *hv_fetch(hash, key, retlen, 0);	
+					SV * value = *hv_fetch(hash, key, retlen, 0);
 					_make_readonly(value);
 				}
 			}
@@ -40,7 +40,7 @@ void _make_readonly (SV * val) {
 void _make_readwrite (SV * val) {
 	dTHX;
 
-	if (SvOK(val) && SvTYPE(val) == SVt_RV && SvROK(val)) {
+	if (SvOK(val) && SvROK(val)) {
 		if (SvTYPE(SvRV(val)) == SVt_PVAV) {
 			AV * arr = (AV*)SvRV(val);
 			if (SvREADONLY(arr)) {
@@ -61,7 +61,7 @@ void _make_readwrite (SV * val) {
 				while ((entry = hv_iternext(hash)))  {
 					STRLEN retlen;
 					char * key =  SvPV(hv_iterkeysv(entry), retlen);
-					SV * value = *hv_fetch(hash, key, retlen, 0);	
+					SV * value = *hv_fetch(hash, key, retlen, 0);
 					_make_readwrite(value);
 				}
 			}
@@ -74,7 +74,7 @@ void _make_readwrite (SV * val) {
 int _is_readonly (SV * val) {
 	dTHX;
 
-	if (SvOK(val) && SvTYPE(val) == SVt_RV && SvROK(val)) {
+	if (SvOK(val) && SvROK(val)) {
 		if (SvTYPE(SvRV(val)) == SVt_PVAV) {
 			AV * arr = (AV*)SvRV(val);
 			if (! _is_readonly((SV*)arr) ) {
@@ -88,7 +88,7 @@ int _is_readonly (SV * val) {
 		}
 	}
 
-	return SvREADONLY(val) ? 1 : 0; 
+	return SvREADONLY(val) ? 1 : 0;
 }
 
 MODULE = Const::XS  PACKAGE = Const::XS
@@ -148,7 +148,7 @@ make_readonly(...)
 		}
 		XSRETURN(1);
 
-SV * 
+SV *
 unmake_readonly(...)
 	PROTOTYPE: \[$@%]@
 	CODE:

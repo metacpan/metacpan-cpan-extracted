@@ -1,5 +1,11 @@
 Revision history for Perl module EBook::Gutenberg
 
+0.03  May 11 2025
+  - gutenberg now prints a proper usage message rather than displaying its
+    manual.
+  - gutenberg uses XDG_DATA_HOME and ~/.local/share as additional potential
+    default data directories.
+
 0.02  Mar 21 2025
   - Require List::Util 1.33.
 

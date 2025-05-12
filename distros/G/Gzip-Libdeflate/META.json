@@ -49,6 +49,6 @@
          "web" : "https://github.com/benkasminbullock/gzip-libdeflate"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

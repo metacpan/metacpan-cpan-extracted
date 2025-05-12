@@ -9,6 +9,8 @@ use Tree::DAG_Node;
 
 # ------------------------------------------------
 
+print "Code refs are always be different, so we do not use \$expected\n";
+
 my($sub) = sub {};
 my($s)   =
 {

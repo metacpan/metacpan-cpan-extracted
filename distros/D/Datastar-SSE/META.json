@@ -1,0 +1,82 @@
+{
+   "abstract" : "Module for creating Datastar Server Events",
+   "author" : [
+      "James Wright <jwright@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.050",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Datastar-SSE",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.050"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "HTTP::ServerEvent" : "0",
+            "JSON" : "0",
+            "JSON::Types" : "0",
+            "Scalar::Util" : "0",
+            "Type::Library" : "0",
+            "Type::Tiny" : "0",
+            "Type::Tiny::Union" : "0",
+            "Types::Standard" : "0",
+            "constant" : "0",
+            "overload" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Datastar::SSE" : {
+         "file" : "lib/Datastar/SSE.pm",
+         "version" : "0.12"
+      },
+      "Datastar::SSE::Types" : {
+         "file" : "lib/Datastar/SSE/Types.pm"
+      },
+      "Datastar::SSE::Types::TypeConstraint" : {
+         "file" : "lib/Datastar/SSE/Types.pm"
+      },
+      "MyTypes" : {
+         "file" : "lib/MyTypes.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tehmoth/datastar-sse/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tehmoth/datastar-sse.git",
+         "web" : "https://github.com/tehmoth/datastar-sse"
+      }
+   },
+   "version" : "0.12",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

@@ -2,6 +2,7 @@ Build.PL
 Changes
 LICENSE
 META.json
+Makefile
 README.md
 cpanfile
 lib/Web/API/Mock.pm

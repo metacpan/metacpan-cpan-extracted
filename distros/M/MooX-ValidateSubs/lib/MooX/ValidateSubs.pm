@@ -5,7 +5,7 @@ use warnings;
 
 use MooX::ReturnModifiers;
 use B;
-our $VERSION = '1.012009';
+our $VERSION = '1.012010';
 
 sub import {
 	my $target	= caller;
@@ -92,7 +92,7 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.012009
+Version 1.012010
 
 =cut
 

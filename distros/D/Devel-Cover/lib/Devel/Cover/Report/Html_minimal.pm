@@ -2,19 +2,18 @@ package Devel::Cover::Report::Html_minimal;
 
 use strict;
 use warnings;
-use HTML::Entities;
-use Getopt::Long;
-use Devel::Cover::DB;
-use Devel::Cover::Html_Common "launch";
-use Devel::Cover::Truth_Table;
+use HTML::Entities            qw( encode_entities );
+use Getopt::Long              qw( GetOptions );
+use Devel::Cover::Html_Common qw( launch );  ## no perlimports
+use Devel::Cover::Truth_Table ();
 
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.47'; # VERSION
+  our $VERSION = '1.48'; # VERSION
 }
 
-use Devel::Cover::Inc;
+use Devel::Cover::Inc ();
 
 BEGIN { $VERSION //= $Devel::Cover::Inc::VERSION }
 
@@ -776,7 +775,7 @@ Devel::Cover::Report::Html_minimal - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

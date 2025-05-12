@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.9986';
+$Geo::Address::Formatter::VERSION = '1.9987';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -699,6 +699,9 @@ sub _apply_replacements {
     }
 
     foreach my $component (keys %$rh_components) {
+        # some components dont need replacements
+        next if ($component eq 'country_code');
+        next if ($component eq 'house_number');
         foreach my $ra_fromto (@$raa_rules) {
             my $regexp;
             # do key specific replacement
@@ -964,7 +967,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.9986
+version 1.9987
 
 =head1 SYNOPSIS
 

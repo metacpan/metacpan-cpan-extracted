@@ -3,7 +3,7 @@ use v5.14;
 use warnings;
 
 package Test::YAFT::Cmp::Complement;
-$Test::YAFT::Cmp::Complement::VERSION = '1.0.1';
+$Test::YAFT::Cmp::Complement::VERSION = '1.0.2';
 use parent 'Test::YAFT::Cmp';
 
 require Test::Deep;

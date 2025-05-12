@@ -2,15 +2,14 @@ package Devel::Cover::Report::Html_subtle;
 use strict;
 use warnings;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.48'; # VERSION
 
-use Devel::Cover::DB;
-use Devel::Cover::Html_Common "launch";
-use Devel::Cover::Truth_Table;
+use Devel::Cover::Html_Common qw( launch );  ## no perlimports
+use Devel::Cover::Truth_Table;               ## no perlimports
 
-use Getopt::Long;
-use Template 2.00;
-use HTML::Entities;
+use Getopt::Long   qw( GetOptions );
+use Template 2.00  ();
+use HTML::Entities qw( encode_entities );
 
 my $Template;
 my %Filenames;
@@ -402,7 +401,7 @@ package Devel::Cover::Report::Html_subtle::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.48'; # VERSION
 
 use base "Template::Provider";
 
@@ -721,7 +720,7 @@ Devel::Cover::Report::Html_subtle - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

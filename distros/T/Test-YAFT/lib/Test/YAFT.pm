@@ -16,7 +16,8 @@ package Test::YAFT {
 	use Test::Deep qw[];
 	use Test::Differences qw[];
 	use Test::More     v0.970 qw[];
-	use Test::Warnings qw[ :no_end_test ];
+
+	require Test::Warnings;
 
 	use Test::YAFT::Arrange;
 	use Test::YAFT::Attributes;
@@ -29,7 +30,6 @@ package Test::YAFT {
 	sub act (&;@);
 	sub arrange (&);
 	sub got (&);
-	sub had_no_warnings (;$);
 	sub pass (;$);
 
 	sub act (&;@)                   :Exported(all,helpers);
@@ -95,7 +95,7 @@ package Test::YAFT {
 	sub explain                     :Exported(all,helpers)      :From(\&Test::More::explain);
 	sub fail                        :Exported(all,asserts);
 	sub got (&)                     :Exported(all,helpers);
-	sub had_no_warnings (;$)        :Exported(all,asserts)      :From(\&Test::Warnings::had_no_warnings);
+	sub had_no_warnings             :Exported(all,asserts)      :From(\&Test::Warnings::had_no_warnings);
 	sub ignore                      :Exported(all,expectations) :From(\&Test::Deep::ignore);
 	sub it                          :Exported(all,asserts);
 	sub nok                         :Exported(all,asserts);
@@ -371,7 +371,7 @@ package Test::YAFT {
 
 	1;
 }
-$Test::YAFT::VERSION = '1.0.1';;
+$Test::YAFT::VERSION = '1.0.2';;
 
 __END__
 

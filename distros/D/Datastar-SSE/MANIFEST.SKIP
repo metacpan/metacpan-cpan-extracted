@@ -1,0 +1,4 @@
+#!include_default
+Datastar-SSE-.*
+README.pod
+lib/MyTypes.pm

@@ -3,7 +3,7 @@ package Tk::ListBrowser::LBHeader;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.04;
+$VERSION = 0.08;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'LBHeader';
@@ -65,8 +65,11 @@ sub Populate {
 	$self->Advertise(Sort => $sort);
 	
 	for ($self, $label, $sort) {
-		$_->bind('<Button-3>', [$self, 'Callback', '-contextcall', Ev('x'), Ev('y')]);
-		$_->bind('<Button-1>', [$self, 'SortClick']);
+		my $item = $_;
+		$item->bind('<Button-3>', [$self, 'Callback', '-contextcall', Ev('x'), Ev('y')]);
+#		$item->bind('<Button-1>', [$self, 'SortClick']);
+		$item->bind('<B1-Motion>', [$self, 'B1Motion', $item, Ev('x')]);
+		$item->bind('<ButtonRelease-1>', [$self, 'B1Release', $item, Ev('x')]);
 	}
 
 	my $fg = $sort->cget('-foreground');
@@ -88,6 +91,8 @@ sub Populate {
 	
 	$self->ConfigSpecs(
 		-contextcall => ['CALLBACK', undef, undef, sub {}],
+		-motioncall => ['CALLBACK', undef, undef, sub {}],
+		-releasecall => ['CALLBACK', undef, undef, sub {}],
 		-sortcall => ['CALLBACK', undef, undef, sub {}],
 		-sortorder => ['METHOD', undef, undef, 'none'],
 		-image => [$label],
@@ -95,6 +100,30 @@ sub Populate {
 		DEFAULT => [ $self ],
 	);
 	return $self;
+}
+
+sub B1Motion {
+	my ($self, $item, $x) = @_;
+	return if $self->column eq '';
+	unless (exists $self->{CURSORSAVE}) {
+		$self->{CURSORSAVE} = $self->cget('-cursor');
+		$self->configure(-cursor => 'fleur');
+	}
+	$x = $x + $item->x unless $item eq $self;
+	$self->Callback('-motioncall', $self->column, $x);
+}
+
+sub B1Release {
+	my $self = shift;
+	if (exists $self->{CURSORSAVE}) {
+		my $c = $self->{CURSORSAVE};
+		$self->configure(-cursor => $c);
+		delete $self->{CURSORSAVE};
+		$self->Callback('-releasecall', $self->column);
+	} else {
+#		print "sortclick\n";
+		$self->SortClick;
+	}
 }
 
 sub column { return $_[0]->{COLUMN} }

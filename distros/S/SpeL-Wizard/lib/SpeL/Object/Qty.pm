@@ -38,7 +38,7 @@ SpeL::Object::Qty - LaTeX operator object
 
 =head1 VERSION
 
-version 20250129.1405
+version 20250511.1428
 
 =head1 METHODS
 

@@ -1,0 +1,7 @@
+Revision history for Datastar-SSE
+
+0.12      2025-05-11 23:47:54-0400
+          - appease Module-Build-Tiny
+0.11      2025-04-21 20:56:37-0400
+          - Initial release to an unsuspecting world
+

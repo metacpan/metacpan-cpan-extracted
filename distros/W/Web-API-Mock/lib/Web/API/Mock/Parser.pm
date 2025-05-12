@@ -3,7 +3,7 @@ use 5.008005;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.11";
 
 use utf8;
 use B qw(perlstring);

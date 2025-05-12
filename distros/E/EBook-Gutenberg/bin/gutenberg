@@ -223,7 +223,7 @@ Disbale informative output.
 
 =item B<-h|--help>
 
-Display B<gutenberg> manual.
+Print B<gutenberg> help message.
 
 =item B<-v|--version>
 

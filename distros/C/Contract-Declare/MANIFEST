@@ -1,0 +1,14 @@
+lib/Contract/Declare.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/01-basic.t
+t/02-missing-impl.t
+t/03-validate-args.t
+t/04-validate-returns.t
+t/05-bad-interface.t
+t/06-method-validate.t
+t/07-edge-cases.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

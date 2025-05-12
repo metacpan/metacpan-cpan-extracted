@@ -25,6 +25,7 @@ WriteMakefile(
 	'Moo' => 0,
         'Carp' => 0,
     },
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-ValidateSubs-*' },
     META_MERGE => {

@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20250129.1405",
+  "VERSION" => "20250511.1428",
   "test" => {
     "TESTS" => "t/*.t t/01-lib/SpeL/Object/*.t t/01-lib/SpeL/Parser/*.t t/02-bin/*.t"
   }

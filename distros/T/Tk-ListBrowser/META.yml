@@ -22,8 +22,9 @@ requires:
   Math::Round: '0.08'
   Test::Tk: '3.04'
   Tk: '804.033'
+  Tk::PopList: '0.14'
 resources:
   bugtracker: https://github.com/haje61/Tk-ListBrowser/issues
   repository: git://github.com/haje61/Tk-ListBrowser.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

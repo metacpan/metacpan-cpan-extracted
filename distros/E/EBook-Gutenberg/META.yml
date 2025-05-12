@@ -36,5 +36,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/gutenberg/issues
   repository: https://codeberg.org/1-1sam/gutenberg.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

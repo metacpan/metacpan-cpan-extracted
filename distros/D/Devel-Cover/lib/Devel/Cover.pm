@@ -13,28 +13,26 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.47'; # VERSION
+  our $VERSION = '1.48'; # VERSION
 }
 
 use DynaLoader ();
 our @ISA = "DynaLoader";
 
-use Devel::Cover::DB;
-use Devel::Cover::DB::Digests;
-use Devel::Cover::Inc;
+use Devel::Cover::DB          ();
+use Devel::Cover::DB::Digests ();
+use Devel::Cover::Inc         ();
 
 BEGIN { $VERSION //= $Devel::Cover::Inc::VERSION }
 
-use B qw( ppname main_cv main_start main_root walksymtable OPf_KIDS );
-use B::Deparse;
+use B          qw( main_cv main_root ppname walksymtable );
+use B::Deparse ();
 
-use Carp;
-use Config;
-use Cwd qw( abs_path getcwd );
-use File::Spec;
+use Config     qw( %Config );
+use Cwd        qw( abs_path getcwd );
+use File::Spec ();
 
-use Devel::Cover::Dumper;
-use Devel::Cover::Util "remove_contained_paths";
+use Devel::Cover::Util qw( remove_contained_paths );
 
 BEGIN {
   # Use Pod::Coverage if it is available
@@ -77,7 +75,7 @@ my %Pod;                                        # Pod coverage data
 my @Cvs;        # All the Cvs we want to cover
 my %Cvs;        # All the Cvs we want to cover
 my @Subs;       # All the subs we want to cover
-my $Cv;         # Cv we are looking in
+my $Cv;         ## no critic (ProhibitUnusedVariables)  # Cv we are looking in
 my $Sub_name;   # Name of the sub we are looking in
 my $Sub_count;  # Count for multiple subs on same line
 
@@ -1332,7 +1330,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

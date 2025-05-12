@@ -21,8 +21,7 @@ sub read {
 
   my $line;
   if( exists $self->{Greek} ) {
-    $self->{Greek} =~ s/\\(?:mit|mup)?//;
-    $self->{Greek} =~ s/\\(?:var)?//;
+    $self->{Greek} =~ s/\\(?:mit|mup)?(?:var)?//;
     $line = $SpeL::I18n::lh->maketext( lc( $self->{Greek} ) );
   }
   else {
@@ -48,7 +47,7 @@ SpeL::Object::Variable - LaTeX variable (math) object
 
 =head1 VERSION
 
-version 20250129.1405
+version 20250511.1428
 
 =head1 METHODS
 

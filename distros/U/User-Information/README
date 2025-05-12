@@ -1,0 +1,17 @@
+User::Information
+-----------------
+
+This module provides an interface for fetching information about a user.
+
+
+Pre-Requirements
+----------------
+
+On Debian:
+$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-perl libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
+
+
+Building
+--------
+$ dzil build
+$ dzil install

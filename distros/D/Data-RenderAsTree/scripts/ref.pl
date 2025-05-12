@@ -30,8 +30,8 @@ my(%source) =
 	{
 		data     => \'s', # Use ' in comment for UltraEdit hiliting.
 		expected => <<EOS,
-Ref Demo
-    |--- SCALAR() [SCALAR 1]
+Ref Demo. Attributes: {}
+    |--- SCALAR() [SCALAR 1]. Attributes: {}
 EOS
 		literal => q|\'s'|, # Use ' in comment for UltraEdit hiliting.
 	},
@@ -39,14 +39,17 @@ EOS
 	{
 		data     => {key => \'s'}, # Use ' in comment for UltraEdit hiliting.
 		expected => <<EOS,
-Ref Demo
-    |--- {} [HASH 1]
-         |--- key = SCALAR() [SCALAR 2]
+Ref Demo. Attributes: {}
+    |--- {} [HASH 1]. Attributes: {}
+         |--- key = SCALAR() [SCALAR 2]. Attributes: {}
+              |--- SCALAR() = s [SCALAR 3]. Attributes: {}
 EOS
 		literal => q|{key => \'s'}|, # Use ' in comment for UltraEdit hiliting.
 	},
 );
-my($renderer) = Data::RenderAsTree -> new
+my($count)		= 0;
+my($successes)	= 0;
+my($renderer)	= Data::RenderAsTree -> new
 	(
 		attributes => 0,
 		title      => 'Ref Demo',
@@ -56,12 +59,25 @@ my($renderer) = Data::RenderAsTree -> new
 my($expected);
 my($got);
 my($i);
+my($result);
+my($x1, $x2);
 
 for $i (sort keys %source)
 {
+	$count++;
+
 	$got      = [map{clean($_)} @{$renderer -> render($source{$i}{data})}];
 	$expected = [map{clean($_)} split(/\n/, $source{$i}{expected})];
+	$x1			= Dumper($got);
+	$x2			= Dumper($expected);
+	$result		= $x1 eq $x2;
+
+	$successes++ if ($result);
 
 	print "$i: $source{$i}{literal}\n";
-	print Dumper($got);
+	print "Got: \n", Dumper($got), "Expected: \n", Dumper($expected);
+	print "# $count: " . ($result ? "OK\n" : "Not OK\n");
 }
+
+print "Test count:    $count\n";
+print "Success count: $successes\n";

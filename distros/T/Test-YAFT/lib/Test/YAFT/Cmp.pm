@@ -41,7 +41,7 @@ package Test::YAFT::Cmp {
 
 	1;
 }
-$Test::YAFT::Cmp::VERSION = '1.0.1';;
+$Test::YAFT::Cmp::VERSION = '1.0.2';;
 
 __END__
 

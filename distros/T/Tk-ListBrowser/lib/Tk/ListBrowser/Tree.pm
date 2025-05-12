@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.04;
+$VERSION =  0.08;
 
 use Math::Round qw(round);
 
@@ -53,13 +53,13 @@ sub draw {
 		if ($item->opened) {
 			$ind = $c->createImage($ix, $iy,
 				-image => $self->cget('-indicatorminusimg'),
-				-tags => ['main'],
+				-tags => ['main', 'indicator'],
 			);
 			$c->bind($ind, '<1>', sub { $self->entryClose($entry) });
 		} else {
 			$ind = $c->createImage($ix, $iy,
 				-image => $self->cget('-indicatorplusimg'),
-				-tags => ['main'],
+				-tags => ['main','indicator'],
 			);
 			$c->bind($ind, '<1>', sub { $self->entryOpen($entry) });
 		}
@@ -69,15 +69,17 @@ sub draw {
 
 sub entryClose {
 	my ($self, $entry) = @_;
+#	my @sel = $self->selectionGet;
+#	my $s = @sel; print "tree sel $s\n";
 	$self->close($entry);
-	$self->refresh;
+	$self->listbrowser->refresh;
 	$self->headerPlace; # TODO not sure why this is needed.
 }
 
 sub entryOpen {
 	my ($self, $entry) = @_;
 	$self->open($entry);
-	$self->refresh;
+	$self->listbrowser->refresh;
 	$self->headerPlace; # TODO not sure why this is needed.
 }
 

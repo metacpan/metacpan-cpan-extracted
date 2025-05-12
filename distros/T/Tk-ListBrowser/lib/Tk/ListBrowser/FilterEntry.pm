@@ -3,7 +3,7 @@ package Tk::ListBrowser::FilterEntry;
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.06;
+$VERSION =  0.08;
 
 use base qw(Tk::Derived Tk::Entry);
 
@@ -13,7 +13,7 @@ use Tk;
 sub Populate {
 	my ($self,$args) = @_;
 	$self->SUPER::Populate($args);
-	$self->{FILTERINIT} = 0;
+	$self->{FILTERINIT} = 1;
 	$self->bind('<Button-1>', [$self, 'Button1']);
 	$self->bind('<KeyRelease>', [$self, 'KeyRelease', Ev('A')]);
 	$self->ConfigSpecs(
@@ -40,7 +40,7 @@ sub activate {
 
 sub Button1 {
 	my $self = shift;
-	$self->icursor(0) if $self->filterinit;
+	$self->icursor(0) unless $self->filterinit;
 	$self->focus;
 }
 
@@ -85,11 +85,12 @@ sub KeyRelease {
 	} else {
 		$self->activate if $key ne ''
 	}
-	$self->icursor(0);
+#	$self->icursor(0);
 }
 
 sub reset {
 	my $self = shift;
+	print "reset\n";
 	$self->delete(0, 'end');
 	$self->insert('end', 'Filter');
 	$self->icursor(0);

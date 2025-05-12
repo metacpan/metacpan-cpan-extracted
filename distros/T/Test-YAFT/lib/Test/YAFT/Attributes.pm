@@ -64,4 +64,4 @@ package Test::YAFT::Attributes {
 
 	1;
 }
-$Test::YAFT::Attributes::VERSION = '1.0.1';
+$Test::YAFT::Attributes::VERSION = '1.0.2';

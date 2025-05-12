@@ -1,0 +1,32 @@
+---
+abstract: 'Blurred background fill image processor'
+author:
+  - dave@perlhacks.com
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-BlurFill
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  Imager: '0'
+  Plack: '0'
+  Test::More: '0'
+  perl: '5.040'
+resources:
+  bugtracker: https://github.com/davorg-cpan/app-blurfill/issues
+  repository: https://github.com/davorg-cpan/app-blurfill.git
+version: v0.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

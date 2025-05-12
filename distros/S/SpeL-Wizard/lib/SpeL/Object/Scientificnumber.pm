@@ -33,9 +33,9 @@ sub read {
   my $exp = '';
   if ( exists $self->{Exponent} ) {
       if ( exists $self->{Value} ) {
-	  $exp .= ' ' . $SpeL::I18n::lh->maketext('times');
+	  $exp .= ' ' . $SpeL::I18n::lh->maketext('*') . ' ';
       }
-      $exp .= ' 10 ' . $SpeL::I18n::lh->maketext('Intpower' ) . ' ' . $self->{Exponent}->read( $level + 1 );
+      $exp .= ' 10 ' . $SpeL::I18n::lh->maketext('Intpower' ) . ' ' . $self->{Exponent}->read( $level + 1 ) . ', ';
   }
   return $sign . $value . $exp;
 }
@@ -54,7 +54,7 @@ SpeL::Object::Scientificnumber - LaTeX Scientificnumber object
 
 =head1 VERSION
 
-version 20250129.1405
+version 20250511.1428
 
 =head1 METHODS
 

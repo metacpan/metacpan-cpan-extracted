@@ -1,0 +1,306 @@
+NAME
+
+    Datastar::SSE - Module for creating Datastar Server Events
+
+DESCRIPTION
+
+    An implementation of the Datastar <https://data-star.dev/> Server Sent
+    Event SDK in Perl
+
+SYNOPSIS
+
+        use Datastar::SSE :merge_modes;
+    
+            my @events;
+            push @events,  Datastar::SSE->merge_fragments( $html_fragment, +{
+            selector => '#name-selector',
+            merge_mode => FRAGMENT_MERGEMODE_OUTER,
+        });
+        # $event is a multiline string which should be sent as part of
+        # the http response body.  Multiple event strings can be sent in the same response.
+            for my $evt (@events) {
+                    $cgi->print( $evt ); # CGI
+                    $psgi_writer->write( $evt ); # PSGI delayed response "writer"
+                    $c->write( $evt ); # Mojolicious controller
+            }
+
+EXPORT TAGS
+
+    The following tags can be specified to export constants related to the
+    Datastar SSE
+
+ events
+
+    The Datastar SSE <https://data-star.dev/reference/sse_events> Event
+    names:
+
+      * DATASTAR_MERGE_FRAGMENTS
+
+      datastar-merge-fragments
+      <https://data-star.dev/reference/sse_events#datastar-merge-fragments>
+
+      * DATASTAR_REMOVE_FRAGMENTS
+
+      datastar-remove-fragments
+      <https://data-star.dev/reference/sse_events#datastar-remove-fragments>
+
+      * DATASTAR_MERGE_SIGNALS
+
+      datastar-merge-signals
+      <https://data-star.dev/reference/sse_events#datastar-merge-signals>
+
+      * DATASTAR_REMOVE_SIGNALS
+
+      datastar-remove-signals
+      <https://data-star.dev/reference/sse_events#datastar-remove-signals>
+
+      * DATASTAR_EXECUTE_SCRIPT
+
+      datastar-execute-script
+      <https://data-star.dev/reference/sse_events#datastar-execute-script>
+
+ fragment_merge_modes
+
+    The Merge Modes for the "merge_fragments" event:
+
+      * FRAGMENT_MERGEMODEMORPH
+
+      morph
+
+      Merges the fragment using Idiomorph
+      <https://github.com/bigskysoftware/idiomorph>. This is the default
+      merge strategy.
+
+      * FRAGMENT_MERGEMODE_INNER
+
+      inner
+
+      Replaces the target’s innerHTML with the fragment.
+
+      * FRAGMENT_MERGEMODE_OUTER
+
+      outer
+
+      Replaces the target’s outerHTML with the fragment.
+
+      * FRAGMENT_MERGEMODE_PREPEND
+
+      prepend
+
+      Prepends the fragment to the target’s children.
+
+      * FRAGMENT_MERGEMODE_APPEND
+
+      append
+
+      Appends the fragment to the target’s children.
+
+      * FRAGMENT_MERGEMODE_BEFORE
+
+      before
+
+      Inserts the fragment before the target as a sibling.
+
+      * FRAGMENT_MERGEMODE_AFTER
+
+      after
+
+      Inserts the fragment after the target as a sibling.
+
+      * FRAGMENT_MERGEMODE_UPSERTATTRIBUTES
+
+      upsertAttributes
+
+      Merges attributes from the fragment into the target – useful for
+      updating a signal.
+
+METHODS
+
+ headers
+
+            ->headers();
+
+    Returns an Array Ref of the recommended headers to sent for Datastar
+    SSE responses.
+
+            Content-Type: text/event-stream
+            Cache-Control: no-cache
+            Connection: keep-alive
+            Keep-Alive: timeout=300, max=100000
+
+EVENTS
+
+    Each Datastar SSE event is implements as a class method on
+    Datastar::SSE. Each method accepts, but does not require, an options
+    hashref as the last parameter, the options are documented per event,
+    additionally all options from HTTP::ServerEvent are supported.
+
+      * id
+
+      The event id. If you send this, a client will send the
+      "Last-Event-Id" header when reconnecting, allowing you to send the
+      events missed while offline. Newlines or null characters in the event
+      id are treated as a fatal error.
+
+      * retry
+
+      the amount of miliseconds to wait before reconnecting if the
+      connection is lost. Newlines or null characters in the retry interval
+      are treated as a fatal error.
+
+ merge_fragments
+
+            ->merge_fragments( $html_fragment, $options_hashref );
+            ->merge_fragments( $html_fragment_arrayref, $options_hashref );
+
+    datastar-merge-fragments
+    <https://data-star.dev/reference/sse_events#datastar-merge-fragments>
+
+    Merges one or more fragments into the DOM. By default, Datastar merges
+    fragments using Idiomorph
+    <https://github.com/bigskysoftware/idiomorph>, which matches top level
+    elements based on their ID.
+
+  OPTIONS
+
+      * selector
+
+      Str
+
+      Selects the target element of the merge process using a CSS selector.
+
+      * use_view_transition
+
+      Bool
+
+      Default: 0
+
+      Sends As: useViewTransition
+
+      Whether to use view transitions when merging into the DOM.
+
+      * merge_mode
+
+      Str|MERGEMODE
+
+      Default: FRAGMENT_MERGEMODE_MORPH
+
+      Sends As: mergeMode
+
+      The mode to use when merging into the DOM.
+
+      See merge modes
+
+ merge_signals
+
+            ->merge_signals( $signals_hashref, $options_hashref );
+
+    datastar-merge-signals
+    <https://data-star.dev/reference/sse_events#datastar-merge-signals>
+
+    Updates the signals with new values. The only_if_missing option
+    determines whether to update the signals with new values only if the
+    key does not exist. The signals line should be a valid data-signals
+    attribute. This will get merged into the signals.
+
+  OPTIONS
+
+      * only_if_missing
+
+      Bool
+
+      Default: 0
+
+      Sends As: onlyIfMissing
+
+      Only update the signals with new values if the key does not exist.
+
+ remove_fragments
+
+            ->remove_fragments( $selector, $options_hashref )
+
+    datastar-remove-fragments
+    <https://data-star.dev/reference/sse_events#datastar-remove-fragments>
+
+    Removes one or more HTML fragments that match the provided selector
+    ($selector) from the DOM.
+
+ remove_signals
+
+            ->remove_signals( @paths, $options_hashref )
+            ->remove_signals( $paths_arrayref, $options_hashref )
+
+    datastar-remove-signals
+    <https://data-star.dev/reference/sse_events#datastar-remove-signals>
+
+    Removes signals that match one or more provided paths (@paths).
+
+ execute_script
+
+            ->execute_script( $script, $options_hashref )
+            ->execute_script( $script_arrayref, $options_hashref )
+
+    datastar-execute-script
+    <https://data-star.dev/reference/sse_events#datastar-execute-script>
+
+    Executes JavaScript ($script or @$script_arrayref) in the browser.
+
+  OPTIONS
+
+      * auto_remove
+
+      Bool
+
+      Default: 1
+
+      Sends As: autoRemove
+
+      Determines whether to remove the script element after execution.
+
+      * attributes
+
+      Map[Name,Value]
+
+      CycleTuple[ Str | Map[Name,Value] ]
+
+      Default: [{ type => 'module' }]
+
+      Each attribute adds an HTML attribute to the <script> tag used for
+      the script, in either name='value' or name format.
+
+      The attributes option can be one of
+
+	* A HashRef of keys and values, with boolean attributes (attributes
+	without a value), as a false value
+
+                options => {
+                        type => 'script',
+                        async => 0,
+                        defer => 0,
+                        class => 'my-script',
+                },
+
+	* An ArrayRef of key,value pairs as Hashrefs, and simple strings
+	for boolean attributes
+
+                options => [
+                        { type => 'script' },
+                        'async',
+                        'defer',
+                        { class => 'my-script' },
+                ];
+
+    All events return the falsey empty string () when they cannot generate
+    an event string.
+
+AUTHOR
+
+    James Wright <jwright@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2025 by James Wright.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

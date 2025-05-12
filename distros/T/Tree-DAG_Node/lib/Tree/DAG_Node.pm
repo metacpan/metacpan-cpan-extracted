@@ -5,7 +5,7 @@ use warnings;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 our $Debug   = 0;
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 use File::Slurper 'read_lines';
 
@@ -723,7 +723,7 @@ sub hashref2string
 	my($self, $hashref) = @_;
 	$hashref ||= {};
 
-	return '{' . join(', ', map{qq|$_ => "$$hashref{$_}"|} sort keys %$hashref) . '}';
+	return '{' . join(', ', map{$_ = 'undef' if (! defined($_) ); $$hashref{$_} = 'undef' if (! defined($$hashref{$_}) ); qq|$_ => "$$hashref{$_}"|} sort keys %$hashref) . '}';
 
 } # End of hashref2string.
 

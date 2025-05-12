@@ -3,7 +3,7 @@ package Rope::Object;
 use strict;
 use warnings;
 
-use Const::XS qw/make_readonly_ref/;
+use Const::XS qw/make_readonly/;
 
 sub TIEHASH {
         my ($class, $obj) = @_;
@@ -73,7 +73,7 @@ sub set_value {
 	}	
 
 	if ($spec->{readonly}) {
-		$value = make_readonly_ref(ref $value eq 'HASH' ? {%{$value}} : ref $value eq 'ARRAY' ? [@{$value}] : $value);
+		make_readonly($value);
 	}
 
 	if ($spec->{handles_via}) {

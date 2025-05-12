@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
         'Coerce::Types::Standard' => 0.000008,
 	'Data::LnArray' => 0.04,
 	'Combine::Keys' => 0.09,
-	'Const::XS' => 1.00
+	'Const::XS' => 1.01
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Rope-*' },

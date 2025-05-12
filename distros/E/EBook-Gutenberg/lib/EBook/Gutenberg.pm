@@ -1,6 +1,6 @@
 package EBook::Gutenberg;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -19,8 +19,23 @@ my $PRGVER = $VERSION;
 
 my $HELP = <<"HERE";
 $PRGNAM - $PRGVER
+
 Usage: $0 [options] command [command options] [args]
-Consult the $PRGNAM manual for more information.
+
+Commands:
+  update            Update local Project Gutenberg catalog
+  get <target>      Download ebook matching target
+  search <target>   Search for ebooks matching target
+  meta <id>         Dump ebook metadata
+
+Options:
+  -d|--data=<dir>   gutenberg data directory
+  -y|--no-prompt    Disable prompts for user input
+  -q|--quiet        Disable informative output
+  -h|--help         Print this help message
+  -v|--version      Print gutenberg version
+
+Consult the gutenberg(1) manual for documentation on command-specific options.
 HERE
 
 my $VER_MSG = <<"HERE";
@@ -41,7 +56,27 @@ my %COMMANDS = (
     'meta'   => \&meta,
 );
 
-sub _default_data { File::Spec->catfile(home, '.gutenberg') }
+my $OLD_DEFAULT_DATA = File::Spec->catfile(home, '.gutenberg');
+my $DOT_LOCAL = File::Spec->catfile(home, '.local/share');
+
+sub _default_data {
+
+    # The default prior to 0.03
+    if (-d $OLD_DEFAULT_DATA) {
+        return $OLD_DEFAULT_DATA;
+    }
+
+    if (exists $ENV{ XDG_DATA_HOME } and -d $ENV{ XDG_DATA_HOME }) {
+        return File::Spec->catfile($ENV{ XDG_DATA_HOME }, 'gutenberg');
+    }
+
+    if (-d $DOT_LOCAL) {
+        return File::Spec->catfile($DOT_LOCAL, 'gutenberg');
+    }
+
+    return $OLD_DEFAULT_DATA;
+
+}
 
 sub _prompt {
 
@@ -270,24 +305,7 @@ sub help {
     my $self = shift;
     my $exit = shift;
 
-    # Silence errors/warnings
-    local $SIG{ __WARN__ } = sub { my $ign = $_[0] };
-    my $error;
-    unless ($^O eq 'os2') {
-        open $error, '>&', \*STDERR;
-        open STDERR, '>', File::Spec->devnull;
-    }
-
-    system 'perldoc', $0;
-
-    unless ($? >> 8 == 0) {
-        print $HELP;
-    }
-
-    unless ($^O eq 'os2') {
-        close STDERR;
-        open STDERR, '>&', $error;
-    }
+    print $HELP;
 
     exit $exit if defined $exit;
 
@@ -600,8 +618,7 @@ Print ebook metadata; the C<meta> command.
 
 =item $gut->help([$exit])
 
-Display L<gutenberg> manual if possible, otherwise print a short usage message.
-If C<$exit> is provided, exit with code C<$exit>.
+Print L<gutenberg> manual. Exit with code C<$exit> if provided.
 
 =back
 

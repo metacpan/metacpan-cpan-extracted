@@ -12,6 +12,7 @@ my %prereq = (
 	'Convert::Color'    => '0.18',
 	'Math::Round'       => '0.08',
 	'Tk'                => '804.033',
+	'Tk::PopList'       => '0.14',
 	'Test::Tk'          => '3.04',
 );
 

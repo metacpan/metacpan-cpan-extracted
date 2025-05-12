@@ -5,11 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  CPAN::Meta: '0'
-  CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,25 +26,29 @@ no_index:
 provides:
   Web::API::Mock:
     file: lib/Web/API/Mock.pm
-    version: '0.01'
+    version: '0.11'
   Web::API::Mock::Map:
     file: lib/Web/API/Mock/Map.pm
-    version: '0.01'
+    version: '0.11'
   Web::API::Mock::Parser:
     file: lib/Web/API/Mock/Parser.pm
-    version: '0.01'
+    version: '0.11'
   Web::API::Mock::Resource:
     file: lib/Web/API/Mock/Resource.pm
-    version: '0.01'
+    version: '0.11'
 requires:
   Class::Accessor::Lite: '0'
   FindBin::libs: '0'
   Plack: '0'
   Router::Simple: '0'
-  Text::Markdown::Hoedown: '1.01'
+  Text::Markdown::Hoedown: '1.03'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/takihito/Web-API-Mock/issues
   homepage: https://github.com/takihito/Web-API-Mock
-  repository: git://github.com/takihito/Web-API-Mock.git
-version: '0.01'
+  repository: https://github.com/takihito/Web-API-Mock.git
+version: '0.11'
+x_contributors:
+  - 'akihito <takeda-akihito@kayac.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

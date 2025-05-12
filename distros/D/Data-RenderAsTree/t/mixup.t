@@ -15,10 +15,10 @@ my(%source) =
 	{
 		data     => [{a => 'b'}],
 		expected => <<EOS,
-Mixup Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- {} [HASH 2]
-              |--- a = b [VALUE 3]
+Mixup Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- {} [HASH 2]. Attributes: {}
+              |--- a = b [VALUE 3]. Attributes: {}
 EOS
 		literal => q||,
 	},
@@ -26,12 +26,12 @@ EOS
 	{
 		data     => [{a => 'b'}, {c => 'd'}],
 		expected => <<EOS,
-Mixup Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- {} [HASH 2]
-         |    |--- a = b [VALUE 3]
-         |--- {} [HASH 4]
-              |--- c = d [VALUE 5]
+Mixup Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- {} [HASH 2]. Attributes: {}
+         |    |--- a = b [VALUE 3]. Attributes: {}
+         |--- {} [HASH 4]. Attributes: {}
+              |--- c = d [VALUE 5]. Attributes: {}
 EOS
 		literal => q|[{a => 'b'}, {c => 'd'}]|,
 	},
@@ -39,13 +39,13 @@ EOS
 	{
 		data     => [{a => 'b'}, ['c' => 'd'] ],
 		expected => <<EOS,
-Mixup Demo
-    |--- 0 = [] [ARRAY 1]
-         |--- {} [HASH 2]
-         |    |--- a = b [VALUE 3]
-         |--- 1 = [] [ARRAY 4]
-              |--- 0 = c [SCALAR 5]
-              |--- 1 = d [SCALAR 6]
+Mixup Demo. Attributes: {}
+    |--- 0 = [] [ARRAY 1]. Attributes: {}
+         |--- {} [HASH 2]. Attributes: {}
+         |    |--- a = b [VALUE 3]. Attributes: {}
+         |--- 1 = [] [ARRAY 4]. Attributes: {}
+              |--- 0 = c [SCALAR 5]. Attributes: {}
+              |--- 1 = d [SCALAR 6]. Attributes: {}
 EOS
 		literal => q|[{a => 'b'}, ['c' => 'd'] ]|,
 	},
@@ -53,12 +53,12 @@ EOS
 	{
 		data     => {a => ['b', 'c'] },
 		expected => <<EOS,
-Mixup Demo
-    |--- {} [HASH 1]
-         |--- a [ARRAY 2]
-              |--- 0 = [] [ARRAY 3]
-                   |--- 0 = b [SCALAR 4]
-                   |--- 1 = c [SCALAR 5]
+Mixup Demo. Attributes: {}
+    |--- {} [HASH 1]. Attributes: {}
+         |--- a [ARRAY 2]. Attributes: {}
+              |--- 0 = [] [ARRAY 3]. Attributes: {}
+                   |--- 0 = b [SCALAR 4]. Attributes: {}
+                   |--- 1 = c [SCALAR 5]. Attributes: {}
 EOS
 		literal => q|{a => ['b', 'c'] }|,
 	},
@@ -66,15 +66,15 @@ EOS
 	{
 		data     => {a => ['b', 'c'], d => {e => 'f'} },
 		expected => <<EOS,
-Mixup Demo
-    |--- {} [HASH 1]
-         |--- a [ARRAY 2]
-         |    |--- 0 = [] [ARRAY 3]
-         |         |--- 0 = b [SCALAR 4]
-         |         |--- 1 = c [SCALAR 5]
-         |--- d = {} [HASH 6]
-              |--- {} [HASH 7]
-                   |--- e = f [VALUE 8]
+Mixup Demo. Attributes: {}
+    |--- {} [HASH 1]. Attributes: {}
+         |--- a [ARRAY 2]. Attributes: {}
+         |    |--- 0 = [] [ARRAY 3]. Attributes: {}
+         |         |--- 0 = b [SCALAR 4]. Attributes: {}
+         |         |--- 1 = c [SCALAR 5]. Attributes: {}
+         |--- d = {} [HASH 6]. Attributes: {}
+              |--- {} [HASH 7]. Attributes: {}
+                   |--- e = f [VALUE 8]. Attributes: {}
 EOS
 		literal => q|{a => ['b', 'c'], d => {e => 'f'} }|,
 	},

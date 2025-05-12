@@ -1,4 +1,4 @@
-<a href="[% settings.plugin_observium.location %]/device/hostname=[% device.dns || device.name | uri %]/tab=port/ifdescr=[% row.base64url_port %]/"
+<a href="[% settings.plugin_observium.location %]/device/hostname=[% device.dns || device.name | uri %]/tab=port/ifdescr=[% row.port %]/"
   [% 'target="_blank"' UNLESS settings.plugin_observium.open_in_same_window %]
   class="btn nd_observium"
   data-content='

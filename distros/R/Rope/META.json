@@ -36,7 +36,7 @@
          "requires" : {
             "Coerce::Types::Standard" : "0.000008",
             "Combine::Keys" : "0.09",
-            "Const::XS" : "1",
+            "Const::XS" : "1.01",
             "Data::LnArray" : "0.04",
             "Factory::Sub" : "0.06",
             "Struct::Conditional" : "1.01",
@@ -51,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.43",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

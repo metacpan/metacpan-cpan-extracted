@@ -10,7 +10,7 @@ package Devel::Cover::Op;
 use strict;
 use warnings;
 
-our $VERSION = '1.47'; # VERSION
+our $VERSION = '1.48'; # VERSION
 
 use Devel::Cover::Dumper;
 
@@ -81,7 +81,7 @@ Devel::Cover::Op - B::Concise with coverage data
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

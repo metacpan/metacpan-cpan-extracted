@@ -52,7 +52,7 @@ package Test::YAFT::Cmp::Compare {
 
 	1;
 }
-$Test::YAFT::Cmp::Compare::VERSION = '1.0.1';;
+$Test::YAFT::Cmp::Compare::VERSION = '1.0.2';;
 
 __END__
 

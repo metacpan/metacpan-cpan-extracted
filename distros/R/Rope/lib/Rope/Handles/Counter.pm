@@ -26,7 +26,7 @@ Rope::Handles::Counter - Rope handles counters
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 

@@ -1,0 +1,64 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          '' => 'De derde \'stille\' voorwaarde legt een beperking op aan de frequenties die we kunnen toelaten op een PCB. Pas deze voorwaarde toe om de maximale lengte te bepalen voor koperbaan op een PCB gemaakt uit FR4 ('
+        }, 'SpeL::Object::TokenSequence' ),
+        bless( {
+          'MathUnit' => bless( {
+            '' => '\\mitvarepsilon = 4',
+            'Left' => bless( {
+              'Component' => bless( {
+                'Greek' => '\\mitvarepsilon',
+                'trailingws' => ' '
+              }, 'SpeL::Object::Variable' ),
+              'Rest' => bless( {
+                'ws' => ''
+              }, 'SpeL::Object::Expressionrest' )
+            }, 'SpeL::Object::Expression' ),
+            'RelationChain' => [
+              {
+                'RelOperator' => bless( {
+                  '' => '='
+                }, 'SpeL::Object::RelOperator' ),
+                'Right' => bless( {
+                  'Component' => bless( {
+                    'Realnumber' => bless( {
+                      'Sign' => '',
+                      'Value' => '4',
+                      'trailingws' => ''
+                    }, 'SpeL::Object::Realnumber' )
+                  }, 'SpeL::Object::Number' ),
+                  'Rest' => bless( {
+                    'ws' => ''
+                  }, 'SpeL::Object::Expressionrest' )
+                }, 'SpeL::Object::Expression' )
+              }
+            ]
+          }, 'SpeL::Object::Relation' )
+        }, 'SpeL::Object::MathInline' ),
+        bless( {
+          '' => '), indien we een frequentie van '
+        }, 'SpeL::Object::TokenSequence' ),
+        bless( {
+          'Units' => bless( {
+            '' => '{\\mega \\hertz }'
+          }, 'SpeL::Object::SIUnits' ),
+          'Value' => bless( {
+            'Sign' => '',
+            'Value' => '400',
+            'trailingws' => ''
+          }, 'SpeL::Object::Scientificnumber' )
+        }, 'SpeL::Object::Qty' ),
+        bless( {
+          '' => 'probleemloos willen verwerken op die PCB.
+
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

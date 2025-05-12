@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 20;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
@@ -59,6 +59,7 @@ if (defined $app) {
 		-textjustify => 'left',
 		-selectmode => 'multiple',
 		-separator =>'.',
+		-filterfield => 'text',
 
 		-browsecmd => sub {
 			print "browsecmd ";
@@ -164,9 +165,32 @@ push @tests, (
 		$ib->add('pipoclown.pipo', -text => 'pipoclown.pipo', -before => 'pipoclown.dikkedeur');
 		$ib->add('pipoclown.mamaloe', -text => 'pipoclown.mamaloe', -after => 'pipoclown.pipo');
 		$ib->add('pipoclown.pipo.schmink', -text => 'schmink');
+		$ib->add('pipoclown.pipo.neus', -text => 'neus');
 		my @list = $ib->infoList;
 		return \@list
-	}, [ 'pipoclown', 'pipoclown.pipo', 'pipoclown.pipo.schmink', 'pipoclown.mamaloe', 'pipoclown.dikkedeur'], 'hierarchical add' ],
+	}, [ 'pipoclown', 'pipoclown.pipo', 'pipoclown.pipo.schmink', 'pipoclown.pipo.neus', 'pipoclown.mamaloe', 'pipoclown.dikkedeur'], 'hierarchical add' ],
+	[ sub {
+		$ib->selectionSet('pipoclown.pipo.neus', 'pipoclown.dikkedeur');
+		my @l = $ib->selectionGet;
+		return \@l
+	}, ['pipoclown.pipo.neus', 'pipoclown.mamaloe', 'pipoclown.dikkedeur'], 'hlist selectionGet' ],
+	[ sub {
+		$ib->selectionClear;
+		my @l = $ib->selectionGet;
+		return \@l
+	}, [], 'hlist selectionClear' ],
+	[ sub {
+#		$ib->configure(-arrange => 'tree');
+		$ib->refresh;
+		$ib->selectionSet('pipoclown.pipo.neus', 'pipoclown.dikkedeur');
+		my @l = $ib->selectionGet;
+		return \@l
+	}, ['pipoclown.pipo.neus', 'pipoclown.mamaloe', 'pipoclown.dikkedeur'], 'tree selectionGet' ],
+	[ sub {
+		$ib->selectionClear;
+		my @l = $ib->selectionGet;
+		return \@l
+	}, [], 'tree selectionClear' ],
 	[ sub {
 		my $parent = $ib->infoParent('pipoclown.pipo');
 		return $parent
@@ -182,7 +206,7 @@ push @tests, (
 	[ sub {
 		my @list = $ib->infoChildren('pipoclown.pipo');
 		return \@list
-	}, ['pipoclown.pipo.schmink' ], 'infoChildren 2' ],
+	}, ['pipoclown.pipo.schmink', 'pipoclown.pipo.neus'], 'infoChildren 2' ],
 	[ sub {
 		my @list = $ib->infoChildren('pipoclown.mamaloe');
 		return \@list
@@ -197,7 +221,7 @@ push @tests, (
 	}, 'comedian', 'handler stackPush / stackTop' ],
 	[ sub {
 		return $handler->stackSize
-	}, 1, 'handler stackSize' ],
+	}, 2, 'handler stackSize' ],
 	[ sub {
 		$handler->stackClear;
 		return defined $handler->stackTop

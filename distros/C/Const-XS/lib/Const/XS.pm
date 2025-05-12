@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require XSLoader;
 XSLoader::load("Const::XS", $VERSION);
@@ -30,7 +30,7 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -40,7 +40,7 @@ Version 1.00
 	package MyApp::Constants;
 
 	use Const::XS qw/const/;
-	
+
 	use base 'Import::Export';
 
 	our %EX = (
@@ -89,7 +89,7 @@ This is the one of five functions of this module. It takes a scalar, array or ha
 
 =head2 make_readonly
 
-The second function exported by this module is make_readonly. It will take a perl variable and deeply make it readonly. 
+The second function exported by this module is make_readonly. It will take a perl variable and deeply make it readonly.
 
 	my $string = "abc";
 	make_readonly($string);
@@ -98,7 +98,7 @@ The second function exported by this module is make_readonly. It will take a per
 	my %hash = ( a => 1, b => 2, c => 3 );
 	make_readonly(%hash);
 	$hash{d}; # errors
-	%hash = ( new => 1 ); # errors 
+	%hash = ( new => 1 ); # errors
 
 =head2 make_readonly_ref
 
@@ -126,7 +126,7 @@ The fifth function exported by this module is is_readonly. It can be used to val
 	is_readonly(%hash); # 0;
 	make_readonly(%hash);
 	is_readonly(%hash); # 1;
-	
+
 =head2 BENCHMARK
 
 	use Benchmark qw(:all);
@@ -207,7 +207,7 @@ The fifth function exported by this module is is_readonly. It can be used to val
 	Const::Fast  221828/s         54%          --        -13%        -83%
 	Const::PP    254194/s         77%         15%          --        -80%
 	XS          1275510/s        787%        475%        402%          --
-	
+
 
 =head2 SEE ALSO
 

@@ -23,7 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/adler32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/adler32.c */
 
 
 /* #include "lib_common.h" */
@@ -74,8 +74,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -295,7 +295,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -1074,8 +1075,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -1295,7 +1296,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -2475,8 +2477,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -2696,7 +2698,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -3426,7 +3429,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_SSE2_NATIVE		0
 #endif
 
-#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
+#if (defined(__PCLMUL__) && defined(__SSE4_1__)) || \
+	(defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMULQDQ(features)	1
 #else
 #  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
@@ -3480,6 +3484,15 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
+	&& !defined(__EVEX512__) 
+#  define EVEX512	",evex512"	
+#  define NO_EVEX512	",no-evex512"
+#else
+#  define EVEX512	""
+#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -4699,7 +4712,7 @@ ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 
 #  define adler32_x86_avx512_vl256_vnni	adler32_x86_avx512_vl256_vnni
 #  define SUFFIX				   _avx512_vl256_vnni
-#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vl,avx512vnni")
+#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vl,avx512vnni" NO_EVEX512)
 #  define VL			32
 #  define USE_VNNI		1
 #  define USE_AVX512		1
@@ -5100,7 +5113,7 @@ ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 
 #  define adler32_x86_avx512_vl512_vnni	adler32_x86_avx512_vl512_vnni
 #  define SUFFIX				   _avx512_vl512_vnni
-#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vnni")
+#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vnni" EVEX512)
 #  define VL			64
 #  define USE_VNNI		1
 #  define USE_AVX512		1
@@ -5566,7 +5579,7 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 		return 1;
 	return adler32_impl(adler, buffer, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/crc32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/crc32.c */
 
 
 
@@ -5619,8 +5632,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -5840,7 +5853,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -6599,10 +6613,8 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define CRC32_X4127_MODG 0x1072db28 
 #define CRC32_X4063_MODG 0x0c30f51d 
 
-#define CRC32_X63_MODG 0xb8bc6765 
-#define CRC32_BARRETT_CONSTANT_1 0x00000001f7011641ULL 
+#define CRC32_BARRETT_CONSTANT_1 0xb4e5b025f7011641ULL 
 #define CRC32_BARRETT_CONSTANT_2 0x00000001db710641ULL 
-#define CRC32_BARRETT_CONSTANTS { CRC32_BARRETT_CONSTANT_1, CRC32_BARRETT_CONSTANT_2 }
 
 #define CRC32_NUM_CHUNKS 4
 #define CRC32_MIN_VARIABLE_CHUNK_LEN 128UL
@@ -7568,8 +7580,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -7789,7 +7801,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -9053,13 +9066,11 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 		{ CRC32_X543_MODG, CRC32_X479_MODG }, 
 		{ CRC32_X287_MODG, CRC32_X223_MODG }, 
 	};
-	static const u64 _aligned_attribute(16) final_mults[3][2] = {
-		{ CRC32_X63_MODG, 0 },
-		{ CRC32_BARRETT_CONSTANT_1, 0 },
-		{ CRC32_BARRETT_CONSTANT_2, 0 },
+	static const u64 _aligned_attribute(16) barrett_consts[3][2] = {
+		{ CRC32_X95_MODG, },
+		{ CRC32_BARRETT_CONSTANT_1, },
+		{ CRC32_BARRETT_CONSTANT_2, },
 	};
-	const uint8x16_t zeroes = vdupq_n_u8(0);
-	const uint8x16_t mask32 = vreinterpretq_u8_u64(vdupq_n_u64(0xFFFFFFFF));
 	const poly64x2_t multipliers_1 = load_multipliers(mults[0]);
 	uint8x16_t v0, v1, v2, v3;
 
@@ -9117,19 +9128,12 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 		v0 = fold_partial_vec(v0, p, len, multipliers_1);
 
 	
-
-	v0 = veorq_u8(vextq_u8(v0, zeroes, 8),
-		      clmul_high(vextq_u8(zeroes, v0, 8), multipliers_1));
-
-	
-	v0 = veorq_u8(vextq_u8(v0, zeroes, 4),
-		      clmul_low(vandq_u8(v0, mask32),
-				load_multipliers(final_mults[0])));
-
-	
-	v1 = clmul_low(vandq_u8(v0, mask32), load_multipliers(final_mults[1]));
-	v1 = clmul_low(vandq_u8(v1, mask32), load_multipliers(final_mults[2]));
-	return vgetq_lane_u32(vreinterpretq_u32_u8(veorq_u8(v0, v1)), 1);
+	v0 = veorq_u8(clmul_low(v0, load_multipliers(barrett_consts[0])),
+		      vextq_u8(v0, vdupq_n_u8(0), 8));
+	v1 = clmul_low(v0, load_multipliers(barrett_consts[1]));
+	v1 = clmul_low(v1, load_multipliers(barrett_consts[2]));
+	v0 = veorq_u8(v0, v1);
+	return vgetq_lane_u32(vreinterpretq_u32_u8(v0), 2);
 }
 #undef SUFFIX
 #undef ATTRIBUTES
@@ -9831,8 +9835,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -10052,7 +10056,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -10782,7 +10787,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_SSE2_NATIVE		0
 #endif
 
-#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
+#if (defined(__PCLMUL__) && defined(__SSE4_1__)) || \
+	(defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMULQDQ(features)	1
 #else
 #  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
@@ -10838,6 +10844,15 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
 #endif
 
+#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
+	&& !defined(__EVEX512__) 
+#  define EVEX512	",evex512"	
+#  define NO_EVEX512	",no-evex512"
+#else
+#  define EVEX512	""
+#  define NO_EVEX512	""
+#endif
+
 #endif 
 
 #endif 
@@ -10857,9 +10872,8 @@ static const u8 MAYBE_UNUSED shift_tab[48] = {
 
 #  define crc32_x86_pclmulqdq	crc32_x86_pclmulqdq
 #  define SUFFIX			 _pclmulqdq
-#  define ATTRIBUTES		_target_attribute("pclmul")
+#  define ATTRIBUTES		_target_attribute("pclmul,sse4.1")
 #  define VL			16
-#  define USE_SSE4_1		0
 #  define USE_AVX512		0
 /* #include "x86-crc32_pclmul_template.h" */
 
@@ -10881,7 +10895,7 @@ static const u8 MAYBE_UNUSED shift_tab[48] = {
 #  define fold_vec		fold_vec256
 #  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
 #  define VXOR(a, b)		_mm256_xor_si256((a), (b))
-#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define M128I_TO_VEC(a)	_mm256_zextsi128_si256(a)
 #  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
 #  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
@@ -10892,7 +10906,7 @@ static const u8 MAYBE_UNUSED shift_tab[48] = {
 #  define fold_vec		fold_vec512
 #  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
 #  define VXOR(a, b)		_mm512_xor_si512((a), (b))
-#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define M128I_TO_VEC(a)	_mm512_zextsi128_si512(a)
 #  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
 #  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
@@ -10949,7 +10963,6 @@ ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
 #define fold_vec512	ADD_SUFFIX(fold_vec512)
 #endif 
 
-#if USE_SSE4_1
 
 #undef fold_lessthan16bytes
 static forceinline ATTRIBUTES __m128i
@@ -10972,7 +10985,6 @@ ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
 	return fold_vec128(x0, x1, mults_128b);
 }
 #define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
-#endif 
 
 static ATTRIBUTES u32
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
@@ -10983,8 +10995,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 	const vec_t mults_2v = MULTS_2V;
 	const vec_t mults_1v = MULTS_1V;
 	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
-	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
-	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
 	const __m128i barrett_reduction_constants =
 		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
 	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
@@ -11039,7 +11049,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			size_t align = -(uintptr_t)p & (VL-1);
 
 			len -= align;
-		#if USE_SSE4_1
 			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
 			p += 16;
 			if (align & 15) {
@@ -11062,11 +11071,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
 		#  endif
 			p -= 16;
-		#else
-			crc = crc32_slice1(crc, p, align);
-			p += align;
-			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
-		#endif
 		} else {
 			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
 		}
@@ -11155,37 +11159,18 @@ less_than_16_remaining:
 	len &= 15;
 
 	
-#if USE_SSE4_1
 	if (len)
 		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
-#endif
 #if USE_AVX512
 reduce_x0:
 #endif
-
 	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
-			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
-
-	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
-			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-						final_mult, 0x00));
-
-	
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-				  barrett_reduction_constants, 0x00);
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
-				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(_mm_clmulepi64_si128(x0, mults_128b, 0x10),
+			   _mm_bsrli_si128(x0, 8));
+	x1 = _mm_clmulepi64_si128(x0, barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(x1, barrett_reduction_constants, 0x10);
 	x0 = _mm_xor_si128(x0, x1);
-#if USE_SSE4_1
-	crc = _mm_extract_epi32(x0, 1);
-#else
-	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
-	
-	crc = crc32_slice1(crc, p, len);
-#endif
-	return crc;
+	return _mm_extract_epi32(x0, 2);
 }
 
 #undef vec_t
@@ -11202,7 +11187,6 @@ reduce_x0:
 #undef SUFFIX
 #undef ATTRIBUTES
 #undef VL
-#undef USE_SSE4_1
 #undef USE_AVX512
 
 
@@ -11211,7 +11195,6 @@ reduce_x0:
 #  define SUFFIX				 _pclmulqdq_avx
 #  define ATTRIBUTES		_target_attribute("pclmul,avx")
 #  define VL			16
-#  define USE_SSE4_1		1
 #  define USE_AVX512		0
 /* #include "x86-crc32_pclmul_template.h" */
 
@@ -11233,7 +11216,7 @@ reduce_x0:
 #  define fold_vec		fold_vec256
 #  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
 #  define VXOR(a, b)		_mm256_xor_si256((a), (b))
-#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define M128I_TO_VEC(a)	_mm256_zextsi128_si256(a)
 #  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
 #  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
@@ -11244,7 +11227,7 @@ reduce_x0:
 #  define fold_vec		fold_vec512
 #  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
 #  define VXOR(a, b)		_mm512_xor_si512((a), (b))
-#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define M128I_TO_VEC(a)	_mm512_zextsi128_si512(a)
 #  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
 #  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
@@ -11301,7 +11284,6 @@ ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
 #define fold_vec512	ADD_SUFFIX(fold_vec512)
 #endif 
 
-#if USE_SSE4_1
 
 #undef fold_lessthan16bytes
 static forceinline ATTRIBUTES __m128i
@@ -11324,7 +11306,6 @@ ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
 	return fold_vec128(x0, x1, mults_128b);
 }
 #define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
-#endif 
 
 static ATTRIBUTES u32
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
@@ -11335,8 +11316,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 	const vec_t mults_2v = MULTS_2V;
 	const vec_t mults_1v = MULTS_1V;
 	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
-	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
-	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
 	const __m128i barrett_reduction_constants =
 		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
 	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
@@ -11391,7 +11370,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			size_t align = -(uintptr_t)p & (VL-1);
 
 			len -= align;
-		#if USE_SSE4_1
 			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
 			p += 16;
 			if (align & 15) {
@@ -11414,11 +11392,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
 		#  endif
 			p -= 16;
-		#else
-			crc = crc32_slice1(crc, p, align);
-			p += align;
-			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
-		#endif
 		} else {
 			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
 		}
@@ -11507,37 +11480,18 @@ less_than_16_remaining:
 	len &= 15;
 
 	
-#if USE_SSE4_1
 	if (len)
 		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
-#endif
 #if USE_AVX512
 reduce_x0:
 #endif
-
 	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
-			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
-
-	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
-			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-						final_mult, 0x00));
-
-	
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-				  barrett_reduction_constants, 0x00);
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
-				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(_mm_clmulepi64_si128(x0, mults_128b, 0x10),
+			   _mm_bsrli_si128(x0, 8));
+	x1 = _mm_clmulepi64_si128(x0, barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(x1, barrett_reduction_constants, 0x10);
 	x0 = _mm_xor_si128(x0, x1);
-#if USE_SSE4_1
-	crc = _mm_extract_epi32(x0, 1);
-#else
-	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
-	
-	crc = crc32_slice1(crc, p, len);
-#endif
-	return crc;
+	return _mm_extract_epi32(x0, 2);
 }
 
 #undef vec_t
@@ -11554,19 +11508,17 @@ reduce_x0:
 #undef SUFFIX
 #undef ATTRIBUTES
 #undef VL
-#undef USE_SSE4_1
 #undef USE_AVX512
 
 #endif
 
 
-#if (GCC_PREREQ(8, 3) || CLANG_PREREQ(6, 0, 10000000)) && \
+#if (GCC_PREREQ(10, 1) || CLANG_PREREQ(6, 0, 10000000)) && \
 	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_VPCLMULQDQ)
 #  define crc32_x86_vpclmulqdq_avx2	crc32_x86_vpclmulqdq_avx2
 #  define SUFFIX				 _vpclmulqdq_avx2
 #  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx2")
 #  define VL			32
-#  define USE_SSE4_1		1
 #  define USE_AVX512		0
 /* #include "x86-crc32_pclmul_template.h" */
 
@@ -11588,7 +11540,7 @@ reduce_x0:
 #  define fold_vec		fold_vec256
 #  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
 #  define VXOR(a, b)		_mm256_xor_si256((a), (b))
-#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define M128I_TO_VEC(a)	_mm256_zextsi128_si256(a)
 #  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
 #  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
@@ -11599,7 +11551,7 @@ reduce_x0:
 #  define fold_vec		fold_vec512
 #  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
 #  define VXOR(a, b)		_mm512_xor_si512((a), (b))
-#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define M128I_TO_VEC(a)	_mm512_zextsi128_si512(a)
 #  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
 #  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
@@ -11656,7 +11608,6 @@ ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
 #define fold_vec512	ADD_SUFFIX(fold_vec512)
 #endif 
 
-#if USE_SSE4_1
 
 #undef fold_lessthan16bytes
 static forceinline ATTRIBUTES __m128i
@@ -11679,7 +11630,6 @@ ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
 	return fold_vec128(x0, x1, mults_128b);
 }
 #define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
-#endif 
 
 static ATTRIBUTES u32
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
@@ -11690,8 +11640,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 	const vec_t mults_2v = MULTS_2V;
 	const vec_t mults_1v = MULTS_1V;
 	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
-	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
-	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
 	const __m128i barrett_reduction_constants =
 		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
 	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
@@ -11746,7 +11694,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			size_t align = -(uintptr_t)p & (VL-1);
 
 			len -= align;
-		#if USE_SSE4_1
 			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
 			p += 16;
 			if (align & 15) {
@@ -11769,11 +11716,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
 		#  endif
 			p -= 16;
-		#else
-			crc = crc32_slice1(crc, p, align);
-			p += align;
-			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
-		#endif
 		} else {
 			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
 		}
@@ -11862,37 +11804,18 @@ less_than_16_remaining:
 	len &= 15;
 
 	
-#if USE_SSE4_1
 	if (len)
 		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
-#endif
 #if USE_AVX512
 reduce_x0:
 #endif
-
 	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
-			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
-
-	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
-			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-						final_mult, 0x00));
-
-	
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-				  barrett_reduction_constants, 0x00);
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
-				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(_mm_clmulepi64_si128(x0, mults_128b, 0x10),
+			   _mm_bsrli_si128(x0, 8));
+	x1 = _mm_clmulepi64_si128(x0, barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(x1, barrett_reduction_constants, 0x10);
 	x0 = _mm_xor_si128(x0, x1);
-#if USE_SSE4_1
-	crc = _mm_extract_epi32(x0, 1);
-#else
-	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
-	
-	crc = crc32_slice1(crc, p, len);
-#endif
-	return crc;
+	return _mm_extract_epi32(x0, 2);
 }
 
 #undef vec_t
@@ -11909,19 +11832,17 @@ reduce_x0:
 #undef SUFFIX
 #undef ATTRIBUTES
 #undef VL
-#undef USE_SSE4_1
 #undef USE_AVX512
 
 #endif
 
-#if (GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)) && \
+#if (GCC_PREREQ(10, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)) && \
 	!defined(LIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_VPCLMULQDQ)
 
 #  define crc32_x86_vpclmulqdq_avx512_vl256  crc32_x86_vpclmulqdq_avx512_vl256
 #  define SUFFIX				      _vpclmulqdq_avx512_vl256
-#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl")
+#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl" NO_EVEX512)
 #  define VL			32
-#  define USE_SSE4_1		1
 #  define USE_AVX512		1
 /* #include "x86-crc32_pclmul_template.h" */
 
@@ -11943,7 +11864,7 @@ reduce_x0:
 #  define fold_vec		fold_vec256
 #  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
 #  define VXOR(a, b)		_mm256_xor_si256((a), (b))
-#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define M128I_TO_VEC(a)	_mm256_zextsi128_si256(a)
 #  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
 #  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
@@ -11954,7 +11875,7 @@ reduce_x0:
 #  define fold_vec		fold_vec512
 #  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
 #  define VXOR(a, b)		_mm512_xor_si512((a), (b))
-#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define M128I_TO_VEC(a)	_mm512_zextsi128_si512(a)
 #  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
 #  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
@@ -12011,7 +11932,6 @@ ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
 #define fold_vec512	ADD_SUFFIX(fold_vec512)
 #endif 
 
-#if USE_SSE4_1
 
 #undef fold_lessthan16bytes
 static forceinline ATTRIBUTES __m128i
@@ -12034,7 +11954,6 @@ ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
 	return fold_vec128(x0, x1, mults_128b);
 }
 #define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
-#endif 
 
 static ATTRIBUTES u32
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
@@ -12045,8 +11964,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 	const vec_t mults_2v = MULTS_2V;
 	const vec_t mults_1v = MULTS_1V;
 	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
-	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
-	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
 	const __m128i barrett_reduction_constants =
 		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
 	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
@@ -12101,7 +12018,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			size_t align = -(uintptr_t)p & (VL-1);
 
 			len -= align;
-		#if USE_SSE4_1
 			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
 			p += 16;
 			if (align & 15) {
@@ -12124,11 +12040,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
 		#  endif
 			p -= 16;
-		#else
-			crc = crc32_slice1(crc, p, align);
-			p += align;
-			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
-		#endif
 		} else {
 			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
 		}
@@ -12217,37 +12128,18 @@ less_than_16_remaining:
 	len &= 15;
 
 	
-#if USE_SSE4_1
 	if (len)
 		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
-#endif
 #if USE_AVX512
 reduce_x0:
 #endif
-
 	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
-			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
-
-	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
-			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-						final_mult, 0x00));
-
-	
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-				  barrett_reduction_constants, 0x00);
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
-				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(_mm_clmulepi64_si128(x0, mults_128b, 0x10),
+			   _mm_bsrli_si128(x0, 8));
+	x1 = _mm_clmulepi64_si128(x0, barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(x1, barrett_reduction_constants, 0x10);
 	x0 = _mm_xor_si128(x0, x1);
-#if USE_SSE4_1
-	crc = _mm_extract_epi32(x0, 1);
-#else
-	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
-	
-	crc = crc32_slice1(crc, p, len);
-#endif
-	return crc;
+	return _mm_extract_epi32(x0, 2);
 }
 
 #undef vec_t
@@ -12264,16 +12156,14 @@ reduce_x0:
 #undef SUFFIX
 #undef ATTRIBUTES
 #undef VL
-#undef USE_SSE4_1
 #undef USE_AVX512
 
 
 
 #  define crc32_x86_vpclmulqdq_avx512_vl512  crc32_x86_vpclmulqdq_avx512_vl512
 #  define SUFFIX				      _vpclmulqdq_avx512_vl512
-#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl")
+#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl" EVEX512)
 #  define VL			64
-#  define USE_SSE4_1		1
 #  define USE_AVX512		1
 /* #include "x86-crc32_pclmul_template.h" */
 
@@ -12295,7 +12185,7 @@ reduce_x0:
 #  define fold_vec		fold_vec256
 #  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
 #  define VXOR(a, b)		_mm256_xor_si256((a), (b))
-#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define M128I_TO_VEC(a)	_mm256_zextsi128_si256(a)
 #  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
 #  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
@@ -12306,7 +12196,7 @@ reduce_x0:
 #  define fold_vec		fold_vec512
 #  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
 #  define VXOR(a, b)		_mm512_xor_si512((a), (b))
-#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define M128I_TO_VEC(a)	_mm512_zextsi128_si512(a)
 #  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
 #  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
 #  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
@@ -12363,7 +12253,6 @@ ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
 #define fold_vec512	ADD_SUFFIX(fold_vec512)
 #endif 
 
-#if USE_SSE4_1
 
 #undef fold_lessthan16bytes
 static forceinline ATTRIBUTES __m128i
@@ -12386,7 +12275,6 @@ ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
 	return fold_vec128(x0, x1, mults_128b);
 }
 #define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
-#endif 
 
 static ATTRIBUTES u32
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
@@ -12397,8 +12285,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 	const vec_t mults_2v = MULTS_2V;
 	const vec_t mults_1v = MULTS_1V;
 	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
-	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
-	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
 	const __m128i barrett_reduction_constants =
 		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
 	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
@@ -12453,7 +12339,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			size_t align = -(uintptr_t)p & (VL-1);
 
 			len -= align;
-		#if USE_SSE4_1
 			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
 			p += 16;
 			if (align & 15) {
@@ -12476,11 +12361,6 @@ ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
 		#  endif
 			p -= 16;
-		#else
-			crc = crc32_slice1(crc, p, align);
-			p += align;
-			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
-		#endif
 		} else {
 			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
 		}
@@ -12569,37 +12449,18 @@ less_than_16_remaining:
 	len &= 15;
 
 	
-#if USE_SSE4_1
 	if (len)
 		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
-#endif
 #if USE_AVX512
 reduce_x0:
 #endif
-
 	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
-			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
-
-	
-	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
-			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-						final_mult, 0x00));
-
-	
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
-				  barrett_reduction_constants, 0x00);
-	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
-				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(_mm_clmulepi64_si128(x0, mults_128b, 0x10),
+			   _mm_bsrli_si128(x0, 8));
+	x1 = _mm_clmulepi64_si128(x0, barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(x1, barrett_reduction_constants, 0x10);
 	x0 = _mm_xor_si128(x0, x1);
-#if USE_SSE4_1
-	crc = _mm_extract_epi32(x0, 1);
-#else
-	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
-	
-	crc = crc32_slice1(crc, p, len);
-#endif
-	return crc;
+	return _mm_extract_epi32(x0, 2);
 }
 
 #undef vec_t
@@ -12616,7 +12477,6 @@ reduce_x0:
 #undef SUFFIX
 #undef ATTRIBUTES
 #undef VL
-#undef USE_SSE4_1
 #undef USE_AVX512
 
 #endif
@@ -12690,7 +12550,7 @@ libdeflate_crc32(u32 crc, const void *p, size_t len)
 		return 0;
 	return ~crc32_impl(~crc, p, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/deflate_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/deflate_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -12745,8 +12605,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -12966,7 +12826,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -13795,8 +13656,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -14016,7 +13877,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -14782,8 +14644,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -15003,7 +14865,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -15941,8 +15804,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -16162,7 +16025,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -16892,7 +16756,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_SSE2_NATIVE		0
 #endif
 
-#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
+#if (defined(__PCLMUL__) && defined(__SSE4_1__)) || \
+	(defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMULQDQ(features)	1
 #else
 #  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
@@ -16946,6 +16811,15 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
+	&& !defined(__EVEX512__) 
+#  define EVEX512	",evex512"	
+#  define NO_EVEX512	",no-evex512"
+#else
+#  define EVEX512	""
+#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -17093,11 +16967,11 @@ lz_hash(u32 seq, unsigned num_bits)
 }
 
 
-static forceinline unsigned
+static forceinline u32
 lz_extend(const u8 * const strptr, const u8 * const matchptr,
-	  const unsigned start_len, const unsigned max_len)
+	  const u32 start_len, const u32 max_len)
 {
-	unsigned len = start_len;
+	u32 len = start_len;
 	machine_word_t v_word;
 
 	if (UNALIGNED_ACCESS_IS_FAST) {
@@ -17436,8 +17310,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -17657,7 +17531,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -18423,8 +18298,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -18644,7 +18519,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -19582,8 +19458,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -19803,7 +19679,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -20533,7 +20410,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_SSE2_NATIVE		0
 #endif
 
-#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
+#if (defined(__PCLMUL__) && defined(__SSE4_1__)) || \
+	(defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMULQDQ(features)	1
 #else
 #  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
@@ -20587,6 +20465,15 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
+	&& !defined(__EVEX512__) 
+#  define EVEX512	",evex512"	
+#  define NO_EVEX512	",no-evex512"
+#else
+#  define EVEX512	""
+#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -20734,11 +20621,11 @@ lz_hash(u32 seq, unsigned num_bits)
 }
 
 
-static forceinline unsigned
+static forceinline u32
 lz_extend(const u8 * const strptr, const u8 * const matchptr,
-	  const unsigned start_len, const unsigned max_len)
+	  const u32 start_len, const u32 max_len)
 {
-	unsigned len = start_len;
+	u32 len = start_len;
 	machine_word_t v_word;
 
 	if (UNALIGNED_ACCESS_IS_FAST) {
@@ -21026,8 +20913,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -21247,7 +21134,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -22013,8 +21901,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -22234,7 +22122,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -23172,8 +23061,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -23393,7 +23282,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -24123,7 +24013,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_SSE2_NATIVE		0
 #endif
 
-#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
+#if (defined(__PCLMUL__) && defined(__SSE4_1__)) || \
+	(defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMULQDQ(features)	1
 #else
 #  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
@@ -24177,6 +24068,15 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
+	&& !defined(__EVEX512__) 
+#  define EVEX512	",evex512"	
+#  define NO_EVEX512	",no-evex512"
+#else
+#  define EVEX512	""
+#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -24324,11 +24224,11 @@ lz_hash(u32 seq, unsigned num_bits)
 }
 
 
-static forceinline unsigned
+static forceinline u32
 lz_extend(const u8 * const strptr, const u8 * const matchptr,
-	  const unsigned start_len, const unsigned max_len)
+	  const u32 start_len, const u32 max_len)
 {
-	unsigned len = start_len;
+	u32 len = start_len;
 	machine_word_t v_word;
 
 	if (UNALIGNED_ACCESS_IS_FAST) {
@@ -24657,7 +24557,7 @@ check_buildtime_parameters(void)
 
 
 
-static const unsigned deflate_length_slot_base[] = {
+static const u32 deflate_length_slot_base[] = {
 	3,    4,    5,    6,    7,    8,    9,    10,
 	11,   13,   15,   17,   19,   23,   27,   31,
 	35,   43,   51,   59,   67,   83,   99,   115,
@@ -24673,7 +24573,7 @@ static const u8 deflate_extra_length_bits[] = {
 };
 
 
-static const unsigned deflate_offset_slot_base[] = {
+static const u32 deflate_offset_slot_base[] = {
 	1,     2,     3,     4,     5,     7,     9,     13,
 	17,    25,    33,    49,    65,    97,    129,   193,
 	257,   385,   513,   769,   1025,  1537,  2049,  3073,
@@ -24837,10 +24737,10 @@ struct libdeflate_compressor {
 	size_t max_passthrough_size;
 
 	
-	unsigned max_search_depth;
+	u32 max_search_depth;
 
 	
-	unsigned nice_match_length;
+	u32 nice_match_length;
 
 	
 	struct deflate_freqs freqs;
@@ -24934,13 +24834,13 @@ struct libdeflate_compressor {
 			unsigned max_optim_passes;
 
 			
-			unsigned min_improvement_to_continue;
+			u32 min_improvement_to_continue;
 
 			
-			unsigned min_bits_to_use_nonfinal_path;
+			u32 min_bits_to_use_nonfinal_path;
 
 			
-			unsigned max_len_to_optimize_static_block;
+			u32 max_len_to_optimize_static_block;
 
 		} n; 
 	#endif 
@@ -25520,7 +25420,7 @@ static void
 deflate_compute_full_len_codewords(struct libdeflate_compressor *c,
 				   const struct deflate_codes *codes)
 {
-	unsigned len;
+	u32 len;
 
 	STATIC_ASSERT(MAX_LITLEN_CODEWORD_LEN +
 		      DEFLATE_MAX_EXTRA_LENGTH_BITS <= 32);
@@ -25543,8 +25443,8 @@ deflate_compute_full_len_codewords(struct libdeflate_compressor *c,
 do {									\
 	const struct libdeflate_compressor *c__ = (c_);			\
 	const struct deflate_codes *codes__ = (codes_);			\
-	unsigned length__ = (length_);					\
-	unsigned offset__ = (offset_);					\
+	u32 length__ = (length_);					\
+	u32 offset__ = (offset_);					\
 	unsigned offset_slot__ = (offset_slot_);			\
 									\
 				\
@@ -25777,9 +25677,9 @@ deflate_flush_block(struct libdeflate_compressor *c,
 		struct deflate_optimum_node * const end_node =
 			&c->p.n.optimum_nodes[block_length];
 		do {
-			unsigned length = cur_node->item & OPTIMUM_LEN_MASK;
-			unsigned offset = cur_node->item >>
-					  OPTIMUM_OFFSET_SHIFT;
+			u32 length = cur_node->item & OPTIMUM_LEN_MASK;
+			u32 offset = cur_node->item >> OPTIMUM_OFFSET_SHIFT;
+
 			if (length == 1) {
 				
 				ADD_BITS(codes->codewords.litlen[offset],
@@ -25801,8 +25701,8 @@ deflate_flush_block(struct libdeflate_compressor *c,
 		for (seq = sequences; ; seq++) {
 			u32 litrunlen = seq->litrunlen_and_length &
 					SEQ_LITRUNLEN_MASK;
-			unsigned length = seq->litrunlen_and_length >>
-					  SEQ_LENGTH_SHIFT;
+			u32 length = seq->litrunlen_and_length >>
+				     SEQ_LENGTH_SHIFT;
 			unsigned lit;
 
 			
@@ -25914,7 +25814,7 @@ observe_literal(struct block_split_stats *stats, u8 lit)
 
 
 static forceinline void
-observe_match(struct block_split_stats *stats, unsigned length)
+observe_match(struct block_split_stats *stats, u32 length)
 {
 	stats->new_observations[NUM_LITERAL_OBSERVATION_TYPES +
 				(length >= 9)]++;
@@ -26019,7 +25919,7 @@ deflate_choose_literal(struct libdeflate_compressor *c, unsigned literal,
 
 static forceinline void
 deflate_choose_match(struct libdeflate_compressor *c,
-		     unsigned length, unsigned offset, bool gather_split_stats,
+		     u32 length, u32 offset, bool gather_split_stats,
 		     struct deflate_sequence **seq_p)
 {
 	struct deflate_sequence *seq = *seq_p;
@@ -26031,7 +25931,7 @@ deflate_choose_match(struct libdeflate_compressor *c,
 	if (gather_split_stats)
 		observe_match(&c->split_stats, length);
 
-	seq->litrunlen_and_length |= (u32)length << SEQ_LENGTH_SHIFT;
+	seq->litrunlen_and_length |= length << SEQ_LENGTH_SHIFT;
 	seq->offset = offset;
 	seq->offset_slot = offset_slot;
 
@@ -26042,7 +25942,7 @@ deflate_choose_match(struct libdeflate_compressor *c,
 
 
 static forceinline void
-adjust_max_and_nice_len(unsigned *max_len, unsigned *nice_len, size_t remaining)
+adjust_max_and_nice_len(u32 *max_len, u32 *nice_len, size_t remaining)
 {
 	if (unlikely(remaining < DEFLATE_MAX_MATCH_LEN)) {
 		*max_len = remaining;
@@ -26051,8 +25951,8 @@ adjust_max_and_nice_len(unsigned *max_len, unsigned *nice_len, size_t remaining)
 }
 
 
-static unsigned
-choose_min_match_len(unsigned num_used_literals, unsigned max_search_depth)
+static u32
+choose_min_match_len(u32 num_used_literals, u32 max_search_depth)
 {
 	
 	static const u8 min_lens[] = {
@@ -26063,7 +25963,7 @@ choose_min_match_len(unsigned num_used_literals, unsigned max_search_depth)
 		4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 		
 	};
-	unsigned min_len;
+	u32 min_len;
 
 	STATIC_ASSERT(DEFLATE_MIN_MATCH_LEN <= 3);
 	STATIC_ASSERT(ARRAY_LEN(min_lens) <= DEFLATE_NUM_LITERALS + 1);
@@ -26083,12 +25983,11 @@ choose_min_match_len(unsigned num_used_literals, unsigned max_search_depth)
 	return min_len;
 }
 
-static unsigned
-calculate_min_match_len(const u8 *data, size_t data_len,
-			unsigned max_search_depth)
+static u32
+calculate_min_match_len(const u8 *data, size_t data_len, u32 max_search_depth)
 {
 	u8 used[256] = { 0 };
-	unsigned num_used_literals = 0;
+	u32 num_used_literals = 0;
 	size_t i;
 
 	
@@ -26105,13 +26004,13 @@ calculate_min_match_len(const u8 *data, size_t data_len,
 }
 
 
-static unsigned
+static u32
 recalculate_min_match_len(const struct deflate_freqs *freqs,
-			  unsigned max_search_depth)
+			  u32 max_search_depth)
 {
 	u32 literal_freq = 0;
 	u32 cutoff;
-	unsigned num_used_literals = 0;
+	u32 num_used_literals = 0;
 	int i;
 
 	for (i = 0; i < DEFLATE_NUM_LITERALS; i++)
@@ -26191,8 +26090,8 @@ deflate_compress_fastest(struct libdeflate_compressor * restrict c,
 	const u8 *in_next = in;
 	const u8 *in_end = in_next + in_nbytes;
 	const u8 *in_cur_base = in_next;
-	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
-	unsigned nice_len = MIN(c->nice_match_length, max_len);
+	u32 max_len = DEFLATE_MAX_MATCH_LEN;
+	u32 nice_len = MIN(c->nice_match_length, max_len);
 	u32 next_hash = 0;
 
 	ht_matchfinder_init(&c->p.f.ht_mf);
@@ -26266,8 +26165,8 @@ deflate_compress_greedy(struct libdeflate_compressor * restrict c,
 	const u8 *in_next = in;
 	const u8 *in_end = in_next + in_nbytes;
 	const u8 *in_cur_base = in_next;
-	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
-	unsigned nice_len = MIN(c->nice_match_length, max_len);
+	u32 max_len = DEFLATE_MAX_MATCH_LEN;
+	u32 nice_len = MIN(c->nice_match_length, max_len);
 	u32 next_hashes[2] = {0, 0};
 
 	hc_matchfinder_init(&c->p.g.hc_mf);
@@ -26279,7 +26178,7 @@ deflate_compress_greedy(struct libdeflate_compressor * restrict c,
 		const u8 * const in_max_block_end = choose_max_block_end(
 				in_next, in_end, SOFT_MAX_BLOCK_LENGTH);
 		struct deflate_sequence *seq = c->p.g.sequences;
-		unsigned min_len;
+		u32 min_len;
 
 		init_block_split_stats(&c->split_stats);
 		deflate_begin_sequences(c, seq);
@@ -26342,8 +26241,8 @@ deflate_compress_lazy_generic(struct libdeflate_compressor * restrict c,
 	const u8 *in_next = in;
 	const u8 *in_end = in_next + in_nbytes;
 	const u8 *in_cur_base = in_next;
-	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
-	unsigned nice_len = MIN(c->nice_match_length, max_len);
+	u32 max_len = DEFLATE_MAX_MATCH_LEN;
+	u32 nice_len = MIN(c->nice_match_length, max_len);
 	u32 next_hashes[2] = {0, 0};
 
 	hc_matchfinder_init(&c->p.g.hc_mf);
@@ -26357,7 +26256,7 @@ deflate_compress_lazy_generic(struct libdeflate_compressor * restrict c,
 		const u8 *next_recalc_min_len =
 			in_next + MIN(in_end - in_next, 10000);
 		struct deflate_sequence *seq = c->p.g.sequences;
-		unsigned min_len;
+		u32 min_len;
 
 		init_block_split_stats(&c->split_stats);
 		deflate_begin_sequences(c, seq);
@@ -26365,10 +26264,10 @@ deflate_compress_lazy_generic(struct libdeflate_compressor * restrict c,
 						  in_max_block_end - in_next,
 						  c->max_search_depth);
 		do {
-			unsigned cur_len;
-			unsigned cur_offset;
-			unsigned next_len;
-			unsigned next_offset;
+			u32 cur_len;
+			u32 cur_offset;
+			u32 next_len;
+			u32 next_offset;
 
 			
 			if (in_next >= next_recalc_min_len) {
@@ -26535,8 +26434,8 @@ deflate_tally_item_list(struct libdeflate_compressor *c, u32 block_length)
 		&c->p.n.optimum_nodes[block_length];
 
 	do {
-		unsigned length = cur_node->item & OPTIMUM_LEN_MASK;
-		unsigned offset = cur_node->item >> OPTIMUM_OFFSET_SHIFT;
+		u32 length = cur_node->item & OPTIMUM_LEN_MASK;
+		u32 offset = cur_node->item >> OPTIMUM_OFFSET_SHIFT;
 
 		if (length == 1) {
 			
@@ -26764,7 +26663,7 @@ deflate_choose_default_litlen_costs(struct libdeflate_compressor *c,
 				    const u8 *block_begin, u32 block_length,
 				    u32 *lit_cost, u32 *len_sym_cost)
 {
-	unsigned num_used_literals = 0;
+	u32 num_used_literals = 0;
 	u32 literal_freq = block_length;
 	u32 match_freq = 0;
 	u32 cutoff;
@@ -26807,7 +26706,7 @@ deflate_choose_default_litlen_costs(struct libdeflate_compressor *c,
 }
 
 static forceinline u32
-deflate_default_length_cost(unsigned len, u32 len_sym_cost)
+deflate_default_length_cost(u32 len, u32 len_sym_cost)
 {
 	unsigned slot = deflate_length_slot[len];
 	u32 num_extra_bits = deflate_extra_length_bits[slot];
@@ -26830,7 +26729,7 @@ static void
 deflate_set_default_costs(struct libdeflate_compressor *c,
 			  u32 lit_cost, u32 len_sym_cost)
 {
-	unsigned i;
+	u32 i;
 
 	
 	for (i = 0; i < DEFLATE_NUM_LITERALS; i++)
@@ -26866,7 +26765,7 @@ static forceinline void
 deflate_adjust_costs_impl(struct libdeflate_compressor *c,
 			  u32 lit_cost, u32 len_sym_cost, int change_amount)
 {
-	unsigned i;
+	u32 i;
 
 	
 	for (i = 0; i < DEFLATE_NUM_LITERALS; i++)
@@ -26949,7 +26848,7 @@ deflate_find_min_cost_path(struct libdeflate_compressor *c,
 	cur_node->cost_to_end = 0;
 	do {
 		unsigned num_matches;
-		unsigned literal;
+		u32 literal;
 		u32 best_cost_to_end;
 
 		cur_node--;
@@ -26961,14 +26860,14 @@ deflate_find_min_cost_path(struct libdeflate_compressor *c,
 		
 		best_cost_to_end = c->p.n.costs.literal[literal] +
 				   (cur_node + 1)->cost_to_end;
-		cur_node->item = ((u32)literal << OPTIMUM_OFFSET_SHIFT) | 1;
+		cur_node->item = (literal << OPTIMUM_OFFSET_SHIFT) | 1;
 
 		
 		if (num_matches) {
 			const struct lz_match *match;
-			unsigned len;
-			unsigned offset;
-			unsigned offset_slot;
+			u32 len;
+			u32 offset;
+			u32 offset_slot;
 			u32 offset_cost;
 			u32 cost_to_end;
 
@@ -26987,7 +26886,7 @@ deflate_find_min_cost_path(struct libdeflate_compressor *c,
 					if (cost_to_end < best_cost_to_end) {
 						best_cost_to_end = cost_to_end;
 						cur_node->item = len |
-							((u32)offset <<
+							(offset <<
 							 OPTIMUM_OFFSET_SHIFT);
 					}
 				} while (++len <= match->length);
@@ -27149,8 +27048,8 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 	const u8 *in_cur_base = in_next;
 	const u8 *in_next_slide =
 		in_next + MIN(in_end - in_next, MATCHFINDER_WINDOW_SIZE);
-	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
-	unsigned nice_len = MIN(c->nice_match_length, max_len);
+	u32 max_len = DEFLATE_MAX_MATCH_LEN;
+	u32 nice_len = MIN(c->nice_match_length, max_len);
 	struct lz_match *cache_ptr = c->p.n.match_cache;
 	u32 next_hashes[2] = {0, 0};
 	bool prev_block_used_only_literals = false;
@@ -27165,7 +27064,7 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 		const u8 *prev_end_block_check = NULL;
 		bool change_detected = false;
 		const u8 *next_observation = in_next;
-		unsigned min_len;
+		u32 min_len;
 
 		
 		if (prev_block_used_only_literals)
@@ -27179,7 +27078,7 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 		
 		for (;;) {
 			struct lz_match *matches;
-			unsigned best_len;
+			u32 best_len;
 			size_t remaining = in_end - in_next;
 
 			
@@ -27334,9 +27233,9 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 static void
 deflate_init_offset_slot_full(struct libdeflate_compressor *c)
 {
-	unsigned offset_slot;
-	unsigned offset;
-	unsigned offset_end;
+	u32 offset_slot;
+	u32 offset;
+	u32 offset_end;
 
 	for (offset_slot = 0; offset_slot < ARRAY_LEN(deflate_offset_slot_base);
 	     offset_slot++) {
@@ -27561,7 +27460,7 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 	
 	return (5 * max_blocks) + in_nbytes;
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/deflate_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/deflate_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -27612,8 +27511,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -27833,7 +27732,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -29754,8 +29654,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -29975,7 +29875,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -30705,7 +30606,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_SSE2_NATIVE		0
 #endif
 
-#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
+#if (defined(__PCLMUL__) && defined(__SSE4_1__)) || \
+	(defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMULQDQ(features)	1
 #else
 #  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
@@ -30759,6 +30661,15 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
+	&& !defined(__EVEX512__) 
+#  define EVEX512	",evex512"	
+#  define NO_EVEX512	",no-evex512"
+#else
+#  define EVEX512	""
+#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -31495,7 +31406,7 @@ libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 	if (d)
 		d->free_func(d);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/gzip_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/gzip_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -31550,8 +31461,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -31771,7 +31682,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -32546,7 +32458,7 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 	return GZIP_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/gzip_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/gzip_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -32597,8 +32509,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -32818,7 +32730,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -33638,7 +33551,7 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/utils.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/utils.c */
 
 
 /* #include "lib_common.h" */
@@ -33689,8 +33602,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -33910,7 +33823,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -34679,7 +34593,7 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line)
 	abort();
 }
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/zlib_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/zlib_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -34734,8 +34648,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -34955,7 +34869,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -35698,7 +35613,7 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 	return ZLIB_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/zlib_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/zlib_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -35749,8 +35664,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -35970,7 +35885,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -36726,7 +36642,7 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/arm/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/arm/cpu_features.c */
 
 
 
@@ -36803,8 +36719,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -37024,7 +36940,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -37789,8 +37706,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -38010,7 +37927,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -39012,7 +38930,7 @@ void libdeflate_init_arm_cpu_features(void)
 }
 
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.22/lib/x86/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/x86/cpu_features.c */
 
 
 /* #include "cpu_features_common.h" - no include guard */ 
@@ -39070,8 +38988,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	22
-#define LIBDEFLATE_VERSION_STRING	"1.22"
+#define LIBDEFLATE_VERSION_MINOR	24
+#define LIBDEFLATE_VERSION_STRING	"1.24"
 
 
 #ifndef LIBDEFLATEAPI
@@ -39291,7 +39209,8 @@ struct libdeflate_options {
 #undef ARCH_ARM32
 #undef ARCH_RISCV
 #ifdef _MSC_VER
-#  if defined(_M_X64)
+   
+#  if defined(_M_X64) && !defined(_M_ARM64EC)
 #    define ARCH_X86_64
 #  elif defined(_M_IX86)
 #    define ARCH_X86_32
@@ -40021,7 +39940,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_SSE2_NATIVE		0
 #endif
 
-#if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
+#if (defined(__PCLMUL__) && defined(__SSE4_1__)) || \
+	(defined(_MSC_VER) && defined(__AVX2__))
 #  define HAVE_PCLMULQDQ(features)	1
 #else
 #  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
@@ -40075,6 +39995,15 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
+	&& !defined(__EVEX512__) 
+#  define EVEX512	",evex512"	
+#  define NO_EVEX512	",no-evex512"
+#else
+#  define EVEX512	""
+#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -40136,6 +40065,17 @@ static const struct cpu_feature x86_cpu_feature_table[] = {
 
 volatile u32 libdeflate_x86_cpu_features = 0;
 
+static inline bool
+os_supports_avx512(u64 xcr0)
+{
+#ifdef __APPLE__
+	
+	return false;
+#else
+	return (xcr0 & 0xe6) == 0xe6;
+#endif
+}
+
 
 static inline bool
 allow_512bit_vectors(const u32 manufacturer[3], u32 family, u32 model)
@@ -40185,7 +40125,8 @@ void libdeflate_init_x86_cpu_features(void)
 		family += (a >> 20) & 0xff;
 	if (d & (1 << 26))
 		features |= X86_CPU_FEATURE_SSE2;
-	if (c & (1 << 1))
+	
+	if ((c & (1 << 1)) && (c & (1 << 19)))
 		features |= X86_CPU_FEATURE_PCLMULQDQ;
 	if (c & (1 << 27))
 		xcr0 = read_xcr(0);
@@ -40197,21 +40138,24 @@ void libdeflate_init_x86_cpu_features(void)
 
 	
 	cpuid(7, 0, &a, &b, &c, &d);
-	if ((b & (1 << 5)) && ((xcr0 & 0x6) == 0x6))
-		features |= X86_CPU_FEATURE_AVX2;
 	if (b & (1 << 8))
 		features |= X86_CPU_FEATURE_BMI2;
-	if (((xcr0 & 0xe6) == 0xe6) &&
-	    allow_512bit_vectors(manufacturer, family, model))
-		features |= X86_CPU_FEATURE_ZMM;
-	if ((b & (1 << 30)) && ((xcr0 & 0xe6) == 0xe6))
-		features |= X86_CPU_FEATURE_AVX512BW;
-	if ((b & (1U << 31)) && ((xcr0 & 0xe6) == 0xe6))
-		features |= X86_CPU_FEATURE_AVX512VL;
-	if ((c & (1 << 10)) && ((xcr0 & 0x6) == 0x6))
-		features |= X86_CPU_FEATURE_VPCLMULQDQ;
-	if ((c & (1 << 11)) && ((xcr0 & 0xe6) == 0xe6))
-		features |= X86_CPU_FEATURE_AVX512VNNI;
+	if ((xcr0 & 0x6) == 0x6) {
+		if (b & (1 << 5))
+			features |= X86_CPU_FEATURE_AVX2;
+		if (c & (1 << 10))
+			features |= X86_CPU_FEATURE_VPCLMULQDQ;
+	}
+	if (os_supports_avx512(xcr0)) {
+		if (allow_512bit_vectors(manufacturer, family, model))
+			features |= X86_CPU_FEATURE_ZMM;
+		if (b & (1 << 30))
+			features |= X86_CPU_FEATURE_AVX512BW;
+		if (b & (1U << 31))
+			features |= X86_CPU_FEATURE_AVX512VL;
+		if (c & (1 << 11))
+			features |= X86_CPU_FEATURE_AVX512VNNI;
+	}
 
 	
 	cpuid(7, 1, &a, &b, &c, &d);

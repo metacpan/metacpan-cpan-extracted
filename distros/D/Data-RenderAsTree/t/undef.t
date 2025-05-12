@@ -15,8 +15,8 @@ my(%source) =
 	{
 		data     => undef,
 		expected => <<EOS,
-Undef Demo
-    |--- undef [VALUE 1]
+Undef Demo. Attributes: {}
+    |--- undef [VALUE 1]. Attributes: {}
 EOS
 		literal => q|undef|,
 	},

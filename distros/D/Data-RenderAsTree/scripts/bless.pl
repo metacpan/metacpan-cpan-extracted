@@ -14,16 +14,16 @@ my(%source) =
 	{
 		data     => Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} }),
 		expected => <<EOS,
-Bless Demo
-    |--- Class = Tree::DAG_Node [BLESS 1]
-         |--- {} [HASH 2]
-              |--- attributes = {} [HASH 3]
-              |    |--- {} [HASH 4]
-              |         |--- one = 1 [VALUE 5]
-              |--- daughters [ARRAY 6]
-              |    |--- 1 = [] [ARRAY 7]
-              |--- mother = undef [VALUE 8]
-              |--- name = Root [VALUE 9]
+Bless Demo. Attributes: {}
+    |--- Class = Tree::DAG_Node [BLESS 1]. Attributes: {}
+         |--- {} [HASH 2]. Attributes: {}
+              |--- attributes = {} [HASH 3]. Attributes: {}
+              |    |--- {} [HASH 4]. Attributes: {}
+              |         |--- one = 1 [VALUE 5]. Attributes: {}
+              |--- daughters [ARRAY 6]. Attributes: {}
+              |    |--- 1 = [] [ARRAY 7]. Attributes: {}
+              |--- mother = undef [VALUE 8]. Attributes: {}
+              |--- name = Root [VALUE 9]. Attributes: {}
 EOS
 		literal => q|Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} })|,
 	},
@@ -31,23 +31,25 @@ EOS
 	{
 		data     => {root => Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} })},
 		expected => <<EOS,
-Bless Demo
-    |--- {} [HASH 1]
-         |--- root = {} [HASH 2]
-              |--- Class = Tree::DAG_Node [BLESS 3]
-                   |--- {} [HASH 4]
-                        |--- attributes = {} [HASH 5]
-                        |    |--- {} [HASH 6]
-                        |         |--- one = 1 [VALUE 7]
-                        |--- daughters [ARRAY 8]
-                        |    |--- 1 = [] [ARRAY 9]
-                        |--- mother = undef [VALUE 10]
-                        |--- name = Root [VALUE 11]
+Bless Demo. Attributes: {}
+    |--- {} [HASH 1]. Attributes: {}
+         |--- root = {} [HASH 2]. Attributes: {}
+              |--- Class = Tree::DAG_Node [BLESS 3]. Attributes: {}
+                   |--- {} [HASH 4]. Attributes: {}
+                        |--- attributes = {} [HASH 5]. Attributes: {}
+                        |    |--- {} [HASH 6]. Attributes: {}
+                        |         |--- one = 1 [VALUE 7]. Attributes: {}
+                        |--- daughters [ARRAY 8]. Attributes: {}
+                        |    |--- 1 = [] [ARRAY 9]. Attributes: {}
+                        |--- mother = undef [VALUE 10]. Attributes: {}
+                        |--- name = Root [VALUE 11]. Attributes: {}
 EOS
 		literal => q|{root => Tree::DAG_Node -> new({name => 'Root', attributes => {one => 1} })}|,
 	},
 );
-my($renderer) = Data::RenderAsTree -> new
+my($count)		= 0;
+my($successes)	= 0;
+my($renderer)	= Data::RenderAsTree -> new
 	(
 		attributes       => 0,
 		max_key_length   => 25,
@@ -59,12 +61,25 @@ my($renderer) = Data::RenderAsTree -> new
 my($expected);
 my($got);
 my($i);
+my($result);
+my($x1, $x2);
 
 for $i (sort keys %source)
 {
-	$got      = $renderer -> render($source{$i}{data});
-	$expected = [split(/\n/, $source{$i}{expected})];
+	$count++;
+
+	$got		= $renderer -> render($source{$i}{data});
+	$expected	= [split(/\n/, $source{$i}{expected})];
+	$x1			= Dumper($got);
+	$x2			= Dumper($expected);
+	$result		= $x1 eq $x2;
+
+	$successes++ if ($result);
 
 	print "$i: $source{$i}{literal}\n";
-	print Dumper($got);
+	print "Got: \n", Dumper($got), "Expected: \n", Dumper($expected);
+	print "# $count: " . ($result ? "OK\n" : "Not OK\n");
 }
+
+print "Test count:    $count\n";
+print "Success count: $successes\n";

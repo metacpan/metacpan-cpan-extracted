@@ -1,16 +1,25 @@
 Revision history for Perl extension Data::RenderAsTree.
 
-1.03  Sun Jul 12 17:01:00 2015
+1.04  2025-05-12T17:00:00
+	- Rewrite scripts/* and t/* to handle most recent Tree::DAG_Node (V 1.35), to handle
+		node and node data being '' (empty string), undef or 0 (zero).
+	- Add new test t/zero.t and script scripts/zero.pl.
+		The point of these 9 plain scripts is so you can use them without having to fiddle about
+		removing the test code in the corresponding test scripts.
+	- Add .gitignore, UltraEdit files and Data-RenderAsTree-.* to MANIFEST.SKIP.
+	- Update Makefile.PL
+
+1.03  2015-07-12T17:01:00
 	- Remove the max_key_length and max_value_length options from t/ref.t so truncation of strings
 		does not cause tests to fail. Also, scripts/ref.pl has been changed to match.
 
-1.02  Mon Jul  6 12:43:00 2015
+1.02  2015-07-06T12:43:00
 	- Add method run(), which does not call tree2string() automatically the way render() does.
 		run() is used by MarpaX::Languages::Lua::Parser.
 	- Add option clean_nodes() to stop undef warnings when printing via tree2string().
 
-1.01  Mon Mar 16 12:44:00 2015
+1.01  2015-03-16T12:44:00
 	- Remove scripts/data.tree.dumper.pl, which required the dread Data::TreeDumper.
 
-1.00  Sun Mar  7 17:12:00 2015
+1.00  2015-03-07TT17:12:00
 	  - Original version

@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.9987 2025-05-11
+       - require newest YAML::LibYAML
+       - minor tweak to apply_replacements step, some components can be skipped
+
 1.9986 2025-03-26
       - in case with multiple unknown entries in the components, sort them before adding them to the attention
         value to ensure consistency

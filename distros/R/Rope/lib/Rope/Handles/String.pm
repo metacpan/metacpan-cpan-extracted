@@ -75,7 +75,7 @@ Rope::Handles::String - Rope handles strings
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 

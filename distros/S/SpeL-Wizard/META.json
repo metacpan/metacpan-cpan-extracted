@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "SpeL-Wizard",
    "no_index" : {
@@ -79,238 +79,238 @@
    "provides" : {
       "SpeL::I18n" : {
          "file" : "lib/SpeL/I18n.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::I18n::en" : {
          "file" : "lib/SpeL/I18n/en.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::I18n::nl" : {
          "file" : "lib/SpeL/I18n/nl.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Arrow" : {
          "file" : "lib/SpeL/Object/Arrow.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Binop" : {
          "file" : "lib/SpeL/Object/Binop.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Bracketconstruction" : {
          "file" : "lib/SpeL/Object/Bracketconstruction.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Command" : {
          "file" : "lib/SpeL/Object/Command.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Document" : {
          "file" : "lib/SpeL/Object/Document.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Element" : {
          "file" : "lib/SpeL/Object/Element.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::ElementList" : {
          "file" : "lib/SpeL/Object/ElementList.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Environment" : {
          "file" : "lib/SpeL/Object/Environment.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Expression" : {
          "file" : "lib/SpeL/Object/Expression.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Expressionrest" : {
          "file" : "lib/SpeL/Object/Expressionrest.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Faculty" : {
          "file" : "lib/SpeL/Object/Faculty.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Fraction" : {
          "file" : "lib/SpeL/Object/Fraction.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Function" : {
          "file" : "lib/SpeL/Object/Function.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Group" : {
          "file" : "lib/SpeL/Object/Group.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Integernumber" : {
          "file" : "lib/SpeL/Object/Integernumber.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Interval" : {
          "file" : "lib/SpeL/Object/Interval.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Item" : {
          "file" : "lib/SpeL/Object/Item.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Limitscommand" : {
          "file" : "lib/SpeL/Object/Limitscommand.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Limitsexpression" : {
          "file" : "lib/SpeL/Object/Limitsexpression.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Log" : {
          "file" : "lib/SpeL/Object/Log.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathElement" : {
          "file" : "lib/SpeL/Object/MathElement.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathElementList" : {
          "file" : "lib/SpeL/Object/MathElementList.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathEnvironment" : {
          "file" : "lib/SpeL/Object/MathEnvironment.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathEnvironmentInner" : {
          "file" : "lib/SpeL/Object/MathEnvironmentInner.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathEnvironmentSimple" : {
          "file" : "lib/SpeL/Object/MathEnvironmentSimple.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathGroup" : {
          "file" : "lib/SpeL/Object/MathGroup.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathInline" : {
          "file" : "lib/SpeL/Object/MathInline.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::MathUnit" : {
          "file" : "lib/SpeL/Object/MathUnit.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Mathtotextcommand" : {
          "file" : "lib/SpeL/Object/Mathtotextcommand.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Matrix" : {
          "file" : "lib/SpeL/Object/Matrix.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Num" : {
          "file" : "lib/SpeL/Object/Num.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Number" : {
          "file" : "lib/SpeL/Object/Number.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Operator" : {
          "file" : "lib/SpeL/Object/Operator.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Option" : {
          "file" : "lib/SpeL/Object/Option.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Overbrace" : {
          "file" : "lib/SpeL/Object/Overbrace.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Power" : {
          "file" : "lib/SpeL/Object/Power.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Qty" : {
          "file" : "lib/SpeL/Object/Qty.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Realnumber" : {
          "file" : "lib/SpeL/Object/Realnumber.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::RelOperator" : {
          "file" : "lib/SpeL/Object/RelOperator.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Relation" : {
          "file" : "lib/SpeL/Object/Relation.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::SIUnits" : {
          "file" : "lib/SpeL/Object/SIUnits.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Scientificnumber" : {
          "file" : "lib/SpeL/Object/Scientificnumber.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Squareroot" : {
          "file" : "lib/SpeL/Object/Squareroot.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Subscript" : {
          "file" : "lib/SpeL/Object/Subscript.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::TokenSequence" : {
          "file" : "lib/SpeL/Object/TokenSequence.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Trig" : {
          "file" : "lib/SpeL/Object/Trig.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Underbrace" : {
          "file" : "lib/SpeL/Object/Underbrace.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Unit" : {
          "file" : "lib/SpeL/Object/Unit.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Unop" : {
          "file" : "lib/SpeL/Object/Unop.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::Variable" : {
          "file" : "lib/SpeL/Object/Variable.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Object::VerbatimEnvironment" : {
          "file" : "lib/SpeL/Object/VerbatimEnvironment.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Parser::Auxiliary" : {
          "file" : "lib/SpeL/Parser/Auxiliary.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Parser::Chunk" : {
          "file" : "lib/SpeL/Parser/Chunk.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       },
       "SpeL::Wizard" : {
          "file" : "lib/SpeL/Wizard.pm",
-         "version" : "20250129.1405"
+         "version" : "20250511.1428"
       }
    },
    "release_status" : "stable",
-   "version" : "20250129.1405",
+   "version" : "20250511.1428",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.038002"
+         "version" : "5.040001"
       },
       "plugins" : [
          {
@@ -368,7 +368,7 @@
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : 0,
+                  "bail_out_on_fail" : "0",
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "xt/author/00-compile.t",
@@ -462,12 +462,12 @@
                },
                "Dist::Zilla::Role::MetaProvider::Provider" : {
                   "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : 1,
-                  "inherit_version" : 1,
-                  "meta_noindex" : 1
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -673,13 +673,13 @@
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : 0
+            "is_trial" : "0"
          },
          "version" : "6.032"
       }
    },
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

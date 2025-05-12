@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 use Rope::Object;
 use Rope::Pro;
 my (%META, %PRO);
@@ -661,7 +661,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 
@@ -20,7 +20,7 @@ Number::Equation::XS - Track how a number is calculated progamically.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

@@ -1,5 +1,10 @@
 Devel::Cover history
 
+1.48 - 11 May 2025
+- Fix up args handling for reports (Mitch McCracken) (GH-354)
+- Correct error message when launch is unavailable
+- Improve perlcritic compliance
+
 1.47 - 4 May 2025
 - Improve defined-or handling (Ed J) (GH-352)
 - Always set both HARNESS_PERL_SWITCHES and PERL5OPT (Ed J) (GH-351)

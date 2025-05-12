@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Scalar::Util qw(blessed looks_like_number);
+use User::Information;
+
+my @as_types = qw(Data::Identifier filename bool raw);
+
+my User::Information::Base $result;
+my $maxlen = 0;
+
+if (scalar(@ARGV) == 1 && $ARGV[0] eq '--local-node') {
+    $result = User::Information->local_node;
+} elsif (scalar(@ARGV)) {
+    $result = User::Information->lookup(@ARGV);
+} else {
+    $result = User::Information->me;
+}
+
+foreach my $path ($result->known('paths')) {
+    my $l = length($path->displayname);
+    $maxlen = $l if $l > $maxlen;
+}
+
+foreach my $path (sort {$a->displayname cmp $b->displayname} $result->known('paths')) {
+    my @values;
+    my $type;
+
+    foreach my $as (@as_types) {
+        @values = eval { $result->get($path, list => 1, default => [], as => $as) };
+        $type = $as;
+        last if scalar @values;
+    }
+    next unless scalar @values;
+
+    printf("%-*s = %s\n", $maxlen, $path->displayname, pretty_print(shift(@values), $type));
+    printf("%-*s & %s\n", $maxlen, '', pretty_print($_, $type)) foreach @values;
+}
+
+sub pretty_print {
+    my ($value, $type) = @_;
+
+    if (blessed($value)) {
+        if ($value->isa('Data::Identifier')) {
+            my $id = $value;
+            $value = sprintf('%s / %s', $id->type->displayname, $id->id);
+            if (defined(my $displayname = $id->displayname(no_defaults => 1, default => undef))) {
+                $value .= sprintf(' (%s)', $displayname);
+            }
+        } elsif ($value->isa('Data::TagDB::Tag')) {
+            my $tag = $value;
+            $value = sprintf('Tag <%s>', $tag->ise);
+            if (defined(my $displayname = $tag->displayname(no_defaults => 1, default => undef))) {
+                $value .= sprintf(' (%s)', $displayname);
+            }
+        } elsif ($value->isa('Data::URIID::Barcode')) {
+            $value = sprintf('Barcode <%s>', $value->data);
+        } elsif ($value->isa('File::FStore::File')) {
+            $value = sprintf('Store File <%s>', $value->dbname);
+        }
+    } elsif ($type eq 'filename') {
+        $value = sprintf('Filename <%s>', $value);
+    } elsif ($type eq 'bool') {
+        $value = $value ? 'true' : 'false';
+    } elsif (looks_like_number($value)) {
+        # no-op
+    } else {
+        $value = sprintf('\'%s\'', $value);
+    }
+
+    return $value;
+}
+
+#ll

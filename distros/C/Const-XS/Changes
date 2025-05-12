@@ -85,3 +85,6 @@ Revision history for Const-XS
 
 1.00	2025-05-10
 	- Version bump to declare interface now stable.
+
+1.01	2025-05-11
+	- remove the SvTYPE(val) == SVt_RV checks as this fails to make passed hash references readonly based on tests with Rope.

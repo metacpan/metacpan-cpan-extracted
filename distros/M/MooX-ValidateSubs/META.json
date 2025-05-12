@@ -44,7 +44,7 @@
    "provides" : {
       "MooX::ValidateSubs" : {
          "file" : "lib/MooX/ValidateSubs.pm",
-         "version" : "1.012009"
+         "version" : "1.012010"
       },
       "MooX::ValidateSubs::Role" : {
          "file" : "lib/MooX/ValidateSubs/Role.pm"
@@ -58,7 +58,7 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-ValidateSubs"
       }
    },
-   "version" : "1.012009",
+   "version" : "1.012010",
    "x_contributors" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -18,7 +18,8 @@ Construct Tk::Widget 'ListBrowser';
 
 use Math::Round;
 use Tk;
-require Tk::Pane;
+require Tk::PopList;
+
 require Tk::ListBrowser::Data;
 require Tk::ListBrowser::FilterEntry;
 require Tk::ListBrowser::Item;
@@ -97,7 +98,8 @@ can choose sort fields like '-data', '-name', or '-text'.
 
 Headers are shown in the 'hlist', 'list' and 'tree' modes. You can
 create and configure them in any mode. They are resizable and can
-be made sortable.
+be made sortable. You can drag headers left or right with your
+mouse to change the column ordering.
 
 =head3 Side columns
 
@@ -107,7 +109,8 @@ Side columns are shown in the 'hlist', 'list' and tree modes. You can create and
 
 The keyboard shortcut CTFL+F opens a filter entry at the bottom of the widget. Filtering is case insensitive.
 The filter will start updating when I<-filterdelay> milliseconds have past after your last keystroke.
-You can choose which data to filter with the I<-filterfield> option.
+You can choose which data to filter with the I<-filterfield> option. Filtering can be done on the main list
+as well as on the side columns.
 
 =head1 OPTIONS
 
@@ -159,6 +162,12 @@ Callback, called when an is selected. Gets the selection list as parameters.
 
 Callback, called when an entry is double clicked or return was pressed. Gets the selection list as parameters.
 
+=item Switch B<-filtercolumns>
+
+By default false. If you set it a button will appear
+next to the filter entry that allows you to select
+a column.
+
 =item Name B<filterDelay>
 
 =item Class B<FilterDelay>
@@ -174,9 +183,13 @@ time out, the timer is reset.
 Default value I<name>. Possible values are I<name>, I<text> and I<data>.
 Specifies on what data the filter should work.
 
-=item Switch B<-filteron>
+=item Switch B<-filterforce>
 
 Default value I<false>. If set the filter entry will allways be visible.
+
+=item Switch B<-filteron>
+
+Default value I<main>, which is the main entry list. You may also set it to a valid column.
 
 =item Name B<headerBorderWidth>
 
@@ -280,9 +293,7 @@ Automatically selects an entry when the pointer is hovering over it.
 =item Switch B<-nofilter>
 
 Default value I<false>. If set the filter entry is not available.
-This option supercedes the I<-filteron> option.
-
-Only available at create time.
+This option supercedes the I<-filterforce> option.
 
 =item Switch B<-selectmode>
 
@@ -369,10 +380,10 @@ would freeze you application. This also means watching out for using very big fo
 =head1 STANDARD OPTIONS
 
 A number of the options above can also be used when you call the
-I<add>, I<columnCreate>, I<headerCreate> and I<itemCreate> methods.
+I<add>, I<columnCreate>, I<add> and I<itemCreate> methods.
 These are I<-background>, I<-font>, I<-foreground>, I<-itempadx>,
-I<-itempady>, I<-itemtype>, I<sortfield>, I<-sortnumerical>, 
-I<-textanchor>, I<-textjustify>, I<-textside>, and I<-wraplength>, 
+I<-itempady>, I<-itemtype>, I<-textanchor>, I<-textjustify>,
+I<-textside>, and I<-wraplength>.
 
 =head1 METHODS
 
@@ -413,7 +424,7 @@ sub Populate {
 	$self->Advertise('Canvas', $c);
 	
 	#create the header frame;
-	my $hf = $c->Pane(-sticky => 'ew');
+	my $hf = $c->Frame;
 	$self->Advertise('HeaderFrame', $hf);
 
 	#mouse bindings
@@ -427,31 +438,17 @@ sub Populate {
 	$c->Tk::bind('<ButtonRelease-2>', [ $self, 'Button2Release', Ev('x'), Ev('y') ]);
 	$c->Tk::bind('<Motion>', [ $self, 'Motion', Ev('x'), Ev('y') ]);
 
-	#setting up the filter
-	my $filter = '';
-	$self->Advertise('Filter', \$filter);
-	my $fframe = $self->Frame;
-	$self->Advertise('FilterFrame', $fframe);
-	my $fentry = $fframe->FilterEntry(
-		-command => ['filterRefresh', $self],
-		-textvariable => \$filter,
-	)->pack(-side => 'left', -pady => 2, -expand => 1, -fill => 'x');
-	$self->Advertise('FilterEntry', $fentry);
-	$fentry->bind('<Control-f>', [$self, 'filterFlip']);
-	$fentry->bind('<Escape>', [$self, 'filterFlip']);
-
 	$self->{ARRANGE} = undef;
 	$self->{COLUMNS} = [];
+	$self->{DATA} = Tk::ListBrowser::Data->new($self);
 	$self->{HANDLER} = undef;
 	$self->{INDENT} = 0;
-	$self->{DATA} = Tk::ListBrowser::Data->new($self);
-#	$self->{WRAPLENGTH} = 0;
+	$self->{SORTACTIVE} = '';
 
 	$self->bind('<Configure>', [ $self, 'OnConfigure' ]);
 
-	my @bmpopt = (-foreground => $c->cget('-foreground'), -background => $c->cget('-background'));
-	my $minusbmp = $self->Bitmap(-data => $minusimg, @bmpopt);
-	my $plusbmp = $self->Bitmap(-data => $plusimg, @bmpopt);
+	my $minusbmp = $self->Bitmap(-data => $minusimg);
+	my $plusbmp = $self->Bitmap(-data => $plusimg);
 	$self->ConfigSpecs(
 		#general
 		-arrange => ['METHOD', undef, undef, 'row'],
@@ -473,9 +470,11 @@ sub Populate {
 
 		#filter
 		-nofilter => ['PASSIVE', undef, undef, ''],
-		-filterdelay => [$fentry],
+		-filtercolumns => ['PASSIVE', undef, undef, ''], #boolean
+		-filterdelay => ['PASSIVE', undef, undef, 300], #boolean
 		-filterfield => ['PASSIVE', undef, undef, 'name'],
-		-filteron => ['PASSIVE', undef, undef, ''], #boolean
+		-filterforce => ['PASSIVE', undef, undef, ''], #boolean
+		-filteron => ['PASSIVE', undef, undef, 'main'],
 
 		#headers
 		-headerborderwidth => ['PASSIVE', 'headerBorderWidth', 'HeaderBorderWidth', 2],
@@ -487,7 +486,7 @@ sub Populate {
 		-indicatorplusimg => ['PASSIVE', undef, undef, $plusbmp],
 
 		#items
-		-itempadx => ['PASSIVE', 'itemPadX', 'ItemPadX', 3],
+		-itempadx => ['PASSIVE', 'itemPadX', 'ItemPadX', 2],
 		-itempady => ['PASSIVE', 'itemPadY', 'ItemPadY', 0],
 		-itemtype => ['PASSIVE', undef, undef, 'imagetext'],
 
@@ -568,9 +567,10 @@ sub Populate {
 		DEFAULT => $self,
 	);
 	$self->after(1, sub {
-		$self->filterShow if $self->cget('-filteron');
-		my $fentry = $self->Subwidget('FilterEntry');
-		$fentry->configure(-background => $c->cget('-background')) if defined $fentry;
+		my @bmpopt = (-foreground => $c->cget('-foreground'), -background => $c->cget('-background'));
+		for ($plusbmp, $minusbmp) {
+			$_->configure(@bmpopt)
+		};
 	});
 
 }
@@ -582,7 +582,8 @@ sub data { return $_[0]->{DATA} }
 =item B<add>I<(?$name?, %options)>
 
 Adds I<$name> to the list with I<%options>. I<$name> must not yet exist.
-Besides the standard options you can also use:
+If you do not specify standard options, the main settings
+will be used. Besides the standard options you can also use:
 
 =over 4
 
@@ -642,10 +643,9 @@ sub anchorClear {
 	my $self = shift;
 	my $pool = $self->data->pool;
 	for (@$pool) {
-			$_->anchor(0)
+		$_->anchor(0)
 	}
 }
-
 =item B<anchorGet>
 
 Returns a reference to the L<Tk::ImageBrowser::Icon> object
@@ -744,12 +744,26 @@ sub arrange {
 sub Button1 {
 	my ($self, $x, $y) = @_;
 	$self->CanvasFocus;
+	my $c = $self->Subwidget('Canvas');
+
+	#return if an indicator was clicked
+	my @ind = $c->find('withtag', 'indicator');
+	for (@ind) {
+		my ($ix, $iy) = $c->coords($_);
+		my $img = $self->cget('-indicatorplusimg');
+		my $half = int($img->width / 2) + 2;
+		my ($x1, $y1, $x2, $y2) = $c->coords($_);
+		return if ($ix - $half <= $x) and ($ix + $half >= $x)
+			and ($iy - $half <= $y) and ($iy + $half >= $y);
+	}
+
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
 		$self->selectionClear;
 		$item->select(1);
 		$self->anchorSet($item->name);
 		$self->Callback('-browsecmd', $item->name);
+		return
 	} else {
 		$self->selectionClear;
 	}
@@ -765,6 +779,7 @@ sub Button1Control {
 		} else {
 			$item->select(1)
 		}
+		$self->anchorSet($item->name);
 	} else {
 		$self->selectionClear;
 	}
@@ -786,6 +801,7 @@ sub Button1Shift {
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
 		my $pool = $self->data->pool;
+		$self->anchorSet($item->name);
 		my @sel = $self->selectionGet;
 		unless (@sel) {
 			my $start = $pool->[0]->name;
@@ -1218,6 +1234,7 @@ sub entryConfigure {
 sub filter {
 	my ($self, $filter, $value) = @_;
 	return 1 if $filter eq '';
+	return '' unless (defined $value) and ($value ne '');
 	$filter = quotemeta($filter);
 	return 1 if $value eq '';
 	return $value =~ /$filter/i;
@@ -1226,15 +1243,15 @@ sub filter {
 sub filterFlip {
 	my $self = shift;
 	return if $self->cget('-nofilter');
-	my $e = $self->Subwidget('FilterEntry');
 	my $f = $self->Subwidget('FilterFrame');
-	if ($f->ismapped) {
-		unless ($self->cget('-filteron')) {
+	if ((defined $f) and ($f->ismapped)) {
+		unless ($self->cget('-filterforce')) {
 			$self->filterHide;
 			$self->CanvasFocus;
 		}
 	} else {
 		$self->filterShow;
+		my $e = $self->Subwidget('FilterEntry');
 		$e->focus;
 	}
 }
@@ -1249,29 +1266,97 @@ sub filterHide {
 	$f->packForget;
 }
 
-sub filterShow {
-	my $self = shift;
-	return if $self->cget('-nofilter');
-	my $e = $self->Subwidget('FilterEntry');
-	my $f = $self->Subwidget('FilterFrame');
-	$e->reset;
-	$f->pack(-fill => 'x');
-}
-
 sub filterRefresh {
 	my $self = shift;
 	my $pool = $self->data->pool;
 	my $filter = $self->Subwidget('FilterEntry')->get;
 	my $filterfield = $self->cget('-filterfield');
+	my $filteron = $self->cget('-filteron');
 	for (@$pool) {
-		if ($self->filter($filter, $_->$filterfield)) {
-			$_->hidden('')
+		my $item;
+		if ($filteron eq 'main') {
+			$item = $_;
+			$filterfield = $self->cget('-filterfield');
+		} else {
+			$filterfield = $self->columnCget($filteron, '-filterfield');
+			$item = $self->itemGet($_->name, $filteron);
+		}
+		if ($self->filter($filter, $item->$filterfield)) {
+			$_->hidden('');
+			if ($self->hierarchy) {
+				my $par = $self->infoParent($_->name);
+				while (defined $par) {
+					my $p = $self->get($par);
+					$p->hidden('');
+					$par = $self->infoParent($p->name);
+				}
+			}
 		} else {
 			$_->hidden(1)
 		}
 	}
 	delete $self->{'filter_id'};
 	$self->refresh;
+}
+
+sub filterShow {
+	my $self = shift;
+	return if $self->cget('-nofilter');
+
+	my $f = $self->Subwidget('FilterFrame');
+	unless (defined $f) {
+		$f = $self->Frame;
+		$self->Advertise('FilterFrame', $f);
+	}
+
+	my $e = $self->Subwidget('FilterEntry');
+	my $flag = 1;
+	unless (defined $e) {
+		$e = $f->FilterEntry(
+			-filterdelay => $self->cget('-filterdelay'),
+			-command => ['filterRefresh', $self],
+		)->pack(-side => 'left', -pady => 2, -expand => 1, -fill => 'x');
+		$flag = '';
+		$self->Advertise('FilterEntry', $e);
+		$e->bind('<Control-f>', [$self, 'filterFlip']);
+		$e->bind('<Escape>', [$self, 'filterFlip']);
+	}
+	$e->reset if $flag;
+
+	my $cf = $self->Subwidget('FilterColumn');
+	if ($self->cget('-filtercolumns')) {
+		unless (defined $cf) {
+			my @menu = ();
+			my $filteron = $self->cget('-filteron');
+			$cf = $f->Frame;
+			$cf->Label(-text => 'On:')->pack(-side => 'left');
+			my $fl;
+			my $fb = $cf->Button(
+				-command => sub {
+					my @list = ('main', $self->columnList);
+					$fl->configure(-values => \@list);
+					$fl->popUp;
+				},
+				-textvariable => \$filteron,
+				-relief => 'flat'
+			)->pack(-side => 'right');
+			$fl = $self->PopList(
+				-relief => 'raised',
+				-popdirection => 'up',
+				-confine => 1,
+				-selectcall => sub {
+					$filteron = shift;
+					$self->configure(-filteron => $filteron)
+				},
+				-widget => $fb,
+			);
+			$self->Advertise('FilterColumn', $cf);
+		}
+		$cf->pack(-side => 'left');
+	} else {
+		$cf->packForget if defined $cf;
+	}
+	$f->pack(-fill => 'x');
 }
 
 sub focus { $_[0]->CanvasFocus }
@@ -1416,6 +1501,8 @@ sub headerCreate {
 	$options{'-sortcall'} = ['sortMode', $self] if (defined $sortable) and $sortable;
 	my $hf= $self->Subwidget('HeaderFrame');
 	my $h = $hf->LBHeader(
+		-motioncall => ['headerMotion', $self],
+		-releasecall => ['refresh', $self],
 		-relief => $self->cget('-headerrelief'),
 		-borderwidth => $self->cget('-headerborderwidth'),
 		-listbrowser => $self,
@@ -1453,6 +1540,38 @@ sub headerGet {
 		$h = $c->header if defined $c
 	}
 	return $h
+}
+
+sub headerMotion {
+	my ($self, $column, $x) = @_;
+	return if $column eq '';
+	my $c = $self->headerGet($column);
+	my ($right, $target);
+	my $index = $self->columnIndex($column);
+	my $columns = $self->{COLUMNS};
+	if ($x > 0) {
+		$right = 1;
+		return if $index >= @$columns - 1;
+		$target = $columns->[$index + 1];
+	} else {
+		$right = '';
+		return if $index <= 0;
+		$target = $columns->[$index - 1];
+	}
+	$target = $self->headerGet($target->name);
+	my $t = $target->x + int($target->width / 2);
+	$x = $x + $c->x;
+	if ($right) {
+		if ($x > $t) {
+			$self->columnMove($column, $index + 1);
+			$self->headerPlace;
+		}
+	} else {
+		if ($x < $t) {
+			$self->columnMove($column, $index - 1);
+			$self->headerPlace;
+		}
+	}
 }
 
 sub headerPlace {
@@ -1616,10 +1735,17 @@ Returns the name of the last entry in the list that is not hidden.
 
 Returns a list of all entry names in the list.
 
-=item B<infoNext>I<($name)>
+=item B<infoNext>I<($name, ?$flag>?)>
 
-Returns the name of the next entry of I<$name>.
-Returns undef if I<$name> is the last entry in the list.
+The parameter I<$flag> is only usefull in hierarchy mode.
+By default it is set to true. You can overwrite that by
+specifying it as false.
+
+If I<$flag> is set in hierarchy mode the next peer is returned, 
+or undef if I<$name> is the last peer amoung it's peers.
+
+In non hierarchy mode it returns the name of the next entry of
+I<$name> or undef if I<$name> is the last entry in the list.
 
 =item B<infoNextVisible>I<($name)>
 
@@ -1628,8 +1754,15 @@ Returns undef if I<$name> is the last entry in the list.
 
 =item B<infoPev>I<($name)>
 
-Returns the name of the previous entry of I<$name>.
-Returns undef if I<$name> is the first entry in the list.
+The parameter I<$flag> is only usefull in hierarchy mode.
+By default it is set to true. You can overwrite that by
+specifying it as false.
+
+If I<$flag> is set in hierarchy mode the previous peer is returned, 
+or undef if I<$name> is the first peer amoung it's peers.
+
+In non hierarchy mode it returns the name of the previous entry of
+I<$name> or undef if I<$name> is the first entry in the list.
 
 =item B<infoPrevVisible>I<($name)>
 
@@ -1670,7 +1803,7 @@ sub itemCget {
 	if (defined $i) {
 		$val = $i->cget($option);
 	}
-	if (exists $self->{'insort'}) {
+	if ($self->sortActive) {
 		unless (defined $val) {
 			if ($i->owner->cget('-sortnumerical')) {
 				$val = $self->cget('-sortbottom');
@@ -1704,11 +1837,11 @@ Creates a new item object for I<$name> in column I<$column>. You can use the sta
 
 =item B<-data>
 
-Data to be assigned to this item item. This options preceeds the I<-text> option.
+Data to be assigned to this item item.
 
 =item B<-image>
 
-Image to display in the item. This options preceeds the I<-text> option.
+Image to display in the item.
 
 =item B<-text>
 
@@ -1781,7 +1914,7 @@ sub KeyArrowNavig {
 		my $flag = 1;
 		if ($self->hierarchy) {
 			my $a = $self->anchorGet;
-			if ($a->selected) {
+			if (defined $a) {
 				my $n = $a->name;
 				my $o = $a->opened;
 				my @ch = $self->infoChildren($a->name);
@@ -1796,9 +1929,15 @@ sub KeyArrowNavig {
 						$self->close($a->name);
 						$self->refresh;
 						$flag = '';
+					} else {
+						if (my $parent = $self->infoParent($a->name)) {
+							$a = $self->get($parent);
+							$flag = '';
+						}
 					}
 				}
 				$self->anchorSet($a->name);
+				$self->selectionSingle($a->name) if $self->cget('-selectstyle') eq 'simple';
 			}
 		}
 		if ($flag) {
@@ -1828,7 +1967,8 @@ sub KeyArrowNavig {
 	if (defined $target) {
 		my $name = $target->name;
 		$self->anchorSet($name);
-		$self->selectionSingle($name) if $self->cget('-selectstyle') eq 'simple';
+		my $style = $self->cget('-selectstyle');
+		$self->selectionSingle($name) if $style eq 'simple';
 		$self->see($name);
 		return 1
 	}
@@ -1873,7 +2013,6 @@ sub KeyPress {
 	my $pool = $self->data->pool;
 	my $h = $self->_handler;
 	return unless @$pool;
-	my @sel = $self->selectionGet;
 
 	if ($key eq 'Return') {
 		return if $self->anchorInitialize;
@@ -1884,7 +2023,8 @@ sub KeyPress {
 		return
 	}
 	if ($key eq 'Escape') {
-		if ($self->Subwidget('FilterEntry')->ismapped) {
+		my $e = $self->Subwidget('FilterEntry');
+		if ((defined $e) and ($e->ismapped)) {
 			$self->filterFlip
 		} else {
 			$self->selectionClear;
@@ -2105,11 +2245,20 @@ sub moveRow {
 
 sub OnConfigure {
 	my ($self, $timer) = @_;
+
+	#redraw headers, anchor and selection in list mode
+	if ($self->listMode) {
+		$self->headerPlace;
+		$self->anchorRefresh;
+		$self->selectionRefresh;
+	}
+
 	if (my $id = $self->{'timer_id'}) {
 		$self->afterCancel($id);
 		my $nid = $self->after(50, ['OnConfigureTimer', $self]);
 		$self->{'timer_id'} = $nid;
 	}
+
 	unless (defined $timer) {
 		$self->update;
 		my $id = $self->after(50, ['OnConfigureTimer', $self]);
@@ -2122,12 +2271,6 @@ sub OnConfigure {
 	my %a = (qw/column 1 row 1/);
 	$self->refresh if exists $a{$arrange};
 
-	#redraw headers, anchor and selection in list mode
-	if ($self->listMode) {
-		$self->headerPlace;
-		$self->anchorRefresh;
-		$self->selectionRefresh;
-	}
 }
 
 sub OnConfigureTimer {
@@ -2256,10 +2399,16 @@ Shows entry I<$name>. Call I<refresh> to see changes.
 
 =cut
 
+sub sortActive {
+	my $self = shift;
+	$self->{SORTACTIVE} = shift if @_;
+	return $self->{SORTACTIVE}
+}
+
 sub sortArray {
 	my $self = shift;
 	my @pool = @_;
-	$self->{'insort'} = 1;
+	$self->sortActive(1);
 	my $on = $self->cget('-sorton');
 	my $order = $self->cget('-sortorder');;
 	my $col;
@@ -2319,7 +2468,7 @@ sub sortArray {
 			}
 		}
 	}
-	delete $self->{'insort'};
+	$self->sortActive('');
 	return @sorted
 }
 
@@ -2428,7 +2577,7 @@ Holding shift while pressing these keys manipulates the selection.
 The escape key clears the selection and anchor or hides the filter entry if it is visible.
 
 CTRL+F pops a filter entry. Clicking CTRL+F again hides it. Filtering is done instantly upon entering
-text. This is influenced by the I<-filteron> and I<-nofilter> options.
+text. This is influenced by the I<-filterforce> and I<-nofilter> options.
 
 =head1 USING THE MOUSE
 

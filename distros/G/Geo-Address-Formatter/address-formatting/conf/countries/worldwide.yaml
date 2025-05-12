@@ -289,11 +289,9 @@ AL:
         {{{attention}}}
         {{{house}}}
         {{{road}}} {{{house_number}}}
-        {{{postcode}}} {{#first}} {{{city}}} || {{{town}}} || {{{city_district}}} || {{{municipality}}} || {{{state_district}}} || {{{village}}} || {{{hamlet}}} {{/first}}
+        {{{postcode}}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{city_district}}} || {{{municipality}}} || {{{state_district}}} || {{{village}}} || {{{hamlet}}} {{/first}}
         {{{country}}}
-    postformat_replace:
-        # fix the postcode to add - after numbers
-        - ["\n(\\d{4}) ([^,]*)\n","\n$1-$2\n"]
 
 # Armenia
 AM:
@@ -710,10 +708,10 @@ DE:
         - ["^Ortsbeirat (\\d+) :",""]
         - ["^Gemeinde ",""]
         - ["^Gemeindeverwaltungsverband ",""]
-        - ["^Landkreis ",""]
-        - ["^Kreis ",""]
+        - ["county=Landkreis ",""]
+        - ["county=Kreis ",""]
         - ["^Grenze ",""]
-        - ["^Free State of ",""]
+        - ["state=Free State of ",""]
         - ["^Freistaat ",""]
         - ["^Regierungsbezirk ",""]
         - ["^Stadtgebiet ",""]
@@ -1012,7 +1010,7 @@ HR:
 HT:
     address_template: *generic1
     postformat_replace:
-        - [" Commune de"," "]
+        - [" Commune de "," "]
 
 # Hungary
 # https://e-nyelv.hu/2014-09-19/lakcim/
@@ -1264,10 +1262,13 @@ KP:
 KR:
     address_template: |
         {{{country}}}
-        {{{state}}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} {{/first}} {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}} {{{road}}} {{{house_number}}}
+        {{{state}}} {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} {{/first}} {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}} {{{road}}} {{{house_number}}}
         {{{attention}}}
         {{{postcode}}}
+    fallback_template: |
+        {{{country}}}
+        {{{state}}} {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} {{/first}} {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
+        {{{attention}}}
 
 # South Korea - English
 KR_en:
@@ -1283,10 +1284,13 @@ KR_en:
 KR_ko:
     address_template: |
         {{{country}}}
-        {{{state}}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} {{/first}} {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}} {{{road}}} {{{house_number}}}
+        {{{state}}} {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} {{/first}} {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}} {{{road}}} {{{house_number}}}
         {{{attention}}}
         {{{postcode}}}
+    fallback_template: |
+        {{{country}}}
+        {{{state}}} {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} {{/first}} {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
+        {{{attention}}}
 
 # Kuwait
 KW:

@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use Convert::Color;
 
-$VERSION =  0.05;
+$VERSION =  0.08;
 
 sub new {
 	my ($class, $lb) = @_;
@@ -40,16 +40,34 @@ sub selectimage {
 	$sbg =~ s/^#//;
 	my $bg = Convert::Color->new("rgb8:$sbg");
 	my ($red, $green, $blue) = $bg->rgb;
-	
 	#convert top rgb
-	my $tred = $self->offset($red, 255, 1.75);
-	my $tgreen = $self->offset($green, 255, 1.75);
-	my $tblue =  $self->offset($blue, 255, 1.75);
+	my $tred = $self->offset($red, 255, 1.79);
+	my $tgreen = $self->offset($green, 255, 2);
+	my $tblue =  $self->offset($blue, 255, 2);
 
 	#convert bottom rgb
-	my $bred = $self->offset($red, 0, 1.5);
-	my $bgreen = $self->offset($green, 0, 1.5);
-	my $bblue = $self->offset($blue, 0, 1.5);
+	my $bred = $self->offset($red, 0, 1.81);
+	my $bgreen = $self->offset($green, 0, 1.81);
+	my $bblue = $self->offset($blue, 0, 1.75);
+
+
+	#uncomment this to test color conversion on kde theme Human KDE
+#	my $reft = Convert::Color->new("rgb8:EFB18F");
+#	my ($rtred, $rtgreen, $rtblue) = $reft->rgb;
+#
+#	my $refb = Convert::Color->new("rgb8:673B12");
+#	my ($rbred, $rbgreen, $rbblue) = $refb->rgb;
+#
+#	my $tored = $rtred / $tred;
+#	my $togreen = $rtgreen / $tgreen;
+#	my $toblue = $rtblue / $tblue;
+#
+#	my $bored = $rbred / $bred;
+#	my $bogreen = $rbgreen / $bgreen;
+#	my $boblue = $rbblue / $bblue;
+#	
+#	print "ratio    top: $tored, $togreen, $toblue\n";
+#	print "ratio bottom: $bored, $bogreen, $boblue\n";
 
 	#create xpm color definitions
 	my $t = Convert::Color->new("rgb:$tred,$tgreen,$tblue");

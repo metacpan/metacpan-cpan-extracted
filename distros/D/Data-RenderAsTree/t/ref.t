@@ -32,8 +32,8 @@ my(%source) =
 	{
 		data     => \'s', # Use ' in comment for UltraEdit hiliting.
 		expected => <<EOS,
-Ref Demo
-    |--- SCALAR() [SCALAR 1]
+Ref Demo. Attributes: {}
+    |--- SCALAR() [SCALAR 1]. Attributes: {}
 EOS
 		literal => q|\'s'|, # Use ' in comment for UltraEdit hiliting.
 	},
@@ -41,10 +41,10 @@ EOS
 	{
 		data     => {key => \'s'}, # Use ' in comment for UltraEdit hiliting.
 		expected => <<EOS,
-Ref Demo
-    |--- {} [HASH 1]
-         |--- key = SCALAR() [SCALAR 2]
-              |--- SCALAR() = s [SCALAR 3]
+Ref Demo. Attributes: {}
+    |--- {} [HASH 1]. Attributes: {}
+         |--- key = SCALAR() [SCALAR 2]. Attributes: {}
+              |--- SCALAR() = s [SCALAR 3]. Attributes: {}
 EOS
 		literal => q|{key => \'s'}|, # Use ' in comment for UltraEdit hiliting.
 	},

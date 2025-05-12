@@ -11,9 +11,9 @@ use warnings;
 use vars qw($VERSION $AUTOLOAD);
 use Carp;
 
-$VERSION =  0.04;
+$VERSION =  0.08;
 
-use Tk::ListBrowser::Item;
+use Tk::ListBrowser::Entry;
 
 =head1 DESCRIPTION
 
@@ -75,7 +75,7 @@ sub add {
 
 	my $after = delete $options{'-after'};
 	my $before = delete $options{'-before'};
-	my $item = new Tk::ListBrowser::Item(
+	my $item = new Tk::ListBrowser::Entry(
 		%options,
 		-listbrowser => $self->listbrowser,
 		-name => $name,
@@ -301,12 +301,24 @@ sub infoList {
 }
 
 sub infoNext {
-	my ($self, $name) = @_;
+	my ($self, $name, $flag) = @_;
+	$flag = 1 unless defined $flag;
 	my $pool = $self->pool;
 	my $a = $self->index($name);
 	unless (defined $a) {
 		croak "Entry '$name' not found";
 		return
+	}
+	return undef if $a eq @$pool - 1;
+	my $lb = $self->listbrowser;
+	if ($lb->hierarchy and $flag) {
+		my $cur = $self->get($name);
+		my @c = $self->infoChildren($name);
+		if (@c) {
+			my $last = pop @c;
+			my $li = $self->index($last);
+			$a = $li if $li < @$pool;
+		}
 	}
 	return undef if $a eq @$pool - 1;
 	return $pool->[$a + 1]->name;
@@ -338,12 +350,24 @@ sub infoParent {
 }
 
 sub infoPrev {
-	my ($self, $name) = @_;
+	my ($self, $name, $flag) = @_;
+	$flag = 1 unless defined $flag;
 	my $pool = $self->pool;
 	my $a = $self->index($name);
 	unless (defined $a) {
 		croak "Entry '$name' not found";
 		return
+	}
+	return undef if $a eq 0;
+	my $lb = $self->listbrowser;
+	if ($lb->hierarchy and $flag) {
+		my $cur = $self->get($name);
+		my @c = $self->infoChildren($name);
+		if (@c) {
+			my $first = shift @c;
+			my $fi = $self->index($first);
+			$a = $fi;
+		}
 	}
 	return undef if $a eq 0;
 	return $pool->[$a - 1]->name;
@@ -502,7 +526,7 @@ sub selectionSet {
 		($begin, $end) = $self->selectionIndex($begin, $end);
 		for ($begin .. $end) {
 			my $i = $pool[$_];
-			$i->select(1) unless $i->hidden;
+			$i->select(1) unless $i->hidden or (not $i->openedparent);
 		}
 	}
 }

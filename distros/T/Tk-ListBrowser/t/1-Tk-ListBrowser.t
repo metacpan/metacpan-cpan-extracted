@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 99;
+use Test::More tests => 101;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
@@ -13,6 +13,7 @@ BEGIN {
 	use_ok('Tk::ListBrowser::BaseItem');
 	use_ok('Tk::ListBrowser::Column');
 	use_ok('Tk::ListBrowser::Data');
+	use_ok('Tk::ListBrowser::Entry');
 	use_ok('Tk::ListBrowser::FilterEntry');
 	use_ok('Tk::ListBrowser::HList');
 	use_ok('Tk::ListBrowser::Item');
@@ -62,7 +63,7 @@ if (defined $app) {
 #		-marginbottom => 80,
 #		-arrange => 'list',
 #		-arrange => 'row',
-#		-filteron => 1,
+#		-filterforce => 1,
 #		-motionselect => 1,
 #		-nofilter => 1,
 #		-textanchor => 'w',
@@ -204,6 +205,22 @@ if (defined $app) {
 			},
 		)->pack(-side => 'left');
 	}
+	my $smsf = $app->LabFrame(
+		-label => 'Select style',
+		-labelside => 'acrosstop',
+	)->pack(-fill => 'x');
+	my $style = $ib->cget('-selectstyle');
+	for (qw/anchor simple/) {
+		$smsf->Radiobutton(
+			-text => $_,
+			-variable => \$style,
+			-value => $_,
+			-command => sub {
+				$ib->configure('-selectstyle', $style);
+				$ib->refresh;
+			},
+		)->pack(-side => 'left');
+	}
 
 	my $jf = $app->LabFrame(
 		-label => 'Text justify',
@@ -247,7 +264,7 @@ if (defined $app) {
 
 testaccessors($data, qw/pool opened/);
 testaccessors($ib, qw/cellHeight cellImageHeight cellImageWidth
-	cellTextHeight cellTextWidth cellWidth forceWidth header listWidth/);
+	cellTextHeight cellTextWidth cellWidth forceWidth header listWidth sortActive/);
 testaccessors($item, qw/background cguideH cguideV cimage cindicator column cimage 
 	crect	ctext data font foreground hidden imageX imageY itemtype opened owner rectX
 	rectY row textanchor textjustify textside textX textY/);

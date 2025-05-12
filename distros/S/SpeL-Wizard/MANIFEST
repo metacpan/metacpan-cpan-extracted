@@ -15,6 +15,7 @@ dist.ini
 lib/SpeL/I18n.pm
 lib/SpeL/I18n/en.pm
 lib/SpeL/I18n/nl.pm
+lib/SpeL/Object/#Variable.pm#~
 lib/SpeL/Object/Arrow.pm
 lib/SpeL/Object/Binop.pm
 lib/SpeL/Object/Bracketconstruction.pm
@@ -115,6 +116,8 @@ t/01-lib/SpeL/Parser/Chunk/chunk-limitexpressions.golden
 t/01-lib/SpeL/Parser/Chunk/chunk-limitexpressions.tex
 t/01-lib/SpeL/Parser/Chunk/chunk-mathsetenum.golden
 t/01-lib/SpeL/Parser/Chunk/chunk-mathsetenum.tex
+t/01-lib/SpeL/Parser/Chunk/chunk-mitvarepsilon.golden
+t/01-lib/SpeL/Parser/Chunk/chunk-mitvarepsilon.tex
 t/01-lib/SpeL/Parser/Chunk/chunk-nestedmath.golden
 t/01-lib/SpeL/Parser/Chunk/chunk-nestedmath.tex
 t/01-lib/SpeL/Parser/Chunk/chunk-newline.golden
@@ -155,6 +158,9 @@ t/02-bin/spel/bracketstring.golden
 t/02-bin/spel/bracketstring.spelidx
 t/02-bin/spel/chunk-firstmathcommand.golden
 t/02-bin/spel/chunk-firstmathcommand.spelidx
+t/02-bin/spel/chunk-mitvarepsilon.golden
+t/02-bin/spel/chunk-mitvarepsilon.spelidx
+t/02-bin/spel/chunk-mitvarepsilon.spelidx~
 t/02-bin/spel/chunk-nestedmath.golden
 t/02-bin/spel/chunk-nestedmath.spelidx
 t/02-bin/spel/chunk-numbers.golden
@@ -189,6 +195,9 @@ t/02-bin/spel/max.golden
 t/02-bin/spel/max.spelidx
 t/02-bin/spel/midtext.golden
 t/02-bin/spel/midtext.spelidx
+t/02-bin/spel/numbers-with-times.golden
+t/02-bin/spel/numbers-with-times.spelidx
+t/02-bin/spel/numbers-with-times.spelidx~
 t/02-bin/spel/percent.golden
 t/02-bin/spel/percent.spelidx
 t/02-bin/spel/scratch.golden
@@ -208,6 +217,7 @@ t/02-bin/spel/spel/backslashdollar.tex
 t/02-bin/spel/spel/bracketstring.tex
 t/02-bin/spel/spel/chunk-aprep.tex
 t/02-bin/spel/spel/chunk-firstmathcommand.tex
+t/02-bin/spel/spel/chunk-mitvarepsilon.tex
 t/02-bin/spel/spel/chunk-nestedmath.tex
 t/02-bin/spel/spel/chunk-numbers.tex
 t/02-bin/spel/spel/difficult.tex
@@ -225,6 +235,7 @@ t/02-bin/spel/spel/mathenvexpressions.tex
 t/02-bin/spel/spel/matrices.tex
 t/02-bin/spel/spel/max.tex
 t/02-bin/spel/spel/midtext.tex
+t/02-bin/spel/spel/numbers-with-times.tex
 t/02-bin/spel/spel/percent.tex
 t/02-bin/spel/spel/scratch.tex
 t/02-bin/spel/spel/section.tex

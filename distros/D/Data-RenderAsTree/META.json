@@ -4,13 +4,13 @@
       "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-RenderAsTree",
    "no_index" : {
@@ -30,6 +30,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.48"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Data::Dumper::Concise" : "2.022",
@@ -44,10 +49,19 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "2.023",
+            "Test::More" : "1.001014"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-RenderAsTree"
+      },
       "license" : [
          "http://opensource.org/licenses/Artistic-2.0"
       ],
@@ -57,5 +71,6 @@
          "web" : "https://github.com/ronsavage/Data-RenderAsTree"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

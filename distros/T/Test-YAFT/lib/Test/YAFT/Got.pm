@@ -17,7 +17,7 @@ package Test::YAFT::Got {
 
 	1;
 }
-$Test::YAFT::Got::VERSION = '1.0.1';;
+$Test::YAFT::Got::VERSION = '1.0.2';;
 
 __END__
 
