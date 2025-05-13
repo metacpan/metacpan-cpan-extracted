@@ -8,6 +8,9 @@ WriteMakefile(
     META_MERGE        => {
         "meta-spec"      => { version => 2 },
         resources        => {
+            bugtracker      => {
+                web            => 'https://github.com/ehuelsmann/perl-protocol-sys-virt/issues',
+            },
             repository      => {
                 type           => 'git',
                 url            => 'git://github.com/ehuelsmann/perl-protocol-sys-virt.git',

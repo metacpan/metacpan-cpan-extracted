@@ -7,7 +7,6 @@ META.yml
 Makefile.PL
 README.md
 cpanfile
-dist.ini
 lib/OIDC/Client.pm
 lib/OIDC/Client/Config.pod
 lib/OIDC/Client/Error.pm
@@ -33,6 +32,7 @@ t/user.t
 xt/author/critic.t
 xt/author/distmeta.t
 xt/author/no-breakpoints.t
+xt/author/no-tabs.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/author/portability.t

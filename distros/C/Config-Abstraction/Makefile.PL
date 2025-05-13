@@ -28,6 +28,8 @@ WriteMakefile(
 		'Config::Auto' => 0,
 		'Config::IniFiles' => 0,
 		'Data::Reuse' => 0,	# Fails installation tests on recent Perls, RT#100461
+		'File::Basename' => 0,
+		'File::Slurp' => 0,
 		'JSON::MaybeXS'	=> 0,
 		'Params::Get' => 0.04,
 		'YAML::XS' => 0,
@@ -35,7 +37,6 @@ WriteMakefile(
 		# 'XML::LibXML' => 0,	# do.
 		# 'XML::Simple' => 0,
 		'XML::PP' => 0,
-		'File::Slurp' => 0,
 		'File::Spec' => 0,
 		'Hash::Merge'	=> 0,
 		'Hash::Flatten'	=> 0,

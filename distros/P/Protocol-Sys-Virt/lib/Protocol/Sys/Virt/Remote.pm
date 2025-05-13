@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.1.0
+#        XDR::Gen version 0.0.5 and LibVirt version v11.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,13 +13,13 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Remote v11.1.0;
+package Protocol::Sys::Virt::Remote v11.3.0;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.1.0;
-use Protocol::Sys::Virt::Transport::XDR v11.1.0;
+use Protocol::Sys::Virt::Remote::XDR v11.3.0;
+use Protocol::Sys::Virt::Transport::XDR v11.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 my $transport = 'Protocol::Sys::Virt::Transport::XDR';
 
@@ -499,7 +499,11 @@ my @args_encoders = (
     sub { my $idx = 0; my $rv = ''; $remote->serialize_network_get_metadata_args($_[0], $idx, $rv); return $rv; },
     invalid_proc(446),
     sub { my $idx = 0; my $rv = ''; $remote->serialize_node_device_update_args($_[0], $idx, $rv); return $rv; },
-    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_graphics_reload_args($_[0], $idx, $rv); return $rv; }
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_graphics_reload_args($_[0], $idx, $rv); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_get_autostart_once_args($_[0], $idx, $rv); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_set_autostart_once_args($_[0], $idx, $rv); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_set_throttle_group_args($_[0], $idx, $rv); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_del_throttle_group_args($_[0], $idx, $rv); return $rv; }
     );
 
 my @args_decoders = (
@@ -951,7 +955,11 @@ my @args_decoders = (
     sub { my $idx = 0; my $rv = ''; $remote->deserialize_network_get_metadata_args($rv, $idx, $_[0]); return $rv; },
     invalid_proc(446),
     sub { my $idx = 0; my $rv = ''; $remote->deserialize_node_device_update_args($rv, $idx, $_[0]); return $rv; },
-    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_graphics_reload_args($rv, $idx, $_[0]); return $rv; }
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_graphics_reload_args($rv, $idx, $_[0]); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_get_autostart_once_args($rv, $idx, $_[0]); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_set_autostart_once_args($rv, $idx, $_[0]); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_set_throttle_group_args($rv, $idx, $_[0]); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_del_throttle_group_args($rv, $idx, $_[0]); return $rv; }
     );
 
 my @ret_encoders = (
@@ -1402,6 +1410,10 @@ my @ret_encoders = (
     \&encode_no_ret,
     sub { my $idx = 0; my $rv; $remote->serialize_network_get_metadata_ret($_[0], $idx, $rv); return $rv; },
     invalid_proc(446),
+    \&encode_no_ret,
+    \&encode_no_ret,
+    sub { my $idx = 0; my $rv; $remote->serialize_domain_get_autostart_once_ret($_[0], $idx, $rv); return $rv; },
+    \&encode_no_ret,
     \&encode_no_ret,
     \&encode_no_ret
     );
@@ -1855,6 +1867,10 @@ my @ret_decoders = (
     sub { my $idx = 0; my $rv; $remote->deserialize_network_get_metadata_ret($rv, $idx, $_[0]); return $rv; },
     invalid_proc(446),
     \&decode_no_ret,
+    \&decode_no_ret,
+    sub { my $idx = 0; my $rv; $remote->deserialize_domain_get_autostart_once_ret($rv, $idx, $_[0]); return $rv; },
+    \&decode_no_ret,
+    \&decode_no_ret,
     \&decode_no_ret
     );
 
@@ -2305,7 +2321,14 @@ my @msg_encoders = (
     invalid_proc(443),
     invalid_proc(444),
     invalid_proc(445),
-    sub { my $idx = 0; my $rv = ''; $remote->serialize_network_event_callback_metadata_change_msg($_[0], $idx, $rv); return $rv; }
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_network_event_callback_metadata_change_msg($_[0], $idx, $rv); return $rv; },
+    invalid_proc(447),
+    invalid_proc(448),
+    invalid_proc(449),
+    invalid_proc(450),
+    invalid_proc(451),
+    invalid_proc(452),
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_event_nic_mac_change_msg($_[0], $idx, $rv); return $rv; }
     );
 
 my @msg_decoders = (
@@ -2755,7 +2778,14 @@ my @msg_decoders = (
     invalid_proc(443),
     invalid_proc(444),
     invalid_proc(445),
-    sub { my $idx = 0; my $rv = ''; $remote->deserialize_network_event_callback_metadata_change_msg($rv, $idx, $_[0]); return $rv; }
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_network_event_callback_metadata_change_msg($rv, $idx, $_[0]); return $rv; },
+    invalid_proc(447),
+    invalid_proc(448),
+    invalid_proc(449),
+    invalid_proc(450),
+    invalid_proc(451),
+    invalid_proc(452),
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_event_nic_mac_change_msg($rv, $idx, $_[0]); return $rv; }
     );
 
 
@@ -3021,9 +3051,9 @@ Protocol::Sys::Virt::Remote - Connect to remote libvirt daemon
 
 =head1 VERSION
 
-v11.1.0
+v11.3.0
 
-Based on LibVirt tag v11.1.0
+Based on LibVirt tag v11.3.0
 
 =head1 SYNOPSIS
 

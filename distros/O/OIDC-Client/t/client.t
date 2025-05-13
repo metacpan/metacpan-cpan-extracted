@@ -29,15 +29,6 @@ sub test_build_with_exceptions {
 
     throws_ok {
       $class->new(
-        id     => 'my_client_id',
-        secret => 'my_client_secret',
-        log    => $log,
-      );
-    } qr/no provider/,
-      'provider is missing';
-
-    throws_ok {
-      $class->new(
         provider => 'my_provider',
         secret   => 'my_client_secret',
         log      => $log,
@@ -47,8 +38,9 @@ sub test_build_with_exceptions {
 
     throws_ok {
       $class->new(
-        id  => 'my_client_id',
-        log => $log,
+        id     => 'my_client_id',
+        secret => 'my_client_secret',
+        log    => $log,
       );
     } qr/no provider/,
       'provider is missing';
@@ -99,6 +91,21 @@ sub test_build_with_exceptions {
     } qr/these configured audiences are duplicated: my_audience, audience1/,
       'duplicates audiences';
   };
+
+  throws_ok {
+    $class->new(
+      log      => $log,
+      kid_keys => {},
+      config   => {
+        provider            => 'my_provider',
+        id                  => 'my_client_id',
+        secret              => 'my_client_secret',
+        identity_expires_in => 3600,
+        bad_key             => 'dd',
+      },
+    );
+  } qr/bad_key/,
+    'unexpected key for checked configuration';
 }
 
 sub test_secret_from_config {

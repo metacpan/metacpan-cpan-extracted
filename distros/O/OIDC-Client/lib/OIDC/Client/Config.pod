@@ -150,6 +150,15 @@ to the application once authentication has been completed.
 
 String with space separators defining the desired scope of rights of the requested token.
 
+=head2 provider."provider".identity_expires_in
+
+Number of seconds to add to the current time (when the ID token is retrieved) to force
+an expiration time. This overrides the expiration time specified in the C<exp> claim,
+which is used by default.
+
+The value I<0> means that there is no expiration time for the stored identity
+(lifetime of the current session).
+
 =head2 provider."provider".expiration_leeway
 
 Number of seconds of leeway for a token to be considered expired before it actually is.

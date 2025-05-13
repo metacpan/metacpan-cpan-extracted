@@ -27,6 +27,7 @@ requires:
   Config::Auto: '0'
   Config::IniFiles: '0'
   Data::Reuse: '0'
+  File::Basename: '0'
   File::Slurp: '0'
   File::Spec: '0'
   Hash::Flatten: '0'
@@ -41,5 +42,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Config-Abstraction/issues
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: https://github.com/nigelhorne/Config-Abstraction
-version: '0.22'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

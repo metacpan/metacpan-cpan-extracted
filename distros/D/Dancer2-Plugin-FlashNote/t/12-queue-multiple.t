@@ -56,7 +56,7 @@ use_ok 'Dancer2::Plugin::FlashNote';
 
     get '/fishy' => sub {
         flash('SLIIIME!');
-        redirect '/';
+        redirect uri_for '/';
     };
 
 }

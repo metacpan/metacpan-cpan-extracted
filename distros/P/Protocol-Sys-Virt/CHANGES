@@ -1,5 +1,19 @@
 -----
 
+11.3.0    2025-05-12
+    [Added]
+       * New remote procedure call constants PROC_DOMAIN_GET_AUTOSTART_ONCE,
+         PROC_DOMAIN_SET_AUTOSTART_ONCE, PROC_DOMAIN_SET_THROTTLE_GROUP,
+         PROC_DOMAIN_DEL_THROTTLE_GROUP, PROC_DOMAIN_EVENT_NIC_MAC_CHANGE
+       * New entry points in Protocol::Sys::Virt::Remote::XDR for message
+         serialization:
+         domain_set_throttle_group_args, domain_del_throttle_group_args,
+         domain_get_autostart_once_args, domain_get_autostart_once_ret,
+         domain_set_autostart_once_args, domain_event_nic_mac_change_msg
+       * Link to GitHub repository in CPAN META data
+    [Changed]
+        * Updated to libvirt tag v11.3.0 (from 11.1.0)
+
 11.1.0    2025-03-21
     [Changed]
         * Updated to libvirt tag v11.1.0 (from v11.0.0)

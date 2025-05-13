@@ -304,7 +304,7 @@ sub get_token {
     $self->log_msg(debug => "OIDC: access token has been stored");
   }
 
-  return $self->get_stored_identity();
+  return $self->_get_stored_identity();
 }
 
 
@@ -612,7 +612,7 @@ sub build_user_from_identity {
   my ($user_class) = pos_validated_list(\@_, { isa => 'Str', default => 'OIDC::Client::User' });
   load($user_class);
 
-  my $identity = $self->get_stored_identity()
+  my $identity = $self->_get_stored_identity()
     or croak("OIDC: no identity has been stored");
 
   my $role_prefix = $self->client->role_prefix;
@@ -718,7 +718,7 @@ sub redirect_to_logout {
   my %args;
 
   if ($params{with_id_token} // $self->client->config->{logout_with_id_token}) {
-    my $identity = $self->get_stored_identity()
+    my $identity = $self->_get_stored_identity()
       or croak("OIDC: no identity has been stored");
     $args{id_token} = $identity->{token};
   }
@@ -871,7 +871,10 @@ sub get_valid_access_token {
 
   my $identity = $c->oidc->get_stored_identity();
 
-Returns the stored identity, a hashref with at least these keys :
+Returns undef if no identity has been stored or if the stored identity has expired
+including the configured leeway.
+
+Otherwise, returns the stored identity, a hashref with at least these keys :
 
 =over 2
 
@@ -882,6 +885,13 @@ Id token (String)
 =item subject
 
 Subject identifier (String)
+
+=item expires_at
+
+Expiration time (number of seconds since from 1970-01-01T00:00:00Z).
+By default, it comes directly from the C<exp> claim but if the C<identity_expires_in>
+configuration entry is specified, it is added to the current time (when the ID token
+is retrieved) to force an expiration time.
 
 =back
 
@@ -894,6 +904,20 @@ entry (hashref) to be returned by this method.
 =cut
 
 sub get_stored_identity {
+  my $self = shift;
+
+  my $identity = $self->_get_stored_identity()
+    or return;
+
+  if (my $expires_at = $identity->{expires_at}) {
+    return if $self->client->has_expired($expires_at);
+  }
+
+  return $identity;
+}
+
+
+sub _get_stored_identity {
   my $self = shift;
 
   if ($self->is_base_url_local and my $mocked_identity = $self->client->config->{mocked_identity}) {
@@ -915,7 +939,6 @@ sub _store_identity {
   );
 
   my $subject = $params{claims}->{sub};
-
   defined $subject
     or croak("OIDC: the 'sub' claim is not defined");
 
@@ -923,6 +946,17 @@ sub _store_identity {
     token   => $params{id_token},
     subject => $subject,
   );
+
+  my $expires_in = $self->client->config->{identity_expires_in};
+  if (defined $expires_in) {
+    if ($expires_in != 0) {
+      $identity{expires_at} = time + $expires_in;
+    }
+  }
+  else {
+    $identity{expires_at} = $params{claims}->{exp}
+      or $self->log_msg(warning => "OIDC: no 'exp' claim in the ID token");
+  }
 
   foreach my $claim_name (keys %{ $self->client->claim_mapping }) {
     $identity{$claim_name} //= $self->client->get_claim_value(
@@ -935,6 +969,29 @@ sub _store_identity {
   my $provider = $self->client->provider;
 
   $self->_store->{oidc}{provider}{$provider}{identity} = \%identity;
+}
+
+
+=head2 get_identity_expiration_time()
+
+  my $expiration_time = $c->oidc->get_identity_expiration_time();
+
+Returns the time (number of seconds since from 1970-01-01T00:00:00Z)
+when the stored identity expires including the configured leeway
+or undef if it doesn't expire.
+
+=cut
+
+sub get_identity_expiration_time {
+  my $self = shift;
+
+  my $identity = $self->_get_stored_identity()
+    or croak("OIDC: no identity has been stored");
+
+  my $expires_at = $identity->{expires_at}
+    or return;
+
+  return $expires_at - ($self->client->config->{expiration_leeway} || 0);
 }
 
 

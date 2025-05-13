@@ -6,7 +6,7 @@ use 5.008_000;
 use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
-    "ABSTRACT"       => "support notifications in your Dancer2 web application",
+    "ABSTRACT"       => "Support notifications in your Dancer2 web application",
     "AUTHOR"         => "Samuel Smith <esaym\@cpan.org>",
     "BUILD_REQUIRES" => {},
     "TEST_REQUIRES"  => {
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
         "Dancer2::Core::Types" => "0.0001",
         "Dancer2::Plugin"      => "0.0001",
     },
-    "VERSION" => "0.02",
+    "VERSION_FROM" => "lib/Dancer2/Plugin/FlashNote.pm",
     "test"    => {
         "TESTS" => "t/*.t"
     },

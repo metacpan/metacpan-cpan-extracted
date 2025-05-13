@@ -1,10 +1,10 @@
 {
    "abstract" : "recursively find differences between similar directories",
    "author" : [
-      "Ben Bullock <bkb@cpan.org>"
+      "Ben Bullock <benkasminbullock@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,6 +53,6 @@
          "web" : "https://github.com/benkasminbullock/Directory-Diff"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

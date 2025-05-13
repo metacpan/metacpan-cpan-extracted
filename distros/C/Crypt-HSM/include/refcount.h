@@ -21,7 +21,7 @@ typedef atomic_size_t Refcount;
 #define refcount_load(counter) atomic_load(counter)
 #define refcount_init(counter, value) atomic_init(counter, value)
 #define refcount_inc(counter) atomic_fetch_add_explicit(counter, 1, memory_order_relaxed)
-static inline atomic_size_t refcount_dec(Refcount* refcount) {
+static inline size_t refcount_dec(Refcount* refcount) {
 	atomic_size_t result = atomic_fetch_sub_explicit(refcount, 1, memory_order_release);
 	if (result == 1)
 		atomic_thread_fence(memory_order_acquire);

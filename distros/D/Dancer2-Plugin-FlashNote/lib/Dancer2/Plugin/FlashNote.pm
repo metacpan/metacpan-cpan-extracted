@@ -7,7 +7,7 @@ use Carp;
 use Dancer2::Core::Types qw/Str CodeRef/;
 use Dancer2::Plugin;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 $VERSION = eval $VERSION;
 
 has token_name => (

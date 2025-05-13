@@ -49,7 +49,7 @@ name: Module-Build-Tiny
 provides:
   Module::Build::Tiny:
     file: lib/Module/Build/Tiny.pm
-    version: '0.051'
+    version: '0.052'
 recommends:
   CPAN::Requirements::Dynamic: '0'
 requires:
@@ -76,7 +76,7 @@ requires:
 resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/module-build-tiny/issues
   repository: git://github.com/Perl-Toolchain-Gang/module-build-tiny.git
-version: '0.051'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.052'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

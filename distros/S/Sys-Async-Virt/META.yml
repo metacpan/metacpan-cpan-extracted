@@ -35,6 +35,7 @@ requires:
   Sublike::Extended: '0.29'
   perl: v5.26.0
 resources:
+  bugtracker: https://github.com/ehuelsmann/perl-sys-async-virt/issues
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.0.18
+version: v0.0.19
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

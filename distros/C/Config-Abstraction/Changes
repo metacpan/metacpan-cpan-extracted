@@ -1,5 +1,14 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.24	Mon May 12 16:15:09 EDT 2025
+	Added the 'no_fixate' option
+
+0.23	Mon May 12 12:01:49 EDT 2025
+	Fix tests on machines that have configuration files installed elsewhere
+	Look in more places for the config files, when config_dirs is not given
+	Consider $script_name for configuration data as well
+	'file' means 'config_file'
+
 0.22	Fri May  9 14:31:28 EDT 2025
 	Fix CI tests
 

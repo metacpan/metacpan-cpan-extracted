@@ -40,12 +40,12 @@ produces output
     /usr/home/ben/projects/directory-diff/examples/old_dir/diff-file is different from /usr/home/ben/projects/directory-diff/examples/new_dir/diff-file.
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.08/examples/synopsis.pl> in the distribution.)  
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.09/examples/synopsis.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents Directory-Diff version 0.08
-corresponding to git commit L<80910e5ff3eaeb27ebbe432883b1798ab6dc6ebe|https://github.com/benkasminbullock/Directory-Diff/commit/80910e5ff3eaeb27ebbe432883b1798ab6dc6ebe> released on Sat Nov 17 06:38:54 2018 +0900.
+This documents Directory-Diff version 0.09
+corresponding to git commit L<6985ccf7389d41b632e46843b493cc2626d2a881|https://github.com/benkasminbullock/Directory-Diff/commit/6985ccf7389d41b632e46843b493cc2626d2a881> released on Tue May 13 08:25:57 2025 +0900.
 
 =head1 DESCRIPTION
 
@@ -130,6 +130,9 @@ If a second argument with a true value is set, it prints debugging
 messages. For example
 
      my %ls = ls_dir ("dir", 1);
+
+As a debugging measure it halts execution if its return value is
+ignored.
 
 =head2 get_only
 
@@ -227,6 +230,8 @@ This section lists people who have contributed to the module.
 
 Mohammad S. Anwar (MANWAR) contributed fixes for broken tests.
 
+Slaven Rezic (ESERTE) contributed bug fixes and suggestions for improvement.
+
 =head1 MOTIVATION
 
 This section discusses why I wrote the module and what I use it for.
@@ -268,12 +273,12 @@ module on github in about 2012 and on CPAN in 2016.
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2009-2018
+2009-2025
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -1,5 +1,7 @@
 Revision history for Dancer2-Plugin-FlashNote
 
+0.03    2025-05-12
+        - Fix failing test
 0.02    2017-04-18
         - Add dependencies to Makefile.PL
 0.01    2017-04-11

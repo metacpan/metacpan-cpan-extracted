@@ -226,10 +226,11 @@ sub test_get_token_ok {
 
     # Then
     my %expected_stored_identity = (
-      token   => 'my_id_token',
-      subject => 'my_subject',
-      login   => 'my_subject',
-      roles   => [qw/role1 role2 role3/],
+      token      => 'my_id_token',
+      subject    => 'my_subject',
+      login      => 'my_subject',
+      roles      => [qw/role1 role2 role3/],
+      expires_at => 1111111,
     );
     cmp_deeply(
       $identity,
@@ -280,10 +281,11 @@ sub test_get_token_ok {
 
     # Then
     my %expected_stored_identity = (
-      token   => 'my_id_token',
-      subject => 'my_subject',
-      login   => 'my_subject',
-      roles   => [qw/role1 role2 role3/],
+      token      => 'my_id_token',
+      subject    => 'my_subject',
+      login      => 'my_subject',
+      roles      => [qw/role1 role2 role3/],
+      expires_at => 1111111,
     );
     cmp_deeply(
       $identity,
@@ -301,6 +303,49 @@ sub test_get_token_ok {
       undef,
       'no stored access token'
     );
+  };
+
+  subtest "get_token() - identity expires in configured number of seconds" => sub {
+
+    # Given
+    my $expires_in = 3600;
+    my $obj = build_object(request_params => {code                => 'my_code',
+                                              state               => 'abc'},
+                           flash          => {oidc_nonce          => 'my-nonce',
+                                              oidc_state          => 'abc'},
+                           token_response => {id_token            => 'my_id_token'},
+                           config         => {identity_expires_in => $expires_in});
+    # When
+    my $begin_time = time;
+    my $identity = $obj->get_token(
+      redirect_uri => 'my_redirect_uri',
+    );
+
+    # Then
+    cmp_deeply(
+      $identity->{expires_at},
+      num($begin_time + $expires_in, 1),
+      'expected expires_at'
+    );
+  };
+
+  subtest "get_token() - no identity expiration" => sub {
+
+    # Given
+    my $obj = build_object(request_params => {code                => 'my_code',
+                                              state               => 'abc'},
+                           flash          => {oidc_nonce          => 'my-nonce',
+                                              oidc_state          => 'abc'},
+                           token_response => {id_token            => 'my_id_token'},
+                           config         => {identity_expires_in => 0});
+    # When
+    my $identity = $obj->get_token(
+      redirect_uri => 'my_redirect_uri',
+    );
+
+    # Then
+    ok(! exists $identity->{expires_at},
+       'no expires_at');
   };
 
   subtest "get_token() with only access token" => sub {
@@ -570,14 +615,14 @@ sub test_verify_token_ok {
     # Then
     my %expected_claims = (
       iss   => 'my_issuer',
-      exp   => 123,
+      exp   => 1111111,
       aud   => 'my_id',
       sub   => 'my_subject',
       roles => [qw/role1 role2 role3/],
     );
     my %expected_stored_token = (
       token      => 'abcd123',
-      expires_at => 123,
+      expires_at => 1111111,
       scopes     => [],
     );
     cmp_deeply($claims,
@@ -610,14 +655,14 @@ sub test_verify_token_ok {
     # Then
     my %expected_claims = (
       iss   => 'my_issuer',
-      exp   => 123,
+      exp   => 1111111,
       aud   => 'my_id',
       sub   => 'my_subject',
       roles => [qw/role1 role2 role3/],
     );
     my %expected_stored_token = (
       token      => 'ABC2',
-      expires_at => 123,
+      expires_at => 1111111,
       scopes     => [],
     );
     cmp_deeply($claims,
@@ -641,7 +686,7 @@ sub test_verify_token_ok {
     my $obj = build_object(
       request_headers => { Authorization => 'bearer abcd123' },
       claims          => { iss => 'my_issuer',
-                           exp => 123,
+                           exp => 1111111,
                            aud => 'my_id',
                            sub => 'my_subject',
                            scp => [qw/scope1 scope2 scope3/] },
@@ -653,14 +698,14 @@ sub test_verify_token_ok {
     # Then
     my %expected_claims = (
       iss => 'my_issuer',
-      exp => 123,
+      exp => 1111111,
       aud => 'my_id',
       sub => 'my_subject',
       scp => [qw/scope1 scope2 scope3/],
     );
     my %expected_stored_token = (
       token      => 'abcd123',
-      expires_at => 123,
+      expires_at => 1111111,
       scopes     => [qw/scope1 scope2 scope3/],
     );
     cmp_deeply($claims,
@@ -1015,7 +1060,8 @@ sub test_build_api_useragent {
 
     # Given
     my $obj = build_object(
-      config => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } }
+      config      => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } },
+      has_expired => 1,
     );
     store_access_token(
       $obj,
@@ -1033,7 +1079,6 @@ sub test_build_api_useragent {
       $obj,
       { subject => 'my_subject' }
     );
-    $obj->client->mock(has_expired => sub { 1 });
 
     # When
     my $ua = $obj->build_api_useragent('my_audience_alias');
@@ -1097,7 +1142,8 @@ sub test_build_api_useragent {
 
     # Given
     my $obj = build_object(
-      config => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } }
+      config      => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } },
+      has_expired => 1,
     );
     store_access_token(
       $obj,
@@ -1108,7 +1154,6 @@ sub test_build_api_useragent {
       $obj,
       { subject => 'my_subject' }
     );
-    $obj->client->mock(has_expired => sub { 1 });
     $obj->client->mock(exchange_token => sub { die 'AAAAAhhhh !!!'; });
 
     # When - Then
@@ -1181,12 +1226,11 @@ sub test_has_access_token_expired {
   subtest "has_access_token_expired() has expired" => sub {
 
     # Given
-    my $obj = build_object();
+    my $obj = build_object(has_expired => 1);
     store_access_token(
       $obj,
       {}
     );
-    $obj->client->mock(has_expired => sub { 1 });
 
     # When
     my $has_expired = $obj->has_access_token_expired();
@@ -1230,13 +1274,12 @@ sub test_get_valid_access_token {
   subtest "get_valid_access_token() with expired access token and no refresh token" => sub {
 
     # Given
-    my $obj = build_object();
+    my $obj = build_object(has_expired => 1);
     store_access_token(
       $obj,
       { token      => 'my_access_token',
         expires_at => 1234 }
     );
-    $obj->client->mock(has_expired => sub { 1 });
 
     # When - Then
     is($obj->get_valid_access_token(), undef,
@@ -1246,14 +1289,13 @@ sub test_get_valid_access_token {
   subtest "get_valid_access_token() with expired access token" => sub {
 
     # Given
-    my $obj = build_object();
+    my $obj = build_object(has_expired => 1);
     store_access_token(
       $obj,
       { token         => 'my_access_token',
         refresh_token => 'my_refresh_token',
         expires_at    => 1234 }
     );
-    $obj->client->mock(has_expired => sub { 1 });
 
     # When
     my $access_token = $obj->get_valid_access_token();
@@ -1287,14 +1329,14 @@ sub test_get_valid_access_token_for_audience {
 
     # Given
     my $obj = build_object(
-      config => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } }
+      config      => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } },
+      has_expired => 1,
     );
     my %expired_access_token = ( token         => 'my_old_access_token',
                                  refresh_token => 'my_old_refresh_token',
                                  expires_at    => 12 );
     store_access_token($obj, \%expired_access_token, 'my_audience');
     store_identity($obj, { subject => 'my_subject' });
-    $obj->client->mock(has_expired => sub { 1 });
 
     # When
     my $exchanged_token = $obj->get_valid_access_token('my_audience_alias');
@@ -1312,13 +1354,13 @@ sub test_get_valid_access_token_for_audience {
 
     # Given
     my $obj = build_object(
-      config => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } }
+      config      => { audience_alias => { my_audience_alias => {audience => 'my_audience'} } },
+      has_expired => 1,
     );
     my %expired_access_token = ( token      => 'my_old_access_token',
                                  expires_at => 12 );
     store_access_token($obj, \%expired_access_token, 'my_audience');
     store_identity($obj, { subject => 'my_subject' });
-    $obj->client->mock(has_expired => sub { 1 });
 
     # When
     is($obj->get_valid_access_token('my_audience_alias'), undef,
@@ -1402,12 +1444,43 @@ sub test_get_stored_identity {
        'expected result');
   };
 
-  subtest "get_stored_identity() with stored identity" => sub {
-
-    my %identity = (subject => 'my_subject');
+  subtest "get_stored_identity() with stored and valid identity" => sub {
 
     # Given
-    my $obj = build_object();
+    my %identity = (subject    => 'my_subject',
+                    expires_at => 777);
+    my $obj = build_object(has_expired => 0);
+    store_identity($obj, \%identity);
+
+    # When
+    my $stored_identity = $obj->get_stored_identity();
+
+    # Then
+    cmp_deeply($stored_identity, \%identity,
+               'expected result');
+  };
+
+  subtest "get_stored_identity() with stored and expired identity" => sub {
+
+    # Given
+    my %identity = (subject    => 'my_subject',
+                    expires_at => 777);
+    my $obj = build_object(has_expired => 1);
+    store_identity($obj, \%identity);
+
+    # When
+    my $result = $obj->get_stored_identity();
+
+    # Then
+    cmp_deeply($result, undef,
+               'expected result');
+  };
+
+  subtest "get_stored_identity() with stored identity and no expiration" => sub {
+
+    # Given
+    my %identity = (subject => 'my_subject');
+    my $obj = build_object(has_expired => 1);
     store_identity($obj, \%identity);
 
     # When
@@ -1455,6 +1528,57 @@ sub test_get_stored_identity {
   };
 }
 
+sub test_get_identity_expiration_time {
+  subtest "get_identity_expiration_time() without configured leeway" => sub {
+
+    # Given
+    my %identity = (expires_at => 99999);
+    my $obj = build_object();
+    store_identity($obj, \%identity);
+
+    # When
+    my $expiration_time = $obj->get_identity_expiration_time();
+
+    # Then
+    is($expiration_time, 99999,
+       'expected result');
+  };
+
+  subtest "get_identity_expiration_time() with configured leeway" => sub {
+
+    # Given
+    my %identity = (expires_at => 99999);
+    my $obj = build_object(
+      config => { expiration_leeway => 60 }
+    );
+    store_identity($obj, \%identity);
+
+    # When
+    my $expiration_time = $obj->get_identity_expiration_time();
+
+    # Then
+    is($expiration_time, 99939,
+       'expected result');
+  };
+
+  subtest "get_identity_expiration_time() with non-expirable identity" => sub {
+
+    # Given
+    my %identity = ();
+    my $obj = build_object(
+      config => { expiration_leeway => 60 }
+    );
+    store_identity($obj, \%identity);
+
+    # When
+    my $expiration_time = $obj->get_identity_expiration_time();
+
+    # Then
+    is($expiration_time, undef,
+       'expected result');
+  };
+}
+
 sub build_object {
   my (%params) = @_;
 
@@ -1468,7 +1592,7 @@ sub build_object {
   );
   my %default_claims = (
     iss   => 'my_issuer',
-    exp   => 123,
+    exp   => 1111111,
     aud   => 'my_id',
     sub   => 'my_subject',
     roles => [qw/role1 role2 role3/],
@@ -1502,7 +1626,7 @@ sub build_object {
   $mock_client->mock(get_token           => sub { OIDC::Client::TokenResponse->new($params{token_response} || \%default_token_response) });
   $mock_client->mock(exchange_token      => sub { OIDC::Client::TokenResponse->new(%exchanged_token) });
   $mock_client->mock(build_api_useragent => sub { Mojo::UserAgent->new(); });
-  $mock_client->mock(has_expired         => sub { 0 });
+  $mock_client->mock(has_expired         => sub { $params{has_expired} // 0 });
   $mock_client->mock(get_userinfo        => sub { $params{userinfo} || \%default_userinfo });
   $mock_client->mock(default_token_type  => sub { 'Bearer' });
   $mock_client->mock(get_claim_value => sub {

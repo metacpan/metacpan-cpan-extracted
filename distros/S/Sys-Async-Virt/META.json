@@ -57,12 +57,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ehuelsmann/perl-sys-async-virt/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/ehuelsmann/perl-sys-async-virt.git",
          "web" : "https://github.com/ehuelsmann/perl-sys-async-virt"
       }
    },
-   "version" : "v0.0.18",
+   "version" : "v0.0.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.22
+Version 0.24
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 =head1 SYNOPSIS
 
@@ -191,8 +191,8 @@ Options:
 
 =item * C<config_dirs>
 
-An arrayref of directories to look for configuration files (default: C<$CONFIG_DIR>, C<[$HOME/.conf]>, C<[$DOCUMENT_ROOT/conf]>, or C<['conf']>).
-Considers the file C<default> before looking at C<config_file> and C<config_files>.
+An arrayref of directories to look for configuration files
+(default: C<$CONFIG_DIR>, C<$HOME/.conf>, C<$HOME/config>, C<$HOME/conf>, C<$DOCUMENT_ROOT/conf>, C<$DOCUMENT_ROOT/../conf>, C<conf>).
 
 =item * C<config_file>
 
@@ -204,6 +204,8 @@ An arrayref of files to look for in the configuration directories.
 Put the more important files later,
 since later files override earlier ones.
 
+Considers the files C<default> and C<$script_name> before looking at C<config_file> and C<config_files>.
+
 =item * C<data>
 
 A hash ref of data to prime the configuration with.
@@ -213,6 +215,10 @@ Any other data will overwrite by this.
 
 A prefix for environment variable keys and comment line options, e.g. C<MYAPP_DATABASE__USER>,
 (default: C<'APP_'>).
+
+=item * C<file>
+
+Synonym for C<config_file>
 
 =item * C<flatten>
 
@@ -249,6 +255,10 @@ sub new
 
 	$params->{'config_dirs'} //= $params->{'path'};	# Compatibility with Config::Auto
 
+	if((!defined($params->{'config_dirs'})) && $params->{'file'}) {
+		$params->{'config_file'} = $params->{'file'};
+	}
+
 	if(!defined($params->{'config_dirs'})) {
 		if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
 			$params->{'config_dirs'} = [''];
@@ -260,11 +270,13 @@ sub new
 			if($ENV{'HOME'}) {
 				push @{$params->{'config_dirs'}},
 					File::Spec->catdir($ENV{'HOME'}, '.conf'),
-					File::Spec->catdir($ENV{'HOME'}, '.config');
+					File::Spec->catdir($ENV{'HOME'}, '.config'),
+					File::Spec->catdir($ENV{'HOME'}, 'conf'),
 			} elsif($ENV{'DOCUMENT_ROOT'}) {
 				push @{$params->{'config_dirs'}},
 					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'conf'),
-					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'config');
+					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'config'),
+					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, File::Spec->updir(), 'conf');
 			}
 			if(my $dir = $ENV{'CONFIG_DIR'}) {
 				push @{$params->{'config_dirs'}}, $dir;
@@ -387,7 +399,14 @@ sub _load_config
 		}
 
 		# Put $self->{config_file} through all parsers, ignoring all errors, then merge that in
-		for my $config_file ('default', $self->{'config_file'}, @{$self->{'config_files'}}) {
+		if(!$self->{'script_name'}) {
+			require File::Basename && File::Basename->import() unless File::Basename->can('basename');
+
+			# Determine script name
+			$self->{'script_name'} = File::Basename::basename($ENV{'SCRIPT_NAME'} || $0);
+		}
+
+		for my $config_file ('default', $self->{'script_name'}, $self->{'config_file'}, @{$self->{'config_files'}}) {
 			next unless defined($config_file);
 			my $path = length($dir) ? File::Spec->catfile($dir, $config_file) : $config_file;
 			if($logger) {
@@ -581,10 +600,12 @@ sub get
 		return undef unless ref $ref eq 'HASH';
 		$ref = $ref->{$part};
 	}
-	if(ref($ref) eq 'HASH') {
-		Data::Reuse::fixate(%{$ref});
-	} elsif(ref($ref) eq 'ARRAY') {
-		Data::Reuse::fixate(@{$ref});
+	if(!$self->{'no_fixate'}) {
+		if(ref($ref) eq 'HASH') {
+			Data::Reuse::fixate(%{$ref});
+		} elsif(ref($ref) eq 'ARRAY') {
+			Data::Reuse::fixate(@{$ref});
+		}
 	}
 	return $ref;
 }
@@ -698,7 +719,7 @@ sub AUTOLOAD
 	$key =~ s/.*:://;	# remove package name
 	return if $key eq 'DESTROY';
 
-	my $data = $self->{data};
+	my $data = $self->{data} || $self->{'config'};
 
 	# If flattening is ON, assume keys are pre-flattened
 	if ($self->{flatten}) {

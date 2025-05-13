@@ -1,5 +1,12 @@
 Revision history for Perl module Directory::Diff
 
+0.09 2025-05-13
+
+- Fix verbose flag in ls_dir
+- Make ls_dir not fail on a directory called "0"
+- Check for errors in return values
+- Documentation
+
 0.08 2018-11-17
 
 - Removed unused testing routines "default_dir_only" and "default_diff"

@@ -13,27 +13,15 @@ Crypt::HSM::Verify	T_MAGIC
 CK_BBOOL	T_BOOL
 CK_ULONG	T_U_LONG
 CK_SLOT_ID	T_U_LONG
-CK_USER_TYPE	T_USER_TYPE
-CK_MECHANISM_TYPE	T_MECHANISM_TYPE
-Attributes	T_ATTRIBUTES
-Session_flags	T_SESSION_FLAGS
+CK_USER_TYPE	T_PACKED
+CK_MECHANISM_TYPE	T_PACKED
+Attributes	T_PACKED
+Session_flags	T_PACKED
 
 INPUT
-T_USER_TYPE
-	$var = get_user_type($arg)
-T_MECHANISM_TYPE
-	$var = get_mechanism_type($arg)
-T_ATTRIBUTES
-	$var = get_attributes($arg)
-T_SESSION_FLAGS
-	$var = get_flags(session_flags, $arg)
 T_MAGIC
 	{
-	%:ifdef mg_findext
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
-	%:else
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:endif
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
@@ -42,12 +30,17 @@ T_MAGIC
 
 T_MAGICEXT
 	{
-	%:ifdef mg_findext
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
-	%:else
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:endif
 	if (magic)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+	}
+
+T_MAGICEXT_BASE
+	{
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
+	if (magic && magic->mg_virtual)
 		$var = ($type)magic->mg_ptr;
 	else
 		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
@@ -56,7 +49,7 @@ T_MAGICEXT
 
 OUTPUT
 T_MAGIC
-	sv_magic(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);
+	sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, NULL, (const char*)$var, 0);
 T_MAGICEXT
 	{
 	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);

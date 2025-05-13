@@ -6,7 +6,7 @@
                                        |___/                         
 
 
-This is the README for Directory::Diff version 0.08.
+This is the README for Directory::Diff version 0.09.
 
 Directory::Diff is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -62,11 +62,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Directory::Diff
 
-To install the module from the source file, Directory-Diff-0.08.tar.gz,
+To install the module from the source file, Directory-Diff-0.09.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Directory-Diff-0.08.tar.gz
-    cd Directory-Diff-0.08
+    tar xfz Directory-Diff-0.09.tar.gz
+    cd Directory-Diff-0.09
     perl Makefile.PL
     make
     make install
@@ -79,8 +79,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can
-report a bug at 
+<benkasminbullock@gmail.com>. If you think there is a problem in the
+module, you can report a bug at 
 
 <https://github.com/benkasminbullock/Directory-Diff/issues>,
 
@@ -91,6 +91,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sat Nov 17 06:41:29 2018.
+This README was written on Tue May 13 08:28:08 2025.
 
 -----------------------------------------------------------------------------

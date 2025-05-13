@@ -1,5 +1,15 @@
 -----
 
+0.0.19   2025-05-12
+    [Added]
+       * New domain entrypoints: del_throttle_group(), set_throttle_group(),
+         get_autostart_once(), set_autostart_once()
+       * New GUEST_INFO_* and STATS_* domain API related constants (from 11.2.0)
+       * New SAVE_PARAM_IMAGE_FORMAT and SAVE_PARAM_PARALLEL_CHANNEL
+         domain API related constants (from 11.2.0)
+    [Changed]
+       * Updated to libvirt tag v11.3.0 (from v11.1.0)
+
 0.0.18   2025-03-29
     [Fixed]
        * Syntax errors in Sys::Async::Virt

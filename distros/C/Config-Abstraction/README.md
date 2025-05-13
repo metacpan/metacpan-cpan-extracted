@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.22
+Version 0.24
 
 # SYNOPSIS
 
@@ -160,8 +160,8 @@ Options:
 
 - `config_dirs`
 
-    An arrayref of directories to look for configuration files (default: `$CONFIG_DIR`, `[$HOME/.conf]`, `[$DOCUMENT_ROOT/conf]`, or `['conf']`).
-    Considers the file `default` before looking at `config_file` and `config_files`.
+    An arrayref of directories to look for configuration files
+    (default: `$CONFIG_DIR`, `$HOME/.conf`, `$HOME/config`, `$HOME/conf`, `$DOCUMENT_ROOT/conf`, `$DOCUMENT_ROOT/../conf`, `conf`).
 
 - `config_file`
 
@@ -173,6 +173,8 @@ Options:
     Put the more important files later,
     since later files override earlier ones.
 
+    Considers the files `default` and `$script_name` before looking at `config_file` and `config_files`.
+
 - `data`
 
     A hash ref of data to prime the configuration with.
@@ -182,6 +184,10 @@ Options:
 
     A prefix for environment variable keys and comment line options, e.g. `MYAPP_DATABASE__USER`,
     (default: `'APP_'`).
+
+- `file`
+
+    Synonym for `config_file`
 
 - `flatten`
 

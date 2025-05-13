@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.1.0
+#                   and LibVirt version v11.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -18,7 +18,7 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Sublike::Extended 0.29 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.18;
+package Sys::Async::Virt v0.0.19;
 
 use parent qw(IO::Async::Notifier);
 
@@ -28,30 +28,30 @@ use Future::Queue;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v11.1.0;
+use Protocol::Sys::Virt::Remote::XDR v11.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v11.1.0;
-use Protocol::Sys::Virt::Remote v11.1.0;
-use Protocol::Sys::Virt::Transport v11.1.0;
-use Protocol::Sys::Virt::URI v11.1.0; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v11.3.0;
+use Protocol::Sys::Virt::Remote v11.3.0;
+use Protocol::Sys::Virt::Transport v11.3.0;
+use Protocol::Sys::Virt::URI v11.3.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.18;
-use Sys::Async::Virt::Domain v0.0.18;
-use Sys::Async::Virt::DomainCheckpoint v0.0.18;
-use Sys::Async::Virt::DomainSnapshot v0.0.18;
-use Sys::Async::Virt::Network v0.0.18;
-use Sys::Async::Virt::NetworkPort v0.0.18;
-use Sys::Async::Virt::NwFilter v0.0.18;
-use Sys::Async::Virt::NwFilterBinding v0.0.18;
-use Sys::Async::Virt::Interface v0.0.18;
-use Sys::Async::Virt::StoragePool v0.0.18;
-use Sys::Async::Virt::StorageVol v0.0.18;
-use Sys::Async::Virt::NodeDevice v0.0.18;
-use Sys::Async::Virt::Secret v0.0.18;
+use Sys::Async::Virt::Connection::Factory v0.0.19;
+use Sys::Async::Virt::Domain v0.0.19;
+use Sys::Async::Virt::DomainCheckpoint v0.0.19;
+use Sys::Async::Virt::DomainSnapshot v0.0.19;
+use Sys::Async::Virt::Network v0.0.19;
+use Sys::Async::Virt::NetworkPort v0.0.19;
+use Sys::Async::Virt::NwFilter v0.0.19;
+use Sys::Async::Virt::NwFilterBinding v0.0.19;
+use Sys::Async::Virt::Interface v0.0.19;
+use Sys::Async::Virt::StoragePool v0.0.19;
+use Sys::Async::Virt::StorageVol v0.0.19;
+use Sys::Async::Virt::NodeDevice v0.0.19;
+use Sys::Async::Virt::Secret v0.0.19;
 
-use Sys::Async::Virt::Callback v0.0.18;
-use Sys::Async::Virt::Stream v0.0.18;
+use Sys::Async::Virt::Callback v0.0.19;
+use Sys::Async::Virt::Stream v0.0.19;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -128,6 +128,7 @@ use constant {
     DOMAIN_EVENT_ID_BLOCK_THRESHOLD                     => 24,
     DOMAIN_EVENT_ID_MEMORY_FAILURE                      => 25,
     DOMAIN_EVENT_ID_MEMORY_DEVICE_SIZE_CHANGE           => 26,
+    DOMAIN_EVENT_ID_NIC_MAC_CHANGE                      => 27,
     SUSPEND_TARGET_MEM                                  => 0,
     SUSPEND_TARGET_DISK                                 => 1,
     SUSPEND_TARGET_HYBRID                               => 2,
@@ -791,7 +792,12 @@ my @reply_translators = (
     sub { 445; my $client = shift; _translated_reply($client, undef, {  }, @_) },
     sub { 446; my $client = shift; _translated_msg($client, { net => \&_translate_remote_nonnull_network }, @_) },
     \&_no_translation,
-    \&_no_translation
+    \&_no_translation,
+    sub { 449; my $client = shift; _translated_reply($client, undef, {  }, @_) },
+    \&_no_translation,
+    \&_no_translation,
+    \&_no_translation,
+    sub { 453; my $client = shift; _translated_msg($client, { dom => \&_translate_remote_nonnull_domain }, @_) }
 );
 
 
@@ -2354,9 +2360,9 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.18
+v0.0.19
 
-Based on LibVirt tag v11.1.0
+Based on LibVirt tag v11.3.0
 
 =head1 SYNOPSIS
 
@@ -2413,7 +2419,7 @@ value.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
-The reference LibVirt version of this module is v11.1.0. This means
+The reference LibVirt version of this module is v11.3.0. This means
 all API entry points have been implemented as they are declared in the
 protocol of that version (except for the ones listed in the section
 L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
@@ -2422,7 +2428,7 @@ supported by the server.
 
 =head2 RUNNING AGAINST NEWER SERVERS
 
-The module can run against any version of LibVirt newer than v11.1.0;
+The module can run against any version of LibVirt newer than v11.3.0;
 any new entry points in the API will not be available, but all existing APIs
 can be used as per the stability guarantees.
 
@@ -3573,6 +3579,8 @@ See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvir
 =item DOMAIN_EVENT_ID_MEMORY_FAILURE
 
 =item DOMAIN_EVENT_ID_MEMORY_DEVICE_SIZE_CHANGE
+
+=item DOMAIN_EVENT_ID_NIC_MAC_CHANGE
 
 =item SUSPEND_TARGET_MEM
 

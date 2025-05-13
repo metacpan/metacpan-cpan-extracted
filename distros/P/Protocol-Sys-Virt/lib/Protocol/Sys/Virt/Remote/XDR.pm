@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.1.0
+#        XDR::Gen version 0.0.5 and LibVirt version v11.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Remote::XDR v11.1.0;
+package Protocol::Sys::Virt::Remote::XDR v11.3.0;
 
 use constant {
     VIR_TYPED_PARAM_INT     => 1,
@@ -11473,6 +11473,144 @@ sub serialize_domain_get_block_io_tune_ret {
     die "Non-integer 'int' value given: $_[1]->{nparams}"
         unless int($_[1]->{nparams}) == $_[1]->{nparams};
     substr( $_[3], $_[2] ) = pack("l>", $_[1]->{nparams});
+    $_[2] += 4;
+}
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_set_throttle_group_args {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Deserializing field: 'group'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_string( $_[1]->{group}, $_[2], $_[3] );
+
+    # Deserializing field: 'params'
+    # my ($class, $value, $index, $input) = @_;
+    do {
+        die "Input buffer too short"
+            if ($input_length - $_[2]) < 4;
+        my $len = unpack("L>", substr( $_[3], $_[2] ));
+        $_[2] += 4;
+
+        die "Array too long (max: 32): $len"
+            unless ($len <= 32);
+        $_[1]->{params} = [];
+        for my $i1 ( 0 .. ($len - 1) ) {
+            # my ($class, $value, $index, $input) = @_;
+            $_[0]->deserialize_typed_param( $_[1]->{params}->[$i1], $_[2], $_[3] );
+        }
+    };
+
+    # Deserializing field: 'flags'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{flags} = unpack("L>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'unsigned int': $_[1]->{flags}"
+        unless (0 <= $_[1]->{flags} and $_[1]->{flags} <= 4294967295);
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_set_throttle_group_args {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Serializing field: 'group'
+    croak "Missing required input value 'group'"
+        unless exists $_[1]->{group};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_string( $_[1]->{group}, $_[2], $_[3] );
+
+    # Serializing field: 'params'
+    croak "Missing required input value 'params'"
+        unless exists $_[1]->{params};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'array' value"
+        unless defined $_[1]->{params};
+    do {
+        my $len = scalar @{ $_[1]->{params} };
+        die "Array too long (max: 32): $len"
+            unless ($len <= 32);
+
+        substr( $_[3], $_[2] ) = pack("L>", $len);
+        $_[2] += 4;
+        for my $i1 ( 0 .. ($len - 1) ) {
+            # my ($class, $value, $index, $output) = @_;
+            $_[0]->serialize_typed_param( $_[1]->{params}->[$i1], $_[2], $_[3] );
+        }
+    };
+
+    # Serializing field: 'flags'
+    croak "Missing required input value 'flags'"
+        unless exists $_[1]->{flags};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'unsigned int' value"
+        unless defined $_[1]->{flags};
+    die "Out of bounds 'unsigned int': $_[1]->{flags}"
+        unless (0 <= $_[1]->{flags} and $_[1]->{flags} <= 4294967295);
+    die "Non-integer 'int' value given: $_[1]->{flags}"
+        unless int($_[1]->{flags}) == $_[1]->{flags};
+    substr( $_[3], $_[2] ) = pack("L>", $_[1]->{flags});
+    $_[2] += 4;
+}
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_del_throttle_group_args {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Deserializing field: 'group'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_string( $_[1]->{group}, $_[2], $_[3] );
+
+    # Deserializing field: 'flags'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{flags} = unpack("L>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'unsigned int': $_[1]->{flags}"
+        unless (0 <= $_[1]->{flags} and $_[1]->{flags} <= 4294967295);
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_del_throttle_group_args {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Serializing field: 'group'
+    croak "Missing required input value 'group'"
+        unless exists $_[1]->{group};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_string( $_[1]->{group}, $_[2], $_[3] );
+
+    # Serializing field: 'flags'
+    croak "Missing required input value 'flags'"
+        unless exists $_[1]->{flags};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'unsigned int' value"
+        unless defined $_[1]->{flags};
+    die "Out of bounds 'unsigned int': $_[1]->{flags}"
+        unless (0 <= $_[1]->{flags} and $_[1]->{flags} <= 4294967295);
+    die "Non-integer 'int' value given: $_[1]->{flags}"
+        unless int($_[1]->{flags}) == $_[1]->{flags};
+    substr( $_[3], $_[2] ) = pack("L>", $_[1]->{flags});
     $_[2] += 4;
 }
 # @_: ($class, $value, $index, $input) = @_;
@@ -33890,6 +34028,168 @@ sub serialize_domain_fd_associate_args {
     substr( $_[3], $_[2] ) = pack("L>", $_[1]->{flags});
     $_[2] += 4;
 }
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_get_autostart_once_args {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_get_autostart_once_args {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+}
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_get_autostart_once_ret {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'autostart'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{autostart} = unpack("l>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'int': $_[1]->{autostart}"
+        unless (-2147483648 <= $_[1]->{autostart} and $_[1]->{autostart} < 2147483648);
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_get_autostart_once_ret {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'autostart'
+    croak "Missing required input value 'autostart'"
+        unless exists $_[1]->{autostart};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'int' value"
+        unless defined $_[1]->{autostart};
+    die "Out of bounds 'int': $_[1]->{autostart}"
+        unless (-2147483648 <= $_[1]->{autostart} and $_[1]->{autostart} < 2147483648);
+    die "Non-integer 'int' value given: $_[1]->{autostart}"
+        unless int($_[1]->{autostart}) == $_[1]->{autostart};
+    substr( $_[3], $_[2] ) = pack("l>", $_[1]->{autostart});
+    $_[2] += 4;
+}
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_set_autostart_once_args {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Deserializing field: 'autostart'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{autostart} = unpack("l>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'int': $_[1]->{autostart}"
+        unless (-2147483648 <= $_[1]->{autostart} and $_[1]->{autostart} < 2147483648);
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_set_autostart_once_args {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Serializing field: 'autostart'
+    croak "Missing required input value 'autostart'"
+        unless exists $_[1]->{autostart};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'int' value"
+        unless defined $_[1]->{autostart};
+    die "Out of bounds 'int': $_[1]->{autostart}"
+        unless (-2147483648 <= $_[1]->{autostart} and $_[1]->{autostart} < 2147483648);
+    die "Non-integer 'int' value given: $_[1]->{autostart}"
+        unless int($_[1]->{autostart}) == $_[1]->{autostart};
+    substr( $_[3], $_[2] ) = pack("l>", $_[1]->{autostart});
+    $_[2] += 4;
+}
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_event_nic_mac_change_msg {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'callbackID'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{callbackID} = unpack("l>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'int': $_[1]->{callbackID}"
+        unless (-2147483648 <= $_[1]->{callbackID} and $_[1]->{callbackID} < 2147483648);
+
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Deserializing field: 'alias'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_string( $_[1]->{alias}, $_[2], $_[3] );
+
+    # Deserializing field: 'oldMAC'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_string( $_[1]->{oldMAC}, $_[2], $_[3] );
+
+    # Deserializing field: 'newMAC'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_string( $_[1]->{newMAC}, $_[2], $_[3] );
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_event_nic_mac_change_msg {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'callbackID'
+    croak "Missing required input value 'callbackID'"
+        unless exists $_[1]->{callbackID};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'int' value"
+        unless defined $_[1]->{callbackID};
+    die "Out of bounds 'int': $_[1]->{callbackID}"
+        unless (-2147483648 <= $_[1]->{callbackID} and $_[1]->{callbackID} < 2147483648);
+    die "Non-integer 'int' value given: $_[1]->{callbackID}"
+        unless int($_[1]->{callbackID}) == $_[1]->{callbackID};
+    substr( $_[3], $_[2] ) = pack("l>", $_[1]->{callbackID});
+    $_[2] += 4;
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Serializing field: 'alias'
+    croak "Missing required input value 'alias'"
+        unless exists $_[1]->{alias};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_string( $_[1]->{alias}, $_[2], $_[3] );
+
+    # Serializing field: 'oldMAC'
+    croak "Missing required input value 'oldMAC'"
+        unless exists $_[1]->{oldMAC};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_string( $_[1]->{oldMAC}, $_[2], $_[3] );
+
+    # Serializing field: 'newMAC'
+    croak "Missing required input value 'newMAC'"
+        unless exists $_[1]->{newMAC};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_string( $_[1]->{newMAC}, $_[2], $_[3] );
+}
 use constant PROGRAM => 536903814; # 0x20008086
 use constant PROTOCOL_VERSION => 1; # 1
 # Define elements from enum 'procedure'
@@ -34342,6 +34642,11 @@ use constant {
     PROC_NETWORK_EVENT_CALLBACK_METADATA_CHANGE       => 446,
     PROC_NODE_DEVICE_UPDATE                           => 447,
     PROC_DOMAIN_GRAPHICS_RELOAD                       => 448,
+    PROC_DOMAIN_GET_AUTOSTART_ONCE                    => 449,
+    PROC_DOMAIN_SET_AUTOSTART_ONCE                    => 450,
+    PROC_DOMAIN_SET_THROTTLE_GROUP                    => 451,
+    PROC_DOMAIN_DEL_THROTTLE_GROUP                    => 452,
+    PROC_DOMAIN_EVENT_NIC_MAC_CHANGE                  => 453,
 };
 # @_: ($class, $value, $index, $input) = @_;
 sub deserialize_procedure {
@@ -34351,7 +34656,7 @@ sub deserialize_procedure {
         if ($input_length - $_[2]) < 4;
     $_[1] = unpack("l>", substr( $_[3], $_[2] ) );
     die "Out of range enum value supplied: $_[1]"
-        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01'),
+        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3f'),
                    $_[1], 1);
     $_[2] += 4;
 }
@@ -34361,7 +34666,7 @@ sub serialize_procedure {
     croak "Missing required input 'enum' value"
         unless defined $_[1];
     die "Out of range enum value: $_[1]"
-        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01'),
+        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3f'),
                    $_[1], 1);
     substr( $_[3], $_[2] ) = pack("l>", $_[1]);
     $_[2] += 4;
@@ -34378,9 +34683,9 @@ Protocol::Sys::Virt::Remote::XDR - Constants and (de)serializers for remote serv
 
 =head1 VERSION
 
-v11.1.0
+v11.3.0
 
-Based on LibVirt tag v11.1.0
+Based on LibVirt tag v11.3.0
 
 =head1 SYNOPSYS
 
@@ -35479,6 +35784,16 @@ brevity.  These prefixes have been stripped:
 
 =item * PROC_DOMAIN_GRAPHICS_RELOAD
 
+=item * PROC_DOMAIN_GET_AUTOSTART_ONCE
+
+=item * PROC_DOMAIN_SET_AUTOSTART_ONCE
+
+=item * PROC_DOMAIN_SET_THROTTLE_GROUP
+
+=item * PROC_DOMAIN_DEL_THROTTLE_GROUP
+
+=item * PROC_DOMAIN_EVENT_NIC_MAC_CHANGE
+
 =back
 
 =back
@@ -35931,6 +36246,10 @@ position C<$idx> into their corresponding Perl representation.
 =item * domain_get_block_io_tune_args
 
 =item * domain_get_block_io_tune_ret
+
+=item * domain_set_throttle_group_args
+
+=item * domain_del_throttle_group_args
 
 =item * domain_get_cpu_stats_args
 
@@ -36915,6 +37234,14 @@ position C<$idx> into their corresponding Perl representation.
 =item * domain_event_memory_device_size_change_msg
 
 =item * domain_fd_associate_args
+
+=item * domain_get_autostart_once_args
+
+=item * domain_get_autostart_once_ret
+
+=item * domain_set_autostart_once_args
+
+=item * domain_event_nic_mac_change_msg
 
 =item * procedure
 

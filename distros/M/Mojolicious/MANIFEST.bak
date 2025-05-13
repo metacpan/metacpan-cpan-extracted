@@ -22,6 +22,7 @@ lib/Mojo/Asset.pm
 lib/Mojo/Asset/File.pm
 lib/Mojo/Asset/Memory.pm
 lib/Mojo/Base.pm
+lib/Mojo/BaseUtil.pm
 lib/Mojo/ByteStream.pm
 lib/Mojo/Cache.pm
 lib/Mojo/Collection.pm
@@ -131,11 +132,11 @@ lib/Mojolicious/Renderer.pm
 lib/Mojolicious/resources/public/favicon.ico
 lib/Mojolicious/resources/public/mojo/bootstrap/bootstrap.css
 lib/Mojolicious/resources/public/mojo/bootstrap/bootstrap.js
+lib/Mojolicious/resources/public/mojo/bootstrap/bootstrap.min.css.map
 lib/Mojolicious/resources/public/mojo/failraptor.png
 lib/Mojolicious/resources/public/mojo/highlight.js/highlight-mojo-dark.css
 lib/Mojolicious/resources/public/mojo/highlight.js/highlight.min.js
 lib/Mojolicious/resources/public/mojo/highlight.js/mojolicious.min.js
-lib/Mojolicious/resources/public/mojo/jquery/jquery.js
 lib/Mojolicious/resources/public/mojo/logo-white-2x.png
 lib/Mojolicious/resources/public/mojo/logo-white.png
 lib/Mojolicious/resources/public/mojo/logo.png
@@ -144,6 +145,7 @@ lib/Mojolicious/resources/public/mojo/noraptor.png
 lib/Mojolicious/resources/public/mojo/notfound.png
 lib/Mojolicious/resources/public/mojo/pinstripe-dark.png
 lib/Mojolicious/resources/public/mojo/pinstripe-light.png
+lib/Mojolicious/resources/public/mojo/popper/popper.js
 lib/Mojolicious/resources/templates/mojo/debug.html.ep
 lib/Mojolicious/resources/templates/mojo/exception.html.ep
 lib/Mojolicious/resources/templates/mojo/not_found.html.ep
@@ -161,6 +163,7 @@ lib/Test/Mojo.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.bak
 MANIFEST.SKIP
 README.md
 script/hypnotoad
@@ -168,6 +171,7 @@ script/mojo
 script/morbo
 t/mojo/asset.t
 t/mojo/base.t
+t/mojo/base_util.t
 t/mojo/bytestream.t
 t/mojo/cache.t
 t/mojo/certs/bad.crt
@@ -185,6 +189,7 @@ t/mojo/collection.t
 t/mojo/content.t
 t/mojo/cookie.t
 t/mojo/cookiejar.t
+t/mojo/cookies/curl.txt
 t/mojo/daemon.t
 t/mojo/daemon_ipv6_tls.t
 t/mojo/date.t
@@ -195,6 +200,7 @@ t/mojo/exception.t
 t/mojo/exception/non_utf8.txt
 t/mojo/exception/utf8.txt
 t/mojo/file.t
+t/mojo/file_download.t
 t/mojo/headers.t
 t/mojo/home.t
 t/mojo/hypnotoad.t
@@ -221,6 +227,7 @@ t/mojo/lib/Mojo/LoaderTest/E/G.txt
 t/mojo/lib/Mojo/LoaderTestException/A.pm
 t/mojo/lib/Mojo/Server/Morbo/Backend/TestBackend.pm
 t/mojo/lib/Mojo/TestConnectProxy.pm
+t/mojo/lib/myapp-module-true.pl
 t/mojo/lib/myapp.pl
 t/mojo/loader.t
 t/mojo/log.t
@@ -341,9 +348,11 @@ t/mojolicious/renderer.t
 t/mojolicious/restful_lite_app.t
 t/mojolicious/routes.t
 t/mojolicious/secret.txt
+t/mojolicious/session_lite_app.t
 t/mojolicious/signatures_lite_app.t
 t/mojolicious/single_file_test_app.conf
 t/mojolicious/static_lite_app.t
+t/mojolicious/static_prefix_lite_app.t
 t/mojolicious/tag_helper_lite_app.t
 t/mojolicious/templates/23.html.epl
 t/mojolicious/templates/dies_too.html.ep

@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.1.0
+#                   and LibVirt version v11.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::NwFilterBinding v0.0.18;
+package Sys::Async::Virt::NwFilterBinding v0.0.19;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.18;
+use Protocol::Sys::Virt::Remote::XDR v0.0.19;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 
@@ -56,7 +56,7 @@ Sys::Async::Virt::NwFilterBinding - Client side proxy to remote LibVirt network 
 
 =head1 VERSION
 
-v0.0.18
+v0.0.19
 
 =head1 SYNOPSIS
 

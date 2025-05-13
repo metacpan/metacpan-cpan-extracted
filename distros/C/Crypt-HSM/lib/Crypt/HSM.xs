@@ -193,6 +193,7 @@ static const map session_flags = {
 	{ STR_WITH_LEN("serial-session"), CKF_SERIAL_SESSION },
 };
 typedef CK_FLAGS Session_flags;
+#define XS_unpack_Session_flags(input) get_flags(session_flags, input)
 
 static const map mechanism_flags = {
 	{ STR_WITH_LEN("hw"), CKF_HW },
@@ -240,7 +241,8 @@ static const map wait_flags = {
 
 static UV S_get_flags(pTHX_ const map table, size_t table_size, SV* input) {
 	if (SvROK(input) && SvTYPE(SvRV(input)) == SVt_PVAV) {
-		UV result = 0, i;
+		size_t i;
+		UV result = 0;
 		AV* array = (AV*)SvRV(input);
 		for (i = 0; i < av_count(array); ++i) {
 			SV** svp = av_fetch(array, i, FALSE);
@@ -719,6 +721,7 @@ static const map mechanisms = {
 
 static CK_MECHANISM_TYPE S_get_mechanism_type(pTHX_ SV* input);
 #define get_mechanism_type(input) S_get_mechanism_type(aTHX_ input)
+#define XS_unpack_CK_MECHANISM_TYPE get_mechanism_type
 
 static const map generators = {
 	{ STR_WITH_LEN("sha1"), CKG_MGF1_SHA1 },
@@ -773,7 +776,7 @@ static const map kdfs = {
 	params->hashAlg = hash;\
 	params->mgf = generator;\
 	if (array_len >= 1)\
-		params->sLen = SvUV((array)[0]);\
+		params->sLen = (CK_ULONG)SvUV((array)[0]);\
 }
 
 #ifndef MIN
@@ -826,7 +829,7 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 			const char* cb = SvPVbyte(array[0], len);
 			memcpy(params->cb, cb, MIN(len, 16));
 
-			params->ulCounterBits = array_len >= 2 ? SvUV(array[1]) : 128;
+			params->ulCounterBits = array_len >= 2 ? (CK_ULONG)SvUV(array[1]) : 128;
 
 			break;
 		}
@@ -844,7 +847,7 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 			if (array_len >= 2 && SvOK(array[1]))
 				params->pAAD = get_buffer(array[1], &params->ulAADLen);
 
-			params->ulTagBits = array_len >= 3 ? SvUV(array[2]) : 128;
+			params->ulTagBits = array_len >= 3 ? (CK_ULONG)SvUV(array[2]) : 128;
 
 			break;
 		}
@@ -932,7 +935,7 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 
 			INIT_PARAMS(CK_OBJECT_HANDLE);
 
-			*params = SvUV(array[0]);
+			*params = (CK_ULONG)SvUV(array[0]);
 
 			break;
 		}
@@ -1107,12 +1110,47 @@ static const map hardware_types = {
 };
 #define get_hardware_type(input) map_get(hardware_types, input, "hardware type")
 
+static const map profile_ids = {
+	{ STR_WITH_LEN("invalid-id"), CKP_INVALID_ID },
+	{ STR_WITH_LEN("baseline-provider"), CKP_BASELINE_PROVIDER },
+	{ STR_WITH_LEN("extended-provider"), CKP_EXTENDED_PROVIDER },
+	{ STR_WITH_LEN("authentication-token"), CKP_AUTHENTICATION_TOKEN },
+	{ STR_WITH_LEN("public-certificates-token"), CKP_PUBLIC_CERTIFICATES_TOKEN },
+	{ STR_WITH_LEN("complete-provider"), CKP_COMPLETE_PROVIDER },
+	{ STR_WITH_LEN("hkdf-tls-token"), CKP_HKDF_TLS_TOKEN },
+	{ STR_WITH_LEN("vendor-defined"), CKP_VENDOR_DEFINED },
+};
+#define get_profile_id(input) map_get(profile_ids, input, "profile id")
+
+static const map otp_formats = {
+	{ STR_WITH_LEN("decimal"), CK_OTP_FORMAT_DECIMAL },
+	{ STR_WITH_LEN("hexadecimal"), CK_OTP_FORMAT_HEXADECIMAL },
+	{ STR_WITH_LEN("alphanumeric"), CK_OTP_FORMAT_ALPHANUMERIC },
+	{ STR_WITH_LEN("binary"), CK_OTP_FORMAT_BINARY },
+};
+#define get_otp_format(input) map_get(otp_formats, input, "otp format")
+
+static const map otp_params = {
+	{ STR_WITH_LEN("ignored"), CK_OTP_PARAM_IGNORED },
+	{ STR_WITH_LEN("optional"), CK_OTP_PARAM_OPTIONAL },
+	{ STR_WITH_LEN("mandatory"), CK_OTP_PARAM_MANDATORY },
+};
+#define get_otp_param(input) map_get(otp_params, input, "otp param")
+
+static const map security_domains = {
+	{ STR_WITH_LEN("unspecified"), CK_SECURITY_DOMAIN_UNSPECIFIED },
+	{ STR_WITH_LEN("manufacturer"), CK_SECURITY_DOMAIN_MANUFACTURER },
+	{ STR_WITH_LEN("operator"), CK_SECURITY_DOMAIN_OPERATOR },
+	{ STR_WITH_LEN("third-party"), CK_SECURITY_DOMAIN_THIRD_PARTY },
+};
+#define get_security_domain(input) map_get(security_domains, input, "security domain")
+
 typedef struct Attributes {
 	size_t length;
 	CK_ATTRIBUTE* member;
 } Attributes;
 
-enum Attribute_type { IntAttr, BoolAttr, StrAttr, ByteAttr, ClassAttr, BigintAttr, KeyTypeAttr, CertTypeAttr, CertCatAttr, HardwareTypeAttr, IntArrayAttr, AttrAttr };
+enum Attribute_type { IntAttr, BoolAttr, StrAttr, ByteAttr, ClassAttr, BigintAttr, KeyTypeAttr, CertTypeAttr, CertCatAttr, HardwareTypeAttr, ProfileIdAttr, MechanismAttr, OtpFormatAttr, OtpParamAttr, TokenFlagsAttr, SecurityDomainAttr, IntArrayAttr, MechanismArrayAttr, AttrAttr };
 
 typedef struct { const char* key; size_t length; CK_ULONG value; enum Attribute_type type; } attribute_entry;
 typedef attribute_entry attribute_map[];
@@ -1134,15 +1172,15 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("attr-types"), CKA_ATTR_TYPES, ByteAttr },
 	{ STR_WITH_LEN("trusted"), CKA_TRUSTED, BoolAttr },
 	{ STR_WITH_LEN("certificate-category"), CKA_CERTIFICATE_CATEGORY, CertCatAttr },
-	{ STR_WITH_LEN("java-midp-security-domain"), CKA_JAVA_MIDP_SECURITY_DOMAIN, IntAttr },
+	{ STR_WITH_LEN("java-midp-security-domain"), CKA_JAVA_MIDP_SECURITY_DOMAIN, SecurityDomainAttr },
 	{ STR_WITH_LEN("url"), CKA_URL, StrAttr },
 	{ STR_WITH_LEN("hash-of-subject-public-key"), CKA_HASH_OF_SUBJECT_PUBLIC_KEY, ByteAttr },
 	{ STR_WITH_LEN("hash-of-issuer-public-key"), CKA_HASH_OF_ISSUER_PUBLIC_KEY, ByteAttr },
-	{ STR_WITH_LEN("name-hash-algorithm"), CKA_NAME_HASH_ALGORITHM, IntAttr },
+	{ STR_WITH_LEN("name-hash-algorithm"), CKA_NAME_HASH_ALGORITHM, MechanismAttr },
 	{ STR_WITH_LEN("check-value"), CKA_CHECK_VALUE, ByteAttr },
 	{ STR_WITH_LEN("key-type"), CKA_KEY_TYPE, KeyTypeAttr },
 	{ STR_WITH_LEN("subject"), CKA_SUBJECT, ByteAttr },
-	{ STR_WITH_LEN("id"), CKA_ID, BigintAttr },
+	{ STR_WITH_LEN("id"), CKA_ID, ByteAttr },
 	{ STR_WITH_LEN("sensitive"), CKA_SENSITIVE, BoolAttr },
 	{ STR_WITH_LEN("encrypt"), CKA_ENCRYPT, BoolAttr },
 	{ STR_WITH_LEN("decrypt"), CKA_DECRYPT, BoolAttr },
@@ -1177,7 +1215,7 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("local"), CKA_LOCAL, BoolAttr },
 	{ STR_WITH_LEN("never-extractable"), CKA_NEVER_EXTRACTABLE, BoolAttr },
 	{ STR_WITH_LEN("always-sensitive"), CKA_ALWAYS_SENSITIVE, BoolAttr },
-	{ STR_WITH_LEN("key-gen-mechanism"), CKA_KEY_GEN_MECHANISM, IntAttr },
+	{ STR_WITH_LEN("key-gen-mechanism"), CKA_KEY_GEN_MECHANISM, MechanismAttr },
 	{ STR_WITH_LEN("modifiable"), CKA_MODIFIABLE, BoolAttr },
 	{ STR_WITH_LEN("copyable"), CKA_COPYABLE, BoolAttr },
 	{ STR_WITH_LEN("destroyable"), CKA_DESTROYABLE, BoolAttr },
@@ -1185,20 +1223,20 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("ec-params"), CKA_EC_PARAMS, BigintAttr },
 	{ STR_WITH_LEN("ec-point"), CKA_EC_POINT, BigintAttr },
 	{ STR_WITH_LEN("secondary-auth"), CKA_SECONDARY_AUTH, BoolAttr },
-	{ STR_WITH_LEN("auth-pin-flags"), CKA_AUTH_PIN_FLAGS, IntAttr },
+	{ STR_WITH_LEN("auth-pin-flags"), CKA_AUTH_PIN_FLAGS, TokenFlagsAttr },
 	{ STR_WITH_LEN("always-authenticate"), CKA_ALWAYS_AUTHENTICATE, BoolAttr },
 	{ STR_WITH_LEN("wrap-with-trusted"), CKA_WRAP_WITH_TRUSTED, BoolAttr },
 	{ STR_WITH_LEN("wrap-template"), CKA_WRAP_TEMPLATE, AttrAttr },
 	{ STR_WITH_LEN("unwrap-template"), CKA_UNWRAP_TEMPLATE, AttrAttr },
 	{ STR_WITH_LEN("derive-template"), CKA_DERIVE_TEMPLATE, AttrAttr },
-	{ STR_WITH_LEN("otp-format"), CKA_OTP_FORMAT, IntAttr },
+	{ STR_WITH_LEN("otp-format"), CKA_OTP_FORMAT, OtpFormatAttr },
 	{ STR_WITH_LEN("otp-length"), CKA_OTP_LENGTH, IntAttr },
 	{ STR_WITH_LEN("otp-time-interval"), CKA_OTP_TIME_INTERVAL, IntAttr },
 	{ STR_WITH_LEN("otp-user-friendly-mode"), CKA_OTP_USER_FRIENDLY_MODE, BoolAttr },
-	{ STR_WITH_LEN("otp-challenge-requirement"), CKA_OTP_CHALLENGE_REQUIREMENT, IntAttr },
-	{ STR_WITH_LEN("otp-time-requirement"), CKA_OTP_TIME_REQUIREMENT, IntAttr },
-	{ STR_WITH_LEN("otp-counter-requirement"), CKA_OTP_COUNTER_REQUIREMENT, IntAttr },
-	{ STR_WITH_LEN("otp-pin-requirement"), CKA_OTP_PIN_REQUIREMENT, IntAttr },
+	{ STR_WITH_LEN("otp-challenge-requirement"), CKA_OTP_CHALLENGE_REQUIREMENT, OtpParamAttr },
+	{ STR_WITH_LEN("otp-time-requirement"), CKA_OTP_TIME_REQUIREMENT, OtpParamAttr },
+	{ STR_WITH_LEN("otp-counter-requirement"), CKA_OTP_COUNTER_REQUIREMENT, OtpParamAttr },
+	{ STR_WITH_LEN("otp-pin-requirement"), CKA_OTP_PIN_REQUIREMENT, OtpParamAttr },
 	{ STR_WITH_LEN("otp-counter"), CKA_OTP_COUNTER, ByteAttr },
 	{ STR_WITH_LEN("otp-time"), CKA_OTP_TIME, StrAttr },
 	{ STR_WITH_LEN("otp-user-identifier"), CKA_OTP_USER_IDENTIFIER, StrAttr },
@@ -1208,7 +1246,7 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("gostr3410-params"), CKA_GOSTR3410_PARAMS, ByteAttr },
 	{ STR_WITH_LEN("gostr3411-params"), CKA_GOSTR3411_PARAMS, ByteAttr },
 	{ STR_WITH_LEN("gost28147-params"), CKA_GOST28147_PARAMS, ByteAttr },
-	{ STR_WITH_LEN("hw-feature-type"), CKA_HW_FEATURE_TYPE, IntAttr },
+	{ STR_WITH_LEN("hw-feature-type"), CKA_HW_FEATURE_TYPE, HardwareTypeAttr },
 	{ STR_WITH_LEN("reset-on-init"), CKA_RESET_ON_INIT, BoolAttr },
 	{ STR_WITH_LEN("has-reset"), CKA_HAS_RESET, BoolAttr },
 	{ STR_WITH_LEN("pixel-x"), CKA_PIXEL_X, IntAttr },
@@ -1216,17 +1254,17 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("resolution"), CKA_RESOLUTION, IntAttr },
 	{ STR_WITH_LEN("char-rows"), CKA_CHAR_ROWS, IntAttr },
 	{ STR_WITH_LEN("char-columns"), CKA_CHAR_COLUMNS, IntAttr },
-	{ STR_WITH_LEN("color"), CKA_COLOR, IntAttr },
+	{ STR_WITH_LEN("color"), CKA_COLOR, BoolAttr },
 	{ STR_WITH_LEN("bits-per-pixel"), CKA_BITS_PER_PIXEL, IntAttr },
 	{ STR_WITH_LEN("char-sets"), CKA_CHAR_SETS, StrAttr },
 	{ STR_WITH_LEN("encoding-methods"), CKA_ENCODING_METHODS, StrAttr },
 	{ STR_WITH_LEN("mime-types"), CKA_MIME_TYPES, StrAttr },
-	{ STR_WITH_LEN("mechanism-type"), CKA_MECHANISM_TYPE, IntAttr },
+	{ STR_WITH_LEN("mechanism-type"), CKA_MECHANISM_TYPE, MechanismAttr },
 	{ STR_WITH_LEN("required-cms-attributes"), CKA_REQUIRED_CMS_ATTRIBUTES, ByteAttr },
 	{ STR_WITH_LEN("default-cms-attributes"), CKA_DEFAULT_CMS_ATTRIBUTES, ByteAttr },
 	{ STR_WITH_LEN("supported-cms-attributes"), CKA_SUPPORTED_CMS_ATTRIBUTES, ByteAttr },
-	{ STR_WITH_LEN("allowed-mechanisms"), CKA_ALLOWED_MECHANISMS, IntArrayAttr },
-	{ STR_WITH_LEN("profile-id"), CKA_PROFILE_ID, IntAttr },
+	{ STR_WITH_LEN("allowed-mechanisms"), CKA_ALLOWED_MECHANISMS, MechanismArrayAttr },
+	{ STR_WITH_LEN("profile-id"), CKA_PROFILE_ID, ProfileIdAttr },
 	{ STR_WITH_LEN("x2ratchet-bag"), CKA_X2RATCHET_BAG, ByteAttr },
 	{ STR_WITH_LEN("x2ratchet-bagsize"), CKA_X2RATCHET_BAGSIZE, IntAttr },
 	{ STR_WITH_LEN("x2ratchet-bobs1stmsg"), CKA_X2RATCHET_BOBS1STMSG, BoolAttr },
@@ -1272,6 +1310,7 @@ static void S_set_intval(pTHX_ CK_ATTRIBUTE* current, CK_ULONG value) {
 #define set_intval(current, value) S_set_intval(aTHX_ current, value)
 
 #define get_attributes(attributes) S_get_attributes(aTHX_ attributes)
+#define XS_unpack_Attributes get_attributes
 static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 	struct Attributes result = { 0, NULL };
 	if (!SvOK(attributes_sv))
@@ -1300,7 +1339,7 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 		if (SvOK(value)) {
 			switch (entry->type) {
 				case IntAttr:
-					set_intval(current, SvUV(value));
+					set_intval(current, (CK_ULONG)SvUV(value));
 					break;
 				case BoolAttr: {
 					static const char bools[] = { '\0', '\1' };
@@ -1354,6 +1393,29 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					set_intval(current, get_hardware_type(value));
 					break;
 				}
+				case ProfileIdAttr: {
+					set_intval(current, get_profile_id(value));
+					break;
+				}
+				case MechanismAttr: {
+					set_intval(current, get_mechanism_type(value));
+					break;
+				}
+				case OtpFormatAttr: {
+					set_intval(current, get_otp_format(value));
+					break;
+				}
+				case OtpParamAttr: {
+					set_intval(current, get_otp_param(value));
+					break;
+				}
+				case TokenFlagsAttr: {
+					Perl_croak(aTHX_ "Can't set token flags");
+				}
+				case SecurityDomainAttr: {
+					set_intval(current, get_security_domain(value));
+					break;
+				}
 
 				case IntArrayAttr: {
 					if (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVAV)
@@ -1363,7 +1425,20 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					Newxz(values, av_len(array) + 1, CK_ULONG);
 					SAVEFREEPV(values);
 					for (i = 0; i < av_count(array); ++i)
-						values[i] = SvUV(*av_fetch(array, i, FALSE));
+						values[i] = (CK_ULONG)SvUV(*av_fetch(array, i, FALSE));
+					current->pValue = value;
+					current->ulValueLen = av_len(array) + 1;
+					break;
+				}
+				case MechanismArrayAttr: {
+					if (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVAV)
+						Perl_croak(aTHX_ "Invalid MechanismArray attribute value");
+					AV* array = (AV*) SvRV(value);
+					CK_ULONG* values, i;
+					Newxz(values, av_len(array) + 1, CK_ULONG);
+					SAVEFREEPV(values);
+					for (i = 0; i < av_count(array); ++i)
+						values[i] = (CK_ULONG)get_mechanism_type(*av_fetch(array, i, FALSE));
 					current->pValue = value;
 					current->ulValueLen = av_len(array) + 1;
 					break;
@@ -1375,7 +1450,7 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					break;
 				}
 				default:
-					Perl_croak(aTHX_ "HERE");
+					Perl_croak(aTHX_ "Unknown type");
 			}
 		}
 		result.length++;
@@ -1447,12 +1522,44 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 			CK_ULONG integer = get_intval(pointer);
 			return entry_to_sv(map_reverse_find(hardware_types, integer));
 		}
+		case ProfileIdAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return entry_to_sv(map_reverse_find(profile_ids, integer));
+		}
+		case MechanismAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return entry_to_sv(map_reverse_find(mechanisms, integer));
+		}
+		case OtpFormatAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return entry_to_sv(map_reverse_find(otp_formats, integer));
+		}
+		case OtpParamAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return entry_to_sv(map_reverse_find(otp_params, integer));
+		}
+		case TokenFlagsAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return newRV_noinc((SV*)reverse_flags(token_flags, integer));
+		}
+		case SecurityDomainAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return newRV_noinc((SV*)reverse_flags(security_domains, integer));
+		}
 		case IntArrayAttr: {
 			AV* result = newAV();
 			CK_ULONG* values = (CK_ULONG*) pointer;
 			size_t elems = length / sizeof(CK_ULONG), i;
 			for (i = 0; i < elems; ++i)
 				av_push(result, newSVuv(values[i]));
+			return newRV_noinc((SV*)result);
+		}
+		case MechanismArrayAttr: {
+			AV* result = newAV();
+			CK_ULONG* values = (CK_ULONG*) pointer;
+			size_t elems = length / sizeof(CK_ULONG), i;
+			for (i = 0; i < elems; ++i)
+				av_push(result, entry_to_sv(map_reverse_find(mechanisms, values[i])));
 			return newRV_noinc((SV*)result);
 		}
 		case AttrAttr: {
@@ -1476,7 +1583,7 @@ static const map user_types = {
 	{ STR_WITH_LEN("user"), CKU_USER },
 	{ STR_WITH_LEN("context-specific"), CKU_CONTEXT_SPECIFIC },
 };
-#define get_user_type(input) map_get(user_types, input, "user type")
+#define XS_unpack_CK_USER_TYPE(input) map_get(user_types, input, "user type")
 
 static SV* S_trimmed_value(pTHX_ const CK_BYTE* ptr, size_t max) {
 	ptrdiff_t last = max - 1;
@@ -1666,7 +1773,7 @@ static SV* S_new_object(pTHX_ struct Session* session, CK_OBJECT_HANDLE handle) 
 	entry->session = session_refcount_increment(session);
 	entry->handle = handle;
 	SV* object = newSV(0);
-	MAGIC* magic = sv_magicext(newSVrv(object, "Crypt::HSM::Object"), NULL, PERL_MAGIC_ext, NULL, (const char*)entry, 0);
+	sv_magicext(newSVrv(object, "Crypt::HSM::Object"), NULL, PERL_MAGIC_ext, NULL, (const char*)entry, 0);
 	return object;
 }
 #define new_object(session, object) S_new_object(aTHX_ session, object)
@@ -1710,7 +1817,7 @@ CODE:
 	if (!RETVAL->handle)
 		Perl_croak(aTHX_ "Can not open library: %s", dlerror());
 
-	CK_RV (*C_GetFunctionList)() = (CK_RV (*)())dlsym(RETVAL->handle, "C_GetFunctionList");
+	CK_C_GetFunctionList C_GetFunctionList = (CK_C_GetFunctionList) dlsym(RETVAL->handle, "C_GetFunctionList");
 	if (C_GetFunctionList == NULL)
 		Perl_croak(aTHX_ "Symbol lookup failed");
 
@@ -1777,7 +1884,8 @@ OUTPUT:
 
 SV* wait_for_event(Crypt::HSM::Provider self, ...)
 CODE:
-	CK_ULONG flags = 0, i;
+	CK_ULONG flags = 0;
+	int i;
 	for (i = 1; i < items; ++i)
 		flags |= get_flags(wait_flags, ST(i));
 
@@ -1929,7 +2037,8 @@ OUTPUT:
 
 bool has_flags(Crypt::HSM::Mechanism self, ...)
 CODE:
-	CK_ULONG flags = 0, i;
+	CK_ULONG flags = 0;
+	int i;
 	for (i = 1; i < items; ++i)
 		flags |= get_flags(mechanism_flags, ST(i));
 	const CK_MECHANISM_INFO* info = get_mechanism_info(self);
@@ -1938,11 +2047,11 @@ OUTPUT:
 	RETVAL
 
 
-void flags(Crypt::HSM::Mechanism self, ..)
+void flags(Crypt::HSM::Mechanism self)
 PPCODE:
 	const CK_MECHANISM_INFO* info = get_mechanism_info(self);
 	AV* flags = reverse_flags(mechanism_flags, info->flags);
-	int i;
+	size_t i;
 	for (i = 0; i < av_count(flags); ++i)
 		mXPUSHs(*av_fetch(flags, i, 0));
 	SvREFCNT_dec((SV*)flags);

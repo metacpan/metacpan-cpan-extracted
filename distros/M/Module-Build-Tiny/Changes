@@ -1,5 +1,8 @@
 Revision history for Module::Build::Tiny
 
+0.052     2025-05-12 19:51:31+02:00 Europe/Brussels
+          - Add extra_compiler_flags and extra_linker_flags command line arguments
+
 0.051     2024-09-06 11:05:08+02:00 Europe/Brussels
           - Make CPAN::Requirements::Dynamic an optional dependency
 

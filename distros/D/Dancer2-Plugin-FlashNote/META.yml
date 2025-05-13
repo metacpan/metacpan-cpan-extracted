@@ -1,5 +1,5 @@
 ---
-abstract: 'support notifications in your Dancer2 web application'
+abstract: 'Support notifications in your Dancer2 web application'
 author:
   - 'Samuel Smith <esaym@cpan.org>'
 build_requires:
@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,4 +26,5 @@ requires:
   Dancer2::Plugin: '0.0001'
 resources:
   repository: https://github.com/smith153/Dancer2-Plugin-FlashNote
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,10 @@
 Revision history for Crypt-HSM
 
+0.020     2025-05-12 19:49:20+02:00 Europe/Brussels
+          - Correctly declare C_GetFunctionList in initialization
+          - Implement decoding/encoding of all remaining known attributes.
+          - Fixes several compiler warnings.
+
 0.019     2024-11-12 20:55:41+01:00 Europe/Brussels
           - Rename slot-description to description
           - Improve error when loading module fails

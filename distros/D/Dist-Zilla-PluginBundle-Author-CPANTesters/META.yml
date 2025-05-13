@@ -1,0 +1,45 @@
+---
+abstract: 'Dist::Zilla plugin bundle for CPAN Testers applications'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-CPANTesters
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Dist::Zilla::PluginBundle::Author::CPANTesters:
+    file: lib/Dist/Zilla/PluginBundle/Author/CPANTesters.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/cpan-testers/Dist-Zilla-PluginBundle-Author-CPANTesters/issues
+  homepage: https://github.com/cpan-testers/Dist-Zilla-PluginBundle-Author-CPANTesters
+  repository: https://github.com/cpan-testers/Dist-Zilla-PluginBundle-Author-CPANTesters.git
+version: '0.001'
+x_authority: cpan:PREACTION
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

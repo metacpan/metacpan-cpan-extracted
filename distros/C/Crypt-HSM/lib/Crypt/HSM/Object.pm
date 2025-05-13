@@ -1,5 +1,5 @@
 package Crypt::HSM::Object;
-$Crypt::HSM::Object::VERSION = '0.019';
+$Crypt::HSM::Object::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Object - A PKCS11 object
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

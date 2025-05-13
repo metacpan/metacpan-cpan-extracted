@@ -101,7 +101,7 @@
    "provides" : {
       "Module::Build::Tiny" : {
          "file" : "lib/Module/Build/Tiny.pm",
-         "version" : "0.051"
+         "version" : "0.052"
       }
    },
    "release_status" : "stable",
@@ -115,9 +115,9 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/module-build-tiny"
       }
    },
-   "version" : "0.051",
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "version" : "0.052",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 
