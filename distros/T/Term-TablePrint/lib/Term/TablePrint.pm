@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.16.0;
 
-our $VERSION = '0.171';
+our $VERSION = '0.172';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -61,6 +61,7 @@ sub _valid_options {
         page              => '[ 0 1 2 ]', # undocumented
         search            => '[ 0 1 2 ]', #
         keep              => '[ 1-9 ][ 0-9 ]*', # undocumented
+        max_width_exp     => '[ 0-9 ]+',
         max_rows          => '[ 0-9 ]+',
         min_col_width     => '[ 0-9 ]+', ##
         progress_bar      => '[ 0-9 ]+',
@@ -83,11 +84,12 @@ sub _defaults {
         codepage_mapping  => 0,
         color             => 0,
         decimal_separator => '.',
-        footer            => undef,
+        #footer           => undef,
         hide_cursor       => 1,
-        info              => undef,
-        keep              => undef,
+        #info             => undef,
+        #keep             => undef,
         max_rows          => 0,
+        #max_width_exp    => undef,
         min_col_width     => 30,
         mouse             => 0,
         pad_row_edges     => 0,
@@ -332,7 +334,7 @@ sub __write_table {
             return $return if $row == 0;
             next;
         }
-        if ( $ENV{TC_RESET_AUTO_UP} ) { # any key other than Return/Enter resets 'auto_jumped_to_row_0' and 'row_was_expanded'
+        if ( $ENV{TC_RESET_AUTO_UP} ) { # true if any key other than Return/Enter was pressed
             $auto_jumped_to_row_0 = 0;
             $row_was_expanded = 0;
         }
@@ -696,14 +698,17 @@ sub __cols_to_string {
 
 sub __print_single_row {
     my ( $self, $tbl_orig, $row, $w_col_names, $footer ) = @_;
-    my $term_w = get_term_width();
+    my $avail_w = get_term_width() - 1;
+    if ( $self->{max_width_exp} && $self->{max_width_exp} < $avail_w ) {
+        $avail_w = $self->{max_width_exp};
+    }
     my $max_key_w = max( @{$w_col_names} ) + 1;
-    if ( $max_key_w > int( $term_w / 3 ) ) {
-        $max_key_w = int( $term_w / 3 );
+    if ( $max_key_w > int( $avail_w / 3 ) ) {
+        $max_key_w = int( $avail_w / 3 );
     }
     my $separator = ' : ';
     my $sep_w = length( $separator );
-    my $max_value_w = $term_w - ( $max_key_w + $sep_w + 1 );
+    my $max_value_w = $avail_w - ( $max_key_w + $sep_w );
     my $separator_row = ' ';
     my $row_data = [ ' Close with ENTER' ];
 
@@ -731,11 +736,12 @@ sub __print_single_row {
             $key =~ s/\v+/\ \ /g;
             $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
         }
-        if ( $self->{pad_row_edges} ) { ##
-            $key = adjust_to_printwidth( ' ' . $key, $max_key_w );
+        my $key_w = print_columns( $key );
+        if ( $key_w > $max_key_w ) {
+            $key = cut_to_printwidth( $key, $max_key_w );
         }
-        else {
-            $key = adjust_to_printwidth( $key, $max_key_w );
+        elsif ( $key_w < $max_key_w ) {
+            $key = ( ' ' x ( $max_key_w - $key_w ) ) . $key;
         }
         if ( @key_color ) {
             $key =~ s/${\PH}/shift @key_color/ge;
@@ -898,7 +904,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.171
+Version 0.172
 
 =cut
 
@@ -951,10 +957,10 @@ row of the table.
 
 =back
 
-If I<table_expand> is set to C<0>, the C<Return> key closes the table if the cursor is on the first row.
+If I<table_expand> is set to C<0>, the C<Enter> key closes the table if the cursor is on the first row.
 
-If I<table_expand> is enabled and the cursor is on the first row, pressing C<Return> three times in succession closes
-the table. If the cursor is auto-jumped to the first row, it is required only one C<Return> to close the table.
+If I<table_expand> is enabled and the cursor is on the first row, pressing C<Enter> three times in succession closes the
+table. If the cursor is auto-jumped to the first row, it is required only one C<Enter> to close the table.
 
 If the cursor is not on the first row:
 
@@ -962,12 +968,12 @@ If the cursor is not on the first row:
 
 =item *
 
-with the option I<table_expand> disabled the cursor jumps to the table head if C<Return> is pressed.
+with the option I<table_expand> disabled the cursor jumps to the table head if C<Enter> is pressed.
 
 =item *
 
 with the option I<table_expand> enabled each column of the selected row is output in its own line preceded by the
-column name if C<Return> is pressed. Another C<Return> closes this output and goes back to the table output. If a row is
+column name if C<Enter> is pressed. Another C<Enter> closes this output and goes back to the table output. If a row is
 selected twice in succession, the pointer jumps to the first row.
 
 =back
@@ -979,7 +985,7 @@ least one column matches the entered pattern. See option L</search>.
 
 =head2 Output
 
-If the option L</table_expand> is enabled and a row is selected with C<Return>, each column of that row is output in its
+If the option L</table_expand> is enabled and a row is selected with C<Enter>, each column of that row is output in its
 own line preceded by the column name.
 
 If the table has more rows than the terminal, the table is divided up on as many pages as needed automatically. If the
@@ -1158,6 +1164,10 @@ reached.
 
 Default: 0
 
+=head3 max_width_exp
+
+Set a maximum width of the expanded table row output. (See option L</table_expand>).
+
 =head3 min_col_width
 
 The columns with a width below or equal I<min_col_width> are only trimmed, if it is still required to lower the row width
@@ -1220,10 +1230,12 @@ Default: 2
 
 =head3 table_expand
 
-If the option I<table_expand> is enabled and C<Return> is pressed, the selected table row is printed with
-each column in its own line. Exception: if the cursor auto-jumped to the first row, the first row will not be expanded.
+If I<table_expand> is enabled and C<Enter> is pressed, the selected table row prints with each column on a new line.
+Pressing C<Enter> again closes this view. The next C<Enter> key press will automatically jump the cursor to the first
+row. If the cursor has automatically jumped to the first row, pressing C<Enter> will close the table instead of
+expanding the first row. Pressing any key other than C<Enter> resets these special behaviors.
 
-If I<table_expand> is set to 0, the cursor jumps to the to first row (if not already there) when C<Return> is pressed.
+If I<table_expand> is set to 0, the cursor jumps to the to first row (if not already there) when C<Enter> is pressed.
 
 0 - off
 

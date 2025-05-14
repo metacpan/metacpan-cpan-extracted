@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.172   2025-05-13
+        - New option 'max_width_exp'.
+        - Print single row: undoing unintended changes.
+
 0.171   2025-05-05
         - Code refactoring.
         - New option 'pad_row_edges'.

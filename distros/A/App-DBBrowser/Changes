@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.430  2025-05-13
+        - Update aggregate functions 'count' and 'group_concat'.
+        - Term::TablePrint minimum version 0.172.
+        - New option 'maximum with expanded table row'.
+
 2.429  2025-05-05
         - Term::TablePrint minimum version 0.171.
         - Added 'List::MoreUtils::XS' to prereq_pm.

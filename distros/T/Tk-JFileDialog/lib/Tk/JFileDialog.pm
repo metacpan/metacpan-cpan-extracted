@@ -16,7 +16,7 @@
 package Tk::JFileDialog;
 
 use vars qw($VERSION $bummer $MAXWIDTH);
-our $VERSION = '2.40';
+our $VERSION = '2.41';
 our $MAXWIDTH = 60;  #AVG. CHARACTERS.
 
 require 5.002;
@@ -1728,6 +1728,9 @@ sub add2Hist
 	if ($self->{'Configure'}{'HistList'} && $histFileNative && open(TEMP, ">$histFileNative"))
 	{
 		shift (@{$self->{'Configure'}{'HistList'}});
+		$fname =~ s#\/[^\/]+?\/\.\.\/#\/#;  #CLEAN UP ANY "/path/subpath/../more" => "/path/more".
+		$fname =~ s#^(\w\:)[^\/]+?\/\.\.\/#$1#  if ($bummer); #CLEAN UP WINDOWSEY FILES.
+		$fname =~ s#\.\/##g;                #CLEAN UP ANY "/path/./more" => "/path/more".
 		print TEMP "$fname\n";
 		my $i = 1;
 		my $t;
@@ -2209,7 +2212,7 @@ widget for Perl/Tk.
 
 =head1 AUTHOR
 
-(c) 1996-2024, Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
+(c) 1996-2025, Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -2217,7 +2220,7 @@ This is a derived work from L<Tk::FileDialog>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 1996-2024 Jim Turner C<< <mailto:turnerjw784@yahoo.com> >>.
+Copyright (c) 1996-2025 Jim Turner C<< <mailto:turnerjw784@yahoo.com> >>.
 All rights reserved.
 
 Tk::JFileDialog is free software; you can redistribute it and/or

@@ -351,8 +351,7 @@ SV * _remove_from_pos (SV * self, int pos) {
 
 
 MODULE = Doubly::Linked  PACKAGE = Doubly::Linked
-PROTOTYPES: ENABLE
-FALLBACK: TRUE
+PROTOTYPES: DISABLE
 
 SV *
 new(...)
@@ -461,7 +460,7 @@ insert(self, cb, ...)
 	SV * self
 	SV * cb
 	CODE:
-		RETVAL = _insert(self, cb, newSVsv(ST(2)));
+		RETVAL = newSVsv(_insert(self, cb, newSVsv(ST(2))));
 	OUTPUT:
 		RETVAL
 

@@ -24,34 +24,34 @@ no_index:
 provides:
   Map::Tube:
     file: lib/Map/Tube.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Cookbook:
     file: lib/Map/Tube/Cookbook.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Line:
     file: lib/Map/Tube/Line.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Node:
     file: lib/Map/Tube/Node.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Pluggable:
     file: lib/Map/Tube/Pluggable.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Route:
     file: lib/Map/Tube/Route.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Table:
     file: lib/Map/Tube/Table.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Types:
     file: lib/Map/Tube/Types.pm
-    version: '4.09'
+    version: '4.10'
   Map::Tube::Utils:
     file: lib/Map/Tube/Utils.pm
-    version: '4.09'
+    version: '4.10'
   Test::Map::Tube:
     file: lib/Test/Map/Tube.pm
-    version: '4.09'
+    version: '4.10'
 requires:
   Data::Compare: '1.25'
   File::Basename: '2.6'
@@ -63,7 +63,6 @@ requires:
   Moo: '2.000000'
   Moo::Role: '2.000000'
   MooX::Options: '4.023'
-  Path::Tiny: '0'
   Role::Tiny: '2.000000'
   Scalar::Util: '0'
   Throwable: '0'
@@ -77,5 +76,5 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/manwar/Map-Tube.git
-version: '4.09'
+version: '4.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

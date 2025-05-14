@@ -23,21 +23,21 @@ no_index:
 provides:
   OrePAN2::S3:
     file: lib/OrePAN2/S3.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Amazon::Credentials: '0'
   Amazon::S3: '0'
   Archive::Tar: '0'
-  Bedrock::Template: '0'
   CLI::Simple: '0'
   JSON: '0'
   OrePAN2::Index: '0'
   Readonly: '0'
+  Template: '0'
   YAML: '0'
   perl: '5.010'
 resources:
   bugtracker: http://github.com/rlauer6/orepan2-s3/issues
   homepage: http://github.com/rlauer6/orepan2-s3.git
   repository: git://github.com/rlauer6/orepan2-s3.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

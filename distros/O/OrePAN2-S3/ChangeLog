@@ -1,3 +1,30 @@
+Tue May 13 07:19:45 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.03]:
+	* bin/orepan2-s2
+	- create index even if template not provided
+	* lib/OrePan2/S3.pm
+	- replace Bedrock::Template w/Template to reduce dependencies
+	(slurp_file): new (again)
+	* requires
+	- Bedrock::Template, +Template
+	* README: updates
+
+Tue May 13 05:59:31 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.02]:
+	* bin/orepan2-s3
+	- -N config profiles
+	- -T template
+	- -v verbose
+	* lib/OrePAN2/S3.pm
+	- --template option
+	- --profile option
+	(__DATA__): make generic
+	(fetch_template): *DATA or template
+	(slurp_file): removed, use Bedrock::slurp_file
+	(fetch_config): profiles
+
 Tue Feb 25 16:24:50 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[BigBang]:

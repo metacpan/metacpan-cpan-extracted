@@ -1,0 +1,36 @@
+Changes
+ignore.txt
+lib/Doubly.pm
+lib/Doubly.xs
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-odea.t
+t/02-data.t
+t/03-start.t
+t/04-end.t
+t/05-next.t
+t/06-prev.t
+t/07-add.t
+t/08-insert.t
+t/09-insert_before.t
+t/10-insert_after.t
+t/11-insert_at_start.t
+t/12-insert_at_end.t
+t/13-insert_at_pos.t
+t/14-remove.t
+t/15-remove_from_start.t
+t/16-remove_from_end.t
+t/17-remove_from_pos.t
+t/18-find.t
+t/19-remove-add.t
+t/20-stress.t
+t/21-nested.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+typemap
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

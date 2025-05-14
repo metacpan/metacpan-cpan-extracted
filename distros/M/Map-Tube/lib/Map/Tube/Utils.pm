@@ -1,6 +1,6 @@
 package Map::Tube::Utils;
 
-$Map::Tube::Utils::VERSION   = '4.09';
+$Map::Tube::Utils::VERSION   = '4.10';
 $Map::Tube::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,16 +9,16 @@ Map::Tube::Utils - Helper package for Map::Tube.
 
 =head1 VERSION
 
-Version 4.09
+Version 4.10
 
 =cut
 
 use utf8;
 use v5.14;
-use strict; use warnings;
+use strict;
+use warnings;
 
 use Try::Tiny;
-use Path::Tiny;
 use JSON::MaybeXS;
 use Scalar::Util ();
 use File::ShareDir ':ALL';
@@ -26,7 +26,7 @@ use Unicode::Normalize 'NFC';
 
 use parent 'Exporter';
 our $COLOR_NAMES = _color_names();
-our @EXPORT_OK   = qw/trim filter to_perl is_same common_lines untaint_path is_tainted get_method_map is_valid_color/;
+our @EXPORT_OK	 = qw/trim filter to_perl is_same common_lines get_method_map is_valid_color/;
 
 =head1 DESCRIPTION
 
@@ -34,67 +34,9 @@ B<FOR INTERNAL USE ONLY>.
 
 =cut
 
-sub untaint_path {
-    my ($tainted_path) = @_;
-
-    # Basic taint removal: printable characters only
-    $tainted_path =~ /^([[:print:]]+)$/
-        or die "Tainted path: non-printable characters detected";
-    my $clean_path = $1;
-
-    # Canonicalize
-    my $path = path($clean_path)->realpath;
-
-    # Confirm it's a regular file
-    -f $path or die "Not a regular file: $path";
-
-    # Return stringified path
-    return "$path";
-}
-
-sub is_tainted {
-    my ($data) = @_;
-
-    # Handle Hashes: Check each key-value pair for taint
-    if (ref $data eq 'HASH') {
-        my %clean;
-        for my $key (keys %$data) {
-            # Check if the key is tainted
-            if (Scalar::Util::tainted($key)) {
-                die "Tainted key: $key\n";
-            }
-
-            # Recursively check the value for taint
-            is_tainted($data->{$key});
-        }
-    }
-
-    # Handle Arrays: Check each element for taint
-    elsif (ref $data eq 'ARRAY') {
-        for my $element (@$data) {
-            is_tainted($element);
-        }
-    }
-
-    # Handle Scalars: Check if the scalar is tainted
-    elsif (!ref $data) {
-        if (Scalar::Util::tainted($data)) {
-            die "Tainted scalar: $data\n";
-        }
-    }
-
-    # Catch unsupported data types
-    else {
-        die "Unsupported data type: " . ref($data) . "\n";
-    }
-
-    return 0;
-}
-
 sub to_perl {
     my ($file) = @_;
 
-    $file = untaint_path($file);
     my $json_text = do {
         open(my $json_fh, "<", $file) or die("ERROR: Can't open $file: $!\n");
         local $/;
@@ -104,8 +46,7 @@ sub to_perl {
     };
 
     try {
-        my $data = JSON::MaybeXS->new->allow_nonref->utf8(1)->decode($json_text);
-        return $data unless is_tainted($data);
+        return JSON::MaybeXS->new->allow_nonref->utf8(1)->decode($json_text);
     }
     catch {
         die $@;

@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.7.1
+version v0.8.0
 
 # SYNOPSIS
 
@@ -149,6 +149,8 @@ The following metrics are logged:
 
     This increments a counter for the request method.
 
+    If the request method is anything other than an ASCII word, then it will be counted as "other".
+
 - `psgi.request.remote_addr`
 
     The remote address is added to the set.
@@ -278,8 +280,6 @@ builder {
 
 ## Non-standard HTTP status codes
 
-## Unknown Status Codes
-
 If your application is returning a status code that is not handled by
 [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus), then the metrics may not be logged for that reponse.
 
@@ -317,6 +317,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+Please see `CONTRIBUTING.md` for more information on how to contribute to this project.
+
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -326,7 +333,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2024 by Robert Rothenberg.
+This software is Copyright (c) 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -69,7 +69,25 @@ sub get_prepared_aggr_func {
         if ( $sf->{o}{enable}{extended_cols} ) {
             push @pre, $sf->{i}{menu_addition};
         }
+        my $group_concat = $sf->__group_concat();
         $prepared_aggr = $aggr . "(";
+        if ( $aggr =~ /^(?:COUNT|$group_concat)\z/i ) {
+            my ( $all, $distinct ) = ( 'ALL', 'DISTINCT' );
+            my $info = $sf->__prepared_aggr_info( $sql, $clause, $prepared_aggr, $r_data );
+            # Choose
+            my $choice = $tc->choose(
+                [ undef, $all, $distinct ],
+                { %{$sf->{i}{lyt_h}}, info => $info }
+            );
+            $ax->print_sql_info( $info );
+            if ( ! defined $choice ) {
+                return;
+            }
+            #if ( $choice eq $distinct ) {
+            #    $prepared_aggr .= "DISTINCT ";
+            #}
+            $prepared_aggr .= $choice . " ";
+        }
 
         COLUMN: while ( 1 ) {
             my $info = $sf->__prepared_aggr_info( $sql, $clause, $prepared_aggr, $r_data );
@@ -95,22 +113,12 @@ sub get_prepared_aggr_func {
                 }
                 $col = $complex_col;
             }
-            my $group_concat = $sf->__group_concat();
-            if ( $aggr =~ /^COUNT\z/i ) {
-                my $is_distinct = $sf->__is_distinct( $sql, $clause, $prepared_aggr . $col, $r_data );
-                if ( ! defined $is_distinct ) {
-                    next COLUMN;
-                }
-                if ( $is_distinct ) {
-                    $prepared_aggr .= "DISTINCT $col)";
-                }
-                else {
-                    $prepared_aggr .= "$col)";
-                }
-            }
-            elsif ( $aggr =~ /^$group_concat\z/i ) {
+            if ( $prepared_aggr =~ /ALL\s\z/ ) {
+                $prepared_aggr = $aggr . "(";
+            };
+            if ( $aggr =~ /^$group_concat\z/i ) {
                 my $bu_prepared_aggr = $prepared_aggr;
-                $prepared_aggr = $sf->__opt_group_concat( $sql, $clause, $col, $prepared_aggr, $r_data );
+                $prepared_aggr = $sf->__op_group_concat( $sql, $clause, $col, $prepared_aggr, $r_data );
                 if ( ! defined $prepared_aggr ) {
                     $prepared_aggr = $bu_prepared_aggr;
                     next COLUMN;
@@ -128,29 +136,6 @@ sub get_prepared_aggr_func {
 }
 
 
-sub __is_distinct {
-    my ( $sf, $sql, $clause, $prepared_aggr, $r_data ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my ( $all, $distinct ) = ( 'ALL', 'DISTINCT' );
-    my $info = $sf->__prepared_aggr_info( $sql, $clause, $prepared_aggr, $r_data );
-    # Choose
-    my $choice = $tc->choose(
-        [ undef, $all, $distinct ],
-        { %{$sf->{i}{lyt_h}}, info => $info }
-    );
-    $ax->print_sql_info( $info );
-    if ( ! defined $choice ) {
-        return;
-    }
-    elsif ( $choice eq $all ) {
-        return 0;
-    }
-    elsif ( $choice eq $distinct ) {
-        return 1;
-    }
-}
-
 sub __prepared_aggr_info {
     my ( $sf, $sql, $clause, $prepared_aggr, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -161,17 +146,11 @@ sub __prepared_aggr_info {
 }
 
 
-sub __opt_group_concat {
+sub __op_group_concat {
     my ( $sf, $sql, $clause, $col, $prepared_aggr, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $is_distinct = $sf->__is_distinct( $sql, $clause, $prepared_aggr . $col, $r_data );
-    if ( ! defined $is_distinct ) {
-        return;
-    }
-    if ( $is_distinct ) {
-        $prepared_aggr .= "DISTINCT ";
-    }
+    my $is_distinct = $prepared_aggr =~ /DISTINCT\s\z/;
     if ( $sf->{i}{driver} eq 'Pg' ) {
         $prepared_aggr .= $ax->pg_column_to_text( $sql, $col );
     }

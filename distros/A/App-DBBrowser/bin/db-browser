@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.429';
+our $VERSION = '2.430';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.429
+Version 2.430
 
 =head1 SYNOPSIS
 
@@ -1168,6 +1168,11 @@ while preparing the data for output.
 =head3 Tab Width
 
 Set the number of spaces between columns.
+
+=head3 Max width expanded
+
+Set a maximum width of the expanded table row output. I<Max width expanded> set to C<0> means no maximum width. See
+option L</Expand Table>.
 
 =head3 Pad row edges
 

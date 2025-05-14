@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '4.09';
+$Map::Tube::VERSION   = '4.10';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 4.09
+Version 4.10
 
 =cut
 
@@ -47,7 +47,7 @@ use Map::Tube::Exception::MalformedMapData;
 use Map::Tube::Exception::InvalidLineStructure;
 use Map::Tube::Exception::InvalidStationStructure;
 use Map::Tube::Exception::RouteNotFound;
-use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_tainted is_valid_color);
+use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_valid_color);
 use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap Color);
 
 use Moo::Role;
@@ -78,13 +78,14 @@ documented in L<Map::Tube::Cookbook>.
     |                      |          | Sofia, Tbilisi, Vienna, Warsaw,          |
     |                      |          | Yekaterinburg                            |
     |                      |          |                                          |
-    | Gisbert W Selke      | GWS      | 15 (Beijing, Brussels, Chicago, Glasgow, |
+    | Gisbert W Selke      | GWS      | 16 (Beijing, Brussels, Chicago, Glasgow, |
     |                      |          | Hamburg, KoelnBonn, Lyon, Muenchen,      |
-    |                      |          | Napoli, Oslo, Rhein/Ruhr, San Francisco, |
-    |                      |          | Stockholm, Stuttgart, Toulouse)          |
+    |                      |          | Napoli, Oslo, Paris, Rhein/Ruhr,         |
+    |                      |          | San Francisco, Stockholm, Stuttgart,     |
+    |                      |          | Toulouse)                                |
     |                      |          |                                          |
-    | Mohammad Sajid Anwar | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
-    |                      |          | Madrid, NYC, Tokyo)                      |
+    | Mohammad Sajid Anwar | MANWAR   | 8 (Barcelona, Delhi, Kolkatta, Leipzig,  |
+    |                      |          | London, Madrid, NYC, Tokyo)              |
     |                      |          |                                          |
     | Renee Baecker        | RENEEB   | 1 (Frankfurt)                            |
     |                      |          |                                          |
@@ -564,12 +565,10 @@ sub get_map_data {
     if ($xml ne '') {
         eval {
             $data = XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0);
-            if (!is_tainted($data)) {
-                # Handle if there is only one line.
-                my $lines = $data->{lines}->{line};
-                if (ref($lines) eq 'HASH') {
-                    $data->{lines}->{line} = [ $lines ];
-                }
+            # Handle if there is only one line.
+            my $lines = $data->{lines}->{line};
+            if (ref($lines) eq 'HASH') {
+                $data->{lines}->{line} = [ $lines ];
             }
         };
         unless ($@) {

@@ -37,7 +37,6 @@ t/ok_map_functions.t
 t/ok_map_routes.t
 t/ok_map_unidirection.t
 t/ok_map_unicode.t
-t/ok_map_path_check.t
 t/ok_map_line_stations.t
 t/ok_map_metachars.t
 t/ok_map_preferred.t

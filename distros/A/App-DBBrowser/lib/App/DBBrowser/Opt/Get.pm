@@ -88,6 +88,7 @@ sub defaults {
             binary_filter     => 0,
             binary_string     => 'BNRY',
             color             => 0,
+            max_width_exp     => 0,
             min_col_width     => 30,
             mouse             => 0,
             pad_row_edges     => 0,

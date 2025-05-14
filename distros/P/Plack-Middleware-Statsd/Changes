@@ -1,5 +1,20 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.8.0    2025-05-13 13:07:16+01:00 Europe/London
+  [Security]
+  - Stats for request methods are only counted for ASCII words, anything else is counted as "other".
+
+  - Stats for content types are only counted for well-formed types.
+
+  [Documentation]
+  - Added a security policy.
+
+  - Added a How to Contribute document
+
+  - Removed redundant heading.
+
+  - Updated copyright year.
+
 v0.7.1    2024-07-20 12:52:04+01:00 Europe/London
   [Documentation]
   - Updated copyright year,

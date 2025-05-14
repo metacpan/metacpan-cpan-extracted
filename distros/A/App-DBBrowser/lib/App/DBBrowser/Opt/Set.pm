@@ -98,6 +98,7 @@ sub _options {
             { name => 'progress_bar',      text => "- Progress bar",        section => 'table' },
             { name => 'tab_width',         text => "- Tab width",           section => 'table' },
             { name => '_pad_row_edges',    text => "- Pad row edges",       section => 'table' },
+            { name => 'max_width_exp',     text => "- Max width expanded",  section => 'table' },
             { name => '_color',            text => "- Color",               section => 'table' },
             { name => 'trunc_fract_first', text => "- Trunc fract first",   section => 'table' },
             { name => 'min_col_width',     text => "- Trunc col threshold", section => 'table' },
@@ -435,6 +436,11 @@ sub set_options {
             elsif ( $opt eq 'tab_width' ) {
                 my $digits = 3;
                 my $prompt = 'Set the tab width ';
+                $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );
+            }
+            elsif ( $opt eq 'max_width_exp' ) {
+                my $digits = 3;
+                my $prompt = 'Maximum width expanded table row';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits, 0 );
             }
             elsif ( $opt eq '_pad_row_edges' ) {

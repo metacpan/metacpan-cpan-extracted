@@ -9,6 +9,10 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "send statistics to statsd",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "7.22",
+    "Module::Metadata" => "1.000015"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -28,8 +32,9 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "HTTP::Request" => 0,
     "HTTP::Request::Common" => 0,
-    "Module::Metadata" => 0,
+    "Module::Metadata" => "1.000015",
     "Plack::Builder" => 0,
     "Plack::MIME" => 0,
     "Plack::Middleware::ContentLength" => 0,
@@ -43,9 +48,10 @@ my %WriteMakefileArgs = (
     "Test::Vars" => "0.015",
     "Test::Warnings" => 0,
     "lib" => 0,
-    "strict" => 0
+    "strict" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "v0.7.1",
+  "VERSION" => "v0.8.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,10 +59,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
+  "HTTP::Request" => 0,
   "HTTP::Request::Common" => 0,
   "List::Util" => 0,
-  "Module::Metadata" => 0,
+  "Module::Metadata" => "1.000015",
   "Plack::Builder" => 0,
   "Plack::MIME" => 0,
   "Plack::Middleware" => 0,
@@ -77,6 +85,7 @@ my %FallbackPrereqs = (
   "lib" => 0,
   "parent" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

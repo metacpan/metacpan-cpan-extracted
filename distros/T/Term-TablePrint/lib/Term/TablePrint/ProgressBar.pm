@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.16.0;
 
-our $VERSION = '0.171';
+our $VERSION = '0.172';
 
 use Term::Choose::Constants qw( EXTRA_W );
 use Term::Choose::Screen    qw( clear_screen clear_to_end_of_line );
@@ -22,11 +22,12 @@ sub set_progress_bar {
     my ( $self ) = @_;
     my $term_w = get_term_width() + EXTRA_W;
     $self->{fmt} = "\rComputing: %3d%% [%s]";
-    $self->{short_print} = $term_w < 25 ? 1 : 0;
-    if ( $self->{short_print} ) {
+    if ( $term_w < 25 ) {
+        $self->{short_print} = 1;
         $self->{bar_w} = $term_w
     }
     else {
+        $self->{short_print} = 0;
         $self->{bar_w} = $term_w - length( sprintf $self->{fmt}, 100, '' ) + 1; # +1: lenght("\r") == 1
     }
     $self->{step} = int( $self->{total} / $self->{bar_w} || 1 );
@@ -42,7 +43,7 @@ sub set_progress_bar {
 
 sub update_progress_bar {
     my ( $self ) = @_;
-    my $multi = int( $self->{count} / ( $self->{total} / $self->{bar_w} ) ) || 1;
+    my $multi = int( $self->{count} / ( $self->{total} / $self->{bar_w} ) );
     if ( $self->{short_print} ) {
         print "\r", clear_to_end_of_line;
         print( ( '=' x $multi ) . ( ' ' x ( $self->{bar_w} - $multi ) ) );
@@ -50,7 +51,7 @@ sub update_progress_bar {
     else {
         printf $self->{fmt}, ( $self->{count} / $self->{total} * 100 ), ( '=' x $multi ) . ( ' ' x ( $self->{bar_w} - $multi ) );
     }
-    $self->{next_update} = $self->{next_update} + $self->{step};
+    $self->{next_update} += $self->{step};
 }
 
 
@@ -67,7 +68,7 @@ Term::TablePrint::ProgressBar - Show a progress bar.
 
 =head1 VERSION
 
-Version 0.171
+Version 0.172
 
 =cut
 
@@ -87,6 +88,7 @@ This library is free software; you can redistribute it and/or modify it under th
 details, see the full text of the licenses in the file LICENSE.
 
 =cut
+
 
 
 1;

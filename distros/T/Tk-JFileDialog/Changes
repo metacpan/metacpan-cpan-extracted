@@ -102,3 +102,12 @@ Revision history for Tk-JFileDialog
         * Automatically default-bind the <Esc> key to the "Cancel button", if 
         one is defined.
         * Update copyright year & touch up pod docs.
+2.41    2025/05/13
+        * Add code to clean up paths when added to the history-list dropdown, 
+        namely convert any paths such as 
+        /home/user/project/subfolder/subsubfolder/../fn.txt to 
+        /home/user/project/subfolder/fn.txt, and /home/usr/./fn.txt to 
+        /home/usr/fn.txt.  This was occasionally happening when user entered a 
+        relative filename path, ie. "../fn.txt relative to the current working 
+        directory.
+        * Update copyright years to 2025.

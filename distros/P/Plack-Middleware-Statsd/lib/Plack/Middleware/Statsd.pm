@@ -22,7 +22,7 @@ use Try::Tiny;
 
 use experimental qw/ postderef signatures /;
 
-our $VERSION = 'v0.7.1';
+our $VERSION = 'v0.8.0';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -134,6 +134,7 @@ sub call ( $self, $env ) {
             }
 
             if ( my $method = $env->{REQUEST_METHOD} ) {
+                $method = "other" unless $method =~ /^\w+$/a;
                 $increment->( $env, 'psgi.request.method.' . $method, $rate );
             }
 
@@ -187,6 +188,7 @@ sub call ( $self, $env ) {
 
 sub _mime_type_to_metric( $type = undef ) {
     return unless $type;
+    return unless $type =~ m#^\w+/(?:\w+[\-\+])*\w+(?: *;\w+=\w+)?#a;
     return $type =~ s#\.#-#gr =~ s#/#.#gr =~ s/;.*$//r;
 }
 
@@ -205,7 +207,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.7.1
+version v0.8.0
 
 =head1 SYNOPSIS
 
@@ -360,6 +362,8 @@ The following metrics are logged:
 
 This increments a counter for the request method.
 
+If the request method is anything other than an ASCII word, then it will be counted as "other".
+
 =item C<psgi.request.remote_addr>
 
 The remote address is added to the set.
@@ -487,8 +491,6 @@ allow you to monitor process size information.  In your F<app.psgi>:
 
 =head2 Non-standard HTTP status codes
 
-=head2 Unknown Status Codes
-
 If your application is returning a status code that is not handled by
 L<HTTP::Status>, then the metrics may not be logged for that reponse.
 
@@ -526,6 +528,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+Please see F<CONTRIBUTING.md> for more information on how to contribute to this project.
+
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -535,7 +544,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2024 by Robert Rothenberg.
+This software is Copyright (c) 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

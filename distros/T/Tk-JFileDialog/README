@@ -3,13 +3,13 @@ NAME
     for Perl/Tk.
 
 AUTHOR
-    (c) 1996-2024, Jim Turner, "<https://metacpan.org/author/TURNERJW>".
+    (c) 1996-2025, Jim Turner, "<https://metacpan.org/author/TURNERJW>".
 
 ACKNOWLEDGEMENTS
     This is a derived work from Tk::FileDialog.
 
 LICENSE AND COPYRIGHT
-    Copyright (c) 1996-2024 Jim Turner "<mailto:turnerjw784@yahoo.com>". All
+    Copyright (c) 1996-2025 Jim Turner "<mailto:turnerjw784@yahoo.com>". All
     rights reserved.
 
     Tk::JFileDialog is free software; you can redistribute it and/or modify

@@ -1,10 +1,17 @@
 Revision history for Map::Tube
 
+4.10  2025-05-13T12:40:00+00:00
+      This release prepared by @GWS.
+      - Removed is_tainted() and untaint_path() from Map::Utils
+      - Removed call to untaint_path() from Map::Tube::Utils
+      - Removed dependency on Path::Tiny
+      - Removed unit test t/ok_map_path_check.t
+      - Documented Map::Tube::Paris
+
 4.09  2025-04-26T02:50:00+00:00
       - Upgraded minimum Perl v5.14 for better Unicode support.
       - Removed the use of Taint::Util
       - Added methods untaint_path() and is_tainted() to Map::Tube::Utils
-      - Added unit test t/ok_map_path_check.t
       - Tidied up unit test folder
       - Used JSON::MaybeXS rather than JSON.
 

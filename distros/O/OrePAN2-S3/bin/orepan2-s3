@@ -13,10 +13,14 @@ Options
   -P, --prefix           Path prefix in the S3 bucket
   -b, --bucket           S3 Bucket Name
   -p, --profile          AWS Profile
+  -N, --profile-name     orepan2-add config profile name
   -x, --no-invalidate    Do not invalidate cache
   -c, --config           Config file name (default: .orepan2-s3.json)
   -r, --region           AWS region (default: us-east-1)
   -d, --distribution-id  CloudFront distribution id
+  -t, --tag              Name tag for CloudFront distribution
+  -T, --template         Template for index
+  -v, --verbose          Verbose output
 
 Commands
 --------
@@ -28,11 +32,70 @@ Notes
 -----
 1. use -x to when adding a new module to repository to prevent invalidating cache.
    (invalidations are not immediate)
+
 2. default configuration file is .orepan2-s3.json and should be in your home directory
+
+3. you must provide either -t TAG-VALUE or -d DISTRIBUTIO-id
 
 EOF
 
     exit 1
+}
+
+########################################################################
+find_config_name() {
+########################################################################
+    local config_file="$1"
+    local config_profile="${2:-default}"
+
+    local path_prefix=".$config_profile.index"
+
+    local index=$(cat $config_file | jq -r "$path_prefix?//\"\"")
+    
+    if test -n "$index"; then
+        echo $config_profile
+    fi
+}
+
+########################################################################
+find_config() {
+########################################################################
+    local config_file="$1"
+    local config_profile="${2:-default}"
+
+    config_profile=$(find_config_name "$config_file" "$config_profile");
+    test -n "$config_profile" && config_profile=".$config_profile"
+
+    local path="$config_profile.index? // \"\""
+
+    cat $config_file | jq -r  "$path"
+}
+
+########################################################################
+upload_artifacts() {
+########################################################################
+
+    local bucket="$BUCKET"
+    
+    local config="$1"
+
+    if [[ -n "$config" && -n $(echo "$config" | jq -r '.files?//""') ]]; then
+        local aws_profile="$AWS_PROFILE";
+
+        if test -n "$aws_profile"; then
+            aws_profile="--profile $aws_profile"
+        fi
+
+        echo "$config" | jq -r '.files| to_entries[] | "\(.key) \(.value)"' |
+            while read -r src dest; do
+                if test -e "$src"; then
+                    echo "uploading $src to => s3://$bucket$dest" >&2
+                    aws s3 $aws_profile cp "$src" "s3://$bucket$dest" >&2
+                else
+                    echo "$src not found...skipping" >&2
+                fi
+            done
+    fi
 }
 
 ########################################################################
@@ -92,9 +155,38 @@ create_index() {
 ########################################################################
     index=$(mktemp)
     
-    orepan2-s3-index -c $CONFIG_FILE create >$index
-    
-    orepan2-s3-index -c $CONFIG_FILE upload $index
+    local config_profile=""
+    local index_template="$INDEX_TEMPLATE{:-}"
+
+    local config=$(find_config "$CONFIG_FILE" "$PROFILE_NAME")
+
+    if test -n "$PROFILE_NAME"; then
+        config_profile="--profile $PROFILE_NAME"
+    fi
+
+    local template="${TEMPLATE:-}"
+
+    if [[ -n "$index_template" && -e "$index_template" ]]; then
+        template="--template $index_template"
+    else
+        index_template=$(echo $config | jq -r '.template')
+        
+        if [[ -n "$index_template" && -e "$index_template" ]]; then
+            $template="--template $index_template"
+        fi
+    fi
+
+    if test -e "$index_template"; then
+        test -n "$VERBOSE" && echo "creating index from template $index_template..."
+    fi
+
+    orepan2-s3-index $template $config_profile -c $CONFIG_FILE create >$index
+
+    test -n "$VERBOSE" && echo "uploading new index..."
+    orepan2-s3-index $config_profile -c $CONFIG_FILE upload $index
+
+    test -n "$VERBOSE" && echo "looking for artifacts to upload..."
+    upload_artifacts "$config"
 
     rm $index
 }
@@ -102,14 +194,18 @@ create_index() {
 ########################################################################
 invalidate_cache() {
 ########################################################################
-    $AWS cloudfront create-invalidation \
+    local output=$($AWS cloudfront create-invalidation \
          --distribution-id "$DISTRIBUTION_ID" \
-         --paths "${INVALIDATION_PATHS[@]}" --profile "$AWS_PROFILE"
+         --paths "${INVALIDATION_PATHS[@]}" \
+         --no-paginate --profile "$AWS_PROFILE")
+
+    test -n "$VERBOSE" && echo "$output" >&2
 }
 
 ########################################################################
 cleanup() {
 ########################################################################
+    test -n "$VERBOSE" && echo "cleaning up temp directory..."
     test -n "$TEMP_DIR" && rm -rf "$TEMP_DIR"
 }
 
@@ -132,8 +228,12 @@ add() {
     # Set an exit trap to always run cleanup
     trap cleanup EXIT
 
+    test -n "$VERBOSE" && echo "syncing s3://$BUCKET/$PATH_PREFIX => $TEMP_DIR/$PATH_PREFIX..."
+
     # Sync S3 contents to the temporary directory
     $AWS s3 sync "s3://$BUCKET/$PATH_PREFIX" "$TEMP_DIR/$PATH_PREFIX" --profile "$AWS_PROFILE"
+
+    test -n "$VERBOSE" && echo "adding $FILE to OrePAN package index..."
 
     orepan2-inject "$FILE" "$TEMP_DIR/$PATH_PREFIX"
 
@@ -143,21 +243,26 @@ add() {
         exit 1
     fi
 
+    test -n "$VERBOSE" && echo "indexing OrePAN repository..." >&2
     orepan2-indexer "$TEMP_DIR/$PATH_PREFIX"
 
+    test -n "$VERBOSE" && echo "syncing $TEMP_DIR/$PATH_PREFIX => s3://$BUCKET/$PATH_PREFIX..."
     $AWS s3 sync "$TEMP_DIR/$PATH_PREFIX" "s3://$BUCKET/$PATH_PREFIX" --profile "$AWS_PROFILE"
 }
 
 ########################################################################
 set_defaults() {
 ########################################################################
-    test -z "$AWS_PROFILE" &&  AWS_PROFILE=$(echo $CONFIG | jq -r '.AWS.profile // ""')
-    test -z "$AWS_REGION" && AWS_REGION=$(echo $CONFIG | jq -r '.AWS.region // "us-east-1"')
-    test -z "$DISTRIBUTION_ID" && DISTRIBUTION_ID=$(echo $CONFIG | jq -r '.CloudFront.DistributionId // ""')
-    test -z "$PATH_PREFIX" && PATH_PREFIX=$(echo $CONFIG | jq -r '.AWS.prefix // ""')
-    test -z "$BUCKET" && BUCKET=$(echo $CONFIG | jq -r '.AWS.bucket // ""')
+    local profile_name=$(find_config_name "$CONFIG_FILE" "$PROFILE_NAME")
+    local config=$(cat "$CONFIG_FILE" | jq -r ".$profile_name")
 
-    AWS_ACCOUNT=$(echo $CONFIG | jq -r '.AWS.account // ""')
+    test -z "$AWS_PROFILE" &&  AWS_PROFILE=$(echo "$config" | jq -r '.AWS.profile // ""')
+    test -z "$AWS_REGION" && AWS_REGION=$(echo "$config" | jq -r '.AWS.region // "us-east-1"')
+    test -z "$DISTRIBUTION_ID" && DISTRIBUTION_ID=$(echo "$config" | jq -r '.CloudFront.DistributionId // ""')
+    test -z "$PATH_PREFIX" && PATH_PREFIX=$(echo "$config" | jq -r '.AWS.prefix // ""')
+    test -z "$BUCKET" && BUCKET=$(echo "$config" | jq -r '.AWS.bucket // ""')
+
+    AWS_ACCOUNT=$(echo "$CONFIG" | jq -r '.AWS.account // ""')
     test -z "$AWS_ACCOUNT" && AWS_ACCOUNT=$($AWS sts get-caller-identity --query 'Account' --output text --profile "$AWS_PROFILE")
 
 }
@@ -178,11 +283,13 @@ PATH_PREFIX=""
 BUCKET=""
 NO_INVALIDATE=""
 NOT_OK="ERROR"
-OK="";
+OK=""
+INDEX_TEMPLATE=""
+VERBOSE=""
 
 # Parse command-line options using getopt
-OPTIONS=$(getopt -o hp:t:P:c:d:b:x \
-                 --long help,profile:,tag:,prefix:,config:,distribution-id:,bucket:,no-invalidate -- "$@")
+OPTIONS=$(getopt -o hp:t:P:c:d:b:xn:T:v \
+                 --long verbose,help,profile:,name:,tag:,template:,prefix:,config:,distribution-id:,bucket:,no-invalidate -- "$@")
 
 if [ $? -ne 0 ]; then
     echo "$NOT_OK Error parsing options." >&2
@@ -198,6 +305,11 @@ while true; do
             usage;
             ;;
 
+        -v|--verbose)
+            VERBOSE="1";
+            shift 1
+            ;;
+
         -c|--config)
             CONFIG_FILE="$2"
             shift 2
@@ -210,6 +322,11 @@ while true; do
 
         -t|--tag)
             TAG_VALUE="$2"
+            shift 2
+            ;;
+
+        -T|--template)
+            INDEX_TEMPLATE="$2"
             shift 2
             ;;
 
@@ -231,6 +348,11 @@ while true; do
         -x|--no-invalidate)
             NO_INVALIDATE="$1"
             shift 1
+            ;;
+
+        -n|--name)
+            PROFILE_NAME="$2"
+            shift 2
             ;;
 
         --)
@@ -261,7 +383,9 @@ if ! test -e "$CONFIG_FILE"; then
     install_config
 fi
 
-CONFIG=$(cat $CONFIG_FILE)
+PROFILE_NAME="${PROFILE_NAME:-default}"
+
+CONFIG=$(find_config "$CONFIG_FILE" "$PROFILE_NAME")
 
 set_defaults
 
@@ -270,8 +394,13 @@ INVALIDATION_PATHS+=("/$PATH_PREFIX/modules/02packages.details.txt.gz")
 INVALIDATION_PATHS+=("/$PATH_PREFIX/orepan2-cache.json")
 INVALIDATION_PATHS+=("/index.html")
 
+for p in $(cat $CONFIG_FILE | jq -r '.default.CloudFront.InvalidationPaths?//[]|.[]|.'); do 
+    test -n "$VERBOSE" && echo "adding custom invalidation path: $p" >&2
+    INVALIDATION_PATHS+=("$p")
+done
+
 if test -n "$FILE"; then
-    INVALIDATION_PATHS+=("/$PATH_PREFIX/authors/D/DU/DUMMY/$(basename $FILE)")
+    INVALIDATION_PATHS+=("/$PATH_PREFIX/authors/id/D/DU/DUMMY/$(basename $FILE)")
 fi
 
 case "$COMMAND" in 
@@ -280,10 +409,10 @@ case "$COMMAND" in
         ;;
 
     invalidate)
-        echo "invalidate"
         if test -z "$DISTRIBUTION_ID"; then
             echo "ERROR: No DistributionId in your configuration file."
         else
+            test -n "$VERBOSE" && echo "invalidating cache...\n${INVALIDATION_PATHS[@]}"
             invalidate_cache
         fi
         ;;
@@ -296,10 +425,13 @@ case "$COMMAND" in
 
         add
 
+        test -n "$VERBOSE" && echo "creating HTML index..." >&2
+
         create_index
 
         if test -z "$NO_INVALIDATE"; then
             if test -n "$DISTRIBUTION_ID"; then
+                test -n "$VERBOSE" && echo "invalidating cache...\n${INVALIDATION_PATHS[@]}"
                 invalidate_cache
             fi
         fi
