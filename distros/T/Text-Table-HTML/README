@@ -2,8 +2,8 @@ NAME
     Text::Table::HTML - Generate HTML table
 
 VERSION
-    This document describes version 0.011 of Text::Table::HTML (from Perl
-    distribution Text-Table-HTML), released on 2024-06-13.
+    This document describes version 0.012 of Text::Table::HTML (from Perl
+    distribution Text-Table-HTML), released on 2025-05-15.
 
 SYNOPSIS
      use Text::Table::HTML;
@@ -200,8 +200,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2023, 2022, 2021, 2017, 2016 by
-    perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

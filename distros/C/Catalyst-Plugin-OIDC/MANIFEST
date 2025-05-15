@@ -7,7 +7,6 @@ META.yml
 Makefile.PL
 README.md
 cpanfile
-dist.ini
 lib/Catalyst/Plugin/OIDC.pm
 perlcritic.rc
 t/00-compile.t
@@ -16,9 +15,12 @@ t/lib/MyCatalystApp/lib/MyCatalystApp.pm
 t/lib/MyCatalystApp/lib/MyCatalystApp/Controller/Root.pm
 t/lib/MyCatalystApp/lib/MyCatalystApp/View/JSON.pm
 t/lib/MyCatalystApp/mycatalystapp.conf
+t/lib/MyProviderApp/app.pl
+t/resource-server-IT.t
 xt/author/critic.t
 xt/author/distmeta.t
 xt/author/no-breakpoints.t
+xt/author/no-tabs.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/author/portability.t

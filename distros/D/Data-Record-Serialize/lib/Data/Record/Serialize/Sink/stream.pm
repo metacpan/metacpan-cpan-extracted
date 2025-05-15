@@ -5,7 +5,7 @@ package Data::Record::Serialize::Sink::stream;
 use v5.10;
 use Moo::Role;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use namespace::clean;
 
@@ -47,7 +47,7 @@ Data::Record::Serialize::Sink::stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 

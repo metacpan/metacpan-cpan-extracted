@@ -236,7 +236,8 @@
     A prefix should NOT be included if a base other than 0 is provided
     as an argument.
     Eg. we handle the following, though GMP's mpq_set_str() does not:
-     new('0.1', $base);  # 1/$base (or 1/10 if $base is 0)
+     new('0.1', $base);  # 1/$base (or 1/10 if $base is 0). This is always
+                         # different from the value assigned by new(0.1).
      new('0.9e-2');      # 9/1000
      new('9@-3');        # 9/1000
      new('9@-3', 16);    # 9/4096
@@ -245,22 +246,29 @@
      new('0o1.34p-1);    # 23/32 but '01.34p-1' is invalid
      new('0b1.0111p-1'); # 23/32
      new('F@10', 16);    # same as '0xFp+64' (276701161105643274240);
-                         # the exponent is read as 0x10 (== 16).
+                         # the exponent is read as 0x10 (== 16), as
+                         # base is positive.
      new('F@16', -16);   # same as '0xFp+64' (276701161105643274240);
-                         # the exponent is read as the decimal 16.
+                         # the exponent is read as the decimal 16, as
+                         # base is negative.
      new('12@4', 61);    # 872287983
-     new('-12@-5', 61)   # 64/844596301
+     new('+1.2@4, 61);   # 14299803 (== 872287983 divided by 61)
+     new('-12@-5', 61)   # -63/844596301
+     new('1.2@-5', 61)   #  63/51520374361 ( == previous / 61)
      And the same applies to Rmpq_set_str.
-     Note: When using the "mantissa@exponent" notation, both "mantissa"
-     (aka significand) and "exponent" must be integers, and must be
-     expressed in their full integer form (ie not in scientific notation).
-     Specifying a negative value for the base indicates that the exponent
+     Note: When using the "mantissa@exponent" notation, the "mantissa"
+     portion is allowed to contain a radix point (but not an exponent),
+     and the "exponent" portion must be an integer value.  Specifying a
+     negative value for the base indicates that the "exponent" portion
      is to be read as a decimal value.
 
     And similarly for overloaded operations, except that they make no
     provision for specifying the base of the given string. Allowable
-    bases are therefore limited to 16 (via 0x prefix), 8 (via 0o prefix),
-    2 (via 0b prefix) and 10 (no prefix).
+    bases are therefore limited to 16 (via 0x or 0X prefix), 8 (via 0o
+    or 0O prefix), 2 (via 0b or 0B prefix) and 10 (no prefix).
+    If a positive or negative value is specified, then the '+' or '-'
+    symbol must be placed at the very beginning of the value. For
+    example : '+0b11011/-0xabc'.
 
    ####################
 
@@ -597,12 +605,14 @@
        The variable is considered to be an IV if the IOK flag is set.
 
     3. If the variable is a string (ie the POK flag is set) then the
-       value of that string is used. Octal strings must begin with
-       '0', hex strings must begin with either '0x' or '0X' -
-       otherwise the string is assumed to be decimal. If the POK
-       flag is set, but the string is not a valid base 8, 10, or 16
-       number, the subroutine croaks with an appropriate error
-       message. If the string is of the form 'numerator/denominator',
+       value of that string is used. Octal strings should begin with
+       '0o' or '0O' (though '0' will work in some cases), hex strings
+       must begin with either '0x' or '0X', base 2 strings must begin
+       with '0b' or '0B', - otherwise the string is assumed to be
+       decimal. If the POK flag is set, but the string is not a valid
+       base 2, 8, 10, or 16 number, the subroutine croaks with a
+       message that the string passed to Rmpfr_set_str() is not a
+       valid number. If the string is of the form 'numerator/denominator',
        then the bases of the numerator and the denominator are
        assessed individually. ie '0xa123/ff' is not a valid number
        (because 'ff' is not a valid base 10 number). That needs to

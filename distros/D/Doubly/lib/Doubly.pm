@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Doubly', $VERSION);
@@ -19,7 +19,7 @@ Doubly - Doubly linked lists
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -40,6 +40,8 @@ Version 0.06
 	$list->data; # 100000;
 
 	$list->prev->data; # 99999);
+
+	$list->destroy(); # explicitly calling destroy is important
 
 =head1 DESCRIPTION
 
@@ -233,7 +235,6 @@ This software is Copyright (c) 2025 by LNATION.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 

@@ -38,9 +38,9 @@ open my $log_fh, '<', $filename or die "Could not open log file: $!";
 my @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG: Log::Abstraction/, 'Logged debug message to file');
+like($log_lines[0], qr/DEBUG> /, 'Logged debug message to file');
 like($log_lines[0], qr/File debug message/, 'Logged correct debug message to file');
-like($log_lines[1], qr/INFO: Log::Abstraction/, 'Logged info message to file');
+like($log_lines[1], qr/INFO> /, 'Logged info message to file');
 like($log_lines[1], qr/File info message/, 'Logged correct info message to file');
 
 # As above but with the file argument
@@ -54,9 +54,9 @@ open $log_fh, '<', $filename or die "Could not open log file: $!";
 @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG: Log::Abstraction/, 'Logged debug message to file');
+like($log_lines[0], qr/DEBUG> /, 'Logged debug message to file');
 like($log_lines[0], qr/File debug message2/, 'Logged correct debug message to file');
-like($log_lines[1], qr/INFO: Log::Abstraction/, 'Logged info message to file');
+like($log_lines[1], qr/INFO> /, 'Logged info message to file');
 like($log_lines[1], qr/File info message2/, 'Logged correct info message to file');
 
 # Test logging to a file descriptor
@@ -71,9 +71,9 @@ open($log_fh, '<', $filename) or die "Could not open log file: $!";
 @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG: Log::Abstraction/, 'Logged debug message to file descriptor');
+like($log_lines[0], qr/DEBUG> Log::Abstraction/, 'Logged debug message to file descriptor');
 like($log_lines[0], qr/File debug message/, 'Logged correct debug message to file descriptor');
-like($log_lines[1], qr/INFO: Log::Abstraction/, 'Logged info message to file descriptor');
+like($log_lines[1], qr/INFO> Log::Abstraction/, 'Logged info message to file descriptor');
 like($log_lines[1], qr/File info message/, 'Logged correct info message to file descriptor');
 
 # Test logging to a code reference

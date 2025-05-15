@@ -1,3 +1,12 @@
+2.02      2025-05-14 12:17:26-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * new public API method: setup_from_record.  Finalizes
+      field and type information prior to sending data, allowing
+      caller earliest access to that information.
+
+
 2.01      2025-02-03 12:42:24-05:00 America/New_York
 
   [BUILD]

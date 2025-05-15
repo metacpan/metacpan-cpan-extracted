@@ -12,7 +12,7 @@ use JSON::PP;    # needed for JSON::PP::true/false
 
 use namespace::clean;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 BEGIN {
     my $YAML_XS_VERSION = 0.67;
@@ -80,7 +80,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 

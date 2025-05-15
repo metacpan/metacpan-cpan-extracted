@@ -26,6 +26,7 @@ __PACKAGE__->config(
     name => 'MyCatalystApp',
     disable_component_resolution_regex_fallback => 1,
     'Plugin::ConfigLoader' => { file => catdir(dirname(__FILE__), '..', 'mycatalystapp.conf') },
+    'View::JSON' => { expose_stash => 'expose_stash' },
 );
 
 __PACKAGE__->setup();

@@ -1,5 +1,10 @@
 Revision history for Perl module Math::GMPq
 
+0.66
+ - Correct some some mistakes (introduced in 0.65) in assigning values of some strings.
+ - Allow a leading '+' in both numerator and denominator strings.
+   GMP's mpq_set_str() does not permit this - so this is new behaviour.
+
 0.65
  - Enhancements added to Rmpq_set_str - allow some more strings that mpq_set_str will not
    accept to be passed to Rmpq_set_str. (Details in POD.)

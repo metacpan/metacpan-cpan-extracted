@@ -1,0 +1,56 @@
+NAME
+    CGI::Session::Driver::mariadb - CGI::Session driver for MariaDB database
+
+SYNOPSIS
+        $s = CGI::Session->new('driver:mariadb', $sid);
+        $s = CGI::Session->new('driver:mariadb', $sid, { DataSource  => 'dbi:MariaDB:test',
+                                                        User        => 'sherzodr',
+                                                        Password    => 'hello' });
+        $s = CGI::Session->new('driver:mariadb', $sid, { Handle => $dbh });
+
+DESCRIPTION
+    mariadb stores session records in a MariaDB table. For details, see
+    CGI::Session::Driver::DBI, its parent class.
+
+    It is important that the session ID column be defined as a primary key
+    or unique:
+
+     CREATE TABLE sessions (
+         id CHAR(32) NOT NULL PRIMARY KEY,
+         a_session TEXT NOT NULL
+     );
+
+    To use different column names, adjust your CREATE TABLE statement
+    accordingly, and then:
+
+        $s = CGI::Session->new('driver:mariadb', undef, {
+            TableName=>'session',
+            IdColName=>'my_id',
+            DataColName=>'my_data',
+            DataSource=>'dbi:MariaDB:project',
+        });
+
+    or
+
+        $s = CGI::Session->new('driver:mariadb', undef, {
+            TableName=>'session',
+            IdColName=>'my_id',
+            DataColName=>'my_data',
+            Handle=>$dbh,
+        });
+
+  DRIVER ARGUMENTS
+    mariadb driver supports all the arguments documented in
+    CGI::Session::Driver::DBI. Like the mariadb driver, you can optionally
+    omit the "dbi:MariaDB:" prefix:
+
+        $s = CGI::Session->new('driver:mariadb', $sid, { DataSource=>'shopping_cart' });
+
+  BACKWARDS COMPATIBILITY
+    Global variables like $CGI::Session::MySQL::TABLE_NAME are no longer
+    used. Refer to the parent CGI::Session::Driver::DBI documentation for
+    new methods.
+
+LICENSING
+    For support and licensing see CGI::Session.
+

@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/mollusc-labs/slapbird/issues
   license: http://www.opensource.org/licenses/mit
   repository: https://github.com/mollusc-labs/slapbird
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

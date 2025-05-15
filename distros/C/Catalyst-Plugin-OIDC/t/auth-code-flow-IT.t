@@ -4,90 +4,77 @@ use strict;
 use warnings;
 use Test::More;
 use Test::MockModule;
-use Mojolicious::Lite;
+use HTTP::Request::Common;
+use HTTP::Cookies;
 
 use FindBin qw($Bin);
 use lib "$Bin/lib/MyCatalystApp/lib";
 
-use Test::WWW::Mechanize::Catalyst::WithContext;
-
 local $ENV{MOJO_LOG_LEVEL} = 'error';
 
-# provider server routes
-get('/wellknown' => sub {
-  my $c = shift;
-  my %url = (
-    authorization_endpoint => '/authorize',
-    end_session_endpoint   => '/logout',
-    token_endpoint         => '/token',
-    userinfo_endpoint      => '/userinfo',
-    jwks_uri               => '/jwks',
-  );
-  $c->render(json => {map { $_ => $url{$_} } keys %url});
-});
-# get '/authorize' in MyCatalystApp/Controller/Root.pm (ugly but necessary)
-post('/token' => sub {
-       my $c = shift;
-       my $grant_type    = $c->param('grant_type');
-       my $client_id     = $c->param('client_id');
-       my $client_secret = $c->param('client_secret');
-       my $code          = $c->param('code');
-       if ($grant_type eq 'authorization_code'
-           && $client_id eq 'my_id' && $client_secret eq 'my_secret'
-           && $code eq 'abc') {
-         $c->render(json => {id_token      => 'my_id_token',
-                             access_token  => 'my_access_token',
-                             refresh_token => 'my_refresh_token',
-                             scope         => 'openid profile email',
-                             token_type    => 'Bearer',
-                             expires_in    => 3599});
-       }
-       else {
-         $c->render(json => {error             => 'error',
-                             error_description => 'error_description'},
-                    status => 401);
-       }
-     });
+my $provider_app = require "$Bin/lib/MyProviderApp/app.pl";
 
 my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('kid_keys' => sub { {} });
-$mock_oidc_client->redefine('user_agent' => app->ua);
+$mock_oidc_client->redefine('user_agent' => $provider_app->ua);
 
 my $mock_plugin = Test::MockModule->new('OIDC::Client::Plugin');
 $mock_plugin->redefine('_generate_uuid_string' => sub { 'fake_uuid' });
 
-my $mech = Test::WWW::Mechanize::Catalyst::WithContext->new( catalyst_app => 'MyCatalystApp' );
+require Catalyst::Test;
+Catalyst::Test->import('MyCatalystApp');
 
-$mech->get_ok('/',
-              'get public index page');
+subtest 'Get public index page' => sub {
+  my $res = request('/');
+  ok($res->is_success, 'Status in success');
+  like( $res->content, qr/Welcome/, 'Expected text');
+};
 
-$mech->content_like(qr/Welcome/,
-                    'expected text for index page');
-
-# invalid token format
-$mech->get('/protected');
-is($mech->status(), 401,
-   'expected status');
-$mech->content_is('Authentication Error',
-                  'expected error message');
+subtest 'Get protected page in error because invalid token format' => sub {
+  my $res = request('/protected');
+  ok($res->is_redirect, 'Response is a redirect');
+  like($res->header('Location'), qr[/authorize\?.+], 'Redirection to the authorize endpoint');
+  $res = follow_redirects($res);
+  is($res->code, 401, 'Expected error code');
+  is($res->content, 'Authentication Error', 'Expected error message');
+};
 
 $mock_oidc_client->redefine('decode_jwt' => sub {
   {
     'iss'   => 'my_issuer',
-    'exp'   => 12345,
+    'exp'   => time + 30,
     'aud'   => 'my_id',
     'sub'   => 'my_subject',
     'nonce' => 'fake_uuid',
   }
 });
 
-$mech->get_ok('/protected?a=b&c=d',
-              'get protected page');
-
-$mech->content_is('my_subject is authenticated',
-                  'expected text');
-like($mech->c->req->uri, qr[/protected\?a=b&c=d$],
-
-     'keep initial url');
+subtest 'Get protected page ok' => sub {
+  my $res = request('/protected?a=b&c=d');
+  ok($res->is_redirect, 'Response is a redirect');
+  like($res->header('Location'), qr[/authorize\?.+], 'Redirection to the authorize endpoint');
+  $res = follow_redirects($res);
+  ok($res->is_success, 'Status in success');
+  like($res->content, qr/my_subject is authenticated/, 'Expected text');
+  like($res->request->uri, qr[/protected\?a=b&c=d$],
+       'Initial url is kept');
+};
 
 done_testing;
+
+sub follow_redirects {
+  my ($res, $max_redirects) = @_;
+  $max_redirects //= 3;
+
+  my $cookie_jar = HTTP::Cookies->new;
+  $cookie_jar->extract_cookies($res);
+
+  my $i = 0;
+  while ($res->is_redirect && ++$i <= $max_redirects) {
+    my $req = GET $res->header('Location');
+    $cookie_jar->add_cookie_header($req);
+    $res = request($req);
+  }
+
+  return $res;
+}

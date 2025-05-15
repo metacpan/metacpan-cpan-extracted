@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Default;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Hash::Util qw[ hv_store ];
 use Ref::Util  qw[ is_coderef ];
@@ -54,23 +54,7 @@ sub _needs_eol { 1 }
 around 'setup' => sub {
     my ( $orig, $self, $data ) = @_;
 
-    # if fields has not been set yet, set it to the names in the data
-    $self->_set_fields( [ keys %$data ] )
-      unless $self->has_fields;
-
-    # make sure there are no duplicate output fields
-    my %dups;
-    $dups{$_}++ && error( fields => "duplicate output field: $_" ) for @{ $self->fields };
-
-    if ( $self->has_default_type ) {
-        $self->_set_types_from_default;
-    }
-    else {
-        $self->_set_types_from_record( $data );
-    }
-
-    # trigger building of output_types, which also remaps types. ick.
-    $self->output_types;
+    $self->setup_from_record( $data );
 
     $orig->( $self );
 
@@ -177,7 +161,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 

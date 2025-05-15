@@ -2,6 +2,7 @@ package MyCatalystApp::Controller::Root;
 use utf8;
 use Moose;
 use namespace::autoclean;
+use Try::Tiny;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -29,6 +30,36 @@ sub error : Chained('/') : PathPart('error') : Args(1) {
     $c->log->warn("OIDC error : " . $c->flash->{error_message});
     $c->response->body( 'Authentication Error' );
     $c->response->status($http_code);
+}
+
+# ----------------------
+# resource server routes
+# ----------------------
+sub my_resource :Path('my-resource') :Args(0) {
+  my ( $self, $c ) = @_;
+
+  my $user = try {
+    $c->oidc->verify_token();
+    return $c->oidc->build_user_from_userinfo();
+  }
+  catch {
+    $c->log->warn("Token/User validation : $_");
+    $c->stash->{expose_stash}{error} = 'Unauthorized';
+    $c->forward('View::JSON');
+    $c->response->status(401);
+    return;
+  } or return;
+
+  unless ($user->has_role('role2')) {
+    $c->log->warn("Insufficient roles");
+    $c->stash->{expose_stash}{error} = 'Forbidden';
+    $c->forward('View::JSON');
+    $c->response->status(403);
+    return;
+  }
+
+  $c->stash->{expose_stash}{user_login} = $user->login;
+  $c->forward('View::JSON');
 }
 
 # ----------------------

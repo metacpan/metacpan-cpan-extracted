@@ -1,0 +1,7 @@
+Makefile.PL
+README
+Changes
+lib/CGI/Session/Driver/mariadb.pm
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

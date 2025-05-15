@@ -11,6 +11,12 @@ if($@) {
   done_testing();
   exit 0;
 }
+elsif(Math::MPFR::MPFR_VERSION_MAJOR() < 4) {
+  is(1,1);
+  warn "Skipping tests because Math::MPFR is too old\n";
+  done_testing();
+  exit 0;
+}
 else {
   my $q = mpfr2mpq(Math::MPFR->new(0.625));
   cmp_ok("$q", 'eq', '5/8', "conversion from 0.625 is correct");

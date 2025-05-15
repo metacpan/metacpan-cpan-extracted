@@ -55,4 +55,14 @@ is( table( rows => [
 </table>
 EOS
 
+is( table( rows => [ [ 'TD11', '0' ],
+                 ] ), <<'EOS', 'cell is "0"' );
+<table>
+<tbody>
+<tr><td>TD11</td><td>0</td></tr>
+</tbody>
+</table>
+EOS
+
+
 done_testing;

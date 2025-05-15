@@ -14,4 +14,8 @@ is($list->data, 100000);
 
 is($list->prev->data, 99999);
 
+$list->destroy();
+
+is($list->data, undef);
+
 done_testing();

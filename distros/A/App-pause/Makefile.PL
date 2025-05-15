@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::pause",
   "PREREQ_PM" => {
     "Complete::Bash" => "0.333",
+    "Data::Sah" => "0.917",
     "Getopt::Long::EvenLess" => "0.111",
     "Getopt::Long::Subcommand" => "0.102",
     "JSON::PP" => 0,
@@ -50,7 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.661",
+  "VERSION" => "0.662",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Bash" => "0.333",
+  "Data::Sah" => "0.917",
   "File::Spec" => 0,
   "Getopt::Long::EvenLess" => "0.111",
   "Getopt::Long::Subcommand" => "0.102",

@@ -2,8 +2,8 @@ NAME
     App::pause - A CLI for PAUSE
 
 VERSION
-    This document describes version 0.661 of App::pause (from Perl
-    distribution App-pause), released on 2025-02-24.
+    This document describes version 0.662 of App::pause (from Perl
+    distribution App-pause), released on 2025-05-15.
 
 DESCRIPTION
     See included script pause.

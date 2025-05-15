@@ -1,0 +1,4 @@
+Revision history for CGI::Session::Driver::mariadb
+
+0.01  2025-05-14 
+    - Initial release.

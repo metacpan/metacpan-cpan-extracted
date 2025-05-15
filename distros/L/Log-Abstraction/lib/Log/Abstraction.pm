@@ -17,11 +17,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 =head1 SYNOPSIS
 
@@ -171,10 +171,14 @@ sub new {
 		# Determine script name
 		$args{'script_name'} = File::Basename::basename($ENV{'SCRIPT_NAME'} || $0);
 
-		croak(__PACKAGE__, ' syslog needs to know the script name') if(!defined($args{'script_name'}));
+		croak("$class: syslog needs to know the script name") if(!defined($args{'script_name'}));
 	}
 
-	if(!defined($args{logger})) {
+	if(defined(my $logger = $args{logger})) {
+		if(Scalar::Util::blessed($logger) && (ref($logger) eq __PACKAGE__)) {
+			croak("$class: attempt to encapulate ", __PACKAGE__, ' as a logging class, that would add a needless indirection');
+		}
+	} else {
 		# Default to Log4perl
 		# FIXME: add default minimum logging level
 		Log::Log4perl->easy_init($args{verbose} ? $Log::Log4perl::DEBUG : $Log::Log4perl::ERROR);
@@ -207,6 +211,11 @@ sub _log {
 	# Push the message to the internal messages array
 	push @{$self->{messages}}, { level => $level, message => join('', grep defined, @messages) };
 
+	my $class = blessed($self) || '';
+	if($class eq __PACKAGE__) {
+		$class = '';
+	}
+
 	if(my $logger = $self->{logger}) {
 		if(ref($logger) eq 'CODE') {
 			# If logger is a code reference, call it with log details
@@ -224,36 +233,51 @@ sub _log {
 		} elsif(ref($logger) eq 'HASH') {
 			if($logger->{'file'}) {
 				if(open(my $fout, '>>', $logger->{'file'})) {
-					print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
+					print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
 						die "ref($self): Can't write to ", $logger->{'file'}, ": $!";
 					close $fout;
 				}
 			}
 			if(my $fout = $logger->{'fd'}) {
-				print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
+				print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
 					die "ref($self): Can't write to file descriptor: $!";
+			} elsif((!$logger->{'file'}) && (!$logger->{'syslog'})) {
+				croak(ref($self), ": Don't know how to deal with the $level message");
 			}
 		} elsif(!ref($logger)) {
 			# If logger is a file path, append the log message to the file
 			if(open(my $fout, '>>', $logger)) {
-				print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n";
+				print $fout uc($level),
+					"> $class ",
+					(caller(1))[1],
+					' (',
+					(caller(1))[2],
+					'): ',
+					join('', @messages), "\n";
 				close $fout;
 			}
 		} elsif(Scalar::Util::blessed($logger) && ($logger->can($level))) {
 			# If logger is an object, call the appropriate method on the object
 			# The test is because Log::Log4perl doesn't understand notice()
 			$logger->$level(@messages);
+		} else {
+			croak(ref($self), ": Don't know how to deal with the $level message");
 		}
 	}
 	if($self->{'file'}) {
 		if(open(my $fout, '>>', $self->{'file'})) {
-			print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
-				die "ref($self): Can't write to ", $self->{'file'}, ": $!";
+			if(blessed($self) eq __PACKAGE__) {
+				print $fout uc($level), '> ', (caller(1))[1], '(', (caller(1))[2], ') ', join('', @messages), "\n" or
+					die "ref($self): Can't write to ", $self->{'file'}, ": $!";
+			} else {
+				print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], '(', (caller(1))[2], ') ', join('', @messages), "\n" or
+					die "ref($self): Can't write to ", $self->{'file'}, ": $!";
+			}
 			close $fout;
 		}
 	}
 	if(my $fout = $self->{'fd'}) {
-		print $fout uc($level), ': ', blessed($self) || __PACKAGE__, ' ', (caller(1))[1], (caller(1))[2], ' ', join('', @messages), "\n" or
+		print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
 			die "ref($self): Can't write to file descriptor: $!";
 	}
 }

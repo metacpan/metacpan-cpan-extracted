@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Base;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
@@ -682,6 +682,42 @@ sub _set_types_from_default {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub setup_from_record {
+    my ( $self, $data ) = @_;
+
+    # if fields has not been set yet, set it to the names in the data
+    $self->_set_fields( [ keys %$data ] )
+      unless $self->has_fields;
+
+    # make sure there are no duplicate output fields
+    my %dups;
+    $dups{$_}++ && error( fields => "duplicate output field: $_" ) for @{ $self->fields };
+
+    if ( $self->has_default_type ) {
+        $self->_set_types_from_default;
+    }
+    else {
+        $self->_set_types_from_record( $data );
+    }
+
+    # trigger building of output_types, which also remaps types. ick.
+    $self->output_types;
+
+}
+
 1;
 
 #
@@ -706,7 +742,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 
@@ -766,7 +802,7 @@ The value passed to the constructor (if any).
 =head2 C<format>
 
 If true, format the output fields using the formats specified in the
-C<format_fields> and/or C<format_types> options.  The default is false.
+C<format_fields> and/or C<format_types> options.  The default is true.
 
 =head1 METHODS
 
@@ -902,6 +938,18 @@ everything that's not C<STRING>
 The fully resolved mapping between output field name and output field type.  If the
 encoder has specified a type map, the output types are the result of
 that mapping.  This is only valid after the first record has been sent.
+
+=head2 setup_from_record
+
+  $self->setup_from_record( $record );
+
+Finalize field names and types from a record.  This routine is
+automatically called on the initial call to the B<send> method, but
+may be explicitly called I<prior> to sending the first record
+if the caller needs information about fields.
+
+It is an expensive no-op if called multiple times or called after
+the first record is sent.
 
 =head1 INTERNALS
 

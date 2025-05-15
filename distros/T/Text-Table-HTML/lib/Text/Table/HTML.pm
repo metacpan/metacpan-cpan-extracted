@@ -5,13 +5,22 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-13'; # DATE
+our $DATE = '2025-05-15'; # DATE
 our $DIST = 'Text-Table-HTML'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
-    HTML::Entities::encode_entities(shift);
+    my $val = shift;
+    # encode_entities change 0 (false) to empty string so we need to filter the
+    # value first
+    if (!defined $val) {
+        "";
+    } elsif (!$val) {
+        "$val";
+    } else {
+        HTML::Entities::encode_entities($val);
+    }
 }
 
 sub table {
@@ -176,7 +185,7 @@ sub table {
                 # any cell in the row has it set. once the attribute is set,
                 # no need to do the check again.
                 $bottom_border //=
-                  ( $bottom_border_rows || $cell->{bottom_border} || undef )
+                  ($bottom_border_rows // $cell->{bottom_border})
                   && " class=has_bottom_border";
 
                 if ( defined $cell->{raw_html} ) {
@@ -232,7 +241,7 @@ sub table {
     push @table, "</tbody>\n" if $needs_tbody_open || $needs_tbody_close;
     push @table, "</table>\n";
 
-    return join( "", grep { $_ } @table );
+    return join( "", @table );
 }
 
 1;
@@ -251,7 +260,7 @@ Text::Table::HTML - Generate HTML table
 
 =head1 VERSION
 
-This document describes version 0.011 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2024-06-13.
+This document describes version 0.012 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2025-05-15.
 
 =head1 SYNOPSIS
 
@@ -483,7 +492,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

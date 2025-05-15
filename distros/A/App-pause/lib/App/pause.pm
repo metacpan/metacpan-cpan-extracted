@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-24'; # DATE
+our $DATE = '2025-05-15'; # DATE
 our $DIST = 'App-pause'; # DIST
-our $VERSION = '0.661'; # VERSION
+our $VERSION = '0.662'; # VERSION
 
 our %cli_attrs = do {
     my $p = '/WWW/PAUSE/Simple/';
@@ -48,7 +48,7 @@ App::pause - A CLI for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.661 of App::pause (from Perl distribution App-pause), released on 2025-02-24.
+This document describes version 0.662 of App::pause (from Perl distribution App-pause), released on 2025-05-15.
 
 =head1 DESCRIPTION
 

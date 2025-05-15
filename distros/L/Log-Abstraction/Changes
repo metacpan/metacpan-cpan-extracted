@@ -1,9 +1,17 @@
 Revision history for Log-Abstraction
 
-0.12
+0.13	Wed May 14 08:30:53 EDT 2025
+	Use '>' after level rather than ':' to files, like lower level loggers
+	Try not to put the name of this package in the logfiles,
+		it adds nothing apart from disc usage
+	Block setting logger => Log::Abstraction in new()
+	Croak if we don't know how to handle a message
+
+0.12	Fri May  9 07:42:35 EDT 2025
 	Added the file parameter, so that both file and syslog can now be given,
 		and file can be read in from a configuration file
 	Added the fd descriptor - a file descriptor to log to
+	Added separators between fields in file output
 
 0.11	Wed May  7 15:37:37 EDT 2025
 	Fixed calling can() on an unblessed variable

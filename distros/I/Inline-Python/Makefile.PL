@@ -310,12 +310,6 @@ sub special_non_windows_check_shared_static_libs {
 
     if (shared_lib_priority($ref)) {
         $ref->{libpython} = $ref->{ldlib};
-        my $shared_lib = File::Spec->catfile($ref->{libpath}, $ref->{libpython});
-        if (!-f $shared_lib) {
-            # Special case for pyenv. The shared library exists in $LIBDIR instead of in
-            #   $LIBPL
-            $ref->{libpath} = get_config_var($ref, "LIBDIR");
-        }
         $ref->{rpath} = $ref->{libpath};
     }
     else {
@@ -340,9 +334,14 @@ sub special_non_windows_check_shared_static_libs {
                         . "WARNING: This is known to not work on linux.\n";
                 }
             }
-            $ref->{libpath} = get_config_var($ref, "LIBDIR");
             $ref->{libpython} = $ref->{ldlib};
-            $ref->{rpath} = $ref->{libpath};
+            my $shared_lib = File::Spec->catfile($ref->{libpath}, $ref->{libpython});
+            if (!-f $shared_lib) {
+                $ref->{libpath} = get_config_var($ref, "LIBDIR");
+            }
+            else {
+                $ref->{rpath} = $ref->{libpath};
+            }
         }
     }
 }
@@ -362,6 +361,9 @@ sub shared_lib_priority {
 
 sub check_static_library_ok {
     my ($ref) = @_;
+
+    my $static_lib = File::Spec->catfile($ref->{libpath}, $ref->{libpython});
+    return 0 if (!-f $static_lib);
 
     # We should check if the static library was compiled with -fPIC, or else
     #  we cannot create a shared Python.so from it.
@@ -493,6 +495,18 @@ sub get_config_var {
     return $val;
 }
 
+sub get_default_python_lib_index {
+  my $r_found_libs=shift;
+
+  # Avoid limited API libraries (ABI), which are versionned with 1 digit only
+  # (cf https://docs.python.org/3/c-api/stable.html)
+  for my $i (0..$#{$r_found_libs}) {
+    return ($i+1) if($r_found_libs->[$i] =~ /python\d\.?\d[^\/\\]+$/i);
+  }
+  
+  return 1;
+}
+
 sub query_options {
     my $ref = shift;
 
@@ -517,7 +531,8 @@ END
 	Here are the libraries I know about:
 END
     my @libs = show_python_libs($ref);
-    my $lib = prompt("Which? Or enter another.", '1');
+    my $defaultLibIndex = $^O eq 'MSWin32' ? get_default_python_lib_index(\@libs) : 1;
+    my $lib = prompt("Which? Or enter another.", $defaultLibIndex);
     $lib = $libs[$lib-1] if $lib =~ /^\d+$/;
     $lib =~ s|\\|/|g;
     my ($volume, $directories, $file) = File::Spec->splitpath( $lib );

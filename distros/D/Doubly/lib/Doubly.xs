@@ -475,3 +475,15 @@ find(self, cb)
 		RETVAL = _find(self, cb);
 	OUTPUT:
 		RETVAL
+
+void
+destroy(self, ...)
+	Doubly self
+	CODE:
+		Doubly next;
+		while ( self->prev != NULL ) {
+			next = self->prev;
+			_remove(ST(0), self);
+			self = next;
+		}
+		_remove(ST(0), self);

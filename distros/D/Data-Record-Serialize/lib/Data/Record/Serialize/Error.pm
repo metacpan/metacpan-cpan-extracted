@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 use Exporter::Shiny qw( error );
 
@@ -103,7 +103,7 @@ Data::Record::Serialize::Error - Error objects
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 

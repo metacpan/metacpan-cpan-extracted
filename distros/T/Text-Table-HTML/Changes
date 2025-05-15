@@ -1,3 +1,9 @@
+0.012   2025-05-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix rendering false values (GH#4, GH#5). Thanks DJERIUS, Mike
+          Edwards.
+
+
 0.011   2024-06-13  Released-By: PERLANCAR; Urgency: medium
 
         [TABLE ELEMENT]

@@ -1,4 +1,10 @@
 Changes for Catalyst-Plugin-OIDC distribution
 
+0.02 2025-05-14
+  - Bump dependency on OIDC::Client v0.08
+  - Removed dependency on Test::WWW::Mechanize::Catalyst
+  - Added tests
+  - Version number from dist.ini
+
 0.01 2025-02-10
   - The plugin is extracted from the OIDC-Client distribution for dependency reasons

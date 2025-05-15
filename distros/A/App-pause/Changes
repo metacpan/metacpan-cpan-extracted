@@ -1,3 +1,8 @@
+0.662   2025-05-15  Released-By: PERLANCAR; Urgency: high
+
+        - Add missing dependency: Data::Sah (GH#3).
+
+
 0.661   2025-02-24  Released-By: PERLANCAR; Urgency: medium
 
         - Derp, typo.
