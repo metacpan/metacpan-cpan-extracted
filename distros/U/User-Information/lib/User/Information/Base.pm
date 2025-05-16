@@ -21,7 +21,7 @@ use User::Information::Source;
 
 use Carp;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 use constant {
     PATH_LOCAL_SYSAPI   => User::Information::Path->new([qw(local sysapi)]),
@@ -35,7 +35,7 @@ my %_types = (
     store       => 'File::FStore',
 );
 
-my %_aux_sources = map {$_ => 1} qw(User::Information::Source::Aggregate User::Information::Source::Tagpool);
+my %_aux_sources = map {$_ => 1} qw(User::Information::Source::Aggregate User::Information::Source::Tagpool User::Information::Source::Defaults);
 
 
 sub attach {
@@ -79,7 +79,8 @@ sub get {
     unless (defined $values) {
         $info //= eval { $self->_key_info($key) };
         if (defined($info)) {
-            my $loadpath = $info->{loadpath} // $key->_hashkey;
+            my $loadpath = $info->{loadpath} // $key;
+            $loadpath = $loadpath->_hashkey;
             unless ($self->{loaded}{$loadpath}) {
                 $self->{loaded}{$loadpath} = 1;
 
@@ -259,7 +260,11 @@ sub _new {
     if (!$self->{sources}{'User::Information::Source::XDG'} && defined(my $username = $self->get(['aggregate', 'username'], default => undef))) {
         $self->_load('User::Information::Source::XDG', username => $username);
     }
-    $self->_load('User::Information::Source::Tagpool');
+    if ($self->_is_local) {
+        $self->_load('User::Information::Source::Git');
+        $self->_load('User::Information::Source::Tagpool');
+    }
+    $self->_load('User::Information::Source::Defaults');
 
     croak 'No matching data sources found for type/request' unless scalar(grep {!$_aux_sources{$_}} keys %{$self->{sources}});
 
@@ -334,7 +339,7 @@ User::Information::Base - generic module for extracting information from user ac
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

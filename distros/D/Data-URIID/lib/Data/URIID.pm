@@ -23,7 +23,9 @@ use Data::Identifier;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.16;
+use parent 'Data::Identifier::Interface::Known';
+
+our $VERSION = v0.17;
 
 my %names = (
     service => {
@@ -365,31 +367,17 @@ sub _ua {
 
 
 sub known {
-    my ($self, $class, %opts) = @_;
-    my @list;
+    my ($pkg, $class, %opts) = @_;
+    $opts{extractor} //= $pkg if ref $pkg;
+    return $pkg->SUPER::known($class, %opts);
+}
 
-    if ($class eq ':all') {
-        foreach my $c (keys %names) {
-            push(@list, values %{$names{$c}});
-        }
-    } else {
-        @list = values %{$names{$class // ''} // croak 'Invalid class'};
-    }
-
-    # Experimental in v0.10, therefore not yet listed in POD.
-    if (defined(my $as = $opts{as})) {
-        if ($as eq 'ise') {
-            # no-op
-        } elsif ($as eq 'uuid') {
-            foreach my $e (@list) {
-                croak 'Cannot return requested data: as=uuid not supported on all elements of list. Try as=ise' unless $e =~ Data::URIID::Result->RE_UUID;
-            }
-        } elsif ($as eq 'Data::Identifier') {
-            @list = map {Data::Identifier->new(ise => $_)} @list;
-        }
-    }
-
-    return @list;
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+    return ([map {values %{$_}} values %names], rawtype => 'uuid') if $class eq ':all';
+    return ([values %{$names{$class}}], rawtype => 'uuid') if defined $names{$class};
+    croak 'Unsupported class';
 }
 
 
@@ -409,6 +397,7 @@ sub name_to_ise {
 
 sub ise_to_name {
     my ($self, $class, $ise) = @_;
+    $ise = $ise->Data::Identifier::as('ise') if ref $ise;
     return $ises{$class // ''}{$ise // ''} // croak 'Invalid class or ISE';
 }
 
@@ -467,6 +456,37 @@ sub match_services {
     return grep {$selected{$_}} keys %selected;
 }
 
+sub _register_service {
+    my ($pkg, $id, %opts) = @_;
+    state $dyn = 0;
+    my $name = 'x_dyn_'.$dyn++;
+    my $uuid;
+
+    $id = Data::Identifier->new(from => $id, (defined $opts{displayname} ? (displayname => $opts{displayname}) : ()));
+    $uuid = $id->uuid;
+
+    $id->register;
+
+    if (defined(my $displayname = $id->displayname(default => undef, no_defaults => 1))) {
+        if ($displayname =~ /^[a-z][0-9a-z-]*[0-9a-z]$/) {
+            $name .= '_'.$displayname;
+        }
+    }
+
+    foreach my $class (keys %ises) {
+        if (exists $ises{$class}{$uuid}) {
+            croak 'Service already in existance. (Bug in user of Data::URIID?)';
+        }
+    }
+
+    $names{service}{$name} = $uuid;
+    $ises{service}{$uuid}  = $name;
+
+    Data::URIID::Result->_register_service($name, %opts);
+
+    return $name => $id;
+}
+
 
 1;
 
@@ -482,7 +502,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -516,6 +536,8 @@ In order to do so, an extractor (instance of this package) is created.
 On that extractor L</lookup> is called for every input to process resulting in a L<Data::URIID::Result> object holding the acquired knowledge.
 
 The module supports both online and offline lookups. See L</online>.
+
+This package inherits from L<Data::Identifier::Interface::Known>.
 
 =head1 METHODS
 
@@ -655,7 +677,9 @@ See also L<"new">.
 
 =head2 known
 
-    my @list = $extractor->known( $class );
+    my @list = $extractor->known( $class [, %opts ] );
+    # or:
+    my @list = Data::URIID->known( $class [, %opts ] );
 
 Returns a list of known items of a class.
 Not all items may have the same level of support by this module.
@@ -663,7 +687,8 @@ Class is one of C<service>, C<type>, C<action>, or C<:all>.
 If the class is given as C<:all> this module will return the lists for all classes
 but may also return additional entries known to it.
 
-This method will return an array of ISEs if successful or C<die> otherwise.
+This implements L<Data::Identifier::Interface::Known/known>. See there for details.
+If called on an instance of this module C<extractor> is automatically filled in the options.
 
 =head2 name_to_ise
 
@@ -684,6 +709,8 @@ Class is one of C<service>, C<type>, or C<action>.
 
 This method will return a name if successful or C<die> otherwise.
 This is the reverse of L<"name_to_ise">.
+
+If C<$ise> is a blessed object it is tried to be converted to a plain ISE via L<Data::Identifier/as> (since v0.17).
 
 =head2 is_ise
 

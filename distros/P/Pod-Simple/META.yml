@@ -41,5 +41,5 @@ resources:
   homepage: https://metacpan.org/pod/Pod::Simple
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl-pod/pod-simple.git
-version: '3.46'
+version: '3.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

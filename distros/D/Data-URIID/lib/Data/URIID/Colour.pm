@@ -15,9 +15,9 @@ use overload '""' => \&rgb;
 use Carp;
 use Scalar::Util qw(weaken blessed);
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
-use parent 'Data::URIID::Base';
+use parent qw(Data::URIID::Base Data::Identifier::Interface::Known);
 
 my %_registered;
 
@@ -35,6 +35,15 @@ sub new {
 
             if ($from->isa(__PACKAGE__)) {
                 $opts{rgb} //= $from->rgb;
+            } elsif ($from->isa('Data::Identifier')) {
+                if (!defined($opts{rgb}) && eval {$from->generator->eq('55febcc4-6655-4397-ae3d-2353b5856b34')}) {
+                    if (defined(my $v = $from->request)) {
+                        if ($v =~ /^#[0-9a-fA-F]{6}$/) {
+                            $opts{rgb} //= $v;
+                        }
+                    }
+                }
+                $from = $from->ise;
             } else {
                 $from = $from->ise;
             }
@@ -65,6 +74,13 @@ sub rgb {
     return $self->{rgb} // croak 'No RGB value';
 }
 
+
+sub known {
+    my ($pkg, $class, %opts) = @_;
+    $opts{extractor} //= $pkg->extractor(default => undef) if ref $pkg;
+    return $pkg->SUPER::known($class, %opts);
+}
+
 # --- Overrides for Data::URIID::Base ---
 
 sub ise {
@@ -81,6 +97,14 @@ sub ise {
 sub displayname {
     my ($self, %opts) = @_;
     return $self->SUPER::displayname(%opts, _fallback => $self->rgb);
+}
+
+# --- Overrides for Data::URIID::Base ---
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+    return ([keys %_registered], rawtype => 'ise') if $class eq ':all';
+    croak 'Unsupported class';
 }
 
 # ---- Private helpers ----
@@ -105,7 +129,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -115,7 +139,7 @@ version v0.16
 
 This module represents a single colour.
 
-This package inherits from L<Data::URIID::Base>.
+This package inherits from L<Data::URIID::Base>, and L<Data::Identifier::Interface::Known> (experimental).
 
 =head1 METHODS
 
@@ -143,7 +167,8 @@ The provider might be used to fill defaults for the other options (such as C<rgb
 
 Currently the value must be one of
 L<Data::URIID::Colour>,
-or L<Data::URIID::Result>.
+L<Data::URIID::Result>, or
+L<Data::Identifier> (only supported for some objects, including those generated with L<Data::Identifier::Generate/colour>).
 But other types might also be supported.
 
 If using L<Data::URIID::Result> this might not be what you want. See also L<Data::URIID::Result/displaycolour>.
@@ -156,6 +181,23 @@ If using L<Data::URIID::Result> this might not be what you want. See also L<Data
 
 Returns the colour in six digit hex notation with prepended pound (C<#>) if successful or C<die> otherwise.
 The returned value is suitable for use in CSS.
+
+=head2 known
+
+    my @list = Data::URIID::Colour->known($class [, %opts ]);
+    # or:
+    my @list = $colour->known($class [, %opts ]);
+
+(B<experimental>, since v0.17)
+
+Returns the list of known objects for the given C<$class>.
+Currently no specific classes are supported, so the only valid value is C<:all>.
+See L<Data::Identifier::Interface::Known/known> for details.
+
+If called on a instance of this package C<extractor> is filled in automatically if one is known by this instance.
+
+B<Note:>
+This is an experimental feature! It may be removed or altered at any future version!
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for Test-MockFile
 
+0.037   4/15/2025
+- Fix unit test broken in perl 5.41.4
+
 0.036   7/26/2023
 - GH #181 - Detect incorrect usage of add_strict_rule_for_command
 

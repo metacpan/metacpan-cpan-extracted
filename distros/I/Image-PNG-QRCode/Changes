@@ -1,5 +1,9 @@
 Revision history for CPAN module Image::PNG::QRCode
 
+0.11 2025-05-16
+
+* Note this module is abandoned
+
 0.10 2018-10-18
 
 * Update libpng detection to newer version

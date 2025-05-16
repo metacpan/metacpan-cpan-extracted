@@ -19,12 +19,12 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
     RE_OID  => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
-    RE_URI  => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+/,
+    RE_URI  => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+:/,
     RE_UINT => qr/^(?:0|[1-9][0-9]*)$/,
     RE_QID  => qr/^[QPL][1-9][0-9]*$/,
     RE_DOI  => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
@@ -838,7 +838,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

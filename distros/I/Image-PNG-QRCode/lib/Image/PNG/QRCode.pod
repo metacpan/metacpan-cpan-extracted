@@ -3,7 +3,14 @@
 
 =head1 NAME
 
-Image::PNG::QRCode - make a PNG image containing a QR code from text
+Image::PNG::QRCode - ABANDONED - Make PNG images containing QR codes from your text
+
+=head1 ABANDONED
+
+This module doesn't compile any more on my system. Fixing the problems
+will take more time than I have available, so it is abandoned, and bug
+reports against the module will be closed without any further
+response.
 
 =head1 SYNOPSIS
 
@@ -13,22 +20,22 @@ Image::PNG::QRCode - make a PNG image containing a QR code from text
     
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.10/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.11/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Image::PNG::QRCode version 0.10
-corresponding to git commit L<f2b7e71f95a93a455dcffd4677a7487f3c086f22|https://github.com/benkasminbullock/image-png-qrcode/commit/f2b7e71f95a93a455dcffd4677a7487f3c086f22> released on Thu Oct 18 13:16:51 2018 +0900.
+This documents Image::PNG::QRCode version 0.11
+corresponding to git commit L<147e504525acbdce8d49e533578e99cdc2250b1d|https://github.com/benkasminbullock/image-png-qrcode/commit/147e504525acbdce8d49e533578e99cdc2250b1d> released on Fri May 16 09:32:07 2025 +0900.
 
 =head1 DESCRIPTION
 
-This module converts input text to a PNG image of a QR code containing
+This module converts your text to a PNG image of a QR code containing
 the text. The PNG image can either be stored to a file or it can be a
 scalar.
 
-Image::PNG::Libpng requires "libpng" to be installed. "libpng" should
-already be installed on most Linux and Windows systems.
+Image::PNG::Libpng requires the PNG standard library "libpng" to be
+installed. "libpng" is usually already installed on Linux and Windows.
 
 =head1 FUNCTIONS
 
@@ -36,15 +43,15 @@ already be installed on most Linux and Windows systems.
 
     my $png = qrpng (text => 'this is my text');
 
-This makes a scalar PNG data in C<$png> containing the QR code PNG.    
-    
+This makes a scalar C<$png> containing the QR code PNG data.
+
     qrpng (in => 'file.txt', out => 'file.png');
 
 This makes a PNG file F<file.png> from the contents of F<file.txt>.
 
 =head3 qrpng options
 
-The function takes the following options.
+This function takes the following options.
 
 =over
 
@@ -52,27 +59,30 @@ The function takes the following options.
 
     qrpng (text => 'this is my text');
 
-Text to convert to a QR code.
+The text you want to convert to a QR code.
 
 =item in
 
     qrpng (in => 'file.txt');
 
-C<in> specifies an input file of text to convert to a QR code. If you
-specify both C<text> and C<in>, the module prints a warning message
-and uses the contents of C<in>, overwriting the value of C<text>.
+Specify a file of text to convert to a QR code. 
+
+If you specify both L</text> and C<in>, the module prints a warning
+message and uses the contents of C<in>, overwriting the value of
+C<text>.
 
 =item out
 
-C<out> specifies an output file or a scalar to put the PNG data into.
+Specify an output file to put the PNG data into. With a scalar
+argument,
 
      qrpng (out => 'file.png');
 
-writes to F<file.png>, but
+writes to F<file.png>, but with a scalar reference,
 
      qrpng (out => \$s);
 
-writes the PNG data into a scalar C<$s>.
+writes the PNG data into the scalar C<$s>.
 
 =item version
 
@@ -80,10 +90,12 @@ writes the PNG data into a scalar C<$s>.
 
 C<version> specifies the "version" of the QR code. The "version" is
 the "size" of the barcode, which controls the amount of information it
-can contain. The maximum value of "version" is 40. If no version is
-specified, the program chooses one using the length of the text. If
-you choose a version which is too small for the input data, a fatal
-error occurs. Usually it isn't necessary to set this parameter.
+can contain. The maximum value of "version" is 40. 
+
+If no version is specified, the program chooses one using the length
+of the text. If you choose a version which is too small for the input
+data, a fatal error occurs. Usually it isn't necessary to set this
+parameter.
 
 =item level
 
@@ -101,21 +113,23 @@ one or greater than four cause a fatal error.
 C<quiet> is a non-negative integer which specifies the size of the
 "quiet zone", the white area around the QR code, in units of
 "modules", the size of one black square of the QR code. The default is
-4 modules. The QR specification requires a minimum of a four-module
+four modules. The QR specification requires a minimum of a four-module
 quiet zone, but you could set this to zero if, for example, you are
 going to embed the image in a white background, so it's not an error
 to set this lower. There is an arbitrary upper limit of 100
-imposed. Note that changing this size makes little difference to the
-output PNG's size because it's just a white area which is compressed
-to take little room.
+imposed. 
+
+Note that changing this size makes little difference to the output
+PNG's size because it's just a white area which is compressed to take
+little room.
 
 =item scale
 
     qrpng (in => 'in.txt', out => 'out.png', scale => 9);
 
 C<scale> is a positive integer which specifies how many pixels one
-"module" (one block of the QR code) occupies. The default is 3. You
-can't use fractional values. An arbitrary upper limit of 100 is
+"module" (one square block of the QR code) occupies. The default is
+3. You can't use fractional values. An arbitrary upper limit of 100 is
 imposed.
 
 =item size
@@ -188,7 +202,7 @@ option unspecified.
 
 There is a script "qrpng" installed with the module:
 
-    qrpng "earphone pad" 
+    qrpng "earphone pad"
 
 makes F<qrcode.png>. Try
 
@@ -212,7 +226,7 @@ This example makes a data URL QR code:
     print "<img src='$u'>\n";
 
 
-(This example is included as L<F<qrpng-data.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.10/examples/qrpng-data.pl> in the distribution.)
+(This example is included as L<F<qrpng-data.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.11/examples/qrpng-data.pl> in the distribution.)
 
 
 =head2 qrpng CGI script
@@ -276,7 +290,7 @@ user's input.
     }
 
 
-(This example is included as L<F<qrpng.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.10/examples/qrpng.pl> in the distribution.)
+(This example is included as L<F<qrpng.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.11/examples/qrpng.pl> in the distribution.)
 
 
 =head1 SEE ALSO
@@ -379,9 +393,19 @@ However, sending these large JavaScript files over the internet will
 use much more bandwidth than sending the QR codes themselves, for most
 usage cases.
 
+=item Project Nayuki QR Code generator library
+
+L<Project Nayuki QR Code generator
+library|https://www.nayuki.io/page/qr-code-generator-library> contains
+an online JavaScript QR code generator and links to implementations in
+C, C++, Java, JavaScript, Python, and Rust.
+
 =back
 
 =head1 BUGS
+
+This section details some deficiencies of the module, and is probably
+only of interest to people who want to contribute to development.
 
 The QR code PNG files are very small and various tricks are used to
 make the memory use and the PNG file very small. Although the original
@@ -397,7 +421,7 @@ down everything for each image.
 The QR encoding is not checked for correctness. The QR code library
 comes from the "qrduino" project, but the contents have been worked on
 so it's not clear whether it's still correct. Also there was a bug in
-the original thing leading to reading uninitialized memory.
+the original qrduino leading to reading uninitialized memory.
 
 This encoder doesn't support the "shift-JIS" format. UTF-8 seems to
 pass through it OK. It doesn't use a BOM for the UTF-8.
@@ -409,10 +433,9 @@ The QR codes have only been checked by using two Android smartphones.
 The QR code creation part (the contents of F<qrencode.c> in the
 distribution) is copyright 2010, Tom Zerucha,
 L<https://github.com/tz1>. The rest of the module is copyright by Ben
-Bullock 2015-2017.
+Bullock 2015-2018.
 
 This Perl module is licensed under the GNU General Public License
 version 3.
 
 =cut
-

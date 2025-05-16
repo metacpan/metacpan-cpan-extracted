@@ -1,0 +1,49 @@
+Geo::CheapRuler
+
+A collection of very fast approximations to common geodesic measurements. Useful for performance-sensitive code that measures things on a city scale (less than 500km, not near the poles). Can be an order of magnitude faster than Haversine based methods.
+
+A Perl port of Mapbox's cheap-ruler v4.0.0 https://github.com/mapbox/cheap-ruler
+
+Very fast as they use just 1 trig function per call.
+
+The Maths model is based upon the Earth's actual shape (a squashed sphere). For 'city' scale work, it is more accurate than
+the Haversine formulae (which uses several trig calls based upon a spherical Earth). The Cheap\_Ruler Github page explains it better!
+
+See:
+	
+	https://github.com/aavmurphy/CheapRuler/REAME.md
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Geo::CheapRuler
+	https://github.com/aavmurphy/CheapRuler
+	https://github.com/mapbox/cheap-ruler
+
+You can also look for information at:
+
+    Issues
+        https://github.com/aavmurphy/CheapRuler/issues
+		https://github.com/mapbox/cheap-ruler/issues
+
+LICENSE AND COPYRIGHT
+
+The original software is (c) Mapbox
+
+This port is Copyright (c) 2025 by Andrew Murphy.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

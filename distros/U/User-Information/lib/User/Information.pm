@@ -14,6 +14,8 @@ use warnings;
 use Carp;
 use Data::Identifier;
 
+use parent qw(Data::Identifier::Interface::Known);
+
 use constant {
     SPECIAL_ME          => [],
     SPECIAL_LOCAL_NODE  => Data::Identifier->new(uuid => '081c3899-cc4f-4cbd-9590-c90d1321e24c')->register,
@@ -29,7 +31,7 @@ use constant PATH_ELEMENT_TYPE   => Data::Identifier->new(
 
 use User::Information::Base;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 
 #@returns User::Information::Base
@@ -61,6 +63,18 @@ sub local_node {
     return state $local_node = $self->lookup(from => SPECIAL_LOCAL_NODE, %opts);
 }
 
+
+# ---- Private helpers ----
+sub _known_provider {
+    my ($self, $class, %opts) = @_;
+
+    croak 'Unsupported options passed' if scalar(keys %opts);
+
+    return [SPECIAL_LOCAL_NODE, PATH_ELEMENT_NS, PATH_ELEMENT_TYPE], rawtype => 'Data::Identifier' if $class eq ':all';
+
+    croak 'Unknown class';
+}
+
 1;
 
 __END__
@@ -75,7 +89,7 @@ User::Information - generic module for extracting information from user accounts
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -84,6 +98,8 @@ version v0.01
     my User::Information::Base $result = User::Information->me;
 
 This module allows extracting information on user accounts.
+
+This package inherits from L<Data::Identifier::Interface::Known>.
 
 =head1 METHODS
 

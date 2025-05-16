@@ -39,7 +39,7 @@ is( opendir( my $notdir_fh, $temp_notdir ), undef,   "opendir on a file returns 
 is( $! + 0,                                 ENOTDIR, '$! numeric is right.' );
 
 my ( $real_fh, $f3 ) = tempfile( DIR => $temp_dir );
-like( warning { readdir($real_fh) }, qr/^readdir\(\) attempted on invalid dirhandle \$fh/, "We only warn if the file handle or glob is invalid." );
+like( warning { readdir($real_fh) }, qr/^readdir\(\) attempted on (?:invalid dir)?handle \$fh/, "We only warn if the file handle or glob is invalid." );
 
 note "-------------- MOCK MODE --------------";
 my $abc = Test::MockFile->file( "$temp_dir/abc", 'hello' );

@@ -30,7 +30,7 @@ use constant {
     DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
 };
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 
@@ -301,9 +301,9 @@ sub read_as_simple_tree {
 
 
 sub read_as_taglist {
-    state $tagpool_source_format = Data::Identifier->new(uuid => 'e5da6a39-46d5-48a9-b174-5c26008e208e', displayname => 'tagpool-source-format');
-    state $tagpool_taglist_format_v1 = Data::Identifier->new(uuid => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa', displayname => 'tagpool-taglist-format-v1');
-    state $tagpool_httpd_htdirectories_format = Data::Identifier->new(uuid => '25990339-3913-4b5a-8bcf-5042ef6d8b5e', displayname => 'tagpool-httpd-htdirectories-format');
+    state $tagpool_source_format              = Data::Identifier->new(uuid => 'e5da6a39-46d5-48a9-b174-5c26008e208e', displayname => 'tagpool-source-format')->register;
+    state $tagpool_taglist_format_v1          = Data::Identifier->new(uuid => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa', displayname => 'tagpool-taglist-format-v1')->register;
+    state $tagpool_httpd_htdirectories_format = Data::Identifier->new(uuid => '25990339-3913-4b5a-8bcf-5042ef6d8b5e', displayname => 'tagpool-httpd-htdirectories-format')->register;
     my ($self) = @_;
     my %list;
     my $format;
@@ -400,7 +400,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

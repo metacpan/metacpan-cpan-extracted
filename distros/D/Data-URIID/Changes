@@ -1,3 +1,8 @@
+v0.17  2025-05-15Z
+    - Implement Data::Identifier::Interface::Known in Data::URIID
+    - Improved support for Data::Identifier in Data::URIID::Colour
+    - Implement Data::Identifier::Interface::Known in Data::URIID::Colour (experimental)
+
 v0.16  2025-04-20Z
     - Improved Barcode support
     - Removed UUID::Tiny as dependency

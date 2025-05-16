@@ -9,7 +9,8 @@ use Test::EOL;
 my @files = (
     'lib/URN/OASIS/SAML2.pm',
     't/00-compile.t',
-    't/01-basic.t'
+    't/01-basic.t',
+    't/02-nameids.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

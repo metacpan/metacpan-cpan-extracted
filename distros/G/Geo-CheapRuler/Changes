@@ -1,0 +1,8 @@
+Revision history for CheapRuler
+
+0.01	2025-04-15
+
+Port of mapbox/cheap-ruler v4.0.0
+Passes the original's test.
+Getting the perldoc and module setup correct... 
+

@@ -63,10 +63,12 @@ my %exports = (
     NAMEID_X509_SUBJECT_NAME             => $saml1_1 . 'nameid-format:X509SubjectName',
     NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME => $saml1_1 . 'nameid-format:WindowsDomainQualifiedName',
 
-    NAMEID_FORMAT_ENTITY => $saml2 . 'nameid-format-entity',
+    NAMEID_FORMAT_ENTITY => $saml2 . 'nameid-format:entity',
+    NAMEID_KERBEROS      => $saml2 . 'nameid-format:kerberos',
     NAMEID_TRANSIENT     => $saml2 . 'nameid-format:transient',
     NAMEID_PERSISTENT    => $saml2 . 'nameid-format:persistent',
     NAMEID_DEFAULT       => $saml1_1 . 'nameid-format:unspecified',
+    NAMEID_ENTITY        => $saml2 . 'nameid-format:entity',
 
     STATUS_AUTH_FAILED    => $saml2 . 'status:AuthnFailed',
     STATUS_REQUESTER      => $saml2 . 'status:Requester',
@@ -77,7 +79,6 @@ my %exports = (
 );
 
 my @exports = sort keys %exports;
-
 is(@URN::OASIS::SAML2::EXPORT_OK, @exports, "We export all our things");
 
 

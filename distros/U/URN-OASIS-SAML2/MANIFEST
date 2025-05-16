@@ -12,6 +12,7 @@ cpanfile
 lib/URN/OASIS/SAML2.pm
 t/00-compile.t
 t/01-basic.t
+t/02-nameids.t
 xt/author/distmeta.t
 xt/author/eol.t
 xt/author/minimum-version.t

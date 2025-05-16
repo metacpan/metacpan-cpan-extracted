@@ -1,3 +1,7 @@
+v0.15  2025-05-15Z
+    - Fixed generator and request storage on well known tags
+    - Made validation of URIs stricter
+
 v0.14  2025-05-07Z
     - Added Data::Identifier::Interface::Userdata (still experimental)
     - Updated tests

@@ -14,7 +14,6 @@
 */
 
 #include <assert.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -22,16 +21,20 @@
 
 #ifdef HEADER
 
-typedef struct qr {
+typedef struct qr 
+{
     char * input;
     int input_length;
     unsigned level;
     unsigned version;
     unsigned char * strinbuf;
     unsigned char * qrframe;
+    /* The output modules. */
     unsigned char *framebase;
+    /* The mask which covers the timing pattern, corners, etc. */
     unsigned char *framask;
     unsigned char *rlens;
+    /* Width of QR code. */
     unsigned char  WD;
     unsigned char WDB;
     unsigned char neccblk1;
@@ -43,7 +46,7 @@ typedef struct qr {
 }
 qr_t;
 
-#define QRBIT(f,x,y) ( ( qr->f[((x)>>3) + (y) * qr->WDB] >> (7-((x) & 7 ))) & 1 )
+#define QRBIT(f,x,y) ((qr->f[((x)>>3) + (y) * qr->WDB] >> (7-((x) & 7 ))) & 1 )
 
 #define QR_MINIMUM_VERSION 1
 #define QR_MAXIMUM_VERSION 40
@@ -72,17 +75,22 @@ static void setmask(qr_t * qr, unsigned char x, unsigned char y)
     qr->framask[bt >> 3] |= 0x80 >> (bt & 7);
 }
 
+/* Put the three 7x7 finder patterns on the three corners. */
+
 static void putfind(qr_t * qr)
 {
     unsigned char j, i, k, t;
     for (t = 0; t < 3; t++) {
+	/* Y offset */
         k = 0;
+	/* X offset */
         i = 0;
         if (t == 1)
             k = (qr->WD - 7);
         if (t == 2)
             i = (qr->WD - 7);
         SETQRBIT(framebase,i + 3, k + 3);
+	/* Outer black rectangle */
         for (j = 0; j < 6; j++) {
             SETQRBIT(framebase,i + j, k);
             SETQRBIT(framebase,i, k + j + 1);
@@ -103,6 +111,8 @@ static void putfind(qr_t * qr)
         }
     }
 }
+
+/* put the alignment patterns */
 
 static void putalign(qr_t * qr, int x, int y)
 {
@@ -170,15 +180,18 @@ static void putvpat(qr_t * qr)
     verinfo = vpat[vers - 7];
 
     bc = 17;
-    for (x = 0; x < 6; x++)
-        for (y = 0; y < 3; y++, bc--)
+    for (x = 0; x < 6; x++) {
+        for (y = 0; y < 3; y++, bc--) {
             if (1 & (bc > 11 ? vers >> (bc - 12) : verinfo >> bc)) {
                 SETQRBIT(framebase,5 - x, 2 - y + qr->WD - 11);
                 SETQRBIT(framebase,2 - y + qr->WD - 11, 5 - x);
-            } else {
+            }
+	    else {
                 setmask(qr, 5 - x, 2 - y + qr->WD - 11);
                 setmask(qr, 2 - y + qr->WD - 11, 5 - x);
             }
+	}
+    }
 }
 
 void initframe(qr_t * qr)
@@ -215,21 +228,25 @@ void initframe(qr_t * qr)
     for (y = 0; y < 7; y++)
         setmask(qr,8, y + qr->WD - 7);
     // timing
-    for (x = 0; x < qr->WD - 14; x++)
+    for (x = 0; x < qr->WD - 14; x++) {
         if (x & 1) {
             setmask(qr,8 + x, 6);
             setmask(qr,6, 8 + x);
-        } else {
+        }
+	else {
             SETQRBIT(framebase,8 + x, 6);
             SETQRBIT(framebase,6, 8 + x);
         }
-
+    }
     // version block
     putvpat(qr);
-    for (y = 0; y < qr->WD; y++)
-        for (x = 0; x <= y; x++)
-            if (QRBIT(framebase,x, y))
+    for (y = 0; y < qr->WD; y++) {
+        for (x = 0; x <= y; x++) {
+            if (QRBIT(framebase,x, y)) {
                 setmask(qr,x, y);
+	    }
+	}
+    }
 }
 
 static void freeframe(qr_t * qr)
@@ -288,6 +305,7 @@ unsigned initecc(qr_t * qr)
 {
     assert (qr->version >= QR_MINIMUM_VERSION &&
 	    qr->version <= QR_MAXIMUM_VERSION);
+    assert (qr->level >= QR_MINIMUM_LEVEL && qr->level <= QR_MAXIMUM_LEVEL);
 
     qr->WD = 17 + 4 * qr->version;
     qr->WDB = (qr->WD + 7) / 8;
@@ -300,7 +318,6 @@ unsigned initecc(qr_t * qr)
     qr->qrframe = malloc (fsz);
     assert (qr->qrframe);
 
-    assert (qr->level >= QR_MINIMUM_LEVEL && qr->level <= QR_MAXIMUM_LEVEL);
 
     unsigned eccindex = (qr->level - 1) * 4 + (qr->version - 1) * 16;
 
@@ -467,6 +484,7 @@ static void stringtoqr (qr_t * qr)
         qr->strinbuf[0] = 0x40 | (size >> 4);
     }
     i = size + 3 - (qr->version < 10);
+    // Byte padding
     while (i < max) {
         qr->strinbuf[i++] = 0xec;
         // buffer has room        if (i == max)            break;
@@ -505,10 +523,12 @@ static void stringtoqr (qr_t * qr)
 
 }
 
-//========================================================================
-// Frame data insert following the path rules
+// Returns 1 or 0 depending on whether x, y is masked by corners,
+// timing stuff, etc.
+
 static unsigned char ismasked(qr_t * qr, unsigned char x, unsigned char y)
 {
+    // The bit of framask corresponding to x, y
     unsigned bt;
     if (x > y) {
         bt = x;
@@ -533,7 +553,7 @@ static void fillframe(qr_t * qr)
     ffdecy = 1;                 // up, minus
     ffgohv = 1;
 
-    /* inteleaved data and ecc codes */
+    /* interleaved data and ecc codes */
     for (i = 0; i < ((qr->datablkw + qr->eccblkwid) * (qr->neccblk1 + qr->neccblk2) + qr->neccblk2); i++) {
         d = qr->strinbuf[i];
         for (j = 0; j < 8; j++, d <<= 1) {
@@ -580,26 +600,29 @@ static void fillframe(qr_t * qr)
     }
 }
 
-//========================================================================
-// Masking 
+// Apply the mask specified by "m" to "qr".
+
 static void applymask(qr_t * qr, unsigned char m)
 {
     unsigned char x, y, r3x, r3y;
 
     switch (m) {
     case 0:
+	/* Chessboard 1x1 */
         for (y = 0; y < qr->WD; y++)
             for (x = 0; x < qr->WD; x++)
                 if (!((x + y) & 1) && !ismasked(qr, x, y))
                     TOGQRBIT(qrframe,x, y);
         break;
     case 1:
+	/* Horizontal stripes, 1 module wide */
         for (y = 0; y < qr->WD; y++)
             for (x = 0; x < qr->WD; x++)
                 if (!(y & 1) && !ismasked(qr,x, y))
                     TOGQRBIT(qrframe,x, y);
         break;
     case 2:
+	/* Vertical stripes, 1, 2 modules wide. */
         for (y = 0; y < qr->WD; y++)
             for (r3x = 0, x = 0; x < qr->WD; x++, r3x++) {
                 if (r3x == 3)
@@ -609,6 +632,7 @@ static void applymask(qr_t * qr, unsigned char m)
             }
         break;
     case 3:
+	/* Diagonal stripes. */
         for (r3y = 0, y = 0; y < qr->WD; y++, r3y++) {
             if (r3y == 3)
                 r3y = 0;
@@ -621,6 +645,7 @@ static void applymask(qr_t * qr, unsigned char m)
         }
         break;
     case 4:
+	/* Chessboard 3x2 squares */
         for (y = 0; y < qr->WD; y++)
             for (r3x = 0, r3y = ((y >> 1) & 1), x = 0; x < qr->WD; x++, r3x++) {
                 if (r3x == 3) {
@@ -632,6 +657,7 @@ static void applymask(qr_t * qr, unsigned char m)
             }
         break;
     case 5:
+	/* Squares with crosses in the centre */
         for (r3y = 0, y = 0; y < qr->WD; y++, r3y++) {
             if (r3y == 3)
                 r3y = 0;
@@ -644,6 +670,7 @@ static void applymask(qr_t * qr, unsigned char m)
         }
         break;
     case 6:
+	/* Fancy-pants pattern */
         for (r3y = 0, y = 0; y < qr->WD; y++, r3y++) {
             if (r3y == 3)
                 r3y = 0;
@@ -656,6 +683,7 @@ static void applymask(qr_t * qr, unsigned char m)
         }
         break;
     case 7:
+	/* Fancy-pants diagonal stripes */
         for (r3y = 0, y = 0; y < qr->WD; y++, r3y++) {
             if (r3y == 3)
                 r3y = 0;
@@ -672,9 +700,13 @@ static void applymask(qr_t * qr, unsigned char m)
 }
 
 // Badness coefficients.
+// Penalty for five-module linear run of the same colour
 static const unsigned char N1 = 3;
+// Penalty for 2x2 blocks of the same colour.
 static const unsigned char N2 = 3;
+// Penalty for false finder pattern
 static const unsigned char N3 = 40;
+// Penalty for monochrome
 static const unsigned char N4 = 10;
 
 static unsigned badruns(qr_t * qr, unsigned char length)
@@ -698,6 +730,8 @@ static unsigned badruns(qr_t * qr, unsigned char length)
             runsbad += N3;
     return runsbad;
 }
+
+/* Return penalty for "qr". */
 
 static int badcheck(qr_t * qr)
 {
@@ -755,12 +789,18 @@ static int badcheck(qr_t * qr)
 
 // final format bits with mask
 // level << 3 | mask
+
+/* Precomputed format bits for various masks and error correction
+   levels. */
+
 static const unsigned fmtword[] = {
     0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976,     //L
     0x5412, 0x5125, 0x5e7c, 0x5b4b, 0x45f9, 0x40ce, 0x4f97, 0x4aa0,     //M
     0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed,     //Q
     0x1689, 0x13be, 0x1ce7, 0x19d0, 0x0762, 0x0255, 0x0d0c, 0x083b,     //H
 };
+
+/* Add the format bits to the image in qr. */
 
 static void addfmt(qr_t * qr, unsigned char masknum)
 {
@@ -788,6 +828,8 @@ static void addfmt(qr_t * qr, unsigned char masknum)
         }
 }
 
+/* Access point of file. */
+
 void qrencode(qr_t * qr)
 {
     unsigned mindem = 30000;
@@ -803,6 +845,7 @@ void qrencode(qr_t * qr)
     // Inisde loop to avoid having separate mask buffer
     fillframe(qr);
     memcpy(qr->strinbuf, qr->qrframe, qrsize);
+    /* Find the best mask for qr. */
     for (i = 0; i < 8; i++) {
         applymask(qr,i);           // returns black-white imbalance
         badness = badcheck(qr);
@@ -818,7 +861,8 @@ void qrencode(qr_t * qr)
 	// redo best mask - none good enough, last wasn't best
         applymask(qr,best);
     }
-    addfmt(qr,best);               // add in final format bytes
+    // add in final format bytes
+    addfmt(qr,best);
 }
 
 void qrfree (qr_t * qr)

@@ -1,5 +1,9 @@
 Revision history for Geo::Location::IP
 
+0.005  2025-05-16 07:07:42 CEST
+
+  - Fix the database type assertion. Reported by Chad Wallace.
+
 0.004  2025-04-25 03:33:45 CEST
 
   - Fix the check for private IP addresses. Reported by klebom.

@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #define PNG_SKIP_SETJMP_CHECK
 #include <png.h>
@@ -9,7 +8,8 @@
 
 #ifdef HEADER
 
-typedef struct qrpng {
+typedef struct qrpng
+{
     /* Size of a module in pixels. */
     unsigned int scale;
     /* Size of the quietzone in modules. */
@@ -28,7 +28,8 @@ typedef struct qrpng {
 }
 qrpng_t;
 
-typedef enum qrpng_status {
+typedef enum qrpng_status
+{
     qrpng_ok,
     qrpng_bad_scale,
     qrpng_bad_quietzone,
@@ -170,5 +171,3 @@ qrpng_free (qrpng_t * qrpng)
     free (qrpng->row_pointers);
     return qrpng_ok;
 }
-
-

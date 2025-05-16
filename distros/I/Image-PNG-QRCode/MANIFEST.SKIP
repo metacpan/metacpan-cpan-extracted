@@ -15,3 +15,5 @@ MYMETA..*
 ^examples/.*-out\.txt$
 .*\.tmpl$
 ^xt/.*\.t$
+^copied/.*$
+^\.(travis|appveyor)\.yml$

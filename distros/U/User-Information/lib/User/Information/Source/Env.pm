@@ -15,7 +15,7 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 # ---- Private helpers ----
 
@@ -56,7 +56,7 @@ User::Information::Source::Env - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

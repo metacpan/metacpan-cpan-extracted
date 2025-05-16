@@ -1,10 +1,10 @@
 {
-   "abstract" : "make a PNG image containing a QR code from text",
+   "abstract" : "ABANDONED - Make PNG images containing QR codes from your text",
    "author" : [
-      "Ben Bullock <bkb@cpan.org>"
+      "Ben Bullock <benkasminbullock@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006001"
+            "perl" : "5.008001"
          }
       }
    },
@@ -47,6 +47,6 @@
          "web" : "https://github.com/benkasminbullock/image-png-qrcode"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

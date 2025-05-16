@@ -18,11 +18,11 @@ use File::ValueFile::Simple::Reader;
 use User::Information::Base;
 use User::Information::Path;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_typeinfo = (
     (map {$_ => 'bool'}             qw(directory-add-analyze file-on-unlink-to-tag pool-lazy-cache-reload pool-lazy-store-reload httpd-reuse-address)),
-    (map {$_ => 'filename'}         qw(httpd-htdirectories httpd-htpasswd httpd-ng-webdir httpd-ng-webdir-assets httpd-webdir httpd-webdir-assets pool-path tags-package-dir tags-universal-dir)),
+    (map {$_ => 'filename'}         qw(httpd-htdirectories httpd-htpasswd httpd-ng-webdir httpd-ng-webdir-assets httpd-webdir httpd-webdir-assets pool pool-path tags-package-dir tags-universal-dir)),
     (map {$_ => 'Data::Identifier'} qw(pool-uuid)),
 );
 
@@ -56,7 +56,7 @@ sub _discover {
             my ($v, $type) = _cast($global{$key}, $key);
 
             push(@info, {
-                    path => User::Information::Path->new($root => [global => $key]),
+                    path => User::Information::Path->new($root => [global => config => $key]),
                     values => {$type => $v},
                     rawtype => $type,
                 });
@@ -70,7 +70,7 @@ sub _discover {
             if (defined $hash) {
                 %{$hash} = (%global, %{$hash});
                 if (defined(my $uuid = $hash->{'pool-uuid'})) {
-                    my $path = User::Information::Path->new($root => [pool => Data::Identifier->new(uuid => $uuid)]);
+                    my $path = User::Information::Path->new($root => [pool => Data::Identifier->new(uuid => $uuid) => 'config']);
 
                     $pools{$uuid} = $poolpath;
 
@@ -123,7 +123,7 @@ User::Information::Source::Tagpool - generic module for extracting information f
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

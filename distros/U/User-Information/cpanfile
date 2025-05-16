@@ -3,14 +3,14 @@
 
 requires "Carp" => "1.35";
 requires "Data::Identifier" => "v0.14.0";
-requires "File::BaseDir" => "0.09";
-requires "File::HomeDir" => "1.006";
-requires "File::Spec" => "3.84";
+requires "File::BaseDir" => "0.07";
+requires "File::HomeDir" => "1.00";
+requires "File::Spec" => "3.6301";
 requires "File::ValueFile::Simple::Reader" => "v0.6.0";
-requires "List::Util" => "1.62";
-requires "POSIX" => "2.03";
-requires "Scalar::Util" => "1.62";
-requires "Sys::Hostname" => "1.24";
+requires "List::Util" => "1.47";
+requires "POSIX" => "1.65";
+requires "Scalar::Util" => "1.47";
+requires "Sys::Hostname" => "1.20";
 requires "perl" => "v5.20.0";
 
 on 'test' => sub {

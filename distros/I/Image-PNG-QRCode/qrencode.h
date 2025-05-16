@@ -7,17 +7,21 @@ cfunctions qrencode.c
 #ifndef CFH_QRENCODE_H
 #define CFH_QRENCODE_H
 
-#line 9 "qrencode.c"
-typedef struct qr {
+#line 8 "qrencode.c"
+typedef struct qr 
+{
     char * input;
     int input_length;
     unsigned level;
     unsigned version;
     unsigned char * strinbuf;
     unsigned char * qrframe;
+    /* The output modules. */
     unsigned char *framebase;
+    /* The mask which covers the timing pattern, corners, etc. */
     unsigned char *framask;
     unsigned char *rlens;
+    /* Width of QR code. */
     unsigned char  WD;
     unsigned char WDB;
     unsigned char neccblk1;
@@ -28,25 +32,25 @@ typedef struct qr {
     unsigned initialized : 1;
 }
 qr_t;
-#define QRBIT(f,x,y) ( ( qr->f[((x)>>3) + (y) * qr->WDB] >> (7-((x) & 7 ))) & 1 )
+#define QRBIT(f,x,y) ((qr->f[((x)>>3) + (y) * qr->WDB] >> (7-((x) & 7 ))) & 1 )
 #define QR_MINIMUM_VERSION 1
 #define QR_MAXIMUM_VERSION 40
 #define QR_MINIMUM_LEVEL 1
 #define QR_MAXIMUM_LEVEL 4
 
-#line 152 "qrencode.c"
+#line 161 "qrencode.c"
 void initframe (qr_t* qr);
 
-#line 255 "qrencode.c"
+#line 268 "qrencode.c"
 unsigned initecc (qr_t* qr);
 
-#line 289 "qrencode.c"
+#line 302 "qrencode.c"
 unsigned initeccsize (qr_t* qr);
 
-#line 757 "qrencode.c"
+#line 794 "qrencode.c"
 void qrencode (qr_t* qr);
 
-#line 790 "qrencode.c"
+#line 829 "qrencode.c"
 void qrfree (qr_t* qr);
 
 #endif /* CFH_QRENCODE_H */

@@ -52,11 +52,18 @@ subtest 'deep nested merge' => sub {
 	};
 	my $conf = Config::Abstraction->new(data => $b);
 
-	my $merged = $conf->merge_defaults(defaults => $a, deep => 1);
+	my $merged = $conf->merge_defaults(defaults => $a, merge => 1, deep => 1);
 
-	# is $merged->{outer}{inner}{setting1}, 'yes', 'retains original setting1';
+	is($merged->{outer}{inner}{setting1}, 'yes', 'retains original setting1');
 	is($merged->{outer}{inner}{setting2}, 'maybe', 'overrides setting2');
 	is($merged->{outer}{inner}{setting3}, 'sure', 'adds setting3');
+
+	$merged = $conf->merge_defaults(defaults => $a, deep => 1);
+
+	isnt($merged->{outer}{inner}{setting1}, 'yes', 'loses original setting1');
+	is($merged->{outer}{inner}{setting2}, 'maybe', 'overrides setting2');
+	is($merged->{outer}{inner}{setting3}, 'sure', 'adds setting3');
+
 };
 
 done_testing();

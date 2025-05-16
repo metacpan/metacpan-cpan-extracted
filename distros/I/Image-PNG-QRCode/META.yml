@@ -1,13 +1,13 @@
 ---
-abstract: 'make a PNG image containing a QR code from text'
+abstract: 'ABANDONED - Make PNG images containing QR codes from your text'
 author:
-  - 'Ben Bullock <bkb@cpan.org>'
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.006001'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/benkasminbullock/image-png-qrcode/issues
   repository: git://github.com/benkasminbullock/image-png-qrcode.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

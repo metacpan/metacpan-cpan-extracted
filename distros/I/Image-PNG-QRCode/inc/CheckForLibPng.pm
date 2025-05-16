@@ -5,6 +5,8 @@
 #  \____|_| |_|\___|\___|_|\_\ |_|  \___/|_|    |_|_|_.__/| .__/|_| |_|\__, |
 #                                                         |_|          |___/ 
 #
+# Repository: https://github.com/benkasminbullock/check4libpng
+#
 # This file lives in ~/projects/check4libpng/lib and should be copied
 # from there.
 #
@@ -94,8 +96,19 @@ sub find_program
 
 sub check_for_libpng
 {
-    if ($_[0]) {
+    my (%options) = @_;
+    if ($options{verbose}) {
 	$verbose = 1;
+    }
+    if ($options{prefix}) {
+	$png_include_dir = "$options{prefix}/include";
+	if (! -d $png_include_dir) {
+	    die "$png_include_dir doesn't exist";
+	}
+	$png_lib_dir = "$options{prefix}/lib";
+	if (! -d $png_lib_dir) {
+	    die "$png_lib_dir doesn't exist";
+	}
     }
 
     msg ("Debugging messages in 'check_for_libpng' are switched on");
@@ -116,25 +129,31 @@ sub check_for_libpng
 
     my $libs = '-lpng -lz -lm';
     if ($png_lib_dir) {
-	$libs = "-L $png_lib_dir $libs";
+	$libs = "-L$png_lib_dir $libs";
     }
-    my $has_pkg_config = find_program ('pkg-config', $verbose);
-    if ($has_pkg_config) {
-	msg ('I found "pkg-config" in your PATH so I am going to use that to help with the compilation of the C part of this module.');
-	my $pkg_config_cflags = `pkg-config --cflags libpng`;
-	$pkg_config_cflags =~ s/\s+$//;
-	my $pkg_config_ldflags = `pkg-config --libs libpng`;
-	$pkg_config_ldflags =~ s/\s+$//;
-	if ($pkg_config_cflags) {
-	    msg ("Adding '$pkg_config_cflags' to C compiler flags from pkg-config");
-	    $inc = "$inc $pkg_config_cflags";
-	}
-	if ($pkg_config_ldflags) {
-	    msg ("Adding '$pkg_config_ldflags' to linker flags from pkg-config");
-	    $libs = "$pkg_config_ldflags $libs";
+    if ($options{prefix}) {
+	if ($verbose) {
+	    print "Overriding library and include directories with $options{prefix}.\n";
 	}
     }
-
+    else {
+	my $has_pkg_config = find_program ('pkg-config', $verbose);
+	if ($has_pkg_config) {
+	    msg ('I found "pkg-config" in your PATH so I am going to use that to help with the compilation of the C part of this module.');
+	    my $pkg_config_cflags = `pkg-config --cflags libpng`;
+	    $pkg_config_cflags =~ s/\s+$//;
+	    my $pkg_config_ldflags = `pkg-config --libs libpng`;
+	    $pkg_config_ldflags =~ s/\s+$//;
+	    if ($pkg_config_cflags) {
+		msg ("Adding '$pkg_config_cflags' to C compiler flags from pkg-config");
+		$inc = $pkg_config_cflags;
+	    }
+	    if ($pkg_config_ldflags) {
+		msg ("Adding '$pkg_config_ldflags' to linker flags from pkg-config");
+		$libs = $pkg_config_ldflags;
+	    }
+	}
+    }
     # A minimal C program to test compilation and running.
 
     my $test_c = <<'EOF';
@@ -200,7 +219,10 @@ EOF
 	print $output $test_c;
 	close $output
             or die "Error closing file '$c_file_name': $!";
-	my $compile = "$cc $ccflags $inc -o $exe_file_name $c_file_name $ldflags $libs";
+	if ($options{prefix}) {
+	    $libs .= " -Wl,--rpath -Wl,$png_lib_dir ";
+	}
+	my $compile = "$cc $inc $ccflags -o $exe_file_name $c_file_name $libs $ldflags ";
 	msg ("The compile command is '$compile'");
 	$compile_ok = (system ($compile) == 0);
 	if ($compile_ok) {
@@ -285,6 +307,10 @@ EOF
     my %vals;
     $vals{libs} = $libs;
     $vals{inc} = $inc;
+    if ($verbose) {
+	print "libs = $vals{libs}\n";
+	print "inc = $vals{inc}\n";
+    }	
     return \%vals;
 }
 

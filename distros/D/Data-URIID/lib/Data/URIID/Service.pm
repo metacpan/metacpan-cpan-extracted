@@ -24,7 +24,7 @@ use Data::Identifier::Generate;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 use parent 'Data::URIID::Base';
 
@@ -711,6 +711,18 @@ sub setting {
     return $self->{setting}{$setting};
 }
 
+
+
+sub register_service {
+    my ($pkg, @args) = @_;
+    my ($name, $id) = Data::URIID->_register_service(@args);
+
+    $own_metadata{services}{$name} //= {};
+
+    if (defined(my $displayname = $id->displayname(default => undef, no_defaults => 1))) {
+        $own_metadata{services}{$name}{displayname} = {'*' => $displayname};
+    }
+}
 
 
 # Private helper:
@@ -1481,7 +1493,11 @@ sub _online_lookup__ruthede {
 
 sub displayname {
     my ($self, %opts) = @_;
-    return $self->name;
+    my $name = $self->name;
+    if (defined($own_metadata{services}{$name}) && defined(my $displayname = $own_metadata{services}{$name}{displayname}{'*'})) {
+        return $displayname;
+    }
+    return $name;
 }
 
 1;
@@ -1498,7 +1514,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -1549,6 +1565,150 @@ Setting an invalid value may result in failures when this service is being used.
 =over
 
 =item C<network_deny>: Denies network access (i.e. online lookups) for this service.
+
+=back
+
+=head2 register_service
+
+    use Data::URIID::Service;
+
+    Data::URIID::Service->register_service($id, %opts);
+
+(since v0.17, experimental)
+
+Registers a new service.
+
+B<Note:>
+This is an B<highly experimental> method. It may be changed or replaced, or removed with future versions.
+
+The service is identified by it's identifier C<$id> (likely a L<Data::Identifier> of type C<uuid>) which must be globally unique.
+The method will C<die> if it finds any problem with the identifier.
+
+B<Note:>
+The identifier given here identifies a specific service, not a type of service. So if there are more than one instances of a given service
+each must have it's own unique identifier.
+
+The following, all optional, options are supported:
+
+=over
+
+=item C<displayname>
+
+(experimental) Used as fallback displayname if C<$id> does not provide one in some cases.
+
+=item C<id_templates>
+
+An arrayref containing templates used to generate URIs from identifiers.
+
+=item C<digest_templates>
+
+An arrayref containing templates used to generate URIs from digests.
+
+=item C<id_patterns>
+
+An arrayref containing patterns used to extract identifiers from URIs.
+
+=back
+
+=head3 Templates
+
+Each template contains a hashref with the following keys:
+
+=over
+
+=item C<id_type>
+
+(only for id templates) A filter for identifier types. This works on the names of the identifier types (e.g. C<uuid>).
+
+=item C<digest>
+
+(only for digest templates) A filter for digest algorithm types. This works on the algorithm names in universal tag format (e.g. C<sha-1-160>).
+
+=item C<template>
+
+The actual template. This might be a single string in an undefined format or an instance of L<URI::Template> or L<URI::Template::Restrict>.
+
+=item C<filter>
+
+A filter that is applied to the value (the identifier or the digest value).
+
+=item C<action>
+
+A filter for which actions this template applies. This works on the names of the actions (e.g. C<info>).
+
+=item C<options>
+
+Additional template options. No options are currently defined by this documentation.
+
+=back
+
+=head4 Filter
+
+A filter in the sense of templates is a regex (quoted using C<qr//>), or an arrayref with exact values to match or a single string that is split into exact values using space and comma as seperator.
+
+=head4 Template variables
+
+The following variables are supported by templates (more may be supported):
+
+=over
+
+=item C<type>
+
+The type (identifier type name e.g. C<uuid> or digest algorithm name e.g. C<sha-3-512>).
+
+=item C<value>
+
+The identifier or digest value.
+
+=item C<id>
+
+The identifier.
+
+=item C<digest>
+
+The digest.
+
+=back
+
+=head3 Patterns
+
+Each pattern is a hashref with the following keys:
+
+=over
+
+=item C<scheme>
+
+(required) The URI scheme to match. E.g. C<https>.
+
+B<Note:>
+C<http> might be considered an invalid valid.
+
+=item C<host>
+
+(optional) The host to match as a string or regex (C<qr//>).
+
+=item C<path>
+
+(optional) The path to match as a string or rexgex (C<qr//>).
+
+=item C<type>
+
+(optional) The type of the identifier (e.g. C<uuid>).
+
+=item C<action>
+
+(optional) The action this matches (e.g. C<info>).
+
+=item C<match>
+
+A method (coderef) that is called to match the URI.
+
+The method is called with the L<Data::URIID::Result> as first argument, the URI (as L<URI>) as second argument, and this hashref (the pattern) as thrid.
+It must return a hash (not a hashref) containing at least an C<id> element.
+If a empty hash is returned a no-match condition is assumed.
+
+It must return an element C<id> that is a L<Data::Identifier> of the found match.
+It may also return an element C<action> that provides the name of the action.
 
 =back
 

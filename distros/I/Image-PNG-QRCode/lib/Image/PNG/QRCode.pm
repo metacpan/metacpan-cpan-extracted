@@ -8,7 +8,7 @@ require Exporter;
 use warnings;
 use strict;
 use Carp;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 require XSLoader;
 XSLoader::load ('Image::PNG::QRCode', $VERSION);
 

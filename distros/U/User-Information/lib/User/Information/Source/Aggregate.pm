@@ -15,24 +15,28 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_paths = (
     username    => [qw(posix/real_user/name     posix/user/name)],
-    fullname    => [qw(posix/fullname/real_user posix/fullname/user)],
+    fullname    => [qw(git/global/user/name posix/fullname/real_user posix/fullname/user)],
+    email       => [qw(git/global/user/email)],
     homedir     => [qw(xdg/homedir/home posix/real_user/dir posix/user/dir)],
     hostname    => [qw(localnodemisc/hostname posix/uname/nodename)],
-    displayname => [qw(aggregate/fullname aggregate/username aggregate/hostname)],
+    displayname => [qw(aggregate/fullname aggregate/username aggregate/email aggregate/hostname)],
 );
 
 my %_storage = (
     rw => {
         home        => [qw(aggregate/homedir)],
-        desktop     => [qw(xdg/homedir/desktop)],
-        documents   => [qw(xdg/homedir/documents)],
-        music       => [qw(xdg/homedir/music)],
-        pictures    => [qw(xdg/homedir/pictures)],
-        videos      => [qw(xdg/homedir/videos)],
+        desktop     => [qw(xdg/homedir/desktop      xdg/userdir/DESKTOP     xdg/defaultdir/DESKTOP)],
+        documents   => [qw(xdg/homedir/documents    xdg/userdir/DOCUMENTS   xdg/defaultdir/DOCUMENTS)],
+        music       => [qw(xdg/homedir/music        xdg/userdir/MUSIC       xdg/defaultdir/MUSIC)],
+        pictures    => [qw(xdg/homedir/pictures     xdg/userdir/PICTURES    xdg/defaultdir/PICTURES)],
+        videos      => [qw(xdg/homedir/videos       xdg/userdir/VIDEOS      xdg/defaultdir/VIDEOS)],
+        downloads   => [qw(                         xdg/userdir/DOWNLOAD    xdg/defaultdir/DOWNLOAD)],
+        templates   => [qw(                         xdg/userdir/TEMPLATES   xdg/defaultdir/TEMPLATES)],
+        publicshare => [qw(                         xdg/userdir/PUBLICSHARE xdg/defaultdir/PUBLICSHARE)],
         cache       => [qw(xdg/basedir/cache_home)],
         config      => [qw(xdg/basedir/config_home)],
     },
@@ -59,6 +63,30 @@ sub _load_paths {
 
     foreach my $source (@{$paths}) {
         eval {$base->get($source, default => [], list => 1)};
+        if (defined(my $values = $base->{data}{$source->_hashkey})) { # steal values!
+            return $values;
+        }
+    }
+
+    die;
+}
+
+sub _load_paths_nohome {
+    my ($base, $paths) = @_;
+    my $home = eval {$base->get([qw(aggregate homedir)], default => undef, as => 'filename')};
+
+    unless ($home) {
+        goto &_load_paths;
+    }
+
+    outer:
+    foreach my $source (@{$paths}) {
+        foreach my $c (eval {$base->get($source, default => [], list => 1, as => 'filename')}) {
+            if ($c eq $home) {
+                next outer;
+            }
+        }
+
         if (defined(my $values = $base->{data}{$source->_hashkey})) { # steal values!
             return $values;
         }
@@ -94,7 +122,7 @@ sub _discover {
             foreach my $dkey (keys %{$d}) {
                 push(@info, {
                         path => User::Information::Path->new($root => [storage => $key => $dir => $dkey]),
-                        loader => sub {_load_paths($_[0], $d->{$dkey})},
+                        loader => $key eq 'home' ? sub {_load_paths($_[0], $d->{$dkey})} : sub {_load_paths_nohome($_[0], $d->{$dkey})},
                     });
             }
         }
@@ -117,7 +145,7 @@ User::Information::Source::Aggregate - generic module for extracting information
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 SYNOPSIS
 
@@ -629,7 +629,43 @@ sub all
 =head2 merge_defaults
 
 Merge the configuration hash into the given hash.
-What's in the object will overwrite what's in the defaults hash.
+
+  package MyPackage;
+  use Params::Get;
+  use Config::Abstraction;
+
+  sub new
+  {
+    my $class = shift;
+
+    my $params = Params::Get::get_params(undef, \@_) || {};
+
+    if(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
+      $params = $config->merge_defaults(defaults => $params, merge => 1, section => $class);
+    }
+
+    return bless $params, $class;
+  }
+
+Options:
+
+=over 4
+
+=item * merge
+
+Usually what's in the object will overwrite what's in the defaults hash,
+if given,
+the result will be a combination of the hashes.
+
+=item * section
+
+Merge in that section from the configuration file.
+
+=item * deep
+
+Try harder to merge in all configuration from the global section of the configuration file.
+
+=back
 
 =cut
 
@@ -655,6 +691,9 @@ sub merge_defaults
 	}
 	if($section && $config->{$section}) {
 		$config = $config->{$section};
+	}
+	if($params->{'merge'}) {
+		return merge($config, $defaults);
 	}
 	return { %{$defaults}, %{$config} };
 }

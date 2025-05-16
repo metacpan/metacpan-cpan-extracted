@@ -61,6 +61,8 @@ This module provides constants which are in use by the SAML2 implementation.
     use URN::OASIS::SAML2 qw(:nameid);
     use URN::OASIS::SAML2 qw(
         NAMEID_EMAIL
+        NAMEID_ENTITY
+        NAMEID_KERBEROS
         NAMEID_TRANSIENT
         NAMEID_PERSISTENT
         NAMEID_UNSPECIFIED

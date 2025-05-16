@@ -7,8 +7,9 @@ cfunctions qrpng.c
 #ifndef CFH_QRPNG_H
 #define CFH_QRPNG_H
 
-#line 9 "qrpng.c"
-typedef struct qrpng {
+#line 8 "qrpng.c"
+typedef struct qrpng
+{
     /* Size of a module in pixels. */
     unsigned int scale;
     /* Size of the quietzone in modules. */
@@ -26,7 +27,8 @@ typedef struct qrpng {
     png_byte * quiet;
 }
 qrpng_t;
-typedef enum qrpng_status {
+typedef enum qrpng_status
+{
     qrpng_ok,
     qrpng_bad_scale,
     qrpng_bad_quietzone,
@@ -44,13 +46,13 @@ qrpng_status_t;
 #define QRPNG_MINIMUM_SCALE 1
 #define QRPNG_MAXIMUM_SCALE MAX_SCALE
 
-#line 34 "qrpng.c"
+#line 33 "qrpng.c"
 qrpng_status_t qrpng_make_png (qr_t* qr, qrpng_t* qrpng);
 
-#line 117 "qrpng.c"
+#line 116 "qrpng.c"
 qrpng_status_t qrpng_write (qrpng_t* qrpng);
 
-#line 136 "qrpng.c"
+#line 135 "qrpng.c"
 qrpng_status_t qrpng_free (qrpng_t* qrpng);
 
 #endif /* CFH_QRPNG_H */

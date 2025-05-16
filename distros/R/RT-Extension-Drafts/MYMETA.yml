@@ -1,0 +1,28 @@
+---
+abstract: 'Allow to save/load drafts in ticket replies/comments'
+author:
+  - 'Emmanuel Lacour, C<< <elacour at home-dn.net> >>'
+  - 'Emmanuel Lacour <elacour@home-dn.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.00, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RT-Extension-Drafts
+no_index:
+  directory:
+    - html
+    - inc
+    - po
+    - t
+requires: {}
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.home-dn.net/manu/RT-Extension-Drafts.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

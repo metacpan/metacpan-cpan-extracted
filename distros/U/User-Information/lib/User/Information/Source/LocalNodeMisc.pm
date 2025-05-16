@@ -16,7 +16,7 @@ use Sys::Hostname;
 
 use User::Information::Path;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 # ---- Private helpers ----
 
@@ -49,7 +49,7 @@ User::Information::Source::LocalNodeMisc - generic module for extracting informa
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

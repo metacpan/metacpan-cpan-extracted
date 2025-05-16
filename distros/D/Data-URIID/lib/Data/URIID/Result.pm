@@ -26,14 +26,16 @@ use Data::URIID::Service;
 use Data::URIID::Digest;
 
 use constant {
-    ISEORDER_UOR => ['uuid', 'oid', 'uri'],
-    ISEORDER_RUO => ['uri', 'uuid', 'oid'],
+    ISEORDER_UOR    => ['uuid', 'oid', 'uri'],
+    ISEORDER_RUO    => ['uri', 'uuid', 'oid'],
+    METATYPE_ID     => 'id',
+    METATYPE_DIGEST => 'digest',
 };
 
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 use parent 'Data::URIID::Base';
 
@@ -947,6 +949,7 @@ sub _lookup {
     foreach my $rule (@{$url_parser{$scheme}}) {
         my @res;
         my %found = map {$_ => $rule->{$_}} qw(source type id ise_order action);
+        my $ud;
 
         if (defined $rule->{host}) {
             next unless defined $host;
@@ -960,12 +963,17 @@ sub _lookup {
             next unless defined($path) && (@res = $path =~ $rule->{path});
         }
 
+        if (defined $rule->{prepare}) {
+            $ud = $rule->{prepare}->($self, $uri, $rule, \@res, \%found);
+            next unless defined $ud;
+        }
+
         foreach my $value (values %found) {
             if (my $ref = ref $value) {
                 if ($ref eq 'SCALAR') {
                     $value = uri_unescape($res[${$value} - 1]);
                 } elsif ($ref eq 'CODE') {
-                    $value = $value->($self, $uri, $rule, \@res);
+                    $value = $value->($self, $uri, $rule, \@res, $ud);
                 }
             }
         }
@@ -1308,7 +1316,7 @@ sub attribute {
         my $cache = ($self->{attributes_cache} //= {})->{$key} //= {};
         my $source_type;
 
-        $source_type = ref($value[0]) || ref($value) || $info->{source_type};
+        $source_type = ref($value[0]) || ref($value) || $info->{source_type} || 'raw';
         $as //= $source_type;
 
         if (ref($value) eq 'ARRAY' xor $opts{list}) {
@@ -1430,16 +1438,77 @@ sub available_keys {
 }
 
 
-sub _match_actions {
-    my ($self, $template, $opts) = @_;
-    my $template_actions = $template->[3];
-    my $action = $opts->{action};
+sub _match_list {
+    my ($self, $list, $value) = @_;
 
-    return 1 unless defined $template_actions;
-    return 1 unless defined $action;
+    return 1 unless defined $list;
+    return 1 unless defined $value;
 
-    return any {$_ eq $action} @{$template_actions};
+    {
+        my $ref = ref($list);
+        if (!$ref) {
+            $list = [split/\s*,\s*|\s+/, $list];
+        } elsif ($ref eq 'Regexp') {
+            return $value =~ $list;
+        }
+    }
 
+
+    return any {$_ eq $value} @{$list};
+
+    return undef;
+}
+
+#@returns URI
+sub _render_url_template {
+    my ($self, $metatype, $type, $value, $template, $opts, $base) = @_;
+    my %map = (%{$base // {}}, type => $type, value => $value);
+    my ($t_type, $t_template, $t_filter, $t_actions, $t_opts);
+    my $url;
+
+    if ($metatype eq METATYPE_ID) {
+        $map{id} = $value;
+        if (ref($template) eq 'ARRAY') {
+            # 0        1            2          3           4
+            ($t_type, $t_template, $t_filter, $t_actions, $t_opts) = @{$template};
+        }
+    } elsif ($metatype eq METATYPE_DIGEST) {
+        $map{digest} = $value;
+        if (ref($template) eq 'ARRAY') {
+            ($t_type, $t_template, $t_actions) = @{$template};
+        }
+    }
+
+    if (!defined($t_template) && ref($template) eq 'HASH') {
+        $t_type     = $template->{id_type} // $template->{digest} // $template->{type};
+        $t_template = $template->{template};
+        $t_filter   = $template->{filter};
+        $t_actions  = $template->{action};
+        $t_opts     = $template->{options};
+    }
+
+    return undef unless defined $t_template;
+    return undef unless $self->_match_list($t_type, $type);
+    return undef unless $self->_match_list($t_filter, $value);
+    return undef unless $self->_match_list($t_actions, $opts->{action});
+
+    if (blessed($t_template)) {
+        if ($t_template->can('process')) {
+            $url = $t_template->process(\%map);
+        } else {
+            return undef;
+        }
+    } elsif ($metatype eq METATYPE_ID) {
+        $t_opts //= {};
+        $url = sprintf($t_template, $t_opts->{no_escape} ? $map{value} : uri_escape_utf8($map{value}));
+    } elsif ($metatype eq METATYPE_DIGEST) {
+        $url = $t_template;
+        $url =~ s/%\{([a-z]+)(?:,([0-9]+)(?:,([0-9]+))?)?\}/uri_escape_utf8(substr($map{$1} || next, $2 || 0, $3 || 9999))/ge;
+    } else {
+        return undef;
+    }
+
+    return ref($url) ? $url : URI->new($url) if defined $url;
     return undef;
 }
 
@@ -1475,14 +1544,8 @@ sub url {
         my $id_type = $extractor->ise_to_name(type => $self->id_type);
 
         foreach my $template (@{$url_templates{$service} // []}) {
-            my $t_opts = $template->[4] // {};
-
-            next unless $id_type eq $template->[0];
-
-            next if defined($template->[2]) && $id !~ $template->[2];
-            next unless $self->_match_actions($template, \%opts);
-
-            return URI->new(sprintf($template->[1], $t_opts->{no_escape} ? $id : uri_escape_utf8($id)));
+            my URI $uri = $self->_render_url_template(METATYPE_ID, $id_type => $id, $template, \%opts);
+            return $uri if defined $uri;
         }
     }
 
@@ -1491,13 +1554,8 @@ sub url {
         #   0           1            2             3           4
         my ($t_id_type, $t_template, $t_id_filter, $t_actions, $t_opts) = @{$template};
         my $id = eval { $self->id($t_id_type) } // next;
-
-        $t_opts //= {};
-
-        next if defined($t_id_filter) && $id !~ $t_id_filter;
-        next unless $self->_match_actions($template, \%opts);
-
-        return URI->new(sprintf($t_template, $t_opts->{no_escape} ? $id : uri_escape_utf8($id)));
+        my URI $uri = $self->_render_url_template(METATYPE_ID, $t_id_type => $id, $template, \%opts);
+        return $uri if defined $uri;
     }
 
     if (defined($opts{action}) && $opts{action} eq 'info' && $service eq 'wikipedia') {
@@ -1538,18 +1596,10 @@ sub url {
 
         foreach my $digest ($self->available_keys('digest')) {
             my $value = $self->digest($digest, default => undef) // next;
-            my %map = (%base, digest => $value);
 
-            foreach my $tpl (@{$digest_url_templates{$service}}) {
-                my ($t_digest, $t_url, $t_actions) = @{$tpl};
-                my $url;
-                next unless $t_digest eq $digest;
-                next unless $self->_match_actions([undef, undef, undef, $t_actions], \%opts);
-
-                $url = $t_url;
-                $url =~ s/%\{([a-z]+)(?:,([0-9]+)(?:,([0-9]+))?)?\}/uri_escape_utf8(substr($map{$1} || next, $2 || 0, $3 || 9999))/ge;
-
-                return URI->new($url);
+            foreach my $template (@{$digest_url_templates{$service}}) {
+                my URI $uri = $self->_render_url_template(METATYPE_DIGEST, $digest => $value, $template, \%opts, \%base);
+                return $uri if defined $uri;
             }
         }
     }
@@ -1564,6 +1614,61 @@ sub url {
 
     return $opts{default} if exists $opts{default};
     croak 'Identifier does not generate a URL for the selected service';
+}
+
+sub _register_service__type {
+    my ($self, $uri, $rule, $res, $ud) = @_;
+    return $self->extractor->ise_to_name(type => $ud->{id}->type->uuid);
+}
+sub _register_service__id {
+    my ($self, $uri, $rule, $res, $ud) = @_;
+    return $ud->{id}->id;
+}
+sub _register_service__action {
+    my ($self, $uri, $rule, $res, $ud) = @_;
+    return $ud->{action};
+}
+
+sub _register_service {
+    my ($pkg, $service, %opts) = @_;
+
+    if (defined(my $id_templates = $opts{id_templates})) {
+        if (scalar(@{$id_templates})) {
+            my $url_templates = $url_templates{$service} //= [];
+            push(@{$url_templates}, @{$id_templates});
+        }
+    }
+
+    if (defined(my $digest_templates = $opts{digest_templates})) {
+        if (scalar(@{$digest_templates})) {
+            my $url_templates = $digest_url_templates{$service} //= [];
+            push(@{$url_templates}, @{$digest_templates});
+        }
+    }
+
+    if (defined(my $id_patterns = $opts{id_patterns})) {
+        foreach my $pattern (@{$id_patterns}) {
+            my $reg = {
+                source => $service,
+                (map {$_ => $pattern->{$_}} grep {defined $pattern->{$_}} qw(host path type action)),
+                prepare => sub {
+                    my ($self, $uri, $rule, $res, $found) = @_;
+                    my %res = $pattern->{match}->($self, $uri, $pattern);
+                    return undef unless keys %res;
+                    return \%res;
+                },
+            };
+
+            $reg->{type}    //= \&_register_service__type;
+            $reg->{id}      //= \&_register_service__id;
+            $reg->{action}  //= \&_register_service__action;
+
+            foreach my $scheme (map {split /\s*,\s*|\s+/} ref($pattern->{scheme}) ? @{$pattern->{scheme}} : $pattern->{scheme}) {
+                $scheme = 'https' if $scheme eq 'http';
+                push(@{$url_parser{$scheme} //= []}, $reg);
+            }
+        }
+    }
 }
 
 # Converters:
@@ -1675,7 +1780,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 

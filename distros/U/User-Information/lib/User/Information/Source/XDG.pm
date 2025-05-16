@@ -17,7 +17,9 @@ use File::BaseDir;
 
 use User::Information::Path;
 
-our $VERSION = v0.01;
+use constant PATH_HOMEDIR => User::Information::Path->new(['aggregate', 'homedir']);
+
+our $VERSION = v0.02;
 
 my @_homedir_keys = qw(home desktop documents music pictures videos data);
 
@@ -95,6 +97,28 @@ sub _discover {
         }
     }
 
+    {
+        my $basedir = File::BaseDir->new;
+        foreach my $filename ($basedir->config_files('user-dirs.defaults'), $basedir->config_files('user-dirs.dirs')) {
+            open(my $fh, '<', $filename) or next;
+            while (defined(my $line = <$fh>)) {
+                if ($line =~ /^\s*XDG_([A-Z]+)_DIR="\$HOME\/([^"]+)"/) {
+                    my ($key, $value) = ($1, $2);
+                    push(@info, {
+                            path => User::Information::Path->new($root => [userdir => $key]),
+                            loader => sub { [{filename => $_[0]->file(PATH_HOMEDIR, extra => $value, directory => 1)}] },
+                        });
+                } elsif ($line =~ /^\s*([A-Z]+)=([^#]+)\s*(?:#.*)?\r?\n/) {
+                    my ($key, $value) = ($1, $2);
+                    push(@info, {
+                            path => User::Information::Path->new($root => [defaultdir => $key]),
+                            loader => sub { [{filename => $_[0]->file(PATH_HOMEDIR, extra => $value, directory => 1)}] },
+                        });
+                }
+            }
+        }
+    }
+
     return @info;
 }
 
@@ -112,7 +136,7 @@ User::Information::Source::XDG - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

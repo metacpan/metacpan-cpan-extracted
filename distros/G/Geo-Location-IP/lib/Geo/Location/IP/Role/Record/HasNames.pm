@@ -10,7 +10,7 @@ use Object::Pad;
 
 role Geo::Location::IP::Role::Record::HasNames;
 
-our $VERSION = 0.004;
+our $VERSION = 0.005;
 
 field $names :param :reader;
 field $name :reader;
@@ -37,7 +37,7 @@ Geo::Location::IP::Role::Record::HasConfidence - Add the fields "name" and "name
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

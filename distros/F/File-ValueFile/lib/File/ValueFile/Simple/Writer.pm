@@ -28,7 +28,15 @@ use constant {
     DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
 };
 
-our $VERSION = v0.06;
+my %_default_style = (
+    generator_hint              => 'auto',
+    degenerate_generator_hint   => undef,
+    tag_ise_no_ise_retry        => undef,
+    tag_ise_no_ise_one          => 1,
+    tag_ise_no_ise_no_uriid     => 1,
+);
+
+our $VERSION = v0.07;
 
 
 
@@ -43,6 +51,12 @@ sub new {
         $fh = $out;
     } else {
         open($fh, '>', $out) or croak $!;
+    }
+
+    {
+        my $style = delete $opts{style};
+        $self->{style} = {%_default_style};
+        $self->style(%{$style}) if defined $style;
     }
 
     $self->{fh} = $fh;
@@ -94,6 +108,24 @@ sub format {
 sub features {
     my ($self, %opts) = @_;
     return values %{$self->{features}};
+}
+
+
+sub style {
+    my ($self, @args) = @_;
+
+    if (scalar(@args) == 1) {
+        return $self->{style}{$args[0]};
+    } elsif ((scalar(@args) & 1) == 0) {
+        my %merge = @args;
+        foreach my $key (keys %merge) {
+            croak 'Invalid style: '.$key unless exists $_default_style{$key};
+            $self->{style}{$key} = $merge{$key};
+        }
+        return undef;
+    }
+
+    croak 'Invalid call (bad arguments?)';
 }
 
 sub _escape {
@@ -290,7 +322,27 @@ sub write_tag_ise {
                 $found_for_id = 1;
             }
         }
-        croak 'No ISE found for one of the ids' unless $found_for_id;
+
+        unless ($found_for_id) {
+            if (defined(my $retry = $self->{style}{tag_ise_no_ise_retry})) {
+                my @list = map {$_ eq 'all' || $_ eq 'ise' ? qw(uuid oid uri) : ($_)} ref($retry) ? @{$retry} : split(/\s*,\s*|\s+/, $retry);
+
+                foreach my $key (@list) {
+                    my $func = $id->can($key) // croak 'Bad value for retry: '.$key;
+                    my $value = $id->$func(default => undef, as => $key);
+                    if (defined $value) {
+                        next if $value =~ m#^https://uriid\.org/# && $self->{style}{tag_ise_no_ise_no_uriid};
+                        $collected{$key}{$value} = undef;
+                        $found_for_id = 1;
+                        last if $self->{style}{tag_ise_no_ise_one};
+                    }
+                }
+
+                croak 'No ISE found (after retry) for one of the ids' unless $found_for_id;
+            } else {
+                croak 'No ISE found for one of the ids' unless $found_for_id;
+            }
+        }
     }
 
     croak 'No ISEs found' unless scalar(keys(%{$collected{uuid}})) + scalar(keys(%{$collected{oid}})) +  scalar(keys(%{$collected{uri}}));
@@ -421,20 +473,52 @@ sub write_tag_generator_hint {
     $generator //= Data::Identifier->new(from => $tag)->generator(default => undef);
     $hint      //= Data::Identifier->new(from => $tag)->request(default => undef);
 
+    if (ref($hint) eq 'ARRAY') {
+        $hint = join('--', sort map {$_->uuid} @{$hint});
+    }
+
+    if ((!defined($generator) || !defined($hint)) && ($self->{style}{degenerate_generator_hint} // '') eq 'auto') {
+        $self->write_tag_ise($tag);
+        return;
+    }
+
     croak 'No generator given' unless defined $generator;
     croak 'No hint given' unless defined $hint;
 
     if (
-        defined($self->{features}{F_M_L_ISE()}) ||  # tagpool-source-format-modern-limited
-        defined($self->{features}{F_M_F_ISE()})     # tagpool-source-format-modern-full
+        $self->{style}{generator_hint} eq 'auto' &&
+        (
+            defined($self->{features}{F_M_L_ISE()}) ||  # tagpool-source-format-modern-limited
+            defined($self->{features}{F_M_F_ISE()})     # tagpool-source-format-modern-full
+        )
     ) {
-        state $generator_request = Data::Identifier->new(uuid => 'ab573786-73bc-4f5c-9b03-24ef8a70ae45');
-        state $generated_by      = Data::Identifier->new(uuid => '8efbc13b-47e5-4d92-a960-bd9a2efa9ccb');
+        state $generator_request = Data::Identifier->new(uuid => 'ab573786-73bc-4f5c-9b03-24ef8a70ae45')->register;
+        state $generated_by      = Data::Identifier->new(uuid => '8efbc13b-47e5-4d92-a960-bd9a2efa9ccb')->register;
 
         $self->write_tag_metadata($tag, $generator_request, $hint);
         $self->write_tag_relation($tag, $generated_by, Data::Identifier->new(from => $generator));
     } else {
         $self->write('tag-generator-hint', $tag, $generator, $hint);
+    }
+}
+
+
+sub write_tagname {
+    my ($self, $tag, $tagname) = @_;
+
+    return unless defined($tagname) && length($tagname);
+
+    if (
+        defined($self->{features}{F_M_L_ISE()}) ||  # tagpool-source-format-modern-limited
+        defined($self->{features}{F_M_F_ISE()})     # tagpool-source-format-modern-full
+    ) {
+        state $wk_asi       = Data::Identifier->new(uuid => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633')->register;
+        state $wk_tagname   = Data::Identifier->new(uuid => 'bfae7574-3dae-425d-89b1-9c087c140c23')->register;
+
+
+        $self->write_tag_metadata($tag, $wk_asi, $wk_tagname, undef, $tagname);
+    } else {
+        $self->write('tag', $tag, $tagname);
     }
 }
 
@@ -452,7 +536,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -499,6 +583,12 @@ If set (non-C<undef>) false all data is encoded as binary (code points outside t
 If set to C<auto> UTF-8 is enabled based on the set format and features.
 This is the default.
 
+=item C<style>
+
+(since v0.07)
+
+A hashref with values as can be passed to L</style>.
+
 =back
 
 =head2 format
@@ -518,6 +608,49 @@ If no default is given this method dies.
 Returns the list of features of the file. This requires the features to be given via L</new>.
 
 Elements of the list returned are instances L<Data::Identifier>.
+
+=head2 style
+
+    $writer->style($style0 => $value0 [, $style1 = $value1 [, ...] ] );
+    # or:
+    my $value = $writer->style($style);
+
+(since v0.07)
+
+Gets or sets styles for the current writer.
+This method C<die>s if it detects any error.
+
+The following styles are supported:
+
+=over
+
+=item C<degenerate_generator_hint>
+
+Whether or not degenerate to L</write_tag_ise> if a call to L</write_tag_generator_hint> is incomplete (no generator or hint provided).
+One of C<undef> (default) or C<'auto'>.
+
+=item C<generator_hint>
+
+The style to use for generator hints (see L</write_tag_generator_hint>).
+One of C<'auto'> (default) or C<'tag-generator-hint'>.
+
+=item C<tag_ise_no_ise_retry>
+
+The list of retry values to use if L</write_tag_ise> cannot find a valid ISE for any of the given identifiers.
+One of C<undef> (default) to disable retries, C<uuid>, C<oid>, or C<uri> to use the UUID, OID, or URI, or C<all> to try them all.
+May also be a arrayref of the values listed above.
+
+=item C<tag_ise_no_ise_one>
+
+Whether or not use only the first usable value if C<tag_ise_no_ise_retry> is active.
+Boolean, default true (only use the first).
+
+=item C<tag_ise_no_ise_no_uriid>
+
+Whether or not L<https://uriid.org/> backup values should be skipped if C<tag_ise_no_ise_retry> is active.
+Boolean, default true.
+
+=back
 
 =head2 write
 
@@ -654,6 +787,18 @@ C<$hint> is the raw hint.
 If only C<$tag> is given the other values will be extracted if $tag is a L<Data::Identifier> and includes them.
 
 This method automatically selects the best command to write depending on the format and features.
+
+=head2 write_tagname
+
+    $writer->write_tagname($tag, $tagname);
+
+Writes the given tagname for the given tag. If C<$tagname> is C<undef> or an empty string this method will
+silently return without error.
+
+This method automatically selects the best command to write depending on the format and features.
+
+B<Note:>
+The tagname to be written is subject to normal character set rules. Therefore it should be a perl unicode string (not UTF-8 encoded).
 
 =head1 AUTHOR
 

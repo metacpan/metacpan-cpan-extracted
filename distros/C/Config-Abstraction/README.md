@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.24
+Version 0.25
 
 # SYNOPSIS
 
@@ -228,7 +228,39 @@ The entry `config_path` contains a list of the files that the configuration was 
 ## merge\_defaults
 
 Merge the configuration hash into the given hash.
-What's in the object will overwrite what's in the defaults hash.
+
+    package MyPackage;
+    use Params::Get;
+    use Config::Abstraction;
+
+    sub new
+    {
+      my $class = shift;
+
+      my $params = Params::Get::get_params(undef, \@_) || {};
+
+      if(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
+        $params = $config->merge_defaults(defaults => $params, merge => 1, section => $class);
+      }
+
+      return bless $params, $class;
+    }
+
+Options:
+
+- merge
+
+    Usually what's in the object will overwrite what's in the defaults hash,
+    if given,
+    the result will be a combination of the hashes.
+
+- section
+
+    Merge in that section from the configuration file.
+
+- deep
+
+    Try harder to merge in all configuration from the global section of the configuration file.
 
 ## AUTOLOAD
 

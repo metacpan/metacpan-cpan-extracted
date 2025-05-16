@@ -1,3 +1,12 @@
+v0.02  2025-05-15Z
+    - Added a source with a number of basic default values
+    - Let User::Information inherit from Data::Identifier::Interface::Known
+    - Improved XDG source significantly
+    - Updated dependency list
+    - Improved aggregation
+    - Added source using git config
+    - Updated paths for tagpool module
+
 v0.01  2025-05-11Z
     - Initial release
     - Basic API

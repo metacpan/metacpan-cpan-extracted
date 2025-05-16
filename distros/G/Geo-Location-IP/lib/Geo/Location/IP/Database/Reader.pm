@@ -11,7 +11,7 @@ use Object::Pad;
 class Geo::Location::IP::Database::Reader
     :isa(Geo::Location::IP::Database::SimpleReader);
 
-our $VERSION = 0.004;
+our $VERSION = 0.005;
 
 use Geo::Location::IP::Address;
 use Geo::Location::IP::Error::Generic;
@@ -95,7 +95,7 @@ our $private_ip_address_regex = qr{
 }xms;
 
 method _assert_database_type ($type_regex) {
-    state $type = $self->metadata->database_type;
+    my $type = $self->metadata->database_type;
     if ($type !~ $type_regex) {
         my $class   = ref $self;
         my $method  = (caller(1))[3] =~ s{.+::}{}r;
@@ -164,7 +164,7 @@ Geo::Location::IP::Database::Reader - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

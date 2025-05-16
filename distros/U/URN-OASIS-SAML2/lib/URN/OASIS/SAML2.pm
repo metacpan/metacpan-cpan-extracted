@@ -1,6 +1,6 @@
 # vim: tw=120
 package URN::OASIS::SAML2;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use warnings;
 use strict;
 
@@ -29,6 +29,8 @@ my @class = qw(
 my @nameid = qw(
     NAMEID_FORMAT
     NAMEID_FORMAT_ENTITY
+    NAMEID_ENTITY
+    NAMEID_KERBEROS
     NAMEID_EMAIL
     NAMEID_TRANSIENT
     NAMEID_PERSISTENT
@@ -124,10 +126,12 @@ use constant NAMEID_UNSPECIFIED                   => saml1_1 . 'nameid-format:un
 use constant NAMEID_X509_SUBJECT_NAME             => saml1_1 . 'nameid-format:X509SubjectName';
 use constant NAMEID_WINDOWS_DOMAIN_QUALIFIED_NAME => saml1_1 . 'nameid-format:WindowsDomainQualifiedName';
 
-use constant NAMEID_FORMAT_ENTITY => saml2 . 'nameid-format-entity';
+use constant NAMEID_FORMAT_ENTITY => saml2 . 'nameid-format:entity';
+use constant NAMEID_KERBEROS      => saml2 . 'nameid-format:kerberos';
 use constant NAMEID_TRANSIENT     => saml2 . 'nameid-format:transient';
 use constant NAMEID_PERSISTENT    => saml2 . 'nameid-format:persistent';
 use constant NAMEID_DEFAULT       => NAMEID_UNSPECIFIED;
+use constant NAMEID_ENTITY        => NAMEID_FORMAT_ENTITY;
 
 
 use constant STATUS_AUTH_FAILED    => saml2 . 'status:AuthnFailed';
@@ -151,7 +155,7 @@ URN::OASIS::SAML2 - Constants for urn:oasis SAML2 implementations
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -216,6 +220,8 @@ This module provides constants which are in use by the SAML2 implementation.
     use URN::OASIS::SAML2 qw(:nameid);
     use URN::OASIS::SAML2 qw(
         NAMEID_EMAIL
+        NAMEID_ENTITY
+        NAMEID_KERBEROS
         NAMEID_TRANSIENT
         NAMEID_PERSISTENT
         NAMEID_UNSPECIFIED

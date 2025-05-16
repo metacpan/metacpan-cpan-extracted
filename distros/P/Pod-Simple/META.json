@@ -74,6 +74,6 @@
       },
       "x_MailingList" : "https://lists.perl.org/list/pod-people.html"
    },
-   "version" : "3.46",
+   "version" : "3.47",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

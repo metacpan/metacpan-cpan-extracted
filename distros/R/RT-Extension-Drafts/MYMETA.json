@@ -1,0 +1,52 @@
+{
+   "abstract" : "Allow to save/load drafts in ticket replies/comments",
+   "author" : [
+      "Emmanuel Lacour, C<< <elacour at home-dn.net> >>",
+      "Emmanuel Lacour <elacour@home-dn.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.00, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "RT-Extension-Drafts",
+   "no_index" : {
+      "directory" : [
+         "html",
+         "inc",
+         "po",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.home-dn.net/manu/RT-Extension-Drafts.git"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

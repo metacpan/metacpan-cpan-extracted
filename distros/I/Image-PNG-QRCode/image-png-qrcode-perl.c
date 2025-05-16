@@ -42,7 +42,7 @@ void
 qrpng_internal (HV * options)
 {
     char * text;
-    unsigned text_length;
+    STRLEN text_length;
     qr_t qr = {0};
     qrpng_t qrpng = {0};
     SV ** sv_ptr;
@@ -54,7 +54,7 @@ qrpng_internal (HV * options)
     HASH_FETCH_PV (options, text);
 
     qr.input = text;
-    qr.input_length = text_length;
+    qr.input_length = (int) text_length;
 
     qr.level = 1;
 
@@ -129,7 +129,7 @@ qrpng_internal (HV * options)
     }
     else {
 	char * out;
-	unsigned int out_length;
+	STRLEN out_length;
 	HASH_FETCH_PV (options, out);
 	qrpng.filename = out;
 	qrpng_write (& qrpng);

@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-OpenTelemetry
 
+0.005     2025-05-15 13:13:10 BST
+
+    * Ensure we convert request URLs to absolute so we are
+      able to retrieve the schema, etc. This protects against
+      accidentally trying to set undefined attributes.
+
 0.004     2024-11-22 13:22:54+00:00 Europe/London
 
     * Fixed an issue that would cause the code to hang with

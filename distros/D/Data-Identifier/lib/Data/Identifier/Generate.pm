@@ -30,7 +30,7 @@ use constant {
 };
 
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -365,7 +365,10 @@ sub generic {
     {
         my $ns = ref($opts{namespace}) ? $opts{namespace}->uuid(no_defaults => 1) : $opts{namespace};
         my $uuid = $pkg->_uuid_v5($ns, $opts{input});
-        return Data::Identifier->new(uuid => $uuid, displayname => $opts{displayname}, %opts{qw(generator request)});
+        my $tag = Data::Identifier->new(uuid => $uuid, displayname => $opts{displayname});
+        $tag->{$_} //= $opts{$_} foreach qw(generator request);
+        $tag->{generator} = Data::Identifier->new(from => $tag->{generator}) if defined($tag->{generator}) && !ref($tag->{generator});
+        return $tag;
     }
 }
 
@@ -466,7 +469,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

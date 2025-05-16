@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
+use FindBin '$Bin';
+use lib "$Bin/inc";
 use CheckForLibPng;
 
 my $pm = 'lib/Image/PNG/QRCode.pm';
@@ -11,7 +12,7 @@ my $repo = "https://$github";
 
 my $verbose;# = 1;
 
-my $vars = check_for_libpng ($verbose);
+my $vars = check_for_libpng (verbose => $verbose);
 
 if (! $vars) {
     print STDERR "Could not find libpng, exiting.\n";
@@ -22,7 +23,7 @@ WriteMakefile (
     NAME => 'Image::PNG::QRCode',
     VERSION_FROM => $pm,
     ABSTRACT_FROM => $pod,
-    AUTHOR => 'Ben Bullock <bkb@cpan.org>',
+    AUTHOR => 'Ben Bullock <benkasminbullock@gmail.com>',
     LICENSE => 'gpl_3',
     PREREQ_PM => {
     },
@@ -44,7 +45,7 @@ WriteMakefile (
 #	    homepage => 'http://',
         },
     },
-    MIN_PERL_VERSION => '5.006001',
+    MIN_PERL_VERSION => '5.008001',
     OBJECT => 'QRCode.o qrencode.o qrpng.o',
     #    OPTIMIZE => '-Wall -g -O',
     EXE_FILES => ['script/qrpng',],

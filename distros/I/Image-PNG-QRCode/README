@@ -12,7 +12,7 @@
                                      
 
 
-This is the README for Image::PNG::QRCode version 0.10.
+This is the README for Image::PNG::QRCode version 0.11.
 
 Image::PNG::QRCode is a "module" for the Perl computer programming
 language, a library of computer code to install on a computer.  This
@@ -30,14 +30,15 @@ document contains four sections:
 
 1. ABOUT
 
-Image::PNG::QRCode - make a PNG image containing a QR code from text
+Image::PNG::QRCode - ABANDONED - Make PNG images containing QR codes from
+your text
 
-This module converts input text to a PNG image of a QR code containing
+This module converts your text to a PNG image of a QR code containing
 the text. The PNG image can either be stored to a file or it can be a
 scalar.
 
-Image::PNG::Libpng requires "libpng" to be installed. "libpng" should
-already be installed on most Linux and Windows systems.
+Image::PNG::Libpng requires the PNG standard library "libpng" to be
+installed. "libpng" is usually already installed on Linux and Windows.
 
 -----------------------------------------------------------------------------
 
@@ -59,7 +60,7 @@ computer using
 
 3. INSTALLATION
 
-This module requires Perl version 5.6.1 or later.
+This module requires Perl version 5.8.1 or later.
 
 To install the module from CPAN, use
 
@@ -69,11 +70,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Image::PNG::QRCode
 
-To install the module from the source file, Image-PNG-QRCode-0.10.tar.gz,
+To install the module from the source file, Image-PNG-QRCode-0.11.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Image-PNG-QRCode-0.10.tar.gz
-    cd Image-PNG-QRCode-0.10
+    tar xfz Image-PNG-QRCode-0.11.tar.gz
+    cd Image-PNG-QRCode-0.11
     perl Makefile.PL
     make
     make install
@@ -86,8 +87,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can
-report a bug at 
+<benkasminbullock@gmail.com>. If you think there is a problem in the
+module, you can report a bug at 
 
 <https://github.com/benkasminbullock/image-png-qrcode/issues>,
 
@@ -98,6 +99,6 @@ public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Oct 18 13:26:27 2018.
+This README was written on Fri May 16 09:33:03 2025.
 
 -----------------------------------------------------------------------------

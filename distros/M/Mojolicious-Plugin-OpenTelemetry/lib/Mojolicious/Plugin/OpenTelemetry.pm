@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::OpenTelemetry;
 # ABSTRACT: An OpenTelemetry integration for Mojolicious
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
@@ -20,7 +20,7 @@ sub register ( $, $app, $config, @ ) {
 
         my $tx      = $c->tx;
         my $req     = $tx->req;
-        my $url     = $req->url;
+        my $url     = $req->url->to_abs;
         my $route   = $c->match->endpoint->to_string;
         my $query   = $url->query->to_string;
         my $method  = $req->method;
