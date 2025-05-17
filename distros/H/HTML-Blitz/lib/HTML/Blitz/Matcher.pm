@@ -2,7 +2,7 @@
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
-package HTML::Blitz::Matcher;
+package HTML::Blitz::Matcher 0.1001;
 use HTML::Blitz::pragma;
 use HTML::Blitz::SelectorType qw(
     LT_DESCENDANT
@@ -15,8 +15,6 @@ use Scalar::Util ();
 use constant {
     INTBITS => length(sprintf '%b', ~0),
 };
-
-our $VERSION = '0.0901';
 
 method new($class: $rules) {
     bless {

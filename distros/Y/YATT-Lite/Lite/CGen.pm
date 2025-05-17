@@ -66,7 +66,13 @@ sub with_template {
     $task->($self, @args);
   } else {
     my ($meth, @rest) = YATT::Lite::Util::lexpand($task);
-    $self->$meth(@rest, @args);
+    unless ($meth) {
+      Carp::croak "meth is undef";
+    }
+    my $sub = $self->can($meth) or do {
+      Carp::croak "No such method $meth";
+    };
+    $sub->($self, @rest, @args);
   }
 }
 
@@ -169,7 +175,7 @@ sub sync_curline {
   return unless defined $lineno;
   my $diff = $lineno - $self->{curline};
   die "curline exceeds expected lineno! expect $lineno, curline=$self->{curline}\n" if $self->{cf_check_lineno} and $diff < 0;
-  $self->{curline} = $lineno;
+  $self->{curline} = $lineno if $lineno > $self->{curline};
   $diff > 0 ? "\n" x $diff : ();
 }
 # <!yatt:widget ...> や <yatt:call ...> の直後の改行を,

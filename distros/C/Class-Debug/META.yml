@@ -5,7 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
+  Test::Needs: '0'
   YAML::XS: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -22,11 +24,11 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Config::Abstraction: '0.2'
+  Config::Abstraction: '0.25'
   ExtUtils::MakeMaker: '6.64'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   Log::Abstraction: '0.11'
 resources: {}
-version: 0.02
+version: 0.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,7 +1,4 @@
 class TestCase::FindBin {
   use FindBin;
-  static method test : int () {
-    
-    return 1;
-  }
+  
 }

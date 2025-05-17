@@ -2,7 +2,7 @@
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
-package HTML::Blitz::Parser;
+package HTML::Blitz::Parser 0.1001;
 use HTML::Blitz::pragma;
 use HTML::Blitz::ParseError ();
 use HTML::Blitz::TokenType qw(
@@ -12,8 +12,6 @@ use HTML::Blitz::TokenType qw(
     TT_COMMENT
     TT_DOCTYPE
 );
-
-our $VERSION = '0.0901';
 
 method _fail(
     $msg,

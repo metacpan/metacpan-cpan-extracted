@@ -36,17 +36,27 @@ WriteMakefile(
 		# 'XML::Parser::Expat' => 0,	# Seems to be needed for Windows
 		# 'XML::LibXML' => 0,	# do.
 		# 'XML::Simple' => 0,
-		'XML::PP' => 0,
+		'XML::PP' => 0.05,
 		'File::Spec' => 0,
 		'Hash::Merge'	=> 0,
 		'Hash::Flatten'	=> 0,
 		'JSON::Parse' => 0
 	},
 	META_MERGE => {
+		'meta-spec' => { version => 2 },
 		resources => {
-			repository => 'https://github.com/nigelhorne/Config-Abstraction',
-			bugtracker => 'https://github.com/nigelhorne/Config-Abstraction/issues',
 			homepage => 'https://metacpan.org/pod/Config::Abstraction',
+			repository => {
+				repository => 'https://github.com/nigelhorne/Config-Abstraction',
+				type => 'git',
+				url => 'git://github.com/nigelhorne/Config-Abstraction.git',
+				web => 'https://github.com/nigelhorne/Config-Abstraction'
+			}, bugtracker => {
+				mailto => 'bug-Config-Abstraction@rt.cpan.org',
+				url => 'https://github.com/nigelhorne/Config-Abstraction/issues',
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction',
+				web => 'https://github.com/nigelhorne/Config-Abstraction/issues'
+			}
 		},
 	}, TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,

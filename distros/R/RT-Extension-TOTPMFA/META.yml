@@ -18,12 +18,18 @@ no_index:
   directory:
     - html
     - inc
+    - po
 requires:
+  Authen::OATH: 0
+  Convert::Base32: 0
+  Imager::QRCode: 0
+  Crypt::CBC: 0
+  LWP::UserAgent: 0
   perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://codeberg.org/ivarch/rt-extension-totpmfa
-version: '0.04'
+version: '0.10'
 x_module_install_rtx_version: '0.44'
 x_requires_rt: 5.0.0
 x_rt_too_new: 5.2.0

@@ -2,7 +2,7 @@
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
-package HTML::Blitz::CodeGen;
+package HTML::Blitz::CodeGen 0.1001;
 use HTML::Blitz::pragma;
 use HTML::Blitz::Atom qw(
     OP_RAW
@@ -25,8 +25,6 @@ use constant {
     _REPR_VERSION     => 1,
     MAX_NESTED_CONCAT => 100,
 };
-
-our $VERSION = '0.0901';
 
 method new($class: :$_scope = 0, :$name = undef) {
     bless {
@@ -58,6 +56,7 @@ method FREEZE($model) {
 }
 
 method THAW($class: $model, $repr_version, $components) {
+    our $VERSION;
     $repr_version <= _REPR_VERSION
         or croak "Cannot deserialize data format $repr_version with $class v$VERSION, which only supports data format " . _REPR_VERSION;
     my @todo = ['init', \my $self, @$components];

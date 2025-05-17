@@ -1,69 +1,57 @@
 package SPVM::FindBin;
 
-our $VERSION = "0.034";
+our $VERSION = "0.035";
 
 1;
 
 =head1 Name
 
-SPVM::FindBin - The Directory Path Where The Program Is Located
+SPVM::FindBin - Directory Path Where Program Is Invoked
 
 =head1 Description
 
-FindBin class in L<SPVM> has method to get the directory path where the program is located.
-
-Locates the full path to the script bin directory to allow the use of paths relative to the bin directory.
+FindBin class in L<SPVM> has method to get the absolute path of the directory where the program was invoked.
 
 =head1 Usage
 
   use FindBin;
   
-  FindBin->init;
-  
   my $Bin = FindBin->Bin;
   my $Script = FindBin->Script;
-  my $RealBin = FindBin->RealBin;
-  my $RealScript = FindBin->RealScript;
 
 =head1 Class Variables
 
 =head2 Bin
 
-  our $Bin : ro string;
+C<our $Bin : ro string;>
 
-The path to bin directory from where script was invoked.
+The absolute path of the directory where the program was invoked.
+
+Note:
+
+In Windows, every path separator C<\> in the path is replaced with C</>.
 
 =head2 Script
 
-  our $Script : ro string;
+C<our $Script : ro string;>
 
-The basename of script from which perl was invoked
-
-=head2 RealBin
-
-  our $RealBin : ro string;
-
-L</"Bin"> with all links resolved
-
-=head2 RealScript
-
-  our $RealScript : ro string;
-
-L</"Script"> with all links resolved
+The base name of the program name.
 
 =head1 Class Methods
 
 =head2 init
 
-  static method init : void ();
+C<static method init : void ();>
 
-Initializes the L<$Bin/"Bin">, L<$Script/"Script">, L<$RealBin/"RealBin">, L<$RealScript/"RealScript"> class variables.
+Initializes L<$Bin|/"Bin"> and L<$Script|/"Script"> class variables.
+
+This method is called in C<INIT> block of this class.
 
 =head2 again
 
-  static method again : void ();
+C<static method again : void ();>
 
-The same as L</"init">.
+The same as L</"init"> method.
 
 =head1 Repository
 
@@ -71,9 +59,17 @@ L<SPVM::FindBin - Github|https://github.com/yuki-kimoto/SPVM-FindBin>
 
 =head1 See Also
 
-=head2 FindBin
+=over 2
 
-C<SPVM::FindBin> is the Perl's L<FindBin> porting to L<SPVM>.
+=item * L<File::Spec|SPVM::File::Spec>
+
+=item * L<File::Basename|SPVM::File::Basename>
+
+=back
+
+=head2 Porting
+
+C<SPVM::FindBin> is a Perl's L<FindBin> porting to L<SPVM>.
 
 =head1 Author
 

@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Base 0.060000;
+package Term::CLI::Base 0.061000;
 
 use 5.014;
 use warnings;
@@ -81,7 +81,7 @@ Term::CLI::Base - generic base class for Term::CLI classes
 
 =head1 VERSION
 
-version 0.060000
+version 0.061000
 
 =head1 SYNOPSIS
 

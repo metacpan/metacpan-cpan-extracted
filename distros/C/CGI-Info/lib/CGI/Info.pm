@@ -1,7 +1,7 @@
 package CGI::Info;
 
 # TODO: remove the expect argument
-# TODO:	look into params::check or params::validate and/or giving a subroutine for the allow parameter to params()
+# TODO:	look into params::check or params::validate
 
 use warnings;
 use strict;
@@ -34,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 =head1 SYNOPSIS
 
@@ -160,6 +160,10 @@ sub new
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
+	# Stash copy of cache to avoid "(in cleanup) Failed to get MD5_CTX pointer".
+	# I suspect Hash::Merge is confusing something
+	my $cache = delete $params->{'cache'};
+
 	# Load the configuration from a config file, if provided
 	$params = Class::Debug::setup($class, $params);
 
@@ -169,6 +173,10 @@ sub new
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
 		Carp::croak("$class: expect has been deprecated, use allow instead");
+	}
+
+	if($cache) {
+		$params->{'cache'} = $cache;
 	}
 
 	# Return the blessed object
@@ -460,11 +468,14 @@ Allow is a reference to a hash list of CGI parameters that you will allow.
 The value for each entry is either a permitted value,
 a regular expression of permitted values for
 the key,
+a code reference,
 or a hash of L<Params::Validate::Strict> rules.
-
+Subroutine exceptions propagate normally, allowing custom error handling.
+This works alongside existing regex and Params::Validate::Strict patterns.
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
+
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
@@ -539,6 +550,50 @@ mustleak and directory traversals,
 thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layers.
 
+=head3 Validation Subroutine Support
+
+The C<allow> parameter accepts subroutine references for dynamic validation,
+enabling complex parameter checks beyond static regex patterns.
+These callbacks:
+
+=over 4
+
+=item * Receive three arguments: the parameter key, value and the C<CGI::Info> instance
+
+=item * Must return a true value to allow the parameter, false to reject
+
+=item * Can access other parameters through the instance for contextual validation
+
+=back
+
+Basic usage:
+
+    CGI::Info->new(
+        allow => {
+            # Simple value check
+            even_number => sub { ($_[1] % 2) == 0 },
+
+            # Context-aware validation
+            child_age => sub {
+                my ($key, $value, $info) = @_;
+                $info->param('is_parent') ? $value <= 18 : 0
+            }
+        }
+    );
+
+Advanced features:
+
+    # Combine with regex validation
+    mixed_validation => {
+        email => qr/@/,  # Regex check
+        promo_code => \&validate_promo_code  # Subroutine check
+    }
+
+    # Throw custom exceptions
+    dangerous_param => sub {
+        die 'Hacking attempt!' if $_[1] =~ /DROP TABLE/;
+        return 1;
+    }
 =cut
 
 sub params {
@@ -808,7 +863,7 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				$self->_notice("Discard unallowed argument '$key'");
+				$self->_info("Discard unallowed argument '$key'");
 				$self->status(422);
 				next;	# Skip to the next parameter
 			}
@@ -818,16 +873,21 @@ sub params {
 				if(!ref($schema)) {
 					# Can only contain one value
 					if($value ne $schema) {
-						$self->_notice("Block $key = $value");
+						$self->_info("Block $key = $value");
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
 				} elsif(ref($schema) eq 'Regexp') {
 					if($value !~ $schema) {
 						# Simple regex
-						$self->_notice("Block $key = $value");
+						$self->_info("Block $key = $value");
 						$self->status(422);
 						next;	# Skip to the next parameter
+					}
+				} elsif(ref($schema) eq 'CODE') {
+					unless($schema->($key, $value, $self)) {
+						$self->_info("Block $key = $value");
+						next;
 					}
 				} else {
 					# Set of rules
@@ -839,7 +899,7 @@ sub params {
 						});
 					};
 					if($@) {
-						$self->_notice("Block $key = $value: $@");
+						$self->_info("Block $key = $value: $@");
 						$self->status(422);
 						next;	# Skip to the next parameter
 					}
@@ -970,10 +1030,21 @@ sub param {
 		return;
 	}
 
-	if(defined($self->params())) {
-		return $self->params()->{$field};
+	# Prevent deep recursion which can happen when a validation routine calls param()
+	my $allow;
+	if($self->{in_param} && $self->{allow}) {
+		$allow = delete $self->{allow};
 	}
-	return;
+	$self->{in_param} = 1;
+
+	my $params = $self->params();
+
+	$self->{in_param} = 0;
+	$self->{allow} = $allow if($allow);
+
+	if($params) {
+		return $params->{$field};
+	}
 }
 
 sub _sanitise_input($) {
@@ -1501,7 +1572,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|msnptc|CriteoBot|is_archiver|backstreet|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
+	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -1870,6 +1941,28 @@ sub messages_as_string
 	return '';
 }
 
+=head2 cache
+
+Get/set the internal cache system.
+
+Use this rather than pass the cache argument to C<new()> if you see these error messages,
+"(in cleanup) Failed to get MD5_CTX pointer".
+It's some obscure problem that I can't work out,
+but calling this after C<new()> works.
+
+=cut
+
+sub cache
+{
+	my $self = shift;
+	my $cache = shift;
+
+	if($cache) {
+		$self->{'cache'} = $cache;
+	}
+	return $self->{'cache'};
+}
+
 =head2 set_logger
 
 Sets the class, array, code reference, or file that will be used for logging.
@@ -1905,7 +1998,7 @@ sub _log
 	my ($self, $level, @messages) = @_;
 
 	# FIXME: add caller's function
-	# if(($level eq 'warn') || ($level eq 'notice')) {
+	# if(($level eq 'warn') || ($level eq 'info')) {
 		push @{$self->{'messages'}}, { level => $level, message => join(' ', grep defined, @messages) };
 	# }
 

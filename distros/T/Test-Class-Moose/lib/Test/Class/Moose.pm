@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.010000;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 use Moose 2.0000;
 use Carp;
@@ -260,7 +260,7 @@ Test::Class::Moose - Serious testing for serious Perl
 
 =head1 VERSION
 
-version 0.99
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -287,8 +287,8 @@ version 0.99
 
 =head1 DESCRIPTION
 
-See the L<Test::Class::Moose home page|http://houseabsolute.github.io/test-class-moose/> for
-a summary.
+See the L<Test::Class::Moose home
+page|http://test-more.github.io/test-class-moose/> for a summary.
 
 C<Test::Class::Moose> is a powerful testing framework for Perl. Out of the box
 you get:
@@ -326,15 +326,15 @@ Just C<use Test::Class::Moose>. That's all. You'll get all L<Test::Most> test
 functions, too, along with C<strict> and C<warnings>. You can use all L<Moose>
 behavior, too.
 
-When you C<use Test::Class::Moose> it inserts itself as a parent class for
-your test class. This means that if you try to use C<extends> in your test
-class you will break things unless you include C<Test::Class::Moose> as a
-parent. We recommend that you use roles in your test classes instead.
+When you C<use Test::Class::Moose> it inserts itself as a parent class for your
+test class. This means that if you try to use C<extends> in your test class you
+will break things unless you include C<Test::Class::Moose> as a parent. We
+recommend that you use roles in your test classes instead.
 
 =head2 Declare a test method
 
-All method names that begin with C<test_> are test methods. Methods that do
-not are not test methods.
+All method names that begin with C<test_> are test methods. Methods that do not
+are not test methods.
 
  sub test_this_is_a_method {
      my $test = shift;
@@ -349,8 +349,8 @@ not are not test methods.
  }
 
 You may specify C<Test> and C<Tests> method attributes, just like in
-L<Test::Class> and the method will automatically be a test method, even if
-does not start with C<test_>:
+L<Test::Class> and the method will automatically be a test method, even if does
+not start with C<test_>:
 
     sub this_is_a_test : Test {
         pass 'we have a single test';
@@ -401,9 +401,9 @@ method modifier:
         # more tests
     };
 
-Please note that if you call C<plan>, the plan will still show up at the end
-of the subtest run, but you'll get the desired failure if the number of tests
-run does not match the plan.
+Please note that if you call C<plan>, the plan will still show up at the end of
+the subtest run, but you'll get the desired failure if the number of tests run
+does not match the plan.
 
 =head2 Inheriting from another Test::Class::Moose class
 
@@ -519,13 +519,13 @@ The available test control methods are:
  }
 
 Runs at the start of each test class. Quite often the base class that you
-inherit from will have its own C<test_startup> code running (such as starting
-a database transaction or connecting to an external resource). You almost
-always want to call C<< $test->next::method >> I<before> your own setup code.
-This ensures that the environment is set up to safely run your code. For
-example, if the parent C<test_startup> starts a database transaction with the
-expectation that the C<test_teardown> will end the database transactions, you
-can safely load database fixtures I<after> that is run.
+inherit from will have its own C<test_startup> code running (such as starting a
+database transaction or connecting to an external resource). You almost always
+want to call C<< $test->next::method >> I<before> your own setup code. This
+ensures that the environment is set up to safely run your code. For example, if
+the parent C<test_startup> starts a database transaction with the expectation
+that the C<test_teardown> will end the database transactions, you can safely
+load database fixtures I<after> that is run.
 
 If you need to know the name of the class you're running this in (though
 usually you shouldn't), use C<< $test->test_class >>, or you can do this:
@@ -538,8 +538,8 @@ usually you shouldn't), use C<< $test->test_class >>, or you can do this:
         ...
     }
 
-The C<< $test->test_report >> object is a L<Test::Class::Moose::Report::Instance>
-object.
+The C<< $test->test_report >> object is a
+L<Test::Class::Moose::Report::Instance> object.
 
 =head2 C<test_setup>
 
@@ -606,10 +606,10 @@ can tell the L<Test::Class::Moose::Runner> to create multiple instances of a
 test class.
 
 To do this, simply consume the
-L<Test::Class::Moose::Role::ParameterizedInstances> role in your test
-class. This role requires you to implement a C<_constructor_parameter_sets>
-method in your test class. That method will be called as a I<class method>. It
-is expected to return a list of key/value pairs. The keys are the name of the
+L<Test::Class::Moose::Role::ParameterizedInstances> role in your test class.
+This role requires you to implement a C<_constructor_parameter_sets> method in
+your test class. That method will be called as a I<class method>. It is
+expected to return a list of key/value pairs. The keys are the name of the
 instance and the values are hashrefs of attributes to be passed to your test
 class's constructor. Here's a really dumb example:
 
@@ -638,15 +638,15 @@ instance>, and each instance will be run in its own subtest. You can
 dynamically decide to skip your test class completely by having
 C<_constructor_parameter_sets> return an empty list.
 
-Note that this feature has great potential for abuse, so use it
-cautiously. That said, there are cases where this feature can greatly simplify
-your test code.
+Note that this feature has great potential for abuse, so use it cautiously.
+That said, there are cases where this feature can greatly simplify your test
+code.
 
 =head1 RUNNING THE TEST SUITE
 
-See the docs for L<Test::Class::Moose::Runner> for details on running your
-test suite. If you'd like to get up and running quickly, here's a very simple
-test file you can use:
+See the docs for L<Test::Class::Moose::Runner> for details on running your test
+suite. If you'd like to get up and running quickly, here's a very simple test
+file you can use:
 
  use Test::Class::Moose::CLI;
  Test::Class::Moose::CLI->new_with_options->run;
@@ -666,9 +666,9 @@ If you wish to skip a class, set the reason in the C<test_startup> method.
         $test->test_skip("I don't want to run this class");
     }
 
-If you are using L<test class instances|/"TEST CLASS INSTANCES">, you
-can also make C<_constructor_parameter_sets> return an empty list,
-which will result in the class being skipped.
+If you are using L<test class instances|/"TEST CLASS INSTANCES">, you can also
+make C<_constructor_parameter_sets> return an empty list, which will result in
+the class being skipped.
 
 Note that if you run C<test_skip>, the C<test_shutdown> method will also be
 skipped. This is due to the assumption that you might not have run any setup
@@ -691,11 +691,11 @@ If you wish to skip an individual method, do so in the C<test_setup> method.
 
 =head2 The "Tests" and "Test" Attributes
 
-If you're comfortable with L<Test::Class>, you know that test methods methods are
-declared in L<Test::Class> with C<Test> (for a method with a single test) or
-C<Tests>, for a method with multiple tests. This also works for
-C<Test::Class::Moose>. Test methods declared this way do not need to start
-with C<test_>.
+If you're comfortable with L<Test::Class>, you know that test methods methods
+are declared in L<Test::Class> with C<Test> (for a method with a single test)
+or C<Tests>, for a method with multiple tests. This also works for
+C<Test::Class::Moose>. Test methods declared this way do not need to start with
+C<test_>.
 
     sub something_we_want_to_check : Test {
         # this method may have only one test
@@ -733,22 +733,22 @@ And later:
     }
 
 In the above example, C<TestsFor::Parent::some_test> will run three tests, but
-C<TestsFor::Child::some_test> will run I<five> tests (two tests, plus the
-three from the parent).
+C<TestsFor::Child::some_test> will run I<five> tests (two tests, plus the three
+from the parent).
 
-Note that if a plan is explicitly declared, any modifiers or overriding
-methods calling the original method will also have to assert the number of
-tests to ensure the plan is correct. The above C<TestsFor::Parent> and
-C<TestsFor::Child> code would fail if the child's C<some_test> method
-attribute was C<Tests> without the number of tests asserted.
+Note that if a plan is explicitly declared, any modifiers or overriding methods
+calling the original method will also have to assert the number of tests to
+ensure the plan is correct. The above C<TestsFor::Parent> and
+C<TestsFor::Child> code would fail if the child's C<some_test> method attribute
+was C<Tests> without the number of tests asserted.
 
 Do not use C<Test> or C<Tests> with test control methods because you don't run
 tests in those.
 
 =head2 Tagging Methods
 
-Sometimes you want to be able to assign metadata to help you better manage
-your test suite. You can do this with tags:
+Sometimes you want to be able to assign metadata to help you better manage your
+test suite. You can do this with tags:
 
     sub test_save_poll_data : Tags(api network) {
         ...
@@ -790,19 +790,20 @@ optional. Now it's mandatory, so those features should always work.
 ... but probably shouldn't.
 
 As a general rule, methods beginning with C</^test_/> are reserved for
-L<Test::Class::Moose>. This makes it easier to remember what you can and
-cannot override. However, any test with C<Test> or C<Tests> are test methods
+L<Test::Class::Moose>. This makes it easier to remember what you can and cannot
+override. However, any test with C<Test> or C<Tests> are test methods
 regardless of their names.
 
 =head2 C<test_report>
 
  my $report = $test->test_report;
 
-Returns the L<Test::Class::Moose::Report> object. Useful if you want to do
-your own reporting and not rely on the default output provided with the
+Returns the L<Test::Class::Moose::Report> object. Useful if you want to do your
+own reporting and not rely on the default output provided with the
 C<statistics> boolean option.
 
-You can also call it in test classes (most useful in the C<test_setup()> method):
+You can also call it in test classes (most useful in the C<test_setup()>
+method):
 
     sub test_setup {
         my $test = shift;
@@ -968,9 +969,9 @@ for you, see L<Test::Class::Moose::Role::AutoUse> in this distribution.
 
 =item *
 
-The L<Test::Class::Moose::Config> class's C<args> method is now
-deprecated. This was a holdover from when Test::Class::Moose was both a parent
-class for your test classes and the test class runner.
+The L<Test::Class::Moose::Config> class's C<args> method is now deprecated.
+This was a holdover from when Test::Class::Moose was both a parent class for
+your test classes and the test class runner.
 
 =back
 
@@ -1009,10 +1010,9 @@ method was never intended to be run unconditionally.
 =item *
 
 Parallel testing now parallelizes test classes rather than individual test
-instances. This is only relevant if your test suite contains parameterized
-test classes. This is slightly less efficient, but made the internal test
-running code much simpler and made it possible to fix reporting for parallel
-test runs.
+instances. This is only relevant if your test suite contains parameterized test
+classes. This is slightly less efficient, but made the internal test running
+code much simpler and made it possible to fix reporting for parallel test runs.
 
 =item *
 
@@ -1030,13 +1030,13 @@ The L<Test::Class::Moose::Runner> C<builder> method has been removed.
 
 =item * The L<Test::Class::Moose::Report> class's C<all_test_classes> method is un-deprecated
 
-This method now returns a list of L<Test::Class::Moose::Report::Class>
-objects. A class report contains one or more instance reports.
+This method now returns a list of L<Test::Class::Moose::Report::Class> objects.
+A class report contains one or more instance reports.
 
 =item *
 
-Removed the L<Test::Class::Moose::Report::Instance>'s error
-attribute. Contrary to the documentation, this attribute was never populated.
+Removed the L<Test::Class::Moose::Report::Instance>'s error attribute. Contrary
+to the documentation, this attribute was never populated.
 
 =item *
 
@@ -1051,8 +1051,8 @@ L<Test::Class::Moose::Report> and L<Test::Class::Moose::Report::Method>.
 
 =item *
 
-Removed the long-deprecated C<<
-Test::Class::Moose::Report::Method->add_to_plan method >>.
+Removed the long-deprecated C<< Test::Class::Moose::Report::Method->add_to_plan
+method >>.
 
 =back
 
@@ -1062,16 +1062,16 @@ Test::Class::Moose::Report::Method->add_to_plan method >>.
 
 =item * Running tests with Test::Class::Moose is deprecated - use L<Test::Class::Moose::Runner>
 
-As of version 0.55, running tests and being a test class have been
-separated. Your test classes should continue to C<use Test::Class::Moose>, but
-your test runner script should use L<Test::Class::Moose::Runner>:
+As of version 0.55, running tests and being a test class have been separated.
+Your test classes should continue to C<use Test::Class::Moose>, but your test
+runner script should use L<Test::Class::Moose::Runner>:
 
  use Test::Class::Moose::Load 't/lib';
  use Test::Class::Moose::Runner;
  Test::Class::Moose::Runner->new->runtests;
 
-Calling C<< Test::Class::Moose->new->runtests >> still works, but is
-deprecated and will issue a warning.
+Calling C<< Test::Class::Moose->new->runtests >> still works, but is deprecated
+and will issue a warning.
 
 =item * Parallel testing is totally different
 
@@ -1082,8 +1082,8 @@ running tests in parallel.
 =item * The L<Test::Class::Moose::Report> C<all_test_classes> method is deprecated
 
 This has been replaced with the C<all_test_instances> method. The
-C<all_test_classes> method is still present for backwards compatibility, but
-it simply calls C<all_test_instances> under the hood.
+C<all_test_classes> method is still present for backwards compatibility, but it
+simply calls C<all_test_instances> under the hood.
 
 =item * The C<Test::Class::Moose::Report::Class> class is gone
 
@@ -1124,9 +1124,9 @@ forgot it:
         ...
     }
 
-That second argument is still passed, but it's deprecated. It's now
-recommended that you call the C<< $test->test_report >> method to get that.
-Instead of this:
+That second argument is still passed, but it's deprecated. It's now recommended
+that you call the C<< $test->test_report >> method to get that. Instead of
+this:
 
     sub test_froblinator {
         my ( $test, $report ) = @_;
@@ -1181,9 +1181,9 @@ L<https://metacpan.org/release/Test-Class-Moose/>
 =item * L<Test::Routine>
 
 I always pointed people to this when they would ask about L<Test::Class> +
-L<Moose>, but I would always hear "that's not quite what I'm looking for".
-I don't quite understand what the reasoning was, but I strongly encourage you
-to take a look at L<Test::Routine>.
+L<Moose>, but I would always hear "that's not quite what I'm looking for". I
+don't quite understand what the reasoning was, but I strongly encourage you to
+take a look at L<Test::Routine>.
 
 =item * L<Test::Roo>
 
@@ -1201,13 +1201,11 @@ L<Test::Class> + L<Test::Most>.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<https://github.com/houseabsolute/test-class-moose/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+Bugs may be submitted at L<https://github.com/Test-More/test-class-moose/issues>.
 
 =head1 SOURCE
 
-The source code repository for Test-Class-Moose can be found at L<https://github.com/houseabsolute/test-class-moose>.
+The source code repository for Test-Class-Moose can be found at L<https://github.com/Test-More/test-class-moose>.
 
 =head1 AUTHORS
 
@@ -1221,17 +1219,25 @@ Curtis "Ovid" Poe <ovid@cpan.org>
 
 Dave Rolsky <autarch@urth.org>
 
+=item *
+
+Chad Granum <exodist@cpan.org>
+
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Christopher Layne Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Harald Jörg Iain Loasby Jeremy Krieg Jonathan C. Otsuka Stowe jrubinator Karen Etheridge Larry Leszczynski mark-5 mephinet Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
+=for stopwords Andy Jack Chad Granum Christopher Layne Chuck Adams Denny de la Haye Desmond Daignault Doug Bell Gregory Oschwald Harald Jörg Iain Loasby Jeremy Krieg Jonathan C. Otsuka Stowe jrubinator Karen Etheridge Larry Leszczynski mark-5 mephinet Mike Jones Neil Bowers Olaf Alders Paul Boyd Williams Petrea Corneliu Stefan Steven Humphrey Stuckdownawell Tim Vroom Tom Beresford Heady Udo Oji
 
 =over 4
 
 =item *
 
 Andy Jack <github@veracity.ca>
+
+=item *
+
+Chad Granum <exodist7@gmail.com>
 
 =item *
 
@@ -1299,6 +1305,10 @@ mephinet <mephinet@gmx.net>
 
 =item *
 
+Mike Jones <mike@netsplit.org.uk>
+
+=item *
+
 Neil Bowers <neil@bowers.com>
 
 =item *
@@ -1345,7 +1355,7 @@ Udo Oji <Velti@signor.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2025 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -35,12 +35,12 @@ requires:
   JSON::MaybeXS: '0'
   JSON::Parse: '0'
   Params::Get: '0.04'
-  XML::PP: '0'
+  XML::PP: '0.05'
   YAML::XS: '0'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/nigelhorne/Config-Abstraction/issues
   homepage: https://metacpan.org/pod/Config::Abstraction
-  repository: https://github.com/nigelhorne/Config-Abstraction
-version: '0.25'
+  repository: git://github.com/nigelhorne/Config-Abstraction.git
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

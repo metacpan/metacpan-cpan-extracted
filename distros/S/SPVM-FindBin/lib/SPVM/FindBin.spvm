@@ -3,18 +3,15 @@
 
 class FindBin {
   
-  version "0.034";
+  version "0.035";
   
   use Sys;
-  use Cwd;
   use File::Spec;
   use File::Basename;
   use Fn;
   
   our $Bin : ro string;
   our $Script : ro string;
-  our $RealBin : ro string;
-  our $RealScript : ro string;
   
   INIT {
     &init();
@@ -22,47 +19,18 @@ class FindBin {
   
   static method init : void () {
     
-    my $script = CommandInfo->PROGRAM_NAME;
+    my $program_name = CommandInfo->PROGRAM_NAME;
     
-    unless (Sys->f($script)) {
-      die "Cannot find current script \"$script\"";
+    unless (File::Spec->file_name_is_absolute($program_name)) {
+      $program_name = File::Spec->rel2abs($program_name);
     }
     
-    unless (File::Spec->file_name_is_absolute($script)) {
-      $script = File::Spec->catfile([Cwd->getcwd, $script]);
+    $Bin = File::Basename->dirname($program_name);
+    if (Sys::OS->is_windows) {
+      Fn->replace_chars((mutable string)$Bin, '\\', '/');
     }
     
-    my $fileparse_ret = File::Basename->fileparse($script);
-    $Script = $fileparse_ret->[0];
-    $Bin = $fileparse_ret->[1];
-    
-    while (1) {
-      
-      my $fileparse_ret = File::Basename->fileparse($script);
-      $RealScript = $fileparse_ret->[0];
-      $RealBin = $fileparse_ret->[1];
-      
-      unless (Sys->l($script)) {
-        last;
-      }
-      
-      my $link_text = Sys->readlink($script);
-      
-      unless ($link_text) {
-        last;
-      }
-      
-      if (File::Spec->file_name_is_absolute($link_text)) {
-        $script = $link_text;
-      }
-      else {
-        $script = File::Spec->catfile([$RealBin, $link_text]);
-      }
-    }
-    
-    $Bin = Cwd->abs_path($Bin);
-    
-    $RealBin = Cwd->abs_path($RealBin);
+    $Script = File::Basename->basename($program_name);
     
     Fn->destroy_runtime_permanent_vars;
   }

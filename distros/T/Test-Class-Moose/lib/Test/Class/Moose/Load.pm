@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 use File::Find;
 use File::Spec;
@@ -91,7 +91,7 @@ Test::Class::Moose::Load - Load L<Test::Class::Moose> classes automatically.
 
 =head1 VERSION
 
-version 0.99
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -281,13 +281,11 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Class-Load>. I will be
 notified, and then you'll automatically be notified of progress on your bug as
 I make changes.
 
-Bugs may be submitted at L<https://github.com/houseabsolute/test-class-moose/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+Bugs may be submitted at L<https://github.com/Test-More/test-class-moose/issues>.
 
 =head1 SOURCE
 
-The source code repository for Test-Class-Moose can be found at L<https://github.com/houseabsolute/test-class-moose>.
+The source code repository for Test-Class-Moose can be found at L<https://github.com/Test-More/test-class-moose>.
 
 =head1 AUTHORS
 
@@ -301,11 +299,15 @@ Curtis "Ovid" Poe <ovid@cpan.org>
 
 Dave Rolsky <autarch@urth.org>
 
+=item *
+
+Chad Granum <exodist@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2025 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

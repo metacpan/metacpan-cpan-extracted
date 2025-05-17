@@ -13,23 +13,6 @@ SEARCH: {
 	delete $ENV{'REMOTE_ADDR'};
 	delete $ENV{'HTTP_USER_AGENT'};
 
-	my $cache;
-
-	eval {
-		require CHI;
-
-		CHI->import();
-	};
-
-	if($@) {
-		diag('CHI not installed');
-		$cache = undef;
-	} else {
-		diag("Using CHI $CHI::VERSION");
-		my $hash = {};
-		$cache = CHI->new(driver => 'Memory', datastore => $hash);
-	}
-
 	my $i = new_ok('CGI::Info');
 	ok($i->is_search_engine() == 0);
 
@@ -71,9 +54,24 @@ SEARCH: {
 	$ENV{'REMOTE_ADDR'} = '66.249.73.149';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)';
 
-	$i = new_ok('CGI::Info' => [{
-		cache => $cache,
-	}]);
+	my $cache;
+
+	eval {
+		require CHI;
+
+		CHI->import();
+	};
+
+	if($@) {
+		diag('CHI not installed');
+	} else {
+		diag("Using CHI $CHI::VERSION");
+		my $hash = {};
+		$cache = CHI->new(driver => 'Memory', datastore => $hash);
+	}
+
+	$i = new_ok('CGI::Info');
+	$i->cache($cache);
 	ok($i->is_search_engine() == 1);
 	ok($i->browser_type() eq 'search');
 	SKIP: {
@@ -90,9 +88,8 @@ SEARCH: {
 
 	$ENV{'HTTP_USER_AGENT'} = 'A nonsense user agent string';
 	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
-	$i = new_ok('CGI::Info::Test' => [{
-		cache => $cache,
-	}]);
+	$i = new_ok('CGI::Info');
+	$i->cache($cache);
 	ok($i->is_search_engine() == 0);
 	ok($i->browser_type() eq 'robot');
 	SKIP: {

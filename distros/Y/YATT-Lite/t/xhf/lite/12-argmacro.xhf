@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+
+TITLE: just declare common args
+IN:
+ <!yatt:argmacro common=[
+   name=!
+   file=!
+   session="value!"
+   required="bool/0"
+ ]>
+ 
+ <!yatt:widget foo %common;>
+   name=&yatt:name;
+   file=&yatt:file;
+   session=&yatt:session;
+   required=&yatt:required;
+ 
+ <!yatt:args>
+  <yatt:foo name="q1" file="aa" session="{}" required/>
+  --
+  <yatt:foo name="q2" file="bb" session="{}" />
+OUT:
+   name=q1
+   file=aa
+   session={}
+ 
+   required=1
+  --
+   name=q2
+   file=bb
+   session={}
+ 
+   required=0
+ 
+
+TITLE: pair => x, y
+FILE: test1impl.yatt
+IN:
+ <!yatt:args>
+ <yatt:foo pair="3, 8"/>
+ 
+ <!yatt:argmacro test1=[x y] pair>
+ my ($x, $y) = split /\s*,\s*/, $cgen->node_value($args->{pair});
+ $result->{x} = $x;
+ $result->{y} = $y;
+ 
+ <!yatt:widget foo %test1; >
+ <h2>&yatt:x;</h2>
+ &yatt:y;
+OUT:
+ <h2>3</h2>
+ 8
+ 
+
+TITLE: argmacro from base
+IN:
+ <!yatt:base file="test1impl.yatt">
+ <!yatt:widget bar %test1; >
+ x=&yatt:x; y=&yatt:y;
+ <!yatt:args>
+ <yatt:bar pair="a, b"/>
+OUT:
+ x=a y=b
+ 
+
+TITLE: add argmacros with renaming
+IN:
+ <!yatt:argmacro enum=[list=list] first="value/0" last="value!">
+ $DB::single = 1;
+ my $firstExpr = $args->{first} ? $cgen->node_value($args->{first}) : $vars->{first}->default;
+ my $lastExpr = $cgen->node_value($args->{last});
+ $result->{list} = sprintf(q{%s .. %s}, $firstExpr, $lastExpr);
+ 
+ <!yatt:widget bar
+   %enum(header=last);
+   %enum(label=last);
+ >
+ <yatt:foreach my=row list=label_list><yatt:foreach my=col list=header_list
+ >   &yatt:row; &yatt:col;
+ </yatt:foreach></yatt:foreach>
+ 
+ <!yatt:args>
+ <yatt:bar header=2 label=3/>
+OUT:
+    0 0
+    0 1
+    0 2
+    1 0
+    1 1
+    1 2
+    2 0
+    2 1
+    2 2
+    3 0
+    3 1
+    3 2
+ 
+ 
+

@@ -7,7 +7,7 @@ require 5.010; # For named capture.
 
 use constant DEBUG_MRO => $ENV{DEBUG_YATT_MRO};
 
-use YATT::Lite::Core qw(Folder Template Part Widget Action Entity);
+use YATT::Lite::Core qw(Folder Template Part Widget Action Entity ArgMacro);
 use YATT::Lite::Constants;
 
 # Naming convention:
@@ -396,6 +396,17 @@ use YATT::Lite::Constants;
     my ($path, $body, $primary, $head, $foot) = nx($node);
     return '' if not $delegate_vars and not $widget->{has_required_arg}
       and not $primary and not $body;
+
+    if ($widget->{argmacro_instance_list}) {
+      $primary = YATT::Lite::CGen::ArgMacro->expand_all_argmacro(
+        $self,
+        $primary,
+        $widget->{argmacro_trigger_dict},
+        $widget->{argmacro_instance_list},
+        $widget->{argmacro_instance_dict},
+      );
+    }
+
     my $wname = join ":", @$path;
     my ($posArgs, $actualNo, @argOrder);
     my $add_arg = sub {

@@ -38,6 +38,9 @@ use YATT::Lite::Breakpoint ();
   use YATT::Lite::Types
     ([Part => -base => MY->Item
       , -fields => [qw(toks arg_dict arg_order
+                       argmacro_instance_dict
+                       argmacro_instance_list
+                       argmacro_trigger_dict
                        decllist
 		       cf_namespace cf_kind cf_folder cf_data
                        cf_decl
@@ -55,6 +58,17 @@ use YATT::Lite::Breakpoint ();
       , [Data => ()]
       , [Entity => ()
          , -constants => [[item_category => 'entity']]
+       ]
+      , [ArgMacro => ()
+         , -fields => [qw(
+           cf_output_args
+           on_declare
+           on_expand
+           cf_to_name
+           cf_from_name
+           cf_rename_map
+           cf_resolve_map
+         )]
        ]
     ]
 
@@ -127,6 +141,17 @@ use YATT::Lite::Breakpoint ();
     (my Part $part, my Folder $folder) = @_;
     Scalar::Util::weaken($part->{cf_folder} = $folder);
     # die "Can't weaken!" unless Scalar::Util::isweak($part->{cf_folder});
+  }
+
+  sub YATT::Lite::Core::ArgMacro::clone_with_renamespec {
+    (my ArgMacro $orig, my ($toName, $fromName)) = @_;
+    my ArgMacro $new = fields::new(ArgMacro);
+    %$new = %$orig;
+    Scalar::Util::weaken($new->{cf_folder});
+    $new->{cf_output_args} = YATT::Lite::Util::deep_copy_array($orig->{cf_output_args});
+    $new->{cf_to_name} = $toName;
+    $new->{cf_from_name} = $fromName;
+    $new;
   }
 
 #  sub YATT::Lite::Core::Part::source {
@@ -613,6 +638,7 @@ sub synerror {
     undef $tmpl->{product};
     undef $tmpl->{parse_ok};
     undef $tmpl->{cf_subroutes};
+    undef $tmpl->{argmacro_dict};
     # delpkg($tmpl->{cf_package}); # No way to avoid redef error.
   }
   sub YATT::Lite::Core::Template::refresh {

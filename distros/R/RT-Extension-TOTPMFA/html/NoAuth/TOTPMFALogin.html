@@ -61,7 +61,7 @@ if (defined $ARGS{'totpmfa_otp'}) {
 <form id="login" name="login" method="post" action="<% RT->Config->Get("WebPath") %>/NoAuth/TOTPMFALogin.html">
 
 <div class="entry">
-    <span class="label"><&|/l&>One-time passcode</&>:</span><span class="value"><input type="text" id="totpmfa_otp" name="totpmfa_otp" autocomplete="off" placeholder="<&|/l&><% $Digits %> digits or Yubikey OTP</&>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" /></span>
+    <span class="label"><&|/l&>One-time passcode</&>:</span><span class="value"><input type="text" id="totpmfa_otp" name="totpmfa_otp" autocomplete="off" placeholder="<% loc("[_1] digits or Yubikey OTP", $Digits) %>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" /></span>
 </div>
 
 <& /Elements/Submit, Label => loc('Login')&>
@@ -107,7 +107,7 @@ if (window.location.hash) {
 
   <div class="form-row">
     <div class="label col-3"><&|/l&>One-time passcode</&>:</div>
-    <div class="valueu col-9"><input type="text" id="totpmfa_otp" name="totpmfa_otp" autocomplete="off" placeholder="<&|/l&><% $Digits %> digits or Yubikey OTP</&>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" /></div>
+    <div class="valueu col-9"><input type="text" id="totpmfa_otp" name="totpmfa_otp" autocomplete="off" placeholder="<% loc("[_1] digits or Yubikey OTP", $Digits) %>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" /></div>
   </div>
 
 <input type="hidden" name="next" value="<% $next %>" />

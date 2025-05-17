@@ -1,16 +1,18 @@
 package EBook::Gutenberg;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 
 use Getopt::Long;
 use File::Path qw(make_path);
 use File::Spec;
+use File::Temp qw(tempfile);
 use JSON::PP;
-use List::Util qw(all max);
+use List::Util qw(all first max);
 
 use EBook::Gutenberg::Catalog;
+use EBook::Gutenberg::Dialog qw(:codes);
 use EBook::Gutenberg::Get;
 use EBook::Gutenberg::Home;
 
@@ -27,6 +29,7 @@ Commands:
   get <target>      Download ebook matching target
   search <target>   Search for ebooks matching target
   meta <id>         Dump ebook metadata
+  menu              Launch gutenberg ncurses interface
 
 Options:
   -d|--data=<dir>   gutenberg data directory
@@ -54,10 +57,13 @@ my %COMMANDS = (
     'search' => \&search,
     'get'    => \&get,
     'meta'   => \&meta,
+    'menu'   => \&menu,
 );
 
 my $OLD_DEFAULT_DATA = File::Spec->catfile(home, '.gutenberg');
 my $DOT_LOCAL = File::Spec->catfile(home, '.local/share');
+
+my $ARG_MAX = 4096;
 
 sub _default_data {
 
@@ -88,7 +94,7 @@ sub _prompt {
         chomp $in;
         if (fc $in eq fc 'y') {
             return 1;
-        } elsif (!$in or fc $in eq fc 'n') {
+        } elsif ($in eq '' or fc $in eq fc 'n') {
             return 0;
         } else {
             warn "'$in' is an invalid reponse\n";
@@ -107,7 +113,7 @@ sub _nprompt {
         print "$prompt ";
         my $in = readline STDIN;
         chomp $in;
-        if (!$in or fc $in eq fc 'n') {
+        if ($in eq '' or fc $in eq fc 'n') {
             return undef;
         } elsif ($in =~ /^\d+$/ and exists $n{ $in }) {
             return $in;
@@ -135,12 +141,23 @@ sub _title2rx {
 
 }
 
-sub _print_book {
+sub _target2param {
+
+    my $targ = shift;
+
+    if ($targ =~ /^\d+$/) {
+        return id => $targ;
+    } else {
+        return title => _title2rx($targ);
+    }
+
+}
+
+sub _book_meta_str {
 
     my $book = shift;
-    my $out = shift // *STDOUT;
 
-    print { $out } <<"HERE";
+    return <<"HERE";
 ID:       $book->{ 'Text#'     }
 Title:    $book->{ Title       }
 Type:     $book->{ Type        }
@@ -154,22 +171,19 @@ HERE
 
 }
 
-sub _print_book_json {
+sub _book_meta_json {
 
     my $book = shift;
-    my $out = shift // *STDOUT;
 
-    my $copy;
-
-    %$copy = %$book;
+    my %copy = %$book;;
 
     for my $k (qw(Authors Subjects Bookshelves LoCC)) {
-        $copy->{ $k } = [ split /\s*;\s*/, $copy->{ $k } ];
+        $copy{ $k } = [ split /\s*;\s*/, $copy{ $k } ];
     }
 
     my $json = JSON::PP->new->pretty(1)->canonical(1);
 
-    print { $out } $json->encode($copy);
+    return $json->encode(\%copy);
 
 }
 
@@ -201,12 +215,41 @@ sub _get_ok {
 
 }
 
-sub _search {
+sub _gen_search_params {
 
     my $self = shift;
-    my $targ = shift;
 
-    my $have_params = defined $targ;
+    my %search;
+
+    if (@{ $self->{ Args } }) {
+       my ($k, $v) = _target2param($self->{ Args }->[0]);
+        $search{ $k } = $v;
+    }
+
+    if (@{ $self->{ Authors } }) {
+        $search{ authors } = $self->{ Authors };
+    }
+
+    if (@{ $self->{ Subjects } }) {
+        $search{ subjects } = $self->{ Subjects };
+    }
+
+    if (defined $self->{ Language }) {
+        $search{ language } = $self->{ Language };
+    }
+
+    if (@{ $self->{ Shelves } }) {
+        $search{ shelves } = $self->{ Shelves };
+    }
+
+    return %search;
+
+}
+
+sub _search {
+
+    my $self   = shift;
+    my %params = @_;
 
     my $catalog = EBook::Gutenberg::Catalog->new($self->{ Catalog });
 
@@ -214,72 +257,58 @@ sub _search {
         Type => sub { $_ eq 'Text' },
     };
 
+    if (defined $params{ title }) {
+        $filter->{ Title } = sub { m/$params{ title }/i };
+    }
+
+    if (defined $params{ id }) {
+        $filter->{ 'Text#' } = sub { $_ == $params{ id } };
+    }
+
     # Get a list words from each supplied author parameter, with non-word
     # characters stripped out. Then filter out books that do not contain every
     # word from that list in their author entries. This seems to be the simplest
     # and DWIMest way of going about this that I could find.
-    if (@{ $self->{ Authors } }) {
+    if (defined $params{ authors } and @{ $params{ authors } }) {
         my @words =
-            map { split /\s/ }
+            map { split /\s+/ }
             map { s/\W+/ /gr }
-            @{ $self->{ Authors } };
+            @{ $params{ authors } };
         $filter->{ Authors } = sub {
             my $a = $_;
             all { $a =~ m/(^|\W)\Q$_\E(\W|$)/i } @words;
         };
-        $have_params = 1;
     }
 
     # Same as authors
-    if (@{ $self->{ Subjects } }) {
+    if (defined $params{ subjects } and @{ $params{ subjects } }) {
         my @words =
-            map { split /\s/ }
+            map { split /\s+/ }
             map { s/\W+/ /gr }
-            @{ $self->{ Subjects } };
+            @{ $params{ subjects } };
         $filter->{ Subjects } = sub {
             my $a = $_;
             all { $a =~ m/(^|\W)\Q$_\E(\W|$)/i } @words;
         };
-        $have_params = 1;
     }
 
     # Same as authors
-    if (@{ $self->{ Shelves } }) {
+    if (defined $params{ shelves } and @{ $params{ shelves } }) {
         my @words =
-            map { split /\s/ }
+            map { split /\s+/ }
             map { s/\W+/ /gr }
-            @{ $self->{ Shelves } };
+            @{ $params{ shelves } };
         $filter->{ Bookshelves } = sub {
             my $a = $_;
-            all { $a =~ m/(^|\w)\Q$_\E(\W|$)/i } @words;
+            all { $a =~ m/(^|\W)\Q$_\E(\W|$)/i } @words;
         };
-        $have_params = 1;
     }
 
-    if (defined $self->{ Language }) {
-        $filter->{ Language } = sub { $_ eq $self->{ Language } };
-        $have_params = 1;
+    if (defined $params{ language }) {
+        $filter->{ Language } = sub { $_ eq $params{ language } };
     }
 
-    unless ($have_params) {
-        $self->help(1);
-    }
-
-    my @books;
-
-    if (not defined $targ) {
-        @books = @{ $catalog->books($filter) };
-    } elsif ($targ =~ /^\d+$/) {
-        my $book = $catalog->book($targ);
-        unless (defined $book) {
-            die "Could not find an ebook with an ID of $targ\n";
-        }
-        @books = ($book);
-    } else {
-        my $rx = _title2rx($targ);
-        $filter->{ Title } = sub { $_ =~ $rx };
-        @books = @{ $catalog->books($filter) };
-    }
+    my @books = @{ $catalog->books($filter) };
 
     return @books;
 
@@ -299,7 +328,318 @@ sub _print_list {
 
 }
 
-# Taken from exiftool
+sub _dialog_search {
+
+    my $self = shift;
+
+    state $ltitl = '';
+    state $lauth = '';
+    state $lsubj = '';
+    state $llang = '';
+    state $lshlf = '';
+    state $lebid = '';
+
+    while (1) {
+
+        my ($rv, $form) = $self->{ Dialog }->form(
+           <<'HERE',
+Search for an ebook using the parameter fields below. Fields left blank will be
+ignored. The "Title" field can be given a Perl regex if the input starts and
+ends with a slash (/) character.
+HERE
+            17, 45, 6,
+            'Title',    1, 0, $ltitl, 1, 10, 36, 255,
+            'Author',   2, 0, $lauth, 2, 10, 36, 255,
+            'Subject',  3, 0, $lsubj, 3, 10, 36, 255,
+            'Language', 4, 0, $llang, 4, 10, 36, 255,
+            'Shelf',    5, 0, $lshlf, 5, 10, 36, 255,
+            'ID',       6, 0, $lebid, 6, 10, 36, 255,
+            {
+                title => 'Search',
+                ok_label => 'Search',
+                extra_button => 1,
+                extra_label => 'Update',
+                erase_on_exit => 1,
+            },
+        );
+
+        last if $rv == DIALOG_CANCEL or $rv == DIALOG_ESC;
+
+        $self->{ Dialog }->infobox('Searching...', 0, 0);
+
+        ($ltitl, $lauth, $lsubj, $llang, $lshlf, $lebid) = @$form;
+
+        if ($rv == DIALOG_EXTRA) {
+            $rv = $self->{ Dialog }->yesno(
+                'Would you like to update your local gutenberg catalog?', 0, 0
+            );
+            next if $rv != DIALOG_OK;
+            $self->{ Dialog }->infobox('Updating gutenberg catalog...', 0, 0);
+            my $catalog = EBook::Gutenberg::Catalog->new($self->{ Catalog });
+            sleep 5 unless $self->_get_ok;
+            $self->_touch_get;
+            eval { $catalog->fetch };
+            if ($@ ne '') {
+                $self->{ Dialog }->msgbox("Failed to fetch catalog: $@", 0, 0);
+                next;
+            }
+            $self->{ Dialog }->msgbox(
+                "Successfully updated gutenberg catalog", 0, 0
+            );
+        } elsif ($rv == DIALOG_OK) {
+
+            unless (-s $self->{ Catalog }) {
+                $self->{ Dialog }->msgbox(
+                    <<'HERE', 0, 0
+No existing Project Gutenberg catalog found. Please run a catalog update before
+searching.
+HERE
+                );
+                next;
+            }
+
+            my %param;
+
+            if ($ltitl ne '') {
+               $param{ title } = _title2rx($ltitl);
+            }
+
+            if ($lauth ne '') {
+                $param{ authors } = [ $lauth ];
+            }
+
+            if ($lsubj ne '') {
+                $param{ subjects } = [ $lsubj ];
+            }
+
+            if ($llang ne '') {
+                $param{ language } = $llang;
+            }
+
+            if ($lshlf ne '') {
+                $param{ shelves } = [ $lshlf ];
+            }
+
+            if ($lebid ne '') {
+                unless ($lebid =~ /^\d+$/) {
+                    $self->{ Dialog }->msgbox(
+                        "'ID' must be an integar", 0, 0
+                    );
+                    next;
+                }
+                $param{ id } = $lebid;
+            }
+
+            unless (%param) {
+                $self->{ Dialog }->msgbox(
+                    'No search parameters provided.', 0, 0
+                );
+                next;
+            }
+
+            my @books = $self->_search(%param);
+
+            if (@books > $ARG_MAX) {
+                $self->{ Dialog }->msgbox(
+                    'Too many search results. Please narrow your search parameters.',
+                    0, 0
+                );
+                next;
+            } elsif (@books == 0) {
+                $self->{ Dialog }->msgbox(
+                    'Found no ebooks matching the given search parameters.', 0, 0
+                );
+            } else {
+                $self->_dialog_download_select(\@books);
+            }
+        }
+    }
+
+    return 1;
+
+}
+
+sub _dialog_download_select {
+
+    my $self  = shift;
+    my $books = shift;
+
+    my @iter = map { $_->{ 'Text#' } => $_->{ Title } } @$books;
+
+    while (1) {
+
+        my ($rv, $sel) = $self->{ Dialog }->menu(
+            '', 0, 0, 0,
+            @iter,
+            {
+                title => 'Search Results',
+                ok_label => 'View',
+            },
+        );
+
+        last if $rv == DIALOG_CANCEL or $rv == DIALOG_ESC;
+
+        my $book = first { $_->{ 'Text#' } == $sel } @$books;
+
+        $self->_dialog_ebook($book);
+
+    }
+
+    return 1;
+
+}
+
+sub _dialog_ebook {
+
+    my $self = shift;
+    my $book = shift;
+
+    while (1) {
+
+        my $rv = $self->{ Dialog }->yesno(
+            _book_meta_str($book), 0, 0,
+            {
+                title => $book->{ Title },
+                yes_label => 'Download',
+                extra_button => 1,
+                extra_label => 'Read',
+                no_label => 'Cancel',
+            },
+        );
+
+        if ($rv == DIALOG_OK) {
+            $self->_dialog_download_format($book);
+        } elsif ($rv == DIALOG_EXTRA) {
+            $self->_dialog_read($book);
+        } elsif ($rv == DIALOG_CANCEL or $rv == DIALOG_ESC) {
+            last;
+        }
+
+    }
+
+    return 1;
+
+}
+
+sub _dialog_download_format {
+
+    my $self = shift;
+    my $book = shift;
+
+    while (1) {
+
+        my ($rv, $sel) = $self->{ Dialog }->menu(
+            '', 0, 0, 0,
+            'epub3', 'Newer style EPUB. May not be compatible with older e-readers.',
+            'epub', 'Older style EPUB. Better compatibility with older e-readers.',
+            'epub-noimages', 'Same as "epub" but with no images.',
+            'kindle', 'KF8 ebook, an Amazon-proprietary format used by newer Kindle devices.',
+            'mobi', 'Ebook format commonly used by older Kindle devices.',
+            'text', 'Plain text file.',
+            'zip', 'Zip archive of HTML and images.',
+            'html', 'Single HTML page.',
+            {
+                title => 'Format Selection',
+            },
+        );
+
+        last if $rv == DIALOG_CANCEL or $rv == DIALOG_ESC;
+
+        $self->_dialog_download($book, $sel);
+
+    }
+
+}
+
+sub _dialog_download {
+
+    my $self = shift;
+    my $book = shift;
+    my $fmt  = shift;
+
+    my $default = sprintf "%s.%s",
+        $book->{ Title },
+        $EBook::Gutenberg::Get::FORMATS{ $fmt }->{ suffix };
+
+
+    my ($rv, $path) = $self->{ Dialog }->inputbox(
+        'Please input the path to write the downloaded ebook to.', 0, 0,
+        $default,
+    );
+
+    return 1 if $rv == DIALOG_CANCEL or $rv == DIALOG_ESC;
+
+    $self->{ Dialog }->infobox('Fetching ebook...', 0, 0);
+
+    my $p = eval {
+        sleep 5 unless $self->_get_ok;
+        $self->_touch_get;
+        gutenberg_get(
+            $book->{ 'Text#' },
+            { fmt => $fmt, to => $path }
+        );
+    };
+
+    if ($@ ne '') {
+        $self->{ Dialog }->msgbox(
+            "Failed to fetch ebook: $@", 0, 0
+        );
+        return 1;
+    }
+
+    $self->{ Dialog }->msgbox(
+        "Successfully fetched $p", 0, 0
+    );
+
+    return 1;
+
+}
+
+sub _dialog_read {
+
+    my $self = shift;
+    my $book = shift;
+
+    $self->{ Dialog }->infobox(
+        'Fetching text...', 0, 0
+    );
+
+    my $file = $self->{ TxtCache }{ $book->{ 'Text#' } } // do {
+
+        my $p = eval {
+            my $tmp = do {
+                my ($fh, $fn) = tempfile;
+                close $fh;
+                $fn;
+            };
+            # TODO: Sleep less?
+            sleep 5 unless $self->_get_ok;
+            $self->_touch_get;
+            gutenberg_get(
+                $book->{ 'Text#' },
+                { fmt => 'text', to => $tmp },
+            );
+        };
+
+        if ($@ ne '') {
+            $self->{ Dialog }->msgbox(
+                "Failed to fetch ebook: $@", 0, 0
+            );
+            return 1;
+        }
+
+        $self->{ TxtCache }{ $book->{ 'Text#' } } = $p;
+
+    };
+
+    # dialog does have a textbox widget, but it doesn't display large text files
+    # like Gutenberg's text ebooks correctly, so we'll just use a pager instead.
+    $self->{ Dialog }->pager($file);
+
+    return 1;
+
+}
+
 sub help {
 
     my $self = shift;
@@ -349,7 +689,13 @@ sub search {
             "run 'update' to fetch a catalog before running 'search'\n";
     }
 
-    my @books = $self->_search(shift @{ $self->{ Args } });
+    my %search = $self->_gen_search_params;
+
+    unless (%search) {
+        $self->help(1);
+    }
+
+    my @books = $self->_search(%search);
 
     if (@books == 0) {
         die "Could not find any ebooks matching the given parameters\n";
@@ -375,7 +721,13 @@ sub get {
             "network operation with Project Gutenberg\n";
     }
 
-    my @books = $self->_search(shift @{ $self->{ Args } });
+    my %search = $self->_gen_search_params;
+
+    unless (%search) {
+        $self->help(1);
+    }
+
+    my @books = $self->_search(%search);
 
     my $sel;
 
@@ -409,7 +761,7 @@ sub get {
     }
 
     my $ok = $self->{ NoPrompt } ? 1 : do {
-        _print_book($sel);
+        print _book_meta_str($sel);
         _prompt("Would you like to download this ebook?");
     };
 
@@ -428,7 +780,7 @@ sub get {
         $sel->{ 'Text#' },
         {
             fmt => $self->{ Format },
-            to  => $self->{ To },
+            to  => $self->{ To } // "$sel->{ Title }.*",
         }
     );
 
@@ -467,10 +819,27 @@ sub meta {
     }
 
     if ($self->{ MetaJSON }) {
-        _print_book_json($book);
+        print _book_meta_json($book);
     } else {
-        _print_book($book);
+        print _book_meta_str($book);
     }
+
+    return 1;
+
+}
+
+sub menu {
+
+    my $self = shift;
+
+    my $dialog;
+    my ($rv, $sel);
+
+    $self->{ Dialog } = EBook::Gutenberg::Dialog->new(
+        backtitle => "$PRGNAM $PRGVER"
+    );
+
+    $self->_dialog_search;
 
     return 1;
 
@@ -496,6 +865,8 @@ sub init {
         # Not set by any option
         Catalog  => undef,
         GetFile  => undef,
+        Dialog   => undef,
+        TxtCache => {},
     };
 
     bless $self, $class;
@@ -569,6 +940,16 @@ sub run {
 
 }
 
+DESTROY {
+
+    my $self = shift;
+
+    for my $f (keys %{ $self->{ TxtCache } }) {
+        unlink $f if -e $f;
+    }
+
+}
+
 1;
 
 =head1 NAME
@@ -615,6 +996,10 @@ Download an ebook; the C<get> command.
 =item $gut->meta
 
 Print ebook metadata; the C<meta> command.
+
+=item $gut->menu
+
+Launch the L<dialog(1)>-based menu interface.
 
 =item $gut->help([$exit])
 

@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Filename 0.060000;
+package Term::CLI::Argument::Filename 0.061000;
 
 use 5.014;
 use warnings;
@@ -91,7 +91,7 @@ Term::CLI::Argument::Filename - class for file name arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.060000
+version 0.061000
 
 =head1 SYNOPSIS
 

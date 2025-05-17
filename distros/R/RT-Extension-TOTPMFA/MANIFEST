@@ -8,6 +8,8 @@ html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn
 html/Elements/TOTPMFATypeSelector
 html/NoAuth/TOTPMFALogin.html
 html/Prefs/TOTPMFA.png
+html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn
+html/Helpers/TOTPMFA/dhandler
 lib/RT/Extension/TOTPMFA.pm
 LICENSE
 make-dist.sh
@@ -15,4 +17,19 @@ Makefile.PL
 MANIFEST
 META.yml
 README.md
+po/totpmfa.pot
+po/fr.po
+inc/Module/Install.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/RTx/Runtime.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Include.pm
+inc/YAML/Tiny.pm
 SIGNATURE                                Public-key signature (added by MakeMaker)

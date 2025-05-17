@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/halstead'
+    'bin/halstead.pl'
 );
 
 # no fake home requested

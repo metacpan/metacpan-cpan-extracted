@@ -1,5 +1,5 @@
 {
-   "abstract" : "The Directory Path Where The Program Is Located",
+   "abstract" : "Directory Path Where Program Is Invoked",
    "author" : [
       "USER_NAME<USER_MAIL>"
    ],
@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-FindBin"
       }
    },
-   "version" : "0.034",
+   "version" : "0.035",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

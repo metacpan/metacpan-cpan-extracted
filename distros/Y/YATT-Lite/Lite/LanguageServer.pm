@@ -13,6 +13,7 @@ use YATT::Lite::LanguageServer::Generic -as_base
   , [fields => qw/_initialized
                   _client_cap
                   _inspector
+                  _last_error
                   current_workspace
                  /
    ];
@@ -67,6 +68,11 @@ sub lspcall__textDocument__didOpen {
   $self->send_notification('textDocument/publishDiagnostics', $notif);
 }
 
+sub last_error {
+  (my MY $self, my TextDocumentIdentifier $docId) = @_;
+  $self->{_last_error}{$docId->{uri}}
+}
+
 sub lspcall__textDocument__didChange {
   (my MY $self, my DidChangeTextDocumentParams $params) = @_;
 
@@ -74,6 +80,8 @@ sub lspcall__textDocument__didChange {
   my $fn = $self->uri2localpath($docId->{uri});
 
   (my $updated, my LintResult $error) = $self->inspector->apply_changes($fn, @{$params->{contentChanges}});
+
+  $self->{_last_error}{$docId->{uri}} = $error;
 
   print STDERR "# updated ", ($error ? "with error " : ""),"as: ", terse_dump($updated), "\n"
     unless $self->{quiet};
@@ -121,6 +129,10 @@ sub lspcall__textDocument__hover {
   my Hover $result = {};
 
   my TextDocumentIdentifier $docId = $params->{textDocument};
+
+  # Skip if the document has error
+  return undef if $self->last_error($docId);
+
   my $fn = $self->uri2localpath($docId->{uri});
   my Position $pos = $params->{position};
 
@@ -179,6 +191,10 @@ sub lspcall__textDocument__documentSymbol {
   (my MY $self, my DocumentSymbolParams $params) = @_;
 
   my TextDocumentIdentifier $docId = $params->{textDocument};
+
+  # Skip if the document has error
+  return undef if $self->last_error($docId);
+
   my $fn = $self->uri2localpath($docId->{uri});
 
   if (my @result = $self->inspector->list_parts_in($fn)) {

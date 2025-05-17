@@ -7,7 +7,6 @@ META.yml
 Makefile.PL
 README.md
 cpanfile
-dist.ini
 lib/Mojolicious/Plugin/OIDC.pm
 t/00-compile.t
 t/auth-code-flow-IT.t
@@ -15,6 +14,7 @@ t/resource-server-IT.t
 xt/author/critic.t
 xt/author/distmeta.t
 xt/author/no-breakpoints.t
+xt/author/no-tabs.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t
 xt/author/portability.t

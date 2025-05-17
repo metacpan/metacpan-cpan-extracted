@@ -22,9 +22,6 @@ _build/
 Build
 Build.bat
 
-# Module::Install
-inc/
-
 # ExtUtils::MakeMaker
 /blib/
 /_eumm/

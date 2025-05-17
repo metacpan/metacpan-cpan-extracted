@@ -2,7 +2,7 @@
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
-package HTML::Blitz::SSSelector;
+package HTML::Blitz::SSSelector 0.1001;
 use HTML::Blitz::pragma;
 use HTML::Blitz::SelectorType qw(
     ST_FALSE
@@ -17,8 +17,6 @@ use HTML::Blitz::SelectorType qw(
     ST_NTH_CHILD
     ST_NTH_CHILD_OF_TYPE
 );
-
-our $VERSION = '0.0901';
 
 method new($class: :$simple_selectors, :$link_type) {
     bless {

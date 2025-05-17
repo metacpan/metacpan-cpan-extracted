@@ -6,7 +6,7 @@ return {
     AUTHOR             => q{Lukas Mai <l.mai@web.de>},
     LICENSE            => 'gpl_3',
 
-    MIN_PERL_VERSION   => '5.24.0',
+    MIN_PERL_VERSION   => '5.20.0',
     CONFIGURE_REQUIRES => {},
     BUILD_REQUIRES     => {},
     TEST_REQUIRES      => {
@@ -26,10 +26,12 @@ return {
         'Exporter'             => '5.57',
         'Function::Parameters' => '2',
         'List::Util'           => '1.33',
+        'HTML::Blitz::Builder' => 0,
         'Scalar::Util'         => 0,
     },
 
-    REPOSITORY => [ github => 'mauke' ],
+    REPOSITORY => [ codeberg => 'mauke' ],
+    BUGTRACKER => 'https://codeberg.org/mauke/HTML-Blitz/issues',
 
     HARNESS_OPTIONS => ['j4'],
 };

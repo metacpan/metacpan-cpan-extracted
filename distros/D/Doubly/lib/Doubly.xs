@@ -155,7 +155,7 @@ Doubly _insert_after (Doubly self, SV * data) {
 	return node;
 }
 
-Doubly _insert (Doubly self, SV * cb, SV * data) {
+Doubly _insert_find (Doubly self, SV * cb, SV * data) {
 	if (_is_undef(self)) {
 		return _set_data(self, data);
 	}
@@ -390,7 +390,7 @@ insert(self, cb, ...)
 	Doubly self
 	SV * cb
 	CODE:
-		RETVAL = _insert(self, cb, newSVsv(ST(2)));
+		RETVAL = _insert_find(self, cb, newSVsv(ST(2)));
 	OUTPUT:
 		RETVAL
 

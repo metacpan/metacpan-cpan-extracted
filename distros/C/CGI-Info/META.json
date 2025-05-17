@@ -88,6 +88,7 @@
          "web" : "https://github.com/nigelhorne/CGI-Info/issues",
          "x_url" : "https://github.com/nigelhorne/CGI-Info/issues"
       },
+      "homepage" : "https://metacpan.org/pod/CGI::Info",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/CGI-Info.git",
@@ -95,6 +96,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

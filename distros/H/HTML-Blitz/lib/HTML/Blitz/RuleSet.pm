@@ -2,7 +2,7 @@
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
-package HTML::Blitz::RuleSet;
+package HTML::Blitz::RuleSet 0.1001;
 use HTML::Blitz::pragma;
 use HTML::Blitz::Matcher ();
 use HTML::Blitz::Parser ();
@@ -34,8 +34,6 @@ use HTML::Blitz::ActionType qw(
     AT_REPLACE_INNER
 );
 use List::Util qw(all reduce);
-
-our $VERSION = '0.0901';
 
 method new($class:) {
     bless {

@@ -4,6 +4,7 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/30-basics.t
 t/complex.t
 t/env.t
 t/eof.t

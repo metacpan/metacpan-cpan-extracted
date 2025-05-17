@@ -22,6 +22,7 @@ require File::Basename;
     ([Item => -fields => [qw(cf_name cf_public cf_type)]
       , -constants => [[can_generate_code => 0], [item_category => '']]
       , [Folder => -fields => [qw(Item cf_path cf_parent cf_base
+                                  argmacro_dict
 				  cf_entns)]
 	 , -eval => q{use YATT::Lite::Util qw(cached_in);}
 	 , [File => -fields => [qw(partlist cf_string cf_overlay cf_imported

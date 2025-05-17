@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.608-6-g0b0c26e9
+package JSON::Schema::Modern; # git description: v0.609-26-g1b5d3153
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.609';
+our $VERSION = '0.610';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -19,7 +19,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Carp qw(croak carp);
-use List::Util 1.55 qw(pairs first uniqint pairmap uniq any);
+use List::Util 1.55 qw(pairs first uniqint pairmap uniq any min);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref);
 use builtin::compat qw(refaddr load_module);
 use Mojo::URL;
@@ -281,7 +281,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
 
   # Note: the starting position is not guaranteed to be at the root of the $document,
   # nor is the fragment portion of this uri necessarily empty
-  my $initial_uri = Mojo::URL->new($config_override->{initial_schema_uri} // '');
+  my $initial_uri = Mojo::URL->new($config_override->{initial_schema_uri} // ());
   my $initial_path = $config_override->{traversed_schema_path} // '';
   my $spec_version = $config_override->{specification_version} // $self->specification_version // SPECIFICATION_VERSION_DEFAULT;
 
@@ -300,6 +300,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     initial_schema_uri => $initial_uri,     # the canonical URI as of the start of this method or last $id
     traversed_schema_path => $initial_path, # the accumulated traversal path as of the start or last $id
     schema_path => '',                      # the rest of the path, since the start of this method or last $id
+    spec_version => $spec_version,
     errors => [],
     identifiers => {},
     subschemas => [],
@@ -309,20 +310,32 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     traverse => 1,
   };
 
+  my $valid = 1;
+
   try {
-    my $for_canonical_uri = Mojo::URL->new(
-      (is_plain_hashref($schema_reference) && exists $schema_reference->{'$id'}
-          ? Mojo::URL->new($schema_reference->{'$id'}) : undef)
-        // $state->{initial_schema_uri});
-    $for_canonical_uri->fragment(undef) if not length $for_canonical_uri->fragment;
+    # determine the initial value of spec_version and vocabularies, so we have something to start
+    # with in _traverse_subschema().
+    # a subsequent "$schema" keyword can still change these values, and it is always processed
+    # first, so the override is skipped if the keyword exists in the schema
+    $state->{metaschema_uri} =
+      (is_plain_hashref($schema_reference) && exists $schema_reference->{'$schema'} ? undef
+        : $config_override->{metaschema_uri}) // $self->METASCHEMA_URIS->{$spec_version};
 
-    # a subsequent "$schema" keyword can still change these values
-    $state->@{qw(spec_version vocabularies)} = $self->_get_metaschema_info(
-      $config_override->{metaschema_uri} // $self->METASCHEMA_URIS->{$spec_version},
-      $for_canonical_uri,
-    );
+    if (my $metaschema_info = $self->_get_metaschema_vocabulary_classes($state->{metaschema_uri})) {
+      $state->@{qw(spec_version vocabularies)} = @$metaschema_info;
+    }
+    else {
+      # metaschema has not been processed for vocabularies yet...
 
-    my $valid = $self->_traverse_subschema($schema_reference, $state);
+      die 'something went wrong - cannot get metaschema data for '.$state->{metaschema_uri}
+        if not $config_override->{metaschema_uri};
+
+      # use the Core vocabulary to set metaschema info via the '$schema' keyword implementation
+      $valid = $self->_get_metaschema_vocabulary_classes($self->METASCHEMA_URIS->{$spec_version})->[1][0]
+          ->_traverse_keyword_schema({ '$schema' => $state->{metaschema_uri}.'' }, $state);
+    }
+
+    $valid = $self->_traverse_subschema($schema_reference, $state) if $valid and not $state->{errors}->@*;
     die 'result is false but there are no errors' if not $valid and not $state->{errors}->@*;
     die 'result is true but there are errors' if $valid and $state->{errors}->@*;
   }
@@ -371,32 +384,17 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
   my $valid;
   try {
-    my $schema_info;
+    # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
+    $schema_reference = $self->add_schema($schema_reference)->canonical_uri
+      if is_ref($schema_reference) and not $schema_reference->$_isa('Mojo::URL');
 
-    if (not is_ref($schema_reference) or $schema_reference->$_isa('Mojo::URL')) {
-      $schema_info = $self->_fetch_from_uri($schema_reference);
-    }
-    else {
-      # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
-      my $document =
-          $schema_reference->$_isa('JSON::Schema::Modern::Document') ? $self->add_document($schema_reference)
-        : $self->add_schema($schema_reference);
-      my $base_resource = $document->_get_resource($document->canonical_uri)
-        || croak "couldn't get resource: document parse error";
-
-      $schema_info = {
-        schema => $document->schema,
-        document => $document,
-        document_path => '',
-        $base_resource->%{qw(canonical_uri specification_version vocabularies configs)},
-      };
-    }
+    my $schema_info = $self->_fetch_from_uri($schema_reference);
+    abort($state, 'EXCEPTION: unable to find resource "%s"', $schema_reference)
+      if not $schema_info;
 
     abort($state, 'EXCEPTION: collect_annotations cannot be used with specification_version '.$schema_info->{specification_version})
       if $config_override->{collect_annotations} and $schema_info->{specification_version} =~ /^draft[467]$/;
 
-    abort($state, 'EXCEPTION: unable to find resource "%s"', $schema_reference)
-      if not $schema_info;
     abort($state, 'EXCEPTION: "%s" is not a schema', $schema_reference)
       if not $schema_info->{document}->get_entity_at_location($schema_info->{document_path});
 
@@ -618,7 +616,7 @@ sub _traverse_subschema ($self, $schema, $state) {
         $valid = 0;
         next;
       }
-      warn 'traverse result is true but there are errors (keyword: '.$keyword.')'
+      warn 'traverse result is true but there are errors ('.$keyword.': '.$state->{errors}[-1]->error
         if $error_count != $state->{errors}->@*;
 
       # a keyword changed the keyword list for this vocabulary; re-fetch the list before continuing
@@ -940,41 +938,6 @@ sub _get_metaschema_vocabulary_classes { $_[0]->__metaschema_vocabulary_classes-
 sub _set_metaschema_vocabulary_classes { $_[0]->__metaschema_vocabulary_classes->{$_[1] =~ s/#$//r} = $mvc_type->($_[2]) }
 sub __all_metaschema_vocabulary_classes { values $_[0]->__metaschema_vocabulary_classes->%* }
 
-# retrieves metaschema info either from cache or by parsing the schema for vocabularies
-# throws a JSON::Schema::Modern::Result on error
-sub _get_metaschema_info ($self, $metaschema_uri, $for_canonical_uri) {
-  # check the cache. specification metaschemas are already populated.
-  my $metaschema_info = $self->_get_metaschema_vocabulary_classes($metaschema_uri);
-  return @$metaschema_info if $metaschema_info;
-
-  # otherwise, fetch the metaschema and parse its $vocabulary keyword.
-  # we do this by traversing a baby schema with just the $schema keyword.
-  my $state = $self->traverse({ '$schema' => $metaschema_uri.'' });
-  die JSON::Schema::Modern::Result->new(
-    output_format => $self->output_format,
-    valid => JSON::PP::false,
-    errors => [
-      map {
-        my $e = $_;
-        # absolute location is undef iff the location = '/$schema'
-        my $absolute_location = $e->absolute_keyword_location // $for_canonical_uri;
-        JSON::Schema::Modern::Error->new(
-          depth => $e->depth,
-          mode => 'traverse',
-          keyword => $e->keyword eq '$schema' ? '' : $e->keyword,
-          instance_location => $e->instance_location,
-          keyword_location => ($for_canonical_uri->fragment//'').($e->keyword_location =~ s{^/\$schema\b}{}r),
-          length $absolute_location ? ( absolute_keyword_location => $absolute_location ) : (),
-          error => $e->error,
-        )
-      }
-      $state->{errors}->@* ],
-    exception => 1,
-  ) if $state->{errors}->@*;
-
-  return ($state->{spec_version}, $state->{vocabularies});
-}
-
 # translate vocabulary URIs into classes, caching the results (if any)
 sub _fetch_vocabulary_data ($self, $state, $schema_info) {
   if (not exists $schema_info->{schema}{'$vocabulary'}) {
@@ -985,6 +948,8 @@ sub _fetch_vocabulary_data ($self, $state, $schema_info) {
   }
 
   my $valid = 1;
+  # Core §8.1.2-6: "The "$vocabulary" keyword SHOULD be used in the root schema of any schema
+  # document intended for use as a meta-schema. It MUST NOT appear in subschemas."
   $valid = E($state, '$vocabulary can only appear at the document root') if length $schema_info->{document_path};
   $valid = E($state, 'metaschemas must have an $id') if not exists $schema_info->{schema}{'$id'};
 
@@ -1020,12 +985,13 @@ sub _fetch_vocabulary_data ($self, $state, $schema_info) {
 }
 
 # used for determining a default '$schema' keyword where there is none
+# these are also normalized as this is how we cache them
 use constant METASCHEMA_URIS => {
   'draft2020-12' => 'https://json-schema.org/draft/2020-12/schema',
   'draft2019-09' => 'https://json-schema.org/draft/2019-09/schema',
-  'draft7' => 'http://json-schema.org/draft-07/schema#',
-  'draft6' => 'http://json-schema.org/draft-06/schema#',
-  'draft4' => 'http://json-schema.org/draft-04/schema#',
+  'draft7' => 'http://json-schema.org/draft-07/schema',
+  'draft6' => 'http://json-schema.org/draft-06/schema',
+  'draft4' => 'http://json-schema.org/draft-04/schema',
 };
 
 use constant CACHED_METASCHEMAS => {
@@ -1099,21 +1065,43 @@ sub _get_or_load_resource ($self, $uri) {
 # creates a Document and adds it to the resource index, if not already present.
 sub _fetch_from_uri ($self, $uri_reference) {
   $uri_reference = Mojo::URL->new($uri_reference) if not is_ref($uri_reference);
-  my $fragment = $uri_reference->fragment;
 
+  # this is *a* resource that would contain our desired location, but may not be the closest one
   my $resource = $self->_get_or_load_resource($uri_reference->clone->fragment(undef));
   return if not $resource;
 
+  my $fragment = $uri_reference->fragment;
   if (not length($fragment) or $fragment =~ m{^/}) {
     my $subschema = $resource->{document}->get(my $document_path = $resource->{path}.($fragment//''));
     return if not defined $subschema;
-    my $doc_addr = refaddr($resource->{document});
-    my $closest_resource = first { !length($_->[1]{path})       # document root
-        || length($document_path)
-          && $document_path =~ m{^\Q$_->[1]{path}\E(?:/|\z)} }  # path is above present location
-      sort { length($b->[1]{path}) <=> length($a->[1]{path}) }  # sort by length, descending
-      grep { refaddr($_->[1]{document}) == $doc_addr }          # in same document
-      $self->_resource_pairs;
+
+    my $closest_resource;
+    if (not length $fragment) { # we already have the canonical resource root
+      $closest_resource = [ undef, $resource ];
+    }
+    else {
+      # determine the canonical uri by finding the closest schema resource(s)
+      my $doc_addr = refaddr($resource->{document});
+      my @closest_resources =
+        sort { length($b->[1]{path}) <=> length($a->[1]{path}) }  # sort by length, descending
+        grep { !length($_->[1]{path})       # document root
+          || length($document_path)
+            && $document_path =~ m{^\Q$_->[1]{path}\E(?:/|\z)} }  # path is above desired location
+        grep { refaddr($_->[1]{document}) == $doc_addr }          # in same document
+        $self->_resource_pairs;
+
+      # now whittle down to all the resources with the same document path as the first candidate
+      if (@closest_resources > 1) {
+        # find the resource key that most closely matches the original query uri, by matching prefixes
+        my $match = $uri_reference.'';
+        @closest_resources =
+          sort { _prefix_match_length($b->[0], $match) <=> _prefix_match_length($a->[0], $match) }
+          grep $_->[1]{path} eq $closest_resources[0]->[1]{path},
+          @closest_resources;
+      }
+
+      $closest_resource = $closest_resources[0];
+    }
 
     my $canonical_uri = $closest_resource->[1]{canonical_uri}->clone
       ->fragment(substr($document_path, length($closest_resource->[1]{path})));
@@ -1123,18 +1111,28 @@ sub _fetch_from_uri ($self, $uri_reference) {
       schema => $subschema,
       canonical_uri => $canonical_uri,
       document_path => $document_path,
-      $resource->%{qw(document specification_version vocabularies configs)}, # reference, not copy
+      $closest_resource->[1]->%{qw(document specification_version vocabularies configs)}, # reference, not copy
     };
   }
   else {  # we are following a URI with a plain-name fragment
     return if not my $subresource = ($resource->{anchors}//{})->{$fragment};
     return {
       schema => $resource->{document}->get($subresource->{path}),
-      canonical_uri => $subresource->{canonical_uri}->clone, # this is *not* the anchor-containing URI
+      canonical_uri => $subresource->{canonical_uri}, # this is *not* the anchor-containing URI
       document_path => $subresource->{path},
       $resource->%{qw(document specification_version vocabularies configs)}, # reference, not copy
     };
   }
+}
+
+# given two strings, determines the number of characters in common, starting from the first
+# character
+sub _prefix_match_length ($x, $y) {
+  my $len = min(length($x), length($y));
+  foreach my $pos (0..$len) {
+    return $pos if substr($x, $pos, 1) ne substr($y, $pos, 1);
+  }
+  return $len;
 }
 
 # Mojo::JSON::JSON_XS is false when the environment variable $MOJO_NO_JSON_XS is set
@@ -1261,7 +1259,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.609
+version 0.610
 
 =head1 SYNOPSIS
 
@@ -1489,11 +1487,7 @@ a Perl data structure, such as what is returned from a JSON decode operation,
 
 =item *
 
-a L<JSON::Schema::Modern::Document> object,
-
-=item *
-
-or a URI string indicating the location where such a schema is located.
+or a URI string indicating the identity of such a schema.
 
 =back
 
@@ -1547,11 +1541,7 @@ a Perl data structure, such as what is returned from a JSON decode operation,
 
 =item *
 
-a L<JSON::Schema::Modern::Document> object,
-
-=item *
-
-or a URI string indicating the location where such a schema is located.
+or a URI string indicating the identity of such a schema.
 
 =back
 
@@ -1670,7 +1660,9 @@ identifier (either provided explicitly in the method call, or via an C<$id> keyw
 root), all such previous schemas are removed from memory and can no longer be referenced.
 
 If there were errors in the document, will die with these errors;
-otherwise returns the L<JSON::Schema::Modern::Document> that contains the added schema.
+otherwise returns the L<JSON::Schema::Modern::Document> that contains the added schema. URIs
+identified within this document will not be resolved to the provided C<$uri> argument, so you can
+re-add the document object again (with L</add_document>, below) using a new base URI if you wish.
 
 =head2 add_document
 
@@ -1996,7 +1988,7 @@ C<date-time> and C<date> require L<Time::Moment>
 
 =item *
 
-C<date-time> also requires <DateTime::Format::RFC3339>
+C<date-time> also requires L<DateTime::Format::RFC3339>
 
 =item *
 
@@ -2075,15 +2067,7 @@ L<RFC8259: The JavaScript Object Notation (JSON) Data Interchange Format|https:/
 
 =item *
 
-L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://datatracker.ietf.org/doc/html/rfc3986>
-
-=item *
-
-L<Test::JSON::Schema::Acceptance>: contains the official JSON Schema test suite
-
-=item *
-
-L<JSON::Schema::Tiny>: a more stripped-down implementation of the specification, with fewer dependencies and faster evaluation
+L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://datatracker.ietf.org/doc/html/rfc3986> dependencies and faster evaluation
 
 =item *
 
@@ -2108,6 +2092,14 @@ L<https://json-schema.org/draft-04/draft-zyp-json-schema-04>
 =item *
 
 L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
+
+=item *
+
+L<Test::JSON::Schema::Acceptance>: contains the official JSON Schema test suite
+
+=item *
+
+L<JSON::Schema::Tiny>: a more stripped-down implementation of the specification, with fewer
 
 =item *
 

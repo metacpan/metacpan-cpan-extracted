@@ -22,6 +22,7 @@ Windows, although I have not extensively tested it.
   - `HTTP::Lite`
   - `lynx`
   - `iosock`
+* `dialog` (optional; for the `menu` command)
 
 Once the aforementioned dependencies are installed, **gutenberg** can built and
 installed via the following commands:
@@ -52,6 +53,7 @@ ebooks or changes to existing ebook metadata.
 ebook ID, title string, or title regex.
 * `search <target>`: Search for a list of ebooks matching *target*.
 * `meta <id>`: Print the metadata for the ebook corresponding to *id*.
+* `menu`: Launch the dialog-based TUI.
 
 This section was meant to be a quick overview of **gutenberg**'s capabilities.
 For more detailed documentation, you should consult the **gutenberg** manual.

@@ -87,6 +87,7 @@ WriteMakefile(
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
+			homepage => 'https://metacpan.org/pod/CGI::Info',
 			repository => {
 				repository => 'https://github.com/nigelhorne/CGI-Info',
 				type => 'git',

@@ -3,7 +3,6 @@ COPYING
 lib/HTML/Blitz.pm
 lib/HTML/Blitz/ActionType.pm
 lib/HTML/Blitz/Atom.pm
-lib/HTML/Blitz/Builder.pm
 lib/HTML/Blitz/CodeGen.pm
 lib/HTML/Blitz/Matcher.pm
 lib/HTML/Blitz/ParseError.pm
@@ -23,10 +22,10 @@ simple-benchmark/bench.html
 simple-benchmark/bench.mt
 simple-benchmark/bench.pl
 simple-benchmark/bench.tmpl
+simple-benchmark/bench.tmplc
 simple-benchmark/bench.tt
 simple-benchmark/bench.tx
 t/actions.t
-t/builder.t
 t/conflict.t
 t/errors.t
 t/marshal.t

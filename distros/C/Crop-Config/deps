@@ -1,0 +1,10 @@
+XML::LibXML
+	https://slackbuilds.org/repository/15.0/perl/perl-xml-libxml/
+Time::Stamp
+Clone
+XML::LibXSLT
+	https://slackbuilds.org/repository/15.0/perl/perl-XML-LibXSLT/
+JSON
+	https://slackbuilds.org/repository/15.0/perl/perl-JSON/
+CGI::Cookie
+CGI::Fast

@@ -1,4 +1,4 @@
-package HTML::Blitz;
+package HTML::Blitz 0.1001;
 use HTML::Blitz::pragma;
 use HTML::Blitz::Template ();
 use HTML::Blitz::RuleSet ();
@@ -43,8 +43,6 @@ use HTML::Blitz::ActionType qw(
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use overload ();
-
-our $VERSION = '0.0901';
 
 method new($class: @rules) {
     my $self = bless {
@@ -1450,8 +1448,8 @@ For example:
 
 =item C<['set_attribute_text', HASHREF]>
 
-If you want to set multiple attributes at once, you can this form. The keys of
-I<HASHREF> specify the attribute names, and the values specify the attribute
+If you want to set multiple attributes at once, you can use this form. The keys
+of I<HASHREF> specify the attribute names, and the values specify the attribute
 values.
 
 For example:
@@ -1475,8 +1473,8 @@ For example:
 
 =item C<['set_attribute_var', HASHREF]>
 
-If you want to set multiple attributes at once, you can this form. The keys of
-I<HASHREF> specify the attribute names, and the values specify the names of
+If you want to set multiple attributes at once, you can use this form. The keys
+of I<HASHREF> specify the attribute names, and the values specify the names of
 runtime variables from which the attribute values will be taken.
 
 For example:
@@ -2092,9 +2090,9 @@ consisting only of string constants, variables, calls to C<encode_entities>
 hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems (L<HTML::Blitz>, L<HTML::Zoom>,
-L<Template::Toolkit>, L<HTML::Template>, L<HTML::Template::Pro>,
-L<Mojo::Template>, L<Text::Xslate>) as well as L<HTML::Blitz::Builder>, which
-is rather the opposite of a template system.
+L<Template::Toolkit>, L<HTML::Template>, L<HTML::Template::Compiled>,
+L<HTML::Template::Pro>, L<Mojo::Template>, L<Text::Xslate>) as well as
+L<HTML::Blitz::Builder>, which is rather the opposite of a template system.
 
 Results:
 
@@ -2102,39 +2100,47 @@ Results:
 
 =item L<Text::Xslate> v3.5.9
 
-1375/s (0.0007s per iteration), 380.9%
+1208/s (0.0008s per iteration), 642.6%
 
-=item L<HTML::Blitz> 0.06
+=item L<HTML::Blitz> 0.0901
 
-678/s (0.0015s per iteration), 187.8%
+638/s (0.0016s per iteration), 339.4%
 
 =item L<HTML::Template::Pro> 0.9524
 
-653/s (0.0015s per iteration), 180.9%
+578/s (0.0017s per iteration), 307.4%
 
-=item L<Mojo::Template> 9.31
+=item L<Mojo::Template> 9.39
 
-463/s (0.0022s per iteration), 128.3%
+470/s (0.0021s per iteration), 250.0%
+
+=item L<HTML::Template::Compiled> 1.003
+
+270/s (0.0037s per iteration), 143.6%
 
 =item handwritten
 
-361/s (0.0028s per iteration), 100.0%
+188/s (0.0053s per iteration), 100.0%
 
-=item L<Template::Toolkit> 3.101
+=item HTML-Blitz-used-wrong
 
-38.6/s (0.0259s per iteration), 10.7%
+130/s (0.0077s per iteration), 69.1%
+
+=item L<Template::Toolkit> 3.102
+
+41.4/s (0.0242s per iteration), 22.0%
 
 =item L<HTML::Template> 2.97
 
-33.5/s (0.0299s per iteration), 9.3%
+36.9/s (0.0271s per iteration), 19.6%
 
-=item L<HTML::Blitz::Builder> 0.06
+=item L<HTML::Blitz::Builder> 0.0901
 
-32.9/s (0.0304s per iteration), 9.1%
+36.5/s (0.0274s per iteration), 19.4%
 
 =item L<HTML::Zoom> 0.009009
 
-1.24/s (0.8065s per iteration), 0.3%
+1.21/s (0.8264s per iteration), 0.6%
 
 =back
 

@@ -27,13 +27,13 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   ['output_format=s', 'output format (flag, basic, terse)'],
   ['short_circuit', 'return early in any execution path as soon as the outcome can be determined'],
   ['max_traversal_depth=i', 'the maximum number of levels deep a schema traversal may go'],
-  ['validate_formats', 'treat format as an assertion, not merely an annotation'],
-  ['validate_content_schemas', 'treat contentMediaType and contentSchema keywords as assertions'],
+  ['validate_formats', 'treat the "format" keyword as an assertion, not merely an annotation'],
+  ['validate_content_schemas', 'treat the "contentMediaType" and "contentSchema" keywords as assertions'],
   ['collect_annotations', 'collect annotations'],
   ['strict', 'disallow unknown keywords'],
   # scalarref_booleans, stringy_numbers make no sense in json-encoded data
   [],
-  ['validate-schema:s', 'validate the provided schema against its meta-schema. do not provide --data or --schema.' ],
+  ['validate-schema:s', 'validate the provided schema against its meta-schema and the specification. do not provide --data or --schema.' ],
   ['add-schema=s@', 'the filename of an extra schema to load, so it can be used by $ref' ],
   ['data=s', 'the filename to use for the instance data (if not provided, STDIN is used)'],
   ['schema=s', 'the filename to use for the schema (if not provided, STDIN is used)'],
@@ -50,9 +50,9 @@ die '--validate-schema and --schema should not be used together' if defined $sch
 my $js = JSON::Schema::Modern->new(%$opt);
 my $decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->allow_nonref(1)->utf8(0);
 
-foreach my $add_schema (@{$opt->add_schema//[]}) {
+foreach my $add_schema_file (@{$opt->add_schema//[]}) {
   try {
-    $js->add_schema($decoder->decode(path($add_schema)->slurp_utf8));
+    $js->add_schema('file://'.$add_schema_file => $decoder->decode(path($add_schema_file)->slurp_utf8));
   }
   catch ($e) {
     say $e->$_isa('JSON::Schema::Modern::Result') ? $e->dump: '"'.$e.'"';
@@ -61,10 +61,11 @@ foreach my $add_schema (@{$opt->add_schema//[]}) {
 }
 
 my $result;
+my $schema_filename = '';
 
 if (defined $validate_schema) {
   if (length $validate_schema) { # boolean flag is passed as ''; some other value = filename
-    $schema = path($validate_schema)->slurp_utf8;
+    $schema = path($schema_filename = $validate_schema)->slurp_utf8;
   }
   else {
     say 'enter schema, followed by ^D:';
@@ -88,7 +89,7 @@ else {
   }
 
   if (defined $schema) {
-    $schema = path($schema)->slurp_utf8;
+    $schema = path($schema_filename = $schema)->slurp_utf8;
   }
   else {
     say 'enter schema, followed by ^D:';
@@ -100,7 +101,7 @@ else {
   $data = $decoder->decode($data);
   $schema = $decoder->decode($schema);
 
-  $result = $js->evaluate($data, $schema);
+  $result = $js->evaluate($data, $schema, { effective_base_uri => 'file://'.$schema_filename });
 }
 
 say $result->dump;
@@ -142,7 +143,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.609
+version 0.610
 
 =head1 SYNOPSIS
 

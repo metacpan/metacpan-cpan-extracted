@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::ArgumentSet 0.060000;
+package Term::CLI::Role::ArgumentSet 0.061000;
 
 use 5.014;
 use warnings;
@@ -117,7 +117,7 @@ Term::CLI::Role::ArgumentSet - Manage command arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.060000
+version 0.061000
 
 =head1 SYNOPSIS
 

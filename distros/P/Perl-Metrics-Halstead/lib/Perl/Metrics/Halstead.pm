@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0617';
+our $VERSION = '0.0619';
 
 use strictures 2;
 use Moo;
@@ -229,7 +229,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0617
+version 0.0619
 
 =head1 SYNOPSIS
 
@@ -401,11 +401,11 @@ L<https://www.compuware.com/hard-can-find-halstead-maintenance-effort-metric/>
 
 =head1 AUTHOR
 
-Gene Boggs <gene@cpan.org>
+Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2019-2025 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

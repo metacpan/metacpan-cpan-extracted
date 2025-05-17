@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:czc="http://example.org/schema/MSC"
+	targetNamespace="http://example.org/schema/MSC"
+	elementFormDefault="qualified">
+
+<annotation>
+	<documentation xml:lang="en">
+		The schema for main config.
+		More info: https://www.w3schools.com/xml/schema_intro.asp
+	</documentation>
+</annotation>
+
+<element name="project" type="czc:CZConfigType"/>
+
+<complexType name="CZConfigType">
+	<sequence>
+		<element name="install">
+			<complexType>
+				<sequence>
+					<element name="path" type="string"/>
+					<element name="url"  type="string"/>
+					<element name="mode" minOccurs="0" maxOccurs="1">
+						<simpleType>
+							<restriction base="string">
+								<enumeration value="test"/>
+							</restriction>
+						</simpleType>
+					</element>
+			      </sequence>
+			</complexType>
+		</element>
+		<element name="warehouse">
+			<complexType>
+				<sequence>
+					<element name="db" type="czc:DB" maxOccurs="unbounded"/>
+					<!-- Adding maxOccurs will require changes to the code in WooF::Config -->
+					<element name="relation" maxOccurs="unbounded">
+						<complexType>
+							<sequence>
+								<element name="db" type="string"/>
+							</sequence>
+							<attribute name="name" type="string"/>
+						</complexType>
+					</element>
+			      </sequence>
+			</complexType>
+		</element>
+		<element name="upload">
+			<complexType>
+				<sequence>
+					<element name="dir"  type="string"/>
+					<element name="path" type="string"/>
+					<element name="url"  type="string"/>
+				</sequence>
+			</complexType>
+		</element>
+		<element name="logLevel">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="EMERG"/>
+					<enumeration value="ALERT"/>
+					<enumeration value="CRIT"/>
+					<enumeration value="ERR"/>
+					<enumeration value="WARNING"/>
+					<enumeration value="NOTICE"/>
+					<enumeration value="INFO"/>
+				</restriction>
+			</simpleType>
+		</element>
+		<element name="debug" type="czc:Debug"/>
+		<element name="test">
+			<complexType>
+				<sequence>
+					<element name="url" maxOccurs="unbounded">
+						<complexType>
+							<sequence>
+								<element name="path" type="string"/>
+							</sequence>
+							<attribute name="name" type="string"/>
+						</complexType>
+					</element>
+				</sequence>
+			</complexType>
+		</element>
+	</sequence>
+</complexType>
+
+<complexType name="Debug">
+	<sequence>
+		<element name="output">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="On"/>
+					<enumeration value="Off"/>
+				</restriction>
+			</simpleType>
+		</element>
+		<element name="layer" minOccurs="0" maxOccurs="unbounded">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="APP"/>
+					<enumeration value="SRV"/>
+					<enumeration value="SQL"/>
+				</restriction>
+			</simpleType>
+		</element>
+	</sequence>
+</complexType>
+
+<complexType name="DB">
+	<sequence>
+		<element name="server" type="czc:Server"/>
+		<element name="name" type="string"/>
+		<element name="driver" type="czc:DBDriver"/>
+		<element name="role" type="czc:DBRole"/>
+	</sequence>
+	  <attribute name="id" use="required"/>
+</complexType>
+
+<complexType name="Server">
+	<sequence>
+		<element name="host" type="string"/>
+		<element name="port">
+			<simpleType>
+				<restriction base="integer">
+					<minInclusive value="1"/>
+				</restriction>
+			</simpleType>
+		</element>
+	</sequence>
+</complexType>
+
+<simpleType name="DBDriver">
+	<restriction base="string">
+		<enumeration value="Pg"/>
+	</restriction>
+</simpleType>
+
+<complexType name="DBRole">
+	<sequence>
+		<element name="user" type="czc:Credits"/>
+		<element name="admin" type="czc:Credits"/>
+	</sequence>
+</complexType>
+
+<complexType name="Credits">
+	<sequence>
+		<element name="login" type="string"/>
+		<element name="pass" type="string"/>
+	</sequence>
+</complexType>
+
+</schema>

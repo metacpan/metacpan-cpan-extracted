@@ -13,11 +13,14 @@ requires 'namespace::autoclean';
 
 test_requires 'Catalyst::Action::RenderView';
 test_requires 'Catalyst::Plugin::ConfigLoader';
+test_requires 'Catalyst::Plugin::Session::State::Cookie';
 test_requires 'Catalyst::Plugin::Session::Store::FastMmap';
 test_requires 'Catalyst::Plugin::Static::Simple';
 test_requires 'Catalyst::Test';
 test_requires 'Catalyst::View::JSON';
 test_requires 'Config::General';
+test_requires 'HTTP::Cookies';
+test_requires 'HTTP::Request::Common';
 test_requires 'Mojolicious', '8.24';
 test_requires 'Test::MockModule', '0.177.0';
 test_requires 'Test::More';

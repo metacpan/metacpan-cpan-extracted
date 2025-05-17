@@ -83,7 +83,7 @@ B<get> has the following options:
 
 Download ebook to I<path>. If I<path> ends with the C<'.*'> suffix, the C<'.*'>
 will be substituted with the file suffix used by the ebook's format. By
-default, B<gutenberg> will download the ebook to C<id.*>.
+default, B<gutenberg> will download the ebook to C<ebook-title.*>.
 
 =item B<-f|--format>=I<format>
 
@@ -197,6 +197,12 @@ Print ebook metadata in JSON.
 
 =back
 
+=item B<menu>
+
+Launch the L<dialog(1)>-based TUI.
+
+This command does not have any unique options.
+
 =back
 
 =head1 OPTIONS
@@ -239,6 +245,10 @@ Print B<gutenberg> version/copyright information and exit.
 
 Directory to store B<gutenberg> data files in.
 
+=item PAGER
+
+Pager program to use for reading ebooks for the C<menu> command.
+
 =back
 
 =head1 CAVEATS
@@ -269,6 +279,10 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<dialog(1)>
 
 =cut
 

@@ -45,12 +45,13 @@
             "Carp" : "0",
             "Exporter" : "5.57",
             "Function::Parameters" : "2",
+            "HTML::Blitz::Builder" : "0",
             "List::Util" : "1.33",
             "Scalar::Util" : "0",
             "constant" : "0",
             "feature" : "0",
             "overload" : "0",
-            "perl" : "5.024000",
+            "perl" : "5.020000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -67,12 +68,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/HTML-Blitz/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/HTML-Blitz",
-         "web" : "https://github.com/mauke/HTML-Blitz"
+         "url" : "https://codeberg.org/mauke/HTML-Blitz.git",
+         "web" : "https://codeberg.org/mauke/HTML-Blitz"
       }
    },
-   "version" : "0.0901",
+   "version" : "0.1001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

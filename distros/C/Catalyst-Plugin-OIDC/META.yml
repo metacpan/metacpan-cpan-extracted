@@ -5,12 +5,15 @@ author:
 build_requires:
   Catalyst::Action::RenderView: '0'
   Catalyst::Plugin::ConfigLoader: '0'
+  Catalyst::Plugin::Session::State::Cookie: '0'
   Catalyst::Plugin::Session::Store::FastMmap: '0'
   Catalyst::Plugin::Static::Simple: '0'
   Catalyst::Test: '0'
   Catalyst::View::JSON: '0'
   Config::General: '0'
   File::Spec: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Mojolicious: '8.24'
@@ -42,7 +45,7 @@ resources:
   bugtracker: https://github.com/sebmourlhou/catalyst-plugin-oidc/issues
   homepage: https://github.com/sebmourlhou/catalyst-plugin-oidc
   repository: https://github.com/sebmourlhou/catalyst-plugin-oidc.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

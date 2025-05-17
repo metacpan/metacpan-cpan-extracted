@@ -2,11 +2,9 @@
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
-package HTML::Blitz::ParseError;
+package HTML::Blitz::ParseError 0.1001;
 use HTML::Blitz::pragma;
 use overload fallback => 1, '""' => method (@) { $self->to_string };
-
-our $VERSION = '0.0901';
 
 method new($class:
     :$src_name,

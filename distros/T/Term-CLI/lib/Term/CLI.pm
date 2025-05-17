@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI 0.060000;
+package Term::CLI 0.061000;
 
 use 5.014;
 use warnings;
@@ -72,7 +72,7 @@ use namespace::clean 0.25;
 
 extends 'Term::CLI::Base';
 
-with qw( 
+with qw(
     Term::CLI::Role::CommandSet
     Term::CLI::Role::State
 );
@@ -229,6 +229,28 @@ sub _default_split {
     return ( q{}, @words );
 }
 
+sub unescape_input {
+    my ($self, $text, $quote_char) = @_;
+
+    if ( !$quote_char || $quote_char ne q{'} ) {
+        return $text =~ s{ \\ (.) }{$1}xgr;
+    }
+    return $text;
+}
+
+sub escape_input {
+    my ($self, $text, $quote_char) = @_;
+
+    if ( !$quote_char ) {
+        my $delim = $self->root_node->word_delimiters;
+        return $text =~ s{ ([$delim\'\"\\]) }{\\$1}xgr;
+    }
+    if ( $quote_char ne q{'}) {
+        return $text =~ s{ ([$quote_char\\]) }{\\$1}xgr;
+    }
+    return $text;
+}
+
 # BOOL = CLI->_is_escaped($line, $index);
 #
 # The character at $index in $line is a possible word break
@@ -271,7 +293,7 @@ sub write_pager {
     my $pager_cmd = $self->pager // [];
 
     my $text =
-        ref $args{text} eq 'ARRAY' 
+        ref $args{text} eq 'ARRAY'
             ? join( q{}, @{ $args{text} } )
             : $args{text};
 
@@ -321,7 +343,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.060000
+version 0.061000
 
 =head1 SYNOPSIS
 
@@ -387,7 +409,7 @@ F<tutorial> directories.
 
 =head2 I/O handles
 
-By default C<Term::CLI> will create a
+By default B<Term::CLI> will create a
 L<Term::CLI::ReadLine|Term::CLI::ReadLine> object
 (which creates a L<Term::ReadLine|Term::ReadLine> object)
 that reads from F<STDIN> and writes to F<STDOUT>.
@@ -423,7 +445,7 @@ L<Term::CLI::Role::State|Term::CLI::Role::State>(3p).
 =item B<new> ( B<attr> => I<VAL> ... )
 X<new>
 
-Create a new C<Term::CLI> object and return a reference to it.
+Create a new B<Term::CLI> object and return a reference to it.
 
 Valid attributes:
 
@@ -454,7 +476,7 @@ is destroyed (i.e. in L<Moo> terminology, when C<DEMOLISH> is called).
 =item B<commands> =E<gt> I<ArrayRef>
 
 Reference to an array containing L<Term::CLI::Command> object
-instances that describe the commands that C<Term::CLI> recognises,
+instances that describe the commands that B<Term::CLI> recognises,
 or C<undef>.
 
 =item B<ignore_keyboard_signals> =E<gt> I<ArrayRef>
@@ -550,7 +572,7 @@ X<commands>
 See
 L<commands in Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/commands>.
 
-I<ArrayRef> with C<Term::CLI::Command> object instances.
+I<ArrayRef> with B<Term::CLI::Command> object instances.
 
 =back
 
@@ -676,8 +698,87 @@ appended to a completed word at the command line prompt.
 
 =back
 
-=head2 Output Control
 
+=head2 Input Control
+
+The L<split_function|/split_function> has already been described
+above.
+However, we also need to deal with escape sequences in
+(partial) input that may or may not be quoted.
+
+For word splitting this is handled by the
+L<split_function|/split_function>,
+but for command/argument completion we need to make sure the text
+passed to the completion functions is the "proper" text.
+
+For example:
+
+  $ ls foo\ b<TAB>
+
+The completion mechanism will be asked to complete C<foo\ b>.
+However, since the string is unquoted, what we really want to complete
+is C<foo b>. On the other hand, with:
+
+  $ ls 'foo\ b<TAB>
+
+We would want to run completion on the literal C<foo\ b> (because it
+is single-quoted).
+
+For this, we use L<unescape_input>.
+Then, when completion is done, we run L<escape_input> on the results.
+
+=over
+
+=item B<escape_input>
+X<escape_input>
+
+=item B<unescape_input>
+X<unescape_input>
+
+    $ESCAPED = $CLI->escape_input( $INPUT, $QUOTE_CHAR );
+    $UNESCAPED = $CLI->unescape_input( $INPUT, $QUOTE_CHAR );
+
+Add or remove backslash escape sequences in an input string.
+This is used during command and argument completion.
+I<$INPUT> is the string to operate on,
+I<$QUOTE_CHAR> indicates how the input is quoted (if any);
+if I<$QUOTE_CHAR> is I<undef> or an empty string,
+then the I<$INPUT> is not surrounded by quotes.
+Otherwise,
+I<$QUOTE_CHAR> indicates which quotes are being used
+(C<"> or C<'>).
+
+The B<unescape_input> is called right before word completion:
+
+  INPUT      | CALL                                   | RESULT
+  -----------|----------------------------------------|--------------
+  <foo\ b>   | $CLI->unescape_input(q{foo\ b}, undef) | q{foo b}
+  <"foo\ b>  | $CLI->unescape_input(q{foo\ b}, q{"})  | q{foo b}
+  <'foo\ b>  | $CLI->unescape_input(q{foo\ b}, q{'})  | q{foo\ b}
+
+The result is then run through the completion process,
+after which B<escape_input> is called on the result(s):
+
+  INPUT      | CALL                                   | RESULT
+  -----------|----------------------------------------|--------------
+  <foo\ bar> | $CLI->escape_input(q{foo\ bar}, undef) | q{foo\\\ bar}
+  <foo\ bar> | $CLI->escape_input(q{foo\ bar}, q{"})  | q{foo\\ bar}
+  <foo\ bar> | $CLI->escape_input(q{foo\ bar}, q{'})  | q{foo\ bar}
+
+The default functions do the following:
+
+                | UNESCAPE               | ESCAPE
+  --------------|------------------------|-----------------
+  unquoted      | anything preceded by \ | \, space, quote
+  double quote  | anything preceded by \ | \, double quote
+  single quote  | nothing                | nothing
+
+If you need special treatment,
+you will have to sub-class B<Term::CLI> and overload these methods.
+
+=back
+
+=head2 Output Control
 
 =over
 
@@ -743,7 +844,7 @@ to I<Str>.
 
 =head1 SIGNAL HANDLING
 
-The C<Term::CLI> object (through L<Term::CLI::ReadLine>) will make sure that
+The B<Term::CLI> object (through L<Term::CLI::ReadLine>) will make sure that
 signals are handled "correctly". This especially means that if a signal is
 not ignored, the terminal is left in a "sane" state before any signal
 handler is called or the program exits.

@@ -8,6 +8,7 @@ use HTML::Entities qw(encode_entities);
 use HTML::Blitz ();
 use HTML::Blitz::Builder qw(mk_doctype mk_comment mk_elem to_html);
 use HTML::Template ();
+use HTML::Template::Compiled ();
 use HTML::Template::Pro ();
 use HTML::Zoom ();
 use Mojo::Template ();
@@ -167,6 +168,14 @@ my $html_template = HTML::Template->new(
     case_sensitive => 1,
 );
 
+my $html_template_compiled = HTML::Template::Compiled->new(
+    filename          => 'bench.tmplc',
+    open_mode         => ':encoding(UTF-8)',
+    default_escape    => 'html',
+    loop_context_vars => 0,
+    objects           => 0,
+);
+
 my $html_template_pro = HTML::Template::Pro->new(
     filename       => 'bench.tmpl',
     utf8           => 1,
@@ -224,6 +233,12 @@ cmpthese(-5, {
         $html_template_pro->param(%html_template_data);
         my $result = $html_template_pro->output;
         $html_template_pro->clear_params;
+    },
+
+    vers('HTML::Template::Compiled') => sub {
+        $html_template_compiled->param(category => $data);
+        my $result = $html_template_compiled->output;
+        $html_template_compiled->clear_params;
     },
 
     vers('HTML::Template') => sub {

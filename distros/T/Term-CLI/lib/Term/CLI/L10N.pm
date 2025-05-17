@@ -16,7 +16,7 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N 0.060000;
+package Term::CLI::L10N 0.061000;
 
 use 5.014;
 use warnings;
@@ -71,7 +71,7 @@ Term::CLI::L10N - localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.060000
+version 0.061000
 
 =head1 SYNOPSIS
 

@@ -2,11 +2,9 @@
 # General Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
 # See the "COPYING" file for details.
-package HTML::Blitz::Atom;
+package HTML::Blitz::Atom 0.1001;
 use HTML::Blitz::pragma;
 use constant ();
-
-our $VERSION = '0.0901';
 
 method import($class: @names) {
     @_ = (

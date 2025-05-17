@@ -79,99 +79,99 @@
    "provides" : {
       "Term::CLI" : {
          "file" : "lib/Term/CLI.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument" : {
          "file" : "lib/Term/CLI/Argument.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::Bool" : {
          "file" : "lib/Term/CLI/Argument/Bool.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::Enum" : {
          "file" : "lib/Term/CLI/Argument/Enum.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::Filename" : {
          "file" : "lib/Term/CLI/Argument/Filename.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::Number" : {
          "file" : "lib/Term/CLI/Argument/Number.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::Number::Float" : {
          "file" : "lib/Term/CLI/Argument/Number/Float.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::Number::Int" : {
          "file" : "lib/Term/CLI/Argument/Number/Int.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::String" : {
          "file" : "lib/Term/CLI/Argument/String.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::Tree" : {
          "file" : "lib/Term/CLI/Argument/Tree.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Argument::TypeTiny" : {
          "file" : "lib/Term/CLI/Argument/TypeTiny.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Base" : {
          "file" : "lib/Term/CLI/Base.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Command" : {
          "file" : "lib/Term/CLI/Command.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Command::Help" : {
          "file" : "lib/Term/CLI/Command/Help.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Element" : {
          "file" : "lib/Term/CLI/Element.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::L10N" : {
          "file" : "lib/Term/CLI/L10N.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::L10N::en" : {
          "file" : "lib/Term/CLI/L10N/en.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::L10N::nl" : {
          "file" : "lib/Term/CLI/L10N/nl.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::ReadLine" : {
          "file" : "lib/Term/CLI/ReadLine.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Role::ArgumentSet" : {
          "file" : "lib/Term/CLI/Role/ArgumentSet.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Role::CommandSet" : {
          "file" : "lib/Term/CLI/Role/CommandSet.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Role::HelpText" : {
          "file" : "lib/Term/CLI/Role/HelpText.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Role::State" : {
          "file" : "lib/Term/CLI/Role/State.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       },
       "Term::CLI::Util" : {
          "file" : "lib/Term/CLI/Util.pm",
-         "version" : "0.060000"
+         "version" : "0.061000"
       }
    },
    "release_status" : "stable",
@@ -186,9 +186,9 @@
          "web" : "https://github.com/sbakker/perl-Term-CLI"
       }
    },
-   "version" : "0.060000",
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "0.061000",
+   "x_generated_by_perl" : "v5.40.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

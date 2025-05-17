@@ -15,8 +15,8 @@ passcodes (TOTP).
 To enable MFA, the "about me" page is extended with a new section alongside
 identity and password, for TOTP token management.  In this section, the user
 may scan a QR code based on this token into their mobile device's
-TOTP-compatible app, such as Google Authenticator.  Or, they can enrol the
-key for their Yubikey device on this page instead.
+TOTP-compatible app, such as FreeOTP+ or Google Authenticator.  Or, they can
+enrol the key for their Yubikey device on this page instead.
 
 When an account has MFA enabled, the RT login page works as usual, but the
 user is then prompted to enter a one-time passcode before they can proceed
@@ -98,6 +98,12 @@ is at [https://codeberg.org/ivarch/rt-extension-totpmfa/issues](https://codeberg
 # License and copyright
 
 Copyright 2025 Andrew Wood.
+
+Contributors include:
+
+ * [elacour](https://codeberg.org/elacour) - localisation support, French
+   translation, inline QR code display, bugfix in secret reset, and
+   packaging improvements.
 
 License GPLv3+: GNU GPL version 3 or later: [https://gnu.org/licenses/gpl.html](https://gnu.org/licenses/gpl.html)
 

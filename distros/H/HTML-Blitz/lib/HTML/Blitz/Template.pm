@@ -1,12 +1,10 @@
-package HTML::Blitz::Template;
+package HTML::Blitz::Template 0.1001;
 use HTML::Blitz::pragma;
 use HTML::Blitz::CodeGen ();
 use Carp qw(croak);
 use constant {
     _REPR_VERSION => 0,
 };
-
-our $VERSION = '0.0901';
 
 method new($class: :$_codegen) {
     bless {
@@ -23,6 +21,7 @@ method FREEZE($model) {
 }
 
 method THAW($class: $model, $repr_version, @components) {
+    our $VERSION;
     $repr_version <= _REPR_VERSION
         or croak "Cannot deserialize data format $repr_version with $class v$VERSION, which only supports data format " . _REPR_VERSION;
     my $codegen = HTML::Blitz::CodeGen->THAW($model, @components);

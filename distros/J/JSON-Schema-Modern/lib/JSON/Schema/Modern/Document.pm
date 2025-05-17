@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.609';
+our $VERSION = '0.610';
 
 use 5.020;
 use Moo;
@@ -52,7 +52,7 @@ has original_uri => (
 
 has metaschema_uri => (
   is => 'rwp',
-  isa => (InstanceOf['Mojo::URL'])->where(q{not length $_->fragment}), # allow for .../draft-07/schema#
+  isa => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
   predicate => '_has_metaschema_uri',
   # default not defined here, but might be defined in a subclass
@@ -95,17 +95,6 @@ sub _add_resource {
   croak 'uri "'.$_[1].'" conflicts with an existing schema resource' if $_[0]->{resource_index}{$_[1]};
   $_[0]->{resource_index}{$resource_key_type->($_[1])} = $resource_type->($_[2]);
 }
-
-# this is not "the path to the resource", but rather "have path, want resource"
-has _path_to_resource => (
-  is => 'ro',
-  isa => HashRef[$resource_type],
-  init_arg => undef,
-  lazy => 1,
-  default => sub { +{ map +($_->{path} => $_), shift->_canonical_resources } },
-);
-
-sub path_to_resource { $_[0]->_path_to_resource; $_[0]->{_path_to_resource}{$_[1]} }
 
 # for internal use only
 has _checksum => (
@@ -222,18 +211,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   die 'original_uri has changed' if $self->original_uri ne $original_uri
     or refaddr($self->original_uri) != refaddr($original_uri);
 
-  # if the schema identified a canonical uri for itself via '$id', it overrides the initial value
-  # Note that subclasses of this class may choose to identify the canonical uri in a different way
-  $self->_set_canonical_uri($state->{initial_schema_uri}) if $state->{initial_schema_uri} ne $original_uri;
-
-  return $state if $state->{errors}->@*;
-
-  # we don't store the metaschema_uri in $state nor in resource_index, but we can figure it out
-  # easily enough.
-  my $metaschema_uri = (is_plain_hashref($self->schema) ? $self->schema->{'$schema'} : undef)
-    // $self->metaschema_uri // $evaluator->METASCHEMA_URIS->{$state->{spec_version}};
-
-  $self->_set_metaschema_uri($metaschema_uri) if $metaschema_uri ne ($self->metaschema_uri//'');
+  # if the document identified a canonical uri for itself via '$id', or metaschema uri via '$schema',
+  # they overrides the initial values
+  # Note that subclasses of this class may choose to identify these values in a different way
+  # (e.g. "$self" in OpenAPI)
+  $self->_set_canonical_uri($state->{initial_schema_uri});
+  $self->_set_metaschema_uri($state->{metaschema_uri});
 
   return $state;
 }
@@ -273,7 +256,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.609
+version 0.610
 
 =head1 SYNOPSIS
 

@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =head1 SYNOPSIS
 
@@ -680,6 +680,8 @@ sub merge_defaults
 	my $defaults = $params->{'defaults'};
 	return $config if(!defined($defaults));
 	my $section = $params->{'section'};
+
+	Hash::Merge::set_clone_behavior(0);
 
 	if($config->{'global'}) {
 		if($params->{'deep'}) {

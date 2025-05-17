@@ -4,7 +4,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 # VERSION
 
-Version 1.64
+Version 1.65
 
 # SYNOPSIS
 
@@ -1643,6 +1643,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 - sleep\_time\_in\_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the [await](#await) or [bye](#bye) methods.  This defaults to "1" millisecond.
 - stealth - stops [navigator.webdriver](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver) from being accessible by the current web page.  This is achieved by loading an [extension](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions), which will automatically switch on the `addons` parameter for the [new](#new) method.  This is extremely experimental.  See [IMITATING OTHER BROWSERS](#imitating-other-browsers) for a discussion.
 - survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.  See the reconnect parameter for an experimental technique for reconnecting.
+- system\_access - firefox [after version 138](https://bugzilla.mozilla.org/show_bug.cgi?id=1944565) allows disabling system access for javascript.  By default, this module will turn on system access.
 - trust - give a path to a [root certificate](https://en.wikipedia.org/wiki/Root_certificate) encoded as a [PEM encoded X.509 certificate](https://datatracker.ietf.org/doc/html/rfc7468#section-5) that will be trusted for this session.
 - timeouts - a shortcut to allow directly providing a [timeout](https://metacpan.org/pod/Firefox::Marionette::Timeout) object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
 - trackable - if this is set, profile preferences will be [set](#set_pref) to make it harder to be tracked by the [browsers fingerprint](https://en.wikipedia.org/wiki/Device_fingerprint#Browser_fingerprint) across browser restarts.  This is on by default, but may be switched off by setting it to 0;
@@ -2516,6 +2517,23 @@ With all those conditions being met, [WebGL](https://en.wikipedia.org/wiki/WebGL
     } else {
         die "WebGL is not supported";
     }
+
+# FILE UPLOADS
+
+Uploading files in forms is accomplished by using the [type](https://metacpan.org/pod/Firefox::Marionette::Element#type) command to enter the full path of the file you want to upload.  An example is shown below;
+
+    use Firefox::Marionette();
+    use File::Spec();
+    use Cwd();
+
+    my $firefox = Firefox::Marionette->new();
+    my $firefox_marionette_directory = Cwd::cwd();
+    $firefox->go("https://practice.expandtesting.com/upload");
+    while($firefox->percentage_visible($firefox->find_id("fileSubmit")) < 90) {
+        sleep 1;
+    }
+    $firefox->find_id("fileInput")->type(File::Spec->catfile($firefox_marionette_directory, qw(t 04-uploads.t)));
+    $firefox->find_id("fileSubmit")->click();
 
 # FINDING ELEMENTS IN A SHADOW DOM
 

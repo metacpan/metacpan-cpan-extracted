@@ -73,7 +73,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.64';
+our $VERSION = '1.65';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1439,6 +1439,11 @@ sub _init {
             $parameters{user}, $parameters{reconnect}
         );
     }
+    if ( defined $parameters{system_access} ) {
+        $self->{system_access} = $parameters{system_access};
+    } else {
+        $self->{system_access} = 1;
+    }
     if ( defined $parameters{width} ) {
         $self->{window_width} = $parameters{width};
     }
@@ -1946,15 +1951,27 @@ return (async function(guidOrInfo) {
     }
     let url = lazy.NetUtil.newURI(bookmark["url"]);
     bookmark["tags"] = await lazy.PlacesUtils.tagging.getTagsForURI(url);
-
+    let serviceResult;
+    if (lazy.PlacesUtils.favicons.getFaviconForPage) {
+      serviceResult = await PlacesUtils.favicons.getFaviconForPage(url, 0);
+    }
     let addFavicon = function(pageUrl) {
       return new Promise((resolve, reject) => {
-        PlacesUtils.favicons.getFaviconDataForPage(
-          pageUrl,
-          function (pageUrl, dataLen, data, mimeType, size) {
-            resolve([ pageUrl, dataLen, data, mimeType, size ]);
+        if (PlacesUtils.favicons.getFaviconForPage) {
+/* https://bugzilla.mozilla.org/show_bug.cgi?id=1915762 */
+          if (serviceResult === null ) {
+            resolve([]);
+          } else {
+            resolve([ serviceResult.uri, serviceResult.rawData.length, serviceResult.rawData, serviceResult.mimeType, serviceResult.width ]);
           }
-        );
+        } else {
+          PlacesUtils.favicons.getFaviconDataForPage(
+            pageUrl,
+            function (pageUrl, dataLen, data, mimeType, size) {
+              resolve([ pageUrl, dataLen, data, mimeType, size ]);
+            }
+          );
+        }
       })};
     let awaitResult = await addFavicon(lazy.PlacesUtils.toURI(bookmark["url"]));
     if (awaitResult[0]) {
@@ -2535,7 +2552,7 @@ sub delete_webauthn_authenticator {
     );
     my $response = $self->_get_response($message_id);
     if (   ( $self->webauthn_authenticator() )
-        && ( $self->webauthn_authenticator()->id() == $authenticator->id() ) )
+        && ( $self->webauthn_authenticator()->id() eq $authenticator->id() ) )
     {
         delete $self->{$webauthn_default_authenticator_key_name};
     }
@@ -4700,7 +4717,9 @@ sub _get_remote_profile_directory {
 sub _setup_arguments {
     my ( $self, %parameters ) = @_;
     my @arguments = qw(-marionette);
-
+    if ( $self->{system_access} ) {
+        push @arguments, '-remote-allow-system-access';
+    }
     if ( defined $self->{window_width} ) {
         push @arguments, '-width', $self->{window_width};
     }
@@ -12297,7 +12316,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.64
+Version 1.65
 
 =head1 SYNOPSIS
 
@@ -14081,6 +14100,8 @@ NOTE: firefox ignores any changes made to the profile on the disk while it is ru
 
 =item * survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.  See the reconnect parameter for an experimental technique for reconnecting.
 
+=item * system_access - firefox L<after version 138|https://bugzilla.mozilla.org/show_bug.cgi?id=1944565> allows disabling system access for javascript.  By default, this module will turn on system access.
+
 =item * trust - give a path to a L<root certificate|https://en.wikipedia.org/wiki/Root_certificate> encoded as a L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5> that will be trusted for this session.
 
 =item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
@@ -15025,6 +15046,23 @@ With all those conditions being met, L<WebGL|https://en.wikipedia.org/wiki/WebGL
     } else {
         die "WebGL is not supported";
     }
+
+=head1 FILE UPLOADS
+
+Uploading files in forms is accomplished by using the L<type|Firefox::Marionette::Element#type> command to enter the full path of the file you want to upload.  An example is shown below;
+
+    use Firefox::Marionette();
+    use File::Spec();
+    use Cwd();
+
+    my $firefox = Firefox::Marionette->new();
+    my $firefox_marionette_directory = Cwd::cwd();
+    $firefox->go("https://practice.expandtesting.com/upload");
+    while($firefox->percentage_visible($firefox->find_id("fileSubmit")) < 90) {
+        sleep 1;
+    }
+    $firefox->find_id("fileInput")->type(File::Spec->catfile($firefox_marionette_directory, qw(t 04-uploads.t)));
+    $firefox->find_id("fileSubmit")->click();
 
 =head1 FINDING ELEMENTS IN A SHADOW DOM
 

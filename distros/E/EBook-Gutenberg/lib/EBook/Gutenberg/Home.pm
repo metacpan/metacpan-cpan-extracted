@@ -1,6 +1,6 @@
 package EBook::Gutenberg::Home;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 

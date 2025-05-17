@@ -7,6 +7,7 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Capture::Tiny' => '0',
+                                      'Encode' => '0',
                                       'File::Spec' => '0',
                                       'FindBin' => '0',
                                       'IO::Handle' => '0',
@@ -28,7 +29,7 @@ do { my $x = {
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'Test::Version' => '2.05'
                                     }
                     },
@@ -62,7 +63,8 @@ do { my $x = {
                                       'TAP::Formatter::Color' => '3.29',
                                       'Test2' => '1.302118',
                                       'Test2::API' => '0',
-                                      'Test2::AsyncSubtest' => '0.000018',
+                                      'Test2::AsyncSubtest' => '1.302212',
+                                      'Test2::AsyncSubtest::Hub' => '0',
                                       'Test2::IPC' => '0',
                                       'Test2::Tools::AsyncSubtest' => '0',
                                       'Test::Most' => '0',

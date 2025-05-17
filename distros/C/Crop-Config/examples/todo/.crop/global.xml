@@ -1,0 +1,83 @@
+<project xmlns="http://example.org/schema/MSC">
+	<!-- Install constants -->
+	<install>
+		<path>/home/user/crop/todo/install</path>
+		<url>http://todoapp.local</url>
+		<mode>test</mode>  <!-- test is optional;  -->
+	</install>
+	
+	<!-- Warehouse can contain many databases -->
+	<warehouse>
+		<db id="main">
+			<server>
+				<host>localhost</host>
+				<port>5432</port>
+			</server>
+			<name>crop_db</name>
+			<driver>Pg</driver>
+			<role>
+				<user>
+					<login>crop_user</login>
+					<pass>secret1</pass>
+				</user>
+				<admin>
+					<login>crop_admin</login>
+					<pass>secret2</pass>
+				</admin>
+			</role>
+		</db>
+		<relation name="todo">
+			<db>main</db>
+		</relation>
+	</warehouse>
+
+	<!-- Full path to user's uploads consists of two parts dir+path.
+	Nginx config could contains:
+	# X-Send uploads
+	location /user/upload/file/ {  # path
+	    internal;
+	    root /home/eugenio/pro/creazilla/uploads;  # dir
+	}
+	
+	It is good descision to store Uploads outside from the git repo. -->
+	<upload>
+		<dir>/home/user/todo/uploads</dir>
+		<path>/user/upload/file/</path>
+		<url>/user/upload/my/</url>
+	</upload>
+
+	<!-- Set the barrier to restrict non-important error messages will be printed.
+	This level hasn't relation to the 'debug'.
+	Levels:
+		EMERG   0
+		ALERT   1
+		CRIT    2
+		ERR     3
+		WARNING 4 (default for Perl-code)
+		NOTICE  5
+		INFO    6 -->
+	<logLevel>WARNING</logLevel>
+
+	<!-- Debug messages -->
+	<debug>
+		<!-- Switch output On/Off.
+			Off by default -->
+		<output>On</output>
+
+		<!-- Flags for each layer:
+			APP - Application layer; default for debug() function
+			SRV - Server logic
+			SQL - Database -->
+		<layer>APP</layer>
+		<!--<layer>SRV</layer>-->
+		<!--<layer>SQL</layer>-->
+	</debug>
+	<test>
+		<url name="root">
+			<path>/</path>
+		</url>
+		<url name="todo">
+			<path>/todo/</path>
+		</url>
+	</test>
+</project>

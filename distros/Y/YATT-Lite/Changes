@@ -1,5 +1,9 @@
 Revision history for YATT::Lite
 
+0.130 2025-05-17
+    * GH-230 - Add `<!yatt:argmacro>` support
+    * Fix GH-231 - yatt subcommand works again
+
 0.123 2025-03-29
     * GH-228 - Fix many LanguageServer bugs
 

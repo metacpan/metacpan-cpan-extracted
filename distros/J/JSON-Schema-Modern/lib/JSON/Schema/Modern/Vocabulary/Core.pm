@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.609';
+our $VERSION = '0.610';
 
 use 5.020;
 use Moo;
@@ -105,13 +105,12 @@ sub _eval_keyword_id ($class, $data, $schema, $state) {
   return 1
     if $state->{spec_version} =~ /^draft[467]$/ and $schema->{$state->{keyword}} =~ /^#/;
 
-  # we could use _fetch_from_uri here to use the parent base uri to resolve against $id at our
-  # current location, but looking up the current path in the resource index is faster.
-  my $schema_info = $state->{document}->path_to_resource($state->{document_path}.$state->{schema_path});
+  my $schema_info = $state->{evaluator}->_fetch_from_uri($state->{initial_schema_uri}->clone->fragment($state->{schema_path}));
+
   # this should never happen, if the pre-evaluation traversal was performed correctly
   abort($state, 'failed to resolve "%s" to canonical uri', $state->{keyword}) if not $schema_info;
 
-  $state->{initial_schema_uri} = $schema_info->{canonical_uri}->clone;
+  $state->{initial_schema_uri} = $schema_info->{canonical_uri};
   # these will already be set in all cases: at document root, or if we are here via a $ref
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
   $state->{document_path} = $state->{document_path}.$state->{schema_path};
@@ -127,7 +126,13 @@ sub _eval_keyword_id ($class, $data, $schema, $state) {
 }
 
 sub _traverse_keyword_schema ($class, $schema, $state) {
-  return if not assert_keyword_type($state, $schema, 'string') or not assert_uri($state, $schema);
+  # Note that this sub is sometimes called with $state->{keyword} undefined, in order to change
+  # error locations
+
+  # Note that because this keyword is parsed ahead of "id"/"$id", location information may not
+  # be correct if an error occurs when parsing this keyword.
+  ()= E($state, '$schema value is not a string'), return if not is_type('string', $schema->{'$schema'});
+  return if not assert_uri($state, $schema, $schema->{'$schema'});
 
   my ($spec_version, $vocabularies);
 
@@ -147,7 +152,7 @@ sub _traverse_keyword_schema ($class, $schema, $state) {
     else {
       ($spec_version, $vocabularies) = $state->{evaluator}->_fetch_vocabulary_data({ %$state,
           keyword => '$vocabulary', initial_schema_uri => Mojo::URL->new($schema->{'$schema'}),
-          traversed_schema_path => jsonp($state->{schema_path}, '$schema') },
+          traversed_schema_path => jsonp($state->{traversed_schema_path}.$state->{schema_path}, $state->{keyword}) },
         $schema_info);
     }
   }
@@ -172,7 +177,7 @@ sub _traverse_keyword_schema ($class, $schema, $state) {
     if exists $schema->{'$ref'} and $spec_version =~ /^draft[467]$/;
 
   $state->{evaluator}->_set_metaschema_vocabulary_classes($schema->{'$schema'}, [ $spec_version, $vocabularies ]);
-  $state->@{qw(spec_version vocabularies)} = ($spec_version, $vocabularies);
+  $state->@{qw(spec_version vocabularies metaschema_uri)} = ($spec_version, $vocabularies, $schema->{'$schema'} =~ s/#$//r);
   return 1;
 }
 
@@ -361,7 +366,7 @@ sub _traverse_keyword_vocabulary ($class, $schema, $state) {
   #   vocabulary uri while still validating those vocabulary keywords (e.g.
   #   https://spec.openapis.org/oas/3.1/schema-base/2021-05-20)
   # Instead, we will verify these constraints when we actually use the metaschema, in
-  # _traverse_keyword_schema -> __fetch_vocabulary_data
+  # _traverse_keyword_schema -> _fetch_vocabulary_data
 
   return $valid;
 }
@@ -397,7 +402,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.609
+version 0.610
 
 =head1 DESCRIPTION
 

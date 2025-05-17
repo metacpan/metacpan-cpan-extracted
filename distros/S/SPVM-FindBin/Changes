@@ -1,3 +1,10 @@
+0.035 2025-05-17
+  [Incompatible Changes]
+    * Remove RealBin and RealScript fields
+      because the resovation of a symbolic link should be Cwd#realpath method rather than in this class.
+    * $Bin field does not resolve symbolic link no more.
+  [Document Improvement]
+    * Improve docs.
 0.034 2025-05-06
   [Requirement Changes]
     * Require SPVM::File::Spec 0.086.

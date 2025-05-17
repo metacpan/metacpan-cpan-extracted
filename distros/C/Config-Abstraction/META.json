@@ -44,7 +44,7 @@
             "JSON::MaybeXS" : "0",
             "JSON::Parse" : "0",
             "Params::Get" : "0.04",
-            "XML::PP" : "0",
+            "XML::PP" : "0.05",
             "YAML::XS" : "0",
             "perl" : "5.010000"
          }
@@ -62,13 +62,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/nigelhorne/Config-Abstraction/issues"
+         "mailto" : "bug-Config-Abstraction@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Config-Abstraction/issues",
+         "x_url" : "https://github.com/nigelhorne/Config-Abstraction/issues"
       },
       "homepage" : "https://metacpan.org/pod/Config::Abstraction",
       "repository" : {
-         "url" : "https://github.com/nigelhorne/Config-Abstraction"
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Config-Abstraction.git",
+         "web" : "https://github.com/nigelhorne/Config-Abstraction",
+         "x_repository" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

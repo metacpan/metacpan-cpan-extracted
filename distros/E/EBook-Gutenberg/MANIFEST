@@ -2,6 +2,7 @@ bin/gutenberg
 Changes
 lib/EBook/Gutenberg.pm
 lib/EBook/Gutenberg/Catalog.pm
+lib/EBook/Gutenberg/Dialog.pm
 lib/EBook/Gutenberg/Get.pm
 lib/EBook/Gutenberg/Home.pm
 LICENSE

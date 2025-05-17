@@ -27,7 +27,13 @@ no_index:
   directory:
     - html
     - inc
+    - po
 requires:
+  Authen::OATH: 0
+  Convert::Base32: 0
+  Imager::QRCode: 0
+  Crypt::CBC: 0
+  LWP::UserAgent: 0
   perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php

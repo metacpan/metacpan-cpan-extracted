@@ -36,7 +36,7 @@ use fields qw/re_decl
 	      _original_entpath
 	    /;
 
-use YATT::Lite::Core qw(Part Widget Page Action Data Entity Template);
+use YATT::Lite::Core qw(Part Widget Page Action Data Entity Template ArgMacro);
 use YATT::Lite::VarTypes;
 use YATT::Lite::Constants;
 use YATT::Lite::Util qw(numLines default untaint_unless_tainted lexpand);
@@ -93,11 +93,11 @@ sub after_new {
 	 | (?<comment>--+.*?--+)
 	 | (?<macro>%(?:[\w\:\.]+(?:[\w:\.\-=\[\]\{\}\(,\)]+)?);)
 	 |
-	   (?:'(?<sq>[^']*+)'
+	   (?:'(?<sq>[^\']*+)'
 	   |"(?<dq>[^\"]*+)"
 	   |(?<nest>\[) | (?<nestclo>\])
 	   |$entOpen
-	   |(?<bare>[^\s'\"<>\[\]/=;]++)
+	   |(?<bare>[^\s\'\"<>\[\]/=;]++)
 	   )
            (?<equal>\s*=\s*+)?+
 	}xs;
@@ -299,18 +299,22 @@ sub parse_decl {
     my $declkind = $+{declname};
     my ($ns, $kind) = split /:/, $declkind, 2;
     if (my $sub = $self->can("declare_$kind")) {
-      # yatt:base, yatt:args vs perl:base, perl:args...
+      # add_part を自分で呼びたい、又は add_part 自体を呼びたくないものは
+      # declare_ で処理する
+
       # 戻り値が undef なら、同じ $part を用いつづける。
       my @args = $self->parse_attlist(\$str, 1);
-      $part = $sub->($self, $tmpl, $ns, @args)
-	// $part;
+      my $newpart = $sub->($self, $tmpl, $ns, @args);
 
-      if ($part) {
-        $part->{decllist} = \@args;
+      if ($newpart) {
+        $self->finalize_part($part) if $part;
+        $newpart->{decllist} = \@args;
+        $part = $newpart;
       }
     }
     elsif ($self->can("build_$kind")) {
-      # yatt:widget, action
+      $self->finalize_part($part) if $part;
+      # yatt:widget, entity
       my (@args) = $self->parse_attlist(\$str, 1); # To delay entity parsing.
       my $saved_attlist = [@args];
 
@@ -357,6 +361,7 @@ sub parse_decl {
   # widget->{cf_endln} は, (視覚上の最後の行)より一つ先の行を指す。(末尾の改行を数える分,多い)
   $part->{cf_endln} = $self->{endln} += numLines($str);
 
+  $self->finalize_part($part);
   $self->finalize_template($tmpl);
 }
 
@@ -473,7 +478,10 @@ sub parse_attlist_with_lvalue {
 
     my AttMatch $m = \%+;
     next if $m->{ws} || $m->{comment};
-    next if $m->{macro};		#XXX: 今はまだ argmacro を無視！
+    if ($m->{macro}) {
+      push @result, $self->mkargmacro($start, $m->{macro});
+      next;
+    }
 
     my @common = ($start, $self->{curpos}, $curln);
     my $mklval = sub {
@@ -590,6 +598,39 @@ sub parse_attlist_with_lvalue {
   wantarray ? @result : \@result;
 }
 
+sub mkargmacro {
+  (my MY $self, my ($start, $string)) = @_;
+  local $_ = $string;
+
+  my $node = [];
+  $node->[NODE_TYPE] = TYPE_ATT_MACRO;
+  @{$node}[NODE_BEGIN, NODE_END, NODE_LNO] = ($start, $self->{curpos}, $self->{startln});
+
+  # namespace-less なケースも扱いたいので % を : に置換
+  s/^%/:/;
+
+  # _parse_entpath だと curpos を移動させてしまうため
+  my (@path) = $self->_parse_pipeline;
+
+  $node->[NODE_PATH] = do {
+    if (@path >= 2 and $path[0][0] eq 'var') {
+      my $head = shift @path;
+      $head->[1];
+    } else {
+      undef;
+    }
+  };
+
+  splice @$node, NODE_BODY, 0, @path;
+
+  if ($_ ne ';') {
+    die $self->synerror_at($self->{startln}
+                           , q{Invalid decl entity: %s (%s remains)}, $string, $_);
+  }
+
+  $node;
+}
+
 sub mkentity {
   (my MY $self) = shift;
   # assert @_ == 3;
@@ -700,6 +741,8 @@ sub build_action { shift->Action->new(@_) }
 sub build_data { shift->Data->new(@_) }
 
 sub build_entity { shift->Entity->new(@_) }
+
+sub build_argmacro { shift->ArgMacro->new(@_) }
 
 #========================================
 # declare
@@ -845,6 +888,71 @@ sub declare_constants {
   undef;
 }
 
+# <!yatt:argmacro macroName=[...output_args...] ...args>
+sub declare_argmacro {
+  (my MY $self, my Template $tmpl, my ($ns, @args)) = @_;
+  my $kind = 'argmacro';
+  my $declkind = join(":", $ns, $kind);
+
+  my $nameAtt = YATT::Lite::Constants::cut_first_att(\@args) or do {
+    die $self->synerror_at($self->{startln}, q{No part name in %s\n%s}
+                           , $declkind
+                           , nonmatched($tmpl->{cf_string}));
+  };
+
+  my $partName = $nameAtt->[NODE_PATH];
+
+  my $output_args = do {
+    if ($nameAtt->[NODE_TYPE] == TYPE_ATT_NESTED) {
+      $nameAtt->[NODE_BODY]
+    } else {
+      my $node = [];
+      $node->[NODE_TYPE] = TYPE_ATT_NAMEONLY;
+      $node->[NODE_PATH] = $partName;
+      [$node];
+    }
+  };
+
+  if ($tmpl->{argmacro_dict}{$partName}) {
+    die $self->synerror_at($self->{startln}, q{Duplicate argmacro %s in %s}
+                           , $partName
+                           , $declkind);
+  }
+
+  my Part $newpart = $self->build(
+    $ns, $kind => $kind, $partName, startln => $self->{startln},
+    output_args => $output_args,
+  );
+
+  Scalar::Util::weaken($tmpl->{argmacro_dict}{$partName} = $newpart);
+
+  $self->add_args($newpart, @args);
+
+  $newpart;
+}
+
+sub finalize_part {
+  (my MY $self, my Part $part) = @_;
+  my $finalizer = $self->can("finalize__" . $part->{cf_kind})
+    or return;
+  $finalizer->($self, $part)
+}
+
+sub finalize__argmacro {
+  (my MY $self, my ArgMacro $argmacro) = @_;
+  require YATT::Lite::CGen::ArgMacro;
+  my $builder = YATT::Lite::CGen::ArgMacro->new(
+    vfs => $self->{cf_vfs}
+  );
+
+  $argmacro->{on_declare} = $builder->with_template(
+    $self->{template},
+    generate_on_declare => ($argmacro),
+  );
+
+  $argmacro;
+}
+
 #========================================
 
 sub location2name {
@@ -926,10 +1034,11 @@ sub parse_arg_spec_for_part {
       = @{$attNode}[NODE_TYPE, NODE_LNO, NODE_PATH, NODE_BODY];
   my ($type, $dflag, $default);
   if ($node_type == TYPE_ATT_NESTED) {
-    $type = $desc->[NODE_PATH] || $desc->[NODE_BODY];
+    my $headDesc = $desc->[0];
+    $type = $headDesc->[NODE_PATH] || $headDesc->[NODE_BODY];
     # primary of [primary key=val key=val] # delegate:foo の時は BODY に入る？
   } else {
-    ($type, $dflag, $default) = split m{([|/?!])}, $desc || '', 2;
+    ($type, $dflag, $default) = $self->parse_type_dflag_default($desc);
   };
   ($type, $argName, nextArgNo($part)
    , $lno, $node_type, $dflag
@@ -940,23 +1049,18 @@ sub parse_arg_spec_for_part {
 sub add_args {
   (my MY $self, my Part $part) = splice @_, 0, 2;
   foreach my $argSpec (@_) {
-    # XXX: Rewrite this with parse_arg_spec_for_part!
 
-    # XXX: text もあるし、 %yatt:argmacro; もある。
-    my ($node_type, $lno, $argName, $desc)
-      = @{$argSpec}[NODE_TYPE, NODE_LNO, NODE_PATH, NODE_BODY];
+    # XXX: comment もあるし、 %yatt:argmacro; もある。
+    if ($argSpec->[NODE_TYPE] == TYPE_ATT_MACRO) {
+      $self->add_argmacro($part, $argSpec);
+      next;
+    }
+
+    my ($type, $argName, $nextArgNo, $lno, $node_type, $dflag, $default)
+      = my @argSpec = $self->parse_arg_spec_for_part($part, $argSpec);
     unless (defined $argName) {
       die $self->synerror_at($self->{startln}, 'argName is empty!');
     }
-
-    my ($type, $dflag, $default);
-    if ($node_type == TYPE_ATT_NESTED) {
-      my $headDesc = $desc->[0];
-      $type = $headDesc->[NODE_PATH] || $headDesc->[NODE_BODY];
-      # primary of [primary key=val key=val] # delegate:foo の時は BODY に入る？
-    } else {
-      ($type, $dflag, $default) = $self->parse_type_dflag_default($desc);
-    };
 
     if (my $var = $part->{arg_dict}{$argName}) {
       if ($var->from_route) {
@@ -969,9 +1073,7 @@ sub add_args {
                                , $argName, $part->{cf_kind}, $part->{cf_name});
       }
     } else {
-      my $var = $self->mkvar_at($self->{startln}
-                                , $type, $argName, nextArgNo($part)
-                                , $lno, $node_type);
+      my $var = $self->mkvar_at($self->{startln}, @argSpec);
       $self->set_dflag_default_to($var, $dflag, $default);
 
       my $type = $var->type->[0];
@@ -979,9 +1081,10 @@ sub add_args {
         # XXX: [delegate:type ...], [code  ...] の ... が来る
         # 仮想的な widget にする？ のが一番楽そうではあるか。そうすれば add_args 出来る。
         # $self->add_arg_of_delegate/code/...へ。
-        my $sub = $self->can("add_arg_of_type_$type")
-          or die $self->synerror_at($self->{startln}, "Unknown arg type in arg '%s': %s", $argName, $type);
-        $sub->($self, $part, $var, $desc);
+        my $sub = $self->can("add_arg_of_type_$type") or do {
+          die $self->synerror_at($self->{startln}, "Unknown arg type in arg '%s': %s", $argName, $type)
+        };
+        $sub->($self, $part, $var, $argSpec->[NODE_BODY]);
       } else {
         if (my $sub = $self->can("add_arg_of_type_$type")) {
           $sub->($self, $part, $var, []);
@@ -993,6 +1096,51 @@ sub add_args {
     }
   }
   $self;
+}
+
+# %macroName(renameTo=renameFrom);
+sub add_argmacro {
+  (my MY $self, my Part $part, my $node) = @_;
+  # widget 宣言の中で argmacro を呼び出す
+
+  my ArgMacro $argmacro = $self->find_argmacro($node);
+
+  require YATT::Lite::CGen::ArgMacro;
+  my $builder = YATT::Lite::CGen::ArgMacro->new(
+    vfs => $self->{cf_vfs}
+  );
+  $builder->with_template(
+    $self->{template},
+    $argmacro->{on_declare} => ($self, $part, $node)
+  );
+
+  return;
+}
+
+sub find_argmacro {
+  (my MY $self, my $node) = @_;
+
+  my $ns = $node->[NODE_PATH];
+  my ($call, $macroName, $renameSpec) = @{$node->[NODE_BODY]};
+
+  # XXX: %yatt:foo; namespace の扱い
+
+  my Template $tmpl = $self->{template};
+  my ArgMacro $argmacro = $tmpl->{argmacro_dict}{$macroName};
+  return $argmacro if $argmacro;
+
+  # XXX: ディレクトリからの追加を許すか否か、その場合の意味論…
+  foreach my Part $part ($tmpl->list_base) {
+    next unless $part->isa(Template);
+    my Template $base = $part;
+    if ($argmacro = $base->{argmacro_dict}{$macroName}) {
+      return $argmacro
+    }
+  }
+
+  die $self->synerror_at($node->[NODE_LNO]
+                         , "Unknown argmacro '%s'"
+                         , $macroName)
 }
 
 sub add_url_params {
@@ -1173,7 +1321,7 @@ sub AUTOLOAD {
   (my $meth = $sub) =~ s/.*:://;
   my $sym = $YATT::Lite::LRXML::{$meth}
     or croak "No such method: $meth";
-  if ($meth =~ /ent/) {
+  if ($meth =~ /ent|pipeline/) {
     require YATT::Lite::LRXML::ParseEntpath
   }
   elsif ($meth =~ /body/) {

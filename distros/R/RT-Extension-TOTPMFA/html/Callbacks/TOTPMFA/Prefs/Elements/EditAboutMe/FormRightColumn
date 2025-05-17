@@ -21,7 +21,19 @@ my $Digits = RT->Config->Get('TOTPMFA_Digits') || 6;
 <& /Elements/TOTPMFATypeSelector, Settings => $Settings &>
   <div class="form-row">
     <div class="label col-3"><&|/l&>Register with TOTP app</&>:</div>
-    <div class="value col-9"><b><a target="TOTPMFA.png" href="TOTPMFA.png"><&|/l&>Click to view QR code</&></a></b></div>
+% my $qrcode_url = RT->Config->Get('WebPath') ."/Helpers/TOTPMFA";
+    <div class="value col-9"><b><a id="get_totp_qrcode" href="TOTPMFA.png"><&|/l&>Click to view QR code</&></a></b><img id="totp_qrcode"></img></div>
+<script type="text/javascript">
+jQuery(function () {
+  jQuery('#get_totp_qrcode').on('click', function () {
+    jQuery.get(<% $qrcode_url |n,j %>, function (data) {
+      jQuery('#totp_qrcode').attr("src", "data:image/png;base64," + data);
+      jQuery('#get_totp_qrcode').hide();
+    });
+    return false;
+  });
+});
+</script>
   </div>
   <div class="form-row">
     <div class="label col-3"><&|/l&>MFA validation duration</&>:</div>
@@ -47,7 +59,7 @@ my $Digits = RT->Config->Get('TOTPMFA_Digits') || 6;
   <div class="form-row">
     <div class="label col-3"><&|/l&>One-time passcode</&>:</div>
     <div class="value col-9">
-<input type="text" name="TestTOTPMFA" autocomplete="off" placeholder="<&|/l&><% $Digits %> digits or Yubikey OTP</&>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" />
+<input type="text" name="TestTOTPMFA" autocomplete="off" placeholder="<% loc("[_1] digits or Yubikey OTP", $Digits) %>" size="20" maxlength="45" pattern="(\d{<% $Digits %>,<% $Digits %>}|[a-z]{32,45})" />
 <input type="submit" name="TestTOTPMFAButton" value="<&|/l&>Test</&>" />
     </div>
   </div>
@@ -69,7 +81,7 @@ my $Digits = RT->Config->Get('TOTPMFA_Digits') || 6;
       <div class="submit" id="ResetTOTPMFASecretContainer">
         <div class="extra-buttons">
           <label><input type="checkbox" name="ConfirmResetTOTPMFASecret" value="Confirm" />
-          <&|/l&> Check this box to confirm.</&>
+          <&|/l&>Check this box to confirm.</&>
           </label>
         </div>
         <div class="buttons">

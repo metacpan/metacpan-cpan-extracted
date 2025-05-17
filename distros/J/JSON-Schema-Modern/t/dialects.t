@@ -1020,12 +1020,12 @@ subtest '$vocabulary syntax' => sub {
       errors => [
         {
           instanceLocation => '',
-          keywordLocation => '/$vocabulary/#~1notauri',
+          keywordLocation => jsonp('/$vocabulary', '#/notauri'),
           error => '"#/notauri" is not a valid URI',
         },
         {
           instanceLocation => '',
-          keywordLocation => '/$vocabulary/https:~1~1foo',
+          keywordLocation => jsonp('/$vocabulary', 'https://foo'),
           error => '$vocabulary value at "https://foo" is not a boolean',
         },
       ],
@@ -1320,6 +1320,15 @@ subtest 'custom metaschemas, without custom vocabularies' => sub {
     allOf => [ { '$ref' => 'https://json-schema.org/draft/2019-09/schema' } ],
   });
 
+  cmp_deeply(
+    $metaschema_document,
+    methods(
+      canonical_uri => str('http://localhost:1234/my-meta-schema'),
+      metaschema_uri => str('https://json-schema.org/draft/2019-09/schema'),
+    ),
+    'document contains correct values',
+  );
+
   is($metaschema_document->_get_resource($metaschema->{'$id'})->{specification_version}, 'draft2019-09',
     'specification version detected from standard metaschema URI');
 
@@ -1416,6 +1425,36 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
   my $js = JSON::Schema::Modern->new;
 
   cmp_result(
+    $js->evaluate(1, { '$schema' => 20 })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/$schema',
+          error => '$schema value is not a string',
+        },
+      ],
+    },
+    '$schema values must be strings',
+  );
+
+  cmp_result(
+    $js->evaluate(1, { '$schema' => '#/not_a_uri' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/$schema',
+          error => '"#/not_a_uri" is not a valid URI',
+        },
+      ],
+    },
+    '$schema values must be URIs',
+  );
+
+  cmp_result(
     $js->evaluate(1, { '$schema' => 'https://unknown/metaschema' })->TO_JSON,
     {
       valid => false,
@@ -1499,14 +1538,14 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
       errors => [
         {
           instanceLocation => '',
-          keywordLocation => '/$schema/$vocabulary/https:~1~1json-schema.org~1draft~12019-09~1vocab~1validation',
-          absoluteKeywordLocation => 'https://metaschema/with/wrong/spec#/$vocabulary/https:~1~1json-schema.org~1draft~12019-09~1vocab~1validation',
+          keywordLocation => jsonp(qw(/$schema $vocabulary https://json-schema.org/draft/2019-09/vocab/validation)),
+          absoluteKeywordLocation => 'https://metaschema/with/wrong/spec#'.jsonp(qw(/$vocabulary https://json-schema.org/draft/2019-09/vocab/validation)),
           error => '"https://json-schema.org/draft/2019-09/vocab/validation" uses draft2019-09, but the metaschema itself uses draft2020-12',
         },
         {
           instanceLocation => '',
-          keywordLocation => '/$schema/$vocabulary/https:~1~1unknown',
-          absoluteKeywordLocation => 'https://metaschema/with/wrong/spec#/$vocabulary/https:~1~1unknown',
+          keywordLocation => jsonp(qw(/$schema $vocabulary https://unknown)),
+          absoluteKeywordLocation => 'https://metaschema/with/wrong/spec#'.jsonp(qw(/$vocabulary https://unknown)),
           error => '"https://unknown" is not a known vocabulary',
         },
         {
@@ -1517,6 +1556,37 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
       ],
     },
     '$vocabulary validation that must be deferred until used as a metaschema',
+  );
+
+  $js->add_schema({
+    '$id' => 'https://my/mismatched/metaschema',
+    '$schema' => 'https://json-schema.org/draft/2019-09/schema',
+    '$vocabulary' => {
+      'https://json-schema.org/draft/2019-09/vocab/core' => true,
+      'https://json-schema.org/draft/2020-12/vocab/applicator' => true,
+      # note: no validation!
+    },
+  });
+
+  cmp_result(
+    $js->evaluate(1, { '$schema' => 'https://my/mismatched/metaschema' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => jsonp(qw(/$schema $vocabulary https://json-schema.org/draft/2020-12/vocab/applicator)),
+          absoluteKeywordLocation => 'https://my/mismatched/metaschema#'.jsonp(qw(/$vocabulary https://json-schema.org/draft/2020-12/vocab/applicator)),
+          error => '"https://json-schema.org/draft/2020-12/vocab/applicator" uses draft2020-12, but the metaschema itself uses draft2019-09',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/$schema',
+          error => '"https://my/mismatched/metaschema" is not a valid metaschema',
+        },
+      ],
+    },
+    'vocabularies in the metaschema must match the $schema version',
   );
 
   $js->add_schema({
@@ -1591,6 +1661,14 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
     )->TO_JSON,
     { valid => true },
     'validation succeeds because "minimum" never gets run',
+  );
+  cmp_deeply(
+    $js->{_resource_index}{$id}{document},
+    methods(
+      canonical_uri => str($id),
+      metaschema_uri => str('https://my/first/metaschema'),
+    ),
+    'document contains correct values',
   );
   cmp_result(
     $js->{_resource_index}{$id},
@@ -1763,6 +1841,71 @@ subtest '$schema points to a boolean schema' => sub {
       ],
     },
     '$schema cannot reference a boolean schema',
+  );
+};
+
+subtest '$ref to a different dialect' => sub {
+  my $js = JSON::Schema::Modern->new(collect_annotations => 1);
+
+  $js->add_schema({
+    '$id' => 'https://my_metaschema',
+    '$schema' => 'https://json-schema.org/draft/2020-12/schema',
+    '$vocabulary' => {
+      'https://json-schema.org/draft/2020-12/vocab/core' => true,
+      'https://json-schema.org/draft/2020-12/vocab/validation' => true,
+    },
+  });
+
+  cmp_result(
+    $js->evaluate(
+      { foo => { bar => 1 } },
+      {
+        '$id' => 'https://example.com',
+        '$defs' => {
+          subschema => {
+            '$id' => 'https://foo.com',
+            '$schema' => 'https://my_metaschema',
+            '$defs' => {
+              my_def => { type => 'object', blah => 1 },
+            },
+            '$ref' => '#/$defs/my_def',
+            bloop => 2,
+            properties => { bar => false }, # this keyword should only annotate
+          },
+        },
+        additionalProperties => { '$ref' => '#/$defs/subschema' },
+      },
+    )->TO_JSON,
+    {
+      valid => true,
+      annotations => [
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/additionalProperties/$ref/$ref/blah',
+          absoluteKeywordLocation => 'https://foo.com#/$defs/my_def/blah',
+          annotation => 1,
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/additionalProperties/$ref/bloop',
+          absoluteKeywordLocation => 'https://foo.com#/bloop',
+          annotation => 2,
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/additionalProperties/$ref/properties',
+          absoluteKeywordLocation => 'https://foo.com#/properties',
+          annotation => { bar => false },
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/additionalProperties',
+          absoluteKeywordLocation => 'https://example.com#/additionalProperties',
+          annotation => [ 'foo' ],
+        },
+      ],
+    },
+    'evaluation of the subschema correctly uses the new $id and $schema',
   );
 };
 

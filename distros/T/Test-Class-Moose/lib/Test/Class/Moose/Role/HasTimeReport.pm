@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.010000;
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 use Moose::Role;
 use Benchmark qw(timediff timestr :hireswallclock);
@@ -81,7 +81,7 @@ Test::Class::Moose::Role::HasTimeReport - Report timing role
 
 =head1 VERSION
 
-version 0.99
+version 1.00
 
 =head1 DESCRIPTION
 
@@ -111,13 +111,11 @@ Returns the end time for the report as an epoch value.
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<https://github.com/houseabsolute/test-class-moose/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+Bugs may be submitted at L<https://github.com/Test-More/test-class-moose/issues>.
 
 =head1 SOURCE
 
-The source code repository for Test-Class-Moose can be found at L<https://github.com/houseabsolute/test-class-moose>.
+The source code repository for Test-Class-Moose can be found at L<https://github.com/Test-More/test-class-moose>.
 
 =head1 AUTHORS
 
@@ -131,11 +129,15 @@ Curtis "Ovid" Poe <ovid@cpan.org>
 
 Dave Rolsky <autarch@urth.org>
 
+=item *
+
+Chad Granum <exodist@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2025 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

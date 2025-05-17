@@ -21,7 +21,7 @@ return if (not $UserObj->Privileged);
 my $Settings = RT::Extension::TOTPMFA::UserSettings($UserObj);
 
 if (   $ARGSRef->{'ResetTOTPMFASecret'}
-    && $ARGSRef->{'ConfirmResetTOTPMFASecretContainer'})
+    && $ARGSRef->{'ConfirmResetTOTPMFASecret'})
 {
 
     # Reset the TOTP secret.
@@ -29,7 +29,7 @@ if (   $ARGSRef->{'ResetTOTPMFASecret'}
     push @$results, $Message;
 
 } elsif ($ARGSRef->{'ResetTOTPMFASecret'}
-    && not $ARGSRef->{'ConfirmResetTOTPMFASecretContainer'})
+    && not $ARGSRef->{'ConfirmResetTOTPMFASecret'})
 {
 
     # Don't reset the TOTP secret - not confirmed.

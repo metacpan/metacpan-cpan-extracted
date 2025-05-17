@@ -328,6 +328,49 @@ sub check_attributes: Test(1) {
 }
 
 
+sub check__escape_input: Test(12) {
+    my ($self) = @_;
+    my $cli = $self->{cli};
+
+    my @unescape_tests = (
+        { quote => undef, input => q{a\ test},   expected => q{a test}  },
+        { quote => undef, input => q{a\"\ test}, expected => q{a" test}  },
+        { quote => q{"},  input => q{a\ test},   expected => q{a test}  },
+        { quote => q{"},  input => q{a\"\ test}, expected => q{a" test}  },
+        { quote => q{'},  input => q{a\ test},   expected => q{a\ test} },
+        { quote => q{'},  input => q{a\"\ test}, expected => q{a\"\ test} },
+    );
+
+    for my $t (@unescape_tests) {
+        my ($quote, $input, $expected)
+            = @{$t}{qw( quote input expected )};
+        my $got = $cli->unescape_input($input, $quote);
+        my $input_descr =
+            $quote ? qq{$quote$input$quote} : qq{unquoted <$input>};
+        is $got, $expected, "$input_descr unescapes to <$expected>";
+    }
+
+    my $bs  = q{\\};
+    my $dbs = q{\\\\};
+    my @escape_tests = (
+        { quote => undef, input => q{a test},    expected => q{a\ test}  },
+        { quote => q{"},  input => q{a test},    expected => q{a test}  },
+        { quote => q{'},  input => q{a test},    expected => q{a test} },
+        { quote => undef, input => q{a"'\ test}, expected => q{a\"\'}.$dbs.$bs.q{ test} },
+        { quote => q{"},  input => q{a"'\ test}, expected => q{a\"'}.$dbs.q{ test} },
+        { quote => q{'},  input => q{a"\ test},  expected => q{a"\ test} },
+    );
+    for my $t (@escape_tests) {
+        my ($quote, $input, $expected)
+            = @{$t}{qw( quote input expected )};
+        my $got = $cli->escape_input($input, $quote);
+        my $text_descr =
+            $quote ? qq{$quote$expected$quote} : qq{unquoted <$expected>};
+        is $got, $expected, "<$input> escapes to $text_descr";
+    }
+
+}
+
 sub check__split_line: Test(6) {
     my $self = shift;
     my $cli = $self->{cli};

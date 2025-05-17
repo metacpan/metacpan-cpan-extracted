@@ -1,0 +1,4 @@
+#!include_default
+
+^maint/
+^HTML-Blitz-Builder-[\d.]+(?:/|\.tar\.gz\z)

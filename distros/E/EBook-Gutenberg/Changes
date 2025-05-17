@@ -1,5 +1,11 @@
 Revision history for Perl module EBook::Gutenberg
 
+1.00  May 16 2025
+  - Add "menu" command: dialog-based TUI for gutenberg.
+  - Default path for downloaded ebooks is now derived from the ebook title
+    rather than its ID.
+  - Fixed -H|--shelf searching.
+
 0.03  May 11 2025
   - gutenberg now prints a proper usage message rather than displaying its
     manual.

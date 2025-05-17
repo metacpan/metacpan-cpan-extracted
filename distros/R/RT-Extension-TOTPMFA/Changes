@@ -1,5 +1,12 @@
 Revision history for RT-Extension-TOTPMFA
 
+0.10 Fri May 16 2025
+ - Allow QR code to be shown inline (elacour - PR #6).
+ - Localisation support added (elacour - PR #4).
+ - French translation added (elacour - PR #4).
+ - Fix bug when resetting secret (elacour - PR #7).
+ - Further packaging improvements (elacour - PR #3).
+
 0.04 Fri Apr 4 2025
  - Adjustments made for packaging.
 

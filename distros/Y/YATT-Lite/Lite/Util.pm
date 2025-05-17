@@ -848,6 +848,16 @@ sub shallow_copy {
   }
 }
 
+sub deep_copy_array {
+  [map {
+    if (ref $_) {
+      deep_copy_array($_)
+    } else {
+      $_;
+    }
+  } @{$_[0]}];
+}
+
 if (not is_debugging() or catch {require Sub::Name}) {
   *subname = sub { my ($name, $sub) = @_; $sub }
 } else {

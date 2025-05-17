@@ -34,6 +34,9 @@ sub mkvar_at {
 
   my $var = $sub->()->new($typerec, $name, @args);
   $var->[VSLOT_LINENO] //= $lineno //= $self->{curline};
+
+  # $self->set_dflag_default_to($var, $var->[VSLOT_DFLAG], $var->[VSLOT_DEFAULT]);
+
   $var;
 }
 

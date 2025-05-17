@@ -1,5 +1,10 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.26	Fri May 16 21:10:49 EDT 2025
+	Change location of bug reports to RT
+	Bumped minimum version of XML::PP (GitHub#1 - ANDK)
+	Turn off clone behavior
+
 0.25	Thu May 15 07:57:07 EDT 2025
 	Added the 'merge' option
 	Improved the documentation of the merge_defaults routine

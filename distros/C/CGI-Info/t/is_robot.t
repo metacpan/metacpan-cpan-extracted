@@ -9,31 +9,13 @@ use Data::Dumper;
 use lib 't/lib';
 use MyLogger;
 
-BEGIN {
-	use_ok('CGI::Info');
-}
+BEGIN { use_ok('CGI::Info') }
 
 ROBOT: {
 	delete $ENV{'REMOTE_ADDR'};
 	delete $ENV{'HTTP_USER_AGENT'};
 
-	my $cache;
-
-	eval {
-		require CHI;
-
-		CHI->import;
-	};
-	if($@) {
-		diag('CHI not installed');
-		$cache = undef;
-	} else {
-		diag("Using CHI $CHI::VERSION");
-		$cache = CHI->new(driver => 'RawMemory', global => 1);
-		$cache->on_set_error('die');
-		$cache->on_get_error('die');
-	}
-
+	my @messages;
 	my $i = new_ok('CGI::Info');
 	ok($i->is_robot() == 0);
 
@@ -67,12 +49,29 @@ ROBOT: {
 	ok($i->is_robot() == 1);
 	ok($i->browser_type() eq 'robot');
 
+	eval {
+		require CHI;
+
+		CHI->import;
+	};
+	my $cache;
+
+	if($@) {
+		diag('CHI not installed');
+	} else {
+		diag("Using CHI $CHI::VERSION");
+		$cache = CHI->new(driver => 'RawMemory', global => 1);
+		$cache->on_set_error('die');
+		$cache->on_get_error('die');
+	}
+
 	$ENV{'REMOTE_ADDR'} = '74.92.149.57';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.7; en-US; rv:1.9.2.20) Gecko/20110803 Firefox/3.6.20';
+
 	$i = new_ok('CGI::Info' => [{
 		cache => $cache,
+		logger => \@messages
 	}]);
-	$i->set_logger({ logger => MyLogger->new() });
 	ok($i->is_robot() == 0);
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);
@@ -81,13 +80,16 @@ ROBOT: {
 	}
 	$ENV{'REMOTE_ADDR'} = '66.249.83.131';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Linux; Android 4.4.4; SAMSUNG-SGH-I337 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.89 Mobile Safari/537.36';
-	$i = new_ok('CGI::Info');
+	$i = new_ok('CGI::Info' => [
+		logger => \@messages,
+	]);
 	ok($i->is_robot() == 0);
 
 	$ENV{'HTTP_REFERER'} = 'http://free-video-tool.com';
 	$i = new_ok('CGI::Info' => [
-		cache => $cache,
+		logger => \@messages,
 	]);
+	$i->cache($cache);
 	$i->set_logger(logger => MyLogger->new());
 	ok($i->is_robot() == 1);
 	SKIP: {
@@ -98,8 +100,9 @@ ROBOT: {
 
 	$ENV{'HTTP_REFERER'} = 'http://0.tqn.com/d/d/spae.gif)';
 	$i = new_ok('CGI::Info' => [
-		cache => $cache,
+		logger => \@messages,
 	]);
+	$i->cache($cache);
 	$i->set_logger(MyLogger->new());
 	ok($i->is_robot() == 1);
 	cmp_ok($i->status(), '==', 200, 'Default HTTP status is 200');

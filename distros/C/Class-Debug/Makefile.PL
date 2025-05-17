@@ -43,13 +43,15 @@ WriteMakefile(
 	}, PREREQ_PM => {						# Dependencies (with versions)
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'Config::Abstraction' => 0.20,
+		'Config::Abstraction' => 0.25,
 		'Log::Abstraction' => 0.11,
 		'LWP::Protocol::https' => 0,
 		'JSON::MaybeXS'	=> 0
 	}, TEST_REQUIRES => {
 		'File::Temp' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
 		'YAML::XS' => 0,
 	}, dist => $dist,
 	clean	 => {

@@ -1,3 +1,30 @@
+0.061000 -- 2025-05-16
+
+    - Fix escape sequences during completion (fixes #29)
+        Unquoted, double quoted, and single quoted partial input
+        needs to have spaces and quotes handled correctly.
+        
+        Basically, a "\" in unquoted and double quoted words will
+        always escape the next character; in a single quoted
+        word it has no effect (meaning it is a literal "\").
+        
+        When adding escape sequences, an unquoted word should have
+        all "\", double/single quote, and whitespace escaped; for
+        double quoted words, it's the same, except that whitespace
+        and single quotes do not need to be escaped; for single
+        quoted strings, no escaping is done.
+
+    - Prevent very long usage lines with sub-commands.
+        Replace a long list of sub-commands with I<sub-command>.
+
+    - Fix missing ')' in translation of help text.
+
+    - Fixes to _check_arguments (Term::CLI::Command)
+        Remove trailing space from error message and change quoting
+        to use double quotes inside the message.
+
+    - Fix debian/fedora package number.
+
 0.060000 -- 2024-09-06
 
     Term::CLI::Role::HelpText

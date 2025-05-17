@@ -114,7 +114,7 @@ sub find_libdir {
 sub after_new {
   (my MY $self) = @_;
   $self->{cf_script_path} //= do {
-    if ($FindBin::Bin =~ m{/YATT/scripts/}) {
+    if ($FindBin::RealBin =~ m{/YATT/scripts\z}) {
       $self->find_libdir . "/YATT/scripts/"
     } else {
       $FindBin::Bin . "/";

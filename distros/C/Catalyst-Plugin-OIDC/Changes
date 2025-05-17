@@ -1,5 +1,8 @@
 Changes for Catalyst-Plugin-OIDC distribution
 
+0.03 2025-05-16
+  - fix dependencies
+
 0.02 2025-05-14
   - Bump dependency on OIDC::Client v0.08
   - Removed dependency on Test::WWW::Mechanize::Catalyst

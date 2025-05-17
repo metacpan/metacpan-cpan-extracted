@@ -95,7 +95,7 @@ $t->get_ok('/protected')
 $mock_oidc_client->redefine('decode_jwt' => sub {
   {
     'iss'   => 'my_issuer',
-    'exp'   => 12345,
+    'exp'   => time + 30,
     'aud'   => 'my_id',
     'sub'   => 'my_subject',
     'nonce' => 'fake_uuid',

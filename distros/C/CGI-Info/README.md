@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.01
+Version 1.03
 
 # SYNOPSIS
 
@@ -211,8 +211,10 @@ Allow is a reference to a hash list of CGI parameters that you will allow.
 The value for each entry is either a permitted value,
 a regular expression of permitted values for
 the key,
+a code reference,
 or a hash of [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) rules.
-
+Subroutine exceptions propagate normally, allowing custom error handling.
+This works alongside existing regex and Params::Validate::Strict patterns.
 A undef value means that any value will be allowed.
 Arguments not in the list are silently ignored.
 This is useful to help to block attacks on your site.
@@ -289,6 +291,45 @@ such as SQL and XSS injections,
 mustleak and directory traversals,
 thus creating a primitive web application firewall (WAF).
 Warning - this is an extra layer, not a replacement for your other security layers.
+
+### Validation Subroutine Support
+
+The `allow` parameter accepts subroutine references for dynamic validation,
+enabling complex parameter checks beyond static regex patterns.
+These callbacks:
+
+- Receive three arguments: the parameter key, value and the `CGI::Info` instance
+- Must return a true value to allow the parameter, false to reject
+- Can access other parameters through the instance for contextual validation
+
+Basic usage:
+
+    CGI::Info->new(
+        allow => {
+            # Simple value check
+            even_number => sub { ($_[1] % 2) == 0 },
+
+            # Context-aware validation
+            child_age => sub {
+                my ($key, $value, $info) = @_;
+                $info->param('is_parent') ? $value <= 18 : 0
+            }
+        }
+    );
+
+Advanced features:
+
+    # Combine with regex validation
+    mixed_validation => {
+        email => qr/@/,  # Regex check
+        promo_code => \&validate_promo_code  # Subroutine check
+    }
+
+    # Throw custom exceptions
+    dangerous_param => sub {
+        die 'Hacking attempt!' if $_[1] =~ /DROP TABLE/;
+        return 1;
+    }
 
 ## param
 
@@ -481,6 +522,15 @@ Returns the messages that the object has generated as a ref to an array of hashe
 ## messages\_as\_string
 
 Returns the messages of that the object has generated as a string.
+
+## cache
+
+Get/set the internal cache system.
+
+Use this rather than pass the cache argument to `new()` if you see these error messages,
+"(in cleanup) Failed to get MD5\_CTX pointer".
+It's some obscure problem that I can't work out,
+but calling this after `new()` works.
 
 ## set\_logger
 

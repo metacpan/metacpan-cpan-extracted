@@ -1,0 +1,8 @@
+
+This is alright.
+
+This one is also alright.
+
+This оne is allowed.   ## Test::MixedScripts Latin,Cyrillic,Common
+
+But this line is not ցood.

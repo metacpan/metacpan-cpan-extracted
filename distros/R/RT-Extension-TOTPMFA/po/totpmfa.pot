@@ -1,0 +1,156 @@
+#. ($Digits)
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:50 html/NoAuth/TOTPMFALogin.html:110 html/NoAuth/TOTPMFALogin.html:64
+msgid "%1 digits or Yubikey OTP"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:28
+msgid "(seconds between MFA prompts)"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:72
+msgid "Check this box to confirm."
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:63
+msgid "Click here to show the reset button."
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:24
+msgid "Click to view QR code"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/AboutMe.html/UpdateLogic:37
+msgid "Confirmation not received - secret has not been reset."
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:32
+msgid "Enter a Yubikey OTP here to register the device"
+msgstr ""
+
+#: html/NoAuth/TOTPMFALogin.html:51 html/NoAuth/TOTPMFALogin.html:96
+msgid "Error"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:57
+msgid "If your TOTP app is lost or the QR code is exposed to others, you can generate a new TOTP secret below."
+msgstr ""
+
+#: html/NoAuth/TOTPMFALogin.html:126 html/NoAuth/TOTPMFALogin.html:67
+msgid "Login"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:27
+msgid "MFA validation duration"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Admin/Users/Modify.html/LeftColumnBottom:17 html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:20 html/Elements/TOTPMFATypeSelector:10 html/NoAuth/TOTPMFALogin.html:47 html/NoAuth/TOTPMFALogin.html:91
+msgid "Multi-factor authentication"
+msgstr ""
+
+#: lib/RT/Extension/TOTPMFA.pm:397
+msgid "No TOTP secret registered"
+msgstr ""
+
+#: lib/RT/Extension/TOTPMFA.pm:218
+msgid "No TOTPMFA settings key provided"
+msgstr ""
+
+#. ($Key)
+#: lib/RT/Extension/TOTPMFA.pm:223
+msgid "No TOTPMFA settings value provided for key %1"
+msgstr ""
+
+#: lib/RT/Extension/TOTPMFA.pm:444
+msgid "No Yubikey device registered"
+msgstr ""
+
+#: html/Elements/TOTPMFATypeSelector:12
+msgid "Not enabled"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:48 html/NoAuth/TOTPMFALogin.html:102 html/NoAuth/TOTPMFALogin.html:109 html/NoAuth/TOTPMFALogin.html:57 html/NoAuth/TOTPMFALogin.html:64
+msgid "One-time passcode"
+msgstr ""
+
+#: html/Elements/TOTPMFATypeSelector:13
+msgid "One-time passcode (OATH TOTP or Yubikey)"
+msgstr ""
+
+#: lib/RT/Extension/TOTPMFA.pm:510
+msgid "One-time passcode does not match a known format."
+msgstr ""
+
+#: lib/RT/Extension/TOTPMFA.pm:426
+msgid "One-time passcode does not match."
+msgstr ""
+
+#: lib/RT/Extension/TOTPMFA.pm:451
+msgid "One-time passcode is not from the registered Yubikey device."
+msgstr ""
+
+#: lib/RT/Extension/TOTPMFA.pm:475
+msgid "One-time passcode validation API call failed"
+msgstr ""
+
+#. ($Response->status_line)
+#: lib/RT/Extension/TOTPMFA.pm:482
+msgid "One-time passcode validation API call failed with this error: %1"
+msgstr ""
+
+#. ($Content)
+#: lib/RT/Extension/TOTPMFA.pm:503
+msgid "One-time passcode validation failed with no valid status response"
+msgstr ""
+
+#. ($Content)
+#: lib/RT/Extension/TOTPMFA.pm:495
+msgid "One-time passcode validation failed with this status response: %1"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:23
+msgid "Register with TOTP app"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:77
+msgid "Reset TOTP secret"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:37
+msgid "Save Preferences"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:51
+msgid "Test"
+msgstr ""
+
+#. ($Message)
+#: html/Callbacks/TOTPMFA/Prefs/AboutMe.html/UpdateLogic:60
+msgid "Test failed: %1"
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/AboutMe.html/UpdateLogic:58
+msgid "Test successful: One-time passcode accepted."
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:58
+msgid "This will invalidate any previously registered secret."
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:43
+msgid "To test your authenticator app without switching on multi-factor authentication, enter a one-time passcode from it here and click on the \"Test\" button."
+msgstr ""
+
+#. ($Key)
+#: lib/RT/Extension/TOTPMFA.pm:220
+msgid "Unknown TOTPMFA settings key: %1"
+msgstr ""
+
+#. ($Key)
+#: lib/RT/Extension/TOTPMFA.pm:251
+msgid "Updated TOTPMFA \"%1\" value."
+msgstr ""
+
+#: html/Callbacks/TOTPMFA/Prefs/Elements/EditAboutMe/FormRightColumn:31
+msgid "Yubikey identifier"
+msgstr ""
+

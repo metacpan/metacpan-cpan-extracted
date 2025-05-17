@@ -38,6 +38,7 @@ subtest 'boolean document' => sub {
       ],
       original_uri => [ str('') ],
       canonical_uri => [ str('') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { '' => 0 } ],
     ),
     'boolean schema with no canonical_uri',
@@ -68,6 +69,7 @@ subtest 'boolean document' => sub {
         },
       ],
       canonical_uri => [ str('https://foo.com') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { '' => 0 } ],
     ),
     'boolean schema with valid canonical_uri',
@@ -94,7 +96,7 @@ subtest 'object document' => sub {
     ),
     'object schema with originally provided uri = \''.($_//'<undef>').'\' and no root $id',
   )
-  foreach (undef, '', '0', Mojo::URL->new(''), Mojo::URL->new('0'));
+  foreach (undef, '', '0', Mojo::URL->new, Mojo::URL->new(''), Mojo::URL->new('0'));
 
   cmp_deeply(
     JSON::Schema::Modern::Document->new(
@@ -112,6 +114,7 @@ subtest 'object document' => sub {
       ],
       original_uri => [ str('https://foo.com') ],
       canonical_uri => [ str('https://foo.com') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { '' => 0 } ],
     ),
     'object schema with valid canonical_uri, no root $id',
@@ -133,6 +136,7 @@ subtest 'object document' => sub {
       ],
       original_uri => [ str($_//'') ],
       canonical_uri => [ str('https://foo.com') ], # note canonical_uri has been overwritten
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { '' => 0 } ],
     ),
     'object schema with originally provided uri = \''.($_//'<undef>').'\' and absolute root $id',
@@ -155,6 +159,7 @@ subtest 'object document' => sub {
       ],
       original_uri => [ str($_) ],
       canonical_uri => [ str('https://bar.com') ], # note canonical_uri has been overwritten
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { '' => 0 } ],
     ),
     'originally provided uri is not indexed when overridden by an absolute root $id',
@@ -232,6 +237,7 @@ subtest 'object document' => sub {
       ),
       original_uri => [ str('https://foo.com') ],
       canonical_uri => [ str('https://bar.com') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { map +($_ => 0), '', '/allOf/0', '/allOf/1' } ],
     ),
     'object schema with canonical_uri and root $id, and additional resource schemas as well',
@@ -254,6 +260,7 @@ subtest 'object document' => sub {
       ],
       original_uri => [ str('https://my-base.com') ],
       canonical_uri => [ str('https://my-base.com/relative') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { '' => 0 } ],
     ),
     'relative $id at root is resolved against provided canonical_id',
@@ -285,6 +292,7 @@ subtest 'object document' => sub {
       ),
       original_uri => [ str('') ],
       canonical_uri => [ str('') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     'relative uri for inner $id',
@@ -315,6 +323,7 @@ subtest 'object document' => sub {
       ),
       original_uri => [ str('') ],
       canonical_uri => [ str('') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
       _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     'no root $id; absolute uri with path in subschema resource',
@@ -369,6 +378,7 @@ subtest 'object document' => sub {
       ],
       original_uri => [ str('https://example.com') ],
       canonical_uri => [ str('https://example.com') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
     ),
     'canonical_uri provided; empty uri not added as a referenceable uri when an anchor exists',
   );
@@ -396,6 +406,7 @@ subtest 'object document' => sub {
       ],
       original_uri => [ str('') ],
       canonical_uri => [ str('https://my-base.com') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
     ),
     'absolute uri provided at root; adjacent anchor has the same canonical uri',
   );
@@ -427,6 +438,7 @@ subtest 'object document' => sub {
       ],
       original_uri => [ str('') ],
       canonical_uri => [ str('https://my-base.com') ],
+      metaschema_uri => [ str(JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'}) ],
     ),
     'absolute uri provided at root; anchor lower down has its own canonical uri',
   );
@@ -618,6 +630,8 @@ subtest '$schema not conforming to syntax' => sub {
       schema => { '$schema' => 'foo' },
     ),
     listmethods(
+      canonical_uri => [ str('') ],
+      metaschema_uri => [ str('https://json-schema.org/draft/2020-12/schema') ],
       resource_index => [],
       errors => [
         methods(TO_JSON => {
@@ -878,18 +892,6 @@ subtest 'resource collisions' => sub {
     undef,
     'ignored "duplicate" uris embedded in non-schemas',
   );
-
-  cmp_deeply(
-    JSON::Schema::Modern::Document->new(
-      canonical_uri => Mojo::URL->new('https://foo.com/x/y/z'),
-      schema => {
-        '$id' => 'https://bar.com',
-        '$anchor' => 'hello',
-      },
-    )->path_to_resource(''),
-    superhashof({ canonical_uri => str('https://bar.com') }),
-    'the correct canonical uri is indexed in the inverted index',
-  );
 };
 
 subtest 'create document with explicit canonical_uri set to the same as root $id' => sub {
@@ -965,6 +967,15 @@ subtest 'custom metaschema_uri' => sub {
     evaluator => $js,  # needed in order to find the metaschema
   ));
 
+  cmp_deeply(
+    $js->{_resource_index}{$id}{document},
+    methods(
+      canonical_uri => str($id),
+      metaschema_uri => str('https://my/first/metaschema'),
+    ),
+    'document contains correct values',
+  );
+
   cmp_result(
     $js->{_resource_index}{$id},
     {
@@ -1007,10 +1018,11 @@ subtest 'multiple uris used for resolution and identification, and original_uri'
     'https://example.com/api/' => JSON::Schema::Modern::Document->new(
       canonical_uri => 'staging/',
       schema => {
-        '$id' => 'alpha.json',
+        '$id' => 'alpha.json',  # https://example.com/staging/alpha.json
         properties => {
-          foo => { '$id' => 'beta' },
+          foo => { '$id' => 'beta', not => true }, # https://example.com/staging/beta
         },
+        not => true,
       },
       evaluator => $js,
     )
@@ -1062,6 +1074,61 @@ subtest 'multiple uris used for resolution and identification, and original_uri'
     'evaluator has correct resources, resolved against the provided base uri',
   );
 
+  cmp_deeply(
+    $js->evaluate({ foo => 1 }, 'https://example.com/api/staging/alpha.json')->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/not',
+          absoluteKeywordLocation => 'https://example.com/api/staging/alpha.json#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/properties/foo/not',
+          absoluteKeywordLocation => 'https://example.com/api/staging/beta#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          absoluteKeywordLocation => 'https://example.com/api/staging/alpha.json#/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'when evaluating the document using the canonical uri, error locations use the canonical uri',
+  );
+
+  cmp_deeply(
+    $js->evaluate({ foo => 1 }, 'https://example.com/api/')->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/not',
+          absoluteKeywordLocation => 'https://example.com/api/staging/alpha.json#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/properties/foo/not',
+          absoluteKeywordLocation => 'https://example.com/api/staging/beta#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          absoluteKeywordLocation => 'https://example.com/api/staging/alpha.json#/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'when evaluating the document using a retrieval uri, error locations still use the canonical uri',
+  );
 
   my $doc2 = $js->add_document('file:///usr/local/share/api.json' => $doc);
   is($doc2, $doc, 'same document is added a second time');
@@ -1090,7 +1157,65 @@ subtest 'multiple uris used for resolution and identification, and original_uri'
         %configs,
       },
     },
-    'document resources are added using new base, which appears in their canonical_uri values',
+    'document resources are added using the new base, which appears in their canonical_uri values',
+  );
+
+  cmp_deeply(
+    $js->evaluate({ foo => 1 }, 'https://example.com/api/')->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/not',
+          absoluteKeywordLocation => 'https://example.com/api/staging/alpha.json#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/properties/foo/not',
+          absoluteKeywordLocation => 'https://example.com/api/staging/beta#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          absoluteKeywordLocation => 'https://example.com/api/staging/alpha.json#/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'when evaluating using the first base uri, error locations are relative to the provided base uri',
+  );
+
+  # there are multiple resources mapped to the same document+path locations, but we want error
+  # locations to be using the set that we used in the evaluation call.
+  cmp_deeply(
+    $js->evaluate({ foo => 1 }, 'file:///usr/local/share/api.json')->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/not',
+          absoluteKeywordLocation => 'file:///usr/local/share/staging/alpha.json#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/properties/foo/not',
+          absoluteKeywordLocation => 'file:///usr/local/share/staging/beta#/not',
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          absoluteKeywordLocation => 'file:///usr/local/share/staging/alpha.json#/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'when evaluating using the second base uri, error locations are relative to the original evaluation location',
   );
 };
 
