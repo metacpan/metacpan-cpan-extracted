@@ -1,0 +1,6 @@
+Revision history for Perl extension PDF::API2::Resource::XObject::Image::Imager.
+
+0.01  Fri May 16 12:17:40 2025
+	- original version; created by h2xs 1.23 with options
+		-n PDF::API2::Resource::XObject::Image::Imager -b 5.10.1 -A -X
+

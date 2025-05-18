@@ -7,16 +7,21 @@ requires "Exporter" => "5.57";
 requires "File::Find" => "0";
 requires "File::Spec" => "0";
 requires "IO" => "0";
-requires "Test2::API" => "0";
+requires "Test2::API" => "1.302200";
 requires "Unicode::UCD" => "0";
-requires "perl" => "v5.14.0";
+requires "perl" => "v5.16.0";
 requires "utf8" => "0";
 requires "warnings" => "0";
+
+on 'build' => sub {
+  requires "ExtUtils::MakeMaker" => "7.22";
+  requires "Module::Metadata" => "1.000015";
+};
 
 on 'test' => sub {
   requires "File::Spec" => "0";
   requires "FindBin" => "0";
-  requires "Module::Metadata" => "0";
+  requires "Module::Metadata" => "1.000015";
   requires "Test2::V0" => "0";
   requires "Test::More" => "0";
   requires "strict" => "0";
@@ -33,6 +38,7 @@ on 'configure' => sub {
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Software::Security::Policy::Individual" => "0.10";
+  requires "Test::CPAN::Changes" => "0";
   requires "Test::DistManifest" => "0";
   requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";
@@ -46,4 +52,5 @@ on 'develop' => sub {
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Portability::Files" => "0";
   requires "Test::TrailingSpace" => "0.0203";
+  requires "Test::Vars" => "0.015";
 };

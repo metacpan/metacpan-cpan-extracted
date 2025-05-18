@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Netmask
 
+2.0003 2025-05-17
+ - Quiet warning (thanks, Todd Rinaldo!)
+
 2.0002 2022-08-31
  - Documentation fixes (thanks, Breno G. de Oliveira!)
 

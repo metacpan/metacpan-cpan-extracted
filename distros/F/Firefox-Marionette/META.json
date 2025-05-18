@@ -56,6 +56,7 @@
             "Exporter" : "0",
             "Fcntl" : "0",
             "File::Find" : "0",
+            "File::Path" : "2.08",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "FileHandle" : "0",
@@ -93,6 +94,6 @@
          "web" : "https://github.com/david-dick/firefox-marionette"
       }
    },
-   "version" : "1.65",
+   "version" : "1.66",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# PODNAME: halstead
+# PODNAME: halstead.pl
 use strict;
 use warnings;
 
@@ -80,11 +80,11 @@ __END__
 
 =head1 NAME
 
-halstead
+halstead.pl
 
 =head1 VERSION
 
-version 0.0619
+version 0.0620
 
 =head1 SYNOPSIS
 

@@ -73,9 +73,10 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.65';
+our $VERSION = '1.66';
 
 sub _ANYPROCESS                     { return -1 }
+sub _PROCESS_GROUP                  { return -1 }
 sub _COMMAND                        { return 0 }
 sub _DEFAULT_HOST                   { return 'localhost' }
 sub _DEFAULT_PORT                   { return 2828 }
@@ -322,7 +323,7 @@ sub geo {
 sub _get_geolocation {
     my ($self) = @_;
 
-    my $result = $self->script( $self->_compress_script( <<'_JS_') );
+    my $result = $self->script( $self->_compress_script(<<'_JS_') );
 return (async function() {
   function getGeo() {
     return new Promise((resolve, reject) => {
@@ -1441,7 +1442,8 @@ sub _init {
     }
     if ( defined $parameters{system_access} ) {
         $self->{system_access} = $parameters{system_access};
-    } else {
+    }
+    else {
         $self->{system_access} = 1;
     }
     if ( defined $parameters{width} ) {
@@ -1936,7 +1938,7 @@ sub _get_bookmark {
     my $result = $self->script(
         $self->_compress_script(
             $self->_bookmark_interface_preamble()
-              . <<'_JS_'), args => [$parameter] );
+              . <<'_JS_' ), args => [$parameter] );
 return (async function(guidOrInfo) {
   let bookmark = await lazy.Bookmarks.fetch(guidOrInfo);
   if (bookmark) {
@@ -2012,7 +2014,7 @@ sub bookmarks {
         $self->script(
             $self->_compress_script(
                 $self->_bookmark_interface_preamble()
-                  . <<'_JS_'), args => [$parameter] ) };
+                  . <<'_JS_' ), args => [$parameter] ) };
 return lazy.Bookmarks.search(arguments[0]);
 _JS_
     $self->_context($old);
@@ -2025,7 +2027,7 @@ sub add_bookmark {
     $self->script(
         $self->_compress_script(
             $self->_bookmark_interface_preamble()
-              . <<'_JS_'), args => [$bookmark] );
+              . <<'_JS_' ), args => [$bookmark] );
 for(let name of [ "dateAdded", "lastModified" ]) {
   if (arguments[0][name]) {
     arguments[0][name] = new Date(parseInt(arguments[0][name] + "000", 10));
@@ -2112,7 +2114,7 @@ sub delete_bookmark {
     $self->script(
         $self->_compress_script(
             $self->_bookmark_interface_preamble()
-              . <<'_JS_'), args => [$guid] );
+              . <<'_JS_' ), args => [$guid] );
 return lazy.Bookmarks.remove(arguments[0]);
 _JS_
     $self->_context($old);
@@ -2758,7 +2760,7 @@ sub fill_login {
                 $self->script(
                     $self->_compress_script(
                         $self->_login_interface_preamble()
-                          . <<"_JS_"), args => [ $browser_uri->scheme() . '://' . $browser_uri->host(), $action_uri->scheme() . '://' . $action_uri->host() ] ) } );
+                          . <<"_JS_" ), args => [ $browser_uri->scheme() . '://' . $browser_uri->host(), $action_uri->scheme() . '://' . $action_uri->host() ] ) } );
 try {
     return loginManager.findLogins(arguments[0], arguments[1], null);
 } catch (e) {
@@ -2799,7 +2801,7 @@ sub delete_login {
               . $self->_define_login_info_from_blessed_user(
                 'loginInfo', $login
               )
-              . <<"_JS_"), args => [$login] );
+              . <<"_JS_" ), args => [$login] );
 loginManager.removeLogin(loginInfo);
 _JS_
     $self->_context($old);
@@ -2811,7 +2813,7 @@ sub delete_logins {
     my $old = $self->_context('chrome');
     $self->script(
         $self->_compress_script(
-            $self->_login_interface_preamble() . <<"_JS_") );
+            $self->_login_interface_preamble() . <<"_JS_" ) );
 loginManager.removeAllLogins();
 _JS_
     $self->_context($old);
@@ -3085,8 +3087,10 @@ sub logins_from_xml {
         my $host;
         if ( defined $pw_entry->{url} ) {
             my $url = URI::URL->new( $pw_entry->{url} );
-            $host = URI::URL->new( $url->scheme() . q[://] . $url->host_port() )
-              ->canonical()->as_string;
+            $host =
+              URI::URL->new( $url->scheme() . q[://] . $url->host_port() )
+              ->canonical()
+              ->as_string;
         }
         if ( ( $pw_entry->{username} ) && ($host) && ( $pw_entry->{password} ) )
         {
@@ -3249,7 +3253,7 @@ sub logins {
     my $old    = $self->_context('chrome');
     my $result = $self->script(
         $self->_compress_script(
-            $self->_login_interface_preamble() . <<"_JS_") );
+            $self->_login_interface_preamble() . <<"_JS_" ) );
 return loginManager.getAllLogins({});
 _JS_
     $self->_context($old);
@@ -3961,7 +3965,7 @@ sub update {
     # toolkit/mozapps/update/nsIUpdateService.idl
     my $update_parameters = $self->script(
         $self->_compress_script(
-            $self->_prefs_interface_preamble() . <<'_JS_') );
+            $self->_prefs_interface_preamble() . <<'_JS_' ) );
 let disabledForTesting = branch.getBoolPref("app.update.disabledForTesting");
 branch.setBoolPref("app.update.disabledForTesting", false);
 let updateManager = new Promise((resolve, reject) => {
@@ -4151,7 +4155,7 @@ sub _import_certificate {
     my $encoded_trust       = URI::Escape::uri_escape($trust);
     my $result              = $self->script(
         $self->_compress_script(
-            $self->_certificate_interface_preamble() . <<"_JS_") );
+            $self->_certificate_interface_preamble() . <<"_JS_" ) );
 certificateDatabase.addCertFromBase64(decodeURIComponent("$encoded_certificate"), decodeURIComponent("$encoded_trust"), "");
 _JS_
     $self->_context($old);
@@ -4172,7 +4176,7 @@ sub certificate_as_pem {
                 $self->script(
                     $self->_compress_script(
                         $self->_certificate_interface_preamble()
-                          . <<"_JS_") ) } ), q[] );
+                          . <<"_JS_" ) ) } ), q[] );
 return certificateDatabase.findCertByDBKey(decodeURIComponent("$encoded_db_key"), {}).getRawDER({});
 _JS_
     $self->_context($old);
@@ -4192,7 +4196,7 @@ sub delete_certificate {
     my $old            = $self->_context('chrome');
     my $certificate_base64_string = $self->script(
         $self->_compress_script(
-            $self->_certificate_interface_preamble() . <<"_JS_") );
+            $self->_certificate_interface_preamble() . <<"_JS_" ) );
 let certificate = certificateDatabase.findCertByDBKey(decodeURIComponent("$encoded_db_key"), {});
 return certificateDatabase.deleteCertificate(certificate);
 _JS_
@@ -4209,7 +4213,7 @@ sub is_trusted {
     my $trusted        = $self->script(
         $self->_compress_script(
             $self->_certificate_interface_preamble()
-              . <<'_JS_'), args => [$encoded_db_key] );
+              . <<'_JS_' ), args => [$encoded_db_key] );
 let certificate = certificateDatabase.findCertByDBKey(decodeURIComponent(arguments[0]), {});
 if (certificateDatabase.isCertTrusted(certificate, Components.interfaces.nsIX509Cert.CA_CERT, Components.interfaces.nsIX509CertDB.TRUSTED_SSL)) {
     return true;
@@ -4226,7 +4230,7 @@ sub certificates {
     my $old          = $self->_context('chrome');
     my $certificates = $self->script(
         $self->_compress_script(
-            $self->_certificate_interface_preamble() . <<'_JS_') );
+            $self->_certificate_interface_preamble() . <<'_JS_' ) );
 let result = certificateDatabase.getCerts();
 if (Array.isArray(result)) {
     return result;
@@ -6348,6 +6352,9 @@ sub _launch_unix {
         }
         elsif ( defined $pid ) {
             eval {
+                setpgrp 0, 0
+                  or Firefox::Marionette::Exception->throw(
+                    "Failed to set process group (setpgrp):$EXTENDED_OS_ERROR");
                 if ( !$self->debug() ) {
                     open STDERR, q[>], $dev_null
                       or Firefox::Marionette::Exception->throw(
@@ -11067,7 +11074,7 @@ sub _wait_for_firefox_to_exit {
 
     }
     else {
-        while ( kill 0, $self->_firefox_pid() ) {
+        while ( kill 0, $self->_firefox_pid() * _PROCESS_GROUP() ) {
             sleep 1;
             $self->_reap();
         }
@@ -11264,7 +11271,7 @@ sub _terminate_local_non_win32_process {
     if ( $term_signal > 0 ) {
         my $count = 0;
         while (( $count < _NUMBER_OF_TERM_ATTEMPTS() )
-            && ( kill $term_signal, $self->_firefox_pid() ) )
+            && ( kill $term_signal, $self->_firefox_pid() * _PROCESS_GROUP() ) )
         {
             $count += 1;
             sleep 1;
@@ -11273,7 +11280,7 @@ sub _terminate_local_non_win32_process {
     }
     my $kill_signal = $self->_signal_number('KILL');    # no more mr nice guy
     if ( $kill_signal > 0 ) {
-        while ( kill $kill_signal, $self->_firefox_pid() ) {
+        while ( kill $kill_signal, $self->_firefox_pid() * _PROCESS_GROUP() ) {
             sleep 1;
             $self->_reap();
         }
@@ -11335,7 +11342,8 @@ sub _terminate_marionette_process {
         elsif ( my $ssh = $self->_ssh() ) {
             $self->_terminate_process_via_ssh();
         }
-        elsif ( ( $self->_firefox_pid() ) && ( kill 0, $self->_firefox_pid() ) )
+        elsif (( $self->_firefox_pid() )
+            && ( kill 0, $self->_firefox_pid() * _PROCESS_GROUP() ) )
         {
             $self->_terminate_local_non_win32_process();
         }
@@ -11593,7 +11601,7 @@ sub json {
     if ( defined $uri ) {
         my $old  = $self->_context('chrome');
         my $json = $self->script(
-            $self->_compress_script( <<'_SCRIPT_'), args => [$uri] );
+            $self->_compress_script(<<'_SCRIPT_'), args => [$uri] );
 return (async function(url) {
   let response = await fetch(url, { method: "GET", mode: "cors", headers: { "Content-Type": "application/json" }, redirect: "follow", referrerPolicy: "no-referrer"});
   if (response.ok) {
@@ -12316,7 +12324,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.65
+Version 1.66
 
 =head1 SYNOPSIS
 

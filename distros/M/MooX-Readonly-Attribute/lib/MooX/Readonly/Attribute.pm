@@ -1,6 +1,6 @@
 package MooX::Readonly::Attribute;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.01';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use Const::XS qw/make_readonly/;
 use MooX::ReturnModifiers;
 
@@ -36,7 +36,7 @@ MooX::Readonly::Attribute - Truly readonly attributes
 
 =head1 VERSION
 
-Version 0.01
+Version 1.00
 
 =cut
 

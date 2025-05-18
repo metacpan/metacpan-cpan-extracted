@@ -1,10 +1,8 @@
 package Catalyst::Controller::Validation::DFV;
-{
-  $Catalyst::Controller::Validation::DFV::VERSION = '0.0.8';
-}
-{
-  $Catalyst::Controller::Validation::DFV::DIST = 'Catalyst-Controller-Validation-DFV';
-}
+
+our $VERSION = '0.0.11';
+$VERSION = eval $VERSION;
+
 use strict;
 use warnings;
 
@@ -28,6 +26,14 @@ sub form_check :Private {
     return;
 }
 
+
+=head1 Methods
+
+=cut
+
+=head2 add_form_invalid
+
+=cut
 sub add_form_invalid :Private {
     my ($self, $c, $invalid_key, $invalid_value) = @_;
 
@@ -46,10 +52,16 @@ sub add_form_invalid :Private {
     return;
 }
 
+=head2 validation_errors_to_html
+
+=cut
 sub validation_errors_to_html :Private {
     my ($self, $c) = @_;
 }
 
+=head2 refill_form
+
+=cut
 # factored out of a block of code I regularly paste into Controller/Root.pm
 sub refill_form :Private {
     my ($self, $c) = @_;
@@ -81,16 +93,13 @@ sub refill_form :Private {
 
 1;
 # ABSTRACT: Form validation and refilling
+__END__
 
 =pod
 
-=head1 NAME
+=head1 DESCRIPTION
 
-Catalyst::Controller::Validation::DFV - Form validation and refilling
-
-=head1 VERSION
-
-version 0.0.8
+Form-validation using a Catalyst controller and Data::FormValidator
 
 =head1 SYNOPSIS
 
@@ -150,10 +159,6 @@ version 0.0.8
         $c->forward('refill_form');
     }
 
-=head1 DESCRIPTION
-
-Form-validation using a Catalyst controller and Data::FormValidator
-
 =head1 EXAMPLES
 
 There are L<Template::Toolkit> file examples in the examples/ directory of
@@ -171,7 +176,5 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
 
 # vim: ts=8 sts=4 et sw=4 sr sta

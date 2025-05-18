@@ -1,0 +1,9 @@
+# https://openwebsearch.eu/owler/
+- ua: 'Owler (ows.eu/owler)'
+  name: 'OWLer'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false

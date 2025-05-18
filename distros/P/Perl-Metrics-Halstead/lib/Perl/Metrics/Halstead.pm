@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0619';
+our $VERSION = '0.0620';
 
 use strictures 2;
 use Moo;
@@ -229,7 +229,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0619
+version 0.0620
 
 =head1 SYNOPSIS
 

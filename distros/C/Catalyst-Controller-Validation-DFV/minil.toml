@@ -1,0 +1,5 @@
+name = "Catalyst-Controller-Validation-DFV"
+# badges = ["travis"]
+authority="cpan:ARUNBEAR"
+
+module_maker="ModuleBuildTiny"

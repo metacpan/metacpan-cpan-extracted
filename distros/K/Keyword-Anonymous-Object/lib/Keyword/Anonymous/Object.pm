@@ -3,7 +3,7 @@ package Keyword::Anonymous::Object;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 use Anonymous::Object;
 
@@ -56,7 +56,7 @@ Keyword::Anonymous::Object - anonymous objects
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 

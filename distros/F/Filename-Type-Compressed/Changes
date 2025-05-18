@@ -1,0 +1,38 @@
+0.051   2024-12-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Filename-{,Type-}*.
+
+
+0.050   2023-12-15  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename 'ci' arg to 'ignore_case' to be
+          consistent with others.
+
+        - Add lz/lzma/zst/br.
+
+        - [ux][doc] Add examples.
+
+
+0.04    2015-09-03  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.03    2015-01-01  Released-By: PERLANCAR
+
+	- Add option ci (and turn it on by default), this is to be useful
+	  in conjunction with Filename::Archive.
+
+
+0.02    2014-12-30  Released-By: PERLANCAR
+
+	- Provide %COMPRESSORS containing information on each compressor.
+
+
+0.01    2014-12-30  Released-By: PERLANCAR
+
+        - First release.

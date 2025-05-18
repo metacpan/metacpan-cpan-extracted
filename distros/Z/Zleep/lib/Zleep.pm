@@ -3,7 +3,7 @@ package Zleep;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use base 'Import::Export';
 
 our %EX = (
@@ -28,7 +28,7 @@ Zleep - zleep
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

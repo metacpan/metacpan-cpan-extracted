@@ -7,7 +7,7 @@ use English qw( -no_match_vars );
 use strict;
 use warnings;
 
-our $VERSION = '1.65';
+our $VERSION = '1.66';
 
 sub _BUFFER_SIZE  { return 65_536 }
 sub _MSIE_VERSION { return 11 }
@@ -463,7 +463,7 @@ _JS_
     $_function_definition_count += 1;
     my $native_code_body = $class->_native_code_body($to_browser_type);
     my $actual_name      = "fm_def_$_function_definition_count";
-    return ( $actual_name, <<"_JS_");
+    return ( $actual_name, <<"_JS_" );
 let $actual_name = new Function("$function_body");
   $actual_name.toString = function fm_def() { return "function ${name}() $native_code_body" };
 _JS_
@@ -866,7 +866,7 @@ Firefox::Marionette::Extension::Stealth - Contains the Stealth Extension
 
 =head1 VERSION
 
-Version 1.65
+Version 1.66
 
 =head1 SYNOPSIS
 

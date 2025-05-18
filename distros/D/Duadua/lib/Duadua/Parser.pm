@@ -69,7 +69,7 @@ sub _detect_general_bot {
             $h{name}    = $1;
             $h{version} = $version;
         }
-        elsif ( $d->ua =~ m!([a-zA-Z0-9\-\_\.\!]+(?:bot|crawler))!i ) {
+        elsif ( $d->ua =~ m!([a-zA-Z0-9\-\_\.\!]+(?:bot|crawler|spider))!i ) {
             $h{name} = $1;
         }
 

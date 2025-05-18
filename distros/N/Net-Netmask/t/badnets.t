@@ -287,7 +287,7 @@ foreach my $test (@tests) {
     is( $result, undef, "$name $type" );
     like( Net::Netmask->errstr, $err, "$name errstr mismatch" );
 
-    warns { $result = Net::Netmask->new(@$input) };
+    my $ignore = warns { $result = Net::Netmask->new(@$input) };
     if ($result->{PROTOCOL} eq 'IPv4') {
         is( "$result", "0.0.0.0/0", "result is 0.0.0.0/0" );
     } else {

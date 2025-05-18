@@ -1,4 +1,23 @@
 Revision history for Test-MixedScripts:
 
+v0.2.0    2025-05-17 23:25:18+01:00 Europe/London
+  [Enhancements]
+  - all_perl_file_scripts_ok will check XS-related files
+    (.xs, .c and .h suffixes).
+
+  [Bug Fixes]
+  - Bumped minimum Perl version to v5.16, since the Unicode Script_Extensions
+    property this module checks is not available in earlier Perl versions.
+
+v0.1.1    2025-05-17 14:15:48+01:00 Europe/London
+  [Bug Fixes]
+  - Specified a minimum version of Test2::API.
+
+  [Security]
+  - Updated minimum build requirements.
+
+  [Tests]
+  - Added more author tests.
+
 v0.1.0    2025-05-16 22:32:37+01:00 Europe/London
   - Initial version.

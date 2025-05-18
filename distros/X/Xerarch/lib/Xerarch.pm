@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use meta;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub import {
 	my $caller = caller();
@@ -55,7 +55,7 @@ Xerarch - Introspection
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -154,10 +154,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Xerarch>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Xerarch>
 
 =item * Search CPAN
 

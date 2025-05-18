@@ -1,0 +1,87 @@
+{
+   "abstract" : "Form validation and refilling",
+   "author" : [
+      "Chisel <chisel@chizography.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.26",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Controller-Validation-DFV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::FormValidator" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst::Plugin::FillInForm" : "0",
+            "Catalyst::View::TT" : "0",
+            "Class::C3" : "0",
+            "Test::Lib" : "0.002",
+            "Test::More" : "0.98",
+            "Test::WWW::Mechanize::Catalyst" : "0",
+            "WWW::Form::UrlEncoded" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Controller::Validation::DFV" : {
+         "file" : "lib/Catalyst/Controller/Validation/DFV.pm",
+         "version" : "v0.0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arunbear/catalyst-validation-dfv/issues"
+      },
+      "homepage" : "https://github.com/arunbear/catalyst-validation-dfv",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/arunbear/catalyst-validation-dfv.git",
+         "web" : "https://github.com/arunbear/catalyst-validation-dfv"
+      }
+   },
+   "version" : "0.0.11",
+   "x_authority" : "cpan:ARUNBEAR",
+   "x_contributors" : [
+      "Arun Prasaad <arunbear@cpan.org>",
+      "Kivanc Yazan <kivancyazan@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

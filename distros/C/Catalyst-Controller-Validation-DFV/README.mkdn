@@ -4,7 +4,7 @@ Catalyst::Controller::Validation::DFV - Form validation and refilling
 
 # VERSION
 
-version 0.0.8
+version 0.0.9
 
 # SYNOPSIS
 
@@ -68,10 +68,24 @@ version 0.0.8
 
 Form-validation using a Catalyst controller and Data::FormValidator
 
+# Methods
+
+## add\_form\_invalid
+
+## validation\_errors\_to\_html
+
+## refill\_form
+
 # EXAMPLES
 
-There are [Template::Toolkit](http://search.cpan.org/perldoc?Template::Toolkit) file examples in the examples/ directory of
+There are [Template::Toolkit](https://metacpan.org/pod/Template::Toolkit) file examples in the examples/ directory of
 this distribution.
+
+## BUILD STATUS
+
+### master
+
+[![Build status](https://badge.buildkite.com/a51523ccfc452014358d9666ac0a51ca30bc409da860c34b7d.svg)](https://buildkite.com/chizography/catalyst-validation-dfv)
 
 # AUTHOR
 
@@ -79,7 +93,7 @@ Chisel <chisel@chizography.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Chisel Wright.
+This software is copyright (c) 2016 by Chisel Wright.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

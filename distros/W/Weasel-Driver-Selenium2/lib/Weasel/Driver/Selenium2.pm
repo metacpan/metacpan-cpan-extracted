@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Weasel driver wrapping Selenium::Remote::Driver
 
 =head1 VERSION
 
-0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ This module wraps L<Selenium::Remote::Driver>, version 2.
 
 
 package Weasel::Driver::Selenium2;
-
+$Weasel::Driver::Selenium2::VERSION = '0.14';
 use strict;
 use warnings;
 
@@ -63,9 +63,6 @@ use English qw(-no_match_vars);
 
 use Moose;
 with 'Weasel::DriverRole';
-
-our $VERSION = '0.12';
-
 
 =head1 ATTRIBUTES
 
@@ -301,8 +298,14 @@ sub get_attribute {
     my $value;
     $value = $element->get_attribute($att)  # Try with property/attribute
         if $self->_driver->{is_wd3};
-    return $value
-        // $element->get_attribute($att,1); # Force using attribute
+    if (ref $value) {
+        # there is a bug in Selenium::Remote::Driver which returns a
+        # hash reference when asked for an element's "id", in some cases
+        # when running against a WebDriver 3 implementation
+        $value = undef;
+    }
+    $value //= $element->get_attribute($att,1); # Force using attribute
+    return $value;
 }
 
 =item get_page_source($fh)
@@ -334,7 +337,22 @@ sub get_text {
 sub is_displayed {
     my ($self, $id) = @_;
 
-    return $self->_resolve_id($id)->is_displayed;
+    my $script = <<~'SCRIPT';
+      var elm = arguments[0];
+
+      if (!elm) return false;
+      var style = window.getComputedStyle(elm);
+      if (style.display === 'none') return false;
+      if (style.visibility === 'hidden') return false;
+      if (style.opacity === '0') return false;
+
+      if (elm.offsetWidth === 0 || elm.offsetHeight === 0) return false;
+      var rect = elm.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return false;
+
+      return true;
+      SCRIPT
+    return $self->execute_script($script, $self->_resolve_id($id));
 }
 
 =item set_attribute($id, $att_name, $value)

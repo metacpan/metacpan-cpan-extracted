@@ -3,7 +3,7 @@
 # Copyright (C) 2018-2021 Joelle Maslak <jmaslak@antelope.net>
 
 package Net::Netmask;
-$Net::Netmask::VERSION = '2.0002';
+$Net::Netmask::VERSION = '2.0003';
 use 5.006_001;
 
 # ABSTRACT: Understand and manipulate IP netmasks

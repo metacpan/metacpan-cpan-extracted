@@ -4,7 +4,7 @@ use utf8;
 
 # ABSTRACT: test text for mixed and potentially confusable Unicode scripts
 
-use v5.14;
+use v5.16;
 use warnings;
 
 use Carp          qw( croak );
@@ -15,11 +15,11 @@ use File::Spec;
 use IO            qw( File );
 use Unicode::UCD  qw( charscript );
 
-use Test2::API qw( context );
+use Test2::API 1.302200 qw( context );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 
 sub file_scripts_ok {
@@ -107,7 +107,7 @@ sub all_perl_files_scripts_ok {
 
 sub _all_perl_files {
     my @files = _all_files(@_);
-    return grep { _is_perl_module($_) || _is_perl_script($_) || _is_pod_file($_) } @files;
+    return grep { _is_perl_module($_) || _is_perl_script($_) || _is_pod_file($_) || _is_xs_file($_) } @files;
 }
 
 sub _all_files {
@@ -166,6 +166,10 @@ sub _is_perl_script {
     return;
 }
 
+sub _is_xs_file {
+    $_[0] =~ /\.(c|h|xs)$/i;
+}
+
 1;
 
 __END__
@@ -180,7 +184,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.1.0
+version v0.2.0
 
 =head1 SYNOPSIS
 

@@ -2,19 +2,23 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "test text for mixed and potentially confusable Unicode scripts",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "7.22",
+    "Module::Metadata" => "1.000015"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Test-MixedScripts",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Test::MixedScripts",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -23,7 +27,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "File::Spec" => 0,
     "IO" => 0,
-    "Test2::API" => 0,
+    "Test2::API" => "1.302200",
     "Unicode::UCD" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -31,12 +35,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "FindBin" => 0,
-    "Module::Metadata" => 0,
+    "Module::Metadata" => "1.000015",
     "Test2::V0" => 0,
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,12 +51,13 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Cwd" => 0,
   "Exporter" => "5.57",
+  "ExtUtils::MakeMaker" => "7.22",
   "File::Find" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
   "IO" => 0,
-  "Module::Metadata" => 0,
-  "Test2::API" => 0,
+  "Module::Metadata" => "1.000015",
+  "Test2::API" => "1.302200",
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Unicode::UCD" => 0,

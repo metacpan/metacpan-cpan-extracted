@@ -13,66 +13,18 @@ my $mech = Test::WWW::Mechanize::Catalyst->new;
 ok(defined $mech);
 
 $mech->get_ok('http://localhost/form/first');
+my @inputs = $mech->grep_inputs( { type => 'text', name => 'first_text' } );
+is( scalar @inputs, 1, "form not re-filled");
 
-$mech->content_like(
-    qr{
-        <input
-        \s+
-        name="first_text"
-        \s+
-        type="text"
-        \s*
-        />
-    }xms,
-    q{form not re-filled}
-);
-
-$mech->content_unlike(
-    qr{
-        <input
-        \s+
-        value="foo"
-        \s+
-        name="first_text"
-        \s+
-        type="text"
-        \s*
-        />
-    }xms,
-    q{form not re-filled}
-);
+@inputs = $mech->grep_inputs( { type => 'text', name => 'first_text', value => 'foo' } );
+is( scalar @inputs, 0, "form not re-filled");
 
 $mech->get_ok('http://localhost/form/first?first_text=foo');
-
-$mech->content_like(
-    qr{
-        <input
-        \s+
-        value="foo"
-        \s+
-        name="first_text"
-        \s+
-        type="text"
-        \s*
-        />
-    }xms,
-    q{form re-filled}
-);
+@inputs = $mech->grep_inputs( { type => 'text', name => 'first_text', value => 'foo' } );
+is( scalar @inputs, 1, "form re-filled");
 
 $mech->get_ok('http://localhost/form/first');
 $mech->field('first_text', 'banana');
 $mech->submit_form_ok(undef, q{submit filled form});
-$mech->content_like(
-   qr{
-        <input
-        \s+
-        value="banana"
-        \s+
-        name="first_text"
-        \s+
-        type="text"
-        \s*
-        />
-    }xms,
-    q{form re-filled}
-);
+@inputs = $mech->grep_inputs( { type => 'text', name => 'first_text', value => 'banana' } );
+is( scalar @inputs, 1, "form re-filled");

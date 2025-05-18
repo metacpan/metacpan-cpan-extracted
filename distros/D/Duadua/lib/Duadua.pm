@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Duadua::Parser;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Browser::MicrosoftEdge
@@ -28,6 +28,7 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Bot::AdIdxBot
     Duadua::Parser::Browser::YahooJapanAppBrowser
     Duadua::Parser::Bot::ChatGPTUser
+    Duadua::Parser::Bot::Perplexity
 
     Duadua::Parser::Browser::AppleSafari
     Duadua::Parser::Browser::Vivaldi
@@ -39,6 +40,7 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Bot::YahooSlurp
     Duadua::Parser::Bot::Baiduspider
     Duadua::Parser::Bot::Bytespider
+    Duadua::Parser::Bot::TikTokSpider
     Duadua::Parser::Bot::YandexBot
     Duadua::Parser::Bot::GooglebotMisc
     Duadua::Parser::Bot::DuckDuckBot
@@ -72,6 +74,7 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Bot::Skype
 
     Duadua::Parser::Browser::Xiaomi
+    Duadua::Parser::Bot::OWLer
     Duadua::Parser::FeaturePhone::FeaturePhone
     Duadua::Parser::Bot::Netcraft
     Duadua::Parser::Bot::Barkrowler
@@ -384,7 +387,7 @@ The list of User Agent Parser
 
 =begin html
 
-<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.34-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1720941083"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1720941083&branch=main"/></a>
+<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.35-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1747554887"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1747554887&branch=main"/></a>
 
 =end html
 

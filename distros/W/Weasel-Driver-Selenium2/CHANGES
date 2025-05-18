@@ -1,3 +1,13 @@
+** 0.14 / 2025-05-18
+   - Work around an issue in Selenium::Remote::Driver returning a hash
+     reference which looks like an internal 'id' being returned when
+     calling 'get_attribute()' with an attribute name of 'id'
+
+** 0.13 / 2025-05-17
+   - Change implementation for 'is_displayed' to take display properties
+     of parent elements into account, as well as the intersection of
+     the element with the viewport
+
 ** 0.12 / 2021-04-05
    - Properly fix JSONWIRE compatibility with FF by letting
      get_attribute try to separate attributes and properties on browsers

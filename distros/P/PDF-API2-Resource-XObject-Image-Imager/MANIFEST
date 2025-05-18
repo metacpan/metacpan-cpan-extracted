@@ -1,0 +1,19 @@
+Changes
+lib/PDF/API2/Resource/XObject/Image/Imager.pm
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/00_info.t
+t/10_import.t
+t/resources/1x1.png
+t/resources/bilevel.png
+t/resources/graya.png
+t/resources/palette.png
+t/resources/rgb8i.png
+t/resources/t102.png
+t/resources/test-rgba.png
+t/02_pod_coverage.t
+t/01_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

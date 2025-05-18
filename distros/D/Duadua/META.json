@@ -67,6 +67,6 @@
          "url" : "http://github.com/bayashi/Duadua"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

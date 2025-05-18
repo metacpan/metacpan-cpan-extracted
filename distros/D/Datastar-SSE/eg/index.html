@@ -1,0 +1,78 @@
+<html>
+<head>
+<title>Datastar::SSE Demo</title>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.0-beta.11/bundles/datastar.js"></script>
+</head>
+<body data-signals='{"test":{"foo":"bar", "bar":"baz"}}' data-persist>
+<style>
+a.demo ~ * {
+	display: none;
+}
+
+a.demo:target ~ * {
+	display: initial;
+}
+
+
+</style>
+<a href="#" name="head1"><h1>Datastar::SSE demo</h1></a>
+
+
+
+
+<div>
+<a class="demo" name="merge_fragments" href="#merge_fragments"><h2>merge_fragments</h2></a>
+add or update html<br>
+<button data-on-click="@post('/merge-fragments')">merge-fragments (append)</button>
+<button data-on-click="@post('/replace-fragments')">merge-fragments (replace)</button><br>
+<table id="my-table"><caption>HTML</caption>
+<tr><th>Name</th><th>Value</th></tr>
+</table>
+</div>
+
+<div>
+<a class="demo" name="merge_signals" href="#merge_signals"><h2>merge_signals</h2></a>
+add or update signals<br>
+<button data-on-click="@post('/merge-signals')">merge-signals</button><br>
+<strong>Signals</strong><br>
+<pre id="signals" data-text="ctx.signals.JSON()"></pre>
+</div>
+
+<div>
+<a class="demo" name="remove_fragments" href="#remove_fragments"><h2>remove_fragments</h2></a>
+Remove HTML fragments by selector<br>
+<button data-on-click="@post('/remove-fragments')">remove-fragments</button><br>
+<strong>HTML</strong><br>
+<ul id="remove-me">
+	<li>Item 1
+	<li>Item 2
+	<li>Item 3
+	<li>Item 4
+	<li>Item 5
+	<li>Item 6
+	<li>Item 7
+	<li>Item 8
+	<li>Item 9
+	<li>Item 10
+</ul>
+</div>
+
+<div data-signals="{remove:{signal1:1,signal2:2,signal3:3,signal4:4,signal5:5,signal6:6,signal7:7,signal8:8,signal9:9}}">
+<a class="demo" name="remove_signals" href="#remove_signals"><h2>remove_signals</h2></a>
+remove signals<br>
+<button data-on-click="@post('/remove-signals')">remove-signals</button><br>
+<strong>Signals</strong><br>
+<pre id="signals2" data-text="ctx.signals.JSON()"></pre>
+</div>
+
+<div data-signals-script='{action:""}'>
+<a class="demo" name="execute_script" href="#execute_script"><h2>execute_script</h2></a>
+Execute javascript<br>
+<button data-on-click="$script.action = 'alert';  @post('/execute-script')">execute-script (alert)</button>
+<button data-on-click="$script.action = 'reload'; @post('/execute-script')">execute-script (reload)</button><br>
+</div>
+
+
+
+</body>
+</html>

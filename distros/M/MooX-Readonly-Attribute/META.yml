@@ -23,5 +23,5 @@ requires:
   Moo: '2'
   MooX::ReturnModifiers: '1.000001'
   perl: '5.006'
-version: '0.01'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

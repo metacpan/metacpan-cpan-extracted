@@ -407,9 +407,9 @@ FUNCTIONS
                              that there is one method for sorting
                              dotted-quads ("a.b.c.d") that is faster than
                              all the rest. This is that way. Use it as
-                             "sort_by_ip_address(@list_of_ips)". That was
-                             the theory anyway. Someone sent a faster
-                             version ...
+                             sort_by_ip_address(@list_of_ips). That was the
+                             theory anyway. Someone sent a faster version
+                             ...
 
                              This method also will sort IPv6 addresses, but
                              is not performance optimized. It is correct,
