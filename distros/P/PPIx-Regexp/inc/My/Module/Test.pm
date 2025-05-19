@@ -16,12 +16,11 @@ use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use constant ARRAY_REF	=> ref [];
 
 our @EXPORT_OK = qw{
-    builder
     cache_count
     choose
     klass
@@ -79,10 +78,6 @@ my (
     $result,		# Operation result.
 );
 
-sub builder {
-    return Test::More->builder();
-}
-
 sub cache_count {
     my ( $expect ) = @_;
     defined $expect or $expect = 0;
@@ -92,7 +87,7 @@ sub cache_count {
     $result = PPIx::Regexp->__cache_size();
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     return is( $result, $expect,
 	"Should be $expect leftover cache contents" );
 }
@@ -108,9 +103,9 @@ sub klass {
     $result = ref $obj || $obj;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( defined $class ) {
-	my $rslt = isa_ok( $obj, $class, "$kind $nav" )
+	my $rslt = isa_ok( $obj, $class )
 	    or diag "    Instead, $kind $nav isa $result";
 	return $rslt;
     } else {
@@ -129,7 +124,7 @@ sub count {
     my $expect = pop @args;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ARRAY_REF eq ref $parse ) {
 	$result = @{ $parse };
 	return is( $result, $expect, "Expect $expect tokens" );
@@ -151,7 +146,7 @@ sub different {
     my ( $left, $right, $name ) = @args;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ! defined $left && ! defined $right ) {
 	return ok( undef, $name );
     } elsif ( ! defined $left || ! defined $right ) {
@@ -174,7 +169,7 @@ sub dump_result {
 	my $got = PPIx::Regexp::Dumper->new( $obj, @args )->string();
 	# cperl does not seem to like goto &xxx; it throws a deep
 	# recursion error if you do it enough times.
-	$Test::Builder::Level = $Test::Builder::Level + 1;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	return is( $got, $expect, $name );
     } elsif ( __instance( $result, 'PPIx::Regexp::Tokenizer' ) ||
 	__instance( $result, 'PPIx::Regexp::Element' ) ) {
@@ -195,7 +190,7 @@ sub equals {
     my ( $left, $right, $name ) = @args;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ! defined $left && ! defined $right ) {
 	return ok( 1, $name );
     } elsif ( ! defined $left || ! defined $right ) {
@@ -223,7 +218,7 @@ sub false {
     my $class = ref $obj;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( $obj->can( $method ) ) {
 	$result = $obj->$method( @{ $args } );
 	my $fmtd = _format_args( $args );
@@ -240,7 +235,7 @@ sub finis {
     $result = PPIx::Regexp::Element->__parent_keys();
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     return is( $result, 0, 'Should be no leftover objects' );
 }
 
@@ -308,9 +303,8 @@ sub parse {		## no critic (RequireArgUnpacking)
     $opt->{test} or return;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
-    return isa_ok( $parse, 'PPIx::Regexp',
-	_replace_characters( $regexp ) );
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return isa_ok( $parse, 'PPIx::Regexp' );
 }
 
 sub ppi {		## no critic (RequireArgUnpacking)
@@ -326,7 +320,7 @@ sub ppi {		## no critic (RequireArgUnpacking)
     }
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     return is( $result, $expect, "$kind $nav ppi() content '$safe'" );
 }
 
@@ -334,7 +328,7 @@ sub raw_width {
     my ( $min, $max, $name ) = @_;
     defined $name
 	or $name = sprintf q<%s '%s'>, ref $obj, $obj->content();
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my @width = $obj->raw_width();
     return is( $width[0], $min, "$name raw minimum witdh" ) && is(
 	$width[1], $max, "$name raw maximum width" );
@@ -364,9 +358,8 @@ sub tokenize {		## no critic (RequireArgUnpacking)
     $result = $parse;
     $nav = '';
     $opt->{test} or return;
-    $Test::Builder::Level = $Test::Builder::Level + 1;
-    return isa_ok( $obj, 'PPIx::Regexp::Tokenizer',
-	_replace_characters( $regexp ) );
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return isa_ok( $obj, 'PPIx::Regexp::Tokenizer' );
 }
 
 sub true {		## no critic (RequireArgUnpacking)
@@ -376,7 +369,7 @@ sub true {		## no critic (RequireArgUnpacking)
     my $class = ref $obj;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( $obj->can( $method ) ) {
 	$result = $obj->$method( @{ $args } );
 	my $fmtd = _format_args( $args );
@@ -396,7 +389,7 @@ sub value {		## no critic (RequireArgUnpacking)
     my $class = ref $obj || $obj || $initial_class;
     # cperl does not seem to like goto &xxx; it throws a deep recursion
     # error if you do it enough times.
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ! $invocant->can( $method ) ) {
 	return ok( undef, "$class->$method() exists" );
     }
@@ -420,7 +413,7 @@ sub width {
     my ( $min, $max, $name ) = @_;
     defined $name
 	or $name = sprintf q<%s '%s'>, ref $obj, $obj->content();
-    $Test::Builder::Level = $Test::Builder::Level + 1;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my @width = $obj->width();
     return is( $width[0], $min, "$name minimum witdh" ) && is(
 	$width[1], $max, "$name maximum width" );
@@ -564,11 +557,6 @@ tests to be performed on that object. A few tests do not test parse
 objects, but rather the state of the system as a whole.
 
 The following subroutines are exported:
-
-=head2 builder
-
-This subroutine returns the underlying L<Test::Builder|Test::Builder>
-object.
 
 =head2 cache_count
 
@@ -827,7 +815,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2023 by Thomas R. Wyant, III
+Copyright (C) 2009-2023, 2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

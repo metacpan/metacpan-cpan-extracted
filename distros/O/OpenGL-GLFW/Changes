@@ -1,3 +1,7 @@
+0.0403 2025-05-18
+- fix tests to use latest OpenGL::Modern (glGetUniformLocation_c removed _c)
+- fix callback-setting return value types (#3) - thanks @xuhaida76 for report
+
 0.0402 2025-04-11
 - minimum Perl 5.10 for better Exporter
 - add constants up to GLFW 3.4

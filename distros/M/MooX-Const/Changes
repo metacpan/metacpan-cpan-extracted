@@ -1,5 +1,16 @@
 Revision history for MooX-Const:
 
+v0.6.3    2025-05-18 12:04:50+01:00 Europe/London
+  [Documentation]
+  - Updated the SEE ALSO section.
+
+  - Added a security policy (SECURITY.md) and how to contribute (CONTRIBUTING.md) document.
+
+  - Updated the copyright year.
+
+  [Tests]
+  - Added more author tests.
+
 v0.6.2    2023-05-15 19:01:45+01:00 Europe/London
   [Documentation]
   - Documented support policy for older Perls.

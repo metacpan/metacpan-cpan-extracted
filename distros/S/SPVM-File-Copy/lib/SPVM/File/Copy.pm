@@ -1,6 +1,6 @@
 package SPVM::File::Copy;
 
-our $VERSION = "0.022";
+our $VERSION = "0.023";
 
 1;
 
@@ -27,21 +27,31 @@ File::Copy class in L<SPVM> has methods to move and copy files.
 
 =head2 copy
 
-  static method copy : int ($from : string, $to : string, $size : int = 0);
+C<static method copy : void ($from : string, $to : string, $size : int = -1);>
 
-Copies the file specified $from to $to. The $size is the buffer size to be used file copy. If the $size is C<0>, the size is decided automatically.
+Copies the first $size bytes of the source file $from to the distination file $to. If $size is a negative value, it is set to the size of $from.
 
 =head2 move
 
-  static method move : int ($from : string, $to : string);
+C<static method move : void ($from : string, $to : string);>
 
-Moves the file specified $from to $to.
+Moves the source file $from to the distination file $to.
 
 =head1 See Also
 
-=head2 File::Copy
+=over 2
 
-C<SPVM::File::Copy> is Perl's L<File::Copy> porting to L<SPVM>.
+=item * L<Sys|SPVM::Sys>
+
+=item * L<IO::File|SPVM::IO::File>
+
+=item * L<File::Find|SPVM::File::Find>
+
+=back
+
+=head1 Porting
+
+C<SPVM::File::Copy> is a Perl's L<File::Copy> porting to L<SPVM>.
 
 =head1 Repository
 

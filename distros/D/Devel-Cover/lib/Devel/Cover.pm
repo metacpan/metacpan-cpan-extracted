@@ -7,13 +7,14 @@
 
 package Devel::Cover;
 
+use v5.12.0;
 use strict;
 use warnings;
 
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.48'; # VERSION
+  our $VERSION = '1.49'; # VERSION
 }
 
 use DynaLoader ();
@@ -125,11 +126,11 @@ BEGIN {
         local %ENV = %ENV;
         # Clear *PERL* variables, but keep PERL5?LIB for local::lib
         # environments
-        /perl/i and !/^PERL5?LIB$/ and delete $ENV{$_} for keys %ENV;
+        /perl/i and not /^PERL5?LIB$/ and delete $ENV{$_} for keys %ENV;
         my $cmd = "$^X -MData::Dumper -e " . '"print Dumper \@INC"';
         my $VAR1;
         # print STDERR "Running [$cmd]\n";
-        eval `$cmd`;
+        eval `$cmd`;  ## no critic (ProhibitStringyEval)
         @Inc = @$VAR1;
       };
       if ($@) {
@@ -140,7 +141,7 @@ BEGIN {
     }
   }
 
-  @Inc = map { -d $_ ? ($_ eq "." ? $_ : Cwd::abs_path($_)) : () } @Inc;
+  @Inc = map { -d() ? ($_ eq "." ? $_ : Cwd::abs_path($_)) : () } @Inc;
 
   @Inc = remove_contained_paths(getcwd, @Inc);
 
@@ -297,7 +298,7 @@ sub import {
   # Die tainting
   # Anyone using this module can do worse things than messing with tainting
   my $options = ($ENV{DEVEL_COVER_OPTIONS} || "") =~ /(.*)/ ? $1 : "";
-  my @o       = (@_, split ",", $options);
+  my @o       = (@_, split /,/, $options);
   defined or $_ = "" for @o;
   # print STDERR __PACKAGE__, ": Parsing options from [@o]\n";
 
@@ -351,7 +352,7 @@ sub import {
     die "Can't mkdir $DB as EUID $>: $err" unless -d $DB;
   }
   chmod 0777, $DB if $Loose_perms;
-  $DB = $1                      if abs_path($DB) =~ /(.*)/;
+  $DB = $1 if abs_path($DB) =~ /(.*)/;  ## no critic (CaptureWithoutTest)
   Devel::Cover::DB->delete($DB) unless $Merge;
 
   %Files = ();  # start gathering file information from scratch
@@ -363,7 +364,7 @@ sub import {
   }
 
   for (keys %Coverage) {
-    my @c = split /-/, $_;
+    my @c = split /-/;
     if (@c > 1) {
       $Coverage{ shift @c } = \@c;
       delete $Coverage{$_};
@@ -377,7 +378,7 @@ sub import {
   $Initialised = 1;
 
   if ($ENV{MOD_PERL}) {
-    eval "BEGIN {}";
+    eval "BEGIN {}";  ## no critic (ProhibitStringyEval)
     check();
     set_first_init_and_end();
   }
@@ -487,7 +488,7 @@ sub get_coverage {
         my $abs;
         $abs = abs_path($file) unless -l $file; # leave symbolic links
                                                 # print STDERR "giving <$abs> ";
-        $file = $abs           if defined $abs;
+        $file = $abs if defined $abs;
       }
     }
     # print STDERR "finally <$file> <$Dir>\n";
@@ -531,18 +532,15 @@ sub get_location {
   }
 }
 
-my $find_filename = qr/
+sub use_file {
+  my ($file) = @_;
+
+  state $find_filename = qr/
     (?:^\(eval\s \d+\)\[(.+):\d+\])      |
     (?:^\(eval\sin\s\w+\)\s(.+))         |
     (?:\(defined\sat\s(.+)\sline\s\d+\)) |
     (?:\[from\s(.+)\sline\s\d+\])
-/x;
-
-sub use_file {
-  # If we're in global destruction, forget it
-  return unless $find_filename;
-
-  my ($file) = @_;
+  /x;
 
   # print STDERR "use_file($file)\n";
 
@@ -732,7 +730,7 @@ sub _report {
   return               unless @collected;
   set_coverage("none") unless $Self_cover;
 
-  my $starting_dir = $1 if Cwd::getcwd() =~ /(.*)/;
+  my ($starting_dir) = Cwd::getcwd() =~ /(.*)/;
   chdir $Dir or die __PACKAGE__ . ": Can't chdir $Dir: $!\n";
 
   $Run{collected} = \@collected;
@@ -811,7 +809,7 @@ sub _report {
     $cover->delete;
     delete $Run{vec};
   }
-  chdir $starting_dir;
+  chdir $starting_dir if $starting_dir;
 }
 
 sub add_subroutine_cover {
@@ -979,6 +977,7 @@ my %Original;
     $Original{deparse}      = \&B::Deparse::deparse;
     $Original{logop}        = \&B::Deparse::logop;
     $Original{logassignop}  = \&B::Deparse::logassignop;
+    $Original{binop}        = \&B::Deparse::binop;
     $Original{const_dumper} = \&B::Deparse::const_dumper;
     $Original{const}        = \&B::Deparse::const if defined &B::Deparse::const;
   }
@@ -989,6 +988,7 @@ my %Original;
     local *B::Deparse::deparse      = $Original{deparse};
     local *B::Deparse::logop        = $Original{logop};
     local *B::Deparse::logassignop  = $Original{logassignop};
+    local *B::Deparse::binop        = $Original{binop};
     local *B::Deparse::const_dumper = $Original{const_dumper};
     local *B::Deparse::const        = $Original{const} if $Original{const};
 
@@ -997,10 +997,13 @@ my %Original;
 
   sub const {
     no warnings "redefine";
+
     local *B::Deparse::deparse      = $Original{deparse};
     local *B::Deparse::logop        = $Original{logop};
     local *B::Deparse::logassignop  = $Original{logassignop};
+    local *B::Deparse::binop        = $Original{binop};
     local *B::Deparse::const_dumper = $Original{const_dumper};
+
     $Original{const}->(@_);
   }
 
@@ -1116,7 +1119,7 @@ my %Original;
     $deparse
   }
 
-  sub logop {
+  sub logop {  ## no critic (ProhibitManyArgs) # B::Deparse API
     my $self = shift;
     my ($op, $cx, $lowop, $lowprec, $highop, $highprec, $blockname) = @_;
     my $left  = $op->first;
@@ -1124,6 +1127,7 @@ my %Original;
     # print STDERR "left [$left], right [$right]\n";
     my ($file, $line) = ($File, $Line);
 
+    $blockname &&= $self->keyword($blockname) if $] >= 5.016000;
     if ($cx < 1 && is_scope($right) && $blockname && $self->{expand} < 7) {
       # print STDERR 'if ($a) {$b}', "\n";
       # if ($a) {$b}
@@ -1172,6 +1176,25 @@ my %Original;
     $right = $self->deparse($right, 7);
     add_condition_cover($op, $opname, $left, $right);
     return $self->maybe_parens("$left $opname $right", $cx, 7);
+  }
+
+  sub binop {
+    my $self = shift;
+    my ($op, $cx, $opname, $prec, $flags) = (@_, 0);
+    if ($] >= 5.041012
+      && ($opname eq "xor" || $opname eq "^^" && !$Seen{condition}{$$op}++))
+    {
+      my $left  = $op->first;
+      my $right = $op->last;
+      {
+        local $Collect;
+        $left  = $self->deparse_binop_left($op, $left, $prec);
+        $right = $self->deparse_binop_right($op, $right, $prec);
+      }
+      # print STDERR "opname [$opname], left [$left], right [$right]\n";
+      add_condition_cover($op, $opname, $left, $right);
+    }
+    $Original{binop}->($self, $op, $cx, $opname, $prec, $flags)
   }
 
 }
@@ -1233,7 +1256,7 @@ sub get_cover {
             push @{ $opts{$p} }, $_;
           }
         }
-        for $p (qw( private also_private trustme )) {
+        for my $p (qw( private also_private trustme )) {
           next unless exists $opts{$p};
           $_ = qr/$_/ for @{ $opts{$p} };
         }
@@ -1277,6 +1300,7 @@ sub get_cover {
   local *B::Deparse::deparse      = \&deparse;
   local *B::Deparse::logop        = \&logop;
   local *B::Deparse::logassignop  = \&logassignop;
+  local *B::Deparse::binop        = \&binop;
   local *B::Deparse::const_dumper = \&const_dumper;
   local *B::Deparse::const        = \&const if $Original{const};
 
@@ -1330,7 +1354,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 

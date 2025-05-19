@@ -6,7 +6,7 @@ use warnings;
 use DateTime::Format::Natural::Duration::Checks;
 use List::Util 1.33 qw(all);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub _pre_duration
 {
@@ -15,7 +15,7 @@ sub _pre_duration
 
     my $check_if = sub
     {
-        my $sub   = shift;
+        my $sub   = '_' . shift;
         my $class = join '::', (__PACKAGE__, 'Checks');
         my $check = $class->can($sub) or die "$sub() not found in $class";
 

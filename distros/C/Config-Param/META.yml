@@ -18,13 +18,13 @@ name: Config-Param
 provides:
   Config::Param:
     file: lib/Config/Param.pm
-    version: '4.000005'
+    version: '4.000006'
   Config::Param::FileWorker:
     file: lib/Config/Param/FileWorker.pm
-    version: '4.000005'
+    version: '4.000006'
 requires:
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '4.000005'
+version: '4.000006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -759,7 +759,7 @@ glfwSetWindowPosCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWwindowposfun fpstatus;
      void * upoint;
      int cvind = windowposfun;
      int i;
@@ -787,7 +787,7 @@ glfwSetWindowSizeCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWwindowsizefun fpstatus;
      void * upoint;
      int cvind = windowsizefun;
      int i;
@@ -814,7 +814,7 @@ glfwSetWindowCloseCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWwindowclosefun fpstatus;
      void * upoint;
      int cvind = windowclosefun;
      int i;
@@ -841,7 +841,7 @@ glfwSetWindowRefreshCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWwindowrefreshfun fpstatus;
      void * upoint;
      int cvind = windowrefreshfun;
      int i;
@@ -868,7 +868,7 @@ glfwSetWindowFocusCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWwindowfocusfun fpstatus;
      void * upoint;
      int cvind = windowfocusfun;
      int i;
@@ -895,7 +895,7 @@ glfwSetWindowIconifyCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWwindowiconifyfun fpstatus;
      void * upoint;
      int cvind = windowiconifyfun;
      int i;
@@ -922,7 +922,7 @@ glfwSetFramebufferSizeCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWframebuffersizefun fpstatus;
      void * upoint;
      int cvind = framebuffersizefun;
      int i;
@@ -949,7 +949,7 @@ glfwSetKeyCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWkeyfun fpstatus;
      void * upoint;
      int cvind = keyfun;
      int i;
@@ -977,7 +977,7 @@ glfwSetCharCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWcharfun fpstatus;
      void * upoint;
      int cvind = charfun;
      int i;
@@ -1004,7 +1004,7 @@ glfwSetCharModsCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWcharmodsfun fpstatus;
      void * upoint;
      int cvind = charmodsfun;
      int i;
@@ -1031,7 +1031,7 @@ glfwSetMouseButtonCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWmousebuttonfun fpstatus;
      void * upoint;
      int cvind = mousebuttonfun;
      int i;
@@ -1058,7 +1058,7 @@ glfwSetCursorPosCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWcursorposfun fpstatus;
      void * upoint;
      int cvind = cursorposfun;
      int i;
@@ -1085,7 +1085,7 @@ glfwSetCursorEnterCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWcursorenterfun fpstatus;
      void * upoint;
      int cvind = cursorenterfun;
      int i;
@@ -1112,7 +1112,7 @@ glfwSetScrollCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWscrollfun fpstatus;
      void * upoint;
      int cvind = scrollfun;
      int i;
@@ -1139,7 +1139,7 @@ glfwSetDropCallback(window, cbfun);
       GLFWwindow* window
       SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWdropfun fpstatus;
      void * upoint;
      int cvind = dropfun;
      int i;
@@ -1170,7 +1170,7 @@ void
 glfwSetErrorCallback(cbfun)
      SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWerrorfun fpstatus;
      // Warn if used in non-void context
      if (GIMME_V != G_VOID) callback_warn();
      //
@@ -1190,7 +1190,7 @@ void
 glfwSetMonitorCallback(cbfun)
      SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWmonitorfun fpstatus;
      // Warn if used in non-void context
      if (GIMME_V != G_VOID) callback_warn();
      // Need to fix return of previous CV
@@ -1209,7 +1209,7 @@ void
 glfwSetJoystickCallback(cbfun)
      SV * cbfun
    CODE:
-     void (*fpstatus)();
+     GLFWjoystickfun fpstatus;
      // Warn if used in non-void context
      if (GIMME_V != G_VOID) callback_warn();
      // Need to fix return of previous CV

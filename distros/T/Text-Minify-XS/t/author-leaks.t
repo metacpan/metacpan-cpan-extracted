@@ -14,7 +14,6 @@ use Test2::V0;
 use Test2::Tools::Warnings qw( warning );
 use Test::LeakTrace;
 
-
 use Text::Minify::XS qw( minify );
 
 no_leaks_ok {
@@ -38,14 +37,16 @@ no_leaks_ok {
 };
 
 no_leaks_ok {
-    warning {
+    my $w1 = warning {
         my $n = chr(160);
         my $r = eval { minify($n) };
     };
-    warning {
+    like $w1, qr/^Malformed UTF-8 character/;
+    my $w2 = warning {
         my $n = " " . chr(160) . " ";
         my $r = eval { minify($n) };
     };
+    like $w2, qr/^Malformed UTF-8 character/;
 };
 
 no_leaks_ok {

@@ -5,11 +5,10 @@ use 5.024;
 use strict;
 use warnings;
 use GD::Image;
-use Math::Random::Secure 'rand';
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Exception;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 my $settings = {
     method      => 'any',
@@ -131,7 +130,7 @@ Mojolicious::Plugin::CaptchaPNG - PNG captcha generation and validation Mojolici
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG)
@@ -369,7 +368,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2050 by Gryphon Shafer.
+This software is Copyright (c) 2025-2050 by Gryphon Shafer.
 
 This is free software, licensed under:
 

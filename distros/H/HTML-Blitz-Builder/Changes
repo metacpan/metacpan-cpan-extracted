@@ -1,2 +1,6 @@
+0.1101 2025-05-18
+    - rework internals
+    - implement FREEZE/THAW support (Types::Serialiser style)
+
 0.1001 2025-05-17
     - split off HTML::Blitz::Builder into its own distribution

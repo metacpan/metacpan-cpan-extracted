@@ -4,7 +4,7 @@ use Config::Param;
 use IO::File;
 use Storable qw(dclone);
 
-our $VERSION = '4.000005'; # updated by release script
+our $VERSION = '4.000006'; # updated by release script
 $VERSION = eval $VERSION;
 
 sub new

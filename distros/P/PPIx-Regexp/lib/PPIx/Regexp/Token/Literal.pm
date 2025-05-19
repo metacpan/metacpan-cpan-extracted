@@ -47,7 +47,7 @@ use PPIx::Regexp::Constant qw{
 
 use PPIx::Regexp::Util qw{ :width_one };
 
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
@@ -259,7 +259,10 @@ sub __PPIX_TOKENIZER__regexp {
     # If /x is in effect _and_ we are not inside a character class, \s
     # is whitespace, and '#' introduces a comment. Otherwise they are
     # both literals.
-    if ( $tokenizer->modifier( 'x*' ) &&
+    # NOTE that the mode check is necessary for this section of code
+    # becaise we call this code in both 'regexp' and 'repl' mode.
+    my $heed_x = $tokenizer->get_mode() eq 'regexp';
+    if ( $heed_x && $tokenizer->modifier( 'x*' ) &&
 	! $tokenizer->cookie( COOKIE_CLASS ) ) {
 	my $accept;
 	$accept = $tokenizer->find_regexp( $white_space_re )
@@ -269,7 +272,7 @@ sub __PPIX_TOKENIZER__regexp {
 	    qr{ \A \# [^\n]* (?: \n | \z) }smx )
 	    and return $tokenizer->make_token(
 		$accept, 'PPIx::Regexp::Token::Comment' );
-    } elsif ( $tokenizer->modifier( 'xx' ) &&
+    } elsif ( $heed_x && $tokenizer->modifier( 'xx' ) &&
 	$tokenizer->cookie( COOKIE_CLASS ) ) {
 	my $accept;
 	$accept = $tokenizer->find_regexp( qr{ \A [ \t] }smx )
@@ -446,7 +449,7 @@ It is analogous to the C<ord> built-in.
 
 It will not attempt to determine the ordinal of a unicode name
 (C<\N{...}>) unless L<charnames|charnames> has been loaded, and supports
-the L<vianame()|charnames/charnames::vianame(I<name>)> function.
+the L<vianame()|charnames/charnames::vianame(name)> function.
 Instead, it will return C<undef>. Users of Perl 5.6.2 and older may be
 out of luck here.
 
@@ -642,7 +645,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2023 by Thomas R. Wyant, III
+Copyright (C) 2009-2023, 2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

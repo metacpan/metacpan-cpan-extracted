@@ -2,20 +2,57 @@
 abstract: 'Find or build DuckDB'
 author:
   - 'Chris Prather <chris@prather.org>'
-build_requires: {}
+build_requires:
+  Alien::Build::MM: '1.74'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  Mojo::DOM58: '1.00'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Path::Tiny: '0.100'
+  Sort::Versions: '0'
+  Test2::V0: '0'
+  Test::Alien: '0.95'
+  Test::More: '0.94'
+  URI: '0'
+  URI::Escape: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
-dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.043, CPAN::Meta::Converter version 2.150010'
+  Alien::Build: '1.40'
+  Alien::Build::MM: '1.74'
+  Alien::cmake3: '0.08'
+  ExtUtils::MakeMaker: '6.52'
+  Path::Tiny: '0.100'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-DuckDB
-provides:
-  Alien::DuckDB:
-    file: lib/Alien/DuckDB.pm
-    version: '0.01'
-version: '0.01'
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '0.038'
+  Alien::Build: '1.74'
+  Path::Tiny: '0.100'
+  perl: '5.008004'
+resources:
+  bugtracker: https://github.com/perigrin/Alien-DuckDB/issues
+  repository: https://github.com/perigrin/Alien-DuckDB.git
+version: '0.02'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

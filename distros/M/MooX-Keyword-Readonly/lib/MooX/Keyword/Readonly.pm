@@ -1,6 +1,6 @@
 package MooX::Keyword::Readonly;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.03';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use Moo;
 use Const::XS qw/make_readonly/;
 
@@ -28,7 +28,7 @@ MooX::Keyword::Readonly - Truly readonly attributes
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -49,6 +49,9 @@ Version 0.03
 
 	push @{ $abc->array }, 4; # dies as array is a readonly array
 	$abc->hash->{d}; # dies as hash is a readonly hash with restricted keys
+
+
+If you just want radonly attributes you are probably looking at the wrong module, L<MooX::Readonly::Attribute> works more transparently unless you are already using L<MooX::Keyword>.
 
 =head1 KEYWORDS
 
@@ -104,6 +107,11 @@ L<https://metacpan.org/release/MooX-Keyword-Readonly>
 
 =head1 ACKNOWLEDGEMENTS
 
+=head1 SEE ALSO
+
+L<Const::XS>
+
+L<MooX::Readonly::Attribute>
 
 =head1 LICENSE AND COPYRIGHT
 

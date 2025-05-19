@@ -45,7 +45,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "5.57",
-            "constant" : "0",
+            "Scalar::Util" : "1.08",
             "feature" : "0",
             "perl" : "5.020000",
             "warnings" : "0"
@@ -53,6 +53,7 @@
       },
       "test" : {
          "requires" : {
+            "JSON::PP" : "0",
             "Test2::V0" : "0"
          }
       }
@@ -68,6 +69,6 @@
          "web" : "https://codeberg.org/mauke/HTML-Blitz-Builder"
       }
    },
-   "version" : "0.1001",
+   "version" : "0.1101",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

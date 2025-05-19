@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0703';
+our $VERSION = '0.0704';
 
 use Moo;
 use strictures 2;
@@ -91,7 +91,7 @@ sub BUILD {
     $self->_msg_channel->send(\$input_name);
 
     unless ($args->{midi_out}) {
-        $self->midi_out->open_virtual_port('foo');
+        $self->midi_out->open_virtual_port('RtController');
 
         _log(sprintf 'Opening %s port %s...', $self->midi_out->{type}, $self->output)
             if $self->verbose;
@@ -198,10 +198,17 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0703
+version 0.0704
 
 =head1 SYNOPSIS
 
+  # Control via command line:
+  # > perl -MMIDI::RtController -E \
+  #   '$rtc = MIDI::RtController->new(input=>shift, output=>shift); $rtc->run' \
+  #   keyboard usb
+  # now play the keyboard... ctrl-c to exit
+
+  # Filter with a program:
   use MIDI::RtController ();
 
   my $rtc = MIDI::RtController->new(

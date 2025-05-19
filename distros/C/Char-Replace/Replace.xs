@@ -94,7 +94,7 @@ SV *_replace_str( SV *sv, SV *map ) {
 
             if ( str == buffer ) {
               /* our first malloc */
-              Newx(str, str_size, char*);
+              Newx(str, str_size, char);
               memcpy( str, buffer, _REPLACE_BUFFER_SIZE ); /* strncpy stops after the first \0 */
             } else {
               /* grow the string */

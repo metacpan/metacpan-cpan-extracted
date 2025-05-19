@@ -1,12 +1,11 @@
-Build.PL
 Changes
 LICENSE
 MANIFEST
-META.json
-META.yml
+MANIFEST.SKIP
 Makefile.PL
-README
 README.md
 alienfile
 lib/Alien/DuckDB.pm
-t/01-basic.t
+t/basic.t
+META.yml
+META.json

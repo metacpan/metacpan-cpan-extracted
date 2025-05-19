@@ -1,8 +1,13 @@
-*******************************************************************************
-* Please note, over time several distributions have been merged into this one *
-* over time. Changes file history has also been merged, so entries for these  *
-* merged distributions can be found further down in the file.                 *
-*******************************************************************************
+********************************************************************************
+* Please note, over time several distributions have been merged into this one. *
+* "Changes" file history has also been merged, so entries for these merged     *
+* distributions can be found further down in the file.                         *
+********************************************************************************
+
+1.302213  2025-05-18 10:42:43-07:00 America/Los_Angeles
+
+    - #1044 Fix duplicate words in Changes file (Thanks Daniel Böhmer)
+    - #1043 Fix spelling issue
 
 1.302212  2025-05-16 10:52:35-07:00 America/Los_Angeles
 

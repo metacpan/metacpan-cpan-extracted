@@ -1,5 +1,8 @@
 Revision history for YATT::Lite
 
+0.131 2025-05-18
+    * GH-237 - Fix module deps
+
 0.130 2025-05-17
     * GH-230 - Add `<!yatt:argmacro>` support
     * Fix GH-231 - yatt subcommand works again

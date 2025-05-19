@@ -30,7 +30,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '4.000005';
+our $VERSION = '4.000006';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -121,11 +121,11 @@ my %typemap  = (''=>$scalar, scalar=>$scalar, array=>$array, hash=>$hash);
 # The grammar is not context-free anymore. Meh.
 # Well, treating it this way: // is a special operator for long names,
 # // is parsed as /=/, then interpreted accordingly for arrays as //.
-my $ops = '.+\-*\/';
+my $ops = '.+\-*\/'; # There's also <<endtext as special thing in config file.
 my $sopex = '['.$ops.']?=|['.$ops.']=?';
 my $lopex = '\/.\/['.$ops.']?=|['.$ops.']?=|\/\/|\/.\/';
-my $noop = '[^+\-=.*\/\s]'; # a non-whitespace character that is unspecial
-my $parname = $noop.'[^\s=\/]*'.$noop;
+my $noop = '[^+\-=.*\/\s<>]'; # a non-whitespace character that is unspecial
+my $parname = $noop.'[^\s=\/<>]*'.$noop;
 
 # Regular expressions for parameter parsing.
 # The two variants are crafted to yield matching back-references.
@@ -1026,7 +1026,7 @@ sub INT_wrap_print
 		# Try to handle command line/code blocks by not messing with them.
 		if($p =~ /^\t/)
 		{
-			print $handle $line."\n"
+			print $handle (defined $line ? $line : '')."\n"
 				if $llen;
 			print $handle $stab.$p."\n";
 			$line = '';
@@ -1034,9 +1034,7 @@ sub INT_wrap_print
 		}
 		elsif($p eq '')
 		{
-			$line = '' # Just for the warnings.
-				unless defined $line;
-			print $handle $line."\n";
+			print $handle (defined $line ? $line : '')."\n";
 			$line = '';
 			$llen = 0;
 		}
@@ -1049,7 +1047,7 @@ sub INT_wrap_print
 				my $l = length($w);
 				if(not $l or $l+$llen >= $length)
 				{
-					print $handle $line."\n";
+					print $handle (defined $line ? $line : '')."\n";
 					$llen = 0;
 					$line = '';
 					$first = 0;

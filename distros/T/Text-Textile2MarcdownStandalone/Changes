@@ -1,5 +1,18 @@
 Revision history for Perl extension Text-Textile2MarcdownStandalone
 
+0.04 2025-05-19T03:56:57Z
+
+    - Marked this module as **DEPRECATED** (uploaded by mistake).
+      Please use Text-Textile2MarkdownStandalone instead.
+
+0.03 2025-05-19T01:14:51Z
+
+    - update pod. add document for cli.
+
+0.02 2025-05-18T13:58:23Z
+
+    - update pod
+
 0.01 2025-05-17T15:46:44Z
 
     - original version

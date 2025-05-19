@@ -10,6 +10,10 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTTP::Status qw(status_message);
 use HTTP::Date qw(time2str str2time);
+use URI;
+use URI::Escape;
+use JSON;
+use MIME::Base64;
 use utf8;
 use Carp qw( croak );
 
@@ -25,11 +29,11 @@ Net::eBay - Perl Interface to XML based eBay API.
 
 =head1 VERSION
 
-Version 0.62
+Version 0.63
 
 =cut
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 =head1 SYNOPSIS
 
@@ -79,7 +83,7 @@ eBay does not allow bidding via eBay API.
                       {
                        DetailLevel => "0",
                        ErrorLevel => "1",
-                       SiteId = > "0",
+                       SiteId => "0",
                        Verb => "  AddItem",
                        Category => "14111",
                        CheckoutDetailsSpecified => "0",
@@ -101,6 +105,13 @@ eBay does not allow bidding via eBay API.
                     );
 
   print "Result: " . Dumper( $result ) . "\n";
+
+
+  NEW: Use of RESTful API:
+
+  my $base_url = "https://api.ebay.com/commerce/taxonomy/v1/category_tree/0/get_category_suggestions";
+  my $json = $ebay->RESTful_Query( $base_url, { q => "wilton vise" } );
+  
 
 Result of submitRequest is a perl hash obtained from the response XML using XML::Simple, something like this:
 
@@ -231,7 +242,7 @@ sub new {
     my $h = {};
     while ( my $l = <F> ) {
       next if $l =~ /^\s*$/;
-      next if $l =~ /\s*\#/;
+      next if $l =~ /^\s*\#/;
       next unless $l =~ /^\s*(\w+)\s*\=\s*(.*)/;
       $h->{$1} = $2;
     }
@@ -249,7 +260,8 @@ sub new {
 
   $hash->{defaults} = {
                        API           => 2,
-                       compatibility => 655,
+                       # compatibility => 655,
+                       compatibility => 967,
                        timeout       => 50,
                        retries       => 2,
                       };
@@ -580,6 +592,57 @@ sub submitPaginatedRequest {
   return $result;
 }
 
+sub get_OAUTH_Token {
+    my ($this) = @_;
+
+    # Check if we have token and it is not expired
+    if( $this->{OAUTH_Token}
+        && $this->{OAUTH_Token_Expiration}
+        && (time() < $this->{OAUTH_Token_Expiration} ) ) {
+        return $this->{OAUTH_Token};
+    }
+        
+    my $client_id     = $this->{ApplicationKey};
+    my $client_secret = $this->{CertificateKey};
+
+    # Encode credentials as base64
+    my $credentials = encode_base64("$client_id:$client_secret", '');
+
+    # eBay OAuth token URL
+    my $url = 'https://api.ebay.com/identity/v1/oauth2/token';
+
+    # Prepare POST data
+    my $post_data = 'grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope';
+
+    # Create user agent and request
+
+    my $req = HTTP::Request->new(POST => $url);
+    $req->header('Content-Type' => 'application/x-www-form-urlencoded');
+    $req->header('Authorization' => "Basic $credentials");
+    $req->content($post_data);
+
+    # Perform request
+    my $res = $_ua->request($req);
+
+    # Check result
+    if ($res->is_success) {
+        my $data = decode_json($res->decoded_content);
+        my $access_token = $data->{access_token};
+        my $expires = $data->{expires_in};
+
+        my $short_token = substr( $access_token, 0, 50 );
+        print STDERR "Net::eBay->get_OAUTH_Token: Access token = $short_token...\n";
+        print STDERR "Net::eBay->get_OAUTH_Token: Expires in $expires seconds\n";
+
+        $this->{OAUTH_Token} = $access_token;
+        $this->{OAUTH_Token_Expiration} = time() + $expires - 1;
+
+        return $access_token;
+    } else {
+        die "Failed to get OAuth token: " . $res->status_line . "\n" . $res->decoded_content;
+    }
+}
+
 sub submitFindingRequestGetText {
   my ($this, $name, $request) = @_;
   my $req = HTTP::Request->new( POST => $this->{finding_url} );
@@ -824,6 +887,44 @@ sub hash2xml {
   }
 
   return $xml;
+}
+
+sub build_RESTful_URL {
+    my ($base_url, $params_ref) = @_;
+    
+    # Create URI object from base
+    my $uri = URI->new($base_url);
+    
+    # Append query parameters
+    $uri->query_form(%$params_ref);
+
+    return $uri->as_string;
+}
+
+sub RESTful_Query {
+    my ($ebay, $base_url, $query_hash) = @_;
+
+    my $url = build_RESTful_URL( $base_url, $query_hash );
+
+    my $oauth_token = $ebay->get_OAUTH_Token();
+
+    my $req = HTTP::Request->new(GET => $url);
+    $req->header('Authorization' => "Bearer $oauth_token");
+    $req->header('Content-Type' => 'application/json');
+
+    my $res = $_ua->request($req);
+
+    if ($res->is_success) {
+        my $content = $res->decoded_content;
+        my $data = decode_json($content);
+
+        #print "Output JSON:\n" . Dumper( $data ) . "\n";
+
+        return $data;
+    } else {
+        print STDERR "API call failed: " . $res->status_line . "\n" . $res->decoded_content . "\n";
+        return undef;
+    }
 }
 
 

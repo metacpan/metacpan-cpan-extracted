@@ -1,5 +1,9 @@
 Revision history for MIDI-RtController
 
+0.0704 2025-05-18 20:27:35
+    - Give a real name to the virtual port that is created.
+    - Improve documentation.
+
 0.0703 2025-04-19 07:52:51
     - Fix documentation.
 

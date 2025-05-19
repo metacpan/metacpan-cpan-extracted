@@ -652,7 +652,7 @@ sub md_quote_code_as {
 
 sub widget_signature_md {
   (my MY $self, my Widget $widget, my $detail) = @_;
-  my $wname = "yatt:$widget->{cf_name}";
+  my $wname = $widget->callsite_name;
   my $args = join("", map {
     my $var = $widget->{arg_dict}{$_};
     " ".join("=", $_, q{"}.$var->spec_string.q{"}).($detail ? "\n" : "");

@@ -1,3 +1,12 @@
+0.089		2025-05-18	T. R. Wyant
+    The /x modifier should not affect the parse of the replacement
+    string in a substitution operator. That is, the '#' in s/x/#/x does
+    NOT introdice a comment.
+
+    Correct POD link in PPIx::Regexp::Token::Literal.
+
+    Annotate sub class(), since with Perl 5.38 it is a built-in.
+
 0.088		2023-02-28	T. R. Wyant
     Remove support for (**{ ... code ... }).  This was introduced in
     Perl 5.37.8 along with a single-splat version.  The double-splat

@@ -1,5 +1,24 @@
 =head1 Revision history for Config-Param
 
+=item * B<4.000006> (2025-05-19)
+
+=over 2
+
+=item - Fix undefined line warning on certain help printouts.
+
+=item - Fix parsing of config file syntax without spaces between parameter and << for multiline values.
+
+=back
+
+=item * B<4.000005> (2023-07-15)
+
+=over 2
+
+=item - avoid perl -T in tests
+=item - documentation fixes
+
+=back
+
 =item * B<4.000004> (2022-04-25)
 
 =over 2

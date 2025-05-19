@@ -47,7 +47,6 @@ recommends:
   Sub::Identify: '0'
   Sub::Inspector: '0'
   Test::Requires: '0'
-  Text::Glob: '0'
   Time::Piece: '0'
 requires:
   CGI: '4.40'
@@ -63,6 +62,7 @@ requires:
   Locale::PO: '0'
   MOP4Import::Declare: '0.052'
   Plack: '0'
+  Text::Glob: '0'
   Tie::IxHash: '0'
   URI::Escape: '0'
   autodie: '0'
@@ -72,5 +72,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/hkoba/yatt_lite
-version: '0.130'
+version: '0.131'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -46,7 +46,8 @@ recommends 'Sub::Inspector';
 
 recommends 'B::Utils' => '!= 0.26';
 
-recommends 'Text::Glob';
+# For Inspector
+requires 'Text::Glob';
 
 # For LanguageServer support
 recommends 'Coro';

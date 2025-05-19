@@ -3,9 +3,14 @@
 
 Text::Textile2MarcdownStandalone - Standalone converter from Textile markup to Markdown
 
+# DEPRECATION
+
+This module is \*\*DEPRECATED\*\* and was uploaded by mistake.
+Please use \*\*Text-Textile2MarkdownStandalone\*\* instead.
+
 # VERSION
 
-version 0.01
+version 0.04
 
 # SYNOPSIS
 
@@ -27,7 +32,7 @@ version 0.01
 
 Text::Textile2MarcdownStandalone provides a simple, standalone tool to convert Textile-formatted text into Markdown. It supports:
 
-- Headings (h1–h6)
+- - Headings (h1-h6)
 - Ordered and unordered lists with nesting
 - Emphasis, strong emphasis, and strikethrough
 - Code spans and code blocks
@@ -58,20 +63,20 @@ Text::Textile2MarcdownStandalone provides a simple, standalone tool to convert T
 
     Execute the conversion. Reads the input file, converts its content to Markdown, and either writes it to the output file or returns it as a string.
 
+# cli
+
+> Use the helper script included with this distribution to run from the command line:
+>
+>     perl script/textile2markdown.pl --input input.textile --output output.md
+>
+> If only an input file is provided, the Markdown output will be printed to STDOUT.
+
 # AUTHOR
 
 Akihito Takeda <takeda.akihito@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2023 Akihito Takeda
+Copyright (C) 2025 Akihito Takeda
 
 This software is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 411:
-
-    Non-ASCII character seen before =encoding in '(h1–h6)'. Assuming UTF-8

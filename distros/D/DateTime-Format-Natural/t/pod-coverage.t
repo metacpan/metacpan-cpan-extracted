@@ -13,7 +13,7 @@ plan skip_all => 'tests for release testing' unless $ENV{RELEASE_TESTING};
 eval "use Test::Pod::Coverage 1.04";
 plan skip_all => "Test::Pod::Coverage 1.04 required for testing POD coverage" if $@;
 
-my @exclude = qw(Duration::Checks);
+my @exclude = qw(Some::Module);
 my @modules;
 _find_modules(realpath(catfile($Bin, updir, 'lib')), \@modules, \@exclude);
 @modules = sort @modules;

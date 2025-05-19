@@ -463,7 +463,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = @{ $EXPORT_TAGS{all} };
 
-our $VERSION    = '0.0402';
+our $VERSION    = '0.0403';
 $VERSION =~ tr/_//d;
 our $XS_VERSION = $VERSION;
 

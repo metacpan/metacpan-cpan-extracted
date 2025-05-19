@@ -1,0 +1,11 @@
+Revision history for Perl extension Text-Textile2MarkdownStandalone
+
+Originally released as Text-Textile2MarcdownStandalone (typo in “Marcdown”).
+Renamed to Text-Textile2MarkdownStandalone in version 0.03 to correct the typo and improve clarity.
+
+
+0.10 2025-05-19T03:29:51Z
+
+    - Text-Textile2MarcdownStandalone is an old version; please use Text-Textile2MarkdownStandalone instead.
+    - original version
+

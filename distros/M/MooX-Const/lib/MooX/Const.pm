@@ -19,7 +19,7 @@ use Types::Standard qw( is_CodeRef Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.6.2';
+our $VERSION = 'v0.6.3';
 
 
 sub import {
@@ -141,7 +141,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.6.2
+version v0.6.3
 
 =head1 SYNOPSIS
 
@@ -238,6 +238,8 @@ backported to those versions.
 
 =head1 SEE ALSO
 
+<MooX::Readonly::Attribute>, which has similar functionality to this module.
+
 L<Const::Fast>
 
 L<Devel::StrictMode>
@@ -281,7 +283,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

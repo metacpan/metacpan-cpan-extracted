@@ -1042,8 +1042,7 @@ sub parse_arg_spec_for_part {
   };
   ($type, $argName, nextArgNo($part)
    , $lno, $node_type, $dflag
-   , defined $default
-   ? $self->_parse_text_entities($default) : undef);
+   , $default);
 }
 
 sub add_args {

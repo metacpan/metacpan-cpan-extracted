@@ -10,7 +10,7 @@ use XSLoader;
 
 our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.7.5';
+our $VERSION = 'v0.7.6';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -34,7 +34,7 @@ Text::Minify::XS - Remove indentation and trailing whitespace from multi-line te
 
 =head1 VERSION
 
-version v0.7.5
+version v0.7.6
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ feature.
 =head2 Reporting Security Vulnerabilities
 
 Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities
+report security vulnerabilities.
 
 =head1 AUTHOR
 
@@ -146,7 +146,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2024 by Robert Rothenberg.
+This software is Copyright (c) 2020-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

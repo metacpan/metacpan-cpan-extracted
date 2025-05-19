@@ -2,23 +2,21 @@
 # MIT License
 
 class File::Copy {
-  version "0.022";
+  version "0.023";
   
-  use Sys::IO::Stat;
-  use Sys::IO;
+  use Sys;
   use IO::File;
   
-  static method copy : int ($from : string, $to : string, $size : int = 0) {
+  static method copy : void ($from : string, $to : string, $size : int = -1) {
     
     my $from_io_file = IO::File->new($from, "<");
     
     my $to_io_file = IO::File->new($to, ">");
     
-    my $fstat_from = Sys::IO::Stat->new;
-    Sys::IO::Stat->fstat($from_io_file->fileno, $fstat_from);
+    my $fstat_from = Sys->fstat($from_io_file->fileno);
     
     my $size_max = 1024 * 1024 * 2;
-    if ($size == 0) {
+    if ($size < 0) {
       my $st_size = $fstat_from->st_size;
       if ($st_size < 512) {
         $size = 1024;
@@ -41,21 +39,10 @@ class File::Copy {
     
     $from_io_file->close;
     $to_io_file->close;
-    
-    my $success = 1;
-    
-    return $success;
   }
   
-  static method move : int ($from : string, $to : string) {
+  static method move : void ($from : string, $to : string) {
     
-    my $status = Sys::IO->rename($from, $to);
-    
-    my $success = 0;
-    if ($status == 0) {
-      $success = 1;
-    }
-    
-    return $success;
+    Sys->rename($from, $to);
   }
 }

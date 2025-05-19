@@ -1,0 +1,15 @@
+Revision history for Dist-Zilla-Plugin-Test-MixedScripts:
+
+v0.1.2    2025-05-18 17:53:02+01:00 Europe/London
+  [Documentation]
+  - Discussed a known issue and workaround for XS files
+
+  - Updated DESCRIPTION with an example as to what this is used for
+    and why it is important.
+
+v0.1.1    2025-05-18 15:38:07+01:00 Europe/London
+  [Bug Fixes]
+  - Fixed the test prerequisites.
+
+v0.1.0    2025-05-18 11:53:04+01:00 Europe/London
+  - Initial version.

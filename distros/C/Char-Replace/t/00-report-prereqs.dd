@@ -19,7 +19,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'perl' => '5.010'
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {

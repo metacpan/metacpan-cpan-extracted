@@ -1,10 +1,11 @@
-package HTML::Blitz::Builder 0.1001;
+package HTML::Blitz::Builder 0.1101;
 use v5.20;
 use warnings qw(all FATAL uninitialized);
 no warnings qw(experimental::signatures);
 use feature qw(signatures);
 use Exporter qw(import);
 use Carp qw(croak);
+use Scalar::Util qw(refaddr);
 
 our @EXPORT_OK = qw(
     mk_doctype
@@ -14,36 +15,89 @@ our @EXPORT_OK = qw(
     fuse_fragment
 );
 
-{
-    package HTML::Blitz::Builder::_Fragment;
+# data Fragment
+#   = Null
+#   | Txt Text
+#   | Html Text
+# instance IsString Fragment where
+#   fromString = Txt . T.pack
+# instance Monoid Fragment where
+#   mempty = Null
+#   mappend Null y = y
+#   mappend x Null = x
+#   mappend (Txt s) (Txt t) = Txt (s <> t)
+#   mappend (Html s) (Html t) = Html (s <> t)
+#   mappend (Txt s) (Html t) = Html (escape s <> t)
+#   mappend (Html s) (Txt t) = Html (s <> escape t)
 
-    sub new($class, @parts) {
-        bless {
-            parts => \@parts,
-        }, $class
-    }
+sub FREEZE($self, $type) { $$self }
+sub THAW($class, $type, $str) { bless \$str, $class }
 
-    sub unwrapped($self) {
-        @{$self->{parts}}
+my $Null;
+package HTML::Blitz::Builder::_Null {
+    $Null = bless do { \my $tmp };
+
+    sub FREEZE($self, $type) { () }
+    sub THAW($class, $type) { $Null }
+}
+
+package HTML::Blitz::Builder::_Text {
+    use overload
+        '""'     => sub ($self, @) { $$self },
+        fallback => 1;
+
+    sub _mk($str) { bless \$str }
+
+    sub FREEZE($self, $type) { $$self }
+    sub THAW($class, $type, $str) { bless \$str, $class }
+}
+
+sub fuse_fragment {
+    return $Null if !@_;
+    my $acc = shift;
+    my $can_mod = 0;
+    for (@_) {
+        next if (refaddr($_) // 0) == $Null;
+        if ((refaddr($acc) // 0) == $Null) {
+            $acc = $_;
+            $can_mod = 0;
+            next;
+        }
+        if (ref($acc) eq __PACKAGE__) {
+            if (!$can_mod) {
+                my $tmp = $$acc;
+                $acc = bless \$tmp;
+                $can_mod = 1;
+            }
+            $$acc .= ref($_) eq __PACKAGE__ ? $$_ : s{(?![\n\t])([[:cntrl:]&<])}{ $1 eq '<' ? '&lt;' : $1 eq '&' ? '&amp;' : '&#' . ord($1) . ';' }egr;
+        } else {
+            if (ref($_) eq __PACKAGE__) {
+                my $tmp =
+                    $acc =~ s{(?![\n\t])([[:cntrl:]&<])}{ $1 eq '<' ? '&lt;' : $1 eq '&' ? '&amp;' : '&#' . ord($1) . ';' }egr
+                    . $$_;
+                $acc = bless \$tmp;
+                $can_mod = 1;
+            } else {
+                $acc .= $_;
+            }
+        }
     }
+    (refaddr($acc) // 0) == $Null
+    || ref($acc) eq __PACKAGE__
+        ? $acc
+        : HTML::Blitz::Builder::_Text::_mk "$acc"
 }
 
 sub to_html(@parts) {
-    join '',
-        map ref($_) eq __PACKAGE__ ? $$_ : s{(?![\n\t])([[:cntrl:]&<])}{ $1 eq '<' ? '&lt;' : $1 eq '&' ? '&amp;' : '&#' . ord($1) . ';' }egr,
-        map ref($_) eq __PACKAGE__ . '::_Fragment' ? $_->unwrapped : $_,
-        @parts
-}
-
-sub fuse_fragment(@parts) {
-    return $parts[0]
-        if @parts == 1 && (ref($parts[0]) eq __PACKAGE__ || ref($parts[0]) eq __PACKAGE__ . '::_Fragment');
-    HTML::Blitz::Builder::_Fragment->new(@parts)
+    my $item = fuse_fragment @parts;
+    ref($item) eq __PACKAGE__ ? $$item
+        : (refaddr($item) // 0) == $Null ? ''
+        : $item =~ s{(?![\n\t])([[:cntrl:]&<])}{ $1 eq '<' ? '&lt;' : $1 eq '&' ? '&amp;' : '&#' . ord($1) . ';' }egr
 }
 
 sub mk_doctype() {
     my $code = '<!DOCTYPE html>';
-    bless \$code, __PACKAGE__
+    bless \$code
 }
 
 sub mk_comment($content) {
@@ -52,7 +106,7 @@ sub mk_comment($content) {
     $content =~ /(<!--|--!?>)/
         and croak "HTML comment cannot contain '$1': '$content'";
     my $code = "<!--$content-->";
-    bless \$code, __PACKAGE__
+    bless \$code
 }
 
 sub _mk_attr($name, $value) {
@@ -101,20 +155,20 @@ sub mk_elem($name, @args) {
     $name =~ m{\A[A-Za-z][^\s/>[:cntrl:]]*\z}
         or croak "Invalid tag name '$name'";
     (my $lc_name = $name) =~ tr/A-Z/a-z/;
-    @args = map ref($_) eq __PACKAGE__ . '::_Fragment' ? $_->unwrapped : $_, @args;
+    my $item = fuse_fragment @args;
     my $attr_str = join '', map _mk_attr($_, $attrs->{$_}), sort keys %$attrs;
     my $html = "<$name$attr_str>";
     if ($is_void{$lc_name}) {
-        croak "<$name> tag cannot have contents" if @args;
+        croak "<$name> tag cannot have contents" if (refaddr($item) // 0) != $Null;
     } else {
-        croak "<$name> tag cannot have child elements" if $is_childless{$lc_name} && grep ref($_) eq __PACKAGE__, @args;
+        croak "<$name> tag cannot have child elements" if $is_childless{$lc_name} && ref($item) eq __PACKAGE__;
         my $contents;
         if ($lc_name eq 'style') {
-            $contents = join '', @args;
+            $contents = (refaddr($item) // 0) == $Null ? '' : $item;
             $contents =~ m{(</style[\s/>])}aai
                 and croak "<$name> tag cannot contain '$1'";
         } elsif ($lc_name eq 'script') {
-            $contents = join '', @args;
+            $contents = (refaddr($item) // 0) == $Null ? '' : $item;
             SCRIPT_DATA: {
                 $contents =~ m{ ( <!-- (?! -?> ) ) | ( </script [ \t\r\n\f/>] ) }xaaigc
                     or last SCRIPT_DATA;
@@ -132,11 +186,11 @@ sub mk_elem($name, @args) {
                 }
             }
         } else {
-            $contents = to_html @args;
+            $contents = to_html $item;
         }
         $html .= "$contents</$name>";
     }
-    bless \$html, __PACKAGE__
+    bless \$html
 }
 
 1
@@ -313,6 +367,10 @@ C<fuse_fragment> is transparent:
     mk_elem($name, $attrs, fuse_fragment(@values))
     # is the same as
     mk_elem($name, $attrs, @values)
+
+Objects returned by C<fuse_fragment> implement the L<generic serialization
+protocol|Types::Serialiser/A GENERIC OBJECT SERIALIATION PROTOCOL> from
+L<Types::Serialiser> with C<FREEZE>/C<THAW> methods.
 
 =head1 EXAMPLE
 

@@ -34,7 +34,7 @@
          "requires" : {
             "SPVM" : "0.990042",
             "SPVM::IO" : "0.232",
-            "SPVM::Sys" : "0.531"
+            "SPVM::Sys" : "0.535"
          }
       },
       "test" : {
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Copy"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

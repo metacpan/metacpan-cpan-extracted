@@ -10,14 +10,14 @@ package Devel::Cover::Op;
 use strict;
 use warnings;
 
-our $VERSION = '1.48'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 use Devel::Cover::Dumper;
 
 use Devel::Cover qw( -ignore blib -ignore \\wB\\w );
 use B::Concise   qw( set_style add_callback );
 
-my %style = (
+my %Style = (
   "terse" => [
     "(?(#label =>\n)?)(*(    )*)#class (#addr) #name <#cover> (?([#targ])?) "
       . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n",
@@ -44,10 +44,10 @@ my %style = (
 my @Options;
 
 sub import {
-  my $class = shift;
-  set_style(@{ $style{concise} });
-  for (@_) {
-    /-(.*)/ && exists $style{$1} ? set_style(@{ $style{$1} }) : push @Options,
+  my ($class, @args) = @_;
+  set_style(@{ $Style{concise} });
+  for (@args) {
+    /-(.*)/ && exists $Style{$1} ? set_style(@{ $Style{$1} }) : push @Options,
       $_;
   }
 
@@ -81,7 +81,7 @@ Devel::Cover::Op - B::Concise with coverage data
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 

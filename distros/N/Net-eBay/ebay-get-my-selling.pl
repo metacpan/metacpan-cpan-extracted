@@ -8,6 +8,8 @@ use Data::Dumper;
 
 use BSD::Resource;
 
+use utf8;
+
 my $eBay = new Net::eBay;
 
 

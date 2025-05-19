@@ -481,6 +481,7 @@ destroy(self, ...)
 	Doubly self
 	CODE:
 		Doubly next;
+		self = _goto_end(self);
 		while ( self->prev != NULL ) {
 			next = self->prev;
 			_remove(ST(0), self);

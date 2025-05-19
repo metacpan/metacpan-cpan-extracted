@@ -4,26 +4,20 @@ use strict;
 use warnings;
 
 use PPIx::Regexp::Constant qw{ SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS };
+
+BEGIN {
+    # NOTE that this MUST be done before Test::More is loaded.
+    if ( SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS ) {
+	require 'open.pm';
+	'open'->import( qw{ :std :encoding(utf-8) } );
+    }
+}
+
 use Test::More 0.88;
 
 use lib qw{ inc };
 
 use My::Module::Test;
-
-# NOTE we use this circumlocution to hide the :encoding() from
-# xt/author/minimum_perl.t and Perl::MinimumVersion. The two-argument
-# binmode itself is OK under Perl 5.6 but the :encoding() is not. But if
-# we're 5.6 then SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS is false,
-# so the binmode() never gets executed.
-use constant OUTPUT_ENCODING	=> ':encoding(utf-8)';
-
-if ( SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS ) {
-    my $builder = My::Module::Test->builder();
-    foreach my $method ( qw{ output failure_output todo_output } ) {
-	my $handle = $builder->$method();
-	binmode $handle, OUTPUT_ENCODING;
-    }
-}
 
 use charnames qw{ :full };
 
@@ -4272,6 +4266,86 @@ choose  ( child => 1, child => 0, child => 1 );
 klass   ( 'PPIx::Regexp::Token::Literal' );
 content ( ' ' );
 choose  ( child => 2 );
+klass   ( 'PPIx::Regexp::Token::Modifier' );
+content ( 'x' );
+
+tokenize( 's/ x/#y/x' );
+count   ( 9 );
+choose  ( 0 );
+klass   ( 'PPIx::Regexp::Token::Structure' );
+content ( 's' );
+choose  ( 1 );
+klass   ( 'PPIx::Regexp::Token::Delimiter' );
+content ( '/' );
+choose  ( 2 );
+klass   ( 'PPIx::Regexp::Token::Whitespace' );
+content ( ' ' );
+choose  ( 3 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( 'x' );
+choose  ( 4 );
+klass   ( 'PPIx::Regexp::Token::Delimiter' );
+content ( '/' );
+choose  ( 5 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( '#' );
+choose  ( 6 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( 'y' );
+choose  ( 7 );
+klass   ( 'PPIx::Regexp::Token::Delimiter' );
+content ( '/' );
+choose  ( 8 );
+klass   ( 'PPIx::Regexp::Token::Modifier' );
+content ( 'x' );
+
+parse   ( 's/ x/#y/x' );
+value   ( failures => [], 0 );
+klass   ( 'PPIx::Regexp' );
+count   ( 4 );
+choose  ( child => 0 );
+klass   ( 'PPIx::Regexp::Token::Structure' );
+content ( 's' );
+choose  ( child => 1 );
+klass   ( 'PPIx::Regexp::Structure::Regexp' );
+count   ( 1 );
+choose  ( child => 1, start => [] );
+count   ( 2 );
+choose  ( child => 1, start => 0 );
+klass   ( 'PPIx::Regexp::Token::Delimiter' );
+content ( '/' );
+choose  ( child => 1, start => 1 );
+klass   ( 'PPIx::Regexp::Token::Whitespace' );
+content ( ' ' );
+choose  ( child => 1, type => [] );
+count   ( 0 );
+choose  ( child => 1, finish => [] );
+count   ( 1 );
+choose  ( child => 1, finish => 0 );
+klass   ( 'PPIx::Regexp::Token::Delimiter' );
+content ( '/' );
+choose  ( child => 1, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( 'x' );
+choose  ( child => 2 );
+klass   ( 'PPIx::Regexp::Structure::Replacement' );
+count   ( 2 );
+choose  ( child => 2, start => [] );
+count   ( 0 );
+choose  ( child => 2, type => [] );
+count   ( 0 );
+choose  ( child => 2, finish => [] );
+count   ( 1 );
+choose  ( child => 2, finish => 0 );
+klass   ( 'PPIx::Regexp::Token::Delimiter' );
+content ( '/' );
+choose  ( child => 2, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( '#' );
+choose  ( child => 2, child => 1 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( 'y' );
+choose  ( child => 3 );
 klass   ( 'PPIx::Regexp::Token::Modifier' );
 content ( 'x' );
 

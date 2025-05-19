@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use boolean qw(true false);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-sub for
+sub _for
 {
     my ($duration, $date_strings, $present) = @_;
 
@@ -21,7 +21,7 @@ sub for
     }
 }
 
-sub first_to_last
+sub _first_to_last
 {
     my ($duration, $date_strings, $extract) = @_;
 
@@ -174,7 +174,7 @@ my $duration_matches = sub
     }
 };
 
-sub from_count_to_count
+sub _from_count_to_count
 {
     my ($duration, $date_strings, $extract, $adjust, $indexes) = @_;
 

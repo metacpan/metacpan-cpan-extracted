@@ -1,5 +1,9 @@
 Devel::Cover history
 
+1.49 - 18 May 2025
+- Handle core Deparse changes for xor (Jim Keenan) (GH-355)
+- Code tidying
+
 1.48 - 11 May 2025
 - Fix up args handling for reports (Mitch McCracken) (GH-354)
 - Correct error message when launch is unavailable

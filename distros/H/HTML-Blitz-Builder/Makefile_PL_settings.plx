@@ -11,14 +11,15 @@ return {
     BUILD_REQUIRES     => {},
     TEST_REQUIRES      => {
         'Test2::V0' => 0,
+        'JSON::PP'  => 0,
     },
     PREREQ_PM          => {
-        'constant' => 0,
-        'feature'  => 0,
-        'warnings' => 0,
+        'feature'      => 0,
+        'warnings'     => 0,
 
-        'Carp'     => 0,
-        'Exporter' => '5.57',
+        'Carp'         => 0,
+        'Exporter'     => '5.57',
+        'Scalar::Util' => '1.08',
     },
 
     REPOSITORY => [ codeberg => 'mauke' ],

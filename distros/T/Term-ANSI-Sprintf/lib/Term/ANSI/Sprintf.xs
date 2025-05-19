@@ -254,13 +254,16 @@ char * basic_color_map[][3] = {
 	{"%bright_white", "97"},
 };
 
-char * concat(const char* str1, const char* str2) {
-	char* result;
-	asprintf(&result, "%s%s", str1, str2);
+char * concat(char* s1, char* s2) {
+	dTHX;
+	char *result = malloc(strlen(s1) + strlen(s2) + 1);
+	strcpy(result, s1);
+	strcat(result, s2);
 	return result;
 }
 
 char *str_replace(char *orig, char *rep, char * map[3], int colour) {
+	dTHX;
 	char * result, * ins, * tmp, * with; 
 	int len_rep, len_with, len_front, count;    
     	len_rep = strlen(rep);
@@ -295,12 +298,14 @@ char *str_replace(char *orig, char *rep, char * map[3], int colour) {
 }
 
 char * preprocess (char * sprint) {
+	dTHX;
+	int i = 0;
 	int size = sizeof(basic_format_map)/sizeof(basic_format_map[0]);
-	for (int i = 0; i < size; i++) {
+	for (i = 0; i < size; i++) {
 		sprint = str_replace(sprint, basic_format_map[i][0], basic_format_map[i], 0);
 	}
 	size = sizeof(basic_color_map)/sizeof(basic_color_map[0]);
-	for (int i = 0; i < size; i++) {
+	for (i = 0; i < size; i++) {
 		sprint = str_replace(sprint, basic_color_map[i][0], basic_color_map[i], 1);
 	}
 	return sprint;
@@ -321,7 +326,8 @@ sprintf(...)
 		EXTEND(SP, len + 2);
 		PUSHs(sv_2mortal(newSVpv("Term::ANSI::Sprintf", 0)));
 		PUSHs(newSVpv(sprint, 0));
-		for (int i = 0; i <= len; i++) {
+		int i = 0;
+		for (i = 0; i <= len; i++) {
 			PUSHs(newSVsv(*av_fetch(params, i, 0)));
 		}
 		PUTBACK;

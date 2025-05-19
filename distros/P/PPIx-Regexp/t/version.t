@@ -21,22 +21,15 @@ use PPIx::Regexp::Constant qw{
 };
 use Scalar::Util qw{ blessed };
 
-use Test::More 0.88;
-
-# NOTE we use this circumlocution to hide the :encoding() from
-# xt/author/minimum_perl.t and Perl::MinimumVersion. The two-argument
-# binmode itself is OK under Perl 5.6 but the :encoding() is not. But if
-# we're 5.6 then SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS is false,
-# so the binmode() never gets executed.
-use constant OUTPUT_ENCODING	=> ':encoding(utf-8)';
-
-if ( SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS ) {
-    my $builder = Test::More->builder();
-    foreach my $method ( qw{ output failure_output todo_output } ) {
-	my $handle = $builder->$method();
-	binmode $handle, OUTPUT_ENCODING;
+BEGIN {
+    # NOTE that this MUST be done before Test::More is loaded.
+    if ( SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS ) {
+	require 'open.pm';
+	'open'->import( qw{ :std :encoding(utf-8) } );
     }
 }
+
+use Test::More 0.88;
 
 use charnames qw{ :full };
 

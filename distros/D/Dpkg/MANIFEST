@@ -94,6 +94,7 @@ lib/Dpkg/Vendor.pm
 lib/Dpkg/Vendor/Debian.pm
 lib/Dpkg/Vendor/Default.pm
 lib/Dpkg/Vendor/Devuan.pm
+lib/Dpkg/Vendor/PureOS.pm
 lib/Dpkg/Vendor/Ubuntu.pm
 lib/Dpkg/Version.pm
 lib/Test/Dpkg.pm

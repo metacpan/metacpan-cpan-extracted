@@ -402,6 +402,10 @@
          "file" : "lib/Dpkg/Vendor/Devuan.pm",
          "version" : "0.01"
       },
+      "Dpkg::Vendor::PureOS" : {
+         "file" : "lib/Dpkg/Vendor/PureOS.pm",
+         "version" : "0.01"
+      },
       "Dpkg::Vendor::Ubuntu" : {
          "file" : "lib/Dpkg/Vendor/Ubuntu.pm",
          "version" : "0.01"
@@ -429,6 +433,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.22.18",
+   "version" : "v1.22.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

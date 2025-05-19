@@ -76,6 +76,7 @@ sub set_dflag_default_to {
   $var->[VSLOT_DFLAG] = $dflag if $dflag;
   if (defined $default) {
     $var->[VSLOT_DEFAULT] = $self->_parse_text_entities($default);
+    $var->[VSLOT_DEFAULT_EXPR] = $default;
   }
 }
 

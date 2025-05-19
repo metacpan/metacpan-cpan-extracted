@@ -38,7 +38,7 @@
       },
       "test" : {
          "requires" : {
-            "OpenGL::Modern" : "0.04"
+            "OpenGL::Modern" : "0.0401"
          }
       }
    },
@@ -50,6 +50,6 @@
          "web" : "https://github.com/devel-chm/OpenGL-GLFW.git"
       }
    },
-   "version" : "0.0402",
+   "version" : "0.0403",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

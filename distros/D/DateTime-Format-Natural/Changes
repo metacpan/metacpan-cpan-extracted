@@ -1,5 +1,15 @@
 Revision history for Perl extension DateTime::Format::Natural.
 
+1.21  2025-05-18  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.20_01  2025-04-28  <schubiger@cpan.org>
+
+ - ::Duration::Checks: mark all subroutines as internal.
+
+ - Un-exclude Duration::Checks in pod{-coverage}.t.
+
 1.20  2025-03-22  <schubiger@cpan.org>
 
  - Document ::Duration::Checks.

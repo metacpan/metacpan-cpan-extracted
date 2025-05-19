@@ -277,6 +277,9 @@ provides:
   Dpkg::Vendor::Devuan:
     file: lib/Dpkg/Vendor/Devuan.pm
     version: '0.01'
+  Dpkg::Vendor::PureOS:
+    file: lib/Dpkg/Vendor/PureOS.pm
+    version: '0.01'
   Dpkg::Vendor::Ubuntu:
     file: lib/Dpkg/Vendor/Ubuntu.pm
     version: '0.01'
@@ -296,5 +299,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.22.18
+version: v1.22.19
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

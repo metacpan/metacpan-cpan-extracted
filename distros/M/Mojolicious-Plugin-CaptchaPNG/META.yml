@@ -24,7 +24,6 @@ name: Mojolicious-Plugin-CaptchaPNG
 requires:
   GD: '2.83'
   GD::Image: '0'
-  Math::Random::Secure: '0'
   Mojo::Base: '0'
   Mojo::Exception: '0'
   perl: '5.024'
@@ -34,7 +33,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Mojo-Plugin-Captcha/issues
   homepage: https://github.com/gryphonshafer/Mojo-Plugin-Captcha
   repository: https://github.com/gryphonshafer/Mojo-Plugin-Captcha.git
-version: '1.03'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '1.04'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

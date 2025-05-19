@@ -12,7 +12,7 @@ use warnings;
 
 use Fcntl ":flock";
 
-our $VERSION = '1.48'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 sub new {
   my $class = shift;
@@ -84,7 +84,7 @@ Devel::Cover::DB::IO::Base - Base class for IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 

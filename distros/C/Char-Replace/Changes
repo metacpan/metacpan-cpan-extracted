@@ -1,8 +1,12 @@
 Revision history for Char-Replace
 
-- fix issue when growing a string containing a '\0'
+0.005     2025-05-18 15:27:02-06:00 America/Denver
+
+- Fix compiler error due to incorrect pointer type in Newx cal
 
 0.004     2019-01-30 13:04:14-06:00 America/Chicago
+
+- fix issue when growing a string containing a '\0'
 
 0.003     2018-12-14 15:30:08-06:00 America/Chicago
 

@@ -3,7 +3,6 @@
 
 requires "GD" => "2.83";
 requires "GD::Image" => "0";
-requires "Math::Random::Secure" => "0";
 requires "Mojo::Base" => "0";
 requires "Mojo::Exception" => "0";
 requires "perl" => "5.024";

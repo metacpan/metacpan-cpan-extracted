@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = "0.01";
+our $VERSION = "0.04";
 
 sub new {
     my ($class, %opt) = @_;
@@ -373,6 +373,7 @@ sub output_table {
 
 1;
 __END__
++=encoding utf8
 
 =pod
 
@@ -380,9 +381,14 @@ __END__
 
 Text::Textile2MarcdownStandalone - Standalone converter from Textile markup to Markdown
 
+=head1 DEPRECATION
+
+This module is **DEPRECATED** and was uploaded by mistake.
+Please use **Text-Textile2MarkdownStandalone** instead.
+
 =head1 VERSION
 
-version 0.01
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -408,7 +414,7 @@ Text::Textile2MarcdownStandalone provides a simple, standalone tool to convert T
 
 =item *
 
-Headings (h1–h6)
+- Headings (h1-h6)
 
 =item *
 
@@ -466,13 +472,25 @@ Execute the conversion. Reads the input file, converts its content to Markdown, 
 
 =back
 
+=head1 cli
+
+=over 4
+
+Use the helper script included with this distribution to run from the command line:
+
+  perl script/textile2markdown.pl --input input.textile --output output.md
+
+If only an input file is provided, the Markdown output will be printed to STDOUT.
+
+=back
+
 =head1 AUTHOR
 
 Akihito Takeda <takeda.akihito@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023 Akihito Takeda
+Copyright (C) 2025 Akihito Takeda
 
 This software is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
 

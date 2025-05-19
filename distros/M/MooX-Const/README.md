@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.6.2
+version v0.6.3
 
 # SYNOPSIS
 
@@ -109,6 +109,8 @@ backported to those versions.
 
 # SEE ALSO
 
+<MooX::Readonly::Attribute>, which has similar functionality to this module.
+
 [Const::Fast](https://metacpan.org/pod/Const%3A%3AFast)
 
 [Devel::StrictMode](https://metacpan.org/pod/Devel%3A%3AStrictMode)
@@ -150,7 +152,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

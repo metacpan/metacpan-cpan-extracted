@@ -19,7 +19,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "GD" => "2.83",
     "GD::Image" => 0,
-    "Math::Random::Secure" => 0,
     "Mojo::Base" => 0,
     "Mojo::Exception" => 0,
     "strict" => 0,
@@ -34,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +46,6 @@ my %FallbackPrereqs = (
   "GD::Image" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Math::Random::Secure" => 0,
   "Mojo::Base" => 0,
   "Mojo::Exception" => 0,
   "Mojolicious::Lite" => 0,

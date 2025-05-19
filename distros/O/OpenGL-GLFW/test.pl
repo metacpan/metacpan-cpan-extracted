@@ -46,8 +46,8 @@ exit if exists $ENV{CI} and $^O eq 'darwin' or $^O eq 'MSWin32';
 #   glUseProgram
 #   glViewport
 #   
-#   glGetAttribLocation_c
-#   glGetUniformLocation_c
+#   glGetAttribLocation
+#   glGetUniformLocation
 #   glUniformMatrix4fv_c
 #   glVertexAttribPointer_c
 #   
@@ -163,9 +163,9 @@ glAttachShader($program, $vertex_shader);
 glAttachShader($program, $fragment_shader);
 glLinkProgram($program);
 
-my $mvp_location  = glGetUniformLocation_c($program, "MVP");  # TODO change name to _p or no-suffix
-my $vpos_location = glGetAttribLocation_c($program, "vPos");  # TODO change name to _p or no-suffix
-my $vcol_location = glGetAttribLocation_c($program, "vCol");  # TODO change name to _p or no-suffix
+my $mvp_location  = glGetUniformLocation($program, "MVP");  # TODO change name to _p or no-suffix
+my $vpos_location = glGetAttribLocation($program, "vPos");  # TODO change name to _p or no-suffix
+my $vcol_location = glGetAttribLocation($program, "vCol");  # TODO change name to _p or no-suffix
 
 glEnableVertexAttribArray($vpos_location);
 #------------------------------------------------------------ stride, offset

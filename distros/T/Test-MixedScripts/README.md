@@ -4,7 +4,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 # VERSION
 
-version v0.2.0
+version v0.2.2
 
 # SYNOPSIS
 
@@ -21,6 +21,13 @@ file_scripts_ok( 'assets/site.js' );
 This is a module to test that Perl code and other text files do not have potentially malicious or confusing Unicode
 combinations.
 
+For example, the text for the domain names "оnе.example.com" and "one.example.com" look indistinguishable in many fonts,
+but the first one has Cyrillic letters.  If your software interactied with a service on the second domain, then someone
+can operate a service on the first domain and attempt to fool developers into using their domain instead.
+
+This might be through a malicious patch submission, or even text from an email or web page that they have convinced a
+developer to copy and paste into their code.
+
 # EXPORTS
 
 ## file\_scripts\_ok
@@ -35,13 +42,13 @@ If no scripts are given, it defaults to `Common` and `Latin` characters.
 You can override the defaults by adding a list of Unicode scripts, for example
 
 ```
-file_scripts_ok( $filepath, qw/ Common Latin Cyryllic / );
+file_scripts_ok( $filepath, qw/ Common Latin Cyrillic / );
 ```
 
 You can also pass options as a hash reference,
 
 ```perl
-file_scripts_ok( $filepath, { scripts => [qw/ Common Latin Cyryllic /] } );
+file_scripts_ok( $filepath, { scripts => [qw/ Common Latin Cyrillic /] } );
 ```
 
 A safer alternative to overriding the default scripts for a file is to specify an exception on each line using a special
@@ -60,6 +67,13 @@ all_perl_files_scripts_ok( \%options, @dirs );
 ```
 
 This applies ["file\_scripts\_ok"](#file_scripts_ok) to all of the Perl scripts in `@dirs`, or the current directory if they are omitted.
+
+# KNOWN ISSUES
+
+The current version does not support specifying exceptions to specific lines of POD.
+
+The only workaround for this is to escape the individual characters using the `E` formatting code. See [perlpod](https://metacpan.org/pod/perlpod)
+for more information. See [perlpod](https://metacpan.org/pod/perlpod) for more details.
 
 # SEE ALSO
 

@@ -19,7 +19,7 @@ use Test2::API 1.302200 qw( context );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.2';
 
 
 sub file_scripts_ok {
@@ -39,7 +39,8 @@ sub file_scripts_ok {
         # is not dual life and charprop is only available after v5.22.0.
 
         my $script  = charscript( ord($char) );
-        my $message = sprintf( 'Unexpected %s character on line %u character %s', $script, $lino, length($pre) + 1 );
+        my $message =
+          sprintf( 'Unexpected %s character on line %u character %s in %s', $script, $lino, length($pre) + 1, "$file" );
 
         $ctx->fail( $file, $message );
 
@@ -184,7 +185,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.2
 
 =head1 SYNOPSIS
 
@@ -199,6 +200,13 @@ version v0.2.0
 This is a module to test that Perl code and other text files do not have potentially malicious or confusing Unicode
 combinations.
 
+For example, the text for the domain names "E<0x043e>nE<0x0435>.example.com" and "one.example.com" look indistinguishable in many fonts,
+but the first one has Cyrillic letters.  If your software interactied with a service on the second domain, then someone
+can operate a service on the first domain and attempt to fool developers into using their domain instead.
+
+This might be through a malicious patch submission, or even text from an email or web page that they have convinced a
+developer to copy and paste into their code.
+
 =head1 EXPORTS
 
 =head2 file_scripts_ok
@@ -210,11 +218,11 @@ If no scripts are given, it defaults to C<Common> and C<Latin> characters.
 
 You can override the defaults by adding a list of Unicode scripts, for example
 
-  file_scripts_ok( $filepath, qw/ Common Latin Cyryllic / );
+  file_scripts_ok( $filepath, qw/ Common Latin Cyrillic / );
 
 You can also pass options as a hash reference,
 
-  file_scripts_ok( $filepath, { scripts => [qw/ Common Latin Cyryllic /] } );
+  file_scripts_ok( $filepath, { scripts => [qw/ Common Latin Cyrillic /] } );
 
 A safer alternative to overriding the default scripts for a file is to specify an exception on each line using a special
 comment:
@@ -228,6 +236,13 @@ comment:
   all_perl_files_scripts_ok( \%options, @dirs );
 
 This applies L</file_scripts_ok> to all of the Perl scripts in C<@dirs>, or the current directory if they are omitted.
+
+=head1 KNOWN ISSUES
+
+The current version does not support specifying exceptions to specific lines of POD.
+
+The only workaround for this is to escape the individual characters using the C<E> formatting code. See L<perlpod>
+for more information. See L<perlpod> for more details.
 
 =head1 SEE ALSO
 

@@ -23,7 +23,9 @@ sub add_slot_to {
 BEGIN {
   our @fields = qw(type
 		   varname argno
-		   lineno quote dflag default
+		   lineno quote
+                   dflag default
+                   default_expr
                    from_route
                    is_body_argument
                 );
@@ -82,7 +84,7 @@ sub list_field_names {
     my ($var) = @_;
     my $type = join(":", @{$var->[VSLOT_TYPE]});
     $type . (defined $var->[VSLOT_DFLAG]
-             ? ($var->[VSLOT_DFLAG] . ($var->[VSLOT_DEFAULT] // '')) : '');
+             ? ($var->[VSLOT_DFLAG] . ($var->[VSLOT_DEFAULT_EXPR] // '')) : '');
   }
 }
 

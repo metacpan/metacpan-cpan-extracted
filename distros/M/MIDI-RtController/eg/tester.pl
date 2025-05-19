@@ -37,6 +37,7 @@ my $feedback = 1;
 my $rtc = MIDI::RtController->new(
     input  => $input_name,
     output => $output_name,
+    verbose => 1,
 );
 
 my $tka = Term::TermKey::Async->new(
