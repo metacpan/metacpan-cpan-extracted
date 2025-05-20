@@ -1,0 +1,19 @@
+=pod
+
+This is alright.
+
+This one is also alright.
+
+=for Test::MixedScripts Latin,Cyrillic,Common
+
+This оne is allowed.
+
+=for Test::MixedScripts default
+
+This is back to normal?
+
+=for Test::MixedScripts Latin,Armenian,Common
+
+But this line is not ցood.
+
+=end

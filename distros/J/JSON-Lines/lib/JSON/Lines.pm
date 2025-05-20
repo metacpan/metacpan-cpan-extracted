@@ -1,5 +1,5 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.05';
+use 5.006; use strict; use warnings; our $VERSION = '1.08';
 use JSON; use base 'Import::Export';
 
 our ($JSON, $LINES, %EX);
@@ -110,6 +110,7 @@ sub get_line {
 	my ($self, $fh) = @_;
 	my $line = '';
 	$line .= <$fh> while ($line !~ m/^$LINES/ && !eof($fh));
+	return undef if $line eq '' && eof($fh);
 	return $self->_decode_line($line);
 }
 
@@ -134,7 +135,11 @@ sub _parse_headers {
 		if (ref $data[0] eq 'ARRAY') {
 			@headers = @{ shift @data };
 		} else {
-			@headers = sort keys %{ $data[0] };
+			my %key_map;
+			for (@data) {
+				%key_map = (%key_map, %{$_});
+			}
+			@headers = sort keys %key_map;
 		}
 		$self->{headers} = \@headers;
 	}
@@ -184,7 +189,7 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.05
+Version 1.08
 
 =cut
 
@@ -392,7 +397,7 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 

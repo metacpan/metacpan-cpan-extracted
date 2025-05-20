@@ -47,7 +47,7 @@ FORK INFO
     not related to these changes should be reported directly to the
     Mojolicious issue tracker.
 
-    This release of Mojo::DOM58 is up to date with version 9.0 of
+    This release of Mojo::DOM58 is up to date with version 9.40 of
     Mojolicious.
 
 NODES AND ELEMENTS
@@ -77,7 +77,7 @@ NODES AND ELEMENTS
     While all node types are represented as Mojo::DOM58 objects, some
     methods like "attr" and "namespace" only apply to elements.
 
-CASE-SENSITIVITY
+HTML AND XML
 
     Mojo::DOM58 defaults to HTML semantics, that means all tags and
     attribute names are lowercased and selectors need to be lowercase as
@@ -375,6 +375,25 @@ SELECTORS
       progress. Also be aware that this feature is currently marked
       at-risk, so there is a high chance that it will get removed
       completely.
+
+    E:text(string_or_regex)
+
+      An E element containing text content that substring matches
+      string_or_regex case-insensitively or that regex matches
+      string_or_regex. For regular expressions use the format :text(/.../).
+      Note that this selector is EXPERIMENTAL and might change without
+      warning!
+
+        # Substring match
+        my $login = $dom->find(':text(Log in)');
+      
+        # Regex match
+        my $login = $dom->find(':text(/Log ?in/)');
+      
+        # Regex match (case-insensitive)
+        my $login = $dom->find(':text(/(?i:Log ?in)/)');
+
+      This is a custom selector for Mojo::DOM58 and not part of any spec.
 
     A|E
 

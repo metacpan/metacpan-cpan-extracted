@@ -1,16 +1,16 @@
 [![Actions Status](https://github.com/takihito/Text-Textile2MarcdownStandalone/actions/workflows/test.yml/badge.svg)](https://github.com/takihito/Text-Textile2MarcdownStandalone/actions)
 # NAME
 
-Text::Textile2MarcdownStandalone - Standalone converter from Textile markup to Markdown
+Text::Textile2MarcdownStandalone - (DEPRECATED) use Text::Textile2MarkdownStandalone instead!-
 
 # DEPRECATION
 
-This module is \*\*DEPRECATED\*\* and was uploaded by mistake.
-Please use \*\*Text-Textile2MarkdownStandalone\*\* instead.
+This module is **DEPRECATED** and was uploaded by mistake.
+Please use Text-Textile2MarkdownStandalone instead.
 
 # VERSION
 
-version 0.04
+version 0.05
 
 # SYNOPSIS
 

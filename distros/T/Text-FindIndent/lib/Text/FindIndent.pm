@@ -7,7 +7,7 @@ use strict;
 
 use vars qw{$VERSION};
 BEGIN {
-  $VERSION = '0.11';
+  $VERSION = '0.12';
 }
 
 use constant MAX_LINES => 500;
@@ -679,6 +679,10 @@ For other issues, contact the author.
 Steffen Mueller E<lt>smueller@cpan.orgE<gt>
 
 Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 REPOSITORY
+
+L<https://github.com/tsee/p5-Text-FindIndent>
 
 =head1 COPYRIGHT
 

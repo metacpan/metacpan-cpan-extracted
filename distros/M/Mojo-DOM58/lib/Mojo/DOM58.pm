@@ -17,7 +17,7 @@ use Mojo::DOM58::_HTML 'tag_to_html';
 use Scalar::Util qw(blessed weaken);
 use Storable 'dclone';
 
-our $VERSION = '3.001';
+our $VERSION = '3.002';
 
 our @EXPORT_OK = 'tag_to_html';
 
@@ -431,7 +431,7 @@ closely compatible with upstream. It differs only in the standalone format and
 compatibility with Perl 5.8. Any bugs or patches not related to these changes
 should be reported directly to the L<Mojolicious> issue tracker.
 
-This release of L<Mojo::DOM58> is up to date with version C<9.0> of
+This release of L<Mojo::DOM58> is up to date with version C<9.40> of
 L<Mojolicious>.
 
 =head1 NODES AND ELEMENTS
@@ -460,7 +460,7 @@ the type C<tag>.
 While all node types are represented as L<Mojo::DOM58> objects, some methods like
 L</"attr"> and L</"namespace"> only apply to elements.
 
-=head1 CASE-SENSITIVITY
+=head1 HTML AND XML
 
 L<Mojo::DOM58> defaults to HTML semantics, that means all tags and attribute
 names are lowercased and selectors need to be lowercase as well.
@@ -751,6 +751,23 @@ match an element. Note that this selector is B<EXPERIMENTAL> and might change wi
 This selector is part of L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
 Also be aware that this feature is currently marked C<at-risk>, so there is a high chance that it will get removed
 completely.
+
+=item E:text(string_or_regex)
+
+An C<E> element containing text content that substring matches C<string_or_regex> case-insensitively or that regex
+matches C<string_or_regex>. For regular expressions use the format C<:text(/.../)>. Note that this selector is
+B<EXPERIMENTAL> and might change without warning!
+
+  # Substring match
+  my $login = $dom->find(':text(Log in)');
+
+  # Regex match
+  my $login = $dom->find(':text(/Log ?in/)');
+
+  # Regex match (case-insensitive)
+  my $login = $dom->find(':text(/(?i:Log ?in)/)');
+
+This is a custom selector for L<Mojo::DOM58> and not part of any spec.
 
 =item A|E
 

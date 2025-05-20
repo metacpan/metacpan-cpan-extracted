@@ -3,26 +3,21 @@ abstract: 'Heuristically determine the indent style'
 author:
   - 'Steffen Mueller <smueller@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '6.36'
-  Test::More: '0.80'
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.36'
-distribution_type: module
-dynamic_config: 0
-generated_by: 'Module::Install version 1.16'
-license: perl
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
-module_name: Text::FindIndent
 name: Text-FindIndent
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  perl: '5.00503'
-resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/tsee/p5-Text-FindIndent
-version: '0.11'
+  Test::More: '0.80'
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,26 +18,30 @@ add_config_role __PACKAGE__.'::Config';
 my $_build_locale = sub {
    my $self   = shift;
    my $conf   = $self->_config;
-   my $locale = $self->query_params->( 'locale', { optional => TRUE } );
+   my $locale = $self->query_params->('locale', { optional => TRUE });
 
-   $locale and is_member $locale, $conf->locales and return $locale;
+   return $locale if $locale and is_member $locale, $conf->locales;
 
-   my $lang; $locale and $lang = extract_lang( $locale )
-      and $lang ne $locale and is_member $lang, $conf->locales and return $lang;
+   my $lang;
 
-   for my $locale (@{ $self->locales }) {
-      is_member $locale, $conf->locales and return $locale;
+   if ($locale and $lang = extract_lang($locale)) {
+      return $lang if $lang ne $locale and is_member $lang, $conf->locales;
    }
 
-   for my $lang (map { extract_lang $_ } @{ $self->locales }) {
-      is_member $lang, $conf->locales and return $lang;
+   for my $locale (@{$self->locales}) {
+      return $locale if is_member $locale, $conf->locales;
+   }
+
+   for my $lang (map { extract_lang $_ } @{$self->locales}) {
+      return $lang if is_member $lang, $conf->locales;
    }
 
    return $conf->locale;
 };
 
 my $_build_locales = sub {
-   my $self = shift; my $lang = $self->_env->{ 'HTTP_ACCEPT_LANGUAGE' } // NUL;
+   my $self = shift;
+   my $lang = $self->_env->{ 'HTTP_ACCEPT_LANGUAGE' } // NUL;
 
    return [ map    { s{ _ \z }{}mx; $_ }
             map    { join '_', $_->[ 0 ], uc( $_->[ 1 ] // NUL ) }
@@ -55,7 +59,7 @@ my $_build_localiser = sub {
       my $text = $key;
 
       if (defined $args->{params} and ref $args->{params} eq 'ARRAY') {
-         0 > index $text, '[_' and return $text;
+         return $text if 0 > index $text, '[_';
 
          # Expand positional parameters of the form [_<n>]
          return inflate_placeholders
@@ -63,10 +67,11 @@ my $_build_localiser = sub {
             @{ $args->{params} };
       }
 
-      0 > index $text, '{' and return $text;
+      return $text if 0 > index $text, '{';
 
       # Expand named parameters of the form {param_name}
-      my %args = %{ $args }; my $re = join '|', map { quotemeta $_ } keys %args;
+      my %args = %{ $args };
+      my $re   = join '|', map { quotemeta $_ } keys %args;
 
       $text =~ s{ \{($re)\} }{ defined $args{$1} ? $args{$1} : "{${1}?}" }egmx;
 
@@ -92,49 +97,53 @@ has 'locales'       => is => 'lazy', isa => ArrayRef[NonEmptySimpleStr],
 has 'localiser'     => is => 'lazy', isa => CodeRef,
    builder          => $_build_localiser;
 
-# Private methods
 my $_domains;
-
-my $_get_domains = sub {
-   my $self    = shift;
-   my $domains = [ @{ $self->_config->l10n_attributes->{domains} // [] } ];
-   my $domain  = $self->domain or return $domains;
-   my $prefix  = $self->domain_prefix;
-
-   $prefix and $domain = "${prefix}-${domain}"; push @{ $domains }, $domain;
-
-   return $domains;
-};
-
-my $_localise_args = sub {
-   my $self = shift;
-   my $args =             ($_[ 0 ] && ref $_[ 0 ] eq 'HASH' ) ? { %{ $_[ 0 ] } }
-            : { params => ($_[ 0 ] && ref $_[ 0 ] eq 'ARRAY') ? $_[ 0 ]
-                                                              : [ @_ ] };
-
-   not exists $args->{domains}
-          and $args->{domains} = $_domains //= $_get_domains->( $self );
-
-   $args->{no_quote_bind_values} //= not $self->_config->quote_bind_values;
-
-   return $args;
-};
 
 # Public methods
 sub loc {
-   my ($self, $key, @args) = @_; my $args = $_localise_args->( $self, @args );
+   my ($self, $key, @args) = @_;
+
+   my $args = $self->_localise_args(@args);
 
    $args->{locale} //= $self->locale;
 
-   return $self->localiser->( $key, $args );
+   return $self->localiser->($key, $args);
 }
 
 sub loc_default {
-   my ($self, $key, @args) = @_; my $args = $_localise_args->( $self, @args );
+   my ($self, $key, @args) = @_;
+
+   my $args = $self->_localise_args(@args);
 
    $args->{locale} = $self->_config->locale;
 
-   return $self->localiser->( $key, $args );
+   return $self->localiser->($key, $args);
+}
+
+# Private methods
+sub _get_domains {
+   my $self    = shift;
+   my $domains = [ @{$self->_config->l10n_attributes->{domains} // []} ];
+   my $domain  = $self->domain or return $domains;
+   my $prefix  = $self->domain_prefix;
+
+   $domain = "${prefix}-${domain}" if $prefix;
+   push @{$domains}, $domain;
+
+   return $domains;
+}
+
+sub _localise_args {
+   my $self = shift;
+   my $args =             ($_[0] && ref $_[0] eq 'HASH' ) ? { %{ $_[0] } }
+            : { params => ($_[0] && ref $_[0] eq 'ARRAY') ? $_[0] : [@_] };
+
+   $args->{domains} = $_domains //= $self->_get_domains
+      unless exists $args->{domains};
+
+   $args->{no_quote_bind_values} //= !$self->_config->quote_bind_values;
+
+   return $args;
 }
 
 package Web::ComposableRequest::Role::L10N::Config;

@@ -322,7 +322,7 @@ select_kth(sample, kth)
 
 
 void
-median_simple_confidence_limits(sample, confidence...)
+median_simple_confidence_limits(sample, confidence, ...)
     AV* sample
     double confidence
   PREINIT:

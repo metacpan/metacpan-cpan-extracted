@@ -21,19 +21,21 @@ use Moo;
 
 # Attribute constructors
 my $_build_body = sub {
-   my $self = shift; my $content = $self->_content; my $len = length $content;
+   my $self    = shift;
+   my $content = $self->_content;
+   my $len     = length $content;
+   my $body    = HTTP::Body->new($self->content_type, $len);
 
-   my $body = HTTP::Body->new( $self->content_type, $len );
+   $body->cleanup(TRUE);
+   $body->tmpdir($self->_config->tempdir);
 
-   $body->cleanup( TRUE ); $body->tmpdir( $self->_config->tempdir );
+   return $body unless $len;
 
-   $len or return $body;
-
-   try   { $self->_decode_body( $body, $content ) }
+   try   { $self->_decode_body($body, $content) }
    catch {
       # uncoverable subroutine
       # uncoverable statement
-      $self->_log->( { level => 'error', message => $_ } );
+      $self->_log->({ level => 'error', message => $_ });
    };
 
    return $body;
@@ -150,9 +152,11 @@ has '_params'  => is => 'ro',   isa => HashRef,
 
 # Construction
 sub BUILD {
-   my $self = shift; my $enc = $self->_config->encoding;
+   my $self = shift;
+   my $enc  = $self->_config->encoding;
 
-   decode_array $enc, $self->_args; decode_hash $enc, $self->_params;
+   decode_array $enc, $self->_args;
+   decode_hash  $enc, $self->_params;
 
    return;
 }
@@ -258,7 +262,8 @@ my $_get_scrubbed_param = sub {
 sub _decode_body {
    my ($self, $body, $content) = @_;
 
-   $body->add( $content ); decode_hash $self->_config->encoding, $body->param;
+   $body->add( $content );
+   decode_hash $self->_config->encoding, $body->param;
 
    return;
 }
@@ -267,12 +272,15 @@ sub _decode_body {
 sub body_params {
    my $self = shift; weaken( $self );
 
-   my $params = $self->body->param; weaken( $params );
+   my $params = $self->body->param;
+
+   weaken($params) if ref $params;
 
    return sub {
-      return $_get_scrubbed_param->
-         ( $self, $params, (defined $_[ 0 ] && !is_hashref $_[ 0 ])
-           ? @_ : (-1, { %{ $_[ 0 ] // {} }, hashref => TRUE }) );
+      return $_get_scrubbed_param->(
+         $self, $params, (defined $_[0] && !is_hashref $_[0])
+            ? @_ : (-1, { hashref => TRUE, %{ $_[0] // {} } })
+      );
    };
 }
 
@@ -282,34 +290,48 @@ sub query_params {
    my $params = $self->_params; weaken( $params );
 
    return sub {
-      return $_get_scrubbed_param->
-         ( $self, $params, (defined $_[ 0 ] && !is_hashref $_[ 0 ])
-           ? @_ : (-1, { %{ $_[ 0 ] // {} }, hashref => TRUE }) );
+      return $_get_scrubbed_param->(
+         $self, $params, (defined $_[0] && !is_hashref $_[0])
+            ? @_ : (-1, { hashref => TRUE, %{ $_[0] // {} } })
+      );
    };
 }
 
 sub uri_for {
    my ($self, $path, @args) = @_; $path //= NUL;
 
-   my $base = $self->_base; my @query_params = (); my $uri_params = [];
+   my $base = $self->_base;
+   my @query_params = ();
+   my $uri_params = [];
 
-   if (is_arrayref $args[ 0 ]) {
-      $uri_params = shift @args; @query_params = @args;
+   if (is_arrayref $args[0]) {
+      $uri_params = shift @args;
+      @query_params = @args;
    }
-   elsif (is_hashref $args[ 0 ]) {
-      $uri_params   =    $args[ 0 ]->{uri_params  } // [];
-      @query_params = @{ $args[ 0 ]->{query_params} // [] };
-      $args[ 0 ]->{base} and $base = $args[ 0 ]->{base};
+   elsif (is_hashref $args[0]) {
+      $uri_params   =    $args[0]->{uri_params  } // [];
+      @query_params = @{ $args[0]->{query_params} // [] };
+
+      $base = $args[0]->{base} if $args[0]->{base};
    }
 
-   first_char $path ne '/' and $path = $base.$path;
+   $path = $base.$path if first_char $path ne '/';
 
-   $uri_params->[ 0 ] and $path = join '/', $path,
-      grep { defined and length } @{ $uri_params };
+   if ($uri_params->[0]) {
+      if ($path =~ m{ \* }mx) {
+         for my $arg (grep { defined and length } @{$uri_params}) {
+            if ($path =~ m{ \* }mx) { $path =~ s{ \* }{$arg}mx }
+            else { $path = "${path}/${arg}" }
+         }
+      }
+      else {
+         $path = join '/', $path, grep { defined and length } @{$uri_params};
+      }
+   }
 
    my $uri = new_uri $self->scheme, $path;
 
-   $query_params[ 0 ] and $uri->query_form( @query_params );
+   $uri->query_form(@query_params) if $query_params[0];
 
    return $uri;
 }

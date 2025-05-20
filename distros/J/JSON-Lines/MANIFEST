@@ -3,6 +3,8 @@ ignore.txt
 lib/JSON/Lines.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-encode.t
@@ -12,9 +14,9 @@ t/04-jsonl.t
 t/05-pretty.t
 t/06-file.t
 t/07-parse_headers.t
+t/08-jwrightecs.t
+t/09-get_line.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

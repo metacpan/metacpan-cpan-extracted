@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 sub new {
     my ($class, %opt) = @_;
@@ -379,16 +379,16 @@ __END__
 
 =head1 NAME
 
-Text::Textile2MarcdownStandalone - Standalone converter from Textile markup to Markdown
+Text::Textile2MarcdownStandalone - (DEPRECATED) use Text::Textile2MarkdownStandalone instead!-
 
 =head1 DEPRECATION
 
-This module is **DEPRECATED** and was uploaded by mistake.
-Please use **Text-Textile2MarkdownStandalone** instead.
+This module is B<DEPRECATED> and was uploaded by mistake.
+Please use Text-Textile2MarkdownStandalone instead.
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

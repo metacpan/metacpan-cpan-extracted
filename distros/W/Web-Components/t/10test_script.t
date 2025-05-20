@@ -150,7 +150,7 @@ is $server->to_psgi_app->($env)->[2]->[0], 'TableObject', 'Routes to method';
 $env->{PATH_INFO} = '/other';
 is $server->to_psgi_app->($env)->[2]->[0], 43, 'Other route to method';
 
-use Web::Components::Util qw( deref exception is_arrayref
+use Web::Components::Util qw( build_routes deref exception is_arrayref
                               load_components ns_environment throw );
 
 eval { throw 'Error' };
@@ -166,6 +166,11 @@ is deref( $server, 'foo', 'bar' ), 'bar', 'Deref object with default';
 is deref( $server, 'foo', '' ), '', 'Deref object with false default';
 is ns_environment( 'Test::App', 'foo', 'bar' ), 'bar', 'Set ns_environment';
 is ns_environment( 'Test::App', 'foo' ), 'bar', 'Get ns_environment';
+
+my @routes = build_routes 'ws_matching_string' => 'action_path';
+
+is $routes[0], 'ws_matching_string', 'Expected route key';
+is $routes[1]->()->[0], 'action_path', 'Expected route value';
 
 my $model = $server->models->{dummy};
 

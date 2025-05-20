@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Fast GPS Geodesic functions, port of mapbox/cheap-ruler'
 author:
   - 'Andrew Murphy <aavm@cpan.org>'
 build_requires:
@@ -20,5 +20,5 @@ no_index:
     - inc
 requires:
   perl: '5.020000'
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

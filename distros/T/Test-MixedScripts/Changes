@@ -1,5 +1,16 @@
 Revision history for Test-MixedScripts:
 
+v0.3.0    2025-05-19 10:50:51+01:00 Europe/London
+  [Enhancements]
+  - Added POD directives to change the expected Unicode scripts for longer blocks of code.
+
+  - The tests will die if an unknown script is passed to the configuration.
+
+  [Documentation]
+  - Document failure messages.
+
+  - Fixed typos.
+
 v0.2.2    2025-05-18 17:46:13+01:00 Europe/London
   [Documentation]
   - Document a workaround for the POD issues.

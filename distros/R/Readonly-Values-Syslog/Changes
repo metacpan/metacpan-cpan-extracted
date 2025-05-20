@@ -1,4 +1,7 @@
 Revision history for Readonly-Values-Syslog - Syslog Constants
 
+0.02	Mon May 19 07:49:25 EDT 2025
+	Added err as a synonym of error
+
 0.01	Mon Mar 31 07:46:30 EDT 2025
 	First draft

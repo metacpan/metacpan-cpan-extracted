@@ -18,7 +18,13 @@ has_exception $class;
 
 has '+class' => default => $class;
 
-has 'rv'     => is => 'ro', isa => Int, default => 1;
+has 'rv' => is => 'ro', isa => Int, default => 1;
+
+has_exception 'BadCSRFToken' => parent => [$class],
+   error => 'CSRF verification failed: [_1]';
+
+has_exception 'UnknownMethod' => parents => [$class],
+   error   => 'Class [_1] has no method [_2]';
 
 1;
 

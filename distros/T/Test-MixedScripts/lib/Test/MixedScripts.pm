@@ -13,13 +13,14 @@ use Exporter 5.57 qw( import );
 use File::Find;
 use File::Spec;
 use IO            qw( File );
-use Unicode::UCD  qw( charscript );
+use List::Util    qw( first );
+use Unicode::UCD  qw( charscript charscripts );
 
 use Test2::API 1.302200 qw( context );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.3.0';
 
 
 sub file_scripts_ok {
@@ -62,12 +63,19 @@ sub _check_file_scripts {
 
     $fh->binmode(":utf8");
 
+    my $current = $default;
+
     while ( my $line = $fh->getline ) {
-        my $re = $default;
+        my $re = $current;
         # TODO custom comment prefix based on the file type
         if ( $line =~ s/\s*##\s+Test::MixedScripts\s+(\w+(?:,\w+)*).*$// ) {
             $re = _make_regex( split /,\s*/, $1 );
         }
+        elsif ( $line =~ /^=for\s+Test::MixedScripts\s+(\w+(?:,\w+)*)$/ ) {
+            $current = $1 eq "default" ? $default : _make_regex( split /,\s*/, $1 );
+            next;
+        }
+
         unless ( $line =~ $re ) {
             my $fail = _make_negative_regex(@scripts);
             $line =~ $fail;
@@ -81,6 +89,10 @@ sub _check_file_scripts {
 }
 
 sub _make_regex_set {
+    state $scripts = charscripts();
+    if ( my $err = first { !exists $scripts->{$_} } @_ ) {
+        croak "Unknown script ${err}";
+    }
     return join( "", map { sprintf( '\p{scx=%s}', $_ ) } @_ );
 }
 
@@ -185,11 +197,11 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.2.2
+version v0.3.0
 
 =head1 SYNOPSIS
 
-  use Test::MixedScripts qw( all_perl_files_scripts_ok file_scripts_ok );
+  use Test::MixedScripts v0.3.0 qw( all_perl_files_scripts_ok file_scripts_ok );
 
   all_perl_files_scripts_ok();
 
@@ -201,7 +213,7 @@ This is a module to test that Perl code and other text files do not have potenti
 combinations.
 
 For example, the text for the domain names "E<0x043e>nE<0x0435>.example.com" and "one.example.com" look indistinguishable in many fonts,
-but the first one has Cyrillic letters.  If your software interactied with a service on the second domain, then someone
+but the first one has Cyrillic letters.  If your software interacted with a service on the second domain, then someone
 can operate a service on the first domain and attempt to fool developers into using their domain instead.
 
 This might be through a malicious patch submission, or even text from an email or web page that they have convinced a
@@ -229,6 +241,33 @@ comment:
 
    "English bŭlgarski" ## Test::MixedScripts Latin,Cyrillic,Common
 
+You can also override the default scripts with a special POD directive, which will change the scripts for all lines
+(code or POD) that follow:
+
+    =for Test::MixedScripts Latin,Cyrillic,Common
+
+You can reset to the default scripts using:
+
+    =for Test::MixedScripts default
+
+You can escape the individual characters in strings and regular expressions using hex codes, for example,
+
+   say qq{The Cyryllic "\x{043e}" looks like an "o".};
+
+and in POD using the C<E> formatting code. For example,
+
+    =pod
+
+    The Cyryllic "E<0x043e>" looks like an "o".
+
+    =cut
+
+See L<perlpod> for more information.
+
+When tests fail, the diagnostic message will indicate the unexpected script and where the character was in the file:
+
+    Unexpected Cyrillic character on line 286 character 45 in lib/Foo/Bar.pm
+
 =head2 all_perl_files_scripts_ok
 
   all_perl_files_scripts_ok();
@@ -239,10 +278,10 @@ This applies L</file_scripts_ok> to all of the Perl scripts in C<@dirs>, or the 
 
 =head1 KNOWN ISSUES
 
-The current version does not support specifying exceptions to specific lines of POD.
-
-The only workaround for this is to escape the individual characters using the C<E> formatting code. See L<perlpod>
-for more information. See L<perlpod> for more details.
+Some scripts were added to later versions of Unicode, and supported by later versions of Perl.  This means that you
+cannot run tests for some scripts on older versions of Perl.
+See L<Unicode Supported Scripts|https://www.unicode.org/standard/supported.html> for a list of scripts supported
+by Unicode versions.
 
 =head1 SEE ALSO
 

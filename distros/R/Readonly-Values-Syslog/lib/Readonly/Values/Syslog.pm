@@ -13,11 +13,28 @@ Readonly::Values::Syslog - Syslog Constants
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+=head1 SYNOPSIS
+
+    use Readonly::Values::Syslog;
+
+    # Example usage in logging
+    sub log_message {
+        my ($level, $message) = @_;
+
+        if (exists($syslog_values{$level})) {
+            print "[$level] $message\n";
+        } else {
+            print "[UNKNOWN] $message\n";
+        }
+    }
+
+=cut
 
 Readonly::Enum our ($EMERGENCY, $ALERT, $CRITICAL, $ERROR, $WARNING, $NOTICE, $INFORMATIONAL, $DEBUG) => 0;
 Readonly::Hash our %syslog_values => (
@@ -25,11 +42,13 @@ Readonly::Hash our %syslog_values => (
 	'alert' => $ALERT,
 	'criticial' => $CRITICAL,
 	'error' => $ERROR,
+	'err' => $ERROR,
 	'warning' => $WARNING,
 	'warn' => $WARNING,
 	'notice' => $NOTICE,
 	'informational' => $INFORMATIONAL,
 	'info' => $INFORMATIONAL,
+	'trace' => $INFORMATIONAL,
 	'debug' => $DEBUG
 );
 

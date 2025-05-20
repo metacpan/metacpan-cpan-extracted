@@ -1,5 +1,9 @@
 Revision history for Perl extension Statistics::CaseResampling.
 
+0.16  Mon May 19 12:37:00 2025
+  - Fix XS bug that made the build break under modern (stricter)
+    ExtUtils::ParseXS. (Thanks Dave!)
+
 0.15  Tue May 14 18:38:00 2013
   - Do not override compiler optimization level in Makefile.PL (P Pisar)
 

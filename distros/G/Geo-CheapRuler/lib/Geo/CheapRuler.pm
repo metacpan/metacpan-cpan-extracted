@@ -1,3 +1,5 @@
+# ABSTRACT: Geo::CheapRuler Fast Geodesic (Lat,Lon) approximations for city scale / not near the poles. Port of mapbox/cheap-ruler.
+
 package Geo::CheapRuler;
 
 #
@@ -7,15 +9,15 @@ package Geo::CheapRuler;
 # $VERSION appears twice here, and once on GITHUB
 #
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 =head1 NAME 
 
-Geo::CheapRuler
+Geo::CheapRuler - Fast GPS Geodesic functions, port of mapbox/cheap-ruler
 
 =head1 VERSION
 
-v0.1.0
+v0.1.1
 
 =head1 SYNOPSIS
 
@@ -28,7 +30,7 @@ Very fast as they use just 1 trig function per call.
 
 =head1 MATHS MODEL
 
-The Maths model is based upon an approximation to Vicenty's formulae, which uses the Earth's actual shape, an oblate ellipsoid (squashed sphere). For 'city' scale work, it is still more accurate than
+The Maths model is based upon an approximation to Vincenty's formulae, which uses the Earth's actual shape, an oblate ellipsoid (squashed sphere). For 'city' scale work, it is still more accurate than
 the Haversine formulae (which uses several trig calls based upon a spherical Earth). For an explanation, see
 https://blog.mapbox.com/fast-geodesic-approximations-with-cheap-ruler-106f229ad016
 
@@ -94,7 +96,7 @@ use warnings;
 use v5.20; # min version for experimental signatures
 use experimental 'signatures';
 use Math::Trig;
-use Data::Dumper;
+#use Data::Dumper;
 
 our %FACTORS = (
     kilometers	=> 1,
@@ -249,6 +251,7 @@ Returns a new point given distance and bearing from the starting point.
 	returns $point [longitude, latitude]
 	
 Example
+
 	$point = ruler->destination([30.5, 50.5], 0.1, 90);
 
 =cut
@@ -721,6 +724,22 @@ sub wrap( $deg) {
 	}
 
 
+=head1 SEE ALSO
+
+GIS::Distance
+
+	https://metacpan.org/pod/GIS::Distance
+
+	Group of modules with XS versions which implement Haversine and Vincenty distance formulas
+
+	Consider for longer than 'city scale' distances, or near the Poles.
+
+GIS::Distance::Vincenty
+
+	The more accurate formulae which this module approximates. There is an XS version of it.
+
+	https://metacpan.org/pod/GIS::Distance::Vincenty
+
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -741,6 +760,10 @@ For the original, please see
 
 	https://github.com/mapbox/cheap-ruler
 
+For testing, see
+
+	https://github.com/aavmurphy/CheapRuler/blob/main/test/test.pl
+
 =head1 AUTHOR
 
 Andrew Murphy, C<< <aavm at perl.org> >>
@@ -759,9 +782,11 @@ This is free software, licensed under:
 
 This module is a direct port of mapbox/cheap-ruler
 
-=head1 GITHUB README
+=head1 DEVELOPER NOTES
 
 README.md is auto-generated from Perl POD
+
+The original's test were also ported. See the Github ./tests directory.
 
 =cut
 

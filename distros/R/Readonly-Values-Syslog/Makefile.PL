@@ -30,6 +30,7 @@ WriteMakefile(
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
+		'Test::Synopsis' => 0,
 	}, PREREQ_PM => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Readonly' => 0,

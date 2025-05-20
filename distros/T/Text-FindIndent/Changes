@@ -1,5 +1,9 @@
 Changes for Perl extension Text-FindIndent
 
+0.12
+    - Move from Module::Install to ExtUtils::MakeMaker to fix default lib
+      upstream perl issue.
+
 0.11
     - Remove warning on new Perl
     - Fix count of spaces when there were tabs and spaces at the start of string

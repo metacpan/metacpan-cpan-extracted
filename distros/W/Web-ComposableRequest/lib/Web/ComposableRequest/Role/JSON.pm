@@ -1,29 +1,43 @@
 package Web::ComposableRequest::Role::JSON;
 
-use namespace::autoclean;
-
 use Encode                            qw( decode );
 use JSON::MaybeXS                     qw( );
-use Web::ComposableRequest::Constants qw( FALSE );
+use Web::ComposableRequest::Constants qw( FALSE TRUE );
+use Web::ComposableRequest::Util      qw( add_config_role );
 use Unexpected::Types                 qw( Object );
 use Moo::Role;
 
 requires qw( content_type _config _decode_body );
 
+add_config_role __PACKAGE__.'::Config';
+
 has '_json' => is => 'lazy', isa => Object,
-   builder  => sub { JSON::MaybeXS->new( utf8 => FALSE ) };
+   builder  => sub { JSON::MaybeXS->new( allow_nonref => TRUE, utf8 => FALSE )};
 
 around '_decode_body' => sub {
    my ($orig, $self, $body, $content) = @_;
 
-   $self->content_type eq 'application/json'
-      or return $orig->( $self, $body, $content );
+   return $orig->($self, $body, $content)
+      unless $self->content_type eq 'application/json';
 
-   $body->{param} = $self->_json->decode
-      ( decode( $self->_config->encoding, $content ) );
+   $body->{$self->_config->json_body_attribute} = $self->_json->decode(
+      decode($self->_config->encoding, $content)
+   );
 
    return;
 };
+
+use namespace::autoclean;
+
+package Web::ComposableRequest::Role::JSON::Config;
+
+use Unexpected::Types qw( Str );
+use Moo::Role;
+
+# Public attributes
+has 'json_body_attribute' => is => 'ro', isa => Str, default => 'param';
+
+use namespace::autoclean;
 
 1;
 

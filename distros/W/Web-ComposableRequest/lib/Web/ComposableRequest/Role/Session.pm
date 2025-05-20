@@ -11,19 +11,36 @@ requires qw( loc loc_default query_params _config _env _log );
 
 add_config_role __PACKAGE__.'::Config';
 
-has 'session'   => is => 'lazy', isa => Object, builder => sub {
-   return $_[ 0 ]->session_class->new
-      ( config  => $_[ 0 ]->_config,
-        request => $_[ 0 ],
-        session => $_[ 0 ]->_env->{ 'psgix.session' }, ) },
-   clearer => TRUE, handles => [ 'authenticated', 'username' ];
+has 'session' =>
+   is      => 'lazy',
+   isa     => Object,
+   builder => sub {
+      my $self = shift;
 
-has 'session_class' => is => 'lazy', isa => LoadableClass, builder => sub {
-   my $conf = $_[ 0 ]->_config;
-   compose_class( $conf->session_class, $conf->session_attr, is => 'rw' ) };
+      return $self->session_class->new(
+         config  => $self->_config,
+         request => $self,
+         session => $self->_env->{'psgix.session'},
+      );
+   },
+   clearer => TRUE,
+   handles => [ 'authenticated', 'username' ];
+
+has 'session_class' =>
+   is      => 'lazy',
+   isa     => LoadableClass,
+   builder => sub {
+      my $self = shift;
+      my $conf = $self->_config;
+
+      return compose_class(
+         $conf->session_class, $conf->session_attr, is => 'rw'
+      );
+   };
 
 sub reset_session {
-   my $self = shift; my $psgix_sess = $self->_env->{ 'psgix.session' };
+   my $self       = shift;
+   my $psgix_sess = $self->_env->{ 'psgix.session' };
 
    delete $psgix_sess->{ $_ } for (keys %{ $psgix_sess });
 
@@ -35,24 +52,30 @@ package Web::ComposableRequest::Role::Session::Config;
 
 use namespace::autoclean;
 
-use Web::ComposableRequest::Constants qw( FALSE );
-use Unexpected::Types qw( ArrayRef CodeRef HashRef NonEmptySimpleStr
+use Web::ComposableRequest::Constants qw( FALSE TRUE );
+use Unexpected::Types qw( ArrayRef Bool CodeRef HashRef NonEmptySimpleStr
                           NonZeroPositiveInt PositiveInt );
 use Moo::Role;
 
+has 'delete_on_collect' => is => 'ro', isa => Bool, default => TRUE;
+
 has 'expire_session' => is => 'lazy', isa => CodeRef,
-   builder           => sub { sub {
-      [ 'User [_1] session expired', $_[ 0 ]->username ] } };
+   default => sub { sub { [ 'User [_1] session expired', $_[ 0 ]->username ] }};
 
-has 'max_messages'   => is => 'ro', isa => NonZeroPositiveInt, default => 3;
+has 'max_messages' => is => 'ro', isa => NonZeroPositiveInt,
+   default => 3;
 
-has 'max_sess_time'  => is => 'ro', isa => PositiveInt, default => 3_600;
+has 'max_sess_time' => is => 'ro', isa => PositiveInt,
+   default => 3_600;
 
-has 'session_attr'   => is => 'ro', isa => HashRef[ArrayRef],
-   builder           => sub { {} };
+has 'serialise_session_attr' => is => 'ro', isa => ArrayRef[NonEmptySimpleStr],
+   default => sub { [] };
 
-has 'session_class'  => is => 'ro', isa => NonEmptySimpleStr,
-   default           => 'Web::ComposableRequest::Session';
+has 'session_attr' => is => 'ro', isa => HashRef[ArrayRef],
+   default => sub { {} };
+
+has 'session_class' => is => 'ro', isa => NonEmptySimpleStr,
+   default => 'Web::ComposableRequest::Session';
 
 1;
 

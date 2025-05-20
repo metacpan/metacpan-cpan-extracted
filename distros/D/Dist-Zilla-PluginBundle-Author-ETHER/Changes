@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.167     2025-05-20 00:01:11Z
+          - fix woven pod for irc details when irc channel contains a hyphen
+
 0.166     2025-03-14 19:34:58Z
           - switched from [PodCoverageTests] to [Test::Pod::Coverage::TrustMe]
 

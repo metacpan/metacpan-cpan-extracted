@@ -1,5 +1,5 @@
 ---
-abstract: 'Standalone converter from Textile markup to Markdown'
+abstract: '(DEPRECATED) use Text::Textile2MarkdownStandalone instead!-'
 author:
   - 'Akihito Takeda <takeda.akihito@gmail.com>'
 build_requires:
@@ -26,14 +26,14 @@ no_index:
 provides:
   Text::Textile2MarcdownStandalone:
     file: lib/Text/Textile2MarcdownStandalone.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/takihito/Text-Textile2MarcdownStandalone/issues
   homepage: https://github.com/takihito/Text-Textile2MarcdownStandalone
   repository: https://github.com/takihito/Text-Textile2MarcdownStandalone.git
-version: '0.04'
+version: '0.05'
 x_contributors:
   - 'akihito <takeda-akihito@kayac.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

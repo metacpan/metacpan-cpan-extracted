@@ -30,28 +30,28 @@ no_index:
 provides:
   Web::Components:
     file: lib/Web/Components.pm
-    version: v0.12.6
+    version: v0.13.1
   Web::Components::ConfigLoader:
     file: lib/Web/Components/ConfigLoader.pm
-    version: v0.12.6
+    version: v0.13.1
   Web::Components::Loader:
     file: lib/Web/Components/Loader.pm
-    version: v0.12.6
+    version: v0.13.1
   Web::Components::Model:
     file: lib/Web/Components/Model.pm
-    version: v0.12.6
+    version: v0.13.1
   Web::Components::Navigation:
     file: lib/Web/Components/Navigation.pm
-    version: v0.12.6
+    version: v0.13.1
   Web::Components::ReverseMap:
     file: lib/Web/Components/ReverseMap.pm
-    version: v0.12.6
+    version: v0.13.1
   Web::Components::Role:
     file: lib/Web/Components/Role.pm
-    version: v0.12.6
+    version: v0.13.1
   Web::Components::Util:
     file: lib/Web/Components/Util.pm
-    version: v0.12.6
+    version: v0.13.1
 requires:
   Exporter::Tiny: '1.006000'
   File::DataClass: v0.73.1
@@ -65,7 +65,7 @@ requires:
   Try::Tiny: '0.31'
   Type::Tiny: '2.002001'
   Unexpected: v1.0.1
-  Web::ComposableRequest: v0.20.1
+  Web::ComposableRequest: v0.21.1
   Web::Simple: '0.033'
   namespace::autoclean: '0.29'
   perl: '5.010001'
@@ -75,7 +75,7 @@ resources:
   homepage: https://metacpan.org/author/PJFL
   license: http://dev.perl.org/licenses/
   repository: git://github.com/pjfl/p5-web-components.git
-version: 0.12.6
+version: 0.13.1
 x_Dist_Zilla:
   perl:
     version: '5.034000'

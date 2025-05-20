@@ -15,8 +15,9 @@ lib/Web/Components/ReverseMap.pm
 lib/Web/Components/Role.pm
 lib/Web/Components/Util.pm
 share/js/wcom-10-util.js
-share/js/wcom-11-modal.js
 share/js/wcom-15-navigation.js
+share/js/wcom-16-modal.js
+share/less/wcom-minimal.less
 t/00report-metadata.dd
 t/00report-metadata.t
 t/02pod.t

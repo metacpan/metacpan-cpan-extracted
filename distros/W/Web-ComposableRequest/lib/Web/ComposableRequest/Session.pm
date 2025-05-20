@@ -2,7 +2,7 @@ package Web::ComposableRequest::Session;
 
 use namespace::autoclean;
 
-use Web::ComposableRequest::Constants qw( EXCEPTION_CLASS FALSE NUL TRUE );
+use Web::ComposableRequest::Constants qw( COMMA EXCEPTION_CLASS FALSE NUL TRUE);
 use Web::ComposableRequest::Util      qw( bson64id is_arrayref throw );
 use Unexpected::Types                 qw( ArrayRef Bool HashRef
                                           NonEmptySimpleStr NonZeroPositiveInt
@@ -12,59 +12,57 @@ use Moo;
 # Public attributes
 has 'authenticated' => is => 'rw',  isa => Bool, default => FALSE;
 
-has 'messages'      => is => 'ro',  isa => HashRef[ArrayRef],
-   builder          => sub { {} };
+has 'messages' => is => 'ro', isa => HashRef[ArrayRef], builder => sub { {} };
 
-has 'updated'       => is => 'ro',  isa => NonZeroPositiveInt, required => TRUE;
+has 'updated' => is => 'ro', isa => NonZeroPositiveInt, required => TRUE;
 
-has 'username'      => is => 'rw',  isa => SimpleStr, default => NUL;
+has 'username' => is => 'rw', isa => SimpleStr, default => NUL;
 
 # Private attributes
-has '_config'       => is => 'ro',  isa => Object, init_arg => 'config',
-   required         => TRUE;
+has '_config' => is => 'ro', isa => Object, init_arg => 'config',
+   required => TRUE;
 
-has '_mid'          => is => 'rwp', isa => NonEmptySimpleStr | Undef;
+has '_mid' => is => 'rwp', isa => NonEmptySimpleStr | Undef;
 
-has '_request'      => is => 'ro',  isa => Object, init_arg => 'request',
-   required         => TRUE, weak_ref => TRUE;
+has '_request' => is => 'ro', isa => Object, init_arg => 'request',
+   required => TRUE, weak_ref => TRUE;
 
-has '_session'      => is => 'ro',  isa => HashRef, init_arg => 'session',
-   required         => TRUE;
-
-# Private functions
-my $_session_attr = sub {
-   my $conf = shift; my @public = qw( authenticated messages updated username );
-
-   return keys %{ $conf->session_attr }, @public;
-};
+has '_session' => is => 'ro', isa => HashRef, init_arg => 'session',
+   required => TRUE;
 
 # Construction
 around 'BUILDARGS' => sub {
-   my ($orig, $self, @args) = @_; my $attr = $orig->( $self, @args );
+   my ($orig, $self, @args) = @_;
 
-   for my $k ($_session_attr->( $attr->{config} )) {
-       my $v = $attr->{session}->{ $k }; defined $v and $attr->{ $k } = $v;
+   my $attr = $orig->($self, @args);
+
+   for my $k (_session_attr($attr->{config})) {
+      my $v = $attr->{session}->{$k};
+
+      $attr->{$k} = $v if defined $v;
    }
 
    $attr->{updated} //= time;
-
    return $attr;
 };
 
 sub BUILD {
-   my $self = shift; my $conf = $self->_config;
-
+   my $self     = shift;
+   my $conf     = $self->_config;
    my $max_time = $conf->max_sess_time;
 
    if ($self->authenticated and $max_time
        and time > $self->updated + $max_time) {
       my $req = $self->_request;
-      my $msg = $conf->expire_session->( $self, $req );
+      my $msg = $conf->expire_session->($self, $req);
 
-      $self->authenticated( FALSE );
-      $self->_set__mid( $self->add_status_message( $msg ) );
-      $req->_log->( { level => 'debug',
-                      message => $req->loc_default( @{ $msg } ) } );
+      $self->authenticated(FALSE);
+      $self->_set__mid($self->add_status_message($msg));
+      $req->_log->({
+         level   => 'debug',
+         message => $req->loc_default(@{$msg}),
+         name    => 'Session.build'
+      });
    }
 
    return;
@@ -74,7 +72,7 @@ sub BUILD {
 sub add_status_message {
    my ($self, $msg) = @_;
 
-   is_arrayref $msg or throw 'Parameter [_1] not an array reference', [ $msg ];
+   is_arrayref $msg or throw 'Parameter [_1] not an array reference', [$msg];
 
    $self->messages->{ my $mid = bson64id } = $msg;
 
@@ -84,46 +82,65 @@ sub add_status_message {
 sub collect_message_id {
    my ($self, $req) = @_;
 
-   return $self->_mid && exists $self->messages->{ $self->_mid }
-        ? $self->_mid : $req->query_params->( 'mid', { optional => TRUE } );
+   return $self->_mid && exists $self->messages->{$self->_mid}
+        ? $self->_mid : $req->query_params->('mid', { optional => TRUE });
 }
 
 sub collect_status_message {
-   my ($self, $req) = @_; my ($mid, $msg);
+   my ($self, $req) = @_;
 
-   $mid = $self->_mid
-      and $msg = delete $self->messages->{ $mid }
-      and return $req->loc( @{ $msg } );
+   for my $mid ($self->_mid, $req->query_params->('mid', { optional => TRUE })){
+      next unless $mid;
 
-   $mid = $req->query_params->( 'mid', { optional => TRUE } )
-      and $msg = delete $self->messages->{ $mid }
-      and return $req->loc( @{ $msg } );
+      my $msg = $self->messages->{$mid} or next;
+
+      delete $self->messages->{$mid} if $self->_config->delete_on_collect;
+      return $req->loc(@{$msg});
+   }
 
    return;
 }
 
 sub collect_status_messages {
-   my ($self, $req) = @_; my @messages = ();
+   my ($self, $req) = @_;
 
-   my $mid = $req->query_params->( 'mid', { optional => TRUE } )
+   my @messages = ();
+   my $mid = $req->query_params->('mid', { optional => TRUE })
       or return \@messages;
 
-   my @keys = reverse sort keys %{ $self->messages };
+   my @keys = reverse sort keys %{$self->messages};
 
    while (my $key = shift @keys) {
-      $key gt $mid and next; my $msg = delete $self->messages->{ $key };
+      next if $key gt $mid;
 
-      push @messages, $req->loc( @{ $msg } );
+      my $msg = $self->messages->{$key} or next;
+
+      delete $self->messages->{$key} if $self->_config->delete_on_collect;
+      push @messages, $req->loc(@{$msg});
    }
 
    return \@messages;
 }
 
+sub serialise {
+   my $self   = shift;
+   my $string = NUL;
+
+   for my $attr (@{$self->_config->serialise_session_attr}) {
+      $string .= COMMA . "${attr}:" . $self->$attr;
+   }
+
+   return $string;
+}
+
 sub trim_message_queue {
-   my $self = shift; my @queue = sort keys %{ $self->messages };
+   my $self  = shift;
+   my @queue = sort keys %{$self->messages};
 
    while (@queue > $self->_config->max_messages) {
-      my $mid = shift @queue; delete $self->messages->{ $mid };
+      my $mid = shift @queue;
+
+      delete $self->messages->{$mid};
    }
 
    return;
@@ -132,8 +149,8 @@ sub trim_message_queue {
 sub update {
    my $self = shift;
 
-   for my $k ($_session_attr->( $self->_config )) {
-      $self->_session->{ $k } = $self->$k();
+   for my $k (_session_attr($self->_config)) {
+      $self->_session->{$k} = $self->$k();
    }
 
    $self->_session->{updated} = time;
@@ -143,6 +160,14 @@ sub update {
 before 'update' => sub {
    my $self = shift; $self->trim_message_queue; return;
 };
+
+# Private functions
+sub _session_attr {
+   my $conf   = shift;
+   my @public = qw( authenticated messages updated username );
+
+   return keys %{$conf->session_attr}, @public;
+}
 
 1;
 

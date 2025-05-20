@@ -1,6 +1,8 @@
 // -*- coding: utf-8; -*-
 // Package WCom.Modal
 WCom.Modal = (function() {
+   const eventUtil = WCom.Util.Event;
+   const navManager = WCom.Navigation.manager;
    const keyCodes = { enter: 13, escape: 27 };
    const modalList = (() => {
       let modals = [];
@@ -17,32 +19,33 @@ WCom.Modal = (function() {
       }
    })();
    class Backdrop {
-      constructor(options) {
-         this.popupBackground = null;
-         this.popupContainer = null;
-         if (options) this.zIndex = opts.zIndex || null;
-      }
-      add(el) {
+      constructor(options = {}) {
+         const noMask = options.noMask || false;
+         const zIndex = options.zIndex || null;
          this.popupContainer = this.h.div({
-            className: 'modal-container out'
-         }, el);
+            id: 'modal-container', className: 'modal-container out'
+         });
          this.popupBackground = this.h.div({
             className: 'modal-outer-wrapper',
-            style: this.zIndex ? `z-index: ${this.zIndex}` : ''
+            id: 'modal-outer-wrapper',
+            style: zIndex ? `z-index: ${zIndex}` : ''
          }, this.popupContainer);
+         if (noMask) this.popupBackground.classList.remove('mask');
+         else this.popupBackground.classList.add('mask');
+      }
+      add(el) {
+         this.popupContainer.appendChild(el);
          document.body.appendChild(this.popupBackground);
-         setTimeout(() => {
-            this.popupContainer.classList.add('in');
-            this.popupContainer.classList.remove('out');
-         }, 50);
+         this.popupContainer.classList.add('in');
+         this.popupContainer.classList.remove('out');
       }
       remove(el) {
          if (!el) return;
-         const popupParent = this.popupBackground.parentNode;
-         if (popupParent) popupParent.removeChild(this.popupBackground);
          const elParent = el.parentNode;
          elParent.classList.add('out');
          elParent.classList.remove('in');
+         const popupParent = this.popupBackground.parentNode;
+         if (popupParent) popupParent.removeChild(this.popupBackground);
       }
    }
    Object.assign(Backdrop.prototype, WCom.Util.Markup);
@@ -196,6 +199,7 @@ WCom.Modal = (function() {
             hoverCallback: options.hoverCallback,
             hoverClass: options.hoverClass,
             moveCallback: options.moveCallback,
+            positionAbsolute: options.positionAbsolute || false,
             viewportHeight: this.h.getDimensions(window).height
          };
          const { drag, scrollWrapper } = this;
@@ -224,7 +228,7 @@ WCom.Modal = (function() {
          document.removeEventListener('mousemove', this.dragHandler);
          this.clearScrollInterval();
          const { drag } = this;
-         if (drag.dragNode) {
+         if (drag.dragNode && !drag.positionAbsolute) {
             drag.dragNode.style.left = null;
             drag.dragNode.style.position = null;
             drag.dragNode.style.top = null;
@@ -274,18 +278,23 @@ WCom.Modal = (function() {
    }
    Object.assign(Drag.prototype, WCom.Util.Markup);
    class Modal {
-      constructor(title, content, buttons, setup) {
-         this.buttonClass = setup.buttonClass;
+      constructor(title, content, buttons, options) {
+         this.backdropAttr = options.backdrop || {};
+         this.buttonClass = options.buttonClass;
          this.buttons = buttons;
-         this.classList = setup.classList;
-         this.closeCallback = setup.closeCallback;
+         this.classList = options.classList;
+         this.closeCallback = options.closeCallback;
          this.content = content;
-         this.dragScrollWrapper = setup.dragScrollWrapper || '.standard';
-         this.icons = setup.icons;
+         this.dragScrollWrapper = options.dragScrollWrapper || '.standard';
+         this.dropCallback = options.dropCallback;
+         this.icons = options.icons;
+         this.id = options.id || 'modal';
          this.ident = this.guid();
          this.open = true;
-         this.resizeElement = setup.resizeElement;
+         this.positionAbsolute = options.positionAbsolute || false;
+         this.resizeElement = options.resizeElement;
          this.title = title;
+         this.unloadIndex = options.unloadIndex;
          modalList.add(this.ident);
          this.keyHandler = this.keyHandler.bind(this);
          window.addEventListener('keydown', this.keyHandler);
@@ -301,6 +310,7 @@ WCom.Modal = (function() {
          this.backdrop.remove(this.el);
          this.backdrop = null;
          if (this.closeCallback) this.closeCallback();
+         if (this.unloadIndex) eventUtil.unregisterOnunload(this.unloadIndex);
       }
       keyHandler(event) {
          const { keyCode } = event;
@@ -309,9 +319,13 @@ WCom.Modal = (function() {
          if (btn) this.buttonHandler(btn);
          else if (keyCode === keyCodes['escape']) this.close();
       }
+      position() {
+         return this.el.getBoundingClientRect();
+      }
       render() {
          const classes = this.classList || '';
-         this.el = this.h.div({ className: 'modal ' + classes });
+         const modalAttr = { className: 'modal ' + classes, id: this.id };
+         this.el = this.h.div(modalAttr);
          this.modalHeader = this.h.div({
             className: 'modal-header', onmousedown: this._clickHandler(this.el)
          }, [
@@ -320,14 +334,18 @@ WCom.Modal = (function() {
          ]);
          this.modalHeader.setAttribute('draggable', 'draggable');
          this.el.appendChild(this.modalHeader);
-         this.content = this.h.div(
-            { className: 'modal-content-wrapper' },
-            this.h.div({ className: 'modal-content' }, this.content)
-         );
-         this.el.appendChild(this.content);
+         const contentWrapper = this.h.div({
+            className: 'modal-content-wrapper'
+         }, this.h.div({ className: 'modal-content' }, this.content));
+         this.el.appendChild(contentWrapper);
          if (this.buttons.length) this._renderButtons(this.el);
-         this.backdrop = new Backdrop();
+         this.backdrop = new Backdrop(this.backdropAttr);
          this.backdrop.add(this.el);
+         if (this.positionAbsolute && this.positionAbsolute.x) {
+            this.el.style.position = 'absolute';
+            this.el.style.left = this.positionAbsolute.x + 'px';
+            this.el.style.top = this.positionAbsolute.y + 'px';
+         }
       }
       _createCloseIcon() {
          const attr = {
@@ -352,11 +370,13 @@ WCom.Modal = (function() {
             const drag = new Drag({ scrollWrapper: this.dragScrollWrapper });
             drag.start(event, {
                dragNode: el,
-               dropTargets: [],
                dragNodeOffset: {
                   x: event.clientX - left,
                   y: (event.clientY + scrollTop) - top
-               }
+               },
+               dropCallback: this.dropCallback,
+               dropTargets: [],
+               positionAbsolute: this.positionAbsolute
             });
          }.bind(this);
       }
@@ -390,20 +410,31 @@ WCom.Modal = (function() {
    Object.assign(Modal.prototype, WCom.Util.Markup);
    Object.assign(Modal.prototype, WCom.Util.String);
    class ModalUtil {
-      constructor(args, onSubmit) {
+      constructor(args) {
          const {
+            callback = () => {},
+            cancelCallback,
             formClass = 'classic',
             icons = '/icons.svg',
             initValue,
+            labels = ['Cancel', 'OK'],
+            noButtons = false,
+            onload = function(c, o) { navManager.scan(c, o) },
             url,
+            validateForm,
             valueStore = {}
          } = args;
-         this.icons = icons;
-         this.url = url;
+         this.callback = callback;
+         this.cancelCallback = cancelCallback;
          this.formClass = formClass;
+         this.icons = icons;
          this.initValue = initValue;
+         this.labels = labels;
+         this.noButtons = noButtons;
+         this.onload = onload;
+         this.url = url;
+         this.validateForm = validateForm;
          this.valueStore = valueStore;
-         this.onSubmit = onSubmit;
       }
       createModalContainer() {
          const spinner = this._createSpinner();
@@ -413,18 +444,17 @@ WCom.Modal = (function() {
             id: 'selector-frame',
             style: 'visibility:hidden;'
          });
-         const container = this.h.div(
-            { className: 'modal-frame-container' }, [loader, this.frame]
-         );
+         const container = this.h.div({
+            className: 'modal-frame-container'
+         }, [loader, this.frame]);
          const options = {
             formClass: this.formClass,
-            onSubmit: this.onSubmit,
             renderLocation: function(href) {
                this._loadFrameContent(href);
             }.bind(this)
          };
          this.selector = new Selector(this.frame);
-         this.onload = function() {
+         const onload = function() {
             loader.style.display = 'none';
             const selector = this.selector;
             if (this.initValue)
@@ -435,24 +465,51 @@ WCom.Modal = (function() {
                   this.initValue = this.valueStore.value;
                }.bind(this));
             };
-            WCom.Navigation.manager.scan(this.frame, options);
+            if (this.onload) this.onload(this.frame, options);
             this.frame.style.visibility = 'visible';
          }.bind(this);
-         this._loadFrameContent(this.url);
+         this._loadFrameContent(this.url, onload);
          return container;
+      }
+      getButtons() {
+         if (this.noButtons) return [];
+         return [{
+            label: this.labels[0],
+            onclick: function(modalObj) {
+               try {
+                  this.callback(false, modalObj, this.getModalValue(false));
+               }
+               catch(e) {}
+               if (this.cancelCallback) return this.cancelCallback();
+               return true;
+            }.bind(this)
+         }, {
+            label: this.labels[1],
+            onclick: function(modalObj) {
+               const modalValue = this.getModalValue(true);
+               if (this.validateForm
+                   && !this.validateForm(modalObj, modalValue))
+                  return false;
+               return this.callback(true, modalObj, modalValue);
+            }.bind(this)
+         }];
       }
       getModalValue(success) {
          return this.selector.getModalValue(success);
       }
       _createSpinner(modifierClass = '') {
          const icon = this.h.icon({
-            name: 'spinner', className: 'loading-icon', icons: this.icons
+            name: 'spinner',
+            className: 'loading-icon',
+            icons: this.icons,
+            height: '40px',
+            width: '40px'
          });
          return this.h.span({
             className: `loading ${modifierClass}`
          }, this.h.span({ className: 'loading-spinner' }, icon));
       }
-      async _loadFrameContent(url) {
+      async _loadFrameContent(url, onload) {
          const opt = { headers: { prefer: 'render=partial' }, response: 'text'};
          const { location, text } = await this.bitch.sucks(url, opt);
          if (text && text.length > 0) {
@@ -464,7 +521,7 @@ WCom.Modal = (function() {
          else {
             console.warn('Neither content nor redirect in response to get');
          }
-         if (this.onload) this.onload();
+         if (onload) onload();
       }
    }
    Object.assign(ModalUtil.prototype, WCom.Util.Bitch);
@@ -651,45 +708,26 @@ WCom.Modal = (function() {
       }
    }
    const create = function(args) {
-      const {
-         buttonClass,
-         callback = () => {},
-         cancelCallback,
-         classList = false,
-         labels = ['Cancel', 'OK'],
-         noButtons = false,
-         title,
-         validateForm
-      } = args;
       let modal;
-      const onSubmit = function(event) { modal.close() };
-      const util = new ModalUtil(args, onSubmit);
+      const close = function(event) { if (modal) modal.close() };
+      const unloadIndex = eventUtil.registerOnunload(close);
+      const util = new ModalUtil(args);
       const container = util.createModalContainer();
-      let buttons = [];
-      if (!noButtons) {
-         buttons = [{
-            label: labels[0],
-            onclick(modalObj) {
-               try { callback(false, modalObj, util.getModalValue(false))}
-               catch(e) {}
-               if (cancelCallback) return cancelCallback();
-               return true;
-            }
-         }, {
-            label: labels[1],
-            onclick(modalObj) {
-               const modalValue = util.getModalValue(true);
-               if (validateForm && !validateForm(modalObj, modalValue))
-                  return false;
-               return callback(true, modalObj, modalValue);
-            }
-         }];
-      }
+      const buttons = util.getButtons();
       const options = {
-         buttonClass, classList, icons: util.icons, noInner: true
+         backdrop: args.backdrop,
+         buttonClass: args.buttonClass,
+         classList: args.classList = false,
+         closeCallback: args.closeCallback,
+         dragScrollWrapper: args.dragScrollWrapper,
+         dropCallback: args.dropCallback,
+         icons: util.icons,
+         id: args.id,
+         positionAbsolute: args.positionAbsolute,
+         resizeElement: args.resizeElement,
+         unloadIndex
       };
-      if (args.closeCallback) options.closeCallback = args.closeCallback;
-      modal = new Modal(title, container, buttons, options);
+      modal = new Modal(args.title, container, buttons, options);
       modal.render();
       return modal;
    };
@@ -716,12 +754,19 @@ WCom.Modal = (function() {
       createSelector: function(args) {
          const { icons, onchange, target, title = 'Select Item', url } = args;
          const callback = function(ok, modal, result) {
-            if (!ok) return;
+            if (!ok || !target) return;
             const el = document.getElementById(target);
-            const newValue = result.value.replace(/!/g, '/');
-            if (onchange && el.value != newValue)
-               eval(onchange.replace(/%value/g, result.value));
-            el.value = newValue;
+            if (!el) return;
+            if (result.value) {
+               const newValue = result.value.replace(/!/g, '/');
+               if (onchange && el.value != newValue)
+                  eval(onchange.replace(/%value/g, result.value));
+               el.value = newValue;
+            }
+            else if (result.files && result.files[0]) {
+               if (onchange) eval(onchange.replace(/%value/g, 'result.files'));
+               el.value = result.files;
+            }
             if (el.focus) el.focus();
          }.bind(this);
          return create({ callback, icons, title, url });

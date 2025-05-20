@@ -1094,28 +1094,28 @@ EOF
   is_deeply \@li, ['F'], 'found third last li element';
   @li = ();
   $dom->find('li:nth-child(1n+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(1n-0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:NTH-CHILD(N+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:Nth-Child(N+0)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
-  is_deeply \@li, [qw(A B C D E F G)], 'found all li elements';
+  is_deeply \@li, [qw(A B C D E F G H)], 'found all li elements';
   @li = ();
   $dom->find('li:nth-child(0n+1)')->each(sub { push @li, shift->text });
   is_deeply \@li, [qw(A)], 'found first li element';
@@ -1157,20 +1157,20 @@ EOF
   @e = ();
   $dom->find('ul li:not(:first-child, :last-child)')
     ->each(sub { push @e, shift->text });
-  is_deeply \@e, [qw(C E F H)], 'found all odd li elements';
+  is_deeply \@e, [qw(C E F H)], 'found all odd li elements but first/last';
   @e = ();
   $dom->find('ul li:is(:first-child, :last-child)')
     ->each(sub { push @e, shift->text });
-  is_deeply \@e, [qw(A I)], 'found all odd li elements';
+  is_deeply \@e, [qw(A I)], 'found first/last li elements';
   @e = ();
   $dom->find('li:nth-last-of-type( odd )')->each(sub { push @e, shift->text });
-  is_deeply \@e, [qw(C F I)], 'found all odd li elements';
+  is_deeply \@e, [qw(C F I)], 'found all odd li elements (counting from end)';
   @e = ();
   $dom->find('p:nth-of-type(odd)')->each(sub { push @e, shift->text });
   is_deeply \@e, [qw(B G)], 'found all odd p elements';
   @e = ();
   $dom->find('p:nth-last-of-type(odd)')->each(sub { push @e, shift->text });
-  is_deeply \@e, [qw(B G)], 'found all odd li elements';
+  is_deeply \@e, [qw(B G)], 'found all odd p elements (counting from end)';
   @e = ();
   $dom->find('ul :nth-child(1)')->each(sub { push @e, shift->text });
   is_deeply \@e, ['A'], 'found first child';
@@ -1256,6 +1256,9 @@ EOF
   @e = ();
   $dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
   is_deeply \@e, [qw(J K)], 'found only child';
+  @e = ();
+  $dom->find('div :nth-child(-n+2)')->each(sub { push @e, shift->text });
+  is_deeply \@e, [qw(J DOM K)], 'found first two children of each div';
 };
 
 subtest 'Links' => sub {
@@ -1383,6 +1386,35 @@ EOF
   is $dom->find('div:has(:not(p)) > p')->last->all_text, 'Four', 'right text';
 };
 
+subtest 'Text matching' => sub {
+  my $dom = Mojo::DOM58->new(<<EOF);
+<p>Zero</p>
+<div>
+  <p>One&lt;Two&gt;</p>
+  <div>Two<!-- Three -->Four</div>
+  <p>Five Six<a href="#">Seven</a>Eight</p>
+</div>
+EOF
+  is $dom->at(':text(ero)')->text,              'Zero',               'right text';
+  is $dom->at(':text(Zero)')->text,             'Zero',               'right text';
+  is $dom->at('p:text(Zero)')->text,            'Zero',               'right text';
+  is $dom->at('div:text(Zero)'),                undef,                'no result';
+  is $dom->at('p:text(w)')->text,               'One<Two>',           'right text';
+  is $dom->at(':text(<Two>)')->text,            'One<Two>',           'right text';
+  is $dom->at(':text(Sev)')->text,              'Seven',              'right text';
+  is $dom->at(':text(/^Seven$/)')->text,        'Seven',              'right text';
+  is $dom->at('p a:text(even)')->text,          'Seven',              'right text';
+  is $dom->at(':text(v) :text(e)')->text,       'Seven',              'right text';
+  is $dom->at(':text(eight)')->all_text,        'Five SixSevenEight', 'right text';
+  is $dom->at(':text(/Ei.ht/)')->all_text,      'Five SixSevenEight', 'right text';
+  is $dom->at(':text(/(?i:ei.ht)/)')->all_text, 'Five SixSevenEight', 'right text';
+  is $dom->at(':text(v) :text(x)'),             undef,                'no result';
+  is $dom->at('div:text(x)'),                   undef,                'no result';
+  is $dom->at(':text(three)'),                  undef,                'no result';
+  is $dom->at(':text(/three/)'),                undef,                'no result';
+  is $dom->at(':text(/zero/)'),                 undef,                'no result';
+  is $dom->at(':text(/zero/)'),                 undef,                'no result';
+};
 
 subtest 'Adding nodes' => sub {
   my $dom = Mojo::DOM58->new(<<EOF);
@@ -1831,7 +1863,7 @@ subtest 'Real world JavaScript and CSS' => sub {
         alert('<123>');
       }
     </script>
-    < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }< / scRiPt >
+    < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }</scRiPt  >
   <body>Foo!</body>
 EOF
   is $dom->find('html > body')->[0]->text, 'Foo!', 'right text';
@@ -2703,6 +2735,25 @@ subtest 'Not self-closing' => sub {
     'right result';
 };
 
+subtest 'Auto-close tag' => sub {
+  my $dom = Mojo::DOM58->new('<p><div />');
+  is "$dom", '<p></p><div></div>', 'right result';
+};
+
+subtest 'No auto-close in scope' => sub {
+  my $dom = Mojo::DOM58->new('<p><svg><div /></svg>');
+  is "$dom", '<p><svg><div></div></svg></p>', 'with SVG';
+  $dom = Mojo::DOM58->new('<p><math><div /></math>');
+  is "$dom", '<p><math><div></div></math></p>', 'with MathML';
+};
+
+subtest 'Auto-close scope' => sub {
+  my $dom = Mojo::DOM58->new('<p><svg></p>');
+  is "$dom", '<p><svg></svg></p>', 'closing tag';
+  $dom = Mojo::DOM58->new('<p><math>');
+  is "$dom", '<p><math></math></p>', 'close eof';
+};
+
 subtest '"image"' => sub {
   my $dom = Mojo::DOM58->new('<image src="foo.png">test');
   is $dom->at('img')->{src}, 'foo.png', 'right attribute';
@@ -3127,6 +3178,94 @@ subtest 'Root pseudo-class' => sub {
   my $dom = Mojo::DOM58->new('<html><head></head><body><div><div>x</div></div></body></html>');
   is $dom->find('body > :first-child > :first-child')->first->text, 'x', 'right text';
   is $dom->at(':scope:first-child'), undef, 'no result';
+};
+
+subtest 'Runaway "<"' => sub {
+  my $dom = Mojo::DOM58->new(<<EOF);
+    <table>
+      <tr>
+        <td>
+          <div class="test" data-id="123" data-score="3">works</div>
+          TEST 123<br />
+          Test  12-34-5 test  >= 75% and < 85%  test<br />
+          Test  12-34-5  -test foo >= 5% and < 30% test<br />
+          Test  12-23-4 n/a >=13% and = 1% and < 5% test tset<br />
+          Test  12-34-5  test >= 1% and < 5%   foo, bar, baz<br />
+          Test foo, bar, baz  123-456-78  test < 1%  foo, bar, baz yada, foo, bar and baz, yada
+        </td>
+      </tr>
+    </table>
+EOF
+  is $dom->at('.test')->text, 'works', 'right text';
+};
+
+subtest 'XML name characters' => sub {
+  my $dom = Mojo::DOM58->new->xml(1)->parse('<Foo><1a>foo</1a></Foo>');
+  is $dom->at('Foo')->text, '<1a>foo</1a>',                        'right text';
+  is "$dom",                '<Foo>&lt;1a&gt;foo&lt;/1a&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<Foo><.a>foo</.a></Foo>');
+  is $dom->at('Foo')->text, '<.a>foo</.a>',                        'right text';
+  is "$dom",                '<Foo>&lt;.a&gt;foo&lt;/.a&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<Foo><.>foo</.></Foo>');
+  is $dom->at('Foo')->text, '<.>foo</.>',                        'right text';
+  is "$dom",                '<Foo>&lt;.&gt;foo&lt;/.&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<Foo><-a>foo</-a></Foo>');
+  is $dom->at('Foo')->text, '<-a>foo</-a>',                        'right text';
+  is "$dom",                '<Foo>&lt;-a&gt;foo&lt;/-a&gt;</Foo>', 'right result';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<Foo><a1>foo</a1></Foo>');
+  is $dom->at('Foo a1')->text, 'foo',                     'right text';
+  is "$dom",                   '<Foo><a1>foo</a1></Foo>', 'right result';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<Foo><a .b -c 1>foo</a></Foo>');
+  is $dom->at('Foo')->text, '<a .b -c 1>foo',                  'right text';
+  is "$dom",                '<Foo>&lt;a .b -c 1&gt;foo</Foo>', 'right result';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<😄 😄="😄">foo</😄>');
+  is $dom->at('😄')->text, 'foo',              'right text';
+  is "$dom",              '<😄 😄="😄">foo</😄>', 'right result';
+
+  $dom = Mojo::DOM58->new->xml(1)->parse('<こんにちは こんにちは="こんにちは">foo</こんにちは>');
+  is $dom->at('こんにちは')->text, 'foo',                              'right text';
+  is "$dom",                  '<こんにちは こんにちは="こんにちは">foo</こんにちは>', 'right result';
+};
+
+subtest 'Script end tags' => sub {
+  my $dom = Mojo::DOM58->new(<<EOF);
+    <!DOCTYPE html>
+    <h1>Welcome to HTML</h1>
+    <script>
+        console.log('< /script> is safe');
+        /* <div>XXX this is not a div element</div> */
+    </script>
+EOF
+  like $dom->at('script')->text, qr/console\.log.+< \/script>.+this is not a div element/s, 'right text';
+
+  $dom = Mojo::DOM58->new(<<EOF);
+    <!DOCTYPE html>
+    <h1>Welcome to HTML</h1>
+    <script>
+        console.log('this is a script element and should be executed');
+    // </script asdf> <p>
+        console.log('this is not a script');
+        // <span data-wtf="</script>">:-)</span>
+EOF
+  like $dom->at('script')->text, qr/console\.log.+executed.+\/\//s,       'right text';
+  like $dom->at('p')->text,      qr/console\.log.+this is not a script/s, 'right text';
+  is $dom->at('span')->text, ':-)', 'right text';
+
+  $dom = Mojo::DOM58->new(<<EOF);
+    <!DOCTYPE html>
+    <h1>Welcome to HTML</h1>
+    <div>
+      <script> console.log('</scriptxyz is safe'); </script>
+    </div>
+EOF
+  like $dom->at('script')->text, qr/console\.log.+scriptxyz is safe/s, 'right text';
+  like $dom->at('div')->text,    qr/^\s+$/s,                           'right text';
 };
 
 subtest 'Unknown CSS selector' => sub {

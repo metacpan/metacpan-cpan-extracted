@@ -26,7 +26,6 @@ t/15-remove_from_end.t
 t/16-remove_from_pos.t
 t/17-find.t
 t/18-remove-add.t
-t/19-stress.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

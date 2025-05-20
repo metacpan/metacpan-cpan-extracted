@@ -124,6 +124,7 @@ sub error {
          %{$self->_template_wrappers},
          layout => $self->_exception_layout
       },
+      view      => $self->_default_view,
    );
 
    $self->_finalise_stash($context);

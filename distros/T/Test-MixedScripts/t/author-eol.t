@@ -32,6 +32,7 @@ my @files = (
     't/author-vars.t',
     't/data/bad-01.txt',
     't/data/bad-02.js',
+    't/data/good-03.pod',
     't/etc/perlcritic.rc',
     't/file_scripts_ok-Test-More.t',
     't/file_scripts_ok.t',

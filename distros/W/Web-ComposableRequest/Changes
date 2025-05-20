@@ -1,5 +1,26 @@
 Revision history for Web::ComposableRequest
 
+0.22.1    2025-05-19 17:22:37
+          - Fix dependency specification
+
+0.21.1    2025-05-19 16:41:16
+          - Fixes delete_on_collect bug
+          - Finds the upload object in any of the args not just the first
+          - Adds exceptions imported by Web::Components
+          - Style improvements
+          - Only weaken body in get param call if ref
+          - Adds name attribute to session log call
+          - Removes unecessary json decode from Compat
+          - Adds serialise method to session
+          - Fixes multiple return values in compat body parameters
+          - Allow non ref in json decodes
+          - Compat role now even more compat
+          - Added delete_on_collect to session messages
+          - Cleaned up L10N code
+          - Base uri_for now expands * to args from the list
+          - Adds Compat role
+          - Adds Headers role
+
 0.20.1    2017-06-12 21:40:28
           - Adds test for endless loop bug
           - Fixes endless loop bug in collect_status_messages

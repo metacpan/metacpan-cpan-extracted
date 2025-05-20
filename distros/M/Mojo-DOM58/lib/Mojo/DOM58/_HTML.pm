@@ -10,12 +10,12 @@ use Exporter 'import';
 use Mojo::DOM58::Entities qw(html_attr_unescape html_escape html_unescape);
 use Scalar::Util 'weaken';
 
-our $VERSION = '3.001';
+our $VERSION = '3.002';
 
 our @EXPORT_OK = 'tag_to_html';
 
 my $ATTR_RE = qr/
-  ([^<>=\s\/]+|\/)                         # Key
+  ([^<>=\s\/0-9.\-][^<>=\s\/]*|\/)         # Key
   (?:
     \s*=\s*
     (?s:(?:"(.*?)")|(?:'(.*?)')|([^>\s]*)) # Value
@@ -40,7 +40,7 @@ my $TOKEN_RE = qr/
     |
       \?(.*?)\?                                       # Processing Instruction
     |
-      \s*([^<>\s]+\s*(?>(?:$ATTR_RE){0,32766})*)       # Tag
+      \s*((?:\/\s*)?[^<>\s\/0-9.\-][^<>\s\/]*\s*(?>(?:$ATTR_RE){0,32766})*)   # Tag
       # Workaround for perl's limit of * to {0,32767}
     )>
   |
@@ -62,6 +62,9 @@ $END{$_} = 'p' for
   qw(address article aside blockquote details dialog div dl fieldset),
   qw(figcaption figure footer form h1 h2 h3 h4 h5 h6 header hgroup hr main),
   qw(menu nav ol p pre section table ul);
+
+# Container HTML elements that create their own scope
+my %SCOPE = map { $_ => 1 } qw(math svg);
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
@@ -151,7 +154,7 @@ sub parse {
         # No more content
         if (!$xml && (my $tags = $NO_MORE_CONTENT{$end})) { _end($_, $xml, \$current) for @$tags }
 
-        _end($xml ? $1 : lc $1, $xml, \$current);
+        _end($end, $xml, \$current);
       }
 
       # Start
@@ -180,7 +183,7 @@ sub parse {
 
         # Raw text elements
         next if $xml || !$RAW{$start} && !$RCDATA{$start};
-        next unless $html =~ m!\G(.*?)<\s*/\s*\Q$start\E\s*>!gcsi;
+        next unless $html =~ m!\G(.*?)</\Q$start\E(?:\s+|\s*>)!gcsi;
         _node($current, 'raw', $RCDATA{$start} ? html_unescape $1 : $1);
         _end($start, 0, \$current);
       }
@@ -216,6 +219,9 @@ sub _end {
 
     # Ignore useless end tag
     return if $next->[0] eq 'root';
+
+    # Don't traverse a container tag
+    return if $SCOPE{$next->[1]} && $next->[1] ne $end;
 
     # Right tag
     return $$current = $next->[3] if $next->[1] eq $end;

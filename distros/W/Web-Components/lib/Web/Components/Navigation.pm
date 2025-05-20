@@ -94,6 +94,17 @@ An immutable string which default to C<div>. The HTML element to render
 
 has 'container_tag' => is => 'ro', isa => Str, default => 'div';
 
+=item C<content_class>
+
+A lazy immutable string which defaults to C<content_name>
+
+=cut
+
+has 'content_class' =>
+   is      => 'lazy',
+   isa     => Str,
+   default => sub { $_[0]->content_name };
+
 =item C<content_name>
 
 An immutable string which defaults to C<panel>. Used as an id and a class name

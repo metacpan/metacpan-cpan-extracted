@@ -5,14 +5,16 @@ use parent 'Exporter::Tiny';
 
 use Web::ComposableRequest::Constants qw( EXCEPTION_CLASS FALSE TRUE );
 use Unexpected::Functions             qw( Unspecified );
+use List::Util                        qw( pairs );
 use Scalar::Util                      qw( blessed );
 use Sys::Hostname                     qw( hostname );
 use Web::ComposableRequest::Util      qw( is_hashref );
 use Module::Pluggable::Object;
 use Moo::Role ();
 
-our @EXPORT_OK  = qw( clear_redirect deref exception first_char formpost
-                      fqdn is_arrayref load_components ns_environment throw );
+our @EXPORT_OK = qw( build_routes clear_redirect deref exception first_char
+                     formpost fqdn is_arrayref load_components ns_environment
+                     throw );
 
 =pod
 
@@ -36,7 +38,28 @@ Defines no attributes
 
 =head1 Subroutines/Methods
 
+Defines the following functions;
+
 =over 3
+
+=item C<build_routes>
+
+Takes a list of pairs of L<Web::Simple> routing expressions and
+L<Web::Components> action paths. Returns a list of pairs of routing expressions
+and subroutines used by L<Web::Simple>s C<dispatch_request> function
+
+=cut
+
+sub build_routes (@) {
+   my @pairs  = @_;
+   my @routes = ();
+
+   for my $pair (pairs @pairs) {
+      push @routes, $pair->key, sub {[$pair->value, @_]};
+   }
+
+   return @routes;
+}
 
 =item C<clear_redirect>
 
@@ -315,7 +338,7 @@ Peter Flanigan, C<< <pjfl@cpan.org> >>
 
 =head1 License and Copyright
 
-Copyright (c) 2017 Peter Flanigan. All rights reserved
+Copyright (c) 2024 Peter Flanigan. All rights reserved
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>

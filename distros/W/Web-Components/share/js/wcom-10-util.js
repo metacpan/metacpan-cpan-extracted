@@ -33,6 +33,9 @@ WCom.Util = (function() {
    const _htmlProps = [
       'disabled', 'readonly', 'required'
    ];
+   const _styleProps = [
+      'height', 'width'
+   ];
    const _typeof = function(x) {
       if (!x) return;
       const type = typeof x;
@@ -67,7 +70,9 @@ WCom.Util = (function() {
             const form = options.form; delete options.form;
             const data = new FormData(form);
             data.set('_submit', form.getAttribute('submitter'));
-            const type = options.enctype || 'application/x-www-form-urlencoded';
+            const type = options.enctype
+                  || form.getAttribute('enctype')
+                  || 'application/x-www-form-urlencoded';
             delete options.enctype;
             if (type == 'multipart/form-data') {
                const files = options.files; delete options.files;
@@ -99,7 +104,7 @@ WCom.Util = (function() {
          if (location) {
             const reload_header = headers.get('x-force-reload');
             const reload = reload_header == 'true' ? true : false;
-            return { location: location, reload: reload, status: 302 };
+            return { location, reload, status: 302 };
          }
          if (want == 'object') return {
             object: await response.json(), status: response.status
@@ -107,7 +112,7 @@ WCom.Util = (function() {
          if (want == 'text') return {
             status: response.status, text: await response.text()
          };
-         return { response: response };
+         return { response };
       }
       async sucks(url, options = {}) {
          const want = options.response || 'object'; delete options.response;
@@ -123,12 +128,12 @@ WCom.Util = (function() {
          }
          const headers = response.headers;
          const location = headers.get('location');
-         if (location) return { location: location, status: 302 };
+         if (location) return { location, status: 302 };
          if (want == 'blob') {
             const key = 'content-disposition';
             const filename = headers.get(key).split('filename=')[1];
             const blob = await response.blob();
-            return { blob: blob, filename: filename, status: response.status };
+            return { blob, filename, status: response.status };
          }
          if (want == 'object') return {
             object: await response.json(), status: response.status
@@ -137,7 +142,7 @@ WCom.Util = (function() {
             status: response.status,
             text: await new Response(await response.blob()).text()
          };
-         return { response: response };
+         return { response };
       }
    }
    class HtmlTiny {
@@ -155,7 +160,8 @@ WCom.Util = (function() {
                else if (_htmlProps.includes(prop)) {
                   el.setAttribute(prop, prop);
                }
-               else { el[prop] = attr[prop]; }
+               else if (_styleProps.includes(prop)) el.style[prop] = attr[prop];
+               else el[prop] = attr[prop];
             }
          }
          else if (type == 'array')   { content = attr; }
@@ -175,6 +181,7 @@ WCom.Util = (function() {
       }
       typeOf(x)               { return _typeof(x) }
       a(attr, content)        { return this._tag('a', attr, content) }
+      canvas(attr, content)   { return this._tag('canvas', attr, content) }
       caption(attr, content)  { return this._tag('caption', attr, content) }
       div(attr, content)      { return this._tag('div', attr, content) }
       fieldset(attr, content) { return this._tag('fieldset', attr, content) }
@@ -227,8 +234,8 @@ WCom.Util = (function() {
       }
       icon(attr) {
          const {
-            attrs = {}, className, height = 20, icons, name,
-            presentational = true, width = 20
+            attrs = {}, className, height = 20, icons, name, onclick,
+            presentational = true, title, width = 20
          } = attr;
          if (Array.isArray(className)) className = `${className.join(' ')}`;
          const newAttrs = {
@@ -239,7 +246,10 @@ WCom.Util = (function() {
 <svg ${Object.keys(newAttrs).filter(attr => newAttrs[attr]).map(attr => `${attr}="${newAttrs[attr]}"`).join(' ')}>
    <use href="${icons}#icon-${name}"></use>
 </svg>`;
-         return this._frag(svg.trim());
+         const wrapperAttr = { className: 'icon-wrapper' };
+         if (onclick) wrapperAttr.onclick = onclick;
+         if (title) wrapperAttr.title = title;
+         return this.span(wrapperAttr, this._frag(svg.trim()));
       }
       radio(attr) {
          attr['type'] = 'radio';
@@ -309,7 +319,8 @@ WCom.Util = (function() {
          };
       }
    }
-   const registeredCallbacks = [];
+   const registeredOnloadCallbacks = [];
+   const registeredOnunloadCallbacks = [];
    return {
       Bitch: {
          bitch: new Bitch(),
@@ -323,11 +334,25 @@ WCom.Util = (function() {
                if (document.readyState == 'complete') callback();
             });
          },
-         register: function(callback) {
-            registeredCallbacks.push(callback);
+         onloadCallbacks: function() {
+            return registeredOnloadCallbacks;
          },
-         callbacks: function() {
-            return registeredCallbacks;
+         onunloadCallbacks: function() {
+            return registeredOnunloadCallbacks;
+         },
+         registerOnload: function(callback) {
+            registeredOnloadCallbacks.push(callback);
+            return registeredOnloadCallbacks.length;
+         },
+         registerOnunload: function(callback) {
+            registeredOnunloadCallbacks.push(callback);
+            return registeredOnunloadCallbacks.length;
+         },
+         unregisterOnload: function(index) {
+            registeredOnloadCallbacks.splice(index - 1, 1);
+         },
+         unregisterOnunload: function(index) {
+            registeredOnunloadCallbacks.splice(index - 1, 1);
          }
       },
       Markup: { // A role

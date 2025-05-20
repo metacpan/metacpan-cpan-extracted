@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Textile2MarcdownStandalone
 
+0.05 2025-05-19T15:19:39Z
+
+    - Added x_deprecated to META.json, META.yaml.
+
 0.04 2025-05-19T03:56:57Z
 
     - Marked this module as **DEPRECATED** (uploaded by mistake).

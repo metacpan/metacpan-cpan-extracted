@@ -197,7 +197,7 @@ SV * _insert_after (SV * self, SV * data) {
 	return node;
 }
 
-SV * _insert (SV * self, SV * cb, SV * data) {
+SV * _insert_find (SV * self, SV * cb, SV * data) {
 	dTHX;
 	if (_is_undef(self)) {
 		return _set_data(self, data);
@@ -460,7 +460,7 @@ insert(self, cb, ...)
 	SV * self
 	SV * cb
 	CODE:
-		RETVAL = newSVsv(_insert(self, cb, newSVsv(ST(2))));
+		RETVAL = newSVsv(_insert_find(self, cb, newSVsv(ST(2))));
 	OUTPUT:
 		RETVAL
 
@@ -540,3 +540,4 @@ find(self, cb)
 		RETVAL = _find(self, cb);
 	OUTPUT:
 		RETVAL
+

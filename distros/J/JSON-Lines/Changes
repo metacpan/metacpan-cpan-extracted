@@ -7,3 +7,9 @@ Revision history for JSON-Lines
 	- Adds get_line and get_lines methods
 	- Update Makefile with links to github
 	- Fix "\n" logic to always append after encoding json
+
+1.07	2025/05/20
+	- Fix - when encoding an array of hashrefs with parse_headers enabled check all hash refs for keys to build the header
+
+1.08	2025/05/20
+	- Fix - get_line to return undef on end of file.

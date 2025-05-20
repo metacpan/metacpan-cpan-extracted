@@ -11,7 +11,7 @@ use Data::Dumper ();
 
 use constant DEBUG => $ENV{MOJO_DOM58_CSS_DEBUG} || 0;
 
-our $VERSION = '3.001';
+our $VERSION = '3.002';
 
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
@@ -136,17 +136,17 @@ sub _compile {
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
 
+      # ":text" (raw text)
+      $args = [$args =~ m!^/(.+)/$! ? qr/$1/ : qr/\Q$args\E/i] if $name eq 'text';
+
       # ":is" and ":not" (contains more selectors)
       $args = _compile($args, %ns) if $name eq 'has' || $name eq 'is' || $name eq 'not';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
 
-      # ":first-*" (rewrite to ":nth-*")
-      ($name, $args) = ("nth-$1", [0, 1]) if $name =~ /^first-(.+)$/;
-
-      # ":last-*" (rewrite to ":nth-*")
-      ($name, $args) = ("nth-$name", [-1, 1]) if $name =~ /^last-/;
+      # ":first-*", ":last-*" (rewrite to ":nth-(last-)*")
+      ($name, $args) = ("nth-$+", [0, 1]) if $name =~ /^(?:first-(.+)|(last-.+))$/;
 
       push @$last, ['pc', $name, $args];
     }
@@ -172,7 +172,7 @@ sub _equation {
   return [0, 0] unless my $equation = shift;
 
   # "even"
-  return [2, 2] if $equation =~ /^\s*even\s*$/i;
+  return [2, 0] if $equation =~ /^\s*even\s*$/i;
 
   # "odd"
   return [2, 1] if $equation =~ /^\s*odd\s*$/i;
@@ -250,6 +250,10 @@ sub _pc {
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
+  # ":text"
+  return grep { ($_->[0] eq 'text' || $_->[0] eq 'raw') && $_->[1] =~ $args->[0] } @$current[4 .. $#$current]
+    if $class eq 'text';
+
   # ":any-link", ":link" and ":visited"
   if ($class eq 'any-link' || $class eq 'link' || $class eq 'visited') {
     return undef unless $current->[0] eq 'tag' && exists $current->[2]{href};
@@ -268,14 +272,16 @@ sub _pc {
     my $type = $class eq 'nth-of-type'
       || $class eq 'nth-last-of-type' ? $current->[1] : undef;
     my @siblings = @{_siblings($current, $type)};
-    @siblings = reverse @siblings
-      if $class eq 'nth-last-child' || $class eq 'nth-last-of-type';
-
+    my $index;
     for my $i (0 .. $#siblings) {
-      next if (my $result = $args->[0] * $i + $args->[1]) < 1;
-      return undef unless my $sibling = $siblings[$result - 1];
-      return 1 if $sibling eq $current;
+      $index = $i, last if $siblings[$i] eq $current;
     }
+    $index = $#siblings - $index if $class eq 'nth-last-child' || $class eq 'nth-last-of-type';
+    $index++;
+
+    my $delta = $index - $args->[1];
+    return 1 if $delta == 0;
+    return $args->[0] != 0 && ($delta < 0) == ($args->[0] < 0) && $delta % $args->[0] == 0;
   }
 
   # Everything else

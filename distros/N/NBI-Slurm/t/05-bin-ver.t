@@ -4,6 +4,14 @@ use FindBin qw($RealBin);
 use Test::More;
 use File::Spec;
 
+# Skip all tests on Windows
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        plan skip_all => "Binary tests not supported on Windows";
+        exit 0; # Ensure early exit
+    }
+}
+
 # Ensure we handle taint mode properly
 my $PERL_INTERPRETER = $^X;
 if ($^T) {  # Check if running in taint mode

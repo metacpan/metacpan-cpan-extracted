@@ -2,88 +2,92 @@ package Web::ComposableRequest;
 
 use 5.010001;
 use namespace::autoclean;
-use version; our $VERSION = qv( sprintf '0.20.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.22.%d', q$Rev: 1 $ =~ /\d+/gmx );
 
-use Scalar::Util                      qw( blessed );
-use Web::ComposableRequest::Base;
-use Web::ComposableRequest::Config;
 use Web::ComposableRequest::Constants qw( NUL );
+use Unexpected::Types                 qw( CodeRef HashRef NonEmptySimpleStr
+                                          Object Undef );
 use Web::ComposableRequest::Util      qw( first_char is_hashref
                                           list_config_roles merge_attributes
                                           trim );
-use Unexpected::Types                 qw( CodeRef HashRef NonEmptySimpleStr
-                                          Object Undef );
+use Scalar::Util                      qw( blessed );
+use Web::ComposableRequest::Base;
+use Web::ComposableRequest::Config;
 use Moo::Role ();
 use Moo;
 
-# Attribute constructors
-my $_build_config = sub {
-   return $_[ 0 ]->config_class->new( $_[ 0 ]->config_attr );
-};
+has 'buildargs' =>
+   is      => 'lazy',
+   isa     => CodeRef,
+   default => sub { sub { return $_[1] } };
 
-my $_build_config_class = sub {
-   my $base  = __PACKAGE__.'::Config';
-   my @roles = list_config_roles; @roles > 0 or return $base;
+has 'config' =>
+   is       => 'lazy',
+   isa      => Object,
+   default  => sub { $_[0]->config_class->new($_[0]->config_attr) },
+   init_arg => undef;
 
-   return Moo::Role->create_class_with_roles( $base, @roles );
-};
+has 'config_attr' =>
+   is       => 'ro',
+   isa      => HashRef|Object|Undef,
+   init_arg => 'config';
 
-my $_build_request_class = sub {
-   my $self = shift;
-   my $base = __PACKAGE__.'::Base';
-   my $conf = $self->config_attr or return $base;
-   my $dflt = { request_class => $base, request_roles => [] };
-   my $attr = {};
+has 'config_class' =>
+   is      => 'lazy',
+   isa     => NonEmptySimpleStr,
+   default => sub {
+      my $base  = __PACKAGE__ . '::Config';
+      my @roles = list_config_roles;
 
-   merge_attributes $attr, $conf, $dflt, [ keys %{ $dflt } ];
+      return $base unless @roles > 0;
 
-   my @roles = @{ $attr->{request_roles} };
+      return Moo::Role->create_class_with_roles($base, @roles);
+   };
 
-   @roles > 0 or return $attr->{request_class};
+has 'request_class' =>
+   is      => 'lazy',
+   isa     => NonEmptySimpleStr,
+   default => sub {
+      my $self = shift;
+      my $base = __PACKAGE__ . '::Base';
+      my $conf = $self->config_attr or return $base;
+      my $dflt = { request_class => $base, request_roles => [] };
+      my $attr = {};
 
-   @roles = map { (first_char $_ eq '+')
-                ?  substr $_, 1 : __PACKAGE__."::Role::${_}" } @roles;
+      merge_attributes $attr, $conf, $dflt, [keys %{$dflt}];
 
-   return Moo::Role->create_class_with_roles( $attr->{request_class}, @roles );
-};
+      my @roles = @{$attr->{request_roles}};
 
-# Public attributes
-has 'buildargs'     => is => 'lazy', isa => CodeRef,
-   builder          => sub { sub { return $_[ 1 ] } };
+      return $attr->{request_class} unless @roles > 0;
 
-has 'config'        => is => 'lazy', isa => Object,
-   builder          => $_build_config, init_arg => undef;
+      @roles = map { (first_char $_ eq '+')
+                     ? substr $_, 1 : __PACKAGE__ . "::Role::${_}" } @roles;
 
-has 'config_attr'   => is => 'ro',   isa => HashRef | Object | Undef,
-   init_arg         => 'config';
+      return Moo::Role->create_class_with_roles($attr->{request_class}, @roles);
+   };
 
-has 'config_class'  => is => 'lazy', isa => NonEmptySimpleStr,
-   builder          => $_build_config_class;
-
-has 'request_class' => is => 'lazy', isa => NonEmptySimpleStr,
-   builder          => $_build_request_class;
-
-# Public methods
 sub new_from_simple_request {
-   my ($self, $opts, @args) = @_; my $attr = { %{ $opts // {} } };
+   my ($self, $opts, @args) = @_;
 
+   my $attr = { %{ $opts // {} } };
    my $request_class = $self->request_class; # Trigger role application
 
    $attr->{config} = $self->config;          # Composed after request_class
-   @args and is_hashref $args[ -1 ] and $attr->{env   } = pop @args;
-   @args and is_hashref $args[ -1 ] and $attr->{params} = pop @args;
+   $attr->{env   } = pop @args if @args and is_hashref $args[-1];
+   $attr->{params} = pop @args if @args and is_hashref $args[-1];
 
-   my $query = $attr->{env}->{ 'Web::Dispatch::ParamParser.unpacked_query' };
-      $query and $attr->{params} = $query;
+   my $query = $attr->{env}->{'Web::Dispatch::ParamParser.unpacked_query'};
 
-   if ((@args and blessed $args[ 0 ])) { $attr->{upload} = $args[ 0 ] }
-   else {
-      for my $arg (grep { defined && length } @args) {
+   $attr->{params} = $query if $query;
+
+   for my $arg (grep { defined && length } @args) {
+      if (blessed $arg) { $attr->{upload} = $arg }
+      else {
          push @{ $attr->{args} //= [] }, map { trim $_ } split m{ / }mx, $arg;
       }
-   };
+   }
 
-   return $request_class->new( $self->buildargs->( $self, $attr ) );
+   return $request_class->new($self->buildargs->($self, $attr));
 }
 
 1;

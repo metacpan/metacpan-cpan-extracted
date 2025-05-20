@@ -17,7 +17,8 @@ my $config  = {
    prefix        => 'my_app',
    request_roles => [ 'L10N', 'Session', 'Cookie', 'JSON', 'Static' ],
    session_attr  => { theme => [ NonEmptySimpleStr, 'green' ] },
-   scrubber      => '[^_~+0-9A-Za-z]' };
+   scrubber      => '[^_~+0-9A-Za-z]'
+};
 my $factory = Web::ComposableRequest->new( config => $config );
 
 is blessed( $factory ), 'Web::ComposableRequest', 'Factory right class';

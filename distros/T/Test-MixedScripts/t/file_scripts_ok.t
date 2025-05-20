@@ -3,6 +3,8 @@ use warnings;
 
 use Test2::V0;
 use Test2::API qw( intercept );
+use Test2::Plugin::UTF8;
+use Test2::Tools::Exception qw( dies );
 
 use Test::MixedScripts qw( file_scripts_ok );
 
@@ -25,7 +27,7 @@ is $b1->squash_info->flatten,
         name           => 't/data/bad-01.txt',
         pass           => 0,
         trace_file     => __FILE__,
-        trace_line     => 16,
+        trace_line     => 18,
     }
   ],
   "expected failure";
@@ -46,9 +48,17 @@ is $b2->squash_info->flatten,
         name           => 't/data/bad-02.js',
         pass           => 0,
         trace_file     => __FILE__,
-        trace_line     => 37,
+        trace_line     => 39,
     }
   ],
   "expected failure";
+
+file_scripts_ok( 't/data/good-03.pod' );
+
+like(
+     dies { file_scripts_ok( 't/data/good-03.pod', 'BadScriptName' ) },
+     qr/^Unknown script BadScriptName/,
+     "died on unknown script name"
+);
 
 done_testing;

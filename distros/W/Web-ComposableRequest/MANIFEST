@@ -11,7 +11,9 @@ lib/Web/ComposableRequest/Base.pm
 lib/Web/ComposableRequest/Config.pm
 lib/Web/ComposableRequest/Constants.pm
 lib/Web/ComposableRequest/Exception.pm
+lib/Web/ComposableRequest/Role/Compat.pm
 lib/Web/ComposableRequest/Role/Cookie.pm
+lib/Web/ComposableRequest/Role/Headers.pm
 lib/Web/ComposableRequest/Role/JSON.pm
 lib/Web/ComposableRequest/Role/L10N.pm
 lib/Web/ComposableRequest/Role/Session.pm
