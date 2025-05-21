@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package RT::Extension::QuickAssign;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
+
+RT->AddStyleSheets('rt-extension-quickassign.css');
 
 =head1 NAME
 

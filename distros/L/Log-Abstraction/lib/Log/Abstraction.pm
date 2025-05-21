@@ -5,9 +5,10 @@ package Log::Abstraction;
 use strict;
 use warnings;
 use Carp;	# Import Carp for warnings
-use Config::Abstraction;
+use Config::Abstraction 0.25;
 use Log::Log4perl;
 use Params::Get 0.04;	# Import Params::Get for parameter handling
+use Readonly::Values::Syslog 0.02;
 use Sys::Syslog;	# Import Sys::Syslog for syslog support
 use Scalar::Util 'blessed';	# Import Scalar::Util for object reference checking
 
@@ -17,11 +18,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.13
+0.15
 
 =cut
 
-our $VERSION = 0.13;
+our $VERSION = 0.15;
 
 =head1 SYNOPSIS
 
@@ -76,6 +77,11 @@ For example:
 
 It doesn't work on Windows because of the case-insensitive nature of that system.
 
+=item * C<level>
+
+The minimum level at which to log something,
+the default is "warning".
+
 =item * C<logger>
 
 A logger can be one or more of:
@@ -92,7 +98,7 @@ A logger can be one or more of:
 
 =item * an object
 
-=item * a hash of options, e.g. 'file' containing the filename, or 'fd' containing a file descriptor to log to
+=item * a hash of options, e.g. 'file' containing the filename, 'array' a reference to an array, or 'fd' containing a file descriptor to log to
 
 =back
 
@@ -119,6 +125,7 @@ sub new {
 
 	# Handle hash or hashref arguments
 	my %args;
+
 	if(@_ == 1) {
 		if(ref($_[0]) eq 'HASH') {
 			# If the first argument is a hash reference, dereference it
@@ -174,20 +181,32 @@ sub new {
 		croak("$class: syslog needs to know the script name") if(!defined($args{'script_name'}));
 	}
 
+	my $level = $args{'level'};
 	if(defined(my $logger = $args{logger})) {
 		if(Scalar::Util::blessed($logger) && (ref($logger) eq __PACKAGE__)) {
 			croak("$class: attempt to encapulate ", __PACKAGE__, ' as a logging class, that would add a needless indirection');
 		}
-	} else {
+	} elsif(!$args{'file'}) {
 		# Default to Log4perl
 		# FIXME: add default minimum logging level
 		Log::Log4perl->easy_init($args{verbose} ? $Log::Log4perl::DEBUG : $Log::Log4perl::ERROR);
 		$args{'logger'} = Log::Log4perl->get_logger();
 	}
 
+	if($level) {
+		if(!defined($syslog_values{$level})) {
+			Carp::croak("$class: invalid syslog level '$level'");
+		}
+		$args{'level'} = $level;
+	} else {
+		# The default minimum level at which to log something is 'warning'
+		$args{'level'} = 'warning';
+	}
+
 	my $self = {
 		messages => [],	# Initialize messages array
 		%args,
+		level => $syslog_values{$args{'level'}},
 	};
 	return bless $self, $class;	# Bless and return the object
 }
@@ -201,6 +220,15 @@ sub _log {
 
 	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
 		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
+	}
+
+	if(!defined($syslog_values{$level})) {
+		Carp::Croak(ref($self), ": Invalid level '$level'");	# "Can't happen"
+	}
+
+	if($self->{'level'} < $syslog_values{$level}) {
+		# The level is too low to log
+		return;
 	}
 
 	if((scalar(@messages) == 1) && (ref($messages[0]) eq 'ARRAY')) {
@@ -231,12 +259,20 @@ sub _log {
 			# If logger is an array reference, push the log message to the array
 			push @{$logger}, { level => $level, message => join('', grep defined, @messages) };
 		} elsif(ref($logger) eq 'HASH') {
-			if($logger->{'file'}) {
+			if(my $file = $logger->{'file'}) {
+				if($file =~ /^([a-zA-Z0-9_\.\-\/\\:]+)$/) {
+					my $file = $1;	# Will untaint
+				} else {
+					Carp::croak(ref($self), ": Invalid file name: $file");
+				}
 				if(open(my $fout, '>>', $logger->{'file'})) {
 					print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
-						die "ref($self): Can't write to ", $logger->{'file'}, ": $!";
+						Carp::croak(ref($self), ": Can't write to $file: $!");
 					close $fout;
 				}
+			}
+			if(my $array = $logger->{'array'}) {
+				push @{$array}, { level => $level, message => join('', grep defined, @messages) };
 			}
 			if(my $fout = $logger->{'fd'}) {
 				print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
@@ -280,6 +316,26 @@ sub _log {
 		print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
 			die "ref($self): Can't write to file descriptor: $!";
 	}
+}
+
+=head2 level
+
+Get/set the minimum level to log at
+
+=cut
+
+sub level
+{
+	my ($self, $level) = @_;
+
+	if($level) {
+		if(!defined($syslog_values{$level})) {
+			Carp::carp(ref($self), ": invalid syslog level '$level'");
+			return;
+		}
+		$self->{'level'} = $syslog_values{$level};
+	}
+	return $self->{'level'};
 }
 
 =head2 debug
@@ -352,6 +408,10 @@ sub warn {
 
 	# Validate input parameters
 	return unless ($params && (ref($params) eq 'HASH'));
+
+	# Only logging things higher than warn level
+	return if($self->{'level'} < $syslog_values{'warn'});
+
 	my $warning = $params->{warning};
 	if(!defined($warning)) {
 		if(scalar(@_) && !ref($_[0])) {

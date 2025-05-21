@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.52     2025-05-20
+        -  Allow all valid characters in client credentials (GH #29)
+
 0.51     2022-08-15
         - Bump min perl version to 5.16 (as per core Mojolicious)
 

@@ -1,5 +1,23 @@
 Revision history for Perl extension Amon2::Auth::Site::LINE
 
+0.05 2025-05-20T12:13:18Z
+        - Previously, this module used String::Random module which uses rand(),
+          a built-in Perl function, to generate random tokens when the state
+          and nonce parameters in OAuth2 are unset.
+          However, the rand() function is vulnerable to a PRNG vulnerability
+          called CWE-338, so it's not cryptographically secure.
+          From this version, it has discarded dependencies of String::Random
+          and has been replaced with Crypt::URandom::Token module,
+          which uses the more secure /dev/urandom to generate tokens.
+          - The above vulnerability was pointed out to me
+            by Robert Rothenberg (RRWO). Thanks for pointing this out.
+        - I'm aware that the above implementation has fixed the vulnerability
+          in this module corresponding to the vulnerability number below.
+          - CVE-2024-57835
+            https://www.cve.org/CVERecord?id=CVE-2024-57835
+          - JVNDB-2025-003449
+            https://jvndb.jvn.jp/ja/contents/2025/JVNDB-2025-003449.html
+
 0.04 2020-11-26T07:03:55Z
         - Replace `//` to `||` operator to support Perl version 5.8.x properly.
         - Fix pod.

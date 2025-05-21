@@ -45,7 +45,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20250302"
+         "version" : "20250521"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "url" : "https://github.com/philiprbrenan/DataTableText"
       }
    },
-   "version" : "20250302",
+   "version" : "20250521",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

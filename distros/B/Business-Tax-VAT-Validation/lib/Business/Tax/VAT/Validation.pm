@@ -29,7 +29,7 @@ package Business::Tax::VAT::Validation;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
@@ -93,7 +93,7 @@ sub new {
         re           => {
             ### t/01_localcheck.t tests if these regexps accepts all regular VAT numbers, according to VIES FAQ
             AT => 'U[0-9]{8}',
-            BE => '0[0-9]{9}',
+            BE => '[01][0-9]{9}',
             BG => '[0-9]{9,10}',
             CY => '[0-9]{8}[A-Za-z]',
             CZ => '[0-9]{8,10}',
@@ -488,10 +488,9 @@ sub _set_error {
 
 LWP::UserAgent
 
-L<http://ec.europa.eu/taxation_customs/vies/faqvies.do> for the FAQs related to the VIES service.
+L<https://ec.europa.eu/taxation_customs/vies/#/faq> for the FAQs related to the VIES service.
 
-L<https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/vat-registered-companies-api/1.0>
-for details of the service provided by the UK's HMRC.
+L<https://www.api.gov.uk/ch/companies-house> for details of the service provided by the UK's HMRC.
 
 =head1 FEEDBACK
 

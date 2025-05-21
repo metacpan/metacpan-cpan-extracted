@@ -4,16 +4,19 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 # VERSION
 
-version v0.3.0
+version v0.4.0
 
 # SYNOPSIS
 
 ```perl
+use Test::V0;
 use Test::MixedScripts v0.3.0 qw( all_perl_files_scripts_ok file_scripts_ok );
 
 all_perl_files_scripts_ok();
 
 file_scripts_ok( 'assets/site.js' );
+
+done_testing;
 ```
 
 # DESCRIPTION
@@ -92,7 +95,7 @@ See [perlpod](https://metacpan.org/pod/perlpod) for more information.
 When tests fail, the diagnostic message will indicate the unexpected script and where the character was in the file:
 
 ```
-Unexpected Cyrillic character on line 286 character 45 in lib/Foo/Bar.pm
+Unexpected Cyrillic character CYRILLIC SMALL LETTER ER on line 286 character 45 in lib/Foo/Bar.pm
 ```
 
 ## all\_perl\_files\_scripts\_ok
@@ -107,16 +110,29 @@ This applies ["file\_scripts\_ok"](#file_scripts_ok) to all of the Perl scripts 
 
 # KNOWN ISSUES
 
+## Unicode and Perl Versions
+
 Some scripts were added to later versions of Unicode, and supported by later versions of Perl.  This means that you
 cannot run tests for some scripts on older versions of Perl.
 See [Unicode Supported Scripts](https://www.unicode.org/standard/supported.html) for a list of scripts supported
 by Unicode versions.
 
+## Pod::Weaver
+
+The `=for` directive is not consistently copied relative to the sections that occur in by [Pod::Weaver](https://metacpan.org/pod/Pod%3A%3AWeaver).
+
+## Other Limitations
+
+This will not identify confusable characters from the same scripts.
+
 # SEE ALSO
 
 [Test::PureASCII](https://metacpan.org/pod/Test%3A%3APureASCII) tests that only ASCII characters are used.
 
-[Unicode Confusables](https://util.unicode.org/UnicodeJsps/confusables.jsp)
+[Unicode::Confuse](https://metacpan.org/pod/Unicode%3A%3AConfuse) identifies [Unicode Confusables](https://util.unicode.org/UnicodeJsps/confusables.jsp).
+
+[Unicode::Security](https://metacpan.org/pod/Unicode%3A%3ASecurity) implements several security mechanisms described in
+[Unicode Security Mechanisms](https://www.unicode.org/reports/tr39/).
 
 [Detecting malicious Unicode](https://daniel.haxx.se/blog/2025/05/16/detecting-malicious-unicode/)
 

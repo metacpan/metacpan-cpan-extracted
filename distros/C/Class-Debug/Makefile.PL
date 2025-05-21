@@ -27,24 +27,13 @@ WriteMakefile(
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),
-	META_MERGE => {
-		resources => {
-			repository => {
-				type => 'git',
-				url => 'https://github.com/nigelhorne/Class-Debug.git',
-				web => 'https://github.com/nigelhorne/Class-Debug',
-			},
-			bugtracker => {
-				web => 'https://github.com/nigelhorne/Class-Debug/issues',
-			},
-		},
-	}, CONFIGURE_REQUIRES => {
+	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {						# Dependencies (with versions)
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Config::Abstraction' => 0.25,
-		'Log::Abstraction' => 0.11,
+		'Log::Abstraction' => 0.15,
 		'LWP::Protocol::https' => 0,
 		'JSON::MaybeXS'	=> 0
 	}, TEST_REQUIRES => {
@@ -56,5 +45,22 @@ WriteMakefile(
 	}, dist => $dist,
 	clean	 => {
 		FILES => 'Class-Debug-*',
-	}
+	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+		'meta-spec' => { version => 2 },
+		resources => {
+			homepage => 'https://metacpan.org/pod/Class::Debug',
+			repository => {
+				repository => 'https://github.com/nigelhorne/Class-Debug',
+				type => 'git',
+				url => 'git://github.com/nigelhorne/Class-Debug.git',
+				web => 'https://github.com/nigelhorne/Class-Debug'
+			}, bugtracker => {
+				mailto => 'bug-Class-Debug@rt.cpan.org',
+				url => 'https://github.com/nigelhorne/Class-Debug/issues',
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Debug',
+				web => 'https://github.com/nigelhorne/Class-Debug/issues'
+			}
+		},
+	},
+	MIN_PERL_VERSION	=> '5.008'
 );

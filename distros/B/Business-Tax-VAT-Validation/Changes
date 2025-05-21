@@ -1,5 +1,9 @@
 Revision history for Business::Tax::VAT::Validation
 
+1.24  21/05/2025
+    - Belgian numbers can start with 0 or 1 (@pottenmak, @jonmz, PR #14, GH #18)
+    - Fix VIES FAQ / Companies House API links (thanks @robrwo)
+
 1.23  18/08/2022
     - Further updates because of API changes - expect name & address elements
       to be namespaced too (thanks to Thomas Glase)

@@ -28,7 +28,11 @@ requires:
   ExtUtils::MakeMaker: '6.64'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
-  Log::Abstraction: '0.11'
-resources: {}
-version: 0.03
+  Log::Abstraction: '0.15'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/Class-Debug/issues
+  homepage: https://metacpan.org/pod/Class::Debug
+  repository: git://github.com/nigelhorne/Class-Debug.git
+version: 0.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

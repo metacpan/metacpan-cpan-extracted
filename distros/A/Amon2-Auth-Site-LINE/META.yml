@@ -6,8 +6,9 @@ build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
+  perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,19 +27,18 @@ no_index:
 provides:
   Amon2::Auth::Site::LINE:
     file: lib/Amon2/Auth/Site/LINE.pm
-    version: '0.04'
+    version: '0.05'
 requires:
+  Crypt::URandom::Token: '0'
   JSON: '0'
   LWP::UserAgent: '0'
   Mouse: '0'
-  String::Random: '0'
   URI: '0'
-  perl: '5.008001'
 resources:
   bugtracker: https://github.com/nipotan/p5-Amon2-Auth-Site-LINE/issues
   homepage: https://github.com/nipotan/p5-Amon2-Auth-Site-LINE
-  repository: git://github.com/nipotan/p5-Amon2-Auth-Site-LINE.git
-version: '0.04'
+  repository: https://github.com/nipotan/p5-Amon2-Auth-Site-LINE.git
+version: '0.05'
 x_authority: cpan:TANIGUCHI
 x_contributors:
   - 'nipotan <nipotan@gmail.com>'

@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: gplv2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,11 +18,12 @@ no_index:
   directory:
     - html
     - inc
+    - static
 requires:
   perl: 5.8.3
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-quickassign
-version: '1.02'
-x_module_install_rtx_version: '0.43'
+version: '1.03'
+x_module_install_rtx_version: '0.44'
 x_requires_rt: 4.0.0

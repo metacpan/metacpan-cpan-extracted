@@ -26,12 +26,17 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Config::Abstraction: '0'
+  Config::Abstraction: '0.25'
   ExtUtils::MakeMaker: '6.64'
   Log::Log4perl: '0'
   Params::Get: '0.04'
+  Readonly::Values::Syslog: '0.02'
   Scalar::Util: '0'
   Sys::Syslog: '0'
-resources: {}
-version: 0.13
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/Log-Abstraction/issues
+  homepage: https://metacpan.org/pod/Log::Abstraction
+  repository: git://github.com/nigelhorne/Log-Abstraction.git
+version: 0.15
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

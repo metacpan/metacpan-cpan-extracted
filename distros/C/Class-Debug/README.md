@@ -4,12 +4,31 @@ Class::Debug - Add Runtime Debugging to a Class
 
 # VERSION
 
-0.03
+0.05
 
 # SYNOPSIS
 
 The `Class::Debug` module is a lightweight utility designed to inject runtime debugging capabilities into other classes,
 primarily by layering configuration and logging support.
+
+[Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) and [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) are modules developed to solve a specific need:
+runtime configurability without needing to rewrite or hardcode behaviours.
+The goal is to allow individual modules to enable or disable features on the fly, and to do it using whatever configuration system the user prefers.
+
+Although the initial aim was general configurability,
+the primary use case that’s emerged has been fine-grained logging control,
+more flexible and easier to manage than what you'd typically do with [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl).
+For example,
+you might want one module to log verbosely while another stays quiet,
+and be able to toggle that dynamically - without making invasive changes to each module.
+
+To tie it all together,
+there is `Class::Debug`.
+It sits on [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) and [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction),
+and with just a couple of extra lines in a class constructor,
+you can hook in this behaviour seamlessly.
+The intent is to keep things modular and reusable,
+especially across larger systems or in situations where you want user-selectable behaviour.
 
 Add this to your constructor:
 
@@ -133,3 +152,11 @@ The licence terms of this software are as follows:
 - All other users (including Commercial, Charity, Educational, Government)
   must apply in writing for a licence for use from Nigel Horne at the
   above e-mail.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 32:
+
+    Non-ASCII character seen before =encoding in 'that’s'. Assuming UTF-8

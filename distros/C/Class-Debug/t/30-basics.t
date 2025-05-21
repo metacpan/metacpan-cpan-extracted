@@ -25,8 +25,10 @@ BEGIN { use_ok('Class::Debug') }
 # Create a temporary config file
 my ($fh, $filename) = tempfile();
 print $fh <<'EOF';
-[My::Module]
-logger = foo.log
+My::Module:
+  logger:
+    file: foo.log
+    level: debug
 EOF
 close $fh;
 
@@ -39,12 +41,14 @@ isa_ok($obj_with_file->{logger}, 'Log::Abstraction');
 ok($obj_with_file->{logger}->can('debug'), 'Logger has debug method');
 $obj_with_file->{'logger'}->debug('Hello, World');
 
+diag(Data::Dumper->new([$obj_with_file])->Dump()) if($ENV{'TEST_VERBOSE'});
+
 ok(-r 'foo.log');
 ok(open my $log_fh, '<', 'foo.log');
 my @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG>  t\/30-basics.t/, 'Logged debug message to file, set from configuration file');
+like($log_lines[0], qr/DEBUG> t\/30-basics.t/, 'Logged debug message to file, set from configuration file');
 like($log_lines[0], qr/Hello, World/, 'Logged correct debug message to file, set from configuration file');
 
 unlink 'foo.log';
@@ -56,6 +60,7 @@ unlink 'foo.log';
 
 ($fh, $filename) = tempfile();
 $ENV{'My::Module::logger__file'} = $filename;
+$ENV{'My::Module::logger__level'} = 'debug';
 close $fh;
 
 my $obj_with_env = My::Module->new();
@@ -70,7 +75,7 @@ ok(open $log_fh, '<', $filename);
 @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG>  t\/30-basics.t/, 'Logged debug message to file, set from the environment');
+like($log_lines[0], qr/DEBUG> t\/30-basics.t/, 'Logged debug message to file, set from the environment');
 like($log_lines[0], qr/xyzzy/, 'Logged correct debug message to file, set from the environment');
 
 unlink $filename;

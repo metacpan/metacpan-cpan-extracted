@@ -8,7 +8,7 @@ use JSON;
 use Mouse;
 use LWP::UserAgent;
  
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub moniker { 'line' }
 
@@ -232,8 +232,8 @@ sub callback {
 sub get_state {
     my($self, $c) = @_;
     my $state = $self->state || $c->session->get($self->state_session_key) || do {
-        require String::Random;
-        String::Random->new->randregex('[a-zA-Z0-9]{16}');
+        require Crypt::URandom::Token;
+        Crypt::URandom::Token::urandom_token(16)
     };
     $self->set_state($c, $state);
     return $state;
@@ -252,8 +252,8 @@ sub clear_state {
 sub get_nonce {
     my($self, $c) = @_;
     my $nonce = $self->nonce || $c->session->get($self->nonce_session_key) || do {
-        require String::Random;
-        String::Random->new->randregex('[a-zA-Z0-9]{16}');
+        require Crypt::URandom::Token;
+        Crypt::URandom::Token::urandom_token(16)
     };
     $self->set_nonce($c, $nonce);
     return $nonce;

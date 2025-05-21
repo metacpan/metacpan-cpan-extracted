@@ -49,6 +49,6 @@
          "url" : "https://github.com/bigpresh/Business-Tax-VAT-Validation"
       }
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

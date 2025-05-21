@@ -1,5 +1,21 @@
 Revision history for Test-MixedScripts:
 
+v0.4.0    2025-05-20 19:52:09+01:00 Europe/London
+  [Enhancements]
+  - Test failure diagnostics show the name of the character.
+
+  [Bug Fixes]
+  - Ignores "tmp" directory inside the repo.
+
+  [Documentation]
+  - Documented a known issue with Pod::Weaver.
+
+  - Documented a known issue with same script confusables.
+
+  - Updated SYNOPSIS.
+
+  - Added related modules to the SEE ALSO section.
+
 v0.3.0    2025-05-19 10:50:51+01:00 Europe/London
   [Enhancements]
   - Added POD directives to change the expected Unicode scripts for longer blocks of code.

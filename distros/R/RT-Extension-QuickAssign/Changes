@@ -1,5 +1,8 @@
 Revision history for RT-Extension-QuickAssign
 
+1.03 2025-05-20
+ - Add CSS class to allow overflow of ticket actions
+
 1.02 2022-03-04
  - Add RT 5 support
 

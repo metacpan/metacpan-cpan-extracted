@@ -4,7 +4,7 @@
       "Koichi Taniguchi (a.k.a. nipotan) <taniguchi@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.26",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
          }
       },
       "develop" : {
@@ -42,12 +43,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Crypt::URandom::Token" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
             "Mouse" : "0",
-            "String::Random" : "0",
-            "URI" : "0",
-            "perl" : "5.008001"
+            "URI" : "0"
          }
       },
       "test" : {
@@ -59,7 +59,7 @@
    "provides" : {
       "Amon2::Auth::Site::LINE" : {
          "file" : "lib/Amon2/Auth/Site/LINE.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -69,11 +69,12 @@
       },
       "homepage" : "https://github.com/nipotan/p5-Amon2-Auth-Site-LINE",
       "repository" : {
-         "url" : "git://github.com/nipotan/p5-Amon2-Auth-Site-LINE.git",
+         "type" : "git",
+         "url" : "https://github.com/nipotan/p5-Amon2-Auth-Site-LINE.git",
          "web" : "https://github.com/nipotan/p5-Amon2-Auth-Site-LINE"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:TANIGUCHI",
    "x_contributors" : [
       "nipotan <nipotan@gmail.com>"

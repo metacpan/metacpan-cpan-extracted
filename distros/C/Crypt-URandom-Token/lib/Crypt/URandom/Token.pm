@@ -10,7 +10,7 @@ use Exporter qw(import);
 
 our @EXPORT_OK = qw(urandom_token);
 
-our $VERION = "0.003";
+our $VERSION = "0.005";
 
 =head1 NAME
 
@@ -23,12 +23,11 @@ Crypt::URandom::Token - Generate secure strings for passwords, secrets and simil
   # generates a 44-character alphanumeric token (default)
   my $token = urandom_token();
 
-  # generate a 6 digit numeric pin
-  my $pin = urandom_token(6, [0..9]);
-
   # generate a 19 character lowercase alphanumeric password
   my $password = urandom_token(19, [a..z, 0..9]);
 
+  # generate a 6 digit numeric pin
+  my $pin = urandom_token(6, "0123456789");
 
   # Object usage:
   my $obj = Crypt::URandom::Token->new(
@@ -52,14 +51,16 @@ alphabet.
 
 =head1 FUNCTIONS
 
-=head2 urandom_token($length = 44, $alphabet = [ A..Z, a..z, 0..9 ]);
+=head2 urandom_token
+
+  my $token = urandom_token($length, $alphabet);
 
 Returns a string of C<$length> random characters from C<$alphabet>.
 
 If C<$length> is not provided, it defaults to 44.
 
 If C<$alphabet> is not provided, it defaults to uppercase letters, lowercase
-letters, and digits. You can provide either a token of characters or an
+letters, and digits. You can provide either a string of characters or an
 arrayref.
 
 =head1 METHODS
@@ -67,7 +68,7 @@ arrayref.
 =head2 new
 
 Creates a new token generator object. Accepts a hash or hashref with these
-paramters:
+parameters:
 
 =over 4
 
@@ -130,11 +131,15 @@ sub urandom_token {
   my $length   = shift || 44;
   my @alphabet = _alphabet(shift);
 
+  unless ($length > 0) {
+    croak "length must be a positive integer";
+  }
+
   my $bias_lim = 256 % @alphabet;
 
   my (@bytes, @token);
   while (@token < $length) {
-    @bytes = split "", urandom(64) unless @bytes;
+    @bytes = split "", urandom(32) unless @bytes;
     my $num = ord(shift @bytes);
     next if $num < $bias_lim;
     push @token, $alphabet[$num % @alphabet];

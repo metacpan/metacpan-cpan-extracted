@@ -1,5 +1,11 @@
 Revision history for Class-Debug - Runtime Debugging for a Class
 
+0.05	Tue May 20 21:21:09 EDT 2025
+	Fix CI
+
+0.04	Tue May 20 21:14:56 EDT 2025
+	Try harder to avoid a logger hash within a logger hash
+
 0.03	Fri May 16 11:45:00 EDT 2025
 	Added CI support
 	Added better reporting on error

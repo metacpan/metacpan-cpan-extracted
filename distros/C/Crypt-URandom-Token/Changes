@@ -1,0 +1,9 @@
+0.005   2025-05-20
+  * Fix typo in $VERSION
+  * Get chunks of 32 bytes instead of 64 bytes from urandom()
+  * Add check that $length is a positive int
+  * Add alphabet as string example in the POD 
+  * Fix typos in documentation
+
+0.003   2024-12-28
+  * Initial release

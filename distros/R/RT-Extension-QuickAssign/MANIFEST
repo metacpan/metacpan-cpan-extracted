@@ -18,3 +18,4 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
+static/css/rt-extension-quickassign.css
