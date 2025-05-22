@@ -5,13 +5,22 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-22'; # DATE
+our $DATE = '2025-05-15'; # DATE
 our $DIST = 'Text-Table-HTML-DataTables'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
-    HTML::Entities::encode_entities(shift);
+    my $val = shift;
+    # encode_entities change 0 (false) to empty string so we need to filter the
+    # value first
+    if (!defined $val) {
+        "";
+    } elsif (!$val) {
+        "$val";
+    } else {
+        HTML::Entities::encode_entities($val);
+    }
 }
 
 sub _escape_uri {
@@ -157,7 +166,7 @@ Text::Table::HTML::DataTables - Generate HTML table with jQuery and DataTables p
 
 =head1 VERSION
 
-This document describes version 0.012 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2022-04-22.
+This document describes version 0.013 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2025-05-15.
 
 =head1 SYNOPSIS
 
@@ -288,13 +297,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

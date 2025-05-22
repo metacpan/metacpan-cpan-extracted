@@ -1,0 +1,11 @@
+<li class="nav-item" id="<% $Queue->{safe_name} %>-nav">
+  <a class="nav-link <% $Queue->{active} ? 'active' : ''  %>" href="#<% $Queue->{safe_name} %>-content" id="<% 'category-tab-' . $Queue->{safe_name} %>" data-toggle="tab" role="tab" aria-controls="<% $Queue->{name} %>" aria-selected="false">
+    <% $Queue->{name} eq '__default__' ? '*' : $Queue->{name} %>
+  </a>
+</li>
+<%INIT>
+$Queue->{safe_name} = RT::Extension::MandatoryOnTransition::HTMLSafeQueueName( $Queue->{name} );
+</%INIT>
+<%ARGS>
+$Queue
+</%ARGS>

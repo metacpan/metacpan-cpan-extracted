@@ -1,0 +1,32 @@
+<%INIT>
+require RT::Extension::MandatoryOnTransition;
+
+my $Queue = {
+    name => $QueueName,
+};
+my $Rule = {
+    from     => $From,
+    to       => $To,
+};
+my $Requires = {
+    field  => $Field,
+    op     => $Op,
+    values => $Value ? [ $Value ] : '',
+};
+
+$m->comp(
+    '/MandatoryOnTransition/Elements/QueueRuleRequires',
+    Queue    => $Queue,
+    Rule     => $Rule,
+    Requires => $Requires,
+);
+$m->abort;
+</%INIT>
+<%ARGS>
+$QueueName
+$From
+$To
+$Field
+$Op => ''
+$Value => ''
+</%ARGS>

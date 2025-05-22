@@ -1,0 +1,526 @@
+<&| /Widgets/TitleBox, title => loc("Queue Configuration") &>
+    <textarea class="hidden" name="MandatoryOnTransition"></textarea>
+    <br />
+    <div class="value col-12">
+        <ul class="nav nav-tabs nav-pills" id="mot-nav" role="tablist">
+            <li class="nav-item" id="__new__-nav">
+                <a class="nav-link <% @queues ? '' : 'show active' %>" href="#__new__-content" id="category-tab-__new__" data-toggle="tab" role="tab" aria-controls="__new__" aria-selected="false">
+                    Add Queue
+                </a>
+            </li>
+% foreach my $queue ( @queues ) {
+            <& /MandatoryOnTransition/Elements/QueueNav, Queue => $queue &>
+% }
+        </ul>
+        <div class="tab-content">
+            <div id="__new__-content" class="tab-pane fade <% @queues ? '' : 'show active' %>" role="tabpanel" aria-labelledby="category-tab-__new__">
+                <input type="hidden" id="MoT-NewQueue-Value" name="MoT-NewQueue-Value" value="">
+                <input type="hidden" id="MoT-Queue-Active" name="MoT-Queue-Active" value="">
+                <div class="form-row">
+                    <div class="boxcontainer col-md-12">
+                        <&| /Elements/LabeledValue, Label => loc('Queue') &>
+                            <& /Elements/SelectQueue, Name => 'MoT-NewQueue', ShowNullOption => 1, ShowAllQueues => 1, DefaultLabel => '*' &>
+                        </&>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <span class="col-12">
+                        <div class="submit">
+                            <div class="buttons">
+                                <input type="button" Name="mot-add-new-queue" value="<% loc('Add Queue') %>" onclick="addQueue();" class="button btn btn-primary form-control" />
+                            </div>
+                        </div>
+                    </span>
+                </div>
+            </div>
+% foreach my $queue ( @queues ) {
+            <& /MandatoryOnTransition/Elements/QueueContent, Queue => $queue &>
+% }
+        </div>
+    </div>
+    <br/>
+    <div class="form-row">
+        <span class="col-12">
+            <div class="submit">
+                <div class="buttons">
+                    <input type="button" value="Undo Changes" onclick="undoChanges();" class="button btn btn-primary form-control" />
+                </div>
+            </div>
+        </span>
+    </div>
+</&>
+<br/>
+<script type="text/javascript">
+    jQuery(document).ready(
+        function() {
+            currentJSON = jQuery('[name=MandatoryOnTransition-Current]').val();
+            if ( currentJSON.length == 0 ) {
+                currentJSON = '{}';
+            }
+            jQuery('[name=MandatoryOnTransition]').text(currentJSON);
+% if ( $active_queue ) {
+            jQuery('#<% $active_queue %>').trigger('click');
+% }
+        }
+    );
+
+    // keep in sync with RT::Extension::MandatoryOnTransition::_sanitize_id
+    function htmlSafeName (str) {
+        return str.trim().toLowerCase().replace( /\s+/g, '_' ).replace( /[^a-z0-9-_]/g, '' );
+    };
+
+    function htmlSafeQueueName (name) {
+        if ( name == '*' ) {
+            name = '__default__';
+        }
+        else {
+            name = htmlSafeName(name);
+        }
+        return name;
+    };
+
+    function htmlSafeStatusName (name) {
+        if ( name == '*' ) {
+            name = '__all__';
+        }
+        else {
+            name = htmlSafeName(name);
+        }
+        return name;
+    };
+
+    function undoChanges() {
+        jQuery('[name=MandatoryOnTransition]').text( jQuery('[name=MandatoryOnTransition-Current]').val() );
+        jQuery('#MoT-Queue-Active').val( jQuery('ul#mot-nav a.active').attr('id') );
+        jQuery( 'input[type=submit][value="<% loc('Save Changes') %>"]' ).trigger('click');
+    };
+
+    function ajaxError ( xhr, error ) {
+        jQuery.jGrowl( error, { sticky: true, themeState: 'none' } );
+    };
+
+    function onClickRequirementType (queue) {
+        var queue_id = htmlSafeQueueName(queue);
+        var type     = jQuery( 'input[name=' + queue_id + '-add-requirement-type' + ']:checked' ).val();
+        jQuery( '#' + queue_id + '-add-requirement-core-content' ).addClass('hidden');
+        jQuery( '#' + queue_id + '-add-requirement-cf-content' ).addClass('hidden');
+        jQuery( '#' + queue_id + '-add-requirement-role-content' ).addClass('hidden');
+        jQuery( '#' + queue_id + '-add-requirement-' + type + '-content' ).removeClass('hidden');
+    };
+
+    function addQueue() {
+        var queue    = jQuery('[name=MoT-NewQueue] option:selected').text();
+        var queue_id = htmlSafeQueueName(queue);
+        if ( jQuery( '#' + queue_id + '-content' ).length > 0 ) {
+            // tab already exists for this queue
+            jQuery( '#category-tab-' + queue_id ).trigger('click');
+        }
+        else {
+            var currentJSON = JSON.parse( jQuery('[name=MandatoryOnTransition]').val() );
+            if ( ! currentJSON.hasOwnProperty(queue) ) {
+                currentJSON[queue] = {};
+            }
+            jQuery('[name=MandatoryOnTransition]').text( JSON.stringify(currentJSON) );
+            jQuery('#MoT-NewQueue-Value').val( 'category-tab-' + queue_id );
+            jQuery( 'input[type=submit][value="<% loc('Save Changes') %>"]' ).trigger('click');
+        }
+    };
+
+    function addRequirement (queue) {
+        var queue_id = htmlSafeQueueName(queue);
+        var type     = jQuery( 'input[name=' + queue_id + '-add-requirement-type' + ']:checked' ).val();
+        var from     = jQuery( '[name=' + queue_id + '-add-from] option:selected' ).val();
+        var to       = jQuery( '[name=' + queue_id + '-add-to] option:selected' ).val();
+        var field    = '';
+        var op       = '';
+        var value    = '';
+        if ( type == 'core' ) {
+            field = jQuery( '[name=' + queue_id + '-add-core-field] option:selected' ).val();
+        }
+        else if ( type == 'cf' ) {
+            field = jQuery( '#' + queue_id + '-content' ).find( '[name=SelectCustomFieldField]' ).val();
+            op    = jQuery( '#' + queue_id + '-content' ).find( '[name="' + field + 'Op"]:eq(1)' ).val();
+            value = jQuery( '#' + queue_id + '-content' ).find( '[name="ValueOf' + field + '"]:eq(1)' ).val();
+            field = field.replace( 'MOT-CF.{', 'CF.');
+            field = field.replace( '}', '');
+        }
+        else if ( type == 'role' ) {
+            field = jQuery( '[name=' + queue_id + '-add-role-role] option:selected' ).val();
+            value = jQuery( '[name=' + queue_id + '-add-role-member]' ).val();
+            if ( value.length > 0 ) {
+                op = 'group';
+            }
+        }
+        var errorMsg = addRequirementJSON( queue, from, to, field, op, value );
+        jQuery( '#' + queue_id + '-add-requirement-error' ).text(errorMsg);
+        if ( ! ( errorMsg.length > 0 ) ) {
+            var from_id  = htmlSafeStatusName(from);
+            var to_id    = htmlSafeStatusName(to);
+            var field_id = htmlSafeName(field);
+            var id       = '#' + queue_id + '-' + from_id + '-' + to_id + '-remove-requires';
+            var url      = RT.Config.WebHomePath + '/Helpers/QueueRuleRequires';
+            var params   = {
+                QueueName: queue,
+                From     : from,
+                To       : to,
+                Field    : field,
+                Op       : op,
+                Value    : value,
+            };
+            if ( jQuery( id + '-' + field_id ).length ) {
+                // field already required - must be a new value/member requirement
+                id = queue_id + '-' + from_id + '-' + to_id + '-remove-requires' + '-' + field_id;
+                var text = jQuery('label[for="' + id + '"]').text();
+                if ( text.slice(-1) == ')' ) {
+                    // there are existing value/member requirements
+                    jQuery('label[for="' + id + '"]').text( text.slice(0, -1) + ", or '" + value + "')" );
+                }
+                else {
+                    // this is the first value/member requirement
+                    jQuery('label[for="' + id + '"]').text( text + ' (' + op + ": '" + value + "')" );
+                }
+            }
+            else {
+                // field not already required
+                if ( ! jQuery(id).length ) {
+                    // new status transition
+                    id  = '#' + queue_id + '-current-requirements';
+                    url = RT.Config.WebHomePath + '/Helpers/QueueRule';
+                }
+                jQuery.ajax(
+                    {
+                        url    : url,
+                        method : 'GET',
+                        data   : params,
+                        error  : ajaxError,
+                        success: function (response) {
+                            jQuery(id).append(response);
+                        }
+                    }
+                );
+            }
+        }
+    };
+
+    function addRequirementJSON ( queue, from='', to='', field='', op='', value='' ) {
+        var currentJSON = JSON.parse( jQuery('[name=MandatoryOnTransition]').val() );
+        var errorMsg    = '';
+        if ( ! ( ( from.length > 0 ) && ( to.length > 0 ) ) ) {
+            errorMsg = '<% loc('Select From and To') %>';
+        }
+        else if ( from == to ) {
+            errorMsg = '<% loc('From and To cannot be the same') %>';
+        }
+        else if ( ! ( field.length > 0 ) ) {
+            errorMsg = '<% loc('Select a Field or Role to require') %>';
+        }
+        else if ( ( ( op.length > 0 ) || ( value.length > 0 ) ) && ! ( ( op.length > 0 ) && ( value.length > 0 ) ) ) {
+            errorMsg = '<% loc('Enter values for both optional value requirement fields') %>';
+        }
+        if ( ! ( errorMsg.length > 0 ) ) {
+            var transition = from + ' -> ' + to;
+            if ( ! currentJSON[queue].hasOwnProperty(transition) ) {
+                // new status change requirement
+                currentJSON[queue][transition] = [];
+            }
+            if ( currentJSON[queue][transition].indexOf(field) == -1 ) {
+                // new required field
+                currentJSON[queue][transition].push(field);
+            }
+            else if ( ! ( ( op.length > 0 ) && ( value.length > 0 ) ) ) {
+                errorMsg = field + ' <% loc('is already required') %>';
+            }
+            if ( ( op.length > 0 ) && ( value.length > 0 ) ) {
+                if ( currentJSON[queue].hasOwnProperty(field) ) {
+                    // field already has existing value/member requirement
+                    if ( currentJSON[queue][field]['transition'] == transition ) {
+                        // status transition matches
+                        if ( currentJSON[queue][field].hasOwnProperty(op) ) {
+                            // op matches
+                            if ( currentJSON[queue][field][op].indexOf(value) == -1 ) {
+                                // required value/group is new
+                                currentJSON[queue][field][op].push(value);
+                            }
+                            else {
+                                errorMsg = field + ' <% loc('already requires') %> ' + op + ': ' + value;
+                            }
+                        }
+                        else {
+                            errorMsg = field + ' <% loc('already has a required value with a different operator') %>: ' + ( op == 'must_be' ? 'must_not_be' : 'must_be' );
+                        }
+                    }
+                    else {
+                        errorMsg = field + ' <% loc('already has a required value for status change') %>: ' + currentJSON[queue][field]['transition'];
+                    }
+                }
+                else {
+                    // first value/member requirement for this field
+                    currentJSON[queue][field]               = {};
+                    currentJSON[queue][field]['transition'] = transition;
+                    currentJSON[queue][field][op]           = [value];
+                }
+            }
+        }
+        jQuery('[name=MandatoryOnTransition]').text( JSON.stringify(currentJSON) );
+        jQuery('#MoT-Queue-Active').val( jQuery('ul#mot-nav a.active').attr('id') );
+
+        return errorMsg;
+    };
+
+    function removeCheckedRequirements (queue_id) {
+        jQuery( '#' + queue_id + '-current-requirements input:checked' ).each(
+            function ( i, obj ) {
+                element = jQuery(obj);
+                removeRequirement(element);
+            }
+        );
+        jQuery( '#' + queue_id + '-current-transitions input:checked' ).each(
+            function ( i, obj ) {
+                element = jQuery(obj);
+                removeTransition(element);
+            }
+        );
+    };
+
+    function removeRequirement (element) {
+        var queue    = element.attr("data-queue");
+        var from     = element.attr("data-from");
+        var to       = element.attr("data-to");
+        var requires = element.attr("data-requires");
+        // TODO: change this logic to determine the id of the element to remove instead of relying on heirarchy
+        //       requires adding id to the <li> element in html/MandatoryOnTransition/Elements/QueueRuleRequires
+        if ( requires.length > 0 ) {
+            jQuery(element).parent().parent().remove();
+        }
+        else {
+            jQuery(element).parent().parent().parent().remove();
+        }
+        removeRequirementJSON( queue, from, to, requires );
+    };
+
+    function removeRequirementJSON ( queue, from, to, value ) {
+        var currentJSON = JSON.parse( jQuery('[name=MandatoryOnTransition]').val() );
+        if ( from.length > 0 ) {
+            var key = from + ' -> ' + to;
+            if ( value.length > 0 ) {
+                var index = currentJSON[queue][key].indexOf(value);
+                if ( index > -1 ) {
+                    currentJSON[queue][key].splice( index, 1 );
+                    if ( currentJSON[queue][key].length == 0 ) {
+                        // last requires was deleted so delete rule as well
+                        delete currentJSON[queue][key];
+                        jQuery( '#' + htmlSafeQueueName(queue) + '-' + htmlSafeStatusName(from) + '-' + htmlSafeStatusName(to) + '-remove-rule' ).parent().parent().parent().remove();
+                    }
+                }
+                if ( currentJSON[queue].hasOwnProperty(value) ) {
+                    delete currentJSON[queue][value];
+                }
+            }
+            else {
+                delete currentJSON[queue][key];
+            }
+        }
+        else {
+            delete currentJSON[queue];
+            // remove queue nav and content tabs
+            var queue_id = htmlSafeQueueName(queue);
+            jQuery( '#category-tab-' + queue_id ).remove();
+            jQuery( '#' + queue_id + '-content' ).remove();
+            jQuery('#mot-nav a:first').trigger('click');
+        }
+        jQuery('[name=MandatoryOnTransition]').text( JSON.stringify(currentJSON) );
+        jQuery('#MoT-Queue-Active').val( jQuery('ul#mot-nav a.active').attr('id') );
+    };
+
+    function removeTransition (element) {
+        var queue       = element.attr("data-queue");
+        var to_queue    = element.attr("data-transition");
+        var field       = element.attr("data-requires");
+        var currentJSON = JSON.parse( jQuery('[name=MandatoryOnTransition]').val() );
+        // TODO: change this logic to determine the id of the element to remove instead of relying on heirarchy
+        //       requires adding id to the <li> element in html/MandatoryOnTransition/Elements/TransitionRuleRequires
+        if ( field.length > 0 ) {
+            jQuery(element).parent().parent().remove();
+            var index = currentJSON[queue][to_queue].indexOf(field);
+            if ( index > -1 ) {
+                currentJSON[queue][to_queue].splice( index, 1 );
+                if ( currentJSON[queue][to_queue].length == 0 ) {
+                    // last requires was deleted so delete rule as well
+                    delete currentJSON[queue][to_queue];
+                    var queue_id    = htmlSafeQueueName(queue);
+                    var to_queue_id = htmlSafeQueueName(to_queue);
+                    jQuery( '#' + queue_id + '-to-' + to_queue_id + '-remove-transition' ).parent().parent().parent().remove();
+                }
+            }
+        }
+        else {
+            jQuery(element).parent().parent().parent().remove();
+            delete currentJSON[queue][to_queue];
+        }
+        jQuery('[name=MandatoryOnTransition]').text( JSON.stringify(currentJSON) );
+        jQuery('#MoT-Queue-Active').val( jQuery('ul#mot-nav a.active').attr('id') );
+    };
+
+    function addTransition (queue) {
+        var queue_id    = htmlSafeQueueName(queue);
+        var to_queue    = jQuery('[name=' + queue_id + '-add-transition-queue] option:selected').text();
+        var field       = jQuery('[name=' + queue_id + '-add-transition-field] option:selected').val();
+        var to_queue_id = htmlSafeQueueName(to_queue);
+        var errorMsg    = '';
+        if ( ( to_queue.length > 0 ) && ( field.length > 0 ) ) {
+            var currentJSON = JSON.parse( jQuery('[name=MandatoryOnTransition]').val() );
+            if ( currentJSON.hasOwnProperty(queue) && currentJSON[queue].hasOwnProperty(to_queue) && ( currentJSON[queue][to_queue].indexOf(field) > -1 ) ) {
+                errorMsg = field + ' <% loc('is already required for this queue transition') %>';
+            }
+            else {
+                var id          = '#' + queue_id + '-to-' + to_queue_id;
+                var url         = RT.Config.WebHomePath + '/Helpers/QueueTransitionRequires';
+                var params      = {
+                    QueueName  : queue,
+                    ToQueueName: to_queue,
+                    Requires   : field,
+                };
+                if ( ! ( jQuery(id).length > 0 ) ) {
+                    id  = '#' + queue_id + '-current-transitions';
+                    url = RT.Config.WebHomePath + '/Helpers/QueueTransition';
+                }
+                jQuery.ajax(
+                    {
+                        url    : url,
+                        method : 'GET',
+                        data   : params,
+                        error  : ajaxError,
+                        success: function (response) {
+                            jQuery(id).append(response);
+                            if ( ! currentJSON.hasOwnProperty(queue) ) {
+                                currentJSON[queue] = {};
+                            }
+                            if ( ! currentJSON[queue].hasOwnProperty(to_queue) ) {
+                                currentJSON[queue][to_queue] = [];
+                            }
+                            currentJSON[queue][to_queue].push(field);
+                            jQuery('[name=MandatoryOnTransition]').text( JSON.stringify(currentJSON) );
+                            jQuery('#MoT-Queue-Active').val( jQuery('ul#mot-nav a.active').attr('id') );
+                        }
+                    }
+                );
+            }
+        }
+        else {
+            errorMsg = '<% loc('Select To and Core or Custom Field') %>';
+        }
+        jQuery( '#' + queue_id + '-add-transition-error' ).text(errorMsg);
+    };
+</script>
+<%INIT>
+my $active_queue = $m->request_args->{'MoT-NewQueue-Value'} || $m->request_args->{'MoT-Queue-Active'} || '';
+my $config       = RT->Config->Get('MandatoryOnTransition') || {};
+
+my @queues = ();
+foreach my $queue ( sort keys %$config ) {
+    my $add_queue;
+    if ( $queue eq '*' ) {
+        # determine all unique statuses for all ticket lifecycles
+        my %unique = ();
+        my @lifecycles
+            = map { RT::Lifecycle->Load( Type => 'ticket', Name => $_ ) }
+                RT::Lifecycle->List('ticket');
+        foreach my $lifecycle ( @lifecycles ) {
+            foreach my $status ( $lifecycle->Valid ) {
+                $unique{$status} = 1;
+            }
+        }
+        $add_queue = {
+            name     => $queue,
+            cfs      => [],
+            statuses => [ '__CREATE__', '*', sort keys %unique ],
+            object   => RT::Queue->new(RT->SystemUser),
+        };
+    }
+    else {
+        my $queueObj = RT::Queue->new(RT->SystemUser);
+        $queueObj->Load($queue);
+        if ( $queueObj->id ) {
+            my @cfs = ();
+            my $cfs = $queueObj->TicketCustomFields;
+            while ( my $cf = $cfs->Next ) {
+                push @cfs, $cf->Name;
+            }
+            my @statuses = (
+                '__CREATE__',
+                '*',
+            );
+            push @statuses, $queueObj->LifecycleObj->Valid;
+            $add_queue = {
+                name     => $queue,
+                cfs      => \@cfs,
+                statuses => \@statuses,
+                object   => $queueObj,
+            };
+        }
+    }
+
+    my @rules       = ();
+    my @transitions = ();
+    foreach my $key ( sort keys %{ $config->{$queue} || {} } ) {
+        if ( $key =~ /(.*?) -> (.*)/  ) {
+            my $from = $1;
+            my $to   = $2;
+            my $rule = {
+                from => $from,
+                to   => $to,
+            };
+            my @requires;
+            foreach my $field ( @{ $config->{$queue}->{$key} || [] } ) {
+                my $require = {
+                    field => $field,
+                };
+                if ( exists $config->{$queue}->{$field} ) {
+                    my $restriction = $config->{$queue}->{$field} || {};
+                    if ( $restriction->{transition} =~ /(.*?)\s*->\s*(.*)/ ) {
+                        if ( ( $1 eq $from ) && ( $2 eq $to ) ) {
+                            if ( exists $restriction->{group} ) {
+                                $require->{op}     = 'group';
+                                $require->{values} = $restriction->{group} || [];
+                            }
+                            elsif ( exists $restriction->{must_be} ) {
+                                $require->{op}     = 'must_be';
+                                $require->{values} = $restriction->{must_be} || [];
+                            }
+                            elsif ( exists $restriction->{must_not_be} ) {
+                                $require->{op}     = 'must_not_be';
+                                $require->{values} = $restriction->{must_not_be} || [];
+                            }
+                        }
+                    }
+                }
+                push @requires, $require;
+            }
+            $rule->{requires} = \@requires;
+            push @rules, $rule;
+        }
+        elsif ( ref( $config->{$queue}->{$key} ) eq 'ARRAY' ) {
+            push @transitions, {
+                to_queue => $key,
+                requires => $config->{$queue}->{$key},
+            };
+        }
+    }
+    $add_queue->{rules}       = \@rules;
+    $add_queue->{transitions} = \@transitions;
+
+    push @queues, $add_queue;
+}
+# set first queue as active
+$queues[0]->{active} = 1
+    if @queues;
+</%INIT>
+
+<%ARGS>
+</%ARGS>
+
+<%METHOD InputOnly>
+</%METHOD>
+
+<%METHOD Process>
+</%METHOD>

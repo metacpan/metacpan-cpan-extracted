@@ -1,0 +1,9 @@
+<&
+    '/Elements/SelectCustomFieldOperator',
+    Name    => $Name,
+    Options => [ '-', loc('must be'), loc('must not be'), ],
+    Values  => [ '',      'must_be',      'must_not_be',  ],
+&>
+<%ARGS>
+$Name
+</%ARGS>

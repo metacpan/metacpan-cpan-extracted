@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.021 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2025-03-11.
+    This document describes version 0.022 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2025-05-06.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -96,6 +96,7 @@ FUNCTIONS
              },
            ],
            {
+             "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
              "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { precision => 3, thousands_sep => "" }],
@@ -103,7 +104,6 @@ FUNCTIONS
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
            },
          ]
 
@@ -205,13 +205,13 @@ FUNCTIONS
            ],
            {
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
              "table.field_aligns"  => ["number", "number", "left", "left"],
+             "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
            },
          ]
 
@@ -265,229 +265,266 @@ FUNCTIONS
              {
                amount  => 1,
                pct_mg  => 100,
+               purity  => 1,
                unit    => "mg-mg-elem",
                summary => "Elemental magnesium, in milligrams",
              },
              {
                amount  => 6.17283950617284,
                pct_mg  => 16.1631051604894,
+               purity  => 1,
                unit    => "mg-trimagnesium-dicitrate",
                summary => "Magnesium citrate a.k.a trimagnesium dicitrate (C12H10Mg3O14), in milligrams",
              },
              {
                amount  => 8.84955752212389,
                pct_mg  => 11.3357585933492,
+               purity  => 1,
                unit    => "mg-mg-citrate-dibasic",
                summary => "Magnesium citrate dibasic (C6H6MgO7), in milligrams",
              },
              {
                amount  => 6.28930817610063,
                pct_mg  => 15.9495581415697,
+               purity  => 1,
                unit    => "mg-mg-citrate-anhydrous",
                summary => "Magnesium citrate anhydrous ((C6H5O7)2Mg3, C12H16Mg3O14), in milligrams",
              },
              {
                amount  => 6.89655172413793,
                pct_mg  => 15.9495581415697,
+               purity  => 0.9091,
                unit    => "mg-mg-citrate-anhydrous-nowfoods",
                summary => "Magnesium citrate in NOW Foods supplement (anhydrous, C12H16Mg3O14, 90.9% pure, contains citric acid etc), in milligrams",
              },
              {
                amount  => 25,
                pct_mg  => 3.96331023236853,
+               purity  => 1,
                unit    => "mg-mg-citrate-nonahydrate",
                summary => "Magnesium citrate nonahydrate ((C6H5O7)2Mg3 \xB7 9H2O, C12H28Mg3O23) [most common hydrate form of Mg-citrate at room temp], in milligrams",
              },
              {
                amount  => 7.09219858156028,
                pct_mg  => 14.0963925298689,
+               purity  => 1,
                unit    => "mg-mg-glycinate-anhydrous",
                summary => "Magnesium glycinate/bisglycinate anhydrous (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams",
              },
              {
                amount  => 7.09219858156028,
                pct_mg  => 14.0963925298689,
+               purity  => 1,
                unit    => "mg-mg-bisglycinate-anhydrous",
                summary => "Magnesium glycinate/bisglycinate (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams",
              },
              {
                amount  => 10,
                pct_mg  => 14.0963925298689,
+               purity  => 0.7094,
                unit    => "mg-mg-bisglycinate-nowfoods",
                summary => "Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams",
              },
              {
                amount  => 15.3846153846154,
                pct_mg  => 6.48929353340097,
+               purity  => 1,
                unit    => "mg-mg-ascorbate-dihydrate",
                summary => "Magnesium ascorbate hydrate (C12H14MgO12) [anhydrous and dihydrate are the most common hydrate forms of Mg-ascorbate at room temp], in milligrams",
              },
              {
                amount  => 11.4942528735632,
                pct_mg  => 8.66435902280432,
+               purity  => 1,
                unit    => "mg-mg-pidolate",
                summary => "Magnesium pidolate (C10H12MgN2O6), in milligrams",
              },
              {
                amount  => 12.0481927710843,
                pct_mg  => 8.25297113752122,
+               purity  => 1,
                unit    => "mg-mg-l-threonate",
                summary => "Magnesium L-threonate (C8H14MgO10), in milligrams",
              },
              {
                amount  => 1.65837479270315,
                pct_mg  => 60.303589682516,
+               purity  => 1,
                unit    => "mg-mg-oxide-anhydrous",
                summary => "Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams",
              },
              {
                amount  => 3.125,
                pct_mg  => 32,
+               purity  => 1,
                unit    => "mg-magshape",
                summary => "MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams",
              },
              {
                amount  => 8.33333333333333,
                pct_mg  => 12.0054334403556,
+               purity  => 1,
                unit    => "mg-mg-lactate-anhydrous",
                summary => "Magnesium lactate dihydrate (C6H10MgO6), in milligrams",
              },
              {
                amount  => 9.80392156862745,
                pct_mg  => 10.1916303253942,
+               purity  => 1,
                unit    => "mg-mg-lactate-dihydrate",
                summary => "Magnesium lactate dihydrate (C6H14MgO8), in milligrams",
              },
              {
                amount  => 3.92156862745098,
                pct_mg  => 25.5275125773282,
+               purity  => 1,
                unit    => "mg-mg-chloride-ah",
                summary => "Magnesium chloride (anhydrous, MgCl2), in milligrams",
              },
              {
                amount  => 8.33333333333333,
                pct_mg  => 11.9546505336678,
+               purity  => 1,
                unit    => "mg-mg-chloride-hexahydrate",
                summary => "Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams",
              },
              {
                amount  => 6.45161290322581,
                pct_mg  => 15.54266639382,
+               purity  => 1,
                unit    => "mg-mg-malate",
                summary => "Magnesium malate (C4H4MgO5), in milligrams",
              },
              {
                amount  => 8.62068965517241,
                pct_mg  => 11.5518060836502,
+               purity  => 1,
                unit    => "mg-mg-malate-trihydrate",
                summary => "Magnesium malate (MgC4H4O5.3H2O), in milligrams",
              },
              {
                amount  => 4.95049504950495,
                pct_mg  => 20.1919082827947,
+               purity  => 1,
                unit    => "mg-mg-sulfate-anhydrous",
                summary => "Magnesium sulfate anhydrous (MgSO4), in milligrams",
              },
              {
                amount  => 5.68181818181818,
                pct_mg  => 17.5626851651131,
+               purity  => 1,
                unit    => "mg-mg-sulfate-monohydrate",
                summary => "Magnesium sulfate monohydrate (MgSO4.H2O), in milligrams",
              },
              {
                amount  => 10.1010101010101,
                pct_mg  => 9.86084063615709,
+               purity  => 1,
                unit    => "mg-mg-sulfate-heptahydrate",
                summary => "Magnesium sulfate heptahydrate (MgSO4.7H2O) a.k.a. Epsom salt, in milligrams",
              },
              {
                amount  => 3.47222222222222,
                pct_mg  => 28.8281342663978,
+               purity  => 1,
                unit    => "mg-mg-carbonate-anhydrous",
                summary => "Magnesium carbonate anhydrous (MgCO3), in milligrams",
              },
              {
                amount  => 6.02409638554217,
                pct_mg  => 16.6029100348384,
+               purity  => 1,
                unit    => "mg-mg-carbonate-trihydrate",
                summary => "Magnesium carbonate trihydrate (MgCO3.3H2O), in milligrams",
              },
              {
                amount  => 2.39808153477218,
                pct_mg  => 41.6752400548697,
+               purity  => 1,
                unit    => "mg-mg-hydroxide-anhydrous",
                summary => "Magnesium hydroxide anhydrous (Mg(OH)2), in milligrams",
              },
              {
                amount  => 5.68181818181818,
                pct_mg  => 17.5664932061289,
+               purity  => 1,
                unit    => "mg-mg-hydroxide-pentahydrate",
                summary => "Magnesium hydroxide pentahydrate (Mg(OH)2.5H2O), in milligrams",
              },
              {
                amount  => 5.84795321637427,
                pct_mg  => 17.0693166654962,
+               purity  => 1,
                unit    => "mg-mg-acetate-anhydrous",
                summary => "Magnesium acetate anhydrous (Mg(CH3COO)2), in milligrams",
              },
              {
                amount  => 8.84955752212389,
                pct_mg  => 11.3336442061087,
+               purity  => 1,
                unit    => "mg-mg-acetate-tetrahydrate",
                summary => "Magnesium acetate tetrahydrate (Mg(CH3COO)2.4H2O), in milligrams",
              },
              {
                amount  => 18.5185185185185,
                pct_mg  => 5.3935601269334,
+               purity  => 1,
                unit    => "mg-mg-gluconate-dihydrate",
                summary => "Magnesium gluconate dihydrate (C12H26MgO16), in milligrams",
              },
              {
                amount  => 17.8571428571429,
                pct_mg  => 5.61809440155333,
+               purity  => 1,
                unit    => "mg-mg-gluconate-hydrate",
                summary => "Magnesium gluconate dihydrate (C12H26MgO16), in milligrams",
              },
              {
                amount  => 8,
                pct_mg  => 12.5051450915826,
+               purity  => 1,
                unit    => "mg-mg-glycerophosphate-anhydrous",
                summary => "Magnesium glycerophosphate anhydrous (C\x{2083}H\x{2087}MgO\x{2086}P), in milligrams",
              },
              {
                amount  => 8.7719298245614,
                pct_mg  => 11.4442119973764,
+               purity  => 1,
                unit    => "mg-mg-glycerophosphate-hydrate",
                summary => "Magnesium glycerophosphate anhydrous (C\x{2083}H\x{2087}MgO\x{2086}P.H2O, C3H9MgO7P), in milligrams",
              },
              {
                amount  => 3.6101083032491,
                pct_mg  => 27.7393433785657,
+               purity  => 1,
                unit    => "mg-trimagnesium-orthophosphate-anhydrous",
                summary => "Trimagnesium orthophosphate (Mg3O8P2), in milligrams",
              },
              {
                amount  => 8.33333333333333,
                pct_mg  => 12,
+               purity  => 1,
                unit    => "mg-sunactive-mg",
                summary => "SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams",
              },
              {
                amount  => 11.2359550561798,
                pct_mg  => 8.91599413059428,
+               purity  => 1,
                unit    => "mg-mg-taurate",
                summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
              },
            ],
            {
-             "table.field_aligns"  => ["number", "number", "left", "left"],
+             "table.fields"        => ["amount", "pct_mg", "purity", "unit", "summary"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "pct_mg", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -614,13 +651,13 @@ FUNCTIONS
              },
            ],
            {
+             "table.fields"        => ["amount", "pct_k", "unit", "summary"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "pct_k", "unit", "summary"],
              "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
@@ -737,11 +774,11 @@ FUNCTIONS
              },
            ],
            {
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.fields"        => ["amount", "pct_na", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
@@ -847,13 +884,13 @@ FUNCTIONS
              },
            ],
            {
+             "table.fields"        => ["amount", "pct_zn", "unit", "summary"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "pct_zn", "unit", "summary"],
              "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
@@ -919,8 +956,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025, 2024 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

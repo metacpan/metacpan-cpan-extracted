@@ -1,0 +1,19 @@
+<li class="list-group=item">
+  <div class="custom-control custom-checkbox">
+% my $id = join '-', $Queue->{safe_name}, 'to', $Transition->{safe_to_name}, 'remove-transition', $safe_requires;
+    <input type="checkbox" class="checkbox custom-control-input" id="<% $id %>" name="<% $id %>" value="1" unchecked="" data-queue="<% $Queue->{name} %>" data-transition="<% $Transition->{to_queue} %>" data-requires="<% $Requires %>">
+    <label class="custom-control-label" for="<% $id %>">
+      <% $Requires %>
+    </label>
+  </div>
+</li>
+<%INIT>
+$Queue->{safe_name}         = RT::Extension::MandatoryOnTransition::HTMLSafeQueueName( $Queue->{name} );
+$Transition->{safe_to_name} = RT::Extension::MandatoryOnTransition::HTMLSafeQueueName( $Transition->{to_queue} );
+my $safe_requires = RT::Extension::MandatoryOnTransition::HTMLSafeName($Requires);
+</%INIT>
+<%ARGS>
+$Queue
+$Transition
+$Requires
+</%ARGS>

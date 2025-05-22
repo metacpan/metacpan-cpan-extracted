@@ -1,0 +1,8 @@
+<%INIT>
+$$row = loc('MandatoryOnTransition was updated')
+    if $$row =~ /^MandatoryOnTransition/;
+</%INIT>
+<%ARGS>
+$row
+$skip
+</%ARGS>

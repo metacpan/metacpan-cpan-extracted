@@ -3,3 +3,10 @@ Revision history for Doubly-Linked-PP
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03 	2025-05-21
+	- New version of Doubly::Linked::PP written by Lukas Mai (MAUKE) showing me the correct approach to take for doubly linked lists in perl.
+	- Update benchmark to show this pure perl version is faster than my current XS implementation.
+
+0.04 	2025-05-21
+	- New version of Doubly::Linked::PP written by Lukas Mai (MAUKE) showing me the correct approach to take for doubly linked lists in perl.
+	- Update benchmark to show this pure perl version is faster than my current XS implementation.

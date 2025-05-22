@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MandatoryOnTransition
 
+0.25 2025-05-21
+ - Add support for modifying configuration in the RT UI which is coming in RT 5.0.9 and RT 6.0.0
+
 0.24 2024-06-20
  - Parse group values on role related validations
  - Clarify the example "to" status for __CREATE__ rules

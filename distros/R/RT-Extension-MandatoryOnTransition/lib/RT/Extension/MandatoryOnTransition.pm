@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -311,6 +311,51 @@ our %CORE_FOR_CREATE = (
     TimeWorked  => 'TimeWorked',
     Content     => 'Content',
 );
+
+# keep this in sync with htmlSafeName in html/Widgets/Form/MandatoryOnTransition
+sub _sanitize_id {
+    my $str = shift;
+
+    $str =~ s/^\s+//;
+    $str =~ s/\s+$//;
+    $str = lc $str;
+    $str =~ s/ /_/g;
+    $str =~ s/[^a-z0-9-_]//g;
+
+    return $str;
+}
+
+sub HTMLSafeName {
+    my $name = shift;
+    $name    = _sanitize_id($name);
+    return $name;
+}
+
+sub HTMLSafeQueueName {
+    my $name = shift;
+
+    if ( $name eq '*' ) {
+        $name = '__default__';
+    }
+    else {
+        $name = _sanitize_id($name);
+    }
+
+    return $name;
+}
+
+sub HTMLSafeStatusName {
+    my $name = shift;
+
+    if ( $name eq '*' ) {
+        $name = '__all__';
+    }
+    else {
+        $name = _sanitize_id($name);
+    }
+
+    return $name;
+}
 
 =head2 Methods
 
@@ -964,6 +1009,34 @@ sub Config {
     return %{$config{$queue}} if $config{$queue};
     return %{$config{'*'}} if $config{'*'};
     return;
+}
+
+# backwards compatibility - confirm RT Config object has the RegisterPluginConfig method before trying to call it
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'MandatoryOnTransition',
+        Content => [
+            {
+                Name => 'MandatoryOnTransition',
+                Help => 'https://metacpan.org/pod/RT::Extension::MandatoryOnTransition#CONFIGURATION',
+            },
+            {
+                Name => 'ShowAllCustomFieldsOnMandatoryUpdate',
+                Help => 'https://metacpan.org/pod/RT::Extension::MandatoryOnTransition#$ShowAllCustomFieldsOnMandatoryUpdate',
+            }
+        ],
+        Meta    => {
+            MandatoryOnTransition => {
+                Type    => 'HASH',
+                Widget  => '/Widgets/Form/MandatoryOnTransition',
+                NoReset => 1,
+                IsJSON  => 1,
+            },
+            ShowAllCustomFieldsOnMandatoryUpdate => {
+                Widget  => '/Widgets/Form/Boolean',
+            },
+        }
+    );
 }
 
 =head1 TODO

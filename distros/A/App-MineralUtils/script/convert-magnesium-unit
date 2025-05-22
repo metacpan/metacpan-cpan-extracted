@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-03-11'; # DATE
+our $DATE = '2025-05-06'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_magnesium_unit",
@@ -39,7 +39,7 @@ convert-magnesium-unit - Convert a magnesium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.021 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2025-03-11.
+This document describes version 0.022 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2025-05-06.
 
 =head1 SYNOPSIS
 
@@ -198,46 +198,46 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Show all possible conversions
 
  % convert-magnesium-unit
- +--------+---------+------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
- | amount |  pct_mg | unit                                     | summary                                                                                                                                           |
- +--------+---------+------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
- |  1.000 | 100.000 | mg-mg-elem                               | Elemental magnesium, in milligrams                                                                                                                |
- |  6.173 |  16.163 | mg-trimagnesium-dicitrate                | Magnesium citrate a.k.a trimagnesium dicitrate (C12H10Mg3O14), in milligrams                                                                      |
- |  8.850 |  11.336 | mg-mg-citrate-dibasic                    | Magnesium citrate dibasic (C6H6MgO7), in milligrams                                                                                               |
- |  6.289 |  15.950 | mg-mg-citrate-anhydrous                  | Magnesium citrate anhydrous ((C6H5O7)2Mg3, C12H16Mg3O14), in milligrams                                                                           |
- |  6.897 |  15.950 | mg-mg-citrate-anhydrous-nowfoods         | Magnesium citrate in NOW Foods supplement (anhydrous, C12H16Mg3O14, 90.9% pure, contains citric acid etc), in milligrams                          |
- | 25.000 |   3.963 | mg-mg-citrate-nonahydrate                | Magnesium citrate nonahydrate ((C6H5O7)2Mg3 · 9H2O, C12H28Mg3O23) [most common hydrate form of Mg-citrate at room temp], in milligrams            |
- |  7.092 |  14.096 | mg-mg-glycinate-anhydrous                | Magnesium glycinate/bisglycinate anhydrous (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams                                 |
- |  7.092 |  14.096 | mg-mg-bisglycinate-anhydrous             | Magnesium glycinate/bisglycinate (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams                                           |
- | 10.000 |  14.096 | mg-mg-bisglycinate-nowfoods              | Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams                                  |
- | 15.385 |   6.489 | mg-mg-ascorbate-dihydrate                | Magnesium ascorbate hydrate (C12H14MgO12) [anhydrous and dihydrate are the most common hydrate forms of Mg-ascorbate at room temp], in milligrams |
- | 11.494 |   8.664 | mg-mg-pidolate                           | Magnesium pidolate (C10H12MgN2O6), in milligrams                                                                                                  |
- | 12.048 |   8.253 | mg-mg-l-threonate                        | Magnesium L-threonate (C8H14MgO10), in milligrams                                                                                                 |
- |  1.658 |  60.304 | mg-mg-oxide-anhydrous                    | Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams                                                     |
- |  3.125 |  32.000 | mg-magshape                              | MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams                                                                               |
- |  8.333 |  12.005 | mg-mg-lactate-anhydrous                  | Magnesium lactate dihydrate (C6H10MgO6), in milligrams                                                                                            |
- |  9.804 |  10.192 | mg-mg-lactate-dihydrate                  | Magnesium lactate dihydrate (C6H14MgO8), in milligrams                                                                                            |
- |  3.922 |  25.528 | mg-mg-chloride-ah                        | Magnesium chloride (anhydrous, MgCl2), in milligrams                                                                                              |
- |  8.333 |  11.955 | mg-mg-chloride-hexahydrate               | Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams                                                                                       |
- |  6.452 |  15.543 | mg-mg-malate                             | Magnesium malate (C4H4MgO5), in milligrams                                                                                                        |
- |  8.621 |  11.552 | mg-mg-malate-trihydrate                  | Magnesium malate (MgC4H4O5.3H2O), in milligrams                                                                                                   |
- |  4.950 |  20.192 | mg-mg-sulfate-anhydrous                  | Magnesium sulfate anhydrous (MgSO4), in milligrams                                                                                                |
- |  5.682 |  17.563 | mg-mg-sulfate-monohydrate                | Magnesium sulfate monohydrate (MgSO4.H2O), in milligrams                                                                                          |
- | 10.101 |   9.861 | mg-mg-sulfate-heptahydrate               | Magnesium sulfate heptahydrate (MgSO4.7H2O) a.k.a. Epsom salt, in milligrams                                                                      |
- |  3.472 |  28.828 | mg-mg-carbonate-anhydrous                | Magnesium carbonate anhydrous (MgCO3), in milligrams                                                                                              |
- |  6.024 |  16.603 | mg-mg-carbonate-trihydrate               | Magnesium carbonate trihydrate (MgCO3.3H2O), in milligrams                                                                                        |
- |  2.398 |  41.675 | mg-mg-hydroxide-anhydrous                | Magnesium hydroxide anhydrous (Mg(OH)2), in milligrams                                                                                            |
- |  5.682 |  17.566 | mg-mg-hydroxide-pentahydrate             | Magnesium hydroxide pentahydrate (Mg(OH)2.5H2O), in milligrams                                                                                    |
- |  5.848 |  17.069 | mg-mg-acetate-anhydrous                  | Magnesium acetate anhydrous (Mg(CH3COO)2), in milligrams                                                                                          |
- |  8.850 |  11.334 | mg-mg-acetate-tetrahydrate               | Magnesium acetate tetrahydrate (Mg(CH3COO)2.4H2O), in milligrams                                                                                  |
- | 18.519 |   5.394 | mg-mg-gluconate-dihydrate                | Magnesium gluconate dihydrate (C12H26MgO16), in milligrams                                                                                        |
- | 17.857 |   5.618 | mg-mg-gluconate-hydrate                  | Magnesium gluconate dihydrate (C12H26MgO16), in milligrams                                                                                        |
- |  8.000 |  12.505 | mg-mg-glycerophosphate-anhydrous         | Magnesium glycerophosphate anhydrous (C₃H₇MgO₆P), in milligrams                                                                                   |
- |  8.772 |  11.444 | mg-mg-glycerophosphate-hydrate           | Magnesium glycerophosphate anhydrous (C₃H₇MgO₆P.H2O, C3H9MgO7P), in milligrams                                                                    |
- |  3.610 |  27.739 | mg-trimagnesium-orthophosphate-anhydrous | Trimagnesium orthophosphate (Mg3O8P2), in milligrams                                                                                              |
- |  8.333 |  12.000 | mg-sunactive-mg                          | SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams                                          |
- | 11.236 |   8.916 | mg-mg-taurate                            | Magnesium taurate (C4H12MgN2O6S2), in milligrams                                                                                                  |
- +--------+---------+------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+ +--------+---------+--------+------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+ | amount |  pct_mg | purity | unit                                     | summary                                                                                                                                           |
+ +--------+---------+--------+------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+ |  1.000 | 100.000 | 1.000  | mg-mg-elem                               | Elemental magnesium, in milligrams                                                                                                                |
+ |  6.173 |  16.163 | 1.000  | mg-trimagnesium-dicitrate                | Magnesium citrate a.k.a trimagnesium dicitrate (C12H10Mg3O14), in milligrams                                                                      |
+ |  8.850 |  11.336 | 1.000  | mg-mg-citrate-dibasic                    | Magnesium citrate dibasic (C6H6MgO7), in milligrams                                                                                               |
+ |  6.289 |  15.950 | 1.000  | mg-mg-citrate-anhydrous                  | Magnesium citrate anhydrous ((C6H5O7)2Mg3, C12H16Mg3O14), in milligrams                                                                           |
+ |  6.897 |  15.950 | 0.909  | mg-mg-citrate-anhydrous-nowfoods         | Magnesium citrate in NOW Foods supplement (anhydrous, C12H16Mg3O14, 90.9% pure, contains citric acid etc), in milligrams                          |
+ | 25.000 |   3.963 | 1.000  | mg-mg-citrate-nonahydrate                | Magnesium citrate nonahydrate ((C6H5O7)2Mg3 · 9H2O, C12H28Mg3O23) [most common hydrate form of Mg-citrate at room temp], in milligrams            |
+ |  7.092 |  14.096 | 1.000  | mg-mg-glycinate-anhydrous                | Magnesium glycinate/bisglycinate anhydrous (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams                                 |
+ |  7.092 |  14.096 | 1.000  | mg-mg-bisglycinate-anhydrous             | Magnesium glycinate/bisglycinate (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams                                           |
+ | 10.000 |  14.096 | 0.709  | mg-mg-bisglycinate-nowfoods              | Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams                                  |
+ | 15.385 |   6.489 | 1.000  | mg-mg-ascorbate-dihydrate                | Magnesium ascorbate hydrate (C12H14MgO12) [anhydrous and dihydrate are the most common hydrate forms of Mg-ascorbate at room temp], in milligrams |
+ | 11.494 |   8.664 | 1.000  | mg-mg-pidolate                           | Magnesium pidolate (C10H12MgN2O6), in milligrams                                                                                                  |
+ | 12.048 |   8.253 | 1.000  | mg-mg-l-threonate                        | Magnesium L-threonate (C8H14MgO10), in milligrams                                                                                                 |
+ |  1.658 |  60.304 | 1.000  | mg-mg-oxide-anhydrous                    | Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams                                                     |
+ |  3.125 |  32.000 | 1.000  | mg-magshape                              | MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams                                                                               |
+ |  8.333 |  12.005 | 1.000  | mg-mg-lactate-anhydrous                  | Magnesium lactate dihydrate (C6H10MgO6), in milligrams                                                                                            |
+ |  9.804 |  10.192 | 1.000  | mg-mg-lactate-dihydrate                  | Magnesium lactate dihydrate (C6H14MgO8), in milligrams                                                                                            |
+ |  3.922 |  25.528 | 1.000  | mg-mg-chloride-ah                        | Magnesium chloride (anhydrous, MgCl2), in milligrams                                                                                              |
+ |  8.333 |  11.955 | 1.000  | mg-mg-chloride-hexahydrate               | Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams                                                                                       |
+ |  6.452 |  15.543 | 1.000  | mg-mg-malate                             | Magnesium malate (C4H4MgO5), in milligrams                                                                                                        |
+ |  8.621 |  11.552 | 1.000  | mg-mg-malate-trihydrate                  | Magnesium malate (MgC4H4O5.3H2O), in milligrams                                                                                                   |
+ |  4.950 |  20.192 | 1.000  | mg-mg-sulfate-anhydrous                  | Magnesium sulfate anhydrous (MgSO4), in milligrams                                                                                                |
+ |  5.682 |  17.563 | 1.000  | mg-mg-sulfate-monohydrate                | Magnesium sulfate monohydrate (MgSO4.H2O), in milligrams                                                                                          |
+ | 10.101 |   9.861 | 1.000  | mg-mg-sulfate-heptahydrate               | Magnesium sulfate heptahydrate (MgSO4.7H2O) a.k.a. Epsom salt, in milligrams                                                                      |
+ |  3.472 |  28.828 | 1.000  | mg-mg-carbonate-anhydrous                | Magnesium carbonate anhydrous (MgCO3), in milligrams                                                                                              |
+ |  6.024 |  16.603 | 1.000  | mg-mg-carbonate-trihydrate               | Magnesium carbonate trihydrate (MgCO3.3H2O), in milligrams                                                                                        |
+ |  2.398 |  41.675 | 1.000  | mg-mg-hydroxide-anhydrous                | Magnesium hydroxide anhydrous (Mg(OH)2), in milligrams                                                                                            |
+ |  5.682 |  17.566 | 1.000  | mg-mg-hydroxide-pentahydrate             | Magnesium hydroxide pentahydrate (Mg(OH)2.5H2O), in milligrams                                                                                    |
+ |  5.848 |  17.069 | 1.000  | mg-mg-acetate-anhydrous                  | Magnesium acetate anhydrous (Mg(CH3COO)2), in milligrams                                                                                          |
+ |  8.850 |  11.334 | 1.000  | mg-mg-acetate-tetrahydrate               | Magnesium acetate tetrahydrate (Mg(CH3COO)2.4H2O), in milligrams                                                                                  |
+ | 18.519 |   5.394 | 1.000  | mg-mg-gluconate-dihydrate                | Magnesium gluconate dihydrate (C12H26MgO16), in milligrams                                                                                        |
+ | 17.857 |   5.618 | 1.000  | mg-mg-gluconate-hydrate                  | Magnesium gluconate dihydrate (C12H26MgO16), in milligrams                                                                                        |
+ |  8.000 |  12.505 | 1.000  | mg-mg-glycerophosphate-anhydrous         | Magnesium glycerophosphate anhydrous (C₃H₇MgO₆P), in milligrams                                                                                   |
+ |  8.772 |  11.444 | 1.000  | mg-mg-glycerophosphate-hydrate           | Magnesium glycerophosphate anhydrous (C₃H₇MgO₆P.H2O, C3H9MgO7P), in milligrams                                                                    |
+ |  3.610 |  27.739 | 1.000  | mg-trimagnesium-orthophosphate-anhydrous | Trimagnesium orthophosphate (Mg3O8P2), in milligrams                                                                                              |
+ |  8.333 |  12.000 | 1.000  | mg-sunactive-mg                          | SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams                                          |
+ | 11.236 |   8.916 | 1.000  | mg-mg-taurate                            | Magnesium taurate (C4H12MgN2O6S2), in milligrams                                                                                                  |
+ +--------+---------+--------+------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 
 =head2 How much of magnesium oxide provides 350 mg of elemental magnesium?
 
@@ -247,42 +247,42 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Sort by highest magnesium content
 
  % convert-magnesium-unit | td sort -- -pct_mg
- 1.000	100.000	mg-mg-elem	Elemental magnesium, in milligrams
- 1.658	60.304	mg-mg-oxide-anhydrous	Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams
- 2.398	41.675	mg-mg-hydroxide-anhydrous	Magnesium hydroxide anhydrous (Mg(OH)2), in milligrams
- 3.125	32.000	mg-magshape	MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams
- 3.472	28.828	mg-mg-carbonate-anhydrous	Magnesium carbonate anhydrous (MgCO3), in milligrams
- 3.610	27.739	mg-trimagnesium-orthophosphate-anhydrous	Trimagnesium orthophosphate (Mg3O8P2), in milligrams
- 3.922	25.528	mg-mg-chloride-ah	Magnesium chloride (anhydrous, MgCl2), in milligrams
- 4.950	20.192	mg-mg-sulfate-anhydrous	Magnesium sulfate anhydrous (MgSO4), in milligrams
- 5.682	17.566	mg-mg-hydroxide-pentahydrate	Magnesium hydroxide pentahydrate (Mg(OH)2.5H2O), in milligrams
- 5.682	17.563	mg-mg-sulfate-monohydrate	Magnesium sulfate monohydrate (MgSO4.H2O), in milligrams
- 5.848	17.069	mg-mg-acetate-anhydrous	Magnesium acetate anhydrous (Mg(CH3COO)2), in milligrams
- 6.024	16.603	mg-mg-carbonate-trihydrate	Magnesium carbonate trihydrate (MgCO3.3H2O), in milligrams
- 6.173	16.163	mg-trimagnesium-dicitrate	Magnesium citrate a.k.a trimagnesium dicitrate (C12H10Mg3O14), in milligrams
- 6.289	15.950	mg-mg-citrate-anhydrous	Magnesium citrate anhydrous ((C6H5O7)2Mg3, C12H16Mg3O14), in milligrams
- 6.897	15.950	mg-mg-citrate-anhydrous-nowfoods	Magnesium citrate in NOW Foods supplement (anhydrous, C12H16Mg3O14, 90.9% pure, contains citric acid etc), in milligrams
- 6.452	15.543	mg-mg-malate	Magnesium malate (C4H4MgO5), in milligrams
- 7.092	14.096	mg-mg-glycinate-anhydrous	Magnesium glycinate/bisglycinate anhydrous (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams
- 7.092	14.096	mg-mg-bisglycinate-anhydrous	Magnesium glycinate/bisglycinate (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams
- 10.000	14.096	mg-mg-bisglycinate-nowfoods	Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams
- 8.000	12.505	mg-mg-glycerophosphate-anhydrous	Magnesium glycerophosphate anhydrous (C\xE2\x82\x83H\xE2\x82\x87MgO\xE2\x82\x86P), in milligrams
- 8.333	12.005	mg-mg-lactate-anhydrous	Magnesium lactate dihydrate (C6H10MgO6), in milligrams
- 8.333	12.000	mg-sunactive-mg	SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams
- 8.333	11.955	mg-mg-chloride-hexahydrate	Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams
- 8.621	11.552	mg-mg-malate-trihydrate	Magnesium malate (MgC4H4O5.3H2O), in milligrams
- 8.772	11.444	mg-mg-glycerophosphate-hydrate	Magnesium glycerophosphate anhydrous (C\xE2\x82\x83H\xE2\x82\x87MgO\xE2\x82\x86P.H2O, C3H9MgO7P), in milligrams
- 8.850	11.336	mg-mg-citrate-dibasic	Magnesium citrate dibasic (C6H6MgO7), in milligrams
- 8.850	11.334	mg-mg-acetate-tetrahydrate	Magnesium acetate tetrahydrate (Mg(CH3COO)2.4H2O), in milligrams
- 9.804	10.192	mg-mg-lactate-dihydrate	Magnesium lactate dihydrate (C6H14MgO8), in milligrams
- 10.101	9.861	mg-mg-sulfate-heptahydrate	Magnesium sulfate heptahydrate (MgSO4.7H2O) a.k.a. Epsom salt, in milligrams
- 11.236	8.916	mg-mg-taurate	Magnesium taurate (C4H12MgN2O6S2), in milligrams
- 11.494	8.664	mg-mg-pidolate	Magnesium pidolate (C10H12MgN2O6), in milligrams
- 12.048	8.253	mg-mg-l-threonate	Magnesium L-threonate (C8H14MgO10), in milligrams
- 15.385	6.489	mg-mg-ascorbate-dihydrate	Magnesium ascorbate hydrate (C12H14MgO12) [anhydrous and dihydrate are the most common hydrate forms of Mg-ascorbate at room temp], in milligrams
- 17.857	5.618	mg-mg-gluconate-hydrate	Magnesium gluconate dihydrate (C12H26MgO16), in milligrams
- 18.519	5.394	mg-mg-gluconate-dihydrate	Magnesium gluconate dihydrate (C12H26MgO16), in milligrams
- 25.000	3.963	mg-mg-citrate-nonahydrate	Magnesium citrate nonahydrate ((C6H5O7)2Mg3 \xC2\xB7 9H2O, C12H28Mg3O23) [most common hydrate form of Mg-citrate at room temp], in milligrams
+ 1.000	100.000	1.000	mg-mg-elem	Elemental magnesium, in milligrams
+ 1.658	60.304	1.000	mg-mg-oxide-anhydrous	Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams
+ 2.398	41.675	1.000	mg-mg-hydroxide-anhydrous	Magnesium hydroxide anhydrous (Mg(OH)2), in milligrams
+ 3.125	32.000	1.000	mg-magshape	MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams
+ 3.472	28.828	1.000	mg-mg-carbonate-anhydrous	Magnesium carbonate anhydrous (MgCO3), in milligrams
+ 3.610	27.739	1.000	mg-trimagnesium-orthophosphate-anhydrous	Trimagnesium orthophosphate (Mg3O8P2), in milligrams
+ 3.922	25.528	1.000	mg-mg-chloride-ah	Magnesium chloride (anhydrous, MgCl2), in milligrams
+ 4.950	20.192	1.000	mg-mg-sulfate-anhydrous	Magnesium sulfate anhydrous (MgSO4), in milligrams
+ 5.682	17.566	1.000	mg-mg-hydroxide-pentahydrate	Magnesium hydroxide pentahydrate (Mg(OH)2.5H2O), in milligrams
+ 5.682	17.563	1.000	mg-mg-sulfate-monohydrate	Magnesium sulfate monohydrate (MgSO4.H2O), in milligrams
+ 5.848	17.069	1.000	mg-mg-acetate-anhydrous	Magnesium acetate anhydrous (Mg(CH3COO)2), in milligrams
+ 6.024	16.603	1.000	mg-mg-carbonate-trihydrate	Magnesium carbonate trihydrate (MgCO3.3H2O), in milligrams
+ 6.173	16.163	1.000	mg-trimagnesium-dicitrate	Magnesium citrate a.k.a trimagnesium dicitrate (C12H10Mg3O14), in milligrams
+ 6.289	15.950	1.000	mg-mg-citrate-anhydrous	Magnesium citrate anhydrous ((C6H5O7)2Mg3, C12H16Mg3O14), in milligrams
+ 6.897	15.950	0.909	mg-mg-citrate-anhydrous-nowfoods	Magnesium citrate in NOW Foods supplement (anhydrous, C12H16Mg3O14, 90.9% pure, contains citric acid etc), in milligrams
+ 6.452	15.543	1.000	mg-mg-malate	Magnesium malate (C4H4MgO5), in milligrams
+ 7.092	14.096	1.000	mg-mg-glycinate-anhydrous	Magnesium glycinate/bisglycinate anhydrous (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams
+ 7.092	14.096	1.000	mg-mg-bisglycinate-anhydrous	Magnesium glycinate/bisglycinate (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams
+ 10.000	14.096	0.709	mg-mg-bisglycinate-nowfoods	Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams
+ 8.000	12.505	1.000	mg-mg-glycerophosphate-anhydrous	Magnesium glycerophosphate anhydrous (C\xE2\x82\x83H\xE2\x82\x87MgO\xE2\x82\x86P), in milligrams
+ 8.333	12.005	1.000	mg-mg-lactate-anhydrous	Magnesium lactate dihydrate (C6H10MgO6), in milligrams
+ 8.333	12.000	1.000	mg-sunactive-mg	SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams
+ 8.333	11.955	1.000	mg-mg-chloride-hexahydrate	Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams
+ 8.621	11.552	1.000	mg-mg-malate-trihydrate	Magnesium malate (MgC4H4O5.3H2O), in milligrams
+ 8.772	11.444	1.000	mg-mg-glycerophosphate-hydrate	Magnesium glycerophosphate anhydrous (C\xE2\x82\x83H\xE2\x82\x87MgO\xE2\x82\x86P.H2O, C3H9MgO7P), in milligrams
+ 8.850	11.336	1.000	mg-mg-citrate-dibasic	Magnesium citrate dibasic (C6H6MgO7), in milligrams
+ 8.850	11.334	1.000	mg-mg-acetate-tetrahydrate	Magnesium acetate tetrahydrate (Mg(CH3COO)2.4H2O), in milligrams
+ 9.804	10.192	1.000	mg-mg-lactate-dihydrate	Magnesium lactate dihydrate (C6H14MgO8), in milligrams
+ 10.101	9.861	1.000	mg-mg-sulfate-heptahydrate	Magnesium sulfate heptahydrate (MgSO4.7H2O) a.k.a. Epsom salt, in milligrams
+ 11.236	8.916	1.000	mg-mg-taurate	Magnesium taurate (C4H12MgN2O6S2), in milligrams
+ 11.494	8.664	1.000	mg-mg-pidolate	Magnesium pidolate (C10H12MgN2O6), in milligrams
+ 12.048	8.253	1.000	mg-mg-l-threonate	Magnesium L-threonate (C8H14MgO10), in milligrams
+ 15.385	6.489	1.000	mg-mg-ascorbate-dihydrate	Magnesium ascorbate hydrate (C12H14MgO12) [anhydrous and dihydrate are the most common hydrate forms of Mg-ascorbate at room temp], in milligrams
+ 17.857	5.618	1.000	mg-mg-gluconate-hydrate	Magnesium gluconate dihydrate (C12H26MgO16), in milligrams
+ 18.519	5.394	1.000	mg-mg-gluconate-dihydrate	Magnesium gluconate dihydrate (C12H26MgO16), in milligrams
+ 25.000	3.963	1.000	mg-mg-citrate-nonahydrate	Magnesium citrate nonahydrate ((C6H5O7)2Mg3 \xC2\xB7 9H2O, C12H28Mg3O23) [most common hydrate form of Mg-citrate at room temp], in milligrams
 
 =head1 HOMEPAGE
 
@@ -316,7 +316,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025, 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,9 @@
+0.013   2025-05-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Apply fix of rendering false values from Text-Table-HTML (see its
+          GH#5).
+
+
 0.012   2022-04-22  Released-By: PERLANCAR; Urgency: medium
 
         - Tweak URI escaping for Windows (do not escape ':', change \ to /).

@@ -1,6 +1,7 @@
 Changes
 html/Callbacks/RT-Extension-MandatoryOnTransition/Elements/EditCustomFields/BeforeCustomFields
 html/Callbacks/RT-Extension-MandatoryOnTransition/Elements/EditCustomFields/MassageCustomFields
+html/Callbacks/RT-Extension-MandatoryOnTransition/Elements/ListActions/ModifyRow
 html/Callbacks/RT-Extension-MandatoryOnTransition/Helpers/TicketUpdate/ProcessArguments
 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/create/BeforeCreate
 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/reply/AfterWorked
@@ -16,6 +17,18 @@ html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Modify.html/Default
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/ModifyAll.html/Default
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/AfterWorked
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/BeforeUpdate
+html/Helpers/QueueRule
+html/Helpers/QueueRuleRequires
+html/Helpers/QueueTransition
+html/Helpers/QueueTransitionRequires
+html/MandatoryOnTransition/Elements/QueueContent
+html/MandatoryOnTransition/Elements/QueueNav
+html/MandatoryOnTransition/Elements/QueueRule
+html/MandatoryOnTransition/Elements/QueueRuleRequires
+html/MandatoryOnTransition/Elements/QueueTransition
+html/MandatoryOnTransition/Elements/QueueTransitionRequires
+html/MandatoryOnTransition/Elements/SelectCustomFieldOperator
+html/Widgets/Form/MandatoryOnTransition
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -46,3 +59,4 @@ xt/mandatory_on_create.t
 xt/queue_change.t
 xt/required_fields.t
 xt/roles.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

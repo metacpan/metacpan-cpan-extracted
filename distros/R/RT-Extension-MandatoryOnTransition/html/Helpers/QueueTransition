@@ -1,0 +1,21 @@
+<%INIT>
+my $Queue = {
+    name => $QueueName,
+};
+my $Transition = {
+    to_queue => $ToQueueName,
+    requires => [ $Requires ],
+};
+
+$m->comp(
+    '/MandatoryOnTransition/Elements/QueueTransition',
+    Queue      => $Queue,
+    Transition => $Transition,
+);
+$m->abort;
+</%INIT>
+<%ARGS>
+$QueueName
+$ToQueueName
+$Requires
+</%ARGS>
