@@ -1,5 +1,8 @@
 Revision history for Class-Debug - Runtime Debugging for a Class
 
+0.06	Thu May 22 21:11:29 EDT 2025
+	Ensure loggers aren't lost when it's a simple list
+
 0.05	Tue May 20 21:21:09 EDT 2025
 	Fix CI
 

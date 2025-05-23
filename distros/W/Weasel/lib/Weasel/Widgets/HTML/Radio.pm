@@ -5,7 +5,7 @@ Weasel::Widgets::HTML::Radio - Wrapper for INPUTs of type 'radio'
 
 =head1 VERSION
 
-0.01
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ Weasel::Widgets::HTML::Radio - Wrapper for INPUTs of type 'radio'
 
 =cut
 
-package Weasel::Widgets::HTML::Radio;
+package Weasel::Widgets::HTML::Radio 0.32;
 
 
 use strict;
@@ -114,4 +114,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

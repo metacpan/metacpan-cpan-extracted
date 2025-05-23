@@ -35,7 +35,7 @@ try {
 };
 like($msg, qr/Usage/, 'Throws an error for single argument without default');
 
-# Test 5: Zero arguments with default
+# Zero arguments with default
 try {
 	get_params('key');
 } catch Error with {
@@ -43,8 +43,72 @@ try {
 };
 like($msg, qr/Usage/, 'Throws an error for zero arguments with default');
 
-# Test 6: Zero arguments without default
+# Zero arguments without default
 $params = get_params();
-is_deeply($params, undef, 'Zero arguments without default returns undef');
+is($params, undef, 'Zero arguments without default returns undef');
+
+# Default argument with options, ref to array
+{
+	package Family;
+
+	use Params::Get;
+
+	sub new {
+		my $class = shift;
+		my $rc = Params::Get::get_params('name', \@_);
+
+		return bless $rc, $class;
+	}
+}
+
+my $obj = Family->new('flintstones', { 'fred' => 'wilma' });
+
+is_deeply($obj, { 'name' => 'flintstones', 'fred' => 'wilma' }, 'Mandatory followed by options works, arrayref');
+
+diag(Data::Dumper->new([$obj])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+# Default argument with options, array
+{
+	package Family2;
+
+	use Params::Get;
+
+	sub new {
+		my $class = shift;
+		my $rc = Params::Get::get_params('name', @_);
+
+		return bless $rc, $class;
+	}
+}
+
+$obj = Family2->new('rubbles', { 'barney' => 'betty' });
+
+is_deeply($obj, { 'name' => 'rubbles', 'barney' => 'betty' }, 'Mandatory followed by options works, array');
+
+{
+	package MyClass;
+
+	use Params::Get;
+
+	sub new {
+		my $class = shift;
+		my $rc = Params::Get::get_params(undef, @_);
+
+		return bless $rc, $class;
+	}
+}
+
+$obj = MyClass->new(
+	config_dirs => ['/tmp'],
+	config_file => 'xml_test'
+);
+
+diag(Data::Dumper->new([$obj])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+is_deeply(get_params('string', 'Hello World'), { 'string' => 'Hello World' });
+
+is_deeply(get_params('string', \'Hello World'), { 'string' => 'Hello World' });
+
+diag(Data::Dumper->new([get_params('string', \'Hello World')])->Dump()) if($ENV{'TEST_VERBOSE'});
 
 done_testing();

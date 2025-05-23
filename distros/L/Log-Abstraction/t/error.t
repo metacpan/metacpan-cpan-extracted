@@ -9,7 +9,7 @@ BEGIN { use_ok('Log::Abstraction') }
 Test::Carp->import();
 
 # Test invalid arguments to new()
-throws_ok { Log::Abstraction->new(1, 2, 3) } qr/Invalid arguments passed to new()/, 'Odd number of arguments should throw error';
+throws_ok { Log::Abstraction->new(1, 2, 3) } qr/^Usage:/, 'Odd number of arguments should throw error';
 
 my $logger = Log::Abstraction->new(logger => []);
 throws_ok { $logger->_log('info', 'Test message') } qr/Illegal Operation/, '_log() should only be called internally';

@@ -7,6 +7,7 @@ use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
 use aliased 'Javonet::Core::Handler::PerlHandler' => 'PerlHandler';
 use aliased 'Javonet::Core::Interpreter::Interpreter' => 'Interpreter', qw(execute_);
 use aliased 'Javonet::Core::Exception::ExceptionThrower' => 'ExceptionThrower';
+use aliased 'Javonet::Sdk::Core::TypesHandler' => 'TypesHandler';
 
 extends 'Javonet::Sdk::Internal::Abstract::AbstractInstanceContext',
     'Javonet::Sdk::Internal::Abstract::AbstractMethodInvocationContext',
@@ -437,12 +438,15 @@ sub encapsulate_payload_item {
     elsif ($payload_item->isa('Javonet::Sdk::Internal::InvocationContext')) {
         return $payload_item->get_current_command();
     }
-    else {
+    elsif (TypesHandler->is_primitive_or_none($payload_item)) {
         return PerlCommand->new(
             runtime      => $self->{runtime_name},
             command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('Value'),
             payload      => [ $payload_item ]
         );
+    }
+    else {
+        die "Unsupported payload item type: " . ref($payload_item) . " for payload item: $payload_item.";
     }
 }
 

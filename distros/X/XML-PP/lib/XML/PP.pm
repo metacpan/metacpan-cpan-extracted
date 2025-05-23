@@ -12,11 +12,11 @@ XML::PP - A simple XML parser
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,7 @@ sub parse
 	$xml_string =~ s/<\?xml.+\?>//;	# Ignore the header
 
 	$xml_string =~ s/^\s+|\s+$//g;	# Trim whitespace
+	# Check if the XML string is empty
 	return $self->_parse_node(\$xml_string, {});
 }
 
@@ -248,10 +249,10 @@ Calling C<collapse_structure> will return:
 =cut
 
 sub collapse_structure {
-	# my ($self, $node) = @_;
-	my $self = shift;
-	my $params = Params::Get::get_params('node', \@_);
-	my $node = $params->{'node'};
+	my ($self, $node) = @_;
+	# my $self = shift;
+	# my $params = Params::Get::get_params('node', \@_);
+	# my $node = $params->{'node'};
 
 	return {} unless ref $node eq 'HASH' && $node->{children};
 

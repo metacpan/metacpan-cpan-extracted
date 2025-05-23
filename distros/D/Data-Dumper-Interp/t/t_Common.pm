@@ -152,7 +152,7 @@ sub import {
     no_upwards file_name_is_absolute tmpdir splitpath splitdir
     abs2rel rel2abs case_tolerant/);
 
-  require Path::Tiny;
+  use Path::Tiny 0.146 ();
   Path::Tiny->import::into($target, qw/path/);
 
   require List::Util;

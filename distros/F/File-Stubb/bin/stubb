@@ -1,0 +1,330 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use File::Stubb;
+
+my $stubb =  File::Stubb->init;
+$stubb->run;
+
+1;
+
+=head1 NAME
+
+stubb - Stub file creator
+
+=head1 SYMOPSIS
+
+  stubb [options] file template
+  stubb [options] file.template
+  stubb [options] -t template file ...
+  stubb [options] -l template
+
+=head1 DESCRIPTION
+
+B<stubb> is a program that can create stub files/directories from
+pre-existing templates.
+
+By default, B<stubb> will create the stub I<file> from the given I<template>.
+The I<template> can either be provided by a second argument to B<stubb> or
+derived from I<file>'s suffix if a specific template isn't provided. A template
+can also be specified by the C<-t> option. I<template> can either be the name of
+a template in B<stubb>'s template directory or a path to a template file.
+
+If I<file> is a single dash (C<->), B<stubb> will write the rendered file to
+F<stdout>. This only works when rendering single files, not directories or
+multiple files at once.
+
+=head2 Templates
+
+B<stubb> creates stubs from pre-existing template files and directories found in
+one of B<stubb>'s template directory. A B<stubb> template file can contain
+"substitution targets" that allow you to customize a render by supplying
+substitution parameters.
+
+B<stubb> looks for stub templates in a template directory. The default
+location for this directory is F<~/.stubb>, but it can be configured to look in
+other locations via the C<STUBB_TEMPLATES> environment variable or through
+the C<-d> command-line option. Templates in the template directory must be
+named after the files they're templating followed by the C<.stubb> path suffix.
+
+  # *template* can be 'pl', 'pm', or 'py'
+  STUBB_TEMPLATES
+  L pl.stubb
+  L pm.stubb
+  L py.stubb
+
+B<stubb> can perform text substitution on the contents of stub files
+through the use of substitution targets. Substitution targets are strings
+enclosed by double carets (C<^^>) that tell B<stubb> how the text should be
+rendered. Substitution parameters can be supplied to B<stubb> via the C<-s>
+option to customize the generation of a stub.
+
+The following are a list of valid substitution target types:
+
+=over 4
+
+=item B<^^ I<target> ^^>
+
+=item B<^^ I<target> // I<default value> ^^>
+
+A basic substitution target. Has no sigil. If a substitution for the target is
+provided, the target will be replaced by the corresponding string. A default
+value can be specified by following the target with a C<//> and the default
+string. If no substitution is provided the target will be rendered as the
+default string instead. If no substitution is provided and no default value is
+present, the target will be rendered as-is in the outputted stub file.
+
+  # Can be set via -s "foo => ...", otherwise is left alone.
+  This is a ^^foo^^ file.
+
+  # Can be set via -s "foo => ...", otherwise is rendered as "text".
+  This is a ^^foo // text^^ file.
+
+=item B<?^^ I<target> ^^>
+
+A conditional target is preceded by a question mark (C<?>) sigil. It is similar
+to the basic target, but if no substitution is provided for the target the
+target will not be rendered at all. It does not support being provided default
+values.
+
+  # Can be set via -s "name => ...", otherwise is rendered as an empty string.
+  Hey ?^^name^^
+
+=item B<$^^ I<perl code> ^^>
+
+A Perl target is preceded by a dollar sign (C<$>) sigil. The text inside the
+target will be interpretted as Perl code and evaluated using Perl's C<eval>
+function. B<stubb> will substitute the target with returned value from the
+C<eval>ed Perl code.
+
+Substitution parameters can be accessed via the topic hash variable (C<%_>) in
+the code. C<%_> will be set to a hash of target names as keys and their
+substituted text as values. The C<%_> hash is also special in that it does
+not return C<undef> if a target does not exist, it instead returns an empty
+string, which should hopefully make writing safe Perl a little simpler.
+
+Because this uses an unprotected C<eval>, it is possible to modify some of
+B<stubb>'s internal data structures through the evaluated code, and cause
+breakages. Don't do that.
+
+  # Target will be rendered as some random number.
+  My favorite number: $^^rand^^
+
+  # $_{ name } can be set via -s "name => ...", otherwise is an empty string.
+  My name is $^^uc $_{ name }^^
+
+=item B<#^^ I<shell code> ^^>
+
+A shell target is preceded by a hash (C<#>) sigil. The text inside the target
+will be interpretted as shell code and evaluated using Perl's C<qx//>
+operator. B<stubb> will substitute the target with the returned text from the
+code.
+
+The code can access the substitution targets through the target's environment
+variables.
+
+  # Target will be rendered as the output of the date command.
+  Today is #^^date^^
+
+  # $number can be set via -s "numer => ..." on POSIX shells.
+  My favorite number is #^^printf "%x" "$number"^^
+
+=item B<\?^^ I<target> ^^>
+
+=item B<\$^^ I<target> ^^>
+
+=item etc...
+
+An escaped target is preceded by a backslash (C<\>) and some other sigil. It
+should be used when you want to render sigil literally followed by a target
+instead of as a special target.
+
+  # "date" is a normal substitution target, not a shell target. The '\#' will
+  # be rendered as a '#'.
+  Today is \#^^date^^
+
+=item B<!^^ I<not a target> ^^>
+
+A non-target is preceded by an exclamation mark (C<!>) sigil. Should be used
+when you have a piece of text that you do not want B<stubb> to interpret as a
+normal substitution target. When rendered, B<stubb> will render the text as-is
+except with the exclamation mark removed.
+
+  # Will be rendered literally, except with the '!' gone.
+  This isn't a target: !^^phony^^
+
+=back
+
+B<stubb> can also perform text substitution on stub path names, both ones
+specified through the command-line and ones located in template directories.
+Path names can only contain basic targets, and the substitutions cannot contain
+illegal path characters.
+
+  # Will create 'abc'
+  stubb -s "prgnam => abc" ^^prgnam^^ template
+
+Directory templates can contain their own rendering configuration in a special
+file called F<.stubb.json>. This file is a JSON file that conveniently stores
+a template's unique configuration so that one does not have to manually specify
+a bunch of command-line flags each time they wish to generate a stub from it.
+The following are a list of valid F<.stubb.json> fields:
+
+=over 4
+
+=item "defaults": { I<...> }
+
+Key-value map of default substitution parameters to use for parameters that
+aren't supplied via the C<-s> option. This field can be ignored with the
+C<--no-defaults> option.
+
+=item "render_hidden": I<bool>
+
+Boolean determining whether to render hidden files or not. Can be overridden
+with the C<--hidden> and C<--no-hidden> options. Defaults to false.
+
+=item "follow_symlinks": I<bool>
+
+Boolean determining whether to render symlinks by following them or by
+creating a new symlink that points to a path that was determined by performing
+text substitution on the template symlink's target. Can be overridden with the
+C<--follow-symlinks> and C<--no-follow-symlinks> options. Defaults to true.
+
+=item "copy_perms": I<bool>
+
+Boolean determining whether to the copy the permissions of a template file to
+its stub when rendering it. Can be overridden with the C<--copy-perms> and
+C<--no-copy-perms> options. Defaults to false.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>|B<--template-dir>=I<dir>
+
+Specify a directory to search for templates in. This option can be used
+multiple times to specify multiple different directories. This option works on
+top of the C<STUBB_TEMPLATES> environment variable.
+
+By default, B<stubb> will search for templates in F<~/.stubb>.
+
+=item B<-t>|B<--template>=I<template>
+
+Specify the template to use for batch file creation. Command-line arguments
+will be interpretted as a list of stub files to create from the given template.
+
+=item B<-s>|B<--substitute>=I<params>
+
+Supply substitution parameters to B<stubb>. I<params> is a string of
+comma-seperated key-value pairs of targets and their corresponding substitution,
+seperated by a "fat comma" (C<=E<gt>>).
+
+As an example, the following option will replaced C<prgnam> targets with "abc",
+C<prgver> with "0.01", and C<srcnam> with "abc-0.01".
+
+  -s "prgnam => abc, prgver => 0.01, srcnam => abc-0.01"
+
+Commas preceded by a backslash will be interpretted as literal commas and not
+be used to split parameters.
+
+This option can be used multiple times to supply multiple different parameter
+strings, if you would prefer that to supplying one single parameter string.
+
+=item B<-a>|B<--hidden>
+
+=item B<-A>|B<--no-hidden>
+
+Enable/disable the rendering of hidden files in stub directories. Default is to
+not render hidden files.
+
+=item B<-c>|B<--copy-perms>
+
+=item B<-C>|B<--no-copy-perms>
+
+Enable/disable the copying of the template files' permissions when rendering
+stub files. Default behavior is to not copy permissions.
+
+=item B<-w>|B<--follow-symlinks>
+
+=item B<-W>|B<--no-follow-symlinks>
+
+Enable/disable the following of symlinks in template directories. If disabled,
+B<stubb> will create new symlinks in the stub directory that point to paths that
+are determined from performing text substitution on the targets of the original
+template symlinks. Default behavior is to just follow symlinks.
+
+=item B<-U>|B<--no-defaults>
+
+Disable the use of any default substitution parameters provided in a template's
+F<.stubb.json>.
+
+=item B<-I>|B<--no-config>
+
+Ignore the F<.stubb.json> configuration file if it is present in a directory
+template.
+
+=item B<-l>|B<--list>
+
+Print a list of substitution targets in the given template.
+
+=item B<-q>|B<--quiet>
+
+Disable informative output.
+
+=item B<-h>|B<--help>
+
+Print B<stubb>'s usage message and exit.
+
+=item B<-v>|B<--version>
+
+Print B<stubb>'s version and copyright information, then exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item STUBB_TEMPLATES
+
+Colon-seperated list of directories for B<stubb> to search for templates in.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.stubb>
+
+Default directory B<stubb> searches for templates in.
+
+=back
+
+=head1 AUTHOR
+
+Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+
+This project's source can be found on its
+L<Codeberg page|https://codeberg.org/1-1sam/stubb>. Comments and pull
+requests are welcome!
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 Samuel Young
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+L<perl(1)>
+
+=cut
+
+# vim: expandtab shiftwidth=4

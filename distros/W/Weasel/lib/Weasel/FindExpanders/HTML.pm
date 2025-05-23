@@ -5,7 +5,7 @@ Weasel::FindExpanders::HTML - Weasel FindExpanders HTML
 
 =head1 VERSION
 
-0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ Weasel::FindExpanders::HTML - Weasel FindExpanders HTML
 
 =cut
 
-package Weasel::FindExpanders::HTML;
+package Weasel::FindExpanders::HTML 0.32;
 
 use strict;
 use warnings;

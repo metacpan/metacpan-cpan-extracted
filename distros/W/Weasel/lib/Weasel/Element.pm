@@ -5,7 +5,7 @@ Weasel::Element - The base HTML/Widget element class
 
 =head1 VERSION
 
-0.02
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ attributes and the tag name, etc.
 
 =cut
 
-package Weasel::Element;
+package Weasel::Element 0.32;
 
 use strict;
 use warnings;
@@ -269,4 +269,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

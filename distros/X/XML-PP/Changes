@@ -1,5 +1,8 @@
 Revision history for XML-PP
 
+0.06	Thu May 22 13:44:50 EDT 2025
+	Use positional parameters when parsing children
+
 0.05	Thu May  8 12:23:15 EDT 2025
 	Simplify new()
 	Needs Params::Get >= 0.04

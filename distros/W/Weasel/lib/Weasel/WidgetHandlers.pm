@@ -5,7 +5,7 @@ Weasel::WidgetHandlers - Mapping elements to widget handlers
 
 =head1 VERSION
 
-0.01
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -33,15 +33,31 @@ Weasel::WidgetHandlers - Mapping elements to widget handlers
 
 =head1 DESCRIPTION
 
+Widget handlers map HTML elements to Perl class instances based on the
+HTML tag and its attributes.  The Perl class can be used to encapsulate
+interaction with the HTML element and its children, abstracting HTML DOM
+interactions into functional behaviours.
+
+A widget may itself be composed of one or more child-widget. Eg, a form
+could be composed of several input fields and a button, all mapped to
+widgets to handle the interactions with the specific element type.
+
+Classes can be developed and handlers registered for widgets which
+perform the same behaviours as basic HTML widgets, like the C<select>
+tag; eg., a Dojo Toolkit, Vue or React widgets could be mapped to
+specific classes which encapsulate the DOM interactions required to make
+these widgets transparent to the Perl code which is interacting with them.
+An example of a widget mimicing to be a C<select> tag is
+L<Weasel::Widgets::Dojo::Select>.
+
 =cut
 
 =head1 DEPENDENCIES
 
 
-
 =cut
 
-package Weasel::WidgetHandlers;
+package Weasel::WidgetHandlers 0.32;
 
 use strict;
 use warnings;
@@ -210,4 +226,3 @@ Licensed under the same terms as Perl.
 
 
 1;
-

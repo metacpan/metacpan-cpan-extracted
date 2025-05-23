@@ -5,7 +5,7 @@ Weasel::Widgets::HTML::Button - Wrapper for button-like INPUT and BUTTON tags
 
 =head1 VERSION
 
-0.01
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ Weasel::Widgets::HTML::Button - Wrapper for button-like INPUT and BUTTON tags
 
 =cut
 
-package Weasel::Widgets::HTML::Button;
+package Weasel::Widgets::HTML::Button 0.32;
 
 
 use strict;
@@ -93,4 +93,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

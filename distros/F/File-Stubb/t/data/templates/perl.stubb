@@ -1,0 +1,4 @@
+My favorite number +1: $^^ $_{ one } + 1 ^^
+My third favorite number squared: $^^ $_{ three } ** 2 ^^
+My three favorite numbers: $^^ join ' ', @_{ qw(one two three) } ^^
+Maybe a number? $^^ $_{ four } ^^

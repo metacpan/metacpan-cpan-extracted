@@ -36,7 +36,7 @@
             "Config::Abstraction" : "0.25",
             "ExtUtils::MakeMaker" : "6.64",
             "Log::Log4perl" : "0",
-            "Params::Get" : "0.04",
+            "Params::Get" : "0.05",
             "Readonly::Values::Syslog" : "0.02",
             "Scalar::Util" : "0",
             "Sys::Syslog" : "0",
@@ -70,6 +70,6 @@
          "x_repository" : "https://github.com/nigelhorne/Log-Abstraction"
       }
    },
-   "version" : 0.15,
+   "version" : 0.17,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

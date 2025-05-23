@@ -1,17 +1,20 @@
 
 =head1 NAME
 
-Weasel::Element::Document - Weasel Element Document 
+Weasel::Element::Document - Weasel Document (root) element
 
 =head1 VERSION
 
-0.01
+version 0.32
 
 =head1 SYNOPSIS
 
 
 
 =head1 DESCRIPTION
+
+The root element of the document tag tree: corresponds with the C<html>
+tag of the HTML document.
 
 =cut
 
@@ -21,7 +24,7 @@ Weasel::Element::Document - Weasel Element Document
 
 =cut
 
-package Weasel::Element::Document;
+package Weasel::Element::Document 0.32;
 
 use strict;
 use warnings;
@@ -35,6 +38,8 @@ use namespace::autoclean;
 =over
 
 =item _id
+
+Internal. Contains the reference to the in-browser element.
 
 =cut
 
@@ -88,4 +93,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

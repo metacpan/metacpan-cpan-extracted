@@ -18,6 +18,7 @@ my %my_type = (
     'JavonetUnsignedLongLong' => 9,
     'JavonetUnsignedInteger' => 10,
     'JavonetNull' => 11,
+    'JavonetVoid' => 12,
 );
 
 sub get_type {

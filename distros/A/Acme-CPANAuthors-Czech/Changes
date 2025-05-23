@@ -1,3 +1,9 @@
+0.32 2025-05-22T15:54:29+02:00
+ - Add MIK CPAN account.
+ - Add RADIUSCZ CPAN account.
+ - Rename example files to better names.
+ - Update copyright years.
+
 0.31 2023-07-31T12:03:40+02:00
  - Add ATG CPAN account.
  - Add BULB CPAN account.

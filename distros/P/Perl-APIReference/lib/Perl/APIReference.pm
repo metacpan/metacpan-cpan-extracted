@@ -8,7 +8,7 @@ use version;
 use Sereal::Encoder;
 use Sereal::Decoder;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Class::XSAccessor
   getters => {
@@ -18,64 +18,70 @@ use Class::XSAccessor
 
 sub _par_loader_hint {
   require Perl::APIReference::Generator;
-  require Perl::APIReference::V5_022_001;
+  require Perl::APIReference::V5_040_002;
 }
 
-our %Perls = (
-  5.022001 => 'V5_022_001',
-  5.022    => 'V5_022_000',
-  5.020002 => 'V5_020_002',
-  5.020001 => 'V5_020_001',
-  5.02     => 'V5_020_000',
-  5.018002 => 'V5_018_002',
-  5.018001 => 'V5_018_001',
-  5.018000 => 'V5_018_000',
-  5.016003 => 'V5_016_003',
-  5.016002 => 'V5_016_002',
-  5.016001 => 'V5_016_001',
-  5.016    => 'V5_016_000',
-  5.014004 => 'V5_014_004',
-  5.014003 => 'V5_014_003',
-  5.014002 => 'V5_014_002',
-  5.014001 => 'V5_014_001',
-  5.014    => 'V5_014_000',
-  5.012005 => 'V5_012_005',
-  5.012004 => 'V5_012_004',
-  5.012003 => 'V5_012_003',
-  5.012002 => 'V5_012_002',
-  5.012001 => 'V5_012_001',
-  5.012    => 'V5_012_000',
-  5.010001 => 'V5_010_001',
-  5.01     => 'V5_010_000',
-  5.008009 => 'V5_008_009',
-  5.008008 => 'V5_008_008',
-  5.008007 => 'V5_008_007',
-  5.008006 => 'V5_008_006',
-  5.008005 => 'V5_008_005',
-  5.008004 => 'V5_008_004',
-  5.008003 => 'V5_008_003',
-  5.008002 => 'V5_008_002',
-  5.008001 => 'V5_008_001',
-  5.008    => 'V5_008_000',
-  5.006002 => 'V5_006_002',
-  5.006001 => 'V5_006_001',
-  5.006    => 'V5_006_000',
-);
+our %Perls;
+SCOPE: {
+  # Generate list of supported Perl versions from shorthand.
+  my @perls = (
+    [40, 0..2],
+    [38, 0..4],
+    [36, 0..3],
+    [34, 0..3],
+    [32, 0..1],
+    [30, 0..3],
+    [28, 0..3],
+    [26, 0..4],
+    [24, 0..4],
+    [22, 0..4],
+    [20, 0..2],
+    [18, 0..2],
+    [16, 0..3],
+    [14, 0..4],
+    [12, 0..5],
+    [10, 0..1],
+    [8,  0..9],
+    [6,  0..2],
+  );
 
-our $NewestAPI       = '5.022001';
-our $NewestStableAPI = '5.022001';
+  foreach my $p (@perls) {
+    my $major = $p->[0];
+    foreach my $minor (@$p[1..$#$p]) {
+      my $v = sprintf("V5_%03u_%03u", $major, $minor);
+      my $num = sprintf("5.%03u", $major);
+      $num .= sprintf("%03u", $minor) if $minor > 0;
+      $Perls{$num} = $v;
+    }
+  }
+};
 
-$Perls{'5.022000'} = $Perls{5.022};
-$Perls{'5.020'}    = $Perls{5.02};
-$Perls{'5.020000'} = $Perls{5.02};
-$Perls{'5.018000'} = $Perls{5.018};
-$Perls{'5.016000'} = $Perls{5.016};
-$Perls{'5.014000'} = $Perls{5.014};
-$Perls{'5.012000'} = $Perls{5.012};
-$Perls{'5.010000'} = $Perls{5.01};
-$Perls{'5.010'}    = $Perls{5.01};
-$Perls{'5.008000'} = $Perls{5.008};
-$Perls{'5.006000'} = $Perls{5.006};
+our $NewestAPI       = '5.040002';
+our $NewestStableAPI = '5.040002';
+
+# Aliases
+$Perls{'5.04'}     = $Perls{'5.040'};
+$Perls{'5.040000'} = $Perls{'5.040'};
+$Perls{'5.038000'} = $Perls{'5.038'};
+$Perls{'5.036000'} = $Perls{'5.036'};
+$Perls{'5.034000'} = $Perls{'5.034'};
+$Perls{'5.032000'} = $Perls{'5.032'};
+$Perls{'5.03'}     = $Perls{'5.030'};
+$Perls{'5.030000'} = $Perls{'5.030'};
+$Perls{'5.028000'} = $Perls{'5.028'};
+$Perls{'5.026000'} = $Perls{'5.026'};
+$Perls{'5.024000'} = $Perls{'5.024'};
+$Perls{'5.022000'} = $Perls{'5.022'};
+$Perls{'5.02'}     = $Perls{'5.020'};
+$Perls{'5.020000'} = $Perls{'5.020'};
+$Perls{'5.018000'} = $Perls{'5.018'};
+$Perls{'5.016000'} = $Perls{'5.016'};
+$Perls{'5.014000'} = $Perls{'5.014'};
+$Perls{'5.012000'} = $Perls{'5.012'};
+$Perls{'5.010000'} = $Perls{'5.010'};
+$Perls{'5.01'}     = $Perls{'5.010'};
+$Perls{'5.008000'} = $Perls{'5.008'};
+$Perls{'5.006000'} = $Perls{'5.006'};
 #$Perls{'5.000'} = $Perls{5};
 
 sub _get_class_name {
@@ -194,7 +200,7 @@ Perl::APIReference - Programmatically query the perlapi
 =head1 SYNOPSIS
 
   use Perl::APIReference;
-  my $api = Perl::APIReference->new(perl_version => '5.22.1');
+  my $api = Perl::APIReference->new(perl_version => '5.40.2');
   my $api_index_hash = $api->index;
 
 =head1 DESCRIPTION
@@ -202,9 +208,8 @@ Perl::APIReference - Programmatically query the perlapi
 This module allows accessing the perlapi documentation for multiple
 releases of perl as an index (a hash).
 
-Currently, the stable releases perl 5.22.0-1, 5.20.0-2, 5.18.0-2, 5.16.0-3,
-5.14.0-3, 5.12.0-4, 5.10.0-1, 5.8.0-9, and 5.6.0-2
-are supported. To add support for another release, simply send me the
+Currently, ll stable releases between 5.6.0 and 5.40.2 are supported.
+To add support for another release, simply send me the
 release's F<perlapi.pod> via email or via an RT ticket and I'll add it
 in the next release.
 
@@ -256,7 +261,7 @@ Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2015 by Steffen Mueller
+Copyright (C) 2009-2025 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

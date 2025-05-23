@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,43 +16,43 @@ name: Weasel
 provides:
   Weasel:
     file: lib/Weasel.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Element:
     file: lib/Weasel/Element.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Element::Document:
     file: lib/Weasel/Element/Document.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::FindExpanders:
     file: lib/Weasel/FindExpanders.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::FindExpanders::HTML:
     file: lib/Weasel/FindExpanders/HTML.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Session:
     file: lib/Weasel/Session.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::WidgetHandlers:
     file: lib/Weasel/WidgetHandlers.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Widgets::HTML:
     file: lib/Weasel/Widgets/HTML.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Widgets::HTML::Button:
     file: lib/Weasel/Widgets/HTML/Button.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Widgets::HTML::Input:
     file: lib/Weasel/Widgets/HTML/Input.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Widgets::HTML::Radio:
     file: lib/Weasel/Widgets/HTML/Radio.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Widgets::HTML::Select:
     file: lib/Weasel/Widgets/HTML/Select.pm
-    version: '0.31'
+    version: '0.32'
   Weasel::Widgets::HTML::Selectable:
     file: lib/Weasel/Widgets/HTML/Selectable.pm
-    version: '0.31'
+    version: '0.32'
 recommends:
   Weasel::Driver::Selenium2: '0'
 requires:
@@ -62,15 +62,15 @@ requires:
   Moose: '0'
   Weasel::DriverRole: '0.04'
   namespace::autoclean: '0'
-  perl: v5.10.1
+  perl: v5.12.0
 resources:
   bugtracker: https://github.com/perl-weasel/weasel/issues
   homepage: https://weasel.pm/
   repository: https://github.com/perl-weasel/weasel.git
-version: '0.31'
+version: '0.32'
 x_contributors:
   - 'Brock Wilcox <bwilcox@optoro.com>'
   - 'Yves Lavoie <ylavoie@yveslavoie.com>'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

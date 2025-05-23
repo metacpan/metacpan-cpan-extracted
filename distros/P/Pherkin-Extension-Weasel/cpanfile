@@ -1,7 +1,7 @@
 #!perl
 
 
-requires 'perl', '5.10.1';
+requires 'perl', '5.12.0';
 
 requires 'File::Find::Rule';
 requires 'File::Share';

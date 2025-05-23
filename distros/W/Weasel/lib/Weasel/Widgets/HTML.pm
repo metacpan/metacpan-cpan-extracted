@@ -5,7 +5,7 @@ Weasel::Widgets::HTML - Helper module for bulk-registration of HTML widgets
 
 =head1 VERSION
 
-0.01
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ Weasel::Widgets::HTML - Helper module for bulk-registration of HTML widgets
 
 =cut
 
-package Weasel::Widgets::HTML;
+package Weasel::Widgets::HTML 0.32;
 
 use strict;
 use warnings;
@@ -80,4 +80,3 @@ Licensed under the same terms as Perl.
 =cut
 
 1;
-

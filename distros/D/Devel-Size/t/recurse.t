@@ -67,7 +67,8 @@ for my $size (2, 3, 7, 100)
   # hash + key minus the value
   my $hash_size = total_size($hash) - total_size(1);
 
-  $hash->{a} = 0/1;
+  $hash->{a} = 2.7;
+  $hash->{a} .= 1;
   $hash->{a} = [];
 
   my $pvnv_size = total_size(\$hash->{a}) - total_size([]);
@@ -270,6 +271,12 @@ sub cmp_array_ro {
 }
 
 {
+    # From Perl 5.41.7, if the source and destination SVs passed to
+    # Perl_sv_setsv_flags are both bodyless the destination SV remains bodyless.
+
+    my $iv2nv_check = 1; $iv2nv_check = 2.2;
+    my $head_only_upgrades = (total_size($iv2nv_check) == total_size (1));
+
     my %sizes;
     # reverse sort ensures that PVIV, PVNV and RV are processed before
     # IV, NULL, or NV :-)
@@ -282,13 +289,14 @@ sub cmp_array_ro {
 	$a->[0] = $types{$type};
 	undef $a->[0];
 
-	my $expect = $sizes{$type} = size(\$a->[0]);
+	$sizes{$type} = size(\$a->[0]);
 
 	$a->[0] = \('x' x 1024);
 
-	$expect = $sizes{RV} if $type eq 'NULL';
-	$expect = $sizes{PVNV} if $type eq 'NV';
-	$expect = $sizes{PVIV} if $type eq 'IV' && $] < 5.012;
+        my $expect = ($type eq 'NULL') ? $sizes{RV} :
+            ($type eq 'IV' && $] < 5.012) ? $sizes{PVIV} :
+            ($type eq 'NV' && !$head_only_upgrades) ? $sizes{PVNV} :
+            $sizes{$type};
 
 	# Remember, size() removes a level of referencing if present. So add
 	# one, so that we get the size of our reference:

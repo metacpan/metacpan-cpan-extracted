@@ -36,8 +36,9 @@ sub _get_entries {
   my $in_entry = 0;
   my $entry = {};
   my $entries = {};
+
   # TODO add "section"
-  # TODO review and robustify
+  # TODO robustify
   foreach my $node (@$output) {
     my $type = $node->{type};
     next if $type eq 'nonpod';
@@ -53,6 +54,12 @@ sub _get_entries {
           $in_entry = 0;
           _finish_entry($entry, $entries);
         }
+        # Not handling the "else" case here basically just strips out
+        # any other POD primitives that are nested. This is NOT how a
+        # parser should work, but since this is somewhat human guided
+        # one-off tooling, I validated that the output is approximately
+        # what it should be, so laziness wins out for now.
+        #else {use Data::Dumper; warn Dumper $node;}
       }
       elsif ($type eq 'text' or $type eq 'blank') {
         $entry->{text} .= $node->{content};
@@ -61,7 +68,9 @@ sub _get_entries {
     } # end if in entry
     else {
       if ($type eq 'command'
-          and $command eq 'item')
+          and $command eq 'item'
+          and $node->{content} !~ /^L/ # stript out the section index for 5.34+
+         )
       {
         $in_entry = _start_entry($entry, $node);
       }
@@ -93,6 +102,9 @@ sub _start_entry {
   $name =~ s/\s+$//;
   $name =~ /([^\n]+)/ or return;
   $name = $1;
+  # drop POD formatting from the name (5.34+)
+  $name =~ s/^\s*[CIB]<//;
+  $name =~ s/>$//;
   %$entry = (
     name => $name,
     text => '',

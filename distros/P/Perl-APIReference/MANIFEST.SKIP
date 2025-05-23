@@ -11,3 +11,4 @@
 ^Perl-APIReference-.*\.gz$
 \.git/
 \bMYMETA\..*$
+data/*

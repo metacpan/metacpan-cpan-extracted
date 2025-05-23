@@ -22,9 +22,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Test::MixedScripts",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Cwd" => 0,
     "Exporter" => "5.57",
-    "File::Find" => 0,
+    "ExtUtils::Manifest" => "1.68",
+    "File::Basename" => 0,
     "File::Spec" => 0,
     "IO" => 0,
     "List::Util" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.4.0",
+  "VERSION" => "v0.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,10 +52,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Cwd" => 0,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => "7.22",
-  "File::Find" => 0,
+  "ExtUtils::Manifest" => "1.68",
+  "File::Basename" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
   "IO" => 0,

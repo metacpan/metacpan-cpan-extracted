@@ -5,7 +5,7 @@ Weasel - Perl's php/Mink-inspired abstracted web-driver framework
 
 =head1 VERSION
 
-0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ can be independently developed and uploaded to CPAN, or contributed.
 (We welcome and encourage both!)
 
 
-=head2 DIFFERENCES WITH OTHER FRAMEWORKS
+=head2 Differences with other frameworks
 
 =over
 
@@ -100,6 +100,13 @@ methods.
 
 =back
 
+=head2 PageObject architecture pattern support
+
+The functionality to encapsulate behaviours in widgets, enables intuitive
+integration of the L<Page Object architectural pattern|https://www.selenium.dev/documentation/test_practices/encouraged/page_object_models/>
+for design of test code. This pattern allows reduction of test code due
+and separation of concerns between the functional test and the page interaction.
+
 =cut
 
 =head1 DEPENDENCIES
@@ -108,15 +115,13 @@ methods.
 
 =cut
 
-package Weasel;
+package Weasel 0.32;
 
 use strict;
 use warnings;
 
 use Moose;
 use namespace::autoclean;
-
-our $VERSION = '0.31';
 
 # From https://w3c.github.io/webdriver/webdriver-spec.html#keyboard-actions
 my %key_codes = (
@@ -305,4 +310,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

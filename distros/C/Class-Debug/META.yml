@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Class-Debug/issues
   homepage: https://metacpan.org/pod/Class::Debug
   repository: git://github.com/nigelhorne/Class-Debug.git
-version: 0.05
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

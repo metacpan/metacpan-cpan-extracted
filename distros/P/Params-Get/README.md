@@ -4,7 +4,7 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # SYNOPSIS
 
@@ -50,11 +50,31 @@ or
 
     get_params('arg', \@_);
 
+Some people like this sort of model, which is also supported.
+
+    use MyClass;
+
+    my $str = 'hello world';
+    my $obj = MyClass->new($str, { type => 'string' });
+
+    package MyClass;
+
+    use Params::Get;
+
+    sub new {
+        my $class = shift;
+        my $rc = Params::Get::get_params('value', \@_);
+
+        return bless $rc, $class;
+    }
+
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
+
+Sometimes giving an array ref rather than array fails.
 
 # SEE ALSO
 

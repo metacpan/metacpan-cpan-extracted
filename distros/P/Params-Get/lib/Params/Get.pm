@@ -2,7 +2,9 @@ package Params::Get;
 
 use strict;
 use warnings;
+
 use Carp;
+use Scalar::Util;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(get_params);
@@ -13,11 +15,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -63,6 +65,24 @@ or
 
     get_params('arg', \@_);
 
+Some people like this sort of model, which is also supported.
+
+    use MyClass;
+
+    my $str = 'hello world';
+    my $obj = MyClass->new($str, { type => 'string' });
+
+    package MyClass;
+
+    use Params::Get;
+
+    sub new {
+        my $class = shift;
+        my $rc = Params::Get::get_params('value', \@_);
+
+        return bless $rc, $class;
+    }
+
 =cut
 
 sub get_params
@@ -86,8 +106,25 @@ sub get_params
 	# Populate %rc based on the number and type of arguments
 	if($num_args == 1) {
 		if(defined($default)) {
-			# %rc = ($default => shift);
-			return { $default => $args->[0] };
+			if(!ref($args->[0])) {
+				# %rc = ($default => shift);
+				return { $default => $args->[0] };
+			}
+			if(ref($args->[0]) eq 'ARRAY') {
+				return { $default => $args->[0] };
+			}
+			if(ref($args->[0]) eq 'SCALAR') {
+				return { $default => ${$args->[0]} };
+			}
+			if(ref($args->[0]) eq 'CODE') {
+				return { $default => $args->[0] };
+			}
+			if(Scalar::Util::blessed($args->[0])) {
+				return { $default => $args->[0] };
+			}
+		}
+		if(ref($args->[0]) eq 'HASH') {
+			return $args->[0];
 		}
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
@@ -97,6 +134,14 @@ sub get_params
 			Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
 		}
 		return;
+	}
+	if(($num_args == 2) && (ref($args->[1]) eq 'HASH')) {
+		if(defined($default)) {
+			return {
+				$default => $args->[0],
+				%{$args->[1]}
+			};
+		}
 	}
 
 	if($array_ref && defined($default)) {
@@ -115,6 +160,8 @@ sub get_params
 Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
+
+Sometimes giving an array ref rather than array fails.
 
 =head1 SEE ALSO
 

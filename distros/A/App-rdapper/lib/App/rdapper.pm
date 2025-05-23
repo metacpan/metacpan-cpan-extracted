@@ -25,7 +25,7 @@ use constant {
 use vars qw($VERSION);
 use strict;
 
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 #
 # global arg variables (note: nopager is now ignored)
@@ -147,14 +147,18 @@ sub main {
     $package->show_version if ($version);
 
     if ($registry && $registrar) {
-        $package->error("Cannot specify both --registry and --registrar, use one or the other.");
+        $package->error("cannot specify both --registry and --registrar, use one or the other.");
 
     } elsif ($registry && $both) {
-        $package->error("Cannot specify both --registry and --both, use one or the other.");
+        $package->error("cannot specify both --registry and --both, use one or the other.");
 
     }
 
     $registrar ||= $both;
+
+    if (!$registry && !$both) {
+        $registrar = 1;
+    }
 
     $object = shift(@_) if (!$object);
 
@@ -179,6 +183,7 @@ sub main {
 
     } else {
         $package->lookup($rdap, $object, $type, %args);
+
     }
 }
 
@@ -190,7 +195,7 @@ sub lookup {
     if ('ip' eq $type) {
         my $ip = Net::IP->new($object);
 
-        $package->error("Invalid IP address '$object'") unless ($ip);
+        $package->error("invalid IP address '$object'") unless ($ip);
 
         $response = $rdap->ip($ip, %args);
 
@@ -264,7 +269,7 @@ sub search {
         $package->domain_search($rdap, $object, %args);
 
     } else {
-        $package->error('Current unable to do searches for %s objects.', $type);
+        $package->error('current unable to do searches for %s objects.', $type);
 
     }
 }
@@ -361,22 +366,24 @@ sub display {
             $registrar = undef;
 
             if (!$link) {
-                $package->warning('No registrar link found, displaying the registry record...');
-                return $package->display($object, $indent);
+                $package->display($object, $indent);
+
+            } else {
+                my $result = $rdap->fetch($link);
+
+                if ($result->isa('Net::RDAP::Error')) {
+                    $package->display($result, $indent, 1);
+
+                    $package->warning('Unable to retrieve registrar record, displaying the registry record...');
+                    $package->display($object, $indent);
+
+                } else {
+                    $package->display($object, $indent, 1) if ($both);
+
+                    $package->display($result, $indent);
+
+                }
             }
-
-            my $result = $rdap->fetch($link);
-
-            if ($result->isa('Net::RDAP::Error')) {
-                return $package->display($result, $indent, 1);
-
-                $package->warning('Unable to retrieve registrar record, displaying the registry record...');
-                return $package->display($object, $indent);
-            }
-
-            $package->display($object, $indent, 1) if ($both);
-
-            $package->display($result, $indent);
 
         } else {
             if ($raw) {
@@ -396,8 +403,8 @@ sub display {
 sub display_object {
     my ($package, $object, $indent) = @_;
 
-    $package->error("JSON response does not include the 'objectClassName' properties") unless ($object->class);
-    $package->error(sprintf("Unknown object type '%s'", $object->class)) unless ($funcs->{$object->class});
+    $package->error("object does not include the 'objectClassName' properties") unless ($object->class);
+    $package->error(sprintf("unknown object type '%s'", $object->class)) unless ($funcs->{$object->class});
 
     #
     # generic properties
@@ -411,7 +418,7 @@ sub display_object {
         if ($name) {
             my $xname;
 
-            if ('Net::DNS::Domain' eq ref($name)) {
+            if ($name->isa('Net::DNS::Domain')) {
                 $xname = $name->xname;
                 $name  = $name->name;
 
@@ -876,14 +883,16 @@ The RDAP server of the parent domain's registry will be queried.
 
 =over
 
-=item * C<--registry> - display the registry record only (the default).
+=item * C<--registry> - display the registry record only. This was the default
+behaviour prior to v1.12.
 
 =item * C<--registrar> - follow referral to the registrar's RDAP record (if
-any) which will be displayed instead of the registry record. Cannot be used with
-C<--registry>.
+any) which will be displayed instead of the registry record. If no registrar
+link can be found, the registry record will be displayed. This option cannot be
+used with C<--registry>. As of v1.12, this is the default behaviour.
 
 =item * C<--both> - display both the registry and (if any) registrar RDAP
-records (implies C<--registrar>).
+records.
 
 =item * C<--reverse> - if you provide an IP address or CIDR prefix, then this
 option causes C<rdapper> to display the record of the corresponding
@@ -935,8 +944,8 @@ you aren't expecting them to.
 
 =head1 RDAP Search
 
-Some RDAP servers support the ability to perform simple substring searches.
-You can use the C<--search> option to enable this functionality.
+Some RDAP servers support the ability to perform simple substring searches. You
+can use the C<--search> option to enable this functionality.
 
 When the C<--search> option is used, C<OBJECT> will be used as a search term.
 If it contains no dots (e.g. C<exampl*>), then C<rdapper> will send a search

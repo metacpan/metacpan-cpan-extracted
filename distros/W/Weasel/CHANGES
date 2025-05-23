@@ -1,4 +1,10 @@
 
+** 0.32 / 2025-05-22
+   - Change minimum Perl version to 5.12.0
+   - Change logging in 'find_all' to show better debug information
+     on the pattern actually being searched for
+   - Add lots of documentation
+
 ** 0.31 / 2023-07-24
    - Fix typo in 'titled' expander affecting 'field' as well
    - Update/expand POD

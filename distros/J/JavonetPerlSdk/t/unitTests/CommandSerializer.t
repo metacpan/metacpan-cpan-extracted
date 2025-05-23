@@ -34,7 +34,7 @@ sub test_command_serialize_deserialize{
 
     my $commandSerializer = CommandSerializer->new();
 
-    my @result = $commandSerializer->encode($command);
+    my @result = $commandSerializer->serialize($command);
 
 
     my $commandDeserializer = CommandDeserializer->new(\@result);
@@ -56,7 +56,7 @@ sub test_nested_command_serialize_deserialize{
 
     my $commandSerializer = CommandSerializer->new();
 
-    my @result = $commandSerializer->encode($get_static_method_nested_command, 0);
+    my @result = $commandSerializer->serialize($get_static_method_nested_command, 0);
 
 
     my $commandDeserializer = CommandDeserializer->new(\@result);

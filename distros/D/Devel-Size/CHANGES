@@ -1,5 +1,14 @@
 Revision history for Perl extension Devel::Size.
 
+0.85 2025-05-23 nicholas
+ [no changes]
+
+0.84_50 2025-05-21 nicholas
+ * From perl 5.41.7, assigning a reference to an NV doesn't upgrade it to PVNV
+   Tests in t/recurse.t were written assuming that it would upgrade
+   Diagnosis from Richard Leach - fix reworked from his initial patch
+ * CvOUTSIDE is no longer set on all cloned subs
+
 0.84 2023-04-25 nicholas
  [no changes]
 

@@ -5,7 +5,7 @@ Weasel::FindExpanders - Mapping find patterns to xpath locators
 
 =head1 VERSION
 
-0.01
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -20,11 +20,23 @@ Weasel::FindExpanders - Mapping find patterns to xpath locators
        return ".//button[text()='$args{text}']";
     });
 
-  $session->find($session->page, "@button|{text=>\"whatever\"}");
+  $session->find($session->page, "*button|{text=>\"whatever\"}");
 
 =cut
 
 =head1 DESCRIPTION
+
+The concept of I<find expanders> is used to define XPath templates for use
+with the C<find> and C<find_all> methods. Multiple patterns may be registered
+with the same pattern name ("mnemonic"); eg, there could be a two patterns
+associated with the C<button> mnemonic, one for the C<< <button> >> tag and
+one for the C<< <input type="submit"> >> tag. Or there could even be more
+patterns registered, eg., to match Vue, React or Web Component elements.
+All patterns registered on a single mnemonic (template name) will be compiled
+into a single XPath expression which will match any of the patterns.
+
+Weasel comes with a standard set of patterns in the L<Weasel::FindExpanders::HTML>
+package.
 
 =cut
 
@@ -34,7 +46,7 @@ Weasel::FindExpanders - Mapping find patterns to xpath locators
 
 =cut
 
-package Weasel::FindExpanders;
+package Weasel::FindExpanders 0.32;
 
 use strict;
 use warnings;
@@ -151,4 +163,3 @@ Licensed under the same terms as Perl.
 
 
 1;
-

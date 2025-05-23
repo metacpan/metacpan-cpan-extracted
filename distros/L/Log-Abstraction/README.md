@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.15
+0.17
 
 # SYNOPSIS
 
@@ -89,6 +89,10 @@ Clone existing objects with or without modifications:
 ## level
 
 Get/set the minimum level to log at
+
+## messages
+
+Return all the messages emmitted so far
 
 ## debug
 

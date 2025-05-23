@@ -29,7 +29,7 @@ requires:
   Config::Abstraction: '0.25'
   ExtUtils::MakeMaker: '6.64'
   Log::Log4perl: '0'
-  Params::Get: '0.04'
+  Params::Get: '0.05'
   Readonly::Values::Syslog: '0.02'
   Scalar::Util: '0'
   Sys::Syslog: '0'
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Log-Abstraction/issues
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.15
+version: 0.17
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

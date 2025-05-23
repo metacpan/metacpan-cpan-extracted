@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.013'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-21'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-05-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -1320,11 +1320,12 @@ sub __unmagic_atom() {  # edits $_
 
 sub __unesc_unicode() {  # edits $_
   if (/^"/) {
-    # Data::Dumper with Useqq(1) outputs wide characters as hex escapes
-    # Note that a BOM is the ZERO WIDTH NO-BREAK SPACE character and
-    # so is considered "Graphical", but we want to see it as hex rather
-    # than "", and probably any other "Format" category Unicode characters.
-
+    # Data::Dumper with Useqq(1) outputs wide characters as hex escapes;
+    # turn them back into the original characters if "printable".
+    # That means "Graph" category EXCEPT:
+    #   BOM (which is ZERO WIDTH NO-BREAK SPACE so is considered "Graphical")
+    #   and any other "Format" category Unicode characters; we want see those
+    #   in hex.
     s{
        \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\x{7B} (?<hex>[a-fA-F0-9]+) \x{7D} )
      }{
@@ -2621,9 +2622,10 @@ Repeated characters in strings are shown as "⸨I<char>xI<repcount>⸩".
 For example
 
   vec(my $s, 31, 1) = 1;
-  say unpack "b*", $s;
-  say visnew->Useqq("unicode:condense")->visl(unpack "b*", $s);
+  my $str = unpack "b*", $s;
+  say $str;
     -->00000000000000000000000000000001
+  say visnew->Useqq("unicode:condense")->visl($str);
     -->⸨0×31⸩1
 
 =item "underscores"
@@ -2633,8 +2635,7 @@ Show numbers with '_' seprating groups of 3 digits.
 =item "style=OPENQUOTE,CLOSEQUOTE"
 
 Use the given symbols instead of double quotes.  The symbols may
-contain multiple characters. E<92>, or E<92>: may be used to
-escape those characters.
+contain multiple characters. Escape , or : with backslash(E<92>).
 
 =item "qq=XY"
 
@@ -2747,7 +2748,7 @@ This is how Data::Dumper indicates that the ref is a copy of the first
 ref and thus points to the same datum.
 "$VAR1" is an artifact of how Data::Dumper would generate code
 using its "Purity" feature.
-Data::Dumper::Interp simply passed through these annotations.
+Data::Dumper::Interp simply passes through these annotations.
 
 However with I<Refaddr(true)>, multiple references to the same thing
 will all show the address of the referenced thing.

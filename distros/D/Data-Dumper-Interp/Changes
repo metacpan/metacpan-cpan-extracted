@@ -1,5 +1,6 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+7.012 - Require Path::Tiny 0.146.  Minor pod tweaks.
 7.012 - Show names of subs pointed to by CODE refs (using Sub::Identify)
 7.011 - Require bigrat 0.65 (per rt 145960). Update shared test library.
         Avoid defeating Data::Dumper's special handling of booleans (!!0 etc.)

@@ -1,5 +1,11 @@
 Revision history for Log-Abstraction
 
+0.17	Thu May 22 14:21:14 EDT 2025
+	Added the messages() method
+
+0.16	Thu May 22 07:40:24 EDT 2025
+	Handle upper case levels, such as 'INFO'
+
 0.15	Tue May 20 21:10:23 EDT 2025
 	No need to create a Log::Log4perl when sending output to a file
 

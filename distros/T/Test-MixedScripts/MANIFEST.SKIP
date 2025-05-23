@@ -1,0 +1,54 @@
+# Avoid version control files.
+\B\.git\b
+^\.github\b
+\B\.git(?:ignore|keep)\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+\b_eumm/                # 7.05_05 and above
+
+# Dist::Zilla
+^\.build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+\..*\.sw.?$
+\.~\d+~$
+
+# Avoid Devel::Cover and Devel::CoverX::Covered files.
+\bcover_db\b
+\bcovered\b
+# Avoid prove files
+\B\.prove$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
+# Placeholder files created when iCloud will "optimize Mac storage"
+\.i[cC]loud$
+
+# Avoid MYMETA files
+^MYMETA\.
+
+# Temp files for new META
+^META_new\.(?:json|yml)
+
+^Test-MixedScripts-.*
+
+# Perl::Tidy
+\.ERR$

@@ -22,7 +22,7 @@ WriteMakefile(
 		'Config::Abstraction' => 0.25,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Log::Log4perl' => 0,
-		'Params::Get' => 0.04,
+		'Params::Get' => 0.05,
 		'Readonly::Values::Syslog' => 0.02,
 		'Sys::Syslog' => 0,
 		'Scalar::Util'=> 0
@@ -37,7 +37,9 @@ WriteMakefile(
 		'YAML::XS' => 0
 	},
 	dist => $dist,
-	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+	clean	 => {
+		FILES => 'Log-Abstraction-*'
+	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
 			homepage => 'https://metacpan.org/pod/Log::Abstraction',

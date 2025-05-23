@@ -5,7 +5,7 @@ Weasel::Widgets::HTML::Select - Wrapper of SELECT tag
 
 =head1 VERSION
 
-0.02
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ Weasel::Widgets::HTML::Select - Wrapper of SELECT tag
 
 =cut
 
-package Weasel::Widgets::HTML::Select;
+package Weasel::Widgets::HTML::Select 0.32;
 
 
 use strict;
@@ -158,4 +158,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

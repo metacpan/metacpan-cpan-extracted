@@ -5,7 +5,7 @@ Weasel::Widgets::HTML::Selectable - Wrapper for selectable elements
 
 =head1 VERSION
 
-0.01
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ Weasel::Widgets::HTML::Selectable - Wrapper for selectable elements
 
 =cut
 
-package Weasel::Widgets::HTML::Selectable;
+package Weasel::Widgets::HTML::Selectable 0.32;
 
 
 use strict;
@@ -136,4 +136,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

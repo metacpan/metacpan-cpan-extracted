@@ -1,0 +1,10 @@
+{
+	"defaults": {
+		"one": "1",
+		"two": "2",
+		"three": "3"
+	},
+	"render_hidden": true,
+	"follow_symlinks": false,
+	"copy_perms": true
+}

@@ -13,6 +13,7 @@ use Test::BDD::Cucumber::Harness;
 use Test::BDD::Cucumber::Model::Document;
 use Test::BDD::Cucumber::Model::Feature;
 use Test::BDD::Cucumber::Model::Line;
+use Test::BDD::Cucumber::Model::Result;
 use Test::BDD::Cucumber::Model::Scenario;
 use Test::BDD::Cucumber::Model::Step;
 use Test::BDD::Cucumber::StepContext;
@@ -184,8 +185,11 @@ $content = _flush_and_read_log();
 like($content, qr!<td>found 2 elements for //div!,
      q{Logging from driver correctly included in the logs});
 
-
-$ext->post_step($f, $context, 1); # failed step
+my $result = Test::BDD::Cucumber::Model::Result->new(
+    result => 'failing',
+    output => 'the failing test output'
+    );
+$ext->post_step($f, $context, 1, $result); # failed step
 
 $ext->screenshot_on('post-scenario', 1);
 $ext->post_scenario($s, $feature_stash, $scenario_stash);
@@ -199,7 +203,7 @@ like($content, qr!<img src="[a-z0-9./]+-scenario-post-\d+\.png"!,
 
 
 # early versions (at least Pherkin <= 0.56) repoort "<missing>" due to a bug
-like($content, qr!<td class="[a-zA-Z0-9\s]+">(?:FAIL|&lt;missing&gt;)</td>!,
+like($content, qr!<td class="[a-zA-Z0-9\s]+">(?:failing|&lt;missing&gt;)</td>!,
      q{Step status correctly included in the logs});
 
 

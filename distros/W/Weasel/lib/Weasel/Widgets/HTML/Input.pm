@@ -5,7 +5,7 @@ Weasel::Widgets::HTML::Input - Parent of the INPUT, OPTION, TEXTAREA and BUTTON 
 
 =head1 VERSION
 
-0.28
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ Weasel::Widgets::HTML::Input - Parent of the INPUT, OPTION, TEXTAREA and BUTTON 
 
 =cut
 
-package Weasel::Widgets::HTML::Input;
+package Weasel::Widgets::HTML::Input 0.32;
 
 
 use strict;

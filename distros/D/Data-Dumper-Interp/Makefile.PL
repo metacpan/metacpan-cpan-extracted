@@ -60,7 +60,7 @@ my %WriteMakefileArgs = (
     "Math::BigFloat" => "1.999837",
     "Math::BigInt" => "1.999837",
     "Math::BigRat" => "0.2624",
-    "Path::Tiny" => 0,
+    "Path::Tiny" => "0.146",
     "Test2::Plugin::BailOnFail" => 0,
     "Test2::V0" => 0,
     "Tie::Array" => 0,
@@ -78,7 +78,7 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "vars" => 0
   },
-  "VERSION" => "7.013",
+  "VERSION" => "7.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -115,7 +115,7 @@ my %FallbackPrereqs = (
   "Math::BigRat" => "0.2624",
   "Moose" => 0,
   "POSIX" => 0,
-  "Path::Tiny" => 0,
+  "Path::Tiny" => "0.146",
   "Regexp::Common" => 0,
   "Scalar::Util" => 0,
   "Sub::Identify" => 0,

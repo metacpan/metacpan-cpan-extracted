@@ -14,6 +14,10 @@ sub implements {
     return $Weasel::DriverRole::VERSION;
 }
 
+sub get_attribute {
+    return '';
+}
+
 sub tag_name {
     my ($self, $tag) = @_;
 
@@ -72,11 +76,11 @@ is(scalar(@found), 2, 'Number of tags found equals two');
 is(ref $found, 'ARRAY', 'Scalar context returns ARRAYREF');
 
 is_deeply(\@logs,
-          [['pre_find_all', 'pattern: span'],
+          [['pre_find_all', 'pattern: span(span)'],
            ['post_find_all', 'found 2 elements for span 
  - Weasel::Element (span)
  - Weasel::Element (span)'],
-           ['pre_find_all', 'pattern: span'],
+           ['pre_find_all', 'pattern: span(span)'],
            ['post_find_all', 'found 2 elements for span 
  - Weasel::Element (span)
  - Weasel::Element (span)'],

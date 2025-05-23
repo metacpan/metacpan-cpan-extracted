@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -14,6 +14,9 @@ version 0.17
      extensions:
        Pherkin::Extension::Weasel:
          default_session: selenium
+         dom_save_events:
+            step_fail: 1
+         logging_dir: ./logs/
          screenshots_dir: img
          screenshot_events:
             pre_step: 1
@@ -42,8 +45,8 @@ version 0.17
 
 =cut
 
-package Pherkin::Extension::Weasel;
-$Pherkin::Extension::Weasel::VERSION = '0.17';
+package Pherkin::Extension::Weasel 0.19;
+
 use strict;
 use warnings;
 
@@ -71,10 +74,6 @@ has feature_template => (is => 'ro', isa => 'Str',
                          default => 'pherkin-weasel-html-log-default.html');
 has index_template => (is => 'ro', isa => 'Str',
                        default => 'pherkin-weasel-html-log-index.html');
-
-has logging_dir => (is => 'ro', isa => 'Maybe[Str]');
-
-has timestamps => (is => 'ro', isa => 'Bool', default => 0);
 
 has templates_dir => (is => 'ro', isa => 'Str',
                       default => sub {
@@ -368,6 +367,8 @@ sub post_step {
     return if ! defined $context->stash->{scenario}->{ext_wsl};
     my $log = $self->_log;
     $self->_save_screenshot("step", "post");
+    $self->_save_dom("step", "fail")
+        if $result->result eq 'failing';
     if ($log) {
         if (ref $result) {
             $log->{step}->{result} = $result->result;
@@ -410,13 +411,42 @@ URL part to be used for prefixing URL arguments in steps
 
 has base_url => ( is => 'rw', default => '' );
 
+=item dom_save_events
+
+Events which trigger saving the current browser DOM tree
+
+=cut
+
+has dom_save_events => (is => 'ro',
+                        isa => 'HashRef',
+                        default => sub { {} },
+                        traits => ['Hash'],
+                        handles => {
+                            dom_save_on => 'set',
+                            dom_save_off => 'delete',
+                            dom_save_event_on => 'get',
+                        },
+    );
+
+=item logging_dir
+
+Name of directory to store the browser-interaction logs
+
+=cut
+
+has logging_dir => (is => 'ro', isa => 'Maybe[Str]');
+
 =item screenshots_dir
+
+Name of directory to store screenshots generated during testing
 
 =cut
 
 has screenshots_dir => (is => 'rw', isa => 'Str');
 
 =item screenshot_events
+
+Events which trigger saving a screenshot of the current browser viewport
 
 =cut
 
@@ -431,6 +461,22 @@ has screenshot_events => (is => 'ro',
                           },
     );
 
+=item timestamps
+
+Boolean. Default: false
+
+If true, adds a timestamp prefix to browser interaction log lines
+
+=cut
+
+has timestamps => (is => 'ro', isa => 'Bool', default => 0);
+
+=back
+
+=head1 INTERNALS
+
+=over
+
 =item _weasel
 
 =cut
@@ -439,11 +485,40 @@ has screenshot_events => (is => 'ro',
 has _weasel => (is => 'rw',
                 isa => 'Weasel');
 
-=back
+=item _save_dom($event, $phase)
 
-=head1 INTERNALS
+=cut
 
-=over
+my $dom_num = 0;
+
+sub _save_dom {
+    my ($self, $event, $phase) = @_;
+
+    return if ! $self->logging_dir;
+    return if ! $self->dom_save_event_on("$phase-$event");
+    return if $self->_weasel->session->state ne 'started';
+
+    my $dom_name = md5_hex($self->_log->{feature}->{filename}) . "-$event-$phase-" . ($dom_num++) . '.html';
+    if (open my $fh, '>:encode(UTF-8)', $self->logging_dir . '/' . $dom_name) {
+        local $tmp_disable_logging = 1;
+        print $fh $self->_weasel->session->get_document_source;
+        close $fh
+            or warn "Couldn't close DOM html output file '$dom_name': $!";
+    }
+    else {
+        warn "Couldn't create DOM output file '$dom_name': $!";
+    }
+
+    if (my $log = $self->_log) {
+        push @{$log->{scenario}->{rows}}, {
+            dom => {
+                location => $dom_name,
+                description => "$phase $event: ",
+                classes => [ $event, $phase, "$phase-$event" ],
+            }
+        }
+    }
+}
 
 =item _save_screenshot($event, $phase)
 

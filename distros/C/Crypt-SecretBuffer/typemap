@@ -1,0 +1,26 @@
+TYPEMAP
+secret_buffer*                   O_SECRET_BUFFER
+const secret_buffer*             O_SECRET_BUFFER
+auto_secret_buffer               O_SECRET_BUFFER
+maybe_secret_buffer              O_SECRET_BUFFER
+
+secret_buffer_async_result*      O_SECRET_BUFFER_ASYNC_RESULT
+
+secret_buffer_io_flags           O_IO_FLAGS
+secret_buffer_alloc_flags        O_ALLOC_FLAGS
+
+INPUT
+O_SECRET_BUFFER
+   $var= secret_buffer_from_magic($arg, SECRET_BUFFER_MAGIC_OR_DIE @{[ $type =~ /^maybe/? q{| SECRET_BUFFER_MAGIC_UNDEF_OK} : $type =~ /^auto/? q{| SECRET_BUFFER_MAGIC_AUTOCREATE} : q{} ]});
+
+INPUT
+O_SECRET_BUFFER_ASYNC_RESULT
+   $var= secret_buffer_async_result_from_magic($arg, SECRET_BUFFER_MAGIC_OR_DIE);
+
+INPUT
+O_IO_FLAGS
+   $var= parse_io_flags($arg);
+
+INPUT
+O_ALLOC_FLAGS
+   $var= parse_alloc_flags($arg);

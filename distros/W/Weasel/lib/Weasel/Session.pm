@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.30
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,12 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 DESCRIPTION
 
-
+The session represents a connection to a browser window, allowing interaction
+with that window. It abstracts from the protocol being used for such access;
+meaning that the true interactions may be achieved through Selenium, W3C
+Web Driver, Cypress, Playwright or any other protocol or access method as
+long as the driver adheres to the L<Weasel::DriverRole> protocol of the
+required minimum version.
 
 =cut
 
@@ -36,7 +41,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =cut
 
-package Weasel::Session;
+package Weasel::Session 0.32;
 
 
 use strict;
@@ -49,8 +54,6 @@ use HTML::Selector::XPath;
 use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
-
-our $VERSION = '0.30';
 
 our $MINIMUM_DRIVER_VERSION = '0.03';
 
@@ -290,13 +293,16 @@ sub find_all {
         sub {
             my ($rv) = @_;
             ##no critic(ProhibitUselessTopic)
-            return 'found ' . scalar(@{$rv}) . " elements for $pattern "
+            return 'found ' . scalar(@{$rv}) . " elements for $expanded_pattern "
                 . (join ', ', %args) . "\n"
                 . (join "\n",
                         map { ' - ' . ref($_)
-                                  . ' (' . $_->tag_name . ')' } @{$rv});
+                                  . ' (' . $_->tag_name
+                                       . ($_->get_attribute('id')
+                                          ? '#' . $_->get_attribute('id') : '') .')'
+                   } @{$rv});
         },
-        "pattern: $pattern");
+        "pattern: $pattern($expanded_pattern)");
     return wantarray ? @rv : \@rv;
 }
 
@@ -728,4 +734,3 @@ Licensed under the same terms as Perl.
 __PACKAGE__->meta->make_immutable;
 
 1;
-

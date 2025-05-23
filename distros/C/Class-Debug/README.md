@@ -4,7 +4,7 @@ Class::Debug - Add Runtime Debugging to a Class
 
 # VERSION
 
-0.05
+0.06
 
 # SYNOPSIS
 

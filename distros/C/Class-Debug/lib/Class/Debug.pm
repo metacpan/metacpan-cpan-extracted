@@ -13,11 +13,11 @@ Class::Debug - Add Runtime Debugging to a Class
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 =head1 SYNOPSIS
 
@@ -143,8 +143,13 @@ Now you can set up a configuration file and environment variables to debug your 
 
 sub setup
 {
-	my $class = shift;
-	my $params = shift;
+	my $class = shift;	# Name of the calling class
+	my $params = shift;	# Variables passed to the calling class's constructor
+	my $array;
+
+	if(ref($params->{'logger'}) eq 'ARRAY') {
+		$array = delete $params->{'logger'};	# The merge seems to lose this
+	}
 
 	# Load the configuration from a config file, if provided
 	if(exists($params->{'config_file'})) {
@@ -176,10 +181,17 @@ sub setup
 		} else {
 			$params->{'logger'} = Log::Abstraction->new({ carp_on_warn => 1, logger => $logger });
 		}
+	} elsif($array) {
+		$params->{'logger'} = Log::Abstraction->new(array => $array, carp_on_warn => 1);
+		undef $array;
 	} else {
 		$params->{'logger'} = Log::Abstraction->new(carp_on_warn => 1);
 	}
 
+	if($array && !$params->{'logger'}->{'array'}) {
+		# Put it back
+		$params->{'logger'}->{'array'} = $array;
+	}
 	return $params;
 }
 

@@ -41,6 +41,7 @@ lib/Javonet/Sdk/Core/RuntimeLib.pm
 lib/Javonet/Sdk/Core/RuntimeLogger.pm
 lib/Javonet/Sdk/Core/StringEncodingMode.pm
 lib/Javonet/Sdk/Core/Type.pm
+lib/Javonet/Sdk/Core/TypesHandler.pm
 lib/Javonet/Sdk/Internal/Abstract/AbstractEnumInvocationContext.pm
 lib/Javonet/Sdk/Internal/Abstract/AbstractInstanceContext.pm
 lib/Javonet/Sdk/Internal/Abstract/AbstractInvocationContext.pm

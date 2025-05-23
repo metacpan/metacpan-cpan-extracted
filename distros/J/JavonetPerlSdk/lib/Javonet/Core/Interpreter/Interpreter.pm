@@ -16,7 +16,7 @@ sub execute_ {
     my $command = shift;
     my $connection_type = shift;
     my $tcp_address = shift;
-    my @serialized_command = Javonet::Core::Protocol::CommandSerializer->encode($command, $connection_type, $tcp_address, 0);
+    my @serialized_command = Javonet::Core::Protocol::CommandSerializer->serialize($command, $connection_type, $tcp_address, 0);
     my $response_byte_array_ref;
     if ($command->{runtime} eq Javonet::Sdk::Core::RuntimeLib::get_runtime('Perl')) {
         require Javonet::Core::Receiver::Receiver;
@@ -37,7 +37,7 @@ sub process {
     my $command = $commandDeserializer->decode();
     my $response = $handler->handle_command($command);
     my $commandSerializer = CommandSerializer->new();
-    my @response_byte_array = $commandSerializer->encode($response, 0, 0, 0);
+    my @response_byte_array = $commandSerializer->serialize($response, 0, 0, 0);
     return @response_byte_array;
 }
 

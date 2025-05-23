@@ -29,8 +29,9 @@ use aliased 'Javonet::Sdk::Core::PerlCommandType' => 'PerlCommandType', qw(get_c
 use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
 use aliased 'Javonet::Core::Handler::ReferencesCache' => 'ReferencesCache';
 use aliased 'Javonet::Core::Handler::AbstractHandler' => 'AbstractHandler';
-use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib', qw(get_runtime);
-use aliased 'Javonet::Core::Handler::HandlerDictionary' => 'HandlerDictionary', qw(get_handler);
+use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib';
+use aliased 'Javonet::Core::Handler::HandlerDictionary' => 'HandlerDictionary';
+use aliased 'Javonet::Sdk::Core::TypesHandler' => 'TypesHandler';
 
 my $value_handler = ValueHandler->new();
 my $load_library_handler = LoadLibraryHandler->new();
@@ -130,21 +131,14 @@ sub handle_command {
     my ($self, $command) = @_;
     my $response = Javonet::Core::Handler::HandlerDictionary::get_handler($command->{command_type})->handle_command($command);
 
-    if (!defined $response) {
+    if (TypesHandler->is_primitive_or_none($response)) {
         return PerlCommand->new(
             runtime      => Javonet::Sdk::Core::RuntimeLib::get_runtime('Perl'),
             command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('Value'),
             payload      => [ $response ]
-        )
+        );
     }
 
-    if (ref $response eq '') {
-        return PerlCommand->new(
-            runtime      => Javonet::Sdk::Core::RuntimeLib::get_runtime('Perl'),
-            command_type => Javonet::Sdk::Core::PerlCommandType::get_command_type('Value'),
-            payload      => [ $response ]
-        )
-    }
     # elsif (ref $response eq 'ARRAY') {
     #     {
     #         my $reference_cache = ReferencesCache->new();

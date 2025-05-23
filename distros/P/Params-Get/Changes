@@ -1,5 +1,12 @@
 Revision history for Params-Get
 
+0.06	Thu May 22 16:51:58 EDT 2025
+	Allow the default to be a CODE ref
+
+0.05	Thu May 22 13:35:12 EDT 2025
+	Handle the model of a mandatory parameter followed by a hash ref of options
+	Go some way to fixing problems using \@_ rather than @_
+
 0.04	Mon Apr 28 16:50:23 EDT 2025
 	Fix when there's only one argument which is a ref to an array
 

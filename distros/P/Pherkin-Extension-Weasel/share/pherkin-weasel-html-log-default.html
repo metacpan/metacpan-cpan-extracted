@@ -58,6 +58,11 @@
                  class="[% row.screenshot.classes.join(' ') %]" />
           </td>
         </tr>
+[% ELSIF row.dom -%]
+        <tr class="dom">
+          <td></td>
+          <td><a href="[% row.dom.location %]">(link to dom tree)</a></td>
+        </tr>
 [% ELSIF row.step -%]
         <tbody class="step [% IF row.step.failing ; 'failing' ; END %]">
           <tr class="step">

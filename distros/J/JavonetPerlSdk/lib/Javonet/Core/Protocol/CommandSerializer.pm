@@ -8,16 +8,17 @@ use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
 use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib', qw(get_runtime);
 use aliased 'Javonet::Sdk::Core::Type' => 'Type', qw(get_type);
 use aliased 'Javonet::Core::Protocol::TypeSerializer' => 'TypeSerializer';
+use aliased 'Javonet::Sdk::Core::TypesHandler' => 'TypesHandler';
 use Javonet::Sdk::Internal::ConnectionType;
 use Thread::Queue;
 
 use Exporter qw(import);
-our @EXPORT = qw(encode serialize_tcp_address serialize_recursively insert_into_buffer);
+our @EXPORT = qw(serialize serialize_tcp_address serialize_recursively insert_into_buffer);
 
 my @byte_buffer = ();
 my $queue = Thread::Queue->new();
 
-sub encode {
+sub serialize {
     my ($self, $root_command, $connection_type, $tcp_address, $runtimeVersion) = @_;
     @byte_buffer = ();
     $queue = Thread::Queue->new();
@@ -32,10 +33,10 @@ sub encode {
 sub serialize_tcp_address {
     my ($connection_type, $tcp_address) = @_;
     my @tcp_byte_array;
-    if ( Javonet::Sdk::Internal::ConnectionType::get_connection_type('Tcp') eq $connection_type) {
+    if (Javonet::Sdk::Internal::ConnectionType::get_connection_type('Tcp') eq $connection_type) {
         my @tcp_array = split(':', $tcp_address);
         my @tcp_ip = split('\\.', $tcp_array[0]);
-        my @bytes_port =  unpack "C*", pack "v",  $tcp_array[1];
+        my @bytes_port = unpack "C*", pack "v", $tcp_array[1];
         @tcp_byte_array = (Javonet::Sdk::Internal::ConnectionType::get_connection_type('Tcp'), @tcp_ip, @bytes_port);
         return @tcp_byte_array;
     }
@@ -45,10 +46,9 @@ sub serialize_tcp_address {
     }
 }
 
-
-sub serialize_recursively{
+sub serialize_recursively {
     my $left = $queue->pending();
-    if ($left == 0){
+    if ($left == 0) {
         return @byte_buffer;
     }
     my $command = $queue->dequeue();
@@ -56,24 +56,25 @@ sub serialize_recursively{
     my $current_payload_ref = $command->{payload};
     my @cur_payload = @$current_payload_ref;
     my $payload_len = @cur_payload;
-    if ($payload_len > 0){
-        if (!defined $cur_payload[0]){
+    if ($payload_len > 0) {
+        if (!defined $cur_payload[0]) {
             insert_into_buffer(TypeSerializer->serializePrimitive(undef));
         }
+        elsif ($cur_payload[0]->isa("Javonet::Sdk::Core::PerlCommand")) {
+            my $inner_command = $cur_payload[0];
+            insert_into_buffer(TypeSerializer->serializeCommand($inner_command));
+            $queue->insert(0, $inner_command);
+        }
+        elsif (TypesHandler->is_primitive_or_none($cur_payload[0])) {
+            my @result = TypeSerializer->serializePrimitive($cur_payload[0]);
+            insert_into_buffer(@result);
+        }
         else {
-            if ($cur_payload[0]->isa("Javonet::Sdk::Core::PerlCommand")) {
-                my $inner_command = $cur_payload[0];
-                insert_into_buffer(TypeSerializer->serializeCommand($inner_command));
-                $queue->insert(0, $inner_command);
-            }
-            else {
-                my @result = TypeSerializer->serializePrimitive($cur_payload[0]);
-                insert_into_buffer(@result);
-            }
+            die "Unsupported payload item type: " . ref($cur_payload[0]) . " for payload item: $cur_payload[0].";
         }
         return serialize_recursively();
     }
-    else{
+    else {
         $queue->dequeue();
     }
     return serialize_recursively();

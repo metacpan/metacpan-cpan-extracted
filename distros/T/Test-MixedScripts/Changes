@@ -1,5 +1,14 @@
 Revision history for Test-MixedScripts:
 
+v0.5.0    2025-05-22 22:30:33+01:00 Europe/London
+  [Enhancements]
+  - Various kinds of scripts and templates are tested by all_perl_files_scripts_ok.
+
+  - all_perl_files_scripts_ok has been simplified to use ExtUtils::Manifest to identify files.
+
+  [Incompatible Changes]
+  - all_perl_files_scripts_ok no longer accepts a list of directories to search.
+
 v0.4.0    2025-05-20 19:52:09+01:00 Europe/London
   [Enhancements]
   - Test failure diagnostics show the name of the character.
