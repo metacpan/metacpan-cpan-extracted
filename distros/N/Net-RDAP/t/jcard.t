@@ -1,4 +1,5 @@
-#!/usr/bin/env perl
+#!/usr/bin/env perl -T
+use Carp::Always;
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;
@@ -32,8 +33,6 @@ foreach my $property ($jcard->properties) {
         ok($property->can($method), "Property object has the '$method' method");
     }
 }
-
-cmp_ok(scalar($jcard->nodes), '==', scalar($jcard->properties));
 
 my $fn = $jcard->first('fn');
 isa_ok($fn, q{Net::RDAP::JCard::Property});

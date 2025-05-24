@@ -3,6 +3,7 @@ abstract: 'An interface to the Registration Data Access Protocol (RDAP).'
 author:
   - 'Gavin Brown <gavin.brown@fastmail.uk>'
 build_requires:
+  Carp::Always: '0'
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -44,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/perl-Net-RDAP/issues
   repository: https://github.com/gbxyz/perl-Net-RDAP.git
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

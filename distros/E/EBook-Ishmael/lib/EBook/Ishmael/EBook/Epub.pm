@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -21,12 +21,15 @@ my $DCNS = "http://purl.org/dc/elements/1.1/";
 # This module only supports EPUBs with a single rootfile. The standard states
 # there can be multiple rootfiles, but I have yet to encounter one that does.
 
+# TODO: Make heuristic more precise.
 # If file uses zip magic bytes, assume it to be an EPUB.
 sub heuristic {
 
 	my $class = shift;
 	my $file  = shift;
 	my $fh    = shift;
+
+	return 0 if $file =~ /\.zip$/;
 
 	read $fh, my $mag, 4;
 
@@ -38,7 +41,10 @@ sub _get_rootfile {
 
 	my $self = shift;
 
-	my $dom = XML::LibXML->load_xml(location => $self->{_container});
+	my $dom = XML::LibXML->load_xml(
+		location => $self->{_container},
+		no_network => !$self->{Network},
+	);
 	my $ns = $dom->documentElement->namespaceURI;
 
 	my $xpc = XML::LibXML::XPathContext->new($dom);
@@ -82,7 +88,10 @@ sub _read_rootfile {
 
 	$self->{_contdir} = dirname($self->{_rootfile});
 
-	my $dom = XML::LibXML-> load_xml(location => $self->{_rootfile});
+	my $dom = XML::LibXML-> load_xml(
+		location => $self->{_rootfile},
+		no_network => !$self->{Network},
+	);
 	my $ns = $dom->documentElement->namespaceURI;
 
 	my $xpc = XML::LibXML::XPathContext->new($dom);
@@ -190,10 +199,13 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift;
+	my $net   = shift // 1;
 
 	my $self = {
 		Source     => undef,
 		Metadata   => EBook::Ishmael::EBook::Metadata->new,
+		Network    => $net,
 		_unzip     => undef,
 		_container => undef,
 		_rootfile  => undef,
@@ -252,7 +264,10 @@ sub html {
 
 	my $html = join '', map {
 
-		my $dom = XML::LibXML->load_xml(location => $_);
+		my $dom = XML::LibXML->load_xml(
+			location => $_,
+			no_network => !$self->{Network},
+		);
 		my $ns = $dom->documentElement->namespaceURI;
 
 		my $xpc = XML::LibXML::XPathContext->new($dom);
@@ -285,7 +300,10 @@ sub raw {
 
 	my $raw = join "\n\n", map {
 
-		my $dom = XML::LibXML->load_xml(location => $_);
+		my $dom = XML::LibXML->load_xml(
+			location => $_,
+			no_network => !$self->{Network},
+		);
 		my $ns = $dom->documentElement->namespaceURI;
 
 		my $xpc = XML::LibXML::XPathContext->new($dom);

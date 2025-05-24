@@ -1,6 +1,6 @@
 package Pithub::SearchV3;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01041';
+our $VERSION = '0.01042';
 
 # ABSTRACT: Github v3 Search API
 
@@ -42,6 +42,7 @@ sub _search {
             q => delete $args{q},
             ( exists $args{sort}  ? ( sort  => delete $args{sort} )  : () ),
             ( exists $args{order} ? ( order => delete $args{order} ) : () ),
+            ( exists $args{per_page} ? ( per_page => delete $args{per_page} ) : () ),
         },
         %args,
     );
@@ -61,7 +62,7 @@ Pithub::SearchV3 - Github v3 Search API
 
 =head1 VERSION
 
-version 0.01041
+version 0.01042
 
 =head1 METHODS
 

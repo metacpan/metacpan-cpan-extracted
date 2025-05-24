@@ -1,6 +1,6 @@
 package Pithub::PullRequests;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01041';
+our $VERSION = '0.01042';
 
 # ABSTRACT: Github v3 Pull Requests API
 
@@ -108,6 +108,10 @@ sub list {
         path   => sprintf(
             '/repos/%s/%s/pulls', delete $args{user}, delete $args{repo}
         ),
+        params => {
+            per_page => 100,
+            page     => delete $args{page},
+        },
         %args,
     );
 }
@@ -160,7 +164,7 @@ Pithub::PullRequests - Github v3 Pull Requests API
 
 =head1 VERSION
 
-version 0.01041
+version 0.01042
 
 =head1 METHODS
 
@@ -297,7 +301,9 @@ Examples:
     my $p = Pithub::PullRequests->new;
     my $result = $p->list(
         user => 'plu',
-        repo => 'Pithub'
+        repo => 'Pithub',
+        page => 2,
+            # Defaults to page 1, and defaults to a limit of 100 results
     );
 
 =back

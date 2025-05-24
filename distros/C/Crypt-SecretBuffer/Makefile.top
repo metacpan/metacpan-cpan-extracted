@@ -1,23 +1,22 @@
 our %PREREQ_PM;
 BEGIN {
-    %PREREQ_PM= (
-        'ExtUtils::Depends' => '0.405',
-        'Devel::CheckLib'   => '1.03',
-    );
-
-    # If the prereqs for this script are missing,
-    # write out a Makefile that tells CPAN to install them
-    my $use_prereqs_code= join('', map { "use $_ '$PREREQ_PM{$_}'; " } keys %PREREQ_PM).'1;';
-    print $use_prereqs_code."\n";
-    unless (eval $use_prereqs_code) {
-       warn "$@\n";
-       WriteMakefile(
-             NAME         => 'Crypt::SecretBuffer',
-             PREREQ_FATAL => 1,
-             PREREQ_PM    => \%PREREQ_PM,
-       );
-       exit 1; # not reached
-    }
+   %PREREQ_PM= (
+      'ExtUtils::Depends' => '0.405',
+      'Devel::CheckLib'   => '1.03',
+   );
+   # If the prereqs for this script are missing,
+   # write out a Makefile that tells CPAN to install them
+   my $use_prereqs_code= join('', map { "use $_ '$PREREQ_PM{$_}'; " } keys %PREREQ_PM).'1;';
+   print $use_prereqs_code."\n";
+   unless (eval $use_prereqs_code) {
+      warn "$@\n";
+      WriteMakefile(
+         NAME         => 'Crypt::SecretBuffer',
+         PREREQ_FATAL => 1,
+         PREREQ_PM    => \%PREREQ_PM,
+      );
+      exit 1; # not reached
+   }
 }
 
 my $dep= ExtUtils::Depends->new('Crypt::SecretBuffer');
@@ -25,31 +24,33 @@ my @incpath;
 my @libpath;
 my @have;
 
-sub check_lib_fn {
-   my ($macro, $fname, $header, $lib)= @_;
+sub check_lib_and_define {
+   my ($macro, %opts)= @_;
    if (check_lib(
-      # Just take the address of it, to verify it gets linked
-      function => qq{void (*fn)()= (void(*)()) $fname; return fn != NULL;},
-      ($header? ( header => $header ) : ()),
-      ($lib? ( lib => $lib ) : ()),
+      ($opts{fn}? (
+         # Just take the address of it, to verify it gets linked
+         function => qq{void (*fn)()= (void(*)()) $opts{fn}; return fn != NULL;},
+      ) : ()),
+      ($opts{h}? ( header => $opts{h} ) : ()),
+      ($opts{lib}? ( lib => $opts{lib} ) : ()),
       incpath  => \@incpath,
       libpath  => \@libpath,
       debug => 1,
-      analyze_binary => sub { warn "  $_\n" for @_; },
    )) {
-      warn "Found $fname";
+      warn "Found ".($opts{fn}||$opts{h}||$opts{lib});
       push @have, $macro;
    } else {
-      warn "Don't have $fname";
+      warn "Don't have ".($opts{fn}||$opts{h}||$opts{lib});
    }
 }
 
+check_lib_and_define(LIBSSL    => fn => 'RAND_bytes', h => 'openssl/rand.h', lib => 'ssl');
+check_lib_and_define(MINCORE   => fn => 'mincore',    h => 'sys/mman.h');
+check_lib_and_define(GETRANDOM => fn => 'getrandom',  h => 'sys/random.h');
+check_lib_and_define(STDBOOL   =>                     h => 'stdbool.h');
 if ($^O ne 'MSWin32') { # none available on windows, and check_lib giving false positives...
-   check_lib_fn(LIBSSL => 'RAND_bytes', 'openssl/rand.h', 'ssl');
-   check_lib_fn(GETRANDOM => 'getrandom', 'sys/random.h');
-   check_lib_fn(EXPLICIT_BZERO => 'explicit_bzero', 'string.h');
-   check_lib_fn(MINCORE => 'mincore', 'sys/mman.h');
-   check_lib_fn(MEMMEM => 'memmem', 'string.h');
+   check_lib_and_define(EXPLICIT_BZERO => fn => 'explicit_bzero', h => 'string.h');
+   check_lib_and_define(MEMMEM         => fn => 'memmem',         h => 'string.h');
 }
 
 $dep->set_libs(join ' ', (map "-L$_", @libpath))

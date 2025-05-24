@@ -34,6 +34,9 @@ WriteMakefile(
         'URI'                       => 0,
         'XML::LibXML'               => 0,
     },
+    TEST_REQUIRES => {
+        'Carp::Always'              => 0,
+    },
     META_MERGE => {
         'meta-spec' => {
             version => 2

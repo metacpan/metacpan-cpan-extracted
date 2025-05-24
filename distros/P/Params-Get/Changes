@@ -1,5 +1,8 @@
 Revision history for Params-Get
 
+0.07	Fri May 23 07:07:13 EDT 2025
+	Fix dependancy. I added Params::Get rather than Scalar::Utils (RT#165760)
+
 0.06	Thu May 22 16:51:58 EDT 2025
 	Allow the default to be a CODE ref
 

@@ -1,4 +1,7 @@
 # ishmael
+
+![ishmael](img/ishmael-logo.png)
+
 **ishmael** is a Perl program that can read and dump the contents of various
 popular (and unpopular) ebook formats. It originally only dumped the formatted
 text contents of an ebook, but has since grown to be able to dump metadata,
@@ -22,6 +25,7 @@ program for further processing. For example, you can pipe it into a pager like
 * zTXT
 * Comic Book Archives (cbr, cbz, cb7)
 * Microsoft Compiled HTML Help (CHM)
+* Zip
 * Text
 
 ## Building

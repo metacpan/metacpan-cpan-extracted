@@ -1,11 +1,11 @@
 package EBook::Ishmael::ImageID;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT = qw(image_id image_size);
+our @EXPORT = qw(image_id image_size is_image_path);
 
 use List::Util qw(max);
 
@@ -26,6 +26,10 @@ my %NONMAGIC = (
 	'svg' => sub {
 		substr(${ $_[0] }, 0, 1024) =~ /<\s*svg[^<>]*>/
 	},
+);
+
+my $IMGRX = sprintf "(%s)", join '|', qw(
+	png jpg jpeg tif tiff gif bmp webp svg
 );
 
 # This function may not support many image formats as it was designed for
@@ -172,6 +176,14 @@ sub image_size {
 
 }
 
+sub is_image_path {
+
+	my $path = shift;
+
+	return $path =~ /\.$IMGRX$/;
+
+}
+
 1;
 
 =head1 NAME
@@ -229,6 +241,10 @@ specified, C<image_size> will identify the format itself. If the image size
 could not be determined, returns C<undef>.
 
 This subroutine does not support the following formats (yet):
+
+=item $bool = is_image_path($path)
+
+Returns true if C<$path> looks like an image path name.
 
 =over 4
 

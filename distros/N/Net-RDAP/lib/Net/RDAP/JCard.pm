@@ -63,14 +63,6 @@ sub properties {
     return grep { !$type || uc($type) eq uc($_->type) } @{$self->{properties}};
 }
 
-#
-# DEPRECATED
-#
-sub nodes {
-    carp("Warning: Net::RDAP::JCard::nodes() has been deprecated and will be removed in a future release.");
-    return shift->properties(@_);
-}
-
 =pod
 
     $property = $jcard->first('fn');

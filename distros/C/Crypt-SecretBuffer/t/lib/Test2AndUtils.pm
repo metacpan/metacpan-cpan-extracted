@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test2::V0 '!subtest';
 use Test2::Tools::Subtest 'subtest_streamed';
+use IO::Handle;
 use parent 'Test2::V0';
 
 our @EXPORT= (

@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -43,6 +43,7 @@ Options:
   -I|--file-encoding=<enc>  Specify ebook character encoding
   -f|--format=<format>      Specify ebook format
   -w|--width=<width>        Specify output line width
+  -N|--no-network           Disable fetching remove resources
   -t|--text                 Dump formatted ebook text
   -H|--html                 Dump ebook HTML
   -c|--cover                Dump ebook cover image
@@ -109,6 +110,7 @@ sub init {
 		Output  => undef,
 		Width   => 80,
 		Meta    => undef,
+		Network => 1,
 	};
 
 	Getopt::Long::config('bundling');
@@ -118,6 +120,7 @@ sub init {
 		'file-encoding|I=s' => \$self->{FileEnc},
 		'format|f=s'        => \$self->{Format},
 		'width|w=i'         => \$self->{Width},
+		'no-network|N'      => sub { $self->{Network} = 0 },
 		'text|t'            => sub { $self->{Mode} = MODE_TEXT },
 		'html|H'            => sub { $self->{Mode} = MODE_HTML },
 		'cover|c'           => sub { $self->{Mode} = MODE_COVER },
@@ -185,7 +188,9 @@ sub text {
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
-		$self->{Format}
+		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	my $tmp = do {
@@ -250,7 +255,9 @@ sub meta_ishmael {
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
-		$self->{Format}
+		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	my %meta = %{ $ebook->metadata };
@@ -276,7 +283,9 @@ sub meta_json {
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
-		$self->{Format}
+		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	my $meta = $ebook->metadata;
@@ -306,6 +315,8 @@ sub meta_xml {
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
 		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	my $meta = $ebook->metadata;
@@ -366,7 +377,9 @@ sub html {
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
-		$self->{Format}
+		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	my $oh = _get_out($self->{Output});
@@ -395,7 +408,9 @@ sub raw {
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
-		$self->{Format}
+		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	my $oh = _get_out($self->{Output});
@@ -424,7 +439,9 @@ sub cover {
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
-		$self->{Format}
+		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	unless ($ebook->has_cover) {
@@ -466,7 +483,9 @@ sub image {
 
 	my $ebook = EBook::Ishmael::EBook->new(
 		$self->{Ebook},
-		$self->{Format}
+		$self->{Format},
+		$self->{FileEnc},
+		$self->{Network},
 	);
 
 	my $num = $ebook->image_num;

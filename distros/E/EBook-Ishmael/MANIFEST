@@ -1,6 +1,8 @@
 bin/ishmael
 bin/queequeg
 Changes
+img/fishmael.png
+img/ishmael-logo.png
 lib/EBook/Ishmael.pm
 lib/EBook/Ishmael/Decode.pm
 lib/EBook/Ishmael/Dir.pm
@@ -20,6 +22,7 @@ lib/EBook/Ishmael/EBook/PalmDoc.pm
 lib/EBook/Ishmael/EBook/PDF.pm
 lib/EBook/Ishmael/EBook/Text.pm
 lib/EBook/Ishmael/EBook/XHTML.pm
+lib/EBook/Ishmael/EBook/Zip.pm
 lib/EBook/Ishmael/EBook/zTXT.pm
 lib/EBook/Ishmael/ImageID.pm
 lib/EBook/Ishmael/MobiHuff.pm
@@ -49,6 +52,7 @@ t/20_cb7.t
 t/21_cbr.t
 t/22_chm.t
 t/23_kf8.t
+t/24_zip.t
 t/40_ishmael.t
 t/data/gerwinski-gnu-head.png
 t/data/gpl3.azw3
@@ -63,5 +67,6 @@ t/data/gpl3.pdb
 t/data/gpl3.pdf
 t/data/gpl3.txt
 t/data/gpl3.xhtml
+t/data/gpl3.zip
 t/data/gpl3.ztxt
 t/data/web2help.chm

@@ -10,7 +10,7 @@ BEGIN { use_ok('Config::Abstraction') }
 Log::Abstraction->import();
 
 my @messages;
-my $config = Config::Abstraction->new(logger => \@messages);
+my $config = Config::Abstraction->new(level => 'trace', logger => \@messages);
 
 diag(Data::Dumper->new([\@messages])->Dump()) if($ENV{'TEST_VERBOSE'});
 

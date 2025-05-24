@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl -T
+use Carp::Always;
 use List::Util qw(any);
 use LWP::Online qw(:skip_all);
 use Test::More;

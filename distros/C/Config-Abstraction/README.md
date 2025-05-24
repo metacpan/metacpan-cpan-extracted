@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.26
+Version 0.27
 
 # SYNOPSIS
 
@@ -118,7 +118,8 @@ This will override any value set for `database.user` in the configuration files.
 - 1. Data Argument
 
     The data passed into the constructor via the `data` argument is the starting point.
-    Essentially this contains the default values.
+    Essentially,
+    this contains the default values.
 
 - 2. Loading Files
 
@@ -138,7 +139,8 @@ This will override any value set for `database.user` in the configuration files.
 
 - 4. Environment Overrides
 
-    After loading and merging the configuration files, environment variables are
+    After loading and merging the configuration files,
+    the environment variables are
     checked and used to override any conflicting settings.
 
 - 5. Command Line
@@ -193,7 +195,11 @@ Options:
 
     If true, returns a flat hash structure like `{database.user}` (default: `0`) instead of `{database}{user}`.
     \`
-    &#x3d;item \* `logger`
+    &#x3d;item \* `level`
+
+    Level for logging.
+
+- `logger`
 
     Used for warnings and traces.
     It can be an object that understands warn() and trace() messages,
@@ -250,7 +256,8 @@ Options:
 
 - merge
 
-    Usually what's in the object will overwrite what's in the defaults hash,
+    Usually,
+    what's in the object will overwrite what's in the defaults hash,
     if given,
     the result will be a combination of the hashes.
 
@@ -260,7 +267,7 @@ Options:
 
 - deep
 
-    Try harder to merge in all configuration from the global section of the configuration file.
+    Try harder to merge all configurations from the global section of the configuration file.
 
 ## AUTOLOAD
 

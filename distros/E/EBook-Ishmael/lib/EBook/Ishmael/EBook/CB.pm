@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CB;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -10,14 +10,12 @@ use File::Which;
 use List::Util qw(max);
 
 use EBook::Ishmael::Dir;
+use EBook::Ishmael::ImageID;
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::Unzip qw(safe_tmp_unzip);
 
 # Not an ebook format itself, just a base class from which actual comic book
 # archives derive themselves.
-
-my @IMG = qw(png jpg jpeg gif tif tiff bmp);
-my $IMGRX = sprintf "(%s)", join '|', @IMG;
 
 sub heuristic { 0 }
 
@@ -30,7 +28,7 @@ sub _images {
 	for my $f (dir($dir)) {
 		if (-d $f) {
 			push @img, _images($f);
-		} elsif (-f $f and $f =~ /\.$IMGRX$/) {
+		} elsif (-f $f and is_image_path($f)) {
 			push @img, $f;
 		}
 	}

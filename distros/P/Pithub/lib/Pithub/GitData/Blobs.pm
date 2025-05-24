@@ -1,6 +1,6 @@
 package Pithub::GitData::Blobs;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01041';
+our $VERSION = '0.01042';
 
 # ABSTRACT: Github v3 Git Data Blobs API
 
@@ -52,7 +52,7 @@ Pithub::GitData::Blobs - Github v3 Git Data Blobs API
 
 =head1 VERSION
 
-version 0.01041
+version 0.01042
 
 =head1 DESCRIPTION
 

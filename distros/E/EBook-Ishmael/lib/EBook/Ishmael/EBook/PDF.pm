@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::PDF;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -108,10 +108,13 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift;
+	my $net   = shift // 1;
 
 	my $self = {
 		Source   => undef,
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
+		Network  => $net,
 		_imgdir  => undef,
 		_images  => [],
 	};
@@ -146,7 +149,8 @@ sub html {
 	}
 
 	my $dom = XML::LibXML->load_html(
-		string => $raw
+		string => $raw,
+		no_network => !$self->{Network},
 	);
 
 	my ($body) = $dom->findnodes('/html/body');
@@ -182,7 +186,8 @@ sub raw {
 	}
 
 	my $dom = XML::LibXML->load_html(
-		string => $rawml
+		string => $rawml,
+		no_network => !$self->{Network},
 	);
 
 	my ($body) = $dom->findnodes('/html/body');

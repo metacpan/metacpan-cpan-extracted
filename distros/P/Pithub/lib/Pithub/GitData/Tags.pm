@@ -1,6 +1,6 @@
 package Pithub::GitData::Tags;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01041';
+our $VERSION = '0.01042';
 
 # ABSTRACT: Github v3 Git Data Tags API
 
@@ -52,7 +52,7 @@ Pithub::GitData::Tags - Github v3 Git Data Tags API
 
 =head1 VERSION
 
-version 0.01041
+version 0.01042
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CHM;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -25,9 +25,6 @@ my $CHMLIB = which 'extract_chmLib';
 our $CAN_TEST = defined $CHMLIB;
 
 my $MAGIC = 'ITSF';
-
-my @IMG = qw(png jpg jpeg tif tiff gif bmp webp);
-my $IMGRX = sprintf "(%s)", join '|', @IMG;
 
 sub heuristic {
 
@@ -100,7 +97,8 @@ sub _hhc {
 
 	my $dom = XML::LibXML->load_html(
 		location => $hhc,
-		recover => 2
+		recover => 2,
+		no_network => !$self->{Network},
 	);
 
 	my @locals = $dom->findnodes('//li/object/param[@name="Local"]');
@@ -130,7 +128,7 @@ sub _images {
 	for my $f (dir($dir)) {
 		if (-d $f) {
 			$self->_images($f);
-		} elsif ($f =~ /\.$IMGRX$/) {
+		} elsif (is_image_path($f)) {
 			push @{ $self->{_images} }, $f;
 		}
 	}
@@ -198,10 +196,13 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift;
+	my $net   = shift // 1;
 
 	my $self = {
 		Source   => undef,
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
+		Network  => $net,
 		_extract => undef,
 		_images  => [],
 		_content => [],
@@ -236,6 +237,7 @@ sub html {
 		my $dom = XML::LibXML->load_html(
 			location => $_,
 			recover => 2,
+			no_network => !$self->{Network},
 		);
 
 		my ($body) = $dom->findnodes('/html/body');
@@ -270,6 +272,7 @@ sub raw {
 		my $dom = XML::LibXML->load_html(
 			location => $_,
 			recover => 2,
+			no_network => !$self->{Network},
 		);
 
 		my ($body) = $dom->findnodes('/html/body');

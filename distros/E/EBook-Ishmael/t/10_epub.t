@@ -11,7 +11,7 @@ use EBook::Ishmael::ImageID;
 
 my $EPUB = File::Spec->catfile(qw/t data gpl3.epub/);
 
-my $ebook = EBook::Ishmael::EBook->new($EPUB);
+my $ebook = EBook::Ishmael::EBook->new($EPUB, undef, undef, 0);
 isa_ok($ebook, 'EBook::Ishmael::EBook::Epub');
 
 like($ebook->{Source}, qr/\Q$EPUB\E$/, "source ok");

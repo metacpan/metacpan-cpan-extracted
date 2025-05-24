@@ -11,7 +11,7 @@ use EBook::Ishmael::ImageID;
 
 my $FB = File::Spec->catfile(qw/t data gpl3.fb2/);
 
-my $ebook = EBook::Ishmael::EBook->new($FB);
+my $ebook = EBook::Ishmael::EBook->new($FB, undef, undef, 0);
 isa_ok($ebook, 'EBook::Ishmael::EBook::FictionBook2');
 
 like($ebook->{Source}, qr/\Q$FB\E$/, "source ok");

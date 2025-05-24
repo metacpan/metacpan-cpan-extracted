@@ -20,7 +20,7 @@ unless ($TEST_CHM) {
 # I just took a random CHM I found on the web (licensed under the GPL3).
 my $CHM = File::Spec->catfile(qw/t data web2help.chm/);
 
-my $ebook = EBook::Ishmael::EBook->new($CHM);
+my $ebook = EBook::Ishmael::EBook->new($CHM, undef, undef, 0);
 isa_ok($ebook, 'EBook::Ishmael::EBook::CHM');
 
 like($ebook->{Source}, qr/\Q$CHM\E$/, "source ok");

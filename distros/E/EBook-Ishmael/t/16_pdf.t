@@ -18,7 +18,7 @@ unless ($TEST_PDF) {
 
 my $PDF = File::Spec->catfile(qw/t data gpl3.pdf/);
 
-my $ebook = EBook::Ishmael::EBook->new($PDF);
+my $ebook = EBook::Ishmael::EBook->new($PDF, undef, 0);
 isa_ok($ebook, 'EBook::Ishmael::EBook::PDF');
 
 like($ebook->{Source}, qr/\Q$PDF\E$/, "source ok");

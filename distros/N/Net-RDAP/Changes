@@ -1,5 +1,11 @@
 Revision history for perl module Net::RDAP:
 
+0.38 - 2025-05-23
+  - untaint filename when mirroring resources
+  - tests now run under -T
+  - HTTP error responses which aren't valid RDAP error respones are handled properly.
+  - Net::RDAP::JCard->nodes() has now been removed.
+
 0.37 - 2025-04-03
   - added link() and related() methods to Net::RDAP::Base.
   - added event(), entity(), registrant() and registrar() methods to

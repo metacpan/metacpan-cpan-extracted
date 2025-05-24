@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.001';
+$Crypt::SecretBuffer::VERSION = '0.003';
 
 use strict;
 use warnings;
@@ -13,11 +13,12 @@ use overload '""' => \&stringify;
 sub dl_load_flags {0x01} # Share extern symbols with other modules
 bootstrap Crypt::SecretBuffer;
 
+
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.001';
+$Crypt::SecretBuffer::Exports::VERSION = '0.003';
    use Exporter 'import';
-   @Crypt::SecretBuffer::Exports::EXPORT_OK= qw( secret_buffer secret NONBLOCK );
+   @Crypt::SecretBuffer::Exports::EXPORT_OK= qw( secret_buffer secret NONBLOCK AT_LEAST );
    sub secret_buffer {
       Crypt::SecretBuffer->new(@_)
    }
@@ -43,6 +44,16 @@ sub new {
 }
 
 
+sub stringify_mask {
+   my $self= shift;
+   if (@_) {
+      $self->{stringify_mask}= shift;
+      return $self;
+   }
+   $self->{stringify_mask}
+}
+
+
 sub as_pipe {
    my $self= shift;
    pipe(my ($r, $w)) or die "pipe: $!";   
@@ -65,11 +76,12 @@ Crypt::SecretBuffer - Prevent accidentally leaking a string of sensitive data
 
 =head1 SYNOPSIS
 
-  $buf= Crypt::SecretBuffer->new;
+  use Crypt::SecretBuffer 'secret';
+  $buf= secret;
   print "Enter your password: ";
-  $buf->append_console_line(\*STDIN)   # read TTY with echo disabled
+  $buf->append_console_line(STDIN)   # read TTY with echo disabled
     or die "Aborted";
-  say $buf;                            # prints "[REDACTED]"
+  say $buf;                          # prints "[REDACTED]"
   
   my @cmd= qw( openssl enc -e -aes-256-cbc -md sha512 -pbkdf2 -iter 239823 -pass fd:3 );
   IPC::Run::run(\@cmd,
@@ -119,8 +131,8 @@ stringification of the buffer reveals the secret or not.  For instance:
 
 There is no guarantee that the XS function in that example wouldn't make a copy of your secret,
 but this at least provides the secret buffer directly to the XS code that calls C<SvPV> without
-making a copy.  If an XS module is aware of Crypt::SecretBuffer, it can use a more official C
-API that doesn't rely on perl stringification behavior.
+making a copy.  If an XS module is aware of Crypt::SecretBuffer, it can use a more official
+L</C API> that doesn't rely on perl stringification behavior.
 
 =head1 CONSTRUCTORS
 
@@ -134,6 +146,11 @@ of key/value pairs, it assigns those attributes, such as C<< ->new(capacity => 2
 Technically it just calls each key as a method with the value as a single argument, so you could
 also do things like C<< ->new(append_random => 16) >>.
 
+=head2 secret_buffer / secret
+
+The functions C<secret_buffer> and C<secret> can be exported from this module as a shorthand
+for C<< Crypt::SecretBuffer->new(...) >>.
+
 =head1 ATTRIBUTES
 
 =head2 capacity
@@ -141,29 +158,40 @@ also do things like C<< ->new(append_random => 16) >>.
   say $buf->capacity;
   $buf->capacity($n_bytes)->...
   $buf->capacity($n_bytes, AT_LEAST)->...
+  $buf->capacity($n_bytes, 'AT_LEAST')->...
 
 This reads or writes the allocated length of the buffer, presumably because you know how much
 space you need for an upcoming read operation, but it can also free up space you know you no
 longer need.  In the third example, a second parameter 'AT_LEAST' is passed to indicate that
 the buffer does not need reallocated if it is already large enough.
 
-Capacity beyond 'length' is not initialized.
-
 =head2 length
 
   say $buf->length;
-  $buf->length(0);
+  $buf->length(0);    # wipes buffer
   $buf->length(32);   # fills with zeroes
 
 This gets or sets the length of the string in the buffer.  If you set it to a smaller value,
 the string is truncated.  If you set it to a larger value, the L</capacity> is raised as needed
 and the bytes are initialized with zeroes.
 
+=head2 stringify_mask
+
+  $buf->stringify_mask;           # "[REDACTED]"
+  $buf->stringify_mask("*****");  # now stringifies as "*****"
+  $buf->stringify_mask(undef);    # exposes secret
+
+Get or set the stringification mask.  Setting it to C<undef> causes L</stringify> to expose the
+secret.  In order to restore the default C<"[REDACTED]"> you have to delete the attribute:
+C<< delete $buf->{stringify_mask} >>.  This attribute is mainly intended to allow cusomizing the
+mask during the constructor.  The preferred way to expose the secret is with C<local> on the
+hash key directly.
+
 =head1 METHODS
 
 =head2 clear
 
-Erases the buffer.  Equivalent to C<< $buf->length(0) >>
+Erases the buffer.  Equivalent to C<< $buf->length(0) >>.  Returns C<$self> for chaining.
 
 =head2 assign
 
@@ -209,11 +237,13 @@ and they are not an lvalue that alters the original.
 
   $byte_count= $buf->append_random($n_bytes);
   $byte_count= $buf->append_random($n_bytes, NONBLOCK);
+  $byte_count= $buf->append_random($n_bytes, 'NONBLOCK');
 
-Append N cryptographic-quality random bytes.  This uses either the c library 'getrandom' call
-with C<GRND_RANDOM>, or if that isn't available, it reads from /dev/random.  The NONBLOCK flag
-can be used to avoid blocking waiting on entropy.  NONBLOCK is ignored on Windows because it
-always returns the requested number of bytes and never blocks.
+Append N cryptographic-quality random bytes.  On POSIX systems, this uses either the C library
+C<getrandom> call with C<GRND_RANDOM>, or if that isn't available, it reads from C</dev/random>.
+The C<NONBLOCK> flag can be used to avoid blocking on insufficient entropy.  On Windows, this
+uses C<CryptGenRandom> and the flag has no effect because it always returns the requested number
+of bytes and never blocks.
 
 =head2 append_console_line
 
@@ -256,7 +286,8 @@ backed by the OS.
 This performs a low-level write from the buffer into a file handle.  It must be a real file
 handle with an underlying file descriptor (C<fileno>).  If the handle has pending bytes in its
 IO buffer, those are flushed first.  Like C<syswrite>, this returns C<undef> on an OS error,
-and otherwise returns the number of bytes written.  This ignores Perl I/O layers.
+and otherwise returns the number of bytes written.  It only makes one write attempt, which may
+be shorter than the requested C<$count>. This ignores Perl I/O layers.
 
 =head2 write_async
 
@@ -274,7 +305,7 @@ a type of handle that can't buffer it, this function will duplicate your file ha
 the secret and pass them to a background thread to do the writing.
 
 You can check the status or wait for its completion using the
-L<Crypt::SecretBuffer::AsyncResult|$async_result> object.
+L<$async_result|Crypt::SecretBuffer::AsyncResult> object.
 
 =head2 as_pipe
 
@@ -289,15 +320,23 @@ The C<$async_result> from L</write_async> is ignored, allowing the background th
 
 =head1 EXPORTS
 
-=over
+=over 15
 
 =item AT_LEAST
 
-Parameter for the setting capacity.
+Parameter for setting the L</capacity>.
 
 =item NONBLOCK
 
-Parameter for append_random, if you are worried about blocking on lack of entropy on Linux.
+Parameter for L</append_random>.
+
+=item secret_buffer
+
+Shorthand function for calling L</new>.
+
+=item secret
+
+Shorthand function for calling L</new>.
 
 =back
 
@@ -426,7 +465,7 @@ destroyed.
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 AUTHOR
 

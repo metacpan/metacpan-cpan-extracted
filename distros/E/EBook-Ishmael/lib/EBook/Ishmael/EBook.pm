@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -20,10 +20,12 @@ use EBook::Ishmael::EBook::PalmDoc;
 use EBook::Ishmael::EBook::PDF;
 use EBook::Ishmael::EBook::Text;
 use EBook::Ishmael::EBook::XHTML;
+use EBook::Ishmael::EBook::Zip;
 use EBook::Ishmael::EBook::zTXT;
 
 our %EBOOK_FORMATS = map { lc $_ => "EBook::Ishmael::EBook::$_" } qw(
-	CB7 CBR CBZ CHM Epub FictionBook2 HTML KF8 Mobi PalmDoc PDF Text XHTML zTXT
+	CB7 CBR CBZ CHM Epub FictionBook2 HTML KF8 Mobi PalmDoc PDF Text XHTML Zip
+	zTXT
 );
 
 sub ebook_id {
@@ -63,12 +65,13 @@ sub new {
 	my $file  = shift;
 	my $type  = shift // ebook_id($file);
 	my $enc   = shift;
+	my $net   = shift;
 
 	if (not defined $type) {
 		die "Could not identify $file format\n";
 	}
 
-	my $obj = $EBOOK_FORMATS{ $type }->new($file, $enc);
+	my $obj = $EBOOK_FORMATS{ $type }->new($file, $enc, $net);
 
 	return $obj;
 
@@ -98,14 +101,16 @@ all (mostly) share the same API.
 
 =head1 METHODS
 
-=head2 $e = EBook::Ishmael::EBook->new($file, $type, $enc)
+=head2 $e = EBook::Ishmael::EBook->new($file, $type, $enc, $net)
 
 Reads C<$file> and returns some ebook object, the exact class will depend the on
 the format of C<$file> or C<$type>. C<$type> is the name of the format you would
 like to read C<$file> as. If not specified, C<new()> will try to identify
 C<$file>'s format automatically via a series of heuristics. C<$enc> is an
 optional argument specify the character encoding to read the ebook format as, if
-the ebook format supports user-specified encodings.
+the ebook format supports user-specified encodings. C<$net> is an optional
+boolean argument that determines whether to allow or disallow performing
+network operations when reading an ebook.
 
 =head2 $html = $e->html([$out])
 

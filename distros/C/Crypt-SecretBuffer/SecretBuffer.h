@@ -104,8 +104,8 @@ extern bool secret_buffer_result_check(SV *promise_ref, int timeout_msec, IV *wr
 
 /* Requests that the write operation be stopped.  The write operation will stop anyway when it
  * gets a pipe error, but this is just in case you want to interrupt it before completion.
- */
-//extern void secret_buffer_result_cancel(SV *promise_ref);
+ *
+X extern void secret_buffer_result_cancel(SV *promise_ref); */
 
 /* Return a magical SV which exposes the secret buffer.
  * This should be used sparingly, if at all, for interoperating with perl code that isn't

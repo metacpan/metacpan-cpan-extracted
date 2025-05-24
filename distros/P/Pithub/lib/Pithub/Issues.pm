@@ -1,6 +1,6 @@
 package Pithub::Issues;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01041';
+our $VERSION = '0.01042';
 
 # ABSTRACT: Github v3 Issues API
 
@@ -119,7 +119,7 @@ Pithub::Issues - Github v3 Issues API
 
 =head1 VERSION
 
-version 0.01041
+version 0.01042
 
 =head1 METHODS
 

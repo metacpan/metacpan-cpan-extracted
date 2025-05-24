@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -592,10 +592,13 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift;
+	my $net   = shift // 1;
 
 	my $self = {
 		Source       => undef,
 		Metadata     => EBook::Ishmael::EBook::Metadata->new,
+		Network      => $net,
 		_pdb         => undef,
 		_compression => undef,
 		_textlen     => undef,
@@ -793,6 +796,7 @@ sub html {
 
 			my $dom = XML::LibXML->load_html(
 				string => $part,
+				no_network => !$self->{Network},
 				recover => 2,
 			);
 
@@ -808,6 +812,7 @@ sub html {
 		my $enc = $self->{_codepage} == 1252 ? "cp1252" : "utf-8";
 		my $dom = XML::LibXML->load_html(
 			string => $rawml,
+			no_network => !$self->{Network},
 			encoding => $enc,
 			recover => 2
 		);
@@ -839,6 +844,7 @@ sub raw {
 		for my $part ($self->_kf8_xhtml) {
 			my $dom = XML::LibXML->load_html(
 				string => $part,
+				no_network => !$self->{Network},
 				recover => 2,
 			);
 			my ($body) = $dom->findnodes('/html/body') or next;
@@ -851,6 +857,7 @@ sub raw {
 		my $enc = $self->{_codepage} == 1252 ? "cp1252" : "utf-8";
 		my $dom = XML::LibXML->load_html(
 			string => $rawml,
+			no_network => !$self->{Network},
 			encoding => $enc,
 			recover => 2,
 		);

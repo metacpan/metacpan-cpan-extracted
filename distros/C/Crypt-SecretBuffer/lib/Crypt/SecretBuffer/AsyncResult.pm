@@ -1,5 +1,5 @@
 package Crypt::SecretBuffer::AsyncResult;
-$Crypt::SecretBuffer::AsyncResult::VERSION = '0.001';
+$Crypt::SecretBuffer::AsyncResult::VERSION = '0.003';
 #ABSTRACT: Observe results of a write_async operation
 #VERSION
 1;
@@ -16,8 +16,8 @@ Crypt::SecretBuffer::AsyncResult - Observe results of a write_async operation
 
 =head1 DESCRIPTION
 
-This object holds a reference to a background write operation started by L<Crypt::SecretBuffer::write_async>.
-There is only one method currently:
+This object holds a reference to a background write operation started by
+L<Crypt::SecretBuffer/write_async>.
 
 =head1 METHODS
 
@@ -28,12 +28,12 @@ There is only one method currently:
   }
 
 This waits up to C<$seconds> (or indefinitely if you pass undef) for the write operation to
-complete, then if it has completed, returns the number of bytes written, and the OS error code,
-if any.
+complete.  If it has completed, this returns the number of bytes written and the OS error code
+as a list.  On a timeout, it returns an empty list.
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 AUTHOR
 

@@ -1,2 +1,10 @@
+Version 0.003 - 2025-05-23
+  - Make attribute accessor for stringify_mask
+    Also allows stringify_mask to be specified in the constructor
+
+Version 0.002 - 2025-05-23
+  - Fix 5.8 compatibility
+  - Fix exports & documentation
+
 Version 0.001 - 2025-05-23
   - Initial version, working on Linux, FreeBSD, and MSWin32

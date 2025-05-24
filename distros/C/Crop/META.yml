@@ -1,0 +1,33 @@
+---
+abstract: 'A configuration management module for Crop framework'
+author:
+  - 'Alex <alextechnologies@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crop
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::Cookie: '0'
+  CGI::Fast: '0'
+  Clone: '0'
+  JSON: '0'
+  Test::More: '0'
+  Time::Stamp: '0'
+  XML::LibXML: '0'
+  XML::LibXSLT: '0'
+resources:
+  bugtracker: hhttps://github.com/alextech7/crop/issues
+  repository: https://github.com/alextech7/crop
+version: v0.1.27
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

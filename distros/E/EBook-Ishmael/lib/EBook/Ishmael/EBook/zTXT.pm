@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::zTXT;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 

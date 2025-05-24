@@ -57,6 +57,8 @@ B<ishmael> currently supports the following ebook formats:
 
 =item Microsoft Compiled HTML Help (CHM)
 
+=item Zip
+
 =item Text
 
 =back
@@ -120,6 +122,8 @@ B<ishmael> to determine the text character encoding.
 
 =item zTXT
 
+=item Zip
+
 =item Text
 
 =back
@@ -166,6 +170,8 @@ heuristics, manually specify the format. The following are valid options
 
 =item chm
 
+=item zip
+
 =item text
 
 =back
@@ -173,6 +179,11 @@ heuristics, manually specify the format. The following are valid options
 =item B<-w>|B<--width>=I<width>
 
 Specify the formatted text line width. Defaults to C<80>.
+
+=item B<-N>|B<--no-network>
+
+Disable fetching remote network resources when reading an ebook, such as
+external XML DTDs or entities. This may cause errors when reading some ebooks..
 
 =item B<-t>|B<--text>
 

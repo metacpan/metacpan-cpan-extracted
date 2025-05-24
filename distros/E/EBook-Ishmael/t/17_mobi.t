@@ -11,7 +11,7 @@ use EBook::Ishmael::ImageID;
 
 my $DOC = File::Spec->catfile(qw/t data gpl3.mobi/);
 
-my $ebook = EBook::Ishmael::EBook->new($DOC);
+my $ebook = EBook::Ishmael::EBook->new($DOC, undef, undef, 0);
 isa_ok($ebook, 'EBook::Ishmael::EBook::Mobi');
 
 like($ebook->{Source}, qr/\Q$DOC\E$/, "source ok");

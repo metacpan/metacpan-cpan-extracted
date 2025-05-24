@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01041';
+our $VERSION = '0.01042';
 
 use Carp qw( croak );
 extends 'Pithub::Base';
@@ -55,7 +55,7 @@ Pithub::Repos::Actions::Workflows - Github v3 Repo Actions Workflows API
 
 =head1 VERSION
 
-version 0.01041
+version 0.01042
 
 =head1 DESCRIPTION
 

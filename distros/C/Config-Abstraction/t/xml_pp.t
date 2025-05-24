@@ -23,6 +23,7 @@ my $config = Config::Abstraction->new(
 	config_file => 'xml_test'
 );
 
+ok(defined($config));
 diag(Data::Dumper->new([$config])->Dump()) if($ENV{'TEST_VERBOSE'});
 cmp_ok($config->get('UserName'), 'eq', 'njh', 'XML can be read in from a file with an XML header');
 

@@ -1,5 +1,12 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.07  May 23 2025
+  - Add Fishmael: the new mascot/logo for ishmael.
+  - Add -N|--no-network option: disable fetching of remote resources when
+    reading an ebook.
+  - Add support for generic Zip ebook archives.
+  - Fix -I|--file-encoding.
+
 1.06  Apr 15 2025
   - Added -I|--file-encoding option: Specify the character encoding of the ebook
     file's text. This option only applies to ebook formats that do not specify

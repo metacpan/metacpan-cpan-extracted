@@ -24,7 +24,7 @@ do { my $x = {
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Pod::Coverage' => '1.08',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.014',
                                       'Test::Version' => '1'
@@ -42,7 +42,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'Moo::Role' => '0',
                                       'URI' => '0',
-                                      'perl' => '5.010',
+                                      'perl' => '5.013010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -68,7 +68,7 @@ do { my $x = {
                                    'Test::Most' => '0',
                                    'Test::Needs' => '0',
                                    'lib' => '0',
-                                   'perl' => '5.010'
+                                   'perl' => '5.013010'
                                  }
                  }
      };

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -236,10 +236,13 @@ sub new {
 
 	my $class = shift;
 	my $file  = shift;
+	my $enc   = shift;
+	my $net   = shift // 1;
 
 	my $self = {
 		Source   => undef,
 		Metadata => EBook::Ishmael::EBook::Metadata->new,
+		Network  => $net,
 		_dom     => undef,
 		_cover   => undef,
 		_images  => [],
@@ -249,7 +252,10 @@ sub new {
 
 	$self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{_dom} = XML::LibXML->load_xml(location => $file);
+	$self->{_dom} = XML::LibXML->load_xml(
+		location => $file,
+		no_network => !$self->{Network},
+	);
 
 	$self->_read_metadata;
 

@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01041';
+our $VERSION = '0.01042';
 
 use Carp           qw( croak );
 use HTTP::Headers  ();
@@ -217,7 +217,8 @@ sub request {
     }
 
     if ( my $query = delete $args{query} ) {
-        $uri->query_form(%$query);
+        my %orig_query = $uri->query_form;
+        $uri->query_form(%orig_query, %$query);
     }
 
     my $request = $self->_request_for( $method, $uri, $data );
@@ -438,7 +439,7 @@ Pithub::Base - Github v3 base class for all Pithub modules
 
 =head1 VERSION
 
-version 0.01041
+version 0.01042
 
 =head1 DESCRIPTION
 

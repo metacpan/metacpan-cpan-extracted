@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =head1 SYNOPSIS
 
@@ -145,7 +145,8 @@ This will override any value set for C<database.user> in the configuration files
 =item 1. Data Argument
 
 The data passed into the constructor via the C<data> argument is the starting point.
-Essentially this contains the default values.
+Essentially,
+this contains the default values.
 
 =item 2. Loading Files
 
@@ -165,7 +166,8 @@ The module merges the contents of these files, with more specific configurations
 
 =item 4. Environment Overrides
 
-After loading and merging the configuration files, environment variables are
+After loading and merging the configuration files,
+the environment variables are
 checked and used to override any conflicting settings.
 
 =item 5. Command Line
@@ -224,6 +226,10 @@ Synonym for C<config_file>
 
 If true, returns a flat hash structure like C<{database.user}> (default: C<0>) instead of C<{database}{user}>.
 `
+=item * C<level>
+
+Level for logging.
+
 =item * C<logger>
 
 Used for warnings and traces.
@@ -274,9 +280,9 @@ sub new
 					File::Spec->catdir($ENV{'HOME'}, 'conf'),
 			} elsif($ENV{'DOCUMENT_ROOT'}) {
 				push @{$params->{'config_dirs'}},
+					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, File::Spec->updir(), 'conf'),
 					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'conf'),
-					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'config'),
-					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, File::Spec->updir(), 'conf');
+					File::Spec->catdir($ENV{'DOCUMENT_ROOT'}, 'config');
 			}
 			if(my $dir = $ENV{'CONFIG_DIR'}) {
 				push @{$params->{'config_dirs'}}, $dir;
@@ -297,6 +303,9 @@ sub new
 		if(!Scalar::Util::blessed($logger)) {
 			$self->_load_driver('Log::Abstraction');
 			$self->{'logger'} = Log::Abstraction->new($logger);
+			if($params->{'level'}) {
+				$self->{'logger'}->level($params->{'level'});
+			}
 		}
 	}
 	$self->_load_config();
@@ -326,7 +335,8 @@ sub _load_config
 		$logger->trace(ref($self), ' ', __LINE__, ': Entered _load_config');
 	}
 
-	for my $dir (@{$self->{'config_dirs'}}) {
+	# Look in the current directory (if the config_file starts with a '/' it'll treat that as an absolute pathname, if config_dirs has been passed in)
+	for my $dir (@{$self->{'config_dirs'}}, '') {
 		for my $file (qw/base.yaml base.yml base.json base.xml base.ini local.yaml local.yml local.json local.xml local.ini/) {
 			my $path = File::Spec->catfile($dir, $file);
 			if($logger) {
@@ -653,7 +663,8 @@ Options:
 
 =item * merge
 
-Usually what's in the object will overwrite what's in the defaults hash,
+Usually,
+what's in the object will overwrite what's in the defaults hash,
 if given,
 the result will be a combination of the hashes.
 
@@ -663,7 +674,7 @@ Merge in that section from the configuration file.
 
 =item * deep
 
-Try harder to merge in all configuration from the global section of the configuration file.
+Try harder to merge all configurations from the global section of the configuration file.
 
 =back
 

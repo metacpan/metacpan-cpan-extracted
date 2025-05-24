@@ -1,4 +1,5 @@
-#!/usr/bin/env perl
+#!/usr/bin/env perl -T
+use Carp::Always;
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;

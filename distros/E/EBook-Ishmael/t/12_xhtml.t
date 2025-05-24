@@ -10,7 +10,7 @@ use EBook::Ishmael::EBook;
 
 my $HTML = File::Spec->catfile(qw/t data gpl3.xhtml/);
 
-my $ebook = EBook::Ishmael::EBook->new($HTML);
+my $ebook = EBook::Ishmael::EBook->new($HTML, undef, undef, 0);
 isa_ok($ebook, 'EBook::Ishmael::EBook::XHTML');
 
 like($ebook->{Source}, qr/\Q$HTML\E$/, "source ok");

@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl -T
+use Carp::Always;
 use Test::More;
 use strict;
 

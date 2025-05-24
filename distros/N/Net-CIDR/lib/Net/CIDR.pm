@@ -2,7 +2,7 @@
 #
 # Copyright 2001-2025 Sam Varshavchik.
 #
-# with contributions from David Cantrell.
+# with contributions from David Cantrell and brian d foy
 #
 # This program is free software; you can redistribute it
 # and/or modify it under the same terms as Perl itself.
@@ -50,7 +50,7 @@ use Carp;
 
 );
 
-$VERSION = "0.23";
+$VERSION = "0.25";
 
 1;
 
@@ -536,7 +536,7 @@ sub addr2cidr {
 	    $n &= 0xF8;
 	}
 
-	my $s=join(".", @ipcpy);
+	my $s=join(".", map { s/\A0+([0-9])/$1/; $_ } @ipcpy);
 
 	push @blocks, ($isipv6 ? _ipv4to6($s):$s) . "/$bits";
     }
@@ -1352,6 +1352,7 @@ but the functions will croak if you're totally off the wall.
 Sam Varshavchik <sam@email-scan.com>
 
 With some contributions from David Cantrell <david@cantrell.org.uk>
+and brian d foy <briandfoy@pobox.com>.
 
 =cut
 

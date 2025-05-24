@@ -1,10 +1,19 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#define NEED_mg_findext
+#define NEED_newSVpvn_share
 #include "ppport.h"
 
-#include "SecretBuffer.h"
+#ifdef HAVE_STDBOOL
+  #include <stdbool.h>
+#else
+  #define bool int
+  #define true 1
+  #define false 0
+#endif
 
+#include "SecretBuffer.h"
 
 /**********************************************************************************************\
 * XS Utils
@@ -76,7 +85,7 @@ static bool disable_console_echo(int fd, console_state *prev_state) {\
    HANDLE hConsole= fd >= 0? (HANDLE)_get_osfhandle(fd) : INVALID_HANDLE_VALUE;
    if (hConsole == INVALID_HANDLE_VALUE || GetFileType(hConsole) != FILE_TYPE_CHAR)
       return false;
-   // Capture current state
+   /* Capture current state */
    if (!GetConsoleMode(hConsole, prev_state))
       return false;
    new_mode = *prev_state & ~ENABLE_ECHO_INPUT;
@@ -111,19 +120,17 @@ typedef struct termios console_state;
 
 static bool disable_console_echo(int fd, console_state *prev_state) {
    struct termios new_state;
-   // Check if stream is a TTY
+   /* Check if stream is a TTY */
    if (fd < 0 || !isatty(fd))
       return false;
    if (tcgetattr(fd, prev_state) != 0)
       return false;
    new_state= *prev_state;
    new_state.c_lflag &= ~ECHO;
-   //warn("# set console state to %X", new_state.c_lflag);
    return tcsetattr(fd, TCSAFLUSH, &new_state) == 0;
 }
 
 static bool restore_console_state(int fd, console_state *prev_state) {
-   //warn("# restore console state to %X", prev_state->c_lflag);
    return tcsetattr(fd, TCSAFLUSH, prev_state) == 0;
 }
 
@@ -144,7 +151,6 @@ static void* memmem(
    char first_ch= *(char*)needle;
    while (p < lim) {
       if (*p == first_ch) {
-         // Check each position for the needle
          if (memcmp(p, needle, needlelen) == 0)
             return (void*)p;
       }
@@ -730,7 +736,6 @@ void secret_buffer_async_result_send(secret_buffer_async_result *result, IV os_e
 
 bool secret_buffer_async_result_recv(secret_buffer_async_result *result, IV timeout_msec, IV *total_written, IV *os_err) {
    bool ready= false;
-   // Wait for the event with timeout
 #ifdef WIN32
    DWORD ret = WaitForSingleObject(result->readyEvent, timeout_msec < 0? INFINITE : timeout_msec);
    if (ret == WAIT_TIMEOUT)
@@ -741,7 +746,10 @@ bool secret_buffer_async_result_recv(secret_buffer_async_result *result, IV time
    ASYNC_RESULT_MUTEX_LOCK(result);
 #else
    struct timespec ts;
-   // Calculate absolute timeout time
+   /* timedwait operates on absolute wallclock time
+    * This is sort of dangerous since wallclock time can change... but the only
+    * alternative I see would be to play with the alarm signal.
+    */
    if (timeout_msec >= 0) {
       clock_gettime(CLOCK_REALTIME, &ts);
       ts.tv_sec += timeout_msec / 1000;
@@ -752,7 +760,7 @@ bool secret_buffer_async_result_recv(secret_buffer_async_result *result, IV time
       }
    }
    ASYNC_RESULT_MUTEX_LOCK(result);
-   // Wait until data is ready or timeout occurs
+   /* Wait until data is ready or timeout occurs */
    while (!result->ready) {
       int rc = timeout_msec < 0? pthread_cond_wait(&result->cond, &result->mutex)
          : pthread_cond_timedwait(&result->cond, &result->mutex, &ts);
@@ -761,7 +769,7 @@ bool secret_buffer_async_result_recv(secret_buffer_async_result *result, IV time
       ready= result->ready;
    }
 #endif
-   // If we got the data successfully, read it and reset the ready flag
+   /* If we got the data successfully, read it and reset the ready flag */
    if (ready) {
       if (total_written) *total_written= result->total_written;
       if (os_err) *os_err= result->os_err;
@@ -867,7 +875,6 @@ IV secret_buffer_write_async(secret_buffer *buf, PerlIO *fh, IV offset, IV count
       HANDLE hFile = (HANDLE)_get_osfhandle(fd);
       DWORD ret;
       if (GetFileType(hFile) == FILE_TYPE_PIPE) {
-         // Save original pipe state
          DWORD origPipeMode = 0;
          DWORD bytesWritten, lastError;
          BOOL success;
@@ -875,24 +882,24 @@ IV secret_buffer_write_async(secret_buffer *buf, PerlIO *fh, IV offset, IV count
          if (!GetNamedPipeHandleState(hFile, &origPipeMode, NULL, NULL, NULL, NULL, 0))
             croak_with_syserror("GetNamedPipeHandleState", GetLastError());
          if (!(origPipeMode & PIPE_NOWAIT)) {
-            // Set pipe to non-blocking mode temporarily
+            /* Set pipe to non-blocking mode temporarily */
             DWORD nonBlockMode = PIPE_NOWAIT;
             if (!SetNamedPipeHandleState(hFile, &nonBlockMode, NULL, NULL))
                croak_with_syserror("SetNamedPipeHandleState", GetLastError());
          }
 
-         // Try nonblocking write
+         /* Try nonblocking write */
          success= WriteFile(hFile, buf->data + offset, count, &bytesWritten, NULL);
          lastError = GetLastError();
 
-         // Restore original pipe state
+         /* Restore original pipe state */
          if (!(origPipeMode & PIPE_NOWAIT)) {
             SetNamedPipeHandleState(hFile, &origPipeMode, NULL, NULL);
             SetLastError(lastError);
          }
         
          if (success && bytesWritten == count)
-            return count; // Write completed immediately
+            return count; /* Write completed immediately */
          else if (!success && lastError != ERROR_NO_DATA)
             /* an actual error */
             return -1;
@@ -935,9 +942,9 @@ IV secret_buffer_write_async(secret_buffer *buf, PerlIO *fh, IV offset, IV count
       }
 
       if (total_written == count)
-         return count; // Write completed immediately
+         return count; /* Write completed immediately */
       else if (total_written < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
-         return -1; // actual error
+         return -1; /* actual error */
       if (total_written < 0)
          total_written= 0;
       /* launch thread */
@@ -969,7 +976,6 @@ IV secret_buffer_write_async(secret_buffer *buf, PerlIO *fh, IV offset, IV count
 
 int secret_buffer_stringify_magic_get(pTHX_ SV *sv, MAGIC *mg) {
    secret_buffer *buf= (secret_buffer *)mg->mg_ptr;
-//   warn("secret_buffer_stringify_magic_get %p %p", buf->stringify_sv, sv);
    assert(buf->stringify_sv == sv);
    SvPVX(sv)= buf->data? buf->data : "";
    SvCUR(sv)= buf->data? buf->len  : 0;
@@ -985,7 +991,7 @@ int secret_buffer_stringify_magic_set(pTHX_ SV *sv, MAGIC *mg) {
 }
 
 int secret_buffer_stringify_magic_free(pTHX_ SV *sv, MAGIC *mg) {
-//   warn("Freeing stringify scalar");
+/*   warn("Freeing stringify scalar"); */
    return 0;
 }
 
@@ -1085,52 +1091,47 @@ typedef int secret_buffer_alloc_flags;
  * Debug helpers
 \**********************************************************************************************/
 
-// Helper function to check if a memory page is accessible (committed and readable)
+/* Helper function to check if a memory page is accessible (committed and readable) */
 #if defined(WIN32)
-
-static bool is_page_accessible(uintptr_t addr) {
-   MEMORY_BASIC_INFORMATION memInfo;
-   if (VirtualQuery((LPCVOID)addr, &memInfo, sizeof(memInfo)) == 0)
-      return FALSE;
-   return (memInfo.State == MEM_COMMIT) && 
-          (memInfo.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE));
-}
-#define CAN_SCAN_MEMORY 1
-
+   #define CAN_SCAN_MEMORY 1
+   static bool is_page_accessible(uintptr_t addr) {
+      MEMORY_BASIC_INFORMATION memInfo;
+      if (VirtualQuery((LPCVOID)addr, &memInfo, sizeof(memInfo)) == 0)
+         return FALSE;
+      return (memInfo.State == MEM_COMMIT) && 
+            (memInfo.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE));
+   }
 #elif defined(HAVE_MINCORE)
-
-#include <sys/mman.h>
-static bool is_page_accessible(uintptr_t addr) {
-   unsigned char vec;
-   return mincore((void*)addr, 1, &vec) == 0;
-}
-#define CAN_SCAN_MEMORY 1
-
+   #define CAN_SCAN_MEMORY 1
+   #include <sys/mman.h>
+   static bool is_page_accessible(uintptr_t addr) {
+      unsigned char vec;
+      return mincore((void*)addr, 1, &vec) == 0;
+   }
 #else
-#define CAN_SCAN_MEMORY 0
+   #define CAN_SCAN_MEMORY 0
 #endif
 
 /* The rest only works if we have is_page_accessible */
 #if CAN_SCAN_MEMORY
-
-size_t scan_mapped_memory_in_range(uintptr_t p, uintptr_t lim, const char *needle, size_t needle_len) {
+IV scan_mapped_memory_in_range(uintptr_t p, uintptr_t lim, const char *needle, size_t needle_len) {
    size_t pagesize= get_page_size();
    size_t count= 0;
    void *at;
    uintptr_t run_start = p, run_lim;
    p = (p & ~(pagesize - 1)); /* round to nearest page, from here out */
    while (p < lim) {
-      // Skip pages that aren't mapped
+      /* Skip pages that aren't mapped */
       while (p < lim && !is_page_accessible(p)) {
          p += pagesize;
          run_start= p;
       }
-      // This page is mapped.  Find the end of this mapped range, if it comes before lim
+      /* This page is mapped.  Find the end of this mapped range, if it comes before lim */
       while (p < lim && is_page_accessible(p)) {
          p += pagesize;
       }
       run_lim= p < lim? p : lim;
-      // Scan memory from run_start to run_lim
+      /* Scan memory from run_start to run_lim */
       while (run_start < run_lim && (at= memmem((void*)run_start, run_lim - run_start, needle, needle_len))) {
          ++count;
          run_start= ((intptr_t)at) + needle_len;
