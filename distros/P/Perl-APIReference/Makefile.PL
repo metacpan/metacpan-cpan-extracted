@@ -11,8 +11,8 @@ WriteMakefile(
       'parent'            => '0',
       'Data::Dumper'      => '0',
       'Class::XSAccessor' => '1.05',
-      'Sereal::Encoder'   => '3.005',
-      'Sereal::Decoder'   => '3.005',
+      'Sereal::Encoder'   => '5.004',
+      'Sereal::Decoder'   => '5.004',
     }, # e.g., Module::Name => 1.1
     dist              => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005

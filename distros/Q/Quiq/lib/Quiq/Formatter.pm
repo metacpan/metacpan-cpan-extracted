@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 use Quiq::Math;
 use Quiq::Formatter;
@@ -180,7 +180,7 @@ ersetzt.
 sub readableNumber {
     my $class = shift;
     my $x = shift;
-    my $sep = shift || '.';
+    my $sep = shift // '.';
 
     if ($sep eq '.') {
         $x =~ s/\./,/;
@@ -302,7 +302,7 @@ sub reducedIsoTime {
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 

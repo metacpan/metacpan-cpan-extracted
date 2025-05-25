@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -335,8 +335,17 @@ sub _load_config
 		$logger->trace(ref($self), ' ', __LINE__, ': Entered _load_config');
 	}
 
-	# Look in the current directory (if the config_file starts with a '/' it'll treat that as an absolute pathname, if config_dirs has been passed in)
-	for my $dir (@{$self->{'config_dirs'}}, '') {
+	my @dirs = @{$self->{'config_dirs'}};
+	if($self->{'config_file'} && (scalar(@dirs) > 1)) {
+		if(File::Spec->file_name_is_absolute($self->{'config_file'})) {
+			# Handle absolute paths
+			@dirs = ('');
+		} else {
+			# Look in the current directory
+			push @dirs, File::Spec->curdir();
+		}
+	}
+	for my $dir (@dirs) {
 		for my $file (qw/base.yaml base.yml base.json base.xml base.ini local.yaml local.yml local.json local.xml local.ini/) {
 			my $path = File::Spec->catfile($dir, $file);
 			if($logger) {

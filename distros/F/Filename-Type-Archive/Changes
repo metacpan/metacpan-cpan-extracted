@@ -1,0 +1,32 @@
+0.033   2024-12-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Filename-{,Type-}*.
+
+
+0.032   2023-08-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Return 'filename_without_suffix' key in result.
+
+
+0.031   2020-06-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Recognize .cb7, .cbz, .cba, .cbt, and .cbr files as archives.
+
+
+0.030   2020-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add .tgz, .tbz, .7z, and .arj.
+
+
+0.02    2015-09-03  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.01    2015-01-01  Released-By: PERLANCAR
+
+        - First release.

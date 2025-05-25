@@ -1,3 +1,40 @@
+1.226 2025-05-25
+================
+
+[Quiq::Eog]
+* transferImages(): Option -addExtension modifiziert
+
+[Quiq::Formatter]
+* readableNumber(): Parameterübergabe verbessert
+
+[Quiq::Mustang]
+* Klasse hinzugefügt
+
+[Quiq::Object]
+* throw(): Option -error hinzugefügt
+
+[Quiq::Path]:
+* moveToDateSubdir(): Option -dirSuffix hinzugefügt
+* reduceToTilde(): Methode hinzugefügt
+* swap(): Methode hinzugefügt
+
+[Quiq::Progress]
+* percent(): Nachkommastelle hinzugefügt
+
+[Quiq::Shell]
+* exec(): Option -log hinzugefügt
+
+[Quiq::StreamServe::Stream]
+* Klasse hinzugefügt
+
+[Quiq::Tree]
+* reduceTree(): Parameter $sub hinzugefügt
+
+[Quiq::Zugferd]
+* combine(): Methode hinzugefügt
+* xml(): Varianten verändert
+* Template EN16931 erweitert
+
 1.225 2025-03-31
 ================
 

@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0704';
+our $VERSION = '0.0800';
 
 use Moo;
 use strictures 2;
@@ -115,7 +115,12 @@ sub _rtmidi_loop ($msg_ch, $midi_ch) {
     my $midi_in = MIDI::RtMidi::FFI::Device->new(type => 'in');
     my $name = _open_port($midi_in, ${ $msg_ch->recv });
     $midi_in->set_callback_decoded(
-        sub { $midi_ch->send([ @_[0, 2], $name ]) }
+        sub {
+            my (@event) = @_;
+            my @e = $event[0] eq 'clock' || $event[0] eq 'start' || $event[0] eq 'stop'
+                ? ($event[0], 0) : @event[0, 2];
+            $midi_ch->send([ @e, $name ])
+        }
     ); # delta-time, event, midi port
     sleep;
 }
@@ -198,7 +203,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0704
+version 0.0800
 
 =head1 SYNOPSIS
 

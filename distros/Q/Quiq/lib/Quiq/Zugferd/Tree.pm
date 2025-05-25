@@ -27,7 +27,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 use Quiq::Tree;
 
@@ -107,6 +107,25 @@ sub getMultiElement {
 =head4 Synopsis
 
   $ztr->reduceTree;
+  $ztr->reduceTree($sub);
+
+=head4 Arguments
+
+=over 4
+
+=item $sub
+
+Referenz auf Subroutine, die unaufgelöste Werte entfernt. Default:
+
+  sub {
+      my $val = shift;
+      if (defined $val && $val =~ /^__\w+__$/) {
+          $val = undef;
+      }
+      return $val;
+  }
+
+=back
 
 =head4 Description
 
@@ -116,7 +135,7 @@ Reduziere den ZUGFeRD-Baum auf ein Minumum, d.h.
 
 =item *
 
-Entferne alle Knoten mit unersetzten Platzhaltern
+Entferne alle Knoten mit unaufgelösten Werten
 
 =item *
 
@@ -129,11 +148,11 @@ Entferne alle leeren Knoten
 # -----------------------------------------------------------------------------
 
 sub reduceTree {
-    my $self = shift;
+    my ($self,$sub) = @_;
 
-    # Entferne Knoten mit unersetzten Platzhaltern
+    # Entferne Knoten mit unaufgelösten Werten (Default: ___XXX__ Platzhalter)
 
-    Quiq::Tree->setLeafValue($self,sub {
+    $sub //= Quiq::Tree->setLeafValue($self,sub {
         my $val = shift;
         if (defined $val && $val =~ /^__\w+__$/) {
             $val = undef;
@@ -216,7 +235,7 @@ sub resolvePlaceholders {
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 

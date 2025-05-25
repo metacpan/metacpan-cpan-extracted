@@ -1,5 +1,12 @@
 Revision history for Perl extension Perl::APIReference.
 
+0.24  Sat May 24 11:00:00 2025
+  - Update Sereal dependency version requirement to >5 to avoid
+    issues with backward compatibility of the Sereal blobs
+    (since version 5 of the protocol was used in the 0.23 update.)
+  - Repacked all blobs with the newest version of Sereal and with
+    compression enabled to reduce wasted space.
+
 0.23  Thu May 22 22:00:00 2025
   - Perl 5.24 to 5.40 support.
 

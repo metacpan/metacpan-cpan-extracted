@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -1819,11 +1819,11 @@ Anwendungsfall: nur die Blatt-Verzeichnisse eines Verzeichnisbaums.
 
 Liefere nur Dateien, die vor mindestens $seconds zuletzt geändert
 wurden. Diese Option ist z.B. nützlich, um veraltete temporäre Dateien
-zu finden, um sie zu löschen.
+zu finden.
 
 =item -outHandle => $fh (Default: \*STDOUT)
 
-Filehandle, auf die Ausgabe im Falle von -verbose=>1 geschrieben
+Filehandle, auf die die Ausgabe im Falle von -verbose=>1 geschrieben
 werden.
 
 =item -pattern => $regex (Default: keiner)
@@ -1852,7 +1852,7 @@ Liefere nur den Subpfad, entferne also $path am Anfang.
 
 =item -testSub => sub {} (Default: undef)
 
-Subroutine, die den Pfad als Argument erthält und einen boolschen
+Subroutine, die den Pfad als Argument erhält und einen boolschen
 Wert liefert, der angibt, ob der Pfad zur Ergebnismenge gehört
 oder nicht.
 
@@ -2887,7 +2887,7 @@ sub expandTilde {
     if ($path && substr($path,0,1) eq '~') {
         if (!exists $ENV{'HOME'}) {
             $class->throw(
-                'PATH-00016: Environment-Variable HOME existiert nicht',
+                'PATH-00016: Envvar HOME does not exist',
             );
         }
         substr($path,0,1) = $ENV{'HOME'};
@@ -2926,6 +2926,10 @@ sub extension {
 
   $filename = $class->filename($path);
 
+=head4 Alias
+
+lastName()
+
 =head4 Description
 
 Liefere die letzte Komponente des Pfads.
@@ -2938,6 +2942,11 @@ sub filename {
     my ($class,$path) = @_;
     $path =~ s|.*/||;
     return $path;
+}
+
+{
+    no warnings 'once';
+    *lastName = \&filename;
 }
 
 # -----------------------------------------------------------------------------
@@ -3106,6 +3115,12 @@ Verzeichnis, in dem das Datums-Subverzeichnis angelegt wird.
 
 Gib Information aus.
 
+=item -dirSuffix => $suffix
+
+Füge an das Datums-Subverzeichnis den Suffix $suffix an. Beispiel:
+
+  Quiq::Path->moveToDateSubDir($_,-dirSuffix=>'.tmp')
+
 =back
 
 =head4 Description
@@ -3135,14 +3150,19 @@ sub moveToDateSubDir {
     # Optionen und Argumente
 
     my $verbose = 1;
+    my $dirSuffix = undef;
 
     my $argA = $this->parameters(1,2,\@_,
         -verbose => \$verbose,
+        -dirSuffix => \$dirSuffix,
     );
     my ($path,$rootDir) = @$argA;
 
     my $date = POSIX::strftime('%Y-%m-%d',localtime $this->mtime($path));
     my $destDir = $rootDir? "$rootDir/$date": $date;
+    if ($dirSuffix) {
+        $destDir .= $dirSuffix;
+    }
     my $name = $this->filename($path);
     if ($verbose) {
         say "$path => $destDir/$name";
@@ -3353,6 +3373,52 @@ sub readlink {
 {
     no warnings 'once';
     *readLink = \&readlink;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 reduceToTilde() - Ersetze Pfandanfang durch Tilde
+
+=head4 Synopsis
+
+  $pathNew = $class->reduceToTilde($path);
+
+=head4 Arguments
+
+=over 4
+
+=item $path
+
+Ein Pfad
+
+=back
+
+=head4 Returns
+
+Pfad (String)
+
+=head4 Description
+
+Ersetze das Homedir am Pfadanfang durch eine Tilde und liefere den
+resultierenden Pfad zurück. Beginnt der Pfad nicht mit dem Homedir,
+bleibt er unverändert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub reduceToTilde {
+    my ($class,$path) = @_;
+
+    if (!exists $ENV{'HOME'}) {
+        $class->throw(
+            'PATH-00016: Envar HOME does not exist',
+        );
+    }
+
+    $path =~ s#^$ENV{'HOME'}#~#;
+    
+    return $path;
 }
 
 # -----------------------------------------------------------------------------
@@ -4030,6 +4096,99 @@ sub stat {
 
 # -----------------------------------------------------------------------------
 
+=head3 swap() - Vertausche in einem Verzeichnis zwei Namen
+
+=head4 Synopsis
+
+  $this->%METHOD($dir,$glob1,$glob2);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Pfad des Verzeichnisses
+
+=item $glob1
+
+Datei oder Verzeichnisname
+
+=item $glob2
+
+Datei oder Verzeichnisname
+
+=back
+
+=head4 Description
+
+Vertausche in Verzeichnis $dir die beiden (Datei- oder Verzeichnis-)Namen
+$glob1 und $glob2.
+
+=head4 Example
+
+  $ perl -MQuiq::Path -E 'Quiq::Path->swap("06-album","0000940.*","0010200.*")'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub swap {
+    my $this = shift;
+    my $dir = $this->expandTilde(shift);
+    my $glob1 = shift;
+    my $glob2 = shift;
+
+    my @paths1 = $this->glob("$dir/$glob1");
+    if (!@paths1) {
+        $this->throw(
+            'PATH-00099: Glob pattern not found',
+            Pattern => "$dir/$glob1",
+        );
+    }
+    my @paths2 = $this->glob("$dir/$glob2");
+    if (!@paths2) {
+        $this->throw(
+            'PATH-00099: Glob pattern not found',
+            Pattern => "$dir/$glob2",
+        );
+    }
+
+    (my $name1 = $glob1) =~ s/\*//g;
+    (my $name2 = $glob2) =~ s/\*//g;
+
+    my @newPaths;
+
+    # $name1 in $name2 umbenennen und Endung .tmp hinzufügen
+
+    for my $path (@paths1) {
+        (my $newPath = $path) =~ s/$name1/$name2/;
+        $newPath .= '.tmp';
+        $this->rename($path,$newPath);
+        push @newPaths,$newPath;
+    }
+
+    # $name2 in $name1 umbenennen und Endung .tmp hinzufügen
+
+    for my $path (@paths2) {
+        (my $newPath = $path) =~ s/$name2/$name1/;
+        $newPath .= '.tmp';
+        $this->rename($path,$newPath);
+        push @newPaths,$newPath;
+    }
+
+    # Endung .tmp entfernen
+
+    for my $path (@newPaths) {
+        (my $newPath = $path) =~ s/\.tmp//;
+        $this->rename($path,$newPath);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 symlink() - Erzeuge Symlink
 
 =head4 Synopsis
@@ -4248,7 +4407,7 @@ sub uid {
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 

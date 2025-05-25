@@ -1,0 +1,123 @@
+NAME
+    Filename::Type::Archive - Check whether filename indicates being an
+    archive file
+
+VERSION
+    This document describes version 0.033 of Filename::Type::Archive (from
+    Perl distribution Filename-Type-Archive), released on 2024-12-20.
+
+SYNOPSIS
+     use Filename::Type::Archive qw(check_archive_filename);
+     my $res = check_archive_filename(filename => "foo.tar.gz");
+     if ($res) {
+         printf "File is an archive (type: %s, compressed: %s)\n",
+             $res->{archive_name},
+             $res->{compressor_info} ? "yes":"no";
+     } else {
+         print "File is not an archive\n";
+     }
+
+DESCRIPTION
+FUNCTIONS
+  check_archive_filename
+    Usage:
+
+     check_archive_filename(%args) -> bool|hash
+
+    Check whether filename indicates being an archive file.
+
+    Examples:
+
+    *   Example #1:
+
+         check_archive_filename(filename => "foo.tar.bz2");
+
+        Result:
+
+         {
+           archive_name            => "tar",
+           archive_suffix          => ".tar",
+           compressor_info         => [
+                                        {
+                                          compressor_name       => "Bzip2",
+                                          compressor_suffix     => ".bz2",
+                                          uncompressed_filename => "foo.tar",
+                                        },
+                                      ],
+           filename_without_suffix => "foo",
+         }
+
+    *   Example #2:
+
+         check_archive_filename(filename => "bar.Zip", ignore_case => 1);
+
+        Result:
+
+         {
+           archive_name => "Zip",
+           archive_suffix => ".Zip",
+           filename_without_suffix => "bar",
+         }
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *str*
+
+        (No description)
+
+    *   ignore_case => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information, which contains these keys: "archive_name",
+    "archive_suffix", "compressor_info", "filename_without_suffix".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Filename-Type-Archive>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Filename-Type-Archive>.
+
+SEE ALSO
+    Filename::Type::Compressed
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Type-Archive
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

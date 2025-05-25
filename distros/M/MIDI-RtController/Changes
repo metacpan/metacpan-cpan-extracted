@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController
 
+0.0800 2025-05-25 01:36:07
+    - Handle MIDI clock messages.
+
 0.0704 2025-05-18 20:27:35
     - Give a real name to the virtual port that is created.
     - Improve documentation.

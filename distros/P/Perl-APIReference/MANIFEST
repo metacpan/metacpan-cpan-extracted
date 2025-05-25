@@ -1,5 +1,6 @@
 .gitignore
 author_scripts/generate.pl
+author_scripts/reencode.pl
 Changes
 lib/Perl/APIReference.pm
 lib/Perl/APIReference/Generator.pm

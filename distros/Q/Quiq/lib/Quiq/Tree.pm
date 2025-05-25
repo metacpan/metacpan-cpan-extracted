@@ -30,7 +30,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 use Quiq::AnsiColor;
 use Scalar::Util ();
@@ -85,6 +85,7 @@ sub leafPaths {
         $ref //= '';
         $ref =~ s/\n/\\n/g;
         return "$path ".$a->str('cyan',$ref); # Pfad und terminaler skalarer Wert
+        # return [$path,$ref]; # ".$a->str('cyan',$ref); # Pfad und terminaler skalarer Wert
     }
     elsif ($type eq 'HASH') {
         for my $key (keys %$ref) {
@@ -322,7 +323,7 @@ sub setLeafValue {
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 

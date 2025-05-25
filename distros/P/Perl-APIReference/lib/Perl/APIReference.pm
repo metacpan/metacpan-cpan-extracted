@@ -5,10 +5,9 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 use version;
-use Sereal::Encoder;
 use Sereal::Decoder;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Class::XSAccessor
   getters => {
@@ -148,10 +147,11 @@ sub _dump_as_class {
   require Sereal::Encoder;
   my $data = $self->{'index'};
   my $dump = Sereal::Encoder->new({
-    canonical      => 1,
-    compress       => Sereal::Encoder::SRL_ZLIB(),
-    compress_level => 9,
-    dedupe_strings => 1,
+    compress           => Sereal::Encoder::SRL_ZSTD(),
+    compress_level     => 22,
+    compress_threshold => 1,
+    dedupe_strings     => 1,
+    sort_keys          => 1,
   })->encode($data);
   
   open my $fh, '>', $file_name or die $!;

@@ -2,7 +2,7 @@ package Test2::Hub;
 use strict;
 use warnings;
 
-our $VERSION = '1.302213';
+our $VERSION = '1.302214';
 
 
 use Carp qw/carp croak confess/;
@@ -725,7 +725,7 @@ process or thread. You can always add a pre_filter.
 These can be used to remove filters and pre_filters. The C<$sub> argument is
 the reference returned by C<filter()> or C<pre_filter()>.
 
-=item $hub->follow_op(sub { ... })
+=item $hub->follow_up(sub { ... })
 
 Use this to add behaviors that are called just before the hub is finalized. The
 only argument to your codeblock will be a L<Test2::EventFacet::Trace> instance.

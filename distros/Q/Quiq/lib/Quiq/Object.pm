@@ -22,7 +22,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -302,6 +302,10 @@ sub parameters {
 
 =over 4
 
+=item -error => $bool (Default: 0)
+
+Wirf keine Exception, sondern gib lediglich einen Fehler aus.
+
 =item -stdout => $bool (Default: 0)
 
 Erzeuge die Meldung auf STDOUT (statt STDERR), wenn -warning => 1
@@ -334,6 +338,7 @@ sub throw {
     # Optionen nicht durch eine andere Klasse verarbeiten!
     # Die Klasse darf auf keiner anderen Klasse basieren.
 
+    my $error = 0;
     my $stdout = 0;
     my $stacktrace = 1;
     my $warning = 0;
@@ -341,6 +346,10 @@ sub throw {
     for (my $i = 0; $i < @_; $i++) {
         if (!defined $_[$i]) {
             next;
+        }
+        elsif ($_[$i] eq '-error') {
+            $error = $_[$i+1];
+            splice @_,$i--,2;
         }
         elsif ($_[$i] eq '-stdout') {
             $stdout = $_[$i+1];
@@ -378,7 +387,7 @@ sub throw {
 
         if (defined $val && $val ne '') {
             $key = ucfirst $key;
-            if ($warning) {
+            if ($error || $warning) {
                 if ($keyVal) {
                     $keyVal .= ', ';
                 }
@@ -391,10 +400,11 @@ sub throw {
         }
     }
 
-    if ($warning) {
-        # Keine Exception, nur Warnung
+    if ($error || $warning) {
+        # Keine Exception, nur Fehlermeldung oder Warnung
 
-        my $msg = "WARNING: $msg. $keyVal\n";
+        my $msg = sprintf "%s: %s. %s\n",
+            ($error? 'ERROR': 'WARNING'),$msg,$keyVal;
         if ($stdout) {
             print $msg;
         }
@@ -672,7 +682,7 @@ sub this {
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 

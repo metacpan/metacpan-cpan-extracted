@@ -10,7 +10,7 @@ use parent qw{ Astro::App::Satpass2::Geocode };
 use Astro::App::Satpass2::Utils qw{ instance @CARP_NOT };
 use List::Util ();
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 use constant GEOCODER_CLASS => 'Geo::Coder::OSM';
 

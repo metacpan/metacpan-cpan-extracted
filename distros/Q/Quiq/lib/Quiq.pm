@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 =encoding utf8
 
@@ -13,7 +13,7 @@ Quiq - Class library for rapid development
 
 =head1 DESCRIPTION
 
-Diese Klassenbibliothek enthält 245 anwendungsunabhängige Klassen,
+Diese Klassenbibliothek enthält 247 anwendungsunabhängige Klassen,
 die ich in Projekten nutze. Die Klassen sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
@@ -672,6 +672,10 @@ L<Quiq::Mojolicious::Plugin::Log::Parameters> - Logge Request-Parameter
 
 =item *
 
+L<Quiq::Mustang> - Frontend für Mustang Kommendozeilen-Werkzeug
+
+=item *
+
 L<Quiq::Net> - Allgemeine Netzwerkfunktionalität
 
 =item *
@@ -864,6 +868,10 @@ L<Quiq::Storable> - Perl-Datenstrukturen persistent speichern
 
 =item *
 
+L<Quiq::StreamServe::Stream> - Inhalt einer StreamServe Stream-Datei
+
+=item *
+
 L<Quiq::String> - Operationen auf Zeichenketten
 
 =item *
@@ -1010,7 +1018,7 @@ L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 

@@ -1,3 +1,8 @@
+0.056		2025-05-24	T. R. Wyant
+    Do not set iridium_status_format on Astro::SpeceTrack when
+    constructing a new object. This attribute was eliminated when the
+    Celestrak web site ditched the underlying data.
+
 0.055		2025-01-04	T. R. Wyant
     Add autocomplete to 'show' command.
 

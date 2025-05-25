@@ -163,6 +163,7 @@ lib/Quiq/MediaWiki/Client.pm
 lib/Quiq/MediaWiki/Markup.pm
 lib/Quiq/ModelCache.pm
 lib/Quiq/Mojolicious/Plugin/Log/Parameters.pm
+lib/Quiq/Mustang.pm
 lib/Quiq/Net.pm
 lib/Quiq/Object.pm
 lib/Quiq/Option.pm
@@ -211,6 +212,7 @@ lib/Quiq/Ssh.pm
 lib/Quiq/Stacktrace.pm
 lib/Quiq/Stopwatch.pm
 lib/Quiq/Storable.pm
+lib/Quiq/StreamServe/Stream.pm
 lib/Quiq/String.pm
 lib/Quiq/Svg/Tag.pm
 lib/Quiq/System.pm
@@ -437,6 +439,7 @@ t/bin/Quiq/MediaWiki/Client.t
 t/bin/Quiq/MediaWiki/Markup.t
 t/bin/Quiq/ModelCache.t
 t/bin/Quiq/Mojolicious/Plugin/Log/Parameters.t
+t/bin/Quiq/Mustang.t
 t/bin/Quiq/Net.t
 t/bin/Quiq/Object.t
 t/bin/Quiq/Option.t
@@ -485,6 +488,7 @@ t/bin/Quiq/Ssh.t
 t/bin/Quiq/Stacktrace.t
 t/bin/Quiq/Stopwatch.t
 t/bin/Quiq/Storable.t
+t/bin/Quiq/StreamServe/Stream.t
 t/bin/Quiq/String.t
 t/bin/Quiq/Svg/Tag.t
 t/bin/Quiq/System.t
@@ -538,8 +542,10 @@ t/data/html/simple1.html
 t/data/html/simple2.html
 t/data/image/A/img/000047-640x360.jpg
 t/data/image/test001.jpg
+t/data/mustang/174341665800.xml
 t/data/sdoc/test.sdoc
 t/data/sdoc/test_anchor.sdoc
+t/data/StreamServe/174582475500.str
 t/data/video/fluch-von-novgorod.mp4
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

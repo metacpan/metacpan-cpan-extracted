@@ -14,7 +14,7 @@ use Astro::App::Satpass2::Utils qw{
 };
 use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 sub __class_name {
     return __PACKAGE__;

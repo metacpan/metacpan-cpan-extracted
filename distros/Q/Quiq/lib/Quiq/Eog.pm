@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 use Quiq::Trash;
 use Quiq::Shell;
@@ -338,12 +338,12 @@ sub transferImages {
 
     if (my $ext = $addExtension) {
         my $answ = Quiq::Terminal->askUser(
-            "Add Extension .$ext?",
+            "Add Extension $ext?",
             -values => 'y/n',
             -default => 'y',
         );
         if ($answ eq 'y') {
-            $p->rename($srcDir,"$srcDir.$ext");
+            $p->rename($srcDir,"$srcDir$ext");
         }
     }
 
@@ -354,7 +354,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 

@@ -15,7 +15,7 @@ use Astro::App::Satpass2::Utils qw{
 };
 use Scalar::Util 1.26 qw{ weaken };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 use constant DEFAULT_LOCAL_COORD => 'azel_rng';
 

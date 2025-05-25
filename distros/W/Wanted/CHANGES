@@ -1,0 +1,35 @@
+Revision history for Perl module Wanted
+
+v0.1.0 2025-05-24T22:45:22+0900
+	- Initial version as a fork from Want, which does not seem maintained anymore.
+	- Added context() function to determine the caller's context (RT#16670).
+	- Fixed various bugs from Want:
+	  - RT#4628: Segfault in Set::Array
+	    Now returns undef in invalid contexts.
+	  - RT#57980: Segmentation Fault in Tied Module
+	    Now returns undef in tied contexts.
+	  - RT#68350: Segfault in Overloaded Operator '>'
+	    Now returns undef in invalid contexts.
+	  - RT#90062: Segfault Under Threads
+	    Now returns undef in invalid thread contexts.
+	  - RT#2196: Bus Error Inside Tie
+	    Now returns undef in tied contexts; version requirement updated to 5.006 (inherited from Want-0.29).
+	  - RT#104042: Add OpSIBLING Support
+	    Already fixed in Want-0.26 and inherited.
+	  - RT#133060: Test Failure When File Path Contains Space
+	    Not applicable in our test suite.
+	  - RT#136651: Segmentation Fault When Used Inside a Thread
+	    Now returns undef in invalid thread contexts.
+	  - RT#47963: want() Confused by Prototypes
+	    Documented limitation in POD under LIMITATIONS; fix requires XS-level changes not implemented in this release.
+	- Fixed lvalue reference assignment issue on Perl < 5.12.0 (e.g., \(scalar g(...)) not tying to underlying variable); added version guard in t/02.all.t.
+	- Fixed first_multideref_type() usage on Perl < 5.22.0 (OP_MULTIDEREF introduced in 5.22.0); added version guards in Want.pm and t/02.all.t.
+	- Fixed critical bug in double_return() under Perl 5.22.x and 5.24.x that caused double-free errors in lvalue assignment contexts.
+	  This was caused by unsafe freeing of op tree structures reused by Perl.
+	  The workaround is version-guarded and safe.
+	- Marked double_return() as stable and safe for use in all supported versions.
+	- All tests now pass successfully across Perl 5.8.8 through 5.38.
+	- Confirmed correctness of disarm_temp(), copy_rval(), and copy_rvals() logic on stack markers.
+	- Known limitation: In Perl 5.36+, want_lvalue() may fail to detect lvalue context in some scenarios (e.g., inside eval) due to CxLVAL unreliability (affects t/11.rreturn.t tests 7 and 14).
+	- Modernised test suite with Test::More.
+	- Added detailed comments to all XS functions in Wanted.xs and FirstMultideref.xsh for better documentation.

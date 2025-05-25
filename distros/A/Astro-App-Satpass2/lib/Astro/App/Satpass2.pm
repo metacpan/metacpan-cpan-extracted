@@ -92,7 +92,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -4711,8 +4711,7 @@ sub _get_spacetrack {
 #	$st = $satpass2->_get_spacetrack_default();
 #
 #	Returns a new Astro::SpaceTrack object, initialized with this
-#	object's webcmd, and with its filter attribute set to 1 and its
-#	iridium_status_format set to 'kelso'.
+#	object's webcmd, and with its filter attribute set to 1.
 
 sub _get_spacetrack_default {
     my ( $self ) = @_;
@@ -4721,7 +4720,6 @@ sub _get_spacetrack_default {
     return Astro::SpaceTrack->new (
 	webcmd => $self->{webcmd},
 	filter => 1,
-	iridium_status_format => 'kelso',
     );
 }
 

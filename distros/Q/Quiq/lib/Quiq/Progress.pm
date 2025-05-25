@@ -56,10 +56,6 @@ die Ausgabe der Prozentangabe wird unterdrückt
 alle Ausgaben erfolgen ohne Bezug zu einer Gesamtanzahl (statt
 Ausgabe I/N nur I, statt ZEIT/GESAMTZEIT(RESTZEIT) nur ZEIT)
 
-=back
-
-*
-
   use Quiq::Progress;
   
   $| = 1;
@@ -75,6 +71,8 @@ Ausgabe I/N nur I, statt ZEIT/GESAMTZEIT(RESTZEIT) nur ZEIT)
   4 3s 4788/h 1.33/s 0.75s/1\r
   5 4s 4500/h 1.25/s 0.80s/1\r
   5 5s 3600/h 1.00/s 1.00s/1\r
+
+=back
 
 =head1 ATTRIBUTES
 
@@ -113,7 +111,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.225';
+our $VERSION = '1.226';
 
 use Quiq::Option;
 use Time::HiRes ();
@@ -287,8 +285,8 @@ sub percent {
         return '';
     }
 
-    # return sprintf '%.0f',$self->{'i'}/$n*100;
-    return int($self->{'i'}/$n*100); # immer abrunden
+    return sprintf '%.1f',$self->{'i'}/$n*100;
+    # return int($self->{'i'}/$n*100); # immer abrunden
 }
 
 # -----------------------------------------------------------------------------
@@ -756,7 +754,7 @@ sub warn {
 
 =head1 VERSION
 
-1.225
+1.226
 
 =head1 AUTHOR
 
