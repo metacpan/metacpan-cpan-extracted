@@ -1,4 +1,4 @@
-package Slack::BlockKit::Role::HasMentionStyle 0.002;
+package Slack::BlockKit::Role::HasMentionStyle 0.003;
 # ABSTRACT: a Block Kit element with a bunch of styles
 
 use Moose::Role;
@@ -44,7 +44,7 @@ Slack::BlockKit::Role::HasMentionStyle - a Block Kit element with a bunch of sty
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -101,7 +101,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

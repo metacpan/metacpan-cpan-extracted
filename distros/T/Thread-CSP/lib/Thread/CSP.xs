@@ -11,16 +11,14 @@
 typedef struct channel* Thread__CSP__Channel;
 typedef struct promise* Thread__CSP__Promise;
 
-#define slurp_arguments(offset) av_make(items - offset, PL_stack_base + ax + offset)
-
 MODULE = Thread::CSP              PACKAGE = Thread::CSP  PREFIX = thread_
 
 BOOT:
 	global_init(aTHX);
 
-Thread::CSP::Promise thread_spawn(SV* class, SV* module, SV* function, ...)
+Thread::CSP::Promise thread_spawn(SV* class, AV* slurpy, ...)
 	C_ARGS:
-		slurp_arguments(1)
+		slurpy
 
 MODULE = Thread::CSP              PACKAGE = Thread::CSP::Promise  PREFIX = promise_
 

@@ -16,6 +16,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Data::Section' => '0',
+                                      'Digest::SHA' => '0',
                                       'Dist::Zilla' => '6.019',
                                       'Dist::Zilla::App' => '0',
                                       'Dist::Zilla::Plugin::AutoPrereqs' => '1.100130',

@@ -1,0 +1,16 @@
+.perlcriticrc
+Changes
+cpanfile
+lib/JSON/Pointer/Marpa.pm
+lib/JSON/Pointer/Marpa.pod
+lib/JSON/Pointer/Marpa/Semantics.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/01-advanced.t
+t/02-pod.t
+t/03-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

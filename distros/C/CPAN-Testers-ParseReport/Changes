@@ -1,3 +1,27 @@
+0.5.0 2025-05-25  k  <andk@cpan.org>
+
+	* Release 0.5.0
+
+	* Unchanged from 0.5.0-TRIAL4
+
+0.5.0-TRIAL4 2025-05-19  k  <andk@cpan.org>
+
+	* Fix Makefile.PL
+
+0.5.0-TRIAL3 2025-05-19  k  <andk@cpan.org>
+
+	* Fix Makefile.PL
+
+0.5.0-TRIAL2 2025-05-19  k  <andk@cpan.org>
+
+	* Fix Makefile.PL
+
+0.5.0-TRIAL1 2025-05-17  k  <andk@cpan.org>
+
+	* add support for ndjson transport
+
+	* update cpantesters URL
+
 0.4.5 2018-12-29  k  <andk@cpan.org>
 
 	* Change the repository URL to https; thanks to Jim Keenan for the

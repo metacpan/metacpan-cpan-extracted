@@ -7,22 +7,20 @@ use Net::SMTP;
 
 =head1 NAME
 
-Data::Validate::Mailbox - Verify that the given mailbox exists
+Data::Validate::Mailbox - Verify if the given mailbox exists
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 
 =head1 SYNOPSIS
 
-Verify that the given mailbox exists.
-
-If you find any issues in using the module, please don't hesitate to email me: pyh@gmx.fr
+Verify if the given mailbox exists.
 
 
     use Data::Validate::Mailbox;
@@ -46,9 +44,9 @@ If you find any issues in using the module, please don't hesitate to email me: p
 
 Please note,
 
-1. This module just uses Net::SMTP to try to deliver messages to peer MTA. If the remote mailbox doesn't exist, peer MTA will return a message such as "mailbox unavailable".
+1. This module uses `Net::SMTP` to attempt delivering messages to the peer MTA. If the recipient's mailbox does not exist, the peer MTA will typically respond with an error message like "mailbox unavailable."
 
-2. Some email providers don't behave like above, such as Yahoo/AOL, so this module won't work for them.
+2. However, not all providers behave this way. For example, Yahoo and AOL do not provide such responses, so this module will not function correctly with them.
 
 
 =head1 SUBROUTINES/METHODS
@@ -57,17 +55,21 @@ Please note,
 
 New the object.
 
-Please note, for many email providers, you have to provide the correct local hostname/username for sending email to them. The hostname must match the following conditions.
+Please note, for many email providers, you have to provide the correct local hostname/username for sending email to them. 
 
-1. It is your valid domain/host name.
+The local hostname refers to the hostname of the machine you use to connect to other MTAs, and it corresponds to the parameter of the HELO command in the SMTP session. The local username refers to the email address you use to send messages to external systems, and it corresponds to the parameter of the MAIL FROM command in the SMTP session.
+
+The hostname must match the following conditions.
+
+1. It is your valid domain/hostname.
 
 2. The hostname has an IP address, and a correct PTR for this IP (PTR match back to hostname).
 
-3. The domain has valid MX records and/or SPF records.
+3. The sender domain has valid MX records and/or SPF records.
 
 4. The IP has good reputation (not listed in any DNSBL).
 
-If you can't send messages to those providers (either the program dies or it gets 0 always), please setup your right localhost and localuser options in new() method.
+If you can't send messages to external providers (either the program dies or it gets 0 always), please setup your right localhost and localuser options in new() method.
 
 
 =head2 validate
@@ -123,7 +125,7 @@ sub validate {
 
 =head1 AUTHOR
 
-Yonghua Peng, C<< <pyh at cpan.org> >>
+Y Peng, C<< <ypeng at t-online.de> >>
 
 =head1 BUGS
 
@@ -169,7 +171,7 @@ L<https://metacpan.org/release/Data-Validate-Mailbox>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by Yonghua Peng.
+This software is Copyright (c) 2023 by Y Peng.
 
 This is free software, licensed under:
 

@@ -7,6 +7,7 @@ use Compress::Zlib ();
 use DateTime::Format::Strptime;
 use File::Basename qw(basename);
 use File::Path qw(mkpath);
+use File::ReadBackwards;
 use HTML::Entities qw(decode_entities);
 use LWP::UserAgent;
 use List::AllUtils qw(uniq max min sum);
@@ -15,8 +16,9 @@ use Time::Local ();
 use Time::HiRes;
 use utf8;
 
+our $default_distrotransport = "ctjson";
 our $default_transport = "http_cpantesters";
-our $default_cturl = "http://static.cpantesters.org/distro";
+our $default_cturl = "https://www.cpantesters.org/show";
 our $Signal = 0;
 
 =encoding utf-8
@@ -27,7 +29,7 @@ CPAN::Testers::ParseReport - parse reports to www.cpantesters.org from various s
 
 =cut
 
-use version; our $VERSION = qv('0.4.5');
+use version; our $VERSION = qv('0.5.0');
 
 =head1 SYNOPSIS
 
@@ -78,6 +80,7 @@ $extract is the result of parse_report() described below.
             (
              keep_alive => 1,
              env_proxy => 1,
+             timeout => 900,
             );
         $ua->parse_head(0);
         $ua;
@@ -109,7 +112,16 @@ $extract is the result of parse_report() described below.
         <$fh>;
     }
     sub _yaml_loadfile {
-        $j->decode(_slurp shift);
+        my $file = shift;
+        my $content = _slurp $file;
+        $DB::single = 1;
+        if ($file =~ /\.ndjson$/) {
+            $content =~ s/}$/},/gm;
+            $content =~ s/,\s*\z//;
+            $content =~ s/^/\[/s;
+            $content =~ s/\z/\]/s;
+        }
+        $j->decode($content);
     }
     sub _yaml_dump {
         $j->encode(shift);
@@ -119,23 +131,67 @@ $extract is the result of parse_report() described below.
 sub _download_overview {
     my($cts_dir, $distro, %Opt) = @_;
     my $cturl = $Opt{cturl} ||= $default_cturl;
-    my $ctarget = "$cts_dir/$distro.json";
+    $Opt{distrotransport} ||= $default_distrotransport;
+    my $extension = $Opt{distrotransport} eq "ndjson" ? "ndjson" : "json";
+    my $ctarget = "$cts_dir/$distro.$extension";
     my $cheaders = "$cts_dir/$distro.headers";
     if ($Opt{local}) {
         unless (-e $ctarget) {
             die "Alert: No local file '$ctarget' found, cannot continue\n";
         }
     } else {
-        if (! -e $ctarget or -M $ctarget > .25) {
-            if (-e $ctarget && $Opt{verbose}) {
-                my(@stat) = stat _;
-                my $timestamp = gmtime $stat[9];
-                print STDERR "(timestamp $timestamp GMT)\n" unless $Opt{quiet};
+        if (0) {
+        } elsif ($Opt{distrotransport} eq "ctjson") {
+            if (! -e $ctarget or -M $ctarget > .25) {
+                if (-e $ctarget && $Opt{verbose}) {
+                    my(@stat) = stat _;
+                    my $timestamp = gmtime $stat[9];
+                    print STDERR "(timestamp $timestamp GMT)\n" unless $Opt{quiet};
+                }
+                print STDERR "Fetching $ctarget..." if $Opt{verbose} && !$Opt{quiet};
+                my $uri = "$cturl/$distro.json";
+                my $resp = _ua->mirror($uri,$ctarget); # should most probably be _ua_gip, but then we need to deal with uncompressing
+                if ($resp->is_success) {
+                    print STDERR "DONE\n" if $Opt{verbose} && !$Opt{quiet};
+                    open my $fh, ">", $cheaders or die;
+                    for ($resp->headers->as_string) {
+                        print $fh $_;
+                        if ($Opt{verbose} && $Opt{verbose}>1) {
+                            print STDERR $_ unless $Opt{quiet};
+                        }
+                    }
+                } elsif (304 == $resp->code) {
+                    print STDERR "DONE (not modified)\n" if $Opt{verbose} && !$Opt{quiet};
+                    my $atime = my $mtime = time;
+                    utime $atime, $mtime, $cheaders;
+                } else {
+                    die sprintf
+                        (
+                         "No success downloading %s: %s",
+                         $uri,
+                         $resp->status_line,
+                        );
+                }
             }
-            print STDERR "Fetching $ctarget..." if $Opt{verbose} && !$Opt{quiet};
-            my $firstletter = substr($distro,0,1);
-            my $uri = "$cturl/$firstletter/$distro.json";
-            my $resp = _ua->mirror($uri,$ctarget);
+        } elsif ($Opt{distrotransport} eq "ndjson") {
+            my $ndjsonurl = $Opt{ndjsonurl} or die "missing option --ndjsonurl";
+            my($uri);
+            if ( -e $ctarget ) {
+                my $bw = File::ReadBackwards->new( $ctarget )
+                    or die "can't read '$ctarget': $!" ;
+                my($log_line, $highestguid);
+                my $j = JSON::XS->new;
+              BW: while( defined( $log_line = $bw->readline ) ) {
+                    my $h = $j->decode($log_line);
+                    if ($highestguid = $h->{guid}) {
+                        last BW;
+                    }
+                }
+                $uri = "$ndjsonurl?dist=$distro&after=$highestguid";
+            } else {
+                $uri = "$ndjsonurl?dist=$distro";
+            }
+            my $resp = _ua->get($uri);
             if ($resp->is_success) {
                 print STDERR "DONE\n" if $Opt{verbose} && !$Opt{quiet};
                 open my $fh, ">", $cheaders or die;
@@ -145,10 +201,8 @@ sub _download_overview {
                         print STDERR $_ unless $Opt{quiet};
                     }
                 }
-            } elsif (304 == $resp->code) {
-                print STDERR "DONE (not modified)\n" if $Opt{verbose} && !$Opt{quiet};
-                my $atime = my $mtime = time;
-                utime $atime, $mtime, $cheaders;
+                open $fh, ">>", $ctarget or die "could not open >>'$ctarget': $!";
+                print $fh $resp->content;
             } else {
                 die sprintf
                     (
@@ -168,7 +222,7 @@ sub _parse_yaml {
     my($selected_release_ul,$selected_release_distrov,$excuse_string);
     if ($Opt{vdistro}) {
         $excuse_string = "selected distro '$Opt{vdistro}'";
-        $arr = [grep {$_->{distversion} eq $Opt{vdistro}} @$arr];
+        $arr = [grep { ($_->{distversion}||=join("-",$_->{dist},$_->{version})) eq $Opt{vdistro} } @$arr];
         ($selected_release_distrov) = $arr->[0]{distversion};
     } else {
         $excuse_string = "any distro";
@@ -947,6 +1001,7 @@ sub parse_report {
         my $have  = $extract{$want} || "";
         $diag .= " $want\[$have]";
     }
+    binmode \*STDERR, ":encoding(UTF-8)";
     printf STDERR " %-4s %8s%s\n", $extract{"meta:ok"}, $id, $diag unless $Opt{quiet};
     if ($Opt{raw}) {
         $report =~ s/\s+\z//;

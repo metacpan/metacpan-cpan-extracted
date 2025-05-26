@@ -1,4 +1,4 @@
-package Slack::BlockKit::Sugar 0.002;
+package Slack::BlockKit::Sugar 0.003;
 # ABSTRACT: sugar for building Block Kit structures easily (start here!)
 
 use v5.36.0;
@@ -679,7 +679,7 @@ Slack::BlockKit::Sugar - sugar for building Block Kit structures easily (start h
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -1048,7 +1048,7 @@ Upgrade carefully until this warning goes away!
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

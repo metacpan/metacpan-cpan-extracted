@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Date 0.002;
+package Slack::BlockKit::Block::RichText::Date 0.003;
 # ABSTRACT: a Block Kit rich text element for a formatted date
 
 use Moose;
@@ -111,7 +111,7 @@ Slack::BlockKit::Block::RichText::Date - a Block Kit rich text element for a for
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -177,7 +177,7 @@ If given, the formatted date string will I<also> be a link to this URL.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

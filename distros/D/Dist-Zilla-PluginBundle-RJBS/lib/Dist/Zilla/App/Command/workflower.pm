@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::workflower 5.032;
+package Dist::Zilla::App::Command::workflower 5.033;
 # ABSTRACT: install rjbs's usual GitHub Actions workflow
 
 use v5.34.0;
@@ -33,14 +33,38 @@ sub opt_spec {
 sub abstract { "install rjbs's usual GitHub Actions workflow" }
 
 sub execute ($self, $opt, $arg) {
-  my $template = $self->section_data('workflow.yml')->$*;
+  my $content = $self->section_data('workflow.yml')->$*;
 
   my $workflow_dir = path(".github/workflows");
   $workflow_dir->mkpath;
 
-  $workflow_dir->child('multiperl-test.yml')->spew_utf8($template);
+  my $target = $workflow_dir->child('dzil-matrix.yaml');
 
-  $self->zilla->log("Workflow installed.");
+  if ($target->exists) {
+    if (grep {; /\A\s*#+\s*do-not-regen/ } $target->lines) {
+      $self->zilla->log('Workflow contains "do-not-regen", aborting.');
+      return;
+    }
+  }
+
+  my $old_digest = $target->exists ? $target->digest : undef;
+
+  if ($old_digest) {
+    require Digest::SHA;
+    if (Digest::SHA::sha256_hex($content) eq $old_digest) {
+      $self->zilla->log("Workflow already present and up to date.");
+      return;
+    }
+  }
+
+  $target->spew_utf8($content);
+  my $verb = $old_digest ? "update" : "create";
+  my $message = "Workflow ${verb}d.";
+  $self->zilla->log($message);
+
+  system("git", "add", "$target");
+  system("git", "commit", "-m", "$target: $verb", "$target");
+
   return;
 }
 
@@ -56,7 +80,7 @@ Dist::Zilla::App::Command::workflower - install rjbs's usual GitHub Actions work
 
 =head1 VERSION
 
-version 5.032
+version 5.033
 
 =head1 SYNOPSIS
 
@@ -85,7 +109,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -94,7 +118,7 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 ___[ workflow.yml ]___
-name: "multiperl test"
+name: "dzil matrix"
 on:
   workflow_dispatch: ~
   push:
@@ -103,27 +127,6 @@ on:
   pull_request: ~
 
 jobs:
-  build-tarball:
-    runs-on: ubuntu-latest
-    outputs:
-      perl-versions: ${{ steps.build-archive.outputs.perl-versions }}
-    steps:
-    - name: Build archive
-      id: build-archive
-      uses: rjbs/dzil-build@v0
-
-  multiperl-test:
-    needs: build-tarball
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        perl-version: ${{ fromJson(needs.build-tarball.outputs.perl-versions) }}
-
-    container:
-      image: perldocker/perl-tester:${{ matrix.perl-version }}
-
-    steps:
-    - name: Test distribution
-      uses: rjbs/test-perl-dist@v0
+  build-and-test:
+    name: dzil-matrix
+    uses: rjbs/dzil-actions/.github/workflows/dzil-matrix.yaml@v0

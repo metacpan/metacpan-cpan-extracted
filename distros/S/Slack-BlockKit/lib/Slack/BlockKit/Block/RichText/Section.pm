@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Section 0.002;
+package Slack::BlockKit::Block::RichText::Section 0.003;
 # ABSTRACT: a collection of rich text elements
 
 use Moose;
@@ -52,7 +52,7 @@ Slack::BlockKit::Block::RichText::Section - a collection of rich text elements
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -82,7 +82,7 @@ according to the Block Kit docs.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

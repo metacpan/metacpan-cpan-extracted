@@ -24,3 +24,4 @@ pm_to_blib
 git-daemon-export-ok
 ^MYMETA\.
 ^t/var-live
+^blib/

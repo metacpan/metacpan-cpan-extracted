@@ -1,4 +1,4 @@
-package Slack::BlockKit 0.002;
+package Slack::BlockKit 0.003;
 # ABSTRACT: a toolkit for building Block Kit blocks for Slack
 
 #pod =head1 OVERVIEW
@@ -75,7 +75,7 @@ Slack::BlockKit - a toolkit for building Block Kit blocks for Slack
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -120,7 +120,13 @@ blog|https://rjbs.cloud/blog/2024/06/slack-blockkit/>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

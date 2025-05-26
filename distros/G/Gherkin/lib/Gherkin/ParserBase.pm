@@ -1,5 +1,5 @@
 package Gherkin::ParserBase;
-$Gherkin::ParserBase::VERSION = '32.1.1';
+$Gherkin::ParserBase::VERSION = '32.1.2';
 use strict;
 use warnings;
 
@@ -41,6 +41,10 @@ sub add_error {
     Gherkin::Exceptions::CompositeParser->throw(@errors)
       if @errors > $self->max_errors;
 }
+
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+# Private subs (subs prefixed with an underscore) are used as "friend methods" here,
+# to be used by the actual parser class which is based on this one.
 
 sub _start_rule {
     my ( $self, $context, $ruleType ) = @_;

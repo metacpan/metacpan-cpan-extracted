@@ -1,16 +1,16 @@
 CPAN-Testers-ParseReport
 
 Purpose of this module is to help processing the reports available from
-http://www.nntp.perl.org/group/perl.cpan.testers/
+https://www.cpantesters.org/
 
 INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+	perl Makefile.PL
+	make
+	make test
+	make install
 
 SUPPORT AND DOCUMENTATION
 
@@ -24,14 +24,8 @@ You can also look for information at:
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-Testers-ParseReport
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/CPAN-Testers-ParseReport
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/CPAN-Testers-ParseReport
-
-    Search CPAN
-        http://search.cpan.org/dist/CPAN-Testers-ParseReport
+    METACPAN
+        https://metacpan.org/dist/CPAN-Testers-ParseReport
 
 
 COPYRIGHT AND LICENCE

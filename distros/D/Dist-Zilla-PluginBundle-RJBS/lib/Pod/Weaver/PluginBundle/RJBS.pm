@@ -1,6 +1,6 @@
 use v5.34.0;
 use Dist::Zilla::Pragmas;
-package Pod::Weaver::PluginBundle::RJBS 5.032;
+package Pod::Weaver::PluginBundle::RJBS 5.033;
 # ABSTRACT: RJBS's default Pod::Weaver config
 
 #pod =head1 OVERVIEW
@@ -149,7 +149,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.032
+version 5.033
 
 =head1 OVERVIEW
 
@@ -181,7 +181,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

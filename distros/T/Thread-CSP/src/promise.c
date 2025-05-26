@@ -16,6 +16,7 @@ struct promise {
 	perl_mutex mutex;
 	perl_cond condvar;
 	PerlInterpreter* owner;
+	PerlInterpreter* from;
 	SV* value;
 	SV* notifier;
 	enum value_type type;
@@ -25,7 +26,7 @@ struct promise {
 };
 
 struct promise* S_promise_alloc(pTHX_ UV refcount) {
-	struct promise* result = calloc(1, sizeof(struct promise));
+	struct promise* result = PerlMemShared_calloc(1, sizeof(struct promise));
 	MUTEX_INIT(&result->mutex);
 	COND_INIT(&result->condvar);
 	refcount_init(&result->refcount, refcount);
@@ -43,7 +44,7 @@ SV* S_promise_get(pTHX_ struct promise* promise) {
 			do COND_WAIT(&promise->condvar, &promise->mutex);
 			while (promise->state != HAS_BOTH);
 		case HAS_WRITER:
-			promise->value = clone_value(promise->value);
+			promise->value = clone_value(promise->value, promise->from);
 			promise->state = DONE;
 			promise->owner = aTHX;
 			COND_SIGNAL(&promise->condvar);
@@ -65,12 +66,13 @@ SV* S_promise_get(pTHX_ struct promise* promise) {
 		return result;
 }
 
-static void promise_set(struct promise* promise, SV* value, enum value_type type) {
+static void S_promise_set(pTHX_ struct promise* promise, SV* value, enum value_type type) {
 	MUTEX_LOCK(&promise->mutex);
 
 	if (promise->state != DONE && promise->state != ABANDONED) {
 		promise->value = value;
 		promise->type = type;
+		promise->from = aTHX;
 
 		if (promise->state == HAS_READER) {
 			promise->state = HAS_BOTH;
@@ -84,14 +86,16 @@ static void promise_set(struct promise* promise, SV* value, enum value_type type
 
 		do COND_WAIT(&promise->condvar, &promise->mutex);
 		while (promise->state != DONE && promise->state != ABANDONED);
+		promise->from = NULL;
 	}
 	MUTEX_UNLOCK(&promise->mutex);
 }
+#define promise_set(promise, value, type) S_promise_set(aTHX_ promise, value, type)
 
-void promise_set_value(struct promise* promise, SV* value) {
+void S_promise_set_value(pTHX_ struct promise* promise, SV* value) {
 	promise_set(promise, value, VALUE);
 }
-void promise_set_exception(struct promise* promise, SV* value) {
+void S_promise_set_exception(pTHX_ struct promise* promise, SV* value) {
 	promise_set(promise, value, EXCEPTION);
 }
 
@@ -107,7 +111,7 @@ void S_promise_refcount_dec(pTHX_ struct promise* promise) {
 		COND_DESTROY(&promise->condvar);
 		MUTEX_DESTROY(&promise->mutex);
 		refcount_destroy(&promise->refcount);
-		free(promise);
+		PerlMemShared_free(promise);
 	}
 }
 
@@ -135,7 +139,10 @@ static int promise_destroy(pTHX_ SV* sv, MAGIC* magic) {
 	return 0;
 }
 
-const MGVTBL Thread__CSP__Promise_magic = { 0, 0, 0, 0, promise_destroy };
+const MGVTBL Thread__CSP__Promise_magic = {
+	.svt_free = promise_destroy
+};
+
 
 static PerlIO* S_sv_to_handle(pTHX_ SV* handle) {
 	if (!SvROK(handle) || SvTYPE(SvRV(handle)) != SVt_PVGV)

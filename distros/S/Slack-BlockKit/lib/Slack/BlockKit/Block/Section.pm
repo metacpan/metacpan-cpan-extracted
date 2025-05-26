@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::Section 0.002;
+package Slack::BlockKit::Block::Section 0.003;
 # ABSTRACT: a Block Kit section block, used to collect text
 
 use Moose;
@@ -94,7 +94,7 @@ Slack::BlockKit::Block::Section - a Block Kit section block, used to collect tex
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -138,7 +138,7 @@ exception to be raised.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

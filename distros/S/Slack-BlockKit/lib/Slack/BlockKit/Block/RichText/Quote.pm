@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Quote 0.002;
+package Slack::BlockKit::Block::RichText::Quote 0.003;
 # ABSTRACT: a Block Kit rich text "quoted text" block
 
 use Moose;
@@ -64,7 +64,7 @@ Slack::BlockKit::Block::RichText::Quote - a Block Kit rich text "quoted text" bl
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -98,7 +98,7 @@ This is an arrayref of rich text elements.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

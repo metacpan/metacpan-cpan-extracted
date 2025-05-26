@@ -1102,17 +1102,24 @@
     YMMV if you use old versions of Math::GMPq and Math::MPFR, but if you
     have Math-GMPq-0.61 (or later) and Math-MPFR-4.37 (or later) then, apart
     from the exceptions noted below, you will be able to use Math::GMPq and
-    Math::MPFR with the overloaded Math::GMPz operations. Such operations
-    return Math::MPFR objects calculated in accordance with Math::MPFR
-    default precision & default rounding, and (respectively) Math::GMPq
-    objects.
+    Math::MPFR objects with the overloaded Math::GMPz operations. Such
+    operations return Math::GMPq and (respectively) Math::GMPz objects.
 
    The following operators are overloaded:
-    + - * / % **           # '**'  not usable with Math::GMPq objects
-    += -= *= /= %= **=     # '**=' not usable with Math::GMPq objects
-    << >> <<= >>=
-    & | ^ ~       # Not usable with Math::GMPq and Math::MPFR objects
-    &= |= ^=      # Not usable with Math::GMPq and Math::MPFR objects
+    + - * / % **         # '**'  not usable with Math::GMPq objects.
+                         # Returned Math::MPFR objects will have been
+                         # calculated with default precision and rounding.
+
+    += -= *= /= %= **=   # '**=' not usable with Math::GMPq objects.
+                         # Returned Math::MPFR objects will have been
+                         # calculated to the same precision as the given
+                         # Math::MPFR operand, and with default rounding.
+
+    << >> <<= >>=   # Not usable with Math::GMPq and Math::MPFR objects.
+
+    & | ^ ~         # Not usable with Math::GMPq and Math::MPFR objects
+    &= |= ^=        # Not usable with Math::GMPq and Math::MPFR objects
+
     < <= > >= == != <=>
     ! abs
     =

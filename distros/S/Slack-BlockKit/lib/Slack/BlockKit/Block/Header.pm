@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::Header 0.002;
+package Slack::BlockKit::Block::Header 0.003;
 # ABSTRACT: a Block Kit header block
 
 use Moose;
@@ -59,7 +59,7 @@ Slack::BlockKit::Block::Header - a Block Kit header block
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -89,7 +89,7 @@ must be C<plain_text>, not C<mrkdwn>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

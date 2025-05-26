@@ -1,4 +1,4 @@
-package Slack::BlockKit::Role::HasStyle 0.002;
+package Slack::BlockKit::Role::HasStyle 0.003;
 # ABSTRACT: a parameterized role for objects with styles
 
 use MooseX::Role::Parameterized;
@@ -78,7 +78,7 @@ Slack::BlockKit::Role::HasStyle - a parameterized role for objects with styles
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 PERL VERSION
 
@@ -109,7 +109,7 @@ You probably don't need to think about this role, though.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

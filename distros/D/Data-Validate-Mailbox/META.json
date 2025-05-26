@@ -1,7 +1,7 @@
 {
-   "abstract" : "Verify that the given mailbox exists",
+   "abstract" : "Verify if the given mailbox exists",
    "author" : [
-      "<pyh@cpan.org>"
+      "<ypeng@t-online.de>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -43,5 +43,5 @@
          "web" : "https://metacpan.org/release/Data-Validate-Mailbox"
       }
    },
-   "version" : "0.12"
+   "version" : "0.14"
 }

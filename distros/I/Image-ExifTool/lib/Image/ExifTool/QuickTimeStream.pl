@@ -111,9 +111,8 @@ my %insvLimit = (
         The tags below are extracted from timed metadata in QuickTime and other
         formats of video files when the ExtractEmbedded option is used.  Although
         most of these tags are combined into the single table below, ExifTool
-        currently reads 103 different types of timed GPS metadata from video files.
+        currently reads 107 different types of timed GPS metadata from video files.
     },
-    VARS => { NO_ID => 1 },
     GPSLatitude  => { PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")', RawConv => '$$self{FoundGPSLatitude} = 1; $val' },
     GPSLongitude => { PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")' },
     GPSLatitude2 => { PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")' },
@@ -318,7 +317,7 @@ my %insvLimit = (
             ByteOrder => 'Little-Endian',
         },
     }],
-    mett => { # Parrot drones
+    mett => { # Parrot drones and iPhone/Android using ARCore
         Name => 'mett',
         SubDirectory => { TagTable => 'Image::ExifTool::Parrot::mett' },
     },
@@ -336,11 +335,25 @@ my %insvLimit = (
         Groups => { 0 => 'Trailer', 1 => 'Insta360' }, # (so these groups will appear in the -listg options)
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::INSV_MakerNotes' },
     },
-    ssmd => { # Chigee AIO-5 dashcam
-        Name => 'PreviewImage',
+    ssmd => [{
+        Name => 'RoveGPS', # Rove R2-4K new model
+        # double value of GPSLatitude is 4294967295 (00 00 e0 ff ff ff ef 41) for no GPS
+        Condition => 'length $$valPt == 32 and $$valPt !~ /^\0\0\xe0\xff\xff\xff\xef\x41/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::RoveGPS',
+            ByteOrder => 'Little-Endian',
+        },
+    },{
+        Name => 'Accelerometer', # Rove R2-4K new model
+        Condition => 'length $$valPt == 12',
+        Format => 'float',
+        ByteOrder => 'Little-Endian',
+    },{
+        Name => 'PreviewImage',  # Chigee AIO-5 dashcam
+        Condition => '$$valPt =~ /^\xff\xd8\xff/',
         Groups => { 2 => 'Preview' },
         RawConv => '$self->ValidateImage(\$val,$tag)',
-    },
+    }],
     djmd => { # (DJI AC003 Osmo Action 4 cam)
         Name => 'DJIMetadata',
         SubDirectory => { TagTable => 'Image::ExifTool::DJI::Protobuf' },
@@ -356,6 +369,45 @@ my %insvLimit = (
     Unknown02 => { Unknown => 1 },
     Unknown03 => { Unknown => 1 },
     MagneticVariation => { }, # (from LIGOGPSINFO)
+);
+
+# accelerometer from newer Rove R2-4K cam
+%Image::ExifTool::QuickTime::RoveGPS = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Location' },
+    FIRST_ENTRY => 0,
+    0 => {
+        Name => 'GPSLatitude',
+        Format => 'double',
+        ValueConv => 'my $deg = int($val/100); $val = $deg + ($val - $deg * 100) / 60',
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
+    },
+    8 => {
+        Name => 'GPSLongitude',
+        Format => 'double',
+        ValueConv => 'my $deg = int($val/100); $val = $deg + ($val - $deg * 100) / 60',
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
+    },
+    20 => {
+        Name => 'GPSSpeed',
+        Format => 'int16u',
+        ValueConv => '$val * 1.852', # convert from knots to km/h
+    },
+    22 => {
+        Name => 'GPSDateTime',
+        Description => 'GPS Date/Time',
+        Groups => { 2 => 'Time' },
+        Format => 'int8u[6]',
+        ValueConv => q{
+            my @v = split ' ', $val;
+            $v[0] += 2000;
+            sprintf('%.4d:%.2d:%.2d %.2d:%.2d:%.2d', @v);
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    # Seen this in the next 4 bytes:
+    # ff 01 01 00 - good GPS?
+    # ff 00 ff ff - no GPS?
 );
 
 # tags found in 'camm' type 0 timed metadata (ref 4)
@@ -2235,6 +2287,16 @@ ATCRec: for ($recPos = 0x30; $recPos + 52 < $dirLen; $recPos += 52) {
                 $lat = ($lat - 187.982162849635) / 3;
                 $lon = ($lon - 2199.19873715495) / 2;
                 $ddd = 1;
+            } elsif (Get32u($dataPt,0) == 0x400000 and abs($lat) <= 90 and abs($lon) <= 180) {
+                # Transcend Drive Body Camera 70
+                #  0000: 00 00 40 00 66 72 65 65 47 50 53 20 4c 00 00 00 [..@.freeGPS L...]
+                #  0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
+                #  0020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
+                #  0030: 09 00 00 00 26 00 00 00 15 00 00 00 e9 07 00 00 [....&...........]
+                #  0040: 05 00 00 00 10 00 00 00 41 53 45 00 6c 59 ee 41 [........ASE.lY.A]
+                #  0050: 9f 1a f7 41 3c 6b 0f 41 9a 99 99 43 00 00 00 00 [...A<k.A...C....]
+                $ddd = 1;               # already in decimal degrees
+                $spd /= $knotsToKph;    # already in km/h
             } else {
                 $debug and $et->FoundTag(GPSType => 17);
             }
@@ -2351,12 +2413,12 @@ ATCRec: for ($recPos = 0x30; $recPos + 52 < $dirLen; $recPos += 52) {
     }
     SetByteOrder($oldOrder);
     return $$et{DOC_NUM} ? 1 : 0 if $done;
-    return 0 if defined $yr and $mon < 1 or $mon > 12;  # quick sanity check
+    return 0 if defined $yr and ($mon < 1 or $mon > 12);  # quick sanity check
 #
 # save tag values extracted by above code
 #
     FoundSomething($et, $tagTbl, $$dirInfo{SampleTime}, $$dirInfo{SampleDuration});
-    $sec = '0' . $sec unless $sec =~ /^\d{2}/;   # pad integer part of seconds to 2 digits
+    $sec = '0' . $sec if defined $sec and $sec !~ /^\d{2}/;   # pad integer part of seconds to 2 digits
     if (defined $yr) {
         $yr += 2000 if $yr < 2000;
         my $time = sprintf('%.4d:%.2d:%.2d %.2d:%.2d:%sZ',$yr,$mon,$day,$hr,$min,$sec);
@@ -2368,8 +2430,8 @@ ATCRec: for ($recPos = 0x30; $recPos + 52 < $dirLen; $recPos += 52) {
     if (defined $lat and defined $lon) {
         # lat/long are in DDDMM.MMMM format unless $ddd is set
         ConvertLatLon($lat, $lon) unless $ddd;
-        $et->HandleTag($tagTbl, GPSLatitude  => $lat * ($latRef eq 'S' ? -1 : 1));
-        $et->HandleTag($tagTbl, GPSLongitude => $lon * ($lonRef eq 'W' ? -1 : 1));
+        $et->HandleTag($tagTbl, GPSLatitude  => $lat * (($latRef and $latRef eq 'S') ? -1 : 1));
+        $et->HandleTag($tagTbl, GPSLongitude => $lon * (($lonRef and $lonRef eq 'W') ? -1 : 1));
     }
     $et->HandleTag($tagTbl, GPSAltitude  => $alt) if defined $alt;
     $et->HandleTag($tagTbl, GPSSpeed     => $spd) if defined $spd;
@@ -3148,8 +3210,9 @@ sub ProcessTTAD($$$)
 }
 
 #------------------------------------------------------------------------------
-# Extract information from Insta360 trailer (INSV and INSP files) (ref PH)
+# Extract information from Insta360 trailer (INSV, INSP and MP4 files) or 'inst' box (ref PH)
 # Inputs: 0) ExifTool ref, 1) Optional dirInfo ref for returning trailer info
+# (dirInfo has Offset from end of trailer to end of file or DirEnd absolute end of trailer)
 # Returns: true on success
 # Notes: There looks to be some useful information by telemetry-parser, but
 #        the code is cryptic:  https://github.com/AdrianEddy/telemetry-parser
@@ -3161,13 +3224,16 @@ sub ProcessInsta360($;$)
     my $offset = $dirInfo ? $$dirInfo{Offset} || 0 : 0;
     my ($buff, $dirTable, $dirTablePos);
 
+    if ($dirInfo and $$dirInfo{DirEnd}) {
+        $raf->Seek(0, 2);
+        $offset = $raf->Tell() - $$dirInfo{DirEnd};
+    }
     return 0 unless $raf->Seek(-78-$offset, 2) and $raf->Read($buff, 78) == 78 and
         substr($buff,-32) eq "8db42d694ccc418790edff439fe026bf";    # check magic number
 
     my $verbose = $et->Options('Verbose');
     my $tagTbl = GetTagTable('Image::ExifTool::QuickTime::Stream');
-    my $fileEnd = $raf->Tell();
-    my $trailEnd = $fileEnd - $offset;
+    my $trailEnd = $raf->Tell();
     my $trailerLen = unpack('x38V', $buff);
     $trailerLen > $trailEnd and $et->Warn('Bad Insta360 trailer size'), return 0;
     if ($dirInfo) {
@@ -3207,7 +3273,7 @@ sub ProcessInsta360($;$)
         ($epos -= $len) + $trailerLen < 0 and last;
         $raf->Seek($epos-$offset, 2) or last;
         if ($verbose) {
-            $et->VPrint(0, sprintf("Insta360 Record 0x%x (offset 0x%x, %d bytes):\n", $id, $fileEnd + $epos, $len));
+            $et->VPrint(0, sprintf("Insta360 Record 0x%x (offset 0x%x, %d bytes):\n", $id, $trailEnd + $epos, $len));
         }
         # there are 2 types of record 0x300:
         # 1. 56 byte records

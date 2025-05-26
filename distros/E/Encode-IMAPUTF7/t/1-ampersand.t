@@ -1,6 +1,4 @@
-#!/usr/bin/perl
-# $Id: 1-ampersand.t 3398 2009-04-21 13:18:16Z makholm $
-
+#!perl
 use strict;
 use warnings;
 
@@ -14,5 +12,3 @@ is(Encode::IMAPUTF7->encode("A&B"), "A&-B", "Ampersand surrounded by two US-ASCI
 is(Encode::IMAPUTF7->encode("A&\x{C5}"), "A&-&AMU-", "Ampersand surrounded by US-ASCII char and 8bit char");
 is(Encode::IMAPUTF7->encode("\x{C5}&B"), "&AMU-&-B", "Ampersand surrounded by 8bit char and US-ASCII char");
 is(Encode::IMAPUTF7->encode("\x{D8}&\x{C5}"), "&ANg-&-&AMU-", "Ampersand surrounded by two 8bit chars");
-
-

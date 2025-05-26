@@ -1,5 +1,5 @@
 ---
-abstract: 'Minimal stub for Business::LetterWriter'
+abstract: 'Some basic functionality Business::LetterWriter'
 author:
   - 'Lubell Yamamoto <lubell@cpan.org>'
 build_requires:
@@ -17,5 +17,10 @@ no_index:
   directory:
     - t
     - inc
-version: '0.01'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+requires:
+  Archive::Zip: '1.68'
+  JSON: '4.10'
+  OpenAPI::Client::OpenAI: '0.21'
+  XML::Twig: '3.53'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

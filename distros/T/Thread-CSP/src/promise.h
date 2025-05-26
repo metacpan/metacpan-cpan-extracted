@@ -4,8 +4,10 @@ struct promise* S_promise_alloc(pTHX_ UV);
 #define promise_alloc(count) S_promise_alloc(aTHX_ count)
 SV* S_promise_get(pTHX_ struct promise* promise);
 #define promise_get(promise) S_promise_get(aTHX_ promise)
-void promise_set_value(struct promise* promise, SV* value);
-void promise_set_exception(struct promise* promise, SV* value);
+void S_promise_set_value(pTHX_ struct promise* promise, SV* value);
+#define promise_set_value(promise, value) S_promise_set_value(aTHX_ promise, value)
+void S_promise_set_exception(pTHX_ struct promise* promise, SV* value);
+#define promise_set_exception(promise, exception) S_promise_set_exception(aTHX_ promise, exception)
 bool promise_is_finished(struct promise*);
 void S_promise_refcount_dec(pTHX_ struct promise* promise);
 #define promise_refcount_dec(promise) S_promise_refcount_dec(aTHX_ promise)

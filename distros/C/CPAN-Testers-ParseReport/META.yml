@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ no_index:
 provides:
   CPAN::Testers::ParseReport:
     file: ./lib/CPAN/Testers/ParseReport.pm
-    version: v0.4.5
+    version: v0.5.0
 requires:
   CPAN::Meta::Converter: '2.110440'
   CPAN::Meta::YAML: '0.018'
@@ -30,6 +30,7 @@ requires:
   DateTime::Format::Strptime: '0'
   ExtUtils::MakeMaker: '6.48'
   File::Path: '1.08'
+  File::ReadBackwards: '1.06'
   File::Spec: '3.74'
   Getopt::Long: '0'
   HTML::Entities: '0'
@@ -49,5 +50,5 @@ requires:
   version: '0.99'
 resources:
   repository: https://repo.or.cz/cpan-testers-parsereport.git
-version: 0.4.5
+version: 0.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

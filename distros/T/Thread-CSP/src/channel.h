@@ -2,7 +2,8 @@ struct channel;
 
 struct channel* S_channel_alloc(pTHX_ UV);
 #define channel_alloc(refcount) S_channel_alloc(aTHX_ refcount)
-void channel_send(struct channel* channel, SV* message);
+void S_channel_send(pTHX_ struct channel* channel, SV* message);
+#define channel_send(channel, message) S_channel_send(aTHX_ channel, message)
 SV* S_channel_receive(pTHX_ struct channel* channel);
 #define channel_receive(channel) S_channel_receive(aTHX_ channel)
 SV* S_channel_receive_ready_fh(pTHX_ struct channel*);

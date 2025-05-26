@@ -1,4 +1,4 @@
-package Slack::BlockKit::Role::HasBasicStyle 0.002;
+package Slack::BlockKit::Role::HasBasicStyle 0.003;
 # ABSTRACT: a Block Kit element with optional (bold, code, italic, strike) styles
 
 use Moose::Role;
@@ -35,7 +35,7 @@ Slack::BlockKit::Role::HasBasicStyle - a Block Kit element with optional (bold, 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -77,7 +77,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

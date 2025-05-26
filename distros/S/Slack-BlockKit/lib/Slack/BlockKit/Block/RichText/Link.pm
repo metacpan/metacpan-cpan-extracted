@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Link 0.002;
+package Slack::BlockKit::Block::RichText::Link 0.003;
 # ABSTRACT: a Block Kit rich text hyperlink element
 
 use Moose;
@@ -79,7 +79,7 @@ Slack::BlockKit::Block::RichText::Link - a Block Kit rich text hyperlink element
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -118,7 +118,7 @@ figured out what this actually I<does> and so never uses it.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,14 +4,13 @@ author:
   - 'Leon Timmermans <leont@cpan.org>'
 build_requires:
   ExtUtils::ParseXS: '3.50'
-  Module::Build: '0.28'
   Test::More: '0'
   lib: '0'
   threads::shared: '0'
 configure_requires:
-  Module::Build: '0.28'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+  Module::Build::Tiny: '0.044'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,13 +19,13 @@ name: Thread-CSP
 provides:
   Thread::CSP:
     file: lib/Thread/CSP.pm
-    version: '0.014'
+    version: '0.015'
   Thread::CSP::Channel:
     file: lib/Thread/CSP/Channel.pm
-    version: '0.014'
+    version: '0.015'
   Thread::CSP::Promise:
     file: lib/Thread/CSP/Promise.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   XSLoader: '0'
   perl: '5.008001'
@@ -35,7 +34,17 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/threads-csp/issues
   repository: git://github.com/Leont/threads-csp.git
-version: '0.014'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.015'
+x_dynamic_prereqs:
+  expressions:
+    -
+      condition:
+        - not
+        - config_defined
+        - useithreads
+      error: "Can't use Threads::CSP without threading support"
+  version: 1
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

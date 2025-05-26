@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText 0.002;
+package Slack::BlockKit::Block::RichText 0.003;
 # ABSTRACT: the top-level rich text block in Block Kit
 
 use Moose;
@@ -74,7 +74,7 @@ Slack::BlockKit::Block::RichText - the top-level rich text block in Block Kit
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -171,7 +171,7 @@ L<Section     |Slack::BlockKit::Block::RichText::Section>
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,62 @@
+=pod
+
+=head1 NAME
+
+JSON::Pointer::Marpa - Marpa::R2 based JSON Pointer RFC6901 implementation.
+
+=head1 SYNOPSIS
+
+  use JSON::Pointer::Marpa ();
+
+  # $json_document, $json_pointer, and $json_value refer to
+  # Perl (JSON decoded) values
+  my $json_value = JSON::Pointer::Marpa->get( $json_document, $json_pointer );
+
+=head1 SYNTAX
+
+ABNF syntax of JSON Pointer
+
+  json-pointer    = *( "/" reference-token )
+  reference-token = *( unescaped / escaped )
+  unescaped       = %x00-2E / %x30-7D / %x7F-10FFFF ; %x2F ('/') and %x7E ('~') are excluded from 'unescaped'
+  escaped         = "~" ( "0" / "1" )               ; representing '~' and '/', respectively
+  array-index     = %x30 / ( %x31-39 *(%x30-39) )   ; "0", or digits without a leading "0"
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+Augmented BNF for Syntax Specifications [L<RFC5234|https://www.rfc-editor.org/rfc/rfc5234>]
+
+=item  *
+
+JSON Pointer [L<RFC6901|https://www.rfc-editor.org/rfc/rfc6901>]
+
+=item *
+
+Uniform Resource Identifier [L<RFC3986|https://www.rfc-editor.org/rfc/rfc3986>]
+
+=item *
+
+L<Marpa::R2>
+
+=item *
+
+L<JSON::Pointer>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

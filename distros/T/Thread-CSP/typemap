@@ -1,22 +1,38 @@
 TYPEMAP
 Thread::CSP::Channel	T_MAGICEXT
 Thread::CSP::Promise	T_MAGICEXT
+AV*	T_SLURP_AV
 
 INPUT
 T_MAGICEXT
 	{
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
 	if (magic)
-		$var = (${type})magic->mg_ptr;
+		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
+		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
 	}
 
+T_MAGICEXT_BASE
+	{
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
+	if (magic && magic->mg_virtual)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+	}
+
+T_SLURP_VAL
+	$var = ${ntype}_gather(&ST($argoff), items - $argoff)
+T_SLURP_VAR
+	${ntype}_gather(&$var, &ST($argoff), items - $argoff)
+T_SLURP_AV
+	$var = av_make(items - $argoff, &ST($argoff))
 
 OUTPUT
 T_MAGICEXT
 	{
-	MAGIC* magic = sv_magicext(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
+	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
 	magic->mg_flags |= MGf_COPY|MGf_DUP;
 	}
 

@@ -11,16 +11,97 @@
 
 <p>RSS feed: <a href="https://exiftool.org/rss.xml">https://exiftool.org/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-13.25.tar.gz">Version 13.25</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-13.30.tar.gz">Version 13.30</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="https://metacpan.org/release/Image-ExifTool">MetaCPAN</a>.)</p>
 
 <!-- Use line width of 80 -->
 <!-- *********************************************************************** -->
 
+<a name='v13.30'><b>May 22, 2025 - Version 13.30</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Added a new Canon RF lens (thanks Norbert Wasser)
+<li>Added some new Olympus ArtFilter values
+<li>Added support for reading timed GPS from Transcend Drive Body Camera 70 MP4
+    videos
+<li>Added a new FujiFilm AdvancedFilter value (thanks Greybeard)
+<li>Decode maker notes from Sigma BF images
+<li>Decode a few more Pentax AF-related tags (thanks Karsten Gieselmann)
+<li>Extract PreviewImage and its metadata from Sigma BF MOV videos
+<li>Allow multiple config files to be specified on the command line (but leave
+    undocumented for now because the config files currently included in the full
+    ExifTool package aren't compatible with this feature)
+<li>Removed warning introduced in version 12.60 for an undefined tag in a -if
+    condition, but leave the 12.60 change that sets these tags to an empty
+    string when -m is used
+<li>Patched LensID conversion to better handle a manual lens on a Sony ILCE-7M2
+<li>Patched to avoid runtime warning when using -fast option and reading and
+    HEIC file via a pipe (but you will still get a seek error)
+<li>Fixed some tag format types in the config_files/pix4d.config file
+<li>Fixed possible "uninitialized value" warning when reading some types of Ligo
+    timed GPS
+</ul>
+
+<a name='v13.29'><b>Apr. 27, 2025 - Version 13.29</b></a>
+<ul>
+<li>Changed default -geotime argument to use SubSecDateTimeOriginal if available
+    instead of DateTimeOriginal, instead of applying both (as was done since
+    ExifTool 13.18).  This is more efficient, and avoids an unnecessary warning
+<li>Properly return warnings from inverse value conversions when copying a tag
+    using -tagsFromFile with a tag name string
+<li>Fixed issue where RW2 images from the Panasonic DC-S1RM2 could be corrupted
+    when writing
+</ul>
+
+<a name='v13.28'><b>Apr. 25, 2025 - Version 13.28</b></a>
+<ul>
+<li>Added print conversion for Pentax AFPointValues
+<li>Added another Pentax PictureMode value
+<li>Decode timed GPS from GKU D900 dashcam videos
+<li>Decode timed telemetry data from newer ARCore videos
+<li>Decode Panasonic AFAreaSize (thanks andrewj)
+<li>Decode ShutterCount for Canon EOS R8 and R50 (<a href="https://github.com/exiftool/exiftool/issues/325">github #325</a>)
+<li>Decode ThumbnailTIFF from some Insta360 videos
+<li>Decode AROT:HDRGainCurveSize from APP10
+<li>Updated to the 2025 MPF specification
+<li>Renamed K-3III AFPoints to AFPointsSelected and changed decoding
+<li>Fixed bug introduced in 13.23 that could cause an incorrect parsing of XMP
+    attributes containing an equals sign
+<li>Fixed issue reading timed GPS from some Insta360 videos, and issue where
+    writing these videos would fail
+<li>Fixed exif2xmp.args and xmp2exif.args to properly handle EXIF:ImageUniqueID
+</ul>
+
+<a name='v13.27'><b>Apr. 8, 2025 - Version 13.27</b></a>
+<ul>
+<li>Decode AF points for the Pentax K-3III
+<li>Decode timed GPS from a variant of the Rove R2-4K dashcam
+<li>Properly decode SensorTemperature for Pentax K3-III
+<li>Patched PCAP test to avoid potential failure
+<li>Patched to avoid potential "not a HASH reference" error when writing MOV/MP4
+    videos
+<li>Fixed issue which could result in "uninitialized value" errors when reading
+    one type of timed GPS from MP4 videos
+<li>Fixed problem writing MotionPhotoVideo in MP4 files
+</ul>
+
+<a name='v13.26'><b>Mar. 31, 2025 - Version 13.26</b></a>
+<ul>
+<li>Added a new Olympus CameraType (thanks Herb)
+<li>Added a new PentaxModelID (<a href="https://github.com/exiftool/exiftool/issues/322">github #322</a>)
+<li>Added a new Nikon LensID
+<li>Improved Duration calculation for some WAV files
+<li>Changed a PCAP tag name and fixed typos in a few others (thanks blue-j)
+<li>Patched to avoid VignettingCorr warning for images from some Canon cameras
+<li>Patched to avoid some unnecessary duplicate tag warnings when -validate used
+    with HEIC images
+<li>Fixed issue with XMP-xmpMM:Pantry items not exhibiting proper List-type
+    behaviour
+</ul>
+
 <a name='v13.25'><b>Mar. 11, 2025 - Version 13.25</b></a> <span class=grn>(production release)</span>
 <ul>
 <li>IMPORTANT: Fixed issue which could corrupt HEIC images from newer iPhones
-    when writing QuickTime:Rotation
+    under certain conditions when writing QuickTime:Rotation
 <li>Decode more PLIST information from HEIC images
 <li>Updated Geolocation databases from current geonames.org files
 <li>Updated DarwinCore for the 2023 specification (thanks Herb)
@@ -39,7 +120,7 @@ considered development releases, and are not uploaded to <a href="https://metacp
 
 <a name='v13.23'><b>Mar. 7, 2025 - Version 13.23</b></a>
 <ul>
-<li>Added read support for <a href="TagNames/PCAP.html">CAP, PCAP and PACPNG files</a> (<a href="https://github.com/exiftool/exiftool/issues/318">github #318</a>)
+<li>Added read support for <a href="TagNames/PCAP.html">CAP, PCAP and PCAPNG files</a> (<a href="https://github.com/exiftool/exiftool/issues/318">github #318</a>)
 <li>Added a number of new Sony LensType2 values (thanks Jos Roost)
 <li>Added the 2 new GPSAltitudeRef values defined by EXIF 3.0
 <li>Decode APP4 "Qualcomm Dual Camera Attributes" metadata
@@ -76,7 +157,7 @@ considered development releases, and are not uploaded to <a href="https://metacp
 <li>Fixed a bug with the new <a href="plot.html">-plot option</a> that could generate a compiler error
 </ul>
 
-<a name='v13.20'><b>Feb. 20, 2025 - Version 13.20</b></a>
+<a name='v13.20'><b>Feb. 20, 2025 - Version 13.20</b> - "SVG Plot"</a>
 <ul>
 <li>Added new <a href="plot.html">-plot option</a> for generating SVG-format plots from tag values
 <li>Added a new Olympus CameraType

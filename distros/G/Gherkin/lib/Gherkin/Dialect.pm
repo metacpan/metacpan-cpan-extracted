@@ -1,5 +1,5 @@
 package Gherkin::Dialect;
-$Gherkin::Dialect::VERSION = '32.1.1';
+$Gherkin::Dialect::VERSION = '32.1.2';
 use strict;
 use warnings;
 
@@ -23,8 +23,10 @@ sub new {
             close $fh;
             $options->{'dictionary'} = Cpanel::JSON::XS::decode_json($input);
         } else {
+            ## no critic (ProhibitPackageVars)
             require Gherkin::Generated::Languages;
             $options->{'dictionary'} = $Gherkin::Generated::Languages::data;
+            ## use critic
         }
     }
 

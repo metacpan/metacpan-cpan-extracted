@@ -1,0 +1,40 @@
+# Ignore build artifacts
+*.o
+*.bs
+*.so
+*.dll
+*.exe
+
+# Ignore temporary/test files
+*.swp
+*.bak
+*.tmp
+*~
+
+# Ignore generated files
+/blib/
+/Makefile
+/Makefile.old
+/pm_to_blib
+/MYMETA.*
+/Build
+/Build.bat
+/Build.PL
+
+# Ignore dist build folders
+/Business-LetterWriter-*/
+
+# Ignore coverage and test output
+/cover_db/
+/nytprof.out
+
+# Ignore local config and meta files
+/.DS_Store
+/.vscode/
+/META.yml
+/META.json
+
+# Ignore tags and logs
+/tags
+/logs/
+

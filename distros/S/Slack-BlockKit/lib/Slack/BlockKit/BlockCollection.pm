@@ -1,4 +1,4 @@
-package Slack::BlockKit::BlockCollection 0.002;
+package Slack::BlockKit::BlockCollection 0.003;
 # ABSTRACT: a collection of Block Kit blocks
 use Moose;
 
@@ -57,7 +57,7 @@ Slack::BlockKit::BlockCollection - a collection of Block Kit blocks
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -89,7 +89,7 @@ It must be defined and non-empty, or an exception will be raised.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

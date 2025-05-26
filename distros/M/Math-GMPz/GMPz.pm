@@ -124,7 +124,7 @@ zgmp_urandomb_ui zgmp_urandomm_ui
     );
 
     @Math::GMPz::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.65';
+    our $VERSION = '0.66';
     #$VERSION = eval $VERSION;
 
     Math::GMPz->DynaLoader::bootstrap($VERSION);
@@ -656,7 +656,61 @@ sub overload_pow_eq {
     my $z = Math::GMPz->new($_[1]);
     return _overload_pow_eq($_[0], $z, 0);
   }
+  if($itsa == 5) { # Math::MPFR object
+    my $mpfr_obj = Math::MPFR::Rmpfr_init2(Rmpz_sizeinbase($_[0], 2));
+    Math::MPFR::Rmpfr_set_z($mpfr_obj, $_[0], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_pow($ret, $mpfr_obj, $_[1], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
+  }
   return _overload_pow_eq(@_);
+}
+
+sub overload_add_eq {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_add_z($ret, $_[1], $_[0], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
+  }
+  return _overload_add_eq(@_);
+}
+
+sub overload_mul_eq {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_mul_z($ret, $_[1], $_[0], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
+  }
+  return _overload_mul_eq(@_);
+}
+
+sub overload_sub_eq {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_z_sub($ret, $_[0], $_[1], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
+  }
+  return _overload_sub_eq(@_);
+}
+
+sub overload_div_eq {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_z_div($ret, $_[0], $_[1], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
+  }
+  return _overload_div_eq(@_);
+}
+
+sub overload_mod_eq {
+  if(_itsa($_[1]) == 5) { # Math::MPFR object
+    my $mpfr_obj = Math::MPFR::Rmpfr_init2(Rmpz_sizeinbase($_[0], 2));
+    Math::MPFR::Rmpfr_set_z($mpfr_obj, $_[0], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_fmod($ret, $mpfr_obj, $_[1], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
+  }
+  return _overload_mod_eq(@_);
 }
 
 sub __GNU_MP_VERSION            () {return ___GNU_MP_VERSION()}

@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::List 0.002;
+package Slack::BlockKit::Block::RichText::List 0.003;
 # ABSTRACT: a Block Kit rich text list element
 use Moose;
 use MooseX::StrictConstructor;
@@ -97,7 +97,7 @@ Slack::BlockKit::Block::RichText::List - a Block Kit rich text list element
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -147,7 +147,7 @@ be either C<bullet> or C<ordered>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

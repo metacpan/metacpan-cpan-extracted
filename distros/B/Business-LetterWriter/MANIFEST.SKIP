@@ -1,0 +1,4 @@
+^Business-LetterWriter-[0-9.]+/
+^.*\.tar\.gz$
+^MYMETA\.
+^Makefile$

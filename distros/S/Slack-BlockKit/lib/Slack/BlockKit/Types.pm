@@ -1,4 +1,4 @@
-package Slack::BlockKit::Types 0.002;
+package Slack::BlockKit::Types 0.003;
 # ABSTRACT: Moose type constraints used internally by Slack::Block Kit
 use v5.36.0;
 
@@ -59,7 +59,7 @@ Slack::BlockKit::Types - Moose type constraints used internally by Slack::Block 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -82,7 +82,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -25,12 +25,13 @@ struct channel {
 	Refcount refcount;
 	enum state state;
 	SV* message;
+	PerlInterpreter* from;
 	Notification read_notification;
 	Notification write_notification;
 };
 
 struct channel* S_channel_alloc(pTHX_ UV refcount) {
-	struct channel* ret = calloc(1, sizeof(struct channel));
+	struct channel* ret = PerlMemShared_calloc(1, sizeof(struct channel));
 	MUTEX_INIT(&ret->data_mutex);
 	MUTEX_INIT(&ret->reader_mutex);
 	MUTEX_INIT(&ret->writer_mutex);
@@ -41,11 +42,12 @@ struct channel* S_channel_alloc(pTHX_ UV refcount) {
 	return ret;
 }
 
-void channel_send(struct channel* channel, SV* message) {
+void S_channel_send(pTHX_ struct channel* channel, SV* message) {
 	MUTEX_LOCK(&channel->writer_mutex);
 	MUTEX_LOCK(&channel->data_mutex);
 
 	channel->message = message;
+	channel->from = aTHX;
 	notification_trigger(&channel->read_notification);
 	if (channel->state == HAS_READER) {
 		channel->state = HAS_MESSAGE;
@@ -58,6 +60,7 @@ void channel_send(struct channel* channel, SV* message) {
 
 	do COND_WAIT(&channel->data_condvar, &channel->data_mutex);
 	while (channel->state != HAS_NOTHING && channel->state != HAS_READER && channel->state != CLOSED);
+	channel->from = NULL;
 
 	MUTEX_UNLOCK(&channel->data_mutex);
 	MUTEX_UNLOCK(&channel->writer_mutex);
@@ -78,7 +81,7 @@ SV* S_channel_receive(pTHX_ struct channel* channel) {
 
 	SV* result;
 	if (channel->state != CLOSED) {
-		result = clone_value(channel->message);
+		result = clone_value(channel->message, channel->from);
 		channel->state = HAS_NOTHING;
 	}
 	else
@@ -135,12 +138,13 @@ void S_channel_refcount_dec(pTHX_ struct channel* channel) {
 		MUTEX_DESTROY(&channel->writer_mutex);
 		MUTEX_DESTROY(&channel->reader_mutex);
 		MUTEX_DESTROY(&channel->data_mutex);
-		free(channel);
+		PerlMemShared_free(channel);
 	}
 }
 
 static int channel_magic_destroy(pTHX_ SV* sv, MAGIC* magic) {
-	channel_refcount_dec((struct channel*)magic->mg_ptr);
+	struct channel* object = (struct channel*)magic->mg_ptr;
+	channel_refcount_dec(object);
 	return 0;
 }
 
@@ -150,4 +154,7 @@ static int channel_magic_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* param) {
 	return 0;
 }
 
-const MGVTBL Thread__CSP__Channel_magic = { 0, 0, 0, 0, channel_magic_destroy, 0, channel_magic_dup };
+const MGVTBL Thread__CSP__Channel_magic = {
+	.svt_dup  = channel_magic_dup,
+	.svt_free = channel_magic_destroy
+};

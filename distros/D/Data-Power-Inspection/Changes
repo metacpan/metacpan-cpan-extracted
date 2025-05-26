@@ -1,0 +1,19 @@
+Revision history for Data-Power-Inspection
+
+0.01    2025-5-23
+        First version
+
+0.02    2025-5-23
+        use utf8
+
+0.03    2025-5-23
+        use open
+
+0.04    2025-5-23
+        update POD
+
+0.05    2025-5-26
+        update META.json
+
+0.06    2025-5-26
+        =encoding utf8

@@ -24,7 +24,14 @@ my $optpod = <<'=back';
 
 =item B<--cachedir=s>
 
-Directory to keep mirrored data in. Defaults to C<$HOME/var/cpantesters>.
+Directory to keep mirrored data in. Defaults to
+C<$HOME/var/cpantesters>. This directory will get populated by
+CPAN::Testers::ParseReport with two subdirectories
+
+  directory           contains
+  ----------------------------------
+  cpantesters-show/   data by distro
+  nntp-testers/       reports
 
 =item B<--ctdb=s>
 
@@ -37,7 +44,15 @@ installed.
 =item B<--cturl=s>
 
 Base URL of the cpantesters website. Defaults to
-C<http://static.cpantesters.org/show>.
+C<https://www.cpantesters.org/show>.
+
+=item B<--distrotransport=s>
+
+Specifies transport to get the distro-data. Defaults to C<ctjson>.
+
+C<ctjson> uses C<cturl> and downloads whole files.
+
+C<ndjson> uses C<ndjsonurl> and downloads increments to append to existing files.
 
 =item B<--dumpfile=s>
 
@@ -106,6 +121,11 @@ steps until the number of passes is equal to this option or higher.
 No default.
 
 If --sample is not set, --minpass and --minfail are ignored.
+
+=item B<--ndjsonurl=s>
+
+Base URL to request ndjson formatted per-distro data. At the time of
+this writing no stable such URL exists yet.
 
 =item B<--pager=s>
 

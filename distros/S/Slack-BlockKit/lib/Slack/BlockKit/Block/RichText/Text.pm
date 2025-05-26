@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Text 0.002;
+package Slack::BlockKit::Block::RichText::Text 0.003;
 # ABSTRACT: a Block Kit rich text object for the text in the rich text
 
 use Moose;
@@ -56,7 +56,7 @@ Slack::BlockKit::Block::RichText::Text - a Block Kit rich text object for the te
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 
@@ -91,7 +91,7 @@ This is the actual text of the text object.  It's a string, and required.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

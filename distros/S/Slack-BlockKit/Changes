@@ -1,5 +1,8 @@
 Revision history for Slack-BlockKit
 
+0.003     2025-05-25 21:53:56-04:00 America/New_York
+        - update dist metadata
+
 0.002     2024-07-08 18:18:15-04:00 America/New_York
         - introduce the Date rich text element and the date() sugar
         - correct how we refer to Slack's Block Kit (not: BlockKit)

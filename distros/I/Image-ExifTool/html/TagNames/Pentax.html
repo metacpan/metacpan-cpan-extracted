@@ -783,9 +783,9 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <br>&#39;1 4&#39; = Auto PICT (Standard)
   <br>&#39;1 5&#39; = Auto PICT (Portrait)
   <br>&#39;1 6&#39; = Auto PICT (Landscape)
-  <br>&#39;1 7&#39; = Auto PICT (Macro)</td><td>&nbsp;&nbsp;</td>
-  <td>&#39;1 8&#39; = Auto PICT (Sport)
-  <br>&#39;2 0&#39; = Program (HyP)
+  <br>&#39;1 7&#39; = Auto PICT (Macro)
+  <br>&#39;1 8&#39; = Auto PICT (Sport)</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;2 0&#39; = Program (HyP)
   <br>&#39;2 1&#39; = Hi-speed Program (HyP)
   <br>&#39;2 2&#39; = DOF Program (HyP)
   <br>&#39;2 3&#39; = MTF Program (HyP)
@@ -810,6 +810,7 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <br>&#39;18 22&#39; = Auto Program (Shallow DOF)
   <br>&#39;19 0&#39; = Astrotracer
   <br>&#39;20 22&#39; = Blur Control
+  <br>&#39;26 0&#39; = Shutter and Aperture Priority (TAv)
   <br>&#39;249 0&#39; = Movie (TAv)
   <br>&#39;250 0&#39; = Movie (TAv, Auto Aperture)
   <br>&#39;251 0&#39; = Movie (Manual)
@@ -1606,53 +1607,58 @@ are left, top, width and height in a 720x480 frame, with Y downwards)</span></sp
 <td class=c>undef[10]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0x0238 = 568'>0x0238</td>
+<td>CAFPointInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html#CAFPointInfo'>Pentax CAFPointInfo Tags</a></td></tr>
+<tr>
 <td title='0x0239 = 569'>0x0239</td>
 <td>LensInfoQ</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#LensInfoQ'>Pentax LensInfoQ Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x023f = 575'>0x023f</td>
 <td>Model</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0243 = 579'>0x0243</td>
 <td>PixelShiftInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#PixelShiftInfo'>Pentax PixelShiftInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0245 = 581'>0x0245</td>
 <td>AFPointInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#AFPointInfo'>Pentax AFPointInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x03fe = 1022'>0x03fe</td>
 <td>DataDump</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x03ff = 1023'>0x03ff</td>
 <td>TempInfo
   <br>UnknownInfo</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Pentax.html#TempInfo'>Pentax TempInfo Tags</a>
   <br>--&gt; <a href='Pentax.html#UnknownInfo'>Pentax UnknownInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0402 = 1026'>0x0402</td>
 <td>ToneCurve</td>
 <td class=c title=' ~ = Writable only with -n'>yes~</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0403 = 1027'>0x0403</td>
 <td>ToneCurves</td>
 <td class=c title=' ~ = Writable only with -n'>yes~</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0405 = 1029'>0x0405</td>
 <td>UnknownBlock?</td>
 <td class=c>undef</td>
 <td><span class=s><span class=n>(large unknown data block in PEF/DNG images but not JPG images)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
@@ -1804,10 +1810,10 @@ are left, top, width and height in a 720x480 frame, with Y downwards)</span></sp
 <td class=r>0x1329a</td><td>= GR IIIx</td>
 </tr><tr><td class=r>0x12c20</td><td>= Samsung GX10</td>
 <td class='r b'>0x12e4e</td><td class=b>= Optio E90</td>
-<td class=r>0x132d6</td><td>= K-3 Mark III Monochrome</td>
+<td class=r>0x132b8</td><td>= KF</td>
 </tr><tr><td class=r>0x12c28</td><td>= Optio S7</td>
 <td class='r b'>0x12e58</td><td class=b>= X90</td>
-<td class=r>&nbsp;</td><td>&nbsp;</td>
+<td class=r>0x132d6</td><td>= K-3 Mark III Monochrome</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='City'>Pentax City Values</a></h2>
@@ -3653,8 +3659,8 @@ serviced)</span></span></td></tr>
 <td class=r title='11 = 0xb'>11</td>
 <td>AFPointsInFocus</td>
 <td class=c>int8u</td>
-<td><span class=s><span class=n>(models other than the K-1 and K-3.  May report two points in focus even
-though a single AFPoint has been selected, in which case the selected
+<td><span class=s><span class=n>(models other than the K-1, K-3, K-70 and KP.  May report two points in focus
+even though a single AFPoint has been selected, in which case the selected
 AFPoint is the first reported)</span></span><table class=cols><tr>
   <td>0 = None
   <br>1 = Lower-left, Bottom
@@ -3679,13 +3685,29 @@ AFPoint is the first reported)</span></span><table class=cols><tr>
   <br>20 = Mid-right</td></tr></table>
 </td></tr>
 <tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>AFPointValues?</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(some unknown values related to each AFPoint)</span></span></td></tr>
+<tr class=b>
+<td class=r title='298 = 0x12a'>298</td>
+<td>AFPointsSelected</td>
+<td class=c title=' ~ = Writable only with -n'>int8u[41]~</td>
+<td><span class=s><span class=n>(K-3III only. 41 selectable AF points from a total of 101 available in a 13x9
+grid. Columns are labelled A-M and rows are 1-9. The center point is G5)</span></span></td></tr>
+<tr>
+<td class=r title='399 = 0x18f'>399</td>
+<td>AFPointsUnknown?</td>
+<td class=c title=' ~ = Writable only with -n'>int8u[41]~</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='506 = 0x1fa'>506</td>
 <td>LiveView</td>
 <td class=c>int8u</td>
 <td><span class=s><span class=n>(decoded only for the K-3 III)</span>
   <br>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='509 = 0x1fd'>509</td>
 <td>AFHold</td>
 <td class=c>int8u</td>
@@ -4501,6 +4523,35 @@ valid for other models.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CAFPointInfo'>Pentax CAFPointInfo Tags</a></h2>
+<p>Contrast-detect AF-point information for the K-01 and later models.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>NumCAFPoints</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1.1</td>
+<td>CAFGridSize</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>CAFPointsInFocus</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='2 = 0x2'>2.1</td>
+<td>CAFPointsSelected</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='LensInfoQ'>Pentax LensInfoQ Tags</a></h2>
 <p>More lens information stored by the Pentax Q.</p>
 <blockquote>
@@ -4550,17 +4601,17 @@ valid for other models.</p>
 <tr class=b>
 <td class=r title='4 = 0x4'>4</td>
 <td>AFPointsInFocus</td>
-<td class=c title=' ~ = Writable only with -n'>int8u[9]~</td>
+<td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='4 = 0x4'>4.1</td>
 <td>AFPointsSelected</td>
-<td class=c title=' ~ = Writable only with -n'>int8u[9]~</td>
+<td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='4 = 0x4'>4.2</td>
 <td>AFPointsSpecial</td>
-<td class=c title=' ~ = Writable only with -n'>int8u[9]~</td>
+<td class=c>no</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -4592,6 +4643,11 @@ sensors are located in the camera.</p>
 <tr class=b>
 <td class=r title='22 = 0x16'>22</td>
 <td>CameraTemperature5</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='42 = 0x2a'>42</td>
+<td>SensorTemperature</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -5043,7 +5099,7 @@ stored as ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 10, 2024</i>
+<br><i>Last revised May 22, 2025</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

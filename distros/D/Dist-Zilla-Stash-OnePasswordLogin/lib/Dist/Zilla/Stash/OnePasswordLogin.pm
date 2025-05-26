@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::OnePasswordLogin 0.001;
+package Dist::Zilla::Stash::OnePasswordLogin 0.002;
 # ABSTRACT: get login credentials from 1Password
 
 #pod =head1 OVERVIEW
@@ -67,7 +67,7 @@ Dist::Zilla::Stash::OnePasswordLogin - get login credentials from 1Password
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
@@ -102,6 +102,12 @@ for any reason, and there is no promise that patches will be accepted to
 lower the minimum required perl.
 
 =head1 AUTHOR
+
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
 
 Ricardo Signes <rjbs@semiotic.systems>
 

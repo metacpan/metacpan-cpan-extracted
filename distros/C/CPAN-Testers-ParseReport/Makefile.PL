@@ -4,13 +4,21 @@ use ExtUtils::MakeMaker;
 $ExtUtils::MakeMaker::VERSION =~ s/_//g;
 my @sign = (MM->can("signature_target") ? (SIGN => 1) : ());
 my $version_diff = 0; # we'll have to die if this becomes true
-$::version_from = './lib/CPAN/Testers/ParseReport.pm';
-my $mmgenereatedversionfrom = MM->parse_version($::version_from);
-if ($ARGV[0] && $ARGV[0] eq "--setversion") {
-    die "Your perl is a bit dated[$]].\nDo not make a release with it\n" if $] < 5.008;
-    warn "Your MakeMaker is a bit dated[$ExtUtils::MakeMaker::VERSION].\nYou should get a new one\n"
-        if $ExtUtils::MakeMaker::VERSION < 6.48;
-    eval {  require $::version_from; }; die $@ if $@;
+my $trial = 0;
+my $version;
+my $version_from = './lib/CPAN/Testers/ParseReport.pm';
+$version = MM->parse_version($version_from);
+if ($trial) {
+    $version .= "-TRIAL";
+    if ($trial > 1) {
+        $version .= $trial;
+    }
+}
+{
+  my $version_set_manually = 1;
+  if ($ARGV[0] && $ARGV[0] eq "--setversion") {
+    die "Your perl is a bit dated[$]].\nDo not make a release with it\n" if $] < 5.016;
+    eval {  require $version_from; }; die $@ if $@;
     my $makefile = "Makefile";
     unless (-f $makefile) {
         $makefile = "Makefile.old";
@@ -18,23 +26,30 @@ if ($ARGV[0] && $ARGV[0] eq "--setversion") {
     unless (-f $makefile) {
         die "no Makefile and no Makefile.old found";
     }
+    local $ENV{LANG} = "C";
     my $dirty = `git status --porcelain --untracked-files=no`;
     die "Not everything checked in or out?\n====\n$dirty====\n" if $dirty;
-    open my $fh, "make -f $makefile the-release-name|" or die "Could not fork: $!";
-    local $/;
-    my ($have_version) = <$fh> =~ /^version\s+([\d\._]+)/m;
-    close $fh or die "Could not close: $!";
-    my ($namespace) = $::version_from;
-    $namespace =~ s|^lib/(.+)\.pm$|$1|;
+
+    my ($have_version);
+    if ($version_set_manually) {
+        open my $fh, "make -f $makefile the-release-name|" or die "Could not fork: $!";
+        local $/;
+        ($have_version) = <$fh> =~ /^version\s+([\d\._]+(?:-TRIAL)?)/m;
+        close $fh or die "Could not close: $!";
+        die "could not determine current version from Makefile" unless $have_version;
+    }
+    my ($namespace) = $version_from;
+    $namespace =~ s|.*lib/(.+)\.pm$|$1|;
     $namespace =~ s|/|::|g;
     eval qq{ if (\$$namespace\::VERSION != \$have_version) {
         warn "Not equal: CPAN::Testers::ParseReport::VERSION[\$$namespace\::VERSION] Makefile version[\$have_version]";
         \$version_diff = 1;
     }};
-    eval qq{ if (\$$namespace\::VERSION != \$mmgenereatedversionfrom) {
-        warn "Not equal: CPAN::Testers::ParseReport::VERSION[\$$namespace\::VERSION] MM generated version[\$mmgenereatedversionfrom]";
+    eval qq{ if (\$$namespace\::VERSION != \$versionfrom) {
+        warn "Not equal: CPAN::Testers::ParseReport::VERSION[\$$namespace\::VERSION] MM generated version[\$versionfrom]";
         \$version_diff = 1;
     }};
+  }
 }
 
 my %indirect_dependencies =
@@ -63,6 +78,7 @@ my $prereq_pm =
      'DateTime::Format::Strptime'  => 0,
      'ExtUtils::MakeMaker'         => 6.48,
      'File::Path'                  => '1.08',
+     'File::ReadBackwards'         => '1.06',
      'Getopt::Long'                => 0,
      'HTML::Entities'              => 0,
      'Hash::Util'                  => 0,
@@ -91,7 +107,7 @@ while (my($k,$v) = each %indirect_dependencies) {
 eval { WriteMakefile
     (
      'NAME' => 'CPAN::Testers::ParseReport',
-     'VERSION_FROM' => $::version_from,
+     'VERSION' => $version,
      'PREREQ_PM' => $prereq_pm,
      'INSTALLDIRS' => 'site',
      'EXE_FILES' => [
@@ -115,7 +131,7 @@ eval { WriteMakefile
      META_MERGE => {
                     # write: git push git+ssh://repo.or.cz/srv/git/cpan-testers-parsereport.git master
                     resources => { repository => "https://repo.or.cz/cpan-testers-parsereport.git" },
-                    provides => { "CPAN::Testers::ParseReport" => { version => $mmgenereatedversionfrom, file => $::version_from }},
+                    provides => { "CPAN::Testers::ParseReport" => { version => $version, file => $version_from }},
                    },
      MIN_PERL_VERSION => '5.008', # Rule: _pragma_utf8
      @sign,
@@ -150,17 +166,18 @@ sub postamble {
 OKDIRS=DIST|bin|blib|cover_db\
        |lib|t
 
-Makefile: }.$::version_from.q{
+Makefile: }.$version_from.q{
 
 META.yml: metafile
 	$(CP) $(DISTVNAME)/META.yml  ./META.yml
+	-$(CP) $(DISTVNAME)/META.json  ./META.json
 
 setversion:
 	$(PERL) Makefile.PL --setversion
 
 verify-changes-date:
 	@$(PERL) -ne 'BEGIN{my@t=(localtime)[5,4,3];$$t[0]+=1900;$$t[1]++;$$t=sprintf"%04d-%02d-%02d",@t}' \
-		-e '$$ok++,exit if /^[\d\.]+\s+$$t\s/ && $$.<12; END{die "Alert: did not find <$$t> in the first 12 lines of the Changes file" unless $$ok}' Changes
+		-e '$$ok++,exit if /^[\d\.]+(?:-TRIAL\d*)?\s+$$t\s/ && $$.<12; END{die "Alert: did not find <$$t> in the first 12 lines of the Changes file" unless $$ok}' Changes
 
 verify-no-subdir:
 	@$(PERL) -e 'my$$s=join",",grep{!/^($(OKDIRS))\z/x&&-d($$_)}glob"*";' \
@@ -171,9 +188,17 @@ the-release-name :
 	$(NOECHO) $(ECHO) 'release-name ' $(DISTVNAME).tar$(SUFFIX)
 
 release :: disttest
-	git tag -m 'This is $(VERSION)' $(VERSION)
+	test -e META.json
 	ls -l $(DISTVNAME).tar$(SUFFIX)
 	rm -rf $(DISTVNAME)
+	$(NOECHO) $(ECHO) '#### Suggested next steps (if all looks good):'
+	$(NOECHO) $(ECHO) '  make reversion AGAINST_TAG=__previous_release__'
+	$(NOECHO) $(ECHO) '  git tag -m "This is $(VERSION)" "$(VERSION)"'
+	$(NOECHO) $(ECHO) '  git push --tags origin master'
+
+reversion:
+	$(NOECHO) $(ECHO) AGAINST_TAG=$(AGAINST_TAG)
+	$(PERL) dagolden-reversion-gist.pl $(AGAINST_TAG)
 
 sign:
 	$(PERL) `dirname $(PERL)`/cpansign -s
@@ -195,6 +220,7 @@ disttest :
 distdir ::
 	touch $(DISTVNAME)/SIGNATURE && $(CP) $(DISTVNAME)/SIGNATURE ./SIGNATURE
 	$(CP) $(DISTVNAME)/META.yml  ./META.yml
+	-$(CP) $(DISTVNAME)/META.json  ./META.json
 	$(CP) $(DISTVNAME)/MANIFEST  ./MANIFEST
 
 }

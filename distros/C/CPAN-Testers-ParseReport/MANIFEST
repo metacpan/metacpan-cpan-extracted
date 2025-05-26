@@ -2,6 +2,7 @@ bin/conf2conf.pl
 bin/ctgetreports
 bin/ctsolvereports
 Changes
+dagolden-reversion-gist.pl
 lib/CPAN/Testers/ParseReport.pm
 Makefile.PL
 MANIFEST
