@@ -1,4 +1,0 @@
-My favorite number: #^^ echo %one% ^^
-My third favorite number: #^^ echo %three% ^^
-My three favorite numbers: #^^ echo %one% %two% %three% ^^
-Maybe a number? #^^ echo %four% ^^

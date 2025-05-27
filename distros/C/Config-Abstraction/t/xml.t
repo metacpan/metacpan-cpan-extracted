@@ -32,6 +32,10 @@ $config = Config::Abstraction->new(
 ok(defined($config));
 cmp_ok($config->get('UserName'), 'eq', 'njh', 'absolute path to config_file works');
 
+$config = Config::Abstraction->new(File::Spec->catdir($test_dir, 'xml_test'));
+ok(defined($config));
+cmp_ok($config->get('UserName'), 'eq', 'njh', 'absolute path to one parameter works');
+
 write_file(File::Spec->catdir($test_dir, 'xml_test'), <<'XML');
 <config>
 	<UserName>nan</UserName>

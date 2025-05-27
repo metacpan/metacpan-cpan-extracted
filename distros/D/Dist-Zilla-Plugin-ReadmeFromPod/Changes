@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-ReadmeFromPod
 
+0.40 2025-05-27 11:57:19
+  - Revert 0.39 since it has issues with add_file (GH #13)
+
 0.39 2025-04-26 08:41:15
   [Enhancements]
   - Add a phase attribute to control when to build the README (Robert Rothenberg)

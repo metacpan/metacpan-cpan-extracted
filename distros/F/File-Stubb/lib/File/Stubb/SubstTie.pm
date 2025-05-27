@@ -1,6 +1,6 @@
 package File::Stubb::SubstTie;
 use 5.016;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ sub FETCH {
 
 =head1 NAME
 
-File::Stubb::SubstTie - Class for tying hashes in $_ for Perl targets
+File::Stubb::SubstTie - Class for tying hashes in %_ for Perl targets
 
 =head1 USAGE
 

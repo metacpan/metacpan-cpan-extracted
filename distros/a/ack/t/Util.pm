@@ -59,7 +59,7 @@ our @EXPORT = qw(
     sets_match
     ack_lists_match
     ack_sets_match
-    ack_error_matches
+    ack_stderr_matches
 
     untaint
 
@@ -653,7 +653,7 @@ sub ack_sets_match {
 }
 
 
-sub ack_error_matches {
+sub ack_stderr_matches {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $args     = shift;
@@ -661,13 +661,16 @@ sub ack_error_matches {
     my $msg      = shift;
 
     return subtest subtest_name( $msg, $args, $expected ) => sub {
-        plan tests => 4;
+        plan tests => 2;
 
         my ( $stdout, $stderr ) = run_ack_with_stderr( @{$args} );
-        isnt( get_rc(), 0, 'Nonzero error' );
         is_empty_array( $stdout, 'No normal output' );
-        is( scalar @{$stderr}, 1, 'Just one error' );
-        like( $stderr->[0], $expected, 'Error matches' );
+
+        # Sometimes we run as ack, sometimes as ack-standalone.
+        for ( @{$stderr} ) {
+            s/^ack-standalone/ack/g;
+        }
+        return lists_match( $stderr, $expected, 'stderr matches' );
     };
 }
 
@@ -819,7 +822,7 @@ BEGIN {
             local $Test::Builder::Level = $Test::Builder::Level + 1;
             Test::More::fail(<<'HERE');
 Your system doesn't seem to have IO::Pty, and the developers
-forgot to check in this test file.  Please file a bug report
+forgot to check for it in this test file.  Please file an issue
 at https://github.com/beyondgrep/ack3/issues with the name of
 the file that generated this failure.
 HERE
@@ -1286,14 +1289,20 @@ sub read_tests {
     my @tests = $ypp->load_file( $filename );
 
     for my $test ( @tests ) {
-        $test->{stdout} = _lineify( $test->{stdout} );
+        for my $i ( qw( stdout stderr ) ) {
+            if ( exists $test->{$i} ) {
+                $test->{$i} = _lineify( $test->{$i} );
+            }
+        }
 
         if ( my $n = $test->{'indent-stdout'} ) {
             my $indent = ' ' x $n;
             $_ = "$indent$_" for @{$test->{stdout}};
         }
 
-        $test->{args} = _split_args( $test->{args} );
+        for my $i ( qw( args args-ack3 ) ) {
+            $test->{$i} = _split_args( $test->{$i} ) if $test->{$i};
+        }
 
         # Assume successful run.
         $test->{exitcode} //= 0;
@@ -1335,8 +1344,11 @@ sub _lineify {
 sub _validate_test {
     my $test = shift;
 
+    # args-ack3 is for args that are only for ack3.
     my @valid_keys = qw(
+        ack3-only
         args
+        args-ack3
         exitcode
         indent-stdout
         name
@@ -1347,6 +1359,9 @@ sub _validate_test {
     );
     for my $key ( keys %{$test} ) {
         die "Invalid key $key" unless _in( $key, \@valid_keys );
+    }
+    if ( not exists $test->{stdout} ) {
+        die "stdout must always be specified.";
     }
 
     return;

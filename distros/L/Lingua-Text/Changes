@@ -1,0 +1,30 @@
+Revision history for Lingua-Text
+
+0.07	Mon May 26 09:48:59 EDT 2025
+	Renamed as Lingua::Text to be compatible with Data::Text
+	
+0.06	Mon Mar  3 15:52:19 EST 2025
+	Only decode if not already UTF-8
+	Added t/30-basics.t
+	Use Params::Get
+
+0.05	Sun Nov  3 22:40:01 EST 2024
+	Use Test::DescribeMe to simplify tests
+	Use gtar to create a distribution on Macs
+	Added better coveralls and codecov support
+
+0.04	Mon Jun  3 13:37:29 EDT 2024
+	Fix synopsis
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
+0.03	Tue Mar 15 17:26:25 EDT 2022
+	Allow instantiation with only one arg - a string
+	Fix https://github.com/nigelhorne/Lingua-String/issues/2
+
+0.02	Sun Jan 24 13:05:03 EST 2021
+	Allow strings to be passed to the constructor
+	Added encode()
+	Fixed https://github.com/nigelhorne/Lingua-String/issues/1
+
+0.01:	Fri Jan 22 16:58:26 EST 2021
+        First draft

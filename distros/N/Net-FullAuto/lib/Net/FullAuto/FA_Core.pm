@@ -20587,17 +20587,23 @@ sub cwd
          } else { $chdir=$target_dir }
          if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
             if (-1<index $target_dir,' ') {
-               ($output,$stderr)=$self->{_cmd_handle}->cmd("cd \"$chdir\"");
+               ($output,$stderr)=Rem_Command::cmd(
+                  { _cmd_handle=>$self->{_cmd_handle},
+                    _host_label=>[ $hostlabel,'' ] },
+                    "cd \"$chdir\"");
                print "_cmd_handle cd \"$chdir\" ",
                   "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
             } else {
-               ($output,$stderr)=$self->{_cmd_handle}->cmd("cd $chdir");
+               ($output,$stderr)=Rem_Command::cmd(
+                  { _cmd_handle=>$self->{_cmd_handle},
+                    _host_label=>[ $hostlabel,'' ] },
+                    "cd $chdir");
                print "_cmd_handle cd $chdir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
-                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  "OUTPUT:\n==>$output<== STDERR==>$stderr<==\nat LINE ",
+                  __LINE__,"\n" if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
             }
@@ -30961,6 +30967,9 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                               if ($line ne $lastline || 0<$str_cnt) {
                                  $str_cnt--;
                                  if ($line=~s/^stdout: ?//) {
+                                    $line=~s/[[]stdout: ?/[\n/g;
+                                    $line=~s/[{]stdout: ?/{\n/g;
+                                    $line=~s/[,]stdout: ?/,\n/g;
                                     $fulloutput.=$line;
                                  } elsif (($line!~/^\[[AK]$|^\n$/s &&
                                        $line ne $live_command &&

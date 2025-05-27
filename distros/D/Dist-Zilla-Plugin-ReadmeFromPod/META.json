@@ -5,7 +5,7 @@
       "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason <avar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,16 +35,13 @@
          "requires" : {
             "Dist::Zilla" : "6.000",
             "Dist::Zilla::File::InMemory" : "0",
-            "Dist::Zilla::Role::AfterBuild" : "0",
-            "Dist::Zilla::Role::AfterRelease" : "0",
             "Dist::Zilla::Role::FilePruner" : "0",
+            "Dist::Zilla::Role::InstallTool" : "5",
             "IO::String" : "0",
             "List::Util" : "1.33",
             "Moose" : "0",
-            "Moose::Util::TypeConstraints" : "0",
             "Path::Tiny" : "0.004",
-            "Pod::Readme" : "v1.2.0",
-            "perl" : "v5.10.1"
+            "Pod::Readme" : "v1.2.0"
          }
       },
       "test" : {
@@ -53,6 +50,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
+            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -74,7 +72,7 @@
          "web" : "http://github.com/fayland/dist-zilla-plugin-readmefrompod"
       }
    },
-   "version" : "0.39",
+   "version" : "0.40",
    "x_authority" : "cpan:AVAR",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

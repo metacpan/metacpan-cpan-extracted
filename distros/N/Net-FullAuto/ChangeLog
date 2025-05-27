@@ -20,6 +20,14 @@
 #######################################################################
 
 
+2025-05-26  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000822 released
+
+        * Updated cwd() to properly handle ..
+
+	* Updated fa_amazon.pm for cli credentials
+
 2025-04-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000821 released

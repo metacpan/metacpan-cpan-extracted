@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = 'v3.8.2'; # Check https://beyondgrep.com/ for updates
+our $VERSION = 'v3.9.0'; # Check https://beyondgrep.com/ for updates
 
 use 5.010001;
 
@@ -440,7 +440,12 @@ sub _compile_file_filter {
 
     return sub {
         if ( $opt_g ) {
-            if ( $File::Next::name =~ /$re_match/o ) {
+            my $match = ($File::Next::name =~ /$re_match/o);
+            if ( $match && $re_not ) {
+                $match = ($File::Next::name !~ /$re_not/o);
+            }
+
+            if ( $match ) {
                 return 0 if $opt_v;
             }
             else {
@@ -899,20 +904,29 @@ sub print_line_with_options {
     my @line_parts;
 
     if ( $opt_show_filename && defined($filename) ) {
-        my $colno;
-        $colno = get_match_colno() if $opt_column;
+        my $disp_filename;
+        my $disp_lineno;
         if ( $opt_color ) {
-            $filename = Term::ANSIColor::colored( $filename, $ENV{ACK_COLOR_FILENAME} );
-            $lineno   = Term::ANSIColor::colored( $lineno,   $ENV{ACK_COLOR_LINENO} );
-            $colno    = Term::ANSIColor::colored( $colno,    $ENV{ACK_COLOR_COLNO} ) if $opt_column;
-        }
-        if ( $opt_heading ) {
-            push @line_parts, $lineno;
+            $disp_filename = Term::ANSIColor::colored( $filename, $ENV{ACK_COLOR_FILENAME} );
+            $disp_lineno   = Term::ANSIColor::colored( $lineno,   $ENV{ACK_COLOR_LINENO} );
         }
         else {
-            push @line_parts, $filename, $lineno;
+            $disp_filename = $filename;
+            $disp_lineno   = $lineno;
         }
-        push @line_parts, $colno if $opt_column;
+
+        if ( $opt_heading ) {
+            push @line_parts, $disp_lineno;
+        }
+        else {
+            push @line_parts, $disp_filename, $disp_lineno;
+        }
+
+        if ( $opt_column ) {
+            my $colno = get_match_colno();
+            $colno = Term::ANSIColor::colored( $colno, $ENV{ACK_COLOR_COLNO} ) if $opt_color;
+            push @line_parts, $colno;
+        }
     }
 
     if ( $opt_output ) {
@@ -1320,8 +1334,7 @@ Note that the options that affect "dogs" also affect "cats", so if you have
 then the search for both "dogs" and "cats" will be case-insensitive and be
 word-limited.
 
-See also the other two boolean options C<--or> and C<--not>, neither of
-which can be used with C<--and>.
+C<--and> cannot be used with C<--or>.
 
 =item B<-A I<NUM>>, B<--after-context=I<NUM>>
 
@@ -1580,9 +1593,6 @@ if you have
 then the search for both "dogs" and "cats" will be case-insensitive and be
 word-limited.
 
-See also the other two boolean options C<--and> and C<--or>, neither of
-which can be used with C<--not>.
-
 =item B<-o>
 
 Show only the part of each line matching PATTERN (turns off text
@@ -1604,8 +1614,7 @@ Note that the options that affect "dogs" also affect "cats", so if you have
 then the search for both "dogs" and "cats" will be case-insensitive and be
 word-limited.
 
-See also the other two boolean options C<--and> and C<--not>, neither of
-which can be used with C<--or>.
+C<--or> cannot be used with C<--and>.
 
 =item B<--output=I<expr>>
 

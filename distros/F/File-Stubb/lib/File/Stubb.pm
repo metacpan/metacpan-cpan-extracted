@@ -1,6 +1,6 @@
 package File::Stubb;
 use 5.016;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -15,8 +15,6 @@ use constant {
     MODE_BATCH   => 1,
     MODE_LIST    => 2,
 };
-
-# TODO: Do some more testing to make sure stubb works correctly
 
 my $PRGNAM = 'stubb';
 my $PRGVER = $VERSION;

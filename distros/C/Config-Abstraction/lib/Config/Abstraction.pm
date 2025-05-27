@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 SYNOPSIS
 
@@ -252,12 +252,21 @@ such as C<'database.user'>.
 
 =back
 
+If just one argument is given, it is assumed to be the name of a file.
+
 =cut
 
 sub new
 {
 	my $class = shift;
-	my $params = Params::Get::get_params(undef, @_) || {};
+	my $params;
+
+	if(scalar(@_) == 1) {
+		# Just one parameter - the name of a file
+		$params = Params::Get::get_params('file', @_);
+	} else {
+		$params = Params::Get::get_params(undef, @_) || {};
+	}
 
 	$params->{'config_dirs'} //= $params->{'path'};	# Compatibility with Config::Auto
 
@@ -425,7 +434,8 @@ sub _load_config
 			$self->{'script_name'} = File::Basename::basename($ENV{'SCRIPT_NAME'} || $0);
 		}
 
-		for my $config_file ('default', $self->{'script_name'}, $self->{'config_file'}, @{$self->{'config_files'}}) {
+		my $script_name = $self->{'script_name'};
+		for my $config_file ('default', $script_name, "$script_name.cfg", "$script_name.conf", "$script_name.config", $self->{'config_file'}, @{$self->{'config_files'}}) {
 			next unless defined($config_file);
 			my $path = length($dir) ? File::Spec->catfile($dir, $config_file) : $config_file;
 			if($logger) {

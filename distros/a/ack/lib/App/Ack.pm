@@ -16,7 +16,7 @@ A container for functions for the ack program.
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = 'v3.8.2'; # Check https://beyondgrep.com/ for updates
+    $VERSION = 'v3.9.0'; # Check https://beyondgrep.com/ for updates
     $COPYRIGHT = 'Copyright 2005-2025 Andy Lester.';
 }
 our $STANDALONE = 0;
@@ -841,7 +841,7 @@ sub build_all_regexes {
 
     my @parts;
 
-    # AND: alpha and beta
+    # AND: alpha AND beta
     if ( @parts = @{$opt->{and}} ) {
         my @match_parts;
         my @hilite_parts;
@@ -875,22 +875,20 @@ sub build_all_regexes {
         $re_hilite = $re_match;
         $re_scan   = join( '|', @scan_parts );
     }
-    # NOT: alpha NOT beta
-    elsif ( @parts = @{$opt->{not}} ) {
+    else {
         ($re_match, $re_scan) = build_regex( $opt_regex, $opt );
         $re_hilite = $re_match;
+    }
 
+    # The --not does not affect the main regex. It is checked separately.
+    # NOT: alpha NOT beta
+    if ( @parts = @{$opt->{not}} ) {
         my @not_parts;
         for my $part ( @parts ) {
             (my $re, undef) = build_regex( $part, $opt );
             push @not_parts, $re;
         }
         $re_not = join( '|', @not_parts );
-    }
-    # No booleans.
-    else {
-        ($re_match, $re_scan) = build_regex( $opt_regex, $opt );
-        $re_hilite = $re_match;
     }
 
     return ($re_match, $re_not, $re_hilite, $re_scan);

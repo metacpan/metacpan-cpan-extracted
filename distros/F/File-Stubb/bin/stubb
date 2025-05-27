@@ -39,7 +39,7 @@ multiple files at once.
 =head2 Templates
 
 B<stubb> creates stubs from pre-existing template files and directories found in
-one of B<stubb>'s template directory. A B<stubb> template file can contain
+one of B<stubb>'s template directories. A B<stubb> template file can contain
 "substitution targets" that allow you to customize a render by supplying
 substitution parameters.
 

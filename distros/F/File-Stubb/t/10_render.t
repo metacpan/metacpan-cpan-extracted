@@ -232,100 +232,53 @@ unlink $TMP;
 
 SKIP: {
 
+    skip('shell rendering is unreliable on Windows', 4) if $^O eq 'MSWin32';
+
     qx/echo "" 2>&1/;
     skip('echo failed', 4) unless ($? >> 8) == 0;
 
-    if ($^O eq 'MSWin32') {
+    $render = File::Stubb::Render->new(
+        template => File::Spec->catfile($TEMPLATES, 'shell.stubb'),
+        subst => $SUBST,
+    );
 
-        $render = File::Stubb::Render->new(
-            template => File::Spec->catfile($TEMPLATES, 'win-shell.stubb'),
-            subst => $SUBST,
-        );
+    isa_ok($render, 'File::Stubb::Render');
 
-        isa_ok($render, 'File::Stubb::Render');
+    $targets = $render->targets;
 
-        $targets = $render->targets;
+    is_deeply(
+        $targets,
+        {
+            basic => [],
+            perl  => [],
+            shell => [
+                q!echo "$one"!,
+                q!echo "$three"!,
+                q!echo "$one $two $three"!,
+                q!echo "$four"!,
+            ],
+        },
+        'targets() ok'
+    );
 
-        is_deeply(
-            $targets,
-            {
-                basic => [],
-                perl  => [],
-                shell => [
-                    q!echo %one%!,
-                    q!echo %three%!,
-                    q!echo %one% %two% %three%!,
-                    q!echo %four%!,
-                ],
-            },
-            'targets ok'
-        );
+    @created = $render->render($TMP);
 
-        @created = $render->render($TMP);
+    is_deeply(
+        \@created,
+        [ $TMP ],
+        'render() ok'
+    );
 
-        is_deeply(
-            \@created,
-            [ $TMP ],
-            'render() ok'
-        );
-
-        is(
-            slurp($TMP),
-            <<'HERE',
-My favorite number: 1
-My third favorite number: 3
-My three favorite numbers: 1 2 3
-Maybe a number? %four%
-HERE
-            'Shell target rendering ok'
-        );
-
-    } else {
-
-        $render = File::Stubb::Render->new(
-            template => File::Spec->catfile($TEMPLATES, 'shell.stubb'),
-            subst => $SUBST,
-        );
-
-        isa_ok($render, 'File::Stubb::Render');
-
-        $targets = $render->targets;
-
-        is_deeply(
-            $targets,
-            {
-                basic => [],
-                perl  => [],
-                shell => [
-                    q!echo "$one"!,
-                    q!echo "$three"!,
-                    q!echo "$one $two $three"!,
-                    q!echo "$four"!,
-                ],
-            },
-            'targets() ok'
-        );
-
-        @created = $render->render($TMP);
-
-        is_deeply(
-            \@created,
-            [ $TMP ],
-            'render() ok'
-        );
-
-        is(
-            slurp($TMP),
-            <<'HERE',
+    is(
+        slurp($TMP),
+        <<'HERE',
 My favorite number: 1
 My third favorite number: 3
 My three favorite numbers: 1 2 3
 Maybe a number? 
 HERE
-            'Shell target rendering ok'
-        );
-
-    }
+        'Shell target rendering ok'
+    );
 
     unlink $TMP;
 

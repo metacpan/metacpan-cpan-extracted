@@ -1,4 +1,9 @@
 Revision history for Perl extension RPi::MultiPCA9685.
+0.08  Mon May 26 18:51:19 2025
+        - prevent disablePWM from error messages when called before init_PWM 
+          has run.
+0.07  Mon May 26 11:45:13 2025
+        - Bad setup - replaced by 0.08
 0.06  Sun Feb 02 08:45:49 2024
         - added a new function: disablePWM. This allows to switch off  the PWM
           output for all channels. After disabling, the required channels need

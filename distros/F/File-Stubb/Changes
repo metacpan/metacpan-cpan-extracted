@@ -1,4 +1,10 @@
 Revision history for stubb (File::Stubb)
 
+0.02  May 26 2025
+  - Skip shell rendering tests on Windows.
+  - Update example templates.
+  - Add JSON::PP to module dependencies.
+  - Fix grammar in documentation.
+
 0.01  May 22 2025
   - Initial release.

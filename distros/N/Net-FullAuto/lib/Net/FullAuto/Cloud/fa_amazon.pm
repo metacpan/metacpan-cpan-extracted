@@ -142,7 +142,8 @@ END
                    unless ($stderr=~/python: command not found/) {
                       ($stdout,$stderr)=$handle->cmd( 
                          'echo Y | pip uninstall awscli','__display__');
-                      # https://stackoverflow.com/questions/30809822/how-to-get-aws-command-line-interface-to-work-in-cygwin
+                      # https://stackoverflow.com/questions/30809822/
+                      # how-to-get-aws-command-line-interface-to-work-in-cygwin
                       ($stdout,$stderr)=$handle->cmd(
                          'wget --random-wait --progress=dot '.
                          'rawgit.com/transcode-open/apt-cyg/master/apt-cyg',
@@ -175,8 +176,10 @@ END
                     ($stdout,$stderr)=$handle->cmd('./aws/install');
                  }
               }
-              $Net::FullAuto::Cloud::fa_amazon::configure_aws->($aws_access_key_id,$aws_secret_access_key,$handle);
-              next
+              $Net::FullAuto::Cloud::fa_amazon::configure_aws->(
+                 $aws_access_key_id,$aws_secret_access_key,$handle);
+              #next
+              last
             }
          }
       } else { last }
@@ -209,6 +212,7 @@ sub setup_aws_security {
       my $region=$hash->{Reservations}->[0]->{Instances}->[0]->{Placement}->{AvailabilityZone};
       my $subnet_id=$hash->{Reservations}->[0]->{Instances}->[0]->{NetworkInterfaces}->[0]->{SubnetId};
       chop($region);
+      $region||='us-west-2';
       my $sg=$hash->{Reservations}->[0]->{Instances}->[0]
                   ->{SecurityGroups}->[0]->{GroupName};
       if ($security_group eq $sg) {
@@ -251,7 +255,36 @@ sub setup_aws_security {
                   ->{SecurityGroups}->[0]->{GroupName};
       print "\n   NEW SECURITY GROUP -> $sg\n\n";
       return "$sg assigned to this host",'';
-   } else { return '','NOT AN AWS HOST' }
+   } else {
+      my $c='aws ec2 describe-security-groups '.
+            "--group-names $security_group";
+      my ($hash,$output,$error)=run_aws_cmd($c,$handle);
+      return '',$error if $error;
+      my $cidr=$hash->{SecurityGroups}->[0]->{IpPermissions}
+              ->[0]->{IpRanges}->[0]->{CidrIp};
+      $c='aws ec2 create-security-group --group-name '.
+         "$security_group --description ".
+         "\"$group_description\" 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
+      return '',$error if $error;
+      $c='aws ec2 authorize-security-group-ingress '.
+         "--group-name $security_group --protocol ".
+         'tcp --port 22 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
+      return '',$error if $error;
+      $c='aws ec2 authorize-security-group-ingress '.
+         "--group-name $security_group --protocol ".
+         'tcp --port 80 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
+      return '',$error if $error;
+      $c='aws ec2 authorize-security-group-ingress '.
+         "--group-name $security_group --protocol ".
+         'tcp --port 443 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c,$handle);
+      print "\n   NEW SECURITY GROUP -> $security_group\n\n";
+      return '',$error if $error;
+      return "$security_group created",'';
+   }
 }
 
 sub get_aws_security_id {
@@ -497,18 +530,24 @@ our $aws_configure=sub {
       $main::aws->{access_id}="]I[{'configure_aws2',1}";
       $main::aws->{secret_key}="]I[{'configure_aws2',2}";
    }
-   my ($stdout,$stderr)=$handle->cmd(
-      'curl -X PUT "http://169.254.169.254/latest/api/token" '.
-      '-H "X-aws-ec2-metadata-token-ttl-seconds: 21600"');
-   my $token=$stdout;
-   ($stdout,$stderr)=$handle->cmd(
-      "curl -H \"X-aws-ec2-metadata-token: $token\" ".
-      'http://169.254.169.254/latest/meta-data/instance-id');
-   my $instance_id=$stdout;
+   my $region='';
+   if (is_host_aws()) {
+      my ($stdout,$stderr)=$handle->cmd(
+         'curl -X PUT "http://169.254.169.254/latest/api/token" '.
+         '-H "X-aws-ec2-metadata-token-ttl-seconds: 21600"');
+      my $token=$stdout;
       ($stdout,$stderr)=$handle->cmd(
-      "curl -H \"X-aws-ec2-metadata-token: $token\" ".
-      'http://169.254.169.254/latest/meta-data/placement/region');
-   my $region=$stdout;
+         "curl -H \"X-aws-ec2-metadata-token: $token\" ".
+         'http://169.254.169.254/latest/meta-data/instance-id');
+      my $instance_id=$stdout;
+         ($stdout,$stderr)=$handle->cmd(
+         "curl -H \"X-aws-ec2-metadata-token: $token\" ".
+         'http://169.254.169.254/latest/meta-data/placement/region');
+      $region=$stdout;
+   }
+   $region||='us-west-2';
+   # us-west-2 is default region
+   # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html
    my $homedir='.';
    my $handle_homedir='';
    my $handle_username='';
@@ -598,8 +637,13 @@ our $aws_configure=sub {
             unless $homedir eq "/home/$username";
          my $group=$username;
          $group='Administrators' if $username eq 'Administrator';
-         system("${sudo}chown -R $username:$group /home/$username/.aws");
-         system("${sudo}chmod 755 /home/$username/.aws");
+         if ($username eq 'root') {
+            system("${sudo}chown -R $username:$group /$username/.aws");
+            system("${sudo}chmod 755 /$username/.aws");
+         } else {
+            system("${sudo}chown -R $username:$group /home/$username/.aws");
+            system("${sudo}chmod 755 /home/$username/.aws");
+         }
       }
    };
    if ($handle) {
@@ -623,11 +667,19 @@ our $aws_configure=sub {
       #$handle->cmd($sudo.
       #   "cp -Rv $homedir/.aws /home/$handle_username",'__display__');
       $group='Administrators' if $handle_username eq 'Administrator';
-      $handle->cmd($sudo.
-         "chown -Rv $handle_username:$group /home/$handle_username/.aws",
-         '__display__');
-      $handle->cmd($sudo.
-         "chmod -v 755 /home/$handle_username/.aws",'__display__');
+      if ($handle_username eq 'root') {
+         $handle->cmd($sudo.
+            "chown -Rv $handle_username:$group /$handle_username/.aws",
+            '__display__');
+         $handle->cmd($sudo.
+            "chmod -v 755 /$handle_username/.aws",'__display__');
+      } else {
+         $handle->cmd($sudo.
+            "chown -Rv $handle_username:$group /home/$handle_username/.aws",
+            '__display__');
+         $handle->cmd($sudo.
+            "chmod -v 755 /home/$handle_username/.aws",'__display__');
+      }
    }
 };
 

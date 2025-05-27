@@ -20,9 +20,10 @@ my %WriteMakefileArgs = (
         'File::Temp' => '0',
     },
     PREREQ_PM => {
-	    'Getopt::Long' => '0',
         'File::Basename' => '0',
         'File::Spec' => '0',
+        'Getopt::Long' => '0',
+        'JSON::PP' => '0',
         'Tie::Hash' => '0',
     },
     EXE_FILES => [

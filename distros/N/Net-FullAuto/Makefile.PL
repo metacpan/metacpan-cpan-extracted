@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000821';
+our $VERSION='1.0000822';
 
 #print `env`,"\n\n\n";
 
@@ -990,7 +990,7 @@ if ($^O eq 'cygwin') {
       foreach my $package ('gcc-core','gcc-g++','make','openssh','openssl',
                            'libssl-devel','perl','db','libdb-devel','zip',
                            'ncurses','cron','inetutils','procps-ng','vim',
-                           'unzip','libmpfr4','libcrypt-devel','nano',
+                           'unzip','libmpfr4','libcrypt-devel','nano','tar',
                            'perl-libwww-perl','perl-LWP-Protocol-https',
                            'wget','git','figlet','autobuild','autoconf',
                            'automake','libtool','libxml2','libxml2-devel',
@@ -1005,7 +1005,7 @@ if ($^O eq 'cygwin') {
                            'libssl-devel','perl','perl-Win32','db4.8',
                            'libdb4.8-devel','ncurses','cron','inetutils',
                            'procps','vim','unzip','libmpfr4','nano','zip',
-                           'wget','git','figlet') {
+                           'wget','git','tar','figlet') {
          unless (-1<index $cygcheck, "$package ") {
             $need_packages{$package}='';
          }
@@ -1372,6 +1372,9 @@ END
    }
    unless (-1<index $yins,'wget') {
       fa_system("sudo yum -y install 'wget'");
+   }
+   unless (-1<index $yins,'tar') {
+      fa_system("sudo yum -y install 'tar'");
    }
    install_figlet();
    unless (-1<index $yins,'nano') {
@@ -1790,12 +1793,12 @@ sub fa_install_mod {
    my $cpan_error='';
    unless (exists $amazon{instance_type} &&
          $amazon{instance_type}=~/micro|nano/) {
-      eval {
-         local $SIG{__DIE__}; # No sigdie handler
-         require CPAN::Mini;
-         import CPAN::Mini;
-      };
       if (!$@ && grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
+         eval {
+            local $SIG{__DIE__}; # No sigdie handler
+            require CPAN::Mini;
+            import CPAN::Mini;
+         };
          my $distribution = CPAN::Shell->expand(
                "Module",$p 
             )->distribution()->pretty_id();
@@ -2360,7 +2363,6 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Test::RequiresInternet','install','Makefile');
    &fa_install_module('LWP','install','Makefile');
    &fa_install_module('File::HomeDir','install','Makefile');
-   &fa_install_module('CPAN::Mini','install','Makefile');
    &fa_install_module('ExtUtils::MakeMaker','install','Makefile');
    &fa_install_module('File::Which','install','Makefile');
    &fa_install_module('Term::ReadKey','install','Makefile');
@@ -2395,6 +2397,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Compress::Raw::Bzip2','install','Makefile');
    &fa_install_module('Compress::Raw::Zlib','install','Makefile');
    &fa_install_module('Compress::Zlib','install','Makefile');
+   &fa_install_module('CPAN::Mini','install','Makefile');
    &fa_install_module('CPAN::Meta::YAML','install','Makefile');
    &fa_install_module('Parse::CPAN::Meta','install','Makefile');
    &fa_install_module('CPAN::Meta::Requirements','install','Makefile');

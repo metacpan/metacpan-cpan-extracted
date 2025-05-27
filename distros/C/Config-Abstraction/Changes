@@ -1,5 +1,9 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.29	Mon May 26 20:55:38 EDT 2025
+	Also look in ${script_name}.cfg, ${script_name}.conf and ${script_name}.config
+	Allow new() to accept just one parameter - the name of a file
+
 0.28	Sat May 24 09:00:10 EDT 2025
 	Look in the current directory, unless given an absolute path
 

@@ -8,7 +8,7 @@ my %WriteMakefileArgs = (
     AUTHOR           => q{#^^whoami^^ <#^^whoami^^@#^^hostname^^>},
     VERSION_FROM     => 'lib/$^^$_{modnam}=~s/::/\//gr^^.pm',
     ABSTRACT_FROM    => 'lib/$^^$_{modnam}=~s/::/\//gr^^.pm',
-    LICENSE          => '^^license//gpl_3^^',
+    LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.016',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

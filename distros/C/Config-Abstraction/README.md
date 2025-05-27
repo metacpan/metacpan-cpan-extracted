@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.27
+Version 0.29
 
 # SYNOPSIS
 
@@ -218,6 +218,8 @@ Options:
     The default is a `'.'`,
     as in dotted notation,
     such as `'database.user'`.
+
+If just one argument is given, it is assumed to be the name of a file.
 
 ## get(key)
 

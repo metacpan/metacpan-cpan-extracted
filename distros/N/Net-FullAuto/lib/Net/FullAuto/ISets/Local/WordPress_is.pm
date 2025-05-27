@@ -644,7 +644,7 @@ if ($do==1) {
       "ln -s /usr/local/bin/make gmake");
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://www.sourceware.org/bzip2/');
+      'wget --no-check-certificate -qO- https://www.sourceware.org/bzip2/');
    $stdout=~s/^.*?stable version is bzip2 ([\d\.]*\d)\..*$/$1/s;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "ls -1 /usr/local/lib | grep libbz2.so.$stdout");

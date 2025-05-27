@@ -36,7 +36,7 @@ WriteMakefile(
 		# 'XML::Parser::Expat' => 0,	# Seems to be needed for Windows
 		# 'XML::LibXML' => 0,	# do.
 		# 'XML::Simple' => 0,
-		'XML::PP' => 0.05,
+		'XML::PP' => 0.06,
 		'File::Spec' => 0,
 		'Hash::Merge'	=> 0,
 		'Hash::Flatten'	=> 0,

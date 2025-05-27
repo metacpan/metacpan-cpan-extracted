@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,12 +35,12 @@ requires:
   JSON::MaybeXS: '0'
   JSON::Parse: '0'
   Params::Get: '0.04'
-  XML::PP: '0.05'
+  XML::PP: '0.06'
   YAML::XS: '0'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/nigelhorne/Config-Abstraction/issues
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,14 +1,11 @@
 bin/stubb
 Changes
 examples/perl.stubb/Changes
+examples/perl.stubb/LICENSE
 examples/perl.stubb/Makefile.PL
 examples/perl.stubb/MANIFEST.SKIP
 examples/perl.stubb/README.md
 examples/pl.stubb
-examples/slackbuild.stubb/^^prgnam^^.info
-examples/slackbuild.stubb/^^prgnam^^.SlackBuild
-examples/slackbuild.stubb/README
-examples/slackbuild.stubb/slack-desc
 lib/File/Stubb.pm
 lib/File/Stubb/Home.pm
 lib/File/Stubb/Render.pm
@@ -37,4 +34,3 @@ t/data/templates/none.stubb
 t/data/templates/not.stubb
 t/data/templates/perl.stubb
 t/data/templates/shell.stubb
-t/data/templates/win-shell.stubb

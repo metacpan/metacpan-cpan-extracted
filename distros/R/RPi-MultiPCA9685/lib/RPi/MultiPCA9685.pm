@@ -1,6 +1,6 @@
 package RPi::MultiPCA9685;
 use 5.006;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our @ISA = qw();
 use strict;
 use warnings;
@@ -34,6 +34,7 @@ sub init_PWM {
 # Disable PWM - powers off all devices
 #----------------------------------------------------------
 sub disablePWM {
+  return unless defined $num_PWMPCBs;      # Only disable if init has been done before
   my $j;
   for ($j=0;$j<=$num_PWMPCBs;$j++){        # disable all PWM PCBs - every 16 ports switch to the next i2c address
     $dev[$j]->write_block([0,0,0,0],250);  # disable PWM for all channels via chip Register FAh(250)
