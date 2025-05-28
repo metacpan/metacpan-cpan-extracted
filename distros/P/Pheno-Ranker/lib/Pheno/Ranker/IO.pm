@@ -27,7 +27,6 @@ use constant DEVEL_MODE => 0;
 #########################
 
 sub serialize_hashes {
-
     my $arg             = shift;
     my $data            = $arg->{data};
     my $export_basename = $arg->{export_basename};
@@ -38,7 +37,6 @@ sub serialize_hashes {
 }
 
 sub write_alignment {
-
     my $arg       = shift;
     my $basename  = $arg->{align};
     my $ascii     = $arg->{ascii};
@@ -58,7 +56,6 @@ sub write_alignment {
 }
 
 sub io_yaml_or_json {
-
     my $arg  = shift;
     my $file = $arg->{filepath};
     my $mode = $arg->{mode};
@@ -95,7 +92,6 @@ sub io_yaml_or_json {
 }
 
 sub read_json {
-
     my $file = shift;
     my $str;
     if ($file =~ /\.gz$/) {
@@ -128,7 +124,6 @@ sub read_yaml {
 }
 
 sub write_json {
-
     my $arg       = shift;
     my $file      = $arg->{filepath};
     my $json_data = $arg->{data};
@@ -140,7 +135,6 @@ sub write_json {
 }
 
 sub write_yaml {
-
     my $arg       = shift;
     my $file      = $arg->{filepath};
     my $json_data = $arg->{data};
@@ -150,7 +144,6 @@ sub write_yaml {
 }
 
 sub write_array2txt {
-
     my $arg  = shift;
     my $file = $arg->{filepath};
     my $data = $arg->{data};
@@ -161,7 +154,6 @@ sub write_array2txt {
 }
 
 sub write_poi {
-
     my $arg         = shift;
     my $ref_data    = $arg->{ref_data};
     my $poi         = $arg->{poi};
@@ -184,7 +176,6 @@ sub write_poi {
 }
 
 sub array2object {
-
     my $data = shift;
     if ( ref $data eq ref [] ) {
         my $n = @$data;
@@ -200,7 +191,6 @@ sub array2object {
 }
 
 sub validate_json {
-
     my $file = shift;
     my $data = ( $file && -f $file ) ? read_yaml($file) : undef;
 
@@ -246,7 +236,6 @@ sub validate_json {
 }
 
 sub coverage_stats {
-
     my $data     = shift;
     my $coverage = {};
 
@@ -277,7 +266,6 @@ sub coverage_stats {
 }
 
 sub check_existence_of_include_terms {
-
     my ( $coverage, $include_terms ) = @_;
 
     # Return true if include_terms is empty
@@ -289,7 +277,6 @@ sub check_existence_of_include_terms {
 }
 
 sub append_and_rename_primary_key {
-
     my $arg             = shift;
     my $ref_data        = $arg->{ref_data};
     my $append_prefixes = $arg->{append_prefixes};
@@ -358,7 +345,6 @@ sub append_and_rename_primary_key {
 }
 
 sub check_null_primary_key {
-
     my $arg         = shift;
     my $id          = $arg->{id};
     my $count       = $arg->{count};
@@ -371,7 +357,6 @@ sub check_null_primary_key {
 }
 
 sub restructure_pxf_interpretations {
-
     my ( $data, $self ) = @_;
 
     # Premature return if the format is not 'PXF'

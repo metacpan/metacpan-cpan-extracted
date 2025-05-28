@@ -13,7 +13,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3 + 23 * 11;
+use Test::More tests => 6 + 23 * 11;
+use Test::Warn;
 
 use WebService::AbuseIPDB::Category;
 use WebService::AbuseIPDB::Response;
@@ -35,10 +36,16 @@ for my $cid (1 .. 23) {
 	is ($cat[2], $cat[0], 'Same object');
 }
 
-my $cat = WebService::AbuseIPDB::Category->new ();
+my $cat;
+warnings_exist {$cat = WebService::AbuseIPDB::Category->new ();}
+	[qr/'new' requires an argument/],
+	'new() empty arguments warned';
 is ($cat, undef, 'Undef cat returns undef');
-$cat = WebService::AbuseIPDB::Category->new ('Not a cat');
+warnings_exist {$cat = WebService::AbuseIPDB::Category->new ('Not a cat');}
+	[qr/'Not a cat' is not a valid category/],
+	'new() invalid text catgeory warned';
 is ($cat, undef, 'Unrecognised cat returns undef');
-$cat = WebService::AbuseIPDB::Category->new
-	(WebService::AbuseIPDB::Response->new);
+warnings_exist {$cat = WebService::AbuseIPDB::Category->new (WebService::AbuseIPDB::Response->new);}
+	[qr/'WebService::AbuseIPDB::Response=HASH\(0x[0-9a-f]+\)' is not a valid category/],
+	'new() invalid object class warned';
 is ($cat, undef, 'Arg of wrong class returns undef');

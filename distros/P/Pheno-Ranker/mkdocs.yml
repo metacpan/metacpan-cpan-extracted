@@ -72,31 +72,31 @@ nav:
   - "🏠 Introduction":
       - "❓ What is Pheno-Ranker?": what-is-pheno-ranker.md
       - "📂 Input formats":
-          - "🗂 BFF": bff.md
-          - "📜 PXF": pxf.md
+          - "🧬 BFF": bff.md
+          - "📦 PXF": pxf.md
           - "🔄 Other formats": other-formats.md
   - "⬇️ Download & Installation": download-and-installation.md
   - "🌐 Web App User Interface": https://pheno-ranker.cnag.eu
   - "⚙️ Modes of operation":
-      - "📊 Cohort mode": cohort.md 
+      - "👥 Cohort mode": cohort.md 
       - "👤 Patient mode": patient.md
   - "🛠 Technical details":
       - "🏗 Implementation": implementation.md
-      - "📊 Algorithm": algorithm.md
+      - "⚙️  Algorithm": algorithm.md
       - "🧭 User workflow": user-workflow.md
   - "🧰 Utilities":
       - "📈 BFF/PXF plot": bff-pxf-plot.md 
       - "🧪 BFF/PXF simulator": bff-pxf-simulator.md
-      - "📑 CSV import": csv-import.md
+      - "📊 CSV import": csv-import.md
       - "🔲 QR code generator": qr-code-generator.md
   - "🚀 Use Cases":
       - "🏥 Phenopacket Corpus": phenopackets-corpus.md
       - "🧬 OMIM Database": omim-database.md
   - "🔗 Formats Beyond BFF/PXF": 
       - "📜 Generic JSON": generic-json.md
-      - "📑 CSV": csv-import.md
-      - "🏥 openEHR": open-ehr.md
-      - "🗄 OMOP-CDM": omop-cdm.md 
+      - "📊 CSV": csv-import.md
+      - "💊 openEHR": open-ehr.md
+      - "🏥 OMOP-CDM": omop-cdm.md 
       - "🧬 VCF": vcf.md
   - "❓ Help":
       - "📖 Google Colab": https://colab.research.google.com/drive/1n3Etu4fnwuDWNveSMb1SzuN50O2a05Rg#scrollTo=8tbJ0f5-hJAB

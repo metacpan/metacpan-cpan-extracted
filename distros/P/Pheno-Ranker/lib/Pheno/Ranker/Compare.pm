@@ -21,19 +21,17 @@ use constant DEVEL_MODE => 0;
 our %nomenclature = ();
 
 sub check_format {
-
     my $data = shift;
     return exists $data->[0]{subject} ? 'PXF' : 'BFF';
 }
 
 sub cohort_comparison {
-
     my ( $ref_binary_hash, $self ) = @_;
     my $out_file          = $self->{out_file};
     my $similarity_metric = $self->{similarity_metric_cohort};
 
     # Define limit #items for switching to whole matrix calculation
-    my $max_items = $self->{max_matrix_items_in_ram};
+    my $max_items = $self->{max_matrix_records_in_ram};
 
     # Inform about the start of the comparison process
     say "Performing COHORT comparison"
@@ -64,7 +62,7 @@ sub cohort_comparison {
 
     say "RAM efficient mode is: "
       . ( $switch ? "on" : "off" )
-      . " (max_matrix_items_in_ram: $max_items)"
+      . " (max_matrix_records_in_ram: $max_items)"
       if ( $self->{debug} || $self->{verbose} );
 
     # Opening file for output
@@ -135,7 +133,6 @@ sub cohort_comparison {
 }
 
 sub compare_and_rank {
-
     my $arg             = shift;
     my $glob_hash       = $arg->{glob_hash};
     my $ref_hash        = $arg->{ref_hash};
@@ -485,7 +482,6 @@ qq/$ref_key;$char1;$format{ $char1 . $char2 };$char2;$glob_hash->{$key};$distanc
 }
 
 sub recreate_array {
-
     my ( $glob_hash, $sorted_keys_glob_hash ) = @_;
     my @recreated_array;
     foreach my $key (@$sorted_keys_glob_hash) {
@@ -497,7 +493,6 @@ sub recreate_array {
 }
 
 sub create_glob_and_ref_hashes {
-
     my ( $array, $weight, $self ) = @_;
     my $primary_key = $self->{primary_key};
     my $glob_hash   = {};
@@ -541,7 +536,6 @@ sub create_glob_and_ref_hashes {
 }
 
 sub randomize_variables {
-
     my ( $glob_hash, $self ) = @_;
     my $max  = $self->{max_number_vars};
     my $seed = $self->{seed};
@@ -563,7 +557,6 @@ sub randomize_variables {
 }
 
 sub prune_excluded_included {
-
     my ( $hash, $self ) = @_;
     my @included = @{ $self->{include_terms} };
     my @excluded = @{ $self->{exclude_terms} };
@@ -594,7 +587,6 @@ sub prune_excluded_included {
 }
 
 sub set_excluded_phenotypicFeatures {
-
     my ( $hash, $switch, $format ) = @_;
 
     # Ensure phenotypicFeatures exist before processing
@@ -628,7 +620,6 @@ sub set_excluded_phenotypicFeatures {
 }
 
 sub remap_hash {
-
     my $arg    = shift;
     my $hash   = $arg->{hash};
     my $weight = $arg->{weight};
@@ -794,7 +785,6 @@ sub remap_hash {
 }
 
 sub add_hpo_ascendants {
-
     my ( $key, $nodes, $edges ) = @_;
 
     # First we obtain the ontology (0000539) from HP:0000539
@@ -836,7 +826,6 @@ sub add_hpo_ascendants {
 }
 
 sub add_id2key {
-
     my ( $key, $hash, $self ) = @_;
     my $id_correspondence    = $self->{id_correspondence}{ $self->{format} };
     my $array_regex_qr       = $self->{array_regex_qr};
@@ -938,7 +927,6 @@ sub add_id2key {
 }
 
 sub create_binary_digit_string {
-
     my ( $export, $weight, $glob_hash, $cmp_hash ) = @_;
     my %out_hash;
 
@@ -988,7 +976,6 @@ sub create_binary_digit_string {
 }
 
 sub parse_hpo_json {
-
     my $data = shift;
 
     # The <hp.json> file is a structured representation of the Human Phenotype Ontology (HPO) in JSON format.
@@ -1019,7 +1006,6 @@ sub parse_hpo_json {
 }
 
 sub prune_keys_with_weight_zero {
-
     my $hash_ref = shift;
 
     # Iterate over the keys of the hash
@@ -1031,7 +1017,6 @@ sub prune_keys_with_weight_zero {
 }
 
 sub guess_label {
-
     my $input_string = shift;
 
     if (
@@ -1049,7 +1034,6 @@ sub guess_label {
 }
 
 sub binary_to_base64 {
-
     my $binary_string = shift;
 
     # Convert binary string (e.g. "0010...") to raw bytes
@@ -1063,7 +1047,6 @@ sub binary_to_base64 {
 }
 
 sub _base64_to_binary {
-
     my ( $b64_string, $original_length ) = @_;
 
     # Decode the Base64 encoded compressed data

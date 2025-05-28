@@ -13,13 +13,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 25;
 use Test::MockModule;
-use JSON::XS;
+use Test::Warn;
 use WebService::AbuseIPDB;
 
-my $mock;
-my %MOCK;
+my ($res, $mock, %MOCK);
 if (defined $ENV{NO_NETWORK_TESTING} || !defined $ENV{AIPDB_KEY}) {
 
 	# Mock it
@@ -38,15 +37,25 @@ ok ($ipdb, 'Client object created');
 	contenttype => 'application/json',
 	code        => 200
 );
-my $res = $ipdb->blacklist (limit => 'foo');
+warnings_exist {$res = $ipdb->blacklist (limit => 'foo');}
+	[qr/limit must be a whole number/],
+	'non-integer limit warned';
 is ($res, undef, 'Limit must be an integer');
-$res = $ipdb->blacklist (limit => 0);
+warnings_exist {$res = $ipdb->blacklist (limit => 0);}
+	[qr/limit must be greater than zero/],
+	'zero limit warned';
 is ($res, undef, 'Limit must be > 0');
-$res = $ipdb->blacklist (min_abuse => 'foo');
+warnings_exist {$res = $ipdb->blacklist (min_abuse => 'foo');}
+	[qr/min_abuse must be a whole number/],
+	'non-integer min_abuse warned';
 is ($res, undef, 'Minimum abuse score must be an integer');
-$res = $ipdb->blacklist (min_abuse => 10);
+warnings_exist {$res = $ipdb->blacklist (min_abuse => 10);}
+	[qr/min_abuse is \d+ but must be greater than 24/],
+	'Too low min_abuse warned';
 is ($res, undef, 'Minimum abuse score must be > 24');
-$res = $ipdb->blacklist (min_abuse => 101);
+warnings_exist {$res = $ipdb->blacklist (min_abuse => 101);}
+	[qr/min_abuse is \d+ but must be less than 100/],
+	'Too high min_abuse warned';
 is ($res, undef, 'Minimum abuse score must be < 101');
 
 # Run it right

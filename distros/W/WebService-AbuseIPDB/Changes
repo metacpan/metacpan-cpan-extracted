@@ -1,5 +1,26 @@
 Revision history for WebService-AbuseIPDB
 
+0.04 2025-05-27
+    - No changes from 0.03_04
+
+0.03_04 2025-05-23
+    - TEST: use more "stable" endpoint for non-API test (GL issue #2)
+
+0.03_03 2025-05-20
+    - Handle service now returning 403 for duplicate reports
+    - Implement the check-block mechanism
+    - Bugtracker now uses https (thanks, szabgab)
+
+0.03_02 2020-09-02
+    - Add support for check-block endpoint
+    - Change all non-API URLs in tests to author-controlled ones
+
+0.03_01 2020-07-03
+    - 503s are now treated as unsuccessful (RT 132655)
+    - 500 series errors are less noisy
+    - Improved documentation of timeouts and POD links
+    - Further tests for errors
+
 0.03 2020-03-23
     - No changes from 0.02_04
 

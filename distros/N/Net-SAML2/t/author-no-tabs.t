@@ -31,6 +31,7 @@ my @files = (
     'lib/Net/SAML2/RequestedAttribute.pm',
     'lib/Net/SAML2/Role/ProtocolMessage.pm',
     'lib/Net/SAML2/Role/VerifyXML.pm',
+    'lib/Net/SAML2/Role/XMLLang.pm',
     'lib/Net/SAML2/SP.pm',
     'lib/Net/SAML2/Types.pm',
     'lib/Net/SAML2/Util.pm',

@@ -1,5 +1,9 @@
 Revision history for Perl distribution Pheno-Ranker
 
+1.06 2025-05-27:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Replace --max-matrix-items-in-ram by --max-matrix-records-in-ram
+
 1.05 2025-02-17:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Added key 'zlib_base64_*' to *.ref_binary_hash.json

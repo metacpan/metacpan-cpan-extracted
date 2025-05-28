@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -56,11 +56,11 @@
    "provides" : {
       "HealthCheck" : {
          "file" : "lib/HealthCheck.pm",
-         "version" : "v1.9.1"
+         "version" : "v1.9.2"
       },
       "HealthCheck::Diagnostic" : {
          "file" : "lib/HealthCheck/Diagnostic.pm",
-         "version" : "v1.9.1"
+         "version" : "v1.9.2"
       }
    },
    "release_status" : "stable",
@@ -74,8 +74,8 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck"
       }
    },
-   "version" : "v1.9.1",
-   "x_generated_by_perl" : "v5.38.0",
+   "version" : "v1.9.2",
+   "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

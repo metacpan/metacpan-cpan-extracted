@@ -8,7 +8,7 @@ use Net::CIDR::Set::IPv6;
 
 use overload '""' => 'as_string';
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ Net::CIDR::Set - Manipulate sets of IP addresses
 
 =head1 VERSION
 
-This document describes Net::CIDR::Set version 0.13
+This document describes Net::CIDR::Set version 0.15
 
 =head1 SYNOPSIS
 
@@ -251,8 +251,8 @@ sub _add_range {
 Add a number of addresses or ranges to a set.
 
   $set->add(
-    '10.0.0.0/8', 
-    '192.168.0.32-192.168.0.63', 
+    '10.0.0.0/8',
+    '192.168.0.32-192.168.0.63',
     '127.0.0.1'
   );
 
@@ -685,7 +685,7 @@ in the set in ascending order. This code
   my $set = Net::CIDR::Set->new(
     '192.168.37.9-192.168.37.134',
     '127.0.0.1',
-    '10.0.0.0/8' 
+    '10.0.0.0/8'
   );
   my $iter = $set->iterate_ranges;
   while ( my $range = $iter->() ) {
@@ -780,7 +780,9 @@ __END__
 
 =head1 AUTHOR
 
-Andy Armstrong  C<< <andy.armstrong@messagesystems.com> >>
+Andy Armstrong
+
+Maintained by Robert Rothenberg <rrwo@cpan.org>
 
 =head1 CREDITS
 
@@ -792,7 +794,7 @@ Wilson's L<Net::CIDR::Lite>.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
-Copyright (c) 2009, Message Systems, Inc.
+Copyright (c) 2009, 2014, 2025, Message Systems, Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or

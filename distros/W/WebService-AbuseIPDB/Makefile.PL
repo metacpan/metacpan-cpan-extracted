@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-my $release = '0.03';
+my $release = '0.04';
 my %MF = (
 	NAME             => 'WebService::AbuseIPDB',
 	AUTHOR           => 'Pete Houston <cpan@openstrike.co.uk>',
@@ -15,7 +15,7 @@ my %MF = (
 		'meta-spec' => { version => 2 },
 		resources   => {
 			bugtracker => {
-				web => 'http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AbuseIPDB'
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AbuseIPDB'
 			},
 			repository => {
 				type => 'git',
@@ -36,12 +36,20 @@ my %MF = (
 				file    => 'lib/WebService/AbuseIPDB/BlacklistResponse.pm',
 				version => $release
 			},
+			'WebService::AbuseIPDB::ReportedAddress' => {
+				file    => 'lib/WebService/AbuseIPDB/ReportedAddress.pm',
+				version => $release
+			},
 			'WebService::AbuseIPDB::Category' => {
 				file    => 'lib/WebService/AbuseIPDB/Category.pm',
 				version => $release
 			},
 			'WebService::AbuseIPDB::Response' => {
 				file    => 'lib/WebService/AbuseIPDB/Response.pm',
+				version => $release
+			},
+			'WebService::AbuseIPDB::CheckBlockResponse' => {
+				file    => 'lib/WebService/AbuseIPDB/CheckBlockResponse.pm',
 				version => $release
 			},
 			'WebService::AbuseIPDB::CheckResponse' => {
@@ -60,12 +68,14 @@ my %MF = (
 		'Test::More'       => '0.41',
 		'Test::Fatal'      => '0',
 		'Test::MockModule' => '0.14',
+		'Test::Warn'       => '0.37',
+		'Data::Dumper'     => '0'
 	},
 	PREREQ_PM => {
 		'IO::Socket::SSL'      => '1.31',
 		'REST::Client'         => '272',
 		'Carp'                 => '1.11',
-		'JSON::XS'             => '2.34',
+		'JSON::MaybeXS'        => '1.004000',
 		'LWP::Protocol::https' => '6.04',
 		'Scalar::Util'         => '1.14',
 		'URI'                  => '1.60'

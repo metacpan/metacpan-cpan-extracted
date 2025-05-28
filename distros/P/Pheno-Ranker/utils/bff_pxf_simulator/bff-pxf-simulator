@@ -9,7 +9,7 @@
 #
 #   $VERSION taken from Pheno::Ranker
 #
-#   Copyright (C) 2023-2024 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
+#   Copyright (C) 2023-2025 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
 #
 #   License: Artistic License 2.0
 #
@@ -26,7 +26,6 @@ randomize_ga4gh();
 exit;
 
 sub randomize_ga4gh {
-
     my $VERSION = '0.09';
     my $format  = 'bff';
     my $number  = 100;
@@ -124,7 +123,6 @@ sub new {
 }
 
 sub run {
-
     my $self        = shift;
     my $number      = $self->{number};
     my $format      = $self->{format};
@@ -163,7 +161,6 @@ sub run {
 }
 
 sub write_json {
-
     my $arg       = shift;
     my $file      = $arg->{filepath};
     my $json_data = $arg->{data};
@@ -175,7 +172,6 @@ sub write_json {
 }
 
 sub pxf_generator {
-
     my ( $id, $self ) = @_;
     my $result_hash = run_functions($self);
     my $pxf         = fake_hash(
@@ -198,7 +194,6 @@ sub pxf_generator {
 }
 
 sub merge_medical_actions {
-
     my $hash = shift;
 
     # Initialize empty arrays for treatments and procedures
@@ -223,7 +218,6 @@ sub merge_medical_actions {
 }
 
 sub bff_generator {
-
     my ( $id, $self ) = @_;
     my $default_array = [];
     my $result_hash   = run_functions($self);
@@ -254,7 +248,6 @@ sub bff_generator {
 ######################
 
 sub create_entries {
-
     my ( $params, $ontologies_array, $n, $max ) = @_;
     my $shuffled_slice = shuffle_slice( $max, $ontologies_array );
     my $array;
@@ -266,7 +259,6 @@ sub create_entries {
 }
 
 sub common_entry_creator {
-
     my ( $element, $params ) = @_;
     return {
         $params->{type}  => $element,
@@ -280,7 +272,6 @@ sub common_entry_creator {
 }
 
 sub phenotypicFeatures {
-
     my ( $format, $ontologies_array, $n, $max ) = @_;
     my $params = {
         type          => $format eq 'bff' ? 'featureType' : 'type',
@@ -291,7 +282,6 @@ sub phenotypicFeatures {
 }
 
 sub diseases {
-
     my ( $format, $ontologies_array, $n, $max ) = @_;
     my $params = {
         type          => $format eq 'bff' ? 'diseaseCode' : 'term',
@@ -302,7 +292,6 @@ sub diseases {
 }
 
 sub treatments {
-
     my ( $format, $ontologies_array, $n, $max ) = @_;
     my $params = {
         entry_creator => sub {
@@ -316,7 +305,6 @@ sub treatments {
 }
 
 sub procedures {
-
     my ( $format, $ontologies_array, $n, $max ) = @_;
     my $params = {
         type          => $format eq 'bff' ? 'procedureCode'  : 'term',
@@ -327,7 +315,6 @@ sub procedures {
 }
 
 sub exposures {
-
     my ( $format, $ontologies_array, $n, $max ) = @_;
     my $default_duration = 'P999Y';
     my $default_ontology_term =
@@ -348,7 +335,6 @@ sub exposures {
 }
 
 sub ethnicity {
-
     my ( undef, $ontologies_array, undef, $max ) = @_;
     my $shuffled_slice = shuffle_slice( $max, $ontologies_array );
     return $shuffled_slice->[0];
@@ -359,7 +345,6 @@ sub ethnicity {
 ####################
 
 sub load_ontology_hash {
-
     my $self = shift;
     my %ont  = (
         diseases           => $omim_array,
@@ -373,7 +358,6 @@ sub load_ontology_hash {
 }
 
 sub run_functions {
-
     my $self       = shift;
     my $ontologies = load_ontology_hash($self);
 
@@ -405,7 +389,6 @@ sub run_functions {
 }
 
 sub shuffle_slice {
-
     my ( $max, $array ) = @_;
 
     # head   -> 1.50 List::Util (5.26 has 1.4602)
@@ -434,7 +417,6 @@ sub fake_pick_mod {
 }
 
 sub validate_json {
-
     my $file   = shift;
     my $data   = read_yaml($file);
     my $schema = {
@@ -485,7 +467,6 @@ sub validate_json {
 }
 
 sub say_errors {
-
     my $errors = shift;
     if ( @{$errors} ) {
         say join "\n", @{$errors};

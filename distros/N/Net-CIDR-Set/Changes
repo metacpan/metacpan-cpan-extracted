@@ -1,14 +1,41 @@
 Revision history for Net-CIDR-Set
 
-0.10  2009-01-29
-      - Initial release
- 
-0.11  2009-01-29
-      - Remove broken cidrcalc
+0.15 2025-05-27 16:33:00+01:00 Europe/London
+  [Documentation]
+  - Add missing version and timestamp to Changes for v0.14.
 
-0.12  2009-05-29
-      - Move to GitHub 
+  [Other]
+  - Re-release due to possible bad signature.
+
+  - Fix MANIFEST.
+
+0.14 2025-05-27 16:16:23+01:00 Europe/London
+  [Security]
+  - CVE-2025-40911: Disallow IPv4 addresses with a leading 0 in the quads, e.g. "010.0.0.1".
+
+  [Documentation]
+  - Updated the current maintainer to Robert Rothenberg <rrwo@cpan.org>.
+
+  - Reversed the order of the Changes file to most-recent first.
+
+  - Updated copyright year.
+
+  [Other]
+  - Fixed minor typos in the MANIFEST.SKIP.
+
+  - Switch to Makefile.PL for building.
+
+  - Sign the distribution.
 
 0.13  2014-02-24
-      - Applied Brian Gottreu's fix for
-        https://rt.cpan.org/Public/Bug/Display.html?id=49632
+  - Applied Brian Gottreu's fix for
+    https://rt.cpan.org/Public/Bug/Display.html?id=49632
+
+0.12  2009-05-29
+  - Move to GitHub
+
+0.11  2009-01-29
+  - Remove broken cidrcalc
+
+0.10  2009-01-29
+  - Initial release

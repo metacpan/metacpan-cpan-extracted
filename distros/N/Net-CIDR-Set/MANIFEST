@@ -1,17 +1,19 @@
-Build.PL
 Changes
-inc/MyBuilder.pm
 lib/Net/CIDR/Set.pm
 lib/Net/CIDR/Set/IPv4.pm
 lib/Net/CIDR/Set/IPv6.pm
+Makefile.PL
 MANIFEST
+META.json
+META.yml
 README
 t/00-load.t
 t/basic.t
 t/ipv6.t
+t/is_cidr.t
 t/misc.t
+t/octal.t
 t/operations.t
 t/pod.t
 t/private.t
-META.yml
-META.json
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2;
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 require 5.012;
 
@@ -40,7 +40,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -112,11 +112,11 @@ version 0.81
 
 Support for the Web Browser SSO profile of SAML2.
 
-Net::SAML2 correctly perform the SSO process against numerous SAML
-Identity Providers (IdPs).  It has been tested against:
+Version 0.54 and newer support EncryptedAssertions. No changes required to
+existing SP applications if EncryptedAssertions are not in use.
 
-Version 0.54 and newer support EncryptedAssertions.  No changes required to existing
-SP applications if EncryptedAssertions are not in use.
+Net::SAML2 correctly perform the SSO process against numerous SAML
+Identity Providers (IdPs). It has been tested against:
 
 =over
 
@@ -180,7 +180,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2025 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

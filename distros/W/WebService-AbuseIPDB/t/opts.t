@@ -15,6 +15,7 @@ use warnings;
 
 use Test::More tests => 16;
 use Test::Fatal;
+use Test::Warn;
 use Test::MockModule;
 
 use WebService::AbuseIPDB;
@@ -35,12 +36,12 @@ is ($ipdb->{api_ver},        2,  'Version default is 2');
 is ($ipdb->{retry},          0,  'Retry default is 0');
 is ($ipdb->{ua}->getTimeout, 20, 'Timeout default is 20');
 $ipdb =
-  WebService::AbuseIPDB->new (key => $ENV{AIPDB_KEY}, timeout => 3, retry => 2,
+  WebService::AbuseIPDB->new (key => $ENV{AIPDB_KEY}, timeout => 2, retry => 1,
 	ver => 2);
 is ($ipdb->{api_ver}, 2, 'Version is 2');
 ok ($ipdb, 'Valid object with opts');
-is ($ipdb->{retry},          2, 'Retry is 2');
-is ($ipdb->{ua}->getTimeout, 3, 'Timeout is 3');
+is ($ipdb->{retry},          1, 'Retry is 1');
+is ($ipdb->{ua}->getTimeout, 2, 'Timeout is 2');
 
 my $mock;
 my %MOCK;
@@ -54,32 +55,41 @@ if (defined $ENV{NO_NETWORK_TESTING}) {
 
 %MOCK = (code => '500');
 $ipdb->{ua}->setHost ('http://abuseipdb.com:999/');
+my $res;
 my $start = time ();
-my $res   = $ipdb->check (ip => '1.1.1.1');
+warnings_exist {$res   = $ipdb->check (ip => '1.1.1.1');}
+	[(qr/REST error 500/) x 2],
+	'Error 500 warned';
 my $dur   = time () - $start;
 ok (!$res->successful, 'Check failed (timed out)');
 like (
 	$res->errors->[0]->{detail},
-	qr/could not connect/,
-	'Error is "could not connect"'
+	$ENV{NO_NETWORK_TESTING} ? qr/Server Problem/ :
+	qr/Can't connect to abuseipdb.com:999/,
+	q/Connection failure warned/
 );
-TODO: {
-	local $TODO = 'Bug: timeout acts twice';
-	cmp_ok (abs (9 - $dur), '<', 2, 'Timeout seems OK')
-	  or diag "Start: $start, Dur: $dur";
-}
+
+# Give up on the timing tests for now as there are far too many
+# variables: version of IO::Socket::IP, IPv4 yes/no, IPv6 yes/no,
+# actually number of addresses in each family to which the host
+# resolves, etc.
+#TODO: {
+#	local $TODO = 'Bug: timeout acts twice';
+#	cmp_ok (abs (9 - $dur), '<', 2, 'Timeout seems OK')
+#	  or diag "Start: $start, Dur: $dur";
+#}
 
 %MOCK = (
 	code        => '200',
 	contenttype => 'text/html; charset=utf-8'
 );
-$ipdb->{ua}->setHost ('https://www.w3.org/');
+$ipdb->{ua}->setHost ('https://duckduckgo.com/');
 $res = $ipdb->check (ip => '1.1.1.1');
 ok (!$res->successful, 'Check failed (not JSON)');
 like (
 	$res->errors->[0]->{detail},
 	qr/could not connect/,
-	'Error is "could not connect"'
+	q/Connection failure warned/
 );
 
 like (exception { $ipdb->_send_receive ('PUT', 'foo') },

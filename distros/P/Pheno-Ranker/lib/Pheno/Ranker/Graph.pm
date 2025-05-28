@@ -140,7 +140,6 @@ sub cytoscape2graph {
 }
 
 sub graph_stats {
-
     my ( $g, $output, $metric, $verbose ) = @_;
 
     # Open the output file

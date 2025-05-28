@@ -49,12 +49,12 @@ my %WriteMakefileArgs = (
     "URI::Encode" => 0,
     "URI::Escape" => 0,
     "URI::QueryParam" => 0,
-    "URN::OASIS::SAML2" => "0.004",
+    "URN::OASIS::SAML2" => "0.007",
     "XML::Enc" => "0.13",
     "XML::Generator" => "1.13",
     "XML::LibXML" => 0,
     "XML::LibXML::XPathContext" => 0,
-    "XML::Sig" => "0.64",
+    "XML::Sig" => "0.66",
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -72,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Pod::Coverage" => "1.04"
   },
-  "VERSION" => "0.81",
+  "VERSION" => "0.82",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t"
   }
@@ -125,12 +125,12 @@ my %FallbackPrereqs = (
   "URI::Encode" => 0,
   "URI::Escape" => 0,
   "URI::QueryParam" => 0,
-  "URN::OASIS::SAML2" => "0.004",
+  "URN::OASIS::SAML2" => "0.007",
   "XML::Enc" => "0.13",
   "XML::Generator" => "1.13",
   "XML::LibXML" => 0,
   "XML::LibXML::XPathContext" => 0,
-  "XML::Sig" => "0.64",
+  "XML::Sig" => "0.66",
   "namespace::autoclean" => 0
 );
 

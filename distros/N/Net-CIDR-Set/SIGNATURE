@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 c22b96f92b120d8a46da31b0e081000242510daecc383a1b91ee34715c5f7f69 Changes
+SHA256 5a02a02d27b62850c0c916b1ec012ca71b21593ac6cb82d01f9b23b20759b5fb MANIFEST
+SHA256 d2d2a338fbd780bd4b5b055b843aefb2b68b60f81020d7a260d83866c275570b META.json
+SHA256 3aba537db37b0f747812898569169dc0ca41d5c9920d2f3b47b59f2ae8f91b8d META.yml
+SHA256 db53ecf5003ccaaf43640e1521117b25810daaa4878fdc23a882e1d526994449 Makefile.PL
+SHA256 9b2f097bf8c4b6ff7d3ae2ece31cbb6654e9feb9609d0aee2f1264f54cc50d31 README
+SHA256 6e05667d03f4a32e75d52abe4fce0fd24fa7b00e7ccf290040ace4f636cf6d22 lib/Net/CIDR/Set.pm
+SHA256 0b0f84558eddd6b03a467a632e419c167788fb1c9f1777c87ac1bf0cb5a64a82 lib/Net/CIDR/Set/IPv4.pm
+SHA256 0b4e7567eb15cf5b160afaa55898848eb7b4ef17256f5a8acbec133c702b64c3 lib/Net/CIDR/Set/IPv6.pm
+SHA256 23367278754969396ab295c1decde22bb7d9d513a0dba9d68309a5c242918263 t/00-load.t
+SHA256 418b26a02b554bcf470d9f2f28750cc2a053f4ae21e722d42cad67bfde9bf37a t/basic.t
+SHA256 436dac01b388165bd739dc17e6003b623e9abfac69bde95104fbcc4f7b15edb4 t/ipv6.t
+SHA256 bcbb915b1eeb783580e56a3c29fc2fe72f7030f7807007805eecc1e8d96ddf23 t/is_cidr.t
+SHA256 3d904633d371863df574e3f7438576820ea7758848fb3743de4e9f981199c50e t/misc.t
+SHA256 057c4f0d470458199e5b8036d713bd3f4dc5ef9850e34b8f31f4304078c880f4 t/octal.t
+SHA256 606a78deb7e2c0dacba1512f92d1b51852a448ffebe8eabb77c27bdbb9d179a4 t/operations.t
+SHA256 505f0d5c68824b3d02df44fa02031c9a379939327af4ef3565166d713cd24f70 t/pod.t
+SHA256 adc7df1d52c8808f0e2779227a9f662477250c3ca69133cabe7b3934a05262e2 t/private.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmg13AwACgkQHmWrcYGD
+C6wo2Av+OkWO7lUn78EcZGOQ539SrbtQfDN52vncR1swFKhIwV2c1kMOPyQb0hth
+WY+wFJzzeT0qZJl8YcWx9SJZ4F8O8BpbdUvk3Da4Je+wN1b3rD035RWdN/k3OSgI
+3QS4z2y3EBRxvewBcverKjRzM1zZjgS22TdZkfg5BFA/1TQco/hsMt/NJaNmsAPg
+GZKOKu5mcZJu9ZSRZtjLsl+Nf5ghGZ/qQnpcYDWl6HPteYuO2UIrNUYGsRYTJJdY
+YVos3t14/QfQDiVaGKZNjQnoQD30X2BhyOzV3f2JW8jEv8ZWty00mkI3qTV67wk8
+q5tLmS1IwcjHo5tlNOWbRR/eSos7ED3jv9xr27p2/JsBQZQFo3aQEeEVsYR1gpox
+w5WW7KOxU831V4AMRb45GjqKxfXIU+2BPfswjwjwlla1GIZageG1f9eL+HWL1vCp
+SXN1ARXG04aP5pHYSiSRd/08/qYyOWcono8Xcg/Aq6oGokvsBRWiWgVPLFScFG0q
+89CSdCSe
+=R3q5
+-----END PGP SIGNATURE-----

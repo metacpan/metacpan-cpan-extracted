@@ -2,7 +2,9 @@ package Net::SAML2::AttributeConsumingService;
 use Moose;
 use XML::Generator;
 use URN::OASIS::SAML2 qw(URN_METADATA NS_METADATA);
-our $VERSION = '0.81'; # VERSION
+with 'Net::SAML2::Role::XMLLang';
+
+our $VERSION = '0.82'; # VERSION
 
 # ABSTRACT: An attribute consuming service object
 
@@ -66,8 +68,8 @@ sub to_xml {
             index     => $self->index,
             isDefault => $self->default ? 'true' : 'false',
         },
-        $xml->ServiceName($self->namespace, { 'xml:lang' => 'en' }, $self->service_name),
-        $self->_has_service_description ? $xml->ServiceDescription($self->namespace, { 'xml:lang' => 'en' }, $self->service_description) : (),
+        $xml->ServiceName($self->namespace, $self->lang, $self->service_name),
+        $self->_has_service_description ? $xml->ServiceDescription($self->namespace, $self->lang, $self->service_description) : (),
         map { $_->to_xml } @{ $self->attributes },
     );
 }
@@ -86,7 +88,7 @@ Net::SAML2::AttributeConsumingService - An attribute consuming service object
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -134,7 +136,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2025 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

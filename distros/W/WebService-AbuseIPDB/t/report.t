@@ -15,7 +15,8 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
-use JSON::XS;
+use Test::Warn;
+use JSON::MaybeXS;
 
 use WebService::AbuseIPDB;
 
@@ -23,7 +24,7 @@ my %map = (
 	score => 'abuseConfidenceScore',
 	ip    => 'ipAddress'
 );
-plan tests => 12 + 2 * keys %map;
+plan tests => 15 + 2 * keys %map;
 
 my $mock;
 my %MOCK;
@@ -41,9 +42,14 @@ my $ipdb = WebService::AbuseIPDB->new (key => $ENV{AIPDB_KEY});
 ok ($ipdb, 'Client object created');
 
 # Bad reports - Check the diagnostics from these
-my $res = $ipdb->report (ip => '8.8.8.8');
+my $res;
+warnings_exist {$res = $ipdb->report (ip => '8.8.8.8');}
+	[qr/No 'categories' key in argument hash/],
+	'Missing categories key warned';
 ok (!$res, 'Categories missing');
-$res = $ipdb->report (categories => [4, 5]);
+warnings_exist {$res = $ipdb->report (categories => [4, 5]);}
+	[qr/No 'ip' key in argument hash/],
+	'Missing ip key warned';
 ok (!$res, 'IP missing');
 %MOCK = (
 	response => {
@@ -57,7 +63,9 @@ ok (!$res, 'IP missing');
 	contenttype => 'application/json',
 	code        => '429'
 );
-$res = $ipdb->report (ip => '127.0.0.2', categories => [46, 55]);
+warnings_exist {$res = $ipdb->report (ip => '127.0.0.2', categories => [46, 55]);}
+	[qr/'46' is not a valid category/, qr/'55' is not a valid category/],
+	'invalid category numbers warned';
 ok (!$res->successful, 'Bad categories');
 my $err = $res->errors;
 ok (defined $err, 'Has "errors"');
@@ -111,13 +119,13 @@ while (my ($meth, $key) = each %map) {
 			{   detail =>
 				  'You can only report the same IP address (`127.0.0.2`)' .
 				  ' once in 15 minutes.',
-				status => '429',
+				status => '403',
 				source => {parameter => 'ip'}
 			}
 		]
 	},
 	contenttype => 'application/json',
-	code        => '429'
+	code        => '403'
 );
 
 $res = $ipdb->report (ip => $classc . $iter, categories => [7, 11]);
@@ -126,7 +134,7 @@ $err = $res->errors;
 ok (defined $err, 'Has "errors"');
 SKIP: {
 	skip 'Oddly, no errors', 1 unless defined $err;
-	is ($err->[0]->{status}, '429', 'Status code is 429');
+	is ($err->[0]->{status}, '403', 'Status code is 403');
 }
 
 done_testing ();

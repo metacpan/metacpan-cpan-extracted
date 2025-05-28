@@ -2,35 +2,35 @@
 use strict;
 use warnings;
 use File::Spec::Functions qw(catfile);
-use File::Temp qw{ tempfile };    # core
-use Test::More tests => 4;        # Indicate the number of tests you want to run
+use File::Temp            qw{ tempfile };    # core
+use Test::More tests => 4;                   # Indicate the number of tests you want to run
 use File::Compare;
 use lib ( './lib', '../lib' );
 use Pheno::Ranker;
 
 my $data = {
-    "age"                      => 0,
-    "align"                    => undef,
-    "align_basename"           => "alignment",
-    "append_prefixes"          => [],
-    "cli"                      => undef,
-    "debug"                    => undef,
-    "exclude_terms"            => [],
-    "export"                   => undef,
-    "hpo_file"                 => undef,
-    "include_hpo_ascendants"   => undef,
-    "include_terms"            => [],
-    "log"                      => "",
-    "max_matrix_items_in_ram" => undef,
+    "age"                       => 0,
+    "align"                     => undef,
+    "align_basename"            => "alignment",
+    "append_prefixes"           => [],
+    "cli"                       => undef,
+    "debug"                     => undef,
+    "exclude_terms"             => [],
+    "export"                    => undef,
+    "hpo_file"                  => undef,
+    "include_hpo_ascendants"    => undef,
+    "include_terms"             => [],
+    "log"                       => "",
+    "max_matrix_records_in_ram" => undef,
     "max_number_vars"           => undef,
-    "max_out"                  => 36,
-    "patients_of_interest"     => [],
-    "poi_out_dir"              => undef,
-    "sort_by"                  => undef,
-    "similarity_metric_cohort" => undef,
-    "target_file"              => undef,
-    "verbose"                  => undef,
-    "weights_file"             => undef
+    "max_out"                   => 36,
+    "patients_of_interest"      => [],
+    "poi_out_dir"               => undef,
+    "sort_by"                   => undef,
+    "similarity_metric_cohort"  => undef,
+    "target_file"               => undef,
+    "verbose"                   => undef,
+    "weights_file"              => undef
 };
 
 ##########

@@ -40,10 +40,19 @@ $acs = Net::SAML2::AttributeConsumingService->new(
     service_description => "Some thing",
     index               => 1,
     default             => 1,
+    lang => 'nl',
 );
 $acs->add_attribute($attr);
 
 $xpath = get_xpath($acs->to_xml, md => URN_METADATA);
+$node
+  = get_single_node_ok($xpath, '/md:AttributeConsumingService/md:ServiceName');
+is(
+    $node->getAttribute('xml:lang'),
+    "nl",
+    ".. and has the correct xml:lang"
+);
+
 $node  = get_single_node_ok($xpath, '/md:AttributeConsumingService');
 is($node->getAttribute('index'), '1', ".. with the correct index");
 ok($node->getAttribute('isDefault'), ".. and is the default");
@@ -58,5 +67,6 @@ is(
 $node = get_single_node_ok($xpath,
     '/md:AttributeConsumingService/md:ServiceDescription');
 is($node->textContent(), "Some thing", ".. and has the correct content");
+
 
 done_testing;

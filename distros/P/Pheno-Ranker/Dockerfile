@@ -35,6 +35,9 @@ RUN apt-get update && \
 WORKDIR /usr/share/
 RUN git clone https://github.com/CNAG-Biomedical-Informatics/pheno-ranker.git
 
+# Remove the .git folder to save space and avoid shipping VCS data
+RUN rm -rf pheno-ranker/.git
+
 # Install Perl and Python dependencies
 WORKDIR /usr/share/pheno-ranker
 RUN cpanm --notest --installdeps .
@@ -53,6 +56,3 @@ RUN groupadd -g "${GID}" dockeruser && \
 
 # To change default user from root -> dockeruser
 #USER dockeruser
-
-# Get back to entry dir
-WORKDIR /usr/share/pheno-ranker

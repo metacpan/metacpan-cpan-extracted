@@ -33,12 +33,12 @@ requires "URI" => "0";
 requires "URI::Encode" => "0";
 requires "URI::Escape" => "0";
 requires "URI::QueryParam" => "0";
-requires "URN::OASIS::SAML2" => "0.004";
+requires "URN::OASIS::SAML2" => "0.007";
 requires "XML::Enc" => "0.13";
 requires "XML::Generator" => "1.13";
 requires "XML::LibXML" => "0";
 requires "XML::LibXML::XPathContext" => "0";
-requires "XML::Sig" => "0.64";
+requires "XML::Sig" => "0.66";
 requires "namespace::autoclean" => "0";
 requires "perl" => "5.014";
 

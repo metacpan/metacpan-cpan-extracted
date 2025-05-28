@@ -1,5 +1,33 @@
 Revision history for Perl extension Net::SAML2.
 
+0.82 -- Tue May 27 20:37:54 ADT 2025
+
+     [Compatibility Deprecation Warning]
+     As of Release 0.79 the following have been changed and the old version may be
+     removed in an upcoming release.
+
+     - Net::SAML2::Protocol::Artifact
+         - response_to changed to in_response_to
+     - Net::SAML2::Protocol::LogoutResponse
+         - response_to changed to in_response_to
+
+    [Significant Changes]
+    - You can now specify that the "key" is signing only with "signing_only"
+    - Fixed bug when generating unsigned metadata xml
+    
+    [Detailed Change Log]
+    - 8ace397 (HEAD -> master, origin/master) Additional logging for testapp
+    - 7e4407c Work around regression in CryptX
+    - a838ce2 Bump URN::OASIS::SAML2 minimum version to 0.007
+    - ef31880 Reorder docs in Net::SAML2
+    - c448709 Allow setting the xml:lang, defaults to 'en'.
+    - 466d72e Bump the requirement for XML::Sig to 0.66
+    - 44110c4 Set key to be only for signing by adding signing_only in the SP
+    - 00a7c4b Fixes #234 Unsigned metadata can fail
+    - b23a0f6 Module::Pluggable - don't test
+    - 8a4b99c Bump repo version after release
+    - 7f2bfad v0.81
+
 0.81 -- Fri Aug 30 15:16:41 ADT 2024
 
      This release is dedicated to the memory of Abe Timmerman (ABELTJE)

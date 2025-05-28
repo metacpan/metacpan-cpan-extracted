@@ -98,7 +98,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         eval { My::Check->register_nonexistant };
         my $at = "at " . __FILE__ . " line " . My::Check->rne_line;
         is $@, "Can't determine what to do with 'nonexistent' $at$nl",
-            "Add nonexestant check from class.";
+            "Add nonexistent check from class.";
     }
     {
         local $@;
@@ -115,7 +115,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         };
         my $at = "at " . __FILE__ . " line " . ( __LINE__ - 3 );
         is $@, "'My::Check' cannot 'nonexistent' $at$nl",
-            "Add nonexestant method on class.";
+            "Add nonexistent method on class.";
     }
     {
         local $@;

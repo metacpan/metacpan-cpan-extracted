@@ -10,11 +10,11 @@ Nset::CIDR::Set::IPv6 - Encode / decode IPv6 addresses
 
 =head1 VERSION
 
-This document describes Net::CIDR::Set::IPv6 version 0.13
+This document describes Net::CIDR::Set::IPv6 version 0.15
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 sub new { bless \my $x, shift }
 
@@ -22,7 +22,7 @@ sub _pack_ipv4 {
   my @nums = split /[.]/, shift, -1;
   return unless @nums == 4;
   for ( @nums ) {
-    return unless /^\d{1,3}$/ and $_ < 256;
+    return unless /^\d{1,3}$/ and !/^0\d{1,2}$/ and $_ < 256;
   }
   return pack "CC*", 0, @nums;
 }
@@ -139,14 +139,16 @@ __END__
 
 =head1 AUTHOR
 
-Andy Armstrong  C<< <andy.armstrong@messagesystems.com> >>
+Andy Armstrong
+
+Maintained by Robert Rothenberg <rrwo@cpan.org>
 
 =head1 LICENCE AND COPYRIGHT
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
-Copyright (c) 2009, Message Systems, Inc.
+Copyright (c) 2009, 2014, 2025 Message Systems, Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or

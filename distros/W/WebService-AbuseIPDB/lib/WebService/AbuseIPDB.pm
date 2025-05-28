@@ -8,10 +8,10 @@ use warnings;
 use IO::Socket::SSL;
 use REST::Client;
 use Carp;
-use JSON::XS;
+use JSON::MaybeXS;
 use URI;    # The GET requests need URI-escaping
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ($class, %opts) = @_;
@@ -69,19 +69,32 @@ sub _send_receive {
 			croak "Unrecognised method '$meth'";
 		}
 
-		if ($self->{ua}->responseCode !~ /[45]00/) {
+		if ($self->{ua}->responseCode !~ /400|50./) {
 			return decode_json $self->{ua}->responseContent
 			  if $self->{ua}->responseHeader ('Content-type') eq
 			  'application/json';
 			return undef;
 		}
 		$tries_left--;
-		carp "REST error " . $self->{ua}->responseCode;
+		warn "REST error " . $self->{ua}->responseCode;
 	}
 
-	carp "Problem with $meth $path";
-	carp "Data was " . encode_json ($data);
-	carp "Client warning: ", $self->{ua}->responseHeader ('Client-Warning');
+	if ($self->{ua}->responseCode > 499) {
+		# Not our problem, so don't carp
+		return {
+			errors => [{
+				status => $self->{ua}->responseCode,
+				detail => $self->{ua}->responseContent //
+					'Server Problem'
+			}]
+		};
+	}
+
+	carp "Problem with $meth $path\nData was " . encode_json ($data) .
+		"\nClient warning: " .
+		(	$self->{ua}->responseHeader ('Client-Warning') //
+			$self->{ua}->responseContent //
+			$self->{ua}->responseCode);
 	return undef;
 }
 
@@ -99,7 +112,21 @@ sub check {
 	require WebService::AbuseIPDB::CheckResponse;
 	return WebService::AbuseIPDB::CheckResponse->new (
 		$self->_send_receive ('GET', 'check', $data));
+}
 
+sub check_block {
+	my ($self, %args) = @_;
+	unless (exists $args{ip}) {
+		carp "No IP in argument hash";
+		return;
+	}
+
+	# Validate this here TODO
+	my $data = {network => $args{ip}};
+	$data->{maxAgeInDays} = $args{max_age} if exists $args{max_age};
+	require WebService::AbuseIPDB::CheckBlockResponse;
+	return WebService::AbuseIPDB::CheckBlockResponse->new (
+		$self->_send_receive ('GET', 'check-block', $data));
 }
 
 sub report {
@@ -198,7 +225,7 @@ WebService::AbuseIPDB - Client for the API (version 2) of AbuseIPDB
 
 =head1 DESCRIPTION
 
-L<https://www.abuseipdb.com/|AbuseIPDB> maintains a database of reports
+L<AbuseIPDB|https://www.abuseipdb.com/> maintains a database of reports
 of bad actors on the net. Users may interface with the database through
 a web browser using forms on their site. An alternative is to use their
 API. Version 1 of this API is to be retired in 2020. This module serves
@@ -228,6 +255,15 @@ using this module.
 
 The timeout in seconds to wait for the server to respond. Defaults to
 20.
+
+Note that the way that L<IO::Socket::IP> handles this in modern
+versions (0.32 and above) means that the timeout applies for each IP
+address which the host resolves to. At time of writing (July 2020) for
+L<api.abuseipdb.com|https://www.sitechecks.co.uk/ipcheck.cgi?in=api.abuseipdb.com>
+there are three IPv4 addresses and three IPv6 addresses so the 20 second
+timeout will apply to each of them consecutively in each supported IP
+family meaning that if all are down you might be waiting for as much as
+2 minutes for a response.
 
 =item retry
 
@@ -260,6 +296,31 @@ omitted the server default is used (currently 30).
 
 If set to any true value, the data from each report itself is also returned.
 B<Not yet impelemented>.
+
+=back
+
+
+=head2 check_block
+
+    my $res = $ipdb->check_block (ip => '127.0.0.0/29', max_age => 30);
+
+This uses the C<check-block> endpoint and returns a
+L<WebService::AbuseIPDB::CheckBlockResponse> object to access the data held
+in the database for the provided IP address range. The argument is a hash with
+these keys:
+
+=over
+
+=item ip
+
+The IP range to be checked in
+L<CIDR|https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing>
+format. This item is mandatory.
+
+=item max_age
+
+The age in integral days of the oldest report(s) to include. If
+omitted the server default is used (currently 30).
 
 =back
 
@@ -340,7 +401,7 @@ the interface are liable to change.
 
 Implement the C<verbose> option on the check method.
 
-Add the other API endpoints: check-block and bulk-report. Allow for fast
+Add the bulk-report API endpoints. Allow for fast
 blacklist-as-string response too.
 
 More validation/sanitation of inputs.
@@ -353,14 +414,19 @@ L<SendMail::AbuseIPDB> is a client for v1 of the API.
 
 Full documentation for the API is at L<https://docs.abuseipdb.com/>.
 
+Discussion of the IO::Socket::IP timeout can be found in
+L<RT 92075|https://rt.cpan.org/Public/Bug/Display.html?id=92075>.
+
 =head1 AUTHOR
 
 Pete Houston, C<< <cpan at openstrike.co.uk> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-webservice-abuseipdb at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-AbuseIPDB>.  See the file CONTRIBUTING.md for further details.
+Please report any bugs or feature requests to
+C<bug-webservice-abuseipdb at rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-AbuseIPDB>.
+See the file CONTRIBUTING.md for further details.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -369,7 +435,7 @@ API.
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright © 2020 Pete Houston.
+Copyright © 2020-2025 Pete Houston.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

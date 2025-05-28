@@ -4,13 +4,13 @@
       "Pete Houston <cpan@openstrike.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-AbuseIPDB",
    "no_index" : {
@@ -34,7 +34,7 @@
          "requires" : {
             "Carp" : "1.11",
             "IO::Socket::SSL" : "1.31",
-            "JSON::XS" : "2.34",
+            "JSON::MaybeXS" : "1.004000",
             "LWP::Protocol::https" : "6.04",
             "REST::Client" : "272",
             "Scalar::Util" : "1.14",
@@ -44,46 +44,56 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "Test::Fatal" : "0",
             "Test::MockModule" : "0.14",
-            "Test::More" : "0.41"
+            "Test::More" : "0.41",
+            "Test::Warn" : "0.37"
          }
       }
    },
    "provides" : {
       "WebService::AbuseIPDB" : {
          "file" : "lib/WebService/AbuseIPDB.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "WebService::AbuseIPDB::BlacklistMember" : {
          "file" : "lib/WebService/AbuseIPDB/BlacklistMember.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "WebService::AbuseIPDB::BlacklistResponse" : {
          "file" : "lib/WebService/AbuseIPDB/BlacklistResponse.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "WebService::AbuseIPDB::Category" : {
          "file" : "lib/WebService/AbuseIPDB/Category.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "WebService::AbuseIPDB::CheckBlockResponse" : {
+         "file" : "lib/WebService/AbuseIPDB/CheckBlockResponse.pm",
+         "version" : "0.04"
       },
       "WebService::AbuseIPDB::CheckResponse" : {
          "file" : "lib/WebService/AbuseIPDB/CheckResponse.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "WebService::AbuseIPDB::ReportResponse" : {
          "file" : "lib/WebService/AbuseIPDB/ReportResponse.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "WebService::AbuseIPDB::ReportedAddress" : {
+         "file" : "lib/WebService/AbuseIPDB/ReportedAddress.pm",
+         "version" : "0.04"
       },
       "WebService::AbuseIPDB::Response" : {
          "file" : "lib/WebService/AbuseIPDB/Response.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AbuseIPDB"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AbuseIPDB"
       },
       "repository" : {
          "type" : "git",
@@ -91,5 +101,6 @@
          "web" : "https://gitlab.com/openstrike/abuseipdb-client"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

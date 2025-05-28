@@ -36,12 +36,12 @@ requires:
 resources:
   bugtracker: https://github.com/regru/Net-Whois-Raw/issues
   repository: git://github.com/regru/Net-Whois-Raw.git
-version: '2.99040'
+version: '2.99041'
 x_contributors:
   - 'Ariel Brosh <schop@cpan.org>'
   - 'Gabor Szabo <szabgab@cpan.org>'
   - 'Corris Randall <corris@cpan.org>'
   - 'Walery Studennikov <despair@cpan.org>'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

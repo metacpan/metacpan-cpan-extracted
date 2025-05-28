@@ -6,7 +6,9 @@ lib/WebService/AbuseIPDB.pm
 lib/WebService/AbuseIPDB/BlacklistMember.pm
 lib/WebService/AbuseIPDB/BlacklistResponse.pm
 lib/WebService/AbuseIPDB/Category.pm
+lib/WebService/AbuseIPDB/CheckBlockResponse.pm
 lib/WebService/AbuseIPDB/CheckResponse.pm
+lib/WebService/AbuseIPDB/ReportedAddress.pm
 lib/WebService/AbuseIPDB/ReportResponse.pm
 lib/WebService/AbuseIPDB/Response.pm
 LICENCE
@@ -16,9 +18,12 @@ README
 t/00-load.t
 t/blacklist.t
 t/category.t
+t/check-block.t
 t/check.t
+t/errors.t
 t/opts.t
 t/report.t
+t/rt-132655.t
 xt/cpan-meta.t
 xt/manifest.t
 xt/pod-coverage.t

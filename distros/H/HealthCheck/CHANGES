@@ -1,6 +1,14 @@
 Changelog for HealthCheck
 
-v1.9.1 2024-04-03T19:45:46
+v1.9.2 2025-05-27T14:20:54
+ - Update Makefile (Brendan Byrd)
+ - Pull request #14: SM-5505 (Brendan Byrd)
+ - Update Makefile / README / LICENSE (Brendan Byrd)
+ - Fix 'nonexistent' typo in unit tests (Brendan Byrd)
+ - Encourage accessor use of the main id/label/runbook/tags fields (Brendan
+   Byrd)
+
+v1.9.1 2024-04-03T19:45:24
  - Update README (Andrew Hewus Fresh)
  - Pull request #13: Patch SM-4775 fixed typo bug and added test (Austin
    Hill)
@@ -58,6 +66,9 @@ v1.5.7 2020-07-02T17:45:23
  - No changes found
 
 v1.5.6 2020-07-02T17:45:23
+ - No changes found
+
+v1.5.5 2020-07-02T17:45:23
  - Update README (Maria Cioffi)
  - Add more tests for runtime (Brandon Messineo)
  - Revert back to b8f12974c15 (Andrew Hewus Fresh)

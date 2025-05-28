@@ -28,7 +28,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '1.05';
+our $VERSION   = '1.06';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set development mode
@@ -36,7 +36,7 @@ use constant DEVEL_MODE => 0;
 
 # Misc variables
 my ( $config_sort_by, $config_similarity_metric_cohort,
-    $config_max_out, $config_max_number_vars, $config_max_matrix_items_in_ram, @config_allowed_terms );
+    $config_max_out, $config_max_number_vars, $config_max_matrix_records_in_ram, @config_allowed_terms );
 my $default_config_file = catfile( $share_dir, 'conf', 'config.yaml' );
 
 ############################################
@@ -75,7 +75,7 @@ sub _set_basic_config {
       // 'hamming';
     $config_max_out         = $config->{max_out}         // 50;
     $config_max_number_vars = $config->{max_number_vars} // 10_000;
-    $config_max_matrix_items_in_ram  = $config->{max_matrix_items_in_ram} // 5_000;
+    $config_max_matrix_records_in_ram  = $config->{max_matrix_records_in_ram} // 5_000;
 }
 
 # Private Method: _validate_and_set_exclusive_config
@@ -162,10 +162,10 @@ has max_number_vars => (
     isa     => Int
 );
 
-has max_matrix_items_in_ram => (
-    default => $config_max_matrix_items_in_ram,
+has max_matrix_records_in_ram => (
+    default => $config_max_matrix_records_in_ram,
     is      => 'ro',
-    coerce  => sub { $_[0] // $config_max_matrix_items_in_ram },
+    coerce  => sub { $_[0] // $config_max_matrix_records_in_ram },
     lazy    => 1,
     isa     => Int
 );
@@ -303,7 +303,7 @@ sub run {
         $ref_binary_hash = read_json( $self->{ref_binary_hash_file} );
 
         # Set format explicitly (for example, to 'PXF')
-        $self->add_attribute( 'format', 'PXF' );
+        $self->_add_attribute( 'format', 'PXF' );
 
         $hash2serialize = {
             glob_hash       => $glob_hash,
@@ -466,7 +466,7 @@ sub _compute_cohort_metrics {
 
     # We have to check if we have BFF|PXF or others (unless defined at config)
 
-    $self->add_attribute( 'format', check_format($ref_data) )
+    $self->_add_attribute( 'format', check_format($ref_data) )
       unless defined $self->{format};
     restructure_pxf_interpretations( $ref_data, $self );
 
@@ -615,7 +615,7 @@ sub _perform_graph_calculations {
     return $graph;
 }
 
-sub add_attribute {
+sub _add_attribute {
     my ( $self, $name, $value ) = @_;
     $self->{$name} = $value;
     return 1;
@@ -664,9 +664,9 @@ L<https://github.com/CNAG-Biomedical-Informatics/pheno-ranker#readme>
 
 =head1 CITATION
 
-The author requests that any published work that utilizes C<Pheno-Ranker> includes a cite to the the following reference:
+The author requests that any published work that utilizes `Pheno-Ranker` includes a cite to the following reference:
 
-Leist, I.C. et al. "Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. (2024) I<Submitted>.
+Leist, I.C. et al., (2024). Pheno-Ranker: a toolkit for comparison of phenotypic data stored in GA4GH standards and beyond. _BMC Bioinformatics_. DOI: 10.1186/s12859-024-05993-2
 
 =head1 AUTHOR
 

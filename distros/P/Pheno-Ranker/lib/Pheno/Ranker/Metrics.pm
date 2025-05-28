@@ -79,7 +79,6 @@ END_C
 
 # Perl wrapper: calls the Inline C function "c_hd_fast"
 sub hd_fast {
-
     my ( $s1, $s2 ) = @_;
     die "Strings must be the same length" if length($s1) != length($s2);
     return c_hd_fast( $s1, $s2, length($s1) );
@@ -98,7 +97,6 @@ sub _hd_fast {
 
 # Perl wrapper: calls the Inline C function "c_jaccard_similarity"
 sub jaccard_similarity {
-
     my ( $str1, $str2 ) = @_;
     my $len = length($str1);
     die "Strings must be of equal length" if $len != length($str2);
@@ -109,7 +107,6 @@ sub jaccard_similarity {
 
 # Original (using vec)
 sub _jaccard_similarity {
-
     my ( $str1, $str2 ) = @_;
     my $len = length($str1);
     die "Strings must be of equal length" if $len != length($str2);
@@ -154,26 +151,22 @@ sub estimate_hamming_stats {
 }
 
 sub z_score {
-
     my ( $observed_value, $expected_value, $std_dev ) = @_;
     return 0 if $std_dev == 0;
     return ( $observed_value - $expected_value ) / $std_dev;
 }
 
 sub p_value_from_z_score {
-
     return pnorm(shift)    # One-tailed test
 }
 
 #sub _p_value {
-#
 #    my ( $hamming_distance, $string_length ) = @_;
 #    my $probability_mismatch = 0.5;
 #    return 2 * (1 - pbinom($hamming_distance - 1, $string_length, $probability_mismatch))
 #}
 
 sub add_stats {
-
     my $array = shift;
     my %hash_out;
     my $stat = Statistics::Descriptive::Full->new();

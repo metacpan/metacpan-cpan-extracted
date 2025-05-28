@@ -1,7 +1,7 @@
-WebService-AbuseIPDB 0.03
--------------------------
+WebService-AbuseIPDB 0.04
+----------------------------
 
-Released 23rd March 2020
+Released 27th May 2025
 
 DESCRIPTION
 -----------
@@ -36,7 +36,7 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs and suggest improvements here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB
 
     Search CPAN
         https://metacpan.org/pod/WebService-AbuseIPDB/
@@ -45,7 +45,7 @@ You can also look for information at:
 LICENSE AND COPYRIGHT
 ---------------------
 
-Copyright © 2020 Pete Houston.
+Copyright © 2020-25 Pete Houston.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

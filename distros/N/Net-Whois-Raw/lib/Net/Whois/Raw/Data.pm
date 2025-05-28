@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99040';
+$Net::Whois::Raw::Data::VERSION = '2.99041';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -492,7 +492,7 @@ our %servers = qw(
     BJ               whois.nic.bj
     BOSTIK           whois-bostik.nic.fr
     BR               whois.registro.br
-    BY               whois.ripe.net
+    BY               whois.cctld.by
     BZ               whois2.afilias-grs.net
     CA               whois.cira.ca
     CD               whois.nic.cd
@@ -2854,7 +2854,7 @@ our %notfound = (
     'whois.nic.work'                       => 'This domain name has not been registered',
     'whois.nic.yoga'                       => 'This domain name has not been registered',
     'whois.ax'                             => 'Domain not found',
-    'whois.cctld.by'                       => 'Object does not exist',
+    'whois.cctld.by'                       => 'object does not exist',
     'whois.mediaserv.net'                  => 'NO OBJECT FOUND!',
     'whois.nic.amsterdam'                  => 'Domain Status: free',
     'whois.nic.arab'                       => 'No Data Found',
@@ -4486,7 +4486,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99040
+version 2.99041
 
 =head1 AUTHOR
 
@@ -4494,7 +4494,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2024 by Alexander Nalobin.
+This software is copyright (c) 2002-2025 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

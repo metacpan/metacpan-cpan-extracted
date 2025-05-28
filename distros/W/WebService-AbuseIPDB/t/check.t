@@ -15,7 +15,8 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
-use JSON::XS;
+use Test::Warn;
+use JSON::MaybeXS;
 
 my %map = (
 	cc               => 'countryCode',
@@ -32,7 +33,7 @@ my %map = (
 	reporter_count   => 'numDistinctUsers'
 );
 
-plan tests => 10 + 2 * keys %map;
+plan tests => 11 + 2 * keys %map;
 
 use WebService::AbuseIPDB;
 
@@ -75,7 +76,9 @@ while (my ($meth, $key) = each %map) {
 }
 
 # Check bad input
-$res = $ipdb->check ();
+warnings_exist {$res = $ipdb->check ();}
+	[qr/No IP in argument hash/],
+	'Missing IP in check argument hash warned';
 is ($res, undef, 'No IP provided');
 
 done_testing ();

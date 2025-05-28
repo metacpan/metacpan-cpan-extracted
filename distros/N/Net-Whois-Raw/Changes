@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99041 May 28 2025 Alexander Nalobin
+    - Fix whois server for .by
+
 2.99040 June 24 2024 Alexander Nalobin
     - Added .спб.рф domain
 

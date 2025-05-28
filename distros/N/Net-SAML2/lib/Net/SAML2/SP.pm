@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.81'; # VERSION
+our $VERSION = '0.82'; # VERSION
 
 use Moose;
 
@@ -20,6 +20,8 @@ use Net::SAML2::Util ();
 use URN::OASIS::SAML2 qw(:bindings :urn);
 use XML::Generator;
 use Net::SAML2::Types qw(XsdID);
+
+with 'Net::SAML2::Role::XMLLang';
 
 # ABSTRACT: SAML Service Provider object
 
@@ -40,6 +42,8 @@ has 'issuer' => (isa => 'Str', is => 'ro', required => 1);
 has 'cert'   => (isa => 'Str', is => 'ro', required => 1, predicate => 'has_cert');
 has 'key'    => (isa => 'Str', is => 'ro', required => 1);
 has 'cacert' => (isa => 'Str', is => 'rw', required => 0, predicate => 'has_cacert');
+
+has 'signing_only' => (isa => 'Bool', is => 'ro', required => 0);
 
 has 'encryption_key'   => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_encryption_key');
 has 'error_url'        => (isa => Uri, is => 'ro', required => 1, coerce => 1);
@@ -388,15 +392,15 @@ sub generate_metadata {
         $x->Organization(
             $md,
             $x->OrganizationName(
-                $md, { 'xml:lang' => 'en' }, $self->org_name,
+                $md, $self->lang, $self->org_name,
             ),
             $x->OrganizationDisplayName(
-                $md, { 'xml:lang' => 'en' },
+                $md, $self->lang,
                 $self->org_display_name,
             ),
             $x->OrganizationURL(
                 $md,
-                { 'xml:lang' => 'en' },
+                $self->lang,
                 defined($self->org_url) ? $self->org_url : $self->url
             )
         ),
@@ -420,6 +424,8 @@ sub _generate_key_descriptors {
         && !$self->sign_metadata;
 
     my $key = $use eq 'encryption' ? $self->_encryption_key_text : $self->_cert_text;
+
+    $use = 'signing' if $self->signing_only && $use eq 'both';
 
     return $x->KeyDescriptor(
         $md,
@@ -459,7 +465,7 @@ sub metadata {
     my $self = shift;
 
     my $metadata = $self->generate_metadata();
-    return $metadata unless $self->sign_metadata;
+    return $metadata->stringify unless $self->sign_metadata;
 
     use Net::SAML2::XML::Sig;
     my $signer = Net::SAML2::XML::Sig->new(
@@ -523,7 +529,7 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -573,9 +579,18 @@ Path to the private key for the signing certificate
 Path to the public key that the IdP should use for encryption. This
 is used when generating the metadata.
 
+=item B<signing_only>
+
+Indicate that the key for signing is exclusively used for signing and not
+encryption and signing.
+
 =item B<cacert>
 
 Path to the CA certificate for verification
+
+=item B<lang>
+
+Set the language for the C<md:localizedNameType>, defaults to C<en>.
 
 =item B<org_name>
 
@@ -774,7 +789,7 @@ Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Venda Ltd, see the CONTRIBUTORS file for others.
+This software is copyright (c) 2025 by Venda Ltd, see the CONTRIBUTORS file for others.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

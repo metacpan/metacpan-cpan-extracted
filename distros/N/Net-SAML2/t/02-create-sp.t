@@ -219,6 +219,46 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
     }
 
 }
+
+{
+    my $sp = net_saml2_sp(signing_only => 1);
+    my $xpath = get_xpath(
+        $sp->metadata,
+        md => URN_METADATA,
+        ds => URN_SIGNATURE,
+    );
+
+
+    my $kd = get_single_node_ok($xpath, "//md:KeyDescriptor");
+    is($kd->getAttribute('use'), 'signing', "Key descriptor says sign");
+}
+
+{
+    my $sp = net_saml2_sp();
+    my $xpath = get_xpath(
+        $sp->metadata,
+        md => URN_METADATA,
+        ds => URN_SIGNATURE,
+    );
+
+
+    my $kd = get_single_node_ok($xpath, "//md:KeyDescriptor");
+    is($kd->getAttribute('use'), undef, "Key descriptor says nothing about use");
+}
+
+{
+    my $sp = net_saml2_sp(signing_only => 0);
+    my $xpath = get_xpath(
+        $sp->metadata,
+        md => URN_METADATA,
+        ds => URN_SIGNATURE,
+    );
+
+
+    my $kd = get_single_node_ok($xpath, "//md:KeyDescriptor");
+    is($kd->getAttribute('use'), undef, "Key descriptor says nothing about use");
+}
+
 {
     my $sp = net_saml2_sp( ( encryption_key => 't/sign-nopw-cert.pem' ) );
 
@@ -489,6 +529,18 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         'foo', ".. with the correct friendly name");
     is($child[1]->getAttribute('Name'),       'urn:foo:bar', ".. and name");
     is($child[1]->getAttribute('isRequired'), 'true', ".. and requiredness");
+}
+{
+    my $sp = net_saml2_sp(lang => 'nl');
+    my $xpath = get_xpath(
+        $sp->metadata,
+        md => URN_METADATA,
+        ds => URN_SIGNATURE,
+    );
+
+    my $org  = get_single_node_ok($xpath,  '//md:OrganizationName');
+    is($org->getAttribute("xml:lang"),
+        "nl", ".. and xml:lang is set");
 }
 
 {

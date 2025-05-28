@@ -12,11 +12,12 @@ You might have a suggestion for a new feature or a cleaner interface.
 You might have spotted a bug in the functionality or an error (even if
 just a typo) in the documentation. You might know of a related project
 with which there could be collaboration. These and many more should be
-raised in the first instance on the CPAN RT.
+raised in the first instance on the [CPAN
+RT](https://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB).
 
 ### General comments
 
-Visit [http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB]
+Visit [RT](https://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB)
 and have a look through the existing issues (both open and resolved) to
 make sure that there is not already a ticket dealing with the point you
 were going to make.
@@ -30,9 +31,10 @@ of integrity.
 
 ### Bugs
 
-Bugs reports should also be submitted via RT as above. A bug report is
-more likely to receive extensive and timely attention if it includes
-the following:
+Bug reports should also be submitted via
+[RT](https://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB)
+as above. A bug report is more likely to receive extensive and timely
+attention if it includes the following:
 
 - The version(s) of the dist/module exhibiting the problem
 - The version(s) of perl being used
@@ -59,14 +61,18 @@ If you are reading this section then thank you very much for even
 considering contributing code to this project. Here are some guidelines
 to ensure a harmonious community of contributors.
 
-- Please get in touch, ideally via RT as above, to outline what it is
-  that you plan to contribute in advance. This avoid duplication of
+- Please get in touch, ideally via
+  [RT](https://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB) as
+  above, to outline what it is
+  that you plan to contribute in advance. This avoids duplication of
   effort and will help to decide what can and should become part of this
   dist and what might benefit from being developed separately.
 - If it is agreed for you to contribute then the easiest way is to clone
-  the public repository at https://gitlab.com/openstrike/abuseipdb-client
+  the [public repository](https://gitlab.com/openstrike/abuseipdb-client)
   and then submit a merge request. Please base your work against the
-  current release branch, not the master.
+  current release branch, not the master, eg. if the most recent, stable
+  release is 0.03 then there should be a branch numbered 0.04 for work
+  in progress.
 - If you do not use git or gitlab then you may submit a patch via RT
   instead.
 - Please accompany your code with tests (we like full coverage where
@@ -93,9 +99,9 @@ audience.
   message to say you use this dist is a great start. There are places to
   post longer pieces (critiques, examples, comparisons, use cases, reviews)
   such as
-  [blogs.perl.org](http://blogs.perl.org/), [PerlMonks
+  [blogs.perl.org](https://blogs.perl.org/), [PerlMonks
   Reviews](https://www.perlmonks.org/?node_id=31673;reviewtype=module),
-  [Medium](https://medium.com/creators), etc.
+  [Dev](https://dev.to/), etc.
 - **Blogs, vlogs and podcasts.** If you have your own blog (with audio,
   video or (gasp!) just the written word) why not tell your audience
   about this dist you've been using?
@@ -112,8 +118,7 @@ not in this to get rich quick, a little recompense would go a long way.
 If you would like to contribute in a monetary form then please consider
 donating in one of these ways.
 
-- Donate to the
-  [EPO](https://ww2.enlightenedperl.org/),
+- Donate to
   [TPF](https://www.perlfoundation.org/donate.html),
   [EFF](https://www.eff.org/pages/other-ways-give-and-donor-support),
   [OSI](https://opensource.org/civicrm/contribute/transact?reset=1&id=2),
@@ -124,4 +129,4 @@ donating in one of these ways.
   which we do not consider meritorious enough to pursue gratis, consider
   sponsorship.
 - Send us some swag! Contact details are at
-  [https://www.openstrike.co.uk/aboutus.html]
+  [https://www.openstrike.co.uk/aboutus.html](https://www.openstrike.co.uk/aboutus.html)

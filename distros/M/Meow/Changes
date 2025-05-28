@@ -3,3 +3,25 @@ Revision history for Meow
 0.01    2025-05-26
 	- Experimental release
 
+0.08    2025-05-27
+	- Fix pod encoding issue
+	- Attempt to fix issues on windows
+
+0.09    2025-05-27
+	- Change to use any_ptr instead of a hash variable
+
+0.10    2025-05-27
+	- dTHX for malloc
+
+0.11	2025-05-27
+	- Add ro keyword to generate readonly attributes.
+	- Add Default keyword so you can set default for attributes.
+
+0.12	2025-05-27
+	- Add an extends keyword for multiple inheritance
+
+0.13	2025-05-27
+	- Add Coerce keyword for attribute coercions
+	- Add Trigger keyword for attribute triggers
+	- Add Builder keyword for lazy building attributes.
+	- update POD

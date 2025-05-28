@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic;
 
 # ABSTRACT: A base clase for writing health check diagnositics
 use version;
-our $VERSION = 'v1.9.1'; # VERSION
+our $VERSION = 'v1.9.2'; # VERSION
 
 use 5.010;
 use strict;
@@ -344,9 +344,13 @@ sub summarize {
 sub _set_default_fields {
     my ($self, $target, @fields) = @_;
     if ( ref $self ) {
-        $target->{$_} = $self->{$_}
-            for grep { not exists $target->{$_} }
-            grep     { exists $self->{$_} } @fields;
+        $target->{$_} = ($_ eq 'tags' ? [ $self->$_ ] : $self->$_) for (
+            grep {
+                !exists($target->{$_}) &&
+                ($_ eq 'tags' ? scalar($self->$_) : defined($self->$_))
+            }
+            @fields
+        );
     }
 }
 
@@ -476,7 +480,7 @@ HealthCheck::Diagnostic - A base clase for writing health check diagnositics
 
 =head1 VERSION
 
-version v1.9.1
+version v1.9.2
 
 =head1 SYNOPSIS
 
@@ -733,7 +737,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 - 2024 by Grant Street Group.
+This software is Copyright (c) 2017 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 

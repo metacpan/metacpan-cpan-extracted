@@ -63,17 +63,17 @@ GetOptions(
     'exclude-terms=s{1,11}'              => \my @exclude_terms,               # array
     'retain-excluded-phenotypicFeatures' => \
       my $retain_excluded_phenotypicFeatures,                                 # flag
-    'prp|precomputed-ref-prefix=s' => \my $precomputed_ref_prefix,                # string
-    'max-matrix-items-in-ram=i' => \my $max_matrix_items_in_ram,            # integer
-    'config=s'                 => \my $config_file,                           # string
-    'age!'                     => \$age,                                      # flag
-    'help|?'                   => \my $help,                                  # flag
-    'log:s'                    => \my $log,                                   # opt-string (defined)
-    'man'                      => \my $man,                                   # flag
-    'debug=i'                  => \my $debug,                                 # integer
-    'verbose|'                 => \my $verbose,                               # flag
-    'color!'                   => \$color,                                    # flag
-    'version|V'                => sub { say "$0 Version $VERSION"; exit; }
+    'prp|precomputed-ref-prefix=s' => \my $precomputed_ref_prefix,            # string
+    'max-matrix-records-in-ram=i'  => \my $max_matrix_records_in_ram,         # integer
+    'config=s'                     => \my $config_file,                       # string
+    'age!'                         => \$age,                                  # flag
+    'help|?'                       => \my $help,                              # flag
+    'log:s'                        => \my $log,                               # opt-string (defined)
+    'man'                          => \my $man,                               # flag
+    'debug=i'                      => \my $debug,                             # integer
+    'verbose|'                     => \my $verbose,                           # flag
+    'color!'                       => \$color,                                # flag
+    'version|V'                    => sub { say "$0 Version $VERSION"; exit; }
 ) or pod2usage(2);
 pod2usage(1)                              if $help;
 pod2usage( -verbose => 2, -exitval => 0 ) if $man;
@@ -169,7 +169,7 @@ my $data = {
     exclude_terms                      => \@exclude_terms,
     retain_excluded_phenotypicFeatures => $retain_excluded_phenotypicFeatures,
     precomputed_ref_prefix             => $precomputed_ref_prefix,
-    max_matrix_items_in_ram            => $max_matrix_items_in_ram,
+    max_matrix_records_in_ram          => $max_matrix_records_in_ram,
     glob_hash_file                     => $glob_hash_file,
     ref_hash_file                      => $ref_hash_file,
     ref_binary_hash_file               => $ref_binary_hash_file,
@@ -197,7 +197,6 @@ write_log( $log ? $log : $log_file, $data, $VERSION )
 ####################
 
 sub handle_option {
-
     my ( $option_ref, $message, $target_file, $default ) = @_;
     if ( defined $$option_ref ) {
         pod2usage( -message => $message, -exitval => 1 ) if $target_file;
@@ -206,7 +205,6 @@ sub handle_option {
 }
 
 sub resolve_file {
-
     my $base = shift;
 
     # If the base file exists, use it.
@@ -221,33 +219,33 @@ sub resolve_file {
 }
 
 sub write_log {
-
     my ( $log, $data, $VERSION ) = @_;
 
     # NB: Darwin does not have nproc to show #logical-cores, using sysctl instead
     my $os = $^O;
     chomp(
-        my $ncpuhost =
+        my $threadshost =
           lc($os) eq 'darwin' ? qx{/usr/sbin/sysctl -n hw.logicalcpu}
-        : $os eq 'MSWin32' ? qx{wmic cpu get NumberOfLogicalProcessors}
-        :                    qx{/usr/bin/nproc} // 1
+        : lc($os) eq 'freebsd' ? qx{sysctl -n hw.ncpu}
+        : $os eq 'MSWin32'     ? qx{wmic cpu get NumberOfLogicalProcessors}
+        :                        qx{/usr/bin/nproc} // 1
     );
 
     # For the Windows command, the result will also contain the string
     # "NumberOfLogicalProcessors" which is the header of the output.
     # So we need to extract the actual number from it:
     if ( $os eq 'MSWin32' ) {
-        ($ncpuhost) = $ncpuhost =~ /(\d+)/;
+        ($threadshost) = $threadshost =~ /(\d+)/;
     }
-    $ncpuhost = 0 + $ncpuhost;    # coercing it to be a number
+    $threadshost = 0 + $threadshost;    # coercing it to be a number
 
     my $info = {
-        date      => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
-        ncpuhost  => $ncpuhost,
-        hostname  => hostname,
-        id        => time . substr( "00000$$", -5 ),                   # string
-        version   => $VERSION,
-             user => $ENV{'LOGNAME'}
+        date        => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
+        threadshost => $threadshost,
+        hostname    => hostname,
+        id          => time . substr( "00000$$", -5 ),                   # string
+        version     => $VERSION,
+             user   => $ENV{'LOGNAME'}
           || $ENV{'USER'}
           || $ENV{'USERNAME'}
           || 'dummy-user'
@@ -264,7 +262,6 @@ sub write_log {
 }
 
 sub program_header {
-
     my $VERSION = shift;
     my $str     = <<EOF;
 ****************************************
@@ -342,7 +339,7 @@ but we will install a few CPAN modules with C<cpanminus>.
 
 First install system level dependencies:
 
-  sudo apt-get install cpanminus libperl-dev
+  sudo apt-get install cpanminus libperl-dev gcc make
 
 Now you have to choose between one of the 2 options below:
 
@@ -470,7 +467,8 @@ Then I will do something like this:
 
 =head3 System requirements
 
-  * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOS, OpenSUSE) should do as well.
+  - OS/ARCH supported: B<linux/amd64> and B<linux/arm64>.
+  - Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOS, OpenSUSE) should do as well (untested).
     (It should also work on macOS and Windows Server, but we are only providing information for Linux here)
   * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
   * >= 4GB of RAM
@@ -501,11 +499,11 @@ With C<-r> reference cohort(s) and C<--t> patient data.
 
 B<Examples:>
 
- $ ./pheno-ranker -r phenopackets.json  # intra-cohort
+ $ bin/pheno-ranker -r phenopackets.json  # intra-cohort
 
- $ ./pheno-ranker -r phenopackets.yaml -o my_matrix.txt # intra-cohort
+ $ bin/pheno-ranker -r phenopackets.yaml -o my_matrix.txt # intra-cohort
 
- $ ./pheno-ranker -r phenopackets.json -w weights.yaml --exclude-terms sex ethnicity exposures # intra-cohort with weights
+ $ bin/pheno-ranker -r phenopackets.json -w weights.yaml --exclude-terms sex ethnicity exposures # intra-cohort with weights
 
  $ $path/pheno-ranker -r individuals.json others.yaml --append-prefixes CANCER CONTROL  # inter-cohort
 
