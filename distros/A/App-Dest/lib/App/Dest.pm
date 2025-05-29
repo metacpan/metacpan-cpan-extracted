@@ -12,9 +12,10 @@ use File::Find 'find';
 use File::Path qw( mkpath rmtree );
 use IPC::Run 'run';
 use Path::Tiny 'path';
+use POSIX 'strftime';
 use Text::Diff ();
 
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.35'; # VERSION
 
 sub init {
     my $self = _new( shift, 'expect_no_root_dir' );
@@ -143,6 +144,8 @@ sub writewatch {
 sub make {
     my ( $self, $path, $ext ) = @_;
     die "No name specified; usage: dest make [path]\n" unless ($path);
+
+    $path = strftime( $path, localtime );
 
     $ext = '.' . $ext if ( defined $ext );
     $ext //= '';
@@ -766,7 +769,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =for markdown [![test](https://github.com/gryphonshafer/dest/workflows/test/badge.svg)](https://github.com/gryphonshafer/dest/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/dest/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/dest)
@@ -902,13 +905,18 @@ So if you want, you can do something like this:
 
     vi `dest make db/schema`
 
-Optionally, you can specify an extention for the created files. For example:
+Optionally, you can specify an extension for the created files. For example:
 
     vi `dest make db/schema sql`
     # this will create and open in vi:
     #    db/schema/deploy.sql
     #    db/schema/revert.sql
     #    db/schema/verify.sql
+
+And optionally, you can include any date/time format supported by L<POSIX>
+C<strftime>.
+
+    dest make db/%s_action sql
 
 =head2 expand NAME
 

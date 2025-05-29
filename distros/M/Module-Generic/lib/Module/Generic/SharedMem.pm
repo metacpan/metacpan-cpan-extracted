@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.5.2
+## Version v0.5.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2025/04/22
+## Modified 2025/04/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,26 +18,32 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64 );
+    use vars qw(
+        $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64
+        $SERIAL2SEMID
+    );
     use Config;
+    use Errno qw( EINVAL EIDRM );
     use File::Spec ();
     use Scalar::Util ();
     # This is disruptive for everybody. Bad idea.
     # use JSON 4.03 qw( -convert_blessed_universally );
     use JSON 4.03;
     use Storable::Improved ();
-    use constant SHM_BUFSIZ     =>  65536;
-    use constant SEM_LOCKER     =>  0;
-    use constant SEM_MARKER     =>  0;
-    use constant SHM_LOCK_WAIT  =>  0;
-    use constant SHM_LOCK_EX    =>  1;
-    use constant SHM_LOCK_UN    => -1;
-    use constant SHM_EXISTS     =>  1;
-    use constant LOCK_SH        =>  1;
-    use constant LOCK_EX        =>  2;
-    use constant LOCK_NB        =>  4;
-    use constant LOCK_UN        =>  8;
-    use constant HAS_THREADS    => ( $Config{useithreads} && $INC{'threads.pm'} );
+    use constant {
+        SHM_BUFSIZ     =>  65536,
+        SEM_LOCKER     =>  0,
+        SEM_MARKER     =>  0,
+        SHM_LOCK_WAIT  =>  0,
+        SHM_LOCK_EX    =>  1,
+        SHM_LOCK_UN    => -1,
+        SHM_EXISTS     =>  1,
+        LOCK_SH        =>  1,
+        LOCK_EX        =>  2,
+        LOCK_NB        =>  4,
+        LOCK_UN        =>  8,
+        HAS_THREADS    => $Config{useithreads},
+    };
     # if( $^O =~ /^(?:Android|cygwin|dos|MSWin32|os2|VMS|riscos)/ )
     # Even better
     $SUPPORTED_RE = qr/IPC\/SysV/;
@@ -111,7 +117,7 @@ EOT
     $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
     # Array to maintain the order in which shared memory object were created, so they can
     # be removed in that order
-    our( $SHEM_REPO, $ID2OBJ );
+    our( $SHEM_REPO, $ID2OBJ, $SERIAL2SEMID );
     if( HAS_THREADS )
     {
         require threads;
@@ -121,22 +127,28 @@ EOT
     
         my @repo :shared;
         my %id2objs :shared;
+        my %serial2semid :shared;
+
         $SHEM_REPO = \@repo;
         $ID2OBJ = \%id2objs;
+        $SERIAL2SEMID = \%serial2semid;
+        *_threads_lock = \&CORE::lock;
     }
     else
     {
-        $SHEM_REPO = [];
-        $ID2OBJ    = {};
+        $SHEM_REPO    = [];
+        $ID2OBJ       = {};
+        $SERIAL2SEMID = {};
+        *_threads_lock = sub{1}; # no-op
     }
     
     our @EXPORT_OK = qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN);
     our %EXPORT_TAGS = (
-            all     => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
-            lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
-            'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
+        all     => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
+        lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
+        'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.5.2';
+    our $VERSION = 'v0.5.3';
 };
 
 use v5.26.1;
@@ -324,7 +336,6 @@ sub flags
 sub id
 {
     my $self = shift( @_ );
-    my @callinfo = caller;
     no warnings 'uninitialized';
     if( @_ )
     {
@@ -402,12 +413,13 @@ sub op
     my $data = pack( "s$N*", @_ );
     my $rv;
     no strict 'subs';
-    $rv = semop( $id, $data ) || do
+    if( !( $rv = semop( $id, $data ) ) )
     {
-        my $serial = $self->serial;
+        my $serial = $self->serial ||
+            return( $self->error( "Cannot get the serial" ) );
         my $semid = semget( $serial, 3, IPC_CREAT | 0666 );
         $rv = semop( $semid, $data );
-    };
+    }
     return( $rv );
 }
 
@@ -421,24 +433,23 @@ sub open
     }
     else
     {
-        @$opts{ qw( key mode size ) } = @_;
+        @$opts{ qw( key mode size semid ) } = @_;
     }
     $opts->{size} = $self->size unless( length( $opts->{size} ) );
     $opts->{size} = int( $opts->{size} );
     $opts->{mode} //= '';
     $opts->{key} //= '';
+    $opts->{semid} //= undef;
     no strict 'subs';
     my $serial;
     if( length( $opts->{key} ) )
     {
         $serial = $self->_str2key( $opts->{key} ) || 
             return( $self->error( "Cannot get serial from key '$opts->{key}': ", $self->error ) );
-        # $serial = $opts->{key};
     }
     else
     {
         $serial = $self->serial;
-        # $serial = $self->key;
     }
     die( "There is no serial!!\n" ) if( !CORE::length( $serial ) );
     my $create = 0;
@@ -470,7 +481,6 @@ sub open
         {
             my $newflags = ( $flags & &IPC::SysV::IPC_CREAT ) ? $flags : ( $flags | &IPC::SysV::IPC_CREAT );
             my $limit = ( $serial + 10 );
-            # &IPC::SysV::ftok has likely made the serial unique, but as stated in the manual page, there is no guarantee
             while( $serial <= $limit )
             {
                 $id = shmget( $serial, $opts->{size}, $newflags | &IPC::SysV::IPC_CREAT );
@@ -479,6 +489,7 @@ sub open
             }
         }
     };
+
     if( $@ )
     {
         if( $@ =~ /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i )
@@ -497,18 +508,39 @@ sub open
     }
     $self->serial( $serial );
     
-    # The value 3 can be anything above 0 and below the limit set by SEMMSL. On Linux system, this is usually 32,000. Seem semget(2) man page:
-    # "The argument nsems can be 0 (a don't care) when a semaphore set is  not being  created.   Otherwise, nsems must be greater than 0 and less than or equal  to  the  maximum  number  of  semaphores  per  semaphore  set (SEMMSL)."
     my $semid;
     # try-catch
     local $@;
     eval
     {
-        $semid = semget( $serial, ( $create ? 3 : 0 ), $flags );
-        if( !defined( $semid ) )
+        # The user passed it explicitly
+        if( defined( $opts->{semid} ) )
         {
-            my $newflags = ( $flags | &IPC::SysV::IPC_CREAT );
-            $semid = semget( $serial, 3, $newflags );
+            $semid = $opts->{semid};
+        }
+        # We are called on a shared memory object that has already been opened, so we get the semaphore ID from it.
+        elsif( !$create && ( my $semaphore_id = $self->semid ) )
+        {
+            $semid = $semaphore_id;
+        }
+        # The semaphore ID is stored in the global shared hash
+        elsif( !$create && CORE::exists( $SERIAL2SEMID->{ $serial } ) )
+        {
+            $semid = $SERIAL2SEMID->{ $serial };
+        }
+        else
+        {
+            $semid = semget( $serial, ( $create ? 3 : 0 ), $flags );
+            if( !defined( $semid ) && $create )
+            {
+                my $newflags = ( $flags | &IPC::SysV::IPC_CREAT );
+                $semid = semget( $serial, 3, $newflags );
+            }
+            if( defined( $semid ) && $create )
+            {
+                &_threads_lock( $SERIAL2SEMID ) if( HAS_THREADS );
+                $SERIAL2SEMID->{ $serial } = $semid;
+            }
         }
     };
     if( $@ )
@@ -522,7 +554,10 @@ sub open
             return( $self->error( "Error while trying to get the semaphore for shared memory id: $@" ) );
         }
     }
-    return( $self->error( "Unable to get a semaphore for shared memory key \"", ( $opts->{key} || $self->key ), "\" wth id \"$id\": $!" ) ) if( !defined( $semid ) );
+    if( !defined( $semid ) )
+    {
+        return( $self->error( "Unable to get semaphore for key \"", ( $opts->{key} || $self->key ), "\" (serial \"$serial\", create=$create, flags=$flags): $!" ) );
+    }
     
     my $new = $self->new(
         key     => ( $opts->{key} || $self->key ),
@@ -533,36 +568,40 @@ sub open
         _packing_method => $self->_packing_method,
     ) || return( $self->error( "Cannot create object with key '", ( $opts->{key} || $self->key ), "': ", $self->error ) );
     $new->key( $self->key );
-    $new->serial( $self->serial );
+    $new->serial( $serial );
     $new->id( $id );
     $new->semid( $semid );
-    if( HAS_THREADS && is_shared( $SHEM_REPO ) )
+
     {
-        lock( $SHEM_REPO );
-        lock( $ID2OBJ );
+        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS && is_shared( $SHEM_REPO ) );
+        &_threads_lock( $ID2OBJ ) if( HAS_THREADS && is_shared( $ID2OBJ ) );
         CORE::push( @$SHEM_REPO, $id );
-        $ID2OBJ->{ $id } = $new;
-    }
-    else
-    {
-        CORE::push( @$SHEM_REPO, $id );
-        $ID2OBJ->{ $id } = $new;
+        my $val;
+        if( HAS_THREADS )
+        {
+            $val = $self->serialise( $new, serialiser => 'Storable::Improved' ) ||
+                return( $self->pass_error );
+        }
+        else
+        {
+            $val = $new;
+        }
+        $ID2OBJ->{ $id } = $val;
     }
 
     if( !defined( $new->op( @{$SEMOP_ARGS->{(LOCK_SH)}} ) ) )
     {
-        return( $self->error( "Unable to set lock on sempahore: $!" ) );
+        return( $self->error( "Unable to set lock on semaphore: $!" ) );
     }
     
     my $there = $new->stat( SEM_MARKER );
     $new->size( $opts->{size} );
-    # $new->flags( $flags );
     if( $there == SHM_EXISTS )
     {
+        # Binding to existing segment
     }
     else
     {
-        # We initialise the semaphore with value of 1
         $new->stat( SEM_MARKER, SHM_EXISTS ) ||
             return( $new->error( "Unable to set semaphore during object creation: ", $new->error ) );
     }
@@ -727,9 +766,9 @@ sub remove
     my $self = shift( @_ );
     return(1) if( $self->removed );
     my $id   = $self->id();
-    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id ) );
+    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id // '' ) );
     my $semid = $self->semid;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid ) );
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid // '' ) );
     $self->unlock();
     no strict 'subs';
     # Remove share memory segment
@@ -742,40 +781,51 @@ sub remove
     my $arg = 0;
     if( !defined( $rv = semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg ) ) )
     {
-        warn( "Warning only: could not remove the semaphore id \"$semid\": $!" ) if( $self->_warnings_is_enabled );
+        # Suppress warning for EINVAL/EIDRM (semaphore already removed or invalid)
+        if( $!{EINVAL} || $!{EIDRM} )
+        {
+            # Treat as success since semaphore is gone
+            $rv = 1;
+        }
+        else
+        {
+            warn( "Warning only: could not remove the semaphore id \"$semid\": $!" ) if( $self->_warnings_is_enabled );
+        }
     }
     $self->removed( $rv ? 1 : 0 );
     if( $rv )
     {
-        if( HAS_THREADS && is_shared( $SHEM_REPO ) )
+        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS );
+        &_threads_lock( $ID2OBJ ) if( HAS_THREADS );
+        my @slices;
+        if( HAS_THREADS )
         {
-            lock( $SHEM_REPO );
-            lock( $ID2OBJ );
-            for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
+            share( @slices );
+        }
+        for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
+        {
+            my $this_id = $SHEM_REPO->[$i];
+            if( $this_id eq $id )
             {
-                my $this_id = $SHEM_REPO->[$i];
-                my $obj = $ID2OBJ->{ $this_id };
-                if( Scalar::Util::blessed( $obj ) && $this_id eq $id )
+                # slice is not supported on shared array, so we have to make a copy, and re-share it.
+                if( !HAS_THREADS )
                 {
                     CORE::splice( @$SHEM_REPO, $i, 1 );
-                    CORE::delete( $ID2OBJ->{ $this_id } );
-                    last;
                 }
+                CORE::delete( $ID2OBJ->{ $this_id } );
+                last;
+            }
+            # Re-build a new array, excluding the elements to splice
+            elsif( HAS_THREADS )
+            {
+                push( @slices, $SHEM_REPO->[$i] );
             }
         }
-        else
+
+        # Did we rebuilt the shared array ?
+        if( scalar( @slices ) )
         {
-            for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
-            {
-                my $this_id = $SHEM_REPO->[$i];
-                my $obj = $ID2OBJ->{ $this_id };
-                if( Scalar::Util::blessed( $obj ) && $this_id eq $id )
-                {
-                    CORE::splice( @$SHEM_REPO, $i, 1 );
-                    CORE::delete( $ID2OBJ->{ $this_id } );
-                    last;
-                }
-            }
+            @$SHEM_REPO = @slices;
         }
         $self->id( undef() );
         $self->semid( undef() );
@@ -787,15 +837,59 @@ sub remove_semaphore
 {
     my $self = shift( @_ );
     return(1) if( $self->removed_semaphore );
-    my $semid = $self->semid;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid ) );
+    my $id   = shift( @_ ) || $self->id || return( $self->error( "No shared memory id provided nor found." ) );
+    my $semid = shift( @_ ) || $self->semid;
+    return( $self->error( "No semaphore id provided nor found for shared memory id '$id'. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid // '' ) );
+    my $serial = $self->serial;
+    # Should we really remove this part ?
+    # if( $semid eq '0' )
+    # {
+    #     $self->removed_semaphore(1);
+    #     $self->semid( undef() );
+    #     return(1);
+    # }
+
     $self->unlock();
+    # try-catch
+    local $@;
     my $rv;
     no strict 'subs';
     my $arg = 0;
-    if( !defined( $rv = semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg ) ) )
+    eval
     {
-        warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "': $!" ) if( $self->_warnings_is_enabled );
+        $rv = semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An error occurred while trying to remove semaphore with id '$semid' for shared memory segment with id '$id': $@" ) );
+    }
+    elsif( !defined( $rv ) || ( $rv == -1 && $! ) )
+    {
+        # return( $self->error( "Unable to remove semaphore with id '$semid' for shared memory segment with id '$id': $!" ) );
+        # Suppress warning for EINVAL/EIDRM (semaphore already removed or invalid)
+        if( $!{EINVAL} || $!{EIDRM} )
+        {
+            # Treat as success since semaphore is gone
+            $rv = 1;
+            if( defined( $serial ) && CORE::exists( $SERIAL2SEMID->{ $serial } ) )
+            {
+                &_threads_lock( $SERIAL2SEMID ) if( HAS_THREADS );
+                CORE::delete( $SERIAL2SEMID->{ $serial } );
+            }
+        }
+        else
+        {
+            warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "' for shared memory id $id: $!" ) if( $self->_warnings_is_enabled );
+        }
+    }
+    else
+    {
+        if( defined( $serial ) && CORE::exists( $SERIAL2SEMID->{ $serial } ) )
+        {
+            &_threads_lock( $SERIAL2SEMID ) if( HAS_THREADS );
+            CORE::delete( $SERIAL2SEMID->{ $serial } );
+        }
+        # return(1);
     }
     $self->removed_semaphore( $rv ? 1 : 0 );
     $self->semid( undef() );
@@ -854,7 +948,7 @@ sub stat
 {
     my $self = shift( @_ );
     my $id   = $self->semid;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id ) );
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id // '' ) );
     no strict 'subs';
     if( @_ )
     {
@@ -868,8 +962,23 @@ sub stat
         else
         {
             my( $sem, $val ) = @_;
-            semctl( $id, $sem, &IPC::SysV::SETVAL, $val ) ||
-                return( $self->error( "Unable to semctl with semaphore id '$id', semaphore '$sem', SETVAL='", &IPC::SysV::SETVAL, "' and value='$val': $!" ) );
+            # semctl( $id, $sem, &IPC::SysV::SETVAL, $val ) ||
+            #     return( $self->error( "Unable to semctl with semaphore id '$id', semaphore '$sem', SETVAL='", &IPC::SysV::SETVAL, "' and value='$val': $!" ) );
+            my $rv = semctl( $id, $sem, &IPC::SysV::SETVAL, $val );
+            if( !defined( $rv ) )
+            {
+                # Suppress EINVAL as non-fatal (semaphore may be invalid or removed)
+                if( $!{EINVAL} )
+                {
+                    # Treat as success to allow recovery
+                    $rv = 1;
+                }
+                else
+                {
+                    return( $self->error( "Unable to semctl with semaphore id '$id', semaphore '$sem', SETVAL='${\(&SETVAL)}' and value='$val': $!" ) );
+                }
+            }
+            return( $rv );
         }
     }
     else
@@ -893,6 +1002,22 @@ sub storable { return( shift->_packing_method( 'storable' ) ); }
 
 sub supported { return( $SYSV_SUPPORTED ); }
 
+# sub unlock
+# {
+#     my $self = shift( @_ );
+#     return(1) if( !$self->locked );
+#     my $semid = $self->semid;
+#     return( $self->error( "No semaphore set yet. You must open the shared memory first to unlock semaphore." ) ) if( !length( $semid // '' ) );
+#     my $type = ( $self->locked | LOCK_UN );
+#     $type ^= LOCK_NB if( $type & LOCK_NB );
+#     my $rc = $self->op( @{$SEMOP_ARGS->{ $type }} );
+#     if( !defined( $rc ) )
+#     {
+#         # Failed to unlock semaphore
+#     }
+#     $self->locked(0);
+#     return( $self );
+# }
 sub unlock
 {
     my $self = shift( @_ );
@@ -901,10 +1026,11 @@ sub unlock
     return( $self->error( "No semaphore set yet. You must open the shared memory first to unlock semaphore." ) ) if( !length( $semid ) );
     my $type = ( $self->locked | LOCK_UN );
     $type ^= LOCK_NB if( $type & LOCK_NB );
-    if( defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
+    if( !defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
     {
-        $self->locked(0);
+        # Failed to unlock semaphore
     }
+    $self->locked(0);
     return( $self );
 }
 
@@ -1006,17 +1132,31 @@ sub write
     {
         return( $self->error( "Data to write are ", length( $encoded ), " bytes long and exceed the maximum you have set of '$size'." ) );
     }
+
+    # Ensure the shared memory segment is attached
     my $addr = $self->addr;
-    if( $addr )
+    if( !defined( $addr ) || ( Scalar::Util::looks_like_number( $addr ) && $addr == -1 ) )
     {
-        memwrite( $addr, $encoded, 0, $len ) ||
-            return( $self->error( "Unable to write to shared memory address '$addr' using memwrite: $!" ) );
+        $addr = shmat( $id, undef, 0 );
+        if( !defined( $addr ) || ( Scalar::Util::looks_like_number( $addr ) && $addr == -1 ) )
+        {
+            return( $self->error( "Unable to attach to shared memory id '$id': $!" ) );
+        }
+        $self->addr( $addr );
     }
-    else
+    
+    $self->lock( LOCK_EX ) || return( $self->pass_error );
+    # my $rv = shmwrite( $id, $encoded, 0, $len ) ||
+    #     return( $self->error( "Unable to write to shared memory id '$id' with ${len} bytes of data encoded and memory size of $size: $!" ) );
+    memwrite( $addr, $encoded, 0, $len ) ||
+        return( $self->error( "Unable to write to shared memory address '$addr' using memwrite: $!" ) );
+    $self->unlock;
+    
+    # Detach the segment to avoid leaving it attached in the thread
+    if( defined( $addr ) && !( Scalar::Util::looks_like_number( $addr ) && $addr == -1 ) )
     {
-        # id, data, position, size
-        shmwrite( $id, $encoded, 0, $len ) ||
-            return( $self->error( "Unable to write to shared memory id '$id' with ${len} bytes of data encoded and memory size of $size: $!" ) );
+        shmdt( $addr );
+        $self->addr( undef );
     }
     return( $self );
 }
@@ -1168,13 +1308,7 @@ sub _str2key
     {
         # my $id = 0;
         # $id += $_ for( unpack( "C*", $key ) );
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Digest::SHA;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
         my $hash = Digest::SHA::sha1_base64( $key );
         my $id = ord( substr( $hash, 0, 1 ) );
         # We use the root as a reliable and stable path.
@@ -1187,8 +1321,11 @@ sub _str2key
 
 sub DESTROY
 {
-    my $self = shift( @_ );
-    return unless( $self->{id} );
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    CORE::return unless( $self->{id} );
     $self->unlock;
     $self->detach;
     my $rv = $self->remove_semaphore;
@@ -1246,11 +1383,21 @@ sub THAW
     CORE::return( $new );
 }
 
+# NOTE: END
 END
 {
     foreach my $id ( @$SHEM_REPO )
     {
         my $s = $ID2OBJ->{ $id } || next;
+        if( HAS_THREADS )
+        {
+            $s = eval{ Storable::Improved::thaw( $s ) };
+            if( $@ )
+            {
+                warn( "Error deserialising object with Storable::Improved: $@" ) if( warnings::enabled() );
+                next;
+            }
+        }
         next if( $s->removed || !$s->id || !$s->destroy );
         $s->detach;
         $s->remove;

@@ -18,74 +18,154 @@ Module::Generic::Iterator - An Array Iterator Object Class
         printf( "Next value is: %s at offset %d\n", $elem->next, $elem->next->pos  );
     }
 
+    # Navigate to a specific element
+    my $elem = $iter->find( "Jack" );
+    print( "Found Jack at position: ", $elem->pos, "\n" );
+
+    # Use element navigation
+    my $first = $iter->first;
+    my $next = $first->next; # Returns "Jack" as an element
+    print( "Next after John: ", $next->value, "\n" );
+
 =head1 VERSION
 
-    v1.2.1
+    v1.2.3
 
 =head1 DESCRIPTION
 
-This provides an object oriented array iterator. Each of its elements are L<Module::Generic::Iterator::Element> object
+L<Module::Generic::Iterator> provides a generic iterator interface for traversing a list of elements. It supports navigation through the list with methods like L</next>, L</prev>, L</first>, and L</last>, and allows finding specific elements with L</find>. Each element in the iterator is wrapped in a L<Module::Generic::Iterator::Element> object, which provides contextual navigation (e.g., L</next>, L</prev>) relative to the parent iterator.
 
-=head1 METHODS
+This class is designed to be lightweight and flexible, working with any array of values, including scalars, references, or objects.
+
+=head1 CONSTRUCTORS
 
 =head2 new
 
-Provided with an array reference or an L<Module::Generic::Array> object, and this will create a new iterator and return it.
+Creates a new iterator object. It takes an optional array reference or an L<Module::Generic::Array> object of elements to iterate over, and an optional hash or hash reference of parameters, and returns the newly instantiated object:
+
+    my $iter = Module::Generic::Iterator->new( [1, 2, 3], debug => 3 );
+
+Supported parameters:
+
+=over 4
+
+=item * C<debug>
+
+An integer to enable debugging. See L<Module::Generic/debug>.
+
+=back
+
+Returns a new L<Module::Generic::Iterator> object.
+
+=head1 METHODS
 
 =head2 elements
 
-Contains the array elements
+Returns the underlying array of elements as a L<Module::Generic::Array> object. Each element is a L<Module::Generic::Iterator::Element> object:
+
+    my $elems = $iter->elements;
+    print( $elems->length, "\n" ); # Number of elements
 
 =head2 eof
 
-Returns true if the position in the iterator has reached the end of the array.
+Returns true if the iterator is at the end of the list (i.e., the current position is the last element or beyond). Optionally takes an element to check its position:
+
+    if( $iter->eof )
+    {
+        print( "End of iterator\n" );
+    }
 
 =head2 find
 
-Creates a clone of the current array object and returns it.Provided wit an array element and this returns its position in the array starting at 0.
+Finds an element by value and returns its corresponding L<Module::Generic::Iterator::Element> object. Returns C<undef> in scalar context, or an empty list in list context if the element is not found:
 
-If nothing was found, this returns undef.
+    my $elem = $iter->find( "Jack" );
+    print( $elem->value, "\n" ) if( $elem ); # "Jack"
+
+For reference values, comparison is done using L<Scalar::Util/refaddr>. For scalar values, comparison is done using string equality (C<eq>).
 
 =head2 first
 
-Returns the first element of the array.
+Moves the iterator to the first element and returns it as a L<Module::Generic::Iterator::Element> object:
+
+    my $first = $iter->first;
+    print( $first->value, "\n" ); # First element
 
 =head2 has_next
 
-Returns true if there is another item after the current one.
+Returns true if there is a next element in the iterator:
+
+    while( $iter->has_next )
+    {
+        my $elem = $iter->next;
+        print( $elem->value, "\n" );
+    }
 
 =head2 has_prev
 
-Returns true if there is another item before the current one.
+Returns true if there is a previous element in the iterator:
+
+    $iter->last;
+    if( $iter->has_prev )
+    {
+        my $prev = $iter->prev;
+        print( $prev->value, "\n" );
+    }
 
 =head2 last
 
-Returns the last element of the array.
+Moves the iterator to the last element and returns it as a L<Module::Generic::Iterator::Element> object:
+
+    my $last = $iter->last;
+    print( $last->value, "\n" ); # Last element
 
 =head2 length
 
-Returns the size of the array, starting from 1, as a L<Module::Generic::Number> object.
+Returns the number of elements, starting from 1, as a L<Module::Generic::Number> object.
+
+    print( $iter->length, "\n" ); # e.g., 5
 
 =head2 next
 
-Returns the next L<Module::Generic::Iterator::Element> object or undef if there are no more element.
+Moves the iterator to the next element and returns it as a L<Module::Generic::Iterator::Element> object. Optionally takes an element to start from:
+
+    while( my $elem = $iter->next )
+    {
+        print( $elem->value, "\n" );
+    }
+
+Returns C<undef> in scalar context, or an empty list in list context, if there are no more elements.
 
 =head2 pos
 
-Sets or returns the current position in the array.
+An lvalue method to get or set the current position in the iterator. Returns the position as an integer:
 
-This is an lvalue method.
+    $iter->pos = 2; # Move to the third element
+    my $pos = $iter->pos; # Returns the current position
+    print( $iter->pos, "\n" ); # 2
 
-    $e->pos = 10; # Sets the current position to 10
-    my $pos = $e->pos; # Returns the current position
+Warns if the position is not an integer.
+
 
 =head2 prev
 
-Returns the previous L<Module::Generic::Iterator::Element> object or undef if there are no more previous element.
+Moves the iterator to the previous element and returns it as a L<Module::Generic::Iterator::Element> object. Optionally takes an element to start from:
+
+    $iter->last;
+    my $prev = $iter->prev;
+    print( $prev->value, "\n" );
+
+Returns C<undef> in scalar context, or an empty list in list context, if there are no previous elements.
 
 =head2 reset
 
-Reset the position inside the array and sets it to 0.
+Resets the iterator position to the beginning (position 0):
+
+    $iter->last;
+    $iter->reset;
+    print( $iter->pos, "\n" ); # 0
+
+Returns the iterator object.
 
 =head2 _find_pos
 
@@ -104,6 +184,58 @@ Provided with an item, this returns its position in the array or undef if it is 
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD-SAFETY
+
+L<Module::Generic::Iterator> is thread-safe for all operations, as it operates on per-object state and does not modify shared resources at runtime.
+
+Key considerations for thread-safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+There are no shared variables that are modified at runtime. The global C<$DEBUG> variable (inherited from L<Module::Generic>) is typically set before threads are created, and it is the user's responsibility to ensure thread-safety if modified at runtime:
+
+    use threads;
+    local $Module::Generic::Iterator::DEBUG = 0; # Set before threads
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $iter = Module::Generic::Iterator->new( [1, 2, 3] );
+            $iter->next; # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Object State>
+
+Iterator data (e.g., L</elements>, L</pos>, L<Module::Generic::Iterator::Element/value>) is stored per-object, ensuring thread isolation:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $iter = Module::Generic::Iterator->new( [1, 2, 3] );
+            while( my $elem = $iter->next )
+            {
+                print( $elem->value, "\n" ); # Thread-safe
+            }
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+
+=back
+
+For debugging in threaded environments (depending on your Operating System):
+
+    ls -l /proc/$$/fd  # List open file descriptors
 
 =head1 SEE ALSO
 

@@ -1,5 +1,4 @@
-
-jQuery(document).ready(function() {
+function selfServiceAnnounce () {
     jQuery('#more_announcements').hide();
     var hide = true;
     jQuery('#toggle_announcements').click( function() {
@@ -14,4 +13,13 @@ jQuery(document).ready(function() {
             hide = true;
         }
     });
-});
+}
+if (typeof htmx != "undefined") {
+    htmx.onLoad(function(elt) {
+        selfServiceAnnounce();
+    });
+} else {
+    jQuery(document).ready(function() {
+        selfServiceAnnounce();
+    });
+}

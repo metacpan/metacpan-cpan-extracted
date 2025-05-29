@@ -1,0 +1,4 @@
+Revision history for perl module ICANN::gTLD
+
+0.02 - 2025-05-28
+  - add ICANN::gTLD->tld() and ICANN::gTLD->name()

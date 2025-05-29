@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Weasel driver wrapping Selenium::Remote::Driver
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -47,8 +47,8 @@ This module wraps L<Selenium::Remote::Driver>, version 2.
 =cut
 
 
-package Weasel::Driver::Selenium2;
-$Weasel::Driver::Selenium2::VERSION = '0.14';
+package Weasel::Driver::Selenium2 0.15;
+
 use strict;
 use warnings;
 
@@ -221,7 +221,9 @@ sub wait_for {
     # Do NOT use Selenium::Waiter, it eats all exceptions!
     my $end = time() + $args{retry_timeout};
     my $rv;
+    my $count = 0;
     while (1) {
+        $count++;
         $rv = $callback->();
         return $rv if $rv;
 
@@ -232,10 +234,10 @@ sub wait_for {
             $args{on_timeout}->();
         }
         else {
-            croak "wait_for deadline expired waiting for: $args{description}"
+            croak "wait_for deadline expired ($args{retry_timeout}s; $count poll attempts) waiting for: $args{description}"
                 if defined $args{description};
 
-            croak 'wait_for deadline expired; consider increasing the deadline';
+            croak "wait_for deadline expired ($args{retry_timeout}s; $count poll attempts); consider increasing the deadline";
         }
     }
 
@@ -334,25 +336,26 @@ sub get_text {
 
 =cut
 
+my $check_displayed_script = <<'SCRIPT';
+var elm = arguments[0];
+
+if (!elm) return false;
+var style = window.getComputedStyle(elm);
+if (style.display === 'none') return false;
+if (style.visibility === 'hidden') return false;
+if (style.opacity === '0') return false;
+
+if (elm.offsetWidth === 0 || elm.offsetHeight === 0) return false;
+var rect = elm.getBoundingClientRect();
+if (rect.width === 0 || rect.height === 0) return false;
+
+return true;
+SCRIPT
+
 sub is_displayed {
     my ($self, $id) = @_;
 
-    my $script = <<~'SCRIPT';
-      var elm = arguments[0];
-
-      if (!elm) return false;
-      var style = window.getComputedStyle(elm);
-      if (style.display === 'none') return false;
-      if (style.visibility === 'hidden') return false;
-      if (style.opacity === '0') return false;
-
-      if (elm.offsetWidth === 0 || elm.offsetHeight === 0) return false;
-      var rect = elm.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return false;
-
-      return true;
-      SCRIPT
-    return $self->execute_script($script, $self->_resolve_id($id));
+    return $self->execute_script($check_displayed_script, $self->_resolve_id($id));
 }
 
 =item set_attribute($id, $att_name, $value)

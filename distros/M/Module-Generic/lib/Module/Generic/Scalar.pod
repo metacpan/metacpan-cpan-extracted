@@ -144,7 +144,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.4.2
+    v1.4.3
 
 =head1 DESCRIPTION
 
@@ -790,6 +790,86 @@ Alias for L</uc>
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD-SAFETY
+
+This module is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event. It relies on L<Module::Generic::Global> for thread-safe storage of shared state and employs synchronisation mechanisms to prevent data corruption and race conditions.
+
+=head2 Synchronisation Mechanisms
+
+=over 4
+
+=item * B<Shared State>
+
+The module uses L<Module::Generic::Global> to manage shared state in two namespaces:
+
+=over 8
+
+=item - C<errors>: Stores error objects for L</error> and L</pass_error>, keyed by object reference address, process ID, and thread ID (if applicable).
+
+=item - C<loaded_classes>: Tracks loaded classes in C<_load_class>, keyed by class name and thread ID (if applicable).
+
+=back
+
+These repositories are C<:shared> when C<CAN_THREADS> is true (Perl supports ithreads), protected by L<perlfunc/lock> for Perl threads or L<APR::ThreadRWLock> for mod_perl threaded MPMs without L<threads>. In non-threaded environments, repositories are per-process, requiring no synchronisation.
+
+=item * B<Tied Scalars>
+
+When callbacks are set via C<callback>, the scalar is tied to C<Module::Generic::Scalar::Tie>. As of version 1.4.3, tied scalar operations (e.g., C<STORE>, C<FETCH>) are thread-safe, as they rely on L<Module::Generic::Global>’s synchronisation. However, callbacks themselves are not inherently thread-safe. If a callback accesses shared resources or performs complex operations, you must implement additional synchronisation (e.g., using L<perlfunc/lock> or L<Thread::Semaphore>).
+
+=back
+
+=head2 Context Key Isolation
+
+L<Module::Generic::Global> uses context keys to isolate data:
+
+=over 4
+
+=item * B<Object-Level Keys>
+
+Methods like L</error>, L</pass_error>, and C<DESTROY> use object-level keys (C<< <refaddr>;<pid>[;<tid>] >>), where C<refaddr> is the object’s reference address, C<pid> is the process ID, and C<tid> is the thread ID (if C<HAS_THREADS> is true). This ensures thread- and process-specific isolation for errors.
+
+=item * B<Class-Level Keys>
+
+C<_load_class> uses class-level keys (C<< <class>[;<tid>] >>), isolating loaded class tracking per thread or process.
+
+=back
+
+Keys differ between threaded (C<< <refaddr>;<pid>;<tid> >>) and non-threaded (C<< <refaddr>;<pid> >>) environments, preventing cross-context interference.
+
+=head2 Error Handling
+
+Errors are stored in the C<errors> namespace, with one error per object-process-thread combination. The package-global C<$ERROR> is retained for backward compatibility but is not cleared in C<DESTROY> to avoid affecting other objects. Errors are serialised using L<Storable::Improved> for thread compatibility.
+
+=head2 mod_perl Considerations
+
+=over 4
+
+=item * B<Prefork MPM>
+
+Data is per-process, requiring no additional synchronisation.
+
+=item * B<Threaded MPMs (Worker/Event)>
+
+Shared repositories are protected by L<Module::Generic::Global>’s synchronisation. Users should call C<Module::Generic::Global->cleanup_register> in mod_perl handlers to clear repositories after requests, preventing memory leaks.
+
+=item * B<Thread-Unsafe Functions>
+
+Avoid Perl functions like C<localtime>, C<readdir>, C<srand>, or operations like C<chdir>, C<umask>, C<chroot> in threaded MPMs, as they may affect all threads. Consult L<perlthrtut|http://perldoc.perl.org/perlthrtut.html> and L<mod_perl documentation|https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environment_Issues> for details.
+
+=back
+
+=head2 Recommendations for Threaded Applications
+
+=over 4
+
+=item * Use non-tied scalars without additional synchronisation, as L<Module::Generic::Global> handles shared state.
+
+=item * For tied scalars, ensure callbacks are thread-safe by adding locks for shared resources.
+
+=item * In mod_perl, use C<cleanup_register> to manage memory.
+
+=back
 
 =head1 SEE ALSO
 

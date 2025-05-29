@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::URI qw(check_urn);
 use Readonly;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 
 Readonly::Array our @RIGHT_URNS => qw(
@@ -34,7 +34,14 @@ foreach my $right_urn (@RIGHT_URNS) {
 # Test.
 $self = {};
 $ret = check_urn($self, 'key');
-is($ret, undef, 'Right not exist key.');
+is($ret, undef, 'Right URN is present (no key).');
+
+# Test.
+$self = {
+	'key' => undef,
+};
+$ret = check_urn($self, 'key');
+is($ret, undef, 'Right URN is present (undef).');
 
 # Test.
 foreach my $bad_urn (@BAD_URNS) {

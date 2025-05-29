@@ -1,9 +1,10 @@
 #!/usr/bin/perl
-
 use Test::More qw( no_plan );
 use strict;
 use warnings;
-use lib './lib';
+use Config;
+use Cwd qw( abs_path );
+use lib abs_path( './lib' );
 use DateTime;
 use DateTime::Duration;
 use DateTime::Format::Strptime;
@@ -98,5 +99,27 @@ is( $now2->year, $dt_now2->year, 'default year' );
 is( $now2->month, $dt_now2->month, 'default month' );
 is( $now2->day, $dt_now2->day, 'default day' );
 is( $now2->time_zone->name, $dt_now2->time_zone->name, 'default time zone' );
+
+subtest 'threaded usage' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+        require threads;
+        threads->import;
+        my $dt = Module::Generic::DateTime->new( year => 2024, month => 4, day => 26 );
+
+        my $thr = threads->create(sub
+        {
+            return( $dt->year );
+        });
+
+        my $year = $thr->join;
+        is( $year, 2024, 'Year is correct in thread' );
+    };
+};
 
 done_testing;

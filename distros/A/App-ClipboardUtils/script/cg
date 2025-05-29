@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-27'; # DATE
+our $DATE = '2025-05-29'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Clipboard/Any/get_clipboard_content",
@@ -40,7 +40,7 @@ cg - Even shorter alias for get-clipboard-content and clipget
 
 =head1 VERSION
 
-This document describes version 0.009 of cg (from Perl distribution App-ClipboardUtils), released on 2025-01-27.
+This document describes version 0.010 of cg (from Perl distribution App-ClipboardUtils), released on 2025-05-29.
 
 =head1 SYNOPSIS
 

@@ -99,7 +99,7 @@ Corrupted symbol tables if a method is installed while another thread is reading
 
 =item *
 
-Use this module only during application initialization, before any threads are spawned.
+Use this module only during application initialisation, before any threads are spawned.
 
 =item *
 
@@ -110,6 +110,13 @@ Avoid invoking C<new()> or triggering C<AUTOLOAD()> from within a thread.
 If used in a persistent environment (like mod_perl), precompile structures at startup.
 
 =back
+
+=head1 ERROR HANDLING
+
+Errors in C<new> and C<AUTOLOAD>, such as invalid parameters, return C<undef> with an error object accessible via C<< $obj->error >>. Check for errors to handle failures gracefully:
+
+    my $obj = Module::Generic::Dynamic->new( %data );
+    die( $obj->error ) if( !defined( $obj ) );
 
 =head1 AUTHOR
 

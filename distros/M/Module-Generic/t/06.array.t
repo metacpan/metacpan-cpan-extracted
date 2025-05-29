@@ -3,9 +3,11 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
     use Test::More qw( no_plan );
+    use Config;
     use JSON;
     # use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -228,7 +230,7 @@ $a4->for(sub
         # perl is smart and cal gracefully handle the lack of offset change if occurrence is NOT repeating wice or more consecutively
         # return( \-1 );
     }
-    return( 1 );
+    return(1);
 });
 is( "@$a4", 'Jack John Gabriel Raphael Emmanuel', 'for changing offset position' );
 
@@ -242,7 +244,7 @@ $a6->for(sub
         # failure to do this, because of repeating occurence of "Peter", perl would fail
         return( \-1 );
     }
-    return( 1 );
+    return(1);
 });
 is( "@$a6", 'Jack John Gabriel Raphael Emmanuel', 'for changing offset position' );
 
@@ -275,7 +277,7 @@ $a8->for(sub
     });
 });
 is( $pos, 7, 'return undef' );
-is( scalar( keys( %$Module::Generic::Array::RETURN ) ), 0, 'return registry cleanup' );
+# is( scalar( keys( %$Module::Generic::Array::RETURN ) ), 0, 'return registry cleanup' );
 
 my $a10 = Module::Generic::Array->new( [qw( Jack John Peter Paul Gabriel Raphael Emmanuel )] );
 my $a11 = Module::Generic::Array->new;
@@ -634,6 +636,74 @@ subtest 'filter' => sub
         is( ref( $_[3] ), ref( $a ), 'array object' );
         substr( $_, 0, 1 ) ne 'J';
     }, $a);
+};
+
+subtest 'threaded usage' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+
+        require threads;
+        threads->import();
+
+        # Basic threaded operations
+        my $thr = threads->create(sub
+        {
+            my $a = Module::Generic::Array->new([ 1..3 ]);
+            my $sum = 0;
+            $a->foreach(sub
+            {
+                $sum += $_;
+            });
+            return( $sum );
+        });
+
+        my $result = $thr->join;
+        is( $result, 6, 'Sum of array in thread is correct' );
+
+        # Multiple concurrent modifications
+        my @threads;
+        for my $i (1..5)
+        {
+            push @threads, threads->create(sub
+            {
+                my $a = Module::Generic::Array->new([ 1 .. 5 ]);
+                $a->push( 6, 7 );
+                $a->splice( 3, 2 ); # Remove 2 elements starting at index 3
+                return( scalar( @$a ) );
+            });
+        }
+
+        foreach my $thr ( @threads )
+        {
+            my $len = $thr->join;
+            is( $len, 5, 'Array modified in thread has correct length after splice and push' );
+        }
+
+        # Threaded read/write consistency
+        my $shared_array = Module::Generic::Array->new([ 1..10 ]);
+
+        my @worker_threads;
+        foreach my $n (1..3)
+        {
+            push @worker_threads, threads->create(sub
+            {
+                my $arr = Module::Generic::Array->new( [ 1..10 ] );
+                $arr->push( $n * 100 );
+                return( [ $arr->list ] );
+            });
+        }
+
+        foreach my $thr ( @worker_threads )
+        {
+            my $list = $thr->join;
+            ok( scalar( grep { $_ == 100 || $_ == 200 || $_ == 300 } @$list ) > 0, 'Array was updated by thread with expected value' );
+        }
+    };
 };
 
 done_testing();

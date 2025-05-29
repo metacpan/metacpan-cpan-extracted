@@ -6,8 +6,10 @@ BEGIN
     use strict;
     use warnings;
     use utf8;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
+    use Config;
     use File::Which;
     use POSIX ();
     use open ':std' => ':utf8';
@@ -31,7 +33,10 @@ use warnings;
 
 # diag( "Environment variables: ", Dumper( \%ENV ) );
 
-BEGIN { use_ok( 'Module::Generic::Number' ) || BAIL_OUT( "Unable to load Module::Generic::Number" ); }
+BEGIN
+{
+    use_ok( 'Module::Generic::Number' ) || BAIL_OUT( "Unable to load Module::Generic::Number" );
+};
 POSIX::setlocale( &POSIX::LC_ALL, 'C.UTF-8' ) if( $DEBUG );
 my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
 diag( "Current locale is '$curr_locale'" ) if( $DEBUG );
@@ -129,11 +134,12 @@ my $n2 = $n->clone;
 is( $n2->locale, $new_loc, "Locale is kept with cloning" );
 $n2->symbol( '€' );
 
-no warnings;
-my $n_fail = Module::Generic::Number->new( 'USD One' );
-use warnings;
-# diag( Module::Generic::Number->error );
-is( $n_fail, undef, 'Invalid number' );
+{
+    no warnings;
+    my $n_fail = Module::Generic::Number->new( 'USD One' );
+    # diag( Module::Generic::Number->error );
+    is( $n_fail, undef, 'Invalid number' );
+}
 
 # Creating object from locale
 SKIP:
@@ -209,12 +215,20 @@ is( 10 <=> $n, -1, 'Numerical comparison lower' );
 is( 1281284 <=> $n, 0, 'Numerical comparison equal' );
 is( 1281285 <=> $n, 1, 'Numerical comparison higher' );
 ok( 1281284 == $n, 'Equal' );
-ok( $n != 'Hello', 'Not equal string' );
+{
+    no warnings;
+    local $SIG{__WARN__} = sub{};
+    ok( $n != 'Hello', 'Not equal string' );
+}
 ok( $n != $n2, 'Not equal number' );
 ok( $n eq 1281284, 'Equal as string' );
 ok( $n ne $n2, 'Not equal as string' );
-my $bool = $n != 'Bonjour';
-# isa_ok( $bool, 'Module::Generic::Boolean', 'Returning boolean object' );
+{
+    no warnings;
+    local $SIG{__WARN__} = sub{};
+    my $bool = $n != 'Bonjour';
+    # isa_ok( $bool, 'Module::Generic::Boolean', 'Returning boolean object' );
+}
 is( ++$n, 1281285, 'Incrementing' );
 is( $n++, 1281286, 'Incrementing (bis)' );
 is( $n--, 1281285, 'Decrementing' );
@@ -278,7 +292,7 @@ is( $n5->floor, POSIX::floor( $n5 ), 'floor' );
 # -0.413777602170324
 is( $n4->cos, CORE::cos( $n4 ), 'cos' );
 # 20.0855369231877
-is( $n4->clone( 3 )->exp, POSIX::exp( 3 ), 'exp' );
+is( $n4->clone(3)->exp, POSIX::exp( 3 ), 'exp' );
 # 108
 is( $n5->int, CORE::int( $n5 ), 'int' );
 ok( !$n5->is_negative, 'Not negative' );
@@ -291,20 +305,20 @@ is( $n4->log, CORE::log( $n4 ), 'log' );
 is( $n4->log2, POSIX::log2( $n4 ), 'log2' );
 # 6.10764540293951
 is( $n4->log10, POSIX::log10( $n4 ), 'log10' );
-is( $n4->max( 1281285 ), 1281285, 'max' );
-is( $n4->min( 1281285 ), 1281284, 'min' );
-is( $n4->mod( 3 ), 2, 'mod' );
+is( $n4->max(1281285), 1281285, 'max' );
+is( $n4->min(1281285), 1281284, 'min' );
+is( $n4->mod(3), 2, 'mod' );
 is( $n4->oct, 10, 'oct' );
-is( $n4->clone( 3.14159265358979323846 )->round( 4 ), 3.1416, 'Rounding' );
+is( $n4->clone(3.14159265358979323846)->round(4), 3.1416, 'Rounding' );
 # -0.910377996187395
 is( $n4->sin, CORE::sin( $n4 ), 'sin' );
 is( $n4->sqrt, CORE::sqrt( $n4 ), 'sqrt' );
 # 2.20016257867108
 is( $n4->tan, POSIX::tan( $n4 ), 'tan' );
-my $pie = $n4->clone( 3.14159265358979323846 );
+my $pie = $n4->clone(3.14159265358979323846);
 is( $pie->length, CORE::length( $pie ), 'Number length' );
 ok( $n4->is_finite, 'Is finite number' );
-ok( $n4->clone( 3.14159265358979323846 )->is_float, 'Is float' );
+ok( $n4->clone(3.14159265358979323846)->is_float, 'Is float' );
 ok( $n4->is_int, 'Is integer' );
 ok( !$n4->is_nan, 'Is NaN' );
 ok( $n4->is_positive, 'Is positive number' );
@@ -345,8 +359,8 @@ ok( $nan->is_nan, 'NaN is NaN' );
 ok( !$nan->is_normal, 'NaN is not normal number' );
 # diag( "Min NaN and 10: " . $nan->min( 10 ) );
 # diag( POSIX::fmax( 'NaN', 10 ) );
-is( $nan->min( 10 ), 10, 'NaN with min' );
-is( $nan->max( 10 ), 10, 'NaN with max' );
+is( $nan->min(10), 10, 'NaN with min' );
+is( $nan->max(10), 10, 'NaN with max' );
 is( $nan * 10, 'NaN', 'NaN overloaded' );
 
 # diag( "Formatting as bytes '$n4'." );
@@ -358,13 +372,13 @@ is( $n4->format_binary, '100111000110100000100', 'Formatting as binary' );
 is( $n4->from_hex( $n4->format_hex ), 1281284, 'Converting from hex' );
 is( $n4->from_binary( $n4->format_binary ), 1281284, 'Converting from binary' );
 
-isa_ok( Module::Generic::Number->new( 0 )->as_boolean, 'Module::Generic::Boolean', 'Number to boolean object' );
-ok( !Module::Generic::Number->new( 0 )->as_boolean, 'Number to false boolean' );
-ok( Module::Generic::Number->new( 2 )->as_boolean, 'Number to true boolean' );
-ok( Module::Generic::Number->new( 2 )->as_boolean == 1, 'Number to boolean, checking value' );
-is( Module::Generic::Number->new( 74 )->chr, 'J', 'Number to character' );
+isa_ok( Module::Generic::Number->new(0)->as_boolean, 'Module::Generic::Boolean', 'Number to boolean object' );
+ok( !Module::Generic::Number->new(0)->as_boolean, 'Number to false boolean' );
+ok( Module::Generic::Number->new(2)->as_boolean, 'Number to true boolean' );
+ok( Module::Generic::Number->new(2)->as_boolean == 1, 'Number to boolean, checking value' );
+is( Module::Generic::Number->new(74)->chr, 'J', 'Number to character' );
 
-my $n6 = Module::Generic::Number->new( 10 );
+my $n6 = Module::Generic::Number->new(10);
 my $s6 = $n6->as_scalar;
 isa_ok( $s6, 'Module::Generic::Scalar', 'as_scalar' );
 ok( $n6 eq "10", "stringified value" );
@@ -373,4 +387,75 @@ my $a = $n6->as_array;
 isa_ok( $a, 'Module::Generic::Array', 'as_array => Module::Generic::Array' );
 is( $a->[0], 10, 'as_array' );
 
+subtest 'Additional functionality and edge cases' => sub
+{
+    my $num = Module::Generic::Number->new( 3.14159, debug => $DEBUG );
+    is( $num->round_zero, 3, 'round_zero' );
+
+    my $lconv = POSIX::localeconv();
+    my $decoded = $num->decode_lconv( $lconv );
+    ok( defined( $decoded ), 'decode_lconv' );
+
+    my $mult = $num->_get_multipliers(1000);
+    is( $mult->{kilo}, 1000, '_get_multipliers kilo base 1000' );
+
+    # Reset locale to C to ensure consistent formatting
+    POSIX::setlocale( &POSIX::LC_ALL, 'C' );
+    # Test a number that is already in scientific notation
+    my $sci_num = Module::Generic::Number->new( "1.23e+45", debug => $DEBUG );
+    is( $sci_num->format, "1.23e+45", 'Number in scientific notation is preserved' );
+
+    {
+        no warnings;
+        my $round_err = $num->round(-1);
+        ok( !defined( $round_err ), 'round with negative precision errors' );
+    }
+};
+
+subtest 'Thread-safe operations' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads not available', 2 );
+        }
+
+        require threads;
+        require threads::shared;
+
+        my @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid();
+                my $num = Module::Generic::Number->new( 1000, lang => 'fr_FR', debug => $DEBUG );
+                if( !defined( $num ) )
+                {
+                    diag( "Thread $tid: Failed to create number object: ", Module::Generic::Number->error ) if( $DEBUG );
+                    return(0);
+                }
+                $num += $tid;
+                my $formatted = $num->format;
+                if( !defined( $formatted ) )
+                {
+                    diag( "Thread $tid: Failed to format number: ", $num->error ) if( $DEBUG );
+                    return(0);
+                }
+                return(1);
+            });
+        } 1..5;
+
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join();
+        }
+
+        ok( $success, 'All threads performed operations successfully' );
+    };
+};
+
 done_testing();
+
+__END__

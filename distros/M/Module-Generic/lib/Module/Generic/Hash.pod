@@ -125,7 +125,7 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
 =head1 VERSION
 
-    v1.4.0
+    v1.4.1
 
 =head1 DESCRIPTION
 
@@ -244,7 +244,9 @@ Provided with a hash key and this returns true if there is a value defined for t
 
 =head2 delete
 
-Provided with a hash key and this remove the hash entry and return the previous value, exactly as L<perlfunc/"delete"> does.
+Provided with a hash key and this remove the hash entry and return the previous value, exactly as L<perlfunc/"delete"> does. Returns C<undef> if the key does not exist:
+
+    my $value = $h->delete( "role" ); # Returns "customer" if it existed
 
 =head2 dump
 
@@ -366,17 +368,35 @@ This returns the number of keys in the hash, as a L<Module::Generic::Number> obj
 
 Provided with a code reference and this calls L<perlfunc/map> and pass the code reference the hash key and its value.
 
-It returns a regular list, i.e. not an object, just like perl's L<perlfunc/map> would do.
+It returns a regular list, i.e. not an object, just like perl's L<perlfunc/map> would do. Returns an empty list if the code reference is invalid:
+
+    my @pairs = $h->map(sub
+    {
+        my( $k, $v ) = @_;
+        return( "$k=$v" );
+    }); # e.g., ("first_name=John", "last_name=Doe")
 
 =head2 map_array
 
 Does the same as L</map> above, except it returns a new array as a L<Module::Generic::Array> object.
+
+    my $pairs = $h->map_array(sub
+    {
+        my( $k, $v ) = @_;
+        return( "$k=$v" );
+    }); # e.g., ["first_name=John", "last_name=Doe"]
 
 =head2 map_hash
 
 Does the same as L</map> above, except it returns a new L<Module::Generic::Hash> object.
 
 For this to work properly, the code reference needs to return a key-value pair.
+
+    my $new_h = $h->map_hash(sub
+    {
+        my( $k, $v ) = @_;
+        return( uc($k) => $v );
+    }); # e.g., { FIRST_NAME => "John", LAST_NAME => "Doe" }
 
 =head2 merge
 
@@ -441,6 +461,79 @@ If the parameter I<sort> is provided, then it will sort the array before returni
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+    use Storable;
+    my $h = Module::Generic::Hash->new( age => 30 );
+    my $frozen = Storable::freeze( $h );
+    my $thawed = Storable::thaw( $frozen );
+    print "Age: ", $thawed->{age}, "\n"; # 30
+
+=head1 THREAD-SAFETY
+
+L<Module::Generic::Hash> is thread-safe for per-object operations, with proper handling of per-object state and external libraries. It supports multi-threaded environments, but care must be taken when sharing objects across threads or modifying global variables.
+
+Key considerations for thread-safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+The global variable C<$KEY_OBJECT> controls whether references can be used as hash keys. It is not shared by default, so concurrent modifications in threads may cause race conditions. Use C<local> or the L</key_object> method to set it per-object:
+
+    use threads;
+    my $h = Module::Generic::Hash->new;
+    $h->key_object(1); # Thread-safe per object
+    my $ref = [];
+    $h->{ $ref } = "array"; # Safe
+
+=item * B<Hash Data>
+
+Hash data is stored in a tied hash (L<Module::Generic::TieHash>), which is per-object and thread-safe for independent operations. Operations like L</merge>, L</json>, and L</clone> operate on local data. However, concurrent modifications to a shared object are not thread-safe without synchronisation:
+
+    use threads;
+    my $h = Module::Generic::Hash->new( first_name => "John" );
+    lock( $h ); # Synchronize access
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            lock( $h );
+            $h->merge({ last_name => "Doe" }); # Thread-safe with lock
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+For best practices, create per-thread objects to avoid shared state:
+
+     use threads;
+     my @threads = map
+     {
+         threads->create(sub
+         {
+             my $h = Module::Generic::Hash->new( first_name => "John" );
+             $h->merge({ last_name => "Doe" }); # Thread-safe
+         });
+     } 1..5;
+     $_->join for @threads;
+
+=item * B<External Libraries>
+
+Methods like L</json> use L<JSON>, L</clone> uses L<Clone>, and L</dump> uses L<Data::Dumper>, all of which are thread-safe as they operate on per-object state.
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe:
+
+    use threads;
+    use Storable;
+    my $h = Module::Generic::Hash->new( age => 30 );
+    my $frozen = Storable::freeze( $h ); # Thread-safe
+
+=back
+
+For debugging in threaded environments:
+
+    ls -l /proc/$$/fd  # List open file descriptors
 
 =head1 SEE ALSO
 

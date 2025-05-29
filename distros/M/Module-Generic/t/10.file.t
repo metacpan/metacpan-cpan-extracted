@@ -1,24 +1,41 @@
 #!/usr/bin/perl
 BEGIN
 {
-    use Test::More qw( no_plan );
     use strict;
     use warnings;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
-    use_ok( 'Module::Generic::File', qw( file cwd stdin stderr stdout tempfile tempdir ) );
+    use Test::More qw( no_plan );
     use Config;
     use Cwd ();
     use Digest::SHA;
     use Encode ();
     use File::Spec ();
-    # use Nice::Try;
+    use Module::Generic::Global ':const';
     use POSIX ();
     use Storable ();
     # Or using Sereal
     # use Sereal ();
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+BEGIN
+{
+    use_ok( 'Module::Generic::File', qw( :seek :flock LOCK_RW LOCK_READ LOCK_WRITE file cwd stdin stderr stdout tempfile tempdir ) ) ||
+    BAIL_OUT( "Unable to load Module::Generic::File" );
+};
+
+# BEGIN
+# {
+#     local $@;
+#     eval
+#     {
+#         require Module::Generic::File;
+#         Module::Generic::File->import( qw( :seek :flock file cwd stdin stderr stdout tempfile tempdir ) );
+#     };
+#     ok( !$@, 'Loaded Module::Generic::File' ) || BAIL_OUT( "Unable to load Module::Generic::File: $@" );
+# };
 
 use strict;
 use warnings;
@@ -97,6 +114,7 @@ diag( "mkpath error: ", $mydir->error ) if( $DEBUG && !defined( $frags ) );
 isa_ok( $frags, 'Module::Generic::Array', 'mkpath returned object' );
 ok( -d( "$mydir" ), "$mydir has been created" );
 
+# NOTE: basename
 subtest 'basename' => sub
 {
     my $tests = 
@@ -146,6 +164,7 @@ subtest 'basename' => sub
     }
 };
 
+# NOTE: children
 subtest 'children' => sub
 {
     my $tmpdir = tempdir({cleanup => 1});
@@ -200,6 +219,7 @@ subtest 'children' => sub
     };
 };
 
+# NOTE: collapse_dots
 subtest 'collapse_dots' => sub
 {
     # Based on RFC 3986 sectin 5.2.4 algorithm, flattening the dots such as '.' and '..' in uri path
@@ -323,7 +343,7 @@ if( $f5 )
             require Digest::SHA2;
             # $data = Encode::decode_utf8( $data ) if( !Encode::is_utf8( $data ) );
             my $digest_sha512 = Digest::SHA2::sha512_hex( $data );
-            diag( "digest md5 is '$digest_sha512'" ) if( $DEBUG );
+            diag( "digest sha512 is '$digest_sha512'" ) if( $DEBUG );
             $f5->debug( $DEBUG );
             $f5->open( '+>', { binmode => 'utf8' } );
             $f5->seek( 0, 0 ) || do
@@ -360,6 +380,10 @@ if( $f5 )
             $f5->append( $data );
             is( $f5->length, length( Encode::encode_utf8( $data ) ), 'size' );
             my $digest = $f5->digest( 'md5' );
+            if( !defined( $digest ) )
+            {
+                diag( "Digest MD5 error: ", $f5->error );
+            }
             is( $digest, $digest_md5, 'digest md5' );
             $f5->close;
         };
@@ -528,6 +552,7 @@ is( $fp->parent(3), '/some/where' );
 is( $fp->parent(1), '/some/where/some/place' );
 is( $fp->parent(0), '/some/where/some/place' );
 
+# NOTE: mmap
 subtest 'mmap' => sub
 {
     SKIP:
@@ -693,6 +718,7 @@ EOT
     };
 };
 
+# NOTE: standard io
 subtest 'standard io' => sub
 {
     ok( defined( &stdin ), 'stdin' );
@@ -719,7 +745,219 @@ subtest 'standard io' => sub
     is( $err2->fileno, fileno( STDERR ), 'stderr descriptor' );
 };
 
+# NOTE: File locking
+subtest 'File locking' => sub
+{
+    my $file = Module::Generic::File->tempfile( cleanup => 1 );
+    my $obj = $file->open( '+>', { lock => 1, exclusive => 1 }) || do
+    {
+        diag( "Failed to open: ", $file->error ) if( $DEBUG );
+        skip( 'Failed to open file', 3 );
+    };
+    ok( $file->locked, 'File locked exclusively' );
+    $file->unlock;
+    ok( !$file->locked, 'File unlocked' );
+    $file->lock( shared => 1 );
+    ok( $file->locked, 'File locked shared' );
+};
+
+# NOTE: Thread-safe file operations
+subtest 'Thread-safe file operations' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads not available', 4 );
+        }
+
+        require threads;
+        require threads::shared;
+        # local $DEBUG = 4;
+
+        # No cleanup, or else a thread shutting down would have the file removed.
+        my $file = Module::Generic::File->tempfile( debug => $DEBUG );
+        my $fh = $file->open( '+>', { autoflush => 1 } );
+        if( !$fh )
+        {
+            diag( "Failed to open file $file: ", $file->error ) if( $DEBUG );
+            skip( "Failed to open file $file", 1 );
+        }
+        diag( "The file $file file descriptor is ", $fh->fileno ) if( $DEBUG );
+
+        my @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid();
+                if( !$file->lock( exclusive => 1 ) )
+                {
+                    diag( "Under thread $tid, failed to lock file $file with descriptor ", $fh->fileno ) if( $DEBUG );
+                    return(0);
+                }
+                if( !$fh->seek( 0, Fcntl::SEEK_END ) )
+                {
+                    diag( "Thread $tid: Failed to seek: ", $file->error ) if( $DEBUG );
+                    return(0);
+                }
+                if( !$fh->write( "Thread $tid: Line $_\n" ) )
+                {
+                    diag( "Thread $tid: Failed to write: ", $file->error ) if( $DEBUG );
+                    return(0);
+                }
+                if( !$fh->flush() )
+                {
+                    diag( "Thread $tid: Failed to flush: ", $file->error ) if( $DEBUG );
+                    return(0);
+                }
+                $file->unlock();
+                return(1);
+            });
+        } 1..5;
+
+        $fh->seek(0,0);
+
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join();
+        }
+
+        ok( $success, 'All threads wrote successfully to file' );
+        my $lines = $file->lines();
+        $fh->close();
+        $file->auto_remove(1);
+        if( ok( $lines, 'retrieved shared file lines' ) )
+        {
+            is( $lines->length, 5, 'Five lines written to file' );
+            ok( $lines->grep(sub { /Thread \d+: Line \d+/ })->length == 5, 'Correct line format in file' );
+        }
+        ok( $file->auto_remove(), 'Auto-remove enabled for file' );
+    };
+};
+
+# NOTE: File locking
+subtest 'File locking' => sub
+{
+    my $file = Module::Generic::File->tempfile( cleanup => 1 );
+    my $obj = $file->open( '+>', { lock => 1, exclusive => 1 }) || do
+    {
+        diag( "Failed to open: ", $file->error ) if( $DEBUG );
+        skip( 'Failed to open file', 5 );
+    };
+    ok( $file->locked, 'File locked exclusively' );
+    my $repo = Module::Generic::Global->new( 'fd_locks' => $file, key => $file->filepath );
+    # is( $repo->get, &Module::Generic::File::LOCK_EX, 'Shared lock state set' );
+    my $lock_state = $repo->get;
+    isa_ok( $lock_state, 'HASH', 'Shared lock state is a hashref' );
+    is( $lock_state->{flags}, LOCK_EX, 'Shared lock flags set' );
+    ok( $lock_state->{tid} >= 0, 'Lock owner thread ID' );
+    $file->unlock;
+    ok( !$file->locked, 'File unlocked' );
+    is( $repo->get, undef, 'Shared lock state cleared' );
+    # $file->lock( shared => 1 );
+    # ok( $file->locked, 'File locked shared' );
+};
+
+# NOTE: Concurrent locking
+subtest 'Concurrent locking' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads not available', 3 );
+        }
+        require threads;
+        my $file = Module::Generic::File->tempfile( cleanup => 0, debug => $DEBUG );
+        diag( "Opening temporary file $file" ) if( $DEBUG );
+        my $io = $file->open( '+>', { autoflush => 1 });
+        # my $io = $file->open( '+>', { lock => 1, exclusive => 1, autoflush => 1 });
+        ok( $io, "Temporary file $file opened in append mode with exclusive lock" );
+        if( !$io )
+        {
+            diag( "Failed to open file $file: ", $file->error ) if( $DEBUG );
+            skip( "Failed to open file $file", 1 );
+        }
+        diag( "The file $file file descriptor is ", $io->fileno ) if( $DEBUG );
+        my $repo = Module::Generic::Global->new( 'fd_locks' => $file, key => $file->filepath );
+        my $success = 1;
+        my @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid();
+                my $f = Module::Generic::File->new( $file->filepath, debug => $DEBUG );
+                diag( "Appending to temporary file $file -> 'Thread $_ ($tid): Test'" ) if( $DEBUG );
+                my $fh = $f->open( '+>>', { lock => 1, exclusive => 1 });
+                if( !$fh )
+                {
+                    diag( "Thread $_ ($tid): Failed to open: ", $f->error ) if( $DEBUG );
+                    return(0);
+                }
+                if( !$fh->seek( 0, SEEK_END ) )
+                {
+                    diag( "Thread $_ ($tid): Failed to seek: ", $file->error ) if( $DEBUG );
+                    return(0);
+                }
+                my $rv = ok( $fh->write( "Thread $tid: Test\n" ), 'write to temporary file' );
+                if( !$rv )
+                {
+                    diag( "Thread $tid: Failed to write: ", $f->error ) if( $DEBUG );
+                }
+                $f->close;
+                return($rv ? 1 : 0);
+            });
+        } 1..3;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join();
+        }
+        ok( $success, 'All threads locked and wrote successfully' );
+        $io->seek(0,0);
+        my $lines = $file->lines;
+        $io->close;
+        is( $lines->length, 3, 'Three lines written' );
+        is( $repo->get, undef, 'Lock state cleared after writes' );
+    };
+};
+
+# NOTE: Lock timeout
+subtest 'Lock timeout' => sub
+{
+    SKIP:
+    {
+        my $file = Module::Generic::File->tempfile( cleanup => 1, debug => $DEBUG );
+        my $obj = $file->open( '+>', { lock => 1, exclusive => 1 }) ||
+            skip( "Failed to open $file: " . $file->error, 2 );
+        my $f2 = Module::Generic::File->new( $file->filepath, debug => $DEBUG );
+        my $fh2 = $f2->open( '+>>', { lock => 1, exclusive => 1, timeout => 1 });
+        ok( !$fh2, 'Lock failed due to existing lock' );
+        isa_ok( $f2->error, 'Module::Generic::Exception', 'Lock error' );
+        $file->close;
+    };
+};
+
+# NOTE: Auto-remove edge case
+subtest 'Auto-remove edge case' => sub
+{
+    SKIP:
+    {
+        my $file = Module::Generic::File->tempfile( cleanup => 1, debug => $DEBUG );
+        my $repo = Module::Generic::Global->new( 'files_to_remove' => $file, key => join( ';', ref($file), $file->filepath, $$, ( HAS_THREADS ? threads->tid : () ) ) );
+        $repo->remove; # Simulate repository state loss
+        $file->auto_remove(1);
+        if( !$file->open( '>', { autoflush => 1 } ) )
+        {
+            skip( "Unable to open file $file", 1 );
+        }
+        $file->write( "Test" );
+        my $filepath = "$file";
+        undef( $file ); # Trigger DESTROY
+        ok( !-e( $filepath ), 'File removed despite repository state' );
+    };
+};
+
 done_testing();
 
 __END__
-

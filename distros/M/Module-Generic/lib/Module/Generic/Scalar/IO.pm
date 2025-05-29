@@ -20,7 +20,7 @@ BEGIN
     use Module::Generic::File::IO;
     use parent qw( Module::Generic::File::IO );
     use vars qw( $DEBUG $VERSION $ERROR @EXPORT );
-    use Devel::StackTrace;
+    use Wanted;
     no warnings 'once';
     our @EXPORT = @Module::Generic::File::IO;
     our $ERROR = '';
@@ -46,7 +46,7 @@ sub new
         return( $self->error( "Error trying to get a file handle: $@" ) );
     }
     *$self = {};
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         return( $self->init( @_ ) );
     }
@@ -341,7 +341,11 @@ sub write
 
 sub DESTROY
 {
-    shift->close;
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    $self->close;
 }
 
 sub FREEZE

@@ -1,0 +1,10 @@
+Revision history for Date-Range
+
+0.03
+	Fix pre-requisites
+
+0.02	Wed May 28 20:35:05 EDT 2025
+	Use gtar for the dist
+
+0.01	Wed May 28 20:30:58 EDT 2025
+        First draft

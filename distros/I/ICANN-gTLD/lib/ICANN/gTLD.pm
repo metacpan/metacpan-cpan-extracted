@@ -6,10 +6,14 @@ use DateTime::Format::ISO8601;
 use Net::DNS::Domain;
 use Net::RDAP 0.34;
 use Net::RDAP::Registry;
+use Data::DNS;
 use URI;
 use constant GTLD_LIST_URL => q{https://www.icann.org/resources/registries/gtlds/v2/gtlds.json};
+use vars qw($VERSION);
 use warnings;
 use strict;
+
+$VERSION = '0.02';
 
 
 sub get_json {
@@ -55,6 +59,7 @@ sub new {
 
 
 sub gtld                                { Net::DNS::Domain->new(shift->{gTLD}) }
+sub name                                { shift->gtld->name }
 sub u_label                             { shift->{uLabel} }
 sub registry_operator                   { shift->{registryOperator} }
 sub registry_operator_country_code      { shift->{registryOperatorCountryCode} }
@@ -66,8 +71,9 @@ sub application_id                      { shift->{applicationId} }
 sub third_or_lower_level_registration   { shift->{thirdOrLowerLevelRegistration} }
 sub registry_class_domain_name_list     { URI->new(shift->{registryClassDomainNameList} || return undef) }
 sub specification_13                    { shift->{specification13} }
-sub rdap_record                         { Net::RDAP->new->fetch(URI->new(q{https://rdap.iana.org/domain/}.shift->gTLD->name)) }
-sub rdap_server                         { Net::RDAP::Service->new_for_tld(shift->gTLD->name) }
+sub rdap_record                         { Net::RDAP->new->fetch(URI->new(q{https://rdap.iana.org/domain/}.shift->gtld->name)) }
+sub rdap_server                         { Net::RDAP::Service->new_for_tld(shift->gtld->name) }
+sub tld                                 { Data::DNS->get(shift->gtld->name)}
 
 1;
 
@@ -83,7 +89,7 @@ ICANN::gTLD - an interface to the ICANN gTLD database.
 
 =head1 VERSION
 
-version 0.001
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -94,7 +100,7 @@ version 0.001
 
     printf(
         "The .%s gTLD is operated by %s and was delegated in %s.\n",
-        ($gtld->uLabel || $gtld->gTLD)->name,
+        ($gtld->uLabel || $gtld->gtld)->name,
         $gtld->registryOperator,
         $gtld->delegationDate->year,
     );
@@ -108,10 +114,14 @@ ICANN publishes a machine-readable database of information about generic
 top-level domains (TLDs) on its website. This module provides access to that
 database.
 
-Note: a I<generic> TLD is a TLD like C<.org> or C<.机构> (C<.xn--nqv7f>), as
+B<Note:> a I<generic> TLD is a TLD like C<.org> or C<.机构> (C<.xn--nqv7f>), as
 distinguished from (a) I<country-code> TLDs such as C<.uk> or C<.台灣>
 (C<.xn--kpry57d>), (b) I<"sponsored"> TLDs (specifically C<.gov>, C<.mil> and
 C<.edu>), and (c) the special "infrastructure" TLD, C<.arpa>.
+
+B<Also note:> the DNS root zone is not static, and gTLDs are created and removed
+regularly. It should not be assumed that the data elements provided by this
+module will never change.
 
 =head1 INTERNALS
 
@@ -128,8 +138,10 @@ documentation to find out how to control its behaviour.
     my @all = ICANN::gTLD->get_all;
 
 To get information about a specific gTLD, use C<get()>. To get information
-about the parent TLD of a domain name, use C<from_domain()>. To get a list of
-I<all> gTLDs, use C<get_all()>.
+about the parent TLD of a domain name, use C<from_domain()>. If the specified
+string does not correspond to a gTLD, these methods will return C<undef>.
+
+To get a list of I<all> gTLDs, use C<get_all()>.
 
 =head1 OBJECT METHODS
 
@@ -138,6 +150,8 @@ that not all fields are available or applicable for all TLDs, so all of these
 methods (except C<gTLD()>) may return C<undef>.
 
 =over
+
+=item * C<$gtld-E<gt>name> - shortcut for C<$gtld-E<gt>gtld-E<gt>name>.
 
 =item * C<$gtld-E<gt>gtld> - returns a L<Net::DNS::DomainName> object
 representing the gTLD's A-label (eg C<org> or C<xn--nqv7f>).
@@ -197,6 +211,9 @@ Service.
 =item * C<$gtld-E<gt>rdap_server> - returns a L<Net::RDAP::Service> object
 that represents the gTLD's RDAP service, as specified in the RDAP DNS Bootstrap
 Registry.
+
+=item * C<$gtld-E<gt>tld> - returns a L<Data::DNS::TLD> object that represents
+the gTLD's entry in the DNS root zone database.
 
 =back
 

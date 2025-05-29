@@ -21,7 +21,7 @@ Module::Generic::Null - Null Value Chaining Object Class
 
 =head1 VERSION
 
-    v1.1.2
+    v1.1.3
 
 =head1 DESCRIPTION
 
@@ -118,15 +118,20 @@ There is only 1 method. This module makes it possible to call it with any method
 
 =head2 new
 
-This takes an error object and an optional hash reference of key-value pairs and return the object.
+This takes an optional error object (e.g., a L<Module::Generic::Exception>) and an optional hash or hash reference of options, and returns a new L<Module::Generic::Null> object.
 
 Possible options:
 
 =over 4
 
-=item I<wants>
+=item * C<wants>
 
-This can be any of (case do not actually matter): C<ARRAY>, C<BOOLEAN>, C<CODE>, C<GLOB>, C<HASH>, C<LIST>, C<OBJECT>, C<REFSCALAR>, C<SCALAR>, C<VOID>
+Specifies the desired context for the null object to return. Can be any of (case-insensitive): C<ARRAY>, C<BOOLEAN>, C<CODE>, C<GLOB>, C<HASH>, C<LIST>, C<OBJECT>, C<REFSCALAR>, C<SCALAR>, C<VOID>. If not specified, the context is determined dynamically using L<Wanted>.
+
+Example:
+
+    my $null = Module::Generic::Null->new( wants => 'HASH' );
+    my $hash = $null->fake; # Returns {}
 
 =back
 
@@ -143,6 +148,92 @@ This can be any of (case do not actually matter): C<ARRAY>, C<BOOLEAN>, C<CODE>,
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD & PROCESS SAFETY
+
+L<Module::Generic::Null> is fully thread-safe and process-safe, designed to provide a null object for method chaining without breaking in multi-threaded or multi-process environments, such as Perl ithreads or mod_perl’s threaded Multi-Processing Modules (MPMs) like Worker or Event. All operations are per-object, ensuring no shared state conflicts.
+
+Key considerations for thread and process safety:
+
+=over 4
+
+=item * B<Object State>
+
+All methods, including L</new>, C<AUTOLOAD>, and serialisation subroutines (L</FREEZE>, L</THAW>), operate exclusively on the object’s internal hash, which is unique to each instance. This ensures thread-safe and process-safe behaviour without shared resources:
+
+    use threads;
+    my $null = Module::Generic::Null->new( wants => 'HASH' );
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $val = $null->fake; # Returns empty hashref, thread-safe
+            return( ref( $val ) eq 'HASH' ? 1 : 0 );
+        });
+    } 1..5;
+    $_->join for @threads;
+
+=item * B<AUTOLOAD>
+
+The C<AUTOLOAD> mechanism handles arbitrary method calls, returning context-appropriate values (e.g., empty hashref, arrayref, or the object itself) based on L<Wanted>’s stack inspection. This process is thread-safe, as it uses no shared state and creates per-object or immutable return values:
+
+    my $null = Module::Generic::Null->new;
+    my $val = $null->any_method->another; # Returns $null, thread-safe
+
+=item * B<Overloading>
+
+Overloaded operators (stringification, equality, boolean) are pure functions operating on the object’s state or local data, ensuring thread-safety:
+
+    my $null = Module::Generic::Null->new;
+    my $str = "$null"; # Empty string, thread-safe
+    my $bool = $null ? 1 : 0; # False, thread-safe
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) copy the object’s hash, which is per-object and thread-safe, supporting L<CBOR::XS>, L<Sereal>, and L<Storable::Improved>:
+
+    use threads;
+    use Sereal;
+    my $null = Module::Generic::Null->new;
+    my $encoded = Sereal::encode_sereal( $null ); # Thread-safe
+
+=item * B<mod_perl Considerations>
+
+=over 4
+
+=item - B<Prefork MPM>
+
+Each process creates independent L<Module::Generic::Null> instances, ensuring process isolation with no shared state.
+
+=item - B<Threaded MPMs (Worker/Event)>
+
+All operations remain thread-safe due to per-object state and thread-safe dependencies (L<Scalar::Util>, L<Wanted>). No thread-unsafe Perl functions (e.g., L<perlfunc/localtime>) are used. Users should ensure mod_perl handlers clean up objects to prevent memory leaks, though L<Module::Generic::Null> itself requires no special handling.
+
+Consult L<perlthrtut|http://perldoc.perl.org/perlthrtut.html> and L<mod_perl documentation|https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environment_Issues> for details.
+
+=back
+
+=item * B<Process Safety>
+
+Since all operations are per-object and use no system-level resources (e.g., files, sockets), L<Module::Generic::Null> is inherently process-safe. Separate processes create distinct instances with no interaction:
+
+    use POSIX qw( fork );
+    my $pid = fork();
+    if( $pid == 0 )
+    {
+        my $null = Module::Generic::Null->new;
+        my $val = $null->fake; # Safe, per-process state
+        exit;
+    }
+    waitpid( $pid, 0 );
+
+=back
+
+For debugging in threaded or multi-process environments, use platform-specific commands (e.g., on Linux):
+
+    ls -l /proc/$$/fd  # List open file descriptors
+
+See your operating system’s documentation for equivalent commands.
 
 =head2 CREDITS
 

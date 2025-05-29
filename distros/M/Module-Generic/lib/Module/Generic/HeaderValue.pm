@@ -649,7 +649,10 @@ Set or get an hash object (L<Module::Generic::Hash>) of parameters.
 
 =head2 qstring
 
-Provided with a string and this returns a quoted version, if necessary.
+Provided with a string, this returns a quoted version if necessary (e.g., if the string contains delimiters). Returns the quoted string, or C<undef> with an error if the string contains invalid characters:
+
+    my $quoted = $hv->qstring( "Mon, 01 Nov 2021" );
+    print $quoted; # "Mon, 01 Nov 2021"
 
 =head2 reset
 
@@ -657,7 +660,12 @@ Remove the cached version of the stringification, i.e. set the object property C
 
 =head2 token_escape
 
-This will escape token value using hexadecimal equivalent if it contains delimiters as defined by L<rfc2616|https://datatracker.ietf.org/doc/html/rfc2616#section-2.2>
+Provided with a string, this will escape token value using hexadecimal equivalent if it contains delimiters as defined by L<rfc2616|https://datatracker.ietf.org/doc/html/rfc2616#section-2.2>
+
+It returns the escaped string:
+
+    my $escaped = $hv->token_escape( "foo/bar" );
+    print $escaped; # "foo%2Fbar"
 
 =head2 token_max
 
@@ -686,7 +694,7 @@ Returns a header value, without any possible attribute, as a string properly for
 
 =head2 value_data
 
-This method returns the value part of a header field value. The need for distinction stems from some header field value, such as cookies, who have field value such as C<foo=bar> where C<foo> is the name and C<bar> is the actual value.
+This method returns the value part of the header field (e.g., "bar" in "foo=bar"). The need for distinction stems from some header field value, such as cookies, who have field value such as C<foo=bar> where C<foo> is the name and C<bar> is the actual value. It returns an empty string if no value part exists:
 
 This method ensures that, no matter the header field type, this returns the actual value, For example:
 
@@ -704,7 +712,10 @@ A value of 0 means no limit.
 
 =head2 value_name
 
-This method returns the name part of the header field value. This is typically useful when dealing with cookies whose value is comprised of a cookie name and a cookie value. Thus with a cook with value C<foo=bar>, this method would return C<foo>.
+This method returns the name part of the header field (e.g., "foo" in "foo=bar"). This is typically useful when dealing with cookies whose value is comprised of a cookie name and a cookie value. Thus with a cook with value C<foo=bar>, this method would return C<foo>. It returns an empty string if no name part exists:
+
+    my $hv = Module::Generic::HeaderValue->new_from_header( "foo=bar" );
+    print $hv->value_name; # "foo"
 
 See also L</value_data>
 
@@ -721,6 +732,59 @@ See also L</value_data>
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD-SAFETY
+
+L<Module::Generic::HeaderValue> is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
+
+Key considerations for thread-safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+There are no shared variables that are modified at runtime. Regular expressions (e.g., C<$TOKEN_REGEXP>, C<$TEXT_REGEXP>) are compile-time constants and immutable. The global C<$DEBUG> variable (inherited from L<Module::Generic>) is typically set before threads are created, and it is the user's responsibility to ensure thread-safety if modified at runtime:
+
+    use threads;
+    local $Module::Generic::HeaderValue::DEBUG = 0; # Set before threads
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $hv = Module::Generic::HeaderValue->new( "foo; bar=2" );
+            $hv->as_string; # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Object State>
+
+Header data (e.g., L</value>, L</params>) is stored per-object, ensuring thread isolation:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $hv = Module::Generic::HeaderValue->new( "foo; bar=2" );
+            $hv->param( tid => threads->tid ); # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<External Libraries>
+
+Methods like L</token_escape> and L</value_as_string> use L<URI::Escape>, which is thread-safe as it operates on local data.
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+
+=back
+
+For debugging in threaded environments:
+
+ls -l /proc/$$/fd  # List open file descriptors
 
 =head1 AUTHOR
 

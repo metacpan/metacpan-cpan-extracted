@@ -2,6 +2,8 @@ severity = 1
 verbose  = 9
 only = 1
 
+[BuiltinFunctions::ProhibitComplexMappings]
+max_statements = 2
 [BuiltinFunctions::ProhibitLvalueSubstr]
 [BuiltinFunctions::ProhibitShiftRef]
 [BuiltinFunctions::ProhibitSleepViaSelect]
@@ -12,6 +14,8 @@ only = 1
 [BuiltinFunctions::ProhibitVoidMap]
 [BuiltinFunctions::RequireGlobFunction]
 [BuiltinFunctions::RequireSimpleSortBlock]
+[ClassHierarchies::ProhibitAutoloading]
+[ClassHierarchies::ProhibitExplicitISA]
 [ClassHierarchies::ProhibitOneArgBless]
 [CodeLayout::ProhibitHardTabs]
 [CodeLayout::RequireConsistentNewlines]
@@ -39,8 +43,9 @@ only = 1
 [Modules::ProhibitExcessMainComplexity]
 [Modules::RequireBarewordIncludes]
 [Modules::RequireEndWithOne]
+[Modules::RequireExplicitPackage]
+allow_import_of = warnings experimental
 [Modules::RequireFilenameMatchesPackage]
-[NamingConventions::ProhibitAmbiguousNames]
 [Objects::ProhibitIndirectSyntax]
 [RegularExpressions::ProhibitCaptureWithoutTest]
 [RegularExpressions::ProhibitComplexRegexes]
@@ -52,6 +57,7 @@ max_mccabe = 30
 [Subroutines::ProhibitNestedSubs]
 [Subroutines::ProhibitReturnSort]
 [Subroutines::ProhibitUnusedPrivateSubroutines]
+allow_name_regex = _build_\w+
 [Subroutines::ProtectPrivateSubs]
 [TestingAndDebugging::ProhibitProlongedStrictureOverride]
 [TestingAndDebugging::RequireTestLabels]
@@ -61,6 +67,7 @@ max_mccabe = 30
 [ValuesAndExpressions::ProhibitComplexVersion]
 [ValuesAndExpressions::ProhibitImplicitNewlines]
 [ValuesAndExpressions::ProhibitMismatchedOperators]
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
 [ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
 [ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
 [ValuesAndExpressions::RequireQuotedHeredocTerminator]
@@ -73,4 +80,5 @@ allow_our = 1
 [Variables::ProtectPrivateVars]
 [Variables::RequireLexicalLoopIterators]
 [Variables::RequireLocalizedPunctuationVars]
+allow = $^H %^H ${^WARNING_BITS} ${^OPEN}
 [Variables::RequireNegativeIndices]

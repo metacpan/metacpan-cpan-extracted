@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 sub new {
     my ($class, %opt) = @_;
@@ -383,7 +383,7 @@ Text::Textile2MarkdownStandalone - Standalone converter from Textile markup to M
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

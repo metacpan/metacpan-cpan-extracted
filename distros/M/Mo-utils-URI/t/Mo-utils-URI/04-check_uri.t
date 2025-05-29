@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::URI qw(check_uri);
 use Readonly;
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 16;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -40,7 +40,14 @@ foreach my $right_uri (@RIGHT_URIS) {
 # Test.
 $self = {};
 $ret = check_uri($self, 'key');
-is($ret, undef, 'Right not exist key.');
+is($ret, undef, 'Right URI is present (no key).');
+
+# Test.
+$self = {
+	'key' => undef,
+};
+$ret = check_uri($self, 'key');
+is($ret, undef, 'Right URI is present (undef).');
 
 # Test.
 foreach my $bad_uri (@BAD_URIS) {

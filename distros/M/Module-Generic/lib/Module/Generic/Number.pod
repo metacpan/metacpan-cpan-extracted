@@ -105,7 +105,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v2.3.1
+    v2.3.3
 
 =head1 DESCRIPTION
 
@@ -154,7 +154,7 @@ Those are just basic arithmetics wrapped in object to enable object oriented int
 
 =head2 new
 
-Provided with a number, some optional parameters and this returns a new object.
+Provided with a number and optional parameters, this returns a new L<Module::Generic::Number> object. On error, it sets an L<error|Module::Generic/error> and returns C<undef> in scalar context or an empty list in list context.
 
 Possible optional parameters are:
 
@@ -382,7 +382,7 @@ If the number is too large or great to work with as a regular number, but instea
 
     Module::Generic::Number->new("0.000020000E+00")->format(7); # 2e-05
 
-It returns a L<scalar object|Module::Generic::Scalar> upon success or an L<error|Module::Generic/error> if an error occurred.
+It returns a L<scalar object|Module::Generic::Scalar> upon success, or sets an L<error|Module::Generic/error> and returns C<undef> in scalar context or an empty list in list context if an error occurred.
 
 =head2 format_binary
 
@@ -781,6 +781,77 @@ It returns an L<error|Module::Generic/error> if the string provided does not con
 =for Pod::Coverage THAW
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD-SAFETY
+
+L<Module::Generic::Number> is thread-safe for all its operations, as it operates on per-object state, uses thread-safe external libraries, and synchronises locale changes to prevent race conditions.
+
+Key considerations for thread-safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+There are no shared variables that are modified at runtime in L<Module::Generic::Number>, except for a lock variable used to synchronise locale changes (see below). The global C<$DEBUG> variable (inherited from L<Module::Generic>) is typically set before threads are created, and it is the user's responsibility to ensure thread-safety if modified at runtime:
+
+    use threads;
+    local $Module::Generic::Number::DEBUG = 0; # Set before threads
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $num = Module::Generic::Number->new(1000);
+            $num->format; # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Object State>
+
+Number data (e.g., C<_number>, formatting properties like C<thousands_sep>) is stored per-object, ensuring thread isolation:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $num = Module::Generic::Number->new(1000);
+            $num += threads->tid; # Thread-safe
+            $num->format; # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Locale Handling>
+
+The L</init> method uses L<POSIX/setlocale> to retrieve locale-specific formatting properties when a C<lang> option is specified or when detecting the system's locale. This modifies process-wide state, which could potentially cause race conditions in a multi-threaded environment. To address this, the module uses a shared lock variable (C<$LOCALE_LOCK>) to synchronise access during locale changes, ensuring thread-safety:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $num = Module::Generic::Number->new( 1000, lang => 'fr_FR' );
+            $num->format; # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+The lock ensures that only one thread can modify the locale at a time, preventing interference with other threads.
+
+=item * B<External Libraries>
+
+This module relies on L<POSIX> functions (e.g., L<POSIX/atan>, L<POSIX/isinf>) for mathematical operations, which are thread-safe as they operate on local data.
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+
+=back
+
+For debugging in threaded environments (depending on your Operating System):
+
+    ls -l /proc/$$/fd  # List open file descriptors
 
 =head1 SEE ALSO
 

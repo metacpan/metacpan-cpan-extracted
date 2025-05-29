@@ -16,7 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $CALLER_LEVEL $CALLER_INTERNAL );
+    use vars qw( $VERSION $CALLER_LEVEL $CALLER_INTERNAL );
     use Scalar::Util;
     use Devel::StackTrace;
     use overload (
@@ -71,7 +71,7 @@ sub init
     }
     # $self->SUPER::init( @_ );
     $self->debug( $args->{debug} ) if( exists( $args->{debug} ) );
-    
+
     unless( length( $args->{skip_frames} ) )
     {
         # NOTE: Taken from Carp to find the right point in the stack to start from
@@ -106,7 +106,7 @@ sub init
                     }
                     else 
                     {
-                        return( 2 );
+                        return(2);
                     }
                 }
                 redo if( $CALLER_INTERNAL->{ $pkg } );
@@ -117,11 +117,11 @@ sub init
         
         $args->{skip_frames} = $error_start_frame->();
     }
-    
+
     my $skip_frame = $args->{skip_frames} || 0;
     # Skip one frame to exclude us
     $skip_frame++;
-    
+
     my $trace = Devel::StackTrace->new( skip_frames => $skip_frame, indent => 1 );
     my $frame = $trace->next_frame;
     my $frame2 = $trace->next_frame;
@@ -208,6 +208,16 @@ sub lang { return( shift->reset(@_)->_set_get_scalar( 'lang', @_ ) ); }
 sub line { return( shift->reset(@_)->_set_get_scalar( 'line', @_ ) ); }
 
 sub locale { return( shift->reset(@_)->_set_get_scalar( 'lang', @_ ) ); }
+
+# sub message
+# {
+#     my( $self, $mesg ) = @_;
+#     if( defined( $mesg ) )
+#     {
+#         $self->{message} = $mesg;
+#     }
+#     return( $self->{message} );
+# }
 
 sub message { return( shift->reset(@_)->_set_get_scalar( {
     field => 'message',
@@ -710,6 +720,12 @@ This takes a package name as value and will serve as the parent class
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD SAFETY
+
+This module is thread-safe.
+
+Each instance of L<Module::Generic::Exception> is self-contained and immutable once created and does not share any mutable state across threads.
 
 =head1 AUTHOR
 

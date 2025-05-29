@@ -1,5 +1,9 @@
 Revision history for Perl extension Dist-Zilla-App-Command-DiffMint
 
+v0.3.2  2025-05-28
+  - add missing abstract for help command
+  - skip modifying a prereqs.yml file by default
+
 v0.3.1  2024-10-30
   - fix pager
 

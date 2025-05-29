@@ -826,31 +826,31 @@ This instantiates a shared mmap cache object. It takes the following parameters:
 
 =over 4
 
-=item I<debug>
+=item C<debug>
 
 A debug value will enable debugging output (equal or above 3 actually)
 
-=item I<cbor>
+=item C<cbor>
 
 Provided with a value (true or false does not matter), and this will set L<CBOR::XS> as the data serialisation mechanism when storing data to mmap file.
 
-=item I<create>
+=item C<create>
 
 A boolean value to indicate whether the shared mmap cache file should be created if it does not exist. Default to false.
 
-=item I<destroy>
+=item C<destroy>
 
 A boolean value to indicate if the shared mmap cache file should be removed when the object is destroyed upon end of the script process.
 
 See L<perlmod> for more about object destruction.
 
-=item I<json>
+=item C<json>
 
 Provided with a value (true or false does not matter), and this will set L<JSON> as the data serialisation mechanism when storing data to mmap file
 
 Please note that if you want to store objects, you need to use I<storable> instead, because L<JSON> is not suitable to serialise objects.
 
-=item I<key>
+=item C<key>
 
 The shared mmap cache key identifier to use. It defaults to a random one created with L</rand>
 
@@ -862,7 +862,7 @@ Otherwise, if you provide a key as string, the characters in the string will be 
 
 Either way, the resulting value is used to create a shared mmap cache file by L</open>.
 
-=item I<mode>
+=item C<mode>
 
 The octal mode value to use when opening the shared mmap cache file.
 
@@ -870,17 +870,17 @@ Shared cache files are owned by system users and access to shared mmap cache fil
 
 If you do not want to share it with any other user than yourself, setting mode to C<0600> is fine.
 
-=item I<sereal>
+=item C<sereal>
 
 Provided with a value (true or false does not matter), and this will set L<Sereal> as the data serialisation mechanism when storing data to mmap file
 
-=item I<size>
+=item C<size>
 
 The size in byte of the shared mmap cache.
 
 This is set once it is created. You can create again the shared mmap cache file with a smaller size. No need to remove it first.
 
-=item I<storable>
+=item C<storable>
 
 Provided with a value (true or false does not matter), and this will set L<Storable::Improved> as the data serialisation mechanism when storing data to mmap file
 
@@ -1127,11 +1127,11 @@ Underlying mmap access is managed via L<Cache::FastMmap>, which internally suppo
 
 =item *
 
-Thawing and serialization are protected against circular references and duplicated shared state.
+Thawing and serialisation are protected against circular references and duplicated shared state.
 
 =back
 
-No global variables are used, and state-dependent logic is wrapped in thread-safe conditionals using C<HAS_THREADS> and C<lock()>.
+No global variables are used.
 
 =head1 AUTHOR
 

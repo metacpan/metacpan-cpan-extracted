@@ -240,7 +240,7 @@ First, second, third and fifth argument of the type.
 
 ```perl
 BEGIN {
-	subtype "Seria[A,B,C,D]", where { A < B < $_ < C < D };
+	subtype "Seria[A,B,C,D]", where { A < B && B < $_ && $_ < C && C < D };
 }
 
 2.5 ~~ Seria[1,2,3,4]   # -> 1
@@ -745,10 +745,12 @@ The machine float number is 4 bytes.
 The machine float number is 8 bytes.
 
 ```perl
--4.8 ~~ Double    					# -> 1
--1.7976931348623158e+308 ~~ Double  # -> 1
-+1.7976931348623158e+308 ~~ Double  # -> 1
--1.7976931348623159e+308 ~~ Double # -> ""
+use Scalar::Util qw//;
+
+-4.8 ~~ Double                     # -> 1
+'-1.7976931348623157e+308' ~~ Double # -> 1
+'+1.7976931348623157e+308' ~~ Double # -> 1
+'-1.7976931348623159e+308' ~~ Double # -> ""
 ```
 
 ## Range[from, to]

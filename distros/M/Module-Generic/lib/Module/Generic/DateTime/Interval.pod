@@ -135,6 +135,12 @@ Example:
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable> is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
+=head2 Thread Safety
+
+This module is thread-safe.
+
+Instances of C<Module::Generic::DateTime> and C<Module::Generic::DateTime::Interval> are immutable once created and do not share any mutable state across threads.
+
 =head1 SEE ALSO
 
 L<Module::Generic>, L<Module::Generic::DateTime>, L<DateTime>, L<DateTime::Format::Strptime>, L<DateTime::TimeZone>

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.12.2
+## Version v0.12.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/04/22
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,9 +19,8 @@ BEGIN
     use warnings::register;
     use version;
     use parent qw( Module::Generic );
-    use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE $FILES_TO_REMOVE 
+    use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE 
                  $MMAP_USE_FILE_MAP $GLOBBING $ILLEGAL_CHARACTERS );
-    use Config;
     use Data::UUID ();
     use Encode ();
     use Fcntl qw( :DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END );
@@ -33,37 +32,35 @@ BEGIN
     use Module::Generic::Finfo;
     # constants are already exported with the use Fcntl
     use Module::Generic::File::IO ();
+    use Module::Generic::Global ':const';
     use Scalar::Util ();
     use URI ();
     use URI::file ();
-    use Want;
-    our @EXPORT_OK = qw( cwd file rmtree rootdir stdin stderr stdout sys_tmpdir tempfile tempdir );
+    use Wanted;
+    # Use the same export mechanism as Fcntl
+    our @EXPORT_OK = 
+    (
+        qw( cwd file rmtree rootdir stdin stderr stdout sys_tmpdir tempfile tempdir ),
+        @Fcntl::EXPORT_OK
+    );
+    # Fcntl import tags are: 'flock', 'Fcompat', 'seek', 'mode'
+    # Merge the export tags
     our %EXPORT_TAGS = %Fcntl::EXPORT_TAGS;
+    $EXPORT_TAGS{default} = [ @EXPORT_OK ];
+
     # Export Fcntl O_* constants for convenience
-    our @EXPORT = grep( /^O_/, keys( %Fcntl:: ) );
+    # our @EXPORT = grep( /^O_/, keys( %Fcntl:: ) );
+    our @EXPORT = grep( /^O_/, @Fcntl::EXPORT );
+
+    # Allow users to import your own tags
+    $EXPORT_TAGS{file} = [ qw( cwd file rmtree rootdir stdin stderr stdout sys_tmpdir tempfile tempdir ) ];
+
     use overload (
         q{""}    => sub{ $_[0]->filename },
-        bool     => sub{ 1 },
+        bool     => sub{1},
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    our $FILES_TO_REMOVE;
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    
-        my %files :shared;
-    
-        $FILES_TO_REMOVE = \%files;
-    }
-    else
-    {
-        $FILES_TO_REMOVE = {};
-    }
 
     # https://en.wikipedia.org/wiki/Path_(computing)
     # perlport
@@ -145,7 +142,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.12.2';
+    our $VERSION = 'v0.12.4';
 };
 
 use v5.12.0;
@@ -203,6 +200,8 @@ sub init
     $self->{changed}        = '';
     $self->{locked}         = 0;
     $self->{opened}         = '';
+    # We store the original PID so we can use it in method 'locked'
+    $self->{pid}            = $$;
     $file = $self->{file} || return( $self->error( "No file was provided." ) );
     unless( CORE::length( $self->{base_dir} ) )
     {
@@ -235,17 +234,14 @@ sub init
         $self->{base_dir} = $base_dir;
     }
     $file = $self->filename( $file ) || return( $self->pass_error );
-    # Idea borrowed from File::Temp
-    if( HAS_THREADS && is_shared( $FILES_TO_REMOVE ) )
+
+    if( defined( $autoremove ) && $autoremove )
     {
-        lock( $FILES_TO_REMOVE );
-        $FILES_TO_REMOVE->{ $$ } //= {};
-        $FILES_TO_REMOVE->{ $$ }->{ $file } = $self->{auto_remove} = 1 if( defined( $autoremove ) && $autoremove );
-    }
-    else
-    {
-        $FILES_TO_REMOVE->{ $$ } //= {};
-        $FILES_TO_REMOVE->{ $$ }->{ $file } = $self->{auto_remove} = 1 if( defined( $autoremove ) && $autoremove );
+        # We want a share repo safe across processes and threads
+        my $repo_key = CORE::join( ';', ( ref( $self ) || $self ), "$file", $$, ( HAS_THREADS ? threads->tid : () ) );
+        my $repo = Module::Generic::Global->new( 'files_to_remove' => $self, key => $repo_key ) ||
+            die( Module::Generic::Global->error );
+        $repo->set( $self->{auto_remove} = 1 );
     }
     $self->{_orig} = [CORE::caller(1)];
     return( $self );
@@ -363,32 +359,18 @@ sub auto_remove
     if( @_ )
     {
         my $v = $self->_set_get_boolean( 'auto_remove', @_ );
-        if( HAS_THREADS && is_shared( $FILES_TO_REMOVE ) )
+        # We want a share repo safe across processes and threads
+        my $file = $self->filename;
+        my $repo_key = CORE::join( ';', ( ref( $self ) || $self ), "$file", $$, ( HAS_THREADS ? threads->tid : () ) );
+        my $repo = Module::Generic::Global->new( 'files_to_remove' => $self, key => $repo_key ) ||
+            die( Module::Generic::Global->error );
+        if( $v )
         {
-            lock( $FILES_TO_REMOVE );
-            $FILES_TO_REMOVE->{ $$ } = {} if( !exists( $FILES_TO_REMOVE->{ $$ } ) );
-            my $file = $self->filename;
-            if( $v )
-            {
-                $FILES_TO_REMOVE->{ $$ }->{ $file } = 1;
-            }
-            else
-            {
-                CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
-            }
+            $repo->set(1);
         }
         else
         {
-            $FILES_TO_REMOVE->{ $$ } = {} if( !exists( $FILES_TO_REMOVE->{ $$ } ) );
-            my $file = $self->filename;
-            if( $v )
-            {
-                $FILES_TO_REMOVE->{ $$ }->{ $file } = 1;
-            }
-            else
-            {
-                CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
-            }
+            $repo->remove;
         }
     }
     return( $self->_set_get_boolean( 'auto_remove' ) );
@@ -742,8 +724,20 @@ sub close
 {
     my $self = shift( @_ );
     my $io = $self->opened || return( $self );
+    my $fd = $io->fileno;
     $io->close;
-    $self->opened( undef() );
+    if( CORE::defined( $fd ) )
+    {
+        # We use the file as the universal key, just like flock locks the file on its inode
+        my $repo_key = $self->filepath;
+        my $repo = Module::Generic::Global->new( 'fd_locks' => $self, key => $repo_key ) ||
+            die( Module::Generic::Global->error );
+        # Clear any lock state
+        $repo->remove;
+    }
+    # Clear instance lock state
+    $self->locked(0);
+    $self->opened( undef );
     return( $self );
 }
 
@@ -1573,18 +1567,12 @@ sub glob
     # Those do not work in virtualisation
     if( $os eq $^O )
     {
-        if( Want::want( 'LIST' ) )
+        if( Wanted::want( 'LIST' ) )
         {
             my @files;
             if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require File::DosGlob;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'File::DosGlob' ) || return( $self->pass_error );
                 @files = File::DosGlob::glob( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path );
             }
             else
@@ -1613,13 +1601,7 @@ sub glob
         {
             if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require File::DosGlob;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'File::DosGlob' ) || return( $self->pass_error );
                 $path = File::DosGlob::glob( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path );
             }
             else
@@ -1863,7 +1845,17 @@ sub lines
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    return( $self->error( "You can only call lines() on a file." ) ) unless( $self->is_file );
+    unless( $self->is_file )
+    {
+        if( !$self->exists )
+        {
+            return( $self->error( "The file (", $self->filename, ") you are trying to get its lines from does not exist." ) );
+        }
+        else
+        {
+            return( $self->error( "You can only call lines() on a file." ) );
+        }
+    }
     my $a = $self->new_array;
     return( $a ) if( !$self->exists || $self->is_dir || !$self->finfo->can_read );
     # If binmode option was provided, the file was opened with it
@@ -2586,16 +2578,54 @@ sub lock
         $flags |= LOCK_UN if( $opts->{unlock} );
     }
     my $file = $self->filename;
-    my $io = $self->opened || return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to lock it." ) );
+    my $io = $self->opened || return( $self->error({
+        message => "File is not opened yet. You must open the file \"${file}\" first to lock it.",
+        code => 400
+    }) );
     # perlport: "(VMS, RISC OS, VOS) Not implemented"
     return(1) if( $^O =~ /^(vms|riscos|vos)$/i );
+    my $fd = $io->fileno;
+    return( $self->error({
+        message => "No file descriptor found for this filehandle.",
+        code => 400
+    }) ) if( !defined( $fd ) );
     # $type = LOCK_EX if( !defined( $type ) );
     return( $self->unlock ) if( ( $flags & LOCK_UN ) );
     # already locked
-    return(1) if( $self->locked & $flags );
-    $opts->{timeout} = 0 if( !defined( $opts->{timeout} ) || $opts->{timeout} !~ /^\d+$/ );
+    # return(1) if( $self->locked & $flags );
     # If the lock is different, release it first
-    $self->unlock if( $self->locked );
+    # $self->unlock if( $self->locked );
+
+    my $repo_key = $self->filepath;
+    my $repo = Module::Generic::Global->new( 'fd_locks' => $self, key => $repo_key ) ||
+        die( Module::Generic::Global->error );
+    my $current_state = $repo->get || {};
+    if( ref( $current_state ) eq 'HASH' )
+    {
+        if( CORE::exists( $current_state->{flags} ) && 
+            CORE::length( $current_state->{flags} // '' ) )
+        {
+            # Return undef with exception if already locked
+            if( $current_state->{flags} && ( $current_state->{flags} & $flags ) )
+            {
+                return( $self->error({
+                    message => "File \"$file\" is already locked with flags $current_state->{flags} by thread $current_state->{tid}.",
+                    # Locked
+                    code => 423
+                }) );
+            }
+            if( $current_state->{flags} )
+            {
+                # Release any existing lock
+                $self->unlock;
+            }
+        }
+    }
+    else
+    {
+        warn( "The stored value from our global shared repository for file locking is not an hash reference!" ) if( $self->_is_warnings_enabled );
+    }
+    $opts->{timeout} = 0 if( !defined( $opts->{timeout} ) || $opts->{timeout} !~ /^\d+$/ );
     local $SIG{ALRM} = sub{ die( "timeout" ); };
     alarm( $opts->{timeout} );
     # try-catch
@@ -2603,19 +2633,88 @@ sub lock
     my $rc;
     eval
     {
+        my $rv = $repo->lock;
+        if( !$rv )
+        {
+            warn( "Failed to acquire a shared lock for file $file: ", $repo->error ) if( $self->_is_warnings_enabled );
+        }
         $rc = $io->flock( $flags );
+        if( $rc )
+        {
+            $repo->set({
+                flags => $flags,
+                tid => ( HAS_THREADS ? threads->tid() : 0 ),
+                timestamp => time(),
+            });
+        }
     };
+    alarm(0);
     if( $@ )
     {
-        return( $self->error( "Unable to set a lock on file \"${file}\": $@" ) );
+        if( $@ =~ /timeout/i )
+        {
+            return( $self->error({
+                message => "Timed out after $opts->{timeout} seconds while attempting to set a lock on file \"$file\".",
+                # Gateway Timeout
+                code => 504
+            }) );
+        }
+        else
+        {
+            return( $self->error({
+                message => "Unable to set a lock on file \"${file}\": $@",
+                code => 500,
+            }) );
+        }
     }
-    return( $self->error( "Unable to set a lock on file \"$file\": $!" ) ) if( !$rc );
-    alarm(0);
+
+    return( $self->error({
+        message => "Unable to set a lock on file \"$file\": $!",
+        code => 500
+    }) ) if( !$rc );
     $self->locked( $flags );
     return( $self );
 }
 
-sub locked { return( shift->_set_get_scalar( 'locked', @_ ) ); }
+sub locked
+{
+    my $self = shift( @_ );
+    my $flags = $self->_set_get_scalar( 'locked', @_ );
+    $flags //= 0;
+    # File is not opened, so it cannot be locked
+    my $fh = $self->opened || return(0);
+    return( $flags ) if( scalar( @_ ) );
+    my $fd = $fh->fileno;
+    return( $self->error( "No file descriptor found for this filehandle." ) ) if( !defined( $fd ) );
+
+    # Check for forked child
+    my $pid_changed = ( CORE::length( $self->{pid} // '' ) && $self->{pid} != $$ );
+    my $should_check = HAS_THREADS || $pid_changed;
+
+    if( $should_check )
+    {
+        local $SIG{ALRM} = sub{ die( "lock timeout" ) };
+        alarm(1);
+        my $is_locked;
+        eval
+        {
+            $is_locked = !$fh->flock( LOCK_EX | LOCK_NB );
+        };
+        alarm(0);
+
+        if( $@ )
+        {
+            return( $self->error( "Unable to lock file (alarm) for descriptor $fd: $@" ) );
+        }
+        if( $is_locked )
+        {
+            # Return the flags used, but make sure to return true, but not 1, because 1 equates to shared lock in most system.
+            return( $flags || 0E0 ) if( $!{EWOULDBLOCK} );
+            return( $self->error( "Unable to lock the file \"", $self->filename, "\": $!" ) );
+        }
+    }
+    return( $flags );
+}
 
 sub max_recursion { return( shift->_set_get_number( 'max_recursion', @_ ) ); }
 
@@ -2656,7 +2755,7 @@ sub mkpath
     }
     # return( $self->error( "No path to create was provided." ) ) if( !scalar( @args ) );
     my $max_recursion = $self->max_recursion;
-    
+
     my $process;
     $process = sub
     {
@@ -2665,7 +2764,7 @@ sub mkpath
         my $params = {};
         $params = shift( @_ ) if( @_ && ref( $_[0] ) eq 'HASH' );
         $params->{recurse} //= 0;
-        return( $self->error( "Too many recursion. Exceeded the threshold of $max_recursion" ) ) if( $max_recursion > 0 && $params->{recurse} >= $max_recursion );
+        return( $self->error({ message => "Too many recursion. Exceeded the threshold of $max_recursion", code => 400  }) ) if( $max_recursion > 0 && $params->{recurse} >= $max_recursion );
         # my( $vol, $dirs, $fname ) = $self->_spec_splitpath( $path );
         # my @fragments = $self->_spec_splitdir( $dirs );
         my $vol = [$self->_spec_splitpath( $path )]->[0];
@@ -2730,7 +2829,7 @@ sub mkpath
         }
         return( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ) ) );
     };
-    
+
     my $new = $self->new_array;
     foreach my $path ( @args )
     {
@@ -2773,16 +2872,16 @@ sub mmap
     my $ok_modes = [qw( > +> >> +>> < +< )];
     my $map =
     {
-    'r'  => '<',
-    'r+' => '+<',
-    'w'  => '>',
-    'w+' => '+>',
-    'a'  => '>>',
-    'a+' => '+>>',
+        'r'  => '<',
+        'r+' => '+<',
+        'w'  => '>',
+        'w+' => '+>',
+        'a'  => '>>',
+        'a+' => '+>>',
     };
     # File::Map does not recognise the mode with letters
     $mode = $map->{ lc( $mode ) } if( CORE::exists( $map->{ lc( $mode ) } ) );
-    
+
     if( !scalar( grep( $_ eq $mode, @$ok_modes ) ) )
     {
         return( $self->error( "Unsupported file mode '$mode'" ) );
@@ -2800,7 +2899,7 @@ sub mmap
     {
         return( $self->error( "You cannot use encoding $1 with File::Map. Encoding do not work with File::Map" ) );
     }
-    
+
     $self->autoflush(1);
     # If we can write to file, we ensure the file has the same size as the one specified,
     # or else File::Map would issue an exception.
@@ -2831,7 +2930,7 @@ sub mmap
                 {
                     return( $self->error( "File already contain $fsize bytes of data, but required size ($size) is smaller than current content. You need to either set the required size to $fsize or empty or adjust the file content beforehand." ) );
                 }
-                
+
                 if( $var_size )
                 {
                     # Position at beginning of file
@@ -2876,7 +2975,7 @@ sub mmap
     # If it was not initially opened, close it now
     # If the user had opened it, he/she will receive an error that he/she needs to close it first and that's ok for he/she to receive this error
     $self->close if( !$opened );
-    
+
     if( HAS_PERLIO_MMAP && !$self->use_file_map )
     {
         my $io = $self->open( "${mode}:mmap" ) || return( $self->pass_error );
@@ -2897,7 +2996,7 @@ sub mmap
         {
             return( $self->error( "You perl version ($]) does not support PerlIO mmap, or you have set the property \"use_file_map\" to true and you do not have File::Map installed. Install File::Map at least if you want to use this method." ) );
         }
-        
+
         # try-catch
         local $@;
         eval
@@ -2951,7 +3050,7 @@ sub open
         }
         my $map = 
         {
-        '<+' => '+<',
+            '<+' => '+<',
         };
         $mode = $map->{ $mode } if( CORE::exists( $map->{ $mode } ) );
         # try-catch
@@ -3017,9 +3116,9 @@ sub open
         $self->opened( $io );
         if( !$existed && $self->can_write )
         {
-            $self->code( 201 ); # created
+            $self->code(201); # created
         }
-        
+
         if( $opts->{lock} )
         {
             # 4 possibilities:
@@ -3054,7 +3153,7 @@ sub open
                 }
             }
         }
-        
+
         if( $opts->{shared} || $opts->{exclusive} || $opts->{non_blocking} || $opts->{nb} )
         {
             $self->lock( $opts ) || return( $self->pass_error );
@@ -3299,17 +3398,11 @@ sub realpath
 {
     my $self = shift( @_ );
     my $path = shift( @_ ) || $self->filename;
+    $self->_load_class( 'Cwd' ) || return( $self->pass_error );
     # try-catch
     local $@;
     my $real = eval
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Cwd;
-            $loaded = 1;
-        }
         return( Cwd::realpath( $path ) );
     };
     return( $self->error( "Error getting the real path for $path: $@" ) ) if( $@ );
@@ -3346,13 +3439,7 @@ sub resolve
     {
         if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require File::DosGlob;
-                $loaded = 1;
-            }
+            $self->_load_class( 'File::DosGlob' ) || return( $self->pass_error );
             $path = File::DosGlob::glob( $path );
         }
         else
@@ -4338,13 +4425,7 @@ sub unload_perl
     }
     else
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Data::Dump;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Data::Dump' ) || return( $self->pass_error );
         local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
         local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
         local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
@@ -4381,7 +4462,16 @@ sub unlock
     return( $self ) if( !$self->locked );
     my $file = $self->filepath;
     my $io = $self->opened;
-    return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to unlock semaphore." ) ) if( !$io );
+    return( $self->error({
+        message => "File is not opened yet. You must open the file \"${file}\" first to unlock semaphore.",
+        code => 400
+    }) ) if( !$io );
+    return(1) if( $^O =~ /^(vms|riscos|vos)$/i );
+
+    my $repo_key = $self->filepath;
+    my $repo = Module::Generic::Global->new( 'fd_locks' => $self, key => $repo_key ) ||
+        die( Module::Generic::Global->error );
+
     # my $flags = $self->locked | LOCK_UN;
     # $flags ^= LOCK_NB if( $flags & LOCK_NB );
     my $flags = LOCK_UN;
@@ -4390,11 +4480,33 @@ sub unlock
     local $@;
     eval
     {
+        my $rv = $repo->lock;
+        if( !$rv )
+        {
+            warn( "Failed to acquire a shared lock for file $file: ", $repo->error ) if( $self->_is_warnings_enabled );
+        }
+        my $current_state = $repo->get || {};
+        if( ref( $current_state ) eq 'HASH' &&
+            CORE::exists( $current_state->{tid} ) &&
+            $current_state->{tid} != ( HAS_THREADS ? threads->tid() : 0 ) )
+        {
+            warn( "Thread ", ( HAS_THREADS ? threads->tid() : 0 ), " attempted to unlock file \"$file\" owned by thread $current_state->{tid}" ) if( $self->_is_warnings_enabled );
+        }
+
         $rc = $io->flock( $flags );
+        if( $rc )
+        {
+            # Clear lock flags
+            $repo->remove;
+        }
+        # The global repository lock gets destroyed automatically as it gets out of scope.
     };
     if( $@ )
     {
-        return( $self->error( "An unexpected error has occurred while trying to unlock file \"${file}\": $@" ) );
+        return( $self->error({
+            message => "Unable to unlock the file \"${file}\": $@",
+            code => 500
+        }) );
     }
 
     if( $rc )
@@ -4403,7 +4515,10 @@ sub unlock
     }
     else
     {
-        return( $self->error( "Unable to remove the lock from file \"${file}\" using flags '$flags': $!" ) );
+        return( $self->error({
+            message => "Unable to unlock the file \"${file}\" using flags '$flags': $!",
+            code => 500
+        }) );
     }
     return( $self );
 }
@@ -5038,32 +5153,31 @@ sub _uri_file_os_map
 
 sub DESTROY
 {
-    my $self = shift( @_ );
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = shift( @_ ) || CORE::return;
     my $file = $self->filepath;
+    CORE::return unless( defined( $file ) );
     no warnings 'uninitialized';
+
     # Revert back to the directory we were before there was a chdir, if any
     # This way, we avoid making change of directory permanent throughout our entire
     # program, even after our object has died
-    if( my $prev_cwd = $self->_prev_cwd )
+    if( my $prev_cwd = $self->{_prev_cwd} )
     {
         CORE::chdir( $prev_cwd );
     }
-    
+
+    my $repo_key = CORE::join( ';', ( ref( $self ) || $self ), "$file", $$, ( HAS_THREADS ? threads->tid : () ) );
+    my $repo = Module::Generic::Global->new( 'files_to_remove' => $self, key => $repo_key ) ||
+        die( Module::Generic::Global->error );
+    $repo->remove;
     # Could use also O_TEMPORARY provided by Fcntl to instruct the system to automatically
     # remove the file, but it is not supported on all platforms.
     my $orig = $self->{_orig};
     if( $self->auto_remove )
     {
-        return unless( CORE::exists( $FILES_TO_REMOVE->{ $$ }->{ $file } ) );
-        if( HAS_THREADS && is_shared( $FILES_TO_REMOVE ) )
-        {
-            lock( $FILES_TO_REMOVE );
-            CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
-        }
-        else
-        {
-            CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
-        }
         my @info = caller();
         my $sub = [caller(1)]->[3];
         return unless( -e( $file ) );
@@ -5079,48 +5193,6 @@ sub DESTROY
     else
     {
         my @info = caller();
-#         $self->debug(3);
-    }
-};
-
-# NOTE: END
-END
-{
-    # Need to be done last, so we can ensure they are empty before they are removed
-    my @dirs_to_remove = ();
-    # We use File::Spec to get the current directory rather than our cwd() method, 
-    # because we do not want to create a new object in a destruction block
-    my $cwd = File::Spec->rel2abs(File::Spec->curdir);
-    foreach my $pid ( keys( %$FILES_TO_REMOVE ) )
-    {
-        next if( $pid ne $$ );
-        foreach my $file ( keys( %{$FILES_TO_REMOVE->{ $$ }} ) )
-        {
-            next if( !$file || !-e( $file ) );
-            if( -d( $file ) )
-            {
-                push( @dirs_to_remove, $file );
-                next;
-            }
-            CORE::unlink( $file );
-        }
-        foreach my $dir ( @dirs_to_remove )
-        {
-            if( $cwd eq $dir )
-            {
-                my $updir = Cwd::abs_path( File::Spec->updir );
-                warnings::warn( "You currently are inside a directory to remove ($dir), moving you up to $updir\n" ) if( warnings::enabled() );
-                CORE::chdir( $updir ) || do
-                {
-                    warnings::warn( "Unable to move to directory '$updir' above current directory: $!\n" ) if( warnings::enabled() );
-                    next;
-                };
-            }
-            CORE::rmdir( $dir ) || do
-            {
-                warnings::warn( "Unable to remove directory $dir: $!\n" ) if( warnings::enabled() );
-            };
-        }
     }
 };
 
@@ -5439,11 +5511,22 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.12.2
+    v0.12.4
 
 =head1 DESCRIPTION
 
-This packages provides a comprehensive and versatile set of methods and functions to manipulate files and directories. You can even manipulate filenames as if under a different OS, by providing the C<os> parameter.
+This packages provides a comprehensive and versatile set of methods and functions to manipulate files and directories.
+
+It has this unique feature that enables you to work with files in different operating system context, by providing the C<os> parameter. For example, assuming your environment is a unix flavoured operating system, you could still do this:
+
+    use Module::Generic::File qw( file );
+    my $f = file( q{C:\Documents\Newsletters\Summer2018.pdf}, os => 'win32' );
+    $f->parent; # C:\Documents\Newsletters
+
+Then, switch to old Mac format:
+
+    my $f2 = $f->as( 'mac' );
+    say $f2; # Documents:Newsletters:Summer2018.pdf
 
 =head1 METHODS
 
@@ -5670,6 +5753,8 @@ This is an alias for L</auto_remove>. It enables or disables the auto cleanup of
 =head2 close
 
 Close the underlying file or directory.
+
+Returns the current object, or the object itself if no handle is open.
 
 =head2 code
 
@@ -6616,9 +6701,50 @@ Takes an integer used to set an alarm for the lock. If a lock cannot be obtained
 
 This returns the current object upon success or undef and set an exception object if an error occurred.
 
+In threaded environments, L</lock> synchronizes access to file descriptors using a shared hash (C<$FD_LOCKS>), ensuring thread-safe locking. Each thread must call L</lock> to acquire an exclusive or shared lock before file operations:
+
+    use threads;
+    my $file = Module::Generic::File->tempfile( cleanup => 1 );
+    my $fh = $file->open( '+>', { autoflush => 1 } );
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            if( !$file->lock( exclusive => 1 ) )
+            {
+                warn( "Thread $_: Failed to lock: ", $file->error );
+                return(0);
+            }
+            $fh->write( "Thread $_: Data\n" );
+            $file->unlock;
+            return(1);
+        });
+    } 1..5;
+    $_->join for @threads;
+
+Returns the current object on success, or C<undef> with an L<error|Module::Generic/error> on failure. On platforms where L<flock> is not supported (VMS, RISC OS, VOS), returns true without locking.
+
 =head2 locked
 
 Returns true if the file is locked. More specifically, this returns the value of the flags originally used to lock the file.
+
+L</locked> checks the file's lock state dynamically in threaded or forked environments, using a non-blocking L<flock> call, and a shared hash (C<$FD_LOCKS>). Returns the lock flags if set, C<0E0> if locked externally, or C<0> if unlocked or unopened.
+
+Example:
+
+    use threads;
+    my $file = Module::Generic::File->tempfile;
+    my $fh = $file->open( '+>' );
+    my $thread = threads->create(sub {
+        $file->lock( exclusive => 1 );
+        sleep(1);
+        $file->unlock;
+    });
+    sleep(0.1);
+    print "Locked: ", $file->locked, "\n"; # Prints 0E0
+    $thread->join;
+
+Returns C<undef> with an L<error|Module::Generic/error> if the lock check fails.
 
 =head2 mkdir
 
@@ -6748,7 +6874,7 @@ With fork:
         }
     }
 
-Provided with some option parameters and this will create a mmap. Mmap are powerful in that they can be used and shared among processes including fork, I<but excluding threads>. Of course, it you want to share objects or other less simple structures, you need to use serialisers like L<Storable::Improved> or L<Sereal>.
+Provided with some option parameters and this will create a mmap. Mmap are powerful in that they can be used and shared among processes including fork, I<but excluding threads> (see below a warning). Of course, it you want to share objects or other less simple structures, you need to use serialisers like L<Storable::Improved> or L<Sereal>.
 
 If the file is not opened yet, this will open it using the mode specified, or C<+<> by default. If the file is already opened, an error will be returned that the file cannot be opened by C<mmap> because it is already opened.
 
@@ -6781,6 +6907,10 @@ The mode can be accompanied by a PerlIO layer like C<:raw>, which is the default
 =back
 
 See also L<BSD documentation for mmap|https://man.openbsd.org/mmap>
+
+=head3 B<Thread-Safety Warning>
+
+L</mmap> is not thread-safe for shared mappings. Use it only in single-threaded or multi-process (e.g., C<fork>) contexts. Concurrent access in threads can lead to undefined behavior.
 
 =head2 mode
 
@@ -6835,6 +6965,8 @@ For example, opening the file in write or append mode, will lead to an exclusive
 If true, this will truncate the file after opening it.
 
 =back
+
+In threaded applications, use the C<lock> option to prevent concurrent access to the same file. Each thread creates its own file handle, but L</lock> ensures exclusive or shared access as needed.
 
 =head2 open_bin
 
@@ -7534,6 +7666,10 @@ For example:
     # or
     $f->open->write( $data );
 
+In multi-threaded environments, use L</lock> to prevent data corruption when multiple threads write to the same file. For example:
+
+    $file->open( '>>', lock => 1 )->write( "Thread-safe data" );
+
 =head1 CLASS FUNCTIONS
 
 =head2 cwd
@@ -7675,7 +7811,7 @@ For example:
     my $f = Module::Generic::File->new( "/my/file.txt" );
     $f->open || die( $f->error );
 
-However, L<Module::Generic/error> used to return undef, is smart and knows in a granular way (thanks to L<Want>) the context of the caller. Thus, if the method is chained, L<Module::Generic/error> will instead return a L<Module::Generic::Null> object to allow the chaining to continue and avoid the perl error that would have otherwise occurred: "method called on an undefined value"
+However, L<Module::Generic/error> used to return undef, is smart and knows in a granular way (thanks to L<Wanted>) the context of the caller. Thus, if the method is chained, L<Module::Generic/error> will instead return a L<Module::Generic::Null> object to allow the chaining to continue and avoid the perl error that would have otherwise occurred: "method called on an undefined value"
 
 =head1 OVERLOADING
 
@@ -7709,6 +7845,142 @@ Then, switch to old Mac format:
     say $f2; # Documents:Newsletters:Summer2018.pdf
 
 Those files manipulation under different os, of course, have limitation since you cannot use real filesystem related method like C<open>, C<print>, etc, on, say a win32 based file object in a Unix environment, as it would not work.
+
+=head1 THREAD & PROCESS SAFETY
+
+L<Module::Generic::File> is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event. It combines system-level file locking (C<flock>) with Perl-level synchronisation via L<Module::Generic::Global> to provide robust, system-wide thread-safe, and process-safe file operations.
+
+Key considerations for thread and process safety:
+
+=over 4
+
+=item * B<File Handles>
+
+File handles created by L</open>, L</write>, L</append>, and similar methods are per-object and exclusive to each thread or process. System-level file locking via L</lock> (using L<perlfunc/flock>) ensures safe concurrent access to file contents across all processes and threads on the system, while L<Module::Generic::Global>’s C<fd_locks> namespace coordinates lock state within a process:
+
+    use threads;
+    my $file = Module::Generic::File->new( "shared.txt", auto_remove => 1 );
+    my $obj = $file->open( '+>', autoflush => 1 );
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $fh = $obj->open( '+>>', { lock => 1, exclusive => 1 });
+            if( !$fh )
+            {
+                warn( "Thread $_: Failed to open: ", $file->error );
+                return(0);
+            }
+            $fh->write( "Thread $_: Hello\n" );
+            $fh->close;
+            return(1);
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+This ensures thread-safe writes, with L<perlfunc/flock> preventing concurrent file access system-wide and C<fd_locks> ensuring threads coordinate lock attempts, even across separate file instances. Lock failures (e.g., file already locked) return C<undef> with an error object (HTTP code C<423> for locked, C<504> for timeout).
+
+=item * B<Auto-Removal>
+
+The L</auto_remove> feature, used by L</tempfile> and L</tempdir> with C<cleanup>, tracks files in the C<files_to_remove> namespace of L<Module::Generic::Global>, storing a boolean (1) to indicate removal eligibility. This repository is thread-safe, protected by L<Module::Generic::Global>’s synchronisation (C<CORE::lock> for ithreads or C<APR::ThreadRWLock> for rare mod_perl non-threaded cases). In L</DESTROY>, the module checks the instance’s C<auto_remove> flag independently of the repository state, ensuring robust cleanup:
+
+    my $temp = Module::Generic::File->tempfile( cleanup => 1 );
+    $temp->auto_remove(1); # Thread-safe, removed in DESTROY
+
+Files and directories are removed per-object in C<DESTROY>, eliminating the need for global cleanup at process exit.
+
+=item * B<File Locking>
+
+File locking combines system-level and Perl-level synchronisation for system-wide thread- and process-safe file access:
+
+=over 4
+
+=item - B<System-Level (C<flock>)>
+
+L</lock> and L</unlock> use C<flock> to enforce exclusive (C<LOCK_EX>) or shared (C<LOCK_SH>) locks on file descriptors, ensuring safe concurrent access to file contents across all processes and threads. If the file is already locked, L</lock> returns C<undef> with an error (code 423). A C<timeout> option (e.g., C<timeout => 5>) triggers an error (code 504) if the lock isn’t acquired in time.
+
+=item - B<Perl-Level (C<Module::Generic::Global>)>
+
+The C<fd_locks> namespace tracks lock state, storing metadata (lock flags, thread ID, timestamp), protected by L<Module::Generic::Global>’s C<lock> method. This ensures thread-safe coordination within a process, preventing redundant C<flock> calls and maintaining consistent lock state across threads, even with separate file instances:
+
+    my $file = Module::Generic::File->new( "shared.txt" );
+    my $fh = $file->open( '>>', { lock => 1, exclusive => 1, timeout => 5 });
+    if( $fh )
+    {
+        $fh->write( "Process $$: Data\n" );
+        $fh->close;
+    }
+    else
+    {
+        warn "Failed to lock: ", $file->error;
+    }
+
+=back
+
+=item * B<Memory Mapping>
+
+The L</mmap> method is designed for inter-process communication (e.g., with L<perlfunc/fork>) and is not thread-safe for shared mappings. Avoid using L</mmap> in threaded environments, as concurrent access to mapped memory can cause undefined behaviour. Use L</mmap> with processes instead:
+
+    my $file = Module::Generic::File->tempfile( unlink => 1 );
+    $file->mmap( my $var, 10240, '+<' );
+    my $pid = fork();
+    if( $pid == 0 )
+    {
+        $var = "Child data";
+        exit;
+    }
+    waitpid( $pid, 0 );
+    print $var; # Child data
+
+See the L</mmap> method for detailed warnings.
+
+=item * B<Tied Scalars>
+
+When callbacks are set via L</callback> (e.g., for custom file operations), the scalar is tied to C<Module::Generic::Scalar::Tie>. Tied scalar operations are thread-safe, as they rely on L<Module::Generic::Global>’s synchronisation. However, callbacks themselves are not inherently thread-safe. If a callback accesses shared resources, you must implement additional synchronisation (e.g., using L<perlfunc/lock> or L<Thread::Semaphore>).
+
+=item * B<Process Safety>
+
+File operations (e.g., L</open>, L</write>, L</delete>) are safe across processes, relying on system-level file descriptors and L<perlfunc/flock> for coordination. Use L</lock> to ensure safe access to shared files:
+
+    my $file = Module::Generic::File->new( "shared.txt" );
+    my $fh = $file->open( '>>', { lock => 1, exclusive => 1 });
+    $fh->write( "Process $$: Data\n" );
+    $fh->close;
+
+=item * B<mod_perl Considerations>
+
+=over 4
+
+=item - B<Prefork MPM>
+
+File operations are per-process, with C<files_to_remove> and C<fd_locks> isolated by process ID. System-level L<perlfunc/flock> ensures safe file access across processes.
+
+=item - B<Threaded MPMs (Worker/Event)>
+
+Shared repositories are protected by L<Module::Generic::Global>’s synchronisation (typically L<perlfunc/lock>, or L<APR::ThreadRWLock> in rare non-threaded Perl cases), and L<perlfunc/flock> ensures file-level safety. Users should call C<< Module::Generic::Global->cleanup_register >> in mod_perl handlers to clear repositories after requests, preventing memory leaks.
+
+=item - B<Thread-Unsafe Functions>
+
+Avoid Perl functions like L<perlfunc/localtime>, L<perlfunc/readdir>, L<perlfunc/srand>, or operations like L<perlfunc/chdir>, L<perlfunc/umask>, L<perlfunc/chroot> in threaded MPMs, as they may affect all threads. Consult L<perlthrtut|http://perldoc.perl.org/perlthrtut.html> and L<mod_perl documentation|https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environment_Issues> for details.
+
+=back
+
+=item * B<Cleanup>
+
+Temporary files and directories (via L</tempfile>, L</tempdir>) are cleaned up thread-safely using the C<files_to_remove> namespace. Ensure C<cleanup> or L</auto_remove> is enabled for automatic removal:
+
+    my $temp = Module::Generic::File->tempfile( cleanup => 1 );
+    $temp->mkpath; # Auto-removed in DESTROY
+
+=back
+
+For debugging file operations in threaded or multi-process environments, use:
+
+    ipcs -m  # List shared memory segments (if mmap used)
+    ipcs -s  # List semaphores (if locking used)
+    ls -l /proc/$$/fd  # List open file descriptors
+
+Note that the actual commands vary based on your Operating System.
 
 =head1 AUTHOR
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/IO.pm
-## Version v0.1.4
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.1.6
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/26
-## Modified 2025/04/20
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,12 +21,12 @@ BEGIN
     use parent qw( Module::Generic IO::File );
     use vars qw( $VERSION @EXPORT $THAW_REOPENS_FILE );
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     our @EXPORT = grep( /^(?:O_|F_GETFL|F_SETFL)/, @Fcntl::EXPORT );
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
     our @EXPORT_OK = qw( wraphandle );
     our $THAW_REOPENS_FILE = 1;
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.1.6';
 };
 
 use strict;
@@ -75,7 +75,7 @@ sub new
     }
     
     *$self = { args => $args };
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         return( $self->init( $opts ) );
     }
@@ -181,6 +181,25 @@ sub flags
     return( CORE::fcntl( *$self, F_GETFL, $dummy ) );
 }
 
+sub flock
+{
+    my $self = shift( @_ );
+    return( $self->error( 'usage: $io->flock( OPERATION );' ) ) if( scalar( @_ ) != 1 );
+    my $op = shift( @_ );
+    my $rv;
+    # try-catch
+    local $@;
+    eval
+    {
+        $rv = CORE::flock( *$self, $op );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An unexpected error occurred while trying to call flock with operation '$op': $@" ) );
+    }
+    return( $rv );
+}
+
 sub flush { return( shift->_filehandle_method( 'flush', @_ ) ); }
 
 sub format_formfeed { return( shift->_filehandle_method( 'format_formfeed', @_ ) ); }
@@ -237,11 +256,31 @@ sub say { return( shift->_filehandle_method( 'say', @_ ) ); }
 
 sub seek { return( shift->_filehandle_method( 'seek', @_ ) ); }
 
+sub select
+{
+    my $self = shift( @_ );
+    return( $self->error( 'usage: $io->select();' ) ) if( scalar( @_ ) );
+    my $rv;
+    # try-catch
+    local $@;
+    eval
+    {
+        $rv = CORE::select( *$self );
+    };
+    if( $@ )
+    {
+        return( $self->error( "An unexpected error occurred while trying to call select: $@" ) );
+    }
+    return( $rv );
+}
+
 sub setpos { return( shift->_filehandle_method( 'setpos', @_ ) ); }
 
 sub stat { return( shift->_filehandle_method( 'stat', @_ ) ); }
 
 sub sync { return( shift->_filehandle_method( 'sync', @_ ) ); }
+
+sub sysopen { return( shift->_filehandle_method( 'sysopen', @_ ) ); }
 
 sub sysread { return( shift->_filehandle_method( 'sysread', @_ ) ); }
 
@@ -334,10 +373,15 @@ sub _filehandle_method
     return( wantarray() ? @rv : $rv[0] );
 }
 
+# NOTE: DESTROY
 sub DESTROY
 {
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
     # NOTE: Storable creates a dummy object as a SCALAR instead of GLOB, so we need to check.
-    shift->close if( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'GLOB' );
+    $self->close if( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' );
 }
 
 sub FREEZE
@@ -424,7 +468,7 @@ Module::Generic::File::IO - File IO Object Wrapper
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.6
 
 =head1 DESCRIPTION
 
@@ -516,6 +560,10 @@ See L<IO::Handle/fileno> for details
 =head2 flags
 
 Returns the filehandle flags value using L<perlfunc/fcntl>
+
+=head2 flock
+
+Returns the filehandle flock using L<perlfunc/flock>
 
 =head2 flush
 
@@ -629,6 +677,17 @@ See L<IO::Handle/say> for details
 
 See L<IO::Seekable/seek> for details
 
+=head2 select
+
+    $io->select;
+    my $oldfh = $io->select; $| = 1; $oldfh->select;
+
+Or, more simply:
+
+    $io->autoflus(1);
+
+Returns the filehandle select using L<perlfunc/select>
+
 =head2 setpos
 
 See L<IO::Seekable/setpos> for details
@@ -640,6 +699,10 @@ See L<IO::Handle/stat> for details
 =head2 sync
 
 See L<IO::Handle/sync> for details
+
+=head2 sysopen
+
+See L<IO::Handle/sysopen> for details
 
 =head2 sysread
 

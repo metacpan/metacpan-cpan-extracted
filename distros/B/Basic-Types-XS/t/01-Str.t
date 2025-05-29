@@ -18,6 +18,28 @@ is(Str->($num2), 123);
 is(Str->($d), 123.123);
 is(Str->($d2), 123.123);
 
+my $string = Str(
+	message => "This is a custom error message",
+	coerce => sub {
+		my $value = shift;
+		return join ",", @{$value} if ref $value eq "ARRAY";
+		return $value;
+	},
+	default => sub {
+		return "default value";
+	},
+);
+
+is($string->("abc"), "abc");
+is($string->(undef), "default value");
+is($string->([qw/a b c/]), "a,b,c");
+eval {
+	$string->({});
+};
+
+like($@, qr/This is a custom error message/);
+
+
 eval {
 	Str->(undef);
 };

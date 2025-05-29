@@ -1,6 +1,7 @@
-0.009   2025-01-27  Released-By: PERLANCAR; Urgency: medium
+0.010   2025-05-29  Released-By: PERLANCAR; Urgency: medium
 
-        - Release v0.008.
+        - [ux] Add utility: tee-clipboard-content (cliptee, ct), which is a
+          shortcut for 'add-clipboard-content --tee'.
 
 
 0.009   2025-01-27  Released-By: PERLANCAR; Urgency: medium

@@ -1,9 +1,14 @@
+0.021   2025-05-22  Released-By: PERLANCAR; Urgency: high
+
+        - Update data (fix newlines again).
+
+
 0.020   2025-05-20  Released-By: PERLANCAR; Urgency: medium
 
         - Update data.
 
 
-0.019   2023-03-09  Released-By: PERLANCAR; Urgency: medium
+0.019   2023-03-09  Released-By: PERLANCAR; Urgency: high
 
         - [bugfix] Fix data, previously incomplete to bad newlines in CSV
           source.

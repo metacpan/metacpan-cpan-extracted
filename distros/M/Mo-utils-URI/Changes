@@ -1,3 +1,10 @@
+0.04 2025-05-28T20:56:26+02:00
+ - Improve doc.
+
+0.03 2025-05-28T16:03:00+02:00
+ - API change: The undef value is possible for all checks.
+ - Update copyright years.
+
 0.02 2024-02-29T22:04:40+01:00
  - Add IRI to test as bad URI.
  - Add tests for URL.

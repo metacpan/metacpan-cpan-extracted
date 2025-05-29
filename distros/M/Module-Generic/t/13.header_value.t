@@ -3,8 +3,10 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
+    use Config;
     use Test::More;
     use DateTime;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -92,6 +94,95 @@ subtest 'stringify' => sub
         }
         is( $res, $expect );
     }
+};
+
+subtest 'Additional methods' => sub
+{
+    my $hv = Module::Generic::HeaderValue->new( "foo=bar", debug => $DEBUG );
+    $hv->decode(1);
+    is( $hv->decode, 1, 'decode' );
+    $hv->encode(1);
+    is( $hv->encode, 1, 'encode' );
+    $hv->original( "foo=bar; baz=qux" );
+    is( $hv->original->scalar, "foo=bar; baz=qux", 'original' );
+    $hv->param( baz => "qux" );
+    is( $hv->param( "baz" ), "qux", 'param set/get' );
+    isa_ok( $hv->params, 'Module::Generic::Hash', 'params class' );
+    my $quoted = $hv->qstring( "Mon, 01 Nov 2021" );
+    is( $quoted, '"Mon, 01 Nov 2021"', 'qstring' );
+    $hv->reset;
+    is( $hv->original->scalar, "", 'reset' );
+    my $escaped = $hv->token_escape( "foo/bar" );
+    is( $escaped, "foo%2Fbar", 'token_escape' );
+    $hv->token_max(10);
+    is( $hv->token_max, 10, 'token_max' );
+    $hv->value_max(20);
+    is( $hv->value_max, 20, 'value_max' );
+    isa_ok( $hv->value, 'Module::Generic::Array', 'value class' );
+    is( $hv->value_as_string, "foo=bar", 'value_as_string' );
+    is( $hv->value_data, "bar", 'value_data' );
+    is( $hv->value_name, "foo", 'value_name' );
+};
+
+subtest 'Edge cases' => sub
+{
+    no warnings;
+    my $hv = Module::Generic::HeaderValue->new( "foo=bar", debug => $DEBUG );
+    $hv->token_max(3);
+    $hv->param( long_token => "value" );
+    my $res = $hv->as_string;
+    ok( !defined( $res ), 'Token exceeds max length' );
+    $hv->token_max(0);
+    $hv->value_max(2);
+    $hv->param( short => "long_value" );
+    $res = $hv->as_string;
+    ok( !defined( $res ), 'Value exceeds max length' );
+    $hv->value_max(0);
+    my $quoted = $hv->qstring( "invalid\nvalue" );
+    ok( !defined( $quoted ), 'Invalid characters in qstring' );
+};
+
+subtest 'Thread-safe header operations' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads not available', 2 );
+        }
+
+        require threads;
+        require threads::shared;
+
+        my @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid();
+                my $hv = Module::Generic::HeaderValue->new( "foo=bar; tid=$tid", debug => $DEBUG );
+                if( !$hv->param( tid => $tid ) )
+                {
+                    diag( "Thread $tid: Failed to set param: ", $hv->error ) if( $DEBUG );
+                    return(0);
+                }
+                if( $hv->param( 'tid' ) ne $tid )
+                {
+                    diag( "Thread $tid: Param 'tid' mismatch: ", $hv->param( 'tid' ) ) if( $DEBUG );
+                    return(0);
+                }
+                return(1);
+            });
+        } 1..5;
+
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join();
+        }
+
+        ok( $success, 'All threads processed headers successfully' );
+        ok( !defined( $Module::Generic::HeaderValue::DEBUG ) || $Module::Generic::HeaderValue::DEBUG == 0, 'Global $DEBUG unchanged' );
+    };
 };
 
 done_testing();

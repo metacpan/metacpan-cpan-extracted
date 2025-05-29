@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.43.3
+## Version v1.0.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/04/21
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -38,26 +38,26 @@ BEGIN
     use Devel::StackTrace;
     use Encode ();
     use File::Spec ();
+    use Module::Generic::Global ':const';
     use Module::Metadata;
     use POSIX;
     use Scalar::Util qw( openhandle );
     use Sub::Util ();
     # To get some context on what the caller expect. This is used in our error() method to allow chaining without breaking
     use version;
-    use Want;
+    use Wanted;
     use Exporter ();
     our @ISA         = qw( Exporter );
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.43.3';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
         &&
-        ( $MOD_PERL = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
+        ( ( $MOD_PERL ) = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
     {
-        select( ( select( STDOUT ), $| = 1 )[ 0 ] );
+        select( ( select( STDOUT ), $| = 1 )[0] );
         require Apache2::Log;
         # For _is_class_loaded method
         require Apache2::Module;
@@ -68,17 +68,16 @@ BEGIN
         require Apache2::Const;
         Apache2::Const->import( compile => qw( :log OK ) );
     }
-    $VERBOSE     = 0;
-    $DEBUG       = 0;
+    $VERBOSE              = 0;
+    $DEBUG                = 0;
     $SILENT_AUTOLOAD      = 1;
     $PARAM_CHECKER_LOADED = 0;
     $CALLER_LEVEL         = 0;
     $COLOUR_NAME_TO_RGB   = {};
     no strict 'refs';
-    $DEBUG_LOG_IO = undef();
     # Can use Sereal also
     $SERIALISER = 'Storable::Improved';
-    our $AUTOLOAD_SUBS;
+
     $SUB_ATTR_LIST = qr{
         [[:blank:]\h]* : [[:blank:]\h]*
         (?:
@@ -100,14 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    }
+    our $VERSION     = 'v1.0.0';
 };
 
 use v5.26.1;
@@ -334,19 +326,13 @@ sub new
     no strict 'refs';
     if( defined( ${ "${class}\::OBJECT_PERMS" } ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Tie;
-            $loaded = 1;
-        }
+        $that->_load_class( 'Module::Generic::Tie' ) || return( $that->pass_error );
         my %hash  = ();
         my $obj   = tie(
-        %hash, 
-        'Module::Generic::Tie', 
-        'pkg'   => [ __PACKAGE__, $class ],
-        'perms' => ${ "${class}::OBJECT_PERMS" },
+            %hash, 
+            'Module::Generic::Tie', 
+            'pkg'   => [ __PACKAGE__, $class ],
+            'perms' => ${ "${class}::OBJECT_PERMS" },
         );
         $self  = \%hash;
     }
@@ -356,7 +342,7 @@ sub new
         $self->{log_debug} = ${ "${class}::LOG_DEBUG" };
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         return( $self->init( @_ ) );
     }
@@ -385,11 +371,12 @@ sub new_glob
     no warnings 'once';
     my $self = bless( \do{ local *FH } => $class );
     *$self = {};
+    no strict 'refs';
     if( defined( ${ "${class}\::LOG_DEBUG" } ) )
     {
         *$self->{log_debug} = ${ "${class}::LOG_DEBUG" };
     }
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         return( $self->init( @_ ) );
     }
@@ -416,15 +403,12 @@ sub clear_error
     my $class = ref( $self ) || $self;
     my $this  = $self->_obj2h;
     no strict 'refs';
-    if( HAS_THREADS )
-    {
-        lock( ${ $class . '::ERROR' } );
-        $this->{error} = ${ $class . '::ERROR' } = '';
-    }
-    else
-    {
-        $this->{error} = ${ $class . '::ERROR' } = '';
-    }
+    my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
+
+    $this->{error} = '';
+    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+    $repo->remove;
+    ${ $class . '::ERROR' } = '';
     return( $self );
 }
 
@@ -439,7 +423,7 @@ sub deserialise
     my $this  = $self->_obj2h;
     my $class = $opts->{serialiser} || $opts->{serializer} || $SERIALISER;
     return( $self->error( "No serialiser class was provided nor set in \$Module::Generic::SERIALISER" ) ) if( !defined( $class ) || !length( $class ) );
-    
+
     # Well, nothing to do
     if( ( !defined( $opts->{file} ) || !length( $opts->{file} ) ) && 
         ( !defined( $opts->{io} ) || !length( $opts->{io} ) ) &&
@@ -459,7 +443,7 @@ sub deserialise
         # There is nothing to do
         return( '' ) if( !length( $temp ) ); 
     }
-    
+
     if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
     {
         $self->_load_class( 'CBOR::XS' ) || return( $self->pass_error );
@@ -472,7 +456,7 @@ sub deserialise
             $self->_load_class( 'Sereal::Decoder' ) || return( $self->pass_error );
         }
     }
-    
+
     # This should be an array with two entries: encoder and decoder handler code reference
     my $base64;
     if( defined( $opts->{base64} ) && $opts->{base64} )
@@ -489,7 +473,8 @@ sub deserialise
             return( $self->error( "Value returned by _has_base64 is not an array reference containing two code references." ) );
         }
     }
-    
+
+    # NOTE: deserialise with CBOR or CBOR::XS
     if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
     {
         my @options = qw( max_depth max_size allow_unknown allow_sharing allow_cycles forbid_objects pack_strings text_keys text_strings validate_utf8 filter );
@@ -500,7 +485,7 @@ sub deserialise
             next unless( CORE::exists( $opts->{ $_ } ) );
             $cbor->$_( $opts->{ $_ } );
         }
-        
+
         if( exists( $opts->{file} ) && $opts->{file} )
         {
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
@@ -559,6 +544,7 @@ sub deserialise
             return( $self->error( "No file and no data was provided to deserialise with $class." ) );
         }
     }
+    # NOTE: deserialise with CBOR::Free
     elsif( $class eq 'CBOR::Free' )
     {
         if( exists( $opts->{file} ) && $opts->{file} )
@@ -598,6 +584,7 @@ sub deserialise
             local $@;
             eval
             {
+                no warnings;
                 if( defined( $base64 ) )
                 {
                     my $decoded = $base64->[1]->( $opts->{data} );
@@ -619,6 +606,7 @@ sub deserialise
             return( $self->error( "No file and no data was provided to deserialise with $class." ) );
         }
     }
+    # NOTE: deserialise with JSON
     elsif( $class eq 'JSON' )
     {
         my @options = qw(
@@ -635,7 +623,7 @@ sub deserialise
                 $code->( $json, $opts->{ $_ } );
             }
         }
-        
+
         if( exists( $opts->{file} ) && $opts->{file} )
         {
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
@@ -694,6 +682,7 @@ sub deserialise
             return( $self->error( "No file and no data was provided to deserialise with $class." ) );
         }
     }
+    # NOTE: deserialise with Sereal
     elsif( $class eq 'Sereal' )
     {
         my @options = qw( refuse_snappy refuse_objects no_bless_objects validate_utf8 max_recursion_depth max_num_hash_entries max_num_array_entries max_string_length max_uncompressed_size incremental alias_smallint alias_varint_under use_undef set_readonly set_readonly_scalars );
@@ -702,7 +691,7 @@ sub deserialise
         {
             $ref->{ $_ } = $opts->{ $_ } if( exists( $opts->{ $_ } ) );
         }
-    
+
         my $code;
         my $dec = Sereal::Decoder->new( $ref );
         if( exists( $opts->{file} ) && $opts->{file} )
@@ -756,7 +745,7 @@ sub deserialise
                 my $type = Sereal::Decoder->looks_like_sereal( $_[0] );
                 # return( $self->error( "Data retrieved from share memory block does not look like sereal data." ) ) if( !$type );
             };
-            
+
             # try-catch
             local $@;
             eval
@@ -784,6 +773,7 @@ sub deserialise
         }
         return( $code );
     }
+    # NOTE: deserialise with Storable::Improved or Storable
     elsif( $class eq 'Storable::Improved' || $class eq 'Storable' )
     {
         if( exists( $opts->{file} ) && $opts->{file} )
@@ -825,7 +815,7 @@ Version...... : $info->{version}
 Version NV... : $info->{version_nv}
 EOT
                 }
-                
+
                 if( defined( $base64 ) )
                 {
                     my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
@@ -1076,10 +1066,11 @@ sub dump
 sub error
 {
     my $self = shift( @_ );
-    my $class = ref( $self ) || $self;
+    my $class = CORE::ref( $self ) || $self;
     our $MOD_PERL;
     my $this = $self->_obj2h;
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $i_am_blessed = Scalar::Util::blessed( $self ) ? 1 : 0;
     my $o;
     no strict 'refs';
     no warnings 'once';
@@ -1104,13 +1095,8 @@ sub error
         },
         object => sub
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Null;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::Null' ) ||
+                die( "Unable to load Module::Generic::Null" );
             my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, has_error => 1, wants => 'object' });
             return( $null );
         },
@@ -1121,13 +1107,15 @@ sub error
         },
     };
 
-    my $want_what = Want::wantref();
+    my $want_what = Wanted::wantref();
 
     # Ensure this is lowercase and at the same time that this is defined
     $want_what = lc( $want_what // '' );
     # What type of expected value we support to prevent perl error upon undef.
     # By default: object
     my $want_ok = [qw( object )];
+    my $err_key = HAS_THREADS ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
+    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
 
     if( @_ )
     {
@@ -1175,19 +1163,7 @@ sub error
 
         push( @$want_ok, 'OBJECT' ) unless( scalar( grep( /^object$/i, @$want_ok ) ) );
 
-        if( defined( $o ) )
-        {
-            if( HAS_THREADS )
-            {
-                lock( ${ $class . '::ERROR' } );
-                $this->{error} = ${ $class . '::ERROR' } = $o;
-            }
-            else
-            {
-                $this->{error} = ${ $class . '::ERROR' } = $o;
-            }
-        }
-        else
+        if( !defined( $o ) )
         {
             $args->{debug} = $self->debug unless( CORE::exists( $args->{debug} ) );
             my $ex_class = CORE::length( $args->{class} )
@@ -1207,17 +1183,14 @@ sub error
                 die( __PACKAGE__ . "::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
             }
             $o = $ex_class->new( $args );
-
-            if( HAS_THREADS )
-            {
-                lock( ${ $class . '::ERROR' } );
-                $this->{error} = ${ $class . '::ERROR' } = $o;
-            }
-            else
-            {
-                $this->{error} = ${ $class . '::ERROR' } = $o;
-            }
         }
+
+        $this->{error} = $o;
+        # We need to also store the object in the global $ERRORS repository, because when a class constructor fails, it may call 'error' using its newly instantiated object, but the caller can only get the error by calling 'error' as a class function, such as My::Module->error
+        # my $rv = $self->_ensure_shared_elements;
+        $repo->set( $o );
+        # For backward compatibility, so the user can access $My::Module::ERROR
+        ${ $class . '::ERROR' } = $o;
 
         my $err_callback = $self->_on_error;
         if( !defined( $err_callback ) &&
@@ -1341,7 +1314,7 @@ sub error
             # overloaded method name can be, for example: My::Package::as_string
             # or, for anonymous sub: My::Package::__ANON__[lib/My/Package.pm:12]
             # caller sub will reliably be the same, so we use it to check if we are called from an overloaded stringification and return undef right here.
-            # Want::want check of being called in an OBJECT context triggers a perl segmentation fault
+            # Wanted::want check of being called in an OBJECT context triggers a perl segmentation fault
             if( length( $overload_meth_name ) && $overload_meth_name eq $call_sub )
             {
                 return;
@@ -1384,19 +1357,37 @@ sub error
         }
         return;
     }
+    # Done with mutator mode
 
-    # To avoid the perl error of 'called on undefined value' and so the user can do
-    # $o->error->_message for example without concerning himself/herself whether an exception object is actually set
-    if( !$this->{error} )
+    if( $i_am_blessed )
     {
-        if( $want_what && 
-            CORE::exists( $want_return->{ $want_what } ) &&
-            scalar( grep( /^$want_what$/i, @$want_ok ) ) )
+        # To avoid the perl error of 'called on undefined value' and so the user can do
+        # $o->error->_message for example without concerning himself/herself whether an exception object is actually set
+        if( !$this->{error} )
         {
-            rreturn( $want_return->{ $want_what }->() );
+            if( $want_what && 
+                CORE::exists( $want_return->{ $want_what } ) &&
+                scalar( grep( /^$want_what$/i, @$want_ok ) ) )
+            {
+                rreturn( $want_return->{ $want_what }->() );
+            }
+        }
+        else
+        {
+            return( $this->{error} );
         }
     }
-    return( ref( $self ) ? $this->{error} : ${ $class . '::ERROR' } );
+
+    $o = $repo->get;
+    if( CORE::defined( $o ) && CORE::length( $o ) )
+    {
+    }
+    elsif( !CAN_THREADS && CORE::defined( ${ $class . '::ERROR' } ) )
+    {
+        $o = ${ $class . '::ERROR' };
+        warn( "Accessing ${class}::ERROR is deprecated; use ${class}->error instead" ) if( $self->_warnings_is_enabled );
+    }
+    return( $o );
 }
 
 sub error_handler { return( shift->_set_get_code( '_error_handler', @_ ) ); }
@@ -1677,13 +1668,7 @@ sub log_handler { return( shift->_set_get_code( '_log_handler', @_ ) ); }
 sub new_array
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Array;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Array' ) || return( $self->pass_error );
     my $v = Module::Generic::Array->new( @_ );
     return( $self->pass_error( Module::Generic::Array->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1692,13 +1677,7 @@ sub new_array
 sub new_datetime
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::DateTime;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::DateTime' ) || return( $self->pass_error );
     my $v = Module::Generic::DateTime->new( @_ );
     return( $self->pass_error( Module::Generic::DateTime->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1707,13 +1686,7 @@ sub new_datetime
 sub new_file
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::File;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::File' ) || return( $self->pass_error );
     my $v = Module::Generic::File->new( @_ );
     return( $self->pass_error( Module::Generic::File->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1722,13 +1695,7 @@ sub new_file
 sub new_hash
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Hash;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Hash' ) || return( $self->pass_error );
     my $v = Module::Generic::Hash->new( @_ );
     return( $self->pass_error( Module::Generic::Hash->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1820,38 +1787,13 @@ sub new_null
     }
     else
     {
-        $what = Want::want( 'LIST' )
-            ? 'LIST'
-            : Want::want( 'HASH' )
-                ? 'HASH'
-                : Want::want( 'ARRAY' )
-                    ? 'ARRAY'
-                    : Want::want( 'OBJECT' )
-                        ? 'OBJECT'
-                        : Want::want( 'CODE' )
-                            ? 'CODE'
-                            : Want::want( 'REFSCALAR' )
-                                ? 'REFSCALAR'
-                                : Want::want( 'BOOLEAN' )
-                                    ? 'BOOLEAN'
-                                    : Want::want( 'GLOB' )
-                                        ? 'GLOB'
-                                        : Want::want( 'SCALAR' )
-                                            ? 'SCALAR'
-                                            : Want::want( 'VOID' )
-                                                ? 'VOID'
-                                                : '';
+        $what = Wanted::context();
     }
     
     if( $what eq 'OBJECT' )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Null;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Null' ) || 
+            die( "Unable to load Module::Generic::Null" );
         return( Module::Generic::Null->new( @_ ) );
     }
     elsif( $what eq 'ARRAY' )
@@ -1879,13 +1821,7 @@ sub new_null
 sub new_number
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Number;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Number' ) || return( $self->pass_error );
     my $v = Module::Generic::Number->new( @_ );
     return( $self->pass_error( Module::Generic::Number->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1894,13 +1830,7 @@ sub new_number
 sub new_scalar
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
     my $v = Module::Generic::Scalar->new( @_ );
     return( $self->pass_error( Module::Generic::Scalar->error ) ) if( !defined( $v ) );
     return( $v );
@@ -1909,26 +1839,14 @@ sub new_scalar
 sub new_tempdir
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::File;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::File' ) || return( $self->pass_error );
     return( Module::Generic::File::tempdir( @_ ) );
 }
 
 sub new_tempfile
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::File;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::File' ) || return( $self->pass_error );
     return( Module::Generic::File::tempfile( @_ ) );
 }
 
@@ -1972,14 +1890,17 @@ sub noexec { $_[0]->{_msg_no_exec_sub} = 1; return( $_[0] ); }
 sub pass_error
 {
     my $self = shift( @_ );
-    my $pack = ref( $self ) || $self;
+    my $class = ref( $self ) || $self;
     my $this = $self->_obj2h;
     my $opts = {};
     my $err;
-    my $class;
+    my $ex_class;
     my $code;
     my $callback;
     no strict 'refs';
+    my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
+    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+
     if( scalar( @_ ) )
     {
         # Either an hash defining a new error and this will be passed along to error(); or
@@ -1999,49 +1920,55 @@ sub pass_error
         }
     }
     $err = $opts->{error} if( !defined( $err ) && CORE::exists( $opts->{error} ) && defined( $opts->{error} ) && CORE::length( $opts->{error} ) );
-    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
+    # We set $ex_class only if the hash provided is a one-element hash and not an error-defining hash
     # $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
-    $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
-    $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
+    $ex_class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
+    $code = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
     $callback = $opts->{callback} if( CORE::exists( $opts->{callback} ) && defined( $opts->{callback} ) && ref( $opts->{callback} ) );
-    
+
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
     # with an hash containing just one argument class => 'Some::ExceptionClass'
-    if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $ex_class ) ) )
     {
-        my $error = ref( $self ) ? $this->{error} : length( ${ $pack . '::ERROR' } ) ? ${ $pack . '::ERROR' } : undef;
+        my $error;
+        if( Scalar::Util::blessed( $self ) )
+        {
+            $error = $this->{error};
+        }
+        elsif( $repo->exists )
+        {
+            $error = $repo->get;
+        }
+
         if( !defined( $error ) )
         {
             warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n", $self->_get_stack_trace );
         }
         else
         {
-            $err = ( defined( $class ) ? bless( $error => $class ) : $error );
+            $err = ( defined( $ex_class ) ? bless( $error => $ex_class ) : $error );
             $err->code( $code ) if( defined( $code ) );
         }
     }
+    # An error object was provided
     elsif( defined( $err ) && 
            Scalar::Util::blessed( $err ) && 
            ( scalar( @_ ) == 1 || 
-             ( scalar( @_ ) == 2 && defined( $class ) ) 
+             ( scalar( @_ ) == 2 && defined( $ex_class ) ) 
            ) )
     {
-        my $o = ( defined( $class ) ? bless( $err => $class ) : $err );
-        if( HAS_THREADS )
-        {
-            lock( ${ $pack . '::ERROR' } );
-            $this->{error} = ${ $pack . '::ERROR' } = $o;
-        }
-        else
-        {
-            $this->{error} = ${ $pack . '::ERROR' } = $o;
-        }
+        # If necessary, we re-bless the error object to the designated class
+        my $o = ( defined( $ex_class ) ? bless( $err => $ex_class ) : $err );
+        $this->{error} = $o;
+        # We ned to be backward compatible, and allow the user to access $My::Module::ERROR
+        $repo->set( $o );
+        ${ $class . '::ERROR' } = $o;
         $this->{error}->code( $code ) if( defined( $code ) );
         my $err_callback = $self->_on_error;
         $err_callback = $callback if( !defined( $err_callback ) && defined( $callback ) );
         if( defined( $err_callback ) && 
-            ref( $err_callback ) eq 'CODE' )
+            CORE::ref( $err_callback ) eq 'CODE' )
         {
             local $SIG{__WARN__} = sub{};
             local $SIG{__DIE__} = sub{};
@@ -2051,7 +1978,7 @@ sub pass_error
                 $err_callback->( $self, $this->{error} );
             };
         }
-        
+
         if( $this->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
         {
             die( $this->{error} );
@@ -2062,16 +1989,11 @@ sub pass_error
     {
         return( $self->error( @_ ) );
     }
-    
+
     if( want( 'OBJECT' ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Null;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Null' ) ||
+            die( "Unable to load Module::Generic::Null" );
         my $null = Module::Generic::Null->new( $err, { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
@@ -2120,6 +2042,7 @@ sub serialise
         }
     }
 
+    # NOTE: serialise with CBOR or CBOR::XS
     if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
     {
         my @options = qw(
@@ -2159,6 +2082,7 @@ sub serialise
         }
         return( $serialised );
     }
+    # NOTE: serialise with CBOR::Free
     if( $class eq 'CBOR::Free' )
     {
         my @options = qw(
@@ -2194,6 +2118,7 @@ sub serialise
         }
         return( $serialised );
     }
+    # NOTE: serialise with JSON
     elsif( $class eq 'JSON' )
     {
         my @options = qw(
@@ -2210,7 +2135,7 @@ sub serialise
                 $code->( $json, $opts->{ $_ } );
             }
         }
-        
+
         # try-catch
         local $@;
         my $serialised = eval
@@ -2226,7 +2151,7 @@ sub serialise
         {
             $serialised = $base64->[0]->( $serialised );
         }
-        
+
         if( exists( $opts->{file} ) && $opts->{file} )
         {
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
@@ -2234,6 +2159,7 @@ sub serialise
         }
         return( $serialised );
     }
+    # NOTE: serialise with Sereal
     elsif( $class eq 'Sereal' )
     {
         my @options = qw( compress compress_threshold compress_level snappy snappy_incr snappy_threshold croak_on_bless freeze_callbacks no_bless_objects undef_unknown stringify_unknown warn_unknown max_recursion_depth  canonical canonical_refs sort_keys no_shared_hashkeys dedupe_strings aliased_dedupe_strings protocol_version use_protocol_v1 );
@@ -2242,7 +2168,7 @@ sub serialise
         {
             $ref->{ $_ } = $opts->{ $_ } if( exists( $opts->{ $_ } ) );
         }
-        
+
         my $enc = Sereal::Encoder->new( $ref );
         if( exists( $opts->{file} ) && $opts->{file} )
         {
@@ -2289,6 +2215,7 @@ sub serialise
             return( $serialised );
         }
     }
+    # NOTE: serialise with Storable::Improved or Storable
     elsif( $class eq 'Storable::Improved' || $class eq 'Storable' )
     {
         if( exists( $opts->{file} ) && $opts->{file} )
@@ -2405,7 +2332,7 @@ sub serialise
             {
                 return( $self->error( "Error trying to serialise data with $class: $@" ) );
             }
-            
+
             if( defined( $base64 ) )
             {
                 return( $base64->[0]->( $serialised ) );
@@ -2561,6 +2488,7 @@ sub __instantiate_object
         }
         else
         {
+            my $args = \@_; $self->_message( 7, "Creating a new ${class} object using arguments '", CORE::join( "', '", map( overload::StrVal( $_ // 'undef' ), @_ ) ), "': ", sub{ $self->Module::Generic::dump( $args) } );
             $o = scalar( @_ ) ? $class->new( @_ ) : $class->new;
         }
     };
@@ -2618,7 +2546,7 @@ sub _get_args_as_hash
     no warnings 'uninitialized';
     my $ref = {};
     my $order = $self->new_array;
-    my $need_list = Want::want( 'LIST' ) ? 1 : 0;
+    my $need_list = Wanted::want( 'LIST' ) ? 1 : 0;
     my $ok = {};
     
     my $process = sub
@@ -2810,17 +2738,28 @@ sub _is_class_loaded
 {
     my $self = shift( @_ );
     my $class = shift( @_ );
+    my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
+    my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
     if( $MOD_PERL )
     {
         # https://perl.apache.org/docs/2.0/api/Apache2/Module.html#C_loaded_
         my $rv = Apache2::Module::loaded( $class );
         return(1) if( $rv );
     }
+    # elsif( HAS_THREADS && $repo->exists )
+    elsif( $repo->exists )
+    {
+        return(1);
+    }
     else
     {
         ( my $pm = $class ) =~ s{::}{/}gs;
         $pm .= '.pm';
-        return(1) if( CORE::exists( $INC{ $pm } ) );
+        if( CORE::exists( $INC{ $pm } ) )
+        {
+            $repo->set(1);
+            return(1);
+        }
     }
     no strict 'refs';
     my $ns = \%{ $class . '::' };
@@ -2832,6 +2771,7 @@ sub _is_class_loaded
             defined( ${*{\$ns->{VERSION}}{SCALAR}} )
         ) )
     {
+        $repo->set(1);
         return(1);
     }
     return(0);
@@ -2884,15 +2824,7 @@ sub _is_ip
     my $self = shift( @_ );
     my $ip   = shift( @_ );
     return(0) if( !defined( $ip ) || !length( $ip ) );
-    # Already loaded
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        $self->_load_class( 'Regexp::Common' ) || return( $self->pass_error );
-        Regexp::Common->import( 'net' );
-        $loaded = 1;
-    }
+    $self->_load_class( 'Regexp::Common', 'net' ) || return( $self->pass_error );
 
     # We need to return either 1 or 0. By default, perl return undef for false
     # supports IPv4 and IPv6 in CIDR notation or not
@@ -2903,19 +2835,20 @@ sub _is_ip
 sub _is_number
 {
     return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
-    if( my $isok = Scalar::Util::looks_like_number( $_[1] ) )
+    my( $self, $num ) = @_;
+    return(0) if( !defined( $num ) || !length( $num ) );
+    if( my $isok = Scalar::Util::looks_like_number( $num ) )
     {
         return(1);
     }
     # If the hexadecimal value is a string, it will return false, so we use regular expression.
-    elsif( $_[1] =~ /^0x[0-9A-F]+$/i )
+    elsif( $num =~ /^0x[0-9A-F]+$/i )
     {
         return(1);
     }
-    $_[0]->_load_class( 'Regexp::Common' ) || return( $_[0]->pass_error );
+    $self->_load_class( 'Regexp::Common' ) || return( $self->pass_error );
     no warnings 'once';
-    return( $_[1] =~ /^$Regexp::Common::RE{num}{real}$/ );
+    return( $num =~ /^$Regexp::Common::RE{num}{real}$/ );
 }
 
 sub _is_object
@@ -2943,38 +2876,68 @@ sub _is_warnings_enabled { return( shift->_warnings_is_enabled( @_ ) ); }
 
 sub _load_class
 {
-    my $self  = shift( @_ );
+    my $self = shift( @_ );
     my $class = shift( @_ ) || return( $self->error( "No package name was provided to load." ) );
-    my $opts  = {};
-    $opts     = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    my $args  = $self->_get_args_as_array( @_ );
+
+    # Rigorous validation
+    return( $self->error( "Class name is empty." ) ) unless( length( $class ) );
+
+    my $opts = {};
+    $opts = pop( @_ ) if ( ref( $_[-1] ) eq 'HASH' );
+
+    # Validate options
+    my %valid_opts = map { $_ => 1 } qw( caller version no_import );
+    foreach my $key ( keys( %$opts ) )
+    {
+        return( $self->error( "Invalid option: $key" ) ) unless ( exists( $valid_opts{ $key } ) );
+    }
+    if( exists( $opts->{version} ) )
+    {
+        return( $self->error( "Version must be defined and non-empty." ) ) unless( defined( $opts->{version} ) && length( $opts->{version} ) );
+    }
+
+    my $args = $self->_get_args_as_array( @_ );
+
     # Get the caller's package so we load the module in context
     my $caller_class = $opts->{caller} || CORE::caller;
-    # Return if already loaded
-    if( $self->_is_class_loaded( $class ) )
+
+    # Return if already loaded (threads aware)
+    my $is_loaded = $self->_is_class_loaded( $class );
+    if( $is_loaded )
     {
+        if( scalar( @$args ) )
+        {
+            my $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
+            eval( $pl );
+            return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
+        }
         return( $class );
     }
-    my $pl = "package ${caller_class}; use $class";
-    $pl .= ' ' . $opts->{version} if( CORE::defined( $opts->{version} ) && CORE::length( $opts->{version} ) );
-    if( scalar( @$args ) )
+    # Use a shared variable for locking in threaded environments
+    # What we retrieved from _is_class_loaded is not a threaded shared value, so we have to do this instead:
+    my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
+    my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
+
+    # Load the module with thread safety
     {
-        $pl .= ' qw( ' . CORE::join( ' ', @$args ) . ' );';
-    }
-    elsif( $opts->{no_import} )
-    {
-        $pl .= ' ();';
+        my $has_version = ( CORE::exists( $opts->{version} ) && CORE::length( $opts->{version} // '' ) ) ? 1 : 0;
+        local $SIG{__DIE__} = sub{};
+        local $@;
+        my $pl = "package ${caller_class}; require $class;";
+        eval( $pl );
+        return( $self->error( "Unable to load package ${class}: $@\nCode executed was:\n${pl}" ) ) if( $@ );
+        if( $has_version )
+        {
+            eval{ $class->VERSION( $opts->{version} ) };
+            return( $self->error( "Insufficient version ", $class->VERSION(), ", for class $class. $opts->{version} minimum is required." ) ) if( $@ );
+        }
+
+        $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
+        eval( $pl );
+        return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
+        $repo->set(1);
     }
 
-    if( HAS_THREADS )
-    {
-        lock( ${"${class}::"} );
-    }
-
-    local $SIG{__DIE__} = sub{};
-    local $@;
-    eval( $pl );
-    return( $self->error( "Unable to load package ${class}: $@" ) ) if( $@ );
     return( $self->_is_class_loaded( $class ) ? $class : '' );
 }
 
@@ -3092,7 +3055,7 @@ sub _message
             my $tid = threads->tid;
             $proc_info .= ' -> [thread id ' . $tid . ']' if( $tid );
         }
-        my $mesg_raw = $opts->{caller_info} ? ( "${pkg}::${sub2}( $self ) [$line]${proc_info}: " . $txt ) : $txt;
+        my $mesg_raw = $opts->{caller_info} ? ( "${pkg}::${sub2}( " . overload::StrVal( $self // 'undef' ) . " ) [$line]${proc_info}: " . $txt ) : $txt;
         $mesg_raw    =~ s/\n$//gs;
         my $mesg = "${prefix} " . join( "\n${prefix} ", split( /\n/, $mesg_raw ) );
         
@@ -3127,13 +3090,7 @@ sub _message
         # Using ModPerl Server to log
         elsif( $MOD_PERL && !${ "${class}::LOG_DEBUG" } )
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Apache2::ServerUtil;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Apache2::ServerUtil' ) || return( $self->pass_error );
             my $s = Apache2::ServerUtil->server;
             $s->log->debug( $mesg );
         }
@@ -3280,11 +3237,8 @@ sub _message_log
     my $io   = $self->_message_log_io;
     return if( !$io );
     return if( !Scalar::Util::openhandle( $io ) && $io );
-
-    if( HAS_THREADS && defined( $DEBUG_LOG_IO ) && $io == $DEBUG_LOG_IO )
-    {
-        lock( $DEBUG_LOG_IO );
-    }
+    my $repo = Module::Generic::Global->new( 'debug_log_io' => ( ref( $self ) || $self ) );
+    $repo->lock;
 
     # 2019-06-14: I decided to remove this test, because if a log is provided it should print to it
     # If we are on the command line, we can easily just do tail -f log_file.txt for example and get the same result as
@@ -3311,18 +3265,12 @@ sub _message_log_io
         ${ "${class}::DEB_LOG" } )
     {
         our $DEB_LOG = ${ "${class}::DEB_LOG" };
-
-        lock( $DEBUG_LOG_IO ) if( HAS_THREADS );
+        my $repo = Module::Generic::Global->new( 'debug_log_io' => ( ref( $self ) || $self ) );
+        $repo->lock;
 
         unless( $DEBUG_LOG_IO )
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::File;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::File' ) || return( $self->pass_error );
             $DEB_LOG = Module::Generic::File::file( $DEB_LOG );
             $DEBUG_LOG_IO = $DEB_LOG->open( '>>', { binmode => 'utf-8', autoflush => 1 }) || 
                 die( "Unable to open debug log file $DEB_LOG in append mode: $!\n" );
@@ -3393,9 +3341,9 @@ sub _obj2h
         my $class = $self;
         my $hash =
         {
-        debug   => ${ "${class}\::DEBUG" },
-        verbose => ${ "${class}\::VERBOSE" },
-        error   => ${ "${class}\::ERROR" },
+            debug   => ${ "${class}\::DEBUG" },
+            verbose => ${ "${class}\::VERBOSE" },
+            error   => ${ "${class}\::ERROR" },
         };
         return( bless( $hash => $class ) );
     }
@@ -3618,13 +3566,7 @@ sub _set_get_array_as_object : lvalue
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Array;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Array' ) || return( $self->pass_error );
                 my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
                 $data->{ $field } = $o;
             }
@@ -3655,13 +3597,7 @@ sub _set_get_array_as_object : lvalue
                 }
                 return( $self->error( "Invalid value provided." ) ) if( !$rv );
             }
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Array;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::Array' ) || return( $self->pass_error );
             my $o = $data->{ $field };
             # Some existing data, like maybe default value
             if( $o )
@@ -3700,13 +3636,8 @@ sub _set_get_array_as_object : lvalue
             
             if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Array;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Array' ) ||
+                    return( $self->pass_error );
                 my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
                 $data->{ $field } = $o;
             }
@@ -3882,7 +3813,7 @@ sub _set_get_callback : lvalue
     {
         $getter = sub{};
     }
-    
+
     if( defined( $setter ) )
     {
         die( "Setter code value provided is actually not a code reference." ) if( ref( $setter ) ne 'CODE' );
@@ -3894,6 +3825,10 @@ sub _set_get_callback : lvalue
     die( "Field value specified is empty." ) if( defined( $field ) && !CORE::length( "$field" ) );
 
     my $context = {};
+    # <https://perldoc.perl.org/threads#THREAD-CONTEXT>
+    my $wantarray = HAS_THREADS ? threads->wantarray() : wantarray();
+    $context->{wantarray} = defined( $wantarray ) ? $wantarray ? 'LIST' : 'SCALAR' : 'VOID';
+    $context->{wantarray0} = defined( wantarray() ) ? wantarray() ? 'LIST' : 'SCALAR' : 'VOID';
     my $args;
     my @rv;
     if( want( qw( LVALUE ASSIGN ) ) )
@@ -3908,7 +3843,7 @@ sub _set_get_callback : lvalue
         {
             $args = [@_];
         }
-        
+
         if( want( 'LVALUE' ) )
         {
             $context->{lvalue}++;
@@ -3917,33 +3852,13 @@ sub _set_get_callback : lvalue
         {
             $context->{rvalue}++;
         }
-        
-        my $expect = Want::want( 'LIST' )
-            ? 'LIST'
-            : Want::want( 'HASH' )
-                ? 'HASH'
-                : Want::want( 'ARRAY' )
-                    ? 'ARRAY'
-                    : Want::want( 'OBJECT' )
-                        ? 'OBJECT'
-                        : Want::want( 'CODE' )
-                            ? 'CODE'
-                        : Want::want( 'REFSCALAR' )
-                            ? 'REFSCALAR'
-                            : Want::want( 'BOOL' )
-                                ? 'BOOLEAN'
-                                : Want::want( 'GLOB' )
-                                    ? 'GLOB'
-                                    : Want::want( 'SCALAR' )
-                                        ? 'SCALAR'
-                                        : Want::want( 'VOID' )
-                                            ? 'VOID'
-                                            : '';
+
+        my $expect = Wanted::context();
         $context->{ lc( $expect ) }++ if( length( $expect ) );
-        $context->{count} = Want::want( 'COUNT' );
+        $context->{count} = Wanted::want( 'COUNT' );
     }
     $context->{eval} = $^S;
-    
+
     if( CORE::defined( $args ) && scalar( @$args ) )
     {
         # try-catch
@@ -3958,7 +3873,7 @@ sub _set_get_callback : lvalue
             eval{ $rv[0] = $setter->( $self, @$args ) };
         }
         $self->error( $@ ) if( $@ );
-        
+
         if( ( !scalar( @rv ) || ( scalar( @rv ) == 1 && !defined( $rv[0] ) ) ) && 
             ( my $has_error = $self->error ) )
         {
@@ -4001,13 +3916,8 @@ sub _set_get_callback : lvalue
             {
                 if( !$self->_is_object( $rv[0] ) && $context->{object} )
                 {
-                    state $loaded;
-                    unless( $loaded )
-                    {
-                        lock( $loaded ) if( HAS_THREADS );
-                        require Module::Generic::Null;
-                        $loaded = 1;
-                    }
+                    $self->_load_class( 'Module::Generic::Null' ) ||
+                        return( $self->pass_error );
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
                 rreturn( $rv[0] );
@@ -4035,13 +3945,8 @@ sub _set_get_callback : lvalue
         {
             if( $context->{object} )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Null;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Null' ) ||
+                    return( $self->pass_error );
                 rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
             }
             rreturn;
@@ -4050,13 +3955,8 @@ sub _set_get_callback : lvalue
         {
             if( $context->{object} )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Null;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Null' ) ||
+                    return( $self->pass_error );
                 return( Module::Generic::Null->new( wants => 'OBJECT' ) );
             }
             return;
@@ -4084,13 +3984,8 @@ sub _set_get_callback : lvalue
             {
                 if( !$self->_is_object( $rv[0] ) && $context->{object} )
                 {
-                    state $loaded;
-                    unless( $loaded )
-                    {
-                        lock( $loaded ) if( HAS_THREADS );
-                        require Module::Generic::Null;
-                        $loaded = 1;
-                    }
+                    $self->_load_class( 'Module::Generic::Null' ) ||
+                        return( $self->pass_error );
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
                 rreturn( $rv[0] );
@@ -4106,13 +4001,8 @@ sub _set_get_callback : lvalue
             {
                 if( !$self->_is_object( $rv[0] ) && $context->{object} )
                 {
-                    state $loaded;
-                    unless( $loaded )
-                    {
-                        lock( $loaded ) if( HAS_THREADS );
-                        require Module::Generic::Null;
-                        $loaded = 1;
-                    }
+                    $self->_load_class( 'Module::Generic::Null' ) ||
+                        return( $self->pass_error );
                     return( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
                 return( $rv[0] );
@@ -4303,13 +4193,8 @@ sub _set_get_file : lvalue
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             if( $data->{ $field } && !$self->_is_a( $data->{ $field } => 'Module::Generic::File' ) )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::File;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::File' ) ||
+                    return( $self->pass_error );
                 $data->{ $field } = Module::Generic::File->new( $data->{ $field } . '' ) ||
                     return( $self->error( Module::Generic::File->error ) );
             }
@@ -4334,13 +4219,8 @@ sub _set_get_file : lvalue
                 return( $self->error( "Invalid value provided." ) ) if( !$rv );
             }
 
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::File;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::File' ) ||
+                return( $self->pass_error );
             my $val;
             if( $self->_is_a( $arg => 'Module::Generic::File' ) )
             {
@@ -4608,13 +4488,8 @@ sub _set_get_hash_as_mix_object : lvalue
                 # but we do not affect the current property value of our object
                 if( $ctx->{object} || $ctx->{hash} )
                 {
-                    state $loaded;
-                    unless( $loaded )
-                    {
-                        lock( $loaded ) if( HAS_THREADS );
-                        require Module::Generic::Hash;
-                        $loaded = 1;
-                    }
+                    $self->_load_class( 'Module::Generic::Hash' ) ||
+                        return( $self->pass_error );
                     local $Module::Generic::Hash::DEBUG = $self->debug;
                     my $o = Module::Generic::Hash->new( $data->{ $field } );
                     return( $o );
@@ -4623,13 +4498,8 @@ sub _set_get_hash_as_mix_object : lvalue
             }
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Hash;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Hash' ) ||
+                    return( $self->pass_error );
                 local $Module::Generic::Hash::DEBUG = $self->debug;
                 my $o = Module::Generic::Hash->new( $data->{ $field } );
                 $data->{ $field } = $o;
@@ -4653,7 +4523,7 @@ sub _set_get_hash_as_mix_object : lvalue
                 {
                     $arg = $_[0]->clone;
                 }
-                elsif( ( @_ % 2 ) )
+                elsif( !( @_ % 2 ) )
                 {
                     $arg = { @_ };
                 }
@@ -4663,7 +4533,7 @@ sub _set_get_hash_as_mix_object : lvalue
                 }
                 else
                 {
-                    $arg = shift( @_ );
+                    $arg = "'" . join( "', '", @_ ) . "'";
                     return( $self->error( "Method $field takes only a hash or reference to a hash, but value provided ($arg) is not supported" ) );
                 }
             }
@@ -4692,13 +4562,8 @@ sub _set_get_hash_as_mix_object : lvalue
             }
             else
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Hash;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Hash' ) ||
+                    return( $self->pass_error );
                 local $Module::Generic::Hash::DEBUG = $self->debug;
                 $data->{ $field } = Module::Generic::Hash->new( $val );
             }
@@ -4709,13 +4574,8 @@ sub _set_get_hash_as_mix_object : lvalue
                 # but we do not affect the current property value of our object
                 if( $ctx->{object} || $ctx->{hash} )
                 {
-                    state $loaded;
-                    unless( $loaded )
-                    {
-                        lock( $loaded ) if( HAS_THREADS );
-                        require Module::Generic::Hash;
-                        $loaded = 1;
-                    }
+                    $self->_load_class( 'Module::Generic::Hash' ) ||
+                        return( $self->pass_error );
                     local $Module::Generic::Hash::DEBUG = $self->debug;
                     my $o = Module::Generic::Hash->new( $data->{ $field } );
                     $self->clear_error;
@@ -4726,13 +4586,8 @@ sub _set_get_hash_as_mix_object : lvalue
             }
             elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Hash;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Hash' ) ||
+                    return( $self->pass_error );
                 local $Module::Generic::Hash::DEBUG = $self->debug;
                 my $o = Module::Generic::Hash->new( $data->{ $field } );
                 $data->{ $field } = $o;
@@ -4941,11 +4796,15 @@ sub _set_get_ip : lvalue
                 }
                 if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
                 {
-                    $coderef->( $self, $v );
+                    $v = $coderef->( $self, $v );
+                    $data->{ $field } = $v;
                 }
             }
 
-            if( !$v->defined )
+            if( defined( $v ) && 
+                Scalar::Util::blessed( $v ) && 
+                $v->can( 'defined' ) && 
+                !$v->defined )
             {
                 return;
             }
@@ -5049,7 +4908,7 @@ sub _set_get_number : lvalue
     no overload;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     my $opts = {};
-    
+
     my $callbacks = {};
     my $check;
     if( ref( $field ) eq 'HASH' )
@@ -5092,14 +4951,8 @@ sub _set_get_number : lvalue
             }
         }
     };
-    
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Number;
-        $loaded = 1;
-    }
+
+    $self->_load_class( 'Module::Generic::Number' ) || return( $self->pass_error );
 
     return( $self->_set_get_callback({
         get => sub
@@ -5237,14 +5090,8 @@ sub _set_get_number_as_scalar : lvalue
                 }
                 return( $self->error( "Invalid value provided." ) ) if( !$rv );
             }
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Regexp::Common;
-                $loaded = 1;
-            }
-            Regexp::Common->import( 'number' );
+            $self->_load_class( 'Regexp::Common', 'number' ) ||
+                return( $self->pass_error );
             # If the user wants to remove it
             if( defined( $v ) && $v !~ /^$RE{num}{real}$/ )
             {
@@ -5299,13 +5146,8 @@ sub _set_get_number_or_object
     }
     if( !CORE::length( $data->{ $field } // '' ) && want( 'OBJECT' ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Null;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Null' ) ||
+            return( $self->pass_error );
         return( Module::Generic::Null->new( wants => 'OBJECT' ) );
     }
     $self->clear_error;
@@ -5446,13 +5288,8 @@ sub _set_get_object
     {
         if( $def->{no_init} )
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Null;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::Null' ) ||
+                return( $self->pass_error );
             my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
             return( $null );
         }
@@ -5919,13 +5756,7 @@ sub _set_get_object_array_object
     my $this = $self->_obj2h;
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Array;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Array' ) || return( $self->pass_error );
     
     my $def = {};
     my $callback;
@@ -6191,13 +6022,8 @@ sub _set_get_scalar_as_object : lvalue
             my $ctx = $_;
             if( !$self->_is_object( $data->{ $field } ) || ( $self->_is_object( $data->{ $field } ) && ref( $data->{ $field } ) ne ref( $self ) ) )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Scalar;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Scalar' ) ||
+                    die( "Unable to load Module::Generic::Scalar" );
                 $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
             }
             my $v = $data->{ $field };
@@ -6279,13 +6105,8 @@ sub _set_get_scalar_as_object : lvalue
             }
             else
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Scalar;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Scalar' ) ||
+                    return( $self->pass_error );
                 $data->{ $field } = Module::Generic::Scalar->new( $val );
             }
             $self->clear_error;
@@ -6312,13 +6133,8 @@ sub _set_get_scalar_as_object : lvalue
             
             if( !$self->_is_object( $data->{ $field } ) || ( $self->_is_object( $data->{ $field } ) && ref( $data->{ $field } ) ne ref( $self ) ) )
             {
-                state $loaded;
-                unless( $loaded )
-                {
-                    lock( $loaded ) if( HAS_THREADS );
-                    require Module::Generic::Scalar;
-                    $loaded = 1;
-                }
+                $self->_load_class( 'Module::Generic::Scalar' ) ||
+                    return( $self->pass_error );
                 $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
             }
             my $v = $data->{ $field };
@@ -6383,13 +6199,8 @@ sub _set_get_scalar_or_object
     }
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Null;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Null' ) ||
+            return( $self->pass_error );
         my $null = Module::Generic::Null->new({ debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
@@ -7609,24 +7420,17 @@ PERL
 sub dump_hex
 {
     my $self = shift( @_ );
-    my $rv;
+    $self->_load_class( 'Devel::Hexdump' ) ||
+        return( $self->pass_error );
     # try-catch
     local $@;
-    eval
+    my $rv = eval
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Devel::Hexdump;
-            $loaded = 1;
-        }
-        require Devel::Hexdump;
-        $rv = Devel::Hexdump::xd( shift( @_ ) );
+        Devel::Hexdump::xd( shift( @_ ) );
     };
     if( $@ )
     {
-        return( $self->error( "Devel::Hexdump is not installed on your system." ) );
+        return( $self->error( "Error dumping with Devel::Hexdump: $@" ) );
     }
     return( $rv );
 }
@@ -7643,19 +7447,13 @@ sub dumper
     my $self = shift( @_ );
     my $opts = {};
     $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    my $rv;
+    $self->_load_class( 'Data::Dumper' ) ||
+        return( $self->pass_error );
     # try-catch
     local $@;
-    eval
+    my $rv = eval
     {
         no warnings 'once';
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Data::Dumper;
-            $loaded = 1;
-        }
         # local $Data::Dumper::Sortkeys = 1;
         local $Data::Dumper::Terse = 1;
         local $Data::Dumper::Indent = 1;
@@ -7666,11 +7464,11 @@ sub dumper
             my $h = shift( @_ );
             return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
         };
-        $rv = Data::Dumper::Dumper( @_ );
+        Data::Dumper::Dumper( @_ );
     };
     if( $@ )
     {
-        return( $self->error( "Data::Dumper is not installed on your system." ) );
+        return( $self->error( "Error dumping with Data::Dumper: $@" ) );
     }
     return( $rv );
 }
@@ -7681,13 +7479,8 @@ sub dumpto_printer
 {
     my $self  = shift( @_ );
     my( $data, $file ) = @_;
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::File;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::File' ) ||
+        return( $self->pass_error );
     $file = Module::Generic::File::file( $file );
     my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
         die( "Unable to create file '$file': $!\n" );
@@ -7704,24 +7497,19 @@ sub dumpto_dumper
 {
     my $self  = shift( @_ );
     my( $data, $file ) = @_;
-    my $rv;
+    $self->_load_class( 'Data::Dumper' ) ||
+        return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::File' ) ||
+        return( $self->pass_error );
     # try-catch
     local $@;
-    eval
+    my $rv = eval
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Data::Dumper;
-            $loaded = 1;
-        }
         no warnings 'once';
         local $Data::Dumper::Sortkeys = 1;
         local $Data::Dumper::Terse = 1;
         local $Data::Dumper::Indent = 1;
         local $Data::Dumper::Useqq = 1;
-        require Module::Generic::File;
         $file = Module::Generic::File::file( $file );
         my $fh =  $file->open( '>', { autoflush => 1 }) || 
             die( "Unable to create file '$file': $!\n" );
@@ -7737,7 +7525,7 @@ sub dumpto_dumper
         $fh->close;
         # 666 so it can work under command line and web alike
         chmod( 0666, $file );
-        $rv = 1;
+        return(1);
     };
     if( $@ )
     {
@@ -7812,31 +7600,25 @@ sub printer
     my $self = shift( @_ );
     my $opts = {};
     $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    my $rv;
+    $self->_load_class( 'Data::Printer' ) ||
+        return( $self->pass_error );
     # try-catch
     local $@;
-    eval
+    my $rv = eval
     {
         local $SIG{__WARN__} = sub{ };
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Data::Printer;
-            $loaded = 1;
-        }
         if( scalar( keys( %$opts ) ) )
         {
-            $rv = Data::Printer::np( @_, %$opts );
+            return( Data::Printer::np( @_, %$opts ) );
         }
         else
         {
-            $rv = Data::Printer::np( @_ );
+            return( Data::Printer::np( @_ ) );
         }
     };
     if( $@ )
     {
-        return( $self->error( "Data::Printer is not installed on your system." ) );
+        return( $self->error( "Error dumping data using Data::Printer: $@" ) );
     }
     return( $rv );
 }
@@ -7856,13 +7638,8 @@ sub save
         $opts->{file} = shift( @_ );
     }
     return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::File;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::File' ) ||
+        return( $self->pass_error );
     $file = Module::Generic::File::file( $opts->{file} );
     my $fh = $file->open( '>', {
         ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
@@ -7888,14 +7665,9 @@ sub subclasses
     my $base  = ref( $that ) || $that;
     $base  =~ s,::,/,g;
     $base .= '.pm';
-    
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require IO::Dir;
-        $loaded = 1;
-    }
+
+    $self->_load_class( 'IO::Dir' ) ||
+        return( $self->pass_error );
     # remove '.pm'
     my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
     
@@ -7924,13 +7696,8 @@ sub __dbh
     if( !$this->{__dbh} )
     {
         return( '' ) if( !${ "$class\::DB_DSN" } );
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require DBI;
-            $loaded = 1;
-        }
+        $self->_load_class( 'DBI' ) ||
+            return( $self->pass_error );
         # Connecting to database
         my $db_opt = {};
         $db_opt->{RaiseError} = ${ "$class\::DB_RAISE_ERROR" } if( length( ${ "$class\::DB_RAISE_ERROR" } ) );
@@ -8071,7 +7838,7 @@ EOT
             }
             else
             {
-                warn( "Warning only: _set_get_class was called from package ${pack} at line ${line} in file ${file}, but the type provided for this field \"${f}\" is unsupported: '", overload::StrVal( $def->{ $f } ), "'" );
+                warn( "Warning only: _set_get_class was called from package ${pack} at line ${line} in file ${file}, but the type provided for this field \"${f}\" is unsupported: '", overload::StrVal( $def->{ $f } // 'undef' ), "'" );
                 next;
             }
             my $type = lc( $info->{type} );
@@ -8955,8 +8722,6 @@ PERL
     _parse_timestamp => <<'PERL',
 # Ref:
 # <https://en.wikipedia.org/wiki/Date_format_by_country>
-# Ref:
-# <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
 {
     my $self = shift( @_ );
@@ -8970,45 +8735,30 @@ sub _parse_timestamp
     # Load the regular expressions
     $self->_get_datetime_regexp;
     $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
+    # We set this has a distinctive key across all process and threads since this value is ubiquitous
+    my $repo = Module::Generic::Global->new( 'globals' => $class, key => 'has_local_tz' );
+    my $HAS_LOCAL_TZ = $repo->get;
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
     if( !defined( $HAS_LOCAL_TZ ) )
     {
         $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
-        if( HAS_THREADS )
+        $repo->lock;
+        # try-catch
+        local $@;
+        eval
         {
-            lock( $HAS_LOCAL_TZ );
-            # try-catch
-            local $@;
-            eval
-            {
-                $tz = DateTime::TimeZone->new( name => 'local' );
-                $HAS_LOCAL_TZ = 1;
-            };
-            if( $@ )
-            {
-                $tz = DateTime::TimeZone->new( name => 'UTC' );
-                $HAS_LOCAL_TZ = 0;
-                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
-            }
-        }
-        else
+            $tz = DateTime::TimeZone->new( name => 'local' );
+            $HAS_LOCAL_TZ = 1;
+        };
+        if( $@ )
         {
-            # try-catch
-            local $@;
-            eval
-            {
-                $tz = DateTime::TimeZone->new( name => 'local' );
-                $HAS_LOCAL_TZ = 1;
-            };
-            if( $@ )
-            {
-                $tz = DateTime::TimeZone->new( name => 'UTC' );
-                $HAS_LOCAL_TZ = 0;
-                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
-            }
+            $tz = DateTime::TimeZone->new( name => 'UTC' );
+            $HAS_LOCAL_TZ = 0;
+            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
         }
+        $repo->set( $HAS_LOCAL_TZ );
 
         # try-catch
         local $@;
@@ -9110,7 +8860,7 @@ sub _parse_timestamp
     # 2019-10-03 19-44+0000
     # 2019-10-03 19:44:01+0000
     # 2001-03-12 17:07+JST
-    # if( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})(?<sep>[\s\t]+)(?<hour>\d{1,2})(?<t_sep>\D)(?<minute>\d{1,2})(?:\D(?<second>\d{1,2}))?(?<tz>([+-])(\d{2})(\d{2}))$/ )
+    # NOTE: PARSE_DATE_FRACTIONAL1_RE
     if( $str =~ /^$PARSE_DATE_FRACTIONAL1_RE$/x )
     {
         my $re = { %+ };
@@ -9175,7 +8925,7 @@ sub _parse_timestamp
     # 2019-06-19 23:23:57.000000000+0900
     # From PostgreSQL: 2019-06-20 11:02:36.306917+09
     # ISO 8601: 2019-06-20T11:08:27
-    # elsif( $str =~ /^(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})(?:\.(?<milli>\d+))?(?<tz>(?:\+|\-)\d{2,4})?$/ )
+    # NOTE: PARSE_DATE_WITH_MILI_SECONDS_RE
     elsif( $str =~ /^$PARSE_DATE_WITH_MILI_SECONDS_RE$/x )
     {
         my $re = { %+ };
@@ -9206,6 +8956,7 @@ sub _parse_timestamp
     }
     # From SQLite: 2019-06-20 02:03:14
     # From MySQL: 2019-06-20 11:04:01
+    # NOTE: SQLite / MySQL
     elsif( $str =~ /^(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})$/ )
     {
         my $re = { %+ };
@@ -9222,7 +8973,7 @@ sub _parse_timestamp
         $opt->{pattern} .= '%z';
     }
     # e.g. Sun, 06 Oct 2019 06:41:11 GMT
-    # elsif( $str =~ /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),[[:blank:]]+(?<day>\d{2})[[:blank:]]+(?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[[:blank:]]+(?<year>\d{4})[[:blank:]]+(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})[[:blank:]]+GMT$/ )
+    # NOTE: PARSE_DATE_HTTP_RE
     elsif( $str =~ /^$PARSE_DATE_HTTP_RE$/x )
     {
         my $re = { %+ };
@@ -9239,6 +8990,7 @@ sub _parse_timestamp
     # Monday, 12 March 2001 17:07:30 JST
     # Monday, 12 Mar 2001 17:07:30 JST
     # 03/Feb/1994:00:00:00 0000
+    # NOTE: PARSE_DATE_NON_STDANDARD_RE
     elsif( $str =~ /^$PARSE_DATE_NON_STDANDARD_RE$/x )
     {
         my $re = { %+ };
@@ -9312,6 +9064,7 @@ sub _parse_timestamp
     # Fri Mar 25 12:18:36 2011
     # Fri Mar 25 12:16:25 ADT 2011
     # Fri Mar 25 2011
+    # NOTE: PARSE_DATE_NON_STDANDARD2_RE
     elsif( $str =~ /^$PARSE_DATE_NON_STDANDARD2_RE$/x )
     {
         my $re = { %+ };
@@ -9362,7 +9115,7 @@ sub _parse_timestamp
     # 2019-06-20
     # 2019/06/20
     # 2016.04.22
-    # elsif( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})$/ )
+    # NOTE: PARSE_DATE_ONLY_RE
     elsif( $str =~ /^$PARSE_DATE_ONLY_RE$/x )
     {
         my $re = { %+ };
@@ -9370,28 +9123,28 @@ sub _parse_timestamp
         $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) );
     }
     # 2014, Feb 17
-    # elsif( $str =~ /^(?<year>\d{4}),(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4})(?<sep2>[[:blank:]\h]+)(?<day>\d{1,2})$/ )
+    # NOTE: PARSE_DATE_ONLY_US_SHORT_RE
     elsif( $str =~ /^$PARSE_DATE_ONLY_US_SHORT_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = '%Y,' . $re->{sep1} . '%b' . $re->{sep2} . '%d';
     }
     # 17 Feb, 2014
-    # elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    # NOTE: PARSE_DATE_ONLY_EU_SHORT_RE
     elsif( $str =~ /^$PARSE_DATE_ONLY_EU_SHORT_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = '%d' . $re->{sep1} . '%b,' . $re->{sep2} . '%Y';
     }
     # February 17, 2009
-    # elsif( $str =~ /^(?<month>[a-zA-Z]{3,9})(?<sep1>[[:blank:]\h]+)(?<day>\d{1,2}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    # NOTE: PARSE_DATE_ONLY_US_LONG_RE
     elsif( $str =~ /^$PARSE_DATE_ONLY_US_LONG_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = '%B' . $re->{sep1} . '%d,' . $re->{sep2} . '%Y';
     }
     # 15 July 2021
-    # elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,9})(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    # NOTE: PARSE_DATE_ONLY_EU_LONG_RE
     elsif( $str =~ /^$PARSE_DATE_ONLY_EU_LONG_RE$/x )
     {
         my $re = { %+ };
@@ -9400,7 +9153,7 @@ sub _parse_timestamp
     # 22.04.2016
     # 22-04-2016
     # 17. 3. 2018.
-    # elsif( $str =~ /^(?<day>\d{1,2})(?<sep>\D)(?<blank1>[[:blank:]\h]+)?(?<month>\d{1,2})\D(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/ )
+    # NOTE: PARSE_DATE_DOTTED_ONLY_EU_RE
     elsif( $str =~ /^$PARSE_DATE_DOTTED_ONLY_EU_RE$/x )
     {
         my $re = { %+ };
@@ -9441,7 +9194,7 @@ sub _parse_timestamp
     }
     # 17.III.2020
     # 17. III. 2018.
-    # elsif( $str =~ /^(?<day>\d{1,2})\.(?<blank1>[[:blank:]\h]+)?(?<month>XI{0,2}|I{0,3}|IV|VI{0,3}|IX)\.(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/i )
+    # NOTE: PARSE_DATE_ROMAN_RE
     elsif( $str =~ /^$PARSE_DATE_ROMAN_RE$/xi )
     {
         my $re = { %+ };
@@ -9492,7 +9245,7 @@ sub _parse_timestamp
         $formatter = 'DateTime::Format::RomanDDXXXYYYY';
     }
     # 20030613
-    # elsif( $str =~ /^(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})$/ )
+    # NOTE: PARSE_DATE_DIGITS_ONLY_RE
     elsif( $str =~ /^$PARSE_DATE_DIGITS_ONLY_RE$/x )
     {
         my $re = { %+ };
@@ -9503,7 +9256,7 @@ sub _parse_timestamp
     }
     # 2021年7月14日
     # 令和3年7月14日
-    # elsif( $str =~ /^(?<era>\p{Han})?(?<year>\d{1,4})年(?<month>\d{1,2})月(?<day>\d{1,2})日$/ )
+    # NOTE: PARSE_DATETIME_JP_RE
     elsif( $str =~ /^$PARSE_DATETIME_JP_RE$/x )
     {
         my $re = { %+ };
@@ -9574,6 +9327,7 @@ sub _parse_timestamp
     }
     # <https://en.wikipedia.org/wiki/Date_format_by_country>
     # Possibly followed by a dot and some integer for milliseconds as provided by Time::HiRes
+    # NOTE: PARSE_DATE_TIMESTAMP_RE
     elsif( $str =~ /^$PARSE_DATE_TIMESTAMP_RE$/x )
     {
         my $re = { %+ };
@@ -9593,6 +9347,7 @@ sub _parse_timestamp
         }
         return( $dt );
     }
+    # NOTE: PARSE_DATETIME_RELATIVE_RE
     elsif( $str =~ /^$PARSE_DATETIME_RELATIVE_RE$/x )
     {
         my( $num, $unit ) = ( $1, $2 );
@@ -9633,6 +9388,7 @@ sub _parse_timestamp
         }
         return( $dt );
     }
+    # NOTE: now
     elsif( lc( $str ) eq 'now' )
     {
         $dt = DateTime->now( time_zone => $tz );
@@ -9682,13 +9438,8 @@ sub _set_get_class_array_object
 
     if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Array;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Array' ) ||
+            return( $self->pass_error );
         my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
         $data->{ $field } = $o;
     }
@@ -9909,7 +9660,8 @@ sub _set_get_datetime : lvalue
                 $data->{ $field } = $now;
             }
             return( $data->{ $field } );
-        }
+        },
+        field => $field,
     }, @_ ) );
 }
 PERL
@@ -9964,10 +9716,11 @@ sub _set_get_enum : lvalue
 
     if( !$self->_is_array( $allowed ) )
     {
-        die( "Property value 'allowed' provided (", overload::StrVal( $allowed ), ") is not an array reference." );
+        die( "Property value 'allowed' provided (", overload::StrVal( $allowed // 'undef' ), ") is not an array reference." );
     }
 
     return( $self->_set_get_callback({
+        field => $field,
         get => sub
         {
             my $self = shift( @_ );
@@ -9999,7 +9752,7 @@ sub _set_get_enum : lvalue
                 my $is_ok = $case_sensitive
                     ? scalar( grep( $_ eq ( $arg // '' ), @$allowed ) )
                     : scalar( grep( /^\Q$arg\E/i, @$allowed ) );
-                return( $self->error( "Invalid value '", overload::StrVal( $arg // '' ), "'" ) ) if( !$is_ok );
+                return( $self->error( "Invalid value '", overload::StrVal( $arg // 'undef' ), "'" ) ) if( !$is_ok );
                 return( $data->{ $field } = $arg );
             }
             else
@@ -10184,14 +9937,32 @@ sub _set_symbol
 }
 PERL
     };
-    unless( $AUTOLOAD_SUBS )
+
+    unless( $AUTOLOAD_SUBS && CORE::scalar( CORE::keys( %$AUTOLOAD_SUBS ) ) )
     {
-        if( HAS_THREADS )
+        # Avoid dependency on HAS_THREADS, and make it explicit
+        # Maybe threads were loaded at runtime ?
+        if( $Config{useithreads} && $INC{'threads.pm'} )
         {
-            my $shared_subs = shared_clone( $subs );
+            my %tmp :shared;
+            # Make sure the value is not undefined, before locking it.
+            $AUTOLOAD_SUBS = \%tmp;
+
+            # We need to catch any possible error, or they may ripple in other parts of the code and wreak havoc
+            # try-catch
+            local $@;
+            # Get the scoped returned value from lock so it works within our block
+            eval
             {
-                lock( $AUTOLOAD_SUBS );
-                $AUTOLOAD_SUBS = $shared_subs;
+                CORE::lock( $AUTOLOAD_SUBS );
+                unless( CORE::scalar( CORE::keys( %$AUTOLOAD_SUBS ) ) )
+                {
+                    %$AUTOLOAD_SUBS = %$subs;
+                }
+            };
+            if( $@ )
+            {
+                warn( "Error: unable to get a lock on the shared \$AUTOLOAD_SUBS: $@" );
             }
         }
         else
@@ -10277,9 +10048,20 @@ sub UNIVERSAL::create_class
     my $opts = $self->_get_args_as_hash( @_ );
     my $parent = $opts->{extends} || $self;
     my $parents = $self->_is_array( $parent ) ? $parent : [$parent];
-    my $meths = CORE::delete( $opts->{method} ) // CORE::delete( $opts->{methods} );
-    if( $self->_is_class_loaded( $class ) )
+    for( my $i = 0; $i < scalar( @$parents ); $i++ )
     {
+        my $this = $parents->[$i];
+        if( ref( $this ) )
+        {
+            return( $self->error( "The parent value provided (", overload::StrVal( $this // 'undef' ), ") is a reference, but not an object. You should provide a parent class as a string, or a blessed object." ) ) if( !Scalar::Util::blessed( $this ) );
+            $parents->[$i] = ref( $this );
+        }
+    }
+    my $meths = CORE::delete( $opts->{method} ) // CORE::delete( $opts->{methods} );
+    my $is_loaded = $self->_is_class_loaded( $class );
+    if( $is_loaded )
+    {
+        # Make sure the parent is in the ISA
         unless( scalar( grep( ( $_ // '' ) eq $parent, @{"${class}::ISA"} ) ) )
         {
             no strict 'refs';
@@ -10328,6 +10110,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    no warnings 'once';
     use vars qw( \@ISA );
 EOT
     # The user has declared a list of methods that use Module::Generic, 
@@ -10388,7 +10171,7 @@ EOT
             }
             else
             {
-                return( $self->error( "The type provided for class '${class}' and method '${meth}' is unsupported: '", overload::StrVal( $info ), "'" ) );
+                return( $self->error( "The type provided for class '${class}' and method '${meth}' is unsupported: '", overload::StrVal( $info // 'undef' ), "'" ) );
             }
             my $type = lc( $def->{type} );
             $def->{class} = $def->{package} if( $def->{package} && !length( $def->{class} ) );
@@ -10444,17 +10227,27 @@ EOT
     $perl .= <<EOT;
 
 
-sub TO_JSON { return( shift->${prefix_class}as_hash ); }
+sub TO_JSON
+{
+    my \$self = shift( \@_ );
+    return( \$self->${prefix_class}as_hash ) if( \$self->can( "${prefix_class}as_hash" ) );
+    return( \$self );
+}
 
 1;
 
 EOT
-    # try-catch
-    local $@;
-    my $rc = eval( $perl );
-    if( $@ )
+    my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
+    my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
     {
-        return( $self->error( "Unable to instantiate class ${class}: $@" ) );
+        # try-catch
+        local $@;
+        my $rc = eval( $perl );
+        if( $@ )
+        {
+            return( $self->error( "Unable to instantiate class ${class}: $@" ) );
+        }
+        $repo->set(1);
     }
     return( $class );
 }
@@ -10467,6 +10260,14 @@ sub VERBOSE
     no strict 'refs';
     return( ${ $pkg . '::VERBOSE' } );
 }
+
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+};
 
 # NOTE:: AUTOLOAD
 sub AUTOLOAD : lvalue
@@ -10511,7 +10312,7 @@ sub AUTOLOAD : lvalue
         $class = substr( $meth, 0, $idx );
         $meth  = substr( $meth, $idx + 2 );
     }
-    
+
     unless( $AUTOLOAD_SUBS )
     {
         &Module::Generic::_autoload_subs();
@@ -10715,7 +10516,7 @@ sub AUTOLOAD : lvalue
                     {
                         my $keys = CORE::join( ',', keys( %$data ) );
                         my $msg  = "Method $func() is not defined in class $class and not autoloadable in package $pkg in file $file at line $line.\n";
-                        $msg    .= "There are actually the following fields in the object '$self': '$keys'\n";
+                        $msg    .= "There are actually the following fields in the object '" . overload::StrVal( $self // 'undef' ) . "': '$keys'\n";
                         die( $msg );
                     }
                 }
@@ -10749,11 +10550,6 @@ sub AUTOLOAD : lvalue
     }
 };
 
-DESTROY
-{
-    # Do nothing
-};
-
 {
     # Credits to the module Sentinel for the idea of using a tied scalar.
     # NOTE: Module::Generic::LvalueGuard
@@ -10761,21 +10557,42 @@ DESTROY
         Module::Generic::LvalueGuard;
     use strict;
     use warnings;
+    use vars qw( $LOCK );
+    use Config;
     use Scalar::Util;
+    use Storable::Improved qw( freeze thaw );
+    use constant CAN_THREADS => $Config{useithreads};
+    sub HAS_THREADS { return( $Config{useithreads} && $INC{'threads.pm'} ); };
+    sub IN_THREAD { return( $Config{useithreads} && $INC{'threads.pm'} && threads->tid != 0 ); };
+    if( HAS_THREADS )
+    {
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+        my $lock :shared;
+        $LOCK = \$lock;
+    }
 
     sub TIESCALAR
     {
         my( $class, %args ) = @_;
-        if( defined( $args{obj} ) &&
-            !Scalar::Util::blessed( $args{obj} ) )
+        if( defined( $args{obj} ) )
         {
-            die( "The object provided (", overload::StrVal( $args{obj} ), ") is not a class object." );
+            if( !Scalar::Util::blessed( $args{obj} ) )
+            {
+                die( "The object provided (", overload::StrVal( $args{obj} // 'undef' ), ") is not a class object." );
+            }
+            elsif( IN_THREAD )
+            {
+                $args{obj} = freeze( $args{obj} );
+            }
         }
         my $self = bless({
             value => $args{value}, # Current value
             get   => $args{get},   # Getter callback
             set   => $args{set},   # Setter callback
-            obj   => $args{obj},   # Object associated
+            obj   => $args{obj},   # Optional object associated
         }, $class );
         return( $self );
     }
@@ -10785,11 +10602,17 @@ DESTROY
         my $self = shift( @_ );
         my $get = $self->{get};
         my $obj = $self->{obj};
+        if( defined( $obj ) && IN_THREAD )
+        {
+            $obj = thaw( $obj );
+        }
+
         # 'get' refers to a method name in the object class
         if( defined( $get ) && !ref( $get ) && defined( $obj ) )
         {
             if( my $code = $obj->can( $get ) )
             {
+                lock( $LOCK ) if( IN_THREAD );
                 return( $code->( $obj ) );
             }
             else
@@ -10800,6 +10623,7 @@ DESTROY
         # Callback
         elsif( defined( $get ) && ref( $get ) eq 'CODE' )
         {
+            lock( $LOCK ) if( IN_THREAD );
             return( $get->( defined( $obj ) ? ( $obj ) : () ) );
         }
         # Direct value
@@ -10815,11 +10639,17 @@ DESTROY
         my( $value ) = @_;
         my $set = $self->{set};
         my $obj = $self->{obj};
+        if( defined( $obj ) && IN_THREAD )
+        {
+            $obj = thaw( $obj );
+        }
+
         # 'set' refers to a method name in the object class
         if( defined( $set ) && !ref( $set ) && defined( $obj ) )
         {
             if( my $code = $obj->can( $set ) )
             {
+                lock( $LOCK ) if( IN_THREAD );
                 return( $code->( $obj, $value ) );
             }
             else
@@ -10830,6 +10660,7 @@ DESTROY
         # Callback
         elsif( defined( $set ) && ref( $set ) eq 'CODE' )
         {
+            lock( $LOCK ) if( IN_THREAD );
             $set->( defined( $obj ) ? ( $obj ) : (), $value );
         }
         # Store the value
@@ -10945,7 +10776,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.43.3
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -13139,7 +12970,7 @@ This is true when the call context is void, such as:
 
 =back
 
-See also L<Want> for more on this context-rich information.
+See also L<Wanted> for more on this context-rich information.
 
 =head2 _set_get_class
 
@@ -14756,6 +14587,10 @@ Also, if you use the option C<allow_tags> with L<JSON>, then all of those module
 
 =head2 create_class
 
+Dynamically creates a Perl package with inheritance, optionally injecting getter/setter methods for a variety of data types, including objects, arrays, and more.
+
+This method is provided by L<Module::Generic> and can be called directly or via the C<UNIVERSAL> namespace.
+
     create_class My::Package extends => 'Other::Package';
     create_class My::Package extends => 'Other::Package', method =>
     {
@@ -14795,9 +14630,11 @@ Supported options are:
 
 This represents a parent class to inherit from. If none is provided, it will inherit from L<Module::Generic> by default.
 
+You may also use the synonym C<parent> instead of C<extends> if you prefer.
+
 =item * C<method> or C<methods>
 
-An hash reference of method name to their definition, which may be either a string representing a method C<type>, or an hash reference, including a C<type> property.
+A hash reference of method name to their definition, which may be either a string representing a method C<type>, or a hash reference, including a C<type> property.
 
 Possible method types supported are:
 
@@ -14848,29 +14685,33 @@ Will use the method L</_set_get_boolean>
 
 Will use the method L</_set_get_class> that dynamically creates object classes based on the method name it is called upon.
 
+If the class name provided is not already loaded, it will be created dynamically using C<create_class>.
+
 For this C<type>, you will also need to provide 1 other property:
 
 =over 12
 
 =item 1. C<def> or C<definition>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
-See also C<class_array> and C<>
+See also C<class_array> and C<class_array_object>.
 
 =item * C<class_array>
 
 Will use the method L</_set_get_class_array> to return a conventional perl array of specified object class.
 
+If the class name provided is not already loaded, it will be created dynamically using C<create_class>.
+
 For this C<type>, you will also need to provide 1 other property:
 
 =over 12
 
 =item 1. C<def> or C<definition>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
@@ -14878,13 +14719,15 @@ An hash reference used for the definition of this dynamic class.
 
 Will use the method L</_set_get_class_array_object> to return an L<object array|Module::Generic::Array> of specified object class.
 
+If the class name provided is not already loaded, it will be created dynamically using C<create_class>.
+
 For this C<type>, you will also need to provide 1 other property:
 
 =over 12
 
 =item 1. C<def> or C<definition>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
@@ -14948,7 +14791,7 @@ For this C<type>, you will also need to provide 1 other property:
 
 =item 1. C<class> or C<packages>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
@@ -14962,7 +14805,7 @@ For this C<type>, you will also need to provide 1 other property:
 
 =item 1. C<class> or C<packages>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
@@ -14976,7 +14819,7 @@ For this C<type>, you will also need to provide 1 other property:
 
 =item 1. C<class> or C<packages>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
@@ -14992,7 +14835,7 @@ For this C<type>, you will also need to provide 1 other property:
 
 =item 1. C<class> or C<packages>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
@@ -15014,7 +14857,7 @@ For this C<type>, you will also need to provide 1 other property:
 
 =item 1. C<class> or C<packages>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
@@ -15036,13 +14879,118 @@ For this C<type>, you will also need to provide 1 other property:
 
 =item 1. C<def> or C<definition>
 
-An hash reference used for the definition of this dynamic class.
+A hash reference used for the definition of this dynamic class.
 
 =back
 
 =back
 
 =back
+
+=head3 Shortcut Usage
+
+Instead of a full method definition, you may use a simple string:
+
+    methods => 
+    {
+        name => 'scalar',
+        age  => 'integer'
+    }
+
+This is equivalent to:
+
+    methods => 
+    {
+        name => { type => 'scalar' },
+        age  => { type => 'integer' }
+    }
+
+=head3 Return Value
+
+Upon success, it returns the fully qualified class name created, or the already-loaded class if it existed.
+
+Upon error, it sets an L<error object|Module::Generic::Exception>, and returns an empty list in list context, or C<undef> in scalar context, so you can do:
+
+    create_class( My::Package, @sone_arguments ) || die( Module::Generic->error );
+
+=head1 THREAD & PROCESS SAFETY
+
+This module is thread-safe. All shared internal variables are properly protected using L<Module::Generic::Global>, which employs L<threads::shared> and C<lock> when Perl ithreads support is available, or L<APR::ThreadRWLock> when running under mod_perl with threaded MPMs (Worker or Event). In non-threaded environments, locking operations are skipped automatically.
+
+Errors are stored using L<Module::Generic::Global>, which provides thread/process-safe global storage with automatic locking and serialisation.
+
+There are various scenarios under which we need to be careful about global variables and they are:
+
+=over 4
+
+=item 1. Perl is non-threaded
+
+This is safe. No global variables are shared
+
+=item 2. Perl is built as threaded
+
+If the code runs inside a thread, then we ensure thread-safety of global variables, otherwise they are safe. We check for this even during runtime using C<HAS_THREADS> below.
+
+=item 3. Perl is running under Apache2/modperl with Prefork
+
+Apache/modperl creates separate instances of the global variables, and there is no risk of collision.
+
+=item 4. Perl is running under Apache/modperl with L<Worker or Event MPM|https://httpd.apache.org/docs/2.4/en/mod/worker.html> (Multi-Processing Module)
+
+This setup requires that your version of Perl be compiled with C<ithreads> (Interpreter Threads) enabled as L<documented in the modperl documentation|https://perl.apache.org/docs/2.0/user/install/install.html#item_Threaded_MPMs>
+
+Since there is a risk of collision of global variables, L<Module::Generic::Global> detects it, and uses L<threads::shared> or L<APR::ThreadRWLock> as necessary.
+
+=back
+
+=head2 Thread Checking
+
+This module provides subroutines to check thread support and usage, used internally for thread-safe error handling and other operations. These are imported from L<Module::Generic::Global> via C<use Module::Generic::Global ':const'>.
+
+=over 4
+
+=item CAN_THREADS
+
+A constant indicating whether Perl is compiled with thread support (C<$Config{useithreads}>). Returns C<1> if threads are supported, C<0> otherwise.
+
+    if( Module::Generic::CAN_THREADS )
+    {
+        print( "Perl supports threads\n" );
+    }
+
+=item HAS_THREADS
+
+A subroutine (not a constant) that returns C<1> if Perl supports threads and the C<threads> module is loaded (C<$INC{'threads.pm'}>), C<0> otherwise. Evaluated at runtime to detect dynamic loading of C<threads>.
+
+    if( Module::Generic::HAS_THREADS )
+    {
+        print( "Threads are in use\n" );
+    }
+
+Note that some modules, such as L<forks>, may manipulate C<%INC> to emulate C<threads>. In such cases, C<HAS_THREADS> may return C<1> even if C<threads.pm> is not loaded. This is typically safe, as C<forks> provides a compatible C<tid> method, but in untrusted environments, consider additional checks (e.g., verifying C<$INC{'threads.pm'}> points to the actual C<threads.pm>).
+
+=item IN_THREAD
+
+A subroutine (not a constant) that returns C<1> if Perl supports threads, the C<threads> module is loaded, and the current execution is in a child thread (C<threads->tid != 0>), C<0> otherwise. Evaluated at runtime.
+
+    if( Module::Generic::IN_THREAD() )
+    {
+        print( "Running in a child thread\n" );
+    }
+
+=back
+
+=head2 Thread-Safety Considerations
+
+The C<HAS_THREADS> and C<IN_THREAD> subroutines rely on C<$INC{'threads.pm'}> to detect thread usage. While this is reliable for standard Perl modules like C<threads>, some modules (e.g., L<forks>) may set C<$INC{'threads.pm'}> to emulate thread behaviour. In such cases, C<HAS_THREADS> and C<IN_THREAD> may return C<1> when L<forks> is loaded instead of L<threads>. Since L<forks> provides a compatible C<tid> method, this is generally safe.
+
+Errors are stored in both instance-level (C<< $self->{error} >>) and class-level (C<Module::Generic::Global> repository under the C<errors> namespace) storage to support patterns like C<< My::Module->new || die( My::Module->error ) >>. Each class-process-thread combination (keyed by C<class;pid;tid> or C<class;pid>) has at most one error in the repository, as subsequent errors overwrite the previous entry, preventing memory growth.
+
+In mod_perl environments with Prefork MPM, errors are per-process, behaving like a non-threaded environment, requiring no additional handling. In threaded MPMs (Worker or Event), threads within a process share the error repository, necessitating thread-safety. Since mod_perl’s threaded MPMs require Perl to be compiled with thread support (C<$Config{useithreads}> is true), the repository is made thread-safe using C<threads::shared> and C<CORE::lock>. If nevertheless, somehow L<threads> is not loaded, a warning is issued, indicating potential data corruption in concurrent access scenarios.
+
+In untrusted or complex environments where C<%INC> manipulation is a concern, you may wish to add custom checks (e.g., verifying C<$INC{'threads.pm'}> points to C<threads.pm> rather than C<forks.pm>). For most applications, the default behaviour is sufficient, as L<forks> and similar modules are designed to be compatible with L<threads>.
+
+B<Warning>: When using mod_perl with threaded MPMs, certain Perl functions and operations may be unsafe or affect all threads in a process. Users should consult L<perlthrtut|http://perldoc.perl.org/perlthrtut.html> and the L<mod_perl documentation|https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environment_Issues> for details on thread-unsafe functions and thread-locality issues.
 
 =head1 SEE ALSO
 

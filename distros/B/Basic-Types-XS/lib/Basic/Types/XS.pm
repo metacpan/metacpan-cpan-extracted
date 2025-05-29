@@ -4,15 +4,10 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load("Basic::Types::XS", $VERSION);
-
-sub import {
-	my ($caller, $pkg, @export) = (scalar caller(), @_);
-	_install($caller, @export);
-}
 
 1;
 
@@ -20,11 +15,11 @@ __END__
 
 =head1 NAME
 
-Basic::Types::XS - The great new Basic::Types::XS!
+Basic::Types::XS - Fast but limited type constraints
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
@@ -68,79 +63,116 @@ Version 0.05
 
 =head1 EXPORT
 
-=head2 Any
+This module exports type constraints that can be used to validate and coerce values in your Perl code.
+You can import the types you need by specifying them in the C<use> statement:
+
+	use Basic::Types::XS qw/Str Num Int ArrayRef HashRef/;
+
+=head2 Type Options
+
+Each type constraint can be used directly as a function to validate values, or you can create a type constraint with options.
+For example, to create a type constraint for a string with custom options:
+
+	use Basic::Types::XS qw/Str/; 
+
+	my $Str = Str(
+		default => sub { return "default value" },
+		coerce  => sub {
+			my $value = shift;
+			return join ",", @{$value} if ref $value eq "ARRAY";
+			return $value;
+		},
+		message => "This is a custom error message",
+	);
+
+	$Str->("abc"); # Validates and returns "abc"
+	$Str->(undef); # Returns "default value"
+	$Str->([qw/a b c/]); # Coerces array to string "a,b,c"
+	$Str->({}); # Throws an error with custom message
+
+=over 4
+
+=item * C<default> - A coderef to provide a default value if the input is undefined
+
+=item * C<coerce> - A coderef to coerce the input value before validation
+
+=item * C<message> - A custom error message string
+
+=back
+
+=head3 Any
 
 Absolutely any value passes this type constraint (even undef).
 
 	Any->("abc");
 
-=head2 Defined
+=head3 Defined
 
 Only undef fails this type constraint.
 
 	Defined->("abc");
 
-=head2 Bool
+=head3 Bool
 
 Values that are reasonable booleans. Accepts 1, 0, "", undef, \1, \0, \"", \undef
 
 	Bool->(1);
 
-=head2 Str
+=head3 Str
 
 Values that are valid strings, this includes numbers.
 
 	Str->("abc");
 
-=head2 Num
+=head3 Num
 
 Values that are valid numbers, this incldues floats/doubles.
 
 	Num->(123.456);
 
-=head2 Int
+=head3 Int
 
 Values that are valide integers.
 
 	Int->(123);
 
-=head2 Ref
+=head3 Ref
 
 Values that contain any reference
 
 	Ref->({ ... });
 
-=head2 ScalarRef
+=head3 ScalarRef
 
 Values that contain a scalar reference.
 
 	ScalarRef->(\"abc");
 
-=head2 ArrayRef
+=head3 ArrayRef
 
 Values that contain array references.
 
 	ArrayRef->([qw/a b c/]);
 
-=head2 HashRef
+=head3 HashRef
 
 Values that contain hash references
 
 	HashRef->({ a => 1, b => 2, c => 3 });
 
-=head2 CodeRef
+=head3 CodeRef
 
 Values that contain code references
 
 	CodeRef->(sub { return 'abc' });
 
-=head2 RegexpRef
+=head3 RegexpRef
 
 Value that contain regexp references
 
 	RegexpRef->(qr/abc/);
 
-=head2 GlobRef
+=head3 GlobRef
 
 Value that contain glob references
 
@@ -149,9 +181,25 @@ Value that contain glob references
 
 =cut
 
+=head3 Object
+
+Values that contain blessed references (objects).
+
+	Object->(My::Class->new());
+
+=head3 ClassName
+
+Values that contain valid class names (strings).
+
+	ClassName->("My::Class");
+
 =head1 METHODS
 
 =head2 validate
+
+Returns the validation function for the type constraint. This function can be used to validate values against the type constraint.
+
+	Str->validate->("abc");
 
 =head1 BENCHMARK
 
@@ -179,7 +227,6 @@ The following benchmark is between L<Types::Standard> with L<Type::Tiny::XS> ins
 			my $Code = Types::Standard::CodeRef->(sub { return 1 });
 		},
 	});
-
 
 	Benchmark: timing 1000000 iterations of Basic::Types::XS, Types::Standard...
 	Basic::Types::XS: 2.22538 wallclock secs ( 2.20 usr +  0.04 sys =  2.24 CPU) @ 446428.57/s (n=1000000)

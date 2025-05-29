@@ -11,17 +11,33 @@ use Daje::Workflow::Errors::Error;
 # NAME
 # ====
 #
-# Daje::Workflow - It's new $module
+# Daje::Workflow - It's a simple workflow engine
 #
 # SYNOPSIS
 # ========
 #
 #    use Daje::Workflow;
+#    use Daje::Workflow::Loader;
+#    use Daje::Workflow::Database;
+#    use Daje::Workflow::Database::Model;
 #
+#    my $context->{context}->{some_key_needed_by_some_activity}="";
+#
+#    my $workflow = Daje::Workflow->new(
+#         pg            => $pg,
+#         loader        => $loader->loader,
+#         workflow_name => 'generate',
+#         workflow_pkey => '12',
+#         context       => $context,
+#    );
+#
+#    $workflow->process("save_perl_file");
+#    say $workflow->error->error if $workflow->error->has_error() ;
 #
 # DESCRIPTION
 # ===========
-# Daje::Workflow is ...
+#
+# Daje::Workflow is
 #
 # LICENSE
 # =======
@@ -36,7 +52,7 @@ use Daje::Workflow::Errors::Error;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 has 'workflow_name';    #
 has 'workflow_pkey';    #

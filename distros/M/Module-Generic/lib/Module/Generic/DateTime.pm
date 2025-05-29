@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.6.1
+## Version v0.6.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/20
+## Modified 2025/04/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,22 +18,13 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $ERROR $TS_RE $VERSION $HAS_LOCAL_TZ );
-    use Config;
+    use vars qw( $ERROR $TS_RE $VERSION );
     use DateTime 1.57;
     use DateTime::Format::Strptime 1.79;
     use DateTime::TimeZone 2.51;
-    # use Nice::Try dont_want => 1;
+    use Module::Generic::Global ':const';
     use Regexp::Common;
     use Scalar::Util ();
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    }
     use overload (
         q{""}   => sub{ $_[0]->{dt}->stringify },
         bool    => sub{1},
@@ -68,7 +59,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.6.1';
+    our $VERSION = 'v0.6.2';
 };
 
 BEGIN
@@ -222,64 +213,66 @@ sub new
     # Module::Generic::DateTime->new( $datetime_object, %hash_of_options );
     # Module::Generic::DateTime->new( $hash_ref_of_options );
     # Module::Generic::DateTime->new( %hash_of_options );
-    if( ( 
-            ( @_ % 2 ) && 
-            (
-                ( scalar( @_ ) == 1 && ref( $_[0] ) ne 'HASH' ) || 
-                scalar( @_ ) > 1
-            )
-        ) || 
-        ( scalar( @_ ) == 2 && ref( $_[1] ) eq 'HASH' ) )
+    if( scalar( @_ ) &&
+        $this->_is_a( $_[0] => 'DateTime' ) )
     {
         $dt = shift( @_ );
     }
     my $opts = $this->_get_args_as_hash( @_ );
     
-    if( defined( $dt ) && length( $dt ) )
-    {
-        if( Scalar::Util::blessed( $dt ) )
-        {
-            if( !$dt->isa( 'DateTime' ) )
-            {
-                return( $this->error( "Object provided is not a DateTime object." ) );
-            }
-        }
-        else
-        {
-            return( $this->error( "First argument provided, among the odd number of parameters received, is not a DateTime object." ) );
-        }
-    }
-    else
+    if( !defined( $dt ) )
     {
         # try-catch
         local $@;
-        eval
+        my @params = qw( year month day hour minute second nanosecond );
+        my $args = {};
+        for( @params )
         {
-            if( !exists( $opts->{formatter} ) )
-            {
-                $opts->{formatter} = DateTime::Format::Strptime->new(
-                    pattern => "%FT%T%z",
-                    locale => "en_GB",
-                );
-            }
-            $dt = DateTime->now( %$opts );
-        };
-        if( $@ )
+            $args->{ $_ } = $opts->{ $_ } if( CORE::exists( $opts->{ $_ } ) && CORE::length( $opts->{ $_ } ) );
+        }
+
+        if( scalar( keys( %$args ) ) )
         {
-            if( $@ =~ /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i )
+            $dt = eval
             {
-                warn( "Warning: Your system is missing key timezone components. Module::Generic::DateTime is reverting to UTC instead of local time zone." );
-                $opts->{time_zone} = 'UTC';
-                $dt = DateTime->new( %$opts );
-                my $dt_fmt = DateTime::Format::Strptime->new(
-                    pattern => '%FT%T%z',
-                    locale => 'en_GB',
-                );
-                $dt->set_formatter( $dt_fmt );
+                DateTime->new( %$opts );
+            };
+            if( $@ )
+            {
+                return( $this->error( $@ ) );
             }
-            else
+        }
+
+        unless( defined( $dt ) )
+        {
+            eval
             {
-                return( $this->error( "Error while creating a DateTime object: $@" ) );
+                if( !exists( $opts->{formatter} ) )
+                {
+                    $opts->{formatter} = DateTime::Format::Strptime->new(
+                        pattern => "%FT%T%z",
+                        locale => "en_GB",
+                    );
+                }
+                $dt = DateTime->now( %$opts );
+            };
+            if( $@ )
+            {
+                if( $@ =~ /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i )
+                {
+                    warn( "Warning: Your system is missing key timezone components. Module::Generic::DateTime is reverting to UTC instead of local time zone." );
+                    $opts->{time_zone} = 'UTC';
+                    $dt = DateTime->new( %$opts );
+                    my $dt_fmt = DateTime::Format::Strptime->new(
+                        pattern => '%FT%T%z',
+                        locale => 'en_GB',
+                    );
+                    $dt->set_formatter( $dt_fmt );
+                }
+                else
+                {
+                    return( $this->error( "Error while creating a DateTime object: $@" ) );
+                }
             }
         }
     }
@@ -335,6 +328,10 @@ sub op
     no strict;
     my $dt1 = $self->{dt};
     my $dt2;
+    # We use a simple $class as key, because it does not matter whether this is in a process or thread
+    my $err_key = $class;
+    my $repo = Module::Generic::Global->new( 'local_tz' => $class, key => $err_key );
+
     if( Scalar::Util::blessed( $other ) && $other->isa( 'DateTime' ) )
     {
         $dt2 = $other;
@@ -351,40 +348,23 @@ sub op
     # Unix time
     elsif( $other =~ /^\d{10}$/ )
     {
-        if( !defined( $HAS_LOCAL_TZ ) )
+        my $has_local_tz = $repo->get;
+        if( !defined( $has_local_tz ) )
         {
-            if( HAS_THREADS )
+            # try-catch
+            local $@;
+            eval
             {
-                lock( $HAS_LOCAL_TZ );
-                # try-catch
-                local $@;
-                eval
-                {
-                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
-                    $HAS_LOCAL_TZ = 1;
-                };
-                if( $@ )
-                {
-                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
-                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
-                    $HAS_LOCAL_TZ = 0;
-                }
-            }
-            else
+                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
+            };
+
+            $has_local_tz = $@ ? 0 : 1;
+            $repo->set( $has_local_tz );
+
+            if( $@ )
             {
-                # try-catch
-                local $@;
-                eval
-                {
-                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
-                    $HAS_LOCAL_TZ = 1;
-                };
-                if( $@ )
-                {
-                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
-                    $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
-                    $HAS_LOCAL_TZ = 0;
-                }
+                warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
             }
         }
         else
@@ -393,11 +373,11 @@ sub op
             local $@;
             eval
             {
-                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
             };
             if( $@ )
             {
-                warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
+                warn( "Error trying to set a DateTime object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone\n" );
                 $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
             }
         }
@@ -451,6 +431,9 @@ sub op_minus_plus
     my $dt1 = $self->{dt};
     $other = $self->_get_other( $other );
     use overloading;
+    my $err_key = $class;
+    my $repo = Module::Generic::Global->new( 'local_tz' => $class, key => $err_key );
+
     if( Scalar::Util::blessed( $other ) && $other->isa( 'DateTime::Duration' ) )
     {
         ## Duration [+-] DateTime => update the datetime object in place
@@ -513,58 +496,27 @@ sub op_minus_plus
             {
                 die( "Error cloning and getting epoch value for DateTime object: $@" );
             }
-            
-            if( !defined( $HAS_LOCAL_TZ ) )
-            {
-                if( HAS_THREADS )
-                {
-                    lock( $HAS_LOCAL_TZ );
-                    # try-catch
-                    local $@;
-                    eval
-                    {
-                        $clone->set_time_zone( 'local' );
-                        $HAS_LOCAL_TZ = 1;
-                    };
-                    if( $@ )
-                    {
-                        $clone->set_time_zone( 'UTC' );
-                        $HAS_LOCAL_TZ = 0;
-                        warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
-                    }
-                }
-                else
-                {
-                    # try-catch
-                    local $@;
-                    eval
-                    {
-                        $clone->set_time_zone( 'local' );
-                        $HAS_LOCAL_TZ = 1;
-                    };
-                    if( $@ )
-                    {
-                        $clone->set_time_zone( 'UTC' );
-                        $HAS_LOCAL_TZ = 0;
-                        warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
-                    }
-                }
-            }
-            else
+
+            my $has_local_tz = $repo->get;
+            if( !defined( $has_local_tz ) )
             {
                 # try-catch
                 local $@;
                 eval
                 {
-                    $clone->set_time_zone( $HAS_LOCAL_TZ ? 'local' : 'UTC' );
+                    $clone->set_time_zone( 'local' );
                 };
+
+                $has_local_tz = $@ ? 0 : 1;
+                $repo->set( $has_local_tz );
+    
                 if( $@ )
                 {
-                    warn( "Error trying to set the DateTime object time zone using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), "\n" );
                     $clone->set_time_zone( 'UTC' );
+                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
                 }
             }
-            
+
             # try-catch
             local $@;
             my $new_ts = $v - $ts;
@@ -712,6 +664,7 @@ sub TO_JSON
 }
 
 # NOTE: DESTROY
+# Avoid getting caught by AUTOLOAD
 DESTROY {};
 
 # NOTE: AUTOLOAD
@@ -783,7 +736,7 @@ BEGIN
     );
     use DateTime;
     use Scalar::Util ();
-    use Want;
+    use Wanted;
 };
 
 sub new
@@ -1205,7 +1158,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.6.1
+    v0.6.2
 
 =head1 DESCRIPTION
 
@@ -1298,6 +1251,64 @@ This methods handles cases of overloading for C<minus> and C<plus>
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
 Additionally, upon loading L<Module::Generic::DateTime>, it will ensure the following L<DateTime> modules also have a C<FREEZE> and C<THAW> subroutines if not defined already: L<DateTime>, L<DateTime::TimeZone>, L<DateTime::TimeZone::OffsetOnly>, L<DateTime::Locale::FromData>, L<DateTime::Locale::Base>
+
+=head1 THREAD & PROCESS SAFETY
+
+C<Module::Generic::DateTime> is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event. It relies on L<Module::Generic::Global> for thread-safe storage of shared state and employs synchronisation mechanisms to prevent data corruption and race conditions.
+
+=head2 Synchronisation Mechanisms
+
+=over 4
+
+=item * B<Shared State>
+
+The module uses L<Module::Generic::Global> to cache the availability of the system’s local timezone in the C<local_tz> namespace, storing a boolean (C<0> or C<1>) indicating whether the local timezone is supported. This repository is C<:shared> when C<CAN_THREADS> is true (Perl supports ithreads), protected by L<perlfunc/lock> for Perl threads or L<APR::ThreadRWLock> for mod_perl threaded MPMs without L<threads>. In non-threaded environments, the repository is shared across processes, requiring no additional synchronisation.
+
+=item * B<DateTime Operations>
+
+Methods like L</op> and L</op_minus_plus> perform timezone checks and DateTime operations, which are thread-safe as they rely on L<Module::Generic::Global>’s synchronisation. The underlying L<DateTime> module is thread-safe for most operations, and this module ensures no shared mutable state is accessed without proper locking.
+
+=back
+
+=head2 Context Key Isolation
+
+The C<local_tz> namespace uses a class-level key (C<< <class> >>), where C<class> is C<Module::Generic::DateTime>. This ensures timezone support is cached across processes, with no thread-specific granularity needed, as timezone availability is a global property. The key format enables cross-process sharing, and threaded environments (C<HAS_THREADS> true) maintain isolation via L<Module::Generic::Global>’s synchronisation.
+
+=head2 mod_perl Considerations
+
+=over 4
+
+=item * B<Prefork MPM>
+
+Data is cross-process, requiring no additional synchronisation, as all processes share the same C<local_tz> repository.
+
+=item * B<Threaded MPMs (Worker/Event)>
+
+The C<local_tz> repository is shared across threads and processes, protected by L<Module::Generic::Global>’s synchronisation. Users should call C<Module::Generic::Global->cleanup_register> in mod_perl handlers to clear the repository after requests, preventing memory leaks in long-running processes.
+
+=item * B<Thread-Unsafe Functions>
+
+Avoid Perl functions like C<localtime>, C<readdir>, C<srand>, or operations like C<chdir>, C<umask>, C<chroot> in threaded MPMs, as they may affect all threads. Consult L<perlthrtut|http://perldoc.perl.org/perlthrtut.html> and L<mod_perl documentation|https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environment_Issues> for details.
+
+=back
+
+=head2 Thread-Safety Considerations
+
+The module’s thread-safety relies on:
+
+=over 4
+
+=item * B<Shared Repository>: The C<local_tz> namespace is initialised as C<:shared> when C<CAN_THREADS> is true, ensuring safe access across threads and processes.
+
+=item * B<Locking>: L<perlfunc/lock> or L<APR::ThreadRWLock> protects all read/write operations to the repository.
+
+=item * B<Immutable State>: Beyond C<local_tz>, the module avoids shared mutable state, relying on L<DateTime>’s thread-safe operations.
+
+=back
+
+In environments where C<%INC> manipulation (e.g., by L<forks>) emulates L<threads>, C<HAS_THREADS> and C<IN_THREAD> may return true. This is generally safe, as L<forks> provides a compatible C<tid> method, but users in untrusted environments should verify C<$INC{'threads.pm'}> points to the actual L<threads> module.
+
+For maximum safety, users running mod_perl with threaded MPMs should ensure Perl is compiled with ithreads and explicitly load L<threads>, or use Prefork MPM for single-threaded operation.
 
 =head1 SEE ALSO
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-24'; # DATE
+our $DATE = '2025-05-29'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 1;
 
@@ -25,7 +25,7 @@ App::CdUtils - CLI utilities related to changing directories
 
 =head1 VERSION
 
-This document describes version 0.007 of App::CdUtils (from Perl distribution App-CdUtils), released on 2023-11-24.
+This document describes version 0.008 of App::CdUtils (from Perl distribution App-CdUtils), released on 2025-05-29.
 
 =head1 DESCRIPTION
 
@@ -34,6 +34,8 @@ This distribution contains the following utilities:
 =over
 
 =item * L<cdpart-backend>
+
+=item * L<cdsibling-backend>
 
 =item * L<cdtarget-backend>
 
@@ -73,7 +75,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

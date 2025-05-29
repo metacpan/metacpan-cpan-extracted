@@ -3,7 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
     use Test::More;
     use Scalar::Util;

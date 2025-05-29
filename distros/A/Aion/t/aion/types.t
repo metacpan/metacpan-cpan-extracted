@@ -1,4 +1,4 @@
-use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { my ($p) = @_; length($`) && !-e $`? mkdir($`, 0755) || die "mkdir $`: $!": () while $p =~ m!/!g; $p } BEGIN { use Scalar::Util qw//; use Carp qw//; $SIG{__DIE__} = sub { my ($s) = @_; if(ref $s) { $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s; die $s } else {die Carp::longmess defined($s)? $s: "undef" }}; my $t = `pwd`; chop $t; $t .= '/' . __FILE__; my $s = '/tmp/.liveman/perl-aion!aion!types/'; `rm -fr '$s'` if -e $s; chdir _mkpath_($s) or die "chdir $s: $!"; open my $__f__, "<:utf8", $t or die "Read $t: $!"; read $__f__, $s, -s $__f__; close $__f__; while($s =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { my ($file, $code) = ($1, $2); $code =~ s/^#>> //mg; open my $__f__, ">:utf8", _mkpath_($file) or die "Write $file: $!"; print $__f__ $code; close $__f__; } } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-aion/aion!types'    ;     File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $s), File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # # NAME
 # 
 # Aion::Types is a library of validators. And it makes new validators
 # 
@@ -240,7 +240,7 @@ BEGIN {
 # 
 done_testing; }; subtest 'A, B, C, D' => sub { 
 BEGIN {
-	subtype "Seria[A,B,C,D]", where { A < B < $_ < C < D };
+	subtype "Seria[A,B,C,D]", where { A < B && B < $_ && $_ < C && C < D };
 }
 
 ::is scalar do {2.5 ~~ Seria[1,2,3,4]}, scalar do{1}, '2.5 ~~ Seria[1,2,3,4]   # -> 1';
@@ -745,10 +745,12 @@ done_testing; }; subtest 'Float' => sub {
 # The machine float number is 8 bytes.
 # 
 done_testing; }; subtest 'Double' => sub { 
-::is scalar do {-4.8 ~~ Double}, scalar do{1}, '-4.8 ~~ Double    					# -> 1';
-::is scalar do {-1.7976931348623158e+308 ~~ Double}, scalar do{1}, '-1.7976931348623158e+308 ~~ Double  # -> 1';
-::is scalar do {+1.7976931348623158e+308 ~~ Double}, scalar do{1}, '+1.7976931348623158e+308 ~~ Double  # -> 1';
-::is scalar do {-1.7976931348623159e+308 ~~ Double}, scalar do{""}, '-1.7976931348623159e+308 ~~ Double # -> ""';
+use Scalar::Util qw//;
+
+::is scalar do {-4.8 ~~ Double}, scalar do{1}, '-4.8 ~~ Double                     # -> 1';
+::is scalar do {'-1.7976931348623157e+308' ~~ Double}, scalar do{1}, '\'-1.7976931348623157e+308\' ~~ Double # -> 1';
+::is scalar do {'+1.7976931348623157e+308' ~~ Double}, scalar do{1}, '\'+1.7976931348623157e+308\' ~~ Double # -> 1';
+::is scalar do {'-1.7976931348623159e+308' ~~ Double}, scalar do{""}, '\'-1.7976931348623159e+308\' ~~ Double # -> ""';
 
 # 
 # ## Range[from, to]

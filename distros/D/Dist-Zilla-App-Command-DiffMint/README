@@ -10,7 +10,8 @@ DESCRIPTION
     minting a dist with the same name.
 
     Additional files in the current dist, files in the `t` or `lib`
-    directories, `Changes`, and `Changelog` files will be ignored.
+    directories, `Changes`, `Changelog`, `cpanfile`, and `prereqs.yml` files
+    will be ignored.
 
     While the output is produced using unified diff format, it is only meant
     to be interpreted by a human.

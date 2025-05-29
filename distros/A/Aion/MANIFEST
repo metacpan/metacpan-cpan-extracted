@@ -4,6 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+i18n/Aion.ru-en.po
 lib/Aion.md
 lib/Aion.pm
 lib/Aion/Type.md

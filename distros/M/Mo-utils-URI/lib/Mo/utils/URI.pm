@@ -12,14 +12,12 @@ use URI;
 Readonly::Array our @EXPORT_OK => qw(check_location check_uri check_url
 	check_urn);
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 sub check_location {
 	my ($self, $key) = @_;
 
-	if (! exists $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	my $value = $self->{$key};
 	my $uri = URI->new($value);
@@ -39,9 +37,7 @@ sub check_location {
 sub check_uri {
 	my ($self, $key) = @_;
 
-	if (! exists $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	my $value = $self->{$key};
 	if (! is_uri($value)) {
@@ -56,9 +52,7 @@ sub check_uri {
 sub check_url {
 	my ($self, $key) = @_;
 
-	if (! exists $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	my $value = $self->{$key};
 	my $uri = URI->new($value);
@@ -74,9 +68,7 @@ sub check_url {
 sub check_urn {
 	my ($self, $key) = @_;
 
-	if (! exists $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	my $value = $self->{$key};
 	my $uri = URI->new($value);
@@ -87,6 +79,16 @@ sub check_urn {
 	}
 
 	return;
+}
+
+sub _check_key {
+	my ($self, $key) = @_;
+
+	if (! exists $self->{$key} || ! defined $self->{$key}) {
+		return 1;
+	}
+
+	return 0;
 }
 
 1;
@@ -120,8 +122,10 @@ Mo utilities for URI checking of data objects.
 
  check_location($self, $key);
 
+I<Since version 0.01. Described functionality since version 0.03.>
+
 Check parameter defined by C<$key> which is valid location. Could be URL or
-absolute or relative path.
+absolute or relative path. Value is valid if it is undefined or key doesn't exist.
 
 Put error if check isn't ok.
 
@@ -131,7 +135,10 @@ Returns undef.
 
  check_uri($self, $key);
 
+I<Since version 0.01. Described functionality since version 0.03.>
+
 Check parameter defined by C<$key> which is valid URI.
+Value is valid if it is undefined or key doesn't exist.
 
 Put error if check isn't ok.
 
@@ -141,7 +148,10 @@ Returns undef.
 
  check_url($self, $key);
 
+I<Since version 0.01. Described functionality since version 0.03.>
+
 Check parameter defined by C<$key> which is valid URL.
+Value is valid if it is undefined or key doesn't exist.
 
 Put error if check isn't ok.
 
@@ -151,7 +161,10 @@ Returns undef.
 
  check_urn($self, $key);
 
+I<Since version 0.01. Described functionality since version 0.03.>
+
 Check parameter defined by C<$key> which is valid URN.
+Value is valid if it is undefined or key doesn't exist.
 
 Put error if check isn't ok.
 
@@ -397,12 +410,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2024 Michal Josef Špaček
+© 2024-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

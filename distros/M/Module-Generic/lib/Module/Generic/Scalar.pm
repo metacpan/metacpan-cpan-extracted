@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.4.2
+## Version v1.4.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/22
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,13 +17,14 @@ BEGIN
     use common::sense;
     use warnings;
     use warnings::register;
-    use vars qw( $DEBUG $ERROR $ERRORS );
+    use vars qw( $DEBUG $ERROR );
     use Config;
     use Encode ();
+    use Module::Generic::Global ':const';
     # So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
     # use parent -norequire, qw( Module::Generic::Scalar );
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     use overload (
         '""'    => 'as_string',
         '.='    => sub
@@ -54,7 +55,7 @@ BEGIN
         {
             my( $self, $other, $swap ) = @_;
             no warnings 'uninitialized';
-            my $expr = $swap ? "\"$other" x \"$$self\"" : "\"$$self\" x \"$other\"";
+            my $expr = $swap ? "\"$other\" x \"$$self\"" : "\"$$self\" x \"$other\"";
             local $@;
             my $res  = eval( $expr );
             if( $@ )
@@ -79,25 +80,8 @@ BEGIN
         },
         fallback => 1,
     );
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    our $ERRORS;
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    
-        my %err :shared;
-    
-        $ERRORS = \%err;
-    }
-    else
-    {
-        $ERRORS = {};
-    }
     $DEBUG = 0;
-    our $VERSION = 'v1.4.2';
+    our $VERSION = 'v1.4.3';
 };
 
 use v5.26.1;
@@ -124,7 +108,7 @@ sub new
     }
     elsif( ref( $_[0] ) )
     {
-        return( $this->error( "I do not know what to do with \"", overload::StrVal( $_[0] ), "\". ${class} only suport string, scalar reference or array reference." ) );
+        return( $this->error( "I do not know what to do with \"", overload::StrVal( $_[0] ), "\". ${class} only supports string, scalar reference or array reference." ) );
     }
     elsif( @_ )
     {
@@ -163,11 +147,11 @@ sub callback
     }
     elsif( scalar( @_ ) == 1 )
     {
-        return( $self->error( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine." ) );
+        return( $self->error( "No callback code was provided. Provide an anonymous subroutine, or reference to an existing subroutine." ) );
     }
     elsif( defined( $code ) && ref( $code ) ne 'CODE' )
     {
-        return( $self->error( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) );
+        return( $self->error( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to an existing subroutine." ) );
     }
     
     if( !defined( $code ) )
@@ -206,10 +190,10 @@ sub callback
                 data  => $self,
                 debug => $DEBUG,
                 $what => $code,
-            }) || return;
+            }) || return( $self->error( "Failed to tie scalar: $!" ) );
             return(1);
         }
-        $tie->set_callback( $what => $code ) || return;
+        $tie->set_callback( $what => $code ) || return( $self->error( "Failed to set callback for $what" ) );
         return(1);
     }
 }
@@ -304,7 +288,7 @@ sub clone
 
 sub crypt { return( __PACKAGE__->_new( CORE::crypt( ${$_[0]}, $_[1] ) ) ); }
 
-sub defined { return( CORE::defined( ${$_[0]} ) ); }
+sub defined { return( CORE::defined( ${$_[0]} ) ? 1 : 0 ); }
 
 sub empty { return( shift->reset( @_ ) ); }
 
@@ -315,6 +299,8 @@ sub error
     my $class = ref( $self ) || $self;
     my $o;
     no strict 'refs';
+    my $repo = Module::Generic::Global->new( 'errors' => $self );
+
     if( @_ )
     {
         my $args = {};
@@ -349,17 +335,12 @@ sub error
             # We have to die, because we have an error within another error
             die( "${class}\::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
         }
-        my $o = $ex_class->new( $args );
-        if( HAS_THREADS && is_shared( $ERRORS ) )
-        {
-            lock( $ERRORS );
-            lock( $ERROR );
-            $ERRORS->{ $addr } = $ERROR = $o;
-        }
-        else
-        {
-            $ERRORS->{ $addr } = $ERROR = $o;
-        }
+
+        $o = $ex_class->new( $args );
+        $repo->set( $o );
+        $ERROR = $o;
+
+        # try-catch
         local $@;
         my $enc_str = eval
         {
@@ -370,31 +351,33 @@ sub error
 
         if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
-            state $loaded;
-            unless( $loaded )
+            # try-catch
+            local $@;
+            if( !$self->_is_class_loaded( 'Module::Generic::Null' ) )
             {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Null;
-                $loaded = 1;
+                eval( 'require Module::Generic::Null' );
+                die( "Unable to load module Module::Generic::Null" ) if( $@ );
             }
             my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, has_error => 1 });
             rreturn( $null );
         }
         return;
     }
-    if( !$ERRORS->{ $addr } && want( 'OBJECT' ) )
+
+    $o = $repo->get;
+    if( !$o && want( 'OBJECT' ) )
     {
-        state $loaded;
-        unless( $loaded )
+        # try-catch
+        local $@;
+        if( !$self->_is_class_loaded( 'Module::Generic::Null' ) )
         {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Null;
-            $loaded = 1;
+            eval( 'require Module::Generic::Null' );
+            die( "Unable to load module Module::Generic::Null" ) if( $@ );
         }
         my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, wants => 'object' });
         rreturn( $null );
     }
-    return( $ERRORS->{ $addr } );
+    return( $o );
 }
 
 sub fc { return( CORE::fc( ${$_[0]} ) eq CORE::fc( $_[1] ) ); }
@@ -509,13 +492,7 @@ sub object { return( $_[0] ); }
 sub open
 {
     my $self = shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar::IO;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Scalar::IO' ) || return( $self->pass_error );
     my $io = Module::Generic::Scalar::IO->new( $self, @_ ) || 
         return( $self->pass_error( Module::Generic::Scalar::IO->error ) );
     return( $io );
@@ -553,63 +530,59 @@ sub pad
 sub pass_error
 {
     my $self = CORE::shift( @_ );
-    my $addr = Scalar::Util::refaddr( $self ) || $self;
+    my $class = ref( $self ) || $self;
     my $opts = {};
     my $err;
-    my $class;
+    my $ex_class;
     no strict 'refs';
+    my $err_key = HAS_THREADS() ? CORE::join( ';', $class, $$, threads->tid ) : CORE::join( ';', $class, $$ );
+    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+
     if( scalar( @_ ) )
     {
         # Either an hash defining a new error and this will be passed along to error(); or
         # an hash with a single property: { class => 'Some::ExceptionClass' }
-        if( CORE::scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        if( CORE::scalar( @_ ) == 1 && CORE::ref( $_[0] ) eq 'HASH' )
         {
             $opts = $_[0];
         }
         else
         {
             # $self->pass_error( $error_object, { class => 'Some::ExceptionClass' } );
-            if( CORE::scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' )
+            if( CORE::scalar( @_ ) > 1 && CORE::ref( $_[-1] ) eq 'HASH' )
             {
                 $opts = CORE::pop( @_ );
             }
             $err = $_[0];
         }
     }
-    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
-    $class = CORE::delete( $opts->{class} ) if( CORE::scalar( CORE::keys( %$opts ) ) == 1 && [CORE::keys( %$opts )]->[0] eq 'class' );
+    # We set $ex_class only if the hash provided is a one-element hash and not an error-defining hash
+    $ex_class = CORE::delete( $opts->{class} ) if( CORE::scalar( CORE::keys( %$opts ) ) == 1 && [CORE::keys( %$opts )]->[0] eq 'class' );
     
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
     # with an hash containing just one argument class => 'Some::ExceptionClass'
-    if( !CORE::defined( $err ) && ( !CORE::scalar( @_ ) || CORE::defined( $class ) ) )
+    if( !CORE::defined( $err ) && ( !CORE::scalar( @_ ) || CORE::defined( $ex_class ) ) )
     {
-        if( !CORE::defined( $ERRORS->{ $addr } ) )
+        my $error = $repo->get;
+        if( !CORE::defined( $error ) )
         {
             warnings::warnif( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
         }
         else
         {
-            $err = ( CORE::defined( $class ) ? bless( $ERRORS->{ $addr } => $class ) : $ERRORS->{ $addr } );
+            $err = ( CORE::defined( $ex_class ) ? bless( $error => $ex_class ) : $error );
         }
     }
     elsif( CORE::defined( $err ) && 
            Scalar::Util::blessed( $err ) && 
            ( CORE::scalar( @_ ) == 1 || 
-             ( CORE::scalar( @_ ) == 2 && CORE::defined( $class ) ) 
+             ( CORE::scalar( @_ ) == 2 && CORE::defined( $ex_class ) ) 
            ) )
     {
-        my $o = ( CORE::defined( $class ) ? bless( $err => $class ) : $err );
-        if( HAS_THREADS && is_shared( $ERRORS ) )
-        {
-            lock( $ERRORS );
-            lock( $ERROR );
-            $ERRORS->{ $addr } = $ERROR = $o;
-        }
-        else
-        {
-            $ERRORS->{ $addr } = $ERROR = $o;
-        }
+        my $o = ( CORE::defined( $ex_class ) ? bless( $err => $ex_class ) : $err );
+        $repo->set( $o );
+        $ERROR = $o;
     }
     # If the error provided is not an object, we call error to create one
     else
@@ -619,14 +592,14 @@ sub pass_error
     
     if( want( 'OBJECT' ) )
     {
-        state $loaded;
-        unless( $loaded )
+        # try-catch
+        local $@;
+        if( !$self->_is_class_loaded( 'Module::Generic::Null' ) )
         {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Null;
-            $loaded = 1;
+            eval( 'require Module::Generic::Null' );
+            die( "Unable to load module Module::Generic::Null" ) if( $@ );
         }
-        my $null = Module::Generic::Null->new( $err, { debug => $ERRORS->{ $addr }, has_error => 1 });
+        my $null = Module::Generic::Null->new( $err, { has_error => 1 });
         rreturn( $null );
     }
     return;
@@ -755,12 +728,12 @@ sub split
     {
         $ref = [ CORE::split( $expr, $$self ) ];
     }
-    if( Want::want( 'OBJECT' ) ||
-        Want::want( 'SCALAR' ) )
+    if( Wanted::want( 'OBJECT' ) ||
+        Wanted::want( 'SCALAR' ) )
     {
         rreturn( $self->_array( $ref ) );
     }
-    elsif( Want::want( 'LIST' ) )
+    elsif( Wanted::want( 'LIST' ) )
     {
         rreturn( @$ref );
     }
@@ -813,16 +786,16 @@ sub unpack
 {
     my( $self, $tmpl ) = @_;
     my $ref = [CORE::unpack( $tmpl, $$self )];
-    # In scalar context, return the first element, as per the original unpack behaviour
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) || Wanted::want( 'ARRAY' ) )
     {
         rreturn( $self->_array( $ref ) );
     }
-    elsif( Want::want( 'LIST' ) )
+    elsif( Wanted::want( 'LIST' ) )
     {
         rreturn( @$ref );
     }
-    elsif( Want::want( 'SCALAR' ) )
+    # In scalar context, return the first element, as per the original unpack behaviour
+    elsif( Wanted::want( 'SCALAR' ) )
     {
         rreturn( $ref->[0] );
     }
@@ -837,17 +810,11 @@ sub _array
     my $arr  = shift( @_ );
     if( !defined( $arr ) )
     {
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             # We might have need to specify, because I found a race condition where
             # even though the context is object, once in Null, the context became 'code'
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Null;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::Null' ) || return( $self->pass_error );
             return( Module::Generic::Null->new( wants => 'OBJECT' ) );
         }
         else
@@ -859,23 +826,61 @@ sub _array
     return( Module::Generic::Array->new( $arr ) );
 }
 
+sub _is_class_loaded
+{
+    my $self = CORE::shift( @_ );
+    my $class = CORE::shift( @_ );
+    ( my $pm = $class ) =~ s{::}{/}gs;
+    $pm .= '.pm';
+    return(1) if( CORE::exists( $INC{ $pm } ) );
+    return(0);
+}
+
+sub _load_class
+{
+    my $self = shift( @_ );
+    my $class = shift( @_ );
+    die( "No class was provided to load." ) if( !$class );
+    my $args = [@_];
+    my $is_loaded = $self->_is_class_loaded( $class );
+    if( $is_loaded )
+    {
+        if( CORE::scalar( @$args ) )
+        {
+            my $pl = "$class->import(" . ( CORE::scalar( @$args ) ? "'" . CORE::join( "', '", @$args ) . "'" : '' ) . ");";
+            eval( $pl );
+            return( $self->error( "Error importing class $class: $@" ) ) if( $@ );
+        }
+        return( $class );
+    }
+
+    local $@;
+    local $SIG{__DIE__} = sub{};
+
+    # Load the module with thread safety
+    my $key  = HAS_THREADS ? CORE::join( ';', $class, threads->tid() ) : $class;
+    my $repo = Module::Generic::Global->new( 'loaded_classes' => CORE::ref( $self ), key => $key );
+    my $pl = "require $class;";
+    eval( $pl );
+    return( $self->error( "Unable to load package ${class}: $@\nCode executed was:\n${pl}" ) ) if( $@ );
+    $pl = "$class->import(" . ( CORE::scalar( @$args ) ? "'" . CORE::join( "', '", @$args ) . "'" : '' ) . ");";
+    eval( $pl );
+    return( $self->error( "Error importing class $class: $@" ) ) if( $@ );
+    $repo->set(1);
+    return( $class );
+}
+
 sub _number
 {
     my $self = shift( @_ );
     my $num = shift( @_ );
     if( !defined( $num ) )
     {
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             # We might have need to specify, because I found a race condition where
             # even though the context is object, once in Null, the context became 'code'
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Null;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::Null' ) || return( $self->pass_error );
             return( Module::Generic::Null->new( wants => 'OBJECT' ) );
         }
         else
@@ -911,17 +916,17 @@ sub _warnings_is_registered
 
 sub DESTROY
 {
-    local( $., $@, $!, $^E, $? );
-    my $self = shift( @_ );
-    my $addr = Scalar::Util::refaddr( $self );
-    if( HAS_THREADS && is_shared( $ERRORS ) )
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    if( my $obj = Module::Generic::Global->new( 'errors' => $self ) )
     {
-        lock( $ERRORS );
-        CORE::delete( $ERRORS->{ $addr } );
+        $obj->remove;
     }
-    else
+    if( my $obj = Module::Generic::Global->new( 'loaded_classes' => $self ) )
     {
-        CORE::delete( $ERRORS->{ $addr } );
+        $obj->remove;
     }
 };
 
@@ -989,7 +994,7 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         our $ERROR = '';
         our $VERSION = 'v0.1.1';
     };
-    
+
     sub init
     {
         my $self = shift( @_ );
@@ -999,9 +1004,9 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         $self->{_init_strict_use_sub} = 1;
         return( $self->SUPER::init( @_ ) );
     }
-    
+
     sub capture { return( shift->_set_get_array_as_object( 'capture', @_ ) ); }
-    
+
     sub matched
     {
         my $res = shift->result;
@@ -1009,9 +1014,9 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         return( $res->length->scalar ) if( $res->length && length( $res->get(0) ) );
         return(0);
     }
-    
+
     sub name { return( shift->_set_get_hash_as_object( 'name', @_ ) ); }
-    
+
     sub result { return( shift->_set_get_array_as_object( 'result', @_ ) ); }
 
     sub FREEZE
@@ -1067,11 +1072,24 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
     {
         use strict;
         use warnings;
+        use vars qw( $LOCK );
+        use Config;
         use Scalar::Util ();
+        use constant HAS_THREADS => $Config{useithreads};
+        use constant IN_THREAD => ( $Config{useithreads} && threads->tid != 0 );
+        if( HAS_THREADS )
+        {
+            require threads;
+            require threads::shared;
+            threads->import();
+            threads::shared->import();
+            my $lock :shared;
+            $LOCK = \$lock;
+        }
     };
 
     our $dummy_callback = sub{1};
-    
+
     sub TIESCALAR
     {
         my( $class, $opts ) = @_;
@@ -1085,29 +1103,35 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         $opts->{debug} //= 0;
         if( CORE::length( $opts->{add} ) && ref( $opts->{add} ) ne 'CODE' )
         {
-            warnings::warn( "Code provided for the scalar add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Sscalar' ) || $opts->{debug} );
+            warnings::warn( "Code provided for the scalar add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) || $opts->{debug} );
             return;
         }
         if( CORE::length( $opts->{remove} ) && ref( $opts->{remove} ) ne 'CODE' )
         {
-            warnings::warn( "Code provided for the scalar remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Sscalar' ) || $opts->{debug} );
+            warnings::warn( "Code provided for the scalar remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) || $opts->{debug} );
             return;
         }
-        
+
+        my $data = ( ( Scalar::Util::reftype( $opts->{data} ) // '' ) eq 'SCALAR' ? \"${$opts->{data}}" : \undef );
+        if( HAS_THREADS )
+        {
+            threads::shared::share( $data );
+        }
         my $ref =
         {
-        callback_add => $opts->{add},
-        callback_remove => $opts->{remove},
-        data => ( ( Scalar::Util::reftype( $opts->{data} ) // '' ) eq 'SCALAR' ? \"${$opts->{data}}" : \undef ),
-        debug => $opts->{debug},
+            callback_add => $opts->{add},
+            callback_remove => $opts->{remove},
+            data => $data,
+            debug => $opts->{debug},
         };
         print( STDERR ( ref( $class ) || $class ), "::TIESCALAR: Using ", CORE::length( ${$ref->{data}} ), " bytes of data in scalar vs ", CORE::length( ${$opts->{data}} ), " bytes received via opts->data.\n" ) if( $ref->{debug} );
         return( bless( $ref => ( ref( $class ) || $class ) ) );
     }
-    
+
     sub FETCH
     {
         my $self = shift( @_ );
+        lock( $LOCK ) if( IN_THREAD );
         return( ${$self->{data}} );
     }
 
@@ -1143,9 +1167,10 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
                 $rv = $cb->({ type => 'add', added => \$value });
             }
         }
-        
+
         print( STDERR ref( $self ), "::STORE: adding ", CORE::length( "$value" ), " bytes of data ($value) at position $index with current data of ", CORE::length( ${$self->{data}} ), " bytes (", ${$self->{data}}, ") -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
         return if( !defined( $rv ) );
+        lock( $LOCK ) if( IN_THREAD );
         ${$self->{data}} = $value;
     }
 
@@ -1155,7 +1180,7 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         return(1) if( ref( $self->{callback_add} ) eq 'CODE' || ref( $self->{callback_remove} ) eq 'CODE' );
         return(0);
     }
-    
+
     sub set_callback
     {
         my( $self, $what, $code ) = @_;
@@ -1179,10 +1204,11 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
             warn( "Callback provided (", overload::StrVal( $code ), ") is not a code reference.\n" );
             return;
         }
+        lock( $LOCK ) if( IN_THREAD );
         $self->{ "callback_${what}" } = $code;
         return(1);
     }
-    
+
     sub unset_callback
     {
         my( $self, $what ) = @_;
@@ -1196,6 +1222,7 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
             warn( "Unknown callback type was provided: '$what'. Use \"add\" or \"remove\".\n" );
             return;
         }
+        lock( $LOCK ) if( IN_THREAD );
         $self->{ "callback_${what}" } = undef;
         return(1);
     }

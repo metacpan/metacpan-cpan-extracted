@@ -1,10 +1,11 @@
-use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { my ($p) = @_; length($`) && !-e $`? mkdir($`, 0755) || die "mkdir $`: $!": () while $p =~ m!/!g; $p } BEGIN { use Scalar::Util qw//; use Carp qw//; $SIG{__DIE__} = sub { my ($s) = @_; if(ref $s) { $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s; die $s } else {die Carp::longmess defined($s)? $s: "undef" }}; my $t = `pwd`; chop $t; $t .= '/' . __FILE__; my $s = '/tmp/.liveman/perl-aion!aion/'; `rm -fr '$s'` if -e $s; chdir _mkpath_($s) or die "chdir $s: $!"; open my $__f__, "<:utf8", $t or die "Read $t: $!"; read $__f__, $s, -s $__f__; close $__f__; while($s =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { my ($file, $code) = ($1, $2); $code =~ s/^#>> //mg; open my $__f__, ">:utf8", _mkpath_($file) or die "Write $file: $!"; print $__f__ $code; close $__f__; } } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-aion/aion'    ;     File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $s), File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # 
+# # NAME
 # 
-# Aion - a postmodern object system for Perl 5, as `Moose` and `Moo`, but with improvements
+# Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями
 # 
 # # VERSION
 # 
-# 0.1
+# 0.2
 # 
 # # SYNOPSIS
 # 
@@ -17,7 +18,7 @@ package Calc {
     has b => (is => 'ro+', isa => Num);
     has op => (is => 'ro', isa => Enum[qw/+ - * \/ **/], default => '+');
 
-    sub result {
+    sub result : Isa(Object => Num) {
         my ($self) = @_;
         eval "${\ $self->a} ${\ $self->op} ${\ $self->b}"
     }
@@ -29,23 +30,25 @@ package Calc {
 # 
 # # DESCRIPTION
 # 
-# Aion — OOP framework for create classes with **features**, has **aspects**, **roles** and so on.
+# Aion — ООП-фреймворк для создания классов с **фичами**, имеет **аспекты**, **роли** и так далее.
 # 
-# Properties declared via `has` are called **features**.
+# Свойства, объявленные через has, называются **фичами**.
 # 
-# And `is`, `isa`, `default` and so on in `has` are called **aspects**.
+# А `is`, `isa`, `default` и так далее в `has` называются **аспектами**.
 # 
-# In addition to standard aspects, roles can add their own aspects using subroutine `aspect`.
+# Помимо стандартных аспектов, роли могут добавлять свои собственные аспекты с помощью подпрограммы **aspect**.
+# 
+# Сигнатура методов может проверяться с помощью атрибута `:Isa(...)`.
 # 
 # # SUBROUTINES IN CLASSES AND ROLES
 # 
-# `use Aion` include in module types from `Aion::Types` and next subroutines:
+# `use Aion` импортирует типы из модуля `Aion::Types` и следующие подпрограммы:
 # 
 # ## has ($name, %aspects)
 # 
-# Make method for get/set feature (property) of the class.
+# Создаёт метод для получения/установки функции (свойства) класса.
 # 
-# File lib/Animal.pm:
+# Файл lib/Animal.pm:
 #@> lib/Animal.pm
 #>> package Animal;
 #>> use Aion;
@@ -71,9 +74,9 @@ $cat->name("murzik");
 # 
 # ## with
 # 
-# Add to module roles. It call on each the role method `import_with`.
+# Добавляет в модуль роли. Для каждой роли вызывается метод `import_with`.
 # 
-# File lib/Role/Keys/Stringify.pm:
+# Файл lib/Role/Keys/Stringify.pm:
 #@> lib/Role/Keys/Stringify.pm
 #>> package Role::Keys::Stringify;
 #>> 
@@ -87,7 +90,7 @@ $cat->name("murzik");
 #>> 1;
 #@< EOF
 # 
-# File lib/Role/Values/Stringify.pm:
+# Файл lib/Role/Values/Stringify.pm:
 #@> lib/Role/Values/Stringify.pm
 #>> package Role::Values::Stringify;
 #>> 
@@ -101,13 +104,14 @@ $cat->name("murzik");
 #>> 1;
 #@< EOF
 # 
-# File lib/Class/All/Stringify.pm:
+# Файл lib/Class/All/Stringify.pm:
 #@> lib/Class/All/Stringify.pm
 #>> package Class::All::Stringify;
 #>> 
 #>> use Aion;
 #>> 
-#>> with qw/Role::Keys::Stringify Role::Values::Stringify/;
+#>> with q/Role::Keys::Stringify/;
+#>> with q/Role::Values::Stringify/;
 #>> 
 #>> has [qw/key1 key2/] => (is => 'rw', isa => Str);
 #>> 
@@ -126,11 +130,11 @@ my $s = Class::All::Stringify->new(key1=>"a", key2=>"b");
 # 
 # ## isa ($package)
 # 
-# Check `$package` is the class what extended this class.
+# Проверяет, что `$package` — это суперкласс для данного или сам этот класс.
 # 
 done_testing; }; subtest 'isa ($package)' => sub { 
 package Ex::X { use Aion; }
-package Ex::A { use Aion; extends qw/Ex::X/; }
+package Ex::A { use Aion; extends q/Ex::X/; }
 package Ex::B { use Aion; }
 package Ex::C { use Aion; extends qw/Ex::A Ex::B/ }
 
@@ -145,7 +149,7 @@ package Ex::C { use Aion; extends qw/Ex::A Ex::B/ }
 # 
 # ## does ($package)
 # 
-# Check `$package` is the role what extended this class.
+# Проверяет, что `$package` — это роль, которая используется в классе или другой роли.
 # 
 done_testing; }; subtest 'does ($package)' => sub { 
 package Role::X { use Aion -role; }
@@ -163,7 +167,7 @@ package Ex::Z { use Aion; with qw/Role::A Role::B/ }
 # 
 # ## aspect ($aspect => sub { ... })
 # 
-# It add aspect to `has` in this class or role, and to the classes, who use this role, if it role.
+# Добавляет аспект к `has` в текущем классе и его классам-наследникам или текущей роли и применяющим её классам.
 # 
 done_testing; }; subtest 'aspect ($aspect => sub { ... })' => sub { 
 package Example::Earth {
@@ -185,15 +189,15 @@ $earth->moon = "Mars";
 ::is scalar do {$earth->moon}, "Mars", '$earth->moon # => Mars';
 
 # 
-# Aspect is called every time it is specified in `has`.
+# Аспект вызывается каждый раз, когда он указан в `has`.
 # 
-# Aspect handler has parameters:
+# Создатель аспекта имеет параметры:
 # 
-# * `$cls` — the package with the `has`.
-# * `$name` — the feature name.
-# * `$value` — the aspect value.
-# * `$construct` — the hash with code fragments for join to the feature method.
-# * `$feature` — the hash present feature.
+# * `$cls` — пакет с `has`.
+# * `$name` — имя фичи.
+# * `$value` — значение аспекта.
+# * `$construct` — хэш с фрагментами кода для присоединения к методу объекта.
+# * `$feature` — хеш описывающий фичу.
 # 
 
 package Example::Mars {
@@ -208,7 +212,7 @@ package Example::Mars {
 ::is scalar do {$name}, "moon", '        $name # => moon';
 ::is scalar do {$value}, scalar do{1}, '        $value # -> 1';
 ::is_deeply scalar do {[sort keys %$construct]}, scalar do {[qw/attr eval get name pkg ret set sub/]}, '        [sort keys %$construct] # --> [qw/attr eval get name pkg ret set sub/]';
-::is_deeply scalar do {[sort keys %$feature]}, scalar do {[qw/construct has name opt/]}, '        [sort keys %$feature] # --> [qw/construct has name opt/]';
+::is_deeply scalar do {[sort keys %$feature]}, scalar do {[qw/construct has name opt order/]}, '        [sort keys %$feature] # --> [qw/construct has name opt order/]';
 
         my $_construct = {
             pkg => $cls,
@@ -241,6 +245,7 @@ package Example::Mars {
             },
             name => $name,
             construct => $_construct,
+            order => 0,
         };
 
 ::is_deeply scalar do {$feature}, scalar do {$_feature}, '        $feature # --> $_feature';
@@ -254,7 +259,7 @@ package Example::Mars {
 # 
 # ## extends (@superclasses)
 # 
-# Extends package other package. It call on each the package method `import_extends` if it exists.
+# Расширяет класс другим классом/классами. Он вызывает из каждого наследуемого класса метод `import_extends`, если он в нём есть.
 # 
 done_testing; }; subtest 'extends (@superclasses)' => sub { 
 package World { use Aion;
@@ -271,7 +276,7 @@ package World { use Aion;
 }
 
 package Hello { use Aion;
-    extends qw/World/;
+    extends q/World/;
 
 ::is scalar do {$World::extended_by_this}, scalar do{1}, '    $World::extended_by_this # -> 1';
 }
@@ -281,11 +286,11 @@ package Hello { use Aion;
 # 
 # ## new (%param)
 # 
-# Constructor. 
+# Конструктор.
 # 
-# * Set `%param` to features.
-# * Check if param not mapped to feature.
-# * Set default values.
+# * Устанавливает `%param` для фич.
+# * Проверяет, что параметры соответствуют фичам.
+# * Устанавливает значения по умолчанию.
 # 
 done_testing; }; subtest 'new (%param)' => sub { 
 package NewExample { use Aion;
@@ -312,7 +317,7 @@ $ex = NewExample->new(x => 10.1, y => 8);
 # 
 # ## requires (@subroutine_names)
 # 
-# Check who in classes who use the role present the subroutines.
+# Проверяет, что в классах использующих эту роль есть указанные подпрограммы или фичи.
 # 
 done_testing; }; subtest 'requires (@subroutine_names)' => sub { 
 package Role::Alpha { use Aion -role;
@@ -340,7 +345,11 @@ package Omega { use Aion;
 # 
 # ## has ($feature)
 # 
-# It check what property is set.
+# Проверяет, что свойство установлено.
+# 
+# Фичи имеющие `default => sub { ... }` выполняют `sub` при первом вызове геттера, то есть: являются отложенными.
+# 
+# `$object->has('фича')` позволяет проверить, что `default` ещё не вызывался.
 # 
 done_testing; }; subtest 'has ($feature)' => sub { 
 package ExHas { use Aion;
@@ -358,15 +367,15 @@ $ex->x(10);
 # 
 # ## clear (@features)
 # 
-# Cleared the features.
+# Удаляет ключи фич из объекта предварительно вызвав на них `clearer` (если есть).
 # 
 done_testing; }; subtest 'clear (@features)' => sub { 
-package ExClear { use Aion;
+package ExClearer { use Aion;
     has x => (is => 'rw');
     has y => (is => 'rw');
 }
 
-my $c = ExClear->new(x => 10, y => 12);
+my $c = ExClearer->new(x => 10, y => 12);
 
 ::is scalar do {$c->has("x")}, scalar do{1}, '$c->has("x")   # -> 1';
 ::is scalar do {$c->has("y")}, scalar do{1}, '$c->has("y")   # -> 1';
@@ -380,29 +389,29 @@ $c->clear(qw/x y/);
 # 
 # # METHODS IN CLASSES
 # 
-# `use Aion` include in module next methods:
+# `use Aion` включает в модуль следующие методы:
 # 
 # ## new (%parameters)
 # 
-# The constructor.
+# Конструктор.
 # 
 # # ASPECTS
 # 
-# `use Aion` include in module next aspects for use in `has`:
+# `use Aion` включает в модуль следующие аспекты для использования в `has`:
 # 
 # ## is => $permissions
 # 
-# * `ro` — make getter only.
-# * `wo` — make setter only.
-# * `rw` — make getter and setter.
+# * `ro` — создать только геттер.
+# * `wo` — создать только сеттер.
+# * `rw` — создать геттер и сеттер.
 # 
-# Default is `rw`.
+# По умолчанию — `rw`.
 # 
-# Additional permissions:
+# Дополнительные разрешения:
 # 
-# * `+` — the feature is required. It is not used with `-`.
-# * `-` — the feature cannot be set in the constructor. It is not used with `+`.
-# * `*` — the value is reference and it maked weaken can be set.
+# * `+` — фича обязательна в параметрах конструктора. `+` не используется с `-`.
+# * `-` — фича не может быть установлена через конструктор. '-' не используется с `+`.
+# * `*` — не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу).
 # 
 done_testing; }; subtest 'is => $permissions' => sub { 
 package ExIs { use Aion;
@@ -423,7 +432,7 @@ ExIs->new(ro => 10, rw => 20);
 ::is scalar do {ExIs->new(ro => 10)->rw(30)->rw}, scalar do{30}, 'ExIs->new(ro => 10)->rw(30)->rw  # -> 30';
 
 # 
-# Feature with `*` don't hold value:
+# Функция с `*` не удерживает значение:
 # 
 
 package Node { use Aion;
@@ -447,11 +456,23 @@ undef $root;
 # 
 # ## isa => $type
 # 
-# Set feature type. It validate feature value 
+# Указывает тип, а точнее – валидатор, фичи.
+# 
+done_testing; }; subtest 'isa => $type' => sub { 
+package ExIsa { use Aion;
+    has x => (is => 'ro', isa => Int);
+}
+
+::like scalar do {eval { ExIsa->new(x => 'str') }; $@}, qr!\* Feature x must have the type Int. The it is 'str'!, 'eval { ExIsa->new(x => \'str\') }; $@ # ~> \* Feature x must have the type Int. The it is \'str\'';
+::like scalar do {eval { ExIsa->new->x          }; $@}, qr!Get feature `x` must have the type Int. The it is undef!, 'eval { ExIsa->new->x          }; $@ # ~> Get feature `x` must have the type Int. The it is undef';
+::is scalar do {ExIsa->new(x => 10)->x}, scalar do{10}, 'ExIsa->new(x => 10)->x              # -> 10';
+
+# 
+# Список валидаторов см. в [Aion::Type](https://metacpan.org/pod/Aion::Type).
 # 
 # ## default => $value
 # 
-# Default value set in constructor, if feature falue not present.
+# Значение по умолчанию устанавливается в конструкторе, если параметр с именем фичи отсутствует.
 # 
 done_testing; }; subtest 'default => $value' => sub { 
 package ExDefault { use Aion;
@@ -462,7 +483,7 @@ package ExDefault { use Aion;
 ::is scalar do {ExDefault->new(x => 20)->x}, scalar do{20}, 'ExDefault->new(x => 20)->x  # -> 20';
 
 # 
-# If `$value` is subroutine, then the subroutine is considered a constructor for feature value. This subroutine lazy called where the value get.
+# Если `$value` является подпрограммой, то подпрограмма считается конструктором значения фичи. Используется ленивое вычисление.
 # 
 
 my $count = 10;
@@ -484,7 +505,8 @@ my $ex = ExLazy->new;
 # 
 # ## trigger => $sub
 # 
-# `$sub` called after the value of the feature is set (in `new` or in setter).
+# `$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер.
+# Этимология – впустить.
 # 
 done_testing; }; subtest 'trigger => $sub' => sub { 
 package ExTrigger { use Aion;
@@ -502,17 +524,64 @@ $ex->x(20);
 ::is scalar do {$ex->y}, scalar do{30}, '$ex->y      # -> 30';
 
 # 
+# ## release => $sub
+# 
+# `$sub` вызывается перед возвратом свойства из объекта через геттер.
+# Этимология – выпустить.
+# 
+done_testing; }; subtest 'release => $sub' => sub { 
+package ExRelease { use Aion;
+    has x => (release => sub {
+        my ($self, $value) = @_;
+        $_[1] = $value + 1;
+    });
+}
+
+my $ex = ExRelease->new(x => 10);
+::is scalar do {$ex->x}, scalar do{11}, '$ex->x      # -> 11';
+
+# 
+# ## clearer => $sub
+# 
+# `$sub` вызывается при вызове декструктора или `$object->clear("feature")`, но только если свойство имеется (см. `$object->has("feature")`).
+# 
+done_testing; }; subtest 'clearer => $sub' => sub { 
+package ExClearer { use Aion;
+	
+	our $x;
+
+    has x => (clearer => sub {
+        my ($self) = @_;
+        $x = $self->x
+    });
+}
+
+::is scalar do {$ExClearer::x}, scalar do{undef}, '$ExClearer::x      	# -> undef';
+ExClearer->new(x => 10);
+::is scalar do {$ExClearer::x}, scalar do{10}, '$ExClearer::x      	# -> 10';
+
+my $ex = ExClearer->new(x => 12);
+
+::is scalar do {$ExClearer::x}, scalar do{10}, '$ExClearer::x      # -> 10';
+$ex->clear('x');
+::is scalar do {$ExClearer::x}, scalar do{12}, '$ExClearer::x      # -> 12';
+
+undef $ex;
+
+::is scalar do {$ExClearer::x}, scalar do{12}, '$ExClearer::x      # -> 12';
+
+# 
 # # ATTRIBUTES
 # 
-# Aion add universal attributes.
+# `Aion` добавляет в пакет универсальные атрибуты.
 # 
 # ## Isa (@signature)
 # 
-# Attribute `Isa` check the signature the function where it called.
+# Атрибут `Isa` проверяет сигнатуру функции.
 # 
-# **WARNING**: use atribute `Isa` slows down the program.
+# **ВНИМАНИЕ**: использование атрибута «Isa» замедляет работу программы.
 # 
-# **TIP**: use aspect `isa` on features is more than enough to check the correctness of the object data.
+# **СОВЕТ**: использования аспекта `isa` для объектов более чем достаточно, чтобы проверить правильность данных объекта.
 # 
 done_testing; }; subtest 'Isa (@signature)' => sub { 
 package Anim { use Aion;
@@ -533,11 +602,9 @@ my $anim = Anim->new;
 ::like scalar do {eval { my @items = $anim->is_cat("cat") }; $@}, qr!Returns of method `is_cat` must have the type Tuple\[Bool\].!, 'eval { my @items = $anim->is_cat("cat") }; $@ # ~> Returns of method `is_cat` must have the type Tuple\[Bool\].';
 
 # 
-# If use name of type in `@signature`, then call subroutine with this name from current package.
-# 
 # # AUTHOR
 # 
-# Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)
+# Yaroslav O. Kosmina <dart@cpan.org>
 # 
 # # LICENSE
 # 

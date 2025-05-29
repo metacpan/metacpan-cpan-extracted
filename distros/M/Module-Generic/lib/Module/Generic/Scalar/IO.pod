@@ -66,7 +66,7 @@ Convenient methods to inspect open mode (e.g. L</is_readonly>, L</is_append>, L<
 
 =item *
 
-Safe serialization support for use with Storable or Sereal
+Safe serialisation support for use with Storable or Sereal
 
 =item *
 

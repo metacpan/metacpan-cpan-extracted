@@ -3,7 +3,7 @@
 % if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
 % my $rows = 1;
 % foreach my $ticket ( @tickets ){
-  <div class="alert alert-danger" role="alert">
+  <div class="alert alert-danger mb-1" role="alert">
     <div class="row">
       <div class="col-3 announce_subject announce_cell">
 %     if( $show_ticket_links{$ticket->Id} ){
@@ -40,7 +40,9 @@
     </div>
     <div class="row mb-3">
       <div class="col-12 toggle_announcements text-center">
-        <a data-text-more="<% loc('More Announcements') %>" data-text-less="<% loc('Less Announcements') %>" class="button btn btn-default btn-sm" data-toggle="collapse" href="#more_announcements" id="toggle_announcements"><% loc('More Announcements') %></a>
+        <a data-text-more="<% loc('More Announcements') %>" data-text-less="<% loc('Less Announcements') %>"
+          class="button btn btn-default btn-sm btn-primary" data-toggle="collapse" href="#more_announcements"
+          id="toggle_announcements" data-bs-toggle="collapse" data-bs-target="#more_announcements"><% loc('More Announcements') %></a>
       </div>
     </div>
 % }

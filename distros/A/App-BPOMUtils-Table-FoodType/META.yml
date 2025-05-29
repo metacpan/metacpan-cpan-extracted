@@ -19,13 +19,13 @@ name: App-BPOMUtils-Table-FoodType
 provides:
   App::BPOMUtils::Table::FoodType:
     file: lib/App/BPOMUtils/Table/FoodType.pm
-    version: '0.020'
+    version: '0.021'
   App::BPOMUtils::Table::FoodTypeRBAImporter:
     file: lib/App/BPOMUtils/Table/FoodTypeRBAImporter.pm
-    version: '0.020'
+    version: '0.021'
   App::BPOMUtils::Table::FoodTypeRBAProducer:
     file: lib/App/BPOMUtils/Table/FoodTypeRBAProducer.pm
-    version: '0.020'
+    version: '0.021'
 requires:
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
   Data::Sah::Compiler::perl::TH::array: '0.914'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table-FoodType
   homepage: https://metacpan.org/release/App-BPOMUtils-Table-FoodType
   repository: git://github.com/perlancar/perl-App-BPOMUtils-Table-FoodType.git
-version: '0.020'
+version: '0.021'
 x_Dist_Zilla:
   perl:
     version: '5.040001'

@@ -1,0 +1,173 @@
+msgid "Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями"
+msgstr "Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, “Moo”, “Mo” and “M”, but with improvements"
+
+msgid "Aion — ООП-фреймворк для создания классов с **фичами**, имеет **аспекты**, **роли** и так далее."
+msgstr "Aion is OOP-framework for creating classes with **features**, has **aspects**, **roles** and so on."
+
+msgid "Свойства, объявленные через has, называются **фичами**."
+msgstr "The properties declared through HAS are called ** features **."
+
+msgid "А `is`, `isa`, `default` и так далее в `has` называются **аспектами**."
+msgstr "And `is`,` isa`, `default`, and so on in` has` are called ** aspects **."
+
+msgid "Помимо стандартных аспектов, роли могут добавлять свои собственные аспекты с помощью подпрограммы **aspect**."
+msgstr "In addition to standard aspects, roles can add their own aspects using the **aspect** subprogram."
+
+msgid "Сигнатура методов может проверяться с помощью атрибута `:Isa(...)`."
+msgstr "The signature of the methods can be checked using the attribute `:Isa(...)`."
+
+msgid "`use Aion` импортирует типы из модуля `Aion::Types` и следующие подпрограммы:"
+msgstr "`Use Aion` imports types from the module`Aion::Types` and the following subprograms:"
+
+msgid "Создаёт метод для получения/установки функции (свойства) класса."
+msgstr "Creates a method for obtaining/setting the function (properties) of the class."
+
+msgid "Файл lib/Animal.pm:"
+msgstr "lib/Animal.pm file:"
+
+msgid "Добавляет в модуль роли. Для каждой роли вызывается метод `import_with`."
+msgstr "Adds to the module of the role. For each role, the `import_with` method is called."
+
+msgid "Файл lib/Role/Keys/Stringify.pm:"
+msgstr "File lib/Role/Keys/Stringify.pm:"
+
+msgid "Файл lib/Role/Values/Stringify.pm:"
+msgstr "File lib/Role/Values/Stringify.pm:"
+
+msgid "Файл lib/Class/All/Stringify.pm:"
+msgstr "File lib/Class/All/Stringify.pm:"
+
+msgid "Проверяет, что `$package` — это суперкласс для данного или сам этот класс."
+msgstr "Checks that `$package` is a super class for a given or this class itself."
+
+msgid "Проверяет, что `$package` — это роль, которая используется в классе или другой роли."
+msgstr "Checks that `$package` is a role that is used in a class or another role."
+
+msgid "Добавляет аспект к `has` в текущем классе и его классам-наследникам или текущей роли и применяющим её классам."
+msgstr "Adds the aspect to `has` in the current class and its classroom classes or the current role and applies its classes."
+
+msgid "Аспект вызывается каждый раз, когда он указан в `has`."
+msgstr "The aspect is called every time it is indicated in `has`."
+
+msgid "Создатель аспекта имеет параметры:"
+msgstr "The creator of the aspect has the parameters:"
+
+msgid ""
+"* `$cls` — пакет с `has`.\n"
+"* `$name` — имя фичи.\n"
+"* `$value` — значение аспекта.\n"
+"* `$construct` — хэш с фрагментами кода для присоединения к методу объекта.\n"
+"* `$feature` — хеш описывающий фичу."
+msgstr ""
+"* `$cls` - a bag with `has`.\n"
+"* `$name` is the name of feature.\n"
+"* `$value` is the meaning of the aspect.\n"
+"* `$construct` - a hash with fragments of the code for joining the object method.\n"
+"* `$feature` - a hash describing a feature."
+
+msgid "Расширяет класс другим классом/классами. Он вызывает из каждого наследуемого класса метод `import_extends`, если он в нём есть."
+msgstr "Expands the class with another class/classes. It causes from each inherited class the method of `import_extends`, if it is in it."
+
+msgid ""
+"* Устанавливает `%param` для фич.\n"
+"* Проверяет, что параметры соответствуют фичам.\n"
+"* Устанавливает значения по умолчанию."
+msgstr ""
+"* Installs `%param` for features.\n"
+"* Checks that the parameters correspond to the features.\n"
+"* Sets default values."
+
+msgid "Проверяет, что в классах использующих эту роль есть указанные подпрограммы или фичи."
+msgstr "Checks that in classes using this role there are these subprograms or features."
+
+msgid "Проверяет, что свойство установлено."
+msgstr "Checks that the property is established."
+
+msgid "Фичи имеющие `default => sub { ... }` выполняют `sub` при первом вызове геттера, то есть: являются отложенными."
+msgstr "Features having `default => sub {...}` perform `sub` during the first call of the Getter, that is: are delayed."
+
+msgid "`$object->has('фича')` позволяет проверить, что `default` ещё не вызывался."
+msgstr "`$object->has('feature')` allows you to check that `default` has not yet been called."
+
+msgid "Удаляет ключи фич из объекта предварительно вызвав на них `clearer` (если есть)."
+msgstr "He removes the keys of the feature from the object by previously calling them `clearer` (if exists)."
+
+msgid "`use Aion` включает в модуль следующие методы:"
+msgstr "`Use Aion` includes the following methods in the module:"
+
+msgid "Конструктор."
+msgstr "The constructor."
+
+msgid "`use Aion` включает в модуль следующие аспекты для использования в `has`:"
+msgstr "`use Aion` includes the following aspects in the module for use in `has`:"
+
+msgid ""
+"* `ro` — создать только геттер.\n"
+"* `wo` — создать только сеттер.\n"
+"* `rw` — создать геттер и сеттер."
+msgstr ""
+"* `ro` - create only a gutter.\n"
+"* `wo` - create only a setter.\n"
+"* `rw` - Create getter and setter."
+
+msgid "По умолчанию — `rw`."
+msgstr "By default - `rw`."
+
+msgid "Дополнительные разрешения:"
+msgstr "Additional permits:"
+
+msgid ""
+"* `+` — фича обязательна в параметрах конструктора. `+` не используется с `-`.\n"
+"* `-` — фича не может быть установлена через конструктор. '-' не используется с `+`.\n"
+"* `*` — не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу)."
+msgstr ""
+"* `+` - feature is required in the parameters of the designer. `+` is not used with `-`.\n"
+"* `-` - a feature cannot be installed through the constructor. '-' is not used with `+`.\n"
+"* `*` - do not increase the counter of links to the value (apply `weaken` to the value after installing it in a feature)."
+
+msgid "Функция с `*` не удерживает значение:"
+msgstr "The function with `*` does not hold the meaning:"
+
+msgid "Указывает тип, а точнее – валидатор, фичи."
+msgstr "Indicates the type, or rather - a validator, feature."
+
+msgid "Список валидаторов см. в [Aion::Type](https://metacpan.org/pod/Aion::Type)."
+msgstr "For a list of validators, see [Aion::Type](https://metacpan.org/pod/Aion:::Type)."
+
+msgid "Значение по умолчанию устанавливается в конструкторе, если параметр с именем фичи отсутствует."
+msgstr "The default value is set in the designer if there is no parameter with the name of the feature."
+
+msgid "Если `$value` является подпрограммой, то подпрограмма считается конструктором значения фичи. Используется ленивое вычисление."
+msgstr "If `$ Value` is a subprogram, then the subprogram is considered a designer of the meaning of the feature. Lazy calculation is used."
+
+msgid "`$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер.\n"
+"Этимология – впустить."
+msgstr "`$sub` is called after installing the property in the constructor (`new`) or through the setter.\n"
+"Etymology - let in."
+
+msgid "`$sub` вызывается перед возвратом свойства из объекта через геттер.\n"
+"Этимология – выпустить."
+msgstr "`$sub` is called before returning the property from the object through the gutter.\n"
+"Etymology - release."
+
+msgid "`$sub` вызывается при вызове декструктора или `$object->clear(\"feature\")`, но только если свойство имеется (см. `$object->has(\"feature\")`)."
+msgstr "`$sub` is called when the deructor is called or` $object->clear(\"feature\") ``, but only if there is a property (see `$object->has(\" feature \")`)."
+
+msgid "`Aion` добавляет в пакет универсальные атрибуты."
+msgstr "`Aion` adds universal attributes to the package."
+
+msgid "Атрибут `Isa` проверяет сигнатуру функции."
+msgstr "The attribute `Isa` checks the signature of the function."
+
+msgid "**ВНИМАНИЕ**: использование атрибута «Isa» замедляет работу программы."
+msgstr "**Attention**: Using the `Isa` attribute slows down the program."
+
+msgid "**СОВЕТ**: использования аспекта `isa` для объектов более чем достаточно, чтобы проверить правильность данных объекта."
+msgstr "**COUNCIL**: The use of the `Isa` aspect for objects is more than enough to check the correctness of the object data."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
+

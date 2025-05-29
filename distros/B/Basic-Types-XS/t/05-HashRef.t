@@ -17,6 +17,32 @@ my $sub = sub { return 2 };
 is_deeply(HashRef->($hash), { a => 1 });
 is_deeply(HashRef->($blessed), { a => 1 });
 
+
+my $hashref = HashRef(
+	message => "This is a custom error message",
+	coerce => sub {
+		my $value = shift;
+		return { a => 200 } if ref $value eq "ARRAY";
+		return $value;
+	},
+	default => sub {
+		return { a => 100 };
+	},
+);
+
+
+is_deeply($hashref->({}), {});
+is_deeply($hashref->(undef), { a => 100 });
+is_deeply($hashref->([qw/a b c/]), { a => 200 });
+eval {
+	$hashref->(123);
+};
+
+like($@, qr/This is a custom error message/);
+
+
+
+
 eval {
 	HashRef->($num);
 };

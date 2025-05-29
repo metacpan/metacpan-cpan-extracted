@@ -1,5 +1,9 @@
 Revision history for RT-Extension-Announce
 
+1.06 2025-05-28
+ - Add RT 6 support
+ - Drop support for RT 4.2 and 4.0
+
 1.05 2024-10-31
  - Support to show announcements for FormTools pages
 

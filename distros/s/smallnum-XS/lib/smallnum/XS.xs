@@ -66,9 +66,6 @@
 	static snum_t OFFSET = 0.5555555;
 	static SV *sn_to_sv(snum_t val) {
 		dTHX;
-		snum_t out = val >= 0
-			? PRECISION * SN_FLOOR((val + (OFFSET * PRECISION)) / PRECISION)
-			: PRECISION * SN_CEIL((val - OFFSET * PRECISION) / PRECISION);
 		return newSVnv(val);
 	}
 #endif

@@ -1,5 +1,5 @@
 {
-   "abstract" : "The great new Basic::Types::XS!",
+   "abstract" : "Fast but limited type constraints",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

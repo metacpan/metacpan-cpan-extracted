@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ClipboardUtils.pm'
@@ -20,10 +20,13 @@ my @scripts = (
     'script/clear-clipboard-history',
     'script/clipadd',
     'script/clipget',
+    'script/cliptee',
+    'script/ct',
     'script/detect-clipboard-manager',
     'script/get-clipboard-content',
     'script/get-clipboard-history-item',
-    'script/list-clipboard-history'
+    'script/list-clipboard-history',
+    'script/tee-clipboard-content'
 );
 
 # no fake home requested

@@ -3,7 +3,9 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    use Config;
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
     use Test::More;
     # 2021-11-01T08:12:10
@@ -63,17 +65,23 @@ if( $DEBUG )
 my $o2 = $o->clone || die( $o->error );
 ok( $o2->name eq $o->name && $o2->value eq $o->value, 'clone' );
 
-$o->error( "Oopsie" );
+{
+    no warnings;
+    $o->error( "Oopsie" );
+}
 my $ex = $o->error;
 isa_ok( $ex, 'MyException', 'error' );
 is( $ex->message, 'Oopsie', 'error->message' );
 
-$o->error({
-    class => 'MyOtherException',
-    code  => 500,
-    message => 'Mince !',
-});
-$ex = $o->error;
+{
+    no warnings;
+    $o->error({
+        class => 'MyOtherException',
+        code  => 500,
+        message => 'Mince !',
+    });
+    $ex = $o->error;
+}
 isa_ok( $ex, 'MyOtherException', 'error->class' );
 is( $ex->message, 'Mince !' );
 
@@ -221,14 +229,19 @@ is( $id, 'hello', '_set_get_scalar' );
 
 # NOTE: IP
 $o->ip = '127.0.0.1';
+diag( "Error: ", $o->error ) if( $o->error );
 my $ip = $o->ip;
 is( $ip, '127.0.0.1', '_set_get_ip' );
 
 $o->ip( '192.168.1.1' );
+diag( "Error: ", $o->error ) if( $o->error );
 $ip = $o->ip;
 is( $ip, '192.168.1.1', '_set_get_ip' );
 
-$o->ip = 'bad ip';
+{
+    no warnings;
+    $o->ip = 'bad ip';
+}
 $ip = $o->ip;
 is( $ip, '192.168.1.1', '_set_get_ip with bad ip' );
 SKIP:
@@ -290,7 +303,10 @@ is( $v, 'pending', '_set_get_scalar_as_object value' );
 $dt = $o->datetime;
 is( $dt, undef, 'lvalue->get -> undef' );
 # $o->debug(4);
-$o->datetime = { dt => 'nope' };
+{
+    no warnings;
+    $o->datetime = { dt => 'nope' };
+}
 is( $o->datetime, undef, 'lvalue->set wrong value -> error' );
 is( $o->error->message, 'Value provided is not a datetime.', 'error message' );
 $o->fatal(1);
@@ -331,15 +347,19 @@ is( $o->choice2, 'no', 'enum setup using hash reference' );
 $o->choice = 'no';
 is( $o->choice, 'no', 'enum as lvalue' );
 diag( "Attempting at setting an invalid value for enum type." ) if( $DEBUG );
-my $rv = $o->choice( 'hello' );
-is( $rv => undef, 'enum with bad valud returns error' );
-ok( $o->error->message =~ /^Invalid value/, 'enum with invalid value error message' );
+{
+    no warnings;
+    my $rv = $o->choice( 'hello' );
+    is( $rv => undef, 'enum with bad valud returns error' );
+    ok( $o->error->message =~ /^Invalid value/, 'enum with invalid value error message' );
+}
 
 diag( "Testing for error returning data type instead of undef" ) if( $DEBUG );
 subtest "want error" => sub
 {
     $o->name( 'id' );
     my $name;
+    no warnings;
     # Array
     $name = $o->trigger_error->[0];
     is( $name => undef, 'error -> array' );
@@ -355,7 +375,7 @@ subtest "want error" => sub
     # Object
     $name = $o->trigger_error->dummy->name;
     # There is a race exception with Test::More whereby even if undef is returned, Test::More will give me an empty string.
-    is( $name => '', 'error -> object' );
+    is( length( $name // '' ), 0, 'error -> object' );
     # Scalar
     $name = ${$o->trigger_error};
     is( $name => undef, 'error -> scalar' );
@@ -377,7 +397,10 @@ subtest "glob" => sub
     # diag( "$rv is not $rv2" );
     isnt( $rv, $rv2, 'new glob set' );
     isa_ok( $rv => 'Module::Generic::File::IO', 'glob set with lvalue' );
-    $o->io( 'bad io' );
+    {
+        no warnings;
+        $o->io( 'bad io' );
+    }
     $rv = $o->io;
     is( $rv, $io2, 'glob remains unchanged after bad assignment' );
 };
@@ -394,7 +417,10 @@ subtest "number" => sub
     $o->total = 30;
     $rv = $o->total;
     is( $rv, 30, 'number assigned via lvalue' );
-    $o->total('not a number');
+    {
+        no warnings;
+        $o->total('not a number');
+    }
     $rv = $o->total;
     is( $rv, 30, 'number remains unchanged after bad assignment' );
     my $ex = $o->error;
@@ -415,7 +441,10 @@ subtest "uuid" => sub
     is( $rv2, '585b2f57-b6af-4619-8068-69672ecc407a', 'assigning uuid' );
     my $rv3 = $o->user_id;
     is( $rv3, '585b2f57-b6af-4619-8068-69672ecc407a', 'accessing uuid' );
-    $o->user_id = 'not an uuid';
+    {
+        no warnings;
+        $o->user_id = 'not an uuid';
+    }
     my $rv4 = $o->user_id;
     is( $rv4, '585b2f57-b6af-4619-8068-69672ecc407a', 'assigning bad uuid keeps value unchanged' );
     my $ex = $o->error;
@@ -454,6 +483,7 @@ subtest "serialisation" => sub
         diag( "Error serialising data with $serialiser: ", $o->error ) if( !defined( $bin ) );
         # diag( "Serialised data is '$bin'" ) if( $DEBUG );
         ok( defined( $bin ) && length( $bin ), "hash is serialised with $serialiser" );
+        no warnings;
         my $orig = $o->deserialise( data => $bin, serialiser => $serialiser );
         diag( "Error deserialising data with $serialiser: ", $o->error ) if( !defined( $orig ) );
         # diag( "Deserialised data is '$orig'" ) if( $DEBUG );
@@ -689,7 +719,7 @@ subtest 'create_class' => sub
     my $rv = create_class My::Package;
     # diag( "create returned '", ( $rv // 'undef' ), "'" );
     # diag( "Error creating class My::Package: ", Module::Generic->error ) if( !$rv );
-    ok( Module::Generic->_is_class_loaded( 'My::Package' ), 'clcreate_classass' );
+    ok( Module::Generic->_is_class_loaded( 'My::Package' ), 'create_class' );
     my $me = My::Package->new;
     isa_ok( $me => 'Module::Generic', 'parent is Module::Generic' );
     $rv = create_class Other::Package extends => 'My::Package';
@@ -730,6 +760,136 @@ subtest 'create_class' => sub
     can_ok( 'Customer::Package', 'version' );
 };
 
+subtest 'threaded usage' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+
+        require threads;
+        threads->import();
+
+        my $thr = threads->create(sub
+        {
+            my $obj = Module::Generic->new( debug => 0 );
+            return( $obj->_is_array( [1, 2, 3] ) );
+        } );
+
+        my $result = $thr->join;
+        ok( $result, '_is_array returns true inside thread' );
+
+        my @threads;
+        for my $i ( 1..5 )
+        {
+            push( @threads, threads->create(sub
+            {
+                my $obj = Module::Generic->new( debug => 0 );
+                return( $obj->_is_number($i) );
+            } ) );
+        }
+
+        foreach my $thr ( @threads )
+        {
+            my $res = $thr->join;
+            ok( $res, '_is_number returns true inside thread' );
+        }
+    };
+};
+
+subtest 'threaded deserialise' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+        require threads;
+        threads->import;
+        my @threads;
+        for my $i (1..5)
+        {
+            push @threads, threads->create(sub
+            {
+                my $obj = Module::Generic->new;
+                my $data = $obj->serialise( { test => $i } );
+                my $result = $obj->deserialise( data => $data );
+                return( $result->{test} == $i );
+            });
+        }
+        my $success = 1;
+        for my $thr (@threads)
+        {
+            $success &&= $thr->join;
+        }
+        ok( $success, 'Deserialise works correctly in threads' );
+    }
+};
+
+subtest 'threaded error handling' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+        require threads;
+        threads->import;
+        my @threads;
+        for my $i (1..5)
+        {
+            push @threads, threads->create(sub
+            {
+                my $obj = Module::Generic->new;
+                no warnings 'Module::Generic';
+                $obj->error( "Test error $i" );
+                my $err = $obj->error;
+                $obj->clear_error;
+                return( $err->message eq "Test error $i" && !$obj->error );
+            });
+        }
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join;
+        }
+        ok( $success, 'Error handling is thread-safe' );
+    }
+};
+
+subtest 'threaded object creation' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+        require threads;
+        threads->import;
+        my @threads;
+        for my $i (1..5)
+        {
+            push @threads, threads->create(sub
+            {
+                my $obj = Module::Generic->new;
+                my $glob = Module::Generic->new_glob;
+                return( $obj && $glob && $glob->_is_glob( $glob ) );
+            });
+        }
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join;
+        }
+        ok( $success, 'Object and glob creation is thread-safe' );
+    }
+};
+
 done_testing();
 
 # NOTE: Fake class MyObject
@@ -739,6 +899,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    use warnings::register;
     use parent qw( Module::Generic );
     our $VERSION = 'v0.1.0';
 };

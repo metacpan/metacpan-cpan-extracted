@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/Text/Textile2MarkdownStandalone.pm
 minil.toml
+script/textile2markdown.pl
 t/00_compile.t
 t/01_convert.t
 t/files/textile01.txt

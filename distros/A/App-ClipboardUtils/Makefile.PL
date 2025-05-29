@@ -21,10 +21,13 @@ my %WriteMakefileArgs = (
     "script/clear-clipboard-history",
     "script/clipadd",
     "script/clipget",
+    "script/cliptee",
+    "script/ct",
     "script/detect-clipboard-manager",
     "script/get-clipboard-content",
     "script/get-clipboard-history-item",
-    "script/list-clipboard-history"
+    "script/list-clipboard-history",
+    "script/tee-clipboard-content"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::ClipboardUtils",
@@ -51,7 +54,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

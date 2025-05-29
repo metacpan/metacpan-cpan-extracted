@@ -25,3 +25,10 @@ Revision history for Meow
 	- Add Trigger keyword for attribute triggers
 	- Add Builder keyword for lazy building attributes.
 	- update POD
+
+0.14	2025-05-27
+	- Update benchmark to show Mouse is faster
+	- Improve test coverage
+
+0.15	2025-05-27
+	- remove sv_sethek usage

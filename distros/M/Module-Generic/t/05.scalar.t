@@ -3,7 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
     use open ':std' => ':utf8';
     use Config;
@@ -219,6 +220,7 @@ my $s8 = Module::Generic::Scalar->new( 'Hello' );
 my $s9 = Module::Generic::Scalar->new( 'world' );
 is( $s8->join( ' ', $s9 ), 'Hello world', 'join (2)' );
 
+# NOTE: scalar io
 subtest 'scalar io' => sub
 {
     use utf8;
@@ -243,7 +245,10 @@ EOT
     # diag( "String (", overload::StrVal( $io ), ") is now: $io" ) if( $DEBUG );
     is( "$s", $text, 'print' );
     $io->printf( "Author: %s\n", 'Pierre de Ronsard' );
-    is( $io->getc, undef(), 'getc' );
+    {
+        no warnings;
+        is( $io->getc, undef(), 'getc' );
+    }
     ok( $io->eof, 'eof' );
     $text .= sprintf( "Author: %s\n", 'Pierre de Ronsard' );
     is( $io->tell, length( $text ), 'tell -> end of text' );
@@ -288,7 +293,10 @@ EOT
     my $s2 = Module::Generic::Scalar->new( \$text );
     $io = $s2->open( '<' );
     isa_ok( $io => 'Module::Generic::Scalar::IO' );
-    $rv = $io->print( "print should not work\n" );
+    {
+        no warnings;
+        $rv = $io->print( "print should not work\n" );
+    }
     ok( !$rv, 'cannot print in read-only mode' );
     $rv = $io->write( "write should not work either\n" );
     ok( !$rv, 'cannot write in read-only mode' );
@@ -324,6 +332,7 @@ EOT
     };
 };
 
+# NOTE: unpack and pack
 # From perlpacktut
 subtest 'unpack and pack' => sub
 {
@@ -348,10 +357,11 @@ subtest 'unpack and pack' => sub
     is( $pack_data, '€', 'pack' );
 };
 
+# NOTE: callback
 subtest 'callback' => sub
 {
     use utf8;
-    $Module::Generic::Scalar::DEBUG = $DEBUG;
+    local $Module::Generic::Scalar::DEBUG = $DEBUG;
     diag( "Setting \$Module::Generic::Scalar::DEBUG to '$Module::Generic::Scalar::DEBUG'" ) if( $DEBUG );
     my $test = Module::Generic::Scalar->new( q{Allons enfants de la Patrie !} );
     is( $test->length, 29, 'init' );
@@ -421,6 +431,199 @@ subtest 'callback' => sub
     $test->callback( add => undef );
     $test->callback( remove => undef );
     ok( !tied( $$test ), 'callbacks removed' );
+};
+
+# NOTE: basic operations
+subtest 'basic operations' => sub
+{
+    my $str = "Hello world";
+    my $s = Module::Generic::Scalar->new( $str ) || BAIL_OUT( "Unable to instantiate an object." );
+    isa_ok( $s, 'Module::Generic::Scalar', 'Scalar object' );
+    is( "$s", $str, 'Stringification' );
+
+    my $s2 = $s->clone;
+    isa_ok( $s2, 'Module::Generic::Scalar', 'Clone object' );
+    is( "$s2", $str, 'Cloning' );
+
+    $s .= "\n";
+    isa_ok( $s, 'Module::Generic::Scalar', 'Object after concatenation' );
+    is( $s, "$str\n", 'Concatenation' );
+
+    my $s3 = Module::Generic::Scalar->new( 'A' );
+    my $res = $s3 x 12;
+    is( $res, 'AAAAAAAAAAAA', 'String multiplication' );
+    isa_ok( $res, 'Module::Generic::Scalar', 'Multiplied string object' );
+    $res->replace( qr/A{2}$/, '' );
+    is( $res, 'AAAAAAAAAA', 'Replace after multiplication' );
+};
+
+# NOTE: conversions
+subtest 'conversions' => sub
+{
+    my $bool = Module::Generic::Scalar->new( 'true' )->as_boolean;
+    isa_ok( $bool, 'Module::Generic::Boolean', 'Scalar to boolean' );
+    ok( $bool == 1, 'True boolean' );
+    ok( !Module::Generic::Scalar->new( 0 )->as_boolean, 'False boolean' );
+
+    my $num = Module::Generic::Scalar->new( '10' )->as_number;
+    isa_ok( $num, 'Module::Generic::Number', 'Scalar to number' );
+    ok( $num == 10, 'Number value' );
+
+    my $arr = Module::Generic::Scalar->new( 'world' )->as_array;
+    isa_ok( $arr, 'Module::Generic::Array', 'Scalar to array' );
+    is( $arr->[0], 'world', 'Array content' );
+};
+
+# NOTE: string operations
+subtest 'string operations' => sub
+{
+    my $s = Module::Generic::Scalar->new( "Hello world\n" );
+    $s->chomp;
+    is( $s, 'Hello world', 'chomp' );
+    $s->chop;
+    is( $s, 'Hello worl', 'chop' );
+
+    is( Module::Generic::Scalar->new( 'Hello' )->lc, 'hello', 'lc' );
+    is( Module::Generic::Scalar->new( 'HELLO' )->lcfirst, 'hELLO', 'lcfirst' );
+    is( Module::Generic::Scalar->new( 'hello' )->uc, 'HELLO', 'uc' );
+    is( Module::Generic::Scalar->new( 'hello' )->ucfirst, 'Hello', 'ucfirst' );
+
+    is( Module::Generic::Scalar->new( 'Hello' )->left( 2 ), 'He', 'left' );
+    is( Module::Generic::Scalar->new( 'Hello' )->right( 2 ), 'lo', 'right' );
+    is( Module::Generic::Scalar->new( 'Hello world%%%%' )->rtrim( '%' ), 'Hello world', 'rtrim' );
+    is( Module::Generic::Scalar->new( '     Hello  ' )->ltrim, 'Hello  ', 'ltrim' );
+    is( Module::Generic::Scalar->new( '     Hello  ' )->trim, 'Hello', 'trim' );
+
+    is( Module::Generic::Scalar->new( 'Bonjour' )->set( 'Hello' ), 'Hello', 'set' );
+    is( Module::Generic::Scalar->new( 'Hello' )->reset->length, 0, 'reset' );
+    is( Module::Generic::Scalar->new( 'Hello' )->undef->defined, 0, 'undef' );
+};
+
+# NOTE: regular expressions
+subtest 'regular expressions' => sub
+{
+    my $s = Module::Generic::Scalar->new( 'Hello world' );
+    ok( $s->match( qr/[[:blank:]]+worl/ ), 'match' );
+    ok( $s->like( qr/\bworld\b/ ), 'like' );
+
+    my $test_named = Module::Generic::Scalar->new( 'GET /some/where HTTP/1.1' );
+    my $re_named = $test_named->match( qr/^(?<method>\w+)[[:blank:]\h]+(?<uri>\S+)[[:blank:]\h]+(?<proto>HTTP\/\d+\.\d+)/ );
+    ok( $re_named->name->method eq 'GET' && $re_named->name->uri eq '/some/where' && $re_named->name->proto eq 'HTTP/1.1', 'named capture' );
+
+    my $rv = $s->replace( qr/(world)/, 'earth' );
+    is( $s, 'Hello earth', 'replace' );
+    isa_ok( $rv, 'Module::Generic::RegexpCapture', 'replace returns RegexpCapture' );
+    is( $rv->capture->first, 'world', 'replace capture' );
+};
+
+# NOTE: thread safety
+subtest 'thread safety' => sub
+{
+    SKIP:
+    {
+        skip "Threads not supported on this system", 4 unless $Config{useithreads};
+        require threads;
+        require threads::shared;
+        my $s = Module::Generic::Scalar->new( 'test' );
+        my $error_count = 0;
+        my @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid;
+                eval
+                {
+                    no warnings;
+                    $s->error( "Error from thread $tid" );
+                    my $err = $s->error;
+                    if( $err && $err->message =~ /Error from thread $tid/ )
+                    {
+                        diag( "Thread $tid: Error handling ok" );
+                    }
+                    else
+                    {
+                        $error_count++;
+                        diag( "Thread $tid: Error handling failed" );
+                    }
+                };
+                if( $@ )
+                {
+                    $error_count++;
+                    diag( "Thread $tid: Error: $@" );
+                }
+            })
+        } 1..5;
+        $_->join for( @threads );
+        is( $error_count, 0, 'Thread-safe error handling' );
+
+        # Test tied scalar thread-safety
+        my $s2 = Module::Generic::Scalar->new( 'initial' );
+        $s2->callback( add => sub
+        {
+            my $this = shift;
+            my $new = $this->{added};
+            diag( "Thread ", threads->tid, ": Adding $$new" );
+            return(1);
+        });
+        $error_count = 0;
+        @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid;
+                eval
+                {
+                    $s2->append( " from thread $tid" );
+                    if( $s2->scalar =~ /from thread $tid/ )
+                    {
+                        diag( "Thread $tid: Append ok" );
+                    }
+                    else
+                    {
+                        $error_count++;
+                        diag( "Thread $tid: Append failed" );
+                    }
+                };
+                if( $@ )
+                {
+                    $error_count++;
+                    diag( "Thread $tid: Error: $@" );
+                }
+            })
+        } 1..5;
+        $_->join for( @threads );
+        is( $error_count, 0, 'Thread-safe tied scalar append' );
+    }
+};
+
+# NOTE: want context
+subtest 'want context' => sub
+{
+    my $s = Module::Generic::Scalar->new( 'a b c' );
+    my $arr = $s->split( qr/[[:blank:]]+/ );
+    isa_ok( $arr, 'Module::Generic::Array', 'split in object context' );
+    my @list = $s->split( qr/[[:blank:]]+/ );
+    is_deeply( \@list, ['a', 'b', 'c'], 'split in list context' );
+
+    local $@;
+    eval
+    {
+        my $val = $s->unpack( 'A1xA1xA1' )->[0];
+    };
+    diag( "Error getting unpack in array context: $@" ) if( $@ );
+    ok( !$@, 'unpack in object context' );
+    my @unpack_list = $s->unpack( 'A1xA1xA1' );
+    is_deeply( \@unpack_list, ['a', 'b', 'c'], 'unpack in list context' );
+};
+
+# NOTE: regexp capture
+subtest 'regexp capture' => sub
+{
+    my $rc = Module::Generic::Scalar->new( 'test' )->match( qr/(es)/ );
+    isa_ok( $rc, 'Module::Generic::RegexpCapture', 'RegexpCapture object' );
+    is( $rc->capture->first, 'es', 'capture' );
+    is( $rc->matched, 1, 'matched' );
+    is( $rc->result->first, 'es', 'result' );
 };
 
 done_testing();

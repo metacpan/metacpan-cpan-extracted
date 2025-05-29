@@ -1,7 +1,7 @@
 use v5.20; use warnings; use experimental qw(signatures postderef);
 package Dist::Zilla::App::Command::DiffMint;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 use Dist::Zilla::App -command;
 
@@ -10,6 +10,8 @@ use Path::Tiny ();
 use namespace::autoclean;
 
 sub command_names { 'diff-mint' }
+
+sub abstract { 'compare files to what a minting profile produces' }
 
 sub opt_spec { (
   [ 'profile|p=s',  'name of the profile to use' ],
@@ -109,7 +111,7 @@ sub execute ($self, $opt, $arg) {
     @files = @matched;
   }
   else {
-      @files = grep !m{^lib/|^t/|^Changes$|^Changelog$}i, @files;
+    @files = grep !m{^lib/|^t/|^Changes$|^Changelog$|^prereqs\.yml$|^cpanfile$}i, @files;
   }
 
   for my $name (@files) {
@@ -379,7 +381,7 @@ Displays a diff of the current dist with what would be created by minting a
 dist with the same name.
 
 Additional files in the current dist, files in the `t` or `lib` directories,
-`Changes`, and `Changelog` files will be ignored.
+`Changes`, `Changelog`, `cpanfile`, and `prereqs.yml` files will be ignored.
 
 While the output is produced using unified diff format, it is only meant to be
 interpreted by a human.

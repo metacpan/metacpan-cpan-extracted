@@ -1,5 +1,5 @@
 
-jQuery(document).ready(function() {
+function announce() {
     jQuery('table #more_announcements').hide();
     var hide = true;
     jQuery('table #toggle_announcements').click( function() {
@@ -21,4 +21,14 @@ jQuery(document).ready(function() {
     jQuery('#more_announcements').on('show.bs.collapse', function () {
         jQuery('#toggle_announcements').text(jQuery('#toggle_announcements').data('text-less'));
     });
-});
+}
+
+if (typeof htmx != "undefined") {
+    htmx.onLoad(function(elt) {
+        announce();
+    });
+} else {
+    jQuery(document).ready(function() {
+        announce();
+    });
+}

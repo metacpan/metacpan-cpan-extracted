@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-01-27'; # DATE
+our $DATE = '2025-05-29'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Clipboard/Any/detect_clipboard_manager",
@@ -40,7 +40,7 @@ detect-clipboard-manager - Detect which clipboard manager program is currently r
 
 =head1 VERSION
 
-This document describes version 0.009 of detect-clipboard-manager (from Perl distribution App-ClipboardUtils), released on 2025-01-27.
+This document describes version 0.010 of detect-clipboard-manager (from Perl distribution App-ClipboardUtils), released on 2025-05-29.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<detect-clipboard-manager> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, 
 
 B<detect-clipboard-manager> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<detect-clipboard-manager> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+B<detect-clipboard-manager> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 =head1 DESCRIPTION
 
@@ -58,6 +58,17 @@ C<klipper>. Will return undef if no known clipboard manager is detected.
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--detail>, B<-l>
+
+(No description)
+
+
+=back
 
 =head2 Logging options
 

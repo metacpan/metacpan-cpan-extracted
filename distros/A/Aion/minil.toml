@@ -3,7 +3,7 @@ name = "Aion"
 authority="cpan:DART"
 license="gpl_3"
 
-badges = ["github-actions/test.yml"]
+badges = ["github-actions/test.yml", "metacpan", "coveralls"]
 markdown_maker = "Liveman::MinillaPod2Markdown"
 module_maker="ModuleBuildTiny"
 static_install = "auto"

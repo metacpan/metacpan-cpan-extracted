@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::Announce;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 RT->AddJavaScript('announce.js');
 RT->AddStyleSheets('announce.css');
@@ -92,6 +92,54 @@ sub GetAnnouncements {
     return @tickets;
 }
 
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'Announce',
+        Content => [
+            {
+                Name => 'RTAnnounceQueue',
+                Help => 'https://metacpan.org/pod/RT::Extension::Announce#$RTAnnounceQueue',
+            },
+            {
+                Name => 'AnnounceGroups',
+                Help => 'https://metacpan.org/pod/RT::Extension::Announce#@AnnounceGroups',
+            },
+            {
+                Name => 'ShowAnnouncementsInSelfService',
+                Help => 'https://metacpan.org/pod/RT::Extension::Announce#$ShowAnnouncementsInSelfService',
+            },
+            {
+                Name => 'RTAnnounceAllowHTML',
+                Help => 'https://metacpan.org/pod/RT::Extension::Announce#$RTAnnounceAllowHTML',
+            },
+            {
+                Name => 'ShowAnnouncementsInFormTools',
+                Help => 'https://metacpan.org/pod/RT::Extension::Announce#$ShowAnnouncementsInFormTools',
+            },
+        ],
+        Meta    => {
+            RTAnnounceQueue => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/String',
+            },
+            AnnounceGroups => {
+                Type => 'ARRAY',
+            },
+            ShowAnnouncementsInSelfService => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+            RTAnnounceAllowHTML => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+            ShowAnnouncementsInFormTools => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+        }
+    );
+}
 
 =head1 NAME
 
@@ -99,7 +147,7 @@ RT-Extension-Announce - Display announcements as a banner on RT pages.
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4, 5.0.
+Works with RT 4.4, 5.0 and 6.0.
 
 =head1 INSTALLATION
 
@@ -113,17 +161,11 @@ Works with RT 4.0, 4.2, 4.4, 5.0.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
+If you are using RT 4.4 or greater, add this line:
 
     Plugin('RT::Extension::Announce');
-
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Extension::Announce));
-
-or add C<RT::Extension::Announce> to your existing C<@Plugins> line.
 
 And add the following:
 
@@ -143,7 +185,7 @@ in case changes need to be made to your database.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 

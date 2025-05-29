@@ -7,6 +7,11 @@ MANIFEST			This list of files
 README
 t/00-load.t
 t/01-odea.t
+t/02-basics.t
+t/03-ro.t
+t/04-trigger.t
+t/05-coerce.t
+t/06-builder.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

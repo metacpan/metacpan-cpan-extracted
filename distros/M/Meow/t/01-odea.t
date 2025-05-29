@@ -9,6 +9,8 @@ use Test::More;
 
 	rw thing => Builder(Num, sub { $_[0]->only });
 
+	sub modify { return qw/a b c d/; }
+
 	rw other => Str;
 	
 	rw array => Trigger(
@@ -54,6 +56,9 @@ is_deeply($foo->array(), [1,2,3]);
 is_deeply($foo->array('a,b,c'), [qw/a b c/]);
 my $foo = Foo->new( thing => 123, other => 'def', array => [ 5, 6, 7 ] );
 
+is_deeply([$foo->modify], [qw/a b c d/]);
+
+
 is($foo->thing, 123);
 is($foo->other, 'def');
 is_deeply($foo->array(), [5, 6, 7]);
@@ -88,7 +93,7 @@ is($bar->boo, 100);
 is_deeply($bar->array, [qw/a b c/]);
 is_deeply($bar->array('1,2,3'), [qw/1 2 3/]);
 is_deeply($bar->array([4, 5, 6]), [qw/4 5 6/]);
-
+is_deeply([$bar->modify], [qw/a b c d/]);
 
 done_testing();
 

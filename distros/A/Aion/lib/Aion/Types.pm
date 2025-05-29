@@ -12,9 +12,8 @@ use Exporter qw/import/;
 use Scalar::Util qw/looks_like_number reftype blessed/;
 use Sub::Util qw/prototype set_prototype subname set_subname/;
 
-require Exporter;
 our @EXPORT = our @EXPORT_OK = grep {
-	*{$Aion::Types::{$_}}{CODE}	&& !/^(_|(NaN|import|all|any|looks_like_number|reftype|blessed|prototype|set_prototype|subname set_subname)\z)/n
+	*{$Aion::Types::{$_}}{CODE}	&& !/^(_|(NaN|import|all|any|looks_like_number|reftype|blessed|prototype|set_prototype|subname|set_subname)\z)/n
 } keys %Aion::Types::;
 
 sub UNIVERSAL::Isa : ATTR(CODE) {
@@ -291,7 +290,7 @@ subtype "Any";
 				awhere { &ArrayLike->test && do { my $A = A; all { $A->test } @$_ }};
 				subtype "Lim[A, B?]", as &ArrayLike,
 					init_where => $init_limit,
-					where { SELF->{min} <= @$_ <= SELF->{max} };
+					where { SELF->{min} <= @$_ && @$_ <= SELF->{max} };
 			subtype "HashLike`[A]", as &Ref,
 				where { reftype($_) eq "HASH" || !!overload::Method($_, "%{}") }
 				awhere { &HashLike->test && do { my $A = A; all { $A->test } values %$_ }};
@@ -299,7 +298,7 @@ subtype "Any";
 						where { my $x = $_; all { exists $x->{$_} } ARGS };
 					subtype "LimKeys[A, B?]", as &HashLike,
 						init_where => $init_limit,
-						where { SELF->{min} <= scalar keys %$_ <= SELF->{max} };
+						where { SELF->{min} <= scalar keys %$_ && scalar keys %$_ <= SELF->{max} };
 
 			subtype "Like", as (&Str | &Object);
 				subtype "HasMethods[m...]", as &Like,
@@ -312,12 +311,18 @@ subtype "Any";
 				subtype "StrLike", as (&Str | Overload(['""']));
 					subtype "Len[A, B?]", as &StrLike,
 						init_where => $init_limit,
-						where { SELF->{min} <= length($_) <= SELF->{max} };
+						where { SELF->{min} <= length($_) && length($_) <= SELF->{max} };
 
 				subtype "NumLike", where { looks_like_number($_) };
-					subtype "Float", as &NumLike, where { -3.402823466E+38 <= $_ <= 3.402823466E+38 };
-					subtype "Double", as &NumLike, where { -1.7976931348623158e+308 <= $_ <= 1.7976931348623158e+308 };
-					subtype "Range[from, to]", as &NumLike, where { A <= $_ <= B };
+					subtype "Float", as &NumLike, where { -3.402823466E+38 <= $_ && $_ <= 3.402823466E+38 };
+					
+					my $_from; my $_to;
+					subtype "Double", as &NumLike, where {
+                        $_from //= do { require Math::BigFloat; Math::BigFloat->new('-1.7976931348623157e+308') };
+                        $_to   //= do { require Math::BigFloat; Math::BigFloat->new( '1.7976931348623157e+308') };
+                        $_from <= $_ && $_ <= $_to;
+                    };
+					subtype "Range[from, to]", as &NumLike, where { A <= $_ && $_ <= B };
 
 					my $_8bits;
 					subtype "Bytes[N]", as &NumLike,
@@ -330,7 +335,7 @@ subtype "Any";
 							N = -$N;
 							M = $N-1;
 						}
-						where { N <= $_ <= M };
+						where { N <= $_ && $_ <= M };
 					subtype "PositiveBytes[N]", as &NumLike,
 						init_where {
 							my $bits = A < 8? 8: ($_8bits //= do {
@@ -339,7 +344,7 @@ subtype "Any";
 							});
 							M = (1 << ($bits*A)) - 1;
 						}
-						where { 0 <= $_ <= M };
+						where { 0 <= $_ && $_ <= M };
 
 	coerce &Str => from &Undef => via { "" };
 	coerce &Int => from &Num => via { int($_+($_ < 0? -.5: .5)) };
@@ -581,7 +586,7 @@ Arguments of the current type. In scalar context returns array ref on the its. A
 First, second, third and fifth argument of the type.
 
 	BEGIN {
-		subtype "Seria[A,B,C,D]", where { A < B < $_ < C < D };
+		subtype "Seria[A,B,C,D]", where { A < B && B < $_ && $_ < C && C < D };
 	}
 	
 	2.5 ~~ Seria[1,2,3,4]   # -> 1
@@ -1002,10 +1007,12 @@ The machine float number is 4 bytes.
 
 The machine float number is 8 bytes.
 
-	-4.8 ~~ Double    					# -> 1
-	-1.7976931348623158e+308 ~~ Double  # -> 1
-	+1.7976931348623158e+308 ~~ Double  # -> 1
-	-1.7976931348623159e+308 ~~ Double # -> ""
+	use Scalar::Util qw//;
+	
+	-4.8 ~~ Double                     # -> 1
+	'-1.7976931348623157e+308' ~~ Double # -> 1
+	'+1.7976931348623157e+308' ~~ Double # -> 1
+	'-1.7976931348623159e+308' ~~ Double # -> ""
 
 =head2 Range[from, to]
 

@@ -103,7 +103,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.5.2
+    v0.5.3
 
 =head1 DESCRIPTION
 
@@ -331,7 +331,7 @@ Provided value sould be a set of 3.
 
 =head2 open
 
-Create an access to the shared memory and return a new L<Module::Generic::SharedMem> object.
+Creates or accesses a shared memory segment and returns a new L<Module::Generic::SharedMem> object. It takes an optional hash or hash reference with parameters such as C<key>, C<mode>, C<size>, and C<semid>.
 
     my $shmem = Module::Generic::SharedMem->new(
         create => 1,
@@ -347,7 +347,77 @@ Create an access to the shared memory and return a new L<Module::Generic::Shared
         size => 1024,
     }) || die( $shmem->error );
 
+If called on an already opened object, it reuses the existing shared memory segment and semaphore, creating a new object that shares the same resources. This is particularly useful in threaded applications to ensure all threads access the same shared memory segment safely.
+
+In threaded applications, the shared memory segment must be opened in the main thread before starting threads to ensure thread-safety. The module automatically manages semaphore reuse via a shared repository (C<$SERIAL2SEMID>) or the current object's semaphore ID, ensuring thread-safe operations without additional configuration.
+
+        require threads;
+        require threads::shared;
+        threads->import();
+        threads::shared->import();
+        my $shem = Module::Generic::SharedMem->new(
+            debug => $DEBUG,
+            key => 'my_memory',
+            size => 65536,
+            mode => 0666,
+            create => 1,
+        ) || die( Module::Generic::SharedMem->error );
+        my $obj = $shem->open({ mode => 'w' }) || die( $shem->error );
+        my @threads;
+        for(1..3)
+        {
+            push @threads, threads->create(sub
+            {
+                my $tid = threads->tid();
+                my $sh = $obj->open();
+                if( !defined( $sh ) )
+                {
+                    warn( "Error with thread $tid: unable to open shared memory segment: ", $obj->error );
+                    return(0);
+                }
+                my $data = $sh->read();
+                my $old_counter = $data->{counter};
+                $data->{counter}++;
+                $sh->write( $data ) || return(0);
+                return(1);
+            });
+        }
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            my $result = $thr->join();
+            $success &&= $result;
+        }
+        my $data = $obj->read();
+        # $data->{counter} is 3, and $success is true
+
+Parameters:
+
+=over 4
+
+=item * C<key>
+
+The shared memory key identifier. Defaults to the key set during object instantiation or C<IPC::SysV::IPC_PRIVATE>.
+
+=item * C<mode>
+
+The octal mode for the shared memory (e.g., C<0600> for owner-only access). Defaults to the mode set during object instantiation.
+
+=item * C<size>
+
+The size of the shared memory segment in bytes. Defaults to the size set during object instantiation.
+
+=item * C<semid>
+
+An explicit semaphore ID to use, overriding automatic semaphore management.
+
+=back
+
 If the L</create> option is set to true, but the shared memory already exists, L</open> will detect it and attempt to open access to the shared memory without the L</create> bit on, which is C<IPC::SysV::IPC_CREAT>
+
+Returns a new L<Module::Generic::SharedMem> object on success, or C<undef> on error, with the error accessible via L<Module::Generic/error>.
+
+    my $s = $shem->open({ mode => 'r', size => 1024 }) || die( $shem->error );
 
 =head2 owner
 
@@ -510,25 +580,51 @@ Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the l
 
 =head1 THREAD & PROCESS SAFETY
 
-C<Module::Generic::SharedMem> is designed to provide multi-process safe access to shared memory using System V IPC. It uses semaphores to guard concurrent access.
+L<Module::Generic::SharedMem> is designed for safe multi-process and multi-threaded access to shared memory using System V IPC. It uses semaphores to guard concurrent access, ensuring data integrity across processes and threads. In threaded applications, the module employs a shared repository (C<$SERIAL2SEMID>) and thread-safe locking to manage semaphore reuse, allowing multiple threads to access the same shared memory segment without conflicts.
 
-However, please note:
+Key considerations for thread and process safety:
 
 =over 4
 
-=item *
+=item * B<Main Thread Initialization>
 
-Shared memory and semaphores are per-system resources — do not assume persistence across process restarts.
+In threaded applications, the shared memory segment must be opened in the main thread before starting worker threads. This ensures the semaphore ID is stored in the shared repository (C<$SERIAL2SEMID>) or accessible via the opened object, allowing worker threads to reuse it safely.
 
-=item *
+    my $shem = Module::Generic::SharedMem->new( key => 'my_memory', create => 1 );
+    my $obj = $shem->open({ mode => 'w' });
+    my @threads = map {
+        threads->create(sub {
+            my $sh = $obj->open();
+            # Work with $sh
+        });
+    } 1..10;
 
-Always call C<remove()> manually if you want to explicitly clean up memory and semaphores, especially in daemonized or mod_perl environments.
+=item * B<Semaphore Reuse>
 
-=item *
+When calling L</open> on an already opened object (e.g., C<$obj->open()>), the module reuses the existing semaphore ID, ensuring all threads operate on the same shared memory segment. This is thread-safe due to internal locking mechanisms.
 
-Thread safety is supported where C<threads> is enabled, but this module is primarily designed for inter-process communication.
+=item * B<Process Safety>
+
+For multi-process applications, semaphores prevent concurrent access issues. Each process can open the shared memory segment using the same key, and the module ensures safe access via semaphore operations.
+
+=item * B<Cleanup>
+
+Shared memory and semaphores are system-wide resources and persist until explicitly removed or the system is rebooted. Use L</remove> to clean up shared memory and L</remove_semaphore> for semaphores, especially in daemonized or mod_perl environments. The L</destroy> and L</destroy_semaphore> options can automate cleanup when the object is destroyed, but manual removal is recommended for explicit control.
+
+    $obj->remove() if $obj->exists();
+
+=item * B<Thread Limitations>
+
+While thread-safe, this module is primarily designed for inter-process communication. In threaded environments, ensure proper initialization and avoid creating new shared memory segments in worker threads to prevent semaphore conflicts.
 
 =back
+
+For debugging shared memory and semaphore usage on Unix-like systems (e.g., Linux, FreeBSD, macOS), use:
+
+    ipcs -m  # List shared memory segments
+    ipcs -s  # List semaphores
+    ipcrm -m <shmid>  # Remove shared memory
+    ipcrm -s <semid>  # Remove semaphore
 
 =head1 AUTHOR
 

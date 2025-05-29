@@ -1,5 +1,8 @@
 Revision history for App::Dest
 
+1.35      2025-05-28 06:47:46-07:00 America/Los_Angeles
+        - Add strftime support in make paths
+
 1.34      2025-03-28 14:06:15-07:00 America/Los_Angeles
         - Add "nuke" command
 

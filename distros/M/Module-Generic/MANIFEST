@@ -15,6 +15,7 @@ lib/Module/Generic/File/Cache.pm
 lib/Module/Generic/File/IO.pm
 lib/Module/Generic/File/Mmap.pm
 lib/Module/Generic/Finfo.pm
+lib/Module/Generic/Global.pm
 lib/Module/Generic/Hash.pm
 lib/Module/Generic/Hash.pod
 lib/Module/Generic/HeaderValue.pm
@@ -43,6 +44,7 @@ MANIFEST
 META.yml
 README
 README.md
+scripts/startup.pl
 SIGNATURE			Public-key signature (added by MakeMaker)
 t/00.load.t
 t/01.core_methods.t
@@ -72,11 +74,23 @@ t/23.tiehash.t
 t/24.exception.t
 t/25.file_csv.t
 t/26.json.t
+t/27.dynamic.t
+t/28.exception.t
+t/29.null.t
+t/30.modperl.t
+t/31.global.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t
-t/test.bat
-t/test.pl
+t/conf/extra.conf.in
+t/conf/options.conf.in
+t/lib/Test/Apache2/Base.pm
+t/lib/Test/Apache2/MG.pm
+t/server.crt
+t/server.key
+t/TEST.PL
+t/test_finfo.bat
+t/test_finfo.pl
 t/test_in.csv
 t/test_in_utf-16be.csv
 t/test_in_utf-16le.csv

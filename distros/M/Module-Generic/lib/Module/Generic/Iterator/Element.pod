@@ -26,7 +26,7 @@ Module::Generic::Iterator::Element - An Array Iterator Element Object Class
 
 This is an object class for L<Module::Generic::Iterator::Element> objects as returned by various methods of L<Module::Generic::Iterator>.
 
-=head1 METHODS
+=head1 CONSTRUCTOR
 
 =head2 new
 
@@ -36,39 +36,77 @@ Typical parameters are:
 
 =over 4
 
-=item I<parent>
+=item * C<parent>
 
 This is the L<Module::Generic::Iterator> object and it is required.
 
 =back
 
+=head1 METHODS
+
 =head2 has_next
 
-Returns true if there is another item after the current one.
+Returns true if there is a next element relative to this element:
+
+    my $first = $iter->first;
+    if( $first->has_next )
+    {
+        print( "There is a next element\n" );
+    }
 
 =head2 has_prev
 
-Returns true if there is another item before the current one.
+Returns true if there is a previous element relative to this element:
+
+    my $last = $iter->last;
+    if( $last->has_prev )
+    {
+        print( "There is a previous element\n" );
+    }
 
 =head2 next
 
-Returns the next L<Module::Generic::Iterator::Element> object relative to this object or undef if there are no more element.
+Returns the next element as a L<Module::Generic::Iterator::Element> object when chaining. In scalar context, returns the element’s value:
+
+    my $first = $iter->first;
+    my $next = $first->next; # Next element
+    print( $next->value, "\n" ); # Value of next element
+    my $value = $first->next; # In scalar context, returns the value
+
+Returns C<undef> in scalar context, or an empty list in list context if there are no more element.
 
 =head2 parent
 
 Sets or gets a L<Module::Generic::Iterator> object as the parent object for this array element.
 
+    my $elem = $iter->first;
+    my $parent = $elem->parent;
+    $parent->reset;
+
 =head2 pos
 
-Returns the position of the object inside the parent array. This is read-only and returns an integer.
+Returns the position of the object in the iterator. This is read-only and returns an integer.
+
+    my $elem = $iter->find( "Jack" );
+    print( $elem->pos, "\n" ); # e.g., 1
 
 =head2 prev
 
-Returns the previous L<Module::Generic::Iterator::Element> object relative to this object or undef if there are no more previous element.
+Returns the previous element as a L<Module::Generic::Iterator::Element> object when chaining. In scalar context, returns the element’s value:
+
+    my $last = $iter->last;
+    my $prev = $last->prev; # Previous element's value
+    print( $last->prev->value, "\n" ); # Same (value of previous element)
+    my $value = $last->prev; # In scalar context, returns the value
+
+Returns C<undef> in scalar context, or an empty list in list context if there are no more element.
 
 =head2 value
 
-Return the value of the L<Module::Generic::Iterator::Element> object, whatever that may be.
+Returns the raw value of the L<element object|Module::Generic::Iterator::Element>:
+
+    my $elem = $iter->first;
+    print( $elem->value, "\n" ); # e.g., "John"
 
 =head1 SERIALISATION
 
@@ -84,6 +122,58 @@ Return the value of the L<Module::Generic::Iterator::Element> object, whatever t
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 
+=head1 THREAD-SAFETY
+
+L<Module::Generic::Iterator::Element> is thread-safe for all operations, as it operates on per-object state and does not modify shared resources at runtime.
+
+Key considerations for thread-safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+There are no shared variables that are modified at runtime. The global C<$DEBUG> variable (inherited from L<Module::Generic>) is typically set before threads are created, and it is the user's responsibility to ensure thread-safety if modified at runtime:
+
+    use threads;
+    local $Module::Generic::Iterator::DEBUG = 0; # Set before threads
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $iter = Module::Generic::Iterator->new( [1, 2, 3] );
+            $iter->next; # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Object State>
+
+Iterator data (e.g., L</elements>, L</pos>, L<Module::Generic::Iterator::Element/value>) is stored per-object, ensuring thread isolation:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $iter = Module::Generic::Iterator->new( [1, 2, 3] );
+            while( my $elem = $iter->next )
+            {
+                print( $elem->value, "\n" ); # Thread-safe
+            }
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+
+=back
+
+For debugging in threaded environments (depending on your Operating System):
+
+    ls -l /proc/$$/fd  # List open file descriptors
+
 =head1 SEE ALSO
 
 L<Module::Generic::Iterator::Element>, L<Module::Generic::Array>
@@ -94,7 +184,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
+Copyright (c) 2000-2025 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

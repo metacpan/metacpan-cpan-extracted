@@ -1,5 +1,44 @@
 Revision history for Perl module Module::Generic
 
+v1.0.0 2025-05-29T10:01:42+0900
+    - Fully threads-safe version
+    - Enhanced 'open' method in Module::Generic::SharedMem, and Module::Generic::SharedMemXS to reuse semaphore ID from opened objects, improving thread-safety.
+    - Fixed 'write' method in Module::Generic::SharedMem to use memwrite with explicit shmat/shmdt, resolving sporadic 'Invalid argument' errors in threaded tests
+    - Updated unit tests for Module::Generic::SharedMem, and Module::Generic::SharedMemXS for thread-safe shared memory access.
+    - Improved POD for all modules about THREAD SAFETY to clarify thread-safe usage.
+    - Added thread-safety unit tests for Module::Generic::File for concurrent file operations and locking
+    - Enhanced POD for open, write, append, and mmap to clarify thread-safety for Module::Generic::File
+    - Enhanced lock method in Module::Generic::File with thread-safe file descriptor locking via $FD_LOCKS
+    - Improved locked method in Module::Generic::File to dynamically check lock state in threads and forks
+    - Added cleanup of $FD_LOCKS in close method for threaded environments
+    - Added unit tests for file locking and max recursion
+    - Enhanced mmap POD with thread-safety warning
+    - Enhanced lock and locked POD with thread-safety and $FD_LOCKS details
+    - Enhanced POD in Module::Generic::Hash for delete, map, map_array, map_hash, and serialisation
+    - Improved unit tests for Module::Generic::Hash
+    - Enhanced POD in Module::Generic::HeaderValue for qstring, token_escape, value_data, and value_name
+    - Added thread-safety unit tests regarding Module::Generic::HeaderValue for header operations
+    - Added unit tests regarding Module::Generic::HeaderValue for decode, encode, original, param, params, qstring, reset, token_escape, token_max, value, value_as_string, value_data, value_name, value_max, and edge cases
+    - Added thread-safety unit test for iterator operations for Module::Generic::Iterator
+    - Added unit tests for Module::Generic::Iterator for elements, next, prev, and edge cases (empty iterators, invalid pos)
+    - Enhanced POD in Module::Generic::JSON for new, decode, encode, decode_json, encode_json, to_json, and from_json
+    - Added thread-safety unit test for Module::Generic::JSON for JSON operations
+    - Added unit tests for Module::Generic::JSON for to_json, from_json, max_depth, and invalid options
+    - Enhanced POD for Module::Generic::Null for new and added has_error method documentation
+    - Added comprehensive unit test suite (t/29.null.t)
+    - In Module::Generic::Number, added $LOCALE_LOCK shared variable and lock in init to ensure thread-safety during locale changes
+    - Fixed typo "negatie" to "negative" in round and round2 error messages in Module::Generic::Number
+    - Added thread-safety unit test for number operations for Module::Generic::Number
+    - Added unit tests for Module::Generic::Number for round_zero, decode_lconv, _get_multipliers, and edge cases
+    - Enhanced POD for Module::Generic::Number for new, and format
+    - Fixed format method in Module::Generic::Number to preserve scientific notation exactly, avoiding locale formatting and precision issues
+    - Updated the method 'defined' in Module::Generic::Scalar to return 0 or 1, not just an empty string that Perl 'defined' return when false
+    - Switched to using the new module Wanted instead of Want
+
+v0.43.4 2025-04-23T13:12:45+0900
+    - Improved detection of threads
+    - Improved _load_class method
+
 v0.43.3 2025-04-22T21:08:25+0900
     - Minor correction of _set_get_callback method in Module::Generic
     - Corrected method 'clear_error' to make it thread safe.

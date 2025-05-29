@@ -6,7 +6,8 @@ use Test::More qw( no_plan );
 use strict;
 use warnings;
 use utf8;
-use lib './lib';
+use Cwd qw( abs_path );
+use lib abs_path( './lib' );
 
 BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
 

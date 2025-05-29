@@ -2,12 +2,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include <stdlib.h>
-#include <string.h>
-
-#ifndef sv_sethek
-#	define sv_sethek(a, b)  Perl_sv_sethek(aTHX_ a, b)
-#endif
 
 static SV * _new(SV *class, HV *hash) {
 	dTHX;
@@ -39,29 +33,19 @@ int find_last(const char *str, const char word) {
 
 char *get_ex_method(const char *name) {
 	dTHX;
-	SV *caller = newSV(0);
-	HEK *stash_hek = HvNAME_HEK((HV*)CopSTASH(PL_curcop));
-	sv_sethek(caller, stash_hek);
-	STRLEN retlen;
-	char *callr = SvPV(caller, retlen);
+	char *callr = HvNAME((HV*)CopSTASH(PL_curcop));
+	STRLEN retlen = strlen(callr);
 	size_t ex_len = strlen(name) + 2 + retlen + 1;
 	char *ex_out = (char *)malloc(ex_len);
 	if (!ex_out) croak("Out of memory in get_ex_method");
 	snprintf(ex_out, ex_len, "%s::%s", callr, name);
-	SvREFCNT_dec(caller);
 	return ex_out;
 }
 
 char *get_caller(void) {
 	dTHX;
-	SV *caller = newSV(0);
-	HEK *stash_hek = HvNAME_HEK((HV*)CopSTASH(PL_curcop));
-	sv_sethek(caller, stash_hek);
-	STRLEN retlen;
-	char *callr = SvPV(caller, retlen);
-	char *ex_out = strdup(callr);
-	SvREFCNT_dec(caller);
-	return ex_out;
+	char *callr = HvNAME((HV*)CopSTASH(PL_curcop));
+	return callr;
 }
 
 void get_class_and_method(SV *cv_name_sv, char **class_out, char **method_out) {
@@ -85,10 +69,10 @@ void register_attribute(CV *cv, char *name, SV *attr, XSUBADDR_t xsub_addr) {
 	SV *newcv = (SV *)CvXSUBANY(cv).any_ptr;
 	SV *spec = (SV *)CvXSUBANY(newcv).any_ptr;
 
-	if (!SvROK(attr)) {
+	if (!SvOK(attr) || !SvROK(attr)) {
 		HV *n = newHV();
 		hv_store(n, "name", 4, newSVpv(name, strlen(name)), 0);
-		attr = newRV_noinc((SV*)newHV());
+		attr = newRV_noinc((SV*)n);
 	} else {
 		SV *rv = SvRV(attr);
 		if (SvTYPE(rv) != SVt_PVHV || !hv_exists((HV*)rv, "isa", 3)) {
@@ -136,9 +120,10 @@ static CV *get_cvf(const char *fmt, ...) {
 
 static SV *normalise_attr(SV *attr) {
 	dTHX;
-	if (!SvROK(attr)) {
+	if (!SvOK(attr) || !SvROK(attr)) {
 		HV *n = newHV();
-		attr = newRV_noinc((SV*)newHV());
+		hv_store(n, "isa", 3, &PL_sv_undef, 0);
+		attr = newRV_noinc((SV*)n);
 	} else {
 		SV *rv = SvRV(attr);
 		if (SvTYPE(rv) != SVt_PVHV || !hv_exists((HV*)rv, "isa", 3)) {
@@ -219,7 +204,7 @@ new(pkg, ...)
 						}
 					}
 
-					if (hv_exists(spec_hv, "coerce", 6)) {
+					if (SvOK(value) && hv_exists(spec_hv, "coerce", 6)) {
 						SV *coerce_sv = *hv_fetch(spec_hv, "coerce", 6, 0);
 						dSP;
 						PUSHMARK(SP);
@@ -233,15 +218,19 @@ new(pkg, ...)
 
 					if (SvOK(value) && hv_exists(spec_hv, "isa", 3)) {
 						SV *sv = *hv_fetch(spec_hv, "isa", 3, 0);
-						dSP;
-						PUSHMARK(SP);
-						XPUSHs(newSVsv(value));
-						PUTBACK;
-						call_sv(sv, G_SCALAR);
-						SPAGAIN;
-						value = POPs;
-						PUTBACK;
+						if (SvOK(sv)) {
+							dSP;
+							PUSHMARK(SP);
+							XPUSHs(newSVsv(value));
+							PUTBACK;
+							call_sv(sv, G_SCALAR);
+							SPAGAIN;
+							value = POPs;
+							PUTBACK;
+						}
 					}
+
+					SvREFCNT_inc(value);
 				}
 			}
 			hv_store(args, key, retlen, value, 0);
@@ -264,7 +253,8 @@ new(pkg, ...)
 				value = POPs;
 				PUTBACK;
 				if (SvOK(value) && hv_exists(spec_hv, "isa", 3)) {
-						SV *sv = *hv_fetch(spec_hv, "isa", 3, 0);
+					SV *sv = *hv_fetch(spec_hv, "isa", 3, 0);
+					if (SvOK(sv)) {
 						dSP;
 						PUSHMARK(SP);
 						XPUSHs(newSVsv(value));
@@ -273,11 +263,12 @@ new(pkg, ...)
 						SPAGAIN;
 						value = POPs;
 						PUTBACK;
+					}
 				}
-				hv_store(args, key, retlen, value, 0);
+				hv_store(args, key, retlen, newSVsv(value), 0);
 			}
 
-			if (hv_exists(spec_hv, "trigger", 7)) {
+			if (SvOK(value) && hv_exists(spec_hv, "trigger", 7)) {
 				SV *trigger_sv = *hv_fetch(spec_hv, "trigger", 7, 0);
 				dSP;
 				PUSHMARK(SP);
@@ -320,14 +311,16 @@ rw_attribute(...)
 			}
 			if (hv_exists(spec, "isa", 3)) {
 				SV *sv = *hv_fetch(spec, "isa", 3, 0);
-				dSP;
-				PUSHMARK(SP);
-				XPUSHs(newSVsv(ST(1)));
-				PUTBACK;
-				call_sv(sv, G_SCALAR);
-				SPAGAIN;
-				ST(1) = POPs;
-				PUTBACK;
+				if (SvOK(sv)) {
+					dSP;
+					PUSHMARK(SP);
+					XPUSHs(newSVsv(ST(1)));
+					PUTBACK;
+					call_sv(sv, G_SCALAR);
+					SPAGAIN;
+					ST(1) = POPs;
+					PUTBACK;
+				}
 			}
 			if (hv_exists(spec, "trigger", 7)) {
 				SV *coerce_sv = *hv_fetch(spec, "trigger", 7, 0);
@@ -381,10 +374,17 @@ ro_attribute(...)
 		RETVAL
 
 SV *
-ro(name, attr)
+ro(name, ...)
 	char *name
-	SV *attr
 	CODE:
+		SV *attr;
+		if (items > 1) {
+			attr = ST(1);
+			SvREFCNT_inc(attr);
+		} else {
+			attr = &PL_sv_undef;
+		}
+
 		register_attribute(cv, name, attr, XS_Meow_ro_attribute);
 
 		RETVAL = newSViv(1);
@@ -394,14 +394,20 @@ ro(name, attr)
 SV *
 Default(...)
 	CODE:
-		if (items < 2) {
-			croak("Default requires an attribute name and a value");
+		SV *attr, *val;
+		if (items > 1) {
+			attr = ST(0);
+			SvREFCNT_inc(attr);
+			val = ST(1);
+			SvREFCNT_inc(val);
+		} else {
+			attr = &PL_sv_undef;
+			val = ST(0);
+			SvREFCNT_inc(val);
 		}
-		SV * attr = ST(0);
 		attr = normalise_attr(attr);
 		HV *spec = (HV*)SvRV(attr);
-		hv_store(spec, "default", 7, newSVsv(ST(1)), 0);
-		SvREFCNT_inc(attr);
+		hv_store(spec, "default", 7, val, 0);
 		RETVAL = attr;
 	OUTPUT:
 		RETVAL
@@ -409,34 +415,48 @@ Default(...)
 SV *
 Coerce(...)
 	CODE:
-		if (items < 2) {
-			croak("Coerce requires an attribute name and a value");
+		SV *attr, *val;
+		if (items > 1) {
+			attr = ST(0);
+			SvREFCNT_inc(attr);
+			val = ST(1);
+			SvREFCNT_inc(val);
+		} else {
+			attr = &PL_sv_undef;
+			val = ST(0);
+			SvREFCNT_inc(val);
 		}
-		if (!SvROK(ST(1)) || SvTYPE(SvRV(ST(1))) != SVt_PVCV) {
+		if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVCV) {
 			croak("Coerce requires a code reference as the second argument");
 		}
-		SV * attr = ST(0);
 		attr = normalise_attr(attr);
 		HV *spec = (HV*)SvRV(attr);
-		hv_store(spec, "coerce", 6, newSVsv(ST(1)), 0);
+		hv_store(spec, "coerce", 6, val, 0);
 		SvREFCNT_inc(attr);
 		RETVAL = attr;
 	OUTPUT:
 		RETVAL
-	
+
 SV *
 Trigger(...)
 	CODE:
-		if (items < 2) {
-			croak("Trigger requires an attribute name and a value");
+		SV *attr, *val;
+		if (items > 1) {
+			attr = ST(0);
+			SvREFCNT_inc(attr);
+			val = ST(1);
+			SvREFCNT_inc(val);
+		} else {
+			attr = &PL_sv_undef;
+			val = ST(0);
+			SvREFCNT_inc(val);
 		}
-		if (!SvROK(ST(1)) || SvTYPE(SvRV(ST(1))) != SVt_PVCV) {
+		if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVCV) {
 			croak("Trigger requires a code reference as the second argument");
 		}
-		SV * attr = ST(0);
 		attr = normalise_attr(attr);
 		HV *spec = (HV*)SvRV(attr);
-		hv_store(spec, "trigger", 7, newSVsv(ST(1)), 0);
+		hv_store(spec, "trigger", 7, val, 0);
 		SvREFCNT_inc(attr);
 		RETVAL = attr;
 	OUTPUT:
@@ -445,16 +465,23 @@ Trigger(...)
 SV *
 Builder(...)
 	CODE:
-		if (items < 2) {
-			croak("Builder requires an attribute name and a value");
+		SV *attr, *val;
+		if (items > 1) {
+			attr = ST(0);
+			SvREFCNT_inc(attr);
+			val = ST(1);
+			SvREFCNT_inc(val);
+		} else {
+			attr = &PL_sv_undef;
+			val = ST(0);
+			SvREFCNT_inc(val);
 		}
-		if (!SvROK(ST(1)) || SvTYPE(SvRV(ST(1))) != SVt_PVCV) {
+		if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVCV) {
 			croak("Builder requires a code reference as the second argument");
 		}
-		SV * attr = ST(0);
 		attr = normalise_attr(attr);
 		HV *spec = (HV*)SvRV(attr);
-		hv_store(spec, "builder", 7, newSVsv(ST(1)), 0);
+		hv_store(spec, "builder", 7, val, 0);
 		SvREFCNT_inc(attr);
 		RETVAL = attr;
 	OUTPUT:
@@ -486,7 +513,7 @@ extends(...)
 
 			CV *child_cv = get_cvf("%s::new", child);
 			CV *parent_cv = get_cvf("%s::new", parent);
-	  
+
 			if (!child_cv || !parent_cv)
 				croak("Could not find new() for child or parent class");
 			SV *child_spec = (SV *)CvXSUBANY(child_cv).any_ptr;
@@ -544,3 +571,8 @@ import(pkg, ...)
 				CV *builder_cv = newXS(name, XS_Meow_Builder, __FILE__);
 			}
 		}
+
+void
+DESTROY(...)
+	CODE:
+		Safefree(ST(0));

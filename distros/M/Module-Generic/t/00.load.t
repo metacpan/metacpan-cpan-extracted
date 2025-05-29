@@ -3,7 +3,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG @modules );
     use Test::More qw( no_plan );
     use File::Find;

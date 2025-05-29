@@ -3,3 +3,6 @@ Revision history for Basic-Types-XS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.07	2025-05-28
+	- Adds Object and ClassName types
+	- Moves all of import into XS.

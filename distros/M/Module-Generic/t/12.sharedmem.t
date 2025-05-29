@@ -5,7 +5,8 @@ BEGIN
     use warnings;
     use Test2::IPC;
     use Test2::V0;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG $IS_SUPPORTED );
     use Config;
     use Data::Dump ();
@@ -380,6 +381,121 @@ subtest 'Module::Generic::SharedMemXS' => sub
             };
             exit(0);
         }
+    };
+};
+
+my $key = 'test_thread_key';
+my $size = 2048;
+
+# Cleanup any existing shared memory
+my $shem_cleanup = Module::Generic::SharedMem->new(
+    debug => $DEBUG,
+    key => $key,
+    size => $size,
+    mode => 0666,
+);
+if( $shem_cleanup->exists )
+{
+    diag( "Cleaning up existing shared memory for key '$key'" ) if( $DEBUG );
+    $shem_cleanup->open({ mode => 'w' })->remove;
+}
+
+subtest "Thread-safe instantiation" => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+
+        require threads;
+        threads->import();
+
+        # NOTE: Threads test 1: Thread-safe instantiation
+        my @threads;
+        for( 1..10 )
+        {
+            push @threads, threads->create(sub
+            {
+                my $shem = Module::Generic::SharedMem->new(
+                    debug => $DEBUG,
+                    key => $key,
+                    size => $size,
+                    mode => 0666,
+                    create => 1,
+                );
+                if( !defined( $shem ) )
+                {
+                    diag( "Unable to instantiate a new Module::Generic::SharedMem object: ", Module::Generic::SharedMem->error ) if( $DEBUG );
+                    return(0);
+                }
+                my $obj = $shem->open({ mode => 'w' });
+                if( !$obj )
+                {
+                    diag( "Unable to open shared memory segment: ", $shem->error ) if( $DEBUG );
+                    return(0);
+                }
+                return( $obj ? 1 : 0 );
+            });
+        }
+        my $success = 1;
+        $success &&= $_->join for( @threads );
+        ok( $success, 'Thread-safe instantiation and open' );
+    };
+};
+
+# NOTE: Threads test 4: Shared resource management
+subtest "Thread-safe shared resource management" => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads are not available on this system', 1 );
+        }
+
+        require threads;
+        threads->import();
+
+        my $shem = Module::Generic::SharedMem->new(
+            debug => $DEBUG,
+            key => $key,
+            size => $size,
+            mode => 0666,
+            create => 1,
+        );
+        my @threads;
+        for(1..10)
+        {
+            push @threads, threads->create(sub
+            {
+                my $shem = Module::Generic::SharedMem->new(
+                    debug => $DEBUG,
+                    key => $key,
+                    size => $size,
+                    mode => 0666,
+                    create => 1,
+                );
+                if( !defined( $shem ) )
+                {
+                    diag( "Unable to instantiate a new Module::Generic::SharedMem object: ", Module::Generic::SharedMem->error ) if( $DEBUG );
+                    return(0);
+                }
+                my $sh = $shem->open({ mode => 'w' });
+                if( !$sh )
+                {
+                    diag( "Unable to open shared memory segment: ", $shem->error ) if( $DEBUG );
+                    return(0);
+                }
+                $sh->write({ thread_id => threads->tid });
+                $sh->remove;
+                return(1);
+            });
+        }
+        my $success = 1;
+        $success &&= $_->join for( @threads );
+        ok( $success && !$shem->exists, 'Thread-safe shared resource creation and cleanup' );
     };
 };
 

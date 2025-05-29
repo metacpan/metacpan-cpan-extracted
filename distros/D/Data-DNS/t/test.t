@@ -32,4 +32,10 @@ isa_ok($tld->rdap_record, q{Net::RDAP::Object::Domain});
 isa_ok($tld->gtld_record, q{ICANN::gTLD});
 isa_ok($tld->rdap_server, q{Net::RDAP::Service});
 
+my @tlds = $class->all;
+
+ok(scalar(@tlds) > 0);
+
+ok(scalar(grep { $_->isa($object_class) } @tlds) == scalar(@tlds));
+
 done_testing;

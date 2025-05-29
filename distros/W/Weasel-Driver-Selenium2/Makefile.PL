@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Weasel-Driver-Selenium2",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Weasel::Driver::Selenium2",
   "PREREQ_PM" => {
     "Carp::Clan" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "File::Util" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }

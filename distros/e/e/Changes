@@ -1,6 +1,13 @@
 Revision history for e
 
 =================
+1.36 - 2025-05-28
+=================
+
+Resolved Error:
+    Can't use an undefined value as an ARRAY reference at ...e.pm line 1311
+
+=================
 1.35 - 2025-03-26
 =================
 

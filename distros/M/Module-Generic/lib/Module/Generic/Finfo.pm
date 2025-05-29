@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.5.1
+## Version v0.5.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/04/20
+## Modified 2025/04/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,17 +18,17 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $HAS_LOCAL_TZ $HAS_FILE_MMAGIC_XS );
-    use Config;
+    use vars qw( $VERSION $HAS_FILE_MMAGIC_XS );
     use File::Basename ();
     local $@;
     eval( "use File::MMagic::XS 0.09008" );
     our $HAS_FILE_MMAGIC_XS = $@ ? 0 : 1;
+    use Module::Generic::Global ':const';
     use Module::Generic::Null;
-    use Want;
+    use Wanted;
     use overload (
         q{""}    => sub    { $_[0]->{filepath} },
-        bool     => sub () { 1 },
+        bool     => sub () {1},
         fallback => 1,
     );
     use constant {
@@ -63,18 +63,10 @@ BEGIN
         FILETYPE_SOCK => 7,
         # a file is of some other unknown type or the type cannot be determined.
         FILETYPE_UNKFILE => 127,
-        HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} ),
     };
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    }
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.5.1';
+    our $VERSION = 'v0.5.2';
 };
 
 use v5.26.1;
@@ -254,27 +246,20 @@ sub mime_type
 {
     my $self = shift( @_ );
     my $file = $self->filepath;
-    my $rv;
     # try-catch
     local $@;
-    eval
+    my $rv = eval
     {
         if( $HAS_FILE_MMAGIC_XS )
         {
             my $m = File::MMagic::XS->new;
-            $rv = $self->new_scalar( $m->get_mime( $file ) );
+            return( $self->new_scalar( $m->get_mime( $file ) ) );
         }
         else
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require File::MMagic;
-                $loaded = 1;
-            }
+            $self->_load_class( 'File::MMagic' ) || die( $self->pass_error );
             my $m = File::MMagic->new;
-            $rv = $self->new_scalar( $m->checktype_filename( $file ) );
+            return( $self->new_scalar( $m->checktype_filename( $file ) ) );
         }
     };
     if( $@ )
@@ -310,6 +295,14 @@ sub nlink
     my $data = $self->{_data};
     return( want( 'OBJECT' ) ? Module::Generic::Null->new : '' ) if( !scalar( @$data ) );
     return( $self->new_number( $data->[ FINFO_NLINK ] ) );
+}
+
+sub permission
+{
+    my $self = shift( @_ );
+    my $data = $self->{_data};
+    return( want( 'OBJECT' ) ? Module::Generic::Null->new : '' ) if( !scalar( @$data ) );
+    return( $self->new_number( sprintf( '%04o', $data->[ FINFO_MODE ] & 07777 ) ) );
 }
 
 sub protection
@@ -424,41 +417,34 @@ sub _datetime
     $self->_load_class( 'DateTime' ) || return( $self->pass_error );
     $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
     $self->_load_class( 'Module::Generic::DateTime' ) || return( $self->pass_error );
+    # my $err_key = $class;
+    # Previous approach
+    # my $repo = Module::Generic::Global->new( 'local_tz' => $class, key => $err_key );
+    # New system-wide shared approach
+    my $repo = Module::Generic::Global->new( 'local_tz' => 'system' );
+    my $has_local_tz = $repo->get;
     my $dt;
-    if( !defined( $HAS_LOCAL_TZ ) )
+    if( !defined( $has_local_tz ) )
     {
-        if( HAS_THREADS )
-        {
-            lock( $HAS_LOCAL_TZ );
-            # try-catch
-            local $@;
-            eval
-            {
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
-                $HAS_LOCAL_TZ = 1;
-            };
-            if( $@ )
-            {
-                $HAS_LOCAL_TZ = 0;
-                warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
-            }
-        }
-        else
+        $repo->lock;
+        $has_local_tz = $repo->get; # Double-check
+        if( !defined( $has_local_tz ) )
         {
             # try-catch
             local $@;
             eval
             {
                 $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
-                $HAS_LOCAL_TZ = 1;
+                $has_local_tz = 1;
             };
             if( $@ )
             {
-                $HAS_LOCAL_TZ = 0;
+                $has_local_tz = 0;
                 warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
                 $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
             }
+            $repo->set( $has_local_tz );
+            # unlocks automatically at end of scope.
         }
     }
     else
@@ -467,15 +453,15 @@ sub _datetime
         local $@;
         eval
         {
-            $dt = DateTime->from_epoch( epoch => $t, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+            $dt = DateTime->from_epoch( epoch => $t, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
         };
         if( $@ )
         {
-            warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
+            warn( "Error trying to set a DateTime object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone\n" );
             $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
         }
     }
-    
+
     # try-catch
     local $@;
     my $o;
@@ -498,43 +484,71 @@ sub _datetime
 # Credits: IPC::SysV <https://metacpan.org/release/JACKS/IPC_SysV>
 sub mode_s2n
 {
+    my $self = shift( @_ );
     my $mode = shift( @_ );
+
+    my $s2n = sub
+    {
+        my $str = shift( @_ );
+        # From string to binary
+        $str =~ tr/\-a-z/01/;
+        # Convert from binary into an octal digit.
+        $str = oct( unpack( 'N', pack( 'B32', substr( '0' x 32 . $str, -32 ) ) ) );
+        return( $str );
+    };
 
     # Just in case its a number already
     $mode =~ /^\d+$/ && return( $mode + 0 );
 
-    $mode =~ /^([r\-])([w\-])\-([r\-])([w\-])\-([r\-])([w\-])\-$/ || return;
+    # $mode =~ /^([r\-])([w\-])\-([r\-])([w\-])\-([r\-])([w\-])\-$/ || return;
+    $mode =~ /^(?<is_dir>[d\-]?)(?<user>[r\-][w\-][x\-])(?<group>[r\-][w\-][x\-])(?<other>[r\-][w\-][x\-])$/ || return;
 
-    my $n_mode = 0;
-    $n_mode |= 00400 if( $1 eq 'r' );
-    $n_mode |= 00200 if( $2 eq 'w' );
-    $n_mode |= 00040 if( $3 eq 'r' );
-    $n_mode |= 00020 if( $4 eq 'w' );
-    $n_mode |= 00004 if( $5 eq 'r' );
-    $n_mode |= 00002 if( $6 eq 'w' );
+    my $n_mode = 0 . $s2n->( $+{user} ) . $s2n->( $+{group} ) . $s2n->( $+{other} );
+    # $n_mode |= 00400 if( $1 eq 'r' );
+    # $n_mode |= 00200 if( $2 eq 'w' );
+    # $n_mode |= 00040 if( $3 eq 'r' );
+    # $n_mode |= 00020 if( $4 eq 'w' );
+    # $n_mode |= 00004 if( $5 eq 'r' );
+    # $n_mode |= 00002 if( $6 eq 'w' );
     return( $n_mode );
 }
 
 sub mode_n2s
 {
+    my $self = shift( @_ );
     my $n_mode = shift( @_ );
 
     # Just in case its a string already
-    $n_mode =~ /^[r\-][w\-]\-[r\-][w\-]\-[r\-][w\-]\-$/ && return( $n_mode );
+    # $n_mode =~ /^[r\-][w\-]\-[r\-][w\-]\-[r\-][w\-]\-$/ && return( $n_mode );
+    $n_mode =~ /^([d\-]?)([r\-][w\-][x\-]){3}$/ && return( $n_mode );
 
-    $n_mode =~ /^\d+$/ || return;
+    # $n_mode =~ /^\d+$/ || return;
+    # ( $n_mode =~ /^0?\d{3}$/ && $n_mode !~ /[89]/ ) || return;
+
+    # Convert numeric string to octal value
+    if( $n_mode =~ /^[0-7]{3,4}$/ )
+    {
+        $n_mode = oct( $n_mode );
+    }
+
+    # Ensure it's a number now
+    return unless( $n_mode =~ /^\d+$/ );
+
+    my @ftype = ('', 'p', 'c', '?', 'd', '?', 'b', '?', '-', '?', 'l', '?', 's', 'D', '?', '?');
+    my $ftype = $ftype[ ( $n_mode & 0170000 ) >> 12 ];
 
     my $mode = '';
     $mode .= ( $n_mode & 00400 ) ? 'r' : '-';
     $mode .= ( $n_mode & 00200 ) ? 'w' : '-';
-    $mode .= '-';
+    $mode .= ( $n_mode & 00100 ) ? 'x' : '-';
     $mode .= ( $n_mode & 00040 ) ? 'r' : '-';
     $mode .= ( $n_mode & 00020 ) ? 'w' : '-';
-    $mode .= '-';
+    $mode .= ( $n_mode & 00010 ) ? 'x' : '-';
     $mode .= ( $n_mode & 00004 ) ? 'r' : '-';
     $mode .= ( $n_mode & 00002 ) ? 'w' : '-';
-    $mode .= '-';
-    return( $mode );
+    $mode .= ( $n_mode & 00001 ) ? 'x' : '-';
+
+    return( $ftype . $mode );
 }
 
 1;
@@ -629,7 +643,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.5.1
+    v0.5.2
 
 =head1 DESCRIPTION
 
@@ -761,9 +775,14 @@ Returns true if this is a socket, false otherwise.
 
 =head2 mime_type
 
+    my $mime = $finfo->mime_type;
+    print "MIME type: $mime\n"; # e.g., "text/plain"
+
 This guesses the file mime type and returns it as a L<scalar object|Module::Generic::Scalar>
 
 If L<File::MMagic::XS> is installed, it will use it, otherwise, it will use L<File::MMagic>
+
+If an error occurs, it will set an L<exception object|Module::Generic::Exception>, and return an empty list in list context, or C<undef> in scalar context.
 
 =head2 mode
 
@@ -782,11 +801,17 @@ So you could do something like:
 
 =head2 mode_n2s
 
-Returns the file or directory mode as human readable string
+Takes a numeric mode (e.g., 0644) of a file or directory, and returns a human-readable string (e.g., C<rw-r--r-->). Returns C<undef> if the mode is invalid:
+
+    my $mode_str = $finfo->mode_n2s( 0644 );
+    print "Mode: $mode_str\n"; # "rw-r--r--"
 
 =head2 mode_s2n
 
-Takes a string and convert it into octal mode.
+Takes a mode string (e.g., C<rw-r--r-->) of a file or directory, and converts it to octal mode (e.g., 0644). Returns C<undef> if the mode string is invalid:
+
+    my $mode_num = $finfo->mode_s2n( "rw-r--r--" );
+    print "Numeric mode: $mode_num\n"; # 0644
 
 =head2 mtime
 
@@ -801,6 +826,10 @@ Interesting to note that L<APR::Finfo/name> which is advertised as returning the
 =head2 nlink
 
 Returns the number of (hard) links to the file.
+
+=head2 permission
+
+Returns the file permission as a 4 digits octal value, such as C<0755> or C<0644>
 
 =head2 protection
 
@@ -879,6 +908,95 @@ The file is of some other unknown type or the type cannot be determined
 =for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+
+=head1 THREAD & PROCESS SAFETY
+
+L<Module::Generic::Finfo> is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event. It leverages L<Module::Generic::Global> for thread-safe management of system-wide state and maintains per-object state for file metadata.
+
+Key considerations for thread and process safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+The C<has_local_tz> value in L</_datetime>, indicating system timezone support, is stored in L<Module::Generic::Global>’s C<local_tz> namespace as a system-wide global (accessed via C<local_tz => 'system'>). This is shared across all C<Module::Generic::*> modules (e.g., L<Module::Generic::Finfo>, L<Module::Generic::DateTime>) to avoid redundant timezone checks. Access is protected by thread locks, ensuring thread-safe initialization and retrieval:
+
+    use threads;
+    my $finfo = Module::Generic::Finfo->new( "example.txt" );
+    my $atime = $finfo->atime; # Sets shared has_local_tz
+    my $dt = Module::Generic::DateTime->new( DateTime->now );
+    $dt->epoch; # Reuses has_local_tz
+
+The C<local_tz> namespace is highly specific, ensuring negligible risk of collisions with unrelated modules.
+
+=item * B<File Metadata>
+
+File metadata (e.g., L</filepath>, internal C<_data> array) is stored per-object, ensuring each thread or process operates on its own instance without shared state conflicts:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $finfo = Module::Generic::Finfo->new( "example.txt" );
+            $finfo->size; # Thread-safe, per-object state
+            return(1);
+        });
+    } 1..5;
+    $_->join for @threads;
+
+=item * B<External Libraries>
+
+Methods like L</mime_type> use L<File::MMagic::XS> or L<File::MMagic>, which are thread-safe as they operate on per-object state. L</_datetime> uses L<DateTime> and L<DateTime::Format::Strptime>, both thread-safe when combined with L<Module::Generic::Global>’s locking for C<has_local_tz>.
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe for use with L<CBOR::XS>, L<Sereal>, or L<Storable::Improved>:
+
+    use threads;
+    use Sereal;
+    my $finfo = Module::Generic::Finfo->new( "example.txt" );
+    my $encoded = Sereal::encode_sereal( $finfo ); # Thread-safe
+
+=item * B<mod_perl Considerations>
+
+=over 4
+
+=item - B<Prefork MPM>
+
+File metadata and C<has_local_tz> are isolated per-process, requiring no additional synchronisation. System-level operations (e.g., C<stat> in L</reset>) are process-safe.
+
+=item - B<Threaded MPMs (Worker/Event)>
+
+The C<local_tz> namespace is protected by L<Module::Generic::Global>’s synchronisation (L<perlfunc/lock> for ithreads, C<APR::ThreadRWLock> in rare non-threaded Perl cases). Users should call C<< Module::Generic::Global->cleanup_register >> in mod_perl handlers to clear shared state after requests, preventing memory leaks.
+
+=item - B<Thread-Unsafe Functions>
+
+Avoid Perl functions like L<perlfunc/localtime> or L<perlfunc/getgrgid> (used in L</group>) in threaded MPMs, as they may affect all threads. L<Module::Generic::Finfo> mitigates this by caching results in per-object state. Consult L<perlthrtut|http://perldoc.perl.org/perlthrtut.html> and L<mod_perl documentation|https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environment_Issues> for details.
+
+=back
+
+=item * B<Process Safety>
+
+File operations (e.g., L<perlfunc/stat> in L</init>, L</reset>) are process-safe, relying on system-level calls. The shared C<has_local_tz> is managed by L<Module::Generic::Global>, ensuring consistent access across processes:
+
+    use POSIX qw( fork );
+    my $pid = fork();
+    if( $pid == 0 )
+    {
+        my $finfo = Module::Generic::Finfo->new( "example.txt" );
+        $finfo->atime; # Safe, uses shared has_local_tz
+        exit;
+    }
+    waitpid( $pid, 0 );
+
+=back
+
+For debugging in threaded or multi-process environments, use platform-specific commands (e.g., on Linux):
+
+    ls -l /proc/$$/fd  # List open file descriptors
+
+See your operating system’s documentation for equivalent commands.
 
 =head1 AUTHOR
 

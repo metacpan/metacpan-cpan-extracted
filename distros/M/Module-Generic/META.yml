@@ -30,6 +30,7 @@ no_index:
     - t
     - inc
 requires:
+  Apache::Test: '0'
   Class::Load: '0.25'
   Clone: '0.43'
   Config: '0'
@@ -41,6 +42,7 @@ requires:
   DateTime::TimeZone::Catalog::Extend: v0.3.0
   Devel::StackTrace: '0'
   Encode: '0'
+  Errno: '0'
   Exporter: '5.70'
   Fcntl: '0'
   File::Basename: '2.85'
@@ -66,7 +68,7 @@ requires:
   Tie::Hash: '1.05'
   URI::Escape: '5.09'
   URI::file: '5.09'
-  Want: '0.29'
+  Wanted: v0.1.0
   common::sense: '0'
   overload: '0'
   overloading: '0'
@@ -79,5 +81,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
   repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v0.43.3
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

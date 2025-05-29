@@ -23,81 +23,63 @@ BEGIN
       fallback => 1;
     $true  = do{ bless( \( my $dummy = 1 ) => 'Module::Generic::Boolean' ) };
     $false = do{ bless( \( my $dummy = 0 ) => 'Module::Generic::Boolean' ) };
-    use Config;
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    }
     our( $VERSION ) = 'v1.2.1';
 };
 
 use v5.26.1;
 use strict;
-# require Module::Generic::Array;
-# require Module::Generic::Number;
-# require Module::Generic::Scalar;
 
 sub new { return( $_[1] ? $true : $false ); }
 
 # sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
 sub as_array
 {
-    state $loaded;
-    if( HAS_THREADS && !$loaded )
+    my $self = shift( @_ );
+    unless( $self->_is_class_loaded( 'Module::Generic::Array' ) )
     {
-        lock( $loaded );
-        require Module::Generic::Array;
-        $loaded = 1;
+        # try-catch
+        local $@;
+        eval( 'Module::Generic::Array' );
+        if( $@ )
+        {
+            die( "Unable to load Module::Generic::Array" );
+        }
     }
-    elsif( !$loaded )
-    {
-        require Module::Generic::Array;
-        $loaded = 1;
-    }
-
-    return( Module::Generic::Array->new( [ ${$_[0]} ] ) );
+    return( Module::Generic::Array->new( [ $$self ] ) );
 }
 
 # sub as_number { return( Module::Generic::Number->new( ${$_[0]} ) ); }
 sub as_number
 {
-    state $loaded;
-    if( HAS_THREADS && !$loaded )
+    my $self = shift( @_ );
+    unless( $self->_is_class_loaded( 'Module::Generic::Number' ) )
     {
-        lock( $loaded );
-        require Module::Generic::Number;
-        $loaded = 1;
+        # try-catch
+        local $@;
+        eval( 'Module::Generic::Number' );
+        if( $@ )
+        {
+            die( "Unable to load Module::Generic::Number" );
+        }
     }
-    elsif( !$loaded )
-    {
-        require Module::Generic::Number;
-        $loaded = 1;
-    }
-
-    return( Module::Generic::Number->new( ${$_[0]} ) );
+    return( Module::Generic::Number->new( $$self ) );
 }
 
 # sub as_scalar { return( Module::Generic::Scalar->new( ${$_[0]} ) ); }
 sub as_scalar
 {
-    state $loaded;
-    if( HAS_THREADS && !$loaded )
+    my $self = shift( @_ );
+    unless( $self->_is_class_loaded( 'Module::Generic::Scalar' ) )
     {
-        lock( $loaded );
-        require Module::Generic::Scalar;
-        $loaded = 1;
+        # try-catch
+        local $@;
+        eval( 'Module::Generic::Scalar' );
+        if( $@ )
+        {
+            die( "Unable to load Module::Generic::Scalar" );
+        }
     }
-    elsif( !$loaded )
-    {
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
-
-    return( Module::Generic::Scalar->new( ${$_[0]} ) );
+    return( Module::Generic::Scalar->new( $$self ) );
 }
 
 sub defined { return(1); }
@@ -108,6 +90,16 @@ sub false () { $false }
 sub is_bool  ($) {           UNIVERSAL::isa( $_[0], 'Module::Generic::Boolean' ) }
 sub is_true  ($) {  $_[0] && UNIVERSAL::isa( $_[0], 'Module::Generic::Boolean' ) }
 sub is_false ($) { !$_[0] && UNIVERSAL::isa( $_[0], 'Module::Generic::Boolean' ) }
+
+sub _is_class_loaded
+{
+    my $self = CORE::shift( @_ );
+    my $class = CORE::shift( @_ );
+    ( my $pm = $class ) =~ s{::}{/}gs;
+    $pm .= '.pm';
+    return(1) if( CORE::exists( $INC{ $pm } ) );
+    return(0);
+}
 
 sub FREEZE
 {

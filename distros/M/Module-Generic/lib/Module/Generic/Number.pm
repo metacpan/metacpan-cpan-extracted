@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.3.1
+## Version v2.3.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/20
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use warnings::register;
-    use vars qw( $SUPPORTED_LOCALES $DEFAULT $NUMBER_RE );
+    use vars qw( $SUPPORTED_LOCALES $DEFAULT $NUMBER_RE $LOCALE_LOCK );
     use Config;
     # use Nice::Try;
     use POSIX qw( Inf NaN );
@@ -105,15 +105,16 @@ BEGIN
     # double floats.  To be safe, we cap at 2**53; use Math::BigFloat
     # instead for larger numbers.
     use constant MAX_INT => 2**53;
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
+    use constant HAS_THREADS => $Config{useithreads};
     if( HAS_THREADS )
     {
         require threads;
         require threads::shared;
         threads->import();
         threads::shared->import();
+        our $LOCALE_LOCK :shared;
     }
-    our( $VERSION ) = 'v2.3.1';
+    our( $VERSION ) = 'v2.3.3';
 };
 
 use v5.26.1;
@@ -519,8 +520,11 @@ sub init
     # Trigger overloading to string operation
     $num = "$num";
     return( $self->error( "Number value provided is empty" ) ) if( !CORE::length( $num ) );
-    return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
-    return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
+    {
+        no warnings;
+        return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
+        return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
+    }
     use utf8;
     my @k = keys( %$map );
     @$self{ @k } = ( '' x scalar( @k ) );
@@ -557,6 +561,8 @@ sub init
     }
     if( $self->{lang} )
     {
+        # Lock the threads while we change the locale to check if it is available, and get its definition.
+        lock( $LOCALE_LOCK ) if( HAS_THREADS );
         # try-catch
         local $@;
         my $try_locale = sub
@@ -609,9 +615,9 @@ sub init
             POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
             if( $lconv && scalar( keys( %$lconv ) ) )
             {
-                my @grouping = unpack("C*", $lconv->{grouping});
+                my @grouping = CORE::length( $lconv->{grouping} // '' ) ? unpack( "C*", $lconv->{grouping} ) : ();
                 $lconv->{grouping} = $grouping[0];
-                @grouping = unpack("C*", $lconv->{mon_grouping});
+                @grouping = CORE::length( $lconv->{mon_grouping} // '' ) ? unpack( "C*", $lconv->{mon_grouping} ) : ();
                 $lconv->{mon_grouping} = $grouping[0];
                 $default = $lconv;
                 if( my $decoded = $self->decode_lconv( $default ) )
@@ -645,9 +651,9 @@ sub init
         $self->encoding( $encoding );
         if( scalar( keys( %$lconv ) ) )
         {
-            my @grouping = unpack("C*", $lconv->{grouping});
+            my @grouping = CORE::length( $lconv->{grouping} // '' ) ? unpack( "C*", $lconv->{grouping} ) : ();
             $lconv->{grouping} = $grouping[0];
-            @grouping = unpack("C*", $lconv->{mon_grouping});
+            @grouping = CORE::length( $lconv->{mon_grouping} // '' ) ? unpack( "C*", $lconv->{mon_grouping} ) : ();
             $lconv->{mon_grouping} = $grouping[0];
             $default = $lconv;
             if( my $decoded = $self->decode_lconv( $default ) )
@@ -740,38 +746,23 @@ sub atan2 { return( shift->_func( 'atan2', @_ ) ); }
 
 sub as_array
 {
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Array;
-        $loaded = 1;
-    }
-    return( Module::Generic::Array->new( [ shift->{_number} ] ) );
+    my $self = shift( @_ );
+    $self->_load_class( 'Module::Generic::Array' ) || return( $self->pass_error );
+    return( Module::Generic::Array->new( [ $self->{_number} ] ) );
 }
 
 sub as_boolean
 {
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Boolean;
-        $loaded = 1;
-    }
-    return( Module::Generic::Boolean->new( shift->{_number} ? 1 : 0 ) );
+    my $self = shift( @_ );
+    $self->_load_class( 'Module::Generic::Boolean' ) || return( $self->pass_error );
+    return( Module::Generic::Boolean->new( $self->{_number} ? 1 : 0 ) );
 }
 
 sub as_scalar
 {
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
-    return( Module::Generic::Scalar->new( shift->{_number} ) );
+    my $self = shift( @_ );
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
+    return( Module::Generic::Scalar->new( $self->{_number} ) );
 }
 
 sub as_string { return( shift->{_number} ) }
@@ -782,14 +773,9 @@ sub ceil { return( shift->_func( 'ceil', { posix => 1 } ) ); }
 
 sub chr
 {
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
-    return( Module::Generic::Scalar->new( CORE::chr( $_[0]->{_number} ) ) );
+    my $self = shift( @_ );
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
+    return( Module::Generic::Scalar->new( CORE::chr( $self->{_number} ) ) );
 }
 
 sub clone
@@ -841,13 +827,9 @@ sub compute
         warn( "Error with return formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
         return if( $@ );
 
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Scalar;
-            $loaded = 1;
-        }
+        # Here we need to die, because we are inside 'compute', which is call in overloading. We simply cannot return an error object.
+        $self->_load_class( 'Module::Generic::Scalar' ) ||
+            die( "Unable to load Module::Generic::Scalar" );
         return( Module::Generic::Scalar->new( $res ) ) if( $opts->{type} eq 'scalar' );
         return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
         return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
@@ -944,17 +926,28 @@ sub format
     # Handle negative numbers
     my $sign = $number <=> 0;
     $number = CORE::abs( $number ) if( $sign < 0 );
-    # round off $number
-    $number = $self->_round( $number => $precision );
-#     no overloading;
 
     # detect scientific notation
     my $exponent = 0;
-    if( $number =~ /^(-?[\d.]+)e([+-]\d+)$/ )
+    # if( $number =~ /^(-?[\d.]+)e([+-]\d+)$/ )
+    # {
+    #     # Don't attempt to format numbers that require scientific notation.
+    #     return( $number );
+    # }
+    # Detect scientific notation and preserve it exactly
+    # 1.23e+45
+    if( "$number" =~ /^(-?\d+(?:\.\d+)?)[eE]([+-]?\d+)+$/i )
     {
-        # Don't attempt to format numbers that require scientific notation.
-        return( $number );
+        my $mantissa = $1;
+        my $exponent = $2;
+        # Preserve the exact string representation without formatting
+        my $result = "$mantissa" . "e" . "$exponent";
+        $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
+        return( Module::Generic::Scalar->new( $result ) );
     }
+
+    # round off $number
+    $number = $self->_round( $number => $precision );
 
     # Split integer and decimal parts of the number and add commas
     my $integer = CORE::int( $number );
@@ -1002,27 +995,16 @@ sub format
 
     my $res = ( $sign < 0 ) ? $self->_format_negative( $result ) : $result;
     return( $self->pass_error ) if( !defined( $res ) );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
     return( Module::Generic::Scalar->new( $res ) );
 }
 
 # sub format_binary { return( Module::Generic::Scalar->new( CORE::sprintf( '%b', shift->{_number} ) ) ); }
 sub format_binary
 {
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
-    return( Module::Generic::Scalar->new( CORE::sprintf( '%b', shift->{_number} ) ) );
+    my $self = shift( @_ );
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
+    return( Module::Generic::Scalar->new( CORE::sprintf( '%b', $self->{_number} ) ) );
 }
 
 sub format_bytes
@@ -1116,26 +1098,15 @@ sub format_bytes
     my $result = $self->new( $number )->format( $opts->{precision} ) . $suffix;
 
     return( $self->pass_error ) if( !defined( $result ) );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
     return( Module::Generic::Scalar->new( $result ) );
 }
 
 sub format_hex
 {
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
-    return( Module::Generic::Scalar->new( CORE::sprintf( '0x%X', shift->{_number} ) ) );
+    my $self = shift( @_ );
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
+    return( Module::Generic::Scalar->new( CORE::sprintf( '0x%X', $self->{_number} ) ) );
 }
 
 sub format_money
@@ -1279,13 +1250,7 @@ sub format_money
     }
 
     return if( !defined( $rv ) );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
     return( Module::Generic::Scalar->new( $rv ) );
 }
 
@@ -1429,13 +1394,7 @@ sub format_picture
     $result =~ s/^(\Q$sign_prefix\E)(\Q$pic_prefix\E)(\s*)/$2$3$1/;
 
     return if( !defined( $result ) );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Scalar' ) || return( $self->pass_error );
     return( Module::Generic::Scalar->new( $result ) );
 }
 
@@ -1582,7 +1541,7 @@ sub round
         }
         elsif( $precision < 0 )
         {
-            return( $self->error( "precision provided '$precision' is negatie. It must be positive." ) );
+            return( $self->error( "precision provided '$precision' is negative. It must be positive." ) );
         }
     }
     else
@@ -1609,7 +1568,7 @@ sub round2
         }
         elsif( $precision < 0 )
         {
-            return( $self->error( "precision provided '$precision' is negatie. It must be positive." ) );
+            return( $self->error( "precision provided '$precision' is negative. It must be positive." ) );
         }
     }
     else
@@ -1891,15 +1850,15 @@ BEGIN
                   '*='      => sub{ &_catchall( @_[0..2], '*' ) },
                   '/='      => sub{ &_catchall( @_[0..2], '/' ) },
                   '%='      => sub{ &_catchall( @_[0..2], '%' ) },
-                  '**='      => sub{ &_catchall( @_[0..2], '**' ) },
-                  '<<='      => sub{ &_catchall( @_[0..2], '<<' ) },
-                  '>>='      => sub{ &_catchall( @_[0..2], '>>' ) },
+                  '**='     => sub{ &_catchall( @_[0..2], '**' ) },
+                  '<<='     => sub{ &_catchall( @_[0..2], '<<' ) },
+                  '>>='     => sub{ &_catchall( @_[0..2], '>>' ) },
                   'x='      => sub{ &_catchall( @_[0..2], 'x' ) },
                   '.='      => sub{ &_catchall( @_[0..2], '.' ) },
                   nomethod  => \&_catchall,
                   fallback  => 1,
                  );
-    use Want;
+    use Wanted;
     use POSIX qw( Inf NaN );
     our( $VERSION ) = '0.1.0';
 };
@@ -1912,17 +1871,17 @@ sub new
 
 sub clone { return( shift->new( @_ ) ); }
 
-sub is_finite { return( 0 ); }
+sub is_finite { return(0); }
 
-sub is_float { return( 0 ); }
+sub is_float { return(0); }
 
-sub is_infinite { return( 0 ); }
+sub is_infinite { return(0); }
 
-sub is_int { return( 0 ); }
+sub is_int { return(0); }
 
-sub is_nan { return( 0 ); }
+sub is_nan { return(0); }
 
-sub is_normal { return( 0 ); }
+sub is_normal { return(0); }
 
 sub length { return( CORE::length( shift->{_number} ) ); }
 
@@ -1961,19 +1920,21 @@ sub _func
     return( $res );
 }
 
+# NOTE: AUTOLOAD
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
     # If we are chained, return our null object, so the chain continues to work
     if( want( 'OBJECT' ) )
     {
-        # No, this is NOT a typo. rreturn() is a function of module Want
+        # No, this is NOT a typo. rreturn() is a function of module Wanted
         rreturn( $_[0] );
     }
     # Otherwise, we return infinity, whether positive or negative or NaN depending on what was set
     return( $_[0]->{_number} );
 };
 
+# NOTE: DESTROY
 DESTROY {};
 
 # NOTE: package Module::Generic::Infinity
@@ -1988,7 +1949,7 @@ BEGIN
     our( $VERSION ) = '0.1.0';
 };
 
-sub is_infinite { return( 1 ); }
+sub is_infinite { return(1); }
 
 # NOTE: package Module::Generic::Nan
 package Module::Generic::Nan;
@@ -2000,7 +1961,7 @@ BEGIN
     our( $VERSION ) = '0.1.0';
 };
 
-sub is_nan { return( 1 ); }
+sub is_nan { return(1); }
 
 1;
 

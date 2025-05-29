@@ -1,14 +1,16 @@
 #!/usr/bin/perl
-
-# t/03.hash.t - check for hash object
-
-use Test::More qw( no_plan );
-use strict;
-use warnings;
-use utf8;
-use lib './lib';
-use JSON;
-# use Nice::Try;
+BEGIN
+{
+    use Test::More qw( no_plan );
+    use strict;
+    use warnings;
+    use utf8;
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
+    use Config;
+    use JSON;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+};
 
 BEGIN { use_ok( 'Module::Generic::Hash' ) || BAIL_OUT( "Unable to load Module::Generic::Hash" ); }
 
@@ -134,4 +136,49 @@ if( $@ )
     fail( 'TO_JSON' );
 }
 
+subtest 'Thread-safe hash operations' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads not available', 2 );
+        }
+
+        require threads;
+        require threads::shared;
+
+        my @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid();
+                my $h = Module::Generic::Hash->new( first_name => "John" );
+                if( !$h->merge( { tid => $tid } ) )
+                {
+                    diag( "Thread $tid: Failed to merge: ", $h->error ) if( $DEBUG );
+                    return(0);
+                }
+                if( !$h->exists( 'tid' ) )
+                {
+                    diag( "Thread $tid: Merged key 'tid' does not exist" ) if( $DEBUG );
+                    return(0);
+                }
+                return(1);
+            });
+        } 1..5;
+
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join();
+        }
+
+        ok( $success, 'All threads merged successfully' );
+        ok( !defined( $Module::Generic::Hash::KEY_OBJECT ) || $Module::Generic::Hash::KEY_OBJECT == 0, 'Global $KEY_OBJECT unchanged' );
+    };
+};
+
 done_testing();
+
+__END__

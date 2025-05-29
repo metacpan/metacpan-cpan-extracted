@@ -1,3 +1,9 @@
+** 0.15 / 2025-05-28
+   - Fix running on 5.24 and older (remove indented heredoc)
+   - Increase minimum Perl to 5.12 (from 5.10) to support version in
+     package statement
+   - Fix interpolation in error string
+
 ** 0.14 / 2025-05-18
    - Work around an issue in Selenium::Remote::Driver returning a hash
      reference which looks like an internal 'id' being returned when

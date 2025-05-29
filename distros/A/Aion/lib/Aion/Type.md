@@ -111,7 +111,7 @@ my $Range = Aion::Type->new(
     init => sub {
         @{$Aion::Type::SELF}{qw/min max/} = @{$Aion::Type::SELF->{args}};
     },
-    test => sub { $Aion::Type::SELF->{min} <= $_ <= $Aion::Type::SELF->{max} },
+    test => sub { $Aion::Type::SELF->{min} <= $_ && $_ <= $Aion::Type::SELF->{max} },
 );
 
 $Range->init;
@@ -242,7 +242,7 @@ It make subroutine with arguments, who return type.
 ```perl
 BEGIN {
     Aion::Type->new(name=>"Len", test => sub {
-        $Aion::Type::SELF->{args}[0] <= length($_) <= $Aion::Type::SELF->{args}[1]
+        $Aion::Type::SELF->{args}[0] <= length($_) && length($_) <= $Aion::Type::SELF->{args}[1]
     })->make_arg(__PACKAGE__);
 }
 

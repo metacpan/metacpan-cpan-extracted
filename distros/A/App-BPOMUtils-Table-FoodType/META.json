@@ -63,15 +63,15 @@
    "provides" : {
       "App::BPOMUtils::Table::FoodType" : {
          "file" : "lib/App/BPOMUtils/Table/FoodType.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "App::BPOMUtils::Table::FoodTypeRBAImporter" : {
          "file" : "lib/App/BPOMUtils/Table/FoodTypeRBAImporter.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "App::BPOMUtils::Table::FoodTypeRBAProducer" : {
          "file" : "lib/App/BPOMUtils/Table/FoodTypeRBAProducer.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -86,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodType"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"

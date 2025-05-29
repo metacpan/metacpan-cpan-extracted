@@ -16,8 +16,11 @@ SUBROUTINES
   "check_location"
      check_location($self, $key);
 
+    *Since version 0.01. Described functionality since version 0.03.*
+
     Check parameter defined by $key which is valid location. Could be URL or
-    absolute or relative path.
+    absolute or relative path. Value is valid if it is undefined or key
+    doesn't exist.
 
     Put error if check isn't ok.
 
@@ -26,7 +29,10 @@ SUBROUTINES
   "check_uri"
      check_uri($self, $key);
 
-    Check parameter defined by $key which is valid URI.
+    *Since version 0.01. Described functionality since version 0.03.*
+
+    Check parameter defined by $key which is valid URI. Value is valid if it
+    is undefined or key doesn't exist.
 
     Put error if check isn't ok.
 
@@ -35,7 +41,10 @@ SUBROUTINES
   "check_url"
      check_url($self, $key);
 
-    Check parameter defined by $key which is valid URL.
+    *Since version 0.01. Described functionality since version 0.03.*
+
+    Check parameter defined by $key which is valid URL. Value is valid if it
+    is undefined or key doesn't exist.
 
     Put error if check isn't ok.
 
@@ -44,7 +53,10 @@ SUBROUTINES
   "check_urn"
      check_urn($self, $key);
 
-    Check parameter defined by $key which is valid URN.
+    *Since version 0.01. Described functionality since version 0.03.*
+
+    Check parameter defined by $key which is valid URN. Value is valid if it
+    is undefined or key doesn't exist.
 
     Put error if check isn't ok.
 
@@ -245,10 +257,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2024 Michal Josef Špaček
+    © 2024-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

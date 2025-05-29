@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-URI
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-URI
-version: '0.02'
+version: '0.04'

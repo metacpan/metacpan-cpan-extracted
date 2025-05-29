@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CdUtils.pm'
@@ -14,6 +14,7 @@ my @module_files = (
 
 my @scripts = (
     'script/cdpart-backend',
+    'script/cdsibling-backend',
     'script/cdtarget-backend',
     'script/cdtree-backend'
 );

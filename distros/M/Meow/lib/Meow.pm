@@ -3,7 +3,7 @@ package Meow;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 require XSLoader;
 XSLoader::load('Meow', $VERSION);
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Meow - Object ฅ^•ﻌ•^ฅ Orientation 
+Meow - Object ฅ^•ﻌ•^ฅ Orientation
 
 =head1 VERSION
 
-Version 0.13
+Version 0.15
 
 =cut
 
@@ -58,7 +58,7 @@ This module is experimental. Many basic features do not yet exist.
 
 	$cat->name; # Simba;
 	$cat->age; # 10;
-	
+
 	$cat->age(11);
 
 =head1 DESCRIPTION
@@ -138,7 +138,7 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 	{
 		package Foo::Extends::Mouse;
 
-		use Moo;
+		use Mouse;
 		extends qw/Foo::Mouse/;
 
 		1;
@@ -220,14 +220,13 @@ Constructs a new object, applying defaults, coercions, triggers, and builders as
 
 ...
 
-	Benchmark: timing 1000000 iterations of Meow, Moo, Mouse...
-	      Meow: 1.30834 wallclock secs ( 1.31 usr +  0.01 sys =  1.32 CPU) @ 757575.76/s (n=1000000)
-	       Moo: 1.56353 wallclock secs ( 1.57 usr +  0.00 sys =  1.57 CPU) @ 636942.68/s (n=1000000)
-	     Mouse: 1.34627 wallclock secs ( 1.34 usr +  0.00 sys =  1.34 CPU) @ 746268.66/s (n=1000000)
-		  Rate   Moo Mouse  Meow
-	Moo   636943/s    --  -15%  -16%
-	Mouse 746269/s   17%    --   -1%
-	Meow  757576/s   19%    2%    --
+	      Meow: 1.14885 wallclock secs ( 1.13 usr +  0.02 sys =  1.15 CPU) @ 869565.22/s (n=1000000)
+	       Moo: 1.62831 wallclock secs ( 1.63 usr +  0.00 sys =  1.63 CPU) @ 613496.93/s (n=1000000)
+	     Mouse: 0.840958 wallclock secs ( 0.84 usr +  0.00 sys =  0.84 CPU) @ 1190476.19/s (n=1000000)
+		   Rate   Moo  Meow Mouse
+	Moo    613497/s    --  -29%  -48%
+	Meow   869565/s   42%    --  -27%
+	Mouse 1190476/s   94%   37%    --
 
 Note: Type::Tiny::XS is installed and so is the other optional XS dependancies for Moo.
 

@@ -30,10 +30,10 @@ my $class = Module::Build->subclass(
 
         sub _update_logo_version {
             my ($s) = @_;
-            print "Updating log ...\n";
+            print "Updating logo ...\n";
 
             require lib;
-            lib->import();
+            lib->import("lib");
 
             require e;
             e->import();

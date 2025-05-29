@@ -1,13 +1,20 @@
 ---
-abstract: 'a postmodern object system for Perl 5, as C<Moose> and C<Moo>, but with improvements'
+abstract: 'a postmodern object system for Perl 5, such as “Mouse”, “Moose”, “Moo”, “Mo” and “M”, but with improvements'
 author:
-  - 'Yaroslav O. Kosmina LL<mailto:dart@cpan.org>'
+  - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
 build_requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
   Test::More: '0.98'
+  common::sense: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +33,16 @@ no_index:
 provides:
   Aion:
     file: lib/Aion.pm
-    version: '0.1'
+    version: '0.3'
   Aion::Type:
     file: lib/Aion/Type.pm
   Aion::Types:
     file: lib/Aion/Types.pm
 requires:
-  Attribute::Handlers: '1.03'
-  Data::Printer: '1.000004'
-  Exporter: '5.77'
-  List::Util: '1.63'
+  Attribute::Handlers: '0.99'
+  DDP: '1.002001'
+  List::Util: '1.68'
+  Math::BigFloat: '0'
   Math::BigInt: '1.999837'
   Scalar::Util: '1.63'
   Sub::Util: '1.63'
@@ -46,11 +53,11 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion/issues
   homepage: https://github.com/darviarush/perl-aion
   repository: https://github.com/darviarush/perl-aion.git
-version: '0.1'
+version: '0.3'
 x_authority: cpan:DART
 x_contributors:
   - 'Iaroslav O. Kosmina <darviarush@ya.ru>'
   - 'Yaroslav O. Kosmina <dart@cpan.org>'
   - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.4.0
+## Version v1.4.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/12/05
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
     use JSON;
     use Module::Generic::TieHash;
     use Regexp::Common;
-    use Want;
+    use Wanted;
     use overload (
         # '""'    => 'as_string',
         'eq'    => sub { _obj_eq(@_) },
@@ -43,7 +43,7 @@ BEGIN
     );
     # Do we allow the use of object as hash keys?
     our $KEY_OBJECT = 0;
-    our( $VERSION ) = 'v1.4.0';
+    our( $VERSION ) = 'v1.4.1';
 };
 
 use strict;
@@ -477,6 +477,15 @@ sub _tie_object
 {
     my $self = shift( @_ );
     return( tied( %$self ) );
+}
+
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    CORE::untie( %$self ) if( $self && CORE::tied( %$self ) );
 }
 
 sub FREEZE

@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::URI qw(check_location);
 use Readonly;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 
 Readonly::Array our @RIGHT_LOCATIONS => qw(
@@ -34,7 +34,14 @@ foreach my $right_url (@RIGHT_LOCATIONS) {
 # Test.
 $self = {};
 $ret = check_location($self, 'key');
-is($ret, undef, 'Right not exist key.');
+is($ret, undef, 'Right location is present (no key).');
+
+# Test.
+$self = {
+	'key' => undef,
+};
+$ret = check_location($self, 'key');
+is($ret, undef, 'Right location is present (undef).');
 
 # Test.
 foreach my $bad_location (@BAD_LOCATIONS) {

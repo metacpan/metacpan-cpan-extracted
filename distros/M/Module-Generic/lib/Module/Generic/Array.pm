@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v2.2.1
+## Version v2.2.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/20
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,11 +17,10 @@ BEGIN
     use common::sense;
     use warnings;
     use warnings::register;
-    use vars qw( $DEBUG $ERROR $ERRORS $RETURN $TRUE $FALSE );
-    use Config;
+    use vars qw( $DEBUG $ERROR $TRUE $FALSE );
     use List::Util ();
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     no warnings;
     use overload (
         # Turned out to be not such a good ide as it create unexpected results, especially when this is an array of overloaded objects
@@ -33,29 +32,12 @@ BEGIN
         '%{}' => 'as_hash',
         fallback => 1,
     );
-    use constant BREAK_LOOP => \"BREAK";
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    our( $ERRORS, $RETURN );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    
-        my %err :shared;
-        my %ret :shared;
-    
-        $ERRORS = \%err;
-        $RETURN = \%ret;
-    }
-    else
-    {
-        $ERRORS = {};
-        $RETURN = {};
-    }
-    $DEBUG  = 0;
-    our $VERSION = 'v2.2.1';
+    use constant BREAK_LOOP => 'BREAK';
+
+    use Module::Generic::Global ':const';
+
+    $DEBUG = 0;
+    our $VERSION = 'v2.2.3';
 };
 
 use v5.26.1;
@@ -88,7 +70,7 @@ sub new
     CORE::return( bless( $init => ( ref( $this ) || $this ) ) );
 }
 
-sub append { return( CORE::shift->push( @_ ) ); }
+sub append { CORE::return( CORE::shift->push( @_ ) ); }
 
 sub as_array { CORE::return( $_[0] ); }
 
@@ -107,19 +89,14 @@ sub as_hash
             $offsets->[ $i ] += $start;
         }
     }
-    
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Hash;
-        $loaded = 1;
-    }
+
+    $self->_load_class( 'Module::Generic::Hash' ) ||
+        CORE::return( $self->pass_error );
     # Since our array might contain reference, we instantiate first our special hash object, and then we add into it our elements
     # Module::Generic::Hash, that uses Module::Generic::TieHash, knows how to handle keys as reference
     my $ref = Module::Generic::Hash->new;
     @$ref{ @$self } = @$offsets;
-    return( $ref );
+    CORE::return( $ref );
 }
 
 sub as_string
@@ -134,8 +111,10 @@ sub as_string
 sub break
 {
     my $self = CORE::shift( @_ );
-    my $id   = Scalar::Util::refaddr( $self );
-    CORE::return( $RETURN->{ $id } = BREAK_LOOP );
+    my $repo = Module::Generic::Global->new( 'return' => $self );
+    my $val  = BREAK_LOOP;
+    $repo->set( $val );
+    CORE::return( $val );
 }
 
 sub callback
@@ -145,42 +124,42 @@ sub callback
     if( !defined( $what ) )
     {
         warnings::warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
-        return;
+        CORE::return;
     }
     elsif( $what ne 'add' && $what ne 'remove' )
     {
         warnings::warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
-        return;
+        CORE::return;
     }
-    elsif( scalar( @_ ) == 1 )
+    elsif( CORE::scalar( @_ ) == 1 )
     {
         warnings::warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
-        return;
+        CORE::return;
     }
     elsif( defined( $code ) && ref( $code ) ne 'CODE' )
     {
         warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic::Array' ) );
-        return;
+        CORE::return;
     }
     
     if( !defined( $code ) )
     {
         # undef is passed as an argument, so we remove the callback
-        if( scalar( @_ ) >= 2 )
+        if( CORE::scalar( @_ ) >= 2 )
         {
             # The array is not tied, so there is nothing to remove.
             my $tie = tied( @$self );
-            return(1) if( !$tie );
+            CORE::return(1) if( !$tie );
             my $rv = $tie->unset_callback( $what );
             untie( @$self ) if( !$tie->has_callback );
-            return( $rv );
+            CORE::return( $rv );
         }
         # Only 1 argument: get mode only
         else
         {
             my $tie = tied( @$self );
-            return if( !$tie );
-            return( $tie->get_callback( $what ) );
+            CORE::return if( !$tie );
+            CORE::return( $tie->get_callback( $what ) );
         }
     }
     # $code is defined, so we have something to set
@@ -195,11 +174,11 @@ sub callback
                 data => $self,
                 debug => $DEBUG,
                 $what => $code,
-            }) || return;
-            return(1);
+            }) || CORE::return;
+            CORE::return(1);
         }
-        $tie->set_callback( $what => $code ) || return;
-        return(1);
+        $tie->set_callback( $what => $code ) || CORE::return;
+        CORE::return(1);
     }
 }
 
@@ -216,7 +195,7 @@ sub concat
 {
     my $self = CORE::shift( @_ );
     my $new = $self->clone;
-    for( my $i = 0; $i < scalar( @_ ); $i++ )
+    for( my $i = 0; $i < CORE::scalar( @_ ); $i++ )
     {
         if( !defined( $_[$i] ) ||
             ( Scalar::Util::reftype( $_[$i] ) // '' ) ne 'ARRAY' )
@@ -225,7 +204,7 @@ sub concat
         }
         $new->push( @{$_[$i]} );
     }
-    return( $new );
+    CORE::return( $new );
 }
 
 sub contains { CORE::return( CORE::shift->exists( @_ ) ); }
@@ -247,7 +226,7 @@ sub delete
             CORE::return( $self );
         }
         my @removed = CORE::splice( @$self, $offset, CORE::defined( $length ) ? CORE::int( $length ) : 1 );
-        if( Want::want( 'LIST' ) )
+        if( Wanted::want( 'LIST' ) )
         {
             rreturn( @removed );
         }
@@ -255,7 +234,7 @@ sub delete
         {
             rreturn( $self->new( \@removed ) );
         }
-        # Required to make the compiler happy, as per Want documentation
+        # Required to make the compiler happy, as per Wanted documentation
         CORE::return;
     }
     CORE::return( $self );
@@ -296,6 +275,8 @@ sub error
     my $class = ref( $self ) || $self;
     my $o;
     no strict 'refs';
+    my $repo = Module::Generic::Global->new( 'errors' => $self );
+
     if( @_ )
     {
         my $args = {};
@@ -314,7 +295,7 @@ sub error
         {
             $args->{message} = CORE::join( '', CORE::map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
         }
-        
+
         $args->{class} //= '';
         my $ex_class = CORE::length( $args->{class} )
             ? $args->{class}
@@ -332,22 +313,12 @@ sub error
         }
 
         $o = $ex_class->new( $args );
-        if( HAS_THREADS && is_shared( $ERRORS ) )
-        {
-            lock( $ERRORS );
-            $ERRORS->{ $addr } = $ERROR = $o;
-        }
-        else
-        {
-            $ERRORS->{ $addr } = $ERROR = $o;
-        }
+        $repo->set( $o );
+        $ERROR = $o;
+
+        # try-catch
         local $@;
-        eval
-        {
-            require Encode;
-        };
-        
-        if( $@ )
+        if( !$self->_is_class_loaded( 'Encode' ) && !eval( 'require Encode' ) )
         {
             warn( $o ) if( $self->_warnings_is_enabled );
         }
@@ -364,31 +335,33 @@ sub error
 
         if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
-            state $loaded;
-            unless( $loaded )
+            # try-catch
+            local $@;
+            if( !$self->_is_class_loaded( 'Module::Generic::Null' ) )
             {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Null;
-                $loaded = 1;
+                eval( 'require Module::Generic::Null' );
+                die( "Unable to load module Module::Generic::Null" ) if( $@ );
             }
             my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, has_error => 1 });
             rreturn( $null );
         }
-        return;
+        CORE::return;
     }
-    if( !$ERRORS->{ $addr } && want( 'OBJECT' ) )
+
+    $o = $repo->get;
+    if( !$o && want( 'OBJECT' ) )
     {
-        state $loaded;
-        unless( $loaded )
+        # try-catch
+        local $@;
+        if( !$self->_is_class_loaded( 'Module::Generic::Null' ) )
         {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Null;
-            $loaded = 1;
+            eval( 'require Module::Generic::Null' );
+            die( "Unable to load module Module::Generic::Null" ) if( $@ );
         }
         my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, wants => 'object' });
         rreturn( $null );
     }
-    return( $ERRORS->{ $addr } );
+    CORE::return( $o );
 }
 
 # Credits: <https://www.perlmonks.org/?node_id=871696>
@@ -404,13 +377,13 @@ sub except
 {
     my $self = CORE::shift( @_ );
     my $ref;
-    if( scalar( @_ ) == 1 && 
+    if( CORE::scalar( @_ ) == 1 && 
         Scalar::Util::blessed( $_[0] ) && 
         $_[0]->isa( 'Module::Generic::Array' ) )
     {
         $ref = CORE::shift( @_ );
     }
-    elsif( scalar( @_ ) == 1 &&
+    elsif( CORE::scalar( @_ ) == 1 &&
            ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' )
     {
         $ref = $self->new( CORE::shift( @_ ) );
@@ -447,12 +420,12 @@ sub filter
     my( $code, $this ) = @_;
     CORE::return if( ref( $code ) ne 'CODE' );
     my $n = -1;
-    return( $self->map(sub
+    CORE::return( $self->map(sub
     {
         local $_ = CORE::shift( @_ );
         my $rv = $code->( ( defined( $this ) ? $this : () ), $_, ++$n, $self );
-        return if( !$rv );
-        return( $_ );
+        CORE::return if( !$rv );
+        CORE::return( $_ );
     }) );
 }
 
@@ -464,29 +437,29 @@ sub for
     my $code = CORE::shift( @_ );
     CORE::return if( ref( $code ) ne 'CODE' );
     $self->return_reset;
-    CORE::for( my $i = 0; $i < scalar( @$self ); $i++ )
+    CORE::for( my $i = 0; $i < CORE::scalar( @$self ); $i++ )
     {
         local $_ = $self->[ $i ];
         my $rv = $code->( $i, $self->[ $i ] );
         CORE::last if( CORE::defined( $rv ) && CORE::length( "$rv" ) && ( $rv eq BREAK_LOOP || !$rv ) );
+
         if( defined( my $ret = $self->return ) )
         {
             $rv = $ret;
             $self->return_reset;
         }
-        
-        if( CORE::ref( $rv ) eq 'SCALAR' )
+
+        # If it's a scalar ref, dereference it
+        my $value = ref( $rv ) eq 'SCALAR' ? $$rv : $rv;
+
+        CORE::last if( defined( $value ) && length( $value ) && ( $value eq BREAK_LOOP || !$value ) );
+
+        if( ref( $rv ) eq 'SCALAR' && defined( $$rv ) && $$rv =~ /^[\-\+]?\d+$/ )
         {
-            if( !CORE::defined( $$rv ) || !CORE::length( $$rv ) || $rv eq BREAK_LOOP )
-            {
-                CORE::last;
-            }
-            elsif( $$rv =~ /^[\-\+]?\d+$/ )
-            {
-                $i += int( $$rv );
-            }
+            $i += int( $$rv );
         }
     }
+    $self->return_reset;
     CORE::return( $self );
 }
 
@@ -503,18 +476,17 @@ sub foreach
         # my $rv = $code->( $v );
         my $rv = $code->( $_ );
         CORE::last if( CORE::defined( $rv ) && CORE::length( "$rv" ) && ( $rv eq BREAK_LOOP || !$rv ) );
-        if( CORE::defined( my $ret = $self->return ) )
+
+        if( defined( my $ret = $self->return ) )
         {
             $rv = $ret;
             $self->return_reset;
         }
-        if( CORE::ref( $rv ) eq 'SCALAR' )
-        {
-            if( !CORE::defined( $$rv ) || !CORE::length( $$rv ) || $rv eq BREAK_LOOP )
-            {
-                CORE::last;
-            }
-        }
+
+        # If it's a scalar ref, dereference it
+        my $value = ref( $rv ) eq 'SCALAR' ? $$rv : $rv;
+
+        CORE::last if( defined( $value ) && length( $value ) && ( $value eq BREAK_LOOP || !$value ) );
     }
     $self->return_reset;
     CORE::return( $self );
@@ -529,13 +501,8 @@ sub get
     # offset may be out of bound, which will lead Module::Generic::Scalar to hold an undefined value or the offset exists but contains an undef value which will lead to the same
     if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || ( Scalar::Util::reftype( $self->[ $offset ] ) // '' ) eq 'SCALAR' ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Scalar;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Scalar' ) ||
+            die( "Unable to load module Module::Generic::Scalar" );
         rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
     }
     # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
@@ -553,13 +520,8 @@ sub get_null
     {
         if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || ( Scalar::Util::reftype( $self->[ $offset ] ) // '' ) eq 'SCALAR' ) )
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Scalar;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::Scalar' ) ||
+                die( "Unable to load module Module::Generic::Scalar" );
             rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
         }
         # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
@@ -570,15 +532,10 @@ sub get_null
     }
     else
     {
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
-            state $loaded;
-            unless( $loaded )
-            {
-                lock( $loaded ) if( HAS_THREADS );
-                require Module::Generic::Null;
-                $loaded = 1;
-            }
+            $self->_load_class( 'Module::Generic::Null' ) ||
+                die( "Unable to load module Module::Generic::Null" );
             rreturn( Module::Generic::Null->new( wants => 'object' ) );
         }
         CORE::return( $self->[ $offset ] );
@@ -603,7 +560,7 @@ sub grep
             : qr/\Q$expr\E/;
         $ref = ( $invert ? [ CORE::grep( $_ !~ /$expr/, @$self ) ] : [ CORE::grep( $_ =~ /$expr/, @$self ) ] );
     }
-    if( Want::want( 'LIST' ) )
+    if( Wanted::want( 'LIST' ) )
     {
         CORE::return( @$ref );
     }
@@ -622,13 +579,8 @@ sub index
     my $pos  = CORE::int( CORE::shift( @_ ) );
     if( want( 'OBJECT' ) && ( !ref( $self->[ $pos ] ) || ( Scalar::Util::reftype( $self->[ $pos ] ) // '' ) eq 'SCALAR' ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Scalar;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Scalar' ) ||
+            die( "Unable to load module Module::Generic::Scalar" );
         rreturn( Module::Generic::Scalar->new( $self->[ $pos ] ) );
     }
     else
@@ -651,14 +603,10 @@ sub is_empty { CORE::return( CORE::scalar( @{$_[0]} ) ? $FALSE : $TRUE ) }
 # sub iterator { CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) ); }
 sub iterator
 {
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Iterator;
-        $loaded = 1;
-    }
-    CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) );
+    my $self  = CORE::shift( @_ );
+    $self->_load_class( 'Module::Generic::Iterator' ) ||
+        die( "Unable to load module Module::Generic::Iterator" );
+    CORE::return( Module::Generic::Iterator->new( $self ) );
 }
 
 sub join
@@ -670,12 +618,12 @@ sub join
 sub keys
 {
     my $self = CORE::shift( @_ );
-    CORE::return( $self->new( scalar( @$self ) ? [ CORE::keys( @$self ) ] : [] ) );
+    CORE::return( $self->new( CORE::scalar( @$self ) ? [ CORE::keys( @$self ) ] : [] ) );
 }
 
 sub last { CORE::return( CORE::shift->get_null(-1) ); }
 
-sub length { CORE::return( $_[0]->_number( scalar( @{$_[0]} ) ) ); }
+sub length { CORE::return( $_[0]->_number( CORE::scalar( @{$_[0]} ) ) ); }
 
 sub list { CORE::return( @{$_[0]} ); }
 
@@ -685,11 +633,11 @@ sub map
     my $code = CORE::shift( @_ );
     CORE::return if( ref( $code ) ne 'CODE' );
     my $ref = [ CORE::map( $code->( $_ ), @$self ) ];
-    if( Want::want( 'OBJECT' ) )
+    if( Wanted::want( 'OBJECT' ) )
     {
         CORE::return( $self->new( $ref ) );
     }
-    elsif( Want::want( 'LIST' ) )
+    elsif( Wanted::want( 'LIST' ) )
     {
         CORE::return( @$ref );
     }
@@ -702,14 +650,9 @@ sub map
 sub max
 {
     my $self = CORE::shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
-    return( Module::Generic::Scalar->new( List::Util::max( @$self ) ) );
+    $self->_load_class( 'Module::Generic::Scalar' ) ||
+        die( "Unable to load module Module::Generic::Scalar" );
+    CORE::return( Module::Generic::Scalar->new( List::Util::max( @$self ) ) );
 }
 
 sub merge
@@ -731,19 +674,14 @@ sub merge
 sub min
 {
     my $self = CORE::shift( @_ );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
-    return( Module::Generic::Scalar->new( List::Util::min( @$self ) ) );
+    $self->_load_class( 'Module::Generic::Scalar' ) ||
+        die( "Unable to load module Module::Generic::Scalar" );
+    CORE::return( Module::Generic::Scalar->new( List::Util::min( @$self ) ) );
 }
 
 sub ninth { CORE::return( CORE::shift->get_null(8) ); }
 
-sub object { return( $_[0] ); }
+sub object { CORE::return( $_[0] ); }
 
 # Credits: <https://www.perlmonks.org/?node_id=871696>
 sub odd
@@ -757,7 +695,7 @@ sub offset
 {
     my $self = CORE::shift( @_ );
     my( $pos, $len ) = @_;
-    if( scalar( @_ ) >= 2 )
+    if( CORE::scalar( @_ ) >= 2 )
     {
         CORE::return(
             int( $len ) < 0 
@@ -780,15 +718,10 @@ sub pack
 sub pop
 {
     my $self = CORE::shift( @_ );
-    if( Want::want( 'OBJECT' ) && ( !ref( $self->[-1] ) || ( Scalar::Util::reftype( $self->[-1] ) // '' ) eq 'SCALAR' ) )
+    if( Wanted::want( 'OBJECT' ) && ( !ref( $self->[-1] ) || ( Scalar::Util::reftype( $self->[-1] ) // '' ) eq 'SCALAR' ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Scalar;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Scalar' ) ||
+            die( "Unable to load module Module::Generic::Scalar" );
         rreturn( Module::Generic::Scalar->new( CORE::pop( @$self ) ) );
     }
     else
@@ -815,7 +748,7 @@ sub pos
     CORE::return;
 }
 
-sub prepend { return( CORE::shift->unshift( @_ ) ); }
+sub prepend { CORE::return( CORE::shift->unshift( @_ ) ); }
 
 sub push
 {
@@ -861,7 +794,7 @@ sub reduce
     {
         ( $accumulator, $pos ) = ( $self->[0], 1 );
     }
-    for( my $i = $pos; $i < scalar( @$self ); $i++ )
+    for( my $i = $pos; $i < CORE::scalar( @$self ); $i++ )
     {
         # try-catch
         local $@;
@@ -875,20 +808,20 @@ sub reduce
             CORE::return( $self->error( "Error calling reduce callback: $@" ) );
         }
     }
-    return( $accumulator );
+    CORE::return( $accumulator );
 }
 
 sub remove
 {
     my $self = CORE::shift( @_ );
     my $ref;
-    if( scalar( @_ ) == 1 && 
+    if( CORE::scalar( @_ ) == 1 && 
         Scalar::Util::blessed( $_[0] ) && 
         $_[0]->isa( 'Module::Generic::Array' ) )
     {
         $ref = CORE::shift( @_ );
     }
-    elsif( scalar( @_ ) == 1 &&
+    elsif( CORE::scalar( @_ ) == 1 &&
            ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' )
     {
         $ref = $self->new( CORE::shift( @_ ) );
@@ -908,9 +841,9 @@ sub replace
     my $self = CORE::shift( @_ );
     my( $old, $new ) = @_;
     my $pos = $self->pos( $old );
-    return if( !defined( $pos ) );
+    CORE::return if( !defined( $pos ) );
     $self->[ $pos ] = $new;
-    return( $self );
+    CORE::return( $self );
 }
 
 sub reset
@@ -918,7 +851,7 @@ sub reset
     my $self = CORE::shift( @_ );
     if( @_ )
     {
-        warn( "Warning only: ", ref( $self ), "::reset() called with ", scalar( @_ ), " arguments, but I was not expecting any. Called from package \"", [caller]->[0], "\" at line ", [caller]->[2], " from subroutine ", [caller]->[3], "\n" );
+        warn( "Warning only: ", ref( $self ), "::reset() called with ", CORE::scalar( @_ ), " arguments, but I was not expecting any. Called from package \"", [caller]->[0], "\" at line ", [caller]->[2], " from subroutine ", [caller]->[3], "\n" );
     }
     @$self = ();
     CORE::return( $self );
@@ -927,28 +860,26 @@ sub reset
 sub return
 {
     my $self = CORE::shift( @_ );
-    my $id   = Scalar::Util::refaddr( $self );
+    my $repo = Module::Generic::Global->new( 'return' => $self );
+
     if( @_ )
     {
-        if( HAS_THREADS )
-        {
-            lock( $RETURN );
-            $RETURN->{ $id } = \( CORE::shift( @_ ) );
-        }
-        else
-        {
-            $RETURN->{ $id } = \( CORE::shift( @_ ) );
-        }
-        CORE::return( '' ) if( !CORE::defined( ${$RETURN->{ $id }} ) );
+        my $this = CORE::shift( @_ );
+        my $val  = \$this;
+        $repo->set( $val );
+        CORE::return( '' ) if( !CORE::defined( $$val ) );
     }
-    CORE::return( $RETURN->{ $id } );
+
+    CORE::return( $repo->get );
 }
 
 sub return_reset
 {
     my $self = CORE::shift( @_ );
-    my $id   = Scalar::Util::refaddr( $self );
-    CORE::return( CORE::delete( $RETURN->{ $id } ) );
+    my $repo = Module::Generic::Global->new( 'return' => $self );
+    my $val  = $repo->get;
+    $repo->remove;
+    CORE::return( $val );
 }
 
 sub reverse
@@ -972,7 +903,7 @@ sub second { CORE::return( CORE::shift->get_null(1) ); }
 sub set
 {
     my $self = CORE::shift( @_ );
-    my $ref = ( scalar( @_ ) == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? CORE::shift( @_ ) : [ @_ ];
+    my $ref = ( CORE::scalar( @_ ) == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? CORE::shift( @_ ) : [ @_ ];
     @$self = @$ref;
     CORE::return( $self );
 }
@@ -982,15 +913,10 @@ sub seventh { CORE::return( CORE::shift->get_null(6) ); }
 sub shift
 {
     my $self = CORE::shift( @_ );
-    if( Want::want( 'OBJECT' ) && ( !ref( $self->[0] ) || ( Scalar::Util::reftype( $self->[0] ) // '' ) eq 'SCALAR' ) )
+    if( Wanted::want( 'OBJECT' ) && ( !ref( $self->[0] ) || ( Scalar::Util::reftype( $self->[0] ) // '' ) eq 'SCALAR' ) )
     {
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Module::Generic::Scalar;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Module::Generic::Scalar' ) ||
+            die( "Unable to load module Module::Generic::Scalar" );
         rreturn( Module::Generic::Scalar->new( CORE::shift( @$self ) ) );
     }
     else
@@ -1019,7 +945,7 @@ sub sort
     {
         $ref = [ CORE::sort( @$self ) ];
     }
-    if( Want::want( 'LIST' ) )
+    if( Wanted::want( 'LIST' ) )
     {
         CORE::return( @$ref );
     }
@@ -1037,23 +963,23 @@ sub splice
     {
         warn( "Offset provided for splice \"$offset\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
         ## If a list was provided, the user is not looking to get an element removed, but add it, so we return out object
-        CORE::return( $self ) if( scalar( @list ) );
+        CORE::return( $self ) if( CORE::scalar( @list ) );
         CORE::return;
     }
     if( defined( $length ) && int( $length ) !~ /^\-?\d+$/ )
     {
         warn( "Length provided for splice \"$length\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
-        CORE::return( $self ) if( scalar( @list ) );
+        CORE::return( $self ) if( CORE::scalar( @list ) );
         CORE::return;
     }
     # Adding elements, so we return our object and allow chaining
     # @_ = offset, length, replacement list
-    if( scalar( @_ ) > 2 )
+    if( CORE::scalar( @_ ) > 2 )
     {
         CORE::splice( @$self, int( $offset ), int( $length ), @list );
         CORE::return( $self );
     }
-    elsif( !scalar( @_ ) )
+    elsif( !CORE::scalar( @_ ) )
     {
         CORE::splice( @$self );
         CORE::return( $self );
@@ -1062,7 +988,7 @@ sub splice
     {
         if( CORE::defined( $offset ) && CORE::defined( $length ) )
         {
-            if( Want::want( 'OBJECT' ) )
+            if( Wanted::want( 'OBJECT' ) )
             {
                 rreturn( $self->new( [CORE::splice( @$self, int( $offset ), int( $length ) )] ) );
             }
@@ -1073,7 +999,7 @@ sub splice
         }
         elsif( CORE::defined( $offset ) )
         {
-            if( Want::want( 'OBJECT' ) )
+            if( Wanted::want( 'OBJECT' ) )
             {
                 rreturn( $self->new( [CORE::splice( @$self, int( $offset ) )] ) );
             }
@@ -1129,7 +1055,7 @@ sub values
 {
     my $self = CORE::shift( @_ );
     my $ref = [ CORE::values( @$self ) ];
-    if( Want::want( 'LIST' ) )
+    if( Wanted::want( 'LIST' ) )
     {
         CORE::return( @$ref );
     }
@@ -1144,19 +1070,58 @@ sub _boolean
     my $self = CORE::shift( @_ );
 }
 
+sub _is_class_loaded
+{
+    my $self = CORE::shift( @_ );
+    my $class = CORE::shift( @_ );
+    ( my $pm = $class ) =~ s{::}{/}gs;
+    $pm .= '.pm';
+    CORE::return(1) if( CORE::exists( $INC{ $pm } ) );
+    CORE::return(0);
+}
+
+sub _load_class
+{
+    my $self = CORE::shift( @_ );
+    my $class = CORE::shift( @_ );
+    die( "No class was provided to load." ) if( !$class );
+    my $args = [@_];
+    my $is_loaded = $self->_is_class_loaded( $class );
+    if( $is_loaded )
+    {
+        if( CORE::scalar( @$args ) )
+        {
+            my $pl = "$class->import(" . ( CORE::scalar( @$args ) ? "'" . CORE::join( "', '", @$args ) . "'" : '' ) . ");";
+            eval( $pl );
+            CORE::return( $self->error( "Error importing class $class: $@" ) ) if( $@ );
+        }
+        CORE::return( $class );
+    }
+
+    local $@;
+    local $SIG{__DIE__} = sub{};
+
+    # Load the module with thread safety
+    my $key  = HAS_THREADS ? CORE::join( ';', $class, threads->tid() ) : $class;
+    my $repo = Module::Generic::Global->new( 'loaded_classes' => CORE::ref( $self ), key => $key );
+    my $pl = "require $class;";
+    eval( $pl );
+    CORE::return( $self->error( "Unable to load package ${class}: $@\nCode executed was:\n${pl}" ) ) if( $@ );
+    $pl = "$class->import(" . ( CORE::scalar( @$args ) ? "'" . CORE::join( "', '", @$args ) . "'" : '' ) . ");";
+    eval( $pl );
+    CORE::return( $self->error( "Error importing class $class: $@" ) ) if( $@ );
+    $repo->set(1);
+    CORE::return( $class );
+}
+
 sub _number
 {
     my $self = CORE::shift( @_ );
     my $num = CORE::shift( @_ );
     CORE::return if( !defined( $num ) );
     CORE::return( $num ) if( !CORE::length( $num ) );
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Number;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Number' ) ||
+        die( "Unable to load module Module::Generic::Number" );
     CORE::return( Module::Generic::Number->new( $num ) );
 }
 
@@ -1190,13 +1155,8 @@ sub _scalar
     my $str  = CORE::shift( @_ );
     CORE::return if( !defined( $str ) );
     # Whether empty or not, return an object
-    state $loaded;
-    unless( $loaded )
-    {
-        lock( $loaded ) if( HAS_THREADS );
-        require Module::Generic::Scalar;
-        $loaded = 1;
-    }
+    $self->_load_class( 'Module::Generic::Scalar' ) ||
+        die( "Unable to load module Module::Generic::Scalar" );
     CORE::return( Module::Generic::Scalar->new( $str ) );
 }
 
@@ -1204,24 +1164,18 @@ sub _warnings_is_enabled { CORE::return( warnings::enabled( ref( $_[0] ) || $_[0
 
 sub DESTROY
 {
-    local( $., $@, $!, $^E, $? );
-    my $self = CORE::shift( @_ );
-    my $id = Scalar::Util::refaddr( $self );
-    CORE::delete( $ERRORS->{ $id } );
-    CORE:delete( $RETURN->{ $id } );
-    if( HAS_THREADS && is_shared( $ERRORS ) )
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+
+    for my $namespace ( qw( errors return loaded_classes ) )
     {
-        lock( $ERRORS );
-        lock( $RETURN );
-        CORE::delete( $ERRORS->{ $id } );
-        CORE:delete( $RETURN->{ $id } );
+        if( my $obj = Module::Generic::Global->new( $namespace => $self ) )
+        {
+            $obj->remove;
+        }
     }
-    else
-    {
-        CORE::delete( $ERRORS->{ $id } );
-        CORE:delete( $RETURN->{ $id } );
-    }
-    return( $self );
 }
 
 sub FREEZE
@@ -1290,12 +1244,12 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         if( CORE::length( $opts->{add} ) && ref( $opts->{add} ) ne 'CODE' )
         {
             warnings::warn( "Code provided for the array add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $opts->{debug} );
-            return;
+            CORE::return;
         }
         if( CORE::length( $opts->{remove} ) && ref( $opts->{remove} ) ne 'CODE' )
         {
             warnings::warn( "Code provided for the array remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $opts->{debug} );
-            return;
+            CORE::return;
         }
         
         my $ref =
@@ -1305,8 +1259,8 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         data => ( ( Scalar::Util::reftype( $opts->{data} ) // '' ) eq 'ARRAY' ? [@{$opts->{data}}] : [] ),
         debug => $opts->{debug},
         };
-        print( STDERR ( ref( $class ) || $class ), "::TIEARRAY: Using ", scalar( @{$ref->{data}} ), " elements in array vs ", scalar( @{$opts->{data}} ), " received via opts->data.\n" ) if( $ref->{debug} );
-        return( bless( $ref => ( ref( $class ) || $class ) ) );
+        print( STDERR ( ref( $class ) || $class ), "::TIEARRAY: Using ", CORE::scalar( @{$ref->{data}} ), " elements in array vs ", CORE::scalar( @{$opts->{data}} ), " received via opts->data.\n" ) if( $ref->{debug} );
+        CORE::return( bless( $ref => ( ref( $class ) || $class ) ) );
     }
     
     sub CLEAR
@@ -1329,7 +1283,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             $rv = $cb->( $def );
         }
         print( STDERR ref( $self ), "::CLEAR: removing all data from 0 to ", $#$data, " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
-        return if( !defined( $rv ) );
+        CORE::return if( !defined( $rv ) );
         @{$self->{data}} = ();
     }
     
@@ -1337,7 +1291,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
     {
         my( $self, $key ) = @_;
         my $data = $self->{data};
-        return(0) if( $key > $#$data || $key < 0 );
+        CORE::return(0) if( $key > $#$data || $key < 0 );
         my $cb = $self->{callback_remove} || $dummy_callback;
         my $rv;
         if( !$cb )
@@ -1354,16 +1308,16 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             $rv = $cb->( $def );
         }
         print( STDERR ref( $self ), "::DELETE: removing data from $key to ", ( $key + 1 ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
-        return if( !defined( $rv ) );
-        return( CORE::splice( @$data, $key, 1 ) );
+        CORE::return if( !defined( $rv ) );
+        CORE::return( CORE::splice( @$data, $key, 1 ) );
     }
     
     sub EXISTS
     {
         my( $self, $key ) = @_;
         my $data = $self->{data};
-        return(0) if( $key > $#$data || $key < 0 );
-        return(1);
+        CORE::return(0) if( $key > $#$data || $key < 0 );
+        CORE::return(1);
     }
     
     sub EXTEND
@@ -1375,14 +1329,14 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
     sub FETCH
     {
         my( $self, $index ) = @_;
-        return( $self->{data}->[ $index ] );
+        CORE::return( $self->{data}->[ $index ] );
     }
     
     sub FETCHSIZE
     {
         my $self = shift( @_ );
         my $data = $self->{data};
-        return( $#$data + 1 );
+        CORE::return( $#$data + 1 );
     }
     
     sub POP
@@ -1405,8 +1359,8 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             $rv = $cb->( $def );
         }
         print( STDERR ref( $self ), "::POP: removing data from ", $#$data, " to ", ( $#$data + 1 ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
-        return if( !defined( $rv ) );
-        return( CORE::splice( @$data, -1 ) );
+        CORE::return if( !defined( $rv ) );
+        CORE::return( CORE::splice( @$data, -1 ) );
     }
     
     sub PUSH
@@ -1428,8 +1382,8 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             local $_ = $def;
             $rv = $cb->( $def );
         }
-        print( STDERR ref( $self ), "::PUSH: adding ", scalar( @values ), " data at position ", ( $#$data + 1 ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), ". Array contains ", scalar( @$data ), " elements.\n" ) if( $self->{debug} );
-        return if( !defined( $rv ) );
+        print( STDERR ref( $self ), "::PUSH: adding ", CORE::scalar( @values ), " data at position ", ( $#$data + 1 ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), ". Array contains ", CORE::scalar( @$data ), " elements.\n" ) if( $self->{debug} );
+        CORE::return if( !defined( $rv ) );
         CORE::splice( @$data, ( $#$data + 1 ), 0, @values );
     }
     
@@ -1452,8 +1406,8 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             local $_ = $def;
             $rv = $cb->( $def );
         }
-        return if( !defined( $rv ) );
-        return( CORE::splice( @$data, 0, 1 ) );
+        CORE::return if( !defined( $rv ) );
+        CORE::return( CORE::splice( @$data, 0, 1 ) );
     }
     
     sub SPLICE
@@ -1464,9 +1418,9 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         $offset //= 0;
         $offset += $size if( $offset < 0 );
         $len //= ( ( $#$data + 1 ) - $offset );
-        print( STDERR ref( $self ), "::SPLICE: called with offset '$offset', length '$len' and ", scalar( @values ), "\n" ) if( $self->{debug} );
+        print( STDERR ref( $self ), "::SPLICE: called with offset '$offset', length '$len' and ", CORE::scalar( @values ), "\n" ) if( $self->{debug} );
         my $rv;
-        if( scalar( @values ) )
+        if( CORE::scalar( @values ) )
         {
             my $cb = $self->{callback_add} || $dummy_callback;
             if( !$cb )
@@ -1482,7 +1436,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
                 local $_ = $def;
                 $rv = $cb->( $def );
             }
-            print( STDERR ref( $self ), "::SPLICE: adding ", scalar( @values ), " data at position $offset -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+            print( STDERR ref( $self ), "::SPLICE: adding ", CORE::scalar( @values ), " data at position $offset -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
         }
         else
         {
@@ -1502,8 +1456,8 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             }
             print( STDERR ref( $self ), "::SPLICE: removing data from $offset to ", ( $offset + $len ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
         }
-        return if( !defined( $rv ) );
-        return( CORE::splice( @$data, $offset, $len, @values ) );
+        CORE::return if( !defined( $rv ) );
+        CORE::return( CORE::splice( @$data, $offset, $len, @values ) );
     }
     
     sub STORE
@@ -1525,7 +1479,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             $rv = $cb->( $def );
         }
         print( STDERR ref( $self ), "::STORE: adding 1 data at position $index -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
-        return if( !defined( $rv ) );
+        CORE::return if( !defined( $rv ) );
         $self->{data}->[ $index ] = $value;
     }
     
@@ -1564,9 +1518,9 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             local $_ = $def;
             $rv = $cb->( $def );
         }
-        print( STDERR ref( $self ), "::UNSHIFT: adding ", scalar( @values ), " data at position 0 -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
-        return if( !defined( $rv ) );
-        return( CORE::splice( @$data, 0, 0, @values ) );
+        print( STDERR ref( $self ), "::UNSHIFT: adding ", CORE::scalar( @values ), " data at position 0 -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        CORE::return if( !defined( $rv ) );
+        CORE::return( CORE::splice( @$data, 0, 0, @values ) );
     }
     
     sub UNTIE
@@ -1581,19 +1535,19 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $frame = 2;
         my $info = [caller( $frame )];
         print( STDERR ref( $self ), "::get_caller: At frame $frame, called from package ", $info->[0], " at line ", $info->[2], "\n" ) if( $self->{debug} );
-        while( scalar( @$info ) && substr( $info->[0], 0, 22 ) eq 'Module::Generic::Array' )
+        while( CORE::scalar( @$info ) && substr( $info->[0], 0, 22 ) eq 'Module::Generic::Array' )
         {
             $info = [caller( ++$frame )];
             print( STDERR ref( $self ), "::get_caller: At frame $frame, called from package ", $info->[0], " at line ", $info->[2], "\n" ) if( $self->{debug} );
         }
-        return( $info );
+        CORE::return( $info );
     }
     
     sub has_callback
     {
         my $self = shift( @_ );
-        return(1) if( ref( $self->{callback_add} ) eq 'CODE' || ref( $self->{callback_remove} ) eq 'CODE' );
-        return(0);
+        CORE::return(1) if( ref( $self->{callback_add} ) eq 'CODE' || ref( $self->{callback_remove} ) eq 'CODE' );
+        CORE::return(0);
     }
     
     sub set_callback
@@ -1602,25 +1556,25 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         if( !defined( $what ) )
         {
             warn( "No callback type was provided. Use \"add\" or \"remove\".\n" );
-            return;
+            CORE::return;
         }
         elsif( $what ne 'add' && $what ne 'remove' )
         {
             warn( "Unknown callback type was provided: '$what'. Use \"add\" or \"remove\".\n" );
-            return;
+            CORE::return;
         }
         elsif( !defined( $code ) )
         {
             warn( "No callback anonymous subroutine or subroutine reference was provided.\n" );
-            return;
+            CORE::return;
         }
         elsif( ref( $code ) ne 'CODE' )
         {
             warn( "Callback provided (", overload::StrVal( $code ), ") is not a code reference.\n" );
-            return;
+            CORE::return;
         }
         $self->{ "callback_${what}" } = $code;
-        return(1);
+        CORE::return(1);
     }
     
     sub unset_callback
@@ -1629,15 +1583,15 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         if( !defined( $what ) )
         {
             warn( "No callback type was provided. Use \"add\" or \"remove\".\n" );
-            return;
+            CORE::return;
         }
         elsif( $what ne 'add' && $what ne 'remove' )
         {
             warn( "Unknown callback type was provided: '$what'. Use \"add\" or \"remove\".\n" );
-            return;
+            CORE::return;
         }
         $self->{ "callback_${what}" } = undef;
-        return(1);
+        CORE::return(1);
     }
 }
 

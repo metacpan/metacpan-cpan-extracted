@@ -17,9 +17,10 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use warnings::register;
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $AUTOLOAD $VERSION $DEBUG );
+    use Config;
+    use Module::Generic::Global ':const';
     use Scalar::Util ();
-    # use Class::ISA;
     our $DEBUG = 0;
     our $VERSION = 'v1.2.4';
 };
@@ -46,6 +47,15 @@ sub new
     {
         CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" ) if( $this->_warnings_is_enabled );
     }
+
+    if( HAS_THREADS )
+    {
+        if( threads->tid != 0 )
+        {
+            warn( "Module::Generic::Dynamic is not thread-safe and should not be called from a thread." ) if( $this->_warnings_is_enabled );
+        }
+    }
+
     my $make_class = sub
     {
         my $k = shift( @_ );
@@ -77,7 +87,8 @@ EOT
         die( "Unable to dynamically create module $new_class: $@" ) if( $@ );
         return( $new_class, $clean_field );
     };
-    
+
+
     local $@;
     foreach my $k ( sort( keys( %$hash ) ) )
     {
@@ -133,7 +144,9 @@ EOT
             {
                 $func_name = '_set_get_uri';
             }
-            eval( "sub ${class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }" );
+            # my $pl = "sub ${class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }";
+            my $pl = q[sub ${class}::${clean_field} { print( STDERR "Got here\n" ); }];
+            eval( $pl );
             my $rv = $self->$clean_field( $hash->{ $k } );
             return( $self->pass_error ) if( !defined( $rv ) && $self->error );
         }
@@ -210,6 +223,14 @@ sub AUTOLOAD
     my $self = shift( @_ );
     my @args = @_;
     my $class = ref( $self ) || $self;
+    if( HAS_THREADS )
+    {
+        if( threads->tid != 0 )
+        {
+            CORE::warn( "Module::Generic::Dynamic::AUTOLOAD is not thread-safe and should not be called from a thread." ) if( warnings::enabled() );
+            # return( $self->error( "Module::Generic::Dynamic::AUTOLOAD is not thread-safe and should not be called from a thread." ) );
+        }
+    }
     my $code;
     # print( STDERR __PACKAGE__, "::$method(): Called\n" );
     if( $code = $self->can( $method ) )
@@ -238,7 +259,7 @@ sub AUTOLOAD
         {
             $handler = '_set_get_scalar';
         }
-        elsif( !$ref && $method =~ /(?<=[^a-zA-Z0-9])(date|datetime)(?!>[^a-zA-Z0-9])/ )
+        elsif( !$ref && $method =~ /(?:created|updated|modified|(?<=[^a-zA-Z0-9])(date|datetime)(?!>[^a-zA-Z0-9]))/ )
         {
             $handler = '_set_get_datetime';
         }
@@ -250,10 +271,20 @@ sub AUTOLOAD
         {
             $handler = '_set_get_uuid';
         }
+        local $@;
         eval( "sub ${class}::${method} { return( shift->$handler( '$method', \@_ ) ); }" );
-        die( $@ ) if( $@ );
+        return( $self->error( "Failed to create method $method in $class: $@" ) ) if( $@ );
+        # die( $@ ) if( $@ );
         return( $self->$method( @args ) );
     }
+};
+
+# Avoid being called by AUTOLOAD
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ ) || CORE::return;
 };
 
 1;

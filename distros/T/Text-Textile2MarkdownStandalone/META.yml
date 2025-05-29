@@ -26,14 +26,14 @@ no_index:
 provides:
   Text::Textile2MarkdownStandalone:
     file: lib/Text/Textile2MarkdownStandalone.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/takihito/Text-Textile2MarkdownStandalone/issues
   homepage: https://github.com/takihito/Text-Textile2MarkdownStandalone
   repository: https://github.com/takihito/Text-Textile2MarkdownStandalone.git
-version: '0.10'
+version: '0.11'
 x_contributors:
   - 'akihito <takeda-akihito@kayac.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

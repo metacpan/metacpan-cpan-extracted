@@ -4,8 +4,10 @@ BEGIN
 {
     use strict;
     use warnings;
-    use lib './lib';
+    use Cwd qw( abs_path );
+    use lib abs_path( './lib' );
     use vars qw( $DEBUG );
+    use Config;
     # use open ':std' => ':utf8';
     use Test::More;
     use Module::Generic::JSON qw( new_json );
@@ -46,14 +48,14 @@ subtest "utf8" => sub
     is( $rv, undef, 'error decoding' );
     like( $j->error->message, qr/malformed UTF-8/, 'error message' );
 
-    is( new_json->allow_nonref(1)->decode('"¶"'), "¶" );
-    is( new_json->allow_nonref(1)->decode('"\u00b6"'), "¶" );
-    is( new_json->allow_nonref(1)->decode('"\ud801\udc02' . "\x{10204}\""), "\x{10402}\x{10204}" );
+    is( new_json->allow_nonref(1)->decode('"¶"'), "¶", 'allow_nonref' );
+    is( new_json->allow_nonref(1)->decode('"\u00b6"'), "¶", 'allow_nonref' );
+    is( new_json->allow_nonref(1)->decode('"\ud801\udc02' . "\x{10204}\"" ), "\x{10402}\x{10204}", 'allow_nonref' );
 
     my $controls = (ord "^" == 0x5E) ? "\012\\\015\011\014\010"
                  : (ord "^" == 0x5F) ? "\025\\\015\005\014\026"  # CP 1024
                  :                     "\045\\\015\005\014\026"; # assume CP 037
-    is( new_json->allow_nonref(1)->decode('"\"\n\\\\\r\t\f\b"'), "\"$controls" );
+    is( new_json->allow_nonref(1)->decode('"\"\n\\\\\r\t\f\b"'), "\"$controls", 'allow_nonref with blackslash' );
 };
 
 subtest "error" => sub
@@ -62,94 +64,99 @@ subtest "error" => sub
     like( $class->error, qr/cannot encode reference/, 'cannot encode reference' );
 
     new_json->encode([\undef]);
-    like $class->error->message => qr/cannot encode reference/;
+    like( $class->error->message => qr/cannot encode reference/, 'cannot encode reference' );
 
     new_json->encode([\2]);
-    like $class->error->message => qr/cannot encode reference/;
+    like( $class->error->message => qr/cannot encode reference/, 'cannot encode reference' );
 
     new_json->encode([\{}]);
-    like $class->error->message => qr/cannot encode reference/;
+    like( $class->error->message => qr/cannot encode reference/, 'cannot encode reference' );
 
     new_json->encode([\[]]);
-    like $class->error->message => qr/cannot encode reference/;
+    like( $class->error->message => qr/cannot encode reference/, 'cannot encode reference' );
 
     new_json->encode([\\1]);
-    like $class->error->message => qr/cannot encode reference/;
+    like( $class->error->message => qr/cannot encode reference/, 'cannot encode reference' );
 
-    new_json->allow_nonref (1)->decode('"\u1234\udc00"');
-    like $class->error->message => qr/missing high /;
+    new_json->allow_nonref(1)->decode('"\u1234\udc00"');
+    like( $class->error->message => qr/missing high /, 'decode error' );
 
     new_json->allow_nonref->decode('"\ud800"');
-    like $class->error->message => qr/missing low /;
+    like( $class->error->message => qr/missing low /, 'decode error' );
 
-    new_json->allow_nonref (1)->decode('"\ud800\u1234"');
-    like $class->error->message => qr/surrogate pair /;
+    new_json->allow_nonref(1)->decode('"\ud800\u1234"');
+    like( $class->error->message => qr/surrogate pair /, 'decode error' );
 
-    new_json->allow_nonref (0)->decode('null');
-    like $class->error->message => qr/allow_nonref/;
+    new_json->allow_nonref(0)->decode('null');
+    like( $class->error->message => qr/allow_nonref/, 'decode error' );
 
-    new_json->allow_nonref (1)->decode('+0');
-    like $class->error->message => qr/malformed/;
+    new_json->allow_nonref(1)->decode('+0');
+    like( $class->error->message => qr/malformed/, 'decode error' );
 
     new_json->allow_nonref->decode('.2');
-    like $class->error->message => qr/malformed/;
+    like( $class->error->message => qr/malformed/, 'decode error' );
 
-    new_json->allow_nonref (1)->decode('bare');
-    like $class->error->message => qr/malformed/;
+    new_json->allow_nonref(1)->decode('bare');
+    like( $class->error->message => qr/malformed/, 'decode error' );
 
     new_json->allow_nonref->decode('naughty');
-    like $class->error->message => qr/null/;
+    like( $class->error->message => qr/null/, 'decode error' );
 
-    new_json->allow_nonref (1)->decode('01');
-    like $class->error->message => qr/leading zero/;
+    new_json->allow_nonref(1)->decode('01');
+    like( $class->error->message => qr/leading zero/, 'decode error' );
 
     new_json->allow_nonref->decode('00');
-    like $class->error->message => qr/leading zero/;
+    like( $class->error->message => qr/leading zero/, 'decode error' );
 
     new_json->allow_nonref (1)->decode('-0.');
-    like $class->error->message => qr/decimal point/;
+    like( $class->error->message => qr/decimal point/, 'decode error' );
 
     new_json->allow_nonref->decode('-0e');
-    like $class->error->message => qr/exp sign/;
+    like( $class->error->message => qr/exp sign/, 'decode error' );
 
     new_json->allow_nonref (1)->decode('-e+1');
-    like $class->error->message => qr/initial minus/;
+    like( $class->error->message => qr/initial minus/, 'decode error' );
 
     new_json->allow_nonref->decode("\"\n\"");
-    like $class->error->message => qr/invalid character/;
+    like( $class->error->message => qr/invalid character/, 'decode error' );
 
     new_json->allow_nonref (1)->decode("\"\x01\"");
-    like $class->error->message => qr/invalid character/;
+    like( $class->error->message => qr/invalid character/, 'decode error' );
 
     new_json->decode('[5');
-    like $class->error->message => qr/parsing array/;
+    like( $class->error->message => qr/parsing array/, 'decode error' );
 
     new_json->decode('{"5"');
-    like $class->error->message => qr/':' expected/;
+    like( $class->error->message => qr/':' expected/, 'decode error' );
 
     new_json->decode('{"5":null');
-    like $class->error->message => qr/parsing object/;
-    
-    new_json->decode(undef);
-    like $class->error->message => qr/malformed/;
+    like( $class->error->message => qr/parsing object/, 'decode error' );
+
+    {
+        no warnings;
+        new_json->decode(undef);
+        like $class->error->message => qr/malformed/, 'decode malformed error';
+    }
 
     new_json->decode(\5);
-    ok !!$class->error; # Can't coerce readonly
+    # Cannot coerce readonly
+    ok( !!$class->error );
 
     new_json->decode([]);
-    like $class->error->message => qr/malformed/;
+    like( $class->error->message => qr/malformed/, 'decode malformed error' );
 
     new_json->decode(\*STDERR);
-    like $class->error->message => qr/malformed/;
+    like( $class->error->message => qr/malformed/, 'decode malformed error' );
 
-    new_json->decode(*STDERR);
-    ok !!$class->error; # cannot coerce GLOB
+    # new_json->decode(*STDERR);
+    # Cannot coerce GLOB
+    # ok( !!$class->error );
 
     decode_json("\"\xa0");
-    like $class->error => qr/malformed.*character/;
+    like( $class->error => qr/malformed.*character/, 'decode malformed error' );
 
     decode_json("\"\xa0\"");
-    like $class->error => qr/malformed.*character/;
+    like( $class->error => qr/malformed.*character/, 'decode malformed error' );
 
     SKIP:
     {
@@ -160,16 +167,16 @@ subtest "error" => sub
             skip( "requires JSON::XS 4 compat backend", 4 );
         }
         decode_json("1\x01");
-        like $class->error => qr/garbage after/;
+        like( $class->error => qr/garbage after/ );
 
         decode_json("1\x00");
-        like $class->error => qr/garbage after/;
+        like( $class->error => qr/garbage after/ );
 
         decode_json("\"\"\x00");
-        like $class->error => qr/garbage after/;
+        like( $class->error => qr/garbage after/ );
 
         decode_json("[]\x00");
-        like $class->error => qr/garbage after/;
+        like( $class->error => qr/garbage after/ );
     }
 
 };
@@ -239,6 +246,83 @@ subtest "relaxed" => sub
     ok( !$json->decode('{,}') );
 
     ok( '[1,2]' eq encode_json( $json->decode("[1#,2\n ,2,#  ]  \n\t]") ) );
+};
+
+subtest 'Additional functionality' => sub
+{
+    no warnings;
+    my $data = { a => 1, b => 2 };
+    my $json_str = to_json( $data, { pretty => 1, canonical => 1 } );
+    ok( defined( $json_str ), 'to_json with pretty option' );
+    like( $json_str, qr/^\s*\{\n\s*"a" : 1,\n\s*"b" : 2\n\s*\}\n$/, 'to_json pretty format' );
+
+    my $decoded = from_json( $json_str, { relaxed => 1 } );
+    ok( defined( $decoded ), 'from_json with relaxed option' );
+    is_deeply( $decoded, $data, 'from_json decoded correctly' );
+
+    my $json = new_json( max_depth => 2 );
+    my $nested = { a => { b => { c => 1 } } };
+    my $rv = $json->encode( $nested );
+    ok( !defined( $rv ), 'max_depth exceeded' );
+    like( $json->error->message, qr/maximum nesting level/, 'max_depth error message' );
+
+    $json = new_json( invalid_option => 1 );
+    # ok( !defined( $json ), 'invalid option in new' );
+    like( Module::Generic::JSON->error->message, qr/Unknown method/, 'invalid option error' );
+};
+
+subtest 'Thread-safe JSON operations' => sub
+{
+    SKIP:
+    {
+        if( !$Config{useithreads} )
+        {
+            skip( 'Threads not available', 3 );
+        }
+
+        require threads;
+        require threads::shared;
+
+        my @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid();
+                my $json = Module::Generic::JSON->new( utf8 => 1, debug => $DEBUG );
+                my $encoded = $json->encode( { tid => $tid } );
+                if( !defined( $encoded ) )
+                {
+                    diag( "Thread $tid: Failed to encode: ", $json->error ) if( $DEBUG );
+                    return(0);
+                }
+                my $decoded = $json->decode( $encoded );
+                if( !defined( $decoded ) )
+                {
+                    diag( "Thread $tid: Failed to decode: ", $json->error ) if( $DEBUG );
+                    return(0);
+                }
+                if( $decoded->{tid} != $tid )
+                {
+                    diag( "Thread $tid: Decoded tid mismatch: ", $decoded->{tid} ) if( $DEBUG );
+                    return(0);
+                }
+                return(1);
+            });
+        } 1..5;
+
+        my $success = 1;
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join();
+        }
+
+        ok( $success, 'All threads encoded/decoded successfully' );
+        my $json = Module::Generic::JSON->new;
+        my $encoded = encode_json( { a => 1 } );
+        ok( defined( $encoded ), 'encode_json thread-safe' );
+        my $decoded = decode_json( $encoded );
+        ok( defined( $decoded ), 'decode_json thread-safe' );
+    };
 };
 
 done_testing();

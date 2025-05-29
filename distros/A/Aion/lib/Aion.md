@@ -1,10 +1,11 @@
+!ru:en
 # NAME
 
-Aion - a postmodern object system for Perl 5, as `Moose` and `Moo`, but with improvements
+Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями
 
 # VERSION
 
-0.1
+0.3
 
 # SYNOPSIS
 
@@ -17,7 +18,7 @@ package Calc {
     has b => (is => 'ro+', isa => Num);
     has op => (is => 'ro', isa => Enum[qw/+ - * \/ **/], default => '+');
 
-    sub result {
+    sub result : Isa(Object => Num) {
         my ($self) = @_;
         eval "${\ $self->a} ${\ $self->op} ${\ $self->b}"
     }
@@ -29,23 +30,25 @@ Calc->new(a => 1.1, b => 2)->result   # => 3.1
 
 # DESCRIPTION
 
-Aion — OOP framework for create classes with **features**, has **aspects**, **roles** and so on.
+Aion — ООП-фреймворк для создания классов с **фичами**, имеет **аспекты**, **роли** и так далее.
 
-Properties declared via `has` are called **features**.
+Свойства, объявленные через has, называются **фичами**.
 
-And `is`, `isa`, `default` and so on in `has` are called **aspects**.
+А `is`, `isa`, `default` и так далее в `has` называются **аспектами**.
 
-In addition to standard aspects, roles can add their own aspects using subroutine `aspect`.
+Помимо стандартных аспектов, роли могут добавлять свои собственные аспекты с помощью подпрограммы **aspect**.
+
+Сигнатура методов может проверяться с помощью атрибута `:Isa(...)`.
 
 # SUBROUTINES IN CLASSES AND ROLES
 
-`use Aion` include in module types from `Aion::Types` and next subroutines:
+`use Aion` импортирует типы из модуля `Aion::Types` и следующие подпрограммы:
 
 ## has ($name, %aspects)
 
-Make method for get/set feature (property) of the class.
+Создаёт метод для получения/установки функции (свойства) класса.
 
-File lib/Animal.pm:
+Файл lib/Animal.pm:
 ```perl
 package Animal;
 use Aion;
@@ -71,9 +74,9 @@ $cat->name   # => murzik
 
 ## with
 
-Add to module roles. It call on each the role method `import_with`.
+Добавляет в модуль роли. Для каждой роли вызывается метод `import_with`.
 
-File lib/Role/Keys/Stringify.pm:
+Файл lib/Role/Keys/Stringify.pm:
 ```perl
 package Role::Keys::Stringify;
 
@@ -87,7 +90,7 @@ sub keysify {
 1;
 ```
 
-File lib/Role/Values/Stringify.pm:
+Файл lib/Role/Values/Stringify.pm:
 ```perl
 package Role::Values::Stringify;
 
@@ -101,13 +104,14 @@ sub valsify {
 1;
 ```
 
-File lib/Class/All/Stringify.pm:
+Файл lib/Class/All/Stringify.pm:
 ```perl
 package Class::All::Stringify;
 
 use Aion;
 
-with qw/Role::Keys::Stringify Role::Values::Stringify/;
+with q/Role::Keys::Stringify/;
+with q/Role::Values::Stringify/;
 
 has [qw/key1 key2/] => (is => 'rw', isa => Str);
 
@@ -126,11 +130,11 @@ $s->valsify     # => a, b
 
 ## isa ($package)
 
-Check `$package` is the class what extended this class.
+Проверяет, что `$package` — это суперкласс для данного или сам этот класс.
 
 ```perl
 package Ex::X { use Aion; }
-package Ex::A { use Aion; extends qw/Ex::X/; }
+package Ex::A { use Aion; extends q/Ex::X/; }
 package Ex::B { use Aion; }
 package Ex::C { use Aion; extends qw/Ex::A Ex::B/ }
 
@@ -145,7 +149,7 @@ Ex::X->isa("Ex::X") # -> 1
 
 ## does ($package)
 
-Check `$package` is the role what extended this class.
+Проверяет, что `$package` — это роль, которая используется в классе или другой роли.
 
 ```perl
 package Role::X { use Aion -role; }
@@ -163,7 +167,7 @@ Ex::Z->does("Ex::Z") # -> ""
 
 ## aspect ($aspect => sub { ... })
 
-It add aspect to `has` in this class or role, and to the classes, who use this role, if it role.
+Добавляет аспект к `has` в текущем классе и его классам-наследникам или текущей роли и применяющим её классам.
 
 ```perl
 package Example::Earth {
@@ -185,15 +189,15 @@ $earth->moon = "Mars";
 $earth->moon # => Mars
 ```
 
-Aspect is called every time it is specified in `has`.
+Аспект вызывается каждый раз, когда он указан в `has`.
 
-Aspect handler has parameters:
+Создатель аспекта имеет параметры:
 
-* `$cls` — the package with the `has`.
-* `$name` — the feature name.
-* `$value` — the aspect value.
-* `$construct` — the hash with code fragments for join to the feature method.
-* `$feature` — the hash present feature.
+* `$cls` — пакет с `has`.
+* `$name` — имя фичи.
+* `$value` — значение аспекта.
+* `$construct` — хэш с фрагментами кода для присоединения к методу объекта.
+* `$feature` — хеш описывающий фичу.
 
 ```perl
 package Example::Mars {
@@ -208,7 +212,7 @@ package Example::Mars {
         $name # => moon
         $value # -> 1
         [sort keys %$construct] # --> [qw/attr eval get name pkg ret set sub/]
-        [sort keys %$feature] # --> [qw/construct has name opt/]
+        [sort keys %$feature] # --> [qw/construct has name opt order/]
 
         my $_construct = {
             pkg => $cls,
@@ -241,6 +245,7 @@ package Example::Mars {
             },
             name => $name,
             construct => $_construct,
+            order => 0,
         };
 
         $feature # --> $_feature
@@ -254,7 +259,7 @@ package Example::Mars {
 
 ## extends (@superclasses)
 
-Extends package other package. It call on each the package method `import_extends` if it exists.
+Расширяет класс другим классом/классами. Он вызывает из каждого наследуемого класса метод `import_extends`, если он в нём есть.
 
 ```perl
 package World { use Aion;
@@ -271,7 +276,7 @@ package World { use Aion;
 }
 
 package Hello { use Aion;
-    extends qw/World/;
+    extends q/World/;
 
     $World::extended_by_this # -> 1
 }
@@ -281,11 +286,11 @@ Hello->isa("World")     # -> 1
 
 ## new (%param)
 
-Constructor. 
+Конструктор.
 
-* Set `%param` to features.
-* Check if param not mapped to feature.
-* Set default values.
+* Устанавливает `%param` для фич.
+* Проверяет, что параметры соответствуют фичам.
+* Устанавливает значения по умолчанию.
 
 ```perl
 package NewExample { use Aion;
@@ -312,7 +317,7 @@ $ex->x # -> 10.1
 
 ## requires (@subroutine_names)
 
-Check who in classes who use the role present the subroutines.
+Проверяет, что в классах использующих эту роль есть указанные подпрограммы или фичи.
 
 ```perl
 package Role::Alpha { use Aion -role;
@@ -340,7 +345,11 @@ Omega->new->in("a")  # -> 1
 
 ## has ($feature)
 
-It check what property is set.
+Проверяет, что свойство установлено.
+
+Фичи имеющие `default => sub { ... }` выполняют `sub` при первом вызове геттера, то есть: являются отложенными.
+
+`$object->has('фича')` позволяет проверить, что `default` ещё не вызывался.
 
 ```perl
 package ExHas { use Aion;
@@ -358,15 +367,15 @@ $ex->has("x")   # -> 1
 
 ## clear (@features)
 
-Cleared the features.
+Удаляет ключи фич из объекта предварительно вызвав на них `clearer` (если есть).
 
 ```perl
-package ExClear { use Aion;
+package ExClearer { use Aion;
     has x => (is => 'rw');
     has y => (is => 'rw');
 }
 
-my $c = ExClear->new(x => 10, y => 12);
+my $c = ExClearer->new(x => 10, y => 12);
 
 $c->has("x")   # -> 1
 $c->has("y")   # -> 1
@@ -380,29 +389,29 @@ $c->has("y")   # -> ""
 
 # METHODS IN CLASSES
 
-`use Aion` include in module next methods:
+`use Aion` включает в модуль следующие методы:
 
 ## new (%parameters)
 
-The constructor.
+Конструктор.
 
 # ASPECTS
 
-`use Aion` include in module next aspects for use in `has`:
+`use Aion` включает в модуль следующие аспекты для использования в `has`:
 
 ## is => $permissions
 
-* `ro` — make getter only.
-* `wo` — make setter only.
-* `rw` — make getter and setter.
+* `ro` — создать только геттер.
+* `wo` — создать только сеттер.
+* `rw` — создать геттер и сеттер.
 
-Default is `rw`.
+По умолчанию — `rw`.
 
-Additional permissions:
+Дополнительные разрешения:
 
-* `+` — the feature is required. It is not used with `-`.
-* `-` — the feature cannot be set in the constructor. It is not used with `+`.
-* `*` — the value is reference and it maked weaken can be set.
+* `+` — фича обязательна в параметрах конструктора. `+` не используется с `-`.
+* `-` — фича не может быть установлена через конструктор. '-' не используется с `+`.
+* `*` — не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу).
 
 ```perl
 package ExIs { use Aion;
@@ -423,7 +432,7 @@ eval { ExIs->new(ro => 10)->wo }; $@ # ~> has: wo is wo- \(not get\)
 ExIs->new(ro => 10)->rw(30)->rw  # -> 30
 ```
 
-Feature with `*` don't hold value:
+Функция с `*` не удерживает значение:
 
 ```perl
 package Node { use Aion;
@@ -447,11 +456,23 @@ $node->parent   # -> undef
 
 ## isa => $type
 
-Set feature type. It validate feature value 
+Указывает тип, а точнее – валидатор, фичи.
+
+```perl
+package ExIsa { use Aion;
+    has x => (is => 'ro', isa => Int);
+}
+
+eval { ExIsa->new(x => 'str') }; $@ # ~> \* Feature x must have the type Int. The it is 'str'
+eval { ExIsa->new->x          }; $@ # ~> Get feature `x` must have the type Int. The it is undef
+ExIsa->new(x => 10)->x              # -> 10
+```
+
+Список валидаторов см. в [Aion::Type](https://metacpan.org/pod/Aion::Type).
 
 ## default => $value
 
-Default value set in constructor, if feature falue not present.
+Значение по умолчанию устанавливается в конструкторе, если параметр с именем фичи отсутствует.
 
 ```perl
 package ExDefault { use Aion;
@@ -462,7 +483,7 @@ ExDefault->new->x  # -> 10
 ExDefault->new(x => 20)->x  # -> 20
 ```
 
-If `$value` is subroutine, then the subroutine is considered a constructor for feature value. This subroutine lazy called where the value get.
+Если `$value` является подпрограммой, то подпрограмма считается конструктором значения фичи. Используется ленивое вычисление.
 
 ```perl
 my $count = 10;
@@ -484,7 +505,8 @@ $count   # -> 11
 
 ## trigger => $sub
 
-`$sub` called after the value of the feature is set (in `new` or in setter).
+`$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер.
+Этимология – впустить.
 
 ```perl
 package ExTrigger { use Aion;
@@ -502,17 +524,64 @@ $ex->x(20);
 $ex->y      # -> 30
 ```
 
+## release => $sub
+
+`$sub` вызывается перед возвратом свойства из объекта через геттер.
+Этимология – выпустить.
+
+```perl
+package ExRelease { use Aion;
+    has x => (release => sub {
+        my ($self, $value) = @_;
+        $_[1] = $value + 1;
+    });
+}
+
+my $ex = ExRelease->new(x => 10);
+$ex->x      # -> 11
+```
+
+## clearer => $sub
+
+`$sub` вызывается при вызове декструктора или `$object->clear("feature")`, но только если свойство имеется (см. `$object->has("feature")`).
+
+```perl
+package ExClearer { use Aion;
+	
+	our $x;
+
+    has x => (clearer => sub {
+        my ($self) = @_;
+        $x = $self->x
+    });
+}
+
+$ExClearer::x      	# -> undef
+ExClearer->new(x => 10);
+$ExClearer::x      	# -> 10
+
+my $ex = ExClearer->new(x => 12);
+
+$ExClearer::x      # -> 10
+$ex->clear('x');
+$ExClearer::x      # -> 12
+
+undef $ex;
+
+$ExClearer::x      # -> 12
+```
+
 # ATTRIBUTES
 
-Aion add universal attributes.
+`Aion` добавляет в пакет универсальные атрибуты.
 
 ## Isa (@signature)
 
-Attribute `Isa` check the signature the function where it called.
+Атрибут `Isa` проверяет сигнатуру функции.
 
-**WARNING**: use atribute `Isa` slows down the program.
+**ВНИМАНИЕ**: использование атрибута «Isa» замедляет работу программы.
 
-**TIP**: use aspect `isa` on features is more than enough to check the correctness of the object data.
+**СОВЕТ**: использования аспекта `isa` для объектов более чем достаточно, чтобы проверить правильность данных объекта.
 
 ```perl
 package Anim { use Aion;
@@ -533,11 +602,9 @@ eval { Anim->is_cat("cat") }; $@ # ~> Arguments of method `is_cat` must have the
 eval { my @items = $anim->is_cat("cat") }; $@ # ~> Returns of method `is_cat` must have the type Tuple\[Bool\].
 ```
 
-If use name of type in `@signature`, then call subroutine with this name from current package.
-
 # AUTHOR
 
-Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)
+Yaroslav O. Kosmina <dart@cpan.org>
 
 # LICENSE
 

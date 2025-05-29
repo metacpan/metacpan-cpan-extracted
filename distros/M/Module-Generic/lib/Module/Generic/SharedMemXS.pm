@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.3.1
+## Version v0.3.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2025/04/20
+## Modified 2025/04/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,9 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64 );
+    use vars qw(
+        $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64
+    );
     use Config;
     use File::Spec ();
     use Scalar::Util ();
@@ -26,18 +28,20 @@ BEGIN
     # use JSON 4.03 qw( -convert_blessed_universally );
     use JSON 4.03;
     use Storable::Improved ();
-    use constant SHM_BUFSIZ     =>  65536;
-    use constant SEM_LOCKER     =>  0;
-    use constant SEM_MARKER     =>  0;
-    use constant SHM_LOCK_WAIT  =>  0;
-    use constant SHM_LOCK_EX    =>  1;
-    use constant SHM_LOCK_UN    => -1;
-    use constant SHM_EXISTS     =>  1;
-    use constant LOCK_SH        =>  1;
-    use constant LOCK_EX        =>  2;
-    use constant LOCK_NB        =>  4;
-    use constant LOCK_UN        =>  8;
-    use constant HAS_THREADS    => ( $Config{useithreads} && $INC{'threads.pm'} );
+    use constant {
+        SHM_BUFSIZ     =>  65536,
+        SEM_LOCKER     =>  0,
+        SEM_MARKER     =>  0,
+        SHM_LOCK_WAIT  =>  0,
+        SHM_LOCK_EX    =>  1,
+        SHM_LOCK_UN    => -1,
+        SHM_EXISTS     =>  1,
+        LOCK_SH        =>  1,
+        LOCK_EX        =>  2,
+        LOCK_NB        =>  4,
+        LOCK_UN        =>  8,
+        HAS_THREADS    => $Config{useithreads},
+    };
     $SUPPORTED_RE = qr/IPC\/SysV/;
     if( $Config{extensions} =~ /$SUPPORTED_RE/ && 
         $^O !~ /^(?:Android|dos|MSWin32|os2|VMS|riscos)/i &&
@@ -113,22 +117,25 @@ EOT
     
         my @repo :shared;
         my %id2objs :shared;
+
         $SHEM_REPO = \@repo;
         $ID2OBJ = \%id2objs;
+        *_threads_lock = \&CORE::lock;
     }
     else
     {
-        $SHEM_REPO = [];
-        $ID2OBJ    = {};
+        $SHEM_REPO    = [];
+        $ID2OBJ       = {};
+        *_threads_lock = sub{1}; # no-op
     }
     
     our @EXPORT_OK = qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN);
     our %EXPORT_TAGS = (
-            all     => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
-            lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
-            'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
+        all     => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
+        lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
+        'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.2';
 };
 
 use v5.26.1;
@@ -488,17 +495,21 @@ sub open
     $new->{_sem} = $sem;
     my $id = $new->id;
 
-    if( HAS_THREADS && is_shared( $SHEM_REPO ) )
     {
-        lock( $SHEM_REPO );
-        lock( $ID2OBJ );
+        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS && is_shared( $SHEM_REPO ) );
+        &_threads_lock( $ID2OBJ ) if( HAS_THREADS && is_shared( $ID2OBJ ) );
         CORE::push( @$SHEM_REPO, $id );
-        $ID2OBJ->{ $id } = $new;
-    }
-    else
-    {
-        CORE::push( @$SHEM_REPO, $id );
-        $ID2OBJ->{ $id } = $new;
+        my $val;
+        if( HAS_THREADS )
+        {
+            $val = $self->serialise( $new, serialiser => 'Storable::Improved' ) ||
+                return( $self->pass_error );
+        }
+        else
+        {
+            $val = $new;
+        }
+        $ID2OBJ->{ $id } = $val;
     }
 
     if( !defined( $sem->op( @{$SEMOP_ARGS->{(LOCK_SH)}} ) ) )
@@ -509,6 +520,7 @@ sub open
     my $there = $new->stat( SEM_MARKER );
     if( defined( $there ) && $there == SHM_EXISTS )
     {
+        # Binding to existing segment
     }
     else
     {
@@ -741,35 +753,38 @@ sub remove
     }
     if( $rv )
     {
-        if( HAS_THREADS && is_shared( $SHEM_REPO ) )
+        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS && is_shared( $SHEM_REPO ) );
+        &_threads_lock( $ID2OBJ ) if( HAS_THREADS && is_shared( $ID2OBJ ) );
+        my @slices;
+        if( HAS_THREADS )
         {
-            lock( $SHEM_REPO );
-            lock( $ID2OBJ );
-            for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
+            share( @slices );
+        }
+        for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
+        {
+            my $this_id = $SHEM_REPO->[$i];
+            my $obj = $ID2OBJ->{ $this_id };
+            if( $this_id eq $id )
             {
-                my $this_id = $SHEM_REPO->[$i];
-                my $obj = $ID2OBJ->{ $this_id };
-                if( Scalar::Util::blessed( $obj ) && $this_id eq $id )
+                # slice is not supported on shared array, so we have to make a copy, and re-share it.
+                if( !HAS_THREADS )
                 {
                     CORE::splice( @$SHEM_REPO, $i, 1 );
-                    CORE::delete( $ID2OBJ->{ $this_id } );
-                    last;
                 }
+                CORE::delete( $ID2OBJ->{ $this_id } );
+                last;
+            }
+            # Re-build a new array, excluding the elements to splice
+            elsif( HAS_THREADS )
+            {
+                push( @slices, $SHEM_REPO->[$i] );
             }
         }
-        else
+
+        # Did we rebuilt the shared array ?
+        if( scalar( @slices ) )
         {
-            for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
-            {
-                my $this_id = $SHEM_REPO->[$i];
-                my $obj = $ID2OBJ->{ $this_id };
-                if( Scalar::Util::blessed( $obj ) && $this_id eq $id )
-                {
-                    CORE::splice( @$SHEM_REPO, $i, 1 );
-                    CORE::delete( $ID2OBJ->{ $this_id } );
-                    last;
-                }
-            }
+            @$SHEM_REPO = @slices;
         }
         $self->{_ipc_shared} = undef;
         $self->{_sem} = undef;
@@ -985,7 +1000,10 @@ sub unlock
     # {
     #     $self->locked(0);
     # }
-    $self->op( @{$SEMOP_ARGS->{ $type }} );
+    if( !defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
+    {
+        # Failed to unlock semaphore
+    }
     $self->locked(0);
     return( $self );
 }
@@ -1004,6 +1022,7 @@ sub write
     }
     my $shm = $self->_ipc_shared ||
         return( $self->error( "No IPC::SharedMem object set. Have you opened the shared memory?" ) );
+    my $id = $self->id || return( $self->error( "No shared memory id set yet. You must open the shared memory first to write." ) );
     my $size = int( $self->size() ) || SHM_BUFSIZ;
     my $packing = $self->_packing_method;
     my $encoded;
@@ -1084,13 +1103,27 @@ sub write
     # Simple encapsulation
     # FYI: MG = Module::Generic
     substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
-    
+
     my $len = length( $encoded );
     if( $len > $size )
     {
         return( $self->error( "Data to write are ${len} bytes long and exceed the maximum you have set of '$size'." ) );
     }
+
+    # Ensure the shared memory segment is attached
+    unless( defined( $self->addr ) )
+    {
+        my $addr = shmat( $id, undef, 0 );
+        if( !defined( $addr ) || ( Scalar::Util::looks_like_number( $addr ) && $addr == -1 ) )
+        {
+            return( $self->error( "Unable to attach to shared memory id '$id': $!" ) );
+        }
+        $self->{addr} = $addr;
+    }
     
+    $self->lock( LOCK_EX ) || return( $self->pass_error );
+    # my $rv = shmwrite( $id, $encoded, 0, $len ) ||
+    #     return( $self->error( "Unable to write to shared memory id '$id' with ${len} bytes of data encoded and memory size of $size: $!" ) );
     my $rv;
     # try-catch
     local $@;
@@ -1102,7 +1135,8 @@ sub write
     {
         return( $self->error( "Error with \$shm->write: $@" ) );
     }
-    return( $self->error( "Unable to write ${len} bytes of data to shared memory block: $!" ) ) if( !$rv );
+    return( $self->error( "Unable to write to shared memory id '$id' with ${len} bytes of data encoded and memory size of $size: $!" ) ) if( !$rv );
+    $self->unlock;
     return( $self );
 }
 
@@ -1257,13 +1291,7 @@ sub _str2key
     {
         # my $id = 0;
         # $id += $_ for( unpack( "C*", $key ) );
-        state $loaded;
-        unless( $loaded )
-        {
-            lock( $loaded ) if( HAS_THREADS );
-            require Digest::SHA;
-            $loaded = 1;
-        }
+        $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
         my $hash = Digest::SHA::sha1_base64( $key );
         my $id = ord( substr( $hash, 0, 1 ) );
         # We use the root as a reliable and stable path.
@@ -1276,10 +1304,13 @@ sub _str2key
 
 sub DESTROY
 {
-    my $self = shift( @_ );
-    return unless( $self->{_ipc_shared} );
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ ) || CORE::return;
+    CORE::return unless( $self->{_ipc_shared} );
     my $shm = $self->{_ipc_shared};
-    return if( $shm->id );
+    CORE::return if( $shm->id );
     $self->unlock;
     $self->detach;
     my $rv = $self->remove_semaphore;
@@ -1287,7 +1318,7 @@ sub DESTROY
     {
         my $stat = $self->shmstat();
         # number of processes attached to the associated shared memory segment.
-        if( defined( $stat ) && ( $stat->nattch() == 0 ) )
+        if( CORE::defined( $stat ) && ( $stat->nattch() == 0 ) )
         {
             $self->remove;
         }
@@ -1384,11 +1415,21 @@ sub THAW
     CORE::return( $new );
 }
 
+# NOTE: END
 END
 {
     foreach my $id ( @$SHEM_REPO )
     {
         my $s = $ID2OBJ->{ $id } || next;
+        if( HAS_THREADS )
+        {
+            $s = eval{ Storable::Improved::thaw( $s ) };
+            if( $@ )
+            {
+                warn( "Error deserialising object with Storable::Improved: $@" ) if( warnings::enabled() );
+                next;
+            }
+        }
         next if( $s->removed || !$s->id || !$s->destroy );
         $s->detach;
         $s->remove;
@@ -1504,7 +1545,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 
@@ -1537,41 +1578,41 @@ This instantiates a shared memory object. It takes the following parameters:
 
 =over 4
 
-=item I<cbor>
+=item * C<cbor>
 
 Provided with a value (true or false does not matter), and this will set L<CBOR::XS> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
-=item I<debug>
+=item * C<debug>
 
 A debug value will enable debugging output (equal or above 3 actually)
 
-=item I<create>
+=item * C<create>
 
 A boolean value to indicate whether the shared memory block should be created if it does not exist. Default to false.
 
-=item I<destroy>
+=item * C<destroy>
 
 A boolean value to indicate if the shared memory block should be removed when the object is destroyed upon end of the script process.
 See L<perlmod> for more about object destruction.
 
-=item I<destroy_semaphore>
+=item * C<destroy_semaphore>
 
 A boolean value to indicate if the semaphore should be removed when the object is destroyed upon end of the script process.
 See L<perlmod> for more about object destruction.
 
-I<destroy_semaphore> is automatically enabled if I<destroy> is set to true.
+C<destroy_semaphore> is automatically enabled if I<destroy> is set to true.
 
 Thus, one can deactive auto removal of the shared memory block, but enable auto removal of the semaphore. This is useful when there are two processes accessing the same shared memory block and one wants to give the first process the authority to create and remove the shared memory block, while the second only access and write to the shared memory block, but does not remove it. Still to avoid having semaphores surviving the process, by enabling this option and disabling I<destroy>, it will remove the semaphore and leave the shared memory.
 
-=item I<exclusive>
+=item * C<exclusive>
 
 A boolean value to set the shared memory as exclusive. This will affect the flags set by L</flags> which are used by L</open>.
 
-=item I<json>
+=item * C<json>
 
 Provided with a value (true or false does not matter), and this will set L<JSON> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
-=item I<key>
+=item * C<key>
 
 The shared memory key identifier to use. It defaults to C<IPC::SysV::IPC_PRIVATE>
 
@@ -1583,7 +1624,7 @@ Otherwise, if you provide a key as string, the characters in the string will be 
 
 Either way, the resulting value is used to create a shared memory segment and a semaphore by L</open>.
 
-=item I<mode>
+=item * C<mode>
 
 The octal mode value to use when opening the shared memory block.
 
@@ -1591,21 +1632,21 @@ Shared memory are owned by system users and access to shared memory segment is r
 
 If you do not want to share it with any other user than yourself, setting mode to C<0600> is fine.
 
-=item I<sereal>
+=item * C<sereal>
 
 Provided with a value (true or false does not matter), and this will set L<Sereal> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
-=item I<serialiser>
+=item * C<serialiser>
 
 You can provide the serialiser with this option. Possible values are: C<cbor>, C<json>, C<sereal>, C<storable>
 
-=item I<size>
+=item * C<size>
 
 The size in byte of the shared memory.
 
 This is set once it is created. You can create again the shared memory segment with a smaller size, but not a bigger one. If you want to increase the size, you would need to remove it first.
 
-=item I<storable>
+=item * C<storable>
 
 Provided with a value (true or false does not matter), and this will set L<Storable::Improved> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
@@ -1738,7 +1779,7 @@ Provided value sould be a set of 3.
 
 =head2 open
 
-Create an access to the shared memory and return a new L<Module::Generic::SharedMemXS> object.
+Creates or accesses a shared memory segment and returns a new L<Module::Generic::SharedMemXS> object. Takes an optional hash or hash reference with parameters such as C<key>, C<mode>, and C<size>:
 
     my $shmem = Module::Generic::SharedMemXS->new(
         create => 1,
@@ -1749,12 +1790,76 @@ Create an access to the shared memory and return a new L<Module::Generic::Shared
         size => 65536,
     ) || die( Module::Generic::SharedMemXS->error );
     # Overriding some default value set during previous object instantiation
-    my $s = $shmem->open({
+    my $shmem = $shmem->open({
         mode => 0600,
         size => 1024,
     }) || die( $shmem->error );
+    # or
+    my $s = $shmem->open({ mode => 'r', size => 1024 }) || die( $shmem->error );
 
-If the L</create> option is set to true, but the shared memory already exists, L</open> will detect it and attempt to open access to the shared memory without the L</create> bit on, which is C<IPC::SysV::IPC_CREAT>
+If called on an already opened object, it reuses the existing shared memory segment and semaphore, creating a new object that shares the same resources. This is critical for threaded applications to ensure all threads access the same segment safely. The module leverages L<IPC::Semaphore> to reliably reuse semaphores based on the shared memory key, ensuring thread-safe operations without additional configuration.
+
+In threaded applications, open the shared memory in the main thread before starting threads to ensure thread-safety:
+
+    require threads;
+    require threads::shared;
+    threads->import();
+    threads::shared->import();
+    my $shmem = Module::Generic::SharedMemXS->new(
+        debug => 3,
+        key => 'my_memory',
+        size => 65536,
+        mode => 0666,
+        create => 1,
+    ) || die( Module::Generic::SharedMemXS->error );
+    my $obj = $shmem->open({ mode => 'w' }) || die( $shmem->error );
+    my @threads;
+    for(1..3)
+    {
+        push @threads, threads->create(sub
+        {
+            my $tid = threads->tid();
+            my $sh = $obj->open();
+            if( !defined( $sh ) )
+            {
+                warn( "Error with thread $tid: unable to open shared memory segment: ", $obj->error );
+                return(0);
+            }
+            my $data = $sh->read();
+            my $old_counter = $data->{counter};
+            $data->{counter}++;
+            $sh->write( $data ) || return(0);
+            return(1);
+        });
+    }
+    my $success = 1;
+    for my $thr ( @threads )
+    {
+        my $result = $thr->join();
+        $success &&= $result;
+    }
+    my $data = $obj->read();
+    # $data->{counter} is 3, and $success is true
+
+Parameters:
+
+=over 4
+
+=item * C<key>
+
+The shared memory key identifier. Defaults to the key set during object instantiation or C<IPC::SysV::IPC_PRIVATE>.
+
+=item * C<mode>
+
+The octal mode for the shared memory (e.g., C<0600> for owner-only access). Defaults to the mode set during object instantiation.
+
+=item * C<size>
+
+The size of the shared memory segment in bytes. Defaults to the size set during object instantiation.
+
+=back
+
+If the L</create> option is true and the shared memory exists, C<open> accesses it without the C<IPC::SysV::IPC_CREAT> flag. Returns a new object on success, or C<undef> on error, with the error accessible via L<Module::Generic/error>.
 
 =head2 owner
 
@@ -1935,6 +2040,56 @@ For best results, call C<remove()> manually if your lifecycle logic requires gua
 
 =back
 
+=head1 THREAD & PROCESS SAFETY
+
+L<Module::Generic::SharedMemXS> is designed for safe multi-process and multi-threaded access to shared memory using System V IPC, leveraging L<IPC::SharedMem> and L<IPC::Semaphore>. Semaphores guard concurrent access, ensuring data integrity across processes and threads. In threaded applications, the module uses L<IPC::Semaphore>’s key-based semaphore reuse and thread-safe locking for shared memory objects, ensuring robust thread-safety.
+
+Key considerations for thread and process safety:
+
+=over 4
+
+=item * B<Main Thread Initialization>
+
+In threaded applications, the shared memory segment must be opened in the main thread before starting worker threads. This ensures the shared memory and semaphore are initialized, allowing worker threads to reuse them safely via L</open>:
+
+    my $shmem = Module::Generic::SharedMemXS->new( key => 'my_memory', create => 1 );
+    my $obj = $shmem->open({ mode => 'w' });
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $sh = $obj->open();
+            # Work with $sh
+        });
+    } 1..10;
+
+=item * B<Semaphore Reuse>
+
+Calling L</open> on an already opened object (e.g., C<$obj->open()>) reuses the existing shared memory segment and semaphore. L<IPC::Semaphore> ensures the same semaphore is used across threads and processes for a given key, providing thread-safe access without additional synchronization.
+
+=item * B<Process Safety>
+
+For multi-process applications, semaphores prevent concurrent access issues. Each process can open the shared memory segment using the same key, with L<IPC::Semaphore> ensuring safe access.
+
+=item * B<Cleanup>
+
+Shared memory and semaphores are system-wide resources and persist until removed or the system is rebooted. Use L</remove> to clean up shared memory and L</remove_semaphore> for semaphores, especially in daemonized or mod_perl environments. The L</destroy> and L</destroy_semaphore> options can automate cleanup, but manual removal is recommended for explicit control:
+
+    $obj->remove() if $obj->exists();
+
+=item * B<Thread Limitations>
+
+While thread-safe, this module is primarily designed for inter-process communication. In threaded environments, ensure proper initialization in the main thread and avoid creating new shared memory segments in worker threads to prevent conflicts.
+
+=back
+
+For debugging shared memory and semaphore usage on Unix-like systems (e.g., Linux, FreeBSD, macOS), use:
+
+    ipcs -m  # List shared memory segments
+    ipcs -s  # List semaphores
+    ipcrm -m <shmid>  # Remove shared memory
+    ipcrm -s <semid>  # Remove semaphore
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
@@ -1947,7 +2102,7 @@ L<perlipc>, L<perlmod>, L<IPC::Semaphore>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2022-2024 DEGUEST Pte. Ltd.
+Copyright (c) 2022-2025 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

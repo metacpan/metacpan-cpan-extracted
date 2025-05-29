@@ -54,7 +54,7 @@
    "provides" : {
       "Text::Textile2MarkdownStandalone" : {
          "file" : "lib/Text/Textile2MarkdownStandalone.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/takihito/Text-Textile2MarkdownStandalone"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "akihito <takeda-akihito@kayac.com>"
    ],

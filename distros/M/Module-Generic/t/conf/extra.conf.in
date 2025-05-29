@@ -1,0 +1,52 @@
+# -*- conf -*-
+# this file will be Include-d by @ServerRoot@/conf/httpd.conf
+
+<IfModule mod_ssl.c>
+    SSLEngine on
+    SSLCertificateFile    @ServerRoot@/server.crt
+    SSLCertificateKeyFile @ServerRoot@/server.key
+</IfModule>
+# See <https://httpd.apache.org/docs/2.4/en/mod/core.html#loglevel>
+LogLevel debug
+# where Apache2::API can be found
+PerlSwitches -I@ServerRoot@/lib
+PerlSwitches -I@ServerRoot@/../lib
+PerlSwitches -I@ServerRoot@/..
+# preload the module
+# PerlModule Cookie::Jar
+PerlOptions +GlobalRequest
+PerlSetupEnv On
+PerlSetVar MG_DEBUG 7
+PerlPassEnv MOD_PERL
+PerlPassEnv HOME
+PerlPassEnv SERVER_NAME
+PerlPassEnv HTTP_HOST
+PerlPassEnv REMOTE_ADDR
+PerlPassEnv REMOTE_HOST
+PerlPassEnv PATH_INFO
+PerlPassEnv QUERY_STRING
+PerlPassEnv LANGUAGE
+<Directory "@documentroot@">
+    SetHandler modperl
+    AcceptPathInfo On
+    <Files ~ "\.(pl|cgi)$">
+        Options All +Includes +ExecCGI -Indexes -MultiViews
+        # AllowOverride All
+        # SetHandler perl-script
+        SetHandler cgi-script
+        AcceptPathInfo On
+        # PerlResponseHandler ModPerl::PerlRun
+        # Even better for stable cgi scripts:
+        # PerlResponseHandler ModPerl::Registry
+        # Change this in mod_perl1 PerlSendHeader On to the following:
+        # <https://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlSendHeader_>
+        #  PerlOptions +ParseHeaders
+    </Files>
+</Directory>
+<Location /tests/mg>
+    SetHandler modperl
+    AcceptPathInfo On
+    PerlResponseHandler Test::Apache2::MG
+</Location>
+# To cleanup Apache2 notes in memory
+PerlPostConfigRequire @ServerRoot@/../scripts/startup.pl

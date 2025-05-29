@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-20'; # DATE
+our $DATE = '2025-05-22'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodType'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_types
@@ -477,7 +477,7 @@ App::BPOMUtils::Table::FoodType - List food types in BPOM processed food divisio
 
 =head1 VERSION
 
-This document describes version 0.020 of App::BPOMUtils::Table::FoodType (from Perl distribution App-BPOMUtils-Table-FoodType), released on 2025-05-20.
+This document describes version 0.021 of App::BPOMUtils::Table::FoodType (from Perl distribution App-BPOMUtils-Table-FoodType), released on 2025-05-22.
 
 =head1 DESCRIPTION
 

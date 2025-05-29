@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/JSON.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/03/24
-## Modified 2025/04/20
+## Modified 2025/04/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,22 +18,13 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( @EXPORT @EXPORT_OK $AUTOLOAD $DEBUG $VERSION );
-    use Config;
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    }
     use JSON ();
     use Scalar::Util ();
     our @ISA         = qw( Module::Generic );
     our @EXPORT      = qw( from_json to_json encode_json decode_json );
     our @EXPORT_OK   = qw( new_json );
     our %EXPORT_TAGS = ();
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use v5.12.0;
@@ -66,6 +57,8 @@ sub init
         sort    => 'canonical',
     };
 
+    # We remove it to prevent it from interfering with out checks
+    my $debug = ( CORE::exists( $opts->{debug} ) ? CORE::delete( $opts->{debug} ) : undef );
     foreach my $opt ( keys( %$opts ) )
     {
         my $ref;
@@ -94,54 +87,36 @@ sub init
         delete( $opts->{ $opt } );
     }
     $self->{_json} = $j;
+    $opts->{debug} = $debug if( defined( $debug ) );
     # Pass the rest to our parent init for properties unique to our module.
     $self->SUPER::init( %$opts ) || return( $self->pass_error );
     return( $self );
 }
 
-# cache
-my $JSON;
-
 sub decode_json($)
 {
+    my $json = __PACKAGE__->new;
     my $rv = eval
     {
-        state $JSON;
-        if( HAS_THREADS )
-        {
-            lock( $JSON );
-            ( $JSON ||= __PACKAGE__->new->utf8 )->decode( @_ );
-        }
-        else
-        {
-            ( $JSON ||= __PACKAGE__->new->utf8 )->decode( @_ );
-        }
+        $json->utf8->decode( @_ );
     };
     if( $@ )
     {
-        return( $JSON->error( $@ ) );
+        return( $json->error( $@ ) );
     }
     return( $rv );
 }
 
 sub encode_json($)
 {
+    my $json = __PACKAGE__->new;
     my $rv = eval
     {
-        state $JSON;
-        if( HAS_THREADS )
-        {
-            lock( $JSON );
-            ( $JSON ||= __PACKAGE__->new->utf8 )->encode( @_ );
-        }
-        else
-        {
-            ( $JSON ||= __PACKAGE__->new->utf8 )->encode( @_ );
-        }
+        $json->utf8->encode( @_ );
     };
     if( $@ )
     {
-        return( $JSON->error( $@ ) );
+        return( $json->error( $@ ) );
     }
     return( $rv );
 }
@@ -215,6 +190,7 @@ sub AUTOLOAD
             my @rv = eval
             {
                 local $SIG{__DIE__} = sub{};
+                no warnings;
                 ( $wantlist // '' ) ? ( $code->( $j, scalar( @args ) ? @args : () ) ) : scalar( $code->( $j, scalar( @args ) ? @args : () ) )
             };
             if( $@ )
@@ -254,6 +230,11 @@ sub AUTOLOAD
         die( "Unknown class function '${meth}' in JSON" );
     }
 }
+
+sub DESTROY
+{
+    # DESTROY exists to avoid being caught by AUTOLOAD
+};
 
 1;
 # NOTE: POD
@@ -297,7 +278,7 @@ Or, even simpler:
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 
@@ -354,11 +335,10 @@ For L<class functions|/"CLASS FUNCTIONS"> too, you can execute them safely and c
 
 =head2 new
 
-This takes an hash or an hash reference of options and it returns a new L<Module::Generic::JSON> object.
+This takes an hash or hash reference of options and returns a new L<Module::Generic::JSON> object. The options must be supported by L<JSON>. On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
 
-The options provided must be supported by L<JSON>.
-
-Upon error, this sets an L<error object|Module::Generic::JSON>, and returns C<undef> in scalar context, or an empty list in list context.
+    my $j = Module::Generic::JSON->new( utf8 => 1, pretty => 1 ) ||
+        die( Module::Generic::JSON->error );
 
 =head1 METHODS
 
@@ -386,9 +366,17 @@ See the documentation for the module L<JSON> for more information, but below are
 
 =head2 decode
 
+Decodes a JSON string and returns the resulting Perl data structure. On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
+
+    my $data = $j->decode( '{"a":1}' ) || die( $j->error );
+
 =head2 decode_prefix
 
 =head2 encode
+
+Encodes a Perl data structure into a JSON string. On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
+
+    my $json_str = $j->encode( { a => 1 } ) || die( $j->error );
 
 =head2 filter_json_object
 
@@ -422,11 +410,100 @@ See the documentation for the module L<JSON> for more information, but below are
 
 =head2 decode_json
 
+Decodes a C<JSON> string and returns the resulting Perl data structure. On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
+
+    my $data = decode_json( '{"a":1}' ) || die( Module::Generic::JSON->error );
+
 =head2 encode_json
+
+Encodes a Perl data structure into a C<JSON> string. On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
+
+    my $json_str = encode_json( { a => 1 } ) || die( Module::Generic::JSON->error );
 
 =head2 from_json
 
+Decodes a C<JSON> string with optional configuration options. Takes a C<JSON> string and an optional hash reference of options (passed to L</new>). On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
+
+    my $data = from_json( '{"a":1}', { utf8 => 1 } ) || die( Module::Generic::JSON->error );
+
 =head2 to_json
+
+Encodes a Perl data structure with optional configuration options. Takes a Perl data structure and an optional hash reference of options (passed to L</new>). On error, sets an L<error object|Module::Generic::Exception> and returns C<undef> in scalar context or an empty list in list context:
+
+    my $json_str = to_json( { a => 1 }, { pretty => 1 } ) || die( Module::Generic::JSON->error );
+
+=head1 SERIALISATION
+
+L<Module::Generic::JSON> inherits serialisation methods from L<Module::Generic>. The following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze>, and C<STORABLE_thaw>. See L<Module::Generic> for details.
+
+=head1 THREAD-SAFETY
+
+L<Module::Generic::JSON> is thread-safe for all operations, as it operates on per-object state and avoids the thread-safety issues present in the underlying L<JSON> module.
+
+Key considerations for thread-safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+There are no shared variables that are modified at runtime in L<Module::Generic::JSON>. The global C<$DEBUG> variable (inherited from L<Module::Generic>) is typically set before threads are created, and it is the user's responsibility to ensure thread-safety if modified at runtime:
+
+    use threads;
+    local $Module::Generic::JSON::DEBUG = 0; # Set before threads
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $json = Module::Generic::JSON->new( utf8 => 1 );
+            $json->encode( { a => 1 } ); # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+Note that the L<JSON> module uses a global C<$JSON> variable for functions like C<encode_json> and C<decode_json>, which can lead to thread-safety issues if modified at runtime. L<Module::Generic::JSON> avoids this by creating a new object instance for each call to L</decode_json> and L</encode_json>, ensuring thread isolation.
+
+=item * B<Object State>
+
+The underlying L<JSON> object is stored per-object, ensuring thread isolation:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $json = Module::Generic::JSON->new( utf8 => 1 );
+            $json->encode( { tid => threads->tid } ); # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<Class Functions>
+
+Class functions like L</decode_json> and L</encode_json> create a new object per call, ensuring thread isolation:
+
+    use threads;
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            my $data = decode_json( '{"a":1}' ); # Thread-safe
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+=item * B<External Libraries>
+
+The underlying L<JSON> module (both L<JSON::XS> and L<JSON::PP>) is thread-safe for object methods, as it operates on per-object state. However, its class functions (e.g., C<encode_json>, C<decode_json>) are not thread-safe due to the use of a global C<$JSON> variable. L<Module::Generic::JSON> mitigates this by always creating a new instance for such calls.
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe.
+
+=back
+
+For debugging in threaded environments (depending on your Operating System):
+
+    ls -l /proc/$$/fd  # List open file descriptors
 
 =head1 AUTHOR
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Iterator.pm
-## Version v1.2.1
+## Version v1.2.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/20
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,23 +19,14 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use Config;
-    use constant HAS_THREADS => ( $Config{useithreads} && $INC{'threads.pm'} );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    }
-    use Module::Generic::Array;
     use Scalar::Util ();
-    use Want;
-    our( $VERSION ) = 'v1.2.1';
+    use Wanted;
+    our( $VERSION ) = 'v1.2.3';
 };
 
 use v5.12.0;
 use strict;
-no warnings 'redefine';
+require Module::Generic::Array;
 
 sub init
 {
@@ -52,6 +43,7 @@ sub init
     }
     $self->{elements} = $elems;
     $self->{pos} = 0;
+    $self->{_started} = 0;
     return( $self );
 }
 
@@ -129,44 +121,32 @@ sub next
     else
     {
         return if( $self->eof );
-        if( HAS_THREADS )
+        if( $self->{_started} )
         {
-            lock( $self );
             $self->pos++;
         }
         else
         {
-            $self->pos++;
+            $self->{_started} = 1;
         }
         $pos = $self->pos;
     }
     return( $self->elements->index( $pos ) );
 }
 
-sub pos : lvalue
-{
-    my $self = shift( @_ );
-    if( want( qw( LVALUE ASSIGN ) ) )
+sub pos : lvalue { return( shift->_set_get_scalar({
+    field => 'pos',
+    check => sub
     {
-        my( $a ) = want( 'ASSIGN' );
-        if( $a !~ /^\d+$/ )
+        my( $self, $a ) = @_;
+        if( $a !~ /^\-?\d+$/ )
         {
             CORE::warn( "Position provided \"$a\" is not an integer.\n" );
-            lnoreturn;
+            return(0);
         }
-        $self->{pos} = $a;
-        lnoreturn;
-    }
-    elsif( want( 'RVALUE' ) )
-    {
-        rreturn( $self->{pos} );
-    }
-    else
-    {
-        return( $self->{pos} );
-    }
-    return;
-}
+        return(1);
+    },
+}, @_ ) ); }
 
 sub prev
 {
@@ -181,19 +161,12 @@ sub prev
     }
     else
     {
-        if( HAS_THREADS )
-        {
-            lock( $self );
-            $self->pos-- if( $self->pos > 0 );
-        }
-        else
-        {
-            $self->pos-- if( $self->pos > 0 );
-        }
+        $self->pos-- if( $self->pos >= 0 );
 
         # Position of the given element is at the beginning of our array, there is nothing more
         $pos = $self->pos;
-        return if( $pos <= 0 );
+        # return if( $pos <= 0 );
+        return if( $pos < 0 );
         # $self->pos--;
     }
     return( $self->elements->index( $pos ) );
@@ -203,6 +176,7 @@ sub reset
 {
     my $self = shift( @_ );
     $self->pos = 0;
+    $self->{_started} = 0;
     return( $self );
 }
 
@@ -212,12 +186,12 @@ sub _find_pos
     my $this = shift( @_ );
     return if( !CORE::length( $this ) );
     my $is_ref = ref( $this );
-    my $ref = $is_ref ? Scalar::Util::refaddr( $this ) : $this;
+    my $ref = $is_ref ? Scalar::Util::refaddr( $this // '' ) : $this;
     my $elems = $self->elements;
     foreach my $i ( 0 .. $#$elems )
     {
         my $val = $elems->[$i]->value;
-        if( ( $is_ref && Scalar::Util::refaddr( $elems->[$i] ) eq $ref ) ||
+        if( ( $is_ref && Scalar::Util::refaddr( $elems->[$i] // '' ) eq $ref ) ||
             ( !$is_ref && $val eq $this ) )
         {
             return( $i );
@@ -242,7 +216,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use Want;
+    use Wanted;
     our( $VERSION ) = 'v0.1.0';
 };
 

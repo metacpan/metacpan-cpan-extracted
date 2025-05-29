@@ -35,13 +35,28 @@ sub new {
 sub type {
     my $self = shift;
 
-    if (ICANN::gTLD->get($self->name)) {
-        return TYPE_GTLD;
-
-    } elsif (exists($KNOWN_TYPES->{$self->name})) {
+    if (exists($KNOWN_TYPES->{$self->name})) {
+        #
+        # known type
+        #
         return $KNOWN_TYPES->{$self->name};
 
+    } elsif (2 == length($self->name)) {
+        #
+        # all 2-character TLDs are ccTLDs
+        #
+        return TYPE_CCTLD;
+
+    } elsif (ICANN::gTLD->get($self->name)) {
+        #
+        # TLD is present in the ICANN gTLD list
+        #
+        return TYPE_GTLD;
+
     } else {
+        #
+        # IDN ccTLD
+        #
         return TYPE_CCTLD;
 
     }
@@ -67,7 +82,7 @@ Data::DNS::TLD - an object representing a top-level domain.
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -104,6 +119,9 @@ This method returns one of the following:
 =item * C<Data::DNS::TLD::TYPE_CCTLD> - the TLD is a "country-code" TLD.
 
 =back
+
+This method uses L<ICANN::gTLD> to check if the TLD is present on the list of
+gTLDs published by ICANN.
 
 =head2 rdap_record()
 

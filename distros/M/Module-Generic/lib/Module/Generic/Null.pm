@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Null.pm
-## Version v1.1.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.1.3
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2024/06/27
+## Modified 2025/05/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -27,8 +27,8 @@ BEGIN
         fallback => 1,
     );
     use Scalar::Util ();
-    use Want;
-    our( $VERSION ) = 'v1.1.2';
+    use Wanted;
+    our( $VERSION ) = 'v1.1.3';
 };
 
 use strict;
@@ -38,10 +38,7 @@ sub new
 {
     my $this = shift( @_ );
     my $class = ref( $this ) || $this;
-    my $error_object;
-    $error_object = shift( @_ ) if( Scalar::Util::blessed( $_[0] ) );
     my $hash = ( @_ == 1 && ref( $_[0] ) ? shift( @_ ) : { @_ } );
-    $hash->{has_error} = $error_object;
     return( bless( $hash => $class ) );
 }
 
@@ -50,7 +47,6 @@ sub _obj_eq
     no overloading;
     my $self = shift( @_ );
     my $other = shift( @_ );
-    my $me;
     if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Null' ) )
     {
         return( $self eq $other );
@@ -71,31 +67,11 @@ AUTOLOAD
     my $self = shift( @_ );
     my $what = ( defined( $self->{wants} ) && length( $self->{wants} ) )
         ? uc( $self->{wants} )
-        : Want::want( 'LIST' )
-            ? 'LIST'
-            : Want::want( 'HASH' )
-                ? 'HASH'
-                : Want::want( 'ARRAY' )
-                    ? 'ARRAY'
-                    : Want::want( 'OBJECT' )
-                        ? 'OBJECT'
-                        : Want::want( 'CODE' )
-                            ? 'CODE'
-                            : Want::want( 'REFSCALAR' )
-                                ? 'REFSCALAR'
-                                : Want::want( 'BOOLEAN' )
-                                    ? 'BOOLEAN'
-                                    : Want::want( 'GLOB' )
-                                        ? 'GLOB'
-                                        : Want::want( 'SCALAR' )
-                                            ? 'SCALAR'
-                                            : Want::want( 'VOID' )
-                                                ? 'VOID'
-                                                : '';
+        : Wanted::context();
     # If we are chained, return our null object, so the chain continues to work
     if( $what eq 'OBJECT' )
     {
-        # No, this is NOT a typo. rreturn() is a function of module Want
+        # No, this is NOT a typo. rreturn() is a function of module Wanted
         # rreturn( $_[0] );
         rreturn( $self );
     }
@@ -115,10 +91,17 @@ AUTOLOAD
     {
         rreturn( \undef );
     }
+    elsif( $what eq 'GLOB' )
+    {
+        my $ref;
+        open( my $fh, '>', \$ref );
+        rreturn( $fh );
+    }
     # Otherwise, we return undef; Empty return returns undef in scalar context and empty list in list context
     return;
 };
 
+# NOTE: DESTROY
 DESTROY {};
 
 sub FREEZE

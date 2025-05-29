@@ -1,0 +1,6 @@
+Revision history for perl module Data::DNS:
+
+0.02 - 2025-05-28
+  - add Data::DNS->all()
+  - improved performance of Data::DNS::TLD->type() to defer anything that could
+    result in a network round trip until absolutely necessary.

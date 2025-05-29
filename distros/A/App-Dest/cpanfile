@@ -8,6 +8,7 @@ requires "File::DirCompare" => "0";
 requires "File::Find" => "0";
 requires "File::Path" => "0";
 requires "IPC::Run" => "0";
+requires "POSIX" => "0";
 requires "Path::Tiny" => "0";
 requires "Pod::Usage" => "0";
 requires "Text::Diff" => "0";

@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.1";
+our $VERSION = "0.3";
 
 use Scalar::Util qw/blessed weaken/;
 use Aion::Types qw//;
@@ -20,7 +20,7 @@ sub export($@);
 # Классы в которых подключён Aion с метаинформацией
 our %META;
 
-# вызывается из другого пакета, для импорта данного
+# Вызывается из другого пакета, для импорта данного
 sub import {
 	my ($cls, $attr) = @_;
 	my $pkg = caller;
@@ -37,6 +37,7 @@ sub import {
 
     # Метаинформация
 	$META{$pkg} = {
+		order => scalar keys %META,
 		feature => {},
 		aspect => {
 			is => \&is_aspect,
@@ -44,6 +45,8 @@ sub import {
 			coerce => \&coerce_aspect,
 			default => \&default_aspect,
 			trigger => \&trigger_aspect,
+			release => \&release_aspect,
+			clearer => \&clearer_aspect,
 		}
 	};
 
@@ -73,7 +76,7 @@ sub _weaken_init {
 	weaken $self->{$feature->{name}};
 }
 
-# ro, rw, + и -
+# ro, rw, + и -, *
 sub is_aspect {
     my ($cls, $name, $is, $construct, $feature) = @_;
     die "Use is => '(ro|rw|wo|no)[+-]?[*]?'" if $is !~ /^(ro|rw|wo|no)[+-]?[*]?\z/;
@@ -152,6 +155,41 @@ sub trigger_aspect {
 	push @{$feature->{init}}, \&_trigger_init;
 }
 
+# release => $sub
+sub release_aspect {
+	my ($cls, $name, $release, $construct, $feature) = @_;
+
+	*{"${cls}::${name}__RELEASE"} = $release;
+
+	$construct->{get} = "my \$release = $construct->{get}; \$self->${name}__RELEASE(\$release); \$release";
+}
+
+# Если на фичах объекта есть clearer, то на него устанавливается этот деструктор
+sub destroy {
+	my ($self) = @_;
+
+	my $feature_href = $Aion::META{ref $self}{feature};
+	
+	for my $feature (sort { $b->{order} <=> $a->{order} } values %$feature_href) {
+		eval {
+			my ($name, $clearer) = @$feature{qw/name clearer/};
+			$clearer->($self) if defined $clearer and exists $self->{$name};
+		};
+		warn $@ if $@;
+	}
+}
+
+# clearer => $sub
+sub clearer_aspect {
+	my ($cls, $name, $clearer, $construct, $feature) = @_;
+
+	$feature->{clearer} = $clearer;
+	*{"${cls}::DESTROY"} = \&destroy unless $cls->can('DESTROY');
+	*{"${cls}::${name}__CLEARER"} = $clearer;
+	
+	die "Is DESTROY in Aion class ($cls): not set aion destroy!" if $cls->can('DESTROY') != \&destroy;
+}
+
 # Расширяет класс или роль
 sub inherits($$@) {
     my $pkg = shift; my $with = shift;
@@ -222,9 +260,7 @@ sub requires(@) {
     return;
 }
 
-
-
-# Требуются подпрограммы
+# Добавляется аспект
 sub aspect($$) {
 	my ($name, $sub) = @_;
     my $pkg = caller;
@@ -272,9 +308,14 @@ sub does {
     return "";
 }
 
-# Очищает переменную в объекте, возвращает себя
+# Очищает переменные в объекте, возвращает себя
 sub clear {
     my $self = shift;
+	my $meta = $Aion::META{ref $self};
+	for my $name (@_) {
+		my $feature = $meta->{feature}{$name};
+		$feature->{clearer}->($self) if $feature and $feature->{clearer} and exists $self->{$name};
+	}
     delete @$self{@_};
     $self
 }
@@ -323,6 +364,7 @@ sub has(@) {
             opt => \%opt,
             name => $name,
             construct => \%construct,
+			order => scalar keys %{$meta->{feature}},
         };
 
         my $ASPECT = $meta->{aspect};
@@ -408,7 +450,7 @@ sub create_from_params {
 
 	do {local $" = ", "; unshift @errors, "Features @required is required!"} if @required > 1;
 	unshift @errors, "Feature @required is required!" if @required == 1;
-	
+
 	my @fakekeys = sort keys %value;
 	unshift @errors, "@fakekeys is not feature!" if @fakekeys == 1;
 	do {local $" = ", "; unshift @errors, "@fakekeys is not features!"} if @fakekeys > 1;
@@ -424,11 +466,11 @@ __END__
 
 =head1 NAME
 
-Aion - a postmodern object system for Perl 5, as C<Moose> and C<Moo>, but with improvements
+Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, “Moo”, “Mo” and “M”, but with improvements
 
 =head1 VERSION
 
-0.1
+0.3
 
 =head1 SYNOPSIS
 
@@ -440,7 +482,7 @@ Aion - a postmodern object system for Perl 5, as C<Moose> and C<Moo>, but with i
 	    has b => (is => 'ro+', isa => Num);
 	    has op => (is => 'ro', isa => Enum[qw/+ - * \/ **/], default => '+');
 	
-	    sub result {
+	    sub result : Isa(Object => Num) {
 	        my ($self) = @_;
 	        eval "${\ $self->a} ${\ $self->op} ${\ $self->b}"
 	    }
@@ -451,23 +493,25 @@ Aion - a postmodern object system for Perl 5, as C<Moose> and C<Moo>, but with i
 
 =head1 DESCRIPTION
 
-Aion — OOP framework for create classes with B<features>, has B<aspects>, B<roles> and so on.
+Aion is OOP-framework for creating classes with B<features>, has B<aspects>, B<roles> and so on.
 
-Properties declared via C<has> are called B<features>.
+The properties declared through HAS are called I<* features *>.
 
-And C<is>, C<isa>, C<default> and so on in C<has> are called B<aspects>.
+And C<is>,C<isa>, C<default>, and so on inC<has> are called I<* aspects *>.
 
-In addition to standard aspects, roles can add their own aspects using subroutine C<aspect>.
+In addition to standard aspects, roles can add their own aspects using the B<aspect> subprogram.
+
+The signature of the methods can be checked using the attribute C<:Isa(...)>.
 
 =head1 SUBROUTINES IN CLASSES AND ROLES
 
-C<use Aion> include in module types from C<Aion::Types> and next subroutines:
+C<Use Aion> imports types from the moduleC<Aion::Types> and the following subprograms:
 
 =head2 has ($name, %aspects)
 
-Make method for get/set feature (property) of the class.
+Creates a method for obtaining/setting the function (properties) of the class.
 
-File lib/Animal.pm:
+lib/Animal.pm file:
 
 	package Animal;
 	use Aion;
@@ -492,7 +536,7 @@ File lib/Animal.pm:
 
 =head2 with
 
-Add to module roles. It call on each the role method C<import_with>.
+Adds to the module of the role. For each role, the C<import_with> method is called.
 
 File lib/Role/Keys/Stringify.pm:
 
@@ -526,7 +570,8 @@ File lib/Class/All/Stringify.pm:
 	
 	use Aion;
 	
-	with qw/Role::Keys::Stringify Role::Values::Stringify/;
+	with q/Role::Keys::Stringify/;
+	with q/Role::Values::Stringify/;
 	
 	has [qw/key1 key2/] => (is => 'rw', isa => Str);
 	
@@ -544,10 +589,10 @@ File lib/Class/All/Stringify.pm:
 
 =head2 isa ($package)
 
-Check C<$package> is the class what extended this class.
+Checks that C<$package> is a super class for a given or this class itself.
 
 	package Ex::X { use Aion; }
-	package Ex::A { use Aion; extends qw/Ex::X/; }
+	package Ex::A { use Aion; extends q/Ex::X/; }
 	package Ex::B { use Aion; }
 	package Ex::C { use Aion; extends qw/Ex::A Ex::B/ }
 	
@@ -561,7 +606,7 @@ Check C<$package> is the class what extended this class.
 
 =head2 does ($package)
 
-Check C<$package> is the role what extended this class.
+Checks that C<$package> is a role that is used in a class or another role.
 
 	package Role::X { use Aion -role; }
 	package Role::A { use Aion; with qw/Role::X/; }
@@ -577,7 +622,7 @@ Check C<$package> is the role what extended this class.
 
 =head2 aspect ($aspect => sub { ... })
 
-It add aspect to C<has> in this class or role, and to the classes, who use this role, if it role.
+Adds the aspect to C<has> in the current class and its classroom classes or the current role and applies its classes.
 
 	package Example::Earth {
 	    use Aion;
@@ -597,21 +642,21 @@ It add aspect to C<has> in this class or role, and to the classes, who use this 
 	
 	$earth->moon # => Mars
 
-Aspect is called every time it is specified in C<has>.
+The aspect is called every time it is indicated in C<has>.
 
-Aspect handler has parameters:
+The creator of the aspect has the parameters:
 
 =over
 
-=item * C<$cls> — the package with the C<has>.
+=item * C<$cls> - a bag with C<has>.
 
-=item * C<$name> — the feature name.
+=item * C<$name> is the name of feature.
 
-=item * C<$value> — the aspect value.
+=item * C<$value> is the meaning of the aspect.
 
-=item * C<$construct> — the hash with code fragments for join to the feature method.
+=item * C<$construct> - a hash with fragments of the code for joining the object method.
 
-=item * C<$feature> — the hash present feature.
+=item * C<$feature> - a hash describing a feature.
 
 =back
 
@@ -627,7 +672,7 @@ Aspect handler has parameters:
 	        $name # => moon
 	        $value # -> 1
 	        [sort keys %$construct] # --> [qw/attr eval get name pkg ret set sub/]
-	        [sort keys %$feature] # --> [qw/construct has name opt/]
+	        [sort keys %$feature] # --> [qw/construct has name opt order/]
 	
 	        my $_construct = {
 	            pkg => $cls,
@@ -660,6 +705,7 @@ Aspect handler has parameters:
 	            },
 	            name => $name,
 	            construct => $_construct,
+	            order => 0,
 	        };
 	
 	        $feature # --> $_feature
@@ -672,7 +718,7 @@ Aspect handler has parameters:
 
 =head2 extends (@superclasses)
 
-Extends package other package. It call on each the package method C<import_extends> if it exists.
+Expands the class with another class/classes. It causes from each inherited class the method of C<import_extends>, if it is in it.
 
 	package World { use Aion;
 	
@@ -688,7 +734,7 @@ Extends package other package. It call on each the package method C<import_exten
 	}
 	
 	package Hello { use Aion;
-	    extends qw/World/;
+	    extends q/World/;
 	
 	    $World::extended_by_this # -> 1
 	}
@@ -697,15 +743,15 @@ Extends package other package. It call on each the package method C<import_exten
 
 =head2 new (%param)
 
-Constructor. 
+The constructor.
 
 =over
 
-=item * Set C<%param> to features.
+=item * Installs C<%param> for features.
 
-=item * Check if param not mapped to feature.
+=item * Checks that the parameters correspond to the features.
 
-=item * Set default values.
+=item * Sets default values.
 
 =back
 
@@ -732,7 +778,7 @@ Constructor.
 
 =head2 requires (@subroutine_names)
 
-Check who in classes who use the role present the subroutines.
+Checks that in classes using this role there are these subprograms or features.
 
 	package Role::Alpha { use Aion -role;
 	
@@ -758,7 +804,11 @@ Check who in classes who use the role present the subroutines.
 
 =head2 has ($feature)
 
-It check what property is set.
+Checks that the property is established.
+
+Features having C<< default =E<gt> sub {...} >> perform C<sub> during the first call of the Getter, that is: are delayed.
+
+C<< $object-E<gt>has('feature') >> allows you to check that C<default> has not yet been called.
 
 	package ExHas { use Aion;
 	    has x => (is => 'rw');
@@ -774,14 +824,14 @@ It check what property is set.
 
 =head2 clear (@features)
 
-Cleared the features.
+He removes the keys of the feature from the object by previously calling them C<clearer> (if exists).
 
-	package ExClear { use Aion;
+	package ExClearer { use Aion;
 	    has x => (is => 'rw');
 	    has y => (is => 'rw');
 	}
 	
-	my $c = ExClear->new(x => 10, y => 12);
+	my $c = ExClearer->new(x => 10, y => 12);
 	
 	$c->has("x")   # -> 1
 	$c->has("y")   # -> 1
@@ -793,7 +843,7 @@ Cleared the features.
 
 =head1 METHODS IN CLASSES
 
-C<use Aion> include in module next methods:
+C<Use Aion> includes the following methods in the module:
 
 =head2 new (%parameters)
 
@@ -801,31 +851,31 @@ The constructor.
 
 =head1 ASPECTS
 
-C<use Aion> include in module next aspects for use in C<has>:
+C<use Aion> includes the following aspects in the module for use in C<has>:
 
 =head2 is => $permissions
 
 =over
 
-=item * C<ro> — make getter only.
+=item * C<ro> - create only a gutter.
 
-=item * C<wo> — make setter only.
+=item * C<wo> - create only a setter.
 
-=item * C<rw> — make getter and setter.
+=item * C<rw> - Create getter and setter.
 
 =back
 
-Default is C<rw>.
+By default - C<rw>.
 
-Additional permissions:
+Additional permits:
 
 =over
 
-=item * C<+> — the feature is required. It is not used with C<->.
+=item * C<+> - feature is required in the parameters of the designer. C<+> is not used with C<->.
 
-=item * C<-> — the feature cannot be set in the constructor. It is not used with C<+>.
+=item * C<-> - a feature cannot be installed through the constructor. '-' is not used with C<+>.
 
-=item * C<*> — the value is reference and it maked weaken can be set.
+=item * C<*> - do not increase the counter of links to the value (apply C<weaken> to the value after installing it in a feature).
 
 =back
 
@@ -846,7 +896,7 @@ Additional permissions:
 	eval { ExIs->new(ro => 10)->wo }; $@ # ~> has: wo is wo- \(not get\)
 	ExIs->new(ro => 10)->rw(30)->rw  # -> 30
 
-Feature with C<*> don't hold value:
+The function with C<*> does not hold the meaning:
 
 	package Node { use Aion;
 	    has parent => (is => "rw*", isa => Maybe[Object["Node"]]);
@@ -868,11 +918,21 @@ Feature with C<*> don't hold value:
 
 =head2 isa => $type
 
-Set feature type. It validate feature value 
+Indicates the type, or rather - a validator, feature.
+
+	package ExIsa { use Aion;
+	    has x => (is => 'ro', isa => Int);
+	}
+	
+	eval { ExIsa->new(x => 'str') }; $@ # ~> \* Feature x must have the type Int. The it is 'str'
+	eval { ExIsa->new->x          }; $@ # ~> Get feature `x` must have the type Int. The it is undef
+	ExIsa->new(x => 10)->x              # -> 10
+
+For a list of validators, see L<Aion:::Type>.
 
 =head2 default => $value
 
-Default value set in constructor, if feature falue not present.
+The default value is set in the designer if there is no parameter with the name of the feature.
 
 	package ExDefault { use Aion;
 	    has x => (is => 'ro', default => 10);
@@ -881,7 +941,7 @@ Default value set in constructor, if feature falue not present.
 	ExDefault->new->x  # -> 10
 	ExDefault->new(x => 20)->x  # -> 20
 
-If C<$value> is subroutine, then the subroutine is considered a constructor for feature value. This subroutine lazy called where the value get.
+If C<$ Value> is a subprogram, then the subprogram is considered a designer of the meaning of the feature. Lazy calculation is used.
 
 	my $count = 10;
 	
@@ -901,7 +961,8 @@ If C<$value> is subroutine, then the subroutine is considered a constructor for 
 
 =head2 trigger => $sub
 
-C<$sub> called after the value of the feature is set (in C<new> or in setter).
+C<$sub> is called after installing the property in the constructor (C<new>) or through the setter.
+Etymology - let in.
 
 	package ExTrigger { use Aion;
 	    has x => (trigger => sub {
@@ -917,17 +978,60 @@ C<$sub> called after the value of the feature is set (in C<new> or in setter).
 	$ex->x(20);
 	$ex->y      # -> 30
 
+=head2 release => $sub
+
+C<$sub> is called before returning the property from the object through the gutter.
+Etymology - release.
+
+	package ExRelease { use Aion;
+	    has x => (release => sub {
+	        my ($self, $value) = @_;
+	        $_[1] = $value + 1;
+	    });
+	}
+	
+	my $ex = ExRelease->new(x => 10);
+	$ex->x      # -> 11
+
+=head2 clearer => $sub
+
+C<$sub> is called when the deructor is called orC<< $object-E<gt>clear("feature") ``, but only if there is a property (see >>$object->has(" feature ")`).
+
+	package ExClearer { use Aion;
+		
+		our $x;
+	
+	    has x => (clearer => sub {
+	        my ($self) = @_;
+	        $x = $self->x
+	    });
+	}
+	
+	$ExClearer::x      	# -> undef
+	ExClearer->new(x => 10);
+	$ExClearer::x      	# -> 10
+	
+	my $ex = ExClearer->new(x => 12);
+	
+	$ExClearer::x      # -> 10
+	$ex->clear('x');
+	$ExClearer::x      # -> 12
+	
+	undef $ex;
+	
+	$ExClearer::x      # -> 12
+
 =head1 ATTRIBUTES
 
-Aion add universal attributes.
+C<Aion> adds universal attributes to the package.
 
 =head2 Isa (@signature)
 
-Attribute C<Isa> check the signature the function where it called.
+The attribute C<Isa> checks the signature of the function.
 
-B<WARNING>: use atribute C<Isa> slows down the program.
+B<Attention>: Using the C<Isa> attribute slows down the program.
 
-B<TIP>: use aspect C<isa> on features is more than enough to check the correctness of the object data.
+B<COUNCIL>: The use of the C<Isa> aspect for objects is more than enough to check the correctness of the object data.
 
 	package Anim { use Aion;
 	
@@ -946,11 +1050,9 @@ B<TIP>: use aspect C<isa> on features is more than enough to check the correctne
 	eval { Anim->is_cat("cat") }; $@ # ~> Arguments of method `is_cat` must have the type Tuple\[Object, Str\].
 	eval { my @items = $anim->is_cat("cat") }; $@ # ~> Returns of method `is_cat` must have the type Tuple\[Bool\].
 
-If use name of type in C<@signature>, then call subroutine with this name from current package.
-
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 
@@ -958,4 +1060,4 @@ Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
 
 =head1 COPYRIGHT
 
-The Aion module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
+The Aion Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.

@@ -2,8 +2,8 @@ NAME
     App::ClipboardUtils - CLI utilities related to clipboard
 
 VERSION
-    This document describes version 0.009 of App::ClipboardUtils (from Perl
-    distribution App-ClipboardUtils), released on 2025-01-27.
+    This document describes version 0.010 of App::ClipboardUtils (from Perl
+    distribution App-ClipboardUtils), released on 2025-05-29.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
@@ -16,10 +16,13 @@ DESCRIPTION
     5. clear-clipboard-history
     6. clipadd
     7. clipget
-    8. detect-clipboard-manager
-    9. get-clipboard-content
-    10. get-clipboard-history-item
-    11. list-clipboard-history
+    8. cliptee
+    9. ct
+    10. detect-clipboard-manager
+    11. get-clipboard-content
+    12. get-clipboard-history-item
+    13. list-clipboard-history
+    14. tee-clipboard-content
 
 FUNCTIONS
   add_clipboard_content
@@ -58,6 +61,42 @@ FUNCTIONS
     *   tee => *true*
 
         Pass stdin to stdout.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  tee_clipboard_content
+    Usage:
+
+     tee_clipboard_content(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Shortcut for add-clipboard-content --tee.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   clipboard_manager => *str*
+
+        Explicitly set clipboard manager to use.
+
+        The default, when left undef, is to detect what clipboard manager is
+        running.
+
+    *   content => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
