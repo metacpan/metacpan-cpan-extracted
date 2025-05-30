@@ -1,12 +1,13 @@
 { 
 package Audio::Nama::Effect;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use List::MoreUtils qw(first_index insert_after_string);
 use Carp qw(carp cluck croak confess);
 use Data::Dumper::Concise;
 use Audio::Nama::Assign qw(json_out);
 use Audio::Nama::Log qw(logsub logpkg);
+use Audio::Nama::Util qw(timer start_event stop_event);
 use Audio::Nama::Globals qw(
 					$fx 
 					$fx_cache 
@@ -1268,7 +1269,7 @@ sub plan_fade {
 		schedule_fade($advance, sub { $self->_modify_effect($param, $to) } );
 		sub schedule_fade {
 			my ($after, $sub) = @_;
-			$project->{events}->{"fade_".$setup->{fade_counter}++} = AE::timer( $after, 0, $sub );
+			start_event("fade_".$setup->{fade_counter}++ => timer( $after, 0, $sub ));
 		}
 	}
 }

@@ -7,7 +7,7 @@ static SV * _new (SV * type, CV * cv) {
 	dTHX;
 	HV * hash = newHV();
 	hv_store(hash, "name", 4, type, 0);
-	hv_store(hash, "validate", 8, (SV*)cv, 0);
+	hv_store(hash, "constraint", 10, (SV*)cv, 0);
 	return sv_bless(newRV_noinc((SV*)hash), gv_stashsv(newSVpv("Basic::Types::XS", 16), 0));
 }
 
@@ -35,7 +35,7 @@ int _sv_isa_bool (SV * param) {
 		param = SvRV(param);
 		type = SvTYPE(param);
 	}
-	
+
 	if (type >= SVt_PVAV) {
 		return 0;
 	}
@@ -117,9 +117,36 @@ static SV * coerce (SV * self, SV * param) {
 	return param;
 }
 
-MODULE = Basic::Types::XS  PACKAGE = Basic::Types::XS
-PROTOTYPES: ENABLE
-FALLBACK: TRUE
+int regex_match(SV *input_sv, SV **pattern_sv) {
+	dTHX;
+	STRLEN retlen;
+	char * input = SvPV(input_sv, retlen);
+	REGEXP *rx;
+	if (!pattern_sv || !SvROK(*pattern_sv)) {
+		char *pattern = (pattern_sv && SvOK(*pattern_sv)) ? SvPV_nolen(*pattern_sv) : "\\s+";
+		STRLEN patlen = strlen(pattern);
+		SV *pat_sv = newSVpvn(pattern, patlen);
+		rx = pregcomp(pat_sv, 0);
+		SvREFCNT_dec(pat_sv);
+	} else if (SvTYPE(SvRV(*pattern_sv)) == SVt_REGEXP) {
+		SvREFCNT_inc(*pattern_sv);
+		rx = (REGEXP *)SvRV(*pattern_sv);
+	}
+	if (!rx) {
+		return 0;
+	}
+	STRLEN pos = 0;
+	STRLEN last = 0;
+	I32 nmatch = pregexec(rx, input + pos, input + retlen, input, 0, input_sv, 0);
+	if (nmatch > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+MODULE = Basic::Types::XS::Definition  PACKAGE = Basic::Types::XS::Definition
+PROTOTYPES: DISABLE
 
 SV *
 _Any(...)
@@ -129,7 +156,7 @@ _Any(...)
 			croak("Any type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -145,20 +172,18 @@ _Any(...)
 SV *
 Any(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Any
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Any, __FILE__);
 		RETVAL = _new(newSVpv("Any", 3), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Any type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -182,7 +207,7 @@ _Defined(...)
 			croak("Defined type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -198,20 +223,18 @@ _Defined(...)
 SV *
 Defined(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Defined
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Defined, __FILE__);
 		RETVAL = _new(newSVpv("Defined", 7), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Defined type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -235,7 +258,7 @@ _Ref(...)
 			croak("Ref type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -251,20 +274,18 @@ _Ref(...)
 SV *
 Ref(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Ref
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Ref, __FILE__);
 		RETVAL = _new(newSVpv("Ref", 3), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Ref type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -288,7 +309,7 @@ _ScalarRef(...)
 			croak("ScalarRef type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -304,20 +325,18 @@ _ScalarRef(...)
 SV *
 ScalarRef(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__ScalarRef
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__ScalarRef, __FILE__);
 		RETVAL = _new(newSVpv("ScalarRef", 9), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("ScalarRef type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -341,7 +360,7 @@ _ArrayRef(...)
 			croak("ArrayRef type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -357,20 +376,18 @@ _ArrayRef(...)
 SV *
 ArrayRef(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__ArrayRef
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__ArrayRef, __FILE__);
 		RETVAL = _new(newSVpv("ArrayRef", 8), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("ArrayRef type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -394,7 +411,7 @@ _HashRef(...)
 			croak("HashRef type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -410,20 +427,18 @@ _HashRef(...)
 SV *
 HashRef(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__HashRef
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__HashRef, __FILE__);
 		RETVAL = _new(newSVpv("HashRef", 7), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("HashRef type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -447,7 +462,7 @@ _CodeRef(...)
 			croak("CodeRef type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -463,20 +478,18 @@ _CodeRef(...)
 SV *
 CodeRef(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__CodeRef
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__CodeRef, __FILE__);
 		RETVAL = _new(newSVpv("CodeRef", 7), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("CodeRef type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -500,7 +513,7 @@ _RegexpRef(...)
 			croak("RegexpRef type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -516,20 +529,18 @@ _RegexpRef(...)
 SV *
 RegexpRef(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__RegexpRef
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__RegexpRef, __FILE__);
 		RETVAL = _new(newSVpv("RegexpRef", 9), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("RegexpRef type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -553,7 +564,7 @@ _GlobRef(...)
 			croak("GlobRef type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -569,20 +580,18 @@ _GlobRef(...)
 SV *
 GlobRef(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__GlobRef
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__GlobRef, __FILE__);
 		RETVAL = _new(newSVpv("GlobRef", 7), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("GlobRef type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -606,7 +615,9 @@ _Str(...)
 			croak("Str type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
+
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -623,20 +634,18 @@ _Str(...)
 SV *
 Str(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Str
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Str, __FILE__);
 		RETVAL = _new(newSVpv("Str", 3), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Str type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -648,10 +657,65 @@ Str(...)
 			STRLEN keylen;
 			char * keystr = SvPV(key, keylen);
 			hv_store(self, keystr, keylen, newSVsv(value), 0);
-		}		
+		}
 	OUTPUT:
 		RETVAL
-		
+
+
+SV *
+_StrMatch(...)
+	CODE:
+		SV * self = CvXSUBANY(cv).any_ptr;
+		if (!self || !SvOK(self)) {
+			croak("StrMatch type constraint not initialized");
+		}
+
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
+		param = set_default(self, param);
+		param = coerce(self, param);
+
+		SV ** pattern_sv = hv_fetch((HV*)SvRV(self), "validate", 8, 0);
+
+		if (SvTYPE(param) != SVt_PV || !regex_match(param, pattern_sv)) {
+			char * custom_error = get_error_message(self, "StrMatch");
+			croak("%s", custom_error);
+		}
+		SvREFCNT_inc(param);
+		RETVAL = param;
+	OUTPUT:
+		RETVAL
+
+SV *
+StrMatch(...)
+	CODE:
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__StrMatch, __FILE__);
+		RETVAL = _new(newSVpv("StrMatch", 8), type);
+		SvREFCNT_inc(type);
+		CvXSUBANY(type).any_ptr = (void *)RETVAL;
+		SvREFCNT_inc(RETVAL);
+		HV * self = (HV*)SvRV(RETVAL);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
+		if (items % 2 != 0) {
+			croak("StrMatch type constraint requires an even number of arguments");
+		}
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
+			SV * key = ST(i);
+			SV * value = ST(i + 1);
+			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
+				croak("key must be a string");
+			}
+			if (!SvOK(value)) {
+				croak("value must be defined");
+			}
+			STRLEN keylen;
+			char * keystr = SvPV(key, keylen);
+			hv_store(self, keystr, keylen, newSVsv(value), 0);
+		}
+	OUTPUT:
+		RETVAL
+
+
 SV *
 _Num(...)
 	CODE:
@@ -660,7 +724,7 @@ _Num(...)
 			croak("Num type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -679,20 +743,18 @@ _Num(...)
 SV *
 Num(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Num
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Num, __FILE__);
 		RETVAL = _new(newSVpv("Num", 3), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Num type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -716,7 +778,7 @@ _Int(...)
 			croak("Int type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -735,20 +797,18 @@ _Int(...)
 SV *
 Int(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Int
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Int, __FILE__);
 		RETVAL = _new(newSVpv("Int", 3), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Int type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -772,7 +832,7 @@ _Bool(...)
 			croak("Bool type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -788,20 +848,18 @@ _Bool(...)
 SV *
 Bool(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Bool
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Bool, __FILE__);
 		RETVAL = _new(newSVpv("Bool", 4), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Bool type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -817,7 +875,7 @@ Bool(...)
 	OUTPUT:
 		RETVAL
 
-SV * 
+SV *
 _Object(...)
 	CODE:
 		SV * self = CvXSUBANY(cv).any_ptr;
@@ -825,7 +883,7 @@ _Object(...)
 			croak("Object type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -841,20 +899,18 @@ _Object(...)
 SV *
 Object(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__Object
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Object, __FILE__);
 		RETVAL = _new(newSVpv("Object", 6), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("Object type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -878,7 +934,7 @@ _ClassName(...)
 			croak("ClassName type constraint not initialized");
 		}
 
-		SV * param = ST(0);
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
 		param = set_default(self, param);
 		param = coerce(self, param);
 
@@ -902,20 +958,18 @@ _ClassName(...)
 SV *
 ClassName(...)
 	CODE:
-		CV *type = newXS(NULL, NULL, __FILE__);
-		CvXSUB(type) = (XSUBADDR_t)(
-			XS_Basic__Types__XS__ClassName
-		);
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__ClassName, __FILE__);
 		RETVAL = _new(newSVpv("ClassName", 9), type);
 		SvREFCNT_inc(type);
 		CvXSUBANY(type).any_ptr = (void *)RETVAL;
 		SvREFCNT_inc(RETVAL);
 		HV * self = (HV*)SvRV(RETVAL);
-		hv_store(self, "validate", 8, (SV*)type, 0);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
 		if (items % 2 != 0) {
 			croak("ClassName type constraint requires an even number of arguments");
 		}
-		for (int i = 0; i < items; i += 2) {
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
 			SV * key = ST(i);
 			SV * value = ST(i + 1);
 			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
@@ -931,15 +985,87 @@ ClassName(...)
 	OUTPUT:
 		RETVAL
 
+
+MODULE = Basic::Types::XS  PACKAGE = Basic::Types::XS
+PROTOTYPES: ENABLE
+FALLBACK: TRUE
+
+SV *
+default(self, value)
+	SV *self
+	SV *value
+	CODE:
+		if (!self || !SvROK(self)) {
+			croak("constraint not initialized");
+		}
+		if (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVCV) {
+			croak("value must be a coderef");
+		}
+		SvREFCNT_inc(self);
+		HV * self_hv = (HV*)SvRV(self);
+		hv_store(self_hv, "default", 7, newSVsv(value), 0);
+		RETVAL = self;
+	OUTPUT:
+		RETVAL
+
+SV *
+coerce(self, value)
+	SV *self
+	SV *value
+	CODE:
+		if (!self || !SvROK(self)) {
+			croak("constraint not initialized");
+		}
+		if (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVCV) {
+			croak("value must be a coderef");
+		}
+		SvREFCNT_inc(self);
+		HV * self_hv = (HV*)SvRV(self);
+		hv_store(self_hv, "coerce", 6, newSVsv(value), 0);
+		RETVAL = self;
+	OUTPUT:
+		RETVAL
+
+SV *
+message(self, value)
+	SV *self
+	SV *value
+	CODE:
+		if (!self || !SvROK(self)) {
+			croak("constraint not initialized");
+		}
+		SvREFCNT_inc(self);
+		HV * self_hv = (HV*)SvRV(self);
+		hv_store(self_hv, "message", 7, newSVsv(value), 0);
+		RETVAL = self;
+	OUTPUT:
+		RETVAL
+
+SV *
+validate(self, value)
+	SV *self
+	SV *value
+	CODE:
+		if (!self || !SvROK(self)) {
+			croak("constraint not initialized");
+		}
+		SvREFCNT_inc(self);
+		HV * self_hv = (HV*)SvRV(self);
+		hv_store(self_hv, "validate", 8, newSVsv(value), 0);
+		RETVAL = self;
+	OUTPUT:
+		RETVAL
+
 CV *
-validate(...)
+constraint(...)
 	OVERLOAD: &{}
 	CODE:
 		SV * self = ST(0);
 		if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV) {
 			croak("first argument must be a Basic::Types::XS object");
 		}
-		SV * cb = *hv_fetch((HV*)SvRV(self), "validate", 8, 0);
+		SvREFCNT_inc(self);
+		SV * cb = *hv_fetch((HV*)SvRV(self), "constraint", 10, 0);
 		RETVAL = (CV*)cb;
 	OUTPUT:
 		RETVAL
@@ -955,36 +1081,38 @@ import( ...)
 			char name [strlen(pkg) + 2 + retlen];
 			sprintf(name, "%s::%s", pkg, ex);
 			if (strcmp(ex, "Any") == 0) {
-				newXS(name, XS_Basic__Types__XS_Any, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Any, __FILE__);
 			} else if (strcmp(ex, "Defined") == 0) {
-				newXS(name, XS_Basic__Types__XS_Defined, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Defined, __FILE__);
 			} else if (strcmp(ex, "Str") == 0)  {
-				newXS(name, XS_Basic__Types__XS_Str, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Str, __FILE__);
 			} else if (strcmp(ex, "Num") == 0) {
-				newXS(name, XS_Basic__Types__XS_Num, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Num, __FILE__);
 			} else if (strcmp(ex, "Int") == 0) {
-				newXS(name, XS_Basic__Types__XS_Int, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Int, __FILE__);
 			} else if (strcmp(ex, "Ref") == 0) {
-				newXS(name, XS_Basic__Types__XS_Ref, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Ref, __FILE__);
 			} else if (strcmp(ex, "ScalarRef") == 0) {
-				newXS(name, XS_Basic__Types__XS_ScalarRef, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_ScalarRef, __FILE__);
 			} else if (strcmp(ex, "ArrayRef") == 0) {
-				newXS(name, XS_Basic__Types__XS_ArrayRef, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_ArrayRef, __FILE__);
 			} else if (strcmp(ex, "HashRef") == 0) {
-				newXS(name, XS_Basic__Types__XS_HashRef, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_HashRef, __FILE__);
 			} else if (strcmp(ex, "CodeRef") == 0) {
-				newXS(name, XS_Basic__Types__XS_CodeRef, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_CodeRef, __FILE__);
 			} else if (strcmp(ex, "RegexpRef") == 0) {
-				newXS(name, XS_Basic__Types__XS_RegexpRef, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_RegexpRef, __FILE__);
 			} else if (strcmp(ex, "GlobRef") == 0) {
-				newXS(name, XS_Basic__Types__XS_GlobRef, __FILE__);		
+				newXS(name, XS_Basic__Types__XS__Definition_GlobRef, __FILE__);
 			} else if (strcmp(ex, "Bool") == 0) {
-				newXS(name, XS_Basic__Types__XS_Bool, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Bool, __FILE__);
 			} else if (strcmp(ex, "Object") == 0) {
-				newXS(name, XS_Basic__Types__XS_Object, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_Object, __FILE__);
 			} else if (strcmp(ex, "ClassName") == 0) {
-				newXS(name, XS_Basic__Types__XS_ClassName, __FILE__);
+				newXS(name, XS_Basic__Types__XS__Definition_ClassName, __FILE__);
+			} else if (strcmp(ex, "StrMatch") == 0) {
+				newXS(name, XS_Basic__Types__XS__Definition_StrMatch, __FILE__);
 			} else {
 				croak("Unknown type constraint: %s", ex);
-			}	
+			}
 		}

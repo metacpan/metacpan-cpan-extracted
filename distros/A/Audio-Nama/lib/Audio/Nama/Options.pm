@@ -1,7 +1,7 @@
 # --------- Command line options ----------
 
 package Audio::Nama;
-use Modern::Perl '2020';
+use v5.36;
 
 sub process_command_line_options {
 

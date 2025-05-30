@@ -71,6 +71,7 @@ foreach my $attr (@display_fields) {
     } else {
         my $method = '$Object->'.$attr.'()';
         $method =~ s/->ISO\(\)$/->ISO( Timezone => 'user' )/;
+        $method =~ s/Priority/PriorityAsString/ if RT->Config->Get('EnablePriorityAsString');
         $value = eval $method;
         if ($@) {
             RT->Logger->error("Check your CalendarPopupFields config. Failed to find \"$attr\" - ". $@);
@@ -80,5 +81,4 @@ foreach my $attr (@display_fields) {
 </%perl>
 	<strong><&|/l&><% $label_of{$attr} %></&>:</strong> <% $value %><br />
 % }
-<br />
 % $m->abort;

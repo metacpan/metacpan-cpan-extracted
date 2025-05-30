@@ -4,6 +4,8 @@ lib/Basic/Types/XS.pm
 lib/Basic/Types/XS.xs
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-Str.t
@@ -16,13 +18,15 @@ t/07-Ref.t
 t/08-Defined.t
 t/09-Any.t
 t/10-Bool.t
+t/100-interface.t
 t/11-CodeRef.t
 t/12-RegexpRef.t
 t/13-GlobRef.t
 t/14-synop.t
+t/15-Object.t
+t/16-ClassName.t
+t/17-StrMatch.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

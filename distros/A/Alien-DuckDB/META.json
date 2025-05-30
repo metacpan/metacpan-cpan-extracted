@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build::MM" : "1.74",
+            "Alien::Build::MM" : "0.25",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "Mojo::DOM58" : "1.00",
@@ -35,27 +35,25 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.40",
-            "Alien::Build::MM" : "1.74",
-            "Alien::cmake3" : "0.08",
-            "ExtUtils::MakeMaker" : "6.52",
-            "Path::Tiny" : "0.100"
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.038",
-            "Alien::Build" : "1.74",
-            "Path::Tiny" : "0.100",
+            "Alien::Build" : "0.25",
+            "Path::Tiny" : "0.122",
             "perl" : "5.008004"
          }
       },
       "test" : {
          "requires" : {
-            "Path::Tiny" : "0.100",
+            "FFI::Platypus" : "0",
             "Test2::V0" : "0",
-            "Test::Alien" : "0.95",
-            "Test::More" : "0.94"
+            "Test::Alien" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -70,7 +68,7 @@
          "web" : "https://github.com/perigrin/Alien-DuckDB"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

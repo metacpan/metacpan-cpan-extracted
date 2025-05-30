@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename q
 # 
 # # VERSION
 # 
-# 0.2
+# 0.3
 # 
 # # SYNOPSIS
 # 

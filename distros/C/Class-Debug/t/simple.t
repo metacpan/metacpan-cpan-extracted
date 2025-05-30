@@ -45,6 +45,6 @@ throws_ok {
 	Class::Debug::setup($class, {
 		config_file => $bad_file,
 	});
-} qr/File not readable/, 'throws on unreadable config file';
+} qr/No such file or directory/, 'throws on unreadable config file';
 
 done_testing();

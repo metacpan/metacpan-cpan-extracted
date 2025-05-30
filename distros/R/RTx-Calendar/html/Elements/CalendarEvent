@@ -64,13 +64,16 @@ if ( ( !grep { $_ eq $TicketId } @$spanning_tickets_for_tomorrow ) ) {
         </div>
         <div class="event-info">
 % if ( $first_day_of_the_event || $DayOfWeek eq 1 ) {
-        <a class="event-title" href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>">
-           <% $Object->QueueObj->Name %> #<% $TicketId %>
-           <% $display_owner ? 'by ' . $Object->OwnerObj->Name : '' %>
-           <% length($Object->Subject) > 80 ? substr($Object->Subject, 0, 77) . "..." : $Object->Subject %>
+        <a class="event-title"
+            href="<%$RT::WebPath%>/Ticket/Display.html?id=<%$TicketId%>"
+            hx-get="<% RT->Config->Get("WebPath") %>/Helpers/CalendarEventInfo?event=<% $Object->Type %>-<% $Object->id %>"
+            hx-trigger="mouseover once"
+            hx-target="next .tip"
+        >
+           <% $display_line %>
         </a>
 % # Placeholder for the event details that will be loaded via AJAX on hover
-        <span class="tip">
+        <span class="tip p-3 rounded">
         </span>
 % }
     </div>
@@ -104,6 +107,8 @@ if ($Object->Type eq 'reminder') {
     $subject = $Object->Subject;
     $status = $Object->Status;
 }
+
+my $display_line = join " ", RTx::Calendar::GetEventData($Object);
 
 my %CalendarStatusColorMap = RT->Config->Get('CalendarStatusColorMap');
 

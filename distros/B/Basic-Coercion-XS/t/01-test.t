@@ -3,6 +3,7 @@ use Test::More;
 use Basic::Coercion::XS qw/StrToArray/;
 
 my $type = StrToArray(by => '-\(\d+\)-');
+
 my $arrayref = $type->("this-(100)-is-(200)-a-(300)-string");
 is_deeply(
 	$arrayref,
@@ -24,6 +25,12 @@ is_deeply($arrayref, [qw(foo bar baz)], 'split by digit sequence');
 $type = StrToArray();
 $arrayref = $type->("α β\tγ");
 is_deeply($arrayref, [qw(α β γ)], 'split unicode by whitespace');
+
+
+$type = StrToArray(by => qr/,/);
+$arrayref = $type->("a,b,c");
+is_deeply($arrayref, [qw(a b c)], 'split by comma - compiled');
+
 
 ok(1);
 

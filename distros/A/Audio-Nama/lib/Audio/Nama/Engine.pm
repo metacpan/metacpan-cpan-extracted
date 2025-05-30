@@ -1,7 +1,7 @@
 {
 package Audio::Nama::Engine;
 our $VERSION = 1.0;
-use Modern::Perl '2020';
+use v5.36;
 use Carp;
 our @ISA;
 our %by_name;
@@ -138,7 +138,7 @@ sub sync_action {
 {
 package Audio::Nama::NetEngine;
 our $VERSION = 1.0;
-use Modern::Perl '2020';
+use v5.36;
 use Audio::Nama::Log qw(logpkg logit);
 use Audio::Nama::Globals qw(:all);
 use Carp qw(carp);
@@ -152,7 +152,7 @@ sub init_ecasound_socket {
 	my $self = shift;
 	my $port = $self->port;
 	Audio::Nama::pager_newline("Creating socket on port $port.");
-	$self->{socket} = new IO::Socket::INET (
+	$self->{socket} = IO::Socket::INET->new (
 		PeerAddr => 'localhost', 
 		PeerPort => $port, 
 		Proto => 'tcp', 
@@ -293,7 +293,7 @@ sub configure {
 {
 package Audio::Nama::LibEngine;
 our $VERSION = 1.0;
-use Modern::Perl '2020';
+use v5.36;
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logit);
 our @ISA = 'Audio::Nama::Engine';
@@ -327,7 +327,7 @@ sub configure { Audio::Nama::NetEngine::configure(@_) }
 } # end package
 { 
 package Audio::Nama::MidiEngine;
-use Modern::Perl '2020';
+use v5.36;
 use SUPER;
 use Audio::Nama::Globals qw($config %tn);
 our $VERSION = 1.0;

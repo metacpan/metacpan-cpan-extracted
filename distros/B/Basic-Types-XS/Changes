@@ -6,3 +6,11 @@ Revision history for Basic-Types-XS
 0.07	2025-05-28
 	- Adds Object and ClassName types
 	- Moves all of import into XS.
+
+0.08	2025-05-29
+	- fix use of newXS by instantiating with the Xsub
+
+0.09    2025-05-29
+	- Scope the object so you can't do Str->Array anymore.
+	- Add StrMatch type
+	- Update object to have accessors message, default, coerce, validate.

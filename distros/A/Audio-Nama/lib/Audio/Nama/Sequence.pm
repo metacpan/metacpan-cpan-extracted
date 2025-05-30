@@ -1,5 +1,5 @@
 package Audio::Nama::Sequence;
-use Modern::Perl '2020'; use Carp; 
+use v5.36; use Carp; 
 use Audio::Nama::Assign qw(json_out);
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Effect  qw(fxn modify_effect);

@@ -1,6 +1,10 @@
 Revision history for RTx-Calendar
 
+2.00 2025-05-29
+ - Update for RT 6
+
 1.10 2024-03-25
+ - RT 5.0 compatibility
  - Add Spanish translation (thanks Eduardo Dominguez!)
  - Add Catalan translation (thanks Eduardo Dominguez!)
 

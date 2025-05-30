@@ -1,12 +1,6 @@
 window.onresize = resizeCalendarEventTitles;
 jQuery(function() {
     resizeCalendarEventTitles();
-
-    jQuery('div[data-object]>small>div.event-info>a.event-title').hover(
-        function(e) {
-            loadCalendarEventDetails(e);
-        }
-    );
 });
 
 /*
@@ -46,26 +40,34 @@ function resizeCalendarEventTitles() {
     )
 }
 
-function changeCalendarMonth() {
-    var month = jQuery('.changeCalendarMonth select[name="Month"]').val();
-    var year = jQuery('.changeCalendarMonth select[name="Year"]').val();
-    var querystring = jQuery('.changeCalendarMonth #querystring').val();
-    window.location.href = "?Month=" + month + "&Year=" + year + "&" + querystring;
-}
+htmx.onLoad(function(elt) {
+    elt.querySelectorAll('.calendar-reload').forEach(elt => {
+        elt.addEventListener('click', function(evt) {
+            evt.preventDefault();
+            const form = elt.closest('form');
+            const data = {};
+            if ( form ) {
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (data[key]) {
+                        if ( data[key] instanceof Array ) {
+                            data[key].push(value);
+                        }
+                        else {
+                            data[key] = [data[key], value];
+                        }
+                    }
+                    else {
+                        data[key] = value;
+                    }
+                }
+            }
 
-function loadCalendarEventDetails(e) {
-    // data-object
-    var event = jQuery(e.currentTarget).parents('[data-object]').attr('data-object');
-    // remove hover event from the element to run only once
-    jQuery(e.currentTarget).off('mouseenter mouseleave');
+            if (elt.name) {
+                data[elt.name] = elt.value;
+            }
 
-    var url = RT.Config.WebHomePath + '/Helpers/CalendarEventInfo?event=' + event;
-
-    jQuery.ajax({
-        url: url,
-        success: function(data) {
-            jQuery(e.currentTarget).parents('[data-object]')
-                .find('div.event-info>span.tip').html(data);
-        }
+            reloadElement(this.closest('[hx-get]'), { 'hx-vals': JSON.stringify(data) });
+        });
     });
-}
+});

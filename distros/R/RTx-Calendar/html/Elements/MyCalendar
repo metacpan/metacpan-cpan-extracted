@@ -113,8 +113,9 @@ my $Query = "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
 my $Format = "__Starts__ __Due__";
 
 if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) {
-  $Format = $Search->SubValue('Format');
-  $Query = $Search->SubValue('Query');
+    my $content = $Search->Content || {};
+    $Format = $content->{'Format'};
+    $Query = $content->{'Query'};
 }
 
 # we search all date types in Format string
@@ -142,5 +143,12 @@ $Query .= RTx::Calendar::DatesClauses(\@Dates, $begin->strftime("%F"), $end->str
 
 $m->callback( CallbackName => 'BeforeFindTickets', ARGSRef => \%ARGS, QueryRef => \$Query, FormatRef => \$Format );
 
-my ($Tickets, $TicketsSpanningDays) = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates);
+my ($Tickets, $TicketsSpanningDays);
+
+# This is the expensive part of the processing, so only run this when
+# htmx is rendering the main content.
+if ( $m->request_path =~ /^(?:\/SelfService)?\/Views/ ) {
+    ($Tickets, $TicketsSpanningDays) = RTx::Calendar::FindTickets($session{'CurrentUser'}, $Query, \@Dates);
+}
+
 </%INIT>

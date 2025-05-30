@@ -1,7 +1,7 @@
 {
 package Audio::Nama::BusUtil;
 use Role::Tiny;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use Audio::Nama::Globals qw(%tn %bn PLAY OFF MON);
 

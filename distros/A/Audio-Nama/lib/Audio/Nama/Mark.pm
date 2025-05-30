@@ -156,7 +156,7 @@ sub mark_time {
 # ---------- Mark and jump routines --------
 {
 package Audio::Nama;
-use Modern::Perl '2020';
+use v5.36;
 use Audio::Nama::Globals qw(:all);
 
 sub drop_mark {
@@ -339,7 +339,7 @@ sub time { Audio::Nama::ecasound_iam('cs-connected') ? ($last_time = Audio::Nama
 }
 
 { package Audio::Nama::ClipMark;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::Mark';
 
@@ -349,7 +349,7 @@ our @ISA = 'Audio::Nama::Mark';
 { package Audio::Nama::TempoMark;
 
 	our $VERSION = 1.0;
-	use Modern::Perl '2020';
+	use v5.36;
 	use Audio::Nama::Log qw(logpkg);
 	use Audio::Nama::Globals qw(:all);
 	our @ISA = 'Audio::Nama::Mark';

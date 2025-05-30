@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v1.0.1 2025-05-30T15:04:32+0900
+    - Corrected unit test in t/11.finfo.t
+
 v1.0.0 2025-05-29T10:01:42+0900
     - Fully threads-safe version
     - Enhanced 'open' method in Module::Generic::SharedMem, and Module::Generic::SharedMemXS to reuse semaphore ID from opened objects, improving thread-safety.

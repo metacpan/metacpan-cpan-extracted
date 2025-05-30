@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "Blio",
-  "dist_version" => "2.008",
+  "dist_version" => "2.009",
   "license" => "perl",
   "module_name" => "Blio",
   "recursive_test_files" => 1,

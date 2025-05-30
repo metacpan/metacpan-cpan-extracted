@@ -3,25 +3,23 @@ abstract: 'Find or build DuckDB'
 author:
   - 'Chris Prather <chris@prather.org>'
 build_requires:
-  Alien::Build::MM: '1.74'
+  Alien::Build::MM: '0.25'
+  FFI::Platypus: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   Mojo::DOM58: '1.00'
   Mozilla::CA: '0'
   Net::SSLeay: '1.49'
-  Path::Tiny: '0.100'
   Sort::Versions: '0'
   Test2::V0: '0'
-  Test::Alien: '0.95'
-  Test::More: '0.94'
+  Test::Alien: '0'
+  Test::More: '0'
   URI: '0'
   URI::Escape: '0'
 configure_requires:
-  Alien::Build: '1.40'
-  Alien::Build::MM: '1.74'
-  Alien::cmake3: '0.08'
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
-  Path::Tiny: '0.100'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -35,13 +33,13 @@ no_index:
     - inc
 requires:
   Alien::Base: '0.038'
-  Alien::Build: '1.74'
-  Path::Tiny: '0.100'
+  Alien::Build: '0.25'
+  Path::Tiny: '0.122'
   perl: '5.008004'
 resources:
   bugtracker: https://github.com/perigrin/Alien-DuckDB/issues
   repository: https://github.com/perigrin/Alien-DuckDB.git
-version: '0.02'
+version: '0.03'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

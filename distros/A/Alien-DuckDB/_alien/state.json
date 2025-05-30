@@ -1,0 +1,22 @@
+{
+   "args" : [
+      "root",
+      "_alien",
+      "meta_prop",
+      {}
+   ],
+   "install" : {
+      "download_rule" : "warn",
+      "mm" : {
+         "distname" : "Alien-DuckDB"
+      },
+      "patch" : null,
+      "root" : "/Users/perigrin/dev/Alien-DuckDB/_alien",
+      "stage" : "/Users/perigrin/dev/Alien-DuckDB/blib/lib/auto/share/dist/Alien-DuckDB"
+   },
+   "plugin_instance" : {},
+   "runtime" : {
+      "alien_build_version" : "2.84",
+      "install_type" : "share"
+   }
+}

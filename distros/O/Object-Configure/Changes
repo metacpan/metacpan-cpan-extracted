@@ -1,0 +1,27 @@
+Revision history for Object::Configure - Runtime Configuration for an Object
+
+0.07	Thu May 29 09:35:38 EDT 2025
+	Renamed from Class::Debug to Object::Configure
+	Get the Abstract from the PM file
+	Give better error message
+
+0.06	Thu May 22 21:11:29 EDT 2025
+	Ensure loggers aren't lost when it's a simple list
+
+0.05	Tue May 20 21:21:09 EDT 2025
+	Fix CI
+
+0.04	Tue May 20 21:14:56 EDT 2025
+	Try harder to avoid a logger hash within a logger hash
+
+0.03	Fri May 16 11:45:00 EDT 2025
+	Added CI support
+	Added better reporting on error
+	Use the features of Config::Abstraction 0.25
+
+0.02	Wed May  7 17:08:29 EDT 2025
+	Fix the return value
+	Added testing
+
+0.01	Wed May  7 16:42:04 EDT 2025
+        First draft

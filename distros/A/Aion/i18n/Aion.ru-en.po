@@ -5,10 +5,10 @@ msgid "Aion — ООП-фреймворк для создания классов
 msgstr "Aion is OOP-framework for creating classes with **features**, has **aspects**, **roles** and so on."
 
 msgid "Свойства, объявленные через has, называются **фичами**."
-msgstr "The properties declared through HAS are called ** features **."
+msgstr "The properties declared through HAS are called **features**."
 
 msgid "А `is`, `isa`, `default` и так далее в `has` называются **аспектами**."
-msgstr "And `is`,` isa`, `default`, and so on in` has` are called ** aspects **."
+msgstr "And `is`,` isa`, `default`, and so on in` has` are called **aspects**."
 
 msgid "Помимо стандартных аспектов, роли могут добавлять свои собственные аспекты с помощью подпрограммы **aspect**."
 msgstr "In addition to standard aspects, roles can add their own aspects using the **aspect** subprogram."

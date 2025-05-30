@@ -1,6 +1,6 @@
 {
 package Audio::Nama::Insert;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use Carp;
 no warnings qw(uninitialized redefine);
@@ -185,7 +185,7 @@ sub soundcard_delay {
 }
 {
 package Audio::Nama::PostFaderInsert;
-use Modern::Perl '2020'; use Carp; our @ISA = qw(Audio::Nama::Insert);
+use v5.36; use Carp; our @ISA = qw(Audio::Nama::Insert);
 our $VERSION = 1.0;
 use Audio::Nama::Util qw(input_node output_node dest_type);
 use Audio::Nama::Log qw(logpkg);
@@ -275,7 +275,7 @@ sub remove {
 }
 {
 package Audio::Nama::PreFaderInsert;
-use Modern::Perl '2020'; use Carp; our @ISA = qw(Audio::Nama::Insert);
+use v5.36; use Carp; our @ISA = qw(Audio::Nama::Insert);
 our $VERSION = 1.0;
 use Audio::Nama::Util qw(input_node output_node dest_type);
 use Audio::Nama::Log qw(logpkg);

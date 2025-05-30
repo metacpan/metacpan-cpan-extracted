@@ -2,7 +2,7 @@ package Blio::Node;
 
 # ABSTRACT: A Blio Node
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 
 use v5.24;
 use Moose;
@@ -236,12 +236,20 @@ sub write {
     }
     utime($utime_ep,$utime_ep,$outfile->stringify);
 
-    if ($self->has_images) {
-        foreach my $img (@{$self->images}) {
+    if ($self->has_images && $self->template ne 'image.tt') {
+        foreach my $img (@{$self->sorted_images}) {
             if ($blio->force || !-e $blio->output_dir->file($img->thumbnail)) {
                 say "\timage ".$img->url unless $blio->quiet;
                 $img->publish($blio);
                 $img->make_thumbnail($blio, $self->thumbnail);
+            }
+        }
+        if ( ($self->images->@* > 1) && $blio->images_as_nodes && !$self->inline_images) {
+            if (defined $self->stash->{images_as_nodes} && $self->stash->{images_as_nodes} == 0) {
+                # image_as_node disabled in node
+            }
+            else {
+                $self->make_images_html($blio);
             }
         }
     }
@@ -543,6 +551,46 @@ sub older_younger {
     return \%sib;
 }
 
+sub make_images_html {
+    my ($self, $blio) = @_;
+
+    my $old_children = $self->children;
+    $self->children([]);
+
+    my @sorted = $self->sorted_images->@*;
+    if ($self->stash->{reverse_children}) {
+        @sorted = reverse @sorted;
+    }
+    my @images;
+
+    foreach my $img (@sorted) {
+        my $img_basename = $img->source_file->basename;
+        my $image_node = Blio::Node->new(
+            base_dir => $blio->source_dir,
+            source_file => $img->source_file,
+            id=> $self->id.'_images/'.$img_basename,
+            title=>$img_basename,
+            date=>$self->date,
+            content=>$img_basename,
+            stash=>{
+                no_comments=>1,
+            },
+            template=>'image.tt',
+            images => $self->images,
+        );
+        $image_node->parent($self);
+        $self->add_child($image_node);
+
+        push(@images, $image_node);
+    }
+
+    foreach my $in (@images) {
+        $in->write($blio);
+    }
+
+    $self->children($old_children);
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -556,7 +604,7 @@ Blio::Node - A Blio Node
 
 =head1 VERSION
 
-version 2.008
+version 2.009
 
 =head1 AUTHOR
 
@@ -564,7 +612,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2024 by Thomas Klausner.
+This software is copyright (c) 2013 - 2025 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

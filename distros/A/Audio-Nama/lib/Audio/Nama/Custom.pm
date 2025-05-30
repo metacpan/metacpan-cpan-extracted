@@ -1,7 +1,7 @@
 # ---------------- User Customization ---------------
 
 package Audio::Nama;
-use Modern::Perl '2020';
+use v5.36;
 
 sub setup_user_customization {
 	my $filename = $file->user_customization();

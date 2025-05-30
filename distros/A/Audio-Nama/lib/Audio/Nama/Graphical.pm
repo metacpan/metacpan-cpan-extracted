@@ -1,7 +1,7 @@
 # ------------ Graphical User Interface ------------
 
 package Audio::Nama::Graphical;  ## gui routines
-use Modern::Perl '2020'; use Carp;
+use v5.36; use Carp;
 our $VERSION = 1.071;
 use Audio::Nama::Globals qw($text $prompt);
 
@@ -19,8 +19,6 @@ our @ISA = 'Audio::Nama';      ## default to root namespace, e.g.  Refresh_subs,
 
 sub hello {"make a window";}
 sub loop {
-	$text->{term_attribs}->{already_prompted} = 0;
-	$text->{term}->tkRunning(1);
   	while (1) {
   		my ($user_input) = $text->{term}->readline($prompt) ;
   		Audio::Nama::process_line( $user_input );
@@ -443,7 +441,7 @@ sub flash_ready {
 	$ui->length_display(-background => $color);
 	$ui->project_label_configure(-background => $color) unless $mode->{preview};
 	# TODO update for preview mode
- 	$project->{events}->{heartbeat} = AE::timer(5, 0, \&reset_engine_mode_color_display);
+ 	start_event(heartbeat =>  timer(5, 0, \&reset_engine_mode_color_display));
 }
 sub reset_engine_mode_color_display { $ui->project_label_configure(
 	-background => $gui->{_nama_palette}->{OffBackground} )
@@ -1211,7 +1209,7 @@ sub destroy_marker {
 
 sub setup_playback_indicator {
 	my $ui = shift;
-	$project->{events}->{update_playback_position_display} = AE::timer(0, 0.1, \&update_indicator);
+	start_event(update_playback_position_display => timer(0, 0.1, \&update_indicator));
 } 	
 sub update_indicator {
 	$gui->{wwcanvas}->delete('playback-indicator');

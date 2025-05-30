@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/05/28
+## Modified 2025/05/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -99,7 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.0.0';
+    our $VERSION     = 'v1.0.1';
 };
 
 use v5.26.1;
@@ -10776,7 +10776,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 

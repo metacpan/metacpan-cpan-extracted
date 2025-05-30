@@ -1,5 +1,5 @@
 package Audio::Nama::Object;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.05;
 use Carp;
 use Audio::Nama::Assign qw(json_out); 

@@ -2,7 +2,7 @@
 # support for beats and bars
 
 package Audio::Nama::Tempo;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use Audio::Nama::Globals qw($config);
 use Audio::Nama::Object qw( label bars meter tempo ticks);
@@ -248,7 +248,7 @@ sub notation_to_time {
 }
 
 package Audio::Nama;
-use Modern::Perl '2020';
+use v5.36;
 use Data::Dumper::Concise;
 use Audio::Nama::Log qw(logsub logpkg);
 use Audio::Nama::Util qw(strip_comments);

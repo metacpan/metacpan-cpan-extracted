@@ -1,7 +1,7 @@
 # ----------- Modes: mastering, preview, doodle ---------
 
 package Audio::Nama;
-use Modern::Perl '2020';
+use v5.36;
 {
 sub set_preview_mode {
 

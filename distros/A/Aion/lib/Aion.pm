@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.3";
+our $VERSION = "0.4";
 
 use Scalar::Util qw/blessed weaken/;
 use Aion::Types qw//;
@@ -470,7 +470,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-0.3
+0.4
 
 =head1 SYNOPSIS
 
@@ -495,9 +495,9 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 Aion is OOP-framework for creating classes with B<features>, has B<aspects>, B<roles> and so on.
 
-The properties declared through HAS are called I<* features *>.
+The properties declared through HAS are called B<features>.
 
-And C<is>,C<isa>, C<default>, and so on inC<has> are called I<* aspects *>.
+And C<is>,C<isa>, C<default>, and so on inC<has> are called B<aspects>.
 
 In addition to standard aspects, roles can add their own aspects using the B<aspect> subprogram.
 

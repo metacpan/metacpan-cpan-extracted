@@ -1,9 +1,19 @@
 <%args>
 $ShowSidebar => 0
+$Standalone => 0
 </%args>
 
-<div class="calendar-container">
+% if ( $ShowSidebar ) {
+<div class="calendar-container <% $ShowSidebar ? 'with-sidebar' : '' %>  <% $Standalone ? 'calendar-standalone' : '' %>">
+% }
 
+<&| /Widgets/TitleBox,
+     title => loc('Calendar'),
+     title_href => $RT::WebPath . "/Search/Calendar.html?Month=$Month&Year=$Year&$QueryString",
+     titleright => loc('Download Spreadsheet'),
+     titleright_href => $RT::WebPath. "/Search/Results.tsv?". $DownloadQueryString,
+     &>
+<div class="row">
 % if ($ShowSidebar) {
   <& /Elements/CalendarSidebar,
     BaseQuery => $BaseQuery,
@@ -15,17 +25,11 @@ $ShowSidebar => 0
     RowsPerPage => $RowsPerPage,
     FilterOnStatus => \@FilterOnStatus,
     Dates => \@Dates,
+    Standalone => $Standalone,
   &>
 % }
 
-<div class="calendar-content">
-<&| /Widgets/TitleBox,
-     title => loc('Calendar for [_1] [_2]', $rtdate->GetMonth($Month), $Year),
-     title_href => "?Month=$Month&Year=$Year&$QueryString",
-     titleright => loc('Download Spreadsheet'),
-     titleright_href => $RT::WebPath. "/Search/Results.tsv?". $DownloadQueryString
-     &>
-
+<div class="calendar-content <% $ShowSidebar ? 'col' : 'col-12' %> ">
 <table width="100%">
 <tr>
 <td align="left">
@@ -34,10 +38,14 @@ $ShowSidebar => 0
 %    $PYear--;
 %    $PMonth = 11;
 % }
-<a href="?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo; <%$rtdate->GetMonth($PMonth)%></a>
+% if ( $Standalone ) {
+  <a href="?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo; <%$rtdate->GetMonth($PMonth)%></a>
+% } else {
+  <a onclick="reloadElement(this.closest('[hx-get]'), {'hx-vals': '<% JSON({ Month => $PMonth, Year => $PYear }) %>'}); return false;" href="#">&laquo; <%$rtdate->GetMonth($PMonth)%></a>
+% }
 </td>
-<th align="center">
-  <font size="+1"><% $rtdate->GetMonth($Month). " $Year" %></font>
+<th class="h5 text-center">
+  <% $rtdate->GetMonth($Month). " $Year" %>
 </th>
 <td align="right">
 % my ($NMonth, $NYear) = ($Month + 1, $Year);
@@ -45,7 +53,11 @@ $ShowSidebar => 0
 %    $NYear++;
 %    $NMonth = 0;
 % }
-<a href="?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%> &raquo;</a>
+% if ( $Standalone ) {
+  <a href="?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%> &raquo;</a>
+% } else {
+  <a onclick="reloadElement(this.closest('[hx-get]'), {'hx-vals': '<% JSON({ Month => $NMonth, Year => $NYear }) %>'}); return false;" href="#"><%$rtdate->GetMonth($NMonth)%> &raquo;</a>
+% }
 </td>
 </tr>
 </table>
@@ -156,40 +168,55 @@ while ($date <= $end) {
 <table width="100%">
 <tr>
 <td align="left">
-<a href="?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo; <%$rtdate->GetMonth($PMonth)%></a>
+% if ( $Standalone ) {
+  <a href="?Month=<%$PMonth%>&Year=<%$PYear%>&<%$QueryString%>">&laquo; <%$rtdate->GetMonth($PMonth)%></a>
+% } else {
+  <a onclick="reloadElement(this.closest('[hx-get]'), {'hx-vals': '<% JSON({ Month => $PMonth, Year => $PYear }) %>'}); return false;" href="#">&laquo; <%$rtdate->GetMonth($PMonth)%></a>
+% }
 </td>
 
 <td valign="top" align="center">
-<form method="post" class="changeCalendarMonth" action="?<% $QueryString %>" onsubmit="changeCalendarMonth()">
-
-<select name="SelectedMonth" class="selectpicker form-control col-3">
+<form class="row justify-content-center" action="?<% $QueryString %>">
+<div class="col-auto">
+<select name="SelectedMonth" class="selectpicker form-select">
 % for (0..11) {
 <option value="<%$_%>" <% $_ == $Month ? 'selected' : ''%> ><%$rtdate->GetMonth($_)%></option>
 % }
 </select>
+</div>
+<div class="col-auto">
 % my $year = (localtime)[5] + 1900;
-<select name="SelectedYear" class="selectpicker form-control col-3">
+<select name="SelectedYear" class="selectpicker form-select">
 % for ( ($year-5) .. ($year+5)) {
 <option value="<%$_%>" <% $_ == $Year ? 'selected' : ''%>><%$_%></option>
 % }
 </select>
-<input type="hidden" id="querystring" value="<% $QueryString|n %>" />
-<input type="submit" value="<% loc('Submit') %>" class="button btn btn-primary" />
+</div>
+<div class="col-auto">
+  <input type="submit" value="<% loc('Submit') %>" class="btn btn-primary <% $Standalone ? '' : 'calendar-reload' %>" />
+</div>
+
 
 </form>
 </td>
 
 <td align="right">
-<a href="?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%> &raquo;</a>
+% if ( $Standalone ) {
+  <a href="?Month=<%$NMonth%>&Year=<%$NYear%>&<%$QueryString%>"><%$rtdate->GetMonth($NMonth)%> &raquo;</a>
+% } else {
+  <a onclick="reloadElement(this.closest('[hx-get]'), {'hx-vals': '<% JSON({ Month => $NMonth, Year => $NYear }) %>'}); return false;" href="#"><%$rtdate->GetMonth($NMonth)%> &raquo;</a>
+% }
 </td>
 </tr>
 </table>
 
 </div>
-
 </&>
 
-</div>
+
+% if ( $ShowSidebar ) {
+  </div>
+% }
 <%INIT>
 my $NotFirstAccess = $DECODED_ARGS->{NotFirstAccess};
 my $Month = $DECODED_ARGS->{SelectedMonth} // $DECODED_ARGS->{Month} // (localtime)[4];
@@ -263,8 +290,9 @@ my $TempQuery = "( Status = 'new' OR Status = 'open' OR Status = 'stalled')
  AND ( Type = 'reminder' OR 'Type' = 'ticket' )";
 
 if ( my $Search = RTx::Calendar::SearchDefaultCalendar($session{CurrentUser}) ) {
-  $TempFormat = $Search->SubValue('Format');
-  $TempQuery = $Search->SubValue('Query');
+    my $content = $Search->Content || {};
+    $TempFormat = $content->{'Format'};
+    $TempQuery = $content->{'Query'};
 }
 
 # we overide them if needed
@@ -321,8 +349,6 @@ $m->callback( CallbackName => 'BeforeFindTickets', ARGSRef => \%ARGS, QueryRef =
 
 $m->callback( CallbackName => 'BeforeFindTickets', ARGSRef => \%ARGS, QueryRef => \$TempQuery, FormatRef => \$TempFormat );
 
-my ($Tickets, $TicketsSpanningDays) = RTx::Calendar::FindTickets($session{'CurrentUser'}, $TempQuery, \@Dates, $date->strftime("%F"), $end->strftime("%F"));
-
 my $DownloadQueryString =
       $m->comp(
         '/Elements/QueryString',
@@ -331,4 +357,13 @@ my $DownloadQueryString =
         Order   => $Order,
         OrderBy => $OrderBy,
       );
+
+my ($Tickets, $TicketsSpanningDays);
+
+# This is the expensive part of the processing, so only run this when
+# htmx is rendering the main content.
+if ( $m->request_path =~ /^(?:\/SelfService)?\/Views/ ) {
+    ($Tickets, $TicketsSpanningDays) = RTx::Calendar::FindTickets($session{'CurrentUser'}, $TempQuery, \@Dates, $date->strftime("%F"), $end->strftime("%F"));
+}
+
 </%INIT>

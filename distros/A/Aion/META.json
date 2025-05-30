@@ -70,7 +70,7 @@
    "provides" : {
       "Aion" : {
          "file" : "lib/Aion.pm",
-         "version" : "0.3"
+         "version" : "0.4"
       },
       "Aion::Type" : {
          "file" : "lib/Aion/Type.pm"
@@ -91,7 +91,7 @@
          "web" : "https://github.com/darviarush/perl-aion"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Iaroslav O. Kosmina <darviarush@ya.ru>",

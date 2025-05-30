@@ -1,0 +1,71 @@
+{
+   "abstract" : "Runtime Configuration for an Object",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Object-Configure",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Abstraction" : "0.25",
+            "ExtUtils::MakeMaker" : "6.64",
+            "JSON::MaybeXS" : "0",
+            "LWP::Protocol::https" : "0",
+            "Log::Abstraction" : "0.15",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Object-Configure@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Object-Configure/issues",
+         "x_url" : "https://github.com/nigelhorne/Object-Configure/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Object::Configure",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Object-Configure.git",
+         "web" : "https://github.com/nigelhorne/Object-Configure",
+         "x_repository" : "https://github.com/nigelhorne/Object-Configure"
+      }
+   },
+   "version" : 0.07,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

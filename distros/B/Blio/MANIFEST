@@ -14,6 +14,7 @@ lib/Blio.pm
 lib/Blio/Image.pm
 lib/Blio/Node.pm
 readme.txt
+share/templates/image.tt
 share/templates/node.tt
 share/templates/snippet/html_title.tt
 share/templates/wrapper.tt

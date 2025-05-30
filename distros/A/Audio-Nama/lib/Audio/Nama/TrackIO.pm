@@ -1,6 +1,6 @@
 package Audio::Nama::TrackIO;
 use Role::Tiny;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use Audio::Nama::Globals qw(:all);
 use File::Slurp qw(write_file);

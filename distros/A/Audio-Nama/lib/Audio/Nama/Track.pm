@@ -19,7 +19,7 @@ use Audio::Nama::Log qw(logpkg logsub);
 use Audio::Nama::Effect  qw(fxn);
 use List::MoreUtils qw(first_index);
 use Try::Tiny;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use Carp qw(carp cluck croak);
 use File::Copy qw(copy);
@@ -280,7 +280,7 @@ sub fades { grep { $_->{track} eq $_[0]->name } values %Audio::Nama::Fade::by_in
 {
 package Audio::Nama::SimpleTrack; # used for Main track
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl '2020'; use Carp; use Audio::Nama::Log qw(logpkg);
+use v5.36; use Carp; use Audio::Nama::Log qw(logpkg);
 our $VERSION = 1.0;
 use SUPER;
 no warnings qw(uninitialized redefine);
@@ -300,7 +300,7 @@ sub activate_bus {}
 {
 package Audio::Nama::MasteringTrack; # used for mastering chains 
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+use v5.36; use Audio::Nama::Log qw(logpkg);
 our $VERSION = 1.0;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::SimpleTrack';
@@ -318,7 +318,7 @@ sub version {0}
 package Audio::Nama::EarTrack; # for submix helper tracks
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Util qw(dest_string);
-use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+use v5.36; use Audio::Nama::Log qw(logpkg);
 our $VERSION = 1.0;
 use SUPER;
 no warnings qw(uninitialized redefine);
@@ -335,7 +335,7 @@ sub width { $_[0]->{width} }
 {
 package Audio::Nama::SlaveTrack;
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+use v5.36; use Audio::Nama::Log qw(logpkg);
 our $VERSION = 1.0;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::Track';
@@ -354,7 +354,7 @@ sub dir { $tn{$_[0]->target}->dir }
 {
 package Audio::Nama::BoostTrack; 
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+use v5.36; use Audio::Nama::Log qw(logpkg);
 our $VERSION = 1.0;
 no warnings qw(uninitialized redefine);
 our @ISA = 'Audio::Nama::Track';
@@ -537,7 +537,7 @@ sub new {
 { 
 package Audio::Nama::WetTrack; # for inserts
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl '2020'; use Audio::Nama::Log qw(logpkg);
+use v5.36; use Audio::Nama::Log qw(logpkg);
 our $VERSION = 1.0;
 our @ISA = 'Audio::Nama::SlaveTrack';
 }
@@ -545,7 +545,7 @@ our @ISA = 'Audio::Nama::SlaveTrack';
 {
 package Audio::Nama::MidiTrack; 
 use Audio::Nama::Globals qw(:all);
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use SUPER;
 use Audio::Nama::Log qw(logpkg);

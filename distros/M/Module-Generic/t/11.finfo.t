@@ -153,7 +153,7 @@ subtest 'Additional methods' => sub
     my $mime = $finfo->mime_type;
     ok( defined( $mime ), 'mime_type defined' );
     diag( "MIME type: $mime" ) if( $DEBUG );
-    like( $mime, qr/^(?:text|application)\//, 'mime_type format' );
+    like( $mime, qr/^(?:(?:text|application)\/|x-system\/x-unix)/, 'mime_type format' );
 
     my $mode = $finfo->permission;
     diag( "The file $finfo has mode $mode" ) if( $DEBUG );

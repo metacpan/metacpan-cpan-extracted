@@ -3,7 +3,7 @@ use v5.24;
 
 # ABSTRACT: domms blogging "engine"
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 
 use Moose;
 use MooseX::Types::Path::Class;
@@ -65,6 +65,7 @@ has 'thumbnail' => (is=>'ro',isa=>'Int',default=>300,required=>1);
 has 'tags' => (is=>'ro',isa=>'Bool',default=>0);
 has 'schedule' => (is=>'ro',isa=>'Bool',default=>0);
 has 'time_zone' => (is=>'ro',isa=>'Str', default=>'UTC');
+has 'images_as_nodes' => (is=>'ro',isa=>'Bool',default=>0);
 
 has 'force' => (is=>'ro',isa=>'Bool',default=>0);
 has 'quiet' => (is=>'ro',isa=>'Bool',default=>0);
@@ -263,7 +264,7 @@ Blio - domms blogging "engine"
 
 =head1 VERSION
 
-version 2.008
+version 2.009
 
 =head1 SYNOPSIS
 
@@ -360,7 +361,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2024 by Thomas Klausner.
+This software is copyright (c) 2013 - 2025 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

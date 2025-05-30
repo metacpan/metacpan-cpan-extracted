@@ -1,5 +1,10 @@
 Revision history for Params-Get
 
+0.08	Thu May 29 14:05:49 EDT 2025
+	Check number of parameters before the quick return
+	Use Devel::Confess to give a full stacktrace
+	Handle get_params('foo', {}), and get_params('foo' => {});
+
 0.07	Fri May 23 07:07:13 EDT 2025
 	Fix dependancy. I added Params::Get rather than Scalar::Utils (RT#165760)
 

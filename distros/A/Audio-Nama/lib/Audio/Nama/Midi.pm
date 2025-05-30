@@ -1,7 +1,7 @@
 # ------------- MIDI routines -----------
 
 package Audio::Nama;
-use Modern::Perl '2020';
+use v5.36;
 #use Audio::Nama::Log qw(logpkg);
 use Carp;
 

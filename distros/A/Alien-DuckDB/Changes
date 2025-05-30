@@ -1,10 +1,4 @@
 Revision history for Alien-DuckDB
 
-0.02    2025-05-18
-        - Fixed cross-platform compatibility issues
-        - Improved Windows build process
-        - Added support for prebuilt binaries on all platforms
-        - Combined test files for better maintainability
-
 0.01    2024-11-25T22:16:47-05:00
         First version, released on an unsuspecting world.

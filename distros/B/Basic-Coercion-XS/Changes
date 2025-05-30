@@ -3,3 +3,10 @@ Revision history for Basic-Coercion-XS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02	2025-05-29
+	- Add support for qr// regexes
+	- Add by method so you can do StrToArray->by(qr/regex/);
+	- Add StrToHash coercion
+
+0.07	2025-05-29
+	- Scope the object so you can't do StrToHash->StrToArray.

@@ -1,3 +1,7 @@
+  GetEventData $Object
+    Accepts a ticket object and returns an array of ticket metadata values
+    based on the configured CalendarEventLineValues.
+
 NAME
     RTx::Calendar - Calendar view for RT ticket dates and custom fields
 
@@ -10,7 +14,7 @@ DESCRIPTION
     including on the RT home page.
 
 RT VERSION
-    Works with RT 5.
+    Works with RT 6.
 
     For older versions of RT, see the CHANGES file for compatible earlier
     versions.
@@ -21,13 +25,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RTx::Calendar');
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -110,6 +114,13 @@ CONFIGURATION
     line to your etc/RT_SiteConfig.pm:
 
         Set($CalendarDisplayOwner, 1);
+
+   Setting event ticket values
+    Set @CalendarEventLineValues to define the ticket information displayed
+    on each event in the calendar. Valid options are the methods on an
+    RT::Ticket object.
+
+        Set(@CalendarEventLineValues, qw(Queue Id Subject));
 
    Choosing the fields to be displayed in the popup
     When you mouse over events on the calendar, a popup window shows
@@ -203,7 +214,7 @@ CONFIGURATION
             'CF.{Maintenance Stop}'  => 'maintstop.png',
 
     To add custom images, create a directory local/static/images in your
-    installed RT directory (usually /opt/rt5) and copy images files there.
+    installed RT directory (usually /opt/rt6) and copy images files there.
 
     You can use any image format that your browser supports, but PNGs and
     GIFs with transparent backgrounds are recommended because they will
@@ -263,7 +274,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RTx-Calendar>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2010-2023 by Best Practical Solutions
+    This software is Copyright (c) 2010-2025 by Best Practical Solutions
 
     Copyright 2007-2009 by Nicolas Chuche
 

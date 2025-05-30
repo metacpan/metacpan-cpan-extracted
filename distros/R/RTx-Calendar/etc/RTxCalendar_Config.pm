@@ -36,4 +36,6 @@ Set(@CalendarPopupFields, (
     "Requestors->MemberEmailAddressesAsString",
 ));
 
+Set(@CalendarEventLineValues, qw(Queue Id Subject));
+
 1;

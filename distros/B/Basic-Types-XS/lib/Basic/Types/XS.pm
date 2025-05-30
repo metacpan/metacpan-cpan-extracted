@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load("Basic::Types::XS", $VERSION);
@@ -19,7 +19,7 @@ Basic::Types::XS - Fast but limited type constraints
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =cut
 
@@ -73,7 +73,7 @@ You can import the types you need by specifying them in the C<use> statement:
 Each type constraint can be used directly as a function to validate values, or you can create a type constraint with options.
 For example, to create a type constraint for a string with custom options:
 
-	use Basic::Types::XS qw/Str/; 
+	use Basic::Types::XS qw/Str/;
 
 	my $Str = Str(
 		default => sub { return "default value" },
@@ -97,6 +97,8 @@ For example, to create a type constraint for a string with custom options:
 =item * C<coerce> - A coderef to coerce the input value before validation
 
 =item * C<message> - A custom error message string
+
+=item * C<validate> - A value that may be used by the constraint to validate the input
 
 =back
 
@@ -123,6 +125,12 @@ Values that are reasonable booleans. Accepts 1, 0, "", undef, \1, \0, \"", \unde
 Values that are valid strings, this includes numbers.
 
 	Str->("abc");
+
+=head3 StrMatch
+
+Values that are valid strings and match a regex pattern.
+
+	StrMatch(validate => qr/^[a-z]+$/)->("abc");
 
 =head3 Num
 
@@ -195,7 +203,36 @@ Values that contain valid class names (strings).
 
 =head1 METHODS
 
+=head2 message
+
+Sets a custom error message for the type constraint. This message will be used when validation fails.
+
+	Str->message("This is a custom error message");
+
+=head2 default
+
+Sets a default value for the type constraint. This value will be returned when the input is undefined.
+
+	Str->default(sub { return "default value" });
+
+=head2 coerce
+
+Sets a coercion function for the type constraint. This function will be used to convert input values before validation.
+
+	Str->coerce(sub {
+		my $value = shift;
+		return join ",", @{$value} if ref $value eq "ARRAY";
+		return $value;
+	});
+
 =head2 validate
+
+This method maybe used to set the constaint validation option. What you set here will depend on the type you are using.
+For example for the StrMatch type you would set a regex to match against.
+
+	StrMatch->validate(qr/^[a-z]+$/);
+
+=head2 constraint
 
 Returns the validation function for the type constraint. This function can be used to validate values against the type constraint.
 
@@ -211,12 +248,12 @@ The following benchmark is between L<Types::Standard> with L<Type::Tiny::XS> ins
 
 	my $r = timethese(1000000, {
 		'Basic::Types::XS' => sub {
-			my $Str = Basic::Types::XS::Str->('123');
-			my $Num = Basic::Types::XS::Num->(123);
-			my $Int = Basic::Types::XS::Int->(123);
-			my $Array = Basic::Types::XS::ArrayRef->([qw/1 2 3/]);
-			my $Hash = Basic::Types::XS::HashRef->({ a => 1, });
-			my $Code = Basic::Types::XS::CodeRef->(sub { return 1 });
+			my $Str = Basic::Types::XS::Definition::Str->('123');
+			my $Num = Basic::Types::XS::Definition::Num->(123);
+			my $Int = Basic::Types::XS::Definition::Int->(123);
+			my $Array = Basic::Types::XS::Definition::ArrayRef->([qw/1 2 3/]);
+			my $Hash = Basic::Types::XS::Definition::HashRef->({ a => 1, });
+			my $Code = Basic::Types::XS::Definition::CodeRef->(sub { return 1 });
 		},
 		'Types::Standard' => sub {
 			my $Str = Types::Standard::Str->('123');

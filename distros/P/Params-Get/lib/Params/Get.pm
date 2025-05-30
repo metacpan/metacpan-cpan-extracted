@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Devel::Confess;
 use Scalar::Util;
 
 our @ISA = qw(Exporter);
@@ -15,11 +16,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -89,8 +90,8 @@ sub get_params
 {
 	my $default = shift;
 
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref($_[0]) eq 'HASH');
+	# Directly return hash reference if the only parameter is a hash reference
+	return $_[0] if((scalar(@_) == 1) && (ref($_[0]) eq 'HASH'));	# Note - doesn't check if "default" was given
 
 	my $args;
 	my $array_ref;
@@ -131,16 +132,22 @@ sub get_params
 	if($num_args == 0) {
 		if(defined($default)) {
 			# FIXME: No means to say that the default is optional
-			Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+			# Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
+			Carp::croak(Devel::Confess::longmess('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)"));
 		}
 		return;
 	}
 	if(($num_args == 2) && (ref($args->[1]) eq 'HASH')) {
 		if(defined($default)) {
-			return {
-				$default => $args->[0],
-				%{$args->[1]}
-			};
+			if(scalar keys %{$args->[1]}) {
+				# Obj->new('foo', { 'key1' => 'val1 } - set foo to the mandatory first argument, and the rest are options
+				return {
+					$default => $args->[0],
+					%{$args->[1]}
+				};
+			}
+			# Obj->new(foo => {}) - set foo to be an empty hash
+			return { $default => $args->[1] }
 		}
 	}
 

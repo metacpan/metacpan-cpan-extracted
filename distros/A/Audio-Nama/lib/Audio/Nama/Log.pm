@@ -1,7 +1,7 @@
 # ----------- Logging ------------
 
 package Audio::Nama::Log;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use Log::Log4perl qw(get_logger :levels);
 use Exporter;
@@ -68,7 +68,6 @@ Audio::Nama::TrackComment
 Audio::Nama::TrackEffect
 Audio::Nama::TrackIO
 Audio::Nama::TrackLatency
-Audio::Nama::TrackMark
 Audio::Nama::Track
 Audio::Nama::TrackRegion
 Audio::Nama::TrackUtils

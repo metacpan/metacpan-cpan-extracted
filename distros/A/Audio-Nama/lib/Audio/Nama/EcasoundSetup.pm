@@ -1,6 +1,6 @@
 package Audio::Nama::EcasoundSetup;
 use Role::Tiny;
-use Modern::Perl '2020';
+use v5.36;
 our $VERSION = 1.0;
 use Audio::Nama::Globals qw(:all);
 use Audio::Nama::Log qw(logpkg logsub);
@@ -45,7 +45,7 @@ sub setup {
 ### legacy ecasound support routines in root namespace 
 
 package Audio::Nama;
-use Modern::Perl '2020';
+use v5.36;
 no warnings 'uninitialized';
 sub find_duplicate_inputs { # in Main bus only
 

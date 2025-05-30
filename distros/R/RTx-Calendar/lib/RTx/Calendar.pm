@@ -4,7 +4,7 @@ use strict;
 use DateTime;
 use DateTime::Set;
 
-our $VERSION = "1.10";
+our $VERSION = "2.00";
 
 RT->AddStyleSheets('calendar.css');
 RT->AddJavaScript('calendar.js');
@@ -217,14 +217,10 @@ sub SearchDefaultCalendar {
     my $Description = "calendar";
 
     my $UserObj  = $CurrentUser->UserObj;
-    my @searches = $UserObj->Attributes->Named('SavedSearch');
-    for my $search (@searches) {
-        next
-            if ( $search->SubValue('SearchType')
-            && $search->SubValue('SearchType') ne 'Ticket' );
-
+    my $searches = $UserObj->SavedSearches( Type => 'Ticket' );
+    while( my $search = $searches->Next ) {
         return $search
-            if "calendar" eq $search->Description;
+            if "calendar" eq $search->Name;
     }
 
     # search through user's groups as well
@@ -232,26 +228,18 @@ sub SearchDefaultCalendar {
     $Groups->LimitToUserDefinedGroups;
     $Groups->WithCurrentUser;
     while ( my $group = $Groups->Next ) {
-        @searches = $group->Attributes->Named('SavedSearch');
-        for my $search (@searches) {
-            next
-                if ( $search->SubValue('SearchType')
-                && $search->SubValue('SearchType') ne 'Ticket' );
-
+        my $searches = $group->SavedSearches( Type => 'Ticket' );
+        while( my $search = $searches->Next ) {
             return $search
-                if "calendar" eq $search->Description;
+                if "calendar" eq $search->Name;
         }
     }
 
     # search thru system saved searches
-    @searches = $RT::System->Attributes->Named('SavedSearch');
-    for my $search (@searches) {
-        next
-            if ( $search->SubValue('SearchType')
-            && $search->SubValue('SearchType') ne 'Ticket' );
-
+    $searches = RT->System->SavedSearches( Type => 'Ticket' );
+    while( my $search = $searches->Next ) {
         return $search
-            if "calendar" eq $search->Description;
+            if "calendar" eq $search->Name;
     }
 }
 
@@ -310,6 +298,94 @@ CALENDAR_ICON:
     }
 }
 
+=head2 GetEventData $Object
+
+Accepts a ticket object and returns an array of ticket metadata
+values based on the configured CalendarEventLineValues.
+
+=cut
+
+sub GetEventData {
+    my $Object   = shift;
+
+    my @event_data;
+    foreach my $field ( RT->Config->Get('CalendarEventLineValues') ) {
+        if ($field eq 'Queue') {
+            push @event_data, $Object->QueueObj->Name;
+        }
+        else {
+            $field =~ s/^Id$/id/;  # "id" is lowercase in CoreAccessible
+            if ( $Object->_Accessible($field => 'READ') ) {
+                push @event_data, $Object->$field();
+            }
+            else {
+                RT->Logger->error("Field $field is not accessible on " . ref($Object));
+            }
+
+        }
+    }
+    return @event_data;
+}
+
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'Calendar',
+        Content => [
+            {
+                Name => 'CalendarDisplayOwner',
+                Help => 'https://metacpan.org/pod/RTx::Calendar#Display-Owner',
+            },
+            {
+                Name => 'CalendarPopupFields',
+                Help => 'https://metacpan.org/pod/RTx::Calendar#Choosing-the-fields-to-be-displayed-in-the-popup',
+            },
+            {
+                Name => 'CalendarStatusColorMap',
+                Help => 'https://metacpan.org/pod/RTx::Calendar#Event-Colors',
+            },
+            {
+                Name => 'CalendarFilterStatuses',
+                Help => 'https://metacpan.org/pod/RTx::Calendar#Filter-on-Status',
+            },
+            {
+                Name => 'CalendarIcons',
+                Help => 'https://metacpan.org/pod/RTx::Calendar#Custom-Icons',
+            },
+            {
+                Name => 'CalendarMultipleDaysEvents',
+                Help => 'https://metacpan.org/pod/RTx::Calendar#Multiple-Days-Events',
+            },
+            {
+                Name => 'CalendarEventLineValues',
+                Help => 'https://metacpan.org/pod/RTx::Calendar#Setting-event-ticket-values',
+            },
+        ],
+        Meta    => {
+            CalendarDisplayOwner => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+            CalendarPopupFields => {
+                Type => 'ARRAY',
+            },
+            CalendarStatusColorMap => {
+                Type => 'HASH',
+            },
+            CalendarFilterStatuses => {
+                Type => 'ARRAY',
+            },
+            CalendarIcons => {
+                Type => 'HASH',
+            },
+            CalendarMultipleDaysEvents => {
+                Type => 'HASH',
+            },
+            CalendarEventLineValues => {
+                Type => 'ARRAY',
+            },
+        }
+    );
+}
 
 1;
 
@@ -336,7 +412,7 @@ to any dashboard, including on the RT home page.
 
 =head1 RT VERSION
 
-Works with RT 5.
+Works with RT 6.
 
 For older versions of RT, see the CHANGES file for compatible earlier versions.
 
@@ -352,7 +428,7 @@ For older versions of RT, see the CHANGES file for compatible earlier versions.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -360,7 +436,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -458,6 +534,14 @@ to your F<etc/RT_SiteConfig.pm>:
 
     Set($CalendarDisplayOwner, 1);
 
+=head3 Setting event ticket values
+
+Set C<@CalendarEventLineValues> to define the ticket information
+displayed on each event in the calendar. Valid options are
+the methods on an C<RT::Ticket> object.
+
+    Set(@CalendarEventLineValues, qw(Queue Id Subject));
+
 =head3 Choosing the fields to be displayed in the popup
 
 When you mouse over events on the calendar, a popup window shows additional
@@ -553,7 +637,7 @@ You can also define icons for custom fields by using the following format:
         'CF.{Maintenance Stop}'  => 'maintstop.png',
 
 To add custom images, create a directory F<local/static/images> in your installed
-RT directory (usually F</opt/rt5>) and copy images files there.
+RT directory (usually F</opt/rt6>) and copy images files there.
 
 You can use any image format that your browser supports, but PNGs and GIFs
 with transparent backgrounds are recommended because they will display better
@@ -629,7 +713,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2010-2023 by Best Practical Solutions
+This software is Copyright (c) 2010-2025 by Best Practical Solutions
 
 Copyright 2007-2009 by Nicolas Chuche
 

@@ -3,7 +3,7 @@ package Basic::Coercion::XS;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load("Basic::Coercion::XS", $VERSION);
@@ -12,11 +12,11 @@ __END__
 
 =head1 NAME
 
-Basic::Coercion::XS - The great new Basic::Coercion::XS!
+Basic::Coercion::XS - basic coercions
 
 =head1 VERSION
 
-Version 0.04
+Version 0.07
 
 =cut
 
@@ -32,7 +32,7 @@ Perhaps a little code snippet.
 	my $arrayref = $type->("a b\tc\nd");
 	# $arrayref is ['a', 'b', 'c', 'd']
 
-	$type = StrToArray(by => ',');
+	$type = StrToArray(by => qr/,/);
 	$arrayref = $type->("a,b,c");
 	# $arrayref is ['a', 'b', 'c']
 
@@ -46,7 +46,13 @@ None by default, but you can export specific functions:
 
 This function creates a coercion type that converts a string into an array reference.
 
-	StrToArray(by => $regex_string, message => $error_message);
+	StrToArray(by => $regex_string);
+
+=head2 StrToHash
+
+This function creates a coercion type that converts a string into a hash reference.
+
+	StrToHash->by($regex_string);
 
 =head1 AUTHOR
 

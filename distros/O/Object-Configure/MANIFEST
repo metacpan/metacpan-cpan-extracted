@@ -1,0 +1,16 @@
+Changes
+lib/Object/Configure.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/30-basics.t
+t/complex.t
+t/env.t
+t/eof.t
+t/eol.t
+t/pod-cm.t
+t/pod-synopsis.t
+t/simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,7 +2,7 @@ package Blio::Image;
 
 # ABSTRACT: An image node
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 
 use 5.010;
 use Moose;
@@ -67,7 +67,7 @@ Blio::Image - An image node
 
 =head1 VERSION
 
-version 2.008
+version 2.009
 
 =head1 SYNOPSIS
 
@@ -121,7 +121,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2024 by Thomas Klausner.
+This software is copyright (c) 2013 - 2025 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

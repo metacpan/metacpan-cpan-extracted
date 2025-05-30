@@ -1,10 +1,13 @@
+[![CPAN version](https://badge.fury.io/pl/Class-Debug.svg)](https://metacpan.org/pod/Class::Debug)
+![Perl CI](https://github.com/nigelhorne/Class-Debug/actions/workflows/perl-ci.yml/badge.svg)
+
 # NAME
 
 Class::Debug - Add Runtime Debugging to a Class
 
 # VERSION
 
-0.06
+0.07
 
 # SYNOPSIS
 

@@ -1,5 +1,6 @@
 use Test::More;
-
+use strict;
+use warnings;
 use Basic::Types::XS qw/Str/;
 
 my $str = "abc";
