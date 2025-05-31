@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load("Basic::Types::XS", $VERSION);
@@ -19,7 +19,7 @@ Basic::Types::XS - Fast but limited type constraints
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
@@ -201,6 +201,12 @@ Values that contain valid class names (strings).
 
 	ClassName->("My::Class");
 
+=head3 Enum
+
+Values that contain a value found in the Enum array reference.
+
+	Enum(validate => [qw/yes no/])->("yes");
+
 =head1 METHODS
 
 =head2 message
@@ -265,12 +271,14 @@ The following benchmark is between L<Types::Standard> with L<Type::Tiny::XS> ins
 		},
 	});
 
+
 	Benchmark: timing 1000000 iterations of Basic::Types::XS, Types::Standard...
-	Basic::Types::XS: 2.22538 wallclock secs ( 2.20 usr +  0.04 sys =  2.24 CPU) @ 446428.57/s (n=1000000)
-	Types::Standard: 3.23532 wallclock secs ( 3.23 usr +  0.00 sys =  3.23 CPU) @ 309597.52/s (n=1000000)
+	Basic::Types::XS: 2.10176 wallclock secs ( 1.93 usr +  0.17 sys =  2.10 CPU) @ 476190.48/s (n=1000000)
+	Types::Standard: 3.15881 wallclock secs ( 3.15 usr +  0.00 sys =  3.15 CPU) @ 317460.32/s (n=1000000)
 			     Rate  Types::Standard Basic::Types::XS
-	Types::Standard  309598/s               --             -31%
-	Basic::Types::XS 446429/s              44%               --
+	Types::Standard  317460/s               --             -33%
+	Basic::Types::XS 476190/s              50%               --
+
 
 =head1 AUTHOR
 

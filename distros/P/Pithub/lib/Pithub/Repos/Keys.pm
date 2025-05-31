@@ -1,6 +1,6 @@
 package Pithub::Repos::Keys;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 # ABSTRACT: Github v3 Repo Keys API
 
@@ -80,7 +80,7 @@ Pithub::Repos::Keys - Github v3 Repo Keys API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 

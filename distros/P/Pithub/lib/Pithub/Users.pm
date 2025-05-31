@@ -1,6 +1,6 @@
 package Pithub::Users;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 # ABSTRACT: Github v3 Users API
 
@@ -69,7 +69,7 @@ Pithub::Users - Github v3 Users API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 

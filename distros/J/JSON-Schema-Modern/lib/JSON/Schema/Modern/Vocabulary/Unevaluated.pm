@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.610';
+our $VERSION = '0.611';
 
 use 5.020;
 use Moo;
@@ -16,6 +16,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use List::Util 1.45 qw(any max);
 use JSON::Schema::Modern::Utilities qw(is_type jsonp local_annotations E A abort true);
 use namespace::clean;
@@ -157,7 +159,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.610
+version 0.611
 
 =head1 DESCRIPTION
 

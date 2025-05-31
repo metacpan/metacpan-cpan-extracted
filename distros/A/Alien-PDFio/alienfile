@@ -1,0 +1,26 @@
+use alienfile;
+
+plugin PkgConfig => pkg_name => 'pdfio';
+
+share {
+  plugin 'Download::GitHub' => (
+    github_user => 'michaelrsweet',
+    github_repo => 'pdfio',
+    asset => 1,
+    asset_convert_version => sub {
+      my $version = shift;
+      $version =~ s/^v//;
+      $version;
+    },
+  );
+  plugin 'Build::Autoconf';
+  # the first one which succeeds will be used
+  extract [ 'tar xf %{.install.download}' ];
+  build [
+    '%{configure} --enable-shared',
+    '%{make}',
+    '%{make} test',
+    '%{make} install',
+  ];
+  plugin 'Gather::IsolateDynamic'
+}

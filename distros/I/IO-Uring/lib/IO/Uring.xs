@@ -108,6 +108,18 @@ static op_entry methods[] = {
 	{ STR_WITH_LEN("listen") },
 };
 
+struct callback {
+	SV* callback;
+};
+
+void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
+	struct callback* callback_data = safecalloc(1, sizeof(struct callback));
+	callback_data->callback = callback ? SvREFCNT_inc(callback) : NULL;
+	io_uring_sqe_set_data(sqe, callback_data);
+	return callback_data;
+}
+#define set_callback(sqe, callback) S_set_callback(aTHX_ sqe, callback)
+
 #undef SvPV
 #define SvPV(sv, len) SvPVbyte(sv, len)
 #undef SvPV_nolen
@@ -186,15 +198,17 @@ void run_once(IO::Uring self, unsigned min_events = 1)
 	EXTEND(SP, 2);
 	io_uring_for_each_cqe(&self->uring, head, cqe) {
 		++self->cqe_count;
-		SV* callback = (SV*)io_uring_cqe_get_data(cqe);
-		if (callback) {
+		struct callback* callback_data = (struct callback*)io_uring_cqe_get_data(cqe);
+		if (callback_data->callback) {
 			PUSHMARK(SP);
 			mPUSHi(cqe->res);
 			mPUSHu(cqe->flags);
 			PUTBACK;
-			call_sv(callback,  G_VOID | G_DISCARD | G_EVAL);
-			if (!(cqe->flags & IORING_CQE_F_MORE))
-				SvREFCNT_dec(callback);
+			call_sv(callback_data->callback,  G_VOID | G_DISCARD | G_EVAL);
+			if (!(cqe->flags & IORING_CQE_F_MORE)) {
+				SvREFCNT_dec(callback_data->callback);
+				Safefree(callback_data);
+			}
 
 			if (SvTRUE(ERRSV)) {
 				io_uring_cq_advance(&self->uring, self->cqe_count);
@@ -204,6 +218,8 @@ void run_once(IO::Uring self, unsigned min_events = 1)
 
 			SPAGAIN;
 		}
+		else if (!(cqe->flags & IORING_CQE_F_MORE))
+			Safefree(callback_data);
 	}
 
 	io_uring_cq_advance(&self->uring, self->cqe_count);
@@ -231,8 +247,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_accept(sqe, fd, NULL, NULL, SOCK_CLOEXEC);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -242,8 +257,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_bind(sqe, fd, (struct sockaddr*)sockaddr, STRLEN_length_of_sockaddr);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -253,8 +267,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_cancel(sqe, NUM2PTR(void*, user_data), flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	void* cancel_data = SvOK(callback) ? SvREFCNT_inc(callback) : NULL;
-	io_uring_sqe_set_data(sqe, cancel_data);
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
 	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
@@ -265,8 +278,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_connect(sqe, fd, (struct sockaddr*)sockaddr, STRLEN_length_of_sockaddr);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -276,8 +288,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_close(sqe, fd);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -287,8 +298,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_fallocate(sqe, fd, 0, offset, length);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -298,8 +308,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_fsync(sqe, fd, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -309,8 +318,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_ftruncate(sqe, fd, length);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -320,8 +328,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_link(sqe, oldpath, newpath, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -331,8 +338,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_linkat(sqe, olddir, oldpath, newdir, newpath, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -342,8 +348,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_link_timeout(sqe, ts, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	void* cancel_data = SvOK(callback) ? SvREFCNT_inc(callback) : NULL;
-	io_uring_sqe_set_data(sqe, cancel_data);
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
 	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
@@ -354,8 +359,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_listen(sqe, fd, backlog);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -365,8 +369,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_mkdir(sqe, path, mode);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -376,8 +379,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_mkdirat(sqe, dir_fd, path, mode);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -387,8 +389,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_nop(sqe);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -398,8 +399,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_open(sqe, path, flags, mode);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -409,8 +409,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_openat(sqe, dir_fd, path, flags, mode);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -420,8 +419,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_poll_add(sqe, fd, poll_mask);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -431,8 +429,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_poll_multishot(sqe, fd, poll_mask);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -442,8 +439,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_read(sqe, fd, buffer, STRLEN_length_of_buffer, offset);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -454,8 +450,7 @@ CODE:
 	io_uring_prep_recv(sqe, fd, buffer, STRLEN_length_of_buffer, rflags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	sqe->ioprio |= pflags;
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -465,8 +460,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_renameat(sqe, AT_FDCWD, oldpath, AT_FDCWD, newpath, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -476,8 +470,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_renameat(sqe, olddir, oldpath, newdir, newpath, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -488,8 +481,7 @@ CODE:
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	sqe->ioprio = pflags;
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -500,8 +492,7 @@ CODE:
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	sqe->ioprio = pflags;
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -511,8 +502,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_socket(sqe, domain, type, protocols, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -522,8 +512,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_shutdown(sqe, fd, how);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -533,8 +522,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_splice(sqe, in, off_in, out, off_out, nbytes, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -544,8 +532,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_sync_file_range(sqe, fd, length, offset, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -555,8 +542,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_tee(sqe, in, out, nbytes, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -566,8 +552,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_timeout(sqe, ts, count, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -577,8 +562,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_timeout_remove(sqe, user_data, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	void* cancel_data = SvOK(callback) ? SvREFCNT_inc(callback) : NULL;
-	io_uring_sqe_set_data(sqe, cancel_data);
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
 	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
@@ -589,8 +573,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_timeout_update(sqe, ts, user_data, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -600,8 +583,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_unlink(sqe, path, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -611,8 +593,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_unlinkat(sqe, dir_fd, path, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -622,8 +603,7 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_waitid(sqe, idtype, id, info, options, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL
 
@@ -633,7 +613,6 @@ CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_write(sqe, fd, buffer, STRLEN_length_of_buffer, offset);
 	io_uring_sqe_set_flags(sqe, iflags);
-	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
-	RETVAL = PTR2UV(callback);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
 OUTPUT:
 	RETVAL

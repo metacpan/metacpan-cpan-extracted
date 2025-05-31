@@ -3,12 +3,9 @@ NAME
     custom fields on status transitions
 
 RT VERSION
-    Works with RT 4.4, 5.0
+    Works with RT 6.
 
-    RT 4.0 and 4.2 are now end-of-life, so compatibility with newer versions
-    of this extension is unknown.
-
-    Also works with RTIR 5.0.3 and later
+    For RT 5, use the latest 0.X version.
 
 DESCRIPTION
     This RT extension enforces that certain fields have values before
@@ -57,9 +54,6 @@ CAVEATS
   Not all pages where you can change status are supported
     SelfService, for example. See "TODO" for others.
 
-    On 4.0, Basics and Jumbo are not supported because they do not have the
-    needed code, which is present in 4.2.
-
   Multiple-entry CFs do not play well with must_be and must_not_be
     The must_be and must_not_be configurations are currently not
     well-defined for multiply-valued CFs. At current, only their first value
@@ -71,20 +65,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
+        Add this line to your RT_SiteConfig.pm:
 
             Plugin('RT::Extension::MandatoryOnTransition');
 
-        For RT 4.0, add this line:
-
-            Set(@Plugins, qw(RT::Extension::MandatoryOnTransition));
-
-        or add RT::Extension::MandatoryOnTransition to your existing
-        @Plugins line.
-
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -141,7 +128,7 @@ CONFIGURATION
         );
 
     The transition syntax is similar to that found in RT's Lifecycles. See
-    perldoc /opt/rt5/etc/RT_Config.pm.
+    perldoc /opt/rt6/etc/RT_Config.pm.
 
   Requiring role values
     You can require any core or custom role on a RT::Ticket object, below is
@@ -331,7 +318,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MandatoryOnTransition>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2012-2024 by Best Pracical Solutions,
+    This software is Copyright (c) 2012-2025 by Best Pracical Solutions,
     LLC.
 
     This is free software, licensed under:

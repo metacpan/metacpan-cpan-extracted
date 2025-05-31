@@ -18,7 +18,8 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
-                                      'Test::More' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::More' => '0.96',
                                       'Test::Pod' => '1.41',
                                       'perl' => '5.006'
                                     }
@@ -27,7 +28,7 @@ do { my $x = {
                       'requires' => {
                                       'Alien::Base' => '0.038',
                                       'parent' => '0',
-                                      'perl' => '5.008001',
+                                      'perl' => '5.006',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

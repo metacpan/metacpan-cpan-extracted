@@ -1,6 +1,6 @@
 use Test::More;
 
-use Basic::Types::XS qw/Str/;
+use Basic::Types::XS qw/Str StrMatch/;
 
 
 my $string = Str->message("Hello, World!")->default(sub { 200 })->coerce(sub { ref $_[0] ? $_[0] : $_[0] . "!" });

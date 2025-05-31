@@ -8,13 +8,18 @@ my $errors_ref = RT::Extension::MandatoryOnTransition->CheckMandatoryFields(
 if (@$errors_ref) {
     RT->Logger->debug("Preventing update because of missing mandatory fields");
     push @$Actions, @$errors_ref;
-    $r->content_type('application/json; charset=utf-8');
-    $m->out( JSON( { actions => \@$Actions } ) );
-    $m->abort;
+
+    $r->headers_out->{'HX-Trigger'} = JSON(
+        {
+            actionsChanged => { messages => $Actions, isWarning => 1 },
+        },
+        ascii => 1,
+    );
+
+    Abort( loc("Missing mandatory fields"), Code => HTTP::Status::HTTP_UNPROCESSABLE_CONTENT );
 }
 
 </%INIT>
-
 <%ARGS>
 $Ticket
 $ARGSRef

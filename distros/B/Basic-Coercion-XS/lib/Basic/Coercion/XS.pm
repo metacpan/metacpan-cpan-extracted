@@ -3,7 +3,7 @@ package Basic::Coercion::XS;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load("Basic::Coercion::XS", $VERSION);
@@ -16,7 +16,7 @@ Basic::Coercion::XS - basic coercions
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

@@ -1,6 +1,6 @@
 package Pithub::PullRequests::Reviewers;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 # ABSTRACT: Github v3 Pull Request Review Requests API
 
@@ -72,7 +72,7 @@ Pithub::PullRequests::Reviewers - Github v3 Pull Request Review Requests API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 

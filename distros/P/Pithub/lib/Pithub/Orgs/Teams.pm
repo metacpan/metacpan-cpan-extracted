@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 use Carp qw( carp croak );
 
@@ -230,7 +230,7 @@ Pithub::Orgs::Teams - Github v3 Org Teams API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 

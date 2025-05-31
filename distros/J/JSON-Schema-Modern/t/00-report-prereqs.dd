@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.166',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.167',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -72,6 +72,7 @@ do { my $x = {
                                       'builtin::compat' => '0.003003',
                                       'constant' => '0',
                                       'experimental' => '0.026',
+                                      'feature' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'open' => '0',

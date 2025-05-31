@@ -11,7 +11,10 @@ build_requires:
   Test::More: '0'
   perl: '5.006'
 configure_requires:
+  Alien::liburing: '0.100'
   Dist::Build: '0.001'
+  Dist::Build::XS: '0'
+  Dist::Build::XS::Alien: '0'
   perl: '5.006'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
@@ -23,7 +26,7 @@ name: IO-Uring
 provides:
   IO::Uring:
     file: lib/IO/Uring.pm
-    version: '0.003'
+    version: '0.005'
 requires:
   Exporter: '0'
   XSLoader: '0'
@@ -33,7 +36,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/io-uring/issues
   repository: git://github.com/Leont/io-uring.git
-version: '0.003'
-x_generated_by_perl: v5.40.0
+version: '0.005'
+x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

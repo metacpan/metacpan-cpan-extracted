@@ -456,7 +456,14 @@ int b_builder_write_file(b_builder *builder, b_string *path, b_string *member_na
         if (builder->options & B_BUILDER_GNU_EXTENSIONS) {
             if (header->truncated && encode_longlink(builder, block, longlink_path, B_HEADER_LONGLINK_TYPE, &wrlen) < 0) {
                 goto error_header_encode;
-            }
+            } else if ( header->truncated && header->truncated_link ) {
+                // With encoding two links side by side, we need to call the get block again to update the internals of the buffer to avoid
+                // the next encode_longlink from overwriting parts of the previous link.
+
+                if ((block = b_buffer_get_block(buf, B_HEADER_SIZE, &wrlen)) == NULL) {
+                    goto error_get_header_block;
+                }
+             }
 
             if (header->truncated_link && encode_longlink(builder, block, header->linkdest, B_HEADER_LONGDEST_TYPE, &wrlen) < 0) {
                 goto error_header_encode;

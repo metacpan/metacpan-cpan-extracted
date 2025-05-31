@@ -1,6 +1,6 @@
 package Pithub::Search;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 # ABSTRACT: Github legacy Search API
 
@@ -71,7 +71,7 @@ Pithub::Search - Github legacy Search API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 

@@ -1,6 +1,6 @@
 package Archive::Tar::Builder;
 
-# Copyright (c) 2019, cPanel, L.L.C.
+# Copyright (c) 2025, cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -15,7 +15,7 @@ use XSLoader ();
 use Archive::Tar::Builder::UserCache     ();
 use Archive::Tar::Builder::HardlinkCache ();
 
-our $VERSION = '2.5005';
+our $VERSION = '2.5006';
 
 XSLoader::load( 'Archive::Tar::Builder', $VERSION );
 

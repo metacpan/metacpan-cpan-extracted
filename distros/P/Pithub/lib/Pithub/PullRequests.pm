@@ -1,6 +1,6 @@
 package Pithub::PullRequests;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 # ABSTRACT: Github v3 Pull Requests API
 
@@ -103,6 +103,9 @@ sub is_merged {
 sub list {
     my ( $self, %args ) = @_;
     $self->_validate_user_repo_args( \%args );
+
+    $args{state} ||= 'open';
+
     return $self->request(
         method => 'GET',
         path   => sprintf(
@@ -111,7 +114,8 @@ sub list {
         params => {
             per_page => 100,
             page     => delete $args{page},
-        },
+            state    => delete $args{state},
+          },
         %args,
     );
 }
@@ -164,7 +168,7 @@ Pithub::PullRequests - Github v3 Pull Requests API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 
@@ -303,7 +307,10 @@ Examples:
         user => 'plu',
         repo => 'Pithub',
         page => 2,
-            # Defaults to page 1, and defaults to a limit of 100 results
+            # Defaults to page 1. Note that the GitHub API returns (a
+            # maximum of) 100 results per page.
+        state => 'open',
+            # Defaults to 'open', other options are 'closed' and 'all'
     );
 
 =back

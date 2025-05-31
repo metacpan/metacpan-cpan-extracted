@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.25';
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -10,12 +10,9 @@ RT-Extension-MandatoryOnTransition - Require core fields and ticket custom field
 
 =head1 RT VERSION
 
-Works with RT 4.4, 5.0
+Works with RT 6.
 
-RT 4.0 and 4.2 are now end-of-life, so compatibility with
-newer versions of this extension is unknown.
-
-Also works with RTIR 5.0.3 and later
+For RT 5, use the latest 0.X version.
 
 =head1 DESCRIPTION
 
@@ -76,9 +73,6 @@ C<(?#Mandatory).> will not magically make it enforced by this extension. >>
 
 SelfService, for example.  See L</TODO> for others.
 
-On 4.0, Basics and Jumbo are not supported because they do not have the
-needed code, which is present in 4.2.
-
 =head2 Multiple-entry CFs do not play well with C<must_be> and C<must_not_be>
 
 The C<must_be> and C<must_not_be> configurations are currently not
@@ -97,21 +91,15 @@ value is validated against the configured whitelist or blacklist.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
+Add this line to your F<RT_SiteConfig.pm>:
 
     Plugin('RT::Extension::MandatoryOnTransition');
 
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Extension::MandatoryOnTransition));
-
-or add C<RT::Extension::MandatoryOnTransition> to your existing C<@Plugins> line.
-
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -171,7 +159,7 @@ Category selection before resolving tickets in every other queue.
     );
 
 The transition syntax is similar to that found in RT's Lifecycles.  See
-C<perldoc /opt/rt5/etc/RT_Config.pm>.
+C<perldoc /opt/rt6/etc/RT_Config.pm>.
 
 =head2 Requiring role values
 
@@ -1080,7 +1068,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2012-2024 by Best Pracical Solutions, LLC.
+This software is Copyright (c) 2012-2025 by Best Pracical Solutions, LLC.
 
 This is free software, licensed under:
 

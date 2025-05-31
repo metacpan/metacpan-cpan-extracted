@@ -7,7 +7,7 @@
 <&| /Widgets/TitleBox, title => loc("Status changes") &>
 <br/>
         <div id="<% $safe_name %>-current-requirements">
-          <div class="form-row">
+          <div class="row mt-2">
             <div class="boxcontainer col-md-1"></div>
             <div class="boxcontainer col-md-3"><% loc('From') %></div>
             <div class="boxcontainer col-md-3"><% loc('To') %></div>
@@ -21,7 +21,7 @@
 <&| /Widgets/TitleBox, title => loc("Queue transitions") &>
 <br/>
         <div id="<% $safe_name %>-current-transitions">
-          <div class="form-row">
+          <div class="row mt-2">
             <div class="boxcontainer col-md-1"></div>
             <div class="boxcontainer col-md-6"><% loc('To') %></div>
             <div class="boxcontainer col-md-5"><% loc('Requires') %></div>
@@ -32,12 +32,12 @@
         </div>
 </&>
         <br/>
-        <div class="form-row">
+        <div class="row mt-2">
           <span class="col-12">
             <div class="submit">
               <div class="buttons">
-                <input type="button" Name="<% $safe_name . '-remove-checked-requirements' %>" value="Remove Checked Requirements" onclick="removeCheckedRequirements('<% $safe_name %>');" class="button btn btn-primary form-control" />
-                <input type="button" value="Delete Queue" onclick="removeRequirementJSON( '<% $name %>', '', '', '' );" class="button btn btn-primary form-control" />
+                <input type="button" Name="<% $safe_name . '-remove-checked-requirements' %>" value="Remove Checked Requirements" onclick="removeCheckedRequirements('<% $safe_name %>');" class="btn btn-primary" />
+                <input type="button" value="Delete Queue" onclick="removeRequirementJSON( '<% $name %>', '', '', '' );" class="btn btn-primary" />
               </div>
             </div>
           </span>
@@ -45,11 +45,11 @@
 </&>
 
 <&| /Widgets/TitleBox, title => loc("Add status change") &>
-<div class="form-row">
+<div class="row mt-2">
   <div class="boxcontainer col-md-6"><% loc('From') %></div>
   <div class="boxcontainer col-md-6"><% loc('To') %></div>
 </div>
-<div class="form-row">
+<div class="row mt-2">
   <div class="boxcontainer col-md-6">
     <& /Elements/SelectStatus, Name => $safe_name . '-add-from', Statuses => $from_statuses &>
   </div>
@@ -57,31 +57,31 @@
     <& /Elements/SelectStatus, Name => $safe_name . '-add-to', Statuses => $to_statuses &>
   </div>
 </div>
-<div class="form-row">
+<div class="row mt-2">
   <div class="boxcontainer col-md-6"><% loc('Require') %></div>
 </div>
-<div class="form-row">
+<div class="row mt-2">
   <div class="boxcontainer col-md-6">
     <div class="col-auto">
-      <div class="custom-control custom-radio">
-        <input type="radio" id="<% $safe_name %>-add-requirement-core" name="<% $safe_name %>-add-requirement-type" class="custom-control-input" value="core" checked="checked" onclick="onClickRequirementType('<% $name %>');">
-        <label class="custom-control-label" for="<% $safe_name %>-add-requirement-core">
+      <div class="form-check">
+        <input type="radio" id="<% $safe_name %>-add-requirement-core" name="<% $safe_name %>-add-requirement-type" class="form-check-input" value="core" checked="checked" onclick="onClickRequirementType('<% $name %>');">
+        <label class="form-check-label" for="<% $safe_name %>-add-requirement-core">
           <&|/l&>Core field</&>
         </label>
       </div>
     </div>
     <div class="col-auto">
-      <div class="custom-control custom-radio">
-        <input type="radio" id="<% $safe_name %>-add-requirement-cf" name="<% $safe_name %>-add-requirement-type" class="custom-control-input" value="cf" onclick="onClickRequirementType('<% $name %>');">
-        <label class="custom-control-label" for="<% $safe_name %>-add-requirement-cf">
+      <div class="form-check">
+        <input type="radio" id="<% $safe_name %>-add-requirement-cf" name="<% $safe_name %>-add-requirement-type" class="form-check-input" value="cf" onclick="onClickRequirementType('<% $name %>');">
+        <label class="form-check-label" for="<% $safe_name %>-add-requirement-cf">
           <&|/l&>Custom field</&>
         </label>
       </div>
     </div>
     <div class="col-auto">
-      <div class="custom-control custom-radio">
-        <input type="radio" id="<% $safe_name %>-add-requirement-role" name="<% $safe_name %>-add-requirement-type" class="custom-control-input" value="role" onclick="onClickRequirementType('<% $name %>');">
-        <label class="custom-control-label" for="<% $safe_name %>-add-requirement-role">
+      <div class="form-check">
+        <input type="radio" id="<% $safe_name %>-add-requirement-role" name="<% $safe_name %>-add-requirement-type" class="form-check-input" value="role" onclick="onClickRequirementType('<% $name %>');">
+        <label class="form-check-label" for="<% $safe_name %>-add-requirement-role">
           <&|/l&>Role</&>
         </label>
       </div>
@@ -89,10 +89,10 @@
   </div>
 </div>
 <div id="<% $safe_name %>-add-requirement-core-content">
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="boxcontainer col-md-6"><% loc('Core Field') %></div>
   </div>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="boxcontainer col-md-6">
       <select name="<% $safe_name . '-add-core-field' %>" class="selectpicker form-control">
         <option value="">-</option>
@@ -104,11 +104,11 @@
   </div>
 </div>
 <div id="<% $safe_name %>-add-requirement-cf-content" class="hidden add-requirement-cf-content">
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="boxcontainer col-md-4"><% loc('Custom Field') %></div>
     <div class="boxcontainer col-md-8"><% loc('Optional value requirement') %></div>
   </div>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="boxcontainer col-md-12">
 <%perl>
 my $CFs = RT::CustomFields->new( RT->SystemUser );
@@ -162,28 +162,33 @@ while ( my $CustomField = $CFs->Next ) {
   </div>
 </div>
 <div id="<% $safe_name %>-add-requirement-role-content" class="hidden add-requirement-role-content">
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="boxcontainer col-md-6"><% loc('Role') %></div>
     <div class="boxcontainer col-md-6"><% loc('Optional membership requirement') %></div>
   </div>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="boxcontainer col-md-6">
       <&/Elements/SelectWatcherType, Name => $safe_name . '-add-role-role', Queue => $queue_object &>
     </div>
     <div class="boxcontainer col-md-6">
-      <&| /Elements/LabeledValue, Label => loc("Member of") &>
-        <input type="text" class="form-control" Name="<% $safe_name . '-add-role-member' %>" value="" data-autocomplete="Groups" data-autocomplete-return="Name" id="autocomplete-<% $safe_name . '-add-role-member' %>" />
-      </&>
+      <div class="row">
+        <div class="col-auto mt-1">
+          <span><% loc("Member of") %></span>
+        </div>
+        <div class="col-auto">
+          <input type="text" class="form-control" Name="<% $safe_name . '-add-role-member' %>" value="" data-autocomplete="Groups" data-autocomplete-return="Name" id="autocomplete-<% $safe_name . '-add-role-member' %>" />
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <br/>
-<div class="form-row">
+<div class="row mt-2">
   <span class="col-12">
     <div class="submit">
       <div class="buttons">
         <span id="<% $safe_name %>-add-requirement-error" class="text-danger"></span>
-        <input type="button" value="Add Requirement" onclick="addRequirement('<% $name %>');" class="button btn btn-primary form-control" />
+        <input type="button" value="Add Requirement" onclick="addRequirement('<% $name %>');" class="btn btn-primary" />
       </div>
     </div>
   </span>
@@ -191,16 +196,16 @@ while ( my $CustomField = $CFs->Next ) {
 </&>
 
 <&| /Widgets/TitleBox, title => loc("Add queue transition") &>
-<div class="form-row">
+<div class="row mt-2">
   <div class="boxcontainer col-md-6"><% loc('To') %></div>
   <div class="boxcontainer col-md-6"><% loc('Core or Custom Field') %></div>
 </div>
-<div class="form-row">
+<div class="row mt-2">
   <div class="boxcontainer col-md-6">
     <& /Elements/SelectQueue, Name => $safe_name . '-add-transition-queue' &>
   </div>
-  <div class="boxcontainer col-md-6 dropdown bootstrap-select form-control">
-    <select name="<% $safe_name %>-add-transition-field" class="selectpicker form-control">
+  <div class="boxcontainer col-md-6">
+    <select name="<% $safe_name %>-add-transition-field" class="selectpicker form-select">
       <option value="">-</option>
 % foreach my $core_field ( @RT::Extension::MandatoryOnTransition::CORE_SUPPORTED ) {
       <option value="<% $core_field %>"><% $core_field %></option>
@@ -218,12 +223,12 @@ while ( my $CustomField = $CFs->Next ) {
   </div>
 </div>
 <br/>
-<div class="form-row">
+<div class="row mt-2">
   <span class="col-12">
     <div class="submit">
       <div class="buttons">
         <span id="<% $safe_name %>-add-transition-error" class="text-danger"></span>
-        <input type="button" Name="<% $safe_name . '-add-queue-queue' %>" value="Add Transition" onclick="addTransition('<% $name %>');" class="button btn btn-primary form-control" />
+        <input type="button" Name="<% $safe_name . '-add-queue-queue' %>" value="Add Transition" onclick="addTransition('<% $name %>');" class="btn btn-primary" />
       </div>
     </div>
   </span>
@@ -231,44 +236,28 @@ while ( my $CustomField = $CFs->Next ) {
 </&>
       </div>
 
-<style>
-.add-requirement-cf-content .form-row .label .bootstrap-select {
-    margin-top: -5px;
-}
-.add-requirement-role-content .bootstrap-select {
-    margin-top: 0.5rem;
-}
-</style>
-
 <script type="text/javascript">
     jQuery('.add-requirement-cf-content select[name^=SelectCustomField]').change(function() {
         var form = jQuery(this).closest('form');
-        var row = jQuery(this).closest('div.form-row');
+        var row = jQuery(this).closest('div.row');
         var val = jQuery(this).val();
 
         var new_operator = form.find(':input[name="' + val + 'Op"]:first').clone();
-        row.children('div.operator').children().remove();
-        row.children('div.operator').append(new_operator);
-        row.children('div.operator').find('select.selectpicker').selectpicker();
+        new_operator.attr('id', null).removeClass('tomselected ts-hidden-accessible');
+        row.children('div.rt-search-operator').children().remove();
+        row.children('div.rt-search-operator').append(new_operator);
 
         var new_value = form.find(':input[name="ValueOf' + val + '"]:first');
-        if ( new_value.hasClass('ui-autocomplete-input') ) {
-            var source = new_value.autocomplete( "option" ).source;
-            new_value = new_value.clone();
-            new_value.autocomplete({ source: source });
-        }
-        else {
-            new_value = new_value.clone();
-        }
+        new_value = new_value.clone();
 
-        new_value.attr('id', null);
-        row.children('div.value').children().remove();
-        row.children('div.value').append(new_value);
-        row.children('div.value').find('select.selectpicker').selectpicker();
+        new_value.attr('id', null).removeClass('tomselected ts-hidden-accessible');
+        row.children('div.rt-search-value').children().remove();
+        row.children('div.rt-search-value').append(new_value);
         if ( new_value.hasClass('datepicker') ) {
             new_value.removeClass('hasDatepicker');
-            initDatePicker(row);
+            initDatePicker(row.get(0));
         }
+        initializeSelectElements(row.get(0));
     });
 </script>
 <%INIT>

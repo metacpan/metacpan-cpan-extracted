@@ -8,6 +8,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Warnings qw(warnings :no_end_test had_no_warnings allow_warnings);
@@ -602,6 +604,22 @@ subtest 'unknown custom formats' => sub {
       '...but this error can be avoided if the keyword is never evaluated',
     );
   }
+};
+
+subtest 'format: invalid base type(s)' => sub {
+  my $js = JSON::Schema::Modern->new(validate_formats => 1);
+
+  like(
+    exception { $js->add_format_validation(my_integer => { type => 'integer', sub => sub {} }) },
+    qr/Value .* did not pass type constraint /,
+    'integer is not a valid base type for a format validation',
+  );
+
+  like(
+    exception { $js->add_format_validation(my_integer => { type => [qw(integer string)], sub => sub {} }) },
+    qr/Reference .* did not pass type constraint /,
+    'integer, string is not a valid base type for a format validation',
+  );
 };
 
 subtest 'format: pure_integer' => sub {

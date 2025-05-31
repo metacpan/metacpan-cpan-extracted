@@ -3,7 +3,7 @@ package Alien::liburing;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.100';
 
 use parent 'Alien::Base';
 
@@ -15,14 +15,14 @@ Alien::liburing - Alien wrapper for liburing
 
 =head1 DESCRIPTION
 
-This module provides bindings for the C<libuing> C library, for
-working with the io_uring Linux kernel subsystem.  This library is
-only available or relavent for Linux, and will fail to install on
-any other operating systems.
+This module provides library building and detectiong support for the
+C<libuing> C library, for working with the io_uring Linux kernel subsystem.
+This library is only available or relavent for Linux, and will fail
+to install on any other operating systems.
 
-This library also requires a fairly new version of the Linux kernel
-as of this writing.  I'd recommend at a minimum a 5.3 versioned kernel
-or newer, due to features and support.
+This library also requires a resonably modern version of the Linux kernel.
+I'd recommend at a minimum a 5.3 versioned kernel or newer, 
+due to features and support.
 
 For the eventual IO::Async::Loop::IOUring module, a minimum kernel
 version of 5.4 (likely 5.5) will also be needed and detected at install
@@ -42,7 +42,7 @@ Ryan Voots <simcop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Ryan Voots.
+This software is Copyright (c) 2025 by Ryan Voots.
 
 This is free software, licensed under:
 
@@ -50,4 +50,4 @@ This is free software, licensed under:
 
 =head1 SEE ALSO
 
-...
+L<IO::Uring> - A library to actually using IO::Uring from within perl

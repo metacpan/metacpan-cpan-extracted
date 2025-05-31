@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/home/brad/BPS/work/rts/testing-mot-config-ui-older-rt/local/lib /home/brad/BPS/work/rts/testing-mot-config-ui-older-rt/lib);
+use lib qw(/home/brad/BPS/work/rts/rt6-plugin-testing/local/lib /home/brad/BPS/work/rts/rt6-plugin-testing/lib);
 
 package RT::Extension::MandatoryOnTransition::Test;
 

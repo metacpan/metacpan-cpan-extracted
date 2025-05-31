@@ -13,6 +13,7 @@
 #include "b_path.h"
 #include "b_find.h"
 #include "b_error.h"
+#include "match_engine.h"
 
 static inline int b_stat(b_string *path, struct stat *st, int flags) {
     int (*statfn)(const char *, struct stat *) = (flags & B_FIND_FOLLOW_SYMLINKS)? stat: lstat;

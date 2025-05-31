@@ -229,8 +229,10 @@ import( ...)
 		int i = 1;
 		for (i = 1; i < items; i++) {
 			char * ex = SvPV(ST(i), retlen);
-			char name [strlen(pkg) + 2 + retlen];
-			sprintf(name, "%s::%s", pkg, ex);
+			int name_len = strlen(pkg) + retlen + 3;
+			char *name = (char *)malloc(name_len);
+			if (!name) croak("Out of memory");
+			snprintf(name, name_len, "%s::%s", pkg, ex);
 			if (strcmp(ex, "StrToArray") == 0) {
 				newXS(name, XS_Basic__Coercion__XS__Definition_StrToArray, __FILE__);
 			} else if (strcmp(ex, "StrToHash") == 0) {
@@ -238,4 +240,5 @@ import( ...)
 			} else {
 				croak("Unknown import: %s", ex);
 			}
+			safefree(name);
 		}

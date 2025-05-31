@@ -7,6 +7,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Deep::UnorderedPairs;
@@ -501,126 +503,218 @@ subtest '$id with an empty fragment' => sub {
 };
 
 subtest '$id with a non-empty fragment' => sub {
-  cmp_deeply(
-    JSON::Schema::Modern::Document->new(
-      schema => {
-        '$id' => 'http://main.com',
-        '$defs' => {
-          foo => {
-            '$id' => 'http://secondary.com',
-            properties => {
-              bar => {
-                '$id' => 'http://localhost:4242/my_foo#hello',
-              },
+  my $doc = JSON::Schema::Modern::Document->new(
+    schema => {
+      '$id' => 'http://main.com',
+      '$defs' => {
+        foo => {
+          '$id' => 'http://secondary.com',
+          properties => {
+            bar => {
+              '$id' => 'http://localhost:4242/my_foo#hello',
             },
           },
         },
       },
-    ),
-    all(
-      methods(canonical_uri => str('http://main.com')),
-      listmethods(
-        resource_index => [],
-        errors => [
-          methods(TO_JSON => {
-            instanceLocation => '',
-            keywordLocation => '/$defs/foo/properties/bar/$id',
-            absoluteKeywordLocation => 'http://secondary.com#/properties/bar/$id',
-            error => '$id value "http://localhost:4242/my_foo#hello" cannot have a non-empty fragment',
-          }),
-        ],
-      ),
-    ),
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/foo/properties/bar/$id',
+        absoluteKeywordLocation => 'http://secondary.com#/properties/bar/$id',
+        error => '$id value "http://localhost:4242/my_foo#hello" cannot have a non-empty fragment',
+      },
+    ],
     'did not index the $id with a non-empty fragment, nor use it as the base for other identifiers',
   );
+
+  cmp_deeply($doc->canonical_uri, str('http://main.com'), 'canonical_uri');
+  cmp_result([ $doc->resource_index ], [], 'nothing was indexed');
 };
 
 subtest '$anchor not conforming to syntax' => sub {
-  cmp_deeply(
-    JSON::Schema::Modern::Document->new(
-      schema => {
-        '$defs' => {
-          foo => {
-            '$anchor' => 'my_#bad_anchor',
-          },
+  my $doc = JSON::Schema::Modern::Document->new(
+    schema => {
+      '$defs' => {
+        foo => {
+          '$anchor' => 'my_#bad_anchor',
         },
       },
-    ),
-    listmethods(
-      resource_index => [],
-      errors => [
-        methods(TO_JSON => {
-          instanceLocation => '',
-          keywordLocation => '/$defs/foo/$anchor',
-          error => '$anchor value "my_#bad_anchor" does not match required syntax',
-        }),
-      ],
-    ),
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/foo/$anchor',
+        error => '$anchor value "my_#bad_anchor" does not match required syntax',
+      },
+    ],
     'did not index an $anchor with invalid characters',
   );
+  cmp_result([ $doc->resource_index ], [], 'nothing was indexed');
 
-  cmp_deeply(
-    JSON::Schema::Modern::Document->new(
-      specification_version => 'draft7',
+  $doc = JSON::Schema::Modern::Document->new(
+    specification_version => 'draft2020-12',
+    schema => {
+      '$defs' => {
+        foo => {
+          '$anchor' => 'my:bad_anchor',  # legal in earlier drafts
+        },
+        qux => {
+          '$id' => 'https://foo.com#my_bad_id',
+        },
+      },
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/foo/$anchor',
+        error => '$anchor value "my:bad_anchor" does not match required syntax',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/qux/$id',
+        error => '$id value "https://foo.com#my_bad_id" cannot have a non-empty fragment',
+      },
+    ],
+    'did not index a draft2020-12 $anchor with invalid characters, or non-fragment-only $id',
+  );
+  cmp_result([ $doc->resource_index ], [], 'nothing was indexed');
+
+  $doc = JSON::Schema::Modern::Document->new(
+    specification_version => 'draft2019-09',
+    schema => {
+      '$defs' => {
+        foo => {
+          '$anchor' => '_my_bad_anchor',  # legal in draft2020-12
+        },
+        qux => {
+          '$id' => 'https://foo.com#my_bad_id',
+        },
+      },
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/foo/$anchor',
+        error => '$anchor value "_my_bad_anchor" does not match required syntax',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/qux/$id',
+        error => '$id value "https://foo.com#my_bad_id" cannot have a non-empty fragment',
+      },
+    ],
+    'did not index a draft2019-09 $anchor with invalid characters, or non-fragment-only $id',
+  );
+  cmp_result([ $doc->resource_index ], [], 'nothing was indexed');
+
+  foreach my $version (qw(draft6 draft7)) {
+    $doc = JSON::Schema::Modern::Document->new(
+      specification_version => $version,
       schema => {
         definitions => {
           foo => {
-            '$id' => '#my_$bad_anchor',
+            '$id' => '#_my_bad_anchor',  # legal in draft2020-12
           },
           qux => {
             '$id' => 'https://foo.com#my_bad_id',
           },
         },
       },
-    ),
-    listmethods(
-      resource_index => [],
-      errors => [
-        methods(TO_JSON => {
+    );
+    cmp_result(
+      [ map $_->TO_JSON, $doc->errors ],
+      [
+        {
           instanceLocation => '',
           keywordLocation => '/definitions/foo/$id',
-          error => '$id value "#my_$bad_anchor" does not match required syntax',
-        }),
-        methods(TO_JSON => {
+          error => '$id value "#_my_bad_anchor" does not match required syntax',
+        },
+        {
           instanceLocation => '',
           keywordLocation => '/definitions/qux/$id',
           error => '$id cannot change the base uri at the same time as declaring an anchor',
-        }),
+        },
       ],
-    ),
-    'did not index a draft7 fragment-only $id with invalid characters, or non-fragment-only $id',
-  );
+      'did not index a '.$version.' fragment-only $id with invalid characters, or non-fragment-only $id',
+    );
+    cmp_result([ $doc->resource_index ], [], 'nothing was indexed');
+  }
 
-  cmp_deeply(
-    JSON::Schema::Modern::Document->new(
-      specification_version => 'draft4',
-      schema => {
-        definitions => {
-          foo => {
-            id => '#my_$bad_anchor',
-          },
-          qux => {
-            id => 'https://foo.com#my_bad_id',
-          },
+  $doc = JSON::Schema::Modern::Document->new(
+    specification_version => 'draft4',
+    schema => {
+      definitions => {
+        foo => {
+          id => '#_my_bad_anchor',  # legal in draft2020-12
         },
       },
-    ),
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/definitions/foo/id',
+        error => 'id value "#_my_bad_anchor" does not match required syntax',
+      },
+    ],
+    'did not index a draft4 fragment-only id with invalid characters',
+  );
+  cmp_result([ $doc->resource_index ], [], 'nothing was indexed');
+
+  $doc = JSON::Schema::Modern::Document->new(
+    specification_version => 'draft4',
+    schema => {
+      id => 'https://foo.com',
+      definitions => {
+        qux => {
+          id => 'blah#weird_but_legal',
+        },
+      },
+    },
+  );
+
+  cmp_result([ map $_->TO_JSON, $doc->errors ], [], 'no errors');
+  cmp_deeply(
+    $doc,
     listmethods(
-      resource_index => [],
-      errors => [
-        methods(TO_JSON => {
-          instanceLocation => '',
-          keywordLocation => '/definitions/foo/id',
-          error => 'id value "#my_$bad_anchor" does not match required syntax',
-        }),
-        methods(TO_JSON => {
-          instanceLocation => '',
-          keywordLocation => '/definitions/qux/id',
-          error => 'id cannot change the base uri at the same time as declaring an anchor',
-        }),
-      ],
-    ),
-    'did not index a draft4 fragment-only $id with invalid characters, or non-fragment-only id',
+      resource_index => unordered_pairs(
+        'https://foo.com' => {
+          path => '',
+          canonical_uri => str('https://foo.com'),
+          specification_version => 'draft4',
+          vocabularies => $vocabularies{'draft4'},
+          configs => {},
+        },
+        'https://foo.com/blah' => {
+          path => '/definitions/qux',
+          canonical_uri => str('https://foo.com/blah'),
+          specification_version => 'draft4',
+          vocabularies => $vocabularies{'draft4'},
+          configs => {},
+          anchors => {
+            weird_but_legal => {
+              path => '/definitions/qux',
+              canonical_uri => str('https://foo.com/blah'),
+            },
+          },
+        },
+      )),
+    'can combine a canonical identifier with an anchor in draft4',
   );
 };
 
@@ -1074,7 +1168,7 @@ subtest 'multiple uris used for resolution and identification, and original_uri'
     'evaluator has correct resources, resolved against the provided base uri',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate({ foo => 1 }, 'https://example.com/api/staging/alpha.json')->TO_JSON,
     {
       valid => false,
@@ -1102,7 +1196,7 @@ subtest 'multiple uris used for resolution and identification, and original_uri'
     'when evaluating the document using the canonical uri, error locations use the canonical uri',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate({ foo => 1 }, 'https://example.com/api/')->TO_JSON,
     {
       valid => false,
@@ -1160,7 +1254,7 @@ subtest 'multiple uris used for resolution and identification, and original_uri'
     'document resources are added using the new base, which appears in their canonical_uri values',
   );
 
-  cmp_deeply(
+  cmp_result(
     $js->evaluate({ foo => 1 }, 'https://example.com/api/')->TO_JSON,
     {
       valid => false,
@@ -1190,7 +1284,7 @@ subtest 'multiple uris used for resolution and identification, and original_uri'
 
   # there are multiple resources mapped to the same document+path locations, but we want error
   # locations to be using the set that we used in the evaluation call.
-  cmp_deeply(
+  cmp_result(
     $js->evaluate({ foo => 1 }, 'file:///usr/local/share/api.json')->TO_JSON,
     {
       valid => false,

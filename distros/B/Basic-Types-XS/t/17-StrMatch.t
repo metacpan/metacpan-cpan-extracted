@@ -15,7 +15,7 @@ is($type->("foo bar"), "foo bar");
 eval { $type->("bar") };
 like($@, qr/Not foo!/, 'custom error message croaks');
 
-$type = StrMatch(validate => qr/^.+$/u);
+$type = StrMatch(validate => qr/^.+$/);
 
 is($type->("αβγ"), "αβγ", 'unicode letters match');
 $type = StrMatch(validate => qr/^abc$/i);

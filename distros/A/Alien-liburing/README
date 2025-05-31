@@ -1,13 +1,13 @@
 Alien::liburing
 
-This module provides bindings for the "libuing" C library, for working
-with the io_uring Linux kernel subsystem. This library is only available
-or relavent for Linux, and will fail to install on any other operating
-systems.
+This module provides library building and detectiong support for the
+"libuing" C library, for working with the io_uring Linux kernel
+subsystem. This library is only available or relavent for Linux, and
+will fail to install on any other operating systems.
 
-This library also requires a fairly new version of the Linux kernel as
-of this writing. I'd recommend at a minimum a 5.3 versioned kernel or
-newer, due to features and support.
+This library also requires a resonably modern version of the Linux
+kernel. I'd recommend at a minimum a 5.3 versioned kernel or newer, due
+to features and support.
 
 For the eventual IO::Async::Loop::IOUring module, a minimum kernel
 version of 5.4 (likely 5.5) will also be needed and detected at install
@@ -37,7 +37,7 @@ Should you wish to install this module manually, the procedure is
 
 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Ryan Voots.
+This software is Copyright (c) 2025 by Ryan Voots.
 
 This is free software, licensed under:
 

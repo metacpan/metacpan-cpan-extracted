@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.610';
+our $VERSION = '0.611';
 
 use 5.020;
 use strictures 2;
@@ -15,6 +15,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use B;
 use Carp 'croak';
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
@@ -58,6 +60,7 @@ use constant { true => JSON::PP::true, false => JSON::PP::false };
 # note that sometimes a value may return true for more than one type, e.g. integer+number,
 # or number+string, depending on its internal flags.
 # pass { legacy_ints => 1 } in $config to use draft4 integer behaviour
+# behaviour is consistent with get_type() (where integers are also numbers).
 sub is_type ($type, $value, $config = {}) {
   if ($type eq 'null') {
     return !(defined $value);
@@ -103,7 +106,8 @@ sub is_type ($type, $value, $config = {}) {
       }
       else {
         # note: values that are larger than $Config{ivsize} will be represented as an NV, not IV,
-        # therefore they will fail this check
+        # therefore they will fail this check -- which is why use of Math::BigInt is recommended
+        # if the exact type is important, or loss of any accuracy is unacceptable
         return is_bignum($value) && $value->is_int
           # if dualvar, PV and stringified NV/IV must be identical
           || created_as_number($value) && int($value) == $value;
@@ -121,6 +125,7 @@ sub is_type ($type, $value, $config = {}) {
 # returns one of the six core types, plus integer
 # we do NOT check stringy_numbers here -- you must do that in the caller
 # pass { legacy_ints => 1 } in $config to use draft4 integer behaviour
+# behaviour is consistent with is_type().
 sub get_type ($value, $config = {}) {
   return 'object' if is_plain_hashref($value);
   return 'boolean' if is_bool($value);
@@ -131,8 +136,7 @@ sub get_type ($value, $config = {}) {
   if (is_ref($value)) {
     my $ref = ref($value);
     return $ref eq 'Math::BigInt' ? 'integer'
-      # note: this will be wrong for Math::BigFloat->new('1.0') in draft4
-      : $ref eq 'Math::BigFloat' ? ($value->is_int ? 'integer' : 'number')
+      : $ref eq 'Math::BigFloat' ? (!$config->{legacy_ints} && $value->is_int ? 'integer' : 'number')
       : (defined blessed($value) ? '' : 'reference to ').$ref;
   }
 
@@ -158,7 +162,8 @@ sub get_type ($value, $config = {}) {
   }
   else {
     # note: values that are larger than $Config{ivsize} will be represented as an NV, not IV,
-    # therefore they will fail this check
+    # therefore they will fail this check -- which is why use of Math::BigInt is recommended
+    # if the exact type is important, or loss of any accuracy is unacceptable
     return int($value) == $value ? 'integer' : 'number' if created_as_number($value);
   }
 
@@ -416,6 +421,8 @@ sub assert_pattern ($state, $pattern) {
 }
 
 # this is only suitable for checking URIs within schemas themselves
+# note that we cannot use $state->{spec_version} to more tightly constrain the plain-name fragment
+# syntax, as we could be checking a $ref to a schema using a different version
 sub assert_uri_reference ($state, $schema) {
   croak 'assert_uri_reference called in void context' if not defined wantarray;
 
@@ -426,7 +433,7 @@ sub assert_uri_reference ($state, $schema) {
       or $string =~ /[^[:ascii:]]/            # ascii characters only
       or $string =~ /#/                       # no fragment, except...
         and $string !~ m{#$}                          # allow empty fragment
-        and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # allow plain-name fragment
+        and $string !~ m{#[A-Za-z_][A-Za-z0-9_:.-]*$} # allow plain-name fragment, superset of all drafts
         and $string !~ m{#/(?:[^~]|~[01])*$};         # allow json pointer fragment
 
   return 1;
@@ -479,7 +486,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.610
+version 0.611
 
 =head1 SYNOPSIS
 

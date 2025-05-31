@@ -1,5 +1,5 @@
 package IO::Uring;
-$IO::Uring::VERSION = '0.003';
+$IO::Uring::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ IO::Uring - io_uring for Perl
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 

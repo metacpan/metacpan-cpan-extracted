@@ -1,8 +1,8 @@
 <li class="list-group=item">
-  <div class="custom-control custom-checkbox">
+  <div class="form-check">
 % my $id = join '-', $Queue->{safe_name}, $Rule->{safe_from}, $Rule->{safe_to}, 'remove-requires', $Requires->{safe_field};
-    <input type="checkbox" class="checkbox custom-control-input" id="<% $id %>" name="<% $id %>" value="1" unchecked="" data-queue="<% $Queue->{name} %>" data-from="<% $Rule->{from} %>" data-to="<% $Rule->{to} %>" data-requires="<% $Requires->{field} %>">
-    <label class="custom-control-label" for="<% $id %>"><% $Requires->{field} . $extra_requires %></label>
+    <input type="checkbox" class="checkbox form-check-input" id="<% $id %>" name="<% $id %>" value="1" unchecked="" data-queue="<% $Queue->{name} %>" data-from="<% $Rule->{from} %>" data-to="<% $Rule->{to} %>" data-requires="<% $Requires->{field} %>">
+    <label class="form-check-label" for="<% $id %>"><% $Requires->{field} . $extra_requires %></label>
   </div>
 </li>
 <%INIT>

@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 use Carp                         qw( croak );
 use Pithub::Issues               ();
@@ -327,7 +327,7 @@ Pithub::Repos - Github v3 Repos API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 

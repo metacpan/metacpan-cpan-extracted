@@ -23,10 +23,10 @@ no_index:
   package:
     - RT::Extension::MandatoryOnTransition::Test
 requires:
-  perl: 5.8.3
+  perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-mandatoryontransition
-version: '0.25'
-x_module_install_rtx_version: '0.43'
-x_requires_rt: 4.0.9
+version: '1.00'
+x_module_install_rtx_version: '0.44'
+x_requires_rt: 6.0.0

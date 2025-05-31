@@ -985,6 +985,87 @@ ClassName(...)
 	OUTPUT:
 		RETVAL
 
+SV *
+_Enum(...)
+	CODE:
+		SV * self = CvXSUBANY(cv).any_ptr;
+		if (!self || !SvOK(self)) {
+			croak("Enum type constraint not initialized");
+		}
+
+		SV * param = items >= 1 ? newSVsv(ST(0)) : &PL_sv_undef;
+		param = set_default(self, param);
+		param = coerce(self, param);
+
+		if (!SvOK(param) || SvTYPE(param) != SVt_PV) {
+			char * custom_error = get_error_message(self, "Enum");
+			croak("%s", custom_error);
+		}
+		HV * self_hv = (HV*)SvRV(self);
+		if (!hv_exists(self_hv, "validate", 8)) {
+			croak("Enum type constraint not initialized with validation values");
+		}
+
+		SV * validate = *hv_fetch(self_hv, "validate", 8, 0);
+		if (!SvROK(validate) || SvTYPE(SvRV(validate)) != SVt_PVAV) {
+			croak("Enum type constraint validation values must be an array reference");
+		}
+		
+		STRLEN retlen;
+		char * param_str = SvPV(param, retlen);
+		AV * enm = (AV*)SvRV(validate);
+		int len = av_len(enm);
+		int found = 0, i = 0;
+		for (i = 0; i <= len; i++) {
+			SV * val = *av_fetch(enm, i, 0);
+			if (SvOK(val) && SvTYPE(val) == SVt_PV ) {
+				char * val_str = SvPV(val, retlen);
+				if (strcmp(val_str, param_str) == 0) {
+					found = 1;
+					break;
+				}
+			}
+		}
+		
+		if (found == 0) {
+			char * custom_error = get_error_message(self, "Enum");
+			croak("%s", custom_error);
+		}
+		
+		SvREFCNT_inc(param);
+		RETVAL = param;
+	OUTPUT:
+		RETVAL
+
+SV *
+Enum(...)
+	CODE:
+		CV *type = newXS(NULL, XS_Basic__Types__XS__Definition__Enum, __FILE__);
+		RETVAL = _new(newSVpv("Enum", 4), type);
+		SvREFCNT_inc(type);
+		CvXSUBANY(type).any_ptr = (void *)RETVAL;
+		SvREFCNT_inc(RETVAL);
+		HV * self = (HV*)SvRV(RETVAL);
+		hv_store(self, "constraint", 10, (SV*)type, 0);
+		if (items % 2 != 0) {
+			croak("Enum type constraint requires an even number of arguments");
+		}
+		int i = 0;
+		for (i = 0; i < items; i += 2) {
+			SV * key = ST(i);
+			SV * value = ST(i + 1);
+			if (!SvOK(key) || SvTYPE(key) != SVt_PV) {
+				croak("key must be a string");
+			}
+			if (!SvOK(value)) {
+				croak("value must be defined");
+			}
+			STRLEN keylen;
+			char * keystr = SvPV(key, keylen);
+			hv_store(self, keystr, keylen, newSVsv(value), 0);
+		}
+	OUTPUT:
+		RETVAL
 
 MODULE = Basic::Types::XS  PACKAGE = Basic::Types::XS
 PROTOTYPES: ENABLE
@@ -1045,6 +1126,7 @@ SV *
 validate(self, value)
 	SV *self
 	SV *value
+	OVERLOAD: &
 	CODE:
 		if (!self || !SvROK(self)) {
 			croak("constraint not initialized");
@@ -1112,6 +1194,8 @@ import( ...)
 				newXS(name, XS_Basic__Types__XS__Definition_ClassName, __FILE__);
 			} else if (strcmp(ex, "StrMatch") == 0) {
 				newXS(name, XS_Basic__Types__XS__Definition_StrMatch, __FILE__);
+			} else if (strcmp(ex, "Enum") == 0) {
+				newXS(name, XS_Basic__Types__XS__Definition_Enum, __FILE__);
 			} else {
 				croak("Unknown type constraint: %s", ex);
 			}

@@ -2,9 +2,9 @@
     <textarea class="hidden" name="MandatoryOnTransition"></textarea>
     <br />
     <div class="value col-12">
-        <ul class="nav nav-tabs nav-pills" id="mot-nav" role="tablist">
+        <ul class="nav nav-pills" id="mot-nav" role="tablist">
             <li class="nav-item" id="__new__-nav">
-                <a class="nav-link <% @queues ? '' : 'show active' %>" href="#__new__-content" id="category-tab-__new__" data-toggle="tab" role="tab" aria-controls="__new__" aria-selected="false">
+                <a class="nav-link <% @queues ? '' : 'show active' %>" href="#__new__-content" id="category-tab-__new__" data-bs-toggle="tab" role="tab" aria-controls="__new__" aria-selected="false">
                     Add Queue
                 </a>
             </li>
@@ -16,18 +16,18 @@
             <div id="__new__-content" class="tab-pane fade <% @queues ? '' : 'show active' %>" role="tabpanel" aria-labelledby="category-tab-__new__">
                 <input type="hidden" id="MoT-NewQueue-Value" name="MoT-NewQueue-Value" value="">
                 <input type="hidden" id="MoT-Queue-Active" name="MoT-Queue-Active" value="">
-                <div class="form-row">
+                <div class="row mt-2">
                     <div class="boxcontainer col-md-12">
                         <&| /Elements/LabeledValue, Label => loc('Queue') &>
                             <& /Elements/SelectQueue, Name => 'MoT-NewQueue', ShowNullOption => 1, ShowAllQueues => 1, DefaultLabel => '*' &>
                         </&>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row mt-2">
                     <span class="col-12">
                         <div class="submit">
                             <div class="buttons">
-                                <input type="button" Name="mot-add-new-queue" value="<% loc('Add Queue') %>" onclick="addQueue();" class="button btn btn-primary form-control" />
+                                <input type="button" Name="mot-add-new-queue" value="<% loc('Add Queue') %>" onclick="addQueue();" class="btn btn-primary" />
                             </div>
                         </div>
                     </span>
@@ -39,11 +39,11 @@
         </div>
     </div>
     <br/>
-    <div class="form-row">
+    <div class="row mt-2">
         <span class="col-12">
             <div class="submit">
                 <div class="buttons">
-                    <input type="button" value="Undo Changes" onclick="undoChanges();" class="button btn btn-primary form-control" />
+                    <input type="button" value="Undo Changes" onclick="undoChanges();" class="btn btn-primary" />
                 </div>
             </div>
         </span>
@@ -51,18 +51,18 @@
 </&>
 <br/>
 <script type="text/javascript">
-    jQuery(document).ready(
-        function() {
+    registerLoadListener(function(evt) {
+        if ( evt.detail.elt.querySelector('[name=MandatoryOnTransition-Current]') ) {
             currentJSON = jQuery('[name=MandatoryOnTransition-Current]').val();
             if ( currentJSON.length == 0 ) {
                 currentJSON = '{}';
             }
             jQuery('[name=MandatoryOnTransition]').text(currentJSON);
 % if ( $active_queue ) {
-            jQuery('#<% $active_queue %>').trigger('click');
+            jQuery('#<% $active_queue %>').tab('show');
 % }
         }
-    );
+    });
 
     // keep in sync with RT::Extension::MandatoryOnTransition::_sanitize_id
     function htmlSafeName (str) {
@@ -92,7 +92,7 @@
     function undoChanges() {
         jQuery('[name=MandatoryOnTransition]').text( jQuery('[name=MandatoryOnTransition-Current]').val() );
         jQuery('#MoT-Queue-Active').val( jQuery('ul#mot-nav a.active').attr('id') );
-        jQuery( 'input[type=submit][value="<% loc('Save Changes') %>"]' ).trigger('click');
+        jQuery( 'input[type=submit][value="<% loc('Save Changes') %>"]:visible' ).trigger('click');
     };
 
     function ajaxError ( xhr, error ) {
@@ -122,7 +122,7 @@
             }
             jQuery('[name=MandatoryOnTransition]').text( JSON.stringify(currentJSON) );
             jQuery('#MoT-NewQueue-Value').val( 'category-tab-' + queue_id );
-            jQuery( 'input[type=submit][value="<% loc('Save Changes') %>"]' ).trigger('click');
+            jQuery( 'input[type=submit][value="<% loc('Save Changes') %>"]:visible' ).trigger('click');
         }
     };
 

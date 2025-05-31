@@ -10,3 +10,6 @@ Revision history for Basic-Coercion-XS
 
 0.07	2025-05-29
 	- Scope the object so you can't do StrToHash->StrToArray.
+
+0.08	2025-05-30
+	- Attempt to prevent stack smashing detected test fails

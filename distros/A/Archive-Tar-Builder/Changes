@@ -1,3 +1,10 @@
+Version 2.5006
+
+    * Fix FreeBSD build errors (RT #116667)
+
+    * Fix issue with truncated symlink destinations w/GNU extensions
+      (RT #115370)
+
 Version 2.5005
 
     * Fix issues with corrupted Perl call stack after handling a certain

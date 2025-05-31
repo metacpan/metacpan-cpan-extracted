@@ -4,7 +4,7 @@ our $AUTHORITY = 'cpan:PLU';
 # ABSTRACT: Github v3 Orgs API
 
 use Moo;
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 use Carp                  qw( croak );
 use Pithub::Orgs::Members ();
@@ -76,7 +76,7 @@ Pithub::Orgs - Github v3 Orgs API
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 METHODS
 

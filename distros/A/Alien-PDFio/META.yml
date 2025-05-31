@@ -1,0 +1,59 @@
+---
+abstract: 'Alien distribution for PDFio'
+author:
+  - 'LNATION <email@lnation.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Download::Negotiate: '1.30'
+  Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+  Archive::Tar: '0'
+  Config: '0'
+  ExtUtils::MakeMaker: '6.52'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Mojo::DOM58: '1.00'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Test::More: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Download::GitHub: '0.10'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-PDFio
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+  perl: '5.006'
+version: '0.05'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

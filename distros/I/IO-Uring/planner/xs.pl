@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-load_module('Dist::Build::XS');
+load_extension('Dist::Build::XS');
+load_extension('Dist::Build::XS::Alien');
 add_xs(
-	libraries            => [ 'uring'],
+	alien => [ 'liburing' ],
 );

@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01042';
+our $VERSION = '0.01043';
 
 use Carp           qw( croak );
 use HTTP::Headers  ();
@@ -439,7 +439,7 @@ Pithub::Base - Github v3 base class for all Pithub modules
 
 =head1 VERSION
 
-version 0.01042
+version 0.01043
 
 =head1 DESCRIPTION
 

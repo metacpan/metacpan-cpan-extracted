@@ -41,6 +41,5 @@ src/ppport.h
 t/lib-Archive-Tar-Builder.t
 t/lib-Archive-Tar-Builder-HardlinkCache.t
 t/lib-Archive-Tar-Builder-UserCache.t
-t/scripts/CPANEL-29859.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

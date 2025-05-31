@@ -15,8 +15,8 @@ html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Elements/EditBasics/Mas
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Elements/EditCustomFields/MassageCustomFields
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Modify.html/Default
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/ModifyAll.html/Default
-html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/AfterWorked
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Update.html/BeforeUpdate
+html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Widgets/Update/Basics/AfterWorked
 html/Helpers/QueueRule
 html/Helpers/QueueRuleRequires
 html/Helpers/QueueTransition

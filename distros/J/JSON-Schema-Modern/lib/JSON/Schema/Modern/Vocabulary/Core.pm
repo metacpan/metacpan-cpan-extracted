@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.610';
+our $VERSION = '0.611';
 
 use 5.020;
 use Moo;
@@ -16,6 +16,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use Ref::Util 'is_plain_hashref';
 use JSON::Schema::Modern::Utilities qw(is_type abort assert_keyword_type canonical_uri E assert_uri_reference assert_uri jsonp);
 use namespace::clean;
@@ -51,26 +53,31 @@ sub keywords ($class, $spec_version) {
 # this is used by the Document constructor to build its resource_index.
 
 sub _traverse_keyword_id ($class, $schema, $state) {
-  return if not assert_keyword_type($state, $schema, 'string');
+  return if not assert_keyword_type($state, $schema, 'string')
+    or not assert_uri_reference($state, $schema);
 
   my $uri = Mojo::URL->new($schema->{$state->{keyword}});
 
-  if ($state->{spec_version} =~ /^draft[467]$/) {
-    # technically the draft4 spec allows this form, but we are not supporting it.
-    if (length($uri->fragment)) {
-      return E($state, '%s cannot change the base uri at the same time as declaring an anchor', $state->{keyword})
-        if length($uri->clone->fragment(undef));
-
-      return $class->_traverse_keyword_anchor($schema, $state);
-    }
-  }
-  else {
-    return if not assert_uri_reference($state, $schema);
-
+  if (length $uri->fragment) {
     return E($state, '%s value "%s" cannot have a non-empty fragment', $state->{keyword}, $schema->{$state->{keyword}})
-      if length $uri->fragment;
+      if $state->{spec_version} !~ /^draft[467]$/;
+
+    if (length(my $base = $uri->clone->fragment(undef))) {
+      return E($state, '$id cannot change the base uri at the same time as declaring an anchor')
+        if $state->{spec_version} =~ /^draft[67]$/;
+
+      # only permitted in draft4: add an id and an anchor via the single 'id' keyword
+      return if not $class->__create_identifier($base, $state);
+    }
+
+    return $class->_traverse_keyword_anchor({ %$schema, id => '#'.$uri->fragment }, $state);
   }
 
+  return if not $class->__create_identifier($uri, $state);
+  return 1;
+}
+
+sub __create_identifier ($class, $uri, $state) {
   $uri->fragment(undef);
   return E($state, '%s cannot be empty', $state->{keyword}) if not length $uri;
 
@@ -96,6 +103,7 @@ sub _traverse_keyword_id ($class, $schema, $state) {
     vocabularies => $state->{vocabularies}, # reference, not copy
     configs => $state->{configs},
   };
+
   return 1;
 }
 
@@ -195,7 +203,7 @@ sub _traverse_keyword_anchor ($class, $schema, $state) {
 
   my $anchor = $schema->{$state->{keyword}};
   return E($state, '%s value "%s" does not match required syntax', $state->{keyword}, $anchor)
-    if $state->{spec_version} =~ /^draft[467]$/ and $anchor !~ /^#[A-Za-z][A-Za-z0-9_:.-]*$/
+    if $state->{spec_version} =~ /^draft[467]$/  and $anchor !~ /^#[A-Za-z][A-Za-z0-9_:.-]*$/
       or $state->{spec_version} eq 'draft2019-09' and $anchor !~ /^[A-Za-z][A-Za-z0-9_:.-]*$/
       or $state->{spec_version} eq 'draft2020-12' and $anchor !~ /^[A-Za-z_][A-Za-z0-9._-]*$/;
 
@@ -402,7 +410,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.610
+version 0.611
 
 =head1 DESCRIPTION
 

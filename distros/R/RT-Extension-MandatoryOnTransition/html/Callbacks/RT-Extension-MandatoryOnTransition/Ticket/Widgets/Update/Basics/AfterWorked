@@ -63,9 +63,7 @@ foreach my $role (@{$roles}) {
 % if ( @$roles ) {
 %     foreach my $role (@roles) {
 %       my $input = 'Add' . ( $role->isa('RT::Group') ? $role->Name : $role->GroupType );
-        <tr>
-            <td class="label"><&|/l, loc($role->Name) &>Add [_1]</&>:</td>
-            <td class="entry">
+<&| /Elements/LabeledValue, Label => loc( "Add [_1]", $role->Name ), LabelFor => $input &>
                 <& /Elements/EmailInput,
                     Name               => $input,
                     Autocomplete       => 1,
@@ -74,7 +72,6 @@ foreach my $role (@{$roles}) {
                     Size               => 20,
                     Default            => $ARGS{$input},
                 &>
-            </td>
-        </tr>
+</&>
 %     }
 % }

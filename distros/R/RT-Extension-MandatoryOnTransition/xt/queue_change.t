@@ -24,9 +24,9 @@ my $ticket = RT::Test->create_ticket(
 );
 
 $m->goto_ticket( $ticket->id );
-$m->follow_link_ok( { text => 'Basics' } );
+$m->follow_link_ok( { text => 'Jumbo' } );
 $m->submit_form_ok(
-    {   form_name => 'TicketModify',
+    {   form_name => 'TicketModifyAll',
         fields    => { Queue => $queue_foo->id, },
         button    => 'SubmitTicket',
     },
@@ -39,7 +39,7 @@ $ticket->Load( $ticket->id );
 is( $ticket->Queue, $queue_general->id, 'Queue is not updated' );
 
 $m->submit_form_ok(
-    {   form_name => 'TicketModify',
+    {   form_name => 'TicketModifyAll',
         fields    => { Queue => $queue_foo->id, TimeWorked => 10 },
         button    => 'SubmitTicket',
     },

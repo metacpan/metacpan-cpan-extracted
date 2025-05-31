@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.609-26-g1b5d3153
+package JSON::Schema::Modern; # git description: v0.610-15-g971fc746
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.610';
+our $VERSION = '0.611';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -17,6 +17,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint pairmap uniq any min);
@@ -99,6 +101,9 @@ has [qw(collect_annotations scalarref_booleans stringy_numbers strict)] => (
   isa => Bool,
 );
 
+# Validation §7.1-2: "Note that the "type" keyword in this specification defines an "integer" type
+# which is not part of the data model. Therefore a format attribute can be limited to numbers, but
+# not specifically to integers."
 my $core_types = Enum[qw(null object array boolean string number)];
 my @core_formats = qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex);
 
@@ -1259,7 +1264,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.610
+version 0.611
 
 =head1 SYNOPSIS
 
@@ -1360,8 +1365,8 @@ Overrides to existing formats (see L</Format Validation>)
 must be specified in the form of C<< { $format_name => $format_sub } >>, where
 the format sub is a subref that takes one argument and returns a boolean result. New formats must
 be specified in the form of C<< { $format_name => { type => $type, sub => $format_sub } } >>,
-where the type indicates which of the core JSON Schema types (null, object, array, boolean, string,
-number, or integer) the instance value must be for the format validation to be considered.
+where the type indicates which of the data model types (null, object, array, boolean, string,
+or number) the instance value must be for the format validation to be considered.
 
 =head2 validate_content_schemas
 
@@ -1901,7 +1906,8 @@ By default (and unless you specify a custom metaschema with the C<$schema> keywo
 L<JSON::Schema::Modern::Document/metaschema>),
 formats are treated only as annotations, not assertions. When L</validate_formats> is
 true, strings are also checked against the format as specified in the schema. At present the
-following formats are supported (use of any other formats than these will always evaluate as true,
+following formats are supported for the latest version of the specification
+(use of any other formats than these will always evaluate as true,
 but remember you can always supply custom format handlers; see L</format_validations> above):
 
 =over 4
@@ -2007,9 +2013,9 @@ C<idn-hostname> also requires L<Net::IDN::Encode>
 =head2 Specification Compliance
 
 This implementation is now fully specification-compliant (for versions
-draft4, draft6, draft7, draft2019-09, draft2020-12),
-but until version 1.000 is released, it is
-still deemed to be missing some optional but quite useful features, such as:
+draft4, draft6, draft7, draft2019-09, draft2020-12).
+
+However, some potentially-useful features are not yet implemented, such as:
 
 =for stopwords Mojolicious
 
@@ -2029,7 +2035,7 @@ loading schema documents from a local web application (e.g. L<Mojolicious>)
 
 =item *
 
-additional output formats beyond C<flag>, C<basic>, and C<terse> (L<https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.12>)
+additional "official" output formats beyond C<flag>, C<basic>, and C<terse> (L<https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.12>)
 
 =back
 
@@ -2071,19 +2077,19 @@ L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://datatracker
 
 =item *
 
-L<https://json-schema.org/draft/2020-12/release-notes.html>
+L<https://json-schema.org/draft/2020-12>
 
 =item *
 
-L<https://json-schema.org/draft/2019-09/release-notes.html>
+L<https://json-schema.org/draft/2019-09>
 
 =item *
 
-L<https://json-schema.org/draft-07/json-schema-release-notes.html>
+L<https://json-schema.org/draft-07>
 
 =item *
 
-L<https://json-schema.org/draft-06#draft-06-release-notes>
+L<https://json-schema.org/draft-06>
 
 =item *
 
@@ -2092,6 +2098,10 @@ L<https://json-schema.org/draft-04/draft-zyp-json-schema-04>
 =item *
 
 L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
+
+=item *
+
+L<Test::JSON::Schema>: test your data against a JSON Schema
 
 =item *
 

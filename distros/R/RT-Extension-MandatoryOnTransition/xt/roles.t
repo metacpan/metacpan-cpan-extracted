@@ -58,38 +58,6 @@ diag "Resolve ticket through Update with required Owner";
     $m->text_contains("Status changed from 'new' to 'resolved'");
 }
 
-diag "Resolve ticket through Basics with required Owner";
-{
-    my $t = RT::Test->create_ticket(
-        Queue   => 'General',
-        Subject => 'Test Mandatory Owner On Resolve',
-        Content => 'Testing',
-    );
-    ok($t->id, 'Created ticket to resolve through Modify.html: ' . $t->id);
-
-    $m->goto_ticket($t->id);
-    $m->follow_link_ok({ text => 'Basics' }, 'Get Modify.html of ticket');
-    $m->submit_form_ok(
-        {   form_name => 'TicketModify',
-            fields    => { Status => 'resolved', },
-            button    => 'SubmitTicket',
-        },
-        'Submit resolve with no Owner set'
-    );
-    $m->text_contains('Owner is required when changing Status to resolved');
-
-    $m->submit_form_ok(
-        {   form_name => 'TicketModify',
-            fields    => { Status => 'resolved', Owner => $root->id, },
-            button    => 'SubmitTicket',
-        },
-        'Submit resolve with no Owner set'
-    );
-    $m->text_lacks('Owner is required when changing Status to resolved');
-    $m->text_contains('Owner changed from Nobody to root');
-    $m->text_contains("Status changed from 'new' to 'resolved'");
-}
-
 diag "Resolve ticket through Jumbo with required Owner";
 {
     my $t = RT::Test->create_ticket(
@@ -135,9 +103,9 @@ diag "Test core role fields";
     ok $ret, $msg;
 
     $m->goto_ticket($t->id);
-    $m->follow_link_ok({ text => 'Basics' }, 'Get Modify.html of ticket');
+    $m->follow_link_ok({ text => 'Jumbo' }, 'Get ModifyAll.html of ticket');
     $m->submit_form_ok(
-        {   form_name => 'TicketModify',
+        {   form_name => 'TicketModifyAll',
             fields    => { Status => 'stalled', },
             button    => 'SubmitTicket',
         },
@@ -157,9 +125,9 @@ diag "Test core role fields";
     ok $ret, $msg;
 
     $m->goto_ticket($t->id);
-    $m->follow_link_ok({ text => 'Basics' }, 'Get Modify.html of ticket');
+    $m->follow_link_ok({ text => 'Jumbo' }, 'Get ModifyAll.html of ticket');
     $m->submit_form_ok(
-        {   form_name => 'TicketModify',
+        {   form_name => 'TicketModifyAll',
             fields    => { Status => 'stalled', },
             button    => 'SubmitTicket',
         },
@@ -173,9 +141,9 @@ diag "Test core role fields";
     ok $ret, "Failed to create Admins group: $msg";
 
     $m->goto_ticket($t->id);
-    $m->follow_link_ok({ text => 'Basics' }, 'Get Modify.html of ticket');
+    $m->follow_link_ok({ text => 'Jumbo' }, 'Get ModifyAll.html of ticket');
     $m->submit_form_ok(
-        {   form_name => 'TicketModify',
+        {   form_name => 'TicketModifyAll',
             fields    => { Status => 'stalled', },
             button    => 'SubmitTicket',
         },
@@ -187,9 +155,9 @@ diag "Test core role fields";
     ok $ret, $msg;
 
     $m->goto_ticket($t->id);
-    $m->follow_link_ok({ text => 'Basics' }, 'Get Modify.html of ticket');
+    $m->follow_link_ok({ text => 'Jumbo' }, 'Get ModifyAll.html of ticket');
     $m->submit_form_ok(
-        {   form_name => 'TicketModify',
+        {   form_name => 'TicketModifyAll',
             fields    => { Status => 'stalled', },
             button    => 'SubmitTicket',
         },
@@ -222,9 +190,9 @@ diag "Test custom role mandatory fields";
     ok $ret, $msg;
 
     $m->goto_ticket($t->id);
-    $m->follow_link_ok({ text => 'Basics' }, 'Get Modify.html of ticket');
+    $m->follow_link_ok({ text => 'Jumbo' }, 'Get ModifyAll.html of ticket');
     $m->submit_form_ok(
-        {   form_name => 'TicketModify',
+        {   form_name => 'TicketModifyAll',
             fields    => { Status => 'deleted', },
             button    => 'SubmitTicket',
         },
@@ -236,9 +204,9 @@ diag "Test custom role mandatory fields";
     ok $ret, $msg;
 
     $m->goto_ticket($t->id);
-    $m->follow_link_ok({ text => 'Basics' }, 'Get Modify.html of ticket');
+    $m->follow_link_ok({ text => 'Jumbo' }, 'Get ModifyAll.html of ticket');
     $m->submit_form_ok(
-        {   form_name => 'TicketModify',
+        {   form_name => 'TicketModifyAll',
             fields    => { Status => 'deleted', },
             button    => 'SubmitTicket',
         },

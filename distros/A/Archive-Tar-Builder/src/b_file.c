@@ -75,9 +75,9 @@ off_t b_file_write_pax_path_blocks(b_buffer *buf, b_string *path, b_string *link
     if ((buffer = malloc(total_len + 1)) == NULL)
         goto error_mem;
 
-    snprintf(buffer, total_len + 1, "%d path=%s\n", full_len, path->str);
+    snprintf(buffer, total_len + 1, "%zu path=%s\n", full_len, path->str);
     if (linkdest)
-        snprintf(buffer + full_len, link_full_len + 1, "%d linkpath=%s\n", link_full_len, linkdest->str);
+        snprintf(buffer + full_len, link_full_len + 1, "%zu linkpath=%s\n", link_full_len, linkdest->str);
 
     for (i=0; i<total_len; i+=B_BLOCK_SIZE) {
         size_t left    = total_len - i;

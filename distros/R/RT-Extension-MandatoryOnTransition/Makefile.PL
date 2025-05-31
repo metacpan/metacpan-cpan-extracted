@@ -8,7 +8,7 @@ license  'gplv2';
 
 repository('https://github.com/bestpractical/rt-extension-mandatoryontransition');
 
-requires_rt('4.0.9');
+requires_rt('6.0.0');
 
 my ($lp) = ($INC{'RT.pm'} =~ /^(.*)[\\\/]/);
 my $lib_path = join( ' ', "$RT::LocalPath/lib", $lp );

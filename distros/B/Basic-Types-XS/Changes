@@ -14,3 +14,9 @@ Revision history for Basic-Types-XS
 	- Scope the object so you can't do Str->Array anymore.
 	- Add StrMatch type
 	- Update object to have accessors message, default, coerce, validate.
+
+0.10	2025-05-30
+	- Fix the failing test.
+
+0.11	2025-05-30
+	- Add new Enum(validate => [qw/m f/]) type.	

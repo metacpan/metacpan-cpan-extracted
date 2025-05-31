@@ -1,12 +1,12 @@
-<div class="form-row">
+<div class="row mt-2">
   <div class="col-md-12">
     <hr/>
   </div>
   <div class="boxcontainer col-md-3">
-    <div class="custom-control custom-checkbox">
+    <div class="form-check">
 % my $id = join '-', $Queue->{safe_name}, $Rule->{safe_from}, $Rule->{safe_to}, 'remove-rule';
-      <input type="checkbox" class="checkbox custom-control-input" id="<% $id %>" name="<% $id %>" value="1" unchecked="" data-queue="<% $Queue->{name} %>" data-from="<% $Rule->{from} %>" data-to="<% $Rule->{to} %>" data-requires="">
-      <label class="custom-control-label" for="<% $id %>">
+      <input type="checkbox" class="checkbox form-check-input" id="<% $id %>" name="<% $id %>" value="1" unchecked="" data-queue="<% $Queue->{name} %>" data-from="<% $Rule->{from} %>" data-to="<% $Rule->{to} %>" data-requires="">
+      <label class="form-check-label" for="<% $id %>">
         <% $Rule->{from} %>
       </label>
     </div>

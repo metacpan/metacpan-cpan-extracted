@@ -26,6 +26,7 @@ t/14-synop.t
 t/15-Object.t
 t/16-ClassName.t
 t/17-StrMatch.t
+t/18-Enum.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

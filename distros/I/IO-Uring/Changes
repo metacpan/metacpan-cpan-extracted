@@ -1,5 +1,11 @@
 Revision history for IO-Uring
 
+0.005     2025-05-31 02:54:06+02:00 Europe/Brussels
+          - Correctly declare Alien::liburing dependency
+
+0.004     2025-05-30 16:06:44+02:00 Europe/Brussels
+          - Use Alien::liburing
+
 0.003     2025-04-01 22:13:31+02:00 Europe/Brussels
           - Add pflags argument to recv and send
 

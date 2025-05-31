@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.610';
+our $VERSION = '0.611';
 
 use 5.020;
 use Moo::Role;
@@ -16,6 +16,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use Ref::Util 0.100 'is_plain_arrayref';
 use JSON::Schema::Modern::Utilities qw(jsonp assert_keyword_type abort);
 use Carp ();
@@ -107,12 +109,12 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.610
+version 0.611
 
 =head1 SYNOPSIS
 
   package MyApp::Vocabulary::Awesome;
-  use Moo::Role;
+  use Moo;
   with 'JSON::Schema::Modern::Vocabulary';
 
 =head1 DESCRIPTION

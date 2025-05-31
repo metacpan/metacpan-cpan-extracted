@@ -1,3 +1,12 @@
+0.100     2025-05-30 10:00:06 EDT
+
+0.100 2025-05-30 09:21:00 EST
+  * Updated liburing from 0.8 PREVIEW to liburing 2.10
+  * Removed supplimentary library that was never fully used
+    as it was needed by an unfinished an unreleased FFI::IOUring.
+    This should now be easier to update and make work for IO::Uring
+    instead.
+
 0.005     2021-01-01 13:20:55 PST
   - Fix some issues with gcc and linking.  I hate gcc.
 
