@@ -1,3 +1,9 @@
+0.06 2025-05-31T19:20:56+02:00
+ - Fix matching for multiple MARC fields.
+ - Regen README file.
+ - Rename example file to better name.
+ - Rewrite to way with print in time of match.
+
 0.05 2025-05-08T18:50:03+02:00
  - Add support for filtering by control fields.
  - Add support for filtering by material type.

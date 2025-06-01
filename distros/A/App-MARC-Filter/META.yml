@@ -46,4 +46,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-MARC-Filter
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-MARC-Filter
-version: '0.05'
+version: '0.06'

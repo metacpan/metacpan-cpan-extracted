@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Workflow::GenerateSchema::Activity:
     file: lib/Daje/Workflow/GenerateSchema/Activity.pm
-    version: '0.15'
+    version: '0.16'
   Daje::Workflow::GenerateSchema::Create::Database:
     file: lib/Daje/Workflow/GenerateSchema/Create/Database.pm
   Daje::Workflow::GenerateSchema::Create::Schema:
@@ -41,6 +41,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-GenerateSchema-Activity/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-GenerateSchema-Activity
   repository: https://github.com/janeskil1525/Daje-Workflow-GenerateSchema-Activity.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

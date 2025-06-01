@@ -19,7 +19,11 @@ sub create($self){
     my $sql = $self->context->{context}->{sql};
     my $length = scalar @{$sql};
     for (my $i = 0; $i < $length; $i++) {
-        $self->pg->migrations->from_string(@{$sql}[$i]->{data})->migrate->latest();
+        my $substr = substr(@{$sql}[$i]->{data}, rindex(@{$sql}[$i]->{data},"--") + 2);
+        $substr =~ s/down//;
+        $substr =~ s/^\s*(.*?)\s*$/$1/;
+        my $sql_string = $self->pg->migrations->from_string(@{$sql}[$i]->{data})->sql_for(0,$substr);
+        $self->pg->db->query($sql_string); #migrations->from_string(@{$sql}[$i]->{data})->migrate($j);
     }
 
 }

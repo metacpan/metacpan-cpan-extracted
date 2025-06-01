@@ -17,7 +17,7 @@ use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 $| = 1;
 
@@ -79,6 +79,7 @@ sub run {
 	my @ret;
 	my $num = 1;
 	$self->{'_num_found'} = 0;
+	$self->{'_printed'} = 0;
 	my $previous_record;
 	while (1) {
 		if (defined $self->{'_opts'}->{'n'} && int($self->{'_opts'}->{'n'}) == $self->{'_num_found'}) {
@@ -106,29 +107,40 @@ sub run {
 		# Leader.
 		if ($self->{'_marc_field'} eq 'leader') {
 			my $leader = $record->leader;
-			push @ret, $self->_match($record, $leader);
+			my $record_to_print = $self->_match($record, $leader);
+			$self->_print($record_to_print);
 
 		# Material type.
 		} elsif ($self->{'_marc_field'} eq 'material_type') {
 			my $leader_string = $record->leader;
 			my $leader = MARC::Leader->new->parse($leader_string);
 			my $material_type = material_type($leader);
-			push @ret, $self->_match($record, $material_type);
+			my $record_to_print = $self->_match($record, $material_type);
+			$self->_print($record_to_print);
 
 		# Control fields.
 		} elsif (any { $self->{'_marc_field'} eq $_ } @CONTROL_FIELDS) {
 			my $control_field = $record->field($self->{'_marc_field'});
-			push @ret, $self->_match($record, $control_field->as_string);
+			my $record_to_print = $self->_match($record, $control_field->as_string);
+			$self->_print($record_to_print);
 
 		# Other.
 		} else {
 			my @fields = $record->field($self->{'_marc_field'});
+			my $record_to_print;
 			foreach my $field (@fields) {
 				my @subfield_values = $field->subfield($self->{'_marc_subfield'});
 				foreach my $subfield_value (@subfield_values) {
-					push @ret, $self->_match($record, $subfield_value);
+					$record_to_print = $self->_match($record, $subfield_value);
+					if (defined $record_to_print) {
+						last;
+					}
+				}
+				if (defined $record_to_print) {
+					last;
 				}
 			}
+			$self->_print($record_to_print);
 		}
 
 		if ($self->{'_opts'}->{'v'}) {
@@ -138,24 +150,7 @@ sub run {
 		$num++;
 	}
 
-	# Print out.
-	$num = 0;
-	foreach my $ret (@ret) {
-		if (! $num) {
-			if ($self->{'_opts'}->{'o'} eq 'xml') {
-				print MARC::File::XML::header()."\n";
-			}
-		}
-
-		if ($self->{'_opts'}->{'o'} eq 'xml') {
-			print encode_utf8(MARC::File::XML::record($ret))."\n";
-		} elsif ($self->{'_opts'}->{'o'} eq 'ascii') {
-			print encode_utf8($ret->as_formatted)."\n";
-		}
-
-		$num++;
-	}
-	if ($num) {
+	if ($self->{'_printed'}) {
 		if ($self->{'_opts'}->{'o'} eq 'xml') {
 			print MARC::File::XML::footer()."\n";
 		}
@@ -168,22 +163,46 @@ sub _match {
 	my ($self, $record, $value) = @_;
 
 	if (! defined $value) {
-		return ();
+		return;
 	}
 
 	if ($self->{'_opts'}->{'r'}) {
 		if ($value =~ m/$self->{'_marc_value'}/ms) {
 			$self->{'_num_found'}++;
-			return ($record);
+			return $record;
 		}
 	} else {
 		if ($value eq $self->{'_marc_value'}) {
 			$self->{'_num_found'}++;
-			return ($record);
+			return $record;
 		}
 	}
 
-	return ();
+	return;
+}
+
+sub _print {
+	my ($self, $record) = @_;
+
+	if (! defined $record) {
+		return;
+	}
+
+	if (! $self->{'_printed'}) {
+		if ($self->{'_opts'}->{'o'} eq 'xml') {
+			print MARC::File::XML::header()."\n";
+		}
+	}
+
+	if ($self->{'_opts'}->{'o'} eq 'xml') {
+		print encode_utf8(MARC::File::XML::record($record))."\n";
+	} elsif ($self->{'_opts'}->{'o'} eq 'ascii') {
+		print encode_utf8($record->as_formatted)."\n";
+	}
+
+	$self->{'_printed'}++;
+
+	return;
 }
 
 sub _usage {
@@ -252,6 +271,8 @@ Returns 1 for error, 0 for success.
          Output format '%s' doesn't supported.
 
 =head1 EXAMPLE
+
+=for comment filename=filter_by_field015a.pl
 
  use strict;
  use warnings;
@@ -528,6 +549,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut
