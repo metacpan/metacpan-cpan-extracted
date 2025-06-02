@@ -1,3 +1,6 @@
+v0.03  2025-06-02Z
+    - Added most basic CGI mode
+
 v0.02  2025-05-15Z
     - Added a source with a number of basic default values
     - Let User::Information inherit from Data::Identifier::Interface::Known

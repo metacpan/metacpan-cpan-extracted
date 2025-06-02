@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Template::Textdomain;{
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 }
 
 use base 'Log::Report::Domain';
@@ -23,7 +23,11 @@ use Scalar::Util qw(weaken);
 
 sub init($)
 {	my ($self, $args) = @_;
-	$self->SUPER::init($args);
+	$self->SUPER::init($args)->_initMe($args);
+}
+
+sub _initMe($)
+{	my ($self, $args) = @_;
 
 	if(my $only =  $args->{only_in_directory})
 	{	my @only = ref $only eq 'ARRAY' ? @$only : $only;
@@ -33,11 +37,22 @@ sub init($)
 
 	$self->{LRTT_function} = $args->{translation_function} || 'loc';
 	$self->{LRTT_lexicon}  = $args->{lexicon};
+	$self->{LRTT_lang}     = $args->{lang};
 
-	$self->{LRTT_templ}    = $args->{templater} or panic;
+	$self->{LRTT_templ}    = $args->{templater} or panic "Requires templater";
 	weaken $self->{LRTT_templ};
 
 	$self;
+}
+
+
+sub upgrade($%)
+{	my ($class, $domain, %args) = @_;
+
+	ref $domain eq 'Log::Report::Domain'
+		or error __x"extension to domain '{name}' already exists", name => $domain->name;
+
+	(bless $domain, $class)->_initMe(\%args);
 }
 
 #----------------

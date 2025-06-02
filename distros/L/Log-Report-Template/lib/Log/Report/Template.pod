@@ -53,6 +53,7 @@ forking.
   modifiers          []
   processing_errors  'NATIVE'
   template_syntax    'HTML'
+  textdomain_class   Log::Report::Template::Textdomain
   translate_to       undef
 
 =over 2
@@ -73,6 +74,10 @@ returned and you need to call L<error()|Log::Report::Template/"Template (Toolkit
 Linked to L<String::Print::new(encode_for)|String::Print/"Constructors">: the output of the translation
 is HTML encoded unless the inserted value name ends on C<_html>.
 Read L</"Translation into HTML">
+
+=item textdomain_class => CLASS
+
+Use your own extension to L<Log::Report::Template::Textdomain|Log::Report::Template::Textdomain>.
 
 =item translate_to => LANGUAGE
 
@@ -108,6 +113,9 @@ See its C<new()> method for the options.
 Additional facts about the options: you may specify C<only_in_directory>
 as a path. Those directories must be in the INCLUDE_PATH as well.
 The (domain) C<name> must be unique, and the C<function> not yet in use.
+
+When the code also uses this textdomain, then that configuration will
+get extended with this configuration.
 
 example: 
 
@@ -531,8 +539,8 @@ tool or CPAN module.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 1.00,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template distribution version 1.01,
+built on June 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

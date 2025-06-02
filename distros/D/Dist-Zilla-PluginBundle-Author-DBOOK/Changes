@@ -1,3 +1,7 @@
+v1.0.5    2025-06-01 19:36:25 EDT
+  - Update minting profile to generate a GitHub workflow instead of Travis CI config
+  - Update generated CONTRIBUTING.md to not reference a specific type of CI
+
 v1.0.4    2020-09-26 20:38:58 EDT
   - Update generated CONTRIBUTING.md to reference prereqs files
 

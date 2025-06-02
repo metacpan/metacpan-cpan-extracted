@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Upload;
-our $VERSION = '0.025';
+our $VERSION = '0.029';
 # ABSTRACT: API for uploads to CPAN
 
 #pod =head1 DESCRIPTION
@@ -116,7 +116,7 @@ sub feed( $c ) {
         $c->app->config->{broker} . '/sub' . $path,
         sub( $ua, $tx ) {
             $c->stash( tx => $tx );
-            $tx->on(finish => sub( $tx, $code ) {
+            $tx->on(finish => sub( $tx, $code, $reason ) {
                 # Broker closed connection, so close connection with
                 # client, unless that's what we're already doing
                 $c->finish if !$c->stash( 'finished' );
@@ -129,7 +129,7 @@ sub feed( $c ) {
     );
 
     $c->stash( ua => $ua );
-    $c->on( finish => sub( $c, $tx ) {
+    $c->on( finish => sub( $c, $tx, $reason ) {
         # Client closed connection, so close connection with broker
         if ( my $tx = $c->stash( 'tx' ) ) {
             $c->stash( finished => 1 );
@@ -151,7 +151,7 @@ CPAN::Testers::API::Controller::Upload - API for uploads to CPAN
 
 =head1 VERSION
 
-version 0.025
+version 0.029
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,12 @@
+#!perl
+use 5.006;
 use strict;
 use warnings;
 use Test::More;
+
+unless ( $ENV{RELEASE_TESTING} ) {
+    plan( skip_all => "Author tests not required for installation" );
+}
 
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;
@@ -15,4 +21,4 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok( { also_private => [qr/^MGF1/, qr/^RSAVP1/, qr/^EMSA/, qr/^is_coprime/] } );
+all_pod_coverage_ok();

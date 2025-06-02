@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Release;
-our $VERSION = '0.025';
+our $VERSION = '0.029';
 # ABSTRACT: API for test reports collected by CPAN release
 
 #pod =head1 DESCRIPTION
@@ -122,7 +122,12 @@ sub release( $c ) {
     }
 
     if ( my $dist = $c->validation->param( 'dist' ) ) {
-        $rs = $rs->by_dist( $dist );
+        my $version = $c->validation->param( 'version' );
+        $rs = $rs->by_dist( $dist, $version );
+        if ( $version ) {
+            my $data = $rs->first || return $c->render_error( 404, 'Not found' );
+            return $c->render( openapi => $data );
+        }
     }
     elsif ( my $author = $c->validation->param( 'author' ) ) {
         $rs = $rs->by_author( $author );
@@ -143,7 +148,7 @@ CPAN::Testers::API::Controller::Release - API for test reports collected by CPAN
 
 =head1 VERSION
 
-version 0.025
+version 0.029
 
 =head1 DESCRIPTION
 

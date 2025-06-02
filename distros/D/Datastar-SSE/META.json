@@ -52,7 +52,7 @@
    "provides" : {
       "Datastar::SSE" : {
          "file" : "lib/Datastar/SSE.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "Datastar::SSE::Types" : {
          "file" : "lib/Datastar/SSE/Types.pm"
@@ -72,7 +72,7 @@
          "web" : "https://github.com/tehmoth/datastar-sse"
       }
    },
-   "version" : "0.15",
+   "version" : "0.17",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

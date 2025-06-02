@@ -4,7 +4,7 @@ use warnings;
 
 package Log::Any::Adapter::Test;
 
-our $VERSION = '1.717';
+our $VERSION = '1.718';
 
 use Log::Any::Adapter::Util qw/dump_one_line/;
 use Test::Builder;
@@ -218,7 +218,7 @@ Log::Any::Adapter::Test
 
 =head1 VERSION
 
-version 1.717
+version 1.718
 
 =head1 AUTHORS
 

@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Sun Mar  2 17:20:37 EST 2025
-#    Data version: tzdata2025a
-#    Code version: tzcode2025a
+#    Generated on: Sun Jun  1 17:33:20 EDT 2025
+#    Data version: tzdata2025b
+#    Code version: tzcode2025b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -101,6 +101,7 @@ database:
      America/Chihuahua                    amchih00
      America/Ciudad_Juarez                amciud00
      America/Costa_Rica                   amcost00
+     America/Coyhaique                    amcoyh00
      America/Cuiaba                       amcuia00
      America/Danmarkshavn                 amdanm00
      America/Dawson                       amdaws00
@@ -1655,6 +1656,7 @@ L<Date::Manip::TZ> module.
                         Pacific/Galapagos
                         America/Merida
                         America/Menominee
+                        America/Coyhaique
                         America/Punta_Arenas
                         America/Santiago
                         America/Chicago
@@ -1663,9 +1665,11 @@ L<Date::Manip::TZ> module.
      0      -04:56:02   America/New_York
      0      -04:49:20   America/Port-au-Prince
      0      -04:49:00   America/Port-au-Prince
+     0      -04:48:16   America/Coyhaique
      0      -04:44:32   America/Grand_Turk
      0      -04:43:40   America/Punta_Arenas
      0      -04:42:45   America/Santiago
+                        America/Coyhaique
                         America/Punta_Arenas
      0      -04:40:00   America/Santo_Domingo
      0      -04:39:36   America/Santo_Domingo
@@ -1728,6 +1732,7 @@ L<Date::Manip::TZ> module.
                         America/Santo_Domingo
                         Etc/GMT-4
                         D
+                        America/Coyhaique
                         America/Asuncion
                         America/Grand_Turk
                         America/Punta_Arenas
@@ -1804,6 +1809,7 @@ L<Date::Manip::TZ> module.
                         America/Paramaribo
                         America/Santarem
                         America/Punta_Arenas
+                        America/Coyhaique
                         Etc/GMT-3
                         C
                         Antarctica/Palmer
@@ -2540,6 +2546,7 @@ L<Date::Manip::TZ> module.
                         America/Jamaica
                         America/Indiana/Tell_City
                         America/Santo_Domingo
+                        America/Coyhaique
                         America/Punta_Arenas
                         America/Santiago
      1      -03:32:36   America/La_Paz
@@ -2552,6 +2559,7 @@ L<Date::Manip::TZ> module.
                         America/Santiago
                         America/Goose_Bay
                         America/Thule
+                        America/Coyhaique
                         America/Asuncion
                         America/Campo_Grande
                         America/Cuiaba
@@ -3545,7 +3553,8 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Africa/Windhoek
      SDMT             America/Santo_Domingo
      SJMT             America/Costa_Rica
-     SMT              America/Punta_Arenas
+     SMT              America/Coyhaique
+                      America/Punta_Arenas
                       America/Santiago
                       Europe/Simferopol
                       Atlantic/Stanley

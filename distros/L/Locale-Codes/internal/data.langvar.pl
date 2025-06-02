@@ -40,6 +40,9 @@ $Data{'langvar'}{'iana'}{'orig'}{'name'} = {
    "Gherdëina standard of Ladin"  => "Ghereina standard of Ladin",
    "Pe̍h-ōe-jī orthography/romanization" => "Peh-oe-ji orthography/romanization",
    "Tâi-lô orthography/romanization" => "Tai-lo orthography/romanization",
+   "The Hà Nội variant of Vietnamese" => "The Ha Noi variant of Vietnamese",
+   "The Huế (province Thừa Thiên) variant of Vietnamese" => "The Hue (province Thua Thien) variant of Vietnamese",
+   "The Sài Gòn variant of Vietnamese" => "The Sai Gon variant of Vietnamese",
 };
 
 $Data{'langvar'}{'iana'}{'ignore'} = {

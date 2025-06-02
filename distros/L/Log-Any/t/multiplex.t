@@ -1,9 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 17;
 
-use Log::Any;
+use Log::Any qw( $LOG );
 use Log::Any::Adapter;
+use FindBin qw( $Bin );
 
 {
     package _My::Structured::Adapter;
@@ -157,4 +158,20 @@ require_ok('Log::Any::Adapter::Multiplex');
     is_deeply { %_My::Unstructured::Adapter::unstructured_args },
               { },
               "unstructured adapter not called when not logging";
+}
+
+# multiplex will load an adapter at runtime
+{
+    local @INC = ($Bin, @INC);
+    eval {
+      Log::Any::Adapter->set(
+        'Multiplex',
+        adapters => {
+          '+LoadAdapter' => [],
+        }
+      );
+      $LOG->info("get the adapters");
+    };
+    ok !$@, "Loading adapter succeeded"
+      or diag "Got error: $@";
 }

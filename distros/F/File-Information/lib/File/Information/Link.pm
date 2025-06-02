@@ -24,7 +24,7 @@ use Data::Identifier::Generate v0.08;
 use File::Information::Inode;
 use File::Information::Deep;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
@@ -75,13 +75,17 @@ sub _new {
 sub inode {
     my ($self) = @_;
 
-    unless (defined $self->{inode}) {
+    unless (exists $self->{inode}) {
         my $fh;
         my $mode = 0;
 
-        if (($self->{symlinks} // '') ne 'follow') {
+        if ($self->{symlinks} eq 'nofollow') {
             $mode |= O_NOFOLLOW;
+        } elsif ($self->{symlinks} eq 'opportunistic-nofollow') {
+            eval { $mode |= O_NOFOLLOW };
         }
+
+        $self->{inode} //= undef; # force the key to exist
 
         sysopen($fh, $self->{path}, O_RDONLY|$mode) or opendir($fh, $self->{path}) or die $!;
         $self->{inode} = File::Information::Inode->_new(
@@ -241,26 +245,28 @@ sub _load_basename {
 sub _load_thumbnail {
     my ($self) = @_;
     unless ($self->{_loaded_thumbnail}) {
-        my $instance = $self->instance;
-        my $pv = ($self->{properties_values} //= {})->{current} //= {};
-        my $uri = URI::file->new_abs($self->{path});
-        my $digest = Digest->new('MD5')->add($uri)->hexdigest;
-        my $mtime = $self->inode->get('st_mtime', default => undef);
-
         $self->{_loaded_thumbnail} = 1;
 
-        return unless defined $mtime;
+        eval {
+            my $instance = $self->instance;
+            my $pv = ($self->{properties_values} //= {})->{current} //= {};
+            my $uri = URI::file->new_abs($self->{path});
+            my $digest = Digest->new('MD5')->add($uri)->hexdigest;
+            my $mtime = $self->inode->get('st_mtime', default => undef);
 
-        foreach my $size (qw(normal large x-large xx-large)) {
-            my $file = $instance->_path(XDG_CACHE_HOME => file => thumbnails => $size => $digest.'.png');
-            my @stat = stat($file);
-            if (scalar(@stat)) {
-                if ($mtime < $stat[9]) {
-                    $pv->{link_thumbnail} = {raw => $file};
-                    return;
+            return unless defined $mtime;
+
+            foreach my $size (qw(normal large x-large xx-large)) {
+                my $file = $instance->_path(XDG_CACHE_HOME => file => thumbnails => $size => $digest.'.png');
+                my @stat = stat($file);
+                if (scalar(@stat)) {
+                    if ($mtime < $stat[9]) {
+                        $pv->{link_thumbnail} = {raw => $file};
+                        return;
+                    }
                 }
             }
-        }
+        };
     }
 }
 
@@ -278,7 +284,7 @@ File::Information::Link - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 

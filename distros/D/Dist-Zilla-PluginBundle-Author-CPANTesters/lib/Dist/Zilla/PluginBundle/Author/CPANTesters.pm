@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::Author::CPANTesters;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 # ABSTRACT: Dist::Zilla plugin bundle for CPAN Testers applications
 
 #pod =head1 SYNOPSIS
@@ -127,6 +127,12 @@ sub configure {
       },
     ],
     'Git::Push',
+
+    [
+      'Run::AfterRelease', 'clean up release dirs', {
+        run => 'rm -rf %a %d',
+      },
+    ],
   );
 
   # XXX: How to add authordep Pod::Weaver::Section::Contributors?
@@ -146,7 +152,7 @@ Dist::Zilla::PluginBundle::Author::CPANTesters - Dist::Zilla plugin bundle for C
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

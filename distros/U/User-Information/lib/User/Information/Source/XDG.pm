@@ -19,7 +19,7 @@ use User::Information::Path;
 
 use constant PATH_HOMEDIR => User::Information::Path->new(['aggregate', 'homedir']);
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my @_homedir_keys = qw(home desktop documents music pictures videos data);
 
@@ -136,7 +136,7 @@ User::Information::Source::XDG - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

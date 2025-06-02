@@ -326,6 +326,7 @@ $def_off{0} = {
                '-04:42:45' => 'America/Santiago',
                '-04:43:40' => 'America/Punta_Arenas',
                '-04:44:32' => 'America/Grand_Turk',
+               '-04:48:16' => 'America/Coyhaique',
                '-04:49:00' => 'America/Port-au-Prince',
                '-04:49:20' => 'America/Port-au-Prince',
                '-04:56:02' => 'America/New_York',

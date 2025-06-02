@@ -6,9 +6,9 @@ Date::Manip::TZ::atazor00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Sun Mar  2 17:18:54 EST 2025
-#    Data version: tzdata2025a
-#    Code version: tzcode2025a
+#    Generated on: Sun Jun  1 17:31:35 EDT 2025
+#    Data version: tzdata2025b
+#    Code version: tzcode2025b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.97';
+$VERSION='6.98';
 END { undef $VERSION; }
 
 %Dates         = (

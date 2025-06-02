@@ -1,5 +1,10 @@
 Revision history for Datastar-SSE
 
+0.17      2025-06-01 13:26:32-0400
+          - Add eg/index.cgi single file example
+0.16      2025-06-01 12:01:26-0400
+          - Correct SYNOPSIS 
+          - Correct formatting in SYNOPSIS
 0.15      2025-05-17 22:41:50-0400
           - add example script in eg/
           - remove MyTypes from index (hopefully)

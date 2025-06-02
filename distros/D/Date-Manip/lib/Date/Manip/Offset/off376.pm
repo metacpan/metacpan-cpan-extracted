@@ -6,9 +6,9 @@ Date::Manip::Offset::off376;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Sun Mar  2 17:20:13 EST 2025
-#    Data version: tzdata2025a
-#    Code version: tzcode2025a
+#    Generated on: Sun Jun  1 17:32:45 EDT 2025
+#    Data version: tzdata2025b
+#    Code version: tzcode2025b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.97';
+$VERSION='6.98';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,25 +28,11 @@ END {
    undef %Offset;
 }
 
-$Offset        = '-09:00:00';
+$Offset        = '-08:59:48';
 
 %Offset        = (
    0 => [
-      'america/yakutat',
       'pacific/gambier',
-      'america/anchorage',
-      'america/juneau',
-      'america/nome',
-      'america/sitka',
-      'america/metlakatla',
-      'etc/gmt-9',
-      'i',
-      'america/dawson',
-      'america/whitehorse',
-      ],
-   1 => [
-      'america/adak',
-      'america/anchorage',
       ],
 );
 

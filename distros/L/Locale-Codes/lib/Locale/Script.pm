@@ -7,7 +7,7 @@ package Locale::Script;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Mon Mar  3 11:03:38 EST 2025
+#    Generated on: Sun Jun  1 17:54:14 EDT 2025
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.82';
+$VERSION   = '3.83';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';

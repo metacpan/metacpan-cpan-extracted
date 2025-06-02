@@ -15,10 +15,10 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_paths = (
-    username    => [qw(posix/real_user/name     posix/user/name)],
+    username    => [qw(posix/real_user/name     posix/user/name cgi/username)],
     fullname    => [qw(git/global/user/name posix/fullname/real_user posix/fullname/user)],
     email       => [qw(git/global/user/email)],
     homedir     => [qw(xdg/homedir/home posix/real_user/dir posix/user/dir)],
@@ -145,7 +145,7 @@ User::Information::Source::Aggregate - generic module for extracting information
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

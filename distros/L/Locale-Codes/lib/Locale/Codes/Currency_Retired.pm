@@ -3,7 +3,7 @@ Locale::Codes::Currency_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Mon Mar  3 11:04:05 EST 2025
+#    Generated on: Sun Jun  1 17:55:48 EDT 2025
 
 use strict;
 require 5.006;
@@ -11,11 +11,12 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.82';
+$VERSION='3.83';
 
 $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(ADP) => q(Andorran Peseta),
    q(AFA) => q(Afghani),
+   q(ANG) => q(Netherlands Antillean Guilder),
    q(AON) => q(New Kwanza),
    q(AOR) => q(Kwanza Reajustado),
    q(ATS) => q(Schilling),
@@ -140,6 +141,7 @@ $Locale::Codes::Retired{'currency'}{'alpha'}{'name'} = {
    q(markka) => [ q(FIM), q(Markka) ],
    q(metical) => [ q(MZN), q(Metical) ],
    q(mexican nuevo peso) => [ q(MXN), q(Mexican Nuevo Peso) ],
+   q(netherlands antillean guilder) => [ q(ANG), q(Netherlands Antillean Guilder) ],
    q(netherlands antillian guilder) => [ q(ANG), q(Netherlands Antillian Guilder) ],
    q(netherlands guilder) => [ q(NLG), q(Netherlands Guilder) ],
    q(new dinar) => [ q(YUM), q(New Dinar) ],
@@ -193,6 +195,7 @@ $Locale::Codes::Retired{'currency'}{'num'}{'name'} = {
    q(leu) => [ q(946), q(Leu) ],
    q(lithuanian litas) => [ q(440), q(Lithuanian Litas) ],
    q(metical) => [ q(943), q(Metical) ],
+   q(netherlands antillean guilder) => [ q(532), q(Netherlands Antillean Guilder) ],
    q(new manat) => [ q(934), q(New Manat) ],
    q(new romanian leu) => [ q(946), q(New Romanian Leu) ],
    q(nuevo sol) => [ q(604), q(Nuevo Sol) ],

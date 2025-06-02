@@ -53,7 +53,7 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::CPANTesters" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/CPANTesters.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/cpan-testers/Dist-Zilla-PluginBundle-Author-CPANTesters"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:PREACTION",
    "x_generated_by_perl" : "v5.40.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",

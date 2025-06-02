@@ -1,5 +1,23 @@
 Changelog for CPAN-Testers-API
 
+0.029     2025-06-01 10:35:28-05:00 America/Chicago
+
+  NOTE: Some of this is 6 years old, since apparently that's when I last
+  did a CPAN release of this...
+
+  [Fixed]
+
+  - Fixed metabase taking pathological amounts of memory
+  - Fixed POST bodies of more than 16M being truncated
+  - Bunch of fixes to the Dockerfile deployment
+
+  [Added]
+
+  - Added a release dist/version API
+  - Added a "maturity" option to summary data to restrict to either
+    stable or development Perls
+
+
 0.025     2018-04-19 15:25:00+02:00 Europe/Oslo
 
     [Added]

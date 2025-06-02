@@ -36,7 +36,7 @@ is $first, $f2;
 #dispatcher close => 'default';
 
 eval { $templater->addTextdomain(name => 'first') };
-is $@, "error: textdomain 'first' already exists\n"
+is $@, "error: extension to domain 'first' already exists\n"
   , 'no redefine';
 
 eval { $templater->addTextdomain(name => 'error1', only_in_directory => '/tmp')};

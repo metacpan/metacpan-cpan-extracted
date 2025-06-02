@@ -27,6 +27,18 @@ subtest 'sanity check that items were inserted' => sub {
 subtest '/v1/release' => \&_test_api, '/v1';
 subtest '/v3/release' => \&_test_api, '/v3';
 
+subtest '/v3/release - unique' => sub {
+    subtest 'version' => sub {
+        $t->get_ok( '/v3/release/dist/My-Dist/1.001' )
+          ->status_is( 200 )
+          ->json_is( { $data{Release}[0]->%{ @API_FIELDS } } );
+        $t->get_ok( '/v3/release/dist/My-Dist/0.001' )
+          ->status_is( 404 )
+          ->json_has( '/errors' )
+          ;
+    };
+};
+
 sub _test_api( $base ) {
     subtest 'all releases' => sub {
         $t->get_ok( $base . '/release' )

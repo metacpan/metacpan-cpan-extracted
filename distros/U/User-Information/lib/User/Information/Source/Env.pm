@@ -15,7 +15,9 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
+
+my %_cgi_var = map {$_ => 1} qw(AUTH_TYPE CONTENT_LENGTH CONTENT_TYPE PATH_INFO PATH_TRANSLATED QUERY_STRING REMOTE_ADDR REMOTE_HOST REMOTE_IDENT REMOTE_USER REQUEST_METHOD SCRIPT_NAME SERVER_NAME SERVER_PORT SERVER_PROTOCOL SERVER_SOFTWARE);
 
 # ---- Private helpers ----
 
@@ -30,13 +32,21 @@ sub _discover {
     my ($pkg, $base, %opts) = @_;
     my $root = User::Information::Path->new('env');
     my @info;
+    my $matcher;
+
+    if ($ENV{SERVER_PROTOCOL} =~ /^HTTP\//) {
+        $opts{cgi} //= 1;
+        $matcher = qr/^HTTP_/;
+    }
 
     foreach my $key (keys %ENV) {
-        my $path = User::Information::Path->new($root, [environ => $key]);
-        push(@info, {
-                path => $path,
-                loader => \&_raw_loader,
-            });
+        if (!$opts{cgi} || $_cgi_var{$key} || (defined($matcher) && $key =~ $matcher)) {
+            my $path = User::Information::Path->new($root, [environ => $key]);
+            push(@info, {
+                    path => $path,
+                    loader => \&_raw_loader,
+                });
+        }
     }
 
     return @info;
@@ -56,7 +66,7 @@ User::Information::Source::Env - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

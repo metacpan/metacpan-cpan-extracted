@@ -2,7 +2,7 @@ package Datastar::SSE;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 use JSON ();
 use HTTP::ServerEvent;
@@ -30,20 +30,21 @@ An implementation of the L<< Datastar|https://data-star.dev/ >> Server Sent Even
 
 =head1 SYNOPSIS
 
-    use Datastar::SSE :merge_modes;
-
-	my @events;
-   	push @events,  Datastar::SSE->merge_fragments( $html_fragment, +{
+    use Datastar::SSE qw/:fragment_merge_modes/;
+    
+    my @events;
+    push @events,  Datastar::SSE->merge_fragments( $html_fragment, +{
         selector => '#name-selector',
         merge_mode => FRAGMENT_MERGEMODE_OUTER,
     });
     # $event is a multiline string which should be sent as part of
     # the http response body.  Multiple event strings can be sent in the same response.
-	for my $evt (@events) {
-		$cgi->print( $evt ); # CGI
-		$psgi_writer->write( $evt ); # PSGI delayed response "writer"
-		$c->write( $evt ); # Mojolicious controller
-	}
+    
+    for my $evt (@events) {
+        $cgi->print( $evt ); # CGI
+        $psgi_writer->write( $evt ); # PSGI delayed response "writer"
+        $c->write( $evt ); # Mojolicious controller
+    }
 
 =cut
 

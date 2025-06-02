@@ -1,24 +1,89 @@
 #!perl
 
+use 5.010001;
 use strict;
 use warnings;
 
+use Complete::Util qw(complete_array_elem hashify_answer);
+use Cwd qw(cwd);
+use File::chdir;
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-29'; # DATE
+our $DATE = '2025-06-01'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
+
+# FRAGMENT id=shcompgen-hint completer=1 for=cdpart
 
 our $DEBUG = $ENV{DEBUG};
+our $COMPLETE_MAX_ENTRIES_PER_LEVEL = $ENV{CDPART_COMPLETE_MAX_ENTRIES_PER_LEVEL} // 100;
+
+my $cwd = $ENV{PWD} || cwd();
+my @cwd_elems = split m!/+!, $cwd;
+
+GetOptionsWithCompletion(
+    sub {
+        my %args = @_;
+        my $type = $args{type};
+        my $word = $args{word};
+
+        return undef unless $type eq 'arg'; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+        my @res;
+
+        #for (reverse 1 .. $#cwd_elems) {
+        #    push @res0, {
+        #        word => $cwd_elems[$_],
+        #        summary => join("/", @cwd_elems[0 .. $_]),
+        #    };
+        #}
+
+        local $Complete::Common::OPT_CHAR_MODE = 0 unless defined $ENV{COMPLETE_OPT_CHAR_MODE};
+        local $Complete::Common::OPT_FUZZY = 0 unless defined $ENV{COMPLETE_OPT_FUZZY};
+
+        while (1) {
+            #last if @res >= $COMPLETE_MAX_ENTRIES;
+            pop @cwd_elems;
+            $CWD = "..";
+            last unless @cwd_elems >= 1;
+            my $entry;
+            opendir my $dh, ".";
+            my @dirs =grep { $_ ne '.' && $_ ne '..' && (-d $_) } readdir($dh);
+            closedir $dh;
+            my $level_res = complete_array_elem(word => $word, array => \@dirs);
+            #use DD; dd $level_res;
+            for (@{ $level_res }) {
+                push @res, {
+                    word => $_,
+                    summary => join("/", @cwd_elems, $_),
+                }
+            }
+        }
+        \@res;
+    },
+    'help|h' => sub {
+        print <<USAGE;
+Usage:
+  % cdpart [options] <dirname>
+Options:
+  --help, -h
+  --version, -v
+USAGE
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "cdpart version ", ($main::VERSION || "dev"), "\n";
+        exit 0;
+    },
+);
 
 if (@ARGV != 1) { print ".\n"; exit }
 
-my $cwd = $ENV{PWD} || do { require Cwd; Cwd::cwd() };
-my @elems = split m!/+!, $cwd;
-
-while (@elems >= 1) {
-    for my $i (reverse 0..$#elems) {
-        my @newelems = @elems; $newelems[$i] = $ARGV[0];
-        my $newpath = join "/", @newelems;
+while (@cwd_elems >= 1) {
+    for my $i (reverse 0..$#cwd_elems) {
+        my @newpath_elems = @cwd_elems; $newpath_elems[$i] = $ARGV[0];
+        my $newpath = join "/", @newpath_elems;
         warn "cdpart: Trying $newpath\n" if $DEBUG;
         if (-d $newpath) {
             warn "cdpart: Found\n" if $DEBUG;
@@ -26,7 +91,7 @@ while (@elems >= 1) {
             exit;
         }
     }
-    pop @elems;
+    pop @cwd_elems;
 }
 
 # no match
@@ -48,7 +113,7 @@ cdpart-backend - Change directory part
 
 =head1 VERSION
 
-This document describes version 0.008 of cdpart-backend (from Perl distribution App-CdUtils), released on 2025-05-29.
+This document describes version 0.009 of cdpart-backend (from Perl distribution App-CdUtils), released on 2025-06-01.
 
 =head1 SYNOPSIS
 
@@ -155,11 +220,49 @@ Another example:
 
 will eventually change the directory to C</media/music/fr/c/celine-dion>.
 
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C cdpart-backend cdpart-backend
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete cdpart-backend 'p/*/`cdpart-backend`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
 =head1 ENVIRONMENT
 
-=head2 DEBUG => bool
+=head2 DEBUG
 
-If set to true, will print the directories as they are tried.
+Bool. If set to true, will print the directories as they are tried.
+
+=head2 CDPART_COMPLETE_ARRAY_ELEM_PER_LEVEL
+
+Uint.
 
 =head1 HOMEPAGE
 

@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.025';
+our $VERSION = '0.029';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -129,13 +129,13 @@ sub startup ( $app ) {
 
     my $r = $app->routes;
     $r->get( '/' => 'index' );
-    $r->get( '/docs/*path' => { path => 'index.html' } )->to(
+    $r->get( '/docs/*docpath' => { docpath => 'index.html' } )->to(
         cb => sub {
             my ( $c ) = @_;
             # Redirect so that trailing / helps browser build URLs and
             # we have our spec loaded. Can't make its own route because
             # the trailing `/` is optional in the Mojolicious route
-            # since we declared a default `path`. Must pass in
+            # since we declared a default `docpath`. Must pass in
             # a Mojo::URL object to redirect_to() so that the trailing
             # slash is maintained.
             if ( !$c->req->url->path->trailing_slash && $c->req->url->path eq '/docs' ) {
@@ -143,7 +143,7 @@ sub startup ( $app ) {
                 $c->req->url->query( url => '/v3' );
                 return $c->redirect_to( $c->req->url );
             }
-            my $path = catfile( Alien::SwaggerUI->root_dir, $c->stash( 'path' ) );
+            my $path = catfile( Alien::SwaggerUI->root_dir, $c->stash( 'docpath' ) );
             my $file = Mojo::Asset::File->new( path => $path );
             $c->reply->asset( $file );
         },
@@ -294,7 +294,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.025
+version 0.029
 
 =head1 SYNOPSIS
 

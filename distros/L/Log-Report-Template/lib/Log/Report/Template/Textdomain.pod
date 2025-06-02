@@ -34,6 +34,7 @@ Extends L<"Constructors" in Log::Report::Domain|Log::Report::Domain/"Constructor
 =item Log::Report::Template::Textdomain-E<gt>B<new>(%options)
 
  -Option              --Defined in                  --Default
+  lang                                                undef
   lexicon                                             undef
   name                  Log::Report::Minimal::Domain  <required>
   only_in_directory                                   undef
@@ -41,6 +42,11 @@ Extends L<"Constructors" in Log::Report::Domain|Log::Report::Domain/"Constructor
   translation_function                                'loc'
 
 =over 2
+
+=item lang => LANGUAGES
+
+[1.01] Initial language to translate to.  Usually, this language which change
+for each user connection via L<translateTo()|Log::Report::Template::Textdomain/"Translating">.
 
 =item lexicon => DIRECTORY
 
@@ -61,6 +67,15 @@ See L<function()|Log::Report::Template::Textdomain/"Attributes">.  It must be un
 
 =back
 
+=item Log::Report::Template::Textdomain-E<gt>B<upgrade>($domain, %options)
+
+Upgrade a base class L<Log::Report::Domain|Log::Report::Domain>-object into an Template
+domain.
+
+This is a bit akward process, needed when one of the code packages
+uses the same domain as the templating system uses.  The generic domain
+configuration stays intact.
+
 =back
 
 =head2 Attributes
@@ -74,10 +89,6 @@ Extends L<"Attributes" in Log::Report::Domain|Log::Report::Domain/"Attributes">.
 Inherited, see L<Log::Report::Domain/"Attributes">
 
 =item $obj-E<gt>B<contextRules>()
-
-Inherited, see L<Log::Report::Domain/"Attributes">
-
-=item $obj-E<gt>B<defaultContext>()
 
 Inherited, see L<Log::Report::Domain/"Attributes">
 
@@ -97,6 +108,9 @@ Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
 
 =item $obj-E<gt>B<lang>()
 
+The language we are going to translate to.  Change this with L<translateTo()|Log::Report::Template::Textdomain/"Translating">
+for this domain, or better L<Log::Report::Template::translateTo()|Log::Report::Template/"Attributes">.
+
 =item $obj-E<gt>B<lexicon>()
 
 Directory where the translation tables are kept.
@@ -115,50 +129,52 @@ Inherited, see L<Log::Report::Domain/"Attributes">
 
 Inherited, see L<Log::Report::Domain/"Attributes">
 
-=item $obj-E<gt>B<setContext>(STRING|HASH|ARRAY|PAIRS)
-
-Inherited, see L<Log::Report::Domain/"Attributes">
-
 =item $obj-E<gt>B<templater>()
+
+The L<Log::Report::Template|Log::Report::Template> object which is using this textdomain.
 
 =item $obj-E<gt>B<translator>()
 
 Inherited, see L<Log::Report::Domain/"Attributes">
 
-=item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
-
-Inherited, see L<Log::Report::Domain/"Attributes">
-
-=back
-
-=head2 Action
-
-Extends L<"Action" in Log::Report::Domain|Log::Report::Domain/"Action">.
- 
-=over 4
-
-=item $obj-E<gt>B<interpolate>( $msgid, [$args] )
-
-Inherited, see L<Log::Report::Minimal::Domain/"Action">
-
-=item $obj-E<gt>B<translate>($message, $language)
-
-Inherited, see L<Log::Report::Domain/"Action">
-
 =back
 
 =head2 Translating
 
+Extends L<"Translating" in Log::Report::Domain|Log::Report::Domain/"Translating">.
+ 
 =over 4
 
+=item $obj-E<gt>B<defaultContext>()
+
+Inherited, see L<Log::Report::Domain/"Translating">
+
+=item $obj-E<gt>B<interpolate>( $msgid, [$args] )
+
+Inherited, see L<Log::Report::Minimal::Domain/"Translating">
+
+=item $obj-E<gt>B<setContext>(STRING|HASH|ARRAY|PAIRS)
+
+Inherited, see L<Log::Report::Domain/"Translating">
+
+=item $obj-E<gt>B<translate>($message, $language)
+
+Inherited, see L<Log::Report::Domain/"Translating">
+
 =item $obj-E<gt>B<translateTo>($lang)
+
+Set the language to translate to for C<$lang>, for this domain only.  This may
+be useful when various text domains do not support the same destination languages.
+But in general, you can best use L<Log::Report::Template::translateTo()|Log::Report::Template/"Attributes">.
 
 =item $obj-E<gt>B<translationFunction>()
 
 This method returns a CODE which is able to handle a call for
 translation by Template Toolkit.
 
-=encoding UTF-8
+=item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
+
+Inherited, see L<Log::Report::Domain/"Translating">
 
 =back
 
@@ -168,8 +184,8 @@ Extends L<"DETAILS" in Log::Report::Domain|Log::Report::Domain/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 1.00,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template distribution version 1.01,
+built on June 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -3,6 +3,13 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 1.01: Mon  2 Jun 09:51:18 CEST 2025
+
+	Fixes:
+	- accept textdomain declaration from code and template.
+	  github issue #2, [Andy Beverley]
+	- handle initial language setting.
+
 version 1.00: Tue  6 May 09:57:31 CEST 2025
 
 	Fixes:

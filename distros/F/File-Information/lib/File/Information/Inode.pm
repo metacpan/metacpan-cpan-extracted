@@ -20,7 +20,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 use Data::Identifier v0.08;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
@@ -79,6 +79,8 @@ my %_properties = (
     content_sha_3_512_uuid  => {loader => \&_load_contentise, rawtype => 'uuid'},
     content_sha_1_160_sha_3_512_uuid => {loader => \&_load_contentise, rawtype => 'uuid'},
     store_file              => {loader => \&_load_fstore, rawtype => 'File::FStore::File'},
+    shebang_line            => {loader => \&_load_shebang},
+    shebang_interpreter     => {loader => \&_load_shebang, rawtype => 'filename'},
 );
 
 $_properties{$_}{rawtype} = 'unixts' foreach qw(st_atime st_mtime st_ctime);
@@ -942,6 +944,35 @@ sub _load_fstore {
     }
 }
 
+sub _load_shebang {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if $self->{_loaded_shebang};
+    $self->{_loaded_shebang} = 1;
+
+    if ($self->peek =~ /^(#\!.+)\r?\n/) {
+        my $line = $1;
+        my $interpreter;
+
+        $pv->{shebang_line} = {raw => $line};
+
+        if ($line =~ m(^#\!(?:(?:/usr)?(?:/local)?/s?bin/)?env\s+(\S+)(\s.*)?$)) {
+            $interpreter = $1;
+            eval {
+                require File::Which;
+
+                $interpreter = File::Which::which($interpreter);
+
+            };
+        } elsif ($line =~ m(^#\!(\S+)(?:\s.*)?$)) {
+            $interpreter = $1;
+        }
+
+        $pv->{shebang_interpreter} = {raw => $interpreter} if defined($interpreter) && length($interpreter);
+    }
+}
+
 1;
 
 __END__
@@ -956,7 +987,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 

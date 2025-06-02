@@ -55,59 +55,63 @@
    "provides" : {
       "User::Information" : {
          "file" : "lib/User/Information.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Base" : {
          "file" : "lib/User/Information/Base.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Path" : {
          "file" : "lib/User/Information/Path.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source" : {
          "file" : "lib/User/Information/Source.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::Aggregate" : {
          "file" : "lib/User/Information/Source/Aggregate.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
+      },
+      "User::Information::Source::CGI" : {
+         "file" : "lib/User/Information/Source/CGI.pm",
+         "version" : "v0.3.0"
       },
       "User::Information::Source::Defaults" : {
          "file" : "lib/User/Information/Source/Defaults.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::Env" : {
          "file" : "lib/User/Information/Source/Env.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::Git" : {
          "file" : "lib/User/Information/Source/Git.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::Local" : {
          "file" : "lib/User/Information/Source/Local.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::LocalNodeMisc" : {
          "file" : "lib/User/Information/Source/LocalNodeMisc.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::POSIX" : {
          "file" : "lib/User/Information/Source/POSIX.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::Tagpool" : {
          "file" : "lib/User/Information/Source/Tagpool.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::VFS" : {
          "file" : "lib/User/Information/Source/VFS.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "User::Information::Source::XDG" : {
          "file" : "lib/User/Information/Source/XDG.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
@@ -117,7 +121,7 @@
          "url" : "git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/User-Information.git"
       }
    },
-   "version" : "v0.02",
+   "version" : "v0.03",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
    "x_spdx_expression" : "Artistic-2.0"

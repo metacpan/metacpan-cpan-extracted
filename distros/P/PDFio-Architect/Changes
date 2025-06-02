@@ -1,0 +1,8 @@
+Revision history for PDFio-Architect
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    2025-06-01
+	- Add page sizes
+	- Add a add_text method which wraps text to a bounding box.

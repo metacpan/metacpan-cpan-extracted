@@ -31,7 +31,7 @@ sub _test_api( $base ) {
         $t->post_ok( $base . '/report', json => $report )
           ->status_is( 400 )
           ->or( sub { diag shift->tx->res->body } )
-          ->json_is( '/errors/0/path' => '/report/environment/language' )
+          ->json_is( '/errors/0/path' => '/report/environment/language/version' )
           ->or( sub { diag shift->tx->res->body } )
           ->json_like( '/errors/0/message' => qr{String does not match} )
           ->or( sub { diag shift->tx->res->body } )

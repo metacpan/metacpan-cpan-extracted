@@ -12,7 +12,7 @@
 # this module can be removd.
 
 package Dancer2::Template::TTLogReport;{
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 }
 
 

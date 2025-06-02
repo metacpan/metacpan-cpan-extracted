@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-our $VERSION = '0.025';
+our $VERSION = '0.029';
 # ABSTRACT: An API from the legacy Metabase::Web to the local database
 
 #pod =head1 SYNOPSIS
@@ -15,7 +15,7 @@ use v5.24;
 use Mojo::Base '-base';
 use Mojo::File 'path';
 use Mojolicious::Lite;
-use experimental 'signatures', 'postderef';
+use experimental qw( signatures postderef );
 use Metabase::Fact;
 use Metabase::User::Profile;
 use Metabase::User::Secret;
@@ -102,15 +102,17 @@ sub handle_post {
         );
     }
 
-    my $body = $c->req->json;
-    my $fact = Metabase::Fact->class_from_type( $body->{metadata}{core}{type} )
-        ->from_struct( $body );
+    my $fact = Metabase::Fact->from_json( $c->req->body );
     my $row = $c->schema->resultset( 'TestReport' )->insert_metabase_fact( $fact );
     $c->app->log->info(
         sprintf 'Wrote report %s from %s (%s)', $row->id, $user->fullname, $user->email,
     );
 
-    Beam::Minion->enqueue( report => 'queue', [ $row->id ], { attempts => 10 } );
+    # Each attempts will try again after a number of seconds increasing
+    # via the fibonnacci sequence. So, 30 attempts reaches about 50,000
+    # seconds (by which point it will have waited almost 2 days for
+    # whatever problem, likely the `uploads` row missing, to resolve)
+    Beam::Minion->enqueue( report => 'queue', [ $row->id ], { attempts => 30 } );
 
     my $url = $c->req->url->clone;
     my $path = $url->path;
@@ -206,7 +208,7 @@ get '/beta/guid/:guid' => \&handle_guid;
 #pod
 #pod =cut
 
-get '/tail/log' => sub( $c ) {
+get '/tail/log' => [ format => [qw( txt )] ], sub( $c ) {
     my $file = app->home->child( 'tail.log' );
     my $age = time - [stat $file]->[9];
     my $expires_in = $age < 300 ? 300 - $age : 0;
@@ -223,7 +225,7 @@ helper refresh_tail_log => sub {
         { order_by => { -desc => 'created' }, rows => 1000 },
     );
     my @reports = $rs->all;
-    $file->spurt(
+    $file->spew(
         app->build_controller->render_to_string( 'tail/log', format => 'txt', reports => \@reports )
     );
 };
@@ -238,7 +240,7 @@ CPANTesters::Web::Legacy::Metabase - An API from the legacy Metabase::Web to the
 
 =head1 VERSION
 
-version 0.025
+version 0.029
 
 =head1 SYNOPSIS
 

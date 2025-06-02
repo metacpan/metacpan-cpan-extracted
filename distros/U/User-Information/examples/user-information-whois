@@ -13,6 +13,8 @@ my $maxlen = 0;
 
 if (scalar(@ARGV) == 1 && $ARGV[0] eq '--local-node') {
     $result = User::Information->local_node;
+} elsif (scalar(@ARGV) == 1 && $ARGV[0] eq '--cgi') {
+    $result = User::Information->cgi;
 } elsif (scalar(@ARGV)) {
     $result = User::Information->lookup(@ARGV);
 } else {

@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Template;{
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 }
 
 use base 'Template';
@@ -58,6 +58,7 @@ sub _init($)
 
 	$self->{LRT_formatter} = $self->_createFormatter($args);
 	$self->{LRT_trTo} = $args->{translate_to};
+	$self->{LRT_tdc}  = $args->{textdomain_class} || 'Log::Report::Template::Textdomain';
 	$self->_defaultFilters;
 	$self;
 }
@@ -116,12 +117,18 @@ sub addTextdomain($%) {
 		}
 	}
 
-	my $name    = $args{name};
-	! textdomain $name, 'EXISTS'
-		or error __x"textdomain '{name}' already exists", name => $name;
+	$args{templater} ||= $self;
+	$args{lang}      ||= $self->translateTo;
 
-	my $domain  = Log::Report::Template::Textdomain->new(%args, templater => $self);
-	textdomain $domain;
+	my $name    = $args{name};
+	my $td_class= $self->{LRT_tdc};
+	my $domain;
+	if($domain  = textdomain $name, 'EXISTS')
+	{	$td_class->upgrade($domain, %args);
+	}
+	else
+	{	$domain = textdomain($td_class->new(%args));
+	}
 
 	my $func    = $domain->function;
 	if((my $other) = grep $func eq $_->function, $self->domains)

@@ -21,7 +21,7 @@ use User::Information::Source;
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 use constant {
     PATH_LOCAL_SYSAPI   => User::Information::Path->new([qw(local sysapi)]),
@@ -244,6 +244,9 @@ sub _new {
             $self->_load('User::Information::Source::Env');
             $self->_load('User::Information::Source::POSIX', data => {real_user => $<, effective_user => $>, real_group => $(, effective_group => $)}) if $self->_is_sysapi('posix');
             $self->_load('User::Information::Source::XDG', me => 1);
+        } elsif ($request eq User::Information->SPECIAL_CGI) {
+            $self->_load('User::Information::Source::CGI');
+            $self->_load('User::Information::Source::Env', cgi => 1);
         } elsif (User::Information->SPECIAL_LOCAL_NODE->eq($request)) {
             $self->_load('User::Information::Source::Local');
             $self->_load('User::Information::Source::VFS');
@@ -257,7 +260,7 @@ sub _new {
         $self->_load('User::Information::Source::Local');
         $self->_load('User::Information::Source::POSIX', data => {group => $request}) if $self->_is_sysapi('posix');
     }
-    if (!$self->{sources}{'User::Information::Source::XDG'} && defined(my $username = $self->get(['aggregate', 'username'], default => undef))) {
+    if (!$self->{sources}{'User::Information::Source::XDG'} && $self->_is_local && defined(my $username = $self->get(['aggregate', 'username'], default => undef))) {
         $self->_load('User::Information::Source::XDG', username => $username);
     }
     if ($self->_is_local) {
@@ -339,7 +342,7 @@ User::Information::Base - generic module for extracting information from user ac
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

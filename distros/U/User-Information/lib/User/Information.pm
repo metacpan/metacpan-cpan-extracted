@@ -18,9 +18,10 @@ use parent qw(Data::Identifier::Interface::Known);
 
 use constant {
     SPECIAL_ME          => [],
+    SPECIAL_CGI         => [],
     SPECIAL_LOCAL_NODE  => Data::Identifier->new(uuid => '081c3899-cc4f-4cbd-9590-c90d1321e24c')->register,
-
 };
+
 use constant PATH_ELEMENT_NS     => Data::Identifier->new(uuid => '533fd060-2b96-4aea-8b8d-56e0766e6e5d')->register;
 use constant PATH_ELEMENT_TYPE   => Data::Identifier->new(
         uuid        => 'f1f59629-3237-4587-a365-7ce094806f6d',
@@ -31,7 +32,7 @@ use constant PATH_ELEMENT_TYPE   => Data::Identifier->new(
 
 use User::Information::Base;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 #@returns User::Information::Base
@@ -54,6 +55,13 @@ sub lookup {
 sub me {
     my ($self, %opts) = @_;
     return $self->lookup(from => SPECIAL_ME, %opts);
+}
+
+
+sub cgi {
+    my ($self, %opts) = @_;
+
+    return $self->lookup(from => SPECIAL_CGI, %opts);
 }
 
 
@@ -89,7 +97,7 @@ User::Information - generic module for extracting information from user accounts
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -132,6 +140,20 @@ Currently the same options are supported as by L<User::Information::Base/attach>
     my User::Information::Base $result = User::Information->me(%opts);
 
 Looks up the current user including information known via the process's environ.
+
+The same options as per L</lookup> are supported.
+
+If running in a CGI environment this will report the local user. See L</cgi> for the CGI user.
+
+See also:
+L</lookup>,
+L</cgi>.
+
+=head2 cgi
+
+    my User::Information::Base $result = User::Information->cgi(%opts);
+
+Looks up the current CGI user (the user in front of a browser).
 
 The same options as per L</lookup> are supported.
 

@@ -4,7 +4,7 @@ use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
 
-our $VERSION = 'v1.0.4';
+our $VERSION = 'v1.0.5';
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -26,27 +26,27 @@ module skeleton in C<lib> and the following additional files:
 
 =item *
 
-C<Changes>
+F<Changes>
 
 =item *
 
-C<dist.ini>
+F<dist.ini>
 
 =item *
 
-C<LICENSE>
+F<LICENSE>
 
 =item *
 
-C<prereqs.yml>
+F<prereqs.yml>
 
 =item *
 
-C<.gitignore>
+F<.gitignore>
 
 =item *
 
-C<.travis.yml>
+F<.github/workflows/test.yml>
 
 =back
 

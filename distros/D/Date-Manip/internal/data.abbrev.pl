@@ -144,7 +144,7 @@
    'SAST'        => 'Africa/Johannesburg',
    'SDMT'        => 'America/Santo_Domingo',
    'SJMT'        => 'America/Costa_Rica',
-   'SMT'         => 'America/Punta_Arenas',
+   'SMT'         => 'America/Coyhaique',
    'SST'         => 'Pacific/Pago_Pago',
    'T'           => 'T',
    'TBMT'        => 'Asia/Tbilisi',

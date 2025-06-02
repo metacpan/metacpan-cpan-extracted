@@ -1,3 +1,8 @@
+0.009   2025-06-01  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add completion for cdpart.
+
+
 0.008   2025-05-29  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: cdsibling-backend.

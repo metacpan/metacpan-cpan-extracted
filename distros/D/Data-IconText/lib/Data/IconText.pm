@@ -16,13 +16,14 @@ use Scalar::Util qw(looks_like_number weaken);
 use Data::Identifier v0.12;
 
 use constant {
-    WK_UNICODE_CP   => Data::Identifier->new(uuid => '5f167223-cc9c-4b2f-9928-9fe1b253b560')->register, # unicode-code-point
-    WK_ASCII_CP     => Data::Identifier->new(uuid => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c')->register, # ascii-code-point
+    WK_UNICODE_CP               => Data::Identifier->new(uuid => '5f167223-cc9c-4b2f-9928-9fe1b253b560')->register, # unicode-code-point
+    WK_ASCII_CP                 => Data::Identifier->new(uuid => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c')->register, # ascii-code-point
+    WK_FREEDESKTOP_ICON_NAME    => Data::Identifier->new(uuid => '560906df-ebd1-41f6-b510-038b30522051')->register, # freedesktop-icon-name
 };
 
 use overload '""' => sub {$_[0]->as_string};
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -73,6 +74,300 @@ my %_for_version = (
                 'db9b0db1-a451-59e8-aa3b-9994e683ded3' => 0x2640,
                 '310f2b49-73a8-5f27-aeaf-5f34bc8e583f' => 0x26A5,
                 '036c0fe8-5189-5134-99ec-0b1b05c7bbf4' => 0x26A5,
+            },
+        },
+    },
+    v0.03 => {
+        parent => v0.02,
+        identifier => {
+            '560906df-ebd1-41f6-b510-038b30522051' => { # freedesktop-icon-name
+                # 'address-book-new'                          => 0x0,
+                # 'application-exit'                          => 0x0,
+                # 'appointment-new'                           => 0x0,
+                # 'call-start'                                => 0x0,
+                # 'call-stop'                                 => 0x0,
+                # 'contact-new'                               => 0x0,
+                # 'document-new'                              => 0x0,
+                # 'document-open'                             => 0x0,
+                # 'document-open-recent'                      => 0x0,
+                # 'document-page-setup'                       => 0x0,
+                # 'document-print'                            => 0x0,
+                # 'document-print-preview'                    => 0x0,
+                # 'document-properties'                       => 0x0,
+                # 'document-revert'                           => 0x0,
+                # 'document-save'                             => 0x0,
+                # 'document-save-as'                          => 0x0,
+                # 'document-send'                             => 0x0,
+                # 'edit-clear'                                => 0x0,
+                # 'edit-copy'                                 => 0x0,
+                # 'edit-cut'                                  => 0x0,
+                # 'edit-delete'                               => 0x0,
+                # 'edit-find'                                 => 0x0,
+                # 'edit-find-replace'                         => 0x0,
+                # 'edit-paste'                                => 0x0,
+                # 'edit-redo'                                 => 0x0,
+                # 'edit-select-all'                           => 0x0,
+                'edit-undo'                                 => 0x238C,
+                # 'folder-new'                                => 0x0,
+                # 'format-indent-less'                        => 0x0,
+                # 'format-indent-more'                        => 0x0,
+                # 'format-justify-center'                     => 0x0,
+                # 'format-justify-fill'                       => 0x0,
+                # 'format-justify-left'                       => 0x0,
+                # 'format-justify-right'                      => 0x0,
+                # 'format-text-direction-ltr'                 => 0x0,
+                # 'format-text-direction-rtl'                 => 0x0,
+                # 'format-text-bold'                          => 0x0,
+                # 'format-text-italic'                        => 0x0,
+                # 'format-text-underline'                     => 0x0,
+                # 'format-text-strikethrough'                 => 0x0,
+                # 'go-bottom'                                 => 0x0,
+                # 'go-down'                                   => 0x0,
+                # 'go-first'                                  => 0x0,
+                # 'go-home'                                   => 0x0,
+                # 'go-jump'                                   => 0x0,
+                # 'go-last'                                   => 0x0,
+                # 'go-next'                                   => 0x0,
+                # 'go-previous'                               => 0x0,
+                'go-top'                                    => 0x1F51D,
+                # 'go-up'                                     => 0x0,
+                # 'help-about'                                => 0x0,
+                # 'help-contents'                             => 0x0,
+                # 'help-faq'                                  => 0x0,
+                # 'insert-image'                              => 0x0,
+                # 'insert-link'                               => 0x0,
+                # 'insert-object'                             => 0x0,
+                # 'insert-text'                               => 0x0,
+                # 'list-add'                                  => 0x0,
+                # 'list-remove'                               => 0x0,
+                # 'mail-forward'                              => 0x0,
+                # 'mail-mark-important'                       => 0x0,
+                # 'mail-mark-junk'                            => 0x0,
+                # 'mail-mark-notjunk'                         => 0x0,
+                # 'mail-mark-read'                            => 0x0,
+                # 'mail-mark-unread'                          => 0x0,
+                # 'mail-message-new'                          => 0x0,
+                # 'mail-reply-all'                            => 0x0,
+                # 'mail-reply-sender'                         => 0x0,
+                'mail-send'                                 => 0x1F4E9,
+                # 'mail-send-receive'                         => 0x0,
+                'media-eject'                               => 0x23CF,
+                'media-playback-pause'                      => 0x23F8,
+                'media-playback-start'                      => 0x23F5,
+                'media-playback-stop'                       => 0x23F9,
+                'media-record'                              => 0x23FA,
+                'media-seek-backward'                       => 0x23EA,
+                'media-seek-forward'                        => 0x23E9,
+                'media-skip-backward'                       => 0x23EE,
+                'media-skip-forward'                        => 0x23ED,
+                # 'object-flip-horizontal'                    => 0x0,
+                # 'object-flip-vertical'                      => 0x0,
+                # 'object-rotate-left'                        => 0x0,
+                # 'object-rotate-right'                       => 0x0,
+                'process-stop'                              => 0x1F5D9,
+                # 'system-lock-screen'                        => 0x0,
+                # 'system-log-out'                            => 0x0,
+                # 'system-run'                                => 0x0,
+                # 'system-search'                             => 0x0,
+                # 'system-reboot'                             => 0x0,
+                # 'system-shutdown'                           => 0x0,
+                # 'tools-check-spelling'                      => 0x0,
+                # 'view-fullscreen'                           => 0x0,
+                'view-refresh'                              => 0x1F5D8,
+                # 'view-restore'                              => 0x0,
+                # 'view-sort-ascending'                       => 0x0,
+                # 'view-sort-descending'                      => 0x0,
+                'window-close'                              => 0x1F5D9,
+                # 'window-new'                                => 0x0,
+                # 'zoom-fit-best'                             => 0x0,
+                # 'zoom-in'                                   => 0x0,
+                # 'zoom-original'                             => 0x0,
+                # 'zoom-out'                                  => 0x0,
+                # 'process-working'                           => 0x0,
+                'accessories-calculator'                    => 0x1F5A9,
+                # 'accessories-character-map'                 => 0x0,
+                # 'accessories-dictionary'                    => 0x0,
+                # 'accessories-screenshot-tool'               => 0x0,
+                # 'accessories-text-editor'                   => 0x0,
+                # 'help-browser'                              => 0x0,
+                'multimedia-volume-control'                 => 0x1F39B,
+                # 'preferences-desktop-accessibility'         => 0x0,
+                # 'preferences-desktop-font'                  => 0x0,
+                # 'preferences-desktop-keyboard'              => 0x0,
+                # 'preferences-desktop-locale'                => 0x0,
+                # 'preferences-desktop-multimedia'            => 0x0,
+                # 'preferences-desktop-screensaver'           => 0x0,
+                # 'preferences-desktop-theme'                 => 0x0,
+                # 'preferences-desktop-wallpaper'             => 0x0,
+                # 'system-file-manager'                       => 0x0,
+                # 'system-software-install'                   => 0x0,
+                # 'system-software-update'                    => 0x0,
+                # 'utilities-system-monitor'                  => 0x0,
+                # 'utilities-terminal'                        => 0x0,
+                # 'applications-accessories'                  => 0x0,
+                # 'applications-development'                  => 0x0,
+                # 'applications-engineering'                  => 0x0,
+                # 'applications-games'                        => 0x0,
+                # 'applications-graphics'                     => 0x0,
+                # 'applications-internet'                     => 0x0,
+                # 'applications-multimedia'                   => 0x0,
+                # 'applications-office'                       => 0x0,
+                # 'applications-other'                        => 0x0,
+                # 'applications-science'                      => 0x0,
+                # 'applications-system'                       => 0x0,
+                # 'applications-utilities'                    => 0x0,
+                # 'preferences-desktop'                       => 0x0,
+                # 'preferences-desktop-peripherals'           => 0x0,
+                # 'preferences-desktop-personal'              => 0x0,
+                # 'preferences-other'                         => 0x0,
+                # 'preferences-system'                        => 0x0,
+                # 'preferences-system-network'                => 0x0,
+                # 'system-help'                               => 0x0,
+                # 'audio-card'                                => 0x0,
+                'audio-input-microphone'                    => 0x1F399,
+                # 'battery'                                   => 0x0,
+                'camera-photo'                              => 0x1F4F7,
+                'camera-video'                              => 0x1F4F9,
+                # 'camera-web'                                => 0x0,
+                # 'computer'                                  => 0x0,
+                # 'drive-harddisk'                            => 0x0,
+                # 'drive-optical'                             => 0x0,
+                # 'drive-removable-media'                     => 0x0,
+                # 'input-gaming'                              => 0x0,
+                'input-keyboard'                            => 0x2328,
+                'input-mouse'                               => 0x1F5B1,
+                # 'input-tablet'                              => 0x0,
+                # 'media-flash'                               => 0x0,
+                'media-floppy'                              => 0x1F4BE,
+                'media-optical'                             => 0x1F4BF,
+                'media-tape'                                => 0x1F5AD,
+                'modem'                                     => 0xF580,
+                # 'multimedia-player'                         => 0x0,
+                # 'network-wired'                             => 0x0,
+                # 'network-wireless'                          => 0x0,
+                # 'pda'                                       => 0x0,
+                'phone'                                     => 0x1F4DE,
+                'printer'                                   => 0x1F5A8,
+                # 'scanner'                                   => 0x0,
+                # 'video-display'                             => 0x0,
+                # 'emblem-default'                            => 0x0,
+                # 'emblem-documents'                          => 0x0,
+                # 'emblem-downloads'                          => 0x0,
+                # 'emblem-favorite'                           => 0x0,
+                # 'emblem-important'                          => 0x0,
+                # 'emblem-mail'                               => 0x0,
+                # 'emblem-photos'                             => 0x0,
+                # 'emblem-readonly'                           => 0x0,
+                # 'emblem-shared'                             => 0x0,
+                # 'emblem-symbolic-link'                      => 0x0,
+                # 'emblem-synchronized'                       => 0x0,
+                # 'emblem-system'                             => 0x0,
+                # 'emblem-unreadable'                         => 0x0,
+                # 'face-angel'                                => 0x0,
+                # 'face-angry'                                => 0x0,
+                # 'face-cool'                                 => 0x0,
+                # 'face-crying'                               => 0x0,
+                # 'face-devilish'                             => 0x0,
+                # 'face-embarrassed'                          => 0x0,
+                # 'face-kiss'                                 => 0x0,
+                # 'face-laugh'                                => 0x0,
+                # 'face-monkey'                               => 0x0,
+                # 'face-plain'                                => 0x0,
+                # 'face-raspberry'                            => 0x0,
+                # 'face-sad'                                  => 0x0,
+                # 'face-sick'                                 => 0x0,
+                # 'face-smile'                                => 0x0,
+                # 'face-smile-big'                            => 0x0,
+                # 'face-smirk'                                => 0x0,
+                # 'face-surprise'                             => 0x0,
+                # 'face-tired'                                => 0x0,
+                # 'face-uncertain'                            => 0x0,
+                # 'face-wink'                                 => 0x0,
+                # 'face-worried'                              => 0x0,
+                # 'flag-aa'                                   => 0x0,
+                # 'application-x-executable'                  => 0x0,
+                # 'audio-x-generic'                           => 0x0,
+                # 'font-x-generic'                            => 0x0,
+                # 'image-x-generic'                           => 0x0,
+                # 'package-x-generic'                         => 0x0,
+                # 'text-html'                                 => 0x0,
+                # 'text-x-generic'                            => 0x0,
+                # 'text-x-generic-template'                   => 0x0,
+                # 'text-x-script'                             => 0x0,
+                # 'video-x-generic'                           => 0x0,
+                # 'x-office-address-book'                     => 0x0,
+                # 'x-office-calendar'                         => 0x0,
+                # 'x-office-document'                         => 0x0,
+                # 'x-office-presentation'                     => 0x0,
+                # 'x-office-spreadsheet'                      => 0x0,
+                'folder'                                    => 0x1F4C1,
+                # 'folder-remote'                             => 0x0,
+                # 'network-server'                            => 0x0,
+                # 'network-workgroup'                         => 0x0,
+                # 'start-here'                                => 0x0,
+                # 'user-bookmarks'                            => 0x0,
+                # 'user-desktop'                              => 0x0,
+                # 'user-home'                                 => 0x0,
+                'user-trash'                                => 0x1F5D1,
+                # 'appointment-missed'                        => 0x0,
+                # 'appointment-soon'                          => 0x0,
+                'audio-volume-high'                         => 0x1F50A,
+                'audio-volume-low'                          => 0x1F508,
+                'audio-volume-medium'                       => 0x1F509,
+                'audio-volume-muted'                        => 0x1F507,
+                # 'battery-caution'                           => 0x0,
+                'battery-low'                               => 0x1FAAB,
+                'dialog-error'                              => 0x1F6D1,
+                'dialog-information'                        => 0x1F6C8,
+                # 'dialog-password'                           => 0x0,
+                'dialog-question'                           => 0x2BD1,
+                'dialog-warning'                            => 0x26A0,
+                # 'folder-drag-accept'                        => 0x0,
+                # 'folder-open'                               => 0x0,
+                # 'folder-visiting'                           => 0x0,
+                # 'image-loading'                             => 0x0,
+                # 'image-missing'                             => 0x0,
+                # 'mail-attachment'                           => 0x0,
+                # 'mail-unread'                               => 0x0,
+                # 'mail-read'                                 => 0x0,
+                # 'mail-replied'                              => 0x0,
+                # 'mail-signed'                               => 0x0,
+                # 'mail-signed-verified'                      => 0x0,
+                'media-playlist-repeat'                     => 0x1F501,
+                'media-playlist-shuffle'                    => 0x1F500,
+                # 'network-error'                             => 0x0,
+                # 'network-idle'                              => 0x0,
+                # 'network-offline'                           => 0x0,
+                # 'network-receive'                           => 0x0,
+                # 'network-transmit'                          => 0x0,
+                # 'network-transmit-receive'                  => 0x0,
+                # 'printer-error'                             => 0x0,
+                # 'printer-printing'                          => 0x0,
+                # 'security-high'                             => 0x0,
+                # 'security-medium'                           => 0x0,
+                # 'security-low'                              => 0x0,
+                # 'software-update-available'                 => 0x0,
+                # 'software-update-urgent'                    => 0x0,
+                # 'sync-error'                                => 0x0,
+                # 'sync-synchronizing'                        => 0x0,
+                # 'task-due'                                  => 0x0,
+                # 'task-past-due'                             => 0x0,
+                # 'user-available'                            => 0x0,
+                # 'user-away'                                 => 0x0,
+                # 'user-idle'                                 => 0x0,
+                # 'user-offline'                              => 0x0,
+                # 'user-trash-full'                           => 0x0,
+                'weather-clear'                             => 0x1F323,
+                # 'weather-clear-night'                       => 0x0,
+                'weather-few-clouds'                        => 0x1F324,
+                # 'weather-few-clouds-night'                  => 0x0,
+                'weather-fog'                               => 0x1F32B,
+                # 'weather-overcast'                          => 0x0,
+                # 'weather-severe-alert'                      => 0x0,
+                'weather-showers'                           => 0x1F327,
+                'weather-showers-scattered'                 => 0x01F326,
+                'weather-snow'                              => 0x1F328,
+                'weather-storm'                             => 0x1F329,
             },
         }
     },
@@ -162,6 +457,12 @@ sub new {
 
             if (defined(my $table = $for_version_info->{identifier}{$for->type->uuid})) {
                 $self->{unicode} //= $table->{$for->id};
+            }
+
+            if (!defined($self->{unicode}) && $for->type->eq(WK_FREEDESKTOP_ICON_NAME)) {
+                if ($for->id =~ /^flag-([a-z]{2})$/) {
+                    $opts{flag} //= $1;
+                }
             }
 
             unless (defined $self->{unicode}) {
@@ -263,6 +564,17 @@ sub new {
         }
     }
 
+    if (defined(my $flag = delete $opts{flag})) {
+        if ($flag =~ /^[a-zA-Z]{2}$/) {
+            $self->{unicode} = [map {0x1F1E6 - 0x61 + ord} split //, lc $flag];
+        #} elsif ($flag =~ /^[a-zA-Z]+$/) {
+            #$self->{unicode} = [0x1F3F4, (map {0xE0061 - 0x61 + ord} split //, lc $flag), 0xE007F];
+            #warn join(' ', map {sprintf('U+%04X', $_)} @{$self->{unicode}});
+        } else {
+            croak 'Invalid format for flag';
+        }
+    }
+
     {
         my $v;
 
@@ -284,7 +596,11 @@ sub new {
         $self->{unicode} //= $for_version_info->{special}{$special =~ s/-/_/gr};
     }
 
-    $self->{unicode} //= $for_version_info->{default_unicode};
+    if (delete $opts{no_defaults}) {
+        return undef unless defined $self->{unicode};
+    } else {
+        $self->{unicode} //= $for_version_info->{default_unicode};
+    }
 
     # Attach subobjects:
     $self->attach(map {$_ => delete $opts{$_}} keys(%_types), 'weak');
@@ -299,6 +615,7 @@ sub unicode {
     my ($self, @args) = @_;
 
     croak 'Stray options passed' if scalar @args;
+    croak 'Bad object' if ref $self->{unicode};
 
     return $self->{unicode};
 }
@@ -306,10 +623,15 @@ sub unicode {
 
 sub as_string {
     my ($self, @args) = @_;
+    my $unicode = $self->{unicode};
 
     croak 'Stray options passed' if scalar @args;
 
-    return chr($self->{unicode});
+    if (ref $unicode) {
+        return join '' => map{chr} @{$unicode};
+    } else {
+        return chr($unicode);
+    }
 }
 
 
@@ -326,7 +648,7 @@ sub as {
     my ($self, $as, %opts) = @_;
 
     require Data::Identifier::Generate;
-    $self->{identifier} //= Data::Identifier::Generate->unicode_character(unicode => $self->{unicode});
+    $self->{identifier} //= Data::Identifier::Generate->unicode_character(unicode => $self->unicode);
 
     $opts{$_} //= $self->{$_} foreach keys %_types;
 
@@ -411,7 +733,7 @@ Data::IconText - Work with icon text
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -430,7 +752,7 @@ Allows icon text (single character text icons) to be handled in a nice way.
 Creates a new icon text object.
 
 The icon text is tried to calculate from the options in the following order (first one wins):
-C<unicode>, C<raw>, C<for>, C<mediasubtype>, C<mediatype>, C<mimetype>, C<special>.
+C<unicode>, C<raw>, C<from>, C<for>, C<flag>, C<mediasubtype>, C<mediatype>, C<mimetype>, C<special>.
 If none is found a fallback is used.
 
 The following options are supported.
@@ -454,6 +776,10 @@ Currently only identifiers of type unicode code point or ascii code point are su
 
 See also:
 L<Data::Identifier::Generate/unicode_character>.
+
+=item C<flag>
+
+A flag for a two letter country code (ISO 3166-1 alpha-2 codes).
 
 =item C<for>
 
@@ -498,6 +824,10 @@ B<Note:>
 This option alters only the rules for finding an icon text for a B<valid> input.
 If an input is invalid but was erroneously accepted in an earlier version newer versions may still C<die> or behave differently.
 
+=item C<no_defaults>
+
+If set true and no match was found return C<undef> instead of the default character.
+
 =back
 
 Additionally subobjects can be attached:
@@ -532,6 +862,7 @@ If only a specific one needs needs to be weaken use L</attach>.
     my $unicode = $icontext->unicode;
 
 This returns the numeric unicode value (e.g. 0x1F981) of the icon text.
+If there is no single value associated with the icon text, this method C<die>s.
 
 =head2 as_string
 

@@ -12,7 +12,7 @@ do { my $x = {
                       'requires' => {
                                       'Alien::SwaggerUI' => '0',
                                       'Beam::Minion' => '0.007',
-                                      'CPAN::Testers::Schema' => '0.022',
+                                      'CPAN::Testers::Schema' => '0.023',
                                       'Cpanel::JSON::XS' => '0',
                                       'File::Share' => '0',
                                       'Import::Base' => '0.012',
@@ -25,6 +25,7 @@ do { my $x = {
                                       'Mojolicious' => '7.40',
                                       'Mojolicious::Plugin::Config' => '0',
                                       'Mojolicious::Plugin::OpenAPI' => '1.21',
+                                      'Mojolicious::Plugin::Yancy' => '1.033',
                                       'perl' => '5.024'
                                     }
                     },
@@ -35,6 +36,7 @@ do { my $x = {
                                      'CPAN::Testers::Fact::TestSummary' => '0',
                                      'CPAN::Testers::Report' => '0',
                                      'DBD::SQLite' => '0',
+                                     'DateTime::Format::SQLite' => '0',
                                      'Test::Reporter' => '0',
                                      'Test::Reporter::Transport::Null' => '0',
                                      'Test::mysqld' => '0'

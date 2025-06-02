@@ -3,15 +3,14 @@
   "info": {
     "version": "3.0",
     "title": "CPAN Testers API 3.0",
-    "description": "API to submit and manipulate test reports",
+    "description": "API to read CPAN Testers data and submit new test reports. This API lets you build your own data visualizations (like [the CPAN Testers Matrix](http://matrix.cpantesters.org)) or to derive additional data (like [regression analysis of CPAN Testers data](http://analysis.cpantesters.org))\n\nHave a question? See a problem? [Open a ticket on Github](http://github.com/cpan-testers/cpantesters-api/issues) or [contact the admins](mailto:admin@cpantesters.org)\n\n* [See the main API landing page](http://api.cpantesters.org)\n* [See the API server code on Github](http://github.com/cpan-testers/cpantesters-api)\n* [The main CPAN Testers website](http://cpantesters.org)",
     "termsOfService": "http://cpantesters.org/api/license",
     "contact": {
-      "name": "CPAN Testers core team",
       "email": "admin@cpantesters.org",
       "url": "http://cpantesters.org"
     },
     "license": {
-      "name": "perl",
+      "name": "This data is licensed under the same terms as Perl 5 itself",
       "url": "https://dev.perl.org/licenses/"
     }
   },
@@ -126,7 +125,8 @@
           { "$ref": "#/parameters/since" },
           { "$ref": "#/parameters/grade" },
           { "$ref": "#/parameters/perl" },
-          { "$ref": "#/parameters/osname" }
+          { "$ref": "#/parameters/osname" },
+          { "$ref": "#/parameters/perl_maturity" }
         ],
         "responses": {
           "200": {
@@ -173,7 +173,8 @@
           { "$ref": "#/parameters/since" },
           { "$ref": "#/parameters/grade" },
           { "$ref": "#/parameters/perl" },
-          { "$ref": "#/parameters/osname" }
+          { "$ref": "#/parameters/osname" },
+          { "$ref": "#/parameters/perl_maturity" }
         ],
         "responses": {
           "200": {
@@ -224,7 +225,8 @@
           { "$ref": "#/parameters/since" },
           { "$ref": "#/parameters/grade" },
           { "$ref": "#/parameters/perl" },
-          { "$ref": "#/parameters/osname" }
+          { "$ref": "#/parameters/osname" },
+          { "$ref": "#/parameters/perl_maturity" }
         ],
         "responses": {
           "200": {
@@ -299,6 +301,48 @@
           "404": {
             "description": "The distribution was not found"
           }
+        }
+      }
+    },
+
+    "/release/dist/{dist}/{version}": {
+      "get": {
+        "tags": [ "Release" ],
+        "operationId": "v3_release_dist_version",
+        "summary": "Get summary test report info for a single release of a distribution",
+        "x-mojo-to": {
+          "controller": "Release",
+          "action": "release"
+        },
+        "parameters": [
+          { "$ref": "#/parameters/since" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/maturity" },
+          {
+            "name": "dist",
+            "in": "path",
+            "description": "The CPAN distribution name (like 'CPAN-Testers-Schema')",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "The distribution version (like '1.043')",
+            "type": "string",
+            "required": true,
+            "x-mojo-placeholder": "#"
+          }
+        ],
+        "responses": {
+            "200": {
+                "description": "The release information",
+                "schema": { "$ref": "#/definitions/Release" }
+            },
+            "400": { "$ref": "#/paths/~1release/get/responses/400" },
+            "404": {
+                "description": "The distribution or version was not found"
+            }
         }
       }
     },
@@ -476,6 +520,13 @@
         "items": { "type": "string" },
         "collectionFormat": "multi",
         "required": false
+    },
+    "perl_maturity": {
+      "name": "perl_maturity",
+      "in": "query",
+      "type": "string",
+      "enum": ["stable", "dev"],
+      "description": "Only send records for Perl versions of the given maturity level"
     }
   },
 

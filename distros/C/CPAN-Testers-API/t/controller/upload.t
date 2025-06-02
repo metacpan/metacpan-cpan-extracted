@@ -139,7 +139,7 @@ sub _test_api( $base ) {
             push $peers->@*, $c;
             $t->app->log->info( "Added 1, Got " . ( scalar @$peers ) . " peers" );
             $_->send( 'Got topic: ' . $c->stash( 'topic' ) ) for $peers->@*;
-            $c->on( finish => sub( $c, $tx ) {
+            $c->on( finish => sub( $c, $tx, $reason ) {
                 $peers = [ grep { $_ ne $c } $peers->@* ],
                 $t->app->log->info( "Lost 1, Got " . ( scalar @$peers ) . " peers" );
             } );
@@ -147,7 +147,7 @@ sub _test_api( $base ) {
         } );
         my $broker_t = Test::Mojo->new( $broker );
 
-        my $broker_url = $broker->ua->server->nb_url;
+        my $broker_url = $broker_t->ua->server->nb_url;
         $t->app->config->{broker} = 'ws://' . $broker_url->host_port;
 
         $t->websocket_ok( $base . '/upload' )

@@ -10,6 +10,7 @@ README.md
 dist.json
 eg/app.psgi
 eg/cpanfile
+eg/index.cgi
 eg/index.html
 lib/Datastar/SSE.pm
 lib/Datastar/SSE/Types.pm

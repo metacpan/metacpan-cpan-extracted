@@ -12,13 +12,23 @@ WriteMakefile(
 				      'Test::More' => 0,
 				     },
 	      PREREQ_PM => {
-			    'Attribute::Deprecated' => 0,
-			    'Carp' => 0,
-			    'Carp::Assert' => 0,
-			    'Crypt::FDH' => 0,
-			    'Crypt::RSA' => 0,
-			    'Compress::Zlib' => 0
+			    'Carp' => '1.50',
+			    'Carp::Assert' => '0.21',
+			    'Crypt::FDH' => '1.010',
+			    'Crypt::RSA' => '1.99',
+			    'Compress::Zlib' => '2.106',
+			    'Feature::Compat::Class' => '0.07',
+                            'Filter::Crypto' => '2.10',
+                            'Math::Pari' => '2.030523'
 			   },
+             META_MERGE => {
+                            "meta-spec" => { version => 2 },
+                            provides => {
+                                         'Crypt::RSA::Blind' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.021},
+                                         'Crypt::RSA::Blind::PubKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.021},
+                                         'Crypt::RSA::Blind::SecKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.021}
+                                        }
+                           },
 	      dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	      clean               => { FILES => 'Crypt-RSA-Blind-*' },
 	     );

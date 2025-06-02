@@ -16,6 +16,7 @@ recommends "Digest" => "1.17_01";
 recommends "Digest::SHA3" => "0.25";
 recommends "File::ExtAttr" => "1.09";
 recommends "File::ValueFile::Simple::Reader" => "v0.1.0";
+recommends "File::Which" => "1.27";
 recommends "Image::Info" => "1.39";
 recommends "MIME::Base64" => "3.15";
 recommends "OpenOffice::OODoc" => "2.125";

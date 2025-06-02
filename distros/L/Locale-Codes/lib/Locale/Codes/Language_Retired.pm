@@ -3,7 +3,7 @@ Locale::Codes::Language_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Mon Mar  3 11:04:05 EST 2025
+#    Generated on: Sun Jun  1 17:55:48 EDT 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.82';
+$VERSION='3.83';
 
 $Locale::Codes::Retired{'language'}{'alpha-2'}{'code'} = {
    q(in) => q(Indonesian),
@@ -455,6 +455,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(kakauhua) => [ q(kbf), q(Kakauhua) ],
    q(kakihum) => [ q(kxe), q(Kakihum) ],
    q(kalami) => [ q(gwc), q(Kalami) ],
+   q(kamantan) => [ q(kci), q(Kamantan) ],
    q(kamba) => [ q(kam), q(Kamba) ],
    q(kamba (brazil)) => [ q(xba), q(Kamba (Brazil)) ],
    q(karadjeri) => [ q(gbd), q(Karadjeri) ],
@@ -561,6 +562,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(ndrag'ngith) => [ q(dgt), q(Ndrag'ngith) ],
    q(nepal bhasa) => [ q(new), q(Nepal Bhasa) ],
    q(nepali kurux) => [ q(kxl), q(Nepali Kurux) ],
+   q(newari) => [ q(new), q(Newari) ],
    q(nga la) => [ q(hlt), q(Nga La) ],
    q(ngalakan) => [ q(nig), q(Ngalakan) ],
    q(ngalkbun) => [ q(ngk), q(Ngalkbun) ],

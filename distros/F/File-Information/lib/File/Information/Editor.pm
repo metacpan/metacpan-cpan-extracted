@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 use constant {
     STATUS_PENDING      => 'pending',
@@ -148,7 +148,7 @@ File::Information::Editor - generic module for extracting information from files
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 

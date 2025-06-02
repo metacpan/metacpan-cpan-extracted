@@ -2,6 +2,13 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.718     2025-06-01 09:59:59-05:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed Log::Any::Adapter::Multiplex not loading its child adapter
+    modules.
+
 1.717     2023-08-17 10:52:21-05:00 America/Chicago
 
   [Fixed]

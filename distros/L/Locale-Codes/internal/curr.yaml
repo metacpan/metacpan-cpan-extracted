@@ -9542,7 +9542,6 @@ currency:
       AFN: Afghani
       ALL: Lek
       AMD: Armenian Dram
-      ANG: Netherlands Antillean Guilder
       AOA: Kwanza
       ARS: Argentine Peso
       AUD: Australian Dollar
@@ -9695,6 +9694,7 @@ currency:
       VND: Dong
       VUV: Vatu
       WST: Tala
+      XAD: Arab Accounting Dinar
       XAF: CFA Franc BEAC
       XAG: Silver
       XAU: Gold
@@ -9703,6 +9703,7 @@ currency:
       XBC: Bond Markets Unit European Unit of Account 9 (E.U.A.-9)
       XBD: Bond Markets Unit European Unit of Account 17 (E.U.A.-17)
       XCD: East Caribbean Dollar
+      XCG: Caribbean Guilder
       XDR: SDR (Special Drawing Right)
       XOF: CFA Franc BCEAO
       XPD: Palladium
@@ -9724,6 +9725,9 @@ currency:
       algerian dinar: 
         - DZD
         - Algerian Dinar
+      arab accounting dinar: 
+        - XAD
+        - Arab Accounting Dinar
       argentine peso: 
         - ARS
         - Argentine Peso
@@ -9799,6 +9803,9 @@ currency:
       canadian dollar: 
         - CAD
         - Canadian Dollar
+      caribbean guilder: 
+        - XCG
+        - Caribbean Guilder
       cayman islands dollar: 
         - KYD
         - Cayman Islands Dollar
@@ -10015,9 +10022,6 @@ currency:
       nepalese rupee: 
         - NPR
         - Nepalese Rupee
-      netherlands antillean guilder: 
-        - ANG
-        - Netherlands Antillean Guilder
       new israeli sheqel: 
         - ILS
         - New Israeli Sheqel
@@ -10297,6 +10301,7 @@ currency:
       376: New Israeli Sheqel
       388: Jamaican Dollar
       392: Yen
+      396: Arab Accounting Dinar
       398: Tenge
       400: Jordanian Dinar
       404: Kenyan Shilling
@@ -10321,7 +10326,7 @@ currency:
       512: Rial Omani
       516: Namibia Dollar
       524: Nepalese Rupee
-      532: Netherlands Antillean Guilder
+      532: Caribbean Guilder
       533: Aruban Florin
       548: Vatu
       554: New Zealand Dollar
@@ -10428,6 +10433,9 @@ currency:
       algerian dinar: 
         - '012'
         - Algerian Dinar
+      arab accounting dinar: 
+        - 396
+        - Arab Accounting Dinar
       argentine peso: 
         - '032'
         - Argentine Peso
@@ -10503,6 +10511,9 @@ currency:
       canadian dollar: 
         - 124
         - Canadian Dollar
+      caribbean guilder: 
+        - 532
+        - Caribbean Guilder
       cayman islands dollar: 
         - 136
         - Cayman Islands Dollar
@@ -10719,9 +10730,6 @@ currency:
       nepalese rupee: 
         - 524
         - Nepalese Rupee
-      netherlands antillean guilder: 
-        - 532
-        - Netherlands Antillean Guilder
       new israeli sheqel: 
         - 376
         - New Israeli Sheqel
@@ -15652,7 +15660,7 @@ language:
       kcf: Ukaan
       kcg: Tyap
       kch: Vono
-      kci: Kamantan
+      kci: Ngyian
       kcj: Kobiana
       kck: Kalanga
       kcl: Kela (Papua New Guinea)
@@ -17343,7 +17351,7 @@ language:
       net: Nete
       neu: Neo
       nev: Nyaheun
-      new: Newari
+      new: Nepal Bhasa
       nex: Neme
       ney: Neyo
       nez: Nez Perce
@@ -17725,6 +17733,7 @@ language:
       nzz: Nanga Dama Dogon
       oaa: Orok
       oac: Oroch
+      oak: Noakhali
       oar: Old Aramaic (up to 700 BCE)
       oav: Old Avar
       obi: Obispeno
@@ -29494,9 +29503,6 @@ language:
       kamano: 
         - kbq
         - Kamano
-      kamantan: 
-        - kci
-        - Kamantan
       kamar: 
         - keq
         - Kamar
@@ -35470,6 +35476,9 @@ language:
       neo-hittite: 
         - nei
         - Neo-Hittite
+      nepal bhasa: 
+        - new
+        - Nepal Bhasa
       nepalese sign language: 
         - nsp
         - Nepalese Sign Language
@@ -35488,9 +35497,6 @@ language:
       new zealand sign language: 
         - nzs
         - New Zealand Sign Language
-      newari: 
-        - new
-        - Newari
       neyo: 
         - ney
         - Neyo
@@ -35746,6 +35752,9 @@ language:
       ngwo: 
         - ngn
         - Ngwo
+      ngyian: 
+        - kci
+        - Ngyian
       nhanda: 
         - nha
         - Nhanda
@@ -35932,6 +35941,9 @@ language:
       no linguistic content: 
         - zxx
         - No linguistic content
+      noakhali: 
+        - oak
+        - Noakhali
       nobiin: 
         - fia
         - Nobiin
@@ -46836,9 +46848,11 @@ langvar:
       grclass: Classical Occitan orthography
       grital: Italian-inspired Occitan orthography
       grmistr: Mistralian or Mistralian-inspired Occitan orthography
+      hanoi: The Ha Noi variant of Vietnamese
       hepburn: Hepburn romanization
       hognorsk: Norwegian in Hognorsk (High Norwegian) orthography
       hsistemo: Standard H-system orthographic fallback for spelling Esperanto
+      huett: The Hue (province Thua Thien) variant of Vietnamese
       ijekavsk: Serbian with Ijekavian pronunciation
       itihasa: Epic Sanskrit
       ivanchov: Bulgarian in 1899 orthography
@@ -46881,6 +46895,7 @@ langvar:
       rigik: Volapuk rigik
       rozaj: Resian
       rumgr: Rumantsch Grischun
+      saigon: The Sai Gon variant of Vietnamese
       scotland: Scottish Standard English
       scouse: Scouse
       simple: Simplified form
@@ -47189,6 +47204,12 @@ langvar:
       the gniva dialect of resian: 
         - njiva
         - The Gniva dialect of Resian
+      the ha noi variant of vietnamese: 
+        - hanoi
+        - The Ha Noi variant of Vietnamese
+      the hue (province thua thien) variant of vietnamese: 
+        - huett
+        - The Hue (province Thua Thien) variant of Vietnamese
       the kociewie dialect of polish: 
         - kociewie
         - The Kociewie dialect of Polish
@@ -47204,6 +47225,9 @@ langvar:
       the oseacco dialect of resian: 
         - osojs
         - The Oseacco dialect of Resian
+      the sai gon variant of vietnamese: 
+        - saigon
+        - The Sai Gon variant of Vietnamese
       the san giorgio dialect of resian: 
         - biske
         - The San Giorgio dialect of Resian
@@ -47337,6 +47361,7 @@ script:
       Hluw: Anatolian Hieroglyphs
       Hmng: Pahawh Hmong
       Hmnp: Nyiakeng Puachue Hmong
+      Hntl: Han (Traditional variant) with Latin (alias for Hant + Latn)
       Hrkt: Japanese syllabaries (alias for Hiragana + Katakana)
       Hung: Old Hungarian
       Inds: Indus
@@ -47432,6 +47457,7 @@ script:
       Sara: Sarati
       Sarb: Old South Arabian
       Saur: Saurashtra
+      Seal: Seal
       Sgnw: SignWriting
       Shaw: Shavian
       Shrd: Sharada
@@ -47669,6 +47695,9 @@ script:
       han (traditional variant): 
         - Hant
         - Han (Traditional variant)
+      han (traditional variant) with latin (alias for hant + latn): 
+        - Hntl
+        - Han (Traditional variant) with Latin (alias for Hant + Latn)
       han with bopomofo (alias for han + bopomofo): 
         - Hanb
         - Han with Bopomofo (alias for Han + Bopomofo)
@@ -47996,6 +48025,9 @@ script:
       saurashtra: 
         - Saur
         - Saurashtra
+      seal: 
+        - Seal
+        - Seal
       sharada: 
         - Shrd
         - Sharada
@@ -48360,12 +48392,14 @@ script:
       501: Han (Simplified variant)
       502: Han (Traditional variant)
       503: Han with Bopomofo (alias for Han + Bopomofo)
+      504: Han (Traditional variant) with Latin (alias for Hant + Latn)
       505: Khitan large script
       510: Jurchen
       520: Tangut
       530: Shuishu
       550: Blissymbols
       570: Braille
+      590: (Small) Seal
       610: Indus (Harappan)
       620: Rongorongo
       755: Duployan shorthand, Duployan stenography
@@ -48376,6 +48410,9 @@ script:
       995: Mathematical notation
       996: Symbols
     name: 
+      (small) seal: 
+        - 590
+        - (Small) Seal
       adlam: 
         - 166
         - Adlam
@@ -48559,6 +48596,9 @@ script:
       han (traditional variant): 
         - 502
         - Han (Traditional variant)
+      han (traditional variant) with latin (alias for hant + latn): 
+        - 504
+        - Han (Traditional variant) with Latin (alias for Hant + Latn)
       han with bopomofo (alias for han + bopomofo): 
         - 503
         - Han with Bopomofo (alias for Han + Bopomofo)

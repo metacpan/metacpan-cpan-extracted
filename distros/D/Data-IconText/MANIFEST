@@ -10,4 +10,5 @@ cpanfile
 dist.ini
 lib/Data/IconText.pm
 t/01_load.t
+t/02_base.t
 xt/author/pod-syntax.t

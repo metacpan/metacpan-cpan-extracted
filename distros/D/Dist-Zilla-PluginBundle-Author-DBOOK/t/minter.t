@@ -23,7 +23,7 @@ $tzil->mint_dist;
 
 my @expected_files = sort qw(
   .gitignore
-  .travis.yml
+  .github/workflows/test.yml
   Changes
   prereqs.yml
   dist.ini
@@ -44,7 +44,7 @@ is_deeply [sort @found_files], \@expected_files, 'minted the correct files';
 my $pm = $tzil->slurp_file('mint/lib/DZT/Minty.pm');
 my $distini = $tzil->slurp_file('mint/dist.ini');
 my $gitignore = $tzil->slurp_file('mint/.gitignore');
-my $travisyml = $tzil->slurp_file('mint/.travis.yml');
+my $testyml = $tzil->slurp_file('mint/.github/workflows/test.yml');
 my $changes = $tzil->slurp_file('mint/Changes');
 
 like $pm, qr/^package DZT::Minty;$/m, 'right package declaration';
@@ -58,7 +58,7 @@ like $distini, qr/^\[\@Author::DBOOK\]$/m, 'author bundle included';
 
 like $gitignore, qr/^\/DZT-Minty-\*$/m, 'builds ignored in git';
 
-like $travisyml, qr/^language:\s*perl$/m, 'travis configured for perl';
+like $testyml, qr/\brun:\s*perl\b/m, 'github CI configured for perl';
 
 like $changes, qr/^\{\{\$NEXT\}\}$/m, 'changes file set up';
 

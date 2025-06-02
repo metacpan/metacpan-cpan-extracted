@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Summary;
-our $VERSION = '0.025';
+our $VERSION = '0.029';
 # ABSTRACT: API for test report summary data
 
 #pod =head1 DESCRIPTION
@@ -72,7 +72,7 @@ sub summary( $c ) {
     $rs = $rs->search(
         {
             ( $dist ? ( dist => $dist ) : () ),
-            ( $version ? ( version => $version ) : () ),
+            ( $version ? ( 'me.version' => $version ) : () ),
             ( $perl && @$perl ? ( perl => $perl ) : () ),
             ( $osname && @$osname ? ( osname => $osname ) : () ),
             ( $grade ? ( state => $grade ) : () ),
@@ -86,6 +86,10 @@ sub summary( $c ) {
 
     if ( my $since = $c->validation->param( 'since' ) ) {
         $rs = $rs->since( $since );
+    }
+
+    if ( my $perl_mat = $c->validation->param( 'perl_maturity' ) ) {
+        $rs = $rs->perl_maturity( $perl_mat );
     }
 
     $c->stream_rs( $rs, sub {
@@ -114,7 +118,7 @@ CPAN::Testers::API::Controller::Summary - API for test report summary data
 
 =head1 VERSION
 
-version 0.025
+version 0.029
 
 =head1 DESCRIPTION
 

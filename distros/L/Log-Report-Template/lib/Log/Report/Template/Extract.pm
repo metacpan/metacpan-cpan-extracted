@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Template::Extract;{
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 }
 
 use base 'Log::Report::Extract';

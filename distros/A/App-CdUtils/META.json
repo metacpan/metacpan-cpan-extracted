@@ -32,6 +32,7 @@
             "Complete::Util" : "0.620",
             "Cwd" : "0",
             "File::Util::Test" : "0.631",
+            "File::chdir" : "0",
             "Getopt::Long::Complete" : "0",
             "Path::Tiny" : "0",
             "perl" : "5.010001",
@@ -51,7 +52,7 @@
    "provides" : {
       "App::CdUtils" : {
          "file" : "lib/App/CdUtils.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-App-CdUtils"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"

@@ -24,17 +24,17 @@ for (@testvectors) {
   ok (($pubkey, $seckey) = $rsab->keygen (e => $_->{e}, p => $_->{p}, q => $_->{q}), "Key generation");
   my $init = $rsab->init;
   my $msg = $_->{randomize} ? $rsab->ssa_randomize($_->{msg}) : $_->{msg};
-  ok (my ($blinded_msg, $inv) = $rsab->ssa_blind( PublicKey => $pubkey, Message => $msg, sLen => $_->{slen},
-						  Init => $init, R_inv => $_->{r}, Salt => $_->{salt}),
+  ok (my ($blinded_msg, $inv) = $rsab->ssa_blind( { PublicKey => $pubkey, Message => $msg, sLen => $_->{slen},
+						    Init => $init, R_inv => $_->{r}, Salt => $_->{salt} } ),
       'Create blind signing request');
   ok (os2ip($blinded_msg) == $_->{blm}, "Check blind signing request") unless $_->{randomize};
-  ok (my $blind_sig = $rsab->ssa_blind_sign( SecretKey => $seckey, BlindedMessage => $blinded_msg),
+  ok (my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } ),
       'Create blind signature');
   ok (os2ip($blind_sig) == $_->{bls}, 'Check blind signature') unless $_->{randomize};
-  ok (my $sig = $rsab->ssa_finalize( PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv,
-				     Message => $msg, sLen => $_->{slen}), 'Unblind signature');
-  ok ($sig = $rsab->ssa_finalize( PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init,
-				  Message => $msg, sLen => $_->{slen}), 'Unblind signature with Init vector');
+  ok (my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv,
+				       Message => $msg, sLen => $_->{slen} } ), 'Unblind signature' );
+  ok ($sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init,
+				    Message => $msg, sLen => $_->{slen} } ), 'Unblind signature with Init vector' );
   ok (os2ip($sig) == $_->{sg}, 'Check signature') unless $_->{randomize};
 }
 
@@ -45,40 +45,40 @@ ok (($pubkey, $seckey) = $rsab->keygen(Size => 1024), "Key generation (1024 bits
 my $msg = "Hello, world!";
 my $slen = 0;
 my $init = $rsab->init;
-my ($blinded_msg, $inv) = $rsab->ssa_blind (PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init);
-my $blind_sig = $rsab->ssa_blind_sign(SecretKey => $seckey, BlindedMessage => $blinded_msg);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen);
-ok (try { $rsab->pss_verify(PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen) }, 'Deterministic, no salt');
+my ($blinded_msg, $inv) = $rsab->ssa_blind ( { PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init } );
+my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } );
+ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }, 'Deterministic, no salt' );
 
 $slen = 48;
 $init = $rsab->init;
-my ($blinded_msg, $inv) = $rsab->ssa_blind (PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init);
-my $blind_sig = $rsab->ssa_blind_sign(SecretKey => $seckey, BlindedMessage => $blinded_msg);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen);
-ok (try { $rsab->pss_verify(PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen) }, 'Deterministic, with salt');
+my ($blinded_msg, $inv) = $rsab->ssa_blind ( { PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init } );
+my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } );
+ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }, 'Deterministic, with salt');
 
 ok (($pubkey, $seckey) = $rsab->keygen(Size => 1024), "Key generation (2048 bits)");
 
 $msg = $rsab->ssa_randomize($msg);
 my $slen = 0;
 $init = $rsab->init;
-my ($blinded_msg, $inv) = $rsab->ssa_blind (PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init);
-my $blind_sig = $rsab->ssa_blind_sign(SecretKey => $seckey, BlindedMessage => $blinded_msg);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen);
-ok (try { $rsab->pss_verify(PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen) }, 'Randomized, no salt');
+my ($blinded_msg, $inv) = $rsab->ssa_blind ( { PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init } );
+my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } );
+ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }, 'Randomized, no salt');
 
 $msg = "Hello, world!";
 $msg = $rsab->ssa_randomize($msg);
 $slen = 48;
 $init = $rsab->init;
-my ($blinded_msg, $inv) = $rsab->ssa_blind (PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init);
-my $blind_sig = $rsab->ssa_blind_sign(SecretKey => $seckey, BlindedMessage => $blinded_msg);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen);
-my $sig = $rsab->ssa_finalize(PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen);
-ok (try { $rsab->pss_verify(PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen) }, 'Randomized, with salt');
+my ($blinded_msg, $inv) = $rsab->ssa_blind ( { PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init } );
+my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } );
+my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } );
+ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }, 'Randomized, with salt');
 
 exit;
 

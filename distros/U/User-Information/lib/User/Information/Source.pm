@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 # ---- Private helpers ----
 sub import {
@@ -51,7 +51,7 @@ User::Information::Source - generic module for extracting information from user 
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

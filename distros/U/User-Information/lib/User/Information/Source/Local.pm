@@ -17,7 +17,7 @@ use List::Util qw(any);
 use User::Information::Base;
 use User::Information::Path;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 # ---- Private helpers ----
 
@@ -62,7 +62,7 @@ User::Information::Source::Local - generic module for extracting information fro
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

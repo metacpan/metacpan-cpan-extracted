@@ -28,7 +28,7 @@ no_index:
 provides:
   Dist::Zilla::PluginBundle::Author::CPANTesters:
     file: lib/Dist/Zilla/PluginBundle/Author/CPANTesters.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Moose: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/cpan-testers/Dist-Zilla-PluginBundle-Author-CPANTesters/issues
   homepage: https://github.com/cpan-testers/Dist-Zilla-PluginBundle-Author-CPANTesters
   repository: https://github.com/cpan-testers/Dist-Zilla-PluginBundle-Author-CPANTesters.git
-version: '0.001'
+version: '0.002'
 x_authority: cpan:PREACTION
 x_generated_by_perl: v5.40.2
 x_serialization_backend: 'YAML::Tiny version 1.76'

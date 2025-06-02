@@ -1,0 +1,25 @@
+Changes
+ignore.txt
+inc/architect.c
+inc/architect.h
+lib/PDFio/Architect.pm
+lib/PDFio/Architect.xs
+lib/PDFio/Architect/File.pm
+lib/PDFio/Architect/File.xs
+lib/PDFio/Architect/Font.pm
+lib/PDFio/Architect/Font.xs
+lib/PDFio/Architect/Page.pm
+lib/PDFio/Architect/Page.xs
+lib/PDFio/Architect/Rect.pm
+lib/PDFio/Architect/Rect.xs
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-test.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -21,7 +21,7 @@ use constant {
     CRLF => "\015\012",
 };
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_check_defaults = (
     blank_lines => 'die',
@@ -99,6 +99,12 @@ sub write_list {
                 print $fh $ent->url, CRLF;
             } elsif ($ent->isa('Data::URIID::Base')) {
                 print $fh $ent->as('uri'), CRLF;
+            } elsif ($ent->isa('Data::Identifier::Cloudlet')) {
+                $self->write_list($ent->roots);
+            } elsif ($ent->isa(__PACKAGE__)) {
+                $ent->read_to(sub {
+                        print $fh $_[1]->as_string, CRLF;
+                    });
             } else {
                 croak 'Unsupported object passed';
             }
@@ -246,7 +252,7 @@ File::URIList - module for reading and writing RFC 2483 URI lists
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -358,8 +364,10 @@ This method can be called multiple times to add more URIs.
 
 Currently
 L<URI>,
-L<Data::Identifier>, and
-L<Data::URIID::Base> (including L<Data::URIID::Result>)
+L<Data::Identifier>,
+L<Data::Identifier::Cloudlet>,
+L<Data::URIID::Base> (including L<Data::URIID::Result>), and
+L<File::URIList>
 objects are supported. Other types might as well be supported.
 If a URI is a plain string it is automatically converted using L<URI/new>.
 

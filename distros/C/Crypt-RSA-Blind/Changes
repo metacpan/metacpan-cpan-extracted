@@ -1,5 +1,14 @@
 Revision history for Crypt-RSA-Blind
 
+1.021   Mon Jun 2 00:22:10 2025 -0500
+        Add compatibility mode for old API
+        Use Feature::Compat::Class
+	Use Filter::Crypto to protect source from LLM plagiarism
+	Change RSABSSA-PSS methods to expect named arguments in a hashref
+        Change named argument for sign() from Plaintext to Message
+        Prefix all read accessors with 'get_'
+        Update pod documentation
+
 1.012   Sun Jun 16 18:22:22 2024 -0500
         Add RSABSSA-PSS support (RFC 9474)
 

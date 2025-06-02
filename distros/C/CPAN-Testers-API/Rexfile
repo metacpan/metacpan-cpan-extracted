@@ -28,7 +28,7 @@ use Rex::Commands::Sync;
 
 #######################################################################
 # Groups
-group api => qw( cpantesters3.dh.bytemark.co.uk cpantesters4.dh.bytemark.co.uk cpantesters1.barnyard.co.uk );
+group api => qw( cpantesters3.dh.bytemark.co.uk cpantesters4.dh.bytemark.co.uk );
 
 #######################################################################
 # Settings

@@ -20,7 +20,7 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -101,6 +101,8 @@ sub for_link {
     } else {
         ($self, %opts) = @_;
     }
+
+    $opts{symlinks} //= 'nofollow';
 
     return File::Information::Link->_new(instance => $self, (map {$_ => $opts{$_}} qw(path symlinks)));
 }
@@ -540,7 +542,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -679,6 +681,7 @@ Required if not using the one-argument form. Gives the path (filename) of the li
 =item C<symlinks>
 
 Whether (C<follow>) or not (C<nofollow>; default) symlinks.
+The special value C<opportunistic-nofollow> can be used to not follow symlinks on system that support nofollow but not C<die> on systems that doesn't.
 
 =back
 

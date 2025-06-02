@@ -1,6 +1,6 @@
 package Log::Any::Adapter::Multiplex;
 # ABSTRACT: Adapter to use allow structured logging across other adapters
-our $VERSION = '1.717';
+our $VERSION = '1.718';
 
 use Log::Any;
 use Log::Any::Adapter;
@@ -88,7 +88,13 @@ sub _get_adapters {
         my $new_cache = [];
         my %adapters = %{ $self->{adapters} };
         while ( my ($adapter_name, $adapter_args) = each %adapters ) {
+            # XXX: This is also duplicated with Log::Any::Manager. It'd
+            # be nice if we could instead use a Log::Any::Manager to do
+            # the work here somehow, or just make Log::Any::Manager
+            # automatically multiplex when provided with more than one
+            # adapter in a single `->set()` call
             my $adapter_class = Log::Any::Manager->_get_adapter_class($adapter_name);
+            Log::Any::Manager::_require_dynamic($adapter_class);
             push @$new_cache, $adapter_class->new(
                 @$adapter_args,
                 category => $category
@@ -115,7 +121,7 @@ Log::Any::Adapter::Multiplex - Adapter to use allow structured logging across ot
 
 =head1 VERSION
 
-version 1.717
+version 1.718
 
 =head1 SYNOPSIS
 

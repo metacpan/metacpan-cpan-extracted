@@ -14,6 +14,7 @@ lib/User/Information/Base.pm
 lib/User/Information/Path.pm
 lib/User/Information/Source.pm
 lib/User/Information/Source/Aggregate.pm
+lib/User/Information/Source/CGI.pm
 lib/User/Information/Source/Defaults.pm
 lib/User/Information/Source/Env.pm
 lib/User/Information/Source/Git.pm
