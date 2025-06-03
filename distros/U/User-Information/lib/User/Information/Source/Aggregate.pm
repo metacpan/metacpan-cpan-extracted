@@ -15,7 +15,7 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_paths = (
     username    => [qw(posix/real_user/name     posix/user/name cgi/username)],
@@ -145,7 +145,7 @@ User::Information::Source::Aggregate - generic module for extracting information
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

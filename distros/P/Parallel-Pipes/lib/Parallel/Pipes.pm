@@ -7,7 +7,7 @@ use IO::Select;
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 
 {
     package Parallel::Pipes::Impl;
@@ -193,7 +193,8 @@ sub is_ready {
     if (my $tick = $self->{option}{idle_tick}) {
         while (1) {
             if (my @r = $select->can_read($tick)) {
-                @ready = @r, last;
+                @ready = @r;
+                last;
             }
             $self->{option}{idle_work}->();
         }

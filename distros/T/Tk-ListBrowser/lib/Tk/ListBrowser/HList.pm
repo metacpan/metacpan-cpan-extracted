@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.04;
+$VERSION =  0.09;
 
 use Math::Round qw(round);
 
@@ -49,8 +49,8 @@ sub cellSize {
 	my $textheight = 0;
 	my $textwidth = 0;
 	my $indent = 0;
-	my $pool = $self->data->pool;
-	for (@$pool) {
+	my @pool = $self->getAll;
+	for (@pool) {
 		my $entry = $_;
 
 		#calculate max indent
@@ -114,26 +114,22 @@ sub draw {
 	my ($self, $item, $x, $y, $column, $row) = @_;
 
 	#calculate indent
+	my $indentsize = $self->cget('-indent');
 	my $entry = $item->name;
-	my $parent = $self->infoParent($entry);
-	if (defined $parent) {
-		my $indentsize = $self->cget('-indent');
-		my $top = $self->stackTop;
-		if (defined $top) {
-			if ($parent ne $top) {
-				$self->stackPull
-			}
-			$x = $x + ($self->stackSize * $indentsize);
-		}
-	} else {
-		$self->stackClear
+	my $sep = quotemeta($self->cget('-separator'));
+	my $count = 0;
+	my $e = $entry;
+	while ($e =~ s/^[^$sep]*$sep//) {
+		$count ++
 	}
+#	($x) = $self->startXY;
+	$x = $x + ($count * $indentsize);
 
 	#draw entry
 	$self->SUPER::draw($item, $x, $y, $column, $row);
-	$self->stackClear unless defined $parent;
 	
 	#draw guides
+	my $parent = $self->infoParent($entry);
 	if (defined $parent) {
 		my $c = $self->Subwidget('Canvas');
 		my @eregion = $item->region;
@@ -165,8 +161,6 @@ sub draw {
 		$item->cguideV($guidev);
 		$c->lower($guidev);
 	}
-
-	$self->stackPush($entry) if $self->infoChildren($entry);
 }
 
 sub getPool {
@@ -179,38 +173,6 @@ sub maxIndent {
 	$self->{MAXINDENT} = shift if @_;
 	return $self->{MAXINDENT}
 }
-
-sub stack {
-	my $self = shift;
-	$self->{STACK} = shift if @_;
-	return $self->{STACK}
-}
-
-sub stackClear {
-	my $self = shift;
-	$self->stack([]);
-}
-
-sub stackPull {
-	my $self = shift;
-	my $s = $self->stack;
-	return shift @$s
-}
-
-sub stackPush {
-	my ($self, $item) = @_;
-	my $s = $self->stack;
-	unshift @$s, $item
-}
-
-sub stackSize {
-	my $self = shift;
-	my $s = $self->stack;
-	my $sz = @$s;
-	return $sz
-}
-
-sub stackTop { return $_[0]->stack->[0] }
 
 =head1 LICENSE
 

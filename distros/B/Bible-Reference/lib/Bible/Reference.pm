@@ -6,7 +6,7 @@ use 5.022;
 use exact;
 use exact::class;
 
-our $VERSION = '1.17'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 has acronyms              => 0;
 has sorting               => 1;
@@ -763,12 +763,6 @@ sub as_array ( $self, $data = undef ) {
             ];
         }
 
-        if ( $self->acronyms ) {
-            for (@$data) {
-                $_->[0] = $self->_bible_data->{book_to_acronym}{ $_->[0] };
-            }
-        }
-
         $data = [ map {
             my $book = $_->[0];
 
@@ -789,6 +783,12 @@ sub as_array ( $self, $data = undef ) {
 
             $_;
         } @$data ] if ( $self->simplify );
+
+        if ( $self->acronyms ) {
+            for (@$data) {
+                $_->[0] = $self->_bible_data->{book_to_acronym}{ $_->[0] };
+            }
+        }
 
         $self->_cache->{data} = $data;
     }
@@ -1002,7 +1002,7 @@ Bible::Reference - Simple Bible reference parser, tester, and canonicalizer
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-Reference/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-Reference/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-Reference/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-Reference)
@@ -1022,6 +1022,7 @@ version 1.17
         require_book_ucfirst  => 0,            # don't require book names to be ucfirst for matching
         minimum_book_length   => 3,
         add_detail            => 0,
+        simplify              => 0,
     );
 
     $r = $r->in('Text with I Pet 3:16 and Rom 12:13-14,17 references in it.');
@@ -1058,6 +1059,7 @@ version 1.17
     $r->require_book_ucfirst(1);  # require book names to be ucfirst for matching
     $r->minimum_book_length(4);   # set minimum book length to 4
     $r->add_detail(1);            # turn on adding chapter and verse detail
+    $r->simplify(1);              # turn on simplifying if possible the ranges
 
 =head1 DESCRIPTION
 

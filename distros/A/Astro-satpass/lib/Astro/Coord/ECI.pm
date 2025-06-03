@@ -92,7 +92,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -2173,6 +2173,11 @@ attribute); if false, the calculation will be based on the center of the
 body. The C<$upper> argument defaults to true if the C<$elev> argument
 is zero or positive, and false if the C<$elev> argument is negative.
 
+In list context, it returns the time, and an indicator which is true if
+the body passes above the given elevation at that time, and false if it
+passes below the given elevation. In scalar context it just returns the
+time.
+
 The algorithm is successive approximation, and assumes that the
 body will be at its highest at meridian passage. It also assumes
 that if the body hasn't passed the given elevation in 183 days it
@@ -2190,6 +2195,11 @@ upper limb of the body (as determined from its C<angulardiameter>
 attribute); if false, the calculation will be based on the center of the
 body. The C<$upper> argument defaults to true if the C<$elev> argument
 is zero or positive, and false if the C<$elev> argument is negative.
+
+In list context, it returns the time, and an indicator which is true if
+the body passes above the given elevation at that time, and false if it
+passes below the given elevation. In scalar context it just returns the
+time.
 
 The algorithm is successive approximation, and assumes that the
 body will be at its highest at meridian passage. It also assumes
@@ -2246,6 +2256,67 @@ EOD
     $self->universal ($end);	# Ensure consistent time.
     $body->universal ($end);
     return wantarray ? ($end, $rise) : $end;
+}
+
+=item ( $time, $type ) = $coord->next_elevation_extreme_tod( $body, $elev, $ipper );
+
+B<This method should be considered experimental.>
+
+This variation on C<next_elevation()> returns the earliest (or latest)
+time the given body passes above (or below) the given elevation (in
+radians) as seen from the given coordinates. If called in list context
+it returns the time of the event and the type of the event, encoded as
+follows:
+
+ 0 - earliest pass below the given elevation
+ 1 - earliest pass above the given elevation
+ 2 - latest pass below the given elevation
+ 3 - latest pass above the given elevation
+
+If called in scalar context this method just returns the time.
+
+If no extreme can be computed, this method returns nothing. It will
+always return nothing unless otherwise documented for the class of the
+C<$body> object.
+
+The motivation for this method was a desire to compute the earliest and
+latest sunrise and sunset at a given location. It appears here in the
+object hierarchy out of a perhaps-foolish desire to be consistent with
+C<next_elevation()>.
+
+Use this method with caution. I have serious doubts about what will
+happen when the invocant is north of the Arctic Circle or south of the
+Antarctic Circle, and I am a little unsure of its behaviour near the
+Equator. In addition, in an early implementation consecutive calls
+returned the same extreme over and over. I believe this to be fixed, but
+the fix raises the possibility of skipped extrema. B<Caveat user.>
+
+=item ( $time, $type ) = $body->next_elevation_extreme_tod( $elev, $ipper );
+
+This way to call C<next_elevation_extreme_tod()> is equivalent to the
+above, but uses the body's C<station> attribute for the C<$coord>
+object.
+
+=cut
+
+sub next_elevation_extreme_tod {
+    my ( $self, $body, $angle, $upper ) = _expand_args_default_station( @_ );
+
+    ref $self or croak <<'EOD';
+Error - The next_elevation_extreme_tod() method may not be called as a
+        class method.
+EOD
+
+    $body->represents(__PACKAGE__) or croak <<"EOD";
+Error - The first argument to next_elevation_extreme_tod() must be a
+        subclass of @{[__PACKAGE__]}.
+EOD
+
+    return $body->__next_elevation_extreme_tod( $self, $angle, $upper );
+}
+
+sub __next_elevation_extreme_tod {
+    return;
 }
 
 =item ( $time, $above ) = $coord->next_meridian( $body, $want )
@@ -2983,6 +3054,21 @@ sub __horizon_name {
 
 sub __horizon_name_tplt {
     return [ '%s sets', '%s rises' ];
+}
+
+sub __horizon_extreme_tod_name {
+    my ( $self, $event, $tplt ) = @_;
+    return $self->__event_name(
+	$event,
+	$tplt || $self->__horizon_extreme_tod_name_tplt(),
+    );
+}
+
+sub __horizon_extreme_tod_name_tplt {
+    return [
+	'earliest %sset', 'earliest %srise',
+	'latest %sset', 'latest %srise',
+    ];
 }
 
 sub __transit_name {
@@ -4195,7 +4281,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2024 by Thomas R. Wyant, III
+Copyright (C) 2005-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

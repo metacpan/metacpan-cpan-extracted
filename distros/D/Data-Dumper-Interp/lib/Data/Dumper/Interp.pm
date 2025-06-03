@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-05-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-06-02'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -341,21 +341,38 @@ around       [qw/Values Useqq Quotekeys Trailingcomma Pad Varname Quotekeys
 # The number of digits shown increases when collisions occur.
 # The arg can be a numeric address or a ref from which the addr is taken.
 # If a ref the result is REFTYPEorOBJTYPE<dec:hex> otherwise just <dec:hex>
+use constant _ADDRVIS_SHARED_MARK => "S*";
 our $addrvis_ndigits = 3;
 our $addrvis_seen    = {};   # full (decimal) address => undef
 our $addrvis_dec_abbrs = {}; # abbreviated decimal digits => undef
 sub _abbr_hex($) {
-  substr(sprintf("%0*x", $addrvis_ndigits, $_[0]), -$addrvis_ndigits) }
+  # Strip off _ADDRVIS_SHARED_MARK prefix, if present
+  local $_ = shift;
+  /^((?:\Q${\_ADDRVIS_SHARED_MARK}\E)?\K)(.*)/ or die;
+  substr(sprintf("%0*x", $addrvis_ndigits, $2), -$addrvis_ndigits)
+}
 sub _abbr_dec($) {
-  substr(sprintf("%0*d", $addrvis_ndigits, $_[0]), -$addrvis_ndigits) }
-sub addrvis(_) {
+  # Preserve a _ADDRVIS_SHARED_MARK prefix, if present
+  local $_ = shift;
+  /^((?:\Q${\_ADDRVIS_SHARED_MARK}\E)?\K)(.*)/ or die;
+  $1.substr(sprintf("%0*d", $addrvis_ndigits, $2), -$addrvis_ndigits)
+}
+sub _refaddrdechex($) {  # Returns just "<hex:dec>" (possibly marked as shared)
   my $arg = shift // return("undef");
   my $refstr = ref($arg);
   my $addr;
-  if ($refstr ne "")              { $addr = refaddr($arg) }
+  if ($refstr ne "") {
+    if (threads::shared->can("is_shared")
+           && defined(my $id = threads::shared::is_shared($arg))) {
+      $addr = _ADDRVIS_SHARED_MARK.$id;
+    } else {
+      $addr = refaddr($arg)
+    }
+  }
   elsif (looks_like_number($arg)) { $addr = $arg }
   else {
-    carp("addrvis arg '$arg' is neither a ref or a number\n");
+    #carp("addrvis arg '$arg' is neither a ref or a number\n");
+    Carp::cluck("addrvis arg '$arg' is neither a ref or a number\n");
     return ""
   }
 
@@ -369,9 +386,12 @@ sub addrvis(_) {
     $addrvis_dec_abbrs->{$dec_abbr} = undef;
     $addrvis_seen->{$addr} = undef;
   }
-  #$refstr ne "" ? $refstr.'<'._abbr_dec($addr).':'._abbr_hex($addr).'>'
-  #              : _abbr_dec($addr).':'._abbr_hex($addr)
-  $refstr.'<'._abbr_dec($addr).':'._abbr_hex($addr).'>'
+  '<'._abbr_dec($addr).':'._abbr_hex($addr).'>'
+}
+sub addrvis(_) {
+  my $arg = shift // return("undef");
+  my $r = _refaddrdechex($arg);  # hex:dec with possible shared-mem indicator
+  ref($arg).$r
 }
 sub addrvisl(_) {
   # Return bare "hex:dec" or "Typename hex:dec"
@@ -800,7 +820,7 @@ sub _prefix_refaddr($;$) {
            && ! $in_overload_replacement
            && ($listform ? ($my_visit_depth > 0) # Not on our argument container
                          : 1);                   # Else always if not a (list)
-  my $pfx = addrvis(refaddr($original//$item));
+  my $pfx = _refaddrdechex($original//$item);
   # However don't do this if $item already has an addrvis() substituted,
   # which happens if an object does not stringify or provide another overload
   # replacement -- see _object_subst().
@@ -957,7 +977,7 @@ sub visit_hash_key {
 sub visit_object {
   my $self = shift;
   my $item = shift;
-  say "!V object a=",addrvis(refaddr $item)," depth:$my_visit_depth"," item=",_dbvis1($item) if $debug;
+  say "!V object a=",_refaddrdechex($item)," depth:$my_visit_depth"," item=",_dbvis1($item) if $debug;
   my $original = $item;
 
   local $my_visit_depth = $my_visit_depth + 1;
@@ -971,7 +991,8 @@ sub visit_object {
   { # Suppress Refaddr treatment of the results of any overloads
     local $in_overload_replacement = $in_overload_replacement + 1;
     my $nitem = $self->SUPER::visit_object($item);
-    # Can compare object refs with != in case that op is not defined!
+    # Can not compare object refs with != in case that op is not defined!
+    # (and refaddr() returns undef if $nitem is e.g. a "magic string")
     if (u(refaddr($nitem)) ne u(refaddr($item))) {
       say "!     (obj) new: $item --> ",_dbvis2($nitem) if $debug;
       $item = $nitem;
@@ -988,9 +1009,9 @@ sub visit_object {
 sub visit_ref {
   my ($self, $item) = @_;
   if (ref($item) eq 'ARRAY') {
-    say "!V ref  A=",addrvis(refaddr $item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbavis2(@$item) if $debug;
+    say "!V ref  A=",_refaddrdechex($item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbavis2(@$item) if $debug;
   } else {
-    say "!V ref  a=",addrvis(refaddr $item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbvis1($item) if $debug;
+    say "!V ref  a=",_refaddrdechex($item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbvis1($item) if $debug;
   }
   my $original = $item;
 
@@ -1061,9 +1082,9 @@ sub visit_seen {
   # which the user will be able to match with other refs to the same thing.
   if ($opt_refaddr) {
     my $t = ref($data);
-    return _MAGIC_NOQUOTES_PFX.addrvis(refaddr $data)."[...]" if $t eq "ARRAY";
-    return _MAGIC_NOQUOTES_PFX.addrvis(refaddr $data)."{...}" if $t eq "HASH";
-    return _MAGIC_NOQUOTES_PFX.addrvis(refaddr $data)."\\..." if $t eq "SCALAR";
+    return _MAGIC_NOQUOTES_PFX._refaddrdechex($data)."[...]" if $t eq "ARRAY";
+    return _MAGIC_NOQUOTES_PFX._refaddrdechex($data)."{...}" if $t eq "HASH";
+    return _MAGIC_NOQUOTES_PFX._refaddrdechex($data)."\\..." if $t eq "SCALAR";
     return _MAGIC_NOQUOTES_PFX.addrvis($data);
   }
 
@@ -1080,7 +1101,7 @@ btw '##pp AAA cloned=",addrvis($cloned_itemref)," -> ',_dbvis($$cloned_itemref) 
 btw '##         orig=",addrvis($orig_itemref)," -> ",_dbvis($$orig_itemref)' if $debug;
 
   # Pop back if this item was visited previously
-  if ($seenhash->{ refaddr($cloned_itemref) }++) {
+  if ($seenhash->{ _refaddrdechex($cloned_itemref) }++) {
     btw '     Seen already' if $debug;
     return
   }
@@ -1300,7 +1321,7 @@ my $anyvname_re =
 
 my $anyvname_or_refexpr_re = qr/ ${anyvname_re} | ${curlies_re} /x;
 
-my $addrvis_re = qr/\<\d+:[\da-fA-F]+\>/;
+my $addrvis_re = qr/\<(?:\Q${\_ADDRVIS_SHARED_MARK}\E)?\d+:[\da-fA-F]+\>/;
 
 sub __unmagic_atom() {  # edits $_
 ##  # FIXME this probably could omit the ([^'"]*?) bc there is never anything
@@ -1864,7 +1885,10 @@ sub _postprocess_DD_result {
     elsif (/\G\s+/sgc)                           {          }
     else {
       my $remnant = substr($_,pos//0);
-      Carp::cluck "UNPARSED ",_dbstr(substr($remnant,0,30)."..."),"  ",_dbstrposn($_,pos()//0),"\nFULL STRING:",_dbstr($_),"\n(Using remainder as-is)\n" ;
+      Carp::cluck "UNPARSED at ${\_dbstrposn($_,pos()//0)}\n",
+                  "   (Using remainder as-is)\n",
+                  "FULL STRING: ${\_dbstr($_)}\n",
+                  "original: ${\_dbstr($original)}\n" ;
       atom($remnant);
       while (defined $context->{parent}) { atom("", "close"); }
       last;
@@ -2467,6 +2491,9 @@ is returned, e.g. I<< "E<lt>457:1c9E<gt>" >>.
 I<"undef"> is returned if the argument is undefined.
 Croaks if the argument is defined but not a number or reference.
 
+If a ref refers to a shared variable (see L<threads::shared>)
+then the internal ID is used and a distinguishing mark is included.
+
 C<addrvis_digits(NUMBER)> forces a minimum width
 and C<addrvis_forget()> discards past values and resets to 3 digits.
 
@@ -2571,6 +2598,10 @@ Deprecated: B<show_classname =E<gt> False> : Please use S<< B<overloads =E<gt> "
 
 The I<objects> value indicates whether and for which classes special
 object handling is enabled (false, "1", "classname" or [list of classnames]).
+
+=head2 Refaddr(I<BOOL>)
+
+If true, references are identified as with C<addrvis>.
 
 =head2 Sortkeys(I<SUBREF>)
 

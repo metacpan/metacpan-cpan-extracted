@@ -1,5 +1,8 @@
 Revision history for Debug-Helper-Flag
 
+0.03    2025/06/02
+        Fixed broken link in POD section.
+
 0.02    2025/03/26
         Fixed issue 163543, added env variable PERL_DEBUG_HELPER_FLAG_STRICT and global $strict.
 

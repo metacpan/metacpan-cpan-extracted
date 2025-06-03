@@ -16,7 +16,7 @@ use List::Util qw(any);
 
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_keys_getpwuid = (
     dir     => 'filename',
@@ -171,7 +171,7 @@ User::Information::Source::POSIX - generic module for extracting information fro
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_cgi_var = map {$_ => 1} qw(AUTH_TYPE CONTENT_LENGTH CONTENT_TYPE PATH_INFO PATH_TRANSLATED QUERY_STRING REMOTE_ADDR REMOTE_HOST REMOTE_IDENT REMOTE_USER REQUEST_METHOD SCRIPT_NAME SERVER_NAME SERVER_PORT SERVER_PROTOCOL SERVER_SOFTWARE);
 
@@ -34,7 +34,7 @@ sub _discover {
     my @info;
     my $matcher;
 
-    if ($ENV{SERVER_PROTOCOL} =~ /^HTTP\//) {
+    if (defined($ENV{SERVER_PROTOCOL}) && $ENV{SERVER_PROTOCOL} =~ /^HTTP\//) {
         $opts{cgi} //= 1;
         $matcher = qr/^HTTP_/;
     }
@@ -66,7 +66,7 @@ User::Information::Source::Env - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

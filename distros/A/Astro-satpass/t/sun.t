@@ -248,6 +248,95 @@ EOD
 }
 
 
+# Earliest and latest sunrise and sunset
+# as seen in Washington DC for the year 2005.
+# Tests: next_elevation_extreme_tod
+
+{
+    note 'Test with Sun passed as argument to next_elevation_extreme_tod()';
+
+    my $sta = Astro::Coord::ECI->new( refraction => 1 )->
+	geodetic( deg2rad( 53/60 + 38 ), deg2rad( -(2/60 + 77) ), 0 );
+    my $sun = Astro::Coord::ECI::Sun->new ();
+    my $zone = -5 * 3600;
+
+    $sta->universal( greg_time_gm( 0, 0, 0, 1, 0, 2005 ) - $zone );
+
+    my ( $time, $event ) = $sta->next_elevation_extreme_tod( $sun, 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 0, 27, 7, 5, 0, 2005 ), 30,
+	'Latest sunrise Washington DC 2005', \&format_time );
+
+    is( $event, 3, 'Event is in fact latest sunrise' );
+
+    # NOTE that there is no summer time correction
+    ( $time, $event ) = $sta->next_elevation_extreme_tod( $sun, 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 12, 42, 4, 13, 5, 2005 ), 30,
+	'Earliest sunrise Washington DC 2005', \&format_time );
+
+    is( $event, 1, 'Event is in fact earlest sunrise' );
+
+    # NOTE that there is no summer time correction
+    ( $time, $event ) = $sta->next_elevation_extreme_tod( $sun, 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 32, 37, 19, 28, 5, 2005 ), 30,
+	'Latest sunset Washington DC 2005', \&format_time );
+
+    is( $event, 2, 'Event is in fact latest sunset' );
+
+    ( $time, $event ) = $sta->next_elevation_extreme_tod( $sun, 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 58, 45, 16, 7, 11, 2005 ), 30,
+	'Earliest sunset Washington DC 2005', \&format_time );
+
+    is( $event, 0, 'Event is in fact earlest sunset' );
+
+}
+
+{
+    note 'Test with location in station attribute of Sun';
+
+    my $sta = Astro::Coord::ECI->new( refraction => 1 )->
+	geodetic( deg2rad( 53/60 + 38 ), deg2rad( -(2/60 + 77) ), 0 );
+    my $sun = Astro::Coord::ECI::Sun->new( station => $sta );
+    my $zone = -5 * 3600;
+
+    $sun->universal( greg_time_gm( 0, 0, 0, 1, 0, 2005 ) - $zone );
+
+    my ( $time, $event ) = $sun->next_elevation_extreme_tod( 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 0, 27, 7, 5, 0, 2005 ), 30,
+	'Latest sunrise Washington DC 2005', \&format_time );
+
+    is( $event, 3, 'Event is in fact latest sunrise' );
+
+    # NOTE that there is no summer time correction
+    ( $time, $event ) = $sun->next_elevation_extreme_tod( 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 12, 42, 4, 13, 5, 2005 ), 30,
+	'Earliest sunrise Washington DC 2005', \&format_time );
+
+    is( $event, 1, 'Event is in fact earlest sunrise' );
+
+    # NOTE that there is no summer time correction
+    ( $time, $event ) = $sun->next_elevation_extreme_tod( 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 32, 37, 19, 28, 5, 2005 ), 30,
+	'Latest sunset Washington DC 2005', \&format_time );
+
+    is( $event, 2, 'Event is in fact latest sunset' );
+
+    ( $time, $event ) = $sun->next_elevation_extreme_tod( 0, 1 );
+    tolerance( $time + $zone,
+	greg_time_gm( 58, 45, 16, 7, 11, 2005 ), 30,
+	'Earliest sunset Washington DC 2005', \&format_time );
+
+    is( $event, 0, 'Event is in fact earlest sunset' );
+
+}
+
+
 # Singleton object
 
 {
@@ -485,7 +574,6 @@ EOD
 
     cmp_ok $almanac[5]{almanac}{detail}, '==', 0,
 	'Sixth event is end of twilight';
-
     is $almanac[5]{almanac}{description}, 'end twilight',
 	q{Sixth event description is 'end twilight'};
 

@@ -13,7 +13,7 @@ use Carp;
 require Tk::ListBrowser::SelectXPM;
 use Math::Round qw(round);
 
-$VERSION = 0.08;
+$VERSION = 0.09;
 
 use base qw(Tk::ListBrowser::BaseItem);
 

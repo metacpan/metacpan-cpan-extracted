@@ -7,7 +7,7 @@ use warnings;
 use Carp;
 use Exporter 'import';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 our @EXPORT_OK = qw(all_reachable);
 
@@ -67,7 +67,7 @@ Algorithm::Graphs::Reachable::Tiny - Calculate the reachable nodes in a graph.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 
 =head1 SYNOPSIS
@@ -117,15 +117,16 @@ graph.
 A graph must be represented like this:
 
     my $graph = {
-                 this => {that => undef,
-                          # ...
+                 A => { B => undef,
+                        C => undef,
+                        # ...
 
-                         },
+                       },
                  # ...
                 };
 
-In this example, there is an edge from 'this' to 'that'. Note that you are not
-forced to use C<undef> as hash value.
+In this example, there is an edge from 'A' to 'B' and to 'C'. Note that you
+are not forced to use C<undef> as hash value.
 
 If your vertices are integers, you can also specify the graph as an array of
 hashes. Non-existent or unconnected vertices can be specified by an empty hash

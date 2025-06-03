@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Carp;
-use Test::Most tests => 15;
+use Test::Most tests => 14;
 use Test::Exception;
 
 BEGIN {
@@ -16,15 +16,14 @@ BEGIN {
 # isa_ok(File::Open::NoCache::ReadOnly->new(), 'File::Open::NoCache::ReadOnly', 'Creating File::Open::NoCache::ReadOnly object');
 # isa_ok(File::Open::NoCache::ReadOnly::new(), 'File::Open::NoCache::ReadOnly', 'Creating File::Open::NoCache::ReadOnly object');
 # isa_ok(File::Open::NoCache::ReadOnly->new->new(), 'File::Open::NoCache::ReadOnly', 'Cloning File::Open::NoCache::ReadOnly object');
-ok(!defined(File::Open::NoCache::ReadOnly::new()));
+throws_ok { File::Open::NoCache::ReadOnly->new() } qr/Usage/, 'new() throws error with no arguments';
 
 # Test 1: No arguments, should carp and return undef
 {
 	local $@;
 	local $SIG{__WARN__} = sub { $@ = shift };
-	my $obj = File::Open::NoCache::ReadOnly->new();
-	like($@, qr/Usage: File::Open::NoCache::ReadOnly->new/, 'Carps on no arguments');
-	ok(!defined $obj, 'Returns undef when no arguments given');
+	eval { File::Open::NoCache::ReadOnly->new() };
+	like($@, qr/Usage: /, 'Carps on no arguments');
 }
 
 my $filename = 'lib/File/Open/NoCache/ReadOnly.pm';

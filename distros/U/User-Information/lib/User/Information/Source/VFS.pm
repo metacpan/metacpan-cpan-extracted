@@ -16,7 +16,7 @@ use File::Spec;
 
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 # ---- Private helpers ----
 
@@ -55,7 +55,7 @@ User::Information::Source::VFS - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

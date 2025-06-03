@@ -5,8 +5,7 @@ use warnings;
 use autodie qw(:all);
 
 use File::Temp;
-use Test::Most tests => 7;
-use File::Open::NoCache::ReadOnly;
+use Test::Most tests => 9;
 
 # Check if the module loads
 use_ok('File::Open::NoCache::ReadOnly');
@@ -35,6 +34,16 @@ ok(!$object->fd(), 'File descriptor closed');
 
 # Attempting to close again should warn
 warnings_like { $object->close() } [qr/Attempt to close object twice/], 'Warning on double close';
+
+$object = File::Open::NoCache::ReadOnly->new($test_file);
+isa_ok($object, 'File::Open::NoCache::ReadOnly', 'Object created successfully');
+
+# Test reading from the file
+$line = $object->readline();
+is($line, "Test content\n", 'Read content matches expected');
+
+# Close the object
+$object->close();
 
 # Cleanup
 unlink $test_file;	# File::Temp should do this anyway

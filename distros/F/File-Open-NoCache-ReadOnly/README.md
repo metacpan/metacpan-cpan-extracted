@@ -4,7 +4,7 @@ File::Open::NoCache::ReadOnly - Open a file and flush from memory on closing
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # DESCRIPTION
 
@@ -40,6 +40,10 @@ Returns the file descriptor of the file
 
     my $fd = $fh->fd();
     my $line = <$fd>;
+
+## readline
+
+Read a line from the file
 
 ## close
 

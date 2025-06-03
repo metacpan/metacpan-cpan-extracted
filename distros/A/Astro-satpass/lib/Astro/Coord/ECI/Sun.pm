@@ -49,7 +49,7 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 
 use base qw{Astro::Coord::ECI};
 
@@ -356,6 +356,56 @@ the first argument (i.e. before C<$theta>). This is currently ignored.
 	return wantarray ? ($point, $intens, $central_mag) : $point;
     }
 }	# End local symbol block.
+
+=item ( $time, $type ) = $sun->next_elevation_extreme_tod( $elev, $ipper );
+
+This variation on C<next_elevation()> returns the earliest (or latest)
+time the Sun passes above (or below) the given elevation (in
+radians) as seen from the location specified in its C<station>
+attribute.
+
+=cut
+
+sub __next_elevation_extreme_tod {
+    my ( $self, $sta, $angle, $upper ) = @_;
+
+    my $time = $sta->universal();
+    my $before = $time + SECS_PER_TROPICAL_YEAR;
+
+    my @prev_event;
+    my @prev_sgn;
+
+    # FIXME this probably breaks inside the Arctic and Antarctic circles
+    $sta->universal( $time - SECSPERDAY );
+    for ( 0 .. 1 ) {
+	( $time, my $rise ) = $sta->next_elevation( $self, $angle, $upper );
+	$prev_event[$rise] = $time;
+    }
+    for ( 0 .. 1 ) {
+	( $time, my $rise ) = $sta->next_elevation( $self, $angle, $upper );
+	my $sgn = ( $prev_event[$rise] + SECSPERDAY ) <=> $time;
+	$sgn < 0
+	    and $sgn = 0;
+	$prev_sgn[$rise] = $sgn;
+	$prev_event[$rise] = $time;
+    }
+
+    while ( $time < $before ) {
+	( $time, my $rise ) = $sta->next_elevation( $self, $angle, $upper );
+	my $sgn = ( $prev_event[$rise] + SECSPERDAY ) <=> $time;
+	$sgn < 0
+	    and $sgn = 0;
+	if ( $sgn != $prev_sgn[$rise] ) {
+	    my $event = $sgn * 2 + $rise;
+	    $time = $prev_event[$rise];
+	    return wantarray ? ( $time, $event ) : $time;
+	}
+	$prev_sgn[$rise] = $sgn;
+	$prev_event[$rise] = $time;
+    }
+
+    return;
+}
 
 =item ($time, $quarter, $desc) = $sun->next_quarter($want);
 
@@ -824,7 +874,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2024 by Thomas R. Wyant, III
+Copyright (C) 2005-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

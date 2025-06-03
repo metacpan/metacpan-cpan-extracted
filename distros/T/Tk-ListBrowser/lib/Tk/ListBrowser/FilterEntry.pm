@@ -3,7 +3,7 @@ package Tk::ListBrowser::FilterEntry;
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.08;
+$VERSION =  0.09;
 
 use base qw(Tk::Derived Tk::Entry);
 
@@ -90,7 +90,6 @@ sub KeyRelease {
 
 sub reset {
 	my $self = shift;
-	print "reset\n";
 	$self->delete(0, 'end');
 	$self->insert('end', 'Filter');
 	$self->icursor(0);

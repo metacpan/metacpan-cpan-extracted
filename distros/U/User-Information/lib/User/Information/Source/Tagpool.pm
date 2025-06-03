@@ -18,7 +18,7 @@ use File::ValueFile::Simple::Reader;
 use User::Information::Base;
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_typeinfo = (
     (map {$_ => 'bool'}             qw(directory-add-analyze file-on-unlink-to-tag pool-lazy-cache-reload pool-lazy-store-reload httpd-reuse-address)),
@@ -123,7 +123,7 @@ User::Information::Source::Tagpool - generic module for extracting information f
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

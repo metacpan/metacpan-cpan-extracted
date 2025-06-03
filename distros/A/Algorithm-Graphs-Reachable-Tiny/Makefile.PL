@@ -21,8 +21,6 @@ my %WriteMakefileArgs = (
         'warnings' => 0,
         'Carp' => 0,
         'Exporter' => 0,
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
     },
     META_MERGE => {
         "meta-spec" => { version => 2 },
@@ -30,7 +28,7 @@ my %WriteMakefileArgs = (
         resources => {
             repository => {
                 type => 'git',
-                url  => 'git@github.com:AAHAZRED/perl-Algorithm-Graphs-Reachable-Tiny.git',
+                url  => 'https://github.com/AAHAZRED/perl-Algorithm-Graphs-Reachable-Tiny.git',
                 web  => 'https://github.com/AAHAZRED/perl-Algorithm-Graphs-Reachable-Tiny',
             },
         },

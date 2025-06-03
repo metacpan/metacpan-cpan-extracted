@@ -102,6 +102,7 @@ Escobal
 EST
 et
 exportable
+extrema
 ff
 filename
 firstderivative

@@ -16,7 +16,7 @@ use File::Spec;
 
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use constant PATH_HOMEDIR => User::Information::Path->new(['aggregate', 'homedir']);
 
@@ -82,7 +82,7 @@ User::Information::Source::Defaults - generic module for extracting information 
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

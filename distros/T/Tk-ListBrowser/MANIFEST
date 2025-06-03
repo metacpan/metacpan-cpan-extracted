@@ -3,9 +3,9 @@ lib/Tk/ListBrowser.pm
 lib/Tk/ListBrowser/Bar.pm
 lib/Tk/ListBrowser/BaseItem.pm
 lib/Tk/ListBrowser/Column.pm
-lib/Tk/ListBrowser/Data.pm
 lib/Tk/ListBrowser/Entry.pm
 lib/Tk/ListBrowser/FilterEntry.pm
+lib/Tk/ListBrowser/HashList.pm
 lib/Tk/ListBrowser/HList.pm
 lib/Tk/ListBrowser/Item.pm
 lib/Tk/ListBrowser/LBCanvas.pm
@@ -19,9 +19,11 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/0-Tk-ListBrowser-hashlist.t
 t/1-Tk-ListBrowser.t
 t/2-Tk-ListBrowser-columns-headers.t
 t/3-Tk-ListBrowser-hlist-tree.t
+t/4-Tk-ListBrowser-priorities.t
 t/icons/accessories-text-editor.png
 t/icons/arrow-down.png
 t/icons/arrow-left-double.png

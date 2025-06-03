@@ -1,0 +1,17 @@
+services:
+  rdap:
+    volumes:
+      - .:/app
+    build:
+      dockerfile_inline: |
+        FROM perl:latest
+        WORKDIR /app
+        COPY . .
+        RUN cpanm -qn Dist::Zilla
+        RUN dzil authordeps --missing | cpanm -qn
+        RUN dzil listdeps --missing | cpanm -qn
+    ports:
+      - 8080:8080
+    environment:
+      PERL5LIB: /app/lib
+    command: /app/examples/rdap-epp.pl config.yaml

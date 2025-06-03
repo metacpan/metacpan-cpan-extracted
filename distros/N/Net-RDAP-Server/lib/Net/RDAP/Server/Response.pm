@@ -75,7 +75,7 @@ Net::RDAP::Server::Response - An RDAP response object.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
@@ -123,7 +123,7 @@ Gavin Brown <gavin.brown@fastmail.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Gavin Brown.
+This software is copyright (c) 2025 by Gavin Brown.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -47,7 +47,23 @@ foreach my $oid (
     }
 }
 
+passing()
+    or diag( <<'EOD' );
+
+
+The canned magnitude table in lib/Astro/Coord/ECI/TLE.pm needs to be
+regenerated.
+
+EOD
+
 done_testing;
+
+sub passing {
+    my $ctx = context();
+    my $passing = $ctx->hub()->is_passing();
+    $ctx->release();
+    return $passing;
+}
 
 sub format_mag {
     my ( $mag, $dflt ) = @_;

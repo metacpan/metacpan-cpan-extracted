@@ -92,6 +92,7 @@ need to specify them first in your import list.
  PIOVER2 = half the circle ratio
  SECSPERDAY = the number of seconds in a day
  SECS_PER_SIDERIAL_DAY = seconds in a siderial day
+ SECS_PER_TROPICAL_YEAR = seconds in a tropical year
  SPEED_OF_LIGHT = speed of light in kilometers per second
  TWOPI = twice the circle ratio
 
@@ -136,7 +137,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.132';
+our $VERSION = '0.133';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -284,7 +285,8 @@ our @CARP_NOT = qw{
 our @EXPORT;
 my @all_external = ( qw{
 	AU $DATETIMEFORMAT $JD_GREGORIAN JD_OF_EPOCH LIGHTYEAR PARSEC
-	PERL2000 PI PIOVER2 SECSPERDAY SECS_PER_SIDERIAL_DAY
+	PERL2000 PI PIOVER2
+	SECSPERDAY SECS_PER_SIDERIAL_DAY SECS_PER_TROPICAL_YEAR
 	SPEED_OF_LIGHT TWOPI
 	ARRAY_REF CODE_REF HASH_REF SCALAR_REF
 	acos add_magnitudes asin
@@ -333,6 +335,8 @@ use constant PI => atan2 (0, -1);
 use constant PIOVER2 => PI / 2;
 use constant SECSPERDAY => 86400;
 use constant SECS_PER_SIDERIAL_DAY => 86164.0905;	# Appendix I, page 408.
+# Meeus Appendix I
+use constant SECS_PER_TROPICAL_YEAR	=> 365.242190 * SECSPERDAY;
 use constant SPEED_OF_LIGHT => 299792.458;	# KM/sec, per NIST.
 ### use constant SOLAR_RADIUS => 1392000 / 2;	# Meeus, Appendix I, page 407.
 use constant TWOPI => PI * 2;
@@ -1693,7 +1697,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2024 by Thomas R. Wyant, III
+Copyright (C) 2005-2025 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

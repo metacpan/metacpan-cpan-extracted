@@ -1,35 +1,42 @@
---- #YAML:1.0
-name:               Config-INI-RefVars
-version:            0.20
-abstract:           INI file reader that supports make-style variable references and multiple assignment operators.
+---
+abstract: 'INI file reader that supports make-style variable references and multiple assignment operators.'
 author:
-    - Abdul al Hazred <451@gmx.eu>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Abdul al Hazred <451@gmx.eu>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:                 0
-    Config:               0
-    constant:             0
-    ExtUtils::MakeMaker:  0
-    feature:              0
-    File::Spec::Functions:  0
-    perl:                 5.010
-    strict:               0
-    TAP::Harness:         3.26
-    Test::Fatal:          0.010
-    Test::More:           0.98
-    Test::Simple:         0.98
-    Test::Warn:           0.37
-    warnings:             0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  TAP::Harness: '3.26'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  Test::Simple: '0.98'
+  Test::Warn: '0.37'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-INI-RefVars
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Config: '0'
+  File::Spec::Functions: '0'
+  constant: '0'
+  feature: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/AAHAZRED/perl-Config-INI-RefVars.git
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

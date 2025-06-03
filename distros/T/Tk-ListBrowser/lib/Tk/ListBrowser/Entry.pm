@@ -47,6 +47,7 @@ sub new {
 
 	$self->anchored(0);
 	$self->hidden(0) unless defined $self->hidden;
+	$self->priority(0) unless defined $self->priority;
 	$self->opened(1);
 	$self->{ANCHOR} = 0;
 	$self->{SELECTED} = 0;
@@ -104,6 +105,13 @@ sub clear {
 	my $c = $self->Subwidget('Canvas');
 	for ($self->canchor, $self->cguideH, $self->cguideV, $self->cindicator, $self->cselect) {
 		$c->delete($_) if defined $_;
+	}
+
+	my @columns = $self->columnList;
+	my $name = $self->name;
+	for (@columns) {
+		my $i = $self->itemGet($name, $_);
+		$i->clear if defined $i;
 	}
 
 	$self->canchor(undef);
@@ -262,6 +270,12 @@ sub openedparent {
 		$r = 1
 	}
 	return $r
+}
+
+sub priority {
+	my $self = shift;
+	$self->{PRIORITY} = shift if @_;
+	return $self->{PRIORITY}
 }
 
 sub select {

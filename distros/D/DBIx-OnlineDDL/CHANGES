@@ -1,6 +1,12 @@
 Changelog for DBIx-OnlineDDL
 
-v1.1.0 2025-04-14T19:49:13
+v1.1.1 2025-06-02T22:01:20
+ - Pull request #9: SM-5600 (Brendan Byrd)
+ - Update README (Brendan Byrd)
+ - Fix bug with FetchHashKeyName usage propagating to SHOW CREATE TABLE
+   statement (Brendan Byrd)
+
+v1.1.0 2025-04-14T19:47:51
  - Pull request #8: SRE-8980 (Brendan Byrd)
  - Update README / LICENSE / Makefile (Brendan Byrd)
  - Fix race conditions with UPDATE/DELETE in before_swap unit test (Brendan

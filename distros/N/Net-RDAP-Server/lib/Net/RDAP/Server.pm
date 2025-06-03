@@ -13,7 +13,7 @@ use strict;
 use vars qw($VERSION @METHODS @OBJECTS @SEARCHES @TYPES);
 use warnings;
 
-$VERSION    = '0.05';
+$VERSION    = '0.06';
 @METHODS    = qw(HEAD GET);
 @OBJECTS    = qw(domain nameserver entity ip autnum);
 @SEARCHES   = qw(domains nameservers entities);
@@ -199,6 +199,7 @@ sub check_handlers {
     }
 }
 
+
 1;
 
 __END__
@@ -213,7 +214,7 @@ Net::RDAP::Server - an RDAP server framework.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -340,13 +341,22 @@ C<$type> must be one of:
 The callback will be passed a L<Net::RDAP::Server::Response> that it must then
 manipulate in order to produce the desired response.
 
+=head1 SEE ALSO
+
+=over
+
+=item * L<Net::RDAP::Server::EPPBackend> - an RDAP server that retrieves
+registration data from an EPP server.
+
+=back
+
 =head1 AUTHOR
 
 Gavin Brown <gavin.brown@fastmail.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Gavin Brown.
+This software is copyright (c) 2025 by Gavin Brown.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

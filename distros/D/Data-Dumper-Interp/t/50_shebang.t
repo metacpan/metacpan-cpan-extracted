@@ -28,7 +28,7 @@ sub oops(@) {
   goto &confess;
 }
 
-$SIG{__WARN__} = sub { confess("warning trapped: @_") };
+$SIG{__WARN__} = sub { confess("warning trapped: @_\n") };
 
 BEGIN{ diag "before use Data::Compare etc."; } # try to find mystery Windows crash
 use Data::Compare qw(Compare);

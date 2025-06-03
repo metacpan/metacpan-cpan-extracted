@@ -3,7 +3,7 @@ package DBIx::OnlineDDL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run DDL on online databases safely
 use version;
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.1.1'; # VERSION
 
 use utf8;
 use open qw(:utf8 :std);
@@ -1803,7 +1803,7 @@ DBIx::OnlineDDL - Run DDL on online databases safely
 
 =head1 VERSION
 
-version v1.1.0
+version v1.1.1
 
 =head1 SYNOPSIS
 

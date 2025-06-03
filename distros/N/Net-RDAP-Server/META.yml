@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,6 +16,7 @@ name: Net-RDAP-Server
 requires:
   Carp: '0'
   DateTime: '0'
+  Getopt::Long: '0'
   HTTP::Request: '0'
   HTTP::Response: '0'
   HTTP::Server::Simple::CGI: '0'
@@ -25,7 +26,9 @@ requires:
   Net::EPP::ResponseCodes: '0'
   Net::EPP::Simple: '0'
   Net::RDAP::EPPStatusMap: '0'
+  Pod::Usage: '0'
   URI: '0'
+  YAML::XS: '0'
   base: '0'
   bytes: '0'
   common::sense: '0'
@@ -37,7 +40,7 @@ resources:
   bugtracker: https://github.com/gbxyz/p5-net-rdap-server/issues
   homepage: https://metacpan.org/pod/Net::RDAP::Server
   repository: https://github.com/gbxyz/p5-net-rdap-server
-version: '0.05'
-x_generated_by_perl: v5.34.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.06'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

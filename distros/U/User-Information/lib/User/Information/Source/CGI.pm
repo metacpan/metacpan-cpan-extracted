@@ -17,7 +17,7 @@ use List::Util qw(any);
 use User::Information::Base;
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 # ---- Private helpers ----
 
@@ -53,7 +53,7 @@ User::Information::Source::CGI - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

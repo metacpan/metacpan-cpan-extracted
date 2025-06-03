@@ -1,5 +1,17 @@
 Revision history for Perl extension Tk::ListBrowser.
 
+0.09  Date 
+	- Fixed mistakes in documentation.
+	- Fixed forced cell width after changing from list mode to row, column or bar.
+	- Fixed whole list being used for cell size calculation in non list modes when hierarchy is activated.
+	- Fixed deep recursion at selectionSingle.
+	- Removed annoying print statement.
+	- Added option -priority for the creation of entries.
+	- Added a secondary refresh mechanism.
+	- Optimized and speeded up a lot of things.
+	- Fixed view being reset after clicking a tree indicator.
+	- Fixed scroll region adjustment after filtering.
+
 0.08  Sun May 11 2025
 	- Selection is retained when clicking an indicator.
 	- Fixed filtering in hierarchy mode.

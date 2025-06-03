@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -19,9 +19,9 @@ Construct Tk::Widget 'ListBrowser';
 use Math::Round;
 use Tk;
 require Tk::PopList;
-
-require Tk::ListBrowser::Data;
+require Tk::ListBrowser::Entry;
 require Tk::ListBrowser::FilterEntry;
+require Tk::ListBrowser::HashList;
 require Tk::ListBrowser::Item;
 require Tk::ListBrowser::LBCanvas;
 require Tk::ListBrowser::LBHeader;
@@ -295,6 +295,16 @@ Automatically selects an entry when the pointer is hovering over it.
 Default value I<false>. If set the filter entry is not available.
 This option supercedes the I<-filterforce> option.
 
+=item Switch B<-refreshentriespercycle>
+
+Default value 10. Specifies how many entries are refreshed during
+one refresh loop cycle.
+
+=item Switch B<-refreshinterval>
+
+Default value 1 milisecond. Specifies the interval between refresh
+loop cycles.
+
 =item Switch B<-selectmode>
 
 Default value I<single>. Can either be I<single> or I<multiple>.
@@ -440,9 +450,12 @@ sub Populate {
 
 	$self->{ARRANGE} = undef;
 	$self->{COLUMNS} = [];
-	$self->{DATA} = Tk::ListBrowser::Data->new($self);
 	$self->{HANDLER} = undef;
 	$self->{INDENT} = 0;
+	$self->{POOL} = new Tk::ListBrowser::HashList;
+	$self->{PRIORITYMAX} = 0;
+	$self->{REFRESHLOOPACTIVE} = 0;
+	$self->{REFRESHPOS} = 0;
 	$self->{SORTACTIVE} = '';
 
 	$self->bind('<Configure>', [ $self, 'OnConfigure' ]);
@@ -457,6 +470,8 @@ sub Populate {
 		-font => ['PASSIVE', 'font', 'Font', 'Arial 9'],
 		-indent => ['PASSIVE', 'indent', 'Indent', 22],
 		-motionselect => ['PASSIVE', undef, undef, ''],
+		-refreshentriespercycle => ['PASSIVE', undef, undef, 10],
+		-refreshinterval => ['PASSIVE', 'refreshInterval', 'RefreshInterval', 1],
 		-scrollregion => [$c],
 		-selectmode => ['PASSIVE', undef, undef, 'single'],
 		-selectstyle => ['PASSIVE', undef, undef, 'anchor'],
@@ -526,44 +541,6 @@ sub Populate {
 		xviewScroll => $c,
 		yviewScroll => $c,
 
-		#data
-		add => $self->data,
-		get => $self->data,
-		getAll => $self->data,
-		getColumn => $self->data,
-		getIndex => $self->data,
-		getRow => $self->data,
-		hide => $self->data,
-		index => $self->data,
-		indexColumnRow => $self->data,
-		indexLast => $self->data,
-		infoChildren => $self->data,
-		infoData => $self->data,
-		infoExists => $self->data,
-		infoFirst => $self->data,
-		infoFirstVisible => $self->data,
-		infoHidden => $self->data,
-		infoList => $self->data,
-		infoLast => $self->data,
-		infoLastVisible => $self->data,
-		infoNext => $self->data,
-		infoNextVisible => $self->data,
-		infoParent => $self->data,
-		infoPrev => $self->data,
-		infoPrevVisible => $self->data,
-		infoRoot => $self->data,
-		lastColumnInRow => $self->data,
-		lastRowInColumn => $self->data,
-		selectAll => $self->data,
-		selectionClear => $self->data,
-		selectionGet => $self->data,
-		selectionFlip => $self->data,
-		selectionIndex => $self->data,
-		selectionSet => $self->data,
-		selectionSingle => $self->data,
-		selectionUnset => $self->data,
-		show => $self->data,
-
 		DEFAULT => $self,
 	);
 	$self->after(1, sub {
@@ -572,12 +549,10 @@ sub Populate {
 			$_->configure(@bmpopt)
 		};
 	});
-
+	return $self
 }
 
 sub _handler { return $_[0]->{HANDLER} }
-
-sub data { return $_[0]->{DATA} }
 
 =item B<add>I<(?$name?, %options)>
 
@@ -608,6 +583,10 @@ the entry is shown after I<refresh>
 
 A valid L<Tk::Image> class assigned to this entry.
 
+=item B<-priority>
+
+Default priority is 0. Entries with the highest priorities are shown first.
+
 =item B<-text>
 
 Text assigned to this entry.
@@ -618,6 +597,128 @@ After a call to I<add> you must call I<refresh> to see your changes.
 Returns a reference to the created item object.
 
 =cut
+
+sub add {
+	my ($self, $name, %options) = @_;
+	if ($self->infoExists($name)) {
+		croak "Entry '$name' already exists";
+		return
+	}
+
+	my $sep = $self->separator;
+	my $after = $options{'-after'};
+	my $before = $options{'-before'};
+	my $parent;
+	my @c;
+
+	my $priority = $options{'-priority'};
+	$priority = 0 unless defined $priority;
+	$self->prioritySet($priority);
+
+
+	#some show stoppers
+	if ((defined $after)  and (not $self->infoExists($after))) {
+		croak "Invalid -after option. Entry $after does not exist";
+		return
+	}
+	if ((defined $before)  and (not $self->infoExists($before))) {
+		croak "Invalid -before option. Entry $before does not exist";
+		return
+	}
+
+	if ($sep ne '') { #hierarchy
+		if (my $parent = $self->decodeParent($name)) {
+			#some show stoppers
+			unless ($self->infoExists($parent)) {
+				croak "Parent for $name does not exist";
+				return
+			}
+			if (my $a = $options{'-after'}) {
+				my $p = $self->infoParent($a);
+				if ($p ne $parent) {
+					croak "Invalid '-after' option, $name and $a do not share the same parent";
+					return
+				}
+			}
+			if (my $b = $options{'-before'}) {
+				my $p = $self->infoParent($b);
+				if ($p ne $parent) {
+					croak "Invalid '-before' option, $name and $b do not share the same parent";
+					return
+				}
+			}
+
+			#go to work
+			if ((defined $after) and ($self->get($after)->priority eq $priority)) {
+				#do nothing
+			} elsif ((defined $before) and ($self->get($before)->priority eq $priority)) {
+				#do nothing
+			} else {
+				my @c = $self->infoChildren($parent);
+				my ($pos, $peer) = $self->addGrep($priority, '-after', \@c);
+				if (defined $pos) {
+					$options{$pos} = $peer;
+				} else {
+					my $last = $self->infoLastOffspring($parent);
+					if (defined $last) {
+						$options{'-after'} = $last;
+					} else {
+						$options{'-after'} = $parent
+					}
+				}
+			}
+		} else { #no parent found
+			my @c = $self->infoRoot;
+			my ($pos, $peer) = $self->addGrep($priority, '-before', \@c);
+			if (defined $pos) {
+				$options{$pos} = $peer;
+			}
+		}
+	} else { #no hierarchy
+		if ($self->priorityMax) {
+			my @c = $self->infoList;
+			my ($pos, $peer) = $self->addGrep($priority, '-after', \@c);
+			if (defined $pos) {
+				$options{$pos} = $peer;
+			}
+		}
+	}
+
+	$after = delete $options{'-after'};
+	$before = delete $options{'-before'};
+
+	my $item = new Tk::ListBrowser::Entry(
+		%options,
+		-listbrowser => $self,
+		-name => $name,
+	);
+	my $pool = $self->pool;
+	my $index;
+	if (defined $after) {
+		$index = $self->index($after)+ 1;
+	} elsif (defined $before) {
+		$index = $self->index($before);
+	}
+	$pool->add($item, $index);
+	return $item
+}
+
+sub addGrep {
+	my ($self, $priority, $pos, $l) = @_;
+	my @list = @$l;
+	my @g = grep {$priority > $self->get($_)->priority } @list;
+	if (@g) {
+		my $i = shift @g;
+		return ('-before', $self->get($i)->name);
+	}
+	my @le = grep { $priority <= $self->get($_)->priority } @list;
+	if (@le) {
+		my $i = $list[@le + 1];
+#		my $i = pop @le;
+		return ($pos, $self->get($i)->name) if defined $i;
+	}
+	return ()
+}
 
 sub anchor {
 	my $self = shift;
@@ -641,8 +742,8 @@ Clears the keyboard anchor.
 
 sub anchorClear {
 	my $self = shift;
-	my $pool = $self->data->pool;
-	for (@$pool) {
+	my @pool = $self->getAll;
+	for (@pool) {
 		$_->anchor(0)
 	}
 }
@@ -655,7 +756,7 @@ that currently holds the anchor.
 
 sub anchorGet {
 	my $self = shift;
-	my @pool = $self->data->getAll;
+	my @pool = $self->getAll;
 	for (0 .. @pool - 1) {
 		my $obj = $pool[$_];
 		return $obj if $obj->anchored
@@ -703,9 +804,8 @@ sub anchorSet {
 sub anchorSetColumnRow {
 	my ($self, $column, $row) = @_;
 	my $index = $self->indexColumnRow($column, $row);
-	my @list = $self->data->infoList;
 	if (defined $index) {
-		return $self->anchorSet($list[$index]);
+		return $self->anchorSet($self->getIndex($index)->name);
 	}
 	return ''
 }
@@ -800,12 +900,12 @@ sub Button1Shift {
 	return $self->Button1($x, $y) if $self->cget('-selectmode') eq 'single';
 	my $item = $self->initem($x, $y);
 	if (defined $item) {
-		my $pool = $self->data->pool;
+		my @pool = $self->getAll;
 		$self->anchorSet($item->name);
 		my @sel = $self->selectionGet;
 		unless (@sel) {
-			my $start = $pool->[0]->name;
-			$self->selectionSet($pool->[0]->name, $item->name);
+			my $start = $pool[0]->name;
+			$self->selectionSet($pool[0]->name, $item->name);
 			return
 		}
 		if ($self->index($item->name) < $self->index($sel[0])) {
@@ -887,15 +987,11 @@ sub cellTextWidth {
 sub cellWidth {
 	my $self = shift;
 	$self->{CELLWIDTH} = shift if @_;
-	my $fw = $self->forceWidth;
-	return $fw if defined $fw;
+	if ($self->columnCapable) {
+		my $fw = $self->forceWidth;
+		return $fw if defined $fw;
+	}
 	return $self->{CELLWIDTH}
-}
-
-sub cheader{
-	my $self = shift;
-	$self->{CHEADER} = shift if @_;
-	return $self->{CHEADER}
 }
 
 =item B<clear>
@@ -910,10 +1006,8 @@ sub clear {
 	$self->anchorClear;
 	$self->selectionClear;
 
-	$self->data->clear;
+	grep { $_->clear } $self->getAll;
 
-#	$self->Subwidget('HeaderFrame')->packForget;
-	$self->cheader(undef);
 	my @columns = $self->columnList;
 	for (@columns) {
 		$self->columnGet($_)->clear;
@@ -928,6 +1022,7 @@ sub clear {
 =item B<close>I<($entry)>
 
 Hides all children of $entry.
+Call I<refresh> or I<refreshPurge> to see changes.
 
 =cut
 
@@ -939,6 +1034,21 @@ sub close {
 		return
 	}
 	$i->opened(0);
+}
+
+=item B<closeAll>
+
+Closes all entries.
+Call I<refresh> or I<refreshPurge> to see changes.
+
+=cut
+
+sub closeAll {
+	my $self = shift;
+	my @list = $self->infoList;
+	for (@list) {
+		$self->close($_) if $self->infoChildren($_);
+	}
 }
 
 =item B<columnCapable>
@@ -1162,9 +1272,21 @@ sub columnWidth {
 	}
 }
 
+sub decodeParent {
+	my ($self, $name) = @_;
+	my $sep = $self->separator;
+	$sep = quotemeta($sep);
+	my $parent;
+	if ($name =~ /$sep/) {
+		$name =~ /^(.*)$sep/;
+		$parent = $1 if defined $1;
+	}
+	return $parent
+}
+
 =item B<delete>I<(?$name?)>
 
-Deletes entry I<$name>. You must call I<refresh> to see your changes.
+Deletes entry I<$name>. Call I<refresh> or refreshPurge to see your changes.
 
 =cut
 
@@ -1172,7 +1294,9 @@ sub delete {
 	my ($self, $name) = @_;
 	my $index = $self->index($name);
 	if (defined $index) {
-		$self->data->delete($name);
+		my $pool = $self->pool;
+		my $del = $pool->delete($name);
+		$del->clear;
 		my @columns = $self->columnList;
 		for (@columns) {
 			$self->itemRemove($name, $_);
@@ -1184,16 +1308,14 @@ sub delete {
 
 =item B<deleteAll>
 
-Deletes all entries. You must call refresh to see your changes.
+Deletes all entries. Call I<refresh> or I<refreshPurge> to see your changes.
 
 =cut
 
 sub deleteAll {
 	my $self = shift;
-	my @list = $self->data->infoList(1);
-	for (@list) {
-		$self->delete($_)
-	}
+	my $pool = $self->pool;
+	grep { $self->delete($_->name) } $pool->getAll;
 }
 
 =item B<entryCget>I<($name, $option)>
@@ -1204,8 +1326,13 @@ options are I<-data>, I<-hidden>, I<-image> and I<-text>.
 =cut
 
 sub entryCget {
-	my $self = shift;
-	my $val = $self->data->itemCget(@_);
+	my ($self, $name, $option) = @_;
+	my $i = $self->get($name);
+	unless (defined $i) {
+		croak "Entry '$name' not found";
+		return
+	}
+	my $val = $i->cget($option);
 	if (exists $self->{'insort'}) {
 		unless (defined $val) {
 			if ($self->cget('-sortnumerical')) {
@@ -1227,8 +1354,15 @@ You can specify multiple options.
 =cut
 
 sub entryConfigure {
-	my $self = shift;
-	$self->data->itemConfigure(@_)
+	my ($self, $name, %options) = @_;
+	my $i = $self->get($name);
+	unless (defined $i) {
+		croak "Entry '$name' not found";
+		return
+	}
+	for (keys %options) {
+		$i->configure($_, $options{$_})
+	}
 }
 
 sub filter {
@@ -1268,11 +1402,11 @@ sub filterHide {
 
 sub filterRefresh {
 	my $self = shift;
-	my $pool = $self->data->pool;
+	my @pool = $self->getAll;
 	my $filter = $self->Subwidget('FilterEntry')->get;
 	my $filterfield = $self->cget('-filterfield');
 	my $filteron = $self->cget('-filteron');
-	for (@$pool) {
+	for (@pool) {
 		my $item;
 		if ($filteron eq 'main') {
 			$item = $_;
@@ -1296,7 +1430,7 @@ sub filterRefresh {
 		}
 	}
 	delete $self->{'filter_id'};
-	$self->refresh;
+	$self->refreshPurge(0);
 }
 
 sub filterShow {
@@ -1371,18 +1505,84 @@ sub forceWidth {
 
 Returns a reference to the L<Tk::ListBrowser::Icon> object of I<$name>.
 
+=cut
+
+sub get {
+	my ($self, $name) = @_;
+	return $self->pool->get($name)
+}
+
 =item B<getAll>I<(?$name?)>
 
 Returns a list of all L<Tk::ListBrowser::Item> objects.
 
+=cut
+
+sub getAll { return $_[0]->pool->getAll }
+
+=item B<getChildren>I<(?$parent?)>
+
+Returns a list of L<Tk::ListBrowser::Item> objects that are children of I<$parent>.
+
+=cut
+
+sub getChildren {
+	my ($self, $name) = @_;
+	my $sep = quotemeta($self->cget('-separator'));
+	my $test = quotemeta($name) . $sep;
+	my @pool = $self->getAll;
+	my @r;
+	my $index = $self->index($name) + 1;
+	return @r if $index > $self->indexLast;
+	my $item = $self->getIndex($index);
+	my $nm = $item->name;
+	while ($nm =~/^$test(.*)/) {
+		push @r, $item unless $1 =~ /$sep/;
+		$index ++;
+		return @r if $index > $self->indexLast;
+		$item = $self->getIndex($index);
+		$nm = $item->name;
+	}
+	return  @r;
+}
+
 =item B<getColumn>I<($column)>
 
-Returns a reference to the L<Tk::ListBrowser::Item> object of column I<$column>.
+Returns a reference to the L<Tk::ListBrowser::SideColumn> object of column I<$column>.
 Only practical when I<-arrange> is set to 'column' or 'row'.
+
+=cut
+
+sub getColumn {
+	my ($self, $col) = @_;
+	my @hits = grep { (defined $_->column) and ($_->column eq $col) } $self->getAll;
+	return @hits
+}
 
 =item B<getIndex>I<($index)>
 
-Returns a reference to the L<Tk::ListBrowser::Item> object at index I<$index>
+Returns a reference to the L<Tk::ListBrowser::Item> object at index I<$index>.
+
+=cut
+
+sub getIndex {
+	my ($self, $index) = @_;
+	return $self->pool->getIndex($index)
+}
+
+=item B<getRoot>
+
+Returns a list of L<Tk::ListBrowser::Entry> objects that are root.
+
+=cut
+
+sub getRoot {
+	my $self = shift;
+	my @pool = $self->getAll;
+	my $sep = $self->separator;
+	$sep = quotemeta($sep);
+	return grep {  not $_->name =~ /$sep/ } @pool;
+}
 
 =item B<getRow>I<($row)>
 
@@ -1391,12 +1591,17 @@ Only practical when I<-arrange> is set to 'column' or 'row'.
 
 =cut
 
+sub getRow {
+	my ($self, $row) = @_;
+	my @hits = grep { (defined $_->row ) and ($_->row eq $row) } $self->getAll;
+	return @hits
+}
+
 sub header {
 	my $self = shift;
 	$self->{HEADER} = shift if @_;
 	return $self->{HEADER}
 }
-
 
 =item B<headerAvailable>
 
@@ -1671,9 +1876,16 @@ sub headerRemove {
 
 =item B<hide>I<($name)>
 
-Hides entry I<$name>. Call I<refresh> to see changes.
+Hides entry I<$name>. Call I<refresh> or I<refreshPurge> to see changes.
 
 =cut
+
+sub hide {
+	my ($self, $name) = @_;
+	my $a = $self->get($name);
+	return unless defined $a;
+	$a->hidden(1);
+}
 
 sub hierarchy { return $_[0]->cget('-separator') ne '' }
 
@@ -1681,13 +1893,41 @@ sub hierarchy { return $_[0]->cget('-separator') ne '' }
 
 Returns the numerical index of entry I<$name>.
 
+=cut
+
+sub index {
+	my ($self, $name) = @_;
+	return $self->pool->index($name)
+}
+
 =item B<indexColumnRow>I<($column, $row)>
 
 Returns the numerical index of the entry at I<$column>, I<$row>.
 
+=cut
+
+sub indexColumnRow {
+	my ($self, $column, $row) = @_;
+	my @pool = $self->getAll;
+	my ($index) = grep {
+		(defined $pool[$_]->column) and
+		(defined $pool[$_]->row) and
+		($pool[$_]->column eq $column) and
+		($pool[$_]->row eq $row)
+	} 0 .. @pool - 1;
+	return $index
+}
+
 =item B<indexLast>
 
 Returns the numerical index of the last entry in the list.
+
+=cut
+
+sub indexLast {
+	my $self = shift;
+	return $self->pool->indexLast
+}
 
 =item B<infoAnchor>
 
@@ -1703,37 +1943,159 @@ sub infoAnchor {
 	return undef
 }
 
+=item B<infoChildren>I<($parent)>
+
+Returns a list with the names of the children of I<$parent>.
+
+=cut
+
+sub infoChildren {
+	my ($self, $name) = @_;
+	my $sep = quotemeta($self->cget('-separator'));
+	my $test = quotemeta($name) . $sep;
+	my @pool = $self->getAll;
+	my @r;
+	my $index = $self->index($name) + 1;
+	return @r if $index > $self->indexLast;
+	my $item = $self->getIndex($index);
+	my $nm = $item->name;
+	while ($nm =~/^$test(.*)/) {
+		push @r, $nm unless $1 =~ /$sep/;
+		$index ++;
+		return @r if $index > $self->indexLast;
+		$item = $self->getIndex($index);
+		$nm = $item->name;
+	}
+	return  @r;
+}
+
 =item B<infoData>I<($name)>
 
 Returns the data associated with entry I<$name>
+
+=cut
+
+sub infoData {
+	my ($self, $name) = @_;
+	my $a = $self->get($name);
+	return $a->data if defined $a;
+	croak "Entry '$name' not found";
+	return undef
+}
 
 =item B<infoExists>I<($name)>
 
 Returns a boolean value indicating if entry I<$name> exists.
 
+=cut
+
+sub infoExists {
+	my ($self, $name) = @_;
+	return $self->pool->exist($name)
+}
+
 =item B<infoFirst>
 
 Returns the name of the first entry in the list.
+
+=cut
+
+sub infoFirst {
+	my $self = shift;
+	my $f = $self->pool->first;
+	return $f->name if defined $f;
+	return undef;
+}
 
 =item B<infoFirstVisible>
 
 Returns the name of the first entry in the list that is not hidden.
 
+=cut
+
+sub infoFirstVisible {
+	my $self = shift;
+	my @pool = $self->getAll;
+	for (@pool) {
+		return $_->name unless $_->hidden
+	}
+	return undef
+}
+
 =item B<infoHidden>I<($name)>
 
 Returns the boolean hidden state of entry I<$name>.
+
+=cut
+
+sub infoHidden {
+	my ($self, $name) = @_;
+	my $a = $self->get($name);
+	return $a->hidden if defined $a;
+	croak "Entry '$name' not found";
+	return undef
+}
 
 =item B<infoLast>
 
 Returns the name of the last entry in the list.
 
+=cut
+
+sub infoLast {
+	my $self = shift;
+	my $l = $self->pool->last;
+	return $l->name if defined $l;
+	return undef
+}
+
+sub infoLastChild {
+	my ($self, $name) = @_;
+	my @c = $self->infoChildren($name);
+	return pop @c if @c;
+	return undef
+}
+
+sub infoLastOffspring {
+	my ($self, $name) = @_;
+	my $last = $self->infoLastChild($name);
+	if (defined $last) {
+		my $lo = $self->infoLastOffspring($last);
+		return $lo if defined $lo;
+	}
+	return $last
+}
+
 =item B<infoLastVisible>
 
 Returns the name of the last entry in the list that is not hidden.
 
+=cut
+
+sub infoLastVisible {
+	my $self = shift;
+	my @pool = $self->getAll;
+	for (reverse @pool) {
+		return $_->name unless $_->hidden
+	}
+	return undef
+}
+
 =item B<infoList>
 
 Returns a list of all entry names in the list.
+
+=cut
+
+sub infoList {
+	my ($self, $flag) = shift;
+	my @pool = $self->getAll;
+	my @list;
+	for (@pool) {
+		push @list, $_->name;
+	}
+	return @list
+}
 
 =item B<infoNext>I<($name, ?$flag>?)>
 
@@ -1747,12 +2109,72 @@ or undef if I<$name> is the last peer amoung it's peers.
 In non hierarchy mode it returns the name of the next entry of
 I<$name> or undef if I<$name> is the last entry in the list.
 
+=cut
+
+sub infoNext {
+	my ($self, $name, $flag) = @_;
+	$flag = 1 unless defined $flag;
+	my $a = $self->index($name);
+	unless (defined $a) {
+		croak "Entry '$name' not found";
+		return undef
+	}
+	my $last = $self->infoLast;
+	return undef if $a eq $last;
+	if ($self->hierarchy and $flag) {
+		my $cur = $self->get($name);
+		my @c = $self->infoChildren($name);
+		if (@c) {
+			my $last = pop @c;
+			my $li = $self->index($last);
+			$a = $li if $li < $self->infoSize;
+		}
+	}
+	return undef if $a eq $self->indexLast;
+	return $self->getIndex($a + 1)->name;
+}
+
 =item B<infoNextVisible>I<($name)>
 
 Returns the name of the first next entry of I<$name> that is not hidden.
 Returns undef if I<$name> is the last entry in the list.
 
-=item B<infoPev>I<($name)>
+=cut
+
+sub infoNextVisible {
+	my ($self, $name) = @_;
+	my @pool = $self->getAll;
+	my $a = $self->index($name);
+	unless (defined $a) {
+		croak "Entry '$name' not found";
+		return
+	}
+	for ($a .. @pool - 1) {
+		return $pool[$_]->name if $pool[$_]->ismapped
+	}
+	return undef
+}
+
+=item B<infoParent>I<($name)>
+
+Returns the name of parent of I<$name>. Returns undef
+if no parent is found.
+
+=cut
+
+sub infoParent {
+	my ($self, $name) = @_;
+	unless ($self->infoExists($name)) {
+		croak "Entry '$name' does not exist";
+		return
+	}
+	my $parent = $self->decodeParent($name);
+	return undef unless defined $parent;
+	return $parent if $self->infoExists($parent);
+	return undef
+}
+
+=item B<infoPev>I<($name, ?$flag?)>
 
 The parameter I<$flag> is only usefull in hierarchy mode.
 By default it is set to true. You can overwrite that by
@@ -1764,10 +2186,70 @@ or undef if I<$name> is the first peer amoung it's peers.
 In non hierarchy mode it returns the name of the previous entry of
 I<$name> or undef if I<$name> is the first entry in the list.
 
+=cut
+
+sub infoPrev {
+	my ($self, $name, $flag) = @_;
+	$flag = 1 unless defined $flag;
+	my @pool = $self->getAll;
+	my $a = $self->index($name);
+	unless (defined $a) {
+		croak "Entry '$name' not found";
+		return
+	}
+	return undef if $a eq 0;
+	if ($self->hierarchy and $flag) {
+		my $cur = $self->get($name);
+		my @c = $self->infoChildren($name);
+		if (@c) {
+			my $first = shift @c;
+			my $fi = $self->index($first);
+			$a = $fi;
+		}
+	}
+	return undef if $a eq 0;
+	return $self->getIndex($a - 1)->name;
+}
+
 =item B<infoPrevVisible>I<($name)>
 
 Returns the name of the first previous entry of I<$name> that is not hidden.
 Returns undef if I<$name> is the first entry in the list.
+
+=cut
+
+sub infoPrevVisible {
+	my ($self, $name) = @_;
+	my @pool = $self->getAll;
+	my $a = $self->index($name);
+	unless (defined $a) {
+		croak "Entry '$name' not found";
+		return
+	}
+	for (reverse 0 .. $a) {
+		return $pool[$_]->name if $pool[$_]->ismapped
+	}
+	return undef
+}
+
+=item B<infoRoot>
+
+Returns a list of root entry names.
+
+=cut
+
+sub infoRoot {
+	my $self = shift;
+	my @pool = $self->getAll;
+	my $sep = $self->cget('-separator');
+	$sep = quotemeta($sep);
+	my @root;
+	for (@pool) {
+		my $name = $_->name;
+		push @root, $name unless $name =~ /$sep/;
+	}
+	return @root
+}
 
 =item B<infoSelection>
 
@@ -1776,6 +2258,8 @@ Same as I<selectionGet>.
 =cut
 
 sub infoSelection {	return $_[0]->selectionGet }
+
+sub infoSize {	return $_[0]->pool->size }
 
 sub indent {
 	my $self = shift;
@@ -1787,7 +2271,14 @@ sub initem {
 	my ($self, $x, $y) = @_;
 	$x = int($self->canvasx($x));
 	$y = int($self->canvasy($y));
-	return $self->data->initem($x, $y)
+	my @pool = $self->getAll;
+	for (@pool) {
+		if ($_->inregion($x, $y)) {
+			return $_;
+		}
+
+	}
+	return undef
 }
 
 =item B<itemCget>I<($name, $column, $option)>
@@ -1901,13 +2392,9 @@ sub itemRemove {
 	$col->itemRemove($entry)
 }
 
-sub KeyArrowSet {
-}
-
 sub KeyArrowNavig {
 	my ($self, $dcol, $drow) = @_;
 	return undef if $self->anchorInitialize;
-	my $pool = $self->data->pool;
 	my $i = $self->anchorGet;
 	my $target;
 	if ($drow eq 0) { #horizontal move
@@ -1920,14 +2407,18 @@ sub KeyArrowNavig {
 				my @ch = $self->infoChildren($a->name);
 				if ($dcol eq 1) { #move to the right
 					if ((! $a->opened) and (@ch)) {
-						$self->open($a->name);
-						$self->refresh;
+						my $nm = $a->name;
+						my $i = $self->index($nm);
+						$self->open($nm);
+						$self->refreshPurge($i, 1);
 						$flag = '';
 					}
 				} else { #move to the left
 					if (($a->opened) and (@ch)) {
-						$self->close($a->name);
-						$self->refresh;
+						my $nm = $a->name;
+						my $i = $self->index($nm);
+						$self->close($nm);
+						$self->refreshPurge($i, 1);
 						$flag = '';
 					} else {
 						if (my $parent = $self->infoParent($a->name)) {
@@ -2001,7 +2492,7 @@ sub KeyLastColumn {
 		while ((not $flag) and ($col >= 0)) {
 			$col --;
 			my $index = $self->indexColumnRow($col, $row);
-			my $name = $self->data->pool->[$index]->name;
+			my $name = $self->getIndex($index)->name;
 			$flag = $self->anchorSet($name);
 			$self->see($name) if $flag;
 		}
@@ -2010,9 +2501,9 @@ sub KeyLastColumn {
 
 sub KeyPress {
 	my ($self, $key) = @_;
-	my $pool = $self->data->pool;
+	my @pool = $self->getAll;
 	my $h = $self->_handler;
-	return unless @$pool;
+	return unless @pool;
 
 	if ($key eq 'Return') {
 		return if $self->anchorInitialize;
@@ -2045,7 +2536,7 @@ sub KeyPress {
 	if ($key eq 'Control-End') {
 		my $name = $self->infoLastVisible;
 		$self->see($name);
-		$self->after(50, sub { $self->anchorSet($name) });
+#		$self->after(50, sub { $self->anchorSet($name) });
 		return
 	}
 	if ($key eq 'Home') {
@@ -2053,7 +2544,7 @@ sub KeyPress {
 		my $i = $self->anchorGet;
 		my $row = $i->row;
 		my $index = $self->indexColumnRow(0, $row);
-		my $name = $pool->[$index]->name;
+		my $name = $pool[$index]->name;
 		$self->anchorSet($name);
 		$self->see($name);
 		return
@@ -2164,7 +2655,6 @@ Returns the number of the last column in I<$row>.
 
 sub lastColumnInRow {
 	my ($self, $row) = @_;
-	my $pool = $self->data->pool;
 	my @row = $self->getRow($row);
 	return $row[@row - 1]->column;
 }
@@ -2174,6 +2664,12 @@ sub lastColumnInRow {
 Returns the number of the last row in I<$column>.
 
 =cut
+
+sub lastRowInColumn {
+	my ($self, $column) = @_;
+	my @column = $self->getColumn($column);
+	return $column[@column - 1]->row;
+}
 
 sub listMode {
 	my $self = shift;
@@ -2281,7 +2777,7 @@ sub OnConfigureTimer {
 
 =item B<open>I<($name)>
 
-Shows all children of I<$name>.
+Shows all children of I<$name>. Call I<refresh> or I<refreshPurge> to see your changes.
 
 =cut
 
@@ -2295,6 +2791,38 @@ sub open {
 	$i->opened(1);
 }
 
+=item B<openAll>
+
+Opens all entries.
+
+=cut
+
+sub openAll {
+	my $self = shift;
+	my @list = $self->infoList;
+	for (@list) {
+		$self->open($_) if $self->infoChildren($_);
+	}
+}
+
+sub pool {
+	my $self = shift;
+	$self->{POOL} = shift if @_;
+	return $self->{POOL}
+}
+
+sub priorityMax {
+	my $self = shift;
+	$self->{PRIORITYMAX} = shift if @_;
+	return $self->{PRIORITYMAX}
+}
+
+sub prioritySet {
+	my ($self, $priority) = @_;
+	my $max = $self->priorityMax;
+	$self->priorityMax($priority) if $max < $priority;
+}
+
 =item B<refresh>
 
 Clears the canvas and rebuilds it. Call this method after you are done making changes.
@@ -2306,14 +2834,137 @@ sub refresh {
 
 	my @sel = $self->selectionGet;
 	my $anch = $self->anchorGet;
+	$self->refreshSaveView;
 
 	$self->_handler->refresh;
 
+	$self->refreshRestoreView;
 	for (@sel) {
 		$self->selectionSet($_)
 	}
 	$self->anchorSet($anch) if defined $anch;
 }
+
+sub refreshLoop {
+	my $self = shift;
+	my $handler = $self->_handler;
+	my $epc = $self->cget('-refreshentriespercycle');
+	for (1 .. $epc) {
+		my $pos = $self->refreshPos;
+		if ($pos <= $self->indexLast) {
+			$self->refreshLoopActive(1);
+			my $entry = $self->getIndex($pos);
+			unless (($entry->hidden) or (not $entry->openedparent)) {
+				my @params = $self->refreshParams;
+				my $entry = $self->getIndex($pos);
+				$handler->draw($entry, @params);
+				@params = $handler->nextPosition(@params);
+				$self->refreshParams(@params);
+			}
+			$pos ++;
+			$self->refreshPos($pos);
+		} else {
+			my ($mx, $my) = $handler->maxXY;
+			my $last = $self->infoLastVisible;
+			if (defined $last) {
+				my @region = $self->get($last)->region;
+				$my = $region[3] + $self->cget('-marginbottom') + 1;
+			}
+			$self->configure(-scrollregion => [0, 0, $mx, $my]);
+			$self->refreshLoopActive(0);
+			$self->refreshRestoreView;
+		}
+		last unless $self->refreshLoopActive;
+	}
+	$self->after($self->cget('-refreshinterval'), ['refreshLoop', $self]) if $self->refreshLoopActive;
+}
+
+sub refreshLoopActive {
+	my $self = shift;
+	$self->{REFRESHLOOPACTIVE} = shift if @_;
+	return $self->{REFRESHLOOPACTIVE}
+}
+
+sub refreshParams {
+	my $self = shift;
+	$self->{REFRESHPAR} = [@_] if @_;
+	my $p = $self->{REFRESHPAR};
+	return @$p
+}
+
+sub refreshPos {
+	my $self = shift;
+	$self->{REFRESHPOS} = shift if @_;
+	return $self->{REFRESHPOS}
+}
+
+=item B<refreshPurge>I<(?$index?, ?$nosave?)>
+
+Same as refresh, but does not calculate cell sizes. Can be used after
+an initializing call to I<refresh> has been made. If you specify I<$index>
+the refresh is done from the entry at the index, going downward. It is
+operated in a background job cycle, so it is non blocking.
+
+if the I<$nosave> flag is set, the xview and yview of the canvas are not saved
+before the refresh starts.
+
+=cut
+
+sub refreshPurge {
+	my ($self, $index, $nosave) = @_;
+	$index = 0 unless defined $index;
+	$nosave = 0 unless defined $nosave;
+	if ($nosave) {
+		$self->refreshView(undef, undef);
+	} else {
+		$self->refreshSaveView;
+	}
+
+	#clear from index
+	for ($index .. $self->indexLast) {
+		my $entry = $self->getIndex($_);
+		$entry->clear;
+	}
+
+	my $handler = $self->_handler;
+	my $entry = $self->getIndex($index);
+	my ($x, $y) = $handler->startXY;
+	my @params = ($x, $y, 0 , 0);
+	my $prev = $self->infoPrevVisible($entry->name);
+	if (defined $prev) {
+		my $p = $self->get($prev);
+		@params = ($p->rectX, $p->rectY, $p->column, $p->row);
+		@params = $handler->nextPosition(@params);
+		$params[0] = $x if $self->listMode;
+	}
+	$self->refreshParams(@params);
+	$self->refreshPos($index);
+	$self->after($self->cget('-refreshinterval'), ['refreshLoop', $self]) unless $self->refreshLoopActive;
+}
+
+sub refreshRestoreView {
+	my $self = shift;
+	my $c = $self->Subwidget('Canvas');
+	my ($xview, $yview) = $self->refreshView;
+	$c->xview(moveto => $xview) if defined $xview;
+	$c->yview(moveto => $yview) if defined $yview;
+}
+
+sub refreshSaveView {
+	my $self = shift;
+	my $c = $self->Subwidget('Canvas');
+	my ($xview) = $c->xview;
+	my ($yview) = $c->yview;
+	$self->refreshView($xview, $yview);
+}
+
+sub refreshView {
+	my $self = shift;
+	$self->{REFRESHVIEW} = [@_] if @_;
+	my $v = $self->{REFRESHVIEW};
+	return @$v
+}
+
 
 =item B<see>I<($name)>
 
@@ -2365,15 +3016,68 @@ sub see {
 
 Selects all entries.
 
+=cut
+
+sub selectAll {
+	my $self = shift;
+	return if $self->cget('-selectmode') eq 'single';
+	my @pool = $self->getAll;
+	grep { $_->select } @pool;
+}
+
 =item B<selectionClear>
 
 Clears the entire selection.
+
+=cut
+
+sub selectionClear {
+	my $self = shift;
+	my @pool = $self->getAll;
+	grep { $_->select(0) } @pool;
+}
+
+sub selectionFlip {
+	my ($self, $begin, $end) = @_;
+	($begin, $end) = $self->selectionIndex($begin, $end);
+	for ($begin .. $end) {
+		my $i = $self->getIndex($_);
+		if ($i->selected) {
+			$self->selectionClear if $self->cget('-selectmode') eq 'single';
+			$i->select(0);
+		} else {
+			$self->selectionClear if $self->cget('-selectmode') eq 'single';
+			$i->select;
+		}
+	}
+}
 
 =item B<selectionGet>
 
 Returns a list of entry names contained in the selection.
 
 =cut
+
+sub selectionGet {
+	my $self = shift;
+	my @list;
+	my @pool = $self->getAll;
+	for (@pool) { push @list, $_->name  if $_->selected }
+	return @list;
+}
+
+sub selectionIndex {
+	my ($self, $begin, $end) = @_;
+	$end = $begin unless defined $end;
+	$begin = $self->index($begin);
+	$end = $self->index($end);
+	if ($begin > $end) {
+		my $t = $begin;
+		$begin = $end;
+		$end = $t;
+	}
+	return ($begin, $end)
+}
 
 sub selectionRefresh {
 	my $self = shift;
@@ -2383,21 +3087,67 @@ sub selectionRefresh {
 		$i->drawSelect;
 	}
 }
+
 =item B<selectionSet>I<($begin, ?$end?)>
 
 Selects entry I<$begin>. If you specify I<$end> the
 range from I<$begin> to I<$end> will be selected.
+
+=cut
+
+sub selectionSet {
+	my ($self, $begin, $end) = @_;
+	if ($self->cget('-selectmode') eq 'single') {
+		$self->selectionSingle($begin);
+	} else {
+		($begin, $end) = $self->selectionIndex($begin, $end);
+		my @pool = $self->getAll;
+		for ($begin .. $end) {
+			my $i = $pool[$_];
+			$i->select(1) unless $i->hidden or (not $i->openedparent);
+		}
+	}
+}
+
+sub selectionSingle {
+	my ($self, $name) = @_;
+	my $index = $self->index($name);
+	$self->selectionClear;
+	$self->getIndex($index)->select(1);
+}
 
 =item B<selectionUnSet>I<($begin, $end)>
 
 Clears the selection of entry I<$begin>. If you specify I<$end> the
 range from I<$begin> to I<$end> will be cleared from the selection.
 
+=cut
+
+sub selectionUnSet {
+	my ($self, $begin, $end) = @_;
+	$end = $begin unless defined $end;
+	($begin, $end) = $self->selectionIndex($begin, $end);
+	my @pool = $self->getAll;
+	for ($begin .. $end) {
+		my $i = $pool[$_];
+		$i->select(0) unless $i->hidden;
+	}
+}
+
+sub separator {	return $_[0]->cget('-separator') }
+
 =item B<show>I<($name)>
 
 Shows entry I<$name>. Call I<refresh> to see changes.
 
 =cut
+
+sub show {
+	my ($self, $name) = @_;
+	my $a = $self->get($name);
+	return unless defined $a;
+	$a->hidden(0);
+}
 
 sub sortActive {
 	my $self = shift;
@@ -2481,23 +3231,26 @@ to specify how to sort or configure the options I<-sorton> and I<sortorder>.
 
 sub sortList {
 	my $self = shift;
-	my @sorted;
+	my $sorted = new Tk::ListBrowser::HashList;
 	$self->clear;
-	my $pool = $self->data->pool;
-	if ($self->hierarchy) {
-		my @root = $self->infoRoot;
-		my @sr;
-		for (@root) {
-			push @sr, $self->get($_)
-		}
-		@sr = $self->sortArray(@sr);
-		for (@sr) {
-			push @sorted, $self->sortRecursive($_);
+ 	if ($self->hierarchy) {
+		my @root = $self->getRoot;
+		for (reverse 0 .. $self->priorityMax) {
+			my $pr = $_;
+			my @p = grep { $_->priority eq $pr} @root;
+			@p = $self->sortArray(@p);
+			for (@p) { $self->sortRecursive($_, $sorted) }
 		}
 	} else {
-		@sorted = $self->sortArray(@$pool);
+		my @all = $self->getAll;
+		for (reverse 0 .. $self->priorityMax) {
+			my $pr = $_;
+			my @p = grep { $_->priority eq $pr} @all;
+			@p = $self->sortArray(@p);
+			for (@p) { $sorted->add($_) }
+		}
 	}
-	$self->data->pool(\@sorted);
+	$self->pool($sorted);
 	$self->refresh;
 }
 
@@ -2528,23 +3281,18 @@ sub sortMode {
 }
 
 sub sortRecursive {
-	my ($self, $item) = @_;
-	my @sorted;
-	push @sorted, $item;
-	my @children = $self->infoChildren($item->name);
-	if (@children) {
-		my @sr;
-		for (@children) {
-			push @sr, $self->get($_)
-		}
-		@sr = $self->sortArray(@sr);
-		for (@sr) {
-			my $i = $_;
-			push @sorted, $self->sortRecursive($_);
+	my ($self, $item, $sorted) = @_;
+	$sorted->add($item);
+	my @children = $self->getChildren($item->name);
+	for (reverse 0 .. $self->priorityMax) {
+		my $pr = $_;
+		my @p = grep { $_->priority eq $pr} @children;
+		@p = $self->sortArray(@p);
+		for (@p) {
+			$self->sortRecursive($_, $sorted)
 		}
 	}
-
-	return @sorted
+	return $sorted
 }
 
 sub wraplength {
@@ -2608,6 +3356,8 @@ If you find any bugs, please report them here: L<https://github.com/haje61/Tk-Li
 =head1 SEE ALSO
 
 =over 4
+
+=item L<Tk::ListBrowser::Entry>
 
 =item L<Tk::ListBrowser::Item>
 

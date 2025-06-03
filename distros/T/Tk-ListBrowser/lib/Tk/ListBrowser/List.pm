@@ -2,7 +2,7 @@ package Tk::ListBrowser::List;
 
 =head1 NAME
 
-Tk::ListBrowser - Tk::ListBrowser::List - List organizer for Tk::ListBrowser.
+Tk::ListBrowser::List - List organizer for Tk::ListBrowser.
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION = 0.04;
+$VERSION = 0.09;
 
 use base qw(Tk::ListBrowser::Row);
 
@@ -61,11 +61,11 @@ sub initColumns {
 		$self->startXY($self->SUPER::startXY);
 	}
 
-	my $pool = $self->listbrowser->data->pool;
+	my @pool = $self->listbrowser->getAll;
 	my ($x, $y) = $self->startXY;
 	my $rows = 0;
-	for (@$pool) {
-		$rows ++ unless $_->hidden
+	for (@pool) {
+		$rows ++ unless ($_->hidden) or (not $_->openedparent)
 	}
 	my $maxy = $y + ($rows * ($self->cellHeight + 1));
 

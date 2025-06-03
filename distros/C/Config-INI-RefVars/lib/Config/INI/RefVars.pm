@@ -9,7 +9,7 @@ use feature ":5.10";
 use Config;
 use File::Spec::Functions qw(catdir rel2abs splitpath);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use constant DFLT_TOCOPY_SECTION  => "__TOCOPY__";
 
@@ -522,7 +522,7 @@ Config::INI::RefVars - INI file reader that supports make-style variable referen
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 SYNOPSIS
 
@@ -1293,7 +1293,7 @@ The constructor takes the following optional named arguments:
 
 =item C<cmnt_vl>
 
-Optional, a Boolean value. If this value is set to I<true>, comments are
+Optional, a boolean value. If this value is set to I<true>, comments are
 permitted in variable lines. The comment character is a semicolon preceded by
 one or more spaces.
 

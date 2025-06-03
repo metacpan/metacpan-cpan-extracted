@@ -188,7 +188,7 @@ sub generate_dnssec_keydata {
             flags       => int($key->[0]),
             protocol    => int($key->[1]),
             algorithm   => int($key->[2]),
-            publicKey   => int($key->[3]),
+            publicKey   => $key->[3],
         });
     }
 
@@ -272,8 +272,10 @@ sub generate_entity {
         roles           => $roles,
     };
 
-    if (my $cinfo = $self->epp->contact_info($handle)) {
-        $entity->{vcardArray} = $self->generate_vcardArray($cinfo);
+    if (1 < scalar(@{$roles}) || q{registrar} ne $roles->[0]) {
+        if (my $cinfo = $self->epp->contact_info($handle)) {
+            $entity->{vcardArray} = $self->generate_vcardArray($cinfo);
+        }
     }
 
     return $entity;
@@ -399,7 +401,7 @@ Net::RDAP::Server::EPPBackend - an RDAP server that retrieves registration data 
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -458,7 +460,7 @@ Gavin Brown <gavin.brown@fastmail.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Gavin Brown.
+This software is copyright (c) 2025 by Gavin Brown.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

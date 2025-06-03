@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::MySQL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for MySQL-specific code
 use version;
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.1.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -113,12 +113,11 @@ sub create_table_sql {
 
     my $table_name_quote = $self->dbh->quote_identifier($table_name);
 
-    my $create_sql;
-    $self->dbh_runner(run => set_subname '_create_table_sql', sub {
-        $create_sql = $_->selectrow_hashref("SHOW CREATE TABLE $table_name_quote")->{'Create Table'};
+    return $self->dbh_runner(run => set_subname '_create_table_sql', sub {
+        # SHOW CREATE TABLE reports two columns, so might as well pull it out by name
+        local $_->{FetchHashKeyName} = 'NAME_uc';
+        $_->selectrow_hashref("SHOW CREATE TABLE $table_name_quote")->{'CREATE TABLE'};
     });
-
-    return $create_sql;
 }
 
 sub rename_fks_in_table_sql {
@@ -262,7 +261,7 @@ sub get_trigger_data {
 
     # Look for anything that isn't a leftover OnlineDDL trigger name.
     $self->dbh_runner(run => set_subname '_non_onlineddl_triggers_on_table', sub {
-        $_->{FetchHashKeyName} = 'NAME_lc';
+        local $_->{FetchHashKeyName} = 'NAME_lc';
         $self->vars->{existing_triggers} = $_->selectall_hashref(
             'SELECT * FROM information_schema.triggers WHERE '.join(' AND ',
                 'event_object_schema = DATABASE()',
@@ -348,6 +347,7 @@ EOF
     }
     $sql .= "\nORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION";
 
+    # NOTE: This FetchHashKeyName setting is consistent with how DBI's *_info methods column names work.
     local $dbh->{FetchHashKeyName} = 'NAME_uc';
     my $sth = $dbh->prepare($sql);
     $sth->execute(@bind);
@@ -478,7 +478,7 @@ DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific cod
 
 =head1 VERSION
 
-version v1.1.0
+version v1.1.1
 
 =head1 DESCRIPTION
 

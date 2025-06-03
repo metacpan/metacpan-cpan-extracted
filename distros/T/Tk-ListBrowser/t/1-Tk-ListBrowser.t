@@ -12,9 +12,9 @@ BEGIN {
 	use_ok('Tk::ListBrowser::Bar');
 	use_ok('Tk::ListBrowser::BaseItem');
 	use_ok('Tk::ListBrowser::Column');
-	use_ok('Tk::ListBrowser::Data');
 	use_ok('Tk::ListBrowser::Entry');
 	use_ok('Tk::ListBrowser::FilterEntry');
+	use_ok('Tk::ListBrowser::HashList');
 	use_ok('Tk::ListBrowser::HList');
 	use_ok('Tk::ListBrowser::Item');
 	use_ok('Tk::ListBrowser::LBCanvas');
@@ -47,7 +47,7 @@ my $ib;
 my $item;
 my $image;
 my $handler;
-my $data;
+
 if (defined $app) {
 #	$app->DynaMouseWheelBind('Tk::ListBrowser::LBCanvas');
 	$image = $app->Photo(
@@ -89,7 +89,6 @@ if (defined $app) {
 	)->pack(-expand =>1, -fill => 'both');
 	$item = $ib->add('miny', -image => $image);
 	$handler = $ib->{HANDLER};
-	$data = Tk::ListBrowser::Data->new($ib);
 	my $bf = $app->LabFrame(
 		-label => 'Tools',
 		-labelside => 'acrosstop',
@@ -262,60 +261,58 @@ if (defined $app) {
 	pause(200);
 }
 
-testaccessors($data, qw/pool opened/);
 testaccessors($ib, qw/cellHeight cellImageHeight cellImageWidth
-	cellTextHeight cellTextWidth cellWidth forceWidth header listWidth sortActive/);
+	cellTextHeight cellTextWidth cellWidth forceWidth header listWidth
+	pool priorityMax refreshLoopActive refreshPos/);
 testaccessors($item, qw/background cguideH cguideV cimage cindicator column cimage 
-	crect	ctext data font foreground hidden imageX imageY itemtype opened owner rectX
-	rectY row textanchor textjustify textside textX textY/);
+	crect	ctext data font foreground hidden imageX imageY itemtype opened owner priority 
+	rectX	rectY row textanchor textjustify textside textX textY/);
 testaccessors($handler, qw/cellHeight cellImageHeight cellImageWidth 
 	cellTextHeight cellTextWidth cellWidth/);
 
 push @tests, (
 	[ sub { return defined $ib }, 1, 'ListBrowser widget created' ],
 	[ sub { return defined $handler }, 1, 'Tk::ListBrowser::Row created' ],
-	[ sub { return defined $data }, 1, 'Tk::ListBrowser::Data created' ],
 	[ sub {
-		$data->add('miny', -image => $image);
-		$data->add('inny', -image => $image, -before => 'miny');
-		$data->add('minny', -image => $image, -after => 'inny');
-		$data->add('mo', -image => $image);
-		my @l = $data->infoList;
-		return \@l
-	}, [qw/inny minny miny mo/], 'data add / list' ],
-	[ sub {
-		my $t = $data->get('miny');
+		my $t = $ib->get('miny');
 		return $t->name
 	}, 'miny', 'data get' ],
 	[ sub {
-		return $data->exists('miny');
+		return $ib->infoExists('miny');
 	}, 1, 'data exists' ],
 	[ sub {
-		return $data->exists('humptydumpty');
+		return $ib->infoExists('humptydumpty');
 	}, '', 'data no exists' ],
 	[ sub {
-		my $t = $data->get('miny');
+		my $t = $ib->get('miny');
 		return $t->name
 	}, 'miny', 'get' ],
 	[ sub {
-		my @all = $data->getAll;
+		my @all = $ib->getAll;
 		my $size = @all;
 		return $size
-	}, 4, 'getAll' ],
+	}, 1, 'getAll' ],
 	[ sub {
-		return $data->index('mo');
-		}, 3, 'index' ],
+		return $ib->index('miny');
+		}, 0, 'index' ],
 	[ sub {
-		$data->itemConfigure('miny', -data => 'new data');
-		return $data->itemCget('miny', '-data');
-	}, 'new data', 'data itemConfigure / itemCget' ],
+		$ib->entryConfigure('miny', -data => 'new data');
+		return $ib->entryCget('miny', '-data');
+	}, 'new data', 'data entryConfigure / itemCget' ],
 	[ sub {
-		$data->delete('miny');
-		return $data->exists('miny');
+		my @p = $ib->getAll;
+#		for (@p) {	print $_->name, "\n" }
+#		print "\n";
+#		my $i = $data->{INDEX};
+#		for (sort keys %$i) { print "$_ => ", $i->{$_}, "\n" }
+#		print "\n";
+		$ib->delete('miny');
+		return $ib->infoExists('miny');
 	}, '', 'data delete' ],
 
 
 	[ sub {
+		$ib->add('miny', -image => $image);
 		$ib->add('inny', -image => $image, -before => 'miny');
 		$ib->add('minny', -image => $image, -after => 'inny');
 		$ib->add('mo', -image => $image);
@@ -344,6 +341,7 @@ push @tests, (
 	}, [], 'deleteAll' ],
 
 	[ sub {
+		my $start = time;
 		for (@images) {
 			my $text = $_;
 			$ib->add($_,
@@ -369,8 +367,12 @@ push @tests, (
 				);
 			}
 		}
+		my $finish = time;
+		my $duration = $finish - $start;
 		my @l = $ib->infoList;
 		my $size = @l;
+		my $rate = $size / $duration;
+		print "It took $duration seconds to load $size entries. This is $rate entries per second\n";
 		return $size
 	}, 744, 'load' ],
 	[ sub {
@@ -415,7 +417,7 @@ push @tests, (
 	[ sub {
 		$ib->show('arrow-down.png');
 		return $ib->infoHidden('arrow-down.png');
-	}, '', 'show / infoHidden shown' ],
+	}, '0', 'show / infoHidden shown' ],
 	[ sub {
 		return $ib->infoLast;
 	}, 'system-file-manager.png60', 'infoLast' ],

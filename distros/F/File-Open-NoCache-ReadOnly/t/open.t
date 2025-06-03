@@ -37,7 +37,7 @@ OPEN: {
 
 	diag('Ignore usage messages');
 
-	ok(!defined(File::Open::NoCache::ReadOnly->new()));
+	throws_ok { File::Open::NoCache::ReadOnly->new() } qr/Usage/, 'new() throws error with no arguments';
 }
 
 sub IO::AIO::fadvise($$$$)

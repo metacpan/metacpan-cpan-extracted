@@ -19,6 +19,7 @@ t/55_tied.t
 t/56_objects.t
 t/57_numeric_show.t
 t/58_addrvis.t
+t/59_addrvis_threads.t
 t/80_random.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

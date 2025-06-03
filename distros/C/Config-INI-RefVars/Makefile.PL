@@ -24,6 +24,17 @@ my %WriteMakefileArgs = (
         'File::Spec::Functions' => 0,
         'Config' => 0,
     },
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        dynamic_config => 0,
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/AAHAZRED/perl-Config-INI-RefVars.git',
+                web  => 'https://github.com/AAHAZRED/perl-Config-INI-RefVars',
+            },
+        },
+    },
     TEST_REQUIRES => {
         'strict' => 0,
         'warnings' => 0,

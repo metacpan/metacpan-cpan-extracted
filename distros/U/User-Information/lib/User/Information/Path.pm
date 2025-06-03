@@ -19,7 +19,7 @@ use User::Information;
 
 use Carp;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_registered;
 
@@ -122,7 +122,7 @@ User::Information::Path - generic module for extracting information from user ac
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

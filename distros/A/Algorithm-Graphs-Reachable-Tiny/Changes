@@ -1,5 +1,7 @@
 Revision history for Algorithm-Graphs-Reachable-Tiny
 
+0.11  2025/06/02
+    - Minor change in POD.
 
 0.10  2025/01/19
     - Corrected Changelog.

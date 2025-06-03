@@ -155,9 +155,9 @@ sub import {
   use Path::Tiny 0.146 ();
   Path::Tiny->import::into($target, qw/path/);
 
-  require List::Util;
-  List::Util->import::into($target, qw/reduce min max first any all none sum0/);
-
+  require List::AllUtils;
+  List::AllUtils->import::into($target,
+    qw/reduce min max first firstidx any all none sum0/);
 
 
   require Scalar::Util;

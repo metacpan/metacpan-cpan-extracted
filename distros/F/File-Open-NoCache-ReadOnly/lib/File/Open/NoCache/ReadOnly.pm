@@ -13,6 +13,7 @@ use strict;
 use warnings;
 use Carp;
 use IO::AIO;
+use Params::Get;
 use Scalar::Util;
 
 =head1 NAME
@@ -21,11 +22,11 @@ File::Open::NoCache::ReadOnly - Open a file and flush from memory on closing
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 DESCRIPTION
 
@@ -61,23 +62,10 @@ sub new {
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %params;
-	if(@_ == 1) {
-		if(ref($_[0]) eq 'HASH') {
-			# If the first argument is a hash reference, dereference it
-			%params = %{$_[0]};
-		} else {
-			$params{'filename'} = shift;
-		}
-	} elsif((scalar(@_) % 2) == 0) {
-		%params = @_;
-	} elsif(ref($_[0]) || !defined($_[0])) {
-		Carp::carp('Usage: ', __PACKAGE__, '->new(%params)');
-		return;
-	}
+	my $params = Params::Get::get_params('filename', @_);
 
 	if(!defined($class)) {
-		if((scalar keys %params) > 0) {
+		if((scalar keys %{$params}) > 0) {
 			# Using File::Open::NoCache::ReadOnly:new(), not File::Open::NoCache::ReadOnly->new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
@@ -87,16 +75,16 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %params }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	# Open file if filename is provided
-	if(my $filename = $params{'filename'}) {
+	if(my $filename = $params->{'filename'}) {
 		if(open(my $fd, '<', $filename)) {
 			IO::AIO::fadvise($fd, 0, 0, IO::AIO::FADV_SEQUENTIAL|IO::AIO::FADV_NOREUSE|IO::AIO::FADV_DONTNEED);
 			return bless { filename => $filename, fd => $fd }, $class;
 		}
-		if($params{'fatal'}) {
+		if($params->{'fatal'}) {
 			Carp::croak("$filename: $!");
 		}
 		Carp::carp("$filename: $!");
@@ -120,6 +108,19 @@ sub fd {
 	my $self = shift;
 
 	return $self->{'fd'};
+}
+
+=head2 readline
+
+Read a line from the file
+
+=cut
+
+sub readline {
+	my $self = shift;
+	my $fd = $self->{'fd'};
+
+	return <$fd>
 }
 
 =head2	close

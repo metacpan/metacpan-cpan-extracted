@@ -1,0 +1,71 @@
+{
+   "abstract" : "INI file reader that supports make-style variable references and multiple assignment operators.",
+   "author" : [
+      "Abdul al Hazred <451@gmx.eu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-INI-RefVars",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "File::Spec::Functions" : "0",
+            "constant" : "0",
+            "feature" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "TAP::Harness" : "3.26",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98",
+            "Test::Simple" : "0.98",
+            "Test::Warn" : "0.37",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/AAHAZRED/perl-Config-INI-RefVars.git",
+         "web" : "https://github.com/AAHAZRED/perl-Config-INI-RefVars"
+      }
+   },
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

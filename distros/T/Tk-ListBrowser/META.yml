@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/haje61/Tk-ListBrowser/issues
   repository: git://github.com/haje61/Tk-ListBrowser.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -41,6 +41,7 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'IO::AIO' => 0,
+		'Params::Get' => 0,
 		'Scalar::Util' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'File-Open-NoCache-ReadOnly-*' },

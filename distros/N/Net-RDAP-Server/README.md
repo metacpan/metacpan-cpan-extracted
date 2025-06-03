@@ -4,7 +4,7 @@ Net::RDAP::Server - an RDAP server framework.
 
 # VERSION
 
-version 0.01
+version 0.05
 
 # SYNOPSIS
 
@@ -15,10 +15,10 @@ version 0.01
     #
     # Set request handlers for the types we want to support.
     #
-    $server->set_handler('GET',  'help',   \&get_help);
-    $server->set_handler('HEAD', 'help',   \&head_help);
-    $server->set_handler('GET',  'domain', \&get_domain);
-    $server->set_handler('HEAD', 'domain', \&head_domain);
+    $server->set_handler(GET  => 'help',   \&get_help);
+    $server->set_handler(HEAD => 'help',   \&head_help);
+    $server->set_handler(GET  => 'domain', \&get_domain);
+    $server->set_handler(HEAD => 'domain', \&head_domain);
 
     #
     # Run the server (on localhost:8080 by default).
@@ -119,13 +119,18 @@ requests plus one or more object types.
 The callback will be passed a [Net::RDAP::Server::Response](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AServer%3A%3AResponse) that it must then
 manipulate in order to produce the desired response.
 
+# SEE ALSO
+
+- [Net::RDAP::Server::EPPBackend](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AServer%3A%3AEPPBackend) - an RDAP server that retrieves
+registration data from an EPP server.
+
 # AUTHOR
 
 Gavin Brown <gavin.brown@fastmail.uk>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Gavin Brown.
+This software is copyright (c) 2025 by Gavin Brown.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -135,6 +135,7 @@ push @tests, (
 		return defined $ib
 	}, 1, 'ListBrowser widget created' ],
 	[ sub {
+		my $start = time;
 		for (@images) {
 			my $text = $_;
 			$ib->add($_,
@@ -146,11 +147,29 @@ push @tests, (
 				),
 			);
 		}
-		$ib->refresh;
+		for (0 ..60) {
+			my $num = $_;
+			for (@images) {
+				my $text = $_;
+				$ib->add("$_$num",
+					-data => "DATA$text",
+					-text => "$text$num",
+					-image => $ib->Photo(
+						-file => "t/icons/$_",
+						-format => 'png',
+					),
+				);
+			}
+		}
+		my $finish = time;
+		my $duration = $finish - $start;
 		my @l = $ib->infoList;
 		my $size = @l;
+		my $rate = $size / $duration;
+		print "It took $duration seconds to load $size entries. This is $rate entries per second\n";
+		$ib->refresh;
 		return $size
-	}, 12, 'refresh' ],
+	}, 744, 'refresh' ],
 	[ sub {
 		my @l = $ib->columnList;
 		return \@l 
@@ -301,9 +320,9 @@ push @tests, (
 			-text => 'Frth',
 			-sortable => 1,
 		);
-		$ib->configure('sorton' => '');
-		$ib->sortMode('', 'ascending');
-		$ib->sortList;
+#		$ib->configure('sorton' => '');
+#		$ib->sortMode('', 'ascending');
+#		$ib->sortList;
 		$ib->refresh;
 	}, '', 'refresh' ],
 );

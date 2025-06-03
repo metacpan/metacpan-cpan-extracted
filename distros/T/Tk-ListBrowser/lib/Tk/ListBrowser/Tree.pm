@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.08;
+$VERSION =  0.09;
 
 use Math::Round qw(round);
 
@@ -69,18 +69,14 @@ sub draw {
 
 sub entryClose {
 	my ($self, $entry) = @_;
-#	my @sel = $self->selectionGet;
-#	my $s = @sel; print "tree sel $s\n";
 	$self->close($entry);
-	$self->listbrowser->refresh;
-	$self->headerPlace; # TODO not sure why this is needed.
+	$self->refreshPurge($self->index($entry), 1);
 }
 
 sub entryOpen {
 	my ($self, $entry) = @_;
 	$self->open($entry);
-	$self->listbrowser->refresh;
-	$self->headerPlace; # TODO not sure why this is needed.
+	$self->refreshPurge($self->index($entry), 1);
 }
 
 =head1 LICENSE

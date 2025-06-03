@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::Base;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for RDBMS-specific code
 use version;
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.1.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -587,7 +587,7 @@ DBIx::OnlineDDL::Helper::Base - Private OnlineDDL helper for RDBMS-specific code
 
 =head1 VERSION
 
-version v1.1.0
+version v1.1.1
 
 =head1 DESCRIPTION
 

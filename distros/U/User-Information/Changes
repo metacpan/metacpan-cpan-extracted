@@ -1,3 +1,6 @@
+v0.04  2025-06-02Z
+    - Fixed warning in non-CGI mode
+
 v0.03  2025-06-02Z
     - Added most basic CGI mode
 

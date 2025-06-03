@@ -1,5 +1,9 @@
 Revision history for Config-INI-RefVars
 
+0.21    2025/06/02
+
+    - Adapted Makefile.PL to generate META.json.
+
 0.20    2025/01/14
 
     - Removed unwanted helper script from MANIFEST.

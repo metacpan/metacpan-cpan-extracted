@@ -15,7 +15,7 @@ use Carp;
 
 use User::Information::Path;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 use constant _LOAD_PATH_GLOBAL => User::Information::Path->new([qw(git global)]);
 
@@ -99,7 +99,7 @@ User::Information::Source::Git - generic module for extracting information from 
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 ~=head1 SYNOPSIS
 

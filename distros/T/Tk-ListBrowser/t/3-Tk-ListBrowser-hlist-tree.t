@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 17;
 use Test::Tk;
 require Tk::Photo;
 require Tk::LabFrame;
@@ -58,7 +58,7 @@ if (defined $app) {
 		-textside => 'right',
 		-textjustify => 'left',
 		-selectmode => 'multiple',
-		-separator =>'.',
+		-separator => '.',
 		-filterfield => 'text',
 
 		-browsecmd => sub {
@@ -156,8 +156,6 @@ if (defined $app) {
 	$app->geometry('500x600+200+200');
 }
 
-testaccessors($handler, qw/stack/);
-
 push @tests, (
 	[ sub {
 		$ib->add('pipoclown', -text => 'pipoclown');
@@ -216,22 +214,6 @@ push @tests, (
 		return \@list
 	}, [ ], 'infoChildren none 2' ],
 	[ sub {
-		$handler->stackPush('comedian');
-		return $handler->stackTop
-	}, 'comedian', 'handler stackPush / stackTop' ],
-	[ sub {
-		return $handler->stackSize
-	}, 2, 'handler stackSize' ],
-	[ sub {
-		$handler->stackClear;
-		return defined $handler->stackTop
-	}, '', 'handler stackClear' ],
-	[ sub {
-		$handler->stackPush('comedian');
-		$handler->stackPull('comedian');
-		return defined $handler->stackTop
-	}, '', 'handler stackPull' ],
-	[ sub {
 		$ib->headerCreate('', -text => 'Primary', -sortable => 1);
 		$ib->columnCreate('number',
 			-itemtype => 'text',
@@ -256,6 +238,16 @@ push @tests, (
 		$ib->refresh;
 		return 1
 	}, 1, 'refresh' ],
+	[ sub {
+		my @l = $ib->infoRoot;
+		return \@l
+	}, ['pipoclown', 'colors'], 'infoRoot' ],
+	[ sub {
+		my @l = $ib->getRoot;
+		my @r;
+		for (@l) { push @r, $_->name }
+		return \@r
+	}, ['pipoclown', 'colors'], 'getRoot' ],
 	[ sub {
 		return $handler->maxIndent
 	}, 44, 'handler maxIndent' ],

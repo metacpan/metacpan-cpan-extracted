@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(DEBUG_FLAG);
@@ -73,7 +73,7 @@ Debug::Helper::Flag - Define and import boolean constant DEBUG_FLAG helping to o
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 
 =head1 SYNOPSIS
@@ -145,13 +145,12 @@ If you try to import C<DEBUG_FLAG> while it is not yet defined, the warning
 a fatal error instead, set the environment variable
 C<PERL_DEBUG_HELPER_FLAG_STRICT> (or C<$Debug::Helper::Flag::strict>) to a
 I<true> value. This is a warning by default to avoid problems when using
-L<Perl::LanguageServer> with e.g. the corresponding vs code plugin.
+L<Perl::LanguageServer> with e.g. the corresponding VS Code plugin.
 
 
 =head1 SEE ALSO
 
-L<https://metacpan.org/pod/Getopt::c
-onstant>
+L<https://metacpan.org/pod/Getopt::constant>
 
 =head1 AUTHOR
 
@@ -162,7 +161,6 @@ Abdul al Hazred, C<< <451 at gmx.eu> >>
 Please report any bugs or feature requests to C<bug-debug-helper-flag at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Debug-Helper-Flag>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
 
 
 

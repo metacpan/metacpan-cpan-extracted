@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use vars qw ($VERSION);
 use Carp;
-$VERSION =  0.04;
+$VERSION =  0.09;
 
 use base qw(Tk::ListBrowser::BaseItem);
 
@@ -102,19 +102,9 @@ sub cellWidth {
 	return $self->{CELLWIDTH}
 }
 
-sub cheader{
-	my $self = shift;
-	$self->{CHEADER} = shift if @_;
-	return $self->{CHEADER}
-}
-
 sub clear {
 	my $self = shift;
 	$self->SUPER::clear;
-	my $c = $self->Subwidget('Canvas');
-	my $h = $self->cheader;
-	$c->delete($h) if defined $h;
-	$self->cheader(undef);
 	my @items = $self->itemList;
 	for (@items) { $self->itemGet($_)->clear }
 }
@@ -178,6 +168,7 @@ sub itemRemove {
 	my ($self, $entry) = @_;
 	my $vh = $self->{VALUES};
 	my $i = $vh->{$entry};
+	return unless defined $i;
 	$i->clear;
 	delete $vh->{$entry};
 }

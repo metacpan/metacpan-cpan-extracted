@@ -37,16 +37,16 @@ name: DBIx-OnlineDDL
 provides:
   DBIx::OnlineDDL:
     file: lib/DBIx/OnlineDDL.pm
-    version: v1.1.0
+    version: v1.1.1
   DBIx::OnlineDDL::Helper::Base:
     file: lib/DBIx/OnlineDDL/Helper/Base.pm
-    version: v1.1.0
+    version: v1.1.1
   DBIx::OnlineDDL::Helper::MySQL:
     file: lib/DBIx/OnlineDDL/Helper/MySQL.pm
-    version: v1.1.0
+    version: v1.1.1
   DBIx::OnlineDDL::Helper::SQLite:
     file: lib/DBIx/OnlineDDL/Helper/SQLite.pm
-    version: v1.1.0
+    version: v1.1.1
 requires:
   Class::Load: '0'
   DBI::Const::GetInfoType: '0'
@@ -65,7 +65,7 @@ requires:
 resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-OnlineDDL/issues
   repository: git://github.com/GrantStreetGroup/DBIx-OnlineDDL.git
-version: v1.1.0
+version: v1.1.1
 x_generated_by_perl: v5.36.1
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

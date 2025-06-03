@@ -1,3 +1,19 @@
+0.133		2025-06-02	T. R. Wyant
+    Add method next_elevation_extreme_tod(). This is analogous to
+    next_elevation(), but returns the earliest (or latest) time the body
+    passes the given elevation after the currentlt-set time -- or
+    nothing if there is none. It really is only useful for computing
+    earliest or latest Sunrise or Sunset, but is present on
+    Astro::Coord::ECI for architectural reasons (meaning my architecture
+    is flawed, but that can't be changed now).
+
+    Don't set iridium_status_format when instantiating an
+    Astro::SpaceTrack object in script/satpass.
+
+    Uppdates ro canned magnitude table.
+
+    Add SECURITY policy.
+
 0.132		2024-09-22	T. R. Wyant
     Update canned magnitudes.
 

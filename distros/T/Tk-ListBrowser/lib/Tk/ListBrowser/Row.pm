@@ -2,7 +2,7 @@ package Tk::ListBrowser::Row;
 
 =head1 NAME
 
-Tk::ListBrowser - Tk::ListBrowser::Row - Row organizer for Tk::ListBrowser.
+Tk::ListBrowser::Row - Row organizer for Tk::ListBrowser.
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION =  0.04;
+$VERSION =  0.09;
 use Carp;
 use Math::Round;
 
@@ -57,9 +57,11 @@ sub cellSize {
 	my $imagewidth = 0;
 	my $textheight = 0;
 	my $textwidth = 0;
-	my $pool = $self->data->pool;
-	for (@$pool) {
+	my @pool = $self->getPool;
+	for (@pool) {
 		my $entry = $_;
+		if ($self->hierarchy) {
+		}
 		my ($iw, $ih, $tw, $th) = $entry->minCellSize($self->cget('-itemtype'));
 		$imageheight = $ih if $ih > $imageheight;
 		$imagewidth = $iw if $iw > $imagewidth;
@@ -134,8 +136,9 @@ sub maxXY {
 	my $self = shift;
 	my $maxc = 0;
 	my $maxr = 0;
-	my $pool = $self->listbrowser->data->pool;
-	for (@$pool) {
+	my @pool = $self->getAll;
+	for (@pool) {
+		next if ($_->hidden or (not $_->openedparent));
 		my $c = $_->column;
 		$maxc = $c if ((defined $c) and ($c > $maxc));
 		my $r = $_->row;

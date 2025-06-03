@@ -32,7 +32,7 @@ use constant PATH_ELEMENT_TYPE   => Data::Identifier->new(
 
 use User::Information::Base;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 
 #@returns User::Information::Base
@@ -97,7 +97,7 @@ User::Information - generic module for extracting information from user accounts
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

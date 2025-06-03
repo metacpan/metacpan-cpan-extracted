@@ -2,7 +2,7 @@ package Tk::ListBrowser::Column;
 
 =head1 NAME
 
-Tk::ListBrowser - Tk::ListBrowser::Column - Column organizer for Tk::ListBrowser.
+Tk::ListBrowser::Column - Column organizer for Tk::ListBrowser.
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ No user serviceable parts inside.
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.01;
+$VERSION =  0.09;
 
 use base qw(Tk::ListBrowser::Row);
 

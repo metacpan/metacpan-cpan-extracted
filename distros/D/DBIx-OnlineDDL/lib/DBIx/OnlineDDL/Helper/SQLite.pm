@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::SQLite;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for SQLite-specific code
 use version;
-our $VERSION = 'v1.1.0'; # VERSION
+our $VERSION = 'v1.1.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -35,8 +35,10 @@ sub null_safe_equals_op           { 'IS' }
 
 sub current_catalog_schema {
     my $self = shift;
+    my $dbh  = $self->dbh;
 
-    my $databases = $self->dbh->selectall_hashref('PRAGMA database_list', 'seq');
+    local $dbh->{FetchHashKeyName} = 'NAME_lc';
+    my $databases = $dbh->selectall_hashref('PRAGMA database_list', 'seq');
     my $schema = $databases->{0}{name};  # probably 'main'
     return (undef, $schema);
 }
@@ -173,7 +175,7 @@ DBIx::OnlineDDL::Helper::SQLite - Private OnlineDDL helper for SQLite-specific c
 
 =head1 VERSION
 
-version v1.1.0
+version v1.1.1
 
 =head1 DESCRIPTION
 
