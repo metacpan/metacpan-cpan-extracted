@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use utf8;
+use v5.40;
+
+use Path::Tiny;
+use Const::Fast;
+use List::Util qw(uniq);
+use Net::SSLeay;
+
+const our $pkgrepo_re      => qr//;
+const our $pkgitem_type_re => qr//;
+const our $pkgname_re      => qr//;
+const our $pkgsep_re       => qr//;
+
+const our $pkgver_re  => qr//;
+const our $pkgfile_re => qr//;
+
+const our %default_paths => (
+    'chroot'   => '/bs/chroot/nameless/pkgdest',
+    'pkgdest'  => '/ba/pkgdest',
+    'cincotuf' => '/bs/repo/cintotuf',
+);
+
+our %artifacts_sorted;
+
+foreach my ( $section, path($path) ) % default_paths {
+    print "$section: $path\n";
+}

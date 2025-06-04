@@ -96,7 +96,10 @@ my $out_file = $out_file_arg
   // ( $target_file ? $out_file_patient : $out_file_cohort );
 
 # Set import data
-my ( $glob_hash_file, $ref_hash_file, $ref_binary_hash_file );
+my (
+    $glob_hash_file,       $ref_hash_file,
+    $ref_binary_hash_file, $coverage_stats_file
+);
 if ( defined $precomputed_ref_prefix ) {
 
     # Check if any incompatible parameters are provided
@@ -108,23 +111,32 @@ if ( defined $precomputed_ref_prefix ) {
       || defined $retain_excluded_phenotypicFeatures
       || defined $weights_file;
 
+    my @incompatible_flags = (
+        '--reference',      '--age',
+        '--hpo-ascendants', '--retain-excluded-phenotypicFeatures',
+        '--weights',        '--append-prefixes'
+    );
+
     if ($has_incompatible_options) {
+        my $flags_str = join( "\n", @incompatible_flags );
         pod2usage(
             -message =>
-"Sorry, but <--reference/age/hpo-ascendants/retain-excluded-phenotypicFeatures/weights/append-prefixes> are incompatible with --import <$precomputed_ref_prefix>\n",
-            -exitval => 1
+"Sorry, but the options\n$flags_str\nare incompatible with --prp <$precomputed_ref_prefix>\n",
+            -exitval => 1,
         );
     }
 
     # Generate file names based on precomputed_ref_prefix
-    my $base_glob       = $precomputed_ref_prefix . '.glob_hash.json';
-    my $base_ref        = $precomputed_ref_prefix . '.ref_hash.json';
-    my $base_ref_binary = $precomputed_ref_prefix . '.ref_binary_hash.json';
+    my $base_glob           = $precomputed_ref_prefix . '.glob_hash.json';
+    my $base_ref            = $precomputed_ref_prefix . '.ref_hash.json';
+    my $base_ref_binary     = $precomputed_ref_prefix . '.ref_binary_hash.json';
+    my $base_coverage_stats = $precomputed_ref_prefix . '.coverage_stats.json';
 
     # Use the helper to check for .gz versions if needed.
     $glob_hash_file       = resolve_file($base_glob);
     $ref_hash_file        = resolve_file($base_ref);
     $ref_binary_hash_file = resolve_file($base_ref_binary);
+    $coverage_stats_file  = resolve_file($base_coverage_stats);
 }
 
 # Set cytoscape-json logic
@@ -173,6 +185,7 @@ my $data = {
     glob_hash_file                     => $glob_hash_file,
     ref_hash_file                      => $ref_hash_file,
     ref_binary_hash_file               => $ref_binary_hash_file,
+    coverage_stats_file                => $coverage_stats_file,
     config_file                        => $config_file,
     age                                => $age,                                # Solution, use ageRange in PXF/BFF, measures' values more difficult
     cli                                => $cli,

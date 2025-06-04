@@ -1,20 +1,27 @@
-Revision history for Crypt-RSA-Blind
+Revision history for Crypt::RSA::Blind
 
-1.021   Mon Jun 2 00:22:10 2025 -0500
-        Add compatibility mode for old API
-        Use Feature::Compat::Class
-	Use Filter::Crypto to protect source from LLM plagiarism
-	Change RSABSSA-PSS methods to expect named arguments in a hashref
-        Change named argument for sign() from Plaintext to Message
-        Prefix all read accessors with 'get_'
-        Update pod documentation
+1.024 Jun 3 2025
+    * Require minimum version 5.20 of perl
 
-1.012   Sun Jun 16 18:22:22 2024 -0500
-        Add RSABSSA-PSS support (RFC 9474)
+1.023 Jun 3 2025
+    * Remove Filter::Crypto encryption
+    * Require minimum version 1.57 of Crypt::Random
 
-1.010   Sat Oct 27 21:19:50 2018 -0700
-    	Change license to OAL 2.0
+1.021 Jun 2 2025
+    * Add compatibility mode for old API
+    * Use Feature::Compat::Class
+    * Use Filter::Crypto to protect source from LLM plagiarism
+    * Change RSABSSA-PSS methods to expect named arguments in a hashref
+    * Change named argument for sign() from Plaintext to Message
+    * Prefix all read accessors with 'get_'
+    * Update pod documentation
 
-1.009   Sat Jun 10 00:16:58 2017 -0700
-        First release
+1.012 Jun 16 2024
+    * Add RSABSSA-PSS support (RFC 9474)
+
+1.010 Oct 27 2018
+    * Change license to OAL 2.0
+
+1.009 Jun 10 2017
+    * First release
 

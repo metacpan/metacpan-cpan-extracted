@@ -23,6 +23,7 @@ MANIFEST
 META.json
 META.yml
 README
+SECURITY
 script/SpaceTrack
 t/basic.t
 t/complete.t
@@ -43,7 +44,6 @@ xt/author/celestrak_datasets.t
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t
-xt/author/iridium_status.t
 xt/author/kwalitee.t
 xt/author/manifest.t
 xt/author/mccants_cert.t

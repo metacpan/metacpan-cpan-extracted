@@ -92,5 +92,7 @@ VERSION
 xt/plot.t
 xt/plot/bff.png
 xt/plot/pxf.png
+xt/poi.t
+xt/poi/107:week_0_arm_1.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -320,6 +320,9 @@ foreach my $name (qw/discover_only macsuck_only arpnip_only nbtstat_only/) {
 
 # legacy config item names
 
+# rename snmp_field_protection to just be field_protection
+config->{'field_protection'} = config->{'snmp_field_protection'};
+
 # if user has previously configured too_many_devices away from 1000 default,
 # then copy it into netmap_performance_limit_max_devices
 config->{'netmap_performance_limit_max_devices'} =
@@ -379,6 +382,13 @@ if (setting('reports') and ref {} eq ref setting('reports')) {
 
 # add system_reports onto reports
 config->{'reports'} = [ @{setting('system_reports')}, @{setting('reports')} ];
+
+# upgrade bare bind_params to dict
+foreach my $r ( @{setting('reports')} ) {
+    next unless exists $r->{bind_params};
+    my $new_bind_params = [ map {ref ? $_ : {param => $_}} @{ $r->{bind_params} } ];
+    $r->{'bind_params'} = $new_bind_params;
+}
 
 # set swagger ui location
 #config->{plugins}->{Swagger}->{ui_dir} =

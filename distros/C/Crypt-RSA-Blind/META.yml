@@ -18,24 +18,15 @@ no_index:
   directory:
     - t
     - inc
-provides:
-  Crypt::RSA::Blind:
-    file: lib/Crypt/RSA/Blind.pm
-    version: '1.021'
-  Crypt::RSA::Blind::PubKey:
-    file: lib/Crypt/RSA/Blind.pm
-    version: '1.021'
-  Crypt::RSA::Blind::SecKey:
-    file: lib/Crypt/RSA/Blind.pm
-    version: '1.021'
 requires:
   Carp: '1.50'
   Carp::Assert: '0.21'
   Compress::Zlib: '2.106'
   Crypt::FDH: '1.010'
   Crypt::RSA: '1.99'
+  Crypt::Random: '1.57'
   Feature::Compat::Class: '0.07'
-  Filter::Crypto: '2.10'
   Math::Pari: '2.030523'
-version: '1.021'
+  perl: '5.020'
+version: '1.024'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

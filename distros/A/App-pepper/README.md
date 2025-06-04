@@ -31,8 +31,8 @@ Available command-line options:
 
 Pepper supports two usage modes:
 
-- 1. Interactive mode: this is the default mode. Pepper will provide a command prompt (with history and line editing capabilities) allowing you to input commands manually.
-- 2. Script mode: if Pepper's `STDIN` is fed a stream of text (ie it's not attached to a terminal) then commands will be read from `STDIN` and executed sequentially. Pepper will exit once EOF is reached.
+- 1 Interactive mode: this is the default mode. Pepper will provide a command prompt (with history and line editing capabilities) allowing you to input commands manually.
+- 2 Script mode: if Pepper's `STDIN` is fed a stream of text (ie it's not attached to a terminal) then commands will be read from `STDIN` and executed sequentially. Pepper will exit once EOF is reached.
 
 # SYNTAX
 
@@ -280,7 +280,7 @@ If [Term::ReadLine::Gnu](https://metacpan.org/pod/Term%3A%3AReadLine%3A%3AGnu) i
 The [git repository](https://github.com/gbxyz/pepper) contains a `Dockerfile`
 that can be used to build an image on your local system.
 
-Alternatively, you can pull the [image from Docker Hub](https://hub.docker.com/repository/docker/gbxyz/pepper/general):
+Alternatively, you can pull the [image from Docker Hub](https://hub.docker.com/r/gbxyz/pepper):
 
         $ docker pull gbxyz/pepper
 

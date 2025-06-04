@@ -1,3 +1,21 @@
+0.169		2025-06-03	T. R. Wyant
+    Add SECURITY policy.
+
+    Further deprecate 'direct' and Iridium functionality.
+
+    Use of 'direct' is now fatal.
+
+    The Kelso (Celestrak) functionality had to be jumped to full deprecation
+    (exception on use) because the underlying data were removed from the web
+    site.
+
+    All Iridium functionality is now in various stages of deprecation, and
+    will at least warn on the first use. This includes the former manifest
+    constants BODY_STATUS_*, which are now simple subroutines so that they
+    CAN warn on first use.
+
+    Track changes in Celestrak catalogs.
+
 0.168		2025-01-05	T. R. Wyant
     Remove McCants' 'rcs' catalog.
 

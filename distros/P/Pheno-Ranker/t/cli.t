@@ -327,9 +327,9 @@ SKIP: {
         );
     }
 
-##########
+    ##########
     # TEST 9 #
-##########
+    ##########
     # interpretations
 
     {
@@ -384,9 +384,9 @@ SKIP: {
         );
     }
 
-##########
+    ##########
     # TEST 10 #
-##########
+    ##########
     # Test for rank.txt by comparing REFERENCE(ID) column
 
     {
@@ -491,9 +491,9 @@ qq/<$generated_rank_file> matches the REFERENCE(ID) in <$reference_rank_file>/
         );
     }
 
-###########
+    ###########
     # TEST 11 #
-###########
+    ###########
 
     {
         # The reference file to compare the output with
@@ -546,9 +546,10 @@ qq/<$generated_rank_file> matches the REFERENCE(ID) in <$reference_rank_file>/
         );
     }
 
-###########
+    ###########
     # TEST 12 #
-###########
+    ###########
+    # --prp
 
     {
         # The reference file to compare the output with
@@ -566,10 +567,8 @@ qq/<$generated_rank_file> matches the REFERENCE(ID) in <$reference_rank_file>/
                 "append_prefixes" => [],
                 "glob_hash_file"  => catfile( 't', 'export.glob_hash.json' ),
                 "ref_hash_file"   => catfile( 't', 'export.ref_hash.json' ),
-                "ref_binary_hash_file" =>
-                  catfile( 't', 'export.ref_binary_hash.json' ),
-
-                #"cli"                    => undef,
+                "ref_binary_hash_file" => catfile( 't', 'export.ref_binary_hash.json' ),
+                "coverage_stats_file" => catfile( 't', 'export.ref_binary_hash.json' ),
                 "config_file"               => undef,
                 "debug"                     => undef,
                 "exclude_terms"             => [],

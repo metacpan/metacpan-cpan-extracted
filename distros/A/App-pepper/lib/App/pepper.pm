@@ -5,15 +5,19 @@ use File::Temp qw(tmpnam);
 use Getopt::Long;
 use Mozilla::CA;
 use Net::EPP::Simple;
+use List::Util qw(none);
 use Pod::Usage;
 use Term::ANSIColor;
 use Term::ReadLine;
 use Text::ParseWords;
 use XML::LibXML;
 use strict;
+use constant {
+    SECURE_AUTHINFO_XMLNS => 'urn:ietf:params:xml:ns:epp:secure-authinfo-transfer-1.0',
+};
 use vars qw($VERSION);
 
-our $VERSION = '0.99.0';
+our $VERSION = '0.99.1';
 
 my $opt = {
 	'port'		=> 700,
@@ -693,7 +697,7 @@ sub handle_contact_clone {
 	my $info = $epp->contact_info($old) || return;
 
 	$info->{'id'} = $new;
-	$info->{'authInfo'} = generate_authinfo();
+	$info->{'authInfo'} = $epp->server_has_extension(SECURE_AUTHINFO_XMLNS) ? '' : generate_authinfo();
 
 	return $epp->create_contact($info);
 }
@@ -705,25 +709,47 @@ sub handle_domain_clone {
 
 	$info->{'period'} = 1;
 	$info->{'name'} = $new;
-	$info->{'authInfo'} = generate_authinfo();
+	$info->{'authInfo'} = $epp->server_has_extension(SECURE_AUTHINFO_XMLNS) ? '' : generate_authinfo();
 
 	return $epp->create_domain($info);
 }
 
 sub generate_authinfo {
 	my $length = shift || 16;
-	my $authinfo;
 
-	my @chars = (('a'..'z'), ('A'..'Z'), (0-9), ('!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '[', ']', '^', '_', '{', '|', '}', '~'));
-	my $c = scalar(@chars);
+    my $safe = shift;
 
-	$authinfo .= $chars[int($c * rand())-1] while (length($authinfo) < $length);
+    my @upper_alpha = ('A'..'Z');
+    my @lower_alpha = ('a'..'z');
+    my @digits = (0..9);
+    my @symbols = ('!', '#', '$', '%', '&', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '[', ']', '^', '_', '{', '|', '}', '~');
 
-	return $authinfo;
+    my (@chars, @authinfo);
+    if ($safe) {
+    	@chars = (@upper_alpha, @digits);
+
+    	@authinfo =  (
+            $upper_alpha[int(scalar(@upper_alpha) * rand())-1],
+            $digits[int(scalar(@digits) * rand())-1],
+        );
+    } else {
+    	@chars = (@upper_alpha, @lower_alpha, @digits, @symbols);
+
+    	@authinfo =  (
+            $upper_alpha[int(scalar(@upper_alpha) * rand())-1],
+            $lower_alpha[int(scalar(@lower_alpha) * rand())-1],
+            $digits[int(scalar(@digits) * rand())-1],
+            $symbols[int(scalar(@symbols) * rand())-1]
+        );
+    }
+
+	push(@authinfo, $chars[int(scalar(@chars) * rand())-1]) while (scalar(@authinfo) < $length);
+
+	return join('', @authinfo);
 }
 
 sub generate_contact_id {
-	return lc(generate_authinfo(16));
+	return generate_authinfo(16, 1);
 }
 
 sub handle_delete {
@@ -825,7 +851,7 @@ sub create_domain {
 			$domain->{'registrant'} = $value;
 
 		} elsif ($name eq 'ns') {
-			push(@{$domain->{'ns'}}, $value);
+			push(@{$domain->{'ns'}}, $epp->server_has_object(Net::EPP::Frame::ObjectSpec->xmlns('host')) ? $value : { name => $value});
 
 		} elsif (lc($name) eq 'authinfo') {
 			$domain->{'authInfo'} = $value;
@@ -840,7 +866,7 @@ sub create_domain {
 	}
 
 	$domain->{'period'} = 1 if ($domain->{'period'} < 1);
-	$domain->{'authInfo'} = generate_authinfo() if (length($domain->{'authInfo'}) < 1);
+	$domain->{'authInfo'} = $epp->server_has_extension(SECURE_AUTHINFO_XMLNS) ? '' : generate_authinfo() if (length($domain->{'authInfo'}) < 1);
 
 	return $epp->create_domain($domain);
 }
@@ -888,7 +914,7 @@ sub create_contact {
 
 	$contact->{'postalInfo'}->{$type} = $postalInfo;
 	$contact->{'id'} = generate_contact_id() if (length($contact->{'id'}) < 1);
-	$contact->{'authInfo'} = generate_authinfo() if (length($contact->{'authInfo'}) < 1);
+	$contact->{'authInfo'} = $epp->server_has_extension(SECURE_AUTHINFO_XMLNS) ? '' : generate_authinfo() if (length($contact->{'authInfo'}) < 1);
 
 	return $epp->create_contact($contact);
 }
@@ -1014,10 +1040,10 @@ sub domain_update {
 	foreach my $change (@{$changes->{'ns'}}) {
 		my ($action, $value) = @{$change};
 		if ($action eq 'add') {
-			$frame->addNS($value);
+			$frame->addNS($epp->server_has_object(Net::EPP::Frame::ObjectSpec->xmlns('host')) ? $value : { name => $value});
 
 		} else {
-			$frame->remNS($value);
+			$frame->remNS($epp->server_has_object(Net::EPP::Frame::ObjectSpec->xmlns('host')) ? $value : { name => $value});
 
 		}
 	}
@@ -1201,9 +1227,9 @@ Pepper supports two usage modes:
 
 =over
 
-=item 1. Interactive mode: this is the default mode. Pepper will provide a command prompt (with history and line editing capabilities) allowing you to input commands manually.
+=item 1 Interactive mode: this is the default mode. Pepper will provide a command prompt (with history and line editing capabilities) allowing you to input commands manually.
 
-=item 2. Script mode: if Pepper's C<STDIN> is fed a stream of text (ie it's not attached to a terminal) then commands will be read from C<STDIN> and executed sequentially. Pepper will exit once EOF is reached.
+=item 2 Script mode: if Pepper's C<STDIN> is fed a stream of text (ie it's not attached to a terminal) then commands will be read from C<STDIN> and executed sequentially. Pepper will exit once EOF is reached.
 
 =back
 
@@ -1419,7 +1445,7 @@ This command creates a contact object according to the parameters specified. C<P
 Example:
 
     pepper (id@host)> create contact id "sh8013" name "John Doe" org "Example Inc." type int street "123 Example Dr." city Dulles sp VA pc 20166-6503 cc US voice +1.7035555555 email jdoe@example.com
-    
+
 =head2 Object Updates
 
 Objects may be updated using the C<update> command.
@@ -1524,7 +1550,7 @@ If L<Term::ReadLine::Gnu> is available, then Pepper can provide a richer interac
 The L<git repository|https://github.com/gbxyz/pepper> contains a C<Dockerfile>
 that can be used to build an image on your local system.
 
-Alternatively, you can pull the L<image from Docker Hub|https://hub.docker.com/repository/docker/gbxyz/pepper/general>:
+Alternatively, you can pull the L<image from Docker Hub|https://hub.docker.com/r/gbxyz/pepper>:
 
 	$ docker pull gbxyz/pepper
 

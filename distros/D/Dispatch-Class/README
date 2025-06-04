@@ -1,46 +1,33 @@
-Dispatch-Class
+NAME
 
-Dispatch on the type (class) of an argument
-
-
+    Dispatch::Class - dispatch on the type (class) of an argument
 
 INSTALLATION
 
-To install this module, run the following commands:
+    To download and install this module, use your favorite CPAN client, e.g.
+    "cpan":
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+        cpan Dispatch::Class
 
-SUPPORT AND DOCUMENTATION
+    Or "cpanm":
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        cpanm Dispatch::Class
 
-    perldoc Dispatch::Class
+    To do it manually, run the following commands (after downloading and
+    unpacking the tarball):
 
-You can also look for information at:
+        perl Makefile.PL
+        make
+        make test
+        make install
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dispatch-Class
+COPYRIGHT & LICENSE
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Dispatch-Class
+    Copyright 2013, 2014 Lukas Mai.
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Dispatch-Class
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
 
-    MetaCPAN
-        https://metacpan.org/module/Dispatch::Class
+    See <https://dev.perl.org/licenses/> for more information.
 
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2013, 2014 Lukas Mai
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.

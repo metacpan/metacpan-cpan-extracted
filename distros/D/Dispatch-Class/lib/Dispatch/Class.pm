@@ -3,7 +3,7 @@ package Dispatch::Class;
 use warnings;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Scalar::Util qw(blessed);
 
@@ -49,37 +49,39 @@ Dispatch::Class - dispatch on the type (class) of an argument
 
 =head1 SYNOPSIS
 
-  use Dispatch::Class qw(
-    class_case
-    dispatch
-  );
-  
-  # analyze the class of an object
-  my $analyze = class_case(
-    'Some::Class'  => 1,
-    'Other::Class' => 2,
-    'UNIVERSAL'    => "???",
-  );
-  my $foo = $analyze->(Other::Class->new);  # 2
-  my $bar = $analyze->(IO::Handle->new);    # "???"
-  my $baz = $analyze->(["not an object"]);  # undef
+=for highlighter language=perl
 
-  # build a dispatcher
-  my $dispatch = dispatch(
-    'Dog::Tiny' => sub { ... },  # handle objects of the class Dog::Tiny
-    'Dog'       => sub { ... },
-    'Mammal'    => sub { ... },
-    'Tree'      => sub { ... },
-  
-    'ARRAY'     => sub { ... },  # handle array refs
-  
-    ':str'      => sub { ... },  # handle non-reference strings
-  
-    '*'         => sub { ... },  # handle any value
-  );
-  
-  # call the appropriate handler, passing $obj as an argument
-  my $result = $dispatch->($obj);
+    use Dispatch::Class qw(
+        class_case
+        dispatch
+    );
+
+    # analyze the class of an object
+    my $analyze = class_case(
+        'Some::Class'  => 1,
+        'Other::Class' => 2,
+        'UNIVERSAL'    => "???",
+    );
+    my $foo = $analyze->(Other::Class->new);  # 2
+    my $bar = $analyze->(IO::Handle->new);    # "???"
+    my $baz = $analyze->(["not an object"]);  # undef
+
+    # build a dispatcher
+    my $dispatch = dispatch(
+        'Dog::Tiny' => sub { ... },  # handle objects of the class Dog::Tiny
+        'Dog'       => sub { ... },
+        'Mammal'    => sub { ... },
+        'Tree'      => sub { ... },
+
+        'ARRAY'     => sub { ... },  # handle array refs
+
+        ':str'      => sub { ... },  # handle non-reference strings
+
+        '*'         => sub { ... },  # handle any value
+    );
+
+    # call the appropriate handler, passing $obj as an argument
+    my $result = $dispatch->($obj);
 
 =head1 DESCRIPTION
 
@@ -101,12 +103,12 @@ matching I<KEY>.
 
 Example:
 
-  my $subref = class_case(
-    KEY1 => VALUE1,
-    KEY2 => VALUE2,
-    ...
-  );
-  my $value = $subref->($some_object);
+    my $subref = class_case(
+        KEY1 => VALUE1,
+        KEY2 => VALUE2,
+        ...
+    );
+    my $value = $subref->($some_object);
 
 This will check the class of C<$some_object> against C<KEY1>, C<KEY2>, ... in
 order and return the corresponding C<VALUEn> of the first match. If no key
@@ -150,14 +152,14 @@ have been composed into the object's class.
 This works like C<class_case> above, but the I<VALUE>s must be code references
 and get invoked automatically:
 
-  sub dispatch {
-    my $analyze = class_case @_;
-    sub {
-      my ($obj) = @_;
-      my $handler = $analyze->($obj) or return;
-      $handler->($obj)
+    sub dispatch {
+        my $analyze = class_case @_;
+        sub {
+            my ($obj) = @_;
+            my $handler = $analyze->($obj) or return;
+            $handler->($obj)
+        }
     }
-  }
 
 That is, the matching object is passed on to the matched I<VALUE>s and the
 return value of the inner sub is whatever the handler returns (or the empty
@@ -176,6 +178,31 @@ L<Exporter::Tiny>
 
 Lukas Mai, C<< <l.mai at web.de> >>
 
+=begin :README
+
+=head1 INSTALLATION
+
+To download and install this module, use your favorite CPAN client, e.g.
+L<C<cpan>|cpan>:
+
+=for highlighter language=sh
+
+    cpan Dispatch::Class
+
+Or L<C<cpanm>|cpanm>:
+
+    cpanm Dispatch::Class
+
+To do it manually, run the following commands (after downloading and unpacking
+the tarball):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=end :README
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2013, 2014 Lukas Mai.
@@ -184,6 +211,6 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<https://dev.perl.org/licenses/> for more information.
 
 =cut

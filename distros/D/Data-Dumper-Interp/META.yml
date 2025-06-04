@@ -25,6 +25,7 @@ build_requires:
   Math::BigRat: '0.2624'
   Path::Tiny: '0.146'
   Test2::Plugin::BailOnFail: '0'
+  Test2::Require::Module: '0'
   Test2::V0: '0'
   Tie::Array: '0'
   Tie::Handle: '0'
@@ -54,7 +55,7 @@ name: Data-Dumper-Interp
 provides:
   Data::Dumper::Interp:
     file: lib/Data/Dumper/Interp.pm
-    version: '7.015'
+    version: '7.016'
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -83,7 +84,7 @@ resources:
   bugtracker: https://github.com/jimav/Data-Dumper-Interp/issues
   homepage: https://github.com/jimav/Data-Dumper-Interp
   repository: https://github.com/jimav/Data-Dumper-Interp.git
-version: '7.015'
+version: '7.016'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

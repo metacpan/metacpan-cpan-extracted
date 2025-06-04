@@ -62,15 +62,7 @@ and C<celestrak_supplemental()> methods will track this, growing new
 arguments as needed.
 
 The API-based service appears not to provide OID lists. Accordingly, as
-of version 0.150 the C<direct> attribute defaults to true, and is
-deprecated. As of version 0.164 the first use of this attribute will
-produce a warning. Six months after that every use will warn, and six
-months after that use if it will be fatal.
-
-The absence of OID lists also means that the Space Track options on
-Celestrak queries are deprecated. As of version 0.163 released
-2023-10-24 these warn on every use. In the first release after
-2024-04-24 use of these options will be fatal.
+of version 0.169 every use of the C<direct> attribute is fatal.
 
 =head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
@@ -80,6 +72,9 @@ deprecated, and will result in an exception.
 As of version 0.143, any access of attribute
 C<url_iridium_status_mccants> is fatal.
 
+As of version 0.169, any use of attribute C<url_iridium_status_kelso> is
+fatal. See below for why my normal deprecation procedure was violated.
+
 As of version 0.164 support for Iridium Classic satellites is being
 deprecated and removed. All testing of the iridium_status() method is
 halted as of version 0.164. As of version 0.167, the first use of the
@@ -88,9 +83,16 @@ months all uses will warn, and after a further six months use of this
 method will be fatal. Related attributes and manifest constants will be
 deprecated on the same schedule.
 
-The Celestrak Iridium catalog is B<not> being deprecated because it
-still exists, and there are still non-functioning Iridium Classic
-satellites in orbit.
+Contrary to my normal deprecation procedure (such as it is), the
+Celestrak Iridium catalog is fully deprecated as of version 0.169, and
+will result in a fatal exception. This jump from non-deprecated to fully
+deprecated was triggered by the removal of the Iridium catalog (as
+opposed to Iridium NEXT) from the Celestrak web site May 8 2025.
+
+As of version 0.169, B<any> functionality relating to Iridium status
+will warn on the first use. This includes the C<BODY_STATUS_*> manifest
+constants, which as of 0.169 are no longer manifest constants but simple
+subroutines so that they B<can> warn on the first use.
 
 =head1 DESCRIPTION
 
@@ -131,7 +133,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.168';
+our $VERSION = '0.169';
 our @EXPORT_OK = qw{
     shell
 
@@ -273,10 +275,14 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	tdrss => {name => 'Tracking and Data Relay Satellite System (TDRSS)'},
 	geo => {name => 'Geostationary'},
 	intelsat => {name => 'Intelsat'},
-	gorizont => {name => 'Gorizont'},
-	raduga => {name => 'Raduga'},
-	molniya => {name => 'Molniya'},
-	iridium => {name => 'Iridium'},
+	# Removed May 8 2025
+	# gorizont => {name => 'Gorizont'},
+	# Removed May 8 2025
+	# raduga => {name => 'Raduga'},
+	# Removed May 8 2025
+	# molniya => {name => 'Molniya'},
+	# Removed May 8 2025
+	# iridium => {name => 'Iridium'},
 	'iridium-NEXT' => { name => 'Iridium NEXT' },
 	ses	=> { name => 'SES communication satellites' },
 	orbcomm => {name => 'Orbcomm'},
@@ -306,7 +312,8 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	satnogs	=> { name => 'SatNOGS' },
 	starlink	=> { name => 'Starlink' },
 	oneweb		=> { name => 'OneWeb' },
-	swarm		=> { name => 'Swarm' },
+	# Removed May 8 2025
+	# swarm		=> { name => 'Swarm' },
 	gnss		=> { name => 'GNSS navigational satellites' },
 	'1982-092'	=> {
 	    name	=> 'Russian ASAT Test Debris (COSMOS 1408)',
@@ -334,6 +341,10 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	# Removed 2022-05-12
 	# '2019-006'	=> { name => 'Indian ASAT Test Debris' },
 	eutelsat	=> { name => 'Eutelsat' },
+	kuiper		=> { name => 'Kuiper' },
+	telesat		=> { name => 'Telesat' },
+	hulianwang	=> { name => 'Hulianwang' },
+	qianfan		=> { name => 'Qianfan' },
     },
     celestrak_supplemental => {
 	# Removed 2024-12-27
@@ -2327,10 +2338,16 @@ This method and the associated manifest constants are B<deprecated>.
     use constant _BODY_STATUS_IS_TUMBLING	=> 2;
     use constant _BODY_STATUS_IS_DECAYED	=> 3;
 
-    use constant BODY_STATUS_IS_OPERATIONAL	=> _BODY_STATUS_IS_OPERATIONAL;
-    use constant BODY_STATUS_IS_SPARE		=> _BODY_STATUS_IS_SPARE;
-    use constant BODY_STATUS_IS_TUMBLING	=> _BODY_STATUS_IS_TUMBLING;
-    use constant BODY_STATUS_IS_DECAYED		=> _BODY_STATUS_IS_DECAYED;
+
+    foreach ( qw{
+	BODY_STATUS_IS_OPERATIONAL
+	BODY_STATUS_IS_SPARE
+	BODY_STATUS_IS_TUMBLING
+	BODY_STATUS_IS_DECAYED
+	} )
+    {
+	eval "sub $_ () { _deprecation_notice(); return _$_ }";	## no critic (ProhibitStringyEval,RequireCheckingReturnValueOfEval)
+    }
 
     my %kelso_comment = (	# Expand Kelso status.
 	'[S]' => 'Spare',
@@ -5144,6 +5161,8 @@ sub _check_cookie_generic {
 
 {
 
+    use constant _MASTER_IRIDIUM_DEPRECATION_LEVEL	=> 1;
+
     my %deprecate = (
 	celestrak => {
 #	    sts	=> 3,
@@ -5154,25 +5173,29 @@ sub _check_cookie_generic {
 #	    '--start_epoch'	=> 3,
 	},
 	attribute	=> {
-	    direct		=> 2,
-	    url_iridium_status_kelso	=> 0,
+	    direct		=> 3,
+	    url_iridium_status_kelso	=> 3,
 	    url_iridium_status_mccants	=> 3,
-	    url_iridium_status_sladen	=> 0,
+	    url_iridium_status_sladen	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	},
-	iridium_status	=> 1,
+	iridium_status	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	iridium_status_format	=> {
-	    kelso	=> 0,
+	    kelso	=> 3,
 	    mccants	=> 3,
-	    sladen	=> 0,
+	    sladen	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	},
+	BODY_STATUS_IS_OPERATIONAL	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
+	BODY_STATUS_IS_SPARE	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
+	BODY_STATUS_IS_TUMBLING	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
+	BODY_STATUS_IS_DECAYED	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
     );
 
     sub _deprecation_notice {
 	my ( undef, $method, $argument ) = @_;	# Invocant unused
-	my $level = $deprecate{$method}
-	    or return;
 	defined $method
 	    or ( $method = ( caller 1 )[3] ) =~ s/ .* :: //smx;
+	my $level = $deprecate{$method}
+	    or return;
 	my $desc = $method;
 	if ( ref $level ) {
 	    defined $argument or Carp::confess( 'Bug - $argument undefined' );

@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.014-3-g24c0911
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.015-3-gd4173d3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use 5.020;
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -104,7 +104,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -112,6 +112,23 @@ version 0.015
     openapi => {
       document_filename => 'data/openapi.yaml',
       after_response => sub ($c) { ... },
+    },
+    ...
+  });
+
+  # or:
+
+  $app->config({
+    openapi => {
+      document_uri => 'https://example.com/api/main.json',
+      schema => {
+        openapi => '3.1.1',
+        info => {
+          title => 'Test API with raw schema',
+          version => '1.2.3',
+        },
+        ...
+      },
     },
     ...
   });
@@ -153,7 +170,7 @@ A filename indicating from where to load the OpenAPI document. Supports YAML and
 Only used if L</schema> is not provided; this value will also be used as the L</document_uri> if one
 was not explicitly provided.
 
-Only used if L</openapi_obj> is not provided.
+Only used if neither L</schema> nor L</openapi_obj> provided.
 
 =head2 openapi_obj
 

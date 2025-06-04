@@ -1,13 +1,33 @@
 Revision history for Net-CIDR-Set
 
-0.15 2025-05-27 16:33:00+01:00 Europe/London
+0.16      2025-06-03 13:54:58+01:00 Europe/London
+  [Bug Fixes]
+  - Imports are removed from the namespace.
+
+  - Removed unused variable.
+
   [Documentation]
-  - Add missing version and timestamp to Changes for v0.14.
+  - Modernised POD.
+
+  - Added a security policy.
+
+  - Updated README from POD.
+
+  - Fixed tense in Changes for v0.15.
 
   [Other]
-  - Re-release due to possible bad signature.
+  - Removed unnecessary files from the repo and distribution.
 
-  - Fix MANIFEST.
+  - Fixed issues with MANIFEST.SKIP.
+
+0.15 2025-05-27 16:33:00+01:00 Europe/London
+  [Documentation]
+  - Added missing version and timestamp to Changes for v0.14.
+
+  [Other]
+  - Re-released due to possible bad signature.
+
+  - Fixed MANIFEST.
 
 0.14 2025-05-27 16:16:23+01:00 Europe/London
   [Security]

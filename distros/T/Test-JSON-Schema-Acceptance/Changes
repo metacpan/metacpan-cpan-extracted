@@ -1,5 +1,12 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.029     2025-06-03 21:01:17Z
+        - the acceptance sub provided by the application can now return an
+          additional value, containing the error result of the validation, for
+          diagnostic purposes.
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/9f256c8811c9c6d181db049d1e69bad35156bf60...9ad349be933f1e74810cb4fd3ad19780694dc77e
+
 1.028     2025-05-10 19:51:04Z
         - now passing the specification_version to the add_resource sub, when
           documents are in draft-specific subdirectories

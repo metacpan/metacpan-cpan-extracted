@@ -1,4 +1,4 @@
-Crypt-RSA-Blind
+Crypt::RSA::Blind
 
 Blind RSA signatures
 
@@ -23,24 +23,17 @@ You can also look for information at:
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-RSA-Blind
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Crypt-RSA-Blind
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Crypt-RSA-Blind
-
-    Search CPAN
-        http://search.cpan.org/dist/Crypt-RSA-Blind/
-
-
-LICENSE AND COPYRIGHT
+COPYRIGHT
 
 Copyright (c) Ashish Gulhati.
 
-This software package is Open Software; you can use, redistribute,
-and/or modify it under the terms of the Open Artistic License 2.0.
+LICENSE
 
-Please see L<http://www.opensoftware.ca/oal20.txt> for the full license
-terms, and ensure that the license grant applies to you before using
-or modifying this software. By using or modifying this software, you
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 4.0.
+
+Please see the LICENSE file included with this package, or visit
+L<http://www.opensoftware.ca/oal40.txt>, for the full license terms,
+and ensure that the license grant applies to you before using or
+modifying this software. By using or modifying this software, you
 indicate your agreement with the license terms.

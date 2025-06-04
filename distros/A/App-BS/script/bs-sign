@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+shopt -s nullglob
+
+[[ ${BS_DEBUG:-0} -ne 0 ]] && set -x;
+
+#export scriptdir="${0//\/$(basename "$0")}"
+. "$scriptdir/bs-common.sh"
+
+export repodb="${BS_REPO:-$AURDIT_REPO}/universe.db.tar.zst"
+export repodb_base="$(basename $repodb)"
+export repodir="${repodb//$repodb_base/}"
+export gpgpubid="${BS_GPG_PUBID:-${BS_GPGFPR:-${GPGKEYID}}}"
+export pkgdest="${BS_PKGDEST:-$PKGDEST}"
+
+signpkgs() {
+  _sign_rel_flow "$@"
+}
+
+_sign_rel_flow() {
+  files=("$@")
+  echo "Signing ${files[*]}..."
+
+  [[ -e "${files[*]:0:1}" ]] || files=("$pkgdest"/*.pkg.tar.zst)
+  complete=()
+
+  for f in "${files[@]}"; do
+    if [[ ! -e "$f" ]]; then
+        echo "Could not locate package file '$f'!! Skipping..."
+    fi
+    for pkg in "${complete[@]}"; do
+      [[ -z "${f//$pkg}" ]] && echo "[◎] Already signed '$f'. Skipping..." \
+        && continue 2
+    done
+
+    signpkg "$f"
+    copy2repo "$f"
+    repoadd "$f"
+    err=$?
+
+    echo ""
+    complete+=("$f")
+  done
+
+  echo "${complete[@]}"
+  return $err
+}
+
+signpkg() {
+  f="$1"
+
+  if [[ -f "$f.sig" ]]; then
+    echo "[◎] Signature file already exists for '$f'."
+    if [[ "$BS_CLOBBER" -ne 1 ]]; then
+      echo "Skipping..."
+    else
+      rm -r "$f.sig"
+      signpkg "$f"
+    fi
+  else
+    gpg -u "$gpgpubid" -sb "$f"
+    gpgerr=$?
+    [[ $gpgerr -eq 0 ]] \
+       && echo "[●] Signed '$f' with '$gpgpubid'"
+  fi
+
+  return $gpgerr
+}
+
+copy2repo() {
+  f="$1"
+  status=0
+
+  if [[ -f "$repodir/$(basename $f)" ]] && [[ "$BS_CLOBBER" -ne 1 ]]; then
+    printf "[◎] Package with identical filename '%s' already exists " \
+      "$(basename "$f")"
+    printf "in repo '%s'. Skipping...\n" "$repodb"
+  else
+    cp -vaf "$f" "${f}.sig" "$repodir" 2>&1
+    status=$?
+    [[ $status -eq 0 ]] \
+      && echo "[●] Copied '$f' to repo '$repodir'..."
+  fi
+
+  return $status
+}
+
+repoadd() {
+  f="$1"
+
+  repo-add -$([[ $BS_CLOBBER -ne 1 ]] && printf "%s" "n")psv --include-sigs \
+   -k"${gpgpubid}" "${repodb}" "${repodir}/$(basename "$f")"
+
+  repoaddexit=$?
+  if [[ $repoaddexit -eq 0 ]]; then
+    echo "[●] \`repo-add -nps... '$repodb' '$f'\` exited successfully!"
+  else
+    >&2 echo "[✖︎] \`repo-add -nps... '$repodb' '$f'\` failed with '$repoaddexit'!"
+  fi
+
+  return $repoaddexit
+}

@@ -124,10 +124,10 @@ sub _jaccard_similarity {
 
 sub jaccard_similarity_formatted {
 
-    # *** IMPORTANT ****
-    # mrueda Dec-27-23
-    # Direct formatting in jaccard_similarity adds minor overhead (verified by testing),
-    # but prevents errors on some CPAN FreeBSD architectures.
+# *** IMPORTANT ****
+# mrueda Dec-27-23
+# Direct formatting in jaccard_similarity adds minor overhead (verified by testing),
+# but prevents errors on some CPAN FreeBSD architectures.
     my ( $result, undef ) = jaccard_similarity(@_);
     return sprintf( "%.6f", $result );
 }
@@ -138,9 +138,9 @@ sub jaccard_similarity_formatted {
 
 sub estimate_hamming_stats {
 
-    # Estimate Hamming stats using a binomial distribution model. Assumes each bit position
-    # in the binary strings has an independent 50% chance of mismatch, to calculate
-    # the mean and standard deviation of the Hamming distance.
+# Estimate Hamming stats using a binomial distribution model. Assumes each bit position
+# in the binary strings has an independent 50% chance of mismatch, to calculate
+# the mean and standard deviation of the Hamming distance.
 
     my $length               = shift;
     my $probability_mismatch = 0.5;

@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use utf8;
+use v5.40;
+
+use Data::Dumper;
+
+our $app = sub {
+    use Data::Dumper;
+
+    #use Plack::Builder;
+    use Plack::App::Directory;
+
+    warn Dumper(@_);
+
+    #return [ 200
+    #  , [[ 'Content-Type' => 'application/json' ]]
+    #  , encode_json({ hello => "world" })]
+
+    Plack::App::Directory->new( { root => $_[0] // "$ENV{BS_ROOT}/repo" } )
+      ->to_app;
+};
+
+unless (caller) {
+    require Plack::Runner;
+    Plack::Runner->parse_options(@ARGV)->run($app);
+    exit( $? // 0 );
+}
+
+$app

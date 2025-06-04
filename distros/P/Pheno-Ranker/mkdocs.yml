@@ -92,6 +92,7 @@ nav:
   - "🚀 Use Cases":
       - "🏥 Phenopacket Corpus": phenopackets-corpus.md
       - "🧬 OMIM Database": omim-database.md
+      - "🎗️ TCGA Clinical": tcga-clinical.md
   - "🔗 Formats Beyond BFF/PXF": 
       - "📜 Generic JSON": generic-json.md
       - "📊 CSV": csv-import.md

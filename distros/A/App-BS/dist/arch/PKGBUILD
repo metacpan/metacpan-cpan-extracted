@@ -1,0 +1,44 @@
+# Maintainer: Muflone http://www.muflone.com/contacts/english/
+# Contributor: <michael dot kogan at gmx dot net>
+# Contributor: John D Jones III AKA jnbek <jnbek1972 -_AT_- g m a i l -_Dot_- com>
+
+pkgname=perl-app-bs
+_perl_namespace=App
+_perl_module=BS
+pkgver=0.01
+pkgrel=1
+pkgdesc="Build system for PKGBUILD based Linux distributions"
+arch=(x86_64 x86_64_v3 aarch64)
+license=('Artistic-1.0-Perl' 'GPL-1.0-or-later')
+depends=('perl')
+makedepends=(perl-syntax-keyword-try' 'perl-cpanel-json-xs' 'perl-module-build' 'perl-dbi' '' 'cpanminus' 'perl-inline-c' perl-path-tiny')
+optdepends=('perl-cpanel-json-xs: Using Cpanel-JSON-XS')
+options=('!emptydirs')
+url="https://github.com/marlencrabapple/App-bs"
+source=("https://cpan.metacpan.org/authors/id/E/ET/ETHER/${_perl_namespace}-${_perl_module}-${pkgver}.tar.gz")
+sha256sums=('cd3937afa78831f80a2ad5abab6c51b9e82fca4c31e5856ea208d598db5dc867')
+
+build() {
+  cd "${_perl_namespace}-${_perl_module}-${pkgver}"
+  unset PERL5LIB PERL_MM_OPT PERL_MB_OPT PERL_LOCAL_LIB_ROOT
+  cpanm -Llocal --save-dists . --verbose \
+    vendor/{Plack,Frame,Dotfiles-p5}*.tar.gz
+  cpanm -Llocal --save-dists . --installdeps --verbose .
+  perl Build.PL
+
+}
+
+check() {
+  cd "${_perl_namespace}-${_perl_module}-${pkgver}"
+  unset PERL5LIB PERL_MM_OPT PERL_MB_OPT PERL_LOCAL_LIB_ROOT
+  export PERL_MM_USE_DEFAULT=1
+  make test
+}
+
+package() {
+  cd "${_perl_namespace}-${_perl_module}-${pkgver}"
+  unset PERL5LIB PERL_MM_OPT PERL_MB_OPT PERL_LOCAL_LIB_ROOT
+  make pure_install INSTALLDIRS=vendor DESTDIR="${pkgdir}"
+  # Delete unuseful files
+  find "${pkgdir}" -name '.packlist' -delete
+}

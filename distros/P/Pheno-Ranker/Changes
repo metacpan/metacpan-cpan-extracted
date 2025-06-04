@@ -1,5 +1,14 @@
 Revision history for Perl distribution Pheno-Ranker
 
+1.07 2025-06-05:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Revived --patient-of-interest (--poi) option
+ - Updated Dockerfile to use perl:stable-bookworm
+ - Switched cpan-publish.yml from ubuntu-latest to ubuntu-22.04
+ - Fixed issue with --prp and BFF
+ - bff-pxf-simulator:
+   - PXF: Fixed 'procedure.term.id' with 'procedure.code.id'
+
 1.06 2025-05-27:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Replace --max-matrix-items-in-ram by --max-matrix-records-in-ram

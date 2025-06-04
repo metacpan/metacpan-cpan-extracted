@@ -1,0 +1,36 @@
+#!/usr/bin/env perl;
+
+use Object::Pad qw(:experimental(:all));
+
+package BSRebuildOrder;
+
+role BSRebuildOrder : does(App::BS::Common)
+  : does(App::BS::CLI::Barearg) : does(BS::Ext::pacman);
+
+use utf8;
+
+use v5.40;
+
+field $queue : param;
+field %pkgin;
+
+method handle_barearg ($arg) {
+    my $arg_novcs = $arg =~ s/-git|-svn|-hg|-cvs//r;
+
+    if ($arg) {
+    }
+    ...;
+}
+
+package main;
+
+class main : does (BSRebuildOrder);
+
+use utf8;
+use v5.40;
+
+method asdf : common () {
+
+}
+
+our $stripuniq = BSRebuildOrder->new;

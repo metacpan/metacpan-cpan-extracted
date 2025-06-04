@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+
+use utf8;
+use v5.40;
+
+use Data::Printer;
+
+use lib 'lib';
+
+use Path::Tiny;
+use BS::Package::Meta;
+
+our $srcinfo_file = path($ARGV[0]);
+our %srcinfo_out;
+
+our $pkg = BS::Package::Meta->parse_srcinfo($srcinfo_file
+  , dest => \%srcinfo_out
+  , resolve_base => $ENV{RESOLVE_BASE});
+
+p $pkg

@@ -1,0 +1,24 @@
+name = "App-BS"
+badges = ["github-actions/test.yml"]
+module_maker = "ModuleBuild"
+static_install = "auto"
+authority = "cpan:CRABAPP"
+
+#c_source = [ 'src' ]
+requires_external_bin = [
+    "pacman",
+    "pacinfo",
+    "pactree",
+    "pacsift",
+    "arch-rebuild-order",
+    "expac",
+    "makechrootpkg",
+    "makepkg",
+    "gpg",
+]
+
+[XSUtil]
+requires_c99_compiler = 1
+generate_ppport_h = 1
+generate_xshelper_h = 1
+cc_warnings = 1

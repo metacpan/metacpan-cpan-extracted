@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+
+use utf8;
+use v5.40;
+
+use TOML::Tiny;
+use DBI;
+use DBD::SQLite;
+use IPC::Run3;
+use Path::Tiny;
+use Data::Printer;
+use Getopt::Long;
+
+# TODO: Think about differences between "new", and things like "init" or "add"
+use constant CMDRE => qr/^(build|clone|package|sign|release|new|depends)$/;
+
+our $config = {
+  sql => {
+    source => $ENV{BS_DBSRC},
+    username => '',
+    password => ''
+  }
+};
+
+die "No database source provided! Please set `sql.source` in your config file"
+  . " or the BS_DBSRC env variable." unless $config->{sql}{source};
+
+our %dispatch = (
+  build => \&buildcmd,
+  release => \&releasecmd
+);
+
+our $currcmd;
+our @packages;
+our %deps;
+
+our $signpkg = 1;
+our $repo_addpkg = 0;
+our $repo_signdb = 1;
+our $repo_copypkgarch = 0;
+our $verbose = 1;
+
+Getopt::Long::Configure("bundling");
+GetOptions("sign-package" => \$signpkg,
+           "sign-repo-db" => \$repo_signdb,
+           "add-to-repo" => \$repo_addpkg,
+           "copy-pkgarch-repo" => \$repo_copypkgarch,
+           "verbose" => \$verbose,
+           "<>" => \&handle_barearg);
+
+$repo_addpkg = 1 if $repo_copypkgarch;
+
+our $conn = DBIx::Connector->new($$config{sql}
+  ->@{qw(source username password)}, {
+    sqlite_unicode => 1
+  });
+
+$dispatch{$currcmd}->();
+
+sub _buildpkg ($pkg) {
+  
+}
+
+sub buildcmd {
+  foreach my $pkg (@packages) {
+    _buildpkg($pkg)
+  }
+}
+
+sub releasecmd ($pkg) {
+  my $bsrepoadd_out = `. bs-repoadd; sign_copy_release $pkg`
+}
+
+sub handle_deps ($pkg) {
+  
+}
+
+sub handle_barearg ($arg) {
+  if (my ($_currcmd) = ($arg =~ CMDRE) && !$currcmd) {
+    $currcmd //= $arg
+  }
+  elsif ($currcmd) {
+    # Currently all commands handle a package afai can guess so just permit
+    # anything through to handle_pkgiden if $currcmd is set?
+    handle_pkgiden($arg)
+  }
+
+  # TODO: Is it better to simply add things to run manifest or start processing?
+  # For now maybe process/create run manifest first to avoid added complexity
+  # of figuring out/choosing our parallel/sync model yet
+}
+
+sub handle_pkgiden ($pkgid) {
+  #state $filedb_updated;
+  #state $pkgdb_updates;
+
+  #if () {
+  #}
+}
+
+sub _srcinfo_parseline ($line) {
+  my ($key, $val) = $line =~ /([^=\s]+)=([^\s\n])+/i;
+  p($line, $key, $val);
+  _srcinfodep_parsevalue($val, $key);
+}
+
+sub _srcinfo_parsepkg ($val, $type) {
+  return undef unless $type =~ /pkg(base|name)/i;
+  $type = "pkg$1";
+
+  
+}
+
+sub _srcinfo_parsedep ($val, $type) {
+  return undef if $type eq 'optdepends' && $ENV{BS_ALLDEPS};
+  return undef unless $type =~ /(opt|make|check)?depends/;
+  $type = "${1}depends";
+
+  
+}
+

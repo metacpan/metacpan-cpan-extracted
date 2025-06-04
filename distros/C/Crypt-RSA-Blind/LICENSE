@@ -1,0 +1,220 @@
+Open Artistic License 4.0
+-------------------------
+
+Preamble
+
+This license establishes the terms under which a software Package may
+be used, copied, modified, distributed, and/or redistributed. The
+intent is that the Copyright Holder maintains artistic control over
+the development of the Package while giving the users of the Package
+the right to use and distribute the Package for noncommercial
+purposes, and the right to make reasonable modifications.
+
+You can always make a licensing arrangement separate from this license
+directly with the Copyright Holder of the Package. If the terms of
+this license do not permit the full use that you propose to make of
+the Package, you should contact the Copyright Holder and seek a
+different licensing arrangement.
+
+Definitions:
+
+"Package" refers to the collection of files distributed by the
+Copyright Holder, and derivatives of that collection of files created
+through textual modification.
+
+"Standard Version" refers to such a Package if it has not been
+modified, or has been modified in accordance with the wishes of the
+Copyright Holder as specified below.
+
+"Modified Version" refers to the Package, if it has been changed, and
+such changes were not explicitly requested by the Copyright Holder.
+
+"Copyright Holder" means the individual(s) or organization(s) named in
+the copyright notice for the entire Package.
+
+"You" and "your" refer to any person who would like to use, copy,
+distribute, or modify the Package.
+
+"Distribute" means providing a copy of the Package or making it
+accessible to anyone else, or in the case of a company or
+organization, to others outside of your company or organization.
+
+"Distribution fee" is a fee you charge for providing a copy
+of this Package to another party.
+
+"Freely Available" means that no fee is charged for the right to
+use the item, though there may be fees involved in handling the
+item. It also means that recipients of the item may redistribute
+it under the same conditions they received it.
+
+"Source" form means the source code, documentation source, and
+configuration files for the Package.
+
+"Compiled" form means the compiled bytecode, object code, binary, or
+any other form resulting from mechanical transformation or translation
+of the Source form.
+
+"Original License" means this Open Artistic License as Distributed
+with the Standard Version of the Package.
+
+Permission for Use and Modification Without Distribution
+
+1. You are permitted to use the Standard Version, and to create and
+use Modified Versions, for noncommercial purposes, provided that you
+do not Distribute a Modified Version, and provided that you are not
+an entity excluded from this license grant, as specified in Section 14
+below, nor an entity that has had this license grant terminated as
+specified in Section 13 below.
+
+2. You may not use the Standard Version or a Modified Version as part
+of any commercial product or service, or in a manner intended for or
+directed towards commercial advantage or compensation. If you would
+like to use the Package in a commercial product or service, or in a
+manner intended for or directed towards commercial advantage, you may
+contact the Copyright Holder to arrange for a commercial use license.
+
+Permissions for Redistribution of the Standard Version
+
+3. You may Distribute verbatim copies of the Source form of the
+Standard Version of this Package in any medium without restriction,
+either gratis or for a Distributor Fee, provided that you duplicate
+all of the original copyright notices and associated disclaimers. At
+your discretion, such verbatim copies may or may not include a
+Compiled form of the Package.
+
+4. You may apply any bug fixes, portability changes, and other
+modifications made available from the Copyright Holder. The resulting
+Package will still be considered the Standard Version, and as such
+will be subject to the Original License.
+
+Distribution of Modified Versions
+
+5. You may not Distribute a Modified Version either as Source or in a
+Compiled form. If you would like to Distribute a Modified Version, you
+may contact the Copyright Holder to arrange for an alternate license
+that permits this.
+
+Distribution of Compiled Forms of the Standard Version without the Source
+
+6. You may Distribute Compiled forms of the Standard Version without
+the Source, provided that you include complete instructions on how to
+get the Source of the Standard Version. Such instructions must be
+valid at the time of your distribution. If these instructions, at any
+time while you are carrying out such distribution, become invalid, you
+must provide new instructions on demand or cease further
+distribution. If you provide valid instructions or cease distribution
+within thirty days after you become aware that the instructions are
+invalid, then you do not forfeit any of your rights under this
+license.
+
+Aggregating or Linking the Package
+
+7. You may aggregate the Standard Version of the Package with other
+packages and Distribute the resulting aggregation provided that you do
+not charge a licensing fee for the Package. Distributor Fees are
+permitted, and licensing fees for other components in the aggregation
+are permitted. The terms of this license apply to the use and
+Distribution of the Standard Version as included in the aggregation.
+
+8. You are permitted to link the Standard Version with other works, to
+embed the Package in a larger work of your own, or to build
+stand-alone binary or bytecode versions of applications that include
+the Package, and Distribute the result. The terms of this license
+apply to the use and Distribution of the Standard Version linked or
+embedded with another work.
+
+Items That are Not Considered Part of a Modified Version
+
+9. Works (including, but not limited to, modules and scripts) that
+merely extend or make use of the Package, do not, by themselves, cause
+the Package to be a Modified Version. In addition, such works are not
+considered parts of the Package itself, and are not subject to the
+terms of this license.
+
+General Provisions
+
+10. Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Open Artistic License. By using,
+modifying or distributing the Package, you accept this license. Do not
+use, modify, or distribute the Package, if you do not accept this
+license.
+
+11. This license does not grant you the right to use any trademark,
+service mark, tradename, or logo of the Copyright Holder, or to use
+the Copyright Holder's name to endorse or promote products derived
+from this software.
+
+12. This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import
+and otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by
+the Package. If you institute patent litigation (including a
+cross-claim or counterclaim) against any party alleging that the
+Package constitutes direct or contributory patent infringement, then
+this Open Artistic License to you shall terminate on the date that
+such litigation is filed.
+
+13. Termination of license: The Copyright Holder may terminate this
+Open Artisic License to you at their sole discretion, at any time, and
+without assigning any reason. Upon the termination of the License you
+must immediately cease use of the Package. License termination will
+also terminate your right to Distribute any versions embedded or
+linked in your own works.
+
+14. License exclusions: This license is NOT granted and does NOT apply
+to ANY of the following entities:
+
+    a) Criminal entities involved in the violation of individual
+       rights, and any associated entities, including the members,
+       owners, collaborators, beneficiaries, employees, contractors
+       and affiliates of such entities. The term "criminal" in this
+       context refers only to actions and entities that violate
+       individual rights, not to those that are legislatively declared
+       "criminal" by a government but don't involve the violation of
+       individual rights.
+
+    b) Government entities and wholly or partially government funded
+       entities, and any associated entities, including the members,
+       employees, contractors, affiliates, and net beneficiaries of
+       such entities. This includes Corporations or other entities
+       (including individuals) that receive funding or income from
+       government entities or government funded entities, and all
+       associated entities, including the members, owners, employees,
+       contractors and affiliates of such entities.
+
+    c) Entities engaged in the advocacy or propagation of ideologies
+       that are inimical to individual rights, including socialism,
+       communism, fascism, racism, feminism, Marxism, and
+       collectivism, and any associated entities, including the
+       members, owners, collaborators, beneficiaries, employees,
+       contractors and affiliates of such entities.
+
+If you are uncertain whether this license exclusion applies to you, you
+should contact the Copyright Holder to ascertain if it does.
+
+15. Entities that are excluded from the rights granted by this Open
+Artistic License through license termination as per Section 13, or by
+being listed in Section 14, may still, unless notified otherwise by
+the Copyright Holder, distribute the Standard Version of the
+package. They may also execute any test suite included with the
+Standard Version of the Package as part of their participation in a
+public automated quality assurance / testing network. However they may
+not use any version of the Package, or create or Distribute any
+Modified Versions.
+
+16. You agree to ensure that your use and/or distribution of the
+Package complies with all applicable laws. This license does not
+authorize the use or distribution of any version of the Package for,
+or in association with, any illegal activity. You agree to indemnify
+the Copyright Holder for any costs or consequences arising from your
+use or distribution of the Package in violation of any applicable
+laws.
+
+17. Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT
+HOLDER AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT
+PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT
+HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

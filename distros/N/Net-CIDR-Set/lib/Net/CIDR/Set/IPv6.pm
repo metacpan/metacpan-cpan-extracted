@@ -4,17 +4,11 @@ use warnings;
 use strict;
 use Carp;
 
-=head1 NAME
+use namespace::autoclean;
 
-Nset::CIDR::Set::IPv6 - Encode / decode IPv6 addresses
+# ABSTRACT: Encode / decode IPv6 addresses
 
-=head1 VERSION
-
-This document describes Net::CIDR::Set::IPv6 version 0.15
-
-=cut
-
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub new { bless \my $x, shift }
 
@@ -135,44 +129,52 @@ sub decode {
 sub nbits { 128 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Net::CIDR::Set::IPv6 - Encode / decode IPv6 addresses
+
+=head1 VERSION
+
+version 0.16
+
+=for Pod::Coverage new
+
+=for Pod::Coverage encode
+
+=for Pod::Coverage decode
+
+=for Pod::Coverage nbits
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/perl-Net-CIDR-Set>
+and may be cloned from L<git://github.com/robrwo/perl-Net-CIDR-Set.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
-Andy Armstrong
+Andy Armstrong <andy@hexten.net>
 
-Maintained by Robert Rothenberg <rrwo@cpan.org>
+=head1 COPYRIGHT AND LICENSE
 
-=head1 LICENCE AND COPYRIGHT
+This software is copyright (c) 2009, 2014, 2025 by Message Systems, Inc.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-Copyright (c) 2009, 2014, 2025 Message Systems, Inc.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or
-without modification, are permitted provided that the following
-conditions are met:
-
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in
-      the documentation and/or other materials provided with the
-      distribution.
-    * Neither the name Message Systems, Inc. nor the names of its
-      contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
-OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+=cut

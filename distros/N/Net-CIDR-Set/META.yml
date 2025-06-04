@@ -1,30 +1,55 @@
 ---
 abstract: 'Manipulate sets of IP addresses'
 author:
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Andy Armstrong <andy@hexten.net>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '7.22'
+  File::Spec: '0'
+  Module::Metadata: '1.000015'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - CIDR
+  - INET
+  - LPM
+  - Longest
+  - Prefix
+  - Match
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-CIDR-Set
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Net::CIDR::Set:
+    file: lib/Net/CIDR/Set.pm
+    version: '0.16'
+  Net::CIDR::Set::IPv4:
+    file: lib/Net/CIDR/Set/IPv4.pm
+    version: '0.16'
+  Net::CIDR::Set::IPv6:
+    file: lib/Net/CIDR/Set/IPv6.pm
+    version: '0.16'
 requires:
   Carp: '0'
+  namespace::autoclean: '0'
   overload: '0'
+  perl: v5.6.0
   strict: '0'
   warnings: '0'
 resources:
+  Authority: cpan:RRWO
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set
   repository: git://github.com/robrwo/perl-Net-CIDR-Set.git
-version: '0.15'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+version: '0.16'
+x_contributors:
+  - 'Brian Gottreu <gottreu@cpan.org>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Stig Palmquist <stigtsp@cpan.org>'
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

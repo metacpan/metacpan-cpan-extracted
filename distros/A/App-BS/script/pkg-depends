@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use Object::Pad;
+
+use lib 'lib';
+
+use utf8;
+use v5.40;
+
+use App::BS::pkgdepends;
+
+our %opts = (
+  unique => 1,
+  sync => 1,
+  order => 'asc'
+);
+
+our @queue;
+our $app = App::BS::pkgdepends->new(getopts => [ "pkgbuild-repo|pkgmeta:s"
+                                      , "seperator:s"
+                                      , "order|sort-direction|print-order:s"
+                                      , "optional|o:i"
+                                      , "depth|max-depth:i"
+                                      , "delimiter:s"
+                                      , "sync!"
+                                      , "fetch"
+                                      , "unique!"
+                                      , "updpkgsums"
+                                      , "update!"
+                                      , "<>" => \&handle_barearg ],
+
+                           argv  => \@ARGV,
+                           dest  => \%opts,
+                           queue => \@queue);
+
+sub handle_barearg ($str) {
+  if (length $str == 1 && $ARGV[-1] eq $str) {
+    $opts{seperator} = $str
+  }
+  else {
+    push @queue, $str
+  }
+}
+
+$app->run;
+
+$app->print_self if $ENV{DEBUG}

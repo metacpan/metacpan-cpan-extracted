@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+[[ ${BS_DEBUG:-0} -eq 1 ]] && set -x;
+
+repodb="${BS_REPO:-$AURDIT_REPO}/universe.db.tar.zst"
+
+scriptdir="${0//\/$(basename "$0")}"
+. "$scriptdir/bs-sign"
+
+_sign_rel_flow "$@"
+

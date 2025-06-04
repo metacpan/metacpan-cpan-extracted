@@ -63,6 +63,7 @@ my %WriteMakefileArgs = (
     "Math::BigRat" => "0.2624",
     "Path::Tiny" => "0.146",
     "Test2::Plugin::BailOnFail" => 0,
+    "Test2::Require::Module" => 0,
     "Test2::V0" => 0,
     "Tie::Array" => 0,
     "Tie::Handle" => 0,
@@ -81,7 +82,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "vars" => 0
   },
-  "VERSION" => "7.015",
+  "VERSION" => "7.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -125,6 +126,7 @@ my %FallbackPrereqs = (
   "Sub::Identify" => 0,
   "Term::ReadKey" => 0,
   "Test2::Plugin::BailOnFail" => 0,
+  "Test2::Require::Module" => 0,
   "Test2::V0" => 0,
   "Tie::Array" => 0,
   "Tie::Handle" => 0,

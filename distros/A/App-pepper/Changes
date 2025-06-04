@@ -1,0 +1,8 @@
+Revision history for perl module App::pepper:
+
+0.99.1 - 2025-06-03
+  - support for EPP servers which implement RFC 9154 (Secure Authorization
+    Information for Transfer).
+  - support for EPP servers which use the host attribute model (see RFC 5731,
+    Section 1.1).
+  - Generate stronger authInfo codes.

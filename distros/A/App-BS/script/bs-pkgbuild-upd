@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+[[ "${BS_DEBUG:=0}" -eq 1 ]] && set -x
+
+for pkg in $(expac -Ss '%e' '^gnome-.*$'); do
+  if [[ ! -d "$pkg" ]]; then
+    pkgctl repo clone --protocol=https "$pkg"
+    err=$?
+
+    [[ "${err:0}" -eq 0 ]] && continue
+
+    (
+      echo "Failed to fetch $($pkg) from Arch Official Repository mirror"
+      plenv shell system
+      aur fetch -r "$pkg"
+      err=$?
+
+      if [[ $err -ne 0 ]]; then
+        echo "Failed to fetch $($pkg) from AUR"
+        for repo in "${BS_REPOS[@]}"; do
+          git clone "$BS_USERREPO_BASE_URI/$repo/$pkg.git"
+          err=$?
+
+          if [[ $err -ne 0 ]]; then
+            echo "Failed to clone $pkg from user added repo $($repo)"
+          fi
+        done
+      fi
+    )
+    continue
+  fi
+
+  cd "$pkg" || continue
+
+  branches=($(git branch --all))
+  curr_branch="$(git branch --no-list)"
+
+  git switch -c "resync-$(epoch)"
+  git add -A
+  git commit -S -m "Sync PKGBUILD with upstream"
+
+  for branch in "${branches[@]}"; do
+    [[ -z "${branch//main|master/}" ]] || continue
+    git switch "$branch"
+    git pull origin "$branch" --rebase
+    git switch "$curr_branch"
+  done
+
+  cd ..
+done

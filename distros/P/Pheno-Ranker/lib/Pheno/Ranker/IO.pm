@@ -6,12 +6,13 @@ use autodie;
 use feature qw(say);
 use Path::Tiny;
 use File::Basename;
-use File::Spec::Functions qw(catdir catfile);
-use List::Util qw(any);
-use Hash::Util qw(lock_hash);
+use File::Spec::Functions  qw(catdir catfile);
+use List::Util             qw(any);
+use Hash::Util             qw(lock_hash);
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
-use YAML::XS qw(Load LoadFile DumpFile);
+use YAML::XS               qw(Load LoadFile DumpFile);
 use JSON::XS;
+
 #use Data::Dumper;
 
 #use Sort::Naturally qw(nsort);
@@ -65,7 +66,7 @@ sub io_yaml_or_json {
     my $is_gz = $file =~ /\.gz$/ ? 1 : 0;
 
     # Remove .gz for extension recognition if present
-    my $file_for_ext = $is_gz ? ($file =~ s/\.gz$//r) : $file;
+    my $file_for_ext = $is_gz ? ( $file =~ s/\.gz$//r ) : $file;
 
     # Allowed extensions
     my @exts = qw(.yaml .yml .json);
@@ -73,11 +74,12 @@ sub io_yaml_or_json {
     # Use fileparse on the file name without the .gz suffix
     my ( undef, undef, $ext ) = fileparse( $file_for_ext, @exts );
     my $msg = qq(Can't recognize <$file> extension. Extensions allowed are: )
-              . join ',', @exts;
+      . join ',', @exts;
     die $msg unless any { $_ eq $ext } @exts;
 
     # Unify extension by removing "a" and "."
-    $ext =~ tr/a.//d;  # so ".yaml" or ".yml" become "yml" and ".json" becomes "json"
+    $ext =~
+      tr/a.//d;   # so ".yaml" or ".yml" become "yml" and ".json" becomes "json"
 
     # Dispatch table for read/write operations
     my $return = {
@@ -88,13 +90,13 @@ sub io_yaml_or_json {
     # Call the appropriate function based on the mode and extension
     return $mode eq 'read'
       ? $return->{$mode}{$ext}->($file)
-      : $return->{$mode}{$ext}->({ filepath => $file, data => $data });
+      : $return->{$mode}{$ext}->( { filepath => $file, data => $data } );
 }
 
 sub read_json {
     my $file = shift;
     my $str;
-    if ($file =~ /\.gz$/) {
+    if ( $file =~ /\.gz$/ ) {
         gunzip $file => \$str
           or die "gunzip failed for $file: $GunzipError\n";
     }
@@ -109,10 +111,11 @@ sub read_yaml {
     my $data;
 
     # Check if the file ends with .gz
-    if ($file =~ /\.gz$/) {
+    if ( $file =~ /\.gz$/ ) {
         my $yaml_str;
         gunzip $file => \$yaml_str
-            or die "gunzip failed for $file: $GunzipError\n";
+          or die "gunzip failed for $file: $GunzipError\n";
+
         # Decode the YAML from the string
         $data = Load($yaml_str);
     }
@@ -236,7 +239,7 @@ sub validate_json {
 }
 
 sub coverage_stats {
-    my $data     = shift;
+    my ( $data, $format ) = @_;
     my $coverage = {};
 
     for my $item (@$data) {
@@ -245,8 +248,8 @@ sub coverage_stats {
             # Initialize key in coverage with 0 if not already present
             $coverage->{$key} //= 0;
 
-            # Increment count only if value is not undef, not an empty hash, not an empty array,
-            # and not equal to 'NA' or 'NaN'
+# Increment count only if value is not undef, not an empty hash, not an empty array,
+# and not equal to 'NA' or 'NaN'
             unless (
                    !defined $item->{$key}
                 || ( ref $item->{$key} eq 'HASH'  && !%{ $item->{$key} } )
@@ -260,6 +263,7 @@ sub coverage_stats {
         }
     }
     return {
+        format         => $format,
         cohort_size    => scalar @$data,
         coverage_terms => $coverage
     };
@@ -363,9 +367,10 @@ sub restructure_pxf_interpretations {
     return unless $self->{format} eq 'PXF';
 
     # Premature return if "interpretations" is excluded
-    return if (grep { $_ eq 'interpretations' } @{ $self->{exclude_terms} });
+    return if ( grep { $_ eq 'interpretations' } @{ $self->{exclude_terms} } );
 
-    say "Restructuring <interpretations> in PXFs..." if defined $self->{verbose};
+    say "Restructuring <interpretations> in PXFs..."
+      if defined $self->{verbose};
 
     # Function to restructure individual interpretation
     my $restructure_interpretation = sub {
@@ -395,7 +400,7 @@ sub restructure_pxf_interpretations {
                       {geneContext}{valueId};
                 }
 
-                # Check if id within variationDescriptor exists as an alternative
+               # Check if id within variationDescriptor exists as an alternative
                 elsif (
                     exists $variant_interpretation->{variationDescriptor}{id} )
                 {

@@ -52,17 +52,17 @@ sub matrix2graph {
         # Ensure each node is represented in the node array
         push @nodes, { data => { id => $node_id } };
 
-        # Process each value in the row corresponding to an edge, but only in the upper triangle
-        # and explicitly skipping diagonal elements
-        # Undirected graph - Cytoscape.js settings:
-        # "style": [
-        #  {
-        #  "selector": "edge",
-        #  "style": {
-        #    "target-arrow-shape": "none"
-        #    }
-        #  }
-        # ]
+# Process each value in the row corresponding to an edge, but only in the upper triangle
+# and explicitly skipping diagonal elements
+# Undirected graph - Cytoscape.js settings:
+# "style": [
+#  {
+#  "selector": "edge",
+#  "style": {
+#    "target-arrow-shape": "none"
+#    }
+#  }
+# ]
 
         for ( my $i = $current_index + 1 ; $i < scalar @headers ; $i++ ) {
             if ( $values[$i] >= $threshold ) {
@@ -101,8 +101,8 @@ sub matrix2graph {
 
 sub cytoscape2graph {
 
-    # This is a very time consuming function, that's why we only load data in Graph
-    # if the user asks for it
+ # This is a very time consuming function, that's why we only load data in Graph
+ # if the user asks for it
     require Graph;
 
     # Decode JSON to a Perl data structure
@@ -128,7 +128,7 @@ sub cytoscape2graph {
         $graph->add_weighted_edge(
             $edge->{data}{source},
             $edge->{data}{target},
-          
+
             # Convert to distances if Jaccard
             $jaccard ? 1 - $edge->{data}{weight} : $edge->{data}{weight}
         );
@@ -147,18 +147,19 @@ sub graph_stats {
     open( my $fh, '>:encoding(UTF-8)', $output );
 
     # Basic stats
-    print $fh "Metric: ",             ucfirst($metric), "\n";
+    print $fh "Metric: ",             ucfirst($metric),    "\n";
     print $fh "Number of vertices: ", scalar $g->vertices, "\n";
     print $fh "Number of edges: ",    scalar $g->edges,    "\n";
 
     # Checking connectivity and components
-    print $fh "Is connected: ", $g->is_connected, "\n";
+    print $fh "Is connected: ",         $g->is_connected,                "\n";
     print $fh "Connected Components: ", scalar $g->connected_components, "\n";
 
     # Diameter and average path length, check if the graph is connected first
     if ( $g->is_connected ) {
         print $fh "Graph Diameter: ", ( join "->", $g->diameter ), "\n";
-        print $fh "Average Path Length: ", sprintf ("%7.3f",$g->average_path_length), "\n";
+        print $fh "Average Path Length: ",
+          sprintf( "%7.3f", $g->average_path_length ), "\n";
     }
 
     # Display degrees of all vertices
@@ -167,14 +168,15 @@ sub graph_stats {
     }
 
     # Minimum Spanning Tree
-    my $mst = $g->MST_Kruskal;    # Assuming Kruskal's is available and appropriate
+    my $mst = $g->MST_Kruskal; # Assuming Kruskal's is available and appropriate
     print $fh "MST has ", scalar $mst->edges, " edges\n";
 
     # Calculate and write all pairs shortest paths and their lengths to the file
     foreach my $u ( $g->vertices ) {
         foreach my $v ( $g->vertices ) {
             if ( $u ne $v ) {
-                my @path = $g->SP_Dijkstra( $u, $v );    # Get shortest path using Dijkstra's algorithm
+                my @path = $g->SP_Dijkstra( $u, $v )
+                  ;    # Get shortest path using Dijkstra's algorithm
                 if (@path) {
                     my $distance = $g->path_length( $u, $v );    # Recompute
                     print $fh "Shortest path from $u to $v is ",

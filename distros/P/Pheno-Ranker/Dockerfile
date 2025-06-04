@@ -1,4 +1,4 @@
-FROM perl:stable-bullseye
+FROM perl:stable-bookworm
 
 LABEL org.opencontainers.image.authors="Manuel Rueda <manuel.rueda@cnag.eu>"
 
@@ -43,7 +43,7 @@ WORKDIR /usr/share/pheno-ranker
 RUN cpanm --notest --installdeps .
 
 # Install Python packages (utils/barcode)                                                          
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt --break-system-packages 
 
 # Install R packages (optional)
 #RUN Rscript -e "install.packages(c('pheatmap', 'ggplot2', 'ggrepel', 'dplyr', 'stringr'), repos='http://cran.rstudio.com/')"

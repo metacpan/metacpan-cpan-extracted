@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-06-02'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.016'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-06-03'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -346,16 +346,16 @@ our $addrvis_ndigits = 3;
 our $addrvis_seen    = {};   # full (decimal) address => undef
 our $addrvis_dec_abbrs = {}; # abbreviated decimal digits => undef
 sub _abbr_hex($) {
-  # Strip off _ADDRVIS_SHARED_MARK prefix, if present
-  local $_ = shift;
-  /^((?:\Q${\_ADDRVIS_SHARED_MARK}\E)?\K)(.*)/ or die;
-  substr(sprintf("%0*x", $addrvis_ndigits, $2), -$addrvis_ndigits)
-}
-sub _abbr_dec($) {
   # Preserve a _ADDRVIS_SHARED_MARK prefix, if present
   local $_ = shift;
   /^((?:\Q${\_ADDRVIS_SHARED_MARK}\E)?\K)(.*)/ or die;
-  $1.substr(sprintf("%0*d", $addrvis_ndigits, $2), -$addrvis_ndigits)
+  $1.substr(sprintf("%0*x", $addrvis_ndigits, $2), -$addrvis_ndigits)
+}
+sub _abbr_dec($) {
+  # Strip off _ADDRVIS_SHARED_MARK prefix, if present
+  local $_ = shift;
+  /^((?:\Q${\_ADDRVIS_SHARED_MARK}\E)?\K)(.*)/ or die;
+  substr(sprintf("%0*d", $addrvis_ndigits, $2), -$addrvis_ndigits)
 }
 sub _refaddrdechex($) {  # Returns just "<hex:dec>" (possibly marked as shared)
   my $arg = shift // return("undef");
@@ -371,8 +371,8 @@ sub _refaddrdechex($) {  # Returns just "<hex:dec>" (possibly marked as shared)
   }
   elsif (looks_like_number($arg)) { $addr = $arg }
   else {
-    #carp("addrvis arg '$arg' is neither a ref or a number\n");
-    Carp::cluck("addrvis arg '$arg' is neither a ref or a number\n");
+    #Carp::cluck("addrvis arg '$arg' is neither a ref or a number\n");
+    carp("addrvis arg '$arg' is neither a ref or a number\n");
     return ""
   }
 
@@ -1321,7 +1321,7 @@ my $anyvname_re =
 
 my $anyvname_or_refexpr_re = qr/ ${anyvname_re} | ${curlies_re} /x;
 
-my $addrvis_re = qr/\<(?:\Q${\_ADDRVIS_SHARED_MARK}\E)?\d+:[\da-fA-F]+\>/;
+my $addrvis_re = qr/\<\d+:(?:\Q${\_ADDRVIS_SHARED_MARK}\E)?[\da-fA-F]+\>/;
 
 sub __unmagic_atom() {  # edits $_
 ##  # FIXME this probably could omit the ([^'"]*?) bc there is never anything

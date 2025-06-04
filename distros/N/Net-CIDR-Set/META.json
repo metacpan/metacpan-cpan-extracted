@@ -1,10 +1,18 @@
 {
    "abstract" : "Manipulate sets of IP addresses",
    "author" : [
-      "Robert Rothenberg <rrwo@cpan.org>"
+      "Andy Armstrong <andy@hexten.net>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "CIDR",
+      "INET",
+      "LPM",
+      "Longest",
+      "Prefix",
+      "Match"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -13,16 +21,11 @@
       "version" : 2
    },
    "name" : "Net-CIDR-Set",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.22",
+            "Module::Metadata" : "1.000015"
          }
       },
       "configure" : {
@@ -30,18 +33,63 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::Security::Policy::Individual" : "0.10",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::DistManifest" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::MixedScripts" : "0",
+            "Test::More" : "1.302200",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203",
+            "Test::Vars" : "0.015"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "namespace::autoclean" : "0",
             "overload" : "0",
+            "perl" : "v5.6.0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "Module::Metadata" : "1.000015",
             "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Net::CIDR::Set" : {
+         "file" : "lib/Net/CIDR/Set.pm",
+         "version" : "0.16"
+      },
+      "Net::CIDR::Set::IPv4" : {
+         "file" : "lib/Net/CIDR/Set/IPv4.pm",
+         "version" : "0.16"
+      },
+      "Net::CIDR::Set::IPv6" : {
+         "file" : "lib/Net/CIDR/Set/IPv6.pm",
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -51,9 +99,19 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/robrwo/perl-Net-CIDR-Set.git"
-      }
+         "url" : "git://github.com/robrwo/perl-Net-CIDR-Set.git",
+         "web" : "https://github.com/robrwo/perl-Net-CIDR-Set"
+      },
+      "x_authority" : "cpan:RRWO"
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.16",
+   "x_contributors" : [
+      "Brian Gottreu <gottreu@cpan.org>",
+      "Robert Rothenberg <rrwo@cpan.org>",
+      "Stig Palmquist <stigtsp@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.34.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

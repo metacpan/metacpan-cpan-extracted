@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.027-5-gbfefa4c
+package Test::JSON::Schema::Acceptance; # git description: v1.028-3-gac2636b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.028';
+our $VERSION = '1.029';
 
 use 5.020;
 use Moo;
@@ -280,12 +280,12 @@ sub _run_test ($self, $one_file, $test_group, $test, $options) {
 
   Test2::API::run_subtest($test_name,
     sub {
-      my ($result, $schema_before, $data_before, $schema_after, $data_after);
+      my ($result_bool, $result, $schema_before, $data_before, $schema_after, $data_after);
       try {
         ($schema_before, $data_before) = map $self->json_serialize($_),
           $test_group->{schema}, $test->{data};
 
-        $result = $options->{validate_data}
+        ($result_bool, $result) = $options->{validate_data}
           ? $options->{validate_data}->($test_group->{schema}, $test->{data})
           : $options->{validate_json_string}->($test_group->{schema}, $self->json_serialize($test->{data}));
 
@@ -296,12 +296,14 @@ sub _run_test ($self, $one_file, $test_group, $test, $options) {
 
         # skip the ugly matrix comparison
         my $expected = $test->{valid} ? 'true' : 'false';
-        if ($result xor $test->{valid}) {
-          $ctx->fail('evaluation result is incorrect', 'expected '.$expected.'; got '.($result ? 'true' : 'false'));
+        if ($result_bool xor $test->{valid}) {
+          $ctx->fail('evaluation result is incorrect', 'expected '.$expected.'; got '.($result_bool ? 'true' : 'false'));
           $ctx->${ $self->verbose ? \'diag' : \'note' }('schema: '.$self->json_prettyprint($test_group->{schema}));
           $ctx->${ $self->verbose ? \'diag' : \'note' }('data: '.$self->json_prettyprint($test->{data}));
 
-          $ctx->${ $self->verbose ? \'diag' : \'note' }('result: '.$self->json_prettyprint($result));
+          # for backwards compatibility, if only one value is returned, it might be possible to
+          # jsonify it to access the full results
+          $ctx->${ $self->verbose ? \'diag' : \'note' }('result: '.$self->json_prettyprint($result // $result_bool));
           $pass = 0;
         }
         else {
@@ -548,7 +550,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.028
+version 1.029
 
 =head1 SYNOPSIS
 
@@ -746,7 +748,7 @@ Defaults to false.
 
 =head2 acceptance
 
-=for stopwords truthy falsey
+=for stopwords truthy falsey JSONified
 
 Accepts a hash of options as its arguments.
 
@@ -760,8 +762,16 @@ Available options are:
 A subroutine reference, which is passed two arguments: the JSON Schema, and the B<inflated> data
 structure to be validated. This is the main entry point to your JSON Schema library being tested.
 
-The subroutine should return truthy or falsey depending on if the schema was valid for the input or
-not (an object with a boolean overload is acceptable).
+The subroutine can return either one value or two:
+
+=over 4
+
+
+
+=back
+
+* a boolean value indicating whether the schema was valid for the input or not (required)
+* a value containing the result of the evaluation (which will be JSONified in the test output) (optional)
 
 Either L</validate_data> or L</validate_json_string> is required.
 
@@ -771,8 +781,16 @@ A subroutine reference, which is passed two arguments: the JSON Schema, and the 
 containing the data to be validated. This is an alternative to L</validate_data> above, if your
 library only accepts JSON strings.
 
-The subroutine should return truthy or falsey depending on if the schema was valid for the input or
-not (an object with a boolean overload is acceptable).
+The subroutine can return either one value or two:
+
+=over 4
+
+
+
+=back
+
+* a boolean value indicating whether the schema was valid for the input or not (required)
+* a value containing the result of the evaluation (which will be JSONified in the test output) (optional)
 
 Exactly one of L</validate_data> or L</validate_json_string> is required.
 

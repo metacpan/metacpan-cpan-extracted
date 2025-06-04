@@ -5,7 +5,7 @@
 #   Note: Check also Monarch Initiative:
 #   https://github.com/monarch-initiative/PhenoImp
 #
-#   Last Modified: Nov/08/2024
+#   Last Modified: Jun/04/2025
 #
 #   $VERSION taken from Pheno::Ranker
 #
@@ -26,7 +26,7 @@ randomize_ga4gh();
 exit;
 
 sub randomize_ga4gh {
-    my $VERSION = '0.09';
+    my $VERSION = '1.08';
     my $format  = 'bff';
     my $number  = 100;
     my $output  = 'individuals.json';
@@ -307,7 +307,7 @@ sub treatments {
 sub procedures {
     my ( $format, $ontologies_array, $n, $max ) = @_;
     my $params = {
-        type          => $format eq 'bff' ? 'procedureCode'  : 'term',
+        type          => $format eq 'bff' ? 'procedureCode'  : 'code',
         onset         => $format eq 'bff' ? 'ageAtProcedure' : 'onset',
         entry_creator => \&common_entry_creator
     };

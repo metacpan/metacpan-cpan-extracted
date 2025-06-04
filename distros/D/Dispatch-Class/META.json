@@ -3,20 +3,21 @@
    "author" : [
       "Lukas Mai <l.mai@web.de>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dispatch-Class",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -26,8 +27,17 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.48",
+            "File::Find" : "0",
+            "File::Spec" : "0",
             "strict" : "0",
             "warnings" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown::Githubert" : "0",
+            "Pod::Text" : "4.09",
+            "Test::Pod" : "1.22"
          }
       },
       "runtime" : {
@@ -48,11 +58,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/Dispatch-Class/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Dispatch-Class.git",
-         "web" : "https://github.com/mauke/Dispatch-Class"
+         "url" : "https://codeberg.org/mauke/Dispatch-Class.git",
+         "web" : "https://codeberg.org/mauke/Dispatch-Class"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

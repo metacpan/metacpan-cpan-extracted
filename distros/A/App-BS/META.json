@@ -1,0 +1,213 @@
+{
+   "abstract" : "Build system for PKGBUILD based Linux distributions",
+   "author" : [
+      "Ian P Bradley <ian.bradley@studiocrabapple.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.26",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-BS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "App::perlimports" : "0",
+            "CPAN::Uploader" : "0",
+            "Devel::StackTrace::WithLexicals" : "2.01",
+            "ExtUtils::MakeMaker" : "0",
+            "Inline" : "0",
+            "Inline::C" : "0",
+            "Inline::MakeMaker" : "0",
+            "Minilla" : "0",
+            "Minilla::Profile::ModuleBuildTiny" : "0",
+            "Module::Build::XSUtil" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Critic::Community" : "0",
+            "Perl::Tidy" : "0",
+            "Version::Next" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckBin" : "0",
+            "Module::Build" : "0.4005",
+            "Module::Build::XSUtil" : "0.03"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::perlimports" : "0",
+            "CPAN::Uploader" : "0",
+            "Devel::StackTrace::WithLexicals" : "2.01",
+            "ExtUtils::MakeMaker" : "0",
+            "Inline" : "0",
+            "Inline::C" : "0",
+            "Inline::MakeMaker" : "0",
+            "Minilla" : "0",
+            "Minilla::Profile::ModuleBuildTiny" : "0",
+            "Module::Build::XSUtil" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Critic::Community" : "0",
+            "Perl::Tidy" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Fast" : "0",
+            "Const::Fast::Exporter" : "0",
+            "Cwd" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DBIx::Connector" : "0",
+            "Data::Printer" : "0",
+            "Devel::CheckBin" : "0",
+            "File::chdir" : "0",
+            "Future::AsyncAwait" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Tinyish" : "0",
+            "IO::Async" : "0",
+            "IO::Async::SSL" : "0",
+            "IO::Socket::SSL" : "0",
+            "IPC::Run3" : "0",
+            "Inline" : "0",
+            "Inline::C" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::AllUtils" : "0",
+            "List::Util" : "0",
+            "Net::SSLeay" : "0",
+            "Object::Pad" : "0",
+            "Path::Tiny" : "0",
+            "Plack" : "0",
+            "Pod::Usage" : "0",
+            "Struct::Dumb" : "0",
+            "Syntax::Keyword::Defer" : "0",
+            "Syntax::Keyword::Dynamically" : "0",
+            "Syntax::Keyword::MultiSub" : "0",
+            "Syntax::Keyword::Try" : "0",
+            "TOML::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0",
+            "Test::More" : "0.98",
+            "Test::Pod" : "0",
+            "Test::Spellunker" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::BS" : {
+         "file" : "lib/App/BS.pm",
+         "version" : "0"
+      },
+      "App::BS::CLI" : {
+         "file" : "lib/App/BS/CLI.pm"
+      },
+      "App::BS::CLI::Barearg" : {
+         "file" : "lib/App/BS/CLI/Barearg.pm"
+      },
+      "App::BS::CLI::Util" : {
+         "file" : "lib/App/BS/CLI/Util.pm"
+      },
+      "App::BS::Common" : {
+         "file" : "lib/App/BS/Common.pm"
+      },
+      "App::BS::pkgbuild" : {
+         "file" : "lib/App/BS/pkgbuild.pm"
+      },
+      "App::BS::pkgdepends" : {
+         "file" : "lib/App/BS/pkgdepends.pm"
+      },
+      "BS" : {
+         "file" : "lib/BS.pm"
+      },
+      "BS::Common" : {
+         "file" : "lib/BS/Common.pm"
+      },
+      "BS::Ext" : {
+         "file" : "lib/BS/Ext.pm"
+      },
+      "BS::Ext::User" : {
+         "file" : "lib/BS/Ext/User.pm",
+         "version" : "0.01"
+      },
+      "BS::Ext::expac" : {
+         "file" : "lib/BS/Ext/expac.pm"
+      },
+      "BS::Ext::pacinfo" : {
+         "file" : "lib/BS/Ext/pacinfo.pm"
+      },
+      "BS::Ext::pacman" : {
+         "file" : "lib/BS/Ext/pacman.pm"
+      },
+      "BS::Ext::pacsift" : {
+         "file" : "lib/BS/Ext/pacsift.pm"
+      },
+      "BS::Ext::pactree" : {
+         "file" : "lib/BS/Ext/pactree.pm"
+      },
+      "BS::Package" : {
+         "file" : "lib/BS/Package.pm"
+      },
+      "BS::Package::Manifest" : {
+         "file" : "lib/BS/Package/Manifest.pm"
+      },
+      "BS::Package::Meta" : {
+         "file" : "lib/BS/Package/Meta.pm"
+      },
+      "BS::Path" : {
+         "file" : "lib/BS/Path.pm"
+      },
+      "BS::alpm" : {
+         "file" : "lib/BS/alpm.pm"
+      },
+      "Minilla::ModuleMaker::InlineMakeMaker" : {
+         "file" : "lib/Minilla/ModuleMaker/InlineMakeMaker.pm"
+      },
+      "Path" : {
+         "file" : "lib/BS/Path.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marlencrabapple/App-bs/issues"
+      },
+      "homepage" : "https://github.com/marlencrabapple/App-bs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/marlencrabapple/App-bs.git",
+         "web" : "https://github.com/marlencrabapple/App-bs"
+      }
+   },
+   "version" : "0",
+   "x_authority" : "cpan:CRABAPP",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

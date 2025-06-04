@@ -40,7 +40,7 @@ subtest 'validate_request helper' => sub {
       openapi => {
         document_uri => $doc_uri,
         schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML')} });
-openapi: 3.1.0
+openapi: 3.1.1
 info:
   title: Test API with raw schema
   version: 1.2.3

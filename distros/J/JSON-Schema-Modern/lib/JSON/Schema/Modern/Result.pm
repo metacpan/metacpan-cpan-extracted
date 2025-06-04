@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.611';
+our $VERSION = '0.612';
 
 use 5.020;
 use Moo;
@@ -40,11 +40,12 @@ use overload
   fallback => 1;
 
 use constant { true => JSON::PP::true, false => JSON::PP::false };
+use constant HAVE_BUILTIN => "$]" >= 5.036;
 
 has valid => (
   is => 'ro',
-  isa => Bool,
-  coerce => 1,
+  isa => Bool|InstanceOf('JSON::PP::true')|InstanceOf('JSON::PP::false'),
+  coerce => sub { HAVE_BUILTIN ? !!$_[0] : $_[0] ? true : false },
   required => 1,
 );
 sub result { goto \&valid } # backcompat only
@@ -268,7 +269,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.611
+version 0.612
 
 =head1 SYNOPSIS
 
@@ -376,7 +377,7 @@ to C<'Bad Request'>.
 =head1 METHODS
 
 =for Pod::Coverage BUILD BUILDARGS OUTPUT_FORMATS result stringify annotation_count error_count
-true false
+true false HAVE_BUILTIN
 
 =head2 format
 
