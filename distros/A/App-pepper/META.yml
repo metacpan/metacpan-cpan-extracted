@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/pepper/issues
   repository: https://github.com/gbxyz/pepper.git
-version: v0.99.1
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

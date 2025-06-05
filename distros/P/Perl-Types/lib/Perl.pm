@@ -1,5 +1,6 @@
 # [[[ HEADER ]]]
-package Perl;
+package    # hide from PAUSE indexing
+    Perl;
 use strict;
 use warnings;
 our $VERSION = 0.001_000;

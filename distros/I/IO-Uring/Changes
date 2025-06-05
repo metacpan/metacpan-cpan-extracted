@@ -1,5 +1,10 @@
 Revision history for IO-Uring
 
+0.006     2025-06-04 20:53:05+02:00 Europe/Brussels
+          - Made sure P_PIDFD is defined on older linuxes
+          - Remove accidental arguments to nop operation
+          - Make sendto actually honor its target argument
+
 0.005     2025-05-31 02:54:06+02:00 Europe/Brussels
           - Correctly declare Alien::liburing dependency
 

@@ -5,9 +5,9 @@
 # <<< EXECUTE_ERROR: 'Initialization values for new() method must be key-value pairs inside a hash reference' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.000_010;
 
 # [[[ CRITICS ]]]

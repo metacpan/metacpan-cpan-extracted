@@ -3,7 +3,7 @@ package Perl::Types::Test::Foo;
 use strict;
 use warnings;
 our $VERSION = 0.006_000;
-use Perl::Types;
+use types;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(Perl::Class);
@@ -36,8 +36,8 @@ our hashref $properties = {
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 sub quux {
-    { my void::method $RETURN_TYPE };
-    ( my object $self) = @ARG;
+    { my void $RETURN_TYPE };
+    ( my Perl::Types::Test::Foo $self) = @ARG;
     $self->{plugh} = $self->{plugh} + 2;
     $self->{plugh} = $self->{plugh} - 3;
     $self->{plugh} = $self->{plugh} * 4;  # ensure integer outcome
@@ -50,7 +50,7 @@ sub quux {
 }
 
 sub quince {
-    { my integer::method $RETURN_TYPE };
+    { my integer $RETURN_TYPE };
     my string $quince_def
         = '...Cydonia vulgaris ... Cydonia, a city in Crete ... [1913 Webster]';
     print $quince_def;
@@ -58,8 +58,8 @@ sub quince {
 }
 
 sub qorge {
-    { my hashref::string::method $RETURN_TYPE };
-    ( my object $self, my integer $qorge_input ) = @ARG;
+    { my hashref::string $RETURN_TYPE };
+    ( my Perl::Types::Test::Foo $self, my integer $qorge_input ) = @ARG;
     return {
         a => $self->{xyzzy} x $qorge_input,
         b => 'howdy',
@@ -68,9 +68,9 @@ sub qorge {
 }
 
 sub qaft {
-    { my Perl::Types::Test::Foo_arrayref::method $RETURN_TYPE };
-    ( my object $self, my integer $foo, my number $bar, my string $bat, my hashref::string $baz ) = @ARG;
-    my Perl::Types::Test::Foo_arrayref $retval = [];
+    { my arrayref::Perl::Types::Test::Foo $RETURN_TYPE };
+    ( my Perl::Types::Test::Foo $self, my integer $foo, my number $bar, my string $bat, my hashref::string $baz ) = @ARG;
+    my arrayref::Perl::Types::Test::Foo $retval = [];
     $retval->[0] = Perl::Types::Test::Foo->new();
     $retval->[0]->{xyzzy} = 'larry';
     $retval->[1] = Perl::Types::Test::Foo->new();

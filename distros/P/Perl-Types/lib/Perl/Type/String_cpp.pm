@@ -13,7 +13,7 @@ use Perl::Inline;
 
 # [[[ SUBROUTINES ]]]
 sub cpp_load {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     my $need_load_cpp = 0;
     if (    ( exists $main::{'Perl__Type__String__MODE_ID'} )
         and ( defined &{ $main::{'Perl__Type__String__MODE_ID'} } ) )

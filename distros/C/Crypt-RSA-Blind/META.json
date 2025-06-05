@@ -40,7 +40,7 @@
             "Crypt::Random" : "1.57",
             "Feature::Compat::Class" : "0.07",
             "Math::Pari" : "2.030523",
-            "perl" : "5.020"
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -49,7 +49,21 @@
          }
       }
    },
+   "provides" : {
+      "Crypt::RSA::Blind" : {
+         "file" : "lib/Crypt/RSA/Blind.pm",
+         "version" : "1.025"
+      },
+      "Crypt::RSA::Blind::PubKey" : {
+         "file" : "lib/Crypt/RSA/Blind.pm",
+         "version" : "1.025"
+      },
+      "Crypt::RSA::Blind::SecKey" : {
+         "file" : "lib/Crypt/RSA/Blind.pm",
+         "version" : "1.025"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.024",
+   "version" : "1.025",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

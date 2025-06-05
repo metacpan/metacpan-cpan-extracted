@@ -4,10 +4,10 @@
 
 # [[[ HEADER ]]]
 use constant PI  => my number $TYPED_PI  = 3.141_59;
-use Perl::Types;
 package Perl::Types::Test::Constant::Package_00_Bad_07;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CONSTANTS ]]]

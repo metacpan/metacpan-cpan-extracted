@@ -13,16 +13,16 @@ using std::cout;  using std::cerr;  using std::endl;
 // [[[ TYPEDEFS ]]]
 #define bson_document bsoncxx::document::value
 #define bson_document__optional bsoncxx::stdx::optional<bsoncxx::document::value>
-//#define bson_arrayref ---  // NOT AN ACTUAL C++ TYPE
-//#define bson_hashref ---   // NOT AN ACTUAL C++ TYPE
+//#define arrayref_bson ---  // NOT AN ACTUAL C++ TYPE
+//#define hashref_bson ---   // NOT AN ACTUAL C++ TYPE
 
 // [[[ MACROS ]]]
 #define bson_begin bsoncxx::builder::stream::document{}
 #define bson_end bsoncxx::builder::stream::finalize
-#define bson_arrayref_begin bsoncxx::builder::stream::open_array
-#define bson_arrayref_end bsoncxx::builder::stream::close_array
-#define bson_hashref_begin bsoncxx::builder::stream::open_document
-#define bson_hashref_end bsoncxx::builder::stream::close_document
+#define arrayref_bson_begin bsoncxx::builder::stream::open_array
+#define arrayref_bson_end bsoncxx::builder::stream::close_array
+#define hashref_bson_begin bsoncxx::builder::stream::open_document
+#define hashref_bson_end bsoncxx::builder::stream::close_document
 #define bson_Dumper(my_bson_data) bsoncxx::to_json(*my_bson_data)
 
 // [[[ OO SUBCLASSES ]]]

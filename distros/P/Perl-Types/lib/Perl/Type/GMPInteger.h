@@ -16,9 +16,9 @@ typedef mpz_t gmp_integer;
 #define gmp_integer_rawptr gmp_integer*
 /* UNUSED?
 typedef std::unique_ptr<gmp_integer> gmp_integer_ptr;
-typedef std::vector<gmp_integer_ptr> gmp_integer_arrayref;
-typedef std::unordered_map<string, gmp_integer_ptr> gmp_integer_hashref;
-typedef std::unordered_map<string, gmp_integer_ptr>::iterator gmp_integer_hashref_iterator;
+typedef std::vector<gmp_integer_ptr> arrayref_gmp_integer;
+typedef std::unordered_map<string, gmp_integer_ptr> hashref_gmp_integer;
+typedef std::unordered_map<string, gmp_integer_ptr>::iterator hashref_gmp_integer_iterator;
 */
 # endif
 

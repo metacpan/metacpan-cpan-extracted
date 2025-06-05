@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.0.0] - 2025-06-05
+
+### Changed
+
+- Use 'https' for the schema.org URI
+
 ## [1.1.0] - 2025-01-08
 
 ### Added

@@ -1,13 +1,15 @@
 package Perl::Structure::Graph::Tree::Binary;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.001_000;
 
 # NEED FIX: weird inheritance for these as-reference-only data structures
 package Perl::Structure::Graph::Tree::BinaryReference;
 use parent qw(Perl::Structure::Graph::TreeReference);
 use Perl::Structure::Graph::Tree;
+
+# [[[ INCLUDES ]]]
 
 # trees are comprised of nodes
 use Perl::Structure::Graph::Tree::Binary::Node;

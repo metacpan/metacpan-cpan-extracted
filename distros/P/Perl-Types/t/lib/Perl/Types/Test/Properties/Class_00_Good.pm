@@ -1,8 +1,8 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Properties::Class_00_Good;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -15,8 +15,8 @@ our hashref $properties
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 sub test_method {
-    { my integer::method $RETURN_TYPE };
-    ( my object $self, my integer $input_integer ) = @ARG;
+    { my integer $RETURN_TYPE };
+    ( my Perl::Types::Test::Properties::Class_00_Good $self, my integer $input_integer ) = @ARG;
     $self->{test_property} *= $input_integer;
     return $self->{test_property};
 }

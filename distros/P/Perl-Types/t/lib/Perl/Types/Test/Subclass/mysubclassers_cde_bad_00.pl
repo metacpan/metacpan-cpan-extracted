@@ -2,12 +2,12 @@
 
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
-# <<< PARSE_ERROR: 'No such class Perl::Types::Test::Subclass::MySubclassersCDE_Good_arrayrefd' >>>
+# <<< PARSE_ERROR: 'No such class arrayref::Perl::Types::Test::Subclass::MySubclassersCDE_Goodd' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -17,12 +17,12 @@ our $VERSION = 0.001_000;
 use Perl::Types::Test::Subclass::MySubclassersCDE_Good;
 
 # [[[ OPERATIONS ]]]
-my Perl::Types::Test::Subclass::MySubclassersCDE_Good_arrayrefd $foo_a = [];
-my Perl::Types::Test::Subclass::MySubclassersCDE_Good_hashref $foo_h = {};
-my Perl::Types::Test::Subclass::MySubclasserC_Good_arrayref $bar_a = [];
-my Perl::Types::Test::Subclass::MySubclasserC_Good_hashref $bar_h = {};
-my Perl::Types::Test::Subclass::MySubclasserD_Good_arrayref $bat_a = [];
-my Perl::Types::Test::Subclass::MySubclasserD_Good_hashref $bat_h = {};
-my Perl::Types::Test::Subclass::MySubclasserE_Good_arrayref $baz_a = [];
-my Perl::Types::Test::Subclass::MySubclasserE_Good_hashref $baz_h = {};
+my arrayref::Perl::Types::Test::Subclass::MySubclassersCDE_Goodd $foo_a = [];
+my hashref::Perl::Types::Test::Subclass::MySubclassersCDE_Good $foo_h = {};
+my arrayref::Perl::Types::Test::Subclass::MySubclasserC_Good $bar_a = [];
+my hashref::Perl::Types::Test::Subclass::MySubclasserC_Good $bar_h = {};
+my arrayref::Perl::Types::Test::Subclass::MySubclasserD_Good $bat_a = [];
+my hashref::Perl::Types::Test::Subclass::MySubclasserD_Good $bat_h = {};
+my arrayref::Perl::Types::Test::Subclass::MySubclasserE_Good $baz_a = [];
+my hashref::Perl::Types::Test::Subclass::MySubclasserE_Good $baz_h = {};
 print 'no errors' . "\n";

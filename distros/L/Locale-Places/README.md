@@ -4,12 +4,13 @@ Locale::Places - Translate places between different languages using http://downl
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
-Translates places between different languages, for example
-London is Londres in French.
+Provides the functionality for translating place names between different languages using data from GeoNames.
+It currently supports places in Great Britain (GB) and the United States (US) and relies on localized databases.
+For example, London is Londres in French.
 
 # METHODS
 
@@ -17,11 +18,29 @@ London is Londres in French.
 
 Create a Locale::Places object.
 
-Takes one optional parameter, directory,
-which tells the object where to find a directory called 'data' containing GB.sql and US.sql
-If that parameter isn't given,
-the module will attempt to find the databases,
-but that can't be guaranteed.
+Arguments:
+
+Takes different argument formats (hash or positional)
+
+- `cache`
+
+    Place to store results.
+    If none is given, the results will be stored in a temporary internal cache.
+
+- `config_file`
+
+    Points to a configuration file which contains the parameters to `new()`.
+    The file can be in any common format,
+    including `YAML`, `XML`, and `INI`.
+    This allows the parameters to be set at run time.
+
+- `directory`
+
+    Tells the object where to find a directory called 'data' containing GB.sql and US.sql
+    If that parameter isn't given,
+    the module will attempt to find the databases,
+    but that can't be guaranteed.
+
 Any other options are passed to the underlying database driver.
 
 ## translate
@@ -50,6 +69,8 @@ Translate to the given language, where the routine's name will be the target lan
     # Prints 'Virginie', since that's Virginia in French
     print $places->fr({ place => 'Virginia', from => 'en', country => 'US' });
 
+Extracts the target language from the method name and calls `translate()` internally.
+
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`
@@ -65,8 +86,8 @@ This is a problem with the data, which has this line:
 
 which overrides the translation by setting the 'isPreferredName' flag
 
-Can't specify below country level.
-For example, is Virginia a state or a town in Illinois or one in Minnesota?
+Can't specify below the country level.
+For example, is Virginia a state, a town in Illinois or one in Minnesota?
 
 # SEE ALSO
 

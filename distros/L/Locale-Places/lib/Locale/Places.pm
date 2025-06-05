@@ -8,10 +8,13 @@ use warnings;
 
 use Carp;
 use CHI;
+use Class::Debug 0.07;
+use Database::Abstraction;
 use File::Spec;
 use Locale::Places::GB;
 use Locale::Places::US;
 use Module::Info;
+use Params::Get;
 use Scalar::Util;
 
 =encoding utf8
@@ -22,16 +25,17 @@ Locale::Places - Translate places between different languages using http://downl
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
-Translates places between different languages, for example
-London is Londres in French.
+Provides the functionality for translating place names between different languages using data from GeoNames.
+It currently supports places in Great Britain (GB) and the United States (US) and relies on localized databases.
+For example, London is Londres in French.
 
 =head1 METHODS
 
@@ -39,11 +43,33 @@ London is Londres in French.
 
 Create a Locale::Places object.
 
-Takes one optional parameter, directory,
-which tells the object where to find a directory called 'data' containing GB.sql and US.sql
+Arguments:
+
+Takes different argument formats (hash or positional)
+
+=over 4
+
+=item * C<cache>
+
+Place to store results.
+If none is given, the results will be stored in a temporary internal cache.
+
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format,
+including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
+
+=item * C<directory>
+
+Tells the object where to find a directory called 'data' containing GB.sql and US.sql
 If that parameter isn't given,
 the module will attempt to find the databases,
 but that can't be guaranteed.
+
+=back
+
 Any other options are passed to the underlying database driver.
 
 =cut
@@ -52,10 +78,10 @@ sub new {
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
+		if((scalar keys %{$params}) > 0) {
 			# Locale::Places::new() used rather than Locale::Places->new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
@@ -65,23 +91,45 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		if($params) {
+			return bless { %{$class}, %{$params} }, ref($class);
+		}
+		return bless $class, ref($class);
 	}
 
-	my $directory = delete $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
-	$directory =~ s/\.pm$//;
+	# Load the configuration from a config file, if provided
+
+	$params = Class::Debug::setup($class, $params);
+
+	my $directory = delete $params->{'directory'};
+	if(!defined($directory)) {
+		$directory = Module::Info->new_from_loaded(__PACKAGE__)->file();
+		$directory =~ s/\.pm$//;
+	}
 	$directory = File::Spec->catfile($directory, 'data');
+
+	if(!-d $directory) {
+		unless($ENV{'AUTOMATED_TESTING'}) {	# Allow some sanity tests to be run
+			Carp::carp("$class: can't find the data directory $directory: $!");
+			return;
+		}
+	}
+
+	$params->{'cache'} ||= CHI->new(driver => 'Memory', datastore => {}, expires_in => $params->{'cache_duration'} || $params->{'expires_in'} || '1 hour');
 
 	Database::Abstraction::init({
 		no_entry => 1,
-		cache => $args{cache} || CHI->new(driver => 'Memory', datastore => {}),
-		cache_duration => $args{'cache_duration'} || '1 week',
-		%args,
+		cache => $params->{cache},
+		cache_duration => $params->{'cache_duration'} || '1 week',
+		%{$params},
 		directory => $directory
 	});
 
 	# Return the blessed object
-	return bless { %args, directory => $directory }, $class;
+	return bless {
+		%{$params},
+		directory => $directory
+	}, $class;
 }
 
 =head2 translate
@@ -111,30 +159,23 @@ sub translate
 	my $self = shift;
 
 	# Ensure $self is valid
-	Carp::croak('translate() must be called on an object') unless Scalar::Util::blessed($self);
+	Carp::croak('translate() must be called on an object') unless(Scalar::Util::blessed($self));
 
-	# Assign parameters based on input structure
-	my %params;
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif((scalar(@_) % 2) == 0) {
-		%params = @_;
-	} elsif(scalar(@_) == 1) {
-		%params = (place => shift, from => 'en');
-	} else {
-		Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2 [ , country => $country ])');
-		return;
+	# Handle hash or hashref arguments
+	my $params = Params::Get::get_params('place', @_);
+	if(scalar(@_) == 1) {
+		$params->{'from'} ||= 'en';
 	}
 
-	my $place = $params{place};
+	my $place = $params->{place};
 	unless(defined $place) {
 		Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2 [ , country => $country ])');
 		return;
 	}
 
 	# Validate 'from' and 'to' languages
-	my $from = $params{from} || $self->_get_language();
-	my $to = $params{to} || $self->_get_language();
+	my $from = $params->{from} || $self->_get_language();
+	my $to = $params->{to} || $self->_get_language();
 	if(!defined($from)) {
 		if(!defined($to)) {
 			Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2 [ , country => $country ])');
@@ -149,10 +190,16 @@ sub translate
 	}
 
 	# Return early if 'from' and 'to' languages are the same
-	return $place if $to eq $from;
+	return $place if($to eq $from);
 
 	# Select database based on country, defaulting to GB
-	my $country = $params{country} || 'GB';
+	my $country = $params->{country} || 'GB';
+
+	my $cache_key = join('|', $place, $from, $to, $country);
+	if(my $cached_result = $self->{cache}->get($cache_key)) {
+		return $cached_result;
+	}
+
 	my $db = $self->{$country} ||= do {
 		my $class = "Locale::Places::$country";
 		$class->new(directory => $self->{directory});
@@ -172,6 +219,7 @@ sub translate
 		if(my $data = $db->data({ type => $to, code2 => $places[0] })) {
 		# if(my $data = $db->data({ type => $to, code2 => $places[0]->{'code2'} })) {
 			# ::diag(__LINE__, ": $places[0]: $data");
+			$self->{cache}->set($cache_key, $data);
 			return $data;
 		}
 	} elsif(scalar(@places) > 1) {
@@ -202,25 +250,30 @@ sub translate
 		@places = $db->code2({ type => $from, data => $place, ispreferredname => 1, isshortname => undef });
 		if(scalar(@places) == 1) {
 			if(my $data = $db->data({ type => $to, code2 => $places[0] })) {
+				$self->{cache}->set($cache_key, $data);
 				return $data;
 			}
 			@places = $db->code2({ type => $from, data => $place, ispreferredname => 1, isshortname => 1 });
 			if(scalar(@places) == 1) {
 				if(my $data = $db->data({ type => $to, code2 => $places[0] })) {
+					$self->{cache}->set($cache_key, $data);
 					return $data;
 				}
 				# Can't find anything
+				$self->{cache}->set($cache_key, $place);
 				return $place;
 			}
 		} elsif(scalar(@places) == 0) {
 			@places = $db->code2({ type => $from, data => $place, isshortname => undef });
 			if((scalar(@places) == 1) &&
 			   (my $data = $db->data({ type => $to, code2 => $places[0] }))) {
+				$self->{cache}->set($cache_key, $data);
 				return $data;
 			}
 			@places = $db->code2({ type => $from, data => $place });
 			if((scalar(@places) == 1) &&
 			   (my $data = $db->data({ type => $to, code2 => $places[0] }))) {
+				$self->{cache}->set($cache_key, $data);
 				return $data;
 			}
 		} else {
@@ -246,10 +299,13 @@ sub translate
 			# }
 		# }
 	}
-	return; # Return undef if no translation found
+	return; # Return undef if no translation is found
 }
 
-# Determine the current environment's default language.
+#Determines the system's default language using environment variables:
+# 'LANGUAGE', 'LC_ALL', 'LC_MESSAGES', $ENV{'LANG'}.
+# Defaults to English ('en') if no valid language is found.
+
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
 # https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
 sub _get_language
@@ -281,6 +337,8 @@ Translate to the given language, where the routine's name will be the target lan
     # Prints 'Virginie', since that's Virginia in French
     print $places->fr({ place => 'Virginia', from => 'en', country => 'US' });
 
+Extracts the target language from the method name and calls C<translate()> internally.
+
 =cut
 
 sub AUTOLOAD
@@ -299,7 +357,7 @@ sub AUTOLOAD
         } elsif((scalar(@_) % 2) == 0) {
                 %params = @_;
         } elsif(scalar(@_) == 1) {
-                $params{'entry'} = shift;
+                $params{'place'} = shift;
         }
 
 	return $self->translate(to => $to, %params);
@@ -320,8 +378,8 @@ This is a problem with the data, which has this line:
 
 which overrides the translation by setting the 'isPreferredName' flag
 
-Can't specify below country level.
-For example, is Virginia a state or a town in Illinois or one in Minnesota?
+Can't specify below the country level.
+For example, is Virginia a state, a town in Illinois or one in Minnesota?
 
 =head1 SEE ALSO
 

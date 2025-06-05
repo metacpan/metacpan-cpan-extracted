@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 #use Perl::Types::AfterSubclass;  # NEED DELETE, RPERL REFACTOR
-use Perl::Types;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

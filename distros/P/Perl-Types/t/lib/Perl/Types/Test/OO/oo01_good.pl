@@ -25,9 +25,9 @@
 # <<< EXECUTE_SUCCESS: 'have $my_object_subclass2->get_bax() = 264' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

@@ -1,9 +1,10 @@
 package Perl::Structure::LinkedList;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.001_000;
 
+# [[[ INCLUDES ]]]
 # NEED FIX: this is also a valid Perl Class, but we can't inherit from Perl::Class due to circular references?
 use Perl::Structure::Array;
 
@@ -43,7 +44,7 @@ sub linkedlist_unshift {
     return;
 }
 
-sub DUMPER { { my string::method $RETURN_TYPE };(my Perl::Structure::LinkedListReference $data) = @ARG; return $data->{head}->DUMPER(); }
+sub DUMPER { { my string $RETURN_TYPE };(my Perl::Structure::LinkedListReference $data) = @ARG; return $data->{head}->DUMPER(); }
 
 
 # [[[ LINKED LISTS ]]]
@@ -64,7 +65,7 @@ our $properties = $properties; our $new_from_arrayref = $new_from_arrayref; our 
 
 # (ref to linked list) of integers
 package  # hide from PAUSE indexing
-    integer_linkedlistref;
+    linkedlistref::integer;
 use parent qw(linkedlistref);
 
 # NEED ADD: remaining sub-types

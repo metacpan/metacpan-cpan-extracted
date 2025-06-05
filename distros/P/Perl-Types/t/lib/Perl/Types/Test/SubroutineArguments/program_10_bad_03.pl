@@ -6,9 +6,9 @@
 # <<< EXECUTE_ERROR_V5_14_NEWER: 'Undefined subroutine &main::empty_sub' >>>  # DEV NOTE: Perl v5.14 and newer
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

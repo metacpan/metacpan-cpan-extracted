@@ -217,12 +217,14 @@ sub getFieldValue ($self, $field) {
             my $data = $entry->{getter}->($self);
             if (eval { blessed $data && $data->isa('Mojo::Promise')}){
                 $data = $data->then(sub ($value) {
-                    $log->debug(sprintf("async getter %s: %0.2fs",$field,time-$start));
+                    my $delay = time-$start;
+                    $log->debug(sprintf("slow async getter %s: %0.2fs",$field,$delay)) if $delay > 2;
                     return $value;
                 });
             }
             else {
-                $log->debug(sprintf("getter %s: %0.2fs",$field,time-$start));
+                my $delay = time-$start;
+                $log->debug(sprintf("slow getter %s: %0.2fs",$field,$delay)) if $delay > 2;
             }
             return $data;
         }

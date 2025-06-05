@@ -5,9 +5,9 @@
 # <<< EXECUTE_ERROR: 'Attempted initialization of invalid property' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.000_010;
 
 # [[[ CRITICS ]]]

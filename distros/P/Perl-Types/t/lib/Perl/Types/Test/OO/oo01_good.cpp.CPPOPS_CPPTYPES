@@ -26,8 +26,8 @@
 
 // [[[ HEADER ]]]
 #include <rperlstandalone.h>
-#ifndef __CPP__INCLUDED__Perl::Types__Test__OO__oo01_good_cpp
-#define __CPP__INCLUDED__Perl::Types__Test__OO__oo01_good_cpp 0.001_000
+#ifndef __CPP__INCLUDED__Perl__Types__Test__OO__oo01_good_cpp
+#define __CPP__INCLUDED__Perl__Types__Test__OO__oo01_good_cpp 0.001_000
 # ifdef __CPP__TYPES
 
 
@@ -39,13 +39,13 @@ int main() {
     // [[[ OPERATIONS HEADER ]]]
 
 // [[[ OPERATIONS ]]]
-    Perl::Types__Test__OO__MyClass01Good_ptr my_object = (NEW_Perl::Types__Test__OO__MyClass01Good {}).bar(22).NEW();
+    Perl__Types__Test__OO__MyClass01Good_ptr my_object = (NEW_Perl__Types__Test__OO__MyClass01Good {}).bar(22).NEW();
     print "have $my_object->get_bar() = " << my_object->get_bar() << endl;
     my_object->double_bar_save();
     print "have $my_object->get_bar() = " << my_object->get_bar() << endl;
     print "have $my_object->double_bar_return() = " << my_object->double_bar_return() << endl;
     print "have $my_object->get_bar() = " << my_object->get_bar() << endl;
-    Perl::Types__Test__OO__MySubclass01Good_ptr my_object_subclass(new Perl::Types__Test__OO__MySubclass01Good);
+    Perl__Types__Test__OO__MySubclass01Good_ptr my_object_subclass(new Perl__Types__Test__OO__MySubclass01Good);
     print "have $my_object_subclass->get_bar() = " << my_object_subclass->get_bar() << endl;
     print "have $my_object_subclass->get_bax() = " << my_object_subclass->get_bax() << endl;
     my_object_subclass->triple_bax_save();
@@ -56,7 +56,7 @@ int main() {
     print "have $my_object_subclass->get_bax() = " << my_object_subclass->get_bax() << endl;
     print "have $my_object_subclass->multiply_bax_return(20) = " << my_object_subclass->multiply_bax_return(20) << endl;
     print "have $my_object_subclass->get_bax() = " << my_object_subclass->get_bax() << endl;
-    Perl::Types__Test__OO__MySubclass01Good_ptr my_object_subclass2 = (NEW_Perl::Types__Test__OO__MySubclass01Good{}).bar(33).bax(88).NEW();
+    Perl__Types__Test__OO__MySubclass01Good_ptr my_object_subclass2 = (NEW_Perl__Types__Test__OO__MySubclass01Good{}).bar(33).bax(88).NEW();
     print "have $my_object_subclass2->get_bar() = " << my_object_subclass2->get_bar() << endl;
     print "have $my_object_subclass2->get_bax() = " << my_object_subclass2->get_bax() << endl;
     my_object_subclass2->triple_bax_save();

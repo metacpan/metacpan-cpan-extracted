@@ -13,6 +13,7 @@ my @files = (
     'lib/Games/Solitaire/BlackHole/Solver/App.pm',
     'lib/Games/Solitaire/BlackHole/Solver/App/Base.pm',
     'lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm',
+    'lib/Games/Solitaire/BlackHole/Solver/_BoardsStream.pm',
     't/00-compile.t',
     't/01-run.t',
     't/data/1.bh.board.txt',

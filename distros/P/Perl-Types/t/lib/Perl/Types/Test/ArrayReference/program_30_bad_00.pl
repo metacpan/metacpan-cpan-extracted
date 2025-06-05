@@ -7,9 +7,9 @@
 # <<< PARSE_ERROR: 'Perl::Critic::Policy::CodeLayout::ProhibitQuotedWordLists' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -19,5 +19,5 @@ our $VERSION = 0.001_000;
 # [[[ OPERATIONS ]]]
 
 my                 @variable_storing_array_by_value     = ('list', 'enclosed', 'within', 'round',  'parentheses');
-#print '@variable_storing_array_by_value = ', string_arrayref_to_string(@variable_storing_array_by_value), "\n";
+#print '@variable_storing_array_by_value = ', arrayref_string_to_string(@variable_storing_array_by_value), "\n";
 print '@variable_storing_array_by_value = ', @variable_storing_array_by_value, "\n";

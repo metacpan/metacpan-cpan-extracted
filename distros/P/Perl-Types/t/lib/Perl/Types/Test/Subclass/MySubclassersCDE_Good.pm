@@ -1,9 +1,9 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 
 package Perl::Types::Test::Subclass::MySubclassersCDE_Good;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]

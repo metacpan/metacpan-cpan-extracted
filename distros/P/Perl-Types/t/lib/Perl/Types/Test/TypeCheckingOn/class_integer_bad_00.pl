@@ -5,9 +5,9 @@
 # <<< EXECUTE_ERROR: 'integer value expected but non-integer value found' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

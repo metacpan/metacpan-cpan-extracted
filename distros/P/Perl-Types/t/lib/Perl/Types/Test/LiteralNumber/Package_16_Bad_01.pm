@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Perl::Critic::Policy::ValuesAndExpressions::ProhibitMismatchedOperators' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralNumber::Package_16_Bad_01;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

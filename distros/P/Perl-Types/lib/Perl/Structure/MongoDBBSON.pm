@@ -2,7 +2,7 @@
 package Perl::Structure::MongoDBBSON;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -15,20 +15,16 @@ use Perl::Class;
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 
 # [[[ SUB-TYPES ]]]
-package    # hide from PAUSE indexing
-    bson_document;
+package bson_document;
 1;    # end of class
 
-package    # hide from PAUSE indexing
-    bson_document__optional;
+package bson_document__optional;
 1;    # end of class
 
-package    # hide from PAUSE indexing
-    bson_arrayref;
+package arrayref::bson;
 1;    # end of class
 
-package    # hide from PAUSE indexing
-    bson_hashref;
+package hashref::bson;
 1;    # end of class
 
 

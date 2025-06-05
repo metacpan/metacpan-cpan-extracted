@@ -1,5 +1,9 @@
 -----
 
+0.0.20   2025-05-04
+    [Changed]
+       * Updated to libvirt tag v11.4.0 (from v11.3.0)
+
 0.0.19   2025-05-12
     [Added]
        * New domain entrypoints: del_throttle_group(), set_throttle_group(),

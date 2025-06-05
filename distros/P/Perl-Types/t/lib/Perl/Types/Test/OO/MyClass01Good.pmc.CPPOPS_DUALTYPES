@@ -3,7 +3,7 @@ package Perl::Types::Test::OO::MyClass01Good;
 use strict;
 use warnings;
 #use Perl::Types::AfterSubclass;  # NEED DELETE, RPERL REFACTOR
-use Perl::Types;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -21,7 +21,7 @@ package Perl::Types::Test::OO::MySubclass01Good;
 use strict;
 use warnings;
 #use Perl::Types::AfterSubclass;  # NEED DELETE, RPERL REFACTOR
-use Perl::Types;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -38,19 +38,19 @@ use Perl::Types::Config;
 
 # <<< C++ LOADER >>>
 sub cpp_load {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     my $need_load_cpp = 0;
-    if (    ( exists $main::{'Perl::Types__Test__OO__MySubclass01Good__MODE_ID'} )
-        and ( defined &{ $main::{'Perl::Types__Test__OO__MySubclass01Good__MODE_ID'} } ) )
+    if (    ( exists $main::{'Perl__Types__Test__OO__MySubclass01Good__MODE_ID'} )
+        and ( defined &{ $main::{'Perl__Types__Test__OO__MySubclass01Good__MODE_ID'} } ) )
     {
-#Perl::Types::diag('in Perl::Types::Test::OO::MySubclass01Good::cpp_load, Perl::Types__Test__OO__MySubclass01Good__MODE_ID() exists & defined' . "\n");
-#Perl::Types::diag(q{in Perl::Types::Test::OO::MySubclass01Good::cpp_load, have Perl::Types__Test__OO__MySubclass01Good__MODE_ID() retval = '} . main::Perl::Types__Test__OO__MySubclass01Good__MODE_ID() . q{'} . "\n");
-        if ( $Perl::Types::MODES->{ main::Perl::Types__Test__OO__MySubclass01Good__MODE_ID() }->{ops} ne 'CPP' ) {
+#Perl::Types::diag('in Perl::Types::Test::OO::MySubclass01Good::cpp_load, Perl__Types__Test__OO__MySubclass01Good__MODE_ID() exists & defined' . "\n");
+#Perl::Types::diag(q{in Perl::Types::Test::OO::MySubclass01Good::cpp_load, have Perl__Types__Test__OO__MySubclass01Good__MODE_ID() retval = '} . main::Perl__Types__Test__OO__MySubclass01Good__MODE_ID() . q{'} . "\n");
+        if ( $Perl::Types::MODES->{ main::Perl__Types__Test__OO__MySubclass01Good__MODE_ID() }->{ops} ne 'CPP' ) {
             $need_load_cpp = 1;
         }
     }
     else {
-        #Perl::Types::diag('in Perl::Types::Test::OO::MySubclass01Good::cpp_load, Perl::Types__Test__OO__MySubclass01Good__MODE_ID() does not exist or undefined' . "\n");
+        #Perl::Types::diag('in Perl::Types::Test::OO::MySubclass01Good::cpp_load, Perl__Types__Test__OO__MySubclass01Good__MODE_ID() does not exist or undefined' . "\n");
         $need_load_cpp = 1;
     }
 

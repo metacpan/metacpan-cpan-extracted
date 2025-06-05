@@ -1,8 +1,8 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralString::Package_SingleQuotes_04_Good;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

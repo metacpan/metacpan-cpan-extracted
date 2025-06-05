@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'near "$bar my hashref::number"' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::SubroutineArguments::Package_06_Bad;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

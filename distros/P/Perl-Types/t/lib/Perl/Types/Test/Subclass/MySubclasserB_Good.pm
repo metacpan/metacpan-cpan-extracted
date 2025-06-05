@@ -1,8 +1,8 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Subclass::MySubclasserB_Good;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -24,7 +24,7 @@ our hashref $properties = { kindergarten => my string $TYPED_kindergarten = 'Eag
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 sub alphabet {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Good::method $RETURN_TYPE };
+    { my Perl::Types::Test::Subclass::MySubclasserB_Good $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserB_Good $self ) = @ARG;
     $self->{kindergarten} .= '; ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     my Perl::Types::Test::Subclass::MySubclasserA_Good $buddy = Perl::Types::Test::Subclass::MySubclasserA_Good->new();
@@ -33,20 +33,20 @@ sub alphabet {
 }
 
 sub brush_paints {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Good_arrayref::method $RETURN_TYPE };
+    { my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Good $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserB_Good $self ) = @ARG;
     $self->{kindergarten} .= '; green blue purple';
-    my Perl::Types::Test::Subclass::MySubclasserB_Good_arrayref $friends
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Good $friends
         = [ Perl::Types::Test::Subclass::MySubclasserB_Good->new(), Perl::Types::Test::Subclass::MySubclasserB_Good->new(),
         Perl::Types::Test::Subclass::MySubclasserB_Good->new() ];
     return $friends;
 }
 
 sub clay {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Good_hashref::method $RETURN_TYPE };
+    { my hashref::Perl::Types::Test::Subclass::MySubclasserB_Good $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserB_Good $self ) = @ARG;
     $self->{kindergarten} .= '; bust';
-    my Perl::Types::Test::Subclass::MySubclasserB_Good_hashref $classmates = {
+    my hashref::Perl::Types::Test::Subclass::MySubclasserB_Good $classmates = {
         'huey'  => Perl::Types::Test::Subclass::MySubclasserB_Good->new(),
         'dewey' => Perl::Types::Test::Subclass::MySubclasserB_Good->new(),
         'louie' => Perl::Types::Test::Subclass::MySubclasserB_Good->new()
@@ -55,19 +55,19 @@ sub clay {
 }
 
 sub seesaw {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Good_arrayref $RETURN_TYPE };
-    my Perl::Types::Test::Subclass::MySubclasserA_Good_arrayref $strangers
+    { my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Good $RETURN_TYPE };
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserA_Good $strangers
         = [ Perl::Types::Test::Subclass::MySubclasserA_Good->new(), Perl::Types::Test::Subclass::MySubclasserA_Good->new() ];
-    my Perl::Types::Test::Subclass::MySubclasserB_Good_arrayref $others
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Good $others
         = [ Perl::Types::Test::Subclass::MySubclasserB_Good->new(), Perl::Types::Test::Subclass::MySubclasserB_Good->new() ];
     return $others;
 }
 
 sub erector_set {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Good_hashref $RETURN_TYPE };
-    my Perl::Types::Test::Subclass::MySubclasserA_Good_hashref $teachers
+    { my hashref::Perl::Types::Test::Subclass::MySubclasserB_Good $RETURN_TYPE };
+    my hashref::Perl::Types::Test::Subclass::MySubclasserA_Good $teachers
         = { 'launchpad' => Perl::Types::Test::Subclass::MySubclasserA_Good->new(), 'donald' => Perl::Types::Test::Subclass::MySubclasserA_Good->new() };
-    my Perl::Types::Test::Subclass::MySubclasserB_Good_hashref $peers = { 'webbigail' => Perl::Types::Test::Subclass::MySubclasserB_Good->new() };
+    my hashref::Perl::Types::Test::Subclass::MySubclasserB_Good $peers = { 'webbigail' => Perl::Types::Test::Subclass::MySubclasserB_Good->new() };
     return $peers;
 }
 

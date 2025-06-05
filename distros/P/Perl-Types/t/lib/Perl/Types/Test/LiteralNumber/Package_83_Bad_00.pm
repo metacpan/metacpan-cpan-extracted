@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Unexpected Token:  -04' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralNumber::Package_83_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -12,7 +12,7 @@ our $VERSION = 0.001_000;
 # [[[ OPERATIONS ]]]
 
 # homogeneous 2-dimensional hash of hashes, using inner types
-my hashref_hashref $hash_hash = {
+my hashref::hashref $hash_hash = {
     key_0 => my hashref::integer $TYPED_key_0
         = { a => 17, b => -23, c => 1_701 },
     key_1 => my hashref::integer $TYPED_key_1

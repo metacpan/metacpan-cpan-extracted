@@ -6,9 +6,9 @@
 # <<< EXECUTE_SUCCESS: "types = 'PERL'" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.000_010;
 
 # [[[ CRITICS ]]]
@@ -22,6 +22,6 @@ use Perl::Class::Template;
 
 #print '%main:: = ', "\n", Dumper( \%main:: ), "\n";
 
-print 'MODE_ID = ', Perl::Types__CompileUnit__Module__Class__CPP__Template__MODE_ID(), "\n";
-print q{ops = '}, $Perl::Types::MODES->{Perl::Types__CompileUnit__Module__Class__CPP__Template__MODE_ID()}->{ops}, q{'}, "\n";
-print q{types = '}, $Perl::Types::MODES->{Perl::Types__CompileUnit__Module__Class__CPP__Template__MODE_ID()}->{types}, q{'}, "\n";
+print 'MODE_ID = ', Perl__Types__CompileUnit__Module__Class__CPP__Template__MODE_ID(), "\n";
+print q{ops = '}, $Perl::Types::MODES->{Perl__Types__CompileUnit__Module__Class__CPP__Template__MODE_ID()}->{ops}, q{'}, "\n";
+print q{types = '}, $Perl::Types::MODES->{Perl__Types__CompileUnit__Module__Class__CPP__Template__MODE_ID()}->{types}, q{'}, "\n";

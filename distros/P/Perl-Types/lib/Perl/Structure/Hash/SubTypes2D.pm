@@ -2,7 +2,7 @@
 package Perl::Structure::Hash::SubTypes2D;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.025_000;
 
 # [[[ CRITICS ]]]
@@ -10,6 +10,14 @@ our $VERSION = 0.025_000;
 ## no critic qw(ProhibitUnreachableCode RequirePodSections RequirePodAtEnd)  # DEVELOPER DEFAULT 1b: allow unreachable & POD-commented code, must be after line 1
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
+
+# [[[ INCLUDES ]]]
+# for TYPE_CHECK() used in hashref_arrayref_TYPE_typetestX()
+use Perl::Type::Integer;
+use Perl::Type::Number;
+use Perl::Type::String;
+# NEED ANSWER: is it bad to have this hash data type code dependent on the array data types?
+use Perl::Structure::Array;  # arrayref::integer, arrayref::number, arrayref::string
 
 # [[[ EXPORTS ]]]
 # DEV NOTE, CORRELATION #rp051: hard-coded list of RPerl data types and data structures
@@ -45,14 +53,6 @@ our @EXPORT_OK = qw(
     hashref_arrayref_string_typetest0
     hashref_arrayref_string_typetest1
 );
-
-# [[[ INCLUDES ]]]
-# for TYPE_CHECK() used in hashref_arrayref_TYPE_typetestX()
-use Perl::Type::Integer;
-use Perl::Type::Number;
-use Perl::Type::String;
-# NEED ANSWER: is it bad to have this hash data type code dependent on the array data types?
-use Perl::Structure::Array;  # arrayref::integer, arrayref::number, arrayref::string
 
 # [[[ HASH REF ARRAY REF ]]]
 # [[[ HASH REF ARRAY REF ]]]

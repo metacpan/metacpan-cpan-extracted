@@ -1,8 +1,8 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::ScopeTypeNameValue::Class_00_Good;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -19,7 +19,7 @@ our hashref $properties
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 sub properties_stnv {
-    { my string::method $RETURN_TYPE };
+    { my string $RETURN_TYPE };
     return main::scope_type_name_value($properties);
 }
 

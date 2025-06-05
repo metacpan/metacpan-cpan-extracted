@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.003';
+$Crypt::SecretBuffer::VERSION = '0.004';
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.003';
+$Crypt::SecretBuffer::Exports::VERSION = '0.004';
    use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw( secret_buffer secret NONBLOCK AT_LEAST );
    sub secret_buffer {
@@ -30,6 +30,11 @@ $Crypt::SecretBuffer::Exports::VERSION = '0.003';
 sub import {
    splice(@_, 0, 1, 'Crypt::SecretBuffer::Exports');
    goto \&Crypt::SecretBuffer::Exports::import;
+}
+
+sub Inline {
+   require Crypt::SecretBuffer::Install::Files;
+   goto \&Crypt::SecretBuffer::Install::Files::Inline;
 }
 
 
@@ -61,6 +66,7 @@ sub as_pipe {
    close($w); # XS dups the file handle if it is writing async from a thread
    return $r;
 }
+
 
 1;
 
@@ -342,10 +348,9 @@ Shorthand function for calling L</new>.
 
 =head1 C API
 
-Since this module is somewhat more intended for XS than Perl users, I'm documenting the
-internal C API here.
-
-First, your XS module should use L<ExtUtils::Depends> to depend on the C API of this module:
+This module is intended for C code as much as it is for Perl code.  To write an XS module that
+uses SecretBuffer, your XS module should use L<ExtUtils::Depends> to add the headers and linkage
+needed for the C API:
 
   my $dep= ExtUtils::Depends->new('Your::Module', 'Crypt::SecretBuffer');
   ...
@@ -354,118 +359,32 @@ First, your XS module should use L<ExtUtils::Depends> to depend on the C API of 
     $dep->get_makefile_vars()
   );
 
-If you are on a GNU Libc platform which supports global symbol linkage (e.g. Linux, not Mac or
-Windows) all you need to do is use the header "SecretBuffer.h" and get to work.  If you want
-to compile on Mac or Windows, you also need to declare function pointer symbols for the exports
-and initialize them:
+You can also just use it with L<Inline::C> if you want to skip the hassle of an XS module:
 
-  #include "SecretBuffer.h"
-  SECRET_BUFFER_DECLARE_FUNCTION_POINTERS
-  SECRET_BUFFER_DEFINE_FUNCTION_POINTERS
-  ...
-  BOOT:
-    SECRET_BUFFER_IMPORT_FUNCTION_POINTERS
+  package TestSecretBufferWithInline;
+  use strict;
+  use warnings;
+  use Inline with => 'Crypt::SecretBuffer';
+  use Inline C => <<END_C;
+  
+  #include <SecretBuffer.h>
+  
+  int test(secret_buffer *buf) {
+    return buf->len;
+  }
+  
+  END_C
+  
+  print test(Crypt::SecretBuffer->new(length => 10))."\n";
+  1;
 
-The complete documentation is found in SecretBuffer.h, but here is a synopsis:
-
-=over
-
-=item struct secret_buffer
-
-  typedef struct {
-    char *data;
-    size_t len, capacity;
-    SV *stringify_sv;
-  } secret_buffer;
-
-=item secret_buffer_new
-
-  secret_buffer* secret_buffer_new(size_t capacity, SV **ref_out);
-
-Create a Crypt::SecretBuffer object, return the struct, optionally return the mortal ref.
-The struct lifespan is tied to the Crypt::SecretBuffer object.
-
-=item secret_buffer_from_magic
-
-  secret_buffer* secret_buffer_from_magic(SV *ref, int flags);
-
-Return the secret_buffer attached to the ref to a Crypt::SecretBuffer object.
-
-=item secret_buffer_alloc_at_least
-
-  void secret_buffer_alloc_at_least(secret_buffer *buf, size_t min_capacity);
-
-Ensure the secret_buffer is allocated to at least min_capacity.
-
-=item secret_buffer_set_len
-
-  void secret_buffer_set_len(secret_buffer *buf, size_t new_len);
-
-Change the length of the "defined" range of the buffer.  Fill with 0 if it grows, clear with 0
-if it shrinks.
-
-=item secret_buffer_append_random
-
-  IV secret_buffer_append_random(secret_buffer *buf, size_t n, unsigned flags);
-
-Grow buffer with N quality-random bytes.
-
-=item secret_buffer_append_sysread
-
-  IV secret_buffer_append_sysread(secret_buffer *buf, PerlIO *fh, size_t count);
-
-Run one system-level read() and append bytes to the buffer, returning -1 on error.
-
-=item secret_buffer_append_read
-
-  IV secret_buffer_append_read(secret_buffer *buf, PerlIO *fh, size_t count);
-
-Same as sysread, but first read from PerlIO buffer if it isn't empty.
-
-=item secret_buffer_append_console_line
-
-  int secret_buffer_append_console_line(secret_buffer *buf, PerlIO *fh);
-
-Attempt to read one complete line of text from a TTY or Console with echo disabled.
-Returns 1 if and only if it got a whole line.  Returns 0 or -1 on EOF or error of the final
-read attempt.
-
-=item secret_buffer_syswrite
-
-  IV secret_buffer_syswrite(secret_buffer *buf, PerlIO *fh, IV offset, IV count);
-
-Perform one system-level write() from the buffer, returning -1 on error and number of bytes
-written otherwise.  Also flushes perl's output buffer before it starts.
-
-=item secret_buffer_write_async
-
-  IV secret_buffer_write_async(secret_buffer *buf, PerlIO *fh, IV offset, IV count, SV **ref_out);
-
-Attempt to load a range of bytes into a handle, and if it would block, spawn a thread to push
-the rest of the data into the pipe.  Returns 0 if thread spawned, and fills the optional ref_out
-variable (which you can omit) with a ref to a promise-like object.  Otherwise returns same as
-syswrite.
-
-=item secret_buffer_result_check
-
-  bool secret_buffer_result_check(SV *promise_ref, int timeout_msec, IV *wrote, IV *os_err);
-
-Check if the promise-like object of secret_buffer_write_async has resolved.  Returns bytes
-written and OS error code into the supplied (optional) references.
-
-=item secret_buffer_get_stringify_sv
-
-  SV* secret_buffer_get_stringify_sv(secret_buffer *buf);
-
-Return a magic SV which exposes the secret via GET magic.  Multiple calls return the same SV.
-The SV can safely be placed on the Perl stack, and becomes mortal if the secret_buffer is
-destroyed.
-
-=back
+The complete API documentation is found in
+L<SecretBuffer.h|https://metacpan.org/dist/Crypt-SecretBuffer/source/SecretBuffer.h>
+but here is a quick example:
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

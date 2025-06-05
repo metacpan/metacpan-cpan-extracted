@@ -13,6 +13,8 @@ lib/Data/Identifier.pm
 lib/Data/Identifier/Cloudlet.pm
 lib/Data/Identifier/Generate.pm
 lib/Data/Identifier/Interface/Known.pm
+lib/Data/Identifier/Interface/Simple.pm
+lib/Data/Identifier/Interface/Subobjects.pm
 lib/Data/Identifier/Interface/Userdata.pm
 lib/Data/Identifier/Wellknown.pm
 t/01_load.t

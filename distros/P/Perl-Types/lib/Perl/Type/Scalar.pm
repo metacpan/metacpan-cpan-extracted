@@ -2,8 +2,8 @@
 package Perl::Type::Scalar;
 use strict;
 use warnings;
-#use Perl::Types;  # don't use Perl::Types inside itself, in order to avoid circular includes
-our $VERSION = 0.006_000;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
+our $VERSION = 0.007_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(Perl::Type);
@@ -14,17 +14,19 @@ use Perl::Type;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 
-# [[[ INCLUDES ]]]
-use English;  # normally this would come from `use Perl::Types;` above
-
 # [[[ CONSTANTS ]]]
-use constant INFINITY => my string $TYPED_INFINITY = 'inf';
+# DEV NOTE: the special string 'inf' is recognized by Perl as representing infinity,
+# but that is about the limit of the Perl interpreter's abilities and it does not appear to be officially documented?
+# NEED ANSWER: why does `use constant INFINITY` cause the following error?
+#     Prototype mismatch: sub Perl::Type::Scalar::INFINITY: none vs () at /usr/share/perl/5.30/constant.pm line 171.
+# could it be due to wholesale EXPORT and EXPORT_OK in Perl::Config or Perl::Types or perltypes??
+#use constant INFINITY => my string $TYPED_INFINITY = 'inf';
+use constant INFINITY_VALUE => my string $TYPED_INFINITY_VALUE = 'inf';
 
 # [[[ SUB-TYPES ]]]
 # a scalartype is a known, non-void data type, meaning a number or a string
 # DEV NOTE: do NOT overload Perl's 'scalar' keyword!!!
-package  # hide from PAUSE indexing
-    scalartype;
+package scalartype;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Scalar);

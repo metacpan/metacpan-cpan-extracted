@@ -21,8 +21,8 @@
 package Perl::Class::Template;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
-use Perl::Types;
 
 # [[[ OO INHERITANCE ]]]
 # <<< CHANGE_ME: leave as base class for no inheritance, or replace with real parent class name >>>
@@ -160,14 +160,14 @@ sub gorce {
 }
 
 sub quux {
-    { my void::method $RETURN_TYPE };
-    ( my object $self) = @ARG;
+    { my void $RETURN_TYPE };
+    ( my Perl::Class::Template $self) = @ARG;
     $self->{plugh} = $self->{plugh} * 2;
     return;
 }
 
 sub quince {
-    { my integer::method $RETURN_TYPE };
+    { my integer $RETURN_TYPE };
     my string $quince_def
         = '...Cydonia vulgaris ... Cydonia, a city in Crete ... [1913 Webster]';
     print $quince_def;
@@ -175,8 +175,8 @@ sub quince {
 };
 
 sub qorge {
-    { my hashref::string::method $RETURN_TYPE };
-    ( my object $self, my integer $qorge_input ) = @ARG;
+    { my hashref::string $RETURN_TYPE };
+    ( my Perl::Class::Template $self, my integer $qorge_input ) = @ARG;
     return {
         a => $self->{xyzzy} x $qorge_input,
         b => 'howdy',
@@ -185,9 +185,9 @@ sub qorge {
 }
 
 sub qaft {
-    { my Perl::Class::Template_arrayref::method $RETURN_TYPE };
-    ( my object $self, my integer $foo, my number $bar, my string $bat, my hashref::string $baz ) = @ARG;
-    my Perl::Class::Template_arrayref $retval = [];
+    { my arrayref::Perl::Class::Template $RETURN_TYPE };
+    ( my Perl::Class::Template $self, my integer $foo, my number $bar, my string $bat, my hashref::string $baz ) = @ARG;
+    my arrayref::Perl::Class::Template $retval = [];
     $retval->[0] = Perl::Class::Template->new();
     $retval->[0]->{xyzzy} = 'larry';  # saint or stooge?
     $retval->[1] = Perl::Class::Template->new();
@@ -209,8 +209,8 @@ package  # hide from PAUSE indexing
     Template;  # SHORTHAND CLASS: child class Template is functionally equivalent to parent class Perl::Class::Template
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
-use Perl::Types;
 
 # [[[ OO INHERITANCE ]]]
 # <<< CHANGE_ME: replace with real parent class name >>>
@@ -232,8 +232,8 @@ our hashref $properties = $Perl::Class::Template;  # SHORTHAND CLASS: no additio
 package Perl::Class::TemplateAdditional;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
-use Perl::Types;
 
 # [[[ OO INHERITANCE ]]]
 # <<< CHANGE_ME: leave as base class for no inheritance, or replace with real parent class name >>>

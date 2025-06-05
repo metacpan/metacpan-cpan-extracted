@@ -1,5 +1,10 @@
 Revision history for Dispatch-Class
 
+0.04    2025-06-04
+        - fix declared prerequisites: parent was missing entirely; Scalar::Util
+          now officially needs version 1.0+
+        - no other changes
+
 0.03    2025-06-03
         - cosmetic updates to documentation
         - switch bug tracker to codeberg

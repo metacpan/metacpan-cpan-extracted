@@ -2,7 +2,7 @@
 package Perl::Type::Number;
 use strict;
 use warnings;
-#use Perl::Types;  # don't use Perl::Types inside itself, in order to avoid circular includes
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.014_100;
 
 # [[[ OO INHERITANCE ]]]
@@ -14,9 +14,6 @@ use Perl::Type::Scalar;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 
-# [[[ INCLUDES ]]]
-use English;  # normally this would come from `use Perl::Types;` above
-
 # [[[ SUB-TYPES ]]]
 # DEV NOTE, CORRELATION #rp007:
 # a number is any numeric value, meaning either an integer or a floating-point number;
@@ -24,29 +21,15 @@ use English;  # normally this would come from `use Perl::Types;` above
 # the hidden Perl semantics are SvIOKp() for ints, and SvNOKp() for numbers;
 # these numbers appear to act as C doubles and are implemented as such in RPerl;
 # in the future, this can be optimized (for at least memory usage) by implementing full Float semantics
-package  # hide from PAUSE indexing
-    number;
+package number;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Number);
 
-package  # hide from PAUSE indexing
-    constant_number;
+package constant_number;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Number);
-
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    boolean;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-package     # hide from PAUSE indexing
-    integer;
-package    # hide from PAUSE indexing
-    character;
-package    # hide from PAUSE indexing
-    string;
 
 # [[[ SWITCH CONTEXT BACK TO PRIMARY PACKAGE ]]]
 package Perl::Type::Number;
@@ -155,7 +138,7 @@ sub number_to_string {
     if ($input_number < 0) { $is_negative = 1; }
     my string $retval;
 #    my $retval;
-    my $split_parts = [ split /[.]/xms, "$input_number" ];   # string_arrayref
+    my $split_parts = [ split /[.]/xms, "$input_number" ];   # arrayref::string
 
     if ( exists $split_parts->[0] ) {
         $retval = reverse $split_parts->[0];

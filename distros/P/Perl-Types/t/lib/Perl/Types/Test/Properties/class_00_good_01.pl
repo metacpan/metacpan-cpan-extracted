@@ -4,9 +4,9 @@
 # <<< EXECUTE_SUCCESS: '69' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.000_010;
 
 # [[[ CRITICS ]]]

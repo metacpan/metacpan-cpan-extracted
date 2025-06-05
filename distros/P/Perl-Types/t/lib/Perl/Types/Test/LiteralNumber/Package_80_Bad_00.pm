@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Bareword found where operator expected' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralNumber::Package_80_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

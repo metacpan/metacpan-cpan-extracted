@@ -1,7 +1,7 @@
 package Perl::Structure::Graph;
 use strict;
 use warnings; 
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.001_000;
 
 use parent qw(Perl::Type::Modifier::Reference);

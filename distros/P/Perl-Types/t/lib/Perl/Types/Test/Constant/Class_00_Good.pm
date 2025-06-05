@@ -1,9 +1,9 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 
 package Perl::Types::Test::Constant::Class_00_Good;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -20,7 +20,7 @@ our hashref $properties = { empty_property => my integer $TYPED_empty_property =
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 sub empty_method {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     return 2;
 }
 

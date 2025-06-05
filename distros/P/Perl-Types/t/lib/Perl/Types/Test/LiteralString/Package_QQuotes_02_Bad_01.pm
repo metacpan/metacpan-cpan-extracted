@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Unexpected Token:  {' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralString::Package_QQuotes_02_Bad_01;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

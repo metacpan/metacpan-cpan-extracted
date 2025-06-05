@@ -1,5 +1,8 @@
 Revision history for perl module App::pepper:
 
+1.0.0 - 2025-06-04
+  - support for contact updates.
+
 0.99.1 - 2025-06-03
   - support for EPP servers which implement RFC 9154 (Secure Authorization
     Information for Transfer).

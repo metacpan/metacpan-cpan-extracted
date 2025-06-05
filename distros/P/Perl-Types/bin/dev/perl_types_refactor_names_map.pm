@@ -405,7 +405,6 @@ our $refactor_names_map = {
              'string_arrayref_arrayref' => 'arrayref_arrayref_string',
              'string_arrayref_arrayref_CHECK' => 'arrayref_arrayref_string_CHECK',
              'string_arrayref_arrayref_CHECKTRACE' => 'arrayref_arrayref_string_CHECKTRACE',
-             'string_arrayref_hashref' => 'hashref_arrayref_string',
              'string_arrayref_hashref_CHECK' => 'hashref_arrayref_string_CHECK',
              'string_arrayref_hashref_CHECKTRACE' => 'hashref_arrayref_string_CHECKTRACE',
              'string_arrayref_hashref_const_iterator' => 'hashref_arrayref_string_const_iterator',
@@ -813,6 +812,8 @@ our $refactor_names_map = {
             'arrayref_arrayref_arrayref' => 'arrayref::arrayref::arrayref',
             'arrayref_arrayref_hashref' => 'hashref::arrayref::arrayref',
             'arrayref_hashref' => 'hashref::arrayref',
+            # composite type: hashref -> arrayref -> string
+            'hashref_arrayref_string' => 'hashref::arrayref::string',
             'arrayref_hashref_hashref' => 'hashref::hashref::arrayref',
             'character_arrayref' => 'arrayref::character',
             'character_hashref' => 'hashref::character',

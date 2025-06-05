@@ -44,7 +44,7 @@ our @EXPORT = qw(
     character_CHECK character_CHECKTRACE character_to_boolean character_to_nonsigned_integer character_to_integer character_to_number character_to_string
     string_CHECK string_CHECKTRACE string_to_boolean string_to_nonsigned_integer string_to_integer string_to_number string_to_character string_to_string
     arrayref_CHECK arrayref_CHECKTRACE arrayref_integer_CHECK arrayref_integer_CHECKTRACE arrayref_number_CHECK arrayref_number_CHECKTRACE arrayref_string_CHECK arrayref_string_CHECKTRACE
-    hashref_CHECK hashref_CHECKTRACE integer_hashref_CHECK integer_hashref_CHECKTRACE number_hashref_CHECK number_hashref_CHECKTRACE string_hashref_CHECK string_hashref_CHECKTRACE
+    hashref_CHECK hashref_CHECKTRACE hashref_integer_CHECK hashref_integer_CHECKTRACE hashref_number_CHECK hashref_number_CHECKTRACE hashref_string_CHECK hashref_string_CHECKTRACE
 );
 =cut
 

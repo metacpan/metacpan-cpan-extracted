@@ -1,8 +1,8 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Properties::Class_10_Good;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -16,8 +16,8 @@ our hashref $properties = { test_property => my arrayref::integer $TYPED_test_pr
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 sub test_method {
-    { my arrayref::integer::method $RETURN_TYPE };
-    ( my object $self, my integer $input_integer ) = @ARG;
+    { my arrayref::integer $RETURN_TYPE };
+    ( my Perl::Types::Test::Properties::Class_10_Good $self, my integer $input_integer ) = @ARG;
     my arrayref::integer $test_property_shortcut = $self->get_test_property();
     $test_property_shortcut->[0] *= $input_integer;
     return $self->{test_property};

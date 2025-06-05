@@ -2,7 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 25;
+
+use Test::Most tests => 28;
 use lib 't/lib';
 use MyLogger;
 
@@ -39,7 +40,7 @@ TRANSLATE: {
 
 			delete $ENV{'LANGUAGE'};
 
-			diag($places->translate(place => 'Canterbury', from => 'en', to => 'fr'));
+			# diag($places->translate(place => 'Canterbury', from => 'en', to => 'fr'));
 			TODO: {
 				# Should be Cantorbéry.  See BUGS in the documentation
 				# https://www.geonames.org/2653877/canterbury.html
@@ -51,7 +52,7 @@ TRANSLATE: {
 			$ENV{'LANG'} = 'fr_FR';
 			is($places->translate(place => 'Dover', 'from' => 'en'), 'Douvres', 'Target LANG set to French');
 
-			is($places->translate(place => 'Douvres', 'to' => 'en'), 'Dover', 'Source LANG set to French');
+			is($places->translate(place => 'Douvres', 'to' => 'en'), 'Dover', 'Source LANG set to English');
 			is($places->translate(place => 'Douvres', 'to' => 'fr'), 'Douvres', 'Source LANG set to French');
 			is($places->translate('Dover'), 'Douvres', 'Sets default source as English and a default target from the environment');
 
@@ -64,16 +65,19 @@ TRANSLATE: {
 			$ENV{'LANG'} = 'en_GB';
 
 			is($places->translate(place => 'Dover', 'to' => 'en'), 'Dover', 'Source LANG set to English');
+			is($places->en('Dover'), 'Dover', 'AUTOLOAD: Source LANG set to English');
 			is($places->translate(place => 'Dover', 'to' => 'fr'), 'Douvres', 'Source LANG set to English');
+			is($places->fr(place => 'Dover'), 'Douvres', 'AUTOLOAD: Source LANG set to English');
 			is($places->translate(place => 'Douvres', 'from' => 'fr'), 'Dover', 'Source LANG set to English');
 			is($places->translate(place => 'Dover', 'from' => 'en'), 'Dover', 'Source LANG set to English');
 
 			# There is more than one preferred entry for Bexley in London in the database, but they have the same value
 			is($places->translate(place => 'Bexley', from => 'en', to => 'fr'), 'Bexley', 'Test for two preferred values that are the same');
 			is($places->translate(place => 'Thurrock', to => 'fr'), 'Thurrock', 'Test for two preferred values neither of which matches');
+			is($places->fr(place => 'Thurrock'), 'Thurrock', 'AUTOLOAD: Test for two preferred values neither of which matches');
 		} else {
 			diag('AUTOMATED_TESTING: Not testing live data');
-			skip('AUTOMATED_TESTING: Not testing live data', 23);
+			skip('AUTOMATED_TESTING: Not testing live data', 26);
 		}
 	}
 }

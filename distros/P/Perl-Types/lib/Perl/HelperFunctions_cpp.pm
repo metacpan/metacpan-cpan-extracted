@@ -2,9 +2,9 @@
 package Perl::HelperFunctions_cpp;
 use strict;
 use warnings;
-use Perl::Config; # get Carp, English, $Perl::INCLUDE_PATH without 'use RPerl;'
+use Perl::Config; # get Carp, English, $Perl::INCLUDE_PATH without 'use Perl::Types;'
 
-#use RPerl;  # DEV NOTE: need to use HelperFunctions in Perl::Structure::Array for type checking SvIOKp() etc; remove dependency on RPerl void::method type so HelperFunctions can be loaded by RPerl type system
+#use Perl::Types;  # DEV NOTE: need to use HelperFunctions in Perl::Structure::Array for type checking SvIOKp() etc; remove dependency on Perl::Types void type so HelperFunctions can be loaded by RPerl type system
 our $VERSION = 0.007_000;
 
 # [[[ CRITICS ]]]
@@ -16,7 +16,7 @@ use perltypessizes;  # get type_integer_native_ccflag() & type_number_native_ccf
 
 # [[[ SUBROUTINES ]]]
 sub cpp_load {
-#    { my void::method $RETURN_TYPE };
+#    { my void $RETURN_TYPE };
     my $need_load_cpp = 0;
 
     if (    ( exists $main::{'Perl__HelperFunctions__MODE_ID'} )

@@ -4,7 +4,7 @@ package perltypes;  # creating the first useful Perl pragma in decades, you're w
 use strict;
 use warnings;
 use Perl::Config;
-our $VERSION = 0.018_000;
+our $VERSION = 0.020_000;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -15,18 +15,16 @@ our $VERSION = 0.018_000;
 ## no critic qw(RequireBriefOpen)  # SYSTEM SPECIAL 10: allow complex processing with open filehandle
 ## no critic qw(ProhibitCascadingIfElse)  # SYSTEM SPECIAL 12: allow complex conditional logic
 
-# [[[ NON-PERL-TYPES MODULES ]]]
-use File::Copy qw(copy);
+# [[[ INCLUDES, NON-PERL-TYPES MODULES ]]]
 use Scalar::Util qw(blessed);
-use Config;
 
-# all following type lists lowest-to-highest level
-
+# [[[ INCLUDES, DATA TYPE SIZES ]]]
 use perltypessizes;
 
 # DEV NOTE, CORRELATION #rp012: type system includes, hard-copies in perltypes.pm & perltypesconv.pm & Class.pm
+# DEV NOTE: all the following type lists are sorted from lowest-to-highest level
 
-# [[[ DATA TYPES ]]]
+# [[[ INCLUDES, DATA TYPES ]]]
 use Perl::Type::Void;
 use Perl::Type::Boolean;
 use Perl::Type::NonsignedInteger;
@@ -38,7 +36,7 @@ use Perl::Type::Scalar;
 use Perl::Type::Unknown;
 use Perl::Type::FileHandle;
 
-# [[[ DATA STRUCTURES ]]]
+# [[[ INCLUDES, DATA STRUCTURES ]]]
 use Perl::Structure::Array;
 use Perl::Structure::Array::SubTypes;
 use Perl::Structure::Array::SubTypes1D;
@@ -64,6 +62,7 @@ use Perl::Structure::Hash::Reference;
 # [[[ EXPORTS ]]]
 use Exporter 'import';
 our @EXPORT = (
+    @Perl::Config::EXPORT,  # export all symbols imported from essential modules; includes Data::Dumper, English, Carp, and POSIX
     @Perl::Type::Void::EXPORT,
     @Perl::Type::Boolean::EXPORT,
     @Perl::Type::NonsignedInteger::EXPORT,
@@ -83,6 +82,7 @@ our @EXPORT = (
     @Perl::Structure::Hash::SubTypes3D::EXPORT
 );
 our @EXPORT_OK = (
+    @Perl::Config::EXPORT_OK,  # export all symbols imported from essential modules; includes Data::Dumper, English, Carp, and POSIX
     @Perl::Type::Void::EXPORT_OK,
     @Perl::Type::Boolean::EXPORT_OK,
     @Perl::Type::NonsignedInteger::EXPORT_OK,
@@ -102,7 +102,7 @@ our @EXPORT_OK = (
     @Perl::Structure::Hash::SubTypes3D::EXPORT_OK
 );
 
-# [[[ OBJECT-ORIENTED ]]]
+# [[[ INCLUDES, OBJECT-ORIENTED ]]]
 use Perl::Object;
 
 # DEV NOTE, CORRELATION #rp051: hard-coded list of Perl data types and data structures
@@ -571,9 +571,10 @@ sub types_recurse {
 
 
 # [[[ C++ TYPE CONTROL ]]]
-package Perl;
+package    # hide from PAUSE indexing
+    Perl;
 if ( not defined $Perl::INCLUDE_PATH ) {
-    our $INCLUDE_PATH = '/FAILURE/BECAUSE/RPERL/INCLUDE/PATH/NOT/YET/SET';
+    our $INCLUDE_PATH = '/FAILURE/BECAUSE/PERL/INCLUDE/PATH/NOT/YET/SET';
 }
 1;    # suppress warnings about typo in types_enable() below
 

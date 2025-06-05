@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Number found where operator expected' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::SubroutineArguments::Package_00_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

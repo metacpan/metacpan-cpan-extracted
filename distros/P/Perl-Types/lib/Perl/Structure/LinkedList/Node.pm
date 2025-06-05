@@ -23,7 +23,7 @@ our hashref $properties =
 };
 
 sub DUMPER {
-    { my string::method $RETURN_TYPE };
+    { my string $RETURN_TYPE };
     (my Perl::Structure::LinkedList::NodeReference $node) = @ARG;
 	my string $dumped = '[';
 	my integer $is_first = 1;

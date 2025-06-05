@@ -4,6 +4,7 @@ Signal::Info	T_OPAQUEOBJ
 Time::Spec	T_OPAQUEOBJ
 FileDescriptor	T_FILE_DESCRIPTOR
 DirDescriptor	T_DIR_DESCRIPTOR
+const struct sockaddr*	T_PV
 sigset_t*	T_SIGSET
 signo_t	T_SIGNO
 struct timespec	T_TIMESPEC

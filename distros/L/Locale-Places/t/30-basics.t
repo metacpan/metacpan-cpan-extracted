@@ -17,9 +17,7 @@ subtest 'Instantiation' => sub {
 	my $places = new_ok('Locale::Places');
 
 	my $custom_dir = '/custom/path';
-	my $places_with_dir = Locale::Places->new({ directory => $custom_dir });
-	isa_ok($places_with_dir, 'Locale::Places', 'Object with custom directory');
-	is($places_with_dir->{'directory'}, File::Spec->catfile($custom_dir, 'data'), 'Custom directory set correctly');
+	ok(!defined(Locale::Places->new({ directory => $custom_dir })));
 };
 
 subtest 'Translation' => sub {

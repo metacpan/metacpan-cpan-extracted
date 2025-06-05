@@ -5,9 +5,9 @@
 # <<< EXECUTE_SUCCESS: 'have $double_bar = 1447.111554' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

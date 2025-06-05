@@ -9,9 +9,9 @@
 # <<< EXECUTE_SUCCESS: "in main(), have post-modify $arrayref_1D = [ 0, 2, 99, 6, 8 ]" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -24,10 +24,10 @@ sub modify_arrayref {
     { my void $RETURN_TYPE };
     ( my arrayref::integer $arrayref_1D_input ) = @ARG;
 
-    print 'in modify_arrayref, received $arrayref_1D_input =      ', integer_arrayref_to_string($arrayref_1D_input), "\n";
+    print 'in modify_arrayref, received $arrayref_1D_input =      ', arrayref_integer_to_string($arrayref_1D_input), "\n";
     $arrayref_1D_input->[2] = 99;
 
-    print 'in modify_arrayref, have modified $arrayref_1D_input = ', integer_arrayref_to_string($arrayref_1D_input), "\n";
+    print 'in modify_arrayref, have modified $arrayref_1D_input = ', arrayref_integer_to_string($arrayref_1D_input), "\n";
     return;
 }
 
@@ -35,8 +35,8 @@ sub modify_arrayref {
 
 my arrayref::integer $arrayref_1D = [ 0, 2, 4, 6, 8 ];
 
-print 'in main(), have pre-modify $arrayref_1D = ', integer_arrayref_to_string($arrayref_1D), "\n";
+print 'in main(), have pre-modify $arrayref_1D = ', arrayref_integer_to_string($arrayref_1D), "\n";
 
 modify_arrayref($arrayref_1D);
 
-print 'in main(), have post-modify $arrayref_1D = ', integer_arrayref_to_string($arrayref_1D), "\n";
+print 'in main(), have post-modify $arrayref_1D = ', arrayref_integer_to_string($arrayref_1D), "\n";

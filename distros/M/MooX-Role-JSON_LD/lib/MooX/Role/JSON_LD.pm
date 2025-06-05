@@ -47,7 +47,7 @@ MooX::Role::JSON_LD - Easily provide JSON-LD mark-up for your objects.
 
 =head1 DESCRIPTION
 
-This role allows you to easily add a method to your class that produces
+This role allows you to easily add methods to your class that produce
 JSON-LD representing an instance of your class.
 
 To do this, you need to do three things:
@@ -130,7 +130,7 @@ anything you want. We can use that to get the full name of our person.
 
     sub json_ld_fields {
         [
-          { birthDate => 'birthDate'},
+          { birthDate => 'birth_date'},
           { name => sub{ $_[0]-> first_name . ' ' . $_[0]->last_name} },
         ]
       }
@@ -140,9 +140,18 @@ That configuration will give us the following output:
     "birthDate" : "1974-01-08",
     "name" : "David Bowie",
 
+To summarise, the C<json_ld_fields> subroutine should return an array
+reference. Each element of the array is either a string or a hash reference.
+If it is a string, that string is used as both the key in the JSON-LD and
+the method to call on an object to get the value. If the array contains
+a hash reference, then the hash key is used in the JSON-LD and the hash value
+is either a string, which is the name of the method to call on an object to
+get the value, or a code reference which is called (passing in the object)
+and which is expected to return the value to use in the JSON-LD.
+
 =head2 Other contexts
 
-By default, this role uses the URL L<http://schema.org>, but you can change
+By default, this role uses the URL L<https://schema.org>, but you can change
 this. This role adds an attribute (called C<context>) which can be used to
 change the context.
 
@@ -160,7 +169,7 @@ use MRO::Compat;
 use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef
   is_ArrayRef is_Ref is_Object];
 
-our $VERSION = '1.1.0';
+our $VERSION = '2.0.0';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -183,7 +192,7 @@ has context => (
 );
 
 sub _build_context {
-  return 'http://schema.org/';
+  return 'https://schema.org/';
 }
 
 sub _resolve_nested {

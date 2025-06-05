@@ -9,9 +9,9 @@
 # <<< EXECUTE_SUCCESS: "$VAR1 = {'hashref' => {'a' => 'unknown','b' => 'unknown','c' => 'unknown','d' => 'integer','e' => 'unknown'}};" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

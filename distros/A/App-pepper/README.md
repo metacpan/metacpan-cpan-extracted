@@ -8,7 +8,7 @@ Pepper is a command-line client for the EPP protocol. It's written in Perl and u
 
 # USAGE
 
-        pepper [OPTIONS]
+    pepper [OPTIONS]
 
 Available command-line options:
 
@@ -23,7 +23,8 @@ Available command-line options:
 - `--cert=FILE` - specify the client certificate to use to connect.
 - `--key=FILE` - specify the private key for the client certificate.
 - `--exec=COMMAND` - specify a command to execute. If not provided, pepper goes into interactive mode.
-- `--insecure` - disable SSL certificate checks.
+- `--nossl` - disable TLS and connect over plaintext.
+- `--insecure` - disable TLS certificate checks.
 - `--lang=LANG` - set the language when logging in.
 - `--debug` - debug mode, makes `Net::EPP::Simple` verbose.
 
@@ -31,8 +32,8 @@ Available command-line options:
 
 Pepper supports two usage modes:
 
-- 1 Interactive mode: this is the default mode. Pepper will provide a command prompt (with history and line editing capabilities) allowing you to input commands manually.
-- 2 Script mode: if Pepper's `STDIN` is fed a stream of text (ie it's not attached to a terminal) then commands will be read from `STDIN` and executed sequentially. Pepper will exit once EOF is reached.
+- 1. **Interactive mode:** this is the default mode. Pepper will provide a command prompt (with history and line editing capabilities) allowing you to input commands manually.
+- 2. **Script mode:** if Pepper's `STDIN` is fed a stream of text (ie, it's not attached to a terminal) then commands will be read from `STDIN` and executed sequentially. Pepper will exit once EOF is reached.
 
 # SYNTAX
 
@@ -67,13 +68,13 @@ Use `help COMMAND` at any time to get information about that command. Where a co
 
 ### Availability Checks
 
-        check TYPE OBJECT
+    check TYPE OBJECT
 
 This checks the availability of an object. `TYPE` is one of `domain`, `host`, `contact`, `claims` or `fee`. See ["Claims and fee Checks"](#claims-and-fee-checks) for more information about the latter two.
 
 ### Object Information
 
-        info TYPE OBJECT [PARAMS]
+    info TYPE OBJECT [PARAMS]
 
 Get object information. `TYPE` is one of `domain`, `host`, `contact`. For domain objects, `PARAMS` can be `AUTHINFO [HOSTS]`, where `AUTHINFO` is the domain's authInfo code, and the optional `HOSTS` is the value of the "hosts" attribute (ie `all`, which is the default, or `del`, `sub`, or `none`). If you want to set `HOSTS` but don't know the authInfo, use an empty quoted string (ie `""`) as `AUTHINFO`.
 
@@ -105,14 +106,14 @@ Pepper provides limited support for the the Launch and Fee extensions:
 The following command will extend the standard &lt;check> command to perform
 a claims check as per Section 3.1.1. of [draft-ietf-eppext-launchphase](https://metacpan.org/pod/draft-ietf-eppext-launchphase).
 
-        pepper> check claims example.xyz
+    pepper> check claims example.xyz
 
 ### Fee Check
 
 The following command will extend the standard &lt;check> command to perform
 a fee check as per Section 3.1.1. of [draft-brown-epp-fees-02](https://metacpan.org/pod/draft-brown-epp-fees-02).
 
-        pepper> check fee example.xyz COMMAND [CURRENCY [PERIOD]]
+    pepper> check fee example.xyz COMMAND [CURRENCY [PERIOD]]
 
 `COMMAND` must be one of: `create`, `renew`, `transfer`, or `restore`.
 `CURRENCY` is OPTIONAL but if provided, must be a three-character currency code.
@@ -124,11 +125,11 @@ a fee check as per Section 3.1.1. of [draft-brown-epp-fees-02](https://metacpan.
 
 There are two ways of creating a domain:
 
-        clone domain OLD NEW
+    clone domain OLD NEW
 
 This command creates the domain `NEW` using the same contacts and nameservers as `OLD`.
 
-        create domain DOMAIN PARAMS
+    create domain DOMAIN PARAMS
 
 This command creates a domain according to the parameters specified after the domain. `PARAMS` consists of pairs of name and (optionally quoted) value pairs as follows:
 
@@ -148,7 +149,7 @@ Example:
 
 Syntax:
 
-        create host HOSTNAME [IP [IP [IP [...]]]]
+    create host HOSTNAME [IP [IP [IP [...]]]]
 
 Create a host object with the specified `HOSTNAME`. IP address may also be
 specified: IPv4 and IPv6 addresses are automatically detected.
@@ -157,11 +158,11 @@ specified: IPv4 and IPv6 addresses are automatically detected.
 
 There are two ways of creating a contact:
 
-        clone contact OLD NEW
+    clone contact OLD NEW
 
 This command creates the contact `NEW` using the same data as `OLD`.
 
-        create contact PARAMS
+    create contact PARAMS
 
 This command creates a contact object according to the parameters specified. `PARAMS` consists of pairs of name and (optionally quoted) value pairs as follows:
 
@@ -182,7 +183,6 @@ This command creates a contact object according to the parameters specified. `PA
 Example:
 
     pepper (id@host)> create contact id "sh8013" name "John Doe" org "Example Inc." type int street "123 Example Dr." city Dulles sp VA pc 20166-6503 cc US voice +1.7035555555 email jdoe@example.com
-    
 
 ## Object Updates
 
@@ -190,61 +190,93 @@ Objects may be updated using the `update` command.
 
 ### Domain Updates
 
-        update domain DOMAIN CHANGES
+    update domain DOMAIN CHANGES
 
 The `CHANGES` argument consists of groups of three values: an action (ie `add`, `rem` or `chg`), followed by a property name (e.g. `ns`, a contact type (such as `admin`, `tech` or `billing`) or `status`), followed by a value.
 
 Example:
 
-        update domain example.com add ns ns0.example.com
+    update domain example.com add ns ns0.example.com
 
-        update domain example.com rem ns ns0.example.com
+    update domain example.com rem ns ns0.example.com
 
-        update domain example.com add status clientUpdateProhibited
+    update domain example.com add status clientUpdateProhibited
 
-        update domain example.com rem status clientHold
+    update domain example.com rem status clientHold
 
-        update domain example.com add admin H12345
+    update domain example.com add admin H12345
 
-        update domain example.com rem tech H54321
+    update domain example.com rem tech H54321
 
-        update domain example.com chg registrant H54321
+    update domain example.com chg registrant H54321
 
-        update domain example.cm chg authinfo foo2bar
+    update domain example.cm chg authinfo foo2bar
 
 Multiple changes can be combined in a single command:
 
-        update domain example.com add status clientUpdateProhibited rem ns ns0.example.com chg registrant H54321
+    update domain example.com add status clientUpdateProhibited rem ns ns0.example.com chg registrant H54321
 
 ### Host Updates
 
 Syntax:
 
-        update host HOSTNAME CHANGES
+    update host HOSTNAME CHANGES
 
 The `CHANGES` argument consists of groups of three values: an action (ie `add`, `rem` or `chg`), followed by a property name (ie `addr`, `status` or `name`), followed by a value (which may be quoted).
 
 Examples:
 
-        update host ns0.example.com add status clientUpdateProhibited
+    update host ns0.example.com add status clientUpdateProhibited
 
-        update host ns0.example.com rem addr 10.0.0.1
+    update host ns0.example.com rem addr 10.0.0.1
 
-        update host ns0.example.com chg name ns0.example.net
+    update host ns0.example.com chg name ns0.example.net
 
 Multiple changes can be combined in a single command:
 
-        update host ns0.example.com add status clientUpdateProhibited rem addr 10.0.0.1 add addr 1::1 chg name ns0.example.net
+    update host ns0.example.com add status clientUpdateProhibited rem addr 10.0.0.1 add addr 1::1 chg name ns0.example.net
 
 ### Contact Updates
 
-Not currently implemented.
+    update contact ID CHANGES
+
+The `CHANGES` argument consists of groups of three values: an action (ie `add`, `rem` or `chg`), followed by a property name, followed by a value (which may be quoted, and may be empty). The property name may be one of:
+
+- `status`
+- `name`
+- `type` (either "`int`" or "`loc`", which applies to all subsequent values, and which may appear multiple times)
+- `org`
+- `street1`, `street2`, `street3`
+- `city`
+- `sp`
+- `pc`
+- `cc`
+- `voice`
+- `fax`
+- `email`
+- `authInfo`
+
+If postal address information is being changed, then any values not specified in the command line will be populated from the existing object information. This is because contact information is updated atomically.
+
+Examples:
+
+    pepper (id@host)> create contact id "sh8013" name "John Doe" org "Example Inc." type int street "123 Example Dr." city Dulles sp VA pc 20166-6503 cc US voice  email jdoe@example.com
+
+    update contact sh8013 chg email example@example.com
+
+    update contact sh8013 chg voice +1.7035555555
+
+    update contact sh8013 street1 "123 Example Dr." street2 "" street3 ""
+
+    update contact city Dulles sp VA pc 20166-6503 cc US
+
+    update contact authInfo foo2bar
 
 ## Object Transfers
 
 Object transfers may be managed with the `transfer` command. Usage:
 
-        transfer TYPE OBJECT CMD [AUTHINFO [PERIOD]]
+    transfer TYPE OBJECT CMD [AUTHINFO [PERIOD]]
 
 where:
 
@@ -271,7 +303,7 @@ In the above example, Pepper will end the session if the first command fails, si
 
 To install, run:
 
-        cpanm --sudo App::pepper
+    cpanm --sudo App::pepper
 
 If [Term::ReadLine::Gnu](https://metacpan.org/pod/Term%3A%3AReadLine%3A%3AGnu) is available, then Pepper can provide a richer interactive command line, with support for history and rich command editing.
 
@@ -282,12 +314,13 @@ that can be used to build an image on your local system.
 
 Alternatively, you can pull the [image from Docker Hub](https://hub.docker.com/r/gbxyz/pepper):
 
-        $ docker pull gbxyz/pepper
+    $ docker pull gbxyz/pepper
 
-        $ docker run -it gbxyz/pepper --help
+    $ docker run -it gbxyz/pepper --help
 
 # LICENSE
 
 Copyright 2014 - 2023 CentralNic Group plc.
+Copyright 2023 - 2025 Gavin Brown.
 
 This program is Free Software; you can use it and/or modify it under the same terms as Perl itself.

@@ -8,9 +8,10 @@
 # <<< EXECUTE_SUCCESS: "have $row_3_column_0_separated = 9" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
+#use perltypes;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -47,6 +48,6 @@ my integer $row_3_column_0_combined = $rows_and_columns_2D->[3]->[0];    # row a
 print 'have $row_3_column_0_combined = ', $row_3_column_0_combined, "\n";
 
 my arrayref::integer $row_3 = $rows_and_columns_2D->[3];                  # row dereference only
-print 'have $row_3 = ', integer_arrayref_to_string($row_3), "\n";
+print 'have $row_3 = ', arrayref_integer_to_string($row_3), "\n";
 my integer $row_3_column_0_separated = $row_3->[0];                      # column dereference only
 print 'have $row_3_column_0_separated = ', $row_3_column_0_separated, "\n";

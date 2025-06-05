@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include <liburing.h>
+#include <linux/wait.h>
 
 
 typedef struct ring {
@@ -15,6 +16,7 @@ int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
 	struct ring* self = (struct ring*)magic->mg_ptr;
 	io_uring_queue_exit(&self->uring);
 	safefree(self);
+	return 0;
 }
 
 static const MGVTBL IO__Uring_magic = {
@@ -384,7 +386,7 @@ OUTPUT:
 	RETVAL
 
 
-UV nop(IO::Uring self, const char* path, int flags, UV mode, UV iflags, SV* callback)
+UV nop(IO::Uring self, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_nop(sqe);
@@ -486,10 +488,10 @@ OUTPUT:
 	RETVAL
 
 
-UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, char* name, size_t length(name), UV pflags, UV iflags, SV* callback)
+UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, const struct sockaddr* name, size_t length(name), UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
-	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
+	io_uring_prep_sendto(sqe, fd, buffer, STRLEN_length_of_buffer, sflags, name, STRLEN_length_of_name);
 	io_uring_sqe_set_flags(sqe, iflags);
 	sqe->ioprio = pflags;
 	RETVAL = PTR2UV(set_callback(sqe, callback));

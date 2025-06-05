@@ -1,12 +1,14 @@
 package Perl::Structure::Graph::Tree::Binary::Node;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.001_000;
 
 package Perl::Structure::Graph::Tree::Binary::NodeReference;
 use parent qw(Perl::Type::Modifier::Reference);
 use Perl::Type::Modifier::Reference;
+
+# [[[ INCLUDES ]]]
 
 # coderef parameter accepted by traverse method(s)
 use Perl::Structure::CodeReference;
@@ -25,7 +27,7 @@ our hashref $properties =
 
 # traverse nodes breadth-first
 sub traverse_breadthfirst_queue {
-    { my unknown::method $RETURN_TYPE };
+    { my unknown $RETURN_TYPE };
     (my Perl::Structure::Graph::Tree::Binary::NodeReference $self, my Perl::Structure::CodeReference $callback) = @ARG;
 	Perl::diag("in ...Tree::Binary::NodeReference::traverse_breadthfirst_queue(), received \$self = \n" . Dumper($self) . "\n");
 	my @return_value = ();
@@ -57,7 +59,7 @@ sub traverse_breadthfirst_queue {
 
 # traverse nodes depth-first in pre-order
 sub traverse_depthfirst_preorder {
-    { my unknown::method $RETURN_TYPE };
+    { my unknown $RETURN_TYPE };
     (my Perl::Structure::Graph::Tree::Binary::NodeReference $self, my Perl::Structure::CodeReference $callback) = @ARG;
 	Perl::diag("in ...Tree::Binary::NodeReference::traverse_depthfirst_preorder(), received \$self = \n" . Dumper($self) . "\n");
 #	Perl::diag("in ...Tree::Binary::NodeReference::traverse_depthfirst_preorder(), received \$callback = " . Dumper($callback) . "\n");
@@ -90,7 +92,7 @@ sub traverse_depthfirst_preorder {
 # accept binary tree nodes, return nested array refs;
 # modified pre-order traversal to achieve the opposite of new_from_nested_arrayrefs()
 sub to_nested_arrayrefs {
-    { my unknown::method $RETURN_TYPE };
+    { my unknown $RETURN_TYPE };
     (my Perl::Structure::Graph::Tree::Binary::NodeReference $self) = @ARG;
 #	Perl::diag("in ...Tree::Binary::NodeReference::to_nested_arrayrefs(), received \$self = \n" . Dumper($self) . "\n");
 	my arrayref $return_value = [];
@@ -141,7 +143,7 @@ sub new_from_nested_arrayrefs {
 
 # DISABLE UNUSED CODE (Using default Data::Dumper for now)
 #sub DUMPER {
-#    { my string::method $RETURN_TYPE };
+#    { my string $RETURN_TYPE };
 #    (my Perl::Structure::Graph::Tree::Binary::NodeReference $node) = @ARG;
 #	my string $dumped = '[';
 # START HERE

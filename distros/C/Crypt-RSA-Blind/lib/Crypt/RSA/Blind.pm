@@ -3,12 +3,12 @@
 # Crypt::RSA::Blind - Blind RSA signatures
 # Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 #
-# $Id: lib/Crypt/RSA/Blind.pm v1.024 Tue Jun  3 22:17:05 EST 2025 $
+# $Id: lib/Crypt/RSA/Blind.pm v1.025 Wed Jun  4 19:11:55 EST 2025 $
 
 use warnings;
 use strict;
 
-use v5.20;
+use v5.26;
 use Feature::Compat::Class;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
@@ -16,7 +16,7 @@ no warnings qw(experimental::signatures);
 class Crypt::RSA::Blind {
 
   use vars qw( $VERSION );
-  our ( $VERSION ) = '$Revision: 1.024 $' =~ /\s+([\d\.]+)/;
+  our ( $VERSION ) = '$Revision: 1.025 $' =~ /\s+([\d\.]+)/;
 
   use Carp;
   use Carp::Assert;
@@ -332,8 +332,8 @@ Crypt::RSA::Blind - Blind RSA signatures
 
 =head1 VERSION
 
- $Revision: 1.024 $
- $Date: Tue Jun  3 22:17:05 EST 2025 $
+ $Revision: 1.025 $
+ $Date: Wed Jun  4 19:11:55 EST 2025 $
 
 =cut
 

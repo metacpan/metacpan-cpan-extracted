@@ -1,13 +1,13 @@
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
-# <<< PARSE_ERROR: 'No such class Perl::Types::Test::Subclass::MySubclasserA_Good_arrayrefd' >>>
+# <<< PARSE_ERROR: 'No such class arrayref::Perl::Types::Test::Subclass::MySubclasserA_Goodd' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 
 package Perl::Types::Test::Subclass::MySubclasserB_Bad_01;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -24,7 +24,7 @@ our hashref $properties = { preschool => my string $TYPED_preschool = 'Eager Mus
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 sub alphabet {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Bad_01::method $RETURN_TYPE };
+    { my Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $self ) = @ARG;
     $self->{kindergarten} .= '; ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     my Perl::Types::Test::Subclass::MySubclasserA_Good $buddy = Perl::Types::Test::Subclass::MySubclasserA_Good->new();
@@ -33,20 +33,20 @@ sub alphabet {
 }
 
 sub brush_paints {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_arrayref::method $RETURN_TYPE };
+    { my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $self ) = @ARG;
     $self->{kindergarten} .= '; green blue purple';
-    my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_arrayref $friends
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $friends
         = [ Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new(), Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new(),
         Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new() ];
     return $friends;
 }
 
 sub clay {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_hashref::method $RETURN_TYPE };
+    { my hashref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $self ) = @ARG;
     $self->{kindergarten} .= '; bust';
-    my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_hashref $classmates = {
+    my hashref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $classmates = {
         'huey'  => Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new(),
         'dewey' => Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new(),
         'louie' => Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new()
@@ -55,21 +55,21 @@ sub clay {
 }
 
 sub seesaw {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_arrayref $RETURN_TYPE };
-    my Perl::Types::Test::Subclass::MySubclasserA_Good_arrayrefd $strangers
+    { my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $RETURN_TYPE };
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserA_Goodd $strangers
         = [ Perl::Types::Test::Subclass::MySubclasserA_Good->new(), Perl::Types::Test::Subclass::MySubclasserA_Good->new() ];
-    my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_arrayref $others
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $others
         = [ Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new(), Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new() ];
     return $others;
 }
 
 sub erector_set {
-    { my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_hashref $RETURN_TYPE };
-    my Perl::Types::Test::Subclass::MySubclasserA_Good_hashref $teachers = {
+    { my hashref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $RETURN_TYPE };
+    my hashref::Perl::Types::Test::Subclass::MySubclasserA_Good $teachers = {
         'launchpad' => Perl::Types::Test::Subclass::MySubclasserA_Good->new(),
         'donald'    => Perl::Types::Test::Subclass::MySubclasserA_Good->new()
     };
-    my Perl::Types::Test::Subclass::MySubclasserB_Bad_01_hashref $peers = { 'webbigail' => Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new() };
+    my hashref::Perl::Types::Test::Subclass::MySubclasserB_Bad_01 $peers = { 'webbigail' => Perl::Types::Test::Subclass::MySubclasserB_Bad_01->new() };
     return $peers;
 }
 

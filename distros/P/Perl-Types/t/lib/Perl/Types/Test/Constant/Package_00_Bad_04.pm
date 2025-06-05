@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Unexpected Token:  use constant' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Constant::Package_00_Bad_04;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CONSTANTS ]]]

@@ -9,8 +9,8 @@
 
 // [[[ HEADER ]]]
 #include <rperlstandalone.h>
-#ifndef __CPP__INCLUDED__Perl::Types__Test__Properties__class_20_good_00_cpp
-#define __CPP__INCLUDED__Perl::Types__Test__Properties__class_20_good_00_cpp 0.000_010
+#ifndef __CPP__INCLUDED__Perl__Types__Test__Properties__class_20_good_00_cpp
+#define __CPP__INCLUDED__Perl__Types__Test__Properties__class_20_good_00_cpp 0.000_010
 # ifdef __CPP__TYPES
 
 
@@ -20,15 +20,15 @@ int main() {
     // [[[ OPERATIONS HEADER ]]]
 
 // [[[ OPERATIONS ]]]
-    Perl::Types__Test__Properties__Class_20_Good_ptr test_object(new Perl::Types__Test__Properties__Class_20_Good);
+    Perl__Types__Test__Properties__Class_20_Good_ptr test_object(new Perl__Types__Test__Properties__Class_20_Good);
     test_object->set_test_property({ {"a", 2}, {"b", 4}, {"c", 6}, {"d", 8} });
-    print string_arrayref_to_string(test_object->get_test_property_keys()) << endl;
-    print integer_hashref_to_string(test_object->get_test_property()) << endl;
-    integer_hashref retval = test_object->test_method(23);
-    print integer_hashref_to_string(retval) << endl;
+    print arrayref_string_to_string(test_object->get_test_property_keys()) << endl;
+    print hashref_integer_to_string(test_object->get_test_property()) << endl;
+    hashref_integer retval = test_object->test_method(23);
+    print hashref_integer_to_string(retval) << endl;
     print test_object->get_test_property_entry_value("c") << endl;
     test_object->set_test_property_entry_value((const string) "c", 23);
-    print integer_hashref_to_string(test_object->get_test_property()) << endl;
+    print hashref_integer_to_string(test_object->get_test_property()) << endl;
 
 
 

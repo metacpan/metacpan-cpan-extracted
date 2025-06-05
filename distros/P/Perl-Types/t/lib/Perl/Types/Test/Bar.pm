@@ -2,7 +2,7 @@ package Perl::Types::Test::Bar;
 use strict;
 use warnings;
 our $VERSION = 0.001_000;
-use Perl::Types;
+use types;
 
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 

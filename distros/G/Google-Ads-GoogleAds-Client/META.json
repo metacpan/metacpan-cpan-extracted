@@ -15,10 +15,6 @@
    "name" : "Google-Ads-GoogleAds-Client",
    "no_index" : {
       "namespace" : [
-         "Google::Ads::GoogleAds::V17::Enums",
-         "Google::Ads::GoogleAds::V17::Common",
-         "Google::Ads::GoogleAds::V17::Resources",
-         "Google::Ads::GoogleAds::V17::Services",
          "Google::Ads::GoogleAds::V18::Enums",
          "Google::Ads::GoogleAds::V18::Common",
          "Google::Ads::GoogleAds::V18::Resources",
@@ -26,7 +22,11 @@
          "Google::Ads::GoogleAds::V19::Enums",
          "Google::Ads::GoogleAds::V19::Common",
          "Google::Ads::GoogleAds::V19::Resources",
-         "Google::Ads::GoogleAds::V19::Services"
+         "Google::Ads::GoogleAds::V19::Services",
+         "Google::Ads::GoogleAds::V20::Enums",
+         "Google::Ads::GoogleAds::V20::Common",
+         "Google::Ads::GoogleAds::V20::Resources",
+         "Google::Ads::GoogleAds::V20::Services"
       ]
    },
    "prereqs" : {
@@ -101,6 +101,6 @@
          "url" : "https://github.com/googleads/google-ads-perl"
       }
    },
-   "version" : "v26.1.0",
+   "version" : "v27.0.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.16.1';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.18.0';
 use Moo;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
@@ -77,9 +77,9 @@ else
 has [
     '_active_record',            '_active_task',
     '_max_iters_limit_exceeded', '_maximal_num_played_cards__from_all_tasks',
-    '_num_traversed_positions',  '_prelude_iter',
-    '_positions',                '_tasks',
-    '_task_idx',
+    '_num_traversed_positions',  '_pending_board_lines',
+    '_prelude_iter',             '_positions',
+    '_tasks',                    '_task_idx',
 ] => ( is => 'rw' );
 
 our %EXPORT_TAGS = ( 'all' => [qw($card_re)] );
@@ -108,7 +108,12 @@ sub _calc_lines
     my $filename = shift;
 
     my @lines;
-    if ( $filename eq "-" )
+    if ( $self->_pending_board_lines )
+    {
+        @lines = @{ $self->_pending_board_lines };
+        $self->_pending_board_lines(undef);
+    }
+    elsif ( $filename eq "-" )
     {
         @lines = <STDIN>;
     }
@@ -839,7 +844,7 @@ sub _set_up_solver
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.16.1';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.18.0';
 use Moo;
 
 has '_queue'        => ( is => 'ro', default => sub { return []; }, );
@@ -864,7 +869,7 @@ sub _push_to_queue
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.16.1';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.18.0';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -883,7 +888,7 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.16.1
+version 0.18.0
 
 =head1 METHODS
 

@@ -2,7 +2,7 @@
 package Perl::Type::Boolean;
 use strict;
 use warnings;
-#use Perl::Types;  # don't use Perl::Types inside itself, in order to avoid circular includes
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.010_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -14,30 +14,12 @@ use Perl::Type::Scalar;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 
-# [[[ INCLUDES ]]]
-use English;  # normally this would come from `use Perl::Types;` above
-
 # [[[ SUB-TYPES ]]]
 # a boolean is a binary boolean value, the only valid values are 0 (false) or 1 (true)
-package  # hide from PAUSE indexing
-    boolean;
+package boolean;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Boolean);
-
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    void;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-package     # hide from PAUSE indexing
-    integer;
-package    # hide from PAUSE indexing
-    number;
-package    # hide from PAUSE indexing
-    character;
-package    # hide from PAUSE indexing
-    string;
 
 # [[[ SWITCH CONTEXT BACK TO PRIMARY PACKAGE ]]]
 package Perl::Type::Boolean;

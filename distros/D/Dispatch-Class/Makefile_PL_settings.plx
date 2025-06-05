@@ -15,10 +15,11 @@ return {
         'IO::Handle' => 0,
     },
     PREREQ_PM => {
+        'parent'         => 0,
         'warnings'       => 0,
         'strict'         => 0,
         'Exporter::Tiny' => 0,
-        'Scalar::Util'   => 0,
+        'Scalar::Util'   => 1,
     },
 
     depend => {

@@ -2,14 +2,12 @@
 package Perl::Structure::Hash;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.009_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(Perl::Structure);
 use Perl::Structure;
-
-use Carp;
 
 # [[[ SUB-TYPES BEFORE INCLUDES ]]]
 use Perl::Structure::Hash::SubTypes;

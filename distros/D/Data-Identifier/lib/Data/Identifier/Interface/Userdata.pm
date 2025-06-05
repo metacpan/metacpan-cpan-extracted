@@ -13,14 +13,27 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
+
+my %_package_storage;
 
 
 sub userdata {
     my ($self, $package, $key, $value) = @_;
-    my $userdata = $self->_userdata_provider;
+    my $userdata;
+
+    if (ref $self) {
+        $userdata = $self->_userdata_provider;
+    } else {
+        if ($self =~ /^[a-zA-Z][a-zA-Z0-9]*(?:::[a-zA-Z0-9]+)*$/) {
+            $userdata = $_package_storage{$self} //= {};
+        } else {
+            croak 'Invalid package name: '.$self;
+        }
+    }
+
     $userdata->{$package} //= {};
-    return $userdata->{$package}{$key} = $value // $self->{userdata}{$package}{$key};
+    return $userdata->{$package}{$key} = $value // $userdata->{$package}{$key};
 }
 
 
@@ -43,7 +56,7 @@ Data::Identifier::Interface::Userdata - format independent identifier object
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -63,6 +76,10 @@ This interface is experimental. Details may change or it may be removed complete
     my $value = $obj->userdata(__PACKAGE__, $key);
     $obj->userdata(__PACKAGE__, $key => $value);
 
+    # since v0.16, highly experimental:
+    my $value = $pkg->Data::Identifier::Interface::Userdata::userdata(__PACKAGE__, $key);
+    $pkg->Data::Identifier::Interface::Userdata::userdata(__PACKAGE__, $key => $value);
+
 Get or set user data to be used with this object. The data is stored using the given C<$key>.
 The package of the caller is given to provide namespaces for the userdata, so two independent packages
 can use the same C<$key>.
@@ -70,6 +87,10 @@ can use the same C<$key>.
 The meaning of C<$key>, and C<$value> is up to C<__PACKAGE__>.
 
 The default implementation uses L</_userdata_provider> as a backend for storage.
+
+Since v0.16 it is possible to call this method on packages. This will store the values on the package.
+This does also not require the package to inherit from this package.
+This is highly experimental and may change at any point.
 
 =head2 _userdata_provider
 

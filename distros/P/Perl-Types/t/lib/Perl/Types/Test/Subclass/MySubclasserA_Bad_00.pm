@@ -1,13 +1,13 @@
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
-# <<< PARSE_ERROR: 'No such class Perl::Types::Test::Subclass::MySubclasserA_Bad_00::methodd' >>>
+# <<< PARSE_ERROR: 'No such class Perl::Types::Test::Subclass::MySubclasserA_Bad_00d' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 
 package Perl::Types::Test::Subclass::MySubclasserA_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -24,7 +24,7 @@ our hashref $properties = { preschool => my string $TYPED_preschool = 'Busy Beav
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 sub building_blocks {
-    { my Perl::Types::Test::Subclass::MySubclasserA_Bad_00::methodd $RETURN_TYPE };
+    { my Perl::Types::Test::Subclass::MySubclasserA_Bad_00d $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $self ) = @ARG;
     $self->{preschool} .= '; ABCDEFG';
     my Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $chum = Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new();
@@ -32,20 +32,20 @@ sub building_blocks {
 }
 
 sub finger_paints {
-    { my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_arrayref::method $RETURN_TYPE };
+    { my arrayref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $self ) = @ARG;
     $self->{preschool} .= '; orange yellow red';
-    my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_arrayref $friends
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $friends
         = [ Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new(), Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new(),
         Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new() ];
     return $friends;
 }
 
 sub sand_box {
-    { my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_hashref::method $RETURN_TYPE };
+    { my hashref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $self ) = @ARG;
     $self->{preschool} .= '; castle';
-    my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_hashref $classmates = {
+    my hashref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $classmates = {
         'alvin'    => Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new(),
         'simon'    => Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new(),
         'theodore' => Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new()
@@ -54,15 +54,15 @@ sub sand_box {
 }
 
 sub swings {
-    { my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_arrayref $RETURN_TYPE };
-    my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_arrayref $others
+    { my arrayref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $RETURN_TYPE };
+    my arrayref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $others
         = [ Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new(), Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new() ];
     return $others;
 }
 
 sub tinker_toys {
-    { my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_hashref $RETURN_TYPE };
-    my Perl::Types::Test::Subclass::MySubclasserA_Bad_00_hashref $peers = {
+    { my hashref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $RETURN_TYPE };
+    my hashref::Perl::Types::Test::Subclass::MySubclasserA_Bad_00 $peers = {
         'chip' => Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new(),
         'dale' => Perl::Types::Test::Subclass::MySubclasserA_Bad_00->new()
     };

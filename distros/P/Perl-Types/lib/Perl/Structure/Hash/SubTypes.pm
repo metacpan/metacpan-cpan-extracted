@@ -2,7 +2,7 @@
 package Perl::Structure::Hash::SubTypes;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.016_000;
 
 # [[[ CRITICS ]]]
@@ -27,8 +27,7 @@ our @EXPORT_OK = qw();
 # a hash is an associative array, meaning a 1-dimensional list/vector/sequence/set of (key, value) pairs;
 # we never use this type directly, instead we always use the hashref type,
 # per LMPC #27: Thou Shalt Not Use Direct Access To Arrays & Hashes Stored In @ Or % Non-Scalar Variables
-package  # hide from PAUSE indexing
-    hash;
+package hash;
 use strict;
 use warnings;
 use parent qw(Perl::Structure::Hash);
@@ -38,8 +37,7 @@ use parent qw(Perl::Structure::Hash);
 # [[[ HASH REF ]]]
 
 # ref to hash
-package  # hide from PAUSE indexing
-    hashref;
+package hashref;
 use strict;
 use warnings;
 #use parent -norequire, qw(ref);  # NEED REMOVE: properly replaced by line below?

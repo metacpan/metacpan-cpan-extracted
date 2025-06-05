@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::App;
-$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.16.1';
+$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.18.0';
 use 5.014;
 use Moo;
 
@@ -67,6 +67,8 @@ sub run
     return $self->_my_exit( $global_verdict, );
 }
 
+use Games::Solitaire::BlackHole::Solver::_BoardsStream ();
+
 sub _multi_filename_run
 {
     my $self      = shift;
@@ -74,8 +76,34 @@ sub _multi_filename_run
 
     my $SOFT_EXCEEDED  = $self->_do_not_err_on_exceeding_max_iters_limit();
     my $global_verdict = 1;
-    foreach my $board_fn (@ARGV)
+    my $boards_stream =
+        Games::Solitaire::BlackHole::Solver::_BoardsStream->new( _width => 0, );
+BOARD_FN:
+    while ( $boards_stream->_fh() or @ARGV )
     {
+        my $board_fn;
+        my $board_s = '';
+        if ( $boards_stream->_fh() )
+        {
+            ( $board_fn, $board_s ) = $boards_stream->_fetch();
+            $self->_pending_board_lines( [ split /\n/ms, $board_s ] );
+        }
+        elsif (@ARGV)
+        {
+            my $arg = shift(@ARGV);
+            if ( $arg eq "readconsec" )
+            {
+                my $fn        = shift(@ARGV) or die "readconsec arguments";
+                my $_width    = shift(@ARGV) or die "readconsec arguments";
+                my $_boardidx = shift(@ARGV) or die "readconsec arguments";
+                $boards_stream->_reset( $fn, $_width, $_boardidx, );
+                redo BOARD_FN;
+            }
+            else
+            {
+                $board_fn = $arg;
+            }
+        }
         my $board_display_fn = $board_fn;
         $board_display_fn =~
             s#([^A-Za-z0-9_\-/\.=\\\:])#sprintf("%%{%x}", ord($1))#egms;
@@ -150,7 +178,7 @@ implemented as a class to solve the Black Hole solitaire.
 
 =head1 VERSION
 
-version 0.16.1
+version 0.18.0
 
 =head1 SYNOPSIS
 
@@ -247,6 +275,10 @@ Instantiates an object.
 =head2 $self->run()
 
 Runs the application.
+
+=head1 Filename Processing
+
+=head2 readconsec [filename] [width in bytes] [start deal index]
 
 =head1 SEE ALSO
 

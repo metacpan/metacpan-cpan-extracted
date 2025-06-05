@@ -6,10 +6,10 @@
 # <<< PARSE_ERROR: 'Subroutine multiply_bax_F redefined' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Subclass::MySubclassersFG_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -26,7 +26,7 @@ our hashref $properties = { bax => my integer $TYPED_bax = 123 };
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 sub multiply_bax_FG {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclassersFG_Bad_00 $self, my integer $multiplier ) = @ARG;
     $self->{bax} = $self->{bax} * $multiplier;
     return;
@@ -42,10 +42,10 @@ sub multiply_return_FG {
 
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Subclass::MySubclasserF_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -58,7 +58,7 @@ our hashref $properties = { xab => my integer $TYPED_xab = 321 };
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 sub multiply_bax_F {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserF_Bad_00 $self, my integer $multiplier ) = @ARG;
     $self->{bax} = $self->{bax} * $multiplier;
     return;
@@ -74,10 +74,10 @@ sub multiply_return_F {
 
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Subclass::MySubclasserG_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -90,7 +90,7 @@ our hashref $properties = { xba => my integer $TYPED_xba = 312 };
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 sub multiply_bax_G {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     ( my Perl::Types::Test::Subclass::MySubclasserG_Bad_00 $self, my integer $multiplier ) = @ARG;
     $self->{bax} = $self->{bax} * $multiplier;
     return;

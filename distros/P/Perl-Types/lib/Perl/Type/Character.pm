@@ -2,7 +2,7 @@
 package Perl::Type::Character;
 use strict;
 use warnings;
-#use Perl::Types;  # don't use Perl::Types inside itself, in order to avoid circular includes
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.011_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -10,28 +10,14 @@ use parent qw(Perl::Type::String);
 use Perl::Type::String;
 
 # [[[ INCLUDES ]]]
-use English;  # normally this would come from `use Perl::Types;` above
 use POSIX qw(floor);
 
 # [[[ SUB-TYPES ]]]
 # a character is a string of length 0 or 1, meaning a single letter, digit, or other ASCII (Unicode???) symbol
-package  # hide from PAUSE indexing
-    character;
+package character;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Integer);
-
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    boolean;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-package     # hide from PAUSE indexing
-    integer;
-package    # hide from PAUSE indexing
-    number;
-package    # hide from PAUSE indexing
-    string;
 
 # [[[ SWITCH CONTEXT BACK TO PRIMARY PACKAGE ]]]
 package Perl::Type::Character;

@@ -16,22 +16,19 @@ our $VERSION = 0.004_000;
 ## no critic qw(RequireBriefOpen)  # SYSTEM SPECIAL 10: allow complex processing with open filehandle
 ## no critic qw(ProhibitCascadingIfElse)  # SYSTEM SPECIAL 12: allow complex conditional logic
 
-# [[[ NON-RPERL MODULES ]]]
-use Config;
-use Carp qw(croak);
+# [[[ NON-PERL-TYPES MODULES ]]]
+use Config;  # the Perl interpreter's Config.pm contains build information include data type sizes, etc.
 
 # [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    string;
 package     # hide from PAUSE indexing
-    string_hashref;
+    hashref::string;
 
 # return to primary package namespace
 package  # hide from PAUSE indexing
     perltypessizes;
 
 # DEV NOTE, CORRELATION #rp001: keep track of all these hard-coded "semi-dynamic" integer data types
-our string_hashref $ALTERNATE_TYPES_TO_PERLISH_TYPES = {
+our hashref::string $ALTERNATE_TYPES_TO_PERLISH_TYPES = {
     '__int8' => 'i8',
     '__int16' => 'i16',
     '__int32' => 'i32',

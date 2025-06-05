@@ -8,9 +8,9 @@
 # <<< EXECUTE_SUCCESS: '[ 46, 4, 23, 8 ]' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.000_010;
 
 # [[[ CRITICS ]]]
@@ -27,12 +27,12 @@ my Perl::Types::Test::Properties::Class_10_Good $test_object = Perl::Types::Test
 
 $test_object->set_test_property([2, 4, 6, 8]);
 print $test_object->get_test_property_size() . "\n";
-print integer_arrayref_to_string($test_object->get_test_property()) . "\n";
+print arrayref_integer_to_string($test_object->get_test_property()) . "\n";
 
 my arrayref::integer $retval = $test_object->test_method(23);
-print integer_arrayref_to_string($retval) . "\n";
+print arrayref_integer_to_string($retval) . "\n";
 
 print $test_object->get_test_property_element(2), "\n";
 
 $test_object->set_test_property_element(2, 23);
-print integer_arrayref_to_string($test_object->get_test_property()) . "\n";
+print arrayref_integer_to_string($test_object->get_test_property()) . "\n";

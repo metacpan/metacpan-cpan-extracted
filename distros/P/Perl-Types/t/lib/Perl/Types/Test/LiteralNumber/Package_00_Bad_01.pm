@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Bareword "_2" not allowed' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralNumber::Package_00_Bad_01;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

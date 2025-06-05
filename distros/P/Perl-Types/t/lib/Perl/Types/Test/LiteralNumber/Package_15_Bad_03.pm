@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Misplaced _ in number' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralNumber::Package_15_Bad_03;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

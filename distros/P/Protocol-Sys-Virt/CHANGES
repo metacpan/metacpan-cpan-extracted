@@ -1,5 +1,9 @@
 -----
 
+11.4.0    2025-06-04
+    [Changed]
+       * Updated to libvirt tag v11.4.0 (from 11.3.0)
+
 11.3.0    2025-05-12
     [Added]
        * New remote procedure call constants PROC_DOMAIN_GET_AUTOSTART_ONCE,

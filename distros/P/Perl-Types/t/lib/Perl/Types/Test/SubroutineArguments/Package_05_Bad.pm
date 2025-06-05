@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'near "@ARG;"' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::SubroutineArguments::Package_05_Bad;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

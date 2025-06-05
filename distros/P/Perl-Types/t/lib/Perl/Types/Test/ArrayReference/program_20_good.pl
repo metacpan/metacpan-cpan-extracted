@@ -4,9 +4,9 @@
 # <<< EXECUTE_SUCCESS: '$foo = [ 23, 42, 2_112 ]' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -17,4 +17,4 @@ our $VERSION = 0.001_000;
 
 my arrayref::integer $foo;
 $foo = [23, 42, 2_112];
-print '$foo = ', integer_arrayref_to_string($foo), "\n";
+print '$foo = ', arrayref_integer_to_string($foo), "\n";

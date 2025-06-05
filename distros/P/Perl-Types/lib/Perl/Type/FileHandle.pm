@@ -2,7 +2,7 @@
 package Perl::Type::FileHandle;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.006_000;
 
 # [[[ CRITICS ]]]
@@ -17,8 +17,7 @@ use Perl::Type;
 # [[[ SUB-TYPES BEFORE SETUP ]]]
 # a filehandleref is "a reference to a newly allocated anonymous filehandle";  http://perldoc.perl.org/functions/open.html
 # we do not ever directly use filehandle type, only filehandleref
-package  # hide from PAUSE indexing
-    filehandleref;
+package filehandleref;
 use strict;
 use warnings;
 use parent -norequire, qw(ref);

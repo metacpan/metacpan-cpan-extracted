@@ -2,7 +2,7 @@
 package Perl::Type::GMPInteger;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.006_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -18,25 +18,10 @@ use Perl::Type::Scalar;
 
 # [[[ SUB-TYPES ]]]
 # a gmp_integer is multi-precision integer using the GMP library
-package    # hide from PAUSE indexing
-    gmp_integer;
+package gmp_integer;
 use strict;
 use warnings;
 use parent qw(Perl::Type::GMPInteger);
-
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    boolean;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-package    # hide from PAUSE indexing
-    integer;
-package    # hide from PAUSE indexing
-    number;
-package    # hide from PAUSE indexing
-    character;
-package    # hide from PAUSE indexing
-    string;
 
 # [[[ SWITCH CONTEXT BACK TO PRIMARY PACKAGE ]]]
 package Perl::Type::GMPInteger;

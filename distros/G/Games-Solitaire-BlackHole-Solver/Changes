@@ -1,5 +1,9 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.18.0  2025-06-05
+        - Add the readconsec feature.
+        - Add scripts/tag-release.pl
+
 0.16.1  2025-03-02
         - Extract Games::Solitaire::BlackHole ::Test which is also used by the
         C solver's tests suite.

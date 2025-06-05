@@ -5,10 +5,10 @@
 # <<< GENERATE_ERROR: 'name masking disallowed' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Properties::Class_01_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]

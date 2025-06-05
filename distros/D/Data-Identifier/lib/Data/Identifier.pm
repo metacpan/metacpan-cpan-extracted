@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.15;
+our $VERSION = v0.16;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -263,6 +263,9 @@ sub new {
                 }
             } elsif ($id->isa('URI')) {
                 $type = 'uri';
+            } elsif ($id->isa('Mojo::URL')) {
+                $type = 'uri';
+                $id = $id->to_string;
             } elsif ($id->isa('Data::URIID::Result')) {
                 $opts{displayname} //= sub { return $from->attribute('displayname', default => undef) };
                 $type = $id->id_type;
@@ -554,6 +557,11 @@ sub as {
 
     return $self if ($as =~ /^[A-Z]/ || $as =~ /::/) && eval {$self->isa($as)};
 
+    if ($self->isa('Data::Identifier::Interface::Subobjects')) {
+        require Data::Identifier::Interface::Subobjects; # Is this required?
+        $opts{$_} //= $self->so_get($_, default => undef) foreach Data::Identifier::Interface::Subobjects->KEYS;
+    }
+
     $self = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
 
     if ($as eq 'uuid' || $as eq 'oid' || $as eq 'uri' || $as eq 'sid' || $as eq 'ise') {
@@ -570,6 +578,19 @@ sub as {
         if ($had_default) {
             return $default if ref $default;
             return URI->new($default);
+        }
+        croak 'No value for URI';
+    } elsif ($as eq 'Mojo::URL') {
+        my $had_default = exists $opts{default};
+        my $default = delete $opts{default};
+        my $val = $self->uri(%opts, default => undef);
+
+        require Mojo::URL;
+
+        return Mojo::URL->new($val) if defined $val;
+        if ($had_default) {
+            return $default if ref $default;
+            return Mojo::URL->new($default);
         }
         croak 'No value for URI';
     } elsif ($as eq 'Data::URIID::Result' && defined($opts{extractor})) {
@@ -838,7 +859,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.15
+version v0.16
 
 =head1 SYNOPSIS
 
@@ -1156,6 +1177,7 @@ or one of the special values.
 
 Currently the following packages are supported:
 L<URI>,
+L<Mojo::URL>,
 L<Data::Identifier>,
 L<Data::URIID::Result>,
 L<Data::URIID::Service>,
@@ -1176,6 +1198,9 @@ In that case C<$identifier> is parsed as with C<from> in L</new>.
 
 If C<$identifier> is a C<$as> (see also C<rawtype> below) then C<$identifier> is returned as-is,
 even if C<$as> would not be supported otherwise.
+
+If C<$identifier> is a L<Data::Identifier::Interface::Subobjects> then subobjects are used to create
+the new object as needed.
 
 The following options (all optional) are supported:
 

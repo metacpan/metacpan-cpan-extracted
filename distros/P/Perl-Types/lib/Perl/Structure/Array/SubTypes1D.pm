@@ -2,7 +2,7 @@
 package Perl::Structure::Array::SubTypes1D;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.021_000;
 
 # [[[ CRITICS ]]]
@@ -10,6 +10,9 @@ our $VERSION = 0.021_000;
 ## no critic qw(ProhibitUnreachableCode RequirePodSections RequirePodAtEnd)  # DEVELOPER DEFAULT 1b: allow unreachable & POD-commented code, must be after line 1
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
+
+# [[[ INCLUDES ]]]
+use Perl::Type::Integer;  # for integer_CHECKTRACE(), used in arrayref_TYPE_typetest1()
 
 # [[[ EXPORTS ]]]
 # DEV NOTE, CORRELATION #rp051: hard-coded list of RPerl data types and data structures
@@ -45,23 +48,6 @@ our @EXPORT_OK = qw(
     arrayref_string_typetest0
     arrayref_string_typetest1
 );
-
-# [[[ INCLUDES ]]]
-use Perl::Type::Integer;  # for integer_CHECKTRACE(), used in arrayref_TYPE_typetest1()
-
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    boolean;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-#package     # hide from PAUSE indexing
-#    integer;
-package    # hide from PAUSE indexing
-    number;
-package    # hide from PAUSE indexing
-    character;
-package    # hide from PAUSE indexing
-    string;
 
 # [[[ ARRAY REF INTEGER ]]]
 # [[[ ARRAY REF INTEGER ]]]

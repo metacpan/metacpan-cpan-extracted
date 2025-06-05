@@ -2,7 +2,7 @@
 package Perl::Structure::GSLMatrix;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -41,8 +41,7 @@ use Perl::Type::Number;
 # [[[ SUB-TYPES ]]]
 
 # non-OO (procedural) data structure
-package    # hide from PAUSE indexing
-    gsl_matrix;
+package gsl_matrix;
 use strict;
 use warnings;
 #use parent qw(Math::GSL::Matrix::gsl_matrix);  # there is no such file as Math/GSL/Matrix/gsl_matrix.pm

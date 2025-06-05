@@ -5,9 +5,9 @@
 # <<< PARSE_ERROR: 'Unexpected Token:  $fOO_FH' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OPERATIONS ]]]

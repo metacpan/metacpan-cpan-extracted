@@ -19,8 +19,8 @@ plan tests => 4;
 
 ok ( (my integer $foo = 1), 'my integer $foo = 1');
 ok ( (my string $bar = 'howdy'), 'my string $bar = ...');
-ok ( (my string::arrayref $bat = ['howdy', 'doody', 'y\'all']), 'my string::arrayref $bat = ...');
-ok ( (my string::hashref $bax = {h => 'howdy', d => 'doody', y => 'y\'all'}), 'my string::hashref $bax = ...');
+ok ( (my arrayref::string $bat = ['howdy', 'doody', 'y\'all']), 'my arrayref::string $bat = ...');
+ok ( (my hashref::string $bax = {h => 'howdy', d => 'doody', y => 'y\'all'}), 'my hashref::string $bax = ...');
 
 done_testing();
 

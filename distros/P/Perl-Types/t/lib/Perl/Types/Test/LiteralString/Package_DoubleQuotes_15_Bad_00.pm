@@ -2,10 +2,10 @@
 # <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::LiteralString::Package_DoubleQuotes_15_Bad_00;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

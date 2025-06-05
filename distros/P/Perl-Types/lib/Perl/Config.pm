@@ -1,12 +1,14 @@
 ## no critic qw(ProhibitUselessNoCritic PodSpelling ProhibitExcessMainComplexity)  # DEVELOPER DEFAULT 1a: allow unreachable & POD-commented code, must be on line 1; SYSTEM SPECIAL 4: allow complex code outside subroutines, must be on line 1
 
-# NEED FIX: triplicate export code
+# DEV NOTE: this package exists to serve as the header file for Perl/Types.pm itself,
+# as well as for Perl/Types.pm dependencies such as Class.pm, HelperFunctions_cpp.pm, and perltypes.pm
 package Perl::Config;
 use strict;
 use warnings;
-our $VERSION = 0.012_000;
+our $VERSION = 0.017_000;
 our $IS_PERL_CONFIG = 1;  # DEV NOTE, CORRELATION #rp027: Perl::Config, MathPerl::Config, PhysicsPerl::Config, etc
 
+# [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(ProhibitUnreachableCode RequirePodSections RequirePodAtEnd)  # DEVELOPER DEFAULT 1b: allow POD & unreachable or POD-commented code, must be after line 1
@@ -15,50 +17,62 @@ our $IS_PERL_CONFIG = 1;  # DEV NOTE, CORRELATION #rp027: Perl::Config, MathPerl
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 ## no critic qw(ProhibitAutomaticExportation)  # SYSTEM SPECIAL 14: allow global exports from Config.pm
 
-# DEV NOTE: this package exists to serve as the header file for Perl.pm itself,
-# as well as for Perl.pm dependencies such as Class.pm, HelperFunctions_cpp.pm, and perltypes.pm
+# [[[ PRE-DECLARED TYPES ]]]
+# DEV NOTE: pre-declare base scalar data types, for use within their own Boolean.pm and Integer.pm etc files,
+# as well as numerous other Perl::Types files which can `use Perl::Config;` but can't `use Perl::Type::Integer;` etc
+package    # hide from PAUSE indexing
+    void;
+package    # hide from PAUSE indexing
+    boolean;
+package     # hide from PAUSE indexing
+    nonsigned_integer;
+package     # hide from PAUSE indexing
+    integer;
+package    # hide from PAUSE indexing
+    number;
+package    # hide from PAUSE indexing
+    character;
+package    # hide from PAUSE indexing
+    string;
 
+# [[[ SWITCH CONTEXT BACK TO PRIMARY PACKAGE ]]]
+package Perl::Config;
+use strict;
+use warnings;
+
+# [[[ EXPORTS ]]]
+# NEED FIX: duplicate export code
+# DEV NOTE: these essential modules are exported automatically into all code which calls `use Perl::Config;` or, by association,
+# either `use Perl::Types;` or `use perltypes;`; done via EXPORTS below
+use Data::Dumper;  # enable expressive Dumper() in addition to print(); LMPC #4: Thou Shalt ... Create ... Bug-Free, High-Quality Code ...
+$Data::Dumper::Sortkeys = 1;    # Dumper() output must sort hash keys for t/lib/Perl/Types/Test/Hash* etc.
+use English qw(-no_match_vars);  # prefer more expressive @ARG over @_, etc; LMPC #23: Thou Shalt Not Use ... Punctuation Variables ...
+use Carp;  # enable expressive carp()/croak() in addition to warn()/die();  LMPC #8: Thou Shalt ... Create Maintainable, Re-Grokkable Code ...
+use POSIX qw(ceil floor modf getcwd);
+use Exporter 'import';
+
+# DEV NOTE, CORRELATION #rp008: can't include to_string(), type(), types(), name(), or scope_type_name_value() in @EXPORT here or in Perl:: namespace below
+# DEV NOTE, CORRELATION #rp034: enable @ARG in all packages (class & non-class)
+# export all symbols imported from essential modules
+our @EXPORT    = (@Data::Dumper::EXPORT,    @English::EXPORT,    @Carp::EXPORT,    @POSIX::EXPORT);
+our @EXPORT_OK = (@Data::Dumper::EXPORT_OK, @English::EXPORT_OK, @Carp::EXPORT_OK, @POSIX::EXPORT_OK);
+# DEV NOTE: do not export individual variables such as $ARG or @ARG, causes unexplainable errors such as incorrect subroutine arguments;
+# export subroutines and typeglobs only;
+# "Exporting variables is not a good idea. They can change under the hood, provoking horrible effects at-a-distance that are too hard to track and to fix. Trust me: they are not worth it."   https://perldoc.perl.org/Exporter#What-Not-to-Export
 # @ARG == @_, $OS_ERROR == $ERRNO == $!, $EVAL_ERROR == $@, $CHILD_ERROR == $?, $EXECUTABLE_NAME == $^X, $PROGRAM_NAME == $0, $OSNAME == $^O
+#our @EXPORT = qw(Dumper carp croak confess *ARG $OS_ERROR $EVAL_ERROR $CHILD_ERROR $EXECUTABLE_NAME $PROGRAM_NAME $OSNAME);
 
-# export various subroutines and variables to all who call 'use Perl::Config;'
-use Data::Dumper;
-$Data::Dumper::Sortkeys = 1;    # Dumper() output must be sorted for lib/Perl/Tests/Type_Types/* etc.
-use Carp;
-use English qw(-no_match_vars);
-use POSIX qw(ceil floor modf);
-use Exporter 'import';
+1;  # end of package
 
-# DEV NOTE, CORRELATION #rp008: can't include to_string(), type(), types(), name(), or scope_type_name_value() in @EXPORT here or in Perl:: namespace below
-# DEV NOTE, CORRELATION #rp034: enable @ARG in all packages (class & non-class)
-our @EXPORT = qw(Dumper carp croak confess *ARG $OS_ERROR $EVAL_ERROR $CHILD_ERROR $EXECUTABLE_NAME $PROGRAM_NAME $OSNAME);
 
-1;                              # end of package
-
-# NEED FIX: triplicate export code
-package Perl::AfterSubclass;
-
-## no critic qw(ProhibitAutomaticExportation)  # SYSTEM SPECIAL 14: allow global exports from Config.pm
-
-# export various subroutines and variables to all who call 'use Perl::AfterSubclass;'
-use Data::Dumper;
-$Data::Dumper::Sortkeys = 1;    # Dumper() output must be sorted for lib/Perl/Tests/Type_Types/* etc.
-use Carp;
-use English qw(-no_match_vars);
-use POSIX qw(ceil floor modf);
-use Exporter 'import';
-
-# DEV NOTE, CORRELATION #rp008: can't include to_string(), type(), types(), name(), or scope_type_name_value() in @EXPORT here or in Perl:: namespace below
-# DEV NOTE, CORRELATION #rp034: enable @ARG in all packages (class & non-class)
-our @EXPORT = qw(Dumper carp croak confess *ARG $OS_ERROR $EVAL_ERROR $CHILD_ERROR $EXECUTABLE_NAME $PROGRAM_NAME $OSNAME);
-
-1;                              # end of package
-
-# NEED FIX: triplicate export code
-package Perl;
+# [[[ ADDITIONAL PACKAGES SPECIAL ]]]
+package    # hide from PAUSE indexing
+    Perl;
 use File::Find qw(find);
 use File::Spec;
 use IPC::Cmd qw(can_run);       # to check for `reset`
 
+# [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(ProhibitUnreachableCode RequirePodSections RequirePodAtEnd)  # DEVELOPER DEFAULT 1b: allow POD & unreachable or POD-commented code, must be after line 1
@@ -67,21 +81,29 @@ use IPC::Cmd qw(can_run);       # to check for `reset`
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 ## no critic qw(ProhibitAutomaticExportation)  # SYSTEM SPECIAL 14: allow global exports from Config.pm
 
-# export $Perl::MODES, as well as various subroutines and variables to all who call 'use Perl;'
+# [[[ EXPORTS SPECIAL ]]]
+# export $Perl::MODES into all code which calls `use Perl;`
 our $MODES = {                  # see perl_modes.txt for more info
     0 => { ops => 'PERL', types => 'PERL' },    # NEED FIX: should be types => 'PERL_STATIC'
     1 => { ops => 'CPP',  types => 'PERL' },    # NEED FIX: should be types => 'PERL_STATIC'
     2 => { ops => 'CPP',  types => 'CPP' }
 };
 
-use Data::Dumper;
-$Data::Dumper::Sortkeys = 1;                    # Dumper() output must be sorted for lib/Perl/Tests/Type_Types/* etc.
-use Carp;
-use English qw(-no_match_vars);
-use POSIX qw(ceil floor modf);
+# NEED FIX: duplicate export code
+# DEV NOTE: these essential modules are exported automatically into all code which calls `use Perl;`; done via EXPORTS below
+use Data::Dumper;  # enable expressive Dumper() in addition to print(); LMPC #4: Thou Shalt ... Create ... Bug-Free, High-Quality Code ...
+$Data::Dumper::Sortkeys = 1;    # Dumper() output must sort hash keys for t/lib/Perl/Types/Test/Hash* etc.
+use English qw(-no_match_vars);  # prefer more expressive @ARG over @_, etc; LMPC #23: Thou Shalt Not Use ... Punctuation Variables ...
+use Carp;  # allow expressive carp()/croak() in addition to warn()/die();  LMPC #8: Thou Shalt ... Create Maintainable, Re-Grokkable Code ...
+use POSIX qw(ceil floor modf getcwd);
 use Exporter 'import';
 # DEV NOTE, CORRELATION #rp034: enable @ARG in all packages (class & non-class)
-our @EXPORT = qw(Dumper carp croak confess *ARG $OS_ERROR $EVAL_ERROR $CHILD_ERROR $EXECUTABLE_NAME $PROGRAM_NAME $OSNAME);
+# export all symbols imported from essential modules
+our @EXPORT    = (@Data::Dumper::EXPORT,    @English::EXPORT,    @Carp::EXPORT,    @POSIX::EXPORT);
+our @EXPORT_OK = (@Data::Dumper::EXPORT_OK, @English::EXPORT_OK, @Carp::EXPORT_OK, @POSIX::EXPORT_OK);
+
+# [[[ INCLUDES SPECIAL ]]]
+use File::Basename qw(fileparse);
 
 # [[[ OO CLASS PROPERTIES SPECIAL ]]]
 
@@ -103,6 +125,78 @@ use constant EPSILON => POSIX::DBL_EPSILON();
 #use constant EPSILON => POSIX::FLT_EPSILON();
 
 # [[[ SUBROUTINES SPECIAL ]]]
+
+# DEV NOTE, RPERL REFACTOR: copied filename_short_to_namespace_root_guess() from the old 'lib/RPerl/AfterSubclass.pm' module
+# NEED ANSWER: does this subroutine really belong here in 'lib/Perl/Config.pm', or do we need to create `lib/Perl/HelperFunctions.pm` etc?
+sub filename_short_to_namespace_root_guess {
+    ( my $filename_short ) = @ARG;
+#    print {*STDERR} 'in Perl::filename_short_to_namespace_root_guess(), received $filename_short = ' . $filename_short . "\n";
+    # # DEV NOTE, CORRELATION #rp021: remove hard-coded fake 'perl::' namespace?
+    if ($filename_short eq 'perl') { return 'perl::'; }
+    my $namespace_root = q{};
+    ( my $filename_prefix, my $filename_path, my $filename_suffix ) = fileparse( $filename_short, qr/[.][^.]*/xms );
+    # DEV NOTE: allow *.pl files to guess a namespace instead of empty string, both here and in filename_short_to_package_guess() below
+    # due to Perl core and/or Perl::Types deps calls to 'use' or 'require' *.pl files, such as Config_git.pl and Config_heavy.pl
+#    if ( $filename_suffix eq '.pm' ) {
+    if ( ( $filename_suffix eq '.pm' ) or ( $filename_suffix eq '.pl' ) ) {
+        my $filename_path_split;
+        if ( $OSNAME eq 'MSWin32' ) {
+            $filename_path_split = [ split /[\/\\]/, $filename_path ];
+            #absolute paths cant go through here anymore, this was dropping the
+            #first part of the package on some modules
+            #shift @{$filename_path_split};    # discard leading drive letter
+        }
+        else {
+            $filename_path_split = [ split /\//, $filename_path ];
+        }
+
+        # join then re-split in case there are no directories in path, only the *.pm filename
+        my $namespace_root_split = [ split /::/, ( join '::', ( @{$filename_path_split}, $filename_prefix ) ) ];
+        if ( $namespace_root_split->[0] eq '.' ) {
+            shift @{$namespace_root_split};
+        }
+#        print {*STDERR} 'in Perl::filename_short_to_namespace_root_guess(), have $namespace_root_split = ' . Dumper($namespace_root_split) . "\n";
+        $namespace_root = $namespace_root_split->[0] . '::';
+    }
+#    print {*STDERR} 'in Perl::filename_short_to_namespace_root_guess(), about to return $namespace_root = ' . $namespace_root . "\n";
+    return $namespace_root;
+}
+
+
+# DEV NOTE, RPERL REFACTOR: copied post_processor__absolute_path_delete() from the old 'lib/RPerl/Compiler.pm' module
+# NEED ANSWER: does this subroutine really belong here in 'lib/Perl/Config.pm', or do we need to create `lib/Perl/HelperFunctions.pm` etc?
+# DEV NOTE, CORRELATION #rp055: handle removal of current directory & all @INC directories, so as not to hard-code system-specific dirs in #include statements
+# remove unnecessary absolute paths
+sub post_processor__absolute_path_delete {
+    { my string $RETURN_TYPE };
+    ( my string $input_path ) = @ARG;
+
+#Perl::diag( 'in Perl::post_processor__absolute_path_delete(), received $input_path = ' . $input_path . "\n" );
+
+    # replace M$ backslashes with *nix forward slashes as path delimiter characters
+    if ( $OSNAME eq 'MSWin32' ) {
+        $input_path =~ s/\\/\//gxms;
+#Perl::diag( 'in Perl::post_processor__absolute_path_delete(), Windows OS detected, have possibly-reformatted $input_path = ' . $input_path . "\n" );
+    }
+
+    # get the CWD, which we want to remove from the $input_path
+    my string $current_working_directory = getcwd();
+
+#Perl::diag( 'in Perl::post_processor__absolute_path_delete(), have $current_working_directory = ' . $current_working_directory . "\n" );
+
+    # if $input_path starts with $current_working_directory, then remove the CWD and return
+    if ( ( substr $input_path, 0, ( length $current_working_directory ) ) eq $current_working_directory ) {
+        return substr $input_path, ( ( length $current_working_directory ) + 1 );
+    }
+
+#Perl::diag( 'in Perl::post_processor__absolute_path_delete(), about to return $input_path = ' . $input_path . "\n" );
+
+    # else return the unmodified $input_path
+    return $input_path;
+}
+
+
+
 
 # use a possibly-compiled Perl package during runtime
 sub eval_use {
@@ -545,6 +639,7 @@ my $file_name_script    = 'perl';
 1;                                                     # end of package
 
 
+# [[[ ADDITIONAL PACKAGES SPECIAL ]]]
 # export system paths to main:: namespace for use by PMC files
 package main;
 

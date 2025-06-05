@@ -3,7 +3,7 @@
 package Perl::Structure::SSENumberPair;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.004_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -15,33 +15,14 @@ use Perl::Structure;
 
 # [[[ SUB-TYPES ]]]
 
-package Perl::Structure::SSENumberPair::method;
-#package    # hide from PAUSE indexing
-#    Perl::Structure::SSENumberPair::method;  # NEED DELETE, RPERL REFACTOR
+package sse_number_pair;
 use strict;
 use warnings;
-
-package    # hide from PAUSE indexing
-    sse_number_pair::method;
-use strict;
-use warnings;
-use parent -norequire, qw(Perl::Structure::SSENumberPair::method);
-
-package    # hide from PAUSE indexing
-    constant_sse_number_pair::method;
-use strict;
-use warnings;
-use parent -norequire, qw(Perl::Structure::SSENumberPair::method);
-
-package    # hide from PAUSE indexing
-    sse_number_pair;
-use strict;
-use warnings;
-use Perl::Config;  # needed for 'use English;' for @ARG
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 use parent qw(Perl::Structure::SSENumberPair);
 
 sub new_from_singleton_duplicate {
-    { my sse_number_pair::method $RETURN_TYPE };
+    { my sse_number_pair $RETURN_TYPE };
     ( my number $single ) = @ARG;
     my sse_number_pair $retval = Perl::Structure::SSENumberPair::new('sse_number_pair');
     $retval->[0] = $single;
@@ -51,7 +32,7 @@ sub new_from_singleton_duplicate {
 
 # NEED TEST
 sub new_from_pair {
-    { my sse_number_pair::method $RETURN_TYPE };
+    { my sse_number_pair $RETURN_TYPE };
     ( my number $pair_0, my number $pair_1 ) = @ARG;
     my sse_number_pair $retval = Perl::Structure::SSENumberPair::new('sse_number_pair');
     $retval->[0] = $pair_0;
@@ -59,15 +40,14 @@ sub new_from_pair {
     return $retval;
 }
 
-package    # hide from PAUSE indexing
-    constant_sse_number_pair;
+package constant_sse_number_pair;
 use strict;
 use warnings;
-use Perl::Config;  # needed for 'use English;' for @ARG
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 use parent qw(Perl::Structure::SSENumberPair);
 
 sub new_from_singleton_duplicate {
-    { my constant_sse_number_pair::method $RETURN_TYPE };
+    { my constant_sse_number_pair $RETURN_TYPE };
     ( my number $single ) = @ARG;
     my constant_sse_number_pair $retval = Perl::Structure::SSENumberPair::new('constant_sse_number_pair');
     $retval->[0] = $single;
@@ -77,7 +57,7 @@ sub new_from_singleton_duplicate {
 
 # NEED TEST
 sub new_from_pair {
-    { my constant_sse_number_pair::method $RETURN_TYPE };
+    { my constant_sse_number_pair $RETURN_TYPE };
     ( my number $pair_0, my number $pair_1 ) = @ARG;
     my constant_sse_number_pair $retval = Perl::Structure::SSENumberPair::new('constant_sse_number_pair');
     $retval->[0] = $pair_0;
@@ -89,7 +69,7 @@ sub new_from_pair {
 package Perl::Structure::SSENumberPair;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 
 # [[[ OPERATOR OVERLOADING ]]]
 
@@ -167,14 +147,14 @@ sub sse_div {
     if ($arguments_swap) {
         if (($argument_left->[0] + 0) == 0) {
 #print {*STDERR} 'in SSENumberPair::sse_div(), have $argument_left->[0] IS ZERO', "\n";
-            $retval->[0] = Perl::Type::Scalar::INFINITY();
+            $retval->[0] = Perl::Type::Scalar::INFINITY_VALUE();
         }
         else {
             $retval->[0] = $argument_right->[0] / $argument_left->[0];
         }
         if (($argument_left->[1] + 0) == 0) {
 #print {*STDERR} 'in SSENumberPair::sse_div(), have $argument_left->[1] IS ZERO', "\n";
-            $retval->[1] = Perl::Type::Scalar::INFINITY();
+            $retval->[1] = Perl::Type::Scalar::INFINITY_VALUE();
         }
         else {
             $retval->[1] = $argument_right->[1] / $argument_left->[1];
@@ -183,14 +163,14 @@ sub sse_div {
     else {
         if (($argument_right->[0] + 0) == 0) {
 #print {*STDERR} 'in SSENumberPair::sse_div(), have $argument_right->[0] IS ZERO', "\n";
-            $retval->[0] = Perl::Type::Scalar::INFINITY();
+            $retval->[0] = Perl::Type::Scalar::INFINITY_VALUE();
         }
         else {
             $retval->[0] = $argument_left->[0] / $argument_right->[0];
         }
         if (($argument_right->[1] + 0) == 0) {
 #print {*STDERR} 'in SSENumberPair::sse_div(), have $argument_right->[1] IS ZERO', "\n";
-            $retval->[1] = Perl::Type::Scalar::INFINITY();
+            $retval->[1] = Perl::Type::Scalar::INFINITY_VALUE();
         }
         else {
             $retval->[1] = $argument_left->[1] / $argument_right->[1];
@@ -201,7 +181,7 @@ sub sse_div {
 
 # DEV NOTE: using blessed arrayref as object instead of blessed hashref, not valid RPerl
 sub new {
-    { my Perl::Structure::SSENumberPair::method $RETURN_TYPE };
+    { my Perl::Structure::SSENumberPair $RETURN_TYPE };
     ( my string $class ) = @ARG;
     my Perl::Structure::SSENumberPair $retval = bless [], $class;
     return $retval;

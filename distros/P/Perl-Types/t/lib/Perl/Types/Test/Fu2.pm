@@ -1,8 +1,8 @@
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Fu2;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -19,8 +19,8 @@ our hashref $properties = { thud => my arrayref::integer $TYPED_thud = [] };
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 sub quux {
-    { my void::method $RETURN_TYPE };
-    ( my object $self, my integer $howdy, my hashref::string $doody) = @ARG;
+    { my void $RETURN_TYPE };
+    ( my Perl::Types::Test::Fu2 $self, my integer $howdy, my hashref::string $doody) = @ARG;
     return 2;
 }
 1;    # end of class

@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Unexpected Token:  use constant' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Constant::Class_00_Bad_17;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -24,6 +24,6 @@ our hashref $properties
 use constant PIE => my string $TYPED_PIE = 'pecan';
 
 # [[[ SUBROUTINES & OO METHODS ]]]
-sub empty_method { { my void::method $RETURN_TYPE }; return 2; }
+sub empty_method { { my void $RETURN_TYPE }; return 2; }
 
 1;    # end of class

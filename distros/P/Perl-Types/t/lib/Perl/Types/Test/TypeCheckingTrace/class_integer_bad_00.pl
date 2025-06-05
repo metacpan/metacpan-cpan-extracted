@@ -6,9 +6,9 @@
 # <<< EXECUTE_ERROR: 'in variable $input_1 from subroutine check_class_integer()' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

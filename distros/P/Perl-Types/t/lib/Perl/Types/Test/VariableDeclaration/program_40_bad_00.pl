@@ -5,9 +5,9 @@
 # <<< GENERATE_ERROR: "'Perl::Types::Test' type is different than 'Perl::Types' constructor type" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]

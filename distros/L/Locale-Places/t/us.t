@@ -6,17 +6,17 @@ use strict;
 use warnings;
 
 # use autodie qw(:all);
+use Test::DescribeMe qw(extended);	# This can use a lot of resources
 use Test::Most tests => 6;
+
 use lib 't/lib';
 use MyLogger;
 
-BEGIN {
-	use_ok('Locale::Places::US');
-}
+BEGIN { use_ok('Locale::Places::US') }
 
 US: {
 	SKIP: {
-		if((!defined($ENV{'AUTOMATED_TESTING'}) && (!defined($ENV{'NO_NETWORK_TESTING'})) && (-d 'lib/Locale/Places/data'))) {
+		if(-d 'lib/Locale/Places/data') {
 			Database::Abstraction::init(directory => 'lib/Locale/Places/data');
 			my $places = new_ok('Locale::Places::US' => [{logger => new_ok('MyLogger'), no_entry => 1}]);
 
@@ -50,8 +50,8 @@ US: {
 
 			cmp_ok($found, '==', 2, 'Should have been 2 matches');
 		} else {
-			diag('AUTOMATED_TESTING: Not testing live data');
-			skip('AUTOMATED_TESTING: Not testing live data', 5);
+			diag('No data');
+			skip('No data', 5);
 		}
 	}
 }

@@ -19,7 +19,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw(  );
+my %skip = map { $_ => 1 } qw( arch::Crypt::SecretBuffer::Install::Files );
 
 my @modules;
 for my $module ( all_modules() ) {
@@ -33,13 +33,11 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 
 plan tests => scalar @modules;
 
-my %trustme = (
-             '' => [
-                     undef
-                   ]
-           );
+my %trustme = ();
 
-my @also_private;
+my @also_private = (
+                  qr/^Inline$/u
+                );
 
 for my $module ( sort @modules ) {
     pod_coverage_ok(

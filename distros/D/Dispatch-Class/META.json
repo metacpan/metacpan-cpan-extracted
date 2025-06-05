@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "Exporter::Tiny" : "0",
-            "Scalar::Util" : "0",
+            "Scalar::Util" : "1",
+            "parent" : "0",
             "perl" : "5.006000",
             "strict" : "0",
             "warnings" : "0"
@@ -67,6 +68,6 @@
          "web" : "https://codeberg.org/mauke/Dispatch-Class"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

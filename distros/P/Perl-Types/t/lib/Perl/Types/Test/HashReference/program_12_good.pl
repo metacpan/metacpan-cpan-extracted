@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -11,7 +11,7 @@ our $VERSION = 0.001_000;
 
 # [[[ OPERATIONS ]]]
 
-my hashref_hashref $hash_hash = {
+my hashref::hashref $hash_hash = {
     key0 => my hashref::integer $TYPED_key0 = { a => 17, b => -23, c => 1_701 },
     key1 => my hashref::number $TYPED_key1 = { d => 42 / 1_701, e => 21.12, f => 2_112.23 },
     key2 => my hashref::string $TYPED_key2 = { g => 'strings are scalars, too', h => 'hello world', i => 'last one' }

@@ -6,9 +6,9 @@
 # <<< EXECUTE_SUCCESS: "$variable_storing_array_by_reference = [ 'list', 'enclosed', 'within', 'square', 'brackets' ]" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -18,4 +18,4 @@ our $VERSION = 0.001_000;
 # [[[ OPERATIONS ]]]
 
 my arrayref::string $variable_storing_array_by_reference = ['list', 'enclosed', 'within', 'square', 'brackets'];
-print '$variable_storing_array_by_reference = ', string_arrayref_to_string($variable_storing_array_by_reference), "\n";
+print '$variable_storing_array_by_reference = ', arrayref_string_to_string($variable_storing_array_by_reference), "\n";

@@ -115,8 +115,8 @@ for my $file (@files) {
                 next;
             }
         }
-        # apply replacements
-        for my $occ (@occurs) {
+        # apply replacements from rightmost to leftmost to avoid shifting earlier offsets
+        for my $occ ( sort { $b->[0] <=> $a->[0] || $b->[1] <=> $a->[1] } @occurs ) {
             my ($ln, $ch) = @$occ;
             my $key = "$ln,$ch";
             if ($refactor_names_mapped{$map_sfx}{$file}{$key}) {

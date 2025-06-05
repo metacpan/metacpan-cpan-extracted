@@ -5,7 +5,7 @@ author:
 build_requires:
   DBI: '0'
   File::Copy: '0'
-  File::Open::NoCache::ReadOnly: '0'
+  File::Open::NoCache::ReadOnly: '0.06'
   IO::AIO: '0'
   Test::Carp: '0'
   Test::DescribeMe: '0'
@@ -18,7 +18,7 @@ configure_requires:
   LWP::Simple: '0'
   Try::Tiny: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,6 +30,7 @@ no_index:
     - inc
 requires:
   CHI: '0'
+  Class::Debug: '0.07'
   DBD::CSV: '0'
   DBD::SQLite: '0'
   DBD::SQLite::Constants: '0'
@@ -40,6 +41,7 @@ requires:
   File::Spec: '0'
   File::pfopen: '0'
   Module::Info: '0'
+  Params::Get: '0'
   Scalar::Util: '0'
   Text::CSV: '0'
   Text::xSV::Slurp: '0'
@@ -47,5 +49,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Locale-Places/issues
   repository: git://github.com/nigelhorne/Locale-Places.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

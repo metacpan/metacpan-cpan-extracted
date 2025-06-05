@@ -2,7 +2,7 @@
 package Perl::Structure::Array::SubTypes2D;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.017_100;
 
 # [[[ CRITICS ]]]
@@ -17,20 +17,6 @@ use Exporter 'import';
 our @EXPORT = qw();
 our @EXPORT_OK = qw();
 
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    boolean;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-#package     # hide from PAUSE indexing
-#    integer;
-package    # hide from PAUSE indexing
-    number;
-package    # hide from PAUSE indexing
-    character;
-package    # hide from PAUSE indexing
-    string;
-
 # [[[ ARRAY REF ARRAY REF (2-dimensional) ]]]
 # [[[ ARRAY REF ARRAY REF (2-dimensional) ]]]
 # [[[ ARRAY REF ARRAY REF (2-dimensional) ]]]
@@ -44,12 +30,6 @@ use parent -norequire, qw(arrayref);
 # [[[ HOMOGENEOUS ARRAY REF ARRAY REF (2-dimensional) ]]] 
 # [[[ HOMOGENEOUS ARRAY REF ARRAY REF (2-dimensional) ]]] 
 # [[[ HOMOGENEOUS ARRAY REF ARRAY REF (2-dimensional) ]]] 
-
-# method returning (ref to array) of (refs to (arrays of integers))
-package arrayref::arrayref::integer::method;
-use strict;
-use warnings;
-use parent -norequire, qw(method);
 
 # (ref to array) of (refs to (arrays of integers))
 package arrayref::arrayref::integer;
@@ -71,7 +51,7 @@ use Perl::Config;  # for 'use English;' etc.
 
 # emulate C++ behavior by actually creating arrays (and presumably allocating memory) at initialization time
 sub new {
-    { my arrayref::arrayref::integer::method $RETURN_TYPE };
+    { my arrayref::arrayref::integer $RETURN_TYPE };
     ( my integer $row_count, my integer $column_count ) = @ARG;  # row-major form (RMF)
     my arrayref::arrayref::integer $retval = [];
     for my integer $j (0 .. ($row_count - 1)) {
@@ -84,12 +64,6 @@ sub new {
     return $retval;
 }
 
-# method returning (ref to array) of (refs to (arrays of numbers))
-package arrayref::arrayref::number::method;
-use strict;
-use warnings;
-use parent -norequire, qw(method);
-
 # (ref to array) of (refs to (arrays of numbers))
 package arrayref::arrayref::number;
 use strict;
@@ -100,7 +74,7 @@ use Perl::Config;  # for 'use English;' etc.
 
 # emulate C++ behavior by actually creating arrays (and presumably allocating memory) at initialization time
 sub new {
-    { my arrayref::arrayref::number::method $RETURN_TYPE };
+    { my arrayref::arrayref::number $RETURN_TYPE };
     ( my integer $row_count, my integer $column_count ) = @ARG;  # row-major form (RMF)
     my arrayref::arrayref::number $retval = [];
     for my integer $j (0 .. ($row_count - 1)) {
@@ -113,12 +87,6 @@ sub new {
     return $retval;
 }
 
-# method returning (ref to array) of (refs to (arrays of strings))
-package  arrayref::arrayref::string::method;
-use strict;
-use warnings;
-use parent -norequire, qw(method);
-
 # (ref to array) of (refs to (arrays of strings))
 package arrayref::arrayref::string;
 use strict;
@@ -129,7 +97,7 @@ use Perl::Config;  # for 'use English;' etc.
 
 # emulate C++ behavior by actually creating arrays (and presumably allocating memory) at initialization time
 sub new {
-    { my arrayref::arrayref::string::method $RETURN_TYPE };
+    { my arrayref::arrayref::string $RETURN_TYPE };
     ( my integer $row_count, my integer $column_count ) = @ARG;  # row-major form (RMF)
     my arrayref::arrayref::string $retval = [];
     for my integer $j (0 .. ($row_count - 1)) {
@@ -142,12 +110,6 @@ sub new {
     return $retval;
 }
 
-# method returning (ref to array) of (refs to (arrays of scalartypes))
-package arrayref::arrayref::scalartype::method;
-use strict;
-use warnings;
-use parent -norequire, qw(method);
-
 # (ref to array) of (refs to (arrays of scalars))
 package arrayref::arrayref::scalartype;
 use strict;
@@ -158,7 +120,7 @@ use Perl::Config;  # for 'use English;' etc.
 
 # emulate C++ behavior by actually creating arrays (and presumably allocating memory) at initialization time
 sub new {
-    { my arrayref::arrayref::scalartype::method $RETURN_TYPE };
+    { my arrayref::arrayref::scalartype $RETURN_TYPE };
     ( my integer $row_count, my integer $column_count ) = @ARG;  # row-major form (RMF)
     my arrayref::arrayref::scalartype $retval = [];
     for my integer $j (0 .. ($row_count - 1)) {

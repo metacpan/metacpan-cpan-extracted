@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -16,11 +16,11 @@ foreach my integer $i ( @{$i_array} ) {
     print '$i = ', $i, "\n";
 }
 
-print 'have integer_arrayref_to_string_compact($i_array) = ', "\n", integer_arrayref_to_string_compact($i_array), "\n";
+print 'have arrayref_integer_to_string_compact($i_array) = ', "\n", arrayref_integer_to_string_compact($i_array), "\n";
 
-print 'have integer_arrayref_to_string($i_array) = ', "\n", integer_arrayref_to_string($i_array), "\n";
+print 'have arrayref_integer_to_string($i_array) = ', "\n", arrayref_integer_to_string($i_array), "\n";
 
-print 'have integer_arrayref_to_string_pretty($i_array) = ', "\n", integer_arrayref_to_string_pretty($i_array), "\n";
+print 'have arrayref_integer_to_string_pretty($i_array) = ', "\n", arrayref_integer_to_string_pretty($i_array), "\n";
 
-print 'have integer_arrayref_to_string_expand($i_array) = ', "\n", integer_arrayref_to_string_expand($i_array), "\n";
+print 'have arrayref_integer_to_string_expand($i_array) = ', "\n", arrayref_integer_to_string_expand($i_array), "\n";
 

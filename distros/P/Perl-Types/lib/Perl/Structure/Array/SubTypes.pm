@@ -2,7 +2,7 @@
 package Perl::Structure::Array::SubTypes;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.017_000;
 
 # [[[ CRITICS ]]]
@@ -19,20 +19,6 @@ our @EXPORT = qw(
     arrayref_CHECKTRACE
 );
 our @EXPORT_OK = qw();
-
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    boolean;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-#package     # hide from PAUSE indexing
-#    integer;
-package    # hide from PAUSE indexing
-    number;
-package    # hide from PAUSE indexing
-    character;
-package    # hide from PAUSE indexing
-    string;
 
 # [[[ ARRAY ]]]
 # [[[ ARRAY ]]]

@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: "Can't find string terminator" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::Constant::Package_00_Bad_03;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CONSTANTS ]]]

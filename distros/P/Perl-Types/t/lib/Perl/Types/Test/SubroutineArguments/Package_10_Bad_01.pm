@@ -3,10 +3,10 @@
 # <<< PARSE_ERROR: 'Unexpected Token:  $RETURN_VALUE' >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::SubroutineArguments::Package_10_Bad_01;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]

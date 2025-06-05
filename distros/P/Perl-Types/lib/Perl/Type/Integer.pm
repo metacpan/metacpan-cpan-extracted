@@ -2,7 +2,7 @@
 package Perl::Type::Integer;
 use strict;
 use warnings;
-#use Perl::Types;  # don't use Perl::Types inside itself, in order to avoid circular includes
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.013_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -14,34 +14,17 @@ use Perl::Type::Scalar;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 
-# [[[ INCLUDES ]]]
-use English;  # normally this would come from `use Perl::Types;` above
-
 # [[[ SUB-TYPES ]]]
 # an integer is a whole number, it has no floating-pointer (fractional/decimal) component
-package    # hide from PAUSE indexing
-    integer;
+package integer;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Integer);
 
-package    # hide from PAUSE indexing
-    constant_integer;
+package constant_integer;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Integer);
-
-# [[[ PRE-DECLARED TYPES ]]]
-package    # hide from PAUSE indexing
-    boolean;
-package    # hide from PAUSE indexing
-    nonsigned_integer;
-package    # hide from PAUSE indexing
-    number;
-package    # hide from PAUSE indexing
-    character;
-package    # hide from PAUSE indexing
-    string;
 
 # [[[ SWITCH CONTEXT BACK TO PRIMARY PACKAGE ]]]
 package Perl::Type::Integer;

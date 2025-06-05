@@ -14,15 +14,15 @@
 
 # hashref_CHECKTRACE()
 # hashentry_CHECKTRACE()  [NOT A DATA TYPE]
-# integer_hashref_CHECKTRACE()
-# number_hashref_CHECKTRACE()
-# string_hashref_CHECKTRACE()
+# hashref_integer_CHECKTRACE()
+# hashref_number_CHECKTRACE()
+# hashref_string_CHECKTRACE()
 
 # [[[ HEADER ]]]
-use Perl::Types;
 package Perl::Types::Test::TypeCheckingTrace::AllTypes;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.005_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -36,7 +36,7 @@ use Perl::Types::Test;
 
 # [[[ EXPORTS ]]]
 use Exporter qw(import);
-our @EXPORT = qw(check_integer check_number check_string check_arrayref check_integer_arrayref check_number_arrayref check_number_arrayrefs check_string_arrayref check_hashref check_integer_hashref check_number_hashref check_number_hashrefs check_string_hashref check__mixed_00 check__mixed_01 check__mixed_02 check__mixed_03);
+our @EXPORT = qw(check_integer check_number check_string check_arrayref check_arrayref_integer check_arrayref_number check_arrayref_number_multiple check_arrayref_string check_hashref check_hashref_integer check_hashref_number check_hashref_number_multiple check_hashref_string check__mixed_00 check__mixed_01 check__mixed_02 check__mixed_03);
 
 # [[[ OO PROPERTIES ]]]
 our hashref $properties = {};
@@ -44,7 +44,7 @@ our hashref $properties = {};
 # [[[ OO METHODS ]]]
 
 sub check_class {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     ( my Perl::Types::Test::TypeCheckingTrace::AllTypes $self ) = @ARG;
 
 #    Perl::Types::diag('in check_class(), received $self =', "\n", Dumper($self), "\n");
@@ -52,7 +52,7 @@ sub check_class {
 }
 
 sub check_class_integer {
-    { my void::method $RETURN_TYPE };
+    { my void $RETURN_TYPE };
     ( my Perl::Types::Test::TypeCheckingTrace::AllTypes $self, my integer $input_1 ) = @ARG;
 
 #    Perl::Types::diag('in check_class_integer(), received $self =', "\n", Dumper($self), "\n");
@@ -98,45 +98,45 @@ sub check_arrayref {
     return;
 }
 
-sub check_integer_arrayref {
+sub check_arrayref_integer {
     { my void $RETURN_TYPE };
     ( my arrayref::integer $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_integer_arrayref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_arrayref_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
-sub check_number_arrayref {
+sub check_arrayref_number {
     { my void $RETURN_TYPE };
     ( my arrayref::number $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_number_arrayref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_arrayref_number(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
-sub check_number_arrayrefs {
+sub check_arrayref_number_multiple {
     { my void $RETURN_TYPE };
     (   my arrayref::number $input_1,
         my arrayref::number $input_2,
         my arrayref::number $input_3)
         = @ARG;
 
-#    Perl::Types::diag("in check_number_arrayrefs(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check_number_arrayrefs(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check_number_arrayrefs(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::Types::diag("in check_arrayref_number_multiple(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_arrayref_number_multiple(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::Types::diag("in check_arrayref_number_multiple(), received \$input_3\n" . Dumper($input_3) . "\n");
 
 # DEPRECATED: type checking automated via <<< TYPE_CHECKING: CHECK(TRACE) >>> preprocessor directive
-#    ::arrayref_number_CHECKTRACE( $input_1, '$input_1', 'check_number_arrayrefs()' );
-#    ::arrayref_number_CHECKTRACE( $input_2, '$input_2', 'check_number_arrayrefs()' );
-#    ::arrayref_number_CHECKTRACE( $input_3, '$input_3', 'check_number_arrayrefs()' );
+#    ::arrayref_number_CHECKTRACE( $input_1, '$input_1', 'check_arrayref_number_multiple()' );
+#    ::arrayref_number_CHECKTRACE( $input_2, '$input_2', 'check_arrayref_number_multiple()' );
+#    ::arrayref_number_CHECKTRACE( $input_3, '$input_3', 'check_arrayref_number_multiple()' );
     return;
 }
 
-sub check_string_arrayref {
+sub check_arrayref_string {
     { my void $RETURN_TYPE };
     ( my arrayref::string $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_string_arrayref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_arrayref_string(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -150,40 +150,40 @@ sub check_hashref {
     return;
 }
 
-sub check_integer_hashref {
+sub check_hashref_integer {
     { my void $RETURN_TYPE };
     ( my hashref::integer $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_integer_hashref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_hashref_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
-sub check_number_hashref {
+sub check_hashref_number {
     { my void $RETURN_TYPE };
     ( my hashref::number $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_number_hashref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_hashref_number(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
-sub check_number_hashrefs {
+sub check_hashref_number_multiple {
     { my void $RETURN_TYPE };
     (   my hashref::number $input_1,
         my hashref::number $input_2,
         my hashref::number $input_3)
         = @ARG;
 
-#    Perl::Types::diag("in check_number_hashrefs(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check_number_hashrefs(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check_number_hashrefs(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::Types::diag("in check_hashref_number_multiple(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_hashref_number_multiple(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::Types::diag("in check_hashref_number_multiple(), received \$input_3\n" . Dumper($input_3) . "\n");
     return;
 }
 
-sub check_string_hashref {
+sub check_hashref_string {
     { my void $RETURN_TYPE };
     ( my hashref::string $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_string_hashref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::Types::diag("in check_hashref_string(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 

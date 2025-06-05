@@ -214,7 +214,7 @@ if(scalar(@countries)) {
 	# }
 
 	if($Config{'osname'} ne 'MSWin32') {
-		$build_requires->{'File::Open::NoCache::ReadOnly'} = 0;
+		$build_requires->{'File::Open::NoCache::ReadOnly'} = 0.06;
 		$build_requires->{'IO::AIO'} = 0;
 	}
 } else {
@@ -261,6 +261,7 @@ WriteMakefile(
 	}, TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'CHI' => 0,
+		'Class::Debug' => 0.07,
 		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'Database::Abstraction' => 0.04,
 		'DBI' => 0,
@@ -271,6 +272,7 @@ WriteMakefile(
 		'File::pfopen' => 0,
 		'File::Spec' => 0,
 		'Module::Info' => 0,
+		'Params::Get' => 0,
 		'Scalar::Util' => 0,
 		'Text::CSV' => 0,
 		'Text::xSV::Slurp' => 0

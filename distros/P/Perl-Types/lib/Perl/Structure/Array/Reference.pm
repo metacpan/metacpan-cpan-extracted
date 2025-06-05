@@ -2,7 +2,7 @@
 package Perl::Structure::Array::Reference;
 use strict;
 use warnings;
-use Perl::Types;
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.005_000;
 
 # [[[ OO INHERITANCE ]]]

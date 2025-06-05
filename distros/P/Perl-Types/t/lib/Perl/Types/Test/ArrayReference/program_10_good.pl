@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -12,7 +12,7 @@ our $VERSION = 0.001_000;
 # [[[ OPERATIONS ]]]
 
 # homogeneous 2-dimensional array of arrays, using inner types
-my arrayref_arrayref $array_array = [
+my arrayref::arrayref $array_array = [
     my arrayref::integer $TYPED_array_array_0 = [ 17,   -23, 1_701 ],
     my arrayref::integer $TYPED_array_array_1 = [ -1,   444, 2_987 ],
     my arrayref::integer $TYPED_array_array_2 = [ -321, 7,   24_851 ]

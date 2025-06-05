@@ -2,7 +2,7 @@
 package Perl::Type::Unknown;
 use strict;
 use warnings;
-#use Perl::Types;  # don't use Perl::Types inside itself, in order to avoid circular includes
+use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
 our $VERSION = 0.004_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -14,13 +14,9 @@ use Perl::Type;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 
-# [[[ INCLUDES ]]]
-use English;  # normally this would come from `use Perl::Types;` above
-
 # [[[ SUB-TYPES ]]]
 # unknown means it could be any data type or data structure
-package  # hide from PAUSE indexing
-    unknown;
+package unknown;
 use strict;
 use warnings;
 use parent qw(Perl::Type::Unknown);

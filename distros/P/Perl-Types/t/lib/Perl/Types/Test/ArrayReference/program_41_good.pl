@@ -6,9 +6,9 @@
 # <<< EXECUTE_SUCCESS: "have $column_3 = [ 6, 7, 1, 6, 5 ]" >>>
 
 # [[[ HEADER ]]]
-use Perl::Types;
 use strict;
 use warnings;
+use types;
 our $VERSION = 0.001_000;
 
 # [[[ CRITICS ]]]
@@ -37,4 +37,4 @@ $column_3->[1] = $rows_and_columns_2D->[1]->[3];
 $column_3->[2] = $rows_and_columns_2D->[2]->[3];
 $column_3->[3] = $rows_and_columns_2D->[3]->[3];
 $column_3->[4] = $rows_and_columns_2D->[4]->[3];
-print 'have $column_3 = ', integer_arrayref_to_string($column_3), "\n";
+print 'have $column_3 = ', arrayref_integer_to_string($column_3), "\n";

@@ -2,7 +2,7 @@
 package Perl::Types::Test;
 use strict;
 use warnings;
-use Perl::Types;
+use types;
 our $VERSION = 0.004_000;
 
 # [[[ OO INHERITANCE ]]]
@@ -19,8 +19,8 @@ our hashref $properties = {};
 
 # OO INHERITANCE TESTING
 sub empty_method {
-    { my void::method $RETURN_TYPE };
-    ( my object $self ) = @ARG;
+    { my void $RETURN_TYPE };
+    ( my Perl::Types::Test $self ) = @ARG;
     print 'Hello, World!', "\n";
     return;
 }

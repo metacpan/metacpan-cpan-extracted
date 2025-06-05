@@ -91,9 +91,12 @@ if ( $OSNAME eq 'MSWin32' ) {
 }
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "enable Perl data types",
+  "ABSTRACT" => "the Perl data type system",
   "AUTHOR" => "William N. Braswell, Jr. <wbraswell\@cpan.org>",
   "BUILD_REQUIRES" => {
+    "Alien::GMP" => "1.16",
+    "Alien::GSL" => "1.07",
+    "Inline" => "0.86",
     "Inline::C" => "0.80",
     "Inline::CPP" => "0.80",
     "Inline::Filters" => "0.20"
@@ -104,96 +107,48 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Perl-Types",
   "EXE_FILES" => [
     "bin/dev/find_replace_recurse_scalars.sh",
+    "bin/dev/namespaces_regenerate.pl",
     "bin/dev/perl_types_refactor_cpp_namespaces.pl",
     "bin/dev/perl_types_refactor_cpp_namespaces.txt",
+    "bin/dev/perl_types_refactor_headers.pl",
     "bin/dev/perl_types_refactor_names.pl",
     "bin/dev/perl_types_refactor_names.txt",
+    "bin/dev/perl_types_refactor_names_accept_mapped.sh",
+    "bin/dev/perl_types_refactor_names_delete_mapped.sh",
     "bin/dev/perl_types_refactor_names_map.pm",
     "bin/dev/perl_types_refactor_names_parser.out",
     "bin/dev/perl_types_refactor_names_parser.pl",
-    "bin/dev/refactor_names_map_create_groups.pl"
+    "bin/dev/refactor_names_map_create_groups.pl",
+    "bin/dev/t09_interpret_execute__mv_failures.sh"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Perl::Types",
   "PREREQ_PM" => {
-    "Alien::GMP" => 0,
-    "Alien::GSL" => 0,
-    "Carp" => 0,
-    "Data::Dumper" => 0,
-    "English" => 0,
-    "Exporter" => 0,
-    "File::Basename" => 0,
-    "File::Copy" => 0,
-    "File::Find" => 0,
-    "File::Path" => 0,
-    "File::Spec" => 0,
-    "Getopt::Long" => 0,
-    "IPC::Cmd" => 0,
-    "IPC::Run3" => 0,
-    "Math::BigInt" => 0,
-    "Math::GSL::BLAS" => 0,
-    "Math::GSL::CBLAS" => 0,
-    "Math::GSL::Matrix" => 0,
-    "POSIX" => 0,
-    "Scalar::Util" => 0,
-    "Term::ReadLine" => 0,
-    "constant" => 0,
-    "lib" => 0,
-    "overload" => 0,
-    "parent" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "PadWalker" => "2.5"
   },
   "TEST_REQUIRES" => {
-    "Cwd" => 0,
-    "Test2::V0" => 0,
-    "Test::Exception" => 0,
-    "Test::More" => 0,
-    "Test::Number::Delta" => 0
+    "Test::CPAN::Changes" => "0.5",
+    "Test::Exception" => "0.43",
+    "Test::Number::Delta" => "1.06"
   },
-  "VERSION" => "0.100",
+  "VERSION" => "0.200",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Alien::GMP" => 0,
-  "Alien::GSL" => 0,
-  "Carp" => 0,
-  "Cwd" => 0,
-  "Data::Dumper" => 0,
-  "English" => 0,
-  "Exporter" => 0,
-  "File::Basename" => 0,
-  "File::Copy" => 0,
-  "File::Find" => 0,
-  "File::Path" => 0,
-  "File::Spec" => 0,
-  "Getopt::Long" => 0,
-  "IPC::Cmd" => 0,
-  "IPC::Run3" => 0,
+  "Alien::GMP" => "1.16",
+  "Alien::GSL" => "1.07",
+  "Inline" => "0.86",
   "Inline::C" => "0.80",
   "Inline::CPP" => "0.80",
   "Inline::Filters" => "0.20",
-  "Math::BigInt" => 0,
-  "Math::GSL::BLAS" => 0,
-  "Math::GSL::CBLAS" => 0,
-  "Math::GSL::Matrix" => 0,
-  "POSIX" => 0,
-  "Scalar::Util" => 0,
-  "Term::ReadLine" => 0,
-  "Test2::V0" => 0,
-  "Test::Exception" => 0,
-  "Test::More" => 0,
-  "Test::Number::Delta" => 0,
-  "constant" => 0,
-  "lib" => 0,
-  "overload" => 0,
-  "parent" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "PadWalker" => "2.5",
+  "Test::CPAN::Changes" => "0.5",
+  "Test::Exception" => "0.43",
+  "Test::Number::Delta" => "1.06"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

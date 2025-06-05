@@ -620,7 +620,7 @@ sub systemNoFd {
         my $link = readlink $path or next;
         $link =~ /socket/ or next;
         if (open my $fh, q{>&=}, int($fd)){
-            $self->log->debug("Setting FIOCLEX on fd $fd ($link)");
+            # $self->log->debug("Setting FIOCLEX on fd $fd ($link)");
             if (defined &FIOCLEX){
                 ioctl $fh, FIOCLEX(),0;
             }
