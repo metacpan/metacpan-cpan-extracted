@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Find-Rule",
    "no_index" : {
@@ -41,5 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.34"
+   "version" : "0.35",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

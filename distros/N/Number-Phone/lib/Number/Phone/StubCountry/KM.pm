@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211830;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -43,23 +43,23 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"269772", "Mohéli",
-"269761", "Mutsamudu",
-"269762", "Mohéli",
-"269771", "Mutsamudu",
-"269770", "Domoni",
-"269767", "Mbéni",
-"269773", "Moroni",
-"269779", "Foumbouni",
-"269760", "Domoni",
-"269777", "Mbéni",
-"269763", "Moroni",
-"269769", "Foumbouni",
-"269778", "Mitsamiouli",
-"269768", "Mitsamiouli",
-"269774", "Moroni",
-"269775", "Moroni",};
 $areanames{fr} = {};
+$areanames{en} = {"269762", "Mohéli",
+"269773", "Moroni",
+"269763", "Moroni",
+"269772", "Mohéli",
+"269778", "Mitsamiouli",
+"269761", "Mutsamudu",
+"269777", "Mbéni",
+"269760", "Domoni",
+"269774", "Moroni",
+"269779", "Foumbouni",
+"269769", "Foumbouni",
+"269771", "Mutsamudu",
+"269767", "Mbéni",
+"269770", "Domoni",
+"269775", "Moroni",
+"269768", "Mitsamiouli",};
 my $timezones = {
                '' => [
                        'Indian/Comoro'

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211817;
+our $VERSION = 1.20250605193633;
 
 my $formatters = [
                 {
@@ -140,53 +140,53 @@ my $validators = {
           79(?:
             1(?:
               [0-2]\\d|
-              3[0-3]
+              3[0-8]
             )|
             2[0-7]\\d
           )\\d{3}
         '
               };
 my %areanames = ();
-$areanames{en} = {"26762", "Kasane",
-"26747", "Mahalapye",
-"267533", "Lobatse",
-"26758", "Jwaneng",
-"267371", "Gaborone",
-"267539", "Ramotswa",
+$areanames{en} = {"267651", "Kgalagadi",
+"26738", "Gaborone",
+"267392", "Gaborone",
+"267310", "Gaborone\ \(outer\)",
+"267315", "Gaborone",
+"267654", "Kgalagadi",
+"267318", "Gaborone",
+"267395", "Gaborone",
+"267390", "Gaborone",
+"267534", "Lobatse",
+"267391", "Gaborone",
 "26746", "Serowe",
+"267312", "Gaborone",
+"267538", "Ramotswa",
+"26749", "Palapye",
+"267394", "Gaborone",
+"26757", "Mochudi",
+"267530", "Lobatse",
+"26736", "Gaborone",
+"26724", "Francistown",
+"267533", "Lobatse",
+"26754", "Barolong\/Ngwaketse",
+"267317", "Gaborone",
+"26758", "Jwaneng",
+"267659", "Gantsi",
+"267393", "Gaborone",
+"267319", "Gaborone",
+"267539", "Ramotswa",
+"267371", "Gaborone",
+"267370", "Gaborone",
+"26726", "Selebi\-Phikwe",
+"26735", "Gaborone",
+"26759", "Molepolole",
+"26768", "Maun",
+"26747", "Mahalapye",
 "267397", "Gaborone",
 "26729", "Letlhakane\/Orapa",
-"267530", "Lobatse",
-"26757", "Mochudi",
-"267392", "Gaborone",
-"267370", "Gaborone",
-"267315", "Gaborone",
-"26724", "Francistown",
-"26735", "Gaborone",
-"267395", "Gaborone",
-"267312", "Gaborone",
-"267534", "Lobatse",
-"267317", "Gaborone",
-"267538", "Ramotswa",
-"267654", "Kgalagadi",
-"267390", "Gaborone",
-"267393", "Gaborone",
-"26754", "Barolong\/Ngwaketse",
-"267318", "Gaborone",
-"26738", "Gaborone",
-"26726", "Selebi\-Phikwe",
-"26749", "Palapye",
-"26736", "Gaborone",
-"26759", "Molepolole",
-"267391", "Gaborone",
-"267651", "Kgalagadi",
-"26768", "Maun",
+"26762", "Kasane",
 "267316", "Gaborone",
-"267659", "Gantsi",
-"267319", "Gaborone",
-"267313", "Gaborone",
-"267394", "Gaborone",
-"267310", "Gaborone\ \(outer\)",};
+"267313", "Gaborone",};
 my $timezones = {
                '' => [
                        'Africa/Gaborone'

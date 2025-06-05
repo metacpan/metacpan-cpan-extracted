@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211826;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -85,20 +85,20 @@ my $validators = {
                 'voip' => '98[23]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"21332", "El\ Oued",
-"21341", "Oran",
-"21321", "Algiers",
-"21331", "Constantine",
-"21344", "Blida",
-"21343", "Tlemcen",
-"21329", "Ghardaia\/Illizi\/Tamanrasset",
+$areanames{en} = {"21333", "Batna\/Beskra",
 "21337", "Tebessa",
-"21333", "Batna\/Beskra",
-"21338", "Annaba\/Skikda",
+"21329", "Ghardaia\/Illizi\/Tamanrasset",
+"21327", "Chlef",
 "21349", "Adrar\/Béchar\/Tindouf",
-"21334", "Béjaïa\/Jijel",
 "21335", "Bordj\ Bou\ Arreridj",
-"21327", "Chlef",};
+"21343", "Tlemcen",
+"21344", "Blida",
+"21332", "El\ Oued",
+"21331", "Constantine",
+"21338", "Annaba\/Skikda",
+"21341", "Oran",
+"21334", "Béjaïa\/Jijel",
+"21321", "Algiers",};
 my $timezones = {
                '' => [
                        'Europe/Paris'

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211829;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -140,18 +140,16 @@ my $validators = {
                 'mobile' => '
           9(?:
             (?:
-              0(?:
-                [0-35]\\d|
-                4[4-6]
-              )|
-              (?:
-                [13]\\d|
-                2[0-3]
-              )\\d
-            )\\d|
+              0[0-5]|
+              [13]\\d|
+              2[0-3]
+            )\\d\\d|
             9(?:
               [0-46]\\d\\d|
-              5[15]0|
+              5(?:
+                10|
+                5\\d
+              )|
               8(?:
                 [12]\\d|
                 88
@@ -193,68 +191,68 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9871", "Fars",
-"9845", "Ardabil\ province",
-"9811", "Mazandaran",
-"9844", "West\ Azarbaijan",
-"9856", "South\ Khorasan",
-"9821", "Tehran\ province",
-"9881", "Hamadan\ province",
-"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
-"9838", "Chahar\-mahal\ and\ Bakhtiari",
-"9841", "East\ Azarbaijan",
-"9858", "North\ Khorasan",
-"9866", "Lorestan",
-"9884", "Ilam\ province",
-"9824", "Zanjan\ province",
-"9825", "Qom\ province",
-"9831", "Isfahan\ province",
+$areanames{en} = {"9828", "Qazvin\ province",
 "9886", "Markazi",
-"9826", "Alborz",
-"9876", "Hormozgan",
-"9851", "Razavi\ Khorasan",
-"9887", "Kurdistan",
-"9883", "Kermanshah\ province",
-"9861", "Khuzestan",
-"9823", "Semnan\ province",
-"9834", "Kerman\ province",
-"9835", "Yazd\ province",
+"9811", "Mazandaran",
 "9877", "Bushehr\ province",
-"9854", "Sistan\ and\ Baluchestan",
-"9828", "Qazvin\ province",
+"9876", "Hormozgan",
+"9887", "Kurdistan",
 "9813", "Gilan",
-"9817", "Golestan",};
-$areanames{fa} = {"9877", "استان\ بوشهر",
-"9817", "گلستان",
-"9813", "گیلان",
-"9828", "استان\ قزوین",
-"9854", "سیستان\ و\ بلوچستان",
-"9834", "استان\ کرمان",
-"9883", "استان\ کرمانشاه",
-"9887", "کردستان",
-"9823", "استان\ سمنان",
+"9831", "Isfahan\ province",
+"9834", "Kerman\ province",
+"9826", "Alborz",
+"9866", "Lorestan",
+"9854", "Sistan\ and\ Baluchestan",
+"9851", "Razavi\ Khorasan",
+"9845", "Ardabil\ province",
+"9825", "Qom\ province",
+"9861", "Khuzestan",
+"9858", "North\ Khorasan",
+"9856", "South\ Khorasan",
+"9835", "Yazd\ province",
+"9881", "Hamadan\ province",
+"9884", "Ilam\ province",
+"9838", "Chahar\-mahal\ and\ Bakhtiari",
+"9823", "Semnan\ province",
+"9871", "Fars",
+"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
+"9817", "Golestan",
+"9883", "Kermanshah\ province",
+"9841", "East\ Azarbaijan",
+"9844", "West\ Azarbaijan",
+"9821", "Tehran\ province",
+"9824", "Zanjan\ province",};
+$areanames{fa} = {"9858", "خراسان\ شمالی",
 "9861", "خوزستان",
-"9835", "استان\ یزد",
-"9876", "هرمزگان",
-"9851", "خراسان\ رضوی",
-"9886", "مرکزی",
-"9826", "البرز",
-"9831", "استان\ اصفهان",
-"9884", "استان\ ایلام",
-"9866", "لرستان",
-"9824", "استان\ زنجان",
-"9858", "خراسان\ شمالی",
-"9825", "استان\ قم",
-"9874", "کهگیلویه\ و\ بویراحمد",
-"9841", "آذربایجان\ شرقی",
-"9838", "چهارمحال\ و\ بختیاری",
-"9821", "استان\ تهران",
-"9881", "استان\ همدان",
-"9845", "استان\ اردبیل",
-"9871", "فارس",
 "9856", "خراسان\ جنوبی",
+"9835", "استان\ یزد",
+"9838", "چهارمحال\ و\ بختیاری",
+"9823", "استان\ سمنان",
+"9817", "گلستان",
+"9874", "کهگیلویه\ و\ بویراحمد",
+"9871", "فارس",
+"9881", "استان\ همدان",
+"9884", "استان\ ایلام",
 "9844", "آذربایجان\ غربی",
-"9811", "مازندران",};
+"9841", "آذربایجان\ شرقی",
+"9824", "استان\ زنجان",
+"9821", "استان\ تهران",
+"9883", "استان\ کرمانشاه",
+"9876", "هرمزگان",
+"9887", "کردستان",
+"9828", "استان\ قزوین",
+"9886", "مرکزی",
+"9811", "مازندران",
+"9877", "استان\ بوشهر",
+"9826", "البرز",
+"9834", "استان\ کرمان",
+"9813", "گیلان",
+"9831", "استان\ اصفهان",
+"9866", "لرستان",
+"9845", "استان\ اردبیل",
+"9825", "استان\ قم",
+"9851", "خراسان\ رضوی",
+"9854", "سیستان\ و\ بلوچستان",};
 my $timezones = {
                '' => [
                        'Asia/Tehran'

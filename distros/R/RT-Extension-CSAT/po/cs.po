@@ -1,0 +1,42 @@
+# Czech translation for CSAT extension
+# This file is distributed under the same license as the rt package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: RT-Extension-CSAT\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2024-06-04 13:22+0000\n"
+"PO-Revision-Date: 2025-06-04 13:22+0000\n"
+"Last-Translator: Jan Okrouhlý <jan.okrouhly@xconsulting.cz>\n"
+"Language-Team: Czech <cs@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Thank You"
+msgstr "Děkujeme"
+
+msgid "Ticket not found"
+msgstr "Tiket nenalezen"
+
+msgid "Submit Comment"
+msgstr "Odeslat komentář"
+
+msgid "Optional comment"
+msgstr "Volitelný komentář"
+
+msgid "Thank you for your feedback!"
+msgstr "Děkujeme za zpětnou vazbu!"
+
+msgid "Customer Satisfaction Feedback Form"
+msgstr "Formulář hodnocení spokojenosti"
+
+msgid "Would you like to leave a comment for rating us with %quant(%1,stars,star,stars) score equivalent?"
+msgstr "Budeme rádi za komentář k hodnocení odpovídající %quant(%1,hvězdě, hvězdám, hvězdám)"
+
+msgid "Your response has been recorded."
+msgstr "Vaše odpověď byla zaznamenána."
+
+msgid "Thank you for your rating"
+msgstr "Děkujeme za hodnocení"

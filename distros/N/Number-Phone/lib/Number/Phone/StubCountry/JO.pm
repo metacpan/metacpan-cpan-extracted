@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211829;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -241,40 +241,40 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"962265", "Irbid",
-"962321", "Ma\’an",
-"962320", "Aqaba",
-"962323", "Karak",
-"962535", "Balqa",
-"962267", "Jarash",
-"962532", "Madaba",
-"9623260", "Tafileh",
-"96227", "Irbid",
-"962324", "Aqaba",
-"9623262", "Southern\ Region",
-"962262", "Mafraq",
-"962537", "Zarqa",
-"962620", "Amman",
-"96265", "Amman",
-"962647", "Greater\ Amman",
-"962538", "Zarqa",
-"96263", "Amman",
-"962534", "Balqa",
+"962539", "Zarqa",
 "96264", "Amman",
-"962322", "Tafileh",
-"962327", "Karak",
+"962537", "Zarqa",
 "962264", "Ajloun",
+"962323", "Karak",
 "962625", "Amman",
 "962268", "Ajloun",
-"962266", "Mafraq",
+"962620", "Amman",
+"962533", "Balqa",
+"962536", "Zarqa",
+"9623262", "Southern\ Region",
+"962262", "Mafraq",
+"962327", "Karak",
+"962622", "Greater\ Amman",
+"962534", "Balqa",
+"962322", "Tafileh",
+"962538", "Zarqa",
+"9623260", "Tafileh",
+"962647", "Greater\ Amman",
+"962535", "Balqa",
+"962530", "Zarqa",
 "962531", "Madaba",
 "962269", "Irbid",
-"962622", "Greater\ Amman",
-"962263", "Jarash",
+"962267", "Jarash",
+"96227", "Irbid",
+"96265", "Amman",
+"962321", "Ma\’an",
+"962320", "Aqaba",
 "962325", "Maan",
-"962539", "Zarqa",
-"962533", "Balqa",
-"962530", "Zarqa",
-"962536", "Zarqa",};
+"962532", "Madaba",
+"962266", "Mafraq",
+"962263", "Jarash",
+"96263", "Amman",
+"962324", "Aqaba",};
 my $timezones = {
                '' => [
                        'Asia/Amman'

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211836;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [];
 
@@ -47,26 +47,26 @@ my $validators = {
                 'voip' => '262\\d\\d'
               };
 my %areanames = ();
-$areanames{en} = {"290266", "St\.\ Helena",
-"290267", "St\.\ Helena",
-"290265", "St\.\ Helena",
-"29024", "St\.\ Helena",
-"29023", "St\.\ Helena",
-"29027", "St\.\ Helena",
-"290269", "St\.\ Helena",
-"29022", "Jamestown",
-"2908", "Tristan\ da\ Cunha",
-"290264", "St\.\ Helena",
-"290268", "St\.\ Helena",};
-$areanames{fr} = {"29027", "Sainte\-Hélène",
+$areanames{fr} = {"290265", "Sainte\-Hélène",
+"29024", "Sainte\-Hélène",
+"29027", "Sainte\-Hélène",
+"290268", "Sainte\-Hélène",
+"29023", "Sainte\-Hélène",
 "290267", "Sainte\-Hélène",
 "290266", "Sainte\-Hélène",
-"290265", "Sainte\-Hélène",
-"29024", "Sainte\-Hélène",
-"29023", "Sainte\-Hélène",
-"290269", "Sainte\-Hélène",
 "290264", "Sainte\-Hélène",
-"290268", "Sainte\-Hélène",};
+"290269", "Sainte\-Hélène",};
+$areanames{en} = {"290267", "St\.\ Helena",
+"29023", "St\.\ Helena",
+"29027", "St\.\ Helena",
+"290268", "St\.\ Helena",
+"290269", "St\.\ Helena",
+"290266", "St\.\ Helena",
+"29022", "Jamestown",
+"290264", "St\.\ Helena",
+"2908", "Tristan\ da\ Cunha",
+"29024", "St\.\ Helena",
+"290265", "St\.\ Helena",};
 my $timezones = {
                '' => [
                        'Atlantic/St_Helena'

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211828;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '6[01]',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2,3})'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
                   'format' => '$1 $2 $3',
@@ -114,7 +114,7 @@ my $validators = {
                 'personal_number' => '7[45]\\d{6}',
                 'specialrate' => '(
           6[01459]\\d{6}|
-          6[01]\\d{4,5}
+          6[01]\\d{5}
         )|(
           62\\d{6,7}|
           72\\d{6}
@@ -123,26 +123,26 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"38534", "Požega\-Slavonia",
+$areanames{en} = {"38523", "Zadar",
 "38549", "Krapina\-Zagorje",
-"38533", "Virovitica\-Podravina",
-"38523", "Zadar",
-"38535", "Brod\-Posavina",
-"38520", "Dubrovnik\-Neretva",
 "38547", "Karlovac",
-"38540", "Međimurje",
-"38543", "Bjelovar\-Bilogora",
-"38548", "Koprivnica\-Križevci",
-"38544", "Sisak\-Moslavina",
+"38535", "Brod\-Posavina",
 "38553", "Lika\-Senj",
-"38542", "Varaždin",
-"38521", "Split\-Dalmatia",
-"38552", "Istra",
-"38531", "Osijek\-Baranja",
+"38543", "Bjelovar\-Bilogora",
 "3851", "Zagreb",
+"38533", "Virovitica\-Podravina",
+"38542", "Varaždin",
+"38552", "Istra",
 "38551", "Primorsko\-goranska",
+"38520", "Dubrovnik\-Neretva",
+"38534", "Požega\-Slavonia",
+"38548", "Koprivnica\-Križevci",
+"38540", "Međimurje",
+"38521", "Split\-Dalmatia",
+"38522", "Šibenik\-Knin",
+"38544", "Sisak\-Moslavina",
 "38532", "Vukovar\-Srijem",
-"38522", "Šibenik\-Knin",};
+"38531", "Osijek\-Baranja",};
 my $timezones = {
                '' => [
                        'Europe/Zagreb'

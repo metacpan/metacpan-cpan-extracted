@@ -1,0 +1,28 @@
+Thu Jun  5 11:11:00 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[CGI compatibility]:
+	* lib/Query/Param.pm
+	- pod updates
+	(Vars): new
+	(params): new
+	(param): new
+	* t/param-methods.t: new
+	* t/vars.t: new
+
+Thu Jun  5 10:19:28 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+	* .gitignore: new
+	* ChangeLog: new
+	* Makefile: new
+	* Query-Param-0.01.tar.gz: new
+	* README.md: new
+	* buildspec.yml: new
+	* extra-files: new
+	* lib/Query/Param.pm: new
+	* requires: new
+	* t/query-param.t: new
+	* test-requires: new
+
+
+

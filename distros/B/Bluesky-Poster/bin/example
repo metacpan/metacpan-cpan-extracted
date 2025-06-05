@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use lib 'lib';
+
+use Bluesky::Poster;
+use Config::Abstraction;
+
+# Create ~/.conf/bluesky with something like:
+# ---
+# user: bluesky.bsky.social
+# password: my_password
+
+my $config = Config::Abstraction->new('bluesky');
+
+# use Data::Dumper;
+# die Data::Dumper->new([$config])->Dump();
+
+my $poster = Bluesky::Poster->new(
+    handle       => $config->user(),
+    app_password => $config->password(), # Get this from https://bsky.app/settings/app-passwords
+);
+
+my $result = $poster->post("Hello from Perl and Bluesky!");
+print "Post URI: $result->{uri}\n";

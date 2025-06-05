@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ This will override any value set for C<database.user> in the configuration files
 
 Configuration values can be overridden via the command line (C<@ARGV>).
 For instance, if you have a key in the configuration such as C<database.user>,
-you can override it by adding C<"APP_DATABASE__USER=other_user_name"> to the command line arguments.
+you can override it by adding C<"--APP_DATABASE__USER=other_user_name"> to the command line arguments.
 This will override any value set for C<database.user> in the configuration files.
 
 =head2 EXAMPLE CONFIGURATION FLOW
@@ -437,6 +437,9 @@ sub _load_config
 		my $script_name = $self->{'script_name'};
 		for my $config_file ('default', $script_name, "$script_name.cfg", "$script_name.conf", "$script_name.config", $self->{'config_file'}, @{$self->{'config_files'}}) {
 			next unless defined($config_file);
+			# Note that loading $script_name in the current directory could mean loading the script as it's own config.
+			# This test is not foolproof, buyer beware
+			next if(($config_file eq $script_name) && ((length($dir) == 0) || ($dir eq File::Spec->curdir())));
 			my $path = length($dir) ? File::Spec->catfile($dir, $config_file) : $config_file;
 			if($logger) {
 				$logger->debug(ref($self), ' ', __LINE__, ": Looking for configuration $path");
@@ -595,7 +598,7 @@ sub _load_config
 	foreach my $arg(@ARGV) {
 		next unless($arg =~ /=/);
 		my ($key, $value) = split(/=/, $arg, 2);
-		next unless $key =~ /^$self->{env_prefix}(.*)$/;
+		next unless $key =~ /^\-\-$self->{env_prefix}(.*)$/;
 
 		my $path = lc($1);
 		my @parts = split(/__/, $path);
@@ -629,12 +632,15 @@ sub get
 		return undef unless ref $ref eq 'HASH';
 		$ref = $ref->{$part};
 	}
-	if(!$self->{'no_fixate'}) {
-		if(ref($ref) eq 'HASH') {
-			Data::Reuse::fixate(%{$ref});
-		} elsif(ref($ref) eq 'ARRAY') {
-			Data::Reuse::fixate(@{$ref});
+	if(defined($ref)) {
+		if(!$self->{'no_fixate'}) {
+			if(ref($ref) eq 'HASH') {
+				Data::Reuse::fixate(%{$ref});
+			} elsif(ref($ref) eq 'ARRAY') {
+				Data::Reuse::fixate(@{$ref});
+			}
 		}
+	} else {
 	}
 	return $ref;
 }
@@ -789,6 +795,9 @@ sub AUTOLOAD
 
 	$key =~ s/.*:://;	# remove package name
 	return if $key eq 'DESTROY';
+
+	# my $val = $self->get($key);
+	# return $val if(defined($val));
 
 	my $data = $self->{data} || $self->{'config'};
 

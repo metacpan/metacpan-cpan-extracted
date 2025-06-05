@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211832;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -82,41 +82,41 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"960674", "Faafu",
-"960668", "Alifu\ Dhaalu",
-"960684", "Gaafu\ Dhaalu",
-"960688", "Addu",
-"960302", "Malé\ Region",
-"960664", "Kaafu",
-"960678", "Thaa",
-"960332", "Malé\/Hulhulé\/Aarah",
-"960686", "Gnaviyani",
-"960660", "Baa",
-"960676", "Dhaalu",
-"960335", "Hulhumalé",
-"960680", "Laamu",
-"960670", "Vaavu",
-"960666", "Alifu\ Alifu",
-"960689", "Addu",
+$areanames{en} = {"960689", "Addu",
 "960652", "Haa\ Dhaalu",
 "960339", "Vilimalé",
-"960300", "Malé\/Hulhulé\/Aarah",
-"960333", "Malé\/Hulhulé\/Aarah",
-"960665", "Kaafu",
+"960672", "Meemu",
 "960303", "Malé\ Region",
-"960330", "Malé\/Hulhulé\/Aarah",
-"960331", "Malé\/Hulhulé\/Aarah",
-"960658", "Raa",
-"960301", "Malé\/Hulhulé\/Aarah",
-"960654", "Shaviyani",
+"960666", "Alifu\ Alifu",
+"960686", "Gnaviyani",
+"960674", "Faafu",
 "960650", "Haa\ Alifu",
-"960659", "Raa",
-"960656", "Noonu",
-"960334", "Malé\/Hulhulé\/Aarah",
-"960304", "Malé\ Region",
+"960678", "Thaa",
+"960670", "Vaavu",
+"960333", "Malé\/Hulhulé\/Aarah",
+"960654", "Shaviyani",
+"960658", "Raa",
+"960302", "Malé\ Region",
+"960335", "Hulhumalé",
+"960684", "Gaafu\ Dhaalu",
+"960331", "Malé\/Hulhulé\/Aarah",
+"960676", "Dhaalu",
+"960330", "Malé\/Hulhulé\/Aarah",
 "960662", "Lhaviyani",
+"960688", "Addu",
+"960656", "Noonu",
+"960680", "Laamu",
+"960334", "Malé\/Hulhulé\/Aarah",
+"960301", "Malé\/Hulhulé\/Aarah",
+"960300", "Malé\/Hulhulé\/Aarah",
+"960332", "Malé\/Hulhulé\/Aarah",
+"960665", "Kaafu",
+"960660", "Baa",
+"960668", "Alifu\ Dhaalu",
+"960659", "Raa",
+"960304", "Malé\ Region",
 "960682", "Gaafu\ Alifu",
-"960672", "Meemu",};
+"960664", "Kaafu",};
 my $timezones = {
                '' => [
                        'Indian/Maldives'

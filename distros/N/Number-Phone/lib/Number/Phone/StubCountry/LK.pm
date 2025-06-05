@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211830;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -93,35 +93,35 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9441", "Matara",
-"9457", "Bandarawela\,\ Badulla",
-"9438", "Panadura\,\ Kalutara",
-"9452", "Nuwara\ Eliya",
-"9432", "Chilaw\,\ Puttalam",
-"9425", "Anuradhapura",
-"9433", "Gampaha",
-"9437", "Kurunegala",
-"9466", "Matale",
-"9424", "Vavuniya",
-"9411", "Colombo",
-"9445", "Ratnapura",
-"9467", "Kalmunai\,\ Ampara",
-"9421", "Jaffna",
-"9463", "Ampara",
-"9436", "Avissawella\,\ Colombo",
-"9482", "Kandy",
-"9435", "Kegalle",
+$areanames{en} = {"9438", "Panadura\,\ Kalutara",
 "9423", "Mannar",
-"9427", "Polonnaruwa",
-"9434", "Kalutara",
-"9454", "Nawalapitiya\,\ Kandy",
+"9436", "Avissawella\,\ Colombo",
 "9455", "Badulla",
-"9465", "Batticaloa",
-"9431", "Negombo\,\ Gampaha",
-"9426", "Trincomalee",
-"9491", "Galle",
+"9421", "Jaffna",
+"9424", "Vavuniya",
+"9452", "Nuwara\ Eliya",
+"9437", "Kurunegala",
+"9441", "Matara",
+"9435", "Kegalle",
+"9463", "Ampara",
+"9457", "Bandarawela\,\ Badulla",
+"9432", "Chilaw\,\ Puttalam",
+"9466", "Matale",
+"9482", "Kandy",
+"9467", "Kalmunai\,\ Ampara",
+"9454", "Nawalapitiya\,\ Kandy",
 "9451", "Hatton\,\ Nuwara\ Eliya",
-"9447", "Hambantota",};
+"9425", "Anuradhapura",
+"9445", "Ratnapura",
+"9491", "Galle",
+"9411", "Colombo",
+"9465", "Batticaloa",
+"9433", "Gampaha",
+"9431", "Negombo\,\ Gampaha",
+"9434", "Kalutara",
+"9447", "Hambantota",
+"9427", "Polonnaruwa",
+"9426", "Trincomalee",};
 my $timezones = {
                '' => [
                        'Asia/Colombo'

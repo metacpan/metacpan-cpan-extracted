@@ -1,0 +1,14 @@
+Revision history for RT-Extension-CSAT
+
+0.03  2025-06-05
+    - Added lost important steps 4 to 6 into README
+
+0.02  2025-06-05
+    - Added EXAMPLE section with Resolve Template with POD-safe UTF-8 emojis
+    - Added =encoding utf8 directive to support Unicode in POD
+    - Improved README and CSAT.pm content based on user feedback
+
+0.01  2025-06-05
+    - Initial release to CPAN
+    - Provides tokenized CSAT links for RT resolution emails
+    - Uses Digest::SHA for secure score tracking

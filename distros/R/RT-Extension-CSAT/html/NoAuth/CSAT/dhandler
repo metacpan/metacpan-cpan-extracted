@@ -1,0 +1,110 @@
+<%ARGS>
+$ticket  => undef
+$score   => undef
+$auth    => undef
+$comment => undef
+</%ARGS>
+
+<%INIT>
+use Digest::SHA qw(hmac_sha256_hex);
+
+my $title = loc("Customer Satisfaction Feedback Form");
+my $secret = $RT::CustomerSatisfactionSecret || 'mysupersecretvalue';
+
+my $Ticket = RT::Ticket->new($RT::SystemUser);
+$Ticket->Load($ticket);
+
+# Check that ticket is existing otherwise hash may not be computed
+unless ( $Ticket->id ) {
+	print(loc("Ticket not found"));
+	$m->abort
+}
+
+my $created = $Ticket->CreatedObj->ISO;
+my $expected = hmac_sha256_hex($ticket . $created . $score, $secret);
+
+# Continue only with correct hash
+unless ( $auth eq $expected ) {
+	print(loc("Unauthorized")); #debug " $ticket $score $auth");
+	$m->abort;
+}
+
+my $old_score = $Ticket->FirstCustomFieldValue("CSAT Score");
+my $old_comment = $Ticket->FirstCustomFieldValue("CSAT Comment");
+
+# Do not allow to change score once it is set and CSAT Comment is set on Closed ticket:
+if (defined($old_score) and $old_score>0 and $old_score<6 and $Ticket->Status eq 'closed' and defined($old_comment)) {
+	print(loc("Thank you for your feedback!"));
+	$m->abort;
+}
+
+$Ticket->AddCustomFieldValue(Field => 'CSAT Score', Value => $score);
+$Ticket->AddCustomFieldValue(Field => 'CSAT Comment', Value => $comment) if $comment;
+
+# Close ticket if not already closed:
+my $msg = loc("Ticket [_1] has been successfully closed.", $ticket);
+unless ($Ticket->Status eq 'closed') {
+	# Comment o teto akci:
+	my $date = RT::Date->new( RT->SystemUser );
+	$date->SetToNow;
+	my $message = "Closing ticket on user demand by provided TicketAuthId: $auth";
+	my @results_ignored = ProcessUpdateMessage( TicketObj=> $Ticket,
+		ARGSRef=>{'UpdateType' => 'private',
+		'SkipNotification' => ["Cc", "AdminCc"],
+		'UpdateContent' => $message
+		}
+	);
+	my ($ok, $msg2) = $Ticket->SetStatus('closed');
+	unless ($ok) {
+		$msg=$msg2;# Zde nelze obsah lokalizovat
+		$RT::Logger->warn("Close by CSAT link failed with error: \"$msg\"");
+	} else {
+		$RT::Logger->info("Close by CSAT link successfull. $msg");
+	}
+}
+
+
+#$title = loc('Thank You') if $comment;
+$title = loc('Thank you for your feedback!') if $comment;
+
+</%INIT>
+
+
+<& /Elements/Header, Title => $title, NoAuth => 1 &>
+
+<div class="container">
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+% if ( $comment ) {
+		<h3><% loc("Thank You") %></h3>
+        </div>
+        <div class="card-body">
+		<h4><% loc("Your response has been recorded.") %></h4>
+% } else {
+		<h3 class="card-title mb-0"><% loc("Thank you for your rating") %></h3>
+        </div>
+        <div class="card-body">
+		<h3><% loc("Would you like to leave a comment for rating us with [quant,_1,stars,star,stars] score equivalent?",$score) %></h3>
+
+	<form method="post" action="<% RT->Config->Get('WebPath') %>/NoAuth/CSAT">
+  		<div class="form-group">
+  			<textarea name="comment" rows="5" cols="60" placeholder="<% loc("Optional comment") %>"></textarea><br><br>
+  		</div>
+  		<input type="hidden" name="ticket" value="<% $ticket %>">
+  		<input type="hidden" name="score" value="<% $score %>">
+  		<input type="hidden" name="auth" value="<% $auth %>">
+  		<div class="mt-3">
+              		<input type="submit" value="<% loc('Submit Comment') %>" class="btn btn-primary">
+            	</div>
+          </form>
+        </div>
+% } 
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<& /Elements/Footer, NoAuth => 1, Menu => 0 &>

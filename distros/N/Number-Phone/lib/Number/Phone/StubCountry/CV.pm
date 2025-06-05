@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211824;
+our $VERSION = 1.20250605193634;
 
 my $formatters = [
                 {
@@ -74,45 +74,45 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"238224", "Cocoli\,\ Santo\ Antão",
-"238236", "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau",
+$areanames{pt} = {};
+$areanames{en} = {"238269", "Pedra\ Badejo\,\ Santiago",
+"238271", "Orgão\/São\ Jorge\ \(Santiago\ Island\)",
 "238267", "Cidade\ Velha\,\ Santiago",
-"238230", "Mindelo\,\ São\ Vicente",
-"238256", "Calheta\,\ Maio",
 "238231", "Mindelo\,\ São\ Vicente",
+"238230", "Mindelo\,\ São\ Vicente",
+"238235", "Ribeira\ Brava\,\ São\ Nicolau",
+"238223", "Paúl\,\ Santo\ Antão",
+"238226", "Manta\ Velha\/Chã\ de\ Igreja\ \ \(Santo\ Antão\ Island\)",
+"238238", "Praia\ Branca\,\ São\ Nicolau",
+"238283", "Mosteiros\,\ Fogo",
+"238255", "Vila\ do\ Maio\,\ Maio",
+"238251", "Sal\ Rei\,\ Boa\ Vista",
+"238263", "Praia\,\ Santiago",
+"238266", "Tarrafal\,\ Santiago",
+"238272", "Picos\,\ Santiago",
+"238232", "Mindelo\,\ São\ Vicente",
+"238252", "Funda\ das\ Figueiras\,\ Boa\ Vista",
+"238227", "Lajedos\/Alto\ Mira\ \(Santo\ Antão\ Island\)",
+"238222", "Porto\ Novo\,\ Santo\ Antão",
+"238264", "Praia\,\ Santiago",
+"238282", "Cova\ Figueira\,\ Fogo",
+"238268", "São\ Domingos\,\ Santiago",
+"238242", "Santa\ Maria\,\ Sal",
+"238237", "Fajã\,\ São\ Nicolau",
+"238265", "Santa\ Catarina\,\ Santiago",
+"238261", "Praia\,\ Santiago",
+"238260", "Praia\,\ Santiago",
+"238221", "Ribeira\ Grande\,\ Santo\ Antão",
+"238225", "Ponta\ do\ Sol\,\ Santo\ Antão",
+"238256", "Calheta\,\ Maio",
+"238285", "Nova\ Sintra\,\ Brava",
+"238281", "São\ Filipe\,\ Fogo",
+"238224", "Cocoli\,\ Santo\ Antão",
 "238241", "Espargos\,\ Sal",
 "238262", "Praia\,\ Santiago",
-"238251", "Sal\ Rei\,\ Boa\ Vista",
-"238272", "Picos\,\ Santiago",
-"238282", "Cova\ Figueira\,\ Fogo",
-"238221", "Ribeira\ Grande\,\ Santo\ Antão",
-"238285", "Nova\ Sintra\,\ Brava",
-"238265", "Santa\ Catarina\,\ Santiago",
-"238226", "Manta\ Velha\/Chã\ de\ Igreja\ \ \(Santo\ Antão\ Island\)",
-"238223", "Paúl\,\ Santo\ Antão",
-"238238", "Praia\ Branca\,\ São\ Nicolau",
-"238260", "Praia\,\ Santiago",
-"238263", "Praia\,\ Santiago",
-"238237", "Fajã\,\ São\ Nicolau",
-"238269", "Pedra\ Badejo\,\ Santiago",
-"238266", "Tarrafal\,\ Santiago",
-"238283", "Mosteiros\,\ Fogo",
 "238273", "Calheta\ de\ São\ Miguel\,\ Santiago",
-"238281", "São\ Filipe\,\ Fogo",
-"238252", "Funda\ das\ Figueiras\,\ Boa\ Vista",
-"238271", "Orgão\/São\ Jorge\ \(Santiago\ Island\)",
-"238225", "Ponta\ do\ Sol\,\ Santo\ Antão",
-"238261", "Praia\,\ Santiago",
-"238242", "Santa\ Maria\,\ Sal",
-"238232", "Mindelo\,\ São\ Vicente",
-"238235", "Ribeira\ Brava\,\ São\ Nicolau",
-"238255", "Vila\ do\ Maio\,\ Maio",
-"238222", "Porto\ Novo\,\ Santo\ Antão",
-"238268", "São\ Domingos\,\ Santiago",
 "238284", "São\ Jorge\,\ Fogo",
-"238227", "Lajedos\/Alto\ Mira\ \(Santo\ Antão\ Island\)",
-"238264", "Praia\,\ Santiago",};
-$areanames{pt} = {};
+"238236", "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau",};
 my $timezones = {
                '' => [
                        'Atlantic/Cape_Verde'

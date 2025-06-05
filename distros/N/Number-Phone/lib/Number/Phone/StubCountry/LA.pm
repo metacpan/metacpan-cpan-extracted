@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211830;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -37,7 +37,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '30[0135-9]',
+                  'leading_digits' => '3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})'
                 },
@@ -67,15 +67,18 @@ my $validators = {
           )\\d{6}
         ',
                 'mobile' => '
-          208[78]\\d{6}|
           (?:
-            20[23579]|
-            30[24]
-          )\\d{7}
+            20(?:
+              [23579]\\d|
+              8[78]
+            )|
+            30[24]\\d
+          )\\d{6}|
+          30\\d{7}
         ',
                 'pager' => '',
                 'personal_number' => '',
-                'specialrate' => '(30[0135-9]\\d{6})',
+                'specialrate' => '',
                 'toll_free' => '',
                 'voip' => ''
               };

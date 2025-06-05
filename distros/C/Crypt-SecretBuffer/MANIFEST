@@ -8,11 +8,13 @@ META.yml
 Makefile.PL
 Makefile.top
 README.md
+SECURITY.md
 SecretBuffer.h
 SecretBuffer.xs
 build-manual-linkage-header.pl
 dist.ini
 dzil-prove
+inc/ExtUtils/CFeatureTest.pm
 inc/ExtUtils/Depends.pm
 lib/Crypt/SecretBuffer.pm
 lib/Crypt/SecretBuffer/AsyncResult.pm
@@ -21,6 +23,7 @@ t/01-ctor.t
 t/02-stringify.t
 t/03-allocate.t
 t/04-leak-check.t
+t/05-random.t
 t/10-substr.t
 t/11-index.t
 t/12-sysread.t

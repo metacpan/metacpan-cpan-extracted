@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211839;
+our $VERSION = 1.20250605193637;
 
 my $formatters = [
                 {
@@ -59,7 +59,6 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
-          50[0-2]\\d{6}|
           (?:
             2(?:
               0330|
@@ -76,7 +75,6 @@ my $validators = {
           )\\d{7}
         ',
                 'geographic' => '
-          50[0-2]\\d{6}|
           (?:
             2(?:
               0330|
@@ -116,6 +114,7 @@ my $validators = {
               9[12]\\d\\d
             )|
             (?:
+              50[0-2]|
               6\\d\\d|
               7(?:
                 [0-46-9]\\d|
@@ -169,44 +168,43 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"2736", "Drakensberg\/Ladysmith",
-"2721", "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
-"2745", "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
-"2756", "Kroonstad\/Parys\/Northern\ Free\ State",
-"2744", "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay",
-"2710", "Johannesburg",
+$areanames{en} = {"2728", "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam",
 "2711", "Johannesburg",
-"2758", "Bethlehem\/Eastern\ Free\ State",
 "2733", "KwaZulu\ Natal\ Midlands\/Pietermaritzburg",
-"2732", "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
-"2715", "Northern\ and\ Eastern\ Limpopo\/Polokwane",
 "2714", "Modimolle\/Northern\ North\ West\ and\ Southwestern\ Limpopo\/Rustenburg",
-"2741", "Port\ Elizabeth\/Uitenhage",
-"2740", "Alice\/Bhisho",
-"2739", "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",
-"2757", "Northern\ Free\ State\ Goldfields\/Welkom",
-"2753", "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
-"2742", "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape",
-"2751", "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",
-"2750", "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",
-"2716", "Vaal\ Triangle",
-"2743", "East\ London",
-"2747", "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
-"2731", "Durban",
 "2748", "Cradock\/Northern\ part\ of\ Eastern\ Cape\/Steynsburg",
 "2749", "Graaff\-Reinet\/Western\ part\ of\ Eastern\ Cape",
-"2712", "Brits\/Tshwane",
-"2746", "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred",
-"2713", "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
-"2717", "Ermelo\/Secunda\/Southern\ Mpumalanga",
-"2728", "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam",
-"2754", "Upington\/Gordonia",
-"2718", "Klerksdorp\/Lichtenburg\/Potchefstroom",
-"2734", "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",
 "2727", "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal",
-"2723", "Beaufort\ West\/Karoo\/Robertson\/Worcester",
+"2747", "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
+"2734", "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",
+"2731", "Durban",
+"2713", "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
+"2746", "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred",
+"2740", "Alice\/Bhisho",
+"2753", "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
+"2754", "Upington\/Gordonia",
+"2751", "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",
+"2722", "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",
+"2742", "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape",
+"2745", "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
+"2715", "Northern\ and\ Eastern\ Limpopo\/Polokwane",
+"2712", "Brits\/Tshwane",
+"2758", "Bethlehem\/Eastern\ Free\ State",
+"2756", "Kroonstad\/Parys\/Northern\ Free\ State",
 "2735", "Richards\ Bay\/St\.\ Lucia\/Ulundi\/Zululand",
-"2722", "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",};
+"2732", "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
+"2757", "Northern\ Free\ State\ Goldfields\/Welkom",
+"2710", "Johannesburg",
+"2716", "Vaal\ Triangle",
+"2723", "Beaufort\ West\/Karoo\/Robertson\/Worcester",
+"2717", "Ermelo\/Secunda\/Southern\ Mpumalanga",
+"2743", "East\ London",
+"2736", "Drakensberg\/Ladysmith",
+"2741", "Port\ Elizabeth\/Uitenhage",
+"2744", "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay",
+"2721", "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
+"2718", "Klerksdorp\/Lichtenburg\/Potchefstroom",
+"2739", "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",};
 my $timezones = {
                '' => [
                        'Africa/Johannesburg'

@@ -6,7 +6,8 @@ use Crypt::SecretBuffer qw(secret);
 subtest lib_exists => sub {
    my $inline_vars= Crypt::SecretBuffer->Inline('C');
    # The first two elements of LIBS should be -LPATH to the library and -llibraryfile
-   my ($path, $file)= $inline_vars->{LIBS} =~ /^-L(?|"([^"]+)"|(\S+)) -l(\S+)/;
+   my ($qpath, $path, $file)= $inline_vars->{LIBS} =~ /^-L(?:"([^"]+)"|([^"]\S+)) -l(\S+)/;
+   $path= $qpath if defined $qpath; # (?| not introduced until perl 5.10
    ok( length $path && length $file, 'parsed LIBS' )
       or diag "Unexpected LIBS format: '$inline_vars->{LIBS}'";
    ok( -d $path, 'path exists' )

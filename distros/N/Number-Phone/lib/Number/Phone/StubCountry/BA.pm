@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211816;
+our $VERSION = 1.20250605193633;
 
 my $formatters = [
                 {
@@ -123,68 +123,68 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{hr} = {"38735", "Tuzlanska\ županija",
-"38736", "Hercegovačko\-neretvanska\ županija",
-"38731", "Županija\ Posavska",
-"38734", "Hercegbosanska\ županija",
-"38738", "Bosansko\-podrinjska\ županija\ Goražde",
-"38733", "Sarajevska\ županija",
-"38730", "Županija\ Središnja\ Bosna",
-"38737", "Unsko\-sanska\ županija",
-"38732", "Zeničko\-dobojska\ županija",
-"38739", "Županija\ Zapadnohercegovačka",};
-$areanames{sr} = {"38759", "Требиње",
-"38735", "Тузлански\ кантон",
-"38730", "Средњoбосански\ кантон",
-"38737", "Унско\-сански\ кантон",
-"38734", "Кантон\ 10",
-"38733", "Сарајевски\ кантон",
-"38738", "Босанско\-подрињски\ кантон\ Горажде",
-"38758", "Фоча",
-"38753", "Добој",
-"38754", "Шамац",
-"38757", "Источно\ Сарајево",
-"38750", "Мркоњић\ Град",
-"38755", "Бијељина",
-"38756", "Зворник",
-"3874", "Брчко\ Дистрикт",
-"38752", "Приједор",
-"38731", "Посавски\ кантон",
-"38751", "Бања\ Лука",
-"38732", "Зеничко\-добојски\ кантон",};
-$areanames{bs} = {"38737", "Unsko\-sanski\ kanton",
-"38730", "Srednjobosanski\ kanton",
+$areanames{bs} = {"38739", "Zapadnohercegovački\ kanton",
+"38737", "Unsko\-sanski\ kanton",
 "38733", "Kanton\ Sarajevo",
-"38738", "Bosansko\-podrinjski\ kanton\ Goražde",
-"38734", "kanton\ 10",
 "38736", "Hercegovačko\-neretvanski\ kanton",
 "38735", "Tuzlanski\ kanton",
-"38739", "Zapadnohercegovački\ kanton",
 "3874", "Brčko\ Distrikt",
 "38757", "Istočno\ Sarajevo",
+"38732", "Zeničko\-dobojski\ kanton",
 "38731", "Posavski\ kanton",
-"38732", "Zeničko\-dobojski\ kanton",};
-$areanames{en} = {"38756", "Zvornik",
+"38738", "Bosansko\-podrinjski\ kanton\ Goražde",
+"38730", "Srednjobosanski\ kanton",
+"38734", "kanton\ 10",};
+$areanames{hr} = {"38738", "Bosansko\-podrinjska\ županija\ Goražde",
+"38730", "Županija\ Središnja\ Bosna",
+"38731", "Županija\ Posavska",
+"38732", "Zeničko\-dobojska\ županija",
+"38734", "Hercegbosanska\ županija",
+"38737", "Unsko\-sanska\ županija",
+"38739", "Županija\ Zapadnohercegovačka",
+"38733", "Sarajevska\ županija",
+"38735", "Tuzlanska\ županija",
+"38736", "Hercegovačko\-neretvanska\ županija",};
+$areanames{en} = {"38753", "Doboj",
+"38735", "Tuzla\ Canton",
 "3874", "Brčko\ District",
+"38759", "Trebinje",
+"38757", "East\ Sarajevo",
+"38736", "Herzegovina\-Neretva\ Canton",
+"38737", "Una\-Sana\ Canton",
 "38739", "West\ Herzegovina\ Canton",
 "38755", "Bijeljina",
-"38757", "East\ Sarajevo",
+"38733", "Sarajevo\ Canton",
+"38756", "Zvornik",
 "38750", "Mrkonjić\ Grad",
 "38758", "Foča",
-"38753", "Doboj",
-"38754", "Šamac",
 "38734", "Canton\ 10",
-"38738", "Bosnian\-Podrinje\ Canton\ Goražde",
-"38733", "Sarajevo\ Canton",
-"38730", "Central\ Bosnia\ Canton",
-"38737", "Una\-Sana\ Canton",
-"38735", "Tuzla\ Canton",
-"38759", "Trebinje",
-"38736", "Herzegovina\-Neretva\ Canton",
-"38751", "Banja\ Luka",
-"38732", "Zenica\-Doboj\ Canton",
 "38752", "Prijedor",
-"38731", "Posavina\ Canton",};
+"38751", "Banja\ Luka",
+"38738", "Bosnian\-Podrinje\ Canton\ Goražde",
+"38730", "Central\ Bosnia\ Canton",
+"38731", "Posavina\ Canton",
+"38732", "Zenica\-Doboj\ Canton",
+"38754", "Šamac",};
+$areanames{sr} = {"38754", "Шамац",
+"38732", "Зеничко\-добојски\ кантон",
+"38731", "Посавски\ кантон",
+"38730", "Средњoбосански\ кантон",
+"38738", "Босанско\-подрињски\ кантон\ Горажде",
+"38752", "Приједор",
+"38751", "Бања\ Лука",
+"38734", "Кантон\ 10",
+"38758", "Фоча",
+"38750", "Мркоњић\ Град",
+"38756", "Зворник",
+"38755", "Бијељина",
+"38733", "Сарајевски\ кантон",
+"38737", "Унско\-сански\ кантон",
+"38757", "Источно\ Сарајево",
+"38759", "Требиње",
+"38735", "Тузлански\ кантон",
+"38753", "Добој",
+"3874", "Брчко\ Дистрикт",};
 my $timezones = {
                '' => [
                        'Europe/Sarajevo'

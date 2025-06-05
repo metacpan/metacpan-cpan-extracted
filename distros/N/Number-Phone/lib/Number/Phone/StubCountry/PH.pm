@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211834;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -182,53 +182,53 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"634463", "Bulacan",
-"634251", "Quezon",
-"634396", "Batangas",
-"634597", "Pampanga",
-"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",
-"638851", "Bukidnon",
-"6387", "Davao\ Oriental",
-"6346", "Cavite",
-"6372", "La\ Union",
-"635446", "Camarines\ Sur",
-"6355", "Western\ Samar",
-"634761", "Zambales",
-"6336", "Antique\/Aklan\/Capiz",
-"638842", "Misamis\ Oriental",
-"6375", "Pangasinan",
-"634594", "Pampanga",
-"6353", "Leyte",
-"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
-"638622", "Surigao\ del\ Sur",
-"634235", "Quezon",
-"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
-"6348", "Palawan",
-"638834", "Misamis\ Occidental",
-"6382", "Davao\ del\ Sur\/Davao",
-"634244", "Quezon",
-"6335", "Negros\ Oriental",
-"634422", "Bulacan",
-"6383", "South\ Cotabato",
-"634765", "Zambales",
-"636423", "North\ Cotabato",
-"638853", "Bukidnon",
-"6377", "Ilocos\ Sur\/Ilocos\ Norte",
-"635221", "Albay",
-"6356", "Sorsogon\/Masbate",
-"638822", "Misamis\ Oriental",
-"6362", "Zamboanga\ del\ Sur",
-"634593", "Pampanga",
-"6363", "Lanao\ del\ Norte\/Lanao\ del\ Sur",
-"634279", "Quezon",
+$areanames{en} = {"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
 "6338", "Bohol",
-"634264", "Quezon",
+"634597", "Pampanga",
+"635446", "Camarines\ Sur",
+"6383", "South\ Cotabato",
+"634235", "Quezon",
+"638851", "Bukidnon",
+"634593", "Pampanga",
 "636422", "North\ Cotabato",
 "6332", "Cebu",
+"6335", "Negros\ Oriental",
+"6363", "Lanao\ del\ Norte\/Lanao\ del\ Sur",
+"635221", "Albay",
+"6356", "Sorsogon\/Masbate",
+"6382", "Davao\ del\ Sur\/Davao",
+"634594", "Pampanga",
 "6385", "Agusan\ del\ Sur\/Agusan\ del\ Norte",
+"638853", "Bukidnon",
+"634264", "Quezon",
+"6362", "Zamboanga\ del\ Sur",
+"6387", "Davao\ Oriental",
+"634765", "Zambales",
+"634761", "Zambales",
+"638622", "Surigao\ del\ Sur",
 "633461", "Negros\ Occidental",
+"638842", "Misamis\ Oriental",
+"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
+"6333", "Iloilo",
+"634396", "Batangas",
+"636423", "North\ Cotabato",
+"6346", "Cavite",
+"634251", "Quezon",
 "6384", "Davao\ del\ Norte",
-"6333", "Iloilo",};
+"6336", "Antique\/Aklan\/Capiz",
+"6355", "Western\ Samar",
+"634422", "Bulacan",
+"638834", "Misamis\ Occidental",
+"6375", "Pangasinan",
+"6353", "Leyte",
+"634279", "Quezon",
+"6372", "La\ Union",
+"6348", "Palawan",
+"6377", "Ilocos\ Sur\/Ilocos\ Norte",
+"634244", "Quezon",
+"634463", "Bulacan",
+"638822", "Misamis\ Oriental",
+"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",};
 my $timezones = {
                '' => [
                        'Asia/Manila'

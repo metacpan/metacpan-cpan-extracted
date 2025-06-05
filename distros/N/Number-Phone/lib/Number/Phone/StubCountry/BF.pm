@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211816;
+our $VERSION = 1.20250605193633;
 
 my $formatters = [
                 {
@@ -89,30 +89,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2262090", "Gaoua",
-"226254", "Ouagadougou",
-"2262446", "Falagountou\/Dori",
-"2262098", "Bobo\-Dioulasso",
-"2262470", "Pouytenga\/Koupéla",
+$areanames{en} = {"2262471", "Tenkodogo",
+"2262090", "Gaoua",
 "226204", "Kaya",
-"2262449", "Falagountou\/Dori",
-"2262456", "Djibo",
-"2262091", "Banfora",
-"2262471", "Tenkodogo",
-"2262541", "Léo\/Sapouy",
-"2262454", "Yako",
-"2262097", "Bobo\-Dioulasso",
-"2262445", "Kaya",
-"2262052", "Dédougou",
-"2262477", "Fada\/Diabo",
-"2262455", "Ouahigouya",
-"2262099", "Béréba\/Fo\/Houndé",
-"2262540", "Pô\/Kombissiri\/Koubri",
-"2262479", "Kantchari",
-"2262053", "Boromo\/Djibasso\/Nouna",
-"226253", "Ouagadougou",
 "2262544", "Koudougou",
-"2262096", "Orodara",};
+"226254", "Ouagadougou",
+"2262541", "Léo\/Sapouy",
+"2262479", "Kantchari",
+"2262098", "Bobo\-Dioulasso",
+"2262477", "Fada\/Diabo",
+"2262052", "Dédougou",
+"226253", "Ouagadougou",
+"2262445", "Kaya",
+"2262470", "Pouytenga\/Koupéla",
+"2262091", "Banfora",
+"2262455", "Ouahigouya",
+"2262449", "Falagountou\/Dori",
+"2262096", "Orodara",
+"2262454", "Yako",
+"2262456", "Djibo",
+"2262097", "Bobo\-Dioulasso",
+"2262540", "Pô\/Kombissiri\/Koubri",
+"2262053", "Boromo\/Djibasso\/Nouna",
+"2262099", "Béréba\/Fo\/Houndé",
+"2262446", "Falagountou\/Dori",};
 my $timezones = {
                '' => [
                        'Africa/Ouagadougou'

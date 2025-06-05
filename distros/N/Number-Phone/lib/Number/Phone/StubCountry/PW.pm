@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211835;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -118,20 +118,20 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"68025", "Sonsorol\ State\ and\ Hatohobei\ State",
-"68073", "Ngaremlengui\ State",
+"68082", "Ngaraard\ State",
 "68074", "Ngardmau\ State",
-"680622", "Ngchesar\ State",
 "6803", "Peleliu\ State",
 "68027", "Angaur\ State",
-"68085", "Ngarchelong\ State",
-"68048", "Koror\ State",
-"68054", "Aimeliik\ State",
-"68058", "Airai\ State",
-"68087", "Kayangel\ State",
 "68053", "Ngatpang\ State",
-"68067", "Ngiwal\ State",
+"68087", "Kayangel\ State",
+"68054", "Aimeliik\ State",
 "68065", "Melekeok\ State",
-"68082", "Ngaraard\ State",};
+"680622", "Ngchesar\ State",
+"68085", "Ngarchelong\ State",
+"68073", "Ngaremlengui\ State",
+"68067", "Ngiwal\ State",
+"68058", "Airai\ State",
+"68048", "Koror\ State",};
 my $timezones = {
                '' => [
                        'Pacific/Palau'

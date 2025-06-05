@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.004';
+$Crypt::SecretBuffer::VERSION = '0.005';
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.004';
+$Crypt::SecretBuffer::Exports::VERSION = '0.005';
    use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw( secret_buffer secret NONBLOCK AT_LEAST );
    sub secret_buffer {
@@ -380,11 +380,16 @@ You can also just use it with L<Inline::C> if you want to skip the hassle of an 
 
 The complete API documentation is found in
 L<SecretBuffer.h|https://metacpan.org/dist/Crypt-SecretBuffer/source/SecretBuffer.h>
-but here is a quick example:
+
+=head1 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see
+L<SECURITY.md|https://metacpan.org/dist/Crypt-SecretBuffer/source/SECURITY.md> for
+instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

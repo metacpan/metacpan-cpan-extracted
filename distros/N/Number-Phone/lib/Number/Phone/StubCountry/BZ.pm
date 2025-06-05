@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211817;
+our $VERSION = 1.20250605193633;
 
 my $formatters = [
                 {
@@ -81,12 +81,12 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5014", "Corozal\ District",
-"5013", "Orange\ Walk\ District",
+$areanames{en} = {"5012", "Belize\ District",
 "5017", "Toledo\ District",
 "5018", "Cayo\ District",
-"5012", "Belize\ District",
-"5015", "Stann\ Creek\ District",};
+"5013", "Orange\ Walk\ District",
+"5015", "Stann\ Creek\ District",
+"5014", "Corozal\ District",};
 my $timezones = {
                '' => [
                        'America/Belize'

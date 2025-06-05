@@ -17,7 +17,7 @@ subtest 'append_read basic' => sub {
 
 
 subtest 'append_read NONBLOCK' => sub {
-   skip_all "Nonblocking doesn't work on WIn32"
+   skip_all "Nonblocking doesn't work on Win32"
       if $^O eq 'MSWin32';
 
    my ($r,$w)= pipe_with_data('x');
@@ -26,8 +26,11 @@ subtest 'append_read NONBLOCK' => sub {
    my $n = $buf->append_read($r,1);
    ok($n==1,'one byte');
    $n = $buf->append_read($r,1);
-   ok($n==0 || ($n==-1 && $!{EAGAIN}), 'no data available');
-   close $r; close $w;
+   is( $n, undef, 'nonblock = syserror' ) && ok( $!{EAGAIN}, 'EAGAIN' );
+   close $w;
+   $n = $buf->append_read($r,1);
+   is( $n, 0, 'EOF' );
+   close $r;
 };
 
 done_testing;

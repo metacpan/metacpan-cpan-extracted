@@ -1,3 +1,6 @@
+0.35 Thursday 5th June, 2025
+	Fix for CVE https://github.com/richardc/perl-file-find-rule/pull/4
+
 0.34 Thursday 4th December, 2015
         Add canonpath option to normalize file-path
         separators.  Work by Mithun Ayachit.

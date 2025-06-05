@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211834;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -135,32 +135,32 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5164", "Junín",
-"5165", "Loreto",
-"5176", "Cajamarca",
-"5142", "San\ Martín",
+$areanames{en} = {"5174", "Lambayeque",
 "5143", "Ancash",
-"5151", "Puno",
-"5161", "Ucayali",
-"5183", "Apurímac",
-"5182", "Madre\ de\ Dios",
-"5173", "Piura",
-"5154", "Arequipa",
-"5172", "Tumbes",
-"5144", "La\ Libertad",
-"5168", "Lima",
-"5156", "Ica",
-"5167", "Huancavelica",
-"5163", "Pasco",
-"511", "Lima\/Callao",
-"5162", "Huánuco",
-"5174", "Lambayeque",
-"5152", "Tacna",
-"5153", "Moquegua",
-"5175", "Lima",
-"5141", "Amazonas",
 "5184", "Cusco",
-"5166", "Ayacucho",};
+"5173", "Piura",
+"5141", "Amazonas",
+"5144", "La\ Libertad",
+"5152", "Tacna",
+"5183", "Apurímac",
+"5161", "Ucayali",
+"5164", "Junín",
+"5156", "Ica",
+"5163", "Pasco",
+"5175", "Lima",
+"5182", "Madre\ de\ Dios",
+"5167", "Huancavelica",
+"5172", "Tumbes",
+"5166", "Ayacucho",
+"5153", "Moquegua",
+"5168", "Lima",
+"5151", "Puno",
+"5154", "Arequipa",
+"5142", "San\ Martín",
+"5176", "Cajamarca",
+"5162", "Huánuco",
+"5165", "Loreto",
+"511", "Lima\/Callao",};
 my $timezones = {
                '' => [
                        'America/Lima'

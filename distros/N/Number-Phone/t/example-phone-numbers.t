@@ -1,7 +1,7 @@
 
         # automatically generated file, don't edit
         #
-        # Copyright 2024 David Cantrell, derived from data from libphonenumber
+        # Copyright 2025 David Cantrell, derived from data from libphonenumber
         # http://code.google.com/p/libphonenumber/
         #
         # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2962,19 +2962,19 @@
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['BR','+55300123456'],
+        args    => ['BR','+55500123456'],
         methods => ['is_specialrate'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['BR','300123456'],
+        args    => ['BR','500123456'],
         methods => ['is_specialrate'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['+55300123456'],
+        args    => ['+55500123456'],
         methods => ['is_specialrate'],
         test_country => 1,
     },
@@ -8788,19 +8788,19 @@
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['HR','+385611234'],
+        args    => ['HR','+3856001234'],
         methods => ['is_specialrate'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['HR','611234'],
+        args    => ['HR','6001234'],
         methods => ['is_specialrate'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['+385611234'],
+        args    => ['+3856001234'],
         methods => ['is_specialrate'],
         test_country => 1,
     },
@@ -11740,24 +11740,6 @@
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['LA','+856301234567'],
-        methods => ['is_specialrate'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
-        args    => ['LA','301234567'],
-        methods => ['is_specialrate'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
-        args    => ['+856301234567'],
-        methods => ['is_specialrate'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
         args    => ['LB','+9611123456'],
         methods => ['is_fixed_line'],
         test_country => 1,
@@ -14184,6 +14166,24 @@
         class   => 'Number::Phone::Lib',
         args    => ['+23052512345'],
         methods => ['is_mobile'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['MU','+2302190123'],
+        methods => ['is_pager'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['MU','2190123'],
+        methods => ['is_pager'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+2302190123'],
+        methods => ['is_pager'],
         test_country => 1,
     },
 {
@@ -17482,24 +17482,6 @@
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['SA','+9668110123456'],
-        methods => ['is_specialrate'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
-        args    => ['SA','8110123456'],
-        methods => ['is_specialrate'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
-        args    => ['+9668110123456'],
-        methods => ['is_specialrate'],
-        test_country => 1,
-    },
-{
-        class   => 'Number::Phone::Lib',
         args    => ['SB','+67740123'],
         methods => ['is_fixed_line'],
         test_country => 1,
@@ -18666,6 +18648,42 @@
         class   => 'Number::Phone::Lib',
         args    => ['+5977412345'],
         methods => ['is_mobile'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['SR','+5978012345'],
+        methods => ['is_tollfree'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['SR','8012345'],
+        methods => ['is_tollfree'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+5978012345'],
+        methods => ['is_tollfree'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['SR','+5979012345'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['SR','9012345'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+5979012345'],
+        methods => ['is_specialrate'],
         test_country => 1,
     },
 {

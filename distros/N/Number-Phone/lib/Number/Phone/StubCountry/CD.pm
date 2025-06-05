@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211819;
+our $VERSION = 1.20250605193633;
 
 my $formatters = [
                 {
@@ -98,15 +98,15 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr} = {"243573", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
-"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",
-"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",};
-$areanames{en} = {"2431", "Kinshasa",
+$areanames{en} = {"2432", "Katanga",
 "2436", "North\ Kivu\/South\ Kivu\/Maniema",
-"2433", "Bas\-Congo\/Bandundu",
+"2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
+"2431", "Kinshasa",
 "2434", "Kasai\-Oriental\/Kasai\-Occidental",
-"2432", "Katanga",
-"2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",};
+"2433", "Bas\-Congo\/Bandundu",};
+$areanames{fr} = {"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",
+"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",
+"243573", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",};
 my $timezones = {
                '' => [
                        'Africa/Kinshasa',

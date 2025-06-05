@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211834;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -67,15 +67,15 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"689408", "Îles\ du\ Vent\(IDV\)",
-"689496", "Polynesia",
-"689495", "Polynesia",
-"689404", "Îles\ du\ Vent\(IDV\)",
-"689409", "Remote\ Archipelago",
 "689498", "Polynesia",
-"6894088", "Polynesia",
-"689494", "Polynesia",
+"689404", "Îles\ du\ Vent\(IDV\)",
 "689406", "Îles\ Sous\-le\-vent\(ISLV\)",
-"689405", "Îles\ du\ Vent\(IDV\)",};
+"689494", "Polynesia",
+"689409", "Remote\ Archipelago",
+"689496", "Polynesia",
+"689405", "Îles\ du\ Vent\(IDV\)",
+"6894088", "Polynesia",
+"689495", "Polynesia",};
 my $timezones = {
                '' => [
                        'Pacific/Gambier',

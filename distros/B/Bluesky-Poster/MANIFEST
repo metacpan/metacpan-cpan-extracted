@@ -1,0 +1,10 @@
+bin/example
+Changes
+lib/Bluesky/Poster.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/10-new.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

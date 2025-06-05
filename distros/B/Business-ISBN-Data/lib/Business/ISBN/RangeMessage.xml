@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>412d36dd-2759-4e33-b6a1-ee30a9d0cc09</MessageSerialNumber>
-  <MessageDate>Wed, 21 May 2025 04:50:11 BST</MessageDate>
+  <MessageSerialNumber>dfed83c2-e6a6-42aa-bfe3-ca79182c1f34</MessageSerialNumber>
+  <MessageDate>Thu, 5 Jun 2025 04:53:44 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8421,11 +8421,11 @@
       <Agency>Luxembourg</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-6999999</Range>
+          <Range>0000000-5499999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>7000000-9999999</Range>
+          <Range>5500000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

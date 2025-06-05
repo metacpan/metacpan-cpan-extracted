@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211819;
+our $VERSION = 1.20250605193633;
 
 my $formatters = [
                 {
@@ -85,50 +85,50 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{de} = {"4131", "Bern",
-"4126", "Freiburg",
-"4144", "Zürich",
-"4143", "Zürich",
+$areanames{de} = {"4126", "Freiburg",
+"4132", "Biel\/Neuenburg\/Solothurn\/Jura",
+"4131", "Bern",
 "4127", "Sitten",
+"4144", "Zürich",
 "4141", "Luzern",
 "4122", "Genf",
-"4132", "Biel\/Neuenburg\/Solothurn\/Jura",};
-$areanames{en} = {"4126", "Fribourg",
+"4143", "Zürich",};
+$areanames{en} = {"4143", "Zurich",
 "4171", "St\.\ Gallen",
-"4131", "Berne",
-"4191", "Bellinzona",
-"4156", "Baden",
-"4144", "Zurich",
-"4121", "Lausanne",
 "4181", "Chur",
-"4162", "Olten",
-"4143", "Zurich",
 "4152", "Winterthur",
+"4121", "Lausanne",
+"4124", "Yverdon\/Aigle",
+"4144", "Zurich",
+"4141", "Lucerne",
+"4122", "Geneva",
+"4155", "Rapperswil",
+"4162", "Olten",
+"4191", "Bellinzona",
+"4133", "Thun",
+"4161", "Basel",
+"4126", "Fribourg",
+"4132", "Bienne\/Neuchâtel\/Soleure\/Jura",
+"4131", "Berne",
 "4134", "Burgdorf\/Langnau\ i\.E\.",
 "4127", "Sion",
-"4161", "Basel",
-"4122", "Geneva",
-"4141", "Lucerne",
-"4155", "Rapperswil",
-"4124", "Yverdon\/Aigle",
-"4133", "Thun",
-"4132", "Bienne\/Neuchâtel\/Soleure\/Jura",};
-$areanames{it} = {"4121", "Losanna",
-"4181", "Coira",
-"4143", "Zurigo",
-"4126", "Friburgo",
-"4171", "San\ Gallo",
-"4131", "Berna",
-"4144", "Zurigo",
-"4132", "Bienne\/Neuchâtel\/Soletta\/Giura",
-"4161", "Basilea",
+"4156", "Baden",};
+$areanames{it} = {"4144", "Zurigo",
+"4141", "Lucerna",
+"4121", "Losanna",
 "4122", "Ginevra",
-"4141", "Lucerna",};
-$areanames{fr} = {"4171", "St\.\ Gall",
-"4181", "Coire",
-"4161", "Bâle",
-"4152", "Winterthour",
+"4143", "Zurigo",
+"4171", "San\ Gallo",
+"4181", "Coira",
+"4132", "Bienne\/Neuchâtel\/Soletta\/Giura",
+"4126", "Friburgo",
+"4131", "Berna",
+"4161", "Basilea",};
+$areanames{fr} = {"4181", "Coire",
+"4171", "St\.\ Gall",
 "4122", "Genève",
+"4152", "Winterthour",
+"4161", "Bâle",
 "4133", "Thoune",};
 my $timezones = {
                '' => [

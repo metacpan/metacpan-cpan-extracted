@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211830;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -32,7 +32,7 @@ my $formatters = [
             7(?:
               [2-57]|
               62|
-              8[0-7]|
+              8[0-6]|
               9[04-9]
             )|
             8[02-9]
@@ -51,7 +51,7 @@ my $validators = {
                 'fixed_line' => '
           7(?:
             62|
-            8[0-7]|
+            8[0-6]|
             9[04-9]
           )\\d{4}|
           (?:
@@ -67,7 +67,7 @@ my $validators = {
                 'geographic' => '
           7(?:
             62|
-            8[0-7]|
+            8[0-6]|
             9[04-9]
           )\\d{4}|
           (?:
@@ -81,10 +81,6 @@ my $validators = {
           )\\d{5}
         ',
                 'mobile' => '
-          793(?:
-            [01]\\d|
-            2[0-4]
-          )\\d{3}|
           (?:
             (?:
               3|
@@ -93,8 +89,8 @@ my $validators = {
             7(?:
               [01]\\d|
               6[013-9]|
-              8[89]|
-              9[12]
+              8[7-9]|
+              9[1-3]
             )
           )\\d{5}
         ',
@@ -105,13 +101,13 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96121", "Beirut",
-"96126", "North\ Lebanon",
-"96125", "Chouf",
+$areanames{en} = {"96128", "Bekaa",
+"96129", "Jbeil\ \&\ Keserwan",
 "96127", "South\ Lebanon",
-"96128", "Bekaa",
-"96124", "Metn",
-"96129", "Jbeil\ \&\ Keserwan",};
+"96121", "Beirut",
+"96125", "Chouf",
+"96126", "North\ Lebanon",
+"96124", "Metn",};
 my $timezones = {
                '' => [
                        'Asia/Beirut'

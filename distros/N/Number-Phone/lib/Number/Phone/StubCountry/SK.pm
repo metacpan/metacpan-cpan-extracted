@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211836;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -132,32 +132,32 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"42138", "Topolcany",
-"42137", "Nitra",
-"42136", "Levice",
-"4212", "Bratislava",
-"42144", "Liptovsky\ Mikulas",
-"42143", "Martin",
-"42155", "Kosice",
-"42145", "Zvolen",
-"42154", "Bardejov",
-"42153", "Spisska\ Nova\ Ves",
-"42142", "Povazska\ Bystrica",
-"42152", "Poprad",
-"42151", "Presov",
-"421601", "Roznava",
-"42141", "Zilina",
+$areanames{en} = {"42145", "Zvolen",
 "42133", "Trnava",
-"42134", "Senica",
-"42135", "Nove\ Zamky",
+"42137", "Nitra",
 "42156", "Michalovce",
-"42148", "Banska\ Bystrica",
 "42147", "Lucenec",
-"42157", "Humenne",
+"42143", "Martin",
+"42135", "Nove\ Zamky",
+"4212", "Bratislava",
+"42154", "Bardejov",
 "42158", "Roznava",
+"42151", "Presov",
+"42152", "Poprad",
+"42155", "Kosice",
 "42146", "Prievidza",
+"42157", "Humenne",
+"421601", "Roznava",
+"42153", "Spisska\ Nova\ Ves",
+"42136", "Levice",
+"42138", "Topolcany",
+"42144", "Liptovsky\ Mikulas",
 "42131", "Dunajska\ Streda",
-"42132", "Trencin",};
+"42132", "Trencin",
+"42148", "Banska\ Bystrica",
+"42142", "Povazska\ Bystrica",
+"42141", "Zilina",
+"42134", "Senica",};
 my $timezones = {
                '' => [
                        'Europe/Bratislava'

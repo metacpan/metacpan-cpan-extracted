@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211838;
+our $VERSION = 1.20250605193637;
 
 my $formatters = [
                 {
@@ -71,68 +71,68 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{es} = {"58277", "Mérida\/Táchira",
-"58237", "Dependencias\ Federales",
-"58275", "Mérida\/Táchira\/Zulia",
-"5821", "Distrito\ Capital\/Miranda\/Vargas",};
-$areanames{en} = {"58237", "Federal\ Dependencies",
-"58278", "Apure\/Barinas",
-"58287", "Delta\ Amacuro\/Monagas",
-"58253", "Lara\/Yaracuy",
-"58254", "Yaracuy",
-"58286", "Anzoátegui\/Bolívar",
-"58296", "Amazonas",
-"58243", "Aragua\/Carabobo",
-"58244", "Aragua",
-"58268", "Falcón",
-"58275", "Táchira\/Mérida\/Zulia",
-"58261", "Zulia",
-"58234", "Miranda",
-"58246", "Aragua\/Guárico",
-"58257", "Portuguesa",
-"58293", "Sucre",
-"58283", "Anzoátegui",
-"58284", "Bolívar",
-"58294", "Sucre",
-"58262", "Zulia",
-"58247", "Apure\/Barinas\/Guárico",
-"58256", "Portuguesa",
-"58279", "Falcón",
-"58265", "Zulia",
-"58271", "Mérida\/Trujillo\/Zulia",
-"5821", "Caracas\/Miranda\/Vargas",
-"58269", "Falcón",
-"58272", "Trujillo",
-"58259", "Falcón",
-"58276", "Táchira",
+$areanames{en} = {"58263", "Zulia",
+"58285", "Anzoátegui\/Bolívar",
 "58277", "Táchira\/Mérida",
-"58249", "Carabobo",
-"58238", "Guárico",
-"58288", "Bolívar",
-"58245", "Carabobo",
-"58255", "Portuguesa",
-"58240", "Apure\/Barinas",
-"58252", "Lara",
-"58266", "Zulia",
-"58267", "Zulia",
+"58234", "Miranda",
 "58242", "Carabobo",
 "58241", "Carabobo",
-"58251", "Lara\/Yaracuy",
-"58235", "Anzoátegui\/Bolívar\/Guárico",
-"58289", "Bolívar",
-"58274", "Mérida",
-"58273", "Barinas",
-"58258", "Cojedes",
-"58248", "Amazonas",
+"58238", "Guárico",
+"58287", "Delta\ Amacuro\/Monagas",
+"58275", "Táchira\/Mérida\/Zulia",
 "58295", "Nueva\ Esparta",
+"5821", "Caracas\/Miranda\/Vargas",
+"58257", "Portuguesa",
+"58249", "Carabobo",
+"58255", "Portuguesa",
+"58246", "Aragua\/Guárico",
+"58269", "Falcón",
+"58258", "Cojedes",
+"58266", "Zulia",
+"58254", "Yaracuy",
+"58235", "Anzoátegui\/Bolívar\/Guárico",
+"58284", "Bolívar",
+"58243", "Aragua\/Carabobo",
+"58278", "Apure\/Barinas",
+"58261", "Zulia",
+"58262", "Zulia",
+"58274", "Mérida",
+"58237", "Federal\ Dependencies",
+"58294", "Sucre",
+"58288", "Bolívar",
+"58267", "Zulia",
+"58248", "Amazonas",
+"58293", "Sucre",
+"58273", "Barinas",
+"58265", "Zulia",
+"58244", "Aragua",
+"58283", "Anzoátegui",
+"58253", "Lara\/Yaracuy",
 "58239", "Miranda",
-"58285", "Anzoátegui\/Bolívar",
-"58292", "Anzoátegui\/Monagas",
-"58282", "Anzoátegui",
-"58263", "Zulia",
-"58264", "Zulia",
+"58240", "Apure\/Barinas",
+"58286", "Anzoátegui\/Bolívar",
+"58279", "Falcón",
+"58252", "Lara",
+"58251", "Lara\/Yaracuy",
+"58296", "Amazonas",
+"58276", "Táchira",
+"58289", "Bolívar",
+"58271", "Mérida\/Trujillo\/Zulia",
+"58272", "Trujillo",
+"58247", "Apure\/Barinas\/Guárico",
 "58291", "Monagas",
-"58281", "Anzoátegui",};
+"58292", "Anzoátegui\/Monagas",
+"58259", "Falcón",
+"58268", "Falcón",
+"58281", "Anzoátegui",
+"58282", "Anzoátegui",
+"58245", "Carabobo",
+"58256", "Portuguesa",
+"58264", "Zulia",};
+$areanames{es} = {"5821", "Distrito\ Capital\/Miranda\/Vargas",
+"58275", "Mérida\/Táchira\/Zulia",
+"58277", "Mérida\/Táchira",
+"58237", "Dependencias\ Federales",};
 my $timezones = {
                '' => [
                        'America/Caracas'

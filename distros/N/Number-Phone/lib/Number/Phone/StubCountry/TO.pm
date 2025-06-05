@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211837;
+our $VERSION = 1.20250605193637;
 
 my $formatters = [
                 {
@@ -95,33 +95,33 @@ my $validators = {
                 'voip' => '55[0-37-9]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"67672", "Vava\’u",
-"67632", "Muʻa",
-"67669", "Ha\’apai",
-"67660", "Ha\’apai",
-"67671", "Vava\’u",
-"67631", "Muʻa",
-"67685", "Niuas",
-"67679", "Vava\’u",
-"67629", "Pea",
-"67680", "Niuas",
-"67634", "Kolonga",
-"67674", "Vava\’u",
-"67633", "Kolonga",
-"67630", "Pea",
+$areanames{en} = {"67680", "Niuas",
 "67670", "Vava\’u",
+"67636", "Nakolo",
+"67660", "Ha\’apai",
 "67675", "Vava\’u",
-"67635", "Nakolo",
+"67631", "Muʻa",
+"67632", "Muʻa",
+"67638", "Vaini",
+"67685", "Niuas",
+"67634", "Kolonga",
 "67641", "Masilamea",
 "67642", "Masilamea",
-"67643", "Matangiake",
-"67640", "Kolovai",
 "67650", "\‘Eua",
-"67638", "Vaini",
 "67637", "Vaini",
-"67636", "Nakolo",
+"67674", "Vava\’u",
+"67633", "Kolonga",
+"67629", "Pea",
+"6762", "Nuku\'alofa",
+"67635", "Nakolo",
+"67643", "Matangiake",
+"67671", "Vava\’u",
+"67672", "Vava\’u",
 "67676", "Vava\’u",
-"6762", "Nuku\'alofa",};
+"67630", "Pea",
+"67679", "Vava\’u",
+"67640", "Kolovai",
+"67669", "Ha\’apai",};
 my $timezones = {
                '' => [
                        'Pacific/Tongatapu'

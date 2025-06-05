@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,21 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211836;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '
-            [1-4]|
-            5[1-3]
-          ',
+                  'leading_digits' => '[1-5]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[59]',
+                  'leading_digits' => '9',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
@@ -75,12 +72,7 @@ my $validators = {
             5[1-3]
           )\\d{6}
         ',
-                'mobile' => '
-          (?:
-            50|
-            9[1-689]
-          )\\d{7}
-        ',
+                'mobile' => '9[1-9]\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
@@ -88,25 +80,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96343", "Tartous",
+$areanames{en} = {"96314", "Al\-Quneitra",
 "96344", "Hamah",
-"96311", "Damascus\ and\ rural\ areas",
-"96353", "Al\-Kameshli",
-"96334", "Palmyra",
-"96333", "Hamah",
-"96325", "Menbej",
-"96312", "Al\-Nebek",
-"96323", "Edleb",
-"96351", "Deir\ Ezzour",
-"96314", "Al\-Quneitra",
-"96313", "Al\-Zabadani",
-"96316", "Al\-Swedaa",
-"96341", "Lattakia",
-"96322", "Al\-Rakkah",
-"96315", "Dara",
-"96321", "Aleppo",
+"96331", "Homs",
 "96352", "Alhasakah",
-"96331", "Homs",};
+"96351", "Deir\ Ezzour",
+"96341", "Lattakia",
+"96311", "Damascus\ and\ rural\ areas",
+"96312", "Al\-Nebek",
+"96334", "Palmyra",
+"96321", "Aleppo",
+"96322", "Al\-Rakkah",
+"96325", "Menbej",
+"96316", "Al\-Swedaa",
+"96333", "Hamah",
+"96315", "Dara",
+"96323", "Edleb",
+"96353", "Al\-Kameshli",
+"96343", "Tartous",
+"96313", "Al\-Zabadani",};
 my $timezones = {
                '' => [
                        'Asia/Damascus'

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211829;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -135,9 +135,8 @@ my $validators = {
                 'voip' => '
           7(?:
             38(?:
-              0\\d|
-              5[0-3569]|
-              88
+              [05]\\d|
+              8[08]
             )|
             8(?:
               33|
@@ -161,14 +160,14 @@ my $validators = {
 my %areanames = ();
 $areanames{en} = {"9724", "Haifa\ and\ North\ Regions",
 "9723", "Tel\ Aviv",
-"9728", "Hashfela\ and\ South\ Regions",
 "9729", "Hasharon",
+"9728", "Hashfela\ and\ South\ Regions",
 "9722", "Jerusalem",};
-$areanames{iw} = {"9724", "חיפה\ והצפון",
-"9723", "תל\ אביב\-יפו\ והמרכז",
+$areanames{iw} = {"9729", "השרון",
+"9728", "השפלה\ והדרום",
 "9722", "ירושלים",
-"9729", "השרון",
-"9728", "השפלה\ והדרום",};
+"9724", "חיפה\ והצפון",
+"9723", "תל\ אביב\-יפו\ והמרכז",};
 my $timezones = {
                '' => [
                        'Asia/Jerusalem'

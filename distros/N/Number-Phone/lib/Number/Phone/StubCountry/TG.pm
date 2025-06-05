@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211837;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -66,24 +66,24 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"22827", "Savannah\ region",
-"22824", "Plateaux\ region",
-"22823", "Maritime\ region",
-"22822", "Lome",
-"22826", "Kara\ region",
-"22825", "Central\ region",};
+$areanames{fr} = {"22823", "Région\ Maritime",
+"22827", "Région\ des\ Savanes",
+"22825", "Région\ Centrale",
+"22826", "Région\ de\ la\ Kara",
+"22824", "Région\ des\ Plateaux",
+"22822", "Lomé",};
 $areanames{es} = {"22826", "Región\ de\ Kara",
-"22825", "Región\ Central",
-"22827", "Región\ de\ Savannah",
 "22824", "Región\ Plateaux",
 "22822", "Lomé",
-"22823", "Región\ Marítima",};
-$areanames{fr} = {"22826", "Région\ de\ la\ Kara",
-"22825", "Région\ Centrale",
-"22827", "Région\ des\ Savanes",
-"22823", "Région\ Maritime",
-"22822", "Lomé",
-"22824", "Région\ des\ Plateaux",};
+"22823", "Región\ Marítima",
+"22827", "Región\ de\ Savannah",
+"22825", "Región\ Central",};
+$areanames{en} = {"22823", "Maritime\ region",
+"22825", "Central\ region",
+"22827", "Savannah\ region",
+"22826", "Kara\ region",
+"22824", "Plateaux\ region",
+"22822", "Lome",};
 my $timezones = {
                '' => [
                        'Africa/Lome'

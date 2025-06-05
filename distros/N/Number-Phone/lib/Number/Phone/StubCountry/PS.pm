@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211835;
+our $VERSION = 1.20250605193636;
 
 my $formatters = [
                 {
@@ -69,21 +69,21 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"970223", "Jerusalem",
+$areanames{en} = {"970826", "Gaza",
 "970229", "Ramallah\/Al\-Bireh",
-"970227", "Bethlehem",
-"970821", "Rafah",
-"970923", "Nablus",
-"970929", "Qalqilya\/Salfit",
-"970222", "Jericho\/Hebron",
-"970820", "Khan\ Yunis",
 "970926", "Tulkarm",
-"970826", "Gaza",
+"970923", "Nablus",
 "970424", "Jenin",
-"970828", "Gaza",
+"970227", "Bethlehem",
+"970222", "Jericho\/Hebron",
 "970824", "North\ Gaza",
+"970925", "Tubas",
+"970828", "Gaza",
 "970825", "Deir\ al\-Balah",
-"970925", "Tubas",};
+"970929", "Qalqilya\/Salfit",
+"970223", "Jerusalem",
+"970821", "Rafah",
+"970820", "Khan\ Yunis",};
 my $timezones = {
                '' => [
                        'Europe/Bucharest'

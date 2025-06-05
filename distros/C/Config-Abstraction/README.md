@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.29
+Version 0.30
 
 # SYNOPSIS
 
@@ -110,7 +110,7 @@ This will override any value set for `database.user` in the configuration files.
 
 Configuration values can be overridden via the command line (`@ARGV`).
 For instance, if you have a key in the configuration such as `database.user`,
-you can override it by adding `"APP_DATABASE__USER=other_user_name"` to the command line arguments.
+you can override it by adding `"--APP_DATABASE__USER=other_user_name"` to the command line arguments.
 This will override any value set for `database.user` in the configuration files.
 
 ## EXAMPLE CONFIGURATION FLOW

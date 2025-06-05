@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211828;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -54,47 +54,47 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"24544322", "St\.\ Luzia",
-"24544331", "Mansôa",
-"24544370", "Buba",
+$areanames{en} = {"24544397", "Bigene",
 "24544354", "Pitche",
-"24544334", "Mansaba",
-"24544342", "Bambadinca",
-"24544351", "Gabu",
-"24544321", "Bissau",
-"24544332", "Bissora",
-"24544393", "S\.\ Domingos",
-"24544341", "Bafatá",
-"24544352", "Sonaco",
-"24544396", "Ingoré",
-"24544391", "Canchungo",
-"24544320", "Bissau",
-"24544335", "Farim",
-"24544394", "Bula",
 "24544353", "Pirada",
+"24544391", "Canchungo",
+"24544352", "Sonaco",
+"24544341", "Bafatá",
+"24544321", "Bissau",
+"24544331", "Mansôa",
+"24544394", "Bula",
+"24544393", "S\.\ Domingos",
+"24544342", "Bambadinca",
+"24544332", "Bissora",
+"24544322", "St\.\ Luzia",
+"24544351", "Gabu",
+"24544396", "Ingoré",
+"24544335", "Farim",
+"24544325", "Brá",
+"24544334", "Mansaba",
 "24544392", "Cacheu",
-"24544397", "Bigene",
-"24544325", "Brá",};
-$areanames{pt} = {"245332", "Bigene\/Bissorã",
-"245342", "Bambadinca",
-"245351", "Gabú",
-"245393", "S\.\ Domingos",
-"245396", "Ingoré",
-"245352", "Sonaco",
-"245325", "Brá",
-"245341", "Bafatá",
-"245331", "Mansôa",
-"245392", "Cacheu",
-"245370", "Buba",
-"245353", "Pirada",
-"245391", "Canchungo",
-"245320", "Bissau",
-"245354", "Pitche",
+"24544370", "Buba",
+"24544320", "Bissau",};
+$areanames{pt} = {"245342", "Bambadinca",
 "245334", "Mansaba",
+"245351", "Gabú",
+"245394", "Bula",
 "245322", "Sta\.\ Luzia",
 "245335", "Farim",
-"245394", "Bula",
-"245321", "Bissau",};
+"245331", "Mansôa",
+"245354", "Pitche",
+"245391", "Canchungo",
+"245370", "Buba",
+"245341", "Bafatá",
+"245352", "Sonaco",
+"245393", "S\.\ Domingos",
+"245396", "Ingoré",
+"245325", "Brá",
+"245321", "Bissau",
+"245320", "Bissau",
+"245332", "Bigene\/Bissorã",
+"245392", "Cacheu",
+"245353", "Pirada",};
 my $timezones = {
                '' => [
                        'Atlantic/Reykjavik'

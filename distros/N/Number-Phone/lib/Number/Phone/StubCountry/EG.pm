@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211826;
+our $VERSION = 1.20250605193635;
 
 my $formatters = [
                 {
@@ -97,34 +97,34 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2040", "Tanta",
-"2057", "Damietta",
-"2015", "10th\ of\ Ramadan",
-"2092", "Wadi\ El\-Gedid",
-"20554", "10th\ of\ Ramadan",
-"2093", "Sohag",
-"2097", "Aswan",
-"2084", "Fayoum",
-"2066", "Port\ Said",
-"2068", "El\-Arish",
-"2069", "El\-Tor",
-"202", "Cairo\/Giza\/Qalyubia",
-"2045", "Damanhur",
-"2062", "Suez",
-"2096", "Qena",
-"2082", "Beni\ Suef",
-"2095", "Luxor",
-"2013", "Banha",
-"2046", "Marsa\ Matruh",
+$areanames{en} = {"2046", "Marsa\ Matruh",
+"2040", "Tanta",
 "2088", "Assiout",
-"2055", "Zagazig",
+"2093", "Sohag",
+"203", "Alexandria",
+"2013", "Banha",
+"2047", "Kafr\ El\-Sheikh",
+"2062", "Suez",
 "2065", "Red\ Sea",
 "2086", "Minia",
-"2064", "Ismailia",
 "2048", "Monufia",
+"2045", "Damanhur",
+"2068", "El\-Arish",
+"2069", "El\-Tor",
+"2082", "Beni\ Suef",
+"2066", "Port\ Said",
+"2057", "Damietta",
 "2050", "Mansoura",
-"2047", "Kafr\ El\-Sheikh",
-"203", "Alexandria",};
+"2092", "Wadi\ El\-Gedid",
+"20554", "10th\ of\ Ramadan",
+"2064", "Ismailia",
+"2015", "10th\ of\ Ramadan",
+"2095", "Luxor",
+"202", "Cairo\/Giza\/Qalyubia",
+"2055", "Zagazig",
+"2097", "Aswan",
+"2084", "Fayoum",
+"2096", "Qena",};
 my $timezones = {
                '' => [
                        'Africa/Cairo'

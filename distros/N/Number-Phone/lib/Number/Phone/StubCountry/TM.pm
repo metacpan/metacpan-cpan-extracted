@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211837;
+our $VERSION = 1.20250605193637;
 
 my $formatters = [
                 {
@@ -113,11 +113,11 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9931", "Ahal",
+$areanames{en} = {"9932", "Balkan",
 "9933", "Daşoguz",
-"9934", "Lebap",
-"9932", "Balkan",
-"9935", "Mary",};
+"9935", "Mary",
+"9931", "Ahal",
+"9934", "Lebap",};
 my $timezones = {
                '' => [
                        'Asia/Ashgabat'

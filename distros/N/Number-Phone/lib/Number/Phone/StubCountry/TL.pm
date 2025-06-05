@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211837;
+our $VERSION = 1.20250605193637;
 
 my $formatters = [
                 {
@@ -63,22 +63,22 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"67042", "Manatuto",
-"67021", "Manufahi",
-"67031", "Dili",
+$areanames{en} = {"67044", "Lautem",
 "67032", "Dili",
-"67022", "Cova\ Lima",
+"67031", "Dili",
+"67024", "Ainaro",
+"67038", "Ermera",
+"67042", "Manatuto",
 "67041", "Baucau",
-"67037", "Aileu",
+"67021", "Manufahi",
+"67022", "Cova\ Lima",
 "67025", "Dekuse",
 "67033", "Dili",
-"67038", "Ermera",
+"67037", "Aileu",
+"67039", "Oekusi",
 "67023", "Bobonaro",
 "67036", "Liquica",
-"67024", "Ainaro",
-"67043", "Viqueque",
-"67039", "Oekusi",
-"67044", "Lautem",};
+"67043", "Viqueque",};
 my $timezones = {
                '' => [
                        'Asia/Dili'

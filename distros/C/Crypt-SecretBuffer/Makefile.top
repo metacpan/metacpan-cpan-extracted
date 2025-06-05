@@ -1,12 +1,13 @@
+use lib "./inc";
 our %PREREQ_PM;
 BEGIN {
    %PREREQ_PM= (
       #'ExtUtils::Depends' => '0.405',
-      'Devel::CheckLib'   => '1.03',
+      'ExtUtils::CBuilder' => '0.2800',
    );
    # If the prereqs for this script are missing,
    # write out a Makefile that tells CPAN to install them
-   my $use_prereqs_code= join('', map { "use $_ '$PREREQ_PM{$_}'; " } keys %PREREQ_PM).'1;';
+   my $use_prereqs_code= join('', map { "use $_ $PREREQ_PM{$_}; " } keys %PREREQ_PM).'1;';
    print $use_prereqs_code."\n";
    unless (eval $use_prereqs_code) {
       warn "$@\n";
@@ -19,55 +20,42 @@ BEGIN {
    }
 }
 
-use lib "./inc";
-use ExtUtils::Depends;
+require ExtUtils::Depends;
+require ExtUtils::CFeatureTest;
 
 my $dep= ExtUtils::Depends->new('Crypt::SecretBuffer');
-my @incpath;
-my @libpath;
-my @have;
+my $test= ExtUtils::CFeatureTest->new;
 
-sub check_lib_and_define {
-   my ($macro, %opts)= @_;
-   if (check_lib(
-      ($opts{fn}? (
-         # Just take the address of it, to verify it gets linked
-         function => qq{void (*fn)()= (void(*)()) $opts{fn}; return fn != NULL;},
-      ) : ()),
-      ($opts{function}? ( function => $opts{function} ) : ()),
-      ($opts{h}? ( header => $opts{h} ) : ()),
-      ($opts{lib}? ( lib => $opts{lib} ) : ()),
-      incpath  => \@incpath,
-      libpath  => \@libpath,
-      debug => 1,
-   )) {
-      warn "Found ".($opts{fn}||$opts{h}||$opts{lib});
-      push @have, $macro;
-      return 1;
-   } else {
-      warn "Don't have ".($opts{fn}||$opts{h}||$opts{lib});
-      return 0;
-   }
+if ($^O eq 'MSWin32') {
+   $test->require_header('windows.h');
+   $test->require_header('wincrypt.h');
+} else {
+   $test->require_header('unistd.h');
+   $test->require_header('fcntl.h');
+   $test->require_header('termios.h');
+   $test->require_feature(HAVE_PTHREAD => 'pthread_detach', { h => 'pthread.h', -l => 'pthread' });
+
+   $test->feature(HAVE_MINCORE   => 'mincore',   { h => 'sys/mman.h' });
+   $test->feature(HAVE_GETRANDOM => 'getrandom', { h => 'sys/random.h' });
 }
 
-check_lib_and_define(LIBSSL    => fn => 'RAND_bytes', h => 'openssl/rand.h', lib => 'ssl');
-check_lib_and_define(MINCORE   => fn => 'mincore',    h => 'sys/mman.h');
-check_lib_and_define(GETRANDOM => fn => 'getrandom',  h => 'sys/random.h');
-check_lib_and_define(STDBOOL   =>                     h => 'stdbool.h');
-if ($^O ne 'MSWin32') { # none available on windows, and check_lib giving false positives...
-   check_lib_and_define(NATIVE_BOOL    => function => 'bool x= true; return x == false;');
-   check_lib_and_define(EXPLICIT_BZERO => fn => 'explicit_bzero', h => 'string.h');
-   check_lib_and_define(MEMMEM         => fn => 'memmem',         h => 'string.h');
-}
+$test->header('stdbool.h');
+$test->feature(HAVE_BOOL      => 'bool x= true; return x == false;');
+
+$test->feature(HAVE_LIBSSL    => 'unsigned char buf[1]; return RAND_bytes(buf, 1) == 1? 0 : 1;',
+               { h => 'openssl/rand.h', lib => 'ssl' });
+
+$test->header('string.h');
+$test->feature(HAVE_EXPLICIT_BZERO => 'char buf[1]= { 1 }; explicit_bzero(buf, 1); return buf[0];');
+$test->feature(HAVE_MEMMEM         => 'return memmem("foo", 3, "bar", 3)? 1 : 0;');
+
+$test->write_config_header('SecretBuffer_config.h');
+$test->export_deps($dep);
 
 my @exports= `$^X build-manual-linkage-header.pl --list-prototypes < SecretBuffer.h`;
 chomp(@exports);
 $dep->add_exported_c_api($_) for @exports;
 
-$dep->set_libs(join ' ', map "-L$_", @libpath)
-   if @libpath;
-$dep->set_inc(join ' ', map "-I$_", @incpath)
-   if @incpath;
 $dep->install('SecretBuffer.h', 'SecretBufferManualLinkage.h');
 $dep->add_xs('SecretBuffer.xs');
 $dep->add_pm(map { my $n= $_; $n =~ s/^lib/\$(INST_LIB)/; $_ => $n } <lib/*/*.pm>, <lib/*/*/*.pm>);

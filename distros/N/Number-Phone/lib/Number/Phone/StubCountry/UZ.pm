@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2024 David Cantrell, derived from data from libphonenumber
+# Copyright 2025 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250323211838;
+our $VERSION = 1.20250605193637;
 
 my $formatters = [
                 {
@@ -67,10 +67,7 @@ my $validators = {
                 7[124-6]|
                 9[135-8]
               )|
-              (?:
-                1[12]|
-                [68]\\d
-              )\\d|
+              [168]\\d\\d|
               2(?:
                 22|
                 3[13-57-9]|
@@ -135,10 +132,7 @@ my $validators = {
                 7[124-6]|
                 9[135-8]
               )|
-              (?:
-                1[12]|
-                [68]\\d
-              )\\d|
+              [168]\\d\\d|
               2(?:
                 22|
                 3[13-57-9]|
@@ -270,16 +264,6 @@ my $validators = {
             )|
             7(?:
               [07]\\d{3}|
-              1(?:
-                13[01]|
-                6(?:
-                  0[47]|
-                  1[67]|
-                  66
-                )|
-                71[3-69]|
-                98\\d
-              )|
               2(?:
                 2(?:
                   2[79]|

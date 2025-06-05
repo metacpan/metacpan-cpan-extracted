@@ -1,0 +1,35 @@
+---
+abstract: Query::Param
+author:
+  - 'Rob Lauer <rlauer6@comcast.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Query-Param
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Query::Param:
+    file: lib/Query/Param.pm
+    version: '0.02'
+requires:
+  URI::Escape: '0'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/rlauer6/query-param/issues
+  homepage: http://github.com/rlauer6/query-param.git
+  repository: git://github.com/rlauer6/query-param.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
