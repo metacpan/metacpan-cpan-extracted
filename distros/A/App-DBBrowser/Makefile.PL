@@ -74,4 +74,9 @@ WriteMakefile(
         'Text::CSV_XS'               => 0,
         %prereqs_os_specific,
     },
+    dist  => {
+        COMPRESS => 'gzip',
+        SUFFIX   => '.gz',
+        TARFLAGS => '--format=gnu -cvf',
+    },
 );

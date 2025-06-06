@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.431  2025-06-06
+        - Update history for date_add and data_substract.
+        - Update available columns for extended expressions.
+        - Makefile.PL: added back the 'dist' section.
+
 2.430  2025-05-13
         - Update aggregate functions 'count' and 'group_concat'.
         - Term::TablePrint minimum version 0.172.

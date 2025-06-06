@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController
 
+0.0801 2025-06-05 18:29:44
+    - Fix eg/* file naming.
+
 0.0800 2025-05-25 01:36:07
     - Handle MIDI clock messages.
 

@@ -166,7 +166,6 @@ sub window_function {
 
     my @func_with_offset_and_default = ( 'LAG', 'LEAD' ); # not if MariaDB ##
     my $rx_func_with_offset_and_default = join( '|', map { quotemeta } @func_with_offset_and_default );
-
     my $info_sql = $ax->get_sql_info( $sql );
     push @$r_data, [ 'win' ];
     my $hidden = 'Window function:';

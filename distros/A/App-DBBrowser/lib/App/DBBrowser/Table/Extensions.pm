@@ -170,7 +170,7 @@ sub __avail_cols_in_extenstions {
         my $sa = App::DBBrowser::Table::Substatement::Aggregate->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my $avail_aggr = $sa->available_aggregate_functions();
         if ( $clause =~ /^(?:select|having|order_by)\z/ && ! $sql->{used_in_aggregate_function} ) {
-            $cols = [ reverse uniq( reverse @{$sql->{selected_cols}}, @{$sql->{group_by_cols}}, @$avail_aggr ) ];
+            $cols = [ uniq( @{$sql->{group_by_cols}}, @$avail_aggr, @{$sql->{selected_cols}} ) ];
         }
         else {
             $cols = [ @{$sql->{columns}} ];
@@ -185,7 +185,7 @@ sub __avail_cols_in_extenstions {
              @selected_cols = @{$sql->{selected_cols}};
         }
         if ( $clause =~ /^(?:select|where|order_by)\z/ ) {
-            $cols = [ reverse uniq( reverse @selected_cols, @{$sql->{columns}} ) ];
+            $cols = [ uniq( @{$sql->{columns}}, @selected_cols ) ];
         }
         else {
             $cols = [ @{$sql->{columns}} ];

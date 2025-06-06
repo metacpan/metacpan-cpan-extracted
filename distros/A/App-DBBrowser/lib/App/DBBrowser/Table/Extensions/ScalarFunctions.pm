@@ -16,7 +16,6 @@ use App::DBBrowser::Table::Extensions::ScalarFunctions::String;
 use App::DBBrowser::Table::Extensions::ScalarFunctions::To;
 use App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments;
 
-
 my $char_length        = 'CHAR_LENGTH';
 my $concat             = 'CONCAT';
 my $instr              = 'INSTR';
@@ -41,7 +40,6 @@ my $truncate           = 'TRUNCATE';
 my $trunc              = 'TRUNC';
 my $upper              = 'UPPER';
 
-
 my $abs                = 'ABS';
 my $ceil               = 'CEIL';
 my $exp                = 'EXP';
@@ -53,7 +51,6 @@ my $rand               = 'RAND';
 my $round              = 'ROUND';
 my $sign               = 'SIGN';
 my $sqrt               = 'SQRT';
-
 
 my $age                = 'AGE';
 my $current            = 'CURRENT';
@@ -91,7 +88,6 @@ my $weekday            = 'WEEKDAY';
 my $week_iso           = 'WEEK_ISO';
 my $year               = 'YEAR';
 
-
 my $date_format        = 'DATE_FORMAT';
 my $epoch_to_date      = 'EPOCH_TO_DATE';
 my $epoch_to_datetime  = 'EPOCH_TO_DATETIME';
@@ -105,7 +101,6 @@ my $to_epoch           = 'TO_EPOCH';
 my $to_number          = 'TO_NUMBER';
 my $to_timestamp       = 'TO_TIMESTAMP';
 my $to_timestamp_tz    = 'TO_TIMESTAMP_TZ';
-
 
 my $cast               = 'CAST';
 my $coalesce           = 'COALESCE';
@@ -296,6 +291,7 @@ sub scalar_function {
             }
             my $func = $menu->[$idx_func] =~ s/^-\s//r;
             push @$r_data, [ 'scalar', $func ];
+            $cols = [ grep { ! /^${func}\(/i } @$cols ];
             my $new_func;
             if ( $type eq 'string' ) {
                 $new_func = App::DBBrowser::Table::Extensions::ScalarFunctions::String->new( $sf->{i}, $sf->{o}, $sf->{d} );

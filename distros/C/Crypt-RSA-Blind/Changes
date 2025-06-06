@@ -1,5 +1,8 @@
 Revision history for Crypt::RSA::Blind
 
+1.026 Jun 5 2025
+    * Remove calls to Crypt::RSA::Primitives functions
+
 1.025 Jun 4 2025
     * Require minimum version 5.26 of perl
 

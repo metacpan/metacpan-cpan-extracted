@@ -7,8 +7,9 @@ Makefile.PL
 README
 README.md
 dist.ini
-eg/control_change.pl
+eg/control.pl
 eg/echo.pl
+eg/filter.pl
 eg/multi.pl
 eg/tester.pl
 lib/MIDI/RtController.pm

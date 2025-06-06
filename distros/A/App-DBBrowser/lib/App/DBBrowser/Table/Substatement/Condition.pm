@@ -51,7 +51,7 @@ sub add_condition {
     }
 
     COL: while ( 1 ) {
-        my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
+        my $info = $sf->__info_add_condition( $sql, $stmt, $r_data );
         # Choose
         my $col = $tc->choose(
             [ @pre, @$cols ],
@@ -96,7 +96,7 @@ sub add_condition {
             $AND_OR = '';
         }
         else {
-            my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
+            my $info = $sf->__info_add_condition( $sql, $stmt, $r_data );
             # Choose
             my $choice = $tc->choose(
                 [ undef, "AND", "OR" ],
@@ -167,7 +167,7 @@ sub __add_operator_and_value {
         #}
         #else {
             my @pre = ( undef );
-            my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
+            my $info = $sf->__info_add_condition( $sql, $stmt, $r_data );
             # Choose
             $operator = $tc->choose(
                 [ @pre, @operators ],
@@ -197,7 +197,7 @@ sub __add_operator_and_value {
         elsif ( $operator =~ /^(?:ALL|ANY)\z/) {
             my @comb_op = ( "= $operator", "$not_equal $operator", "> $operator", "< $operator", ">= $operator", "<= $operator" );
             my @pre = ( undef );
-            my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
+            my $info = $sf->__info_add_condition( $sql, $stmt, $r_data );
             # Choose
             $operator = $tc->choose(
                 [ @pre, @comb_op ],
@@ -235,7 +235,7 @@ sub __add_operator_and_value {
 
 
 sub __info_add_condition {
-    my ( $sf, $sql, $clause, $stmt, $r_data ) = @_;
+    my ( $sf, $sql, $stmt, $r_data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $info = $ax->get_sql_info( $sql );
     if ( @{$r_data//[]} ) {
@@ -367,7 +367,7 @@ sub __choose_a_column {
     my @choices = @{$sql->{cols_join_condition}};
 
     COL: while ( 1 ) {
-        my $info = $sf->__info_add_condition( $sql, $clause, $stmt, $r_data );
+        my $info = $sf->__info_add_condition( $sql, $stmt, $r_data );
         # Choose
         my $col = $tc->choose(
             [ @pre, @choices ],

@@ -67,7 +67,7 @@
          "web" : "https://github.com/ology/MIDI-RtController"
       }
    },
-   "version" : "0.0800",
+   "version" : "0.0801",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

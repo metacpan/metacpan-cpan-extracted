@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController
   repository: https://github.com/ology/MIDI-RtController.git
-version: '0.0800'
+version: '0.0801'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

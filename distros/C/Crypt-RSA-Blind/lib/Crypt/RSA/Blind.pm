@@ -3,7 +3,7 @@
 # Crypt::RSA::Blind - Blind RSA signatures
 # Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 #
-# $Id: lib/Crypt/RSA/Blind.pm v1.025 Wed Jun  4 19:11:55 EST 2025 $
+# $Id: lib/Crypt/RSA/Blind.pm v1.026 Thu Jun  5 19:42:39 EST 2025 $
 
 use warnings;
 use strict;
@@ -16,7 +16,7 @@ no warnings qw(experimental::signatures);
 class Crypt::RSA::Blind {
 
   use vars qw( $VERSION );
-  our ( $VERSION ) = '$Revision: 1.025 $' =~ /\s+([\d\.]+)/;
+  our ( $VERSION ) = '$Revision: 1.026 $' =~ /\s+([\d\.]+)/;
 
   use Carp;
   use Carp::Assert;
@@ -25,7 +25,7 @@ class Crypt::RSA::Blind {
   use Crypt::RSA::DataFormat qw(bitsize i2osp os2ip octet_xor);
   use Crypt::RSA::Primitives;
   use Digest::SHA qw(sha384 sha384_hex);
-  use Math::Pari qw (Mod component gcd ceil);
+  use Math::Pari qw (Mod ceil component gcd lift);
   use Crypt::Random qw(makerandom_itv makerandom);
 
   field $hashsize :param :reader(get_hashsize) = 768;
@@ -70,13 +70,13 @@ class Crypt::RSA::Blind {
     my $r; my $r_inv;
     if ($arg_ref->{R_inv}) {  # for test vector verification
       $r_inv = $arg_ref->{R_inv};
-      $r = Crypt::RSA::Primitives::mod_inverse($r_inv, $n);
+      $r = mod_inverse($r_inv, $n);
     }
     else {
       while (!$r_inv) {
 	$r = makerandom_itv( Size => 4096, Lower => 1, Upper => $n, Strength => 1, Uniform => 1 );
 	# Check that blinding factor is invertible mod n
-	$r_inv = Crypt::RSA::Primitives::mod_inverse($r, $n);
+	$r_inv = mod_inverse($r, $n);
       }
     }
     $self->_request($arg_ref->{Init} => $r_inv, $arg_ref->{Message}) if $arg_ref->{Init};
@@ -95,7 +95,7 @@ class Crypt::RSA::Blind {
     my $d = $arg_ref->{SecretKey}->d;
     my $m = os2ip($arg_ref->{BlindedMessage});
     croak("Invalid message length") if $m >= $n;
-    my $s = Crypt::RSA::Primitives::mod_exp($m, $d, $n);
+    my $s = mod_exp($m, $d, $n);
     my $blind_sig = i2osp($s, $klen);
   }
 
@@ -291,7 +291,7 @@ class Crypt::RSA::Blind {
   sub RSAVP1 ($pubkey, $r) {
     my $e = $pubkey->e;
     my $n = $pubkey->n;
-    my $c = Crypt::RSA::Primitives::mod_exp($r, $e, $n);
+    my $c = mod_exp($r, $e, $n);
   }
 
   sub MGF1 ($seed, $masklen) {
@@ -307,6 +307,18 @@ class Crypt::RSA::Blind {
 
   sub is_coprime {
     gcd(@_) == 1;
+  }
+
+  sub mod_inverse {
+    my($a, $n) = @_;
+    my $m = Mod(1, $n);
+    lift($m / $a);
+  }
+
+  sub mod_exp {
+    my($a, $exp, $n) = @_;
+    my $m = Mod($a, $n);
+    lift($m ** $exp);
   }
 }
 
@@ -332,8 +344,8 @@ Crypt::RSA::Blind - Blind RSA signatures
 
 =head1 VERSION
 
- $Revision: 1.025 $
- $Date: Wed Jun  4 19:11:55 EST 2025 $
+ $Revision: 1.026 $
+ $Date: Thu Jun  5 19:42:39 EST 2025 $
 
 =cut
 

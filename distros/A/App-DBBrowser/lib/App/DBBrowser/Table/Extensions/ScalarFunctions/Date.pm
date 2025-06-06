@@ -62,10 +62,14 @@ sub __add_date_subtract_date {
     if ( ! defined $col ) {
         return;
     }
-    my $args_data = [
-        { prompt => 'Unit: ', history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ], unquote => 1 },
-        { prompt => 'Amount: ', is_numeric => 1 },
-    ];
+    my $args_data = [];
+    if ( $driver =~ /^(?:SQLite|Informix|Oracle)\z/ ) {
+        push @$args_data, { prompt => 'Unit: ', history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ], unquote => 1 };
+    }
+    else {
+        push @$args_data, { prompt => 'Unit: ', history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND) ], unquote => 1 };
+    }
+    push @$args_data, { prompt => 'Amount: ', is_numeric => 1 };
     my ( $unit, $amount ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     return if ! defined $amount || ! defined $unit;
     $unit = uc $unit;
