@@ -1,5 +1,9 @@
 Revision history for Perl-Types.
 
+0.210     2025-06-06 05:10:53-05:00 America/Chicago
+
+  - Tests, fix failures in missing dependencies tests P2
+
 0.200     2025-06-05 02:54:51-05:00 America/Chicago
 
   - Documentation, provide basic user POD in Perl::Types

@@ -2,7 +2,7 @@
 <& /Elements/Tabs &>
 <& /Elements/ListActions, actions => \@results &>
 
-<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
+<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ms-auto me-auto' &>
   <p><&|/l&>Forms are shown to users on a page in the RT Self Service interface. Below you can manage how the form details will appear to end users.</&></p>
   <form name="EditFormDescription" action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Describe.html" method="post" enctype="multipart/form-data">
   <input type="hidden" class="hidden" name="id" value="<% $id %>" />
@@ -14,30 +14,24 @@
 % }
 
       <div class="row">
-        <div class="col ml-5 mr-5">
-          <div class="custom-file">
-            <input type="file" name="FormUploadIcon" class="custom-file-input" id="formtools-upload-icon" />
-            <label class="custom-file-label" for="formtools-upload-icon"><&|/l&>Upload an icon for this form</&></label>
-          </div>
+        <div class="col ms-5 me-5">
+          <label class="form-label" for="formtools-upload-icon"><&|/l&>Upload an icon for this form</&></label>
+          <input type="file" name="FormUploadIcon" class="form-control" id="formtools-upload-icon" />
         </div>
       </div>
   </&>
   <&| /Widgets/TitleBox, title => loc('Description') &>
     <p><&|/l&>Describe what the form should be used for and include instructions to help users pick the correct form.</&></p>
-      <div class="form-row">
+      <div class="row mt-2">
         <div class="col-12">
           <input type="hidden" class="hidden" name="FormDescriptionType" value="text/html" />
           <textarea autocomplete="off" class="form-control messagebox richtext" cols="80" rows="15" name="FormDescription"><% $ARGS{'FormDescription'} || $form->{'form-description'} %></textarea>
         </div>
       </div>
   </&>
-</&>
-<div class="form-row">
-  <div class="col-12">
-    <& /Elements/Submit, Label => loc('Save'), Name => 'SubmitDescription' &>
-  </div>
-</div>
+  <& /Elements/Submit, Label => loc('Save'), Name => 'SubmitDescription', FullWidth => 1 &>
 </form>
+</&>
 <%init>
 use Digest::MD5 'md5_hex';
 

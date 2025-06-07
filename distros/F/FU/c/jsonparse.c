@@ -2,6 +2,7 @@ typedef struct {
     const unsigned char *buf;
     const unsigned char *end;
     UV depth;
+    int allow_control;
 } fujson_parse_ctx;
 
 static SV *fujson_parse(pTHX_ fujson_parse_ctx *);
@@ -23,10 +24,10 @@ static inline int fujson_parse_string_escape(pTHX_ fujson_parse_ctx *ctx, fustr 
         case '"': *(r->cur++) = '\"'; break;
         case '\\':*(r->cur++) = '\\'; break;
         case '/': *(r->cur++) = '/';  break; /* We don't escape this one */
-        case 'b': *(r->cur++) = 0x08; break;
+        case 'b': if (!ctx->allow_control) return 1; *(r->cur++) = 0x08; break;
         case 't': *(r->cur++) = 0x09; break;
         case 'n': *(r->cur++) = 0x0a; break;
-        case 'f': *(r->cur++) = 0x0c; break;
+        case 'f': if (!ctx->allow_control) return 1; *(r->cur++) = 0x0c; break;
         case 'r': *(r->cur++) = 0x0d; break;
         case 'u':
             /* (awful code adapted from ncdu) */
@@ -43,6 +44,9 @@ static inline int fujson_parse_string_escape(pTHX_ fujson_parse_ctx *ctx, fustr 
                 n = 0x10000 + (((n & 0x03ff) << 10) | (s & 0x03ff));
                 ctx->buf += 6;
             }
+            if (!ctx->allow_control &&
+                    (n <= 8 || n == 0x0b || n == 0x0c || (n >= 0x0e && n <= 0x1f) || n == 0x7f))
+                return 1;
             r->cur = (char *)uvchr_to_utf8((U8 *)r->cur, n);
             if (n >= 0x80) r->setutf8 = 1;
             break;
@@ -265,6 +269,7 @@ static SV *fujson_parse_xs(pTHX_ I32 ax, I32 argc, SV *val) {
     fujson_parse_ctx ctx;
 
     ctx.depth = 0;
+    ctx.allow_control = 0;
     while (i < argc) {
         arg = SvPV_nolen(ST(i));
         i++;
@@ -275,6 +280,7 @@ static SV *fujson_parse_xs(pTHX_ I32 ax, I32 argc, SV *val) {
         if (strcmp(arg, "utf8") == 0) decutf8 = SvTRUEx(r);
         else if (strcmp(arg, "max_size") == 0) maxlen = SvUV(r);
         else if (strcmp(arg, "max_depth") == 0) ctx.depth = SvUV(r);
+        else if (strcmp(arg, "allow_control") == 0) ctx.allow_control = SvTRUE(r);
         else if (strcmp(arg, "offset") == 0) offset = r;
         else croak("Unknown flag: '%s'", arg);
     }

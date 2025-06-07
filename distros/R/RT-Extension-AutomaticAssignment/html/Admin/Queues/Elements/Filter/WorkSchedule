@@ -2,19 +2,14 @@
 <p><&|/l&>This filter selects eligible owners by their work schedule. The following user custom field decides which work schedule each user maintains. Administrators may update the <tt>%ServiceBusinessHours</tt> RT config for adding or modifying the available schedules.</&></p>
 
 % if ($user_cfs->Count) {
-<div class="form-row">
-  <div class="col-3 label">
-    <&|/l&>Custom Field</&>:
-  </div>
-  <div class="col-9 value">
-    <select id="<% $prefix %>_user_cf" name="<% $prefix %>_user_cf" class="selectpicker form-control">
+  <&| /Elements/LabeledValue, Label => loc('Custom Field') &>
+    <select id="<% $prefix %>_user_cf" name="<% $prefix %>_user_cf" class="selectpicker form-select">
       <option value="">-</option>
 %   while (my $cf = $user_cfs->Next) {
       <option <% ($config->{user_cf}||0) == $cf->Id ? "selected" : "" %> value="<% $cf->Id %>"><% $cf->Name %></option>
 %   }
     </select>
-  </div>
-</div>
+  </&>
 % } else {
 <p><&|/l&>No user custom fields found.</&></p>
 % }

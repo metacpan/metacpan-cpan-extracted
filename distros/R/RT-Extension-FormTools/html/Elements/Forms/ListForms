@@ -1,5 +1,5 @@
 % $m->callback( CallbackName => 'BeforeFormsTitleBox', ARGSRef => \%ARGS );
-<&|/Widgets/TitleBox, title => '', class => 'container formtools-form-list ml-auto mr-auto' &>
+<&|/Widgets/TitleBox, title => '', class => 'container formtools-form-list ms-auto me-auto' &>
 % if ( defined $Group ) {
 %   if ( $banner_message ) {
 <div class="row">
@@ -20,7 +20,7 @@
       <% $m->scomp('/Elements/Forms/ShowFormGraphic', FormObj => $form_attribute, ItemNumber => $item_number) |n %>
     </a>
   </div>
-  <div class="col my-auto ml-2 mr-2 formtools-form-text">
+  <div class="col my-auto ms-2 me-2 formtools-form-text">
     <% $form->{'form-description'} |n %>
   </div>
 </div>
@@ -39,7 +39,7 @@
       <% $m->scomp('/Elements/Forms/ShowFormGraphic', FormObj => $group, ItemNumber => $item_number) |n %>
     </a>
   </div>
-  <div class="col my-auto ml-2 mr-2 formtools-form-text">
+  <div class="col my-auto ms-2 me-2 formtools-form-text">
       <% $group->Content->{description} |n %>
   </div>
 </div>

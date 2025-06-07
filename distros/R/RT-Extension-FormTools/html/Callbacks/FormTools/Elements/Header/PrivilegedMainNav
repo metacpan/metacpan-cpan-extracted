@@ -1,0 +1,35 @@
+<%init>
+if ( Menu->child('admin')
+    && $session{'CurrentUser'}->HasRight( Object => RT->System, Right => 'AdminForm' ) )
+{
+    my $formtools = Menu->child('admin')->child(
+        formtools  => title => loc('FormTools'),
+        path       => '/Admin/FormTools/',
+        attributes => {
+            'hx-trigger' => 'mouseover queue:none',
+            'hx-target'  => 'next ul',
+            'hx-get'     => RT->Config->Get('WebPath') . '/Views/FormToolsMenu',
+        }
+    );
+
+    $formtools->child( select => title => loc('Select'), path => '/Admin/FormTools/' );
+    $formtools->child( create => title => loc('Create'), path => '/Admin/FormTools/Create.html' );
+
+    if ( RT->Config->Get('FormToolsEnableGroups') ) {
+        my $formtool_groups = $formtools->child(
+            formtools => title => loc('Groups'),
+            path      => '/Admin/FormTools/Groups/',
+        );
+
+        $formtool_groups->child( select => title => loc('Select'), path => '/Admin/FormTools/Groups/' );
+        $formtool_groups->child( create => title => loc('Create'), path => '/Admin/FormTools/Groups/Create.html' );
+    }
+}
+
+# Forms home page for all privileged users
+my $formtools = Menu->child('home')->child(
+    formtools => title => loc('Forms'),
+    path      => '/Forms.html',
+);
+
+</%init>

@@ -23,5 +23,5 @@ resources:
   bugtracker: https://code.blicky.net/yorhel/fu/issues
   homepage: https://dev.yorhel.nl/fu
   repository: https://code.blicky.net/yorhel/fu
-version: '1.0'
+version: '1.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

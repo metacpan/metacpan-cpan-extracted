@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2024.12
+2025.06
 
 # DESCRIPTION
 
@@ -92,17 +92,17 @@ Here are the snippets that may accompany the photo project
 
 ## LEEJO (example from "How Perl Saved the Human Genome Project" complete with syntax error)
 
-    use Boulder::Stream; 
-    $stream = new Boulder::Stream; 
+    use Boulder::Stream;
+    $stream = new Boulder::Stream;
     while ($record=$stream->read_record('NAME','SEQUENCE')) {
-        $name = $record->get('NAME'); 
-        $sequence = $record->get('SEQUENCE'); 
+        $name = $record->get('NAME');
+        $sequence = $record->get('SEQUENCE');
 
         ...continue processing...
 
-        $record->add(QUALITY_CHECK=>"OK|); 
-        $stream->write_record($record); 
-    } 
+        $record->add(QUALITY_CHECK=>"OK|);
+        $stream->write_record($record);
+    }
 
 ## LEEJO (quine - a program that prints itself out)
 
@@ -223,7 +223,7 @@ A full list of the workshops and conferences this project was shot at
 - Alpine Perl Workshop (2016)
 - FOSDEM (2024)
 - German Perl Workshop (2019)
-- German Perl and Raku Workshop (2022, 2023, 2024)
+- German Perl and Raku Workshop (2022, 2023, 2024, 2025)
 - Les Journées Perl (2017, 2019)
 - London Perl Workshop (2015, 2016, 2019)
 - PerlCon (2019)

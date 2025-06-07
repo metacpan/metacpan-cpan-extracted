@@ -1,11 +1,11 @@
-package FU::SQL 1.0;
+package FU::SQL 1.1;
 use v5.36;
 use Exporter 'import';
 use Carp 'confess';
 use experimental 'builtin', 'for_list';
 
 our @EXPORT = qw/
-    P RAW SQL
+    P RAW IDENT SQL
     PARENS INTERSPERSE COMMA
     AND OR WHERE
     SET VALUES IN
@@ -16,6 +16,7 @@ sub _obj { bless [@_], 'FU::SQL::val' }
 
 sub P :prototype($) ($p) { bless \(my $x = $p), 'FU::SQL::p' }
 sub RAW :prototype($) ($s) { _obj "$s" }
+sub IDENT :prototype($) ($s) { bless \(my $x = "$s"), 'FU::SQL::i' }
 
 # These operate on $_ and must be called with &func syntax.
 # The readonly check can be finicky.
@@ -29,7 +30,7 @@ sub COMMA { INTERSPERSE ',', @_ }
 
 sub _conditions {
     @_ == 1 && ref $_[0] eq 'HASH'
-    ? map PARENS(RAW $_,
+    ? map PARENS(IDENT $_,
         !defined $_[0]{$_}              ? ('IS NULL') :
         ref($_[0]{$_}) eq 'FU::SQL::in' ? ($_[0]{$_})
                                         : ('=', $_[0]{$_})
@@ -41,11 +42,11 @@ sub AND { !@_ || (@_ == 1 && ref $_[0] eq 'HASH' && keys $_[0]->%* == 0) ? RAW '
 sub OR  { !@_ || (@_ == 1 && ref $_[0] eq 'HASH' && keys $_[0]->%* == 0) ? RAW '1=0' : INTERSPERSE 'OR',  _conditions @_ }
 sub WHERE { SQL 'WHERE', AND @_ }
 
-sub SET($h) { SQL 'SET', COMMA map SQL(RAW $_, '=', $h->{$_}), sort keys %$h }
+sub SET($h) { SQL 'SET', COMMA map SQL(IDENT $_, '=', $h->{$_}), sort keys %$h }
 
 sub VALUES {
     @_ == 1 && ref $_[0] eq 'HASH'
-    ? SQL '(', COMMA(map RAW $_, sort keys $_[0]->%*), ') VALUES (', COMMA(map $_[0]{$_}, sort keys $_[0]->%*), ')'
+    ? SQL '(', COMMA(map IDENT $_, sort keys $_[0]->%*), ') VALUES (', COMMA(map $_[0]{$_}, sort keys $_[0]->%*), ')'
     : @_ == 1 && ref $_[0] eq 'ARRAY'
     ? SQL 'VALUES (', COMMA($_[0]->@*), ')'
     : SQL 'VALUES (', COMMA(@_), ')';
@@ -71,6 +72,10 @@ sub FU::SQL::p::_compile($self, $opt, $sql, $params) {
     $$sql .= $opt->{placeholder_style} eq 'pg' ? '$'.@$params : '?';
 }
 
+sub FU::SQL::i::_compile($self, $opt, $sql, $params) {
+    $$sql .= $opt->{quote_identifier} ? $opt->{quote_identifier}->($$self) : $$self;
+}
+
 sub FU::SQL::in::_compile($self, $opt, $sql, $params) {
     if ($opt->{in_style} eq 'pg') {
         $$sql .= '= ANY(';
@@ -87,6 +92,7 @@ sub FU::SQL::in::_compile($self, $opt, $sql, $params) {
 }
 
 sub FU::SQL::val::compile($self, %opt) {
+    !/^(placeholder_style|in_style|quote_identifier)$/ && confess "Unknown flag: $_" for keys %opt;
     $opt{placeholder_style} ||= 'dbi';
     $opt{in_style} ||= 'dbi';
     my($sql, @params) = ('');
@@ -94,7 +100,7 @@ sub FU::SQL::val::compile($self, %opt) {
     ($sql, \@params)
 }
 
-*FU::SQL::p::compile = *FU::SQL::in::compile = \*FU::SQL::val::compile;
+*FU::SQL::p::compile = *FU::SQL::i::compile = *FU::SQL::in::compile = \*FU::SQL::val::compile;
 
 1;
 __END__
@@ -156,6 +162,16 @@ C<'pg'> when your SQL is going to L<FU::Pg> or L<Pg::PQ>.
 Set the style to use for C<IN> expressions, refer to the C<IN()> function below
 for details.
 
+=item quote_identifier => $func
+
+Set a function to perform quoting of SQL identifiers. When using DBI, you can
+do:
+
+  my($sql) = $obj->compile(quote_identifier => sub { $dbh->quote_identifier(@_) });
+
+If this option is not set, identifiers are included into the raw SQL string
+without any escaping.
+
 =back
 
 =back
@@ -176,7 +192,7 @@ types of supported arguments:
 
 =item 1.
 
-B<String literals> are interpreted as raw SQL fragments.
+I<String literals> are interpreted as raw SQL fragments.
 
 =item 2.
 
@@ -184,7 +200,7 @@ Objects returned by other functions listed below are included as SQL fragments.
 
 =item 3.
 
-B<Everything else> is considered a bind parameter.
+I<Everything else> is considered a bind parameter.
 
 =back
 
@@ -244,6 +260,18 @@ Force the given C<$sql> string to be included as SQL. For example:
 
 Never use this function with untrusted input.
 
+=item IDENT($string)
+
+Mark the given string as an SQL identifier. This function is only useful if you
+use potentially untrusted input to determine which column to select or which
+table to select from, for example:
+
+  SQL 'SELECT id,', IDENT $ENV{column}, 'FROM table';
+
+B<WARNING:> By default this function is equivalent to C<RAW()> and hence
+provides no safety whatsoever. Be sure to set the C<quote_identifier> option on
+C<compile()> to get more useful behavior.
+
 =item PARENS(@args)
 
 Like C<SQL()> but surrounds the expression by parens:
@@ -279,8 +307,8 @@ C<'1=1'> (i.e. true) if C<@conditions> is an empty list.
 =item AND($hashref)
 
 A special form of C<AND()> that tests the given columns for equality instead.
-The keys of the hashref are interpreted as raw SQL and the values as bind
-parameters.
+The keys of the hashref are interpreted as per C<IDENT()> and the values as
+bind parameters.
 
   AND { id => 1, number => RAW 'random()', x => undef }
   # '( id = ? ) AND ( number = random() ) AND ( x IS NULL )'

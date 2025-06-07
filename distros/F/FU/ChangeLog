@@ -1,3 +1,12 @@
+1.1 - 2025-06-07
+	- FU::SQL: Add IDENT function and `quote_identifier` option
+	- FU::Pg: Set appropriate `quote_identifier` for `$conn->Q()`
+	- FU: Improve `--monitor` file change detection
+	- FU::XMLWriter: Disallow stringification of bare Perl references
+	- FU::Util::json_parse(): Disallow control characters in strings, add
+	  `allow_control` option to revert to old behavior.
+	- Some doc fixes
+
 1.0 - 2025-05-11
 	- FU::Util: Fix parsing of empty sections in query_decode()
 	- FU::Util: Fix buffer overflow in json_format() float formatting

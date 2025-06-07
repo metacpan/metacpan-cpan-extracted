@@ -217,6 +217,12 @@ void query_trace(fupg_conn *c, SV *cb)
     SvGETMAGIC(cb);
     c->trace = SvOK(cb) ? SvREFCNT_inc(cb) : NULL;
 
+void conn(fupg_conn *c)
+  CODE:
+    ST(0) = sv_newmortal();
+    sv_setrv_inc(ST(0), c->self);
+    sv_bless(ST(0), gv_stashpv("FU::Pg::conn", 0));
+
 void status(fupg_conn *c)
   CODE:
     ST(0) = sv_2mortal(newSVpv(fupg_conn_status(c), 0));
@@ -316,6 +322,12 @@ void cache(fupg_txn *x, ...)
     FU::Pg::txn::text         = FUPG_TEXT
   CODE:
     FUPG_STFLAGS;
+
+void conn(fupg_txn *t)
+  CODE:
+    ST(0) = sv_newmortal();
+    sv_setrv_inc(ST(0), t->conn->self);
+    sv_bless(ST(0), gv_stashpv("FU::Pg::conn", 0));
 
 void status(fupg_txn *t)
   CODE:

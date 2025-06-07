@@ -54,6 +54,6 @@
          "url" : "https://github.com/leejo/acme-glue"
       }
    },
-   "version" : "2024.12",
+   "version" : "2025.06",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,4 +1,4 @@
-package FU::Util 1.0;
+package FU::Util 1.1;
 
 use v5.36;
 use FU::XS;
@@ -137,7 +137,7 @@ value for C<$val>, due to C<\0> and C<\1> being considered booleans.
 =head1 JSON Parsing & Formatting
 
 This module comes with a custom C-based JSON parser and formatter. These
-functions conform strictly to L<RFC-8259|https://tools.ietf.org/html/rfc8259>,
+functions conform to L<RFC-8259|https://tools.ietf.org/html/rfc8259>,
 non-standard extensions are not supported and never will be. It also happens to
 be pretty fast, refer to L<FU::Benchmarks> for some numbers.
 
@@ -170,6 +170,13 @@ with other modules.
 Supported C<%options>:
 
 =over
+
+=item allow_control
+
+Boolean, set to true to allow (encoded) ASCII control characters in JSON
+strings, such as C<\u0000>, C<\b>, C<\u007f>, etc.  These characters are
+permitted per RFC-8259, but disallowed by this parser by default. See
+C<utf8_decode()> below.
 
 =item utf8
 
@@ -251,10 +258,9 @@ value. There is no way to do that without violating JSON specs, so you should
 use entity escaping instead.
 
 Some JSON modules escape the forward slash (C</>) character instead, but that
-is, at best, B<only> sufficient for embedding inside a C<< <script> >> tag (I'm
-not sure how C<< <!-- >> and C<< <![CDATA[ >> are treated in that context). In
-any other context, you'll need the more thourough escaping provided by this
-C<html_safe> option.
+is I<only> sufficient for embedding inside a C<< <script> >> tag. In any other
+context, you'll need the more thourough escaping provided by this C<html_safe>
+option.
 
 =item max_size
 

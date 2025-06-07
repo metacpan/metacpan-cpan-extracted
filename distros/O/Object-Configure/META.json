@@ -35,8 +35,6 @@
             "Carp" : "0",
             "Config::Abstraction" : "0.25",
             "ExtUtils::MakeMaker" : "6.64",
-            "JSON::MaybeXS" : "0",
-            "LWP::Protocol::https" : "0",
             "Log::Abstraction" : "0.15",
             "perl" : "5.008"
          }
@@ -66,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Object-Configure"
       }
    },
-   "version" : 0.07,
+   "version" : 0.08,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

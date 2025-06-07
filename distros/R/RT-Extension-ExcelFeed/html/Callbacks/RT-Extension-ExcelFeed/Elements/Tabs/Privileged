@@ -4,24 +4,16 @@
 # can appear on the search results page or in a submenu of Search if
 # there is a previous search.
 
-if ( $Has_Query ) {
-    my $search = Menu()->child('search')->child('tickets');
-
-    my $current_search_menu;
-    if ( $Path =~ m{^/Ticket} ) {
-        $current_search_menu = $search->child('current_search');
-    } elsif ( $Path =~ m{^/Search/} ) {
-        $current_search_menu = PageMenu();
-    }
-
-    if ($current_search_menu && $current_search_menu->child('more')) {
-        $current_search_menu->child('more')->child(
-            'ms_excel',
-            title => loc('Microsoft Excel'),
-            description => loc("Export search as a Microsoft Excel XLSX file"),
-            path => "/Search/Results.xlsx$Search_Args",
-            );
-    }
+if ( $Has_Query && $Path =~ m{^/Search/} && PageMenu()->child('more') ) {
+    PageMenu()->child('more')->child(
+        'ms_excel',
+        title       => loc('Microsoft Excel'),
+        description => loc("Export search as a Microsoft Excel XLSX file"),
+        path        => "/Search/Results.xlsx$Search_Args",
+        attributes  => {
+            'hx-boost' => 'false',
+        },
+    );
 }
 
 </%INIT>

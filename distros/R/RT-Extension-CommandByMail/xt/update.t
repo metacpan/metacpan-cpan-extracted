@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use RT::Extension::CommandByMail::Test tests => undef;
+use Test::Warn;
 my $test = 'RT::Extension::CommandByMail::Test';
 
 my $test_ticket_id;
@@ -156,9 +157,10 @@ END
 
 
 diag("set watchers on update") if $ENV{'TEST_VERBOSE'};
-foreach my $field ( qw(Requestor Cc AdminCc) ) {
-    my $value = 'test@localhost';
-    my $text = <<END;
+warning_like {
+    foreach my $field (qw(Requestor Cc AdminCc)) {
+        my $value = 'test@localhost';
+        my $text  = <<END;
 Subject: [$RT::rtname #$test_ticket_id] test
 From: root\@localhost
 
@@ -166,14 +168,15 @@ $field: $value
 
 test
 END
-    my (undef, $id) = $test->send_via_mailgate( $text );
-    is($id, $test_ticket_id, "updated ticket");
-    my $obj = RT::Ticket->new( $RT::SystemUser );
-    $obj->Load( $id );
-    is($obj->id, $id, "loaded ticket");
-    my $method = $field .'Addresses';
-    is($obj->$method(), $value, 'set '. $field );
-}
+        my ( undef, $id ) = $test->send_via_mailgate($text);
+        is( $id, $test_ticket_id, "updated ticket" );
+        my $obj = RT::Ticket->new($RT::SystemUser);
+        $obj->Load($id);
+        is( $obj->id, $id, "loaded ticket" );
+        my $method = $field . 'Addresses';
+        is( $obj->$method(), $value, 'set ' . $field );
+    }
+} qr/User 'test\@localhost' not found/;
 
 
 diag("add requestor on update") if $ENV{'TEST_VERBOSE'};

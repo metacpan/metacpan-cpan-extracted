@@ -1,4 +1,4 @@
-package FU::MultipartFormData 1.0;
+package FU::MultipartFormData 1.1;
 use v5.36;
 use Carp 'confess';
 use FU::Util 'utf8_decode';

@@ -5,6 +5,7 @@ RTx ('RT-Extension-CommandByMail');
 no_index package => "RT::Extension::CommandByMail::Test";
 build_requires('Test::More');
 build_requires('IPC::Open2');
+requires_rt('4.4.0');
 
 repository('https://github.com/bestpractical/rt-extension-commandbymail');
 

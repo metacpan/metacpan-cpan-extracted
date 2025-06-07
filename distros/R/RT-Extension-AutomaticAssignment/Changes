@@ -1,3 +1,6 @@
+2.00  2025-06-06
+    - Update for RT 6
+
 1.01  2024-02-08
     - Migrate to Module::Runtime from UNIVERSAL::require for RT 5.0.4+
 

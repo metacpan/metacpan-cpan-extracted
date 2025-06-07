@@ -10,10 +10,7 @@ DESCRIPTION
     files rather than inline HTML reports.
 
 RT VERSION
-    Works with RT 4.4.5, 5.0.2
-
-    Updates are made in version 0.07 for compatibility with RT 4.4.5 and
-    5.0.2. To run with earlier versions of RT, use version 0.06.
+    Works with RT 6.0. For RT 5.0 install the latest 0.* version.
 
 INSTALLATION
     "perl Makefile.PL"
@@ -21,11 +18,11 @@ INSTALLATION
     "make install"
         May need root permissions
 
-    Add this line to /opt/rt5/etc/RT_SiteConfig.pm
+    Add this line to /opt/rt6/etc/RT_SiteConfig.pm
             Plugin('RT::Extension::ExcelFeed');
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -50,7 +47,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ExcelFeed>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2015-2024 by Best Practical Solutions,
+    This software is Copyright (c) 2015-2025 by Best Practical Solutions,
     LLC
 
     This is free software, licensed under:

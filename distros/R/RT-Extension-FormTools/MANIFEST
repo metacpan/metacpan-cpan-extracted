@@ -24,8 +24,9 @@ html/Admin/FormTools/Modify.html
 html/Admin/FormTools/Routing.html
 html/Admin/FormTools/UserRights.html
 html/Callbacks/FormTools/Elements/Header/Head
+html/Callbacks/FormTools/Elements/Header/PrivilegedMainNav
+html/Callbacks/FormTools/Elements/Header/SelfServiceMainNav
 html/Callbacks/FormTools/Elements/Tabs/Privileged
-html/Callbacks/FormTools/Elements/Tabs/SelfService
 html/Elements/Forms/ListForms
 html/Elements/Forms/ShowFormGraphic
 html/Elements/Forms/ShowFormIcon
@@ -41,6 +42,7 @@ html/NoAuth/js/form_tools.js
 html/Search/Elements/RoutingPickTicketCFs
 html/SelfService/Forms.html
 html/SelfService/Forms/dhandler
+html/Views/FormToolsMenu
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -50,6 +52,7 @@ inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Remove.pm
 inc/Module/Install/RTx/Runtime.pm
 inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
@@ -68,3 +71,4 @@ po/fr.po
 README
 static/css/rt-extension-formtools.css
 static/js/rt-extension-formtools.js
+SIGNATURE                                Public-key signature (added by MakeMaker)

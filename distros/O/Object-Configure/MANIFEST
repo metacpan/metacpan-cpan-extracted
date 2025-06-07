@@ -9,8 +9,10 @@ t/complex.t
 t/env.t
 t/eof.t
 t/eol.t
+t/instantiate.t
 t/pod-cm.t
 t/pod-synopsis.t
+t/pod.t
 t/simple.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

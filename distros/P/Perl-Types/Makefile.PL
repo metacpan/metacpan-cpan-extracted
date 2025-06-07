@@ -128,11 +128,16 @@ my %WriteMakefileArgs = (
     "PadWalker" => "2.5"
   },
   "TEST_REQUIRES" => {
+    "Cwd" => "3.75",
+    "File::Find" => 0,
+    "File::Spec" => "3.75",
+    "IPC::Run3" => "0.049",
     "Test::CPAN::Changes" => "0.5",
     "Test::Exception" => "0.43",
+    "Test::More" => "1.302208",
     "Test::Number::Delta" => "1.06"
   },
-  "VERSION" => "0.200",
+  "VERSION" => "0.210",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -141,6 +146,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Alien::GMP" => "1.16",
   "Alien::GSL" => "1.07",
+  "Cwd" => "3.75",
+  "File::Find" => 0,
+  "File::Spec" => "3.75",
+  "IPC::Run3" => "0.049",
   "Inline" => "0.86",
   "Inline::C" => "0.80",
   "Inline::CPP" => "0.80",
@@ -148,6 +157,7 @@ my %FallbackPrereqs = (
   "PadWalker" => "2.5",
   "Test::CPAN::Changes" => "0.5",
   "Test::Exception" => "0.43",
+  "Test::More" => "1.302208",
   "Test::Number::Delta" => "1.06"
 );
 

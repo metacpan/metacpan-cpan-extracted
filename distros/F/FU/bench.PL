@@ -115,7 +115,7 @@ defjson stru => 0, 'Unicode strings', do { use utf8;
     [ map +('グリザイアの果実 -LE FRUIT DE LA GRISAIA-', '💩', 'Я люблю нічого не робити'), 1..50 ];
 };
 defjson stres => 0, 'String escaping (few)', [ map 'This string needs to "be escaped" a little bit', 1..100 ];
-defjson strel => 0, 'String escaping (many)', [ map "This \" \\ needs \b\x01\x02\x03\x04 more", 1..100 ];
+defjson strel => 0, 'String escaping (many)', [ map "This \" \\ needs \n\x41\x42\x43\x44 more", 1..100 ];
 
 
 

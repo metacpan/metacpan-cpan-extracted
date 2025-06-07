@@ -34,8 +34,6 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Config::Abstraction' => 0.25,
 		'Log::Abstraction' => 0.15,
-		'LWP::Protocol::https' => 0,
-		'JSON::MaybeXS'	=> 0
 	}, TEST_REQUIRES => {
 		'File::Temp' => 0,
 		'Test::DescribeMe' => 0,

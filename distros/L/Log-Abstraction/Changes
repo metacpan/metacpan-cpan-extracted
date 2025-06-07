@@ -1,5 +1,8 @@
 Revision history for Log-Abstraction
 
+0.18	Fri Jun  6 15:52:27 EDT 2025
+	Fix level testing
+
 0.17	Thu May 22 14:21:14 EDT 2025
 	Added the messages() method
 

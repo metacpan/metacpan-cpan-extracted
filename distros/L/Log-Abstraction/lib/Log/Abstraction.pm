@@ -18,11 +18,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 SYNOPSIS
 
@@ -143,7 +143,11 @@ sub new {
 			if($config->{$class}) {
 				$config = $config->{$class};
 			}
+			my $array = $args{'array'};
 			%args = (%{$config}, %args);
+			if($array) {
+				$args{'array'} = $array;
+			}
 		} else {
 			croak("$class: Can't load configuration from ", $args{'config_file'});
 		}
@@ -177,7 +181,7 @@ sub new {
 		if(Scalar::Util::blessed($logger) && (ref($logger) eq __PACKAGE__)) {
 			croak("$class: attempt to encapulate ", __PACKAGE__, ' as a logging class, that would add a needless indirection');
 		}
-	} elsif(!$args{'file'}) {
+	} elsif((!$args{'file'}) && (!$args{'array'})) {
 		# Default to Log4perl
 		# FIXME: add default minimum logging level
 		Log::Log4perl->easy_init($args{verbose} ? $Log::Log4perl::DEBUG : $Log::Log4perl::ERROR);
@@ -219,7 +223,7 @@ sub _log
 		Carp::Croak(ref($self), ": Invalid level '$level'");	# "Can't happen"
 	}
 
-	if($self->{'level'} < $syslog_values{$level}) {
+	if($syslog_values{$level} > $self->{'level'}) {
 		# The level is too low to log
 		return;
 	}
@@ -292,6 +296,8 @@ sub _log
 		} else {
 			croak(ref($self), ": Don't know how to deal with the $level message");
 		}
+	} elsif($self->{'array'}) {
+		push @{$self->{'array'}}, { level => $level, message => join('', grep defined, @messages) };
 	}
 	if($self->{'file'}) {
 		if(open(my $fout, '>>', $self->{'file'})) {

@@ -1,4 +1,4 @@
-package FU::XMLWriter 1.0;
+package FU::XMLWriter 1.1;
 use v5.36;
 use Carp 'confess';
 use Exporter 'import';
@@ -263,7 +263,7 @@ and C<"> are replaced with their XML entity.
 All of the functions mentioned in this document can be imported individually.
 There are also two import groups:
 
-  use FU::XMLWriter ':html_';
+  use FU::XMLWriter ':html5_';
 
 Exports C<tag_()>, C<html_()>, C<lit_()>, C<txt_()> and all of the C<<
 <html-tag>_ >> functions mentioned above.

@@ -22,13 +22,13 @@
     <textarea class="form-control" rows="30" name="Content"><% $ARGS{Content} || $encoded_content %></textarea>
   </&>
 
-  <div class="form-row invalid-json hidden">
+  <div class="row mt-2 invalid-json hidden">
     <div class="offset-3 col-9">
       <div class="alert alert-danger mb-0"><&|/l&>Invalid JSON</&></div>
     </div>
   </div>
 
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-12">
       <& /Elements/Submit, Label => loc('Save Changes'), Name => 'Update' &>
     </div>

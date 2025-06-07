@@ -370,18 +370,18 @@ subtest 'Prepared statement cache', sub {
     $conn->cache_size(2);
     my $txn = $conn->txn;
     $txn->cache;
-    my sub numexec($sql) {
+    my $numexec = sub($sql) {
         $txn->q('SELECT generic_plans + custom_plans FROM pg_prepared_statements WHERE statement = $1', $sql)->cache(0)->val
-    }
+    };
     is $txn->q('SELECT 1')->val, 1;
-    is numexec('SELECT 1'), 1;
+    is $numexec->('SELECT 1'), 1;
 
     my $sql = 'SELECT $1::int as a, $2::text as b';
-    ok !defined numexec($sql);
+    ok !defined $numexec->($sql);
 
     my $params = $txn->q($sql)->param_types;
     is_deeply $params, [23, 25];
-    is numexec($sql), 0;
+    is $numexec->($sql), 0;
     my $cparams = $txn->q($sql)->param_types;
     is_deeply $cparams, $params;
 
@@ -391,23 +391,23 @@ subtest 'Prepared statement cache', sub {
     is_deeply $ccols, $cols;
 
     $txn->q($sql, 0, '')->exec;
-    is numexec($sql), 1;
+    is $numexec->($sql), 1;
     $txn->q($sql, 0, '')->exec;
-    is numexec($sql), 2;
+    is $numexec->($sql), 2;
 
-    is numexec('SELECT 1'), 1;
+    is $numexec->('SELECT 1'), 1;
     $txn->q('SELECT 2')->exec;
-    ok !defined numexec('SELECT 1');
-    is numexec('SELECT 2'), 1;
+    ok !defined $numexec->('SELECT 1');
+    is $numexec->('SELECT 2'), 1;
 
     $conn->cache_size(1);
-    ok !defined numexec('SELECT 1');
-    ok !defined numexec($sql);
-    is numexec('SELECT 2'), 1;
+    ok !defined $numexec->('SELECT 1');
+    ok !defined $numexec->($sql);
+    is $numexec->('SELECT 2'), 1;
 
     $conn->cache_size(0);
-    ok !defined numexec($sql);
-    ok !defined numexec('SELECT 2');
+    ok !defined $numexec->($sql);
+    ok !defined $numexec->('SELECT 2');
 };
 
 

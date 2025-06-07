@@ -1,5 +1,9 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.08	Fri Jun  6 08:35:54 EDT 2025
+	Removed a bunch of unneeded pre-reqs
+	Added the instantiate method
+
 0.07	Thu May 29 09:35:38 EDT 2025
 	Renamed from Class::Debug to Object::Configure
 	Get the Abstract from the PM file

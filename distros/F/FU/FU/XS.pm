@@ -1,5 +1,5 @@
 # This module is for internal use by other FU modules.
-package FU::XS 1.0;
+package FU::XS 1.1;
 use Carp; # may be called by XS.
 use XSLoader;
 XSLoader::load('FU');

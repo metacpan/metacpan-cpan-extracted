@@ -1,5 +1,5 @@
 # Internal module used by FU.pm
-package FU::DebugImpl 1.0;
+package FU::DebugImpl 1.1;
 use v5.36;
 use utf8;
 use experimental 'for_list';

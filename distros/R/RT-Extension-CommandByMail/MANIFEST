@@ -28,7 +28,6 @@ META.yml
 README
 xt/create.t
 xt/internals.t
-xt/tmp/ports
 xt/txn-cfs.t
 xt/update.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.17';
+our $VERSION = '2.00';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -139,7 +139,9 @@ information and create a ticket.
 
 =head1 RT VERSION
 
-Works with RT 5.0.5 and newer.
+Works with RT 6.0.0 and newer.
+
+Install RT::Extension::FormTools 1.18 for older RTs.
 
 =head1 INSTALLATION
 
@@ -153,7 +155,7 @@ Works with RT 5.0.5 and newer.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -161,7 +163,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -264,7 +266,7 @@ message if they don't have sufficient rights.
 
 If you would like to organize your forms by placing them in groups you can
 enable Form Groups by setting C<FormToolsEnableGroups> in your
-F</opt/rt5/etc/RT_SiteConfig.pm>:
+F</opt/rt6/etc/RT_SiteConfig.pm>:
 
     Set( $FormToolsEnableGroups, 1 );
 
@@ -502,6 +504,24 @@ sub LoadFormIcon {
         RT->Logger->error("Unable to load icon: $msg");
         return ( 0, $msg );
     }
+}
+
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'FormTools',
+        Content => [
+            {
+                Name => 'FormToolsEnableGroups',
+                Help => 'https://metacpan.org/pod/RT::Extension::FormTools#Form-Groups',
+            },
+        ],
+        Meta    => {
+            FormToolsEnableGroups => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+        }
+    );
 }
 
 =head1 AUTHOR

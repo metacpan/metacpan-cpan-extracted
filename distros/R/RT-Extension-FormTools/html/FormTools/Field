@@ -277,7 +277,7 @@ $Token              => ''
 %   if ($render_as !~ /^(?:normal)/i) {
 %       RT->Deprecated( Message => "render_as '$render_as' is ignored: RT already supports it in core" );
 %   }
-    <& /Elements/EditCustomField, CustomField => $cf,
+    <& /Elements/EditCustomField, ShowLabel => 0, CustomField => $cf,
             ($cf->Type =~ /text/i) ? (Cols => $cols ||60) : (),
             ($cf->Type =~ /freeform/i) ? (Cols => $cols ||30) : (),
             Rows => $rows || 6,
@@ -293,8 +293,8 @@ $Token              => ''
 %      }
 % } elsif ($render_as =~  /^boolean/i)  {
 %       my $value = 'Yes';
-<div class="custom-control custom-checkbox" style="margin-top: 5px">
-  <input class="custom-control-input" type="checkbox" name="<% $input_name %>" id="<% $input_name %>" value="<% $value %>"
+<div class="form-check" style="margin-top: 5px">
+  <input class="form-check-input" type="checkbox" name="<% $input_name %>" id="<% $input_name %>" value="<% $value %>"
 % my $checked = 0;
 %  if ($default) {
 %       $checked = ref $default? (grep { $_ eq $value} @$default) : $default eq $value;
@@ -304,7 +304,7 @@ $Token              => ''
         onclick="disable_form_field(this.checked, '<% $disable %>');"
 % }
         />
-  <label class="custom-control-label" for="<% $input_name %>"><% $value %></label>
+  <label class="form-check-label" for="<% $input_name %>"><% $value %></label>
 </div>
 
 % if ( $checked and my $disable = $disables->{$value} ) {

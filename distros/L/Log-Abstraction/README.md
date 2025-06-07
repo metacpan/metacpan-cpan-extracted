@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.17
+0.18
 
 # SYNOPSIS
 

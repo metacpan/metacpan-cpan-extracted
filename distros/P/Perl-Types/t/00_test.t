@@ -6,7 +6,7 @@
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
-use Test2::V0;
+use Test::More;
 use Data::Dumper;
 use Perl::Types;
 

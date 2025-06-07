@@ -85,14 +85,9 @@ div .formtools-admin-description {
     height: 200px;
 }
 
-#formtools-edit .custom-control-label.has-text-input::before,
-#formtools-edit .custom-control-label.has-text-input::after {
-  top: 0.5rem;
-}
-
-/* Make select options fully clickable */
-#formtools-edit .custom-checkbox {
-    z-index: auto;
+input[name=dependent_validation],
+input[name=show_condition] {
+    margin-top: 12px;
 }
 
 .formtools-item .value .custom-control.custom-checkbox {

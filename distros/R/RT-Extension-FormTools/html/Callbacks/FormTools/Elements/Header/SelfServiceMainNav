@@ -6,6 +6,3 @@ my $formtools = Menu->child('home')->child(
 );
 
 </%init>
-<%args>
-$Path
-</%args>

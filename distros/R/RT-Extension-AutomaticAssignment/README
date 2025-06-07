@@ -2,10 +2,10 @@ NAME
     RT-Extension-AutomaticAssignment - automatically assign tickets based on
     rules
 
-INSTALLATION
-    RT-Extension-AutomaticAssignment 1.* versions require RT 5.0 or later.
-    Use 0.* versions if you are still using RT 4.
+RT VERSION
+    Works with RT 6.0. For RT 5.0 install the latest 1.* version.
 
+INSTALLATION
     perl Makefile.PL
     make
     make install
@@ -20,7 +20,7 @@ INSTALLATION
         If you are upgrading this module, check for upgrading instructions
         in case changes need to be made to your database.
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin( "RT::Extension::AutomaticAssignment" );
@@ -32,7 +32,7 @@ INSTALLATION
             Set( @CustomFieldValuesSources, "RT::CustomFieldValues::ServiceBusinessHours" );
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
     Create scrips
@@ -93,7 +93,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AutomaticAssignment>.
 
 COPYRIGHT
-    This extension is Copyright (C) 2016-2020 Best Practical Solutions, LLC.
+    This extension is Copyright (C) 2016-2025 Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

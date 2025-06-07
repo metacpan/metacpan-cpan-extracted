@@ -1,5 +1,5 @@
 ---
-abstract: 'A flexible logging class for Perl'
+abstract: 'Logging Abstraction Layer'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Log-Abstraction/issues
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.17
+version: 0.18
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -8,7 +8,9 @@ DESCRIPTION
     and create a ticket.
 
 RT VERSION
-    Works with RT 5.0.5 and newer.
+    Works with RT 6.0.0 and newer.
+
+    Install RT::Extension::FormTools 1.18 for older RTs.
 
 INSTALLATION
     perl Makefile.PL
@@ -16,13 +18,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::FormTools');
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -112,7 +114,7 @@ USAGE
   Form Groups
     If you would like to organize your forms by placing them in groups you
     can enable Form Groups by setting FormToolsEnableGroups in your
-    /opt/rt5/etc/RT_SiteConfig.pm:
+    /opt/rt6/etc/RT_SiteConfig.pm:
 
         Set( $FormToolsEnableGroups, 1 );
 

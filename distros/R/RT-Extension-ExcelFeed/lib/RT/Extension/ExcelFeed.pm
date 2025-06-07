@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ExcelFeed;
 
-our $VERSION = '0.11';
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -19,10 +19,7 @@ inline HTML reports.
 
 =head1 RT VERSION
 
-Works with RT 4.4.5, 5.0.2
-
-Updates are made in version 0.07 for compatibility with RT 4.4.5 and 5.0.2.
-To run with earlier versions of RT, use version 0.06.
+Works with RT 6.0. For RT 5.0 install the latest 0.* version.
 
 =head1 INSTALLATION
 
@@ -36,13 +33,13 @@ To run with earlier versions of RT, use version 0.06.
 
 May need root permissions
 
-=item Add this line to F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Add this line to F</opt/rt6/etc/RT_SiteConfig.pm>
 
     Plugin('RT::Extension::ExcelFeed');
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -62,6 +59,26 @@ RT_SiteConfig.pm:
 
 =back
 
+=cut
+
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'ExcelFeed',
+        Content => [
+            {
+                Name => 'HideChartDownloadButton',
+                Help => 'https://metacpan.org/pod/RT::Extension::ExcelFeed#$HideChartDownloadButton',
+            },
+        ],
+        Meta    => {
+            HideChartDownloadButton => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+        }
+    );
+}
+
 =head1 AUTHOR
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
@@ -78,7 +95,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2015-2024 by Best Practical Solutions, LLC
+This software is Copyright (c) 2015-2025 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

@@ -11,7 +11,7 @@ our @LINK_ATTRIBUTES    = qw(MemberOf Parents Members Children
             HasMember RefersTo ReferredToBy DependsOn DependedOnBy);
 our @WATCHER_ATTRIBUTES = qw(Requestor Cc AdminCc);
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ RT::Extension::CommandByMail - Change ticket metadata via email
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4, 5.0
+Works with RT 4.4, 5.0, 6.0
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ C<$CommandByMailErrorOnUnknown> under "Configuration" for more information.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -203,11 +203,13 @@ value.
 
 =head3 Watchers
 
-Manage watchers: requestors, ccs and admin ccs. This commands
+Manage watchers: requestors, ccs and admin ccs. These commands
 can be used several times and/or with C<Add> and C<Del> prefixes,
 for example C<Requestor> comand set requestor(s) and the current
 requestors would be deleted, but C<AddRequestor> command adds
 to the current list.
+For groups, you must prefix the group name with C<group:>. For example,
+C<AddAdminCc: group:MyGroupname>.
 
     Requestor: <address> Set requestor(s) using the email address
     AddRequestor: <address> Add new requestor using the email address
@@ -218,6 +220,22 @@ to the current list.
     AdminCc: <address> Set AdminCc watcher(s) using the email address
     AddAdminCc: <address> Add new AdminCc watcher using the email address
     DelAdminCc: <address> Remove email address as AdminCc watcher
+
+=head3 Custom Roles
+
+Manage custom roles of the ticket.
+These commands can be used several times and/or with C<Add> and C<Del>
+prefixes. If you have a Custom Role called C<Customer> for example, you can
+pass the command C<CustomRole.{Customer}> to set the members of that role.
+You can pass either a username or an email address.
+For groups, you must prefix the group name with C<group:>. For example,
+C<CustomRole.{Customer}: group:MyGroupname>.
+
+        CustomRole.{Customer}: set the members of the Customer Custom Role
+        AddCustomRole.{Customer}: add members to the Customer Custom Role
+        DelCustomRole.{Customer}: remove members from the Customer Custom Role
+
+Replace C<Customer> with the name of your Custom Role.
 
 =head3 Links
 
@@ -420,6 +438,14 @@ sub ProcessCommands {
 
     my $transaction;
 
+    # Prepare Custom Roles. We will restrict also later to the ticket
+    # queue or to the creation queue according to the operation we are
+    # doing (create / update)
+    my $custom_roles = RT::CustomRoles->new( $args{'CurrentUser'} );
+    if ( RT::Handle::cmp_version($RT::VERSION, '5.0.4') >= 0 ) {
+        $custom_roles->LimitToLookupType( 'RT::Queue-RT::Ticket' );
+    }
+
     # If we're updating.
     if ( $args{'Ticket'}->id ) {
         $ticket_as_user->Load( $args{'Ticket'}->id );
@@ -462,23 +488,66 @@ sub ProcessCommands {
             $results{ $attribute }->{value} = $cmds{ lc $attribute };
         }
 
+
+        # Parses core WATCHERS and Custom Roles related commands
+        # First, add custom roles from this queue to the list of
+        # attributes we are going to parse
+        $custom_roles->LimitToObjectId( $queue->id );
+        my %custom_role_grouptype_to_name;
+        while ( my $custom_role = $custom_roles->Next ) {
+            $custom_role_grouptype_to_name{ $custom_role->GroupType }
+                = $custom_role->Name;
+            push @WATCHER_ATTRIBUTES, $custom_role->GroupType;
+        }
+        # Then, parse the commands
         foreach my $type ( @WATCHER_ATTRIBUTES ) {
-            my %tmp = _ParseAdditiveCommand( \%cmds, 1, $type );
+            my $command_suffix = $type;
+            $command_suffix = "CustomRole{". $custom_role_grouptype_to_name{ $type } ."}"
+                if $type =~ /^RT::CustomRole-/;
+            my %tmp = _ParseAdditiveCommand( \%cmds, 1, $command_suffix );
             next unless keys %tmp;
 
-            $tmp{'Default'} = [ do {
-                my $method = $type;
-                $method .= 's' if $type eq 'Requestor';
-                $args{'Ticket'}->$method->MemberEmailAddresses;
-            } ];
+            # Convert values to ID so we can better compare with the existing
+            # values when we are updating
+            # %tmp can be originally something like
+            #   ( 'Add' => [ 'user1@example.com', 'group:group1', 'nonexistantuser@example.com' ] )
+            # after _ParseAdditiveCommand, found objects will be converted to
+            # PrincipalId's, so it will be turned into something like the following:
+            #   ( 'Add' => [ 1, 2, 'nonexistantuser@example' ] )
+            _ReplaceUserAndGroupById( \%tmp );
+
+            my $role_group;
+            if ( $type eq 'Requestor' )
+            {
+                $role_group = $ticket_as_user->Requestors;
+            }
+            elsif ( $type =~ /^RT::CustomRole-/ )
+            {
+                $role_group = $ticket_as_user->RoleGroup($type);
+            }
+            else
+            {
+                # AdminCc, Cc
+                $role_group = $ticket_as_user->$type;
+            }
+
+            my $members = $role_group->MembersObj( Recursively => 0 );
+
+            my @res;
+            while ( my $member = $members->Next ) {
+                push @res, $member->MemberId;
+            }
+
+            $tmp{'Default'} = [ @res ];
             my ($add, $del) = _CompileAdditiveForUpdate( %tmp );
+
             foreach my $text ( @$del ) {
-                my $user = RT::User->new($RT::SystemUser);
-                $user->LoadByEmail($text) if $text =~ /\@/;
-                $user->Load($text) unless $user->id;
+                # if we are removing a watcher, it is already has a user
+                # in the system, so emails will not be useful here
+                next if $text =~ /\@/;
                 my ( $val, $msg ) = $ticket_as_user->DeleteWatcher(
                     Type  => $type,
-                    PrincipalId => $user->PrincipalId,
+                    PrincipalId => $text,
                 );
                 push @{ $results{ 'Del'. $type } }, {
                     value   => $text,
@@ -487,15 +556,9 @@ sub ProcessCommands {
                 };
             }
             foreach my $text ( @$add ) {
-                my $user = RT::User->new($RT::SystemUser);
-                $user->LoadByEmail($text) if $text =~ /\@/;
-                $user->Load($text) unless $user->id;
                 my ( $val, $msg ) = $ticket_as_user->AddWatcher(
                     Type  => $type,
-                    $user->id
-                        ? (PrincipalId => $user->PrincipalId)
-                        : (Email => $text)
-                    ,
+                    $text =~ /\D/ ? (Email => $text) : (PrincipalId => $text),
                 );
                 push @{ $results{ 'Add'. $type } }, {
                     value   => $text,
@@ -681,6 +744,14 @@ sub ProcessCommands {
             $create_args{ 'CustomField-' . $cf->id } = [ _CompileAdditiveForCreate(%tmp) ];
         }
 
+        # Canonicalize custom roles
+        $custom_roles->LimitToObjectId( $queue->id );
+        while ( my $custom_role = $custom_roles->Next ) {
+            my %tmp = _ParseAdditiveCommand( \%cmds, 0, "CustomRole{". $custom_role->Name ."}" );
+            next unless keys %tmp;
+            $create_args{ $custom_role->GroupType } = [ _CompileAdditiveForCreate(%tmp) ];
+        }
+
         # Canonicalize watchers
         # First of all fetch default values
         foreach my $type ( @WATCHER_ATTRIBUTES ) {
@@ -769,6 +840,48 @@ sub ProcessCommands {
     return { CurrentUser => $args{'CurrentUser'},
              AuthLevel   => -2,
              Transaction => $transaction };
+}
+
+sub _ReplaceUserAndGroupById {
+    my $cmds = shift;
+
+    foreach my $key (keys %$cmds) {
+        my @values = @{ $cmds->{$key} };
+        next unless @values;
+
+        my @new_values;
+        # Check each value and see if it can be a user or a group
+        foreach my $value (@values) {
+            if ($value =~ /^group\:(.*)/) {
+                my $group_name = $1;
+                $group_name =~ s/^\s+|\s+$//g;
+
+                my $group = RT::Group->new(RT->SystemUser);
+                $group->LoadUserDefinedGroup($group_name);
+                if ($group->id) {
+                    push @new_values, $group->id;
+                    next;
+                } else {
+                    RT->Logger->error("Group '$1' not found");
+                    next;
+                }
+            }
+            my $user = RT::User->new(RT->SystemUser);
+            $user->LoadByEmail($value) if $value =~ /\@/;
+            $user->Load($value) unless $user->id;
+            if ($user->id) {
+                push @new_values, $user->id;
+                next;
+            } else {
+                RT->Logger->warning("User '$value' not found");
+                next unless $value =~ /\@/;
+            }
+            # If no user or group found, keep the original value in case
+            # it contains an email address
+            push @new_values, $value;
+        }
+        $cmds->{$key} = \@new_values;
+    }
 }
 
 sub _ParseAdditiveCommand {
@@ -871,6 +984,10 @@ sub _CanonicalizeCommand {
     # CustomField commands
     $key =~ s/^(add|del|)c(?:ustom)?-?f(?:ield)?\.?[({\[](.*)[)}\]]$/$1customfield{$2}/i;
     $key =~ s/^(?:transaction|txn)c(?:ustom)?-?f(?:ield)?\.?[({\[](.*)[)}\]]$/transactioncustomfield{$1}/i;
+
+    # CustomRole commands
+    $key =~ s/^(add|del|)c(?:ustom)?-?r(?:ole)?\.?[({\[](.*)[)}\]]$/$1customrole{$2}/i;
+
     return $key;
 }
 
@@ -878,6 +995,7 @@ sub _CheckCommand {
     my ($cmd, $val) = (lc shift, shift);
     return 1 if $cmd =~ /^(add|del|)customfield\{.*\}$/i;
     return 1 if $cmd =~ /^transactioncustomfield\{.*\}$/i;
+    return 1 if $cmd =~ /^(add|del|)customrole\{.*\}$/i;
     if ( grep $cmd eq lc $_, @REGULAR_ATTRIBUTES, @TIME_ATTRIBUTES, @DATE_ATTRIBUTES ) {
         return 1 unless ref $val;
         return (0, "Command '$cmd' doesn't support multiple values");
@@ -960,6 +1078,48 @@ sub ParseCcAddressesFromHead {
         qw(To Cc);
 }
 
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'CommandByMail',
+        Content => [
+            {
+                Name => 'CommandByMailGroup',
+                Help => 'https://metacpan.org/pod/RT::Extension::CommandByMail#$CommandByMailGroup',
+            },
+            {
+                Name => 'CommandByMailHeader',
+                Help => 'https://metacpan.org/pod/RT::Extension::CommandByMail#$CommandByMailHeader',
+            },
+            {
+                Name => 'CommandByMailOnlyHeaders',
+                Help => 'https://metacpan.org/pod/RT::Extension::CommandByMail#$CommandByMailOnlyHeaders',
+            },
+            {
+                Name => 'CommandByMailErrorOnUnknown',
+                Help => 'https://metacpan.org/pod/RT::Extension::CommandByMail#$CommandByMailErrorOnUnknown',
+            },
+        ],
+        Meta    => {
+            CommandByMailGroup => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/String',
+            },
+            CommandByMailHeader => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/String',
+            },
+            CommandByMailOnlyHeaders => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+            CommandByMailErrorOnUnknown => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Boolean',
+            },
+        }
+    );
+}
+
 1;
 __END__
 
@@ -979,7 +1139,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2020 by Best Practical Solutions
+This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
 This is free software, licensed under:
 

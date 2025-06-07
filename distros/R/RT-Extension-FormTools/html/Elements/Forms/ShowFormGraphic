@@ -1,4 +1,4 @@
-<div class="formtools-form-graphic w-50 mt-2 mb-2 ml-auto mr-auto">
+<div class="formtools-form-graphic w-50 mt-2 mb-2 ms-auto me-auto">
 % if ( $has_icon ) {
 <& /Elements/Forms/ShowFormIcon, FormID => $FormObj->Id &>
 % } else {

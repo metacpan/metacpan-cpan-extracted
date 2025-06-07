@@ -2,7 +2,7 @@ package RT::Extension::AutomaticAssignment;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '2.00';
 
 RT->AddStyleSheets("automatic-assignment.css");
 RT->AddJavaScript("automatic-assignment.js");
@@ -200,7 +200,7 @@ sub _ScripsForQueue {
     my $queue = shift;
 
     my $scrips = RT::Scrips->new($queue->CurrentUser);
-    $scrips->LimitToQueue($queue->Id);
+    $scrips->LimitToObjectId($queue->Id);
     $scrips->LimitToGlobal;
     my $scripactions = $scrips->Join(
         ALIAS1 => 'main',
@@ -238,10 +238,11 @@ sub OwnerForTicket {
 
 RT-Extension-AutomaticAssignment - automatically assign tickets based on rules
 
-=head1 INSTALLATION
+=head1 RT VERSION
 
-RT-Extension-AutomaticAssignment 1.* versions require RT 5.0 or later.
-Use 0.* versions if you are still using RT 4.
+Works with RT 6.0. For RT 5.0 install the latest 1.* version.
+
+=head1 INSTALLATION
 
 =over
 
@@ -263,7 +264,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your /opt/rt5/etc/RT_SiteConfig.pm
+=item Edit your /opt/rt6/etc/RT_SiteConfig.pm
 
 Add this line:
 
@@ -276,7 +277,7 @@ filter, which exposes the RT's SLA business hours as custom field values:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -342,7 +343,7 @@ or via the web at
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2016-2020 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2016-2025 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

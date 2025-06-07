@@ -1,27 +1,4 @@
 <%init>
-
-if ( Menu->child('admin')
-    && $session{'CurrentUser'}->HasRight( Object => RT->System, Right => 'AdminForm' ) )
-{
-    my $formtools = Menu->child('admin')->child(
-        formtools => title => loc('FormTools'),
-        path      => '/Admin/FormTools/',
-    );
-
-    $formtools->child( select => title => loc('Select'), path => '/Admin/FormTools/' );
-    $formtools->child( create => title => loc('Create'), path => '/Admin/FormTools/Create.html' );
-
-    if ( RT->Config->Get('FormToolsEnableGroups') ) {
-        my $formtool_groups = $formtools->child(
-            formtools => title => loc('Groups'),
-            path      => '/Admin/FormTools/Groups/',
-        );
-
-        $formtool_groups->child( select => title => loc('Select'), path => '/Admin/FormTools/Groups/' );
-        $formtool_groups->child( create => title => loc('Create'), path => '/Admin/FormTools/Groups/Create.html' );
-    }
-}
-
 if ( $m->request_path =~ m{^/Admin/FormTools/Groups/} ) {
     my $page = PageMenu();
     if ( $HTML::Mason::Commands::m->request_args->{'id'} && $HTML::Mason::Commands::m->request_args->{'id'} =~ /^\d+$/ ) {
@@ -75,13 +52,6 @@ elsif ( $m->request_path =~ m{^/Admin/FormTools/} ) {
         $page->child( 'user-rights' => title => loc('User Rights'), path => "/Admin/FormTools/UserRights.html?id=" . $id );
     }
 }
-
-# Forms home page for all privileged users
-my $formtools = Menu->child('home')->child(
-    formtools => title => loc('Forms'),
-    path      => '/Forms.html',
-);
-
 </%init>
 <%args>
 $Path

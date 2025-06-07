@@ -14,9 +14,7 @@ BEGIN { use_ok('Object::Configure') }
 
 	sub new {
 		my ($class, %args) = @_;
-		my $self = Object::Configure::configure($class, \%args);
-		bless $self, $class;
-		return $self;
+		return bless Object::Configure::configure($class, \%args), $class;
 	}
 }
 

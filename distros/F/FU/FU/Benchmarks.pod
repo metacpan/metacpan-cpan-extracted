@@ -30,7 +30,7 @@ The following module versions were used:
 
 =item L<DBD::Pg> 3.18.0
 
-=item L<FU> 1.0
+=item L<FU> 1.1
 
 =item L<HTML::Tiny> 1.08
 
@@ -71,7 +71,7 @@ API object from L<JSON::XS> documentation.
   Cpanel::JSON::XS    114802/s    104141/s    107274/s
         JSON::SIMD    130137/s    118948/s    115123/s
           JSON::XS    128421/s    120243/s    117940/s
-          FU::Util    132890/s    111630/s    121124/s
+          FU::Util    132067/s    111328/s    117781/s
 
 Object (small)
 
@@ -81,7 +81,7 @@ Object (small)
   Cpanel::JSON::XS     45732/s     30862/s     20102/s
         JSON::SIMD     49019/s     30699/s     23267/s
           JSON::XS     49814/s     31326/s     25336/s
-          FU::Util     43853/s     26568/s     20426/s
+          FU::Util     39684/s     24971/s     17998/s
 
 Object (large)
 
@@ -91,7 +91,7 @@ Object (large)
   Cpanel::JSON::XS     30587/s     11875/s     15515/s
         JSON::SIMD     24418/s     12388/s     22895/s
           JSON::XS     23192/s     13174/s     23553/s
-          FU::Util     36455/s     11920/s     17370/s
+          FU::Util     35489/s     13247/s     16571/s
 
 Object (large, mixed unicode)
 
@@ -101,7 +101,7 @@ Object (large, mixed unicode)
   Cpanel::JSON::XS     25333/s      1459/s      7480/s
         JSON::SIMD     25031/s      1331/s     15997/s
           JSON::XS     23580/s      1375/s      8526/s
-          FU::Util     33085/s     12639/s      9375/s
+          FU::Util     32519/s     12488/s      9290/s
 
 Small integers
 
@@ -111,7 +111,7 @@ Small integers
   Cpanel::JSON::XS      7345/s      6151/s
         JSON::SIMD      7963/s      4361/s
           JSON::XS      7915/s      6058/s
-          FU::Util      7883/s      5671/s
+          FU::Util      7851/s      5828/s
 
 Large integers
 
@@ -121,7 +121,7 @@ Large integers
   Cpanel::JSON::XS     32545/s     50162/s
         JSON::SIMD     37201/s     51719/s
           JSON::XS     36722/s     50110/s
-          FU::Util    110210/s     61006/s
+          FU::Util    109163/s     63176/s
 
 ASCII strings
 
@@ -131,7 +131,7 @@ ASCII strings
   Cpanel::JSON::XS    116721/s     44560/s
         JSON::SIMD    134711/s     50429/s
           JSON::XS    135419/s     43976/s
-          FU::Util    164804/s     48163/s
+          FU::Util    162246/s     44216/s
 
 Unicode strings
 
@@ -141,7 +141,7 @@ Unicode strings
   Cpanel::JSON::XS     97039/s     67669/s
         JSON::SIMD    106928/s    102440/s
           JSON::XS    105473/s     60558/s
-          FU::Util    187489/s     61121/s
+          FU::Util    201648/s     57397/s
 
 String escaping (few)
 
@@ -151,17 +151,17 @@ String escaping (few)
   Cpanel::JSON::XS    136755/s    118059/s
         JSON::SIMD    158171/s    153692/s
           JSON::XS    157261/s     97676/s
-          FU::Util    216443/s     96354/s
+          FU::Util    225259/s     92515/s
 
 String escaping (many)
 
                         Encode      Decode
-          JSON::PP      2224/s       366/s
-        JSON::Tiny      2884/s       984/s
-  Cpanel::JSON::XS    140220/s    107040/s
-        JSON::SIMD    152951/s    113242/s
-          JSON::XS    153471/s    106269/s
-          FU::Util    153081/s    100279/s
+          JSON::PP      3963/s       561/s
+        JSON::Tiny      4463/s      2175/s
+  Cpanel::JSON::XS    197154/s    133102/s
+        JSON::SIMD    199955/s    152557/s
+          JSON::XS    231905/s    125191/s
+          FU::Util    215367/s    118073/s
 
 
 
@@ -176,7 +176,7 @@ HTML fragment
          TUWF::XML       795/s
        XML::Writer       833/s
         HTML::Tiny       423/s
-     FU::XMLWriter      5396/s
+     FU::XMLWriter      5327/s
 
 
 
@@ -191,8 +191,8 @@ Fetch and bitwise-or 20k integers
                       Smallint      Bigint
            DBD::Pg       194/s        22/s
             Pg::PQ       226/s        19/s
-      FU::Pg (bin)       239/s        23/s
-     FU::Pg (text)       222/s        21/s
+      FU::Pg (bin)       245/s        22/s
+     FU::Pg (text)       217/s        20/s
 
 
 
@@ -200,154 +200,154 @@ Fetch and bitwise-or 20k integers
 
 # Cached data used by bench.PL. Same as the formatted tables above but easier to parse.
 json/api	Canonical	Cpanel::JSON::XS	104141
-json/api	Canonical	FU::Util	111630
+json/api	Canonical	FU::Util	111328
 json/api	Canonical	JSON::PP	5119
 json/api	Canonical	JSON::SIMD	118948
 json/api	Canonical	JSON::XS	120243
 json/api	Decode	Cpanel::JSON::XS	107274
-json/api	Decode	FU::Util	121124
+json/api	Decode	FU::Util	117781
 json/api	Decode	JSON::PP	1290
 json/api	Decode	JSON::SIMD	115123
 json/api	Decode	JSON::Tiny	3426
 json/api	Decode	JSON::XS	117940
 json/api	Encode	Cpanel::JSON::XS	114802
-json/api	Encode	FU::Util	132890
+json/api	Encode	FU::Util	132067
 json/api	Encode	JSON::PP	5312
 json/api	Encode	JSON::SIMD	130137
 json/api	Encode	JSON::Tiny	7757
 json/api	Encode	JSON::XS	128421
 json/intl	Decode	Cpanel::JSON::XS	50162
-json/intl	Decode	FU::Util	61006
+json/intl	Decode	FU::Util	63176
 json/intl	Decode	JSON::PP	329
 json/intl	Decode	JSON::SIMD	51719
 json/intl	Decode	JSON::Tiny	1638
 json/intl	Decode	JSON::XS	50110
 json/intl	Encode	Cpanel::JSON::XS	32545
-json/intl	Encode	FU::Util	110210
+json/intl	Encode	FU::Util	109163
 json/intl	Encode	JSON::PP	2176
 json/intl	Encode	JSON::SIMD	37201
 json/intl	Encode	JSON::Tiny	2999
 json/intl	Encode	JSON::XS	36722
 json/ints	Decode	Cpanel::JSON::XS	6151
-json/ints	Decode	FU::Util	5671
+json/ints	Decode	FU::Util	5828
 json/ints	Decode	JSON::PP	29
 json/ints	Decode	JSON::SIMD	4361
 json/ints	Decode	JSON::Tiny	86
 json/ints	Decode	JSON::XS	6058
 json/ints	Encode	Cpanel::JSON::XS	7345
-json/ints	Encode	FU::Util	7883
+json/ints	Encode	FU::Util	7851
 json/ints	Encode	JSON::PP	113
 json/ints	Encode	JSON::SIMD	7963
 json/ints	Encode	JSON::Tiny	160
 json/ints	Encode	JSON::XS	7915
 json/objl	Canonical	Cpanel::JSON::XS	11875
-json/objl	Canonical	FU::Util	11920
+json/objl	Canonical	FU::Util	13247
 json/objl	Canonical	JSON::PP	747
 json/objl	Canonical	JSON::SIMD	12388
 json/objl	Canonical	JSON::XS	13174
 json/objl	Decode	Cpanel::JSON::XS	15515
-json/objl	Decode	FU::Util	17370
+json/objl	Decode	FU::Util	16571
 json/objl	Decode	JSON::PP	104
 json/objl	Decode	JSON::SIMD	22895
 json/objl	Decode	JSON::Tiny	392
 json/objl	Decode	JSON::XS	23553
 json/objl	Encode	Cpanel::JSON::XS	30587
-json/objl	Encode	FU::Util	36455
+json/objl	Encode	FU::Util	35489
 json/objl	Encode	JSON::PP	927
 json/objl	Encode	JSON::SIMD	24418
 json/objl	Encode	JSON::Tiny	1108
 json/objl	Encode	JSON::XS	23192
 json/objs	Canonical	Cpanel::JSON::XS	30862
-json/objs	Canonical	FU::Util	26568
+json/objs	Canonical	FU::Util	24971
 json/objs	Canonical	JSON::PP	829
 json/objs	Canonical	JSON::SIMD	30699
 json/objs	Canonical	JSON::XS	31326
 json/objs	Decode	Cpanel::JSON::XS	20102
-json/objs	Decode	FU::Util	20426
+json/objs	Decode	FU::Util	17998
 json/objs	Decode	JSON::PP	202
 json/objs	Decode	JSON::SIMD	23267
 json/objs	Decode	JSON::Tiny	499
 json/objs	Decode	JSON::XS	25336
 json/objs	Encode	Cpanel::JSON::XS	45732
-json/objs	Encode	FU::Util	43853
+json/objs	Encode	FU::Util	39684
 json/objs	Encode	JSON::PP	907
 json/objs	Encode	JSON::SIMD	49019
 json/objs	Encode	JSON::Tiny	1224
 json/objs	Encode	JSON::XS	49814
 json/obju	Canonical	Cpanel::JSON::XS	1459
-json/obju	Canonical	FU::Util	12639
+json/obju	Canonical	FU::Util	12488
 json/obju	Canonical	JSON::PP	679
 json/obju	Canonical	JSON::SIMD	1331
 json/obju	Canonical	JSON::XS	1375
 json/obju	Decode	Cpanel::JSON::XS	7480
-json/obju	Decode	FU::Util	9375
+json/obju	Decode	FU::Util	9290
 json/obju	Decode	JSON::PP	86
 json/obju	Decode	JSON::SIMD	15997
 json/obju	Decode	JSON::Tiny	402
 json/obju	Decode	JSON::XS	8526
 json/obju	Encode	Cpanel::JSON::XS	25333
-json/obju	Encode	FU::Util	33085
+json/obju	Encode	FU::Util	32519
 json/obju	Encode	JSON::PP	817
 json/obju	Encode	JSON::SIMD	25031
 json/obju	Encode	JSON::Tiny	1036
 json/obju	Encode	JSON::XS	23580
-json/strel	Decode	Cpanel::JSON::XS	107040
-json/strel	Decode	FU::Util	100279
-json/strel	Decode	JSON::PP	366
-json/strel	Decode	JSON::SIMD	113242
-json/strel	Decode	JSON::Tiny	984
-json/strel	Decode	JSON::XS	106269
-json/strel	Encode	Cpanel::JSON::XS	140220
-json/strel	Encode	FU::Util	153081
-json/strel	Encode	JSON::PP	2224
-json/strel	Encode	JSON::SIMD	152951
-json/strel	Encode	JSON::Tiny	2884
-json/strel	Encode	JSON::XS	153471
+json/strel	Decode	Cpanel::JSON::XS	133102
+json/strel	Decode	FU::Util	118073
+json/strel	Decode	JSON::PP	561
+json/strel	Decode	JSON::SIMD	152557
+json/strel	Decode	JSON::Tiny	2175
+json/strel	Decode	JSON::XS	125191
+json/strel	Encode	Cpanel::JSON::XS	197154
+json/strel	Encode	FU::Util	215367
+json/strel	Encode	JSON::PP	3963
+json/strel	Encode	JSON::SIMD	199955
+json/strel	Encode	JSON::Tiny	4463
+json/strel	Encode	JSON::XS	231905
 json/stres	Decode	Cpanel::JSON::XS	118059
-json/stres	Decode	FU::Util	96354
+json/stres	Decode	FU::Util	92515
 json/stres	Decode	JSON::PP	352
 json/stres	Decode	JSON::SIMD	153692
 json/stres	Decode	JSON::Tiny	1869
 json/stres	Decode	JSON::XS	97676
 json/stres	Encode	Cpanel::JSON::XS	136755
-json/stres	Encode	FU::Util	216443
+json/stres	Encode	FU::Util	225259
 json/stres	Encode	JSON::PP	4251
 json/stres	Encode	JSON::SIMD	158171
 json/stres	Encode	JSON::Tiny	4704
 json/stres	Encode	JSON::XS	157261
 json/strs	Decode	Cpanel::JSON::XS	44560
-json/strs	Decode	FU::Util	48163
+json/strs	Decode	FU::Util	44216
 json/strs	Decode	JSON::PP	336
 json/strs	Decode	JSON::SIMD	50429
 json/strs	Decode	JSON::Tiny	1439
 json/strs	Decode	JSON::XS	43976
 json/strs	Encode	Cpanel::JSON::XS	116721
-json/strs	Encode	FU::Util	164804
+json/strs	Encode	FU::Util	162246
 json/strs	Encode	JSON::PP	2934
 json/strs	Encode	JSON::SIMD	134711
 json/strs	Encode	JSON::Tiny	4126
 json/strs	Encode	JSON::XS	135419
 json/stru	Decode	Cpanel::JSON::XS	67669
-json/stru	Decode	FU::Util	61121
+json/stru	Decode	FU::Util	57397
 json/stru	Decode	JSON::PP	253
 json/stru	Decode	JSON::SIMD	102440
 json/stru	Decode	JSON::Tiny	2585
 json/stru	Decode	JSON::XS	60558
 json/stru	Encode	Cpanel::JSON::XS	97039
-json/stru	Encode	FU::Util	187489
+json/stru	Encode	FU::Util	201648
 json/stru	Encode	JSON::PP	5113
 json/stru	Encode	JSON::SIMD	106928
 json/stru	Encode	JSON::Tiny	6603
 json/stru	Encode	JSON::XS	105473
 pg/ints	Bigint	DBD::Pg	22
-pg/ints	Bigint	FU::Pg (bin)	23
-pg/ints	Bigint	FU::Pg (text)	21
+pg/ints	Bigint	FU::Pg (bin)	22
+pg/ints	Bigint	FU::Pg (text)	20
 pg/ints	Bigint	Pg::PQ	19
 pg/ints	Smallint	DBD::Pg	194
-pg/ints	Smallint	FU::Pg (bin)	239
-pg/ints	Smallint	FU::Pg (text)	222
+pg/ints	Smallint	FU::Pg (bin)	245
+pg/ints	Smallint	FU::Pg (text)	217
 pg/ints	Smallint	Pg::PQ	226
-xml/a	Rate	FU::XMLWriter	5396
+xml/a	Rate	FU::XMLWriter	5327
 xml/a	Rate	HTML::Tiny	423
 xml/a	Rate	TUWF::XML	795
 xml/a	Rate	XML::Writer	833

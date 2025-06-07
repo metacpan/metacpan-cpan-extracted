@@ -36,3 +36,11 @@
 form.automatic-assignment textarea {
     font-family: monospace;
 }
+
+.automatic-assignment li {
+    list-style:none;
+}
+
+.automatic-assignment .destination ul {
+    padding-left:0px;
+}

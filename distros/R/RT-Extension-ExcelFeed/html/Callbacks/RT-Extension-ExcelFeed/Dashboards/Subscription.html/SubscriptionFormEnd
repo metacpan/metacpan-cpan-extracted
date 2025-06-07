@@ -1,21 +1,10 @@
-% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0 ) {
-<tr><td class="label">
-<&|/l&>Microsoft Excel Attachment</&>:
-</td><td class="value">
-<input type="checkbox" id="MSExcel" name="MSExcel" value="selected" <% $FieldsRef->{'MSExcel'} eq 'selected' ? 'checked="checked"' : "" |n %>></input>
-<label for="MSExcel"><&|/l&>Send reports as attached Microsoft Excel (.xlsx) files</&></label>
-</td></tr>
-% } else {
-<div class="form-row">
-  <div class="col-3 label"></div>
-  <div class="col-9 value">
-    <div class="custom-control custom-checkbox">
-      <input type="checkbox" id="MSExcel" name="MSExcel" class="custom-control-input" value="selected" <% $FieldsRef->{'MSExcel'} ? 'checked="checked"' : "" |n %>>
-      <label class="custom-control-label" for="MSExcel"><&|/l&>Send reports as attached Microsoft Excel (.xlsx) files</&></label>
-    </div>
+<&| /Elements/LabeledValue, Label => '' &>
+  <div class="form-check">
+    <input type="checkbox" id="MSExcel" name="MSExcel" class="form-check-input" value="selected" <% $FieldsRef->{'MSExcel'} ? 'checked="checked"' : "" |n %>>
+    <label class="form-check-input-label" for="MSExcel"><&|/l&>Send reports as attached Microsoft Excel (.xlsx) files</&></label>
   </div>
-</div>
-% }
+</&>
+
 <%ARGS>
 $FieldsRef
 $SubscriptionObj

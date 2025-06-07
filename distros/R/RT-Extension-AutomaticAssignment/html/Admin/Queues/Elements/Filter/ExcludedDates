@@ -2,33 +2,23 @@
 <p><&|/l&>This filter selects eligible owners by datetime custom fields on users, meant for scheduled vacations. If the current date and time falls between the following two custom fields, the user will be excluded from automatic assignment.</&></p>
 
 % if ($user_cfs->Count) {
-<div class="form-row">
-  <div class="col-3 label">
-    <&|/l&>Begin Custom Field</&>:
-  </div>
-  <div class="col-9 value">
-    <select id="<% $prefix %>_begin" name="<% $prefix %>_begin" class="selectpicker form-control">
+  <&| /Elements/LabeledValue, Label => loc('Begin Custom Field') &>
+    <select id="<% $prefix %>_begin" name="<% $prefix %>_begin" class="selectpicker form-select">
       <option value="">-</option>
 %   while (my $cf = $user_cfs->Next) {
       <option <% ($config->{begin}||0) == $cf->Id ? "selected" : "" %> value="<% $cf->Id %>"><% $cf->Name %></option>
 %   }
     </select>
-  </div>
-</div>
+  </&>
 
-<div class="form-row">
-  <div class="col-3 label">
-    <&|/l&>End Custom Field</&>:
-  </div>
-  <div class="col-9 value">
-    <select id="<% $prefix %>_end" name="<% $prefix %>_end" class="selectpicker form-control">
+  <&| /Elements/LabeledValue, Label => loc('End Custom Field') &>
+    <select id="<% $prefix %>_end" name="<% $prefix %>_end" class="selectpicker form-select">
       <option value="">-</option>
 %   while (my $cf = $user_cfs->Next) {
       <option <% ($config->{end}||0) == $cf->Id ? "selected" : "" %> value="<% $cf->Id %>"><% $cf->Name %></option>
 %   }
     </select>
-  </div>
-</div>
+  </&>
 % } else {
 <p><&|/l&>No user custom fields found.</&></p>
 % }

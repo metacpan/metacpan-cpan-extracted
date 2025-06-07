@@ -1,7 +1,7 @@
 use lib '.';
 use inc::Module::Install;
-RTx('RT-Extension-FormTools');
-requires_rt('5.0.5');
+RTx( 'RT-Extension-FormTools', { remove_files => 1 } );
+requires_rt('6.0.0');
 
 repository('https://github.com/bestpractical/rt-extension-formtools');
 

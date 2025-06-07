@@ -6,7 +6,7 @@
   <input type="hidden" class="hidden" name="id" value="<% $form_group_attribute->id %>" />
 
   <& /Admin/Elements/EditRights, Context => $form_group_attribute, Principals => \@principals &>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-12">
       <& /Elements/Submit, Label => loc('Save Changes') &>
     </div>

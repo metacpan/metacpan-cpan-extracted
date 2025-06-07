@@ -2,7 +2,7 @@ NAME
     RT::Extension::CommandByMail - Change ticket metadata via email
 
 RT VERSION
-    Works with RT 4.0, 4.2, 4.4, 5.0
+    Works with RT 4.4, 5.0, 6.0
 
 SYNOPSIS
         (Send email with content that looks like the following.)
@@ -29,7 +29,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::CommandByMail');
@@ -154,10 +154,12 @@ DESCRIPTION
         TimeLeft: <minutes>
 
    Watchers
-    Manage watchers: requestors, ccs and admin ccs. This commands can be
+    Manage watchers: requestors, ccs and admin ccs. These commands can be
     used several times and/or with Add and Del prefixes, for example
     Requestor comand set requestor(s) and the current requestors would be
-    deleted, but AddRequestor command adds to the current list.
+    deleted, but AddRequestor command adds to the current list. For groups,
+    you must prefix the group name with group:. For example, AddAdminCc:
+    group:MyGroupname.
 
         Requestor: <address> Set requestor(s) using the email address
         AddRequestor: <address> Add new requestor using the email address
@@ -168,6 +170,20 @@ DESCRIPTION
         AdminCc: <address> Set AdminCc watcher(s) using the email address
         AddAdminCc: <address> Add new AdminCc watcher using the email address
         DelAdminCc: <address> Remove email address as AdminCc watcher
+
+   Custom Roles
+    Manage custom roles of the ticket. These commands can be used several
+    times and/or with Add and Del prefixes. If you have a Custom Role called
+    Customer for example, you can pass the command CustomRole.{Customer} to
+    set the members of that role. You can pass either a username or an email
+    address. For groups, you must prefix the group name with group:. For
+    example, CustomRole.{Customer}: group:MyGroupname.
+
+            CustomRole.{Customer}: set the members of the Customer Custom Role
+            AddCustomRole.{Customer}: add members to the Customer Custom Role
+            DelCustomRole.{Customer}: remove members from the Customer Custom Role
+
+    Replace Customer with the name of your Custom Role.
 
    Links
     Manage links. These commands are also could be used several times in one
@@ -242,7 +258,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-CommandByMail>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2020 by Best Practical Solutions
+    This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
     This is free software, licensed under:
 

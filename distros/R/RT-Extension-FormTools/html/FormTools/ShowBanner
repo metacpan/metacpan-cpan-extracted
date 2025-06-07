@@ -1,5 +1,5 @@
 % if ( $banner_message ) {
-<div class=" form-row">
+<div class=" row mt-2">
     <p><% $banner_message |n %></p>
     <hr class="w-100" />
 </div>

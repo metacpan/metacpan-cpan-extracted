@@ -1,0 +1,19 @@
+  <li id="li-admin-formtools-select">
+    <a id="admin-formtools-select" class="menu-item rounded dropdown-item" href="<% RT->Config->Get('WebPath') %>/Admin/FormTools/"><% loc('Select') %></a>
+  </li>
+  <li id="li-admin-formtools-create">
+    <a id="admin-formtools-create" class="menu-item rounded dropdown-item" href="<% RT->Config->Get('WebPath') %>/Admin/FormTools/Create.html"><% loc('Create') %></a>
+  </li>
+% if ( RT->Config->Get('FormToolsEnableGroups') ) {
+  <li id="li-admin-formtools-groups" class="has-children dropend">
+    <a id="admin-formtools-groups" class="menu-item rounded dropdown-item dropdown-toggle" href="<% RT->Config->Get('WebPath') %>/Admin/FormTools/Groups"><% loc('Groups') %></a>
+    <ul class="dropdown-menu">
+      <li id="li-admin-formtools-groups-select">
+        <a id="admin-formtools-groups-select" class="menu-item rounded dropdown-item" href="<% RT->Config->Get('WebPath') %>/Admin/FormTools/Groups/"><% loc('Select') %></a>
+      </li>
+      <li id="li-admin-formtools-groups-create">
+        <a id="admin-formtools-groups-create" class="menu-item rounded dropdown-item" href="<% RT->Config->Get('WebPath') %>/Admin/FormTools/Groups/Create.html"><% loc('Create') %></a>
+      </li>
+    </ul>
+  </li>
+% }

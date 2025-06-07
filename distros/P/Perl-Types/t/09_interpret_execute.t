@@ -9,7 +9,7 @@ BEGIN { $ENV{PERL_WARNINGS} = 0; }
 use strict;
 use warnings;
 use Perl::Types;
-our $VERSION = 0.011_000;
+our $VERSION = 0.012_000;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -28,7 +28,11 @@ use perltypessizes;
 
 # [[[ CONSTANTS ]]]
 # DEV NOTE: $Perl::INCLUDE_PATH is just 'lib' so it doesn't help us here,
-# that is the normal include path but we need the test include path 't/lib' so just hard-code it for now
+# that is the normal include path but we need the test include path 't/lib' so we have to hard-code it;
+# this serves as the default location for File::Find to search for the test files,
+# and can be overridden by passing a command-line argument into $ARGV[0], like so:
+# $ perl ./t/09_interpret_execute.t ./t/lib/Perl/Types/Test/
+# either PATH_TESTS() or $ARGV[0] must be defined and valid, in order to avoid the error "No such file or directory"
 use constant PATH_TESTS => my string $TYPED_PATH_TESTS = 't/lib/';
 Perl::diag('in 09_interpret_execute.t, CONSTANTS section, have PATH_TESTS() = \'' . PATH_TESTS() . '\'' . "\n");
 
@@ -49,13 +53,6 @@ BEGIN {
 #my integer $number_of_tests_run = 4;  # initialize to 4 for use_ok() calls in BEGIN block above
 
 my $test_files = {};    # string_hashref
-
-if (not defined $ARGV[0]) {
-    # File::Find changes directories while searching for files;
-    # user must provide command-line argument when running this test to avoid error "No such file or directory"
-    warn 'in 09_interpret_execute.t, NEED PASS COMMAND-LINE ARGUMENT of directory containing test files in order to avoid error \'No such file or directory\'' . "\n";
-    warn 'EXAMPLE: $ perl ./t/09_interpret_execute.t ./lib/Perl/Types/Test/' . "\n";
-}
 
 ## DEV NOTE: File::Find option form requires 'wanted' key for the callback
 find({

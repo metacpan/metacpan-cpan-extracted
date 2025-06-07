@@ -2,7 +2,7 @@
 <& /Elements/Tabs &>
 <& /Elements/ListActions, actions => \@results &>
 
-<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
+<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ms-auto me-auto' &>
   <p><&|/l&>Form groups are shown to users on a page in the RT Self Service interface. Below you can manage how the form group details will appear to end users.</&></p>
   <form name="EditFormGroupBannerMessage" action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Groups/Modify.html" method="post" enctype="multipart/form-data">
   <input type="hidden" class="hidden" name="id" value="<% $id %>" />
@@ -16,7 +16,7 @@
     <p><&|/l&>Upload an icon to be shown to users on the Form Groups page or select a color for the background of graphical box users can click.</&></p>
 % }
     <div class="row">
-      <div class="col ml-5 mr-5">
+      <div class="col ms-5 me-5">
         <div class="custom-file">
           <input type="file" name="FormGroupUploadIcon" class="custom-file-input" id="formtools-upload-icon" />
           <label class="custom-file-label" for="formtools-upload-icon"><&|/l&>Upload an icon for this form group</&></label>
@@ -25,7 +25,7 @@
     </div>
   </&>
   <&| /Elements/LabeledValue, Label => loc('Description') &>
-    <div class="form-row">
+    <div class="row mt-2">
       <div class="col-12">
         <input type="hidden" class="hidden" name="DescriptionType" value="text/html" />
         <textarea autocomplete="off" class="form-control messagebox richtext" cols="80" rows="10" name="Description"><% $ARGS{'Description'} || $form_group->{description} %></textarea>
@@ -33,20 +33,20 @@
     </div>
   </&>
   <&| /Elements/LabeledValue, Label => loc('Banner Message') &>
-    <div class="form-row">
+    <div class="row mt-2">
       <div class="col-12">
         <input type="hidden" class="hidden" name="BannerMessageType" value="text/html" />
         <textarea autocomplete="off" class="form-control messagebox richtext" cols="80" rows="10" name="BannerMessage"><% $ARGS{'BannerMessage'} || $form_group->{banner_message} %></textarea>
       </div>
     </div>
   </&>
-</&>
-<div class="form-row">
-  <div class="col-12">
-    <& /Elements/Submit, Label => loc('Save'), Name => 'SubmitModify' &>
+  <div class="row mt-2">
+    <div class="col-12">
+      <& /Elements/Submit, Label => loc('Save'), Name => 'SubmitModify' &>
+    </div>
   </div>
-</div>
-</form>
+  </form>
+</&>
 <%INIT>
 use Digest::MD5 'md5_hex';
 

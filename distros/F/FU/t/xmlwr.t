@@ -65,4 +65,21 @@ sub t {
 
 is fragment { t 'arg' }, '<div attr1="arg"><span>ab&quot; &lt; c &amp;&lt; d</span><span><ok🥳ay></span>🥳</div>';
 
+ok !eval { fragment { tag_ 'hi', \1 } };
+like $@, qr/Invalid attempt to output bare reference/;
+
+ok !eval { fragment { tag_ 'hi', {} } };
+like $@, qr/Invalid attempt to output bare reference/;
+
+is fragment { tag_ 'hi', bless {}, 'XTEST1' }, '<hi>string</hi>';
+like fragment { tag_ 'hi', bless {}, 'XTEST2' }, qr{<hi>HASH\(.*\)</hi>}; # Yeah, whatever.
+like fragment { tag_ 'hi', ''.{} }, qr{<hi>HASH\(.*\)</hi>};
+
 done_testing;
+
+
+package XTEST1;
+use overload '""' => sub { 'string' };
+
+package XTEST2;
+use overload '""' => sub { {} };

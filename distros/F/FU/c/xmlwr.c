@@ -27,6 +27,8 @@ static void fuxmlwr_destroy(pTHX_ fuxmlwr *wr) {
 
 
 static void fuxmlwr_escape(pTHX_ fuxmlwr *wr, SV *sv) {
+    if (SvROK(sv) && !SvAMAGIC(sv)) fu_confess("Invalid attempt to output bare reference");
+
     STRLEN len;
     const unsigned char *str = (unsigned char *)SvPV_const(sv, len);
     const unsigned char *tmp, *end = str + len;
@@ -96,7 +98,7 @@ static void fuxmlwr_tag(pTHX_ fuxmlwr *wr, I32 ax, I32 offset, I32 argc, int sel
         val = ST(offset);
         offset++;
 
-        // Don't even try to stringify other arguments; non-string keys are always a bug.
+        // Don't even try to stringify attribute names; non-string keys are always a bug.
         if (!SvPOK(key)) fu_confess("Non-string attribute");
         keys = SvPVX(key);
 

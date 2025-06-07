@@ -1,4 +1,5 @@
 <%INIT>
+RT::Interface::Web::RedirectBoostedRequest();
 use Excel::Writer::XLSX;
 
 

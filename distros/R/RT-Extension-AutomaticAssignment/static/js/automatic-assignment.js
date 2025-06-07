@@ -1,12 +1,17 @@
-jQuery(function () {
-    var form = jQuery("#automatic-assignment");
+htmx.onLoad(function (elt) {
+    var form = jQuery(elt).find("#automatic-assignment");
+    if (!form.length) {
+        return;
+    }
+
     var addFilterSelect = form.find('select[name=FilterType]');
     var filtersField = form.find('input[name=Filters]');
     var chooserField = form.find('input[name=Chooser]');
     var filterContainer = form.find('.filters');
     var chooserContainer = form.find('.chooser');
     var filterList = form.find('.filter-list');
-    var addFilterButton = form.find('input.button[name=AddFilter]');
+    var filterListUl = filterList.find('ul');
+    var addFilterButton = form.find('input[name=AddFilter]');
 
     var i = filterList.find('.sortable-box').length;
     var queueId = form.find('input[name=id]').val();
@@ -38,12 +43,12 @@ jQuery(function () {
                 url: RT.Config.WebHomePath + "/Helpers/AddFilter",
                 data: params,
                 success: function (html) {
-                    jQuery(html).prependTo(filterList).hide().slideDown();
+                    var newElements = jQuery(html).prependTo(filterListUl).hide().slideDown();
+                    RT.selectionBox.registerDrag(newElements[0]);
                     refreshFiltersField();
                     filterContainer.removeClass('adding');
                     addFilterSelect.val('').attr('disabled', false);
                     addFilterButton.attr('disabled', false);
-                    jQuery('.selectpicker').selectpicker('refresh');
                 },
                 error: function (xhr, reason) {
                     alert(reason);
@@ -55,31 +60,6 @@ jQuery(function () {
         }
     });
 
-    form.find('select[name=ChooserType]').change(function (e) {
-        e.preventDefault();
-        var chooserName = jQuery(this).val();
-        var params = {
-            Name: chooserName,
-            Queue: queueId
-        };
-
-        chooserContainer.addClass('replacing');
-        chooserContainer.find('.sortable-box :input').attr('disabled', true);
-
-        jQuery.ajax({
-            url: RT.Config.WebHomePath + "/Helpers/SelectChooser",
-            data: params,
-            success: function (html) {
-                chooserContainer.find('.sortable-box').replaceWith(html);
-                chooserContainer.removeClass('replacing');
-                chooserField.val('Chooser_' + chooserName);
-            },
-            error: function (xhr, reason) {
-                alert(reason);
-            }
-        });
-    });
-
     form.on('click', '.sortable-box .remove', function (e) {
         e.preventDefault();
         jQuery(this).closest('.sortable-box').slideUp(400, function () {
@@ -88,15 +68,17 @@ jQuery(function () {
         });
     });
 
-    filterList.sortable({
-        axis: 'y',
-        items: '.sortable-box',
-        containment: 'parent',
-        placeholder: 'sortable-placeholder',
-        forcePlaceholderSize: true,
-        update: function (event, ui) {
-            refreshFiltersField();
-        }
+    jQuery('.sortable-filter').each(function() {
+        RT.selectionBox.registerDrag(this);
     });
+
+    jQuery('.filter-list').each(function() {
+        RT.selectionBox.registerDrop(this);
+    });
+
+    jQuery('.filter-list').on('dragend', function() {
+       refreshFiltersField();
+    });
+
 });
 

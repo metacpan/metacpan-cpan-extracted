@@ -6,6 +6,7 @@ use warnings;
 use Carp;
 use Config::Abstraction 0.25;
 use Log::Abstraction 0.15;
+use Params::Get;
 
 =head1 NAME
 
@@ -13,11 +14,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 =head1 SYNOPSIS
 
@@ -29,7 +30,7 @@ runtime configurability without needing to rewrite or hardcode behaviours.
 The goal is to allow individual modules to enable or disable features on the fly, and to do it using whatever configuration system the user prefers.
 
 Although the initial aim was general configurability,
-the primary use case that’s emerged has been fine-grained logging control,
+the primary use case that's emerged has been fine-grained logging control,
 more flexible and easier to manage than what you'd typically do with L<Log::Log4perl>.
 For example,
 you might want one module to log verbosely while another stays quiet,
@@ -193,6 +194,24 @@ sub configure
 		$params->{'logger'}->{'array'} = $array;
 	}
 	return $params;
+}
+
+=head2 instantiate($class,...)
+
+Create and configure an object of the given class.
+This is a quick and dirty way of making third-party classes configurable at runtime.
+
+=cut
+
+sub instantiate
+{
+	my $params = Params::Get::get_params('class', @_);
+
+	my $class = $params->{'class'};
+
+	$params = configure($class, $params);
+
+	return bless $class->new($params), $class;
 }
 
 =head1 SEE ALSO

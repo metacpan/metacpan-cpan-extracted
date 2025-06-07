@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2024.12";
+$Acme::Glue::VERSION = "2025.06";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2024.12
+2025.06
 
 =head1 DESCRIPTION
 
@@ -102,17 +102,17 @@ Here are the snippets that may accompany the photo project
 
 =head2 LEEJO (example from "How Perl Saved the Human Genome Project" complete with syntax error)
 
-    use Boulder::Stream; 
-    $stream = new Boulder::Stream; 
+    use Boulder::Stream;
+    $stream = new Boulder::Stream;
     while ($record=$stream->read_record('NAME','SEQUENCE')) {
-        $name = $record->get('NAME'); 
-        $sequence = $record->get('SEQUENCE'); 
+        $name = $record->get('NAME');
+        $sequence = $record->get('SEQUENCE');
 
         ...continue processing...
 
-        $record->add(QUALITY_CHECK=>"OK|); 
-        $stream->write_record($record); 
-    } 
+        $record->add(QUALITY_CHECK=>"OK|);
+        $stream->write_record($record);
+    }
 
 =head2 LEEJO (quine - a program that prints itself out)
 
@@ -239,7 +239,7 @@ A full list of the workshops and conferences this project was shot at
 
 =item German Perl Workshop (2019)
 
-=item German Perl and Raku Workshop (2022, 2023, 2024)
+=item German Perl and Raku Workshop (2022, 2023, 2024, 2025)
 
 =item Les Journées Perl (2017, 2019)
 

@@ -67,16 +67,20 @@ sub SendDashboard {
     my $currentuser  = $args{CurrentUser};
     my $context_user = $args{ContextUser} || $currentuser;
     my $subscription = $args{Subscription};
-    my $rows = $subscription->SubValue('Rows');
 
-    my $DashboardId = $subscription->SubValue('DashboardId');
+    my $dashboard_content = $subscription->Content || {};
+    my $rows = $dashboard_content->{'Rows'};
 
-    my $dashboard = RT::Dashboard->new($currentuser);
-    my ($ok, $msg) = $dashboard->LoadById($DashboardId);
+    my $DashboardId = $subscription->DashboardId;
+
+    my $dashboard = $subscription->DashboardObj;
 
     # failed to load dashboard. perhaps it was deleted or it changed privacy
-    if (!$ok) {
-        $RT::Logger->warning("Unable to load dashboard $DashboardId of subscription ".$subscription->Id." for user ".$currentuser->Name.": $msg");
+    if (!$dashboard->Id) {
+        $RT::Logger->warning( "Unable to load dashboard $DashboardId of subscription "
+                . $subscription->Id
+                . " for user "
+                . $currentuser->Name );
         return $self->ObsoleteSubscription(
             %args,
             Subscription => $subscription,
@@ -96,6 +100,9 @@ SUMMARY
 
     local $HTML::Mason::Commands::session{CurrentUser} = $currentuser;
     local $HTML::Mason::Commands::session{ContextUser} = $context_user;
+    local $HTML::Mason::Commands::session{WebDefaultStylesheet} = 'elevator';
+    local $RT::Config::OVERRIDDEN_OPTIONS{WebDefaultThemeMode}  = 'light';
+    local $HTML::Mason::Commands::session{_session_id}; # Make sure to not touch sessions table
     local $HTML::Mason::Commands::r = RT::Dashboard::FakeRequest->new;
 
     my $HasResults = undef;
@@ -107,7 +114,7 @@ SUMMARY
         HasResults => \$HasResults,
     );
 
-    if ($subscription->SubValue('SuppressIfEmpty')) {
+    if ($dashboard_content->{'SuppressIfEmpty'}) {
         # undef means there were no searches, so we should still send it (it's just portlets)
         # 0 means there was at least one search and none had any result, so we should suppress it
         if (defined($HasResults) && !$HasResults) {
@@ -117,7 +124,7 @@ SUMMARY
     }
 
     my @attachments;
-    my $send_msexcel = $subscription->SubValue('MSExcel');
+    my $send_msexcel = $dashboard_content->{'MSExcel'};
 
     if ( $send_msexcel
          and $send_msexcel eq 'selected') { # Send reports as MS Excel attachments?
@@ -131,7 +138,7 @@ SUMMARY
         local $HTML::Mason::Commands::session{CurrentUser} = $context_user;
         # Run each search and push the resulting file into the @attachments array
         foreach my $search (@searches){
-            my $search_content = $search->{'Attribute'}->Content;
+            my $search_content = $search->Content;
             my $xlsx;
 
             if ( ( $search_content->{SearchType} // '' ) eq 'Chart' ) {
@@ -156,10 +163,7 @@ SUMMARY
             }
 
             # Grab Name for RT System saved searches
-            my $search_name = $search->{'Attribute'}->Name;
-
-            # Use Description for user generated saved searches
-            $search_name = $search->{'Attribute'}->Description if $search_name eq 'SavedSearch';
+            my $search_name = $search->Name;
 
             push @attachments, {
                 Content  => $xlsx,
@@ -168,22 +172,21 @@ SUMMARY
             };
         }
     }
-    else{
+    else {
         if ( RT->Config->Get('EmailDashboardRemove') ) {
             for ( RT->Config->Get('EmailDashboardRemove') ) {
                 $content =~ s/$_//g;
             }
         }
-
-        $content = ScrubContent($content);
-
-        $RT::Logger->debug("Got ".length($content)." characters of output.");
-
-        $content = HTML::RewriteAttributes::Links->rewrite(
-            $content,
-            RT->Config->Get('WebURL') . 'Dashboards/Render.html',
-        );
     }
+
+
+    $RT::Logger->debug("Got ".length($content)." characters of output.");
+
+    $content = HTML::RewriteAttributes::Links->rewrite(
+        $content,
+        RT->Config->Get('WebURL') . 'Dashboards/Render.html',
+    );
 
     $self->EmailDashboard(
         %args,

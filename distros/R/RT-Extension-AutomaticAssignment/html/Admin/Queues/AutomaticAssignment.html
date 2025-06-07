@@ -33,12 +33,12 @@
 
 </select>
 
-<input type="submit" class="button btn btn-primary form-control" name="AddFilter" value="<&|/l&>Add Filter</&>">
+<& /Elements/Submit, Name => 'AddFilter', Label => loc('Add Filter'), FullWidth => 1 &>
 
 <span class="loading"><&|/l&>Loading...</&></span>
 
-<div class="filter-list">
-
+<div class="filter-list destination">
+<ul>
 % my $i = 0;
 % my $filters_value = "";
 % for my $filter (@{ $config->{filters} }) {
@@ -51,6 +51,8 @@
 %    $m->comp($path, prefix => $prefix, config => $filter, queue => $QueueObj);
 % }
 
+<p class="rt-drop-placeholder m-1 p-2 border rounded"><&|/l&>Place here</&></p>
+</ul>
 </div>
 
 <input type="hidden" class="hidden" name="Filters" value="<% $filters_value %>" />
@@ -66,10 +68,16 @@
 <p><i><&|/l&>A chooser selects a single owner from the filtered set of eligible users.</&></i></p>
 
 % my $chooser_config = $config->{chooser};
-% my $name = $chooser_config->{_name};
+% my $name = $ChooserType // $chooser_config->{_name};
 % my $prefix = "Chooser_${name}";
 
-<select name="ChooserType" class="selectpicker">
+<select name="ChooserType"
+        class="selectpicker"
+        hx-trigger="change"
+        hx-post="AutomaticAssignment.html"
+        hx-swap="innerHTML"
+        hx-target="#chooser-details"
+        hx-select="#chooser-details">
 
 % for my $chooser (@choosers) {
 % my $class = "RT::Extension::AutomaticAssignment::Chooser::$chooser";
@@ -92,14 +100,16 @@
 
 <span class="loading">Loading...</span>
 
+<div id="chooser-details">
 % my $path = "/Admin/Queues/Elements/Chooser/$name";
 % $m->comp($path, prefix => $prefix, config => $chooser_config, queue => $QueueObj);
 
 <input type="hidden" class="hidden" name="Chooser" value="<% $prefix %>" />
+</div>
 
 </div>
 
-<div class="form-row">
+<div class="row mt-2">
   <div class="col-12">
     <& /Elements/Submit, Name => 'Update', Label => loc('Save Changes') &>
   </div>
@@ -163,4 +173,5 @@ $id => undef
 $Update => undef
 $Filters => undef
 $Chooser => undef
+$ChooserType => undef
 </%ARGS>

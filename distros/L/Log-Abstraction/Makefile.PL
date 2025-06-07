@@ -11,9 +11,9 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		 => 'Log::Abstraction',
+	ABSTRACT_FROM => 'lib/Log/Abstraction.pm',
 	VERSION_FROM => 'lib/Log/Abstraction.pm', # finds $VERSION
 	AUTHOR	 => 'Nigel Horne <njh@nigelhorne.com>',
-	ABSTRACT	 => 'A flexible logging class for Perl',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),

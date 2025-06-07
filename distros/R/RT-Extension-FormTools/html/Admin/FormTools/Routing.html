@@ -2,31 +2,21 @@
 <& /Elements/Tabs &>
 <& /Elements/ListActions, actions => \@results &>
 
-<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
+<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ms-auto me-auto' &>
 <form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Routing.html" method="post" enctype="multipart/form-data">
   <input type="hidden" class="hidden" name="id" value="<% $id %>" />
 
-  <div class="form-row">
-    <div class="col-2"></div>
-    <div class="col-8 text-center">
-      <&| /Elements/LabeledValue, Label => loc("Default Queue") &>
-        <& /Elements/SelectQueue, Name => 'DefaultQueue', Id => 'default-queue', Default => $queue_obj->id &>
-      </&>
-    </div>
-    <div class="col-2"></div>
-  </div>
-  <div class="form-row">
-    <div class="col-12">
-      <& /Elements/Submit, Label => loc('Update Default Queue'), Name => 'ModifyDefault' &>
-    </div>
-  </div>
+  <&| /Elements/LabeledValue, Label => loc("Default Queue") &>
+    <& /Elements/SelectQueue, Name => 'DefaultQueue', Id => 'default-queue', Default => $queue_obj->id &>
+  </&>
+  <& /Elements/Submit, Label => loc('Update Default Queue'), Name => 'ModifyDefault', FullWidth => 1 &>
 </form>
 % my $route_count = 0;
 % foreach my $route ( @{ $content->{routing} || [] } ) {
 <form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Routing.html" id="Update-<% $route_count %>" name="BuildQuery" method="post" enctype="multipart/form-data">
   <input type="hidden" class="hidden" name="id" value="<% $id %>" />
   <&| /Widgets/TitleBox, title => loc('Update Routing') &>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-1"></div>
     <div class="col-8 text-center">
         <strong><% loc('Criteria') %></strong>
@@ -35,34 +25,28 @@
         <strong><% loc('Route to Queue') %></strong>
     </div>
   </div>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-1 text-end">
-      <div class="form-row">
-        <div class="label mt-1 w-100">&nbsp;</div>
-      </div>
-      <div class="form-row">
-        <div class="label mt-1 w-100"><% loc('and then') %></div>
-      </div>
-      <div class="form-row">
-        <div class="label mt-1 w-100"><% loc('and then') %></div>
-      </div>
+      <div class="label mt-2 w-100">&nbsp;</div>
+      <div class="label mt-2 w-100"><% loc('and then') %></div>
+      <div class="label mt-2 w-100"><% loc('and then') %></div>
     </div>
 % # need to use id="pick-criteria" to get correct styling for the pick cf fields
     <div id="pick-criteria" class="col-8">
       <& /Search/Elements/RoutingPickTicketCFs, CF_ids => \@cf_ids &>
     </div>
-    <div class="col-3">
+    <div class="col-3 mt-3">
       <&| /Elements/LabeledValue, Label => loc("Queue") &>
         <& /Elements/SelectQueue, Name => 'Queue-' . $route_count, Id => 'queue' . $route_count, Default => $route->{queue}, ShowNullOption => 0 &>
       </&>
     </div>
   </div>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-12">
       <div class="submit">
         <div class="buttons">
-          <input type="submit" name="<% 'Delete-' . $route_count %>" value="<% loc('Delete') %>" class="button btn btn-danger form-control">
-          <input type="submit" name="<% 'Update-' . $route_count %>" value="<% loc('Update') %>" class="button btn btn-primary form-control">
+          <input type="submit" name="<% 'Delete-' . $route_count %>" value="<% loc('Delete') %>" class="btn btn-danger">
+          <input type="submit" name="<% 'Update-' . $route_count %>" value="<% loc('Update') %>" class="btn btn-primary">
         </div>
         <div class="submit-clear"></div>
       </div>
@@ -75,22 +59,23 @@ jQuery(function () {
     var criteria = [
         <% join ', ', map { '[' . join( ', ', map { '"' . $_ . '"' } @$_ ) . ']' } @{ $route->{criteria} || [] } |n %>
     ];
-    var $count = 0;
-    jQuery("#Update-<% $route_count %> #SelectCustomFieldField").each(
-        function () {
-            if ( criteria[$count] !== undefined ) {
-                const elem = jQuery(this);
-                elem.val('CF.{' + criteria[$count][0] + '}');
-                elem.selectpicker('refresh');
-                elem.trigger("change");
-                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).val(criteria[$count][1]);
-                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).selectpicker('refresh');
-                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).val(criteria[$count][2]);
-                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).selectpicker('refresh');
+    let count = 0;
+    setTimeout(function() {
+        jQuery("#Update-<% $route_count %> #SelectCustomFieldField").each(
+            function () {
+                if ( criteria[count] !== undefined ) {
+                    const elem = jQuery(this);
+                    elem.val('CF.{' + criteria[count][0] + '}');
+                    elem.get(0).tomselect?.setValue('CF.{' + criteria[count][0] + '}', true);
+                    elem.trigger("change");
+                    elem.closest(".row").find( '[name="CF.{' + criteria[count][0] + '}Op"]' ).get(0).tomselect?.setValue(criteria[count][1]);
+                    elem.closest(".row").find( '[name="ValueOfCF.{' + criteria[count][0] + '}"]' ).val(criteria[count][2]);
+                    elem.closest(".row").find( '[name="ValueOfCF.{' + criteria[count][0] + '}"]' ).get(0).tomselect?.setValue(criteria[count][2], true);
+                }
+                count++;
             }
-            $count++;
-        }
-    );
+        );
+    }, 200);
 });
 </script>
 % $route_count++;
@@ -99,7 +84,7 @@ jQuery(function () {
   <&| /Widgets/TitleBox, title => loc('Add new routing') &>
 <form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Routing.html" id="AddFormRoute" name="BuildQuery" method="post" enctype="multipart/form-data">
   <input type="hidden" class="hidden" name="id" value="<% $id %>" />
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-1"></div>
     <div class="col-8 text-center">
         <strong><% loc('Criteria') %></strong>
@@ -108,29 +93,23 @@ jQuery(function () {
         <strong><% loc('Route to Queue') %></strong>
     </div>
   </div>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-1 text-end">
-      <div class="form-row">
-        <div class="label mt-1 w-100">&nbsp;</div>
-      </div>
-      <div class="form-row">
-        <div class="label mt-1 w-100"><% loc('and then') %></div>
-      </div>
-      <div class="form-row">
-        <div class="label mt-1 w-100"><% loc('and then') %></div>
-      </div>
+      <div class="label mt-2 w-100">&nbsp;</div>
+      <div class="label mt-2 w-100"><% loc('and then') %></div>
+      <div class="label mt-2 w-100"><% loc('and then') %></div>
     </div>
 % # need to use id="pick-criteria" to get correct styling for the pick cf fields
     <div id="pick-criteria" class="col-8">
       <& /Search/Elements/RoutingPickTicketCFs, CF_ids => \@cf_ids &>
     </div>
-    <div class="col-3">
+    <div class="col-3 mt-3">
       <&| /Elements/LabeledValue, Label => loc("Queue") &>
         <& /Elements/SelectQueue, Name => 'Queue', Id => 'queue', Default => $ARGS{Queue} &>
       </&>
     </div>
   </div>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-12">
       <& /Elements/Submit, Label => loc('Add Routing'), Name => 'AddNew' &>
     </div>
@@ -143,20 +122,17 @@ jQuery(function () {
     var criteria = [
         <% join ', ', map { '[' . join( ', ', map { '"' . $_ . '"' } @$_ ) . ']' } @add_new_routing |n %>
     ];
-    var $count = 0;
+    var count = 0;
     jQuery("#AddFormRoute #SelectCustomFieldField").each(
         function () {
-            if ( criteria[$count] !== undefined ) {
+            if ( criteria[count] !== undefined ) {
                 const elem = jQuery(this);
-                elem.val('CF.{' + criteria[$count][0] + '}');
-                elem.selectpicker('refresh');
+                elem.get(0).tomselect?.setValue('CF.{' + criteria[count][0] + '}');
                 elem.trigger("change");
-                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).val(criteria[$count][1]);
-                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).selectpicker('refresh');
-                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).val(criteria[$count][2]);
-                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).selectpicker('refresh');
+                elem.closest(".row").find( '[name="CF.{' + criteria[count][0] + '}Op"]' ).get(0).tomselect.setValue(criteria[count][1]);
+                elem.closest(".row").find( '[name="ValueOfCF.{' + criteria[count][0] + '}"]' ).get(0).tomselect.setValue(criteria[count][2]);
             }
-            $count++;
+            count++;
         }
     );
 });

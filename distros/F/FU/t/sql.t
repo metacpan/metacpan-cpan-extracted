@@ -9,11 +9,15 @@ sub t($obj, $sql, $params, @opt) {
     is_deeply $gotparams, $params;
 }
 
+my @q_ident = (quote_identifier => sub($x) { $x =~ s/"/_/rg });
+
 my $x;
 t P '', '?', [''];
 t P '', '$1', [''], placeholder_style => 'pg';
 t P undef, '?', [undef];
 t RAW '', '', [];
+t IDENT '"hello"', '"hello"', [];
+t IDENT '"hello"', '_hello_', [], @q_ident;
 t SQL('select', '1'), 'select 1', [];
 t SQL('select', P '1'), 'select ?', [1];
 t SQL('select', $x = '1'), 'select ?', [1];
@@ -41,6 +45,7 @@ t WHERE($x, '1 = 2', SQL('x = ', $x)),
 t WHERE({ col1 => RAW 'NOW()', col2 => 'a'}),
   'WHERE ( col1 = NOW() ) AND ( col2 = ? )', ['a'];
 t WHERE(), 'WHERE 1=1', [];
+t WHERE({ '"x' => 1 }), 'WHERE ( _x = ? )', [1], @q_ident;
 
 t WHERE(AND('true', $x), OR($y, 'y'), AND, OR),
   'WHERE ( ( true ) AND ( ? ) ) AND ( ( ? ) OR ( y ) ) AND ( 1=1 ) AND ( 1=0 )', [$x, $y];
@@ -52,9 +57,11 @@ t SQL(SELECT => COMMA(qw/a b c/), FROM => 'table', WHERE { x => 1, a => undef })
 
 t SET({ a => 1, c => RAW 'NOW()', d => undef }),
   'SET a = ? , c = NOW() , d = ?', [1, undef];
+t SET({ '"x' => 1 }), 'SET _x = ?', [1], @q_ident;
 
 t VALUES({ a => 1, c => RAW 'NOW()', d => undef }),
   '( a , c , d ) VALUES ( ? , NOW() , ? )', [1, undef];
+t VALUES({ '"x' => 1 }), '( _x ) VALUES ( ? )', [1], @q_ident;
 
 t VALUES(1, $x, 'NOW()', RAW 'NOW()'), 'VALUES ( ? , ? , NOW() , NOW() )', [1, $x];
 t VALUES([1, $x, 'NOW()', RAW 'NOW()']), 'VALUES ( ? , ? , ? , NOW() )', [1, $x, 'NOW()'];
@@ -85,5 +92,8 @@ my %hash = (v => 'value');
 Hash::Util::lock_keys(%hash);
 Hash::Util::lock_value(%hash, 'v');
 t SQL($hash{v}), 'value', [];
+
+ok !eval { SQL('')->compile(oops => 1); 1 };
+like $@, qr/Unknown flag: oops/;
 
 done_testing;

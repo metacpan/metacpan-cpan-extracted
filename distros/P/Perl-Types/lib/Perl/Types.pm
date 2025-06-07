@@ -265,7 +265,7 @@ The following data types are partially implemented and planned for future releas
 
 =head1 SEE ALSO
 
-L<The Perl Compiler|rperl>
+L<The Perl Compiler|RPerl>
 
 L<The Perl::Types Committee|https://perlcommunity.org/types>
 

@@ -127,6 +127,14 @@ subtest 'custom types', sub {
 };
 
 
+subtest 'identifier quoting', sub {
+    my $txn = $conn->txn;
+    $txn->exec('CREATE TEMPORARY TABLE fupg_test_tbl ("desc" int, ok int, "hello world" int)');
+    ok $txn->Q('INSERT INTO fupg_test_tbl', VALUES {desc => 5, ok => 10, 'hello world', 15})->exec;
+    is $txn->Q('SELECT', IDENT 'hello world', 'FROM fupg_test_tbl')->val, 15;
+};
+
+
 subtest 'vndbid', sub {
     plan skip_all => 'type not loaded in the database' if !$conn->q("SELECT 1 FROM pg_type WHERE typname = 'vndbtag'")->val;
 

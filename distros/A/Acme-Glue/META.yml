@@ -25,5 +25,5 @@ resources:
   homepage: https://metacpan.org/module/Acme::Glue
   license: http://dev.perl.org/licenses/
   repository: https://github.com/leejo/acme-glue
-version: '2024.12'
+version: '2025.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,4 @@
-package FU::Pg 1.0;
+package FU::Pg 1.1;
 use v5.36;
 use FU::XS;
 
@@ -10,7 +10,11 @@ package FU::Pg::conn {
     sub Q {
         require FU::SQL;
         my $s = shift;
-        my($sql, $params) = FU::SQL::SQL(@_)->compile(placeholder_style => 'pg', in_style => 'pg');
+        my($sql, $params) = FU::SQL::SQL(@_)->compile(
+            placeholder_style => 'pg',
+            in_style          => 'pg',
+            quote_identifier  => sub { $s->conn->escape_identifier(@_) },
+        );
         $s->q($sql, @$params);
     }
 
@@ -208,7 +212,8 @@ used.
 =item $conn->Q(@args)
 
 Same as C<< $conn->q() >> but uses L<FU::SQL> to construct the query and bind
-parameters.
+parameters. Uses the 'pg' C<in_style> and C<< $conn->escape_identifier() >> for
+identifier quoting.
 
 =back
 

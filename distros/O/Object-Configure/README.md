@@ -3,11 +3,11 @@
 
 # NAME
 
-Object::Configure - Add Runtime Configuration to a Class
+Object::Configure - Runtime Configuration for an Object
 
 # VERSION
 
-0.07
+0.08
 
 # SYNOPSIS
 
@@ -19,7 +19,7 @@ runtime configurability without needing to rewrite or hardcode behaviours.
 The goal is to allow individual modules to enable or disable features on the fly, and to do it using whatever configuration system the user prefers.
 
 Although the initial aim was general configurability,
-the primary use case that’s emerged has been fine-grained logging control,
+the primary use case that's emerged has been fine-grained logging control,
 more flexible and easier to manage than what you'd typically do with [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl).
 For example,
 you might want one module to log verbosely while another stays quiet,
@@ -124,6 +124,11 @@ Returns the new values for the constructor.
 
 Now you can set up a configuration file and environment variables to configure your object.
 
+## instantiate($class,...)
+
+Create and configure an object of the given class.
+This is a quick and dirty way of making third-party classes configurable at runtime.
+
 # SEE ALSO
 
 - [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction)
@@ -155,11 +160,3 @@ The licence terms of this software are as follows:
 - All other users (including Commercial, Charity, Educational, Government)
   must apply in writing for a licence for use from Nigel Horne at the
   above e-mail.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 32:
-
-    Non-ASCII character seen before =encoding in 'that’s'. Assuming UTF-8
