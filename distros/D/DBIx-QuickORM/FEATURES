@@ -1,0 +1,17 @@
+$select = $source->select(where)->follow(LINK) # All linked objects to those that matched the select.
+
+->bulk_insert
+
+strive LIMIT => sub { ... };
+
+Strive will do the operation, tracking all row fields that have been read. Once
+done it will start a transaction, then verify nothing read previously has
+changed. If nothing that was read in the block is changed in the DB from when
+it was read prioer to the transaction, then any changes made in the block will
+be written. If things changed in the DB after they were read, but before the
+transaction, then nothing is written and it tries again up to LIMIT times.
+
+my $iter = shotgun(...)
+
+run several queries asynchronously (aside), the iterator fetches results as they come
+in.

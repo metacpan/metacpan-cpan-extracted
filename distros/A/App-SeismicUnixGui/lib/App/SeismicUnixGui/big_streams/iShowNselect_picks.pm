@@ -17,7 +17,7 @@ package App::SeismicUnixGui::big_streams::iShowNselect_picks;
 
 =cut
 
-		$iPick->{_min_amplitude} = $min_amplitude;
+#		$iPick->{_min_amplitude} = $min_amplitude;
 
 =head2 
 
@@ -243,9 +243,11 @@ sub calcNdisplay {
 		&& $iShowNselect_picks->{_freq} ne $empty_string )
 	{
 
- #		print(
- #			"iShowNselect_picks, sufilter frequencies:  $iShowNselect_picks->{_freq}\n"
- #		);
+# 		print(
+# 			"iShowNselect_picks, sufilter frequencies:  $iShowNselect_picks->{_freq}\n"
+# 		);
+        print("L249 iShowNselect_picks, error_freq: $iShowNselect_picks->{_error_freq}\n");
+        
 		$sufilter->clear();
 		$sufilter->freq( $iShowNselect_picks->{_freq} );
 		$sufilter[1] = $sufilter->Step();
@@ -262,7 +264,7 @@ sub calcNdisplay {
 	}
 	else {
 
-		# print("iShowNselect_picks, missing frequencies NADA \n");
+		print("iShowNselect_picks, missing frequencies NADA \n");
 	}
 
 =head2
@@ -341,7 +343,7 @@ sub calcNdisplay {
 
 	&_inbound_curve_file();
 
-	print("iShowNselect_picks,calc, using a curve file:\n");
+#	print("iShowNselect_picks,calc, using a curve file:\n");
 	print("\t$iShowNselect_picks->{_inbound_curve_file}\n\n");
 
 	$suximage->curve( quotemeta( $iShowNselect_picks->{_inbound_curve_file} ) );
@@ -457,15 +459,14 @@ sub calcNdisplay {
   remove gain		$to,        $sugain[1],
 =cut
 
-	# CASE 1: With GEOPSY purpose
+	# CASES 1 and 2 With GEOPSY as the purpose
 	if ( defined $iShowNselect_picks->{_purpose}
 		and $iShowNselect_picks->{_purpose} ne $empty_string )
 	{
 
-		if (   $iShowNselect_picks->{_purpose} eq $purpose->{_geopsy}
-			&& $iShowNselect_picks->{_error_freq} eq $true )
+		if (   $iShowNselect_picks->{_purpose} eq $purpose->{_geopsy})
 		{
-
+			# CASE 1: frequencies may or may not be input by the user
 			@items = (
 				$suwind[1], $in, $iShowNselect_picks->{_inbound},
 				$to,        $suwind[2],
@@ -474,7 +475,7 @@ sub calcNdisplay {
 			);
 			$flow[1] = $run->modules( \@items );
 
-			# print  ("iShowNselect_picks,  CASE1: $flow[1]\n");
+			print  ("iShowNselect_picks,  CASE1: $flow[1]\n");
 			@items = (
 				$suwind[1], $in, $iShowNselect_picks->{_inbound},
 				$to, $suwind[2], $to, $suximage[1], $go
@@ -482,14 +483,17 @@ sub calcNdisplay {
 			$flow[2] = $run->modules( \@items );
 
 		}
-		else {
+#		else {
+#
+#print("1. iShowNselect_picks, purpose:$iShowNselect_picks->{_purpose}\n");
+#print("1. iShowNselect_picks, error_freq: $iShowNselect_picks->{_error_freq}\n");
+#print("1. iShowNselect_picks, unconstrained purpose\n");
+#		print ( "L490 $flow[1]\n");
+#		}
 
-# print("1. iShowNselect_picks, purpose:$iShowNselect_picks->{_purpose}\n");
-# print("1. iShowNselect_picks, error_freq: $iShowNselect_picks->{_error_freq}\n");
-# print("1. iShowNselect_picks, unconstrained purpose\n");
-		}
-
-		# CASE 2
+		# CASE 2 No purpose  
+		# BUT frequencies ARE present
+		# TODO No purpose BUT frequencies are absent
 	}
 	elsif (
 		(
@@ -506,7 +510,7 @@ sub calcNdisplay {
 		);
 		$flow[1] = $run->modules( \@items );
 
-		# print  ("iShowNselect_picks,  CASE2: $flow[1]\n");
+		print  ("iShowNselect_picks,  CASE2: $flow[1]\n");
 
 		@items = (
 			$suwind[1], $in, $iShowNselect_picks->{_inbound},
@@ -516,9 +520,10 @@ sub calcNdisplay {
 
 	}
 	else {
+		
 
 # print("2. iShowNselect_picks, purpose:---$iShowNselect_picks->{_purpose}---\n");
-# print("2. iShowNselect_picks, error_freq:---$iShowNselect_picks->{_error_freq}---\n");
+ print("2. iShowNselect_picks, error_freq:---$iShowNselect_picks->{_error_freq}---\n");
 # print("2. iShowNselect_picks, unexpected purpose\n");
 	}
 
@@ -545,7 +550,6 @@ sub calcNdisplay {
 =cut
 
 	# for suxwigb
-		print  "$flow[1]\n";
 	#$log->file($flow[1]);
 
 	#for suximage

@@ -1,5 +1,9 @@
 Revision history for Crypt::RSA::Blind
 
+1.027 Jun 7 2025
+    * Add more tests
+    * Change ::PubKey and ::SecKey classes to packages
+
 1.026 Jun 5 2025
     * Remove calls to Crypt::RSA::Primitives functions
 

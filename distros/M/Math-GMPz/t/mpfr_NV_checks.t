@@ -44,7 +44,7 @@ my $z0 = Math::GMPz->new();
 
 for my $power( ($max - 10) .. ($max - 9),
      -5 .. 50,
-     $min .. ($min + 10),) { test_it(2 ** $power) }
+     $min .. ($min + 10) ) { test_it(2 ** $power) }
 
 for($nv_max, -$nv_max) { test_it($_) }
 
@@ -55,11 +55,14 @@ done_testing(); #
 sub test_it {
   my $nv = shift;
   my $mpfr = Math::MPFR->new($nv);
-  cmp_ok($mpfr, '==', $nv, "$nv == Math::MPFR object");
+  cmp_ok($mpfr, '==', $nv, "NV == Math::MPFR object ($mpfr)"); # Don't interpolate $nv here as that will
+                                                               # cause old perls to turn on its POK flag
   get_z($z0, $mpfr, 1); # Round towards zero because that is what Rmpz_set_NV does.
   my $z1 = Math::GMPz->new($nv);
-  cmp_ok($z0, '==', $z1, "$nv assigns consistently");
-  cmp_ok(Rmpz_cmp_NV($z1, $nv), '==', cmp_z($mpfr, $z1) * - 1, "comparisons agree for $nv");
+  cmp_ok($z0, '==', $z1, "NV assigns consistently"); # Don't interpolate $nv here as that will
+                                                     # cause old perls to turn on the POK flag
+  cmp_ok(Rmpz_cmp_NV($z1, $nv), '==', cmp_z($mpfr, $z1) * - 1, "comparisons agree for $nv"); # Can safely interpolate $nv as
+                                                                                             # we have now finished with it.
 }
 
 

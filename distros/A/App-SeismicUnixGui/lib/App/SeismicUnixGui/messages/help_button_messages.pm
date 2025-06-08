@@ -122,7 +122,7 @@ sub get_pdf {
 		my $inbound_pdf =
 		  $path4SeismicUnixGui . '/doc/' . $help_button_messages->{_item};
 
-		print $inbound_pdf;
+#		print("help_button_messages,get_pdf, $inbound_pdf\n");
 		system("evince $inbound_pdf &");
 
 	}
@@ -156,17 +156,18 @@ sub set_pdf {
 		if ( $item eq 'InstallationGuide' ) {
 
 			$help_button_messages->{_item} =
-			  'SeismicUnixGuiInstallationGuide0.87.2.pdf';
+			  'SeismicUnixGuiInstallationGuide0.87.3.pdf';
 
 		}
 		elsif ( $item eq 'Tutorial' ) {
 
 			$help_button_messages->{_item} =
-			  'SeismicUnixGuiTutorial0.87.2.pdf';
+			  'SeismicUnixGuiTutorial0.87.3.pdf';
 			
 			
 		} else{
 			print("help_button_messages, set_pdf, unexpectedly here\n");
+			print("help_button_messages, set_pdf, not ready for $item\n");
 		}
 
 	}

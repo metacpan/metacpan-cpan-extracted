@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.016'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-06-03'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.017'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-06-07'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...

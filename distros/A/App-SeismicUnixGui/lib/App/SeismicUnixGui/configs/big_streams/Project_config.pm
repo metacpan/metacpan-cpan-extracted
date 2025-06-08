@@ -76,6 +76,7 @@ my $Project = {
 	_subUser             => '',
 	_DATA_GEOMAPS                 => '',
 	_DATA_GEOMAPS_BIN             => '',
+	_DATA_GEOMAPS_GOOGLE          => '',	
 	_DATA_GEOMAPS_TEXT            => '',
 	_DATA_GEOMAPS_TOPO            => '',
 	_GEOMAPS_IMAGES               => '',
@@ -87,12 +88,14 @@ my $Project = {
 	_DATA_GAMMA_WELL              => '',
 	_DATA_GAMMA_WELL_TXT          => '',
 	_DATA_GEOTECH_WELL_TXT        => '',
+	_DATA_GEOTECH_WELL_XL         => '',
 	_DATA_RESISTIVITY_SURFACE     => '',
 	_DATA_RESISTIVITY_SURFACE_TXT => '',
 	_DATA_RESISTIVITY_WELL        => '',
 	_DATA_RESISTIVITY_WELL_TXT    => '',
 	_GMT_SEISMIC                  => '',
 	_GMT_GEOMAPS                  => '',
+	_GOOGLE_GEOMAPS               => '',	
 	_GRASS_GEOMAPS                => '',
 	#	_DATA_GPR                     => '',
 	#	_DATA_GPR_SEGY                => '',
@@ -100,7 +103,6 @@ my $Project = {
 	#	_DATA_GPR_SU                  => '',
 	#	_DATA_GPR_SU_RAW              => '',
 	#	_DATA_GPR_TXT                 => '',
-	_DATA_GEOTECH_WELL_TXT     => '',
 	_DATA_SEISMIC              => '',
 	_DATA_SEISMIC_BIN          => '',
 	_DATA_SEISMIC_DAT          => '',
@@ -618,7 +620,7 @@ sub _system_dirs {
 	my $SEISMIC_WELL        = $WELL . '/seismics';
 
 	#	my $DATA_GPR                 = $GPR . '/data';
-	my $DATA_WELL                = $WELL . '/data';
+#	my $DATA_WELL                = $WELL . '/data';
 	my $DATA_SEISMIC             = $SEISMIC . '/data';
 	my $DATA_RESISTIVITY_SURFACE = $RESISTIVITY_SURFACE . '/data';    # legacy
 	my $DATA_GEOMAPS             = $GEOMAPS . '/data';
@@ -697,8 +699,9 @@ sub _system_dirs {
 
 	# IMAGES
 	#	my $IMAGES_GPR     = $GPR . '/images';
-	my $IMAGES_SEISMIC = $SEISMIC . '/images';
-	my $IMAGES_WELL    = $WELL . '/images';
+	my $IMAGES_SEISMIC  = $SEISMIC . '/images';
+	my $IMAGES_WELL     = $WELL . '/images';
+	my $GEOMAPS_IMAGES  = $GEOMAPS . '/images';
 
 	#	my $GIF_GPR =
 	#		$IMAGES_GPR . '/' . 'gif' . '/'
@@ -760,6 +763,13 @@ sub _system_dirs {
 	# GMT GEOMAPS
 	my $GMT_GEOMAPS =
 	  $GEOMAPS . '/gmt/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
+
+	# GOOGLE GEOMAPS
+	my $GOOGLE_GEOMAPS =
+		$GEOMAPS
+	  . '/google/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser;
 
 	# GRASS GEOMAPS
 	my $GRASS_GEOMAPS =
@@ -882,6 +892,12 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
 	  . $subUser;
 
+	# GEOTECH WELL DATA in XLformat
+	my $DATA_GEOTECH_WELL_XL =
+		$DATA_GEOTECH_WELL . '/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/xl' . '/'
+	  . $subUser;
+	  
 	#	# GPR DIRECTORY
 	#	my $DATA_GPR_SEGY =
 	#		$DATA_GPR . '/'
@@ -1032,6 +1048,12 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/xl' . '/'
 	  . $subUser;
 
+	# GEOMAPS GOOGLE DIRECTORY
+	my $DATA_GEOMAPS_GOOGLE =
+		$DATA_GEOMAPS . '/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/google' . '/'
+	  . $subUser;
+
 	# GEOMAPS TEXT DIRECTORY
 	my $DATA_GEOMAPS_TEXT =
 		$DATA_GEOMAPS . '/'
@@ -1052,39 +1074,38 @@ sub _system_dirs {
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/bin' . '/'
 	  . $subUser;
 
-	# GEOMAPS IMAGES DIRECTORY
-	my $GEOMAPS_IMAGES =
-		$GEOMAPS . '/'
-	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/'
-	  . $subUser;
+#	# GEOMAPS IMAGES DIRECTORY
+#	my $GEOMAPS_IMAGES =
+#		$GEOMAPS_IMAGES . '/'
+#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+#	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_JPEG =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/jpeg' . '/'
+	  . '/jpeg' . '/'
 	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_PNG =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES  . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/png' . '/'
+	  . '/png' . '/'
 	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_TIF =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES  . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/tif' . '/'
+	  . '/tif' . '/'
 	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_PS =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/ps' . '/'
+	  . '/ps' . '/'
 	  . $subUser;
 
 	# GEOMAPS TEMP DIRECTORY
@@ -1105,11 +1126,11 @@ sub _system_dirs {
 	# TOMO TEMP DIRECTORY
 	my $TEMP_FAST_TOMO = $FAST_TOMO . '/temp' . '/' . $subUser;
 
-	# WELL DATA DIRECTORY
-	$DATA_WELL =
-		$WELL . '/data' . '/'
-	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-	  . $subUser;
+	# GENERIC WELL DATA DIRECTORY
+#	$DATA_WELL =
+#		$WELL . '/data' . '/'
+#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+#	  . $subUser;
 
 	$Project->{_DATA_GEOMAPS}        = $DATA_GEOMAPS;
 	$Project->{_DATA_GEOMAPS_BIN}    = $DATA_GEOMAPS_BIN;
@@ -1119,8 +1140,9 @@ sub _system_dirs {
 	$Project->{_GEOMAPS_IMAGES_PNG}  = $GEOMAPS_IMAGES_PNG;
 	$Project->{_GEOMAPS_IMAGES_TIF}  = $GEOMAPS_IMAGES_TIF;
 	$Project->{_GEOMAPS_IMAGES_PS}   = $GEOMAPS_IMAGES_PS;
+	$Project->{_DATA_GEOMAPS_GOOGLE} = $DATA_GEOMAPS_GOOGLE;
 	$Project->{_DATA_GEOMAPS_TEXT}   = $DATA_GEOMAPS_TEXT;
-
+	
 	#print("3. Project_config,DATA_GEOMAPS_TEXT=$DATA_GEOMAPS_TEXT\n");
 
 	$Project->{_PROJECT_HOME}        = $PROJECT_HOME;
@@ -1129,7 +1151,8 @@ sub _system_dirs {
 
 	$Project->{_DATA_GEOTECH_WELL}     = $DATA_GEOTECH_WELL;
 	$Project->{_DATA_GEOTECH_WELL_TXT} = $DATA_GEOTECH_WELL_TXT;
-
+	$Project->{_DATA_GEOTECH_WELL_XL}  = $DATA_GEOTECH_WELL_XL;
+	
 	$Project->{_DATA_RESISTIVITY_SURFACE}     = $DATA_RESISTIVITY_SURFACE;
 	$Project->{_DATA_RESISTIVITY_SURFACE_TXT} = $DATA_RESISTIVITY_SURFACE_TXT;
 	$Project->{_DATA_RESISTIVITY_WELL}        = $DATA_RESISTIVITY_WELL;
@@ -1158,7 +1181,7 @@ sub _system_dirs {
 	$Project->{_DATA_SEISMIC_WELL_SYNSEIS} = $DATA_SEISMIC_WELL_SYNSEIS;
 	$Project->{_DATA_SEISMIC_XL}           = $DATA_SEISMIC_XL;
 	$Project->{_DATABASE_SEISMIC_SQLITE}   = $DATABASE_SEISMIC_SQLITE;
-	$Project->{_DATA_WELL}                 = $DATA_WELL;
+#	$Project->{_DATA_WELL}                 = $DATA_WELL;
 	$Project->{_FAST_TOMO}                 = $FAST_TOMO;
 	
 	$Project->{_GEOPSY}                    = $GEOPSY;
@@ -1172,6 +1195,7 @@ sub _system_dirs {
 	$Project->{_GIF_SEISMIC}               = $GIF_SEISMIC;
 	$Project->{_GMT_SEISMIC}               = $GMT_SEISMIC;
 	$Project->{_GMT_GEOMAPS}               = $GMT_GEOMAPS;
+	$Project->{_GOOGLE_GEOMAPS}            = $GOOGLE_GEOMAPS;	
 	$Project->{_GRASS_GEOMAPS}             = $GRASS_GEOMAPS;
 	$Project->{_IMMODPG}           = $IMMODPG;
 	$Project->{_IMMODPG_INVISIBLE} = $IMMODPG_INVISIBLE;
@@ -1269,7 +1293,7 @@ sub system_dirs {
 
 	# DATA CATEGORIES by TOOL collected in a WELL
 	my $WELL             = $PROJECT_HOME . '/well';
-	my $DATA_WELL        = $WELL . '/data';
+#	my $DATA_WELL        = $WELL . '/data';
 	my $GAMMA_WELL       = $WELL . '/gamma';
 	my $GEOTECH_WELL     = $WELL . '/geotech';
 	my $SEISMIC_WELL     = $WELL . '/seismics';
@@ -1352,9 +1376,9 @@ sub system_dirs {
 
 	# IMAGES
 	my $IMAGES_SEISMIC = $SEISMIC . '/images';
-
 	#	my $IMAGES_GPR     = $GPR . '/images';
-	my $IMAGES_WELL = $WELL . '/images';
+	my $IMAGES_WELL    = $WELL . '/images';
+	my $GEOMAPS_IMAGES  = $GEOMAPS . '/images';
 
 	#	my $GIF_GPR =
 	#		$IMAGES_GPR . '/gif' . '/'
@@ -1429,12 +1453,19 @@ sub system_dirs {
 	my $GMT_GEOMAPS =
 	  $GEOMAPS . '/gmt/' . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/' . $subUser;
 
+	 # GOOGLE GEOMAPS
+	my $GOOGLE_GEOMAPS =
+		$GEOMAPS
+	  . '/google/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+	  . $subUser;
+
 	# GRASS GEOMAPS
 	my $GRASS_GEOMAPS =
 		$GEOMAPS
 	  . '/grass/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-	  . $subUser;
+	  . $subUser; 
 
 	# PROGRAMMING LANGUAGES
 	my $C_SEISMIC =
@@ -1578,7 +1609,13 @@ sub system_dirs {
 		$DATA_GEOTECH_WELL . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/txt' . '/'
 	  . $subUser;
-
+	  
+	# WELL GEOTECH DATA in XL format
+	my $DATA_GEOTECH_WELL_XL =
+		$DATA_GEOTECH_WELL . '/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/xl' . '/'
+	  . $subUser;  
+	  
 	# SEISMIC BIN  and DAT DIRECTORY
 	my $DATA_SEISMIC_BIN =
 		$DATA_SEISMIC . '/'
@@ -1699,6 +1736,12 @@ sub system_dirs {
 	  . '/synseis' . '/'
 	  . $subUser;
 
+	# GEOMAPS GOOGLE DIRECTORY
+	my $DATA_GEOMAPS_GOOGLE =
+		$DATA_GEOMAPS . '/'
+	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/google' . '/'
+	  . $subUser;
+
 	# GEOMAPS TEXT DIRECTORY
 	my $DATA_GEOMAPS_TEXT =
 		$DATA_GEOMAPS . '/'
@@ -1720,38 +1763,31 @@ sub system_dirs {
 	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
-	my $GEOMAPS_IMAGES =
-		$GEOMAPS . '/'
-	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/'
-	  . $subUser;
-
-	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_JPEG =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/jpeg' . '/'
+	  . '/jpeg' . '/'
 	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_PNG =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/jpeg' . '/'
+	  . '/png' . '/'
 	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_TIF =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/tif' . '/'
+	  . '/tif' . '/'
 	  . $subUser;
 
 	# GEOMAPS IMAGES DIRECTORY
 	my $GEOMAPS_IMAGES_PS =
-		$GEOMAPS . '/'
+		$GEOMAPS_IMAGES . '/'
 	  . $DATE_LINE_COMPONENT_STAGE_PROCESS
-	  . '/images' . '/ps' . '/'
+	  . '/ps' . '/'
 	  . $subUser;
 
 	# GEOMAPS TEMP DIRECTORY
@@ -1773,12 +1809,13 @@ sub system_dirs {
 	my $TEMP_FAST_TOMO = $FAST_TOMO . '/temp' . '/' . $subUser;
 
 	# WELL DATA DIRECTORY
-	$DATA_WELL =
-		$WELL . '/data' . '/'
-	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
-	  . $subUser;
+#	$DATA_WELL =
+#		$WELL . '/data' . '/'
+#	  . $DATE_LINE_COMPONENT_STAGE_PROCESS . '/'
+#	  . $subUser;
 
-	$Project->{_DATA_GEOMAPS_TEXT} = $DATA_GEOMAPS_TEXT;
+	$Project->{_DATA_GEOMAPS_GOOGLE} = $DATA_GEOMAPS_GOOGLE;
+	$Project->{_DATA_GEOMAPS_TEXT}   = $DATA_GEOMAPS_TEXT;
 
 	$Project->{_PROJECT_HOME}        = $PROJECT_HOME;
 	$Project->{_DATA_GAMMA_WELL}     = $DATA_GAMMA_WELL;
@@ -1786,7 +1823,8 @@ sub system_dirs {
 
 	$Project->{_DATA_GEOTECH_WELL}     = $DATA_GEOTECH_WELL;
 	$Project->{_DATA_GEOTECH_WELL_TXT} = $DATA_GEOTECH_WELL_TXT;
-
+	$Project->{_DATA_GEOTECH_WELL_XL}  = $DATA_GEOTECH_WELL_XL;
+	
 	$Project->{_DATA_GEOMAPS}      = $DATA_GEOMAPS;
 	$Project->{_DATA_GEOMAPS_BIN}  = $DATA_GEOMAPS_BIN;
 	$Project->{_DATA_GEOMAPS_TOPO} = $DATA_GEOMAPS_TOPO;
@@ -1808,6 +1846,7 @@ sub system_dirs {
 	$Project->{_DATA_SEISMIC_MATLAB}       = $DATA_SEISMIC_MATLAB;
 	$Project->{_GMT_SEISMIC}               = $GMT_SEISMIC;
 	$Project->{_GMT_GEOMAPS}               = $GMT_GEOMAPS;
+	$Project->{_GOOGLE_GEOMAPS}            = $GOOGLE_GEOMAPS;
 	$Project->{_GRASS_GEOMAPS}             = $GRASS_GEOMAPS;
 	$Project->{_DATA_SEISMIC}              = $DATA_SEISMIC;
 	$Project->{_DATA_SEISMIC_PASSCAL_SEGY} = $DATA_SEISMIC_PASSCAL_SEGY;
@@ -1828,7 +1867,7 @@ sub system_dirs {
 	$Project->{_DATA_SEISMIC_WELL_SYNSEIS} = $DATA_SEISMIC_WELL_SYNSEIS;
 	$Project->{_DATA_SEISMIC_XL}           = $DATA_SEISMIC_XL;
 	$Project->{_DATABASE_SEISMIC_SQLITE}   = $DATABASE_SEISMIC_SQLITE;
-	$Project->{_DATA_WELL}                 = $DATA_WELL;
+#	$Project->{_DATA_WELL}                 = $DATA_WELL;
 	$Project->{_FAST_TOMO}                 = $FAST_TOMO;
 	$Project->{_GEOPSY}                    = $GEOPSY;
 	$Project->{_GEOPSY_PARAMS}             = $GEOPSY_PARAMS;
@@ -1928,6 +1967,15 @@ sub DATA_GEOMAPS_BIN {
 	return ($DATA_GEOMAPS_BIN);
 }
 
+sub DATA_GEOMAPS_GOOGLE {
+	_set_dirs();
+
+	my $DATA_GEOMAPS_GOOGLE = $Project->{_DATA_GEOMAPS_GOOGLE};
+
+#print("4. Project_config,DATA_GEOMAPS_GOOGLE=$DATA_GEOMAPS_GOOGLE\n");
+	return ($DATA_GEOMAPS_GOOGLE);
+}
+
 sub DATA_GEOMAPS_TEXT {
 	_set_dirs();
 
@@ -1949,6 +1997,13 @@ sub DATA_GEOTECH_WELL_TXT {
 
 	my $DATA_GEOTECH_WELL_TXT = $Project->{_DATA_GEOTECH_WELL_TXT};
 	return ($DATA_GEOTECH_WELL_TXT);
+}
+
+sub DATA_GEOTECH_WELL_XL {
+	_set_dirs();
+
+	my $DATA_GEOTECH_WELL_XL = $Project->{_DATA_GEOTECH_WELL_XL};
+	return ($DATA_GEOTECH_WELL_XL);
 }
 
 sub DATA_GPR {
@@ -2126,6 +2181,13 @@ sub GMT_GEOMAPS {
 	return ($GMT_GEOMAPS);
 }
 
+sub GOOGLE_GEOMAPS {
+	_set_dirs();
+
+	my $GOOGLE_GEOMAPS = $Project->{_GOOGLE_GEOMAPS};
+	return ($GOOGLE_GEOMAPS);
+}
+
 sub GRASS_GEOMAPS {
 	_set_dirs();
 
@@ -2295,11 +2357,11 @@ sub DATA_SEISMIC_WELL_SYNSEIS {
 	return ($DATA_SEISMIC_WELL_SYNSEIS);
 }
 
-sub DATA_WELL {
-	_set_dirs();
-	my $DATA_WELL = $Project->{_DATA_WELL};
-	return ($DATA_WELL);
-}
+#sub DATA_WELL {
+#	_set_dirs();
+#	my $DATA_WELL = $Project->{_DATA_WELL};
+#	return ($DATA_WELL);
+#}
 
 sub FAST_TOMO {
 	_set_dirs();
@@ -2640,9 +2702,10 @@ sub make_local_dirs {
 
 	# BY data type
 	# CATEGORY GEOMAPS images and data
-	my $DATA_GEOMAPS      = $Project->{_DATA_GEOMAPS};
-	my $DATA_GEOMAPS_TEXT = $Project->{_DATA_GEOMAPS_TEXT};
-	my $DATA_GEOMAPS_TOPO = $Project->{_DATA_GEOMAPS_TOPO};
+	my $DATA_GEOMAPS        = $Project->{_DATA_GEOMAPS};
+	my $DATA_GEOMAPS_GOOGLE = $Project->{_DATA_GEOMAPS_GOOGLE};	
+	my $DATA_GEOMAPS_TEXT   = $Project->{_DATA_GEOMAPS_TEXT};
+	my $DATA_GEOMAPS_TOPO   = $Project->{_DATA_GEOMAPS_TOPO};
 	my $DATA_SEISMIC_MATLAB = $Project->{_DATA_SEISMIC_MATLAB};
 	my $DATA_SEISMIC_XL     = $Project->{_DATA_SEISMIC_XL};
 	my $GEOMAPS_IMAGES      = $Project->{_GEOMAPS_IMAGES};
@@ -2659,9 +2722,10 @@ sub make_local_dirs {
 	my $GEOPSY_REPORTS      = $Project->{_GEOPSY_REPORTS};
 	my $GEOPSY_TARGETS      = $Project->{_GEOPSY_TARGETS};
 
-	my $GMT_GEOMAPS   = $Project->{_GMT_GEOMAPS};
-	my $GRASS_GEOMAPS = $Project->{_GRASS_GEOMAPS};
-	my $GMT_SEISMIC   = $Project->{_GMT_SEISMIC};
+	my $GMT_GEOMAPS    = $Project->{_GMT_GEOMAPS};
+	my $GOOGLE_GEOMAPS = $Project->{_GOOGLE_GEOMAPS};
+	my $GRASS_GEOMAPS  = $Project->{_GRASS_GEOMAPS};
+	my $GMT_SEISMIC    = $Project->{_GMT_SEISMIC};
 
 	# pl programs and geomaps
 	my $PL_GEOMAPS        = $Project->{_PL_GEOMAPS};
@@ -2692,6 +2756,7 @@ sub make_local_dirs {
 		$manage_dirs_by->make_dir($GEOMAPS_IMAGES_JPEG);
 		$manage_dirs_by->make_dir($GEOMAPS_IMAGES_PNG);
 		$manage_dirs_by->make_dir($GEOMAPS_IMAGES_PS);
+		$manage_dirs_by->make_dir($DATA_GEOMAPS_GOOGLE);		
 		$manage_dirs_by->make_dir($DATA_GEOMAPS_TEXT);
 		$manage_dirs_by->make_dir($PL_GEOMAPS);
 	}
@@ -2797,6 +2862,11 @@ sub make_local_dirs {
 	# grass programs with map  data
 	if ( $Project->{_grass_is_selected} ) {
 		$manage_dirs_by->make_dir($GRASS_GEOMAPS);
+	}
+	
+	# google programs with map  data
+	if ( $Project->{_geomaps_is_selected} ) {
+		$manage_dirs_by->make_dir($GOOGLE_GEOMAPS);
 	}
 
 	# By programs
@@ -2915,6 +2985,11 @@ sub make_local_dirs {
 	# location well
 	my $DATA_GEOTECH_WELL_TXT = $Project->{_DATA_GEOTECH_WELL_TXT};
 	$manage_dirs_by->make_dir($DATA_GEOTECH_WELL_TXT);
+	
+	# CATEGORY GEOTECH well data
+	# location well
+	my $DATA_GEOTECH_WELL_XL = $Project->{_DATA_GEOTECH_WELL_XL};
+	$manage_dirs_by->make_dir($DATA_GEOTECH_WELL_XL);
 
 	# Always create new wells and their data
 	my $DATA_SEISMIC_WELL_SYNSEIS = $Project->{_DATA_SEISMIC_WELL_SYNSEIS};

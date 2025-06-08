@@ -1,6 +1,6 @@
 package Catalyst::Plugin::SocialMeta;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.04';
+use 5.006; use strict; use warnings; our $VERSION = '0.05';
 
 use HTML::SocialMeta;
 
@@ -25,6 +25,10 @@ sub socialmeta {
 
 	my $config = $c->config->{'Plugin::SocialMeta'} || {};
 	%data = (%{$config}, %data);
+
+	if (!$data{url}) {
+		$data{url} = "" . $c->req->uri;
+	}
 
 	my $provider = defined $data{meta_provider}
 		? delete $data{meta_provider}
@@ -62,7 +66,7 @@ Catalyst::Plugin::SocialMeta - Generate social media meta tags for your catalyst
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -99,7 +103,6 @@ Perhaps a little code snippet.
 			description => 'Demo UI for HTML::SocialMeta',
 			image => 'https://lnation.org/static/images/social.png',
 			fb_app_id => 'lnationorgnofb',
-			url => 'https://lnation.org/socialmeta/demo'
 		}
 	);
 

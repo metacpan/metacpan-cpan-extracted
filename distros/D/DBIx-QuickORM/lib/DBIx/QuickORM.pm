@@ -1,2200 +1,2662 @@
 package DBIx::QuickORM;
 use strict;
 use warnings;
+use feature qw/state/;
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000011';
 
 use Carp qw/croak confess/;
+$Carp::Internal{ (__PACKAGE__) }++;
+
+use Storable qw/dclone/;
 use Sub::Util qw/set_subname/;
-use List::Util qw/first uniq/;
 use Scalar::Util qw/blessed/;
-use DBIx::QuickORM::Util qw/update_subname mod2file alias find_modules mesh_accessors accessor_field_inversion/;
 
-use DBIx::QuickORM::BuilderState;
+use Scope::Guard();
+use DBIx::QuickORM::Schema::Autofill();
 
-use Importer Importer => 'import';
+use DBIx::QuickORM::Util qw/load_class find_modules/;
+use DBIx::QuickORM::Affinity qw/validate_affinity/;
 
-$Carp::Internal{(__PACKAGE__)}++;
+use constant DBS     => 'dbs';
+use constant ORMS    => 'orms';
+use constant PACKAGE => 'package';
+use constant SCHEMAS => 'schemas';
+use constant SERVERS => 'servers';
+use constant STACK   => 'stack';
+use constant TYPE    => 'type';
 
-my @PLUGIN_EXPORTS = qw{
+my @EXPORT = qw{
     plugin
     plugins
-    plugin_hook
+    meta
+    orm
+     handle_class
+    autofill
+     autotype
+     autohook
+     autoskip
+     autorow
+     autoname
+    alt
+
+    build_class
+
+    server
+     driver
+     dialect
+     attributes
+     host hostname
+     port
+     socket
+     user username
+     pass password
+     creds
+     db
+      connect
+      dsn
+
+    schema
+     row_class
+     tables
+     table
+     view
+      db_name
+      column
+       omit
+       nullable
+       not_null
+       identity
+       affinity
+       type
+       sql
+       default
+      columns
+      primary_key
+      unique
+      index
+     link
 };
 
-my @DB_EXPORTS = qw{
-    db
-    db_attributes
-    db_class
-    db_connect
-    db_dsn
-    db_host
-    db_name
-    db_password
-    db_port
-    db_socket
-    db_user
-    sql_spec
-};
-
-my @REL_EXPORTS = qw{
-    relate
-    rtable
-    relation
-    relations
-    references
-    prefetch
-    as
-    on
-    using
-    on_delete
-};
-
-my @_TABLE_EXPORTS = qw{
-    column
-    column_class
-    columns
-    conflate
-    inflate
-    deflate
-    default
-    index
-    is_temp
-    is_view
-    not_null
-    nullable
-    omit
-    primary_key
-    relation
-    relations
-    row_class
-    serial
-    source_class
-    sql_spec
-    sql_type
-    table_class
-    unique
-    accessors
-};
-
-my @TABLE_EXPORTS = uniq (
-    @_TABLE_EXPORTS,
-    @REL_EXPORTS,
-    @PLUGIN_EXPORTS,
-    qw{ table update_table },
-);
-
-my @ROGUE_TABLE_EXPORTS = uniq (
-    @_TABLE_EXPORTS,
-    @REL_EXPORTS,
-    @PLUGIN_EXPORTS,
-    qw{ rogue_table },
-);
-
-my @TABLE_CLASS_EXPORTS = uniq (
-    @_TABLE_EXPORTS,
-    @REL_EXPORTS,
-    @PLUGIN_EXPORTS,
-    qw{ meta_table },
-);
-
-my @SCHEMA_EXPORTS = uniq (
-    @TABLE_EXPORTS,
-    @REL_EXPORTS,
-    @PLUGIN_EXPORTS,
-    qw{
-        include
-        schema
-        tables
-        default_base_row
-        update_table
-    },
-);
-
-our @FETCH_EXPORTS = qw/get_orm get_schema get_db get_conflator/;
-
-our %EXPORT_GEN = (
-    '&meta_table' => \&_gen_meta_table,
-);
-
-our %EXPORT_MAGIC = (
-    '&meta_table' => \&_magic_meta_table,
-);
-
-our @EXPORT = uniq (
-    @DB_EXPORTS,
-    @TABLE_EXPORTS,
-    @SCHEMA_EXPORTS,
-    @REL_EXPORTS,
-    @FETCH_EXPORTS,
-    @PLUGIN_EXPORTS,
-
-    qw{
-        default_base_row
-        autofill
-        conflator
-        orm
-    },
-);
-
-our @EXPORT_OK = uniq (
-    @EXPORT,
-    @TABLE_CLASS_EXPORTS,
-    @ROGUE_TABLE_EXPORTS,
-);
-
-our %EXPORT_TAGS = (
-    DB            => \@DB_EXPORTS,
-    ROGUE_TABLE   => \@ROGUE_TABLE_EXPORTS,
-    SCHEMA        => \@SCHEMA_EXPORTS,
-    TABLE         => \@TABLE_EXPORTS,
-    TABLE_CLASS   => \@TABLE_CLASS_EXPORTS,
-    RELATION      => \@REL_EXPORTS,
-    FETCH         => \@FETCH_EXPORTS,
-    PLUGIN        => \@PLUGIN_EXPORTS,
-);
-
-my %LOOKUP;
-my $COL_ORDER = 1;
-
-alias column => 'columns';
-
-sub _get {
-    my $type = shift;
-    my $caller = shift;
-    my ($name, $class) = reverse @_;
-
-    $class //= $caller;
-    croak "Not enough arguments" unless $name;
-
-    return $LOOKUP{$class}{$type}{$name};
-}
-
-sub _set {
-    my $type = shift;
-    my $caller = shift;
-    my ($obj, $name, $class) = reverse @_;
-
-    $class //= $caller;
-    croak "Not enough arguments" unless $obj && $name;
-
-    croak "A $type named '$name' has already been defined" if $LOOKUP{$class}{$type}{$name};
-
-    return $LOOKUP{$class}{$type}{$name} = $obj;
-}
-
-sub get_orm       { _get('orm',       scalar(caller()), @_) }
-sub get_db        { _get('db',        scalar(caller()), @_) }
-sub get_schema    { _get('schema',    scalar(caller()), @_) }
-sub get_conflator { _get('conflator', scalar(caller()), @_) }
-
-sub default_base_row {
-    my $state = build_state or croak "Must be used inside an orm, schema, or table builder";
-
-    if (@_) {
-        my $class = shift;
-        require(mod2file($class));
-        return $state->{+DEFAULT_BASE_ROW} = $class;
-    }
-
-    return $state->{+DEFAULT_BASE_ROW} // 'DBIx::QuickORM::Row';
-}
-
-sub conflator {
-    croak "Too many arguments to conflator()" if @_ > 2;
-    my ($cb, $name);
-
-    my $state = build_state;
-    my $col   = $state->{+COLUMN};
-
-    croak "conflator() can only be used in void context inside a column builder, or with a name"
-        unless $name || $col || wantarray;
-
-    for my $arg (@_) {
-        $cb = $arg if ref($arg) eq 'CODE';
-        $name = $arg;
-    }
-
-    require DBIx::QuickORM::Conflator;
-
-    my $c;
-    if ($cb) {
-        my %params = ();
-        $params{name} = $name if $name;
-
-        build(
-            building => 'conflator',
-            state    => {%$state, CONFLATOR => \%params},
-            callback => $cb,
-            caller   => [caller],
-            args     => [\%params],
-        );
-
-        croak "The callback did not define an inflator" unless $params{inflator};
-        croak "The callback did not define a deflator"  unless $params{deflator};
-
-        $c = DBIx::QuickORM::Conflator->new(%params);
-    }
-    elsif ($name) {
-        $c = _get('conflator', scalar(caller()), $name) or croak "conflator '$name' is not defined";
-    }
-    else {
-        croak "Either a codeblock or a name is required";
-    }
-
-    _set('conflator', scalar(caller()), $name) if $name;
-
-    $col->{conflate} = $c if $col;
-
-    return $c;
-}
-
-sub inflate(&) {
-    my $self = shift;
-    my ($code) = @_;
-
-    croak "inflate() requires a coderef" unless $code and ref($code) eq 'CODE';
-
-    if (my $state = build_state) {
-        if (my $c = $state->{CONFLATOR}) {
-            croak "An inflation coderef has already been provided" if $c->{inflate};
-            return $c->{inflate} = $code;
-        }
-
-        if (my $col = $state->{COLUMN}) {
-            my $c = $col->{conflate} //= {};
-            croak "An inflation coderef has already been provided" if $c->{inflate};
-            return $c->{inflate} = $code;
-        }
-    }
-
-    croak "inflate() can only be used inside either a conflator builder or a column builder"
-}
-
-sub deflate(&) {
-    my $self = shift;
-    my ($code) = @_;
-    croak "deflate() requires a coderef" unless $code and ref($code) eq 'CODE';
-
-    if (my $state = build_state) {
-        if (my $c = $state->{CONFLATOR}) {
-            croak "An deflation coderef has already been provided" if $c->{deflate};
-            return $c->{deflate} = $code;
-        }
-
-        if (my $col = $state->{COLUMN}) {
-            my $c = $col->{conflate} //= {};
-            croak "An deflation coderef has already been provided" if $c->{deflate};
-            return $c->{deflate} = $code;
-        }
-    }
-
-    croak "deflate() can only be used inside either a conflator builder or a column builder"
-}
-
-# sub orm {
-build_top_builder orm => sub {
+sub import {
+    my $class = shift;
     my %params = @_;
 
-    my $args      = $params{args};
-    my $state     = $params{state};
-    my $caller    = $params{caller};
-    my $wantarray = $params{wantarray};
+    my $type   = $params{type}   // 'orm';
+    my $rename = $params{rename} // {};
+    my $skip   = $params{skip}   // {};
+    my $only   = $params{only};
 
-    require DBIx::QuickORM::ORM;
-    require DBIx::QuickORM::DB;
-    require DBIx::QuickORM::Schema;
+    $only = {map {($_ => 1)} @$only} if $only;
 
-    if (@$args == 1 && !ref($args->[0])) {
-        croak 'useless use of orm($name) in void context' unless defined $wantarray;
-        return _get('orm', $caller->[0], $args->[0]);
-    }
+    my $caller = caller;
 
-    my ($name, $db, $schema, $cb, @other);
-    while (my $arg = shift(@$args)) {
-        if (blessed($arg)) {
-            $schema = $arg and next if $arg->isa('DBIx::QuickORM::Schema');
-            $db     = $arg and next if $arg->isa('DBIx::QuickORM::DB');
-            croak "'$arg' is not a valid argument to orm()";
-        }
+    my $builder = $class->new(PACKAGE() => $caller, TYPE() => $type);
 
-        if (my $ref = ref($arg)) {
-            $cb = $arg and next if $ref eq 'CODE';
-            croak "'$arg' is not a valid argument to orm()";
-        }
-
-        if ($arg eq 'db' || $arg eq 'database') {
-            my $db_name = shift(@$args);
-            $db = _get('db', $caller->[0], $db_name) or croak "Database '$db_name' is not a defined";
-            next;
-        }
-        elsif ($arg eq 'schema') {
-            my $schema_name = shift(@$args);
-            $schema = _get('schema', $caller->[0], $schema_name) or croak "Database '$schema_name' is not a defined";
-            next;
-        }
-        elsif ($arg eq 'name') {
-            $name = shift(@$args);
-            next;
-        }
-
-        push @other => $arg;
-    }
-
-    for my $arg (@other) {
-        unless($name) {
-            $name = $arg;
-            next;
-        }
-
-        unless ($db) {
-            $db = _get('db', $caller->[0], $arg) or croak "Database '$arg' is not defined";
-            next;
-        }
-
-        unless ($schema) {
-            $schema = _get('schema', $caller->[0], $arg) or croak "Schema '$arg' is not defined";
-            next;
-        }
-
-        croak "Too many plain string arguments, not sure what to do with '$arg' as name, database, and schema are all defined already"
-    }
-
-    my %orm = (
-        created => "$caller->[1] line $caller->[2]",
+    my %export = (
+        builder => set_subname("${caller}::builder" => sub { $builder }),
     );
 
-    $orm{name}   //= $name   if $name;
-    $orm{schema} //= $schema if $schema;
-    $orm{db}     //= $db     if $db;
-
-    $state->{+ORM_STATE} = \%orm;
-
-    delete $state->{+DB};
-    delete $state->{+SCHEMA};
-    delete $state->{+RELATION};
-
-    update_subname($name ? "orm builder $name" : "orm builder", $cb)->(\%orm) if $cb;
-
-    if (my $db = $state->{+DB}) {
-        croak "ORM already has a database defined, but a second one has been built" if $orm{db};
-        $orm{db} = $db;
+    if ($type eq 'orm') {
+        $export{import} = set_subname("${caller}::import" => sub { shift; $builder->import_into(scalar(caller), @_) }),
     }
 
-    if (my $schema = $state->{+SCHEMA}) {
-        croak "ORM already has a schema defined, but a second one has been built" if $orm{schema};
-        $orm{schema} = $schema;
+    for my $name (@EXPORT) {
+        my $meth = $name;
+        $export{$name} //= set_subname("${caller}::$meth" => sub { shift @_ if @_ && $_[0] && "$_[0]" eq $caller; $builder->$meth(@_) });
     }
 
-    croak "No database specified" unless $orm{db};
-    croak "No schema specified" unless $orm{schema};
-
-    $orm{db}     = _build_db($orm{db})         unless blessed($orm{db});
-    $orm{schema} = _build_schema($orm{schema}) unless blessed($orm{schema});
-
-    require DBIx::QuickORM::ORM;
-    my $orm = DBIx::QuickORM::ORM->new(%orm);
-
-    $name //= $orm->name;
-
-    croak "Cannot be called in void context without a name"
-        unless $name || defined($wantarray);
-
-    _set('orm', $caller->[0], $name, $orm) if $name;
-
-    return $orm;
-};
-
-sub autofill {
-    my ($val) = @_;
-    $val //= 1;
-
-    my $orm = build_state('ORM') or croak "This can only be used inside a orm builder";
-
-    my $ok;
-    if (my $type = ref($val)) {
-        $ok = 1 if $type eq 'CODE';
-    }
-    else {
-        $ok = 1 if "$val" == "1" || "$val" == "0";
-    }
-
-    croak "Autofill takes either no argument (on), 1 (on), 0 (off), or a coderef (got: $val)"
-        unless $ok;
-
-    $orm->{autofill} = $val;
-}
-
-sub _new_db_params {
-    my ($name, $caller) = @_;
-
-    my %out = (
-        created    => "$caller->[1] line $caller->[2]",
-        db_name    => $name,
-        attributes => {},
-    );
-
-    $out{name} = $name if $name;
-
-    return %out;
-}
-
-sub _build_db {
-    my $params = shift;
-
-    my $class  = delete($params->{class}) or croak "You must specify a db class such as: PostgreSQL, MariaDB, Percona, MySQL, or SQLite";
-    $class = "DBIx::QuickORM::DB::$class" unless $class =~ s/^\+// || $class =~ m/^DBIx::QuickORM::DB::/;
-
-    eval { require(mod2file($class)); 1 } or croak "Could not load $class: $@";
-    return $class->new(%$params);
-}
-
-# sub db {
-build_top_builder db => sub {
-    my %params = @_;
-
-    my $args      = $params{args};
-    my $state     = $params{state};
-    my $caller    = $params{caller};
-    my $wantarray = $params{wantarray};
-
-    require DBIx::QuickORM::DB;
-    if (@$args == 1 && !ref($args->[0])) {
-        croak 'useless use of db($name) in void context' unless defined $wantarray;
-        return _get('db', $caller->[0], $args->[0]);
-    }
-
-    my ($name, $cb);
-    for my $arg (@$args) {
-        $name = $arg and next unless ref($arg);
-        $cb = $arg and next if ref($arg) eq 'CODE';
-        croak "Not sure what to do with argument '$arg'";
-    }
-
-    croak "A codeblock is required to build a database" unless $cb;
-
-    my $orm = $state->{+ORM_STATE};
-    if ($orm) {
-        croak "Quick ORM '$orm->{name}' already has a database" if $orm->{db};
-    }
-    elsif (!$name) {
-        croak "useless use of db(sub { ... }) in void context. Either provide a name, or assign the result";
-    }
-
-    my %db = _new_db_params($name => $caller);
-
-    $state->{+DB} = \%db;
-
-    update_subname($name ? "db builder $name" : "db builder", $cb)->(\%db) if $cb;
-
-    my $db = _build_db(\%db);
-
-    if ($orm) {
-        croak "Quick ORM instance already has a db" if $orm->{db};
-        $orm->{db} = $db;
-    }
-
-    _set('db', $caller->[0], $name, $db) if $name;
-
-    return $db;
-};
-
-sub _get_db {
-    my $state = build_state or return;
-
-    return $state->{+DB} if $state->{+DB};
-    return unless $state->{+ORM_STATE};
-
-    croak "Attempt to use db builder tools outside of a db builder in an orm that already has a db defined"
-        if $state->{+ORM_STATE}->{db};
-
-    my %params = _new_db_params(undef, [caller(1)]);
-
-    $state->{+DB} = \%params;
-}
-
-sub db_attributes {
-    my %attrs = @_ == 1 ? (%{$_[0]}) : (@_);
-
-    my $db = _get_db() or croak "attributes() must be called inside of a db or orm builer";
-    %{$db->{attributes} //= {}} = (%{$db->{attributes} // {}}, %attrs);
-
-    return $db->{attributes};
-}
-
-sub db_connect {
-    my ($in) = @_;
-
-    my $db = _get_db() or croak "connect() must be called inside of a db or ORM builer";
-
-    if (ref($in) eq 'CODE') {
-        return $db->{connect} = $in;
-    }
-
-    my $code = do { no strict 'refs'; \&{$in} };
-    croak "'$in' does not appear to be a defined subroutine" unless defined(&$code);
-    return $db->{connect} = $code;
-}
-
-BEGIN {
-    for my $db_field (qw/db_class db_name db_dsn db_host db_socket db_port db_user db_password/) {
-        my $name = $db_field;
-        my $attr = $name;
-        $attr =~ s/^db_// unless $attr eq 'db_name';
-        my $sub  = sub {
-            my $db = _get_db() or croak "$name() must be called inside of a db builer";
-            $db->{$attr} = $_[0];
-        };
-
+    my %seen;
+    for my $sym (keys %export) {
+        my $name = $rename->{$sym} // $sym;
+        next if $skip->{$name} || $skip->{$sym};
+        next if $only && !($only->{$name} || $only->{$sym});
+        next if $seen{$name}++;
         no strict 'refs';
-        *{$name} = set_subname $name => $sub;
+        *{"${caller}\::${name}"} = $export{$sym};
     }
 }
 
-sub _new_schema_params {
-    my ($name, $caller) = @_;
+sub _caller {
+    my $self = shift;
 
-    my %out = (
-        created  => "$caller->[1] line $caller->[2]",
-        includes => [],
-    );
-
-    $out{name} = $name if $name;
-
-    return %out;
-}
-
-sub _build_schema {
-    my $params = shift;
-
-    my $state = build_state;
-
-    if (my $pacc = $state->{+ACCESSORS}) {
-        for my $tname (%{$params->{tables}}) {
-            my $table = $params->{tables}->{$tname};
-            $tname = $table->clone(accessors => mesh_accessors($table->accessors, $pacc));
-        }
-    }
-
-    my $includes = delete $params->{includes};
-    my $class    = delete($params->{schema_class}) // 'DBIx::QuickORM::Schema';
-    eval { require(mod2file($class)); 1 } or croak "Could not load class $class: $@";
-    my $schema = $class->new(%$params);
-    $schema = $schema->merge($_) for @$includes;
-
-    return $schema;
-}
-
-# sub schema {
-build_top_builder schema => sub {
-    my %params = @_;
-
-    my $args      = $params{args};
-    my $state     = $params{state};
-    my $caller    = $params{caller};
-    my $wantarray = $params{wantarray};
-
-    require DBIx::QuickORM::Schema;
-
-    if (@$args == 1 && !ref($args->[0])) {
-        croak 'useless use of schema($name) in void context' unless defined $wantarray;
-        _get('schema', $caller->[0], $args->[0]);
-    }
-
-    my ($name, $cb);
-    for my $arg (@$args) {
-        $name = $arg and next unless ref($arg);
-        $cb = $arg and next if ref($arg) eq 'CODE';
-        croak "Got an undefined argument";
-        croak "Not sure what to do with argument '$arg'";
-    }
-
-    croak "A codeblock is required to build a schema" unless $cb;
-
-    my $orm = $state->{+ORM_STATE};
-    if ($orm) {
-        croak "Quick ORM '$orm->{name}' already has a schema" if $orm->{schema};
-    }
-    elsif(!$name && !defined($wantarray)) {
-        croak "useless use of schema(sub { ... }) in void context. Either provide a name, or assign the result";
-    }
-
-    my %schema = _new_schema_params($name => $caller);
-
-    $state->{+SCHEMA}    = \%schema;
-
-    delete $state->{+COLUMN};
-    delete $state->{+TABLE};
-    delete $state->{+RELATION};
-
-    update_subname($name ? "schema builder $name" : "schema builder", $cb)->(\%schema) if $cb;
-
-    my $schema = _build_schema(\%schema);
-
-    if ($orm) {
-        croak "This orm instance already has a schema" if $orm->{schema};
-        $orm->{schema} = $schema;
-    }
-
-    _set('schema', $caller->[0], $name, $schema) if $name;
-
-    return $schema;
-};
-
-sub _get_schema {
-    my $state = build_state;
-    return $state->{+SCHEMA} if $state->{+SCHEMA};
-    my $orm = $state->{+ORM_STATE} or return;
-
-    return $orm->{schema} if $orm->{schema};
-
-    my %params = _new_schema_params(undef, [caller(1)]);
-
-    $orm->{schema} = $state->{+SCHEMA} = \%params;
-
-    return $state->{+SCHEMA};
-}
-
-sub include {
-    my @schemas = @_;
-
-    my $state  = build_state;
-    my $schema = $state->{+SCHEMA} or croak "'include()' must be used inside a 'schema' builder";
-
-    require DBIx::QuickORM::Schema;
-    for my $item (@schemas) {
-        my $it = blessed($item) ? $item : (_get('schema', scalar(caller), $item) or "Schema '$item' is not defined");
-
-        croak "'" . ($it // $item) . "' is not an instance of 'DBIx::QuickORM::Schema'" unless $it && blessed($it) && $it->isa('DBIx::QuickORM::Schema');
-
-        push @{$schema->{include} //= []} => $it;
+    my $i = 0;
+    while (my @caller = caller($i++)) {
+        return unless @caller;
+        next if eval { $caller[0]->isa(__PACKAGE__) };
+        return \@caller;
     }
 
     return;
 }
 
-sub tables {
-    my (@prefixes) = @_;
+sub unimport {
+    my $class = shift;
+    my $caller = caller;
 
-    my $schema = build_state(SCHEMA) or croak "tables() can only be called under a schema builder";
+    $class->unimport_from($caller);
+}
+
+sub unimport_from {
+    my $class = shift;
+    my ($caller) = @_;
+
+    my $stash = do { no strict 'refs'; \%{"$caller\::"} };
+
+    for my $item (@EXPORT) {
+        my $export = $class->can($item)  or next;
+        my $sub    = $caller->can($item) or next;
+
+        next unless $export == $sub;
+
+        my $glob = delete $stash->{$item};
+
+        {
+            no strict 'refs';
+            no warnings 'redefine';
+
+            for my $type (qw/SCALAR HASH ARRAY FORMAT IO/) {
+                next unless defined(*{$glob}{$type});
+                *{"$caller\::$item"} = *{$glob}{$type};
+            }
+        }
+    }
+}
+
+sub new {
+    my $class = shift;
+    my %params = @_;
+
+    croak "'package' is a required attribute" unless $params{+PACKAGE};
+
+    $params{+STACK}   //= [{base => 1, plugins => [], building => '', build => 'Should not access this', meta => 'Should not access this'}];
+
+    $params{+ORMS}    //= {};
+    $params{+DBS}     //= {};
+    $params{+SCHEMAS} //= {};
+    $params{+SERVERS} //= {};
+
+    return bless(\%params, $class);
+}
+
+sub import_into {
+    my $self = shift;
+    my ($caller, $name, @extra) = @_;
+
+    croak "Not enough arguments, caller is required" unless $caller;
+    croak "Too many arguments" if @extra;
+
+    $name //= 'qorm';
+
+    no strict 'refs';
+    *{"${caller}\::${name}"} = sub {
+        return $self unless @_;
+        return $self->orm(@_)->connection if @_ == 1;
+        my ($type, $name, @extra) = @_;
+        croak "Too many arguments" if @extra;
+        croak "'$type' is not a valid item type to fetch from '$caller'" unless $type =~ m/^(orm|db|schema)$/;
+        return $self->$type($name);
+    };
+}
+
+sub top {
+    my $self = shift;
+    return $self->{+STACK}->[-1];
+}
+
+sub alt {
+    my $self = shift;
+    my $top = $self->top;
+    croak "alt() cannot be used outside of a builder" if $top->{base};
+    my ($name, $builder) = @_;
+
+    my $frame = $top->{alt}->{$name} // {building => $top->{building}, name => $name, meta => {}};
+    return $self->_build(
+        'Alt',
+        into => $top->{alt} //= {},
+        frame => $frame,
+        args => [$name, $builder],
+    );
+}
+
+sub plugin {
+    my $self = shift;
+    my ($proto, @proto_params) = @_;
+
+    if (blessed($proto)) {
+        croak "Cannot pass in both a blessed plugin instance and constructor arguments" if @proto_params;
+        if ($proto->isa('DBIx::QuickORM::Plugin')) {
+            push @{$self->top->{plugins}} => $proto;
+            return $proto;
+        }
+        croak "$proto is not an instance of 'DBIx::QuickORM::Plugin' or a subclass of it";
+    }
+
+    my $class = load_class($proto, 'DBIx::QuickORM::Plugin') or croak "Could not load plugin '$proto': $@";
+    croak "$class is not a subclass of DBIx::QuickORM::Plugin" unless $class->isa('DBIx::QuickORM::Plugin');
+
+    my $params = @proto_params == 1 ? shift(@proto_params) : { @proto_params };
+
+    my $plugin = $class->new(%$params);
+    push @{$self->top->{plugins}} => $plugin;
+    return $plugin;
+}
+
+sub plugins {
+    my $self = shift;
+
+    # Return a list of plugins if no arguments were provided
+    return [map { @{$_->{plugins} // []} } reverse @{$self->{+STACK}}]
+        unless @_;
 
     my @out;
-    for my $mod (find_modules(@prefixes)) {
-        my ($mod, $table) = _add_table_class($mod, $schema);
-        push @out => $mod;
+
+    while (my $proto = shift @_) {
+        if (@_ && ref($_[0]) eq 'HASH') {
+            my $params = shift @_;
+            push @out => $self->plugin($proto, $params);
+        }
+        else {
+            push @out => $self->plugin($proto);
+        }
     }
 
-    return @out;
+    return \@out;
 }
 
-sub _add_table_class {
-    my ($mod, $schema) = @_;
+sub meta {
+    my $self = shift;
 
-    my $state = build_state;
+    croak "Cannot access meta without a builder" unless @{$self->{+STACK}} > 1;
+    my $top = $self->top;
 
-    $schema //= $state->{SCHEMA} or croak "No schema found";
+    return $top->{meta} unless @_;
 
-    require (mod2file($mod));
+    %{$top->{meta}} = (%{$top->{meta}}, @_);
 
-    my $table = $mod->orm_table;
-    my $name = $table->name;
+    return $top->{meta};
+}
 
-    croak "Schema already has a table named '$name', cannot add table from module '$mod'" if $schema->{tables}->{$name};
+sub build_class {
+    my $self = shift;
 
-    my %clone;
+    croak "Not enough arguments" unless @_;
 
-    if (my $pacc = $state->{ACCESSORS}) {
-        $clone{accessors} = mesh_accessors($pacc, $table->accessors);
+    my ($proto) = @_;
+
+    croak "You must provide a class name" unless $proto;
+
+    my $class = load_class($proto) or croak "Could not load class '$proto': $@";
+
+    croak "Cannot set the build class without a builder" unless @{$self->{+STACK}} > 1;
+
+    $self->top->{class} = $class;
+}
+
+sub server {
+    my $self = shift;
+
+    my $top   = $self->top;
+    my $into  = $self->{+SERVERS};
+    my $frame = {building => 'SERVER'};
+
+    return $self->_build('Server', into => $into, frame => $frame, args => \@_);
+}
+
+sub db {
+    my $self = shift;
+
+    my $top = $self->top;
+
+    my $bld_orm = 0;
+    if ($top->{building} eq 'ORM') {
+        croak "DB has already been defined" if $top->{meta}->{db};
+        $bld_orm = 1;
     }
 
-    if (my $row_class = $table->{row_class} // $schema->{row_class}) {
-        $clone{row_class} = $row_class;
+    if (@_ == 1 && $_[0] =~ m/^(\S+)\.([^:\s]+)(?::(\S+))?$/) {
+        my ($server_name, $db_name, $variant_name) = ($1, $2, $3);
+
+        my $server = $self->{+SERVERS}->{$server_name} or croak "'$server_name' is not a defined server";
+        my $db = $server->{meta}->{dbs}->{$db_name} or croak "'$db_name' is not a defined database on server '$server_name'";
+
+        return $top->{meta}->{db} = $db if $bld_orm;
+        return $self->compile($db, $variant_name);
     }
 
-    $table = $table->clone(%clone) if keys %clone;
-
-    $schema->{tables}->{$name} = $table;
-    return ($mod, $table);
-}
-
-# sub rogue_table {
-build_clean_builder rogue_table => sub {
-    my %params = @_;
-
-    my $args   = $params{args};
-    my $state  = $params{state};
-    my $caller = $params{caller};
-
-    my ($name, $cb) = @$args;
-
-    return _table($name, $cb, caller => $caller);
-};
-
-sub _table {
-    my ($name, $cb, %params) = @_;
-
-    my $caller = delete($params{caller}) // [caller(1)];
-
-    $params{name}    = $name;
-    $params{created} //= "$caller->[1] line $caller->[2]";
-    $params{indexes} //= {};
-
-    my $state = build_state();
-    $state->{+TABLE} = \%params;
-
-    update_subname("table builder $name", $cb)->(\%params);
-
-    for my $cname (keys %{$params{columns}}) {
-        my $spec = $params{columns}{$cname};
-
-        if (my $conflate = $spec->{conflate}) {
-            if (ref($conflate) eq 'HASH') { # unblessed hash
-                confess "No inflate callback was provided for conflation" unless $conflate->{inflate};
-                confess "No deflate callback was provided for conflation" unless $conflate->{deflate};
-
-                require DBIx::QuickORM::Conflator;
-                $spec->{conflate} = DBIx::QuickORM::Conflator->new(%$conflate);
-            }
-        }
-
-        my $class = delete($spec->{column_class}) || $params{column_class} || ($state->{SCHEMA} ? $state->{SCHEMA}->{column_class} : undef ) || 'DBIx::QuickORM::Table::Column';
-        eval { require(mod2file($class)); 1 } or die "Could not load column class '$class': $@";
-        $params{columns}{$cname} = $class->new(%$spec);
-    }
-
-    my $class = delete($params{table_class}) // 'DBIx::QuickORM::Table';
-    eval { require(mod2file($class)); 1 } or croak "Could not load class $class: $@";
-    return $class->new(%params);
-}
-
-# sub update_table {
-build_top_builder update_table => sub {
-    my %params = @_;
-
-    my $args   = $params{args};
-    my $state  = $params{state};
-    my $caller = $params{caller};
-
-    my ($name, $cb) = @$args;
-
-    my $schema = _get_schema() or croak "table() can only be used inside a schema builder";
-
-    my $old = $schema->{tables}->{$name};
-
-    delete $state->{+COLUMN};
-    delete $state->{+RELATION};
-
-    my $table = _table($name, $cb, caller => $caller);
-
-    $schema->{tables}->{$name} = $old ? $old->merge($table) : $table;
-
-    return $schema->{tables}->{$name}
-};
-
-# sub table {
-build_top_builder table => sub {
-    my %params = @_;
-
-    my $args   = $params{args};
-    my $state  = $params{state};
-    my $caller = $params{caller};
-
-    return rtable(@$args) if $state->{+RELATION};
-    my $schema = _get_schema() or croak "table() can only be used inside a schema builder";
-
-    my ($name, $cb) = @$args;
-
-    croak "Table '$name' is already defined" if $schema->{tables}->{$name};
-
-    if ($name =~ m/::/) {
-        croak "Too many arguments for table(\$table_class)" if $cb;
-        my ($mod, $table) = _add_table_class($name, $schema);
-        return $table;
-    }
-
-    delete $state->{+COLUMN};
-    delete $state->{+RELATION};
-
-    my $table = _table($name, $cb);
-
-    $schema->{tables}->{$name} = $table;
-
-    return $table;
-};
-
-sub _magic_meta_table {
-    my $from = shift;
-    my %args = @_;
-
-    my $into = $args{into};
-    my $name = $args{new_name};
-    my $ref  = $args{ref};
-
-    eval { require BEGIN::Lift; BEGIN::Lift->can('install') } or return;
-
-    my $stash = do { no strict 'refs'; \%{"$into\::"} };
-    $stash->{_meta_table} = delete $stash->{meta_table};
-
-    BEGIN::Lift::install($into, $name, $ref);
-}
-
-sub _gen_meta_table {
-    my $from_package = shift;
-    my ($into_package, $symbol_name) = @_;
-
-    my %subs;
-
-    my $stash = do { no strict 'refs'; \%{"$into_package\::"} };
-
-    for my $item (keys %$stash) {
-        my $sub = $into_package->can($item) or next;
-        $subs{$item} = $sub;
-    }
-
-    my $me;
-    $me = set_subname 'meta_table_wrapper' => sub {
-        my $name     = shift;
-        my $cb       = pop;
-        my $row_base = shift // build_state(DEFAULT_BASE_ROW) // 'DBIx::QuickORM::Row';
-
-        my @caller_parent = caller(1);
-        confess "meta_table must be called directly from a BEGIN block (Or you can install 'BEGIN::Lift' to automatically wrap it in a BEGIN block)"
-            unless @caller_parent && $caller_parent[3] =~ m/(^BEGIN::Lift::__ANON__|::BEGIN|::import)$/;
-
-        my $table = _meta_table(name => $name, cb => $cb, row_base => $row_base, into => $into_package);
-
-        for my $item (keys %$stash) {
-            my $export = $item eq 'meta_table' ? $me : $from_package->can($item) or next;
-            my $sub    = $into_package->can($item)                               or next;
-
-            next unless $export == $sub || $item eq '_meta_table';
-
-            my $glob = delete $stash->{$item};
-
-            {
-                no strict 'refs';
-                no warnings 'redefine';
-
-                for my $type (qw/SCALAR HASH ARRAY FORMAT IO/) {
-                    next unless defined(*{$glob}{$type});
-                    *{"$into_package\::$item"} = *{$glob}{$type};
-                }
-
-                if ($subs{$item} && $subs{$item} != $export) {
-                    *{"$into_package\::$item"} = $subs{$item};
-                }
-            }
-        }
-
-        $me = undef;
-
-        return $table;
-    };
-
-    return $me;
-}
-
-sub meta_table {
-    my $name     = shift;
-    my $cb       = pop;
-    my $row_base = shift // build_state(DEFAULT_BASE_ROW) // 'DBIx::QuickORM::Row';
-    my @caller   = caller;
-
-    return _meta_table(name => $name, cb => $cb, row_base => $row_base, into => $caller[0]);
-}
-
-# sub _meta_table {
-build_clean_builder _meta_table => sub {
-    my %params = @_;
-
-    my $args   = $params{args};
-    my $state  = $params{state};
-    my $caller = $params{caller};
-
-    my %table = @$args;
-
-    my $name     = $table{name};
-    my $cb       = $table{cb};
-    my $row_base = $table{row_base} // build_state(DEFAULT_BASE_ROW) // 'DBIx::QuickORM::Row';
-    my $into     = $table{into};
-
-    require(mod2file($row_base));
-
-    my $table = _table($name, $cb, row_class => $into, accessors => {inject_into => $into});
-
-    {
-        no strict 'refs';
-        my $subname = "$into\::orm_table";
-        *{$subname} = set_subname $subname => sub { $table };
-        push @{"$into\::ISA"} => $row_base;
-    }
-
-    return $table;
-};
-
-# -name - remove a name
-# :NONE
-# :ALL
-# {name => newname} - renames
-# [qw/name1 name2/] - includes
-# name - include
-# sub { my ($name, {col => $col, rel => $rel}) = @_; return $newname } - name generator, return original, new, or undef if it should be skipped
-sub accessors {
-    return _table_accessors(@_) if build_state(TABLE);
-    return _other_accessors(@_) if build_state(ACCESSORS);
-    croak "accesors() must be called inside one of the following builders: table, orm, schema"
-}
-
-sub _other_accessors {
-    my $acc = build_state(ACCESSORS, {});
-
-    for my $arg (@_) {
-        if (ref($arg) eq 'CODE') {
-            push @{$acc->{name_cbs}} => $arg;
-            next;
-        }
-
-        if ($arg =~ m/^:(\S+)$/) {
-            my $field = $1;
-            my $inverse = accessor_field_inversion($field) or croak "'$arg' is not a valid accessors() argument";
-
-            $acc->{$field} = 1;
-            $acc->{$inverse} = 0;
-
-            next;
-        }
-
-        croak "'$arg' is not a valid argument to accessors in this builder";
-    }
-
-    return;
-}
-
-sub _table_accessors {
-    my $acc = build_state(TABLE)->{accessors} //= {};
-
-    while (my $arg = shift @_) {
-        my $r = ref($arg);
-
-        if ($r eq 'HASH') {
-            $acc->{include}->{$_} = $r->{$_} for keys %$r;
-            next;
-        }
-
-        if ($r eq 'ARRAY') {
-            $acc->{include}->{$_} //= $r->{$_} for @$r;
-            next;
-        }
-
-        if ($r eq 'CODE') {
-            push @{$acc->{name_cbs} //= []} => $arg;
-            next
-        }
-
-        if ($arg =~ m/^-(\S+)$/) {
-            $acc->{exclude}->{$1} = $1;
-            next;
-        }
-
-        if ($arg =~ m/^\+(\$+)$/) {
-            $acc->{inject_into} = $1;
-        }
-
-        if ($arg =~ m/^:(\S+)$/) {
-            my $field = $1;
-            my $inverse = accessor_field_inversion($field) or croak "'$arg' is not a valid accessors() argument";
-
-            $acc->{$field} = 1;
-            $acc->{$inverse} = 0;
-
-            next;
-        }
-
-        $acc->{include}->{$arg} //= $arg;
-    }
-
-    return;
-}
-
-BEGIN {
-    my @CLASS_SELECTORS = (
-        [column_class=> (COLUMN, TABLE, SCHEMA)],
-        [row_class=>    (TABLE,  SCHEMA)],
-        [table_class=>  (TABLE,  SCHEMA)],
-        [source_class=> (TABLE)],
-    );
-
-    for my $cs (@CLASS_SELECTORS) {
-        my ($name, @states) = @$cs;
-
-        my $code = sub {
-            my ($class) = @_;
-            eval { require(mod2file($class)); 1 } or croak "Could not load class $class: $@";
-
-            for my $state (@states) {
-                my $params = build_state($state) or next;
-                return $params->{$name} = $class;
-            }
-
-            croak "$name() must be called inside one of the following builders: " . join(', ' => map { lc($_) } @states);
+    my $into = $self->{+DBS};
+    my $frame = {building => 'DB', class => 'DBIx::QuickORM::DB'};
+
+    return $top->{meta}->{db} = $self->_build('DB', into => $into, frame => $frame, args => \@_, no_compile => 1)
+        if $bld_orm;
+
+    my $force_build = 0;
+    if ($top->{building} eq 'SERVER') {
+        $force_build = 1;
+
+        $frame = {
+            %$frame,
+            %{$top},
+            building => 'DB',
+            meta => {%{$top->{meta}}},
+            server => $top->{name} // $top->{created},
         };
 
-        no strict 'refs';
-        *{$name} = set_subname $name => $code;
+        delete $frame->{name};
+        delete $frame->{meta}->{name};
+        delete $frame->{meta}->{dbs};
+        delete $frame->{prefix} unless defined $frame->{prefix};
+
+        $into = $top->{meta}->{dbs} //= {};
     }
+
+    return $self->_build('DB', into => $into, frame => $frame, args => \@_, force_build => $force_build);
 }
 
-sub sql_type {
-    my ($type, @dbs) = @_;
+sub handle_class {
+    my $self = shift;
+    my ($proto) = @_;
 
-    my $col = build_state(COLUMN) or croak "sql_type() may only be used inside a column builder";
+    my $top = $self->_in_builder(qw{orm});
 
-    if (@dbs) {
-        sql_spec($_ => { type => $type }) for @dbs;
+    $top->{meta}->{default_handle_class} = load_class($proto, 'DBIx::QuickORM::Handle') or croak "Could not load handle class '$proto': $@";
+
+    return;
+}
+
+sub autofill {
+    my $self = shift;
+
+    my $top = $self->_in_builder(qw{orm});
+
+    my $frame = {building => 'AUTOFILL', class => 'DBIx::QuickORM::Schema::Autofill', meta => {}};
+
+    if (@_ && !ref($_[0])) {
+        my $proto = shift @_;
+        $frame->{class} = load_class($proto, 'DBIx::QuickORM::Schema::Autofill') or croak "Could not load autofill class '$proto': $@";
     }
-    else {
-        sql_spec(type => $type);
-    }
-}
 
-sub sql_spec {
-    my %hash = @_ == 1 ? %{$_[0]} : (@_);
-
-    my $builder = build_meta_state('building') or croak "Must be called inside a builder";
-
-    $builder = uc($builder);
-
-    my $obj = build_state($builder) or croak "Could not find '$builder' state";
-
-    my $specs = $obj->{sql_spec} //= {};
-
-    %$specs = (%$specs, %hash);
-
-    return $specs;
-}
-
-sub is_view {
-    my $table = build_state(TABLE) or croak "is_view() may only be used in a table builder";
-    $table->{is_view} = 1;
-}
-
-sub is_temp {
-    my $table = build_state(TABLE) or croak "is_temp() may only be used in a table builder";
-    $table->{is_temp} = 1;
-}
-
-sub column {
-    my @specs = @_;
-
-    @specs = @{$specs[0]} if @specs == 1 && ref($specs[0]) eq 'ARRAY';
-
-    my @caller = caller;
-    my $created = "$caller[1] line $caller[2]";
-
-    my $table = build_state(TABLE) or croak "columns may only be used in a table builder";
-
-    my $sql_spec = pop(@specs) if $table && @specs && ref($specs[-1]) eq 'HASH';
-
-    while (my $name = shift @specs) {
-        my $spec = @specs && ref($specs[0]) ? shift(@specs) : undef;
-
-        if ($table) {
-            if ($spec) {
-                my $type = ref($spec);
-                if ($type eq 'HASH') {
-                    $table->{columns}->{$name}->{$_} = $spec->{$_} for keys %$spec;
-                }
-                elsif ($type eq 'CODE') {
-                    my $column = $table->{columns}->{$name} //= {created => $created, name => $name};
-
-                    $spec = update_subname 'column builder' => $spec;
-
-                    build(
-                        building => 'column',
-                        callback => $spec,
-                        args     => [],
-                        caller   => \@caller,
-                        state    => { %{build_state()}, COLUMN() => $column },
-                    );
-                }
-            }
-            else {
-                $table->{columns}->{$name} //= {created => $created, name => $name};
-            }
-
-            $table->{columns}->{$name}->{name}  //= $name;
-            $table->{columns}->{$name}->{order} //= $COL_ORDER++;
-
-            %{$table->{columns}->{$name}->{sql_spec} //= {}} = (%{$table->{columns}->{$name}->{sql_spec} //= {}}, %$sql_spec)
-                if $sql_spec;
-        }
-        elsif ($spec) {
-            croak "Cannot specify column data outside of a table builder";
-        }
-    }
-}
-
-sub serial {
-    my ($size, @cols) = @_;
-    $size //= 1;
-
-    if (@cols) {
-        my @caller  = caller;
-        my $created = "$caller[1] line $caller[2]";
-
-        my $table = build_state(TABLE) or croak 'serial($size, @cols) must be used inside a table builer';
-        for my $cname (@cols) {
-            my $col = $table->{columns}->{$cname} //= {created => $created, name => $cname};
-            $col->{serial} = $size;
-        }
+    if (!@_) {
+        $top->{meta}->{autofill} = $frame;
         return;
     }
 
-    my $col = build_state(COLUMN) or croak 'serial($size) must be used inside a column builer';
-    $col->{serial} = $size;
-    $col->{sql_type} //= 'serial';
+    $top->{meta}->{autofill} = $self->_build('AUTOFILL', frame => $frame, args => \@_, no_compile => 1);
 }
 
-BEGIN {
-    my @COL_ATTRS = (
-        [unique      => set_subname(unique_col_val => sub { @{$_[0]} > 1 ? undef : 1 }), {index => 'unique'}],
-        [primary_key => set_subname(unique_pk_val => sub { @{$_[0]} > 1 ? undef : 1 }),  {set => 'primary_key', index => 'unique'}],
-        [nullable    => set_subname(nullable_val => sub { $_[0] // 1 }),                 {set => 'nullable'}],
-        [not_null    => 0,                                                               {set => 'nullable'}],
-        [omit        => 1],
-        [
-            default => set_subname default_col_val => sub {
-                my $sub = shift(@{$_[0]});
-                croak "First argument to default() must be a coderef" unless ref($sub) eq 'CODE';
-                return $sub;
-            },
-        ],
-        [
-            conflate => set_subname conflate_col_val => sub {
-                my $conf = shift(@{$_[0]});
+sub autotype {
+    my $self = shift;
+    my ($type) = @_;
 
-                if (blessed($conf)) {
-                    croak "Conflator '$conf' does not implement inflate()" unless $conf->can('inflate');
-                    croak "Conflator '$conf' does not implement deflate()" unless $conf->can('deflate');
-                    return $conf;
-                }
+    my $top = $self->_in_builder(qw{autofill});
 
-                $conf = "DBIx::QuickORM::Conflator::$conf" unless $conf =~ s/^\+// || $conf =~ m/^DBIx::QuickORM::Conflator::/;
+    my $class = load_class($type, 'DBIx::QuickORM::Type') or croak "Could not load type '$type': $@";
 
-                eval { require(mod2file($conf)); 1 } or croak "Could not load conflator class '$conf': $@";
-                return $conf;
-            },
-        ],
-    );
+    $class->qorm_register_type($top->{meta}->{types} //= {}, $top->{meta}->{affinities} //= {});
 
-    for my $col_attr (@COL_ATTRS) {
-        my ($attr, $val, $params) = @$col_attr;
+    return;
+}
 
-        my $code = sub {
-            my @cols = @_;
+sub autorow {
+    my $self = shift;
+    my ($base, $name_to_class) = @_;
 
-            my $val = ref($val) ? $val->(\@cols) : $val;
+    my $top = $self->_in_builder(qw{autofill});
+    croak "autorow already set" if $top->{autorow};
 
-            my $table = build_state(TABLE) or croak "$attr can only be used inside a column or table builder";
+    my $caller = $self->_caller;
 
-            if (my $column = build_state(COLUMN)) {
-                croak "Cannot provide a list of columns inside a column builder ($column->{created})" if @cols;
-                $column->{$attr} = $val;
-                @cols = ($column->{name});
-                $column->{order} //= $COL_ORDER++;
-            }
-            else {
-                croak "Must provide a list of columns when used inside a table builder" unless @cols;
+    $name_to_class //= sub {
+        my $name = shift;
+        my @parts = split /_/, $name;
+        return join '' => map { ucfirst(lc($_)) } @parts;
+    };
 
-                my @caller  = caller;
-                my $created = "$caller[1] line $caller[2]";
+    $top->{autorow} = $base;
 
-                for my $cname (@cols) {
-                    my $col = $table->{columns}->{$cname} //= {created => $created, name => $cname};
-                    $col->{$attr} = $val if defined $val;
-                    $col->{order} //= $COL_ORDER++;
-                }
-            }
+    local $@;
+    my $parent = load_class($base) // load_class('DBIx::QuickORM::Row') or die $@;
+    $self->autohook(post_table => sub {
+        my %params = @_;
+        my $autofill = $params{autofill};
+        my $table = $params{table};
 
-            # FIXME - Why are we sorting and doing ordered?
-            my $ordered;
+        my $postfix = $name_to_class->($table->{name});
+        my $package = "$base\::$postfix";
 
-            if (my $key = $params->{set}) {
-                $ordered //= [sort @cols];
-                $table->{$key} = $ordered;
-            }
+        local $@;
+        my $loaded = load_class($package);
 
-            if (my $key = $params->{index}) {
-                $ordered //= [sort @cols];
-                my $index = join ', ' => @$ordered;
-                $table->{$key}->{$index} = $ordered;
-            }
+        my $isa = do { no strict 'refs'; \@{"$package\::ISA"} };
+        push @$isa => $parent unless @$isa;
 
-            return @cols;
-        };
+        my $file = $package;
+        $file =~ s{::}{/};
+        $file .= ".pm";
+        $INC{$file} ||= $caller->[1];
 
-        no strict 'refs';
-        *{$attr} = set_subname $attr => $code;
+        $table->{row_class} = $package;
+        $table->{row_class_autofill} = $autofill;
+    });
+
+    return;
+}
+
+sub autoname {
+    my $self = shift;
+    my ($type, $callback) = @_;
+
+    my $top = $self->_in_builder(qw{autofill});
+
+    croak "autoname for '$type' already set" if $top->{autoname}->{$type};
+    $top->{autoname}->{$type} = 1;
+
+    if ($type eq 'field_accessor') {
+        $self->autohook(field_accessor => sub {
+            my %params = @_;
+            return $callback->(%params) || $params{name};
+        });
     }
+    elsif ($type eq 'link_accessor') {
+        $self->autohook(link_accessor => sub {
+            my %params = @_;
+            return $callback->(%params) || $params{name};
+        });
+    }
+    elsif ($type eq 'table') {
+        $self->autohook(pre_table => sub {
+            my %params = @_;
+            my $table = $params{table} // return;
+            $table->{name} = $callback->(table => $table, name => $table->{name}) || $table->{name};
+        });
+    }
+    elsif ($type eq 'link') {
+        $self->autohook(links => sub {
+            my %params = @_;
+
+            my $links = $params{links} // return;
+            return unless @$links;
+            for my $link_pair (@$links) {
+                my ($a, $b) = @$link_pair;
+                my $table_a = $a->[0];
+                my $table_b = $b->[0];
+
+                push @$a => $callback->(in_table => $a->[0], fetch_table => $b->[0], in_fields => $a->[1], fetch_fields => $b->[1])
+                    unless @$a > 2; # Skip if it has an alias
+
+                push @$b => $callback->(in_table => $b->[0], fetch_table => $a->[0], in_fields => $b->[1], fetch_fields => $a->[1])
+                    unless @$b > 2; # Skip if it has an alias
+            }
+        });
+    }
+    else {
+        croak "'$type' is not a valid autoname() type";
+    }
+}
+
+sub autohook {
+    my $self = shift;
+    my ($hook, $cb) = @_;
+
+    my $top = $self->_in_builder(qw{autofill});
+
+    croak "'$hook' is not a valid hook for $top->{class}"
+        unless $top->{class}->is_valid_hook($hook);
+
+    croak "Second argument must be a coderef"
+        unless $cb && ref($cb) eq 'CODE';
+
+    push @{$top->{meta}->{hooks}->{$hook} //= []} => $cb;
+
+    return;
+}
+
+my %SKIP_TYPES = (
+    table  => 1,
+    column => 2,
+);
+
+sub autoskip {
+    my $self = shift;
+    my ($type, @args) = @_;
+
+    my $cnt = $SKIP_TYPES{$type} or croak "'$type' is not a valid type to skip";
+    croak "Incorrect number of arguments" unless @args == $cnt;
+
+    my $top = $self->_in_builder(qw{autofill});
+
+    my $last = pop @args;
+    my $into = $top->{meta}->{skip}->{$type} //= {};
+    while (my $level = shift @args) {
+        $into = $into->{$level} //= {};
+    }
+    $into->{$last} = 1;
+}
+
+sub driver {
+    my $self = shift;
+    my ($proto) = @_;
+
+    my $top = $self->_in_builder(qw{db server});
+
+    my $class = load_class($proto, 'DBD') or croak "Could not load DBI driver '$proto': $@";
+
+    $top->{meta}->{dbi_driver} = $class;
+}
+
+sub dialect {
+    my $self = shift;
+    my ($dialect) = @_;
+
+    my $top = $self->_in_builder(qw{db server});
+
+    my $class = load_class($dialect, 'DBIx::QuickORM::Dialect') or croak "Could not load dialect '$dialect': $@";
+
+    $top->{meta}->{dialect} = $class;
+}
+
+sub connect {
+    my $self = shift;
+    my ($cb) = @_;
+
+    my $top = $self->_in_builder(qw{db server});
+
+    croak "connect must be given a coderef as its only argument, got '$cb' instead" unless ref($cb) eq 'CODE';
+
+    $top->{meta}->{connect} = $cb;
+}
+
+sub attributes {
+    my $self = shift;
+    my $attrs = @_ == 1 ? $_[0] : {@_};
+
+    my $top = $self->_in_builder(qw{db server});
+
+    croak "attributes() accepts either a hashref, or (key => value) pairs"
+        unless ref($attrs) eq 'HASH';
+
+    $top->{meta}->{attributes} = $attrs;
+}
+
+sub creds {
+    my $self = shift;
+    my ($in) = @_;
+
+    croak "creds() accepts only a coderef as an argument" unless $in && ref($in) eq 'CODE';
+    my $data = $in->();
+
+    my $top = $self->_in_builder(qw{db server});
+
+    croak "The subroutine passed to creds() must return a hashref" unless $data && ref($data) eq 'HASH';
+
+    my %creds;
+
+    $creds{user}   = $data->{user} or croak "No 'user' key in the hash returned by the credential subroutine";
+    $creds{pass}   = $data->{pass} or croak "No 'pass' key in the hash returned by the credential subroutine";
+    $creds{socket} = $data->{socket} if $data->{socket};
+    $creds{host}   = $data->{host}   if $data->{host};
+    $creds{port}   = $data->{port}   if $data->{port};
+
+    croak "Neither 'host' or 'socket' keys were provided by the credential subroutine" unless $creds{host} || $creds{socket};
+
+    my @keys = keys %creds;
+    @{$top->{meta} // {}}{@keys} = @creds{@keys};
+
+    return;
+}
+
+sub dsn    { $_[0]->_in_builder(qw{db server})->{meta}->{dsn}    = $_[1] }
+sub host   { $_[0]->_in_builder(qw{db server})->{meta}->{host}   = $_[1] }
+sub port   { $_[0]->_in_builder(qw{db server})->{meta}->{port}   = $_[1] }
+sub socket { $_[0]->_in_builder(qw{db server})->{meta}->{socket} = $_[1] }
+sub user   { $_[0]->_in_builder(qw{db server})->{meta}->{user}   = $_[1] }
+sub pass   { $_[0]->_in_builder(qw{db server})->{meta}->{pass}   = $_[1] }
+
+*hostname = \&host;
+*username = \&user;
+*password = \&pass;
+
+sub schema {
+    my $self = shift;
+
+    my $into  = $self->{+SCHEMAS};
+    my $frame = {building => 'SCHEMA', class => 'DBIx::QuickORM::Schema'};
+
+    my $top = $self->top;
+    if ($top->{building} eq 'ORM') {
+        croak "Schema has already been defined" if $top->{meta}->{schema};
+        return $top->{meta}->{schema} = $self->_build('Schema', into => $into, frame => $frame, args => \@_, no_compile => 1);
+    }
+
+    return $self->_build('Schema', into => $into, frame => $frame, args => \@_);
+}
+
+sub tables {
+    my $self = shift;
+
+    my $top = $self->_in_builder(qw{schema});
+    my $into = $top->{meta}->{tables} //= {};
+
+    my (@modules, $cb);
+    for my $arg (@_) {
+        if (ref($arg) eq 'CODE') {
+            croak "Only 1 callback is supported" if $cb;
+            $cb = $arg;
+            next;
+        }
+
+        push @modules => $arg;
+    }
+
+    $cb //= sub { ($_[0]->{name}, $_[0]) };
+
+    for my $mod (find_modules(@modules)) {
+        my $table = $self->_load_table($mod);
+        my ($name, $data) = $cb->($table);
+        next unless $name && $data;
+        $into->{$name} = $data;
+    }
+
+    return;
+}
+
+sub _load_table {
+    my $self = shift;
+    my ($class) = @_;
+
+    load_class($class) or croak "Could not load table class '$class': $@";
+    croak "Class '$class' does not appear to define a table (no qorm_table() method)" unless $class->can('qorm_table');
+    my $table = $class->qorm_table() or croak "Class '$class' appears to have an empty table";
+    return $table;
+}
+
+sub table {
+    my $self = shift;
+    $self->_table('DBIx::QuickORM::Schema::Table', @_);
+}
+
+sub view {
+    my $self = shift;
+    $self->_table('DBIx::QuickORM::Schema::View', @_);
+}
+
+sub _table {
+    my $self = shift;
+    my $make = shift;
+
+    # Defining a table in a table (row) class
+    if (@{$self->{+STACK}} == 1 && $self->{+TYPE} eq 'table') {
+        my $into  = \($self->top->{table});
+        my $frame = {building => 'TABLE', class => $make};
+        $self->_build('Table', into => $into, frame => $frame, args => \@_);
+        my $table = $$into;
+
+        $self->unimport_from($self->{+PACKAGE});
+
+        my $pkg       = $self->{+PACKAGE};
+        my $row_class = $table->{row_class} // '+DBIx::QuickORM::Row';
+        my $loaded_class = load_class($row_class, 'DBIx::QuickORM::Row') or croak "Could not load row class '$row_class': $@";
+        $table->{row_class} = $self->{+PACKAGE};
+        $table->{meta}->{row_class} = $self->{+PACKAGE};
+
+        {
+            no strict 'refs';
+            *{"$pkg\::qorm_table"} = sub { dclone($table) };
+            push @{"$pkg\::ISA"} => $loaded_class;
+        }
+
+        return $table;
+    }
+
+    my $top = $self->_in_builder(qw{schema});
+    my $into = $top->{meta}->{tables} //= {};
+
+    # One of these:
+    #   table NAME => CLASS, sub ...;
+    #   table NAME => CLASS;
+    #   table CLASS;
+    #   table CLASS => sub ...;
+    if ($_[0] =~ m/::/ || $_[1] && $_[1] =~ m/::/) {
+        my @args = @_;
+        my ($class, $name, $cb, $no_match);
+
+        while (my $arg = shift @args) {
+            if    ($arg =~ m/::/) { $class = $arg }
+            elsif (my $ref = ref($arg)) {
+                if   ($ref eq 'CODE') { $cb       = $arg }
+                else                  { $no_match = 1; last }
+            }
+            else { $name = $arg }
+        }
+
+        if ($class && !$no_match) {
+            my $table = $self->_load_table($class);
+            $name //= $table->{name};
+            $into->{$name} = $table;
+
+            $self->_build('Table', frame => $table, args => [$cb], void => 1) if $cb;
+
+            return $table;
+        }
+
+        # Fallback to regular build
+    }
+
+    # Typical case `table NAME => sub { ... }` or `table NAME => { ... }`
+    my $frame = {building => 'TABLE', class => $make, meta => {row_class => $top->{meta}->{row_class}}};
+    return $self->_build('Table', into => $into, frame => $frame, args => \@_);
 }
 
 sub index {
-    my $idx;
-
-    my $table = build_state(TABLE) or croak "Must be used under table builder";
-
-    if (@_ == 0) {
-        croak "Arguments are required";
-    }
-    elsif (@_ > 1) {
-        my $name = shift;
-        my $sql_spec = ref($_[0]) eq 'HASH' ? shift : undef;
-        my @cols = @_;
-
-        croak "A name is required as the first argument" unless $name;
-        croak "A list of column names is required" unless @cols;
-
-        $idx = {name => $name, columns => \@cols};
-        $idx->{sql_spec} = $sql_spec if $sql_spec;
-    }
-    else {
-        croak "1-argument form must be a hashref, got '$_[0]'" unless ref($_[0]) eq 'HASH';
-        $idx = { %{$_[0]} };
-    }
-
-    my $name = $idx->{name};
-
-    croak "Index '$name' is already defined on table" if $table->{indexes}->{$name};
-
-    unless ($idx->{created}) {
-        my @caller  = caller;
-        $idx->{created} = "$caller[1] line $caller[2]";
-    }
-
-    $table->{indexes}->{$name} = $idx;
-}
-
-sub relate {
-    my ($table_a_name, $a_spec, $table_b_name, $b_spec) = @_;
-
-    croak "relate() cannot be used inside a table builder" if build_state(TABLE);
-    my $schema = _get_schema or croak "relate() must be used inside a schema builder";
-
-    my $table_a = $schema->{tables}->{$table_a_name} or croak "Table '$table_a_name' is not present in the schema";
-    my $table_b = $schema->{tables}->{$table_b_name} or croak "Table '$table_b_name' is not present in the schema";
-
-    $a_spec = [%$a_spec] if ref($a_spec) eq 'HASH';
-    $a_spec = [$a_spec] unless ref($a_spec);
-
-    $b_spec = [%$b_spec] if ref($b_spec) eq 'HASH';
-    $b_spec = [$b_spec] unless ref($b_spec);
-
-    my ($rel_a, @aliases_a) = _relation(table => $table_b_name, @$a_spec);
-    my ($rel_b, @aliases_b) = _relation(table => $table_a_name, @$b_spec);
-
-    $table_a->add_relation($_, $rel_a) for @aliases_a;
-    $table_b->add_relation($_, $rel_b) for @aliases_b;
-
-    return ($rel_a, $rel_b);
-}
-
-sub relation {
-    my $table = build_state(TABLE) or croak "relation() can only be used inside a table builder";
-    my ($rel, @aliases) = _relation(@_, method => 'find');
-    _add_relation($table, $rel, @aliases);
-    return $rel;
-}
-
-sub relations {
-    my $table = build_state(TABLE) or croak "relations() can only be used inside a table builder";
-    my ($rel, @aliases) = _relation(@_, method => 'select');
-    _add_relation($table, $rel, @aliases);
-    return $rel;
-}
-
-sub references {
-    my $table  = build_state(TABLE)  or croak "references() can only be used inside a table builder";
-    my $column = build_state(COLUMN) or croak "references() can only be used inside a column builder";
-
-    my ($rel, @aliases) = _relation(@_, method => 'find', using => [$column->{name}]);
-    _add_relation($table, $rel, @aliases);
-    return $rel;
-}
-
-sub _add_relation {
-    my ($table, $rel, @aliases) = @_;
-
-    my %seen;
-    for my $alias (@aliases) {
-        next if $seen{$alias}++;
-        croak "Table already has a relation named '$alias'" if $table->{relations}->{$alias};
-        $table->{relations}->{$alias} = $rel;
-    }
-
-    return $rel;
-}
-
-sub rtable($) {
-    if (my $relation = build_state(RELATION)) {
-        $relation->{table} = $_[0];
-    }
-    else {
-        return (table => $_[0]);
-    }
-}
-
-sub prefetch() {
-    if (my $relation = build_state(RELATION)) {
-        $relation->{prefetch} = 1;
-    }
-    else {
-        return (prefetch => 1);
-    }
-}
-
-sub as($) {
-    my ($alias) = @_;
-
-    if (my $relation = build_state(RELATION)) {
-        push @{$relation->{aliases} //= []} => $alias;
-    }
-    else {
-        return ('as' => $alias);
-    }
-}
-
-sub on($) {
-    my ($cols) = @_;
-
-    croak "on() takes a hashref of primary table column names mapped to join table column names, got '$cols'" unless ref($cols) eq 'HASH';
-
-    if (my $relation = build_state(RELATION)) {
-        $relation->{on} = $cols;
-    }
-    else {
-        return (on => $cols);
-    }
-}
-
-sub using($) {
-    my ($cols) = @_;
-
-    $cols = [$cols] unless ref($cols);
-    croak "using() takes a single column name, or an arrayref of column names, got '$cols'" unless ref($cols) eq 'ARRAY';
-
-    if (my $relation = build_state(RELATION)) {
-        $relation->{using} = $cols;
-    }
-    else {
-        return (using => $cols);
-    }
-}
-
-sub on_delete($) {
-    my ($val) = @_;
-
-    if (my $relation = build_state(RELATION)) {
-        $relation->{on_delete} = $val;
-    }
-    else {
-        return (on_delete => $val);
-    }
-}
-
-sub _relation {
-    my (%params, @aliases);
-    $params{aliases} = \@aliases;
+    my $self = shift;
+    my ($name, $cols, $params);
 
     while (my $arg = shift @_) {
-        my $type = ref($arg);
+        my $ref = ref($arg);
+        if    (!$ref)           { $name = $arg }
+        elsif ($ref eq 'HASH')  { $params = {%{$params // {}}, %{$arg}} }
+        elsif ($ref eq 'ARRAY') { $cols = $arg }
+        else                    { croak "Not sure what to do with '$arg'" }
+    }
 
-        if (!$type) {
-            if ($arg eq 'table') {
-                $params{table} = shift(@_);
+    my $index = { %{$params // {}}, name => $name, columns => $cols };
+
+    return $index if defined wantarray;
+
+    my $top = $self->_in_builder(qw{table});
+
+    push @{$top->{meta}->{indexes}} => $index;
+}
+
+sub column {
+    my $self = shift;
+
+    my $top = $self->_in_builder(qw{table});
+
+    $top->{column_order} //= 1;
+    my $order = $top->{column_order}++;
+
+    my $into  = $top->{meta}->{columns} //= {};
+    my $frame = {building => 'COLUMN', class => 'DBIx::QuickORM::Schema::Table::Column', meta => {order => $order}};
+
+    return $self->_build(
+        'Column',
+        into     => $into,
+        frame    => $frame,
+        args     => \@_,
+        extra_cb => sub {
+            my $self = shift;
+            my %params = @_;
+
+            my $extra = $params{extra};
+            my $meta  = $params{meta};
+
+            while (my $arg = shift @$extra) {
+                local $@;
+                if (blessed($arg)) {
+                    if ($arg->DOES('DBIx::QuickORM::Role::Type')) {
+                        $meta->{type} = $arg;
+                    }
+                    else {
+                        croak "'$arg' does not implement 'DBIx::QuickORM::Role::Type'";
+                    }
+                }
+                elsif (my $ref = ref($arg)) {
+                    if ($ref eq 'SCALAR') {
+                        $meta->{type} = $arg;
+                    }
+                    else {
+                        croak "Not sure what to do with column argument '$arg'";
+                    }
+                }
+                elsif ($arg eq 'id' || $arg eq 'identity') {
+                    $meta->{identity} = 1;
+                }
+                elsif ($arg eq 'not_null') {
+                    $meta->{nullable} = 0;
+                }
+                elsif ($arg eq 'nullable') {
+                    $meta->{nullable} = 1;
+                }
+                elsif ($arg eq 'omit') {
+                    $meta->{omit} = 1;
+                }
+                elsif ($arg eq 'sql_default' || $arg eq 'perl_default') {
+                    $meta->{$arg} = shift @$extra;
+                }
+                elsif (validate_affinity($arg)) {
+                    $meta->{affinity} = $arg;
+                }
+                elsif (my $class = load_class($arg, 'DBIx::QuickORM::Type')) {
+                    croak "Class '$class' does not implement DBIx::QuickORM::Role::Type" unless $class->DOES('DBIx::QuickORM::Role::Type');
+                    $meta->{type} = $class;
+                }
+                else {
+                    croak "Error loading class for type '$arg': $@" unless $@ =~ m/^Can't locate .+ in \@INC/;
+                    croak "Column arg '$arg' does not appear to be pure-sql (scalar ref), affinity, or an object implementing DBIx::QuickORM::Role::Type";
+                }
             }
-            elsif ($arg eq 'alias' || $arg eq 'as') {
-                push @aliases => shift(@_);
-            }
-            elsif ($arg eq 'on') {
-                $params{on} = shift(@_);
-            }
-            elsif ($arg eq 'using') {
-                $params{using} = shift(@_);
-            }
-            elsif ($arg eq 'method') {
-                $params{method} = shift(@_);
-            }
-            elsif ($arg eq 'on_delete') {
-                $params{on_delete} = shift(@_);
-            }
-            elsif ($arg eq 'prefetch') {
-                $params{prefetch} = shift(@_);
-            }
-            elsif (!@aliases) {
-                push @aliases => $arg;
-            }
-            elsif(!$params{table}) {
-                $params{table} = $arg;
+        },
+    );
+}
+
+sub columns {
+    my $self = shift;
+
+    my $top = $self->_in_builder(qw{table});
+
+    my (@names, $other);
+    for my $arg (@_) {
+        my $ref = ref($arg);
+        if    (!$ref)          { push @names => $arg }
+        elsif ($ref eq 'HASH') { croak "Cannot provide multiple hashrefs" if $other; $other = $arg }
+        else                   { croak "Not sure what to do with '$arg' ($ref)" }
+    }
+
+    return [map { $self->column($_, $other) } @names] if defined wantarray;
+
+    $self->column($_, $other) for @names;
+
+    return;
+}
+
+sub sql {
+    my $self = shift;
+
+    croak "Not enough arguments" unless @_;
+    croak "Too many arguments" if @_ > 2;
+
+    my $sql = pop;
+    my $affix = lc(pop // 'infix');
+
+    croak "'$affix' is not a valid sql position, use 'prefix', 'infix', or 'postfix'" unless $affix =~ m/^(pre|post|in)fix$/;
+
+    my $top = $self->_in_builder(qw{schema table column});
+
+    if ($affix eq 'infix') {
+        croak "'infix' sql is not supported in SCHEMA, use prefix or postfix" if $top->{building} eq 'SCHEMA';
+        croak "'infix' sql has already been set for '$top->{created}'"        if $top->{meta}->{sql}->{$affix};
+        $top->{meta}->{sql}->{$affix} = $sql;
+    }
+    else {
+        push @{$top->{meta}->{sql}->{$affix}} => $sql;
+    }
+}
+
+sub affinity {
+    my $self = shift;
+    croak "Not enough arguments" unless @_;
+    my ($affinity) = @_;
+
+    croak "'$affinity' is not a valid affinity" unless validate_affinity($affinity);
+
+    return $affinity if defined wantarray;
+
+    my $top = $self->_in_builder(qw{column});
+    $top->{meta}->{affinity} = $affinity;
+}
+
+sub _check_type {
+    my $self = shift;
+    my ($type) = @_;
+
+    return $type if ref($type) eq 'SCALAR';
+    return undef if ref($type);
+    return $type if $type->DOES('DBIx::QuickORM::Role::Type');
+
+    my $class = load_class($type, 'DBIx::QuickORM::Type') or return undef;
+    return $class;
+}
+
+sub type {
+    my $self = shift;
+    croak "Not enough arguments" unless @_;
+    my ($type, @args) = @_;
+
+    croak "Too many arguments" if @args;
+    croak "cannot use a blessed instance of the type ($type)" if blessed($type);
+
+    local $@;
+    my $use_type = $self->_check_type($type);
+    unless ($use_type) {
+        my $err = "Type must be a scalar reference, or a class that implements 'DBIx::QuickORM::Role::Type', got: $type";
+        $err .= "\nGot exception: $@" if $@ =~ m/^Can't locate .+ in \@INC/;
+        confess $err;
+    }
+
+    return $use_type if defined wantarray;
+
+    my $top = $self->_in_builder(qw{column});
+    $top->{meta}->{type} = $use_type;
+}
+
+sub omit     { defined(wantarray) ? (($_[1] // 1) ? 'omit'     : ())         : ($_[0]->_in_builder('column')->{meta}->{omit}     = $_[1] // 1) }
+sub identity { defined(wantarray) ? (($_[1] // 1) ? 'identity' : ())         : ($_[0]->_in_builder('column')->{meta}->{identity} = $_[1] // 1) }
+sub nullable { defined(wantarray) ? (($_[1] // 1) ? 'nullable' : 'not_null') : ($_[0]->_in_builder('column')->{meta}->{nullable} = $_[1] // 1) }
+sub not_null { defined(wantarray) ? (($_[1] // 1) ? 'not_null' : 'nullable') : ($_[0]->_in_builder('column')->{meta}->{nullable} = $_[1] ? 0 : 1) }
+
+sub default {
+    my $self = shift;
+    my ($val) = @_;
+
+    my $r = ref($val);
+
+    my ($key);
+    if    ($r eq 'SCALAR') { $key = 'sql_default'; $val = $$val }
+    elsif ($r eq 'CODE')   { $key = 'perl_default' }
+    else                   { croak "'$val' is not a valid default, must be a scalar ref, or a coderef" }
+
+    return ($key => $val) if defined wantarray;
+
+    my $top = $self->_in_builder('column');
+    $top->{meta}->{$key} = $val;
+}
+
+sub _in_builder {
+    my $self = shift;
+    my %builders = map { lc($_) => 1 } @_;
+
+    if (@{$self->{+STACK}} > 1) {
+        my $top = $self->top;
+        my $bld = lc($top->{building});
+
+        return $top if $builders{$bld};
+    }
+
+    my ($pkg, $file, $line, $name) = caller(0);
+    ($pkg, $file, $line, $name) = caller(1) if $name =~ m/_in_builder/;
+
+    croak "${name}() can only be used inside one of the following builders: " . join(', ', @_);
+}
+
+sub db_name {
+    my $self = shift;
+    my ($db_name) = @_;
+
+    my $top = $self->_in_builder(qw{table db});
+
+    $top->{meta}->{db_name} = $db_name;
+}
+
+sub row_class {
+    my $self = shift;
+    my ($proto) = @_;
+
+    my $top = $self->_in_builder(qw{table schema});
+
+    my $class = load_class($proto, 'DBIx::QuickORM::Row') or croak "Could not load class '$proto': $@";
+
+    $top->{meta}->{row_class} = $class;
+}
+
+sub primary_key {
+    my $self = shift;
+    my (@list) = @_;
+
+    my $top = $self->_in_builder(qw{table column});
+
+    my $meta;
+    if ($top->{building} eq 'COLUMN') {
+        my $frame = $self->{+STACK}->[-2];
+
+        croak "Too many arguments" if @list;
+
+        croak "Could not find table for the column currently being built"
+            unless $frame->{building} eq 'TABLE';
+
+        @list = ($top->{meta}->{name});
+        $meta = $frame->{meta};
+    }
+    else {
+        croak "Not enough arguments" unless @list;
+        $meta = $top->{meta};
+    }
+
+    $meta->{primary_key} = \@list;
+}
+
+sub unique {
+    my $self = shift;
+    my (@list) = @_;
+
+    my $top = $self->_in_builder(qw{table column});
+
+    my $meta;
+    if ($top->{building} eq 'COLUMN') {
+        my $frame = $self->{+STACK}->[-2];
+
+        croak "Too many arguments" if @list;
+
+        croak "Could not find table for the column currently being built"
+            unless $frame->{building} eq 'TABLE';
+
+        @list = ($top->{meta}->{name});
+        $meta = $frame->{meta};
+    }
+    else {
+        croak "Not enough arguments" unless @list;
+        $meta = $top->{meta};
+    }
+
+    my $key = join ', ' => sort @list;
+
+    $meta->{unique}->{$key} = \@list;
+    push @{$meta->{indexes}} => {unique => 1, columns => \@list};
+}
+
+sub link {
+    my $self = shift;
+    my @args = @_;
+
+    my $top = $self->_in_builder(qw{schema column});
+
+    my ($table, $local);
+    if ($top->{building} eq 'COLUMN') {
+        my $alias = @args && !ref($args[0]) ? shift @args : undef;
+        croak "Expected an arrayref, got '$args[0]'" unless ref($args[0]) eq 'ARRAY';
+        @args = @{$args[0]};
+
+        my $cols = [$top->{meta}->{name}];
+
+        croak "Could not find table?" unless $self->{+STACK}->[-2]->{building} eq 'TABLE';
+
+        $table = $self->{+STACK}->[-2];
+        my $tname = $table->{name};
+
+        $local = [$tname, $cols];
+        push @$local => $alias if $alias;
+    }
+
+    my @nodes;
+    while (my $first = shift @args) {
+        my $fref = ref($first);
+        if (!$fref) {
+            my $second = shift(@args);
+            my $sref = ref($second);
+
+            croak "Expected an array, got '$second'" unless $sref && $sref eq 'ARRAY';
+            my $eref = ref($second->[1]);
+            if ($eref && $eref eq 'ARRAY') {
+                push @nodes => [$second->[0], $second->[1], $first];
             }
             else {
-                push @aliases => $arg;
+                push @nodes => [$first, $second];
             }
+
+            next;
         }
-        elsif ($type eq 'HASH') {
-            $params{on} = $arg;
+
+        if ($fref eq 'HASH') {
+            push @nodes => [$first->{table}, $first->{columns}, $first->{alias}];
+            next;
         }
-        elsif ($type eq 'ARRAY') {
-            $params{using} = $arg;
+
+        croak "Expected a hashref, table name, or alias, got '$first'";
+    }
+
+    my $other;
+    if ($local) {
+        croak "Too many nodes" if @nodes > 1;
+        croak "Not enough nodes" unless @nodes;
+        ($other) = @nodes;
+    }
+    else {
+        ($local, $other) = @nodes;
+    }
+
+    my $caller = $self->_caller;
+    my $created = "$caller->[3]() at $caller->[1] line $caller->[2]";
+    my $link = [$local, $other, $created];
+
+    push @{($table // $top)->{meta}->{_links}} => $link;
+
+    return;
+}
+
+sub orm {
+    my $self = shift;
+
+    my $into  = $self->{+ORMS};
+    my $frame = {building => 'ORM', class => 'DBIx::QuickORM::ORM'};
+
+    $self->_build('ORM', into => $into, frame => $frame, args => \@_);
+}
+
+my %RECURSE = (
+    DB       => {},
+    LINK     => {},
+    COLUMN   => {},
+    AUTOFILL => {},
+    ORM      => {schema  => 1, db => 1, autofill => 1},
+    SCHEMA   => {tables  => 2},
+    TABLE    => {columns => 2},
+);
+
+sub compile {
+    my $self = shift;
+    my ($frame, $alt_arg) = @_;
+
+    my $alt = $alt_arg || ':';
+
+    # Already compiled
+    return $frame->{__COMPILED__}->{$alt} if $frame->{__COMPILED__}->{$alt};
+
+    my $bld = $frame->{building} or confess "Not currently building anything";
+    my $recurse = $RECURSE{$bld} or croak "Not sure how to compile '$bld'";
+
+    my $meta = $frame->{meta};
+    my $alta = $alt_arg && $frame->{alt}->{$alt_arg} ? $frame->{alt}->{$alt_arg}->{meta} // {} : {};
+
+    my %obj_data;
+
+    my %seen;
+    for my $field (keys %$meta, keys %$alta) {
+        next if $seen{$field}++;
+
+        my $val = $self->_merge($alta->{$field}, $meta->{$field}) // next;
+
+        unless($recurse->{$field}) {
+            $obj_data{$field} = $val;
+            next;
         }
-        elsif ($type eq 'CODE') {
-            build(
-                building => 'relation',
-                callback => $arg,
-                args     => [\%params],
-                caller   => [caller(1)],
-                state    => { %{build_state()}, RELATION() => \%params },
-            );
+
+        if ($recurse->{$field} > 1) {
+            $obj_data{$field} = { map { $_ => $self->compile($val->{$_}, $alt_arg) } keys %$val };
+        }
+        else {
+            $obj_data{$field} = $self->compile($val, $alt_arg);
         }
     }
 
-    delete $params{aliases};
-    $params{table} //= $aliases[-1] if @aliases;
+    my $proto = $frame->{class} or croak "No class to compile for '$frame->{name}' ($frame->{created})";
+    my $class = load_class($proto) or croak "Could not load class '$proto' for '$frame->{name}' ($frame->{created}): $@";
 
-    require DBIx::QuickORM::Table::Relation;
-    my $rel = DBIx::QuickORM::Table::Relation->new(%params);
+    my $caller = $self->_caller;
+    my $compiled = "$caller->[3]() at $caller->[1] line $caller->[2]";
 
-    push @aliases => $params{table} unless @aliases;
+    $obj_data{compiled} = $compiled;
 
-    return ($rel, @aliases);
+    my $out = eval { $class->new(%obj_data) } or confess "Could not construct an instance of '$class': $@";
+    $frame->{__COMPILED__}->{$alt} = $out;
+
+    return $out;
 }
 
+sub _merge {
+    my $self = shift;
+    my ($a, $b) = @_;
+
+    return $a unless defined $b;
+    return $b unless defined $a;
+
+    my $ref_a = ref($a);
+    my $ref_b = ref($b);
+    croak "Mismatched reference!" unless $ref_a eq $ref_b;
+
+    # Not a ref, a wins
+    return $a // $b unless $ref_a;
+
+    return { %$a, %$b } if $ref_a eq 'HASH';
+
+    croak "Not sure how to merge $a and $b";
+}
+
+sub _build {
+    my $self = shift;
+    my ($type, %params) = @_;
+
+    my $into        = $params{into};
+    my $frame       = $params{frame};
+    my $args        = $params{args};
+    my $extra_cb    = $params{extra_cb};
+    my $force_build = $params{force_build};
+
+    croak "Not enough arguments" unless $args && @$args;
+
+    my $caller = $self->_caller;
+
+    my ($name, $builder, $meta_arg, @extra);
+    for my $arg (@$args) {
+        my $ref = ref($arg);
+        if    (!$ref)          { if ($name) { push @extra => $arg } else { $name = $arg } }
+        elsif ($ref eq 'CODE') { croak "Multiple builders provided!" if $builder; $builder = $arg }
+        elsif ($ref eq 'HASH') { croak "Multiple meta hashes provided!" if $meta_arg; $meta_arg = $arg }
+        else                   { push @extra => $arg }
+    }
+
+    $force_build = 1 if @extra;
+    my $alt = $name && $name =~ s/:(\S+)$// ? $1 : undef;
+    $name = undef if defined($name) && !length($name);
+
+    my $meta = $meta_arg // {};
+    $self->$extra_cb(%params, type => $type, extra => \@extra, meta => $meta, name => $name, frame => $frame) if $extra_cb;
+    croak "Multiple names provided: " . join(', ' => $name, @extra) if @extra;
+
+    # Simple fetch
+    if ($name && !$builder && !$meta_arg && !$force_build) {
+        croak "'$name' is not a defined $type" unless $into->{$name};
+        return $self->compile($into->{$name}, $alt) unless $params{no_compile};
+        return $into->{$name};
+    }
+
+    my $created = "$caller->[3]() at $caller->[1] line $caller->[2]";
+    %$frame = (
+        %$frame,
+        plugins  => [],
+        created  => $created,
+    );
+
+    $frame->{name} //= $name // "Anonymous builder ($created)";
+
+    $frame->{meta} = { %{$frame->{meta} // {}}, %{$meta} };
+
+    $frame->{meta}->{name} = $name if $name && $type ne 'Alt';
+
+    $frame->{meta}->{created} = $created;
+
+    push @{$self->{+STACK}} => $frame;
+
+    my $ok = eval {
+        $builder->(meta => $meta, frame => $frame) if $builder;
+        $_->munge($frame) for @{$self->plugins};
+        1;
+    };
+    my $err = $@;
+
+    pop @{$self->{+STACK}};
+
+    die $err unless $ok;
+
+    if ($into) {
+        my $ref = ref($into);
+        if ($ref eq 'HASH') {
+            $into->{$name} = $frame if $name;
+        }
+        elsif ($ref eq 'SCALAR') {
+            ${$into} = $frame;
+        }
+        else {
+            croak "Invalid 'into': $into";
+        }
+    }
+
+    return if $params{void};
+
+    if (defined wantarray) {
+        return $self->compile($frame, $alt) unless $params{no_compile};
+        return $frame;
+    }
+
+    return if $name;
+
+    croak "No name provided, but called in void context!";
+}
 
 1;
 
 __END__
 
-=pod
-
-=encoding UTF-8
-
 =head1 NAME
 
-DBIx::QuickORM - Actively maintained Object Relational Mapping that makes
-getting started Quick and has a rich feature set.
-
-=head1 EXTREMELY EARLY VERSION WARNING!
-
-B<THIS IS A VERY EARLY VERSION!>
-
-=over 4
-
-=item About 90% of the functionality from the features section is written.
-
-=item About 80% of the features have been listed.
-
-=item About 40% of the written code is tested.
-
-=item About 10% of the documentation has been written.
-
-=back
-
-If you want to try it, go for it. Some of the tests give a pretty good idea of
-how to use it.
-
-B<DO NOT USE THIS FOR ANYTHING PRODUCTION> it is not ready yet.
-
-B<The API can and will change!>
+DBIx::QuickORM - Composable ORM builder.
 
 =head1 DESCRIPTION
 
-An actively maintained ORM tool that is quick and easy to start with, but
-powerful and expandable for long term and larger projects. An alternative to
-L<DBIx::Class>, but not a drop-in replacement.
+DBIx::QuickORM allows you to define ORMs with reusable and composible parts.
 
-=head1 SCOPE
-
-The primary scope of this project is to write a good ORM for perl. It is very
-easy to add scope, and try to focus on things outside this scope. I am not
-opposed to such things being written around the ORM functionality, afterall the
-project has a lot of useful code, and knowledge of the database. But the
-primary focus must always be the ORM functionality, and it must not suffer in
-favor of functionality beyond that scope.
-
-=head1 SYNOPSIS
-
-FIXME!
-
-=head1 MOTIVATION
-
-The most widely accepted ORM for perl, L<DBIx::Class> is for all intents and
-purposes, dead. There is only 1 maintainer, and that person has stated that the
-project is feature complete. The project will recieve no updates apart from
-critical bugs. The distribution has been marked such that it absolutely can
-never be transferred to anyone else.
-
-There are 4 ways forward:
+With this ORM builder you can specify:
 
 =over 4
 
-=item Use DBIx::Class it as it is.
+=item How to connect to one or more databases on one or more servers.
 
-Many people continue to do this.
+=item One or more schema structures.
 
-=item Monkeypatch DBIx::Class
+=item Custom row classes to use.
 
-I know a handful of people who are working on a way to do this that is not
-terrible and will effectively keep L<DBIx::Class> on life support.
-
-=item Fork DBIx::Class
-
-I was initially going to take this route. But after a couple hours in the
-codebase I realized I dislike the internals of DBIx::Class almost as much as I
-dislike using its interface.
-
-=item Write an alternative
-
-I decided to take this route. I have never liked DBIx::Class, I find it
-difficult to approach, and it is complicated to start a project with it. The
-interface is unintuitive, and the internals are very opaque.
-
-My goal is to start with the interface, make it approachable, easy to start,
-etc. I also want the interface to be intuitive to use. I also want
-expandability. I also want to make sure I adopt the good ideas and capabilities
-from DBIx::Class. Only a fool would say DBIx::Class has nothing of value.
+=item Plugins to use.
 
 =back
 
-=head2 MAINTENANCE COMMITMENT
+=head1 SYNOPSIS
 
-I want to be sure that what happened to L<DBIx::Class> cannot happen to this
-project. I will maintain this as long as I am able. When I am not capable I
-will let others pick up where I left off.
+The common use case is to create an ORM package for your app, then use that ORM
+package any place in the app that needs ORM access.
 
-I am stating here, in the docs, for all to see for all time:
+# TODO broken sentence
+The ORM class
 
-B<If I become unable to maintain this project, I approve of others being given
-cpan and github permissions to develop and release this distribution.>
+=head2 YOUR ORM PACKAGE
 
-Peferably maint will be handed off to someone who has been a contributor, or to
-a group of contributors, If none can be found, or none are willing, I trust the
-cpan toolchain group to takeover.
+=head3 MANUAL SCHEMA
 
-=head1 FEATURE/GOAL OVERVIEW
+    package My::ORM;
+    use DBIx::QuickORM;
 
-=head2 Quick to start
+    # Define your ORM
+    orm my_orm => sub {
+        # Define your object
+        db my_db => sub {
+            dialect 'PostgreSQL'; # Or MySQL, MariaDB, SQLite
+            host 'mydb.mydomain.com';
+            port 1234;
 
-It should be very simple to start a project. The ORM should stay out of your
-way until you want to make it do something for you.
+            # Best not to hardcode these, read them from a secure place and pass them in here.
+            user $USER;
+            pass $PASS;
+        };
 
-=head2 Intuitive
+        # Define your schema
+        schema myschema => sub {
+            table my_table => sub {
+                column id => sub {
+                    identity;
+                    primary_key;
+                    not_null;
+                };
 
-Names, interfaces, etc should make sense and be obvious.
+                column name => sub {
+                    type \'VARCHAR(128)';    # Exact SQL for the type
+                    affinity 'string';       # required if other information does not make it obvious to DBIx::QuickORM
+                    unique;
+                    not_null;
+                };
 
-=head2 Declarative syntax
+                column added => sub {
+                    type 'Stamp';            # Short for DBIx::QuickORM::Type::Stamp
+                    not_null;
 
-Look at the L</"DECLARATIVE INTERFACE"> section below, or the L</"SYNOPSIS">
-section above.
+                    # Exact SQL to use if DBIx::QuickORM generates the table SQL
+                    default \'NOW()';
 
-=head2 SQL <-> Perl conversion
-
-It can go either way.
-
-=head3 Generate the perl schema from a populated database.
-
-    my $orm = orm 'MyOrm' => sub {
-        # First provide db credentials and connect info
-        db { ... };
-
-        # Tell DBIx::QuickORM to do the rest
-        autofill();
-    };
-
-    # Built for you by reading from the database.
-    my $schema = $orm->schema;
-
-=head3 Generate SQL to populate a database from a schema defined in perl.
-
-See L<DBIx::QuickORM::Util::SchemaBuilder> for more info.
-
-=head2 Async query support
-
-Async query support is a key and first class feature of DBIx::QuickORM.
-
-=head3 Single async query - single connection
-
-Launch an async query on the current connection, then do other stuff until it
-is ready.
-
-See L<DBIx::QuickORM::Select::Async> for full details. but here are some teasers:
-
-    # It can take more args than just \%where, this is just a simply case
-    my $async = $orm->async(\%where)->start;
-    until ($async->ready) { ... };
-    my @rows = $async->all;
-
-You can also turn any select into an async:
-
-    my $select = $orm->select(...);
-    my $async = $orm->async;
-    $async->start;
-
-=head3 Multiple concurrent async query support - multiple connections on 1 process
-
-DBIx::QuickORM calls this an 'aside'. See L<DBIx::QuickORM::Select::Aside> for
-more detail.
-
-In this case we have 2 queries executing simultaneously.
-
-    my $aside  = $orm->aside(\%where)->start;    # Runs async query on a new connection
-    my $select = $orm->select(\%where);
-    my @rows1  = $select->all;
-    my @rows2  = $aside->all;
-
-Note that if both queries return some of the same rows there will only be 1
-copy in cache, and both @row arrays will have the same object reference.
-
-=head3 Multiple concurrent async query support - emulation via forking
-
-See L<DBIx::QuickORM::Select::Forked> for more detail.
-
-Similar to the 'aside' functionality above, but instead of running an async
-query on a new connection, a new process is forked, and that process does a
-synchronous query and returns the results. This is useful for emulating
-aside/async with databases that do not support it such as SQLite.
-
-=head2 First class inflation and deflation (Conflation)
-
-Inflation and Deflation of columns is a first-class feature. But since saying
-'inflation and deflation' every time is a chore DBIx::QuickORM shortens the
-concept to 'conflation'. No, the word "conflation" is not actually related to
-"inflation" or "deflation", but it is an amusing pun, specially since it still
-kind of works with the actual definition of "conflation".
-
-If you specify that a column has a conflator, then using
-C<< my $val = $row->column('name') >> will give you the inflated form. You can
-also set the column by giving it either the inflated or deflated form. You also
-always have access to the raw values, and asking for either the 'stored' or
-'dirty' value will give the raw form.
-
-You can also use inflated forms in the %where argument to select/find.
-
-The rows are also smart enough to check if your inflated forms have been
-mutated and consider the row dirty (in need of saving or discarding) after the
-mutation. This is done by deflating the values to compare to the stored form
-when checking for dirtyness.
-
-If your inflated values are readonly, locked restricted hashes, or objects that
-implement the 'qorm_immutible' method (and it returns true). Then the row is
-smart enough to skip checking them for mutations as they cannot be mutated.
-
-Oh, also of note, inflated forms do not need to be blessed, nor do they even
-need to be references. You could write a conflator that inflates string to have
-"inflated: " prefixed to them, and no prefix when they are raw/deflated. A
-conflator that encrypts/decrypts passively is also possible, assuming the
-encrypted and decrypted forms are easily distinguishable.
-
-=head3 UUID, UUID::Binary, UUID::Stringy
-
-Automatically inflate and deflate UUID's. Your database can store it as a
-native UUID, a BIN(16), a VARCHAR(36), or whatever. Tell the orm the row should
-be conflated as a UUID and it will just work. You can set the value by
-providing a string, binary data, or anything else the conflator recognizes. In
-the DB it will store the right type, and in perl you will get a UUID object.
-
-    schema sub {
-        table my_table => sub {
-            column thing_uuid => sub {
-                conflate 'UUID'; # OR provide '+Your::Conflator', adds 'DBIx::QuickORM::Conflator::' without the '+'
+                    # Perl code to generate a default value when rows are created by DBIx::QuickORM
+                    default sub { ... };
+                };
             };
         };
     };
 
+=head3 AUTOMAGIC SCHEMA
+
+    package My::ORM;
+    use DBIx::QuickORM;
+
+    # Define your ORM
+    orm my_orm => sub {
+        # Define your object
+        db my_db => sub {
+            dialect 'PostgreSQL'; # Or MySQL, MariaDB, SQLite
+            host 'mydb.mydomain.com';
+            port 1234;
+
+            # Best not to hardcode these, read them from a secure place and pass them in here.
+            user $USER;
+            pass $PASS;
+        };
+
+        # Define your schema
+        schema myschema => sub {
+            # The class name is optional, the one shown here is the default
+            autofill 'DBIx::QuickORM::Schema::Autofill' => sub {
+                autotype 'UUID';    # Automatically handle UUID fields
+                autotype 'JSON';    # Automatically handle JSON fields
+
+                # Do not autofill these tables
+                autoskip table => qw/foo bar baz/;
+
+                # Will automatically create My::Row::Table classes for you with
+                # accessors for links and fields If My::Table::Row can be
+                # loaded (IE My/Row/Table.pm exists) it will load it then
+                # autofill anything missing.
+                autorow 'My::Row';
+
+                # autorow can also take a subref that accepts a table name as
+                # input and provides the class name for it, here is the default
+                # one used if none if provided:
+                autorow 'My::Row' => sub {
+                    my $name = shift;
+                    my @parts = split /_/, $name;
+                    return join '' => map { ucfirst(lc($_)) } @parts;
+                };
+
+                # You can provide custom names for tables. It will still refer
+                # to the correct name in queries, but will provide an alternate
+                # name for the orm to use in perl code.
+                autoname table => sub {
+                    my %params = @_;
+                    my $table_hash = $params{table}; # unblessed ref that will become a table
+                    my $name = $params{name}; # The name of the table
+                    ...
+                    return $new_name;
+                };
+
+                # You can provide custom names for link (foreign key) accessors when using autorow
+                autoname link_accessor => sub {
+                    my %params = @_;
+                    my $link = $params{link};
+
+                    return "obtain_" . $link->other_table if $params{link}->unique;
+                    return "select_" . $link->other_table . "s";
+                };
+
+                # You can provide custom names for field accessors when using autorow
+                autoname field_accessor => sub {
+                    my %params = @_;
+                    return "get_$params{name}";
+                };
+            };
+        };
+    };
+
+=head2 YOUR APP CODE
+
+    package My::App;
+    use My::Orm qw/orm/;
+
+    # Get a connection to the orm
+    # Note: This will return the same connection each time, no need to cache it yourself.
+    # See DBIx::QuickORM::Connection for more info.
+    my $orm = orm('my_orm');
+
+    # See DBIx::QuickORM::Handle for more info.
+    my $h = $orm->handle('people', {surname => 'smith'});
+    for my $person ($handle->all) {
+        print $person->field('first_name') . "\n"
+    }
+
+    my $new_h = $h->limit(5)->order_by('surname')->omit(@large_fields);
+    my $iterator = $new_h->iterator; # Query is actually sent to DB here.
+    while (my $row = $iterator->next) {
+        ...
+    }
+
+    # Start an async query
+    my $async = $h->async->iterator;
+
+    while (!$async->ready) {
+        do_something_else();
+    }
+
+    while (my $item = $iterator->next) {
+        ...
+    }
+
+See L<DBIx::QuickORM::Connection> for details on the object returned by
+C<< my $orm = orm('my_orm'); >>.
+
+See L<DBIx::QuickORM::Handle> for more details on handles, which are similar to
+ResultSets from L<DBIx::Class>.
+
+=head1 A NOTE ON AFFINITY
+
+Whenever you define a column in DBIx::QuickORM it is necessary for the ORM to
+know the I<affinity> of the column. It may be any of these:
+
 =over 4
 
-=item L<DBIx::QuickORM::Conflator::UUID>
+=item C<string>
 
-Inflates to an object of this class, deflates to whatever the database column
-type is. Object stringifies as a UUID string, and you can get both the string
-and binary value from it through accessors.
+The column should be treated as a string when written to, or read from the
+database.
 
-If generating the SQL to populate the db this will tell it the column should be
-the 'UUID' type, and will throw an exception if that type is not supported by
-the db.
+=item C<numeric>
 
-=item L<DBIx::QuickORM::Conflator::UUID::Binary>
+The column should be treated as a number when written to, or read from the
+database.
 
-This is useful only if you are generating the schema SQL to populate the db and
-the db does not support UUID types. This will create the column using a binary
-data type like BIN(16).
+=item C<boolean>
 
-=item L<DBIx::QuickORM::Conflator::UUID::Stringy>
+The column should be treated as a boolean when written to, or read from the
+database.
 
-This is useful only if you are generating the schema SQL to populate the db and
-the db does not support UUID types. This will create the column using a stringy
-data type like VARCHAR(36).
+=item C<binary>
+
+The column should be treated as a binary data when written to, or read from the
+database.
 
 =back
 
-=head3 JSON, JSON::ASCII
+Much of the time the affinity can be derived from other data. The
+L<DBIx::QuickORM::Affinity> package has an internal map for default affinities
+for many SQL types. Also if you use a class implementing
+L<DBIx::QuickORM::Role::Type> it will often provide an affinity. You can
+override the affinity if necessary. If the affinity cannot be derived you
+must specify it.
 
-This conflator will inflate the JSON into a perl data structure and deflate it
-back into a JSON string.
+=head1 RECIPES
 
-This uses L<Cpanel::JSON::XS> under the hood.
+=head2 RENAMING EXPORTS
 
-=over 4
+When importing L<DBIx::QuickORM> you can provide
+C<< rename => { name => new_name } >> mapping to rename exports.
 
-=item L<DBIx::QuickORM::Conflator::JSON>
-
-Defaults to C<< $json->utf8->encode_json >>
-
-This produces a utf8 encoded json string.
-
-=item L<DBIx::QuickORM::Conflator::JSON::ASCII>
-
-Defaults to C<< $json->ascii->encode_json >>
-
-This produces an ASCII encoded json string with non-ascii characters escaped.
-
-=back
-
-=head3 DateTime - Will not leave a mess with Data::Dumper!
-
-L<DBIx::QuickORM::Conflator::DateTime>
-
-This conflator will inflate dates and times into L<DateTime> objects. However
-it also wraps them in an L<DBIx::QuickORM::Util::Mask> object. This object
-hides the DateTime object in a C<< sub { $datetime } >>. When dumped by
-Data::Dumper you get something like this:
-
-    bless( [
-             '2024-10-26T06:18:45',
-             sub { "DUMMY" }
-           ], 'DBIx::QuickORM::Conflator::DateTime' );
-
-This is much better than spewing the DateTime internals, whcih can take several
-pages of scrollback.
-
-You can still call any valid L<DateTime> method on this object and it will
-delegate it to the one that is masked beind the coderef.
-
-=head3 Custom conflator
-
-See the L<DBIx::QuickORM::Role::Conflator> role.
-
-=head3 Custom on the fly
-
-Declarative:
-
-    my $conflator = conflator NAME => sub {
-        inflate { ... };
-        deflate { ... };
+    package My::ORM;
+    use DBIx::QuickORM rename => {
+        pass  => 'password',
+        user  => 'username',
+        table => 'build_table',
     };
 
-OOP:
+B<Note> If you do not want to bring in the C<import()> method that normally
+gets produced, you can also add C<< type => 'porcelain' >>.
 
-    my $conflator = DBIx::QuickORM::Conflator->new(
-        name => 'NAME',
-        inflate => sub { ... },
-        defalte => sub { ... }
-    );
+    use DBIx::QuickORM type => 'porcelain';
 
-=head2 Multiple ORM instances for different databases and schemas
+Really any 'type' other than 'orm' and undef (which becomes 'orm' by default)
+will work to prevent C<import()> from being exported to your namespace.
 
-    db develop    => sub { ... };
-    db staging    => sub { ... };
-    db production => sub { ... };
+=head2 DEFINE TABLES IN THEIR OWN PACKAGES/FILES
 
-    my $app1 = schema app1 => { ... };
-    my $app2 = schema app2 { ... };
+If you have many tables, or want each to have a custom row class (custom
+methods for items returned by tables), then you probably want to define tables
+in their own files.
 
-    orm app1_dev => sub {
-        db 'develop';
-        schema 'app1';
-    };
+When you follow this example you create the table C<My::ORM::Table::Foo>. The
+package will automatically subclass L<DBIx::QuickORM::Row> unless you use
+C<row_class()> to set an alternative base.
 
-    orm app2_prod => sub {
-        db 'production';
-        schema 'app2';
-    };
+Any methods added in the file will be callable on the rows returned when
+querying this table.
 
-    orm both_stage => sub {
-        db 'staging';
+First create F<My/ORM/Table/Foo.pm>:
 
-        # Builds a new schema object, does not modify either original
-        schema $app1->merge($app2);
-    };
+    package My::ORM::Table::Foo;
+    use DBIx::QuickORM type => 'table';
 
-=head2 "Select" object that is very similar to DBIx::Class's ResultSet
-
-ResultSet was a good idea, regardless of your opinion on L<DBIx::Class>. The
-L<DBIx::QuickORM::Select> objects implement most of the same things.
-
-    my $sel = $orm->select('TABLE/SOURCE', \%where)
-    my $sel = $orm->select('TABLE/SOURCE', \%where, $order_by)
-    my $sel = $orm->select('TABLE/SOURCE', where => $where, order_by => $order_by, ... );
-    $sel = $sel->and(\%where);
-    my @rows = $sel->all;
-    my $row = $sel->next;
-    my $total = $sel->count;
-
-=head2 Find exactly 1 row
-
-    # Throws an exception if multiple rows are found.
-    my $row = $orm->find($source, \%where);
-
-=head2 Fetch just the data, no row object (bypasses cache)
-
-    my $data_hashref = $orm->fetch($source, \%where);
-
-=head2 Uses SQL::Abstract under the hood for familiar query syntax
-
-See L<SQL::Abstract>.
-
-=head2 Built in support for transactions and nested transactions (savepoints)
-
-See L<DBIx::QuickORM::Transaction> and L<DBIx::QuickORM::ORM/"TRANSACTIONS">
-for additional details.
-
-=over 4
-
-=item $orm->txn_do(sub { ... });
-
-Void context will commit if there are no exceptions. It will rollback the
-transaction and re-throw the exception if it encounters one.
-
-=item $res = $orm->txn_do(sub { ... });
-
-Scalar context.
-
-On success it will commit and return whatever the sub returns, or the number 1 if the sub
-returns nothing, or anything falsy. If you want to return a false value you
-must send it as a ref, or use the list context form.
-
-If an exception is thrown by the block then the transaction will be rolled back
-and $res will be false.
-
-=item ($ok, $res_or_err) = $orm->txn_do(sub { ... });
-
-List context.
-
-On success it will commit and return C<< (1, $result) >>.
-
-If an exception occurs in the block then the transaction will be rolled back,
-$ok will be 0, and $ret_or_err will contain the exception.
-
-=back
-
-    $orm->txn_do(sub {
-        my $txn = shift;
-
-        # Nested!
-        my ($ok, $res_or_err) = $orm->txn_do(sub { ... });
-
-        if ($ok) { $txn->commit }
-        else     { $txn->rollback };
-
-        # Automatic rollback if an exception is thrown, or if commit is not called
-    });
-
-    # Commit if no exception is thrown, rollback on exception
-    $orm->txn_do(sub { ... });
-
-Or manually:
-
-    my $txn = $orm->start_txn;
-
-    if ($ok) { $txn->commit }
-    else     { $txn->rollback };
-
-    # Force a rollback unless commit or rollback were called:
-    $txn = undef;
-
-=head2 Caching system
-
-Each L<DBIx::QuickORM::ORM> instance has its own cache object.
-
-=head3 Default cache: Naive, only 1 copy of any row in active memory
-
-L<DBIx::QuickORM::Cache::Naive> is a basic caching system that insures you only
-have 1 copy of any specific row at any given time (assuming it has a primary
-key, no cahcing is attempted for rows with no primary key).
-
-B<Note:> If you have multiple ORMs connecting to the same db, they do not share
-a cache and you can end up with the same row in memory twice with 2 different
-references.
-
-=head3 'None' cache option to skip caching, every find/select gets a new row instance
-
-You can also choose to use L<DBIx::QuickORM::Cache::None> which is basically a
-no-op for everything meaning there is no cache, every time you get an object
-from the db it is a new copy.
-
-=head3 Write your own cache if you do not like these
-
-Write your own based on the L<DBIx::QuickORM::Cache> base class.
-
-=head2 Multiple databases supported:
-
-Database interactions are defined by L<DBIx::QuickORM::DB> subclasses. The
-parent class provides a lot of generic functionality that is fairly universal.
-But the subclasses allow you to specify if a DB does or does not support
-things, how to translate type names from other DBs, etc.
-
-=head3 PostgreSQL
-
-Tells the ORM what features are supported by PostgreSQL, and how to access
-them.
-
-See L<DBIx::QuickORM::DB::PostgreSQL>, which uses L<DBD::Pg> under the hood.
-
-=head3 MySQL (Generic)
-
-Tells the ORM what features are supported by any generic MySQL, and how to
-access them.
-
-This FULLY supports both L<DBD::mysql> and L<DBD::MariaDB> for connections,
-pick whichever you prefer, the L<DBIx::QuickORM::DB::MySQL> class is aware of
-the differences and will alter behavior accordingly.
-
-=head3 MySQL (Percona)
-
-Tells the ORM what features are supported by Percona MySQL, and how to
-access them.
-
-This FULLY supports both L<DBD::mysql> and L<DBD::MariaDB> for connections,
-pick whichever you prefer, the L<DBIx::QuickORM::DB::MySQL> and
-L<DBIx::QuickORM::DB::Percona> classes are aware of the differences and will
-alter behavior accordingly.
-
-=head3 MariaDB
-
-Tells the ORM what features are supported by MariaDB, and how to
-access them.
-
-This is essentially MySQL + the extra features MariaDB supports.
-
-This FULLY supports both L<DBD::mysql> and L<DBD::MariaDB> for connections,
-pick whichever you prefer, the L<DBIx::QuickORM::DB::MySQL> and
-L<DBIx::QuickORM::DB::MariaDB> classes are aware of the differences and will
-alter behavior accordingly.
-
-=head3 SQLite
-
-Tells the ORM what features are supported by SQLite, and how to
-access them.
-
-See L<DBIx::QuickORM::DB::SQLite>, which uses L<DBD::SQLite> under the hood.
-
-=head3 Write your own orm <-> db link class
-
-Take a look at L<DBIx::QuickORM::DB> to see what you need to implement.
-
-=head2 Temporary tables and views
-
-Each ORM object L<DBIx::QuickORM::ORM> has the static schema it is built with,
-but it also has a second 'connection' schema. Using this second schema you can
-define temporary views and tables (on supported databases).
-
-    $orm->create_temp_table(...);
-    $orm->create_temp_view(...);
-
-See the L<DBIx::QuickORM::ORM> documentation for more details.
-
-=head2 Highly functional Row class, ability to use custom ones
-
-L<DBIx::QuickORM::Row> is the base class for rows, and the default one used for
-rows that are returned. It provides several methods for getting/setting
-columns, including directly accessing stored, pending, and inflated values. It
-also has methods for finding and fetching relations.
-
-This row class does not provide any per-column accessors. For those you need one of the following:
-
-=over 4
-
-=item L<DBIx::QuickORM::Row::AutoAccessors>
-
-This row class uses AUTOLOAD to generate accessors based on column names on the
-fly. So C<< my $val = $row->foo >> is the same as C<< $row->column('foo') >>.
-
-It also generates accessors for relationships on the fly.
-
-=item Create your own row subclasses and tell the schema to use them.
-
+    # Calling this will define the table. It will also:
+    #  * Remove all functions imported from DBIx::QuickORM
+    #  * Set the base class to DBIx::QuickORM::Row, or to whatever class you specify with 'row_class'.
     table foo => sub {
-        row_class 'My::Row::Class::Foo';
+        column a => sub { ... };
+        column b => sub { ... };
+        column c => sub { ... };
+
+        ....
+
+        # This is the default, but you can change it to set an alternate base class.
+        row_class 'DBIx::QuickORM::Row';
     };
 
-=item Create a class that defines the table and generates a table specific row class
-
-My::Table::Foo.pm:
-
-    package My::Table::Foo
-    use DBIx::QuickORM ':TABLE_CLASS';
-
-    use DBIx::QuickORM::MetaTable foo => sub {
-        column id => ...;
-        column foo => ...;
-
-        # Declarative keywords are removed after this scope ends.
-    };
-
-    # There are now accessors for all the columns and relationships.
-
-    sub whatever_methods_you_want {
+    sub custom_row_method {
         my $self = shift;
         ...
     }
 
-Elsware...
+Then in your ORM package:
 
-    orm MyORM => sub {
-        table My::Table::Foo;
+    package My::ORM;
 
-        # or to load a bunch:
-        tables 'My::Table'; # Loads all My::Table::* tables
+    schema my_schema => sub {
+        table 'My::ORM::Table::Foo'; # Bring in the table
     };
+
+Or if you have many tables and want to load all the tables under C<My::ORM::Table::> at once:
+
+    schema my_schema => sub {
+        tables 'My::ORM::Table';
+    };
+
+=head2 APP THAT CAN USE NEARLY IDENTICAL MYSQL AND POSTGRESQL DATABASES
+
+Lets say you have a test app that can connect to nearly identical MySQL or
+PostgreSQL databases. The schemas are the same apart from minor differences required by
+the database engine. You want to make it easy to access whichever one you want,
+or even both.
+
+    package My::ORM;
+    use DBIx::QuickORM;
+
+    orm my_orm => sub {
+        db myapp => sub {
+            alt mysql => sub {
+                dialect 'MySQL';
+                driver '+DBD::mysql';     # Or 'mysql', '+DBD::MariaDB', 'MariaDB'
+                host 'mysql.myapp.com';
+                user $MYSQL_USER;
+                pass $MYSQL_PASS;
+                db_name 'myapp_mysql';    # In MySQL the db is named myapp_mysql
+            };
+            alt pgsql => sub {
+                dialect 'PostgreSQL';
+                host 'pgsql.myapp.com';
+                user $PGSQL_USER;
+                pass $PGSQL_PASS;
+                db_name 'myapp_pgsql';    # In PostgreSQL the db is named myapp_pgsql
+            };
+        };
+
+        schema my_schema => sub {
+            table same_on_both => sub { ... };
+
+            # Give the name 'differs' that can always be used to refer to this table, despite each db giving it a different name
+            table differs => sub {
+                # Each db has a different name for the table
+                alt mysql => sub { db_name 'differs_mysql' };
+                alt pgsql => sub { db_name 'differs_pgsql' };
+
+                # Name for the column that the code can always use regardless of which db is in use
+                column foo => sub {
+                    # Each db also names this column differently
+                    alt mysql => sub { db_name 'foo_mysql' };
+                    alt pgsql => sub { db_name 'foo_pgsql' };
+                    ...;
+                };
+
+                ...;
+            };
+        };
+    };
+
+Then to use it:
+
+    use My::ORM;
+
+    my $orm_mysql = orm('my_orm:mysql');
+    my $orm_pgsql = orm('my_orm:pgsql');
+
+Each ORM object is a complete and self-contained ORM with its own caching and
+db connection. One connects to MySQL and one connects to PostgreSQL. Both can
+ask for rows in the C<differs> table, on MySQL it will query the
+C<differs_mysql>, on PostgreSQL it will query the C<differs_pgsql> table. You can
+use them both at the same time in the same code.
+
+
+=head2 ADVANCED COMPOSING
+
+You can define databases and schemas on their own and create multiple ORMs that
+combine them. You can also define a C<server> that has multiple databases.
+
+    package My::ORM;
+    use DBIx::QuickORM;
+
+    server pg => sub {
+        dialect 'PostgreSQL';
+        host 'pg.myapp.com';
+        user $USER;
+        pass $PASS;
+
+        db 'myapp';       # Points at the 'myapp' database on this db server
+        db 'otherapp';    # Points at the 'otherapp' database on this db server
+    };
+
+    schema myapp => sub { ... };
+    schema otherapp => sub { ... };
+
+    orm myapp => sub {
+        db 'pg.myapp';
+        schema 'myapp';
+    };
+
+    orm otherapp => sub {
+        db 'pg.otherapp';
+        schema 'otherapp';
+    };
+
+Then to use them:
+
+    use My::ORM;
+
+    my $myapp    = orm('myapp');
+    my $otherapp = orm('otherapp');
+
+Also note that C<< alt(variant => sub { ... }) >> can be used in any of the
+above builders to create MySQL/PostgreSQL/etc. variants on the databases and
+schemas. Then access them like:
+
+    my $myapp_pgsql = orm('myapp:pgsql');
+    my $myapp_mysql = orm('myapp:myql');
+
+=head1 ORM BUILDER EXPORTS
+
+You get all these when using DBIx::QuickORM.
+
+=over 4
+
+=item C<< orm $NAME => sub { ... } >>
+
+=item C<< my $orm = orm($NAME) >>
+
+Define or fetch an ORM.
+
+    orm myorm => sub {
+        db mydb => sub { ... };
+        schema myschema => sub { ... };
+    };
+
+    my $orm = orm('myorm');
+
+You can also compose using databases or schemas you defined previously:
+
+    db mydb1 => sub { ... };
+    db mydb2 => sub { ... };
+
+    schema myschema1 => sub { ... };
+    schema myschema2 => sub { ... };
+
+    orm myorm1 => sub {
+        db 'mydb1';
+        schema 'myschema1';
+    };
+
+    orm myorm2 => sub {
+        db 'mydb2';
+        schema 'myschema2';
+    };
+
+    orm my_mix_a => sub {
+        db 'mydb1';
+        schema 'myschema2';
+    };
+
+    orm my_mix_b => sub {
+        db 'mydb2';
+        schema 'myschema1';
+    };
+
+=item C<< alt $VARIANT => sub { ... } >>
+
+Can be used to add variations to any builder:
+
+    orm my_orm => sub {
+        db mydb => sub {
+            # ************************************
+            alt mysql => sub {
+                dialect 'MySQL';
+            };
+
+            alt pgsql => sub {
+                dialect 'PostgreSQL';
+            };
+            # ************************************
+        };
+
+        schema my_schema => sub {
+            table foo => sub {
+                column x => sub {
+                    identity();
+
+                    # ************************************
+                    alt mysql => sub {
+                        type \'BIGINT';
+                    };
+
+                    alt pgsql => sub {
+                        type \'BIGSERIAL';
+                    };
+                    # ************************************
+                };
+            }
+        };
+    };
+
+Variants can be fetched using the colon C<:> in the name:
+
+    my $pg_orm    = orm('my_orm:pgsql');
+    my $mysql_orm = orm('my_orm:mysql');
+
+This works in C<orm()>, C<db()>, C<schema()>, C<table()>, and C<row()> builders. It does
+cascade, so if you ask for the C<mysql> variant of an ORM, it will also give you
+the C<mysql> variants of the database, schema, tables and rows.
+
+=item C<< db $NAME >>
+
+=item C<< db $NAME => sub { ... } >>
+
+=item C<< $db = db $NAME >>
+
+=item C<< $db = db $NAME => sub { ... } >>
+
+Used to define a database.
+
+    db mydb => sub {
+        dialect 'MySQL';
+        host 'mysql.myapp.com';
+        port 1234;
+        user $MYSQL_USER;
+        pass $MYSQL_PASS;
+        db_name 'myapp_mysql';    # In mysql the db is named myapp_mysql
+    };
+
+Can also be used to fetch a database by name:
+
+    my $db = db('mydb');
+
+Can also be used to tell an ORM which database to use:
+
+    orm myorm => sub {
+        db 'mydb';
+        ...
+    };
+
+=item C<dialect '+DBIx::QuickORM::Dialect::PostgreSQL'>
+
+=item C<dialect 'PostgreSQL'>
+
+=item C<dialect 'MySQL'>
+
+=item C<dialect 'MySQL::MariaDB'>
+
+=item C<dialect 'MySQL::Percona'>
+
+=item C<dialect 'MySQL::Community'>
+
+=item C<dialect 'SQLite'>
+
+Specify what dialect of SQL should be used. This is important for reading
+schema from an existing database, or writing new schema SQL.
+
+C<DBIx::QuickORM::Dialect::> will be prefixed to the start of any string
+provided unless it starts with a plus C<+>, in which case the plus is removed
+and the rest of the string is left unmodified.
+
+The following are all supported by DBIx::QuickORM by default
+
+=over 4
+
+=item L<PostgreSQL|DBIx::QuickORM::Dialect::PostgreSQL>
+
+For interacting with PostgreSQL databases.
+
+=item L<MySQL|DBIx::QuickORM::Dialect::MySQL>
+
+For interacting with generic MySQL databases. Selecting this will auto-upgrade
+to MariaDB, Percona, or Community variants if it can detect the variant. If it
+cannot detect the variant then the generic will be used.
+
+B<NOTE:> Using the correct variant can produce better results. For example
+MariaDB supports C<RETURNING> on C<INSERT>s, Percona and Community variants
+do not, and thus need a second query to fetch the data post-C<INSERT>, and using
+C<last_insert_id> to get auto-generated primary keys. DBIx::QuickORM is aware
+of this and will use returning when possible.
+
+=item L<MySQL::MariaDB|DBIx::QuickORM::Dialect::MySQL::MariaDB>
+
+For interacting with MariaDB databases.
+
+=item L<MySQL::Percona|DBIx::QuickORM::Dialect::MySQL::Percona>
+
+For interacting with MySQL as distributed by Percona.
+
+=item L<MySQL::Community|DBIx::QuickORM::Dialect::MySQL::Community>
+
+For interacting with the Community Edition of MySQL.
+
+=item L<SQLite|DBIx::QuickORM::Dialect::SQLite>
+
+For interacting with SQLite databases.
 
 =back
 
-=head2 Relation mapping and pre-fetching
+=item C<driver '+DBD::Pg'>
 
-TODO: Fill this in.
+=item C<driver 'Pg'>
 
-=head2 Plugin system
+=item C<driver 'mysql'>
 
-There are a lot of hooks, essentially a plugin is either a codered called for
-all hooks (with params telling you about the hook, or they are classes/objects
-that define the 'qorm_plugin_action()" method or that consume the
-L<DBIx::QuickORM::Role::Plugin> role.
+=item C<driver 'MariaDB'>
 
-    plugin sub { ... }; # On the fly plugin writing
-    plugin Some::Plugin; # Use a plugin class (does not have or need a new method)
-    plugin Other::Plugin->new(...); Plugin that needs to be blessed
+=item C<driver 'SQLite'>
 
-Bigger example:
+Usually you do not need to specify this as your dialect should specify the
+correct one to use. However in cases like MySQL and MariaDB they are more or
+less interchangeable and you may want to override the default.
 
-    plugin sub {
-        my $self = shift;
-        my %params     = @_;
-        my $hook       = $params{hook};
-        my $return_ref = $params{return_ref};
+Specify what DBI driver should be used. C<DBD::> is prefixed to any string you
+specify unless it starts with C<+>, in which case the plus is stripped and the
+rest of the module name is unmodified.
+
+B<NOTE:> DBIx::QuickORM can use either L<DBD::mysql> or L<DBD::MariaDB> to
+connect to any of the MySQL variants. It will default to L<DBD::MariaDB> if it
+is installed and you have not requested L<DBD::mysql> directly.
+
+=item C<< attributes \%HASHREF >>
+
+=item C<< attributes(attr => val, ...) >>
+
+Set the attributes of the database connection.
+
+This can take a hashref or key-value pairs.
+
+This will override all previous attributes, it does not merge.
+
+    db mydb => sub {
+        attributes { foo => 1 };
+    };
+
+Or:
+
+    db mydb => sub {
+        attributes foo => 1;
+    };
+
+=item C<host $HOSTNAME>
+
+=item C<hostname $HOSTNAME>
+
+Provide a hostname or IP address for database connections
+
+    db mydb => sub {
+        host 'mydb.mydomain.com';
+    };
+
+=item C<port $PORT>
+
+Provide a port number for database connection.
+
+    db mydb => sub {
+        port 1234;
+    };
+
+=item C<socket $SOCKET_PATH>
+
+Provide a socket instead of a host+port
+
+    db mydb => sub {
+        socket '/path/to/db.socket';
+    };
+
+=item C<user $USERNAME>
+
+=item C<username $USERNAME>
+
+provide a database username
+
+    db mydb => sub {
+        user 'bob';
+    };
+
+=item C<pass $PASSWORD>
+
+=item C<password $PASSWORD>
+
+provide a database password
+
+    db mydb => sub {
+        pass 'hunter2'; # Do not store any real passwords in plaintext in code!!!!
+    };
+
+=item C<creds sub { return \%CREDS }>
+
+Allows you to provide a coderef that will return a hashref with all the
+necessary database connection fields.
+
+This is mainly useful if you credentials are in an encrypted YAML or JSON file
+and you have a method to decrypt and read it returning it as a hash.
+
+    db mydb => sub {
+        creds sub { ... };
+    };
+
+=item C<connect sub { ... }>
+
+=item C<connect \&connect>
+
+Instead of providing all the other fields, you may specify a coderef that
+returns a L<DBI> connection.
+
+B<IMPORTANT:> This function must always return a new L<DBI> connection it
+B<MUST NOT> cache it!
+
+    sub mydb => sub {
+        connect sub { ... };
+    };
+
+=item C<dsn $DSN>
+
+Specify the DSN used to connect to the database. If not provided then an
+attempt will be made to construct a DSN from other parameters, if they are
+available.
+
+    db mydb => sub {
+        dsn "dbi:Pg:dbname=foo";
+    };
+
+=item C<< server $NAME => sub { ... } >>
+
+Used to define a server with multiple databases. This is a way to avoid
+re-specifying credentials for each database you connect to.
+
+You can use C<< db('server_name.db_name') >> to fetch the database.
+
+Basically this allows you to specify any database fields once in the server, then
+define any number of databases that inherit them.
+
+Example:
+
+    server pg => sub {
+        host 'pg.myapp.com';
+        user $USER;
+        pass $PASS;
+        attributes { work_well => 1 }
+
+        db 'myapp';       # Points at the 'myapp' database on this db server
+        db 'otherapp';    # Points at the 'otherapp' database on this db server
+
+        # You can also override any if a special db needs slight modifications.
+        db special => sub {
+            attributes { work_well => 0, work_wrong => 1 };
+        };
+    };
+
+    orm myapp => sub {
+        db 'pg.myapp';
+        ...;
+    };
+
+    orm otherapp => sub {
+        db 'pg.otherapp';
+        ...;
+    };
+
+=item C<< schema $NAME => sub { ... } >>
+
+=item C<< $schema = schema($NAME) >>
+
+=item C<< $schema = schema($NAME => sub { ... }) >>
+
+Used to either fetch or define a schema.
+
+When called with only 1 argument it will fetch the schema with the given name.
+
+When used inside an ORM builder it will set the schema for the ORM (all ORMs
+have exactly one schema).
+
+When called with 2 arguments it will define the schema using the coderef as a
+builder.
+
+When called in a non-void context it will return the compiled schema, otherwise
+it adds it to the ORM class.
+
+    # Define the 'foo' schema:
+    schema foo => sub {
+        table a => sub { ... };
+        table b => sub { ... };
+    };
+
+    # Fetch it:
+    my $foo = schema('foo');
+
+    # Define and compile one:
+    my $bar = schema bar => sub { ... }
+
+    # Use it in an orm:
+    orm my_orm => sub {
+        schema('foo');
+        db(...);
+    };
+
+=item C<< table $NAME => sub { ... } >>
+
+=item C<< table $CLASS >>
+
+=item C<< table $CLASS => sub { ... } >>
+
+Used to define a table, or load a table class.
+
+    schema my_schema => sub {
+        # Load an existing table
+        table 'My::Table::Foo';
+
+        # Define a new table
+        table my_table => sub {
+            column foo => sub { ... };
+            primary_key('foo');
+        };
+
+        # Load an existing table, but make some changes to it
+        table 'My::Table::Bar' => sub {
+            # Override the row class used in the original
+            row_class 'DBIx::QuickORM::Row';
+        };
+    };
+
+This will assume you are loading a table class if the double colon C<::>
+appears in the name.  Otherwise it assumes you are defining a new table.
+This means it is not possible to load top-level packages as table classes,
+which is a feature, not a bug.
+
+=item C<tables 'Table::Namespace'>
+
+Used to load all tables in the specified namespace:
+
+    schema my_schema => sub {
+        # Load My::Table::Foo, My::Table::Bar, etc.
+        tables 'My::Table';
+    };
+
+=item C<row_class '+My::Row::Class'>
+
+=item C<row_class 'MyRowClass'>
+
+When fetching a row from a table, this is the class that each row will be
+blessed into.
+
+This can be provided as a default for a schema, or as a specific one to use in
+a table. When using table classes this will set the base class for the table as
+the table class itself will be the row class.
+
+If the class name has a plus C<+> it will be stripped off and the class name will not
+be altered further. If there is no C<+> then C<DBIx::QuickORM::Row::> will be
+prefixed onto your string, and the resulting class will be loaded.
+
+    schema my_schema => sub {
+        # Uses My::Row::Class as the default for rows in all tables that do not override it.
+        row_class '+My::Row::Class';
+
+        table foo => sub {
+            row_class 'Foo'; # Uses DBIx::QuickORM::Row::Foo as the row class for this table
+        };
+    };
+
+In a table class:
+
+    package My::ORM::Table::Foo;
+    use DBIx::QuickORM type => 'table';
+
+    table foo => sub {
+        # Sets the base class (@ISA) for this table class to 'My::Row::Class'
+        row_class '+My::Row::Class';
+    };
+
+=item C<db_name $NAME>
+
+Sometimes you want the ORM to use one name for a table or database, but the
+database server actually uses another. For example you may want the ORM to use the
+name C<people> for a table, but the database actually uses the table name C<populace>.
+You can use C<db_name> to set the in-database name.
+
+    table people => sub {
+        db_name 'populace';
 
         ...
-
-        # if the hook expects you to return a value, instead of modifying a ref
-        # in %params, then the return_ref will have a scalar reference to set.
-        ${return_ref} = $out if defined($return_ref);
     };
 
-Define custom plugin hooks in your custom tools:
+This can also be used to have a different name for an entire database in the
+orm from its actual name on the server:
 
-    plugin_hook NAME => \%params; # Any/All plugins can take action here.
+    db theapp => sub {    # Name in the orm
+        db_name 'myapp'    # Actual name on the server;
+    };
 
-=head3 Current hooks
+=item C<< column NAME => sub { ... } >>
 
-=over 4
+=item C<< column NAME => %SPECS >>
 
-=item auto_conflate => (data_type => $dtype, sql_type => $stype, column => $col, table => $table)
+Define a column with the given name. The name will be used both as the name the
+ORM uses for the column, and the actual name of the column in the database.
+Currently having a column use a different name in the ORM vs the table is not
+supported.
 
-Use this to automatically inject conflation when auto-generating perl-side
-schema from a populated db.
+    column foo => sub {
+        type \'BIGINT'; # Specify a type in raw SQL (can also accept DBIx::QuickORM::Type::*)
 
-=item post_build => (build_params => \%params, built => $out, built_ref => \$out)
+        not_null(); # Column cannot be null
 
-Called after building an object (ORM, Schema, DB, etc).
+        # This column is an identity column, or is a primary key using
+        # auto-increment. OR similar
+        identity();
 
-=item pre_build => (build_params => \%params)
+        ...
+    };
 
-Called before building an object (ORM, Schema, DB, etc).
+Another simple way to do everything above:
 
-=item relation_name => (default_name => $alias, table => $table, table_name => $tname, fk => $fk)
+    column foo => ('not_null', 'identity', \'BIGINT');
 
-use to rename relations when auto-generating perl-side schema from a populated db.
+=item C<omit>
 
-=item sql_spec => (column => $col, table => $table, sql_spec => $spec)
+When set on a column, the column will be omitted from C<SELECT>s by default. When
+you fetch a row the column will not be fetched until needed. This is useful if
+a table has a column that is usually huge and rarely used.
 
-Opportunity to modify the L<DBIx::QuickORM::SQLSpec> data for a row.
+    column foo => sub {
+        omit;
+    };
 
-=item sql_spec => (table => $table, sql_spec => sql_spec())
+In a non-void context it will return the string C<omit> for use in a column
+specification without a builder.
 
-Opportunity to modify the L<DBIx::QuickORM::SQLSpec> data for a table.
+    column bar => omit();
+
+=item C<nullable()>
+
+=item C<nullable(1)>
+
+=item C<nullable(0)>
+
+=item C<not_null()>
+
+=item C<not_null(1)>
+
+=item C<not_null(0)>
+
+Toggle nullability for a column. C<nullable()> defaults to setting the column as
+nullable. C<not_null()> defaults to setting the column as I<not> nullable.
+
+    column not_nullable => sub {
+        not_null();
+    };
+
+    column is_nullable => sub {
+        nullable();
+    };
+
+In a non-void context these will return a string, either C<nullable> or
+C<not_null>. These can be used in column specifications that do not use a
+builder.
+
+    column foo => nullable();
+    column bar => not_null();
+
+=item C<identity()>
+
+=item C<identity(1)>
+
+=item C<identity(0)>
+
+Used to designate a column as an identity column. This is mainly used for
+generating schema SQL. In a sufficient version of PostgreSQL this will generate
+an identity column. It will fallback to a column with a sequence, or in
+MySQL/SQLite it will use auto-incrementing columns.
+
+In a column builder it will set (default) or unset the C<identity> attribute of
+the column.
+
+
+    column foo => sub {
+        identity();
+    };
+
+In a non-void context it will simply return C<identity> by default or when given
+a true value as an argument. It will return an empty list if a false argument
+is provided.
+
+    column foo => identity();
+
+=item C<affinity('string')>
+
+=item C<affinity('numeric')>
+
+=item C<affinity('binary')>
+
+=item C<affinity('boolean')>
+
+When used inside a column builder it will set the columns affinity to the one
+specified.
+
+    column foo => sub {
+        affinity 'string';
+    };
+
+When used in a non-void context it will return the provided string. This case
+is only useful for checking for typos as it will throw an exception if you use
+an invalid affinity type.
+
+    column foo => affinity('string');
+
+=item C<< type(\$sql) >>
+
+=item C<< type("+My::Custom::Type") # The + is stripped off >>
+
+=item C<< type("+My::Custom::Type", @CONSTRUCTION_ARGS) >>
+
+=item C<< type("MyType") # Short for "DBIx::QuickORM::Type::MyType" >>
+
+=item C<< type("MyType", @CONSTRUCTION_ARGS) >>
+
+=item C<< type(My::Type->new(...)) >>
+
+Used to specify the type for the column. You can provide custom SQL in the form
+of a scalar referernce. You can also provide the class of a type, if you prefix
+the class name with a plus C<+> then it will strip the C<+> off and make no further
+modifications. If you provide a string without a C<+> it will attempt to load
+C<DBIx::QuickORM::Type::YOUR_STRING> and use that.
+
+In a column builder this will directly apply the type to the column being
+built.
+
+In scalar context this will return the constructed type object.
+
+    column foo => sub {
+        type 'MyType';
+    };
+
+    column foo => type('MyType');
+
+=item C<< sql($sql) >>
+
+=item C<< sql(infix => $sql) >>
+
+=item C<< sql(prefix => $sql) >>
+
+=item C<< sql(postfix => $sql) >>
+
+This is used when generating SQL to define the database.
+
+This allows you to provide custom SQL to define a table/column, or add SQL
+before (prefix) and after (postfix).
+
+Infix will prevent the typical SQL from being generated, the infix will be used
+instead.
+
+If no *fix is specified then C<infix> is assumed.
+
+=item C<default(\$sql)>
+
+=item C<default(sub { ... })>
+
+=item C<%key_val = default(\$sql)>
+
+=item C<%key_val = default(sub { ... })>
+
+When given a scalar reference it is treated as SQL to be used when generating
+SQL to define the column.
+
+When given a coderef it will be used as a default value generator for the
+column whenever DBIx::QuickORM C<INSERT>s a new row.
+
+In void context it will apply the default to the column being defined, or will
+throw an exception if no column is being built.
+
+    column foo => sub {
+        default \"NOW()"; # Used when generating SQL for the table
+        default sub { 123 }; # Used when inserting a new row
+    };
+
+This can also be used without a codeblock:
+
+    column foo => default(\"NOW()"), default(sub { 123 });
+
+In the above cases they return:
+
+    (sql_default => "NOW()")
+    (perl_default => sub { 123 })
+
+=item C<columns(@names)>
+
+=item C<columns(@names, \%attrs)>
+
+=item C<columns(@names, sub { ... })>
+
+Define multiple columns at a time. If any attrs hashref or sub builder are
+specified they will be applied to B<all> provided column names.
+
+=item C<primary_key>
+
+=item C<primary_key(@COLUMNS)>
+
+Used to define a primary key. When used under a table you must provide a
+list of columns. When used under a column builder it designates just that
+column as the primary key, no arguments would be accepted.
+
+    table mytable => sub {
+        column a => sub { ... };
+        column b => sub { ... };
+
+        primary_key('a', 'b');
+    };
+
+Or to make a single column the primary key:
+
+    table mytable => sub {
+        column a => sub {
+            ...
+            primary_key();
+        };
+    };
+
+=item C<unique>
+
+=item C<unique(@COLUMNS)>
+
+Used to define a unique constraint. When used under a table you must provide a
+list of columns. When used under a column builder it designates just that
+column as unique, no arguments would be accepted.
+
+    table mytable => sub {
+        column a => sub { ... };
+        column b => sub { ... };
+
+        unique('a', 'b');
+    };
+
+Or to make a single column unique:
+
+    table mytable => sub {
+        column a => sub {
+            ...
+            unique();
+        };
+    };
+
+=item C<build_class $CLASS>
+
+Use this to override the class being built by a builder.
+
+    schema myschema => sub {
+        build_class 'DBIx::QuickORM::Schema::MySchemaSubclass';
+
+        ...
+    };
+
+=item C<my $meta = meta>
+
+Get the current builder meta hashref
+
+    table mytable => sub {
+        my $meta = meta();
+
+        # This is what db_name('foo') would do!
+        $meta->{name} = 'foo';
+    };
+
+=item C<< plugin '+My::Plugin' >>
+
+=item C<< plugin 'MyPlugin' >>
+
+=item C<< plugin 'MyPlugin' => @CONSTRUCTION_ARGS >>
+
+=item C<< plugin 'MyPlugin' => \%CONSTRUCTION_ARGS >>
+
+=item C<< plugin My::Plugin->new() >>
+
+Load a plugin and apply it to the current builder (or top level) and all nested
+builders below it.
+
+The C<+> prefix can be used to specify a fully qualified plugin package name.
+Without the plus C<+> the namespace C<DBIx::QuickORM::Plugin::> will be prefixed to
+the string.
+
+    plugin '+My::Plugin';    # Loads 'My::Plugin'
+    plugin 'MyPlugin';       # Loads 'DBIx::QuickORM::Plugin::MyPlugin
+
+You can also provide an already blessed plugin:
+
+    plugin My::Plugin->new();
+
+Or provide construction args:
+
+    plugin '+My::Plugin' => (foo => 1, bar => 2);
+    plugin '+MyPlugin'   => {foo => 1, bar => 2};
+
+=item C<< $plugins = plugins() >>
+
+=item C<< plugins '+My::Plugin', 'MyPlugin' => \%ARGS, My::Plugin->new(...), ... >>
+
+Load several plugins at once, if a plugin class is followed by a hashref it is
+used as construction arguments.
+
+Can also be used with no arguments to return an arrayref of all active plugins
+for the current scope.
+
+=item C<< autofill() >>
+
+=item C<< autofill($CLASS) >>
+
+=item C<< autofill(sub { ... }) >>
+
+=item C<< autofill($CLASS, sub { ... }) >>
+
+=item C<< autofill $CLASS >>
+
+=item C<< autofill sub { ... } >>
+
+=item C<< autofill $CLASS => sub { ... } >>
+
+Used inside an C<orm()> builder. This tells QuickORM to build an
+L<DBIx::QuickORM::Schema> object by asking the database what tables and columns
+it has.
+
+    orm my_orm => sub {
+        db ...;
+
+        autofill; # Autofill schema from the db itself
+    };
+
+By default the L<DBIx::QuickORM::Schema::Autofill> class is used to do the
+autofill operation. You can provide an alternate class as the first argument if
+you wish to use a custom one.
+
+There are additional operations that can be done inside autofill, just provide
+a subref and call them:
+
+    autofill sub {
+        autotype $TYPE;                         # Automatically use DBIx::QuickORM::Type::TYPE classes when applicable
+        autoskip table => qw/table1 table2/;    # Do not generate schema for the specified tables
+        autorow 'My::Row::Namespace';           # Automatically generate My::Row::Namespace::TABLE classes, also loading any that exist as .pm files
+        autoname TYPE => sub { ... };           # Custom names for tables, accessors, links, etc.
+        autohook HOOK => sub { ... };           # Run behavior at specific hook points
+    };
+
+=item C<autotype $TYPE_CLASS>
+
+=item C<autotype 'JSON'>
+
+=item C<autotype '+DBIx::QuickORM::Type::JSON'>
+
+=item C<autotype 'UUID'>
+
+=item C<autotype '+DBIx::QuickORM::Type::UUID'>
+
+Load custom L<DBIx::QuickORM::Type> subclasses. If a column is found with the
+right type then the type class will be used to inflate/deflate the values
+automatically.
+
+=item C<autoskip table => qw/table1 table2 .../>
+
+=item C<autoskip column => qw/col1 col2 .../>
+
+Skip defining schema entries for the specified tables or columns.
+
+=item C<autorow 'My::App::Row'>
+
+=item C<autorow $ROW_BASE_CLASS>
+
+Generate C<My::App::Row::TABLE> classes for each table autofilled. If you write
+a F<My/App/Row/TABLE.pm> file it will be loaded as well.
+
+If you define a C<My::App::Row> class it will be loaded and all table rows will
+use it as a base class. If no such class is found the new classes will use
+L<DBIx::QuickORM::Row> as a base class.
+
+=item C<< autoname link_accessor => sub { ... } >>
+
+=item C<< autoname field_accessor => sub { ... } >>
+
+=item C<< autoname table => sub { ... } >>
+
+=item C<< autoname link => sub { ... } >>
+
+You can name the C<< $row->FIELD >> accessor:
+
+    autoname field_accessor => sub {
+        my %params     = @_;
+        my $name       = $params{name};   # Name that would be used by default
+        my $field_name = $params{field};  # Usually the same as 'name'
+        my $table      = $params{table};  # The DBIx::QuickORM::Schema::Table object
+        my $column     = $params{column}; # The DBIx::QuickORM::Schema::Table::Column object
+
+        return $new_name;
+    };
+
+You can also name the C<< $row->LINK >> accessor
+
+    autoname link_accessor => sub {
+        my %params = @_;
+        my $name         = $params{name};        # Name that would be used by default
+        my $link         = $params{link};        # DBIx::QuickORM::Link object
+        my $table        = $params{table};       # DBIx::QuickORM::Schema::Table object
+        my $linked_table = $params{linked_table} # Name of the table being linked to
+
+        # If the foreign key points to a unique row, then the accessor will
+        # return a single row object:
+        return "obtain_" . $linked_table if $link->unique;
+
+        # If the foreign key points to non-unique rows, then the accessor will
+        # return a DBIx::QuickORM::Query object:
+        return "select_" . $linked_table . "s";
+    };
+
+You can also provide custom names for tables. When using the table in the ORM
+you would use the name provided here, but under the hood the ORM will use the
+correct table name in queries.
+
+    autoname table => sub {
+        my %params = @_;
+        my $name   = $params{name};     # The name of the table in the database
+        my $table  = $params{table};    # A hashref that will be blessed into the DBIx::QuickORM::Schema::Table once the name is set.
+
+        return $new_name;
+    };
+
+You can also set aliases for links before they are constructed:
+
+    autoname link => sub {
+        my %params       = @_;
+        my $in_table     = $params{in_table};
+        my $in_fields    = $params{in_fields};
+        my $fetch_table  = $params{fetch_table};
+        my $fetch_fields = $params{fetch_fields};
+
+        return $alias;
+    };
+
+=item C<autohook HOOK => sub { my %params = @_; ... }>
+
+See L<DBIx::QuickORM::Schema::Autofill> for a list of hooks and their params.
 
 =back
 
-=head3 Ability to customize relationship names when auto-generating perl schema from SQL schema
-
-TODO: Fill this in.
-
-=head2 Does not use Moose under the hood (light weight)
-
-Most objects in L<DBIx::QuickORM> use L<Object::HashBase> which is what
-L<Test2> uses under the hood. L<Object::HashBase> is very lightweight and
-performant.
-
-For roles DBIx::QuickORM uses L<Role::Tiny>.
-
-=head2 Using Data::Dumper on a row does not dump all the ORM internals
-
-L<DBIx::QuickORM::Row> objects need access to the source, and to the orm. If a
-reference to these was simply put into the row objects hashref then
-L<Data::Dumper> is going to work hard to absolutely fill your scrollback with
-useless info every time you dump your row. L<DBIx::Class> suffers from this
-issue.
-
-For L<DBIx::QuickORM> the source is an L<DBIx::QuickORM::Source> object. And it
-is put into the C<< $row->{source} >> hash key. But first it is masked using
-L<DBIx::QuickORM::Util::Mask> so that when dumped with L<Data::Dumper> you see
-this:
-
-    bless( {
-             'source' => bless( [
-                                  'DBIx::QuickORM::Source=HASH(0x59d72c1c33c8)',
-                                  sub { "DUMMY" }
-                                ], 'DBIx::QuickORM::Util::Mask' ),
-             ...
-                              }
-           }, 'DBIx::QuickORM::Row' );
-
-All methods that are valid on L<DBIx::QuickORM::Source> can be called on the
-masked form and they will be delegated to the masked object.
-
-This + the DateTime conflator mean that rows from DBIx::QuickORM can be dumped
-by Data::Dumper without wiping out your scrollback buffer.
-
-=head1 DECLARATIVE INTERFACE
-
-TODO - Fill this in.
-
-=head1 SOURCE
-
-The source code repository for DBIx-QuickORM can be found at
-L<http://github.com/exodist/DBIx-QuickORM/>.
-
-=head1 MAINTAINERS
+=head1 YOUR ORM PACKAGE EXPORTS
 
 =over 4
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+=item C<< $orm_meta = orm() >>
+
+=item C<< $orm = orm($ORM_NAME) >>
+
+=item C<< $db = orm(db => $DB_NAME) >>
+
+=item C<< $schema = orm(schema => $SCHEMA_NAME) >>
+
+=item C<< $orm_variant = orm("${ORM_NAME}:${VARIANT}") >>
+
+=item C<< $db_variant = orm(db => "${DB_NAME}:${VARIANT}") >>
+
+=item C<< $schema_variant = orm(schema => "${SCHEMA_NAME}:${VARIANT}") >>
+
+This function is the one-stop shop to access any ORM, schema, or database instances
+you have defined.
 
 =back
 
-=head1 AUTHORS
+=head2 RENAMING THE EXPORT
 
-=over 4
+You can rename the C<orm()> function at import time by providing an alternate
+name.
 
-=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+    use My::ORM qw/renamed_orm/;
 
-=back
-
-=head1 COPYRIGHT
-
-Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
-
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
-See L<http://dev.perl.org/licenses/>
+    my $orm = renamed_orm('my_orm');
 
 =cut
-

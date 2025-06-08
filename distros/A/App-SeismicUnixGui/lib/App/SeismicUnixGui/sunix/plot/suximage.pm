@@ -487,6 +487,28 @@ sub ftr {
     }
 }
 
+=head2 sub headerword 
+
+same as key
+
+
+=cut
+
+sub headerword {
+
+    my ( $self, $key ) = @_;
+    if ( $key ne $empty_string ) {
+
+        $suximage->{_key}  = $key;
+        $suximage->{_note} = $suximage->{_note} . ' key=' . $suximage->{_key};
+        $suximage->{_Step} = $suximage->{_Step} . ' key=' . $suximage->{_key};
+
+    }
+    else {
+        print("suximage, key, missing key,\n");
+    }
+}
+
 =head2 sub infile 
 
 
@@ -511,6 +533,7 @@ sub infile {
 
 =head2 sub key 
 
+headerword is equivalent
 
 =cut
 
@@ -2762,7 +2785,7 @@ sub get_max_index {
     my ($self) = @_;
 
     # index=60
-    my $max_index = 59;
+    my $max_index = 58;
 
     return ($max_index);
 }

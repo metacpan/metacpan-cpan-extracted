@@ -1036,6 +1036,54 @@ sub help_menubutton {
 	return ();
 }
 
+#ChatGPT
+#sub help_menubutton {
+#    my ($self, $install_option_ref) = @_;
+#
+#    # Fetch the help menubutton type map
+#    my $help_menubutton_type = $get->help_menubutton_type_href();
+#
+#    # Ensure the install option is provided
+#    unless ($install_option_ref && length $$install_option_ref) {
+#        carp("L_SU, help_menubutton: missing value");
+#        return;
+#    }
+#
+#    # Define the action for the different help options
+#    my %help_actions = (
+#        $help_menubutton_type->{_About}             => \&help_button_action("_About"),
+##        $help_menubutton_type->{_InstallationGuide} => \&help_button_pdf_action('_InstallationGuide'),
+##        $help_menubutton_type->{_Tutorial}          => \&help_button_pdf_action('_Tutorial'),
+#    );
+#
+#    my $option = $$install_option_ref;
+#    print("L_SU,help_menubutton, option=$option\n");
+#    if (exists $help_actions{$option}) {
+#        # Call the appropriate function for the help option
+#        $help_actions{$option}->($option);
+#    }
+#    else {
+#        carp("L_SU, cannot provide help for option: $option");
+#    }
+#
+#    return;
+#}
+#
+## Helper subroutines for the different help options
+#sub help_button_action {
+#    my ($option) = @_;
+#    print("L_SU,help_button_action,option=$option\n");
+#    my $item = $alias_help_menubutton_label_h->{$option};
+#    $message_director->help_button($item);
+#}
+#
+#sub help_button_pdf_action {
+#    my ($option) = @_;
+#    my $item = $alias_help_menubutton_label_h->{$option};
+#    $message_director->help_button_pdf($item);
+#}
+
+
 =head2 sub initialize my dialogs
 
 Create widgets that show messages
@@ -1320,219 +1368,322 @@ sub set_run_button {
 	return ();
 }
 
-=head2 sub set_save_button
+#=head2 sub set_save_button
+#
+# called from MAIN
+#
+# foreach my $key (sort keys %$L_SU_href) {
+#      print (" L_SU,set_save_button, key is $key, value is $L_SU_href->{$key}\n");
+# }	
+#          
+#         dialog_type for set_save_button is only 'Save'
+#         
+#   Because private hash does not have _dialog type
+#   it should be assigned to set_save_button after set_hash_ref transfers L_SU hash
+#   but not before
+#   i.e. for safety, transfer set_hash_ref first
+#         
+#   save can be for 2 situations: pre-built superflows and user-built flows
+#         
+#  collect changes to environmental indicator variables such as _has_used_SaveAs_button
+#         
+#    print("L_SU,set_save_button, flow_type : $L_SU_href->{_flow_type}\n");
+#    
+#    In:  set_save_button, uses topics
+#    	
+#    Topics originate as a dialog_type topic which can be  'Data', 'Flow
+# 'SaveAs', or 'Delete'
+#    
+#    Topic for set_save_button can also be 'Save'
+#    
+#    Flow types can be: user-built or pre-built superflow
+#    
+#    Logic for use: SaveAs_button must have been used previously or Save_button
+#    Once Save_button is used has_used_SaveAs_button = false
+# 	
+#
+#=cut
+#
+#sub set_save_button {
+#
+#	my ( $self, $topic_sref ) = @_;
+#
+#	#	print("L_SU,set_save_button, topic: $$topic_sref\n");
+#
+#	my $message = $message_director->null_button(0);
+#
+#	# a blank message
+#	$message_w->delete( "1.0", 'end' );
+#	$message_w->insert( 'end', $message );
+#
+#	if ($topic_sref) {    # i.e., topic is 'Save'
+#		my $topic;
+#		$topic = $$topic_sref;
+#
+#		# choose between
+#		# user-built,  or pre-built superflow
+#		if ( $L_SU_href->{_flow_type} ) {
+#
+#			my $flow_type = $L_SU_href->{_flow_type};
+#
+#			if ( $flow_type eq 'user_built' ) {
+#
+#				my $flow_color = $L_SU_href->{_flow_color};
+#
+#	   # print("L_SU,set_save_button,flow_color: $L_SU_href->{_flow_color} \n");
+#
+#				my $flow_color_hname = $flow_color . '_flow';
+#
+#				if ($flow_color) {    # e.g. grey, pink, green or blue flows
+#
+## collect information from the most recent updates to flow packages (e.g., grey_flow.pm)
+#
+#					#					my $temp_hash = $flow_color_hname->get_hash_ref();
+#
+#					my $temp_hash;
+#					if ( $flow_color eq 'grey' ) {
+#
+#						$temp_hash = $grey_flow->get_hash_ref();
+#
+#					}
+#					elsif ( $flow_color eq 'pink' ) {
+#
+#						$temp_hash = $pink_flow->get_hash_ref();
+#
+#					}
+#					elsif ( $flow_color eq 'green' ) {
+#
+#						$temp_hash = $green_flow->get_hash_ref();
+#
+#					}
+#					elsif ( $flow_color eq 'blue' ) {
+#
+#						$temp_hash = $blue_flow->get_hash_ref();
+#
+#					}
+#					else {
+#						print("L_SU, unexpected flow color\n");
+#					}
+#
+#					$L_SU_href->{_has_used_SaveAs_button} =
+#					  $temp_hash->{_has_used_SaveAs_button};
+#					$L_SU_href->{_has_used_Save_button} =
+#					  $temp_hash->{_has_used_Save_button};
+#					$L_SU_href->{_flow_name_out} =
+#					  $temp_hash->{_flow_name_out};    #TBD
+#					$L_SU_href->{_has_used_open_perl_file_button} =
+#					  $temp_hash->{_has_used_open_perl_file_button};
+#
+#	# check to see if the current user-built flow has used SaveAs or Save button
+#					if (   $L_SU_href->{_has_used_SaveAs_button}
+#						|| $L_SU_href->{_has_used_Save_button}
+#						|| $L_SU_href->{_flow_name_out}
+#						|| $L_SU_href->{_has_used_open_perl_file_button} )
+#					{
+#
+## store possible changes in parameter values
+## print("L_SU, set_save_button, saving flow \n");
+## print("L_SU, set_save_button,_last_parameter_index_touched_color, $L_SU_href->{_last_parameter_index_touched_color}\n");
+#
+#						if ( $flow_color eq 'grey' ) {
+#
+#							$grey_flow->save_button($topic);
+#
+#						}
+#						elsif ( $flow_color eq 'pink' ) {
+#
+#							$pink_flow->save_button($topic);
+#
+#						}
+#						elsif ( $flow_color eq 'green' ) {
+#
+#							$green_flow->save_button($topic);
+#
+#						}
+#						elsif ( $flow_color eq 'blue' ) {
+#
+#							$blue_flow->save_button($topic);
+#
+#						}
+#						else {
+#							print("L_SU, unexpected flow color\n");
+#						}
+#
+#		# reset states
+#		# N.B. Save_button can only be used if SaveAs is true
+#		# But, after Save_button is used, reset _has_used_SaveAs_button to false
+#		# and has_used_Save_button to true
+#
+#						$gui_history->set_hash_ref($L_SU_href);
+#						$gui_history->set4end_of_Save_button();
+#						$L_SU_href = $gui_history->get_hash_ref();
+#
+## print("2. L_SU, set_save_button, for user_built_flow, print out gui_history.txt\n");
+## $gui_history->view();
+#
+#					}
+#					else {
+#						my $message = $message_director->save_button(1);
+#						$message_w->insert( 'end', $message );
+#
+#				# print("L_SU,set_save_button, can not save user-built file\n");
+#					}
+#
+#				}
+#				else {
+#					print("L_SU, set_save_button, missing color\n");
+#				}
+#
+#			}
+#			elsif ( $flow_type eq 'pre_built_superflow' ) {
+#
+## collect latest values from a prior run of pre_built_superflow or FileDialog_button
+##print("2. L_SU, set_save_button, _values_aref[0]: @{$L_SU_href->{_values_aref}}\n");
+#
+#				$L_SU_href->{_dialog_type} = 'Save';
+#
+##print("2. L_SU, set_save_button, _names_aref: @{$L_SU_href->{_names_aref}}\n");  # equi to labels_aref
+#				$save_button->set_hash_ref($L_SU_href);
+#
+## $save_button->set_gui_widgets($L_SU_href);                            #  uses 27 / 115 in
+#
+#			#				print("2. L_SU, set_save_button, print out gui_history.txt\n");
+#			#				$gui_history->view();
+#				$save_button->set_flow_type( $L_SU_href->{_flow_type} );
+#				$save_button->set_prog_name_sref(
+#					$L_SU_href->{_prog_name_sref} );
+#
+##print("1. L_SU, set_save_button,last left listbox flow program touched had index = $L_SU_href->{_last_flow_index_touched}\n");
+##print("1. L_SU, set_save_button, flow_item_up_arrow_button= $L_SU_href->{_flow_item_up_arrow_button}\n");
+#				$save_button->set_dialog_type($topic);    # set 1 of 3
+#				 # print("1. L_SU, set_save_buttonlast left listbox flow program touched had index = $L_SU_href->{_last_flow_index_touched}\n");
+#				 # print("2. L_SU, set_save_button, for  pre-built stream, print out gui_history.txt\n");
+#				 # $gui_history->view();
+#
+#				$save_button->director();
+#
+#				$L_SU_href = $save_button->get_all_hash_ref();
+#
+## print("2. L_SU, set_save_button, flow_item_up_arrow_button= $L_SU_href->{_flow_item_up_arrow_button}\n");
+## print("L_SU, set_save_button,pre_built_flow,has_used_SaveAs_button $L_SU_href->{_has_used_SaveAs_button}\n");
+## print("L_SU, set_save_button,pre_built_flow,has_used_Save_superflow $L_SU_href->{_has_used_Save_superflow}\n");
+## print("L_SU, set_save_button,pre_built_flow,has_used_Save_button $L_SU_href->{_has_used_Save_button}\n");
+## print("L_SU, set_save_button,pre_built_flow,is_Save_button $L_SU_href->{_is_Save_button}\n");
+#
+#			}
+#			else {
+#				print("L_SU,set_save_button , missing flow type\n");
+#			}
+#		}
+#
+#	}
+#	else {
+#		print("L_SU,set_save_button , missing dialog_type, Save \n");
+#	}
+#	return ();
+#}
 
- called from MAIN
-
- foreach my $key (sort keys %$L_SU_href) {
-      print (" L_SU,set_save_button, key is $key, value is $L_SU_href->{$key}\n");
- }	
-          
-         dialog_type for set_save_button is only 'Save'
-         
-   Because private hash does not have _dialog type
-   it should be assigned to set_save_button after set_hash_ref transfers L_SU hash
-   but not before
-   i.e. for safety, transfer set_hash_ref first
-         
-   save can be for 2 situations: pre-built superflows and user-built flows
-         
-  collect changes to environmental indicator variables such as _has_used_SaveAs_button
-         
-    print("L_SU,set_save_button, flow_type : $L_SU_href->{_flow_type}\n");
-    
-    In:  set_save_button, uses topics
-    	
-    Topics originate as a dialog_type topic which can be  'Data', 'Flow
- 'SaveAs', or 'Delete'
-    
-    Topic for set_save_button can also be 'Save'
-    
-    Flow types can be: user-built or pre-built superflow
-    
-    Logic for use: SaveAs_button must have been used previously or Save_button
-    Once Save_button is used has_used_SaveAs_button = false
- 	
-
-=cut
 
 sub set_save_button {
+    my ($self, $topic_sref) = @_;
 
-	my ( $self, $topic_sref ) = @_;
+    # Print message to indicate function execution (optional debugging)
+    # print("L_SU, set_save_button, topic: $$topic_sref\n");
 
-	#	print("L_SU,set_save_button, topic: $$topic_sref\n");
+    # Initialize blank message
+    my $message = $message_director->null_button(0);
+    $message_w->delete("1.0", 'end');
+    $message_w->insert('end', $message);
 
-	my $message = $message_director->null_button(0);
+    # Ensure topic is provided
+    unless ($topic_sref) {
+        carp("L_SU, set_save_button: missing dialog_type, Save");
+        return;
+    }
 
-	# a blank message
-	$message_w->delete( "1.0", 'end' );
-	$message_w->insert( 'end', $message );
+    my $topic = $$topic_sref;
 
-	if ($topic_sref) {    # i.e., topic is 'Save'
-		my $topic;
-		$topic = $$topic_sref;
+    # Handle user-built or pre-built superflow based on flow type
+    if ($L_SU_href->{_flow_type}) {
+    	
+        my $flow_type = $L_SU_href->{_flow_type};
+        
+        if ($flow_type eq 'user_built') {
+        	
+            handle_user_built_flow($topic);
+            
+        } elsif ($flow_type eq 'pre_built_superflow') {
+        	
+            handle_pre_built_superflow($topic);
+            
+        } else {
+            carp("L_SU, set_save_button: unexpected flow type");
+        }
+    } else {
+        carp("L_SU, set_save_button: missing flow type");
+    }
 
-		# choose between
-		# user-built,  or pre-built superflow
-		if ( $L_SU_href->{_flow_type} ) {
+    return;
+}
 
-			my $flow_type = $L_SU_href->{_flow_type};
+# Helper function for user-built flow
+sub handle_user_built_flow {
+    my ($topic) = @_;
+    my $flow_color = $L_SU_href->{_flow_color};
 
-			if ( $flow_type eq 'user_built' ) {
+    unless ($flow_color) {
+        carp("L_SU, set_save_button: missing flow color");
+        return;
+    }
 
-				my $flow_color = $L_SU_href->{_flow_color};
+    # Map flow colors to corresponding flow objects
+    my %flow_map = (
+        grey  => $grey_flow,
+        pink  => $pink_flow,
+        green => $green_flow,
+        blue  => $blue_flow,
+    );
 
-	   # print("L_SU,set_save_button,flow_color: $L_SU_href->{_flow_color} \n");
+    my $flow_object = $flow_map{$flow_color};
 
-				my $flow_color_hname = $flow_color . '_flow';
+    unless ($flow_object) {
+        carp("L_SU, set_save_button: unexpected flow color");
+        return;
+    }
 
-				if ($flow_color) {    # e.g. grey, pink, green or blue flows
+    # Collect the flow package data
+    my $temp_hash = $flow_object->get_hash_ref();
 
-# collect information from the most recent updates to flow packages (e.g., grey_flow.pm)
+    # Check if save actions are allowed
+    if ($temp_hash->{_has_used_SaveAs_button} || $temp_hash->{_has_used_Save_button} || $temp_hash->{_flow_name_out} || $temp_hash->{_has_used_open_perl_file_button}) {
+        $flow_object->save_button($topic);
 
-					#					my $temp_hash = $flow_color_hname->get_hash_ref();
+        # Reset states and update history after saving
+        $gui_history->set_hash_ref($L_SU_href);
+        $gui_history->set4end_of_Save_button();
+        $L_SU_href = $gui_history->get_hash_ref();
+        
+    } else {
+        my $message = $message_director->save_button(1);
+        $message_w->insert('end', $message);
+    }
+}
 
-					my $temp_hash;
-					if ( $flow_color eq 'grey' ) {
+# Helper function for pre-built superflow
+sub handle_pre_built_superflow {
+    my ($topic) = @_;
 
-						$temp_hash = $grey_flow->get_hash_ref();
+    $L_SU_href->{_dialog_type} = 'Save';
+    $save_button->set_hash_ref($L_SU_href);
+    $save_button->set_flow_type($L_SU_href->{_flow_type});
+    $save_button->set_prog_name_sref($L_SU_href->{_prog_name_sref});
+    $save_button->set_dialog_type($topic);
+    
+    # Run the save button director
+    $save_button->director();
 
-					}
-					elsif ( $flow_color eq 'pink' ) {
-
-						$temp_hash = $pink_flow->get_hash_ref();
-
-					}
-					elsif ( $flow_color eq 'green' ) {
-
-						$temp_hash = $green_flow->get_hash_ref();
-
-					}
-					elsif ( $flow_color eq 'blue' ) {
-
-						$temp_hash = $blue_flow->get_hash_ref();
-
-					}
-					else {
-						print("L_SU, unexpected flow color\n");
-					}
-
-					$L_SU_href->{_has_used_SaveAs_button} =
-					  $temp_hash->{_has_used_SaveAs_button};
-					$L_SU_href->{_has_used_Save_button} =
-					  $temp_hash->{_has_used_Save_button};
-					$L_SU_href->{_flow_name_out} =
-					  $temp_hash->{_flow_name_out};    #TBD
-					$L_SU_href->{_has_used_open_perl_file_button} =
-					  $temp_hash->{_has_used_open_perl_file_button};
-
-	# check to see if the current user-built flow has used SaveAs or Save button
-					if (   $L_SU_href->{_has_used_SaveAs_button}
-						|| $L_SU_href->{_has_used_Save_button}
-						|| $L_SU_href->{_flow_name_out}
-						|| $L_SU_href->{_has_used_open_perl_file_button} )
-					{
-
-# store possible changes in parameter values
-# print("L_SU, set_save_button, saving flow \n");
-# print("L_SU, set_save_button,_last_parameter_index_touched_color, $L_SU_href->{_last_parameter_index_touched_color}\n");
-
-						if ( $flow_color eq 'grey' ) {
-
-							$grey_flow->save_button($topic);
-
-						}
-						elsif ( $flow_color eq 'pink' ) {
-
-							$pink_flow->save_button($topic);
-
-						}
-						elsif ( $flow_color eq 'green' ) {
-
-							$green_flow->save_button($topic);
-
-						}
-						elsif ( $flow_color eq 'blue' ) {
-
-							$blue_flow->save_button($topic);
-
-						}
-						else {
-							print("L_SU, unexpected flow color\n");
-						}
-
-		# reset states
-		# N.B. Save_button can only be used if SaveAs is true
-		# But, after Save_button is used, reset _has_used_SaveAs_button to false
-		# and has_used_Save_button to true
-
-						$gui_history->set_hash_ref($L_SU_href);
-						$gui_history->set4end_of_Save_button();
-						$L_SU_href = $gui_history->get_hash_ref();
-
-# print("2. L_SU, set_save_button, for user_built_flow, print out gui_history.txt\n");
-# $gui_history->view();
-
-					}
-					else {
-						my $message = $message_director->save_button(1);
-						$message_w->insert( 'end', $message );
-
-				# print("L_SU,set_save_button, can not save user-built file\n");
-					}
-
-				}
-				else {
-					print("L_SU, set_save_button, missing color\n");
-				}
-
-			}
-			elsif ( $flow_type eq 'pre_built_superflow' ) {
-
-# collect latest values from a prior run of pre_built_superflow or FileDialog_button
-#print("2. L_SU, set_save_button, _values_aref[0]: @{$L_SU_href->{_values_aref}}\n");
-
-				$L_SU_href->{_dialog_type} = 'Save';
-
-#print("2. L_SU, set_save_button, _names_aref: @{$L_SU_href->{_names_aref}}\n");  # equi to labels_aref
-				$save_button->set_hash_ref($L_SU_href);
-
-# $save_button->set_gui_widgets($L_SU_href);                            #  uses 27 / 115 in
-
-			#				print("2. L_SU, set_save_button, print out gui_history.txt\n");
-			#				$gui_history->view();
-				$save_button->set_flow_type( $L_SU_href->{_flow_type} );
-				$save_button->set_prog_name_sref(
-					$L_SU_href->{_prog_name_sref} );
-
-#print("1. L_SU, set_save_button,last left listbox flow program touched had index = $L_SU_href->{_last_flow_index_touched}\n");
-#print("1. L_SU, set_save_button, flow_item_up_arrow_button= $L_SU_href->{_flow_item_up_arrow_button}\n");
-				$save_button->set_dialog_type($topic);    # set 1 of 3
-				 # print("1. L_SU, set_save_buttonlast left listbox flow program touched had index = $L_SU_href->{_last_flow_index_touched}\n");
-				 # print("2. L_SU, set_save_button, for  pre-built stream, print out gui_history.txt\n");
-				 # $gui_history->view();
-
-				$save_button->director();
-
-				$L_SU_href = $save_button->get_all_hash_ref();
-
-# print("2. L_SU, set_save_button, flow_item_up_arrow_button= $L_SU_href->{_flow_item_up_arrow_button}\n");
-# print("L_SU, set_save_button,pre_built_flow,has_used_SaveAs_button $L_SU_href->{_has_used_SaveAs_button}\n");
-# print("L_SU, set_save_button,pre_built_flow,has_used_Save_superflow $L_SU_href->{_has_used_Save_superflow}\n");
-# print("L_SU, set_save_button,pre_built_flow,has_used_Save_button $L_SU_href->{_has_used_Save_button}\n");
-# print("L_SU, set_save_button,pre_built_flow,is_Save_button $L_SU_href->{_is_Save_button}\n");
-
-			}
-			else {
-				print("L_SU,set_save_button , missing flow type\n");
-			}
-		}
-
-	}
-	else {
-		print("L_SU,set_save_button , missing dialog_type, Save \n");
-	}
-	return ();
+    # Update the hash with changes made by the save button
+    $L_SU_href = $save_button->get_all_hash_ref();
 }
 
 =head2 sub set_hash_ref 

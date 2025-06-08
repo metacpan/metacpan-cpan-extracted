@@ -296,7 +296,7 @@ sub read_conf ($) {
         die "Missing channel name at channel\n" unless ( $_->{name} );
         die "Invalid network at channel " . $_->{name} . "\n"
             unless ( $_->{network} and $conf->{networks}{ $_->{network} } );
-        push @{ $conf->{networks}{ $_->{network} }{channels} }, $_->{name};
+        $conf->{networks}{ $_->{network} }{channels}{$_->{name}} = $_->{secret};
         my $chanid = KGB->get_chanid( $_->{network}, $_->{name} );
         die "Invalid repos key at channel $chanid\n"
             unless $_->{broadcast}
@@ -946,16 +946,19 @@ sub _irc_reconnect {
             push @to_restart, $net;
         }
         else {
+            # TODO: this doesn't account for secret changes
+            # perhaps it needs to part and re-join a channel when
+            # its secret is changed?
             my ( %newchan, %oldchan, %allchan );
-            %newchan = map( { $_ => 1 } @{ $new->{channels} } );
-            %oldchan = map( { $_ => 1 } @{ $old->{channels} } );
+            %newchan = %{ $new->{channels} };
+            %oldchan = %{ $old->{channels} };
             %allchan = ( %newchan, %oldchan );
-            foreach my $chan ( keys %allchan ) {
-                if ( $newchan{$chan} and !$oldchan{$chan} ) {
+            foreach my $chan ( sort keys %allchan ) {
+                if ( exists $newchan{$chan} and not exists $oldchan{$chan} ) {
                     KGB->out("Joining $chan...\n");
-                    $kernel->post( "irc_$net" => join => $chan );
+                    $kernel->post( "irc_$net" => join => $chan => $newchan{$chan} );
                 }
-                elsif ( !$newchan{$chan} and $oldchan{$chan} ) {
+                elsif ( not exists $newchan{$chan} and exists $oldchan{$chan} ) {
                     KGB->out("Parting $chan...\n");
                     $kernel->post( "irc_$net" => part => $chan );
                 }
@@ -1094,7 +1097,8 @@ sub add_channel ($$$) {
         unless (exists $KGB::config->{networks}{$network});
     return if (exists $KGB::config->{chanidx}{$chanid});
 
-    push @{ $KGB::config->{networks}{$network}{channels} }, $channel;
+    # secret-less
+    $KGB::config->{networks}{$network}{channels}{$channel} = '';
     $KGB::config->{chanidx}{$chanid} = {
         name => $channel,
         network => $network,
@@ -1124,11 +1128,12 @@ sub irc_001 {
     my ( $kernel, $sender ) = @_[ KERNEL, SENDER ];
     my $net = get_net($sender);
     my $channels = $KGB::config->{networks}{$net}{channels};
+    my @channel_names = sort keys %{$channels};
 
     # Get the component's object at any time by accessing the heap of
     # the SENDER
     KGB->out( "Connected to $net (", $sender->get_heap->server_name(), ")\n" );
-    KGB->out( "Joining @$channels...\n" ) if ($channels);
+    KGB->out( "Joining @channel_names...\n" ) if @channel_names;
     undef;
 }
 

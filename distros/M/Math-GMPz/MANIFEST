@@ -37,8 +37,6 @@ t/imp_exp.t
 t/imp_warnings.t
 t/index_bug.t
 t/math_bigint.t
-t/math_bigint_gmp.t
-t/math_bigint_gmp_only.t
 t/misc.t
 t/power.t
 t/primes.t

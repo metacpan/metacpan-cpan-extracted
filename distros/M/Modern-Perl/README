@@ -7,6 +7,13 @@ one:
 
     use Modern::Perl;
 
+*NOTE* that Perl versions 5.38 and newer effectively do the same thing with:
+
+    use v5.38; # or v5.40, v5.42, etc
+
+... so if you're writing code with those language versions, you may not need
+this module at all!
+
 INSTALLATION
 
 To install this module, run the following commands:
@@ -40,7 +47,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2009-2022 chromatic
+Copyright (C) 2009-2025 chromatic
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

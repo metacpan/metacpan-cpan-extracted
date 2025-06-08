@@ -77,7 +77,7 @@
             "Math::BigRat" : "0.2624",
             "Path::Tiny" : "0.146",
             "Test2::Plugin::BailOnFail" : "0",
-            "Test2::Require::Module" : "0",
+            "Test2::Require::Threads" : "0",
             "Test2::V0" : "0",
             "Tie::Array" : "0",
             "Tie::Handle" : "0",
@@ -101,7 +101,7 @@
    "provides" : {
       "Data::Dumper::Interp" : {
          "file" : "lib/Data/Dumper/Interp.pm",
-         "version" : "7.016"
+         "version" : "7.017"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/jimav/Data-Dumper-Interp"
       }
    },
-   "version" : "7.016",
+   "version" : "7.017",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "CC0-1.0"

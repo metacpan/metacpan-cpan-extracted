@@ -3,3 +3,5 @@ Revision history for Catalyst-Plugin-SocialMeta
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.05 	2025-06-08
+	- Set the uri based on the current $c->req->uri as fb now honors this as the uri to take the metatags from.

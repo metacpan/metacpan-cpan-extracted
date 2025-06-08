@@ -5,7 +5,7 @@ package App::SeismicUnixGui::misc::manage_files_by2;
 =head2 SYNOPSIS 
  Contains methods/subroutines/functions to operate on directories
 
- PROGRAM NAME: manage_files_by  classIVA 
+ PROGRAM NAME: manage_files_by2 
  AUTHOR: Juan Lorenzo
  DATE:   V 1. March 3 2008
  V 2 May 27 2014
@@ -1231,9 +1231,9 @@ sub read_1col {
 	  my ( $self, $file_name ) = @_;
 	  my @OFFSET;
 
-	  print(
-		  "\nmanage_files_by2, read_1col, The input file is called $file_name\n"
-	  );
+#	  print(
+#		  "\nmanage_files_by2, read_1col, The input file is called $file_name\n"
+#	  );
 
 	  # open the file of interest
 	  open( FILE, $file_name ) || print("Can't open $file_name, $!\n");
@@ -1249,9 +1249,9 @@ sub read_1col {
 		  my ($x) = $line;
 		  $OFFSET[$i] = $x;
 
-		  print(
-			  "\n manage_files_by2, read_1col, Reading 1 col file:$OFFSET[$i]\n"
-		  );
+#		  print(
+#			  "\n manage_files_by2, read_1col, Reading 1 col file:$OFFSET[$i]\n"
+#		  );
 		  $i = $i + 1;
 
 	  }
@@ -1261,9 +1261,9 @@ sub read_1col {
 	  my $num_rows = scalar @OFFSET;
 
 	  # print out the number of lines of data for the user
-	  print(
-"manage_files_by2, read_1col, This file contains $num_rows rows of data\n\n\n"
-	  );
+#	  print(
+#"manage_files_by2, read_1col, This file contains $num_rows rows of data\n\n\n"
+#	  );
 
 	  # make sure arrays do not contaminate outside
 	  my $result = \@OFFSET;
@@ -2162,17 +2162,31 @@ sub write_5cols {
 	  my ( $self, $ref_X, $ref_Y, $ref_Z, $ref_A, $ref_B, $file_name, $fmt ) =
 		@_;
 
-	  my $num_rows = scalar @$ref_X;
+	  if (length $ref_X &&
+	      length $ref_Y &&
+	      length $ref_A &&
+	      length $ref_B &&
+	      length $file_name &&
+	      length $fmt ) {
+			
+		  my $num_rows = scalar @$ref_X;
+#		  $num_rows=5;
+		  print ("manage_files_by2,write_5cols,num_rows, $num_rows\n");
 
-	  open( OUT, ">$file_name" );
+#	  open( OUT, ">$file_name" );
 
 	  for ( my $j = 0 ; $j < $num_rows ; $j++ ) {
 
-		  printf OUT "$fmt", @$ref_X[$j], @$ref_Y[$j], @$ref_Z[$j],
-			@$ref_A[$j], @$ref_B[$j];
+#		  printf OUT "$fmt", @$ref_X[$j], @$ref_Y[$j], @$ref_Z[$j],
+#			@$ref_A[$j], @$ref_B[$j];
+			print ("$fmt @$ref_X[$j], @$ref_Y[$j], @$ref_Z[$j],@$ref_A[$j], @$ref_B[$j]\n");
 	  }
 
-	  close(OUT);
+	  close(OUT);	
+	  } else{
+		print("manage_files_by2,write_5cols, incompelte values\n");
+	  }
+
 
 	  #	print(
 	  #		"\nmanage_files_by2,write_5cols,The output file is called $file_name\n"

@@ -30,6 +30,12 @@
 		char fmt[32], buf[128];
 		snprintf(fmt, sizeof(fmt), "%%.%df", places);
 		quadmath_snprintf(buf, sizeof(buf), fmt, (double)val); // cast for display
+		char *dot = strchr(buf, '.');
+		if (dot) {
+			char *end = buf + strlen(buf) - 1;
+			while (end > dot && *end == '0') *end-- = '\0';
+			if (end == dot) *end = '\0';
+		}
 		return newSVpv(buf, 0);
 	}
 #elif defined(USE_LONG_DOUBLE)
@@ -55,6 +61,12 @@
 		char fmt[32], buf[64];
 		snprintf(fmt, sizeof(fmt), "%%.%dLf", places);
 		snprintf(buf, sizeof(buf), fmt, val);
+		char *dot = strchr(buf, '.');
+		if (dot) {
+			char *end = buf + strlen(buf) - 1;
+			while (end > dot && *end == '0') *end-- = '\0';
+			if (end == dot) *end = '\0';
+		}
 		return newSVpv(buf, 0);
 	}
 #else

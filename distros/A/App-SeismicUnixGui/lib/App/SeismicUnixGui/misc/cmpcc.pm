@@ -327,6 +327,8 @@ sub get_cmp_x_m_aref4cc {
 		my $last_geo_idx  = $cmpcc->{_geo_number_of};
 		my $geo_number_of = $cmpcc->{_geo_number_of};
 		my @geo_x_m       = @{ $cmpcc->{_geo_x_m_aref} };
+		
+#		print("geo_number_of=$geo_number_of\n");
 
 		# combination of all geophones
 		for (
@@ -482,11 +484,10 @@ sub get_geo_x_m_aref4cc {
 
 =head2 sub get_offset_x_m_aref4cc
 
-
 For a single SP gather,
 build offset for all the following
 combinations:
-24 geophones, combined 2 at a time
+e.g., 24 geophones, combined 2 at a time
 
 print("cmpcc,get_offset_x_m_aref4cc,
 geo_ref=$geo_ref; every=$every; offset = $offset_x_m[$every]\n");
@@ -532,7 +533,7 @@ sub get_offset_x_m_aref4cc {
 		  # Offset between 2 geophones at a time
 		  # Use successively different first geophone
 		  # To make pairs:
-		  # fix the first geophone, then onsider every geophone in a shot gather
+		  # fix the first geophone, then consider every geophone in a shot gather
 			for ( my $every = 0 ; $every < $geo_number_of ; $every++ ) {
 
 				$offset_x_m[$every] =
@@ -669,14 +670,20 @@ sub set_sp_gather_geom_out {
 
 		}
 		else {
-			# NADA print("cmpcc, count, $count\n");
+#			print("cmpcc, NADA, count, $count\n");
 		}
 
 		my $file_name = $cmpcc->{_shove_sp_gather_geom_outbound};
 		my $format    = "%d\t%f\t%d\t%d\t%f\n";
 
-		#		print("@{$cmpcc->{_vector_pt1_aref}}\n");
-
+#		print("cmpc,set_sp_gather_geom_out, vector 1 @{$cmpcc->{_vector_pt1_aref}}\n");
+#		print("cmpc,set_sp_gather_geom_out, vector 2 @{$cmpcc->{_vector_pt2_aref}}\n");
+#		print("cmpc,set_sp_gather_geom_out, vector 3 @{$cmpcc->{_vector_pt3_aref}}\n");
+#		print("cmpc,set_sp_gather_geom_out, vector 4 @{$cmpcc->{_vector_pt4_aref}}\n");
+#		print("cmpc,set_sp_gather_geom_out, vector 5 @{$cmpcc->{_vector_pt5_aref}}\n");
+#		print("cmpc,set_sp_gather_geom_out, file name $file_name\n");
+#		print("cmpc,set_sp_gather_geom_out, format $format\n");		
+		
 		$file->write_5cols(
 			$cmpcc->{_vector_pt1_aref}, $cmpcc->{_vector_pt2_aref},
 			$cmpcc->{_vector_pt3_aref}, $cmpcc->{_vector_pt4_aref},
@@ -726,9 +733,9 @@ sub set_base_file_name_gx {
 
 	if ( length $base_file_name_gx ) {
 
-	   #		print(
-	   #"cmpcc, set_base_file_name_gx, base_file_name_gx = $base_file_name_gx\n"
-	   #		);
+#	   		print(
+#	   "cmpcc, set_base_file_name_gx, base_file_name_gx = $base_file_name_gx\n"
+#	   		);
 
 		$cmpcc->{_base_file_name_gx} = $base_file_name_gx;
 	}
@@ -751,9 +758,9 @@ sub set_base_file_name_sx {
 
 	if ( length $base_file_name_sx ) {
 
-	   #		print(
-	   #"cmpcc, set_base_file_name_sx, base_file_name_sx = $base_file_name_sx\n"
-	   #		);
+#	   		print(
+#	   "cmpcc, set_base_file_name_sx, base_file_name_sx = $base_file_name_sx\n"
+#	   		);
 
 		$cmpcc->{_base_file_name_sx} = $base_file_name_sx;
 	}
@@ -1644,6 +1651,9 @@ Assemble
 gx data
 for correlation across a sp
 24choose2 = 276 traces
+48choose2 = 1128 traces
+geophone location does not change but is repeated
+24, 48 times ( as many times as there are geophones)
 
 =cut
 
@@ -1667,7 +1677,7 @@ sub set_geo_x_m_aref4cc {
 		$cmpcc->{_geo_x_m_aref4cc} = \@array;
 
 #			print(
-#"cmpcc, set_geo_x_m_aref4cc set_ cmpcc->{_geo_x_m_aref4cc} = @{$cmpcc->{_geo_x_m_aref4cc}}\n"
+#"cmpcc, set_geo_x_m_aref4cc set_ cmpcc->{_geo_x_m_aref4cc} = @{@{$cmpcc->{_geo_x_m_aref4cc}}[1]}\n"
 #			);
 
 	}
@@ -1859,7 +1869,7 @@ sub set_geom4calc {
 		{
 			$geo_x_m[$i] = $geo;
 
-			#			print("geo_x_m=$geo_x_m[$i]\n");
+			print("geo_x_m=$geo_x_m[$i]\n");
 
 		}
 
@@ -1868,7 +1878,7 @@ sub set_geom4calc {
 		$cmpcc->{_geo_number_of} = $geo_number_of;
 		$cmpcc->{_geo_x_m_aref}  = \@geo_x_m;
 
-		#		print("geo_number_of = $geo_number_of\n");
+		print("geo_number_of = $geo_number_of\n");
 	}
 	else {
 		print("cmpcc, set_geom4calc, missing values\n");
@@ -1909,9 +1919,10 @@ sub set_geom4data {
 		my ( $geo_x_m_aref, $num_rows_gx ) =
 		  $manage_files_by2->read_1col($inbound_gx);
 
-		#		my @sx = @$sp_x_m_aref;
-		#		print("sx= @sx\n");
-		#		print("gx= @{$geo_x_m_aref}\n");
+				my @sx = @$sp_x_m_aref;
+#				print("sx= @sx\n");
+#				print("gx= @{$geo_x_m_aref}\n");
+#				print("num_rows_sx=$num_rows_sx\n");
 
 		$cmpcc->{_geo_number_of} = $num_rows_gx;
 		$cmpcc->{_geo_x_m_aref}  = $geo_x_m_aref;
@@ -2096,6 +2107,7 @@ Assemble
 sp data
 for correlation across a sp
 24choose2 = 276 traces
+48choose2 = 1128 traces
 
 =cut
 
@@ -2117,9 +2129,9 @@ sub set_sp_x_m_aref4cc {
 		}
 
 		$cmpcc->{_sp_x_m_aref4cc} = \@array;
-
+#
 #			print(
-#"cmpcc, set_sp_x_m_aref4cc set_ cmpcc->{_sp_x_m_aref4cc} = @{$cmpcc->{_sp_x_m_aref4cc}}\n"
+#"cmpcc, set_sp_x_m_aref4cc set_ cmpcc->{_sp_x_m_aref4cc} = @{@{$cmpcc->{_sp_x_m_aref4cc}}[0]}\n"
 #			);
 
 	}
@@ -2572,9 +2584,9 @@ sub set_shove_geom {
 			my $vector_pt5_aref = $array->get_one_row_aref();
 			$cmpcc->{_vector_pt5_aref} = $vector_pt5_aref;
 
-#		print("cmpcc,set_shove_geom,pt5, vector_pt5= @{$cmpcc->{_vector_pt5_aref}}\n");
-#		print("cmpcc,set_shove_geom,pt5, elements_number_of= $elements_number_of_pt5\n");
-
+		print("cmpcc,set_shove_geom,pt5, vector_pt5= @{$cmpcc->{_vector_pt5_aref}}\n");
+		print("cmpcc,set_shove_geom,pt5, elements_number_of= $elements_number_of_pt5\n");
+		print("cmpcc,set_shove_geom,pt5, plotting cmp locations\n");
 		}
 		else {
 			print("cmpcc, set2shove_geom,pt5, missing variable \n");
@@ -2588,8 +2600,9 @@ sub set_shove_geom {
 			my $vector_pt4_aref = $array->get_one_row_aref();
 			$cmpcc->{_vector_pt4_aref} = $vector_pt4_aref;
 
-#		print("cmpcc,set_shove_geom,pt4, vector_pt4= @{$cmpcc->{_vector_pt4_aref}}\n");
-#		print("cmpcc,set_shove_geom,pt4, elements_number_of= $elements_number_of_pt4\n");
+		print("cmpcc,set_shove_geom,pt4, vector_pt4= @{$cmpcc->{_vector_pt4_aref}}\n");
+		print("cmpcc,set_shove_geom,pt4, elements_number_of= $elements_number_of_pt4\n");
+				print("cmpcc,set_shove_geom,pt5, plotting offset values\n");
 
 		}
 		else {
@@ -2604,8 +2617,9 @@ sub set_shove_geom {
 			my $vector_pt3_aref = $array->get_one_row_aref();
 			$cmpcc->{_vector_pt3_aref} = $vector_pt3_aref;
 
-#		print("cmpcc,set_shove_geom,pt3, vector_pt3= @{$cmpcc->{_vector_pt3_aref}}\n");
-#		print("cmpcc,set_shove_geom,pt3, elements_number_of= $elements_number_of_pt3\n");
+		print("cmpcc,set_shove_geom,pt3, vector_pt3= @{$cmpcc->{_vector_pt3_aref}}\n");
+		print("cmpcc,set_shove_geom,pt3, elements_number_of= $elements_number_of_pt3\n");
+		print("cmpcc,set_shove_geom,pt5, plotting sx locations\n");
 
 		}
 		else {
@@ -2620,8 +2634,9 @@ sub set_shove_geom {
 			my $vector_pt2_aref = $array->get_one_row_aref();
 			$cmpcc->{_vector_pt2_aref} = $vector_pt2_aref;
 
-#		print("cmpcc,set_shove_geom,pt2, vector_pt2= @{$cmpcc->{_vector_pt2_aref}}\n");
-#		print("cmpcc,set_shove_geom,pt2, elements_number_of= $elements_number_of_pt2\n");
+		print("cmpcc,set_shove_geom,pt2, vector_pt2= @{$cmpcc->{_vector_pt2_aref}}\n");
+		print("cmpcc,set_shove_geom,pt2, elements_number_of= $elements_number_of_pt2\n");
+		print("cmpcc,set_shove_geom,pt5, plotting gx locations\n");
 
 		}
 		else {
@@ -2651,8 +2666,9 @@ sub set_shove_geom {
 
 			$cmpcc->{_vector_pt1_aref} = \@vector_pt1;
 
-#		print("cmpcc,set_shove_geom,with tracl,pt1(i.e.,2), vector_pt1= @{$cmpcc->{_vector_pt1_aref}}\n");
-#		print("cmpcc,set_shove_geom,with tracl, pt1(i.e.,2), elements_number_of= $elements_number_of_pt2\n");
+		print("cmpcc,set_shove_geom,with tracl,pt1(i.e.,2), vector_pt1= @{$cmpcc->{_vector_pt1_aref}}\n");
+		print("cmpcc,set_shove_geom,with tracl, pt1(i.e.,2), elements_number_of= $elements_number_of_pt2\n");
+		print("cmpcc,set_shove_geom,pt5, plotting trace sequential numbers\n");
 
 		}
 		else {
@@ -2667,13 +2683,13 @@ sub set_shove_geom {
 			my $vector_pt1_aref = $array->get_one_row_aref();
 			$cmpcc->{_vector_pt1_aref} = $vector_pt1_aref;
 
-#		print("cmpcc,set_shove_geom,without tracl,pt2, vector_pt1= $cmpcc->{_vector_pt1_aref}}\n");
-#		print("cmpcc,set_shove_geom,without tracl, pt2, elements_number_of= $elements_number_of_pt1\n");
+		print("cmpcc,set_shove_geom,without tracl,pt2, vector_pt1= $cmpcc->{_vector_pt1_aref}}\n");
+		print("cmpcc,set_shove_geom,without tracl, pt2, elements_number_of= $elements_number_of_pt1\n");
 
 		}
 		else {
 			#NADA
-			# print("cmpcc, set2shove_geom,pt1.b, missing variable \n");
+#			 print("cmpcc, set2shove_geom,pt1.b, missing variable \n");
 		}
 
 	}

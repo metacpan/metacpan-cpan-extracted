@@ -3,7 +3,7 @@
 # Crypt::RSA::Blind - Blind RSA signatures
 # Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 #
-# $Id: lib/Crypt/RSA/Blind.pm v1.026 Thu Jun  5 19:42:39 EST 2025 $
+# $Id: lib/Crypt/RSA/Blind.pm v1.027 Sat Jun  7 19:23:39 EST 2025 $
 
 use warnings;
 use strict;
@@ -13,328 +13,329 @@ use Feature::Compat::Class;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
-class Crypt::RSA::Blind {
+class Crypt::RSA::Blind;
 
-  use vars qw( $VERSION );
-  our ( $VERSION ) = '$Revision: 1.026 $' =~ /\s+([\d\.]+)/;
+use vars qw( $VERSION );
+our ( $VERSION ) = '$Revision: 1.027 $' =~ /\s+([\d\.]+)/;
 
-  use Carp;
-  use Carp::Assert;
-  use Crypt::FDH;
-  use Crypt::RSA;
-  use Crypt::RSA::DataFormat qw(bitsize i2osp os2ip octet_xor);
-  use Crypt::RSA::Primitives;
-  use Digest::SHA qw(sha384 sha384_hex);
-  use Math::Pari qw (Mod ceil component gcd lift);
-  use Crypt::Random qw(makerandom_itv makerandom);
+use Carp;
+use Carp::Assert;
+use Crypt::FDH;
+use Crypt::RSA;
+use Crypt::RSA::DataFormat qw(bitsize i2osp os2ip octet_xor);
+use Crypt::RSA::Primitives;
+use Digest::SHA qw(sha384 sha384_hex);
+use Math::Pari qw (Mod ceil component gcd lift);
+use Crypt::Random qw(makerandom_itv makerandom);
 
-  field $hashsize :param :reader(get_hashsize) = 768;
-  field $initsize :param :reader(get_initsize) = 128;
-  field $blindsize :param :reader(get_blindsize) = 512;
-  field $hash_algorithm :reader(get_hash_algorithm) :param = 'SHA384';
-  field $mgf_hash_algorithm :reader(get_mgf) :param = 'SHA384';
-  field $slen :param :reader(get_slen) = 0;
-  field $oldapi :param :reader(get_oldapi) = 1;
-  field $rsa :reader(get_rsa) = Crypt::RSA->new;
-  field $rsap :reader(get_rsap) = Crypt::RSA::Primitives->new;
-  field $requests = {};
-  field $messages = {};
+field $hashsize :param :reader(get_hashsize) = 768;
+field $initsize :param :reader(get_initsize) = 128;
+field $blindsize :param :reader(get_blindsize) = 512;
+field $hash_algorithm :reader(get_hash_algorithm) :param = 'SHA384';
+field $mgf_hash_algorithm :reader(get_mgf) :param = 'SHA384';
+field $slen :param :reader(get_slen) = 0;
+field $oldapi :param :reader(get_oldapi) = 1;
+field $rsa :reader(get_rsa) = Crypt::RSA->new;
+field $rsap :reader(get_rsap) = Crypt::RSA::Primitives->new;
+field $requests = {};
+field $messages = {};
 
-  method set_hashsize ($value) { $hashsize = $value; }
-  method set_hash_algorithm ($value) { $hash_algorithm = $value; }
-  method set_mgf_hash_algorithm ($value) { $mgf_hash_algorithm = $value; }
-  method set_blindsize ($value) { $blindsize = $value; }
-  method set_initsize ($value) { $initsize = $value; }
-  method set_oldapi ($value) { $oldapi = $value; }
-  method set_slen ($value) { $slen = $value; }
+method set_hashsize ($value) { $hashsize = $value; }
+method set_hash_algorithm ($value) { $hash_algorithm = $value; }
+method set_mgf_hash_algorithm ($value) { $mgf_hash_algorithm = $value; }
+method set_blindsize ($value) { $blindsize = $value; }
+method set_initsize ($value) { $initsize = $value; }
+method set_oldapi ($value) { $oldapi = $value; }
+method set_slen ($value) { $slen = $value; }
 
-  method keygen (@args) {
-    $self->get_rsa->keygen(@args);
-  }
-
-  method init () {
-    makerandom( Size => $self->get_initsize, Strength => 0, Uniform => 1 );
-  }
-
-  # RSABSSA methods
-
-  method ssa_blind ($arg_ref) {
-    my $n = $arg_ref->{PublicKey}->n;
-    my $kbits = bitsize($n);
-    my $klen = ceil($kbits/8);
-    my $encoded_msg = $self->EMSA_PSS_ENCODE($kbits, @$arg_ref{qw(Message sLen Salt)});
-    my $m = os2ip($encoded_msg);
-
-    croak("Invalid input") unless is_coprime($m, $n);
-
-    my $r; my $r_inv;
-    if ($arg_ref->{R_inv}) {  # for test vector verification
-      $r_inv = $arg_ref->{R_inv};
-      $r = mod_inverse($r_inv, $n);
-    }
-    else {
-      while (!$r_inv) {
-	$r = makerandom_itv( Size => 4096, Lower => 1, Upper => $n, Strength => 1, Uniform => 1 );
-	# Check that blinding factor is invertible mod n
-	$r_inv = mod_inverse($r, $n);
-      }
-    }
-    $self->_request($arg_ref->{Init} => $r_inv, $arg_ref->{Message}) if $arg_ref->{Init};
-    my $x = RSAVP1($arg_ref->{PublicKey}, $r);
-    my $z = ($m * $x) % $n;
-    my $blinded_msg = i2osp($z, $klen);
-    my $inv = i2osp($r_inv, $klen);
-    return ($blinded_msg, $inv);
-  }
-
-  method ssa_blind_sign ($arg_ref) {
-    my $n = $arg_ref->{SecretKey}->n;
-    my $kbits = bitsize($n);
-    my $klen = ceil($kbits/8);
-    croak("Unexpected input size") if length($arg_ref->{BlindedMessage}) != $klen;
-    my $d = $arg_ref->{SecretKey}->d;
-    my $m = os2ip($arg_ref->{BlindedMessage});
-    croak("Invalid message length") if $m >= $n;
-    my $s = mod_exp($m, $d, $n);
-    my $blind_sig = i2osp($s, $klen);
-  }
-
-  method ssa_finalize ($arg_ref) {
-    my $n = $arg_ref->{PublicKey}->n;
-    my $kbits = bitsize($n);
-    my $klen = ceil($kbits/8);
-    my $z = os2ip($arg_ref->{BlindSig});
-    my ($blinding, $message);
-    unless ($arg_ref->{Blinding}) {
-      my $saved = $self->_request($arg_ref->{Init});
-      $blinding = $self->get_oldapi ? $saved->[0] : $saved;
-      $message = $self->get_oldapi ? $saved->[1] : $arg_ref->{Message};
-    }
-    croak("Neither Blinding nor valid Init vector provided") unless my $r_inv = $arg_ref->{Blinding} ? os2ip($arg_ref->{Blinding}) : $blinding;
-    my $s = ($z * $r_inv) % $n;
-    my $sig = i2osp($s, $klen);
-    $self->pss_verify( { PublicKey => $arg_ref->{PublicKey}, Signature => $sig, Message => $arg_ref->{Blinding} ? $arg_ref->{Message} : $message, sLen => $arg_ref->{sLen} } );
-    return $sig;
-  }
-
-  method ssa_randomize ($msg) {
-    $msg = i2osp(makerandom(Size => 32 * 8, Strength => 0, Uniform => 1)) . $msg;
-  }
-
-  method pss_verify ($arg_ref) {
-    my $n = $arg_ref->{PublicKey}->n;
-    my $kbits = bitsize($n);
-    my $klen = ceil($kbits/8);
-    # Step 1
-    croak("Incorrect signature") if length($arg_ref->{Signature}) != $klen;
-    # Step 2a (OS2IP)
-    my $signature_int = os2ip($arg_ref->{Signature});
-    # Step 2b (RSAVP1)
-    my $em_int = RSAVP1($arg_ref->{PublicKey}, $signature_int);
-    # Step 2c (I2OSP)
-    my $emlen = ceil(($kbits - 1)/8);
-    my $em = i2osp($em_int, $emlen);
-    my $hash = Digest::SHA->new($self->get_hash_algorithm);
-    $hash->add($arg_ref->{Message});
-    $self->EMSA_PSS_VERIFY($hash, $em, $kbits-1, sub { MGF1(@_) }, $arg_ref->{sLen});
-    return 1
-  }
-
-  method EMSA_PSS_ENCODE ($kbits, $msg, $slen, $salt) {
-    my $hash = Digest::SHA->new($self->get_hash_algorithm);
-    $hash->add($msg);
-    my $m_hash = $hash->hexdigest;
-    my $hlen = ceil($hash->hashsize/8);
-
-    my $embits = $kbits - 1;
-    my $emlen = ceil($embits/8);
-    assert($emlen >= $hlen + $slen + 2);
-
-    my $lmask = 0;
-    for (0..(8 * $emlen - $embits - 1)) {
-      $lmask = $lmask >> 1 | 0x80;
-    }
-
-    unless ($salt) {
-      $salt = '';
-      $salt = uc(unpack ('H*',i2osp(makerandom(Size => $slen * 8, Strength => 0, Uniform => 1)))) if $slen;
-    }
-
-    my $m_prime = chr(0) x 8 . i2osp(Math::Pari::_hex_cvt('0x' . $m_hash . $salt));
-    $hash = Digest::SHA->new($self->get_hash_algorithm);
-    $hash->add($m_prime);
-    my $h = $hash->digest;
-    my $ps = chr(0) x ($emlen - $slen - $hlen - 2);
-    my $db = $ps . chr(0x01); $db .= i2osp(Math::Pari::_hex_cvt('0x' . $salt)) if $slen;
-    my $dbMask = MGF1($h, $emlen - $hlen - 1);
-    my $masked_db = octet_xor($db, $dbMask);
-    $masked_db = chr(os2ip(substr($masked_db, 0, 1)) & (~$lmask)) . substr($masked_db, 1);
-    my $encoded_msg = $masked_db . $h . chr(0xBC);
-  }
-
-  method EMSA_PSS_VERIFY ($mhash, $em, $embits, $mgf, $slen) {
-    my $hashlen = ceil($mhash->hashsize / 8);
-    my $emlen = ceil($embits/8);
-    my $lmask = 0;
-    for (0..(8*$emlen-$embits-1)) {
-      $lmask = $lmask >> 1 | 0x80
-    }
-    # Step 1 and 2 already done
-    # Step 3
-    croak("Incorrect signature") if ($emlen < $hashlen + $slen + 2);
-    # Step 4
-    croak("Incorrect signature") if ord(substr($em, -1)) != 0xBC;
-    # Step 5
-    my $masked_db = substr($em,0,$emlen-$hashlen-1);
-    my $h = substr($em,$emlen-$hashlen-1,-1);
-    # Step 6
-    croak("Incorrect signature") if $lmask & ord(substr($em,0,1));
-    # Step 7
-    my $dbmask = &$mgf($h, $emlen-$hashlen-1);
-    # Step 8
-    my $db = octet_xor($masked_db, $dbmask);
-    # Step 9
-    $db = chr(ord(substr($db,0,1)) & ~$lmask) . substr($db,1);
-    # Step 10
-    croak("Incorrect signature") unless (substr($db, 0, $emlen-$hashlen-$slen-1) eq (chr(0) x ($emlen-$hashlen-$slen-2) . chr(1)));
-    # Step 11
-    my $salt = $slen > 0 ? substr($db,-$slen) : '';
-    # Step 12
-    my $m_prime = chr(0) x 8 . $mhash->digest . $salt;
-    # Step 13
-    my $hash = Digest::SHA->new($self->get_hash_algorithm);
-    $hash->add($m_prime);
-    my $hp = $hash->digest;
-    # Step 14
-    croak("Incorrect signature") if $h ne $hp;
-  }
-
-  # Old-style API methods
-
-  method request (%arg) {
-    if ($self->get_oldapi) {
-      my ($req, $blinding) = $self->ssa_blind( { PublicKey => $arg{Key}, sLen => $self->get_slen, %arg } );
-      return os2ip($req);
-    }
-    $self->_req(%arg);
-  }
-
-  method sign (%arg) {
-    $self->get_oldapi ? os2ip($self->ssa_blind_sign( { SecretKey => $arg{Key}, BlindedMessage => i2osp($arg{Message}) } )) : $self->_sign(%arg);
-  }
-
-  method unblind (%arg) {
-    $self->get_oldapi ? os2ip($self->ssa_finalize( { PublicKey => $arg{Key}, BlindSig => i2osp($arg{Signature}), sLen => $self->get_slen, %arg } )) : $self->_unblind(%arg);
-  }
-
-  method verify (%arg) {
-    $self->get_oldapi ? $self->pss_verify( { PublicKey => $arg{Key}, %arg, Signature => i2osp($arg{Signature}), sLen => $self->get_slen } ) : $self->_verify(%arg);
-  }
-
-  # Deprecated methods
-
-  method _req (%arg) {
-    carp('Call to deprecated method: request');
-    my ($invertible, $blinding);
-    while (!$invertible) {
-      $blinding = makerandom_itv( Size => $self->get_blindsize, Upper => $arg{Key}->n-1, Strength => 1, Uniform => 1 );
-      # Check that blinding is invertible mod n
-      $invertible = gcd( $blinding, $arg{Key}->n );
-      $invertible = 0 unless $invertible == 1;
-    }
-    $self->_request($arg{Init} => $blinding);
-
-    my $be = $self->get_rsap->core_encrypt(Key => $arg{Key}, Plaintext => $blinding);
-    my $fdh = Math::Pari::_hex_cvt ('0x'.Crypt::FDH::hash(Size => $self->get_hashsize, Message => $arg{Message}));
-    component((Mod($fdh,$arg{Key}->n)) * (Mod($be,$arg{Key}->n)), 2);
-  }
-
-  method _sign (@args) {
-    carp('Call to deprecated method: sign');
-    $self->get_rsap->core_sign(@args);
-  }
-
-  method _unblind (%arg) {
-    carp('Call to deprecated method: unblind');
-    my $blinding = $self->_request($arg{Init});
-    component((Mod($arg{Signature},$arg{Key}->n)) / (Mod($blinding,$arg{Key}->n)), 2);
-  }
-
-  method _verify (%arg) {
-    carp('Call to deprecated method: verify');
-    my $pt = $self->get_rsap->core_verify(Key => $arg{Key}, Signature => $arg{Signature});
-    $pt == Math::Pari::_hex_cvt ('0x'.Crypt::FDH::hash(Size => $self->get_hashsize, Message => $arg{Message}));
-  }
-
-  # Helper methods and functions
-
-  method errstr (@args) {
-    $self->rsa->errstr(@args);
-  }
-
-  method _request ($init, $blinding=undef, $message=undef) {
-    my $ret;
-    if ($blinding) {
-      $requests->{$init} = $blinding;
-      $messages->{$init} = $message if $self->get_oldapi;
-    }
-    else {
-      $ret = $self->get_oldapi ?
-	[ $requests->{$init}, $messages->{$init} ] :
-	$requests->{$init};
-      delete $requests->{$init};
-      delete $messages->{$init} if $self->get_oldapi;
-    }
-    return $ret;
-  }
-
-  sub RSAVP1 ($pubkey, $r) {
-    my $e = $pubkey->e;
-    my $n = $pubkey->n;
-    my $c = mod_exp($r, $e, $n);
-  }
-
-  sub MGF1 ($seed, $masklen) {
-    my $hlen = 48;
-    my $T = '';
-    for (0..ceil($masklen/$hlen)-1) {
-      my $c = i2osp($_, 4);
-      $T = $T . sha384($seed . $c);
-    }
-    assert(length($T) >= $masklen);
-    unpack "a$masklen", $T;
-  }
-
-  sub is_coprime {
-    gcd(@_) == 1;
-  }
-
-  sub mod_inverse {
-    my($a, $n) = @_;
-    my $m = Mod(1, $n);
-    lift($m / $a);
-  }
-
-  sub mod_exp {
-    my($a, $exp, $n) = @_;
-    my $m = Mod($a, $n);
-    lift($m ** $exp);
-  }
+method keygen (@args) {
+  $self->get_rsa->keygen(@args);
 }
 
-class Crypt::RSA::Blind::PubKey {
+method init () {
+  makerandom( Size => $self->get_initsize, Strength => 0, Uniform => 1 );
+}
+
+# RSABSSA methods
+
+method ssa_blind ($arg_ref) {
+  my $n = $arg_ref->{PublicKey}->n;
+  my $kbits = bitsize($n);
+  my $klen = ceil($kbits/8);
+  my $encoded_msg = $self->EMSA_PSS_ENCODE($kbits, @$arg_ref{qw(Message sLen Salt)});
+  my $m = os2ip($encoded_msg);
+
+  croak("Invalid input") unless is_coprime($m, $n);
+
+  my $r; my $r_inv;
+  if ($arg_ref->{R_inv}) {  # for test vector verification
+    $r_inv = $arg_ref->{R_inv};
+    $r = mod_inverse($r_inv, $n);
+  }
+  else {
+    while (!$r_inv) {
+      $r = makerandom_itv( Size => 4096, Lower => 1, Upper => $n, Strength => 1, Uniform => 1 );
+      # Check that blinding factor is invertible mod n
+      $r_inv = mod_inverse($r, $n);
+    }
+  }
+  $self->_request($arg_ref->{Init} => $r_inv, $arg_ref->{Message}) if $arg_ref->{Init};
+  my $x = RSAVP1($arg_ref->{PublicKey}, $r);
+  my $z = ($m * $x) % $n;
+  my $blinded_msg = i2osp($z, $klen);
+  my $inv = i2osp($r_inv, $klen);
+  return ($blinded_msg, $inv);
+}
+
+method ssa_blind_sign ($arg_ref) {
+  my $n = $arg_ref->{SecretKey}->n;
+  my $kbits = bitsize($n);
+  my $klen = ceil($kbits/8);
+  croak("Unexpected input size") if length($arg_ref->{BlindedMessage}) != $klen;
+  my $d = $arg_ref->{SecretKey}->d;
+  my $m = os2ip($arg_ref->{BlindedMessage});
+  croak("Invalid message length") if $m >= $n;
+  my $s = mod_exp($m, $d, $n);
+  my $blind_sig = i2osp($s, $klen);
+}
+
+method ssa_finalize ($arg_ref) {
+  my $n = $arg_ref->{PublicKey}->n;
+  my $kbits = bitsize($n);
+  my $klen = ceil($kbits/8);
+  my $z = os2ip($arg_ref->{BlindSig});
+  my ($blinding, $message);
+  unless ($arg_ref->{Blinding}) {
+    my $saved = $self->_request($arg_ref->{Init});
+    $blinding = $self->get_oldapi ? $saved->[0] : $saved;
+    $message = $self->get_oldapi ? $saved->[1] : $arg_ref->{Message};
+  }
+  croak("Neither Blinding nor valid Init vector provided") unless my $r_inv = $arg_ref->{Blinding} ? os2ip($arg_ref->{Blinding}) : $blinding;
+  my $s = ($z * $r_inv) % $n;
+  my $sig = i2osp($s, $klen);
+  $self->pss_verify( { PublicKey => $arg_ref->{PublicKey}, Signature => $sig, Message => $arg_ref->{Blinding} ? $arg_ref->{Message} : $message, sLen => $arg_ref->{sLen} } );
+  return $sig;
+}
+
+method ssa_randomize ($msg) {
+  $msg = i2osp(makerandom(Size => 32 * 8, Strength => 0, Uniform => 1)) . $msg;
+}
+
+method pss_verify ($arg_ref) {
+  my $n = $arg_ref->{PublicKey}->n;
+  my $kbits = bitsize($n);
+  my $klen = ceil($kbits/8);
+  # Step 1
+  croak("Incorrect signature length") if length($arg_ref->{Signature}) != $klen;
+  # Step 2a (OS2IP)
+  my $signature_int = os2ip($arg_ref->{Signature});
+  # Step 2b (RSAVP1)
+  my $em_int = RSAVP1($arg_ref->{PublicKey}, $signature_int);
+  # Step 2c (I2OSP)
+  my $emlen = ceil(($kbits - 1)/8);
+  my $em = i2osp($em_int, $emlen);
+  my $hash = Digest::SHA->new($self->get_hash_algorithm);
+  $hash->add($arg_ref->{Message});
+  $self->EMSA_PSS_VERIFY($hash, $em, $kbits-1, sub { MGF1(@_) }, $arg_ref->{sLen});
+  return 1
+}
+
+method EMSA_PSS_ENCODE ($kbits, $msg, $slen, $salt) {
+  my $hash = Digest::SHA->new($self->get_hash_algorithm);
+  $hash->add($msg);
+  my $m_hash = $hash->hexdigest;
+  my $hlen = ceil($hash->hashsize/8);
+
+  my $embits = $kbits - 1;
+  my $emlen = ceil($embits/8);
+  assert($emlen >= $hlen + $slen + 2);
+
+  my $lmask = 0;
+  for (0..(8 * $emlen - $embits - 1)) {
+    $lmask = $lmask >> 1 | 0x80;
+  }
+
+  unless ($salt) {
+    $salt = '';
+    $salt = uc(unpack ('H*',i2osp(makerandom(Size => $slen * 8, Strength => 0, Uniform => 1)))) if $slen;
+  }
+
+  my $m_prime = chr(0) x 8 . i2osp(Math::Pari::_hex_cvt('0x' . $m_hash . $salt));
+  $hash = Digest::SHA->new($self->get_hash_algorithm);
+  $hash->add($m_prime);
+  my $h = $hash->digest;
+  my $ps = chr(0) x ($emlen - $slen - $hlen - 2);
+  my $db = $ps . chr(0x01); $db .= i2osp(Math::Pari::_hex_cvt('0x' . $salt)) if $slen;
+  my $dbMask = MGF1($h, $emlen - $hlen - 1);
+  my $masked_db = octet_xor($db, $dbMask);
+  $masked_db = chr(os2ip(substr($masked_db, 0, 1)) & (~$lmask)) . substr($masked_db, 1);
+  my $encoded_msg = $masked_db . $h . chr(0xBC);
+}
+
+method EMSA_PSS_VERIFY ($mhash, $em, $embits, $mgf, $slen) {
+  my $hashlen = ceil($mhash->hashsize / 8);
+  my $emlen = ceil($embits/8);
+  my $lmask = 0;
+  for (0..(8*$emlen-$embits-1)) {
+    $lmask = $lmask >> 1 | 0x80
+  }
+  # Step 1 and 2 already done
+  # Step 3
+  croak("Incorrect signature at step 3") if ($emlen < $hashlen + $slen + 2);
+  # Step 4
+  croak("Incorrect signature at step 4") if ord(substr($em, -1)) != 0xBC;
+  # Step 5
+  my $masked_db = substr($em,0,$emlen-$hashlen-1);
+  my $h = substr($em,$emlen-$hashlen-1,-1);
+  # Step 6
+  croak("Incorrect signature at step 6") if $lmask & ord(substr($em,0,1));
+  # Step 7
+  my $dbmask = &$mgf($h, $emlen-$hashlen-1);
+  # Step 8
+  my $db = octet_xor($masked_db, $dbmask);
+  # Step 9
+  $db = chr(ord(substr($db,0,1)) & ~$lmask) . substr($db,1);
+  # Step 10
+  croak("Incorrect signature at step 10") unless (substr($db, 0, $emlen-$hashlen-$slen-1) eq (chr(0) x ($emlen-$hashlen-$slen-2) . chr(1)));
+  # Step 11
+  my $salt = $slen > 0 ? substr($db,-$slen) : '';
+  # Step 12
+  my $m_prime = chr(0) x 8 . $mhash->digest . $salt;
+  # Step 13
+  my $hash = Digest::SHA->new($self->get_hash_algorithm);
+  $hash->add($m_prime);
+  my $hp = $hash->digest;
+  # Step 14
+  croak("Incorrect signature at step 14\nh: $h\nhp: $hp") if $h ne $hp;
+}
+
+# Old-style API methods
+
+method request (%arg) {
+  if ($self->get_oldapi) {
+    my ($req, $blinding) = $self->ssa_blind( { PublicKey => $arg{Key}, sLen => $self->get_slen, %arg } );
+    return os2ip($req);
+  }
+  $self->_req(%arg);
+}
+
+method sign (%arg) {
+  $self->get_oldapi ? os2ip($self->ssa_blind_sign( { SecretKey => $arg{Key}, BlindedMessage => i2osp($arg{Message}) } )) : $self->_sign(%arg);
+}
+
+method unblind (%arg) {
+  $self->get_oldapi ? os2ip($self->ssa_finalize( { PublicKey => $arg{Key}, BlindSig => i2osp($arg{Signature}), sLen => $self->get_slen, %arg } )) : $self->_unblind(%arg);
+}
+
+method verify (%arg) {
+  $self->get_oldapi ? $self->pss_verify( { PublicKey => $arg{Key}, %arg, Signature => i2osp($arg{Signature}), sLen => $self->get_slen } ) : $self->_verify(%arg);
+}
+
+# Deprecated methods
+
+method _req (%arg) {
+  carp('Call to deprecated method: request');
+  my ($invertible, $blinding);
+  while (!$invertible) {
+    $blinding = makerandom_itv( Size => $self->get_blindsize, Upper => $arg{Key}->n-1, Strength => 1, Uniform => 1 );
+    # Check that blinding is invertible mod n
+    $invertible = gcd( $blinding, $arg{Key}->n );
+    $invertible = 0 unless $invertible == 1;
+  }
+  $self->_request($arg{Init} => $blinding);
+
+  my $be = $self->get_rsap->core_encrypt(Key => $arg{Key}, Plaintext => $blinding);
+  my $fdh = Math::Pari::_hex_cvt ('0x'.Crypt::FDH::hash(Size => $self->get_hashsize, Message => $arg{Message}));
+  component((Mod($fdh,$arg{Key}->n)) * (Mod($be,$arg{Key}->n)), 2);
+}
+
+method _sign (@args) {
+  carp('Call to deprecated method: sign');
+  $self->get_rsap->core_sign(@args);
+}
+
+method _unblind (%arg) {
+  carp('Call to deprecated method: unblind');
+  my $blinding = $self->_request($arg{Init});
+  component((Mod($arg{Signature},$arg{Key}->n)) / (Mod($blinding,$arg{Key}->n)), 2);
+}
+
+method _verify (%arg) {
+  carp('Call to deprecated method: verify');
+  my $pt = $self->get_rsap->core_verify(Key => $arg{Key}, Signature => $arg{Signature});
+  $pt == Math::Pari::_hex_cvt ('0x'.Crypt::FDH::hash(Size => $self->get_hashsize, Message => $arg{Message}));
+}
+
+# Helper methods and functions
+
+method errstr (@args) {
+  $self->rsa->errstr(@args);
+}
+
+method _request ($init, $blinding=undef, $message=undef) {       # Save / retrieve blinding by init vector
+  my $ret;
+  if ($blinding) {                                               # Associate blinding with init vector
+    $requests->{$init} = $blinding;
+    $messages->{$init} = $message if $self->get_oldapi;
+  }
+  else {                                                         # Retrieve blinding associated with init vector
+    $ret = $self->get_oldapi ?
+      [ $requests->{$init}, $messages->{$init} ] :
+      $requests->{$init};
+    delete $requests->{$init};
+    delete $messages->{$init} if $self->get_oldapi;
+  }
+  return $ret;
+}
+
+sub RSAVP1 ($pubkey, $r) {
+  my $e = $pubkey->e;
+  my $n = $pubkey->n;
+  my $c = mod_exp($r, $e, $n);
+}
+
+sub MGF1 ($seed, $masklen) {
+  my $hlen = 48;
+  my $T = '';
+  for (0..ceil($masklen/$hlen)-1) {
+    my $c = i2osp($_, 4);
+    $T = $T . sha384($seed . $c);
+  }
+  assert(length($T) >= $masklen);
+  unpack "a$masklen", $T;
+}
+
+sub is_coprime {
+  gcd(@_) == 1;
+}
+
+sub mod_inverse {
+  my($a, $n) = @_;
+  my $m = Mod(1, $n);
+  lift($m / $a);
+}
+
+sub mod_exp {
+  my($a, $exp, $n) = @_;
+  my $m = Mod($a, $n);
+  lift($m ** $exp);
+}
+
+package Crypt::RSA::Blind::PubKey {
   use Compress::Zlib;
-  method from_hex :common ($pubkey) {
+  sub from_hex ($pubkey) {
     Crypt::RSA::Key::Public->new->deserialize(String => [ uncompress(pack('H*',$pubkey)) ]);
   }
 }
 
-class Crypt::RSA::Blind::SecKey {
+package Crypt::RSA::Blind::SecKey {
   use Compress::Zlib;
-  method from_hex :common ($seckey) {
+  sub from_hex ($seckey) {
     Crypt::RSA::Key::Private->new->deserialize(String => [ uncompress(pack('H*',$seckey)) ]);
   }
 }
+
+1;
 
 __END__
 
@@ -344,8 +345,8 @@ Crypt::RSA::Blind - Blind RSA signatures
 
 =head1 VERSION
 
- $Revision: 1.026 $
- $Date: Thu Jun  5 19:42:39 EST 2025 $
+ $Revision: 1.027 $
+ $Date: Sat Jun  7 19:23:39 EST 2025 $
 
 =cut
 

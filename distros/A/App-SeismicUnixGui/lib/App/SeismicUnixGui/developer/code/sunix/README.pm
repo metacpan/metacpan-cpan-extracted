@@ -81,7 +81,7 @@ $developer_sunix_categories[14] = 'transform'; 15
 $developer_sunix_categories[15] = 'well'; 6
 $developer_sunix_categories[16] = 'unix'; NA
 $developer_sunix_categories[17] = '';
-total modules: 290
+total modules: 290, of which 2 are for linux commands
 Total Tools; 13 2-linux, 1-C, 1 sioseis, 1 fortran
 
 

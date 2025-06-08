@@ -1,0 +1,92 @@
+NAME
+    Filename::Type::Backup - Check whether filename indicates being a backup
+    file
+
+VERSION
+    This document describes version 0.040 of Filename::Type::Backup (from
+    Perl distribution Filename-Type-Backup), released on 2024-12-20.
+
+SYNOPSIS
+     use Filename::Type::Backup qw(check_backup_filename);
+     my $res = check_backup_filename(filename => "foo.txt~");
+     if ($res) {
+         printf "Filename indicates a backup, original name: %s\n",
+             $res->{original_filename};
+     } else {
+         print "Filename does not indicate a backup\n";
+     }
+
+DESCRIPTION
+FUNCTIONS
+  check_backup_filename
+    Usage:
+
+     check_backup_filename(%args) -> bool|hash
+
+    Check whether filename indicates being a backup file.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ci => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   filename* => *str*
+
+        (No description)
+
+    Return value: (bool|hash)
+
+    Return false if not detected as backup name. Otherwise return a hash,
+    which may contain these keys: "original_filename". In the future there
+    will be extra information returned, e.g. editor name (if filename
+    indicates backup from certain backup program), date (if filename
+    contains date information), and so on.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Filename-Type-Backup>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Filename-Type-Backup>.
+
+SEE ALSO
+    Filename::Type::Archive
+
+    Filename::Type::Compressed
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Type-Backup>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

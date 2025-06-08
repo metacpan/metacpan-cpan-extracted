@@ -18,7 +18,7 @@ my $rsab = new Crypt::RSA::Blind;
 ok (my ($pubkey, $seckey) = $rsab->keygen(Size => 1024), "Key generation");
 for (0..1) {
   ok (my $init = $rsab->init, "Initialize blind signing");
-  ok (my $req = $rsab->request(Key => $pubkey, Message => "Hello world", Init => $init), "Request signature");
+  ok (my $req = $rsab->request(Key => $pubkey, Message => "Hello world", Init => $init), "Create signing request");
   ok (my $bsigned = $rsab->sign(Key => $seckey, Message => $req, Init => $init), "Create blind signature");
   ok (my $signed = $rsab->unblind(Signature => $bsigned, Key => $pubkey, Init => $init), "Unblind signature");
   ok ($rsab->verify(Key => $pubkey, Signature => $signed, Message => "Hello world"), "Verify signature");

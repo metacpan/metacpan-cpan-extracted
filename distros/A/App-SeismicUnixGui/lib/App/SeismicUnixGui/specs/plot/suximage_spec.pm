@@ -52,6 +52,7 @@ my $suximage_spec = {
 	_has_subin_out         => $false,
 	_is_data               => $false,
 	_is_first_of_2         => $true,
+	
 	_is_first_of_3or_more  => $false,
 	_is_first_of_4or_more  => $false,
 	_is_last_of_2          => $true,

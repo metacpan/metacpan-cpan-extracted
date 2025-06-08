@@ -1,3 +1,11 @@
+1.62 2025-06-07
+
+  [ Antoine Beaupré, Damyan Ivanov ]
+  * channel secret support (Closes: #899245)
+
+  [ Damyan Ivanov ]
+  * update copyright notices
+
 1.61 2024-09-20
   [ Martina Ferrari ]
   * trim_lines: Remove prefix from continuation lines.

@@ -1,72 +1,88 @@
-use Test2::V0;
-use lib 't/lib';
-use DBIx::QuickORM::Tester qw/dbs_do all_dbs/;
+use Test2::V0 -target => 'DBIx::QuickORM', '!meta', '!pass';
 use DBIx::QuickORM;
-#use Test2::Plugin::BailOnFail;
+use Carp::Always;
 
-dbs_do db => sub {
-    my ($dbname, $dbc, $st) = @_;
+use Scalar::Util qw/blessed/;
+use Time::HiRes qw/sleep/;
 
-    my $orm = orm sub {
-        db sub {
-            db_class $dbname;
-            db_name 'quickdb';
-            db_connect sub { $dbc->connect };
-        };
+use lib 't/lib';
+use DBIx::QuickORM::Test;
 
-        schema sub {
-            table person => sub {
-                column person_id => sub {
-                    primary_key;
-                    serial('BIG');
-                };
+do_for_all_dbs {
+    my $db = shift;
 
-                column name => sub {
-                    unique;
-                    sql_spec(type => 'VARCHAR(128)');
-                };
-            };
-        };
+    if (curdialect() =~ m/sqlite/i) {
+        skip_all "Skipping for sqlite...";
+        return;
+    }
+
+    db mydb => sub {
+        dialect curdialect();
+        db_name 'quickdb';
+        connect sub { $db->connect };
     };
 
-    skip_all "$dbname does not support async" unless $orm->connection->supports_async;
+    orm my_orm => sub {
+        db 'mydb';
+        autofill;
+    };
 
-    ok(lives { $orm->generate_and_load_schema() }, "Generate and load schema");
+    ok(my $orm = orm('my_orm')->connect, "Got a connection");
+    ok(my $row = $orm->handle('example')->insert({name => 'a'}), "Inserted a row");
+    ok(my $row2 = $orm->handle('example')->insert({name => 'b'}), "Inserted a row");
+    ok(my $row3 = $orm->handle('example')->insert({name => 'c'}), "Inserted a row");
 
-    is([$orm->connection->tables], ['person'], "Table person was added");
+    my $async = $orm->async(
+        example => (
+            where  => {name => 'a'},
+            fields => ['name', 'id', curdialect() =~ m/PostgreSQL/ ? \'pg_sleep(1)' : \'SLEEP(1)']
+        )
+    )->first;
+    my $other_ref = $async;
 
-    my $s = $orm->source('person');
-    my $bob = $s->insert(name => 'bob');
-    my $ted = $s->insert(name => 'ted');
-    my $ann = $s->insert(name => 'ann');
+    my $nasync = $orm->in_async;
 
-    my $as = $orm->source('person')->async({}, 'name')->start;
+    my $counter = 0;
+    my $ready;
+    until($ready = $async->ready) {
+        $counter++;
+        sleep 0.1 if $counter > 1;
+    }
 
-    ok(!$as->{rows}, "No rows yet");
-    ok($as->started, "Query has been started");
+    ok($nasync, "We were in a sync query back when we stashed the value");
+    ok(!$orm->in_async, "Async query is over");
 
-    ok($s->busy, "Source is currently busy");
-    ok($as->busy, "Select is currently busy");
+    ok($counter > 1, "We waited at least once ($counter)");
+
+    ok(blessed($ready), 'DBIx::QuickORM::Row', "Row was returned from ready()");
+    ref_is($ready, $row, "same ref");
+
+    is(blessed($async), 'DBIx::QuickORM::Row::Async', "Still async");
+    my $copy = $async->row;
+    is($async->field('name'), 'a', "Can get value");
+    is(blessed($async), 'DBIx::QuickORM::Row', "Not async anymore!");
+    ref_is($async, $row, "Same ref");
+    ref_is($copy, $row, "Same ref");
+
+    is(blessed($other_ref), 'DBIx::QuickORM::Row::Async', "Other ref is unchanged");
+
+    my $async2 = $orm->async(example => (where => {name => 'b'}))->one;
+    is($async2->field('name'), 'b', "Got b");
+
+    my $async3 = $orm->async(example => (where => {}))->one;
 
     like(
-        dies { $s->first },
-        qr/This database connection is currently engaged in an async query/,
-        "Cannot issue another query while an async query is in progress"
+        dies { sleep 0.1 until $async3->ready },
+        qr/Expected only 1 row, but got more than one/,
+        "used one() but got multiple rows"
     );
 
-    #sleep(1) while !$as->ready;
-
-    sleep 1;
-    ok($as->ready, "We are ready!");
-
-    is(
-        [$as->all],
-        [$ann, $bob, $ted],
-        "Got all 3 rows"
-    );
-
-    ok($s->first, "Now we can do other queries again");
+    my $async4 = $orm->async(example => (where => {}, order_by => ['name']))->iterator;
+    is($async4->next->field('name'), 'a', "Got a");
+    is($async4->next->field('name'), 'b', "Got b");
+    is($async4->next->field('name'), 'c', "Got c");
+    is($async4->next, undef, "Out of rows");
+    is($async4->next, undef, "Out of rows");
 };
-
 
 done_testing;

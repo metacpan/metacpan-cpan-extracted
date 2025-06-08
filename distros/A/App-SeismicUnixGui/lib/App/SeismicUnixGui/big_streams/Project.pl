@@ -31,4 +31,4 @@ my $Project = Project_config->new();
 $Project->basic_dirs();
 $Project->system_dirs();
 $Project->make_local_dirs();
-$Project->update_configuration_files();
+#$Project->update_configuration_files();

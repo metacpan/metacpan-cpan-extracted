@@ -1,9 +1,15 @@
 Revision history for Perl module Math::GMPz
 
+0.67
+ - Fix bug in t/overload_op_eq.t. Fixes:
+   https://www.cpantesters.org/cpan/report/92ed61d1-72f8-1014-830e-990a97a7943c
+ - Remove both Math::BigInt::GMP test scripts - namely t/math_bigint_gmp.t and
+   t/math_bigint_gmp_only.t. (Not really up to Math::GMPz to test.)
+
 0.66
- - Corrections to the 'op=' cross-class overloading where a Math::MPFR object is the
-   second arg. (Was returning a default precision value, but should return a value
-   that has the same precision as the given Math::MPFR object.)
+ - Provide better clarity in OPERATOR OVERLOADING documentation.
+ - Small adjustments to t/mpfr_NV_checks to (hopefully) fix
+   https://www.cpantesters.org/cpan/report/67d1c3b4-12d6-11f0-ae08-b38bff174ad1
 
 0.65
  - Allow new() to accept Math::GMPq objects and Math::MPFR objects.

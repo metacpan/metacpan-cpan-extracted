@@ -1,3 +1,26 @@
+0.000011  2025-06-07 15:36:38-07:00 America/Los_Angeles
+
+    - Rename select to query
+    - Rename sqla-source to query-source
+    - Work on eliminating the assumption that SQLAbstract will always do the work
+
+0.000010  2025-05-07 06:36:38-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Still felshing out functionality after the rewrite
+    - Add 'forked' async emulation
+    - Add 'aside' async functionality
+    - Add more txn callbacks
+
+0.000009  2025-05-06 08:17:08-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+0.000008  2025-05-02 01:20:14-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+0.000007  2025-05-02 01:04:21-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+0.000006  2025-05-02 01:02:32-07:00 America/Los_Angeles
+
+0.000005  2025-05-02 00:19:35-07:00 America/Los_Angeles (TRIAL RELEASE)
+
 0.000004  2024-10-27 23:40:03-07:00 America/Los_Angeles
 
     - Fix some DB specific tests

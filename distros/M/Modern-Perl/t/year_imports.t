@@ -475,6 +475,28 @@ if ($] >= 5.038)
     test_module_true_for(     $year );
 }
 
+if ($] >= 5.040)
+{
+    my $year = 2025;
+
+    test_no_switch_for(           $year );
+    test_no_indirect_for(         $year );
+    test_no_multidimensional_for( $year );
+
+    test_say_for(             $year );
+    test_state_for(           $year );
+    test_cur_sub_for(         $year );
+    test_array_base_for(      $year );
+    test_lexical_subs_for(    $year );
+    test_fc_for(              $year );
+    test_postderef_for(       $year );
+    test_unicode_strings_for( $year );
+    test_signatures_for(      $year );
+    test_isa_for(             $year );
+    test_warnings_for(        $year );
+    test_module_true_for(     $year );
+}
+
 eval 'sub { given (0) {} }';
 isnt $@, "", 'switch feature does not leak out';
 eval 'sub { say 0 }';

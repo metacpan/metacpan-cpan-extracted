@@ -863,7 +863,9 @@ lib/App/SeismicUnixGui/doc/FAQ_immodpg
 lib/App/SeismicUnixGui/doc/FAQ_SeismicUnixGui
 lib/App/SeismicUnixGui/doc/README_to_INSTALL
 lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.2.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.3.pdf
 lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.2.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.3.pdf
 lib/App/SeismicUnixGui/fortran/bin/immodpg1.1
 lib/App/SeismicUnixGui/fortran/bin/stdsleep
 lib/App/SeismicUnixGui/fortran/Makefile
@@ -1103,6 +1105,7 @@ lib/App/SeismicUnixGui/misc/writefiles.pm
 lib/App/SeismicUnixGui/script/BackupProject
 lib/App/SeismicUnixGui/script/convert2V08
 lib/App/SeismicUnixGui/script/copyNclean_sgy_up
+lib/App/SeismicUnixGui/script/geopsy2supiks.sh
 lib/App/SeismicUnixGui/script/iBottomMute
 lib/App/SeismicUnixGui/script/immodpg
 lib/App/SeismicUnixGui/script/iPick

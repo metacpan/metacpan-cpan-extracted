@@ -158,6 +158,10 @@ Channel name, e.g. C<#commits>. B<Mandatory>.
 
 Network name, as described in the B<networks> map. B<Mandatory>.
 
+=item secret
+
+The secret key used to join the channel, if any.
+
 =item broadcast
 
 Enables broadcasting all commit notifications to this channel.

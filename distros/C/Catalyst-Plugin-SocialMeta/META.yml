@@ -24,5 +24,5 @@ requires:
   Catalyst::Runtime: '5.80001'
   HTML::SocialMeta: '0.74006'
   perl: '5.006'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

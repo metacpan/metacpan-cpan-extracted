@@ -40,7 +40,7 @@ suggests "DateTime::Format::SQLite" => "0";
 
 on 'test' => sub {
   requires "Test2::Require::Module" => "0";
-  requires "Test2::Tools::QuickDB" => "0";
+  requires "Test2::Tools::QuickDB" => "0.000037";
   requires "Test2::Tools::Subtest" => "0";
   requires "Test2::Util" => "0";
   requires "Test2::V0" => "0";

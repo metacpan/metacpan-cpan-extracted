@@ -61,5 +61,5 @@ requires:
   perl: '5.010'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
-version: '1.61'
+version: '1.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

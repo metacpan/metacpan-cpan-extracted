@@ -1,5 +1,9 @@
 Revision history for Modern::Perl
 
+1.20250607 2025-06-07 16:56:19-07:00 America/Los_Angeles
+    - update for 2025 year bundle
+    - enhance documentation to discourage this module for v5.38 and newer
+
 1.20241001 2024-09-30 19:12:47-07:00 America/Los_Angeles
     - fix switch tests after Perl 5.41.4 removal of deprecated feature (RT #155822, Slaven Rezic)
 

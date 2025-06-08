@@ -23,7 +23,7 @@ if ($ENV{AUTOMATED_TESTING}) {
 }
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Actively maintained Object Relational Mapping that makes getting started Quick and has a rich feature set.",
+  "ABSTRACT" => "Composable ORM builder.",
   "AUTHOR" => "Chad Granum <exodist\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -63,16 +63,16 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Test2::Require::Module" => 0,
-    "Test2::Tools::QuickDB" => 0,
+    "Test2::Tools::QuickDB" => "0.000037",
     "Test2::Tools::Subtest" => 0,
     "Test2::Util" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0,
     "ok" => 0
   },
-  "VERSION" => "0.000004",
+  "VERSION" => "0.000011",
   "test" => {
-    "TESTS" => "t/*.t t/unit/*.t t/unit/QuickORM/*.t t/unit/QuickORM/Builder/*.t t/unit/QuickORM/Cache/*.t t/unit/QuickORM/Conflator/*.t t/unit/QuickORM/Conflator/JSON/*.t t/unit/QuickORM/Conflator/UUID/*.t t/unit/QuickORM/DB/*.t t/unit/QuickORM/Role/*.t t/unit/QuickORM/Row/*.t t/unit/QuickORM/SQLSpec/*.t t/unit/QuickORM/Select/*.t t/unit/QuickORM/Table/*.t t/unit/QuickORM/Util/*.t"
+    "TESTS" => "t/*.t t/handle/*.t"
   }
 );
 
@@ -99,7 +99,7 @@ my %FallbackPrereqs = (
   "Storable" => 0,
   "Sub::Util" => 0,
   "Test2::Require::Module" => 0,
-  "Test2::Tools::QuickDB" => 0,
+  "Test2::Tools::QuickDB" => "0.000037",
   "Test2::Tools::Subtest" => 0,
   "Test2::Util" => 0,
   "Test2::V0" => 0,

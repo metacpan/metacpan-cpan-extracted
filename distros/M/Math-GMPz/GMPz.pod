@@ -1103,7 +1103,7 @@
     have Math-GMPq-0.61 (or later) and Math-MPFR-4.37 (or later) then, apart
     from the exceptions noted below, you will be able to use Math::GMPq and
     Math::MPFR objects with the overloaded Math::GMPz operations. Such
-    operations return Math::GMPq and (respectively) Math::GMPz objects.
+    operations return Math::GMPq and (respectively) Math::MPFR objects.
 
    The following operators are overloaded:
     + - * / % **         # '**'  not usable with Math::GMPq objects.

@@ -347,84 +347,16 @@ compared to former Vbot values
 
 sub _checkVbot {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	# print("immodpg, _checkVbot, $immodpg->{_VbotEntry}\n");
-
-	if (   defined $immodpg->{_VbotEntry}
-		&& length $immodpg->{_VbotEntry}
-		&& length $immodpg->{_inVbot}
-		&& length $immodpg->{_outsideVbot}
-		&& length $immodpg->{_Vbot_current}
-		&& length $immodpg->{_Vbot_prior} )
-	{
-
-		# rename for convenience
-		my $inVbot       = $immodpg->{_inVbot};
-		my $outsideVbot  = $immodpg->{_outsideVbot};
-		my $Vbot_current = $immodpg->{_Vbot_current};
-		my $Vbot_prior   = $immodpg->{_Vbot_prior};
-
-		# print("immodpg,_checkVbot, inVbot:$inVbot\n");
-		# print("immodpg,_checkVbot, outsideVbot: $outsideVbot\n");
-		if (   $inVbot eq $yes
-			&& $outsideVbot eq $no )
-		{
-
-			# print("immodpg, _checkVbot, Leaving widget\n");
-
-			# CASE 1: Previously, inside Entry widget
-			# Now leaving Entry widget
-			$Vbot_current = $immodpg->{_VbotEntry}->get();
-
-			# print("immodpg,_checkVbot, Vbot_current:$Vbot_current\n");
-			# reverse the conditions now
-			# when user leaves Entry widget
-			$inVbot      = $no;
-			$outsideVbot = $yes;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVbot}       = $inVbot;
-			$immodpg->{_outsideVbot}  = $outsideVbot;
-			$immodpg->{_Vbot_current} = $Vbot_current;
-
-			return ();
-
-		}
-		elsif ($inVbot eq $no
-			&& $outsideVbot eq $yes )
-		{
-
-			# CASE 2: Previously, outside Entry widget
-			# Now entering Entry widget
-			$Vbot_prior   = $Vbot_current;
-			$Vbot_current = $immodpg->{_VbotEntry}->get();
-
-			# print("immodpg, _checkVbot, Entering widget\n");
-
-			# reverse the conditions now
-			# when user enters Entry widget
-			$inVbot      = $yes;
-			$outsideVbot = $no;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVbot}       = $inVbot;
-			$immodpg->{_outsideVbot}  = $outsideVbot;
-			$immodpg->{_Vbot_current} = $Vbot_current;
-			$immodpg->{_Vbot_prior}   = $Vbot_prior;
-			return ();
-
-		}
-		else {
-			print("immodpg, _checkVbot, unexpected values\n");
-			return ();
-		}
-
-	}
-	else {
-		print("immodpg, _checkVbot, missing widget\n");
-		return ();
-	}
+    return _check_widget_state(
+        $self,
+        '_VbotEntry',        # entry widget key
+        '_inVbot',           # in state key
+        '_outsideVbot',      # outside state key
+        '_Vbot_current',     # current value key
+        '_Vbot_prior'        # prior value key
+    );
 }
 
 =head2 sub _checkVbot_upper_layer
@@ -437,85 +369,16 @@ compared to former setVbot_upper_layer values
 
 sub _checkVbot_upper_layer {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-# print("immodpg, _checkVbot_upper_layer, $immodpg->{_Vbot_upper_layerEntry}\n");
-
-	if (   length( $immodpg->{_Vbot_upper_layerEntry} )
-		&& length $immodpg->{_Vbot_upper_layerEntry}
-		&& length $immodpg->{_inVbot_upper_layer}
-		&& length $immodpg->{_outsideVbot_upper_layer}
-		&& length $immodpg->{_Vbot_upper_layer_current}
-		&& length $immodpg->{_Vbot_upper_layer_prior} )
-	{
-
-		# rename for convenience
-		my $inVbot_upper_layer       = $immodpg->{_inVbot_upper_layer};
-		my $outsideVbot_upper_layer  = $immodpg->{_outsideVbot_upper_layer};
-		my $Vbot_upper_layer_current = $immodpg->{_Vbot_upper_layer_current};
-		my $Vbot_upper_layer_prior   = $immodpg->{_Vbot_upper_layer_prior};
-
-# print("immodpg,_checkVbot_upper_layer, inVbot_upper_layer:$inVbot_upper_layer\n");
-# print("immodpg,_checkVbot_upper_layer, outsideVbot_upper_layer: $outsideVbot_upper_layer\n");
-		if (   $inVbot_upper_layer eq $yes
-			&& $outsideVbot_upper_layer eq $no )
-		{
-
-			#	print("immodpg, _checkVbot_upper_layer, Leaving widget\n");
-
-			# CASE 1: Previously, inside Entry widget
-			# Now leaving Entry widget
-			$Vbot_upper_layer_current =
-			  $immodpg->{_Vbot_upper_layerEntry}->get();
-
-			# reverse the conditions now
-			# when user leaves Entry widget
-			$inVbot_upper_layer      = $no;
-			$outsideVbot_upper_layer = $yes;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVbot_upper_layer}       = $inVbot_upper_layer;
-			$immodpg->{_outsideVbot_upper_layer}  = $outsideVbot_upper_layer;
-			$immodpg->{_Vbot_upper_layer_current} = $Vbot_upper_layer_current;
-
-			return ();
-
-		}
-		elsif ($inVbot_upper_layer eq $no
-			&& $outsideVbot_upper_layer eq $yes )
-		{
-
-			# CASE 2: Previously, outside Entry widget
-			# Now entering Entry widget
-			$Vbot_upper_layer_prior = $Vbot_upper_layer_current;
-			$Vbot_upper_layer_current =
-			  $immodpg->{_Vbot_upper_layerEntry}->get();
-
-			#			print("immodpg, _checkVbot_upper_layer, Entering widget\n");
-
-			# reverse the conditions now
-			# when user enters Entry widget
-			$inVbot_upper_layer      = $yes;
-			$outsideVbot_upper_layer = $no;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVbot_upper_layer}       = $inVbot_upper_layer;
-			$immodpg->{_outsideVbot_upper_layer}  = $outsideVbot_upper_layer;
-			$immodpg->{_Vbot_upper_layer_current} = $Vbot_upper_layer_current;
-			$immodpg->{_Vbot_upper_layer_prior}   = $Vbot_upper_layer_prior;
-			return ();
-
-		}
-		else {
-			print("immodpg, _checkVbot_upper_layer, unexpected values\n");
-			return ();
-		}
-
-	}
-	else {
-		print("immodpg, _checkVbot_upper_layer, missing widget or values\n");
-		return ();
-	}
+    return _check_widget_state(
+        $self,
+        '_Vbot_upper_layerEntry',        # entry widget key
+        '_inVbot_upper_layer',           # in state key
+        '_outsideVbot_upper_layer',      # outside state key
+        '_Vbot_upper_layer_current',     # current value key
+        '_Vbot_upper_layer_prior'        # prior value key
+    );
 }
 
 =head2 sub _checkVincrement
@@ -528,82 +391,16 @@ compared to former Vincrement values
 
 sub _checkVincrement {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	# print("immodpg, _checkVincrement, $immodpg->{_VincrementEntry}\n");
-
-	if (   defined $immodpg->{_VincrementEntry}
-		&& $immodpg->{_VincrementEntry} ne $empty_string
-		&& $immodpg->{_inVincrement} ne $empty_string
-		&& $immodpg->{_outsideVincrement} ne $empty_string
-		&& $immodpg->{_Vincrement} ne $empty_string )
-	{
-
-		# rename for convenience
-		my $inVincrement       = $immodpg->{_inVincrement};
-		my $outsideVincrement  = $immodpg->{_outsideVincrement};
-		my $Vincrement_current = $immodpg->{_Vincrement_current};
-		my $Vincrement_prior   = $immodpg->{_Vincrement_prior};
-
-   # print("immodpg,_checkVincrement, inVincrement:$inVincrement\n");
-   # print("immodpg,_checkVincrement, outsideVincrement: $outsideVincrement\n");
-		if (   $inVincrement eq $yes
-			&& $outsideVincrement eq $no )
-		{
-
-			# print("immodpg, _checkVincrement, Leaving widget\n");
-
-			# CASE 1: Previously, inside Entry widget
-			# Now leaving Entry widget
-			$Vincrement_current = $immodpg->{_VincrementEntry}->get();
-
-			# reverse the conditions now
-			# when user leaves Entry widget
-			$inVincrement      = $no;
-			$outsideVincrement = $yes;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVincrement}       = $inVincrement;
-			$immodpg->{_outsideVincrement}  = $outsideVincrement;
-			$immodpg->{_Vincrement_current} = $Vincrement_current;
-
-			return ();
-
-		}
-		elsif ($inVincrement eq $no
-			&& $outsideVincrement eq $yes )
-		{
-
-			# CASE 2: Previously, outside Entry widget
-			# Now entering Entry widget
-			$Vincrement_prior   = $Vincrement_current;
-			$Vincrement_current = $immodpg->{_VincrementEntry}->get();
-
-			# print("immodpg, _checkVincrement, Entering widget\n");
-
-			# reverse the conditions now
-			# when user enters Entry widget
-			$inVincrement      = $yes;
-			$outsideVincrement = $no;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVincrement}       = $inVincrement;
-			$immodpg->{_outsideVincrement}  = $outsideVincrement;
-			$immodpg->{_Vincrement_current} = $Vincrement_current;
-			$immodpg->{_Vincrement_prior}   = $Vincrement_prior;
-			return ();
-
-		}
-		else {
-			print("immodpg, _checkVincrement, unexpected values\n");
-			return ();
-		}
-
-	}
-	else {
-		print("immodpg, _checkVincrement, missing widget\n");
-		return ();
-	}
+    return _check_widget_state(
+        $self,
+        '_VincrementEntry',        # entry widget key
+        '_inVincrement',           # in state key
+        '_outsideVincrement',      # outside state key
+        '_Vincrement_current',     # current value key
+        '_Vincrement_prior'        # prior value key
+    );
 }
 
 =head2 sub _checkVtop
@@ -616,85 +413,446 @@ compared to former Vtop values
 
 sub _checkVtop {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	# print("immodpg, _checkVtop, $immodpg->{_VtopEntry}\n");
-
-	if (   defined $immodpg->{_VtopEntry}
-		&& $immodpg->{_VtopEntry} ne $empty_string
-		&& $immodpg->{_inVtop} ne $empty_string
-		&& $immodpg->{_outsideVtop} ne $empty_string
-		&& $immodpg->{_Vtop_current} ne $empty_string
-		&& $immodpg->{_Vtop_prior} ne $empty_string )
-	{
-
-		# rename for convenience
-		my $inVtop       = $immodpg->{_inVtop};
-		my $outsideVtop  = $immodpg->{_outsideVtop};
-		my $Vtop_current = $immodpg->{_Vtop_current};
-		my $Vtop_prior   = $immodpg->{_Vtop_prior};
-
-		# print("immodpg,_checkVtop, inVtop:$inVtop\n");
-		# print("immodpg,_checkVtop, outsideVtop: $outsideVtop\n");
-		# print("immodpg,_checkVtop, Vtop_current: $Vtop_current\n");
-		if (   $inVtop eq $yes
-			&& $outsideVtop eq $no )
-		{
-
-			#			print("immodpg, _checkVtop, Leaving widget\n");
-
-			# CASE 1: Previously, inside Entry widget
-			# Now leaving Entry widget
-			$Vtop_current = $immodpg->{_VtopEntry}->get();
-
-			# reverse the conditions now
-			# when user leaves Entry widget
-			$inVtop      = $no;
-			$outsideVtop = $yes;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVtop}       = $inVtop;
-			$immodpg->{_outsideVtop}  = $outsideVtop;
-			$immodpg->{_Vtop_current} = $Vtop_current;
-
-			return ();
-
-		}
-		elsif ($inVtop eq $no
-			&& $outsideVtop eq $yes )
-		{
-
-			# CASE 2: Previously, outside Entry widget
-			# Now entering Entry widget
-			$Vtop_prior   = $Vtop_current;
-			$Vtop_current = $immodpg->{_VtopEntry}->get();
-
-			# print("immodpg, _checkVtop, Entering widget\n");
-
-			# reverse the conditions now
-			# when user enters Entry widget
-			$inVtop      = $yes;
-			$outsideVtop = $no;
-
-			# reset module values for convenience of renaming
-			$immodpg->{_inVtop}       = $inVtop;
-			$immodpg->{_outsideVtop}  = $outsideVtop;
-			$immodpg->{_Vtop_current} = $Vtop_current;
-			$immodpg->{_Vtop_prior}   = $Vtop_prior;
-			return ();
-
-		}
-		else {
-			print("immodpg, _checkVtop, unexpected values\n");
-			return ();
-		}
-
-	}
-	else {
-		print("immodpg, _checkVtop, missing widget\n");
-		return ();
-	}
+    return _check_widget_state(
+        $self,
+        '_VtopEntry',        # entry widget key
+        '_inVtop',           # in state key
+        '_outsideVtop',      # outside state key
+        '_Vtop_current',     # current value key
+        '_Vtop_prior'        # prior value key
+    );
 }
+
+=head2 sub _check_widget_state
+
+A generic subroutine to check the state of the widget, handle entry and exit, and update the current and prior values.
+
+=cut
+
+sub _check_widget_state {
+    my ($self, $entry_key, $in_key, $outside_key, $current_key, $prior_key) = @_;
+
+    if (   defined $immodpg->{$entry_key}
+        && length $immodpg->{$entry_key}
+        && length $immodpg->{$in_key}
+        && length $immodpg->{$outside_key}
+        && length $immodpg->{$current_key}
+        && length $immodpg->{$prior_key} ) {
+
+        # Convenience variables
+        my $in       = $immodpg->{$in_key};
+        my $outside  = $immodpg->{$outside_key};
+        my $current  = $immodpg->{$current_key};
+        my $prior    = $immodpg->{$prior_key};
+
+        if (   $in eq $yes
+            && $outside eq $no ) {
+
+            # CASE 1: Previously inside the widget, now leaving
+            $current = $immodpg->{$entry_key}->get();
+
+            # Reverse conditions: leaving the widget
+            $in      = $no;
+            $outside = $yes;
+
+            # Update the module values
+            $immodpg->{$in_key}      = $in;
+            $immodpg->{$outside_key} = $outside;
+            $immodpg->{$current_key} = $current;
+
+            return ();
+
+        } elsif ( $in eq $no
+            && $outside eq $yes ) {
+
+            # CASE 2: Previously outside the widget, now entering
+            $prior   = $current;
+            $current = $immodpg->{$entry_key}->get();
+
+            # Reverse conditions: entering the widget
+            $in      = $yes;
+            $outside = $no;
+
+            # Update the module values
+            $immodpg->{$in_key}      = $in;
+            $immodpg->{$outside_key} = $outside;
+            $immodpg->{$current_key} = $current;
+            $immodpg->{$prior_key}   = $prior;
+
+            return ();
+
+        } else {
+            print("immodpg, $entry_key, unexpected values\n");
+            return ();
+        }
+
+    } else {
+        print("immodpg, $entry_key, missing widget or values\n");
+        return ();
+    }
+}
+
+
+#=head2 sub _checkVbot
+#When you use setVbot
+#check what the current Vbot value is
+#compared to former Vbot values
+#
+#=cut
+#
+#sub _checkVbot {
+#
+#	my ($self) = @_;
+#
+#	# print("immodpg, _checkVbot, $immodpg->{_VbotEntry}\n");
+#
+#	if (   defined $immodpg->{_VbotEntry}
+#		&& length $immodpg->{_VbotEntry}
+#		&& length $immodpg->{_inVbot}
+#		&& length $immodpg->{_outsideVbot}
+#		&& length $immodpg->{_Vbot_current}
+#		&& length $immodpg->{_Vbot_prior} )
+#	{
+#
+#		# rename for convenience
+#		my $inVbot       = $immodpg->{_inVbot};
+#		my $outsideVbot  = $immodpg->{_outsideVbot};
+#		my $Vbot_current = $immodpg->{_Vbot_current};
+#		my $Vbot_prior   = $immodpg->{_Vbot_prior};
+#
+#		# print("immodpg,_checkVbot, inVbot:$inVbot\n");
+#		# print("immodpg,_checkVbot, outsideVbot: $outsideVbot\n");
+#		if (   $inVbot eq $yes
+#			&& $outsideVbot eq $no )
+#		{
+#
+#			# print("immodpg, _checkVbot, Leaving widget\n");
+#
+#			# CASE 1: Previously, inside Entry widget
+#			# Now leaving Entry widget
+#			$Vbot_current = $immodpg->{_VbotEntry}->get();
+#
+#			# print("immodpg,_checkVbot, Vbot_current:$Vbot_current\n");
+#			# reverse the conditions now
+#			# when user leaves Entry widget
+#			$inVbot      = $no;
+#			$outsideVbot = $yes;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVbot}       = $inVbot;
+#			$immodpg->{_outsideVbot}  = $outsideVbot;
+#			$immodpg->{_Vbot_current} = $Vbot_current;
+#
+#			return ();
+#
+#		}
+#		elsif ($inVbot eq $no
+#			&& $outsideVbot eq $yes )
+#		{
+#
+#			# CASE 2: Previously, outside Entry widget
+#			# Now entering Entry widget
+#			$Vbot_prior   = $Vbot_current;
+#			$Vbot_current = $immodpg->{_VbotEntry}->get();
+#
+#			# print("immodpg, _checkVbot, Entering widget\n");
+#
+#			# reverse the conditions now
+#			# when user enters Entry widget
+#			$inVbot      = $yes;
+#			$outsideVbot = $no;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVbot}       = $inVbot;
+#			$immodpg->{_outsideVbot}  = $outsideVbot;
+#			$immodpg->{_Vbot_current} = $Vbot_current;
+#			$immodpg->{_Vbot_prior}   = $Vbot_prior;
+#			return ();
+#
+#		}
+#		else {
+#			print("immodpg, _checkVbot, unexpected values\n");
+#			return ();
+#		}
+#
+#	}
+#	else {
+#		print("immodpg, _checkVbot, missing widget\n");
+#		return ();
+#	}
+#}
+
+#=head2 sub _checkVbot_upper_layer
+#
+#When you use setVbot_upper_layer
+#check what the current setVbot_upper_layer value is
+#compared to former setVbot_upper_layer values
+#
+#=cut
+#
+#sub _checkVbot_upper_layer {
+#
+#	my ($self) = @_;
+#
+## print("immodpg, _checkVbot_upper_layer, $immodpg->{_Vbot_upper_layerEntry}\n");
+#
+#	if (   length( $immodpg->{_Vbot_upper_layerEntry} )
+#		&& length $immodpg->{_Vbot_upper_layerEntry}
+#		&& length $immodpg->{_inVbot_upper_layer}
+#		&& length $immodpg->{_outsideVbot_upper_layer}
+#		&& length $immodpg->{_Vbot_upper_layer_current}
+#		&& length $immodpg->{_Vbot_upper_layer_prior} )
+#	{
+#
+#		# rename for convenience
+#		my $inVbot_upper_layer       = $immodpg->{_inVbot_upper_layer};
+#		my $outsideVbot_upper_layer  = $immodpg->{_outsideVbot_upper_layer};
+#		my $Vbot_upper_layer_current = $immodpg->{_Vbot_upper_layer_current};
+#		my $Vbot_upper_layer_prior   = $immodpg->{_Vbot_upper_layer_prior};
+#
+## print("immodpg,_checkVbot_upper_layer, inVbot_upper_layer:$inVbot_upper_layer\n");
+## print("immodpg,_checkVbot_upper_layer, outsideVbot_upper_layer: $outsideVbot_upper_layer\n");
+#		if (   $inVbot_upper_layer eq $yes
+#			&& $outsideVbot_upper_layer eq $no )
+#		{
+#
+#			#	print("immodpg, _checkVbot_upper_layer, Leaving widget\n");
+#
+#			# CASE 1: Previously, inside Entry widget
+#			# Now leaving Entry widget
+#			$Vbot_upper_layer_current =
+#			  $immodpg->{_Vbot_upper_layerEntry}->get();
+#
+#			# reverse the conditions now
+#			# when user leaves Entry widget
+#			$inVbot_upper_layer      = $no;
+#			$outsideVbot_upper_layer = $yes;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVbot_upper_layer}       = $inVbot_upper_layer;
+#			$immodpg->{_outsideVbot_upper_layer}  = $outsideVbot_upper_layer;
+#			$immodpg->{_Vbot_upper_layer_current} = $Vbot_upper_layer_current;
+#
+#			return ();
+#
+#		}
+#		elsif ($inVbot_upper_layer eq $no
+#			&& $outsideVbot_upper_layer eq $yes )
+#		{
+#
+#			# CASE 2: Previously, outside Entry widget
+#			# Now entering Entry widget
+#			$Vbot_upper_layer_prior = $Vbot_upper_layer_current;
+#			$Vbot_upper_layer_current =
+#			  $immodpg->{_Vbot_upper_layerEntry}->get();
+#
+#			#			print("immodpg, _checkVbot_upper_layer, Entering widget\n");
+#
+#			# reverse the conditions now
+#			# when user enters Entry widget
+#			$inVbot_upper_layer      = $yes;
+#			$outsideVbot_upper_layer = $no;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVbot_upper_layer}       = $inVbot_upper_layer;
+#			$immodpg->{_outsideVbot_upper_layer}  = $outsideVbot_upper_layer;
+#			$immodpg->{_Vbot_upper_layer_current} = $Vbot_upper_layer_current;
+#			$immodpg->{_Vbot_upper_layer_prior}   = $Vbot_upper_layer_prior;
+#			return ();
+#
+#		}
+#		else {
+#			print("immodpg, _checkVbot_upper_layer, unexpected values\n");
+#			return ();
+#		}
+#
+#	}
+#	else {
+#		print("immodpg, _checkVbot_upper_layer, missing widget or values\n");
+#		return ();
+#	}
+#}
+
+#=head2 sub _checkVincrement
+#
+#When you use Vincrement
+#check what the current Vincrement value is
+#compared to former Vincrement values
+#
+#=cut
+#
+#sub _checkVincrement {
+#
+#	my ($self) = @_;
+#
+#	# print("immodpg, _checkVincrement, $immodpg->{_VincrementEntry}\n");
+#
+#	if (   defined $immodpg->{_VincrementEntry}
+#		&& $immodpg->{_VincrementEntry} ne $empty_string
+#		&& $immodpg->{_inVincrement} ne $empty_string
+#		&& $immodpg->{_outsideVincrement} ne $empty_string
+#		&& $immodpg->{_Vincrement} ne $empty_string )
+#	{
+#
+#		# rename for convenience
+#		my $inVincrement       = $immodpg->{_inVincrement};
+#		my $outsideVincrement  = $immodpg->{_outsideVincrement};
+#		my $Vincrement_current = $immodpg->{_Vincrement_current};
+#		my $Vincrement_prior   = $immodpg->{_Vincrement_prior};
+#
+#   # print("immodpg,_checkVincrement, inVincrement:$inVincrement\n");
+#   # print("immodpg,_checkVincrement, outsideVincrement: $outsideVincrement\n");
+#		if (   $inVincrement eq $yes
+#			&& $outsideVincrement eq $no )
+#		{
+#
+#			# print("immodpg, _checkVincrement, Leaving widget\n");
+#
+#			# CASE 1: Previously, inside Entry widget
+#			# Now leaving Entry widget
+#			$Vincrement_current = $immodpg->{_VincrementEntry}->get();
+#
+#			# reverse the conditions now
+#			# when user leaves Entry widget
+#			$inVincrement      = $no;
+#			$outsideVincrement = $yes;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVincrement}       = $inVincrement;
+#			$immodpg->{_outsideVincrement}  = $outsideVincrement;
+#			$immodpg->{_Vincrement_current} = $Vincrement_current;
+#
+#			return ();
+#
+#		}
+#		elsif ($inVincrement eq $no
+#			&& $outsideVincrement eq $yes )
+#		{
+#
+#			# CASE 2: Previously, outside Entry widget
+#			# Now entering Entry widget
+#			$Vincrement_prior   = $Vincrement_current;
+#			$Vincrement_current = $immodpg->{_VincrementEntry}->get();
+#
+#			# print("immodpg, _checkVincrement, Entering widget\n");
+#
+#			# reverse the conditions now
+#			# when user enters Entry widget
+#			$inVincrement      = $yes;
+#			$outsideVincrement = $no;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVincrement}       = $inVincrement;
+#			$immodpg->{_outsideVincrement}  = $outsideVincrement;
+#			$immodpg->{_Vincrement_current} = $Vincrement_current;
+#			$immodpg->{_Vincrement_prior}   = $Vincrement_prior;
+#			return ();
+#
+#		}
+#		else {
+#			print("immodpg, _checkVincrement, unexpected values\n");
+#			return ();
+#		}
+#
+#	}
+#	else {
+#		print("immodpg, _checkVincrement, missing widget\n");
+#		return ();
+#	}
+#}
+
+#=head2 sub _checkVtop
+#
+#When you modify, enter or leave VtopEntry widget
+#check what the current Vtop value is
+#compared to former Vtop values
+#
+#=cut
+#
+#sub _checkVtop {
+#
+#	my ($self) = @_;
+#
+#	# print("immodpg, _checkVtop, $immodpg->{_VtopEntry}\n");
+#
+#	if (   defined $immodpg->{_VtopEntry}
+#		&& $immodpg->{_VtopEntry} ne $empty_string
+#		&& $immodpg->{_inVtop} ne $empty_string
+#		&& $immodpg->{_outsideVtop} ne $empty_string
+#		&& $immodpg->{_Vtop_current} ne $empty_string
+#		&& $immodpg->{_Vtop_prior} ne $empty_string )
+#	{
+#
+#		# rename for convenience
+#		my $inVtop       = $immodpg->{_inVtop};
+#		my $outsideVtop  = $immodpg->{_outsideVtop};
+#		my $Vtop_current = $immodpg->{_Vtop_current};
+#		my $Vtop_prior   = $immodpg->{_Vtop_prior};
+#
+#		# print("immodpg,_checkVtop, inVtop:$inVtop\n");
+#		# print("immodpg,_checkVtop, outsideVtop: $outsideVtop\n");
+#		# print("immodpg,_checkVtop, Vtop_current: $Vtop_current\n");
+#		if (   $inVtop eq $yes
+#			&& $outsideVtop eq $no )
+#		{
+#
+#			#			print("immodpg, _checkVtop, Leaving widget\n");
+#
+#			# CASE 1: Previously, inside Entry widget
+#			# Now leaving Entry widget
+#			$Vtop_current = $immodpg->{_VtopEntry}->get();
+#
+#			# reverse the conditions now
+#			# when user leaves Entry widget
+#			$inVtop      = $no;
+#			$outsideVtop = $yes;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVtop}       = $inVtop;
+#			$immodpg->{_outsideVtop}  = $outsideVtop;
+#			$immodpg->{_Vtop_current} = $Vtop_current;
+#
+#			return ();
+#
+#		}
+#		elsif ($inVtop eq $no
+#			&& $outsideVtop eq $yes )
+#		{
+#
+#			# CASE 2: Previously, outside Entry widget
+#			# Now entering Entry widget
+#			$Vtop_prior   = $Vtop_current;
+#			$Vtop_current = $immodpg->{_VtopEntry}->get();
+#
+#			# print("immodpg, _checkVtop, Entering widget\n");
+#
+#			# reverse the conditions now
+#			# when user enters Entry widget
+#			$inVtop      = $yes;
+#			$outsideVtop = $no;
+#
+#			# reset module values for convenience of renaming
+#			$immodpg->{_inVtop}       = $inVtop;
+#			$immodpg->{_outsideVtop}  = $outsideVtop;
+#			$immodpg->{_Vtop_current} = $Vtop_current;
+#			$immodpg->{_Vtop_prior}   = $Vtop_prior;
+#			return ();
+#
+#		}
+#		else {
+#			print("immodpg, _checkVtop, unexpected values\n");
+#			return ();
+#		}
+#
+#	}
+#	else {
+#		print("immodpg, _checkVtop, missing widget\n");
+#		return ();
+#	}
+#}
+
 
 =head2 sub _checkVtop_lower_layer
 
@@ -6277,7 +6435,7 @@ sub setVincrement {
 
 	}
 	else {
-
+	print("immodpg, setVincrement, missing value\n");
 	}
 
 }

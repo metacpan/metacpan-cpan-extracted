@@ -31,7 +31,7 @@ App::KGB - collaborative IRC helper
 
 =cut
 
-our $VERSION = '1.61';
+our $VERSION = '1.62';
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,8 @@ daemon.
 =head1 LICENSE
 
 Copyright (C) 2008 Martina Ferrari
-Copyright (C) 2008-2009 Damyan Ivanov
+Copyright (C) 2008-2009, 2025 Damyan Ivanov
+Copyright (C) 2023 Antoine Beaupré
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

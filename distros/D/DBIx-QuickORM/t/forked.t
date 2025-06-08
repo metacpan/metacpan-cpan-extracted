@@ -1,77 +1,116 @@
-use Test2::V0;
-use lib 't/lib';
-use DBIx::QuickORM::Tester qw/dbs_do all_dbs/;
+use Test2::V0 -target => 'DBIx::QuickORM', '!meta', '!pass';
 use DBIx::QuickORM;
+use Carp::Always;
+
+use Scalar::Util qw/blessed/;
 use Time::HiRes qw/sleep/;
 
-dbs_do db => sub {
-    my ($dbname, $dbc, $st) = @_;
+use lib 't/lib';
+use DBIx::QuickORM::Test;
 
-    my $orm = orm sub {
-        db sub {
-            db_class $dbname;
+do_for_all_dbs {
+    my $db = shift;
+
+    db mydb => sub {
+        dialect curdialect();
+        db_name 'quickdb';
+
+        if (curdialect() =~ m/MySQL/) {
+            socket $db->socket;
+            user $db->username;
+            pass $db->password;
+        }
+        elsif (curdialect() =~ m/PostgreSQL/) {
+            socket $db->dir;
+            user $db->username;
+            pass $db->password;
+        }
+        elsif (curdialect() =~ m/SQLite/) {
             db_name 'quickdb';
-            db_connect sub { $dbc->connect };
-        };
-
-        schema sub {
-            table person => sub {
-                column person_id => sub {
-                    primary_key;
-                    serial('BIG');
-                };
-
-                column name => sub {
-                    unique;
-                    sql_spec(type => 'VARCHAR(128)');
-                };
-            };
-        };
+            db_name $db->dir . '/quickdb';
+        }
     };
 
-    skip_all "$dbname does not support async" unless $orm->connection->supports_async;
+    orm my_orm => sub {
+        db 'mydb';
+        autofill;
+    };
 
-    ok(lives { $orm->generate_and_load_schema() }, "Generate and load schema");
+    ok(my $orm = orm('my_orm')->connect, "Got a connection");
+    ok(my $row = $orm->handle('example')->insert({name => 'a'}), "Inserted a row");
+    ok(my $row2 = $orm->handle('example')->insert({name => 'b'}), "Inserted a row");
+    ok(my $row3 = $orm->handle('example')->insert({name => 'c'}), "Inserted a row");
 
-    is([$orm->connection->tables], ['person'], "Table person was added");
+    my $sleep;
+    if (curdialect() =~ m/PostgreSQL/i) { $sleep = \'pg_sleep(1)' }
+    elsif (curdialect() =~ m/(MySQL|MariaDB)/i) { $sleep = \'SLEEP(1)' }
 
-    my $s = $orm->source('person');
-    my $bob = $s->insert(name => 'bob');
-    my $ted = $s->insert(name => 'ted');
-    my $ann = $s->insert(name => 'ann');
+    my $forked = $orm->handle(
+        example => (
+            where  => {name => 'a'},
+            fields => ['name', 'id', $sleep]
+        )
+    )->forked->first;
 
-    my $start = time;
-    my $as = $orm->source('person')->forked({}, 'name')->start(sub { sleep 2 });
+    my $forkedC = $orm->handle(
+        example => (
+            where  => {name => 'a'},
+            fields => ['name', 'id', $sleep]
+        )
+    )->forked->first;
 
-    ok(!$as->{rows}, "No rows yet");
-    ok($as->started, "Query has been started");
-
-    ok(!$s->busy, "First source is not currently busy");
-    ok($as->busy, "Select is currently busy");
-
-    ok($s->first, "Now we still do other queries on the initial source");
-
-    my $not = 0;
-    until ($as->ready) {
-        $not++;
-        sleep(0.2);
+    my $counter = 0;
+    my $ready;
+    until($ready = $forked->ready) {
+        $counter++;
+        sleep 0.1 if $counter > 1;
     }
-    ok(time - $start >= 1.5, "Had to wait for the child to be ready");
-    ok($not, "got not ready at least once");
 
-    ok($as->ready, "We are ready!");
+    my $counterC = 0;
+    my $readyC;
+    until($readyC = $forkedC->ready) {
+        $counterC++;
+        sleep 0.1 if $counterC > 1;
+    }
 
-    is(
-        [$as->all],
-        [$ann, $bob, $ted],
-        "Got all 3 rows"
+    if ($sleep) {
+        ok($counter > 5, "We waited at least once ($counter)");
+        ok($counterC < 5, "We did not need to wait much for the second ($counterC)");
+    }
+
+    ok($forked->async->pid, "got a pid");
+
+    ok(blessed($ready), 'DBIx::QuickORM::Row', "Row was returned from ready()");
+    ref_is($ready, $row, "same ref");
+
+    ok(blessed($readyC), 'DBIx::QuickORM::Row', "Row was returned from ready()");
+    ref_is($readyC, $row, "same ref");
+
+    is(blessed($forked), 'DBIx::QuickORM::Row::Async', "Still async");
+    my $copy = $forked->row;
+    is($forked->field('name'), 'a', "Can get value");
+    is(blessed($forked), 'DBIx::QuickORM::Row', "Not async anymore!");
+    ref_is($forked, $row, "Same ref");
+    ref_is($copy, $row, "Same ref");
+
+    my $forked2 = $orm->handle(example => (where => {name => 'b'}))->forked->one;
+    is($forked2->field('name'), 'b', "Got b");
+
+    my $forked3 = $orm->handle(example => (where => {}))->forked->one;
+
+    like(
+        dies { sleep 0.1 until $forked3->ready },
+        qr/Expected only 1 row, but got more than one/,
+        "used one() but got multiple rows"
     );
 
-    is(
-        $as->first->real_source,
-        exact_ref($ann->real_source),
-        "Correct source in the end"
-    );
+    my $forked4 = $orm->handle(example => (where => {}, order_by => ['name']))->forked->iterator;
+    is($forked4->next->field('name'), 'a', "Got a");
+    is($forked4->next->field('name'), 'b', "Got b");
+    is($forked4->next->field('name'), 'c', "Got c");
+    is($forked4->next, undef, "Out of rows");
+    is($forked4->next, undef, "Out of rows");
 };
 
 done_testing;
+

@@ -52,18 +52,18 @@
    "provides" : {
       "Crypt::RSA::Blind" : {
          "file" : "lib/Crypt/RSA/Blind.pm",
-         "version" : "1.026"
+         "version" : "1.027"
       },
       "Crypt::RSA::Blind::PubKey" : {
          "file" : "lib/Crypt/RSA/Blind.pm",
-         "version" : "1.026"
+         "version" : "1.027"
       },
       "Crypt::RSA::Blind::SecKey" : {
          "file" : "lib/Crypt/RSA/Blind.pm",
-         "version" : "1.026"
+         "version" : "1.027"
       }
    },
    "release_status" : "stable",
-   "version" : "1.026",
+   "version" : "1.027",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

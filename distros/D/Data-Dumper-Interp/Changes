@@ -1,6 +1,6 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
-7.016 - addrvis() fixes, test improv. Skip if no 'threads'
+7.017 - addrvis() fixes, test improv. Skip if no 'threads'
 7.015 - addrvis() uses threads::shared::is_shared() when appropriate.
         Subrefs show the name of the referenced sub (using Sub::Identify).
         Requires Path::Tiny 0.146 or later.

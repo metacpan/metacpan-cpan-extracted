@@ -1,5 +1,5 @@
 {
-   "abstract" : "Actively maintained Object Relational Mapping that makes getting started Quick and has a rich feature set.",
+   "abstract" : "Composable ORM builder.",
    "author" : [
       "Chad Granum <exodist@cpan.org>"
    ],
@@ -76,7 +76,7 @@
       "test" : {
          "requires" : {
             "Test2::Require::Module" : "0",
-            "Test2::Tools::QuickDB" : "0",
+            "Test2::Tools::QuickDB" : "0.000037",
             "Test2::Tools::Subtest" : "0",
             "Test2::Util" : "0",
             "Test2::V0" : "0",
@@ -95,9 +95,9 @@
          "url" : "https://github.com/exodist/DBIx-QuickORM/"
       }
    },
-   "version" : "0.000004",
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "version" : "0.000011",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 
