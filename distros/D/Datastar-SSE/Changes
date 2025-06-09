@@ -1,5 +1,9 @@
 Revision history for Datastar-SSE
 
+0.21      2025-06-08 15:28:56-0400
+          - stop mbtiny from autoscanning mytypes
+0.18      2025-06-08 15:11:46-0400
+          - Let META.* reflect only actual dependencies
 0.17      2025-06-01 13:26:32-0400
           - Add eg/index.cgi single file example
 0.16      2025-06-01 12:01:26-0400

@@ -2,6 +2,8 @@ package DBIx::QuickORM::RowManager;
 use strict;
 use warnings;
 
+our $VERSION = '0.000013';
+
 use Carp qw/confess croak/;
 use Scalar::Util qw/weaken/;
 use DBIx::QuickORM::Util qw/load_class/;

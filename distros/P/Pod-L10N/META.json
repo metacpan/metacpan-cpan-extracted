@@ -4,7 +4,7 @@
       "SHIRAKATA Kentaro <argrath@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.15",
    "license" : [
       "artistic_1"
    ],
@@ -52,21 +52,27 @@
       },
       "test" : {
          "requires" : {
-            "Test::Exception" : "0"
+            "File::Path" : "2.06_05",
+            "Test::Exception" : "0",
+            "Test::Simple" : "0.88"
          }
       }
    },
    "provides" : {
       "Pod::L10N" : {
          "file" : "lib/Pod/L10N.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "Pod::L10N::Html" : {
          "file" : "lib/Pod/L10N/Html.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "Pod::L10N::Html::LocalPodLinks" : {
          "file" : "lib/Pod/L10N/Html.pm"
+      },
+      "Pod::L10N::Html::Util" : {
+         "file" : "lib/Pod/L10N/Html/Util.pm",
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -76,15 +82,16 @@
       },
       "homepage" : "https://github.com/argrath/Pod-L10N",
       "repository" : {
-         "url" : "git://github.com/argrath/Pod-L10N.git",
+         "type" : "git",
+         "url" : "https://github.com/argrath/Pod-L10N.git",
          "web" : "https://github.com/argrath/Pod-L10N"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_contributors" : [
       "Neil Bowers <neil@bowers.com>",
       "SHIRAKATA Kentaro <argrath@ub32.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

@@ -7,5 +7,9 @@ on build => sub {
 };
 
 on test => sub {
+    # make_path()
+    requires 'File::Path', '2.06_05';
     requires 'Test::Exception';
+    # done_testing()
+    requires 'Test::Simple', '0.88';
 };

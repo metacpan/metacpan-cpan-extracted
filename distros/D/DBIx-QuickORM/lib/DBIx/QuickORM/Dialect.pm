@@ -6,7 +6,7 @@ use Carp qw/croak confess/;
 use Scalar::Util qw/blessed/;
 use DBI();
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000013';
 
 use DBIx::QuickORM::Util qw/load_class find_modules/;
 
@@ -84,6 +84,12 @@ sub dsn {
     }
 
     return $dsn;
+}
+
+sub upsert_statement {
+    my $self = shift;
+    my ($pk) = @_;
+    return "ON CONFLICT(" . join(", " => @$pk). ") DO UPDATE SET";
 }
 
 ###############################################################################

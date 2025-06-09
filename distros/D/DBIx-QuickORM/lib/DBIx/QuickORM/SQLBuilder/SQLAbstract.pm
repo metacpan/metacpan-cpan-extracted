@@ -2,7 +2,7 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000013';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;
@@ -56,9 +56,49 @@ BEGIN {
     }
 }
 
+sub qorm_upsert {
+    my $self = shift;
+    my %params = @_;
+
+    my $data = delete $params{insert} // delete $params{update};
+
+    my $sql = $self->qorm_insert(%params, insert => $data);
+
+    my $pk = $params{source}->primary_key;
+    confess "upsert cannot be used on a table without a primary key" unless $pk && @$pk;
+
+    my $changes = { %$data };
+    my $where = { map {$_ => delete $changes->{$_}} @$pk };
+
+    my $binds = $sql->{bind} //= [];
+    my $counter = @$binds + 1;
+
+    my $returning = "";
+    my $statement = $sql->{statement};
+    $returning = $1 if $statement =~ s/\s+(returning.*)$//is;
+
+    my $conf = $params{dialect}->upsert_statement($pk);
+    for my $field (sort keys %$changes) {
+        $conf .= " $field = ?";
+        push @$binds => {
+            field => $field,
+            value => $changes->{$field},
+            type  => 'field',
+            param => $counter++,
+        };
+    }
+
+    $sql->{statement} = "$statement $conf $returning";
+
+    return $sql;
+}
+
 sub _insert_args {
     my $self = shift;
     my ($params) = @_;
+
+    confess "insert() with a 'limit' clause is not currently supported"     if $params->{limit};
+    confess "insert() with an 'order_by' clause is not currently supported" if $params->{order_by};
 
     my $values = $params->{insert} // croak "'insert' is required";
     my $returning = $params->{returning};
@@ -72,11 +112,11 @@ sub _delete_args {
     my $self = shift;
     my ($params) = @_;
 
-    my $where = $params->{where} // undef;
-    my $returning = $params->{returning};
-
     confess "delete() with a 'limit' clause is not currently supported"     if $params->{limit};
     confess "delete() with an 'order_by' clause is not currently supported" if $params->{order_by};
+
+    my $where = $params->{where} // undef;
+    my $returning = $params->{returning};
 
     return ($where, $returning ? {returning => $returning} : ());
 }

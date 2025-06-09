@@ -18,9 +18,6 @@ With this ORM builder you can specify:
 The common use case is to create an ORM package for your app, then use that ORM
 package any place in the app that needs ORM access.
 
-\# TODO broken sentence
-The ORM class
-
 ## YOUR ORM PACKAGE
 
 ### MANUAL SCHEMA
@@ -182,7 +179,57 @@ See [DBIx::QuickORM::Connection](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%
 See [DBIx::QuickORM::Handle](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3AHandle) for more details on handles, which are similar to
 ResultSets from [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
 
-# A NOTE ON AFFINITY
+# ESSENTIAL CONCEPTS
+
+Knowing the basics about these concepts will help you understand how
+DBIx::QuickORM does things.
+
+## DIALECTS
+
+A dielect tell DBIx::QuickORM hwo to interact with and communicate with a
+database. Not all SQL databases use identical syntax or extensions, a dialects
+job to to define behaviors a specific database understands.
+
+[DBIx::QuickORM::Dialect](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect) is the base class for dialects. All dialects should
+subclass this base class.
+
+It is important to pick the dialect that best matches your situation.
+[DBIx::QuickORM::Dialect::MySQL](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3AMySQL) may work for all flavors of MySQL, but
+[DBIx::QuickORM::Dialect::MySQL::MariaDB](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3AMySQL%3A%3AMariaDB) will work much better if you are
+using MariaDB, as the dialect will know about additions regular mysql does not
+support.
+
+- [DBIx::QuickORM::Dialect::PostgreSQL](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3APostgreSQL)
+
+    For interacting with PostgreSQL databases.
+
+- [DBIx::QuickORM::Dialect::SQLite](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3ASQLite)
+
+    For interacting with SQLite databases.
+
+- [DBIx::QuickORM::Dialect::MySQL](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3AMySQL)
+
+    For interacting with generic MySQL databases.
+
+- [DBIx::QuickORM::Dialect::MySQL::MariaDB](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3AMySQL%3A%3AMariaDB)
+
+    For interacting with MariaDB databases.
+
+- [DBIx::QuickORM::Dialect::MySQL::Percona](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3AMySQL%3A%3APercona)
+
+    For interacting with MySQL as distributed by Percona.
+
+- [DBIx::QuickORM::Dialect::MySQL::Community](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ADialect%3A%3AMySQL%3A%3ACommunity)
+
+    For interacting with the Community Edition of MySQL.
+
+## SCHEMA
+
+This refers to [DBIx::QuickORM::Schema](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ASchema), your entire database schema/structure
+should be represented in the ORM as a schema structure consisting of
+[DBIx::QuickORM::Schema::Table](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ASchema%3A%3ATable) objects, and others.
+
+## AFFINITY
 
 Whenever you define a column in DBIx::QuickORM it is necessary for the ORM to
 know the _affinity_ of the column. It may be any of these:
@@ -213,6 +260,51 @@ for many SQL types. Also if you use a class implementing
 [DBIx::QuickORM::Role::Type](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ARole%3A%3AType) it will often provide an affinity. You can
 override the affinity if necessary. If the affinity cannot be derived you
 must specify it.
+
+## CONNECTIONS
+
+There are 2 primary interfaces your application will use to interact with the
+orm/database. The first of these is the [DBIx::QuickORM::Connection](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3AConnection) object
+which represents a single connection to the database.
+
+This connection maintains a connection specific copy of the schema, row cache,
+async status, and transaction state. You can have more than 1 connection to a
+specific database/schema, or connections to more than one database/schema and
+they will have completely independent row caches, transaction states, and so
+on.
+
+Once you have a connection you will primarily use it to create handles that can
+be used to find or modify rows.
+
+## HANDLES
+
+There are 2 primary interfaces your application will use to interact with the
+orm/database. The second of these is the [DBIx::QuickORM::Handle](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3AHandle) object. This
+is very similar to the [ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet) object from
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass), though they are not identical or directly interchangable.
+
+A handle is a combination of an [Connection](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3AConnection) and a
+query state. The query state must include a
+[Source](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ARole%3A%3ASource), and may include things like a WHERE
+condition, a result limit, order-by directives, and so on.
+
+The [Handle](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3AHandle) object is your primary interface for row
+actions such as `insert()`, `update()`, `upsert()`, `delete()`, and
+fetching 1 or more rows.
+
+## ROWS
+
+When you interact with rows in the database they will usually be presented as
+instances of [DBIx::QuickORM::Row](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3ARow) or a subclass of it. A row will usually be
+cached to the [Connection](https://metacpan.org/pod/DBIx%3A%3AQuickORM%3A%3AConnection) that was used to fetch
+or create it.
+
+See the ["DEFINE TABLES IN THEIR OWN PACKAGES/FILES"](#define-tables-in-their-own-packages-files) section for info on how
+to create per-table row classes, which are probably what you want. Rows classes
+like this have methods added for all fields defined on the table so that you do
+can call `$val = $row->foo()`, and `$row->foo($new_val)` instead
+of needing to call `$val = $row->field('foo')` and
+`$row->field(foo => $new_val)`.
 
 # RECIPES
 

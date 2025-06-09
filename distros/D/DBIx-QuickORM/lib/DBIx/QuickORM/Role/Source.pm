@@ -2,6 +2,8 @@ package DBIx::QuickORM::Role::Source;
 use strict;
 use warnings;
 
+our $VERSION = '0.000013';
+
 use Carp qw/croak confess/;
 
 use Role::Tiny;

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000013';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -139,6 +139,13 @@ sub db_vendor {
 
     return undef;
 }
+
+sub upsert_statement {
+    my $self = shift;
+    my ($pk) = @_;
+    return "ON DUPLICATE KEY UPDATE";
+}
+
 
 ###############################################################################
 # {{{ Schema Builder Code

@@ -2,6 +2,8 @@ package DBIx::QuickORM::Role::SQLBuilder;
 use strict;
 use warnings;
 
+our $VERSION = '0.000013';
+
 use Role::Tiny;
 
 requires qw{

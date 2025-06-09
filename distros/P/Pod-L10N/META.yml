@@ -4,11 +4,13 @@ author:
   - 'SHIRAKATA Kentaro <argrath@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Path: 2.06_05
   Test::Exception: '0'
+  Test::Simple: '0.88'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.15, CPAN::Meta::Converter version 2.150010'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,12 +26,15 @@ no_index:
 provides:
   Pod::L10N:
     file: lib/Pod/L10N.pm
-    version: '1.07'
+    version: '1.08'
   Pod::L10N::Html:
     file: lib/Pod/L10N/Html.pm
-    version: '1.07'
+    version: '1.08'
   Pod::L10N::Html::LocalPodLinks:
     file: lib/Pod/L10N/Html.pm
+  Pod::L10N::Html::Util:
+    file: lib/Pod/L10N/Html/Util.pm
+    version: '1.08'
 requires:
   Pod::L10N::Model: '0'
   Pod::Simple: '>= 3.18, != 3.26, != 3.30'
@@ -37,8 +42,8 @@ requires:
 resources:
   bugtracker: https://github.com/argrath/Pod-L10N/issues
   homepage: https://github.com/argrath/Pod-L10N
-  repository: git://github.com/argrath/Pod-L10N.git
-version: '1.07'
+  repository: https://github.com/argrath/Pod-L10N.git
+version: '1.08'
 x_contributors:
   - 'Neil Bowers <neil@bowers.com>'
   - 'SHIRAKATA Kentaro <argrath@ub32.org>'

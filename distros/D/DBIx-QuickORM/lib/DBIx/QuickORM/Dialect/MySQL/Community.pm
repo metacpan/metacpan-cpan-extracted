@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::MySQL::Community;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000013';
 
 use Carp qw/croak/;
 

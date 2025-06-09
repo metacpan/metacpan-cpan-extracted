@@ -2,6 +2,8 @@ package DBIx::QuickORM::Role::Handle;
 use strict;
 use warnings;
 
+our $VERSION = '0.000013';
+
 use Carp qw/croak/;
 
 use Role::Tiny;
@@ -29,8 +31,7 @@ requires qw{
     insert
     update
     vivify
-    find_or_insert
-    update_or_insert
+    upsert
 
     connection
     dialect

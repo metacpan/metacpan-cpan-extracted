@@ -1,5 +1,8 @@
 Revision history for Perl module MetaCPAN::Role:
 
+1.00 Sat 19 Nov 2016 13:47:43 GMT
+	- default to soft purge
+
 0.06 Sat 19 Nov 2016 13:47:43 GMT
 	- purge_author_key accepts arrays
 

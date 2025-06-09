@@ -1,5 +1,9 @@
 Revision history for Crypt::RSA::Blind
 
+1.029 Jun 8 2025
+    * Include length argument in all i2osp calls
+    * Catch and warn about exceptions in tests
+
 1.027 Jun 7 2025
     * Add more tests
     * Change ::PubKey and ::SecKey classes to packages
@@ -34,4 +38,3 @@ Revision history for Crypt::RSA::Blind
 
 1.009 Jun 10 2017
     * First release
-

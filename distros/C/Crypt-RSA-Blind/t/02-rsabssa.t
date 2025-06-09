@@ -32,13 +32,23 @@ for (@testvectors) {
       'Create blind signature');
   ok (os2ip($blind_sig) == $_->{bls}, 'Check blind signature') unless $_->{randomize};
   my $sig; my $sig2;
-  ok (try { $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv,
-					  Message => $msg, sLen => $_->{slen} } ) }, 'Unblind signature' );
-  ok (try { $sig2 = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init,
-					   Message => $msg, sLen => $_->{slen} } ) }, 'Unblind signature using Init vector' );
+  try { $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv,
+				      Message => $msg, sLen => $_->{slen} } ) }
+  catch { warn $_ };
+  ok ($sig, 'Unblind signature');
+  try { $sig2 = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init,
+				       Message => $msg, sLen => $_->{slen} } ) }
+  catch { warn $_ };
+  ok ($sig2, 'Unblind signature using Init vector');
+  my $verified;
   if ($_->{randomize}) {
-    ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $_->{slen} } ) }, 'Verify signature' );
-    ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig2, Message => $msg, sLen => $_->{slen} } ) }, 'Verify signature unblinded using Init vector' );
+    try { $verified = $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $_->{slen} } ) }
+    catch { warn $_ };
+    ok ($verified, 'Verify signature');
+    $verified = 0;
+    try { $verified = $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig2, Message => $msg, sLen => $_->{slen} } ) }
+    catch { warn $_ };
+    ok ($verified, 'Verify signature unblinded using Init vector' );
   }
   else {
     ok (os2ip($sig) == $_->{sg}, 'Check signature');
@@ -56,12 +66,20 @@ for my $slen (0, 48) {
   ok (my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } ),
       'Create blind signature');
   my $sig; my $sig2;
-  ok (try { $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } ) },
-      'Unblind signature');
-  ok (try { $sig2 = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } ) },
-      'Unblind signature using Init vector');
-  ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }, 'Verify signature' );
-  ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig2, Message => $msg, sLen => $slen } ) }, 'Verify signature unblinded using Init vector' );
+  try { $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($sig, 'Unblind signature');
+  try { $sig2 = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($sig2, 'Unblind signature using Init vector');
+  my $verified;
+  try { $verified = $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($verified, 'Verify signature');
+  $verified = 0;
+  try { $verified = $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig2, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($verified, 'Verify signature unblinded using Init vector' );
 }
 
 for my $slen (0, 48) {
@@ -75,12 +93,20 @@ for my $slen (0, 48) {
   ok (my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } ),
       'Create blind signature');
   my $sig; my $sig2;
-  ok (try { $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } ) },
-      'Unblind signature');
-  ok (try { $sig2 = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } ) },
-      'Unblind signature using Init vector');
-  ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }, 'Verify signature');
-  ok (try { $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig2, Message => $msg, sLen => $slen } ) }, 'Verify signature unblinded using Init vector');
+  try { $sig = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($sig, 'Unblind signature');
+  try { $sig2 = $rsab->ssa_finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Init => $init, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($sig2, 'Unblind signature using Init vector');
+  my $verified;
+  try { $verified = $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($verified, 'Verify signature');
+  $verified = 0;
+  try { $verified = $rsab->pss_verify( { PublicKey => $pubkey, Signature => $sig2, Message => $msg, sLen => $slen } ) }
+  catch { warn $_ };
+  ok ($verified, 'Verify signature unblinded using Init vector' );
 }
 
 exit;

@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use feature qw/state/;
 
+our $VERSION = '0.000013';
+
 use Carp qw/confess croak carp/;
 use Sub::Util qw/set_subname/;
 use List::Util qw/mesh/;
@@ -858,6 +860,7 @@ sub _builder_args {
         limit    => $self->{+LIMIT},
         order_by => $self->{+ORDER_BY},
         fields   => $self->fields,
+        dialect  => $self->dialect,
     };
 }
 
@@ -881,6 +884,17 @@ sub _row_or_hashref {
     return $self->$meth({ @_ });
 }
 
+sub upsert {
+    my $self = shift->_row_or_hashref(TARGET() => @_);
+    return $self->_insert_and_refresh(upsert => 1) if $self->{+AUTO_REFRESH};
+    return $self->_insert(upsert => 1);
+}
+
+sub upsert_and_refresh {
+    my $self = shift->_row_or_hashref(TARGET() => @_);
+    return $self->_insert_and_refresh(upsert => 1);
+}
+
 sub insert {
     my $self = shift->_row_or_hashref(TARGET() => @_);
     return $self->_insert_and_refresh() if $self->{+AUTO_REFRESH};
@@ -894,12 +908,13 @@ sub insert_and_refresh {
 
 sub _insert_and_refresh {
     my $self = shift;
+    my %params = @_;
 
     croak "Cannot refresh a row without a primary key" unless $self->_has_pk;
 
-    return $self->handle(AUTO_REFRESH() => 1)->_insert() if $self->dialect->supports_returning_insert;
+    return $self->handle(AUTO_REFRESH() => 1)->_insert(%params) if $self->dialect->supports_returning_insert;
 
-    my $row = $self->_insert();
+    my $row = $self->_insert(%params);
 
     if ($self->is_sync) {
         $row->refresh();
@@ -913,6 +928,9 @@ sub _insert_and_refresh {
 
 sub _insert {
     my $self = shift;
+    my %params = @_;
+
+    my $upsert = $params{upsert};
 
     croak "Cannot insert rows using a handle with data_only set"   if $self->{+DATA_ONLY};
     croak "Cannot insert rows using a handle with a limit set"     if defined $self->{+LIMIT};
@@ -962,7 +980,8 @@ sub _insert {
         $builder_args->{returning} = $self->{+AUTO_REFRESH} ? [ grep { !$seen{$_}++ } @$has_pk, @$fields, keys %$data ] : $has_pk;
     }
 
-    my $sql = $self->sql_builder->qorm_insert(%$builder_args);
+    my $meth = $upsert ? 'qorm_upsert' : 'qorm_insert';
+    my $sql = $self->sql_builder->$meth(%$builder_args);
     my $sth = $self->_make_sth(
         $sql,
         only_one => 1,
@@ -1353,14 +1372,6 @@ sub iterate {
     return;
 }
 
-sub find_or_insert {
-    die "TODO";
-}
-
-sub update_or_insert {
-    die "TODO";
-}
-
 ########################
 # }}} Results Fetchers #
 ########################
@@ -1672,8 +1683,6 @@ Return the L<DBIx::QuickORM::Dialect> object.
 
 Used to create a join handle.
 
-TODO: Flesh this out more!
-
 =item $new_h = $h->left_join(@args)
 
 =item $new_h = $h->right_join(@args)
@@ -1688,7 +1697,80 @@ These are all shortcuts for:
 
     $new_h = $h->join(type => $DIRECTION, @args);
 
+Then you can get L<DBIx::QuickORM::Join::Row> objects:
+
+    my $jrow = $h->first;
+
+    my @jrows = $h->all;
+
 =back
+
+Here is an example, here is some schema:
+
+    CREATE TABLE foo (
+        foo_id  SERIAL      NOT NULL PRIMARY KEY,
+        name    VARCHAR(20) NOT NULL,
+        UNIQUE(name)
+    );
+
+    CREATE TABLE bar (
+        bar_id  SERIAL      NOT NULL PRIMARY KEY,
+        name    VARCHAR(20) NOT NULL,
+        foo_id  INTEGER     DEFAULT NULL REFERENCES foo(foo_id),
+        UNIQUE(name)
+    );
+
+    CREATE TABLE baz (
+        baz_id  SERIAL      NOT NULL PRIMARY KEY,
+        name    VARCHAR(20) NOT NULL,
+        foo_id  INTEGER     DEFAULT NULL REFERENCES foo(foo_id),
+        bar_id  INTEGER     DEFAULT NULL REFERENCES bar(bar_id),
+        UNIQUE(name)
+    );
+
+Define the ORM:
+
+    orm my_orm => sub {
+        db 'mydb';
+        autofill sub {
+            autorow 'My::Test::Row';
+        };
+    };
+
+Insert some data and use join:
+
+    my $con = orm('my_orm');
+
+    # Insert a row into foo
+    my $foo_a = $con->insert(foo => {name => 'a'});
+
+    # Insert 3 rows into bar that link to foo.
+    my $bar_a1 = $con->insert(bar => {name => 'a1', foo_id => $foo_a->foo_id});
+    my $bar_a2 = $con->insert(bar => {name => 'a2', foo_id => $foo_a->foo_id});
+    my $bar_a3 = $con->insert(bar => {name => 'a3', foo_id => $foo_a->foo_id});
+
+    # Insert a row into baz linked to foo_a and bar_a1
+    my $baz = $con->insert(baz => {name => 'a', foo_id => $foo_a->foo_id, bar_id => $bar_a1->bar_id});
+
+    my $h = $con->handle('foo')->left_join('bar')->left_join('baz', from => 'foo')->order_by(qw/a.foo_id b.bar_id c.baz_id/);
+
+The handle can be used to fetch L<DBIx::QuickORM::Join::Row> instances, that lets you get each component row object by alias:
+
+    my $one = $iter->first;
+
+Getting component rows using C<by_alias()> will return regular row objects,
+they will be the same references if the rows have already been fetched and are
+in memory/cache.
+
+    use Test2::V0 qw/ref_is/;
+
+    ref_is($one->by_alias('a'), $foo_a,  "Got the foo_a reference");
+    ref_is($one->by_alias('b'), $bar_a1, "Got the bar_a reference");
+    ref_is($one->by_alias('c'), $baz,    "Got the baz reference");
+
+You can also directly access fields:
+
+    my $a_name = $one->field('a.name');
 
 =head2 Immutators
 
@@ -1905,6 +1987,27 @@ used, otherwise the insert and fetch operations are wrapped in a single
 transaction, unless internal transactions are disabled in which case an
 exception may be thrown.
 
+=item $h->update(\%CHANGES)
+
+Apply the changes (field names and new values) to all rows matching the where condition.
+
+=item $h->update($row_obj)
+
+Write pending changes to the row.
+
+=item $row = $h->upsert(\%ROW_DATA)
+
+=item $row = $h->upsert_and_refresh(\%ROW_DATA)
+
+These will either insert or update the row depending on if it already exists in
+the database.
+
+Depending on SQL dialect  it will usually result in a sql statement like one of these:
+
+    INSERT INTO example (id, name) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET name = ? RETURNING id
+    INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ? RETURNING id
+    INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ?
+
 =item $h->delete
 
 =item $h->delete($row)
@@ -1919,14 +2022,6 @@ If a where clause is provided then all rows it would find will be deleted.
 
 If a row or where condition are provided they will override any that are
 already associated with the handle.
-
-=item $h->update(\%CHANGES)
-
-Apply the changes (field names and new values) to all rows matching the where condition.
-
-=item $h->update($row_obj)
-
-Write pending changes to the row.
 
 =item $row = $h->one()
 
@@ -1977,13 +2072,5 @@ Get the number of rows that the query would return.
 Run the callback for each row found.
 
 In data_only mode this will provide hashrefs instead of blessed row objects.
-
-=item $h->find_or_insert
-
-TODO: Not yet implemented
-
-=item $h->update_or_insert
-
-TODO: Not yet implemented
 
 =back

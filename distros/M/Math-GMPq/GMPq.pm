@@ -95,7 +95,7 @@ qgmp_urandomb_ui qgmp_urandomm_ui
     );
 
     @Math::GMPq::EXPORT_OK = (@untagged, @tagged);
-    our $VERSION = '0.66';
+    our $VERSION = '0.67';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -465,13 +465,19 @@ sub overload_add {
 }
 
 sub overload_add_eq {
-  if( _itsa($_[1]) == 4 ) {
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 4 ) { # PV
     my $q = Math::GMPq->new($_[1], 0);
-    _overload_add_eq($_[0], $q, $_[2]);
+    return _overload_add_eq($_[0], $q, $_[2]);
   }
-  else {
-    _overload_add_eq($_[0], $_[1], $_[2]);
+
+  if( $itsa == 5 ) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_add_q($ret, $_[1], $_[0], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
   }
+
+  return _overload_add_eq($_[0], $_[1], $_[2]);
 }
 
 sub overload_mul {
@@ -485,13 +491,19 @@ sub overload_mul {
 }
 
 sub overload_mul_eq {
-  if( _itsa($_[1]) == 4 ) {
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 4 ) {
     my $q = Math::GMPq->new($_[1], 0);
-    _overload_mul_eq($_[0], $q, $_[2]);
+    return _overload_mul_eq($_[0], $q, $_[2]);
   }
-  else {
-    _overload_mul_eq($_[0], $_[1], $_[2]);
+
+  if( $itsa == 5 ) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_mul_q($ret, $_[1], $_[0], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
   }
+
+  return _overload_mul_eq($_[0], $_[1], $_[2]);
 }
 
 sub overload_sub {
@@ -508,16 +520,22 @@ sub overload_sub {
 }
 
 sub overload_sub_eq {
-  if( _itsa($_[1]) == 4 ) {
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 4 ) {
     my $q = Math::GMPq->new($_[1], 0);
     # _overload_sub_eq() doesn't check $_[2] if both args are
     # Math::GMPq objects - so we perform the check here.
-    if($_[2]) { _overload_sub_eq($q, $_[0], 0) }
-    else { _overload_sub_eq($_[0], $q, 0) }
+    if($_[2]) { return _overload_sub_eq($q, $_[0], 0) }
+    else { return _overload_sub_eq($_[0], $q, 0) }
   }
-  else {
-    _overload_sub_eq($_[0], $_[1], $_[2]);
+
+  if($itsa == 5) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_sub_q($ret, $_[1], $_[0], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return -$ret;
   }
+
+  return _overload_sub_eq($_[0], $_[1], $_[2]);
 }
 
 sub overload_div {
@@ -534,16 +552,22 @@ sub overload_div {
 }
 
 sub overload_div_eq {
-  if( _itsa($_[1]) == 4 ) {
+  my $itsa = _itsa($_[1]);
+  if( $itsa == 4 ) {
     my $q = Math::GMPq->new($_[1], 0);
     # _overload_div_eq() doesn't check $_[2] if both args are
     # Math::GMPq objects - so we perform the check here.
-    if($_[2]) { _overload_div_eq($q, $_[0], 0) }
-    else { _overload_div_eq($_[0], $q, 0) }
+    if($_[2]) { return _overload_div_eq($q, $_[0], 0) }
+    else { return _overload_div_eq($_[0], $q, 0) }
   }
-  else {
-    _overload_div_eq($_[0], $_[1], $_[2]);
+
+  if($itsa == 5) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    Math::MPFR::Rmpfr_q_div($ret, $_[0], $_[1], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
   }
+
+  return _overload_div_eq($_[0], $_[1], $_[2]);
 }
 
 sub overload_pow {
@@ -557,13 +581,20 @@ sub overload_pow {
 }
 
 sub overload_pow_eq {
+  my $itsa = _itsa($_[1]);
   if( _itsa($_[1]) == 4 ) {
     my $q = Math::GMPq->new($_[1], 0);
-    _overload_pow_eq($_[0], $q, $_[2]);
+    return _overload_pow_eq($_[0], $q, $_[2]);
   }
-  else {
-    _overload_pow_eq($_[0], $_[1], $_[2]);
+
+  if($itsa == 5) { # Math::MPFR object
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    my $q_as_fr = Math::MPFR->new($_[0]);
+    Math::MPFR::Rmpfr_pow($ret, $q_as_fr, $_[1], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
   }
+
+  return _overload_pow_eq($_[0], $_[1], $_[2]);
 }
 
 ##### overloaded comparisons #####
@@ -784,7 +815,11 @@ sub overload_fmod {
 
 sub overload_fmod_eq {
   if(ref($_[1]) eq 'Math::MPFR') {
-    return Math::MPFR::_overload_fmod(Math::MPFR->new($_[0]), $_[1], 0);
+    #return Math::MPFR::_overload_fmod(Math::MPFR->new($_[0]), $_[1], 0);
+    my $ret = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($_[1]));
+    my $q_as_fr = Math::MPFR->new($_[0]);
+    Math::MPFR::Rmpfr_fmod($ret, $q_as_fr, $_[1], Math::MPFR::Rmpfr_get_default_rounding_mode());
+    return $ret;
   }
   if(ref($_[1]) ne 'Math::GMPq') {
     return _overload_fmod_eq($_[0], Math::GMPq->new($_[1]), 0) unless $_[2];

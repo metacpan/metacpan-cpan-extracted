@@ -116,6 +116,7 @@ t/handle/schema/mysql.sql
 t/handle/schema/postgresql.sql
 t/handle/schema/sqlite.sql
 t/handle/update.t
+t/handle/upsert.t
 t/interface.t
 t/join.t
 t/join/mysql.sql

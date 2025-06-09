@@ -3,7 +3,7 @@
 # Crypt::RSA::Blind - Blind RSA signatures
 # Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 #
-# $Id: lib/Crypt/RSA/Blind.pm v1.027 Sat Jun  7 19:23:39 EST 2025 $
+# $Id: lib/Crypt/RSA/Blind.pm v1.029 Sun Jun  8 21:48:54 EST 2025 $
 
 use warnings;
 use strict;
@@ -16,7 +16,7 @@ no warnings qw(experimental::signatures);
 class Crypt::RSA::Blind;
 
 use vars qw( $VERSION );
-our ( $VERSION ) = '$Revision: 1.027 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.029 $' =~ /\s+([\d\.]+)/;
 
 use Carp;
 use Carp::Assert;
@@ -53,7 +53,7 @@ method keygen (@args) {
 }
 
 method init () {
-  makerandom( Size => $self->get_initsize, Strength => 0, Uniform => 1 );
+  makerandom( Size => $self->get_initsize, Strength => 1, Uniform => 0 );
 }
 
 # RSABSSA methods
@@ -84,6 +84,8 @@ method ssa_blind ($arg_ref) {
   my $z = ($m * $x) % $n;
   my $blinded_msg = i2osp($z, $klen);
   my $inv = i2osp($r_inv, $klen);
+  my $msglen = length($blinded_msg);
+  croak("Unexpected message size (msglen: $msglen, klen: $klen") if $msglen != $klen;
   return ($blinded_msg, $inv);
 }
 
@@ -91,11 +93,15 @@ method ssa_blind_sign ($arg_ref) {
   my $n = $arg_ref->{SecretKey}->n;
   my $kbits = bitsize($n);
   my $klen = ceil($kbits/8);
-  croak("Unexpected input size") if length($arg_ref->{BlindedMessage}) != $klen;
-  my $d = $arg_ref->{SecretKey}->d;
+  my $inputlen = length($arg_ref->{BlindedMessage});
+  croak("Unexpected input size (inputlen: $inputlen, klen: $klen)") if $inputlen != $klen;
   my $m = os2ip($arg_ref->{BlindedMessage});
   croak("Invalid message length") if $m >= $n;
-  my $s = mod_exp($m, $d, $n);
+  my $s = RSASP1($arg_ref->{SecretKey}, $m);
+  if (defined $arg_ref->{PublicKey}) {
+    my $mdash = RSAVP1($arg_ref->{PublicKey}, $s);
+    croak "Signing failure" unless $m == $mdash;
+  }
   my $blind_sig = i2osp($s, $klen);
 }
 
@@ -118,7 +124,8 @@ method ssa_finalize ($arg_ref) {
 }
 
 method ssa_randomize ($msg) {
-  $msg = i2osp(makerandom(Size => 32 * 8, Strength => 0, Uniform => 1)) . $msg;
+  my $random = makerandom(Size => 32 * 8, Strength => 1, Uniform => 1);
+  $msg = i2osp($random, 32) . $msg;
 }
 
 method pss_verify ($arg_ref) {
@@ -126,7 +133,8 @@ method pss_verify ($arg_ref) {
   my $kbits = bitsize($n);
   my $klen = ceil($kbits/8);
   # Step 1
-  croak("Incorrect signature length") if length($arg_ref->{Signature}) != $klen;
+  my $siglen = length($arg_ref->{Signature});
+  croak("Incorrect signature length (siglen: $siglen, klen: $klen") if $siglen != $klen;
   # Step 2a (OS2IP)
   my $signature_int = os2ip($arg_ref->{Signature});
   # Step 2b (RSAVP1)
@@ -157,15 +165,15 @@ method EMSA_PSS_ENCODE ($kbits, $msg, $slen, $salt) {
 
   unless ($salt) {
     $salt = '';
-    $salt = uc(unpack ('H*',i2osp(makerandom(Size => $slen * 8, Strength => 0, Uniform => 1)))) if $slen;
-  }
+    $salt = uc(unpack ('H*',i2osp(makerandom(Size => $slen * 8, Strength => 1, Uniform => 0), $slen))) if $slen;
+1  }
 
-  my $m_prime = chr(0) x 8 . i2osp(Math::Pari::_hex_cvt('0x' . $m_hash . $salt));
+  my $m_prime = chr(0) x 8 . i2osp(Math::Pari::_hex_cvt('0x' . $m_hash . $salt), $hlen + $slen);
   $hash = Digest::SHA->new($self->get_hash_algorithm);
   $hash->add($m_prime);
   my $h = $hash->digest;
   my $ps = chr(0) x ($emlen - $slen - $hlen - 2);
-  my $db = $ps . chr(0x01); $db .= i2osp(Math::Pari::_hex_cvt('0x' . $salt)) if $slen;
+  my $db = $ps . chr(0x01); $db .= i2osp(Math::Pari::_hex_cvt('0x' . $salt), $slen) if $slen;
   my $dbMask = MGF1($h, $emlen - $hlen - 1);
   my $masked_db = octet_xor($db, $dbMask);
   $masked_db = chr(os2ip(substr($masked_db, 0, 1)) & (~$lmask)) . substr($masked_db, 1);
@@ -206,7 +214,7 @@ method EMSA_PSS_VERIFY ($mhash, $em, $embits, $mgf, $slen) {
   $hash->add($m_prime);
   my $hp = $hash->digest;
   # Step 14
-  croak("Incorrect signature at step 14\nh: $h\nhp: $hp") if $h ne $hp;
+  croak("Incorrect signature at step 14") if $h ne $hp;
 }
 
 # Old-style API methods
@@ -220,15 +228,18 @@ method request (%arg) {
 }
 
 method sign (%arg) {
-  $self->get_oldapi ? os2ip($self->ssa_blind_sign( { SecretKey => $arg{Key}, BlindedMessage => i2osp($arg{Message}) } )) : $self->_sign(%arg);
+  my $klen = ceil(bitsize($arg{Key}->n)/8);
+  $self->get_oldapi ? os2ip($self->ssa_blind_sign( { SecretKey => $arg{Key}, BlindedMessage => i2osp($arg{Message}, $klen) } )) : $self->_sign(%arg);
 }
 
 method unblind (%arg) {
-  $self->get_oldapi ? os2ip($self->ssa_finalize( { PublicKey => $arg{Key}, BlindSig => i2osp($arg{Signature}), sLen => $self->get_slen, %arg } )) : $self->_unblind(%arg);
+  my $klen = ceil(bitsize($arg{Key}->n)/8);
+  $self->get_oldapi ? os2ip($self->ssa_finalize( { PublicKey => $arg{Key}, BlindSig => i2osp($arg{Signature}, $klen), sLen => $self->get_slen, %arg } )) : $self->_unblind(%arg);
 }
 
 method verify (%arg) {
-  $self->get_oldapi ? $self->pss_verify( { PublicKey => $arg{Key}, %arg, Signature => i2osp($arg{Signature}), sLen => $self->get_slen } ) : $self->_verify(%arg);
+  my $klen = ceil(bitsize($arg{Key}->n)/8);
+  $self->get_oldapi ? $self->pss_verify( { PublicKey => $arg{Key}, %arg, Signature => i2osp($arg{Signature}, $klen), sLen => $self->get_slen } ) : $self->_verify(%arg);
 }
 
 # Deprecated methods
@@ -237,7 +248,7 @@ method _req (%arg) {
   carp('Call to deprecated method: request');
   my ($invertible, $blinding);
   while (!$invertible) {
-    $blinding = makerandom_itv( Size => $self->get_blindsize, Upper => $arg{Key}->n-1, Strength => 1, Uniform => 1 );
+    $blinding = makerandom_itv( Size => $self->get_blindsize, Upper => $arg{Key}->n-1, Strength => 1, Uniform => 0 );
     # Check that blinding is invertible mod n
     $invertible = gcd( $blinding, $arg{Key}->n );
     $invertible = 0 unless $invertible == 1;
@@ -288,10 +299,20 @@ method _request ($init, $blinding=undef, $message=undef) {       # Save / retrie
   return $ret;
 }
 
-sub RSAVP1 ($pubkey, $r) {
+sub RSAVP1 ($pubkey, $s) {
   my $e = $pubkey->e;
   my $n = $pubkey->n;
-  my $c = mod_exp($r, $e, $n);
+  my $scopy = $s; my $ncopy = $n;
+  croak "Signature representative out of range" unless $scopy < $ncopy and $scopy > 0;
+  my $m = mod_exp($s, $e, $n);
+}
+
+sub RSASP1 ($seckey, $m) {
+  my $d = $seckey->d;
+  my $n = $seckey->n;
+  my $mcopy = $m; my $ncopy = $n;
+  croak "Message representative out of range" unless $mcopy < $ncopy and $mcopy > 0;
+  my $s = mod_exp($m, $d, $n);
 }
 
 sub MGF1 ($seed, $masklen) {
@@ -345,8 +366,8 @@ Crypt::RSA::Blind - Blind RSA signatures
 
 =head1 VERSION
 
- $Revision: 1.027 $
- $Date: Sat Jun  7 19:23:39 EST 2025 $
+ $Revision: 1.029 $
+ $Date: Sun Jun  8 21:48:54 EST 2025 $
 
 =cut
 

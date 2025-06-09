@@ -1,13 +1,11 @@
 package MetaCPAN::Role::Fastly;
-$MetaCPAN::Role::Fastly::VERSION = '0.06';
-# COPY BELOW HERE INTO MetaCPAN::Role::Fastly
-
+$MetaCPAN::Role::Fastly::VERSION = '1.00';
 use Moose::Role;
 use Net::Fastly 1.05;
 use Carp;
 
 # For dzil [AutoPreq]
-use MooseX::Fastly::Role 0.01;
+use MooseX::Fastly::Role 0.04;
 
 with 'MooseX::Fastly::Role';
 
@@ -110,6 +108,19 @@ has _surrogate_keys_to_purge => (
     },
 );
 
+=head2 soft_purge
+
+Defaults to true and will be used in perform_purges()
+
+=cut
+
+has soft_purge => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 1,
+);
+
+
 sub perform_purges {
     my ($self) = @_;
 
@@ -119,7 +130,7 @@ sub perform_purges {
         # Something changed, means we need to purge some keys
         my @keys = $self->surrogate_keys_to_purge();
 
-        $self->cdn_purge_now( { keys => \@keys, } );
+        $self->cdn_purge_now( { keys => \@keys, soft_purge => $self->soft_purge } );
 
         # Rest
         $self->reset_surrogate_keys();

@@ -2,7 +2,7 @@
    "auto_bump" : 1,
    "auto_git" : 1,
    "auto_repo" : 1,
-   "auto_scan" : 1,
+   "auto_scan" : 0,
    "auto_tracker" : 1,
    "write_build" : 1,
    "write_license" : 1,

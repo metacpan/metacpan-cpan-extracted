@@ -25,9 +25,9 @@ WriteMakefile(
               META_MERGE => {
 			     "meta-spec" => { version => 2 },
 			     provides => {
-					  'Crypt::RSA::Blind' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.027},
-					  'Crypt::RSA::Blind::PubKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.027},
-					  'Crypt::RSA::Blind::SecKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.027}
+					  'Crypt::RSA::Blind' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.029},
+					  'Crypt::RSA::Blind::PubKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.029},
+					  'Crypt::RSA::Blind::SecKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => 1.029}
 					 }
 			    },
 	      dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

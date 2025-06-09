@@ -70,20 +70,21 @@ if($have_mpfr) {
     # objects. ################################################
     ###########################################################
 
-    for my $p(30, 53, 64, 113, 120) {
+    for my $default_prec(30, 53, 64, 113, 120) {
 
     ############################################################
       {
-      Math::MPFR::Rmpfr_set_default_prec($p);
-      my $mpfr_op = Math::MPFR::Rmpfr_init2(100);
+      Math::MPFR::Rmpfr_set_default_prec($default_prec);
+      my $p = 100;
+      my $mpfr_op = Math::MPFR::Rmpfr_init2($p);
       Math::MPFR::Rmpfr_set_NV($mpfr_op, 2.5, 0);
       my $gmpq_op = Rmpq_init();
       Rmpq_set_NV($gmpq_op,3.5);
 
       my($c1, $c2) = ($mpfr_op + $gmpq_op, $gmpq_op + $mpfr_op);
       cmp_ok($c1, '==', $c2, "$p: '+' is commutative");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $p, "$p: \$c1: correct precision returned for '+' op");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $p, "$p: \$c2: correct precision returned for '+' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $default_prec, "$default_prec: \$c1: correct precision returned for '+' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $default_prec, "$default_prec: \$c2: correct precision returned for '+' op");
 
       $mpfr_op += $gmpq_op;
       my $c3 = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($mpfr_op));
@@ -104,16 +105,17 @@ if($have_mpfr) {
     ############################################################
     ############################################################
       {
-      Math::MPFR::Rmpfr_set_default_prec($p);
-      my $mpfr_op = Math::MPFR::Rmpfr_init2(100);
+      Math::MPFR::Rmpfr_set_default_prec($default_prec);
+      my $p = 100;
+      my $mpfr_op = Math::MPFR::Rmpfr_init2($p);
       Math::MPFR::Rmpfr_set_NV($mpfr_op, 2.5, 0);
       my $gmpq_op = Rmpq_init();
       Rmpq_set_NV($gmpq_op, 3.5);
 
       my ($c1, $c2) = ($mpfr_op * $gmpq_op, $gmpq_op * $mpfr_op);
       cmp_ok($c1, '==', $c2, "$p: '*' is commutative");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $p, "$p: \$c1: correct precision returned for '*' op");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $p, "$p: \$c2: correct precision returned for '*' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $default_prec, "$default_prec: \$c1: correct precision returned for '*' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $default_prec, "$default_prec: \$c2: correct precision returned for '*' op");
 
       $mpfr_op *= $gmpq_op;
       my $c3 = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($mpfr_op));
@@ -133,9 +135,10 @@ if($have_mpfr) {
     ############################################################
     ############################################################
       {
-      Math::MPFR::Rmpfr_set_default_prec($p);
-      my $mpfr_op = Math::MPFR::Rmpfr_init2(100);
-      my $mpfr_inv = Math::MPFR::Rmpfr_init2(100);
+      Math::MPFR::Rmpfr_set_default_prec($default_prec);
+      my $p = 100;
+      my $mpfr_op = Math::MPFR::Rmpfr_init2($p);
+      my $mpfr_inv = Math::MPFR::Rmpfr_init2($p);
       Math::MPFR::Rmpfr_set_NV($mpfr_op, 2.5, 0);
       my $gmpq_op = Rmpq_init();
       Rmpq_set_NV($gmpq_op,3.5);
@@ -149,10 +152,10 @@ if($have_mpfr) {
       cmp_ok($c1, '==', $d1, "$p: '/' and '*' reciprocate as expected");
 #     cmp_ok($c2, '==', $d2, "$p: '/' and '*' (again) reciprocate as expected"); # orig, replaced by next line.
       cmp_ok($c2, '==', _approx($c2,$d2), "$p: '/' and '*' (again) reciprocate as expected");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $p, "$p: \$c1: correct precision returned for '/' op");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $p, "$p: \$c2: correct precision returned for '/' op");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($d1), '==', $p, "$p: \$d1: correct precision returned for inverted '*' op");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($d2), '==', $p, "$p: \$d2: correct precision returned for inverted '*' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $default_prec, "$default_prec: \$c1: correct precision returned for '/' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $default_prec, "$default_prec: \$c2: correct precision returned for '/' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($d1), '==', $default_prec, "$default_prec: \$d1: correct precision returned for inverted '*' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($d2), '==', $default_prec, "$default_prec: \$d2: correct precision returned for inverted '*' op");
 
       $mpfr_op /= $gmpq_op;
       my $c3 = Math::MPFR::Rmpfr_init2(Math::MPFR::Rmpfr_get_prec($mpfr_op));
@@ -187,15 +190,16 @@ if($have_mpfr) {
     ############################################################
     ############################################################
       if($Math::MPFR::VERSION >= 4.35) {
-        Math::MPFR::Rmpfr_set_default_prec($p);
-        my $mpfr_op = Math::MPFR::Rmpfr_init2(100);
+        Math::MPFR::Rmpfr_set_default_prec($default_prec);
+        my $p = 100;
+        my $mpfr_op = Math::MPFR::Rmpfr_init2($p);
         Math::MPFR::Rmpfr_set_NV($mpfr_op, 2.5, 0);
         my $gmpq_op = Rmpq_init();
         Rmpq_set_NV($gmpq_op,22.8125);
 
         my($c1, $c2) = ($mpfr_op % $gmpq_op, $gmpq_op % $mpfr_op);
-        cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $p, "$p: \$c1: correct precision returned for '%' op");
-        cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $p, "$p: \$c2: correct precision returned for '%' op");
+        cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $default_prec, "$default_prec: \$c1: correct precision returned for '%' op");
+        cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $default_prec, "$default_prec: \$c2: correct precision returned for '%' op");
         cmp_ok($c1, '==', 2.5, "$p: \$c1: value unaltered for '%' op");
         cmp_ok($c2, '==', 0.3125, "$p: \$c2: correct value for '%' op");
 
@@ -223,15 +227,16 @@ if($have_mpfr) {
     ############################################################
     ############################################################
       {
-      Math::MPFR::Rmpfr_set_default_prec($p);
-      my $mpfr_op = Math::MPFR::Rmpfr_init2(100);
+      Math::MPFR::Rmpfr_set_default_prec($default_prec);
+      my $p = 100;
+      my $mpfr_op = Math::MPFR::Rmpfr_init2($p);
       Math::MPFR::Rmpfr_set_NV($mpfr_op, 2.5, 0);
       my $gmpq_op = Rmpq_init();
       Rmpq_set_NV($gmpq_op,4.0);
 
       my($c1, $c2) = ($mpfr_op ** $gmpq_op, $gmpq_op ** $mpfr_op);
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $p, "$p: \$c1: correct precision returned for '**' op");
-      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $p, "$p: \$c2: correct precision returned for '**' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c1), '==', $default_prec, "$default_prec: \$c1: correct precision returned for '**' op");
+      cmp_ok(Math::MPFR::Rmpfr_get_prec($c2), '==', $default_prec, "$default_prec: \$c2: correct precision returned for '**' op");
       cmp_ok($c1, '==', 39.0625, "$p: \$c1: value set to 39.0625for '**' op");
       cmp_ok($c2, '==', 32, "$p: \$c2: value set to 32 for '**' op");
 

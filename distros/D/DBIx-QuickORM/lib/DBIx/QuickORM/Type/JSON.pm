@@ -2,6 +2,8 @@ package DBIx::QuickORM::Type::JSON;
 use strict;
 use warnings;
 
+our $VERSION = '0.000013';
+
 use Carp qw/croak/;
 use Scalar::Util qw/reftype blessed/;
 use Role::Tiny::With qw/with/;

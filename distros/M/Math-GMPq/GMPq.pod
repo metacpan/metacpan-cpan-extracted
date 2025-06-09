@@ -565,7 +565,7 @@
     =
 
     NOTE: Overloading of '**' and '**=' accepts only a positive integer
-          (IV) or a Math::MPFR object.
+          (IV or PV) or a Math::MPFR object.
 
     NOTE: Making use of the '=' overloading is not recommended unless
           you understand its caveats. See 'perldoc overload' and
@@ -577,18 +577,23 @@
    '<<' operators has now been added.
 
     Atempting to use the overloaded operators with objects that
-    have been blessed into some package other than 'Math::GMPq'
-    or 'Math::MPFR'/'Math::GMPz'/'Math::GMP' will not work.
+    have been blessed into some package other than 'Math::GMPq',
+    Math::MPFR', 'Math::GMPz', or 'Math::GMP' will throw an error.
 
     YMMV with older versions of Math::MPFR but, if you use Math-MPFR-4.19
     or later, then Math::MPFR objects can be provided as the second arg
     with '+', '+=', '-', '-=', '*', '*=',  '/', '/=', '%', '%=', '**'
     and '**=' operators. In these cases, the operation will return a
     Math::MPFR object, rounded in accordance with the current Math::MPFR
-    default precision and the current Math::MPFR default rounding mode.
-    For the '%', '%=', '**' and '**=' overloading, the  value of the
-    Math::GMPq object is first set to a Math::MPFR object using the
-    same default precision and defauilt rounding mode.
+    default rounding mode.
+    The precision of Math::MPFR objects returned by the '+=', '-=', '*=',
+    '/=', '%=' and '**=' operators will be the same as the Math::MPFR
+    object that was provided as an argument.
+    For the other operators, the returned Math::MPFR object will have
+    current Math::MPFR default precision.
+    For the '%', '%=', '**' and '**=' operations, the  value of the
+    Math::GMPq argument is first set to a Math::MPFR object using the
+    current Math::MPFR default precision and default rounding mode.
 
     Comparisons between Math::GMPq and Math::GMPz objects can be performed
     using either the Math::GMPz or Math::GMPq overloading.

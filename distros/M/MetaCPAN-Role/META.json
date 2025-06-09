@@ -4,7 +4,7 @@
       "Leo Lapworth"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,19 +19,12 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Test::More" : "0.88",
-            "Test::NoTabs" : "0",
-            "Test::Pod" : "1.41"
-         }
-      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "CatalystX::Fastly::Role::Response" : "0.04",
+            "CatalystX::Fastly::Role::Response" : "0.07",
             "Moose::Role" : "0",
-            "MooseX::Fastly::Role" : "0.01",
+            "MooseX::Fastly::Role" : "0.04",
             "Net::Fastly" : "1.05"
          }
       },
@@ -52,6 +45,9 @@
          "web" : "https://github.com/metacpan/p5-metacpan-role"
       }
    },
-   "version" : "0.06"
+   "version" : "1.00",
+   "x_generated_by_perl" : "v5.38.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

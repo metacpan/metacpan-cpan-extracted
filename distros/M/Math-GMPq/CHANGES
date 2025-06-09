@@ -1,5 +1,14 @@
 Revision history for Perl module Math::GMPq
 
+0.67
+ - Correction to t/overload_cross_class.t. Only relevant if a pre-4.19 version of
+   Math::MPFR is loaded.
+   Fixes https://www.cpantesters.org/cpan/report/a75afb86-6d32-1014-b14f-669fb03d33c9
+ - When overloaded +=, -=, *=, /=, %=, and **= operations return a Math::MPFR object,
+   the bit-precision of that returned Math::MPFR object is the same as the bit-precision
+   of the Math::MPFR object that was provided as an argument. (Previously, these
+   returned objects were given current Math::MPFR default precision.)
+
 0.66
  - Correct some some mistakes (introduced in 0.65) in assigning values of some strings.
  - Allow a leading '+' in both numerator and denominator strings.

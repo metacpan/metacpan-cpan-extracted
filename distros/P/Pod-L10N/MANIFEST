@@ -4,13 +4,18 @@ LICENSE
 META.json
 Makefile
 README.md
+corpus/perlpodspec-copy.pod
+corpus/perlvar-copy.pod
 cpanfile
 lib/Pod/L10N.pm
 lib/Pod/L10N/Format.pod
 lib/Pod/L10N/Html.pm
+lib/Pod/L10N/Html/Util.pm
 minil.toml
 script/pod2htmll10n
 t/80_help.t
+t/anchorify-536.t
+t/anchorify.t
 t/cache.pod
 t/cache.t
 t/crossref.pod
@@ -38,7 +43,7 @@ t/htmllink.pod
 t/htmllink.t
 t/htmlview.pod
 t/htmlview.t
-t/pod2html-lib.pl
+t/lib/Testing.pm
 t/poderr.pod
 t/poderr.t
 t/podnoerr.pod
@@ -49,7 +54,5 @@ t/substitem.pod
 t/substitem.t
 t/substlink.pod
 t/substlink.t
-testdir/perlpodspec-copy.pod
-testdir/perlvar-copy.pod
 META.yml
 MANIFEST

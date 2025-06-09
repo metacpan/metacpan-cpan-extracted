@@ -1,9 +1,9 @@
 package MetaCPAN::Role::Fastly::Catalyst;
-$MetaCPAN::Role::Fastly::Catalyst::VERSION = '0.06';
+$MetaCPAN::Role::Fastly::Catalyst::VERSION = '1.00';
 use Moose::Role;
 
 # For dzil [AutoPreq]
-use CatalystX::Fastly::Role::Response 0.04;
+use CatalystX::Fastly::Role::Response 0.07;
 
 with 'MetaCPAN::Role::Fastly';
 with 'CatalystX::Fastly::Role::Response';
@@ -67,6 +67,10 @@ before 'finalize' => sub {
         # We've decided to cache on Fastly, so throw fail overs
         # if there is an error at origin
         $c->cdn_stale_if_error('30d');
+
+        # And lets serve stale content whilst we revalidate as our content
+        # really doesn't update that often
+        $c->cdn_stale_while_revalidate('1d');
     }
 
     my $content_type = lc( $c->res->content_type || 'none' );

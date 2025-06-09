@@ -2,6 +2,8 @@ package DBIx::QuickORM::Schema::Autofill;
 use strict;
 use warnings;
 
+our $VERSION = '0.000013';
+
 use List::Util qw/first/;
 use DBIx::QuickORM::Util qw/load_class/;
 

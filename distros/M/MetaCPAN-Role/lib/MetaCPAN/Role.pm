@@ -1,5 +1,5 @@
 package MetaCPAN::Role;
-$MetaCPAN::Role::VERSION = '0.06';
+$MetaCPAN::Role::VERSION = '1.00';
 # ABSTRACT: Collection of roles useful to MetaCPAN project
 
 =head1 NAME

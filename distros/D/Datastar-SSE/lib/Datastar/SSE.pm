@@ -2,7 +2,7 @@ package Datastar::SSE;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.21';
 
 use JSON ();
 use HTTP::ServerEvent;
