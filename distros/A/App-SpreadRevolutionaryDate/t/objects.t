@@ -35,10 +35,10 @@ isa_ok($spread_revolutionary_date->targets->{liberachat}->obj, 'App::SpreadRevol
 ok(!$spread_revolutionary_date->targets->{bluesky}->obj->{did}, 'Bluesky no connection with fake credentials');
 
 eval { $spread_revolutionary_date->targets->{twitter}->obj->verify_credentials };
-like($@, qr/^Invalid or expired token./, 'Twitter no connection with fake credentials');
+like($@, qr/^(?:Invalid or expired token|599 Internal Exception)/, 'Twitter no connection with fake credentials');
 
 eval { $spread_revolutionary_date->targets->{mastodon}->obj->get_account };
-like($@, qr/^Could not complete request: (?:500 Can't connect to Instance|599 Internal Exception)/, 'Mastodon no connection with fake credentials');
+like($@, qr/^Could not complete request: (?:500 Can't connect to Instance|599 Internal Exception|404 Not Found)/, 'Mastodon no connection with fake credentials');
 
 __DATA__
 

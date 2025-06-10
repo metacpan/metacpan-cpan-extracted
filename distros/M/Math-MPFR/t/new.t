@@ -4,7 +4,7 @@ use Math::MPFR qw(:mpfr);
 use Math::BigInt;
 use Config;
 
-print "1..9\n";
+print "1..17\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -201,7 +201,7 @@ eval{require Math::GMPz;};
 if(!$@) {$gmpz = 1}
 
 eval{require Math::GMP;};
-if(!$@) {$gmp = 1}
+if(!$@ && $Math::GMP::VERSION >= 2.25) {$gmp = 1}
 
 if($gmpf) {
   my $x = Math::GMPf::new(125.5);
@@ -220,6 +220,7 @@ else {
 }
 
 if($gmpq) {
+  Rmpfr_set_default_prec(53);
   my $x = Math::GMPq::new('251/2');
   my $y = Math::MPFR::new($x);
   my $z = Math::MPFR->new($x);
@@ -236,6 +237,7 @@ else {
 }
 
 if($gmpz) {
+  Rmpfr_set_default_prec(53);
   my $x = Math::GMPz::new(125.5);
   my $y = Math::MPFR::new($x);
   my $z = Math::MPFR->new($x);
@@ -245,10 +247,41 @@ if($gmpz) {
     warn "\$y: $y\n\$z: $z\n";
     print "not ok 7\n";
   }
+
+  my $mpz = Math::GMPz->new('1' . ('0' x 64), 2);
+  my $mpfr_64 = Rmpfr_init2(64);
+  $mpfr_64 = Math::MPFR->new(2 ** 64);
+
+  my $mpfr1 = Math::MPFR->new($mpz - 1);
+
+  if(Rmpfr_get_prec($mpfr1) == 53) {
+    print "ok 8\n";
+  }
+  else {
+    warn "Expected precision of 53: ", Rmpfr_get_default_prec(), "\n";
+    print "not ok 8\n";
+  }
+
+  if($mpfr1 == $mpfr_64) { print "ok 9\n" } # $mpfr1 should be rounded up to 0x1p+64
+  else { print "not ok 9\n" }
+
+  Rmpfr_set_default_rounding_mode(MPFR_RNDD);
+  my $mpfr2 = Math::MPFR->new($mpz - 1); # $mpfr2 should be rounded down to 0x1.fffffffffffffp+63
+  Rmpfr_set_default_rounding_mode(MPFR_RNDN);
+
+  if(Rmpfr_get_prec($mpfr2) == 53) {
+    print "ok 10\n";
+  }
+  else {print "not ok 10\n"}
+
+  if($mpfr2 < $mpfr_64) { print "ok 11\n" }
+  else {
+    print "not ok 11\n";
+  }
 }
 else {
-  warn "Skipping test 7 - no Math::GMPz\n";
-  print "ok 7\n";
+  warn "Skipping tests 7 to 11 - no Math::GMPz\n";
+  for(7..11) { print "ok $_\n" }
 }
 
 if($gmp) {
@@ -256,24 +289,52 @@ if($gmp) {
   my $y = Math::MPFR::new($x);
   my $z = Math::MPFR->new($x);
 
-  if($y == $z && $z == 125) {print "ok 8\n"}
+  if($y == $z && $z == 125) {print "ok 12\n"}
   else {
     warn "\$y: $y\n\$z: $z\n";
-    print "not ok 8\n";
+    print "not ok 12\n";
   }
+
+  my $mpz = Math::GMP->new(1) << 64;
+  my $mpfr_64 = Rmpfr_init2(64);
+  $mpfr_64 = Math::MPFR->new(2 ** 64);
+
+  my $mpfr1 = Math::MPFR->new($mpz - 1);
+
+  if(Rmpfr_get_prec($mpfr1) == 53) {
+    print "ok 13\n";
+  }
+  else {print "not ok 13\n"}
+
+  if($mpfr1 == $mpfr_64) { print "ok 14\n" } # $mpfr1 should be rounded up to 0x1p+64
+  else { print "not ok 14\n" }
+
+  Rmpfr_set_default_rounding_mode(MPFR_RNDD);
+  my $mpfr2 = Math::MPFR->new($mpz - 1); # $mpfr2 should be rounded down to 0x1.fffffffffffffp+63
+  Rmpfr_set_default_rounding_mode(MPFR_RNDN);
+
+  if(Rmpfr_get_prec($mpfr2) == 53) {
+    print "ok 15\n";
+  }
+  else {print "not ok 15\n";
+  }
+
+  if($mpfr2 < $mpfr_64) { print "ok 16\n" }
+  else {
+    print "not ok 16\n" }
 }
 else {
-  warn "Skipping test 8 - no Math::GMP\n";
-  print "ok 8\n";
+  warn "Skipping tests 12 to 16 - no Math::GMP or $Math::GMP::VERSION < 2.25\n";
+  for(12..16) { print "ok $_\n" }
 }
 
 my $x = Math::MPFR::new(12345.5);
 my $y = Math::MPFR::new($x);
 my $z = Math::MPFR->new($x);
 
-if($y == $z && $z == 12345.5) {print "ok 9\n"}
+if($y == $z && $z == 12345.5) {print "ok 17\n"}
 else {
   warn "\$y: $y\n\$z: $z\n";
-  print "not ok 9\n";
+  print "not ok 17\n";
 }
 

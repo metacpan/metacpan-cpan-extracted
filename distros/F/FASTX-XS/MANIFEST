@@ -1,0 +1,43 @@
+.claude/settings.local.json
+Build.PL
+Changes
+cpanfile
+demo.pl
+demo_pp.pl
+'docs/Creating a Fast FASTA_FASTQ Parser in Perl with XS.docx'
+docs/fasta-fastq-parser-xs-tutorial.md
+docs/fasta-fastq-parser-xs-tutorial.pdf
+FASTX-XS-0.0.1/Changes
+FASTX-XS-0.0.1/demo.pl
+FASTX-XS-0.0.1/demo_pp.pl
+FASTX-XS-0.0.1/kseq.h
+FASTX-XS-0.0.1/lib/FASTX/XS.pm
+FASTX-XS-0.0.1/Makefile.PL
+FASTX-XS-0.0.1/META.json
+FASTX-XS-0.0.1/META.yml
+FASTX-XS-0.0.1/README.md
+FASTX-XS-0.0.1/t/01-basic.t
+FASTX-XS-0.0.1/t/test.fa
+FASTX-XS-0.0.1/t/test.fa.gz
+FASTX-XS-0.0.1/t/test.fq
+FASTX-XS-0.0.1/t/test.fq.gz
+FASTX.c
+FASTX.o
+FASTX.xs
+kseq.h
+lib/FASTX/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+Parser.c
+Parser.o
+README.md
+t/01-basic.t
+t/test.fa
+t/test.fa.gz
+t/test.fq
+t/test.fq.gz
+XS.bs
+XS.c
+XS.o
+META.yml                                 Module YAML meta-data (added by MakeMaker)

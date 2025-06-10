@@ -168,6 +168,14 @@ diag "About to start tests...\n"; # try to find mystery Windows crash
 { my $code="Data::Dumper::Interp->new->dvis('foo') ;"; mycheck $code, 'foo',       eval $code }
 { my $code="Data::Dumper::Interp->new->ivis('foo') ;"; mycheck $code, 'foo',       eval $code }
 
+# avisl with multiple args
+{ my $code="Data::Dumper::Interp->new->avis('foo','b a r') ;"; mycheck $code, '("foo","b a r")',   eval $code }
+{ my $code="Data::Dumper::Interp->new->avisl('foo','b a r') ;"; mycheck $code, '"foo","b a r"',   eval $code }
+{ my $code="Data::Dumper::Interp->new->avisl('foo','x\"y') ;"; mycheck $code, '"foo","x\"y"',   eval $code }
+{ my $code="Data::Dumper::Interp->new->visl('b a r') ;"; mycheck $code, 'b a r',   eval $code }
+{ my $code="Data::Dumper::Interp->new->visql('b \"a r') ;"; mycheck $code, 'b "a r',   eval $code }
+{ my $code="Data::Dumper::Interp->new->visql('b \\'a r') ;"; mycheck $code, 'b \\\'a r',   eval $code }
+
 diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
 
 foreach (

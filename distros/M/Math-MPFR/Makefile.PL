@@ -117,7 +117,7 @@ unless($skip_msvc) {
     }
   }
 
-  $defines .= ' -DHAVE_FLOAT16 -DMPFR_WANT_FLOAT16=1' if $have_float16 == 1;
+  $defines .= ' -DHAVE_FLOAT16 -DMPFR_WANT_FLOAT16=1' if(defined $have_float16 && $have_float16 == 1);
 
   ############################################
   # Whether to build with _Decimal64 support #

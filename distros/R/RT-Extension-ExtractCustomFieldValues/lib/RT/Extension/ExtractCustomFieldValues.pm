@@ -9,11 +9,11 @@ RT::Extension::ExtractCustomFieldValues - extract CF values from email headers o
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4, 5.0
+Works with RT 4.0, 4.2, 4.4, 5.0, 6.0
 
 =cut
 
-our $VERSION = '3.16';
+our $VERSION = '3.17';
 
 1;
 
@@ -45,7 +45,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -230,7 +230,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2007-2020 by Best Practical Solutions, LLC.
+This software is Copyright (c) 2007-2025 by Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

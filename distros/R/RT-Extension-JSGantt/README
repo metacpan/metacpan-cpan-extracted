@@ -5,25 +5,22 @@ DESCRIPTION
     This extension uses the Starts and Due dates, along with ticket
     dependencies, to produce Gantt charts.
 
+RT VERSION
+    Works with RT 6.0 and 5.0
+
 INSTALLATION
     perl Makefile.PL
     make
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
+        Add this line to your /opt/rt6/etc/RT_SiteConfig.pm:
 
             Plugin('RT::Extension::JSGantt');
 
-        For RT 4.0, add this line:
-
-            Set(@Plugins, qw(RT::Extension::JSGantt));
-
-        or add RT::Extension::JSGantt to your existing @Plugins line.
-
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -105,7 +102,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-JSGantt>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2021 by Best Practical Solutions
+    This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
     This is free software, licensed under:
 

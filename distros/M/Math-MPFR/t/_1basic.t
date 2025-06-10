@@ -81,10 +81,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-cmp_ok($Math::MPFR::VERSION, 'eq', '4.38', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
+cmp_ok($Math::MPFR::VERSION, 'eq', '4.39', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
 
 my $xs_version = Math::MPFR::_get_xs_version();
-cmp_ok($xs_version, 'eq', '4.38', "Math::MPFR::_get_xs_version returns $xs_version as expected");
+cmp_ok($xs_version, 'eq', '4.39', "Math::MPFR::_get_xs_version returns $xs_version as expected");
 
 my $l_ver = Rmpfr_get_version();
 my $h_ver = MPFR_VERSION_STRING;

@@ -1,6 +1,10 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.50 2025-03-30T10:42:55
+0.51 2025-06-09T12:15:44
+ - Fix easter eggs url only for configured day
+ - Fix error message for cpan testers on bsd
+
+0.50 2025-03-30T10:42:55Z
  - Use link for easter egg
  - Delete debug instruction
 

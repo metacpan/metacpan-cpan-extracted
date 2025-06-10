@@ -235,6 +235,12 @@ my %tests = (
         [ 'charnames',
           'require Encode; Encode::encode("UTF-8", "\N{PILL}")',
           "\xf0\x9f\x92\x8a" ],
+        [ '__FILE__()',
+          '__FILE__ eq __FILE__()'
+          . ' && __LINE__ eq __LINE__()'
+          . '  && __PACKAGE__ eq __PACKAGE__()',
+          1
+        ]
     ],
 
     '5.014' => [

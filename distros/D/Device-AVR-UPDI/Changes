@@ -1,5 +1,16 @@
 Revision history for Device-AVR-UPDI
 
+0.17    2025-06-09
+        [CHANGES]
+         * Allow a user-specific config file to override --port and --baud
+         * Trim read flash image by truncating trailing 0xFF bytes
+         * Better handling of discontinuous input files for flash write
+         * Use Sublike::Extended v0.29 to avoid needing the `extended` keyword
+
+        [BUGFIXES]
+         * Some AVR chips have trouble writing an odd number of flash bytes;
+           pad with a trailing 0xFF if required
+
 0.16    2024-09-07
         [CHANGES]
          * Neater handling of global commandline options by Commandable,

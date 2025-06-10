@@ -1,5 +1,11 @@
 Revision history for Perl module Math::MPFR
 
+4.39
+  - Rewrite parts of "OPERATOR OVERLOADING" and "FORMATTED OUTPUT" sections in
+    MPFR.pod.
+  - Make correction and expansion in decimalize() documentation in MPFR.pod
+  - Add new test file t/overload_op_eq.t
+
 4.38
   - Enable the Rmpf_*_uj and Rmpfr_*_sj functions (except for Rmpfr_get_uj and
     Rmpfr_get_sj) for all perl configurations. Also enable Rmpfr_pown.

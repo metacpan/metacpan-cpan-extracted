@@ -94,13 +94,17 @@ if(!$@) {
       cmp_ok(ref($f1 % $z1), 'eq', 'Math::MPFR', "'%' returns Math::MPFR object");
       cmp_ok(ref($f1 % $z1), 'eq', ref($z2 % $f2), "X % Y always returns Math::MPFR object");
 
-      $z1 %= $f1;
-      $f2 %= $z2;
+      unless(MPFR_VERSION_MAJOR() < 4 && abs($z1) <= 1) {
+        $z1 %= $f1;
+        $f2 %= $z2;
 
-      cmp_ok( $z1, '==', $f2, "X %= Y is not dependent on type");
-      cmp_ok(ref($z1), 'eq', 'Math::MPFR', "'%=' returns Math::MPFR object");
-      cmp_ok(ref($z1), 'eq', ref($f2), "X %= Y always returns Math::MPFR object");
-
+        cmp_ok( $z1, '==', $f2, "X %= Y is not dependent on type");
+        cmp_ok(ref($z1), 'eq', 'Math::MPFR', "'%=' returns Math::MPFR object");
+        cmp_ok(ref($z1), 'eq', ref($f2), "X %= Y always returns Math::MPFR object");
+      }
+      else {
+       warn "Skipping '%=' a Math::GMPz test because your old MPFR library might not accommodate 1-bit precision";
+      }
     }
   }
   else { warn "Skipping Math::GMPz tests - Math-GMPz-0.63 or later is require; have only $Math::GMPz::VERSION" }

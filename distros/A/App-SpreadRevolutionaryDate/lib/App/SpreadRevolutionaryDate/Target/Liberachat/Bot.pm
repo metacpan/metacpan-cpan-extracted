@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Liberachat::Bot;
-$App::SpreadRevolutionaryDate::Target::Liberachat::Bot::VERSION = '0.50';
+$App::SpreadRevolutionaryDate::Target::Liberachat::Bot::VERSION = '0.51';
 # ABSTRACT: Subclass overloading L<Bot::BasicBot> to post a message on some Liberachat channels
 
 use Moose;
@@ -121,7 +121,7 @@ App::SpreadRevolutionaryDate::Target::Liberachat::Bot - Subclass overloading L<B
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SEE ALSO
 

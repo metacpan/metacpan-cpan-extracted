@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.50';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.51';
 # ABSTRACT: Role providing interface for localization of revolutionary date built by L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>.
 
 use Moose::Role;
@@ -116,7 +116,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale - Role providi
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

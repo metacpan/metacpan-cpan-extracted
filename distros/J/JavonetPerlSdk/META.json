@@ -4,7 +4,7 @@
       "SdNCenter Sp. z o.o"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -53,6 +53,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.5.19",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "v2.5.20",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

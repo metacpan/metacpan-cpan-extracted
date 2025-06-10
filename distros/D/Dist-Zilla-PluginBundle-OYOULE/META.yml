@@ -1,0 +1,47 @@
+---
+abstract: 'Dist::Zilla plugin configuration for Author/OYOULE'
+author:
+  - 'Oliver Youle <oliver@youle.io>'
+build_requires:
+  Dist::Zilla: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-OYOULE
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Dist::Zilla::PluginBundle::OYOULE:
+    file: lib/Dist/Zilla/PluginBundle/OYOULE.pm
+    version: v1.1.0
+requires:
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0'
+  Dist::Zilla::Plugin::UploadToDarkPAN: '0'
+  Dist::Zilla::PluginBundle::Starter: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: v5.26.0
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/Olyol95/perl-Dist-Zilla-PluginBundle-OYOULE/issues
+  repository: https://github.com/Olyol95/perl-Dist-Zilla-PluginBundle-OYOULE.git
+version: 1.1.0
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: GPL-3.0-only

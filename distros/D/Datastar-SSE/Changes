@@ -1,5 +1,9 @@
 Revision history for Datastar-SSE
 
+0.23      2025-06-09 20:31:28-0400
+          - Remove use of postfix derefercing
+0.22      2025-06-09 10:58:12-0400
+          - Remove "JSON::Types" unimport causing test failures
 0.21      2025-06-08 15:28:56-0400
           - stop mbtiny from autoscanning mytypes
 0.18      2025-06-08 15:11:46-0400

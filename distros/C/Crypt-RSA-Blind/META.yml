@@ -21,13 +21,13 @@ no_index:
 provides:
   Crypt::RSA::Blind:
     file: lib/Crypt/RSA/Blind.pm
-    version: '1.029'
+    version: '1.031'
   Crypt::RSA::Blind::PubKey:
     file: lib/Crypt/RSA/Blind.pm
-    version: '1.029'
+    version: '1.031'
   Crypt::RSA::Blind::SecKey:
     file: lib/Crypt/RSA/Blind.pm
-    version: '1.029'
+    version: '1.031'
 requires:
   Carp: '1.50'
   Carp::Assert: '0.21'
@@ -38,5 +38,5 @@ requires:
   Feature::Compat::Class: '0.07'
   Math::Pari: '2.030523'
   perl: '5.026'
-version: '1.029'
+version: '1.031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

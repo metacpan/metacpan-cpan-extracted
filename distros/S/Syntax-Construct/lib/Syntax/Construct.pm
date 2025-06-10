@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.040';
+our $VERSION = '1.041';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.040' => [qw[
@@ -54,7 +54,7 @@ my %introduces = do { no warnings 'qw';
                                  split-space
                               ]],
                    '5.016' => [qw[
-                                 charnames
+                                 charnames __FILE__()
                               ]],
                    '5.014' => [qw[
                                  ?^ /r /d /l /u /a auto-deref
@@ -126,6 +126,9 @@ my %alias = (
     'regex-compile-as-unicode-strings' => '/u',
     'global-phase' => '^GLOBAL_PHASE',
     'octal-escape' => '\o',
+    # 5.016
+    '__LINE__()' => '__FILE__()',
+    '__PACKAGE__()' => '__FILE__()',
     # 5.020
     'hash-slice' => '%slice',
     'attribute-prototype' => 'attr-prototype',
@@ -302,7 +305,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.040
+Version 1.041
 
 =head1 SYNOPSIS
 
@@ -640,6 +643,12 @@ See L<perl5140delta/Single-term-prototype>.
 =head3 charnames
 
 See L<perl5160delta/use charnames is no longer needed for \N{name}>.
+
+=head3 __FILE__()
+
+See L<perl5160delta/__FILE__() Syntax>.
+
+Aliases: __LINE__() __PACKAGE__()
 
 =head2 5.018
 

@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Daje/Plugin/Apploader.pm
+minil.toml
+t/00_compile.t
+META.json
+META.yml
+MANIFEST

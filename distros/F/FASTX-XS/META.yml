@@ -1,0 +1,30 @@
+---
+abstract: 'Fast FASTA/FASTQ parser using kseq.h'
+author:
+  - 'Andrea Telatin <proch@cpan.org>'
+build_requires:
+  FASTX::Reader: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FASTX-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/quadram-institute-bioscience/fastx-xs/issues
+  homepage: https://github.com/quadram-institute-bioscience/fastx-xs
+  repository: https://github.com/quadram-institute-bioscience/fastx-xs.git
+version: v0.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

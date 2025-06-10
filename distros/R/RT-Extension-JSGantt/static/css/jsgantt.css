@@ -52,3 +52,16 @@ DIV.scroll { BORDER-RIGHT: #efefef 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #e
 DIV.scroll2 { position:relative; PADDING-RIGHT: 0px; overflow:auto ;overflow-x:scroll;overflow-y:hidden; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; WIDTH: 720px; PADDING-TOP: 0px; BACKGROUND-COLOR: #ffffff }
 
 #GanttChartDIV table { border-collapse: separate; }
+
+[data-bs-theme=dark] #GanttChartDIV #theTable > tbody > tr > td > div,
+[data-bs-theme=dark] #GanttChartDIV #theTable > tbody > tr > td > div > table > tbody> tr,
+[data-bs-theme=dark] #GanttChartDIV #theTable .yesdisplay,
+[data-bs-theme=dark] #GanttChartDIV #theTable .ghead
+{
+    background-color: var(--bs-body-bg) !important;
+}
+
+[data-bs-theme=dark] #GanttChartDIV #theTable .gheadwkend
+{
+    background-color: #3A474D !important;
+}

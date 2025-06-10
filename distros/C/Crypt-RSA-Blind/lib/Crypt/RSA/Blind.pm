@@ -3,7 +3,7 @@
 # Crypt::RSA::Blind - Blind RSA signatures
 # Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 #
-# $Id: lib/Crypt/RSA/Blind.pm v1.029 Sun Jun  8 21:48:54 EST 2025 $
+# $Id: lib/Crypt/RSA/Blind.pm v1.031 Mon Jun  9 13:22:34 EST 2025 $
 
 use warnings;
 use strict;
@@ -16,7 +16,7 @@ no warnings qw(experimental::signatures);
 class Crypt::RSA::Blind;
 
 use vars qw( $VERSION );
-our ( $VERSION ) = '$Revision: 1.029 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.031 $' =~ /\s+([\d\.]+)/;
 
 use Carp;
 use Carp::Assert;
@@ -53,12 +53,12 @@ method keygen (@args) {
 }
 
 method init () {
-  makerandom( Size => $self->get_initsize, Strength => 1, Uniform => 0 );
+  makerandom( Size => $self->get_initsize, Strength => 1, Uniform => 1 );
 }
 
 # RSABSSA methods
 
-method ssa_blind ($arg_ref) {
+method blind ($arg_ref) {
   my $n = $arg_ref->{PublicKey}->n;
   my $kbits = bitsize($n);
   my $klen = ceil($kbits/8);
@@ -89,7 +89,7 @@ method ssa_blind ($arg_ref) {
   return ($blinded_msg, $inv);
 }
 
-method ssa_blind_sign ($arg_ref) {
+method blind_sign ($arg_ref) {
   my $n = $arg_ref->{SecretKey}->n;
   my $kbits = bitsize($n);
   my $klen = ceil($kbits/8);
@@ -105,7 +105,7 @@ method ssa_blind_sign ($arg_ref) {
   my $blind_sig = i2osp($s, $klen);
 }
 
-method ssa_finalize ($arg_ref) {
+method finalize ($arg_ref) {
   my $n = $arg_ref->{PublicKey}->n;
   my $kbits = bitsize($n);
   my $klen = ceil($kbits/8);
@@ -123,7 +123,7 @@ method ssa_finalize ($arg_ref) {
   return $sig;
 }
 
-method ssa_randomize ($msg) {
+method randomize ($msg) {
   my $random = makerandom(Size => 32 * 8, Strength => 1, Uniform => 1);
   $msg = i2osp($random, 32) . $msg;
 }
@@ -165,7 +165,7 @@ method EMSA_PSS_ENCODE ($kbits, $msg, $slen, $salt) {
 
   unless ($salt) {
     $salt = '';
-    $salt = uc(unpack ('H*',i2osp(makerandom(Size => $slen * 8, Strength => 1, Uniform => 0), $slen))) if $slen;
+    $salt = uc(unpack ('H*',i2osp(makerandom(Size => $slen * 8, Strength => 1, Uniform => 1), $slen))) if $slen;
 1  }
 
   my $m_prime = chr(0) x 8 . i2osp(Math::Pari::_hex_cvt('0x' . $m_hash . $salt), $hlen + $slen);
@@ -221,7 +221,7 @@ method EMSA_PSS_VERIFY ($mhash, $em, $embits, $mgf, $slen) {
 
 method request (%arg) {
   if ($self->get_oldapi) {
-    my ($req, $blinding) = $self->ssa_blind( { PublicKey => $arg{Key}, sLen => $self->get_slen, %arg } );
+    my ($req, $blinding) = $self->blind( { PublicKey => $arg{Key}, sLen => $self->get_slen, %arg } );
     return os2ip($req);
   }
   $self->_req(%arg);
@@ -229,12 +229,12 @@ method request (%arg) {
 
 method sign (%arg) {
   my $klen = ceil(bitsize($arg{Key}->n)/8);
-  $self->get_oldapi ? os2ip($self->ssa_blind_sign( { SecretKey => $arg{Key}, BlindedMessage => i2osp($arg{Message}, $klen) } )) : $self->_sign(%arg);
+  $self->get_oldapi ? os2ip($self->blind_sign( { SecretKey => $arg{Key}, BlindedMessage => i2osp($arg{Message}, $klen) } )) : $self->_sign(%arg);
 }
 
 method unblind (%arg) {
   my $klen = ceil(bitsize($arg{Key}->n)/8);
-  $self->get_oldapi ? os2ip($self->ssa_finalize( { PublicKey => $arg{Key}, BlindSig => i2osp($arg{Signature}, $klen), sLen => $self->get_slen, %arg } )) : $self->_unblind(%arg);
+  $self->get_oldapi ? os2ip($self->finalize( { PublicKey => $arg{Key}, BlindSig => i2osp($arg{Signature}, $klen), sLen => $self->get_slen, %arg } )) : $self->_unblind(%arg);
 }
 
 method verify (%arg) {
@@ -366,8 +366,8 @@ Crypt::RSA::Blind - Blind RSA signatures
 
 =head1 VERSION
 
- $Revision: 1.029 $
- $Date: Sun Jun  8 21:48:54 EST 2025 $
+ $Revision: 1.031 $
+ $Date: Mon Jun  9 13:22:34 EST 2025 $
 
 =cut
 
@@ -386,18 +386,18 @@ Crypt::RSA::Blind - Blind RSA signatures
 
     my $slen = 48; # Salt length (in bytes). 0 for no salt.
 
-    my ($blinded_msg, $blinding) = $rsab->ssa_blind ( { PublicKey => $pubkey,
-                                                        Message => $msg,
-                                                        sLen => $slen } );
+    my ($blinded_msg, $blinding) = $rsab->blind ( { PublicKey => $pubkey,
+                                                    Message => $msg,
+                                                    sLen => $slen } );
 
-    my $blind_sig = $rsab->ssa_blind_sign( { SecretKey => $seckey,
-                                             BlindedMessage => $blinded_msg } );
+    my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey,
+                                         BlindedMessage => $blinded_msg } );
 
-    my $sig = $rsab->ssa_finalize( { PublicKey => $pubkey,
-                                     BlindSig => $blind_sig,
-                                     Blinding => $blinding,
-                                     Message => $msg,
-                                     sLen => $slen } );
+    my $sig = $rsab->finalize( { PublicKey => $pubkey,
+                                 BlindSig => $blind_sig,
+                                 Blinding => $blinding,
+                                 Message => $msg,
+                                 sLen => $slen } );
 
     print "OK\n" if try { $rsab->pss_verify( { PublicKey => $pubkey,
                                                Signature => $sig,
@@ -451,22 +451,22 @@ convenient to use initialization vectors when creating multiple
 interlaved signing requests.
 
 When using initialization vectors, the vector should be passed as the
-'Init' named argument to the ssa_blind() and ssa_finalize() methods
-(in the old deprecated interface, to the req(), and unblind()
+'Init' named argument to the blind() and finalize() methods
+(in the old deprecated interface, to the request(), and unblind()
 methods).
 
 Alternately, you can keep track of the blinding factor for each
 request in your own code. In this case, you can supply the blinding
-factor as the 'Blinding' named argument to the ssa_finalize() method,
+factor as the 'Blinding' named argument to the finalize() method,
 instead of providing an initialization vector as the 'Init' argument
-to ssa_blind() and ssa_finalize().
+to blind() and finalize().
 
 Initialization vectors are not persistent across different invocations
-of a script, so if you need to call ssa_blind() and ssa_finalize() in
+of a script, so if you need to call blind() and finalize() in
 different processes, you will need to record and persist the blinding
 factor yourself.
 
-=head2 ssa_blind
+=head2 blind
 
 Generate a blinding factor and a blinded message for signing.
 
@@ -501,7 +501,7 @@ verification.
 
 =back
 
-=head2 ssa_blind_sign
+=head2 blind_sign
 
 Generate a blind signature.
 
@@ -515,11 +515,11 @@ are required:
 
 SecretKey - The private key of the signer
 
-BlindedMessage - The blinded message from ssa_blind()
+BlindedMessage - The blinded message from blind()
 
 =back
 
-=head2 ssa_finalize
+=head2 finalize
 
 Unblind a blind signature and generate an RSASSA-PSS compatible
 signature.
@@ -534,9 +534,9 @@ are required:
 
 PublicKey - The public key of the signer
 
-BlindSig - The blind signature from ssa_blindsign()
+BlindSig - The blind signature from blind_sign()
 
-Message - The message that was provided to ssa_blind()
+Message - The message that was provided to blind()
 
 sLen - The lengh in bytes of the salt. 0 for no salt.
 
@@ -546,9 +546,9 @@ In addition, one of the following arguments is required:
 
 =over
 
-Init - The initialization vector that was provided to ssa_blind()
+Init - The initialization vector that was provided to blind()
 
-Blinding - The blinding factor that was returned by ssa_blind()
+Blinding - The blinding factor that was returned by blind()
 
 =back
 
@@ -574,7 +574,7 @@ sLen - The lengh in bytes of the salt. 0 for no salt.
 
 =back
 
-=head2 ssa_randomize
+=head2 randomize
 
 Takes a single required argument, the message to be signed, and
 returns a prepared message with a random prefix.
@@ -727,10 +727,10 @@ Other than keygen(), only the "old API" methods of Crypt::RSA::Blind
 report errors this way, when operating with their original
 implementation. See OLD API MODES above.
 
-The ssa_* methods and pss_verify() do not use the above error
-reporting method. They raise an exception on error. As do the "old
-API" methods when operating in compatibility mode (see OLD API MODES
-above).
+The blind(), blind_sign(), finalize() and pss_verify() methods do not
+use the above error reporting method. They raise an exception on
+error. As do the "old API" methods when operating in compatibility
+mode (see OLD API MODES above).
 
 =head1 AUTHOR
 

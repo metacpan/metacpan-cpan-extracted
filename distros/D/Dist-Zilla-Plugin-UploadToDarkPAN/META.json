@@ -1,0 +1,90 @@
+{
+   "abstract" : "Release to a private CPAN (a.k.a a DarkPAN)",
+   "author" : [
+      "Oliver Youle <oliver@youle.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-UploadToDarkPAN",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::PluginBundle::Starter" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.26.0",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::UploadToDarkPAN" : {
+         "file" : "lib/Dist/Zilla/Plugin/UploadToDarkPAN.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Olyol95/perl-Dist-Zilla-Plugin-UploadToDarkPAN/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Olyol95/perl-Dist-Zilla-Plugin-UploadToDarkPAN.git"
+      }
+   },
+   "version" : "1.0.0",
+   "x_generated_by_perl" : "v5.40.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "GPL-3.0-only"
+}
+

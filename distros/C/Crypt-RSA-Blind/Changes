@@ -1,5 +1,12 @@
 Revision history for Crypt::RSA::Blind
 
+1.031 Jun 9 2025
+    * Put version numbers inside quotes in Makefile.PL
+
+1.030 Jun 9 2025
+    * Remove ssa_ prefix from method names
+    * Update pod documentation
+
 1.029 Jun 8 2025
     * Include length argument in all i2osp calls
     * Catch and warn about exceptions in tests

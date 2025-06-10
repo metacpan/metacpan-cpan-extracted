@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.041   2025-06-09
+        - Add the __FILE__() syntax
+
 1.040   2025-01-20
         - Documentation link fixed (wrong letter case)
 

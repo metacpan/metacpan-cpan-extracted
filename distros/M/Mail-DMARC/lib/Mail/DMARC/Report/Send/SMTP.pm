@@ -2,7 +2,7 @@ package Mail::DMARC::Report::Send::SMTP;
 use strict;
 use warnings;
 
-our $VERSION = '1.20250203';
+our $VERSION = '1.20250610';
 
 use Carp;
 use English '-no_match_vars';
@@ -204,7 +204,7 @@ sub get_message_id {
     my ($ss, $mm, $hh, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
 
     # Generate a "random" Message-ID
-    return sprintf("<%04d%02d%02d%02d%02d.%s\@%s>\n",
+    return sprintf("<%04d%02d%02d%02d%02d.%s\@%s>",
              $year + 1900,
              $mon  + 1,
              $mday,
@@ -227,7 +227,7 @@ Mail::DMARC::Report::Send::SMTP - utility methods for sending reports via SMTP
 
 =head1 VERSION
 
-version 1.20250203
+version 1.20250610
 
 =head2 SUBJECT FIELD
 

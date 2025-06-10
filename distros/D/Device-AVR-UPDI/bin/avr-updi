@@ -2,7 +2,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
 use v5.20;
 use warnings;
@@ -73,10 +73,27 @@ hex.
 
 STDOUT->autoflush;
 
+my %configvars;
+if( -e ( my $config = "$ENV{HOME}/.avrupdirc" ) ) {
+   open my $fh, "<", $config or die "Cannot read $config - $!\n";
+   while( <$fh> ) {
+      next if m/^\s*#/;
+      chomp;
+      m/^\s*(\w+)\s*=\s*(.*)\s*$/ and
+         $configvars{$1} = $2;
+   }
+}
+
 our $PORT
    :GlobalOption("port|P=",
                  "Path to the device where the UPDI adapter is connected")
-   = "/dev/ttyUSB0";
+   = join ",", grep { defined } $configvars{port}, "/dev/ttyUSB0";
+if( $PORT =~ m/,/ ) {
+   my $chosen_port = first { -e $_ } split m/,/, $PORT;
+   defined $chosen_port or
+      die "Cannot find a UPDI port out of $PORT\n";
+   $PORT = $chosen_port;
+}
 
 our $PART
    :GlobalOption("part|p=",
@@ -85,7 +102,7 @@ our $PART
 our $BAUD
    :GlobalOption("baud|B=u",
                  "Sets a different baud rate for communications")
-   = 115200;
+   = $configvars{baud} // 115200;
 
 our $ERASE
    :GlobalOption("erase|e",
@@ -191,7 +208,8 @@ sub _generic_read
 
 sub _generic_write
 {
-   my ( $type, $data, $pagesize, $size ) = @_;
+   my ( $type, $data, $pagesize, $size, $baseaddr ) = @_;
+   $baseaddr //= 0;
 
    my $writemethod = "write_${type}_page";
    my $readmethod  = "read_${type}_page";
@@ -201,15 +219,15 @@ sub _generic_write
 
    $size = length $data;
 
-   printf STDERR "Need to write %d bytes\n", $size;
+   printf STDERR "Need to write %d bytes to %06X\n", $size, $baseaddr;
 
    my $addr = 0;
    while( $addr < $size ) {
-      my $chunk = substr $data, $addr, $pagesize;
+      my $page = substr $data, $addr, $pagesize;
 
-      $updi->$writemethod( $addr, $chunk )->get;
+      $updi->$writemethod( $baseaddr + $addr, $page )->get;
 
-      $addr += length $chunk;
+      $addr += length $page;
       printf STDERR "\rWritten %d (%.2f%%)", $addr, 100 * $addr / $size;
    }
    print STDERR "\n";
@@ -217,20 +235,20 @@ sub _generic_write
    # Verify
    $addr = 0;
    while( $addr < $size ) {
-      my $chunk = substr $data, $addr, $pagesize;
+      my $page = substr $data, $addr, $pagesize;
 
-      my $readback = $updi->$readmethod( $addr, length $chunk )->get;
-      if( $readback ne $chunk ) {
+      my $readback = $updi->$readmethod( $baseaddr + $addr, length $page )->get;
+      if( $readback ne $page ) {
          my $offset = 0;
-         $offset++ while substr( $readback, $offset, 1 ) eq substr( $chunk, $offset, 1 );
+         $offset++ while substr( $readback, $offset, 1 ) eq substr( $page, $offset, 1 );
 
          printf STDERR "\n";
          printf STDERR "Read: %v02X\n", $readback;
-         printf STDERR "Exp : %v02X\n", $chunk;
-         die sprintf "Verify failed at addr=0x%04X\n", $addr + $offset;
+         printf STDERR "Exp : %v02X\n", $page;
+         die sprintf "Verify failed at addr=0x%04X\n", $baseaddr + $addr + $offset;
       }
 
-      $addr += length $chunk;
+      $addr += length $page;
       printf STDERR "\rVerified %d (%.2f%%)", $addr, 100 * $addr / $size;
    }
    print STDERR "\n";
@@ -413,6 +431,12 @@ sub command_read_flash
    my $data = _generic_read( flash =>
       $updi->partinfo->pagesize_flash, $length );
 
+   # Hard to detect this for real but in practice just trimming the 0xFF bytes
+   # off the end is good enough
+   $data =~ s/\xFF+$//;
+
+   printf "Trimmed to %d bytes\n", length $data;
+
    $outfile->output( $data );
 }
 
@@ -430,16 +454,25 @@ sub command_write_flash
 {
    my ( $file ) = @_;
 
+   my @chunks = open_input_file( $file )->input_chunks;
+
    make_updi;
 
    $updi->erase_chip( no_reset => 1 )->get;
 
    check_signature; # TODO: Check if enable_nvmprog logic is correct
 
-   my $data = open_input_file( $file )->input;
+   foreach my $chunk ( @chunks ) {
+      my ( $baseaddr, $data ) = @$chunk;
 
-   _generic_write( flash => $data,
-      $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash );
+      # Some UPDI chips seem to have trouble writing an odd number of bytes.
+      # We'll pad the data with an extra 0xFF if so
+      $data .= "\xFF" if length($data) % 2;
+
+      _generic_write( flash => $data,
+         $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash,
+         $baseaddr );
+   }
 }
 
 =head2 read-eeprom
@@ -481,11 +514,11 @@ sub command_write_eeprom
 {
    my ( $file ) = @_;
 
+   my $data = open_input_file( $file )->input;
+
    make_updi;
 
    check_signature;
-
-   my $data = open_input_file( $file )->input;
 
    _generic_write( eeprom => $data,
       $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom );
@@ -664,6 +697,10 @@ package main::Fileformat::Binary {
       local $/;
       return scalar <$self>;
    }
+   sub input_chunks {
+      my $self = shift;
+      return [ 0, $self->input ];
+   }
 }
 
 package main::Fileformat::IntelHex {
@@ -688,7 +725,21 @@ package main::Fileformat::IntelHex {
    }
    sub input {
       my $self = shift;
+
       my $bytes = "";
+      foreach my $chunk ( $self->input_chunks ) {
+         my ( $addr, $chunkbytes ) = @$chunk;
+
+         # TODO: this presumes chunks arrive in address order with no overlaps
+         # but maybe gaps
+         $bytes .= "\xFF" x ( $addr - length $bytes );
+         $bytes .= $chunkbytes;
+      }
+      return $bytes;
+   }
+   sub input_chunks {
+      my $self = shift;
+      my @chunks; my $lastchunk;
       while( my $line = <$self> ) {
          $line =~ s/\r?\n$//; # chomp doesn't do CRLF on Linux
          next unless my ( $clen, $addr, $type, $data, $cksum ) =
@@ -700,17 +751,40 @@ package main::Fileformat::IntelHex {
          warn "Bad record length on line $.\n" and next if
             length $data != 2 * $clen;
          $data = pack "H*", $data;
-         if( $addr > length $bytes ) {
-            # TODO: at write time this could be optimised away after chip erase
-            $bytes .= "\xFF" x ( $addr - length $bytes );
+         if( $lastchunk and ( $lastchunk->[0] + length $lastchunk->[1] ) == $addr ) {
+            # merge
+            $lastchunk->[1] .= $data;
          }
-         substr( $bytes, $addr, length $data ) = $data;
+         else {
+            push @chunks, $lastchunk = [ $addr, $data ];
+         }
       }
-      return $bytes;
+      return @chunks;
    }
 }
 
 __END__
+
+=head1 CONFIG FILE
+
+If the file F<$HOME/.avrupdirc> exists, it is opened and read as lines of
+C<name = value> declarations, to define some default configuration. The
+following variables are recognised. Lines beginning with C<#> are ignored as
+comments.
+
+=over 4
+
+=item C<baud>
+
+Overrides the baud rate.
+
+=item C<port>
+
+Overrides the path to the UPDI device. This value may consist of multiple
+paths separated by commas. The first path in the list that names a device
+which actually exists is used.
+
+=back
 
 =head1 AUTHOR
 

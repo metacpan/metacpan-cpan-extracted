@@ -202,7 +202,7 @@ prec_cast q_add_fr q_cmp_fr q_div_fr q_fmod_fr q_mul_fr q_sub_fr rndna
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.38';
+    our $VERSION = '4.39';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);

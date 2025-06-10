@@ -1,0 +1,7 @@
+0.0.2   2025-06-04
+
+* Updated metadata in Makefile.PL
+
+0.0.1	2025-06-01
+
+* Initial release, FASTX parser XS

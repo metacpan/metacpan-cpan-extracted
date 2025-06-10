@@ -29,7 +29,7 @@
             "IO::Termios" : "0",
             "Object::Pad" : "0.807",
             "Object::Pad::ClassAttr::Struct" : "0.04",
-            "Sublike::Extended" : "0",
+            "Sublike::Extended" : "0.29",
             "YAML" : "0",
             "perl" : "5.026"
          }
@@ -45,7 +45,7 @@
    "provides" : {
       "Device::AVR::UPDI" : {
          "file" : "lib/Device/AVR/UPDI.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

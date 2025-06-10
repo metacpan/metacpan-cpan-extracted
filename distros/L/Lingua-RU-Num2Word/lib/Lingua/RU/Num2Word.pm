@@ -7,7 +7,7 @@ use POSIX qw/floor/;
 use Carp qw/croak/;
 
 # ABSTRACT: Numbers to words in russian (without currency, but with specified gender)
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 # AUTHORITY
 
 use Exporter qw/import/;
@@ -26,7 +26,7 @@ my %diw = (
         8  => { 0 => "восемь",             1 => 1 },
         9  => { 0 => "девять",             1 => 1 },
         10 => { 0 => "десять",             1 => 1 },
-        11 => { 0 => "одинадцать",     1 => 1 },
+        11 => { 0 => "одиннадцать",     1 => 1 },
         12 => { 0 => "двенадцать",     1 => 1 },
         13 => { 0 => "тринадцать",     1 => 1 },
         14 => { 0 => "четырнадцать", 1 => 1 },
@@ -206,7 +206,7 @@ Lingua::RU::Num2Word - Numbers to words in russian (without currency, but with s
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

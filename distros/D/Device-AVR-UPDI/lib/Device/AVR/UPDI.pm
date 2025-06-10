@@ -5,16 +5,16 @@
 
 use v5.26;
 use warnings;
-use Object::Pad 0.807;
+use Object::Pad 0.807 ':experimental(inherit_field)';
 
-package Device::AVR::UPDI 0.16;
+package Device::AVR::UPDI 0.17;
 class Device::AVR::UPDI :strict(params);
 
 use Carp;
 
 use Future::AsyncAwait;
 use Future::IO 0.03; # ->sysread_exactly
-use Sublike::Extended;
+use Sublike::Extended 'method';
 
 use File::ShareDir qw( module_dir );
 use YAML ();
@@ -83,6 +83,8 @@ provide this can be created using a USB-UART adapter, connecting the C<RX>
 line directly to the MCU's C<UPDI> pin, and connecting C<TX> via a
 current-limiting resistor of 1kohm.
 
+=for highlighter
+
    +------------+                    +-------------------+
    |         RX-|-------------+      |                   |
    | USB-UART   |             +------|-UPDI              |
@@ -92,6 +94,8 @@ current-limiting resistor of 1kohm.
 =cut
 
 =head1 CONSTRUCTORS
+
+=for highlighter language=perl
 
 =cut
 
@@ -659,7 +663,7 @@ may be required e.g. to recover from a bad C<SYSCFG0> fuse setting.
 
 =cut
 
-extended async method erase_chip ( :$no_reset = 0 )
+async method erase_chip ( :$no_reset = 0 )
 {
    await $self->key( KEY_CHIPERASE );
 
@@ -811,7 +815,7 @@ async method read_fuse ( $idx )
    return await $self->lds8( $addr );
 }
 
-role # hide from indexer
+class # hide from indexer
    Device::AVR::UPDI::_NVMCtrl {
 
    use constant {
@@ -820,8 +824,8 @@ role # hide from indexer
          NVMCTRL_STATUS_FBUSY => (1<<0),
    };
 
-   field $_updi     :reader :param;
-   field $_partinfo :reader;
+   field $_updi     :param :inheritable;
+   field $_partinfo :inheritable;
 
    ADJUST
    {
@@ -830,15 +834,15 @@ role # hide from indexer
 
    async method nvmctrl_command ( $cmd )
    {
-      await $self->updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLA, $cmd );
+      await $_updi->sts8( $_partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLA, $cmd );
    }
 
    async method await_nvm_not_busy ()
    {
       my $timeout = 50;
       while( --$timeout ) {
-         last if not( NVMCTRL_STATUS_FBUSY & await $self->updi->lds8(
-            $self->partinfo->baseaddr_nvmctrl + NVMCTRL_STATUS ) );
+         last if not( NVMCTRL_STATUS_FBUSY & await $_updi->lds8(
+            $_partinfo->baseaddr_nvmctrl + NVMCTRL_STATUS ) );
 
          await Future::IO->sleep( 0.01 );
       }
@@ -846,9 +850,9 @@ role # hide from indexer
 }
 
 class # hide from indexer
-   Device::AVR::UPDI::_NVMCtrlv0{
+   Device::AVR::UPDI::_NVMCtrlv0 {
 
-   apply Device::AVR::UPDI::_NVMCtrl;
+   inherit Device::AVR::UPDI::_NVMCtrl qw( $_updi $_partinfo );
 
    use Carp;
 
@@ -868,37 +872,35 @@ class # hide from indexer
 
    async method read_flash_page ( $addr, $len )
    {
-      return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
+      return await $_updi->ld( $_partinfo->baseaddr_flash + $addr, $len );
    }
 
    async method read_eeprom_page ( $addr, $len )
    {
-      return await $self->updi->ld( $self->partinfo->baseaddr_eeprom + $addr, $len );
+      return await $_updi->ld( $_partinfo->baseaddr_eeprom + $addr, $len );
    }
 
    async method _write_page ( $addr, $data, $wordsize, $cmd )
    {
-      my $updi = $self->updi;
-
       # clear page buffer
       await $self->nvmctrl_command( NVMCTRL_CMD_PBC );
       await $self->await_nvm_not_busy;
 
       # Disable response sig for speed
-      await $updi->set_rsd( 1 );
+      await $_updi->set_rsd( 1 );
 
       if( $wordsize == 8 ) {
-         await $updi->st8( $addr, $data );
+         await $_updi->st8( $addr, $data );
       }
       elsif( $wordsize == 16 ) {
-         await $updi->st16( $addr, $data );
+         await $_updi->st16( $addr, $data );
       }
       else {
          croak "Invalid word size";
       }
 
       # Re-enable response sig again
-      await $updi->set_rsd( 0 );
+      await $_updi->set_rsd( 0 );
 
       await $self->nvmctrl_command( $cmd );
       await $self->await_nvm_not_busy;
@@ -906,27 +908,25 @@ class # hide from indexer
 
    async method write_flash_page ( $addr, $data )
    {
-      await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_WP );
+      await $self->_write_page( $_partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_WP );
    }
 
    async method write_eeprom_page ( $addr, $data )
    {
-      await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_ERWP );
+      await $self->_write_page( $_partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_ERWP );
    }
 
    async method write_fuse ( $idx, $value )
    {
-      my $updi = $self->updi;
+      my $addr = $_partinfo->baseaddr_fuse + $idx;
 
-      my $addr = $self->partinfo->baseaddr_fuse + $idx;
-
-      my $baseaddr = $self->partinfo->baseaddr_nvmctrl;
+      my $baseaddr = $_partinfo->baseaddr_nvmctrl;
 
       # Oddly, this works but an attempt at STS16 does not. Unsure why
-      await $updi->sts8 ( $baseaddr + NVMCTRL_ADDR  , $addr & 0xFF );
-      await $updi->sts8 ( $baseaddr + NVMCTRL_ADDR+1, $addr >> 8 );
+      await $_updi->sts8 ( $baseaddr + NVMCTRL_ADDR  , $addr & 0xFF );
+      await $_updi->sts8 ( $baseaddr + NVMCTRL_ADDR+1, $addr >> 8 );
 
-      await $updi->sts8 ( $baseaddr + NVMCTRL_DATA, $value );
+      await $_updi->sts8 ( $baseaddr + NVMCTRL_DATA, $value );
 
       await $self->nvmctrl_command( NVMCTRL_CMD_WFU );
 
@@ -937,7 +937,7 @@ class # hide from indexer
 class # hide from indexer
    Device::AVR::UPDI::_NVMCtrlv2 {
 
-   apply Device::AVR::UPDI::_NVMCtrl;
+   inherit Device::AVR::UPDI::_NVMCtrl qw( $_updi $_partinfo );
 
    use Carp;
 
@@ -952,7 +952,7 @@ class # hide from indexer
 
    async method _set_flmap ( $bank )
    {
-      await $self->updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLB, $bank << 4 );
+      await $_updi->sts8( $_partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLB, $bank << 4 );
    }
 
    async method read_flash_page ( $addr, $len )
@@ -960,37 +960,35 @@ class # hide from indexer
       await $self->_set_flmap( $addr >> 15 );
       $addr &= 0x7FFF;
 
-      return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
+      return await $_updi->ld( $_partinfo->baseaddr_flash + $addr, $len );
    }
 
    async method read_eeprom_page ( $addr, $len )
    {
-      return await $self->updi->ld( $self->partinfo->baseaddr_eeprom + $addr, $len );
+      return await $_updi->ld( $_partinfo->baseaddr_eeprom + $addr, $len );
    }
 
    async method _write_page ( $addr, $data, $wordsize, $cmd )
    {
-      my $updi = $self->updi;
-
       # set page write mode
       await $self->nvmctrl_command( $cmd );
 
       # Disable response sig for speed on long data
       #  (no point on single-byte fuses)
-      await $updi->set_rsd( 1 ) if length $data > 1;
+      await $_updi->set_rsd( 1 ) if length $data > 1;
 
       if( $wordsize == 8 ) {
-         await $updi->st8( $addr, $data );
+         await $_updi->st8( $addr, $data );
       }
       elsif( $wordsize == 16 ) {
-         await $updi->st16( $addr, $data );
+         await $_updi->st16( $addr, $data );
       }
       else {
          croak "Invalid word size";
       }
 
       # Re-enable response sig again
-      await $updi->set_rsd( 0 );
+      await $_updi->set_rsd( 0 );
 
       await $self->await_nvm_not_busy;
 
@@ -1004,12 +1002,12 @@ class # hide from indexer
       await $self->_set_flmap( $addr >> 15 );
       $addr &= 0x7FFF;
 
-      await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_FLWR );
+      await $self->_write_page( $_partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_FLWR );
    }
 
    async method write_eeprom_page ( $addr, $data )
    {
-      await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_EEERWR );
+      await $self->_write_page( $_partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_EEERWR );
    }
 
    async method write_fuse ( $idx, $value )
@@ -1017,7 +1015,7 @@ class # hide from indexer
       # Fuses are written by pretending it's EEPROM
       my $data = pack "C", $value;
 
-      await $self->_write_page( $self->partinfo->baseaddr_fuse + $idx, $data, 8, NVMCTRL_CMD_EEERWR );
+      await $self->_write_page( $_partinfo->baseaddr_fuse + $idx, $data, 8, NVMCTRL_CMD_EEERWR );
    }
 }
 

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Fast FASTA/FASTQ parser using kseq.h",
+   "author" : [
+      "Andrea Telatin <proch@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FASTX-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "FASTX::Reader" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/quadram-institute-bioscience/fastx-xs/issues"
+      },
+      "homepage" : "https://github.com/quadram-institute-bioscience/fastx-xs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/quadram-institute-bioscience/fastx-xs.git",
+         "web" : "https://github.com/quadram-institute-bioscience/fastx-xs"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

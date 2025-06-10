@@ -13,7 +13,7 @@ my $build = Module::Build->new(
       'Future::AsyncAwait' => 0,
       'Object::Pad' => '0.807',
       'Object::Pad::ClassAttr::Struct' => '0.04',
-      'Sublike::Extended' => 0,
+      'Sublike::Extended' => '0.29',
 
       'Commandable' => '0.08',
       'Commandable::Finder::SubAttributes' => '0.14',

@@ -1,0 +1,91 @@
+{
+   "abstract" : "Dist::Zilla plugin configuration for Author/OYOULE",
+   "author" : [
+      "Oliver Youle <oliver@youle.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-OYOULE",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Dist::Zilla" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::UploadToDarkPAN" : "0",
+            "Dist::Zilla::PluginBundle::Starter" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.26.0",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::OYOULE" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/OYOULE.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Olyol95/perl-Dist-Zilla-PluginBundle-OYOULE/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Olyol95/perl-Dist-Zilla-PluginBundle-OYOULE.git"
+      }
+   },
+   "version" : "1.1.0",
+   "x_generated_by_perl" : "v5.40.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "GPL-3.0-only"
+}
+
