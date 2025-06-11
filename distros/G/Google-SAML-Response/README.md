@@ -5,7 +5,7 @@ Google's SSO implementation
 
 # VERSION
 
-You are currently reading the documentation for version 0.14
+You are currently reading the documentation for version 0.15
 
 # DESCRIPTION
 
@@ -40,15 +40,15 @@ passwords.
 
     # Generate SAML response
     my $saml = Google::SAML::Response->new( { 
-                               key     => $key, 
-                               login   => $login, 
-                               request => $req 
+                   key     => $key, 
+                   login   => $login, 
+                   request => $req 
                } );
     my $xml  = $saml->get_response_xml;
 
     # Alternatively, send a HTML page to the client that will redirect
-    # her to Google. You have to extract the RelayState param from the cgi
-    # environment first.
+    # her to Google. You have to extract the RelayState param from the
+    # cgi environment first.
 
     print $saml->get_google_form( $relayState );
 
@@ -56,12 +56,12 @@ passwords.
 
 You will need the following modules installed:
 
-- [Crypt::OpenSSL::RSA](https://metacpan.org/pod/Crypt::OpenSSL::RSA)
-- [Crypt::OpenSSL::Bignum](https://metacpan.org/pod/Crypt::OpenSSL::Bignum)
-- [XML::Canonical or XML::CanonicalizeXML](https://metacpan.org/pod/XML::Canonical&#x20;or&#x20;XML::CanonicalizeXML)
-- [Digest::SHA](https://metacpan.org/pod/Digest::SHA)
-- [Date::Format](https://metacpan.org/pod/Date::Format)
-- [Google::SAML::Request](https://metacpan.org/pod/Google::SAML::Request)
+- [Crypt::OpenSSL::RSA](https://metacpan.org/pod/Crypt%3A%3AOpenSSL%3A%3ARSA)
+- [Crypt::OpenSSL::Bignum](https://metacpan.org/pod/Crypt%3A%3AOpenSSL%3A%3ABignum)
+- [XML::Canonical or XML::CanonicalizeXML](https://metacpan.org/pod/XML%3A%3ACanonical%20or%20XML%3A%3ACanonicalizeXML)
+- [Digest::SHA](https://metacpan.org/pod/Digest%3A%3ASHA)
+- [Date::Format](https://metacpan.org/pod/Date%3A%3AFormat)
+- [Google::SAML::Request](https://metacpan.org/pod/Google%3A%3ASAML%3A%3ARequest)
 
 # RESOURCES
 
@@ -94,8 +94,8 @@ the signed xml later on. Parameters are passed in as a hash-reference.
 - key
 
     The path to your private key that will be used to sign the response. Currently,
-    only RSA and DSA keys without pass phrases are supported. __NOTE__: To handle DSA keys,
-    the module [Crypt::OpenSSL::DSA](https://metacpan.org/pod/Crypt::OpenSSL::DSA) needs to be installed. However,
+    only RSA and DSA keys without pass phrases are supported. **NOTE**: To handle DSA keys,
+    the module [Crypt::OpenSSL::DSA](https://metacpan.org/pod/Crypt%3A%3AOpenSSL%3A%3ADSA) needs to be installed. However,
     it is not listed as a requirement in the Makefile for Google::SAML::Response, so make
     sure it really is installed before using DSA keys.
 
@@ -112,8 +112,8 @@ the signed xml later on. Parameters are passed in as a hash-reference.
 - canonicalizer
 
     The name of the module that will be used to canonicalize parts of our xml. Currently,
-    [XML::Canonical](https://metacpan.org/pod/XML::Canonical) and [XML::CanonicalizeXML](https://metacpan.org/pod/XML::CanonicalizeXML) are
-    supported. [XML::CanonicalizeXML](https://metacpan.org/pod/XML::CanonicalizeXML) is the default.
+    [XML::Canonical](https://metacpan.org/pod/XML%3A%3ACanonical) and [XML::CanonicalizeXML](https://metacpan.org/pod/XML%3A%3ACanonicalizeXML) are
+    supported. [XML::CanonicalizeXML](https://metacpan.org/pod/XML%3A%3ACanonicalizeXML) is the default.
 
 ## get\_response\_xml
 
@@ -172,15 +172,15 @@ in debug.txt, your response will not be valid.
 
 This brings us to another issue: XML-canonicalization. There are currently two
 modules on CPAN that promise to do the work for you:
-[XML::CanonicalizeXML](https://metacpan.org/pod/XML::CanonicalizeXML) and [XML::Canonical](https://metacpan.org/pod/XML::Canonical).
+[XML::CanonicalizeXML](https://metacpan.org/pod/XML%3A%3ACanonicalizeXML) and [XML::Canonical](https://metacpan.org/pod/XML%3A%3ACanonical).
 Both can be used with Google::SAML::Response, however the default is to use the former
 because it is much easier to install. However, the latter's interface is much
 cleaner and Perl-like than the interface of the former.
 
-[XML::Canonical](https://metacpan.org/pod/XML::Canonical) uses [XML::GDOME](https://metacpan.org/pod/XML::GDOME) which has a
+[XML::Canonical](https://metacpan.org/pod/XML%3A%3ACanonical) uses [XML::GDOME](https://metacpan.org/pod/XML%3A%3AGDOME) which has a
 Makefile.PL that begs to be hacked because it insists on using the version
 of gdome that was available when Makefile.PL was written (2003) and then it still doesn't
-install without force. [XML::CanonicalizeXML](https://metacpan.org/pod/XML::CanonicalizeXML) is much easier
+install without force. [XML::CanonicalizeXML](https://metacpan.org/pod/XML%3A%3ACanonicalizeXML) is much easier
 to install, you just have to have the libxml development files installed so it will
 compile.
 
@@ -202,7 +202,7 @@ with the help of Jeremy Smith and Thiago Damasceno. Thank you!
 
 # LICENSE
 
-Copyright (c) 2008-2013 Manni Heumann. All rights reserved.
+Copyright (c) 2008-2025 Manni Heumann. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

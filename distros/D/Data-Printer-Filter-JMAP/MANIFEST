@@ -7,6 +7,8 @@ META.yml
 Makefile.PL
 README
 dist.ini
+eg/fruit-salad
+eg/jmap-request
 lib/Data/Printer/Filter/JMAP.pm
 lib/Data/Printer/Filter/JType.pm
 t/00-report-prereqs.dd

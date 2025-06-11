@@ -24,6 +24,18 @@ changes that you use, feel free to contact me.  Based on my available
 time and the time until the next release is scheduled, I will try to
 do a release any time the standards change.
 
+=head1 VERSION 3.84  (2025-06-10  sbeck)
+
+=over 5
+
+=item Fixed a packaging error
+
+For some reason, there was a problem with my 3.83 package which caused
+the module to completely disappear from CPAN.  This is a release to try
+to correct that.
+
+=back
+
 =head1 VERSION 3.83  (2025-06-01  sbeck)
 
 =over 5

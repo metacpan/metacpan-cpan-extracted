@@ -2,7 +2,7 @@ package DBIx::QuickORM::LiteralSource;
 use strict;
 use warnings;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000014';
 
 use Role::Tiny::With qw/with/;
 

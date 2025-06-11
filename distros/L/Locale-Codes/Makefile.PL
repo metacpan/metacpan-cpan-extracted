@@ -39,7 +39,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Locale::Codes",
-   VERSION          => "3.83",
+   VERSION          => "3.84",
    ABSTRACT         => "a distribution of modules to handle locale codes",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -59,112 +59,112 @@ WriteMakefile(
     ? (META_ADD => {
           provides     => {
              'Locale::Codes' => {
-                file    => 'blib/lib/Locale/Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::Constants' => {
-                file    => 'blib/lib/Locale/Codes/Constants.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Constants.pm',
+                version => '3.84',
              },
              'Locale::Codes::Country' => {
-                file    => 'blib/lib/Locale/Codes/Country.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Country.pm',
+                version => '3.84',
              },
              'Locale::Codes::Country_Codes' => {
-                file    => 'blib/lib/Locale/Codes/Country_Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Country_Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::Country_Retired' => {
-                file    => 'blib/lib/Locale/Codes/Country_Retired.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Country_Retired.pm',
+                version => '3.84',
              },
              'Locale::Codes::Currency' => {
-                file    => 'blib/lib/Locale/Codes/Currency.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Currency.pm',
+                version => '3.84',
              },
              'Locale::Codes::Currency_Codes' => {
-                file    => 'blib/lib/Locale/Codes/Currency_Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Currency_Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::Currency_Retired' => {
-                file    => 'blib/lib/Locale/Codes/Currency_Retired.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Currency_Retired.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangExt' => {
-                file    => 'blib/lib/Locale/Codes/LangExt.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangExt.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangExt_Codes' => {
-                file    => 'blib/lib/Locale/Codes/LangExt_Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangExt_Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangExt_Retired' => {
-                file    => 'blib/lib/Locale/Codes/LangExt_Retired.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangExt_Retired.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangFam' => {
-                file    => 'blib/lib/Locale/Codes/LangFam.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangFam.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangFam_Codes' => {
-                file    => 'blib/lib/Locale/Codes/LangFam_Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangFam_Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangFam_Retired' => {
-                file    => 'blib/lib/Locale/Codes/LangFam_Retired.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangFam_Retired.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangVar' => {
-                file    => 'blib/lib/Locale/Codes/LangVar.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangVar.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangVar_Codes' => {
-                file    => 'blib/lib/Locale/Codes/LangVar_Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangVar_Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::LangVar_Retired' => {
-                file    => 'blib/lib/Locale/Codes/LangVar_Retired.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/LangVar_Retired.pm',
+                version => '3.84',
              },
              'Locale::Codes::Language' => {
-                file    => 'blib/lib/Locale/Codes/Language.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Language.pm',
+                version => '3.84',
              },
              'Locale::Codes::Language_Codes' => {
-                file    => 'blib/lib/Locale/Codes/Language_Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Language_Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::Language_Retired' => {
-                file    => 'blib/lib/Locale/Codes/Language_Retired.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Language_Retired.pm',
+                version => '3.84',
              },
              'Locale::Codes::Script' => {
-                file    => 'blib/lib/Locale/Codes/Script.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Script.pm',
+                version => '3.84',
              },
              'Locale::Codes::Script_Codes' => {
-                file    => 'blib/lib/Locale/Codes/Script_Codes.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Script_Codes.pm',
+                version => '3.84',
              },
              'Locale::Codes::Script_Retired' => {
-                file    => 'blib/lib/Locale/Codes/Script_Retired.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Codes/Script_Retired.pm',
+                version => '3.84',
              },
              'Locale::Country' => {
-                file    => 'blib/lib/Locale/Country.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Country.pm',
+                version => '3.84',
              },
              'Locale::Currency' => {
-                file    => 'blib/lib/Locale/Currency.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Currency.pm',
+                version => '3.84',
              },
              'Locale::Language' => {
-                file    => 'blib/lib/Locale/Language.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Language.pm',
+                version => '3.84',
              },
              'Locale::Script' => {
-                file    => 'blib/lib/Locale/Script.pm',
-                version => '3.83',
+                file    => 'lib/Locale/Script.pm',
+                version => '3.84',
              },
 
           },

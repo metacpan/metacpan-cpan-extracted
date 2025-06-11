@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/rjbs/Data-Printer-Filter-JMAP/issues
   homepage: https://github.com/rjbs/Data-Printer-Filter-JMAP
   repository: https://github.com/rjbs/Data-Printer-Filter-JMAP.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -328,7 +328,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

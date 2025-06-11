@@ -9,7 +9,7 @@ use Config::Abstraction 0.25;
 use Log::Log4perl;
 use Params::Get 0.05;	# Import Params::Get for parameter handling
 use Readonly::Values::Syslog 0.02;
-use Sys::Syslog;	# Import Sys::Syslog for syslog support
+use Sys::Syslog 0.28;	# Import Sys::Syslog for syslog support
 use Scalar::Util 'blessed';	# Import Scalar::Util for object reference checking
 
 =head1 NAME
@@ -18,11 +18,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.18
+0.19
 
 =cut
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 SYNOPSIS
 
@@ -199,12 +199,12 @@ sub new {
 		$args{'level'} = 'warning';
 	}
 
-	my $self = {
+	# Bless and return the object
+	return bless {
 		messages => [],	# Initialize messages array
 		%args,
 		level => $syslog_values{$args{'level'}},
-	};
-	return bless $self, $class;	# Bless and return the object
+	}, $class;
 }
 
 # Internal method to log messages. This method is called by other logging methods.
@@ -257,7 +257,7 @@ sub _log
 			push @{$logger}, { level => $level, message => join('', grep defined, @messages) };
 		} elsif(ref($logger) eq 'HASH') {
 			if(my $file = $logger->{'file'}) {
-				if($file =~ /^([a-zA-Z0-9_\.\-\/\\:]+)$/) {
+				if($file =~ /^([a-zA-Z0-9_\.\-\/\\~:]+)$/) {
 					my $file = $1;	# Will untaint
 				} else {
 					Carp::croak(ref($self), ": Invalid file name: $file");
@@ -289,7 +289,7 @@ sub _log
 					join('', @messages), "\n";
 				close $fout;
 			}
-		} elsif(Scalar::Util::blessed($logger) && ($logger->can($level))) {
+		} elsif(Scalar::Util::blessed($logger) && $logger->can($level)) {
 			# If logger is an object, call the appropriate method on the object
 			# The test is because Log::Log4perl doesn't understand notice()
 			$logger->$level(@messages);
@@ -300,7 +300,17 @@ sub _log
 		push @{$self->{'array'}}, { level => $level, message => join('', grep defined, @messages) };
 	}
 	if($self->{'file'}) {
-		if(open(my $fout, '>>', $self->{'file'})) {
+		my $file = $self->{'file'};
+
+		# Untaint the file name
+		# if($file =~ /^([-\@\w.\/\\]+)$/) {
+		if($file =~ /^([a-zA-Z0-9_\.\-\/\\:~]+)$/) {
+			$file = $1;  # untainted version
+		} else {
+			croak(ref($self), ": Tainted or unsafe filename: $file");
+		}
+
+		if(open(my $fout, '>>', $file)) {
 			if(blessed($self) eq __PACKAGE__) {
 				print $fout uc($level), '> ', (caller(1))[1], '(', (caller(1))[2], ') ', join('', @messages), "\n" or
 					die "ref($self): Can't write to ", $self->{'file'}, ": $!";
@@ -313,7 +323,7 @@ sub _log
 	}
 	if(my $fout = $self->{'fd'}) {
 		print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
-			die "ref($self): Can't write to file descriptor: $!";
+			croak(ref($self), ": Can't write to file descriptor: $!");
 	}
 }
 
@@ -450,7 +460,8 @@ sub warn {
 	if($self->{syslog}) {
 		# Handle syslog-based logging
 		if(ref($self->{syslog}) eq 'HASH') {
-			Sys::Syslog::setlogsock($self->{syslog});
+			# HASH argument to setlogsocket introduced in Sys::Syslog 0.28
+			Sys::Syslog::setlogsock($self->{'syslog'});
 		}
 		openlog($self->{script_name}, 'cons,pid', 'user');
 		eval {

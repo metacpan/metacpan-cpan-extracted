@@ -5,9 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.36'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Google::SAML::Response:
     file: lib/Google/SAML/Response.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Carp: '0'
   Crypt::OpenSSL::Bignum: '0'
@@ -43,9 +43,11 @@ requires:
 resources:
   bugtracker: https://github.com/mannih/Google-SAML-Response/issues
   homepage: https://github.com/mannih/Google-SAML-Response
-  repository: git://github.com/mannih/Google-SAML-Response.git
-version: '0.14'
+  repository: https://github.com/mannih/Google-SAML-Response.git
+version: '0.15'
 x_contributors:
-  - 'manni <manni@5c52eb61-1380-4012-85c8-26fb47f1eac4>'
-  - 'Manni Heumann <heumann@strato-rz.de>'
   - 'Manni Heumann <github@lxxi.org>'
+  - 'Manni Heumann <heumann@strato-rz.de>'
+  - 'manni <manni@5c52eb61-1380-4012-85c8-26fb47f1eac4>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

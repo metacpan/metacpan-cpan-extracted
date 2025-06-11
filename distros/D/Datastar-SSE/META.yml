@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.050, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.051, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Datastar-SSE
 provides:
   Datastar::SSE:
     file: lib/Datastar/SSE.pm
-    version: '0.23'
+    version: '0.24'
   Datastar::SSE::Types:
     file: lib/Datastar/SSE/Types.pm
   Datastar::SSE::Types::TypeConstraint:
@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/tehmoth/datastar-sse/issues
   repository: https://github.com/tehmoth/datastar-sse.git
-version: '0.23'
-x_generated_by_perl: v5.32.1
+version: '0.24'
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

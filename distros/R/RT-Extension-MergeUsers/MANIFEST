@@ -29,3 +29,4 @@ README
 xt/01merge_users.t
 xt/change_email.t
 xt/collection.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MergeUsers
 
+1.11 2025-06-10
+ - Update for RT 6.0
+
 1.10 2024-09-03
  - Handle merged users in group HasMember searches
 

@@ -4,7 +4,7 @@
       "Manni Heumann (saml at lxxi dot org)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -33,14 +33,14 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -65,7 +65,7 @@
    "provides" : {
       "Google::SAML::Response" : {
          "file" : "lib/Google/SAML/Response.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -75,14 +75,17 @@
       },
       "homepage" : "https://github.com/mannih/Google-SAML-Response",
       "repository" : {
-         "url" : "git://github.com/mannih/Google-SAML-Response.git",
+         "type" : "git",
+         "url" : "https://github.com/mannih/Google-SAML-Response.git",
          "web" : "https://github.com/mannih/Google-SAML-Response"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
-      "manni <manni@5c52eb61-1380-4012-85c8-26fb47f1eac4>",
+      "Manni Heumann <github@lxxi.org>",
       "Manni Heumann <heumann@strato-rz.de>",
-      "Manni Heumann <github@lxxi.org>"
-   ]
+      "manni <manni@5c52eb61-1380-4012-85c8-26fb47f1eac4>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
 }

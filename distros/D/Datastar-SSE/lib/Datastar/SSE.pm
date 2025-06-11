@@ -2,7 +2,7 @@ package Datastar::SSE;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use JSON ();
 use HTTP::ServerEvent;
@@ -561,7 +561,7 @@ sub _datastar_event {
 
 # 0/1 to false/true
 sub _bool($) {
-	shift ? "true" : "false";
+	shift() ? "true" : "false";
 }
 
 =head1 AUTHOR

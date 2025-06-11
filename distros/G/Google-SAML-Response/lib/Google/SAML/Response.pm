@@ -13,7 +13,7 @@ Google's SSO implementation
 
 =head1 VERSION
 
-You are currently reading the documentation for version 0.14
+You are currently reading the documentation for version 0.15
 
 =head1 DESCRIPTION
 
@@ -48,15 +48,15 @@ passwords.
 
  # Generate SAML response
  my $saml = Google::SAML::Response->new( { 
-                            key     => $key, 
-                            login   => $login, 
-                            request => $req 
+                key     => $key, 
+                login   => $login, 
+                request => $req 
             } );
  my $xml  = $saml->get_response_xml;
 
  # Alternatively, send a HTML page to the client that will redirect
- # her to Google. You have to extract the RelayState param from the cgi
- # environment first.
+ # her to Google. You have to extract the RelayState param from the
+ # cgi environment first.
 
  print $saml->get_google_form( $relayState );
 
@@ -115,7 +115,7 @@ use Carp;
 use HTML::Entities;
 
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head2 new
 
@@ -165,10 +165,10 @@ supported. L<XML::CanonicalizeXML|XML::CanonicalizeXML> is the default.
 
 
 sub new {
-    my $class = shift;
-
+    my $class  = shift;
     my $params = shift;
-    my $self = {};
+
+    my $self = bless {}, $class;
 
     foreach my $required ( qw/ request key login / ) {
         if ( exists $params->{ $required } ) {
@@ -178,8 +178,6 @@ sub new {
             confess "You need to provide the $required parameter!";
         }
     }
-
-    bless $self, $class;
 
     my $request = Google::SAML::Request->new_from_string( $self->{ request } );
 
@@ -196,19 +194,18 @@ sub new {
     else {
         return;
     }
-
 }
 
 
 sub _load_dsa_key {
-    my $self = shift;
+    my $self     = shift;
     my $key_text = shift;
 
     eval {
         require Crypt::OpenSSL::DSA;
     };
 
-    confess "Crypt::OpenSSL::DSA needs to be installed so that we can handle DSA keys." if $@;
+    confess 'Crypt::OpenSSL::DSA needs to be installed so that we can handle DSA keys.' if $@;
 
     my $dsa_key = Crypt::OpenSSL::DSA->read_priv_key_str( $key_text );
 
@@ -223,39 +220,39 @@ sub _load_dsa_key {
         $self->{ key_type } = 'dsa';
     }
     else {
-        confess "did not get a new Crypt::OpenSSL::RSA object";
+        confess 'did not get a new Crypt::OpenSSL::RSA object';
     }
 }
 
 
 sub _load_rsa_key {
-    my $self = shift;
+    my $self     = shift;
     my $key_text = shift;
 
-    my $rsaKey = Crypt::OpenSSL::RSA->new_private_key( $key_text );
+    my $rsa_key = Crypt::OpenSSL::RSA->new_private_key( $key_text );
 
-    if ( $rsaKey ) {
-        $rsaKey->use_pkcs1_padding;
-        $self->{ key_obj } = $rsaKey;
+    if ( $rsa_key ) {
+        $self->{ key_obj } = $rsa_key;
 
-        my $bigNum = ( $rsaKey->get_key_parameters )[ 1 ];
-        my $bin = $bigNum->to_bin;
+        my $big_num = ( $rsa_key->get_key_parameters )[ 1 ];
+        my $bin = $big_num->to_bin;
         my $exp = encode_base64( $bin, '' );
 
-        $bigNum = ( $rsaKey->get_key_parameters )[ 0 ];
-        $bin = $bigNum->to_bin;
+        $big_num = ( $rsa_key->get_key_parameters )[ 0 ];
+        $bin = $big_num->to_bin;
         my $mod = encode_base64( $bin, '' );
         $self->{ KeyInfo }  = "<KeyInfo><KeyValue><RSAKeyValue><Modulus>$mod</Modulus><Exponent>$exp</Exponent></RSAKeyValue></KeyValue></KeyInfo>";
         $self->{ key_type } = 'rsa';
     }
     else {
-        confess "did not get a new Crypt::OpenSSL::RSA object";
+        confess 'did not get a new Crypt::OpenSSL::RSA object';
     }
 }
 
 
 sub _load_key {
     my $self = shift;
+
     my $file = $self->{ key };
 
     if ( open my $KEY, '<', $file ) {
@@ -362,41 +359,41 @@ sub get_response_xml {
 
 
 sub _signature_xml {
-    my $self = shift;
-    my $signed_info = shift;
+    my $self            = shift;
+    my $signed_info     = shift;
     my $signature_value = shift;
 
-    return qq{<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
-            $signed_info
-            <SignatureValue>$signature_value</SignatureValue>
-            $self->{ KeyInfo }
-        </Signature>};
+    return qq|<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        $signed_info
+        <SignatureValue>$signature_value</SignatureValue>
+        $self->{ KeyInfo }
+    </Signature>|;
 }
 
 
 sub _signedinfo_xml {
-    my $self = shift;
+    my $self       = shift;
     my $digest_xml = shift;
 
-    return qq{<SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+    return qq|<SignedInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
                 <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments" />
                 <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#$self->{ key_type }-sha1" />
                 $digest_xml
-            </SignedInfo>};
+            </SignedInfo>|;
 }
 
 
 sub _reference_xml {
-    my $self = shift;
+    my $self   = shift;
     my $digest = shift;
 
-    return qq{<Reference URI="">
+    return qq|<Reference URI="">
                         <Transforms>
                             <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
                         </Transforms>
                         <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
                         <DigestValue>$digest</DigestValue>
-                    </Reference>};
+                    </Reference>|;
 }
 
 
@@ -415,7 +412,7 @@ sub _canonicalize_xml {
         return XML::CanonicalizeXML::canonicalize( $xml, $xpath, [], 0, 0 );
     }
     else {
-        confess "Unknown XML canonicalizer module.";
+        confess 'Unknown XML canonicalizer module.';
     }
 }
 
@@ -425,7 +422,7 @@ sub _response_xml {
 
     # A 160-bit string containing a set of randomly generated characters.
     # The ID MUST start with a character
-    my $response_id   = sprintf 'GOSAML0d%04d', time, rand(10000);
+    my $response_id = sprintf 'GOSAML%0d%04d', time, rand( 10000 );
 
     # A timestamp indicating the date and time that the SAML response was generated
     # Bsp: 2006-08-17T10:05:29Z
@@ -434,7 +431,7 @@ sub _response_xml {
     my $issue_instant = time2str( "%Y-%m-%dT%XZ", time, 'UTC' );
 
     # A 160-bit string containing a set of randomly generated characters.
-    my $assertion_id  = sprintf 'GOSAML%010d%04d', time, rand(10000);
+    my $assertion_id = sprintf 'GOSAML%010d%04d', time, rand( 10000 );
 
     # The acs url
     my $assertion_url = $self->{ service_url };
@@ -443,7 +440,7 @@ sub _response_xml {
     my $username      = $self->{ login };
 
     # A timestamp identifying the date and time after which the SAML response is deemed invalid.
-    my $best_before   = time2str( "%Y-%m-%dT%XZ", time + $self->{ ttl }, 'UTC' );
+    my $best_before   = time2str( '%Y-%m-%dT%XZ', time + $self->{ ttl }, 'UTC' );
 
     # A timestamp indicating the date and time that you authenticated the user.
     my $authn_instant = $issue_instant;
@@ -451,7 +448,7 @@ sub _response_xml {
     my $request_id    = $self->{ request_id };
 
     return
-        qq{<samlp:Response xmlns="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" ID="$response_id" IssueInstant="$issue_instant" Version="2.0">
+        qq|<samlp:Response xmlns="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" ID="$response_id" IssueInstant="$issue_instant" Version="2.0">
         <samlp:Status>
            <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"></samlp:StatusCode>
         </samlp:Status>
@@ -479,7 +476,7 @@ sub _response_xml {
            </AuthnStatement>
         </Assertion>
     </samlp:Response>
-};
+|;
 }
 
 
@@ -528,6 +525,9 @@ sub get_google_form {
 }
 
 
+1;
+
+__END__
 
 =head1 REMARKS
 
@@ -580,12 +580,9 @@ with the help of Jeremy Smith and Thiago Damasceno. Thank you!
 
 =head1 LICENSE
 
-Copyright (c) 2008-2013 Manni Heumann. All rights reserved.
+Copyright (c) 2008-2025 Manni Heumann. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
-
-
-1;

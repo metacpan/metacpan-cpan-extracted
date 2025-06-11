@@ -4,7 +4,7 @@ App::Greple::xp - extended pattern module
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,16 @@ Lines start with hash mark (C<#>) is ignored as a comment line.
 String after double slash (C<//>) is also ignored with preceding
 spaces.
 
+=head2 MULTILINE REGEX
+
+Complex pattern can be written on multiple lines as follows.
+
+    (?xxn) \
+    ( (?<b>\[) | \@ )   # start with "[" or @             \
+    (?<n> [ \d : , ]+)  # sequence of digit, ":", or ","  \
+    (?(<b>) \] | )      # closing "]" if start with "["   \
+    $                   # EOL
+
 =head2 WILD CARD
 
 Because I<file> parameter is globbed, you can use wild card to give
@@ -76,7 +86,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2019- Kazumasa Utashiro.
+Copyright 2019-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -90,7 +100,7 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 use Exporter 'import';
 our @EXPORT = qw(&xp_pattern_file);
@@ -115,8 +125,8 @@ sub xp_pattern_file {
     my @r;
     for my $file (@files) {
 	open my $fh, $file or die "$file: $!";
-	while (my $p = <$fh>) {
-	    $p =~ s/\R\z//;
+	my @p = map s/\\(?=\R)//gr, split /(?<!\\)\R/, do { local $/; <$fh> };
+	for my $p (@p) {
 	    if ($opt{hash_comment} and !$opt{fixed}) {
 		next if $p =~ /^\s*#/;
 	    }

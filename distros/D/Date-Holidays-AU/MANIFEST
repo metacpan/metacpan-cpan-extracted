@@ -1,5 +1,6 @@
 MANIFEST
 README
+README.md
 Makefile.PL
 Changes
 t/test.t

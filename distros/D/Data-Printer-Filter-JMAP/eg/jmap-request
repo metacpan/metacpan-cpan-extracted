@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+use v5.36.0;
+use lib 'lib';
+use utf8;
+
+binmode *STDOUT, ':encoding(UTF-8)';
+binmode *STDERR, ':encoding(UTF-8)';
+
+use Data::Printer;
+
+use HTTP::Response;
+use JMAP::Tester::Response;
+use JMAP::Tester::Result::Failure;
+use JSON::Typist;
+use JSON::XS;
+
+my $typist = JSON::Typist->new;
+
+my $response = JMAP::Tester::Response->new({
+  http_response => HTTP::Response->new(
+    200,
+    'OK',
+    [ 'Content-Type', 'application/json' ],
+    "{...}",
+  ),
+  wrapper_properties => { foo => 1 },
+  items => [
+    [
+      'Dessert/eat', {
+        isPie => JSON::XS::true(),
+        qty   => $typist->number(10),
+        type  => $typist->string('pumpkin'),
+      },
+      'a'
+    ],
+  ]
+});
+
+sub pp ($label, $value, %rest) {
+  p $value,
+    as => $label,
+    caller_message_newline => 0,
+    return_value => 'void',
+    %rest;
+}
+
+pp(data => $response);
+
+pp(data_with_http => $response, filter_jmap => { show_http => 1 });
+
+pp(one_sentence => $response->sentence_named('Dessert/eat'));
+
+my $failure = JMAP::Tester::Result::Failure->new({
+  http_response => HTTP::Response->new(
+    200,
+    'OK',
+    [ 'Content-Type', 'application/json' ],
+    "{...}",
+  ),
+});
+
+pp(failure => $failure);

@@ -19,12 +19,12 @@ no_index:
     - t
     - inc
 requires:
+  XSLoader: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/quadram-institute-bioscience/fastx-xs/issues
-  homepage: https://github.com/quadram-institute-bioscience/fastx-xs
   repository: https://github.com/quadram-institute-bioscience/fastx-xs.git
-version: v0.0.2
+version: v0.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 #! /usr/bin/perl 
 
 use Date::Holidays::AU qw( is_holiday holidays );
-use Test::More(tests => 162 );
+use Test::More(tests => 166 );
 use strict;
 use warnings;
 
@@ -48,6 +48,7 @@ eval {
 };
 ok($@ =~ /^Holidays parameter must be a reference to an array/, "Exception is thrown when the holidays parameter is not a reference to an array");
 ok(not(is_holiday(2004, 1, 7, 'TAS', { 'holidays' => ['Recreation Day']})), "Not Devonport Cup 2004");
+ok(not(is_holiday(2004, 1, 7, 'TAS')), "Not Devonport Cup 2004 (no holiday hash)");
 ok(is_holiday(2005, 1, 26, 'VIC'), "Australia Day 2005");
 ok(is_holiday(2019, 1, 28, 'VIC'), "Australia Day 2019");
 ok(is_holiday(2004, 2, 9, 'TAS', { 'holidays' => [ 'Hobart Show','Hobart Regatta' ]}), "Hobart Regatta 2004");
@@ -97,9 +98,10 @@ ok(is_holiday(2004, 6, 14, 'TAS'), "Queen's Birthday 2004");
 ok(is_holiday(2005, 6, 13, 'VIC'), "Queen's Birthday 2005");
 ok(is_holiday(2005, 6, 13, 'ACT'), "Queen's Birthday 2005");
 ok(is_holiday(2005, 6, 13, 'NT'), "Queen's Birthday 2005");
-ok(is_holiday(2007, 6, 11, 'QLD'), "Queen's Birthday 2007");
+ok(is_holiday(2007, 10, 1, 'QLD'), "Queen's Birthday 2007");
 ok(is_holiday(2006, 6, 12, 'NSW'), "Queen's Birthday 2007");
 ok(is_holiday(2006, 6, 12, 'SA'), "Queen's Birthday 2007");
+ok(is_holiday(2025, 10, 6, 'QLD'), "Queen's Birthday 2025");
 ok(not(is_holiday(2006, 6, 12, 'WA')), "Not WA Queen's Birthday 2007");
 ok(not(is_holiday(2005, 7, 1, 'NT')), "Not Alice Springs Show Day 2005");
 ok(is_holiday(2005, 7, 1, 'NT', { 'region' => 'Alice Springs' }), "Alice Springs Show Day 2005");
@@ -196,5 +198,7 @@ ok(is_holiday(2020, 10, 23, 'VIC'), "Grand Final Eve / Thank you 2020");
 ok(is_holiday(2021, 9, 24, 'VIC'), "Grand Final Eve 2021");
 ok(is_holiday(2022, 9, 23, 'VIC'), "Grand Final Eve 2022");
 ok(is_holiday(2023, 9, 29, 'VIC'), "Grand Final Eve 2023");
+ok(is_holiday(2024, 9, 27, 'VIC'), "Grand Final Eve 2023");
+ok(is_holiday(2025, 9, 26, 'VIC'), "Grand Final Eve 2023");
 eval { is_holiday($year + 2, 1, 1, 'VIC'); };
 ok($@ =~ /^Don't know how to calculate Grand Final Eve Day/, "Attempting to calculate Grand Final Eve too far in the future throws exception");

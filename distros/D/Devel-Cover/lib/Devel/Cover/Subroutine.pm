@@ -10,7 +10,7 @@ package Devel::Cover::Subroutine;
 use strict;
 use warnings;
 
-our $VERSION = '1.49'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
@@ -32,7 +32,7 @@ Devel::Cover::Subroutine - Code coverage metrics for Perl subroutines
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

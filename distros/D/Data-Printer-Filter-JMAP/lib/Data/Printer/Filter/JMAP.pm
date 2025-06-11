@@ -1,4 +1,4 @@
-package Data::Printer::Filter::JMAP 0.001;
+package Data::Printer::Filter::JMAP 0.002;
 use v5.36.0;
 
 # ABSTRACT: a Data::Printer filter for JMAP::Tester-related objects
@@ -123,7 +123,7 @@ Data::Printer::Filter::JMAP - a Data::Printer filter for JMAP::Tester-related ob
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

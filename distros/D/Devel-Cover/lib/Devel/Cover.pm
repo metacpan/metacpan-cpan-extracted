@@ -14,7 +14,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.49'; # VERSION
+  our $VERSION = '1.50'; # VERSION
 }
 
 use DynaLoader ();
@@ -130,7 +130,7 @@ BEGIN {
         my $cmd = "$^X -MData::Dumper -e " . '"print Dumper \@INC"';
         my $VAR1;
         # print STDERR "Running [$cmd]\n";
-        eval `$cmd`;  ## no critic (ProhibitStringyEval)
+        eval `$cmd`;
         @Inc = @$VAR1;
       };
       if ($@) {
@@ -378,7 +378,7 @@ sub import {
   $Initialised = 1;
 
   if ($ENV{MOD_PERL}) {
-    eval "BEGIN {}";  ## no critic (ProhibitStringyEval)
+    eval "BEGIN {}";
     check();
     set_first_init_and_end();
   }
@@ -541,6 +541,8 @@ sub use_file {
     (?:\(defined\sat\s(.+)\sline\s\d+\)) |
     (?:\[from\s(.+)\sline\s\d+\])
   /x;
+
+  return 0 unless $file && $find_filename;  # global destruction, probably
 
   # print STDERR "use_file($file)\n";
 
@@ -1354,7 +1356,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

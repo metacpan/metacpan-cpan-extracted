@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 require XSLoader;
 XSLoader::load('FASTX::XS', $VERSION);

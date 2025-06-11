@@ -26,15 +26,15 @@ no_index:
 provides:
   App::Greple::xp:
     file: lib/App/Greple/xp.pm
-    version: '1.00'
+    version: '1.01'
 requires:
-  App::Greple: '8.42'
+  App::Greple: '9.23'
   perl: v5.18.2
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-xp/issues
   homepage: https://github.com/kaz-utashiro/greple-xp
   repository: https://github.com/kaz-utashiro/greple-xp.git
-version: '1.00'
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

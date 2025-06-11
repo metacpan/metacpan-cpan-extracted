@@ -1,4 +1,4 @@
-package Data::Printer::Filter::JType 0.001;
+package Data::Printer::Filter::JType 0.002;
 use v5.36.0;
 
 # ABSTRACT: a Data::Printer filter for when you're using JSON::Typist
@@ -44,6 +44,8 @@ filter 'JSON::Typist::String' => sub {
 filter 'JSON::PP::Boolean' => sub {
   my ($object, $ddp) = @_;
 
+  $ddp->unsee($object);
+
   my $s = $object ? "true" : "false";
 
   return  $ddp->maybe_colorize($s, $s)
@@ -67,7 +69,7 @@ Data::Printer::Filter::JType - a Data::Printer filter for when you're using JSON
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

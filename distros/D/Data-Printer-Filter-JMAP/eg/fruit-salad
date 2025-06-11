@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use v5.36.0;
+use lib 'lib';
+use utf8;
+
+binmode *STDOUT, ':encoding(UTF-8)';
+binmode *STDERR, ':encoding(UTF-8)';
+
+use Data::Printer;
+
+use DateTime;
+use JSON::XS;
+use JSON::Typist;
+
+package Customized {
+  sub new {
+    bless {}, $_[0];
+  }
+
+  sub _data_printer ($self, $ddp) {
+    return $ddp->maybe_colorize('{{', 'brackets')
+         . $ddp->parse([ qw( this is Customized ) ])
+         . $ddp->maybe_colorize('}}', 'brackets');
+  }
+}
+
+my $typist = JSON::Typist->new;
+
+my $data = [
+  Customized->new,
+  {
+    a => 1,
+    b => "2",
+    c => !!0,
+    h => '"Hello!", I said.',
+    p => sub { procedure() },
+    q => "Queensrÿche",
+    s => "ASCII",
+    t => "This\thas\ttabs",
+    u => undef,
+  },
+  {
+    jtrue => JSON::XS::true(),
+    jtru2 => JSON::XS::true(),
+    jtru3 => JSON::XS::true(),
+    jnum  => $typist->number(1),
+    jstr  => $typist->string(1),
+    typist => $typist,
+  },
+  {
+    flo => DateTime->now(time_zone => 'floating'),
+    nyc => DateTime->now(time_zone => 'America/New_York'),
+    lax => DateTime->now(time_zone => 'America/Los_Angeles'),
+  },
+];
+
+sub pp ($label, $value) {
+  p $value, as => $label, caller_message_newline => 0;
+}
+
+pp(data => $data);

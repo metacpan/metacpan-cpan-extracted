@@ -1,4 +1,8 @@
 Revision history for Data-Printer-Filter-JMAP
 
+0.002     2025-06-10 09:42:16-04:00 America/New_York
+        - JSON bools now have "unsee" called so each one serializes as itself,
+          not a reference to the first time we saw a true/false previously
+
 0.001     2025-05-31 16:38:47-04:00 America/New_York
         - first version! been sitting unused for a while now…

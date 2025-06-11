@@ -1,5 +1,7 @@
 Revision history for Datastar-SSE
 
+0.24      2025-06-10 09:18:40-0400
+          - shift => shift(), fix for perl 5.20
 0.23      2025-06-09 20:31:28-0400
           - Remove use of postfix derefercing
 0.22      2025-06-09 10:58:12-0400

@@ -42,6 +42,6 @@
          "url" : "http://github.com/mirod/xmltwig"
       }
    },
-   "version" : "3.53",
+   "version" : "3.54",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

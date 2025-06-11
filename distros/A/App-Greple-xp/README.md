@@ -5,7 +5,7 @@ App::Greple::xp - extended pattern module
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # SYNOPSIS
 
@@ -45,6 +45,16 @@ Lines start with hash mark (`#`) is ignored as a comment line.
 String after double slash (`//`) is also ignored with preceding
 spaces.
 
+## MULTILINE REGEX
+
+Complex pattern can be written on multiple lines as follows.
+
+    (?xxn) \
+    ( (?<b>\[) | \@ )   # start with "[" or @             \
+    (?<n> [ \d : , ]+)  # sequence of digit, ":", or ","  \
+    (?(<b>) \] | )      # closing "]" if start with "["   \
+    $                   # EOL
+
 ## WILD CARD
 
 Because _file_ parameter is globbed, you can use wild card to give
@@ -65,7 +75,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2019- Kazumasa Utashiro.
+Copyright 2019-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

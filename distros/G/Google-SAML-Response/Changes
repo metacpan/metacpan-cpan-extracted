@@ -1,5 +1,10 @@
 Revision history for Perl module Google::SAML::Response
 
+0.15 2025-06-10T10:26:15Z
+    - Fix issues #2 and #3 (huge thanks to andk and tcleamy! and even huger
+      apologies to tcleamy for managing to not notice the issue in 7 years!).
+    - Make the code just a little bit less ugly.
+
 0.14 2014-08-16T21:31:59Z
     - This distribution is now Minilla-managed. No code changes
 

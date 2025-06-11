@@ -2,6 +2,9 @@ NAME
     RT-Extension-NonWatcherRecipients - Note when non-watchers received an
     email which RT redistributed to watchers
 
+RT VERSION
+    Works with RT 4.0, 4.2, 4.4, 5.0, 6.0
+
 DESCRIPTION
     Sometimes email addresses will be added to a thread attached to an RT
     ticket because someone wants someone else to know what's going on.
@@ -43,7 +46,7 @@ INSTALLATION
         If you are upgrading this module, check for upgrading instructions
         in case changes need to be made to your database.
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::NonWatcherRecipients');
@@ -109,7 +112,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-NonWatcherRecipients>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2013-2022 by Best Practical Solutions,
+    This software is Copyright (c) 2013-2025 by Best Practical Solutions,
     LLC
 
     This is free software, licensed under:

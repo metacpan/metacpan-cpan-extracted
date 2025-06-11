@@ -29,6 +29,8 @@ lib/DBIx/QuickORM/Join.pm
 lib/DBIx/QuickORM/Join/Row.pm
 lib/DBIx/QuickORM/Link.pm
 lib/DBIx/QuickORM/LiteralSource.pm
+lib/DBIx/QuickORM/Manual.pm
+lib/DBIx/QuickORM/Manual/Concepts.pm
 lib/DBIx/QuickORM/ORM.pm
 lib/DBIx/QuickORM/Plugin.pm
 lib/DBIx/QuickORM/Role/Async.pm
@@ -167,5 +169,4 @@ t/transactions/mysql_mariadb.sql
 t/transactions/mysql_percona.sql
 t/transactions/postgresql.sql
 t/transactions/sqlite.sql
-template.pod
 xt/author/pod-syntax.t

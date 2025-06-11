@@ -3,7 +3,7 @@ NAME
     user
 
 RT VERSION
-    Works with RT 4.0, 4.2, 4.4, 5.0.
+    Works with RT 4.0, 4.2, 4.4, 5.0, 6.0.
 
 DESCRIPTION
     This RT extension adds a "Merge Users" box to the User Administration
@@ -26,7 +26,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::MergeUsers');
@@ -38,7 +38,7 @@ INSTALLATION
         or add RT::Extension::MergeUsers to your existing @Plugins line.
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -84,6 +84,10 @@ CAVEATS
         likely to be useful if you are shredding one specific user (and all
         merged accounts).
 
+  rt-serializer
+    MergeUsers is not compatible with rt-seralizer, you need to disable the
+    extension before running rt-serializer.
+
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 
@@ -97,7 +101,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MergeUsers>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2023 by Best Practical Solutions
+    This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
     This is free software, licensed under:
 

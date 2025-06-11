@@ -8,7 +8,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::DOM;
 use Mojo::Util;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -52,11 +52,10 @@ sub register {
 package Mojolicious::Plugin::CSRF::Base;
 
 use Mojo::Base -base;
-use Crypt::Random;
 use Mojo::Util;
 
 has c              => undef;
-has generate_token => sub { sub { Mojo::Util::md5_sum( '' . Crypt::Random::makerandom( Size => 50 ) ) } };
+has generate_token => sub { sub { Mojo::Util::md5_sum( $$ . time . rand ) } };
 has token_name     => 'csrf_token';
 has header         => 'X-CSRF-Token';
 has methods        => sub { [ qw( POST PUT DELETE PATCH ) ] };
@@ -155,7 +154,7 @@ Mojolicious::Plugin::CSRF - Cross Site Request Forgery (CSRF) "prevention" Mojol
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-CSRF/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-CSRF/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CSRF/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CSRF)

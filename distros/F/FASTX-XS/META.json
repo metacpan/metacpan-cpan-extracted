@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "XSLoader" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -44,13 +45,12 @@
       "bugtracker" : {
          "web" : "https://github.com/quadram-institute-bioscience/fastx-xs/issues"
       },
-      "homepage" : "https://github.com/quadram-institute-bioscience/fastx-xs",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/quadram-institute-bioscience/fastx-xs.git",
          "web" : "https://github.com/quadram-institute-bioscience/fastx-xs"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

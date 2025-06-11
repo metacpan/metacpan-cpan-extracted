@@ -13,7 +13,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.49'; # VERSION
+  our $VERSION = '1.50'; # VERSION
 }
 
 use Devel::Cover::Html_Common qw( launch );     ## no perlimports
@@ -455,7 +455,7 @@ package Devel::Cover::Report::Html_basic::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.49'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 use base "Template::Provider";
 
@@ -814,7 +814,7 @@ Devel::Cover::Report::Html_basic - HTML backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

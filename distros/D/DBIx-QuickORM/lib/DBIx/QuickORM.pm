@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000014';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
@@ -1318,6 +1318,10 @@ With this ORM builder you can specify:
 
 =back
 
+=head1 SEE ALSO
+
+L<DBIx::QuickORM::Manual> - Documentation hub.
+
 =head1 SYNOPSIS
 
 The common use case is to create an ORM package for your app, then use that ORM
@@ -1483,141 +1487,6 @@ C<< my $orm = orm('my_orm'); >>.
 
 See L<DBIx::QuickORM::Handle> for more details on handles, which are similar to
 ResultSets from L<DBIx::Class>.
-
-=head1 ESSENTIAL CONCEPTS
-
-Knowing the basics about these concepts will help you understand how
-DBIx::QuickORM does things.
-
-=head2 DIALECTS
-
-A dielect tell DBIx::QuickORM hwo to interact with and communicate with a
-database. Not all SQL databases use identical syntax or extensions, a dialects
-job to to define behaviors a specific database understands.
-
-L<DBIx::QuickORM::Dialect> is the base class for dialects. All dialects should
-subclass this base class.
-
-It is important to pick the dialect that best matches your situation.
-L<DBIx::QuickORM::Dialect::MySQL> may work for all flavors of MySQL, but
-L<DBIx::QuickORM::Dialect::MySQL::MariaDB> will work much better if you are
-using MariaDB, as the dialect will know about additions regular mysql does not
-support.
-
-=over 4
-
-=item L<DBIx::QuickORM::Dialect::PostgreSQL>
-
-For interacting with PostgreSQL databases.
-
-=item L<DBIx::QuickORM::Dialect::SQLite>
-
-For interacting with SQLite databases.
-
-=item L<DBIx::QuickORM::Dialect::MySQL>
-
-For interacting with generic MySQL databases.
-
-=item L<DBIx::QuickORM::Dialect::MySQL::MariaDB>
-
-For interacting with MariaDB databases.
-
-=item L<DBIx::QuickORM::Dialect::MySQL::Percona>
-
-For interacting with MySQL as distributed by Percona.
-
-=item L<DBIx::QuickORM::Dialect::MySQL::Community>
-
-For interacting with the Community Edition of MySQL.
-
-=back
-
-=head2 SCHEMA
-
-This refers to L<DBIx::QuickORM::Schema>, your entire database schema/structure
-should be represented in the ORM as a schema structure consisting of
-L<DBIx::QuickORM::Schema::Table> objects, and others.
-
-=head2 AFFINITY
-
-Whenever you define a column in DBIx::QuickORM it is necessary for the ORM to
-know the I<affinity> of the column. It may be any of these:
-
-=over 4
-
-=item C<string>
-
-The column should be treated as a string when written to, or read from the
-database.
-
-=item C<numeric>
-
-The column should be treated as a number when written to, or read from the
-database.
-
-=item C<boolean>
-
-The column should be treated as a boolean when written to, or read from the
-database.
-
-=item C<binary>
-
-The column should be treated as a binary data when written to, or read from the
-database.
-
-=back
-
-Much of the time the affinity can be derived from other data. The
-L<DBIx::QuickORM::Affinity> package has an internal map for default affinities
-for many SQL types. Also if you use a class implementing
-L<DBIx::QuickORM::Role::Type> it will often provide an affinity. You can
-override the affinity if necessary. If the affinity cannot be derived you
-must specify it.
-
-=head2 CONNECTIONS
-
-There are 2 primary interfaces your application will use to interact with the
-orm/database. The first of these is the L<DBIx::QuickORM::Connection> object
-which represents a single connection to the database.
-
-This connection maintains a connection specific copy of the schema, row cache,
-async status, and transaction state. You can have more than 1 connection to a
-specific database/schema, or connections to more than one database/schema and
-they will have completely independent row caches, transaction states, and so
-on.
-
-Once you have a connection you will primarily use it to create handles that can
-be used to find or modify rows.
-
-=head2 HANDLES
-
-There are 2 primary interfaces your application will use to interact with the
-orm/database. The second of these is the L<DBIx::QuickORM::Handle> object. This
-is very similar to the L<ResultSet|DBIx::Class::ResultSet> object from
-L<DBIx::Class>, though they are not identical or directly interchangable.
-
-A handle is a combination of an L<Connection|DBIx::QuickORM::Connection> and a
-query state. The query state must include a
-L<Source|DBIx::QuickORM::Role::Source>, and may include things like a WHERE
-condition, a result limit, order-by directives, and so on.
-
-The L<Handle|DBIx::QuickORM::Handle> object is your primary interface for row
-actions such as C<insert()>, C<update()>, C<upsert()>, C<delete()>, and
-fetching 1 or more rows.
-
-=head2 ROWS
-
-When you interact with rows in the database they will usually be presented as
-instances of L<DBIx::QuickORM::Row> or a subclass of it. A row will usually be
-cached to the L<Connection|DBIx::QuickORM::Connection> that was used to fetch
-or create it.
-
-See the L</"DEFINE TABLES IN THEIR OWN PACKAGES/FILES"> section for info on how
-to create per-table row classes, which are probably what you want. Rows classes
-like this have methods added for all fields defined on the table so that you do
-can call C<< $val = $row->foo() >>, and C<< $row->foo($new_val) >> instead
-of needing to call C<< $val = $row->field('foo') >> and
-C<< $row->field(foo => $new_val) >>.
 
 =head1 RECIPES
 
@@ -2753,5 +2622,35 @@ name.
     use My::ORM qw/renamed_orm/;
 
     my $orm = renamed_orm('my_orm');
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist@cpan.orgE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
 
 =cut

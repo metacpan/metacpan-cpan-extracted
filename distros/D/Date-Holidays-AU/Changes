@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  0.34 - 10 Jun 2025
+
+      * Correcting QLD King's Birthday, improving test coverage.  Thanks to Nishchal Nishchal.
+
   0.33 - 25 Jan 2024
 
       * Adding WA King's Birthday for 2026/2027, estimating Grand Final Eve for 2025.

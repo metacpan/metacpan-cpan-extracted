@@ -13,7 +13,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.49'; # VERSION
+  our $VERSION = '1.50'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -79,7 +79,7 @@ package Devel::Cover::Report::Vim::Template::Provider;
 use strict;
 use warnings;
 
-our $VERSION = '1.49'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 use base "Template::Provider";
 
@@ -307,7 +307,7 @@ Devel::Cover::Report::Vim - Backend for displaying coverage data in Vim
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

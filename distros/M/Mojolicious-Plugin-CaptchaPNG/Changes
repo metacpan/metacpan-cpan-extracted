@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::CaptchaPNG
 
+1.05      2025-06-10 18:39:15-07:00 America/Los_Angeles
+        - Tiny POD update
+
 1.04      2025-05-18 10:47:06-07:00 America/Los_Angeles
         - Remove Math::Random::Secure dependency
 

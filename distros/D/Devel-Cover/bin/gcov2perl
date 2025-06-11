@@ -12,7 +12,7 @@ require 5.12.0;
 use strict;
 use warnings;
 
-our $VERSION = '1.49'; # VERSION
+our $VERSION = '1.50'; # VERSION
 
 use Devel::Cover::DB;
 
@@ -150,7 +150,7 @@ gcov2perl - convert gcov files to Devel::Cover databases
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

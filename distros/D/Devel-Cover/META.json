@@ -66,199 +66,199 @@
    "provides" : {
       "Devel::Cover" : {
          "file" : "lib/Devel/Cover.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Annotation::Git" : {
          "file" : "lib/Devel/Cover/Annotation/Git.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Annotation::Random" : {
          "file" : "lib/Devel/Cover/Annotation/Random.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Annotation::Svk" : {
          "file" : "lib/Devel/Cover/Annotation/Svk.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Branch" : {
          "file" : "lib/Devel/Cover/Branch.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Collection" : {
          "file" : "lib/Devel/Cover/Collection.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Collection::Template::Provider" : {
          "file" : "lib/Devel/Cover/Collection.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Condition" : {
          "file" : "lib/Devel/Cover/Condition.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Condition_and_2" : {
          "file" : "lib/Devel/Cover/Condition_and_2.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Condition_and_3" : {
          "file" : "lib/Devel/Cover/Condition_and_3.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Condition_or_2" : {
          "file" : "lib/Devel/Cover/Condition_or_2.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Condition_or_3" : {
          "file" : "lib/Devel/Cover/Condition_or_3.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Condition_xor_4" : {
          "file" : "lib/Devel/Cover/Condition_xor_4.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Criterion" : {
          "file" : "lib/Devel/Cover/Criterion.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB" : {
          "file" : "lib/Devel/Cover/DB.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::Criterion" : {
          "file" : "lib/Devel/Cover/Truth_Table.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::Digests" : {
          "file" : "lib/Devel/Cover/DB/Digests.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::File" : {
          "file" : "lib/Devel/Cover/DB/File.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::IO" : {
          "file" : "lib/Devel/Cover/DB/IO.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::IO::Base" : {
          "file" : "lib/Devel/Cover/DB/IO/Base.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::IO::JSON" : {
          "file" : "lib/Devel/Cover/DB/IO/JSON.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::IO::Sereal" : {
          "file" : "lib/Devel/Cover/DB/IO/Sereal.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::IO::Storable" : {
          "file" : "lib/Devel/Cover/DB/IO/Storable.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::Run" : {
          "file" : "lib/Devel/Cover/DB.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::DB::Structure" : {
          "file" : "lib/Devel/Cover/DB/Structure.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Html_Common" : {
          "file" : "lib/Devel/Cover/Html_Common.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Op" : {
          "file" : "lib/Devel/Cover/Op.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Pod" : {
          "file" : "lib/Devel/Cover/Pod.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Compilation" : {
          "file" : "lib/Devel/Cover/Report/Compilation.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Html" : {
          "file" : "lib/Devel/Cover/Report/Html.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Html_basic" : {
          "file" : "lib/Devel/Cover/Report/Html_basic.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Html_basic::Template::Provider" : {
          "file" : "lib/Devel/Cover/Report/Html_basic.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Html_minimal" : {
          "file" : "lib/Devel/Cover/Report/Html_minimal.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Html_subtle" : {
          "file" : "lib/Devel/Cover/Report/Html_subtle.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Html_subtle::Template::Provider" : {
          "file" : "lib/Devel/Cover/Report/Html_subtle.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Json" : {
          "file" : "lib/Devel/Cover/Report/Json.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Sort" : {
          "file" : "lib/Devel/Cover/Report/Sort.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Text" : {
          "file" : "lib/Devel/Cover/Report/Text.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Text2" : {
          "file" : "lib/Devel/Cover/Report/Text2.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Vim" : {
          "file" : "lib/Devel/Cover/Report/Vim.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Report::Vim::Template::Provider" : {
          "file" : "lib/Devel/Cover/Report/Vim.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Statement" : {
          "file" : "lib/Devel/Cover/Statement.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Subroutine" : {
          "file" : "lib/Devel/Cover/Subroutine.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Test" : {
          "file" : "lib/Devel/Cover/Test.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Time" : {
          "file" : "lib/Devel/Cover/Time.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Truth_Table" : {
          "file" : "lib/Devel/Cover/Truth_Table.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Truth_Table::Row" : {
          "file" : "lib/Devel/Cover/Truth_Table.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Util" : {
          "file" : "lib/Devel/Cover/Util.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       },
       "Devel::Cover::Web" : {
          "file" : "lib/Devel/Cover/Web.pm",
-         "version" : "1.49"
+         "version" : "1.50"
       }
    },
    "release_status" : "stable",
@@ -278,7 +278,7 @@
       "x_IRC" : "irc://irc.perl.org/#perl-qa",
       "x_mailing_list" : "https://lists.perl.org/list/perl-qa.html"
    },
-   "version" : "1.49",
+   "version" : "1.50",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040002"
@@ -538,7 +538,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.49",
+                  "tag" : "v1.50",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
