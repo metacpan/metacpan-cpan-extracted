@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.775   2025-06-11
+    - Makefile.PL: added back the 'dist' section.
+    - Code refactoring LineFold.pm.
+
 1.774   2025-04-27
     - Undone the last 'print_columns' update.
     - Optional module 'Term::Choose::LineFold::XS'.

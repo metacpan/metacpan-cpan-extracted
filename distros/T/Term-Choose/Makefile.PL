@@ -66,4 +66,9 @@ WriteMakefile(
     test  => {
         TESTS => 't/*/*.t',
     },
+    dist  => {
+        COMPRESS => 'gzip',
+        SUFFIX   => '.gz',
+        TARFLAGS => '--format=gnu -cvf',
+    },
 );

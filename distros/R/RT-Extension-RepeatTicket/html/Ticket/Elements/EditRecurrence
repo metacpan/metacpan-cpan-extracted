@@ -20,16 +20,12 @@ jQuery( function () {
         var val = jQuery(this).val();
         if ( val == 0 ) {
             jQuery('div#repeat-coexistent-number-div').removeClass('hidden');
-            jQuery('svg#lead-time-tooltip-simple').addClass('hidden');
-            jQuery('svg#lead-time-tooltip-concurrent').removeClass('hidden');
             if ( jQuery('div.repeat input[name=repeat-coexistent-number]').val() == 0 ) {
               jQuery('div.repeat input[name=repeat-coexistent-number]').val( <% RT->Config->Get('RepeatTicketCoexistentNumber') || 1 %> );
             }
         }
         else {
             jQuery('div#repeat-coexistent-number-div').addClass('hidden');
-            jQuery('svg#lead-time-tooltip-simple').removeClass('hidden');
-            jQuery('svg#lead-time-tooltip-concurrent').addClass('hidden');
             jQuery('div.repeat input[name=repeat-coexistent-number]').val(0);
         }
     } );
@@ -41,128 +37,88 @@ jQuery( function () {
 </script>
 <div class="repeat <% $ReadOnly ? 'read-only' : '' %>">
 
-  <div class="form-row">
-    <div class="label input col-4">
-      <&|/l&>Enable Recurrence:</&>
+  <&| /Elements/LabeledValue, Label => '' &>
+    <div class="form-check">
+      <input type="checkbox" id="<% $InputIdPrefix %>repeat-enabled" name="repeat-enabled" class="form-check-input" value="1" <% $ARGSRef->{'repeat-enabled'} ? ' checked="checked"': '' |n %>>
+      <label for="<% $InputIdPrefix %>repeat-enabled" class="form-check-label"><&|/l&>Enable Recurrence</&></label>
     </div>
-    <div class="value col-8">
-      <div class="form-check pl-0">
-        <div class="custom-control custom-checkbox">
-          <input type="checkbox" id="<% $InputIdPrefix %>repeat-enabled" name="repeat-enabled" class="custom-control-input" value="1" <% $ARGSRef->{'repeat-enabled'} ? ' checked="checked"': '' |n %>>
-          <label for="<% $InputIdPrefix %>repeat-enabled" class="custom-control-label"></label>
-        </div>
-      </div>
-    </div>
-  </div>
+  </&>
 
   <div class="repeat-toggle <% $ARGSRef->{'repeat-enabled'} ? '' : 'hidden' %> ">
 
-    <div class="form-row">
-      <div class="label input col-4">
-        <&|/l&>Ticket Create Mode</&>:
+    <&| /Elements/LabeledValue, Label => loc('Ticket Create Mode') &>
+      <div class="form-check form-check-inline">
+        <input type="radio" id="<% $InputIdPrefix %>repeat-create-on-recurring-date-true" name="repeat-create-on-recurring-date" class="form-check-input" value="1" <% $ARGSRef->{'repeat-create-on-recurring-date'} ? ' checked="checked"': '' |n %>>
+        <label class="form-check-label" for="<% $InputIdPrefix %>repeat-create-on-recurring-date-true"><&|/l&>Simple Mode - Ticket created on Recurring Date</&></label>
       </div>
-      <div class="value col-8">
-        <div class="form-check form-check-inline">
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-create-on-recurring-date-true" name="repeat-create-on-recurring-date" class="custom-control-input" value="1" <% $ARGSRef->{'repeat-create-on-recurring-date'} ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-create-on-recurring-date-true"><&|/l&>Simple Mode - Ticket created on Recurring Date</&></label>
-          </div>
-        </div>
 
-        <div class="form-check form-check-inline">
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-create-on-recurring-date-false" name="repeat-create-on-recurring-date" class="custom-control-input" value="0" <% $ARGSRef->{'repeat-create-on-recurring-date'} ? '' : ' checked="checked"' |n %>>
-            <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-create-on-recurring-date-false"><&|/l&>Concurrent Tickets Mode - Ticket due on Recurring Date</&></label>
-          </div>
-        </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" id="<% $InputIdPrefix %>repeat-create-on-recurring-date-false" name="repeat-create-on-recurring-date" class="form-check-input" value="0" <% $ARGSRef->{'repeat-create-on-recurring-date'} ? '' : ' checked="checked"' |n %>>
+        <label class="form-check-label" for="<% $InputIdPrefix %>repeat-create-on-recurring-date-false"><&|/l&>Concurrent Tickets Mode - Ticket due on Recurring Date</&></label>
       </div>
-    </div>
+    </&>
 
-    <div id="repeat-coexistent-number-div" class="form-row <% $ARGSRef->{'repeat-create-on-recurring-date'} ? 'hidden' : '' %>">
-      <div class="label input col-4">
-        <&|/l&>Concurrent active tickets</&>:
-      </div>
-      <div class="value col-8">
+    <div id="repeat-coexistent-number-div" class="<% $ARGSRef->{'repeat-create-on-recurring-date'} ? 'hidden' : '' %>">
+      <&| /Elements/LabeledValue, Label => loc('Concurrent active tickets') &>
         <input class="form-control" size="3" name="repeat-coexistent-number" type="text" value="<% $ARGSRef->{'repeat-coexistent-number'} %>" />
-      </div>
+      </&>
     </div>
 
-    <div class="form-row">
-      <div class="label input col-4">
-        <&|/l&>Ticket lead time (days)</&>:
-        <span id="lead-time-tooltip-simple" class="far fa-question-circle icon-helper <% $ARGSRef->{'repeat-create-on-recurring-date'} ? '' : 'hidden' %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc($lead_time_tooltip_simple) %>"></span>
-        <span id="lead-time-tooltip-concurrent" class="far fa-question-circle icon-helper <% $ARGSRef->{'repeat-create-on-recurring-date'} ? 'hidden' : '' %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc($lead_time_tooltip_concurrent) %>"></span>
-      </div>
-      <div class="value col-8">
-        <input class="form-control" size="3" name="repeat-lead-time" type="text" value="<% $ARGSRef->{'repeat-lead-time'} %>" />
-      </div>
-    </div>
+    <&| /Elements/LabeledValue, Label => loc('Ticket lead time (days)'), LabelTooltip => loc($lead_time_tooltip) &>
+      <input class="form-control" size="3" name="repeat-lead-time" type="text" value="<% $ARGSRef->{'repeat-lead-time'} %>" />
+    </&>
 
-    <div class="form-row">
-      <div class="label input col-4">
-        <&|/l&>Recurrence pattern</&>:
-      </div>
-      <div class="value col-8">
-
+    <&| /Elements/LabeledValue, Label => loc('Recurrence pattern') &>
         <div class="form-check form-check-inline">
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-type-daily" name="repeat-type" class="custom-control-input" value="daily" <% ($ARGSRef->{'repeat-type'} || '') eq 'daily' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-type-daily"><&|/l&>Daily</&></label>
-          </div>
+            <input type="radio" id="<% $InputIdPrefix %>repeat-type-daily" name="repeat-type" class="form-check-input" value="daily" <% ($ARGSRef->{'repeat-type'} || '') eq 'daily' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-type-daily"><&|/l&>Daily</&></label>
         </div>
 
         <div class="form-check form-check-inline">
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-type-weekly" name="repeat-type" class="custom-control-input" value="weekly" <% ($ARGSRef->{'repeat-type'} || '') eq 'weekly' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-type-weekly"><&|/l&>Weekly</&></label>
-          </div>
+            <input type="radio" id="<% $InputIdPrefix %>repeat-type-weekly" name="repeat-type" class="form-check-input" value="weekly" <% ($ARGSRef->{'repeat-type'} || '') eq 'weekly' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-type-weekly"><&|/l&>Weekly</&></label>
         </div>
 
         <div class="form-check form-check-inline">
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-type-monthly" name="repeat-type" class="custom-control-input" value="monthly" <% ($ARGSRef->{'repeat-type'} || '') eq 'monthly' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-type-monthly"><&|/l&>Monthly</&></label>
-          </div>
+            <input type="radio" id="<% $InputIdPrefix %>repeat-type-monthly" name="repeat-type" class="form-check-input" value="monthly" <% ($ARGSRef->{'repeat-type'} || '') eq 'monthly' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-type-monthly"><&|/l&>Monthly</&></label>
         </div>
 
         <div class="form-check form-check-inline">
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-type-yearly" name="repeat-type" class="custom-control-input" value="yearly" <% ($ARGSRef->{'repeat-type'} || '') eq 'yearly' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-type-yearly"><&|/l&>Yearly</&></label>
-          </div>
-
+            <input type="radio" id="<% $InputIdPrefix %>repeat-type-yearly" name="repeat-type" class="form-check-input" value="yearly" <% ($ARGSRef->{'repeat-type'} || '') eq 'yearly' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-type-yearly"><&|/l&>Yearly</&></label>
         </div>
 
         <div class="mt-3 repeat-details repeat-details-daily <% ($ARGSRef->{'repeat-type'} || '' ) eq 'daily' ? '' : 'hidden' %>">
 
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-daily-day" name="repeat-details-daily" class="custom-control-input" value="day" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'day' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-daily-day"><&|/l_unsafe, $input->("repeat-details-daily-day") &>Every [_1] Day(s)</&></label>
+          <div class="form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-daily-day" name="repeat-details-daily" class="form-check-input" value="day" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'day' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-daily-day"><&|/l_unsafe, $input->("repeat-details-daily-day") &>Every [_1] Day(s)</&></label>
           </div>
 
-          <div class="mt-1 custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-daily-weekday" name="repeat-details-daily" class="custom-control-input" value="weekday" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'weekday' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-details-daily-weekday"><&|/l&>Every Weekday</&></label>
+          <div class="mt-1 form-check">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-daily-weekday" name="repeat-details-daily" class="form-check-input" value="weekday" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'weekday' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-daily-weekday"><&|/l&>Every Weekday</&></label>
           </div>
 
-          <div class="mt-1 custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-daily-complete" name="repeat-details-daily" class="custom-control-input" value="complete" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-daily-complete"><&|/l_unsafe, $input->("repeat-details-daily-complete") &>Create new task [_1] day(s) after each task is completed</&></label>
+          <div class="mt-1 form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-daily-complete" name="repeat-details-daily" class="form-check-input" value="complete" <% ($ARGSRef->{'repeat-details-daily'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-daily-complete"><&|/l_unsafe, $input->("repeat-details-daily-complete") &>Create new task [_1] day(s) after each task is completed</&></label>
           </div>
 
         </div>
 
         <div class="mt-3 repeat-details repeat-details-weekly <% ($ARGSRef->{'repeat-type'} || '' ) eq 'weekly' ? '' : 'hidden' %>">
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-weekly-week" name="repeat-details-weekly" class="custom-control-input" value="week" <% ($ARGSRef->{'repeat-details-weekly'} || '') eq 'week' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-weekly-week"><&|/l_unsafe, $input->("repeat-details-weekly-week") &>Recur every [_1] week(s) on</&>:</label>
+          <div class="form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-weekly-week" name="repeat-details-weekly" class="form-check-input" value="week" <% ($ARGSRef->{'repeat-details-weekly'} || '') eq 'week' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-weekly-week"><&|/l_unsafe, $input->("repeat-details-weekly-week") &>Recur every [_1] week(s) on</&>:</label>
           </div>
 
           <div class="ml-4">
 %         for my $number ( 0 .. 6 ) {
             <div class="form-check form-check-inline">
               <div class="custom-control custom-checkbox">
-                <input id="<% $InputIdPrefix %>repeat-details-weekly-weeks-<% $week_values[$number] %>" name="repeat-details-weekly-weeks" type="checkbox" class="custom-control-input" value="<% $week_values[$number] %>"
+                <input id="<% $InputIdPrefix %>repeat-details-weekly-weeks-<% $week_values[$number] %>" name="repeat-details-weekly-weeks" type="checkbox" class="form-check-input" value="<% $week_values[$number] %>"
 %             if ( defined $ARGSRef->{'repeat-details-weekly-weeks'} && (
 %               ( ref $ARGSRef->{'repeat-details-weekly-weeks'} && grep { $_ eq $week_values[$number] }
 %               @{$ARGSRef->{'repeat-details-weekly-weeks'}} ) ||
@@ -170,83 +126,70 @@ jQuery( function () {
                   checked="checked"
 %             }
                 />
-                <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-details-weekly-weeks-<% $week_values[$number] %>"><% loc($week_labels[$number]) %></label>
+                <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-weekly-weeks-<% $week_values[$number] %>"><% loc($week_labels[$number]) %></label>
               </div>
             </div>
 %       }
           </div>
 
-          <div class="mt-1 custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-weekly-complete" name="repeat-details-weekly" class="custom-control-input" value="complete" <% ($ARGSRef->{'repeat-details-weekly'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-weekly-complete"><&|/l_unsafe, $input->("repeat-details-weekly-complete") &>Create new task [_1] week(s) after each task is completed</&></label>
+          <div class="mt-1 form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-weekly-complete" name="repeat-details-weekly" class="form-check-input" value="complete" <% ($ARGSRef->{'repeat-details-weekly'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-weekly-complete"><&|/l_unsafe, $input->("repeat-details-weekly-complete") &>Create new task [_1] week(s) after each task is completed</&></label>
           </div>
 
         </div>
 
         <div class="mt-3 repeat-details repeat-details-monthly <% ($ARGSRef->{'repeat-type'} || '' ) eq 'monthly' ? '' : 'hidden' %>">
-
-          <div class="custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-monthly-day" name="repeat-details-monthly" class="custom-control-input" value="day" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'day' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-monthly-day"><&|/l_unsafe, $input->("repeat-details-monthly-day-day"), $input->("repeat-details-monthly-day-month") &>Day [_1] of every [_2] month(s)</&></label>
+          <div class="form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-monthly-day" name="repeat-details-monthly" class="form-check-input" value="day" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'day' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-monthly-day"><&|/l_unsafe, $input->("repeat-details-monthly-day-day"), $input->("repeat-details-monthly-day-month") &>Day [_1] of every [_2] month(s)</&></label>
           </div>
 
-          <div class="mt-1 custom-control custom-radio z-index-auto">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-monthly-week" name="repeat-details-monthly" class="custom-control-input" value="week" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'week' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-monthly-week"><&|/l_unsafe, $nth->("repeat-details-monthly-week-number"), $wday->("repeat-details-monthly-week-week"), $input->("repeat-details-monthly-week-month") &>The [_1] [_2] of every [_3] month(s)</&></label>
+          <div class="mt-1 form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-monthly-week" name="repeat-details-monthly" class="form-check-input" value="week" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'week' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-monthly-week"><&|/l_unsafe, $nth->("repeat-details-monthly-week-number"), $wday->("repeat-details-monthly-week-week"), $input->("repeat-details-monthly-week-month") &>The [_1] [_2] of every [_3] month(s)</&></label>
           </div>
 
-          <div class="mt-1 custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-monthly-complete" name="repeat-details-monthly" class="custom-control-input" value="complete" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-monthly-complete"><&|/l_unsafe, $input->("repeat-details-monthly-complete") &>Create new task [_1] month(s) after each task is completed</&></label>
+          <div class="mt-1 form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-monthly-complete" name="repeat-details-monthly" class="form-check-input" value="complete" <% ($ARGSRef->{'repeat-details-monthly'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-monthly-complete"><&|/l_unsafe, $input->("repeat-details-monthly-complete") &>Create new task [_1] month(s) after each task is completed</&></label>
           </div>
 
         </div>
 
         <div class="mt-3 repeat-details repeat-details-yearly <% ($ARGSRef->{'repeat-type'} || '' ) eq 'yearly' ? '' : 'hidden' %>">
 
-          <div class="custom-control custom-radio z-index-auto">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-yearly-day" name="repeat-details-yearly" class="custom-control-input" value="day" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'day' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-yearly-day"><&|/l_unsafe, $month->("repeat-details-yearly-day-month"), $input->("repeat-details-yearly-day-day") &>Every [_1] [_2]</&></label>
+          <div class="form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-yearly-day" name="repeat-details-yearly" class="form-check-input" value="day" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'day' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-yearly-day"><&|/l_unsafe, $month->("repeat-details-yearly-day-month"), $input->("repeat-details-yearly-day-day") &>Every [_1] [_2]</&></label>
           </div>
 
-          <div class="mt-1 custom-control custom-radio z-index-auto">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-yearly-week" name="repeat-details-yearly" class="custom-control-input" value="week" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'week' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-yearly-week"><&|/l_unsafe, $nth->("repeat-details-yearly-week-number"), $wday->("repeat-details-yearly-week-week"), $month->("repeat-details-yearly-week-month") &>The [_1] [_2] of [_3]</&></label>
+          <div class="mt-1 form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-yearly-week" name="repeat-details-yearly" class="form-check-input" value="week" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'week' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-yearly-week"><&|/l_unsafe, $nth->("repeat-details-yearly-week-number"), $wday->("repeat-details-yearly-week-week"), $month->("repeat-details-yearly-week-month") &>The [_1] [_2] of [_3]</&></label>
           </div>
 
-          <div class="mt-1 custom-control custom-radio">
-            <input type="radio" id="<% $InputIdPrefix %>repeat-details-yearly-complete" name="repeat-details-yearly" class="custom-control-input" value="complete" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
-            <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-details-yearly-complete"><&|/l_unsafe, $input->("repeat-details-yearly-complete") &>Create new task [_1] year(s) after each task is completed</&></label>
+          <div class="mt-1 form-check has-text-input">
+            <input type="radio" id="<% $InputIdPrefix %>repeat-details-yearly-complete" name="repeat-details-yearly" class="form-check-input" value="complete" <% ($ARGSRef->{'repeat-details-yearly'} || '') eq 'complete' ? ' checked="checked"': '' |n %>>
+            <label class="form-check-label" for="<% $InputIdPrefix %>repeat-details-yearly-complete"><&|/l_unsafe, $input->("repeat-details-yearly-complete") &>Create new task [_1] year(s) after each task is completed</&></label>
           </div>
 
         </div>
+    </&>
 
-      </div>
-    </div>
+    <&| /Elements/LabeledValue, Label => loc('Start of recurrence'), &>
+      <& /Elements/SelectDate, Name => 'repeat-start-date', id => "${InputIdPrefix}repeat-start-date_Date", ShowTime => 0, Default => $ARGSRef->{'repeat-start-date'} || '' &>
+    </&>
 
-    <div class="form-row mt-2">
-      <div class="label input col-4">
-        <&|/l&>Start of recurrence</&>:
-      </div>
-      <div class="value col-8">
-        <& /Elements/SelectDate, Name => 'repeat-start-date', id => "${InputIdPrefix}repeat-start-date_Date", ShowTime => 0, Default => $ARGSRef->{'repeat-start-date'} || '' &>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="label input col-4">
-        <&|/l&>End of recurrence</&>:
-      </div>
-      <div class="value col-8 form-check">
-
-        <div class="custom-control custom-radio">
-          <input type="radio" id="<% $InputIdPrefix %>repeat-end-none" name="repeat-end" class="custom-control-input" value="none" <% ($ARGSRef->{'repeat-end'} || '') eq 'none' ? ' checked="checked"': '' |n %>>
-          <label class="custom-control-label" for="<% $InputIdPrefix %>repeat-end-none"><&|/l&>No end date</&></label>
+    <&| /Elements/LabeledValue, Label => loc('End of recurrence'), &>
+        <div class="form-check">
+          <input type="radio" id="<% $InputIdPrefix %>repeat-end-none" name="repeat-end" class="form-check-input" value="none" <% ($ARGSRef->{'repeat-end'} || '') eq 'none' ? ' checked="checked"': '' |n %>>
+          <label class="form-check-label" for="<% $InputIdPrefix %>repeat-end-none"><&|/l&>No end date</&></label>
         </div>
 
-        <div class="mt-1 custom-control custom-radio">
-          <input type="radio" id="<% $InputIdPrefix %>repeat-end-number" name="repeat-end" class="custom-control-input" value="number" <% ($ARGSRef->{'repeat-end'} || '') eq 'number' ? ' checked="checked"': '' |n %>>
-          <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-end-number"><&|/l_unsafe, $input->("repeat-end-number",6,10) &>End after [_1] occurrence(s)</&>
+        <div class="mt-1 form-check has-text-input">
+          <input type="radio" id="<% $InputIdPrefix %>repeat-end-number" name="repeat-end" class="form-check-input" value="number" <% ($ARGSRef->{'repeat-end'} || '') eq 'number' ? ' checked="checked"': '' |n %>>
+          <label class="form-check-label" for="<% $InputIdPrefix %>repeat-end-number"><&|/l_unsafe, $input->("repeat-end-number",6,10) &>End after [_1] occurrence(s)</&>
 %         if ( $Initial ) {
             <input name="repeat-occurrences" type="hidden" value="1">
 %         } else {
@@ -255,25 +198,23 @@ jQuery( function () {
           </label>
         </div>
 
-        <div class="mt-1 custom-control custom-radio">
-          <input type="radio" id="<% $InputIdPrefix %>repeat-end-type-date" name="repeat-end" class="custom-control-input" value="date" <% ($ARGSRef->{'repeat-end'} || '') eq 'date' ? ' checked="checked"': '' |n %>>
-          <label class="custom-control-label has-text-input" for="<% $InputIdPrefix %>repeat-end-type-date">
+        <div class="mt-1 form-check has-text-input">
+          <input type="radio" id="<% $InputIdPrefix %>repeat-end-type-date" name="repeat-end" class="form-check-input" value="date" <% ($ARGSRef->{'repeat-end'} || '') eq 'date' ? ' checked="checked"': '' |n %>>
+          <label class="form-check-label" for="<% $InputIdPrefix %>repeat-end-type-date">
             <&|/l&>End by</&>: <& /Elements/SelectDate, Name => 'repeat-end-date', id => "${InputIdPrefix}repeat-end-date_Date", ShowTime => 0, Default => $ARGSRef->{'repeat-end-date'} || '' &>
           </label>
         </div>
-
-      </div>
-    </div>
+    </&>
   </div>
 
   <div class="<% $ARGSRef->{'repeat-enabled'} && $ReadOnly && $preview_num ? '' : 'hidden' %>" id="tickets-preview">
     <&| /Widgets/TitleBox, title => loc("Recurrence Preview") &>
-      <div class="form-row" style="text-align:left;">
+      <div class="row" style="text-align:left;">
         <p>This shows the next <% $preview_num %> tickets that would be created with the current recurrence configuration.</p>
 
         <p>If the recurrence configuration uses the concurrent active tickets option or the create new task after task is complete option the preview may not be accurate as it depends on whether previously created tickets are still active.</p>
       </div>
-      <div class="form-row" style="text-align:center;">
+      <div class="row" style="text-align:center;">
         <div class="col-6">
           <span><% loc('Starts') . ( $ARGSRef->{'repeat-create-on-recurring-date'} ? ' - ' . loc('Recurring Date') : '' ) %></span>
         </div>
@@ -282,7 +223,7 @@ jQuery( function () {
         </div>
       </div>
 % foreach my $preview ( @preview_tickets ) {
-      <div class="form-row" style="text-align:center;">
+      <div class="row" style="text-align:center;">
         <div class="col-6">
           <span><% $preview->[0] %></span>
         </div>
@@ -302,8 +243,7 @@ my @week_values = qw(su mo tu we th fr sa);
 my @week_number_labels = qw(First Second Third Fourth Last); # loc_qw
 my @month_labels = qw(January February March April  May June July August September October November December); # loc_qw
 
-my $lead_time_tooltip_simple     = loc('Ticket will be due this many days after the recurring date.');
-my $lead_time_tooltip_concurrent = loc('Ticket will be created this many days before the recurring date.');
+my $lead_time_tooltip = loc('In simple mode, ticket will be due this many days after the recurring date. In concurrent mode, ticket will be created this many days before the recurring date.');
 
 my $repeat;
 if ( $Ticket ) {
@@ -348,7 +288,7 @@ my $input = sub {
 my $nth = sub {
     my ($name) = @_;
     my $escaped = $m->interp->apply_escapes($name, "h");
-    my $str = qq|<select class="form-control selectpicker" name="$escaped">|;
+    my $str = qq|<select class="form-select selectpicker w-auto d-inline-block" name="$escaped">|;
     for my $number ( 1 .. 4, -1 ) {
         $str .= qq|<option value="$number" |
               . (($ARGSRef->{$name} || '') eq $number ? 'selected="selected"' : '') . ">"
@@ -361,7 +301,7 @@ my $nth = sub {
 my $wday = sub {
     my ($name) = @_;
     my $escaped = $m->interp->apply_escapes($name, "h");
-    my $str = qq|<select class="form-control selectpicker" name="$escaped">|;
+    my $str = qq|<select class="form-select selectpicker w-auto d-inline-block" name="$escaped">|;
     for my $number ( 0 .. 6 ) {
         $str .= qq|<option value="$week_values[$number]" |
               . (($ARGSRef->{$name} || '') eq $week_values[$number] ? 'selected="selected"' : '' ) . ">"
@@ -374,7 +314,7 @@ my $wday = sub {
 my $month = sub {
     my ($name) = @_;
     my $escaped = $m->interp->apply_escapes($name, "h");
-    my $str = qq|<select class="form-control selectpicker" name="$escaped">|;
+    my $str = qq|<select class="form-select selectpicker w-auto d-inline-block" name="$escaped">|;
     for my $number ( 1 .. 12 ) {
         $str .= qq|<option value="$number" |
               . (($ARGSRef->{$name} || '') eq $number ? 'selected="selected"' : '') . ">"
@@ -456,3 +396,7 @@ $ReadOnly => undef
 $Initial => undef
 $InputIdPrefix => ''
 </%args>
+
+<%attr>
+directly_accessible => 1
+</%attr>

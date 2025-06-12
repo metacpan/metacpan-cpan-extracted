@@ -1,5 +1,10 @@
 Revision history for JMAP-Tester
 
+0.104     2025-06-11 13:28:56-04:00 America/New_York
+        - add a TO_JSON method to the Sentence class
+        - include ->sentences, not ->items in default diagnostics (which allows
+          smarter diagnostic dumpers to filter based on the class)
+
 0.103     2023-01-11 21:24:00-05:00 America/New_York
         - update distribution metadata
         - bump required Perl to v5.14.0

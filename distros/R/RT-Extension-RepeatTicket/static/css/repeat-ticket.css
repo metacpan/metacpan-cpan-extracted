@@ -1,25 +1,9 @@
-.ticket-info-repeat-recurrence .titlebox.card {
-  border-top: 3px solid #B23;
-}
-
-.repeat .form-row .form-check {
-  margin-top: 5px;
-}
-
-.repeat .custom-control-label.has-text-input::before,
-.repeat .custom-control-label.has-text-input::after {
-  top: 0.5rem;
+.repeat .form-check.has-text-input > .form-check-input {
+  margin-top: 0.7rem;
 }
 
 .repeat .form-control {
-  display: inline;
+  display: inline-block;
   width: auto;
 }
 
-.repeat .bootstrap-select > .dropdown-toggle {
-  width: auto;
-}
-
-.z-index-auto {
-  z-index: auto;
-}

@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 my %prereqs_os_specific;
 if ( $^O eq 'MSWin32' ) {
     %prereqs_os_specific = (
-        'Term::Choose::Win32' => '1.773',
+        'Term::Choose::Win32' => '1.775',
     );
 }
 
@@ -48,15 +48,12 @@ WriteMakefile(
         'File::HomeDir'          => 0,
         'File::Spec::Functions'  => 0,
         'List::Util'             => '1.33',
-        'Term::Choose'           => '1.773',
+        'Term::Choose'           => '1.775',
         %prereqs_os_specific,
     },
     dist  => {
         COMPRESS => 'gzip',
         SUFFIX   => '.gz',
         TARFLAGS => '--format=gnu -cvf',
-    },
-    clean => {
-        FILES => 'Term-Choose-Util-*',
     },
 );

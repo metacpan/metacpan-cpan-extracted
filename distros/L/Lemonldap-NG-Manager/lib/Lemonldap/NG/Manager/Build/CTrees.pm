@@ -347,6 +347,7 @@ sub cTrees {
                     'casSrvMetaDataOptionsUrl',
                     'casSrvMetaDataOptionsRenew',
                     'casSrvMetaDataOptionsGateway',
+                    'casSrvMetaDataOptionsSamlValidate',
                     'casSrvMetaDataOptionsComment'
                 ]
             },
@@ -371,7 +372,6 @@ sub cTrees {
                     'casAppMetaDataOptionsService',
                     'casAppMetaDataOptionsUserAttribute',
                     'casAppMetaDataOptionsAllowProxy',
-                    'casSrvMetaDataOptionsSamlValidate',
                     'casAppMetaDataOptionsLogout',
                     'casAppMetaDataOptionsAuthnLevel',
                     'casAppMetaDataOptionsRule',

@@ -16,7 +16,7 @@ name: MsOffice-Word-Surgeon
 provides:
   MsOffice::Word::Surgeon:
     file: lib/MsOffice/Word/Surgeon.pm
-    version: '2.10'
+    version: '2.11'
   MsOffice::Word::Surgeon::BookmarkBoundary:
     file: lib/MsOffice/Word/Surgeon/BookmarkBoundary.pm
   MsOffice::Word::Surgeon::Carp:
@@ -50,5 +50,5 @@ requires:
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/damil/MsOffice-Word-Surgeon
-version: '2.10'
+version: '2.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

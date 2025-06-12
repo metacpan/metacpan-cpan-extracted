@@ -1,0 +1,38 @@
+% $r->content_type('application/json; charset=utf-8');
+<% JSON({
+    actions => \@Actions,
+}) |n %>
+% $m->abort;
+<%ARGS>
+$id
+</%ARGS>
+<%INIT>
+my @Actions;
+
+if ( $ARGS{SubmitRecurrence} ) {
+    my $TicketObj = LoadTicket($id);
+    my @events;
+    if ( $TicketObj->CurrentUserHasRight('ModifyTicket') ) {
+        my ( $ret, $msg ) = RT::Extension::RepeatTicket::SetRepeatAttribute( $TicketObj, %ARGS );
+        if ( $ret ) {
+            push @events, 'ticketRecurrenceChanged';
+        }
+        else {
+            RT->Logger->warning("Couldn't update recurrence: $msg");
+        }
+        push @Actions, $msg;
+    }
+    else {
+        push @Actions, loc("Permission Denied");
+    }
+
+    $r->headers_out->{'HX-Trigger'} = JSON(
+        {
+            actionsChanged => { messages => \@Actions },
+            requestSucceeded => 1,
+            map { $_ => '' } @events
+        },
+        ascii => 1,
+    );
+}
+</%INIT>

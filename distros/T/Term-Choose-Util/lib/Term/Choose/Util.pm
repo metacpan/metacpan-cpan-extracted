@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '0.145';
+our $VERSION = '0.146';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -247,7 +247,7 @@ sub __prepare_path {
     if ( ! -d $init_dir_fs ) {
         croak "Could not find the home directory.";
     }
-    my $dir_fs = realpath $init_dir_fs;
+    my $dir_fs = realpath( $init_dir_fs ) or die "$init_dir_fs: $!";
     my $dir = decode( 'locale_fs', $dir_fs );
     return $dir;
 }
@@ -258,7 +258,7 @@ sub __available_dirs {
     my $dir_fs = encode( 'locale_fs', $dir );
     my $dh;
     if ( ! eval {
-        opendir( $dh, $dir_fs ) or croak $!;
+        opendir( $dh, $dir_fs ) or croak "$dir_fs: $!";
         1 }
     ) {
         print "$@";
@@ -429,7 +429,7 @@ sub __choose_a_path {
         my ( $dh, @dirs );
         my $dir_fs = encode( 'locale_fs', $dir );
         if ( ! eval {
-            opendir( $dh, $dir_fs ) or croak $!;
+            opendir( $dh, $dir_fs ) or croak "$dir_fs: $!";
             1 }
         ) {
             print "$@";
@@ -492,7 +492,7 @@ sub __a_file {
                 @files_fs = map { basename $_} grep { -e $_ } glob( encode( 'locale_fs', catfile $dir, $self->{filter} ) );
             }
             else {
-                opendir( my $dh, $dir_fs ) or croak $!;
+                opendir( my $dh, $dir_fs ) or croak "$dir_fs: $!";
                 @files_fs = readdir $dh;
                 closedir $dh;
             }
@@ -950,7 +950,7 @@ sub unicode_sprintf {
         $str =~ s/${\PH}//g;
         $str =~ s/(${\SGR_ES})/push( @color, $1 ) && ${\PH}/ge;
     }
-    my $str_w = print_columns( $str, $avail_w + 1 );
+    my $str_w = print_columns( $str );
     if ( $str_w > $avail_w ) {
         if ( @{$opt->{suffix_on_truncate}||[]} ) {
             $str = cut_to_printwidth( $str, $avail_w - $opt->{suffix_on_truncate}[1] ) . $opt->{suffix_on_truncate}[0];
@@ -1002,7 +1002,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.145
+Version 0.146
 
 =cut
 

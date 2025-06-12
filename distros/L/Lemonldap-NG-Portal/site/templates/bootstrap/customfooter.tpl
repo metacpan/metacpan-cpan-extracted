@@ -5,5 +5,5 @@
         <span class="fa fa-globe"></span>
         LemonLDAP::NG
       </a>
-      <span trspan="gplSoft">free software covered by the GPL license</span>.
+      <span trspan="gplSoft">free software covered by the GPL license.</span>
     </p>

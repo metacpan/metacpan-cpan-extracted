@@ -23,7 +23,7 @@ t/01_arguments/Data_Test_Arguments.pm
 t/LineFold/01-width.t
 t/LineFold/02-cut.t
 tools/build_TCF_char_width_table_modules.pl
-tools/update_verson.pl
+tools/update_version.pl
 tools/xt_prereq.txt
 xt/01_option.t
 xt/02_option_error.t

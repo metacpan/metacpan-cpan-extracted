@@ -6,8 +6,8 @@ package Lemonldap::NG::Portal::Main;
 
 use strict;
 use MIME::Base64;
-use POSIX qw(strftime);
-use Lemonldap::NG::Common::Util qw(isHiddenAttr);
+use POSIX                                  qw(strftime);
+use Lemonldap::NG::Common::Util            qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(portalConsts);
 use URI;
 
@@ -173,9 +173,9 @@ sub controlUrl {
         if ( $tmp and ( $tmp !~ URIRE ) ) {
             $self->auditLog(
                 $req,
-                message  => "Bad URL $tmp",
-                code     => "UNAUTHORIZED_REDIRECT",
-                url      => $tmp,
+                message => "Bad URL $tmp",
+                code    => "UNAUTHORIZED_REDIRECT",
+                url     => $tmp,
             );
             delete $req->{urldc};
             return PE_BADURL;
@@ -215,8 +215,8 @@ sub controlUrl {
                         "URL contains an unprotected host (param: urldc"
                       . " | value: $tmp | alias: $vhost)"
                 ),
-                code     => "UNAUTHORIZED_REDIRECT",
-                url      => $tmp,
+                code => "UNAUTHORIZED_REDIRECT",
+                url  => $tmp,
             );
             delete $req->{urldc};
             return PE_UNPROTECTEDURL;
@@ -468,10 +468,7 @@ sub authenticate {
     my ( $self, $req ) = @_;
     my $ret = $req->authResult( $self->_authentication->authenticate($req) );
     $self->logger->debug( " -> authResult = " . $req->authResult );
-    if ( $ret == PE_OK ) {
-        $req->{sessionInfo}->{_lastAuthnUTime} = time();
-        return $ret;
-    }
+    return $ret if $ret == PE_OK;
 
     # Store failed login into history
     $req->steps( [
@@ -492,6 +489,7 @@ sub authenticate {
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
+    $req->{sessionInfo}->{_lastAuthnUTime} = time();
     my $ret = $self->_authentication->setAuthSessionInfo($req);
     if ( $ret == PE_OK
         and not( defined $req->sessionInfo->{authenticationLevel} ) )

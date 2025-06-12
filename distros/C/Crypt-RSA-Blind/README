@@ -1,4 +1,4 @@
-Crypt::RSA::Blind
+Crypt::RSA::Blind is Copyright (c) Ashish Gulhati.
 
 Blind RSA signatures
 
@@ -27,7 +27,7 @@ COPYRIGHT
 
 Copyright (c) Ashish Gulhati.
 
-LICENSE
+LICENSE INFORMATION
 
 This software package is Open Software; you can use, redistribute,
 and/or modify it under the terms of the Open Artistic License 4.0.

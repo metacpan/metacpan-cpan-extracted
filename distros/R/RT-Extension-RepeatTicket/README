@@ -17,7 +17,7 @@ DESCRIPTION
     rt-repeat-ticket script.
 
 RT VERSION
-    Works with RT 5.0. Check out 1.* versions if you are still using RT 4.
+    Works with RT 6.0. For RT 5.0 install the most recent 2.* version.
 
 INSTALLATION
     perl Makefile.PL
@@ -34,21 +34,24 @@ INSTALLATION
         If you are upgrading this module, check for upgrading instructions
         in case changes need to be made to your database.
 
-    patch RT
-        Apply for 5.0.0:
-
-            patch -p1 -d /opt/rt5 < patches/0001-Fix-radio-checkbox-inputs-for-click-panel-behavior-o.patch
-
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::RepeatTicket');
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Add bin/rt-repeat-ticket to the daily cron job.
     Restart your webserver
+    Add Repeat Ticket to your Page Layouts
+        This extension provides a widget that can be added to the Page
+        Layouts for the Ticket Create and Display pages for queues where you
+        want to use Repeat Ticket. You can add the widget by going to Admin
+        -> Page Layouts -> Ticket and choosing the Create or Display Layout.
+
+        If you do not add the widget to the Page Layouts you can use the
+        Recurrence tab to modify recurrence for a ticket.
 
 MODES
   Simple Mode VS Concurrent Tickets Mode
@@ -272,7 +275,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-RepeatTicket>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2020 by Best Practical Solutions
+    This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
     This is free software, licensed under:
 

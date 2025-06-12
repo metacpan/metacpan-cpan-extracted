@@ -1,0 +1,11 @@
+<&| /Widgets/TitleBox, title => loc("Recurrence"), class => 'ticket-info-repeat-recurrence' &>
+<& /Ticket/Elements/EditRecurrence, ARGSRef => \%ARGS, Initial => 1 &>
+</&>
+<%init>
+my $cf = RT::CustomField->new($session{CurrentUser});
+$cf->Load('Original Ticket');
+return unless $cf->id && ( $cf->IsAdded(0) || $cf->IsAdded($ARGS{QueueObj}->id) );
+</%init>
+<%args>
+$QueueObj => undef
+</%args>

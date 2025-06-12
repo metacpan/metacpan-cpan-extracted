@@ -1,7 +1,7 @@
 #! /usr/bin/perl 
 
 use Date::Holidays::AU qw( is_holiday holidays );
-use Test::More(tests => 166 );
+use Test::More(tests => 167 );
 use strict;
 use warnings;
 
@@ -166,6 +166,7 @@ ok(not(is_holiday(2004, 10, 1, 'TAS', { 'holidays' => [ 'Agfest' ]})), "Not Burn
 ok(is_holiday(2005, 10, 3, 'NSW'), "NSW Labour Day 2005");
 ok(is_holiday(2005, 10, 3, 'NSW'), "ACT Labour Day 2005");
 ok(is_holiday(2006, 10, 2, 'SA'), "SA Labour Day 2005");
+ok(is_holiday(2025, 5, 5, 'QLD'), "QLD Labour Day 2025");
 ok(is_holiday(2004, 10, 7, 'TAS', { 'holidays' => ['Launceston Show','Burnie Show']}), "Launceston Show 2004");
 ok(not(is_holiday(2004, 10, 7, 'TAS', { 'holidays' => ['Burnie Show']})), "Not Launceston Show 2004");
 ok(is_holiday(2004, 10, 15, 'TAS', { 'holidays' => ['Burnie Show','Flinders Island Show']}), "Flinders Island Show 2004");

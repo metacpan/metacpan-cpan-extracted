@@ -4,7 +4,7 @@ RTx('RT-Extension-RepeatTicket');
 
 requires('DateTime::Event::ICal');
 
-requires_rt('5.0.0');
+requires_rt('6.0.0');
 
 my ($lp) = ($INC{'RT.pm'} =~ /^(.*)[\\\/]/);
 my $lib_path = join( ' ', "$RT::LocalPath/lib", $lp );

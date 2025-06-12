@@ -1,227 +1,183 @@
-=head1 NAME
-
-MQUL - General purpose, MongoDB-style query and update language
-
-=head1 SYNOPSIS
-
-	use MQUL qw/doc_matches update_doc/;
-
-	my $doc = {
-		title => 'Freaks and Geeks',
-		genres => [qw/comedy drama/],
-		imdb_score => 9.4,
-		seasons => 1,
-		starring => ['Linda Cardellini', 'James Franco', 'Jason Segel'],
-		likes => { up => 45, down => 11 }
-	};
-
-	if (doc_matches($doc, {
-		title => qr/geeks/i,
-		genres => 'comedy',
-		imdb_score => { '$gte' => 5, '$lte' => 9.5 },
-		starring => { '$type' => 'array', '$size' => 3 },
-		'likes.up' => { '$gt' => 40 }
-	})) {
-		# will be true in this example
-	}
-
-	update_doc($doc, {
-		'$set' => { title => 'Greeks and Feaks' },
-		'$pop' => { genres => 1 },
-		'$inc' => { imdb_score => 0.6 },
-		'$unset' => { seasons => 1 },
-		'$push' => { starring => 'John Francis Daley' },
-	});
-
-	# $doc will now be:
-	{
-		title => 'Greeks and Feaks',
-		genres => ['comedy'],
-		imdb_score => 10,
-		starring => ['Linda Cardellini', 'James Franco', 'Jason Segel', 'John Francis Daley'],
-		likes => { up => 45, down => 11 }
-	}
+NAME
+    MQUL - General purpose, MongoDB-style query and update language
+
+SYNOPSIS
+            use MQUL qw/doc_matches update_doc/;
+
+            my $doc = {
+                    title => 'Freaks and Geeks',
+                    genres => [qw/comedy drama/],
+                    imdb_score => 9.4,
+                    seasons => 1,
+                    starring => ['Linda Cardellini', 'James Franco', 'Jason Segel'],
+                    likes => { up => 45, down => 11 }
+            };
+
+            if (doc_matches($doc, {
+                    title => qr/geeks/i,
+                    genres => 'comedy',
+                    imdb_score => { '$gte' => 5, '$lte' => 9.5 },
+                    starring => { '$type' => 'array', '$size' => 3 },
+                    'likes.up' => { '$gt' => 40 }
+            })) {
+                    # will be true in this example
+            }
+
+            update_doc($doc, {
+                    '$set' => { title => 'Greeks and Feaks' },
+                    '$pop' => { genres => 1 },
+                    '$inc' => { imdb_score => 0.6 },
+                    '$unset' => { seasons => 1 },
+                    '$push' => { starring => 'John Francis Daley' },
+            });
+
+            # $doc will now be:
+            {
+                    title => 'Greeks and Feaks',
+                    genres => ['comedy'],
+                    imdb_score => 10,
+                    starring => ['Linda Cardellini', 'James Franco', 'Jason Segel', 'John Francis Daley'],
+                    likes => { up => 45, down => 11 }
+            }
+
+DESCRIPTION
+    MQUL (for MongoDB-style Query & Update Language; pronounced *"umm,
+    cool"*; yeah, I know, that's the dumbest thing ever), is a general
+    purpose implementation of MongoDB's query and update language. The
+    implementation is not 100% compatible, but it only slightly deviates
+    from MongoDB's behavior, actually extending it a bit.
+
+    The module exports two subroutines: "doc_matches()" and "update_doc()".
+    The first subroutine takes a document, which is really just a hash-ref
+    (of whatever complexity), and a query hash-ref built in the MQUL query
+    language. It returns a true value if the document matches the query, and
+    a false value otherwise. The second subroutine takes a document and an
+    update hash-ref built in the MQUL update language. The subroutine
+    modifies the document (in-place) according to the update hash-ref.
+
+    You can use this module for whatever purpose you see fit. It was
+    actually written for Giddy, my Git-database, and was extracted from its
+    original code. Outside of the database world, I plan to use it in an
+    application that performs tests (such as process monitoring for
+    example), and uses the query language to determine whether the results
+    are valid or not (in our monitoring example, that could be CPU usage
+    above a certain threshold and stuff like that). It is also used by
+    MorboDB, an in-memory clone of MongoDB.
+
+  UPGRADE NOTES
+    My distributions follow the semantic versioning scheme
+    <http://semver.org/>, so whenever the major version changes, that means
+    that API changes incompatible with previous versions have been made.
+    Always read the Changes file before upgrading.
+
+  THE LANGUAGE
+    The language itself is described in MQUL::Reference. This document only
+    describes the interface of this module.
+
+    The reference document also details MQUL's current differences from the
+    original MongoDB language.
+
+INTERFACE
+  doc_matches( \%document, [ \%query, \@defs ] )
+    Receives a document hash-ref and possibly a query hash-ref, and returns
+    true if the document matches the query, false otherwise. If no query is
+    given (or an empty hash-ref is given), true will be returned (every
+    document will match an empty query - in accordance with MongoDB).
+
+    See "QUERY STRUCTURE" in MQUL::Reference to learn about the structure of
+    query hash-refs.
+
+    Optionally, an even-numbered array reference of dynamically calculated
+    attribute definitions can be provided. For example:
+
+            [ min_val => { '$min' => ['attr1', 'attr2', 'attr3' ] },
+              max_val => { '$max' => ['attr1', 'attr2', 'attr3' ] },
+              difference => { '$diff' => ['max_val', 'min_val'] } ]
+
+    This defines three dynamic attributes: "min_val", "max_val" and
+    "difference", which is made up of the first two.
+
+    See "DYNAMICALLY CALCULATED ATTRIBUTES" in MQUL::Reference for more
+    information about dynamic attributes.
 
-=head1 DESCRIPTION
+  update_doc( \%document, \%update )
+    Receives a document hash-ref and an update hash-ref, and updates the
+    document in-place according to the update hash-ref. Also returns the
+    document after the update. If the update hash-ref doesn't have any of
+    the update modifiers described by the language, then the update hash-ref
+    is considered as what the document should now be, and so will simply
+    replace the document hash-ref (once again, in accordance with MongoDB).
 
-MQUL (for B<M>ongoDB-style B<Q>uery & B<U>pdate B<L>anguage; pronounced
-I<"umm, cool">; yeah, I know, that's the dumbest thing ever), is a general
-purpose implementation of L<MongoDB>'s query and update language. The
-implementation is not 100% compatible, but it only slightly deviates from
-MongoDB's behavior, actually extending it a bit.
+    See "UPDATE STRUCTURE" in MQUL::Reference to learn about the structure
+    of update hash-refs.
 
-The module exports two subroutines: C<doc_matches()> and C<update_doc()>.
-The first subroutine takes a document, which is really just a hash-ref (of
-whatever complexity), and a query hash-ref built in the MQUL query language.
-It returns a true value if the document matches the query, and a
-false value otherwise. The second subroutine takes a document and an update
-hash-ref built in the MQUL update language. The subroutine modifies the document
-(in-place) according to the update hash-ref.
+DIAGNOSTICS
+    "MQUL::doc_matches() requires a document hash-ref."
+        This error means that you've either haven't passed the
+        "doc_matches()" subroutine any parameters, or given it a
+        non-hash-ref document.
 
-You can use this module for whatever purpose you see fit. It was actually
-written for L<Giddy>, my Git-database, and was extracted from its
-original code. Outside of the database world, I plan to use it in an application
-that performs tests (such as process monitoring for example), and uses the
-query language to determine whether the results are valid or not (in our
-monitoring example, that could be CPU usage above a certain threshold and
-stuff like that). It is also used by L<MorboDB>, an in-memory clone of
-MongoDB.
+    "MQUL::doc_matches() expects a query hash-ref."
+        This error means that you've passed the "doc_matches()" attribute a
+        non-hash-ref query variable. While you don't actually have to pass a
+        query variable, if you do, it has to be a hash-ref.
 
-=head2 UPGRADE NOTES
+    "MQUL::update_doc() requires a document hash-ref."
+        This error means that you've either haven't passed the
+        "update_doc()" subroutine any parameters, or given it a non-hash-ref
+        document.
 
-My distributions follow the L<semantic versioning scheme|http://semver.org/>,
-so whenever the major version changes, that means that API changes incompatible
-with previous versions have been made. Always read the Changes file before upgrading.
+    "MQUL::update_doc() requires an update hash-ref."
+        This error means that you've passed the "update_doc()" subroutine a
+        non-hash-ref update variable.
 
-=head2 THE LANGUAGE
+    "The %s attribute is not an array in the doc."
+        This error means that your update hash-ref tries to modify an array
+        attribute (with $push, $pushAll, $addToSet, $pull, $pullAll, $pop,
+        $shift and $splice), but the attribute in the document provided to
+        the "update_doc()" subroutine is not an array.
 
-The language itself is described in L<MQUL::Reference>. This document
-only describes the interface of this module.
+CONFIGURATION AND ENVIRONMENT
+    MQUL requires no configuration files or environment variables.
 
-The reference document also details MQUL's current differences from the
-original MongoDB language.
+DEPENDENCIES
+    MQUL depends on the following modules:
 
-=head1 INTERFACE
+    *   Data::Compare
 
-=head2 doc_matches( \%document, [ \%query, \@defs ] )
+    *   Data::Types
 
-Receives a document hash-ref and possibly a query hash-ref, and returns
-true if the document matches the query, false otherwise. If no query
-is given (or an empty hash-ref is given), true will be returned (every
-document will match an empty query - in accordance with MongoDB).
+    *   DateTime::Format::W3CDTF
 
-See L<MQUL::Reference/"QUERY STRUCTURE"> to learn about the structure of
-query hash-refs.
+    *   Scalar::Util
 
-Optionally, an even-numbered array reference of dynamically calculated
-attribute definitions can be provided. For example:
+    *   Try::Tiny
 
-	[ min_val => { '$min' => ['attr1', 'attr2', 'attr3' ] },
-	  max_val => { '$max' => ['attr1', 'attr2', 'attr3' ] },
-	  difference => { '$diff' => ['max_val', 'min_val'] } ]
+INCOMPATIBILITIES
+    None reported.
 
-This defines three dynamic attributes: C<min_val>, C<max_val> and
-C<difference>, which is made up of the first two.
+BUGS AND LIMITATIONS
+    No bugs have been reported.
 
-See L<MQUL::Reference/"DYNAMICALLY CALCULATED ATTRIBUTES"> for more information
-about dynamic attributes.
+    Please report any bugs or feature requests to "bug-MQUL@rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MQUL>.
 
-=head2 update_doc( \%document, \%update )
+AUTHOR
+    Ido Perlmuter <ido at ido50 dot net>
 
-Receives a document hash-ref and an update hash-ref, and updates the
-document in-place according to the update hash-ref. Also returns the document
-after the update. If the update hash-ref doesn't have any of the update
-modifiers described by the language, then the update hash-ref is considered
-as what the document should now be, and so will simply replace the document
-hash-ref (once again, in accordance with MongoDB).
+LICENSE AND COPYRIGHT
+    Copyright (c) 2011-2025, Ido Perlmuter "ido at ido50 dot net".
 
-See L<MQUL::Reference/"UPDATE STRUCTURE"> to learn about the structure of
-update hash-refs.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    The full License is included in the LICENSE file. You may also
+    obtain a copy of the License at
 
-=head1 DIAGNOSTICS
+        http://www.apache.org/licenses/LICENSE-2.0
 
-=over
-
-=item C<< MQUL::doc_matches() requires a document hash-ref. >>
-
-This error means that you've either haven't passed the C<doc_matches()>
-subroutine any parameters, or given it a non-hash-ref document.
-
-=item C<< MQUL::doc_matches() expects a query hash-ref. >>
-
-This error means that you've passed the C<doc_matches()> attribute a
-non-hash-ref query variable. While you don't actually have to pass a
-query variable, if you do, it has to be a hash-ref.
-
-=item C<< MQUL::update_doc() requires a document hash-ref. >>
-
-This error means that you've either haven't passed the C<update_doc()>
-subroutine any parameters, or given it a non-hash-ref document.
-
-=item C<< MQUL::update_doc() requires an update hash-ref. >>
-
-This error means that you've passed the C<update_doc()> subroutine a
-non-hash-ref update variable.
-
-=item C<< The %s attribute is not an array in the doc. >>
-
-This error means that your update hash-ref tries to modify an array attribute
-(with C<$push>, C<$pushAll>, C<$addToSet>, C<$pull>, C<$pullAll>,
-C<$pop>, C<$shift> and C<$splice>), but the attribute in the document
-provided to the C<update_doc()> subroutine is not an array.
-
-=back
-
-=head1 CONFIGURATION AND ENVIRONMENT
-  
-MQUL requires no configuration files or environment variables.
-
-=head1 DEPENDENCIES
-
-MQUL depends on the following modules:
-
-=over
-
-=item * L<Data::Compare>
-
-=item * L<Data::Types>
-
-=item * L<DateTime::Format::W3CDTF>
-
-=item * L<Scalar::Util>
-
-=item * L<Try::Tiny>
-
-=back
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-MQUL@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MQUL>.
-
-=head1 AUTHOR
-
-Ido Perlmuter <ido at ido50 dot net>
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright (c) 2011-2015, Ido Perlmuter C<< ido at ido50 dot net >>.
-
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself, either version
-5.8.1 or any later version. See L<perlartistic|perlartistic> 
-and L<perlgpl|perlgpl>.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
-
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
-
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.

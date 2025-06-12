@@ -5,6 +5,6 @@ Host: geocode.nigelhorne.com
 root_dir: /var/www/geocode.nigelhorne.com/
 disc_cache: driver=File, root_dir=/tmp/cache
 # memory_cache: driver=File, root_dir=/tmp/cache
-memory_cache: driver=Memory global=1
+memory_cache: driver=Memory, global=1
 OPENADDR_HOME: /usr/local/share/openaddr
 vwflog: /tmp/vwf.log

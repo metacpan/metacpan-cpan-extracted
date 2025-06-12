@@ -27,6 +27,14 @@ my $force     = $opt_f;
 my $nb_purged = 0;
 my $nb_error  = 0;
 
+sub debug {
+    if ($debug) {
+        local $/ = "\n";
+        local $\ = "\n";
+        print STDERR @_;
+    }
+}
+
 #=============================================================================
 # Load configuration
 #=============================================================================
@@ -40,12 +48,12 @@ if ($localconf) {
     $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
 }
 
-print "Configuration loaded\n" if $debug;
+debug "Configuration loaded";
 
 #=============================================================================
 # Timeout
 #=============================================================================
-print "Timeout value: " . $conf->{timeout} . "\n" if $debug;
+debug "Timeout value: " . $conf->{timeout};
 
 #=============================================================================
 # Apache::Session backends
@@ -65,7 +73,7 @@ if ( $conf->{globalStorage} ) {
     # Add module in managed backends
     push @backends, $conf->{globalStorageOptions};
 
-    print "Session backend $module will be used\n" if $debug;
+    debug "Session backend $module will be used";
 }
 
 # SAML
@@ -82,7 +90,7 @@ if ( $conf->{samlStorage}
     # Add module in managed backends
     push @backends, $conf->{samlStorageOptions};
 
-    print "SAML backend $module will be used\n" if $debug;
+    debug "SAML backend $module will be used";
 }
 
 # CAS
@@ -99,7 +107,7 @@ if ( $conf->{casStorage}
     # Add module in managed backends
     push @backends, $conf->{casStorageOptions};
 
-    print "CAS backend $module will be used\n" if $debug;
+    debug "CAS backend $module will be used";
 }
 
 # Captcha
@@ -116,7 +124,7 @@ if ( $conf->{captchaStorage}
     # Add module in managed backends
     push @backends, $conf->{captchaStorageOptions};
 
-    print "Captcha backend $module will be used\n" if $debug;
+    debug "Captcha backend $module will be used";
 }
 
 # OpenIDConnect
@@ -133,7 +141,7 @@ if ( $conf->{oidcStorage}
     # Add module in managed backends
     push @backends, $conf->{oidcStorageOptions};
 
-    print "OIDC backend $module will be used\n" if $debug;
+    debug "OIDC backend $module will be used";
 }
 
 #=============================================================================
@@ -144,6 +152,7 @@ for my $options (@backends) {
     next if ( $options->{backend} eq "Apache::Session::Memcached" );
     my @t;
     if ( $options->{backend}->can('deleteIfLowerThan') ) {
+        debug "Found deleteIfLowerThan() in backend, using it";
         my ( $success, $rows ) = $options->{backend}->deleteIfLowerThan(
             $options,
             {
@@ -175,13 +184,12 @@ for my $options (@backends) {
             my $id    = shift;
             my $time  = time;
 
-            print "Check session $id\n" if $debug;
+            debug "Check session $id";
 
             # Empty session need to be removed
             unless ($entry) {
                 push @t, $id;
-                print "Session $id is empty (corrupted?), delete forced\n"
-                  if $debug;
+                debug "Session $id is empty (corrupted?), delete forced";
             }
 
             # Do net check sessions without _utime
@@ -193,7 +201,7 @@ for my $options (@backends) {
             # Session expired
             if ( $time - $entry->{_utime} > $conf->{timeout} ) {
                 push @t, $id;
-                print "Session $id expired\n" if $debug;
+                debug "Session $id expired";
             }
 
             # User has no activity, so considere the session has expired
@@ -202,7 +210,7 @@ for my $options (@backends) {
                 and $time - $entry->{_lastSeen} > $conf->{timeoutActivity} )
             {
                 push @t, $id;
-                print "Session $id inactive\n" if $debug;
+                debug "Session $id inactive";
             }
             undef;
         }
@@ -221,7 +229,7 @@ for my $options (@backends) {
         );
 
         unless ( $session->data ) {
-            print "Error while opening session $id\n" if $debug;
+            debug "Error while opening session $id";
             print STDERR "Error on session $id\n";
             $nb_error++;
             push @errors, $id;
@@ -229,13 +237,13 @@ for my $options (@backends) {
         }
 
         unless ( $session->remove ) {
-            print "Error while deleting session $id\n" if $debug;
+            debug "Error while deleting session $id";
             print STDERR "Error on session $id\n";
             $nb_error++;
             push @errors, $id;
             next;
         }
-        print "Session $id has been purged\n" if $debug;
+        debug "Session $id has been purged\n";
         $nb_purged++;
     }
 
@@ -350,7 +358,7 @@ for my $options (@backends) {
 #=============================================================================
 # Exit
 #=============================================================================
-print "$nb_purged sessions have been purged\n" if $debug;
+debug "$nb_purged sessions have been purged";
 print STDERR
   "$nb_error sessions remaining, try to purge them with force (option -f)\n"
   if $nb_error;

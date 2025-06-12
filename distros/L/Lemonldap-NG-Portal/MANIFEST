@@ -419,6 +419,7 @@ site/htdocs/static/common/pt.png
 site/htdocs/static/common/pt_BR.png
 site/htdocs/static/common/ro.png
 site/htdocs/static/common/ru.png
+site/htdocs/static/common/sk.png
 site/htdocs/static/common/tr.png
 site/htdocs/static/common/vi.png
 site/htdocs/static/common/zh.png
@@ -436,6 +437,7 @@ site/htdocs/static/languages/pl.json
 site/htdocs/static/languages/pt.json
 site/htdocs/static/languages/pt_BR.json
 site/htdocs/static/languages/ru.json
+site/htdocs/static/languages/sk.json
 site/htdocs/static/languages/tr.json
 site/htdocs/static/languages/vi.json
 site/htdocs/static/languages/zh.json
@@ -553,6 +555,7 @@ site/templates/common/mail/pl.json
 site/templates/common/mail/pt.json
 site/templates/common/mail/pt_BR.json
 site/templates/common/mail/ru.json
+site/templates/common/mail/sk.json
 site/templates/common/mail/tr.json
 site/templates/common/mail/vi.json
 site/templates/common/mail/zh.json
@@ -759,6 +762,7 @@ t/32-OIDC-OP-claims-in-idtoken.t
 t/32-OIDC-Opaque-Token.t
 t/32-OIDC-Password-Grant-with-Bruteforce-and-Choice.t
 t/32-OIDC-Password-Grant.t
+t/32-OIDC-prompt-none.t
 t/32-OIDC-redirect_uri-filter.t
 t/32-OIDC-Refresh-Token.t
 t/32-OIDC-Register-with-bad-redirect-uri.t

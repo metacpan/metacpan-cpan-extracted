@@ -51,4 +51,9 @@ WriteMakefile(
         'Term::Form::ReadLine'       => '0.561',
         %prereqs_os_specific,
     },
+    dist  => {
+        COMPRESS => 'gzip',
+        SUFFIX   => '.gz',
+        TARFLAGS => '--format=gnu -cvf',
+    },
 );

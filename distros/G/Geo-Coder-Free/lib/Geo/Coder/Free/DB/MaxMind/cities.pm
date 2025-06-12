@@ -9,11 +9,11 @@ Geo::Coder::Free::DB::MaxMind::cities - driver for https://www.maxmind.com/en/fr
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Database::Abstraction;
 

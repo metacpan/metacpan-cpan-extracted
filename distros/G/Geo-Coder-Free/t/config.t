@@ -10,8 +10,13 @@ use File::Spec;
 
 BEGIN {
 	use_ok('Geo::Coder::Free::Config');
-	$ENV{'HOME'} = File::Temp::tempdir(CLEANUP => 1);
+	local $ENV{'HOME'} = File::Temp::tempdir(CLEANUP => 1);
 }
+
+# Ensure CGI::Info doesn't attempt to read from stdin
+local $ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+local $ENV{'REQUEST_METHOD'} = 'GET';
+local $ENV{'QUERY_STRING'} = 'lang=en';
 
 # Test for creating a new object
 subtest 'Object creation' => sub {

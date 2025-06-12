@@ -48,11 +48,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 SYNOPSIS
 
@@ -132,6 +132,9 @@ So "106 Wells Street, Fort Wayne, Allen, Indiana, USA" isn't found, a match for
 Arguably that's incorrect, but it is the behaviour I want.
 If "exact" is not given,
 it will go on to look just for the town if the street isn't found.
+
+The word "county" is removed from US county searches,
+that either C<Leesburg, Loudoun County, Virginia, US> or C<Leesburg, Loudoun, Virginia, US> will work.
 
 =cut
 
@@ -954,35 +957,26 @@ sub _get {
 	}
 	my $openaddr_db = $self->{openaddr_db} ||
 		Geo::Coder::Free::DB::openaddresses->new(
+			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {}),
 			directory => $self->{openaddr},
-			cache => $self->{cache} || CHI->new(driver => 'Memory', datastore => {})
+			id => 'md5',
+			no_entry => 1,
 		);
 	$self->{openaddr_db} = $openaddr_db;
-	my $rc = $openaddr_db->fetchrow_hashref(md5 => $digest);
-	if($rc && defined($rc->{'geohash'})) {
+	if(my $geohash = $openaddr_db->geohash(md5 => $digest)) {
 		$self->{'geo_hash'} ||= Geo::Hash->new();
-		($rc->{'latitude'}, $rc->{'longitude'}) = $self->{'geo_hash'}->decode($rc->{'geohash'});
-	}
-	if($rc && defined($rc->{'lat'})) {
-		$rc->{'latitude'} = delete $rc->{'lat'};
-		$rc->{'longitude'} = delete $rc->{'lon'};
-	}
-	if($rc && defined($rc->{'latitude'})) {
-		# if(my $city = $rc->{'city'}) {
-			# if(my $rc2 = $openaddr_db->fetchrow_hashref(sequence => $city, table => 'cities')) {
-				# $rc = { %$rc, %$rc2 };
-			# }
-		# }
-		# ::diag(Data::Dumper->new([\$rc])->Dump());
-		$rc = Geo::Location::Point->new({
-			'lat' => $rc->{'latitude'},
-			'long' => $rc->{'longitude'},
-			'lng' => $rc->{'longitude'},
+		my ($latitude, $longitude) = $self->{'geo_hash'}->decode($geohash);
+
+		my $rc = Geo::Location::Point->new({
+			'lat' => $latitude,
+			'long' => $longitude,
+			'lng' => $longitude,
 			'location' => $location,
 			'database' => 'OpenAddresses'
 		});
+
 		if(my $cache = $self->{'cache'}) {
-			$cache->set($digest, Storable::freeze($rc), '1 week');
+			$cache->set($digest, Storable::freeze($rc), '1 month');
 		}
 
 		return $rc;

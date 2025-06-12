@@ -96,8 +96,10 @@ Log::WarnDie->dispatcher($logger);
 
 # my $pagename = "Geo::Coder::Free::Display::$script_name";
 # eval "require $pagename";
-use Geo::Coder::Free::Display::index;
-use Geo::Coder::Free::Display::query;
+
+# Loaded later, only when needed
+# use Geo::Coder::Free::Display::index;
+# use Geo::Coder::Free::Display::query;
 
 # use Geo::Coder::Free::DB::Maxmind;
 use Geo::Coder::Free::DB::openaddresses;
@@ -107,7 +109,12 @@ my $config = Geo::Coder::Free::Config->new({ logger => $logger, info => $info })
 die 'Set OPENADDR_HOME' if(!$config->OPENADDR_HOME());
 
 my $database_dir = "$script_dir/../lib/Geo/Coder/Free/MaxMind/databases";
-Database::Abstraction::init({ directory => $database_dir, logger => $logger });
+Database::Abstraction::init({
+	cache => CHI->new(driver => 'Memory', datastore => {}),
+	cache_duration => '1 day',
+	directory => $database_dir,
+	logger => $logger
+});
 
 my $openaddresses = Geo::Coder::Free::DB::openaddresses->new(openaddr => $config->OPENADDR_HOME());
 if($@) {
@@ -130,7 +137,12 @@ my %blacklisted_ip;
 my $rate_limit_cache;	# Rate limit clients by IP address
 Readonly my @rate_limit_trusted_ips => ('127.0.0.1', '192.168.1.1');
 
-my $acl = CGI::ACL->new()->deny_country(country => ['RU', 'CN'])->allow_ip('131.161.0.0/16')->allow_ip('127.0.0.1');
+Readonly my @blacklist_country_list => (
+	'BY', 'MD', 'RU', 'CN', 'BR', 'UY', 'TR', 'MA', 'VE', 'SA', 'CY',
+	'CO', 'MX', 'IN', 'RS', 'PK', 'UA', 'XH'
+);
+
+my $acl = CGI::ACL->new()->deny_country(country => \@blacklist_country_list)->allow_ip('108.44.193.70')->allow_ip('127.0.0.1');
 
 sub sig_handler {
 	$exit_requested = 1;
@@ -179,9 +191,12 @@ while($handling_request = ($request->Accept() >= 0)) {
 		Log::Any::Adapter->set('Stdout', log_level => 'trace');
 		$logger = Log::Any->get_logger(category => $script_name);
 		Log::WarnDie->dispatcher($logger);
+		Database::Abstraction::init({ logger => $logger });
 		$info->set_logger($logger);
 		$openaddresses->set_logger($logger);
 		$vwf_log->set_logger($logger);
+		# $Config::Auto::Debug = 1;
+
 		$Error::Debug = 1;
 		# CHI->stats->enable();
 		try {
@@ -204,6 +219,7 @@ while($handling_request = ($request->Accept() >= 0)) {
 
 	my $start = [Time::HiRes::gettimeofday()];
 
+	# TODO:  Make this neater
 	try {
 		doit(debug => 0);
 		my $timetaken = Time::HiRes::tv_interval($start);
@@ -257,8 +273,15 @@ sub doit
 
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	$config ||= Geo::Coder::Free::Config->new({ logger => $logger, info => $info, debug => $params{'debug'} });
-	$info_cache ||= create_memory_cache(config => $config, logger => $logger, namespace => 'CGI::Info');
+	$config ||= Geo::Coder::Free::Config->new({
+		logger => $logger,
+		info => $info,
+		debug => $params{'debug'},
+		lingua => CGI::Lingua->new({ supported => [ 'en-gb' ], info => $info, logger => $logger })	# Use a temporary CGI::Lingua
+	});
+
+	# Stores things for a day or longer
+	$info_cache ||= create_disc_cache(config => $config, logger => $logger, namespace => 'CGI::Info');
 
 	my $options = {
 		cache => $info_cache,
@@ -274,7 +297,8 @@ sub doit
 	}
 	$info = CGI::Info->new($options);
 
-	$lingua_cache ||= create_memory_cache(config => $config, logger => $logger, namespace => 'CGI::Lingua');
+	# Stores things for a month or longer
+	$lingua_cache ||= create_disc_cache(config => $config, logger => $logger, namespace => 'CGI::Lingua');
 
 	# Language negotiation
 	my $lingua = CGI::Lingua->new({
@@ -293,7 +317,7 @@ sub doit
 	my $client_ip = $ENV{'REMOTE_ADDR'} || 'unknown';
 
 	# Check and increment request count
-	my $request_count = $rate_limit_cache->get($script_name . ':rate_limit:' . $client_ip) || 0;
+	my $request_count = $rate_limit_cache->get("$script_name:rate_limit:$client_ip") || 0;
 
 	# TODO: update the vwf_log variable to point here
 	$vwflog ||= $config->vwflog() || File::Spec->catfile($info->logdir(), 'vwf.log');
@@ -317,7 +341,7 @@ sub doit
 	}
 
 	# Increment request count
-	$rate_limit_cache->set($script_name . ':rate_limit:' . $client_ip, $request_count + 1, $TIME_WINDOW);
+	$rate_limit_cache->set("$script_name:rate_limit:$client_ip", $request_count + 1, $TIME_WINDOW);
 
 	if(!defined($info->param('page'))) {
 		$logger->info('No page given in ', $info->as_string());
@@ -361,7 +385,9 @@ sub doit
 		lingua => $lingua
 	};
 
-	if(!$info->is_search_engine() && $config->root_dir() && ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
+	if((!$info->is_search_engine()) && $config->root_dir() &&
+	   ($info->param('page') ne 'home') &&
+	   ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
 		$args->{'save_to'} = {
 			directory => File::Spec->catfile($config->root_dir(), 'save_to'),
 			ttl => 3600 * 24,
@@ -410,7 +436,8 @@ sub doit
 			$invalidpage = 1;
 		} else {
 			# Remove all non alphanumeric characters in the name of the page to be loaded
-			$page =~ s/\W//;
+			$page =~ s/\W//g;
+			$page =~ s/\s//g;
 			my $display_module = "Geo::Coder::Free::Display::$page";
 
 			# TODO: consider creating a whitelist of valid modules
@@ -450,7 +477,11 @@ sub doit
 
 	my $error = $@;
 	if($error) {
-		$logger->error($error);
+		if($info->status() == 429) {
+			$logger->notice($error);
+		} else {
+			$logger->error($error);
+		}
 		$display = undef;
 	}
 
@@ -501,7 +532,7 @@ sub doit
 			}
 			$info->status(500);
 			$log->status(500);
-		} else {
+		} elsif(($info->status() == 200) || ($info->status() == 403)) {
 			# No permission to show this page
 			print "Status: 403 Forbidden\n",
 				"Content-type: text/plain\n",
@@ -512,8 +543,20 @@ sub doit
 			}
 			$info->status(403);
 			$log->status(403);
+		} else {
+			my $status = $info->status();
+			# No permission to show this page
+			print "Status: $status ",
+				HTTP::Status::status_message($status),
+				"Content-type: text/plain\n",
+				"Pragma: no-cache\n\n";
+
+			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
+				print "Page unavailable - something is wrong at your end, please fix and try again\n";
+			}
+			$log->status($status);
 		}
-		vwflog($vwflog, $info, $lingua, $syslog, 'Access denied', $log);
+		vwflog($vwflog, $info, $lingua, $syslog, $error ? $error : 'Access denied', $log);
 		throw Error::Simple($error ? $error : $info->as_string());
 	}
 }
@@ -643,8 +686,8 @@ sub vwflog($$$$$$)
 		if(ref($syslog) eq 'HASH') {
 			Sys::Syslog::setlogsock($syslog);
 		}
-		openlog($script_name, 'cons,pid', 'user');
-		syslog('info|local0', '%s %s %s %s %s %d %s %s %s %s',
+		Sys::Syslog::openlog($script_name, 'cons,pid', 'user');
+		Sys::Syslog::syslog('info|local0', '%s %s %s %s %s %d %s %s %s %s',
 			$info->domain_name() || '',
 			$ENV{REMOTE_ADDR} || '',
 			$lingua->country() || '',
@@ -656,6 +699,6 @@ sub vwflog($$$$$$)
 			$warnings,
 			$message
 		);
-		closelog();
+		Sys::Syslog::closelog();
 	}
 }

@@ -176,6 +176,15 @@ subtest 'Login after several resend' => sub {
     $client->logout($id);
 };
 
+subtest 'Try to resend with an expired token' => sub {
+    my $res  = init_login($client);
+    my $code = expectSentCode($res);
+
+    Time::Fake->offset("+10m");
+    $res = resendCode( $res, $client );
+    expectPortalError( $res, 82 );
+};
+
 # If the session info check was not run during the test, then something
 # probably is wrong with the hook system
 is( $sessionInfoCheck, 1, "SessionInfo check was called during the test" );

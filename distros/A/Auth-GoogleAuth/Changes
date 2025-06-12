@@ -1,5 +1,8 @@
 Revision history for Auth::GoogleAuth
 
+1.08      2025-06-11 07:18:54-07:00 America/Los_Angeles
+        - Use Crypt::URandom to provide urand as rand replacement
+
 1.07      2025-02-13 13:27:22-08:00 America/Los_Angeles
         - Perl minimum version align
 

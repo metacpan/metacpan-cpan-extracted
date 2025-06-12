@@ -4,7 +4,7 @@ use strict;
 use Perl::MinimumVersion;
 use Perl::Version;
 use File::Find;
-use Test::More tests => 2;
+use Test::More;
 
 
 my $make_minimum;
@@ -46,16 +46,17 @@ for my $dir ( 'lib', 't' ) {
         no_chdir => 1,
     }, $dir );
 }
-my %explicit_minimum;
+
 for my $file ( @files ) {
     my $object    = Perl::MinimumVersion->new( $file );
     my $min_exp_v = $object->minimum_explicit_version;
     my $version   = Perl::Version->new( $min_exp_v );
     my $numified  = $version->numify;
-    $explicit_minimum{$numified}++;
+    cmp_ok( $make_minimum, '==', $numified, "$make_minimum in Makefile.PL == $numified in $file" );
 }
-my ( $explicit_minimum ) = keys %explicit_minimum;
 
 
-cmp_ok( $make_minimum, '==', $explicit_minimum, 'perl minimum version in Makefile.PL == explicit perl minimum version' );
-cmp_ok( $make_minimum, '==', $pod_minimum,      'perl minimum version in Makefile.PL == pod perl minimum version' );
+cmp_ok( $make_minimum, '==', $pod_minimum, "$make_minimum in Makefile.PL == $pod_minimum in pod" );
+
+
+done_testing();

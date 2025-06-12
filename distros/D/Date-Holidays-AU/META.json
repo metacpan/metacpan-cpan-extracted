@@ -34,6 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "Date::Easter" : "0",
+            "Exporter" : "0",
             "Time::Local" : "1.28",
             "perl" : "5.006"
          }
@@ -50,6 +51,6 @@
          "web" : "https://github.com/david-dick/date-holidays-au"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

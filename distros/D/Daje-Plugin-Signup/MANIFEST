@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Daje/Controller/Signup.pm
+lib/Daje/Plugin/Signup.pm
+minil.toml
+t/00_compile.t
+META.json
+META.yml
+MANIFEST

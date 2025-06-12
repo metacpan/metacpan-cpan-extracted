@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.562   2025-06-11
+    - Update xt files.
+
 0.561   2025-04-10
     - Term::Choose::Util minimum version 0.145.
     - Raised Perl minimum version to 5.10.1.

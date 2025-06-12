@@ -1,5 +1,8 @@
 Revision history for Crypt::RSA::Blind
 
+1.035 Jun 11 2025
+    * Update pod documentation
+
 1.031 Jun 9 2025
     * Put version numbers inside quotes in Makefile.PL
 

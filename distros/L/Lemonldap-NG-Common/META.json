@@ -31,6 +31,7 @@
             "Digest::HMAC_SHA1" : "0",
             "Email::Address::XS" : "0",
             "IO::String" : "0",
+            "LWP::Protocol::PSGI" : "0",
             "LWP::Protocol::https" : "0",
             "MIME::Entity" : "0",
             "Net::LDAP" : "0",
@@ -97,6 +98,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.21.0",
+   "version" : "v2.21.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

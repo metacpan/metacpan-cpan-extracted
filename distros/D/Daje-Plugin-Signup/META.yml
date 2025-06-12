@@ -1,0 +1,41 @@
+---
+abstract: "It's how we signup"
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-Signup
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Controller::Signup:
+    file: lib/Daje/Controller/Signup.pm
+    version: '0.04'
+  Daje::Plugin::Signup:
+    file: lib/Daje/Plugin/Signup.pm
+    version: '0.02'
+requires:
+  perl: v5.40.0
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-Signup/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-Signup
+  repository: https://github.com/janeskil1525/Daje-Plugin-Signup.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

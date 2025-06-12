@@ -29,6 +29,8 @@ GetOptions(
 eval {
     setgid( ( getgrnam($opt_group) )[2] );
     setuid( ( getpwnam($opt_user) )[2] );
+    my (undef, undef, undef, undef, undef, undef, undef, $homedir, undef) = getpwnam($opt_user);
+    $ENV{HOME} = $homedir if $homedir;
     print STDERR "Running as uid $EUID and gid $EGID\n";
 };
 

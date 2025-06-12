@@ -1095,13 +1095,13 @@
       var selector = Util.getSelectorFromElement(this);
 
       if (!selector) {
-        return;
+        return false;
       }
 
       var target = $__default["default"](selector)[0];
 
       if (!target || !$__default["default"](target).hasClass(CLASS_NAME_CAROUSEL)) {
-        return;
+        return false;
       }
 
       var config = _extends({}, $__default["default"](target).data(), $__default["default"](this).data());

@@ -3,8 +3,8 @@ package MQUL;
 # ABSTRACT: General purpose, MongoDB-style query and update language
 
 BEGIN {
-	use Exporter 'import';
-	@EXPORT_OK = qw/doc_matches update_doc/;
+    use Exporter 'import';
+    @EXPORT_OK = qw/doc_matches update_doc/;
 }
 
 use warnings;
@@ -16,7 +16,7 @@ use DateTime::Format::W3CDTF;
 use Scalar::Util qw/blessed/;
 use Try::Tiny;
 
-our $VERSION = "2.001000";
+our $VERSION = "3.000000";
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -105,104 +105,104 @@ original MongoDB language.
 =cut
 
 our %BUILTINS = (
-	'$abs' => sub {
-		##############################################
-		# abs( $value )                              #
-		# ========================================== #
-		# $value - a numerical value                 #
-		# ------------------------------------------ #
-		# returns the absolute value of $value       #
-		##############################################
-		abs shift;
-	},
-	'$min' => sub {
-		##############################################
-		# min( @values )                             #
-		# ========================================== #
-		# @values - a list of numerical values       #
-		# ------------------------------------------ #
-		# returns the smallest number in @values     #
-		##############################################
-		my $min = shift;
-		foreach (@_) {
-			$min = $_ if $_ < $min;
-		}
-		return $min;
-	},
-	'$max' => sub {
-		##############################################
-		# max( @values )                             #
-		# ========================================== #
-		# @values - a list of numerical values       #
-		# ------------------------------------------ #
-		# returns the largest number in @values      #
-		##############################################
-		my $max = shift;
-		foreach (@_) {
-			$max = $_ if $_ > $max;
-		}
-		return $max;
-	},
-	'$diff' => sub {
-		##############################################
-		# diff( @values )                            #
-		# ========================================== #
-		# @values - a list of numerical values       #
-		# ------------------------------------------ #
-		# returns the difference between the values  #
-		##############################################
-		my $diff = shift;
-		foreach (@_) {
-			$diff -= $_;
-		}
-		return $diff;
-	},
-	'$sum' => sub {
-		##############################################
-		# sum( @values )                             #
-		# ========================================== #
-		# @values - a list of numerical values       #
-		# ------------------------------------------ #
-		# returns the summation of the values        #
-		##############################################
-		my $sum = shift;
-		foreach (@_) {
-			$sum += $_;
-		}
-		return $sum;
-	},
-	'$product' => sub {
-		##############################################
-		# product( @values )                         #
-		# ========================================== #
-		# @values - a list of numerical values       #
-		# ------------------------------------------ #
-		# returns the product of the values          #
-		##############################################
-		my $prod = shift;
-		foreach (@_) {
-			$prod *= $_;
-		}
-		return $prod;
-	},
-	'$div' => sub {
-		##############################################
-		# div( @values )                             #
-		# ========================================== #
-		# @values - a list of numerical values       #
-		# ------------------------------------------ #
-		# returns the division of the values.        #
-		# if the function encounters zero anywhere   #
-		# after the first value, it will immediately #
-		# return zero instead of raise an error.     #
-		##############################################
-		my $div = shift;
-		foreach (@_) {
-			return 0 if $_ == 0;
-			$div /= $_;
-		}
-		return $div;
-	}
+    '$abs' => sub {
+        ##############################################
+        # abs( $value )                              #
+        # ========================================== #
+        # $value - a numerical value                 #
+        # ------------------------------------------ #
+        # returns the absolute value of $value       #
+        ##############################################
+        abs shift;
+    },
+    '$min' => sub {
+        ##############################################
+        # min( @values )                             #
+        # ========================================== #
+        # @values - a list of numerical values       #
+        # ------------------------------------------ #
+        # returns the smallest number in @values     #
+        ##############################################
+        my $min = shift;
+        foreach (@_) {
+            $min = $_ if $_ < $min;
+        }
+        return $min;
+    },
+    '$max' => sub {
+        ##############################################
+        # max( @values )                             #
+        # ========================================== #
+        # @values - a list of numerical values       #
+        # ------------------------------------------ #
+        # returns the largest number in @values      #
+        ##############################################
+        my $max = shift;
+        foreach (@_) {
+            $max = $_ if $_ > $max;
+        }
+        return $max;
+    },
+    '$diff' => sub {
+        ##############################################
+        # diff( @values )                            #
+        # ========================================== #
+        # @values - a list of numerical values       #
+        # ------------------------------------------ #
+        # returns the difference between the values  #
+        ##############################################
+        my $diff = shift;
+        foreach (@_) {
+            $diff -= $_;
+        }
+        return $diff;
+    },
+    '$sum' => sub {
+        ##############################################
+        # sum( @values )                             #
+        # ========================================== #
+        # @values - a list of numerical values       #
+        # ------------------------------------------ #
+        # returns the summation of the values        #
+        ##############################################
+        my $sum = shift;
+        foreach (@_) {
+            $sum += $_;
+        }
+        return $sum;
+    },
+    '$product' => sub {
+        ##############################################
+        # product( @values )                         #
+        # ========================================== #
+        # @values - a list of numerical values       #
+        # ------------------------------------------ #
+        # returns the product of the values          #
+        ##############################################
+        my $prod = shift;
+        foreach (@_) {
+            $prod *= $_;
+        }
+        return $prod;
+    },
+    '$div' => sub {
+        ##############################################
+        # div( @values )                             #
+        # ========================================== #
+        # @values - a list of numerical values       #
+        # ------------------------------------------ #
+        # returns the division of the values.        #
+        # if the function encounters zero anywhere   #
+        # after the first value, it will immediately #
+        # return zero instead of raise an error.     #
+        ##############################################
+        my $div = shift;
+        foreach (@_) {
+            return 0 if $_ == 0;
+            $div /= $_;
+        }
+        return $div;
+    }
 );
 
 =head1 INTERFACE
@@ -233,57 +233,58 @@ about dynamic attributes.
 =cut
 
 sub doc_matches {
-	my ($doc, $query, $defs) = @_;
+    my ( $doc, $query, $defs ) = @_;
 
-	croak 'MQUL::doc_matches() requires a document hash-ref.'
-		unless $doc && ref $doc && ref $doc eq 'HASH';
-	croak 'MQUL::doc_matches() expects a query hash-ref.'
-		if $query && (!ref $query || ref $query ne 'HASH');
-	croak 'MQUL::doc_matches() expects an even-numbered definitions array-ref.'
-		if $defs && (!ref $defs || ref $defs ne 'ARRAY' || scalar @$defs % 2 != 0);
+    croak 'MQUL::doc_matches() requires a document hash-ref.'
+      unless $doc && ref $doc && ref $doc eq 'HASH';
+    croak 'MQUL::doc_matches() expects a query hash-ref.'
+      if $query && ( !ref $query || ref $query ne 'HASH' );
+    croak 'MQUL::doc_matches() expects an even-numbered definitions array-ref.'
+      if $defs
+      && ( !ref $defs || ref $defs ne 'ARRAY' || scalar @$defs % 2 != 0 );
 
-	$query ||= {};
+    $query ||= {};
 
-	if ($defs) {
-		for (my $i = 0; $i < scalar(@$defs) - 1; $i = $i + 2) {
-			my ($name, $def) = ($defs->[$i], $defs->[$i+1]);
-			$doc->{$name} = _parse_function($doc, $def);
-		}
-	}
+    if ($defs) {
+        for ( my $i = 0 ; $i < scalar(@$defs) - 1 ; $i = $i + 2 ) {
+            my ( $name, $def ) = ( $defs->[$i], $defs->[ $i + 1 ] );
+            $doc->{$name} = _parse_function( $doc, $def );
+        }
+    }
 
-	# go over each key of the query
-	foreach my $key (keys %$query) {
-		my $value = $query->{$key};
-		if ($key eq '$or' && ref $value eq 'ARRAY') {
-			my $found;
-			foreach (@$value) {
-				next unless ref $_ eq 'HASH';
-				my $ok = 1;
+    # go over each key of the query
+    foreach my $key ( keys %$query ) {
+        my $value = $query->{$key};
+        if ( $key eq '$or' && ref $value eq 'ARRAY' ) {
+            my $found;
+            foreach (@$value) {
+                next unless ref $_ eq 'HASH';
+                my $ok = 1;
 
-				while (my ($k, $v) = each %$_) {
-					unless (&_attribute_matches($doc, $k, $v)) {
-						undef $ok;
-						last;
-					}
-				}
+                while ( my ( $k, $v ) = each %$_ ) {
+                    unless ( &_attribute_matches( $doc, $k, $v ) ) {
+                        undef $ok;
+                        last;
+                    }
+                }
 
-				if ($ok) { # document matches this criteria
-					$found = 1;
-					last;
-				}
-			}
-			return unless $found;
-		} elsif ($key eq '$and' && ref $value eq 'ARRAY') {
-			foreach (@$value) {
-				return unless &doc_matches($doc, $_, $defs);
-			}
-		} else {
-			return unless &_attribute_matches($doc, $key, $value);
-		}
-	}
+                if ($ok) {    # document matches this criteria
+                    $found = 1;
+                    last;
+                }
+            }
+            return unless $found;
+        } elsif ( $key eq '$and' && ref $value eq 'ARRAY' ) {
+            foreach (@$value) {
+                return unless &doc_matches( $doc, $_, $defs );
+            }
+        } else {
+            return unless &_attribute_matches( $doc, $key, $value );
+        }
+    }
 
-	# if we've reached here, the document matches, so return true
-	return 1;
+    # if we've reached here, the document matches, so return true
+    return 1;
 }
 
 ##############################################
@@ -298,167 +299,235 @@ sub doc_matches {
 # provided document.                         #
 ##############################################
 
-my $funcs = join('|', keys %BUILTINS);
+my $funcs = join( '|', keys %BUILTINS );
 
 sub _attribute_matches {
-	my ($doc, $key, $value) = @_;
+    my ( $doc, $key, $value ) = @_;
 
-	my %virt;
-	if ($key =~ m/\./) {
-		# support for the dot notation
-		my ($v, $k) = _expand_dot_notation($doc, $key);
+    my %virt;
+    if ( $key =~ m/\./ ) {
 
-		$key = $k;
-		$virt{$key} = $v
-			if defined $v;
-	} else {
-		$virt{$key} = $doc->{$key}
-			if exists $doc->{$key};
-	}
+        # support for the dot notation
+        my ( $v, $k ) = _expand_dot_notation( $doc, $key );
 
-	if (!ref $value) {	# if value is a scalar, we need to check for equality
-					# (or, if the attribute is an array in the document,
-					# we need to check the value exists in it)
-		return unless defined $virt{$key};
-		if (ref $virt{$key} eq 'ARRAY') { # check the array has the requested value
-			return unless &_array_has_eq($value, $virt{$key});
-		} elsif (!ref $virt{$key}) { # check the values are equal
-			return unless $virt{$key} eq $value;
-		} else { # we can't compare a non-scalar to a scalar, so return false
-			return;
-		}
-	} elsif (blessed $value && (blessed $value eq 'MongoDB::OID' || blessed $value eq 'MorboDB::OID')) {
-		# we're trying to compare MongoDB::OIDs/MorboDB::OIDs
-		# (MorboDB is my in-memory clone of MongoDB)
-		return unless defined $virt{$key};
-		if (blessed $virt{$key} && (blessed $virt{$key} eq 'MongoDB::OID' || blessed $virt{$key} eq 'MorboDB::OID')) {
-			return unless $virt{$key}->value eq $value->value;
-		} else {
-			return;
-		}
-	} elsif (ref $value eq 'Regexp') {	# if the value is a regex, we need to check
-							# for a match (or, if the attribute is an array
-							# in the document, we need to check at least one
-							# value in it matches it)
-		return unless defined $virt{$key};
-		if (ref $virt{$key} eq 'ARRAY') {
-			return unless &_array_has_re($value, $virt{$key});
-		} elsif (!ref $virt{$key}) { # check the values match
-			return unless $virt{$key} =~ $value;
-		} else { # we can't compare a non-scalar to a scalar, so return false
-			return;
-		}
-	} elsif (ref $value eq 'HASH') { # if the value is a hash, than it either contains
-					 # advanced queries, or it's just a hash that we
-					 # want the document to have as-is
-		unless (&_has_adv_que($value)) {
-			# value hash-ref doesn't have any advanced
-			# queries, we need to check our document
-			# has an attributes with exactly the same hash-ref
-			# (and name of course)
-			return unless Compare($value, $virt{$key});
-		} else {
-			# value contains advanced queries,
-			# we need to make sure our document has an
-			# attribute with the same name that matches
-			# all these queries
-			foreach my $q (keys %$value) {
-				my $term = $value->{$q};
-				if ($q eq '$gt') {
-					return unless defined $virt{$key} && !ref $virt{$key};
-					if (is_float($virt{$key})) {
-						return unless $virt{$key} > $term;
-					} else {
-						return unless $virt{$key} gt $term;
-					}
-				} elsif ($q eq '$gte') {
-					return unless defined $virt{$key} && !ref $virt{$key};
-					if (is_float($virt{$key})) {
-						return unless $virt{$key} >= $term;
-					} else {
-						return unless $virt{$key} ge $term;
-					}
-				} elsif ($q eq '$lt') {
-					return unless defined $virt{$key} && !ref $virt{$key};
-					if (is_float($virt{$key})) {
-						return unless $virt{$key} < $term;
-					} else {
-						return unless $virt{$key} lt $term;
-					}
-				} elsif ($q eq '$lte') {
-					return unless defined $virt{$key} && !ref $virt{$key};
-					if (is_float($virt{$key})) {
-						return unless $virt{$key} <= $term;
-					} else {
-						return unless $virt{$key} le $term;
-					}
-				} elsif ($q eq '$eq') {
-					return unless defined $virt{$key} && !ref $virt{$key};
-					if (is_float($virt{$key})) {
-						return unless $virt{$key} == $term;
-					} else {
-						return unless $virt{$key} eq $term;
-					}
-				} elsif ($q eq '$ne') {
-					return unless defined $virt{$key} && !ref $virt{$key};
-					if (is_float($virt{$key})) {
-						return unless $virt{$key} != $term;
-					} else {
-						return unless $virt{$key} ne $term;
-					}
-				} elsif ($q eq '$exists') {
-					if ($term) {
-						return unless exists $virt{$key};
-					} else {
-						return if exists $virt{$key};
-					}
-				} elsif ($q eq '$mod' && ref $term eq 'ARRAY' && scalar @$term == 2) {
-					return unless defined $virt{$key} && is_float($virt{$key}) && $virt{$key} % $term->[0] == $term->[1];
-				} elsif ($q eq '$in' && ref $term eq 'ARRAY') {
-					return unless defined $virt{$key} && &_value_in($virt{$key}, $term);
-				} elsif ($q eq '$nin' && ref $term eq 'ARRAY') {
-					return unless defined $virt{$key} && !&_value_in($virt{$key}, $term);
-				} elsif ($q eq '$size' && is_int($term)) {
-					return unless defined $virt{$key} && ((ref $virt{$key} eq 'ARRAY' && scalar @{$virt{$key}} == $term) || (ref $virt{$key} eq 'HASH' && scalar keys %{$virt{$key}} == $term));
-				} elsif ($q eq '$all' && ref $term eq 'ARRAY') {
-					return unless defined $virt{$key} && ref $virt{$key} eq 'ARRAY';
-					foreach (@$term) {
-						return unless &_value_in($_, $virt{$key});
-					}
-				} elsif ($q eq '$type' && !ref $term) {
-					if ($term eq 'int') {
-						return unless defined $virt{$key} && is_int($virt{$key});
-					} elsif ($term eq 'float') {
-						return unless defined $virt{$key} && is_float($virt{$key});
-					} elsif ($term eq 'real') {
-						return unless defined $virt{$key} && is_real($virt{$key});
-					} elsif ($term eq 'whole') {
-						return unless defined $virt{$key} && is_whole($virt{$key});
-					} elsif ($term eq 'string') {
-						return unless defined $virt{$key} && is_string($virt{$key});
-					} elsif ($term eq 'array') {
-						return unless defined $virt{$key} && ref $virt{$key} eq 'ARRAY';
-					} elsif ($term eq 'hash') {
-						return unless defined $virt{$key} && ref $virt{$key} eq 'HASH';
-					} elsif ($term eq 'bool') {
-						# boolean - not really supported, will always return true since everything in Perl is a boolean
-					} elsif ($term eq 'date') {
-						return unless defined $virt{$key} && !ref $virt{$key};
-						my $date = try { DateTime::Format::W3CDTF->parse_datetime($virt{$key}) } catch { undef };
-						return unless blessed $date && blessed $date eq 'DateTime';
-					} elsif ($term eq 'null') {
-						return unless exists $virt{$key} && !defined $virt{$key};
-					} elsif ($term eq 'regex') {
-						return unless defined $virt{$key} && ref $virt{$key} eq 'Regexp';
-					}
-				}
-			}
-		}
-	} elsif (ref $value eq 'ARRAY') {
-		return unless Compare($value, $virt{$key});
-	}
+        $key = $k;
+        $virt{$key} = $v
+          if defined $v;
+    } else {
+        $virt{$key} = $doc->{$key}
+          if exists $doc->{$key};
+    }
 
-	return 1;
+    if ( !ref $value ) {   # if value is a scalar, we need to check for equality
+                           # (or, if the attribute is an array in the document,
+                           # we need to check the value exists in it)
+        return unless defined $virt{$key};
+        if ( ref $virt{$key} eq 'ARRAY' )
+        {                  # check the array has the requested value
+            return unless &_array_has_eq( $value, $virt{$key} );
+        } elsif ( !ref $virt{$key} ) {    # check the values are equal
+            return unless $virt{$key} eq $value;
+        } else {    # we can't compare a non-scalar to a scalar, so return false
+            return;
+        }
+    } elsif (
+        blessed $value
+        && (   blessed $value eq 'MongoDB::OID'
+            || blessed $value eq 'MorboDB::OID' )
+      )
+    {
+        # we're trying to compare MongoDB::OIDs/MorboDB::OIDs
+        # (MorboDB is my in-memory clone of MongoDB)
+        return unless defined $virt{$key};
+        if (
+            blessed $virt{$key}
+            && (   blessed $virt{$key} eq 'MongoDB::OID'
+                || blessed $virt{$key} eq 'MorboDB::OID' )
+          )
+        {
+            return unless $virt{$key}->value eq $value->value;
+        } else {
+            return;
+        }
+    } elsif ( ref $value eq 'Regexp' )
+    {    # if the value is a regex, we need to check
+         # for a match (or, if the attribute is an array
+         # in the document, we need to check at least one
+         # value in it matches it)
+        return unless defined $virt{$key};
+        if ( ref $virt{$key} eq 'ARRAY' ) {
+            return unless &_array_has_re( $value, $virt{$key} );
+        } elsif ( !ref $virt{$key} ) {    # check the values match
+            return unless $virt{$key} =~ $value;
+        } else {    # we can't compare a non-scalar to a scalar, so return false
+            return;
+        }
+    } elsif ( ref $value eq 'HASH' )
+    {               # if the value is a hash, than it either contains
+                    # advanced queries, or it's just a hash that we
+                    # want the document to have as-is
+        unless ( &_has_adv_que($value) ) {
+
+            # value hash-ref doesn't have any advanced
+            # queries, we need to check our document
+            # has an attributes with exactly the same hash-ref
+            # (and name of course)
+            return unless Compare( $value, $virt{$key} );
+        } else {
+
+            # value contains advanced queries,
+            # we need to make sure our document has an
+            # attribute with the same name that matches
+            # all these queries
+            foreach my $q ( keys %$value ) {
+                my $term = $value->{$q};
+                if (   $q eq '$gt'
+                    || $q eq '$gte'
+                    || $q eq '$lt'
+                    || $q eq '$lte'
+                    || $q eq '$eq'
+                    || $q eq '$ne' )
+                {
+                    return unless defined $virt{$key} && !ref $virt{$key};
+
+                    # If the values are not of the same type, do not bother
+                    # comparing.
+                    if ( is_float( $virt{$key} ) && !is_float($term)
+                        || ( !is_float( $virt{$key} ) && is_float($term) ) )
+                    {
+                        return;
+                    }
+
+                    if ( $q eq '$gt' ) {
+                        if ( is_float( $virt{$key} ) ) {
+                            return unless $virt{$key} > $term;
+                        } else {
+                            return unless $virt{$key} gt $term;
+                        }
+                    } elsif ( $q eq '$gte' ) {
+                        if ( is_float( $virt{$key} ) ) {
+                            return unless $virt{$key} >= $term;
+                        } else {
+                            return unless $virt{$key} ge $term;
+                        }
+                    } elsif ( $q eq '$lt' ) {
+                        if ( is_float( $virt{$key} ) ) {
+                            return unless $virt{$key} < $term;
+                        } else {
+                            return unless $virt{$key} lt $term;
+                        }
+                    } elsif ( $q eq '$lte' ) {
+                        if ( is_float( $virt{$key} ) ) {
+                            return unless $virt{$key} <= $term;
+                        } else {
+                            return unless $virt{$key} le $term;
+                        }
+                    } elsif ( $q eq '$eq' ) {
+                        if ( is_float( $virt{$key} ) ) {
+                            return unless $virt{$key} == $term;
+                        } else {
+                            return unless $virt{$key} eq $term;
+                        }
+                    } elsif ( $q eq '$ne' ) {
+                        if ( is_float( $virt{$key} ) ) {
+                            return unless $virt{$key} != $term;
+                        } else {
+                            return unless $virt{$key} ne $term;
+                        }
+                    }
+                } elsif ( $q eq '$exists' ) {
+                    if ($term) {
+                        return unless exists $virt{$key};
+                    } else {
+                        return if exists $virt{$key};
+                    }
+                } elsif ( $q eq '$mod'
+                    && ref $term eq 'ARRAY'
+                    && scalar @$term == 2 )
+                {
+                    return
+                         unless defined $virt{$key}
+                      && is_float( $virt{$key} )
+                      && $virt{$key} % $term->[0] == $term->[1];
+                } elsif ( $q eq '$in' && ref $term eq 'ARRAY' ) {
+                    return
+                      unless defined $virt{$key}
+                      && &_value_in( $virt{$key}, $term );
+                } elsif ( $q eq '$nin' && ref $term eq 'ARRAY' ) {
+                    return
+                      unless defined $virt{$key}
+                      && !&_value_in( $virt{$key}, $term );
+                } elsif ( $q eq '$size' && is_int($term) ) {
+                    return
+                      unless defined $virt{$key}
+                      && (
+                        (
+                            ref $virt{$key} eq 'ARRAY'
+                            && scalar @{ $virt{$key} } == $term
+                        )
+                        || ( ref $virt{$key} eq 'HASH'
+                            && scalar keys %{ $virt{$key} } == $term )
+                      );
+                } elsif ( $q eq '$all' && ref $term eq 'ARRAY' ) {
+                    return
+                      unless defined $virt{$key} && ref $virt{$key} eq 'ARRAY';
+                    foreach (@$term) {
+                        return unless &_value_in( $_, $virt{$key} );
+                    }
+                } elsif ( $q eq '$type' && !ref $term ) {
+                    if ( $term eq 'int' ) {
+                        return
+                          unless defined $virt{$key} && is_int( $virt{$key} );
+                    } elsif ( $term eq 'float' ) {
+                        return
+                          unless defined $virt{$key} && is_float( $virt{$key} );
+                    } elsif ( $term eq 'real' ) {
+                        return
+                          unless defined $virt{$key} && is_real( $virt{$key} );
+                    } elsif ( $term eq 'whole' ) {
+                        return
+                          unless defined $virt{$key} && is_whole( $virt{$key} );
+                    } elsif ( $term eq 'string' ) {
+                        return
+                          unless defined $virt{$key}
+                          && is_string( $virt{$key} );
+                    } elsif ( $term eq 'array' ) {
+                        return
+                          unless defined $virt{$key}
+                          && ref $virt{$key} eq 'ARRAY';
+                    } elsif ( $term eq 'hash' ) {
+                        return
+                          unless defined $virt{$key}
+                          && ref $virt{$key} eq 'HASH';
+                    } elsif ( $term eq 'bool' ) {
+
+# boolean - not really supported, will always return true since everything in Perl is a boolean
+                    } elsif ( $term eq 'date' ) {
+                        return unless defined $virt{$key} && !ref $virt{$key};
+                        my $date = try {
+                            DateTime::Format::W3CDTF->parse_datetime(
+                                $virt{$key} )
+                        } catch {
+                            undef
+                        };
+                        return
+                          unless blessed $date && blessed $date eq 'DateTime';
+                    } elsif ( $term eq 'null' ) {
+                        return
+                          unless exists $virt{$key} && !defined $virt{$key};
+                    } elsif ( $term eq 'regex' ) {
+                        return
+                          unless defined $virt{$key}
+                          && ref $virt{$key} eq 'Regexp';
+                    }
+                }
+            }
+        }
+    } elsif ( ref $value eq 'ARRAY' ) {
+        return unless Compare( $value, $virt{$key} );
+    }
+
+    return 1;
 }
 
 ##############################################
@@ -472,13 +541,13 @@ sub _attribute_matches {
 ##############################################
 
 sub _array_has_eq {
-	my ($value, $array) = @_;
+    my ( $value, $array ) = @_;
 
-	foreach (@$array) {
-		return 1 if $_ eq $value;
-	}
+    foreach (@$array) {
+        return 1 if $_ eq $value;
+    }
 
-	return;
+    return;
 }
 
 ##############################################
@@ -492,13 +561,13 @@ sub _array_has_eq {
 ##############################################
 
 sub _array_has_re {
-	my ($re, $array) = @_;
+    my ( $re, $array ) = @_;
 
-	foreach (@$array) {
-		return 1 if m/$re/;
-	}
+    foreach (@$array) {
+        return 1 if m/$re/;
+    }
 
-	return;
+    return;
 }
 
 ##############################################
@@ -511,13 +580,17 @@ sub _array_has_re {
 ##############################################
 
 sub _has_adv_que {
-	my $hash = shift;
+    my $hash = shift;
 
-	foreach ('$gt', '$gte', '$lt', '$lte', '$all', '$exists', '$mod', '$eq', '$ne', '$in', '$nin', '$size', '$type') {
-		return 1 if exists $hash->{$_};
-	}
+    foreach (
+        '$gt', '$gte', '$lt', '$lte', '$all',  '$exists', '$mod',
+        '$eq', '$ne',  '$in', '$nin', '$size', '$type'
+      )
+    {
+        return 1 if exists $hash->{$_};
+    }
 
-	return;
+    return;
 }
 
 ##############################################
@@ -531,16 +604,16 @@ sub _has_adv_que {
 ##############################################
 
 sub _value_in {
-	my ($value, $array) = @_;
+    my ( $value, $array ) = @_;
 
-	foreach (@$array) {
-		next if is_float($_) && !is_float($value);
-		next if !is_float($_) && is_float($value);
-		return 1 if is_float($_) && $value == $_;
-		return 1 if !is_float($_) && $value eq $_;
-	}
+    foreach (@$array) {
+        next     if is_float($_)  && !is_float($value);
+        next     if !is_float($_) && is_float($value);
+        return 1 if is_float($_)  && $value == $_;
+        return 1 if !is_float($_) && $value eq $_;
+    }
 
-	return;
+    return;
 }
 
 =head2 update_doc( \%document, \%update )
@@ -558,143 +631,174 @@ update hash-refs.
 =cut
 
 sub update_doc {
-	my ($doc, $obj) = @_;
+    my ( $doc, $obj ) = @_;
 
-	croak "MQUL::update_doc() requires a document hash-ref."
-		unless defined $doc && ref $doc && ref $doc eq 'HASH';
-	croak "MQUL::update_doc() requires an update hash-ref."
-		unless defined $obj && ref $obj && ref $obj eq 'HASH';
+    croak "MQUL::update_doc() requires a document hash-ref."
+      unless defined $doc && ref $doc && ref $doc eq 'HASH';
+    croak "MQUL::update_doc() requires an update hash-ref."
+      unless defined $obj && ref $obj && ref $obj eq 'HASH';
 
-	# we only need to do something if the $obj hash-ref has any advanced
-	# update operations, otherwise $obj is meant to be the new $doc
+    # we only need to do something if the $obj hash-ref has any advanced
+    # update operations, otherwise $obj is meant to be the new $doc
 
-	if (&_has_adv_upd($obj)) {
-		foreach my $op (keys %$obj) {
-			if ($op eq '$inc') {
-				# increase numerically
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					$doc->{$field} ||= 0;
-					$doc->{$field} += $obj->{$op}->{$field};
-				}
-			} elsif ($op eq '$set') {
-				# set key-value pairs
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					$doc->{$field} = $obj->{$op}->{$field};
-				}
-			} elsif ($op eq '$unset') {
-				# remove key-value pairs
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					delete $doc->{$field} if $obj->{$op}->{$field};
-				}
-			} elsif ($op eq '$rename') {
-				# rename attributes
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					$doc->{$obj->{$op}->{$field}} = delete $doc->{$field}
-						if exists $doc->{$field};
-				}
-			} elsif ($op eq '$push') {
-				# push values to end of arrays
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					$doc->{$field} ||= [];
-					push(@{$doc->{$field}}, $obj->{$op}->{$field});
-				}
-			} elsif ($op eq '$pushAll') {
-				# push a list of values to end of arrays
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					$doc->{$field} ||= [];
-					push(@{$doc->{$field}}, @{$obj->{$op}->{$field}});
-				}
-			} elsif ($op eq '$addToSet') {
-				# push values to arrays only if they're not already there
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					$doc->{$field} ||= [];
-					my @add = ref $obj->{$op}->{$field} && ref $obj->{$op}->{$field} eq 'ARRAY' ? @{$obj->{$op}->{$field}} : ($obj->{$op}->{$field});
-					foreach my $val (@add) {
-						push(@{$doc->{$field}}, $val)
-							unless defined &_index_of($val, $doc->{$field});
-					}
-				}
-			} elsif ($op eq '$pop') {
-				# pop the last item from an array
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					$doc->{$field} ||= [];
-					pop(@{$doc->{$field}})
-						if $obj->{$op}->{$field};
-				}
-			} elsif ($op eq '$shift') {
-				# shift the first item from an array
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					$doc->{$field} ||= [];
-					shift(@{$doc->{$field}})
-						if $obj->{$op}->{$field};
-				}
-			} elsif ($op eq '$splice') {
-				# splice offsets from arrays
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					next unless	ref $obj->{$op}->{$field} &&
-							ref $obj->{$op}->{$field} eq 'ARRAY' &&
-							scalar @{$obj->{$op}->{$field}} == 2;
-					$doc->{$field} ||= [];
-					splice(@{$doc->{$field}}, $obj->{$op}->{$field}->[0], $obj->{$op}->{$field}->[1]);
-				}
-			} elsif ($op eq '$pull') {
-				# remove values from arrays
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					$doc->{$field} ||= [];
-					my $i = &_index_of($obj->{$op}->{$field}, $doc->{$field});
-					while (defined $i) {
-						splice(@{$doc->{$field}}, $i, 1);
-						$i = &_index_of($obj->{$op}->{$field}, $doc->{$field});
-					}
-				}
-			} elsif ($op eq '$pullAll') {
-				# remove a list of values from arrays
-				next unless ref $obj->{$op} eq 'HASH';
-				foreach my $field (keys %{$obj->{$op}}) {
-					croak "The $field attribute is not an array in the doc."
-						if defined $doc->{$field} && ref $doc->{$field} ne 'ARRAY';
-					$doc->{$field} ||= [];
-					foreach my $value (@{$obj->{$op}->{$field}}) {
-						my $i = &_index_of($value, $doc->{$field});
-						while (defined $i) {
-							splice(@{$doc->{$field}}, $i, 1);
-							$i = &_index_of($value, $doc->{$field});
-						}
-					}
-				}
-			}
-		}
-	} else {
-		# $obj is actually the new $doc
-		%$doc = %$obj;
-	}
+    if ( &_has_adv_upd($obj) ) {
+        foreach my $op ( keys %$obj ) {
+            if ( $op eq '$inc' ) {
 
-	return $doc;
+                # increase numerically
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    $doc->{$field} ||= 0;
+                    $doc->{$field} += $obj->{$op}->{$field};
+                }
+            } elsif ( $op eq '$set' ) {
+
+                # set key-value pairs
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    $doc->{$field} = $obj->{$op}->{$field};
+                }
+            } elsif ( $op eq '$unset' ) {
+
+                # remove key-value pairs
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    delete $doc->{$field} if $obj->{$op}->{$field};
+                }
+            } elsif ( $op eq '$rename' ) {
+
+                # rename attributes
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    $doc->{ $obj->{$op}->{$field} } = delete $doc->{$field}
+                      if exists $doc->{$field};
+                }
+            } elsif ( $op eq '$push' ) {
+
+                # push values to end of arrays
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    $doc->{$field} ||= [];
+                    push( @{ $doc->{$field} }, $obj->{$op}->{$field} );
+                }
+            } elsif ( $op eq '$pushAll' ) {
+
+                # push a list of values to end of arrays
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    $doc->{$field} ||= [];
+                    push( @{ $doc->{$field} }, @{ $obj->{$op}->{$field} } );
+                }
+            } elsif ( $op eq '$addToSet' ) {
+
+                # push values to arrays only if they're not already there
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    $doc->{$field} ||= [];
+                    my @add =
+                         ref $obj->{$op}->{$field}
+                      && ref $obj->{$op}->{$field} eq 'ARRAY'
+                      ? @{ $obj->{$op}->{$field} }
+                      : ( $obj->{$op}->{$field} );
+                    foreach my $val (@add) {
+                        push( @{ $doc->{$field} }, $val )
+                          unless defined &_index_of( $val, $doc->{$field} );
+                    }
+                }
+            } elsif ( $op eq '$pop' ) {
+
+                # pop the last item from an array
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    $doc->{$field} ||= [];
+                    pop( @{ $doc->{$field} } )
+                      if $obj->{$op}->{$field};
+                }
+            } elsif ( $op eq '$shift' ) {
+
+                # shift the first item from an array
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    $doc->{$field} ||= [];
+                    shift( @{ $doc->{$field} } )
+                      if $obj->{$op}->{$field};
+                }
+            } elsif ( $op eq '$splice' ) {
+
+                # splice offsets from arrays
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    next
+                      unless ref $obj->{$op}->{$field}
+                      && ref $obj->{$op}->{$field} eq 'ARRAY'
+                      && scalar @{ $obj->{$op}->{$field} } == 2;
+                    $doc->{$field} ||= [];
+                    splice(
+                        @{ $doc->{$field} },
+                        $obj->{$op}->{$field}->[0],
+                        $obj->{$op}->{$field}->[1]
+                    );
+                }
+            } elsif ( $op eq '$pull' ) {
+
+                # remove values from arrays
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    $doc->{$field} ||= [];
+                    my $i = &_index_of( $obj->{$op}->{$field}, $doc->{$field} );
+                    while ( defined $i ) {
+                        splice( @{ $doc->{$field} }, $i, 1 );
+                        $i =
+                          &_index_of( $obj->{$op}->{$field}, $doc->{$field} );
+                    }
+                }
+            } elsif ( $op eq '$pullAll' ) {
+
+                # remove a list of values from arrays
+                next unless ref $obj->{$op} eq 'HASH';
+                foreach my $field ( keys %{ $obj->{$op} } ) {
+                    croak "The $field attribute is not an array in the doc."
+                      if defined $doc->{$field}
+                      && ref $doc->{$field} ne 'ARRAY';
+                    $doc->{$field} ||= [];
+                    foreach my $value ( @{ $obj->{$op}->{$field} } ) {
+                        my $i = &_index_of( $value, $doc->{$field} );
+                        while ( defined $i ) {
+                            splice( @{ $doc->{$field} }, $i, 1 );
+                            $i = &_index_of( $value, $doc->{$field} );
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+
+        # $obj is actually the new $doc
+        %$doc = %$obj;
+    }
+
+    return $doc;
 }
 
 ##############################################
@@ -707,13 +811,18 @@ sub update_doc {
 ##############################################
 
 sub _has_adv_upd {
-	my $hash = shift;
+    my $hash = shift;
 
-	foreach ('$inc', '$set', '$unset', '$push', '$pushAll', '$addToSet', '$pop', '$shift', '$splice', '$pull', '$pullAll', '$rename', '$bit') {
-		return 1 if exists $hash->{$_};
-	}
+    foreach (
+        '$inc',      '$set',    '$unset', '$push',   '$pushAll',
+        '$addToSet', '$pop',    '$shift', '$splice', '$pull',
+        '$pullAll',  '$rename', '$bit'
+      )
+    {
+        return 1 if exists $hash->{$_};
+    }
 
-	return;
+    return;
 }
 
 ##############################################
@@ -728,17 +837,17 @@ sub _has_adv_upd {
 ##############################################
 
 sub _index_of {
-	my ($value, $array) = @_;
+    my ( $value, $array ) = @_;
 
-	for (my $i = 0; $i < scalar @$array; $i++) {
-		if (is_float($array->[$i]) && is_float($value)) {
-			return $i if $array->[$i] == $value;
-		} else {
-			return $i if $array->[$i] eq $value;
-		}
-	}
+    for ( my $i = 0 ; $i < scalar @$array ; $i++ ) {
+        if ( is_float( $array->[$i] ) && is_float($value) ) {
+            return $i if $array->[$i] == $value;
+        } else {
+            return $i if $array->[$i] eq $value;
+        }
+    }
 
-	return;
+    return;
 }
 
 ##############################################
@@ -754,26 +863,26 @@ sub _index_of {
 ##############################################
 
 sub _parse_function {
-	my ($doc, $def) = @_;
+    my ( $doc, $def ) = @_;
 
-	my ($func) = keys %$def;
+    my ($func) = keys %$def;
 
-	die "Unrecognized function $func"
-		unless exists $BUILTINS{$func};
+    die "Unrecognized function $func"
+      unless exists $BUILTINS{$func};
 
-	$def->{$func} = [$def->{$func}]
-		unless ref $def->{$func};
+    $def->{$func} = [ $def->{$func} ]
+      unless ref $def->{$func};
 
-	my @vals;
-	foreach (@{$def->{$func}}) {
-		my ($v, $k) = _expand_dot_notation($doc, $_);
-		push(@vals, $v)
-			if defined $v;
-	}
+    my @vals;
+    foreach ( @{ $def->{$func} } ) {
+        my ( $v, $k ) = _expand_dot_notation( $doc, $_ );
+        push( @vals, $v )
+          if defined $v;
+    }
 
-	return unless scalar @vals;
+    return unless scalar @vals;
 
-	return $BUILTINS{$func}->(@vals);
+    return $BUILTINS{$func}->(@vals);
 }
 
 ##############################################
@@ -789,30 +898,34 @@ sub _parse_function {
 ##############################################
 
 sub _expand_dot_notation {
-	my ($doc, $key) = @_;
+    my ( $doc, $key ) = @_;
 
-	return ($doc->{$key}, $key)
-		unless $key =~ m/\./;
+    return ( $doc->{$key}, $key )
+      unless $key =~ m/\./;
 
-	my @way_there = split(/\./, $key);
+    my @way_there = split( /\./, $key );
 
-	$key = shift @way_there;
-	my %virt = ( $key => $doc->{$key} );
+    $key = shift @way_there;
+    my %virt = ( $key => $doc->{$key} );
 
-	while (scalar @way_there) {
-		$key = shift @way_there;
-		my ($have) = values %virt;
+    while ( scalar @way_there ) {
+        $key = shift @way_there;
+        my ($have) = values %virt;
 
-		if ($have && ref $have eq 'HASH' && exists $have->{$key}) {
-			%virt = ( $key => $have->{$key} );
-		} elsif ($have && ref $have eq 'ARRAY' && $key =~ m/^\d+$/ && scalar @$have > $key) {
-			%virt = ( $key => $have->[$key] )
-		} else {
-			%virt = ();
-		}
-	}
+        if ( $have && ref $have eq 'HASH' && exists $have->{$key} ) {
+            %virt = ( $key => $have->{$key} );
+        } elsif ( $have
+            && ref $have eq 'ARRAY'
+            && $key =~ m/^\d+$/
+            && scalar @$have > $key )
+        {
+            %virt = ( $key => $have->[$key] );
+        } else {
+            %virt = ();
+        }
+    }
 
-	return ($virt{$key}, $key);
+    return ( $virt{$key}, $key );
 }
 
 =head1 DIAGNOSTICS
@@ -889,38 +1002,20 @@ Ido Perlmuter <ido at ido50 dot net>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011-2015, Ido Perlmuter C<< ido at ido50 dot net >>.
+Copyright (c) 2011-2025, Ido Perlmuter C<< ido at ido50 dot net >>.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself, either version
-5.8.1 or any later version. See L<perlartistic|perlartistic> 
-and L<perlgpl|perlgpl>.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+The full License is included in the LICENSE file. You may also
+obtain a copy of the License at
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+L<http://www.apache.org/licenses/LICENSE-2.0>
 
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 =cut
 

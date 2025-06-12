@@ -1,5 +1,8 @@
 Revision history for RT-Extension-RepeatTicket
 
+3.00 2025-06-10
+ - Update for RT 6.0 (RT 5.0 users need to use 2.* versions)
+
 2.04 2025-01-29
  - Add configuration to specify custom fields to be skipped on repeat
 

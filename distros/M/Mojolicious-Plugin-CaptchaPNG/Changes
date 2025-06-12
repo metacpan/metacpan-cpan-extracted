@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::CaptchaPNG
 
+1.06      2025-06-11 07:07:50-07:00 America/Los_Angeles
+        - Use Crypt::URandom to provide urand as rand replacement
+
 1.05      2025-06-10 18:39:15-07:00 America/Los_Angeles
         - Tiny POD update
 

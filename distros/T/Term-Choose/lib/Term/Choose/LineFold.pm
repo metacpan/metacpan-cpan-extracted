@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.774';
+our $VERSION = '1.775';
 
 use Exporter qw( import );
 
@@ -15,23 +15,6 @@ use Carp qw( croak );
 use Term::Choose::Constants qw( PH SGR_ES EXTRA_W );
 use Term::Choose::Screen    qw( get_term_size );
 
-
-#BEGIN {
-#    my $module;
-#    eval {
-#        require Term::Choose::LineFold::XS;
-#        Term::Choose::LineFold::XS->VERSION( 0.001 );
-#        $module = 'Term::Choose::LineFold::XS';
-#        1;
-#    } or do {
-#        require Term::Choose::LineFold::PP;
-#        $module = 'Term::Choose::LineFold::PP';
-#    };
-#    no strict qw( refs );
-#    for my $func ( qw( char_width print_columns cut_to_printwidth adjust_to_printwidth ) ) {
-#        *{"Term::Choose::LineFold::$func"} = \&{"${module}::$func"};
-#    }
-#}
 BEGIN {
     my $module;
     eval {
@@ -43,11 +26,27 @@ BEGIN {
         require Term::Choose::LineFold::PP;
         $module = 'Term::Choose::LineFold::PP';
     };
-    *Term::Choose::LineFold::char_width = \&{"${module}::char_width"};
-    *Term::Choose::LineFold::print_columns = \&{"${module}::print_columns"};
-    *Term::Choose::LineFold::cut_to_printwidth = \&{"${module}::cut_to_printwidth"};
-    *Term::Choose::LineFold::adjust_to_printwidth = \&{"${module}::adjust_to_printwidth"};
+    no strict qw( refs );
+    for my $func ( qw( char_width print_columns cut_to_printwidth adjust_to_printwidth ) ) {
+        *{"Term::Choose::LineFold::$func"} = \&{"${module}::$func"};
+    }
 }
+#BEGIN {
+#    my $module;
+#    eval {
+#        require Term::Choose::LineFold::XS;
+#        Term::Choose::LineFold::XS->VERSION( 0.001 );
+#        $module = 'Term::Choose::LineFold::XS';
+#        1;
+#    } or do {
+#        require Term::Choose::LineFold::PP;
+#        $module = 'Term::Choose::LineFold::PP';
+#    };
+#    *Term::Choose::LineFold::char_width = \&{"${module}::char_width"};
+#    *Term::Choose::LineFold::print_columns = \&{"${module}::print_columns"};
+#    *Term::Choose::LineFold::cut_to_printwidth = \&{"${module}::cut_to_printwidth"};
+#    *Term::Choose::LineFold::adjust_to_printwidth = \&{"${module}::adjust_to_printwidth"};
+#}
 
 
 sub line_fold {
@@ -196,7 +195,7 @@ Term::Choose::LineFold
 
 =head1 VERSION
 
-Version 1.774
+Version 1.775
 
 =cut
 

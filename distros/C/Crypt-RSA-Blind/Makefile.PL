@@ -9,6 +9,7 @@ WriteMakefile(
 	      ABSTRACT_FROM       => 'lib/Crypt/RSA/Blind.pm',
 	      PL_FILES            => {},
 	      MIN_PERL_VERSION    => '5.026',
+	      LICENSE             => 'unrestricted',
 	      TEST_REQUIRES       => {
 				      'Test::More' => 0,
 				     },
@@ -25,9 +26,9 @@ WriteMakefile(
               META_MERGE => {
 			     "meta-spec" => { version => 2 },
 			     provides => {
-					  'Crypt::RSA::Blind' => {file => 'lib/Crypt/RSA/Blind.pm', version => '1.031'},
-					  'Crypt::RSA::Blind::PubKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => '1.031'},
-					  'Crypt::RSA::Blind::SecKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => '1.031'}
+					  'Crypt::RSA::Blind' => {file => 'lib/Crypt/RSA/Blind.pm', version => '1.035'},
+					  'Crypt::RSA::Blind::PubKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => '1.035'},
+					  'Crypt::RSA::Blind::SecKey' => {file => 'lib/Crypt/RSA/Blind.pm', version => '1.035'}
 					 }
 			    },
 	      dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -1,5 +1,10 @@
 Revision history for MQUL
 
+3.000000  2025-06-11 13:43:40+03:00 Asia/Jerusalem
+        - Bugfix: warnings printed when doc_matches compares strings with
+          numbers.
+        - Switch to Apache Licene 2.0.
+
 2.001000  2015-06-17 11:17:15+03:00 Asia/Jerusalem
 		- Feature: added support for the $and keyword in queries
 

@@ -10,7 +10,7 @@ use Carp();
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(is_holiday holidays);
-our $VERSION   = '0.34';
+our $VERSION   = '0.35';
 
 sub _DEFAULT_STATE                        { return 'VIC' }
 sub _LOCALTIME_YEAR_IDX                   { return 5 }
@@ -21,6 +21,7 @@ sub _FOURTH_DAY_OF_EASTER                 { return 4 }
 sub _ANZAC_DAY_IN_APRIL                   { return 25 }
 sub _CHRISTMAS_DAY_IN_DECEMBER            { return 25 }
 sub _APRIL_MONTH_NUMBER                   { return 4 }
+sub _MAY_MONTH_NUMBER                     { return 5 }
 sub _OCTOBER_MONTH_NUMBER                 { return 10 }
 sub _NOVEMBER_MONTH_NUMBER                { return 11 }
 sub _DECEMBER_MONTH_NUMBER                { return 12 }
@@ -149,6 +150,12 @@ sub holidays {
         foreach my $holiday ( _compute_vic_grand_final_eve_day($year) )
         {    # VIC grand final day
             $holidays{$holiday} = 'Grand Final Eve';
+        }
+    }
+    elsif ( $state eq 'QLD' ) {
+        foreach my $holiday ( _compute_qld_labour_day($year) )
+        {    # QLD labour day
+            $holidays{$holiday} = 'Labour Day';
         }
     }
     elsif ( $state eq 'WA' ) {
@@ -972,6 +979,28 @@ sub _compute_vic_labour_day {    # second monday in march
     return ( sprintf '%02d%02d', ( $month + 1 ), $day );
 }
 
+sub _compute_qld_labour_day {    # first monday in may
+    my ($year)     = @_;
+    my $day        = 1;
+    my $month      = _MAY_MONTH_NUMBER() - 1;
+    my $date       = Time::Local::timelocal( 0, 0, 0, $day, $month, $year );
+    my $mondays    = 0;
+    my $which_week = 1;
+    my ( $sec, $min, $hour, $wday, $yday, $isdst );
+    while ( $mondays < $which_week ) {
+        ( $sec, $min, $hour, undef, undef, undef, $wday, $yday, $isdst ) =
+          localtime $date;
+        if ( $wday == 1 ) {
+            $mondays += 1;
+        }
+        if ( $mondays < $which_week ) {
+            $day += 1;
+            $date = Time::Local::timelocal( 0, 0, 0, $day, $month, $year );
+        }
+    }
+    return ( sprintf '%02d%02d', ( $month + 1 ), $day );
+}
+
 sub _compute_vic_grand_final_eve_day {    # i have no words ...
     my ($year) = @_;
     my ( $day, $month );
@@ -1362,7 +1391,7 @@ Date::Holidays::AU - Determine Australian Public Holidays
 
 =head1 VERSION
  
-Version 0.34
+Version 0.35
 
 =head1 SYNOPSIS
 

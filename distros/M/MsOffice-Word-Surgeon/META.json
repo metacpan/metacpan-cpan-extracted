@@ -45,7 +45,7 @@
    "provides" : {
       "MsOffice::Word::Surgeon" : {
          "file" : "lib/MsOffice/Word/Surgeon.pm",
-         "version" : "2.10"
+         "version" : "2.11"
       },
       "MsOffice::Word::Surgeon::BookmarkBoundary" : {
          "file" : "lib/MsOffice/Word/Surgeon/BookmarkBoundary.pm"
@@ -81,6 +81,6 @@
          "url" : "https://github.com/damil/MsOffice-Word-Surgeon"
       }
    },
-   "version" : "2.10",
+   "version" : "2.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

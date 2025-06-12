@@ -28,7 +28,7 @@ use URI;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_REDIRECT PE_ERROR portalConsts);
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.21.1';
 
 use constant oidcErrorLevel => {
     server_error     => 'error',
@@ -453,11 +453,16 @@ sub buildAuthorizationCodeAuthnRequest {
     };
     my $authorize_request_params = {
         %$authorize_request_oauth2_params,
-        ( defined $display    ? ( display    => $display )    : () ),
-        ( defined $prompt     ? ( prompt     => $prompt )     : () ),
-        ( $max_age            ? ( max_age    => $max_age )    : () ),
-        ( defined $ui_locales ? ( ui_locales => $ui_locales ) : () ),
-        ( defined $acr_values ? ( acr_values => $acr_values ) : () )
+        ( $display    ? ( display    => $display )    : () ),
+        ( $prompt     ? ( prompt     => $prompt )     : () ),
+        ( $ui_locales ? ( ui_locales => $ui_locales ) : () ),
+        (
+            defined($max_age) && length($max_age) ? ( max_age => $max_age ) : ()
+        ),
+        (
+            defined($acr_values)
+              && length($acr_values) ? ( acr_values => $acr_values ) : ()
+        )
     };
 
     # Call oidcGenerateAuthenticationRequest

@@ -18,6 +18,7 @@ use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
 use Locale::US;
 use Carp;
+use Params::Get;
 use Scalar::Util;
 
 =head1 NAME
@@ -26,11 +27,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 our $alternatives;
 our $abbreviations;
@@ -40,15 +41,15 @@ sub _normalize($);
 
 =head1 DESCRIPTION
 
-C<Geo::Coder::Free> translates addresses into latitude and longitude coordinates using free databases such as
+C<Geo::Coder::Free> translates addresses into latitude and longitude coordinates using a local C<SQLite> database built from free databases such as
 L<https://spelunker.whosonfirst.org/>,
 L<https://maxmind.com>,
 L<https://github.com/dr5hn/countries-states-cities-database>,
 L<https://openaddresses.io/>, and
 L<https://openstreetmap.org>.
 The module is designed to be flexible,
-importing the data into a local C<SQLite> database,
-and supports both command-line and programmatic usage.
+importing the data into the database,
+and supporting both command-line and programmatic usage.
 The module includes methods for geocoding (translating addresses to coordinates) and reverse geocoding (translating coordinates to addresses),
 though the latter is not fully implemented.
 It also provides utilities for handling common address formats and abbreviations,
@@ -105,18 +106,10 @@ sub new {
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args;
-	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
-		%args = %{$_[0]};
-	} elsif((@_ % 2) == 0) {
-		%args = @_;
-	} else {
-		carp(__PACKAGE__, ': Invalid arguments passed to new()');
-		return;
-	}
+	my $params = Params::Get::get_params(undef, \@_) || {};
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
+		if((scalar keys %{$params}) > 0) {
 			# Using Geo::Coder::Free->new not Geo::Coder::Free::new
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
@@ -126,7 +119,7 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	if(!$alternatives) {
@@ -141,19 +134,19 @@ sub new {
 		}
 	}
 	my $rc = {
-		%args,
-		maxmind => Geo::Coder::Free::MaxMind->new(%args),
+		%{$params},
+		maxmind => Geo::Coder::Free::MaxMind->new($params),
 		alternatives => $alternatives
 	};
 
-	if((!defined $args{'openaddr'}) && $ENV{'OPENADDR_HOME'}) {
-		$args{'openaddr'} = $ENV{'OPENADDR_HOME'};
+	if((!defined $params->{'openaddr'}) && $ENV{'OPENADDR_HOME'}) {
+		$params->{'openaddr'} = $ENV{'OPENADDR_HOME'};
 	}
 
-	if($args{'openaddr'}) {
-		$rc->{'openaddr'} = Geo::Coder::Free::OpenAddresses->new(%args);
+	if($params->{'openaddr'}) {
+		$rc->{'openaddr'} = Geo::Coder::Free::OpenAddresses->new('id' => 'md5', %{$params});
 	}
-	if(my $cache = $args{'cache'}) {
+	if(my $cache = $params->{'cache'}) {
 		$rc->{'cache'} = $cache;
 	}
 
@@ -202,6 +195,7 @@ my %common_words = (
 	'road' => 1,
 	'she' => 1,
 	'side' => 1,
+	'some' => 1,
 	'to' => 1,
 	'the' => 1,
 	'was' => 1,

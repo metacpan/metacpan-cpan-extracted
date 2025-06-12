@@ -1,8 +1,8 @@
 #!perl
 # -*-cperl-*-
 #
-# 02-rsabssa.t - Test RSABSSA-PSS as per RFC 9474
-# Copyright (c) 2024 Ashish Gulhati <crypt-rsab at hash.neo.email>
+# 02-rsabssa.t - Test RSABSSA-PSS (RFC 9474) blind signing and verification
+# Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 
 use Test::More tests => 59;
 use Crypt::RSA::DataFormat qw(i2osp os2ip octet_xor);
@@ -28,7 +28,7 @@ for (@testvectors) {
 						    Init => $init, R_inv => $_->{r}, Salt => $_->{salt} } ),
       'Create blind signing request');
   ok (os2ip($blinded_msg) == $_->{blm}, "Check blind signing request") unless $_->{randomize};
-  ok (my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } ),
+  ok (my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey, PublicKey => $pubkey, BlindedMessage => $blinded_msg } ),
       'Create blind signature');
   ok (os2ip($blind_sig) == $_->{bls}, 'Check blind signature') unless $_->{randomize};
   my $sig; my $sig2;
@@ -63,7 +63,7 @@ for my $slen (0, 48) {
   my $init = $rsab->init;
   ok (my ($blinded_msg, $inv) = $rsab->blind( { PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init } ),
       "Create blind signing request");
-  ok (my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } ),
+  ok (my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey, PublicKey => $pubkey, BlindedMessage => $blinded_msg } ),
       'Create blind signature');
   my $sig; my $sig2;
   try { $sig = $rsab->finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } ) }
@@ -90,7 +90,7 @@ for my $slen (0, 48) {
   my $init = $rsab->init;
   ok (my ($blinded_msg, $inv) = $rsab->blind( { PublicKey => $pubkey, Message => $msg, sLen => $slen, Init => $init } ),
       "Create blind signing request");
-  ok (my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey, BlindedMessage => $blinded_msg } ),
+  ok (my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey, PublicKey => $pubkey, BlindedMessage => $blinded_msg } ),
       'Create blind signature');
   my $sig; my $sig2;
   try { $sig = $rsab->finalize( { PublicKey => $pubkey, BlindSig => $blind_sig, Blinding => $inv, Message => $msg, sLen => $slen } ) }

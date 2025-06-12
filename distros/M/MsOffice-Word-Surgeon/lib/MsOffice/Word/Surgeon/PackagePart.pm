@@ -95,7 +95,7 @@ sub _runs {
     # build internal TEXT objects
   TXT:
     while (my ($xml_before_text, $txt_contents) = splice @txt_fragments, 0, 2) {
-      next TXT if !$xml_before_text && !$txt_contents;
+      next TXT if !$xml_before_text && !length($txt_contents);
       $_ //= '' for $xml_before_text, $txt_contents;
       decode_entities($txt_contents);
       push @texts, MsOffice::Word::Surgeon::Text->new(xml_before   => $xml_before_text,

@@ -3,7 +3,7 @@
 # Crypt::RSA::Blind - Blind RSA signatures
 # Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 #
-# $Id: lib/Crypt/RSA/Blind.pm v1.031 Mon Jun  9 13:22:34 EST 2025 $
+# $Id: lib/Crypt/RSA/Blind.pm v1.035 Wed Jun 11 13:34:13 EST 2025 $
 
 use warnings;
 use strict;
@@ -16,7 +16,7 @@ no warnings qw(experimental::signatures);
 class Crypt::RSA::Blind;
 
 use vars qw( $VERSION );
-our ( $VERSION ) = '$Revision: 1.031 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.035 $' =~ /\s+([\d\.]+)/;
 
 use Carp;
 use Carp::Assert;
@@ -229,7 +229,7 @@ method request (%arg) {
 
 method sign (%arg) {
   my $klen = ceil(bitsize($arg{Key}->n)/8);
-  $self->get_oldapi ? os2ip($self->blind_sign( { SecretKey => $arg{Key}, BlindedMessage => i2osp($arg{Message}, $klen) } )) : $self->_sign(%arg);
+  $self->get_oldapi ? os2ip($self->blind_sign( { SecretKey => $arg{Key}, PublicKey => $arg{PublicKey}, BlindedMessage => i2osp($arg{Message}, $klen) } )) : $self->_sign(%arg);
 }
 
 method unblind (%arg) {
@@ -366,8 +366,8 @@ Crypt::RSA::Blind - Blind RSA signatures
 
 =head1 VERSION
 
- $Revision: 1.031 $
- $Date: Mon Jun  9 13:22:34 EST 2025 $
+ $Revision: 1.035 $
+ $Date: Wed Jun 11 13:34:13 EST 2025 $
 
 =cut
 
@@ -382,7 +382,7 @@ Crypt::RSA::Blind - Blind RSA signatures
 
     my $msg = "Hello, world!";
 
-    # RSABSSA-PSS interface (RFC 9474)
+    # RSABSSA-PSS methods (RFC 9474)
 
     my $slen = 48; # Salt length (in bytes). 0 for no salt.
 
@@ -391,6 +391,7 @@ Crypt::RSA::Blind - Blind RSA signatures
                                                     sLen => $slen } );
 
     my $blind_sig = $rsab->blind_sign( { SecretKey => $seckey,
+                                         PublicKey => $pubkey,
                                          BlindedMessage => $blinded_msg } );
 
     my $sig = $rsab->finalize( { PublicKey => $pubkey,
@@ -420,25 +421,29 @@ Crypt::RSA::Blind - Blind RSA signatures
                               Init => $init,
                               Message => $msg );
 
-    my $blindsig = $rsab->sign( Key => $seckey, Message => $req );
+    my $blindsig = $rsab->sign( Key => $seckey,
+                                PublicKey => $pubkey,
+                                Message => $req );
 
-    my $sig = $rsab->unblind( Key => $pubkey, Init => $init,
+    my $sig = $rsab->unblind( Key => $pubkey,
+                              Init => $init,
                               Signature => $blindsig );
 
-    print "OK\n" if $rsab->verify( Key => $pubkey, Message => $msg,
+    print "OK\n" if $rsab->verify( Key => $pubkey,
+                                   Message => $msg,
                                    Signature => $sig );
 
 =head1 METHODS
 
 =head2 new
 
-Creates and returns a new Crypt::RSA::Blind object.
+Creates and returns a new C<Crypt::RSA::Blind> object.
 
 =head2 keygen
 
 Generates and returns an RSA key-pair of specified bitsize. This is a
-synonym for Crypt::RSA::Key::generate(). Arguments and return values
-are described in the Crypt::RSA::Key(3) manpage.
+synonym for C<Crypt::RSA::Key::generate>. Arguments and return values
+are described in the L<Crypt::RSA::Key> manpage.
 
 =head2 init
 
@@ -451,18 +456,18 @@ convenient to use initialization vectors when creating multiple
 interlaved signing requests.
 
 When using initialization vectors, the vector should be passed as the
-'Init' named argument to the blind() and finalize() methods
-(in the old deprecated interface, to the request(), and unblind()
+C<Init> named argument to the C<blind> and C<finalize> methods
+(in the old deprecated interface, to the C<request> and C<unblind>
 methods).
 
 Alternately, you can keep track of the blinding factor for each
 request in your own code. In this case, you can supply the blinding
-factor as the 'Blinding' named argument to the finalize() method,
-instead of providing an initialization vector as the 'Init' argument
-to blind() and finalize().
+factor as the C<Blinding> named argument to the C<finalize> method,
+instead of providing an initialization vector as the C<Init> argument
+to C<blind> and C<finalize>.
 
 Initialization vectors are not persistent across different invocations
-of a script, so if you need to call blind() and finalize() in
+of a script, so if you need to call C<blind> and C<finalize> in
 different processes, you will need to record and persist the blinding
 factor yourself.
 
@@ -479,11 +484,11 @@ are required:
 
 =over
 
-PublicKey - The public key of the signer
+B<PublicKey> - The public key of the signer
 
-Message - The message to be blind signed
+B<Message> - The message to be blind signed
 
-sLen - The length (in bytes) of the salt to be used in the RSABSSA-PSS
+B<sLen> - The length (in bytes) of the salt to be used in the RSABSSA-PSS
 protocol. This can be 0 for no salt.
 
 =back
@@ -492,11 +497,11 @@ The following optional arguments can be provided:
 
 =over
 
-Init - An initialization vector from init()
+B<Init> - An initialization vector from init()
 
-R_inv - The r_inv value as an integer, for test vector verification.
+B<R_inv> - The r_inv value as an integer, for test vector verification.
 
-Salt - A salt as a hex string without a leading '0x', for test vector
+B<Salt> - A salt as a hex string without a leading '0x', for test vector
 verification.
 
 =back
@@ -513,9 +518,19 @@ are required:
 
 =over
 
-SecretKey - The private key of the signer
+B<SecretKey> - The private key of the signer
 
-BlindedMessage - The blinded message from blind()
+B<BlindedMessage> - The blinded message from blind()
+
+=back
+
+The following optional arguments can be provided:
+
+=over
+
+B<PublicKey> - The public key of the signer. If this is provided, the
+blind signature will be verified as an implementation safeguard. This
+is required by RFC9474.
 
 =back
 
@@ -532,13 +547,13 @@ are required:
 
 =over
 
-PublicKey - The public key of the signer
+B<PublicKey> - The public key of the signer
 
-BlindSig - The blind signature from blind_sign()
+B<BlindSig> - The blind signature from blind_sign()
 
-Message - The message that was provided to blind()
+B<Message> - The message that was provided to blind()
 
-sLen - The lengh in bytes of the salt. 0 for no salt.
+B<sLen> - The lengh in bytes of the salt. 0 for no salt.
 
 =back
 
@@ -546,9 +561,9 @@ In addition, one of the following arguments is required:
 
 =over
 
-Init - The initialization vector that was provided to blind()
+B<Init> - The initialization vector that was provided to blind()
 
-Blinding - The blinding factor that was returned by blind()
+B<Blinding> - The blinding factor that was returned by blind()
 
 =back
 
@@ -564,34 +579,35 @@ arguments are required:
 
 =over
 
-PublicKey - The public key of the signer
+B<PublicKey> - The public key of the signer
 
-Signature - The blind signature
+B<Signature> - The blind signature
 
-Message - The message that was signed
+B<Message> - The message that was signed
 
-sLen - The lengh in bytes of the salt. 0 for no salt.
+B<sLen> - The lengh in bytes of the salt. 0 for no salt.
 
 =back
 
 =head2 randomize
 
-Takes a single required argument, the message to be signed, and
-returns a prepared message with a random prefix.
+Takes a single required argument, the message to be signed (as a
+binary string), and returns a prepared message with a random prefix
+(also as a binary string).
 
 =head2 errstr
 
-Returns the error message from the last failed method call. See ERROR
-HANDLING below for more details.
+Returns the error message from the last failed method call. See
+L</ERROR HANDLING> below for more details.
 
 =head1 OLD API MODES
 
-The methods under OLD API METHODS below are the original interface for
+The methods under L</OLD API METHODS> below are the original interface for
 this module. They continue to be available in two modes for backwards
 compatibility.
 
 The first, recommended, and default mode for these methods is
-"compatibility mode", which can be set with:
+"compatibility mode", which can be enabled with:
 
     $rsab->set_oldapi(1);     # Enable old API wrappers
 
@@ -610,7 +626,7 @@ and isn't compliant with it.
 While these original methods continue to be available, versions 1.020
 and higher of this module use different accessor names than previous
 versions. This change is incompatible with code that uses the old
-accessors. See ACCESSORS below.
+accessors. See L</ACCESSORS> below.
 
 =head1 OLD API METHODS
 
@@ -621,11 +637,11 @@ arguments are required:
 
 =over
 
-Init - The initialization vector from init()
+B<Init> - The initialization vector from init()
 
-Key - The public key of the signer
+B<Key> - The public key of the signer
 
-Message - The message to be blind signed
+B<Message> - The message to be blind signed
 
 =back
 
@@ -636,9 +652,19 @@ arguments are required:
 
 =over
 
-Key - The private key of the signer
+B<Key> - The private key of the signer
 
-Message - The blind-signing request
+B<Message> - The blind-signing request
+
+=back
+
+The following optional arguments can be provided:
+
+=over
+
+B<PublicKey> - The public key of the signer. If this is provided, the
+blind signature will be verified as an implementation safeguard. This
+is required by RFC9474.
 
 =back
 
@@ -649,11 +675,11 @@ following named arguments are required:
 
 =over
 
-Init - The initialization vector from init()
+B<Init> - The initialization vector from init()
 
-Key - The public key of the signer
+B<Key> - The public key of the signer
 
-Signature - The blind signature
+B<Signature> - The blind signature
 
 =back
 
@@ -663,11 +689,11 @@ Verify a signature. The following named arguments are required:
 
 =over
 
-Key - The public key of the signer
+B<Key> - The public key of the signer
 
-Signature - The blind signature
+B<Signature> - The blind signature
 
-Message - The message that was signed
+B<Message> - The message that was signed
 
 =back
 
@@ -709,28 +735,28 @@ only relevant to the old deprecated implementation.
 
 =head2 get_oldapi / set_oldapi
 
-Enable / disable compatibility mode for the original Crypt::RSA::Blind
-API to wrap the RSABSSA-PSS methods. set_oldapi(1) enables wrapping
-RSABSSA-PSS in the old API methods. set_oldapi(0) disables wrapping
-and uses the original implementation for the original methods. This
-mode is deprecated.
+Enable / disable compatibility mode for the original
+C<Crypt::RSA::Blind> API to wrap the RSABSSA-PSS
+methods. C<set_oldapi(1)> enables wrapping RSABSSA-PSS in the old API
+methods. C<set_oldapi(0)> disables wrapping and uses the original
+implementation for the original methods. This mode is deprecated.
 
 =head1 ERROR HANDLING
 
-Crypt::RSA::Blind relies on Crypt::RSA, which uses an error handling
-method implemented in Crypt::RSA::Errorhandler. When a method fails
+C<Crypt::RSA::Blind> relies on L<Crypt::RSA>, which uses an error handling
+method implemented in L<Crypt::RSA::Errorhandler>. When a method fails
 it returns undef and saves the error message. This error message is
-available to the caller through the errstr() method. For more details
-see the Crypt::RSA::Errorhandler(3) manpage.
+available to the caller through the C<errstr> method. For more details
+see the L<Crypt::RSA::Errorhandler> manpage.
 
-Other than keygen(), only the "old API" methods of Crypt::RSA::Blind
+Other than C<keygen>, only the "old API" methods of C<Crypt::RSA::Blind>
 report errors this way, when operating with their original
-implementation. See OLD API MODES above.
+implementation. See L</OLD API MODES> above.
 
-The blind(), blind_sign(), finalize() and pss_verify() methods do not
+The C<blind>, C<blind_sign>, C<finalize> and C<pss_verify> methods do not
 use the above error reporting method. They raise an exception on
 error. As do the "old API" methods when operating in compatibility
-mode (see OLD API MODES above).
+mode (see L</OLD API MODES> above).
 
 =head1 AUTHOR
 
@@ -739,15 +765,13 @@ Ashish Gulhati, C<< <crypt-rsab at hash.neo.email> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-crypt-rsa-blind at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-RSA-Blind>. 
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-RSA-Blind>.
 I will be notified, and then you'll automatically be notified of progress
 on your bug as I make changes.
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (c) Ashish Gulhati.
-
-=head1 LICENSE
 
 This software package is Open Software; you can use, redistribute,
 and/or modify it under the terms of the Open Artistic License 4.0.

@@ -117,8 +117,7 @@ sub _resend {
             type         => $self->prefix,
         );
 
-        eval { $self->setSecurity($req) };
-        $req->mustRedirect(1);
+        $req->noLoginDisplay(1);
         return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
     }
 
@@ -135,7 +134,7 @@ sub _resend {
             portal_error => portalConsts->{PE_TOKENEXPIRED},
             type         => $self->prefix,
         );
-        $self->setSecurity($req);
+        $req->noLoginDisplay(1);
         return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
     }
 

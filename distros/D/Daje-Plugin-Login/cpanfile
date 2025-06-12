@@ -1,0 +1,9 @@
+requires 'perl', '5.040000';
+
+requires 'Daje::Tools::JWT','0.01';
+requires 'Digest::SHA','0';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+};
+

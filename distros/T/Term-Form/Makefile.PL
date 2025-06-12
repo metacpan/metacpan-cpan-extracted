@@ -55,7 +55,4 @@ WriteMakefile(
         SUFFIX   => '.gz',
         TARFLAGS => '--format=gnu -cvf',
     },
-    clean => {
-        FILES => 'Term-Form-*',
-    },
 );

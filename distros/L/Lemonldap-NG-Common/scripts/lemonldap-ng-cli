@@ -18,6 +18,8 @@ my $action;
 eval {
     POSIX::setgid( scalar( getgrnam($opt_group) ) );
     POSIX::setuid( scalar( getpwnam($opt_user) ) );
+    my (undef, undef, undef, undef, undef, undef, undef, $homedir, undef) = getpwnam($opt_user);
+    $ENV{HOME} = $homedir if $homedir;
 };
 
 for ( my $i = 0 ; $i < @ARGV ; $i++ ) {

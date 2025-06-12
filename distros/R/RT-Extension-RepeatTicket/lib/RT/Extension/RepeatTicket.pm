@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::RepeatTicket;
 
-our $VERSION = "2.04";
+our $VERSION = "3.00";
 
 use RT::Interface::Web;
 use DateTime;
@@ -820,6 +820,55 @@ sub CheckCompleteDate {
     return 1;
 }
 
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'RepeatTicket',
+        Content => [
+            {
+                Name => 'RepeatTicketCoexistentNumber',
+                Help => 'https://metacpan.org/pod/RT::Extension::RepeatTicket#$RepeatTicketCoexistentNumber',
+            },
+            {
+                Name => 'RepeatTicketLeadTime',
+                Help => 'https://metacpan.org/pod/RT::Extension::RepeatTicket#$RepeatTicketLeadTime',
+            },
+            {
+                Name => 'RepeatTicketSubjectFormat',
+                Help => 'https://metacpan.org/pod/RT::Extension::RepeatTicket#$RepeatTicketSubjectFormat',
+            },
+            {
+                Name => 'RepeatTicketPreviewNumber',
+                Help => 'https://metacpan.org/pod/RT::Extension::RepeatTicket#$RepeatTicketPreviewNumber',
+            },
+            {
+                Name => 'RepeatTicketSkipCustomFields',
+                Help => 'https://metacpan.org/pod/RT::Extension::RepeatTicket#@RepeatTicketSkipCustomFields',
+            },
+        ],
+        Meta    => {
+            RepeatTicketCoexistentNumber => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Integer',
+            },
+            RepeatTicketLeadTime => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Integer',
+            },
+            RepeatTicketSubjectFormat => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/String',
+            },
+            RepeatTicketPreviewNumber => {
+                Type   => 'SCALAR',
+                Widget => '/Widgets/Form/Integer',
+            },
+            RepeatTicketSkipCustomFields => {
+                Type => 'ARRAY',
+            },
+        }
+    );
+}
+
 1;
 __END__
 
@@ -845,7 +894,7 @@ script.
 
 =head1 RT VERSION
 
-Works with RT 5.0. Check out 1.* versions if you are still using RT 4.
+Works with RT 6.0. For RT 5.0 install the most recent 2.* version.
 
 =head1 INSTALLATION
 
@@ -869,13 +918,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item C<patch RT>
-
-Apply for 5.0.0:
-
-    patch -p1 -d /opt/rt5 < patches/0001-Fix-radio-checkbox-inputs-for-click-panel-behavior-o.patch
-
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -883,11 +926,21 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Add F<bin/rt-repeat-ticket> to the daily cron job.
 
 =item Restart your webserver
+
+=item Add Repeat Ticket to your Page Layouts
+
+This extension provides a widget that can be added to the Page Layouts for the
+Ticket Create and Display pages for queues where you want to use Repeat Ticket.
+You can add the widget by going to Admin -> Page Layouts -> Ticket and choosing
+the Create or Display Layout.
+
+If you do not add the widget to the Page Layouts you can use the Recurrence tab
+to modify recurrence for a ticket.
 
 =back
 
@@ -1162,7 +1215,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2020 by Best Practical Solutions
+This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
 This is free software, licensed under:
 

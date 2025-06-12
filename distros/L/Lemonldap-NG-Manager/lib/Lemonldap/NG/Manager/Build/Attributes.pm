@@ -1463,7 +1463,7 @@ sub attributes {
         },
         lwpSslOpts => {
             type          => 'keyTextContainer',
-            documentation => 'SSL options passed to LWP::UserAgent',
+            documentation => 'TLS/SSL options passed to LWP::UserAgent',
         },
 
         # CrowdSec plugin
@@ -3800,7 +3800,7 @@ sub attributes {
                 { k => 'PAM',         v => 'PAM' },
                 { k => 'Radius',      v => 'Radius' },
                 { k => 'REST',        v => 'REST' },
-                { k => 'SSL',         v => 'SSL' },
+                { k => 'SSL',         v => 'mTLS' },
                 { k => 'Twitter',     v => 'Twitter' },
                 { k => 'WebID',       v => 'WebID (deprecated)' },
                 { k => 'WebAuthn',    v => 'WebAuthn' },
@@ -4163,7 +4163,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         SSLAuthnLevel => {
             type          => 'int',
             default       => 5,
-            documentation => 'SSL authentication level',
+            documentation => 'Mutual TLS authentication level',
         },
         SSLVar => {
             type    => 'text',
@@ -4181,11 +4181,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         sslByAjax => {
             type          => 'bool',
             default       => 0,
-            documentation => 'Use Ajax request for SSL',
+            documentation => 'Use Ajax request for Mutual TLS Authentication',
         },
         sslHost => {
             type          => 'url',
-            documentation => 'URL for SSL Ajax request',
+            documentation => 'URL for Mutual TLS Authentication Ajax request',
         },
 
         # CAS
@@ -4619,7 +4619,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'Remote',        v => 'Remote' },
                     { k => 'SAML',          v => 'SAML v2' },
                     { k => 'Slave',         v => 'Slave' },
-                    { k => 'SSL',           v => 'SSL' },
+                    { k => 'SSL',           v => 'mTLS' },
                     { k => 'Twitter',       v => 'Twitter' },
                     { k => 'WebID',         v => 'WebID (deprecated)' },
                     { k => 'WebAuthn',      v => 'WebAuthn' },
@@ -4682,7 +4682,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 { k => 'PAM',      v => 'PAM' },
                 { k => 'Radius',   v => 'Radius' },
                 { k => 'REST',     v => 'REST' },
-                { k => 'SSL',      v => 'SSL' },
+                { k => 'SSL',      v => 'mTLS' },
                 { k => 'Twitter',  v => 'Twitter' },
                 { k => 'WebID',    v => 'WebID (deprecated)' },
                 { k => 'WebAuthn', v => 'WebAuthn' },

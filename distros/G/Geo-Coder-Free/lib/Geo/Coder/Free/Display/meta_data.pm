@@ -5,11 +5,11 @@ use warnings;
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 # Display the meta-data page - the internal status of the server and VWF system
 

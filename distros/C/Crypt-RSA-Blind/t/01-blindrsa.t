@@ -2,14 +2,13 @@
 # -*-cperl-*-
 #
 # 01-signverify.t - Test blind signing and verification
-# Copyright (c) 2016-2017 Ashish Gulhati <crypt-rsab at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <crypt-rsab at hash.neo.email>
 
 use Test::More tests => 12;
 use Try::Tiny;
 
 BEGIN {
-    use_ok( 'Crypt::RSA::Blind' ) || print "Bail out!
-";
+    use_ok( 'Crypt::RSA::Blind' ) || print "Bail out!\n";
 }
 
 diag( "Testing Crypt::RSA::Blind $Crypt::RSA::Blind::VERSION, Perl $], $^X" );
@@ -25,7 +24,7 @@ for (1,0) {
   try { $req = $rsab->request(Key => $pubkey, Message => "Hello world", Init => $init) }
   catch { warn $_ };
   ok ($req, "Create signing request");
-  try { $bsigned = $rsab->sign(Key => $seckey, Message => $req, Init => $init) }
+  try { $bsigned = $rsab->sign(Key => $seckey, PublicKey => $pubkey, Message => $req, Init => $init) }
   catch { warn $_ };
   ok ($bsigned, "Create blind signature");
   try { $signed = $rsab->unblind(Signature => $bsigned, Key => $pubkey, Init => $init) }

@@ -36,6 +36,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Time::Local'  => 1.28,
         'Date::Easter' => 0,
+        'Exporter'     => 0,
         'Carp'         => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

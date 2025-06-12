@@ -2,11 +2,12 @@ bin/rt-repeat-ticket.in
 Changes
 etc/initialdata
 html/Callbacks/RepeatTicket/Elements/Tabs/Privileged
-html/Callbacks/RepeatTicket/Ticket/Create.html/AfterBasics
 html/Callbacks/RepeatTicket/Ticket/Display.html/BeforeDisplay
-html/Callbacks/RepeatTicket/Ticket/Elements/ShowSummary/LeftColumn
+html/Helpers/TicketUpdateRecurrence
 html/Ticket/Elements/EditRecurrence
 html/Ticket/ModifyRecurrence.html
+html/Ticket/Widgets/Create/RepeatTicket
+html/Ticket/Widgets/Display/RepeatTicket
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
@@ -42,3 +43,4 @@ xt/on_complete.t
 xt/start_date.t
 xt/weekly.t
 xt/yearly.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

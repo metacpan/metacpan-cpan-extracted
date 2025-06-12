@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/Term-TablePrint/issues
   repository: https://github.com/kuerbis/Term-TablePrint.git
-version: '0.172'
+version: '0.173'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

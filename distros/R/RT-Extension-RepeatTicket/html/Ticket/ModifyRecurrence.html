@@ -10,11 +10,7 @@
 <& Elements/EditRecurrence, Ticket => $TicketObj, ARGSRef => $ARGSRef &>
 </&>
 
-  <div class="form-row">
-    <div class="col-12">
-      <& /Elements/Submit, Name => 'SubmitTicket', Label => loc('Save Changes') &>
-    </div>
-  </div>
+  <& /Elements/Submit, Name => 'SubmitTicket', Label => loc('Save Changes'), FullWidth => 1 &>
 </form>
 % }
 

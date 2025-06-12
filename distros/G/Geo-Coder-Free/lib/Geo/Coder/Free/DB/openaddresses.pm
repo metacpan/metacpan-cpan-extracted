@@ -10,11 +10,11 @@ Geo::Coder::Free::DB::openaddresses - interface to data from http://results.open
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 our @ISA = ('Database::Abstraction');
 

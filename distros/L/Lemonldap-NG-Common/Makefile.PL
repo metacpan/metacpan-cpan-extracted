@@ -46,6 +46,7 @@ WriteMakefile(
         'Email::Address::XS'          => 0,
         'IO::String'                  => 0,
         'LWP::Protocol::https'        => 0,
+        'LWP::Protocol::PSGI'         => 0,
         'MIME::Entity'                => 0,
         'Net::LDAP'                   => 0,
         'SOAP::Lite'                  => 0,

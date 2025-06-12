@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -52,18 +52,18 @@
    "provides" : {
       "Crypt::RSA::Blind" : {
          "file" : "lib/Crypt/RSA/Blind.pm",
-         "version" : "1.031"
+         "version" : "1.035"
       },
       "Crypt::RSA::Blind::PubKey" : {
          "file" : "lib/Crypt/RSA/Blind.pm",
-         "version" : "1.031"
+         "version" : "1.035"
       },
       "Crypt::RSA::Blind::SecKey" : {
          "file" : "lib/Crypt/RSA/Blind.pm",
-         "version" : "1.031"
+         "version" : "1.035"
       }
    },
    "release_status" : "stable",
-   "version" : "1.031",
+   "version" : "1.035",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

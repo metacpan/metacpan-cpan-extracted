@@ -31,6 +31,7 @@ use Test::Perl::Critic (
         Subroutines::ProhibitUnusedPrivateSubroutines
         Subroutines::RequireArgUnpacking
         Subroutines::RequireFinalReturn
+        TestingAndDebugging::ProhibitNoStrict
         ValuesAndExpressions::ProhibitEmptyQuotes
         ValuesAndExpressions::ProhibitInterpolationOfLiterals
         ValuesAndExpressions::ProhibitMagicNumbers
