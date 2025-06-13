@@ -1,3 +1,23 @@
+0.55.2 2025-06-12 17:35:56 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix fake login page format
+
+0.55.1 2025-06-12 17:28:21 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - properly close the popup after download if so configured
+
+0.55.0 2025-06-12 15:24:25 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - download displays a busy message which can be configured using
+   busyMessage property
+ - upon download completing popup will close if closeAfterDownload => true,
+   is set
+
+0.54.0 2025-06-12 14:52:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - upload actions are now busy during upload
+   use the busyMessage property to display a custom message during upload
+
 0.53.1 2025-06-04 18:04:46 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - only log slow getters

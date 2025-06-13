@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-under
 
+1.00 2025-06-12T13:16:19Z
+
+    - use Getopt::EX::Config
+
 0.9905 2024-10-19T09:53:47Z
 
     - sequence parameter accept combining character

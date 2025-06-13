@@ -24,20 +24,19 @@ no_index:
     - author
     - builder
 provides:
-  App::Greple::Config:
-    file: lib/App/Greple/Config.pm
   App::Greple::under:
     file: lib/App/Greple/under.pm
-    version: '0.9905'
+    version: '1.00'
   App::Greple::under::line:
     file: lib/App/Greple/under/line.pm
-    version: '0.9905'
+    version: '1.00'
   App::Greple::under::mise:
     file: lib/App/Greple/under/mise.pm
   App::Greple::under::place:
     file: lib/App/Greple/under/place.pm
 requires:
   App::Greple: '9.17'
+  Getopt::EX::Config: '0.9904'
   Hash::Util: '0'
   List::Util: '0'
   Term::ANSIColor::Concise: '0'
@@ -48,7 +47,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-under/issues
   homepage: https://github.com/kaz-utashiro/greple-under
   repository: https://github.com/kaz-utashiro/greple-under.git
-version: '0.9905'
+version: '1.00'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

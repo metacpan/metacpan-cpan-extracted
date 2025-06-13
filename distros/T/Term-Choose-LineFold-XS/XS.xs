@@ -71,14 +71,6 @@ print_columns(SV *input)
             if (clen == -1 ) {
                 codepoint = *p; // Interpret the invalid byte as a single character
                 clen = 1;       // Advance by 1 byte
-
-                // Option B: Stop processing on error
-                // Perl_warn(aTHX_ "Malformed UTF-8 at byte offset %ld", (long)(p - (const U8 *)SvPVX(input)));
-                // break;
-
-                // Option C: Malformed UTF-8. Skip bad byte and keep going
-                // p++;
-                // continue;
             }
             p += clen;
             width += _char_width(codepoint);
@@ -130,13 +122,6 @@ cut_to_printwidth(SV *input, int max_width)
                 split_point = char_start;
                 break;
             }
-
-            //if (str_w + this_w == max_width) {
-            //    p += clen;
-            //    str_w += this_w;
-            //    split_point = p;
-            //    break;
-            //}
 
             str_w += this_w;
             p += clen;
@@ -214,7 +199,7 @@ adjust_to_printwidth(SV *input, int width)
             p += clen;
         }
 
-        len = (STRLEN)(p - start);  // Final cutoff length: now len is bytes length
+        len = (STRLEN)(p - start);  // now len is byte length
 
         if (str_w == width) {
             RETVAL = newSVpvn((const char *)start, len);

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -40,12 +40,10 @@
       },
       "test" : {
          "requires" : {
-            "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::Synopsis" : "0"
+            "Test::NoWarnings" : "0"
          }
       }
    },
@@ -63,6 +61,6 @@
          "x_repository" : "https://github.com/nigelhorne/Readonly-Values-Syslog"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

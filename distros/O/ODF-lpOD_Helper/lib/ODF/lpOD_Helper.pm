@@ -96,8 +96,8 @@ and fonts registered.
 package ODF::lpOD_Helper;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-08-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-06-09'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Data::Dumper::Interp 6.004 qw/visnew
@@ -132,6 +132,7 @@ use constant {
 sub _is_Hr_valid($) { ($_[0]//"invalid") =~ /^[01236]$/ }
 
 use ODF::lpOD;
+use XML::Twig 3.53; # force version which fixes precedence warnings
 
 #$ODF::lpOD::Common::DEBUG = TRUE;
 
@@ -1929,7 +1930,7 @@ Returns the nearest ancestor which matches condition C<$cond>.
 
 If C<$stop_cond> is defined, then 0 is returned if the search would
 ascend above the nearest ancestor matching the stop condition.
-Undef is returned no ancestor matches either $cond or $stop_cond.
+Undef is returned if no ancestor matches either $cond or $stop_cond.
 
 For example,
 
@@ -2682,6 +2683,10 @@ better be done by extending ODF::lpOD in a compatible way.
 That is still a distant goal, but would involve
 major surgery on ODF::lpOD and careful regression testing
 against unknown legacy applications of ODF::lpOD.
+
+=head1 SEE ALSO
+
+ODF::MailMerge
 
 =head1 AUTHOR
 

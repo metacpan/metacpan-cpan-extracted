@@ -38,7 +38,7 @@ use CallBackery::Database;
 use CallBackery::User;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.53.1';
+our $VERSION = '0.55.2';
 
 =head2 config
 
@@ -204,7 +204,7 @@ sub startup {
     $routes->get('/login')->to(cb => sub {
         my $c = shift;
         $c->render(data=><<HTML, format=>'html');
-<!DOCTYPE html><html><body><form id="cbLoginForm"  name="cbLoginForm" autocomplete="on" method="POST" >
+<!DOCTYPE html><html><head></head><body><form id="cbLoginForm"  name="cbLoginForm" autocomplete="on" method="POST" >
 <input type="text" id="cbUsername"  name="cbUsername" autocomplete="on" />
 <input type="password" id="cbPassword"  name="cbPassword" autocomplete="on" />
 </form></body></html>
@@ -213,7 +213,9 @@ HTML
     # second stage of the deception. the answer page for login must not be the same as the original page
     # otherwise the browser assumes the login failed and does not offer to save the password.
     $routes->post('/login')->to(cb => sub {
-        shift->render(text=>'gugus :)');
+        shift->render(data=><<HTML, format=>'html');
+<!DOCTYPE html><html><head></head><body></body></html>
+HTML
     });
 
 

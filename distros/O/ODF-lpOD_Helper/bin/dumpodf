@@ -8,7 +8,7 @@
 # This utility script ships with ODF::lpOD_Helper
 
 use strict; use warnings; use feature qw/say/;
-our $VERSION = '6.014'; # VERSION
+our $VERSION = '6.015'; # VERSION
 
 my $progname = basename($0);
 my $usage = <<EOF;

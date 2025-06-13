@@ -1,5 +1,9 @@
 Revision history for Term::Choose::LineFold::XS
 
 
+0.002   2025-06-12
+    - Makefile.PL: added 'dist' section.
+    - Removed unnecessary files.
+
 0.001   2025-04-27
     - First release on cpan.

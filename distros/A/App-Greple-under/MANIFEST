@@ -7,7 +7,6 @@ cpanfile
 images/mise-place.png
 images/normal.png
 images/under-line.png
-lib/App/Greple/Config.pm
 lib/App/Greple/under.pm
 lib/App/Greple/under/line.pm
 lib/App/Greple/under/mise.pm

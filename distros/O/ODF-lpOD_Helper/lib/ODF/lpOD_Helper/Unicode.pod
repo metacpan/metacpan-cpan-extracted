@@ -22,14 +22,24 @@ was confused or misleading.
 
 =head1 THE PERL UNICODE PARADIGM
 
-  1. "Decode" input from binary into Perl characters as soon as possible
-     after getting it from the outside world (e.g. from a disk file).
+=over
 
-  2. As much of the application as possible works with Perl characters,
-     paying absolutely no attention to encoding.
+=item 1.
 
-  3. "Encode" Perl characters into binary data as late as possible,
-     just before sending the data out.
+"B<Decode>" input from binary into Perl characters as soon as possible
+after getting it from the outside world (e.g. from a disk file).
+
+=item 2.
+
+As much of the application as possible works with Perl characters,
+I<paying absolutely no attention to encoding>.
+
+=item 3.
+
+"B<Encode>" Perl characters into binary data as late as possible,
+just before sending the data out.
+
+=back
 
 See "Not always so tidy" below for more discussion.
 

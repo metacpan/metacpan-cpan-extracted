@@ -208,6 +208,10 @@ XS_EUPXS(XS_FASTX__XS__xs_new)
 
         // Initialize kseq
         seq = kseq_init(fp);
+        if (seq == NULL) {
+            gzclose(fp);
+            croak("Failed to initialize sequence parser");
+        }
 
         // Create a hash to store our object data
         HV* self = newHV();
@@ -218,7 +222,7 @@ XS_EUPXS(XS_FASTX__XS__xs_new)
 
         // Bless and return
         RETVAL = sv_bless(newRV_noinc((SV*)self), gv_stashpv(class, 0));
-#line 222 "FASTX.c"
+#line 226 "FASTX.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -236,7 +240,7 @@ XS_EUPXS(XS_FASTX__XS_next_seq)
 	SV*	self = ST(0)
 ;
 	SV *	RETVAL;
-#line 68 "FASTX.xs"
+#line 72 "FASTX.xs"
         HV* hash;
         SV** fp_sv;
         SV** seq_sv;
@@ -256,6 +260,12 @@ XS_EUPXS(XS_FASTX__XS_next_seq)
         if (!fp_sv || !seq_sv)
             croak("Invalid object");
 
+        // Check if pointers are valid (not already freed)
+        if (!SvOK(*fp_sv) || SvIV(*fp_sv) == 0)
+            croak("File pointer has been freed");
+        if (!SvOK(*seq_sv) || SvIV(*seq_sv) == 0)
+            croak("Sequence parser has been freed");
+
         fp = INT2PTR(gzFile, SvIV(*fp_sv));
         seq = INT2PTR(kseq_t*, SvIV(*seq_sv));
 
@@ -269,7 +279,7 @@ XS_EUPXS(XS_FASTX__XS_next_seq)
             // Convert to hash and return
             RETVAL = kseq_to_hash(aTHX_ seq);
         }
-#line 273 "FASTX.c"
+#line 283 "FASTX.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -286,7 +296,7 @@ XS_EUPXS(XS_FASTX__XS_DESTROY)
     {
 	SV*	self = ST(0)
 ;
-#line 107 "FASTX.xs"
+#line 117 "FASTX.xs"
         HV* hash;
         SV** fp_sv;
         SV** seq_sv;
@@ -305,13 +315,21 @@ XS_EUPXS(XS_FASTX__XS_DESTROY)
         if (!fp_sv || !seq_sv)
             return;
 
-        fp = INT2PTR(gzFile, SvIV(*fp_sv));
-        seq = INT2PTR(kseq_t*, SvIV(*seq_sv));
+        // Check if pointers are valid before cleanup
+        if (SvOK(*fp_sv) && SvIV(*fp_sv) != 0) {
+            fp = INT2PTR(gzFile, SvIV(*fp_sv));
+            gzclose(fp);
+            // Mark as cleaned up
+            sv_setiv(*fp_sv, 0);
+        }
 
-        // Clean up
-        kseq_destroy(seq);
-        gzclose(fp);
-#line 315 "FASTX.c"
+        if (SvOK(*seq_sv) && SvIV(*seq_sv) != 0) {
+            seq = INT2PTR(kseq_t*, SvIV(*seq_sv));
+            kseq_destroy(seq);
+            // Mark as cleaned up
+            sv_setiv(*seq_sv, 0);
+        }
+#line 333 "FASTX.c"
     }
     XSRETURN_EMPTY;
 }

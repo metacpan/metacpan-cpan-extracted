@@ -9,9 +9,6 @@ README
 t/00-load.t
 t/01-width.t
 t/02-cut.t
-XS.bs
-XS.c
-XS.o
 XS.xs
 xt/manifest.t
 xt/perl_minimum_version.t

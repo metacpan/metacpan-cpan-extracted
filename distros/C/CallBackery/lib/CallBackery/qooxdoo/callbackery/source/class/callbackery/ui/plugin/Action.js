@@ -392,6 +392,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         case 'download':
                         case 'display':
                             var formData = getFormData();
+                            let busy = callbackery.ui.Busy.getInstance();
                             if (formData === false) {
                                 callbackery.ui.MsgBox.getInstance().error(
                                     this.tr("Validation Error"),
@@ -400,6 +401,11 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 return;
                             }
                             var key = btCfg.key;
+                            if (btCfg.busyMessage) {
+                                busy.manifest(this.xtr(btCfg.busyMessage));
+                            } else {
+                                busy.manifest(this.tr('Preparing Download ...'));
+                            }
                             callbackery.data.Server.getInstance().callAsyncSmart(function (cookie) {
                                 let url = 'download'
                                     + '?name=' + cfg.name
@@ -415,6 +421,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     height: 100
                                 });
                                 iframe.addListener('load', function (e) {
+                                    busy.vanish();
                                     var response = {
                                         exception: {
                                             message: String(that.tr("No Data")),
@@ -435,7 +442,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                         }
                                         // otherwise remove standard exception.
                                         else {
-                                            response = '';
+                                            response = {};
                                         }
                                     } catch (e) { };
                                     if (response.exception) {
@@ -445,6 +452,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                         );
                                     }
                                     that.getApplicationRoot().remove(iframe);
+                                    if (btCfg.closeAfterDownload) {
+                                        that.fireDataEvent('actionResponse', { action: 'cancel' });
+                                    }
                                 });
                                 iframe.setSource(url);
                                 that.getApplicationRoot().add(iframe, { top: -1000, left: -1000 });
@@ -581,7 +591,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     var that = this;
                     serverCall.callAsyncSmart(function (cookie) {
                         form.append('xsc', cookie);
-                        that._uploadForm(form);
+                        that._uploadForm(form,btCfg.busyMessage);
                     }, 'getSessionCookie');
                 } else {
                     callbackery.ui.MsgBox.getInstance().error(
@@ -594,11 +604,13 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             return button;
         },
 
-        _uploadForm(form) {
+        _uploadForm(form,busyMessage) {
             var req = new qx.io.request.Xhr("upload", 'POST').set({
                 requestData: form
             });
+            let busy = callbackery.ui.Busy.getInstance();
             req.addListener('success', function (e) {
+                busy.vanish();                
                 var response = req.getResponse();
                 if (response.exception) {
                     callbackery.ui.MsgBox.getInstance().error(
@@ -613,6 +625,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             }, this);
             req.addListener('fail', function (e) {
                 var response = {};
+                busy.vanish();
                 try {
                     response = req.getResponse();
                 }
@@ -631,6 +644,11 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 );
                 req.dispose();
             });
+            if (busyMessage) {
+                busy.manifest(this.xtr(busyMessage));
+            } else {
+                busy.manifest(this.tr('Uploading File, please wait ...'));
+            }
             req.send();
         },
 

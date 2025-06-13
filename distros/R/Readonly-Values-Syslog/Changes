@@ -1,5 +1,9 @@
 Revision history for Readonly-Values-Syslog - Syslog Constants
 
+0.03	Thu Jun 12 08:10:50 EDT 2025
+	Fix the manifest
+	Remove optional modules from TEST_REQUIRES
+
 0.02	Mon May 19 07:49:25 EDT 2025
 	Added err as a synonym of error
 

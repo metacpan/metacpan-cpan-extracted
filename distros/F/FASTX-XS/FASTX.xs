@@ -48,6 +48,10 @@ _xs_new(class, filename)
         
         // Initialize kseq
         seq = kseq_init(fp);
+        if (seq == NULL) {
+            gzclose(fp);
+            croak("Failed to initialize sequence parser");
+        }
         
         // Create a hash to store our object data
         HV* self = newHV();
@@ -83,6 +87,12 @@ next_seq(self)
         
         if (!fp_sv || !seq_sv)
             croak("Invalid object");
+        
+        // Check if pointers are valid (not already freed)
+        if (!SvOK(*fp_sv) || SvIV(*fp_sv) == 0)
+            croak("File pointer has been freed");
+        if (!SvOK(*seq_sv) || SvIV(*seq_sv) == 0)
+            croak("Sequence parser has been freed");
         
         fp = INT2PTR(gzFile, SvIV(*fp_sv));
         seq = INT2PTR(kseq_t*, SvIV(*seq_sv));
@@ -122,9 +132,17 @@ DESTROY(self)
         if (!fp_sv || !seq_sv)
             return;
         
-        fp = INT2PTR(gzFile, SvIV(*fp_sv));
-        seq = INT2PTR(kseq_t*, SvIV(*seq_sv));
+        // Check if pointers are valid before cleanup
+        if (SvOK(*fp_sv) && SvIV(*fp_sv) != 0) {
+            fp = INT2PTR(gzFile, SvIV(*fp_sv));
+            gzclose(fp);
+            // Mark as cleaned up
+            sv_setiv(*fp_sv, 0);
+        }
         
-        // Clean up
-        kseq_destroy(seq);
-        gzclose(fp);
+        if (SvOK(*seq_sv) && SvIV(*seq_sv) != 0) {
+            seq = INT2PTR(kseq_t*, SvIV(*seq_sv));
+            kseq_destroy(seq);
+            // Mark as cleaned up
+            sv_setiv(*seq_sv, 0);
+        }

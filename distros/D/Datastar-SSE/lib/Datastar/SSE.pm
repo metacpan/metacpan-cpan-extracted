@@ -2,7 +2,7 @@ package Datastar::SSE;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use JSON ();
 use HTTP::ServerEvent;
@@ -70,7 +70,8 @@ BEGIN {
 		after
 		upsertAttributes
 	/;
-	%DATASTAR_EVENTS = +map +( "\U$_" => s/_/-/rg ), @datastar_events;
+	@DATASTAR_EVENTS{map uc, @datastar_events} = @datastar_events;
+	s/_/-/g for values %DATASTAR_EVENTS;
 	%MERGEMODES = +map +( "FRAGMENT_MERGEMODE_\U$_" => $_ ), @merge_mode;
 }
 		

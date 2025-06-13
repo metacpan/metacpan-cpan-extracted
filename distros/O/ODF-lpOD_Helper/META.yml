@@ -8,7 +8,7 @@ build_requires:
   Carp::Always: '0'
   Cwd: '0'
   Data::Dumper: '0'
-  Data::Dumper::Interp: '6.006'
+  Data::Dumper::Interp: '7.012'
   Encode: '0'
   English: '0'
   Env: '0'
@@ -20,8 +20,9 @@ build_requires:
   Guard: '0'
   Import::Into: '0'
   JSON: '0'
+  List::AllUtils: '0'
   POSIX: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.146'
   Test2::Plugin::BailOnFail: '0'
   Test2::Tools::Compare: '0'
   Test2::V0: '0'
@@ -44,16 +45,17 @@ name: ODF-lpOD_Helper
 provides:
   ODF::lpOD_Helper:
     file: lib/ODF/lpOD_Helper.pm
-    version: '6.014'
+    version: '6.015'
 requires:
   Carp: '0'
-  Data::Dumper::Interp: '6.006'
+  Data::Dumper::Interp: '7.012'
   Exporter: '0'
   File::Basename: '0'
   Getopt::Long: '0'
   List::Util: '0'
   ODF::lpOD: '1.201'
   Scalar::Util: '0'
+  XML::Twig: '3.53'
   constant: '0'
   feature: '0'
   open: '0'
@@ -66,7 +68,7 @@ resources:
   bugtracker: https://github.com/jimav/ODF-lpOD_Helper/issues
   homepage: https://github.com/jimav/ODF-lpOD_Helper
   repository: https://github.com/jimav/ODF-lpOD_Helper.git
-version: '6.014'
+version: '6.015'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

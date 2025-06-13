@@ -15,7 +15,7 @@ name: Datastar-SSE
 provides:
   Datastar::SSE:
     file: lib/Datastar/SSE.pm
-    version: '0.24'
+    version: '0.25'
   Datastar::SSE::Types:
     file: lib/Datastar/SSE/Types.pm
   Datastar::SSE::Types::TypeConstraint:
@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/tehmoth/datastar-sse/issues
   repository: https://github.com/tehmoth/datastar-sse.git
-version: '0.24'
+version: '0.25'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

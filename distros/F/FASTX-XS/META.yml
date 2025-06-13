@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/quadram-institute-bioscience/fastx-xs/issues
   repository: https://github.com/quadram-institute-bioscience/fastx-xs.git
-version: v0.0.3
+version: v0.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

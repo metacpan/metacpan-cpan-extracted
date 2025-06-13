@@ -2,7 +2,7 @@ package App::Greple::under::line;
 use strict;
 use warnings;
 
-our $VERSION = "0.9905";
+our $VERSION = "1.00";
 
 use App::Greple::under ':all';
 

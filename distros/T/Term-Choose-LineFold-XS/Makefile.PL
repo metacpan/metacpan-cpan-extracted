@@ -42,4 +42,9 @@ WriteMakefile(
     XS => {
         'XS.xs' => 'XS.c'
     },
+    dist  => {
+        COMPRESS => 'gzip',
+        SUFFIX   => '.gz',
+        TARFLAGS => '--format=gnu -cvf',
+    },
 );
