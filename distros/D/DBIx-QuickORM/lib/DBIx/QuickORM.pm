@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
@@ -191,11 +191,15 @@ sub import_into {
     no strict 'refs';
     *{"${caller}\::${name}"} = sub {
         return $self unless @_;
-        return $self->orm(@_)->connection if @_ == 1;
+
         my ($type, $name, @extra) = @_;
-        croak "Too many arguments" if @extra;
-        croak "'$type' is not a valid item type to fetch from '$caller'" unless $type =~ m/^(orm|db|schema)$/;
-        return $self->$type($name);
+
+        if ($type =~ m/^(orm|db|schema)$/) {
+            croak "Too many arguments" if @extra;
+            return $self->$type($name);
+        }
+
+        return $self->orm(@_)->connection;
     };
 }
 
@@ -1489,6 +1493,61 @@ See L<DBIx::QuickORM::Handle> for more details on handles, which are similar to
 ResultSets from L<DBIx::Class>.
 
 =head1 RECIPES
+
+=head2 DEFINE DB LATER
+
+In some cases you may want to define your orm/schema before you have your
+database credentials. Then you want to add the database later in an app/script
+bootstrap process.
+
+Schema:
+
+    package My::Schema;
+    use DBIx::QuickORM;
+
+    orm MyORM => sub {
+        autofill;
+    };
+
+Bootstrap process:
+
+    package My::Bootstrap;
+    use DBIx::QuickORM only => [qw/db db_name host port user pass/];
+    use My::Schema;
+
+    sub import {
+        # Get the orm (the `orm => ...` param is required to prevent it from attempting a connection now)
+        my $orm = qorm(orm => 'MyORM');
+
+        return if $orm->db; # Already bootstrapped
+
+        my %db_params = decrypt_creds();
+
+        # Define the DB
+        my $db = db {
+            db_name 'quickdb';
+            host $db_params{host};
+            port $db_params{port};
+            user $db_params{user};
+            pass $db_params{pass};
+        };
+
+        # Set the db on the ORM:
+        $orm->db($db);
+    }
+
+Your app:
+
+    package My::App;
+
+    # Get the qorm() subroutine
+    use My::Schema;
+
+    # This will do the db bootstrap
+    use My::Bootstrap;
+
+    # Connect to the database with the ORM
+    my $con = qorm('MyORM');
 
 =head2 RENAMING EXPORTS
 

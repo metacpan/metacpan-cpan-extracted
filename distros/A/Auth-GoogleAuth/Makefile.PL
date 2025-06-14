@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Class::Accessor" => 0,
     "Convert::Base32" => 0,
-    "Crypt::URandom" => 0,
+    "Crypt::PRNG" => 0,
     "Digest::HMAC_SHA1" => 0,
     "URI::Escape" => 0,
     "base" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.08",
+  "VERSION" => "1.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Accessor" => 0,
   "Convert::Base32" => 0,
-  "Crypt::URandom" => 0,
+  "Crypt::PRNG" => 0,
   "Digest::HMAC_SHA1" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

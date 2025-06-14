@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::MetarTaf
 
+1.05      2025-06-13 10:23:55-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.04      2022-03-18 08:52:34-07:00 America/Los_Angeles
         - Minor documentation update
 

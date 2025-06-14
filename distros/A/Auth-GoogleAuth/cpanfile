@@ -4,7 +4,7 @@
 requires "Carp" => "0";
 requires "Class::Accessor" => "0";
 requires "Convert::Base32" => "0";
-requires "Crypt::URandom" => "0";
+requires "Crypt::PRNG" => "0";
 requires "Digest::HMAC_SHA1" => "0";
 requires "URI::Escape" => "0";
 requires "base" => "0";
@@ -28,6 +28,7 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Software::Security::Policy::Individual" => "0";
   requires "Test::EOL" => "0";
   requires "Test::Kwalitee" => "1.21";
   requires "Test::More" => "0.88";

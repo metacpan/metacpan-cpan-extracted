@@ -1,30 +1,31 @@
---- #YAML:1.0
-name:               Ham-Packet-DXSpider
-version:            0.04
-abstract:           Receives DX Spots from the DXCluster
+---
+abstract: 'Receives DX Spots from the DXCluster'
 author:
-    - Bruce James <custard@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Bruce James <custard@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    IO::Handle:           0
-    IO::Socket:           0
-    IO::Socket::INET:     0
-    Moose:                0
-    perl:                 5.006
-    POSIX:                0
-    Test::More:           0
-    Test::Pod:            0
-    Test::Pod::Coverage:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ham-Packet-DXSpider
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Handle: '0'
+  IO::Socket: '0'
+  IO::Socket::INET: '0'
+  Moose: '0'
+  POSIX: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  perl: '5.006'
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

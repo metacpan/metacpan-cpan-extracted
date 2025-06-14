@@ -3,9 +3,10 @@
 # Class  : Ham::Packet::DXSpider
 # Purpose: Provides a remote interface to the DXSpider DX Cluster software. 
 # Author : Bruce James (custard@cpan.org)
-# Date   : 7th April 2012
-#
+# Date   : 13th June 2025
+
 package Ham::Packet::DXSpider;
+
 use strict;
 use warnings;
 use IO::Handle;
@@ -13,7 +14,7 @@ use IO::Socket;
 use POSIX;
 use Moose;
 
-our $VERSION="0.04";
+our $VERSION="0.05";
 
 =pod
 

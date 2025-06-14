@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require Alien::CXC::param;
 
@@ -23,7 +23,7 @@ Alien::CXC::param::Install::Files
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =for Pod::Coverage   Inline
 

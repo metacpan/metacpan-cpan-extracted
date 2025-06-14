@@ -185,6 +185,61 @@ ResultSets from [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass).
 
 # RECIPES
 
+## DEFINE DB LATER
+
+In some cases you may want to define your orm/schema before you have your
+database credentials. Then you want to add the database later in an app/script
+bootstrap process.
+
+Schema:
+
+    package My::Schema;
+    use DBIx::QuickORM;
+
+    orm MyORM => sub {
+        autofill;
+    };
+
+Bootstrap process:
+
+    package My::Bootstrap;
+    use DBIx::QuickORM only => [qw/db db_name host port user pass/];
+    use My::Schema;
+
+    sub import {
+        # Get the orm (the `orm => ...` param is required to prevent it from attempting a connection now)
+        my $orm = qorm(orm => 'MyORM');
+
+        return if $orm->db; # Already bootstrapped
+
+        my %db_params = decrypt_creds();
+
+        # Define the DB
+        my $db = db {
+            db_name 'quickdb';
+            host $db_params{host};
+            port $db_params{port};
+            user $db_params{user};
+            pass $db_params{pass};
+        };
+
+        # Set the db on the ORM:
+        $orm->db($db);
+    }
+
+Your app:
+
+    package My::App;
+
+    # Get the qorm() subroutine
+    use My::Schema;
+
+    # This will do the db bootstrap
+    use My::Bootstrap;
+
+    # Connect to the database with the ORM
+    my $con = qorm('MyORM');
+
 ## RENAMING EXPORTS
 
 When importing [DBIx::QuickORM](https://metacpan.org/pod/DBIx%3A%3AQuickORM) you can provide

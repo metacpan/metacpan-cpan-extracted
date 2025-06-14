@@ -7,18 +7,23 @@ use warnings;
 use alienfile;
 use Path::Tiny;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+use constant PKG_NAME    => 'cxcparam';
+use constant PKG_VERSION => '4.12.0.10';
+use constant PKG_TARBALL => PKG_NAME . q{-} . PKG_VERSION . '.tar.gz';
 
 my $pkg_name = 'cxcparam';
 
 plugin 'Gather::IsolateDynamic';
 
-plugin PkgConfig => ( pkg_name => $pkg_name, );
-
-probe ["pkg-config --exists $pkg_name"];
+plugin PkgConfig => (
+    pkg_name        => PKG_NAME,
+    atleast_version => PKG_VERSION,
+);
 
 share {
-    start_url 'inc/cxcparam-4.12.0.5.tar.gz';
+    start_url 'inc/' . PKG_TARBALL;
 
     plugin 'Download';
 

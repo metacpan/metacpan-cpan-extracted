@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::WwwShorten
 
+1.05      2025-06-13 10:24:39-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.04      2022-03-18 08:53:36-07:00 America/Los_Angeles
         - Minor documentation update
 

@@ -1,4 +1,7 @@
 Revision history for RTx-RemoteLinks
 
+1.02 2025-06-13
+ - Update for RT 6.0
+
 1.01 2020-07-27
  - Add RT 5 support

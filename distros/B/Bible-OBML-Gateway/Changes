@@ -1,5 +1,8 @@
 Revision history for Bible::OBML::Gateway
 
+2.11      2025-06-13 10:22:25-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 2.10      2025-02-13 13:31:13-08:00 America/Los_Angeles
         - Perl minimum version align
 

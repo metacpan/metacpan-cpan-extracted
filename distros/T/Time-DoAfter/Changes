@@ -1,5 +1,8 @@
 Revision history for Time::DoAfter
 
+1.09      2025-06-13 10:27:47-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.08      2022-03-19 17:52:59-07:00 America/Los_Angeles
         - Minor documentation update
 

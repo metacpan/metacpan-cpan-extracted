@@ -1,5 +1,8 @@
 Revision history for MojoX::Linda
 
+1.04      2025-06-13 10:26:43-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.03      2023-11-06 18:37:54-08:00 America/Los_Angeles
         - use Config::App 1.17 and include a deimport call on conf()
 

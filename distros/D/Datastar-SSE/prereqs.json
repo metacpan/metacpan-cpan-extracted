@@ -1,17 +1,26 @@
 {
    "configure" : {
       "requires" : {
-         "Module::Build::Tiny" : "0.039"
+         "Module::Build::Tiny" : "0.044"
       }
    },
    "runtime" : {
       "requires" : {
+         "Carp" : "0",
          "Exporter" : "0",
          "HTTP::ServerEvent" : "0",
          "JSON" : "0",
          "Scalar::Util" : "0",
+         "constant" : "0",
+         "overload" : "0",
+         "perl" : "v5.10.0",
          "strict" : "0",
          "warnings" : "0"
+      }
+   },
+   "test" : {
+      "requires" : {
+         "Test::More" : "0"
       }
    }
 }

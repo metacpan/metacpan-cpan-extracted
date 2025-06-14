@@ -2,6 +2,9 @@ NAME
     RTx-RemoteLinks - Conveniently create links to ticket IDs in other RT
     instances
 
+RT VERSION
+    Works with RT 4.0, 4.2, 4.4, 5.0, 6.0
+
 DESCRIPTION
     With a small amount of configuration, this extension lets you enter new
     ticket links as foo:123 which are then displayed in the Links box as
@@ -31,7 +34,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RTx::RemoteLinks');
@@ -45,7 +48,7 @@ INSTALLATION
         Configure your remote RT instances per "CONFIGURATION" above.
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -62,7 +65,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RTx-RemoteLinks>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2013-2020 by Best Practical Solutions,
+    This software is Copyright (c) 2013-2025 by Best Practical Solutions,
     LLC
 
     This is free software, licensed under:

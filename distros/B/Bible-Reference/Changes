@@ -1,5 +1,8 @@
 Revision history for Bible::Reference
 
+1.19      2025-06-13 10:22:37-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.18      2025-06-02 11:40:02-07:00 America/Los_Angeles
         - Fix bug if both simplify and acronyms are on; document simplify
 

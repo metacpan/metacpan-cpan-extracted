@@ -1,5 +1,8 @@
 Revision history for Excel::XLSX
 
+1.03      2025-06-13 10:25:47-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.02      2025-04-04 16:13:45-07:00 America/Los_Angeles
         - Fix typo in dist.ini file
 

@@ -8,7 +8,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::DOM;
 use Mojo::Util;
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -154,7 +154,7 @@ Mojolicious::Plugin::CSRF - Cross Site Request Forgery (CSRF) "prevention" Mojol
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-CSRF/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-CSRF/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CSRF/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CSRF)

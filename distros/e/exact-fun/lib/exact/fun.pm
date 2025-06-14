@@ -7,7 +7,7 @@ use Import::Into;
 use Class::Method::Modifiers ();
 use Function::Parameters     ();
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 sub import {
     my ( $self, $params, $caller ) = @_;
@@ -29,7 +29,7 @@ exact::fun - Functions and methods with parameter lists for exact
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-fun/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-fun/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-fun/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-fun)

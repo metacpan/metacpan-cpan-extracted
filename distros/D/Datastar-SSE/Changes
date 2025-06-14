@@ -1,5 +1,7 @@
 Revision history for Datastar-SSE
 
+0.26      2025-06-13 21:00:40-0400
+          - Require at least perl 5.10.0 
 0.25      2025-06-12 17:16:25-0400
           - Don't use post-5.12 constructs (s//r)
 0.24      2025-06-10 09:18:40-0400

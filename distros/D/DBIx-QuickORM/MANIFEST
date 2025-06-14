@@ -94,6 +94,10 @@ t/complex/mysql_percona.sql
 t/complex/postgresql.sql
 t/complex/postgresql17.sql
 t/complex/sqlite.sql
+t/composite.t
+t/composite/mysql.sql
+t/composite/postgresql.sql
+t/composite/sqlite.sql
 t/default.t
 t/default/mysql.sql
 t/default/mysql_community.sql

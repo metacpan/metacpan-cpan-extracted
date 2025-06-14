@@ -15,7 +15,7 @@ use Path::Tiny 'path';
 use POSIX 'strftime';
 use Text::Diff ();
 
-our $VERSION = '1.35'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 sub init {
     my $self = _new( shift, 'expect_no_root_dir' );
@@ -769,7 +769,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =for markdown [![test](https://github.com/gryphonshafer/dest/workflows/test/badge.svg)](https://github.com/gryphonshafer/dest/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/dest/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/dest)

@@ -1,5 +1,8 @@
 Revision history for Unit::Duration
 
+1.05      2025-06-13 10:27:56-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.04      2025-02-13 13:33:25-08:00 America/Los_Angeles
         - Perl minimum version align
 

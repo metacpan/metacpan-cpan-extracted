@@ -5,7 +5,7 @@ use FindBin;
 
 my $plan;
 BEGIN {
-    my %count = (constructs => 102,
+    my %count = (constructs => 103,
                  removed    => 7,
                  aliases    => 80,
                  old        => 4);

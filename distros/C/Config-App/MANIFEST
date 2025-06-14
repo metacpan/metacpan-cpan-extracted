@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 config/alt.yaml
 config/app.yaml
 config/app_optional.yaml

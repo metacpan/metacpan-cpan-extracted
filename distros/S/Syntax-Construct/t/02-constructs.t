@@ -269,6 +269,15 @@ my %tests = (
         [ 'prototype+',
           'sub proto_plus (+) { $_[0][0] }; my @ar = qw( a b ); proto_plus(@ar)',
           'a' ],
+        [ 'sig-warn-obj',
+          'sub My::Warn::value { 42 }
+           my $out;
+           my $w = bless {}, "My::Warn";
+           local $SIG{__WARN__} = sub { $out = shift->value };
+           warn $w;
+           $out',
+           42
+        ],
     ],
 
     '5.012' => [

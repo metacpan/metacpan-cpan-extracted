@@ -14,7 +14,7 @@ use IO::All 'io';
 use MIME::Words 'encode_mimewords';
 use Encode qw( encode is_utf8 );
 
-our $VERSION = '1.21'; # VERSION
+our $VERSION = '1.22'; # VERSION
 
 sub new {
     my $self = shift;
@@ -170,7 +170,7 @@ Email::Mailer - Multi-purpose emailer for HTML, auto-text, attachments, and temp
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =for markdown [![test](https://github.com/gryphonshafer/Email-Mailer/workflows/test/badge.svg)](https://github.com/gryphonshafer/Email-Mailer/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Email-Mailer/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Email-Mailer)

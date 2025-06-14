@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::CSRF
 
+1.05      2025-06-13 10:27:01-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.04      2025-06-11 06:30:46-07:00 America/Los_Angeles
         - Use Crypt::URandom for cryptographic randomness
 

@@ -1,5 +1,7 @@
 Revision history for Ham-Packet-DXSpider
 
+0.05    13th June 2025
+        Fix pod in example
 0.04    7th April 2012
         Tweaked POD as per CPAN Testers suggestions. Added LICENSE. Updated dependencies list.
 0.03    2012/04/04

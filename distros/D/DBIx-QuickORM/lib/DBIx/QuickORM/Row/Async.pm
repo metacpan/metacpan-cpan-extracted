@@ -2,7 +2,7 @@ package DBIx::QuickORM::Row::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp();
 use Scalar::Util();

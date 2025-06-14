@@ -1,5 +1,8 @@
 Revision history for App::Dest
 
+1.36      2025-06-13 10:28:18-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.35      2025-05-28 06:47:46-07:00 America/Los_Angeles
         - Add strftime support in make paths
 

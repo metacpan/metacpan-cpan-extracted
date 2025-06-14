@@ -1,6 +1,6 @@
 package RTx::TicketlistTransactions;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ RTx::TicketlistTransactions - Adds LastTransactionContent as a search display co
 
 =head1 RT VERSION
 
-Works with RT 4 and 5
+Works with RT 4, 5 and 6
 
 =head1 INSTALLATION
 
@@ -22,7 +22,7 @@ Works with RT 4 and 5
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -36,7 +36,7 @@ or add C<RTx::TicketlistTransactions> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -76,7 +76,7 @@ or via the web at
 
 =head1 LICENCE AND COPYRIGHT
 
-This software is copyright (c) 2011-2020 by Best Practical Solutions, LLC
+This software is copyright (c) 2011-2025 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

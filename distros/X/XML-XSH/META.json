@@ -4,13 +4,13 @@
       "Petr Pajas (pajas@matfyz.cz)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "XML-XSH",
    "no_index" : {
@@ -42,6 +42,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.8.6",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v1.8.7",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

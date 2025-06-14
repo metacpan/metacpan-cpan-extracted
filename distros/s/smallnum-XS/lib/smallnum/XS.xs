@@ -6,81 +6,45 @@
 #include <string.h>
 
 
-#ifdef USE_QUADMATH
-	#include <quadmath.h>
-	typedef __float128 snum_t;
-	#define SN_FLOOR floorq
-	#define SN_CEIL ceilq
-	#define SN_NV(sv) ((__float128)SvNV(sv))
-	static snum_t PRECISION = 0.01Q;
-	static snum_t OFFSET = 0.5555555Q;
-	static int precision_places(snum_t prec) {
-		int places = 0;
-		snum_t p = prec;
-		while (p < 1.0) {
-			p *= 10.0;
-			places++;
-			if (places > 18) break;
-		}
-   		return places;
+typedef double snum_t;
+#define SN_FLOOR floor
+#define SN_CEIL ceil
+#define SN_NV(sv) (SvNV(sv))
+static snum_t PRECISION = 0.01;
+static snum_t OFFSET = 0.5555555;
+static int precision_places(snum_t prec) {
+	int places = 0;
+	snum_t p = prec;
+	while (p < 1.0) {
+		p *= 10.0;
+		places++;
+		if (places > 18) break;
 	}
-	static SV *sn_to_sv(snum_t val) {
-		dTHX;
-		int places = precision_places(PRECISION);
-		char fmt[32], buf[128];
-		snprintf(fmt, sizeof(fmt), "%%.%df", places);
-		quadmath_snprintf(buf, sizeof(buf), fmt, (double)val); // cast for display
-		char *dot = strchr(buf, '.');
-		if (dot) {
-			char *end = buf + strlen(buf) - 1;
-			while (end > dot && *end == '0') *end-- = '\0';
-			if (end == dot) *end = '\0';
+   	return places;
+}
+
+static SV *sn_to_sv(snum_t val) {
+	dTHX;
+	int places = precision_places(PRECISION);
+	char fmt[16];
+	snprintf(fmt, sizeof(fmt), "%%.%df", places);
+	char *num = Perl_form(fmt, val);
+	size_t len = strlen(num);
+	char *dot = strchr(num, '.');
+	if (dot) {
+		while (len > 1 && num[len - 1] == '0') {
+			num[--len] = '\0';
 		}
-		return newSVpv(buf, 0);
-	}
-#elif defined(USE_LONG_DOUBLE)
-	typedef long double snum_t;
-	#define SN_FLOOR floorl
-	#define SN_CEIL ceill
-	#define SN_NV(sv) ((long double)SvNV(sv))
-	static snum_t PRECISION = 0.01L;
-	static snum_t OFFSET = 0.5555555L;
-	static int precision_places(snum_t prec) {
-		int places = 0;
-		snum_t p = prec;
-		while (p < 1.0) {
-			p *= 10.0;
-			places++;
-			if (places > 18) break;
+		if (len > 0 && num[len - 1] == '.') {
+			num[--len] = '\0';
 		}
-   		return places;
 	}
-	static SV *sn_to_sv(snum_t val) {
-		dTHX;
-		int places = precision_places(PRECISION);
-		char fmt[32], buf[64];
-		snprintf(fmt, sizeof(fmt), "%%.%dLf", places);
-		snprintf(buf, sizeof(buf), fmt, val);
-		char *dot = strchr(buf, '.');
-		if (dot) {
-			char *end = buf + strlen(buf) - 1;
-			while (end > dot && *end == '0') *end-- = '\0';
-			if (end == dot) *end = '\0';
-		}
-		return newSVpv(buf, 0);
-	}
-#else
-	typedef double snum_t;
-	#define SN_FLOOR floor
-	#define SN_CEIL ceil
-	#define SN_NV(sv) (SvNV(sv))
-	static snum_t PRECISION = 0.01;
-	static snum_t OFFSET = 0.5555555;
-	static SV *sn_to_sv(snum_t val) {
-		dTHX;
+	snum_t val_out = strtod(num, NULL);
+	if (val_out < val) {
 		return newSVnv(val);
 	}
-#endif
+	return newSVpv(num, 0);
+}
 
 static SV * new (snum_t num) {
 	dTHX;

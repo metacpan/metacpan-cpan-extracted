@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.10",
+  "VERSION" => "2.11",
   "test" => {
     "TESTS" => "t/*.t t/Bible/OBML/*.t"
   }

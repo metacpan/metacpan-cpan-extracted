@@ -3,3 +3,8 @@ Revision history for smallnum-XS
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.09	2025-06-13
+	- Another attempt at support in doublelong and quadmath perls
+
+0.10	2025-06-13
+	- Another attempt at support in doublelong and quadmath perls

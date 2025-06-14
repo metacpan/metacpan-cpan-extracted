@@ -9,7 +9,7 @@ use GD::Image;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Exception;
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 my $settings = {
     method      => 'any',
@@ -35,11 +35,13 @@ my $settings = {
     },
 };
 
-sub urand {
-    my ($max) = @_;
-    $max = 1 unless defined $max;
-    $max = abs($max);
-    return unpack( 'Q>', Crypt::URandom::urandom(8) ) / ( 2 ** 64 ) * $max;
+use constant SIZE => 1 << 31;
+use constant MASK => SIZE - 1;
+
+sub urand(;$) {
+    my $a = shift || 1;
+    my ($b) = unpack( 'N', Crypt::URandom::urandom(4) ) & MASK;
+    return $a * $b / SIZE;
 }
 
 sub register {
@@ -138,7 +140,7 @@ Mojolicious::Plugin::CaptchaPNG - PNG captcha generation and validation Mojolici
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG)

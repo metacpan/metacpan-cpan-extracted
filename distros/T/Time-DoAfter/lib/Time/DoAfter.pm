@@ -8,7 +8,7 @@ use warnings;
 use Carp 'croak';
 use Time::HiRes qw( time sleep );
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 sub _input_handler {
     my ( $input, $set ) = ( {}, {} );
@@ -169,7 +169,7 @@ Time::DoAfter - Wait before doing by label contoller singleton
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![test](https://github.com/gryphonshafer/Time-DoAfter/workflows/test/badge.svg)](https://github.com/gryphonshafer/Time-DoAfter/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Time-DoAfter/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Time-DoAfter)

@@ -1,5 +1,8 @@
 Revision history for exact::me
 
+1.06      2025-06-13 10:29:34-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.05      2023-09-12 21:10:17-07:00 America/Los_Angeles
         - Remove redundant strict (since it's provided by exact)
         - New import signature change required by exact v1.23

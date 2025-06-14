@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::Time
 
+1.05      2025-06-13 10:24:22-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.04      2022-03-18 08:53:12-07:00 America/Los_Angeles
         - Minor documentation update
 

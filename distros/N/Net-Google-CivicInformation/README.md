@@ -13,12 +13,6 @@ You must obtain an API key (free) from Google to use this package. See
 
 Do not use this module directly. Use one of the subclasses.
 
-# ATTRIBUTES
-
-- api\_key
-
-    Your Google Civic Information API key.
-
 # SEE ALSO
 
 [Net::Google::CivicInformation::Representatives](https://metacpan.org/pod/Net%3A%3AGoogle%3A%3ACivicInformation%3A%3ARepresentatives)

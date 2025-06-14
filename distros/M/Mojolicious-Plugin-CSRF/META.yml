@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Mojo-Plugin-CSRF/issues
   homepage: https://github.com/gryphonshafer/Mojo-Plugin-CSRF
   repository: https://github.com/gryphonshafer/Mojo-Plugin-CSRF.git
-version: '1.04'
+version: '1.05'
 x_generated_by_perl: v5.40.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

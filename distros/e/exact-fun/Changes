@@ -1,5 +1,8 @@
 Revision history for exact::fun
 
+1.02      2025-06-13 10:29:16-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.01      2023-09-12 21:08:36-07:00 America/Los_Angeles
         - Use Import::Into instead of eval to inject/import
         - New import signature change required by exact v1.23

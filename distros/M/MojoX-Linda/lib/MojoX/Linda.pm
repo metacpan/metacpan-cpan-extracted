@@ -10,7 +10,7 @@ use File::Find 'find';
 use Mojo::Server::Morbo;
 use Mojo::File 'path';
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub conf ($conf) {
     my $conf_app   = Config::App->find;
@@ -94,7 +94,7 @@ MojoX::Linda - Plausibly helpful (and probably drunk) wrapper around morbo
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![test](https://github.com/gryphonshafer/MojoX-Linda/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-Linda/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/MojoX-Linda/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-Linda)

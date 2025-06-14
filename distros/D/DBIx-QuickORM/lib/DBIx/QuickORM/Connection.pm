@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp qw/confess croak cluck/;
 use Scalar::Util qw/blessed weaken/;

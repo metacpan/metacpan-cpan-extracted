@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "GD::Image" => 0,
     "Mojo::Base" => 0,
     "Mojo::Exception" => 0,
+    "constant" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.06",
+  "VERSION" => "1.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Test2::MojoX" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0,
+  "constant" => 0,
   "strict" => 0,
   "warnings" => 0
 );

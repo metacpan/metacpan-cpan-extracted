@@ -1,5 +1,8 @@
 Revision history for English::Script
 
+1.07      2025-06-13 10:25:30-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.06      2022-03-19 17:50:34-07:00 America/Los_Angeles
         - Minor documentation update
 

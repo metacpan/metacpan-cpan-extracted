@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.040' => [qw[
@@ -59,7 +59,7 @@ my %introduces = do { no warnings 'qw';
                    '5.014' => [qw[
                                  ?^ /r /d /l /u /a auto-deref
                                  ^GLOBAL_PHASE \o package-block
-                                 srand-return prototype+
+                                 srand-return prototype+ sig-warn-obj
                               ]],
                    '5.012' => [qw[
                                  package-version ... each-array
@@ -305,7 +305,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.041
+Version 1.042
 
 =head1 SYNOPSIS
 
@@ -637,6 +637,10 @@ See B<srand() now returns the seed> under L<perl5140delta/Other Enhancements>.
 =head3 prototype+
 
 See L<perl5140delta/Single-term-prototype>.
+
+=head3 sig-warn-obj
+
+See the second bullet in L<perl5140delta/Exception Handling>.
 
 =head2 5.016
 

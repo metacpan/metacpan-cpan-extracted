@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 cpanfile
 dist.ini
 lib/Bible/OBML.pm

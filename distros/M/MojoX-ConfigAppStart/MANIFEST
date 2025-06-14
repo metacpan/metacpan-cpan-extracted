@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SECURITY.md
 config/app.yaml
 cpanfile
 dist.ini

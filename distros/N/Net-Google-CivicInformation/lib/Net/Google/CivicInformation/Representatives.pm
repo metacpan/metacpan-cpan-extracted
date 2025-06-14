@@ -1,6 +1,6 @@
 package Net::Google::CivicInformation::Representatives;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use strict;
 use warnings;
@@ -10,12 +10,16 @@ use Carp 'croak';
 use Function::Parameters;
 use JSON::MaybeXS;
 use Try::Tiny;
+
 use Types::Common::String 'NonEmptyStr';
-use URI;
 use Moo;
 use namespace::clean;
 
 extends 'Net::Google::CivicInformation';
+
+BEGIN {
+    warn 'Net::Google::CivicInformation::Representatives is deprecated (Google terminated the API) and should no longer be used';
+}
 
 ##
 sub _build__api_url {
@@ -23,33 +27,22 @@ sub _build__api_url {
 }
 
 ##
-method BUILD (@) {
-    $self->log->trace('Building instance of ' . __PACKAGE__);
-}
-
-##
 method representatives_for_address (NonEmptyStr $address) {
-    $self->log->debugf('representatives_for_address called with: "%s"', $address);
-
     my $uri = URI->new( $self->_api_url );
     $uri->query_form(
         address => $address,
-        key     => $self->api_key,
+        key => $self->api_key,
     );
 
     my $call = $self->_client->get( $uri );
-    my $response;
 
+    my $response;
     try {
         if ( ! $call->{success} ) {
             my $resp = decode_json( $call->{content} );
             $response = $resp;
-
-            $self->log->error('Error response from Google API', $resp);
         }
         else {
-            $self->log->debug('Success response from Google API');
-
             my $data = decode_json( $call->{content} );
 
             my @result;
@@ -77,8 +70,6 @@ method representatives_for_address (NonEmptyStr $address) {
         }
     }
     catch {
-        $self->log->errorf("Fatal error trying to call Google API: $_");
-
         $response = {
             error => {
                 message => 'Caught fatal error trying to call Google API',
@@ -97,13 +88,18 @@ __END__
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =encoding utf8
 
 =head1 NAME
 
-Net::Google::CivicInformation::Representatives - All elected representatives for US addresses
+DEPRECATED: Net::Google::CivicInformation::Representatives - All elected representatives for US addresses
+
+=head1 DESCRIPTION
+
+  DEPRECATED: In April 2025 Google discontinued the API that this module depended on. 
+  The module should no longer be used, and cannot return any data.
 
 =head1 SYNOPSIS
 
@@ -111,65 +107,21 @@ Net::Google::CivicInformation::Representatives - All elected representatives for
 
   my $res = $client->representatives_for_address('123 Main St Springfield MO 12345');
 
-  if ( $res->{error} ) {
-      # handle the error hash returned
+  if ( $res->error ) {
+      # handle the error returned (JSON obj, see below)
   }
   else {
-      for my $official ( $res->{officals} ) {
-          # use the data hash
-      }
+      # MORE DOC NEEDED HERE
   }
 
 =head1 METHODS
 
 =over
 
-=item B<representatives_for_address (NonEmptyStr $address)>
+=item B<representatives_for_address>
 
-Requires an address string as the only argument.
-
-On error, the response will contain a key C<error> containing a hashref like:
-
-  {
-    'error' => {
-      'code' => 400,
-      'errors' => [
-        {
-          'domain' => 'global',
-          'message' => 'Failed to parse address',
-          'reason' => 'parseError'
-        }
-      ],
-      'message' => 'Failed to parse address'
-    }
-  }
-
-On success, the response will contain a key C<officials> containing an arrayref of
-hashrefs, ordered by descending seniority (head of state down). Each hashref
-represents a single official: there may be more than one record at the same "rank."
-The hashref will contain the following keys:
-
-=over
-
-=item name (string)
-
-=item title (string)
-
-=item party (string)
-
-=item addresses (arrayref of hashrefs)
-
-=item phone_numbers (arrayref of strings)
-
-=item websites (arrayref of strings)
-
-=item social_media (arrayref of hashrefs)
-
-=back
-
-=back
-
-=cut
+Requires an address string as the only argument. Returns an object providing methods
+to access the reponse data, or else a method C<error> containing MORE DOC NEEDED HERE.
 
 =head1 AUTHOR
 
@@ -177,7 +129,7 @@ Nick Tonkin <tonkin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Nick Tonkin.
+This software is copyright (c) 2025 by Nick Tonkin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

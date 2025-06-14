@@ -1549,9 +1549,8 @@ use Test2::V0 -target => 'DBIx::QuickORM';
     isa_ok(qorm(db => 'somesql.somedb'),             ['DBIx::QuickORM::DB'], "Got the db by name");
     isa_ok(qorm(db => 'variable.db_one:postgresql'), ['DBIx::QuickORM::DB'], "Got the db by name and variation");
 
-    like(dies { qorm(1 .. 10) },         qr/Too many arguments/,                                             "Too many args");
-    like(dies { qorm('fake') },          qr/'fake' is not a defined ORM/,                                    "Need to provide a valid orm name");
-    like(dies { qorm('fake' => 'foo') }, qr/'fake' is not a valid item type to fetch from 'Test::Consumer'/, "We do not define any 'fake's here");
+    like(dies { qorm(orm => 1 .. 10) }, qr/Too many arguments/,          "Too many args");
+    like(dies { qorm('fake') },         qr/'fake' is not a defined ORM/, "Need to provide a valid orm name");
 
     no warnings 'once';
     local *DBIx::QuickORM::ORM::connection = sub { 'connected!' };

@@ -10,7 +10,7 @@ use XML::XSH::Functions qw(:default);
 use XML::XSH::Completion;
 
 BEGIN {
-  $VERSION   = '1.8.6';
+  $VERSION   = '1.8.7';
   @ISA       = qw(Exporter);
   @EXPORT = qw(&xsh);
   @EXPORT_OK = @XML::XSH::Functions::EXPORT_OK;

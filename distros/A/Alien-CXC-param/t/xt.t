@@ -9,10 +9,10 @@ use Alien::CXC::param;
 alien_ok 'Alien::CXC::param';
 my $xs = do { local $/; <DATA> };
 xs_ok { xs => $xs, verbose => 1 }, with_subtest {
-    my($module) = @_;
-    my $stash = Package::Stash->new( $module );
-    my $error = $stash->get_symbol( '&paramerrstr')->();
-    is ( $error, 'parameter error?' );
+    my ( $module ) = @_;
+    my $stash      = Package::Stash->new( $module );
+    my $error      = $stash->get_symbol( '&paramerrstr' )->();
+    is( $error, 'parameter error?' );
     pass;
 };
 

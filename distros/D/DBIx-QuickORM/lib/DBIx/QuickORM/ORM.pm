@@ -2,7 +2,7 @@ package DBIx::QuickORM::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp qw/croak/;
 
@@ -10,7 +10,7 @@ use DBIx::QuickORM::Connection;
 
 use DBIx::QuickORM::Util::HashBase qw{
     <name
-    <db
+    +db
     <schema
     <autofill
     <row_class
@@ -27,14 +27,26 @@ sub init {
 
     delete $self->{+NAME} unless defined $self->{+NAME};
 
-    my $db = $self->{+DB} or croak "'db' is a required attribute";
-
     croak "You must either provide the 'schema' attribute or enable 'autofill'"
         unless $self->{+SCHEMA} || $self->{+AUTOFILL};
 }
 
+sub db {
+    my $self = shift;
+
+    if (@_) {
+        croak "'db' has already been set" if $self->{+DB};
+        croak "Too many arguments" if @_ > 1;
+        ($self->{+DB}) = @_;
+    }
+
+    return $self->{+DB} // croak "'db' has not been set";
+}
+
 sub connect {
     my $self = shift;
+
+    croak "'db' has not been set" unless $self->{+DB};
 
     my %params = (orm => $self);
     $params{cache} = $self->{+CACHE_CLASS}->new() if $self->{+CACHE_CLASS};

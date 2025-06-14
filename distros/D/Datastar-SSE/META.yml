@@ -2,9 +2,10 @@
 abstract: 'Module for creating Datastar Server Events'
 author:
   - 'James Wright <jwright@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.044'
 dynamic_config: 0
 generated_by: 'App::ModuleBuildTiny version 0.051, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -15,22 +16,26 @@ name: Datastar-SSE
 provides:
   Datastar::SSE:
     file: lib/Datastar/SSE.pm
-    version: '0.25'
+    version: '0.26'
   Datastar::SSE::Types:
     file: lib/Datastar/SSE/Types.pm
   Datastar::SSE::Types::TypeConstraint:
     file: lib/Datastar/SSE/Types.pm
 requires:
+  Carp: '0'
   Exporter: '0'
   HTTP::ServerEvent: '0'
   JSON: '0'
   Scalar::Util: '0'
+  constant: '0'
+  overload: '0'
+  perl: v5.10.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/tehmoth/datastar-sse/issues
   repository: https://github.com/tehmoth/datastar-sse.git
-version: '0.25'
-x_generated_by_perl: v5.38.2
+version: '0.26'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

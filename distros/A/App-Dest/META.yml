@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/dest/issues
   homepage: https://github.com/gryphonshafer/dest
   repository: https://github.com/gryphonshafer/dest.git
-version: '1.35'
+version: '1.36'
 x_generated_by_perl: v5.40.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

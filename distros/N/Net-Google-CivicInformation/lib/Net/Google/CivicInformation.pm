@@ -1,16 +1,13 @@
 package Net::Google::CivicInformation;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use strict;
 use warnings;
 use v5.10;
 
 use Carp 'croak';
-use Function::Parameters;
 use HTTP::Tiny;
-use Log::Any ();
-
 use Types::Common::String 'NonEmptyStr';
 use Moo;
 use namespace::clean;
@@ -41,15 +38,6 @@ has _client => (
     },
 );
 
-has log => (
-    is      => 'lazy',
-    builder => sub { Log::Any->get_logger() },
-);
-
-method BUILD (@) {
-    $self->log->trace('Building instance of ' . __PACKAGE__);
-}
-
 1; # return true
 
 __END__
@@ -58,7 +46,7 @@ __END__
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =encoding utf8
 
@@ -77,21 +65,9 @@ L<https://developers.google.com/civic-information>.
 
 Do not use this module directly. Use one of the subclasses.
 
-=head1 ATTRIBUTES
-
-=over
-
-=item api_key
-
-Your Google Civic Information API key.
-
-=back
-
 =head1 SEE ALSO
 
 L<Net::Google::CivicInformation::Representatives>
-
-=cut
 
 =head1 AUTHOR
 
@@ -99,7 +75,7 @@ Nick Tonkin <tonkin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Nick Tonkin.
+This software is copyright (c) 2025 by Nick Tonkin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

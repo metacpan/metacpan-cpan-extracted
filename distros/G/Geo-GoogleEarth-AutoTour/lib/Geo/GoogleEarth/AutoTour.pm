@@ -14,7 +14,7 @@ use XML::LibXML;
 use Date::Parse 'str2time';
 use Math::Trig 1.23 qw( deg2rad rad2deg great_circle_distance great_circle_bearing );
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 our @EXPORT_OK = qw( tour kmz_to_xml xml_to_kmz load_kml read_path gather_points build_tour );
 
@@ -272,7 +272,7 @@ Geo::GoogleEarth::AutoTour - Generate Google Earth Camera Tours from Tracks and 
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =for markdown [![test](https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour/workflows/test/badge.svg)](https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Geo-GoogleEarth-AutoTour/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Geo-GoogleEarth-AutoTour)

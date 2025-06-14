@@ -30,7 +30,7 @@ use vars qw/@ISA @EXPORT_OK %EXPORT_TAGS $VERSION $REVISION $OUT $LOCAL_ID $LOCA
 	  /;
 
 BEGIN {
-  $VERSION='1.8.6';
+  $VERSION='1.8.7';
   $REVISION='$Revision: 1.73 $';
   @ISA=qw(Exporter);
   my @PARAM_VARS=qw/$ENCODING

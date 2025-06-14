@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.042   2025-06-13
+        - Add sig-warn-obj
+
 1.041   2025-06-09
         - Add the __FILE__() syntax
 

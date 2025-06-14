@@ -1,5 +1,9 @@
 Revision history for Mojolicious::Plugin::CaptchaPNG
 
+1.07      2025-06-13 10:27:09-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+        - Improve urand function as per CPANSec recommendation
+
 1.06      2025-06-11 07:07:50-07:00 America/Los_Angeles
         - Use Crypt::URandom to provide urand as rand replacement
 

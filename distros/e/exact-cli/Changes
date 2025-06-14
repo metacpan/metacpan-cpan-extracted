@@ -1,5 +1,8 @@
 Revision history for exact::cli
 
+1.08      2025-06-13 10:28:56-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.07      2023-09-12 21:06:47-07:00 America/Los_Angeles
         - Remove redundant strict (since it's provided by exact)
         - New import signature change required by exact v1.23

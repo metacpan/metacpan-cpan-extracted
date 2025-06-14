@@ -1,5 +1,8 @@
 Revision history for Bot::IRC::X::Message
 
+1.07      2025-06-13 10:23:46-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.06      2022-03-18 08:52:22-07:00 America/Los_Angeles
         - Minor documentation update
 

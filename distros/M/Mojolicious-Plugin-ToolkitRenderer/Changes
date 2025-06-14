@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::ToolkitRenderer
 
+1.14      2025-06-13 10:27:19-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.13      2025-02-13 13:32:39-08:00 America/Los_Angeles
         - Perl minimum version align
 

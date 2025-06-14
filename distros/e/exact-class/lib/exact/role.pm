@@ -7,7 +7,7 @@ use Import::Into;
 use feature    ();
 use Role::Tiny ();
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 my ($perl_version) = $^V =~ /^v5\.(\d+)/;
 
@@ -58,7 +58,7 @@ exact::role - Simple role interface extension for exact
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 SYNOPSIS
 

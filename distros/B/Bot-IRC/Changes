@@ -1,5 +1,8 @@
 Revision history for Bot::IRC
 
+1.42      2025-06-13 10:22:57-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.41      2025-01-28 11:46:54-08:00 America/Los_Angeles
         - exact::class attr leak guard
 

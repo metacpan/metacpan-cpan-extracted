@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Bible-OBML-Gateway/issues
   homepage: https://github.com/gryphonshafer/Bible-OBML-Gateway
   repository: https://github.com/gryphonshafer/Bible-OBML-Gateway.git
-version: '2.10'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '2.11'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

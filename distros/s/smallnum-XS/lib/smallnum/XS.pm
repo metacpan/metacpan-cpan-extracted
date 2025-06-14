@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 use overload;
 require XSLoader;
 XSLoader::load('smallnum::XS', $VERSION);

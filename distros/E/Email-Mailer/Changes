@@ -1,5 +1,8 @@
 Revision history for Email::Mailer
 
+1.22      2025-06-13 10:25:20-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.21      2024-10-07 18:04:00-07:00 America/Los_Angeles
         - Quick patch to fix tests in old Perl versions (14..22)
 

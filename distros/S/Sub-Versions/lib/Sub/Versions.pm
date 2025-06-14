@@ -7,7 +7,7 @@ use exact;
 use Sub::Util 'subname';
 use Devel::Hook;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 my $versions;
 my $subspaces;
@@ -136,7 +136,7 @@ Sub::Versions - Subroutine versioning syntactic sugar
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Sub-Versions/workflows/test/badge.svg)](https://github.com/gryphonshafer/Sub-Versions/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Sub-Versions/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Sub-Versions)

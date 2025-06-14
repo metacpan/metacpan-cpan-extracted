@@ -30,6 +30,9 @@ WriteMakefile(
 	 CI        => 'cvs ci',
 	 RCS_LABEL => 'cvs admin -Nv$(VERSION_SYM):',
     },
+    META_MERGE => {
+        x_deprecated => 1,
+    },
 );
 
 sub MY::postamble {

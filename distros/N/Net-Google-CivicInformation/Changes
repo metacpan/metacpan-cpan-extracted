@@ -1,5 +1,9 @@
 Changes file for Net::Google::CivicInformation
 
+1.03      2025-06-13 08:50:08-04:00 America/New_York
+
+  - Deprecate Net::Google::CivicInformation::Representatives
+
 1.02      2021-03-05 17:15:43-05:00 America/New_York
 
   - Fix documentation typo
@@ -9,7 +13,6 @@ Changes file for Net::Google::CivicInformation
   - No changes for this version
 
 1.00      2021-02-07 17:34:21-05:00 America/New_York
-
   - Add tests and doc and dependencies
   - Bump major version to 1
 

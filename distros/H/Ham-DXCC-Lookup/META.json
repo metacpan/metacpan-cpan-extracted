@@ -1,0 +1,69 @@
+{
+   "abstract" : "Look up DXCC entity from amateur radio callsign",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Ham-DXCC-Lookup",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::CSV" : "0",
+            "Database::Abstraction" : "0",
+            "Exporter" : "0",
+            "FindBin" : "0",
+            "Text::CSV" : "0",
+            "Text::xSV::Slurp" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Ham-DXCC-Lookup@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Ham-DXCC-Lookup/issues",
+         "x_url" : "https://github.com/nigelhorne/Ham-DXCC-Lookup/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Ham::DXCC::Lookup",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Ham-DXCC-Lookup.git",
+         "web" : "https://github.com/nigelhorne/Ham-DXCC-Lookup",
+         "x_repository" : "https://github.com/nigelhorne/Ham-DXCC-Lookup"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

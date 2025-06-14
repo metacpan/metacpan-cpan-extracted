@@ -10,7 +10,7 @@ use Carp qw( croak carp );
 use POSIX ":sys_wait_h";
 use IO::Pipe;
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 sub new {
     my $class = shift;
@@ -331,7 +331,7 @@ Daemon::Device - Forking daemon device construct
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =for markdown [![test](https://github.com/gryphonshafer/Daemon-Device/workflows/test/badge.svg)](https://github.com/gryphonshafer/Daemon-Device/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Daemon-Device/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Daemon-Device)

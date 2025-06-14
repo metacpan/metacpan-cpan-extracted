@@ -26,7 +26,7 @@ local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin'
     : q[]
   );
 
-our $VERSION = '1.66';
+our $VERSION = '1.67';
 
 my $binary  = 'firefox';
 my $ident   = 'ssh-auth-cmd-marionette';
@@ -149,6 +149,7 @@ s/^(${tmp_directory_regex}\/firefox_marionette_remote\w+)(?:\/tmp)?$/$1/smx
       qr/[ ]\-n[ ]$ca_name_regex[ ]\d{1,10}[ ]\-t[ ]TC,,/smx;
     my $firefox_arguments_regex = join q[],
       qr/[ ]\-marionette/smx,
+      qr/(?:[ ]\-remote\-allow\-system\-access)?/smx,
       qr/(?:[ ]\-width[ ]\d{1,8})?/smx,
       qr/(?:[ ]\-height[ ]\d{1,8})?/smx,
       qr/(?:[ ]\-\-jsconsole)?/smx,
@@ -414,7 +415,7 @@ ssh-auth-cmd-marionette - ssh ~/.ssh/authorized_keys command for Firefox::Marion
 
 =head1 VERSION
 
-Version 1.66
+Version 1.67
 
 =head1 USAGE
 

@@ -1,5 +1,8 @@
 Revision history for Geo::GoogleEarth::AutoTour
 
+1.10      2025-06-13 10:26:05-07:00 America/Los_Angeles
+        - Add security policy as per CPANSec recommendation
+
 1.09      2023-08-21 13:07:39-07:00 America/Los_Angeles
         - Update test zip files to sidestep a date bug
 
