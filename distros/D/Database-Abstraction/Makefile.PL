@@ -43,7 +43,6 @@ WriteMakefile(
 		'strict' => 0,
 		'warnings' => 0,
 		'Carp' => 0,
-		'Config::Auto' => 0,
 		'Data::Dumper' => 0,
 		'Data::Reuse' => 0,	# Fails installation tests on recent Perls, RT#100461
 		# 'Error' => 0,
@@ -53,6 +52,7 @@ WriteMakefile(
 		'File::pfopen' => 0.03,
 		'File::Temp' => 0,
 		'Log::Abstraction' => 0.05,
+		'Object::Configure' => 0,
 		'Params::Get' => 0,
 		'Scalar::Util' => 0,
 	}, dist => $dist,
@@ -64,10 +64,11 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
+				repository => 'https://github.com/nigelhorne/Database-Abstraction',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Database-Abstraction.git',
 				web => 'https://github.com/nigelhorne/Database-Abstraction',
-				repository => 'https://github.com/nigelhorne/Database-Abstraction',
+				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction',
 				web => 'https://github.com/nigelhorne/Database-Abstraction/issues',

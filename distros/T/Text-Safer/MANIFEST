@@ -11,6 +11,7 @@ lib/Text/Safer.pm
 lib/Text/Safer/alphanum_kebab.pm
 lib/Text/Safer/alphanum_kebab_nodashend_lc.pm
 lib/Text/Safer/alphanum_snake.pm
+lib/Text/Safer/alphanum_snake_lc.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

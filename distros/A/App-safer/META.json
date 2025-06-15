@@ -24,13 +24,22 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.151"
+         },
+         "x_spec" : {
+            "Rinci" : "v1.1.102"
          }
       },
       "runtime" : {
          "requires" : {
-            "Getopt::Long" : "2.50",
-            "Text::Safer" : "0",
+            "Complete::Util" : "0.620",
+            "Data::Sah::Compiler::perl::TH::bool" : "0.914",
+            "Data::Sah::Compiler::perl::TH::str" : "0.914",
+            "Module::List::Tiny" : "0",
+            "Perinci::CmdLine::Any" : "0.154",
+            "Perinci::CmdLine::Lite" : "1.924",
+            "Text::Safer" : "0.003",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -48,7 +57,7 @@
    "provides" : {
       "App::safer" : {
          "file" : "lib/App/safer.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -63,12 +72,17 @@
          "web" : "https://github.com/perlancar/perl-App-safer"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript safer",
+            "version" : "0.425"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
@@ -570,6 +584,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "x_spec"
+               }
+            },
+            "name" : "DevelopX_spec",
             "version" : "6.032"
          },
          {

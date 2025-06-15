@@ -1,3 +1,19 @@
+0.003   2025-06-14  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [INCOMPATIBLE CHANGES]
+
+        - [ux] Change default encodoing from alphanum_kebab to
+          alphanum_kebab_nodashend_lc.
+
+        [UX]
+
+        - Tweak abstracts, use dzil plugin to get abstracts from %META.
+
+        [NEW]
+
+        - Add encoding: alphanum_snake_lc.
+
+
 0.002   2025-06-11  Released-By: PERLANCAR; Urgency: medium
 
         - Add encoding: alphanum_kebab_nodashend_lc.

@@ -7,15 +7,15 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-06-11'; # DATE
+our $DATE = '2025-06-14'; # DATE
 our $DIST = 'Text-Safer'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(encode_safer);
 
 sub encode_safer {
     my ($text, $encoding, $encoding_args) = @_;
-    $encoding //= "alphanum_kebab";
+    $encoding //= "alphanum_kebab_nodashend_lc";
     $encoding_args //= {};
 
     my $module = "Text::Safer::$encoding";
@@ -27,7 +27,7 @@ sub encode_safer {
 }
 
 1;
-# ABSTRACT: Convert text to a safer (e.g. more restricted) encoding
+# ABSTRACT: Convert text with one of several available methods, usually to a safer/more restricted encoding, e.g. for filenames
 
 __END__
 
@@ -37,17 +37,17 @@ __END__
 
 =head1 NAME
 
-Text::Safer - Convert text to a safer (e.g. more restricted) encoding
+Text::Safer - Convert text with one of several available methods, usually to a safer/more restricted encoding, e.g. for filenames
 
 =head1 VERSION
 
-This document describes version 0.002 of Text::Safer (from Perl distribution Text-Safer), released on 2025-06-11.
+This document describes version 0.003 of Text::Safer (from Perl distribution Text-Safer), released on 2025-06-14.
 
 =head1 SYNOPSIS
 
  use Text::Safer qw(encode_safer);
 
- my $safer1 = encode_safer("Foo bar!!!");                            # "Foo-bar-", default encoding is "alphanum_kebab"
+ my $safer1 = encode_safer("Foo bar. baz!!!");                       # "foo-bar-baz", default encoding is "alphanum_kebab_nodashend_lc"
  my $safer2 = encode_safer("Foo bar!!!", "alphanum_snake");          # "Foo_bar_"
  my $safer3 = encode_safer("Foo bar!!!", "alphanum_snake", {lc=>1}); # "foo_bar_"
 

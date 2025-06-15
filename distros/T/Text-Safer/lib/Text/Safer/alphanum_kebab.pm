@@ -5,11 +5,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-06-11'; # DATE
+our $DATE = '2025-06-14'; # DATE
 our $DIST = 'Text-Safer'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %META = (
+    summary => 'Replace sequences of non-alphanumeric characters (underscores not included) with a single dash, e.g. Foo_Bar!!!Baz. -> Foo_Bar-Baz-',
     args => {
         lc => {
             schema => 'bool*',
@@ -26,7 +27,7 @@ sub encode_safer {
 }
 
 1;
-# ABSTRACT: Convert text to a safer (e.g. more restricted) encoding using only alphanumeric and dash characters
+# ABSTRACT: Replace sequences of non-alphanumeric characters (underscores not included) with a single dash, e.g. Foo_Bar!!!Baz. -> Foo_Bar-Baz-
 
 __END__
 
@@ -36,18 +37,15 @@ __END__
 
 =head1 NAME
 
-Text::Safer::alphanum_kebab - Convert text to a safer (e.g. more restricted) encoding using only alphanumeric and dash characters
+Text::Safer::alphanum_kebab - Replace sequences of non-alphanumeric characters (underscores not included) with a single dash, e.g. Foo_Bar!!!Baz. -> Foo_Bar-Baz-
 
 =head1 VERSION
 
-This document describes version 0.002 of Text::Safer::alphanum_kebab (from Perl distribution Text-Safer), released on 2025-06-11.
+This document describes version 0.003 of Text::Safer::alphanum_kebab (from Perl distribution Text-Safer), released on 2025-06-14.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
-
-- Multiple non-alphanumeric characters are converted to a single dash
-- Underscores are not converted to dash
 
 =head1 FUNCTIONS
 

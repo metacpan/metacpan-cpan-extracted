@@ -41,6 +41,7 @@
             "Data::Sah::Compiler::perl::TH::re" : "0.914",
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Data::Sah::Filter::perl::Str::maybe_convert_to_re" : "0",
+            "IPC::System::Options" : "0.339",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
@@ -62,7 +63,7 @@
    "provides" : {
       "App::ClipboardUtils" : {
          "file" : "lib/App/ClipboardUtils.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -77,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-App-ClipboardUtils"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"

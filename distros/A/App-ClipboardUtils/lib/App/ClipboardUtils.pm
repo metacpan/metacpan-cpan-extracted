@@ -5,66 +5,140 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-29'; # DATE
+our $DATE = '2025-06-15'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use Clipboard::Any ();
 use Clone::PP qw(clone);
 
 our %SPEC;
 
-$SPEC{add_clipboard_content} = clone $Clipboard::Any::SPEC{add_clipboard_content};
-$SPEC{add_clipboard_content}{args}{split_by} = {
-    summary => 'Split content by specified string/regex, add the split content as multiple clipboard entries',
-    schema => ['str_or_re*'],
-    description => <<'MARKDOWN',
+{
+    $SPEC{add_clipboard_content} = clone $Clipboard::Any::SPEC{add_clipboard_content};
+
+    # because we also have --command and do our own while(<>) { ... }
+    delete $SPEC{add_clipboard_content}{args}{content}{cmdline_src};
+
+    $SPEC{add_clipboard_content}{args}{split_by} = {
+        summary => 'Split content by specified string/regex, add the split content as multiple clipboard entries',
+        schema => ['str_or_re*'],
+        description => <<'MARKDOWN',
 
 Note that if you supply a regex, you should not have any capture groups in the
 regex.
 
 MARKDOWN
-    cmdline_aliases => {s=>{}},
-};
-$SPEC{add_clipboard_content}{args}{tee} = {
-    summary => 'Pass stdin to stdout',
-    schema => ['true*'],
-    description => <<'MARKDOWN',
+        cmdline_aliases => {s=>{}},
+    };
+
+    $SPEC{add_clipboard_content}{args}{tee} = {
+        summary => 'Pass stdin to stdout',
+        schema => ['true*'],
+        description => <<'MARKDOWN',
 
 MARKDOWN
-    cmdline_aliases => {t=>{}},
-};
+        cmdline_aliases => {t=>{}},
+    };
+
+    $SPEC{add_clipboard_content}{args}{command_line} = {
+        summary => 'For every line of input in *stdin*, execute a command, feed it the input line, and add the output to clipboard',
+        schema => ['str*'],
+        description => <<'MARKDOWN',
+
+Note that when you use this option, the `--content` argument is ignored. Input
+is taken from stdin. With `--tee`, each output will be printed to stdout. After
+eof, the utility will return empty result.
+
+An example for using this option (<prog:safer> is a utility from <pm:App::safer>):
+
+    % clipadd -c safer --tee
+    Foo Bar, Co., Ltd.
+    foo-bar-co-ltd
+    BaZZ, Co., Ltd.
+    bazz-co-ltd
+    _
+
+MARKDOWN
+        cmdline_aliases => {c=>{}},
+    };
+}
+
 sub add_clipboard_content {
     my %args = @_;
     my $split_by = delete $args{split_by};
     my $tee = delete $args{tee};
+    my $command_line = $args{command_line};
 
-    if (defined $split_by) {
-        my $content = delete $args{content};
-        my @split_parts = split /($split_by)/, $content;
-        log_trace "split_by=%s, split_contents=%s", $split_by, \@split_parts;
+    if (defined $command_line) {
 
-        my $res = [204, "OK (no content)"];
-        my $i = 0;
-        while (my ($part, $separator) = splice @split_parts, 0, 2) {
-            if ($tee) {
-                print $part;
-                print $separator if defined $separator;
+        require IPC::System::Options;
+
+        while (defined(my $input_line = <>)) {
+            my $stdout;
+            IPC::System::Options::run({log=>1, die=>1, stdin => $input_line, capture_stdout => \$stdout}, $command_line);
+
+            if (defined $split_by) {
+                my $content = delete $args{content};
+                my @split_parts = split /($split_by)/, $content;
+                log_trace "split_by=%s, split_contents=%s", $split_by, \@split_parts;
+
+                my $i = 0;
+                while (my ($part, $separator) = splice @split_parts, 0, 2) {
+                    if ($tee) {
+                        print $part;
+                        print $separator if defined $separator;
+                    }
+
+                    # do not add empty part to clipboard
+                    if (length $part) {
+                        my $res = Clipboard::Any::add_clipboard_content(
+                            %args, content => $part,
+                        );
+                        return $res unless $res->[0] == 200;
+                    }
+                }
+            } else {
+                print $stdout if $tee;
+                my $res = Clipboard::Any::add_clipboard_content(%args, content => $stdout);
+                return $res unless $res->[0] == 200;
             }
+        } # while input
+        return [200, "OK"];
 
-            # do not add empty part to clipboard
-            if (length $part) {
-                $res = Clipboard::Any::add_clipboard_content(
-                    %args, content => $part,
-                ); # currently we use the last add_clipboard_content status
-            }
-        }
-        $res->[3]{'func.parts'} = @split_parts;
-        $res;
     } else {
-        print $args{content} if $tee;
-        Clipboard::Any::add_clipboard_content(%args);
-    }
+
+        my $content = $args{content};
+        $content = do { local $/; scalar <> } unless defined $content;
+        $args{content} = $content;
+
+        if (defined $split_by) {
+            my @split_parts = split /($split_by)/, $content;
+            log_trace "split_by=%s, split_contents=%s", $split_by, \@split_parts;
+
+            my $res = [204, "OK (no content)"];
+            my $i = 0;
+            while (my ($part, $separator) = splice @split_parts, 0, 2) {
+                if ($tee) {
+                    print $part;
+                    print $separator if defined $separator;
+                }
+
+                # do not add empty part to clipboard
+                if (length $part) {
+                    $res = Clipboard::Any::add_clipboard_content(
+                        %args, content => $part,
+                    ); # currently we use the last add_clipboard_content status
+                }
+            }
+            $res->[3]{'func.parts'} = @split_parts;
+            $res;
+        } else {
+            print $content if $tee;
+            Clipboard::Any::add_clipboard_content(%args);
+        }
+
+    } # if command_line
 }
 
 $SPEC{tee_clipboard_content} = clone $Clipboard::Any::SPEC{add_clipboard_content};
@@ -90,7 +164,7 @@ App::ClipboardUtils - CLI utilities related to clipboard
 
 =head1 VERSION
 
-This document describes version 0.010 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2025-05-29.
+This document describes version 0.011 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2025-06-15.
 
 =head1 DESCRIPTION
 
@@ -153,6 +227,23 @@ Arguments ('*' denotes required arguments):
 Explicitly set clipboard manager to use.
 
 The default, when left undef, is to detect what clipboard manager is running.
+
+=item * B<command_line> => I<str>
+
+For every line of input in *stdin*, execute a command, feed it the input line, and add the output to clipboard.
+
+Note that when you use this option, the C<--content> argument is ignored. Input
+is taken from stdin. With C<--tee>, each output will be printed to stdout. After
+eof, the utility will return empty result.
+
+An example for using this option (L<safer> is a utility from L<App::safer>):
+
+ % clipadd -c safer --tee
+ Foo Bar, Co., Ltd.
+ foo-bar-co-ltd
+ BaZZ, Co., Ltd.
+ bazz-co-ltd
+ _
 
 =item * B<content> => I<str>
 

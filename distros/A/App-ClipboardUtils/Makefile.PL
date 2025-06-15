@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::re" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Str::maybe_convert_to_re" => 0,
+    "IPC::System::Options" => "0.339",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "IPC::System::Options" => "0.339",
   "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",

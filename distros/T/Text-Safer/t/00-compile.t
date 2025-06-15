@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Text/Safer.pm',
     'Text/Safer/alphanum_kebab.pm',
     'Text/Safer/alphanum_kebab_nodashend_lc.pm',
-    'Text/Safer/alphanum_snake.pm'
+    'Text/Safer/alphanum_snake.pm',
+    'Text/Safer/alphanum_snake_lc.pm'
 );
 
 

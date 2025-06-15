@@ -15,7 +15,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.26
+Version 0.27
 
 # DESCRIPTION
 
@@ -286,6 +286,16 @@ Throws an error in slurp mode when an invalid column name is given.
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
+
+# SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to `bug-database-abstraction at rt.cpan.org`,
+or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Database-Abstraction](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Database-Abstraction).
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 # BUGS
 

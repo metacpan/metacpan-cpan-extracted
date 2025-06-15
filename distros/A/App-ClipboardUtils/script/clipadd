@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-29'; # DATE
+our $DATE = '2025-06-15'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ClipboardUtils/add_clipboard_content",
@@ -40,7 +40,7 @@ clipadd - Shorter alias for add-clipboard-content
 
 =head1 VERSION
 
-This document describes version 0.010 of clipadd (from Perl distribution App-ClipboardUtils), released on 2025-05-29.
+This document describes version 0.011 of clipadd (from Perl distribution App-ClipboardUtils), released on 2025-06-15.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<clipadd> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?
 
 B<clipadd> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<clipadd> [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--split-by|/"--split-by=s, -s">>=I<L<str_or_re|Sah::Schema::str_or_re>>|B<L<-s|/"--split-by=s, -s">>=I<L<str_or_re|Sah::Schema::str_or_re>>] [B<L<--tee|/"--tee, -t">>|B<L<-t|/"--tee, -t">>] -- [I<L<content|/"--content=s">>]
+B<clipadd> [B<L<--clipboard-manager|/"--clipboard-manager=s, -m">>=I<str>|B<L<-m|/"--clipboard-manager=s, -m">>=I<str>] [B<L<--command-line|/"--command-line=s, -c">>=I<str>|B<L<-c|/"--command-line=s, -c">>=I<str>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--split-by|/"--split-by=s, -s">>=I<L<str_or_re|Sah::Schema::str_or_re>>|B<L<-s|/"--split-by=s, -s">>=I<L<str_or_re|Sah::Schema::str_or_re>>] [B<L<--tee|/"--tee, -t">>|B<L<-t|/"--tee, -t">>] -- [I<L<content|/"--content=s">>]
 
 
 
@@ -76,6 +76,24 @@ Valid values:
  ["klipper","parcellite","clipit","xclip"]
 
 The default, when left undef, is to detect what clipboard manager is running.
+
+
+=item B<--command-line>=I<s>, B<-c>
+
+For every line of input in *stdin*, execute a command, feed it the input line, and add the output to clipboard.
+
+Note that when you use this option, the C<--content> argument is ignored. Input
+is taken from stdin. With C<--tee>, each output will be printed to stdout. After
+eof, the utility will return empty result.
+
+An example for using this option (L<safer> is a utility from L<App::safer>):
+
+ % clipadd -c safer --tee
+ Foo Bar, Co., Ltd.
+ foo-bar-co-ltd
+ BaZZ, Co., Ltd.
+ bazz-co-ltd
+ _
 
 
 =item B<--content>=I<s>

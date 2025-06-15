@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.160',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.167',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -23,6 +23,7 @@ do { my $x = {
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage::TrustMe' => '0.002001',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'perl' => '5.006',
@@ -113,6 +114,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::Test::Compile' => '2.039',
                                            'Dist::Zilla::Plugin::Test::Kwalitee' => '2.10',
                                            'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000010',
+                                           'Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe' => '0',
                                            'Dist::Zilla::Plugin::Test::Pod::No404s' => '1.003',
                                            'Dist::Zilla::Plugin::Test::Portability' => '2.000007',
                                            'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.022',

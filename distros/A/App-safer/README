@@ -2,11 +2,123 @@ NAME
     App::safer - CLI for Text::Safer
 
 VERSION
-    This document describes version 0.001 of App::safer (from Perl
-    distribution App-safer), released on 2025-06-11.
+    This document describes version 0.003 of App::safer (from Perl
+    distribution App-safer), released on 2025-06-15.
 
 SYNOPSIS
     See safer script.
+
+FUNCTIONS
+  app
+    Usage:
+
+     app(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    CLI for Text::Safer.
+
+    Examples:
+
+    *   List available encodings:
+
+         app(action => "list-encodings");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               encoding => "alphanum_kebab",
+               summary => "Replace sequences of non-alphanumeric characters (underscores not included) with a single dash, e.g. Foo_Bar!!!Baz. -> Foo_Bar-Baz-",
+               args => "lc",
+             },
+             {
+               encoding => "alphanum_kebab_nodashend_lc",
+               summary => "Like alphanum_kebab, but additionally lower case & remove dash at the beginning & end of text, e.g. \"Foo Bar, Co., Ltd.\" -> \"foo-bar-co-ltd\"",
+               args => "",
+             },
+             {
+               encoding => "alphanum_snake",
+               summary => "Replace sequences of non-alphanumeric characters (including dashes) with a single underscore, e.g. Foo-Bar_Baz!!!Qux-. -> Foo_Bar_Baz_Qux_",
+               args => "lc",
+             },
+             {
+               encoding => "alphanum_snake_lc",
+               summary => "Like alphanum_snake, but additionally lower case",
+               args => "",
+             },
+           ],
+           { "table.fields" => ["encoding", "summary", "args"] },
+         ]
+
+    *   List available encodings (verbose mode):
+
+         app(action => "list-encodings", detail => 1);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               encoding => "alphanum_kebab",
+               summary => "Replace sequences of non-alphanumeric characters (underscores not included) with a single dash, e.g. Foo_Bar!!!Baz. -> Foo_Bar-Baz-",
+               args => "lc",
+             },
+             {
+               encoding => "alphanum_kebab_nodashend_lc",
+               summary => "Like alphanum_kebab, but additionally lower case & remove dash at the beginning & end of text, e.g. \"Foo Bar, Co., Ltd.\" -> \"foo-bar-co-ltd\"",
+               args => "",
+             },
+             {
+               encoding => "alphanum_snake",
+               summary => "Replace sequences of non-alphanumeric characters (including dashes) with a single underscore, e.g. Foo-Bar_Baz!!!Qux-. -> Foo_Bar_Baz_Qux_",
+               args => "lc",
+             },
+             {
+               encoding => "alphanum_snake_lc",
+               summary => "Like alphanum_snake, but additionally lower case",
+               args => "",
+             },
+           ],
+           { "table.fields" => ["encoding", "summary", "args"] },
+         ]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "encode")
+
+        (No description)
+
+    *   detail => *bool*
+
+        Show detail information in list.
+
+    *   encoding => *str* (default: "alphanum_kebab_nodashend_lc")
+
+        (No description)
+
+    *   text => *str*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at

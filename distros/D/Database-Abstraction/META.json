@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Auto" : "0",
             "DBD::SQLite::Constants" : "0",
             "Data::Dumper" : "0",
             "Data::Reuse" : "0",
@@ -42,6 +41,7 @@
             "File::Temp" : "0",
             "File::pfopen" : "0.03",
             "Log::Abstraction" : "0.05",
+            "Object::Configure" : "0",
             "Params::Get" : "0",
             "Scalar::Util" : "0",
             "autodie" : "0",
@@ -83,6 +83,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,8 @@
 Revision history for Database-Abstraction
 
+0.27	Sat Jun 14 20:56:27 EDT 2025
+	Use Object::Configure rather than Class::Debug
+
 0.26	Tue Apr 15 16:42:48 EDT 2025
 	Added the 'no_fixate' option
 	POC - fixate slurped data

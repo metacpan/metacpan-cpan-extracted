@@ -31,7 +31,6 @@ use strict;
 
 use boolean;
 use Carp;
-use Config::Auto;
 use Data::Dumper;
 use Data::Reuse;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
@@ -39,7 +38,7 @@ use Fcntl;	# For O_RDONLY
 use File::Spec;
 use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
-use Log::Abstraction;
+use Object::Configure;
 use Params::Get;
 # use Error::Simple;	# A nice idea to use this but it doesn't play well with "use lib"
 use Scalar::Util;
@@ -53,11 +52,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =head1 DESCRIPTION
 
@@ -293,12 +292,10 @@ sub new {
 	my %args;
 
 	# Handle hash or hashref arguments
-	if(ref($_[0]) eq 'HASH') {
-		%args = %{$_[0]};
-	} elsif((scalar(@_) % 2) == 0) {
-		%args = @_;
-	} elsif(scalar(@_) == 1) {
-		$args{'directory'} = shift;
+	if((scalar(@_) == 1) && !ref($_[0])) {
+		$args{'directory'} = $_[0];
+	} elsif(my $params = Params::Get::get_params(undef, @_)) {
+		%args = %{$params};
 	}
 
 	if(!defined($class)) {
@@ -317,13 +314,7 @@ sub new {
 	}
 
 	# Load the configuration from a config file, if provided
-	if(exists($args{'config_file'}) && (my $config = Config::Auto::parse($args{'config_file'}))) {
-		# my $config = YAML::XS::LoadFile($args{'config_file'});
-		if($config->{$class}) {
-			$config = $config->{$class};
-		}
-		%args = (%{$config}, %args);
-	}
+	%args = %{Object::Configure::configure($class, \%args)};
 
 	croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
 
@@ -340,15 +331,6 @@ sub new {
 		# no_entry => $args{'no_entry'} || 0,
 	# }, $class;
 
-	my $logger;
-	if($logger = $args{'logger'}) {
-		if(!Scalar::Util::blessed($logger)) {
-			$logger = Log::Abstraction->new($logger);
-		}
-	} else {
-		$logger = Log::Abstraction->new();
-	}
-
 	# Re-seen keys take precedence, so defaults come first
 	return bless {
 		no_entry => 0,
@@ -358,7 +340,6 @@ sub new {
 		max_slurp_size => DEFAULT_MAX_SLURP_SIZE,
 		%defaults,
 		%args,
-		logger => $logger
 	}, $class;
 }
 
@@ -1312,6 +1293,16 @@ sub _warn {
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to C<bug-database-abstraction at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Database-Abstraction>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 =head1 BUGS
 

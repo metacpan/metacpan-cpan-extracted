@@ -1,5 +1,5 @@
 {
-   "abstract" : "Convert text to a safer (e.g. more restricted) encoding",
+   "abstract" : "Convert text with one of several available methods, usually to a safer/more restricted encoding, e.g. for filenames",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -47,19 +47,23 @@
    "provides" : {
       "Text::Safer" : {
          "file" : "lib/Text/Safer.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Text::Safer::alphanum_kebab" : {
          "file" : "lib/Text/Safer/alphanum_kebab.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Text::Safer::alphanum_kebab_nodashend_lc" : {
          "file" : "lib/Text/Safer/alphanum_kebab_nodashend_lc.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Text::Safer::alphanum_snake" : {
          "file" : "lib/Text/Safer/alphanum_snake.pm",
-         "version" : "0.002"
+         "version" : "0.003"
+      },
+      "Text::Safer::alphanum_snake_lc" : {
+         "file" : "lib/Text/Safer/alphanum_snake_lc.pm",
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -74,12 +78,17 @@
          "web" : "https://github.com/perlancar/perl-Text-Safer"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Text::Safer",
+            "name" : "Text::Safer",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",

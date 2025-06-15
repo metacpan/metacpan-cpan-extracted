@@ -1,4 +1,4 @@
-package Template::Tiny; # git description: v1.13-3-g7fb3b0a
+package Template::Tiny; # git description: v1.14-6-gb67b1a2
 # ABSTRACT: Template Toolkit reimplemented in as little code as possible
 
 
@@ -6,71 +6,77 @@ package Template::Tiny; # git description: v1.13-3-g7fb3b0a
 
 use strict;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 # Evaluatable expression
 my $EXPR = qr/ [a-z_][\w.]* /xs;
 
-# Opening [% tag including whitespace chomping rules
-my $LEFT = qr/
-	(?:
-		(?: (?:^|\n) [ \t]* )? \[\%\-
-		|
-		\[\% \+?
-	) \s*
+sub new {
+    my $self = bless {
+        start_tag => '[%',
+        end_tag   => '%]',
+        @_[ 1 .. $#_ ]
+      },
+      $_[0];
+
+# Opening tag including whitespace chomping rules
+    my $LEFT = $self->{LEFT} = qr/
+    (?:
+        (?: (?:^|\n) [ \t]* )? \Q$self->{start_tag}\E\-
+        |
+        \Q$self->{start_tag}\E \+?
+    ) \s*
 /xs;
 
 # Closing %] tag including whitespace chomping rules
-my $RIGHT  = qr/
-	\s* (?:
-		\+? \%\]
-		|
-		\-\%\] (?: [ \t]* \n )?
-	)
+    my $RIGHT = $self->{RIGHT} = qr/
+    \s* (?:
+        \+? \Q$self->{end_tag}\E
+        |
+        \-\Q$self->{end_tag}\E (?: [ \t]* \n )?
+    )
 /xs;
 
 # Preparsing run for nesting tags
-my $PREPARSE = qr/
-	$LEFT ( IF | UNLESS | FOREACH ) \s+
-		(
-			(?: \S+ \s+ IN \s+ )?
-		\S+ )
-	$RIGHT
-	(?!
-		.*?
-		$LEFT (?: IF | UNLESS | FOREACH ) \b
-	)
-	( .*? )
-	(?:
-		$LEFT ELSE $RIGHT
-		(?!
-			.*?
-			$LEFT (?: IF | UNLESS | FOREACH ) \b
-		)
-		( .+? )
-	)?
-	$LEFT END $RIGHT
+    $self->{PREPARSE} = qr/
+    $LEFT ( IF | UNLESS | FOREACH ) \s+
+        (
+            (?: \S+ \s+ IN \s+ )?
+        \S+ )
+    $RIGHT
+    (?!
+        .*?
+        $LEFT (?: IF | UNLESS | FOREACH ) \b
+    )
+    ( .*? )
+    (?:
+        $LEFT ELSE $RIGHT
+        (?!
+            .*?
+            $LEFT (?: IF | UNLESS | FOREACH ) \b
+        )
+        ( .+? )
+    )?
+    $LEFT END $RIGHT
 /xs;
 
-# Condition set
-my $CONDITION = qr/
-	\[\%\s
-		( ([IUF])\d+ ) \s+
-		(?:
-			([a-z]\w*) \s+ IN \s+
-		)?
-		( $EXPR )
-	\s\%\]
-	( .*? )
-	(?:
-		\[\%\s \1 \s\%\]
-		( .+? )
-	)?
-	\[\%\s \1 \s\%\]
+    $self->{CONDITION} = qr/
+    \Q$self->{start_tag}\E\s
+        ( ([IUF])\d+ ) \s+
+        (?:
+            ([a-z]\w*) \s+ IN \s+
+        )?
+        ( $EXPR )
+    \s\Q$self->{end_tag}\E
+    ( .*? )
+    (?:
+        \Q$self->{start_tag}\E\s \1 \s\Q$self->{end_tag}\E
+        ( .+? )
+    )?
+    \Q$self->{start_tag}\E\s \1 \s\Q$self->{end_tag}\E
 /xs;
 
-sub new {
-	bless { @_[1..$#_] }, $_[0];
+    $self;
 }
 
 # Copy and modify
@@ -121,7 +127,7 @@ sub _preprocess {
 	# Preprocess to establish unique matching tag sets
 	my $id = 0;
 	1 while $$copy =~ s/
-		$PREPARSE
+		$self->{ PREPARSE }
 	/
 		my $tag = substr($1, 0, 1) . ++$id;
 		"\[\% $tag $2 \%\]$3\[\% $tag \%\]"
@@ -133,7 +139,7 @@ sub _process {
 	my ($self, $stash, $text) = @_;
 
 	$text =~ s/
-		$CONDITION
+		$self->{ CONDITION }
 	/
 		($2 eq 'F')
 			? $self->_foreach($stash, $3, $4, $5)
@@ -149,7 +155,7 @@ sub _process {
 
 	# Resolve expressions
 	$text =~ s/
-		$LEFT ( $EXPR ) $RIGHT
+		$self->{ LEFT } ( $EXPR ) $self->{ RIGHT}
 	/
 		eval {
 			$self->_expression($stash, $1)
@@ -217,14 +223,14 @@ Template::Tiny - Template Toolkit reimplemented in as little code as possible
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
   my $template = Template::Tiny->new(
       TRIM => 1,
   );
-  
+
   # Print the template results to STDOUT
   $template->process( <<'END_TEMPLATE', { foo => 'World' } );
   Hello [% foo %]!
@@ -249,7 +255,13 @@ the Perl regular expression engine.
 
 =head2 SUPPORTED USAGE
 
-Only the default C<[% %]> tag style is supported.
+Unless otherwise specified, the default Template Toolkit C<[% %]> tag style
+is used. If you want to use different opening and closing tags, specify
+these when creating your B<Template::Tiny> object:
+
+    my $template = Template::Tiny->new( start_tag => '<%', end_tag => '%>' );
+
+(for the remainder of the documentation, C<[% %]> tags are assumed)
 
 Both the C<[%+ +%]> style explicit whitespace and the C<[%- -%]> style
 explicit chomp B<are> support, although the C<[%+ +%]> version is unneeded
@@ -282,16 +294,35 @@ Anything beyond the above is currently out of scope.
 
 =head1 METHODS
 
+=for Pod::Coverage preprocess
+
 =head2 new
 
   my $template = Template::Tiny->new(
-      TRIM => 1,
+      TRIM      => 1,
+      start_tag => '<%',
+      end_tag   => '%>',
   );
 
 The C<new> constructor is provided for compatibility with Template Toolkit.
 
-The only parameter it currently supports is C<TRIM> (which removes leading
-and trailing whitespace from processed templates).
+The only parameters currently supported are:
+
+=over
+
+=item TRIM
+
+Removes leading and trailing whitespace from processed templates)
+
+=item start_tag
+
+Changes the starting tag identifier from C<[%>
+
+=item end_tag
+
+Changes the ending tag identifier from C<%]>
+
+=back
 
 Additional parameters can be provided without error, but will be ignored.
 
@@ -299,10 +330,10 @@ Additional parameters can be provided without error, but will be ignored.
 
   # DEPRECATED: Return template results (emits a warning)
   my $text = $template->process( \$input, $vars );
-  
+
   # Print template results to STDOUT
   $template->process( \$input, $vars );
-  
+
   # Generate template results into a variable
   my $output = '';
   $template->process( \$input, $vars, \$output );
@@ -339,7 +370,7 @@ Adam Kennedy <adamk@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Kennedy Karen Etheridge Alexandr Ciornii Matt S Trout
+=for stopwords Adam Kennedy Karen Etheridge Jason A. Crome Alexandr Ciornii Matt S Trout
 
 =over 4
 
@@ -350,6 +381,10 @@ Adam Kennedy <adam@ali.as>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Jason A. Crome <jason@crome-plated.com>
 
 =item *
 

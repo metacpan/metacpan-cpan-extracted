@@ -5,11 +5,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-06-11'; # DATE
+our $DATE = '2025-06-14'; # DATE
 our $DIST = 'Text-Safer'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %META = (
+    summary => 'Like alphanum_kebab, but additionally lower case & remove dash at the beginning & end of text, e.g. "Foo Bar, Co., Ltd." -> "foo-bar-co-ltd"',
     args => {
     },
 );
@@ -25,7 +26,7 @@ sub encode_safer {
 }
 
 1;
-# ABSTRACT: Convert text to a safer (e.g. more restricted) encoding using only lower alphanumeric and dash characters, avoid dash at the beginning/end of text
+# ABSTRACT: Like alphanum_kebab, but additionally lower case & remove dash at the beginning & end of text, e.g. "Foo Bar, Co., Ltd." -> "foo-bar-co-ltd"
 
 __END__
 
@@ -35,22 +36,15 @@ __END__
 
 =head1 NAME
 
-Text::Safer::alphanum_kebab_nodashend_lc - Convert text to a safer (e.g. more restricted) encoding using only lower alphanumeric and dash characters, avoid dash at the beginning/end of text
+Text::Safer::alphanum_kebab_nodashend_lc - Like alphanum_kebab, but additionally lower case & remove dash at the beginning & end of text, e.g. "Foo Bar, Co., Ltd." -> "foo-bar-co-ltd"
 
 =head1 VERSION
 
-This document describes version 0.002 of Text::Safer::alphanum_kebab_nodashend_lc (from Perl distribution Text-Safer), released on 2025-06-11.
+This document describes version 0.003 of Text::Safer::alphanum_kebab_nodashend_lc (from Perl distribution Text-Safer), released on 2025-06-14.
 
 =head1 SYNOPSIS
 
- Input text             Output
- ----------             ------
- Foo Bar, Co., Ltd.     foo-bar-co-ltd
-
 =head1 DESCRIPTION
-
-- Multiple non-alphanumeric characters are converted to a single dash
-- Underscores are not converted to dash
 
 =head1 FUNCTIONS
 
@@ -59,8 +53,6 @@ This document describes version 0.002 of Text::Safer::alphanum_kebab_nodashend_l
 Arguments:
 
 =over
-
-=item * lc
 
 =back
 

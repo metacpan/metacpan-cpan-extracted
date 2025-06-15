@@ -2,8 +2,8 @@ NAME
     App::ClipboardUtils - CLI utilities related to clipboard
 
 VERSION
-    This document describes version 0.010 of App::ClipboardUtils (from Perl
-    distribution App-ClipboardUtils), released on 2025-05-29.
+    This document describes version 0.011 of App::ClipboardUtils (from Perl
+    distribution App-ClipboardUtils), released on 2025-06-15.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
@@ -45,6 +45,26 @@ FUNCTIONS
 
         The default, when left undef, is to detect what clipboard manager is
         running.
+
+    *   command_line => *str*
+
+        For every line of input in *stdin*, execute a command, feed it the
+        input line, and add the output to clipboard.
+
+        Note that when you use this option, the "--content" argument is
+        ignored. Input is taken from stdin. With "--tee", each output will
+        be printed to stdout. After eof, the utility will return empty
+        result.
+
+        An example for using this option (safer is a utility from
+        App::safer):
+
+         % clipadd -c safer --tee
+         Foo Bar, Co., Ltd.
+         foo-bar-co-ltd
+         BaZZ, Co., Ltd.
+         bazz-co-ltd
+         _
 
     *   content => *str*
 

@@ -20,8 +20,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::safer",
   "PREREQ_PM" => {
-    "Getopt::Long" => "2.50",
-    "Text::Safer" => 0,
+    "Complete::Util" => "0.620",
+    "Data::Sah::Compiler::perl::TH::bool" => "0.914",
+    "Data::Sah::Compiler::perl::TH::str" => "0.914",
+    "Module::List::Tiny" => 0,
+    "Perinci::CmdLine::Any" => "0.154",
+    "Perinci::CmdLine::Lite" => "1.924",
+    "Text::Safer" => "0.003",
     "strict" => 0,
     "warnings" => 0
   },
@@ -31,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,12 +44,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Complete::Util" => "0.620",
+  "Data::Sah::Compiler::perl::TH::bool" => "0.914",
+  "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "File::Spec" => 0,
-  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Module::List::Tiny" => 0,
+  "Perinci::CmdLine::Any" => "0.154",
+  "Perinci::CmdLine::Lite" => "1.924",
   "Test::More" => 0,
-  "Text::Safer" => 0,
+  "Text::Safer" => "0.003",
   "strict" => 0,
   "warnings" => 0
 );

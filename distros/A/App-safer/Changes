@@ -1,3 +1,30 @@
+0.003   2025-06-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix getting text from stdin.
+
+        - [ux] Add examples.
+
+
+0.002   2025-06-14  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [INCOMPATIBLE CHANGES]
+
+        - The script now only converts one-shot then exit instead of iterating
+          with 'while (<>) { ... }'.
+
+        [UX]
+
+        - Convert to Perinci::CmdLine for ease of implementing tab completion
+          feature.
+
+        - Show summaries in completion of --encoding.
+
+        [NEW FEATURES]
+
+        - Add options --action (-a), add 'list-encodings' action (-l, -ll for
+          verbose listing).
+
+
 0.001   2025-06-11  Released-By: PERLANCAR
 
         - First release.
