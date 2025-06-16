@@ -35,6 +35,10 @@ sub load_instance {
 # VRT: Encoding issues
 # VVSt: NXDOMAIN
 my %efa_instance = (
+	BEG => {
+		url  => 'https://bahnland-bayern.de/efa',
+		name => 'Bayerische Eisenbahngesellschaft',
+	},
 	BSVG => {
 		url  => 'https://bsvg.efa.de/bsvagstd',
 		name => 'Braunschweiger Verkehrs-GmbH',
@@ -60,6 +64,10 @@ my %efa_instance = (
 		name => 'Nahverkehr Westfalen-Lippe',
 	},
 	Rolph => { load_instance('de/rolph') },
+	RVV   => {
+		url  => 'https://efa.rvv.de/efa',
+		name => 'Regensburger Verkehrsverbund',
+	},
 	VAG => {
 		url  => 'https://efa.vagfr.de/vagfr3',
 		name => 'Freiburger Verkehrs AG',
@@ -100,7 +108,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '3.09';
+our $VERSION = '3.10';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

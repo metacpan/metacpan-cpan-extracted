@@ -9,3 +9,6 @@ MANIFEST\.bak$
 pm_to_blib$
 ^Imager-zxing-
 ^MYMETA\.
+^compile_commands\.json$
+# clangd cache
+^\.cache/

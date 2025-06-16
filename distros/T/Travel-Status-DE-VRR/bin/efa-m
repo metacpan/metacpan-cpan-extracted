@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.09';
+our $VERSION = '3.10';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -233,7 +233,13 @@ sub format_route {
 		if ( $stop->delay ) {
 			$delay = sprintf( '(%+3d)', $stop->delay );
 		}
-		if ( defined $stop->arr and defined $stop->dep ) {
+		if ( $stop->is_cancelled ) {
+			$output .= sprintf(
+				"   --:--     %s %s %35s %s\n",
+				$delay, $occupancy, $stop->full_name, $stop->platform // q{},
+			);
+		}
+		elsif ( defined $stop->arr and defined $stop->dep ) {
 			if ( $stop->arr->epoch == $stop->dep->epoch ) {
 				$output .= sprintf(
 					"    %5s      %s %s %35s %s\n",
@@ -355,6 +361,10 @@ sub show_stopseq {
 		$delay_len       = length( sprintf( '(%+d)', $max_delay ) ) + 1;
 	}
 
+	if ( first { $_->is_cancelled } $trip->route and $delay_len < 3 ) {
+		$delay_len = 3;
+	}
+
 	for my $stop ( $trip->route ) {
 		printf(
 			"%s → %s%${delay_len}s  %s (%s) %s\n",
@@ -362,8 +372,12 @@ sub show_stopseq {
 			: q{     },
 			$stop->dep ? $stop->dep->strftime('%H:%M')
 			: q{     },
-			$stop->delay ? sprintf( " (%+${inner_delay_len}d)", $stop->delay )
-			: q{},
+			$stop->is_cancelled ? 'XX'
+			: (
+				$stop->delay
+				? sprintf( " (%+${inner_delay_len}d)", $stop->delay )
+				: q{}
+			),
 			$stop->full_name,
 			$stop->niveau,
 			$stop->platform
@@ -555,11 +569,15 @@ if ( my $err = $efa->errstr ) {
 
 	if ( $efa->place_candidates ) {
 		say 'You might want to try one of the following places:';
-		say join( "\n", $efa->place_candidates );
+		for my $candidate ( $efa->place_candidates ) {
+			printf( "%d  %s\n", $candidate->id_num, $candidate->name );
+		}
 	}
 	elsif ( $efa->name_candidates ) {
 		say 'You might want to try one of the following names:';
-		say join( "\n", $efa->name_candidates );
+		for my $candidate ( $efa->name_candidates ) {
+			printf( "%d  %s\n", $candidate->id_num, $candidate->name );
+		}
 	}
 
 	exit 2;
@@ -610,7 +628,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

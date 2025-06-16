@@ -107,7 +107,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.226';
+our $VERSION = '1.227';
 
 use Quiq::Hash;
 use Quiq::Database::Config;
@@ -790,7 +790,7 @@ sub udl {
 
 =head1 VERSION
 
-1.226
+1.227
 
 =head1 AUTHOR
 

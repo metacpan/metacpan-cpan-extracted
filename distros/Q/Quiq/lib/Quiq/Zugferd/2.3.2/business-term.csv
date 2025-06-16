@@ -1,0 +1,98 @@
+# Bedeutung der Kennzeichnung 0,1,2:
+# 0: optional
+# 1: Pflicht bei XML::Compile Schemavalidierung
+# 2: Pflicht bei Validierung durch den Mustang-Validator
+BG-21-1;0;Indikator für Zuschlag, Wert
+BT-1;1;Rechnungsnummer
+BT-2;1;Rechnungsdatum
+BT-2-0;1;Code des Datumsformats
+BT-3;1;Code für den Rechnungstyp (Werte siehe ZUGFeRD Doku)
+BT-5;1;Code für die Rechnungswährung
+BT-9;2;Fälligkeitsdatum der Zahlung
+BT-9-0;2;Datum, Format
+BT-12;0;Vertragsreferenz
+BT-13;0;Bestellreferenz
+BT-99;0;Betrag des Zuschlags auf Dokumentenebene
+BT-20;0;Zahlungsbedingungen
+BT-21;0;Code zum Freitext der Rechnung
+BT-22;0;Freitext zur Rechnung
+BT-24;1;Spezifikationskennung
+BT-27;1;Name des Verkäufers
+BT-29;0;Kennung des Verkäufers
+BT-30-1;0;Kennung des Schemas
+BT-30;0;Kennung der rechtlichen Registrierung des Verkäufers
+BT-31-0;2;Art der Steuernummer
+BT-31;2;Umsatzsteuer-Identifikationsnummer des Verkäufers
+BT-35;0;Zeile 1 der Verkäuferanschrift
+BT-36;0;Zeile 2 der Verkäuferanschrift
+BT-37;0;Stadt der Verkäuferanschrift
+BT-38;0;Postleitzahl der Verkäuferanschrift
+BT-39;0;Region oder Bundesland der Verkäuferanschrift
+BT-40;2;Ländercode der Verkäuferanschrift
+BT-41-0;0;Abteilungsname
+BT-41;0;Kontaktstelle des Verkäufers
+BT-42;0;Telefonnummer der Kontaktstelle des Verkäufers
+BT-44;1;Name des Käufers
+BT-46;0;Kennung des Käufers
+BT-48-0;0;Art der Steuernummer
+BT-48;0;Umsatzsteuer-Identifikationsnummer des Käufers
+BT-50;0;Zeile 1 der Käuferanschrift
+BT-51;0;Zeile 2 der Käuferanschrift B
+BT-52;0;Stadt der Käuferanschrift
+BT-53;0;Postleitzahl der Käuferanschrift
+BT-55;2;Ländercode der Käuferanschrift
+BT-56;0;Kontaktstelle des Käufers (Person)
+BT-70;0;Name des Waren- oder Dienstleistungsempfängers
+BT-72-0;0;Format des Datums
+BT-72;0;Tatsächliches Lieferdatum
+BT-75;0;Zeile 1 der Lieferanschrift
+BT-76;0;Zeile 2 der Lieferanschrift
+BT-77;0;Stadt der Lieferanschrift
+BT-78;0;Postleitzahl der Lieferanschrift
+BT-80;1;Ländercode der Lieferanschrift
+BT-81;0;Code für die Zahlungsart
+BT-82;0;Text zur Zahlungsart
+BT-83;0;Verwendungszweck
+BT-84;0;Kennung des Zahlungskontos (IBAN)
+BT-86;0;Kennung des Zahlungsdienstleisters (BIC)
+BT-102-0;0;Art der Steuer (Code) B
+BT-102;0;Code der für den Zuschlag auf Dokumentenebene geltenden Umsatzsteuerkategorie
+BT-103;0;Umsatzsteuersatz des Zuschlags auf Dokumentenebene
+BT-104;0;Grund für den Zuschlag auf Dokumentenebene
+BT-106;1;Summe der Nettobeträge aller Rechnungspositionen
+BT-107;0;Summe der Abschläge auf Dokumentenebene
+BT-108;0;Summe der Zuschläge auf Dokumentenebene
+BT-109;1;Rechnungsgesamtbetrag ohne Umsatzsteuer
+BT-110-0;2;Code für die Rechnungswährung
+BT-110;2;Montant total de TVA 
+BT-112;1;Rechnungsgesamtbetrag einschließlich Umsatzsteuer
+BT-113;0;Vorauszahlungsbetrag
+BT-114;0;Rundungsbetrag
+BT-115;1;Fälliger Zahlungsbetrag
+BT-116;1;Kategoriespezifischer Steuerbasisbetrag
+BT-117;1;Kategoriespezifischer Steuerbetrag
+BT-118-0;1;Art der Steuer (Code)
+BT-118;1;Code der Umsatzsteuerkategorie
+BT-119;2;Kategoriespezifischer Umsatzsteuersatz
+BT-120;0;Umsatzsteuerbefreiungsgrund
+BT-126;1;Kennung der Rechnungsposition
+BT-127;0;Freitext zur Rechnungsposition
+BT-128-1;0;Kennung des Schemas
+BT-128;0;Objektkennung auf Ebene der Rechnungsposition
+BT-129;1;In Rechnung gestellte Menge
+BT-130;2;Code der Maßeinheit der in Rechnung gestellten Menge
+BT-131;1;Nettobetrag der Rechnungsposition
+BT-134-0;0;Datum, Format
+BT-134;0;Anfangsdatum des Rechnungspositionszeitraums
+BT-135-0;0;Datum, Format
+BT-135;0;Enddatum des Rechnungspositionszeitraums
+BT-146;1;Nettopreis des Artikels
+BT-148;0;Bruttopreis des Artikels
+BT-151-0;1;Steuerart (Code) 
+BT-151;1;Code der Umsatzsteuerkategorie des in Rechnung gestellten Artikels
+BT-152;2;Umsatzsteuersatz für den in Rechnung gestellten Artikel
+BT-153;1;Artikelname
+BT-155;0;Artikelkennung des Verkäufers
+BT-162;0;Zeile 3 der Verkäuferanschrift
+BT-163;0;Zeile 3 der Käuferanschrift
+BT-165;0;Zeile 3 der Lieferanschrift

@@ -4,7 +4,7 @@
       "Maximilian Lika"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "efl",
       "enlightenment",
@@ -46,6 +46,6 @@
          "url" : "https://github.com/MaxPerl/Perl-Efl"
       }
    },
-   "version" : "0.75",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.76",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

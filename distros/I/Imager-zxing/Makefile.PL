@@ -5,14 +5,11 @@ use ExtUtils::CppGuess;
 use Getopt::Long;
 use List::Util "first";
 use Config;
+use Imager::ExtUtils;
 
-my $verbose = $ENV{IM_VERBOSE};
-my @libpaths;
-my @incpaths;
-
-GetOptions("incpath=s", \@incpaths,
-           "libpath=s" => \@libpaths,
-           "verbose|v" => \$verbose);
+# Imager required configure through use
+# need 1.015 for C++ compatibility
+my @Imager_req = ( Imager => "1.015" );
 
 my %opts = 
   (
@@ -22,9 +19,15 @@ my %opts =
    #DEFINE => $define,
    #clean => { FILES => 'testout' },
    LICENSE => "perl_5",
-   AUTHOR => 'Tony Cook <tonyc@cpan.org>',
+   AUTHOR => 'Tony Cook <tony@develop-help.com>',
    XSOPT => '-C++',
    ABSTRACT => 'Barcode scanning with libzxing-cpp',
+   TYPEMAPS => [ Imager::ExtUtils->typemap ],
+   #PREREQ_PM =>
+   #{
+   #  @Imager_req,
+   #  XSLoader => 0,
+   #},
    META_MERGE =>
    {
      'meta-spec' =>
@@ -46,61 +49,44 @@ my %opts =
          web => "https://github.com/tonycoz/imager-zxing/",
        },
      },
+     prereqs =>
+     {
+       configure =>
+       {
+         requires =>
+         {
+           @Imager_req,
+           "ExtUtils::CppGuess" => "0.22",
+           "ExtUtils::MakeMaker" => "6.46",
+           "ExtUtils::CppGuess" => 0,
+           "List::Util" => "1.43",
+         },
+       },
+       build =>
+       {
+         requires =>
+         {
+           @Imager_req,
+           "Test::More" => "0.47",
+         }
+       },
+       runtime =>
+       {
+         requires =>
+         {
+           @Imager_req,
+         }
+       },
+       test =>
+       {
+         requires =>
+         {
+           "Test::More" => "0.47",
+         }
+       },
+     },
    },
   );
-
-
-my @inc;
-unshift @INC, "inc";
-require Imager::ExtUtils;
-push @inc, Imager::ExtUtils->includes;
-$opts{TYPEMAPS} = [ Imager::ExtUtils->typemap ];
-
-# Imager required configure through use
-# need 1.015 for C++ compatibility
-my @Imager_req = ( Imager => "1.015" );
-$opts{META_MERGE}{prereqs} =
-  {
-    configure =>
-    {
-      requires =>
-      {
-        @Imager_req,
-        "ExtUtils::CppGuess" => "0.22",
-        "ExtUtils::MakeMaker" => "6.46",
-        "ExtUtils::CppGuess" => 0,
-        "List::Util" => "1.43",
-      },
-    },
-    build =>
-    {
-      requires =>
-      {
-        @Imager_req,
-        "Test::More" => "0.47",
-      }
-    },
-    runtime =>
-    {
-      requires =>
-      {
-        @Imager_req,
-      }
-    },
-    test =>
-    {
-      requires =>
-      {
-        "Test::More" => "0.47",
-      }
-    },
-  };
-$opts{PREREQ_PM} =
-  {
-    @Imager_req,
-    XSLoader => 0,
-  };
-
 
 my $pkgname = first { system("pkg-config --exists $_") == 0 } qw( zxing zxing-cpp );
 
@@ -108,8 +94,6 @@ die <<'DIE' unless $pkgname;
 OS unsupported: Can't find pkg-config for zxing or zxing-cpp.
 Make sure you have the devel package installed
 DIE
-
-print "Found $pkgname\n";
 
 my $cflags = `pkg-config --cflags $pkgname`;
 my $ldflags = `pkg-config --libs $pkgname`;
@@ -126,6 +110,9 @@ or
 didn't return a useful result.
 DIE
 }
+
+print "Found $pkgname $version\n";
+
 my @v = split /\./, $version;
 my $v = $v[0] * 10_000 + $v[1] * 100 + $v[2];
 if ($v < 10400) {
@@ -143,7 +130,7 @@ unless (eval { $std = $guess->cpp_standard_flag("C++20") }) {
 }
 $guess->add_extra_compiler_flags
   (
-    $cflags . " " . Imager::ExtUtils->includes . " $std"
+    $cflags . " " . Imager::ExtUtils->includes . " $std -DMY_ZXVERSION=$v"
    );
 $guess->add_extra_linker_flags
   (

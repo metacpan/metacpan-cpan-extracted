@@ -68,6 +68,7 @@ ElmMenuItem *						T_EVAS_OBJECT
 ElmNotify * 						T_EVAS_OBJECT
 ElmObjectItem * 					T_EVAS_OBJECT
 const ElmObjectItem *				T_EVAS_OBJECT
+ElmPalette *						T_EVAS_OBJECT
 ElmPanes *							T_EVAS_OBJECT
 ElmPanel *							T_EVAS_OBJECT
 const ElmPanel *					T_EVAS_OBJECT
@@ -220,7 +221,13 @@ EcoreIdler *						T_EVAS_OBJECT
 EcoreIdleEnterer *					T_EVAS_OBJECT
 EcoreIdleExiter *					T_EVAS_OBJECT
 EcorePoller *						T_EVAS_OBJECT
-const EcorePoller * 				T_EVAS_OBJECT
+const EcorePoller *					T_EVAS_OBJECT
+
+#############
+# Others
+#############
+intArray *							T_ARRAY
+
 
 ################################################################################
 INPUT

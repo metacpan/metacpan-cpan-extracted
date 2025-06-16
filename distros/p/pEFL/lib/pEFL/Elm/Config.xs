@@ -13,6 +13,7 @@ typedef Eina_List EinaList;
 typedef Elm_Text_Class ElmTextClass;
 typedef Elm_Font_Overlay ElmFontOverlay;
 typedef Elm_Color_Class ElmColorClass;
+typedef Elm_Palette ElmPalette;
 
 MODULE = pEFL::Elm::Config		PACKAGE = pEFL::Elm::Config	PREFIX = elm_config_
 
@@ -442,62 +443,61 @@ elm_config_icon_theme_set(theme)
 # the palette code is marked in elm_config.h as not surely final yet
 ################
 
-#char *
-#elm_config_palette_get()
-	 
+char *
+elm_config_palette_get()	 
 
 
-#void
-#elm_config_palette_set(palette)
-#	const char *palette
+void
+elm_config_palette_set(palette)
+	const char *palette
 
 
-#Elm_Palette *
-#elm_config_palette_load(palette)
-#	const char *palette
+ElmPalette *
+elm_config_palette_load(palette)
+	const char *palette
 
 
-#void
-#elm_config_palette_color_set(pal,name,r,g,b,a)
-#	Elm_Palette *pal
-#	const char *name
-#	int r
-#	int g
-#	int b
-#	int a
+void
+elm_config_palette_color_set(pal,name,r,g,b,a)
+	ElmPalette *pal
+	const char *name
+	int r
+	int g
+	int b
+	int a
 
-#void
-#elm_config_palette_color_unset(pal,name)
-#	Elm_Palette *pal
-#	const char *name
+void
+elm_config_palette_color_unset(pal,name)
+	ElmPalette *pal
+	const char *name
 
-#void
-#elm_config_palette_save(pal,palette)
-#	Elm_Palette *pal
-#	const char *palette
-
-
-#void
-#elm_config_palette_free(pal)
-#	Elm_Palette *pal
-
-#void
-#elm_config_palette_delete(palette)
-#	const char *palette
+void
+elm_config_palette_save(pal,palette)
+	ElmPalette *pal
+	const char *palette
 
 
-#Eina_Bool
-#elm_config_palette_system_has(palette)
-#	const char *palette
+void
+elm_config_palette_free(pal)
+	ElmPalette *pal
+
+void
+elm_config_palette_delete(palette)
+	const char *palette
 
 
-#EinaList *
-#elm_config_palette_list()	 
+Eina_Bool
+elm_config_palette_system_has(palette)
+	const char *palette
 
 
-#void
-#elm_config_palette_list_free(list)
-#	EinaList *list
+EinaList *
+elm_config_palette_list()	 
+
+
+void
+elm_config_palette_list_free(list)
+	EinaList *list
 
 
 Eina_Bool
@@ -1027,5 +1027,24 @@ desc(color_class)
     ElmColorClass *color_class
 CODE:
     RETVAL = color_class->desc;
+OUTPUT:
+    RETVAL
+    
+MODULE = pEFL::Elm::Config		PACKAGE = ElmPalettePtr
+
+int
+version(pal)
+    ElmPalette *pal
+CODE:
+    RETVAL = pal->version;
+OUTPUT:
+    RETVAL
+    
+    
+EinaList *
+colors(pal)
+	ElmPalette *pal
+CODE:
+    RETVAL = pal->colors;
 OUTPUT:
     RETVAL

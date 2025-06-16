@@ -27,9 +27,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.226';
+our $VERSION = '1.227';
 
 use Quiq::Tree;
+use Quiq::AnsiColor;
 
 # -----------------------------------------------------------------------------
 
@@ -61,11 +62,11 @@ sub new {
 
 =head2 Objektmethoden
 
-=head3 getMultiElement() - Liefere Mehrfach-Element
+=head3 getSubTree() - Liefere Mehrfach-Element
 
 =head4 Synopsis
 
-  $ztr = $ztr->getMultiElement($keyPath,$placeholder)
+  $ztr = $ztr->getSubTree($keyPath,$placeholder)
 
 =head4 Arguments
 
@@ -91,7 +92,7 @@ $placeholder.
 
 # -----------------------------------------------------------------------------
 
-sub getMultiElement {
+sub getSubTree {
     my ($self,$keyPath,$placeholder) = @_;
 
     my $tree = $self->getDeep($keyPath)->[0];
@@ -160,7 +161,7 @@ sub reduceTree {
         return $val;
     });
 
-    # Entferne alle leere Knoten
+    # Entferne alle leeren Knoten
     Quiq::Tree->removeEmptyNodes($self);
 
     return;
@@ -172,7 +173,7 @@ sub reduceTree {
 
 =head4 Synopsis
 
-  $ztr->resolvePlaceholders(@keyVal);
+  $ztr->resolvePlaceholders(@keyVal,%options);
 
 =head4 Arguments
 
@@ -184,34 +185,107 @@ Liste der Platzhalter und ihrer Werte
 
 =back
 
+=head4 Options
+
+=over 4
+
+=item -label => $text (Default: '')
+
+Versieh den Abschnitt der Platzhalter (bei -showPlaceHolders=>1) mit
+der Beschriftung $label.
+
+=item -showPlaceholders => $bool (Default: 0)
+
+Gibt die Liste der Platzhalter auf STDOUT aus
+
+=back
+
 =head4 Description
 
 Durchlaufe den ZUGFeRD-Baum rekursiv und ersetze auf den Blattknoten
-die Platzhalter durch ihre Werte.
+die Keys durch ihre Werte. Blattknoten-Werte, die unter den Keys
+nicht vorkommen, werden auf C<undef> gesetzt (und ggf. später durch
+reduceTree() entfernt).
 
-Fehlt einer der Platzhalter (key) im Baum, wird eine Exception geworfen.
+Fehlt einer der Platzhalter (key) im Baum oder kommen Platzhalter
+mehrfach vor, wird eine Exception geworfen.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
+my $a = Quiq::AnsiColor->new(1);
+
 sub resolvePlaceholders {
     my $self = shift;
-    # @_: @keyVal
+    # @_: $zug,@keyVal,%options
 
-    my %map = @_;
+    # Optionen und Argumente
+    
+    my $label = '';
+    my $showPlaceholders = 0;
+    
+    my $argA = $self->parameters(0,undef,\@_,
+       -label => \$label,
+       -showPlaceholders => \$showPlaceholders,
+    );
+    # @$argA;
+    
+    if ($showPlaceholders) {
+        say "--$label--";
+        for (my $i = 0; $i < @$argA; $i += 2) {
+            my $key = $argA->[$i];
+            my $val = $argA->[$i+1];
+            printf "%s = %s %s\n",$key,defined($val)? "'$val'": 'undef',
+                $a->str('dark green','?'); # $zug->bt($key)->text);
+        }
+        print "\n";
+    }
+
+    # my %map = @_;
+    my %map = @$argA;
+
+    # Operation ausführen
+
+    if (0) { # Debug
+        my @keys = map {$_->[0]}
+            sort {$a->[1] <=> $b->[1] or $a->[0] cmp $b->[0]}
+            map {[$_,/-(\d+)/]}
+            keys %map;
+        for my $key (@keys) {
+            say "$key => $map{$key}";
+        }
+    }
+
+    # * Prüfe, dass kein Schlüssel doppelt vorkommen
+
     my %seen; # gesehene Platzhalter
-    for my $key (keys %map) {
+    my @arr; # doppelte Platzhalter
+    for (my $i = 0; $i < @_; $i += 2) {
+        my $key = $_[$i];
+        if (exists $seen{$key}) {
+            push @arr,$key;
+        }
         $seen{$key} = 0;
     }
+
+    if (@arr) {
+        $self->throw(
+            'TREE-00099: Duplicate placeholders',
+            Placeholders => join(', ',@arr),
+        );
+    }
+
+    # Ersetze Platzhalter
+
     Quiq::Tree->setLeafValue($self,sub {
         my $val = shift; # akt. Knotenwert
-        if (defined $val) { # undef-Knoten belassen wir
+        if (defined $val) { # Wir ersetzen nur definierte Werte
             if (exists $map{$val}) { # wir haben einen Platzhalter-Knoten
                 $seen{$val} = 1;
                 my $newVal = $map{$val}; # neuer Wert
+                # Wir setzen den neuen Wert nur, wenn er nicht leer ist
                 if (defined($newVal) && $newVal ne '') {
-                    # Wir setzen den neuen Wert nur, wenn er nicht leer ist
                     return $newVal;
                 }
             }
@@ -219,13 +293,19 @@ sub resolvePlaceholders {
         return undef;
     });
 
+    # Prüfe, dass wir alle Platzhalter ersetzt haben
+
+    @arr = (); # nicht gefundene Platzhalter
     for my $key (keys %map) {
         if (!$seen{$key}) {
-            $self->throw(
-                'TREE-00099: Placeholder does not exist',
-                Placeholder => $key,
-            );
+            push @arr,$key;
         }
+    }
+    if (@arr) {
+        $self->throw(
+            'TREE-00099: Non-existent Placeholders',
+            Placeholders => join('. ',@arr),
+        );
     }
 
     return;
@@ -235,7 +315,7 @@ sub resolvePlaceholders {
 
 =head1 VERSION
 
-1.226
+1.227
 
 =head1 AUTHOR
 

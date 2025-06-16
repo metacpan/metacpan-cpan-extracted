@@ -17,7 +17,7 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_unitTest : Test(5) {
+sub test_unitTest : Test(6) {
     my $self = shift;
 
     my $streamFile = Quiq::Test::Class->testPath(
@@ -37,6 +37,9 @@ sub test_unitTest : Test(5) {
 
     eval {$ssf->blocks('XX')};
     $self->ok($@);
+
+    my $blockA = $ssf->allBlocks;
+    $self->is(scalar(@$blockA),10);
 
     # Zeige die Struktur des Streams
     #

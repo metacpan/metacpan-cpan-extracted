@@ -20,6 +20,7 @@ my %args = (
     NAME	=> $meta->module_name(),
     PREREQ_PM	=> $meta->requires(),
     PL_FILES	=> {},	# Prevent old MakeMaker from running Build.PL
+    PMLIBDIRS	=> [ 'lib' ],
     realclean	=> {
 	FILES => join( ' ', @{ $meta->add_to_cleanup() } ),
     },

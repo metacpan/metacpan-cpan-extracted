@@ -7,8 +7,11 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use Test::Memory::Cycle;
 use lib 't/lib';
 use Helper;
 
@@ -97,6 +100,8 @@ subtest 'basic document validation' => sub {
 '': not all properties are valid
 ERRORS
 
+  memory_cycle_ok($doc, 'no leaks in the document object');
+
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -134,6 +139,8 @@ ERRORS
 '/webhooks': got string, not object
 '': not all properties are valid
 ERRORS
+
+  memory_cycle_ok($doc, 'no leaks in the document object');
 };
 
 subtest 'bad subschemas' => sub {
@@ -156,7 +163,7 @@ subtest 'bad subschemas' => sub {
     },
   );
 
-  cmp_deeply(
+  cmp_result(
     ($doc->errors)[0],
     methods(
       instance_location => '/components/schemas/alpha_schema/not/minimum',
@@ -180,6 +187,8 @@ subtest 'bad subschemas' => sub {
 '/components': not all properties are valid
 '': not all properties are valid
 ERRORS
+
+  memory_cycle_ok($doc, 'no leaks in the document object');
 };
 
 subtest 'identify subschemas and other entities' => sub {
@@ -221,7 +230,7 @@ components:
           $anchor: alpha_anchor
 YAML
 
-  cmp_deeply(
+  cmp_result(
     [ $doc->errors ],
     [
       methods(
@@ -263,6 +272,8 @@ YAML
     ],
     'identifier collisions within the document are found, even those between subschemas',
   );
+
+  memory_cycle_ok($doc, 'no leaks in the document object');
 
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -443,7 +454,7 @@ YAML
     'subschema resources are correctly identified in the document',
   );
 
-  cmp_deeply(
+  cmp_result(
     $doc->_entities,
     {
       '/components/parameters/my_param1' => 2,
@@ -477,6 +488,8 @@ YAML
     },
     'all entity locations are identified',
   );
+
+  memory_cycle_ok($doc, 'no leaks in the document object');
 };
 
 subtest 'invalid servers entries' => sub {
@@ -492,7 +505,7 @@ servers:
       unused:
         default: nope
   - url: https://example.com/{v}/{greeting}
-  - url: https://example.com/{foo}
+  - url: https://example.com/{foo}/{foo}
     variables: {}
   - url: http://example.com/literal
     variables:
@@ -500,6 +513,9 @@ servers:
         default: v1
         enum: [v2, v3]
   - url: http://example.com/literal2
+  - url: http://example.com/
+  - url: http://example.com?foo=1
+  - url: http://example.com#bar
 YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -545,7 +561,13 @@ YAML
           instanceLocation => '',
           keywordLocation => $_.'/servers/2/variables',
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/2/variables',
-          error => 'missing "variables" definition for templated variable "foo"',
+          error => 'missing "variables" definition for servers template variable "foo"',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => $_.'/servers/2',
+          absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/2',
+          error => 'duplicate servers template variable "foo"',
         },
         {
           instanceLocation => '',
@@ -553,6 +575,15 @@ YAML
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/3/variables/version/default',
           error => 'servers default is not a member of enum',
         },
+        do {
+          my $base = $_;
+          map +{
+            instanceLocation => '',
+            keywordLocation => $base.'/servers/'.$_.'/url',
+            absoluteKeywordLocation => 'http://localhost:1234/api#'.$base.'/servers/'.$_.'/url',
+            error => 'server url cannot end in / or contain query or fragment components',
+          }, 5,6,7
+        }
       ), '', '/components/pathItems/path0', '/components/pathItems/path0/get',
     ],
     'all issues with server entries found',
@@ -562,19 +593,33 @@ YAML
 '/servers/0/variables/version/default': servers default is not a member of enum
 '/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/servers/1': "variables" property is required for templated server urls
-'/servers/2/variables': missing "variables" definition for templated variable "foo"
+'/servers/2/variables': missing "variables" definition for servers template variable "foo"
+'/servers/2': duplicate servers template variable "foo"
 '/servers/3/variables/version/default': servers default is not a member of enum
+'/servers/5/url': server url cannot end in / or contain query or fragment components
+'/servers/6/url': server url cannot end in / or contain query or fragment components
+'/servers/7/url': server url cannot end in / or contain query or fragment components
 '/components/pathItems/path0/servers/0/variables/version/default': servers default is not a member of enum
 '/components/pathItems/path0/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/components/pathItems/path0/servers/1': "variables" property is required for templated server urls
-'/components/pathItems/path0/servers/2/variables': missing "variables" definition for templated variable "foo"
+'/components/pathItems/path0/servers/2/variables': missing "variables" definition for servers template variable "foo"
+'/components/pathItems/path0/servers/2': duplicate servers template variable "foo"
 '/components/pathItems/path0/servers/3/variables/version/default': servers default is not a member of enum
+'/components/pathItems/path0/servers/5/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/servers/6/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/servers/7/url': server url cannot end in / or contain query or fragment components
 '/components/pathItems/path0/get/servers/0/variables/version/default': servers default is not a member of enum
 '/components/pathItems/path0/get/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/components/pathItems/path0/get/servers/1': "variables" property is required for templated server urls
-'/components/pathItems/path0/get/servers/2/variables': missing "variables" definition for templated variable "foo"
+'/components/pathItems/path0/get/servers/2/variables': missing "variables" definition for servers template variable "foo"
+'/components/pathItems/path0/get/servers/2': duplicate servers template variable "foo"
 '/components/pathItems/path0/get/servers/3/variables/version/default': servers default is not a member of enum
+'/components/pathItems/path0/get/servers/5/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/get/servers/6/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/get/servers/7/url': server url cannot end in / or contain query or fragment components
 ERRORS
+
+  memory_cycle_ok($doc, 'no leaks in the document object');
 };
 
 subtest 'disallowed fields adjacent to $refs in path-items' => sub {
@@ -588,6 +633,7 @@ paths:
 YAML
 
   cmp_result([$doc->errors], [], 'no errors during traversal');
+  memory_cycle_ok($doc, 'no leaks in the document object');
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -636,6 +682,8 @@ YAML
 '/paths/~1bar~1{bar_id}': invalid keywords used adjacent to $ref in a path-item: servers
 '/webhooks/my_webhook1': invalid keywords used adjacent to $ref in a path-item: get
 ERRORS
+
+  memory_cycle_ok($doc, 'no leaks in the document object');
 };
 
 done_testing;

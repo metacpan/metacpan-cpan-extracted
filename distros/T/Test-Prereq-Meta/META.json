@@ -4,7 +4,7 @@
       "Thomas R. Wyant, III F<wyant at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
             "File::Find" : "0",
             "File::Glob" : "0",
             "File::Spec" : "0",
-            "Module::CoreList" : "0",
+            "Module::CoreList" : "2.13",
             "Module::Extract::Use" : "1.045",
             "Module::Metadata" : "0",
             "Scalar::Util" : "0",
@@ -56,7 +56,7 @@
    "provides" : {
       "Test::Prereq::Meta" : {
          "file" : "lib/Test/Prereq/Meta.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -74,6 +74,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

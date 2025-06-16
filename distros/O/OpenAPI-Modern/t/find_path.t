@@ -8,6 +8,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
@@ -632,6 +634,7 @@ YAML
     'request URI is inconsistent with provided path captures',
   );
 
+  $OpenAPI::Modern::DEBUG = 1;
   ok(!$openapi->find_path($options = { request => request('GET', 'http://example.com/bloop/blah') }),
     to_str($request).': find_path returns false');
   cmp_result(
@@ -647,9 +650,11 @@ YAML
           error => 'no match found for request URI "http://example.com/bloop/blah"',
         }),
       ],
+      debug => { uri_patterns => [ '^\/foo\/([^/?#]*)$' ] },
     },
     'no match for URI against /paths',
   );
+  $OpenAPI::Modern::DEBUG = 0;
 
   my $uri = uri('http://example.com', '', 'foo', 'hello // there ಠ_ಠ!');
   ok($openapi->find_path($options = { request => request('GET', $uri),
@@ -1134,7 +1139,7 @@ YAML
       method => 'POST',
       errors => [
         methods(TO_JSON => {
-          instanceLocation => '/request/method',
+          instanceLocation => '',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} get)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))->to_string,
           error => 'wrong HTTP method "POST"',

@@ -7,9 +7,9 @@ build_requires:
   App::Yath: '0'
   Test2::V0: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.044'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.041, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.051, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,14 +18,15 @@ name: Date-Holidays-TW
 provides:
   Date::Holidays::TW:
     file: lib/Date/Holidays/TW.pm
-    version: v0.6.0
+    version: v0.7.0
 requires:
   DateTime: '0'
   DateTime::Calendar::Chinese: '0'
 resources:
   bugtracker: https://github.com/perltaiwan/Date-Holidays-TW/issues
   repository: https://github.com/perltaiwan/Date-Holidays-TW.git
-version: v0.6.0
+version: v0.7.0
+x_generated_by_perl: v5.40.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

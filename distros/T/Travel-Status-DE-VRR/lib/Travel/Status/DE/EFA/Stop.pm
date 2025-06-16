@@ -6,12 +6,12 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.09';
+our $VERSION = '3.10';
 
 Travel::Status::DE::EFA::Stop->mk_ro_accessors(
 	qw(sched_arr rt_arr arr arr_delay
 	  sched_dep rt_dep dep dep_delay
-	  occupancy delay distance_m
+	  occupancy delay distance_m is_cancelled
 	  place name full_name id_num id_code latlon
 	  platform niveau)
 );
@@ -93,7 +93,7 @@ in a Travel::Status::DE::EFA::Result's route
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

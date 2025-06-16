@@ -524,6 +524,15 @@ sub cleanup_ecore_task_cb {
 	#delete($EcoreTask_Cbs{$objaddr});
 }
 
+
+####################
+# SmartClasses
+####################
+
+our %SmartClasses;
+
+
+
 # Preloaded methods go here.
 
 1;

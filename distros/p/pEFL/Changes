@@ -135,9 +135,13 @@ Revision history for Perl extension pEFL.
 	- Add most of the enums/constants of Edje_Common.h
 	- Add support of Edje Messages
 	- Add edje_load_error_str()
-0.75
+0.75 Wed Dec 07 20:50:00 2022
 	- Add ElmTheme support
 	- restructure pEFL::Evas::Canvas constructor (nonetheless still not usable)
 	- Add pEFL::Elm::Object->focus_allow_set|get
 	- Add pEFL::Elm::Config::focus_move_policy_set|get
 	- POD work
+0.76
+	- Code cleaning
+	- Add pEFL::Ecore::Event::type_flush_internal()
+	- Add support of ElmPalette

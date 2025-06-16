@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.008'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/perltidy/perltidy/issues
   repository: https://github.com/perltidy/perltidy.git
-version: '20250311'
+version: '20250616'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

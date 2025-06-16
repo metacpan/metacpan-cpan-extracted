@@ -1,3 +1,11 @@
+Travel::Status::DE::VRR 3.10 - Sun Jun 15 2025
+
+    * Stop: Add is_cancelled accessor
+    * Add BEG, RVV service definitions
+    * Breaking change: $efa->name_candidates and $efa->place_candidates now
+      return lists of Travel::Status::DE::EFA::Stop objects rather than
+      just strings.
+
 Travel::Status::DE::VRR 3.09 - Sun Mar 23 2025
 
     * Trip: Add polyline accessor

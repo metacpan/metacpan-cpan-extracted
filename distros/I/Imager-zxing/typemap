@@ -1,10 +1,65 @@
-Imager::zxing::Decoder T_PTROBJ
-Imager::zxing::Decoder::Result T_PTROBJ
+ZXingDecoder * O_OBJECT
+const ZXingDecoder * O_OBJECT
+
+ZXingDecoderResult * O_OBJECT
+const ZXingDecoderResult * O_OBJECT
+
+ZXingEncoder * O_OBJECT
+const ZXingEncoder * O_OBJECT
+
 std_string T_STD_STRING
+std_string_view T_STD_STRING_VIEW
+utf8_std_string_view T_UTF8_STD_STRING_VIEW
+BarcodeFormat T_BARCODE_FORMAT
+ImagerFormat T_IMAGER_FORMAT
 
 OUTPUT
+
+O_OBJECT
+        sv_setref_pv($arg, CLASS, (void *)$var);
 
 T_STD_STRING
         SvUTF8_off($arg);
         sv_setpvn($arg, $var.data(), $var.size());
         sv_utf8_decode($arg);
+
+INPUT
+
+O_OBJECT
+        if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+             $var = ($type)SvIV((SV*)SvRV( $arg ));
+        else {
+             croak(\"${Package}::$func_name() -- \"
+                   \"$var is not a blessed SV reference\");
+             XSRETURN_UNDEF;
+        }
+
+T_STD_STRING
+        STRLEN ${var}_len;
+        const char *${var}_pv = SvPV($arg, ${var}_len);
+        $var = $type\{${var}_pv, ${var}_len\};
+
+T_STD_STRING_VIEW
+        STRLEN ${var}_len;
+        const char *${var}_pv = SvPV($arg, ${var}_len);
+        $var = $type\{${var}_pv, ${var}_len\};
+
+T_UTF8_STD_STRING_VIEW
+        STRLEN ${var}_len;
+        const char *${var}_pv = SvPVutf8($arg, ${var}_len);
+        $var = $type\{${var}_pv, ${var}_len\};
+
+T_BARCODE_FORMAT
+        {
+          const char *${var}_pv = SvPV_nolen($arg);
+          $var = BarcodeFormatFromString(${var}_pv);
+          if ($var == BarcodeFormat::None) {
+            // this will skip destroying any C++ objects
+            // in scope, so be careful using this
+            Perl_croak(aTHX_ \"Unknown barcode format %s\", ${var}_pv);
+          }
+        }
+
+T_IMAGER_FORMAT
+        $var = SVtoImagerFormat($arg);
+

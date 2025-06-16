@@ -20,8 +20,8 @@ sub test_unitTest: Test(6) {
     my $self = shift;
 
     if ($0 =~ /\.cotedo/) {
-        $ENV{'ZUGFERD_DIR'} = $ENV{'HOME'}.'/dvl/jaz/Blob/zugferd/profile/'.
-            'en16931';
+        $ENV{'ZUGFERD_DIR'} = $ENV{'HOME'}.'/dvl/jaz/Blob/zugferd/2.3.2/'.
+            'profile/en16931';
     }
 
     my $xml = Quiq::Zugferd->createTemplate('minimum');

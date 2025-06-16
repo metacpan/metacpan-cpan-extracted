@@ -8,14 +8,14 @@
       <ram:ID schemeID=""></ram:ID>
     </ram:BusinessProcessSpecifiedDocumentContextParameter>
     <ram:GuidelineSpecifiedDocumentContextParameter>
-      <ram:ID schemeID="">BT-24</ram:ID> <!-- 1..1 -->
+      <ram:ID schemeID="">BT-24</ram:ID>
     </ram:GuidelineSpecifiedDocumentContextParameter>
   </rsm:ExchangedDocumentContext>
   <rsm:ExchangedDocument>
-    <ram:ID schemeID="">BT-1</ram:ID> <!-- 1..1 -->
-    <ram:TypeCode>BT-3</ram:TypeCode> <!-- 1..1 -->
+    <ram:ID schemeID="">BT-1</ram:ID>
+    <ram:TypeCode>BT-3</ram:TypeCode>
     <ram:IssueDateTime>
-      <udt:DateTimeString format="BT-2-0">BT-2</udt:DateTimeString> <!-- 1..1 -->
+      <udt:DateTimeString format="BT-2-0">BT-2</udt:DateTimeString>
     </ram:IssueDateTime>
     <ram:IncludedNote>
       <ram:Content>BT-22</ram:Content>
@@ -25,7 +25,7 @@
   <rsm:SupplyChainTradeTransaction>
     <ram:IncludedSupplyChainTradeLineItem>
       <ram:AssociatedDocumentLineDocument>
-        <ram:LineID schemeID="">BT-126</ram:LineID> <!-- 1..1 -->
+        <ram:LineID schemeID="">BT-126</ram:LineID>
         <ram:IncludedNote>
           <ram:Content>BT-127</ram:Content>
           <ram:SubjectCode listID="" listVersionID=""></ram:SubjectCode>
@@ -33,9 +33,9 @@
       </ram:AssociatedDocumentLineDocument>
       <ram:SpecifiedTradeProduct>
         <ram:GlobalID schemeID=""></ram:GlobalID>
-        <ram:SellerAssignedID schemeID="">BT-155</ram:SellerAssignedID> <!-- 0..1 -->
+        <ram:SellerAssignedID schemeID="">BT-155</ram:SellerAssignedID>
         <ram:BuyerAssignedID schemeID=""></ram:BuyerAssignedID>
-        <ram:Name>BT-153</ram:Name> <!-- 1..1 -->
+        <ram:Name>BT-153</ram:Name>
         <ram:Description></ram:Description>
         <ram:ApplicableProductCharacteristic>
           <ram:Description></ram:Description>
@@ -62,7 +62,7 @@
           </ram:FormattedIssueDateTime>
         </ram:BuyerOrderReferencedDocument>
         <ram:GrossPriceProductTradePrice>
-          <ram:ChargeAmount currencyID="">BT-148</ram:ChargeAmount> <!-- 1..1 -->
+          <ram:ChargeAmount currencyID="">BT-148</ram:ChargeAmount>
           <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
           <ram:AppliedTradeAllowanceCharge>
             <ram:ChargeIndicator>
@@ -89,7 +89,7 @@
           </ram:AppliedTradeAllowanceCharge>
         </ram:GrossPriceProductTradePrice>
         <ram:NetPriceProductTradePrice>
-          <ram:ChargeAmount currencyID="">BT-146</ram:ChargeAmount> <!-- 1..1 -->
+          <ram:ChargeAmount currencyID="">BT-146</ram:ChargeAmount>
           <ram:BasisQuantity unitCode=""></ram:BasisQuantity>
           <ram:AppliedTradeAllowanceCharge>
             <ram:ChargeIndicator>
@@ -117,21 +117,21 @@
         </ram:NetPriceProductTradePrice>
       </ram:SpecifiedLineTradeAgreement>
       <ram:SpecifiedLineTradeDelivery>
-        <ram:BilledQuantity unitCode="BT-130">BT-129</ram:BilledQuantity> <!-- 1..1 -->
+        <ram:BilledQuantity unitCode="BT-130">BT-129</ram:BilledQuantity>
       </ram:SpecifiedLineTradeDelivery>
       <ram:SpecifiedLineTradeSettlement>
         <ram:ApplicableTradeTax>
           <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
-          <ram:TypeCode>BT-151-0</ram:TypeCode> <!-- 1..1 -->
+          <ram:TypeCode>BT-151-0</ram:TypeCode>
           <ram:ExemptionReason></ram:ExemptionReason>
           <ram:BasisAmount currencyID=""></ram:BasisAmount>
-          <ram:CategoryCode>BT-151</ram:CategoryCode> <!-- 1..1 -->
+          <ram:CategoryCode>BT-151</ram:CategoryCode>
           <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
           <ram:TaxPointDate>
             <udt:DateString format=""></udt:DateString>
           </ram:TaxPointDate>
           <ram:DueDateTypeCode></ram:DueDateTypeCode>
-          <ram:RateApplicablePercent>BT-152</ram:RateApplicablePercent> <!-- 0..1 -->
+          <ram:RateApplicablePercent>BT-152</ram:RateApplicablePercent>
         </ram:ApplicableTradeTax>
         <ram:BillingSpecifiedPeriod>
           <ram:StartDateTime>
@@ -165,10 +165,10 @@
            </ram:CategoryTradeTax>
          </ram:SpecifiedTradeAllowanceCharge>
         <ram:SpecifiedTradeSettlementLineMonetarySummation>
-          <ram:LineTotalAmount currencyID="">BT-131</ram:LineTotalAmount> <!-- 1..1 -->
+          <ram:LineTotalAmount currencyID="">BT-131</ram:LineTotalAmount>
         </ram:SpecifiedTradeSettlementLineMonetarySummation>
         <ram:AdditionalReferencedDocument>
-          <ram:IssuerAssignedID schemeID="">BT-128</ram:IssuerAssignedID> <!-- 1..1 -->
+          <ram:IssuerAssignedID schemeID="">BT-128</ram:IssuerAssignedID>
           <ram:URIID schemeID=""></ram:URIID>
           <ram:LineID schemeID=""></ram:LineID>
           <ram:TypeCode></ram:TypeCode>
@@ -186,10 +186,10 @@
     </ram:IncludedSupplyChainTradeLineItem>
     <ram:ApplicableHeaderTradeAgreement>
       <ram:BuyerReference></ram:BuyerReference>
-      <ram:SellerTradeParty> <!-- 1..1 -->
-        <ram:ID schemeID="">BT-29</ram:ID> <!-- 0..n -->
+      <ram:SellerTradeParty>
+        <ram:ID schemeID="">BT-29</ram:ID>
         <ram:GlobalID schemeID=""></ram:GlobalID>
-        <ram:Name>BT-27</ram:Name> <!-- 1..1 -->
+        <ram:Name>BT-27</ram:Name>
         <ram:Description></ram:Description>
         <ram:SpecifiedLegalOrganization>
           <ram:ID schemeID=""></ram:ID>
@@ -200,41 +200,41 @@
           <ram:DepartmentName>BT-41-0</ram:DepartmentName>
           <ram:TelephoneUniversalCommunication>
             <ram:URIID schemeID=""></ram:URIID>
-            <ram:CompleteNumber>BT-42</ram:CompleteNumber> <!-- 1..1 -->
+            <ram:CompleteNumber>BT-42</ram:CompleteNumber>
           </ram:TelephoneUniversalCommunication>
           <ram:EmailURIUniversalCommunication>
             <ram:URIID schemeID=""></ram:URIID>
             <ram:CompleteNumber></ram:CompleteNumber>
           </ram:EmailURIUniversalCommunication>
         </ram:DefinedTradeContact>
-        <ram:PostalTradeAddress> <!-- 1..1 -->
-          <ram:PostcodeCode listID="" listVersionID="">BT-38</ram:PostcodeCode> <!-- 0..1 -->
-          <ram:LineOne>BT-35</ram:LineOne> <!-- 0..1 -->
-          <ram:LineTwo>BT-36</ram:LineTwo> <!-- 0..1 -->
-          <ram:LineThree>BT-162</ram:LineThree> <!-- 0..1 -->
-          <ram:CityName>BT-37</ram:CityName> <!-- 0..1 -->
-          <ram:CountryID>BT-40</ram:CountryID> <!-- 1..1 -->
-          <ram:CountrySubDivisionName>BT-39</ram:CountrySubDivisionName> <!-- 0..1 -->
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID="">BT-38</ram:PostcodeCode>
+          <ram:LineOne>BT-35</ram:LineOne>
+          <ram:LineTwo>BT-36</ram:LineTwo>
+          <ram:LineThree>BT-162</ram:LineThree>
+          <ram:CityName>BT-37</ram:CityName>
+          <ram:CountryID>BT-40</ram:CountryID>
+          <ram:CountrySubDivisionName>BT-39</ram:CountrySubDivisionName>
         </ram:PostalTradeAddress>
         <ram:URIUniversalCommunication>
           <ram:URIID schemeID=""></ram:URIID>
           <ram:CompleteNumber></ram:CompleteNumber>
         </ram:URIUniversalCommunication>
-        <ram:SpecifiedTaxRegistration> <!-- 0..1 -->
-          <ram:ID schemeID="BT-31-0">BT-31</ram:ID> <!-- 1..1 -->
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID="BT-31-0">BT-31</ram:ID>
         </ram:SpecifiedTaxRegistration>
       </ram:SellerTradeParty>
-      <ram:BuyerTradeParty> <!-- 1..1 -->
-        <ram:ID schemeID="">BT-46</ram:ID> <!-- 0..1 -->
+      <ram:BuyerTradeParty>
+        <ram:ID schemeID="">BT-46</ram:ID>
         <ram:GlobalID schemeID=""></ram:GlobalID>
-        <ram:Name>BT-44</ram:Name> <!-- 1..1 -->
+        <ram:Name>BT-44</ram:Name>
         <ram:Description></ram:Description>
         <ram:SpecifiedLegalOrganization>
-          <ram:ID schemeID="BT-30-1">BT-30</ram:ID> <!-- 0..1 -->
+          <ram:ID schemeID="BT-30-1">BT-30</ram:ID>
           <ram:TradingBusinessName></ram:TradingBusinessName>
         </ram:SpecifiedLegalOrganization>
         <ram:DefinedTradeContact>
-          <ram:PersonName></ram:PersonName>
+          <ram:PersonName>BT-56</ram:PersonName>
           <ram:DepartmentName></ram:DepartmentName>
           <ram:TelephoneUniversalCommunication>
             <ram:URIID schemeID=""></ram:URIID>
@@ -245,13 +245,13 @@
             <ram:CompleteNumber></ram:CompleteNumber>
           </ram:EmailURIUniversalCommunication>
         </ram:DefinedTradeContact>
-        <ram:PostalTradeAddress> <!-- 1..1 -->
-          <ram:PostcodeCode listID="" listVersionID="">BT-53</ram:PostcodeCode> <!-- 0..1 -->
-          <ram:LineOne>BT-50</ram:LineOne> <!-- 0..1 -->
-          <ram:LineTwo>BT-51</ram:LineTwo> <!-- 0..1 -->
-          <ram:LineThree>BT-163</ram:LineThree> <!-- 0..1 -->
-          <ram:CityName>BT-52</ram:CityName> <!-- 0..1 -->
-          <ram:CountryID>BT-55</ram:CountryID> <!-- 1..1 -->
+        <ram:PostalTradeAddress>
+          <ram:PostcodeCode listID="" listVersionID="">BT-53</ram:PostcodeCode>
+          <ram:LineOne>BT-50</ram:LineOne>
+          <ram:LineTwo>BT-51</ram:LineTwo>
+          <ram:LineThree>BT-163</ram:LineThree>
+          <ram:CityName>BT-52</ram:CityName>
+          <ram:CountryID>BT-55</ram:CountryID>
           <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
         </ram:PostalTradeAddress>
         <ram:URIUniversalCommunication>
@@ -259,7 +259,7 @@
           <ram:CompleteNumber></ram:CompleteNumber>
         </ram:URIUniversalCommunication>
         <ram:SpecifiedTaxRegistration>
-          <ram:ID schemeID="BT-48-0">BT-48</ram:ID> <!-- 1..1 -->
+          <ram:ID schemeID="BT-48-0">BT-48</ram:ID>
         </ram:SpecifiedTaxRegistration>
       </ram:BuyerTradeParty>
       <ram:SellerTaxRepresentativeTradeParty>
@@ -313,7 +313,7 @@
         </ram:FormattedIssueDateTime>
       </ram:SellerOrderReferencedDocument>
       <ram:BuyerOrderReferencedDocument>
-        <ram:IssuerAssignedID schemeID="">BT-13</ram:IssuerAssignedID> <!-- 1..1 -->
+        <ram:IssuerAssignedID schemeID="">BT-13</ram:IssuerAssignedID>
         <ram:URIID schemeID=""></ram:URIID>
         <ram:LineID schemeID=""></ram:LineID>
         <ram:TypeCode></ram:TypeCode>
@@ -325,7 +325,7 @@
         </ram:FormattedIssueDateTime>
       </ram:BuyerOrderReferencedDocument>
       <ram:ContractReferencedDocument>
-        <ram:IssuerAssignedID schemeID="">BT-12</ram:IssuerAssignedID> <!-- 1..1 -->
+        <ram:IssuerAssignedID schemeID="">BT-12</ram:IssuerAssignedID>
         <ram:URIID schemeID=""></ram:URIID>
         <ram:LineID schemeID=""></ram:LineID>
         <ram:TypeCode></ram:TypeCode>
@@ -357,7 +357,7 @@
       <ram:ShipToTradeParty>
         <ram:ID schemeID=""></ram:ID>
         <ram:GlobalID schemeID=""></ram:GlobalID>
-        <ram:Name></ram:Name>
+        <ram:Name>BT-70</ram:Name>
         <ram:Description></ram:Description>
         <ram:SpecifiedLegalOrganization>
           <ram:ID schemeID=""></ram:ID>
@@ -376,12 +376,12 @@
           </ram:EmailURIUniversalCommunication>
         </ram:DefinedTradeContact>
         <ram:PostalTradeAddress>
-          <ram:PostcodeCode listID="" listVersionID=""></ram:PostcodeCode>
-          <ram:LineOne></ram:LineOne>
-          <ram:LineTwo></ram:LineTwo>
-          <ram:LineThree></ram:LineThree>
-          <ram:CityName></ram:CityName>
-          <ram:CountryID>BT-80</ram:CountryID> <!-- 1..1 -->
+          <ram:PostcodeCode listID="" listVersionID="">BT-78</ram:PostcodeCode>
+          <ram:LineOne>BT-75</ram:LineOne>
+          <ram:LineTwo>BT-76</ram:LineTwo>
+          <ram:LineThree>BT-165</ram:LineThree>
+          <ram:CityName>BT-77</ram:CityName>
+          <ram:CountryID>BT-80</ram:CountryID>
           <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
         </ram:PostalTradeAddress>
         <ram:URIUniversalCommunication>
@@ -392,9 +392,9 @@
           <ram:ID schemeID=""></ram:ID>
         </ram:SpecifiedTaxRegistration>
       </ram:ShipToTradeParty>
-      <ram:ActualDeliverySupplyChainEvent> <!-- 0..1 -->
+      <ram:ActualDeliverySupplyChainEvent>
         <ram:OccurrenceDateTime>
-          <udt:DateTimeString format="BT-72-0">BT-72</udt:DateTimeString> <!-- 1..1 -->
+          <udt:DateTimeString format="BT-72-0">BT-72</udt:DateTimeString>
         </ram:OccurrenceDateTime>
       </ram:ActualDeliverySupplyChainEvent>
       <ram:DespatchAdviceReferencedDocument>
@@ -422,11 +422,11 @@
         </ram:FormattedIssueDateTime>
       </ram:ReceivingAdviceReferencedDocument>
     </ram:ApplicableHeaderTradeDelivery>
-    <ram:ApplicableHeaderTradeSettlement> <!-- 1..1 -->
+    <ram:ApplicableHeaderTradeSettlement>
       <ram:CreditorReferenceID schemeID=""></ram:CreditorReferenceID>
-      <ram:PaymentReference>BT-83</ram:PaymentReference> <!-- 0..1 -->
+      <ram:PaymentReference>BT-83</ram:PaymentReference>
       <ram:TaxCurrencyCode></ram:TaxCurrencyCode>
-      <ram:InvoiceCurrencyCode>BT-5</ram:InvoiceCurrencyCode> <!-- 1..1 -->
+      <ram:InvoiceCurrencyCode>BT-5</ram:InvoiceCurrencyCode>
       <ram:PayeeTradeParty>
         <ram:ID schemeID=""></ram:ID>
         <ram:GlobalID schemeID=""></ram:GlobalID>
@@ -466,8 +466,8 @@
         </ram:SpecifiedTaxRegistration>
       </ram:PayeeTradeParty>
       <ram:SpecifiedTradeSettlementPaymentMeans>
-        <ram:TypeCode>BT-81</ram:TypeCode> <!-- 1..1 -->
-        <ram:Information>BT-82</ram:Information> <!-- 0..1 -->
+        <ram:TypeCode>BT-81</ram:TypeCode>
+        <ram:Information>BT-82</ram:Information>
         <ram:ApplicableTradeSettlementFinancialCard>
           <ram:ID schemeID=""></ram:ID>
           <ram:CardholderName></ram:CardholderName>
@@ -476,26 +476,26 @@
           <ram:IBANID schemeID=""></ram:IBANID>
         </ram:PayerPartyDebtorFinancialAccount>
         <ram:PayeePartyCreditorFinancialAccount>
-          <ram:IBANID schemeID="">BT-84</ram:IBANID> <!-- 0..1 -->
+          <ram:IBANID schemeID="">BT-84</ram:IBANID>
           <ram:AccountName></ram:AccountName>
           <ram:ProprietaryID schemeID=""></ram:ProprietaryID>
         </ram:PayeePartyCreditorFinancialAccount>
         <ram:PayeeSpecifiedCreditorFinancialInstitution>
-          <ram:BICID schemeID="">BT-86</ram:BICID> <!-- 1..1 -->
+          <ram:BICID schemeID="">BT-86</ram:BICID>
         </ram:PayeeSpecifiedCreditorFinancialInstitution>
       </ram:SpecifiedTradeSettlementPaymentMeans>
-      <ram:ApplicableTradeTax> <!-- 1..n -->
-        <ram:CalculatedAmount currencyID="">BT-117</ram:CalculatedAmount> <!-- 1..1 -->
-        <ram:TypeCode>BT-118-0</ram:TypeCode> <!-- 1..1 -->
+      <ram:ApplicableTradeTax>
+        <ram:CalculatedAmount currencyID="">BT-117</ram:CalculatedAmount>
+        <ram:TypeCode>BT-118-0</ram:TypeCode>
         <ram:ExemptionReason>BT-120</ram:ExemptionReason>
-        <ram:BasisAmount currencyID="">BT-116</ram:BasisAmount> <!-- 1..1 -->
-        <ram:CategoryCode>BT-118</ram:CategoryCode> <!-- 1..1 -->
+        <ram:BasisAmount currencyID="">BT-116</ram:BasisAmount>
+        <ram:CategoryCode>BT-118</ram:CategoryCode>
         <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
         <ram:TaxPointDate>
           <udt:DateString format=""></udt:DateString>
         </ram:TaxPointDate>
         <ram:DueDateTypeCode></ram:DueDateTypeCode>
-        <ram:RateApplicablePercent>BT-119</ram:RateApplicablePercent> <!-- 0..1 -->
+        <ram:RateApplicablePercent>BT-119</ram:RateApplicablePercent>
       </ram:ApplicableTradeTax>
       <ram:BillingSpecifiedPeriod>
         <ram:StartDateTime>
@@ -507,44 +507,44 @@
       </ram:BillingSpecifiedPeriod>
       <ram:SpecifiedTradeAllowanceCharge>
         <ram:ChargeIndicator>
-          <udt:Indicator>BG-21-1</udt:Indicator> <!-- 1..1 -->
+          <udt:Indicator>BG-21-1</udt:Indicator>
         </ram:ChargeIndicator>
         <ram:CalculationPercent></ram:CalculationPercent>
         <ram:BasisAmount currencyID=""></ram:BasisAmount>
-        <ram:ActualAmount currencyID="">BT-99</ram:ActualAmount> <!-- 1..1 -->
+        <ram:ActualAmount currencyID="">BT-99</ram:ActualAmount>
         <ram:ReasonCode></ram:ReasonCode>
-        <ram:Reason>BT-104</ram:Reason> <!-- 0..1 -->
+        <ram:Reason>BT-104</ram:Reason>
         <ram:CategoryTradeTax>
           <ram:CalculatedAmount currencyID=""></ram:CalculatedAmount>
-          <ram:TypeCode>BT-102-0</ram:TypeCode> <!-- 1..1 -->
+          <ram:TypeCode>BT-102-0</ram:TypeCode>
           <ram:ExemptionReason></ram:ExemptionReason>
           <ram:BasisAmount currencyID=""></ram:BasisAmount>
-          <ram:CategoryCode>BT-102</ram:CategoryCode> <!-- 1..1 -->
+          <ram:CategoryCode>BT-102</ram:CategoryCode>
           <ram:ExemptionReasonCode listID="" listVersionID=""></ram:ExemptionReasonCode>
           <ram:TaxPointDate>
             <udt:DateString format=""></udt:DateString>
           </ram:TaxPointDate>
           <ram:DueDateTypeCode></ram:DueDateTypeCode>
-          <ram:RateApplicablePercent>BT-103</ram:RateApplicablePercent> <!-- 0..1 -->
+          <ram:RateApplicablePercent>BT-103</ram:RateApplicablePercent>
         </ram:CategoryTradeTax>
       </ram:SpecifiedTradeAllowanceCharge>
-      <ram:SpecifiedTradePaymentTerms> <!-- 0..1 -->
-        <ram:Description>BT-20</ram:Description> <!-- 0..1 -->
-        <ram:DueDateDateTime> <!-- 0..1 -->
-          <udt:DateTimeString format="BT-9-0">BT-9</udt:DateTimeString> <!-- 1..1 -->
+      <ram:SpecifiedTradePaymentTerms>
+        <ram:Description>BT-20</ram:Description>
+        <ram:DueDateDateTime>
+          <udt:DateTimeString format="BT-9-0">BT-9</udt:DateTimeString>
         </ram:DueDateDateTime>
         <ram:DirectDebitMandateID schemeID=""></ram:DirectDebitMandateID>
       </ram:SpecifiedTradePaymentTerms>
-      <ram:SpecifiedTradeSettlementHeaderMonetarySummation> <!-- 1..1 -->
-        <ram:LineTotalAmount currencyID="">BT-106</ram:LineTotalAmount> <!-- 1..1 -->
-        <ram:ChargeTotalAmount currencyID="">BT-108</ram:ChargeTotalAmount> <!-- 0..1 -->
-        <ram:AllowanceTotalAmount currencyID="">BT-107</ram:AllowanceTotalAmount> <!-- 0..1 -->
-        <ram:TaxBasisTotalAmount currencyID="">BT-109</ram:TaxBasisTotalAmount> <!-- 1..1 -->
-        <ram:TaxTotalAmount currencyID="BT-110-0">BT-110</ram:TaxTotalAmount> <!-- 0..1 -->
-        <ram:RoundingAmount currencyID="">BT-114</ram:RoundingAmount> <!-- 0..1 -->
-        <ram:GrandTotalAmount currencyID="">BT-112</ram:GrandTotalAmount> <!-- 1..1 -->
-        <ram:TotalPrepaidAmount currencyID="">BT-113</ram:TotalPrepaidAmount> <!-- 0..1 -->
-        <ram:DuePayableAmount currencyID="">BT-115</ram:DuePayableAmount> <!-- 1..1 -->
+      <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        <ram:LineTotalAmount currencyID="">BT-106</ram:LineTotalAmount>
+        <ram:ChargeTotalAmount currencyID="">BT-108</ram:ChargeTotalAmount>
+        <ram:AllowanceTotalAmount currencyID="">BT-107</ram:AllowanceTotalAmount>
+        <ram:TaxBasisTotalAmount currencyID="">BT-109</ram:TaxBasisTotalAmount>
+        <ram:TaxTotalAmount currencyID="BT-110-0">BT-110</ram:TaxTotalAmount>
+        <ram:RoundingAmount currencyID="">BT-114</ram:RoundingAmount>
+        <ram:GrandTotalAmount currencyID="">BT-112</ram:GrandTotalAmount>
+        <ram:TotalPrepaidAmount currencyID="">BT-113</ram:TotalPrepaidAmount>
+        <ram:DuePayableAmount currencyID="">BT-115</ram:DuePayableAmount>
       </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
       <ram:InvoiceReferencedDocument>
         <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>

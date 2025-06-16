@@ -81,7 +81,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.226';
+our $VERSION = '1.227';
 
 use Quiq::AnsiColor;
 use LWP::UserAgent ();
@@ -1392,7 +1392,7 @@ sub log {
 
 =head1 VERSION
 
-1.226
+1.227
 
 =head1 AUTHOR
 

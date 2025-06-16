@@ -1,0 +1,5 @@
+BG-1;0;Freitexte zur Rechnung;ExchangedDocument.IncludedNote
+BG-16;0;Zahlungsanweisungen;SupplyChainTradeTransaction.ApplicableHeaderTradeSettlement.SpecifiedTradeSettlementPaymentMeans
+BG-21;0;Zuschläge auf Dokumentebene;SupplyChainTradeTransaction.ApplicableHeaderTradeSettlement.SpecifiedTradeAllowanceCharge
+BG-23;1;Umsatzaufschlüsselung;SupplyChainTradeTransaction.ApplicableHeaderTradeSettlement.ApplicableTradeTax
+BG-25;1;Rechnungspositionen;SupplyChainTradeTransaction.IncludedSupplyChainTradeLineItem

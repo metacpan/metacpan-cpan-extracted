@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.086     2025-06-15 22:58:48Z
+          - allow for "x-*" properties in /paths/*
+          - "debug" option added to OpenAPI::Modern
+
 0.085     2025-04-22 17:42:36Z
           - no longer resolving error, annotation locations against scheme or
             host from the HTTP request/response

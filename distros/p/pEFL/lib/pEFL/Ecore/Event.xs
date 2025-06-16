@@ -9,6 +9,13 @@
 #include <Ecore_Input.h>
 
 typedef Ecore_Event EcoreEvent;
+typedef int intArray;
+
+intArray * intArrayPtr (int num) {
+	intArray *array;
+	New(0,array,num,intArray);
+	return array;
+}
 
 MODULE = pEFL::Ecore::Event		PACKAGE = pEFL::Ecore::Event   PREFIX = ecore_event_
 
@@ -28,10 +35,15 @@ ecore_event_shutdown()
 int
 ecore_event_type_new()
 
-#void
-#ecore_event_type_flush_internal(type,...)
-#	int type
-#	 ...
+void
+ecore_event_type_flush_internal(type, array, ...)
+	int type
+	intArray * array
+CODE:
+	ecore_event_type_flush_internal(type, array);
+CLEANUP:
+	Safefree(array);
+
 
 int
 ecore_event_current_type_get()

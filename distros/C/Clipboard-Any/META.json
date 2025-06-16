@@ -55,7 +55,7 @@
    "provides" : {
       "Clipboard::Any" : {
          "file" : "lib/Clipboard/Any.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Clipboard-Any"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"

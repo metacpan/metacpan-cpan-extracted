@@ -136,7 +136,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20250311';
+    $VERSION = '20250616';
 } ## end BEGIN
 
 {
@@ -463,6 +463,49 @@ sub Warn_msg { my $msg = shift; $fh_stderr->print($msg); return }
 # Output Warn message and bump Warn count
 sub Warn { my $msg = shift; $fh_stderr->print($msg); $Warn_count++; return }
 
+sub Exit {
+    my $flag = shift;
+    if   ($flag) { goto ERROR_EXIT }
+    else         { goto NORMAL_EXIT }
+    croak "unexpected return to sub Exit";
+} ## end sub Exit
+
+sub Die {
+    my $msg = shift;
+    Warn($msg);
+    Exit(1);
+    croak "unexpected return from sub Exit";
+} ## end sub Die
+
+sub Fault {
+    my ($msg) = @_;
+
+    # This routine is called for errors that really should not occur
+    # except if there has been a bug introduced by a recent program change.
+    # Please add comments at calls to Fault to explain why the call
+    # should not occur, and where to look to fix it.
+    my ( $package0_uu, $filename0_uu, $line0,    $subroutine0_uu ) = caller(0);
+    my ( $package1_uu, $filename1,    $line1,    $subroutine1 )    = caller(1);
+    my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 )    = caller(2);
+    my $pkg = __PACKAGE__;
+
+    my $input_stream_name = $rstatus->{'input_name'};
+    $input_stream_name = '(unknown)' unless ($input_stream_name);
+    Die(<<EOM);
+==============================================================================
+While operating on input stream with name: '$input_stream_name'
+A fault was detected at line $line0 of sub '$subroutine1'
+in file '$filename1'
+which was called from line $line1 of sub '$subroutine2'
+Message: '$msg'
+This is probably an error introduced by a recent programming change.
+$pkg reports VERSION='$VERSION'.
+==============================================================================
+EOM
+
+    croak "unexpected return from sub Die";
+} ## end sub Fault
+
 sub is_char_mode {
 
     my ($string) = @_;
@@ -739,49 +782,6 @@ EOM
     my $self = [];
     bless $self, __PACKAGE__;
 
-    sub Exit {
-        my $flag = shift;
-        if   ($flag) { goto ERROR_EXIT }
-        else         { goto NORMAL_EXIT }
-        croak "unexpected return to sub Exit";
-    } ## end sub Exit
-
-    sub Die {
-        my $msg = shift;
-        Warn($msg);
-        Exit(1);
-        croak "unexpected return from sub Exit";
-    } ## end sub Die
-
-    sub Fault {
-        my ($msg) = @_;
-
-        # This routine is called for errors that really should not occur
-        # except if there has been a bug introduced by a recent program change.
-        # Please add comments at calls to Fault to explain why the call
-        # should not occur, and where to look to fix it.
-        my ( $package0_uu, $filename0_uu, $line0, $subroutine0_uu ) = caller(0);
-        my ( $package1_uu, $filename1,    $line1, $subroutine1 )    = caller(1);
-        my ( $package2_uu, $filename2_uu, $line2_uu, $subroutine2 ) = caller(2);
-        my $pkg = __PACKAGE__;
-
-        my $input_stream_name = $rstatus->{'input_name'};
-        $input_stream_name = '(unknown)' unless ($input_stream_name);
-        Die(<<EOM);
-==============================================================================
-While operating on input stream with name: '$input_stream_name'
-A fault was detected at line $line0 of sub '$subroutine1'
-in file '$filename1'
-which was called from line $line1 of sub '$subroutine2'
-Message: '$msg'
-This is probably an error introduced by a recent programming change.
-$pkg reports VERSION='$VERSION'.
-==============================================================================
-EOM
-
-        croak "unexpected return from sub Die";
-    } ## end sub Fault
-
     # extract various dump parameters
     my $dump_options_type     = $input_hash{'dump_options_type'};
     my $dump_options          = $get_hash_ref->('dump_options');
@@ -844,7 +844,7 @@ EOM
             my ( $rargv_str, $msg ) = parse_args($argv);
             if ($msg) {
                 Die(<<EOM);
-Error parsing this string passed to to perltidy with 'argv':
+Error parsing this string passed to perltidy with 'argv':
 $msg
 EOM
             }
@@ -3158,7 +3158,7 @@ sub copy_buffer_to_external_ref {
         $destination_buffer = ${$routput};
     }
     else {
-        Fatal(
+        Fault(
             "'copy_buffer_to_external_ref' expecting ref to ARRAY or SCALAR\n");
     }
 
@@ -3735,6 +3735,7 @@ sub generate_options {
     $add_option->( 'non-indenting-brace-prefix',          'nibp',  '=s' );
     $add_option->( 'outdent-long-comments',               'olc',   '!' );
     $add_option->( 'outdent-static-block-comments',       'osbc',  '!' );
+    $add_option->( 'skip-formatting-except-id',           'sfei',  '=s' );
     $add_option->( 'static-block-comment-prefix',         'sbcp',  '=s' );
     $add_option->( 'static-block-comments',               'sbc',   '!' );
     $add_option->( 'static-side-comment-prefix',          'sscp',  '=s' );
@@ -3756,6 +3757,7 @@ sub generate_options {
     $add_option->( 'cuddled-block-list-exclusive',            'cblx',  '!' );
     $add_option->( 'cuddled-break-option',                    'cbo',   '=i' );
     $add_option->( 'cuddled-paren-brace',                     'cpb',   '!' );
+    $add_option->( 'cuddled-paren-brace-weld',                'cpbw',  '!' );
     $add_option->( 'delete-old-newlines',                     'dnl',   '!' );
     $add_option->( 'opening-brace-always-on-right',           'bar',   '!' );
     $add_option->( 'opening-brace-on-new-line',               'bl',    '!' );
@@ -3803,19 +3805,17 @@ sub generate_options {
     $add_option->( 'break-after-labels',                     'bal',   '=i' );
     $add_option->( 'pack-operator-types',                    'pot',   '=s' );
 
-    # This was an experiment mentioned in git #78, originally named -bopl. I
-    # expanded it to also open logical blocks, based on git discussion #100,
-    # and renamed it -bocp. It works, but will remain commented out due to
-    # apparent lack of interest.
-    # $add_option->( 'break-open-compact-parens', 'bocp', '=s' );
+    # This was an experiment mentioned in git #78, originally named -bopl.
+    $add_option->( 'break-open-compact-parens', 'bocp', '=s' );
 
     ########################################
     $category = 6;    # Controlling list formatting
     ########################################
     $add_option->( 'break-at-old-comma-breakpoints', 'boc',  '!' );
+    $add_option->( 'break-at-old-comma-types',       'boct', '=s' );
     $add_option->( 'break-at-trailing-comma-types',  'btct', '=s' );
     $add_option->( 'comma-arrow-breakpoints',        'cab',  '=i' );
-    $add_option->( 'maximum-fields-per-table',       'mft',  '=i' );
+    $add_option->( 'maximum-fields-per-table',       'mft',  '=s' );
 
     ########################################
     $category = 7;    # Retaining or ignoring existing line breaks
@@ -4098,7 +4098,6 @@ sub generate_options {
         'keyword-paren-inner-tightness'             => [ 0, 2,     1 ],
         'long-block-line-count'                     => [ 0, undef, 8 ],
         'maximum-consecutive-blank-lines'           => [ 0, undef, 1 ],
-        'maximum-fields-per-table'                  => [ 0, undef, 0 ],
         'maximum-file-size-mb'                      => [ 0, undef, 10 ],
         'maximum-level-errors'                      => [ 0, undef, 1 ],
         'maximum-line-length'                       => [ 0, undef, 80 ],
@@ -4256,6 +4255,7 @@ sub generate_options {
         'nokeyword-group-blanks' => [qw(kgbb=1 nkgbi kgba=1)],
         'nkgb'                   => [qw(kgbb=1 nkgbi kgba=1)],
 
+        # allow spelling error 'trinary' vs 'ternary'
         'break-at-old-trinary-breakpoints' => [qw(bot)],
 
         'cti=0' => [qw(cpi=0 cbi=0 csbi=0)],

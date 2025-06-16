@@ -45,5 +45,5 @@ void
 DESTROY(message) 
     EdjeMessageString *message
 CODE:
-	printf("Freeing Message_String\n");
+	//printf("Freeing Message_String\n");
 	Safefree(message);

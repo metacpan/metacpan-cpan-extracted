@@ -1,7 +1,7 @@
 ---
 abstract: 'Barcode scanning with libzxing-cpp'
 author:
-  - 'Tony Cook <tonyc@cpan.org>'
+  - 'Tony Cook <tony@develop-help.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Imager: '1.015'
@@ -24,10 +24,9 @@ no_index:
     - inc
 requires:
   Imager: '1.015'
-  XSLoader: '0'
 resources:
   bugtracker: https://github.com/tonycoz/imager-zxing/
   homepage: http://imager.perl.org/
   repository: https://github.com/tonycoz/imager-zxing.git
-version: '1.001'
+version: '1.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

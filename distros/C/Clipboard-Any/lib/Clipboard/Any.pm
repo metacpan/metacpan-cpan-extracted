@@ -9,9 +9,9 @@ use Exporter::Rinci qw(import);
 use IPC::System::Options 'system', 'readpipe', 'run', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-04-17'; # DATE
+our $DATE = '2025-06-16'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our $known_clipboard_managers = [qw/klipper parcellite clipit xclip/];
 our $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -525,6 +525,12 @@ MARKDOWN
         tee => {
             summary => 'If set to true, will output content back to STDOUT',
             schema => 'bool*',
+            cmdline_aliases => {t=>{}},
+        },
+        chomp_newline => {
+            summary => 'Remove trailing newlines before adding item to clipboard',
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
         },
     },
     examples => [
@@ -547,16 +553,20 @@ sub add_clipboard_content {
     defined $args{content} or
         return [400, "Please specify content"];
 
+    my $content0 = $args{content};
+    my $content = $content0;
+    $content =~ s/\R+\z// if $args{chomp_newline};
+
     if ($clipboard_manager eq 'klipper') {
         my @paths = _find_qdbus();
         die "Can't find qdbus" unless @paths;
         my ($stdout, $stderr);
         # qdbus likes to emit an empty line
         system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
-               $paths[0], "org.kde.klipper", "/klipper", "setClipboardContents", $args{content});
+               $paths[0], "org.kde.klipper", "/klipper", "setClipboardContents", $content);
         my $exit_code = $? < 0 ? $? : $?>>8;
         return [500, "/klipper's setClipboardContents failed: $exit_code"] if $exit_code;
-        print $args{content} if $args{tee};
+        print $content0 if $args{tee};
         return [200, "OK"];
     } elsif ($clipboard_manager eq 'parcellite') {
         # parcellite cli copies unknown options and stdin to clipboard history
@@ -569,10 +579,10 @@ sub add_clipboard_content {
     } elsif ($clipboard_manager eq 'xclip') {
         open my $fh, "| xclip -i -selection primary" ## no critic: InputOutput::ProhibitTwoArgOpen
             or return [500, "xclip -i -selection primary failed (1): $!"];
-        print $fh $args{content};
+        print $fh $content;
         close $fh
             or return [500, "xclip -i -selection primary failed (2): $!"];
-        print $args{content} if $args{tee};
+        print $content0 if $args{tee};
         return [200, "OK"];
     }
 
@@ -594,7 +604,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.014 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2025-04-17.
+This document describes version 0.015 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2025-06-16.
 
 =head1 DESCRIPTION
 
@@ -664,6 +674,10 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<chomp_newline> => I<bool>
+
+Remove trailing newlines before adding item to clipboard.
 
 =item * B<clipboard_manager> => I<str>
 

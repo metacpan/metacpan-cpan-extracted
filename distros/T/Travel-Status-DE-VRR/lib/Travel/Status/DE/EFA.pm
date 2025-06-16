@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.09';
+our $VERSION = '3.10';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -412,15 +412,37 @@ sub check_for_ambiguous {
 
 	for my $m ( @{ $json->{dm}{message} // [] } ) {
 		if ( $m->{name} eq 'error' and $m->{value} eq 'name list' ) {
-			$self->{errstr} = "ambiguous name parameter";
-			$self->{name_candidates}
-			  = [ map { $_->{name} } @{ $json->{dm}{points} // [] } ];
+			$self->{errstr}          = "ambiguous name parameter";
+			$self->{name_candidates} = [];
+			for my $point ( @{ $json->{dm}{points} // [] } ) {
+				my $place = $point->{ref}{place};
+				push(
+					@{ $self->{name_candidates} },
+					Travel::Status::DE::EFA::Stop->new(
+						place     => $place,
+						full_name => $point->{name},
+						name      => $point->{name} =~ s{\Q$place\E,? ?}{}r,
+						id_num    => $point->{ref}{id},
+					)
+				);
+			}
 			return;
 		}
 		if ( $m->{name} eq 'error' and $m->{value} eq 'place list' ) {
-			$self->{errstr} = "ambiguous name parameter";
-			$self->{place_candidates}
-			  = [ map { $_->{name} } @{ $json->{dm}{points} // [] } ];
+			$self->{errstr}           = "ambiguous name parameter";
+			$self->{place_candidates} = [];
+			for my $point ( @{ $json->{dm}{points} // [] } ) {
+				my $place = $point->{ref}{place};
+				push(
+					@{ $self->{place_candidates} },
+					Travel::Status::DE::EFA::Stop->new(
+						place     => $place,
+						full_name => $point->{name},
+						name      => $point->{name} =~ s{\Q$place\E,? ?}{}r,
+						id_num    => $point->{ref}{id},
+					)
+				);
+			}
 			return;
 		}
 	}
@@ -680,7 +702,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

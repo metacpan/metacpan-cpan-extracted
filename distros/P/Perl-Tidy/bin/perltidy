@@ -54,109 +54,137 @@ A convenient aid to systematically defining a set of style parameters
 can be found at
 http://perltidy.sourceforge.net/stylekey.html
 
-Perltidy can produce output on either of two modes, depending on the
-existence of an B<-html> flag.  Without this flag, the output is passed
-through a formatter.  The default formatting tries to follow the
-recommendations in perlstyle(1), but it can be controlled in detail with
-numerous input parameters, which are described in L<"FORMATTING OPTIONS">.
+Perltidy can produce output on either of two modes, depending on the existence
+of an B<-html> flag.  Without this flag, the output is passed through a
+formatter.  The default formatting tries to follow the recommendations in
+perlstyle(1), but it can be controlled in detail with numerous input
+parameters, which are described in L<"FORMATTING OPTIONS">.  Many style
+variations are possible, but it is worth noting that the default style is
+particularly convenient for working on chunks of code with a line editor
+because it is easy to select a sequence of lines with balanced containers,
+which is necessary for formatting a snippet of code with perltidy.
 
 When the B<-html> flag is given, the output is passed through an HTML
 formatter which is described in L<"HTML OPTIONS">.
 
 =head1 EXAMPLES
 
-Here are some example perltidy commands followed by their meanings:
+Here are some example perltidy commands and their meanings:
 
-  perltidy somefile.pl
+=over 4
+
+=item *
 
 This will produce a file F<somefile.pl.tdy> containing the script reformatted
 using the default options, which approximate the style suggested in
 perlstyle(1).  The source file F<somefile.pl> is unchanged.
 
-  perltidy *.pl
+  perltidy somefile.pl
+
+=item *
 
 Execute perltidy on all F<.pl> files in the current directory with the
 default options.  The output will be in files with an appended F<.tdy>
 extension.  For any file with an error, there will be a file with extension
 F<.ERR>.
 
-  perltidy -b file1.pl file2.pl
+  perltidy *.pl
+
+
+=item *
 
 Modify F<file1.pl> and F<file2.pl> in place, and backup the originals to
 F<file1.pl.bak> and F<file2.pl.bak>.  If F<file1.pl.bak> and/or F<file2.pl.bak>
 already exist, they will be overwritten.
 
-  perltidy -b -bext='/' file1.pl file2.pl
+  perltidy -b file1.pl file2.pl
+
+=item *
 
 Same as the previous example except that the backup files F<file1.pl.bak> and F<file2.pl.bak> will be deleted if there are no errors.
 
-  perltidy -gnu somefile.pl
+  perltidy -b -bext='/' file1.pl file2.pl
 
-Execute perltidy on file F<somefile.pl> with a style which approximates the
-GNU Coding Standards for C programs.  The output will be F<somefile.pl.tdy>.
+=item *
 
-  perltidy -i=3 somefile.pl
+Execute perltidy on file F<somefile.pl>, with 4 columns for each level of
+continuation indentation (B<-ci=4>) instead of the default 2 columns, so that
+it is the same as the default primary indentation (B<-i=4>). There will not be
+any tabs in the reformatted script, except for any which already exist in
+comments, pod documents, quotes, and here documents.  Output will be
+F<somefile.pl.tdy>.
 
-Execute perltidy on file F<somefile.pl>, with 3 columns for each level of
-indentation (B<-i=3>) instead of the default 4 columns.  There will not be any
-tabs in the reformatted script, except for any which already exist in comments,
-pod documents, quotes, and here documents.  Output will be F<somefile.pl.tdy>.
+  perltidy -ci=4 somefile.pl
 
-  perltidy -i=3 -et=8 somefile.pl
+=item *
 
-Same as the previous example, except that leading whitespace will
-be entabbed with one tab character per 8 spaces.
+Same as the previous example, except that leading whitespace will be entabbed
+with one tab character per 4 spaces, and thus one tab for each indentation
+level.
 
-  perltidy -ce -l=72 somefile.pl
+  perltidy -ci=4 -et=4 somefile.pl
+
+=item *
 
 Execute perltidy on file F<somefile.pl> with all defaults except use "cuddled
 elses" (B<-ce>) and a maximum line length of 72 columns (B<-l=72>) instead of
 the default 80 columns.
 
-  perltidy -g somefile.pl
+  perltidy -ce -l=72 somefile.pl
 
-Execute perltidy on file F<somefile.pl> and save a log file F<somefile.pl.LOG>
-which shows the nesting of braces, parentheses, and square brackets at
-the start of every line.
+=item *
+
+Dump a table of comma-separated metrics for subroutines longer than 10 lines to
+F<blocks.csv> and immediately exit without formatting:
 
    perltidy -dbs -dbl=10 somefile.pl >blocks.csv
 
-This will dump a table of comma-separated metrics for subroutines longer than
-10 lines to F<blocks.csv>.
+=item *
+
+Dump a list of unused and reused lexical variable names to F<vars.txt>:
 
     perltidy -duv somefile.pl >vars.txt
 
-This will dump a list of unused and reused lexical variable names to
-F<vars.txt>.
-
-  perltidy -html somefile.pl
+=item *
 
 This will produce a file F<somefile.pl.html> containing the script with
 html markup.  The output file will contain an embedded style sheet in
 the C<<HEAD>> section which may be edited to change the appearance.
 
-  perltidy -html -css=mystyle.css somefile.pl
+  perltidy -html somefile.pl
+
+=item *
 
 This will produce a file F<somefile.pl.html> containing the script with
 html markup.  This output file will contain a link to a separate style
 sheet file F<mystyle.css>.  If the file F<mystyle.css> does not exist,
 it will be created.  If it exists, it will not be overwritten.
 
-  perltidy -html -pre somefile.pl
+  perltidy -html -css=mystyle.css somefile.pl
+
+=item *
 
 Write an html snippet with only the C<<PRE>> section to F<somefile.pl.html>.
 This is useful when code snippets are being formatted for inclusion in a
 larger web page.  No style sheet will be written in this case.
 
-  perltidy -html -ss >mystyle.css
+  perltidy -html -pre somefile.pl
+
+=item *
 
 Write a style sheet to F<mystyle.css> and exit.
 
-  perltidy -html -frm mymodule.pm
+  perltidy -html -ss >mystyle.css
+
+=item *
 
 Write html with a frame holding a table of contents and the source code.  The
 output files will be F<mymodule.pm.html> (the frame), F<mymodule.pm.toc.html>
 (the table of contents), and F<mymodule.pm.src.html> (the source code).
+
+  perltidy -html -frm mymodule.pm
+
+=back
 
 =head1 OPTIONS - OVERVIEW
 
@@ -166,10 +194,11 @@ whether flags are before or after any filenames.  However, the relative
 order of parameters is important, with later parameters overriding the
 values of earlier parameters.
 
-For each parameter, there is a long name and a short name.  The short
+For most parameters, there is a long name and a short name.  The short
 names are convenient for keyboard input, while the long names are
-self-documenting and therefore useful in scripts.  It is customary to
-use two leading dashes for long names, but one may be used.
+self-documenting and therefore useful in scripts.  B<It is customary to
+use two leading dashes for long names, but a single dash may be used
+for any parameter.>
 
 Most parameters which serve as on/off flags can be negated with a
 leading "n" (for the short name) or a leading "no" or "no-" (for the
@@ -539,7 +568,7 @@ controls set as desired without tabs, particularly the two parameters B<--indent
 
 The value of the integer B<n> can be any value but can be coordinated with the
 number of spaces used for indentation. For example, B<-et=4 -ci=4 -i=4> will
-produce one tab for each indentation level and and one for each continuation
+produce one tab for each indentation level and one for each continuation
 indentation level.  You may want to coordinate the value of B<n> with what your
 display software assumes for the spacing of a tab.
 
@@ -676,7 +705,7 @@ The default was changed from B<-neos> to B<-eos> in versions after 20220217.
 If this change causes a program to start running incorrectly on encoded files,
 an emergency fix might be to set B<-neos>.  Additional information can be found
 in the man pages for the B<Perl::Tidy> module and also in
-L<https://github.com/perltidy/perltidy/blob/master/docs/eos_flag.md>.
+L<https://github.com/perltidy/perltidy/blob/master/docs/eos_flag.md>
 
 =item B<-gcs>,  B<--use-unicode-gcstring>
 
@@ -721,7 +750,7 @@ revert to the default behavior of using the line ending of the host system.
 This flag, which is enabled by default, allows perltidy to terminate the last
 line of the output stream with a newline character, regardless of whether or
 not the input stream was terminated with a newline character.  If this flag is
-negated, with B<-natnl>, then perltidy will add a terminal newline to the the
+negated, with B<-natnl>, then perltidy will add a terminal newline to the
 output stream only if the input stream is terminated with a newline.
 
 Negating this flag may be useful for manipulating one-line scripts intended for
@@ -755,6 +784,18 @@ reformatting complex code structures, such as deeply nested ternary statements.
 =back
 
 =head2 Code Indentation Control
+
+The basic indentation model used by perltidy sets the indentation of a line equal to
+the sum of any number of primary indentation levels, each of which corresponds to
+the entry into a new container, plus one continuation level, which arises when a
+statement is broken across multiple lines. This is not the most general possible
+model, but it has been found to work well with most perl code while
+also allowing robust coding which avoids instabilities.
+
+The number of spaces corresponding to these primary and secondary (continuation)
+levels can be independently controlled. The number of spaces for the
+primary indentation is B<--indent-columns=n>, or B<-i=n>, as described above.
+The number of spaces for the secondary indentation is described in the next section.
 
 =over 4
 
@@ -1009,7 +1050,7 @@ which says to exclude lists within square-brackets and braces.  So what remains 
 A second optional item of information which can be given for parentheses is an alphanumeric
 letter which is used to limit the selection further depending on the type of
 token immediately before the paren.  The possible letters are currently 'k',
-'K', 'f', 'F', 'w', and 'W', with these meanings for matching whatever precedes an opening paren:
+'K', 'f', 'F', 'w', and 'W', with these meanings for matching whatever precedes an opening paren (see L<"Specifying Paren Types">):
 
  'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
@@ -2480,6 +2521,60 @@ The default is equivalent to -cse='#>>V'.
 
 =back
 
+=head2 Formatting Only Tagged Sections of Code
+
+A command B<--skip-formatting-except-id=tag>, or B<-sfei=tag>, is available to
+cause perltidy to B<only> format sections of code which are labeled with the
+selected tag on C<format-skipping> comments.
+
+For example, the tagged sections might contain tables which are best formatted
+with special values of the C<--maximum-line-length> parameter.
+
+The tag name is introduced with the added text B<id=NAME> after one or more
+spaces on the opening format-skipping comment. The tag B<NAME> can be any
+combination of letters and numbers. For example
+
+ #<<< id=Table27
+   ...
+ #>>>
+
+The code in this section will be treated like any other format skipping section
+unless the parameter B<--skip-formatting-except-id=Table27> is entered.
+In that case, it will be formatted.
+
+Here are some points regarding this option:
+
+=over 4
+
+=item *
+
+The special option B<--skip-formatting-except-id='-'>, or B<-sfei='-'>, means
+skip all formatting (since a tag named '-' does not exist).  This will allow
+the code to be scanned for problems, but the formatting will not be changed.
+The B<-notidy> parameter can also be used to skip formatting, but it exits at
+an earlier point in the process, so it runs faster but does not perform as many
+code checks.
+
+=item *
+
+The sections which are being skipped or formatted can be determined by
+dumping a log file with the B<-g> parameter.
+
+=item *
+
+When this option is used, the starting indentation is still guessed from
+the first code in the file, even if it is not being formatted.  If this
+results in an unwanted indentation of the tagged section, then the
+parameter B<--starting-indentation-level=n>, or B<-sil=n>, can be used
+to set the desired indentation.
+
+=item *
+
+This feature was suggested in issue git #183 at
+L<https://github.com/perltidy/perltidy/issues/183>, which discusses an example.
+
+=back
+
 =head2 Formatting a Limited Range of Lines
 
 A command B<--line-range-tidy=n1:n2> is available to process just a selected
@@ -2871,6 +2966,47 @@ For example:
         ...;
     }
 
+=item B<-cpbw>, B<--cuddled-paren-brace-weld>
+
+This parameter modifies the B<-cuddled-paren-brace> parameter of the previous
+to actively form these cuddled pairs whenever possible.  In situations where
+the opening block brace will be placed on a new line, and separated from a
+closing paren on the previous line, it will move a preceding closing paren
+there too.  So in effect, it causes a closing paren to stay with an
+opening brace as if they were 'welded' together.
+
+To illustrate, formatting with B<-cpb> alone gives:
+
+        # perltidy -cpb
+        if (   $Kouter_opening == $Kfirst
+            && $token_oo eq '('
+            && $has_tight_paren{$type_prev} )
+        {
+            $Kref = $Kprev;
+        }
+
+Here, the option B<-cpb> by itself has no effect here because the
+C<)> and C<}> are on different lines. But adding ``-cpbw`` gives:
+
+        # perltidy -cpb -cpbw
+        if (
+               $Kouter_opening == $Kfirst
+            && $token_oo eq '('
+            && $has_tight_paren{$type_prev}
+        ) {
+            $Kref = $Kprev;
+        }
+
+In this case, the B<-cpbw> modifier has caused the container to be broken open
+so that its closing paren is on the same line as opening brace.
+
+The default is not to do this. Note that B<-cpbw> is a modifier and has no
+effect unless B<-cpb> is also set.
+
+A limitation is that this operation cannot be done if it would conflict
+with other parameter settings, such as B<--opening-brace-on-new-line>
+and B<--opening-brace-always-on-right>.
+
 =item B<-otr>,  B<--opening-token-right> and related flags
 
 The B<-otr> flag is a hint that perltidy should not place a break between a
@@ -3243,7 +3379,7 @@ last represents a quoted list.  For example the string
 means do B<NOT> include square-brackets, braces, or quotes in any welds.  The only unspecified
 container is '(', so this string means that only welds involving parens will be made.
 
-To illustrate, following welded snippet consists of a chain of three welded
+To illustrate, the following welded snippet consists of a chain of three welded
 containers with types '(' '[' and 'q':
 
     # perltidy -wn
@@ -3275,7 +3411,7 @@ A third optional item of information which can be given is an alphanumeric
 letter which is used to limit the selection further depending on the type of
 token immediately before the container.  If given, it goes just before the
 container symbol.  The possible letters are currently 'k', 'K', 'f', 'F',
-'w', and 'W', with these meanings:
+'w', and 'W', with these meanings (see L<"Specifying Paren Types">):
 
  'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
@@ -3787,7 +3923,27 @@ the original style, yields
                 1, 4, 6, 4, 1,);
 
 A disadvantage of this flag compared to the methods discussed above is that all
-tables in the file must already be nicely formatted.
+tables in the file must already be nicely formatted. The parameter of the next
+section can be used to limit the tables to which it applies.
+
+=item B<-boct=s>,  B<--break-at-old-comma-types=s>
+
+This parameter can be used to make the B<-boc> flag of the previous section apply
+only to commas in certain types of containers. The parameter string B<s> is a
+space-separated list of the types of containers. It may include any of the
+list container tokens B<(>, B<{>, and B<[>. In addition, a paren token may be
+preceded by any of the letters 'k', 'K', 'f', 'F', 'w', and 'W', to further
+restrict the types of parens to which B<-boc> applies (see L<"Specifying Paren Types">).
+
+For example:
+
+    -boct='('  means keep old comma breaks in paren lists
+    -boct='f(' means keep old comma breaks in function call lists
+
+Commas which are not contained within one of these three container types can
+be selected with a ';' character.
+
+Note that this parameter has no effect unless B<-break-at-old-comma-breakpoints> is also set.
 
 =item B<-btct=s>,  B<--break-at-trailing-comma-types=s>
 
@@ -3846,7 +4002,7 @@ For parentheses, an additional item of information which can be given is an
 alphanumeric letter which is used to limit the selection further depending on
 the type of token immediately before the opening paren.  The possible letters
 are currently 'k', 'K', 'f', 'F', 'w', and 'W', with these meanings for
-matching whatever precedes an opening paren:
+matching whatever precedes an opening paren (see L<"Specifying Paren Types">):
 
  'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
@@ -3869,14 +4025,58 @@ working with trailing commas. These can be combined with the
 B<-break-trailing-comma-types> parameter for additional control of list
 formatting.
 
-=item B<-mft=n>,  B<--maximum-fields-per-table=n>
+=item B<-bocp=s>,  B<--break-open-compact-parens=s>
 
-If B<n> is a positive number, and the computed number of fields for any table
-exceeds B<n>, then it will be reduced to B<n>.  This parameter might be used on
-a small section of code to force a list to have a particular number of fields
-per line, and then either the B<-boc> flag could be used to retain this
-formatting, or a blank line or comment could be introduced somewhere to freeze
-the formatting in future applications of perltidy. For example
+When list contained in parentheses is too long to display on a single line, but
+short enough to display on two lines, then the default is to display it
+compactly on two lines.  If more than two lines are required, then the default
+is to put line breaks after the opening paren and before the closing paren. For
+example, the following short list is displayed with the default formatting:
+
+    initialize_warn_variable_types( $wvt_in_args, $num_files,
+        $line_range_clipped );
+
+The parameter B<-bocp=s> can be used to cause short lists like this to
+be broken open in the same way as longer lists. The parameter B<s> is a single
+letter which indicates the types of parentheses to which this applies. This
+letter may be one of the following (see L<"Specifying Paren Types">):
+
+ '1' or '*' matches all parens
+ 'k' matches if the previous nonblank token is a perl keyword
+     (such as 'my', 'return'),
+ 'K' matches if 'k' does not: previous token is not a keyword
+ 'f' matches if previous token is a function (not a keyword)
+ 'F' matches if 'f' does not.
+ 'w' matches if either 'k' or 'f' match.
+ 'W' matches if 'w' does not.
+ '0' deactivates this parameter [DEFAULT]
+
+In this case, the most useful of these are B<f> (function), B<k> (keyword), and
+B<w> (both).
+
+So to illustrate:
+
+    # perltidy -bocp='f'
+    initialize_warn_variable_types(
+        $wvt_in_args, $num_files, $line_range_clipped
+    );
+
+=item B<-mft=s>,  B<--maximum-fields-per-table=s>
+
+Perltidy will use special formatting rules for lists are relatively small,
+irregular, or associated with certain keywords such as C<sprintf>. In other
+words, for data which may not display well as a table. For other lists it will
+make a table with a certain number of fields B<n> which is computed to fit the
+page width and the data.  This number B<n> can be controlled with this input
+parameter.
+
+If B<s> is a positive number B<n>, and the computed number of fields for a
+table exceeds B<n>, then it will be reduced to B<n>.  This parameter might be
+used, for example, on a small section of code to force a list to have a
+particular number of fields per line, and then either the B<-boc> flag could be
+used to retain this formatting, or a blank line or comment could be introduced
+somewhere to freeze the formatting in future applications of perltidy. For
+example,
 
     # perltidy -mft=2
     @month_of_year = (
@@ -3890,6 +4090,32 @@ the formatting in future applications of perltidy. For example
 
 The default value is B<n=0>, which does not place a limit on the
 number of fields in a table.
+
+Starting with perltidy version 20250311.05, an optional more general
+input parameter allows some selection of the tables to which this
+option applies. The integer B<n> may be preceded by one of the
+container types C<(>, C<[>, or C<{> to selected just that type
+of container. Different numerical values may be assigned to different
+container types.  For example, the input
+
+    -mft='(1 [2'
+
+would mean use 1 field for tables within parens, 2 fields for tables within
+square brackets, and do not control the fields within curly braces.
+
+In addition, parens may be preceded by one of the paren control
+letters C<k f w K F W> to further limit
+the tables for which the number of fields will be controlled
+(see the table above or L<"Specifying Paren Types">). One
+use for this would be to match the control of the number of fields
+of a table with the parameter B<--break-open-compact-parens> described
+above.  Thus the combination
+
+   -bocp='f' -mft='f(1'
+
+says that paren lists following function calls should be
+broken open, and these same lists should have 1 field per line
+when formatted as a table.
 
 =item B<-cab=n>,  B<--comma-arrow-breakpoints=n>
 
@@ -4181,7 +4407,7 @@ For parentheses, an additional item of information which can be given is an
 alphanumeric letter which is used to limit the selection further depending on
 the type of token immediately before the opening paren.  The possible letters
 are currently 'k', 'K', 'f', 'F', 'w', and 'W', with these meanings for
-matching whatever precedes an opening paren:
+matching whatever precedes an opening paren (see L<"Specifying Paren Types">):
 
  'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
@@ -4870,9 +5096,7 @@ the command to keep a break after all opening parens is:
 
 It is possible to be more specific in matching parentheses by preceding them
 with a letter.  The possible letters are 'k', 'K', 'f', 'F', 'w', and 'W', with
-these meanings (these are the same as used in the
-B<--weld-nested-exclusion-list> and B<--line-up-parentheses-exclusion-list>
-parameters):
+these meanings (see L<"Specifying Paren Types">):
 
  'k' matches if the previous nonblank token is a perl keyword
      (such as 'if', 'while'),
@@ -4882,7 +5106,7 @@ parameters):
  'w' matches if either 'k' or 'f' match.
  'W' matches if 'w' does not.
 
-So for example the the following parameter will keep breaks after opening function call
+So for example the following parameter will keep breaks after opening function call
 parens:
 
    perltidy -kba='f('
@@ -5324,7 +5548,7 @@ subgroup and the others. In the example above this happened between the
 B<use> and B<my> statements.
 
 B<-kgbd> or B<--keyword-group-blanks-delete> controls the deletion of any
-blank lines that exist in the the group when it is first scanned.  When
+blank lines that exist in the group when it is first scanned.  When
 statements are initially scanned, any existing blank lines are included in the
 collection.  Any such original blank lines will be deleted before any other
 insertions are made when the parameter B<-kgbd> is set.  The default is not to
@@ -5658,12 +5882,12 @@ aligned.
 Vertical alignment is implemented by locally increasing an existing blank space
 to produce alignment with an adjacent line.  It cannot occur if there is no
 blank space to increase.  So if a particular space is removed by one of the
-existing controls then vertical alignment cannot occur. Likewise, if a space is
-added with one of the controls, then vertical alignment might occur.
+existing controls then vertical alignment cannot occur.
 
-For example,
+For example, if we remove the space before the "fat commas" in the above
+example, vertical alignment cannot occur:
 
-        # perltidy -nwls='=>'
+        # perltidy --no-want-left-space='=>'
         $data = $pkg->new(
             PeerAddr=> join( ".", @port[ 0 .. 3 ] ),
             PeerPort=> $port[4] * 256 + $port[5],
@@ -5687,11 +5911,16 @@ negative B<-novalign> is an alias for B<-nvc -nvsc -nvbc>.
 
 =item B<Controlling code alignment with --valign-code or -vc>
 
-The B<-vc> flag enables alignment of code symbols such as B<=>.  The default is B<-vc>.
+The B<-vc> flag enables alignment of code symbols such as <=>.  The default is B<-vc>.
 For detailed control of which symbols to align, see the B<-valign-exclude-list> parameter
 below.
 
 =item B<Controlling side comment alignment with --valign-side-comments or -vsc>
+
+The basic rule for side comment alignment is that side comments on a sequence
+of lines with the same leading indentation will be aligned if space allows.
+Side comments on lines with different leading indentations will generally not
+be aligned.
 
 The B<-vsc> flag enables alignment of side comments and is enabled by default.  If side
 comment alignment is disabled with B<-nvsc> they will appear at a fixed space from the
@@ -5711,7 +5940,7 @@ More detailed control of alignment types is available with these two
 parameters.  Most of the vertical alignments in typical programs occur at one
 of the tokens ',', '=', and '=>', but many other alignments are possible and are given in the following list:
 
-  = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=
+  = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x= ^^=
   { ( ? : , ; => && || ~~ !~~ =~ !~ // <=> -> q
   if unless and or err for foreach while until
 
@@ -5854,7 +6083,7 @@ normally both in view.
 
 The following assignment operators are aligned independently by default:
 
-      = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=
+      = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x= ^^=
 
 Setting B<--valign-wide-equals>, or B<-vwe>, causes them to be vertically
 aligned together with the trailing B<=> all aligned. For example, here
@@ -5866,9 +6095,9 @@ is the default formatting for some code with several of these operators:
             $str .= $rfields->[$j];
             $str_len += $rfield_lengths->[$j];
 
-And here is the same code formatted with B<-vme>:
+And here is the same code formatted with B<-vwe>:
 
-            # perltidy -vme
+            # perltidy -vwe
             $str             .= SPACE x $total_pad_count;
             $str_len         += $total_pad_count;
             $total_pad_count  = 0;
@@ -6542,7 +6771,7 @@ one of the variables.
 
 These are lexical variables which are declared in one package and still visible
 in subroutines of a different package in the same file.  This can be confusing,
-and it might cause the program to run differently, or fail, if the the packages
+and it might cause the program to run differently, or fail, if the packages
 were ever split into separate files. This issue can usually be avoided by
 placing code in block braces of some type.  For example, this issue is often
 found in test code and can sometimes be fixed by using the structure
@@ -6810,7 +7039,7 @@ The lines in the output file list the keys and number of occurrences.
 
 The parameter B<--dump-mixed-call-parens>, or B<-dmcp>, provides information on
 the use of call parens within a program.  It produces a list of keywords and sub
-names which occur both both with and without parens.  In other words, with
+names which occur both with and without parens.  In other words, with
 a mixed style.  This might be useful if one is working to standardize the
 call style for some particular keyword or function. For example,
 
@@ -6839,7 +7068,7 @@ next section.
 
 =item B<Use --want-call-parens=s and --nowant-call-parens=s to warn about specific missing or extra call parens>
 
-The parameter B<--want-call-parens=s>, or B<-wcp=s>, can be used to to produce
+The parameter B<--want-call-parens=s>, or B<-wcp=s>, can be used to produce
 a warning message if call parens are missing from selected functions.
 Likewise, B<--nowant-call-parens=s>, or B<-nwcp=s>, can warn if call parens
 exist for selected functions.  When either of these parameters are set,
@@ -7078,9 +7307,11 @@ The following types of issues are reported:
 
 =item B<s:> calls requesting a scalar from a sub which only returns two or more items.
 
+=item B<m:> multiple array return sizes.
+
 =back
 
-These issue types are illustrated with the following code
+Most of these issue types are illustrated with the following code
 
     sub macho {
         ...
@@ -7099,8 +7330,20 @@ These issue types are illustrated with the following code
     ($name) = wimp();                   # 'u' (want array 1 < 2)
     $name   = wimp();  # 's' (want scalar but 2 values returned)
 
+The type B<m> issue occurs when a sub has multiple returns of finite lists with
+different counts greater than 1, and not all of them are matched with calls.
+For example:
+
+    sub find_libs {
+        ...;
+        return ( $libjava, $libjvm, $libhpi, $libawt );  # 4 items
+        ...;
+        return ( $libjava, $libawt );                    # 2 items
+    }
+    my ( $libjava, $libjvm, $libhpi, $libawt ) = find_libs();
+
 This analysis works by scanning all call statements and all sub return
-statements, and comparing the the number of items wanted with the possible
+statements, and comparing the number of items wanted with the possible
 number of items returned.  If a specific value for either of these numbers
 cannot be determined for a call then it cannot be checked.
 
@@ -7438,6 +7681,39 @@ for vertical tightness:
 
    -bbvtl='*'
 
+=head2 Specifying Paren Types
+
+Several input parameters accept a single alphanumeric letter to specify the
+parentheses to which they apply.
+
+The possible letters are 'k', 'K', 'f', 'F', 'w', and 'W', with these
+meanings for matching whatever precedes an opening paren:
+
+ 'k' matches if the previous nonblank token is a perl keyword
+     (such as 'my', 'for'),
+ 'K' matches if 'k' does not: previous token is not a keyword
+ 'f' matches if previous token is a function or '->' (not a keyword)
+ 'F' matches if 'f' does not.
+ 'w' matches if either 'k' or 'f' match.
+ 'W' matches if 'w' does not.
+
+Most parameters also allow '1' or '*' to select all parens, and '0' to
+select no parens.
+
+For example, the opening paren in this expression is preceded by the builtin
+keyword C<my> so it matches type 'k' (keyword) but also 'w' (keyword or
+function) and 'F' (not a function):
+
+    my ( $name, $inx2, $id, $dir, $key);
+
+The opening paren in the following expression is a function call so it matches
+type 'f' (function) and also 'w' (keyword or function) and 'K' (not a keyword):
+
+    $G->get_attribute( 'capacity', $u, $v );
+
+So both of these expressions match type 'w' (keyword or function).
+Note that the letter 'w' is suggestive of some kind of word.
+
 =head2 Specifying File Extensions
 
 Several parameters allow default file extensions to be overridden.  For
@@ -7462,24 +7738,24 @@ The following list shows all short parameter names which allow a prefix
  D      aia    altc   ame    anl    asbl   asc    ast    asu    atc
  atnl   aws    b      baa    baao   bar    bbao   bbb    bbc    bbs
  bl     bli    boa    boc    bok    bol    bom    bos    bot    cblx
- ce     conv   cpb    cs     csc    cscb   cscw   dac    dbc    dbs
- dcbl   dcsc   ddf    dhk    dia    dior   dln    dltc   dma    dmcp
- dmr    dnl    dop    dp     dpro   drc    dsc    dsk    dsm    dsn
- dtc    dtco   dtt    duk    duv    dwic   dwls   dwrs   dws    eos
- f      fpva   frm    fs     fso    gcs    hbc    hbcm   hbco   hbh
- hbhh   hbi    hbj    hbk    hbm    hbn    hbp    hbpd   hbpu   hbq
- hbs    hbsc   hbv    hbw    hent   hic    hicm   hico   hih    hihh
- hii    hij    hik    him    hin    hip    hipd   hipu   hiq    his
- hisc   hiv    hiw    hsc    html   ibc    icb    icp    ils    iob
- ipc    isbc   iscl   kgb    kgbd   kgbi   kis    lal    log    lop
- lp     lsl    mci    mem    nib    ohbr   okw    ola    olc    oll
- olq    opr    opt    osbc   osbr   otr    ple    pod    pvl    q
- qwaf   sac    sbc    sbl    scbb   schb   scp    scsb   sct    se
- sfp    sfs    skp    sob    sobb   sohb   sop    sosb   sot    ssc
- st     sts    t      tac    tbc    toc    tp     tqw    trp    ts
- tsc    tso    vbc    vc     viu    vmll   vsc    vsn    vwe    w
- wfc    wia    wma    wme    wmr    wn     wsk    wuk    x      xbt
- xci    xlp    xs
+ ce     conv   cpb    cpbw   cs     csc    cscb   cscw   dac    dbc
+ dbs    dcbl   dcsc   ddf    dhk    dia    dior   dln    dltc   dma
+ dmcp   dmr    dnl    dop    dp     dpro   drc    dsc    dsk    dsm
+ dsn    dtc    dtco   dtt    duk    duv    dwic   dwls   dwrs   dws
+ eos    f      fpva   frm    fs     fso    gcs    hbc    hbcm   hbco
+ hbh    hbhh   hbi    hbj    hbk    hbm    hbn    hbp    hbpd   hbpu
+ hbq    hbs    hbsc   hbv    hbw    hent   hic    hicm   hico   hih
+ hihh   hii    hij    hik    him    hin    hip    hipd   hipu   hiq
+ his    hisc   hiv    hiw    hsc    html   ibc    icb    icp    ils
+ iob    ipc    isbc   iscl   kgb    kgbd   kgbi   kis    lal    log
+ lop    lp     lsl    mci    mem    nib    ohbr   okw    ola    olc
+ oll    olq    opr    opt    osbc   osbr   otr    ple    pod    pvl
+ q      qwaf   sac    sbc    sbl    scbb   schb   scp    scsb   sct
+ se     sfp    sfs    skp    sob    sobb   sohb   sop    sosb   sot
+ ssc    st     sts    t      tac    tbc    toc    tp     tqw    trp
+ ts     tsc    tso    vbc    vc     viu    vmll   vsc    vsn    vwe
+ w      wfc    wia    wma    wme    wmr    wn     wsk    wuk    x
+ xbt    xci    xlp    xs
 
 Equivalently, the prefix 'no' or 'no-' on the corresponding long names may be
 used.
@@ -7495,7 +7771,7 @@ self-checking, but still, it is possible that an error could be
 introduced and go undetected.  Therefore, it is essential to make
 careful backups and to test reformatted scripts.
 
-The main current limitation is that perltidy does not scan modules
+The main limitation is that perltidy does not scan modules
 included with 'use' statements.  This makes it necessary to guess the
 context of any bare words introduced by such modules.  Perltidy has good
 guessing algorithms, but they are not infallible.  When it must guess,
@@ -7505,8 +7781,8 @@ If you encounter a bug, please report it.
 
 =item  B<What perltidy does not parse and format>
 
-Perltidy indents but does not reformat comments and C<qw> quotes.
-Perltidy does not in any way modify the contents of here documents or
+Perltidy indents but does not reformat comments.
+Perltidy does not modify the contents of here documents or
 quoted text, even if they contain source code.  (You could, however,
 reformat them separately).  Perltidy does not format 'format' sections
 in any way.  And, of course, it does not modify pod documents.
@@ -7562,7 +7838,7 @@ standard error output will indicate the cause of any problem.  If perltidy
 terminates prematurely then no output files will be produced.
 
 An exit value of 2 indicates that perltidy was able to run to completion but
-there there are (1) warning messages in the standard error output related to
+there are (1) warning messages in the standard error output related to
 parameter errors or problems and/or (2) warning messages in the perltidy error
 file(s) relating to possible syntax errors in one or more of the source
 script(s) being tidied.  When multiple files are being processed, an error
@@ -7578,7 +7854,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20250311
+This man page documents perltidy version 20250616
 
 =head1 BUG REPORTS
 

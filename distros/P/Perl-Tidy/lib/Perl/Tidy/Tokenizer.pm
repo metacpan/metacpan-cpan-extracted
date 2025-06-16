@@ -33,7 +33,7 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20250311';
+our $VERSION = '20250616';
 
 use Carp;
 
@@ -84,6 +84,7 @@ my (
     $rbrace_type,
     $rcurrent_depth,
     $rcurrent_sequence_number,
+    $ris_lexical_sub,
     $rdepth_array,
     $ris_block_function,
     $ris_block_list_function,
@@ -146,6 +147,7 @@ my (
     # GLOBAL VARIABLES which are constant after being configured.
     # INITIALIZER: BEGIN block and modified by sub check_options
     %is_code_block_token,
+    %is_zero_continuation_block_type,
     %is_keyword,
     %is_my_our_state,
     %is_package,
@@ -453,13 +455,19 @@ sub check_options {
     }
 
     # 'field'  - added as a keyword, and works like 'my'
-    $is_keyword{'field'}      = $use_feature_class;
-    $is_my_our_state{'field'} = $use_feature_class;
+    # Setting zero_continuation_block_type allows inclusion in table of level
+    # differences in case of a missing or extra brace (see sub wrapup).
+    $is_keyword{'field'}                      = $use_feature_class;
+    $is_my_our_state{'field'}                 = $use_feature_class;
+    $is_zero_continuation_block_type{'field'} = $use_feature_class;
 
     # 'ADJUST' - added as a keyword and works like 'BEGIN'
-    # TODO: if ADJUST gets a paren list, this will need to be updated
-    $is_keyword{'ADJUST'}          = $use_feature_class;
-    $is_code_block_token{'ADJUST'} = $use_feature_class;
+    # See update git #182 for 'ADJUST :params'
+    # Setting zero_continuation_block_type allows inclusion in table of level
+    # differences in case of a missing or extra brace (see sub wrapup).
+    $is_keyword{'ADJUST'}                      = $use_feature_class;
+    $is_code_block_token{'ADJUST'}             = $use_feature_class;
+    $is_zero_continuation_block_type{'ADJUST'} = $use_feature_class;
 
     %is_grep_alias = ();
     if ( $rOpts->{'grep-alias-list'} ) {
@@ -1204,11 +1212,11 @@ EOM
     my $ln_1         = $rhistory_line_number->[1];
     if ( $level_diff_1 < 0 ) {
         push @output_lines,
-          "There may be an extra '}' between lines $ln_0 and $ln_1\n";
+"There may be an extra '}' or missing '{' between lines $ln_0 and $ln_1\n";
     }
     elsif ( $level_diff_1 > 0 ) {
         push @output_lines,
-          "There may be a missing '}' between lines $ln_0 and $ln_1\n";
+"There may be a missing '}' or extra '{' between lines $ln_0 and $ln_1\n";
     }
     else {
         ## two leading zeros in the table - probably can't happen - no hint
@@ -1956,6 +1964,7 @@ sub prepare_for_a_new_file {
     $total_depth              = 0;
     $rtotal_depth             = [];
     $rcurrent_sequence_number = [];
+    $ris_lexical_sub          = {};
     $next_sequence_number     = SEQ_ROOT + 1;
 
     $rparen_type                     = [];
@@ -2015,8 +2024,13 @@ sub prepare_for_a_new_file {
 
     # TV3: SCALARS for quote variables.  These are initialized with a
     # subroutine call and continually updated as lines are processed.
-    my ( $in_quote, $quote_type, $quote_character, $quote_pos, $quote_depth,
-        $quoted_string_1, $quoted_string_2, $allowed_quote_modifiers );
+    my (
+        $in_quote,           $quote_type,
+        $quote_character,    $quote_pos,
+        $quote_depth,        $quoted_string_1,
+        $quoted_string_2,    $allowed_quote_modifiers,
+        $quote_starting_tok, $quote_here_target_2,
+    );
 
     # TV4: SCALARS for multi-line identifiers and
     # statements. These are initialized with a subroutine call
@@ -2058,6 +2072,8 @@ sub prepare_for_a_new_file {
         $quoted_string_1         = EMPTY_STRING;
         $quoted_string_2         = EMPTY_STRING;
         $allowed_quote_modifiers = EMPTY_STRING;
+        $quote_starting_tok      = EMPTY_STRING;
+        $quote_here_target_2     = undef;
 
         # TV4:
         $id_scan_state = EMPTY_STRING;
@@ -2097,6 +2113,7 @@ sub prepare_for_a_new_file {
             $rbrace_type,
             $rcurrent_depth,
             $rcurrent_sequence_number,
+            $ris_lexical_sub,
             $rdepth_array,
             $ris_block_function,
             $ris_block_list_function,
@@ -2138,10 +2155,11 @@ sub prepare_for_a_new_file {
         ];
 
         my $rTV3 = [
-            $in_quote,        $quote_type,
-            $quote_character, $quote_pos,
-            $quote_depth,     $quoted_string_1,
-            $quoted_string_2, $allowed_quote_modifiers,
+            $in_quote,           $quote_type,
+            $quote_character,    $quote_pos,
+            $quote_depth,        $quoted_string_1,
+            $quoted_string_2,    $allowed_quote_modifiers,
+            $quote_starting_tok, $quote_here_target_2,
         ];
 
         my $rTV4 = [ $id_scan_state, $identifier, $want_paren ];
@@ -2178,6 +2196,7 @@ sub prepare_for_a_new_file {
             $rbrace_type,
             $rcurrent_depth,
             $rcurrent_sequence_number,
+            $ris_lexical_sub,
             $rdepth_array,
             $ris_block_function,
             $ris_block_list_function,
@@ -2218,8 +2237,11 @@ sub prepare_for_a_new_file {
         ) = @{$rTV2};
 
         (
-            $in_quote, $quote_type, $quote_character, $quote_pos, $quote_depth,
-            $quoted_string_1, $quoted_string_2, $allowed_quote_modifiers,
+            $in_quote,           $quote_type,
+            $quote_character,    $quote_pos,
+            $quote_depth,        $quoted_string_1,
+            $quoted_string_2,    $allowed_quote_modifiers,
+            $quote_starting_tok, $quote_here_target_2,
         ) = @{$rTV3};
 
         ( $id_scan_state, $identifier, $want_paren ) = @{$rTV4};
@@ -2353,14 +2375,7 @@ EOM
 
     my %matching_start_token = ( '}' => '{', ']' => '[', ')' => '(' );
 
-    # These block types terminate statements and do not need a trailing
-    # semicolon
-    # patched for SWITCH/CASE/
-    my %is_zero_continuation_block_type;
     my @q;
-    @q = qw( } { BEGIN END CHECK INIT AUTOLOAD DESTROY UNITCHECK continue ;
-      if elsif else unless while until for foreach switch case given when );
-    @is_zero_continuation_block_type{@q} = (1) x scalar(@q);
 
     my %is_logical_container;
     @q = qw( if elsif unless while and or err not && ! || for foreach );
@@ -2435,9 +2450,6 @@ EOM
     # in the form:
     # keyword ( .... ) { BLOCK }
     # patch for SWITCH/CASE: added 'switch' 'case' 'given' 'when'
-    # NOTE for --use-feature=class: if ADJUST blocks eventually take a
-    # parameter list, then ADJUST might need to be added to this list (see
-    # perlclass.pod)
     my %is_blocktype_with_paren;
     @q =
       qw(if elsif unless while until for foreach switch case given when catch);
@@ -2959,7 +2971,7 @@ EOM
             )
           )
         {
-            # Let let full scanner handle multi-digit integers beginning with
+            # Let the full scanner handle multi-digit integers beginning with
             # '0' because there could be error messages.  For example, '009' is
             # not a valid number.
 
@@ -3392,6 +3404,8 @@ EOM
         $in_quote                = 1;
         $type                    = 'Q';
         $allowed_quote_modifiers = EMPTY_STRING;
+        $quote_starting_tok      = $tok;
+        $quote_here_target_2     = undef;
         return;
     } ## end sub do_QUOTATION_MARK
 
@@ -3405,6 +3419,8 @@ EOM
         $in_quote                = 1;
         $type                    = 'Q';
         $allowed_quote_modifiers = EMPTY_STRING;
+        $quote_starting_tok      = $tok;
+        $quote_here_target_2     = undef;
         return;
     } ## end sub do_APOSTROPHE
 
@@ -3418,6 +3434,8 @@ EOM
         $in_quote                = 1;
         $type                    = 'Q';
         $allowed_quote_modifiers = EMPTY_STRING;
+        $quote_starting_tok      = $tok;
+        $quote_here_target_2     = undef;
         return;
     } ## end sub do_BACKTICK
 
@@ -3455,6 +3473,8 @@ EOM
             $in_quote                = 1;
             $type                    = 'Q';
             $allowed_quote_modifiers = $quote_modifiers{'m'};
+            $quote_starting_tok      = 'm';
+            $quote_here_target_2     = undef;
         }
         else {    # not a pattern; check for a /= token
 
@@ -3582,9 +3602,19 @@ EOM
         # curly braces we have: hash index container, anonymous
         # hash reference, or code block.
 
+        # Patch for Object::Pad "field $var BLOCK"
+        if (   $statement_type eq 'field'
+            && $last_last_nonblank_token eq 'field'
+            && $last_nonblank_type eq 'i'
+            && $last_last_nonblank_type eq 'k' )
+        {
+            $type       = '{';
+            $block_type = $statement_type;
+        }
+
         # non-structural (hash index) curly brace pair
         # get marked 'L' and 'R'
-        if ( is_non_structural_brace() ) {
+        elsif ( is_non_structural_brace() ) {
             $type = 'L';
 
             # patch for SWITCH/CASE:
@@ -3604,10 +3634,30 @@ EOM
         # distinguished by 'block_type',
         # which will be blank for an anonymous hash
         else {
-
             $block_type =
               $self->code_block_type( $i_tok, $rtokens, $rtoken_type,
                 $max_token_index );
+
+            # Is a new lexical sub looking for its block sequence number?
+            # This is indicated with a special '911' signal.
+            if (   $block_type
+                && $ris_lexical_sub->{911}
+                && $last_nonblank_type eq 'S'
+                && substr( $block_type, 0, 3 ) eq 'sub' )
+            {
+                my ( $subname, $package ) = @{ $ris_lexical_sub->{911} };
+                if (   $block_type =~ /^sub $subname/
+                    && $is_my_our_state{$last_last_nonblank_token} )
+                {
+                    $ris_lexical_sub->{$subname}->{$package} =
+                      $next_sequence_number;
+                }
+
+                # Turn the signal off, even if we did not find the block being
+                # sought - it may not exist if the sub statement was a simple
+                # declaration without a block definition.
+                $ris_lexical_sub->{911} = undef;
+            }
 
             # patch to promote bareword type to function taking block
             if (   $block_type
@@ -3776,6 +3826,8 @@ EOM
             $in_quote                = 1;
             $type                    = 'Q';
             $allowed_quote_modifiers = $quote_modifiers{'m'};
+            $quote_starting_tok      = 'm';
+            $quote_here_target_2     = undef;
         }
         else {
             ( $type_sequence, $indent_flag ) =
@@ -4425,8 +4477,10 @@ EOM
             # (see 'signatures.t' for good examples)
             $in_quote                = $quote_items{'q'};
             $allowed_quote_modifiers = $quote_modifiers{'q'};
+            $quote_starting_tok      = 'q';
             $type                    = 'q';
             $quote_type              = 'q';
+            $quote_here_target_2     = undef;
             return 1;
         }
 
@@ -4636,6 +4690,8 @@ EOM
         }
         $in_quote                = $quote_items{$tok};
         $allowed_quote_modifiers = $quote_modifiers{$tok};
+        $quote_starting_tok      = $tok;
+        $quote_here_target_2     = undef;
 
         # All quote types are 'Q' except possibly qw quotes.
         # qw quotes are special in that they may generally be trimmed
@@ -4901,6 +4957,23 @@ EOM
               $self->find_next_nonblank_token( $i, $rtokens, $max_token_index );
         }
 
+        # Fix for git #182: If --use-feature=class is set, then
+        # a colon between words 'ADJUST' and 'params', and on the same line,
+        # does not form the label 'ADJUST:'. It will get marked as type 'A'.
+        my $is_not_label;
+        if (   $tok eq 'ADJUST'
+            && $is_code_block_token{$tok}
+            && $rtokens->[$i_next] eq ':'
+            && $i_next < $max_token_index )
+        {
+            my $i_next2 =
+              $rtoken_type->[ $i_next + 1 ] eq 'b' ? $i_next + 2 : $i_next + 1;
+            $is_not_label =
+              (      $i_next2 <= $max_token_index
+                  && $rtoken_type->[$i_next2] eq 'w'
+                  && $rtokens->[$i_next2] eq 'params' );
+        }
+
         # a bare word immediately followed by :: is not a keyword;
         # use $tok_kw when testing for keywords to avoid a mistake
         my $tok_kw = $tok;
@@ -4913,6 +4986,49 @@ EOM
         if ( $self->[_in_attribute_list_] ) {
             my $is_attribute = $self->do_ATTRIBUTE_LIST($next_nonblank_token);
             return if ($is_attribute);
+        }
+
+        #-----------------------------------------
+        # Preliminary check for a lexical sub name
+        #-----------------------------------------
+        my $is_lexical_sub_type;
+
+        # Has this name been seen as a lexical sub?
+        if ( my $rseqno_hash = $ris_lexical_sub->{$tok_kw} ) {
+
+            # Look back up the stack to see if it is still in scope.
+            # Use the deepest we find if there are multiple versions.
+            my @seqno_tested;
+            my $cd_aa = $rcurrent_depth->[BRACE];
+            foreach my $cd ( reverse( 0 .. $cd_aa ) ) {
+                my $p_seqno =
+                    $cd
+                  ? $rcurrent_sequence_number->[BRACE]->[$cd]
+                  : SEQ_ROOT;
+
+                push @seqno_tested, $p_seqno;
+
+                # Lexical subs use their containing sequence number as package
+                if ( my $seqno_brace = $rseqno_hash->{$p_seqno} ) {
+
+                    # This sub is in scope .. lookup its type
+                    $is_lexical_sub_type =
+                        $ris_constant->{$p_seqno}->{$tok_kw}            ? 'C'
+                      : $ris_block_function->{$p_seqno}->{$tok_kw}      ? 'G'
+                      : $ris_block_list_function->{$p_seqno}->{$tok_kw} ? 'G'
+                      : $ris_user_function->{$p_seqno}->{$tok_kw}       ? 'U'
+                      :                                                   'U';
+
+                    # But lexical subs do not apply within their defining code
+                    foreach (@seqno_tested) {
+                        next if ( $_ != $seqno_brace );
+                        $is_lexical_sub_type = undef;
+                        last;
+                    }
+
+                    last;
+                }
+            }
         }
 
         #----------------------------------------
@@ -5092,6 +5208,12 @@ EOM
             $self->do_USE_CONSTANT();
         }
 
+        # Lexical sub names override keywords, labels.  Based on testing,
+        # this seems to be the correct location for this check.
+        elsif ($is_lexical_sub_type) {
+            $type = $is_lexical_sub_type;
+        }
+
         # various quote operators
         elsif ( $is_q_qq_qw_qx_qr_s_y_tr_m{$tok} ) {
             $self->do_QUOTE_OPERATOR();
@@ -5100,6 +5222,7 @@ EOM
         # check for a statement label
         elsif (
                ( $next_nonblank_token eq ':' )
+            && !$is_not_label
             && ( $rtokens->[ $i_next + 1 ] ne ':' )
             && ( $i_next <= $max_token_index )    # colon on same line
 
@@ -5123,7 +5246,14 @@ EOM
             # Update for --use-feature=class (rt145706):
             # We have to be extra careful to avoid misparsing other uses of
             # 'method' in older scripts.
-            if ( $tok_kw eq 'method' && $guess_if_method ) {
+            if (
+                   $tok_kw eq 'method'
+                && $guess_if_method
+
+                # Patch for Object::Pad lexical method like 'method $var {'
+                && !( $next_nonblank_token eq '$' && new_statement_ok() )
+              )
+            {
                 if (   $expecting == OPERATOR
                     || $next_nonblank_token !~ /^[\w\:]/
                     || !$self->method_ok_here() )
@@ -5186,7 +5316,6 @@ EOM
             $self->[ $is_END_DATA{$tok_kw} ] = 1;
             $is_last = 1;                          ## is last token on this line
         }
-
         elsif ( $is_keyword{$tok_kw} ) {
             $self->do_KEYWORD();
         }
@@ -5289,6 +5418,40 @@ EOM
 
     } ## end sub do_BAREWORD
 
+    # Table of quote types checked for interpolated here targets.
+    # Issue 310 has extensive test cases.
+    my %is_interpolated_quote = (
+        q{'} => 0,
+        q{`} => 1,
+        q{"} => 1,
+        qq   => 1,
+        qx   => 1,
+        m    => 1,
+        qr   => 1,
+        q    => 0,
+        qw   => 0,
+        s    => 1,
+        y    => 0,
+        tr   => 0,
+    );
+
+    sub push_here_targets {
+        my ($rht) = @_;
+
+        # Push here targets found in a quote onto the here target list
+        push @{$rhere_target_list}, @{$rht};
+
+        # Change type from 'Q' to 'h' for quotes with here-doc targets so that
+        # the formatter (see sub process_line_of_CODE) will not make any line
+        # breaks after this point.
+        $type = 'h';
+        if ( $i_tok < 0 ) {
+            my $ilast = $routput_token_list->[-1];
+            $routput_token_type->[$ilast] = $type;
+        }
+        return;
+    } ## end sub push_here_targets
+
     sub do_FOLLOW_QUOTE {
 
         my $self = shift;
@@ -5296,11 +5459,16 @@ EOM
         # Continue following a quote on a new line
         $type = $quote_type;
 
-        if ( !@{$routput_token_list} ) {    # initialize if continuation line
+        # initialize if continuation line
+        if ( !@{$routput_token_list} ) {
             push( @{$routput_token_list}, $i );
             $routput_token_type->[$i] = $type;
-
         }
+
+        # Save starting lengths for here target search
+        my $len_qs1        = length($quoted_string_1);
+        my $len_qs2        = length($quoted_string_2);
+        my $in_quote_start = $in_quote;
 
         # scan for the end of the quote or pattern
         (
@@ -5328,11 +5496,100 @@ EOM
 
         );
 
-        # all done if we didn't find it
+        # Save pattern and replacement text for rescanning for /e
+        my $qs1_for_e_scan = $quoted_string_1;
+
+        # Check for possible here targets in an interpolated quote
+        if (   $is_interpolated_quote{$quote_starting_tok}
+            && $in_quote < $in_quote_start )
+        {
+
+            # post any saved target of a 2-part quote if the end is reached
+            if ( !$in_quote && defined($quote_here_target_2) ) {
+
+                # Safety check
+                if ( $quote_items{$quote_starting_tok} == 2 ) {
+                    push_here_targets($quote_here_target_2);
+                }
+                else {
+                    DEVEL_MODE
+                      && $self->Fault(
+"unexpected saved here target near line $input_line_number\n"
+                      );
+                }
+                $quote_here_target_2 = undef;
+            }
+
+            # Single part quotes: use $quoted_string_1, and
+            #  $in_quote drops from 1 to 0 when the end is found
+            # Dual part quotes ('s'): first part is in $quoted_string_2, and
+            #  $in_quote:
+            #    drops from 2 to 1 when the the first part is found
+            #    drops 1 to 0 when the the second part is found
+            #    drops from 2 to 0 if both parts are found in this call
+            # The tricky part is that we must search for here targets whenever
+            # $in_quote drops, but we can only post here targets after the end
+            # of the last part is found (in_quote==0). See test 'here4.in'.
+            # Update c310 added interpolated here docs and has many test cases.
+
+            # Initialize for the normal case of a single quote
+            my $qs         = $quoted_string_1;
+            my $len_qs     = $len_qs1;
+            my $num_quotes = $in_quote_start - $in_quote;
+
+            # Dual part quotes (type 's') have first part in $quoted_string_2
+            if ( $in_quote_start == 2 ) {
+                $qs     = $quoted_string_2;
+                $len_qs = $len_qs2;
+            }
+
+            # Loop to search 1 or 2 quotes for here targets
+            foreach ( 1 .. $num_quotes ) {
+
+                # Perform quick tests to avoid a sub call:
+                my $pos_shift = rindex( $qs, '<<' );
+                if (
+
+                    # '<<' in the last line
+                    $pos_shift >= $len_qs
+
+                    # followed by a '}'
+                    && rindex( $qs, '}' ) > $pos_shift
+
+                    # preceded by '$' or '@'
+                    && (   rindex( $qs, '$', $pos_shift ) >= 0
+                        || rindex( $qs, '@', $pos_shift ) >= 0 )
+                  )
+                {
+
+                    # scan the quote for here targets
+                    my ( $rht, $qs_mod ) =
+                      $self->find_interpolated_here_targets( $qs, $len_qs );
+                    if ($rht) {
+
+                        # only post here targets when end of quote is found
+                        if ($in_quote) {
+                            $quote_here_target_2 = $rht;
+                        }
+                        else {
+                            push_here_targets($rht);
+
+                            # Replace the string with the modified version
+                            # in case it is re-scanned due to a /e modifier
+                            $qs1_for_e_scan = $qs_mod;
+                        }
+                    }
+                }
+
+                # re-initialize for next pass
+                $qs     = $quoted_string_1;
+                $len_qs = $len_qs1;
+            } ## end while ( $num_quotes-- > 0)
+        }
+
         if ($in_quote) { return }
 
-        # save pattern and replacement text for rescanning
-        my $qs1 = $quoted_string_1;
+        # All done with this quote...
 
         # re-initialize for next search
         $quote_character = EMPTY_STRING;
@@ -5357,26 +5614,16 @@ EOM
 
                 # For an 'e' quote modifier we must scan the replacement
                 # text for here-doc targets...
-                # but if the modifier starts a new line we can skip
+                # but if the modifier starts a new line we must skip
                 # this because either the here doc will be fully
                 # contained in the replacement text (so we can
-                # ignore it) or Perl will not find it.
-                # See test 'here2.in'.
-                if ( $saw_modifier_e && $i_tok >= 0 ) {
-
-                    my $rht = $self->scan_replacement_text($qs1);
-
-                    # Change type from 'Q' to 'h' for quotes with
-                    # here-doc targets so that the formatter (see sub
-                    # process_line_of_CODE) will not make any line
-                    # breaks after this point.
+                # ignore it) or Perl will not find it. The modifier will have a
+                # pretoken index $i=1 if it starts a new line, so we only look
+                # for a here doc if $i>1.  See test 'here2.in'.
+                if ( $saw_modifier_e && $i > 1 ) {
+                    my $rht = $self->scan_replacement_text($qs1_for_e_scan);
                     if ($rht) {
-                        push @{$rhere_target_list}, @{$rht};
-                        $type = 'h';
-                        if ( $i_tok < 0 ) {
-                            my $ilast = $routput_token_list->[-1];
-                            $routput_token_type->[$ilast] = $type;
-                        }
+                        push_here_targets($rht);
                     }
                 }
 
@@ -6189,11 +6436,13 @@ EOM
                 # it could also be bug introduced by programming change.  Perl
                 # silently accepts a 032 (^Z) and takes it as the end
                 elsif ( !$is_valid_token_type{$type_i} ) {
-                    my $val = ord($type_i);
-                    $self->warning(
+                    if ( !$self->[_in_error_] ) {
+                        my $val = ord($type_i);
+                        $self->warning(
 "unexpected character decimal $val ($type_i) in script\n"
-                    );
-                    $self->[_in_error_] = 1;
+                        );
+                        $self->[_in_error_] = 1;
+                    }
                 }
                 else {
                     # valid token type other than ; and t
@@ -6953,7 +7202,7 @@ sub code_block_type {
 
     # handle case of multiple '{'s
 
-# print "BLOCK_TYPE EXAMINING: type=$last_nonblank_type tok=$last_nonblank_token\n";
+#print "BLOCK_TYPE EXAMINING: type=$last_nonblank_type tok=$last_nonblank_token\n";
 
     if (   $last_nonblank_token eq '{'
         && $last_nonblank_type eq $last_nonblank_token )
@@ -7590,9 +7839,16 @@ sub check_final_nesting_depths {
         if ($cd_aa) {
             my $rsl = $rstarting_line_of_current_depth->[$aa]->[$cd_aa];
             my $sl  = $rsl->[0];
+
+            # Add hint for something like a missing terminal ':' of a ternary
+            my $hint = EMPTY_STRING;
+            if ( $cd_aa == 1 ) {
+                $hint =
+                  " (its closing $closing_brace_names[$aa] was not found)";
+            }
             my $msg = <<"EOM";
 Final nesting depth of $opening_brace_names[$aa]s is $cd_aa
-The most recent un-matched $opening_brace_names[$aa] is on line $sl
+The most recent un-matched $opening_brace_names[$aa] is on line $sl$hint
 EOM
             $self->indicate_error( $msg, @{$rsl}, '^' );
             $self->increment_brace_error();
@@ -8290,6 +8546,7 @@ sub scan_id_do {
     # find $i_beg = index of next nonblank token,
     # and handle empty lines
     my $blank_line          = 0;
+    my $is_lexical_method   = 0;
     my $next_nonblank_token = $rtokens->[$i_beg];
     if ( $i_beg > $max_token_index ) {
         $blank_line = 1;
@@ -8311,6 +8568,18 @@ sub scan_id_do {
                 $blank_line = 1;
             }
         }
+
+        # Patch for Object::Pad lexical method like 'method $var {':
+        # Skip past a '$'
+        if (  !$blank_line
+            && $next_nonblank_token eq '$'
+            && $id_scan_state eq 'method' )
+        {
+            ( $next_nonblank_token, $i_beg ) =
+              find_next_nonblank_token_on_this_line( $i_beg, $rtokens,
+                $max_token_index );
+            $is_lexical_method = 1;
+        }
     }
 
     # handle non-blank line; identifier, if any, must follow
@@ -8319,15 +8588,16 @@ sub scan_id_do {
         if ( $is_sub{$id_scan_state} ) {
             ( $i, $tok, $type, $id_scan_state ) = $self->do_scan_sub(
                 {
-                    input_line      => $input_line,
-                    i               => $i,
-                    i_beg           => $i_beg,
-                    tok             => $tok,
-                    type            => $type,
-                    rtokens         => $rtokens,
-                    rtoken_map      => $rtoken_map,
-                    id_scan_state   => $id_scan_state,
-                    max_token_index => $max_token_index,
+                    input_line        => $input_line,
+                    i                 => $i,
+                    i_beg             => $i_beg,
+                    tok               => $tok,
+                    type              => $type,
+                    rtokens           => $rtokens,
+                    rtoken_map        => $rtoken_map,
+                    id_scan_state     => $id_scan_state,
+                    max_token_index   => $max_token_index,
+                    is_lexical_method => $is_lexical_method,
                 }
             );
         }
@@ -9143,7 +9413,7 @@ sub do_scan_package {
         # current id_scan_state and token, and returns an updated
         # id_scan_state and the next index after the identifier.
 
-        # This routine now serves a a backup for sub scan_simple_identifier
+        # This routine now serves a backup for sub scan_simple_identifier
         # which handles most identifiers.
 
         # Note that $self must be a 'my' variable and not be a closure
@@ -9409,15 +9679,6 @@ EOM
 
 {    ## closure for sub do_scan_sub
 
-    my %warn_if_lexical;
-
-    BEGIN {
-
-        # lexical subs with these names can cause parsing errors in this version
-        my @q = qw( m q qq qr qw qx s tr y );
-        @warn_if_lexical{@q} = (1) x scalar(@q);
-    } ## end BEGIN
-
     # saved package and subnames in case prototype is on separate line
     my ( $package_saved, $subname_saved );
 
@@ -9447,6 +9708,8 @@ EOM
         my $rtoken_map      = $rcall_hash->{rtoken_map};
         my $id_scan_state   = $rcall_hash->{id_scan_state};
         my $max_token_index = $rcall_hash->{max_token_index};
+
+        my $id_prefix = $rcall_hash->{is_lexical_method} ? '$' : EMPTY_STRING;
 
         # Parse a sub name and prototype.
 
@@ -9520,30 +9783,46 @@ EOM
         {
             $match   = 1;
             $subname = $2;
-
-            my $is_lexical_sub =
-              $last_nonblank_type eq 'k' && $last_nonblank_token eq 'my';
+            my $is_lexical_sub = $last_nonblank_type eq 'k'
+              && $is_my_our_state{$last_nonblank_token};
             if ( $is_lexical_sub && $1 ) {
-                $self->warning("'my' sub $subname cannot be in package '$1'\n");
+                $self->warning(
+"'$last_nonblank_token' sub $subname cannot be in package '$1'\n"
+                );
                 $is_lexical_sub = 0;
             }
 
             if ($is_lexical_sub) {
 
-                # lexical subs use the block sequence number as a package name
+                # Lexical subs use the containing block sequence number as a
+                # package name.
                 my $seqno =
                   $rcurrent_sequence_number->[BRACE]
                   ->[ $rcurrent_depth->[BRACE] ];
-                $seqno   = 1 if ( !defined($seqno) );
+                $seqno   = SEQ_ROOT if ( !defined($seqno) );
                 $package = $seqno;
-                if ( $warn_if_lexical{$subname} ) {
-                    $self->warning(
-"'my' sub '$subname' matches a builtin name and may not be handled correctly in this perltidy version.\n"
-                    );
 
-                    # This may end badly, it is safest to block formatting
-                    # For an example, see perl527/lexsub.t (issue c203)
-                    $self->[_in_trouble_] = 1;
+                # The value will eventually be the sequence number of the
+                # opening curly brace of the definition (if any). We use -1
+                # until we find it.
+                $ris_lexical_sub->{$subname}->{$package} = -1;
+
+                # Set a special signal to tell sub do_LEFT_CURLY_BRACKET to
+                # update this value if the next opening sub block brace is for
+                # this sub.  The reason we need this value is to avoid applying
+                # this new sub in its own definition block.  Note that '911' is
+                # not a possible sub name. Search for '911' for related code.
+                $ris_lexical_sub->{911} = [ $subname, $package ];
+
+                # Complain if lexical sub name hides a quote operator
+                if ( $is_q_qq_qw_qx_qr_s_y_tr_m{$subname} ) {
+                    $self->complain(
+                        "'my' sub '$subname' matches a builtin quote operator\n"
+                    );
+                    ## OLD CODING, before improved handling of lexical subs:
+                    ## This may end badly, it is safest to avoid formatting.
+                    ## For an example, see perl527/lexsub.t (issue c203)
+                    ## $self->[_in_trouble_] = 1;
                 }
             }
             else {
@@ -9555,7 +9834,7 @@ EOM
 
             my $pos  = pos($input_line);
             my $numc = $pos - $pos_beg;
-            $tok  = 'sub ' . substr( $input_line, $pos_beg, $numc );
+            $tok = 'sub ' . $id_prefix . substr( $input_line, $pos_beg, $numc );
             $type = 'S';    ## Fix for c250, was 'i';
 
             # remember the sub name in case another call is needed to
@@ -9572,7 +9851,7 @@ EOM
 
         # NOTE: We only want to parse PROTOTYPES here. If we see anything that
         # does not look like a prototype, we assume it is a SIGNATURE and we
-        # will stop and let the the standard tokenizer handle it.  In
+        # will stop and let the standard tokenizer handle it.  In
         # particular, we stop if we see any nested parens, braces, or commas.
         # Also note, a valid prototype cannot contain any alphabetic character
         #  -- see https://perldoc.perl.org/perlsub
@@ -10643,6 +10922,152 @@ sub do_quote {
     );
 } ## end sub do_quote
 
+use constant DEBUG_FIND_INTERPOLATED_HERE_TARGETS => 0;
+
+sub find_interpolated_here_targets {
+    my ( $self, $quoted_string, $len_starting_lines ) = @_;
+
+    # Search for here targets in a quoted string
+    # Given:
+    #   $quoted_string = the complete string of an interpolated quote
+    #   $len_starting_lines = number of characters of the first n-1 lines
+    #      (=0 if this is a single-line quote)
+    # Task:
+    #   Find and return a list of all here targets on the last line;
+    #   i.e., if here target is index ii, we only return the
+    #   target if $rmap->[$ii]>=$len_starting_lines
+
+    #  The items returned are the format needed for @{$rhere_target_list};
+    #  [ $here_doc_target, $here_quote_character ]
+    #  there can be multiple here targets.
+
+    my $rht;
+
+    # Break the entire quote into pre-tokens, even if multi-line, because we
+    # have to determine which parts are in single quotes
+    my ( $rtokens, $rmap, $rtoken_type ) = pre_tokenize($quoted_string);
+    my $max_ii = @{$rtokens} - 1;
+
+    # Depth of braces controlled by a sigil
+    my $code_depth = 0;
+
+    # Loop over pre-tokens
+    my $ii = -1;
+    while ( ++$ii <= $max_ii ) {
+        my $token = $rtokens->[$ii];
+        if (DEBUG_FIND_INTERPOLATED_HERE_TARGETS) {
+            print "i=$ii tok=$token block=$code_depth\n";
+        }
+
+        if ( $token eq BACKSLASH ) {
+            if ( !$code_depth ) { $ii++ }
+            next;
+        }
+
+        # Look for start of interpolation code block, '${', '@{', '$var{', etc
+        if ( !$code_depth ) {
+            if ( $token eq '$' || $token eq '@' ) {
+
+                $ii++
+                  if ( $ii < $max_ii && $rtoken_type->[ $ii + 1 ] eq 'b' );
+
+                while (
+                    $ii < $max_ii
+                    && (   $rtoken_type->[ $ii + 1 ] eq 'w'
+                        || $rtoken_type->[ $ii + 1 ] eq '::' )
+                  )
+                {
+                    $ii++;
+                } ## end while ( $ii < $max_ii && ...)
+
+                $ii++
+                  if ( $ii < $max_ii && $rtoken_type->[ $ii + 1 ] eq 'b' );
+
+                if ( $ii < $max_ii && $rtokens->[ $ii + 1 ] eq '{' ) {
+                    $ii++;
+                    $code_depth++;
+                }
+            }
+            next;
+        }
+
+        # Continue interpolating while $code_depth > 0..
+        if ( $token eq '{' ) {
+            $code_depth++;
+            next;
+        }
+        if ( $token eq '}' ) {
+            $code_depth--;
+            next;
+        }
+
+        # Look for '<<'
+        if (   $token ne '<'
+            || $ii >= $max_ii - 1
+            || $rtokens->[ $ii + 1 ] ne '<' )
+        {
+            next;
+        }
+
+        # Remember the location of the first '<' so it can be modified
+        my $ii_left_shift = $ii;
+
+        $ii++;
+
+        # or '<<~'
+        if ( $rtoken_type->[ $ii + 1 ] eq '~' && $ii < $max_ii - 2 ) {
+            $ii++;
+        }
+
+        # blanks ok before targets in quotes
+        my $saw_blank;
+        if ( $rtoken_type->[ $ii + 1 ] eq 'b' && $ii < $max_ii - 2 ) {
+            $saw_blank = 1;
+            $ii++;
+        }
+
+        my $next_type = $rtoken_type->[ $ii + 1 ];
+
+        # Look for unquoted targets like "${ \<<END1 }"
+        if ( $next_type eq 'w' ) {
+            if ($saw_blank) {
+                ## error: blank target is deprecated
+            }
+            else {
+                $ii++;
+                if ( $rmap->[$ii] >= $len_starting_lines ) {
+                    push @{$rht}, [ $rtokens->[$ii], EMPTY_STRING ];
+
+                    # Modify the string so the target is not found again
+                    my $pos_left_shift = $rmap->[$ii_left_shift];
+                    substr( $quoted_string, $pos_left_shift,     1, SPACE );
+                    substr( $quoted_string, $pos_left_shift + 1, 1, SPACE );
+                }
+            }
+        }
+
+        # Look for quoted targets like  "${ \<< 'END1' }${ \<<\"END2\" }";
+        elsif ( $next_type eq "'" || $next_type eq '"' || $next_type eq '`' ) {
+            my $quote_char = $next_type;
+            $ii++;
+            my $here_target = EMPTY_STRING;
+            while ( ++$ii <= $max_ii && $rtokens->[$ii] ne $quote_char ) {
+                next
+                  if ( $quote_char ne "'" && $rtokens->[$ii] eq BACKSLASH );
+                $here_target .= $rtokens->[$ii];
+            }
+            if ( $rmap->[$ii] >= $len_starting_lines ) {
+                push @{$rht}, [ $here_target, $quote_char ];
+            }
+        }
+        else {
+            ## no here target found
+        }
+        next;
+    } ## end while ( ++$ii <= $max_ii )
+    return ( $rht, $quoted_string );
+} ## end sub find_interpolated_here_targets
+
 # Some possible non-word quote delimiters, for preliminary checking
 my %is_punct_char;
 
@@ -11232,7 +11657,8 @@ BEGIN {
     );
     @can_start_digraph{@q} = (1) x scalar(@q);
 
-    my @trigraphs = qw( ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.= <<~ );
+    my @trigraphs =
+      qw( ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.= <<~ ^^= );
     @is_trigraph{@trigraphs} = (1) x scalar(@trigraphs);
 
     my @tetragraphs = qw( <<>> );
@@ -11284,6 +11710,13 @@ BEGIN {
       when      default  catch try    finally
     );
     @is_code_block_token{@q} = (1) x scalar(@q);
+
+    # These block types terminate statements and do not need a trailing
+    # semicolon; patched for SWITCH/CASE/;  This may be updated in sub
+    # check_options.
+    @q = qw( } { BEGIN END CHECK INIT AUTOLOAD DESTROY UNITCHECK continue ;
+      if elsif else unless while until for foreach switch case given when );
+    @is_zero_continuation_block_type{@q} = (1) x scalar(@q);
 
     # Note: this hash was formerly named '%is_not_zero_continuation_block_type'
     # to contrast it with the block types in '%is_zero_continuation_block_type'

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 keywords:
   - efl
   - enlightenment
@@ -25,5 +25,5 @@ no_index:
 requires: {}
 resources:
   repository: https://github.com/MaxPerl/Perl-Efl
-version: '0.75'
+version: '0.76'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

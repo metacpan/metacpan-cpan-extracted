@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 use 5.020;
 use Moo;
@@ -16,6 +16,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp is_equal);
 use Carp 'croak';
 use Safe::Isa;
@@ -251,6 +253,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   # as they are identical."
   my %seen_path;
   foreach my $path (sort keys(($schema->{paths}//{})->%*)) {
+    next if $path =~ '^x-';
     my %seen_names;
     foreach my $name ($path =~ m!\{([^}]+)\}!g) {
       if (++$seen_names{$name} == 2) {
@@ -281,6 +284,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     my %seen_url;
 
     foreach my $server_idx (0 .. $servers->$#*) {
+      if ($servers->[$server_idx]{url} =~ m{(?:/$|\?|#)}) {
+        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'url') },
+          'server url cannot end in / or contain query or fragment components');
+        next;
+      }
+
       my $normalized = $servers->[$server_idx]{url} =~ s/\{[^}]+\}/\x00/r;
       # { for the editor
       my @url_variables = $servers->[$server_idx]{url} =~ /\{([^}]+)\}/g;
@@ -292,28 +301,29 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       $seen_url{$normalized} = $servers->[$server_idx]{url};
 
       my $variables_obj = $servers->[$server_idx]{variables};
-      if (@url_variables and not $variables_obj) {
+      if (not $variables_obj) {
         # missing 'variables': needs variables/$varname/default
         ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx) },
-          '"variables" property is required for templated server urls');
+          '"variables" property is required for templated server urls') if @url_variables;
         next;
       }
 
-      next if not $variables_obj;
+      my %seen_names;
+      foreach my $name (@url_variables) {
+        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx) },
+            'duplicate servers template variable "%s"', $name)
+          if ++$seen_names{$name} == 2;
 
-      foreach my $varname (keys $variables_obj->%*) {
-        if (exists $variables_obj->{$varname}{enum}
-            and not grep $variables_obj->{$varname}{default} eq $_, $variables_obj->{$varname}{enum}->@*) {
-          ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default') },
-            'servers default is not a member of enum');
-        }
+        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables') },
+            'missing "variables" definition for servers template variable "%s"', $name)
+          if $seen_names{$name} == 1 and not exists $variables_obj->{$name};
       }
 
-      if (@url_variables
-          and my @missing_definitions = grep !exists $variables_obj->{$_}, @url_variables) {
-        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables') },
-          'missing "variables" definition for templated variable%s "%s"',
-          @missing_definitions > 1 ? 's' : '', join('", "', @missing_definitions));
+      foreach my $varname (keys $variables_obj->%*) {
+        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default') },
+            'servers default is not a member of enum')
+          if exists $variables_obj->{$varname}{enum}
+            and not grep $variables_obj->{$varname}{default} eq $_, $variables_obj->{$varname}{enum}->@*;
       }
     }
   }
@@ -502,7 +512,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 SYNOPSIS
 
@@ -523,8 +533,7 @@ Provides structured parsing of an OpenAPI document, suitable as the base for mor
 request and response validation, code generation or form generation.
 
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
-L<https://spec.openapis.org/oas/3.1/schema-base/2024-10-25>.
-
+L<https://spec.openapis.org/oas/3.1/schema-base/2024-10-25>
 and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1>.
 
 =for Pod::Coverage THAW DEFAULT_BASE_METASCHEMA DEFAULT_DIALECT DEFAULT_METASCHEMA DEFAULT_SCHEMAS
@@ -544,7 +553,8 @@ The actual raw data representing the OpenAPI document. Required.
 A L<JSON::Schema::Modern> object. Unlike in the parent class, this is B<REQUIRED>, because loaded
 vocabularies, metaschemas and resource identifiers must be stored here as they are discovered in the
 OpenAPI document. This is the object that will be used for subsequent evaluation of data against
-schemas in the document, either manually or perhaps via a web framework plugin (coming soon).
+schemas in the document, either manually or perhaps via a web framework plugin
+(see L<Mojo::Plugin::OpenAPI::Modern>).
 
 =head2 canonical_uri
 
@@ -564,7 +574,7 @@ Overrides the value of C<jsonSchemaDialect> in the document, or the specificatio
 (C<https://spec.openapis.org/oas/3.1/dialect/base>).
 
 If you specify your own dialect here or in C<jsonSchemaDialect>, then you need to add the
-vocabularies and schemas to the implementation yourself. (see C<JSON::Schema::Modern/add_vocabulary>
+vocabularies and schemas to the implementation yourself (see C<JSON::Schema::Modern/add_vocabulary>
 and C<JSON::Schema::Modern/add_schema>).
 
 Note this is B<NOT> the same as L<JSON::Schema::Modern::Document/metaschema_uri>

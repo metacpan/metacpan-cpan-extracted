@@ -1,3 +1,27 @@
+1.002 - 16 Jun 2025
+=====
+
+ - expose all of the boolean decoder hints.
+
+ - re-work to take better advantage of ExtUtils::ParseXS's support for
+   C++ (hopefully no functional changes)
+
+ - rename decoder and result object accessors to match the C++ APIs,
+   this is mostly from like_this() to likeThis().  The old method
+   names continue to be available for now but they are now silently
+   deprecated.
+   They will start warning from some future release, and be removed
+   from some later release.
+
+   - "Codabar" decoding now returns the start and end markers by
+     default.  The method to control these was deprecated in 2.0 and
+     the default for zxing-cpp changed to return them by default in
+     2.3.0.
+
+  - implement encoding
+
+  - zxing-cpp 1.4.0 support is deprecated.
+
 1.001 - 13 Sep 2023
 =====
 

@@ -22,18 +22,18 @@ char *
 elm_config_icon_theme_get()
 
 void
-elm_config_icon_theme_set (theme)
+elm_config_icon_theme_set(theme)
     char *theme
 
 void
-elm_icon_thumb_set (obj, file, group)
+elm_icon_thumb_set(obj, file, group)
     EvasObject *obj
     char *file
     char *group
 
 # DEPRECATED
 # void
-# elm_icon_order_lookup_set (obj,order)
+# elm_icon_order_lookup_set(obj,order)
 #    EvasObject *obj
 #    int order
 
@@ -43,10 +43,10 @@ elm_icon_thumb_set (obj, file, group)
 #    EvasObject *obj
 
 Eina_Bool
-elm_icon_standard_set (obj,name)
+elm_icon_standard_set(obj,name)
     EvasObject *obj
     char *name
 
 char *
-elm_icon_standard_get (obj)
+elm_icon_standard_get(obj)
      EvasObject *obj

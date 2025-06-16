@@ -63,6 +63,13 @@ sub color_classes_list_get_pv {
 	return @array;
 }
 
+sub palette_list_pv {
+	my $list = palette_list();
+	my @array = pEFL::Eina::list2array($list,"String");
+	palette_list_free($list);
+	return @array;
+}
+
 package pEFL::Elm::Config::TextClass;
 
 our @ISA = qw(ElmTextClassPtr);

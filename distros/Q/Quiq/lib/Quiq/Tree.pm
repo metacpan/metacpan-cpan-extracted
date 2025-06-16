@@ -30,16 +30,86 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.226';
+our $VERSION = '1.227';
 
-use Quiq::AnsiColor;
 use Scalar::Util ();
+use Quiq::AnsiColor;
 
 # -----------------------------------------------------------------------------
 
 =head1 METHODS
 
 =head2 Klassenmethoden
+
+=head3 blessNodes() - Blesse Knotentypen auf bestimmte Klassen
+
+=head4 Synopsis
+
+  $class->blessNodes($ref,{$type=>$class,...});
+
+=head4 Arguments
+
+=over 4
+
+=item $ref
+
+Referenz auf hierarchische Datenstruktur
+
+=item {$type=>$class,...}
+
+Abbildung von Typ $type auf Klasse $class
+
+=back
+
+=head4 Description
+
+Durchlaufe die Datenstruktur $ref rekursiv und blesse Knoten
+vom Typ $type auf Klasse $class.
+
+=head4 Example
+
+  $class->blessNodes($ref,{
+      HASH => 'Quiq::Hash',
+      ARRAY => 'Quiq::Array',
+  });
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub blessNodes {
+    my ($class,$ref,$typeH) = @_;
+
+    my $type = Scalar::Util::reftype($ref);
+    if (!defined $type) { # Terminaler Knoten
+        # nichts tun
+        return;
+    }
+    if (my $nodeClass = $typeH->{$type}) {
+        $ref = bless $ref,$nodeClass;
+    }
+    if ($type eq 'HASH') {
+        for my $key (keys %$ref) {
+            $class->blessNodes($ref->{$key},$typeH);
+        }
+    }
+    elsif ($type eq 'ARRAY') {
+        for my $e (@$ref) {
+            $class->blessNodes($e,$typeH);
+        }
+    }
+    else {
+        $class->throw(
+            'TREE-00099: Unknown reference type',
+            Reference => "$ref",
+            Type => $type,
+        );
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 leafPaths() - Liste der Pfade
 
@@ -59,12 +129,12 @@ Referenz auf den Baum
 
 =head4 Returns
 
-(Array) Liste der Pfade. Im Skalarkontext wird eine Referenz auf die
+(Array of Pairs) Liste der Pfade. Im Skalarkontext wird eine Referenz auf die
 Liste geliefert.
 
 =head4 Description
 
-Liefere die Liste der Pfade zu den Blattknoten des Baums $ref.
+Liefere die Liste der Pfade [$path,$value] zu den Blattknoten des Baums $ref.
 Diese Liste ist nützlich, um die Zugriffspfade zu den Blattknoten
 zu ermitteln.
 
@@ -84,8 +154,8 @@ sub leafPaths {
     if (!defined $type) {
         $ref //= '';
         $ref =~ s/\n/\\n/g;
-        return "$path ".$a->str('cyan',$ref); # Pfad und terminaler skalarer Wert
-        # return [$path,$ref]; # ".$a->str('cyan',$ref); # Pfad und terminaler skalarer Wert
+        # return "$path ".$a->str('cyan',$ref); # Pfad und terminaler skalarer Wert
+        return [$path,$ref]; # ".$a->str('cyan',$ref); # Pfad und terminaler skalarer Wert
     }
     elsif ($type eq 'HASH') {
         for my $key (keys %$ref) {
@@ -198,6 +268,11 @@ Knoten zu entfernen, siehe $class->removeEmptyNodes().
 sub removeEmptyNodesRecursive {
     my $class = shift;
     my $ref = $_[0];
+
+    if (!defined $ref) {
+        # Kein Baum (mehr)
+        return 0;
+    }
 
     my $n = 0;
 
@@ -323,7 +398,7 @@ sub setLeafValue {
 
 =head1 VERSION
 
-1.226
+1.227
 
 =head1 AUTHOR
 

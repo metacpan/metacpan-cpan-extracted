@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING
 eg/README
 eg/test-prereq-meta
 inc/My/Module/Build.pm
@@ -12,6 +13,7 @@ MANIFEST
 META.json
 META.yml
 README
+SECURITY
 t/basic.t
 t/data/accept/lib/accept.pm
 t/data/accept/META.json

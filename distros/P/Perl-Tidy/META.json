@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008"
+            "perl" : "5.008001"
          }
       }
    },
@@ -47,6 +47,6 @@
          "web" : "https://github.com/perltidy/perltidy"
       }
    },
-   "version" : "20250311",
+   "version" : "20250616",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

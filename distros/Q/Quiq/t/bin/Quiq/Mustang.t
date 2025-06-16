@@ -26,6 +26,7 @@ sub test_unitTest: Test(3) {
     my $jarFile = '~/sys/opt/mustang/Mustang-CLI-2.16.2.jar';
     if (!$p->exists($jarFile)) {
         $self->skipAll('JAR-Datei nicht vorhanden');
+        return;
     }
 
     my $mus = Quiq::Mustang->new($jarFile);

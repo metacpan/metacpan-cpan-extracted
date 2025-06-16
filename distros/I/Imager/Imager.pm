@@ -149,7 +149,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     our @ISA = qw(Exporter);
   }
-  $VERSION = '1.027';
+  $VERSION = '1.028';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -2262,7 +2262,7 @@ sub filter {
 
   if (!$input{'type'}) { $self->{ERRSTR}='type parameter missing'; return undef; }
 
-  if ( (grep { $_ eq $input{'type'} } keys %filters) != 1) {
+  if (!exists $filters{$input{'type'}}) {
     $self->{ERRSTR}='type parameter not matching any filter'; return undef;
   }
 

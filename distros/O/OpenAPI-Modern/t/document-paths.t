@@ -7,6 +7,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use lib 't/lib';
@@ -28,11 +30,14 @@ subtest '/paths correctness' => sub {
         '/b/{a}/hi' => {},
         '/b/{b}/hi' => {},
         '/c/{c}/d/{c}/e/{e}/f/{e}' => {},
+        'x-{alpha}' => {},
+        'x-{beta}' => {},
+        'x-{foo}-{foo}' => {},
       },
     },
   );
 
-  cmp_deeply(
+  cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
       +{

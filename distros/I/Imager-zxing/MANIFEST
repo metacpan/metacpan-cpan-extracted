@@ -7,6 +7,7 @@ README
 t/00-use.t
 t/10-formats.t
 t/30-decode.t
+t/40-encode.t
 t/90-pod.t
 t/code39-FA158826-1bit.png
 t/code39-FA158826-8bit.png

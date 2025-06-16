@@ -27,11 +27,11 @@ is( $status->errstr, 'ambiguous name parameter', 'errstr ok' );
 
 is_deeply( [ $status->place_candidates ], [], 'place candidates ok' );
 is_deeply(
-	[ $status->name_candidates ],
+	[ map { $_->id_num . ' ' . $_->full_name } $status->name_candidates ],
 	[
-		'Essen, Alfred-Krupp-Schule',
-		'Essen, Alfredbrücke',
-		'Essen, Alfredusbad'
+		'20009114 Essen, Alfred-Krupp-Schule',
+		'20009113 Essen, Alfredbrücke',
+		'20009115 Essen, Alfredusbad',
 	],
 	'name candidates ok'
 );

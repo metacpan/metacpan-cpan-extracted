@@ -1,7 +1,7 @@
 {
    "abstract" : "Barcode scanning with libzxing-cpp",
    "author" : [
-      "Tony Cook <tonyc@cpan.org>"
+      "Tony Cook <tony@develop-help.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
@@ -37,8 +37,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Imager" : "1.015",
-            "XSLoader" : "0"
+            "Imager" : "1.015"
          }
       },
       "test" : {
@@ -59,6 +58,6 @@
          "web" : "https://github.com/tonycoz/imager-zxing/"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -2,8 +2,8 @@ NAME
     Clipboard::Any - Common interface to clipboard manager functions
 
 VERSION
-    This document describes version 0.014 of Clipboard::Any (from Perl
-    distribution Clipboard-Any), released on 2025-04-17.
+    This document describes version 0.015 of Clipboard::Any (from Perl
+    distribution Clipboard-Any), released on 2025-06-16.
 
 DESCRIPTION
     This module provides a common interface to interact with clipboard.
@@ -58,6 +58,10 @@ FUNCTIONS
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   chomp_newline => *bool*
+
+        Remove trailing newlines before adding item to clipboard.
 
     *   clipboard_manager => *str*
 

@@ -1,3 +1,12 @@
+0.015   2025-06-16  Released-By: PERLANCAR; Urgency: medium
+
+        [func add_clipboard_content]
+
+        - [ux] Add -t as shortcut for 'tee' argument.
+
+        - Add argument 'chomp_newline'.
+
+
 0.014   2025-04-17  Released-By: PERLANCAR; Urgency: high
 
         - [bugfix] Find qdbus in alternate location for other actions.

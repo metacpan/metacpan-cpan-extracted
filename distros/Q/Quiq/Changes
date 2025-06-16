@@ -1,3 +1,33 @@
+1.227 2025-06-15
+================
+
+[Quiq::Hash]
+* new(): Wenn Instntiierung via Referenz, den Hash unlocken
+* setDeep(): an die Logik von getDeep() angepasst
+
+[Quiq::Path]
+* getFirst(): Methode hinzugefügt
+* globExists(): Methode hinzugefügt
+
+[Quiq::StreamServe::Block]
+* Klasse hinzugefügt
+
+[Quiq::StreamServe::Stream]
+* Klasse überarbeitet
+
+[Quiq::Tree]
+*blessNodes(): Methode hinzugefügt
+
+[Quiq::Zugferd]
+* Neue Struktur für die statischen Dateien wie XSDs
+
+[Quiq::Zugferd2]
+* Überarbeitete Fassung der Klasse Quiq::Zugferd (wird diese zukünftig
+  ersetzen)
+
+[Quiq::Zugferd::Tree]
+* Klasse überarbeitet
+
 1.226 2025-05-25
 ================
 

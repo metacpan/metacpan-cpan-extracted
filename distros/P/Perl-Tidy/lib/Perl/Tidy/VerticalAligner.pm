@@ -5,7 +5,7 @@ use Carp;
 
 { #<<< A non-indenting brace to contain all lexical variables
 
-our $VERSION = '20250311';
+our $VERSION = '20250616';
 use English qw( -no_match_vars );
 use Scalar::Util 'refaddr';    # perl 5.8.1 and later
 use Perl::Tidy::VerticalAligner::Alignment;
@@ -536,7 +536,7 @@ BEGIN {
     @q = qw( if unless or || );
     @is_if_or{@q} = (1) x scalar(@q);
 
-    @q = qw( = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x= );
+    @q = qw( = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x= ^^= );
     @is_assignment{@q} = (1) x scalar(@q);
 
     @q = qw( => );
@@ -1988,7 +1988,7 @@ sub _flush_group_lines {
         initialize_for_new_rgroup();
         return unless ( @{$rlines} );    # shouldn't happen
 
-        # Unset the _end_group flag for the last line if it it set because it
+        # Unset the _end_group flag for the last line if it set because it
         # is not needed and can causes problems for -lp formatting
         $rall_lines->[-1]->{'end_group'} = 0;
 
@@ -3940,7 +3940,7 @@ sub prune_alignment_tree {
     #   ];
 
     # We can work to any depth, but there is little advantage to working
-    # to a a depth greater than 2
+    # to a depth greater than 2
     my $MAX_DEPTH = 2;
 
     # This arrays will hold the tree of alignment tokens at different depths

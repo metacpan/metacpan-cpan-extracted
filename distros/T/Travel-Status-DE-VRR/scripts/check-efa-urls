@@ -2,12 +2,14 @@
 
 export PERL5LIB=lib
 
-checks="BSVG Braunschweig Hbf
+checks="BEG Dachau Dachau Bahnhof
+BSVG Braunschweig Hbf
 DING Ulm Hbf
 KVV Karlsruhe Hbf
 LinzAG Linz/Donau Hbf
 MVV München Hackerbrücke
 NVBW Stuttgart Hbf (A.-Klett-Pl.)
+RVV Regensburg Hbf
 VAG Schallstadt Bf
 VGN Nürnberg Hbf
 VMV Schwerin Hbf

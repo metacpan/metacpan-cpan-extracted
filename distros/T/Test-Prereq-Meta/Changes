@@ -1,3 +1,12 @@
+0.004		2025-06-15	T. R. Wyant
+    Make work with Module::CoreList 2.13. This is the version that comes
+    with Perl 5.10.0. Required Module::CoreList 2.13 in metadata and
+    module, just to be safe.
+
+    Tell Makefile.PL not to pick up extraneous directories.
+
+    Harden metadata parse.
+
 0.003		2021-09-27	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

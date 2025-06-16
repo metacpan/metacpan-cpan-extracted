@@ -32,7 +32,7 @@ to precisely control the formatting details.
 
 ## Prerequisites
 
-Perltidy should run on any system with perl 5.008 or later.
+Perltidy should run on any system with perl v5.8.1 or later.
 The total disk space needed after removing the installation directory will be
 about 4 Mb.
 
@@ -70,6 +70,4 @@ are mainly for older systems but also tell how to use perltidy without doing an 
 
 ## FEEDBACK / BUG REPORTS
 
-The best place to report bugs and issues is [GitHub](https://github.com/perltidy/perltidy/issues)
-
-Bugs and issues can also be reported at the CPAN site [https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy](https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy)
+Bugs and issues can be reported at [GitHub](https://github.com/perltidy/perltidy/issues)

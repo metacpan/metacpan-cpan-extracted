@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.084-14-g9a84772
+package OpenAPI::Modern; # git description: v0.085-15-g62f85f4
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 use 5.020;
 use utf8;
@@ -17,6 +17,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use Carp 'croak';
 use Safe::Isa;
 use Ref::Util qw(is_plain_hashref is_plain_arrayref is_ref);
@@ -24,13 +26,13 @@ use List::Util qw(first pairs);
 use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
 use Encode 2.89 ();
-use URI::Escape ();
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
-use Types::Standard 'InstanceOf';
+use Types::Standard qw(InstanceOf Bool);
 use constant { true => JSON::PP::true, false => JSON::PP::false };
+use Mojo::Util 'url_unescape';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Storable 'dclone';
@@ -53,6 +55,13 @@ has evaluator => (
   isa => InstanceOf['JSON::Schema::Modern'],
   required => 1,
   handles => [ qw(get_media_type add_media_type) ],
+);
+
+our $DEBUG;
+has debug => (
+  is => 'ro',
+  isa => Bool,
+  default => $DEBUG,
 );
 
 around BUILDARGS => sub ($orig, $class, @args) {
@@ -326,6 +335,7 @@ sub find_path ($self, $options, $state = {}) {
   $state->{errors} = $options->{errors} //= [];
   $state->{annotations} //= [];
   $state->{depth} = 0;
+  $state->{debug} = $options->{debug} = {} if $DEBUG or $self->debug;
 
   # now guaranteed to be a Mojo::Message::Request
   if ($options->{request}) {
@@ -380,7 +390,7 @@ sub find_path ($self, $options, $state = {}) {
 
     if ($options->{method} and lc $options->{method} ne $method) {
       delete $options->{operation_id};
-      return E({ %$state, data_path => '/request/method', schema_path => $operation_path },
+      return E({ %$state, ($options->{request} ? ( data_path => '/request/method' ) : ()), schema_path => $operation_path },
         'wrong HTTP method "%s"', $options->{method});
     }
 
@@ -390,7 +400,7 @@ sub find_path ($self, $options, $state = {}) {
   # TODO: support passing $options->{operation_uri}
 
   # by now we will have extracted method from request or operation_id
-  return E({ %$state, data_path => '', exception => 1, recommended_response => [ 500 ] }, 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
+  return E({ %$state, exception => 1, recommended_response => [ 500 ] }, 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
     if not $options->{request}
       and not ($options->{path_template} and $method)
       and not $options->{operation_id};
@@ -425,21 +435,21 @@ sub find_path ($self, $options, $state = {}) {
     # templated components, except when the concrete component is a non-ascii character or matches
     # 0x7c (pipe), 0x7d (close-brace) or 0x7e (tilde)
     foreach my $pt (sort keys(($schema->{paths}//{})->%*)) {
-      $capture_values = $self->_match_uri($options->{request}->url, $pt);
+      $capture_values = $self->_match_uri($options->{request}->url, $pt, $state);
 
       # this might not be the intended match, as multiple templates can match the same URI
       $path_template = $pt, last if $capture_values;
     }
 
     return E({ %$state, data_path => '/request/uri/path', keyword => 'paths' }, 'no match found for request URI "%s"',
-        $options->{request}->url->clone->query(undef)->fragment(undef))
+        $options->{request}->url->clone->query('')->fragment(undef))
       if not $capture_values;
   }
 
   elsif ($options->{request}) {
     # we were passed path_template in options or we calculated it from operation_id, and now we
     # verify it against path_captures and the request URI.
-    $capture_values = $self->_match_uri($options->{request}->url, $path_template);
+    $capture_values = $self->_match_uri($options->{request}->url, $path_template, $state);
 
     if (not $capture_values) {
       delete $options->{operation_id};
@@ -529,7 +539,7 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
 # given a request uri and a path_template, check that these match, and extract capture values.
-sub _match_uri ($self, $uri, $path_template) {
+sub _match_uri ($self, $uri, $path_template, $state) {
   my $uri_path = $uri->path->to_string;
 
   # RFC9112 §3.2.1-3: "If the target URI's path component is empty, the client MUST send "/" as the
@@ -542,13 +552,17 @@ sub _match_uri ($self, $uri, $path_template) {
     map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
     split /(\{[^}]+\})/, $path_template;
 
+  # TODO: this will soon be the pattern for the entire uri, not the path
+  do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, '^'.$path_pattern.'$' }
+    if exists $state->{debug};
+
   # TODO: consider 'servers' fields when matching request URIs: this requires looking at
   # path prefixes present in server urls
   return if $uri_path !~ m/^$path_pattern$/;
 
   # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
   return [ map
-    Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
+    Encode::decode('UTF-8', url_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
       Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#- ];
 }
 
@@ -941,7 +955,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.085
+version 0.086
 
 =head1 SYNOPSIS
 
@@ -1064,20 +1078,25 @@ If construction of the object is not successful, for example the document has a 
 call to C<new()> will throw an exception, which will likely be a L<JSON::Schema::Modern::Result>
 object containing details.
 
+Unless otherwise noted, these are also available as read-only accessors.
+
 =head2 openapi_uri
 
 The URI that identifies the OpenAPI document; an alias to C<< ->openapi_document->canonical_uri >>.
 See L<JSON::Schema::Modern::Document::OpenAPI/canonical_uri>.
 Ignored if L</openapi_document> is provided.
 
-It is used at runtime as the base for absolute URIs used in L<JSON::Schema::Modern::Result> objects.
+This URI will be used at runtime to resolve relative URIs used in
+the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values, as well as used
+for locations in L<JSON::Schema::Modern::Result> objects (see below).
+
 The value of C<$self> in the document (if present) is resolved against this value.
 It is strongly recommended that this URI is absolute.
 
 =head2 openapi_schema
 
 The data structure describing the OpenAPI v3.1 document (as specified at
-L<https://spec.openapis.org/oas/v3.1>); an alias to C<< ->openapi_document->schema >>.
+L<https://spec.openapis.org/oas/v3.1.1>); an alias to C<< ->openapi_document->schema >>.
 See L<JSON::Schema::Modern::Document::OpenAPI/schema>.
 Ignored if L</openapi_document> is provided.
 
@@ -1090,24 +1109,16 @@ L</openapi_schema> B<MUST> be provided, and L</evaluator> will also be used if p
 =head2 evaluator
 
 The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema evaluation.
-Ignored if L</openapi_document> is provided. Optional.
+Ignored if L</openapi_document> is provided. Optional (a default is constructed when omitted).
 
-=head1 ACCESSORS/METHODS
+=head2 debug
 
-=head2 openapi_uri
+Boolean; defaults to false (can also be set via C<$DEBUG>).
 
-The URI that identifies the OpenAPI document. This URI will be used to resolve relative URIs used in
-the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values, as well as used
-for locations in L<JSON::Schema::Modern::Result> objects (see below).
+When set, useful diagnostic information is stored in the C<$options> hash used in public methods
+described below.
 
-=head2 openapi_schema
-
-The data structure describing the OpenAPI document. See L<the specification/https://spec.openapis.org/oas/v3.1>.
-
-=head2 openapi_document
-
-The L<JSON::Schema::Modern::Document::OpenAPI> document that holds the OpenAPI information to be
-used for validation.
+=head1 METHODS
 
 =head2 document_get
 
@@ -1118,10 +1129,6 @@ Proxies to L<JSON::Schema::Modern::Document::OpenAPI/get>.
 This is not recursive (does not follow C<$ref> chains) -- for that, use
 C<< $openapi->recursive_get(Mojo::URL->new->fragment($json_pointer)) >>, see
 L</recursive_get>.
-
-=head2 evaluator
-
-The L<JSON::Schema::Modern> object to use for all URI retrieval and JSON Schema evaluation.
 
 =head2 validate_request
 
@@ -1206,6 +1213,18 @@ C<path_captures>: a hashref mapping placeholders in the path template to their a
 =item *
 
 C<method>: the HTTP method used by the request (used case-insensitively)
+
+=item *
+
+C<debug>: when C<$OpenAPI::Modern::DEBUG> or L</debug> is set on the OpenAPI::Modern object, additional diagnostic information is stored here in separate keys:
+
+=over 4
+
+=item *
+
+C<uri_pattern>: an arrayref of patterns that are attempted to be matched against the URI path (note! soon to be the entire URI, when servers urls are implemented) during request matching
+
+=back
 
 =back
 

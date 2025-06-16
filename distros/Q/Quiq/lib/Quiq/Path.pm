@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.226';
+our $VERSION = '1.227';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2951,6 +2951,72 @@ sub filename {
 
 # -----------------------------------------------------------------------------
 
+=head3 getFirst() - Liefere ersten existenten Pfad
+
+=head4 Synopsis
+
+  $path = $this->getFirst(@patterns);
+
+=head4 Arguments
+
+=over 4
+
+=item @patterns
+
+Liste an Shell-Patterns (wie sie glob() erwartet)
+
+=back
+
+=head4 Description
+
+Durchlaufe die Pfad-Pattern @patterns und liefere den ersten existenten
+Pfad zurück. Ist I<kein> Pattern erfüllt oder erfüllt ein Pattern
+I<mehrere> Pfade, wirf eine Exception.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub getFirst {
+    my $this = shift;
+
+    # Argumente und Optionen
+
+    my $sloppy = 0;
+
+    my $argA = $this->parameters(1,undef,\@_,
+        -sloppy => \$sloppy,
+    );
+    # @$argA MEMO: Hier ist keine Tilde-Expansion nötig
+
+    # Operation ausführen
+
+    for my $pattern (@$argA) {
+        my @paths = CORE::glob $pattern;
+        if (@paths == 1 && $this->exists($paths[0])) {
+            return $paths[0];
+        }
+        elsif (@paths > 1) {
+            $this->throw(
+                'PATH-00099: Pattern matches more than one path',
+                Pattern => $pattern,
+                Paths => join(', ',@paths),
+            );
+        }
+    }
+
+    if (!$sloppy) {
+        $this->throw(
+            'PATH-00099: No pattern matches a path',
+            Patterns => join(', ',@_),
+        );
+    }
+
+    return undef;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 glob() - Liefere Pfade, die Shell-Pattern erfüllen
 
 =head4 Synopsis
@@ -2979,18 +3045,42 @@ sub glob {
 
     if (!@arr) {
         $this->throw(
-            'PATH-00014: Pfad existert nicht',
+            'PATH-00014: Path does not exist',
             Pattern => $pat,
         );
     }
     elsif (@arr > 1) {
         $this->throw(
-            'PATH-00015: Mehr als ein Pfad erfüllt Muster',
+            'PATH-00015: More than one path matches pattern',
             Pattern => $pat,
         );
     }
 
     return $arr[0];
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 globExists() - Prüfe, ob Shell-Pattern erfüllt ist
+
+=head4 Synopsis
+
+  $bool = $this->globExists($pat);
+
+=head4 Description
+
+Prüfe, ob Pfad-Objekte existieren, die Shell-Pattern $pat erfüllen.
+Wenn ja, liefere I<wahr>, sonst I<falsch>.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub globExists {
+    my ($this,$pat) = @_; # MEMO: Hier ist keine Tilde-Expansion nötig
+
+    my @arr = CORE::glob $pat;
+    return @arr? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -4407,7 +4497,7 @@ sub uid {
 
 =head1 VERSION
 
-1.226
+1.227
 
 =head1 AUTHOR
 

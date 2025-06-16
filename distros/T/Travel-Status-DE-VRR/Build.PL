@@ -15,6 +15,10 @@ Module::Build->new(
 	},
 	module_name => 'Travel::Status::DE::VRR',
 	license     => 'perl',
+	recommends  => {
+		'Cache::File'   => 0,
+		'GIS::Distance' => 0,
+	},
 	requires    => {
 		'perl'                       => '5.10.1',
 		'Carp'                       => 0,

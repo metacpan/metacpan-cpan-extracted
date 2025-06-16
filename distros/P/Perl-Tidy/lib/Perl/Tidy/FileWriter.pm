@@ -16,7 +16,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20250311';
+our $VERSION = '20250616';
 use Carp;
 
 use constant DEVEL_MODE   => 0;
@@ -333,7 +333,7 @@ sub write_code_line {
 
     # Write a line of code, given
     #  $str = the line of code
-    #  $K   = an optional check integer which, if if given, must
+    #  $K   = an optional check integer which, if given, must
     #       increase monotonically. This was added to catch cache
     #       sequence errors in the vertical aligner.
 

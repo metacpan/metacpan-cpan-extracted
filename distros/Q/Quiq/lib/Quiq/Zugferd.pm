@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Quiq::Zugferd - Generiere/Akzeptiere XML einer ZUGFeRD-Rechnung
+Quiq::Zugferd - Generiere XML einer ZUGFeRD-Rechnung
 
 =head1 BASE CLASS
 
@@ -62,7 +62,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.226';
+our $VERSION = '1.227';
 
 use Quiq::Path;
 use Quiq::Shell;
@@ -198,7 +198,7 @@ sub createTemplate {
     my $modDir = $mod->loadPath;
     $modDir =~ s/\.pm//;
 
-    my $zugferdDir = $ENV{'ZUGFERD_DIR'} || "$modDir/profile/$profile";
+    my $zugferdDir = $ENV{'ZUGFERD_DIR'} || "$modDir/2.3.2/profile/$profile";
 
     # Optionen
 
@@ -271,7 +271,7 @@ sub new {
     my $modDir = $mod->loadPath;
     $modDir =~ s/\.pm//;
 
-    my $zugferdDir = $ENV{'ZUGFERD_DIR'} || "$modDir/profile/$profile";
+    my $zugferdDir = $ENV{'ZUGFERD_DIR'} || "$modDir/2.3.2/profile/$profile";
 
     my $xmlTemplateFile = "$zugferdDir/template.xml";
     my $xsdDir = $zugferdDir;
@@ -791,7 +791,7 @@ sub xml {
 
 =head1 VERSION
 
-1.226
+1.227
 
 =head1 AUTHOR
 
