@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Base;
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 # ABSTRACT: Base module for importing standard modules, features, and subs
 
 #pod =head1 SYNOPSIS
@@ -49,6 +49,10 @@ our %IMPORT_BUNDLES = (
         'Test::More', 'Test::Lib',
         'Local::Schema' => [qw( prepare_temp_schema )],
     ],
+    Test2 => [
+        'Test2::V0', 'Test::Lib',
+        'Local::Schema' => [qw( prepare_temp_schema )],
+    ],
 );
 
 1;
@@ -63,7 +67,7 @@ CPAN::Testers::Schema::Base - Base module for importing standard modules, featur
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

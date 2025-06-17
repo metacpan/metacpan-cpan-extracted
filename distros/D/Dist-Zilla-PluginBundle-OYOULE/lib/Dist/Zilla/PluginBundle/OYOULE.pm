@@ -184,7 +184,7 @@ Dist::Zilla::PluginBundle::OYOULE - Dist::Zilla plugin configuration for Author/
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 SYNOPSIS
 

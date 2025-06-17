@@ -1,0 +1,10 @@
+Revision history for Dist::Zilla::PluginBundle::OYOULE
+
+1.1.1  2025-06-16
+    - Add changelog
+
+1.1.0  2025-03-23
+    - Add option to regenerate license.
+
+1.0.0  2025-03-23
+    - Initial release.

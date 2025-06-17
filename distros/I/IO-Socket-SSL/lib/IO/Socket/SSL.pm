@@ -13,13 +13,13 @@
 
 package IO::Socket::SSL;
 
-our $VERSION = '2.091';
+our $VERSION = '2.093';
 
 use IO::Socket;
 use Net::SSLeay 1.46;
 use IO::Socket::SSL::PublicSuffix;
 use Exporter ();
-use Errno qw( EWOULDBLOCK EAGAIN ETIMEDOUT EINTR EPIPE );
+use Errno qw( EWOULDBLOCK EAGAIN ETIMEDOUT EINTR EPIPE EPERM );
 use Carp;
 use strict;
 
@@ -592,26 +592,30 @@ my %SSL_OBJECT;
 my %CREATED_IN_THIS_THREAD;
 sub CLONE { %CREATED_IN_THIS_THREAD = (); }
 
-# all keys used internally, these should be cleaned up at end
-my @all_my_keys = qw(
-    _SSL_arguments
-    _SSL_certificate
-    _SSL_ctx
+# all keys specific for the current state of the socket
+# these should be removed on close
+my @all_my_conn_keys = qw(
     _SSL_fileno
-    _SSL_in_DESTROY
-    _SSL_ioclass_downgrade
-    _SSL_ioclass_upgraded
-    _SSL_last_err
     _SSL_object
-    _SSL_ocsp_verify
     _SSL_opened
     _SSL_opening
     _SSL_read_closed
     _SSL_write_closed
     _SSL_rawfd
+);
+
+# all keys used internally, these should be cleaned up at end
+# but not already on close
+my @all_my_keys = (@all_my_conn_keys, qw(
+    _SSL_arguments
+    _SSL_certificate
+    _SSL_ctx
+    _SSL_ioclass_upgraded
+    _SSL_last_err
+    _SSL_ocsp_verify
     _SSL_servername
     _SSL_msg_callback
-);
+));
 
 
 # we have callbacks associated with contexts, but have no way to access the
@@ -1205,9 +1209,20 @@ sub _generic_read {
 	    if ($status & SSL_SENT_SHUTDOWN) {
 		# fully done, close SSL object - no need to call shutdown again
 		$self->stop_SSL(SSL_no_shutdown => 1);
+	    } elsif (my $cb = ${*$self}{_SSL_arguments}{SSL_on_peer_shutdown}) {
+		# Mark as half done but leave further handling to callback
+		${*$self}{_SSL_read_closed} = 1;
+		return $cb->($self);
 	    } else {
-		# mark read side as automatically closed
-		${*$self}{_SSL_read_closed} = -1;
+		# Half done, send also close notify
+		# Don't destruct _SSL_object since code might still rely on
+		# having access to it. Leave this to explicit stop_SSL or close.
+		local $SIG{PIPE} = 'IGNORE';
+		$SSL_ERROR = $! = undef;
+		Net::SSLeay::shutdown($ssl);
+		# Use "-1" to mark as automatic closed and thus require action
+		# before reading/sending plain data
+		${*$self}{_SSL_read_closed} = ${*$self}{_SSL_write_closed} = -1;
 	    }
 	}
 	return 0;
@@ -1231,21 +1246,25 @@ sub _rawfd {
     return ${*$self}{_SSL_rawfd} ||= do { open(my $fh,'+<&=',$self); $fh };
 }
 
+sub _handle_read_closed_unack {
+    my ($self,$rc) = @_;
+    # reading eof is fine, reading plain data is not
+    return if ! defined recv($self,my $buf,1,MSG_PEEK);
+    return 0 if $buf eq '';
+    $! = EPERM;
+    return;
+}
+
 sub read {
     my $self = shift;
-    my $rc = ${*$self}{_SSL_read_closed};
+    my $rc = ${*$self}{_SSL_read_closed} || 0;
     if (my $ssl = !$rc && ${*$self}{_SSL_object}) {
 	return _generic_read($self, $ssl, 0,
 	    $self->blocking ? \&Net::SSLeay::ssl_read_all : \&Net::SSLeay::read,
 	    @_);
     }
 
-    if ($rc && $rc<0) {
-	warn "got SSL shutdown by peer, call stop_SSL(SSL_ack_read_closed => 1) before reading plain data";
-	return;
-    }
-
-
+    return _handle_read_closed_unack($self) if $rc<0;
 
     # fall back to plain read if we are not required to use SSL yet
     return ($rc ? _rawfd($self) : $self)->SUPER::read(@_);
@@ -1254,15 +1273,12 @@ sub read {
 # contrary to the behavior of read sysread can read partial data
 sub sysread {
     my $self = shift;
-    my $rc = ${*$self}{_SSL_read_closed};
+    my $rc = ${*$self}{_SSL_read_closed} || 0;
     if (my $ssl = !$rc && ${*$self}{_SSL_object}) {
 	return _generic_read( $self, $ssl, 0, \&Net::SSLeay::read, @_ );
     }
 
-    if ($rc && $rc<0) {
-	warn "got SSL shutdown by peer, call stop_SSL(SSL_ack_read_closed => 1) before reading plain data";
-	return;
-    }
+    return _handle_read_closed_unack($self) if $rc<0;
 
     # fall back to plain sysread if we are not required to use SSL yet
     return ($rc ? _rawfd($self) : $self)->SUPER::sysread(@_);
@@ -1270,15 +1286,12 @@ sub sysread {
 
 sub peek {
     my $self = shift;
-    my $rc = ${*$self}{_SSL_read_closed};
+    my $rc = ${*$self}{_SSL_read_closed} || 0;
     if (my $ssl = !$rc && ${*$self}{_SSL_object}) {
 	return _generic_read( $self, $ssl, 1, \&Net::SSLeay::peek, @_ );
     }
 
-    if ($rc && $rc<0) {
-	warn "got SSL shutdown by peer, call stop_SSL(SSL_ack_read_closed => 1) before reading plain data";
-	return;
-    }
+    return _handle_read_closed_unack($self) if $rc<0;
 
     # fall back to plain peek if we are not required to use SSL yet
     # emulate peek with recv(...,MSG_PEEK) - peek(buf,len,offset)
@@ -1327,9 +1340,15 @@ sub _generic_write {
 # if all data are written
 sub write {
     my $self = shift;
-    my $wc = ${*$self}{_SSL_write_closed};
+    my $wc = ${*$self}{_SSL_write_closed} || 0;
     if (my $ssl = !$wc && ${*$self}{_SSL_object}) {
 	return _generic_write( $self, $ssl, scalar($self->blocking),@_ );
+    }
+
+    # don't write plain after automtic SSL shutdown
+    if ($wc<0) {
+	$! = EPERM;
+	return;
     }
 
     # fall back to plain write if we are not required to use SSL yet
@@ -1340,9 +1359,15 @@ sub write {
 # a part of the data is written
 sub syswrite {
     my $self = shift;
-    my $wc = ${*$self}{_SSL_write_closed};
+    my $wc = ${*$self}{_SSL_write_closed} || 0;
     if (my $ssl = !$wc && ${*$self}{_SSL_object}) {
 	return _generic_write($self,$ssl,0,@_);
+    }
+
+    # don't write plain after automtic SSL shutdown
+    if ($wc<0) {
+	$! = EPERM;
+	return;
     }
 
     # fall back to plain syswrite if we are not required to use SSL yet
@@ -1488,7 +1513,7 @@ sub close {
 
     if ( ! $close_args->{_SSL_in_DESTROY} ) {
 	untie( *$self );
-	undef ${*$self}{_SSL_fileno};
+	delete @{*$self}{@all_my_conn_keys};
 	return $self->SUPER::close;
     }
     return 1;
@@ -1496,7 +1521,9 @@ sub close {
 
 sub is_SSL {
     my $self = pop;
-    return ${*$self}{_SSL_object} && 1
+    return if !${*$self}{_SSL_object};
+    return (${*$self}{_SSL_read_closed} ? '':'r') .
+	(${*$self}{_SSL_write_closed} ? '':'w');
 }
 
 sub stop_SSL {
@@ -1507,10 +1534,6 @@ sub stop_SSL {
     if (my $ssl = ${*$self}{'_SSL_object'}) {
 	if (delete ${*$self}{'_SSL_opening'}) {
 	    # just destroy the object further below
-	} elsif ($stop_args->{SSL_ack_read_closed} ) {
-	    return 0 if !${*$self}{_SSL_read_closed}; # not (automatically) closed
-	    ${*$self}{_SSL_read_closed} = 1; # accept as closed
-	    return 1;
 	} elsif ( ! $stop_args->{SSL_no_shutdown} ) {
 	    my $status = Net::SSLeay::get_shutdown($ssl);
 
@@ -1590,8 +1613,8 @@ sub stop_SSL {
 	if (my $cert = delete ${*$self}{'_SSL_certificate'}) {
 	    Net::SSLeay::X509_free($cert);
 	}
-	delete ${*$self}{_SSL_object};
-	delete ${*$self}{_SSL_rawfd};
+	delete @{*$self}{
+	    qw(_SSL_object _SSL_write_closed _SSL_read_closed _SSL_rawfd)};
 	${*$self}{'_SSL_opened'} = 0;
 	delete $SSL_OBJECT{$ssl};
 	delete $CREATED_IN_THIS_THREAD{$ssl};

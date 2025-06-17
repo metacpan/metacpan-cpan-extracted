@@ -30,7 +30,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::UploadToDarkPAN:
     file: lib/Dist/Zilla/Plugin/UploadToDarkPAN.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Dist::Zilla::Plugin::UploadToCPAN: '0'
   Moose: '0'
@@ -40,7 +40,7 @@ requires:
 resources:
   bugtracker: https://github.com/Olyol95/perl-Dist-Zilla-Plugin-UploadToDarkPAN/issues
   repository: https://github.com/Olyol95/perl-Dist-Zilla-Plugin-UploadToDarkPAN.git
-version: 1.0.0
+version: 1.0.1
 x_generated_by_perl: v5.40.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-3.0-only

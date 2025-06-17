@@ -1,3 +1,8 @@
+Travel::Status::DE::VRR 3.11 - Mon Jun 16 2025
+
+    * efa-m: Show occupancy in trip details
+    * Trip->route: Provide occupancy data
+
 Travel::Status::DE::VRR 3.10 - Sun Jun 15 2025
 
     * Stop: Add is_cancelled accessor

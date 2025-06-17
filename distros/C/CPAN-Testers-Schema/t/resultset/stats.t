@@ -10,6 +10,7 @@ L<DBIx::Class::ResultSet>
 
 =cut
 
+use utf8;
 use CPAN::Testers::Schema::Base 'Test';
 use CPAN::Testers::Schema;
 
@@ -32,7 +33,7 @@ subtest 'insert_test_report' => sub {
         ),
         report => {
             reporter => {
-                name  => 'Andreas J. Koenig',
+                name  => 'Andreas J. Köenig',
                 email => 'andreas.koenig.gmwojprw@franz.ak.mind.de',
             },
             environment => {
@@ -67,7 +68,7 @@ subtest 'insert_test_report' => sub {
         is $stat->guid, 'd0ab4d36-3343-11e7-b830-917e22bfee97', 'correct guid';
         is $stat->state, 'fail', 'correct test state';
         is $stat->postdate, 201705, 'correct postdate';
-        is $stat->tester, '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>', 'correct tester';
+        is $stat->tester, '"Andreas J. K&#246;enig" <andreas.koenig.gmwojprw@franz.ak.mind.de>', 'correct tester';
         is $stat->dist, 'Sorauta-SVN-AutoCommit', 'correct dist';
         is $stat->version, '0.02', 'correct version';
         is $stat->platform, 'x86_64-linux', 'correct platform';
@@ -111,7 +112,7 @@ subtest 'since' => sub {
                 'platform' => 'x86_64-linux',
                 'postdate' => 201705,
                 'state' => 'pass',
-                'tester' => '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
+                'tester' => '"Andreas J. K&#246;enig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
                 'type' => 2,
                 'uploadid' => $upload_id,
                 'version' => '0.02',
@@ -137,7 +138,7 @@ subtest 'perl_maturity' => sub {
         'platform' => 'x86_64-linux',
         'postdate' => 201705,
         'state' => 'pass',
-        'tester' => '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
+        'tester' => '"Andreas J. K&#246;enig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
         'type' => 2,
         'uploadid' => 169497,
         'version' => '0.02',
@@ -154,7 +155,7 @@ subtest 'perl_maturity' => sub {
         'platform' => 'x86_64-linux',
         'postdate' => 201705,
         'state' => 'pass',
-        'tester' => '"Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
+        'tester' => '"Andreas J. K&#246;enig" <andreas.koenig.gmwojprw@franz.ak.mind.de>',
         'type' => 2,
         'uploadid' => 169497,
         'version' => '0.02',

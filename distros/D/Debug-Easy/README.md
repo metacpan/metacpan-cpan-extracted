@@ -1,6 +1,6 @@
 # Debug-Easy
 
-![Debug::Easy Logo](files/main/Debug-Easy.png?raw=true "Debug::Easy")
+![Debug::Easy Logo](Debug-Easy.png?raw=true "Debug::Easy")
 
 ## INSTALLATION
 

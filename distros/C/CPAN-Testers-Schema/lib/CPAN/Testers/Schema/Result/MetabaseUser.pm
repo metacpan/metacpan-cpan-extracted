@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::MetabaseUser;
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 # ABSTRACT: Legacy user information from the Metabase
 
 #pod =head1 SYNOPSIS
@@ -82,7 +82,7 @@ CPAN::Testers::Schema::Result::MetabaseUser - Legacy user information from the M
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

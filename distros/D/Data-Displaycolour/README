@@ -1,0 +1,16 @@
+Data::Displaycolour
+----------------
+
+This module allows lookup for displaycolours (coloures to be used alongside objects for to aid users).
+
+Pre-Requirements
+----------------
+
+On Debian:
+$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-perl libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
+
+
+Building
+--------
+$ dzil build
+$ dzil install

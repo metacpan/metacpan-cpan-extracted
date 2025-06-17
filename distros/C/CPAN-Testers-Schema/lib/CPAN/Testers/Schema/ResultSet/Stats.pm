@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Stats;
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -115,11 +115,12 @@ sub insert_test_report ( $self, $report ) {
     }
     my $uploadid = $uploads[0]->uploadid;
 
+    my $encoded_name = $data->{reporter}{name} =~ s/([^[:ascii:]])/'&#' . ord( $1 ) . ';'/ger;
     my $stat = {
         guid => $guid,
         state => lc($data->{result}{grade}),
         postdate => $created->strftime('%Y%m'),
-        tester => qq["$data->{reporter}{name}" <$data->{reporter}{email}>],
+        tester => qq["] . $encoded_name . qq[" <$data->{reporter}{email}>],
         dist => $data->{distribution}{name},
         version => $data->{distribution}{version},
         platform => $data->{environment}{language}{archname},
@@ -146,7 +147,7 @@ CPAN::Testers::Schema::ResultSet::Stats - Query the raw test reports
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

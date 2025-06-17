@@ -70,7 +70,7 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::OYOULE" : {
          "file" : "lib/Dist/Zilla/PluginBundle/OYOULE.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.1.1"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "url" : "https://github.com/Olyol95/perl-Dist-Zilla-PluginBundle-OYOULE.git"
       }
    },
-   "version" : "1.1.0",
+   "version" : "1.1.1",
    "x_generated_by_perl" : "v5.40.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "GPL-3.0-only"

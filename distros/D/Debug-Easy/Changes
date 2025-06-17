@@ -352,8 +352,13 @@ Revision history for Debug-Easy
 
         Changed the Data::Dumper specific output behavior
 
-2.15    Apr 20,2025
+2.15    Apr 20, 2025
 
         Control variables were case specific.  I relaxed that requirement.
-		The documentation still shows the case sensitive variables, but the
-		actual code is forgiving.
+        The documentation still shows the case sensitive variables, but the
+        actual code is forgiving.
+
+2.16    Jun 13, 2025
+
+        Some minor documentation changes.  A little optimization.
+		Build Makefile.PL also modified.

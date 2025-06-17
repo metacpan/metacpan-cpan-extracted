@@ -4,7 +4,7 @@ use Imager;
 use vars qw($VERSION @ISA);
 
 BEGIN {
-  $VERSION = "0.010";
+  $VERSION = "1.000";
 
   require XSLoader;
   XSLoader::load('Imager::File::QOI', $VERSION);
@@ -113,6 +113,10 @@ Implements QOI file support for Imager.
 Due to the limitations of C<QOI> grayscale images are written as RGB
 images.
 
+=item *
+
+The decoder limits image sizes to 400 000 000 pixels.
+
 =back
 
 =head2 Image tags
@@ -130,14 +134,18 @@ https://github.com/phoboslab/qoi/issues/98
 The bundled reference decoder doesn't validate the end of file marker.
 https://github.com/phoboslab/qoi/issues/96
 
+=head1 LICENSE
+
+Imager::File::QOI is licensed under the same terms as Perl itself.
+
 =head1 AUTHOR
 
-Tony Cook <tonyc@cpan.org>
+Tony Cook <tony@develop-help.com>
 
 =head1 SEE ALSO
 
 L<Imager>, <Imager::Files>.
 
-L<https://qoiformat.org/>
+L<https://qoiformat.org/>, L<https://github.com/phoboslab/qoi>
 
 =cut

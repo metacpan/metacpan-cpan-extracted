@@ -4,23 +4,22 @@ author:
   - 'Oriol Soriano <oriolsoriano@gmail.com>'
   - 'Doug Bell <preaction@cpan.org>'
 build_requires:
-  CPAN::Testers::Fact::LegacyReport: '0'
-  CPAN::Testers::Fact::TestSummary: '0'
-  CPAN::Testers::Report: '0'
+  Data::GUID: '0'
   DateTime::Format::SQLite: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::Suite: '0'
   Test::Lib: '0'
   Test::More: '1.001005'
-  Test::Reporter: '0'
+  YAML::PP: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,52 +36,56 @@ no_index:
 provides:
   CPAN::Testers::Schema:
     file: lib/CPAN/Testers/Schema.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Base:
     file: lib/CPAN/Testers/Schema/Base.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::LatestIndex:
     file: lib/CPAN/Testers/Schema/Result/LatestIndex.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::MetabaseUser:
     file: lib/CPAN/Testers/Schema/Result/MetabaseUser.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::PerlVersion:
     file: lib/CPAN/Testers/Schema/Result/PerlVersion.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::Release:
     file: lib/CPAN/Testers/Schema/Result/Release.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::ReleaseStat:
     file: lib/CPAN/Testers/Schema/Result/ReleaseStat.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::Stats:
     file: lib/CPAN/Testers/Schema/Result/Stats.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::TestReport:
     file: lib/CPAN/Testers/Schema/Result/TestReport.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::Result::Upload:
     file: lib/CPAN/Testers/Schema/Result/Upload.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::ResultSet::PerlVersion:
     file: lib/CPAN/Testers/Schema/ResultSet/PerlVersion.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::ResultSet::Release:
     file: lib/CPAN/Testers/Schema/ResultSet/Release.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::ResultSet::Stats:
     file: lib/CPAN/Testers/Schema/ResultSet/Stats.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::ResultSet::TestReport:
     file: lib/CPAN/Testers/Schema/ResultSet/TestReport.pm
-    version: '0.027'
+    version: '0.028'
   CPAN::Testers::Schema::ResultSet::Upload:
     file: lib/CPAN/Testers/Schema/ResultSet/Upload.pm
-    version: '0.027'
+    version: '0.028'
 requires:
+  CPAN::Testers::Fact::LegacyReport: '0'
+  CPAN::Testers::Fact::TestSummary: '0'
+  CPAN::Testers::Report: '0'
   DBIx::Class: '0'
   DBIx::Class::Candy: '0'
+  Data::FlexSerializer: '0'
   Data::UUID: '0'
   DateTime: '0'
   DateTime::Format::ISO8601: '0'
@@ -94,6 +97,7 @@ requires:
   Mojolicious: '8.13'
   Path::Tiny: '0.072'
   SQL::Translator: '0.11018'
+  Test::Reporter: '0'
   perl: '5.024'
   strict: '0'
   warnings: '0'
@@ -102,7 +106,7 @@ resources:
   bugtracker: https://github.com/cpan-testers/cpantesters-schema/issues
   homepage: https://github.com/cpan-testers/cpantesters-schema
   repository: https://github.com/cpan-testers/cpantesters-schema.git
-version: '0.027'
+version: '0.028'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Breno G. de Oliveira <garu@cpan.org>'
@@ -110,6 +114,6 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nick Tonkin <1nickt@users.noreply.github.com>'
   - 'Paul Cochrane <paul@liekut.de>'
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.40.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

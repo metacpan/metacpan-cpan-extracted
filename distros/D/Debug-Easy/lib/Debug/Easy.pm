@@ -3,7 +3,7 @@
 ################# Copyright 2013 - 2025 Richard Kelsch ######################
 #################          All Rights Reserved         ######################
 #############################################################################
-####### Licensing information available near the end of this file. ##########
+######## Licensing information available near the end of this file. #########
 #############################################################################
 
 package Debug::Easy;
@@ -11,8 +11,9 @@ package Debug::Easy;
 use strict;
 use constant {
     TRUE  => 1,
-    FALSE => 0
+    FALSE => 0,
 };
+use Config;;
 
 use DateTime;
 use Term::ANSIColor;
@@ -26,6 +27,8 @@ eval {               # Data::Dumper::Simple is preferred.  Try to load it withou
     1;
 };
 
+# Set up dumper variables for friendly output
+
 $Data::Dumper::Terse         = TRUE;
 $Data::Dumper::Indent        = TRUE;
 $Data::Dumper::Useqq         = TRUE;
@@ -36,14 +39,13 @@ $Data::Dumper::Sortkeys      = TRUE;
 $Data::Dumper::Purity        = TRUE;
 $Data::Dumper::Deparse       = TRUE;
 
-use Config;
 use threads;
 
 BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.15';
+    our $VERSION = '2.16';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -378,7 +380,7 @@ sub new {
                 $self->{$upper} = 'ERR' if ($self->{$upper} =~ /^ERROR$/i);
                 $self->{$upper} = uc($self->{$upper});    # Make loglevels case insensitive
             }
-            delete($self->{$Key});
+            delete($self->{$Key});        # Get rid of the bad key
         } elsif ($Key eq 'LOGLEVEL') {    # Make loglevels case insensitive
             $self->{$upper} = uc($self->{$upper});
         }
@@ -524,7 +526,6 @@ sub debug {
     # Figure out the benchmarks, but only if it is in the prefix
     if ($self->{'PREFIX'} =~ /\%Benchmark\%/i) {
         # For multiline output, only output the bench data on the first line.  Use padded spaces for the rest.
-        #        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{$level . '_LASTSTAMP'}));
         $thisBench = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
         $thisBench2 = ' ' x length($thisBench);
     } ## end if ($self->{'PREFIX'} ...)
@@ -599,7 +600,7 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $fh = $self->{'FILEHANDLE'};
     if ($level eq 'INFO' && $self->{'LOGLEVEL'} eq 'VERBOSE') {    # Trap verbose flag and temporarily drop the prefix.
         print $fh "$msg\n";
-    } elsif ($level eq 'DEBUGMAX') {                               # Special version of DEBUG.  Outputs as DEBUG in Log::Fast
+    } elsif ($level eq 'DEBUGMAX') {                               # Special version of DEBUG.  Extremely verbose debugging and quite noisy
         if ($self->{'LOGLEVEL'} eq 'DEBUGMAX') {
             print $fh "$prefix$padding$msg\n";
         }
@@ -763,7 +764,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 B<VERSION>
 
-Version 2.13    (Dec 15, 2023)
+Version 2.16
 
 =head1 B<SUPPORT>
 

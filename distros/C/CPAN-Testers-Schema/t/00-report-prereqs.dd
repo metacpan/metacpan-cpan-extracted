@@ -7,8 +7,12 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
+                                      'CPAN::Testers::Fact::LegacyReport' => '0',
+                                      'CPAN::Testers::Fact::TestSummary' => '0',
+                                      'CPAN::Testers::Report' => '0',
                                       'DBIx::Class' => '0',
                                       'DBIx::Class::Candy' => '0',
+                                      'Data::FlexSerializer' => '0',
                                       'Data::UUID' => '0',
                                       'DateTime' => '0',
                                       'DateTime::Format::ISO8601' => '0',
@@ -20,6 +24,7 @@ do { my $x = {
                                       'Mojolicious' => '8.13',
                                       'Path::Tiny' => '0.072',
                                       'SQL::Translator' => '0.11018',
+                                      'Test::Reporter' => '0',
                                       'perl' => '5.024',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -31,18 +36,17 @@ do { my $x = {
                                      'Test::mysqld' => '0'
                                    },
                    'requires' => {
-                                   'CPAN::Testers::Fact::LegacyReport' => '0',
-                                   'CPAN::Testers::Fact::TestSummary' => '0',
-                                   'CPAN::Testers::Report' => '0',
+                                   'Data::GUID' => '0',
                                    'DateTime::Format::SQLite' => '0',
                                    'Exporter' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test2::Suite' => '0',
                                    'Test::Lib' => '0',
                                    'Test::More' => '1.001005',
-                                   'Test::Reporter' => '0'
+                                   'YAML::PP' => '0'
                                  }
                  }
      };

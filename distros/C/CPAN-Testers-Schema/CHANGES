@@ -1,5 +1,11 @@
 Changelog for CPAN-Testers-Schema
 
+0.028     2025-06-16 19:03:10-05:00 America/Chicago
+
+  - Fixed HTML-encoding of UTF-8 characters
+  - Moved Metabase conversion to this module. Previously, this was in
+    the backend, and spread across multiple modules...
+
 0.027     2024-04-27 09:49:52+01:00 Europe/Lisbon
 
   - Fixed relationship between dists and stat rows

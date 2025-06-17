@@ -9,7 +9,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.10';
+our $VERSION = '3.11';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
 	qw(operator product product_class name line number type id dest_name dest_id)
@@ -152,6 +152,7 @@ sub route {
 				sched_dep => $self->parse_dt( $stop->{departureTimePlanned} ),
 				rt_arr    => $self->parse_dt( $stop->{arrivalTimeEstimated} ),
 				rt_dep    => $self->parse_dt( $stop->{departureTimeEstimated} ),
+				occupancy => $stop->{properties}{occupancy},
 				is_cancelled => $stop->{isCancelled},
 				latlon       => $stop->{coord},
 				full_name    => $name_full,
@@ -204,7 +205,7 @@ trip
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

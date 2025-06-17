@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.10';
+our $VERSION = '3.11';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -353,12 +353,16 @@ sub show_stopseq {
 	);
 	say q{};
 
+	my $occupancy_len   = 0;
 	my $delay_len       = 0;
 	my $inner_delay_len = 0;
 	my $max_delay       = max map { abs( $_->delay // 0 ) } $trip->route;
 	if ($max_delay) {
 		$inner_delay_len = length($max_delay) + 1;
 		$delay_len       = length( sprintf( '(%+d)', $max_delay ) ) + 1;
+	}
+	if ( first { $_->occupancy } $trip->route ) {
+		$occupancy_len = 2;
 	}
 
 	if ( first { $_->is_cancelled } $trip->route and $delay_len < 3 ) {
@@ -367,7 +371,7 @@ sub show_stopseq {
 
 	for my $stop ( $trip->route ) {
 		printf(
-			"%s → %s%${delay_len}s  %s (%s) %s\n",
+			"%s → %s%${delay_len}s %-${occupancy_len}s%s (%s) %s\n",
 			$stop->arr ? $stop->arr->strftime('%H:%M')
 			: q{     },
 			$stop->dep ? $stop->dep->strftime('%H:%M')
@@ -378,6 +382,7 @@ sub show_stopseq {
 				? sprintf( " (%+${inner_delay_len}d)", $stop->delay )
 				: q{}
 			),
+			$stop->occupancy ? format_occupancy( $stop->occupancy ) : q{},
 			$stop->full_name,
 			$stop->niveau,
 			$stop->platform
@@ -628,7 +633,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 DESCRIPTION
 

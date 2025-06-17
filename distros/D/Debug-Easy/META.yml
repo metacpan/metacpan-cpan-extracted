@@ -26,5 +26,5 @@ requires:
   Term::ANSIColor: '0'
   Time::HiRes: '0'
   perl: '5.008'
-version: '2.15'
+version: '2.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

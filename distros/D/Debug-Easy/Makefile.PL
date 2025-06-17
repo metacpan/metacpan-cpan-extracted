@@ -1,20 +1,19 @@
+
+# Debug::Easy Makefile.PL
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
 use Config;
 use Term::ANSIColor;
 
-print colored(['bright_yellow'],q{
-  _____       _                     ______                  ___   __ _____
- |  __ \     | |                _ _|  ____|                |__ \ /_ | ____|
- | |  | | ___| |__  _   _  __ _(_|_) |__   __ _ ___ _   _     ) | | | |__
- | |  | |/ _ \ '_ \| | | |/ _` |   |  __| / _` / __| | | |   / /  | |___ \
- | |__| |  __/ |_) | |_| | (_| |_ _| |___| (_| \__ \ |_| |  / /_ _| |___) |
- |_____/ \___|_.__/ \__,_|\__, (_|_)______\__,_|___/\__, | |____(_)_|____/
-                           __/ |                     __/ |
-                          |___/                     |___/
-});
-print "\nIs this a threaded Perl? ...";
+print colored(['red'],q{ ____       _                 }),colored(['bright_green'],q{      _____} ),"\n";
+print colored(['red'],q{|  _ \  ___| |__  _   _  __ _ }),colored(['bright_white'],q{ _ _ } ),colored(['bright_green'],q{| ____|__ _ ___ _   _ }),"\n";
+print colored(['red'],q{| | | |/ _ \ '_ \| | | |/ _` |}),colored(['bright_white'],q{(_|_)} ),colored(['bright_green'],q{|  _| / _` / __| | | |}),"\n";
+print colored(['red'],q{| |_| |  __/ |_) | |_| | (_| |}),colored(['bright_white'],q{ _ _ } ),colored(['bright_green'],q{| |__| (_| \__ \ |_| |}),"\n";
+print colored(['red'],q{|____/ \___|_.__/ \__,_|\__, |}),colored(['bright_white'],q{(_|_)} ),colored(['bright_green'],q{|_____\__,_|___/\__, |}),"\n";
+print colored(['red'],q{                        |___/ }),colored(['bright_green'],q{                     |___/}),"\n";
+
+print "\nIs this a threaded Perl? ... ";
 if ($Config{'useithreads'}) {
     print colored(['green'],'YES'), ", good no changes needed\n\n";
 } else {

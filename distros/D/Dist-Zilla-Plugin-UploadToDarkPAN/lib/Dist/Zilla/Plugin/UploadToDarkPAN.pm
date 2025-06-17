@@ -45,7 +45,7 @@ Dist::Zilla::Plugin::UploadToDarkPAN - Release to a private CPAN (a.k.a a DarkPA
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 

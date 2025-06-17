@@ -1,0 +1,15 @@
+Imager::File::QOI 1.000 - 17 Jun 2025
+=======================
+
+Update bundled QOI decoder with these relevant changes:
+
+ - fixes decoding on big endian platforms, if we can find one.
+
+ - minor performance improvement
+
+Other QOI decoder changes which aren't relevant to Imager::File::QOI.
+
+Imager::File::QOI 0.010 - 20 Apr 2022
+=======================
+
+Initial release

@@ -91,6 +91,7 @@ sub client {
 sub server {
     my $client = $server->accept || die $!;
     $client->autoflush;
+    my $peer_shutdown;
     while (1) {
 	alarm(15);
 	sysread($client, my $line, 1024) or last;
@@ -100,7 +101,7 @@ sub server {
 	    IO::Socket::SSL->start_SSL( $client,
 		SSL_server => 1,
 		SSL_cert_file => "t/certs/client-cert.pem",
-		SSL_key_file => "t/certs/client-key.pem"
+		SSL_key_file => "t/certs/client-key.pem",
 	    ) || die "not ok # server::start_SSL: $SSL_ERROR\n";
 	    #print STDERR "<<$$ start\n";
 
@@ -117,39 +118,53 @@ sub server {
 	    syswrite($client,"OK\n");
 
 	} elsif ( $line eq 'stop:write' ) {
-	    # expect "eof" on ssl shutdown from peer
+	    # expect 0
 	    my $n = sysread($client, $line, 1);
 	    print "not " if !defined $n or $n !=0;
-	    print "ok # server read ssl eof\n";
+	    print "ok # server read ssl n=0\n";
 
+	    # implicit close will not remove _SSL_object
+	    ${*$client}{_SSL_object} or print "not ";
+	    print "ok # server _SSL_object\n";
+
+	    # read and write is marked as automatic shutdown
+	    ${*$client}{_SSL_read_closed} == -1 or print "not ";
+	    print "ok # server _SSL_read_closed == -1\n";
+	    ${*$client}{_SSL_write_closed} == -1 or print "not ";
+	    print "ok # server _SSL_write_closed == -1\n";
+
+	    # not implicitly downgraded
 	    ref($client) eq "IO::Socket::SSL" or print "not ";
 	    print "ok # server class=".ref($client)."\n";
 
-	    ${*$client}{_SSL_read_closed} == -1 or print "not ";
-	    print "ok # server _SSL_read_closed == -1\n";
+	    # but will show as not having (anymore) SSL
+	    $client->is_SSL and print "not ";
+	    print "ok # is_SSL returns false\n";
 
-	    {
-		# this should throw a warning if we attempt to read plain data
-		# without calling stop_SSL first
-		my $warn = '';
-		local $SIG{__WARN__} = sub { $warn .= "@_" };
-		$n = sysread($client, $line, 1);
-		print "not " if defined $n;
-		print "ok # server read returns undef\n";
-		$warn =~m{\Qcall stop_SSL(SSL_ack_read_closed => 1) before reading plain data}
-		    or print "not ";
-		print "ok # server got warning: $warn\n";
-	    }
+	    # write before explict stop_SSL will fail with EPERM
+	    $n = syswrite($client, 'foo', 3);
+	    print "not " if defined($n) or not $!{EPERM};
+	    print "ok # write results in undef/EPERM\n";
 
-	    $client->stop_SSL(SSL_ack_read_closed => 1) ||
-		die "not ok # server::stop_SSL(SSL_ack_read_closed => 1)\n";
-	    ${*$client}{_SSL_read_closed} == 1 or print "not ";
-	    print "ok # server _SSL_read_closed == 1\n";
+	    # same with read
+	    $n = sysread($client, $line, 100);
+	    print "not " if defined($n) or not $!{EPERM};
+	    print "ok # read results in undef/EPERM\n";
+
+	    # will both work after explicit stop_SSL
+	    $client->stop_SSL();
+
+	    # downgraded
+	    ref($client) eq "IO::Socket::INET" or print "not ";
+	    print "ok # server class=".ref($client)."\n";
 
 	    $n = sysread($client, $line, 100);
 	    print "not " if ! $line || $line ne "after stop:write\n";
 	    print "ok # server plain read: $line\n";
-	    syswrite($client,"OK\n");
+
+	    $n = syswrite($client,"OK\n");
+	    print "not " unless defined $n and $n>0;
+	    print "ok # plain write\n";
 
 	} elsif ( $line eq 'close' ) {
 	    my $class = ref($client);

@@ -1,0 +1,7 @@
+Revision history for Dist::Zilla::Plugin::UploadToDarkPAN
+
+1.0.1  2025-06-16
+    - Add changelog.
+
+1.0.0  2025-03-23
+    - Initial release.

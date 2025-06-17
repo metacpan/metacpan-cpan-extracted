@@ -7,7 +7,6 @@ ignore.txt
 lib/Debug/Easy.pm
 Makefile.PL
 MANIFEST
-README
 README.md
 t/00-load.t
 t/01-all-levels.t
