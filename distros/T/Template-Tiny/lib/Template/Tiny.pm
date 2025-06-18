@@ -1,4 +1,4 @@
-package Template::Tiny; # git description: v1.14-6-gb67b1a2
+package Template::Tiny; # git description: v1.15-3-g3c92468
 # ABSTRACT: Template Toolkit reimplemented in as little code as possible
 
 
@@ -6,7 +6,7 @@ package Template::Tiny; # git description: v1.14-6-gb67b1a2
 
 use strict;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 # Evaluatable expression
 my $EXPR = qr/ [a-z_][\w.]* /xs;
@@ -206,6 +206,9 @@ sub _expression {
 			return '';
 		}
 	}
+
+    # If the last expression is a coderef, execute it.
+    ref $cursor eq 'CODE' and $cursor = $cursor->();
 	return $cursor;
 }
 
@@ -223,7 +226,7 @@ Template::Tiny - Template Toolkit reimplemented in as little code as possible
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

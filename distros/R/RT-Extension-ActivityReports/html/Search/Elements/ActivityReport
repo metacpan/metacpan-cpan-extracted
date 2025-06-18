@@ -5,5 +5,10 @@ $End   => undef
 $Query => ''
 $Actor => undef
 </%args>
+<%init>
+my $title = $ReportType;
+$title =~ s/([a-z])([A-Z])/$1 \l$2/g;
+</%init>
+<&| /Widgets/TitleBox, title => loc($title) &>
 <& '/Reports/Activity/Elements/'.$ReportType, start => $Start, end => $End, query => $Query, actor => $Actor &>
-
+</&>

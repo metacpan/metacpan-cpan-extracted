@@ -4,13 +4,16 @@ author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
   File::Spec: '0'
+  JSON::PP: '0'
   JSON::Schema::Modern::Utilities: '0'
   Module::Metadata: '0'
+  Test2::API: '0'
   Test::Deep: '0'
   Test::Memory::Cycle: '0'
   Test::Mojo: '0'
-  Test::More: '0.88'
+  Test::More: '0.96'
   Test::Warnings: '0.033'
+  autovivification: '0'
   constant: '0'
   experimental: '0'
   lib: '0'
@@ -46,26 +49,28 @@ no_index:
 provides:
   Mojolicious::Plugin::OpenAPI::Modern:
     file: lib/Mojolicious/Plugin/OpenAPI/Modern.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   Feature::Compat::Try: '0'
   JSON::Schema::Modern: '0.549'
   JSON::Schema::Modern::Document::OpenAPI: '0.024'
   Mojo::Base: '0'
   Mojo::JSON: '0'
-  OpenAPI::Modern: '0.077'
+  OpenAPI::Modern: '0.087'
   Path::Tiny: '0'
   Safe::Isa: '0'
   YAML::PP: '0'
+  feature: '0'
   if: '0'
   namespace::clean: '0'
   perl: '5.020'
   strictures: '2'
+  utf8: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern
   repository: https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
     version: '5.041013'
@@ -488,7 +493,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.47.1
+          git_version: 2.49.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -580,7 +585,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.051'
@@ -588,7 +593,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -596,7 +601,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -622,7 +627,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.051'
@@ -706,7 +711,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -719,11 +724,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.016
+          tag: v0.017
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -760,7 +765,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -782,7 +787,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.49.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.051'

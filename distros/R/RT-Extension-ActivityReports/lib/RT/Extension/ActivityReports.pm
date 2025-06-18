@@ -3,7 +3,7 @@ package RT::Extension::ActivityReports;
 use Exporter qw( import );
 @EXPORT_OK = qw( RelevantTxns );
 
-our $VERSION = '1.09';
+our $VERSION = '2.00';
 
 RT->AddStyleSheets('activity-reports.css');
 
@@ -49,9 +49,7 @@ and/or between two dates, so it's quite flexible.
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4
-
-Works with RT 5.0, but styling has not yet been updated
+Works with RT 6.0. For RT 5.0 install the latest 1.* version.
 
 =head1 INSTALLATION
 
@@ -65,21 +63,15 @@ Works with RT 5.0, but styling has not yet been updated
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
+Add this line:
 
     Plugin('RT::Extension::ActivityReports');
 
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Extension::ActivityReports));
-
-or add C<RT::Extension::ActivityReports> to your existing C<@Plugins> line.
-
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -89,7 +81,7 @@ The activity reports can be accessed from the URL
 http://<path_to_your_RT>/Reports/Activity/index.html
 
 and will also be available as an Activity Reports tab on Search Results
-pages in 4.0.
+pages.
 
 =back
 
@@ -109,7 +101,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2005-2014 by Best Practical Solutions
+This software is Copyright (c) 2005-2025 by Best Practical Solutions
 
 This is free software, licensed under:
 

@@ -8,12 +8,15 @@ use warnings;
 
 #<<<
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 #>>>
 
 
-use overload q{""} => \&message;
+use overload
+  q{""}    => \&message,
+  bool     => sub { 1 },
+  fallback => 1;
 
 
 
@@ -95,7 +98,7 @@ Math::NLopt::Exception - Basic Exception Classes
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 

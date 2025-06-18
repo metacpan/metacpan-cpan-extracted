@@ -46,26 +46,19 @@
 %# 
 %# END BPS TAGGED BLOCK }}}
 <%INIT>
-my $request_path = $HTML::Mason::Commands::r->path_info;
 
-my $query_string = sub {
-    my %args = @_;
-    my $u    = URI->new();
-    $u->query_form(%args);
-    return $u->query;
-};
-
-if ( $request_path =~ qr{^/Search/(?:Article|Build|Bulk|Chart|Graph|Results)\.html} ) {
+if ( $Path =~ qr{^/Search/(?:Article|Build|Bulk|Chart|Graph|Results)\.html} ) {
     my $tabs = PageMenu;
     my $last = ($tabs->children)[-1];
     my $sort_order = $last->sort_order;
     $last->sort_order( $sort_order + 1 );
     $tabs->child( 'activity' => title => loc('Activity Reports'),
-                    path => '/Reports/Activity/index.html?Query=' .$m->request_args->{'Query'},
+                    path => '/Reports/Activity/index.html' . $Search_Args,
                     sort_order => $sort_order );
 }
-
-my $menu = Menu;
-my $tools = $menu->child('tools');
-$tools->child('activity-reports' => title => loc('Activity Reports'), path  => '/Reports/Activity/index.html' );
 </%INIT>
+<%ARGS>
+$Path
+$Search_Args
+$Has_Query
+</%ARGS>

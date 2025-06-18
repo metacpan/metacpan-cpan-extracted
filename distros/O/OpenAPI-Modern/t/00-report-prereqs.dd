@@ -58,6 +58,7 @@ do { my $x = {
                                       'Storable' => '0',
                                       'Types::Standard' => '0',
                                       'autovivification' => '0',
+                                      'builtin::compat' => '0',
                                       'constant' => '0',
                                       'experimental' => '0',
                                       'feature' => '0',

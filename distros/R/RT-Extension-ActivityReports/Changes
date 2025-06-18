@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ActivityReports
 
+2.00 2025-06-17
+ - Update for RT 6.0
+
 1.09 2021-12-03
  - Works with RT 5, but styling has not been updated to Bootstrap yet
 

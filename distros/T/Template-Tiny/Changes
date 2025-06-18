@@ -1,8 +1,12 @@
 Changes for Perl extension Template-Tiny
 
+1.16      2025-06-17 17:21:03Z
+          - Evaluate coderefs and insert results in template (CROMEDOME).
+            This achieves full feature parity with
+            Dancer2::Template::ForkedImplementation::Tiny.
+
 1.15      2025-06-14 15:33:27Z
-          - Allow configurable start/end tags (CROMEDOME). This achieves full
-            feature parity with Dancer2::Template::ForkedImplementation::Tiny.
+          - Allow configurable start/end tags (CROMEDOME).
 
 1.14      2021-05-02 16:48:45Z
           - add link to Template::Tiny::Strict

@@ -134,31 +134,31 @@
    "provides" : {
       "Math::NLopt" : {
          "file" : "lib/Math/NLopt.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "Math::NLopt::Exception" : {
          "file" : "lib/Math/NLopt/Exception.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "Math::NLopt::Exception::Failure" : {
          "file" : "lib/Math/NLopt/Exception.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "Math::NLopt::Exception::ForcedStop" : {
          "file" : "lib/Math/NLopt/Exception.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "Math::NLopt::Exception::InvalidArgs" : {
          "file" : "lib/Math/NLopt/Exception.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "Math::NLopt::Exception::OutOfMemory" : {
          "file" : "lib/Math/NLopt/Exception.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "Math::NLopt::Exception::RoundoffLimited" : {
          "file" : "lib/Math/NLopt/Exception.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -173,7 +173,7 @@
          "web" : "https://gitlab.com/djerius/math-nlopt"
       }
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"

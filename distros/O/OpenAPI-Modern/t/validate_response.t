@@ -414,10 +414,10 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request',
           keywordLocation => '/paths',
           absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'no match found for request URI "http://example.com/foo/bar"',
+          error => 'no match found for request GET "http://example.com/foo/bar"',
         },
       ],
     },
@@ -434,10 +434,10 @@ YAML
         valid => false,
         errors => [
           {
-            instanceLocation => '/request/uri/path',
+            instanceLocation => '/request',
             keywordLocation => '/paths',
             absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-            error => 'no match found for request URI "http://example.com/foo/bar"',
+            error => 'no match found for request POST "http://example.com/foo/bar"',
           },
         ],
       },

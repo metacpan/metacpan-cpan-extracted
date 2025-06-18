@@ -12,5 +12,6 @@ WriteMakefile(
 		'Cwd'        => 0,
 		'File::Spec' => 0,
 		'JSON'       => 0,
+		'DateTime'   => 0,
 	},
 );

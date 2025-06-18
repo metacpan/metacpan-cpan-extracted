@@ -8,7 +8,8 @@ export APT_LISTCHANGES_FRONTEND=none
 apt-get update
 apt-get -y install \
 	apt-file dh-make-perl libmodule-build-perl \
-	libclass-accessor-perl libdatetime-perl libdatetime-format-strptime-perl \
+	libclass-accessor-perl libdatetime-perl libdatetime-format-iso8601-perl \
+	libgis-distance-perl \
 	liblwp-protocol-https-perl libjson-perl libjson-xs-perl \
 	liblist-moreutils-perl \
 	libwww-perl \
@@ -20,7 +21,7 @@ apt-cache dumpavail | dpkg --merge-avail
 
 mkdir -p /src/app
 cp -a /orig/Build.PL /orig/Changelog /orig/README.md /src/app
-cp -a /orig/bin /orig/lib /src/app
+cp -a /orig/bin /orig/ext /orig/lib /src/app
 cd /src/app
 
 sed -i 's/sign *=> *1/sign => 0/' Build.PL

@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.165',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.167',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -15,7 +15,6 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
-                                      'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
@@ -27,7 +26,7 @@ do { my $x = {
                                       'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::Coverage::TrustMe' => '0.002001',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
                                       'Test::Warnings' => '0'
@@ -44,11 +43,13 @@ do { my $x = {
                                       'Mojolicious' => '9.0',
                                       'OpenAPI::Modern' => '0.079',
                                       'Role::Tiny' => '2.000001',
+                                      'feature' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.020',
                                       'strict' => '0',
                                       'strictures' => '2',
+                                      'utf8' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -72,8 +73,7 @@ do { my $x = {
                                    'lib' => '0',
                                    'open' => '0',
                                    'perl' => '5.020',
-                                   'stable' => '0.031',
-                                   'utf8' => '0'
+                                   'stable' => '0.031'
                                  }
                  },
        'x_Dist_Zilla' => {
@@ -120,7 +120,6 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
                                            'Dist::Zilla::Plugin::MojibakeTests' => '0.8',
                                            'Dist::Zilla::Plugin::NextRelease' => '5.033',
-                                           'Dist::Zilla::Plugin::PodCoverageTests' => '5.040',
                                            'Dist::Zilla::Plugin::PodSyntaxTests' => '5.040',
                                            'Dist::Zilla::Plugin::PodWeaver' => '4.008',
                                            'Dist::Zilla::Plugin::Prereqs' => '0',
@@ -141,6 +140,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::Test::Kwalitee' => '2.10',
                                            'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000010',
                                            'Dist::Zilla::Plugin::Test::NoTabs' => '0.08',
+                                           'Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe' => '0',
                                            'Dist::Zilla::Plugin::Test::PodSpelling' => '2.006003',
                                            'Dist::Zilla::Plugin::Test::Portability' => '2.000007',
                                            'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.022',

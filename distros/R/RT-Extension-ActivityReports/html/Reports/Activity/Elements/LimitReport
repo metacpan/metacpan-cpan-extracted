@@ -1,22 +1,48 @@
+<&| /Widgets/TitleBox, title => loc('Report Options')&>
 <form action="index.html" method="GET">
-Query:
-<textarea name="Query" rows="5" cols="80"><% $Query %></textarea><br />
+<div class="row mt-2">
+<&| /Elements/LabeledValue, Label => loc('Query'), LabelFor => 'query' &>
+    <textarea id="query" name="Query" rows="5" cols="80" class="form-control"><% $Query %></textarea>
+</&>
+</div>
 
-Report type: <select name="ReportType">
-<option value="ActivityDetail" <% $ReportType =~ /ActivityDetail/ ? 'selected' : '' %>>Activity detail</option>
-<option value="ActivitySummary" <% $ReportType =~ /ActivitySummary/ ? 'selected' : '' %>>Activity summary</option>
+<div class="row mt-2">
+<&| /Elements/LabeledValue, Label => loc('Report type'), LabelFor => 'reporttype' &>
+    <select id="reporttype" name="ReportType" class="selectpicker form-control">
+        <option value="ActivityDetail" <% $ReportType =~ /ActivityDetail/ ? 'selected' : '' %>>Activity detail</option>
+        <option value="ActivitySummary" <% $ReportType =~ /ActivitySummary/ ? 'selected' : '' %>>Activity summary</option>
 % $m->callback( %ARGS, CallbackName => 'AddReports' );
-<option value="ResolutionComments" <% $ReportType =~ /ResolutionComments/ ? 'selected' : '' %>>Resolution comments</option>
-<option value="ResolutionStatistics" <% $ReportType =~ /ResolutionStatistics/ ? 'selected' : '' %>>Resolution statistics</option>
-<option value="WorkedStatistics" <% $ReportType =~ /WorkedStatistics/ ? 'selected' : '' %>>Time worked statistics</option>
-</select><br />
+        <option value="ResolutionComments" <% $ReportType =~ /ResolutionComments/ ? 'selected' : '' %>>Resolution comments</option>
+        <option value="ResolutionStatistics" <% $ReportType =~ /ResolutionStatistics/ ? 'selected' : '' %>>Resolution statistics</option>
+        <option value="WorkedStatistics" <% $ReportType =~ /WorkedStatistics/ ? 'selected' : '' %>>Time worked statistics</option>
+    </select>
+</&>
+</div>
 
-Start date: <input type="text" name="Start" value="<% $Start %>" /><br />
-End date:   <input type="text" name="End"   value="<% $End   %>" /><br />
-Limit to user: <& /Elements/SelectOwner, Name => "Actor", ValueAttribute => 'Name', Default => $actor_obj->Id||0 &>
+<div class="row mt-2">
+<&| /Elements/LabeledValue, Label => loc('Start date'), LabelFor => 'Start' &>
+    <& /Elements/SelectDate, ShowTime => 0, Name => 'Start', Default => $Start &>
+</&>
+</div>
+
+<div class="row mt-2">
+<&| /Elements/LabeledValue, Label => loc('End date'), LabelFor => 'End' &>
+    <& /Elements/SelectDate, ShowTime => 0, Name => 'End', Default => $End &>
+</&>
+</div>
+
+<div class="row mt-2">
+<&| /Elements/LabeledValue, Label => loc('Limit to user') &>
+    <& /Elements/SelectOwner, Name => "Actor", ValueAttribute => 'Name', Default => $actor_obj->Id||0 &>
+</&>
+</div>
+
 % $m->callback( %ARGS, CallbackName => 'AddOptions' );
-<& /Elements/Submit, Label => loc('Report') &>
+<div class="row mt-2">
+    <& /Elements/Submit, Label => loc('Report') &>
+</div>
 </form>
+</&>
 <%args>
 $ReportType  => ''
 $Start => undef

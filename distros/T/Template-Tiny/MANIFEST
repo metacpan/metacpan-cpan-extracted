@@ -17,6 +17,7 @@ t/03_samples.t
 t/04_compat.t
 t/05_preparse.t
 t/06_change_tags.t
+t/07_coderefs.t
 t/samples/01_hello.tt
 t/samples/01_hello.txt
 t/samples/01_hello.var

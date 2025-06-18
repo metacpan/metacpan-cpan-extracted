@@ -1,6 +1,6 @@
 <& LimitReport, %ARGS &>
 % if ($show_print_link) {
-<div align="right">
+<div class = "row mt-2 text-end">
 % my %printable_args = %ARGS;
 % delete $printable_args{$_} for (qw/path title mode/);
 % $printable_args{'mode'} = 'print';

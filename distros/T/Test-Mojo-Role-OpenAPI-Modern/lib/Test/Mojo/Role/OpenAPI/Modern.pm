@@ -1,18 +1,21 @@
 use strict;
 use warnings;
-package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.008-2-gef324c3
+package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.009-3-g2de4222
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test::Mojo role providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use 5.020;  # for fc, unicode_strings features
 use strictures 2;
+use utf8;
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use JSON::Schema::Modern 0.577;
 use OpenAPI::Modern 0.054;
 use List::Util 'any';
@@ -168,7 +171,7 @@ Test::Mojo::Role::OpenAPI::Modern - Test::Mojo role providing access to an OpenA
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -252,6 +255,10 @@ information on how to customize your validation and provide the specification do
 If not provided, the object is constructed using configuration values passed to the application
 under the C<openapi> key (see L<Test::Mojo/new>), as for L<Mojolicious::Plugin::OpenAPI::Modern>,
 or re-uses the object from the application itself if that plugin is applied.
+
+Note that for testing purposes, you should use a relative URI for C<openapi_uri>, otherwise request
+URIs will not match. This is because L<Test::Mojo> uses a randomly-generated port for test requests,
+which cannot be predicted in advance to be included in C<openapi_uri>.
 
 =head2 test_openapi_verbose
 

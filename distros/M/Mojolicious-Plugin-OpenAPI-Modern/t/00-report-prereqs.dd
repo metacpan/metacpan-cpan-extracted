@@ -42,14 +42,16 @@ do { my $x = {
                                       'JSON::Schema::Modern::Document::OpenAPI' => '0.024',
                                       'Mojo::Base' => '0',
                                       'Mojo::JSON' => '0',
-                                      'OpenAPI::Modern' => '0.077',
+                                      'OpenAPI::Modern' => '0.087',
                                       'Path::Tiny' => '0',
                                       'Safe::Isa' => '0',
                                       'YAML::PP' => '0',
+                                      'feature' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.020',
-                                      'strictures' => '2'
+                                      'strictures' => '2',
+                                      'utf8' => '0'
                                     }
                     },
        'test' => {
@@ -58,13 +60,16 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
+                                   'JSON::PP' => '0',
                                    'JSON::Schema::Modern::Utilities' => '0',
                                    'Module::Metadata' => '0',
+                                   'Test2::API' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Memory::Cycle' => '0',
                                    'Test::Mojo' => '0',
-                                   'Test::More' => '0.88',
+                                   'Test::More' => '0.96',
                                    'Test::Warnings' => '0.033',
+                                   'autovivification' => '0',
                                    'constant' => '0',
                                    'experimental' => '0',
                                    'lib' => '0',

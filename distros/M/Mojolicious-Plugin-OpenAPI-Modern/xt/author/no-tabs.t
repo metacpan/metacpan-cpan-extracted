@@ -12,6 +12,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/initialization.t',
     't/lib/BasicApp.pm',
+    't/lib/Helper.pm',
     't/validate_request_response.t',
     'xt/author/00-compile.t',
     'xt/author/clean-namespaces.t',

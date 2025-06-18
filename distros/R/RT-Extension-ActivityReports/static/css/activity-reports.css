@@ -69,3 +69,6 @@ table.numberreport td {
     text-align: right;
 }
 
+div.activity-reports-saved-search div.container.text-center a#saved-search-options-button {
+    display: none;
+}

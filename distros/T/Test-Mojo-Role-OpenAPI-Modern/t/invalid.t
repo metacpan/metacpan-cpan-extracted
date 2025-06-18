@@ -7,6 +7,8 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
@@ -60,9 +62,9 @@ subtest 'request or response not valid' => sub {
 
   $t->post_ok('/foo/123', json => { kaboom => 'oh noes' })
     ->status_is(200)
-    ->request_not_valid(q{'/request/body/kaboom': EXCEPTION: unable to find resource "https://example.com/api#/$defs/i_do_not_exist"})
+    ->request_not_valid(q{'/request/body/kaboom': EXCEPTION: unable to find resource "/api#/$defs/i_do_not_exist"})
     ->request_not_valid('Internal Server Error')
-    ->response_not_valid(q{'/response/body/kaboom': EXCEPTION: unable to find resource "https://example.com/api#/$defs/i_do_not_exist"});
+    ->response_not_valid(q{'/response/body/kaboom': EXCEPTION: unable to find resource "/api#/$defs/i_do_not_exist"});
 
   cmp_deeply(
     $t->request_validation_result->recommended_response,

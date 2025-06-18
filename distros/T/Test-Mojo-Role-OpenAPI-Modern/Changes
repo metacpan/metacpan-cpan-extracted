@@ -1,5 +1,8 @@
 Revision history for Test-Mojo-Role-OpenAPI-Modern
 
+0.010     2025-06-17 21:45:20Z
+          - update tests for error and routing changes in OpenAPI::Modern 0.087
+
 0.009     2025-02-09 01:22:47Z
           - update another prerequisite version to avoid other
             incompatibilities

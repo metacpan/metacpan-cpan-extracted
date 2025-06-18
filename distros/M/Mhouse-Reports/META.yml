@@ -19,9 +19,10 @@ no_index:
     - inc
 requires:
   Cwd: '0'
+  DateTime: '0'
   File::Find: '0'
   File::Path: '0'
   File::Spec: '0'
   JSON: '0'
-version: '0.01'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

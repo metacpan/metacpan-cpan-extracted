@@ -14,6 +14,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/initialization.t
 t/lib/BasicApp.pm
+t/lib/Helper.pm
 t/validate_request_response.t
 weaver.ini
 xt/author/00-compile.t

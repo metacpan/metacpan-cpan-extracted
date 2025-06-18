@@ -17,13 +17,16 @@ use parent 'Exporter';
 
 our @EXPORT_OK = qw(decode_polyline);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Translated this php script
 # <http://unitstep.net/blog/2008/08/02/decoding-google-maps-encoded-polylines-using-php/>
 # to perl
 sub decode_polyline {
-	my ($encoded) = @_;
+	my ( $input ) = @_;
+
+	my $encoded = $input->{points};
+	my $precision = $input->{precision};
 
 	my $length = length $encoded;
 	my $index  = 0;
@@ -80,14 +83,14 @@ sub decode_polyline {
 		}
 
 		# The actual latitude and longitude values were multiplied by
-		# 1e5 before encoding so that they could be converted to a 32-bit
-		# integer representation. (With a decimal accuracy of 7 places)
+		# 1e$precision before encoding so that they could be converted to a 32-bit
+		# integer representation. (With a decimal accuracy of $precision places)
 		# Convert back to original values.
 		push(
 			@points,
 			{
-				lat => $lat * 1e-7,
-				lon => $lon * 1e-7
+				lat => $lat * (10 ** -$precision),
+				lon => $lon * (10 ** -$precision),
 			}
 		);
 	}

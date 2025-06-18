@@ -4,7 +4,7 @@ Config::Abstraction - Configuration Abstraction Layer
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # SYNOPSIS
 

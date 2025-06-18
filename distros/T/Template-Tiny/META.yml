@@ -28,7 +28,7 @@ no_index:
 provides:
   Template::Tiny:
     file: lib/Template/Tiny.pm
-    version: '1.15'
+    version: '1.16'
 requires:
   Carp: '0'
   perl: '5.006'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Tiny
   homepage: https://github.com/karenetheridge/Template-Tiny
   repository: https://github.com/karenetheridge/Template-Tiny.git
-version: '1.15'
+version: '1.16'
 x_Dist_Zilla:
   perl:
     version: '5.041013'
@@ -644,7 +644,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.15
+          tag: v1.16
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

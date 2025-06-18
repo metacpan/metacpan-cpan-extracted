@@ -74,14 +74,16 @@
             "JSON::Schema::Modern::Document::OpenAPI" : "0.024",
             "Mojo::Base" : "0",
             "Mojo::JSON" : "0",
-            "OpenAPI::Modern" : "0.077",
+            "OpenAPI::Modern" : "0.087",
             "Path::Tiny" : "0",
             "Safe::Isa" : "0",
             "YAML::PP" : "0",
+            "feature" : "0",
             "if" : "0",
             "namespace::clean" : "0",
             "perl" : "5.020",
-            "strictures" : "2"
+            "strictures" : "2",
+            "utf8" : "0"
          }
       },
       "test" : {
@@ -90,13 +92,16 @@
          },
          "requires" : {
             "File::Spec" : "0",
+            "JSON::PP" : "0",
             "JSON::Schema::Modern::Utilities" : "0",
             "Module::Metadata" : "0",
+            "Test2::API" : "0",
             "Test::Deep" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mojo" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
             "Test::Warnings" : "0.033",
+            "autovivification" : "0",
             "constant" : "0",
             "experimental" : "0",
             "lib" : "0",
@@ -186,7 +191,7 @@
    "provides" : {
       "Mojolicious::Plugin::OpenAPI::Modern" : {
          "file" : "lib/Mojolicious/Plugin/OpenAPI/Modern.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -201,7 +206,7 @@
          "web" : "https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041013"
@@ -749,7 +754,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -873,7 +878,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                }
             },
@@ -884,7 +889,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                }
             },
@@ -895,7 +900,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                }
             },
@@ -929,7 +934,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                }
             },
@@ -1041,7 +1046,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1058,12 +1063,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.016",
+                  "tag" : "v0.017",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1113,7 +1118,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1144,7 +1149,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.49.0",
                   "repo_root" : "."
                }
             },

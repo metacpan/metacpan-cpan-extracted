@@ -8,7 +8,7 @@ use warnings;
 
 #<<<
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 #>>>
 
@@ -166,7 +166,7 @@ Math::NLopt - Math::NLopt - Perl interface to the NLopt optimization library
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -354,285 +354,7 @@ The C<\&precond> fallback has this signature:
 C<\@x>, C<\@v>, and C<\@vpre> are arrays of length C<$n>.
 C<\@x>, C<\@v>  are input and C<\@vpre> should be filled in by the routine.
 
-=head1 METHODS
-
-Most methods have the same calling signature as their C versions, but
-not all!
-
-=head3 add_equality_constraint
-
-  $opt->add_equality_constraint( \&func, ?$data, ?$tol = 0 );
-
-=head3 add_equality_mconstraint
-
-  $opt->add_equality_mconstraint( \&func, $m, ?$data, ?\@tol );
-
-=head3 add_inequality_constraint
-
-  $opt->add_inequality_constraint( \&func, ?$data, ?$tol = 0 );
-
-=head3 add_inequality_mconstraint
-
-  $opt->add_inequality_mconstraint( \&func, $m, ?$data, ?\@tol );
-
-=head3 force_stop
-
-  $opt->force_stop;
-
-=head3 get_algorithm
-
-  $algorithm_int_id = $opt->get_algorithm;
-
-=head3 get_dimension
-
-  $n = $opt->get_dimension;
-
-=head3 get_errmsg
-
-  $string  $opt->get_errmsg;
-
-=head3 get_force_stop
-
-  $stop = $opt->get_force_stop;
-
-=head3 get_ftol_abs
-
-  $tol = $opt->get_ftol_abs;
-
-=head3 get_ftol_rel
-
-  $tol = $opt->get_ftol_rel;
-
-=head3 get_initial_step
-
-  \@steps = $opt->get_initial_step( \@init_x );
-
-=head3 get_lower_bounds
-
-  \@lb = $opt->get_lower_bounds;
-
-=head3 get_maxeval
-
-  $max_eval = $opt->get_maxeval;
-
-=head3 get_maxtime
-
-  $max_time = $opt->get_maxtime;
-
-=head3 get_numevals
-
-  $num_evals = $opt->get_numevals;
-
-=head3 get_param
-
-  $val = $opt->get_param( $name, $defaultval);
-
-Return parameter value, or C<$defaultval> if not set.
-
-=head3 get_population
-
-  $pop = $opt->get_population;
-
-=head3 get_stopval
-
-  $val = $opt->get_stopval;
-
-=head3 get_upper_bounds
-
-  \@ub = $opt->get_upper_bounds;
-
-=head3 get_vector_storage
-
-  $dim = $opt->get_vector_storage;
-
-=head3 get_x_weights
-
-  \@weights = $opt->get_x_weights;
-
-=head3 get_xtol_abs
-
-  \@tol = $opt->get_xtol_abs;
-
-=head3 get_xtol_rel
-
-  $tol = $opt->get_xtol_rel;
-
-=head3 has_param
-
-  $bool = $opt->has_param( $name );
-
-True if the parameter with C<$name> was set.
-
-=head3 nth_param
-
-  $name = $opt->nth_param( $i );
-
-Return the name of algorithm specific parameter C<$i>.
-
-=head3 last_optimize_result
-
-  $result_code = $opt->last_optimize_result;
-
-Return the result code after an optimization.
-
-=head3 last_optimum_value
-
-  $min_f = $opt->last_optimum_value;
-
-Return the objective value obtained after an optimization.
-
-=head3 num_params
-
-  $n_algo_params = $opt->num_params;
-
-Return the number of algorithm specific parameters.
-
-=head3 optimize
-
-  \@optimized_pars = $opt->optimize( \@input_pars );
-
-Returns the parameter values determined from the optimization.  The
-status of the optimization (e.g. NLopt's result code) can be retrieved
-via the L</last_optimize_result> method. The final value of the
-objective function is available via the L</last_aptimum_value> method.
-
-=head3 remove_equality_constraints
-
-  $opt->remove_equality_constraints;
-
-=head3 remove_inequality_constraints
-
-  $opt->remove_inequality_constraints;
-
-=head3 set_force_stop
-
-  $opt->set_force_stop( $val );
-
-=head3 set_ftol_abs
-
-  $opt->set_ftol_abs( $tol );
-
-=head3 set_ftol_rel
-
-  $opt->set_ftol_rel( $tol );
-
-=head3 set_initial_step
-
-  $opt->set_initial_step(\@dx);
-
-C<@dx> has length C<$n>.
-
-=head3 set_initial_step1
-
-  $opt->set_initial_step1( $dx );
-
-=head3 set_local_optimizer
-
-  $opt->set_local_optmizer( $local_opt );
-
-=head3 set_lower_bound
-
-  $opt->set_lower_bound( $i, $ub );
-
-Set the lower bound for parameter C<$i> (zero based) to C<$ub>
-
-=head3 set_lower_bounds
-
-  $opt->set_lower_bounds(\@ub);
-
-C<@ub> has length C<$n>.
-
-=head3 set_lower_bounds1
-
-  $opt->set_lower_bounds1 ($ub);
-
-=head3 set_max_objective
-
-  $opt->set_max_objective( \&func, ?$data );
-
-See L<Objective Functions>
-
-=head3 set_maxeval
-
-   $opt->set_maxeval( $max_iterations );
-
-=head3 set_maxtime
-
-   $opt->set_maxtime( $time );
-
-=head3 set_min_objective
-
-  $opt->set_min_objective( \&func, ?$data );
-
-See L<Objective Functions>
-
-=head3 set_param
-
-  $opt->set_param( $name, $value );
-
-=head3 set_population
-
-  $opt->set_population( $pop );
-
-=head3 set_precond_max_objective
-
-  $opt->set_precond_max_objective( \&func, \&precond, ?$data);
-
-See L</Preconditioned Objectives>
-
-=head3 set_precond_min_objective
-
-  $opt->set_precond_min_objective( \&func, \&precond, ?$data);
-
-See L</Preconditioned Objectives>
-
-=head3 set_stopval
-
-  $opt->set_stopval( $stopval);
-
-=head3 set_upper_bound
-
-  $opt->set_upper_bound( $i, $ub );
-
-Set the upper bound for parameter C<$i> (zero based) to C<$ub>
-
-=head3 set_upper_bounds
-
-  $opt->set_upper_bounds(\@ub);
-
-C<@ub> has length C<$n>.
-
-=head3 set_upper_bounds1
-
-  $opt->set_upper_bounds1 ($ub);
-
-=head3 set_vector_storage
-
-  $opt->set_vector_storage( $dim )
-
-=head3 set_x_weights
-
-  $opt->set_x_weights( \@weights );
-
-C<@weights> has length C<$n>.
-
-=head3 set_x_weights1
-
-  $opt->set_x_weights1( $weight );
-
-=head3 set_xtol_abs
-
-  $opt->set_xtol_abs( \@tol );
-
-C<@tol> has length C<$n>.
-
-=head3 set_xtol_abs1
-
-  $opt->set_xtol_abs1( $tol );
-
-=head3 set_xtol_rel
-
-  $opt->set_xtol_rel( $tol );
+=head1 CONSTRUCTORS
 
 =head2 new
 
@@ -644,52 +366,330 @@ B<$algorithm> is one of the algorithm constants, e.g.
   use Math::NLopt 'NLOPT_LD_MMA';
   my $opt = Math::NLopt->new( NLOPT_LD_MMA, 3 );
 
-=for Pod::Coverage constant
-create
+=head1 METHODS
 
-=head1 CONSTRUCTORS
+Most methods have the same calling signature as their C versions, but
+not all!
 
-=head1 UTILITY SUBROUTINES
+=head2 add_equality_constraint
+
+  $opt->add_equality_constraint( \&func, ?$data, ?$tol = 0 );
+
+=head2 add_equality_mconstraint
+
+  $opt->add_equality_mconstraint( \&func, $m, ?$data, ?\@tol );
+
+=head2 add_inequality_constraint
+
+  $opt->add_inequality_constraint( \&func, ?$data, ?$tol = 0 );
+
+=head2 add_inequality_mconstraint
+
+  $opt->add_inequality_mconstraint( \&func, $m, ?$data, ?\@tol );
+
+=head2 force_stop
+
+  $opt->force_stop;
+
+=head2 get_algorithm
+
+  $algorithm_int_id = $opt->get_algorithm;
+
+=head2 get_dimension
+
+  $n = $opt->get_dimension;
+
+=head2 get_errmsg
+
+  $string  $opt->get_errmsg;
+
+=head2 get_force_stop
+
+  $stop = $opt->get_force_stop;
+
+=head2 get_ftol_abs
+
+  $tol = $opt->get_ftol_abs;
+
+=head2 get_ftol_rel
+
+  $tol = $opt->get_ftol_rel;
+
+=head2 get_initial_step
+
+  \@steps = $opt->get_initial_step( \@init_x );
+
+=head2 get_lower_bounds
+
+  \@lb = $opt->get_lower_bounds;
+
+=head2 get_maxeval
+
+  $max_eval = $opt->get_maxeval;
+
+=head2 get_maxtime
+
+  $max_time = $opt->get_maxtime;
+
+=head2 get_numevals
+
+  $num_evals = $opt->get_numevals;
+
+=head2 get_param
+
+  $val = $opt->get_param( $name, $defaultval);
+
+Return parameter value, or C<$defaultval> if not set.
+
+=head2 get_population
+
+  $pop = $opt->get_population;
+
+=head2 get_stopval
+
+  $val = $opt->get_stopval;
+
+=head2 get_upper_bounds
+
+  \@ub = $opt->get_upper_bounds;
+
+=head2 get_vector_storage
+
+  $dim = $opt->get_vector_storage;
+
+=head2 get_x_weights
+
+  \@weights = $opt->get_x_weights;
+
+=head2 get_xtol_abs
+
+  \@tol = $opt->get_xtol_abs;
+
+=head2 get_xtol_rel
+
+  $tol = $opt->get_xtol_rel;
+
+=head2 has_param
+
+  $bool = $opt->has_param( $name );
+
+True if the parameter with C<$name> was set.
+
+=head2 nth_param
+
+  $name = $opt->nth_param( $i );
+
+Return the name of algorithm specific parameter C<$i>.
+
+=head2 last_optimize_result
+
+  $result_code = $opt->last_optimize_result;
+
+Return the result code after an optimization.
+
+=head2 last_optimum_value
+
+  $min_f = $opt->last_optimum_value;
+
+Return the objective value obtained after an optimization.
+
+=head2 num_params
+
+  $n_algo_params = $opt->num_params;
+
+Return the number of algorithm specific parameters.
+
+=head2 optimize
+
+  \@optimized_pars = $opt->optimize( \@input_pars );
+
+Returns the parameter values determined from the optimization.  The
+status of the optimization (e.g. NLopt's result code) can be retrieved
+via the L</last_optimize_result> method. The final value of the
+objective function is available via the L</last_aptimum_value> method.
+
+=head2 remove_equality_constraints
+
+  $opt->remove_equality_constraints;
+
+=head2 remove_inequality_constraints
+
+  $opt->remove_inequality_constraints;
+
+=head2 set_force_stop
+
+  $opt->set_force_stop( $val );
+
+=head2 set_ftol_abs
+
+  $opt->set_ftol_abs( $tol );
+
+=head2 set_ftol_rel
+
+  $opt->set_ftol_rel( $tol );
+
+=head2 set_initial_step
+
+  $opt->set_initial_step(\@dx);
+
+C<@dx> has length C<$n>.
+
+=head2 set_initial_step1
+
+  $opt->set_initial_step1( $dx );
+
+=head2 set_local_optimizer
+
+  $opt->set_local_optmizer( $local_opt );
+
+=head2 set_lower_bound
+
+  $opt->set_lower_bound( $i, $ub );
+
+Set the lower bound for parameter C<$i> (zero based) to C<$ub>
+
+=head2 set_lower_bounds
+
+  $opt->set_lower_bounds(\@ub);
+
+C<@ub> has length C<$n>.
+
+=head2 set_lower_bounds1
+
+  $opt->set_lower_bounds1 ($ub);
+
+=head2 set_max_objective
+
+  $opt->set_max_objective( \&func, ?$data );
+
+See L<Objective Functions>
+
+=head2 set_maxeval
+
+   $opt->set_maxeval( $max_iterations );
+
+=head2 set_maxtime
+
+   $opt->set_maxtime( $time );
+
+=head2 set_min_objective
+
+  $opt->set_min_objective( \&func, ?$data );
+
+See L<Objective Functions>
+
+=head2 set_param
+
+  $opt->set_param( $name, $value );
+
+=head2 set_population
+
+  $opt->set_population( $pop );
+
+=head2 set_precond_max_objective
+
+  $opt->set_precond_max_objective( \&func, \&precond, ?$data);
+
+See L</Preconditioned Objectives>
+
+=head2 set_precond_min_objective
+
+  $opt->set_precond_min_objective( \&func, \&precond, ?$data);
+
+See L</Preconditioned Objectives>
+
+=head2 set_stopval
+
+  $opt->set_stopval( $stopval);
+
+=head2 set_upper_bound
+
+  $opt->set_upper_bound( $i, $ub );
+
+Set the upper bound for parameter C<$i> (zero based) to C<$ub>
+
+=head2 set_upper_bounds
+
+  $opt->set_upper_bounds(\@ub);
+
+C<@ub> has length C<$n>.
+
+=head2 set_upper_bounds1
+
+  $opt->set_upper_bounds1 ($ub);
+
+=head2 set_vector_storage
+
+  $opt->set_vector_storage( $dim )
+
+=head2 set_x_weights
+
+  $opt->set_x_weights( \@weights );
+
+C<@weights> has length C<$n>.
+
+=head2 set_x_weights1
+
+  $opt->set_x_weights1( $weight );
+
+=head2 set_xtol_abs
+
+  $opt->set_xtol_abs( \@tol );
+
+C<@tol> has length C<$n>.
+
+=head2 set_xtol_abs1
+
+  $opt->set_xtol_abs1( $tol );
+
+=head2 set_xtol_rel
+
+  $opt->set_xtol_rel( $tol );
+
+=head1 SUBROUTINES
 
 These are exportable individually, or en-masse via the C<:utils> tag,
 but beware that B<srand> has same name as the Perl C<srand> routine, and
 C<version> is rather generic.
 
-=head3 algorithm_from_string
+=head2 algorithm_from_string
 
   $algorithm_int_id = algorithm_from_string( $algorithm_string_id );
 
 return an integer id (e.g. B<NLOPT_LD_MMA>) from a string id (e.g. 'LD_MMA').
 
-=head3 algorithm_name
+=head2 algorithm_name
 
   $algorithm_name = algorithm_from_string( $algorithm_int_id );
 
 return a descriptive name from an integer id
 
-=head3 algorithm_to_string
+=head2 algorithm_to_string
 
   $algorithm_string_id = algorithm_to_string( $algorithm_int_id );
 
-=head3 result_from_string
+=head2 result_from_string
 
   $result_int_id = result_from_string( $result_string_id );
 
 return an integer id (e.g. B<NLOPT_SUCCESS>) from a string id (e.g. 'SUCCESS').
 
-=head3 result_to_string
+=head2 result_to_string
 
   $result_string_id = result_to_string( $result_int_id );
 
-=head3 srand
+=head2 srand
 
   srand( $seed )
 
-=head3 srand_time
+=head2 srand_time
 
-=head3 version
+=head2 version
 
   ($major, $minor, $bugfix ) = Math::NLopt::version()
+
+=for Pod::Coverage constant
+create
 
 =head1 SUPPORT
 

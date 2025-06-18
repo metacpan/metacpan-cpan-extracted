@@ -8,7 +8,7 @@ use DateTime::Format::ISO8601;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 	qw(
@@ -17,6 +17,7 @@ Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 	  agency
 	  route_name
 	  route_color
+	  route_text_color
 	  headsign
 
 	  is_cancelled
@@ -29,15 +30,17 @@ Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my $json = $opt{json};
+	my $json      = $opt{json};
+	my $time_zone = $opt{time_zone};
 
 	my $ref = {
-		id          => $json->{tripId},
-		mode        => $json->{mode},
-		agency      => $json->{agencyName},
-		route_name  => $json->{routeShortName},
-		route_color => $json->{routeColor},
-		headsign    => $json->{headsign},
+		id               => $json->{tripId},
+		mode             => $json->{mode},
+		agency           => $json->{agencyName},
+		route_name       => $json->{routeShortName},
+		route_color      => $json->{routeColor},
+		route_text_color => $json->{routeTextColor},
+		headsign         => $json->{headsign},
 
 		is_cancelled => $json->{cancelled},
 		is_realtime  => $json->{realTime},
@@ -48,6 +51,8 @@ sub new {
 			# NOTE: $json->{place}->{cancelled} isn't set, we just override this here.
 			cancelled => $json->{cancelled},
 			realtime  => $json->{realTime},
+
+			time_zone => $time_zone,
 		),
 	};
 

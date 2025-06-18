@@ -1,3 +1,12 @@
+Travel::Status::MOTIS 0.02 - Tue Jun 17 2025
+
+    * motis-m: Fix --json for trip lookups (patch by networkException)
+    * MOTIS: Use v2 API for trip lookups (patch by networkException)
+    * MOTIS: Add time_zone parameter, allowing users to receive times in the
+      specified time_zone rather than the system's local time zone
+      (patch by networkException)
+    * Trip: Add route_text_color accessor (patch by networkException)
+
 Travel::Status::MOTIS 0.01 - Sun Apr 20 2025
 
     * Initial release

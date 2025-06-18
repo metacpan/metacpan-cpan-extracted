@@ -23,7 +23,7 @@ use Travel::Status::MOTIS::Trip;
 use Travel::Status::MOTIS::Stopover;
 use Travel::Status::MOTIS::Stop;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # {{{ Endpoint Definition
 
@@ -59,6 +59,7 @@ sub new {
 		results        => [],
 		station        => $conf{station},
 		user_agent     => $user_agent,
+		time_zone      => 'local',
 	};
 
 	bless( $self, $obj );
@@ -83,7 +84,7 @@ sub new {
 		);
 	}
 	elsif ( my $trip_id = $conf{trip_id} ) {
-		$request_url->path('api/v1/trip');
+		$request_url->path('api/v2/trip');
 		$request_url->query_form(
 			tripId => $trip_id,
 		);
@@ -311,8 +312,10 @@ sub get_with_cache_p {
 sub parse_trip {
 	my ( $self, %opt ) = @_;
 
-	$self->{result}
-	  = Travel::Status::MOTIS::Trip->new( json => $self->{raw_json} );
+	$self->{result} = Travel::Status::MOTIS::Trip->new(
+		json      => $self->{raw_json},
+		time_zone => $self->{time_zone},
+	);
 }
 
 sub parse_stops_by {
@@ -330,9 +333,12 @@ sub parse_stops_by {
 sub parse_trips_at_stopover {
 	my ($self) = @_;
 
-	@{ $self->{results} }
-	  = map { Travel::Status::MOTIS::TripAtStopover->new( json => $_ ) }
-	  @{ $self->{raw_json}{stopTimes} // [] };
+	@{ $self->{results} } = map {
+		Travel::Status::MOTIS::TripAtStopover->new(
+			json      => $_,
+			time_zone => $self->{time_zone},
+		)
+	} @{ $self->{raw_json}{stopTimes} // [] };
 
 	return $self;
 }
@@ -434,7 +440,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 
@@ -521,6 +527,10 @@ By default, Travel::Status::MOTIS uses TRANSIT.
 Do not perform a request to MOTIS; load the prepared response provided in
 I<json> instead. Note that you still need to specify B<stop_id>, B<trip_id>,
 etc. as appropriate.
+
+=item B<time_zone> => I<$time_zone>
+
+A timezone to normalize timestamps to, defaults to 'local'.
 
 =back
 

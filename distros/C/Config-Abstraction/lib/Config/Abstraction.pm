@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -312,7 +312,7 @@ sub new
 		if(!Scalar::Util::blessed($logger)) {
 			$self->_load_driver('Log::Abstraction');
 			$self->{'logger'} = Log::Abstraction->new($logger);
-			if($params->{'level'}) {
+			if($params->{'level'} && $self->{'logger'}->can('level')) {
 				$self->{'logger'}->level($params->{'level'});
 			}
 		}
@@ -609,7 +609,11 @@ sub _load_config
 
 	if($self->{'flatten'}) {
 		$self->_load_driver('Hash::Flatten', ['flatten']);
+	} else {
+		$self->_load_driver('Hash::Flatten', ['unflatten']);
 	}
+	# $self->{config} = $self->{flatten} ? flatten(\%merged) : unflatten(\%merged);
+	# Don't unflatten because of RT#166761
 	$self->{config} = $self->{flatten} ? flatten(\%merged) : \%merged;
 }
 

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.085-15-g62f85f4
+package OpenAPI::Modern; # git description: v0.086-15-g8f56a9c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.086';
+our $VERSION = '0.087';
 
 use 5.020;
 use utf8;
@@ -22,8 +22,9 @@ no feature 'switch';
 use Carp 'croak';
 use Safe::Isa;
 use Ref::Util qw(is_plain_hashref is_plain_arrayref is_ref);
-use List::Util qw(first pairs);
+use List::Util qw(first pairs none);
 use Scalar::Util 'looks_like_number';
+use builtin::compat 'indexed';
 use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
@@ -347,7 +348,7 @@ sub find_path ($self, $options, $state = {}) {
     }
   }
 
-  my ($method, $path_template, $path_item_path);
+  my $method;
 
   # method from options
   if (exists $options->{method}) {
@@ -360,18 +361,17 @@ sub find_path ($self, $options, $state = {}) {
     $method = $options->{method} = lc $options->{request}->method;
   }
 
+  my ($path_template, $operation_path);
+
   # path_template and method from operation_id from options
   if (exists $options->{operation_id}) {
     # FIXME: what if the operation is defined in another document? Need to look it up across
     # all documents, and localize $state->{initial_schema_uri}
-    my $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
+    $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
     return E({ %$state, recommended_response => [ 500 ] }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
 
-    my @bits = unjsonp($operation_path);
-    ($path_template, $method) = @bits[-2,-1];
-    pop @bits;  # remove method from operation_path to get path-item path
-    $path_item_path = jsonp(@bits); # perhaps ('', 'paths', $path_template)
+    ($path_template, $method) = (unjsonp($operation_path))[-2,-1];
 
     # The path_template cannot be found if the operation path is not directly under /paths (such as
     # for path-items reached by a $ref): we will do a URI -> path_template lookup later on,
@@ -383,15 +383,15 @@ sub find_path ($self, $options, $state = {}) {
     else {
       # the path_template need not be provided, but if it is, the operation must be located at the
       # path-item directly underneath that /paths/<path_template>.
-      return E({ %$state, schema_path => $path_item_path, recommended_response => [ 500 ] },
+      return E({ %$state, schema_path => $operation_path.'/operationId', recommended_response => [ 500 ] },
           'operation at operation_id does not match provided path_template')
         if exists $options->{path_template} and $options->{path_template} ne $path_template;
     }
 
     if ($options->{method} and lc $options->{method} ne $method) {
       delete $options->{operation_id};
-      return E({ %$state, ($options->{request} ? ( data_path => '/request/method' ) : ()), schema_path => $operation_path },
-        'wrong HTTP method "%s"', $options->{method});
+      return E({ %$state, ($options->{request} ? ( data_path => '/request/method' ) : ()), schema_path => $operation_path.'/operationId' },
+        'operation at operation_id does not match HTTP method "%s"', $options->{method});
     }
 
     $options->{method} = $method;
@@ -411,22 +411,24 @@ sub find_path ($self, $options, $state = {}) {
   if (exists $options->{path_template}) {
     $path_template = $options->{path_template};
 
-    return E({ %$state, data_path => '/request/uri/path', keyword => 'paths' }, 'missing path-item "%s"', $path_template)
+    return E({ %$state, data_path => '/request/uri', keyword => 'paths' }, 'missing path-item "%s"', $path_template)
       if not exists $schema->{paths}{$path_template};
   }
 
   if (not $path_template and not $options->{request}) {
     # some operations don't exist directly under a /paths/$path_template - e.g. webhooks or
     # callbacks, but they are still usable
+    my $path_item_path = $operation_path =~ s{/$method$}{}r;
     $state->{schema_path} = $path_item_path;
-    $options->{_path_item} = $self->openapi_document->get($path_item_path);
+    $options->{_path_item} = $self->document_get($path_item_path);
 
     # FIXME: this is not accurate if the operation lives in another document
-    $options->{operation_uri} = $state->{initial_schema_uri}->clone->fragment($path_item_path.'/'.$method);
+    # (and in that case, get_operation_uri_by_id can be returned as-is)
+    $options->{operation_uri} = $state->{initial_schema_uri}->clone->fragment($operation_path);
     return 1;
   }
 
-  my $capture_values;
+  my $captures;  # hashref of template variable names -> concrete values from the uri
 
   if (not $path_template and $options->{request}) {
     # derive path_template and capture values from the request URI
@@ -435,75 +437,125 @@ sub find_path ($self, $options, $state = {}) {
     # templated components, except when the concrete component is a non-ascii character or matches
     # 0x7c (pipe), 0x7d (close-brace) or 0x7e (tilde)
     foreach my $pt (sort keys(($schema->{paths}//{})->%*)) {
-      $capture_values = $self->_match_uri($options->{request}->url, $pt, $state);
+      $state->{path_item} = $schema->{paths}{$pt};
+      $state->{schema_path} = jsonp('/paths', $pt);
+      $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $pt, $state);
 
-      # this might not be the intended match, as multiple templates can match the same URI
-      $path_template = $pt, last if $capture_values;
+      # note: this might not be the intended match, as multiple templates can match the same URI
+      $path_template = $pt, last if $captures;
+
+      # the initial match succeeded, but something else went wrong
+      if ($state->{errors}->@*) {
+        $options->{path_template} = $pt;
+        $options->{_path_item} = $state->{path_item};
+        return;
+      }
     }
 
-    return E({ %$state, data_path => '/request/uri/path', keyword => 'paths' }, 'no match found for request URI "%s"',
-        $options->{request}->url->clone->query('')->fragment(undef))
-      if not $capture_values;
+    return E({ %$state, data_path => '/request', schema_path => '', keyword => 'paths' },
+        'no match found for request %s "%s"',
+        $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef))
+      if not $captures;
   }
 
   elsif ($options->{request}) {
     # we were passed path_template in options or we calculated it from operation_id, and now we
     # verify it against path_captures and the request URI.
-    $capture_values = $self->_match_uri($options->{request}->url, $path_template, $state);
+    $state->{path_item} = $schema->{paths}{$path_template};
+    $state->{schema_path} = jsonp('/paths', $path_template);
+    $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $path_template, $state);
 
-    if (not $capture_values) {
+    if (not $captures) {
       delete $options->{operation_id};
-      return E({ %$state, data_path => '/request/uri/path',
-          schema_path => jsonp('/paths', $path_template, exists $options->{path_template} ? () : $method), recommended_response => [ 500 ] }, 'provided %s does not match request URI',
-        exists $options->{path_template} ? 'path_template' : 'operation_id');
+
+      # the initial match succeeded, but something else went wrong
+      if ($state->{errors}->@*) {
+        $options->{path_template} = $path_template;
+        $options->{_path_item} = $state->{path_item};
+        return;
+      }
+
+      if (exists $options->{path_template}) {
+        return E({ %$state, data_path => '/request/uri',
+            schema_path => jsonp('/paths', $path_template), recommended_response => [ 500 ] },
+          'provided path_template does not match request URI "%s"',
+          $options->{request}->url->clone->query('')->fragment(undef));
+      }
+      else {
+        return E({ %$state, data_path => '/request/uri',
+            schema_path => jsonp('/paths', $path_template, $method, 'operationId'), recommended_response => [ 500 ] },
+          'provided operation_id does not match request %s %s',
+          $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef));
+      }
+    }
+  }
+
+  else {
+    $state->{path_item} = $schema->{paths}{$path_template};
+    $state->{schema_path} = jsonp('/paths', $path_template);
+    while (my $ref = $state->{path_item}{'$ref'}) {
+      $state->{path_item} = $self->_resolve_ref('path-item', $ref, $state);
     }
   }
 
   # if we weren't passed a request, we can't verify that the path_template matches, but we may have
   # derived it from looking upward from the operation_id
   $options->{path_template} = $path_template;
-
-  # TODO: possibly support looking for paths in other documents?
-  my $path_item = $schema->{paths}{$path_template};
-  $state->{schema_path} = $path_item_path = jsonp('/paths', $path_template);
-  while (my $ref = $path_item->{'$ref'}) {
-    $path_item = $self->_resolve_ref('path-item', $ref, $state);
-    $path_item_path = $state->{initial_schema_uri}->fragment; # FIXME include full document location
-  }
-  $options->{_path_item} = $path_item;
+  $options->{_path_item} = $state->{path_item};
 
   # this can only happen if we were not able to derive the path_template from the provided
   # operation_id earlier, but we still matched the request against some other path-item
   return E({ %$state, recommended_response => [ 500 ] }, 'templated operation does not match provided operation_id')
-    if $options->{operation_id} and ($path_item->{$method}{operationId}//'') ne $options->{operation_id};
+    if $options->{operation_id} and ($options->{_path_item}{$method}{operationId}//'') ne $options->{operation_id};
 
+  # this can only happen if we do not have a request object, as otherwise a missing operation is
+  # simply reported as a match failure
   return E({ %$state, data_path => '/request/method', recommended_response => [ 405 ] },
-      'missing operation for HTTP method "%s"', $method)
-    if not exists $path_item->{$method};
+      'missing operation for HTTP method "%s" under "%s"', uc $method, $path_template)
+    if not exists $options->{_path_item}{$method};
 
-  # FIXME: this is not accurate if the operation lives in another document
-  $options->{operation_uri} = $state->{initial_schema_uri}->clone->fragment($path_item_path.'/'.$method);
-  $options->{operation_id} = $path_item->{$method}{operationId} if exists $path_item->{$method}{operationId};
+  # if initial_schema_uri still points to the head of the entry document, then we have not followed
+  # a $ref and the path-item is located at /paths/<path_template>
+  $options->{operation_uri} = $state->{initial_schema_uri}->clone
+    ->fragment(($state->{initial_schema_uri}->fragment // $state->{schema_path}).'/'.$method);
+
+  $options->{operation_id} = $options->{_path_item}{$method}{operationId} if exists $options->{_path_item}{$method}{operationId};
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   # { for the editor
-  my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
-  return E({ %$state, $options->{request} ? ( data_path => '/request/uri/path' ) : (), recommended_response => [ 500 ] }, 'provided path_captures names do not match path template "%s"', $path_template)
+  my @path_capture_names = ($path_template =~ m!\{([^}]+)\}!g);
+  return E({ %$state, $options->{request} ? ( data_path => '/request/uri' ) : (), recommended_response => [ 500 ] }, 'provided path_captures names do not match path template "%s"', $path_template)
     if exists $options->{path_captures}
-      and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @capture_names ]);
+      and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @path_capture_names ]);
 
-  return 1 if not $capture_values;
+  return 1 if not $captures;
 
-  if (exists $options->{path_captures}) {
+  my @uri_capture_names = keys %$captures;
+
+  if (exists $options->{uri_captures}) {
+    return E({ %$state, $options->{request} ? ( data_path => '/request/uri' ) : (), recommended_response => [ 500 ] },
+        'provided uri_captures names do not match extracted values')
+      if not is_equal([ sort keys $options->{uri_captures}->%* ], [ sort @uri_capture_names ]);
+
     # $equal_state will contain { path => '/0' } indicating the index of the mismatch
-    if (not is_equal([ $options->{path_captures}->@{@capture_names} ], $capture_values, my $equal_state = { stringy_numbers => 1 })) {
-      return E({ %$state, data_path => '/request/uri/path', recommended_response => [ 500 ]  },
-        'provided path_captures values do not match request URI (value for %s differs)', $capture_names[substr($equal_state->{path}, 1)]);
+    if (not is_equal([ $options->{uri_captures}->@{@uri_capture_names} ], [ $captures->@{@uri_capture_names} ], my $equal_state = { stringy_numbers => 1 })) {
+      return E({ %$state, data_path => '/request/uri', recommended_response => [ 500 ] },
+        'provided uri_captures values do not match request URI (value for %s differs)', $uri_capture_names[substr($equal_state->{path}, 1)]);
     }
   }
   else {
-    my %path_captures; @path_captures{@capture_names} = @$capture_values;
-    $options->{path_captures} = \%path_captures;
+    $options->{uri_captures} = $captures;
+  }
+
+  if (exists $options->{path_captures}) {
+    # $equal_state will contain { path => '/0' } indicating the index of the mismatch
+    if (not is_equal([ $options->{path_captures}->@{@path_capture_names} ], [ $captures->@{@path_capture_names} ], my $equal_state = { stringy_numbers => 1 })) {
+      return E({ %$state, data_path => '/request/uri', recommended_response => [ 500 ] },
+        'provided path_captures values do not match request URI (value for %s differs)', $path_capture_names[substr($equal_state->{path}, 1)]);
+    }
+  }
+  else {
+    $options->{path_captures} = +{ $captures->%{@path_capture_names} };
   }
 
   return 1;
@@ -539,7 +591,8 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
 # given a request uri and a path_template, check that these match, and extract capture values.
-sub _match_uri ($self, $uri, $path_template, $state) {
+# returns false on error, possibly adding errors to $state.
+sub _match_uri ($self, $method, $uri, $path_template, $state) {
   my $uri_path = $uri->path->to_string;
 
   # RFC9112 §3.2.1-3: "If the target URI's path component is empty, the client MUST send "/" as the
@@ -552,18 +605,104 @@ sub _match_uri ($self, $uri, $path_template, $state) {
     map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
     split /(\{[^}]+\})/, $path_template;
 
-  # TODO: this will soon be the pattern for the entire uri, not the path
-  do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, '^'.$path_pattern.'$' }
+  # if the uri doesn't match against the path alone, we can immediately bail (and keep looking for
+  # another /paths entry that might match)... this also saves us needless parsing of server objects
+  do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, $path_pattern.'$' }
     if exists $state->{debug};
+  return if $uri_path !~ m/$path_pattern$/;
 
-  # TODO: consider 'servers' fields when matching request URIs: this requires looking at
-  # path prefixes present in server urls
-  return if $uri_path !~ m/^$path_pattern$/;
+  my $local_state = +{ %$state };
 
-  # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
-  return [ map
-    Encode::decode('UTF-8', url_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
-      Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#- ];
+  while (my $ref = $local_state->{path_item}{'$ref'}) {
+    $local_state->{path_item} = $self->_resolve_ref('path-item', $ref, $local_state);
+  }
+
+  # §4.8.8.1: "In case of ambiguous matching, it’s up to the tooling to decide which one to use."
+  # There could be another paths entry that matches this URI that does have this method
+  # implemented, so we return false and keep searching. Since we may still match to the wrong URI,
+  # the correct operation can be forced to match by explicitly passing the corresponding
+  # path_template or (preferrably) operationId to be used in the search.
+  return if not exists $local_state->{path_item}{lc $method};
+
+  my $full_uri = $uri->clone->path($uri_path)->fragment(undef)->query('')->to_string;
+
+  # we need to keep track of the traversed path to the servers object, as well as its absolute
+  # location, for usage in error objects
+  my ($servers, $more_schema_path, $base_schema_uri) =
+      exists $local_state->{path_item}{lc $method}{servers}
+        ? ($local_state->{path_item}{lc $method}{servers}, [lc $method, 'servers'])
+    : exists $local_state->{path_item}{servers}
+        ? ($local_state->{path_item}{servers}, ['servers'])
+    : exists $self->openapi_document->schema->{servers}
+        ? ($self->openapi_document->schema->{servers}, ['servers'], $self->openapi_uri)
+    : ();
+
+  # §4.8.1.1 "If the servers field is not provided, or is an empty array, the default value would
+  # be [an array consisting of a single] Server Object with a url value of `/`."
+  $servers = [{ url => '/' }] if not $servers or not @$servers;
+
+  foreach my $index_and_server (pairs indexed @$servers) {
+    my ($index, $server) = @$index_and_server;
+
+    # we need a full uri to match against the full uri taken from the request (scheme and host)
+    # we fall back to using the request's scheme, host and port, otherwise the match can never
+    # succeed.
+    my $server_url = Mojo::URL->new($server->{url})->to_abs($self->openapi_document->retrieval_uri);
+    $server_url = $server_url->to_abs($uri)->query('');
+    $server_url->path->leading_slash(0)->trailing_slash(0);
+
+    # turn %7B and %7D back into { and }
+    my $uri_template = url_unescape($server_url) . $path_template;
+
+    my $uri_pattern = join '',
+      map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
+      split /(\{[^}]+\})/, $uri_template;
+    do { use autovivification 'store'; push $state->{debug}{uri_patterns}->@*, '^'.$uri_pattern.'$' }
+      if exists $state->{debug};
+    next if $full_uri !~ m/^$uri_pattern$/;
+
+    # extract all capture values from server variables and path template variables: ($1 .. $n)
+    # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
+    my @uri_capture_values = map
+      Encode::decode('UTF-8', url_unescape(substr($full_uri, $-[$_], $+[$_]-$-[$_])),
+        Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
+
+    # we have a match, so preserve our new $state values created via _resolve_ref
+    %$state = %$local_state;
+
+    # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
+    # { for the editor
+    my @uri_capture_names = ($uri_template =~ m!\{([^}]+)\}!g);
+
+    my ($valid, %seen) = (1);
+    foreach my $name (@uri_capture_names) {
+      $valid = E({ %$state, keyword => 'url', data_path => '/request/uri',
+            schema_path => jsonp($state->{schema_path}, @$more_schema_path, $index),
+            defined $base_schema_uri ? (initial_schema_uri => $base_schema_uri) : () },
+          'duplicate template name "%s" in server url and path template', $name)
+        if $seen{$name}++;
+    }
+    return if not $valid;
+
+    my %captures;
+    @captures{@uri_capture_names} = @uri_capture_values;
+
+    foreach my $name (@uri_capture_names) {
+      next if not exists((($server->{variables}//{})->{$name}//{})->{enum});
+
+      $valid = E({ %$state, data_path => '/request/uri', keyword => 'enum',
+            schema_path => jsonp($state->{schema_path}, @$more_schema_path, $index, 'variables', $name),
+            defined $base_schema_uri ? (initial_schema_uri => $base_schema_uri) : () },
+          'server url value does not match any of the allowed values')
+        if none { $captures{$name} eq $_ } $server->{variables}{$name}{enum}->@*;
+    }
+
+    return if not $valid;
+    return \%captures;
+  }
+
+  # no match against any servers urls
+  return;
 }
 
 sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
@@ -955,12 +1094,12 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.086
+version 0.087
 
 =head1 SYNOPSIS
 
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => 'https://production.example.com/api',
+    openapi_uri => 'https://prod.example.com/api',
     openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
   openapi: 3.1.1
   info:
@@ -968,6 +1107,12 @@ version 0.086
     version: 1.2.3
   paths:
     /foo/{foo_id}:
+      servers:
+        - url: https://{host}.example.com
+          variables:
+            host:
+              default: prod
+              enum: [dev, stg, prod]
       parameters:
       - name: foo_id
         in: path
@@ -1011,9 +1156,11 @@ version 0.086
   YAML
 
   say 'request:';
-  my $request = POST '/foo/bar',
-    'My-Request-Header' => '123', 'Content-Type' => 'application/json', Host => 'dev.example.com',
-    Content => '{"hello": 123}';
+  my $request = Mojo::Message::Request->new;
+  $request->url->parse("https://dev.example.com/foo/bar");
+  $request->headers('My-Request-Header' => '123');
+  $request->headers('Content-Type' => 'application/json');
+  $request->body('{"hello": 123}');
   my $results = $openapi->validate_request($request);
   say $results;
   say ''; # newline
@@ -1096,7 +1243,7 @@ It is strongly recommended that this URI is absolute.
 =head2 openapi_schema
 
 The data structure describing the OpenAPI v3.1 document (as specified at
-L<https://spec.openapis.org/oas/v3.1.1>); an alias to C<< ->openapi_document->schema >>.
+L<https://spec.openapis.org/oas/v3.1>); an alias to C<< ->openapi_document->schema >>.
 See L<JSON::Schema::Modern::Document::OpenAPI/schema>.
 Ignored if L</openapi_document> is provided.
 
@@ -1148,13 +1295,13 @@ object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
 Absolute URIs in the result object are constructed by resolving the openapi document path against
-the L</openapi_uri>, as well as the C<Host> header of the request if a host component is not
-included in the L</openapi_uri>.
+the L</openapi_uri> (which is derived from the document's C<$self> keyword as well as the URI
+provided to the document constructor).
 
 The second argument is an optional hashref that contains extra information about the request,
-corresponding to the values expected by L</find_path> below. It is populated with some information
-about the request:
-save it and pass it to a later L</validate_response> (corresponding to a response for this request)
+corresponding to the values expected by L</find_path> below. The method populates the hashref
+with some information about the request:
+save it and pass it to a later L</validate_response> call (that corresponds to a response for this request)
 to improve performance.
 
 =head2 validate_response
@@ -1172,8 +1319,8 @@ object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
 Absolute URIs in the result object are constructed by resolving the openapi document path against
-the L</openapi_uri>, as well as the C<Host> header of the request if the request is provided and if a
-host component is not included in the L</openapi_uri>.
+the L</openapi_uri> (which is derived from the document's C<$self> keyword as well as the URI
+provided to the document constructor).
 
 The second argument is an optional hashref that contains extra information about the request
 corresponding to the response, as in L</find_path>.
@@ -1185,9 +1332,8 @@ corresponds to this response (as not all HTTP libraries link to the request in t
 
   $result = $self->find_path($options);
 
-Uses information in the request to determine the relevant parts of the OpenAPI specification.
-C<request> should be provided if available, but instead of or in addition to this,
-additional data can also be provided.
+Finds the appropriate entry in the OpenAPI document corresponding to a request. Called
+internally by both L</validate_request> and L</validate_response>.
 
 The single argument is a hashref that contains information about the request. Possible values
 include:
@@ -1196,7 +1342,7 @@ include:
 
 =item *
 
-C<request>: the object representing the HTTP request. Should be provided when available.
+C<request>: the object representing the HTTP request. Should be provided when available. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Mojo::Message::Request>.
 
 =item *
 
@@ -1222,7 +1368,7 @@ C<debug>: when C<$OpenAPI::Modern::DEBUG> or L</debug> is set on the OpenAPI::Mo
 
 =item *
 
-C<uri_pattern>: an arrayref of patterns that are attempted to be matched against the URI path (note! soon to be the entire URI, when servers urls are implemented) during request matching
+C<uri_patterns>: an arrayref of patterns that are attempted to be matched against the URI
 
 =back
 
@@ -1231,17 +1377,21 @@ C<uri_pattern>: an arrayref of patterns that are attempted to be matched against
 All of these values are optional (unless C<request> is omitted), and will be derived from the
 request as needed (albeit less
 efficiently than if they were provided). All passed-in values MUST be consistent with each other and
-the request or the return value from this method is false.
+the request or the return value from this method is false and appropriate errors will be included
+in the C<$options> hash.
 
-When successful, the options hash will be populated (or updated) with keys C<path_template>,
-C<path_captures>, C<method>, C<operation_id> and C<operation_uri> (see below), and the return value
-is true.
+When successful, the options hash will be populated (or updated) with all the above keys,
+and the return value is true.
 When not successful, the options hash will be populated with key C<errors>, an arrayref containing
 a L<JSON::Schema::Modern::Error> object, and the return value is false.
 
-In addition, these values are populated in the options hash (when available):
+In addition, these values are also populated in the options hash (when available):
 
 =over 4
+
+=item *
+
+C<uri_captures>: a hashref mapping placeholders in the entire uri template (server url plus path template) to their actual values in the request URI
 
 =item *
 
@@ -1253,15 +1403,10 @@ C<request> (not necessarily what was passed in: this is always a L<Mojo::Message
 
 =back
 
-You can find the associated operation object by using either C<operation_uri>,
+You can find the associated operation object in the OpenAPI document by using either C<operation_uri>,
 or by calling C<< $openapi->openapi_document->get_operationId_path($operation_id) >>
 (see L<JSON::Schema::Modern::Document::OpenAPI/get_operationId_path>) (note that the latter will
-be removed in a subsequent release, in order to support operations existing in other documents).
-
-Note that the L<C</servers>|https://spec.openapis.org/oas/v3.1#server-object> section of the
-OpenAPI document is not used for path matching at this time, for either scheme and host matching nor
-path prefixes. For now, if you use a path prefix in C<servers> entries you will need to add this to
-the path templates under `/paths`.
+be changed in a subsequent release, in order to support operations existing in other documents).
 
 =head2 recursive_get
 
@@ -1277,9 +1422,11 @@ referenced location in list context.
 
 If the provided location is relative, the main openapi document is used for the base URI.
 If you have a local json pointer you want to resolve, you can turn it into a uri-reference by
-prepending C<#>.
+prepending C<#> and url-encoding it, e.g. C<< Mojo::URL->new->fragment($jsonp) >>.
 
-  my $schema = $openapi->recursive_get('#/components/parameters/Content-Encoding', 'parameter');
+  my $param = $openapi->recursive_get('#/components/parameters/Content-Encoding', 'parameter');
+  my $operation_schema = $openapi->recursive_get(Mojo::URL->new('https://example.com/api.json')
+    ->fragment(jsonp(qw(/paths /foo/{foo_id} get requestBody content application/json schema)));
 
   # starts with a JSON::Schema::Modern object (TODO)
   my $schema = $js->recursive_get('https:///openapi_doc.yaml#/components/schemas/my_object')
@@ -1392,15 +1539,11 @@ C<application/x-www-form-urlencoded> and C<multipart/*> messages are not yet sup
 
 =item *
 
-C<server> fields in definitions are completely ignored, and not considered when parsing request URIs.
-
-=item *
-
 OpenAPI descriptions must be contained in a single document; C<$ref>erences to other documents are not fully supported at this time.
 
 =item *
 
-The use of C<$ref> within a path-item object is only allowed when not adjacent to any other path-item properties ('parameters', 'servers', request methods)
+The use of C<$ref> within a path-item object is only allowed when not adjacent to any other path-item properties (C<parameters>, C<servers>, request methods)
 
 =item *
 

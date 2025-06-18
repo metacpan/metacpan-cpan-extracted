@@ -8,7 +8,7 @@ use parent 'Class::Accessor';
 
 use DateTime::Format::ISO8601;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 Travel::Status::MOTIS::Stopover->mk_ro_accessors(
 	qw(
@@ -41,6 +41,7 @@ sub new {
 	my $json      = $opt{json};
 	my $realtime  = $opt{realtime} // 0;
 	my $cancelled = $opt{cancelled};
+	my $time_zone = $opt{time_zone};
 
 	my $ref = {
 		stop => Travel::Status::MOTIS::Stop->from_stopover( json => $json ),
@@ -52,25 +53,25 @@ sub new {
 	if ( $json->{scheduledArrival} ) {
 		$ref->{scheduled_arrival} = DateTime::Format::ISO8601->parse_datetime(
 			$json->{scheduledArrival} );
-		$ref->{scheduled_arrival}->set_time_zone('local');
+		$ref->{scheduled_arrival}->set_time_zone( $time_zone );
 	}
 
 	if ( $json->{arrival} and $realtime ) {
 		$ref->{realtime_arrival}
 		  = DateTime::Format::ISO8601->parse_datetime( $json->{arrival} );
-		$ref->{realtime_arrival}->set_time_zone('local');
+		$ref->{realtime_arrival}->set_time_zone( $time_zone );
 	}
 
 	if ( $json->{scheduledDeparture} ) {
 		$ref->{scheduled_departure} = DateTime::Format::ISO8601->parse_datetime(
 			$json->{scheduledDeparture} );
-		$ref->{scheduled_departure}->set_time_zone('local');
+		$ref->{scheduled_departure}->set_time_zone( $time_zone );
 	}
 
 	if ( $json->{departure} and $realtime ) {
 		$ref->{realtime_departure}
 		  = DateTime::Format::ISO8601->parse_datetime( $json->{departure} );
-		$ref->{realtime_departure}->set_time_zone('local');
+		$ref->{realtime_departure}->set_time_zone( $time_zone );
 	}
 
 	if ( $ref->{scheduled_arrival} and $ref->{realtime_arrival} ) {

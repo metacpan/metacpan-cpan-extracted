@@ -203,10 +203,10 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request',
           keywordLocation => '/paths',
           absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'no match found for request URI "http://example.com/bloop/blah"',
+          error => 'no match found for request GET "http://example.com/bloop/blah"',
         },
       ],
     },
@@ -219,7 +219,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request/uri',
           keywordLocation => '/paths',
           absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
           error => 'missing path-item "/foo/baz"',
@@ -243,6 +243,42 @@ YAML
       ],
     },
     'path specification was correctly found on the far side of a $ref; error locations are correct',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  pathItems:
+    bar:
+      post: {}
+    foo-bar:
+      get:
+        requestBody:
+          required: true
+          content: {}
+paths:
+  /bar:
+    $ref: '#/components/pathItems/bar'
+  /foo/bar:
+    $ref: '#/components/pathItems/foo-bar'
+YAML
+
+  cmp_result(
+    $openapi->validate_request(request('GET', 'http://example.com/foo/bar'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => jsonp(qw(/paths /foo/bar $ref get requestBody required)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/foo-bar/get/requestBody/required')->to_string,
+          error => 'request body is required but missing',
+        },
+      ],
+    },
+    'suffix match not deemed sufficient; error locations are correct when $refs involved in both paths',
   );
 };
 
@@ -283,7 +319,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request/uri',
           keywordLocation => jsonp(qw(/paths /foo)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo)))->to_string,
           error => 'provided path_captures names do not match path template "/foo"',

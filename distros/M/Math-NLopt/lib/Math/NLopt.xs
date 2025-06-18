@@ -9,6 +9,12 @@
 
 #include "const-c.inc"
 
+#if INTSIZE == Size_t_size
+#define FMT_SIZE_T "%d"
+#else
+#define FMT_SIZE_T "%ld"
+#endif
+
 #define EXCEPTION "Math::NLopt::Exception"
 
 /* copy a C double array (in) into an AV (out).
@@ -43,7 +49,8 @@ double_to_AV( pTHX_ unsigned n, const double *in, SV* out ) {
         }
 
         if ( n != av_count(arr) )
-             croak( "double_to_AV: inconsistent output Perl arr length: expected %d, got %d", n, av_count(arr) );
+             croak( "double_to_AV: inconsistent output Perl arr length: expected %d, got " FMT_SIZE_T,
+                    n, av_count(arr) );
 
         /* possibly cheaper to call AvARR and get a direct pointer to
            the SV* arr, but av_fetch ensures the location is populated
@@ -84,7 +91,8 @@ AV_to_double( pTHX_ unsigned n, SV* in, double *out ) {
 
     SSize_t len = av_count( arr );
     if ( len != n )
-        croak( "AV_to_double: inconsistent input Perl array length: expected %d, got %d", n, len );
+        croak( "AV_to_double: inconsistent input Perl array length: expected %d, got " FMT_SIZE_T,
+               n, len );
 
     if ( NULL == out )
         out = (double*) SvPVX( sv_2mortal(newSV(n * sizeof(double))) );
@@ -222,7 +230,7 @@ throw_nlopt( pTHX_ int iclass, const char* message ) {
         break;
 
     case NLOPT_ROUNDOFF_LIMITED:
-        pclass = "Math::NLopt::Exception::RoundOffLimited";
+        pclass = "Math::NLopt::Exception::RoundoffLimited";
         if ( NULL == message )
             message = "roundoff limited";
         break;
@@ -1206,3 +1214,14 @@ nlopt_version( OUTLIST major, OUTLIST minor, OUTLIST bugfix)
         int 	major
         int 	minor
         int 	bugfix
+
+# this is NOT part of the public API
+nlopt_result
+_validate_result ( opt, result )
+        NLopt opt
+        nlopt_result result
+     CODE:
+         RETVAL = validate_result( aTHX_ opt, result );
+     OUTPUT:
+        RETVAL
+

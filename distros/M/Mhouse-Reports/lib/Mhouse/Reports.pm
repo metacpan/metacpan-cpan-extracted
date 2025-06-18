@@ -29,7 +29,16 @@ use File::Find;
 use Cwd 'cwd';
 use File::Spec;
 use JSON;
-our $VERSION = '0.01';
+use DateTime;
+
+our $VERSION = '0.04';
+
+sub get_timestamp{
+    my $local_time_zone = DateTime::TimeZone->new( name => 'local' );
+    my $dt = DateTime->now(time_zone => $local_time_zone);
+    my $timestamp = sprintf("%4d%02d%02d_%02d%02d_%02d", $dt->year, $dt->month, $dt->day, $dt->hour, $dt->minute, $dt->second );
+    return $timestamp;
+}
 
 sub get_array_from_authenticated_json_file{
     my $input_data_fn = shift;
@@ -110,18 +119,49 @@ sub read_mhouse_annotations_from_folder{
     return \%cumul_hash;
 }
 
+sub get_header{
+	my $config_fn = shift;
+	my $arrref_before = shift;
+	my $arrref_after  = shift;
+	open my $config_fh, "<", $config_fn or die "Cannot open $config_fn: $!";
+	my $config_file_contents = do {local $/; <$config_fh>; };
+	
+	my $time = sprintf "\nTime generated  : %s \n", get_timestamp() ;
+	
+	my $freq_table = get_freq_table(@{$arrref_before});
+	my $before_grep = sprintf "Total before grep : %d (%s)\n", scalar @{$arrref_before}, $freq_table;
+	my $displayed = sprintf "Total displayed   : %d \n\n", scalar @{$arrref_after};
+	my $header =
+	$config_file_contents .
+	$time .
+	$before_grep .
+	$displayed
+	;
+	return $header;
+}
+
+
 sub output_llm_scored_mhouse_json_annotated{
     my $arref        = shift;
     my $out_fn       = shift;
     my $anno_hashref = shift;
     my $displayed_field_arrref = shift;
+	my $config_fn = shift;
+	my $header = shift;
     my @cumulative_llm_answers = @{$arref};
     open my $outfh, ">", $out_fn or die $!;
     binmode($outfh, ":utf8");
-    printf $outfh "<pre>";
-
-    printf "%d records total\n", $#cumulative_llm_answers + 1;
-    my $counter = 0;
+    print $outfh "<pre>";
+	
+	open my $config_fh, "<", $config_fn or die "Cannot open $config_fn: $!";
+	my $config_file_contents = do {local $/; <$config_fh>; };
+	
+	print $outfh $header;
+    # printf $outfh "Time generated  : %s \n", get_timestamp();
+    # printf $outfh "Total before grep : %d (%s)\n", $total_before_grep, $freq_table;
+	# printf $outfh "Total displayed   : %d \n\n", scalar @cumulative_llm_answers;
+	
+    my $counter = 1;
     foreach my $company_data(@cumulative_llm_answers){
         printf $outfh "%5d   ", $counter++;
         foreach my $field (@{$displayed_field_arrref}){
@@ -132,10 +172,20 @@ sub output_llm_scored_mhouse_json_annotated{
         my $legalName_plus = $legalName =~ s/\s/+/gr;
         my $address_composed_string_plus = $company_data->{address_composed_string} =~ s/\s/+/gr;
         my $hyperlink_google = sprintf "<a href='https://www.google.com/search?q=+" . $legalName_plus . "+" . $address_composed_string_plus . "' target='_blank'>Google</a>";
-        my $hyperlink_ducky  = sprintf "<a href='https://duckduckgo.com/?q=!ducky+%s+%s' target='_blank'>%-30s</a>", $legalName_plus, $address_composed_string_plus, $legalName;
-        printf $outfh "%-10s    %s  -> %s <br>", $hyperlink_google, $hyperlink_ducky, $anno_hashref->{$legalName};
+        my $hyperlink_ducky  = sprintf "<a href='https://duckduckgo.com/?q=!ducky+%s+%s' target='_blank'>%-50s</a>", $legalName_plus, $address_composed_string_plus, $legalName;
+        printf $outfh "%-10s    %s  -> %s \n", $hyperlink_google, $hyperlink_ducky, $anno_hashref->{$legalName};
     }
     close $outfh;
+}
+
+
+sub get_freq_table{
+	my @llm_scored_arr = @_;
+	my %counts;
+	foreach my $rec (@llm_scored_arr) {
+		$counts{ $rec->{employees} }++;
+	}
+	return join ", ", map { "$_ => $counts{$_}" } sort keys %counts;
 }
 
 =pod
@@ -145,7 +195,6 @@ sub output_llm_scored_mhouse_json_annotated{
         traverse(sub{push @cumulative_llm_answers, get_array_from_authenticated_json_file(shift);}, '../zh');
         printf "Total company count = %d\n", scalar @cumulative_llm_answers;
 =cut
-
 sub traverse_folder_tree_jsontxt{
     my ($callback, $root_dir) = @_;
     my $cwd = cwd();
@@ -160,5 +209,31 @@ sub traverse_folder_tree_jsontxt{
         $root_dir
     );
 }
+
+sub report_based_on_config{
+	my $config_fn = shift;
+	my $config = do $config_fn;
+	die "Config error: $@" if !$config;
+
+	my $sort_logic = eval $config->{sort_logic};
+	die "Sort logic error: $@" if !$sort_logic;
+
+	my $grep_logic = eval $config->{grep_logic};
+	die "Grep logic error: $@" if !$grep_logic;
+
+	my @folder_list = @{$config->{data_folder_list}};
+	my $displayed_scores_arrref = $config->{displayed_scores};
+	my $annotation_folder = $config->{annotation_folder};
+
+	my @scored_field_list = qw(personnel e_data documentation programming automation sysadmin energy_sector e_commerce logistics_supply construction agri_tech ar_vr industry_1 industry_2);
+	my @cumulative_llm_answers = read_mhouse_llm_scored_data(\@folder_list, \@scored_field_list);
+	printf "Total selected before grep: %d\n", scalar @cumulative_llm_answers;
+	my @sorted_arr = sort { $sort_logic->($a, $b) } grep { $grep_logic->($_) } @cumulative_llm_answers;
+	my $annotation_hashref = read_mhouse_annotations_from_folder($annotation_folder);
+	my $out_fn = "displayed_list_" . get_timestamp() . ".html";
+	my $header = get_header($config_fn, \@cumulative_llm_answers, \@sorted_arr);
+	output_llm_scored_mhouse_json_annotated(\@sorted_arr, $out_fn, $annotation_hashref, $displayed_scores_arrref, $config_fn, $header);
+}
+
 
 1;

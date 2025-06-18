@@ -1,5 +1,8 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.31	Tue Jun 17 14:52:57 EDT 2025
+	Fix GitHub#4
+
 0.30	Thu Jun  5 15:30:25 EDT 2025
 	Try harder to ensure the running script isn't loaded as its own configuration
 	Test argv and note that argv now need to start with --

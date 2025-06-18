@@ -3,9 +3,13 @@
 
 % if ($ReportType) {
 %   if ($mode eq 'screen') {
+<div class="activity-reports-saved-search">
       <& /Widgets/SavedSearch:show, %ARGS, Action => 'index.html', self => $saved_search, Title => 'Saved Activity reports' &>
+</div>
 %   }
+<div class="row mt-2">
 <& /Search/Elements/ActivityReport, %ARGS &>
+</div>
 % }
 
 </&>

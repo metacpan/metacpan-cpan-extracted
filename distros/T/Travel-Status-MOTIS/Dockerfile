@@ -1,6 +1,7 @@
 FROM perl:5.30-slim
 
 COPY bin/ /app/bin/
+COPY ext/ /app/ext/
 COPY lib/ /app/lib/
 COPY Build.PL cpanfile* /app/
 
@@ -20,4 +21,4 @@ RUN apt-get update \
 	&& apt-get -y clean \
 	&& rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 
-ENTRYPOINT ["perl", "-Ilib", "bin/motis"]
+ENTRYPOINT ["perl", "-Ilib", "bin/motis-m"]

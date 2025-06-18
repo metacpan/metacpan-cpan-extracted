@@ -5,11 +5,12 @@ use 5.024;
 use strict;
 use warnings;
 use Crypt::URandom;
+use Data::Password::Entropy 'password_entropy';
 use GD::Image;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Exception;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 my $settings = {
     method      => 'any',
@@ -26,6 +27,7 @@ my $settings = {
     background  => [ 255, 255, 255 ],
     text_color  => [ 'urand(128)', 'urand(128)', 'urand(128)' ],
     noise_color => [ 'urand(128) + 128', 'urand(128) + 128', 'urand(128) + 128' ],
+    min_entropy => 40,
     value       => sub { int( urand( 10_000_000 - 1_000_000 ) ) + 1_000_000 },
     display     => sub {
         my ($display) = @_;
@@ -33,6 +35,8 @@ my $settings = {
         $display =~ s/(.)/ $1/g;
         return $display;
     },
+    encrypt => undef,
+    decrypt => undef,
 };
 
 use constant SIZE => 1 << 31;
@@ -46,6 +50,24 @@ sub urand(;$) {
 
 sub register {
     my ( $self, $app, $overrides ) = @_;
+
+    unless ( ref $settings->{encrypt} eq 'CODE' and ref $settings->{decrypt} eq 'CODE' ) {
+        if (
+            my $below_min_entropy = grep { password_entropy($_) < $settings->{min_entropy} } $app->secrets->@*
+        ) {
+            $app->log->warn(
+                $below_min_entropy . ' Mojolicious application secret' .
+                ( $below_min_entropy > 1 ? 's are' : ' is' ) .
+                q{ below CaptchaPNG's minimum entropy}
+            );
+        }
+
+        $app->log->warn(
+            q{Application's Mojolicious::Sessions encryption is not active } .
+            q{and there's not both encrypt and decrypt methods provided in CaptchaPNG's settings. } .
+            q{Reverting to unsecured CaptchaPNG use, which is likely undesirable.}
+        ) unless ( $app->sessions->can('encrypted') and $app->sessions->encrypted );
+    }
 
     if ($overrides) {
         $settings->{$_} = $overrides->{$_} for ( keys %$overrides );
@@ -83,19 +105,28 @@ sub register {
                 for ( 1 .. $settings->{noise} );
         }
 
+        $value = $settings->{encrypt}->($value)
+            if ( ref $settings->{encrypt} eq 'CODE' and ref $settings->{decrypt} eq 'CODE' );
+
         $c->session( $settings->{key} => $value );
         return $c->render( data => $image->png(9), format => 'png' );
     } );
 
     $app->helper(
         get_captcha_value => sub {
-            return $_[0]->session( $settings->{key} );
+            my $value = $_[0]->session( $settings->{key} );
+            $value = $settings->{decrypt}->($value)
+                if ( ref $settings->{encrypt} eq 'CODE' and ref $settings->{decrypt} eq 'CODE' );
+            return $value;
         }
     );
 
     $app->helper(
         set_captcha_value => sub {
-            $_[0]->session( $settings->{key} => $_[1] );
+            my ( $this, $value ) = @_;
+            $value = $settings->{encrypt}->($value)
+                if ( ref $settings->{encrypt} eq 'CODE' and ref $settings->{decrypt} eq 'CODE' );
+            $this->session( $settings->{key} => $value );
             return;
         }
     );
@@ -140,7 +171,7 @@ Mojolicious::Plugin::CaptchaPNG - PNG captcha generation and validation Mojolici
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-CaptchaPNG/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-CaptchaPNG)
@@ -174,6 +205,7 @@ version 1.07
         background  => [ 255, 255, 255 ],
         text_color  => [ 'urand(128)', 'urand(128)', 'urand(128)' ],
         noise_color => [ 'urand(128) + 128', 'urand(128) + 128', 'urand(128) + 128' ],
+        min_entropy => 40,
         value       => sub {
             return int(
                 Mojolicious::Plugin::CaptchaPNG::urand(
@@ -202,6 +234,13 @@ During registration (when C<plugin> is called), the plugin will setup a route
 The image is generated using L<GD::Image>. The plugin will also setup helper
 methods to get, check, and clear the captcha value, which is stored in the
 session.
+
+Note that the assumption herein is that you're using Mojolicious verison 9.39 or
+higher with L<Mojolicious::Sessions>'s C<encrypted> on. If so, the application's
+Mojolicious secrets are checked for strong entropy and a warning is issued if
+any have low entropy. (See C<min_entropy> below.) If not, then its expected
+you'll provide your own captcha value encryption. (See C<encrypt> and C<decrypt>
+below.)
 
 =head1 SETTINGS
 
@@ -295,6 +334,13 @@ it defaults to:
 
 Note that C<urand> is provided by this library. See below.
 
+=head2 min_entropy
+
+This is the minimum entropy level the application's Mojolicious secrets need to
+achieve to avoid this plugin logging a warning. The default threshold is 40.
+
+Note that C<min_entropy> is ignored if C<encrypt> and C<decrypt> are provided.
+
 =head2 value
 
 A subroutine reference that will be called to generate the value used for the
@@ -320,6 +366,12 @@ or dashes or other such things. If not set, it defaults to:
         $display =~ s/(.)/ $1/g;
         return $display;
     }
+
+=head2 encrypt, decrypt
+
+If these are set to subroutine references, they will be called to encrypt and
+decrypt the value into and out of the session. They are passed the value to
+encrypt or decrypt.
 
 =head1 HELPER METHODS
 
