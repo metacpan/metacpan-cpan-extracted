@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -85,7 +86,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/storage/folder/move/{srcPath}';
+    my $_resource_path = 'v4.0/cells/storage/folder/move/{srcPath}';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -115,6 +116,9 @@ sub run_http_request {
         $query_params->{'destStorageName'} = $client->to_query_value($self->dest_storage_name);      
     } 
     my $_body_data;
+
+ 
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 

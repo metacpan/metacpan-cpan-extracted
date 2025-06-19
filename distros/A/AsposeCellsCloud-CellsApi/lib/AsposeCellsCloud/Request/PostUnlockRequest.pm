@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -83,7 +84,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/unlock';
+    my $_resource_path = 'v3.0/cells/unlock';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -101,14 +102,15 @@ sub run_http_request {
         $query_params->{'password'} = $client->to_query_value($self->password);      
     } 
     my $_body_data;
- 
+
 
     if (defined $self->file) {   
         my $map_file = $self->file;
         while ( my ($filename,$value) = each( %$map_file ) ) {
                 $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
         }
-    } 
+    }
+ 
 
     # authentication setting, if any
     my $auth_settings = [qw()];

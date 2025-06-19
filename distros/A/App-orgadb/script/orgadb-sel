@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-13'; # DATE
+our $DATE = '2025-06-19'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -35,7 +35,7 @@ orgadb-sel - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.019 of orgadb-sel (from Perl distribution App-orgadb), released on 2025-02-13.
+This document describes version 0.020 of orgadb-sel (from Perl distribution App-orgadb), released on 2025-06-19.
 
 =head1 SYNOPSIS
 
@@ -451,17 +451,17 @@ equivalent to:
  /^\Qre\E$/i
 
 
-=item B<-X>
-
-Turn on exact entry matching (shortcut for `--field-match-mode=exact`).
-
-See C<--field-match-mode>.
-
 =item B<-x>
 
 Turn on exact entry matching (shortcut for `--entry-match-mode=exact`).
 
 See C<--entry-match-mode>.
+
+=item B<-X>
+
+Turn on exact field matching (shortcut for `--field-match-mode=exact`).
+
+See C<--field-match-mode>.
 
 =back
 
@@ -1164,6 +1164,9 @@ document.
 Other CLI's in this distribution.
 
 Information about the Org format: L<https://orgmode.org>
+
+The format of the addressbook described in this document is compatible
+with L<OrgINI> specification.
 
 =head1 AUTHOR
 

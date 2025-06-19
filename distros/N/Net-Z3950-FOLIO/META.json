@@ -60,6 +60,6 @@
          "web" : "https://github.com/folio-org/Net-Z3950-FOLIO"
       }
    },
-   "version" : "v4.1.1",
+   "version" : "v4.2.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

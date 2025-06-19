@@ -1,29 +1,41 @@
-# Before 'make install' is performed this script should be runnable with
-# 'make test'. After 'make install' it should work as 'perl Net-Z3950-FOLIO.t'
-
 use strict;
 use warnings;
 use IO::File;
 use MARC::Record;
 use Cpanel::JSON::XS qw(decode_json);
-use Test::More tests => 3;
-BEGIN { use_ok('Net::Z3950::FOLIO') };
 use Net::Z3950::FOLIO::MARCHoldings qw(insertMARCHoldings);
 use DummyRecord;
 
+BEGIN {
+    use vars qw(@tests);
+    @tests = (
+	# testName, configName1, configName2
+	[ '[regular]', undef ],
+	[ 'fieldPerItem', 'fieldPerItem' ],
+	[ 'restrictToItem', 'restrictToItem' ],
+	[ 'holdingsInEachItem', 'holdingsInEachItem' ],
+	[ 'fieldPerItem with holdings', 'fieldPerItem', 'holdingsInEachItem' ],
+    );
+}
+
+use Test::More tests => 1 + scalar(@tests);
+
+BEGIN { use_ok('Net::Z3950::FOLIO') };
+
 for (my $i = 1; $i <= 1; $i++) {
-    for (my $j = 1; $j <= 2; $j++) {
-	my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings',
-						$j == 2 ? 'fieldPerItem' : undef);
-	#use Data::Dumper; $Data::Dumper::INDENT = 2; warn "j=$j, config", Dumper($cfg);
+    foreach my $test (@tests) {
+	my($testName, $configName1, $configName2) = @$test;
+
+	my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', $configName1, $configName2);
+	#use Data::Dumper; $Data::Dumper::INDENT = 2; warn "config", Dumper($cfg);
 	my $dummyMarc = makeDummyMarc();
-	my $expected = readFile("t/data/records/expectedMarc$i" . ($j == 2 ? 'byItem' : '') . ".marc");
+	my $expected = readFile("t/data/records/expectedMarc$i" . ($configName1 || "") . ($configName2 || "") . ".marc");
 	my $folioJson = readFile("t/data/records/input$i.json");
 	my $folioHoldings = decode_json(qq[{ "holdingsRecords2": $folioJson }]);
 	my $rec = new DummyRecord($folioHoldings, $dummyMarc);
-	insertMARCHoldings($rec, $dummyMarc, $cfg);
+	insertMARCHoldings($rec, $dummyMarc, $cfg, '9876543210');
 	my $marcString = $dummyMarc->as_formatted() . "\n";
-	is($marcString, $expected, "generated holdings $i match expected MARC");
+	is($marcString, $expected, "generated holdings $i: $testName match expected MARC");
     }
 }
 

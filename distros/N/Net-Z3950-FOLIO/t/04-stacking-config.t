@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 26;
+use Test::More tests => 28;
 BEGIN { use_ok('Net::Z3950::FOLIO::Config') };
 
 my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'bar');
@@ -24,11 +24,13 @@ $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings');
 ok(defined $cfg, 'parsed stacked foo->marcHoldings config');
 is($cfg->{marcHoldings}->{field}, "952", "Base value, not overriden");
 is($cfg->{marcHoldings}->{fieldPerItem}, undef, "Absent base value (fieldPerItem)");
+is($cfg->{marcHoldings}->{holdingsInEachItem}, undef, "Absent base value (holdingsInEachItem)");
 
-$cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', 'fieldPerItem');
-ok(defined $cfg, 'parsed stacked foo->marcHoldings->fieldPerItem config');
+$cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', 'fieldPerItem', 'holdingsInEachItem');
+ok(defined $cfg, 'parsed stacked foo->marcHoldings->fieldPerItem->holdingsInEachItem config');
 is($cfg->{marcHoldings}->{field}, "952", "Base value, not overriden");
 is($cfg->{marcHoldings}->{fieldPerItem}, 1, "fieldPerItem overriden");
+is($cfg->{marcHoldings}->{holdingsInEachItem}, 1, "holdingsInEachItem overriden");
 is($cfg->{fieldDefinitions}->{circulation}->{dummy}, "someField", "Present base value (dummy)");
 is($cfg->{fieldDefinitions}->{circulation}->{availableThru}, undef, "Absent base value (availableThru)");
 

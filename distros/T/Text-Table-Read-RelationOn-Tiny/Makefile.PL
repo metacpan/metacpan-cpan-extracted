@@ -13,6 +13,26 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0'
     },
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        dynamic_config => 0,
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny.git',
+                web  => 'https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny',
+            },
+            bugtracker => {
+                web => 'https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny/issues'
+            },
+
+        },
+                   provides => { 'Text::Table::Read::RelationOn::Tiny' => {file => 'lib/Text/Table/Read/RelationOn/Tiny.pm',
+                                                                           version => "v3.0.0"
+                                                               },
+                    },
+        no_index => {package => 'Text::Table::Read::RelationOn::Tiny::_Relation_Matrix'}
+    },
     TEST_REQUIRES => {
         'Test::More' => '0',
         'strict'   => '0',

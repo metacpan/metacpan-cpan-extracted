@@ -11,6 +11,15 @@ Couch::DB::Design - handle design documents
 
 =head1 SYNOPSIS
 
+  my $ddoc = Couch::DB::Design->new(id => 'myname', db => $db);
+  my $ddoc = $db->design('myname');          # same
+  my $ddoc = $db->design('_design/myname');  # same
+  my $ddoc = $db->design;  # id generated
+
+  my $results = $db->design('d')->search('i', ...) or die;
+  my $results = $db->search(d => 'i', ...); # same
+  my $results = $db->search($ddoc => 'i', ...); # same
+
 =head1 DESCRIPTION
 
 In CouchDB, design documents provide the main interface for building
@@ -34,14 +43,23 @@ Extends L<"Constructors" in Couch::DB::Document|Couch::DB::Document/"Constructor
  
 =over 4
 
+=item Couch::DB::Design-E<gt>B<fromResult>($result, $data, %options)
+
+Inherited, see L<Couch::DB::Document/"Constructors">
+
 =item Couch::DB::Design-E<gt>B<new>(%options)
+
+If no id is passed, then one gets generated: a UUID is requested from
+the server.  You may also use a local generator via UUID::URandom
+or Data::UUID, which is (of course) more efficient.
 
  -Option --Defined in         --Default
   batch    Couch::DB::Document  from database
   content  Couch::DB::Document  undef
   db       Couch::DB::Document  undef
-  id       Couch::DB::Document  undef
+  id       Couch::DB::Document  generated
   local    Couch::DB::Document  false
+  row      Couch::DB::Document  undef
 
 =over 2
 
@@ -54,6 +72,8 @@ Extends L<"Constructors" in Couch::DB::Document|Couch::DB::Document/"Constructor
 =item id => ID
 
 =item local => BOOLEAN
+
+=item row => L<Couch::DB::Row|Couch::DB::Row>-object
 
 =back
 
@@ -80,6 +100,26 @@ Inherited, see L<Couch::DB::Document/"Accessors">
 =item $obj-E<gt>B<id>()
 
 Inherited, see L<Couch::DB::Document/"Accessors">
+
+=item $obj-E<gt>B<idBase>()
+
+Various calls need the C<id> without the C<_design>.  Whether the
+full document id for the design document or only the unique part
+is required/given is confusing.  This method returns the unique
+part.
+
+=item $obj-E<gt>B<row>( [$row] )
+
+Inherited, see L<Couch::DB::Document/"Accessors">
+
+=item Couch::DB::Design-E<gt>B<setIdGenerator>(CODE)
+
+When a design document is created without explicit C<id>, that will
+get generated.  By default, this is done by requesting a fresh UUID
+from the server.  You may change this into some local random collission
+free id generator for better performance.
+
+The CODE is called with the daabase object as only parameter.
 
 =back
 
@@ -163,9 +203,11 @@ Extends L<"Document in the database" in Couch::DB::Document|Couch::DB::Document/
 
 =item $obj-E<gt>B<create>(\%data, %options)
 
-Create a new design document.  Design documents do not use generated ids,
-so: you have to have specified one with L<new(id)|Couch::DB::Document/"Constructors">.  Therefore, this method
-is equivalent to L<update()|Couch::DB::Design/"Document in the database">.
+ [CouchDB API "POST /{db}/_index", UNTESTED]
+Create a new design document.
+
+In Couch::DB, the client-side, not the server, generates ids.  Therefore,
+this method is equivalent to L<update()|Couch::DB::Design/"Document in the database">.
 
  -Option--Defined in         --Default
   batch   Couch::DB::Document  new(batch)
@@ -266,16 +308,16 @@ Inherited, see L<Couch::DB::Document/"Attachments">
 
 =back
 
-=head2 Indexes
+=head2 Indexes (indices)
 
 =over 4
 
-=item $obj-E<gt>B<createIndex>(\%filter, %options)
+=item $obj-E<gt>B<createIndex>(\%config, %options)
 
  [CouchDB API "POST /{db}/_index", UNTESTED]
 
-Create/confirm an index on the database.  When you like a generated design
-document name, you can use L<Couch::DB::Database::createIndex()|Couch::DB::Database/"Designs and Indexes">.
+Create an index on the database.  If the name already exists and the
+configuration is different, then the index be get regenerated.
 
 =item $obj-E<gt>B<deleteIndex>($index, %options)
 
@@ -289,25 +331,23 @@ Remove an index from this design document.
 
 Returns metadata for the specified search index.
 
-=item $obj-E<gt>B<indexFind>($index, %options)
+=item $obj-E<gt>B<search>( $index, [\%search, %options] )
 
  [CouchDB API "GET /{db}/_design/{ddoc}/_search/{index}", UNTESTED]
 
-Executes a search request against the named $index.
+Executes a (text) search request against the named $index.  The default
+C<%search> contains the whole index.  When the search contains
+C<include_docs>, then full docs are made available.
 
-When you have used C<include_docs>, then the documents can be found in
-C<< $result->values->{docs} >>, not C<< {rows} >>.
+(Of course) this command supports paging.
 
- -Option--Default
-  search  {}
+example: return full index all as rows
 
-=over 2
+ my $d    = $db->design('d');
+ my $rows = $d->search('i', {}, all => 1)->page;
 
-=item search => HASH
-
-The search query.
-
-=back
+ my $search = +{ include_docs => 1 };
+ my @docs = $d->search('i', \%search, all => 1)->pageDocs;
 
 =back
 
@@ -315,7 +355,7 @@ The search query.
 
 =over 4
 
-=item $obj-E<gt>B<viewSearch>( $view, [\%search|\@%search), %options] )
+=item $obj-E<gt>B<viewDocs>( $view, [\%search|\@%search], %options] )
 
  [CouchDB API "GET /{db}/_design/{ddoc}/_view/{view}", UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_view/{view}", UNTESTED]
@@ -324,8 +364,17 @@ The search query.
 
 Executes the specified view function.
 
-This work is handled in L<Couch::DB::Database::search()|Couch::DB::Database/"Handling documents">.  See that method for
+This work is handled in L<Couch::DB::Database::allDocs()|Couch::DB::Database/"Handling documents">.  See that method for
 C<%options> and results.
+
+example: 
+
+  my %search;
+  my $c = $db->design('people')->viewDocs(customers => \%search, all => 1);
+  my $hits = $c->page;
+
+  my %search = (design => 'people', view => 'customers');
+  my $c = $db->allDocs(\%search, all => 1);
 
 =back
 
@@ -338,7 +387,7 @@ C<%options> and results.
  [CouchDB API "POST /{db}/_design/{ddoc}/_update/{func}", UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_update/{func}/{docid}", UNTESTED]
 
-See what the update function would change.  The update $function is run
+See what the update function would change.  The update C<$function> is run
 on a document, specified by id or object.  By default or explicit undef,
 a C<null> (missing) document will be used.
 
@@ -349,7 +398,7 @@ a C<null> (missing) document will be used.
  [CouchDB API "GET /{db}/_design/{ddoc}/_list/{func}/{other-ddoc}/{view}", deprecated 3.0, removed 4.0, UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_list/{func}/{other-ddoc}/{view}", deprecated 3.0, removed 4.0, UNTESTED]
 
-Executes a list function against the view.
+Executes a list function against the C<$view>.
 
  -Option   --Default
   view_ddoc  undef
@@ -358,7 +407,7 @@ Executes a list function against the view.
 
 =item view_ddoc => $ddoc|$ddocid
 
-When the $view resides in a differen design.
+When the C<$view> resides in a different design.
 
 =back
 
@@ -369,19 +418,19 @@ When the $view resides in a differen design.
  [CouchDB API "GET /{db}/_design/{ddoc}/_show/{func}/{docid}", deprecated 3.0, removed 4.0, UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_show/{func}/{docid}", deprecated 3.0, removed 4.0, UNTESTED]
 
-Apply show $function on the document, as specified by id or object.  By default or explicit
-undef, a C<null> document will be used.
+Apply show C<$function> on the document, as specified by C<$docid> or document object.  By
+default or explicit C<undef>, a "null" document will be used.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.006,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.200,
+built on June 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2024-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

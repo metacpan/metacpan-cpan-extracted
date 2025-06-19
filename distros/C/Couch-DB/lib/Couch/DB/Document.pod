@@ -19,7 +19,7 @@ Couch::DB::Document - one document as exchanged with a CouchDB server
   $doc->save;
   $db->saveBulk([$doc]);
 
-  my $content = $db->latest;
+  my $content = $db->latest;  # content of latest revision
 
 =head1 DESCRIPTION
 
@@ -34,6 +34,8 @@ in your data.
 
 =over 4
 
+=item Couch::DB::Document-E<gt>B<fromResult>($result, $data, %options)
+
 =item Couch::DB::Document-E<gt>B<new>(%options)
 
  -Option --Default
@@ -42,6 +44,7 @@ in your data.
   db       undef
   id       undef
   local    false
+  row      undef
 
 =over 2
 
@@ -71,6 +74,8 @@ Use a local document: do not replicate it to other instances.  Only limited
 actions are permitted on local documents... probably they do not support
 attachments.
 
+=item row => L<Couch::DB::Row|Couch::DB::Row>-object
+
 =back
 
 =back
@@ -86,6 +91,10 @@ attachments.
 =item $obj-E<gt>B<db>()
 
 =item $obj-E<gt>B<id>()
+
+=item $obj-E<gt>B<row>( [$row] )
+
+Returns the L<Couch::DB::Row|Couch::DB::Row>-object where this document was found, if any.
 
 =back
 
@@ -153,7 +162,7 @@ Returns a HASH with all revisions and their status.
 =item $obj-E<gt>B<updateSequence>()
 
 Returns the update sequence code for this document on the current server (local_seq).
-Only useful when you use an explicit C<_client> when you L<get()|Couch::DB::Document/"Document in the database"> the document.
+Only useful when you use an explicit C<client> when you L<get()|Couch::DB::Document/"Document in the database"> the document.
 
 =back
 
@@ -187,7 +196,7 @@ example: appending one document into an other
 
 See also L<appendTo()|Couch::DB::Document/"Document in the database">.
 
-As %options, C<batch> and C<rev>.
+For C<%options>, you can use C<batch> and C<rev>.
 
 example: cloning one document into a new one
 
@@ -338,12 +347,12 @@ Returns the names of all attachments.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.006,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.200,
+built on June 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2024-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents the options of saving pptx file.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'PptxSaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'ignore_hidden_rows' => {
      	datatype => 'boolean',
      	base_name => 'IgnoreHiddenRows',
-     	description => 'Ignore hidden rows',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'adjust_font_size_for_row_type' => {
      	datatype => 'string',
      	base_name => 'AdjustFontSizeForRowType',
-     	description => 'Adjust font size for row type',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'export_view_type' => {
      	datatype => 'string',
      	base_name => 'ExportViewType',
-     	description => 'Gets and sets the display type when exporting to PowerPoint. The default exporting type is working as printing.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

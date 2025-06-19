@@ -195,11 +195,15 @@ sub call_api {
     $self->update_params_for_auth($header_params, $query_params, $auth_settings ); 
 
 
-    my $_url = $self->{config}{base_url}."/" .$self->{config}{api_version} . $resource_path;
+    my $_url = $self->{config}{base_url}."/" . $resource_path;
     if($get_token){
         $_url = $self->{config}{base_url} . $resource_path;
     }
 
+    # build header
+
+    $header_params->{'x-aspose-client'} = 'perl sdk';
+    $header_params->{'x-aspose-client-version'} = '25.6.1';  
     # build query 
     if (%$query_params) {
         $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });
@@ -252,10 +256,10 @@ sub call_api {
     elsif ($method eq 'DELETE') { #TODO support form data
         my $headers = HTTP::Headers->new(%$header_params);
         if($_body_data){
-            $_request = DELETE($_url, %$headers, Content => $_body_data);
+            $_request = DELETE($_url, %$header_params, Content => $_body_data);
         }
         else{
-            $_request = DELETE($_url, %$headers);
+            $_request = DELETE($_url, %$header_params);
         }
     }
     elsif ($method eq 'PATCH') { #TODO

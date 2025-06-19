@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -71,6 +72,7 @@ sub new {
 # PostWorkbookSaveAsRequest.region : The regional settings for workbook.  ,
 # PostWorkbookSaveAsRequest.pageWideFitOnPerSheet : The page wide fit on worksheet.  ,
 # PostWorkbookSaveAsRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.  ,
+# PostWorkbookSaveAsRequest.onePagePerSheet :   ,
 # PostWorkbookSaveAsRequest.FontsLocation : Use Custom fonts.   
 
 {
@@ -94,7 +96,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/{name}/SaveAs';
+    my $_resource_path = 'v3.0/cells/{name}/SaveAs';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -152,16 +154,23 @@ sub run_http_request {
         $query_params->{'pageTallFitOnPerSheet'} = $client->to_query_value($self->page_tall_fit_on_per_sheet);      
     }
 
+    if(defined $self->one_page_per_sheet){
+        $query_params->{'onePagePerSheet'} = $client->to_query_value($self->one_page_per_sheet);      
+    }
+
     if(defined $self->fonts_location){
         $query_params->{'FontsLocation'} = $client->to_query_value($self->fonts_location);      
     } 
     my $_body_data;
 
+
     # body params
     if (defined $self->save_options) {
-        #$_body_data = $self->save_options;
          $_body_data = JSON->new->convert_blessed->encode( $self->save_options);
     }
+
+ 
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -256,6 +265,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'one_page_per_sheet' => {
+     	datatype => 'string',
+     	base_name => 'onePagePerSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'fonts_location' => {
      	datatype => 'string',
      	base_name => 'FontsLocation',
@@ -279,6 +295,7 @@ __PACKAGE__->attribute_map( {
     'region' => 'region',
     'page_wide_fit_on_per_sheet' => 'pageWideFitOnPerSheet',
     'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet',
+    'one_page_per_sheet' => 'onePagePerSheet',
     'fonts_location' => 'FontsLocation' 
 } );
 

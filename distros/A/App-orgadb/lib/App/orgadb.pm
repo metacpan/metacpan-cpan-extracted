@@ -8,9 +8,9 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-13'; # DATE
+our $DATE = '2025-06-19'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our %SPEC;
 
@@ -445,14 +445,14 @@ $SPEC{select} = {
         'ORGADB_COLOR_THEME' => {
             summary => 'Set default color theme',
             schema => 'perl::colortheme::modname_with_optional_args*',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Color theme is Perl module name under the `ColorTheme::Search::` namespace,
 without the namespace prefix. The default is `Light`. You can set color theme
 using the `--color-theme` command-line option as well as this environment
 variable.
 
-_
+MARKDOWN
         },
     },
 };
@@ -525,7 +525,7 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.019 of App::orgadb (from Perl distribution App-orgadb), released on 2025-02-13.
+This document describes version 0.020 of App::orgadb (from Perl distribution App-orgadb), released on 2025-06-19.
 
 =head1 SYNOPSIS
 

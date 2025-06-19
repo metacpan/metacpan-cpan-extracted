@@ -34,15 +34,16 @@ foreach my $package (sort @show_versions)
     warn "$package $report\n";
 }
 
-use_ok 'Couch::DB::Mojolicious';
-use_ok 'Couch::DB::Result';
-use_ok 'Couch::DB::Cluster';
-use_ok 'Couch::DB::Client';
-use_ok 'Couch::DB::Design';
-use_ok 'Couch::DB::Node';
 use_ok 'Couch::DB::Util';
-use_ok 'Couch::DB::Database';
+use_ok 'Couch::DB::Row';
 use_ok 'Couch::DB::Document';
+use_ok 'Couch::DB::Design';
+use_ok 'Couch::DB::Result';
+use_ok 'Couch::DB::Node';
+use_ok 'Couch::DB::Client';
+use_ok 'Couch::DB::Cluster';
+use_ok 'Couch::DB::Database';
 use_ok 'Couch::DB';
+use_ok 'Couch::DB::Mojolicious';
 
 done_testing;

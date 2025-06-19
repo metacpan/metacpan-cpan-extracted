@@ -9,7 +9,7 @@ build_requires:
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -20,6 +20,12 @@ no_index:
   directory:
     - t
     - inc
+  package:
+    - Text::Table::Read::RelationOn::Tiny::_Relation_Matrix
+provides:
+  Text::Table::Read::RelationOn::Tiny:
+    file: lib/Text/Table/Read/RelationOn/Tiny.pm
+    version: v3.0.0
 requires:
   Carp: '0'
   autodie: '0'
@@ -27,5 +33,8 @@ requires:
   strict: '0'
   version: '0.77'
   warnings: '0'
-version: v2.3.5
+resources:
+  bugtracker: https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny/issues
+  repository: https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny.git
+version: v3.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

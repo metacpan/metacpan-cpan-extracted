@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.11';
+our $VERSION = '3.13';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -99,12 +99,15 @@ if ($use_cache) {
 my ( $place, $input, $coord, $stopseq, $stopfinder );
 
 if ( @ARGV == 1 ) {
-	if ( $ARGV[0] =~ m{ ^ ([^@]*) @ ([^@]*) [(] ([^)]*) [)] (.*)  $ }x ) {
+	if ( $ARGV[0]
+		=~ m{ ^ ([^@]*) @ ([^@]*) [(] ([^T]*) T ([^)]*) [)] (.*)  $ }x )
+	{
 		$stopseq = {
 			stateless => $1,
 			stop_id   => $2,
 			date      => $3,
-			key       => $4
+			time      => $4,
+			key       => $5
 		};
 	}
 	elsif ( $ARGV[0] =~ m{ ^ [?] (?<name> .*) $ }x ) {
@@ -633,7 +636,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.11
+version 3.13
 
 =head1 DESCRIPTION
 

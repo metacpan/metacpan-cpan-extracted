@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents the options of saving .xml file.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'SpreadsheetML2003SaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'export_column_index_of_cell' => {
      	datatype => 'boolean',
      	base_name => 'ExportColumnIndexOfCell',
-     	description => 'The default value is false, it means that column index will be ignored if the cell is contiguous to the previous cell.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'is_indented_formatting' => {
      	datatype => 'boolean',
      	base_name => 'IsIndentedFormatting',
-     	description => 'Causes child elements to be indented.The default value is true.  If the value is false, it will reduce the size of the xml file',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'limit_as_xls' => {
      	datatype => 'boolean',
      	base_name => 'LimitAsXls',
-     	description => 'Limit as xls, the max row index is 65535 and the max column index is 255.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

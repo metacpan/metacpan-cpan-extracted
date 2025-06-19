@@ -1,4 +1,4 @@
-# Copyrights 2024 by [Mark Overmeer].
+# Copyrights 2024-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # SPDX-License-Identifier: Artistic-2.0
 
 #!!! leading blank to make Pause ignore this package
-   package Test;
-use vars '$VERSION';
-$VERSION = '0.006';
+   package Test;{
+our $VERSION = '0.200';
+}
 
    use parent 'Exporter';
 

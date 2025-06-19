@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Session::Browseable.
 
+1.3.17
+    - Add Patroni support
+
 1.3.16
     - Optimize deleteIfLowerThan for Redis
 

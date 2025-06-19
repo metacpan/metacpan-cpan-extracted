@@ -18,9 +18,17 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
+        'Ref::Util' => 0,
         #'ABC'              => 1.6,
         #'Foo::Bar::Module' => 5.0401,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-Censor-*' },
+    META_MERGE => {
+        resources => {
+            repository => 'https://github.com/bigpresh/Data-Censor',
+            bugtracker => 'https://github.com/bigpresh/Data-Censor/issues',
+            homepage   => 'https://github.com/bigpresh/Data-Censor',
+        },
+    },
 );

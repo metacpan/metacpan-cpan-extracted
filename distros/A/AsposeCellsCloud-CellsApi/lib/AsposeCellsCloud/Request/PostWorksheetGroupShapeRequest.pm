@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -86,7 +87,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/shapes/group';
+    my $_resource_path = 'v3.0/cells/{name}/worksheets/{sheetName}/shapes/group';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -119,11 +120,14 @@ sub run_http_request {
     } 
     my $_body_data;
 
+
     # body params
     if (defined $self->list_shape) {
-        #$_body_data = $self->list_shape;
          $_body_data = JSON->new->convert_blessed->encode( $self->list_shape);
     }
+
+ 
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 

@@ -21,7 +21,7 @@ class_api_ok( $class,
 );
 
 class_api_ok( $subclass,
-  qw( new do_before do_while managed_schema tracking_schema create_tracking_table placeholders quoted_tracking_table )
+  qw( new do_before do_while dsn managed_schema tracking_schema create_tracking_table placeholders quoted_tracking_table )
 );
 
 like exception { $class->new() }, qr/\Aboth dsn and dbh are not set/, '"dsn" or "dbh" are both absent';

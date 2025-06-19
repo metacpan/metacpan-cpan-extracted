@@ -14,7 +14,7 @@ Module::Build->new(
         'Redis::Fast'    => 0,
     },
     test_requires      => { DBI => 0, 'DBD::SQLite' => 0, },
-    dist_version       => '1.3.16',
+    dist_version       => '1.3.17',
     autosplit          => [qw(lib/Apache/Session/Browseable/_common.pm)],
     configure_requires => { 'Module::Build' => 0, },
     meta_merge         => {

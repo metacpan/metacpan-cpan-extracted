@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Watermark for rendering.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'RenderingWatermark',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'rotation' => {
      	datatype => 'double',
      	base_name => 'Rotation',
-     	description => 'Gets or sets roation of the watermark in degrees.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

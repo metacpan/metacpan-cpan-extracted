@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents options of saving .ods file.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'OdsSaveOptions',
                                   required => [], # TODO
 }                                 );

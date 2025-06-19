@@ -21,12 +21,12 @@ no_index:
 provides:
   JSON::Lines:
     file: lib/JSON/Lines.pm
-    version: '1.08'
+    version: '1.09'
 requires:
+  Cpanel::JSON::XS: '0'
   Import::Export: '1.00'
-  JSON: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/JSON-Lines.git
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

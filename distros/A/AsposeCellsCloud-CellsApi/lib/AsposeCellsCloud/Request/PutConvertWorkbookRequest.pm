@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -69,8 +70,11 @@ sub new {
 # PutConvertWorkbookRequest.region : The regional settings for workbook.  ,
 # PutConvertWorkbookRequest.pageWideFitOnPerSheet : The page wide fit on worksheet.  ,
 # PutConvertWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.  ,
-# PutConvertWorkbookRequest.sheetName :   ,
-# PutConvertWorkbookRequest.pageIndex :   ,
+# PutConvertWorkbookRequest.sheetName : Convert the specified worksheet.   ,
+# PutConvertWorkbookRequest.pageIndex : Convert the specified page  of worksheet, sheetName is required.   ,
+# PutConvertWorkbookRequest.onePagePerSheet : When converting to PDF format, one page per sheet.   ,
+# PutConvertWorkbookRequest.AutoRowsFit : Auto-fits all rows in this workbook.  ,
+# PutConvertWorkbookRequest.AutoColumnsFit : Auto-fits the columns width in this workbook.  ,
 # PutConvertWorkbookRequest.FontsLocation : Use Custom fonts.   
 
 {
@@ -94,7 +98,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/convert';
+    my $_resource_path = 'v3.0/cells/convert';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -152,18 +156,31 @@ sub run_http_request {
         $query_params->{'pageIndex'} = $client->to_query_value($self->page_index);      
     }
 
+    if(defined $self->one_page_per_sheet){
+        $query_params->{'onePagePerSheet'} = $client->to_query_value($self->one_page_per_sheet);      
+    }
+
+    if(defined $self->auto_rows_fit){
+        $query_params->{'AutoRowsFit'} = $client->to_query_value($self->auto_rows_fit);      
+    }
+
+    if(defined $self->auto_columns_fit){
+        $query_params->{'AutoColumnsFit'} = $client->to_query_value($self->auto_columns_fit);      
+    }
+
     if(defined $self->fonts_location){
         $query_params->{'FontsLocation'} = $client->to_query_value($self->fonts_location);      
     } 
     my $_body_data;
- 
+
 
     if (defined $self->file) {   
         my $map_file = $self->file;
         while ( my ($filename,$value) = each( %$map_file ) ) {
                 $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
         }
-    } 
+    }
+ 
 
     # authentication setting, if any
     my $auth_settings = [qw()];
@@ -248,14 +265,35 @@ __PACKAGE__->method_documentation({
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'Convert the specified worksheet. ',
      	format => '',
      	read_only => '',
      		},
      'page_index' => {
      	datatype => 'int',
      	base_name => 'pageIndex',
-     	description => '',
+     	description => 'Convert the specified page  of worksheet, sheetName is required. ',
+     	format => '',
+     	read_only => '',
+     		},
+     'one_page_per_sheet' => {
+     	datatype => 'string',
+     	base_name => 'onePagePerSheet',
+     	description => 'When converting to PDF format, one page per sheet. ',
+     	format => '',
+     	read_only => '',
+     		},
+     'auto_rows_fit' => {
+     	datatype => 'string',
+     	base_name => 'AutoRowsFit',
+     	description => 'Auto-fits all rows in this workbook.',
+     	format => '',
+     	read_only => '',
+     		},
+     'auto_columns_fit' => {
+     	datatype => 'string',
+     	base_name => 'AutoColumnsFit',
+     	description => 'Auto-fits the columns width in this workbook.',
      	format => '',
      	read_only => '',
      		},
@@ -282,6 +320,9 @@ __PACKAGE__->attribute_map( {
     'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet',
     'sheet_name' => 'sheetName',
     'page_index' => 'pageIndex',
+    'one_page_per_sheet' => 'onePagePerSheet',
+    'auto_rows_fit' => 'AutoRowsFit',
+    'auto_columns_fit' => 'AutoColumnsFit',
     'fonts_location' => 'FontsLocation' 
 } );
 

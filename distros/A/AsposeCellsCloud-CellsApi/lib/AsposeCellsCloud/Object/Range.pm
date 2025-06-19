@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '           Encapsulates the object that represents a range of cells within a spreadsheet.           ',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'Range',
                                   required => [], # TODO
 }                                 );
@@ -128,63 +128,63 @@ __PACKAGE__->method_documentation({
      'column_count' => {
      	datatype => 'int',
      	base_name => 'ColumnCount',
-     	description => 'Gets the count of columns in the range. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'column_width' => {
      	datatype => 'double',
      	base_name => 'ColumnWidth',
-     	description => 'Sets or gets the column width of this range ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'first_column' => {
      	datatype => 'int',
      	base_name => 'FirstColumn',
-     	description => 'Gets the index of the first column of the range. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'first_row' => {
      	datatype => 'int',
      	base_name => 'FirstRow',
-     	description => 'Gets the index of the first row of the range. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => 'Gets or sets the name of the range. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'refers_to' => {
      	datatype => 'string',
      	base_name => 'RefersTo',
-     	description => 'Gets the range`s refers to. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'row_count' => {
      	datatype => 'int',
      	base_name => 'RowCount',
-     	description => 'Gets the count of rows in the range. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'row_height' => {
      	datatype => 'double',
      	base_name => 'RowHeight',
-     	description => 'Sets or gets the height of rows in this range ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'worksheet' => {
      	datatype => 'string',
      	base_name => 'Worksheet',
-     	description => 'Gets the object which contains this range. ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

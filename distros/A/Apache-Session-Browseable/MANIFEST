@@ -11,6 +11,7 @@ lib/Apache/Session/Browseable/LDAP.pm
 lib/Apache/Session/Browseable/MySQL.pm
 lib/Apache/Session/Browseable/MySQLJSON.pm
 lib/Apache/Session/Browseable/Oracle.pm
+lib/Apache/Session/Browseable/Patroni.pm
 lib/Apache/Session/Browseable/PgHstore.pm
 lib/Apache/Session/Browseable/PgJSON.pm
 lib/Apache/Session/Browseable/Postgres.pm
@@ -23,6 +24,7 @@ lib/Apache/Session/Browseable/Store/Informix.pm
 lib/Apache/Session/Browseable/Store/LDAP.pm
 lib/Apache/Session/Browseable/Store/MySQL.pm
 lib/Apache/Session/Browseable/Store/Oracle.pm
+lib/Apache/Session/Browseable/Store/Patroni.pm
 lib/Apache/Session/Browseable/Store/Postgres.pm
 lib/Apache/Session/Browseable/Store/Redis.pm
 lib/Apache/Session/Browseable/Store/SQLite.pm
@@ -36,12 +38,14 @@ MANIFEST
 META.json
 META.yml			Module meta-data (added by MakeMaker)
 README.md
+RELEASE.md
 rpm/Apache-Session-Browseable.spec
 t/Apache-Session-Browseable-Cassandra.t
 t/Apache-Session-Browseable-common.t
 t/Apache-Session-Browseable-DBI.t
 t/Apache-Session-Browseable-File.t
 t/Apache-Session-Browseable-LDAP.t
+t/Apache-Session-Browseable-Patroni.t
 t/Apache-Session-Browseable-Redis.t
 t/Apache-Session-Browseable-SQLite.t
 t/Apache-Session-Browseable-Store-DBI.t

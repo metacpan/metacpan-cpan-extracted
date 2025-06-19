@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -85,7 +86,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/{name}/protection';
+    my $_resource_path = 'v3.0/cells/{name}/protection';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -112,11 +113,14 @@ sub run_http_request {
     } 
     my $_body_data;
 
+
     # body params
     if (defined $self->protect_workbook_request) {
-        #$_body_data = $self->protect_workbook_request;
          $_body_data = JSON->new->convert_blessed->encode( $self->protect_workbook_request);
     }
+
+ 
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 

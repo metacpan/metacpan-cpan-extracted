@@ -3,6 +3,34 @@
 	  All code was made by Mark Overmeer.
 	  Attributes refer to people who made contributions in ideas and bug-reports.
 
+version 0.200: Wed 18 Jun 12:26:20 CEST 2025
+
+	Changes:
+	- rename ::Database::search() into ::allDocs()
+	- rename ::Design::indexFind() into ::search(), add $db->search()
+	- rename ::Design::viewSearch() into ::viewDocs()
+	- rename ::Result::page() into ::pageDocs()
+	- loads of work on the ::Design documents
+	- remove leading '_' from special call parameters.
+
+	Fixes:
+	- setResultDelayed() method name [paulinsche]
+	- _pathToDoc() calls in ::Design [paulinsche]
+	- _pathToDoc() double uri_escape [paulinsche]
+	- find() cannot run queries in parallel.
+
+	Improvements:
+	- add on_row event
+	- add ::Result::supportsPaging()
+	- add ::Result::row(), ::rows(), and ::docs()
+	- add ::Result::page(), ::pageDocs(), and ::pageRows()
+	- add ::Document::row()
+	- explain different ways of searching.
+	- add ::DB::freshUUID()
+	- add ::Result::short() and string overloading.
+	- add rows feature to some ::Client interfaces.
+	- configurable paging stop
+
 version 0.006: Mon  9 Sep 09:42:09 CEST 2024
 
 	Fixes:

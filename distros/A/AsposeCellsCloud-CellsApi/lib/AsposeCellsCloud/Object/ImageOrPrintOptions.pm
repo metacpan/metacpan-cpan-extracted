@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '           Allows to specify options when rendering worksheet to images, printing worksheet or rendering chart to image.           ',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'ImageOrPrintOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'text_cross_type' => {
      	datatype => 'string',
      	base_name => 'TextCrossType',
-     	description => 'TextCrossType',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'gridline_type' => {
      	datatype => 'string',
      	base_name => 'GridlineType',
-     	description => 'GridlineType',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'output_blank_page_when_nothing_to_print' => {
      	datatype => 'boolean',
      	base_name => 'OutputBlankPageWhenNothingToPrint',
-     	description => 'Indicates whether to output a blank page when there is nothing to print.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
@@ -247,28 +247,28 @@ __PACKAGE__->method_documentation({
      'default_edit_language' => {
      	datatype => 'string',
      	base_name => 'DefaultEditLanguage',
-     	description => 'DefaultEditLanguage',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'tiff_color_depth' => {
      	datatype => 'string',
      	base_name => 'TiffColorDepth',
-     	description => 'ColorDepth',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'tiff_compression' => {
      	datatype => 'string',
      	base_name => 'TiffCompression',
-     	description => 'TiffCompression',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'printing_page' => {
      	datatype => 'string',
      	base_name => 'PrintingPage',
-     	description => 'PrintingPageType',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
@@ -282,7 +282,7 @@ __PACKAGE__->method_documentation({
      'image_type' => {
      	datatype => 'string',
      	base_name => 'ImageType',
-     	description => 'ImageType',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
@@ -296,7 +296,7 @@ __PACKAGE__->method_documentation({
      'tiff_binarization_method' => {
      	datatype => 'string',
      	base_name => 'TiffBinarizationMethod',
-     	description => 'ImageBinarizationMethod',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

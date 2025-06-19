@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Cpanel::JSON::XS" : "0",
             "Import::Export" : "1.00",
-            "JSON" : "0",
             "perl" : "5.006"
          }
       },
@@ -46,7 +46,7 @@
    "provides" : {
       "JSON::Lines" : {
          "file" : "lib/JSON/Lines.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/JSON-Lines"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

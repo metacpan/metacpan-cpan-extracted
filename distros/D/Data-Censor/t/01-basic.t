@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Test::More;
 use Data::Censor;
 
-plan tests => 11;
+plan tests => 13;
 
 diag( "Testing Data::Censor $Data::Censor::VERSION, Perl $], $^X" );
 
@@ -69,4 +69,32 @@ SKIP: {
         "clone_and_censor email not censored (used as object method)");
 }
 
+subtest 'objects as hashes' => sub {
+	my $data = bless {
+		password => 'hush',
+	} => 'MyThing';
+
+	$censor->censor($data);
+
+	isnt $data->{password} => 'hush', 'can process object instances';
+};
+
+
+subtest 'recursive' => sub {
+	my $data = {
+		foo => 1,
+	};
+
+	my $y = {
+		bar => 2,
+		password => 'hush',
+		data => $data,
+	};
+
+	$data->{y} = $y; 
+
+	$censor->censor($data);
+
+	isnt $data->{y}{password} => 'hush', 'password is hidden';
+};
 

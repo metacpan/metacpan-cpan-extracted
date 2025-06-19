@@ -19,16 +19,16 @@ name: App-orgadb
 provides:
   App::orgadb:
     file: lib/App/orgadb.pm
-    version: '0.019'
+    version: '0.020'
   App::orgadb::Common:
     file: lib/App/orgadb/Common.pm
-    version: '0.019'
+    version: '0.020'
   App::orgadb::Select::Shell:
     file: lib/App/orgadb/Select/Shell.pm
-    version: '0.019'
+    version: '0.020'
   App::orgadb::Select::Shell::Commands:
     file: lib/App/orgadb/Select/Shell/Commands.pm
-    version: '0.019'
+    version: '0.020'
 requires:
   Carp: '1.12'
   Clipboard::Any: '0.011'
@@ -84,10 +84,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgadb
   homepage: https://metacpan.org/release/App-orgadb
   repository: git://github.com/perlancar/perl-App-orgadb.git
-version: '0.019'
+version: '0.020'
 x_Dist_Zilla:
   perl:
-    version: '5.040000'
+    version: '5.040001'
   plugins:
     -
       class: Dist::Zilla::Plugin::InsertExecsList
@@ -216,13 +216,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.39.5
+          git_version: 2.45.2
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Author::PERLANCAR/Git::Contributors'
-      version: '0.037'
+      version: '0.038'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
@@ -557,7 +557,7 @@ x_Dist_Zilla:
 x_authority: cpan:PERLANCAR
 x_contributors:
   - 'Steven Haryanto <stevenharyanto@gmail.com>'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

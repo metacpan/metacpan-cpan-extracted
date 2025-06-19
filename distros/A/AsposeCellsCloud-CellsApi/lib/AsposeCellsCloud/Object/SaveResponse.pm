@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents the Save Response.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'SaveResponse',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'save_result' => {
      	datatype => 'SaveResult',
      	base_name => 'SaveResult',
-     	description => 'This class property represents a "SaveResult" XML element.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

@@ -1,13 +1,13 @@
-# Copyrights 2024 by [Mark Overmeer].
+# Copyrights 2024-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
 # SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
 # SPDX-License-Identifier: Artistic-2.0
 
-package Couch::DB::Client;
-use vars '$VERSION';
-$VERSION = '0.006';
+package Couch::DB::Client;{
+our $VERSION = '0.200';
+}
 
 
 use Couch::DB::Util   qw(flat);
@@ -21,6 +21,8 @@ use MIME::Base64    qw(encode_base64);
 use Storable        qw(dclone);
 use URI::Escape     qw(uri_escape);
 
+my $seqnr = 0;
+
 
 sub new(@) { (bless {}, shift)->init( {@_} ) }
 
@@ -30,6 +32,7 @@ sub init($)
 	$self->{CDC_name}   = delete $args->{name} || "$server";
 	$self->{CDC_ua}     = delete $args->{user_agent} or panic "Requires 'user_agent'";
 	$self->{CDC_uuids}  = [];
+	$self->{CDC_seqnr}  = ++$seqnr;
 
 	$self->{CDC_couch}  = delete $args->{couch} or panic "Requires 'couch'";
 	weaken $self->{CDC_couch};
@@ -62,13 +65,16 @@ sub userAgent() { $_[0]->{CDC_ua} }
 
 sub headers($) { $_[0]->{CDC_hdrs} }
 
+
+sub seqnr() { $_[0]->{CDC_seqnr} }
+
 #-------------
 
 sub _clientIsMe($)   # check no client parameter is used
 {	my ($self, $args) = @_;
-	defined $args->{_client} and panic "No parameter 'client' allowed.";
-	$args->{_clients} && @{delete $args->{_clients}} and panic "No parameter '_clients' allowed.";
-	$args->{_client} = $self;
+	defined $args->{client} and panic "No parameter 'client' allowed.";
+	$args->{clients} && @{delete $args->{clients}} and panic "No parameter 'clients' allowed.";
+	$args->{client} = $self;
 }
 
 sub login(%)
@@ -139,14 +145,14 @@ sub hasRole($) { first { $_[1] eq $_ } $_[0]->roles }
 
 #-------------
 
-sub __serverInfoValues
-{	my ($result, $data) = @_;
-	my %values = %$data;
+sub __serverInfoValues($$)
+{	my ($self, $result, $data) = @_;
+	my $values = { %$data };
 
 	# 3.3.3 does not contain the vendor/version, as the example in the spec says
 	# Probably a mistake.
-	$result->couch->toPerl(\%values, version => qw/version/);
-	\%values;
+	$result->couch->toPerl($values, version => qw/version/);
+	$values;
 }
 
 sub serverInfo(%)
@@ -163,7 +169,9 @@ sub serverInfo(%)
 	}
 
 	my $result = $self->couch->call(GET => '/',
-		$self->couch->_resultsConfig(\%args, on_values => \&__serverInfoValues),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__serverInfoValues(@_) }
+		),
 	);
 
 	if($cached ne 'PING')
@@ -189,8 +197,17 @@ sub version()
 }
 
 
+sub __simpleArrayRow($$%)
+{   my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->[$index] or return ();
+
+	  (	answer => $answer,
+		values => $result->values->[$index],
+	  );
+}
+
 sub __activeTasksValues($$)
-{	my ($result, $tasks) = @_;
+{	my ($self, $result, $tasks) = @_;
 	my $couch = $result->couch;
 
 	my @tasks;
@@ -208,53 +225,64 @@ sub activeTasks(%)
 	$self->_clientIsMe(\%args);
 
 	$self->couch->call(GET => '/_active_tasks',
-		$self->couch->_resultsConfig(\%args, on_values => \&__activeTasksValues),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__activeTasksValues(@_) },
+			on_row    => sub { $self->__simpleArrayRow(@_) },
+		),
 	);
 }
 
 
-sub __dbNameFilter($)
+sub __dbNamesFilter($)
 {	my ($self, $search) = @_;
 
-	my $query = +{ %$search };
+	my $query = defined $search ? +{ %$search } : return {};
 	$self->couch
 		->toQuery($query, bool => qw/descending/)
 		->toQuery($query, json => qw/endkey end_key startkey start_key/);
 	$query;
 }
 
-sub databaseNames(%)
-{	my ($self, %args) = @_;
+sub databaseNames(;$%)
+{	my ($self, $search, %args) = @_;
 	$self->_clientIsMe(\%args);
 
-	my $search = delete $args{search} || {};
-
 	$self->couch->call(GET => '/_all_dbs',
-		query => $self->__dbNameFilter($search),
-		$self->couch->_resultsConfig(\%args),
+		query => $self->__dbNamesFilter($search),
+		$self->couch->_resultsConfig(\%args,
+			on_row => sub { $self->__simpleArrayRow(@_) },
+		),
 	);
 }
 
 
-sub databaseInfo(%)
-{	my ($self, %args) = @_;
+sub databaseInfo(;$%)
+{	my ($self, $search, %args) = @_;
 	$self->_clientIsMe(\%args);
-
 	my $names  = delete $args{names};
-	my $search = delete $args{search} || {};
 
 	my ($method, $query, $send, $intro) = $names
 	  ?	(POST => undef,  +{ keys => $names }, '2.2.0')
-	  :	(GET  => $self->_dbNameFilter($search), undef, '3.2.0');
+	  :	(GET  => $self->_dbNamesFilter($search), undef, '3.2.0');
 
 	$self->couch->call($method => '/_dbs_info',
 		introduced => $intro,
 		query      => $query,
 		send       => $send,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsConfig(\%args,
+			on_row => sub { $self->__simpleArrayRow(@_) },
+		),
 	);
 }
 
+
+sub __dbUpRow($$%)
+{	my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->{results}[$index] or return ();
+	  (	answer => $answer,
+		values => $result->values->{results}[$index],
+	  );
+}
 
 sub dbUpdates($%)
 {	my ($self, $feed, %args) = @_;
@@ -265,13 +293,15 @@ sub dbUpdates($%)
 	$self->couch->call(GET => '/_db_updates',
 		introduced => '1.4.0',
 		query      => $query,
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsConfig(\%args,
+			on_row => sub { $self->__dbUpRow(@_) },
+		),
 	);
 }
 
 
-sub __clusterNodeValues($)
-{	my ($result, $data) = @_;
+sub __clusterNodeValues($$)
+{	my ($self, $result, $data) = @_;
 	my $couch   = $result->couch;
 
 	my %values  = %$data;
@@ -289,13 +319,15 @@ sub clusterNodes(%)
 
 	$self->couch->call(GET => '/_membership',
 		introduced => '2.0.0',
-		$self->couch->_resultsConfig(\%args, on_values => \&__clusterNodeValues),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__clusterNodeValues(@_) }
+		),
 	);
 }
 
 
 sub __replicateValues($$)
-{	my ($result, $raw) = @_;
+{	my ($self, $result, $raw) = @_;
 	my $couch   = $result->couch;
 
 	my $history = delete $raw->{history} or return $raw;
@@ -323,13 +355,24 @@ sub replicate($%)
 
 	$couch->call(POST => '/_replicate',
 		send   => $rules,
-		$couch->_resultsConfig(\%args, on_values => \&__replicateValues),
+		$couch->_resultsConfig(\%args,
+			on_values => sub { $self->__replicateValues(@_) }
+		),
 	);
 }
 
 
+sub __replJobsRow($$%)
+{	my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->{jobs}[$index] or return ();
+
+	  (	answer => $answer,
+		values => $result->values->{jobs}[$index],
+	  );
+}
+
 sub __replJobsValues($$)
-{	my ($result, $raw) = @_;
+{	my ($self, $result, $raw) = @_;
 	my $couch   = $result->couch;
 	my $values  = dclone $raw;
 
@@ -351,13 +394,25 @@ sub replicationJobs(%)
 	$self->_clientIsMe(\%args);
 
 	$self->couch->call(GET => '/_scheduler/jobs',
-		$self->couch->_resultsPaging(\%args, on_values => \&__replJobsValues),
+		$self->couch->_resultsPaging(\%args,
+			on_values => sub { $self->__replJobsValues(@_) },
+			on_row    => sub { $self->__replJobsRow(@_) },
+		),
 	);
 }
 
 
+sub __replDocRow($$%)
+{	my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->{jobs}[$index] or return ();
+
+	  (	answer => $answer,
+		values => $result->values->{jobs}[$index],
+	  );
+}
+
 sub __replDocValues($$)
-{	my ($result, $raw) = @_;
+{	my ($self, $result, $raw) = @_;
 	my $v = +{ %$raw }; # $raw->{info} needs no conversions
 
 	$result->couch
@@ -368,10 +423,10 @@ sub __replDocValues($$)
 }
 
 sub __replDocsValues($$)
-{	my ($result, $raw) = @_;
+{	my ($self, $result, $raw) = @_;
 	my $couch   = $result->couch;
 	my $values  = dclone $raw;
-	$values->{docs} = [ map __replDocValues($result, $_), @{$values->{docs} || []} ];
+	$values->{docs} = [ map $self->__replDocValues($result, $_), @{$values->{docs} || []} ];
 	$values;
 }
 
@@ -386,12 +441,20 @@ sub replicationDocs(%)
 	}
 
 	$self->couch->call(GET => $path,
-		$self->couch->_resultsPaging(\%args, on_values => \&__replDocsValues),
+		$self->couch->_resultsPaging(\%args,
+			on_values => sub { $self->__replDocsValues(@_) },
+			on_row    => sub { $self->__replDocRow(@_) },
+		),
 	);
 }
 
 
-#XXX the output differs from replicationDoc
+#XXX the output differs from replicationDoc, so different method
+
+sub __replOneDocValues($$)
+{	my ($self, $result, $raw) = @_;
+	$self->__replDocValues($result, $raw);
+}
 
 sub replicationDoc($%)
 {	my ($self, $doc, %args) = @_;
@@ -403,14 +466,15 @@ sub replicationDoc($%)
 	my $path = '/_scheduler/docs/' . uri_escape($dbname) . '/' . $docid;
 
 	$self->couch->call(GET => $path,
-		$self->couch->_resultsPaging(\%args, on_values => \&__replDocValues),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__replOneDocValues(@_) },
+		),
 	);
 }
 
 
-
 sub __nodeNameValues($)
-{	my ($result, $raw) = @_;
+{	my ($self, $result, $raw) = @_;
 	my $values = dclone $raw;
 	$result->couch->toPerl($values, node => qw/name/);
 	$values;
@@ -421,7 +485,9 @@ sub nodeName($%)
 	$self->_clientIsMe(\%args);
 
 	$self->couch->call(GET => "/_node/$name",
-		$self->couch->_resultsConfig(\%args, on_values => \&__nodeNameValues),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__nodeNameValues(@_) }
+		),
 	);
 }
 

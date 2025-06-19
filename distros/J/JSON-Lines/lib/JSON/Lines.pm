@@ -1,10 +1,10 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.08';
-use JSON; use base 'Import::Export';
+use 5.006; use strict; use warnings; our $VERSION = '1.09';
+use Cpanel::JSON::XS; use base 'Import::Export';
 
 our ($JSON, $LINES, %EX);
 BEGIN {
-	$JSON = JSON->new;
+	$JSON = Cpanel::JSON::XS->new;
 	$LINES = qr{ ([\[\{] (?: (?> [^\[\]\{\}]+ ) | (??{ $LINES }) )* [\]\}]) }x;
 	%EX = (
 		jsonl => [qw/all/]
@@ -114,6 +114,50 @@ sub get_line {
 	return $self->_decode_line($line);
 }
 
+sub get_subset {
+	my ($self, $fh, $offset, $length, $out_file) = @_;
+
+	my $in_fh = 1;
+	if (ref $fh ne 'GLOB') {
+		my $file = $fh;
+		open my $ffh, '<', $file or die "cannot open file: $!";
+		$fh = $ffh;
+		$in_fh = 0;
+	}
+
+	seek $fh, 0, 0;
+	if ($offset) {
+		<$fh> for ( 1 .. $offset );
+	}
+	my @lines;
+	my $line = '';
+	while ($offset <= $length) {
+		do { $offset++; $line .= <$fh> } 
+			while ($line !~ m/^$LINES/ && !eof($fh) && $offset <= $length);
+		if ($line =~ m/^$LINES/) {
+			push @lines, $line;
+			$line = "";
+		}
+	}
+
+	if (!$in_fh) {
+		close $fh;
+	}
+
+	if ($out_file) {
+		open my $cfh, '>', $out_file or die "cannot open file for writing: $!";
+		print $cfh join "", @lines;
+		close $cfh;
+		return 1;
+	}
+
+	return [ 
+		map { 
+			$self->_decode_line($_);
+		} @lines
+	];
+}
+
 sub _decode_line {
 	my ($self, $line) = @_;
 	my $struct = eval { $JSON->decode($line) };
@@ -189,7 +233,7 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =cut
 
@@ -378,6 +422,14 @@ Decode a json lines file, 'n' lines at a time.
 Clear the current JSON::Lines stream.
 
 	$jsonl->clear_stream;
+
+=head2 get_subset
+
+Get a subset of JSON lines, optionally pass a file to write to.
+
+	my $lines = $jsonl->get_subset($file, $offset, $length);
+
+	$jsonl->get_subset($file, $offset, $length, $out_file);
 
 =head1 AUTHOR
 

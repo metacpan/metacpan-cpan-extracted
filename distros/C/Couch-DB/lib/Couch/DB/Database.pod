@@ -6,7 +6,10 @@ Couch::DB::Database - One database connection
 
 =head1 SYNOPSIS
 
-   my $db = Couch::DB->db('my-db');
+  my $db   = Couch::DB->db('my-db');
+
+  # (search) documents in the database
+  my @docs = $db->allDocs->docs;
 
 =head1 DESCRIPTION
 
@@ -67,8 +70,8 @@ The name of a database must match C<< ^[a-z][a-z0-9_$()+/-]*$ >>.
 
 =head2 Database information
 
-B<All CouchDB API calls> documented below, support C<%options> like C<_delay>,
-C<_client>, and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
+B<All CouchDB API calls> documented below, support C<%options> like C<delay>,
+C<client>, and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
 
 =over 4
 
@@ -153,29 +156,45 @@ A deleted document is only marked as being deleted, but exists until
 purge.  There must be sufficient time between deletion and purging,
 to give replication a chance to distribute the fact of deletion.
 
-=item $obj-E<gt>B<purgeRecordsLimit>(%options)
-
- [CouchDB API "GET /{db}/_purged_infos_limit", UNTESTED]
-
-Returns the soft maximum number of records kept about deleting records.
-
-=item $obj-E<gt>B<purgeRecordsLimitSet>($limit, %options)
-
- [CouchDB API "PUT /{db}/_purged_infos_limit", UNTESTED]
-
-Set a new soft limit.  The default is 1000.
-
 =item $obj-E<gt>B<purgeUnusedViews>(%options)
 
  [CouchDB API "POST /{db}/_view_cleanup", UNTESTED]
 
 Removes view files that are not used by any design document.
 
+=item $obj-E<gt>B<purgedRecordsLimit>(%options)
+
+ [CouchDB API "GET /{db}/_purged_infos_limit", UNTESTED]
+
+Returns the soft maximum number of records kept about deleting records.
+
+=item $obj-E<gt>B<purgedRecordsLimitSet>($limit, %options)
+
+ [CouchDB API "PUT /{db}/_purged_infos_limit", UNTESTED]
+
+Set a new soft limit.  The default is 1000.
+
 =item $obj-E<gt>B<remove>(%options)
 
  [CouchDB API "DELETE /{db}"]
 
 Remove the database.
+
+example: be sure a database does not exist
+
+Any call returns a success, which you should test; there are many reasons
+why they may fail.  So, for any call, you should write like this:
+
+  my $r = $couch->db('test')->remove;
+  $r or error "Cannot remove database 'test'; $r";
+
+However, in this case you may not want to cast an error at reply code 404
+(not found). Away means away.  So, this works:
+
+  $r && $r->code != 404 or error $r;
+
+  use HTTP::Status  qw(HTTP_NOT_FOUND);
+  $r && $r->code != HTTP_NOT_FOUND or error $r;
 
 =item $obj-E<gt>B<revisionLimit>(%options)
 
@@ -237,27 +256,31 @@ Returns the users who have access to the database, including their roles
 
 =back
 
-=head2 Designs and Indexes
+=head2 Indexes
+
+Three indexes exist:
 
 =over 4
 
-=item $obj-E<gt>B<createIndex>(\%filter, %options)
+=item * json (Mango)
 
- [CouchDB API "POST /{db}/_index", UNTESTED]
-Create/confirm an index on the database.  By default, the index C<name>
-and the name for the design document C<ddoc> are generated.  You can
-also call C<Couch::DB::Design::createIndex()>.
+=item * text (Lucene via Cousteau, phased out)
 
- -Option--Default
-  design  undef
-
-=over 2
-
-=item design => $design|$ddocid
-
-When no design document is specified, then one will be created.
+=item * nouveau (Lucene via Nouveau, since 3.4.1)
 
 =back
+
+The details about each index are stored in design documents.  You may have
+more than one index per design document, but any change to such document
+will force a rebuild of all other indices in the same file.
+
+=over 4
+
+=item $obj-E<gt>B<design>( [$ddocid|$ddoc|undef] )
+
+Returns the L<Couch::DB::Design|Couch::DB::Design> object which manages a design document.
+The document will not be read until an explicit call to C<get()>.
+The C<$ddocid> may start with C<_design/> which will be ignored.
 
 =item $obj-E<gt>B<designs>( [\%search|\@%search, %options] )
 
@@ -272,17 +295,86 @@ parameters are added and missing.
 If there are searches, then C<GET> is used, otherwise the C<POST> version.
 The returned structure depends on the searches and the number of searches.
 
+Rows are supported.
+
 =item $obj-E<gt>B<indexes>(%options)
 
- [CouchDB API "GET /{db}/_index", UNTESTED]
+ [CouchDB API "GET /{db}/_index"]
 
-Collect all indexes for the database.
+Collect all indexes for the database.  This command supports rows.
+
+=item $obj-E<gt>B<search>( $ddoc, $index, [\%search, %options] )
+
+Run a search (Mango or text) on the database.  The search base is
+described in the C<$index> in design document C<$ddoc>.  The design
+document may be specified as id or object.
+
+example: search
+
+  # Twice the same
+  my $r = $db->search(myddoc => myindex => \%search);
+  my $r = $db->design('myddoc')->search(myindex => \%search);
 
 =back
 
 =head2 Handling documents
 
 =over 4
+
+=item $obj-E<gt>B<allDocs>( [\%query|\@queries], %options] )
+
+ [CouchDB API "GET /{db}/_all_docs"]
+ [CouchDB API "POST /{db}/_all_docs"]
+ [CouchDB API "POST /{db}/_all_docs/queries", UNTESTED]
+ [CouchDB API "GET /{db}/_local_docs", UNTESTED]
+ [CouchDB API "POST /{db}/_local_docs", UNTESTED]
+ [CouchDB API "POST /{db}/_local_docs/queries", UNTESTED]
+ [CouchDB API "GET /{db}/_partition/{partition}/_all_docs", UNTESTED]
+
+Get the documents, optionally limited by a view.  If there are queries,
+then C<POST> is used, otherwise the C<GET> endpoint.
+
+The returned structure depends on the C<%query> and the number of
+C<@queries> (an ARRAY of query HASHes).  This method support pagination,
+but only when a single query is given.
+
+The preferred way to use this method with a C<view>, is by calling
+L<Couch::DB::Design::viewDocs()|Couch::DB::Design/"Views"> on its C<design> object.
+
+ -Option   --Default
+  design     undef
+  local      false
+  partition  undef
+  view       undef
+
+=over 2
+
+=item design => $design|$ddocid
+
+Usually called via L<Couch::DB::Design::viewDocs()|Couch::DB::Design/"Views">.
+
+=item local => BOOLEAN
+
+Search only in local (non-replicated) documents.  This does not support
+a combination with C<partition> or C<view>.
+
+=item partition => $name
+
+Restrict the search to the specific partition.
+
+=item view => $name
+
+Restrict the search to the named view.  Requires the C<design> document.
+
+=back
+
+example: getting all documents in a database
+
+Be warned: doing it this way is memory hungry: better use paging.
+
+  my $all  = $couch->db('users')->allDocs({include_docs => 1}, all => 1);
+  my $rows = $all->page;
+  my @docs = map $_->doc, @$rows;
 
 =item $obj-E<gt>B<doc>($docid, %options)
 
@@ -299,13 +391,12 @@ not need to pass the C<Couch::DB::Database> object explicitly.
  [CouchDB API "POST /{db}/_find"]
  [CouchDB API "POST /{db}/_partition/{partition_id}/_find", UNTESTED]
 
-Search the database for matching documents.  The documents are always
-included in the reply, including attachment information.  Attachement
-data is not included.
+Search the database for matching documents, using Mango selectors.
+The documents are always included in the reply, including attachment
+information.  Attachment data is not included.
 
 The default search will select everything (uses a blank HASH as required
 C<selector>).  By default, the number of results has a C<limit> of 25.
-j
 Pass C<limit> and C<skip> in C<%options> with other pagination control,
 not in C<%search>.
 
@@ -321,14 +412,8 @@ not in C<%search>.
 example: of find() with a single query
 
   my $result = $couch->find or die;
-  my $docs   = $result->values->{docs};  # Couch::DB::Documents
-  foreach my $doc (@$docs) { ... }
-
-example: of find() more than one query:
-
-  my $result = $couch->find( [\%q0, \%q1] ) or die;
-  my $docs   = $result->values->{results}[1]{docs};
-  foreach my $doc (@$docs) { ... }
+  my @docs   = $result->docs;  # Couch::DB::Documents
+  foreach my $doc (@docs) { ... }
 
 =item $obj-E<gt>B<findExplain>(\%search, %options)
 
@@ -415,71 +500,16 @@ example: for error handling
   sub handle($result, $doc, %details) { ... }
   $db->saveBulk(@save, issues => \&handle);
 
-=item $obj-E<gt>B<search>( [\%query|\@queries, %options] )
-
- [CouchDB API "GET /{db}/_all_docs"]
- [CouchDB API "POST /{db}/_all_docs"]
- [CouchDB API "POST /{db}/_all_docs/queries", UNTESTED]
- [CouchDB API "GET /{db}/_local_docs", UNTESTED]
- [CouchDB API "POST /{db}/_local_docs", UNTESTED]
- [CouchDB API "POST /{db}/_local_docs/queries", UNTESTED]
- [CouchDB API "GET /{db}/_partition/{partition}/_all_docs", UNTESTED]
-
-Get the documents, optionally limited by a view.  If there are queries,
-then C<POST> is used, otherwise the C<GET> endpoint.
-
-The returned structure depends on the C<%query> and the number of
-C<@queries> (an ARRAY of query HASHes).  This method support pagination,
-but only when a single query is given.
-
-The preferred way to use this method with a C<view>, is by calling
-L<Couch::DB::Design::viewSearch()|Couch::DB::Design/"Views"> on its C<design> object.
-
- -Option   --Default
-  design     undef
-  local      false
-  partition  undef
-  view       undef
-
-=over 2
-
-=item design => $design|$ddocid
-
-Usually called via L<Couch::DB::Design::viewSearch()|Couch::DB::Design/"Views">.
-
-=item local => BOOLEAN
-
-Search only in local (non-replicated) documents.  This does not support
-a combination with C<partition> or C<view>.
-
-=item partition => $name
-
-Restrict the search to the specific partition.
-
-=item view => $name
-
-Restrict the search to the named view.  Requires the C<design> document.
-
-=back
-
-example: getting all documents in a database
-
-Be warned: doing it this way is memory hungry: better use paging.
-
-  my $all  = $couch->db('users')->search({include_docs => 1}, _all => 1);
-  my $hits = $all->page;
-  my @docs = map $_->{doc}, @$hits;
-
 =back
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.006,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.200,
+built on June 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2024-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

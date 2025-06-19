@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -91,7 +92,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/pictures';
+    my $_resource_path = 'v3.0/cells/{name}/worksheets/{sheetName}/pictures';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -144,11 +145,14 @@ sub run_http_request {
     } 
     my $_body_data;
 
+
     # body params
     if (defined $self->picture) {
-        #$_body_data = $self->picture;
          $_body_data = JSON->new->convert_blessed->encode( $self->picture);
     }
+
+ 
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Options for encrypting and access permissions for a PDF document.            PDF/A does not allow security setting.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'PdfSecurityOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'annotations_permission' => {
      	datatype => 'boolean',
      	base_name => 'AnnotationsPermission',
-     	description => 'Indicates whether to allow to add or modify text annotations, fill in interactive form fields.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

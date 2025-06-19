@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents the CellsCloudFileInfo Response.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'CellsCloudFileInfoResponse',
                                   required => [], # TODO
 }                                 );
@@ -129,7 +129,7 @@ __PACKAGE__->method_documentation({
      'file_info' => {
      	datatype => 'CellsCloudFileInfo',
      	base_name => 'FileInfo',
-     	description => 'A property named `FileInfo` of type `CellsCloudFileInfo` is defined for the class.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

@@ -109,15 +109,20 @@ sub deleteIfLowerThan {
     elsif ( $rule->{and} ) {
         $query = join ' AND ', map {
             $fields{$_}++;
-            $class->_buildLowerThanExpression( $_, $rule->{or}->{$_} )
+            $class->_buildLowerThanExpression( $_, $rule->{and}->{$_} )
           }
-          keys %{ $rule->{or} };
+          keys %{ $rule->{and} };
     }
     if ( $rule->{not} ) {
-        $query = "($query) AND "
-          . join( ' AND ',
-            map { $fields{$_}++; "$_ <> '$rule->{not}->{$_}'" }
-              keys %{ $rule->{not} } );
+        $query = "($query) AND " . join(
+            ' AND ',
+            map {
+                $rule->{not}->{$_} =~ s/'/''/g;
+                $fields{$_}++;
+                "$_ <> '$rule->{not}->{$_}'"
+              }
+              keys %{ $rule->{not} }
+        );
     }
     return 0
       unless ( $query and $class->_tabInTab( [ keys %fields ], $index ) );
@@ -180,12 +185,12 @@ sub get_key_from_all_sessions {
         ? sub {
             require Storable;
             return Storable::thaw( pack( 'H*', $_[0] ) );
-        }
+          }
         : $args->{DataSource} =~ /^mysql/i ? sub {
             require MIME::Base64;
             require Storable;
             return Storable::thaw( MIME::Base64::decode_base64( $_[0] ) );
-        }
+          }
         : undef
     );
     while ( my @row = $sth->fetchrow_array ) {

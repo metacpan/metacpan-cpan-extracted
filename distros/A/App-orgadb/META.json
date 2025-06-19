@@ -97,19 +97,19 @@
    "provides" : {
       "App::orgadb" : {
          "file" : "lib/App/orgadb.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "App::orgadb::Common" : {
          "file" : "lib/App/orgadb/Common.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "App::orgadb::Select::Shell" : {
          "file" : "lib/App/orgadb/Select/Shell.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "App::orgadb::Select::Shell::Commands" : {
          "file" : "lib/App/orgadb/Select/Shell/Commands.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -124,10 +124,10 @@
          "web" : "https://github.com/perlancar/perl-App-orgadb"
       }
    },
-   "version" : "0.019",
+   "version" : "0.020",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.040000"
+         "version" : "5.040001"
       },
       "plugins" : [
          {
@@ -292,7 +292,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.45.2",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -300,7 +300,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Git::Contributors",
-            "version" : "0.037"
+            "version" : "0.038"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
@@ -733,8 +733,8 @@
    "x_contributors" : [
       "Steven Haryanto <stevenharyanto@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

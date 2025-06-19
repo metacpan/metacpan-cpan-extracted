@@ -72,7 +72,6 @@ sub _setRefreshTokenExpiration {
     my $minEpoch = $refreshTokenEpoch < $accessTokenEpoch ? $refreshTokenEpoch : $accessTokenEpoch;
     my $nowEpoch = DateTime->now()->epoch();
     my $secs = $minEpoch - $nowEpoch;
-    warn 'refresh token expires in ', $refreshTokenEpoch-$nowEpoch, ' seconds, access token in ', $accessTokenEpoch-$nowEpoch;
 
     # Choose when to get a new token, based on when the shorter-lived
     # of the two tokens expires. One simple option would be when half

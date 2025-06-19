@@ -17,14 +17,12 @@ sub insert {
       ? $session->{args}->{Index}
       : [ split /\s+/, $session->{args}->{Index} ];
 
-    if ( !defined $self->{insert_sth} ) {
-        $self->{insert_sth} =
-          $self->{dbh}->prepare_cached( "INSERT INTO $self->{table_name} ("
-              . join( ',', 'id', 'a_session', map { s/'/''/g; $_ } @$index )
-              . ') VALUES ('
-              . join( ',', ('?') x ( 2 + @$index ) )
-              . ')' );
-    }
+    $self->{insert_sth} //=
+      $self->{dbh}->prepare_cached( "INSERT INTO $self->{table_name} ("
+          . join( ',', 'id', 'a_session', map { s/'/''/g; $_ } @$index )
+          . ') VALUES ('
+          . join( ',', ('?') x ( 2 + @$index ) )
+          . ')' );
 
     $self->{insert_sth}->bind_param( 1, $session->{data}->{_session_id} );
     $self->{insert_sth}->bind_param( 2, $session->{serialized} );

@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-02-13'; # DATE
+our $DATE = '2025-06-19'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 sub _heading_from_line {
     my $heading = shift;
@@ -342,7 +342,7 @@ equivalent to:
 
 MARKDOWN
         cmdline_aliases => {
-            X => { is_flag=>1, summary=>'Turn on exact entry matching (shortcut for `--field-match-mode=exact`)', code => sub { $_[0]{field_match_mode} = 'exact' } },
+            X => { is_flag=>1, summary=>'Turn on exact field matching (shortcut for `--field-match-mode=exact`)', code => sub { $_[0]{field_match_mode} = 'exact' } },
         },
     },
 
@@ -550,7 +550,7 @@ App::orgadb::Common
 
 =head1 VERSION
 
-This document describes version 0.019 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2025-02-13.
+This document describes version 0.020 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2025-06-19.
 
 =head1 HOMEPAGE
 

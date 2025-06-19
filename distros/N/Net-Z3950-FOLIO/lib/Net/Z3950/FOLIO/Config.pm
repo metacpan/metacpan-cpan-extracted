@@ -472,6 +472,17 @@ This setting makes it simpler to access information about individual
 items, at the cost of losing information about how they are grouped
 into holdings.
 
+=item C<holdingsInEachItem>
+
+If specified and set to a true value, then holdings information is
+included in each item's MARC field.  When this is absent or set to a
+false value (the default), only the first item in a given holding
+includes the holdings fields.
+
+This setting makes it simpler to access all the information about any
+single item, at the cost of wasting record size and network bandwidth
+on redundant information.
+
 =item C<holdingsElements>
 
 An object specifying MARC subfields that should be set from

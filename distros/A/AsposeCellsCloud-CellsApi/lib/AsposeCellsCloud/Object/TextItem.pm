@@ -35,8 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-use AsposeCellsCloud::Object::Link;
-use AsposeCellsCloud::Object::LinkElement; 
+ 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -119,23 +118,37 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents text item.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'TextItem',
                                   required => [], # TODO
 }                                 );
 
 
 __PACKAGE__->method_documentation({
-     'text' => {
+     'filename' => {
      	datatype => 'string',
-     	base_name => 'Text',
-     	description => 'Represents text content.',
+     	base_name => 'Filename',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
-     'link' => {
-     	datatype => 'Link',
-     	base_name => 'link',
+     'worksheet' => {
+     	datatype => 'string',
+     	base_name => 'Worksheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'position' => {
+     	datatype => 'string',
+     	base_name => 'Position',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'content' => {
+     	datatype => 'string',
+     	base_name => 'Content',
      	description => '',
      	format => '',
      	read_only => '',
@@ -143,13 +156,17 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'text' => 'string',
-    'link' => 'Link' 
+    'filename' => 'string',
+    'worksheet' => 'string',
+    'position' => 'string',
+    'content' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'text' => 'Text',
-    'link' => 'link' 
+    'filename' => 'Filename',
+    'worksheet' => 'Worksheet',
+    'position' => 'Position',
+    'content' => 'Content' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.11';
+our $VERSION = '3.13';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -54,7 +54,7 @@ sub new_p {
 		}
 	)->catch(
 		sub {
-			my ($err) = @_;
+			my ( $err, $self ) = @_;
 			$promise->reject($err);
 			return;
 		}
@@ -206,6 +206,7 @@ sub new {
 			stop              => $opt{stopseq}{stop_id},
 			tripCode          => $opt{stopseq}{key},
 			date              => $opt{stopseq}{date},
+			time              => $opt{stopseq}{time},
 			coordOutputFormat => 'WGS84[DD.DDDDD]',
 			outputFormat      => 'rapidJson',
 			useRealtime       => '1',
@@ -702,7 +703,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.11
+version 3.13
 
 =head1 DESCRIPTION
 

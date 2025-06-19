@@ -13,3 +13,7 @@ Revision history for JSON-Lines
 
 1.08	2025/05/20
 	- Fix - get_line to return undef on end of file.
+
+1.09	2025/06/19
+	- Switch to use Cpanel::JSON::XS
+	- Adds a get_subset function that returns a subset of json lines from a file. Note: this handles pretty printed json.

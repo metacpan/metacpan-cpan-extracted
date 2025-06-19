@@ -5,17 +5,19 @@ use strict;
 use warnings FATAL => 'all';
 use Carp;
 
+use Ref::Util qw/ is_hashref /;
+
 =head1 NAME
 
 Data::Censor - censor sensitive stuff in a data structure
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -81,30 +83,30 @@ defined which matches the key being considered takes precedence.
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args  = @_;
 
     my $self = bless {} => $class;
 
-    if (ref $args{sensitive_fields} eq 'Regexp') {
+    if ( ref $args{sensitive_fields} eq 'Regexp' ) {
         $self->{censor_regex} = $args{sensitive_fields};
-    } elsif (ref $args{sensitive_fields} eq 'ARRAY') {
-        $self->{is_sensitive_field} = { 
+    } elsif ( ref $args{sensitive_fields} eq 'ARRAY' ) {
+        $self->{is_sensitive_field} = {
             map { $_ => 1 } @{ $args{sensitive_fields} }
         };
     } else {
         $self->{is_sensitive_field} = {
             map { $_ => 1 } qw(
-                pass         password     old_password   secret
-                private_key  cardnum      card_number    pan
-                cvv          cvv2         ccv
+              pass         password     old_password   secret
+              private_key  cardnum      card_number    pan
+              cvv          cvv2         ccv
             )
         };
     }
 
-    if (ref $args{replacement_callbacks} eq 'HASH') {
+    if ( is_hashref $args{replacement_callbacks} ) {
         $self->{replacement_callbacks} = $args{replacement_callbacks};
     }
-    if (exists $args{replacement}) {
+    if ( exists $args{replacement} ) {
         $self->{replacement} = $args{replacement};
     } else {
         $self->{replacement} = 'Hidden (looks potentially sensitive)';
@@ -125,39 +127,43 @@ censoring potentially sensitive data within.
 =cut
 
 sub censor {
-    my ($self, $data, $recurse_count) = @_;
+    my ( $self, $data, $recurse_count, $visited ) = @_;
     $recurse_count ||= 0;
-    
-    no warnings 'recursion'; # we're checking ourselves.
+    $visited       ||= {};
 
-    if ($recurse_count++ > $self->{recurse_limit}) {
+    no warnings 'recursion';    # we're checking ourselves.
+
+    if ( $recurse_count++ > $self->{recurse_limit} ) {
         warn "Data exceeding $self->{recurse_limit} levels";
         return;
     }
 
-    if (ref $data ne 'HASH') {
-        croak('censor expects a hashref');
-    }
-    
+    croak('censor expects a hashref') unless is_hashref $data;
+
     my $censored = 0;
-    for my $key (keys %$data) {
-        if (ref $data->{$key} eq 'HASH') {
-            $censored += $self->censor($data->{$key}, $recurse_count);
-        } elsif (
-            ($self->{is_sensitive_field} && $self->{is_sensitive_field}{lc $key})
-            ||
-            ($self->{censor_regex} && $key =~ $self->{censor_regex})
-        ) {
-            # OK, censor this
-            if ($self->{replacement_callbacks}{lc $key}) {
-                $data->{$key} = $self->{replacement_callbacks}{lc $key}->(
-                    $data->{$key}
-                );
-                $censored++;
-            } else {
-                $data->{$key} = $self->{replacement};
-                $censored++;
-            }
+    for my $key ( keys %$data ) {
+
+        if ( is_hashref $data->{$key} ) {
+            $censored
+              += $self->censor( $data->{$key}, $recurse_count, $visited )
+              unless $visited->{ $data->{$key} }++;
+            next;
+        }
+
+        next unless
+          (    $self->{is_sensitive_field}
+            && $self->{is_sensitive_field}{ lc $key } )
+          or ( $self->{censor_regex} && $key =~ $self->{censor_regex} );
+
+        # OK, censor this
+        if ( $self->{replacement_callbacks}{ lc $key } ) {
+            $data->{$key} = $self->{replacement_callbacks}{ lc $key }->(
+                $data->{$key}
+            );
+            $censored++;
+        } else {
+            $data->{$key} = $self->{replacement};
+            $censored++;
         }
     }
 
@@ -181,25 +187,26 @@ custom settings to the object before using it.
   my $censored_data = $censor->clone_and_censor($data);
 
 =cut
+
 sub clone_and_censor {
     my $class = shift;
-    my $data = shift;
-    
+    my $data  = shift;
+
     eval { require Clone; 1 }
-        or die "Can't clone data without Clone installed";
+      or die "Can't clone data without Clone installed";
 
     my $cloned_data = Clone::clone($data);
 
-    # if $class is a Data::Censor object, then we were called as an object method
-    # rather than a class method - that's fine - otherwise, create a new
-    # instance and use it:
+   # if $class is a Data::Censor object, then we were called as an object method
+   # rather than a class method - that's fine - otherwise, create a new
+   # instance and use it:
     my $self = ref $class && $class->isa('Data::Censor')
-        ? $class
-        : $class->new;
+      ? $class
+      : $class->new;
 
     $self->censor($cloned_data);
     return $cloned_data;
-};
+}
 
 
 =head1 AUTHOR
@@ -261,4 +268,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Data::Censor
+1;    # End of Data::Censor

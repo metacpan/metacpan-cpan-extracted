@@ -29,6 +29,18 @@ handle them all.  B<Read the DETAILS chapter below, to understand them all.>
 This result objects are pretty heavy: it collects request, response, and much
 more.  So: let them run out-of-scope once you have collected your C<values()>.
 
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<bool>
+
+These Return objects are overloaded to return a false value when there is
+any error.  For delayed collection of data, this status may change after
+this object is initially created.
+
+=back
+
 =head1 METHODS
 
 =head2 Constructors
@@ -44,6 +56,7 @@ For details on the C<on_*> event handlers, see L<Couch::DB/DETAILS>.
   on_chain   [ ]
   on_error   [ ]
   on_final   [ ]
+  on_row     [ ]
   on_values  [ ]
   paging     undef
 
@@ -64,6 +77,10 @@ Called each time when the result CODE changes to be "not a success".
 =item on_final => CODE|ARRAY
 
 Called when the Result object has either an error or an success.
+
+=item on_row => CODE|ARRAY
+
+Produces a single L<Couch::DB::Row|Couch::DB::Row>-object when L<page()|Couch::DB::Result/"Paging through results"> is used.
 
 =item on_values => CODE|ARRAY
 
@@ -109,11 +126,21 @@ of the codes.
 Returns C<undef>, or a message (string) which explains why the status
 is as it is.
 
-=item $obj-E<gt>B<status>($code, $message)
+=item $obj-E<gt>B<seqnr>()
+
+Returns the (process space) unique result object number.  This may help
+debugging and tracing.
+
+=item $obj-E<gt>B<setStatus>($code, $message)
 
 Set the $code and $message to something else.  Your program should
 probably not do this: it's the library which determines how the result
 needs to be interpreted.
+
+=item $obj-E<gt>B<short>()
+
+Returns a string which contains some crucial information about this
+result, which could help with debugging.
 
 =back
 
@@ -154,9 +181,65 @@ The raw data is returned with L<answer()|Couch::DB::Result/"When the document is
 
 =back
 
-=head2 Paging through results
+=head2 Results containing rows
+
+When a result (potentially) contains multiple rows, then paging is supported.
+But you may also wish to access the rows directly.
 
 =over 4
+
+=item $obj-E<gt>B<doc>( $nr, [$qnr] )
+
+Returns the document of the indicated row.  The counter is the row counter,
+so starts at one.
+
+=item $obj-E<gt>B<docs>( [$qnr] )
+
+Return only the document information which is kept in the rows.  Some
+rows may contain more search information.
+Returns a LIST of L<Couch::DB::Document|Couch::DB::Document>-objects.
+
+=item $obj-E<gt>B<docsRef>( [$qnr] )
+
+Returns a reference to the documents.
+
+=item $obj-E<gt>B<numberOfRows>( [$qnr] )
+
+=item $obj-E<gt>B<row>( $rownr, [$qnr] )
+
+Returns a L<Couch::DB::Row|Couch::DB::Row> object (or an empty LIST) which represents one
+row in a paging answer.  Row numbers start on 1.
+
+=item $obj-E<gt>B<rows>( [$qnr] )
+
+Some CouchDB calls can be used with paging.  In that case, the answer will
+show something which reflects rows.  This method wraps the values in the
+rows into L<Couch::DB::Row|Couch::DB::Row>-objects.
+
+(At least with) L<Couch::DB::Database::find()|Couch::DB::Database/"Handling documents"> you can supply multiple
+queries at the same time.  They will all use the same paging, usually C<_all>
+records at once.  In this case, you must specify the query sequence number
+(starts with zero)
+
+=item $obj-E<gt>B<rowsRef>( [$qnr] )
+
+Returns a reference to the returned rows.
+
+=back
+
+=head2 Paging through results
+
+Only when this result is produced by a call in "paging mode" (uses the C<all> or
+C<page_size> parameters), then the follow C<page*> methods are available to get
+the data.  Otherwise, use the C<row*> and C<doc*> methods.
+
+=over 4
+
+=item $obj-E<gt>B<inPagingMode>()
+
+Returns true when this call may be chained with other calls to come up to
+a number of rows which match the number you desire.  True when either
+call parameter C<all> is true, or a C<page_size> is given.
 
 =item $obj-E<gt>B<isLastPage>()
 
@@ -172,12 +255,53 @@ details to be saved outside the program, than use L<pagingState()|Couch::DB::Res
 
 Returns an ARRAY with the elements collected (harvested) for this page.
 When there are less elements than the requested page size, then there
-are no more elements in the collections.
+are no more elements as result of the search.
+
+Method L<pageRows()|Couch::DB::Result/"Paging through results"> will return the rows as a LIST.
+
+example: compare page and pageRows
+
+   my $r = $db->find(...);
+   foreach my $row ($r->pageRows) { ... }
+   foreach my $row ( @{$r->page} ) { ... }
+   print template($t, rows => [ $r->pageRows ]);
+   print template($t, rows => $r->page);
+
+=item $obj-E<gt>B<pageDoc>($rownr)
+
+Returns the document (L<Couch::DB::Document|Couch::DB::Document> object) on the indicated row
+in the page (starts at 1).
+
+=item $obj-E<gt>B<pageDocs>()
+
+Returns the LIST of documents (L<Couch::DB::Document|Couch::DB::Document> objects), which are
+contained in the rows.
+
+example: of pageDocs()
+
+  my $r1 = $couch->find(...);
+  my @docs1 = map $_->doc, $r1->page;
+
+  my $r2 = $couch->find(..., _harvester => sub { $_[0]->docs });
+  my @docs2 = $r2->page;
+
+  my $r3 = $couch->find(...);
+  my @docs3 = $r3->pageDocs;
 
 =item $obj-E<gt>B<pageIsPartial>()
 
 Returns a true value when there should be made another attempt to fill the
 page upto the the requested page size.
+
+=item $obj-E<gt>B<pageNumber>()
+
+When in paging mode, pages all have the same size.  Otherwise, this will count
+the number of calls made with variable number of rows.
+
+=item $obj-E<gt>B<pageRows>()
+
+Returns the LIST of rows (L<Couch::DB::Row|Couch::DB::Row> objects), where L<page()|Couch::DB::Result/"Paging through results"> returns it
+as ARRAY (reference).
 
 =item $obj-E<gt>B<pagingState>(%options)
 
@@ -197,6 +321,11 @@ bookmarks are thrown away.  Set to '0' to disable this restriction.
 
 =back
 
+=item $obj-E<gt>B<supportsPaging>()
+
+[0.100] Returns whether the result supports paging.  Still, you may not use
+this in paging mode.
+
 =back
 
 =head2 When the collecting is delayed
@@ -214,7 +343,7 @@ Fill this Result object with the actual results.
 
 =item $obj-E<gt>B<setResultDelayed>($plan, %options)
 
-When defined, the result document is not yet collected.  The $plan contains
+When defined, the result document is not yet collected.  The C<$plan> contains
 framework specific information how to realize that in a later stage.
 
 =back
@@ -283,26 +412,14 @@ In some cases, data is added or modified for convenience: to make it
 compatible with the version your program has been written for.  See
 L<Couch::DB::new(api)|Couch::DB/"Constructors">.
 
-=head1 OVERLOADING
-
-=over 4
-
-=item overload: B<bool>
-
-These Return objecs are overloaded to return a false value when there is
-any error.  For delayed collection of data, this status may change after
-this object is initially created.
-
-=back
-
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.006,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.200,
+built on June 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2024-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

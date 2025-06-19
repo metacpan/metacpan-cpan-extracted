@@ -104,23 +104,27 @@ Inherited, see L<Couch::DB/"Interface starting points">
 
 =back
 
-=head2 Unrelated calls
+=head2 Ungrouped calls
 
-Extends L<"Unrelated calls" in Couch::DB|Couch::DB/"Unrelated calls">.
+Extends L<"Ungrouped calls" in Couch::DB|Couch::DB/"Ungrouped calls">.
  
 =over 4
 
+=item $obj-E<gt>B<freshUUID>(%options)
+
+Inherited, see L<Couch::DB/"Ungrouped calls">
+
 =item $obj-E<gt>B<freshUUIDs>($count, %options)
 
-Inherited, see L<Couch::DB/"Unrelated calls">
+Inherited, see L<Couch::DB/"Ungrouped calls">
 
 =item $obj-E<gt>B<requestUUIDs>($count, %options)
 
-Inherited, see L<Couch::DB/"Unrelated calls">
+Inherited, see L<Couch::DB/"Ungrouped calls">
 
 =item $obj-E<gt>B<searchAnalyze>(%options)
 
-Inherited, see L<Couch::DB/"Unrelated calls">
+Inherited, see L<Couch::DB/"Ungrouped calls">
 
 =back
 
@@ -183,12 +187,12 @@ Extends L<"DETAILS" in Couch::DB|Couch::DB/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.006,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.200,
+built on June 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2024-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

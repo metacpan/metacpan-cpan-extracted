@@ -1,13 +1,13 @@
-# Copyrights 2024 by [Mark Overmeer].
+# Copyrights 2024-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
 # SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
 # SPDX-License-Identifier: Artistic-2.0
 
-package Couch::DB::Design;
-use vars '$VERSION';
-$VERSION = '0.006';
+package Couch::DB::Design;{
+our $VERSION = '0.200';
+}
 
 use parent 'Couch::DB::Document';
 
@@ -18,23 +18,40 @@ use Log::Report 'couch-db';
 use URI::Escape  qw/uri_escape/;
 use Scalar::Util qw/blessed/;
 
+my $id_generator;
+
+
+sub init($)
+{	my ($self, $args) = @_;
+	my $which = $args->{id} || $id_generator->($args->{db} or panic);
+	my ($id, $base) = $which =~ m!^_design/(.*)! ? ($which, $1) : ("_design/$which", $which);
+	$args->{id} = $id;
+
+	$self->SUPER::init($args);
+	$self->{CDD_base} = $base;
+	$self;
+}
 
 #-------------
 
-sub _pathToDoc(;$) { $_[0]->db->_pathToDB('_design/' . $_[0]->id) . (defined $_[1] ? '/' . uri_escape $_[1] : '')  }
+$id_generator = sub ($) { $_[0]->couch->freshUUID };
+sub setIdGenerator($) { $id_generator = $_[1] }
+
+
+sub idBase() { $_[0]->{CDD_base} }
 
 #-------------
 
 sub create($%)
 {	my $self = shift;
-	defined $self->id
-		or error __x"Design documents do not generate an id by themselves.";
 	$self->update(@_);
 }
 
 
 sub update($%)
-{	my ($self, $data, $args) = @_;
+{	my ($self, $data, %args) = @_;
+	$data->{_id} = $self->id;
+
 	$self->couch
 		->toJSON($data, bool => qw/autoupdate/)
 		->check($data->{lists}, deprecated => '3.0.0', 'DesignDoc create() option list')
@@ -45,9 +62,11 @@ sub update($%)
 
 	#XXX Do we need more parameter conversions in the nested queries?
 
-	$self->SUPER::create($data, $args);
+	$self->SUPER::create($data, %args);
 }
 
+# get/delete/etc. are simply produced by extension of the _pathToDoc() which
+# adds "_design/" to the front of the path.
 
 sub details(%)
 {	my ($self, %args) = @_;
@@ -62,47 +81,56 @@ sub details(%)
 #-------------
 
 sub createIndex($%)
-{	my ($self, $filter, %args) = @_;
-	$self->db->createIndex(%args, design => $self);
+{	my ($self, $config, %args) = @_;
+
+	my $send  = +{ %$config, ddoc => $self->id };
+	my $couch = $self->couch;
+	$couch->toJSON($send, bool => qw/partitioned/);
+
+	$couch->call(POST => $self->db->_pathToDB('_index'),
+		send => $send,
+		$couch->_resultsConfig(\%args),
+	);
 }
 
 
 sub deleteIndex($%)
 {	my ($self, $ddoc, $index, %args) = @_;
-	$self->couch->call(DELETE => $self->db->_pathToDB('_index/' . uri_escape($self->id) . '/json/' . uri_escape($index)),
+	my $id = $self->idBase;  # id() would also work
+	$self->couch->call(DELETE => $self->db->_pathToDB("_index/$id/json/" . uri_escape($index)),
 		$self->couch->_resultsConfig(\%args),
 	);
 }
 
 
-sub __indexValues($$%)
-{	my ($self, $result, $raw, %args) = @_;
-	delete $args{full_docs} or return $raw;
+sub __searchRow($$$%)
+{	my ($self, $result, $index, $column, %args) = @_;
+	my $answer = $result->answer->{rows}[$index] or return ();
+	my $values = $result->values->{rows}[$index];
 
-	my $values = +{ %$raw };
-	$values->{docs} = delete $values->{rows};
-	$self->db->__toDocs($result, $values, db => $self->db);
-	$values;
+	  (	answer    => $answer,
+		values    => $values,
+		docdata   => $args{full_docs} ? $values : undef,
+		docparams => { db => $self },
+	  );
 }
 
-sub indexFind($%)
-{	my ($self, $index, %args) = @_;
-	my $couch = $self->couch;
-
-	my $search  = delete $args{search} || {};
-	my $query   = +{ %$search };
+sub search($$%)
+{	my ($self, $index, $search, %args) = @_;
+	my $query = defined $search ? +{ %$search } : {};
 
 	# Everything into the query :-(  Why no POST version?
+	my $couch = $self->couch;
 	$couch
 		->toQuery($query, json => qw/counts drilldown group_sort highlight_fields include_fields ranges sort/)
 		->toQuery($query, int  => qw/highlight_number highlight_size limit/)
 		->toQuery($query, bool => qw/include_docs/);
 
-	$couch->call(GET => $self->_pathToDDoc('_search/' . uri_escape $index),
+	$couch->call(GET => $self->_pathToDoc('_search/' . uri_escape $index),
 		introduced => '3.0.0',
 		query      => $query,
 		$couch->_resultsPaging(\%args,
-			on_values  => sub { $self->__indexValues($_[0], $_[1], db => $self->db, full_docs => $search->{include_docs}) },
+			on_row => sub { $self->__searchRow(@_, full_docs => $search->{include_docs}) },
 		),
 	);
 }
@@ -111,7 +139,7 @@ sub indexFind($%)
 sub indexDetails($%)
 {	my ($self, $index, %args) = @_;
 
-	$self->couch->call(GET => $self->_pathToDDoc('_search_info/' . uri_escape($index)),
+	$self->couch->call(GET => $self->_pathToDoc('_search_info/' . uri_escape($index)),
 		introduced => '3.0.0',
 		$self->couch->_resultsConfig(\%args),
 	);
@@ -119,9 +147,9 @@ sub indexDetails($%)
 
 #-------------
 
-sub viewSearch($;$%)
+sub viewDocs($;$%)
 {	my ($self, $view, $search, %args) = @_;
-	$self->db->search($search, view => $view, design => $self, %args);
+	$self->db->allDocs($search, view => $view, design => $self, %args);
 }
 
 #-------------

@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://issues.folio.org/projects/ZF/issues
   repository: https://github.com/folio-org/Net-Z3950-FOLIO.git
-version: v4.1.1
+version: v4.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

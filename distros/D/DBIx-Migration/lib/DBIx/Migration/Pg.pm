@@ -24,6 +24,12 @@ has '+do_while' => (
     return [ sprintf( 'LOCK TABLE %s IN EXCLUSIVE MODE', $self->quoted_tracking_table ) ];
   }
 );
+has '+dsn' => (
+  coerce => sub {
+    my $dsn = shift;
+    return ( ( $dsn =~ m/\Adbi:Pg:\z/i and exists $ENV{ PGSERVICE } ) ? "dbi:Pg:service=$ENV{ PGSERVICE }" : $dsn );
+  }
+);
 has managed_schema  => ( is => 'ro', isa => Str, default => 'public' );
 has tracking_schema => ( is => 'ro', isa => Str, default => 'public' );
 has '+placeholders' => (

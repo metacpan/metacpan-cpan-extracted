@@ -65,8 +65,11 @@ sub _marc2folioId {
     my $marc = shift;
 
     my @fields999 = $marc->field(999);
-    my $last999 = $fields999[-1];
-    return $last999->subfield('i');
+    foreach my $field999 (@fields999) {
+	my $folioId = $field999->subfield('i');
+	return $folioId if $folioId;
+    }
+    return undef;
 }
 
 sub marcRecord {
@@ -83,6 +86,7 @@ sub marcRecord {
 	for (my $i = 0; $i < @marcRecords; $i++) {
 	    my $marc = $marcRecords[$i];
 	    my $id = _marc2folioId($marc);
+	    Net::Z3950::FOLIO::_throw(1, "can't find FOLIO ID in MARC record", undef, 1) if !defined $id;
 	    my $rec = $rs->recordById($id);
 	    $rec->{marc} = $marcRecords[$i];
 	}

@@ -16,6 +16,7 @@ t/06-file.t
 t/07-parse_headers.t
 t/08-jwrightecs.t
 t/09-get_line.t
+t/10-subset.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

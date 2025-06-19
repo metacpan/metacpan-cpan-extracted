@@ -1,5 +1,9 @@
 Revision history for Data-Censor
 
+0.04    2025-06-19
+        Deal with object instances, handle recursions better
+        (thanks to @yanick in GH PR-2)
+
 0.03    2018-10-04
         Add old_password to default list of sensitive fields.
 

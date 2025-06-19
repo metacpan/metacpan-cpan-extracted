@@ -77,7 +77,7 @@ $ENV{APP_EXTRA__DEBUG} = '1';
 # Load config
 my $config = Config::Abstraction->new(
 	config_dirs => [$test_dir],
-	env_prefix => 'APP_',
+	# env_prefix => 'APP_',
 	flatten => 0,
 );
 

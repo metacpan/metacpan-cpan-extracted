@@ -21,6 +21,8 @@ _result create           => $db->create;
 
 my $t1 = $db->doc('testdoc1');
 ok defined $t1, "Created testdoc1 in test";
+isa_ok $t1, 'Couch::DB::Document';
+
 is $t1->id, 'testdoc1', '... id';
 is $t1->db, $db, '... db';
 is $t1->couch, $couch, '... couch';
@@ -34,7 +36,8 @@ $trace && warn Dumper [ $t1->revisions ];
 _result t1_att1_save     => $t1->attSave(att1 => 'unsorted bytes');
 
 my $t2 = $db->doc('testdoc1');
-my $r2 = _result t1_get => $t2->get({
+isa_ok $t2, 'Couch::DB::Document';
+my $r2 = _result t2_get => $t2->get({
 	attachments => 1,
 	att_encoding_info => 1,
 	conflicts => 1,

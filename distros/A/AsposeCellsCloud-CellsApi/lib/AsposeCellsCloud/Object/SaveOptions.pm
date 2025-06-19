@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents all save options',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'SaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,56 +128,56 @@ __PACKAGE__->method_documentation({
      'save_format' => {
      	datatype => 'string',
      	base_name => 'SaveFormat',
-     	description => 'Save format name',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'cached_file_folder' => {
      	datatype => 'string',
      	base_name => 'CachedFileFolder',
-     	description => 'The cached file folder is used to store some large data.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'clear_data' => {
      	datatype => 'boolean',
      	base_name => 'ClearData',
-     	description => 'Make the workbook empty after saving the file.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'create_directory' => {
      	datatype => 'boolean',
      	base_name => 'CreateDirectory',
-     	description => 'If true and the directory does not exist, the directory will be automatically created before saving the file.            ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'enable_http_compression' => {
      	datatype => 'boolean',
      	base_name => 'EnableHTTPCompression',
-     	description => 'whether http compression is to be used.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'refresh_chart_cache' => {
      	datatype => 'boolean',
      	base_name => 'RefreshChartCache',
-     	description => 'Indicates whether refreshing chart cache data',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'sort_names' => {
      	datatype => 'boolean',
      	base_name => 'SortNames',
-     	description => 'Indicates whether sorting defined names before saving file.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'validate_merged_areas' => {
      	datatype => 'boolean',
      	base_name => 'ValidateMergedAreas',
-     	description => 'Indicates whether validate merged areas before saving the file.The default value is false.            ',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

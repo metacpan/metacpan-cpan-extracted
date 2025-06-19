@@ -3,7 +3,7 @@ abstract: 'Frequently asked questions about Perl'
 author:
   - 'Tom Christiansen <tchrist@perl.com>'
   - 'Nat Torkington <gnat@frii.com>'
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
   - 'Leo Lapworth <LLAP@cpan.org>'
   - 'perlfaq-workers <perlfaq-workers@perl.org>'
   - 'The Perl 5 Porters <perl5-porters@perl.org>'
@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,50 +33,50 @@ resources:
   bugtracker: https://github.com/perl-doc-cats/perlfaq/issues
   homepage: https://metacpan.org/release/perlfaq
   repository: https://github.com/perl-doc-cats/perlfaq.git
-version: '5.20240218'
+version: '5.20250619'
 x_Dist_Zilla:
   perl:
-    version: '5.039006'
+    version: '5.041013'
   plugins:
     -
       class: Dist::Zilla::Plugin::AutoVersion
       name: AutoVersion
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Readme
       name: Readme
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: '6'
       name: MakeMaker
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -92,7 +92,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -114,7 +114,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -140,7 +140,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -178,29 +178,29 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: Test::Portability
-      version: '2.001001'
+      version: '2.001003'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
         Dist::Zilla::Plugin::Test::MinimumVersion:
           max_target_perl: '5.006'
       name: Test::MinimumVersion
-      version: '2.000010'
+      version: '2.000011'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.43.2
+          git_version: 2.49.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.036'
+      version: '0.038'
     -
       class: Dist::Zilla::Plugin::Authority
       name: Authority
@@ -208,7 +208,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '6.031'
+      version: '6.033'
     -
       class: inc::CreateQuestionList
       name: =inc::CreateQuestionList
@@ -216,11 +216,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FileFinder::Filter
       name: PodFiles
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::PodVersion
       name: PodVersion
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -231,15 +231,15 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.49.0
           repo_root: .
       name: Git::Check
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.49.0
           repo_root: .
       name: Git::CheckFor::MergeConflicts
       version: '0.014'
@@ -247,7 +247,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.49.0
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -271,7 +271,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Git::VersionManager/pluginbundle version'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -312,12 +312,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/release snapshot'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -325,16 +325,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.20240218
+          tag: v5.20250619
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/Git::Tag'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -350,7 +350,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Git::VersionManager/NextRelease'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -367,12 +367,12 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.49.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/post-release commit'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -381,78 +381,77 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.43.2
+          git_version: 2.49.0
           repo_root: .
       name: Git::Push
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.031'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.031'
+      version: '6.033'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.031'
+    version: '6.033'
 x_authority: cpan:LLAP
 x_contributors:
   - 'Alex Beamish <talexb@gmail.com>'
-  - 'brian d foy <briandfoy@pobox.com>'
   - 'Brian Fraser <brian.fraser@booking.com>'
   - 'Celejar <celejar@gmail.com>'
   - 'Chris Nehren <apeiron@cpan.org>'
   - 'Christian Walde <walde.christian@googlemail.com>'
   - 'Christopher J. Madsen <perl@cjmweb.net>'
   - 'Dan Book <grinnz@gmail.com>'
-  - 'Dan Book <grinnz@grinnz.com>'
   - 'darfich <bourbaki007@gmail.com>'
-  - 'Dave Cross <dave@dave.org.uk>'
+  - 'Dave Cross <dave@perlhacks.com>'
   - 'David Precious <davidp@preshweb.co.uk>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'dctabuyz <dctabuyz@yandex.ru>'
   - 'Denilson Sá Maia <denilsonsa@gmail.com>'
   - 'Douglas L. Jenkins <jenkinsd@ochin.org>'
   - 'E. Choroba <choroba@matfyz.cz>'
+  - 'Elvin Aslanov <rwp.primary@gmail.com>'
   - 'Eric Johnson <eric.git@iijo.org>'
   - 'Father Chrysostomos <sprout@cpan.org>'
   - 'Felipe Gasper <felipe@felipegasper.com>'
@@ -461,13 +460,13 @@ x_contributors:
   - 'hemanth.hm <hemanth.hm@gmail.com>'
   - 'Herbert Breunung <lichtkind@cpan.org>'
   - 'hurricup <hurricup@gmail.com>'
+  - 'Jakub Wilk <jwilk@jwilk.net>'
   - 'James E Keenan <jkeenan@cpan.org>'
   - 'Jeffrey Kegler <jeffreykegler@jeffreykegler.com>'
   - 'Joaquín Ferrero <explorer@joaquinferrero.com>'
-  - 'Joel Maslak <jmaslak@antelope.net>'
+  - 'Joelle Maslak <jmaslak@antelope.net>'
   - 'John Karr <brainbuz@brainbuz.org>'
   - 'Karen Etheridge <ether@cpan.org>'
-  - 'Karen Etheridge <github@froods.org>'
   - 'Laurent Dami <laurent.dami@free.fr>'
   - 'Leo Lapworth <leo@cuckoo.org>'
   - 'Lukas Mai <l.mai@web.de>'
@@ -481,6 +480,7 @@ x_contributors:
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'Samanta Navarro <ferivoz@riseup.net>'
   - 'Sebastian Riedel <kraihx@gmail.com>'
   - 'SHIRAKATA Kentaro <argrath@ub32.org>'
@@ -488,6 +488,7 @@ x_contributors:
   - 'Smylers <Smylers@stripey.com>'
   - 'tina <forum@s05.tinita.de>'
   - 'Tom Molesworth <tom@binary.com>'
-x_generated_by_perl: v5.39.6
-x_serialization_backend: 'YAML::Tiny version 1.74'
+  - 'vaitkus <antanas.vaitkus90@gmail.com>'
+x_generated_by_perl: v5.41.13
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

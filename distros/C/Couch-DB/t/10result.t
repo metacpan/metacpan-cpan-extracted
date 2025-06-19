@@ -17,6 +17,7 @@ my $couch = _framework;
 ok defined $couch, 'Created the framework';
 
 my $db = $couch->db('test');
+$db->remove;  ### cleanup after crash of this script
 ok defined $db, 'Create database "test"';
 
 # Any action

@@ -1,0 +1,118 @@
+=encoding utf8
+
+=head1 NAME
+
+Couch::DB::Row - a single row of a page
+
+=head1 SYNOPSIS
+
+  my $list = $db->allDocs({include_docs => 1}, _all => 1);
+  my @rows = $list->page;
+  my @docs = map $_->doc, @rows;
+
+  foreach my $row (@rows)
+  {   printf "page %3d item %4d: %s\n",
+         $row->pageNumber,
+         $row->rowNumberInPage,
+         $row->doc->{name};
+  }
+
+=head1 DESCRIPTION
+
+Many command can page their answers.  The resulting rows are
+each wrapped in this object for nicer abstraction of the data
+structures.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Couch::DB::Row-E<gt>B<new>(%options)
+
+ -Option--Default
+  answer  <required>
+  doc     undef
+  result  <required>
+  rownr   <required>
+  values  undef
+
+=over 2
+
+=item answer => JSON
+
+The JSON structure from the result which represents this row.
+
+=item doc => L<Couch::DB::Document|Couch::DB::Document>-object
+
+=item result => L<Couch::DB::Result|Couch::DB::Result>
+
+The result-object which contains this row.
+
+=item rownr => INTEGER
+
+The location of this row in the result.  Starts at 1.
+
+=item values => HASH
+
+The answer about this row converted to Perl data types.  Default to
+the C<answer>.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<answer>()
+
+The JSON fragment from the result answer which contains the information
+about this row.
+
+=item $obj-E<gt>B<doc>()
+
+In case the response contains a document structure (you may need to
+use C<include_docs> in the query), then this method will return a
+C<Couch::DB::Document> object.
+
+=item $obj-E<gt>B<result>()
+
+The L<Couch::DB::Result|Couch::DB::Result> structure which contained this row.  Within one
+page, this may be different for different rows.
+
+=item $obj-E<gt>B<values>()
+
+The answer about this row, translated into Perl data types.
+
+=back
+
+=head2 Paging
+
+=over 4
+
+=item $obj-E<gt>B<pageNumber>()
+
+=item $obj-E<gt>B<rowNumberInPage>()
+
+=item $obj-E<gt>B<rowNumberInResult>()
+
+=item $obj-E<gt>B<rowNumberInSearch>()
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Couch-DB distribution version 0.200,
+built on June 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

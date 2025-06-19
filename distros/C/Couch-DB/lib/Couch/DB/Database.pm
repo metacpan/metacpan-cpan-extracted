@@ -1,18 +1,20 @@
-# Copyrights 2024 by [Mark Overmeer].
+# Copyrights 2024-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
 # SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
 # SPDX-License-Identifier: Artistic-2.0
 
-package Couch::DB::Database;
-use vars '$VERSION';
-$VERSION = '0.006';
+package Couch::DB::Database;{
+our $VERSION = '0.200';
+}
 
 
 use Log::Report 'couch-db';
 
 use Couch::DB::Util   qw(flat);
+use Couch::DB::Document ();
+use Couch::DB::Design   ();
 
 use Scalar::Util      qw(weaken blessed);
 use HTTP::Status      qw(HTTP_OK HTTP_NOT_FOUND);
@@ -56,7 +58,7 @@ sub ping(%)
 
 sub exists()
 {	my $self = shift;
-	my $result = $self->ping(_delay => 0);
+	my $result = $self->ping(delay => 0);
 
 	  $result->code eq HTTP_NOT_FOUND ? 0
     : $result->code eq HTTP_OK        ? 1
@@ -65,10 +67,9 @@ sub exists()
 
 
 sub __detailsValues($$)
-{	my ($result, $raw) = @_;
-	my $couch = $result->couch;
+{	my ($self, $result, $raw) = @_;
 	my %values = %$raw;   # deep not needed;
-	$couch->toPerl(\%values, epoch => qw/instance_start_time/);
+	$self->couch->toPerl(\%values, epoch => qw/instance_start_time/);
 	\%values;
 }
 
@@ -80,7 +81,9 @@ sub details(%)
 	#XXX zero in old nodes?
 
 	$self->couch->call(GET => $self->_pathToDB($part ? '_partition/'.uri_escape($part) : undef),
-		$self->couch->_resultsConfig(\%args, on_values => \&__detailsValues),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__detailsValues(@_) },
+		),
 	);
 }
 
@@ -154,10 +157,10 @@ sub compact(%)
 
 
 sub __ensure($$)
-{	my ($result, $raw) = @_;
+{	my ($self, $result, $raw) = @_;
 	return $raw unless $raw->{instance_start_time};  # exists && !=0
 	my $v = { %$raw };
-	$result->couch->toPerl($v, epoch => qw/instance_start_time/);
+	$self->couch->toPerl($v, epoch => qw/instance_start_time/);
 	$v;
 }
 
@@ -167,7 +170,9 @@ sub ensureFullCommit(%)
 	$self->couch->call(POST => $self->_pathToDB('_ensure_full_commit'),
 		deprecated => '3.0.0',
 		send       => { },
-		$self->couch->_resultsConfig(\%args, on_values => \&__ensure),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__ensureValues(@_) },
+		),
 	);
 }
 
@@ -186,7 +191,7 @@ sub purgeDocs($%)
 
 #XXX seems not really a useful method.
 
-sub purgeRecordsLimit(%)
+sub purgedRecordsLimit(%)
 {	my ($self, %args) = @_;
 
 	$self->couch->call(GET => $self->_pathToDB('_purged_infos_limit'),
@@ -197,7 +202,7 @@ sub purgeRecordsLimit(%)
 
 #XXX attribute of database creation
 
-sub purgeRecordsLimitSet($%)
+sub purgedRecordsLimitSet($%)
 {	my ($self, $value, %args) = @_;
 
 	$self->couch->call(PUT => $self->_pathToDB('_purged_infos_limit'),
@@ -263,33 +268,15 @@ sub revisionLimitSet($%)
 
 #-------------
 
-sub designs(;$%)
-{	my ($self, $search, %args) = @_;
-	my $couch   = $self->couch;
-	my @search  = flat $search;
+sub design($)
+{	my ($self, $which) = @_;
 
-	my ($method, $path, $send) = (GET => $self->_pathToDB('_design_docs'), undef);
-	if(@search)
-	{	$method = 'POST';
-	 	my @s   = map $self->_designPrepare($method, $_), @search;
-
-		if(@search==1)
-		{	$send  = $search[0];
-		}
-		else
-		{	$send  = +{ queries => \@search };
-			$path .= '/queries';
-		}
-	}
-
-	$self->couch->call($method => $path,
-		($send ? (send => $send) : ()),
-		$couch->_resultsConfig(\%args),
-	);
+	return $which if blessed $which && $which->isa('Couch::DB::Design');
+	Couch::DB::Design->new(id => $which, db => $self);
 }
 
 
-sub _designPrepare($$$)
+sub __designsPrepare($$$)
 {	my ($self, $method, $data, $where) = @_;
 	$method eq 'POST' or panic;
 	my $s     = +{ %$data };
@@ -302,31 +289,78 @@ sub _designPrepare($$$)
 	$s;
 }
 
+sub __designsRow($$%)
+{	my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->{rows}[$index] or return;
+	my $values = $result->values->{rows}[$index];
 
-sub createIndex($%)
-{	my ($self, $filter, %args) = @_;
-	my $couch  = $self->couch;
+	  ( answer    => $answer,
+		values    => $values,
+		ddocdata  => $values->{doc},
+		docparams => { db => $self },
+	  );
+}
 
-	my $send   = +{ %$filter };
-	if(my $design = delete $args{design})
-	{	$send->{ddoc} = blessed $design ? $design->id : $design;
+sub designs(;$%)
+{	my ($self, $search, %args) = @_;
+	my $couch   = $self->couch;
+	my @search  = flat $search;
+
+	my ($method, $path, $send) = (GET => $self->_pathToDB('_design_docs'), undef);
+	if(@search)
+	{	$method = 'POST';
+	 	my @s   = map $self->__designsPrepare($method, $_), @search;
+
+		if(@search==1)
+		{	$send  = $s[0];
+		}
+		else
+		{	$send  = +{ queries => \@s };
+			$path .= '/queries';
+		}
 	}
 
-	$couch->toJSON($send, bool => qw/partitioned/);
-
-	$couch->call(POST => $self->_pathToDB('_index'),
-		send => $send,
-		$couch->_resultsConfig(\%args),
+	$self->couch->call($method => $path,
+		($send ? (send => $send) : ()),
+		$couch->_resultsConfig(\%args,
+			on_row => sub { $self->__designsRow(@_, queries => scalar(@search)) },
+		),
 	);
 }
 
+
+sub __indexesRow($$%)
+{	my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->{indexes}[$index] or return ();
+
+	  (	answer => $answer,
+		values => $result->values->{indexes}[$index],
+	  );
+}
+
+sub __indexesValues()
+{	my ($self, $raw) = @_;
+	my %values = %$raw;   # deep not needed (yes)
+	$self->couch->toPerl(\%values, bool => qw/partitioned/);
+	$values{design} = $self->design($values{ddoc}) if $values{ddoc};
+	\%values;
+}
 
 sub indexes(%)
 {	my ($self, %args) = @_;
 
 	$self->couch->call(GET => $self->_pathToDB('_index'),
-		$self->couch->_resultsConfig(\%args),
+		$self->couch->_resultsConfig(\%args,
+			on_values => sub { $self->__indexesValues(@_) },
+			on_row    => sub { $self->__indexesRow(@_) },
+		),
 	);
+}
+
+
+sub search($$;$%)
+{	my ($self, $ddoc, $index, $search, %args) = @_;
+	$self->design($ddoc)->search($index, $search, %args);
 }
 
 #-------------
@@ -416,7 +450,7 @@ sub inspectDocs($%)
 	#XXX what does "conflicted documents mean?
 	#XXX what does "a": 1 mean in its response?
 
-	$self->couch->call(POST =>  $self->_pathToDB('_bulk_get'),
+	$self->couch->call(POST => $self->_pathToDB('_bulk_get'),
 		query => $query,
 		send  => { docs => $docs },
 		$couch->_resultsConfig(\%args),
@@ -424,34 +458,19 @@ sub inspectDocs($%)
 }
 
 
-sub __toDocs($$%)
-{	my ($self, $result, $data, %args) = @_;
-	foreach my $row (@{$data->{rows}})
-	{	my $doc = $row->{doc} or next;
-		$row->{doc} = Couch::DB::Document->_fromResponse($result, $doc, %args);
-	}
-	$data;
+sub __allDocsRow($$%)
+{	my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->{rows}[$index] or return ();
+	my $values = $result->values->{rows}[$index];
+
+	 (	answer    => $answer,
+		values    => $values,
+		docdata   => $values->{doc},
+		docparams => { local => $args{local}, db => $self },
+	 );
 }
 
-sub __searchValues($$%)
-{	my ($self, $result, $raw, %args) = @_;
-
-	$args{db}  = $self;
-	my $values = +{ %$raw };
-
-	if(my $multi = $values->{results})
-	{	# Multiple queries, multiple answers
-		$values->{results} = [ map $self->__toDocs($result, +{ %$_ }, %args), flat $multi ];
-	}
-	else
-	{	# Single query
-		$self->__toDocs($result, $values, %args);
-	}
-
-	$values;
-}
-
-sub search(;$%)
+sub allDocs(;$%)
 {	my ($self, $search, %args) = @_;
 	my $couch  = $self->couch;
 
@@ -464,22 +483,22 @@ sub search(;$%)
 
 	#XXX The API shows some difference in the parameter combinations, which do not
 	#XXX need to be there.  For now, we produce an error for these cases.
-	!$view  || $ddoc  or panic "docs(view) requires design document.";
-	!$local || !$part or panic "docs(local) cannot be combined with partition.";
-	!$local || !$view or panic "docs(local) cannot be combined with a view.";
-	!$part  || @search < 2 or panic "docs(partition) cannot work with multiple searches.";
+	!$view  || $ddoc  or panic "allDocs(view) requires design document.";
+	!$local || !$part or panic "allDocs(local) cannot be combined with partition.";
+	!$local || !$view or panic "allDocs(local) cannot be combined with a view.";
+	!$part  || @search < 2 or panic "allDocs(partition) cannot work with multiple searches.";
 
 	my $set
 	  = $local ? '_local_docs'
 	  :   ($part ? '_partition/'. uri_escape($part) . '/' : '')
-        . ($view ? "_design/$ddocid/_view/". uri_escape($view) : '_all_docs');
+	    . ($view ? "_design/$ddocid/_view/". uri_escape($view) : '_all_docs');
 
 	my $method = !@search || $part ? 'GET' : 'POST';
 	my $path   = $self->_pathToDB($set);
 
 	# According to the spec, _all_docs is just a special view.
 	my @send   = map $self->_viewPrepare($method, $_, "docs search"), @search;
-		
+
 	my @params;
 	if($method eq 'GET')
 	{	@send < 2 or panic "Only one search with docs(GET)";
@@ -497,12 +516,12 @@ sub search(;$%)
 	$couch->call($method => $path,
 		@params,
 		$couch->_resultsPaging(\%args,
-			on_values => sub { $self->__searchValues($_[0], $_[1], local => $local) },
+			on_row   => sub { $self->__allDocsRow(@_, local => $local, queries => scalar(@search)) },
 		),
 	);
 }
 
-my @search_bools = qw/
+my @docview_bools = qw/
 	conflicts descending group include_docs attachments att_encoding_info
 	inclusive_end reduce sorted stable update_seq
 /;
@@ -516,12 +535,12 @@ sub _viewPrepare($$$)
 	# Main doc in 1.5.4.  /{db}/_design/{ddoc}/_view/{view}
 	if($method eq 'GET')
 	{	$couch
-			->toQuery($s, bool => @search_bools)
+			->toQuery($s, bool => @docview_bools)
 			->toQuery($s, json => qw/endkey end_key key keys start_key startkey/);
 	}
 	else
 	{	$couch
-			->toJSON($s, bool => @search_bools)
+			->toJSON($s, bool => @docview_bools)
 			->toJSON($s, int  => qw/group_level limit skip/);
 	}
 
@@ -536,27 +555,32 @@ sub _viewPrepare($$$)
 }
 
 
-sub __findValues($$)
-{	my ($self, $result, $raw) = @_;
-	my @docs = flat $raw->{docs};
-	@docs or return $raw;
+sub __findRow($$%)
+{	my ($self, $result, $index, %args) = @_;
+	my $answer = $result->answer->{docs}[$index] or return ();
+	my $values = $result->values->{docs}[$index];
 
-	my %data = %$raw;
-	$data{docs} = [ map Couch::DB::Document->_fromResponse($result, $_, db => $self), @docs ];
-	\%data;
+	(	answer    => $answer,
+		values    => $values,
+		docdata   => $values,
+		docparams => { local => $args{local}, db => $self },
+	 );
 }
 
 sub find($%)
 {	my ($self, $search, %args) = @_;
+
 	my $part   = delete $args{partition};
 	$search->{selector} ||= {};
 
 	my $path   = $self->_pathToDB;
-	$path     .= '/_partition/'. uri_espace($part) if $part;
+	$path     .= '/_partition/'. uri_escape($part) if $part;
 
 	$self->couch->call(POST => "$path/_find",
 		send   => $self->_findPrepare(POST => $search),
-		$self->couch->_resultsPaging(\%args, on_values => sub { $self->__findValues(@_) }),
+		$self->couch->_resultsPaging(\%args,
+			on_row => sub { $self->__findRow(@_) },
+		),
 	);
 }
 

@@ -1,12 +1,27 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+
+v3.0.0     2025/06/19
+
+           - Minor change in POD
+           - Increased major version to resolve pause/cpan indexing problem.
+
+v2.3.7     2025/06/18
+
+           - Hide internal package from PAUSE.
+
+v2.3.6     2025/06/18
+
+           - Argument src of method get() also accepts a scalar reference.
+           - Added META.json, CONTRIBUTING.md and SECURITY.md.
+
 v2.3.5     2025/02/09
 
          - Corrected POD.
 
 v2.3.4     2025/02/03
 
-         - Method get() can also red from open handle (argument src).
+         - Method get() can also read from open handle (argument src).
 
 v2.3.3     2025/01/15
 
@@ -41,7 +56,7 @@ v2.2.5     2023/04/30
 
 v2.2.4     2022/04/11
 
-         - Used croak() from Carp instead of die() and confess().
+         - Use croak() from Carp instead of die() and confess().
          - Corrected typo in POD. Some minor improvements in POD section.
 
 v2.2.3     2022/04/11
@@ -51,7 +66,7 @@ v2.2.3     2022/04/11
 v2.2.2     2022/04/11
 
          - Added subsection PITFALLS to POD.
-         - If pedantic is true, then first cheack indetation of a row.
+         - If pedantic is true, then first check indetation of a row.
          - Added tests.
 
 v2.2.1     2022/04/09

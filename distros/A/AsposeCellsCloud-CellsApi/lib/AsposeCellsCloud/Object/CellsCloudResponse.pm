@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '           Represents the CellsCloud Response.           ',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'CellsCloudResponse',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'code' => {
      	datatype => 'int',
      	base_name => 'Code',
-     	description => 'The property "Code" allows for accessing and modifying the HTTP status code of the response.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

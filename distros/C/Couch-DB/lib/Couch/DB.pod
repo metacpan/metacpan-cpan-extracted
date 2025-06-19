@@ -27,52 +27,11 @@ much easier.
 
 Also, open F<https://perl.overmeer.net/couch-db/reference.html>
 in a browser window, as useful cross-reference: parameters for CouchDB
-are not documented in this Perl documentation!
+are not documented in this Perl documentation!  For those, you need
+to visit F<https://docs.couchdb.org/en/stable/>.
 
 B<Please read> the L</DETAILS> section, further down, at least once
 before you start!
-
-=head2 Early adopters
-
-B<Be warned> that this module is really new.  The 127 different endpoints
-that the CouchDB 3.3.3 API defines, are grouped and combined.  The result
-is often not tested, and certainly not battle ready.  Please, report
-the result of calls which which are currently flagged "UNTESTED".
-
-B<Please help> me fix issues by reporting them.  Bugs will be solved within
-a day.  Please, contribute ideas to make the use of the module lighter.
-Together, we can make the quality grow fast.
-
-=head2 Integration with your framework
-
-You need to instantiate an extensions of this class.  At the moment,
-you can pick from:
-
-=over 4
-
-=item * L<Couch::DB::Mojolicious|Couch::DB::Mojolicious>
-
-Implements the client using the Mojolicious framework, using Mojo::URL,
-Mojo::UserAgent, Mojo::IOLoop, and many other.
-
-=back
-
-Other extensions are hopefully added in the future.  Preferrably as part
-of this release so it gets maintained together.  The extensions are not
-too difficult to create and certainly quite small.
-
-=head2 Where can I find what?
-
-The CouchDB API lists all endpoints as URLs.  This library, however,
-creates an Object Oriented interface around these calls: you do not
-see the internals in the resulting code.  Knowing the CouchDB API,
-it is usually immediately clear where to find a certain end-point:
-C<< /{db} >> will be in L<Couch::DB::Database|Couch::DB::Database>.  A major exception is
-anything what has to do with replication and sharding: this is bundled
-in L<Couch::DB::Cluster|Couch::DB::Cluster>.
-
-Have a look at F<https://perl.overmeer.net/couch-db/reference.html>.
-Keep that page open in your browser while developing.
 
 =head1 METHODS
 
@@ -175,7 +134,7 @@ return the same object.
 
 Create a client object which handles a server.  All options are passed
 to L<Couch::DB::Client|Couch::DB::Client>.  The C<couch> parameter is added for you.
-The client will also be added via L<addClient()|Couch::DB/"Processing">, and is returned.
+The client will also be added via L<addClient()|Couch::DB/"Processing">, and is then returned.
 
 It may be useful to create to clients to the same server: one with admin
 rights, and one without.  Or clients to different nodes, to create
@@ -196,15 +155,19 @@ exist yet, it gets created, otherwise reused.
 
 =back
 
-=head2 Unrelated calls
+=head2 Ungrouped calls
 
 =over 4
 
+=item $obj-E<gt>B<freshUUID>(%options)
+
+Returns one unique identifier.
+
 =item $obj-E<gt>B<freshUUIDs>($count, %options)
 
-Returns a $count number of UUIDs in a LIST.  This uses L<requestUUIDs()|Couch::DB/"Unrelated calls"> to get
-a bunch at the same time, for efficiency.  You may get fewer than you want, but
-only when the server is not sending them.
+Returns a $count number of UUIDs in a LIST.  This uses L<requestUUIDs()|Couch::DB/"Ungrouped calls">
+to get a bunch at the same time, for efficiency.  You may get fewer than
+you want, but only when the server is not sending them.
 
  -Option--Default
   bulk    50
@@ -223,7 +186,7 @@ more.
  [CouchDB API "GET /_uuids", since 2.0]
 
 Returns UUIDs (Universally unique identifiers), when the call was
-successful.  Better use L<freshUUIDs()|Couch::DB/"Unrelated calls">.  It is faster to use Perl
+successful.  Better use L<freshUUIDs()|Couch::DB/"Ungrouped calls">.  It is faster to use Perl
 modules to generate UUIDs.
 
 =item $obj-E<gt>B<searchAnalyze>(%options)
@@ -263,60 +226,26 @@ cluster.  Returned is the couch object, so these calls are stackable.
 Call some couchDB server, to get work done.  This is the base for any
 interaction with the server.
 
+Besides the explicitly listed parameters, this C<call> method is also responsible
+for handling the generic parameters which influence the connection to the server
+(like C<delay>, C<client>, and C<headers>) and hook into events (like C<on_final>
+and C<on_error>).
+
 B<Note:> you should probably not use this method yourself: all endpoint of
 CouchDB are available via a nice, abstract wrapper.
 
- -Option   --Default
-  client     undef
-  clients    undef
-  delay      false
-  on_chain   undef
-  on_values  undef
-  paging     {}
-  query      undef
-  send       undef
+ -Option--Default
+  paging  {}
+  query   undef
+  send    undef
 
 =over 2
-
-=item client => L<Couch::DB::Client|Couch::DB::Client>|$name
-
-Select a specific client connection to be used, as object or by name.
-
-=item clients => ARRAY|$role
-
-Explicitly use only the specified clients (L<Couch::DB::Client|Couch::DB::Client>-objects)
-for the query.  When none are given, then all are used (in order of
-precedence).  When a $role (string) is provided, it is used to select
-a subset of the defined clients.
-
-=item delay => BOOLEAN
-
- [PARTIAL]
-
-Do not execute the server call yet, but prepare it only in a way that
-it can be combined with other clients in parallel.
-See L<Couch::DB::Result|Couch::DB::Result> chapter L</DETAILS> about delayed requests.
-
-=item on_chain => CODE
-
-When the call ends successfully, then run the chain code.  Event
-C<on_error> and C<on_final> are only called on the last results of
-the chain.
-
-=item on_values => CODE
-
-A function (sub) which transforms the data of the CouchDB answer into
-useful Perl values and objects.  See L<Couch::DB::toPerl()|Couch::DB/"Processing">.
-The function is called with the result and a partially or unprocessed
-reponse (answer).  That data shall not be modified.  Return a new
-data-structure which contains the processed information, which may
-reuse parts which are not modified.
 
 =item paging => HASH
 
 When the endpoint support paging, then its needed configuration
-data has been collected in here.  This enables the use of C<_succeed>,
-C<_page>, C<skip>, and friends.  See examples in section L</Pagination>.
+data has been collected in here.  This enables the use of C<succeed>,
+C<page>, C<skip>, and friends.  See examples in section L</Pagination>.
 
 =item query => HASH
 
@@ -402,6 +331,48 @@ format.  Fields which do not exist are left alone.
 =back
 
 =head1 DETAILS
+
+=head2 Early adopters
+
+B<Be warned> that this module is really new.  The 127 different endpoints
+that the CouchDB 3.3.3 API defines, are grouped and combined.  The result
+is often not tested, and certainly not combat ready.  Please, report
+the result of calls which are currently flagged "UNTESTED".
+
+B<Please help> me fix issues by reporting them.  Bugs will be solved within
+a day.  Please, contribute ideas to make the use of the module lighter.
+Together, we can make the quality grow fast.
+
+=head2 Integration with your framework
+
+You need to instantiate an extensions of this class.  At the moment,
+you can pick from:
+
+=over 4
+
+=item * L<Couch::DB::Mojolicious|Couch::DB::Mojolicious>
+
+Implements the client using the Mojolicious framework, using Mojo::URL,
+Mojo::UserAgent, Mojo::IOLoop, and many other.
+
+=back
+
+Other extensions are hopefully added in the future.  Preferrably as part
+of this release so it gets maintained together.  The extensions are not
+too difficult to create and certainly quite small.
+
+=head2 Where can I find what?
+
+The CouchDB API lists all endpoints as URLs.  This library, however,
+creates an Object Oriented interface around these calls: you do not
+see the internals in the resulting code.  Knowing the CouchDB API,
+it is usually immediately clear where to find a certain end-point:
+C<< /{db} >> will be in L<Couch::DB::Database|Couch::DB::Database>.  A major exception is
+anything what has to do with replication and sharding: this is bundled
+in L<Couch::DB::Cluster|Couch::DB::Cluster>.
+
+Have a look at F<https://perl.overmeer.net/couch-db/reference.html>.
+Keep that page open in your browser while developing.
 
 =head2 Thick interface
 
@@ -499,35 +470,42 @@ C<Couch::DB> will totally hide these differences for you!
 =head3 Generic parameters
 
 Each method which is labeled C<< [CouchDB API] >> also accepts a few options
-which are controlling the calling progress.  These are available everywhere,
-hence no-where documented explicitly.  Those options start with an underscore (C<_>)
-or with C<on_> (events).
+which are controlling the calling progress.  They are handled by the L<call()|Couch::DB/"Processing">
+method which implements the API calls.
 
-At the moment, the following C<%options> are supported everywhere:
+These parameters are available for every API call, hence no-where
+documented explicitly.  These options are either about the connection
+between client and server, for result paging, or processing event hooks.
+
+=head4 Connection parameters
+
+At the moment, the following generic C<%options> are supported everywhere:
 
 =over 4
 
-=item * C<_delay> =E<gt> BOOLEAN, default C<false>
+=item * C<delay> =E<gt> BOOLEAN, default C<false>
 
 Do not perform and wait for the actual call, but prepare it to be used in parallel
 querying.  TO BE IMPLEMENTED/DOCUMENTED.
 
-=item * C<_client> =E<gt> $client-object or -name
+=item * C<client> =E<gt> $client-object or -name
 
 Use only the specified client (=server) to perform the call.
 
-=item * C<_clients> =E<gt> ARRAY-of-clients or a role
+=item * C<clients> =E<gt> ARRAY-of-clients or a role
 
 Use any of the specified clients to perform the call.  When not an ARRAY, the
 parameter is a C<role>: select all clients which can perform that role (the
 logged-in user of that client is allowed to perform that task).
 
-=item * C<_headers> =E<gt> HASH
+=item * C<headers> =E<gt> HASH
 
 Add headers to the request.  When applicable (for instance, the C<Accept>-header)
 this will overrule the internally calculated defaults.
 
 =back
+
+=head4 Processing events
 
 Besides, at the moment we support the following events:
 
@@ -542,7 +520,7 @@ only parameter.
 =item * C<on_final> =E<gt> CODE or ARRAY-of-CODE
 
 A CODE (sub) which is called when the interaction with the server has
-been completed.  This may happen much later, when combined with C<_delay>.
+been completed.  This may happen much later, when combined with C<delay>.
 The CODE gets the result object as only parameter, and returns a result
 object which might be different... as calls can be chained.
 
@@ -560,18 +538,97 @@ raw C<answer()> into C<values()>.  Wherever seemed useful, this is
 already hidden for you.  However: there may be cases where you want to
 add changes.
 
+=item * C<on_row> =E<gt> CODE
+
+Used to produce rows where the answer of a call produces a list of
+answers.
+
 =back
 
-=head2 Pagination
+=head2 Searching with CouchDB
 
-Searches tend to give a large number of results.  CouchDB calls will
-refuse to return too many answers at a time (typically 25).  When you
-need more results, you will need more calls.
+CouchDB supports various search mechanisms, which are confusingly
+named.  Their configuration is stored in design documents (see
+L<Couch::DB::Design|Couch::DB::Design>).  The mechanisms can often be combined.
 
-To get more answers, there are two mechanisms: some calls provide a
-C<skip> and C<limit> only.  Other calls implement the more sofisticated
-bookmark mechanism.  Both mechanisms are abstracted away by the
-C<_succeed> mechanism.
+=over 4
+
+=item * Views
+
+Views are docid-key-value tables which are following the changes made
+in a database.  The value may be complex, and may contain extracts
+and computed elements based on each document.
+See F<https://docs.couchdb.org/en/stable/ddocs/views/>
+
+=item * Search
+
+Use Lucene (mainly full text search) indexes on a database.  The
+interface uses Clouseau wrapper libraries around the Lucene core.
+See F<https://docs.couchdb.org/en/stable/ddocs/search.html>
+
+Clouseau was introduced in CouchDB 3.0.0, and now being phased out
+because it got stuck on Java 8. It has index type C<text>.
+
+=item * Search
+
+Uses Lucene indexes via the (new) Nouveau wrapper.
+Nouveau was introduced as beta in 3.4.1 as alternative, with index
+type C<nouveau>.
+
+=item * Mango
+
+The C<find()> method uses MongoDB compatible search statements,
+which can be combined with index and view restrictions.
+These indexes are of the (ill-named) type C<json>.
+See F<https://docs.couchdb.org/en/stable/ddocs/mango.html>
+
+=back
+
+Confusing? Yes it is.  There are often multiple solutions for the
+same problem.
+
+=head2 Paging
+
+Searches tend to give a large number of results.  The CouchDB server
+will refuse to return too many answers at a time (typically 25).
+When you need more results, you will need to do more calls.
+
+We distinguish three cases:
+
+=over 4
+
+=item 1. no paging possible
+
+Most commands will give you the full requested knowledge in one go.
+In some cases, the result may still present parts of the reply in
+convenient rows.
+
+=item 2. paging possible, but not used
+
+Command may support C<skip>, C<limit>, and/or C<bookmark>.  You decide
+you need them.  You can even use C<succeed> (see below).  However, the
+number of rows you get in the result can differ from your expectations.
+You may expect to get 50 elements, but sometimes get 10.  Use the
+"row"- and "doc" methods on the result object.
+
+=item 3. paging used
+
+When you provide options C<all> or C<page_size>, then your call gets
+into paging mode: the server will be polled until the requested number
+of results has been received.
+
+You cannot use the row commands on the result, because it will only
+return the rows of the last call which was made to fulfil your request.
+Now, you need to use the page commands of the result object.
+
+=back
+
+=head3 paging possible
+
+To get more answers, CouchDB implements two mechanisms: some calls
+provide a C<skip> and C<limit> only.  Other calls implement the more
+sophisticated bookmark mechanism.  Both mechanisms are abstracted away
+in this library by the C<succeed> mechanism.
 
 B<Be aware> that you shall provide the same query parameters to each
 call of the search method.  Succession may be broken when you change
@@ -579,49 +636,51 @@ some parameters: it is not fully documented which ones are needed to
 continue, so simply pass all again.  Probably, it is save to change
 the C<limit> between pages.
 
-To manage paged results, selected calls support the following options:
+The following parameters can be used then the CouchDB call supports
+paging (this will be documented explicitly at these methods)
 
 =over 4
 
-=item * C<all> =E<gt> BOOLEAN (default false)
+=item * C<skip> =E<gt> INTEGER
 
-Return all results at once.  This may involve multiple calls, like when
-the number of results is larger than what the server wants to produce
-in one go.
+Do not return this amount of first following elements.
+B<Be warned:> use as C<%option>, not as search parameter.
 
-Do not use this when you expect many or large results.  Maybe in
-combination with C<_map>.
+=item * C<limit> =E<gt> INTEGER
 
-=item * C<_page> =E<gt> INTEGER (default 1)
+Do not request more than C<limit> number of results per request.  May be
+less than C<page_size>.
+B<Be warned:> use as C<%option>, not as search parameter.
 
-Start-point of returned results, for calls which support paging.
-Pages are numbered starting from 1.  When available, bookmarks will
-be used for next pages.  Succeeding searches will automatically move
-through pages (see examples)
+=item * C<bookmark> =E<gt> STRING
 
-=item * C<_page_size> =E<gt> INTEGER (default 25)
+If you accidentally know the bookmark for the search.  Usually, this is
+automatically picked-up via C<succeed>.
 
-The CouchDB server will often not give you more than 25 or 50 answers
-at a time, but you do not want to know.
+=item * C<stop> =E<gt> CODE|'EMPTY'|'SMALLER'|'UPTO($nr)'
 
-=item * C<_succeed> =E<gt> $result or $result->paging
+When do we stop asking the server for more pages?  When the call returned
+no rows, then we always stop.  C<EMPTY> reflects the same.
+
+With C<SMALLER>, you will also stop when fewer rows were returned than in
+the first call.  It's not sure what the normal number of rows is what the
+server returns, but probably always the same until the source runs out.
+
+When C<UPTO> is used with some value (for instance C<UPTO(5)>) then no new
+call is made when less or equal to that number of rows is returned.
+
+=item * C<succeed> =E<gt> $result or $result->paging
 
 Make this query as successor of a previous query.  Some requests support
 paging (via bookmarks).  See examples in a section below.
 
-=item * C<_harvester> =E<gt> CODE
+=item * C<harvester> =E<gt> CODE
 
 How or what to extract per request.  You may add other information,
 like collecting response objects.  The CODE returns the extract LIST of
-objects/elements. Collection for a page stops once that combined list
-reaches C<_page_size>.
+objects/elements.
 
-=item * C<_bookmark> =E<gt> STRING
-
-If you accidentally know the bookmark for the search.  Usually, this is
-automatically picked-up via C<_succeed>.
-
-=item * C<_map> =E<gt> CODE
+=item * C<map> =E<gt> CODE
 
 Call the CODE on each of the (defined) harvested page elements.  The CODE
 is called with the result object, and one of the harvested elements.  When
@@ -634,16 +693,38 @@ Your CODE may return the harvested object, but also something small
 However: at least return a single scalar (it will be returned in the
 "page"), because an empty list signals "end of results".
 
-=item * C<skip> =E<gt> INTEGER
+=back
 
-Do not return this amount of first following elements.
-B<Be warned:> use as C<%option>, not as search parameter.
+=head3 paging used
 
-=item * C<limit> =E<gt> INTEGER
+To manage paged results, selected calls support the following options:
 
-Do not request more than C<limit> number of results per request.  May be
-less than C<_page_size>.
-B<Be warned:> use as C<%option>, not as search parameter.
+=over 4
+
+=item * C<all> =E<gt> BOOLEAN (default false)
+
+Return all results at once.  This may involve multiple calls, like when
+the number of results is larger than what the server wants to produce
+in one go.
+
+Avoid to use this when you expect many or large results.  Although, in
+such case C<map> may help you a lot.
+
+=item * C<page_size> =E<gt> INTEGER (default 25)
+
+The CouchDB server will often not give you more than 25 or 50 answers
+at a time, but you do not want to know.
+
+=item * C<page> =E<gt> INTEGER (default 1)
+
+Start-point of returned results, for calls which support paging.
+Pages are numbered starting from 1.  When available, bookmarks will
+be used for next pages.  Succeeding searches will automatically move
+through pages (see examples)
+
+=item * C<pagenr> =E<gt> INTEGER (default C<page>)
+
+The start of the page counter, for display purposes.
 
 =back
 
@@ -651,15 +732,25 @@ B<. Example: paging through result>
 
 Get page by page, where you may use the C<limit> parameter to request
 for a number of elements.  Do not use C<skip>, except in the first call.
-The C<_succeed> handling will play tricks with C<_page>, C<_harvester>,
-and C<_client>, which you do not wish to know.
+The C<succeed> handling will play tricks with C<page>, C<harvester>,
+and C<client>, which you do not wish to know.
 
-  my $page1 = $couch->find(\%search, limit => 12, skip => 300);
-  my $docs1 = $page1->page;
-  my $page2 = $couch->find(\%search, _succeed => $page1);
-  my $docs2 = $page2->page;
+  my $page1 = $couch->find(\%search, limit => 12, skip => 300, page_size => 10);
+  my $rows1 = $page1->page;
+  my @rows1 = $page1->pageRows;
+  my @docs1 = map $_->doc, @rows1;
+  
+  my $page2 = $couch->find(\%search, succeed => $page1);
+  my $rows2 = $page2->page;
+  my @docs2 = map $_->doc, $page2->page;
+  my @docs2 = $page2->pageDocs;
+  
+  sub h { my ($result) = @_; $result->docs }
+  my $page3 = $couch->find(\%search, succeed => $page2, harvester => \&h);
+  my $docs3 = $page3->page;    # now docs!
+  my @docs3 = $page3->pageRows;
 
-B<. Example: paging via a session>
+B<. Example: paging with a website user session>
 
 When you cannot ask for pages within a single continuous process, because
 the page is shown to a user who has to take action to see an other page,
@@ -668,13 +759,13 @@ then save the pagingState.
 The state cannot contain code references, so when you have a specific
 harvester or map, then you need to resupply those.
 
-  my $page1 = $couch->find(\%search);
-  my $docs1 = $page1->page;
+  my $page1 = $couch->find(\%search, page_size => 50);
+  my $rows1 = $page1->page;
   $session->save(current => serialized $page1->pagingState);
   ...
   my $prev  = deserialize $session->load('current');
-  my $page2 = $couch->find(\%search, _succeed => $prev);
-  my $docs2 = $page2->page;
+  my $page2 = $couch->find(\%search, succeed => $prev);
+  my $rows2 = $page2->page;
 
 B<. Example: get all results in a loop>
 
@@ -683,12 +774,18 @@ when the documents (with attachements?) are large.  Each C<$list>
 is a new result object.
 
   my $list;
-  while($list = $couch->find(\%search, _succeed => $list))
-  {   my $docs = $list->page;
-      @$docs or last;    # nothing left
-      ...;    # use the docs
+  while($list = $couch->find(\%search, succeed => $list))
+  {   my @rows = $list->rows;
+      @rows or last;    # nothing left
+      ...;              # use the rows
   }
+
+  # Checks the success of $list, not the number of rows
   $list or die "Stopped somewhere with ". $list->message;
+
+This call does not use C<page_size> or C<all>, so the number of rows
+received per loop may differ by decission of the server.  You cannot
+use the C<page*> set of methods, only the C<row*> and C<doc> methods.
 
 B<. Example: get one page of results>
 
@@ -696,22 +793,31 @@ You can jump back and forward in the pages: bookmarks will remember the
 pages already seen.
 
   my $page4 = $couch->find(\%search,
-	limit      => 10,  # results per server request
-	_page_size => 50,  # results until complete
-    _page      =>  4,  # start point, may use bookmark
-    _harvester => sub { $_[0]->values->{docs} }, # default
+	limit     => 10,  # results per server request
+	page_size => 50,  # results until complete
+    page      =>  4,  # start point, may use bookmark
+    harvester => sub { $_[0]->rows }, # default
   );
-  my $docs4 = $page4->page;
-  my $page5 = $couch->find(\%search, _succeed => $page4);
-  my $docs5 = $page5->page;
+  my $rows4 = $page4->page;
+  my $page5 = $couch->find(\%search, succeed => $page4);
+  my $rows5 = $page5->page;
+
+When paging (here selected via C<page_size>, you cannot use the
+the C<row*> and C<doc> methods on the result object: you need to
+use the C<page*> versions.
 
 B<. Example: get all results in one call>
 
-Do not attempt this unless you know there there is a limited number of
-results, maybe just a bit more than a page.
+When you ask for all answers at once, you must be aware this can consume
+a lot of time and memory.  Your clients will keep on requesting data from
+the server until all rows have been collected.
 
-  my $all   = $couch->find(\%search, _all => 1) or die;
-  my $docs6 = $all->page;
+  my $all   = $couch->find(\%search, all => 1) or die;
+  my @rows6 = $all->pageRows;
+
+You may consider to use C<map> here: to extract the data immediately
+when it comes in.  In this case, you can reduce the amount of information
+which has to be kept in memory immediately on arrival.
 
 B<. Example: processing results when they arrive>
 
@@ -719,17 +825,17 @@ When a page (may) require multiple calls to the server, this may enhance
 the user experience.
 
   sub do_something($$) { my ($result, $doc) = @_; ...; 42 }
-  my $all = $couch->find(\%search, _all => 1, _map => \&do_something);
+  my $all = $couch->find(\%search, all => 1, map => \&do_something);
   # $all->page will now show elements containing '42'.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.006,
-built on September 09, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.200,
+built on June 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2024-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents options of saving .docx file.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'DocxSaveOptions',
                                   required => [], # TODO
 }                                 );

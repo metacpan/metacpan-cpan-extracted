@@ -23,6 +23,8 @@ lib/Couch/DB/Node.pm
 lib/Couch/DB/Node.pod
 lib/Couch/DB/Result.pm
 lib/Couch/DB/Result.pod
+lib/Couch/DB/Row.pm
+lib/Couch/DB/Row.pod
 lib/Couch/DB/Util.pm
 lib/Couch/DB/Util.pod
 reference.html
@@ -32,10 +34,13 @@ t/10result.t
 t/11events.t
 t/12paging.t
 t/13uuids.t
+t/14alldocs.t
+t/15rows.t
 t/20client.t
 t/30database.t
 t/31bulk.t
 t/40document.t
+t/41design.t
 t/50cluster.t
 t/Test.pm
 xt/99pod.t

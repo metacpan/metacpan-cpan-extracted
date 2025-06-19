@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -88,7 +89,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/{name}';
+    my $_resource_path = 'v3.0/cells/{name}';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -130,6 +131,9 @@ sub run_http_request {
         $query_params->{'checkExcelRestriction'} = $client->to_query_value($self->check_excel_restriction);      
     } 
     my $_body_data;
+
+ 
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 

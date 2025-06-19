@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ our $VERSION = '0.31';
 
   my $config = Config::Abstraction->new(
     config_dirs => ['config'],
-    env_prefix => 'MYAPP_',
+    env_prefix => 'APP_',
     flatten => 0,
   );
 
@@ -579,11 +579,12 @@ sub _load_config
 
 	# Merge ENV vars
 	my $prefix = $self->{env_prefix};
+	$prefix =~ s/__$//;
 	$prefix =~ s/_$//;
 	$prefix =~ s/::$//;
 	for my $key (keys %ENV) {
 		next unless $key =~ /^$self->{env_prefix}(.*)$/i;
-		my $path = lc $1;
+		my $path = lc($1);
 		if($path =~ /__/) {
 			my @parts = split /__/, $path;
 			my $ref = \%merged;

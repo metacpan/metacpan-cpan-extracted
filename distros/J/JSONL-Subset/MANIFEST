@@ -1,0 +1,10 @@
+lib/JSONL/Subset.pm
+Makefile.PL
+README.md
+t/basic.t
+t/fixtures/sample.jsonl
+bin/jsonl-subset
+MANIFEST
+LICENSE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

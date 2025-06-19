@@ -1,6 +1,6 @@
 package Apache::Session::Browseable;
 
-our $VERSION = '1.3.16';
+our $VERSION = '1.3.17';
 
 print STDERR "Use a sub module of Apache::Session::Browseable such as Apache::Session::Browseable::File";
 
@@ -32,6 +32,9 @@ chosen module documentation carefully to set the indexes.
 =item L<Apache::Session::Browseable::PgHstore>: uses "hstore" field
 
 =item L<Apache::Session::Browseable::PgJSON>: uses "json/jsonb" field
+
+=item L<Apache::Session::Browseable::Patroni>: uses "json/jsonb" field and
+manage connection using Patroni API to find master node of PostgreSQL cluster
 
 =back
 

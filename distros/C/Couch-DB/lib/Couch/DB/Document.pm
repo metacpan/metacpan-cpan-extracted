@@ -1,13 +1,13 @@
-# Copyrights 2024 by [Mark Overmeer].
+# Copyrights 2024-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
 # SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
 # SPDX-License-Identifier: Artistic-2.0
 
-package Couch::DB::Document;
-use vars '$VERSION';
-$VERSION = '0.006';
+package Couch::DB::Document;{
+our $VERSION = '0.200';
+}
 
 use Couch::DB::Util;
 
@@ -39,6 +39,7 @@ sub init($)
 	# that might consume a lot of memory.  Although it may help debugging.
 	# weaken $self->{CDD_result} = my $result = delete $args->{result};
 
+	$self->row(delete $args->{row});
 	$self;
 }
 
@@ -74,9 +75,10 @@ sub _consume($$)
 	$self;
 }
 
-sub _fromResponse($$$%)
+
+sub fromResult($$$%)
 {	my ($class, $result, $data, %args) = @_;
-	$class->new(%args)->_consume($result, $data);
+	$class->new(%args, result => $result)->_consume($result, { %$data });
 }
 
 #-------------
@@ -105,6 +107,15 @@ sub _saved($$;$)
 {	my ($self, $id, $rev, $data) = @_;
 	$self->{CDD_id} ||= $id;
 	$self->{CDD_revs}{$rev} = $data || delete $self->{CDD_revs}{_new};
+}
+
+
+sub row(;$)
+{	my $self = shift;
+	@_ or return $self->{CDD_row};
+	$self->{CDD_row} = shift;
+	weaken($self->{CDD_row});
+	$self->{CDD_row};
 }
 
 #-------------

@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Font for rendering.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'RenderingFont',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => 'Gets name of the font.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

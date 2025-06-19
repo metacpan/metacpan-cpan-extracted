@@ -34,6 +34,7 @@ etc/config.bugfest_ramsons.json
 etc/config.chicago.json
 etc/config.dummy.json
 etc/config.fieldPerItem.json
+etc/config.holdingsInEachItem.json
 etc/config.include-suppressed.json
 etc/config.indexdata.json
 etc/config.invalidisbn.json
@@ -82,9 +83,11 @@ t/data/config/foo.atplt.json
 t/data/config/foo.bar.json
 t/data/config/foo.baz.json
 t/data/config/foo.fieldPerItem.json
+t/data/config/foo.holdingsInEachItem.json
 t/data/config/foo.json
 t/data/config/foo.marcHoldings.json
 t/data/config/foo.postProcess.json
+t/data/config/foo.restrictToItem.json
 t/data/config/yazgfs-9996.xml
 t/data/fetch/in00000000007-opac.xml
 t/data/fetch/input-inventory1.json
@@ -95,7 +98,10 @@ t/data/fetch/marc1.usmarc
 t/data/fetch/marc1.xml
 t/data/fetch/sorted1.json
 t/data/records/expectedMarc1.marc
-t/data/records/expectedMarc1byItem.marc
+t/data/records/expectedMarc1fieldPerItem.marc
+t/data/records/expectedMarc1fieldPerItemholdingsInEachItem.marc
+t/data/records/expectedMarc1holdingsInEachItem.marc
+t/data/records/expectedMarc1restrictToItem.marc
 t/data/records/expectedOutput1.xml
 t/data/records/expectedOutput2.xml
 t/data/records/expectedOutput3.xml

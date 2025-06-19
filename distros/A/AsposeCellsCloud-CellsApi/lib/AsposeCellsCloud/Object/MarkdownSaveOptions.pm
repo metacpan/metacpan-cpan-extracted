@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents options of saving .md file.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'MarkdownSaveOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'encoding' => {
      	datatype => 'string',
      	base_name => 'Encoding',
-     	description => 'Gets and sets the default encoding.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'format_strategy' => {
      	datatype => 'string',
      	base_name => 'FormatStrategy',
-     	description => 'The Data provider to provide cells data for saving workbook in light mode.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'line_separator' => {
      	datatype => 'string',
      	base_name => 'LineSeparator',
-     	description => 'Gets and sets the line separator.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

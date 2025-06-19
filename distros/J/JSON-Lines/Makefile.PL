@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'JSON' => '0',
+        'Cpanel::JSON::XS' => '0',
         'Import::Export' => '1.00'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

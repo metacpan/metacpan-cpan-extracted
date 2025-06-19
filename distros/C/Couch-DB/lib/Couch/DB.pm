@@ -1,13 +1,13 @@
-# Copyrights 2024 by [Mark Overmeer].
+# Copyrights 2024-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
 # SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
 # SPDX-License-Identifier: Artistic-2.0
 
-package Couch::DB;
-use vars '$VERSION';
-$VERSION = '0.006';
+package Couch::DB;{
+our $VERSION = '0.200';
+}
 
 use version;
 
@@ -16,7 +16,6 @@ use Log::Report 'couch-db';
 use Couch::DB::Client   ();
 use Couch::DB::Cluster  ();
 use Couch::DB::Database ();
-use Couch::DB::Design   ();
 use Couch::DB::Node     ();
 use Couch::DB::Util     qw(flat);
 
@@ -145,12 +144,15 @@ sub freshUUIDs($%)
 	my $bulk  = delete $args{bulk} || 50;
 
 	while($count > @$stock)
-	{	my $result = $self->requestUUIDs($bulk, _delay => 0) or last;
+	{	my $result = $self->requestUUIDs($bulk, delay => 0) or last;
 		push @$stock, @{$result->values->{uuids} || []};
 	}
 
 	splice @$stock, 0, $count;
 }
+
+
+sub freshUUID(%) { my $s = shift; ($s->freshUUIDs(1, @_))[0] }
 
 #-------------
 
@@ -228,6 +230,7 @@ sub call($$%)
 		on_error  => $args{on_error},
 		on_final  => $args{on_final},
 		on_chain  => $args{on_chain},
+		on_row    => $args{on_row},
 		paging    => $paging,
 	);
 
@@ -243,9 +246,9 @@ sub call($$%)
 	    		$self->_pageRequest($paging, $method, $query, $send);
 
 				$self->_callClient($result, $client, %args);
-
 				$result
 					or next CLIENT;  # fail
+
 			} while $result->pageIsPartial;
 
 			last CLIENT;
@@ -268,22 +271,17 @@ sub _resultsConfig($%)
 {	my ($self, $args, @more) = @_;
 	my %config;
 
-	exists $args->{"_$_"} && ($config{$_} = delete $args->{"_$_"})
-		for qw/delay client clients headers/;
-
-	exists $args->{$_} && (push @{$config{$_}}, delete $args->{$_})
-		for qw/on_error on_final on_chain on_values/;
-
+	unshift @more, %$args;
 	while(@more)
 	{	my ($key, $value) = (shift @more, shift @more);
-		if($key eq '_headers')
+		if($key eq 'headers')
 		{	# Headers are added, as default only
 			my $headers = $config{headers} ||= {};
 			exists $headers->{$_} or ($headers->{$_} = $value->{$_}) for keys %$value;
-			next;
 		}
 		elsif($key =~ /^on_/)
-		{	push @{$config{$key}}, $value;
+		{	# User specified additional events
+			push @{$config{$key}}, $value if defined $value;
 		}
 		else
 		{	# Other parameters used as default
@@ -291,7 +289,12 @@ sub _resultsConfig($%)
 		}
 	}
 
+	$config{paging} && !$config{on_row} and panic "paging without on_row";
+
+	delete @{$args}{qw/delay client clients/};
+	delete @{$args}{grep /^on_/, keys %$args};
 	keys %$args and warn "Unused call parameters: ", join ', ', sort keys %$args;
+
 	%config;
 }
 
@@ -301,60 +304,85 @@ sub _resultsPaging($%)
 
 	my %state = (harvested => []);
 	my $succ;  # successor
-	if(my $succeeds = delete $args->{_succeed})
-	{	delete $args->{_clients}; # no client switching within paging
+	if(my $succeeds = delete $args->{succeed})
+	{	delete $args->{clients}; # no client switching within paging
 
 		if(blessed $succeeds && $succeeds->isa('Couch::DB::Result'))
 		{	# continue from living previous result
 			$succ = $succeeds->nextPageSettings;
-			$args->{_client} = $succeeds->client;
+			$args->{client} = $succeeds->client;
 		}
 		else
 		{	# continue from resurrected from Result->pagingState()
 			my $h = $succeeds->{harvester}
 				or panic "_succeed does not contain data from pagingState() nor is a Result object.";
 
-			$h eq 'DEFAULT' || $args->{_harvester}
+			$h eq 'DEFAULT' || $args->{harvester}
 				or panic "Harvester does not survive pagingState(), resupply.";
 
-			$succeeds->{map} eq 'NONE' || $args->{_map}
+			$succeeds->{map} eq 'NONE' || $args->{map}
 				or panic "Map does not survive pagingState(), resupply.";
 
 			$succ  = $succeeds;
-			$args->{_client} = $succeeds->{client};
+			$args->{client} = $succeeds->{client};
 		}
 	}
 
 	$state{start}     = $succ->{start} || 0;
 	$state{skip}      = delete $args->{skip} || 0;
-	$state{all}       = delete $args->{_all} || 0;
-	$state{map}       = my $map = delete $args->{_map} || $succ->{map};
-	$state{harvester} = my $harvester = delete $args->{_harvester} || $succ->{harvester};
-	$state{page_size} = my $size = delete $args->{_page_size} || $succ->{page_size} || 25;
-	$state{req_max}   = delete $args->{limit} || $succ->{req_max} || 100;
+	$state{all}       = delete $args->{all}  || 0;
+	$state{map}       = my $map = delete $args->{map} || $succ->{map};
+	$state{harvester} = my $harvester = delete $args->{harvester} || $succ->{harvester};
+	$state{page_size} = my $size = delete $args->{page_size} || $succ->{page_size};
+	$state{req_rows}  = delete $args->{limit} || $succ->{req_rows} || 100;
+	$state{page_mode} = !! ($state{all} || $size);
+	$state{stop}      = my $stop = delete $args->{stop} || $succ->{stop} || 'EMPTY';
 
-	if(my $page = delete $args->{_page})
-	{	$state{start}  = ($page - 1) * $state{page_size};
+	my $page;
+	if($page = delete $args->{page})
+	{	defined $size or panic "page parameter only usefull with page_size.";
+		$state{start} = ($page - 1) * $size;
 	}
+	$state{pagenr}    = delete $args->{pagenr} // $succ->{pagenr} // $page // 1;
 
 	$state{bookmarks} = $succ->{bookmarks} ||= { };
-	if(my $b = delete $args->{_bookmark})
-	{	$state{bookmarks}{$state{start}} = $b;
+	if(my $bm = delete $args->{bookmark})
+	{	$state{bookmarks}{$state{start}} = $bm;
 	}
 
-	$harvester ||= sub { my $v = $_[0]->values; $v->{docs} || $v->{rows} };
+	$harvester ||= sub { $_[0]->_rowsRef(0) };
 	my $harvest = sub {
 		my $result = shift or return;
 		my @found  = flat $harvester->($result);
 		@found     = map $map->($result, $_), @found if $map;
-		$result->_pageAdd($result->answer->{bookmark}, @found);  # also call with 0
+
+		# The answer does not tell me that we are on the last page.
+		$result->_pageAdd($result->answer->{bookmark}, \@found);  # also call with 0
 	};
 
-	# When less elements are returned
-	return
-	( $self->_resultsConfig($args, @more, on_final => $harvest),
-	   paging => \%state,
-	);
+	if(ref $stop ne 'CODE')
+	{	if($stop eq 'EMPTY')
+		{	# we always stop when there were no rows returned
+			$state{stop} = sub { 0 };
+		}
+		elsif($stop eq 'SMALLER')
+		{	my $first;
+			$state{stop} = sub {
+				return $_[0]->numberOfRows < $first if defined $first;
+				$first = $_[0]->numberOfRows;
+				0;
+			};
+		}
+		elsif($stop =~ m/^UPTO\((\d+)\)$/)
+		{	my $upto = $1;
+			$state{stop} = sub { $_[0]->numberOfRows <= $upto };
+		}
+		else
+		{	panic "Unknown stop value `$stop`";
+		}
+	}
+
+	$self->_resultsConfig($args, @more, on_final => $harvest, paging => \%state),
 }
 
 sub _pageRequest($$$$)
@@ -363,7 +391,10 @@ sub _pageRequest($$$$)
 	my $progress = @{$paging->{harvested}};      # within the page
 	my $start    = $paging->{start};
 
-	$params->{limit} = $paging->{all} ? $paging->{req_max} : (min $paging->{page_size} - $progress, $paging->{req_max});
+	$params->{limit}
+	  = $paging->{page_size}
+	  ? (min $paging->{page_size} - $progress, $paging->{req_rows})
+	  : $paging->{req_rows};
 
 	if(my $bookmark = $paging->{bookmarks}{$start + $progress})
 	{	$params->{bookmark} = $bookmark;
@@ -502,7 +533,7 @@ sub check($$$$)
 #### Extension which perform some tasks which are framework object specific.
 
 # Returns the JSON structure which is part of the response by the CouchDB
-# server.  Usually, this is the bofy of the response.  In multipart
+# server.  Usually, this is the body of the response.  In multipart
 # responses, it is the first part.
 sub _extractAnswer($)  { panic "must be extended" }
 

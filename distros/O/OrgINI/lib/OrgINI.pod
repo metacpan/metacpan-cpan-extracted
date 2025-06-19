@@ -1,0 +1,222 @@
+
+# ABSTRACT: OrgINI file format specification
+#PODNAME: OrgINI
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+OrgINI - OrgINI file format specification
+
+=head1 SPECIFICATION VERSION
+
+0.1
+
+=head1 VERSION
+
+This document describes version 0.1.0 of OrgINI (from Perl distribution OrgINI), released on 2025-06-19.
+
+=head1 STATUS
+
+First version of specification. There might still be incompatible changes before
+1.0.
+
+=head1 ABSTRACT
+
+OrgINI is a configuration file format. It is Org [1] (a highly flexible
+structured plain text file format) with some rules to make it easily convertible
+to INI, specifically a subset of IOD (INI On Drugs) [2].
+
+The goal is to create a simple configuration format that is convenient to write
+by human.
+
+=head1 NOTATION
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
+
+=head1 RATIONALE
+
+The Org format is highly flexible and is commonly used to write rich notes that
+can contain agenda, links, todo items, tables, and so on. It is also convenient
+to write, particularly in Emacs. Being a plain text format with open
+specification, it is portable and free from vendor lock-in. It is not, however,
+popular as a configuration file format because it is too flexible and there are
+few(er) parsers for it.
+
+INI, however, is a very popular configuration format. It is also a plain text
+format and simple, both syntax-wise and semantic-wise (the content can be
+represented as a two-level hash structure).
+
+OrgINI is a convention to make an Org file more easily convertible to IOD (INI
+on Drugs) format. The use case is for users to write configuration in OrgINI
+format and programs to read (and/or write) the configuration in OrgINI or in INI
+format.
+
+=head1 SPECIFICATION
+
+A configuration file is a plain text file in Org markup. Org heading will become
+IOD section. Org definition list will become key-value pairs.
+
+=head2 Heading
+
+Org heading will become IOD section.
+
+Multilevel heading will be encoded using absolute path notation with C<[> as
+the path separator character.
+
+IOD section can contain backslash string encoding (C<\xN>, C<\n>, C<\t>, C<\\>)
+to encode a Unicode character with a certain codepoint. The section name will be
+decoded when IOD is converted back to Org.
+
+When converting an Org heading, C<[> and C<]> characters must be encoded into
+C<\x5b> and C<\x5d>, respectively.
+
+Example, this Org:
+
+  * heading1
+  ** heading2
+  *** heading3
+  ** heading4 [2025-06-19 Thu]
+  **** heading5 [
+
+will convert to this IOD:
+
+ [heading1]
+ [heading1[heading2]
+ [heading1[heading2[heading3]
+ [heading1[heading4 \x5b2025-06-19 Thu\x5d]
+ [heading1[heading4 \x5b2025-06-19 Thu\x5d[[heading5 \x5b]
+
+=head2 Definition list
+
+Org definition list will become IOD key-value pairs.
+
+When converting to IoD, C<=> in term of definition list must be encoded to
+C<\x3d>.
+
+Newlines and substructures under the term must be encoded using backslash string
+encoding.
+
+Example, this Org:
+
+  - foo :: value1
+  - bar\ :: value2
+  - baz= :: value3
+  - qux :: a long long long
+      line
+  - quux ::
+    + another :: sub
+    + definition :: list
+
+will convert to this IOD:
+
+  foo = value1
+  bar\\ = value2
+  baz\x3d = value3
+  qux = a long long long\n  line
+  quux = \n  + another :: sub\n  + definition :: list
+
+Note that for simplicity, built-in IOD encoding is not used. Instead, backslash
+string encoding is used.
+
+=head2 Additional stuffs
+
+When converting to IOD, additional elements in Org not explicitly specified in
+this specification should be ignored.
+
+Example, this Org:
+
+  +#TODO: TODO | CLOSED OLD CANTUSE
+  some description text
+  some description text
+
+  * category1
+  - foo :: 1
+  - bar :: 2
+  - baz :: 3
+
+  some text.
+  ** subcategory1
+  - foo :: 2
+  ** subcategory2 > subsubcategory
+  - foo :: 3
+  - log ::
+    + [2025-06-18] :: change foo to 3
+    + [2025-07-17] :: remove bar
+  * category2
+
+will convert to this IOD:
+
+  [category1]
+  foo = 1
+  bar = 2
+  baz = 3
+  [category1[subcategory1]
+  foo = 2
+  [category1[subcategory2[subsubcategory]
+  foo = 3
+  log = \n  + [2025-06-18] :: change foo to 3\n    + [2025-07-17] :: remove bar
+  [category2]
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/OrgINI>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-OrgINI>.
+
+=head1 SEE ALSO
+
+[1] https://orgmode.org/
+
+[2] L<IOD>
+
+Some projects already using this format: L<App::orgadb>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=OrgINI>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

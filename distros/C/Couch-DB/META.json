@@ -60,6 +60,6 @@
          "web" : "https://github.com/markov2/perl5-Couch-DB"
       }
    },
-   "version" : "0.006",
+   "version" : "0.200",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

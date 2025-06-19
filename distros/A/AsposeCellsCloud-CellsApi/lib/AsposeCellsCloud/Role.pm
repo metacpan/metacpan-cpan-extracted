@@ -61,7 +61,7 @@ has version_info => ( is => 'ro',
                       isa => 'HashRef',
                       default => sub { {
                           app_name => 'Aspose.Cells Cloud SDK APIs.',
-                          app_version => '25.4',
+                          app_version => '25.6.1',
                           generator_class => 'io.swagger.codegen.languages.PerlClientCodeGen',
                       } },
                       documentation => 'Information about the application version and the codegen codebase version'
@@ -119,7 +119,7 @@ sub _build_af {
 
 AsposeCellsCloud::Role - a Moose role for the Aspose.Cells Cloud SDK APIs.
 
-=head2 Aspose.Cells Cloud SDK APIs. version: 25.4
+=head2 Aspose.Cells Cloud SDK APIs. version: 25.6.1
 
 =head1 VERSION
 

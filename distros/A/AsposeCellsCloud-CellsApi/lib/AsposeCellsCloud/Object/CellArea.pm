@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '           Represent an area of cells.           ',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'CellArea',
                                   required => [], # TODO
 }                                 );
@@ -128,28 +128,28 @@ __PACKAGE__->method_documentation({
      'end_column' => {
      	datatype => 'int',
      	base_name => 'EndColumn',
-     	description => 'The end column index.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'EndRow',
-     	description => 'The end row index.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'StartColumn',
-     	description => 'The start column index.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'StartRow',
-     	description => 'The start row index.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

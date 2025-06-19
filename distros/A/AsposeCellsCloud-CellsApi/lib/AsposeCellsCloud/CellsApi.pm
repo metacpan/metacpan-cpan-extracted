@@ -59,6 +59,1825 @@ sub new {
 }
 
 #
+# PostAccessTokenRequest
+#
+# Get Access Token Result: The Cells Cloud Get Token API acts as a proxy service,forwarding user requests to the Aspose Cloud authentication server and returning the resulting access token to the client.
+# 
+ 
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAccessTokenRequest',
+            description => 'PostAccessToken Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_access_token' } = { 
+    	summary => 'Get Access Token Result: The Cells Cloud Get Token API acts as a proxy service,forwarding user requests to the Aspose Cloud authentication server and returning the resulting access token to the client.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_access_token{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# GetAsposeCellsCloudStatusRequest
+#
+# Check the Health Status of Aspose.Cells Cloud Service.
+# 
+ 
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetAsposeCellsCloudStatusRequest',
+            description => 'GetAsposeCellsCloudStatus Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_aspose_cells_cloud_status' } = { 
+    	summary => 'Check the Health Status of Aspose.Cells Cloud Service.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub get_aspose_cells_cloud_status{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# CheckCloudServiceHealthRequest
+#
+# Check the Health Status of Aspose.Cells Cloud Service.
+# 
+ 
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'CheckCloudServiceHealthRequest',
+            description => 'CheckCloudServiceHealth Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'check_cloud_service_health' } = { 
+    	summary => 'Check the Health Status of Aspose.Cells Cloud Service.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub check_cloud_service_health{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ExportSpreadsheetAsFormatRequest
+#
+# Converts a spreadsheet in cloud storage to the specified format.
+# 
+# @name  string (required)  (Required) The name of the workbook file to be retrieved.  
+# @format  string (required)  (Required) The desired output format (e.g., "Xlsx", "Pdf", "Csv").  
+# @folder  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ExportSpreadsheetAsFormatRequest',
+            description => 'ExportSpreadsheetAsFormat Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'export_spreadsheet_as_format' } = { 
+    	summary => 'Converts a spreadsheet in cloud storage to the specified format.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub export_spreadsheet_as_format{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ExportChartAsFormatRequest
+#
+# Converts a chart of spreadsheet in cloud storage to the specified format.
+# 
+# @name  string (required)  (Required) The name of the workbook file to be retrieved.  
+# @worksheet  string (required)    
+# @chartIndex  int (required)    
+# @format  string (required)  (Required) The desired pdf or image format  (e.g., "png", "Pdf", "svg").  
+# @folder  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ExportChartAsFormatRequest',
+            description => 'ExportChartAsFormat Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'export_chart_as_format' } = { 
+    	summary => 'Converts a chart of spreadsheet in cloud storage to the specified format.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub export_chart_as_format{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ConvertSpreadsheetRequest
+#
+# Converts a spreadsheet on a local drive to the specified format.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @format  string (required)  (Required) The desired output format (e.g., "Xlsx", "Pdf", "Csv").  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ConvertSpreadsheetRequest',
+            description => 'ConvertSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'convert_spreadsheet' } = { 
+    	summary => 'Converts a spreadsheet on a local drive to the specified format.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub convert_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ConvertChartToImageRequest
+#
+# Converts a chart of spreadsheet on a local drive to image.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)    
+# @chartIndex  int (required)    
+# @format  string (required)  (Required) The desired image type (e.g., svg, png, jpg).  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ConvertChartToImageRequest',
+            description => 'ConvertChartToImage Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'convert_chart_to_image' } = { 
+    	summary => 'Converts a chart of spreadsheet on a local drive to image.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub convert_chart_to_image{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ConvertChartToPdfRequest
+#
+# Converts a chart of spreadsheet on a local drive to pdf.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string (required)    
+# @chartIndex  int (required)    
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ConvertChartToPdfRequest',
+            description => 'ConvertChartToPdf Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'convert_chart_to_pdf' } = { 
+    	summary => 'Converts a chart of spreadsheet on a local drive to pdf.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub convert_chart_to_pdf{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# SaveSpreadsheetAsRequest
+#
+# Converts a spreadsheet in cloud storage to the specified format.
+# 
+# @name  string (required)  (Required) The name of the workbook file to be converted.  
+# @format  string (required)  (Required) The desired output format (e.g., "Xlsx", "Pdf", "Csv").  
+# @saveOptionsData  SaveOptionsData   (Optional) Save options data. The default is null.  
+# @folder  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SaveSpreadsheetAsRequest',
+            description => 'SaveSpreadsheetAs Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'save_spreadsheet_as' } = { 
+    	summary => 'Converts a spreadsheet in cloud storage to the specified format.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub save_spreadsheet_as{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# MergeSpreadsheetsRequest
+#
+# Merge local spreadsheet files into a specified format file.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outFormat  string   The out file format.  
+# @mergeInOneSheet  boolean   Whether to combine all data into a single worksheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'MergeSpreadsheetsRequest',
+            description => 'MergeSpreadsheets Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'merge_spreadsheets' } = { 
+    	summary => 'Merge local spreadsheet files into a specified format file.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub merge_spreadsheets{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# MergeSpreadsheetsInRemoteFolderRequest
+#
+# Merge spreadsheet files in folder of cloud storage into a specified format file.
+# 
+# @folder  string (required)  The folder used to store the merged files.  
+# @fileMatchExpression  string     
+# @outFormat  string   The out file format.  
+# @mergeInOneSheet  boolean   Whether to combine all data into a single worksheet.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'MergeSpreadsheetsInRemoteFolderRequest',
+            description => 'MergeSpreadsheetsInRemoteFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'merge_spreadsheets_in_remote_folder' } = { 
+    	summary => 'Merge spreadsheet files in folder of cloud storage into a specified format file.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub merge_spreadsheets_in_remote_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# MergeRemoteSpreadsheetRequest
+#
+# Merge a spreadsheet file into other spreadsheet in cloud storage, and output a specified format file.
+# 
+# @name  string (required)  The name of the workbook file to be split.  
+# @mergedSpreadsheet  string (required)    
+# @folder  string   The folder path where the workbook is stored.  
+# @outFormat  string   The out file format.  
+# @mergeInOneSheet  boolean   Whether to combine all data into a single worksheet.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'MergeRemoteSpreadsheetRequest',
+            description => 'MergeRemoteSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'merge_remote_spreadsheet' } = { 
+    	summary => 'Merge a spreadsheet file into other spreadsheet in cloud storage, and output a specified format file.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub merge_remote_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# SplitSpreadsheetRequest
+#
+# Split a local spreadsheet into the specified format, multi-file.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @from  int   Begin worksheet index.  
+# @to  int   End worksheet index.  
+# @outFormat  string   The out file format.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SplitSpreadsheetRequest',
+            description => 'SplitSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'split_spreadsheet' } = { 
+    	summary => 'Split a local spreadsheet into the specified format, multi-file.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub split_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# SplitRemoteSpreadsheetRequest
+#
+# Split a spreadsheet in cloud storage into the specified format, multi-file.
+# 
+# @name  string (required)  The name of the workbook file to be split.  
+# @folder  string   The folder path where the workbook is stored.  
+# @from  int   Begin worksheet index.  
+# @to  int   End worksheet index.  
+# @outFormat  string   The desired output format (e.g., "Xlsx", "Pdf", "Csv").  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SplitRemoteSpreadsheetRequest',
+            description => 'SplitRemoteSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'split_remote_spreadsheet' } = { 
+    	summary => 'Split a spreadsheet in cloud storage into the specified format, multi-file.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub split_remote_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# GetPublicKeyRequest
+#
+# Get an asymmetric public key.
+# 
+ 
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetPublicKeyRequest',
+            description => 'GetPublicKey Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_public_key' } = { 
+    	summary => 'Get an asymmetric public key.',
+        params => $params,
+        returns => 'CellsCloudPublicKeyResponse',
+    };
+}
+#
+# @return CellsCloudPublicKeyResponse
+#
+sub get_public_key{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudPublicKeyResponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchSpreadsheetContentRequest
+#
+# Search text in the local spreadsheet.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @searchText  string (required)  The searched text.  
+# @ignoringCase  boolean   Ignore the text of the search.  
+# @worksheet  string   Specify the worksheet for the lookup.  
+# @cellArea  string   Specify the cell area for the lookup  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchSpreadsheetContentRequest',
+            description => 'SearchSpreadsheetContent Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_spreadsheet_content' } = { 
+    	summary => 'Search text in the local spreadsheet.',
+        params => $params,
+        returns => 'SearchResponse',
+    };
+}
+#
+# @return SearchResponse
+#
+sub search_spreadsheet_content{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SearchResponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchContentInRemoteSpreadsheetRequest
+#
+# Search text in the remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be search.  
+# @searchText  string (required)  The searched text.  
+# @ignoringCase  boolean   Ignore the text of the search.  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchContentInRemoteSpreadsheetRequest',
+            description => 'SearchContentInRemoteSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_content_in_remote_spreadsheet' } = { 
+    	summary => 'Search text in the remoted spreadsheet.',
+        params => $params,
+        returns => 'SearchResponse',
+    };
+}
+#
+# @return SearchResponse
+#
+sub search_content_in_remote_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SearchResponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchContentInRemoteWorksheetRequest
+#
+# Search text in the worksheet of remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be search.  
+# @worksheet  string (required)  The name of worksheet  
+# @searchText  string (required)  The searched text.  
+# @ignoringCase  boolean   Ignore the text of the search.  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchContentInRemoteWorksheetRequest',
+            description => 'SearchContentInRemoteWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_content_in_remote_worksheet' } = { 
+    	summary => 'Search text in the worksheet of remoted spreadsheet.',
+        params => $params,
+        returns => 'SearchResponse',
+    };
+}
+#
+# @return SearchResponse
+#
+sub search_content_in_remote_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SearchResponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchContentInRemoteRangeRequest
+#
+# Search text in the range of remoted spreadsheet.
+# 
+# @name  string (required)    
+# @worksheet  string (required)    
+# @cellArea  string (required)    
+# @searchText  string (required)    
+# @ignoringCase  boolean     
+# @folder  string     
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchContentInRemoteRangeRequest',
+            description => 'SearchContentInRemoteRange Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_content_in_remote_range' } = { 
+    	summary => 'Search text in the range of remoted spreadsheet.',
+        params => $params,
+        returns => 'SearchResponse',
+    };
+}
+#
+# @return SearchResponse
+#
+sub search_content_in_remote_range{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SearchResponse', $response);
+    return $_response_object;
+}
+
+#
+# ReplaceSpreadsheetContentRequest
+#
+# Replace text in the local spreadsheet.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @searchText  string (required)  The searched text.  
+# @replaceText  string (required)  The replaced text.  
+# @worksheet  string   Specify the worksheet for the replace.  
+# @cellArea  string   Specify the cell area for the replace.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ReplaceSpreadsheetContentRequest',
+            description => 'ReplaceSpreadsheetContent Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'replace_spreadsheet_content' } = { 
+    	summary => 'Replace text in the local spreadsheet.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub replace_spreadsheet_content{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ReplaceContentInRemoteSpreadsheetRequest
+#
+# Replace text in the remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be replace.  
+# @searchText  string (required)  The searched text.  
+# @replaceText  string (required)  The replaced text.  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ReplaceContentInRemoteSpreadsheetRequest',
+            description => 'ReplaceContentInRemoteSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'replace_content_in_remote_spreadsheet' } = { 
+    	summary => 'Replace text in the remoted spreadsheet.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub replace_content_in_remote_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# ReplaceContentInRemoteWorksheetRequest
+#
+# Replace text in the worksheet of remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be replace.  
+# @worksheet  string (required)  Specify the worksheet for the replace.  
+# @searchText  string (required)  The searched text.  
+# @replaceText  string (required)  The replaced text.  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ReplaceContentInRemoteWorksheetRequest',
+            description => 'ReplaceContentInRemoteWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'replace_content_in_remote_worksheet' } = { 
+    	summary => 'Replace text in the worksheet of remoted spreadsheet.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub replace_content_in_remote_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# ReplaceContentInRemoteRangeRequest
+#
+# Replace text in the range of remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be replace.  
+# @searchText  string (required)  The searched text.  
+# @replaceText  string (required)  The replaced text.  
+# @worksheet  string (required)  The worksheet name.  
+# @cellArea  string (required)  The cell area for the replace.  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ReplaceContentInRemoteRangeRequest',
+            description => 'ReplaceContentInRemoteRange Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'replace_content_in_remote_range' } = { 
+    	summary => 'Replace text in the range of remoted spreadsheet.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+    };
+}
+#
+# @return CellsCloudResponse
+#
+sub replace_content_in_remote_range{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchSpreadsheetBrokenLinksRequest
+#
+# Search broken links in the local spreadsheet.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string   Specify the worksheet for the replace.  
+# @cellArea  string   Specify the cell area for the replace.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchSpreadsheetBrokenLinksRequest',
+            description => 'SearchSpreadsheetBrokenLinks Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_spreadsheet_broken_links' } = { 
+    	summary => 'Search broken links in the local spreadsheet.',
+        params => $params,
+        returns => 'BrokenLinksReponse',
+    };
+}
+#
+# @return BrokenLinksReponse
+#
+sub search_spreadsheet_broken_links{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('BrokenLinksReponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchBrokenLinksInRemoteSpreadsheetRequest
+#
+# Search broken links in the remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be search.  
+# @worksheet  string   Specify the worksheet for the lookup.  
+# @cellArea  string   Specify the cell area for the lookup  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchBrokenLinksInRemoteSpreadsheetRequest',
+            description => 'SearchBrokenLinksInRemoteSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_broken_links_in_remote_spreadsheet' } = { 
+    	summary => 'Search broken links in the remoted spreadsheet.',
+        params => $params,
+        returns => 'BrokenLinksReponse',
+    };
+}
+#
+# @return BrokenLinksReponse
+#
+sub search_broken_links_in_remote_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('BrokenLinksReponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchBrokenLinksInRemoteWorksheetRequest
+#
+# Search broken links in the worksheet of remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be search.  
+# @worksheet  string (required)  Specify the worksheet for the lookup.  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchBrokenLinksInRemoteWorksheetRequest',
+            description => 'SearchBrokenLinksInRemoteWorksheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_broken_links_in_remote_worksheet' } = { 
+    	summary => 'Search broken links in the worksheet of remoted spreadsheet.',
+        params => $params,
+        returns => 'BrokenLinksReponse',
+    };
+}
+#
+# @return BrokenLinksReponse
+#
+sub search_broken_links_in_remote_worksheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('BrokenLinksReponse', $response);
+    return $_response_object;
+}
+
+#
+# SearchBrokenLinksInRemoteRangeRequest
+#
+# Search broken links in the range of remoted spreadsheet.
+# 
+# @name  string (required)  The name of the workbook file to be search.  
+# @worksheet  string (required)  Specify the worksheet for the lookup.  
+# @cellArea  string (required)  Specify the cell area for the lookup  
+# @folder  string   The folder path where the workbook is stored.  
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SearchBrokenLinksInRemoteRangeRequest',
+            description => 'SearchBrokenLinksInRemoteRange Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'search_broken_links_in_remote_range' } = { 
+    	summary => 'Search broken links in the range of remoted spreadsheet.',
+        params => $params,
+        returns => 'BrokenLinksReponse',
+    };
+}
+#
+# @return BrokenLinksReponse
+#
+sub search_broken_links_in_remote_range{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('BrokenLinksReponse', $response);
+    return $_response_object;
+}
+
+#
+# SpecRequest
+#
+# Get the specifications
+# 
+# @version  string (required)    
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SpecRequest',
+            description => 'Spec Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'spec' } = { 
+    	summary => 'Get the specifications',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub spec{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# CodegenSpecRequest
+#
+# 
+# 
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'CodegenSpecRequest',
+            description => 'CodegenSpec Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'codegen_spec' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub codegen_spec{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# DeleteSpreadsheetBlankRowsRequest
+#
+# Delete all blank rows which do not contain any data or other object.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteSpreadsheetBlankRowsRequest',
+            description => 'DeleteSpreadsheetBlankRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_spreadsheet_blank_rows' } = { 
+    	summary => 'Delete all blank rows which do not contain any data or other object.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub delete_spreadsheet_blank_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# DeleteSpreadsheetBlankColumnsRequest
+#
+# Delete all blank columns which do not contain any data.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteSpreadsheetBlankColumnsRequest',
+            description => 'DeleteSpreadsheetBlankColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_spreadsheet_blank_columns' } = { 
+    	summary => 'Delete all blank columns which do not contain any data.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub delete_spreadsheet_blank_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# DeleteSpreadsheetBlankWorksheetsRequest
+#
+# Delete all blank worksheets which do not contain any data or other object.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @regoin  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteSpreadsheetBlankWorksheetsRequest',
+            description => 'DeleteSpreadsheetBlankWorksheets Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_spreadsheet_blank_worksheets' } = { 
+    	summary => 'Delete all blank worksheets which do not contain any data or other object.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub delete_spreadsheet_blank_worksheets{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# DownloadFileRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DownloadFileRequest',
+            description => 'DownloadFile Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'download_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub download_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# UploadFileRequest
+#
+# 
+# 
+# @UploadFiles  string (required)  Upload files to cloud storage.  
+# @path  string (required)    
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'UploadFileRequest',
+            description => 'UploadFile Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'upload_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesUploadResult',
+    };
+}
+#
+# @return FilesUploadResult
+#
+sub upload_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesUploadResult', $response);
+    return $_response_object;
+}
+
+#
+# CopyFileRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'CopyFileRequest',
+            description => 'CopyFile Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'copy_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub copy_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# MoveFileRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'MoveFileRequest',
+            description => 'MoveFile Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'move_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub move_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# DeleteFileRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteFileRequest',
+            description => 'DeleteFile Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_file' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub delete_file{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# GetFilesListRequest
+#
+# 
+# 
+# @path  string     
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetFilesListRequest',
+            description => 'GetFilesList Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_files_list' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesList',
+    };
+}
+#
+# @return FilesList
+#
+sub get_files_list{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesList', $response);
+    return $_response_object;
+}
+
+#
+# CreateFolderRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'CreateFolderRequest',
+            description => 'CreateFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'create_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub create_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# CopyFolderRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'CopyFolderRequest',
+            description => 'CopyFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'copy_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub copy_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# MoveFolderRequest
+#
+# 
+# 
+# @srcPath  string (required)    
+# @destPath  string (required)    
+# @srcStorageName  string     
+# @destStorageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'MoveFolderRequest',
+            description => 'MoveFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'move_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub move_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# DeleteFolderRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @recursive  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'DeleteFolderRequest',
+            description => 'DeleteFolder Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'delete_folder' } = { 
+    	summary => '',
+        params => $params,
+        returns => '',
+    };
+}
+#
+# @return 
+#
+sub delete_folder{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('', $response);
+    return $_response_object;
+}
+
+#
+# StorageExistsRequest
+#
+# 
+# 
+# @storageName  string (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'StorageExistsRequest',
+            description => 'StorageExists Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'storage_exists' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'StorageExist',
+    };
+}
+#
+# @return StorageExist
+#
+sub storage_exists{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('StorageExist', $response);
+    return $_response_object;
+}
+
+#
+# ObjectExistsRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string     
+# @versionId  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ObjectExistsRequest',
+            description => 'ObjectExists Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'object_exists' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'ObjectExist',
+    };
+}
+#
+# @return ObjectExist
+#
+sub object_exists{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ObjectExist', $response);
+    return $_response_object;
+}
+
+#
+# GetDiscUsageRequest
+#
+# 
+# 
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetDiscUsageRequest',
+            description => 'GetDiscUsage Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_disc_usage' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'DiscUsage',
+    };
+}
+#
+# @return DiscUsage
+#
+sub get_disc_usage{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('DiscUsage', $response);
+    return $_response_object;
+}
+
+#
+# GetFileVersionsRequest
+#
+# 
+# 
+# @path  string (required)    
+# @storageName  string      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'GetFileVersionsRequest',
+            description => 'GetFileVersions Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'get_file_versions' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileVersions',
+    };
+}
+#
+# @return FileVersions
+#
+sub get_file_versions{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileVersions', $response);
+    return $_response_object;
+}
+
+#
 # PostAnalyzeExcelRequest
 #
 # Perform business analysis of data in Excel files.
@@ -890,41 +2709,6 @@ sub post_batch_unlock{
 # @return string
 #
 sub post_batch_split{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('string', $response);
-    return $_response_object;
-}
-
-#
-# PostAccessTokenRequest
-#
-# Get Access Token Result
-# 
- 
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'PostAccessTokenRequest',
-            description => 'PostAccessToken Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'post_access_token' } = { 
-    	summary => 'Get Access Token Result',
-        params => $params,
-        returns => 'string',
-    };
-}
-#
-# @return string
-#
-sub post_access_token{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -4083,6 +5867,8 @@ sub delete_worksheet_conditional_formatting_area{
 # @region  string   The regional settings for workbook.  
 # @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
 # @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.  
+# @onePagePerSheet  boolean   When converting to PDF format, one page per sheet.  
+# @onlyAutofitTable  boolean     
 # @FontsLocation  string   Use Custom fonts.   
 #
 {
@@ -4128,8 +5914,11 @@ sub get_workbook{
 # @region  string   The regional settings for workbook.  
 # @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
 # @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.  
-# @sheetName  string     
-# @pageIndex  int     
+# @sheetName  string   Convert the specified worksheet.   
+# @pageIndex  int   Convert the specified page  of worksheet, sheetName is required.   
+# @onePagePerSheet  boolean   When converting to PDF format, one page per sheet.   
+# @AutoRowsFit  boolean   Auto-fits all rows in this workbook.  
+# @AutoColumnsFit  boolean   Auto-fits the columns width in this workbook.  
 # @FontsLocation  string   Use Custom fonts.   
 #
 {
@@ -4177,6 +5966,7 @@ sub put_convert_workbook{
 # @region  string   The regional settings for workbook.  
 # @pageWideFitOnPerSheet  boolean   The page wide fit on worksheet.  
 # @pageTallFitOnPerSheet  boolean   The page tall fit on worksheet.  
+# @onePagePerSheet  boolean     
 # @FontsLocation  string   Use Custom fonts.   
 #
 {
@@ -11402,7 +13192,9 @@ sub post_workbook_calculate_formula{
 # @endRow  int   End row.  
 # @onlyAuto  boolean   Only auto.  
 # @folder  string   The folder where the file is situated.  
-# @storageName  string   The storage name where the file is situated.   
+# @storageName  string   The storage name where the file is situated.  
+# @firstColumn  int   First column index.  
+# @lastColumn  int   Last column index.   
 #
 {
     my $params = {
@@ -12722,10 +14514,11 @@ sub post_worksheet_range_sort{
 # @name  string (required)  The file name.  
 # @sheetName  string (required)  The worksheet name.  
 # @rowIndex  int (required)  The row index.  
-# @firstColumn  int (required)  The first column index.  
-# @lastColumn  int (required)  The last column index.  
+# @firstColumn  int   The first column index.  
+# @lastColumn  int   The last column index.  
 # @folder  string   The folder where the file is situated.  
-# @storageName  string   The storage name where the file is situated.   
+# @storageName  string   The storage name where the file is situated.  
+# @rowCount  int      
 #
 {
     my $params = {
@@ -13502,522 +15295,5 @@ sub delete_worksheet_validations{
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
-    return $_response_object;
-}
-
-#
-# DownloadFileRequest
-#
-# 
-# 
-# @path  string (required)    
-# @storageName  string     
-# @versionId  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'DownloadFileRequest',
-            description => 'DownloadFile Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'download_file' } = { 
-    	summary => '',
-        params => $params,
-        returns => 'string',
-    };
-}
-#
-# @return string
-#
-sub download_file{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('string', $response);
-    return $_response_object;
-}
-
-#
-# UploadFileRequest
-#
-# 
-# 
-# @UploadFiles  string (required)  Upload files to cloud storage.  
-# @path  string (required)    
-# @storageName  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'UploadFileRequest',
-            description => 'UploadFile Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'upload_file' } = { 
-    	summary => '',
-        params => $params,
-        returns => 'FilesUploadResult',
-    };
-}
-#
-# @return FilesUploadResult
-#
-sub upload_file{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('FilesUploadResult', $response);
-    return $_response_object;
-}
-
-#
-# CopyFileRequest
-#
-# 
-# 
-# @srcPath  string (required)    
-# @destPath  string (required)    
-# @srcStorageName  string     
-# @destStorageName  string     
-# @versionId  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'CopyFileRequest',
-            description => 'CopyFile Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'copy_file' } = { 
-    	summary => '',
-        params => $params,
-        returns => '',
-    };
-}
-#
-# @return 
-#
-sub copy_file{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('', $response);
-    return $_response_object;
-}
-
-#
-# MoveFileRequest
-#
-# 
-# 
-# @srcPath  string (required)    
-# @destPath  string (required)    
-# @srcStorageName  string     
-# @destStorageName  string     
-# @versionId  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'MoveFileRequest',
-            description => 'MoveFile Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'move_file' } = { 
-    	summary => '',
-        params => $params,
-        returns => '',
-    };
-}
-#
-# @return 
-#
-sub move_file{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('', $response);
-    return $_response_object;
-}
-
-#
-# DeleteFileRequest
-#
-# 
-# 
-# @path  string (required)    
-# @storageName  string     
-# @versionId  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'DeleteFileRequest',
-            description => 'DeleteFile Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'delete_file' } = { 
-    	summary => '',
-        params => $params,
-        returns => '',
-    };
-}
-#
-# @return 
-#
-sub delete_file{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('', $response);
-    return $_response_object;
-}
-
-#
-# GetFilesListRequest
-#
-# 
-# 
-# @path  string     
-# @storageName  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'GetFilesListRequest',
-            description => 'GetFilesList Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'get_files_list' } = { 
-    	summary => '',
-        params => $params,
-        returns => 'FilesList',
-    };
-}
-#
-# @return FilesList
-#
-sub get_files_list{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('FilesList', $response);
-    return $_response_object;
-}
-
-#
-# CreateFolderRequest
-#
-# 
-# 
-# @path  string (required)    
-# @storageName  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'CreateFolderRequest',
-            description => 'CreateFolder Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'create_folder' } = { 
-    	summary => '',
-        params => $params,
-        returns => '',
-    };
-}
-#
-# @return 
-#
-sub create_folder{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('', $response);
-    return $_response_object;
-}
-
-#
-# CopyFolderRequest
-#
-# 
-# 
-# @srcPath  string (required)    
-# @destPath  string (required)    
-# @srcStorageName  string     
-# @destStorageName  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'CopyFolderRequest',
-            description => 'CopyFolder Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'copy_folder' } = { 
-    	summary => '',
-        params => $params,
-        returns => '',
-    };
-}
-#
-# @return 
-#
-sub copy_folder{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('', $response);
-    return $_response_object;
-}
-
-#
-# MoveFolderRequest
-#
-# 
-# 
-# @srcPath  string (required)    
-# @destPath  string (required)    
-# @srcStorageName  string     
-# @destStorageName  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'MoveFolderRequest',
-            description => 'MoveFolder Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'move_folder' } = { 
-    	summary => '',
-        params => $params,
-        returns => '',
-    };
-}
-#
-# @return 
-#
-sub move_folder{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('', $response);
-    return $_response_object;
-}
-
-#
-# DeleteFolderRequest
-#
-# 
-# 
-# @path  string (required)    
-# @storageName  string     
-# @recursive  boolean      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'DeleteFolderRequest',
-            description => 'DeleteFolder Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'delete_folder' } = { 
-    	summary => '',
-        params => $params,
-        returns => '',
-    };
-}
-#
-# @return 
-#
-sub delete_folder{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('', $response);
-    return $_response_object;
-}
-
-#
-# StorageExistsRequest
-#
-# 
-# 
-# @storageName  string (required)     
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'StorageExistsRequest',
-            description => 'StorageExists Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'storage_exists' } = { 
-    	summary => '',
-        params => $params,
-        returns => 'StorageExist',
-    };
-}
-#
-# @return StorageExist
-#
-sub storage_exists{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('StorageExist', $response);
-    return $_response_object;
-}
-
-#
-# ObjectExistsRequest
-#
-# 
-# 
-# @path  string (required)    
-# @storageName  string     
-# @versionId  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'ObjectExistsRequest',
-            description => 'ObjectExists Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'object_exists' } = { 
-    	summary => '',
-        params => $params,
-        returns => 'ObjectExist',
-    };
-}
-#
-# @return ObjectExist
-#
-sub object_exists{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('ObjectExist', $response);
-    return $_response_object;
-}
-
-#
-# GetDiscUsageRequest
-#
-# 
-# 
-# @storageName  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'GetDiscUsageRequest',
-            description => 'GetDiscUsage Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'get_disc_usage' } = { 
-    	summary => '',
-        params => $params,
-        returns => 'DiscUsage',
-    };
-}
-#
-# @return DiscUsage
-#
-sub get_disc_usage{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('DiscUsage', $response);
-    return $_response_object;
-}
-
-#
-# GetFileVersionsRequest
-#
-# 
-# 
-# @path  string (required)    
-# @storageName  string      
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'GetFileVersionsRequest',
-            description => 'GetFileVersions Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'get_file_versions' } = { 
-    	summary => '',
-        params => $params,
-        returns => 'FileVersions',
-    };
-}
-#
-# @return FileVersions
-#
-sub get_file_versions{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('FileVersions', $response);
     return $_response_object;
 }

@@ -35,6 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use File::Basename;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -65,7 +66,8 @@ sub new {
 # PostAutofitWorksheetRowRequest.firstColumn : The first column index.  ,
 # PostAutofitWorksheetRowRequest.lastColumn : The last column index.  ,
 # PostAutofitWorksheetRowRequest.folder : The folder where the file is situated.  ,
-# PostAutofitWorksheetRowRequest.storageName : The storage name where the file is situated.   
+# PostAutofitWorksheetRowRequest.storageName : The storage name where the file is situated.  ,
+# PostAutofitWorksheetRowRequest.rowCount :    
 
 {
     my $params = {
@@ -88,7 +90,7 @@ sub run_http_request {
     my $client = $args{'client'};
 
     # parse inputs
-    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autofitrow';
+    my $_resource_path = 'v3.0/cells/{name}/worksheets/{sheetName}/autofitrow';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -130,8 +132,15 @@ sub run_http_request {
 
     if(defined $self->storage_name){
         $query_params->{'storageName'} = $client->to_query_value($self->storage_name);      
+    }
+
+    if(defined $self->row_count){
+        $query_params->{'rowCount'} = $client->to_query_value($self->row_count);      
     } 
     my $_body_data;
+
+ 
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -190,6 +199,13 @@ __PACKAGE__->method_documentation({
      	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
+     		},
+     'row_count' => {
+     	datatype => 'int',
+     	base_name => 'rowCount',
+     	description => '',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -201,7 +217,8 @@ __PACKAGE__->attribute_map( {
     'first_column' => 'firstColumn',
     'last_column' => 'lastColumn',
     'folder' => 'folder',
-    'storage_name' => 'storageName' 
+    'storage_name' => 'storageName',
+    'row_count' => 'rowCount' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

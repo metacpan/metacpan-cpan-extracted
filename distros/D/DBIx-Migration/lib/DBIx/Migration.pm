@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use feature qw( state );
 
@@ -127,6 +127,8 @@ sub migrate {
   Dir->assert_valid( $self->dir );
 
   $target = $self->latest unless defined $target;
+
+  $Logger->debugf( "Will use DBI DSN '%s'", $self->dsn );
 
   my $fatal_error;
   my $return_value = try {

@@ -1,13 +1,13 @@
-# Copyrights 2024 by [Mark Overmeer].
+# Copyrights 2024-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
 # SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@overmeer.net>
 # SPDX-License-Identifier: Artistic-2.0
 
-package Couch::DB::Mojolicious;
-use vars '$VERSION';
-$VERSION = '0.006';
+package Couch::DB::Mojolicious;{
+our $VERSION = '0.200';
+}
 
 use parent 'Couch::DB';
 use feature 'state';
@@ -61,7 +61,7 @@ sub _callClient($$%)
 	my $query   = delete $args{query};
 	my $send    = delete $args{send};
 
-	my $ua  = $client->userAgent;
+	my $ua      = $client->userAgent;
 	my %headers = ( %{$client->headers}, %{delete $args{headers}} );
 #warn "HEADERS = ", join ';', %headers;
 
@@ -89,7 +89,7 @@ sub _callClient($$%)
 	});
 
 	if($delay)
-	{	$result->setResultDelay({ client => $client });
+	{	$result->setResultDelayed({ client => $client });
 	}
 	else
 	{	$plan->wait;

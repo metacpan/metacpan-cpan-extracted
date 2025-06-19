@@ -4,13 +4,13 @@
       "David Precious <davidp@preshweb.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Censor",
    "no_index" : {
@@ -32,10 +32,21 @@
       },
       "runtime" : {
          "requires" : {
+            "Ref::Util" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bigpresh/Data-Censor/issues"
+      },
+      "homepage" : "https://github.com/bigpresh/Data-Censor",
+      "repository" : {
+         "url" : "https://github.com/bigpresh/Data-Censor"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

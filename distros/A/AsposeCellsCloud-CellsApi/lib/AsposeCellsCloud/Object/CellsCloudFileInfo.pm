@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Cells Cloud File information description.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'CellsCloudFileInfo',
                                   required => [], # TODO
 }                                 );
@@ -128,28 +128,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => 'The file name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'size' => {
      	datatype => 'int',
      	base_name => 'Size',
-     	description => 'The file size.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'Folder',
-     	description => 'The file position.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'storage' => {
      	datatype => 'string',
      	base_name => 'Storage',
-     	description => 'The storage name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    

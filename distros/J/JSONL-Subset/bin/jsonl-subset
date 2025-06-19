@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use JSONL::Subset qw(subset_jsonl);
+
+my ($infile, $outfile, $percent, $lines, $mode, $seed, $streaming);
+
+GetOptions(
+    "in=s"     => \$infile,
+    "out=s"    => \$outfile,
+    "percent=i"=> \$percent,
+    "lines=i"  => \$lines,
+    "mode=s"   => \$mode,
+    "seed=i"   => \$seed,
+    "streaming" => \$streaming,
+) or die "Usage: $0 --in FILE --out FILE [--percent INT] [--lines INT] [--mode random|start|end] [--seed INT] [--streaming]\n";
+
+subset_jsonl(
+    infile  => $infile,
+    outfile => $outfile,
+    percent => $percent,
+    lines   => $lines,
+    mode    => $mode,
+    seed    => $seed,
+    streaming => $streaming,
+);

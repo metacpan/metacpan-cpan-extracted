@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Represents save result.',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'SaveResult',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'documents' => {
      	datatype => 'ARRAY[CellsCloudFileInfo]',
      	base_name => 'Documents',
-     	description => 'Represents cells cloud file infomation.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},    
