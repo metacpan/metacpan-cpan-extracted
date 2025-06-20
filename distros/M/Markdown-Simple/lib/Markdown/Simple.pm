@@ -3,7 +3,7 @@ package Markdown::Simple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use parent qw(Exporter);
 
 require XSLoader;
@@ -21,7 +21,7 @@ Markdown::Simple - Markdown to HTML
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -62,6 +62,8 @@ Converts the given Markdown text to HTML. The second argument is an optional has
 The available options are:
 
 =over 12
+
+=item * preprocess - Enable or disable preprocessing (default: enabled). Replaces \r\n with \n
 
 =item * headers - Enable or disable header parsing (default: enabled)
 

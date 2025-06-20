@@ -86,6 +86,7 @@ my @files = (
     't/lib/MyTest/Tests/May/Iter.pm',
     't/lib/MyTest/Utils.pm',
     't/multi_stage.t',
+    't/regressions/#icat.t#',
     't/regressions/next-active.t'
 );
 

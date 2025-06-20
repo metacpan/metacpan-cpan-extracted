@@ -3,6 +3,7 @@
 #include "XSUB.h"
 
 typedef struct {
+	int enable_preprocess;
 	int enable_headers;
 	int enable_bold;
 	int enable_italic;
@@ -20,6 +21,23 @@ typedef struct {
 static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
 	SV* out = newSVpv("", 0);
 	const char* p = input;
+
+	/* Preprocess: replace \r\n with \n in input */
+	if (opts->enable_preprocess) {
+		SV* pre = newSVpv("", 0);
+		const char* q = input;
+		while (*q) {
+			if (*q == '\r' && *(q+1) == '\n') {
+				sv_catpv(pre, "\n");
+				q += 2;
+			} else {
+				sv_catpvf(pre, "%c", *q);
+				q++;
+			}
+		}
+		input = SvPV_nolen(pre);
+		p = input;
+	}
 
 	while (*p) {
 		// Fenced code block
@@ -283,7 +301,7 @@ SV*
 markdown_to_html(input, ...)
 	const char* input
 PREINIT:
-	MarkdownOptions opts = {1,1,1,1,1,1,1,1,1,1,1,1};
+	MarkdownOptions opts = {1, 1,1,1,1,1,1,1,1,1,1,1,1};
 	HV* options;
 	SV** val;
 CODE:
@@ -301,6 +319,7 @@ CODE:
 		if (val = hv_fetch(options, "strikethrough", 13, 0)) opts.enable_strikethrough = SvTRUE(*val);
 		if (val = hv_fetch(options, "ordered_lists", 13, 0)) opts.enable_ordered_lists = SvTRUE(*val);
 		if (val = hv_fetch(options, "unordered_lists", 15, 0)) opts.enable_unordered_lists = SvTRUE(*val);
+		if (val = hv_fetch(options, "preprocess", 10, 0)) opts.enable_preprocess = SvTRUE(*val);
 	}
 	RETVAL = markdown_to_html(input, &opts);
 OUTPUT:

@@ -8,7 +8,7 @@ use warnings;
 
 use experimental ( 'postderef', 'signatures' );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Exporter 'import';
 
@@ -474,7 +474,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -631,7 +631,7 @@ The returned iterator supports the following methods:
 
 =head2 icat
 
-  $iterator = icat( \@iterables, ?\%pars );
+  $iterator = icat( @iterables, ?\%pars );
 
 Concatenate the iterables.  As each iterator is exhausted, the next
 one is queried for its values.  See L<Iterator::Flex::Cat> for more

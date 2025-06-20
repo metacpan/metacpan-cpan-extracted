@@ -11,7 +11,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw(  );
+my %skip = map { $_ => 1 } qw( Specio::PP Specio::XS );
 
 my @modules;
 for my $module ( all_modules() ) {

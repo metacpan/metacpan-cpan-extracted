@@ -4,7 +4,11 @@ Thank you for your interest in contributing!
 
 ## Reporting Issues
 
-Please open a [GitHub Issue](https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny/issues) if you encounter a bug or have a suggestion.
+Please open a
+[CPAN request](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Table-Read-RelationOn-Tiny)
+or a
+[GitHub Issue](https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny/issues)
+if you encounter a bug or have a suggestion.
 Include the following if possible:
 
 - A clear description of the issue

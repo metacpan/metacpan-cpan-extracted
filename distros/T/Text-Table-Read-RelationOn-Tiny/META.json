@@ -54,7 +54,7 @@
    "provides" : {
       "Text::Table::Read::RelationOn::Tiny" : {
          "file" : "lib/Text/Table/Read/RelationOn/Tiny.pm",
-         "version" : "v3.0.0"
+         "version" : "v3.0.3"
       }
    },
    "release_status" : "stable",
@@ -68,6 +68,6 @@
          "web" : "https://github.com/AAHAZRED/perl-Text-Table-Read-RelationOn-Tiny"
       }
    },
-   "version" : "v3.0.0",
+   "version" : "v3.0.3",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

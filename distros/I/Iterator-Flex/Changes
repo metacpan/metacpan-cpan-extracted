@@ -1,5 +1,11 @@
 Revision history for Iterator-Flex
 
+0.19      2025-06-19 12:19:18-04:00 America/New_York
+
+  [DOCUMENTATION]
+
+    * icat takes a list of iterables, not an arrayref
+
 0.18      2023-11-03 19:44:53-04:00 America/New_York
 
     * add Stack and istack to iterate and manipulate a stack of iterators

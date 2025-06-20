@@ -5,7 +5,7 @@ package Iterator::Flex::Role::State::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Iterator::Flex::Utils qw( :default ITERATOR STATE :IterStates );
 
@@ -67,7 +67,7 @@ Iterator::Flex::Role::State::Closure - Iterator State is kept in a closure varia
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 METHODS
 

@@ -9,7 +9,7 @@ use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v3.0.0");
+use version 0.77; our $VERSION = version->declare("v3.0.3");
 
 
 sub new {
@@ -501,7 +501,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v3.0.0
+Version v3.0.3
 
 
 =head1 SYNOPSIS
@@ -517,7 +517,7 @@ Version v3.0.0
 This module implements a class that reads a binary I<relation on a set>
 (I<homogeneous relation>, see
 L<https://en.wikipedia.org/wiki/Binary_relation#Homogeneous_relation>) from a
-text table, which could be described as a "two-valued cross table" (in german
+text table, which could be described as a "two-valued cross table" (in German
 "Kreuzchentabelle").
 
 The table format must look like this:

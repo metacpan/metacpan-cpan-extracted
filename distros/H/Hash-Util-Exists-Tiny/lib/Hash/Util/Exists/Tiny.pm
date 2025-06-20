@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 
 use Exporter 'import';
 
-our $VERSION = '0.07';
+our $VERSION = '1.02';
 
 
 our @EXPORT_OK   = qw(exists_one_of  list_exists  num_exists
@@ -16,38 +16,32 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 
 sub exists_one_of {
-  my $href = shift;
-  return !!grep(exists($href->{$_}), @_);
+  return !!grep(exists($_[0]->{$_}), @_);
 }
 
 
 sub list_exists {
-  my $href = shift;
-  return grep(exists($href->{$_}), @_);
+  return grep(exists($_[0]->{$_}), @_);
 }
 
 
 sub num_exists {
-  my $href = shift;
-  return scalar grep(exists($href->{$_}), @_);
+  return scalar grep(exists($_[0]->{$_}), @_);
 }
 
 
 sub defined_one_of {
-  my $href = shift;
-  return !!grep(defined($href->{$_}), @_);
+  return !!grep(defined($_[0]->{$_}), @_);
 }
 
 
 sub list_defined {
-  my $href = shift;
-  return grep(defined($href->{$_}), @_);
+  return grep(defined($_[0]->{$_}), @_);
 }
 
 
 sub num_defined {
-  my $href = shift;
-  return scalar grep(defined($href->{$_}), @_);
+  return scalar grep(defined($_[0]->{$_}), @_);
 }
 
 
@@ -64,7 +58,7 @@ Hash::Util::Exists::Tiny - Some hash helper functions related to perl's "exists"
 
 =head1 VERSION
 
-Version 0.07
+Version 1.02
 
 
 =head1 SYNOPSIS
@@ -87,6 +81,8 @@ This module provides some funtions for hashes, related to perl's
 C<exists> function. All functions are exported on demand, you can use tag
 C<:all> to export all functions at once.
 
+The functions do not perform parameter checks.
+
 
 =head2 FUNCTIONS
 
@@ -94,7 +90,7 @@ C<:all> to export all functions at once.
 
 =item C<exists_one_of HASH_REF [, LIST]>
 
-Returns true if one of the elements in C<LIST> is a key in C<HASH_REF>,
+Returns I<true> if one of the elements in C<LIST> is a key in C<HASH_REF>,
 otherwise false. Example:
 
    my $flag = exists_one_of($href, qw(foo bar baz));

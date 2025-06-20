@@ -2,7 +2,19 @@ use strict;
 use warnings;
 
 use FindBin qw( $Bin );
-use lib "$Bin/lib";
+
+my $lib_path;
+
+BEGIN {
+    if ( $Bin =~ /xt/ ) {
+        $lib_path = "$Bin/../../t";
+    }
+    else {
+        $lib_path = "$Bin";
+    }
+}
+
+use lib "$lib_path/lib";
 
 use Test::Fatal;
 use Test::More 0.96;

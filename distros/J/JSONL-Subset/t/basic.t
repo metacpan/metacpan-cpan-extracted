@@ -2,10 +2,11 @@ use strict;
 use warnings;
 
 use File::Temp qw(tempfile);
-use Test::More tests => 25;
+use Test::More tests => 29;
 use JSONL::Subset qw(subset_jsonl);
 
 my $FIXTURE = "t/fixtures/sample.jsonl";
+my $WINDOWS_FIXTURE = "t/fixtures/windows.jsonl";
 
 ok(defined &subset_jsonl, 'subset_jsonl is defined');
 
@@ -96,7 +97,7 @@ open my $rs, "<", $filename_out_rs or die $!;
 my @rand_out_s = <$rs>;
 close $rs;
 is(scalar(@rand_out_s), 3, "random (streaming): got exactly 3 lines");
-is_deeply(\@rand_out_s, ["{ \"id\": 6 }\n", "{ \"id\": 7 }\n", "{ \"id\": 9 }\n"], "random (streaming): got the right lines");
+is_deeply(\@rand_out_s, ["{ \"id\": 4 }\n", "{ \"id\": 7 }\n", "{ \"id\": 10 }\n"], "random (streaming): got the right lines");
 
 # Start mode (lines)
 my ($fh_out_sl, $filename_out_sl) = tempfile();
@@ -185,4 +186,36 @@ open my $rs_l, "<", $filename_out_rs_l or die $!;
 my @rand_out_sl = <$rs_l>;
 close $rs_l;
 is(scalar(@rand_out_sl), 3, "random (streaming & lines): got exactly 3 lines");
-is_deeply(\@rand_out_sl, ["{ \"id\": 6 }\n", "{ \"id\": 7 }\n", "{ \"id\": 9 }\n"], "random (streaming & lines): got the right lines");
+is_deeply(\@rand_out_sl, ["{ \"id\": 4 }\n", "{ \"id\": 7 }\n", "{ \"id\": 10 }\n"], "random (streaming & lines): got the right lines");
+
+# Random mode (Windows line endings)
+my ($fh_out_r_win, $filename_out_r_win) = tempfile();
+subset_jsonl(
+	infile => $WINDOWS_FIXTURE,
+	outfile => $filename_out_r_win,
+	percent => 30,
+	mode => "random",
+	seed => 1337
+);
+open my $r_win, "<", $filename_out_r_win or die $!;
+my @rand_out_win = <$r_win>;
+close $r_win;
+is(scalar(@rand_out_win), 3, "random: got exactly 3 lines");
+is_deeply(\@rand_out_win, ["{ \"id\": 9 }\r\n", "{ \"id\": 6 }\r\n", "{ \"id\": 7 }\r\n"], "random: got the right lines");
+
+# Random mode (streaming, Windows line endings)
+my ($fh_out_rs_win, $filename_out_rs_win) = tempfile();
+subset_jsonl(
+	infile => $WINDOWS_FIXTURE,
+	outfile => $filename_out_rs_win,
+	percent => 30,
+	mode => "random",
+	seed => 1337,
+	streaming => 1
+);
+open my $rs_win, "<", $filename_out_rs_win or die $!;
+my @rand_out_s_win = <$rs_win>;
+close $rs_win;
+is(scalar(@rand_out_s_win), 3, "random (streaming): got exactly 3 lines");
+is_deeply(\@rand_out_s_win, ["{ \"id\": 4 }\r\n", "{ \"id\": 7 }\r\n", "{ \"id\": 10 }\r\n"], "random (streaming): got the right lines");
+

@@ -3,6 +3,23 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+use File::Spec::Functions;
+use autodie;
+
+my $PM_File = catfile(qw(lib Text Table Read RelationOn Tiny.pm));
+
+open(my $h, '<', $PM_File);
+my $Version;
+foreach my $line (<$h>) {
+  if ($line =~ /\bour\s+\$VERSION\s+.*?["'](v[^"']+)["']/) {
+    $Version = $1;
+    last;
+  }
+}
+close($h);
+die("VERSION not found in $PM_File") if !$Version;
+
+
 my %WriteMakefileArgs = (
     NAME             => 'Text::Table::Read::RelationOn::Tiny',
     AUTHOR           => q{Abdul al Hazred <451@gmx.eu>},
@@ -27,8 +44,8 @@ my %WriteMakefileArgs = (
             },
 
         },
-                   provides => { 'Text::Table::Read::RelationOn::Tiny' => {file => 'lib/Text/Table/Read/RelationOn/Tiny.pm',
-                                                                           version => "v3.0.0"
+                   provides => { 'Text::Table::Read::RelationOn::Tiny' => {file => $PM_File,
+                                                                           version => $Version
                                                                },
                     },
         no_index => {package => 'Text::Table::Read::RelationOn::Tiny::_Relation_Matrix'}

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory;
@@ -189,7 +189,7 @@ Iterator::Flex::Cat - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 METHODS
 

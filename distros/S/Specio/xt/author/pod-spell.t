@@ -60,6 +60,7 @@ ObjectCan
 ObjectDoes
 ObjectIsa
 PARAMETERIZABLE
+PP
 PackageName
 Parameterizable
 Parameterized
@@ -96,6 +97,7 @@ TypeChecks
 Union
 Vitaly
 White
+XS
 Yuval
 autarch
 boolification

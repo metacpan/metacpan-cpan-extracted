@@ -3,7 +3,7 @@
    "author" : [
       "Abdul al Hazred <451@gmx.eu>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -33,7 +33,9 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "1.9402",
-            "perl" : "5.010001"
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -42,7 +44,23 @@
          }
       }
    },
+   "provides" : {
+      "Hash::Util::Exists::Tiny" : {
+         "file" : "lib/Hash/Util/Exists/Tiny.pm",
+         "version" : "1.02"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.07",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/AAHAZRED/perl-Hash-Util-Exists-Tiny/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/AAHAZRED/perl-Hash-Util-Exists-Tiny",
+         "web" : "https://github.com/AAHAZRED/perl-Hash-Util-Exists-Tiny"
+      }
+   },
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

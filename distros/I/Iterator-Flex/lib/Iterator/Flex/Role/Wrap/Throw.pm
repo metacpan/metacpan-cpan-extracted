@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Wrap::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Iterator::Flex::Utils qw( :RegistryKeys INPUT_EXHAUSTION PASSTHROUGH );
 use Ref::Util             qw( is_ref is_blessed_ref is_regexpref is_arrayref is_coderef );
@@ -136,7 +136,7 @@ Iterator::Flex::Role::Wrap::Throw - Role to add throw on exhaustion to an iterat
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 INTERNALS
 

@@ -1,7 +1,14 @@
+0.51     2025-06-19
+
+- Made it possible to force Specio to only use pure Perl dependencies by setting the
+  SPECIO_IMPLEMENTATION environment variable to "PP". Requested by @arodland (Andrew Rodland). GH
+  #23.
+
+
 0.50     2025-02-18
 
 - Fixed a bug in the Int type that caused it to accept numbers like 124512.000000000123, which when
-  stringified, are stringified as integers.
+  stringified, are stringified as integers. Reported by @n1vux (Bill Ricker). GH #22.
 
 
 0.49     2024-12-23

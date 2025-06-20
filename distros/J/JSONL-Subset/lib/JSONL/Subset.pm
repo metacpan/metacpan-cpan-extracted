@@ -47,8 +47,8 @@ sub _subset_jsonl_inplace {
     my ($infile, $outfile, $percent, $lines, $mode, $seed) =
         @args{qw/infile outfile percent lines mode seed/};
 
-    my $in = IO::File->new($infile, "<:encoding(UTF-8)") or die "Can't read $infile: $!";
-    my @lines = grep { /\S/ } map { chomp; $_ } <$in>;
+    my $in = IO::File->new($infile, "<:raw") or die "Can't read $infile: $!";
+    my @lines = grep { /^\s*[\{\[]/ } map { $_ } <$in>;
 
     die "requested more lines ($lines) than infile contains (${scalar(@lines)})" if (defined $lines && $lines > scalar(@lines));
 
@@ -67,12 +67,10 @@ sub _subset_jsonl_inplace {
     my @subset = $mode eq 'end'  
                  ? @lines[-$count..-1]
                  : @lines[0..$count-1];
-    my $out = IO::File->new($outfile, ">:encoding(UTF-8)") or die $!;
+    my $out = IO::File->new($outfile, ">:raw") or die $!;
 
-    for my $el (@subset) {
-        chomp $el;
-
-        $out->print("$el\n");
+    for my $line (@subset) {
+        print $out $line;
     }
     $out->close;
 
@@ -88,7 +86,7 @@ sub _subset_jsonl_streaming {
     my $total = 0;
 
     while (my $line = <$in>) {
-        $total++ if $line =~ /\S/;
+        $total++ if $line =~ /^\s*[\{\[]/;;
     }
 
     close $in;
@@ -102,30 +100,33 @@ sub _subset_jsonl_streaming {
     } else {
         $count = $lines;
     }
-    my @all_indexes = (0..$total-1);
 
-    if ($mode eq 'random') {
-        srand($seed) if defined $seed;
-        @all_indexes = shuffle(@all_indexes);
-    }
-
-    my @picked = $mode eq 'end'  
-                 ? @all_indexes[-$count..-1]
-                 : @all_indexes[0..$count-1];
     my %picked = ();
-    for my $p (@picked) {
-        $picked{$p} = 1;
+
+    if ($mode eq 'start') {
+        %picked = map { $_ => 1 } 0 .. $count-1;
+    } elsif ($mode eq 'end') {
+        %picked = map { $_ => 1 } ($total-$count) .. ($total-1);
+    } else { # Random
+        srand($seed) if defined $seed;
+
+        for (my $i = 0; $i < $total; $i++) {
+            if (rand($total - $i) < $count) {
+                $picked{$i} = 1;
+                $count--;
+                last if $count == 0;
+            }
+        }
     }
 
-    open $in, "<:encoding(UTF-8)", $infile or die $!;
-    open my $out, ">:encoding(UTF-8)", $outfile or die $!;
+    open $in, "<:raw", $infile or die $!;
+    open my $out, ">:raw", $outfile or die $!;
     my $real = 0;
 
     while (my $line = <$in>) {
-        next unless $line =~ /\S/;
-        chomp $line;
+        next unless $line =~ /^\s*[\{\[]/;;
 
-        print $out "$line\n" if $picked{$real};
+        print $out $line if $picked{$real};
         $real++;
 
         if ($mode eq 'start' && $real >= $count) {

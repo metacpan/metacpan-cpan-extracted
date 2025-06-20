@@ -4,16 +4,17 @@ use strict;
 use warnings;
 
 use Carp            qw( confess );
-use Clone           ();
+use Clone::Choose   ();
 use List::Util 1.33 qw( all );
 use MRO::Compat;
 use Role::Tiny;
 use Scalar::Util        qw( weaken );
+use Specio              qw( _clone );
 use Specio::Helpers     qw( perlstring );
 use Specio::PartialDump qw( partial_dump );
 use Specio::TypeChecks;
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 use Exporter qw( import );
 
@@ -335,7 +336,7 @@ sub clone {
         $new->{$key}
             = !$ref               ? $value
             : $ref eq 'CODE'      ? $value
-            : $BuiltinTypes{$ref} ? Clone::clone($value)
+            : $BuiltinTypes{$ref} ? _clone($value)
             :                       $value->clone;
     }
 
@@ -365,7 +366,7 @@ Specio::OO - A painfully poor reimplementation of Moo(se)
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

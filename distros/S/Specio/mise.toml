@@ -1,0 +1,6 @@
+[tools]
+node = "22.11.0"
+"npm:prettier" = "3.5.3"
+taplo = "0.10.0"
+"ubi:houseabsolute/omegasort" = "0.1.3"
+"ubi:houseabsolute/precious" = "0.9.0"

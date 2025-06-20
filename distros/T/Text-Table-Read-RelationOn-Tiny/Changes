@@ -1,5 +1,17 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+v3.0.3     2025/06/19
+
+          - Replaced existing SECURITY.md with the one created by Software::Security::Policy.
+          - Corrected typo in POD.
+
+v3.0.2     2025/06/19
+
+           - Fixed problem with spell test.
+
+v3.0.1     2025/06/19
+
+           - Completed CONTRIBUTING.md.
 
 v3.0.0     2025/06/19
 

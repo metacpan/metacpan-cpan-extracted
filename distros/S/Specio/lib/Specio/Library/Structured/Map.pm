@@ -3,7 +3,7 @@ package Specio::Library::Structured::Map;
 use strict;
 use warnings;
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 use Carp qw( confess );
 use List::Util 1.33 ();
@@ -88,7 +88,7 @@ Specio::Library::Structured::Map - Guts of Map structured type
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 DESCRIPTION
 

@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Internals - How Things Work
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 
