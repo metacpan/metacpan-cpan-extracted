@@ -50,7 +50,7 @@ use Carp;
 
 );
 
-$VERSION = "0.25";
+$VERSION = "0.26";
 
 1;
 
@@ -1203,7 +1203,7 @@ sub cidrlookup {
 =head2 $ip=Net::CIDR::cidrvalidate($ip);
 
 Validate whether $ip is a valid IPv4 or IPv6 address, or a CIDR.
-Returns its argument or undef.
+Returns its validated argument or undef.
 Spaces are removed, and IPv6 hexadecimal address are converted to lowercase.
 
 $ip with less than four octets gets filled out with additional octets, and
@@ -1320,10 +1320,32 @@ sub cidrvalidate {
 
     $v =~ s/([0-9A-Fa-f]+)/_triml0($1)/ge;
 
-	my $compressed = _compress_ipv6($v);
-    foreach (addr2cidr($v))
+    my @compressed = _compress_ipv6($v);
+
+    unless ($compressed[0] =~ /::/)
     {
-	return $_ if $_ eq "$compressed/$suffix";
+	my @split = split(/:/, $compressed[0]);
+
+	foreach my $i (0..$#split)
+	{
+	    if ($split[$i] eq "0")
+	    {
+		my @cpy = @split;
+
+		$cpy[$i] = "";
+
+		push @compressed, join(":", @cpy);
+		last;
+	    }
+	}
+    }
+
+    foreach my $candidate (addr2cidr($v))
+    {
+	foreach my $c (@compressed)
+	{
+	    return $candidate if $candidate eq "$c/$suffix";
+	}
     }
     return undef;
 }

@@ -11,7 +11,7 @@ use DateTime::Format::ISO8601;
 use Travel::Status::MOTIS::Stop;
 use Travel::Status::MOTIS::Polyline qw(decode_polyline);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Travel::Status::MOTIS::Trip->mk_ro_accessors(
 	qw(

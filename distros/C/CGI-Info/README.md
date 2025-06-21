@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # SYNOPSIS
 
@@ -333,7 +333,7 @@ Advanced features:
 
 ## param
 
-Get a single parameter.
+Get a single parameter from the query string.
 Takes an optional single string parameter which is the argument to return. If
 that parameter is not given param() is a wrapper to params() with no arguments.
 
@@ -359,6 +359,8 @@ Returns undef if the requested parameter was not given
 Returns a boolean if the website is being viewed on a mobile
 device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
+
+Can be overriden by the IS\_MOBILE environment setting
 
 ## is\_tablet
 
@@ -451,6 +453,8 @@ Is the visitor a search engine?
     } else {
         # allow the user to pick and choose something to display
     }
+
+Can be overriden by the IS\_SEARCH\_ENGINE environment setting
 
 ## browser\_type
 
@@ -564,6 +568,10 @@ things to happen.
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
 
+# REPOSITORY
+
+[https://github.com/nigelhorne/CGI-Info](https://github.com/nigelhorne/CGI-Info)
+
 # SUPPORT
 
 This module is provided as-is without any warranty.
@@ -596,7 +604,7 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=CGI::Info](http://deps.cpantesters.org/?module=CGI::Info)
 
-# LICENSE AND COPYRIGHT
+# LICENCE AND COPYRIGHT
 
 Copyright 2010-2025 Nigel Horne.
 

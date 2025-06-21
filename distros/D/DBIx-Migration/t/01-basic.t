@@ -1,9 +1,11 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT like use_ok ) ], tests => 8;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like use_ok ) ], tests => 12;
 use Test::API import => [ qw( class_api_ok ) ];
 use Test::Fatal qw( exception );
+
+use Path::Tiny qw( cwd );
 
 my ( $class, $subclass );
 
@@ -37,3 +39,15 @@ use DBI::Const::GetInfoType qw( %GetInfoType );
 $dbh->{ mock_get_info } = { $GetInfoType{ SQL_DATA_SOURCE_NAME } => 'dbi:SQLite:' };
 like exception { $subclass->new( dbh => $dbh ) },
   qr/\Asubclass DBIx::Migration::Pg cannot handle SQLite driver/, 'subclass-driver inconsistency';
+
+my $m = $class->new( dbh => $dbh );
+$m->dir( cwd->child( qw( t sql match ) ) );
+is ref( my $files = $m->_files( 'up', [ 1 .. 1 ] ) ), 'ARRAY', 'migrations found';
+is_deeply [ map { $_->{ name }->basename } @$files ], [ qw( schema_1_up.sql ) ],
+  'single migration with proper name (not "schema_11_up.sql")';
+
+$m = $class->new( dbh => $dbh );
+$m->dir( cwd->child( qw( t sql match ) ) );
+is ref( $files = $m->_files( 'up', [ 1 .. 2 ] ) ), 'ARRAY', 'migrations found';
+is_deeply [ map { $_->{ name }->basename } @$files ], [ qw( schema_1_up.sql 2_up.sql ) ],
+  'two migrations: one with and one without "schema_" prefix';

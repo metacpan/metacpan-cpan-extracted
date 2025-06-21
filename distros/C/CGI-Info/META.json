@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -33,8 +33,6 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Class::Debug" : "0.02",
-            "Config::Abstraction" : "0.19",
             "Cwd" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "File::Basename" : "0",
@@ -45,6 +43,8 @@
             "List::Util" : "1.33",
             "Log::Abstraction" : "0.1",
             "Log::Any" : "0",
+            "Net::CIDR" : "0",
+            "Object::Configure" : "0.1",
             "Params::Get" : "0",
             "Params::Validate::Strict" : "0.02",
             "Scalar::Util" : "0",
@@ -96,6 +96,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

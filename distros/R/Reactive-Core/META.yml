@@ -23,7 +23,10 @@ requires:
   Moo: '0'
   Type::Tiny: '0'
   namespace::clean: '0'
-version: '0.100'
+resources:
+  bugtracker: https://github.com/ReactivePL/Core/issues
+  repository: https://github.com/ReactivePL/Core.git
+version: '0.103'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

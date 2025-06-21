@@ -55,11 +55,11 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'boolean' => 0,
 		'Carp' => 0,
-		'Class::Debug' => 0.02,
-		'Config::Abstraction' => 0.19,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'File::Spec' => 3.4,
 		'Log::Abstraction' => 0.10,
+		'Net::CIDR' => 0,
+		'Object::Configure' => 0.10,
 		'Params::Get' => 0,
 		'Params::Validate::Strict' => 0.02,
 		'Scalar::Util' => 0,
@@ -92,7 +92,8 @@ WriteMakefile(
 				repository => 'https://github.com/nigelhorne/CGI-Info',
 				type => 'git',
 				url => 'git://github.com/nigelhorne/CGI-Info.git',
-				web => 'https://github.com/nigelhorne/CGI-Info'
+				web => 'https://github.com/nigelhorne/CGI-Info',
+				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-CGI-Info@rt.cpan.org',
 				url => 'https://github.com/nigelhorne/CGI-Info/issues',

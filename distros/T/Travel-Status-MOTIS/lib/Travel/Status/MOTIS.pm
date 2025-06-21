@@ -23,7 +23,7 @@ use Travel::Status::MOTIS::Trip;
 use Travel::Status::MOTIS::Stopover;
 use Travel::Status::MOTIS::Stop;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # {{{ Endpoint Definition
 
@@ -59,7 +59,7 @@ sub new {
 		results        => [],
 		station        => $conf{station},
 		user_agent     => $user_agent,
-		time_zone      => 'local',
+		time_zone      => $conf{time_zone} // 'local',
 	};
 
 	bless( $self, $obj );
@@ -440,7 +440,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,7 @@
+Travel::Routing::DE::DBRIS 0.07 - Sat Jun 21 2025
+
+    * dbris: Add--colour={auto,always,never}
+
 Travel::Routing::DE::DBRIS 0.06 - Thu Feb 20 2025
 
     * Handle gzip-compressed bahn.de responses -- older versions of this

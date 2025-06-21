@@ -3,7 +3,7 @@ package Alien::liburing;
 use strict;
 use warnings;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use parent 'Alien::Base';
 

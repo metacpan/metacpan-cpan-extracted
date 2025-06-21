@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<opml version="1.0">
+	<head>
+		<title>Test feed list</title>
+	</head>
+	<body>
+		<outline title="Folder1" text="Folder1" type="folder">
+			<outline title="Feed1" text="Feed1" xmlUrl="https://phonysite.com/f1.xml" type="rss"/>
+			<outline title="Feed2" text="Feed2" xmlUrl="https://phonysite.com/f2.xml" type="rss"/>
+		</outline>
+		<outline title="Folder2" text="Folder2" type="folder">
+			<outline title="Feed3" text="Feed3" xmlUrl="https://phonysite.com/f3.xml" type="rss"/>
+			<outline title="Feed4" text="Feed4" xmlUrl="https://phonysite.com/f4.xml" type="rss"/>
+		</outline>
+	</body>
+</opml>

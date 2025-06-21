@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 37;
+use Test::Most tests => 39;
 use Test::NoWarnings;
 
 BEGIN {
@@ -48,6 +48,12 @@ MOBILE: {
 	$i = new_ok('CGI::Info');
 	ok($i->is_mobile() == 0);
 	ok($i->browser_type eq 'web');
+
+	{
+		local $ENV{'IS_MOBILE'} = 1;
+		$i = new_ok('CGI::Info');
+		ok($i->is_mobile() == 1);
+	}
 
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (iPad; CPU OS 5_1_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B206 Safari/7534.48.3';
 	$i = new_ok('CGI::Info');

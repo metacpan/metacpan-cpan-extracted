@@ -1,5 +1,9 @@
 Revision history for perl distribution DBIx-Migration
 
+0.30 Fri Jun 20 02:27:30 PM CEST 2025
+        - Fix migrations basename regular expression used in _files() object
+          method
+
 0.29 Thu Jun 19 10:37:41 AM CEST 2025
         - Log DBI DSN
         - Override dsn attribute in PostgreSQL driver specific subclass:

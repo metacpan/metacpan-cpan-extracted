@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>Test Atom Feed</title>
+	<updated>2025-06-15T18:07:01Z</updated>
+	<author>
+		<name>Samuel Young</name>
+		<email>samyoung12788 at gmail dot com</email>
+		<uri>https://1-1sam.codeberg.page/</uri>
+	</author>
+	<category term="test"/>
+	<category term="sample"/>
+	<category term="phony"/>
+	<generator>VIM 9.0</generator>
+	<logo>/logo.png</logo>
+	<rights>Copyright (C) 2025 Samuel Young (samyoung12788 at gmail dot com)</rights>
+	<subtitle>An Atom feed for testing purposes</subtitle>
+	<link rel="alternate" href="https://phonysite.com"/>
+	<entry>
+		<id>a1</id>
+		<title>Test post #1</title>
+		<published>2025-06-15T18:16:01Z</published>
+		<updated>2025-06-15T18:16:01Z</updated>
+		<author>
+			<name>Samuel Young</name>
+			<email>samyoung12788 at gmail dot com</email>
+			<uri>https://1-1sam.codeberg.page/</uri>
+		</author>
+		<content>Just a plain-text post.</content>
+		<link rel="alternate" href="https://phonysite.com/a1"/>
+		<category term="test"/>
+		<category term="sample"/>
+		<category term="phony"/>
+	</entry>
+	<entry>
+		<id>a2</id>
+		<title>Test post #2</title>
+		<published>2025-06-15T18:21:01Z</published>
+		<updated>2025-06-15T18:21:01Z</updated>
+		<author>
+			<name>Samuel Young</name>
+			<email>samyoung12788 at gmail dot com</email>
+			<uri>https://1-1sam.codeberg.page/</uri>
+		</author>
+		<content type="html">&lt;p&gt;Post with HTML content.&lt;/p&gt;</content>
+		<link rel="alternate" href="https://phonysite.com/a2"/>
+		<category term="test"/>
+		<category term="sample"/>
+		<category term="phony"/>
+	</entry>
+	<entry>
+		<id>a3</id>
+		<title>Test post #3</title>
+		<published>2025-06-15T19:49:01Z</published>
+		<updated>2025-06-15T19:49:01Z</updated>
+		<author>
+			<name>Samuel Young</name>
+			<email>samyoung12788 at gmail dot com</email>
+			<uri>https://1-1sam.codeberg.page/</uri>
+		</author>
+		<content type="xhtml">&lt;div&gt;&lt;p&gt;Post with XHTML content.&lt;/p&gt;&lt;/div&gt;</content>
+		<link href="https://phonysite.com/a3"/>
+		<category term="test"/>
+		<category term="sample"/>
+		<category term="phony"/>
+	</entry>
+	<entry>
+		<id>a4</id>
+		<title>Test post #4</title>
+		<published>2025-06-15T19:54:01Z</published>
+		<updated>2025-06-15T19:54:01Z</updated>
+		<author>
+			<name>Samuel Young</name>
+			<email>samyoung12788 at gmail dot com</email>
+			<uri>https://1-1sam.codeberg.page/</uri>
+		</author>
+		<content type="+xml">&lt;div&gt;&lt;p&gt;Post with XML content.&lt;/p&gt;&lt;/div&gt;</content>
+		<link href="https://phonysite.com/a4"/>
+		<category term="test"/>
+		<category term="sample"/>
+		<category term="phony"/>
+		<category term="bonus"/>
+	</entry>
+	<entry>
+		<id>a5</id>
+		<title>Test post #5</title>
+		<published>2025-06-15T19:55:01Z</published>
+		<updated>2025-06-15T19:55:01Z</updated>
+		<author>
+			<name>Samuel Young</name>
+			<email>samyoung12788 at gmail dot com</email>
+			<uri>https://1-1sam.codeberg.page/</uri>
+		</author>
+		<summary>Post with some more text content.</summary>
+		<link href="https://phonysite.com/a5"/>
+		<category term="test"/>
+		<category term="sample"/>
+		<category term="phony"/>
+		<category term="extra"/>
+	</entry>
+</feed>

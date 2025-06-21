@@ -18,16 +18,16 @@ name: Travel-Routing-DE-DBRIS
 provides:
   Travel::Routing::DE::DBRIS:
     file: lib/Travel/Routing/DE/DBRIS.pm
-    version: '0.06'
+    version: '0.07'
   Travel::Routing::DE::DBRIS::Connection:
     file: lib/Travel/Routing/DE/DBRIS/Connection.pm
-    version: '0.06'
+    version: '0.07'
   Travel::Routing::DE::DBRIS::Connection::Segment:
     file: lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm
-    version: '0.06'
+    version: '0.07'
   Travel::Routing::DE::DBRIS::Offer:
     file: lib/Travel/Routing/DE/DBRIS/Offer.pm
-    version: '0.06'
+    version: '0.07'
 recommends:
   Cache::File: '0'
 requires:
@@ -41,11 +41,11 @@ requires:
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   List::Util: '0'
-  Travel::Status::DE::DBRIS: '0.05'
-  Travel::Status::DE::DBRIS::Location: '0.05'
+  Travel::Status::DE::DBRIS: '0.08'
+  Travel::Status::DE::DBRIS::Location: '0.08'
   perl: v5.20.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Routing-DE-DBRIS
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

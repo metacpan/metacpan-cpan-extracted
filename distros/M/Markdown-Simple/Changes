@@ -3,6 +3,8 @@ Revision history for Markdown-Simple
 0.01    Date/time
         First version, released on an unsuspecting world.
 
-
 0.06 	2025-06-19
 	- Adds preprocessing by default which replaces \r\n with \n
+
+0.07 	2025-06-20
+	- prompt engineer utf8 support - it's a bit of a hack!

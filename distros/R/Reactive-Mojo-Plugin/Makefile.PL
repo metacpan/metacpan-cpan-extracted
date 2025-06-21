@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Reactive::Core" => 0,
     "Type::Tiny" => 0
   },
-  "VERSION" => "0.101",
+  "VERSION" => "0.103",
   "test" => {
     "TESTS" => "t/*.t"
   }

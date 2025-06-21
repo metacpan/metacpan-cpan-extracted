@@ -73,7 +73,7 @@
    "provides" : {
       "Alien::liburing" : {
          "file" : "lib/Alien/liburing.pm",
-         "version" : "0.100"
+         "version" : "0.101"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/simcop2387/Alien-liburing"
       }
    },
-   "version" : "0.100",
+   "version" : "0.101",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.33",
       "requires" : {

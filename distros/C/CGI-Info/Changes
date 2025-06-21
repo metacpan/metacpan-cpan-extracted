@@ -1,10 +1,16 @@
 Revision history for CGI-Info
 
+0.104	Fri Jun 20 07:41:53 EDT 2025
+	Bumped minimum version of Config::Abstraction - and hence removed MD5_CTX workaround code
+	Flag Alibaba as a search engine
+	Use Object::Configure instead of Class::Debug
+	Allow IS_SEARCH_ENGINE and IS_MOBILE to be set in the environment
+
 0.103	Fri May 16 17:48:32 EDT 2025
 	Mark Clickagy as a bot
 	Don't use notice() since Log::Log4perl doesn't understand it
 	Added the cache() method
-	Work around "(in cleanup) Failed to get MD5_CTX pointer" issue
+	Workaround "(in cleanup) Failed to get MD5_CTX pointer" issue
 	Enhanced allow parameter with subroutine support
 
 0.102	Thu May  8 21:39:31 EDT 2025

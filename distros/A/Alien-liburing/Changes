@@ -1,4 +1,8 @@
-0.100     2025-05-30 10:00:06 EDT
+0.101     2025-06-20 12:39:18 EDT
+
+0.101     2025-05-30 10:00:06 EDT
+  * Update to liburing 2.11 released on Jun 16 2025
+  * A bugfix release from liburing that fixes issues with musl, and a number of compilation failures
 
 0.100 2025-05-30 09:21:00 EST
   * Updated liburing from 0.8 PREVIEW to liburing 2.10

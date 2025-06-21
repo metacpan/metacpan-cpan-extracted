@@ -19,25 +19,25 @@ name: Travel-Status-MOTIS
 provides:
   Travel::Status::MOTIS:
     file: lib/Travel/Status/MOTIS.pm
-    version: '0.02'
+    version: '0.03'
   Travel::Status::MOTIS::Polyline:
     file: lib/Travel/Status/MOTIS/Polyline.pm
-    version: '0.02'
+    version: '0.03'
   Travel::Status::MOTIS::Services:
     file: lib/Travel/Status/MOTIS/Services.pm
-    version: '0.02'
+    version: '0.03'
   Travel::Status::MOTIS::Stop:
     file: lib/Travel/Status/MOTIS/Stop.pm
-    version: '0.02'
+    version: '0.03'
   Travel::Status::MOTIS::Stopover:
     file: lib/Travel/Status/MOTIS/Stopover.pm
-    version: '0.02'
+    version: '0.03'
   Travel::Status::MOTIS::Trip:
     file: lib/Travel/Status/MOTIS/Trip.pm
-    version: '0.02'
+    version: '0.03'
   Travel::Status::MOTIS::TripAtStopover:
     file: lib/Travel/Status/MOTIS/TripAtStopover.pm
-    version: '0.02'
+    version: '0.03'
 recommends:
   Cache::File: '0'
   GIS::Distance: '0'
@@ -56,5 +56,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-MOTIS
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

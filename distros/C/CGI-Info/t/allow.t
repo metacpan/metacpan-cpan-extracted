@@ -100,7 +100,7 @@ subtest 'Allowed Parameters Regex' => sub {
 	);
 
 	my @messages;
-	my $info = CGI::Info->new(allow => { allowed_param => qr/^\d{3}$/ }, logger => \@messages);
+	my $info = CGI::Info->new(allow => { allowed_param => qr/^\d{3}$/ }, logger => { array => \@messages, level => 'info' });
 	my $params = $info->params();
 
 	is_deeply(
@@ -200,7 +200,7 @@ subtest 'Allow Parameters Rules' => sub {
 	);
 
 	local $ENV{'QUERY_STRING'} = 'username=test_user&email=test@example.com&age=150&bio=a+test+bio&ip_address=192.168.1.';
-	$info = CGI::Info->new(logger => \@messages);
+	$info = CGI::Info->new(logger => { array => \@messages, level => 'info' });
 	$params = $info->params({ allow => $allowed });
 	is_deeply(
 		$params,

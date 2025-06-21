@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use utf8;
 use DateTime;
@@ -21,7 +21,8 @@ my ( $show_offers,    $show_upsell_offers, $show_cross_offers );
 my ( $first_class,    $passengers );
 my ( $developer_mode, $verbose );
 my ( $json_output,    $raw_json_output );
-my $use_cache = 1;
+my $use_cache  = 1;
+my $use_colour = 'auto';
 my $cache;
 
 my %known_mot = map { $_ => 1 }
@@ -32,20 +33,20 @@ for my $arg (@ARGV) {
 	$arg = decode( 'UTF-8', $arg );
 }
 
-my $output_bold  = -t STDOUT ? "\033[1m" : q{};
-my $output_reset = -t STDOUT ? "\033[0m" : q{};
+my $output_bold  = "\033[1m";
+my $output_reset = "\033[0m";
 
-my $output_fyi      = -t STDOUT ? "\033[40;36m" : q{};
-my $output_unknown  = -t STDOUT ? "\033[40;35m" : q{};
-my $output_good     = -t STDOUT ? "\033[40;32m" : q{};
-my $output_warning  = -t STDOUT ? "\033[40;33m" : q{};
-my $output_critical = -t STDOUT ? "\033[40;31m" : q{};
+my $output_fyi      = "\033[40;36m";
+my $output_unknown  = "\033[40;35m";
+my $output_good     = "\033[40;32m";
+my $output_warning  = "\033[40;33m";
+my $output_critical = "\033[40;31m";
 
-my $output_bold_fyi      = -t STDOUT ? "\033[1;40;36m" : q{};
-my $output_bold_unknown  = -t STDOUT ? "\033[1;40;35m" : q{};
-my $output_bold_good     = -t STDOUT ? "\033[1;40;32m" : q{};
-my $output_bold_warning  = -t STDOUT ? "\033[1;40;33m" : q{};
-my $output_bold_critical = -t STDOUT ? "\033[1;40;31m" : q{};
+my $output_bold_fyi      = "\033[1;40;36m";
+my $output_bold_unknown  = "\033[1;40;35m";
+my $output_bold_good     = "\033[1;40;32m";
+my $output_bold_warning  = "\033[1;40;33m";
+my $output_bold_critical = "\033[1;40;31m";
 
 GetOptions(
 	'a|arrive=s'           => sub { $arrival = 1; $time = $_[1] },
@@ -64,11 +65,24 @@ GetOptions(
 	'v|verbose'            => \$verbose,
 	'V|version'            => \&show_version,
 	'cache!'               => \$use_cache,
+	'color=s'              => \$use_colour,
+	'colour=s'             => \$use_colour,
 	'devmode'              => \$developer_mode,
 	'json'                 => \$json_output,
 	'raw-json'             => \$raw_json_output,
 
 ) or show_help(1);
+
+if ( $use_colour eq 'auto'
+	and ( not -t STDOUT or ( defined $ENV{TERM} and $ENV{TERM} eq 'dumb' ) )
+	or $use_colour eq 'never' )
+{
+	$output_bold = $output_reset   = q{};
+	$output_fyi  = $output_unknown = $output_good = $output_warning
+	  = $output_critical = q{};
+	$output_bold_fyi = $output_bold_unknown = $output_bold_good
+	  = $output_bold_warning = $output_bold_critical = q{};
+}
 
 if ($use_cache) {
 	my $cache_path = ( $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache" )
@@ -346,10 +360,12 @@ for my $connection ( $ris->connections ) {
 	  map { length( $_->dep_delay || q{} ), length( $_->arr_delay || q{} ) }
 	  $connection->segments;
 	if ($show_full_route) {
-		my $max_route_delay_digits = max map {
-			map { length( $_->arr_delay || q{} ) }
-			  $_->route
-		} $connection->segments;
+		my $max_route_delay_digits = (
+			max map {
+				map { length( $_->arr_delay || q{} ) }
+				  $_->route
+			} $connection->segments
+		) // 0;
 		if ( $max_route_delay_digits > $max_delay_digits ) {
 			$max_delay_digits = $max_route_delay_digits;
 		}
@@ -533,7 +549,7 @@ B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-a>|B<-t> I<HH:MM>] [...] I<from-stop>
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -550,6 +566,14 @@ connections, with an optional minimum stopover I<duration> given in minutes.
 
 Request connections that arrive on or after I<HH:MM>.
 Overrides B<--time>.
+
+=item B<--colour>, B<--color> B<always>|B<auto>|B<never>
+
+By default, B<dbris-m> uses ANSI escape codes for output formatting whenever
+the output is connected to a terminal and the TERM environment variable is not
+set to C<< dumb >>. B<--colour=always> causes it to always use output
+formatting regardless of terminal setup, and B<--colour=never> disables any
+formatting. B<--colour=auto> restores the default behaviour.
 
 =item B<-d>, B<--date> I<dd.mm.>[I<yyyy>]
 

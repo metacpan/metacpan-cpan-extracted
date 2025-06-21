@@ -31,7 +31,7 @@ no_index:
 provides:
   Alien::liburing:
     file: lib/Alien/liburing.pm
-    version: '0.100'
+    version: '0.101'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/simcop2387/Alien-liburing/issues
   repository: git://github.com/simcop2387/Alien-liburing.git
-version: '0.100'
+version: '0.101'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.33'
   requires:

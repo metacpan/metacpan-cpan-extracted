@@ -58,6 +58,8 @@ subtest 'cidrvalidate' => sub {
 			dead:beef:: dead:beef::/32 dead:beef::/120 1:1:000f:01:65:e:1111:eeee
 			fe80:0:120::/44
 			2001:4860:4860:0:0:0:0:8888 2001:4860:4860::8888
+			2001:4860:4860:1:0:1:1:8888
+			2001:4860:4860:0:1:0:1:8888
 			);
 		foreach my $addr (@addrs) {
 			ok Net::CIDR::cidrvalidate($addr), "$addr validates";

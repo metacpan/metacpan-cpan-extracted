@@ -1,0 +1,764 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use WWW::Noss;
+
+my $noss = WWW::Noss->init(@ARGV);
+$noss->run;
+
+=head1 NAME
+
+noss - RSS/Atom feed reader and aggregator
+
+=head1 USAGE
+
+  noss [global options] command [command options] [arguments] ...
+
+=head1 DESCRIPTION
+
+B<noss> is a command-line program for aggregating and reading RSS/Atom feeds.
+B<noss> can fetch feed updates, list posts, read posts from the
+command-line, open posts in a browser, and much more.
+
+B<noss> works by storing feed and post information in a local database, and the
+user interacts with the database by supplying commands to B<noss>.
+
+B<noss> requires a feed list in order for it to function. A feed list is
+supplied to B<noss> via a feeds file, a file that contains a list of feeds and
+any special configuration to use for those feeds. The format of this file is
+documented in the subequent L</"Feeds File"> section of this manual.
+Once a list of feeds is supplied to B<noss> through the feeds file, the feeds
+can then be fetched and loaded into its database via the C<update> command.
+
+In order for B<noss> to read posts, it must be able to uniquely identify and
+distinguish posts from each other.
+Posts in B<noss> are identified via two pieces of information: the name of the
+feed they're in and their unique ID within that feed. When reading a post,
+like with either the C<read> or C<open> command, you would typically supply
+the command with the feed name and post ID to refer to that specifc post.
+
+  # Read post #1 in the PlanetDebian feed
+  noss read PlanetDebian 1
+
+To determine the feed and ID of a post, the C<list> command can be used to query
+the post database for a list of posts that conform to whatever search parameters
+are provided (like title containing a string, content matching a regex, being
+tagged with a specific tag, etc.). The C<post> command can also be used to query
+more detailed post information than the C<list> command provides for a specifc
+post. Consult the documentation for the C<list> and C<post> commands in the
+L</"COMMANDS"> section of this manual.
+
+So basically, the typical usage of B<noss> would involve managing your feed
+list from the feeds file, using the C<update> command to fetch feed updates,
+using the C<list> command to see what posts are available, and the using
+C<read> or C<open> commands for actually reading posts.
+
+  # Add your feeds
+  vim ~/.config/noss/noss.feeds
+
+  # Fetch and update feed updates
+  noss update
+
+  # Look to see what posts you have
+  noss list
+  # ...or only check for unread ones
+  noss unread
+
+  # And then actually reading a post
+  noss read whatever 12
+
+The L</"COMMANDS"> section of this manual documents the complete list of
+commands and any options that are available to them.
+
+B<noss> can also have its behavior modified through a configuration file,
+whose format is documented in the L</"CONFIGURATION"> section of this manual.
+
+=head2 Feeds File
+
+As previously mentioned, B<noss> reads its feed list from a feeds file. The
+feeds file is a JSON file that contains a list of feeds, feed groups, and
+feed configurations for B<noss> to use. B<noss> uses a special JSON format
+that supports comments and trailing commas, so that it can be better suited
+as a configuration file format. Comments start with a hash (C<#>) sign, are
+terminated by the end of a line, and can be placed anywhere where JSON allows
+whitespace.
+
+B<noss> will look for a feeds file in the following locations:
+
+=over 4
+
+=item Path specified by the C<-f>|C<--feeds> option
+
+=item F<C<$NOSS_FEEDS>>
+
+=item F<C<$XDG_CONFIG_HOME>/noss/noss.feeds>
+
+=item F<C<$XDG_CONFIG_HOME>/noss.feeds>
+
+=item F<~/.config/noss/noss.feeds>
+
+=item F<~/.config/noss.feeds>
+
+=item F<~/.noss.feeds>
+
+=back
+
+The feeds file can have three different fields: C<feeds>, C<groups>, and
+C<default>. The only required field is the C<feeds> field.
+
+=head3 feeds
+
+The C<feeds> field is a key-value map of feed names and their configuration.
+Feed names can only contain alphanumeric/underscore characters, and must not be
+the name of another feed or group. The feed can either be mapped to a URL string
+of the feed it represents or a key-value map of configuration parameters for the
+feed. The former has the benefit of better readability but lacks the ability to
+have its configuration fine-tuned. The latter can have fine-tuned configuration
+but may look more cluttered than the former.
+
+  {
+    "feeds": {
+      # Just the URL, no specific configuration
+      "feed1": "https://phonysite.com/feed1.rss",
+      # Key-value map allows for fine-tuned configuration
+      "feed2": {
+        "feed": "https://phonysite.com/feed2.rss",
+        "limit": 100,
+        "autoread": false,
+      },
+    }, # yes, you can have trailing commas :-)
+  # yes, you can have comments, too!
+  }
+
+When using the latter-style key-value map syntax for a feed, the only required
+field is the C<feed> field, which must store the feed's URL. Additional fields,
+which are listed below, can be set to provide the previously mentioned
+fine-tuned configuration.
+
+=over 4
+
+=item "B<limit>": I<integar>
+
+Specify a limit to the number of posts a feed can contain. If a feed exceeds
+the limit, B<noss> will discard older posts to fit into that limit.
+By default, there is no limit to the number of posts a feed can contain.
+
+=item "B<respect_skip>": I<bool>
+
+Specify whether to respect the C<skipDays> and C<skipHours> fields in RSS
+feeds, which tells feed aggregators to skip updating feeds on certain hours or
+days. This is enabled by default, and is recommended to not be disabled.
+
+=item "B<include_title>": "I<target>" | [ "I<target>", ... ]
+
+=item "B<exclude_title>": "I<target>" | [ "I<target>", ... ]
+
+Specify a target string or list of target strings a post title must include or
+not include in order to not be filtered out by B<noss> during aggregation.
+A I<target> string can either be a literal string that a post title must
+include/exclude, or a Perl regex (signified by a leading and trailing
+forward slash character) that a title must match/not match.
+
+=item "B<include_content>": "I<target>" | [ "I<target>", ... ]
+
+=item "B<exclude_content>": "I<target>" | [ "I<target>", ... ]
+
+Similar to the C<include_title> and C<exclude_title> parameters, except for
+a post's content instead of its title.
+
+=item "B<include_tags>": "I<tag>" | [ "I<tag>", ... ]
+
+=item "B<exclude_tags>": "I<tag>" | [ "I<tag>", ... ]
+
+Specify a tag or list of tags that a post must be tagged with or without in
+order to not be filtered out by B<noss> during aggregation.
+
+=item "B<autoread>": I<bool>
+
+Specify whether new posts from this feed should automatically be marked as
+C<read> or not. Defaults to C<false>.
+
+=item "B<default_update>": I<bool>
+
+Specify whether this feed should be included in a default update or not
+(C<update> when ran with no arguments). Defaults to C<true>.
+
+=item "B<hidden>": I<bool>
+
+Specify whether this feed should be omitted from the C<list> command's default
+listing (the list shown when ran with no arguments). Defaults to C<false>.
+
+=back
+
+A feed's specific configuration takes priority over the configuration it may
+inherit from the C<default> field or any groups it may be a part of.
+
+B<noss> uses L<curl(1)> for fetching feeds, so generally any URL that is
+acceptable for L<curl(1)> will be acceptable for B<noss>. There are two unique
+types of URLs that B<noss> will process in a special way.
+
+=over 4
+
+=item file://I</path/to/file>
+
+A URL that starts with the C<file://> protocol will be interpreted as a local
+file which B<noss> will copy over to its feed cache and load instead of
+fetching remotely via L<curl(1)>.
+
+  # Use the contents of "/home/sam/feeds/feed.rss" as a feed
+  "file_feed": "file:///home/sam/feeds/feed.rss"
+
+=item shell://I<command>
+
+A URL that starts with the C<shell://> protocol will be interpreted as a shell
+command which B<noss> will execute and capture the output of, then use that
+output as the contents of the feed.
+
+  # Use the output of the "cat feed.rss" command as a feed
+  "shell_feed": "shell://cat feed.rss"
+
+=back
+
+=head3 groups
+
+C<groups> is a key-value map of group names and their configuration. Feed groups
+in B<noss> serve two purposes: 1) to provide a way to logically group
+multiple feeds together, and 2) provide a way to "share" a common configuration
+between multiple different feeds.
+
+Just like with feeds, group names can only contain alphanumeric/underscore
+characters and cannot be the same name as any other group or feed. A group
+can either be defined by a list of feed names with no special configuration,
+purely acting as a logical collection of feeds, or a key-value map of feed
+configuration parameters with a feed list stored in the C<feeds> field of the
+map. The same options listed above for a feed's configuration in the C<feeds>
+field can be used for a group's configuration.
+
+  {
+    "groups": {
+      # purely logical feed grouping, no special configuration
+      "group1": [ "f1", "f2", "f3" ],
+      # each feed will inherit group2's configuration
+      "group2": {
+        "feeds": [ "f2", "f4", "f6" ],
+        "limit": 100,
+        "autoread": false,
+      },
+    },
+    "feeds": {
+      ...
+    },
+  }
+
+Feeds are also allowed to be a part of multiple different groups. If a feed
+is a part of multiple different groups that try to configure the same parameter,
+B<noss> will try to resolve the conflict by picking the most "non-default"
+option available. Group configurations take priority over the C<default>
+field but are overridden by a feed's own configuration.
+
+=head3 default
+
+The C<default> field is a special feed group that every feed is a part of. Any
+configuration in the C<default> feed will used by every feed and group (unless
+their configuration overrides the default's). The same configuration options
+available to a feed and group are available to C<default>.
+
+  {
+    # All feeds have a limit of 100 posts and must contain 'foo' in their
+    # titles.
+    "default": {
+      "limit": 100,
+      "include_title": [ "/foo/" ],
+    },
+    ..
+  }
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<update> [I<feed>|I<group>] ...
+
+Fetch and reload feeds. Whenever a new feed is added to B<noss>'s feed list,
+this command can be used to load it into B<noss>'s database.
+
+If no specific feeds or groups are specified, all feeds are updated.
+
+See the L</"CAVEATS"> section of this manual for some warnings to keep in mind
+when using this command.
+
+C<update> has the following options:
+
+=over 4
+
+=item B<--new-only>
+
+Only update feeds that are not present in the database.
+
+=item B<--non-defaults>
+
+When running C<update> with no arguments, update all feeds, even those that
+are configured to not be updated by default.
+
+=item B<--downloads>=I<num>
+
+Specify number of parallel downloads to perform. Default amount is C<10>.
+
+Can also be configured via the C<downloads> configuration field.
+
+=item B<--unconditional>
+
+Unconditionally download feeds, even if they have not been modified since the
+last update. This option should be used with caution, as performing
+unconditional downloads is wasteful on feed servers and considered bad
+practice.
+
+=item B<--limit-rate>=I<speed>
+
+Specify the maximum transfer rate for downloads. Speeds are measured in
+bytes/second, unless a suffix is appended. C<k>/C<K>, C<m>/C<M>, and
+C<g>/C<G> correspond to kilobytes, megabytes, and gigabytes respectively.
+
+Can also be configured via the C<limit_rate> configuration field.
+
+=item B<--user-agent>=I<agent>
+
+Specify the string to use as the user-agent string.
+
+Can also be configured via the C<user_agent> configuration field.
+
+=item B<--timeout>=I<fractional second>
+
+Specify the maximum number of seconds a transfer is allowed to take.
+
+Can also be configured via the C<timeout> configuration field.
+
+=item B<--proxy>=[I<protocol>://]I<host>[:I<port>]
+
+Specify the proxy server to use. If I<protocol> is not specified, defaults
+as a C<http://> proxy. If no port number is specified, defaults to C<1000>.
+
+Can also be configured via the C<proxy> configuration field.
+
+=item B<--proxy-user>=I<user>:I<password>
+
+Specify the username and password to use for proxy authentication.
+
+Can also be configured via the C<proxy_user> configuration field.
+
+=back
+
+=item B<reload> [I<feed>|I<group>] ...
+
+Reload cached feeds. Useful for when you make changes to a feed's configuration
+and want B<noss> to recognize the changes. If no feeds are specified, reloads
+all cached feeds.
+
+C<reload> has no unique options.
+
+=item B<read> I<feed> [I<post>]
+
+Read the specified post's contents in I<feed> via a pager. If I<post> is not
+specified, reads the latest unread post in I<feed>.
+
+C<read> has the following options:
+
+=over 4
+
+=item B<--pager>=I<command>
+
+Use the specified command as the pager for reading the post's contents. Defaults
+to L<less(1)> on Unix systems and L<more(1)> on Windows systems.
+
+Can also be configured via the C<PAGER> environment variable and
+C<pager> configuration field.
+
+=item B<--no-mark>
+
+Do not mark post as read.
+
+=item B<--stdout>
+
+Instead of reading post via a pager, write the post's formatted contents to
+F<stdout>.
+
+=back
+
+=item B<open> I<feed> [I<post>]
+
+Open the specified post's link in I<feed> via a web browser. If I<post> is not
+specified, opens the latest unread post in I<feed>.
+
+C<open> has the following options:
+
+=over 4
+
+=item B<--browser>=I<command>
+
+Use the specified command as the browser to use for opening the post's URL.
+Defaults to L<lynx(1)>.
+
+Can also be configured via the C<BROWSER> environment variable and
+C<browser> configuration field.
+
+=item B<--no-mark>
+
+Do not mark post as read.
+
+=back
+
+=item B<list> [I<feed>|I<group>] ...
+
+List posts from specified feeds. When listing posts, B<noss> displays the
+post's read status (signified by a C<U> for C<unread>), the name of the feed
+the post is a part of, the post's ID, and the title of the post. Each post is
+listed on a single line, which should make it easy to process in a pipeline.
+
+If no feeds or groups are specified, all feeds are searched.
+
+C<list> has the following options:
+
+=over 4
+
+=item B<--title>=I<target>
+
+Only list posts containing the string I<target> in their title. If I<target>
+starts and ends with a forward slash (C</>), C<list> will interpret it as a
+Perl regex and search for posts whose titles match the given regex.
+
+=item B<--tag>=I<tag>
+
+Only list posts tagged with the specified tag. This option can be used
+multiple times to specify multiple different tags.
+
+=item B<--status>=I<status>
+
+Only list posts marked with the specified status. Valid values are C<read>
+and C<unread>.
+
+=item B<--content>=I<target>
+
+Only list posts containing the string I<target> in their HTML content. If
+I<target> starts and ends with a forward slash (C</>), C<list> will interpret
+it as a Perl regex and search for posts that match the given regex. This
+option can be used multiple times to specify multiple diffrent targets.
+
+=item B<--sort>=I<method>
+
+Sort post list by the given method. The following are valid methods:
+
+=over 2
+
+=item date
+
+Sort posts by date (default).
+
+=item feed
+
+Sort posts by feed.
+
+=item title
+
+Sort posts by title.
+
+=back
+
+This option can also be configured via the C<sort> configuration field.
+
+=item B<--reverse>
+
+Print the post list in reverse order.
+
+=item B<--hidden>
+
+Show hidden feeds when using C<list> with no arguments.
+
+=back
+
+=item B<unread> [I<feed>|I<group>] ...
+
+Similar to the C<list> command, except only shows unread posts.
+
+This command has the same options as the C<list> command.
+
+=item B<mark> I<status> I<feed>|I<group> [I<post>] ...
+
+=item B<mark> --all I<status>
+
+Mark the given posts in the specified feeds as C<read> or C<unread>.
+
+I<posts> is a list of post IDs to mark as read. If a post argument is a range
+(C<I<from>-I<to>>), then each post in that range is marked. I<posts> can only
+be specified when marking posts in individual feeds, not when marking groups of
+feeds.
+
+This command has the following options:
+
+=over 4
+
+=item B<--all>
+
+Mark all posts in every feed as read or unread.
+
+=back
+
+=item B<post> I<feed> I<post>
+
+View the post information for the specified post.
+
+This command has no unique options.
+
+=item B<feeds> [I<feed>] ...
+
+View feed information. If no feeds are specified, prints information for all
+feeds.
+
+This command has the following options:
+
+=over 4
+
+=item B<--brief>
+
+Only print feed names, not additional feed info.
+
+=back
+
+=item B<groups> [I<group>] ...
+
+View group information. If no groups are specified, prints information for all
+groups.
+
+This command has the following options:
+
+=over 4
+
+Only print group names, not additional group info.
+
+=back
+
+=item B<clean>
+
+Cleans up obsolete cache files and database data.
+
+This command has no unique options.
+
+=item B<export> [I<opml>]
+
+Export feed list as an OPML file for transferring feed data to another feed
+reader. If no output file is specified, the OPML will be written directly to
+F<stdout>.
+
+This command has the following options:
+
+=over 4
+
+=item B<--no-groups>
+
+Do not try to generate feed group structures in the exported OPML.
+
+=back
+
+=item B<import> I<opml> [I<json>]
+
+Import feed list from an OPML file. Will write the feed list as a JSON file
+which can be used by B<noss>. Writes the feed file to I<json> if specified,
+otherwise writes it directly to F<stdout>.
+
+This command has the following options:
+
+=over 4
+
+=item B<--no-groups>
+
+Do no try to import feed groups from the OPML.
+
+=back
+
+=back
+
+=head1 GLOBAL OPTIONS
+
+These options can be used with any command.
+
+=over 4
+
+=item B<-c>|B<--config>=I<file>
+
+Specify path to the B<noss> configuration file.
+
+=item B<-D>|B<--data>=I<dir>
+
+Specify path to the B<noss> data directory. The data directory is the directory
+where B<noss> stores data like its feed database and feed cache.
+
+=item B<-f>|B<--feeds>=I<file>
+
+Specify path to the B<noss> feeds file.
+
+=item B<-h>|B<--help>
+
+Print B<noss>'s usage message and exit.
+
+=item B<-v>|B<--version>
+
+Print B<noss>'s version and copyright info, then exit.
+
+=back
+
+=head1 CONFIGURATION
+
+B<noss> can have its behavior configured by writing it a configuration file.
+A B<noss> configuration file is a JSON file that supports the same extensions
+as the feeds file (comments and trailing commas).
+
+B<noss> will look for a configuration file in the following locations:
+
+=over 4
+
+=item Path specifed by the C<-c>|C<--config> option
+
+=item F<C<$NOSS_CONFIG>>
+
+=item F<C<$XDG_CONFIG_HOME>/noss/noss.conf>
+
+=item F<C<$XDG_CONFIG_HOME>/noss.conf>
+
+=item F<~/.config/noss/noss.conf>
+
+=item F<~/.config/noss.conf>
+
+=item F<~/.noss.conf>
+
+=back
+
+A B<noss> configuration file can contain the following fields:
+
+=over 4
+
+=item "B<feeds>": "I<path>"
+
+Path to feeds file. See also the C<-f>|C<--feeds> option.
+
+=item "B<data>": "I<dir>"
+
+Path to use for the data directory. See also the C<-D>|C<--data> option.
+
+=item "B<downloads>": I<integar>
+
+Number of parallel downloads to perform when fetching feeds for the
+C<update> command. See also the C<update> command's C<--downloads> option.
+
+=item "B<limit_rate>": "I<speed>"
+
+The maximum transfer rate for downloads. I<speed> follows the same
+format as the speed given to the C<--limit-rate> option.
+
+=item "B<user_agent>": "I<agent>"
+
+The string to use as user-agent string for downloads. See also the
+C<update> command's C<--user-agent> option.
+
+=item "B<timeout>": I<fractional second>
+
+The maximum number of seconds a transfer is allowed to take. See also
+the C<update> command's C<--timeout> option.
+
+=item "B<proxy>": "[I<protocol://>]I<host>[:I<port>]"
+
+The proxy server to use for performing downloads. The proxy host string
+follows the same format as one used in the C<update> command's C<--proxy>
+option.
+
+=item "B<proxy_user>": "I<user>:I<password>"
+
+The username and password to use for proxy authentication. Follows the
+same format as the one used in the C<update> command's C<--proxy-user>
+option.
+
+=item "B<pager>": "I<command>"
+
+The command to use for reading posts via the C<read> command. See also
+the C<read> command's C<--pager> option.
+
+=item "B<browser>": "I<command>"
+
+The command to use for opening post URLs via the C<open> command. See
+also the C<open> command's C<--browser> option.
+
+=item "B<sort>": "I<method>"
+
+How you would like the C<list> command to sort posts. Valid methods are
+C<date>, C<feed>, and C<title>. See also the C<list> command's C<--sort>
+option.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item NOSS_DATA
+
+Directory for B<noss> to store program data in.
+
+=item NOSS_CONFIG
+
+Path to B<noss>'s configuration file.
+
+=item NOSS_FEEDS
+
+Path to B<noss>'s feeds file.
+
+=item XDG_DATA_HOME
+
+Directory for B<noss> to store its data directory in, if no data directory path
+is configured otherwise.
+
+=item XDG_CONFIG_HOME
+
+Directory where B<noss> looks for configuration in by default.
+
+=item PAGER
+
+Default pager to use for the C<read> command.
+
+=item BROWSER
+
+Default browser to use for the C<open> command.
+
+=back
+
+=head1 CAVEATS
+
+Updating a feed too frequently can be wasteful on a server's resources, and in
+extreme cases could result in them banning you from accessing their feed. The
+acceptable frequency of feed updates varies from server to server, but a good
+rule of thumb is once per hour at most. You should also refrain from using
+the C<--unconditional> option without a good reason.
+
+=head1 AUTHOR
+
+Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+
+This project's source can be found on its
+L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull
+requests are welcome!
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 Samuel Young
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+L<curl(1)>, L<less(1)>, L<lynx(1)>, L<more(1)>, L<sqlite3(1)>
+
+=cut
+
+# vim: expandtab shiftwidth=4

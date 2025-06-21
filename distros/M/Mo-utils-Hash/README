@@ -1,0 +1,88 @@
+NAME
+    Mo::utils::Hash - Mo hash utilities.
+
+SYNOPSIS
+     use Mo::utils::Hash qw(check_hash);
+
+     check_hash($self, $key);
+
+DESCRIPTION
+    Utilities for checking of hash values.
+
+SUBROUTINES
+  "check_hash"
+     check_hash($self, $key);
+
+    *Since version 0.01.*
+
+    Check parameter defined by $key which is reference to hash.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_hash():
+             Parameter '%s' isn't hash reference.
+                     Reference: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Hash qw(check_hash);
+
+     my $self = {
+             'key' => {},
+     };
+     check_hash($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Hash qw(check_hash);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad',
+     };
+     check_hash($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Utils.pm:?] Parameter 'key' isn't hash reference.
+
+DEPENDENCIES
+    Exporter, Error::Pure, Readonly.
+
+SEE ALSO
+    Mo::utils
+        Mo utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Hash>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

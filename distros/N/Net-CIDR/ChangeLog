@@ -1,3 +1,8 @@
+0.26    Sam Varshavchik  <mrsam@courier-mta.com>
+
+	cidrvalidate() should accept IPv6 addresses with one uncompressed
+	0.
+
 0.25    Sam Varshavchik  <mrsam@courier-mta.com>
 
 	Fix warning with Perl 5.40

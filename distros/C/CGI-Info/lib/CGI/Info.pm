@@ -8,12 +8,12 @@ use strict;
 
 use boolean;
 use Carp;
-use Class::Debug 0.02;
-use Config::Abstraction 0.20;
+use Object::Configure 0.10;
 use File::Spec;
 use Log::Abstraction 0.10;
 use Params::Get;
 use Params::Validate::Strict;
+use Net::CIDR;
 use Scalar::Util;
 use Socket;	# For AF_INET
 use 5.008;
@@ -34,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -160,12 +160,8 @@ sub new
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	# Stash copy of cache to avoid "(in cleanup) Failed to get MD5_CTX pointer".
-	# I suspect Hash::Merge is confusing something
-	my $cache = delete $params->{'cache'};
-
 	# Load the configuration from a config file, if provided
-	$params = Class::Debug::setup($class, $params);
+	$params = Object::Configure::configure($class, $params);
 
 	if(defined($params->{'expect'})) {
 		# if(ref($params->{expect}) ne 'ARRAY') {
@@ -173,10 +169,6 @@ sub new
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
 		Carp::croak("$class: expect has been deprecated, use allow instead");
-	}
-
-	if($cache) {
-		$params->{'cache'} = $cache;
 	}
 
 	# Return the blessed object
@@ -679,11 +671,11 @@ sub params {
 			return;
 		}
 	} elsif($ENV{'REQUEST_METHOD'} eq 'POST') {
-		if(!defined($ENV{'CONTENT_LENGTH'})) {
+		my $content_length = $self->_get_env('CONTENT_LENGTH');
+		if((!defined($content_length)) || ($content_length =~ /\D/)) {
 			$self->{status} = 411;
 			return;
 		}
-		my $content_length = $ENV{'CONTENT_LENGTH'};
 		if(($self->{max_upload_size} >= 0) && ($content_length > $self->{max_upload_size})) {	# Set maximum posts
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
@@ -993,7 +985,7 @@ sub params {
 
 =head2 param
 
-Get a single parameter.
+Get a single parameter from the query string.
 Takes an optional single string parameter which is the argument to return. If
 that parameter is not given param() is a wrapper to params() with no arguments.
 
@@ -1192,6 +1184,8 @@ Returns a boolean if the website is being viewed on a mobile
 device such as a smartphone.
 All tablets are mobile, but not all mobile devices are tablets.
 
+Can be overriden by the IS_MOBILE environment setting
+
 =cut
 
 sub is_mobile {
@@ -1199,6 +1193,10 @@ sub is_mobile {
 
 	if(defined($self->{is_mobile})) {
 		return $self->{is_mobile};
+	}
+
+	if($ENV{'IS_MOBILE'}) {
+		return $ENV{'IS_MOBILE'}
 	}
 
 	# Support Sec-CH-UA-Mobile
@@ -1688,6 +1686,8 @@ Is the visitor a search engine?
 	# allow the user to pick and choose something to display
     }
 
+Can be overriden by the IS_SEARCH_ENGINE environment setting
+
 =cut
 
 sub is_search_engine
@@ -1696,6 +1696,10 @@ sub is_search_engine
 
 	if(defined($self->{is_search_engine})) {
 		return $self->{is_search_engine};
+	}
+
+	if($ENV{'IS_SEARCH_ENGINE'}) {
+		return $ENV{'IS_SEARCH_ENGINE'}
 	}
 
 	my $remote = $ENV{'REMOTE_ADDR'};
@@ -1751,6 +1755,16 @@ sub is_search_engine
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
 	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) {
+		if($self->{cache}) {
+			$self->{cache}->set($key, 'search', '1 day');
+		}
+		$self->{is_search_engine} = 1;
+		return 1;
+	}
+
+	my @cidr_blocks = ('47.235.0.0/12');	# Alibaba
+
+	if(Net::CIDR::cidrlookup($remote, @cidr_blocks)) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}
@@ -1977,19 +1991,16 @@ sub set_logger
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	if(defined($params->{'logger'})) {
-		if(my $logger = $params->{'logger'}) {
-			if(Scalar::Util::blessed($logger)) {
-				$self->{'logger'} = $logger;
-			} else {
-				$self->{'logger'} = Log::Abstraction->new($logger);
-			}
+	if(my $logger = $params->{'logger'}) {
+		if(Scalar::Util::blessed($logger)) {
+			$self->{'logger'} = $logger;
 		} else {
-			$self->{'logger'} = Log::Abstraction->new();
+			$self->{'logger'} = Log::Abstraction->new($logger);
 		}
-		return $self;
+	} else {
+		$self->{'logger'} = Log::Abstraction->new();
 	}
-	Carp::croak('Usage: set_logger(logger => $logger)')
+	return $self;
 }
 
 # Log and remember a message
@@ -2119,6 +2130,10 @@ things to happen.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/nigelhorne/CGI-Info>
+
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
@@ -2155,7 +2170,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENCE AND COPYRIGHT
 
 Copyright 2010-2025 Nigel Horne.
 

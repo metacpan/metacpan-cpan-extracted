@@ -8,7 +8,7 @@ use DateTime::Format::ISO8601;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Travel::Status::MOTIS::TripAtStopover->mk_ro_accessors(
 	qw(

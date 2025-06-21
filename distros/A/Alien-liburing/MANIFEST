@@ -9,7 +9,7 @@ Makefile.PL
 README
 alienfile
 dist.ini
-extern/liburing-liburing-2.10.tar.gz
+extern/liburing-liburing-2.11.tar.gz
 extern/secondary_build.sh
 inc/Devel/AssertOS.pm
 inc/Devel/AssertOS/Alias/MacOS.pm

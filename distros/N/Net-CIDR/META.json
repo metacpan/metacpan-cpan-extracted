@@ -4,7 +4,7 @@
       "Sam Varshavchik <sam@email-scan.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "network"
    ],
@@ -56,6 +56,6 @@
          "web" : "https://github.com/svarshavchik/Net-CIDR"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

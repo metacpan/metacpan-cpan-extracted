@@ -1,3 +1,7 @@
+Travel::Status::MOTIS 0.03 - Fri Jun 20 2025
+
+    * MOTIS->new: Fix time_zone parameter not being respected
+
 Travel::Status::MOTIS 0.02 - Tue Jun 17 2025
 
     * motis-m: Fix --json for trip lookups (patch by networkException)

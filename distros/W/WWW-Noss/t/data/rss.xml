@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+<channel>
+	<title>Test RSS Feed</title>
+	<link>https://phonysite.com</link>
+	<description>An RSS feed for testing purposes.</description>
+	<copyright>Copyright (C) 2025 Samuel Young (samyoung12788 at gmail dot com)</copyright>
+	<lastBuildDate>Sun, 15 Jun 2025 20:03:13 +0000</lastBuildDate>
+	<category>test</category>
+	<category>sample</category>
+	<category>phony</category>
+	<generator>VIM 9.0</generator>
+	<image>
+		<url>/test.png</url>
+		<title>Test RSS Feed</title>
+		<link>https://phonysite.com</link>
+	</image>
+	<skipHours>
+		<hour>23</hour>
+		<hour>0</hour>
+		<hour>1</hour>
+		<hour>2</hour>
+		<hour>3</hour>
+		<hour>4</hour>
+	</skipHours>
+	<skipDays>
+		<day>Saturday</day>
+		<day>Sunday</day>
+	</skipDays>
+	<item>
+		<title>Test post #1</title>
+		<link>https://phonysite.com/r1</link>
+		<description>A text description.</description>
+		<author>samyoung12788 at gmail dot com (Samuel Young)</author>
+		<category>test</category>
+		<category>sample</category>
+		<category>phony</category>
+		<guid>r1</guid>
+		<pubDate>Sun, 15 Jun 2025 20:12:20 +0000</pubDate>
+	</item>
+	<item>
+		<title>Test post #2</title>
+		<link>https://phonysite.com/r2</link>
+		<description>&lt;p&gt;Some HTML text.&lt;/p&gt;</description>
+		<author>samyoung12788 at gmail dot com (Samuel Young)</author>
+		<category>test</category>
+		<category>sample</category>
+		<category>phony</category>
+		<guid>r2</guid>
+		<pubDate>Sun, 15 Jun 2025 20:13:13 +0000</pubDate>
+	</item>
+	<item>
+		<title>Test post #3</title>
+		<link>https://phonysite.com/r3</link>
+		<description>&lt;p&gt;Some more HTML.&lt;/p&gt;</description>
+		<author>samyoung12788 at gmail dot com (Samuel Young)</author>
+		<category>test</category>
+		<category>sample</category>
+		<category>phony</category>
+		<guid>r3</guid>
+		<pubDate>Sun, 15 Jun 2025 20:15:57 +0000</pubDate>
+	</item>
+</channel>
+</rss>

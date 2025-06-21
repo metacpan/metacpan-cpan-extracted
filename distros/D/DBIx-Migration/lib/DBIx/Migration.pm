@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use feature qw( state );
 
@@ -251,7 +251,7 @@ sub _files {
     no warnings 'uninitialized';
     $self->dir->visit(
       sub {
-        return unless m/\D*${i}_$type\.sql\z/;
+        return unless $_->basename =~ m/(?:\A|\D+)${i}_$type\.sql\z/;
         $Logger->debugf( "Found migration '%s'", $_ );
         push @files, { name => $_, version => $i };
       }

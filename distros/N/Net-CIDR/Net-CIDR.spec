@@ -1,7 +1,7 @@
 
 Summary: Net::CIDR Perl module
 Name: perl-Net-CIDR
-Version: 0.25
+Version: 0.26
 Release: 1.%{perl_version}%{?dist}
 Source0: Net-CIDR-%{version}.tar.gz
 License: Perl

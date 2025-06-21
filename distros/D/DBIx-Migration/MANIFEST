@@ -36,6 +36,9 @@ t/sql/basic/schema_1_up.sql
 t/sql/basic/schema_2_down.sql
 t/sql/invalid/schema_0_up.sql
 t/sql/invalid/schema_1_down.sql
+t/sql/match/2_up.sql
+t/sql/match/schema_11_up.sql
+t/sql/match/schema_1_up.sql
 t/sql/rollback/schema_1_up.sql
 t/sql/trigger/schema_1_down.sql
 t/sql/trigger/schema_1_up.sql

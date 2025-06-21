@@ -7,7 +7,7 @@ use utf8;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 Travel::Routing::DE::DBRIS::Offer->mk_ro_accessors(
 	qw(class name price price_unit is_upsell is_cross_sell needs_context));

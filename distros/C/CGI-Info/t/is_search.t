@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 29;
+use Test::Most tests => 31;
 use Test::NoWarnings;
 
 BEGIN {
@@ -43,6 +43,13 @@ SEARCH: {
 
 	$i = new_ok('CGI::Info');
 	ok($i->is_search_engine() == 0);
+
+	{
+		local $ENV{'IS_SEARCH_ENGINE'} = 1;
+
+		$i = new_ok('CGI::Info');
+		ok($i->is_search_engine() == 1);
+	}
 
 	$ENV{'REMOTE_ADDR'} = '66.249.73.149';
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';

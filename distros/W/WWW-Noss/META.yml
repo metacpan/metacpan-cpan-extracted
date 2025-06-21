@@ -1,0 +1,45 @@
+---
+abstract: 'RSS/Atom feed reader and aggregator'
+author:
+  - 'Samuel Young <samyoung12788@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.10'
+  Test::More: '0'
+configure_requires:
+  DBD::SQLite: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Noss
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '0'
+  DBD::SQLite: '0'
+  DBI: '1.614'
+  DateTime: '0'
+  DateTime::Format::Mail: '0'
+  DateTime::Format::RFC3339: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0.10'
+  Getopt::Long: '0'
+  JSON: '0'
+  List::Util: '1.33'
+  Parallel::ForkManager: v0.7.6
+  XML::LibXML: '1.70'
+  perl: '5.016'
+resources:
+  bugtracker: https://codeberg.org/1-1sam/noss/issues
+  repository: https://codeberg.org/1-1sam/noss.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
