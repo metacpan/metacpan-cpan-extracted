@@ -1,9 +1,12 @@
 use strict;
 use warnings;
 
+use English;
+use Error::Pure::Utils qw(clean);
 use MARC::Leader;
 use MARC::Field008;
-use Test::More 'tests' => 7;
+use Test::MockObject;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Test.
@@ -72,3 +75,28 @@ $field_008 = '951020s1984    xr nnn g          kncze  ';
 $data = $obj->parse($field_008);
 $ret = $obj->serialize($data);
 is($ret, $field_008, 'Get serialized string (music - "'.$field_008.'").');
+
+# Test.
+$leader = MARC::Leader->new->parse('01298ckm a2200385   4500');
+$obj = MARC::Field008->new(
+	'leader' => $leader,
+);
+eval {
+	$obj->serialize('bad');
+};
+is($EVAL_ERROR, "Bad 'Data::MARC::Field008' instance to serialize.\n",
+	"Bad 'Data::MARC::Field008' instance to serialize (bad string).");
+clean();
+
+# Test.
+$leader = MARC::Leader->new->parse('01298ckm a2200385   4500');
+$obj = MARC::Field008->new(
+	'leader' => $leader,
+);
+my $mock = Test::MockObject->new;
+eval {
+	$obj->serialize($mock);
+};
+is($EVAL_ERROR, "Bad 'Data::MARC::Field008' instance to serialize.\n",
+	"Bad 'Data::MARC::Field008' instance to serialize (bad object).");
+clean();

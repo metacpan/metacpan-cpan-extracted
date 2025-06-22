@@ -4,7 +4,7 @@ use warnings;
 use Data::MARC::Field008::Book;
 use English;
 use Error::Pure::Utils qw(clean err_get);
-use Test::More 'tests' => 12;
+use Test::More 'tests' => 20;
 use Test::NoWarnings;
 
 # Test.
@@ -44,6 +44,7 @@ eval {
 		'index' => '0',
 		'literary_form' => '0',
 		'nature_of_content' => '    ',
+		'raw' => '     r     000 0x',
 		'target_audience' => ' ',
 	);
 };
@@ -58,5 +59,31 @@ is($errors[0]->{'msg'}->[2], "x", "Error key value (x).");
 is(scalar @{$errors[0]->{'msg'}}, 3, 'Number of error values (3).');
 is($errors[1]->{'msg'}->[0], "Couldn't create data object of book.",
 	"Couldn't create data object of book.");
-is(scalar @{$errors[1]->{'msg'}}, 1, 'Number of error values (1).');
+is(scalar @{$errors[1]->{'msg'}}, 3, 'Number of error values (3).');
+is($errors[1]->{'msg'}->[1], 'Raw string', "Error key (Raw string).");
+is($errors[1]->{'msg'}->[2], '     r     000 0x', "Error key value (     r     000 0x).");
+clean();
+
+# Test.
+$Data::MARC::Field008::Book::STRICT = 0;
+$obj = Data::MARC::Field008::Book->new(
+	'biography' => 'x',
+	'conference_publication' => '0',
+	'festschrift' => '0',
+	'form_of_item' => 'r',
+	'government_publication' => ' ',
+	'illustrations' => '    ',
+	'index' => '0',
+	'literary_form' => '0',
+	'nature_of_content' => '    ',
+	'target_audience' => ' ',
+);
+isa_ok($obj, 'Data::MARC::Field008::Book');
+@errors = err_get;
+is(scalar @errors, 1, 'Number of errors (2).');
+is($errors[0]->{'msg'}->[0], "Parameter 'biography' has bad value.",
+	"Parameter 'biography' has bad value.");
+is($errors[0]->{'msg'}->[1], 'Value', "Error key (Value).");
+is($errors[0]->{'msg'}->[2], 'x', "Error key value (x).");
+is(scalar @{$errors[0]->{'msg'}}, 3, 'Number of error values (3).');
 clean();

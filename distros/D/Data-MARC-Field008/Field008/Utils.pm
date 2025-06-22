@@ -22,7 +22,7 @@ Readonly::Array our @EXPORT_OK => qw(check_book_biography check_book_festschrift
 	check_map_projection check_map_relief check_map_special_format
 	check_modified_record check_music_accompanying_matter
 	check_music_composition_form check_music_format check_music_literary_text
-	check_music_part check_music_transposition_and_arrangement
+	check_music_parts check_music_transposition_and_arrangement
 	check_visual_material_running_time check_visual_material_technique
 	check_visual_material_type check_target_audience check_type_of_date);
 Readonly::Array our @BOOK_BIOGRAPHIES => (' ', 'a', 'b', 'c', 'd', '|');
@@ -74,7 +74,7 @@ Readonly::Array our @TARGET_AUDIENCES => (' ', 'a', 'b', 'c', 'd', 'e', 'f',
 	'g', 'j', '|');
 Readonly::Array our @TYPE_OF_DATES => qw(b c d e i k m n p q r s t u |);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub check_book_biography {
 	my ($self, $key) = @_;
@@ -448,7 +448,7 @@ sub check_music_literary_text {
 	return;
 }
 
-sub check_music_part {
+sub check_music_parts {
 	my ($self, $key) = @_;
 
 	_check_base($self, $key);
@@ -606,7 +606,7 @@ Data::MARC::Field008::Utils - Utilities to check MARC field008 values.
          check_map_projection check_map_relief check_map_special_format
          check_modified_record check_music_accompanying_matter
          check_music_composition_form check_music_format check_music_literary_text
-         check_music_part check_music_transposition_and_arrangement
+         check_music_parts check_music_transposition_and_arrangement
          check_visual_material_running_time check_visual_material_technique
          check_visual_material_type check_target_audience check_type_of_date);
 
@@ -640,7 +640,7 @@ Data::MARC::Field008::Utils - Utilities to check MARC field008 values.
  check_music_composition_form($self, $key);
  check_music_format($self, $key);
  check_music_literary_text($self, $key);
- check_music_part($self, $key);
+ check_music_parts($self, $key);
  check_music_transposition_and_arrangement($self, $key);
  check_visual_material_running_time($self, $key);
  check_visual_material_technique($self, $key);
@@ -959,9 +959,9 @@ Put error if check isn't ok.
 
 Returns undef.
 
-=head2 C<check_music_part>
+=head2 C<check_music_parts>
 
- check_music_part($self, $key);
+ check_music_parts($self, $key);
 
 Check parameter defined by C<$key> which is music parts.
 
@@ -1377,7 +1377,7 @@ Returns undef.
                  Value: %s
                  Expected length: 2
 
- check_music_part():
+ check_music_parts():
          Parameter '%s' has bad value.
                  Value: %s
          Parameter '%s' is required.
@@ -1495,6 +1495,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

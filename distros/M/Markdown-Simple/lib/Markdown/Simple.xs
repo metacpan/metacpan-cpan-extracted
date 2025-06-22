@@ -144,7 +144,22 @@ static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
 						while (*cell == ' ') cell++;
 						const char* cell_end = pipe;
 						while (cell_end > cell && (*(cell_end-1) == ' ')) cell_end--;
-						sv_catpvf(out, "<th>%.*s</th>", (int)(cell_end-cell), cell);
+						// Recursively process header cell content for inline markdown (bold, italic, links, etc.)
+						SV* cell_sv = newSVpv("", 0);
+						sv_catpvf(cell_sv, "%.*s", (int)(cell_end-cell), cell);
+						SV* cell_html = markdown_to_html(SvPV_nolen(cell_sv), opts);
+						const char* html_str = SvPV_nolen(cell_html);
+						STRLEN html_len = strlen(html_str);
+						// Remove wrapping <div>...</div> if present
+						if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
+							SV* trimmed = newSVpv("", 0);
+							sv_catpvn(trimmed, html_str + 5, html_len - 11);
+							SvREFCNT_dec(cell_html);
+							cell_html = trimmed;
+						}
+						sv_catpvf(out, "<th>%s</th>", SvPV_nolen(cell_html));
+						SvREFCNT_dec(cell_sv);
+						SvREFCNT_dec(cell_html);
 						cell = pipe + 1;
 					}
 					sv_catpvf(out, "</tr>\n");
@@ -161,7 +176,22 @@ static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
 							while (*cell == ' ') cell++;
 							const char* cell_end = pipe;
 							while (cell_end > cell && (*(cell_end-1) == ' ')) cell_end--;
-							sv_catpvf(out, "<td>%.*s</td>", (int)(cell_end-cell), cell);
+							// Recursively process table cell content for inline markdown (bold, italic, links, etc.)
+							SV* cell_sv = newSVpv("", 0);
+							sv_catpvf(cell_sv, "%.*s", (int)(cell_end-cell), cell);
+							SV* cell_html = markdown_to_html(SvPV_nolen(cell_sv), opts);
+							const char* html_str = SvPV_nolen(cell_html);
+							STRLEN html_len = strlen(html_str);
+							// Remove wrapping <div>...</div> if present
+							if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
+								SV* trimmed = newSVpv("", 0);
+								sv_catpvn(trimmed, html_str + 5, html_len - 11);
+								SvREFCNT_dec(cell_html);
+								cell_html = trimmed;
+							}
+							sv_catpvf(out, "<td>%s</td>", SvPV_nolen(cell_html));
+							SvREFCNT_dec(cell_sv);
+							SvREFCNT_dec(cell_html);
 							cell = pipe + 1;
 						}
 						sv_catpvf(out, "</tr>\n");
@@ -175,21 +205,28 @@ static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
 			}
 		}
 		// Bold
-		if (opts->enable_bold && *p == '*' && *(p+1) == '*') {
+		if (opts->enable_bold && (
+				(*p == '*' && *(p+1) == '*') ||
+				(*p == '_' && *(p+1) == '_')
+			)) {
 			p += 2;
 			const char* start = p;
-			while (*p && !(*p == '*' && *(p+1) == '*')) p++;
+			while (*p && !(
+				((*p == '*' && *(p+1) == '*')) ||
+				((*p == '_' && *(p+1) == '_'))
+			)) p++;
 			sv_catpvf(out, "<strong>%.*s</strong>", (int)(p-start), start);
-			if (*p == '*' && *(p+1) == '*') p += 2;
+			if ((*p == '*' && *(p+1) == '*') || (*p == '_' && *(p+1) == '_')) p += 2;
 			continue;
 		}
 		// Italic
-		if (opts->enable_italic && *p == '*' && *(p+1) != ' ') {
+		if (opts->enable_italic && ((*p == '*' && *(p+1) != ' ') || (*p == '_' && *(p+1) != ' '))) {
 			p++;
 			const char* start = p;
-			while (*p && *p != '*') p++;
+			char end_marker = *(p-1); // either '*' or '_'
+			while (*p && *p != end_marker) p++;
 			sv_catpvf(out, "<em>%.*s</em>", (int)(p-start), start);
-			if (*p == '*') p++;
+			if (*p == end_marker) p++;
 			continue;
 		}
 		// Inline code
@@ -247,7 +284,22 @@ static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
 				if (*p == ' ') p++; // Skip space
 				const char* start = p;
 				while (*p && *p != '\n') p++;
-				sv_catpvf(out, "<li>%.*s</li>\n", (int)(p-start), start);
+				// Recursively process the list item content for inline markdown (bold, italic, links, etc.)
+				SV* item_sv = newSVpv("", 0);
+				sv_catpvf(item_sv, "%.*s", (int)(p-start), start);
+				SV* item_html = markdown_to_html(SvPV_nolen(item_sv), opts);
+				/* Remove wrapping <div>...</div> if present */
+				const char* html_str = SvPV_nolen(item_html);
+				STRLEN html_len = strlen(html_str);
+				if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
+					SV* trimmed = newSVpv("", 0);
+					sv_catpvn(trimmed, html_str + 5, html_len - 11);
+					SvREFCNT_dec(item_html);
+					item_html = trimmed;
+				}
+				sv_catpvf(out, "<li>%s</li>\n", SvPV_nolen(item_html));
+				SvREFCNT_dec(item_sv);
+				SvREFCNT_dec(item_html);
 				if (*p == '\n') p++;
 				// Skip blank lines between list items
 				const char* lookahead = p;
@@ -263,14 +315,31 @@ static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
 		// Unordered lists (support multiple consecutive lines as one <ul>)
 		if (opts->enable_unordered_lists && 
 			(p == input || *(p-1) == '\n') && 
-			(*p == '-' || *p == '*' || *p == '+')) {
+			(*p == '-' || *p == '*' || *p == '+') && (*(p+1) == ' ')) {
 			sv_catpvf(out, "<ul>\n");
-			while (opts->enable_unordered_lists && (*p == '-' || *p == '*' || *p == '+')) {
+			while (opts->enable_unordered_lists && (*p == '-' || *p == '*' || *p == '+') && (*(p+1) == ' ')) {
 				p++; // Skip marker
 				if (*p == ' ') p++; // Skip space
 				const char* start = p;
 				while (*p && *p != '\n') p++;
-				sv_catpvf(out, "<li>%.*s</li>\n", (int)(p-start), start);
+				// Recursively process the list item content for inline markdown (bold, italic, links, etc.)
+				SV* item_sv = newSVpv("", 0);
+				sv_catpvf(item_sv, "%.*s", (int)(p-start), start);
+				SV* item_html = markdown_to_html(SvPV_nolen(item_sv), opts);
+				SvREFCNT_dec(item_html);
+				item_html = markdown_to_html(SvPV_nolen(item_sv), opts);
+				/* Remove wrapping <div>...</div> if present */
+				const char* html_str = SvPV_nolen(item_html);
+				STRLEN html_len = strlen(html_str);
+				if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
+					SV* trimmed = newSVpv("", 0);
+					sv_catpvn(trimmed, html_str + 5, html_len - 11);
+					SvREFCNT_dec(item_html);
+					item_html = trimmed;
+				}
+				sv_catpvf(out, "<li>%s</li>\n", SvPV_nolen(item_html));
+				SvREFCNT_dec(item_sv);
+				SvREFCNT_dec(item_html);
 				if (*p == '\n') p++;
 				// Skip blank lines between list items
 				const char* lookahead = p;

@@ -183,17 +183,16 @@ sub page_query_key {
 
 sub navigation_line {
   my $self = shift;
-  my $link_generator = shift if (ref($_[0])||'') eq 'CODE';
+  my $uri_base = $self->has_uri_base ? $self->uri_base : undef;
 
+  # If a link generator is passed, use it, otherwise create a default one
+  my $link_generator = undef;
+  $link_generator = shift if (ref($_[0])||'') eq 'CODE';
   unless($link_generator) {
-    my $uri_base = $self->has_uri_base ?
-      $self->uri_base :
-      croak "A Link generator must exist if there's no uri_base"; # Maybe $self->view->ctx->request->uri_base;
-    
+    croak "A Link generator must exist if there's no uri_base" unless $uri_base;
     $uri_base->query_param_delete($self->page_query_key); # delete defaults
-
     $link_generator = sub {
-      my ($view, $pb, $page_num, $pager, $model) = @_;
+      my ($view, $pb, $page_num, $pager, $model, $uri_base) = @_;
       my $uri = $uri_base->clone;
       $uri->query_param_append($pb->page_query_key=>$page_num);
       return $uri;
@@ -213,7 +212,7 @@ sub navigation_line {
   my $html = '';
 
   foreach my $page_num (1..$self->pager->last_page) {
-    my $href = $link_generator->($self->view, $self, $page_num, $self->pager, $self->model);
+    my $href = $link_generator->($self->view, $self, $page_num, $self->pager, $self->model, $uri_base);
     if($page_num == $self->pager->current_page) {
       my $attrs = $self->tag_builder->_tag_options(%$current_page_attrs, href=>$href);
       my $link = process_template $current_page, current_page=>$page_num, current_page_attrs=>$attrs;

@@ -1,0 +1,12 @@
+Revision history for Perl::Critic::Grape
+
+0.0.3 - 2025-06-21
+	- viv RequireParensWithBuiltins
+	- viv ProhibitTopicIterator
+
+0.0.2 - 2025-03-28
+	- viv ProhibitRefChecks
+	- viv ProhibitInlineDo
+
+0.0.1 - 2025-03-26
+	- Core functionality

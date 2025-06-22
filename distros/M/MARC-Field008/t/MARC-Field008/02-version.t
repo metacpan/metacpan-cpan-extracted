@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($MARC::Field008::VERSION, 0.01, 'Version.');
+is($MARC::Field008::VERSION, 0.02, 'Version.');

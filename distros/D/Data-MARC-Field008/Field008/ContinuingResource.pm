@@ -20,7 +20,7 @@ use Mo::utils 0.22 qw(check_length_fix check_required);
 
 our $STRICT = 1;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has conference_publication => (
 	is => 'ro',
@@ -581,6 +581,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

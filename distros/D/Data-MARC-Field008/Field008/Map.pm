@@ -13,7 +13,7 @@ use Mo::utils 0.22 qw(check_length_fix);
 
 our $STRICT = 1;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has form_of_item => (
 	is => 'ro',
@@ -358,6 +358,7 @@ Returns string.
  use Data::Printer;
  use Data::MARC::Field008::Map;
 
+ # cnb000001006
  my $obj = Data::MARC::Field008::Map->new(
          'form_of_item' => ' ',
          'government_publication' => ' ',
@@ -425,6 +426,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

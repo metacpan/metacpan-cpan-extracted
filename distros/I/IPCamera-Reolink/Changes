@@ -1,5 +1,6 @@
 Revision history for IPCamera-Reolink
 
+
 1.00    Thu 04 Jan 2024 04:50:29 PM EST
         Initial version, created with: module-starter -module=IPCamera::Reolink --author="Stephen Oberski" -email="cpan@cargocult.ca"
 
@@ -21,3 +22,6 @@ Revision history for IPCamera-Reolink
 1.04    Wed 02 Oct 2024 02:51:50 PM EDT
         - added AudioAlarmPlay() method to play camera alarm.
         - added Reboot() method to reboot camera.
+
+1.06    Sat 21 Jun 2025 05:37:24 PM EDT 
+        -added SetPtzPreset() - implement camera API SetPtzPreset iterface, used to set configuration of Ptz Preset.

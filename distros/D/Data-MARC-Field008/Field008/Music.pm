@@ -5,7 +5,7 @@ use warnings;
 
 use Data::MARC::Field008::Utils qw(check_item_form
 	check_music_accompanying_matter check_music_composition_form
-	check_music_format check_music_literary_text check_music_part
+	check_music_format check_music_literary_text check_music_parts
 	check_music_transposition_and_arrangement check_target_audience);
 use Error::Pure qw(err);
 use Error::Pure::Utils qw(err_get);
@@ -14,7 +14,7 @@ use Mo::utils 0.22 qw(check_length_fix check_required);
 
 our $STRICT = 1;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has accompanying_matter => (
 	is => 'ro',
@@ -74,7 +74,7 @@ sub BUILD {
 	eval { check_music_literary_text($self, 'literary_text_for_sound_recordings'); };
 
 	# Check 'music_parts'.
-	eval { check_music_part($self, 'music_parts'); };
+	eval { check_music_parts($self, 'music_parts'); };
 
 	# Check 'target_audience'.
 	eval { check_target_audience($self, 'target_audience'); };
@@ -354,7 +354,7 @@ Returns string.
                          Length: %s
                          Value: %s
                          Expected length: 2
-         From Data::MARC::Field008::Utils::check_music_part():
+         From Data::MARC::Field008::Utils::check_music_parts():
                  Parameter 'music_parts' has bad value.
                          Value: %s
                  Parameter 'music_parts' is required.
@@ -395,6 +395,7 @@ Returns string.
  use Data::Printer;
  use Data::MARC::Field008::Music;
 
+ # cnb000012142
  my $obj = Data::MARC::Field008::Music->new(
          'accompanying_matter' => '      ',
          'form_of_composition' => 'sg',
@@ -417,7 +418,7 @@ Returns string.
  #     public methods (13):
  #         BUILD
  #         Data::MARC::Field008::Utils:
- #             check_item_form, check_music_accompanying_matter, check_music_composition_form, check_music_format, check_music_literary_text, check_music_part, check_music_transposition_and_arrangement, check_target_audience
+ #             check_item_form, check_music_accompanying_matter, check_music_composition_form, check_music_format, check_music_literary_text, check_music_parts, check_music_transposition_and_arrangement, check_target_audience
  #         Error::Pure:
  #             err
  #         Error::Pure::Utils:
@@ -464,6 +465,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

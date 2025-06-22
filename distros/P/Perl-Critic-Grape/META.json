@@ -1,9 +1,9 @@
 {
-	"version" : "0.0.2",
+	"version" : "0.0.3",
 	"name"    : "Perl::Critic::Grape",
 	"author"  : "Brian Blackmore",
 	"abstract": "Additional Perl::Critic policies",
-	"license" : "perl",
+	"license" : ["perl_5"],
 	"meta-spec" : {
 		"url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
 		"version" : "2"
@@ -34,5 +34,8 @@
 	"resources" : {
 		"bugtracker": {"web":"https://github.com/blb8/perl-critic-grape/issues"},
 		"repository": {"url":"git://github.com/blb8/perl-critic-grape.git"}
-	}
+	},
+	"dynamic_config": 1,
+	"generated_by": "Brian Blackmore",
+	"release_status": "stable"
 }

@@ -126,7 +126,7 @@ t/Data-MARC-Field008-Utils/29-check_music_accompanying_matter.t
 t/Data-MARC-Field008-Utils/30-check_music_composition_form.t
 t/Data-MARC-Field008-Utils/31-check_music_format.t
 t/Data-MARC-Field008-Utils/32-check_music_literary_text.t
-t/Data-MARC-Field008-Utils/33-check_music_part.t
+t/Data-MARC-Field008-Utils/33-check_music_parts.t
 t/Data-MARC-Field008-Utils/34-check_music_transposition_and_arrangement.t
 t/Data-MARC-Field008-Utils/35-check_visual_material_running_time.t
 t/Data-MARC-Field008-Utils/36-check_visual_material_technique.t

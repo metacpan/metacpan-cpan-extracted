@@ -8,7 +8,7 @@ use warnings;
 use REST::Client;
 use IO::Socket::SSL;
 use JSON;
-use Data::Dump;
+use Data::Dumper;
 use Time::HiRes;
 use String::Random;
 
@@ -54,6 +54,9 @@ use constant PTZ_PresetMax => 63;
 # IPCamera::Reolink::PtzCtrl() preset values as list.
 our @PTZ_preset_list = (PTZ_PresetMin ... PTZ_PresetMax);
 
+# IPCamera::Reolink::SetPtzPreset() maximum preset name length.
+use constant PTZ_PresetMaxNameLength => 31;
+
 # IPCamera::Reolink::StartZoomFocus() op values.
 use constant ZF_ZoomPos => 'ZoomPos'; # set camera zoom to specified value
 
@@ -93,7 +96,7 @@ use constant AAP_AlarmModeManual => "manu"; # play continuously until next Audio
 # IPCamera::Reolink:AudioAlarmPlay() alarm_mode values as list.
 our @AAP_AlarmMode_list = (AAP_AlarmModeTimes, AAP_AlarmModeManual, );
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 our $DEBUG = 0; # > 0 for debug output to STDERR
 
@@ -133,7 +136,7 @@ sub new {
 sub _sendCameraCommand($$$$){
     my($camera_rest_client, $camera_command, $request_r, $token) = @_;
 
-    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): enter: camera_command '$camera_command' request_r '" . Data::Dump::quote($request_r) . "'\n" if($DEBUG > 2);
+    print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): enter: camera_command '$camera_command' request_r '" . Dumper($request_r) . "'\n" if($DEBUG > 2);
 
     my $t1 = Time::HiRes::time() if($DEBUG > 1);
     print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): " . $t1 . ": call JSON::encode_json()\n" if($DEBUG > 2);
@@ -190,7 +193,7 @@ sub _sendCameraCommand($$$$){
             } # if
             my $save_linewidth = $Data::Dump::LINEWIDTH;
             $Data::Dump::LINEWIDTH = 500; # no linebreak
-            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Data::Dump::quote($request_r) . "' response length " . length($response_content) . " time " . ($t6 - $t1) . " seconds\n";
+            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Dumper($request_r) . "' response length " . length($response_content) . " time " . ($t6 - $t1) . " seconds\n";
             $Data::Dump::LINEWIDTH = $save_linewidth; 
         } # if
         print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): exit OK\n" if($DEBUG > 2);
@@ -219,7 +222,7 @@ sub _sendCameraCommand($$$$){
             } # if
             my $save_linewidth = $Data::Dump::LINEWIDTH;
             $Data::Dump::LINEWIDTH = 500; # no linebreak
-            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Data::Dump::quote($request_r) . "' response '" . Data::Dump::quote($response_r) . "' time " . ($t6 - $t1) . " seconds\n";
+            print STDERR scalar(localtime()) . ": debug: IPCamera::Reolink::_sendCameraCommand($camera_command): command '" . $camera_command . "' token '" . (defined($token) ? $token : 'undef') . "' request '" . Dumper($request_r) . "' response '" . Dumper($response_r) . "' time " . ($t6 - $t1) . " seconds\n";
             $Data::Dump::LINEWIDTH = $save_linewidth; 
         } # if
 
@@ -439,6 +442,22 @@ sub GetPtzPreset($){
     } # if
 } # GetPtzPreset()
 
+# SetPtzPreset() - implement camera API SetPtzPreset iterface, used to set configuration of Ptz Preset.
+sub SetPtzPreset($$$$){
+    my($self, $channel, $enable, $id, $name) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return (undef, undef, undef);
+    } # if
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+    my $setptzpreset_r = [ {cmd => "SetPtzPreset", action => 0, param => { PtzPreset => { channel => int($channel), enable => int($enable), id => $id, name => $name, }}} ];
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'SetPtzPreset', $setptzpreset_r, $_camera_login_token);
+    if(defined($response_r)){
+        return 1;
+    }else{
+        return 0;
+    } # if
+} # SetPtzPreset()
+
 # Snap() - It is used to capture an image.
 sub Snap($$){
     my($self, $channel) = @_;
@@ -501,7 +520,7 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
 
 =head1 VERSION
 
-1.03
+1.06
 
 =head1 SYNOPSIS
 
@@ -763,7 +782,7 @@ PTZ turn to the specified preset at the specified speed.
 
 =back
 
-=head2 IPCamera::Reolink:AudioAlarmPlay() alarm_mode values.
+=head2 IPCamera::Reolink::AudioAlarmPlay() alarm_mode values.
 
 =over 4
 
@@ -774,6 +793,14 @@ play # times specified by times
 =item AAP_AlarmModeManual => "manu"; 
 
 play continuously until next AudioAlarmPlay command
+
+=head2 IPCamera::Reolink::SetPtzPrest() maximum legth of preset name.
+
+=over 4
+
+=item  PTZ_PresetMaxNameLength => 31;
+
+IPCamera::Reolink::SetPtzPrest() maximum legth of preset name.
 
 =back
 
@@ -1626,6 +1653,66 @@ Hash reference to camera PTZ Preset ranges.
 Hash reference to camera PTZ Preset initial values.
 
 =back
+
+=back
+
+=head2 SetPtzPreset($camera_channel, $enable, $id, $name)
+
+Set specified camera Ptz Preset.
+
+=over 4
+
+=item $camera_channel 
+
+Perform camera operation on specified camera channel.
+
+=over 4
+
+=item IPCamera::Reolink::ChannelDefault 
+
+If you are connected to a camera then there is (usually) only 1 channel.
+
+=item integer >= 0
+
+If you are connected to an NVR then there is usually one channel per attached camera starting at integer value 0.
+
+=back
+
+=back
+
+=over 4
+
+=item $enable 
+
+1 to enable the preset, 0 to disable the preset.
+
+=back
+
+=back
+
+=over 4
+
+=item $id 
+
+Preset id, integer value in the range [PTZ_PresetMin + 1, PTZ_PresetMax +1].
+
+=back
+
+=back
+
+=over 4
+
+=item $name 
+
+Preset name, maximum length  PTZ_PresetMaxNameLength characters.
+
+=back
+
+=back
+
+=item return
+
+Returns 1 if the specified preset is set else 0.
 
 =back
 

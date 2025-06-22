@@ -17,7 +17,7 @@ use List::Util 1.33 qw(any);
 use Mo::utils 0.08 qw(check_bool check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -573,6 +573,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

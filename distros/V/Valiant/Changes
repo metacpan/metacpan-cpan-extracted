@@ -1,6 +1,15 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002018 2025 June 21
+          - Fixed memory leak issue with the PagerBuilder control.
+          Control would leak if you invoked the pager builder on a
+          list that didn't actually page.  If you are using the
+          PagerBuilder in your code you should upgrade to this version.
+
 0.002017 2025 March 10
+          - various documentation updates.
+          - Minor changes to the way we look for errors on a model to improve forward
+            compatibility with some planned changes.
           - minor changes to the way we call 'csrf_token' to support per form tokens
             when the underlying CSRF library supports that.
 

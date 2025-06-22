@@ -11,6 +11,9 @@ t/00-load.t
 t/01-test.t
 t/02-ai-test.t
 t/03-utf8.t
+t/04-inline.t
+t/05-underscore.t
+t/06-not_a_list.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

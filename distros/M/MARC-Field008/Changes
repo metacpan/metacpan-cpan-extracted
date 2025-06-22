@@ -1,2 +1,6 @@
+0.02 2025-06-21T18:12:09+02:00
+ - Add tests for book material in parse().
+ - Add tests for errors.
+
 0.01 2025-06-20T11:47:20+02:00
  - First version.

@@ -17,10 +17,12 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
+        #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
         'REST::Client' => '0',
         'JSON' => '0',
         'Data::Dump' => '0',
+        'Data::Dumper' => 0,
         'Time::HiRes' => '0',
         'IO::Socket::SSL' => '0',
         'String::Random' => 0,

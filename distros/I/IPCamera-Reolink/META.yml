@@ -20,6 +20,7 @@ no_index:
     - inc
 requires:
   Data::Dump: '0'
+  Data::Dumper: '0'
   IO::Socket::SSL: '0'
   JSON: '0'
   REST::Client: '0'
@@ -29,5 +30,5 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '1.04'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
