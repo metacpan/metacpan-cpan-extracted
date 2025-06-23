@@ -384,6 +384,106 @@ Do not mark post as read.
 Instead of reading post via a pager, write the post's formatted contents to
 F<stdout>.
 
+=item B<--read-format>=I<fmt>
+
+Specify the format for the post's HTML contents that B<noss> will format when
+reading. I<fmt> is a string that consists of formatting codes which will be
+substituted by B<noss> for whatever information the code represents. A
+formatting code starts with a percentage sign, followed by an optional integar
+specifying the pad width, and a character signifying what the code is actually
+formatting. If the pad width is negative, the text will be left-justified. See
+also the C<read_format> configuration option.
+
+The format string can use the following formatting codes:
+
+=over 2
+
+=item %%
+
+A percentage sign.
+
+=item %f
+
+The name of the feed the post is in.
+
+=item %i
+
+The ID of the post.
+
+=item %t
+
+The title of the post.
+
+=item %u
+
+The URL of the post.
+
+=item %a
+
+The name of the author of the post.
+
+=item %c
+
+The list of categories the post is tagged under.
+
+=item %s
+
+A single character signifying the post's read status (C<r> for read, C<U> for
+unread).
+
+=item %S
+
+The post's read status, C<read> or C<unread>.
+
+=item %P
+
+The HTML contents of the post.
+
+=item %C
+
+The date of the post in the preferred date/time representation of the
+current locale.
+
+=item %d
+
+The post's day of the month as a decimal number (range 01 to 31).
+
+=item %w
+
+The post's abbreviated day of the week according to the current locale.
+
+=item %W
+
+The post's full day of the week according to the current locale.
+
+=item %m
+
+The post's abbreviated month name according to the current locale.
+
+=item %M
+
+The post's full month name according to the current locale.
+
+=item %n
+
+THe post's month as a decimal number (range 01 to 12).
+
+=item %y
+
+The post's year in two-digit form (range 00 to 99).
+
+=item %Y
+
+The post's full year.
+
+=back
+
+
+=item B<--width>=I<width>
+
+Specify the line width to use for the formatted text output. Defaults to C<80>.
+See also the C<line_width> configuration field.
+
 =back
 
 =item B<open> I<feed> [I<post>]
@@ -412,7 +512,7 @@ Do not mark post as read.
 =item B<list> [I<feed>|I<group>] ...
 
 List posts from specified feeds. When listing posts, B<noss> displays the
-post's read status (signified by a C<U> for C<unread>), the name of the feed
+post's read status, the name of the feed
 the post is a part of, the post's ID, and the title of the post. Each post is
 listed on a single line, which should make it easy to process in a pipeline.
 
@@ -475,6 +575,12 @@ Print the post list in reverse order.
 
 Show hidden feeds when using C<list> with no arguments.
 
+=item B<--list-format>=I<fmt>
+
+Print post information using the specified format. This option works just like
+the C<--read-format> option in the C<read> command. Consult its documentation
+for how formatting works and list of valid formatting codes.
+
 =back
 
 =item B<unread> [I<feed>|I<group>] ...
@@ -508,7 +614,17 @@ Mark all posts in every feed as read or unread.
 
 View the post information for the specified post.
 
-This command has no unique options.
+This command has the following options:
+
+=over 4
+
+=item B<--post-format>=I<fmt>
+
+Specify the format to use for printing post information. Consult the
+documentation for the C<read> command's C<--read-format> option for information
+on how formatting works and a list of valid formatting codes.
+
+=back
 
 =item B<feeds> [I<feed>] ...
 
@@ -522,6 +638,82 @@ This command has the following options:
 =item B<--brief>
 
 Only print feed names, not additional feed info.
+
+=item B<--feeds-format>=I<fmt>
+
+Specify the format to use for printing feed information. Consult the
+documentation for the C<read> command's C<--read-format> option for information
+on how format strings are processed.
+
+The following format codes are available:
+
+=over 2
+
+=item %%
+
+A percentage sign.
+
+=item %f
+
+The feed's name.
+
+=item %l
+
+The feed's link.
+
+=item %t
+
+THe feed's title
+
+=item %u
+
+The feed's homepage.
+
+=item %e
+
+The feed's description.
+
+=item %a
+
+The feed's author.
+
+=item %c
+
+The feed's tags.
+
+=item %p
+
+The number of posts in the feed.
+
+=item %r
+
+The number of read posts in the feed.
+
+=item %U
+
+The number of unread posts in the feed.
+
+=item %C
+
+=item %d
+
+=item %w
+
+=item %W
+
+=item %m
+
+=item %M
+
+=item %n
+
+=item %y
+
+=item %Y
+
+The same as their post formatting counterparts.
+
+=back
 
 =back
 
@@ -596,6 +788,15 @@ where B<noss> stores data like its feed database and feed cache.
 =item B<-f>|B<--feeds>=I<file>
 
 Specify path to the B<noss> feeds file.
+
+=item B<-A>|B<--autoclean>[=I<0>|I<1>]
+
+Toggle whether B<noss> should automatically run the C<clean> command after any
+operation. C<0> disables autoclean, C<1> enables it. Giving no argument is the
+equivalent to enabling autoclean. This command helps with automatically freeing
+up unused space at the cost of a slight performance penalty.
+By default, autoclean is disabled. This
+option can also be configured via the C<autoclean> configuration field.
 
 =item B<-h>|B<--help>
 
@@ -692,6 +893,38 @@ also the C<open> command's C<--browser> option.
 How you would like the C<list> command to sort posts. Valid methods are
 C<date>, C<feed>, and C<title>. See also the C<list> command's C<--sort>
 option.
+
+=item "B<line_width>": I<width>
+
+The line width to use for the formatted text output of the C<read> command.
+See also the C<read> command's C<--width> option.
+
+=item "B<read_format>": "I<fmt>"
+
+The format to use for the HTML contents of a post that B<noss> will format for
+the C<read> command. See the documentation for the C<read> command's
+C<--read-format> option for more information on the details of how text
+formatting works.
+
+=item "B<list_format>": "I<fmt>"
+
+The format to use for posts in the C<list> command. See also the C<list>
+command's C<--list-format> option.
+
+=item "B<post_format>": "I<fmt>"
+
+The format to use for the post information printed in the C<post> command. See
+also the C<post> command's C<--post-format> option.
+
+=item "B<feeds_format>": "I<fmt>"
+
+The format to use for feed information printed in the C<feeds> command. See
+also the C<feeds> command's C<--feeds-format> option.
+
+=item "B<autoclean>": I<bool>
+
+Boolean determining whether B<noss> should automatically run the C<clean>
+command after performing any operation. See also the C<--autoclean> option.
 
 =back
 

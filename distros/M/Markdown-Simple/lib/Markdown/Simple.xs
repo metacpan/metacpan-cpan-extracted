@@ -448,7 +448,130 @@ static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
 	return out;
 }
 
+
+static SV* strip_markdown_except_lists_tables(const char* input) {
+	SV* out = newSVpv("", 0);
+	const char* p = input;
+
+	while (*p) {
+		// Ordered lists: keep numbers and text, remove ". " or ") "
+		if ((p == input || *(p-1) == '\n') && *p >= '1' && *p <= '9' && (*(p+1) == '.' || *(p+1) == ')')) {
+			// Copy number
+			sv_catpvn(out, p, 1);
+			sv_catpvn(out, " ", 1); // Keep space after number	
+			p += 2;
+			if (*p == ' ') p++;
+			continue;
+		}
+		// Unordered lists: keep marker, remove space
+		if ((p == input || *(p-1) == '\n') && (*p == '-' || *p == '*' || *p == '+') && *(p+1) == ' ') {
+			sv_catpvn(out, p, 1);
+			sv_catpvn(out, " ", 1); // Keep space after marker
+			p += 2;
+			continue;
+		}
+		// Tables: just copy everything (including pipes and dashes)
+		if (*p == '|') {
+			sv_catpvn(out, p, 1);
+			p++;
+			continue;
+		}
+		// Table separator row (---): just copy dashes and pipes
+		if (*p == '-' && ((p > input && *(p-1) == '|') || (p == input))) {
+			sv_catpvn(out, p, 1);
+			p++;
+			continue;
+		}
+		// Remove bold (** or __)
+		if ((*p == '*' && *(p+1) == '*') || (*p == '_' && *(p+1) == '_')) {
+			p += 2;
+			continue;
+		}
+		// Remove italic (* or _)
+		if (*p == '*' || *p == '_') {
+			p++;
+			continue;
+		}
+		// Remove strikethrough (~~)
+		if (*p == '~' && *(p+1) == '~') {
+			p += 2;
+			continue;
+		}
+		// Remove inline code (`) and fenced code (```)
+		if (*p == '`') {
+			if (*(p+1) == '`' && *(p+2) == '`') {
+				p += 3;
+				// Skip until closing ```
+				const char* fence = strstr(p, "```");
+				if (fence) {
+					p = fence + 3;
+				} else {
+					p += strlen(p);
+				}
+			} else {
+				p++;
+				// Skip until closing `
+				while (*p && *p != '`') p++;
+				if (*p == '`') p++;
+			}
+			continue;
+		}
+		// Remove images ![alt](url)
+		if (*p == '!' && *(p+1) == '[') {
+			p += 2;
+			while (*p && *p != ']') p++;
+			if (*p == ']') p++;
+			if (*p == '(') {
+				p++;
+				while (*p && *p != ')') p++;
+				if (*p == ')') p++;
+			}
+			continue;
+		}
+		// Remove links [text](url), keep text
+		if (*p == '[') {
+			p++;
+			const char* text_start = p;
+			while (*p && *p != ']') p++;
+			int text_len = (int)(p - text_start);
+			if (text_len > 0)
+				sv_catpvn(out, text_start, text_len);
+			if (*p == ']') p++;
+			if (*p == '(') {
+				p++;
+				while (*p && *p != ')') p++;
+				if (*p == ')') p++;
+			}
+			continue;
+		}
+		// Remove headers (#)
+		if (*p == '#') {
+			while (*p == '#') p++;
+			if (*p == ' ') p++;
+			continue;
+		}
+		// Remove task list [ ] or [x]
+		if (*p == '[' && (*(p+1) == ' ' || *(p+1) == 'x' || *(p+1) == 'X') && *(p+2) == ']') {
+			p += 3;
+			if (*p == ' ') p++;
+			continue;
+		}
+		// Default: copy character
+		sv_catpvn(out, p, 1);
+		p++;
+	}
+	return out;
+}
+
 MODULE = Markdown::Simple    PACKAGE = Markdown::Simple
+
+SV*
+strip_markdown(input)
+	const char* input
+CODE:
+	RETVAL = strip_markdown_except_lists_tables(input);
+OUTPUT:
+	RETVAL
 
 SV*
 markdown_to_html(input, ...)

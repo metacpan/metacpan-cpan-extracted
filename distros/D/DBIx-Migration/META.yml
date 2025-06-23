@@ -4,7 +4,7 @@ author:
   - 'Sebastian Riedel, <kraihx@gmail.com>'
 build_requires:
   DBD::Mock: '0'
-  DBD::SQLite: '1.27'
+  DBD::SQLite: '1.6'
   Test::API: '0'
   Test::DatabaseRow: '0'
   Test::Deep: '0'
@@ -27,7 +27,7 @@ name: DBIx-Migration
 provides:
   DBIx::Migration:
     file: lib/DBIx/Migration.pm
-    version: '0.30'
+    version: '0.31'
   DBIx::Migration::CLI:
     file: lib/DBIx/Migration/CLI.pm
   DBIx::Migration::Pg:
@@ -60,5 +60,5 @@ resources:
   bugtracker: https://github.com/XSven/perl-dbix-migration/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/XSven/perl-dbix-migration.git
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -130,6 +130,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'skip_java_script_links' => {
+    	datatype => 'boolean',
+    	base_name => 'SkipJavaScriptLinks',
+    	description => 'True to skip hyperlinks with javascript calls when saving the presentation.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -193,6 +200,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'disable_font_ligatures' => {
+    	datatype => 'boolean',
+    	base_name => 'DisableFontLigatures',
+    	description => 'true to disable ligatures in the rendered output.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -201,6 +215,7 @@ __PACKAGE__->swagger_types( {
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
+    'skip_java_script_links' => 'boolean',
     'format' => 'string',
     'save_as_zip' => 'boolean',
     'sub_directory_name' => 'string',
@@ -209,7 +224,8 @@ __PACKAGE__->swagger_types( {
     'jpeg_quality' => 'int',
     'pictures_compression' => 'string',
     'delete_pictures_cropped_areas' => 'boolean',
-    'slides_layout_options' => 'SlidesLayoutOptions'
+    'slides_layout_options' => 'SlidesLayoutOptions',
+    'disable_font_ligatures' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -218,6 +234,7 @@ __PACKAGE__->attribute_map( {
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
+    'skip_java_script_links' => 'SkipJavaScriptLinks',
     'format' => 'Format',
     'save_as_zip' => 'SaveAsZip',
     'sub_directory_name' => 'SubDirectoryName',
@@ -226,7 +243,8 @@ __PACKAGE__->attribute_map( {
     'jpeg_quality' => 'JpegQuality',
     'pictures_compression' => 'PicturesCompression',
     'delete_pictures_cropped_areas' => 'DeletePicturesCroppedAreas',
-    'slides_layout_options' => 'SlidesLayoutOptions'
+    'slides_layout_options' => 'SlidesLayoutOptions',
+    'disable_font_ligatures' => 'DisableFontLigatures'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

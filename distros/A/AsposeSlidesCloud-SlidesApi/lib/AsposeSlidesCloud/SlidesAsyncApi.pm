@@ -338,7 +338,7 @@ sub start_convert {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -483,7 +483,7 @@ sub start_convert_and_save {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -638,7 +638,7 @@ sub start_download_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -972,7 +972,7 @@ sub start_save_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -1160,7 +1160,7 @@ sub start_split {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -1352,7 +1352,7 @@ sub start_upload_and_split {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 

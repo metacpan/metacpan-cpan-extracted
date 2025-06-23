@@ -12,6 +12,12 @@ Daje::Workflow::Config - Loads the JSON based configs and put them in a hash
        path => "path",
     )->load($filename);
 
+    my $parameter = "key";
+
+    my $value = $config->param($parameter);
+
+    my $parameter = "key1.key2";
+
     my $value = $config->param($parameter);
 
 # DESCRIPTION
@@ -20,8 +26,6 @@ Daje::Config is loading workflows from JSON files in a set folder
 
 # REQUIRES
 
-[Daje::Workflow::Config](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3AConfig) 
-
 [Daje::Config](https://metacpan.org/pod/Daje%3A%3AConfig) 
 
 [Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
@@ -29,6 +33,14 @@ Daje::Config is loading workflows from JSON files in a set folder
 [v5.40](https://metacpan.org/pod/v5.40) 
 
 # METHODS
+
+## load($self,
+
+    load($self,();
+
+## param($self,
+
+    param($self,();
 
 # AUTHOR
 

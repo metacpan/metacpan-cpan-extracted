@@ -806,7 +806,7 @@ sub convert {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -951,7 +951,7 @@ sub convert_and_save {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -6349,6 +6349,167 @@ sub create_vba_module {
 }
 
 #
+# create_video_caption_track
+#
+# Create video captions track.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must refer to a picture frame). (required)
+# @param string $label Caption track label. (required)
+# @param string $data Caption track data. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must refer to a picture frame).',
+        required => '1',
+    },
+    'label' => {
+        data_type => 'string',
+        description => 'Caption track label.',
+        required => '1',
+    },
+    'data' => {
+        data_type => 'string',
+        description => 'Caption track data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_video_caption_track' } = { 
+    	summary => 'Create video captions track.',
+        params => $params,
+        returns => 'CaptionTrack',
+        };
+}
+# @return CaptionTrack
+#
+sub create_video_caption_track {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling create_video_caption_track");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling create_video_caption_track");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling create_video_caption_track");
+    }
+
+    # verify the required parameter 'label' is set
+    unless (exists $args{'label'} && defined $args{'label'} && $args{'label'}) {
+      croak("Missing the required parameter 'label' when calling create_video_caption_track");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/captionTracks';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'label'} && defined $args{'label'}) {
+        $query_params->{'label'} = $self->{api_client}->to_query_value($args{'label'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'data'} && $args{'data'}) {
+        $_body_data = $args{'data'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CaptionTrack', $response);
+    return $_response_object;
+}
+
+#
 # create_watermark
 #
 # Adds a text watermark to each slide of the presentation. Text watermark can be setup via method arguments or withing Shape DTO for detailed customization. Both options are applicable simultaneously. 
@@ -9189,136 +9350,6 @@ sub delete_paragraphs {
     }
     my $_response_object = $self->{api_client}->deserialize('Paragraphs', $response);
     return $_response_object;
-}
-
-#
-# delete_picture_cropped_areas
-#
-# Deletes cropped areas of a pictire.
-# 
-# @param string $name Document name. (required)
-# @param int $slide_index Slide index. (required)
-# @param int $shape_index Shape index (must refer to a picture frame). (required)
-# @param string $password Document password. (optional)
-# @param string $folder Document folder. (optional)
-# @param string $storage Presentation storage. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Document name.',
-        required => '1',
-    },
-    'slide_index' => {
-        data_type => 'int',
-        description => 'Slide index.',
-        required => '1',
-    },
-    'shape_index' => {
-        data_type => 'int',
-        description => 'Shape index (must refer to a picture frame).',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'delete_picture_cropped_areas' } = { 
-    	summary => 'Deletes cropped areas of a pictire.',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub delete_picture_cropped_areas {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling delete_picture_cropped_areas");
-    }
-
-    # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling delete_picture_cropped_areas");
-    }
-
-    # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling delete_picture_cropped_areas");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/pictureCroppedAreas';
-
-    my $_method = 'DELETE';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # header params
-    if ( exists $args{'password'}) {
-        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'slide_index'}) {
-        my $_base_variable = "{" . "slideIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'shape_index'}) {
-        my $_base_variable = "{" . "shapeIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    my $files = [];
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $files);
-    return;
 }
 
 #
@@ -14029,6 +14060,284 @@ sub delete_vba_module {
 }
 
 #
+# delete_video_caption_track
+#
+# Delete video captions track.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must refer to a video frame). (required)
+# @param int $captions_index Captions track index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must refer to a video frame).',
+        required => '1',
+    },
+    'captions_index' => {
+        data_type => 'int',
+        description => 'Captions track index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_video_caption_track' } = { 
+    	summary => 'Delete video captions track.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub delete_video_caption_track {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_video_caption_track");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_video_caption_track");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_video_caption_track");
+    }
+
+    # verify the required parameter 'captions_index' is set
+    unless (exists $args{'captions_index'} && defined $args{'captions_index'}) {
+      croak("Missing the required parameter 'captions_index' when calling delete_video_caption_track");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/captionTracks/{captionsIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'captions_index'}) {
+        my $_base_variable = "{" . "captionsIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'captions_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
+# delete_video_caption_tracks
+#
+# Delete all video captions tracks.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must refer to a video frame). (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must refer to a video frame).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_video_caption_tracks' } = { 
+    	summary => 'Delete all video captions tracks.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub delete_video_caption_tracks {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_video_caption_tracks");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_video_caption_tracks");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_video_caption_tracks");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/captionTracks';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
 # delete_watermark
 #
 # Removes shapes with name \"watermark\" from the presentation.
@@ -14314,6 +14623,7 @@ sub download_file {
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
+# @param int $quality Image quality (0 to 100; has effect only on Jpeg format). (optional, default to 100)
 {
     my $params = {
     'name' => {
@@ -14344,6 +14654,11 @@ sub download_file {
     'storage' => {
         data_type => 'string',
         description => 'Document storage.',
+        required => '0',
+    },
+    'quality' => {
+        data_type => 'int',
+        description => 'Image quality (0 to 100; has effect only on Jpeg format).',
         required => '0',
     },
     };
@@ -14401,6 +14716,11 @@ sub download_image {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'quality'} && defined $args{'quality'}) {
+        $query_params->{'quality'} = $self->{api_client}->to_query_value($args{'quality'});
     }
 
     # header params
@@ -14657,6 +14977,7 @@ sub download_image_default_format_online {
 # @param int $index Image index. (required)
 # @param string $format Export format (png, jpg, gif). (required)
 # @param string $password Document password. (optional)
+# @param int $quality Image quality (0 to 100; has effect only on Jpeg format). (optional, default to 100)
 {
     my $params = {
     'document' => {
@@ -14677,6 +14998,11 @@ sub download_image_default_format_online {
     'password' => {
         data_type => 'string',
         description => 'Document password.',
+        required => '0',
+    },
+    'quality' => {
+        data_type => 'int',
+        description => 'Image quality (0 to 100; has effect only on Jpeg format).',
         required => '0',
     },
     };
@@ -14726,6 +15052,11 @@ sub download_image_online {
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
+    # query params
+    if (exists $args{'quality'} && defined $args{'quality'}) {
+        $query_params->{'quality'} = $self->{api_client}->to_query_value($args{'quality'});
+    }
+
     # header params
     if ( exists $args{'password'}) {
         $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
@@ -14771,6 +15102,7 @@ sub download_image_online {
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
+# @param int $quality Image quality (0 to 100; has effect only on Jpeg format). (optional, default to 100)
 {
     my $params = {
     'name' => {
@@ -14796,6 +15128,11 @@ sub download_image_online {
     'storage' => {
         data_type => 'string',
         description => 'Document storage.',
+        required => '0',
+    },
+    'quality' => {
+        data_type => 'int',
+        description => 'Image quality (0 to 100; has effect only on Jpeg format).',
         required => '0',
     },
     };
@@ -14848,6 +15185,11 @@ sub download_images {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'quality'} && defined $args{'quality'}) {
+        $query_params->{'quality'} = $self->{api_client}->to_query_value($args{'quality'});
     }
 
     # header params
@@ -15060,6 +15402,7 @@ sub download_images_default_format_online {
 # @param File $document Document data. (required)
 # @param string $format Export format (png, jpg, gif). (required)
 # @param string $password Document password. (optional)
+# @param int $quality Image quality (0 to 100; has effect only on Jpeg format). (optional, default to 100)
 {
     my $params = {
     'document' => {
@@ -15075,6 +15418,11 @@ sub download_images_default_format_online {
     'password' => {
         data_type => 'string',
         description => 'Document password.',
+        required => '0',
+    },
+    'quality' => {
+        data_type => 'int',
+        description => 'Image quality (0 to 100; has effect only on Jpeg format).',
         required => '0',
     },
     };
@@ -15118,6 +15466,11 @@ sub download_images_online {
         $header_params->{'Accept'} = $_header_accept;
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'quality'} && defined $args{'quality'}) {
+        $query_params->{'quality'} = $self->{api_client}->to_query_value($args{'quality'});
+    }
 
     # header params
     if ( exists $args{'password'}) {
@@ -15736,7 +16089,7 @@ sub download_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -15930,7 +16283,7 @@ sub download_shape {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16077,7 +16430,7 @@ sub download_shape_from_dto {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16232,7 +16585,7 @@ sub download_shape_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16423,7 +16776,7 @@ sub download_slide {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16600,7 +16953,7 @@ sub download_slide_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16813,7 +17166,7 @@ sub download_special_slide_shape {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -24819,6 +25172,151 @@ sub get_vba_project {
 }
 
 #
+# get_video_caption_tracks
+#
+# Gets video captions tracks.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must refer to a picture frame). (required)
+# @param boolean $include_data true to include caption data string values in the response. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must refer to a picture frame).',
+        required => '1',
+    },
+    'include_data' => {
+        data_type => 'boolean',
+        description => 'true to include caption data string values in the response.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_video_caption_tracks' } = { 
+    	summary => 'Gets video captions tracks.',
+        params => $params,
+        returns => 'CaptionTracks',
+        };
+}
+# @return CaptionTracks
+#
+sub get_video_caption_tracks {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_video_caption_tracks");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_video_caption_tracks");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_video_caption_tracks");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/captionTracks';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'include_data'} && defined $args{'include_data'}) {
+        $query_params->{'includeData'} = $self->{api_client}->to_boolean_query_value($args{'include_data'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CaptionTracks', $response);
+    return $_response_object;
+}
+
+#
 # get_view_properties
 #
 # Read presentation view properties.
@@ -25584,6 +26082,8 @@ sub highlight_shape_text {
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
+# @param int $position Slide index before which the HTML should be added (add to the end by default). (optional)
+# @param boolean $use_slide_with_index_as_start true to insert data starting from an empty space on the slide with the specified index; false to add data to the created slides. (optional, default to false)
 {
     my $params = {
     'name' => {
@@ -25609,6 +26109,16 @@ sub highlight_shape_text {
     'storage' => {
         data_type => 'string',
         description => 'Document storage.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Slide index before which the HTML should be added (add to the end by default).',
+        required => '0',
+    },
+    'use_slide_with_index_as_start' => {
+        data_type => 'boolean',
+        description => 'true to insert data starting from an empty space on the slide with the specified index; false to add data to the created slides.',
         required => '0',
     },
     };
@@ -25651,6 +26161,16 @@ sub import_from_html {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
+    if (exists $args{'use_slide_with_index_as_start'} && defined $args{'use_slide_with_index_as_start'}) {
+        $query_params->{'useSlideWithIndexAsStart'} = $self->{api_client}->to_boolean_query_value($args{'use_slide_with_index_as_start'});
     }
 
     # header params
@@ -29413,7 +29933,7 @@ sub save_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -29619,7 +30139,7 @@ sub save_shape {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -29847,7 +30367,7 @@ sub save_shape_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -30050,7 +30570,7 @@ sub save_slide {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -30239,7 +30759,7 @@ sub save_slide_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -30464,7 +30984,7 @@ sub save_special_slide_shape {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33801,7 +34321,7 @@ sub split {
     }
 
     # verify enum value
-    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33991,7 +34511,7 @@ sub split_and_save_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -34168,7 +34688,7 @@ sub split_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml', 'Emf' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 

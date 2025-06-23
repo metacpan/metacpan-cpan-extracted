@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.018'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-06-09'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.019'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-06-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -646,8 +646,8 @@ sub _generate_sub($;$) {
     $code .= " { \@_ = ( &__getself" ;
   }
   elsif ($basename eq "dvis") {
-    $code .= " { \@_ = ( &__getself->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" ;
-    #$code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':spacedots')" ;
+    $code .= " { \@_ = ( &__getself->_EnabUseqqFeature(_utfoutput() ? ':showspaces:condense' : ':condense')" ;
+    #$code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':showspaces')" ;
   }
   else { oops "basename=",u($basename) }
 
@@ -663,7 +663,7 @@ sub _generate_sub($;$) {
 
   $code .= "->Useqq(\$Useqq.'${useqq}')" if $useqq ne "";
 
-  $code .= "->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" if delete($mod{d}) or $basename eq "dvis";
+  $code .= "->_EnabUseqqFeature(_utfoutput() ? ':showspaces:condense' : ':condense')" if delete($mod{d}) or $basename eq "dvis";
 
   $code .= "->Useqq(0)"     if delete $mod{q};
 
@@ -735,8 +735,8 @@ sub _get_terminal_width() {  # returns undef if unknowable
       # such messages to /dev/null.  So we have to do it here.
       require Capture::Tiny;
       () = Capture::Tiny::capture_merged(sub{
-        delete local $INC{__WARN__};
-        delete local $INC{__DIE__};
+        delete local $SIG{__WARN__};
+        delete local $SIG{__DIE__};
         ($width, $height) = eval{ Term::ReadKey::GetTerminalSize($fh) };
       });
     }
@@ -1484,10 +1484,11 @@ sub __subst_controlpic_backesc() {  # edits $_
       $qqesc2controlpic{$1} // $1
     }xesg;
 }
-sub __subst_spacedots() {  # edits $_
+sub __subst_visiblespaces() {  # edits $_
   if (/^"/) {
-    s{\N{MIDDLE DOT}}{\N{BLACK LARGE CIRCLE}}g;
-    s{ }{\N{MIDDLE DOT}}g;
+    #s{\N{MIDDLE DOT}}{\N{BLACK LARGE CIRCLE}}g;
+    #s{ }{\N{MIDDLE DOT}}g;
+    s{ }{\N{OPEN BOX}}g;  # ␣
   }
 }
 
@@ -1548,7 +1549,7 @@ sub _postprocess_DD_result {
     if $useqq =~ /[^\x{0}-\x{7F}]/ && !utf8::is_utf8($useqq);
 
   my ($unesc_unicode,$condense_strings,$octet_strings,$nums_in_hex,
-      $controlpics,$spacedots,$underscores,$q_pfx,$q_lq,$q_rq);
+      $controlpics,$showspaces,$underscores,$q_pfx,$q_lq,$q_rq);
   if ($useqq && $useqq ne "1") {
     my @useqq = split /(?<!\\):/, $useqq;
     foreach (@useqq) {
@@ -1557,7 +1558,7 @@ sub _postprocess_DD_result {
       $octet_strings    = 1,next if /octet/;
       $nums_in_hex      = 1,next if /hex/;
       $controlpics      = 1,next if /pic/;
-      $spacedots        = 1,next if /space/;
+      $showspaces        = 1,next if /space/;
       $underscores      = 1,next if /under/;
       $_ = "qq={}" if $_ eq "qq"; # deprecated
       if (/^qq=(.)(.)$/) { # deprecated
@@ -1613,7 +1614,7 @@ sub _postprocess_DD_result {
     __unesc_unicode          if $unesc_unicode;
     __unesc_nonoctal         if $octet_strings;
     __subst_controlpic_backesc      if $controlpics;
-    __subst_spacedots        if $spacedots;
+    __subst_visiblespaces    if $showspaces;
     __condense_strings(8)    if $condense_strings;
     __change_quotechars($q_pfx, $q_lq, $q_rq) if defined($q_pfx);
     __nums_in_hex            if $nums_in_hex;
@@ -2712,9 +2713,11 @@ set C<Useqq> to just "unicode";
 Optimize for viewing binary strings (i.e. strings of octets, not "wide"
 characters).  Octal escapes are shown instead of \n, \r, etc.
 
-=item "spacedots"
+=item "showspaces"
 
-Space characters are shown as '·' (Middle Dot).
+Make space characters visible (as '␣').
+
+(An older "spacedots" option used Middle Dot for this purpose)
 
 =item "condense"
 
@@ -2748,7 +2751,7 @@ contain multiple characters. Escape , or : with backslash(E<92>).
 =back
 
 The default is C<Useqq('unicode')> except for C<dvis> which also
-enables 'condense' and possibly 'spacedots'.
+enables 'condense' and possibly 'showspaces'.
 Functions/methods with 'q' in their name force C<Useqq(0)>;
 
 =head2 Quotekeys

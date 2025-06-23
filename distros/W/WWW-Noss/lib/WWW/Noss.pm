@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -11,6 +11,7 @@ use File::Copy;
 use File::Spec;
 use File::Temp qw(tempfile);
 use List::Util qw(max);
+use POSIX qw(strftime);
 
 use JSON;
 use Parallel::ForkManager;
@@ -28,9 +29,11 @@ use WWW::Noss::TextToHtml qw(escape_html);
 my $PRGNAM = 'noss';
 my $PRGVER = $VERSION;
 
-# TODO: --list-format option for list
-# TODO: --content-format option for read
 # TODO: nossui script?
+
+# TODO: Command to view unread post information? (what feeds are unread, how many unread, etc.)
+
+# TODO: Simplify config reading code
 
 my $HELP = <<"HERE";
 Usage:
@@ -53,7 +56,7 @@ Commands:
 
 Global Options:
   -c|--config=<file>   Specify path to configuration file
-  -D|--data=<dir>      Speciy path to data directory
+  -D|--data=<dir>      Specify path to data directory
   -f|--feeds=<file>    Specify path to feeds file
 
   -h|--help      Print this usage message
@@ -95,12 +98,133 @@ my $DOT_CONFIG = File::Spec->catfile(home, '.config');
 my $DEFAULT_AGENT = "$PRGNAM/$PRGVER ($^O; perl $^V)";
 my $DEFAULT_PAGER = $^O eq 'MSWin32' ? 'more' : 'less';
 my $DEFAULT_FORKS = 10;
+my $DEFAULT_WIDTH = 80;
 
 my %VALID_SORTS = map { $_ => 1 } qw(
 	feed
 	title
 	date
 );
+
+my $MARK = "\x{fffe}";
+
+my %POST_FMT_CODES = (
+	'%' => sub { '%' },
+	'f' => sub { $_[0]->{ feed     } },
+	'i' => sub { $_[0]->{ nossid   } },
+	't' => sub { $_[0]->{ title    } // ''},
+	'u' => sub { $_[0]->{ link     } // 'N/A' },
+	'a' => sub { $_[0]->{ author   } // 'N/A' },
+	'c' => sub { join ', ', @{ $_[0]->{ category } } },
+	's' => sub { $_[0]->{ status } eq 'read' ? 'r' : 'U' },
+	'S' => sub { $_[0]->{ status } eq 'read' ? 'read' : 'unread' },
+	'P' => sub { $_[0]->{ summary } // '' },
+	'C' => sub {
+		strftime('%c', localtime($_[0]->{ updated } // $_[0]->{ published } // return 'N/A'))
+	},
+	'd' => sub {
+		strftime('%d', localtime($_[0]->{ updated } // $_[0]->{ published } // return '??'))
+	},
+	'w' => sub {
+		strftime('%a', localtime($_[0]->{ updated } // $_[0]->{ published } // return '???'))
+	},
+	'W' => sub {
+		strftime('%A', localtime($_[0]->{ updated } // $_[0]->{ published } // return '???'))
+	},
+	'm' => sub {
+		strftime('%b', localtime($_[0]->{ updated } // $_[0]->{ published } // return '???'))
+	},
+	'M' => sub {
+		strftime('%B', localtime($_[0]->{ updated } // $_[0]->{ published } // return '???'))
+	},
+	'n' => sub {
+		strftime('%m', localtime($_[0]->{ updated } // $_[0]->{ published } // return '??'))
+	},
+	'y' => sub {
+		strftime('%g', localtime($_[0]->{ updated } // $_[0]->{ published } // return '??'))
+	},
+	'Y' => sub {
+		strftime('%G', localtime($_[0]->{ updated } // $_[0]->{ published } // return '????'))
+	},
+);
+
+my %FEED_FMT_CODES = (
+	'%' => sub { '%' },
+	'f' => sub { $_[0]->{ nossname    } },
+	'l' => sub { $_[0]->{ nosslink    } },
+	't' => sub { $_[0]->{ title       } // '' },
+	'u' => sub { $_[0]->{ link        } // 'N/A' },
+	'e' => sub { $_[0]->{ description } // '' },
+	'a' => sub { $_[0]->{ author      } // 'N/A' },
+	'c' => sub { join ', ', @{ $_[0]->{ category } // [] } },
+	'p' => sub { $_[0]->{ posts } // 0},
+	'r' => sub { ($_[0]->{ posts } // 0) - ($_[0]->{ unread } // 0) },
+	'U' => sub { $_[0]->{ unread } // 0},
+	'C' => sub {
+		strftime('%c', localtime($_[0]->{ updated } // return 'N/A'))
+	},
+	'd' => sub {
+		strftime('%d', localtime($_[0]->{ updated } // return '??'))
+	},
+	'w' => sub {
+		strftime('%a', localtime($_[0]->{ updated } // return '???'))
+	},
+	'W' => sub {
+		strftime('%A', localtime($_[0]->{ updated } // return '???'))
+	},
+	'm' => sub {
+		strftime('%b', localtime($_[0]->{ updated } // return '???'))
+	},
+	'M' => sub {
+		strftime('%B', localtime($_[0]->{ updated } // return '???'))
+	},
+	'n' => sub {
+		strftime('%m', localtime($_[0]->{ updated } // return '??'))
+	},
+	'y' => sub {
+		strftime('%g', localtime($_[0]->{ updated } // return '??'))
+	},
+	'Y' => sub {
+		strftime('%G', localtime($_[0]->{ updated } // return '????'))
+	},
+);
+
+my $DEFAULT_READ_FMT = <<'HERE';
+<h1>%f - %t</h1>
+
+<div>
+%P
+</div>
+
+<p>
+Link: %u
+</p>
+
+<p>
+Updated: %C
+</p>
+
+HERE
+
+my $DEFAULT_POST_FMT = <<'HERE';
+%f:%i
+  Title:   %t
+  Link:    %u
+  Author:  %a
+  Tags:    %c
+  Updated: %C
+HERE
+
+my $DEFAULT_FEED_FMT = <<'HERE';
+%f
+  Title:   %t
+  Link:    %u
+  Author:  %a
+  Updated: %C
+  Posts:   %p
+  Unread:  %U/%p
+
+HERE
 
 sub _default_data_dir {
 
@@ -327,10 +451,54 @@ sub _read_config {
 
 	if (defined $json->{ sort }) {
 		if (exists $VALID_SORTS{ $json->{ sort } }) {
-			$self->{ Sort } = $json->{ sort };
+			$self->{ Sort } //= $json->{ sort };
 		} else {
 			warn sprintf "'sort' must be one of the following: %s\n", join(', ', sort keys %VALID_SORTS);
 		}
+	}
+
+	if (defined $json->{ line_width }) {
+		if ($json->{ line_width } =~ /^\d+$/ and $json->{ line_width } > 0) {
+			$self->{ LineWidth } //= $json->{ line_width };
+		} else {
+			warn "'line_width' must be an integar greater than 0, ignoring\n";
+		}
+	}
+
+	if (defined $json->{ list_format }) {
+		if (ref $json->{ list_format }) {
+			warn "'list_format' is not a format string, ignoring\n";
+		} else {
+			$self->{ ListFmt } //= $json->{ list_format };
+		}
+	}
+
+	if (defined $json->{ read_format }) {
+		if (ref $json->{ read_format }) {
+			warn "'read_format' is not a format string, ignoring\n";
+		} else {
+			$self->{ ReadFmt } //= $json->{ read_format };
+		}
+	}
+
+	if (defined $json->{ post_format }) {
+		if (ref $json->{ post_format }) {
+			warn "'post_format' is not a format string, ignoring\n";
+		} else {
+			$self->{ PostFmt } //= $json->{ post_format };
+		}
+	}
+
+	if (defined $json->{ feeds_format }) {
+		if (ref $json->{ feeds_format }) {
+			warn "'feeds_format' is not a format string, ignoring\n";
+		} else {
+			$self->{ FeedsFmt } //= $json->{ feeds_fmt };
+		}
+	}
+
+	if (defined $json->{ autoclean }) {
+		$self->{ AutoClean } //= !! $json->{ autoclean };
 	}
 
 	return 1;
@@ -571,51 +739,6 @@ sub _read_feed_file {
 
 }
 
-sub _post_html {
-
-	my ($post) = @_;
-
-	my $html = '';
-
-	if (defined $post->{ title }) {
-		$html .=
-			sprintf "<h1>%s</h1>\n",
-			escape_html($post->{ title });
-	}
-
-	if (defined $post->{ summary }) {
-		$html .= $post->{ summary };
-		$html .= "<h1>--- END OF POST ---</h1>\n";
-	}
-
-	if (defined $post->{ link }) {
-		$html .=
-			sprintf "<p>Link: %s</p>\n",
-			escape_html($post->{ link });
-	}
-
-	if (defined $post->{ author }) {
-		$html .=
-			sprintf "<p>Author: %s</p>\n",
-			escape_html($post->{ author });
-	}
-
-	if (@{ $post->{ category } }) {
-		$html .=
-			sprintf "<p>Tags: %s</p>\n",
-			escape_html(join ', ', @{ $post->{ category } });
-	}
-
-	if (defined $post->{ published }) {
-		$html .=
-			sprintf "<p>Published: %s</p>\n",
-			escape_html(scalar gmtime $post->{ published });
-	}
-
-	return $html;
-
-}
-
 sub _arg2rx {
 
 	my ($str) = @_;
@@ -625,6 +748,37 @@ sub _arg2rx {
 	} else {
 		return qr/\Q$str\E/i;
 	}
+
+}
+
+sub _fmt {
+
+	my ($fmt, $codes) = @_;
+
+	$fmt .= "\n" unless $fmt =~ /\n$/;
+
+	my @subs;
+
+	for my $m ($fmt =~ m/(%(?:-?\d+)?.)/g) {
+
+		my $c = chop $m;
+
+		unless (exists $codes->{ $c }) {
+			die "'$m$c' is not a valid list formatting code\n";
+		}
+
+		# Add $MARK so that subsequent substitutions don't interfere with this
+		# one.
+		my $subst = $m . $MARK . 's';
+
+		$fmt =~ s/\Q$m$c\E/$subst/;
+		push @subs, $codes->{ $c };
+
+	}
+
+	$fmt =~ s/$MARK//g;
+
+	return sub { sprintf $fmt, map { $_->($_[0]) } @subs };
 
 }
 
@@ -806,7 +960,8 @@ sub update {
 		if ($@ ne '') {
 			my $e = $@;
 			chomp $e;
-			die "Error updating $c: $e, skipping\n";
+			warn "Error updating $c: $e, skipping\n";
+			next;
 		}
 
 		next if $new == 0;
@@ -875,10 +1030,13 @@ sub reload {
 			$self->{ DB }->load_feed($self->{ Feeds }{ $r });
 		};
 
-		warn $@ if $@ ne '';
-
 		unless (defined $new) {
-			warn "Failed to reload $r, skipping\n";
+			my $e = $@;
+			chomp $e;
+			warn
+				$e ne ''
+				? "Failed to reload $r: $e, skipping\n"
+				: "Failed to relaod $r, skipping\n";
 			next;
 		}
 
@@ -901,6 +1059,7 @@ sub reload {
 
 }
 
+# TODO: --html option?
 sub read_post {
 
 	my ($self) = @_;
@@ -932,18 +1091,29 @@ sub read_post {
 		}
 	}
 
+	my $html = do {
+		my %fmt_codes = %POST_FMT_CODES;
+		for my $f (keys %fmt_codes) {
+			next if $f eq 'P';
+			$fmt_codes{ $f } = sub {
+				escape_html($POST_FMT_CODES{ $f }->($_[0]))
+			};
+		}
+		_fmt($self->{ ReadFmt }, \%fmt_codes)->($post);
+	};
+
 	my ($tmp_html_fh, $tmp_html_nm) = tempfile(UNLINK => 1);
-	print { $tmp_html_fh } _post_html($post);
+	print { $tmp_html_fh } $html;
 	close $tmp_html_fh;
 
 	if ($self->{ Stdout }) {
 
-		say lynx_dump($tmp_html_nm);
+		say lynx_dump($tmp_html_nm, width => $self->{ LineWidth });
 
 	} else {
 
 		my ($tmp_lynx_fh, $tmp_lynx_nm) = tempfile(UNLINK => 1);
-		print { $tmp_lynx_fh } lynx_dump($tmp_html_nm);
+		print { $tmp_lynx_fh } lynx_dump($tmp_html_nm, width => $self->{ LineWidth });
 		close $tmp_lynx_fh;
 
 		system "$self->{ Pager } $tmp_lynx_nm";
@@ -1053,8 +1223,13 @@ sub look {
 		: undef;
 	my @contrx = map { _arg2rx($_) } @{ $self->{ Content } };
 
+	# TODO: Only calculate this stuff if we're not using list-format
 	my $idlen   = length($self->{ DB }->largest_id(@feeds) // 0);
 	my $feedlen = max map { length } @feeds;
+
+	my $fmt = $self->{ ListFmt } // ("%s %-$feedlen" . "f %$idlen" ."i  %t");
+
+	my $callback = sub { print _fmt($fmt, \%POST_FMT_CODES)->($_[0]) };
 
 	$self->{ DB }->look(
 		title => $titlerx,
@@ -1064,13 +1239,7 @@ sub look {
 		content => \@contrx,
 		order => $self->{ Sort },
 		reverse => $self->{ Reverse },
-		callback => sub {
-			printf "%s %*s  %*s  %s\n",
-				($_[0]->{ status } eq 'read' ? ' ' : 'U'),
-				-$feedlen, $_[0]->{ feed },
-				$idlen, $_[0]->{ nossid },
-				$_[0]->{ title } // '';
-		},
+		callback => $callback,
 	);
 
 	return 1;
@@ -1172,36 +1341,7 @@ sub post {
 		die "'$feed:$id' does not exist\n";
 	}
 
-	my $feed_info = $self->{ DB }->feed($feed);
-
-	printf(
-		<<"HERE",
-%s:%s
-  Title:     %s
-  Link:      %s
-  Author:    %s
-  Tags:      %s
-  Published: %s
-  Updated:   %s
-HERE
-		$feed, $id,
-		$post->{ title  },
-		$post->{ link   },
-		$post->{ author } // $feed_info->{ author } // 'Not available',
-		join(', ', @{ $post->{ category } }),
-		(
-			defined $post->{ published }
-			? scalar gmtime $post->{ published }
-			: 'Not available'
-		),
-		(
-			defined $post->{ updated }
-			? scalar gmtime $post->{ updated }
-			: defined $post->{ published }
-			  ? scalar gmtime $post->{ published }
-			  : 'Not available'
-		),
-	);
+	print _fmt($self->{ PostFmt }, \%POST_FMT_CODES)->($post);
 
 	return 1;
 
@@ -1229,39 +1369,18 @@ sub feeds {
 		die "No feeds can be printed\n";
 	}
 
-	for my $i (0 .. $#feeds) {
+	my $cb = _fmt($self->{ FeedsFmt }, \%FEED_FMT_CODES);
 
-		say $feeds[$i];
+	for my $n (@feeds) {
 
-		unless ($self->{ Brief }) {
+		my $f = $self->{ DB }->feed($n, post_info => 1);
 
-			my $f = $self->{ DB }->feed($feeds[$i], post_info => 1);
+		$f //= {
+			nossname => $self->{ Feeds }{ $n }->name,
+			nosslink => $self->{ Feeds }{ $n }->feed,
+		};
 
-			unless (defined $f) {
-				say "  Not available\n";
-				next;
-			}
-
-			printf(
-				<<"HERE",
-  Title:   %s
-  Link:    %s
-  Author:  %s
-  Updated: %s
-  Posts:   %s
-  Unread:  %s
-HERE
-				$f->{ title } // $f,
-				$f->{ link } // $f->{ nosslink },
-				$f->{ author } // 'Not available',
-				(defined $f->{ updated } ? scalar gmtime $f->{ updated } : 'Not available'),
-				$f->{ posts },
-				"$f->{ unread }/$f->{ posts }"
-			);
-
-			print "\n" unless $i == $#feeds;
-
-		}
+		print $cb->($f);
 
 	}
 
@@ -1353,6 +1472,8 @@ sub clean {
 		$self->{ DB }->del_feeds(@clean);
 		$self->{ DB }->commit;
 	}
+
+	$self->{ DB }->vacuum;
 
 	return 1;
 
@@ -1478,6 +1599,7 @@ sub init {
 		Groups        => {},
 		DefaultGroup  => undef,
 		DB            => undef,
+		AutoClean     => undef,
 		# update
 		NewOnly       => 0,
 		NonDefaults   => 0,
@@ -1492,6 +1614,8 @@ sub init {
 		Pager         => undef,
 		NoMark        => 0, # open, too
 		Stdout        => 0,
+		LineWidth     => undef,
+		ReadFmt       => undef,
 		# open
 		Browser       => undef,
 		# look/unread
@@ -1502,49 +1626,69 @@ sub init {
 		Sort          => undef,
 		Reverse       => 0,
 		ShowHidden    => 0,
+		ListFmt       => undef,
 		# mark
 		MarkAll       => 0,
-		# feeds/groups
-		Brief         => 0,
+		# post
+		PostFmt       => undef,
+		# feeds
+		Brief         => 0, # groups, too
+		FeedsFmt      => undef,
 		# export/import
 		NoGroups      => 0,
 	};
 
 	Getopt::Long::config('bundling');
 	GetOptionsFromArray(\@argv,
-		'config|c=s'    => \$self->{ ConfFile },
-		'data|D=s'      => \$self->{ DataDir },
-		'feeds|f=s'     => \$self->{ FeedFile },
+		'config|c=s'     => \$self->{ ConfFile },
+		'data|D=s'       => \$self->{ DataDir },
+		'feeds|f=s'      => \$self->{ FeedFile },
+		'autoclean|A:s'  => sub {
+			if ($_[1] eq '' or $_[1] eq '1') {
+				$self->{ AutoClean } = 1;
+			} elsif ($_[1] eq '0') {
+				$self->{ AutoClean } = 0;
+			} else {
+				$self->{ AutoClean } = 1;
+				unshift @argv, $_[1];
+			}
+		},
 		# update
-		'new-only'      => \$self->{ NewOnly },
-		'non-defaults'  => \$self->{ NonDefaults },
-		'downloads=i'   => \$self->{ Forks },
-		'unconditional' => \$self->{ Unconditional },
-		'limit-rate=s'  => \$self->{ RateLimit },
-		'user-agent=s'  => \$self->{ UserAgent },
-		'timeout=f'     => \$self->{ Timeout },
-		'proxy=s'       => \$self->{ Proxy },
-		'proxy-user=s'  => \$self->{ ProxyUser },
+		'new-only'       => \$self->{ NewOnly },
+		'non-defaults'   => \$self->{ NonDefaults },
+		'downloads=i'    => \$self->{ Forks },
+		'unconditional'  => \$self->{ Unconditional },
+		'limit-rate=s'   => \$self->{ RateLimit },
+		'user-agent=s'   => \$self->{ UserAgent },
+		'timeout=f'      => \$self->{ Timeout },
+		'proxy=s'        => \$self->{ Proxy },
+		'proxy-user=s'   => \$self->{ ProxyUser },
 		# read
-		'pager=s'       => \$self->{ Pager },
-		'no-mark'       => \$self->{ NoMark }, # open, too
-		'stdout'        => \$self->{ Stdout },
+		'pager=s'        => \$self->{ Pager },
+		'no-mark'        => \$self->{ NoMark }, # open, too
+		'stdout'         => \$self->{ Stdout },
+		'width=i'        => \$self->{ LineWidth },
+		'read-format=s'  => \$self->{ ReadFmt },
 		# open
-		'browser=s'     => \$self->{ Browser },
+		'browser=s'      => \$self->{ Browser },
 		# look/unread
-		'title=s'       => \$self->{ Title },
-		'tag=s'         =>  $self->{ Tags },
-		'status=s'      => \$self->{ Status }, # look only
-		'content=s'     =>  $self->{ Content },
-		'sort=s'        => \$self->{ Sort },
-		'reverse'       => \$self->{ Reverse },
-		'hidden'        => \$self->{ ShowHidden },
+		'title=s'        => \$self->{ Title },
+		'tag=s'          =>  $self->{ Tags },
+		'status=s'       => \$self->{ Status }, # look only
+		'content=s'      =>  $self->{ Content },
+		'sort=s'         => \$self->{ Sort },
+		'reverse'        => \$self->{ Reverse },
+		'hidden'         => \$self->{ ShowHidden },
+		'list-format=s'  => \$self->{ ListFmt },
 		# mark
-		'all'           => \$self->{ MarkAll },
-		# feeds/groups
-		'brief'         => \$self->{ Brief },
+		'all'            => \$self->{ MarkAll },
+		# post
+		'post-format=s'  => \$self->{ PostFmt },
+		# feeds
+		'brief'          => \$self->{ Brief }, # groups, too
+		'feeds-format=s' => \$self->{ FeedsFmt },
 		# export/import
-		'no-groups'     => \$self->{ NoGroups },
+		'no-groups'      => \$self->{ NoGroups },
 		# misc
 		'help|h'    => sub { print $HELP;    exit 0 },
 		'version|v' => sub { print $VER_MSG; exit 0 },
@@ -1562,6 +1706,10 @@ sub init {
 	$self->{ Args } = [ @argv ];
 
 	$self->{ ConfFile } //= _default_config;
+
+	if ($self->{ Brief } and $self->{ Cmd } eq 'feeds') {
+		$self->{ FeedsFmt } = '%f';
+	}
 
 	if (defined $self->{ ConfFile }) {
 		$self->_read_config;
@@ -1614,9 +1762,18 @@ sub init {
 		die "Download count must be greater than 0\n";
 	}
 
+	$self->{ AutoClean } //= 0;
 	$self->{ UserAgent } //= $DEFAULT_AGENT;
 	$self->{ Pager }     //= $ENV{ PAGER }   // $DEFAULT_PAGER;
 	$self->{ Browser }   //= $ENV{ BROWSER } // 'lynx';
+	$self->{ LineWidth } //= $DEFAULT_WIDTH;
+	$self->{ ReadFmt }   //= $DEFAULT_READ_FMT;
+	$self->{ PostFmt }   //= $DEFAULT_POST_FMT;
+	$self->{ FeedsFmt }  //= $DEFAULT_FEED_FMT;
+
+	unless ($self->{ LineWidth } > 0) {
+		die "width must be greater than 0\n";
+	}
 
 	if (defined $self->{ Status } and $self->{ Status } !~ /^(un)?read$/) {
 		die "status must either be 'read' or 'unread'\n";
@@ -1643,6 +1800,10 @@ sub run {
 	my ($self) = @_;
 
 	$COMMANDS{ $self->{ Cmd } }->($self);
+
+	if ($self->{ AutoClean } and $self->{ Cmd } ne 'clean') {
+		$self->clean;
+	}
 
 	return 1;
 

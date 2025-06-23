@@ -1,3 +1,24 @@
+1.228 2025-06-22
+================
+[Quiq::Html::FrameSet}
+* Klasse hinzugefügt
+
+[Quiq::Mustang]
+* Geschäftsregeln (business rules) hinzugefügt
+* getResult(): Repräsentation 'html' hinzugefügt
+* visualize(): HTMl-Visualisierung um Angabe der Business Terms ergänzt
+* br(): Methode hinzugefügt
+* mustangDir(): Methode hinzugefügt
+
+[Quiq::PerlModule]:
+* moduleDir(): Methode hinzugefügt
+
+[Quiq::Test::Class]
+* Doku ergänzt
+
+[Quiq::Zugferd]
+* Klasse reimplementiert
+
 1.227 2025-06-15
 ================
 

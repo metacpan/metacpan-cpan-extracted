@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 99;
+plan tests => 116;
 
 {
     use Math::AnyNum qw(:overload);
@@ -132,11 +132,30 @@ plan tests => 99;
     is(Math::AnyNum->new('-3.5 - 4i'), '-3.5-4i');
 
     # Special values
-    is(Math::AnyNum->new('-1.42e-3'),    '-0.00142');
-    is(Math::AnyNum->new('42/12'),       '7/2');
-    is(Math::AnyNum->new('12.34'),       '12.34');
-    is(Math::AnyNum->new('0/0'),         'NaN');
-    is(Math::AnyNum->new('0/0', 36),     'NaN');
+    is(Math::AnyNum->new('-1.42e-3'), '-0.00142');
+    is(Math::AnyNum->new('42/12'),    '7/2');
+    is(Math::AnyNum->new('12.34'),    '12.34');
+    is(Math::AnyNum->new('0/0'),      'NaN');
+    is(Math::AnyNum->new('0/0', 36),  'NaN');
+    is(Math::AnyNum->new('-1/0', 36), '-Inf');
+    is(Math::AnyNum->new('1/0', 36),  'Inf');
+    is(Math::AnyNum->new('1/0'),      'Inf');
+    is(Math::AnyNum->new('-2/0'),     '-Inf');
+    is(Math::AnyNum->new('-2/'),      'NaN');
+    is(Math::AnyNum->new('1/'),       'NaN');
+    is(Math::AnyNum->new('/'),        'NaN');
+    is(Math::AnyNum->new('0/'),       'NaN');
+    is(Math::AnyNum->new('/2'),       'NaN');
+    is(Math::AnyNum->new('/0'),       'NaN');
+
+    is(Math::AnyNum->new('-2/0', 36), '-Inf');
+    is(Math::AnyNum->new('-2/',  36), 'NaN');
+    is(Math::AnyNum->new('1/',   36), 'NaN');
+    is(Math::AnyNum->new('/',    36), 'NaN');
+    is(Math::AnyNum->new('0/',   36), 'NaN');
+    is(Math::AnyNum->new('/2',   36), 'NaN');
+    is(Math::AnyNum->new('/0',   36), 'NaN');
+
     is(Math::AnyNum->new('000/000', 16), 'NaN');
     is(Math::AnyNum->new('dfp/abc', 12), 'NaN');
     is(Math::AnyNum->new('hi'),          'NaN');

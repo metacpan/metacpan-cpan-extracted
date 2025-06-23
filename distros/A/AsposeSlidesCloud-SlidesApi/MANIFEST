@@ -34,6 +34,8 @@ lib/AsposeSlidesCloud/Object/BoxElement.pm
 lib/AsposeSlidesCloud/Object/BubbleChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/BubbleSeries.pm
 lib/AsposeSlidesCloud/Object/Camera.pm
+lib/AsposeSlidesCloud/Object/CaptionTrack.pm
+lib/AsposeSlidesCloud/Object/CaptionTracks.pm
 lib/AsposeSlidesCloud/Object/Chart.pm
 lib/AsposeSlidesCloud/Object/ChartCategory.pm
 lib/AsposeSlidesCloud/Object/ChartLinesFormat.pm

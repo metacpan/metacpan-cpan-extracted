@@ -27,77 +27,21 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
-## Enhancements in Version 24.12
+## Enhancements in Version 25.6
 
-* Added **CompressImage** method. **DeletePictureCroppedAreas** method is deprecated and will be removed after 25.2 release.
-* The **Paragraphs** property of **Shape** class is now a list of **Paragraph** objects instead of ResourceURIs.
-* Added **TileScaleX**, **TileScaleY**, **TileOffsetX**, **TileOffsetY**, **TileAlignment** and **TileFlip** properties to **PictureFill** class.
-* Added **DrawingGuides** property to **CommonSlideViewProperty** class.
-* Added **DeleteEmbeddedBinaryObjects** boolean property to **ExportOptions** class.
-* Added **IncludeOleData** boolean property to **PdfExportOptions** class.
-* Added **GridSpacing** property to **ViewProperties** class.
-
-## Enhancements in Version 24.9
-
-* Added **Upload** and **Download** methods to async API. They are identical to **UploadFile** and **DownloadFile** methods of the regular API, but file size is not restricted for them.
-
-## Enhancements in Version 24.8
-
-* Added **StartSplit** and **StartUploadAndSplit** methods to async API.
-* Added **ReplacePresentationRegex** and **ReplacePresentationRegexOnline** methods.
-* Added **HighlightPresentationText** and **HighlightPresentationRegex** methods.
-* Added **OperationError** class; changed **Operation**.**Error** property type from string to **OperationError**.
-* Removed **wholeWordsOnly** parameter from **ReplaceShapeRegex** method.
-
-## Enhancements in Version 24.7
-
-* Added **TemplatesPath** property to **Html5ExportOptions** class. It enables using custom templates in conversion to Html5 format.
-* Added **GetHtml5Templates** method to retrieve the list of default Html5 templates.
-* Added **Xml** to the list of available export formats.
-* Added **wholeWordsOnly** parameter to **ReplacePresentationText** and  **ReplacePresentationTextOnline** methods.
-* Added **GradientStyle** property to **ExportOptions** class.
-* Added **ResterizeUnsupportedFontStyles** property to **PdfExportOptions** class.
-* Added **Zip64Mode** property to **PptxExportOptions** class.
-* Added **Transparency** property to **Table** and **TableCell** class.
-* Removed obsolete **DownloadPortionsAsMathML**, **SavePortionsAsMathML** methods. Use **DownloadMathPortion** and **SaveMathPortion** methods to convert portions to math formats.
-
-## Enhancements in Version 24.6
-
-* Added **HideInk** and **InterpretMaskOpAsOpacity** properties to **PdfExportOptions** class.
-* Removed **Enqueued** from the list of allowed values for **Operation.Status** property.
-
-## Enhancements in Version 24.5
-
-* Added **options** parameter to **ImportFromPdf** method. You can specify **options.DetectTables** property to control import behavior.
-* Added **Title** property to **Axis** class for charts.
-* Added **X**, **Y**, **Width**, **Height**, **Overlay**, **FillFormat**, **EffectFormat** and **LineFormat** properties to **ChartTitle** class.
-* Added **HasTitle** property to **Chart** class; removed **HasTitle** property from **ChartTitle** class.
-
-## Enhancements in Version 24.4
-
-* Added **DownloadMathPortion** and **SaveMathPortion** methods to convert math portions to math markup formats (MathML or LaTeX). See [documentation](https://docs.aspose.cloud/slides/export-a-math-formula/) for more info. **DownloadPortionAsMathML** and **SavePortionAsMathML** methods are deprecated and will be removed after 24.6.
-* Added **Marker** property to **DataPoint** class.
-
-## Enhancements in Version 24.3
-
-* Added Markdown (**Md**) to the list of allowed export formats.
-* Added **DeletePictureCroppedAreas** method to delete cropped areas of pictures.
-* Added **SlidesLayoutOptions** property to **PdfExportOptions**, **HtmlExportOptions**, **TiffExportOptions** and **ImageExportOptions** classes. You can use it to specify handout or notes/comments layouting options.
-* Added **AnimateTextType** enum property to **Effect** class.
-* Added **NotesCommentsLayouting** property to **Html5ExportOptions** class.
-* Added **BwConversionMode** property to **TiffExportOptions** class.
-* Added **EmbedImages** boolean property to **Html5ExportOptions** class.
-* Added **ShowMediaControls** boolean property to **SlideShowProperties** class.
-* Added **IsDecorative** boolean property to **ShapeBase** class.
-
-
-## Enhancements in Version 24.2
-
-* Added **GetCommentAuthors** method to get list of comment authors.
-
-## Enhancements in Version 24.1
-
-* Added **GetAvailableFonts** method to get list of installed system & custom fonts.
+* Added **GetVideoCaptionTracks**, **CreateVideoCaptionTrack**, **DeleteVideoCaptionTracks**, **DeleteVideoCaptionTracks** method.
+* Removed deprecated **DeletePictureCroppedAreas** method.
+* Added an optional **quality** parameter to **DownloadImage**, **DownloadImageOnline**, **DownloadImages**, **DownloadImagesOnline** method. It applies to jpeg fromat.
+* Added **RemoveEmptyLines**, **SlideNumberFormat** and **HandleRepeatedSpaces** properties to **MarkdownExportOptions** class.
+* Added **DeletePictureCroppedAreas** and **Resolution** parameters to **PictureFill** class that allow to compress and/or delete cropped aread of picture fill formats.
+* Added **Emf** to the list of allowed values for **ExportFormat**, **SlideExportFormat** and **ShapeExportFormat** enumerations. You can now export presentations, slides and shapes to EMF format.
+* Added **VolumeValue**, **FadeInDuration**, **FadeOutDuration**, **TrimFromStart** and **TrimFromEnd** properties to **AudioFrame** class.
+* Added **SkipJavaScriptLinks** boolean property to **ExportOptions** class.
+* Added **DisableFontLigatures** boolean property to **HtmlExportOptions**, **Html5ExportOptions** and **SvgExportOptions** class.
+* Added **SlidesLayoutOptions** property and removed **NotesCommentsLayouting** property from **Html5ExportOptions** class.
+* Added **RemoveEmptyLines**, **SlideNumberFormat** and **HandleRepeatedSpaces** properties to **MarkdownExportOptions** class.
+* Added **SlidesLayoutOptions** property and removed **CommentsPosition**, **CommentsAreaColor**, **CommentsAreaWidth**, **NotesPosition** and **ShowCommentsByNoAuthor** properties from **SwfExportOptions** class.
+* Added **RefreshThumbnail** boolean property to **PptxExportOptions** class.
 
 ## Licensing
 All Aspose.Slides Cloud SDKs are licensed under MIT License.

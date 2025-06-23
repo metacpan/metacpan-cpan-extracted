@@ -40,6 +40,11 @@ man noss
 ```
 It should contain all the information you need to get started using **noss**.
 
+## Thanks
+A huge thanks to the [newsraft](https://codeberg.org/newsraft/newsraft) and
+[newsboat](https://newsboat.org/) projects, which inspired the creation of this
+program and are also where I got many ideas for this project from.
+
 ## Author
 This program was written by Samuel Young, *\<samyoung12788 at gmail dot com\>*.
 

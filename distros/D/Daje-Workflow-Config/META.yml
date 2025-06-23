@@ -26,15 +26,16 @@ no_index:
 provides:
   Daje::Workflow::Config:
     file: lib/Daje/Workflow/Config.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Daje::Config: '0'
   Mojo::Base: '0'
+  Mojo::File: '0'
   perl: v5.40.0
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow-Config/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow-Config
   repository: https://github.com/janeskil1525/Daje-Workflow-Config.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

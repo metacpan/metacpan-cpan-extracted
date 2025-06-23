@@ -4,7 +4,7 @@
       "Bryan Jurish <moocow@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -61,14 +61,20 @@
             "Tie::File::Indexed" : "0.08",
             "Time::HiRes" : "0",
             "XML::LibXML" : "1.70",
-            "perl" : "5.01",
+            "perl" : "5.010",
             "threads" : "0",
             "threads::shared" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "v0.12.020",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/moocow-the-bovine/DiaColloDB.git",
+         "web" : "https://github.com/moocow-the-bovine/DiaColloDB"
+      }
+   },
+   "version" : "v0.12.021",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

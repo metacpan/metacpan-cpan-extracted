@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.021 Sun, 22 Jun 2025 18:25:27 +0200 moocow
+	* dodge TDF errors "input parameter 'ghaving' is null" on debian bookworm (PDL-v2.081)
+
 v0.12.020 Fri, 05 Feb 2021 08:21:59 +0100 moocow
 	* added support for environment variables DIACOLLO_SORT, SORT
 	  - allow user to specify additional compile-time system sort options, especially --parallel and --buffer-size

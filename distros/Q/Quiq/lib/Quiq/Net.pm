@@ -16,7 +16,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.227';
+our $VERSION = '1.228';
 
 use IO::Socket::INET ();
 
@@ -76,7 +76,7 @@ sub checkPort {
 
 =head1 VERSION
 
-1.227
+1.228
 
 =head1 AUTHOR
 

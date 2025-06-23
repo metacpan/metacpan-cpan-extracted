@@ -44,6 +44,7 @@
          "requires" : {
             "Daje::Config" : "0",
             "Mojo::Base" : "0",
+            "Mojo::File" : "0",
             "perl" : "v5.40.0"
          }
       },
@@ -56,7 +57,7 @@
    "provides" : {
       "Daje::Workflow::Config" : {
          "file" : "lib/Daje/Workflow/Config.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow-Config"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

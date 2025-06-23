@@ -22,5 +22,5 @@ requires:
   perl: '5.008004'
 resources:
   repository: https://github.com/vkeselj/App-Utils.git
-version: 24.12
+version: 25.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -17,6 +17,12 @@ use Mojo::Base -base;
 #       path => "path",
 #    )->load($filename);
 #
+#    my $parameter = "key";
+#
+#    my $value = $config->param($parameter);
+#
+#    my $parameter = "key1.key2";
+#
 #    my $value = $config->param($parameter);
 #
 # DESCRIPTION
@@ -38,9 +44,10 @@ use Mojo::Base -base;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Daje::Config;
+use Mojo::File;
 
 has 'path' => "";
 has 'config';
@@ -52,8 +59,9 @@ sub load($self, $filename) {
         my $config = Daje::Config->new(
             path => $self->path,
         )->load($filename);
-
-        $self->config($config);
+        my $path = Mojo::File->new($self->path . $filename);
+        my $tag = substr($path->basename(), 0, index($path->basename(), '.json'));
+        $self->config($config->{$tag});
     } catch($e) {
         $self->error($e);
     };
@@ -64,11 +72,25 @@ sub load($self, $filename) {
 sub param($self, $parameter) {
     my $result = "";
 
-    try {
-        $result = $self->config->{$parameter};
-    } catch ($e) {
-        $self->error($e);
-    };
+    if (index($parameter,'.') == -1) {
+        try {
+            $result = $self->config->{$parameter};
+        }
+        catch ($e) {
+            $self->error($e);
+        };
+    } else {
+        try {
+            while (index($parameter,'.') > -1) {
+                my $key = substr($parameter, 0, index($parameter, '.'));
+                $result = $self->config->{$key};
+                $parameter = substr($parameter, rindex($parameter, '.') + 1);
+            }
+            $result = $result->{$parameter};
+        } catch($e) {
+            $self->error($e);
+        }
+    }
 
     return $result;
 }
@@ -76,6 +98,8 @@ sub param($self, $parameter) {
 
 1;
 __END__
+
+
 
 
 
@@ -98,6 +122,12 @@ Daje::Workflow::Config - Loads the JSON based configs and put them in a hash
       path => "path",
    )->load($filename);
 
+   my $parameter = "key";
+
+   my $value = $config->param($parameter);
+
+   my $parameter = "key1.key2";
+
    my $value = $config->param($parameter);
 
 
@@ -111,7 +141,7 @@ Daje::Config is loading workflows from JSON files in a set folder
 
 =head1 REQUIRES
 
-L<Daje::Workflow::Config> 
+L<Mojo::File> 
 
 L<Daje::Config> 
 
@@ -121,6 +151,14 @@ L<v5.40>
 
 
 =head1 METHODS
+
+=head2 load($self,
+
+ load($self,();
+
+=head2 param($self,
+
+ param($self,();
 
 
 =head1 AUTHOR

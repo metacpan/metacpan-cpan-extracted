@@ -135,6 +135,46 @@ kann folgendermaßen vorgenommen werden:
       }
   }
 
+=head2 Klasse oder Programm von Tests ausnehmen
+
+Ist eine Klasse oder ein Programm nicht testbar, z.B. weil auf dem
+lokalen Rechner die erforderlichen Perl-Module nicht vorhanden sind,
+kann die der gesamte Code von Tests ausgenommen werden.
+
+=over 4
+
+=item 1.
+
+Unter CoTeDo wird für die Klasse oder das Programm definiert:
+
+  TestProcedure:
+      Minimal
+
+=item 2.
+
+Als Testmethode wird definiert:
+
+  # <Test> ----------------------------------------------
+  
+  sub initMethod : Init(1) {
+      my $self = shift;
+  
+      my $host = '<host>'; # Wir prüfen auf den Hostnamen
+  
+      if (Quiq::System->hostname ne $host) {
+          $self->skipAllTests("Not on $host");
+          return;
+      }
+      $self->ok(1);
+  
+      $self->useOk('<class>');
+  }
+
+=back
+
+Hierbei ist C<< <host> >> der Name des Hosts, auf dem der Code läuft,
+C<< <class> >> ist die Name der (Programm-)Klasse, die getestet werden soll.
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -147,7 +187,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.227';
+our $VERSION = '1.228';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -1230,7 +1270,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.227
+1.228
 
 =head1 AUTHOR
 

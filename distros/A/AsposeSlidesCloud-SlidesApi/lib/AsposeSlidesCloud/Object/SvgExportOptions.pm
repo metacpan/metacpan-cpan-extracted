@@ -129,6 +129,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'skip_java_script_links' => {
+    	datatype => 'boolean',
+    	base_name => 'SkipJavaScriptLinks',
+    	description => 'True to skip hyperlinks with javascript calls when saving the presentation.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -213,6 +220,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'disable_font_ligatures' => {
+    	datatype => 'boolean',
+    	base_name => 'DisableFontLigatures',
+    	description => 'true to disable ligatures in the rendered output.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -221,6 +235,7 @@ __PACKAGE__->swagger_types( {
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
+    'skip_java_script_links' => 'boolean',
     'format' => 'string',
     'vectorize_text' => 'boolean',
     'metafile_rasterization_dpi' => 'int',
@@ -232,7 +247,8 @@ __PACKAGE__->swagger_types( {
     'delete_pictures_cropped_areas' => 'boolean',
     'external_fonts_handling' => 'string',
     'use_frame_size' => 'boolean',
-    'use_frame_rotation' => 'boolean'
+    'use_frame_rotation' => 'boolean',
+    'disable_font_ligatures' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -241,6 +257,7 @@ __PACKAGE__->attribute_map( {
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
+    'skip_java_script_links' => 'SkipJavaScriptLinks',
     'format' => 'Format',
     'vectorize_text' => 'VectorizeText',
     'metafile_rasterization_dpi' => 'MetafileRasterizationDpi',
@@ -252,7 +269,8 @@ __PACKAGE__->attribute_map( {
     'delete_pictures_cropped_areas' => 'DeletePicturesCroppedAreas',
     'external_fonts_handling' => 'ExternalFontsHandling',
     'use_frame_size' => 'UseFrameSize',
-    'use_frame_rotation' => 'UseFrameRotation'
+    'use_frame_rotation' => 'UseFrameRotation',
+    'disable_font_ligatures' => 'DisableFontLigatures'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

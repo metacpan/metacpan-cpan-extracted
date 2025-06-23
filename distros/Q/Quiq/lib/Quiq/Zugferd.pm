@@ -4,52 +4,31 @@
 
 =head1 NAME
 
-Quiq::Zugferd - Generiere XML einer ZUGFeRD-Rechnung
+Quiq::Zugferd - Generiere das XML von ZUGFeRD-Rechnungen
 
 =head1 BASE CLASS
 
 L<Quiq::Hash>
 
-=head1 ENVIRONMENT
-
-=over 4
-
-=item $ZUGFERD_DIR
-
-Verzeichnis mit den ZUGFeRD XSD-Dateien und dem ZUGFeRD XML-Template.
-Der Wert dar Variable ist priorisiert gegenüber dem klasseninternen Pfad.
-
-=back
-
 =head1 DESCRIPTION
 
-B<Diese Klasse befindet sich in Entwicklung!>
+Diese Klasse dient der Generung des XMLs von E-Rechnungen nach dem
+ZUGFeRD/Factur-X-Standard. Sie kapselt die Profile des Standards,
+sowohl die XSD-Dateien (XML-Schemadefinition) als auch fertige
+Templates.
 
-Die Klasse kapselt das ZUGFeRD 2.3(Factur-X Version 1.0.07) XML
-Profile BASIC sowie ein XML-Template zu diesem Profile, das alle
-ELemente und Attribute umfasst. Das Template kann als XML (Text)
-oder als Datenstruktur (Baum) in verschiedenen Varianten
-(leer, mit Beispielwerten, mit Platzhaltern) genutzt werden.
+Die Generierung eines Rechnungs-XMLs erfolgt durch Einsetzung der
+Rechnungswerte in das Template des jeweiligen Profils.
 
 =head1 EXAMPLES
 
-Zeige ZUGFeRD XML und Datenstruktur als Zeichenkette:
+Zeige das Template des Profils EN16931:
 
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->new->doc' # XML, kommentiert
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->new->doc("tree")'
+  $ perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new("en16931")->template'
 
-(Tipp: XML-Ausgabe in Datei speichern und mit Emacs oder vi
-mit "Syntax Highlighting" lesen)
+Zeige den Template-Baum des Profils EN16931:
 
-Zeige das ZUGFeRD XML:
-
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->new->xml' # ohne Werte
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->new->xml("placeholders")'
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->new->xml("values")'
-
-Zeige das ZUGFeRD XML als Baum:
-
-  $ perl -MQuiq::Zugferd -MQuiq::Dumper -E 'say Quiq::Dumper->dump(Quiq::Zugferd->new->tree)'
+  $ perl -MQuiq::Zugferd -MQuiq::Dumper -E '$t = Quiq::Zugferd->new("en16931")->tree; say Quiq::Dumper->dump($t)'
 
 =cut
 
@@ -62,65 +41,32 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.227';
+our $VERSION = '1.228';
 
-use Quiq::Path;
-use Quiq::Shell;
 use Quiq::PerlModule;
+use Quiq::Path;
+use Quiq::Zugferd::Tree;
+use Quiq::Dumper;
 use XML::Compile::Schema ();
 use XML::LibXML ();
 use XML::Compile::Util ();
-use Quiq::Dumper;
-use Quiq::Tree;
+use Quiq::Storable;
 use Quiq::AnsiColor;
-use Quiq::Zugferd::Tree;
 use Quiq::Xml;
 use Quiq::FileHandle;
+use Quiq::Hash;
 
 # -----------------------------------------------------------------------------
 
 =head1 METHODS
 
-=head2 Klassenmethoden
+=head2 Konstruktor
 
-=head3 combine() - Füge ZUGFeRD XML zu PDF hinzu
-
-=head4 Synopsis
-
-  $class->combine($pdfFile,$xmlFile);
-
-=head4 Description
-
-Füge die ZUGFeRD XML-Datei $xmlFile zur PDF-Datei $pdfFile hinzu.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub combine {
-    my ($class,$pdfFile,$xmlFile) = @_;
-
-    my $p = Quiq::Path->new;
-    my $sh = Quiq::Shell->new(log=>1);
-
-    my $tmpDir = $p->tempDir;
-    $p->copy($xmlFile,"$tmpDir/factur-x.xml");
-    $pdfFile = $p->absolute($pdfFile);
-    $sh->cd($tmpDir);
-    $sh->exec("pdftk $pdfFile attach_files factur-x.xml output tmp.pdf");
-    $p->copy('tmp.pdf',$pdfFile);
-    $sh->back;
-
-    return;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 createTemplate() - Erzeuge Template zu ZUGFeRD-Profil
+=head3 new() - Instantiiere Objekt
 
 =head4 Synopsis
 
-  $xml = $class->createTemplate($profile,%opt);
+  $zug = $class->new($profile,%options);
 
 =head4 Arguments
 
@@ -128,8 +74,8 @@ sub combine {
 
 =item $profile
 
-Name des ZUGFeRD-Profils. Mögliche Namen: 'minimum', 'basicwl',
-'basic', 'en16931', 'extended'.
+Name des ZUGFeRD-Profils. Es existieren die ZUGFeRD-Profile: C<minimum>,
+C<basicwl>, C<basic>, C<en16931>, C<extended>.
 
 =back
 
@@ -137,119 +83,11 @@ Name des ZUGFeRD-Profils. Mögliche Namen: 'minimum', 'basicwl',
 
 =over 4
 
-=item -xsdDir => DIR (Default: $ENV{'ZUGFERD_DIR'} || I<ModuleDir>)
+=item -version => $version (Default: '2.3.2')
 
-Verzeichnis mit den ZUGFeRD Schema-Dateien
+Die ZUGFeRD-Version.
 
 =back
-
-=head4 Returns
-
-(String) XML-Template
-
-=head4 Description
-
-Erzeuge auf Basis der XSD-Dateien des ZUGFeRD-Profils $profile mit
-XML::Compile::Schema eine XML Template-Datei ohne Werte und liefere das
-Ergebnis zurück.
-
-B<ACHTUNG:> Die Templates sind nicht umfassend, es gibt Elemente, denen
-die Unterelemente felen. Suche nach Tags mit dem Muster "/>":
-
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("minimum")' | grep '/>'
-      <ram:GuidelineSpecifiedDocumentContextParameter/>
-        <ram:BuyerTradeParty/>
-      <ram:ApplicableHeaderTradeDelivery/>
-
-B<Tipp:> Unterschiede zwischen den Profilen lassen sich mit
-diff(1) ermitteln.
-
-=head4 Examples
-
-Profil MINIMUM:
-
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("minimum")'
-
-Profil BASICWL:
-
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("basicwl")'
-
-Profil BASIC:
-
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("basic")'
-
-Profil EN16931:
-
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("en16931")'
-
-Profil EXTENDED:
-
-  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->createTemplate("extended")'
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub createTemplate {
-    my ($class,$profile) = splice @_,0,2;
-    # @_: @opt
-
-    my $mod = Quiq::PerlModule->new('Quiq::Zugferd');
-    my $modDir = $mod->loadPath;
-    $modDir =~ s/\.pm//;
-
-    my $zugferdDir = $ENV{'ZUGFERD_DIR'} || "$modDir/2.3.2/profile/$profile";
-
-    # Optionen
-
-    my $xsdDir = $zugferdDir;
-
-    my $opt = $class->parameters(0,0,\@_,
-        -xsdDir => \$xsdDir,
-    );
-
-    # Ermittele .xsd-Dateien im aktuellen Verzeichnis
-    my @xsdFiles = Quiq::Path->find($xsdDir,-pattern=>'\.xsd$');
-
-    # Instantiiere Schema-Objekt
-
-    my $sch = XML::Compile::Schema->new;
-    for my $file (@xsdFiles) {
-        $sch->importDefinitions($file);
-    }
-
-    my $rootType = '{urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100}'.
-        'CrossIndustryInvoice';
-    my $xml = $sch->template(XML=>$rootType,
-        show_comments => 'NONE',
-        skip_header => 1,
-        show_all => 1,
-        prefixes => [
-            rsm => 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
-        ],
-    );
-
-    $xml =~ s|"token"|""|g;
-    $xml =~ s|>\s*token\s*<|><|g;
-    $xml =~ s|"example"|""|g;
-    $xml =~ s|>\s*example\s*<|><|g;
-    $xml =~ s|"example"|""|g;
-    $xml =~ s|>\s*example\s*<|><|g;
-    $xml =~ s|"3.1415"|""|g;
-    $xml =~ s|>\s*3.1415\s*<|><|g;
-    $xml =~ s|>\s*decoded bytes\s*<|><|g;
-    $xml =~ s|>\s*true\s*<|><|g;
-
-    return $xml;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 new() - Instantiiere Objekt
-
-=head4 Synopsis
-
-  $zug = $class->new($profile);
 
 =head4 Returns
 
@@ -257,24 +95,31 @@ Object
 
 =head4 Description
 
-Instantiiere ein ZUGFeRD-Objekt auf Basis von Profil $profile der Klasse
-und liefere dieses zurück.
+Instantiiere ein ZUGFeRD-Objekt des Profils $profile und der
+ZUGFeRD-Version $version und liefere dieses zurück.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$profile) = @_;
+    my $class = shift;
+
+    # Optionen und Argumente
+
+    my $version = '2.3.2';
+
+    my $argA = $class->parameters(1,1,\@_,
+        -version => \$version,
+    );
+    my $profile = shift @$argA;
 
     my $mod = Quiq::PerlModule->new('Quiq::Zugferd');
-    my $modDir = $mod->loadPath;
-    $modDir =~ s/\.pm//;
+    my $modDir = $mod->moduleDir;
 
-    my $zugferdDir = $ENV{'ZUGFERD_DIR'} || "$modDir/2.3.2/profile/$profile";
-
-    my $xmlTemplateFile = "$zugferdDir/template.xml";
-    my $xsdDir = $zugferdDir;
+    my $zugferdDir = "$modDir/$version";
+    my $xsdDir = "$zugferdDir/profile/$profile";
+    my $xmlTemplateFile = "$xsdDir/template.xml";
 
     my $p = Quiq::Path->new;
 
@@ -316,228 +161,7 @@ sub new {
     my $top = $doc->documentElement;
     my $rootType = XML::Compile::Util::type_of_node($top);
 
-    # Ermittele die [01]..n-Bestandteile im Template. Diese Komponenten
-    # extrahieren wir später aus dem Baum.
-    
-    my @parts;
-    while ($template =~ m|<([\w:]+)>.*\.\.n\b|g) {
-        (my $tag = $1) =~ s/.*://;
-        push @parts,$tag;
-    }
-
-    return bless {
-        sch => $sch,
-        rootType => $rootType,
-        template => $template,
-        parts => \@parts,
-    },$class;
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Objektmethoden
-
-=head3 parts() - Liefere Abschnitte mit mehreren gleichen Unterabschnitten
-
-=head4 Synopsis
-
-  @parts | $partA = $zug->parts;
-
-=head4 Returns
-
-(Array) Liste von Abschnitten. Im Skalarkontext liefere eine Referenz auf
-die Liste.
-
-=head4 Description
-
-Liefere die Liste der Namen aller Abschnitte, die mehrere gleiche
-Unterabschnitte haben. Die Namen sind Tagnamen ohne Namespace-Präfix.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub parts {
-    my $self = shift;
-    my $partA = $self->{'parts'};
-    return wantarray? @$partA: $partA;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 doc() - Liefere ZUGFeRD Doku
-
-=head4 Synopsis
-
-  $str = $zug->doc;
-  $str = $zug->doc($type);
-
-=head4 Arguments
-
-=over 4
-
-=item $type (Default: 'xml')
-
-Art der Dokumentation:
-
-=over 4
-
-=item 'xml'
-
-ZUGFeRD XML mit Beispielwerten und Kommentaren
-
-=item 'tree'
-
-ZUGFeRD Baum mit Beispielwerten
-
-=item 'parts'
-
-Liste der Elemente, mit n-fachen Unterelementen. Wenn keine
-Kardinalitäten vorhanden sind, ist die Liste leer.
-
-=item 'paths'
-
-Liste der Zugriffspfade im Baum
-
-=item 'cardinality'
-
-Liste der Elemente und ihrer Kardinalitäten. Wenn keine Kardinalitäten
-und/oder Kommentare vorhanden sind, fehlt die Information in der
-Ausgabe.
-
-=back
-
-=back
-
-=head4 Returns
-
-(String) Doku
-
-=head4 Example
-
-ZUGFeRD XML mit Beispielwerten und Kommentaren:
-
-  $ perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new->doc("xml")'
-
-ZUGFeRD Baum mit Beispielwerten:
-
-  $ perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new->doc("tree")'
-
-Zugriffspfade im ZUGFeRD Baum:
-
-  $ perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new->doc("paths")'
-
-Elemente mit n-fachen Unterelementen:
-
-  $ perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new->doc("parts")'
-
-Elemente und ihre Kardinalitäten:
-
-  $ perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new->doc("cardinality")'
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub doc {
-    my $self = shift;
-    my $type = shift // 'xml';
-
-    if ($type eq 'xml') {
-        return $self->get('template');
-    }
-    elsif ($type eq 'tree') {
-        my $h = $self->tree('values');
-        return Quiq::Dumper->dump($h)."\n";
-    }
-    elsif ($type eq 'paths') {
-        my $h = $self->tree;
-        my @paths = Quiq::Tree->leafPaths($h);
-        return join("\n",@paths)."\n";
-    }
-    elsif ($type eq 'parts') {
-        return join("\n",$self->parts)."\n";
-    }
-    elsif ($type eq 'cardinality') {
-        my $a = Quiq::AnsiColor->new(1);
-        my $str = '';
-        my $template = $self->get('template');
-        for my $line (split /\n/,$template) {
-            my ($tag) = $line =~ /^(\s+<[\w:]+>)/;
-            my ($comment) = $line =~ /(\s+<!--.*?-->)/;
-            $comment //= '';
-            if ($tag) {
-                my ($cardinality) = $line =~ /(.\.\..)/;
-                $cardinality ||= '    ';
-                $str .= sprintf "%s%s%s\n",$cardinality,
-                    $a->str('cyan',$tag),
-                    $a->str('red',$comment);
-            }
-        }
-        return $str;
-    }
-
-    $self->throw(
-        'ZUGFERD-00099: Unknown document type',
-        Type => $type,
-    );
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 tree() - Liefere ZUGFeRD XML Template als Baum
-
-=head4 Synopsis
-
-  $h = $zug->tree;
-  $h = $zug->tree($variant);
-
-=head4 Arguments
-
-=over 4
-
-=item $variant (Default: 'placeholders')
-
-=over 4
-
-=item 'empty'
-
-Ohne Werte
-
-=item 'placeholders'
-
-Mit Platzhaltern. Identisch zu "empty", wenn keine Platzhalter
-definiert sind.
-
-=item 'values'
-
-Mit Beispielwerten. Leerstrings statt undef, wenn keine Werte
-gesetzt sind.
-
-=back
-
-=back
-
-=head4 Returns
-
-Baum-Referenz
-
-=head4 Description
-
-Wandele das ZUGFeRD XML Template in einen Baum und liefere eine Referenz
-auf den Wurzelknoten zurück.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub tree {
-    my $self = shift;
-    my $variant = shift // 'empty';
-
-    my ($sch,$rootType) = $self->get(qw/sch rootType/);
-
-    # Instantiiere nicht-validierenden XML-Reader
+    # Erzeuge Template-Baum
 
     my $rdr = $sch->compile(READER=>$rootType,
         sloppy_floats => 1, # Wir wollen keine BigFloat-Elemente
@@ -545,78 +169,45 @@ sub tree {
         validation => 0,
     );
 
-    my $h;
-    if ($variant eq 'empty') {
-        # Erzeuge Baum mit ohne Werte
+    my $h = $rdr->($template);
+    my $tree = Quiq::Zugferd::Tree->new($h);
 
-        my $xml = $self->xml('empty');
-        $h = $rdr->($xml);
+    # direkte Zuweisung, da XML::Compile diese Platzhalter überschreibt
+    $tree->setDeep('SupplyChainTradeTransaction.'.
+         'ApplicableHeaderTradeSettlement.SpecifiedTradeAllowanceCharge.[0].'.
+         'ChargeIndicator.Indicator','BG-21-1');
 
-        # Setze den Wert aller Blattknoten auf undef
+    # say Quiq::Dumper->dump($tree);
 
-        Quiq::Tree->setLeafValue($h,sub {
-            return undef;
-        });
-    }
-    elsif ($variant eq 'placeholders') {
-        # Erzeuge Baum mit Platzhaltern
-
-        my $xml = $self->xml('placeholders');
-        $h = $rdr->($xml);
-
-        # Setze den Wert aller Blattknoten ohne Platzhalter auf undef
-
-        Quiq::Tree->setLeafValue($h,sub {
-            my $val = shift;
-            # '1' kann bei Boolean Element auftreten ("Indicator")
-            if ($val eq '' || $val eq '1') {
-                $val = undef;
-            }
-            return $val;
-        });
-    }
-    elsif ($variant eq 'values') {
-        # Erzeuge Baum mit Werten (hier könnte auch ein validierender
-        # XML-Reader zum EInsatz kommen)
-
-        my $xml = $self->xml('values');
-        $h = $rdr->($xml);
-    }
-    else {
-        $self->throw(
-            'ZUGFERD-00099: Unknown tree variant',
-            Variant => $variant,
-        );
-    }
-
-    return Quiq::Zugferd::Tree->new($h);
+    return bless {
+        zugferdDir => $zugferdDir,
+        sch => $sch,
+        rootType => $rootType,
+        template => $template,
+        tree => $tree,
+        version => $version,
+        bgH => undef, # wird bei Bedarf geladen
+    },$class;
 }
 
 # -----------------------------------------------------------------------------
 
-=head3 treeToXml() - Wandele (ZUGFeRD) Baum nach XML
+=head2 Objektmethoden
+
+=head3 createInvoice() - Erzeuge das XML einer ZUGFeRD-Rechnung (abstrakt)
 
 =head4 Synopsis
 
-  $xml = $zug->treeToXml($tree,%opt);
+  $xml = $zug->createInvoice(@args);
 
 =head4 Arguments
 
 =over 4
 
-=item $tree
+=item @args
 
-(Object) Baum, der nach XML gewandelt wird.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -validate => $bool (Default: 1)
-
-Erzeuge einen validierenden XML-Writer.
+Beliebige Argumente, die für das Ausfüllen des ZUGFeRD XML-Templates
+benötigt werden.
 
 =back
 
@@ -624,33 +215,214 @@ Erzeuge einen validierenden XML-Writer.
 
 (String) XML
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub createInvoice {
+    my $self = shift;
+
+    # Dies ist eine abstrakte Methode, die in einer abgeleiteten
+    # Klasse überschrieben werden muss
+    $self->throw;
+
+    # Spezifikationskennung
+    my $bt24 = 'urn:cen.eu:en16931:2017';
+
+    return $self->resolvePlaceholders(
+        -validate => 1,
+        -showPlaceholders => 1,
+        -showTree => 1,
+        '--',
+        'BT-24' => $bt24,
+    );
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 processSubTree() - Verarbeite einen Subbaum
+
+=head4 Synopsis
+
+  $xmlA = $zug->processSubTree($name,\@arr,sub {
+      my ($zug,$t,$h,$i) = @_;
+      ...
+      $t->resolvePlaceholders(
+          ...
+      );
+  
+      return $t;
+  });
+
+=head4 Arguments
+
+=over 4
+
+=item $zug
+
+ZUGFeRD-Objekt
+
+=item $name
+
+Name des Subbaums
+
+=item @arr
+
+Liste der Elemente, aus denen die Platzhalter im Subbaum
+ersetzt werden.
+
+=item sub {}
+
+Subroutine, die die Einsetzung in einen Subbaum vornimmt
+
+=back
+
+=head4 Returns
+
+(Object) Subbaum mit ersetzen Platzhaltern
+
 =head4 Description
 
-Wandele den Baum nach XML und liefere dieses zurück.
-
-=head4 Example
-
-  $ perl -MQuiq::Zugferd -E '$zug = Quiq::Zugferd->new("en16931"); $tree = $zug->tree; print $zug->treeToXml($tree)'
+Ersetze im Subbaum $name die Platzhalter aus den Elementen von @arr.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub treeToXml {
-    my ($self,$tree) = splice @_,0,2;
-    # @_: %opt
+sub processSubTree {
+    my ($self,$name,$arr,$sub) = @_;
 
-    # Optionen
+    my $path = $self->bg($name)->path;
+    my $t0 = $self->tree->getSubTree($path,$name);
 
-    my $validate = 1;
+    my $i = 0;
+    my @arr;
+    for my $e (@$arr) {
+        my $t = Quiq::Storable->clone($t0);
+        push @arr,$sub->($self,$t,$e,$i++);
+    }
 
-    $self->parameters(\@_,
-        -validate => \$validate,
+    return \@arr;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 resolvePlaceholders() - Ersetze Platzhalter im Template
+
+=head4 Synopsis
+
+  $xml = $zug->resolvePlaceholders(@keyVal,%options);
+
+=head4 Arguments
+
+=over 4
+
+=item @keyVal
+
+Liste der Platzhalter/Wert-Paare
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -label => $text (Default: '')
+
+Versieh den Abschnitt der Platzhalter (bei -showPlaceHolders=>1) mit
+der Beschriftung $label.
+
+=item -showPlaceholders => $bool (Default: 0)
+
+Gibt die Liste der Platzhalter auf STDOUT aus
+
+=item -showTree => $bool (Default: 0)
+
+Gib den resultierenden ZUGFeRD-Baum auf STDOUT aus.
+
+=item -subTree => $tree (Default: undef)
+
+Führe die Ersetzung auf dem Teilbaum $tree aus.
+
+=item -validate => $bool (Default: 0)
+
+Aktiviere die Validierung durch XML::Compile
+
+=back
+
+=head4 Returns
+
+(String) XML nach Platzhalter-Ersetzung
+
+=head4 Description
+
+Ersetze die Platzhalter im Template des ZUGFeRD-Profils und liefere
+das resultierende XML zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+my $a = Quiq::AnsiColor->new(1);
+
+sub resolvePlaceholders {
+    my $self = shift;
+    # @_: @keyVal,%options
+
+    # Optionen und Argumente
+
+    my $label = '';
+    my $showPlaceholders = 0;
+    my $showTree = 0;
+    my $subTree => undef;
+    my $validate = 0;
+
+    my $argA = $self->parameters(0,undef,\@_,
+       -label => \$label,
+       -showPlaceholders => \$showPlaceholders,
+       -showTree => \$showTree,
+       -subTree => \$subTree,
+       -validate => \$validate,
     );
+    # @$argA;
 
-    # Operation ausführen
+    if ($showPlaceholders) {
+        printf "--%s--\n",$a->str('bold red',$label);
+        for (my $i = 0; $i < @$argA; $i += 2) {
+            my $key = $argA->[$i];
+            my $val = $argA->[$i+1];
+            my $method = lc substr($key,0,2);
+            my $bt = $self->$method($key);
+            printf "%s = %s - %s%s\n",$key,defined($val)? "'$val'": 'undef',
+                $bt->mandatory? $a->str('bold dark green','*').' ': '',
+                $a->str('dark green',$bt->text);
+        }
+    }
 
-    my ($sch,$rootType) = $self->get(qw/sch rootType/);
+    if ($subTree) {
+        $subTree->resolvePlaceholders(
+            '--',
+            @$argA
+        );
+        return;
+    }
+
+    my ($sch,$rootType,$tree) = $self->get(qw/sch rootType tree/);
+
+    # Wir operieren auf einer Kopie des Baums
+    $tree = Quiq::Storable->clone($tree);
+
+    $tree->resolvePlaceholders(
+        '--',
+        @$argA
+    );
+    $tree->reduceTree;
+
+    if ($showTree) {
+        say '-----';
+        say Quiq::Dumper->dump($tree);
+        say '-----';
+    }
 
     # (Leeren) XML-Baum instantiieren
     my $doc = XML::LibXML::Document->new('1.0','UTF-8');
@@ -664,8 +436,9 @@ sub treeToXml {
             'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'],
     );
 
-    # Erzeuge aus dem Baum XML
+    # Wandele den Baum in XML
     my $xml = $wrt->($doc,$tree);
+    
 
     # Liefere das XML formatiert
     return Quiq::Xml->print($xml);
@@ -673,125 +446,287 @@ sub treeToXml {
 
 # -----------------------------------------------------------------------------
 
-=head3 xml() - Liefere ZUGFeRD XML Template als Zeichenkette
+=head3 template() - Liefere das ZUGFeRD-Template
 
 =head4 Synopsis
 
-  $xml = $zug->xml;
-  $xml = $zug->xml($variant);
-
-=head4 Arguments
-
-=over 4
-
-=item $variant (Default: 'empty')
-
-Variante des XML:
-
-=over 4
-
-=item 'empty'
-
-Ohne Werte, also mit ausschließlich leeren Attributen und Elementen
-und ohne KOmmentare.
-
-=item 'placeholders'
-
-Mit Platzhaltern, also mit Attributen und Elementen, die __NAME__
-als Wert haben und ohne Kommentare.
-
-=item 'values'
-
-Mit Beispielwerten, also dem Template, so wie es hinterlegt ist,
-jedoch ohne Kommentare.
-
-=item 'template'
-
-Das unveränderte Template, einschließlich Kommentaren.
-
-=back
-
-=back
+  $xml = $zug->template;
 
 =head4 Returns
 
 (String) XML
 
+=cut
+
+# -----------------------------------------------------------------------------
+
+# Accessor-Methode
+
+# -----------------------------------------------------------------------------
+
+=head3 tree() - Liefere den ZUGFeRD-Baum
+
+=head4 Synopsis
+
+  $tree = $zug->tree;
+
+=head4 Returns
+
+(Object) Baum
+
 =head4 Example
 
-  $ perl -MQuiq::Zugferd -E 'print Quiq::Zugferd->new("en16931")->xml("values")'
+  $ perl -MQuiq::Zugferd -MQuiq::Dumper -E '$t = Quiq::Zugferd->new("en16931")->tree; say Quiq::Dumper->dump($t)'
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub xml {
-    my $self = shift;
-    my $variant = shift // 'empty';
+# Accessor-Methode
 
-    my $xml = $self->get('template');
+# -----------------------------------------------------------------------------
 
-    if ($variant eq 'template') {
-        # unverändert
-    }
-    elsif ($variant eq 'empty') {
-        $xml =~ s|\s*<!--.*?-->||g; # Kommentare entfernen
-        $xml =~ s|>((?!.*:basic).)*</|></|g; # Inhalte entfernen, außer
-                                             # Specification Identifier
-        $xml =~ s|(?<!xmlns:...)=".*?"|=""|g; # Attributwerte entfernen (bis
-                                              # auf Namespace-Vereinbarungen)
-    }
-    elsif ($variant eq 'placeholders') {
-        my $str = '';
-        my $fh = Quiq::FileHandle->new('<',\$xml);
+=head2 Information
+
+=head3 bg() - Business Group
+
+=head4 Synopsis
+
+  $bg = $zug->bg($name);
+
+=head4 Arguments
+
+=over 4
+
+=item $name
+
+Name der Business Group. Beispiel: C<BG-25> (Rechnungsposition)
+
+=back
+
+=head4 Returns
+
+(Object) Business Group
+
+=head4 Description
+
+Liefere die Business Group $name. Ist die Business Group nicht definiert,
+wirf eine Exception.
+
+Das Objekt hat die Attribute:
+
+=over 4
+
+=item name
+
+Name der Business Group.
+
+=item text
+
+Kurzbeschreibung der Business Group.
+
+=item path
+
+Pfad zum Knoten im ZUGFeRD-Baum.
+
+=back
+
+=head4 Example
+
+  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->new("en16931")->bg("BG-25")->path'
+  SupplyChainTradeTransaction.IncludedSupplyChainTradeLineItem
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub bg {
+    my ($self,$name) = @_;
+
+    my $bgH = $self->memoize('bgH',sub {
+        my ($self,$key) = @_;
+
+        my %h;
+        my $file = $self->zugferdDir('business-group.csv');
+        my $fh = Quiq::FileHandle->new('<',$file);
+        $fh->setEncoding('UTF-8');
         while (<$fh>) {
-            # Content-Platzhalter ermitteln
-            my $ph = '';
-            if (/%([A-Z1-9_]+)%/) {
-                $ph = "__${1}__";
+            if (/^\s*#/) {
+                next;
             }
-
-            # Attribut-Platzhalter ermitteln
-            my %ph;
-            while (/(\w+)=%([A-Z1-9_]+)%/g) {
-                $ph{$1} = "__${2}__";
-            }
-
-            # Kommentar entfernen
-            s|\s*<!--.*?-->||g;
-
-            # Content-Platzhalter einsetzen
-            s|>.*?</|>$ph</|;
-
-            # Attribut-Platzhalter einsetzen
-            my @attr;
-            while (/(\S+)=".*?"/g) {
-                 # Ignoriere Attribute mit Namespace-Angabe
-                 if (index($1,'xmlns:') < 0) {
-                     push @attr,$1;
-                 }
-            }
-            for my $attr (@attr) {
-                 my $ph = $ph{$attr} // '';
-                 s/$attr=".*?"/$attr="$ph"/;
-            }
-            $str .= $_;
+            chomp;
+            my ($name,$mandatory,$text,$path) = split /;/;
+            $h{$name} = Quiq::Hash->new(
+                name => $name,
+                mandatory => $mandatory,
+                path => $path,
+                text => $text,
+            );
         }
         $fh->close;
-        $xml = $str;
-    }
-    else { # values
-        $xml =~ s|\s*<!--.*?-->||g;
+
+        return \%h;
+    });
+
+    my $bg = $bgH->{$name} // $self->throw(
+        'ZUGFERD-00099: Business group does not exist',
+        BusinessGroup => $name,
+    );
+
+    return $bg;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 bt() - Business Term
+
+=head4 Synopsis
+
+  $bt = $zug->bt($name);
+
+=head4 Arguments
+
+=over 4
+
+=item $name
+
+Name des Business Terms. Beispiel: C<BT-1> (Rechnungsnummer)
+
+=back
+
+=head4 Returns
+
+(Object) Business Term
+
+=head4 Description
+
+Liefere den Business Term $name. Ist der Business Term nicht definiert,
+wirf eine Exception.
+
+Das Objekt hat die Attribute:
+
+=over 4
+
+=item name
+
+Name des Business Terms.
+
+=item text
+
+Kurzbeschreibung des Business Terms.
+
+=item path
+
+Pfad zum Blattknoten im ZUGFeRD-Baum.
+
+=back
+
+=head4 Example
+
+  $ perl -MQuiq::Zugferd -E 'say Quiq::Zugferd->new("en16931")->bt("BT-1")->text'
+  Rechnungsnummer
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub bt {
+    my ($self,$name) = @_;
+
+    my $btH = $self->memoize('btH',sub {
+        my ($self,$key) = @_;
+
+        my %h;
+        my $file = $self->zugferdDir('business-term.csv');
+        my $fh = Quiq::FileHandle->new('<',$file);
+        $fh->setEncoding('UTF-8');
+        while (<$fh>) {
+            if (/^\s*#/) {
+                next;
+            }
+            chomp;
+            my ($name,$mandatory,$text) = split /;/;
+            $h{$name} = Quiq::Hash->new(
+                name => $name,
+                mandatory => $mandatory,
+                text => $text,
+                path => undef,
+            );
+        }
+        $fh->close;
+
+        $file = $self->zugferdDir('business-term-path.csv');
+        $fh = Quiq::FileHandle->new('<',$file);
+        $fh->setEncoding('UTF-8');
+        while (<$fh>) {
+            if (/^\s*#/) {
+                next;
+            }
+            chomp;
+            my ($name,$path) = split /;/;
+            $h{$name}{'path'} = $path;
+        }
+        $fh->close;
+
+        return \%h;
+    });
+
+    my $bt = $btH->{$name} // $self->throw(
+        'ZUGFERD-00099: Business term does not exist',
+        BusinessGroup => $name,
+    );
+
+    return $bt;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 zugferdDir() - Pfad des ZUGFeRD-Verzeichnisses
+
+=head4 Synopsis
+
+  $path = $zug->zugferdDir;
+  $path = $zug->zugferdDir($subPath);
+
+=head4 Arguments
+
+=over 4
+
+=item $subPath
+
+Subpfad ins Verzeichnis
+
+=back
+
+=head4 Returns
+
+(String) Dateipfad
+
+=head4 Description
+
+Liefere den Dateipfad des ZUGFeRD-Verzeichnisses, optional ergänzt um
+Subpfad $subPath.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub zugferdDir {
+    my $self = shift;
+
+    my $path = $self->{'zugferdDir'};
+    if (@_) {
+        $path .= "/$_[0]";
     }
 
-    return $xml;
+    return $path;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.227
+1.228
 
 =head1 AUTHOR
 

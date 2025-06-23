@@ -129,6 +129,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'skip_java_script_links' => {
+    	datatype => 'boolean',
+    	base_name => 'SkipJavaScriptLinks',
+    	description => 'True to skip hyperlinks with javascript calls when saving the presentation.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -185,6 +192,27 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'remove_empty_lines' => {
+    	datatype => 'boolean',
+    	base_name => 'RemoveEmptyLines',
+    	description => 'true to remove empty or whitespace-only lines from the final Markdown output. Default is false. ',
+    	format => '',
+    	read_only => '',
+    		},
+    'handle_repeated_spaces' => {
+    	datatype => 'string',
+    	base_name => 'HandleRepeatedSpaces',
+    	description => 'Specifies how repeated space characters are preserved to maintain visual alignment. ',
+    	format => '',
+    	read_only => '',
+    		},
+    'slide_number_format' => {
+    	datatype => 'string',
+    	base_name => 'SlideNumberFormat',
+    	description => 'The format of slide number headers. ',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -193,6 +221,7 @@ __PACKAGE__->swagger_types( {
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
+    'skip_java_script_links' => 'boolean',
     'format' => 'string',
     'export_type' => 'string',
     'flavor' => 'string',
@@ -200,7 +229,10 @@ __PACKAGE__->swagger_types( {
     'images_save_folder_name' => 'string',
     'show_slide_number' => 'boolean',
     'show_comments' => 'boolean',
-    'show_hidden_slides' => 'boolean'
+    'show_hidden_slides' => 'boolean',
+    'remove_empty_lines' => 'boolean',
+    'handle_repeated_spaces' => 'string',
+    'slide_number_format' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -209,6 +241,7 @@ __PACKAGE__->attribute_map( {
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
+    'skip_java_script_links' => 'SkipJavaScriptLinks',
     'format' => 'Format',
     'export_type' => 'ExportType',
     'flavor' => 'Flavor',
@@ -216,7 +249,10 @@ __PACKAGE__->attribute_map( {
     'images_save_folder_name' => 'ImagesSaveFolderName',
     'show_slide_number' => 'ShowSlideNumber',
     'show_comments' => 'ShowComments',
-    'show_hidden_slides' => 'ShowHiddenSlides'
+    'show_hidden_slides' => 'ShowHiddenSlides',
+    'remove_empty_lines' => 'RemoveEmptyLines',
+    'handle_repeated_spaces' => 'HandleRepeatedSpaces',
+    'slide_number_format' => 'SlideNumberFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

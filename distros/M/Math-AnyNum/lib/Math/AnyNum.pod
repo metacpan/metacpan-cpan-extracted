@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =head1 SYNOPSIS
 
@@ -411,7 +411,7 @@ we get the following results:
     say 98**7;                                    #=> 86812553324672
 
     # Rationals
-    say 1 / 98**7                                 #=> 1/86812553324672
+    say 1 / 98**7;                                #=> 1/86812553324672
 
 Notice that integers and rational numbers do not obey this precision, because they can grow and
 shrink dynamically, without a specific limit.
@@ -2782,7 +2782,7 @@ Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2021 Daniel Șuteu
+Copyright (C) 2017-2025 Daniel Șuteu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

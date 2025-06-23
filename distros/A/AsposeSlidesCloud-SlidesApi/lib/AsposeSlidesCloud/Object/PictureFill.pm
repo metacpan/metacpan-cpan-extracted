@@ -199,6 +199,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'delete_picture_cropped_areas' => {
+    	datatype => 'boolean',
+    	base_name => 'DeletePictureCroppedAreas',
+    	description => 'true to delete picture cropped areas on save.',
+    	format => '',
+    	read_only => '',
+    		},
+    'resolution' => {
+    	datatype => 'double',
+    	base_name => 'Resolution',
+    	description => 'true to compress the picture image with the specified resolution (in dpi) on save.',
+    	format => '',
+    	read_only => '',
+    		},
     'picture_fill_mode' => {
     	datatype => 'string',
     	base_name => 'PictureFillMode',
@@ -231,6 +245,8 @@ __PACKAGE__->swagger_types( {
     'image' => 'ResourceUri',
     'base64_data' => 'string',
     'svg_data' => 'string',
+    'delete_picture_cropped_areas' => 'boolean',
+    'resolution' => 'double',
     'picture_fill_mode' => 'string',
     'image_transform_list' => 'ARRAY[ImageTransformEffect]'
 } );
@@ -251,6 +267,8 @@ __PACKAGE__->attribute_map( {
     'image' => 'Image',
     'base64_data' => 'Base64Data',
     'svg_data' => 'SvgData',
+    'delete_picture_cropped_areas' => 'DeletePictureCroppedAreas',
+    'resolution' => 'Resolution',
     'picture_fill_mode' => 'PictureFillMode',
     'image_transform_list' => 'ImageTransformList'
 } );

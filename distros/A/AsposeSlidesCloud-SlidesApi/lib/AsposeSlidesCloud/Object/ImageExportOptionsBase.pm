@@ -128,6 +128,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'skip_java_script_links' => {
+    	datatype => 'boolean',
+    	base_name => 'SkipJavaScriptLinks',
+    	description => 'True to skip hyperlinks with javascript calls when saving the presentation.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -157,6 +164,7 @@ __PACKAGE__->swagger_types( {
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
+    'skip_java_script_links' => 'boolean',
     'format' => 'string',
     'height' => 'int',
     'width' => 'int'
@@ -168,6 +176,7 @@ __PACKAGE__->attribute_map( {
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
+    'skip_java_script_links' => 'SkipJavaScriptLinks',
     'format' => 'Format',
     'height' => 'Height',
     'width' => 'Width'

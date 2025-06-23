@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.227';
+our $VERSION = '1.228';
 
 =encoding utf8
 
@@ -393,6 +393,10 @@ L<Quiq::Html::Form::Layout> - HTML-Formular mit freiem Layout
 =item *
 
 L<Quiq::Html::Form::Matrix> - HTML-Formular mit Matrix-Layout
+
+=item *
+
+L<Quiq::Html::FrameSet> - HTML-Frameset
 
 =item *
 
@@ -1008,15 +1012,11 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =item *
 
-L<Quiq::Zugferd> - Generiere XML einer ZUGFeRD-Rechnung
+L<Quiq::Zugferd> - Generiere das XML von ZUGFeRD-Rechnungen
 
 =item *
 
 L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
-
-=item *
-
-L<Quiq::Zugferd2> - Generiere das XML von ZUGFeRD-Rechnungen
 
 =back
 
@@ -1026,7 +1026,7 @@ L<Quiq::Zugferd2> - Generiere das XML von ZUGFeRD-Rechnungen
 
 =head1 VERSION
 
-1.227
+1.228
 
 =head1 AUTHOR
 

@@ -14,6 +14,7 @@ t/03-utf8.t
 t/04-inline.t
 t/05-underscore.t
 t/06-not_a_list.t
+t/07-strip_markdown.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

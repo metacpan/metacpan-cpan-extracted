@@ -1,5 +1,8 @@
 Revision history for perl distribution DBIx-Migration
 
+0.31 Mon Jun 23 10:17:37 AM CEST 2025
+        - Fix DBD::SQLite minimum version requirement
+
 0.30 Fri Jun 20 02:27:30 PM CEST 2025
         - Fix migrations basename regular expression used in _files() object
           method

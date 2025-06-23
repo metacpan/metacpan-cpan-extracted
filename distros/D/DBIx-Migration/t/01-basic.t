@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like use_ok ) ], tests => 12;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like note use_ok ) ], tests => 12;
 use Test::API import => [ qw( class_api_ok ) ];
 use Test::Fatal qw( exception );
 
-use Path::Tiny qw( cwd );
+use DBI::Const::GetInfoType qw( %GetInfoType );
+use Path::Tiny              qw( cwd );
 
 my ( $class, $subclass );
 
@@ -35,7 +36,7 @@ like exception { $class->new( dbh => DBI->connect( 'dbi:Mock:', undef, undef, {}
   qr/\Adbh and username cannot be used at the same time/, '"dbh" and "username" are mutually exclusive';
 
 my $dbh = DBI->connect( 'dbi:Mock:', undef, undef, {} );
-use DBI::Const::GetInfoType qw( %GetInfoType );
+note 'Numeric value of the GetInfo Type Code SQL_DATA_SOURCE_NAME: ', $GetInfoType{ SQL_DATA_SOURCE_NAME };
 $dbh->{ mock_get_info } = { $GetInfoType{ SQL_DATA_SOURCE_NAME } => 'dbi:SQLite:' };
 like exception { $subclass->new( dbh => $dbh ) },
   qr/\Asubclass DBIx::Migration::Pg cannot handle SQLite driver/, 'subclass-driver inconsistency';

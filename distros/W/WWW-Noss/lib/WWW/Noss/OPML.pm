@@ -2,7 +2,7 @@ package WWW::Noss::OPML;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 
 use XML::LibXML;
 
@@ -342,8 +342,6 @@ converted XML structure. The following are valid values:
 
 Boolean determining whether to include outline folders in the XML strucutre.
 Defaults to true.
-
-=back
 
 =back
 

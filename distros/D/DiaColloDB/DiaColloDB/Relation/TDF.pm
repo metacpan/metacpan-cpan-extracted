@@ -1140,8 +1140,11 @@ sub vprofile {
 	      @$vs{qw(tvals d2c c2date)},
 	      $sliceby, $dlo,$dhi,
 	      $qwhich, $qvals,
-	      $groupby->{gapos},
-	      ($groupby->{ghavingt}//null),
+          $groupby->{gapos},
+              ##-- argh 2025-06-22: chokes with 'diacollo_cof_t_long: input parameter 'ghaving' is null'
+              #($groupby->{ghavingt}//null),
+              ($groupby->{ghavingt}//empty($vs->itype)),
+              ##-- /argh
 	      $f1p={},
 	      $f12p={},
               ($extendp // 0)

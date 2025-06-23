@@ -1,8 +1,10 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
-7.019 - Add threads::shared support
-7.018 - Add Trunctailwidth(), set_defaults, reset_defaults; fix avisl;
-7.017 - addrvis() fixes, test improv. Skip if no 'threads'
+7.019 - Changed Useqq("spacedots") to "showspaces" and using ␣ instead of Middle Dot
+        Disable __WARN__ trap around GetTerminalSize() [delete local $SIG{__WARN__}]
+7.018 - Add threads::shared support
+7.017 - Add Trunctailwidth(), set_defaults, reset_defaults; fix avisl;
+7.016 - addrvis() fixes, test improv. Skip if no 'threads'
 7.015 - addrvis() uses threads::shared::is_shared() when appropriate.
         Subrefs show the name of the referenced sub (using Sub::Identify).
         Requires Path::Tiny 0.146 or later.

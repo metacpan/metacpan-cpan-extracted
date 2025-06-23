@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -643,11 +643,16 @@ sub _str2obj {
     $s =~ s/^\+// if substr($s, 0, 1) eq '+';
 
     # Fraction
-    if (index($s, '/') != -1 and $s =~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
-        my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_str($r, $s, 10);
-        Math::GMPq::Rmpq_canonicalize($r);
-        return $r;
+    if (index($s, '/') != -1) {
+
+        if ($s =~ m{^\s*-?[0-9]+\s*/\s*-?[1-9]+[0-9]*\s*\z}) {
+            my $r = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_str($r, $s, 10);
+            Math::GMPq::Rmpq_canonicalize($r);
+            return $r;
+        }
+
+        return ${Math::AnyNum->new($s, 10)};
     }
 
     # Integer
@@ -1136,9 +1141,7 @@ sub _cached_primorial {
 
         if ($OLD_GMP) {
             Math::GMPz::Rmpz_set_ui($t, 1);
-            for (my $p = Math::GMPz::Rmpz_init_set_ui(2) ;
-                 Math::GMPz::Rmpz_cmp_ui($p, $k) <= 0 ;
-                 Math::GMPz::Rmpz_nextprime($p, $p)) {
+            for (my $p = Math::GMPz::Rmpz_init_set_ui(2) ; Math::GMPz::Rmpz_cmp_ui($p, $k) <= 0 ; Math::GMPz::Rmpz_nextprime($p, $p)) {
                 Math::GMPz::Rmpz_mul($t, $t, $p);
             }
         }
@@ -1187,15 +1190,41 @@ sub new {
         $num =~ s/^\+// if substr($num, 0, 1) eq '+';
 
         if (index($num, '/') != -1) {
-            my $r = Math::GMPq::Rmpq_init();
-            eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
 
-            if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*(?:/\s*[-+]?[1-9]+[0-9]*\s*)?\z}) {
+            my ($nu, $de) = split(/\//, $num);
+
+            my $nu_obj = $class->new($nu, $base);
+            my $de_obj = $class->new($de, $base);
+
+            if (ref($$nu_obj) ne 'Math::GMPz') {
                 goto &nan;
             }
 
+            if (ref($$de_obj) ne 'Math::GMPz') {
+                goto &nan;
+            }
+
+            if (Math::GMPz::Rmpz_sgn($$de_obj) == 0) {
+                if (Math::GMPz::Rmpz_sgn($$nu_obj) == 0) {
+                    goto &nan;    # 0/0
+                }
+
+                if (Math::GMPz::Rmpz_sgn($$nu_obj) < 0) {
+                    goto &ninf;    # -x/0
+                }
+                else {
+                    goto &inf;     # +x/0
+                }
+            }
+
+            my $r = Math::GMPq::Rmpq_init();
+
+            Math::GMPq::Rmpq_set_num($r, $$nu_obj);
+            Math::GMPq::Rmpq_set_den($r, $$de_obj);
+
             Math::GMPq::Rmpq_canonicalize($r);
-            return bless \$r, $class;
+
+            return bless(\$r, $class);
         }
         elsif (substr($num, 0, 1) eq '(' and substr($num, -1) eq ')') {
             my $r = Math::MPC::Rmpc_init2($PREC);
@@ -4928,11 +4957,19 @@ sub log (_;$) {
 sub __ilog__ {
     my ($x, $y) = @_;
 
+    if (ref($y) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+        $y = Math::GMPz::Rmpz_get_ui($y);
+    }
+
     # ilog(x, y <= 1) = NaN
     $y <= 1 and return;
 
     # ilog(x <= 0, y) = NaN
     Math::GMPz::Rmpz_sgn($x) <= 0 and return;
+
+    # ilog(x,y) = 0, when y > x
+    (ref($y) ? Math::GMPz::Rmpz_cmp($x, $y) : Math::GMPz::Rmpz_cmp_ui($x, $y)) >= 0
+      or return 0;
 
     # Return faster for y <= 62
     if ($y <= 62) {
@@ -9967,7 +10004,7 @@ sub binomial ($$) {
         and CORE::int($k) eq $k
         and $n >= 0
         and $k >= 0
-        and $n < ULONG_MAX
+        and $n < 1e6
         and $k < ULONG_MAX) {
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_bin_uiui($r, $n, $k);
@@ -9979,7 +10016,7 @@ sub binomial ($$) {
 
     my $r = Math::GMPz::Rmpz_init();
 
-    if ($k >= 0 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+    if ($k >= 0 and Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_cmp_ui($n, 1e6) <= 0) {
         Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($n), $k);
     }
     else {

@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 
 use List::Util qw(all any max);
 
@@ -851,6 +851,19 @@ WHERE
 
 }
 
+sub vacuum {
+
+	my ($self) = @_;
+
+	# Stops the 'cannot VACUUM from within a transaction' error
+	local $self->{ DB }{ AutoCommit } = 1;
+
+	$self->{ DB }->do(q{ VACUUM; });
+
+	return 1;
+
+}
+
 sub commit {
 
 	my ($self) = @_;
@@ -1072,6 +1085,11 @@ To commit the updated posts, you must also call the C<commit()> method.
 Check whether you are supposed to skip updating C<$feed> right now. C<$feed>
 can either be a feed name or L<WWW::Noss::FeedConfig> object. C<undef> is
 returned if C<$feed> does not exist.
+
+=item $db->vacuum()
+
+Runs the C<VACUUM> L<sqlite3(1)> command on the database, which frees up any
+unused space within the database and reduces its total size.
 
 =item $db->commit()
 

@@ -1,0 +1,1124 @@
+BR-01 (Prozesssteuerung)
+Eine Rechnung (INVOICE) muss eine Spezifikationskennung „Specification
+identification“ (BT-24) enthalten.
+
+BR-02 (Rechnung)
+Eine Rechnung (INVOICE) muss eine Rechnungsnummer „Invoice number“ (BT-01)
+enthalten.
+
+BR-03 (Rechnung)
+Eine Rechnung (INVOICE) muss ein Rechnungsdatum „Invoice issue date“ (BT-02)
+enthalten.
+
+BR-04 (Rechnung)
+Eine Rechnung (INVOICE) muss einen Rechnungstyp-Code „Invoice type code“
+(BT-03) enthalten.
+
+BR-05 (Rechnung)
+Eine Rechnung (INVOICE) muss einen Währungs-Code „Invoice currency code“
+(BT-05) enthalten.
+
+BR-06 (Verkäufer)
+Eine Rechnung (INVOICE) muss den Verkäufernamen „Seller name“ (BT-27)
+enthalten.
+
+BR-07 (Käufer)
+Eine Rechnung (INVOICE) muss den Erwerbernamen „Buyer name“ (BT-44) enthalten.
+
+BR-08 (Verkäufer)
+Eine Rechnung (INVOICE) muss die postalische Anschrift des Verkäufers „SELLER
+POSTAL ADDRESS“ (BG-05) enthalten.
+
+BR-09 (Verkäufer)
+Eine postalische Anschrift des Verkäufers „SELLER POSTAL ADDRESS“ (BG-05) muss
+einen Verkäufer-Ländercode „Seller country code“ (BT-40) enthalten.
+
+BR-10 (Käufer)
+Eine Rechnung (INVOICE) muss die postalische Anschrift des Erwerbers „BUYER
+POSTAL ADDRESS“ (BG-08) enthalten.
+
+BR-11 (Käufer)
+Eine postalische Anschrift des Erwerbers „BUYER POSTAL ADDRESS“ (BG-08) muss
+einen Erwerber-Ländercode „Buyer country code“ (BT-55) enthalten.
+
+BR-12 (Gesamtsummen auf Dokumentenebene)
+Eine Rechnung (INVOICE) muss die Summe der Rechnungspositionen-Nettobeträge
+„Sum of Invoice line net amount“ (BT-106) enthalten.
+
+BR-13 (Gesamtsummen auf Dokumentenebene)
+Eine Rechnung (INVOICE) muss den Gesamtbetrag der Rechnung ohne Umsatzsteuer
+„Invoice total amount without VAT“ (BT-109) enthalten.
+
+BR-14 (Gesamtsummen auf Dokumentenebene)
+Eine Rechnung (INVOICE) muss den Gesamtbetrag der Rechnung mit Umsatzsteuer
+„Invoice total amount with VAT“ (BT-112) enthalten.
+
+BR-15 (Gesamtsummen auf Dokumentenebene)
+Eine Rechnung (INVOICE) muss den ausstehenden Betrag „Amount due for payment“
+(BT-115) enthalten.
+
+BR-16 (Rechnung)
+Eine Rechnung (INVOICE) muss mindestens eine Rechnungsposition „INVOICE LINE“
+(BG-25) enthalten.
+
+BR-17 (Zahlungsempfänger)
+Eine Rechnung (INVOICE) muss den Namen des Zahlungsempfängers „Payee name“
+(BT-59) enthalten, wenn sich der Zahlungsempfänger „PAYEE“ (BG-10) vom
+Verkäufer „SELLER“ (BG-04) unterscheidet.
+
+BR-18 (Steuerbevollmächtigter des Verkäufers)
+Eine Rechnung (INVOICE) muss den Namen des Steuervertreters des Verkäufers
+„Seller tax representative name“ (BT-62) enthalten, wenn der Verkäufer
+„SELLER“ (BG-04) einen Steuervertreter hat.
+
+BR-19 (Steuerbevollmächtigter des Verkäufers)
+Eine Rechnung (INVOICE) muss die postalische Anschrift des Steuervertreters
+„SELLER TAX REPRESENTATIVE POSTAL ADDRESS“ (BG-12) enthalten, wenn der
+Verkäufer „SELLER“ (BG-04) einen Steuervertreter hat.
+
+BR-20 (Steuerbevollmächtigter des Verkäufers)
+Die postalische Anschrift des Steuervertreters des Verkäufers „SELLER TAX
+REPRESENTATIVE POSTAL ADDRESS“ (BG-12) muss einen Steuervertreter-Ländercode
+enthalten, wenn der Verkäufer „SELLER“ (BG-04) einen Steuervertreter hat.
+
+BR-21 (Rechnungsposition)
+Jede Rechnungsposition „INVOICE LINE“ (BG-25) muss eine eindeutige Bezeichnung
+„Invoice line identifier“ (BT-126) haben.
+
+BR-22 (Rechnungsposition)
+Jede Rechnungsposition „INVOICE LINE“ (BG-25) muss die Menge der in der
+betreffenden Position in Rechnung gestellten Waren oder Dienstleistungen als
+Einzelposten „Invoiced quantity“ (BT-129) enthalten.
+
+BR-23 (Rechnungsposition)
+Jede Rechnungsposition „INVOICE LINE“ (BG-25) muss eine Einheit zur
+Mengenangabe „Invoiced quantity unit of measure code“ (BT-130) enthalten.
+
+BR-24 (Rechnungsposition)
+Jede Rechnungsposition „INVOICE LINE“ (BG-25) muss den Nettobetrag der
+Rechnungsposition „Invoice line net amount“ (BT-131) enthalten.
+
+BR-25 (Artikelinformationen)
+Jede Rechnungsposition „INVOICE LINE“ (BG-25) muss den Namen des Postens „Item
+name“ (BT-153) enthalten.
+
+BR-26 (Detailinformationen zum Preis)
+Jede Rechnungsposition „INVOICE LINE“ (BG-25) muss den Preis des Postens, ohne
+Umsatzsteuer, nach Abzug des für diese Rechnungsposition geltenden Rabatts
+„Item net price“ (BT-146) beinhalten.
+
+BR-27 (Nettopreis des Artikels)
+Der Artikel-Nettobetrag „Item net price“ (BT-146) darf nicht negativ sein.
+
+BR-28 (Detailinformationen zum Preis)
+Der Einheitspreis ohne Umsatzsteuer vor Abzug des Postenpreisrabatts einer
+Rechnungsposition „Item gross price“ (BT-148) darf nicht negativ sein.
+
+BR-29 (Rechnungszeitraum)
+Wenn Start- und Enddatum des Rechnungszeitraums gegeben sind, muss das
+Enddatum „Invoicing period end date“ (BT-74) nach dem Startdatum „Invoicing
+period start date“ (BT-73) liegen oder mit diesem identisch sein.
+
+BR-30 (Rechnungszeitraum auf Positionsebene)
+Wenn Start- und Enddatum des Rechnungspositionenzeitraums gegeben sind, muss
+das Enddatum „Invoice line period end date“ (BT-135) nach dem Startdatum
+„Invoice line period start date“ (BT-134) liegen oder mit diesem identisch
+sein.
+
+BR-31 (Abschläge auf Dokumentenebene)
+Jeder Nachlass für die Rechnung als Ganzes „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+muss einen Betrag „Document level allowance amount“ (BT-92) aufweisen.
+
+BR-32 (Abschläge auf Dokumentenebene)
+Jeder Nachlass für die Rechnung als Ganzes „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+muss einen Umsatzsteuer-Code „Document level allowance VAT category code“
+(BT-95) aufweisen.
+
+BR-33 (Abschläge auf Dokumentenebene)
+Jeder Nachlass für die Rechnung als Ganzes „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+muss einen Nachlassgrund „Document level allowance reason“ (BT-97) oder einen
+entsprechenden Code „Document level allowance reason code“ (BT-98) aufweisen.
+
+BR-36 (Zuschläge auf Dokumentenebene)
+Jede Abgabe auf Dokumentenebene „DOCUMENT LEVEL CHARGES“ (BG-21) muss einen
+Betrag „Document level charge amount“ (BT-99) aufweisen.
+
+BR-37 (Zuschläge auf Dokumentenebene)
+Jede Abgabe auf Dokumentenebene „DOCUMENT LEVEL CHARGES“ (BG-21) muss einen
+Umsatzsteuer-Code „Document level charge VAT category code“ (BT-102)
+aufweisen.
+
+BR-38 (Zuschläge auf Dokumentenebene)
+Jede Abgabe auf Dokumentenebene „DOCUMENT LEVEL CHARGES“ (BG-21) muss einen
+Abgabegrund „Document level charge reason“ (BT-104) oder einen entsprechenden
+Code „Document level charge reason code“ (BT-105) aufweisen.
+
+BR-41 (Abschläge auf Ebene der Rechnungsposition)
+Jeder Nachlass auf der Ebene der Rechnungsposition „INVOICE LINE ALLOWANCES“
+(BG-27) muss einen Betrag „Invoice line allowance amount“ (BT-136) aufweisen.
+
+BR-42 (Abschläge auf Ebene der Rechnungsposition)
+Jeder Nachlass auf der Ebene der Rechnungsposition „INVOICE LINE ALLOWANCES“
+(BG-27) muss einen Nachlassgrund „Invoice line allowance reason“ (BT-139) oder
+einen entsprechenden Code „Invoice line allowance reason code“ (BT-140)
+aufweisen.
+
+BR-43 (Charge ou frais sur ligne de facture)
+Jede Abgabe auf der Ebene der Rechnungsposition „INVOICE LINE CHARGES“ (BG-28)
+muss einen Betrag „Invoice line charge amount“ (BT-141) aufweisen.
+
+BR-44 (Charge ou frais sur ligne de facture)
+Jede Abgabe auf der Ebene der Rechnungsposition „INVOICE LINE CHARGES“ (BG-28)
+muss einen Abgabegrund „Invoice line charge reason“ (BT144) oder einen
+entsprechenden Code „Invoice line charge reason code“ (BT-145) aufweisen.
+
+BR-45 (Umsatzsteueraufschlüsselung)
+Jede Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) muss die Summe aller
+nach dem jeweiligen Schlüssel zu versteuernden Beträge „VAT category taxable
+amount“ (BT-116) aufweisen.
+
+BR-46 (Umsatzsteueraufschlüsselung)
+Jede Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) muss den für die
+betreffende Umsatzsteuerkategorie zu entrichtenden Gesamtbetrag „VAT category
+tax amount“ (BT-117) aufweisen.
+
+BR-47 (Umsatzsteueraufschlüsselung)
+Jede Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) muss über eine
+codierte Bezeichnung einer Umsatzsteuerkategorie „VAT category code“ (BT-118)
+definiert werden.
+
+BR-48 (Umsatzsteueraufschlüsselung)
+Jede Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) muss einen
+Umsatzsteuersatz gemäß einer Kategorie „VAT category rate“ (BT119)
+haben. Sofern die Rechnung von der Umsatzsteuer ausgenommen ist, ist „0“ zu
+übermitteln.
+
+BR-49 (Zahlungsanweisungen)
+Die Zahlungsinstruktionen „PAYMENT INSTRUCTIONS“ (BG-16) müssen den
+Zahlungsart-Code „Payment means type code“ (BT-81) enthalten.
+
+BR-50 (Kontoinformationen)
+Die Kennung des Kontos, auf das die Zahlung erfolgen soll „Payment account
+identifier“ (BT-84), muss angegeben werden, wenn Überweisungsinformationen in
+der Rechnung angegeben werden.
+
+BR-51 (Karteninformationen)
+Die letzten vier bis sechs Ziffern der Kreditkartennummer „Payment card
+primary account number“ (BT-87) sollen angegeben werden, wenn Informationen
+zur Kartenzahlung übermittelt werden.
+
+BR-52 (Rechnungsbegründende Unterlagen)
+
+Jede rechnungsbegründende Unterlage muss einen Dokumentenbezeichner
+„Supporting document reference“ (BT-122) haben.
+
+BR-53 (Gesamtsummen auf Dokumentenebene)
+Wenn eine Währung für die Umsatzsteuerabrechnung angegeben wurde, muss der
+Umsatzsteuergesamtbetrag in der Abrechnungswährung „Invoice total VAT amount
+in accounting currency“ (BT-111) angegeben werden.
+
+BR-54 (Artikelattribute)
+Jede Eigenschaft eines in Rechnung gestellten Postens „ITEM ATTRIBUTES“
+(BG-32) muss eine Bezeichnung „Item attribute name“ (BT-160) und einen Wert
+„Item attribute value“ (BT-161) haben.
+
+BR-55 (Referenz auf die vorausgegangene Rechnung)
+Jede Bezugnahme auf eine vorausgegangene Rechnung „Preceding Invoice
+reference“ (BT-25) muss die Nummer der vorausgegangenen Rechnung enthalten.
+
+BR-56 (Steuerbevollmächtigter des Verkäufers)
+Jeder Steuervertreter des Verkäufers „SELLER TAX REPRESENTATIVE PARTY“ (BG-11)
+muss eine Umsatzsteuer-Identifikationsnummer „Seller tax representative VAT
+identifier“ (BT-63) haben.
+
+BR-57 (Lieferanschrift)
+Jede Lieferadresse „DELIVER TO ADDRESS“ (BG-15) muss einen entsprechenden
+Ländercode „Deliver to country code“ (BT-80) enthalten.
+
+BR-61 (Zahlungsanweisungen)
+Wenn der Zahlungsmittel-Typ SEPA, lokale Überweisung oder
+Nicht-SEPA-Überweisung ist, muss der „Payment account identifier“ (BT-84) des
+Zahlungsempfängers angegeben werden.
+
+BR-62 (Elektronische Adresse des Verkäufers)
+Im Element „Seller electronic address“ (BT-34) muss die Komponente „Scheme
+Identifier“ vorhanden sein.
+
+BR-63 (Elektronische Adresse des Käufers)
+Im Element „Buyer electronic address“ (BT-49) muss die Komponente „Scheme
+Identifier“ vorhanden sein.
+
+BR-64 (Kennung eines Artikels nach registriertem Schema)
+Im Element „Item standard identifier“ (BT-157) muss die Komponente „Scheme
+Identifier“ vorhanden sein.
+
+BR-65 (Kennung der Artikelklassifizierung)
+Im Element „Item classification identifier“ (BT-158) muss die Komponente
+„Scheme Identifier“ vorhanden sein.
+
+BR-CO-03 (Rechnung)
+Umsatzsteuerdatum „Value added tax point date“ (BT-07) und Code für das
+Umsatzsteuerdatum „Value added tax point date code“ (BT-08) schließen sich
+gegenseitig aus.
+
+BR-CO-04 (Rechnungsposition)
+Jede Rechnungsposition „INVOICE LINE“ (BG-25) muss anhand der
+Umsatzsteuerkategorie des in Rechnung gestellten Postens „Invoiced item VAT
+category code“ (BT-151) kategorisiert werden.
+
+BR-CO-05 (Abschläge auf Dokumentenebene)
+Der Code des Grundes für den Nachlass auf der Dokumentenebene „Document level
+allowance reason code“ (BT-98) und der Grund für den Nachlass auf der
+Dokumentenebene „Document level allowance reason“ (BT-97) müssen dieselbe
+Nachlassart anzeigen.
+
+BR-CO-06 (Abschläge auf Dokumentenebene)
+Der Code des Grundes für die Abgaben auf der Dokumentenebene „Document level
+charge reason code“ (BT-105) und der Grund für die Abgaben auf der
+Dokumentenebene „Document level charge reason“ (BT-104) müssen dieselbe
+Abgabenart anzeigen.
+
+BR-CO-07 (Abschläge auf Ebene der Rechnungsposition)
+Der Code für den Grund des Rechnungszeilennachlasses „Invoice line allowance
+reason code“ (BT-140) und der Grund für den Rechnungszeilennachlass „Invoice
+line allowance reason“ (BT-139) müssen dieselbe Nachlassart anzeigen.
+
+BR-CO-08 (Zuschläge auf Ebene der Rechnungsposition)
+Der Code für den Grund der Abgabe auf Rechnungspositionsebene „Invoice line
+charge reason code“ (BT-145) und der Grund für die Abgabe auf
+Rechnungspositionsebene „Invoice line charge reason“ (BT-144) müssen dieselbe
+Abgabenart anzeigen.
+
+BR-CO-09 (Umsatzsteuer-Identifikationsnummern)
+Der Umsatzsteuer-Identifikationsnummer des Verkäufers „Seller VAT identifier“
+(BT-31), der Umsatzsteuer-Identifikationsnummer des Steuervertreters des
+Verkäufers „Seller tax representative VAT identifier“ (BT-63) und der
+Umsatzsteuer-Identifikationsnummer des Erwerbers „Buyer VAT identifier“
+(BT-48) muss zur Kennzeichnung des Mitgliedstaats, der sie erteilt hat,
+jeweils ein Präfix nach dem ISO-Code 3166 Alpha-2 vorangestellt
+werden. Griechenland wird jedoch ermächtigt, das Präfix „EL“ zu verwenden.
+
+BR-CO-10 (Gesamtsummen auf Dokumentenebene)
+Der Inhalt des Elementes „Sum of Invoice line net amount“ (BT-106) entspricht
+der Summe aller Inhalte der Elemente „Invoice line net amount“ (BT-131).
+
+BR-CO-11 (Gesamtsummen auf Dokumentenebene)
+Der Inhalt des Elementes „Sum of allowances on document level“ (BT-107)
+entspricht der Summe aller Inhalte der Elemente „Document level allowance
+amount“ (BT-92).
+
+BR-CO-12 (Gesamtsummen auf Dokumentenebene)
+Der Inhalt des Elementes „Sum of charges on document level“ (BT-108)
+entspricht der Summe aller Inhalte der Elemente „Document level charge amount“
+(BT-99).
+
+BR-CO-13 (Gesamtsummen auf Dokumentenebene)
+Der Inhalt des Elementes „Invoice total amount without VAT“ (BT-109)
+entspricht der Summe aller Inhalte der Elemente „Invoice line net amount“
+(BT-131) abzüglich der Summe aller in der Rechnung enthaltenen Nachlässe der
+Dokumentenebene „Sum of allowances on document level“ (BT107) zuzüglich der
+Summe aller in der Rechnung enthaltenen Abgaben der Dokumentenebene „Sum of
+charges on document level“ (BT-108).
+
+BR-CO-14 (Gesamtsummen auf Dokumentenebene)
+Der Inhalt des Elementes „Invoice total VAT amount“ (BT-110) entspricht der
+Summe aller Inhalte der Elemente „VAT category tax amount“ (BT117).
+
+BR-CO-15 (Gesamtsummen auf Dokumentenebene)
+Der Inhalt des Elementes „Invoice total amount with VAT“ (BT-112) entspricht
+der Summe des Inhalts des Elementes „Invoice total amount without VAT“
+(BT-109) und des Elementes „Invoice total VAT amount“ (BT-110).
+
+BR-CO-16 (Gesamtsummen auf Dokumentenebene)
+Der Inhalt des Elementes „Amount due for payment“ (BT-115) entspricht dem
+Inhalt des Elementes „Invoice total VAT amount“ (BT-110) abzüglich dem Inhalt
+des Elementes „Paid amount“ (BT-113) zuzüglich dem Inhalt des Elementes
+„Rounding amount“ (BT-114).
+
+BR-CO-17 (Umsatzsteueraufschlüsselung)
+Der Inhalt des Elementes „VAT category tax amount“ (BT-117) entspricht dem
+Inhalt des Elementes „VAT category taxable amount“ (BT-116), multipliziert mit
+dem Inhalt des Elementes „VAT category rate“ (BT-119) geteilt durch 100,
+gerundet auf zwei Dezimalstellen.
+
+BR-CO-18 (Umsatzsteueraufschlüsselung)
+Eine Rechnung (INVOICE) soll mindestens eine Gruppe „VAT BREAKDOWN“ (BG-23)
+enthalten.
+
+BR-CO-19 (Liefer- oder Rechnungszeitraum)
+Wenn die Gruppe „INVOICING PERIOD“ (BG-14) verwendet wird, müssen entweder das
+Element „Invoicing period start date“ (BT-73) oder das Element „Invoicing
+period end date“ (BT-74) oder beide gefüllt sein.
+
+BR-CO-20 (Rechnungszeitraum auf Positionsebene)
+Wenn die Gruppe „INVOICE LINE PERIOD“ (BG-26) verwendet wird, müssen entweder
+das Element „Invoice line period start date“ (BT-134) oder das Element
+„Invoice line period end date“ (BT-135) oder beide gefüllt sein.
+
+BR-CO-21 (Abschläge auf Dokumentenebene)
+Jede Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20) muss entweder ein Element
+„Document level allowance reason“ (BT-97) oder ein Element „Document level
+allowance reason code“ (BT-98) oder beides enthalten.
+
+BR-CO-22 (Zuschläge auf Dokumentenebene)
+Jede Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) muss entweder ein Element
+„Document level charge reason“ (BT-104) oder ein Element „Document level
+charge reason code“ (BT-105) oder beides enthalten.
+
+BR-CO-23 (Abschläge auf Ebene der Rechnungsposition)
+Jede Gruppe „INVOICE LINE ALLOWANCES“ (BG-27) muss entweder ein Element
+„Invoice line allowance reason“ (BT-139) oder ein Element „Invoice line
+allowance reason code“ (BT-140) oder beides enthalten.
+
+BR-CO-24 (Zuschläge auf Ebene der Rechnungsposition)
+Jede Gruppe „INVOICE LINE CHARGES“ (BG-28) muss entweder ein Element „Invoice
+line charge reason“ (BT-144) oder ein Element „Invoice line charge reason
+code“ (BT-145) oder beides enthalten.
+
+BR-CO-25 (Rechnung)
+Im Falle eines positiven Zahlbetrags „Amount due for payment“ (BT-115) muss
+entweder das Element Fälligkeitsdatum „Payment due date“ (BT-9) oder das
+Element Zahlungsbedingungen „Payment terms“ (BT-20) vorhanden sein.
+
+BR-CO-26 (Verkäufer)
+Damit der Erwerber den Lieferanten automatisch identifizieren kann, soll der
+„Seller identifier“ (BT-29), der „Seller legal registration identifier“
+(BT-30) oder der „Seller VAT identifier“ (BT-31) vorhanden sein.
+
+BR-AE-01 (Umkehrung der Steuerschuldnerschaft)
+Eine Rechnung (INVOICE), die eine Position, einen Nachlass oder eine Abgabe
+auf der Rechnungsebene enthält, bei der als Code der Umsatzsteuerkategorie des
+in Rechnung gestellten Postens („Invoiced item VAT category code“ (BT-151),
+„Document level allowance VAT category code“ (BT-95) oder „Document level
+charge VAT category code“ (BT-102)) der Wert „VAT reverse charge“ angegeben
+ist, muss in „VAT BREAKDOWN“ (BG-23) genau einen Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert „VAT Reverse
+charge“ enthalten.
+
+BR-AE-02 (Umkehrung der Steuerschuldnerschaft)
+Eine Rechnung (INVOICE), die eine Position enthält, in der als Code der
+Umsatzsteuerkategorie für den in Rechnung gestellten Posten „Invoiced item VAT
+category code“ (BT-151) der Wert „Exempt from VAT“ angegeben ist, muss die
+Umsatzsteuer-Identifikationsnummer des Verkäufers „Seller VAT identifier“
+(BT-31), die Steueridentifikationsnummer des Verkäufers „Seller tax
+registration identifier“ (BT-32) oder die UmsatzsteuerIdentifikationsnummer
+des Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) und die UmsatzsteuerIdentifikationsnummer des Erwerbers „Buyer VAT
+identifier“ (BT-48) oder den „Buyer tax registration identifier“a enthalten.
+
+BR-AE-03 (Umkehrung der Steuerschuldnerschaft)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+enthält, in der „Document level allowance VAT category code“ (BT-95) den Wert
+„Exempt from VAT“ hat, müssen entweder „Seller VAT identifier“ (BT-31),
+„Seller tax registration identifier“ (BT-32) oder „Seller tax representative
+VAT identifier“ (BT-63) sowie die Umsatzsteuer-Identifikationsnummer des
+Erwerbers „Buyer VAT identifier“ (BT-48) oder „Buyer tax registration
+identifier“ vorhanden sein.
+
+BR-AE-04 (Umkehrung der Steuerschuldnerschaft)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) enthält,
+in der „Document level charge VAT category code“ (BT-102) den Wert „Exempt
+from VAT“ hat, muss entweder „Seller VAT identifier“ (BT-31), „Seller tax
+registration identifier“ (BT-32) oder „Seller tax representative VAT
+identifier“ (BT-63) und die Umsatzsteuer-Identifikationsnummer des Erwerbers
+„Buyer VAT identifier“ (BT-48) vorhanden sein.
+
+BR-AE-05 (Umkehrung der Steuerschuldnerschaft)
+In einer „INVOICE LINE“ (BG-25), in der „Invoiced item VAT category code“
+(BT-151) den Wert „Reverse charge“ hat, muss „Invoiced item VAT rate“ (BT-152)
+gleich „0“ sein.
+
+BR-AE-06 (Umkehrung der Steuerschuldnerschaft)
+In einer „DOCUMENT LEVEL ALLOWANCES“ (BG-20), in der „Document level allowance
+VAT category code“ (BT-95) den Wert „Reverse charge“ hat, muss „Document level
+allowance VAT rate“ (BT-96) gleich „0“ sein.
+
+BR-AE-07 (Umkehrung der Steuerschuldnerschaft)
+In einer „DOCUMENT LEVEL CHARGES“ (BG-21), in der „Document level charge VAT
+category code“ (BT-102) den Wert „Reverse charge“ hat, muss „Document level
+charge VAT rate“ (BT-103) gleich „0“ sein.
+
+BR-AE-08 (Umkehrung der Steuerschuldnerschaft)
+In einer „VAT BREAKDOWN“ (BG-23), in der als Code der Umsatzsteuerkategorie
+„VAT category code“ (BT-118) der Wert „Reverse charge“ angegeben ist, muss der
+„VAT category taxable amount“ (BT-116) gleich der Summe der „Invoice line net
+amount“ (BT-131) abzüglich der „Document level allowance amount“ (BT-92)
+zuzüglich der „Document level charge amount“ (BT-99) sein, wobei als „Invoiced
+item VAT category code“ (BT-151), als „Document level allowance VAT category
+code“ (BT-95) sowie als „Document level charge VAT category code“ (BT-102)
+jeweils der Wert „Reverse charge“ angegeben wird.
+
+BR-AE-09 (Umkehrung der Steuerschuldnerschaft)
+Der „VAT category tax amount“ (BT-117) muss in einer „VAT BREAKDOWN“ (BG-23)
+mit dem Code der Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem
+Wert „Reverse charge“ gleich „0“ sein.
+
+BR-AE-10 (Umkehrung der Steuerschuldnerschaft)
+Ein „VAT BREAKDOWN“ (BG-23) mit dem Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) mit dem Wert „Reverse charge“ muss einen „VAT
+exemption reason code“ (BT-121) mit dem Wert „Reverse charge“ oder einen „VAT
+exemption reason text“ (BT-120) des Wertes „Reverse charge“ (oder das
+Äquivalent in einer anderen Sprache) enthalten.
+
+BR-E-01 (Steuerbefreit)
+Eine Rechnung (INVOICE), die eine Position, einen Nachlass oder eine Abgabe
+auf der Rechnungsebene enthält, bei der als Code der Umsatzsteuerkategorie des
+in Rechnung gestellten Postens („Invoiced item VAT category code“ (BT-151),
+„Document level allowance VAT category code“ (BT-95) oder „Document level
+charge VAT category code“ (BT-102)) der Wert „Exempt from VAT“ angegeben ist,
+muss genau ein „VAT BREAKDOWN“ (BG-23) mit dem Code der Umsatzsteuerkategorie
+„VAT category code“ (BT-118) mit dem Wert „Exempt from VAT“ enthalten.
+
+BR-E-02 (Steuerbefreit)
+Eine Rechnung (INVOICE), die eine Position enthält, in der als Code der
+Umsatzsteuerkategorie für den in Rechnung gestellten Posten „Invoiced item VAT
+category code“ (BT-151) der Wert „Exempt from VAT“ angegeben ist, muss die
+Umsatzsteuer-Identifikationsnummer des Verkäufers „Seller VAT identifier“
+(BT-31), die Steueridentifikationsnummer des Verkäufers „Seller tax
+registration identifier“ (BT-32) oder die UmsatzsteuerIdentifikationsnummer
+des Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) enthalten.
+
+BR-E-03 (Steuerbefreit)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+enthält, in der „Document level allowance VAT category code“ (BT-95) den Wert
+„Exempt from VAT“ hat, muss entweder „Seller VAT identifier“ (BT-31), „Seller
+tax registration identifier“ (BT-32) oder „Seller tax representative VAT
+identifier“ (BT-63) vorhanden sein.
+
+BR-E-04 (Steuerbefreit)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) enthält,
+in der „Document level charge VAT category code“ (BT-102) den Wert „Exempt
+from VAT“ hat, muss entweder „Seller VAT identifier“ (BT-31), „Seller tax
+registration identifier“ (BT-32) oder „Seller tax representative VAT
+identifier“ (BT-63) vorhanden sein.
+
+BR-E-05 (Steuerbefreit)
+In einer „INVOICE LINE“ (BG-25), in der „Invoiced item VAT category code“
+(BT-151) den Wert „Exempt from VAT“ hat, muss „Invoiced item VAT rate“
+(BT-152) gleich „0“ sein.
+
+BR-E-06 (Steuerbefreit)
+In einer „DOCUMENT LEVEL ALLOWANCES“ (BG-20), in der „Document level allowance
+VAT category code“ (BT-95) den Wert „Exempt from VAT“ hat, muss „Document
+level allowance VAT rate“ (BT-96) gleich „0“ sein.
+
+BR-E-07 (Steuerbefreit)
+In einer „DOCUMENT LEVEL CHARGES“ (BG-21), in der „Document level charge VAT
+category code“ (BT-102) den Wert „Exempt from VAT“ hat, muss „Document level
+charge VAT rate“ (BT-103) gleich „0“ sein.
+
+BR-E-08 (Steuerbefreit)
+In einer „VAT BREAKDOWN“ (BG-23), in der als Code der Umsatzsteuerkategorie
+„VAT category code“ (BT-118) der Wert „Exempt from VAT“ angegeben ist, muss
+der „VAT category taxable amount“ (BT-116) gleich der Summe der „Invoice line
+net amount“ (BT-131) abzüglich der „Document level allowance amount“ (BT-92)
+zuzüglich der „Document level charge amount“ (BT-99) sein, wobei als „Invoiced
+item VAT category code“ (BT-151), als „Document level allowance VAT category
+code“ (BT-95) sowie als „Document level charge VAT category code“ (BT-102)
+jeweils der Wert „Exempt from VAT“ angegeben wird.
+
+BR-E-09 (Steuerbefreit)
+Der „VAT category tax amount“ (BT-117) muss in einer „VAT BREAKDOWN“ (BG-23)
+mit dem Code der Umsatzsteuerkategorie „VAT category code“ (BT-118) dem Wert
+„Exempt from VAT“ gleich „0“ sein.
+
+BR-E-10 (Steuerbefreit)
+Ein „VAT BREAKDOWN“ (BG-23) mit dem Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) mit dem Wert „Exempt from VAT“ muss einen Code des
+Umsatzsteuerbefreiungsgrundes „VAT exemption reason code“ (BT-121) oder einen
+Text des Umsatzsteuerbefreiungsgrundes „VAT exemption reason text“ (BT-120)
+enthalten.
+
+BR-G-01 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+Eine Rechnung (INVOICE), die eine Position, einen Nachlass oder eine Abgabe
+auf der Rechnungsebene enthält, bei der als Code der Umsatzsteuerkategorie des
+in Rechnung gestellten Postens („Invoiced item VAT category code“ (BT-151),
+„Document level allowance VAT category code“ (BT-95) oder „Document level
+charge VAT category code“ (BT-102)) der Wert „Export outside the EU“ angegeben
+ist, muss in „VAT BREAKDOWN“ (BG-23) genau einen Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert „Export
+outside the EU“ enthalten.
+
+BR-G-02 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+Eine Rechnung (INVOICE), die eine Position enthält, in der als Code der
+Umsatzsteuerkategorie für den in Rechnung gestellten Posten „Invoiced item VAT
+category code“ (BT-151) der Wert „Export outside the EU“ angegeben ist, muss
+die Umsatzsteuer-Identifikationsnummer des Verkäufers „Seller VAT identifier“
+(BT-31) oder die Umsatzsteuer-Identifikationsnummer des Steuervertreters des
+Verkäufers „Seller tax representative VAT identifier“ (BT-63) enthalten.
+
+BR-G-03 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+enthält, in der „Document level allowance VAT category code“ (BT-95) den Wert
+„Export outside the EU“ hat, muss die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31) oder die
+Umsatzsteuer-Identifikationsnummer des Steuervertreters des Verkäufers „Seller
+tax representative VAT identifier“ (BT-63) enthalten sein.
+
+BR-G-04 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) enthält,
+in der „Document level charge VAT category code“ (BT-102) den Wert „Export
+outside the EU“ hat, muss die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31) oder die
+Umsatzsteuer-Identifikationsnummer des Steuervertreters des Verkäufers „Seller
+tax representative VAT identifier“ (BT-63) enthalten sein.
+
+BR-G-05 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+In einer „INVOICE LINE“ (BG-25), in der „Invoiced item VAT category code“
+(BT-151) den Wert „Export outside the EU“ hat, muss „Invoiced item VAT rate“
+(BT-152) gleich „0“ sein.
+
+BR-G-06 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+In einer „DOCUMENT LEVEL ALLOWANCES“ (BG-20), in der „Document level allowance
+VAT category code“ (BT-95) den Wert „Export outside the EU“ hat, muss
+„Document level allowance VAT rate“ (BT-96) gleich „0“ sein.
+
+BR-G-07 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+In einer „DOCUMENT LEVEL CHARGES“ (BG-21), in der „Document level charge VAT
+category code“ (BT-102) den Wert „Export outside the EU“ hat, muss „Document
+level charge VAT rate“ (BT-103) gleich „0“ sein.
+
+BR-G-08 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+In einer „VAT BREAKDOWN“ (BG-23), in der als Code der Umsatzsteuerkategorie
+„VAT category code“ (BT-118) der Wert „Export outside the EU“ angegeben ist,
+muss der „VAT category taxable amount“ (BT-116) gleich der Summe der „Invoice
+line net amount“ (BT-131) abzüglich der „Document level allowance amount“
+(BT-92) zuzüglich der „Document level charge amount“ (BT-99) sein, wobei als
+„Invoiced item VAT category code“ (BT-151), als „Document level allowance VAT
+category code“ (BT-95) sowie als „Document level charge VAT category code“
+(BT-102) jeweils der Wert „Export outside the EU“ angegeben wird.
+
+BR-G-09 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+Der „VAT category tax amount“ (BT-117) muss in „VAT BREAKDOWN“ (BG-23) mit dem
+Code der Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert
+„Export outside the EU“ gleich „0“ sein.
+
+BR-G-10 (Steuer nicht erhoben aufgrund von Export außerhalb der EU)
+Ein „VAT BREAKDOWN“ (BG-23) mit dem Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) mit dem Wert „intra-community supply“ muss einen „VAT
+exemption reason code“ (BT-121) mit dem Wert „Export outside the EU“ oder
+einen „VAT exemption reason text“ (BT-120) des Wertes „Export outside the EU“
+(oder das Äquivalent in einer anderen Sprache) enthalten.
+
+BR-IC-01 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+Eine Rechnung (INVOICE), die eine Position, einen Nachlass oder eine Abgabe
+auf der Rechnungsebene enthält, bei der als Code der Umsatzsteuerkategorie des
+in Rechnung gestellten Postens („Invoiced item VAT category code“ (BT-151),
+„Document level allowance VAT category code“ (BT-95) oder „Document level
+charge VAT category code“ (BT-102)) der Wert „intra-community supply“
+angegeben ist, muss in „VAT BREAKDOWN“ (BG-23) genau einen Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert
+„intra-community supply“ enthalten.
+
+BR-IC-02 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+Eine Rechnung (INVOICE), die eine Position enthält, in der als Code der
+Umsatzsteuerkategorie für den in Rechnung gestellten Posten „Invoiced item VAT
+category code“ (BT-151) der Wert „intra-community supply“ angegeben ist,
+müssen die Umsatzsteuer-Identifikationsnummer des Verkäufers „Seller VAT
+identifier“ (BT-31) oder die Umsatzsteuer-Identifikationsnummer des
+Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) sowie die Umsatzsteuer-Identifikationsnummer des Erwerbers „Buyer VAT
+identifier“ (BT-48) enthalten.
+
+BR-IC-03 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+enthält, in der „Document level allowance VAT category code“ (BT-95) den Wert
+„intra-community supply“ hat, müssen die Umsatzsteuer-Identifikationsnummer
+des Verkäufers „Seller VAT identifier“ (BT-31) oder die
+Umsatzsteuer-Identifikationsnummer des Steuervertreters des Verkäufers „Seller
+tax representative VAT identifier“ (BT-63) sowie die
+Umsatzsteuer-Identifikationsnummer des Erwerbers „Buyer VAT identifier“
+(BT-48) enthalten sein.
+
+BR-IC-04 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) enthält,
+in der „Document level charge VAT category code“ (BT-102) den Wert
+„intra-community supply“ hat, müssen die Umsatzsteuer-Identifikationsnummer
+des Verkäufers „Seller VAT identifier“ (BT-31) oder die
+Umsatzsteuer-Identifikationsnummer des Steuervertreters des Verkäufers „Seller
+tax representative VAT identifier“ (BT-63) sowie die
+Umsatzsteuer-Identifikationsnummer des Erwerbers „Buyer VAT identifier“
+(BT-48) enthalten sein.
+
+BR-IC-05 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer „INVOICE LINE“ (BG-25), in der „Invoiced item VAT category code“
+(BT-151) den Wert „intracommunity supply“ hat, muss „Invoiced item VAT rate“
+(BT-152) gleich „0“ sein.
+
+BR-IC-06 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer „DOCUMENT LEVEL ALLOWANCES“ (BG-20), in der „Document level allowance
+VAT category code“ (BT-95) den Wert „intra-community supply“ hat, muss
+„Document level allowance VAT rate“ (BT-96) gleich „0“ sein.
+
+BR-IC-07 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer „DOCUMENT LEVEL CHARGES“ (BG-21), in der „Document level charge VAT
+category code“ (BT-102) den Wert „intra-community supply“ hat, muss „Document
+level charge VAT rate“ (BT-103) gleich „0“ sein.
+
+BR-IC-08 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer „VAT BREAKDOWN“ (BG-23), in der als Code der Umsatzsteuerkategorie
+„VAT category code“ (BT-118) der Wert „intra-community supply“ angegeben ist,
+muss der „VAT category taxable amount“ (BT-116) gleich der Summe der „Invoice
+line net amount“ (BT-131) abzüglich der „Document level allowance amount“
+(BT-92) zuzüglich der „Document level charge amount“ (BT-99) sein, wobei als
+„Invoiced item VAT category code“ (BT-151), als „Document level allowance VAT
+category code“ (BT-95) sowie als „Document level charge VAT category code“
+(BT-102) jeweils der Wert „intra-community supply“ angegeben wird.
+
+BR-IC-09 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+Der „VAT category tax amount“ (BT-117) muss in einer „VAT BREAKDOWN“ (BG-23)
+mit dem Code der Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem
+Wert „intra-community supply“ gleich „0“ sein.
+
+BR-IC-10 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+Ein „VAT BREAKDOWN“ (BG-23) mit dem Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) mit dem Wert „intra-community supply“ muss einen „VAT
+exemption reason code“ (BT-121) mit dem Wert „intra-community supply“ oder
+einen „VAT exemption reason text“ (BT-120) mit dem Wert „intracommunity
+supply“ (oder das Äquivalent in einer anderen Sprache) enthalten.
+
+BR-IC-11 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer Rechnung, die ein „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert
+„intra-community supply“ enthält, dürfen „Actual delivery date“ (BT-72) oder
+„INVOICING PERIOD“ (BG-14) nicht leer sein.
+
+BR-IC-12 (Kein Ausweis der Umsatzsteuer bei innergemeinschaftlichen Lieferungen)
+In einer Rechnung, die ein „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert
+„intra-community supply“ enthält, darf „Deliver to country code“ (BT-80) nicht
+leer sein.
+
+BR-IG-01 (IGIC (Kanarische Inseln))
+Eine Rechnung (INVOICE), die eine Position, eine Abgabe auf der
+Dokumentenebene oder einen Nachlass auf der Rechnungsebene enthält, bei der
+als Code der Umsatzsteuerkategorie des in Rechnung gestellten Postens der Wert
+„IGIC“ angegeben ist, muss in der Umsatzsteueraufschlüsselung „VAT BREAKDOWN“
+(BG-23) mindestens einen Code der Umsatzsteuerkategorie mit dem Wert „IGIC“
+enthalten.
+
+BR-IG-02 (IGIC (Kanarische Inseln))
+Eine Rechnung (INVOICE), die eine Position enthält, bei der als Code der
+Umsatzsteuerkategorie des in Rechnung gestellten Postens der Wert „IGIC“
+angegeben ist, muss die Umsatzsteuer-Identifikationsnummer des Verkäufers
+„Seller VAT identifier“ (BT-31), den Bezeichner der Steuerangaben des
+Verkäufers oder die Umsatzsteuer-Identifikationsnummer des Steuervertreters
+des Verkäufers „Seller tax representative VAT identifier“ (BT-63) enthalten.
+
+BR-IG-03 (IGIC (Kanarische Inseln))
+Eine Rechnung (INVOICE), die eine Abgabe auf der Dokumentenebene enthält, bei
+dem als Code der Umsatzsteuerkategorie des in Rechnung gestellten Postens der
+Wert „IGIC“ angegeben ist, muss die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31), den Bezeichner der Steuerangaben
+des Verkäufers oder die Umsatzsteuer-Identifikationsnummer des
+Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) enthalten.
+
+BR-IG-04 (IGIC (Kanarische Inseln))
+Eine Rechnung (INVOICE), die einen Nachlass auf der Dokumentenebene enthält,
+bei dem als Code der Umsatzsteuerkategorie des in Rechnung gestellten Postens
+der Wert „IGIC“ angegeben ist, muss die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31), den Bezeichner der Steuerangaben
+des Verkäufers oder die Umsatzsteuer-Identifikationsnummer des
+Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) enthalten.
+
+BR-IG-05 (IGIC (Kanarische Inseln))
+In einer Rechnungsposition, in der als Code der Umsatzsteuerkategorie für den
+Rechnungsposten der Wert „IGIC“ angegeben ist, muss der Umsatzsteuersatz für
+den in Rechnung gestellten Posten „0“ oder größer „0“ sein.
+
+BR-IG-06 (IGIC (Kanarische Inseln))
+In einer Abgabe auf der Dokumentenebene, in dem als Code der
+Umsatzsteuerkategorie für den Rechnungsposten der Wert „IGIC“ angegeben ist,
+muss der Umsatzsteuersatz für den in Rechnung gestellten Posten „0“ oder
+größer „0“ sein.
+
+BR-IG-07 (IGIC (Kanarische Inseln))
+In einem Nachlass auf der Dokumentenebene, in dem als Code der
+Umsatzsteuerkategorie für den Rechnungsposten der Wert „IGIC“ angegeben ist,
+muss der Umsatzsteuersatz für den in Rechnung gestellten Posten „0“ oder
+größer „0“ sein.
+
+BR-IG-08 (IGIC (Kanarische Inseln))
+Für jeden anderen Wert des kategoriespezifischen Umsatzsteuersatzes, bei dem
+als Code der Umsatzsteuerkategorie der Wert „IGIC“ angegeben ist, muss der
+nach der Umsatzsteuerkategorie zu versteuernde Betrag in einer
+Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) gleich der Summe der
+Rechnungspositions-Nettobeträge zuzüglich der Summe der Beträge aller
+Abschläge auf der Dokumentenebene abzüglich der Summe der Beträge aller
+Zuschläge auf der Dokumentenebene sein; wobei als Code der
+Umsatzsteuerkategorie der Wert „IGIC“ angegeben wird und der Umsatzsteuersatz
+gleich dem kategoriespezifischen Umsatzsteuersatz ist.
+
+BR-IG-09 (IGIC (Kanarische Inseln))
+Der in der Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) angegebene
+Betrag der nach Kategorie zu entrichtenden Umsatzsteuer, bei dem als Code der
+Umsatzsteuerkategorie der Wert „IGIC“ angegeben ist, muss gleich dem mit dem
+kategoriespezifischen Umsatzsteuersatz multiplizierten nach der
+Umsatzsteuerkategorie zu versteuernden Betrag sein.
+
+BR-IG-10 (IGIC (Kanarische Inseln))
+Eine Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie der Wert „IGIC“ darf keinen Code für den
+Umsatzsteuerbefreiungsgrund oder Text für den Umsatzsteuerbefreiungsgrund
+haben.
+
+BR-IP-01 (IPSI (Ceuta/Melilla))
+Eine Rechnung (INVOICE), die eine Position, eine Abgabe auf der
+Dokumentenebene oder einen Nachlass auf der Dokumentenebene enthält, bei der
+als Code der Umsatzsteuerkategorie des in Rechnung gestellten Postens der Wert
+„IPSI“ angegeben ist, muss in der Umsatzsteueraufschlüsselung „VAT BREAKDOWN“
+(BG-23) mindestens einen Code der Umsatzsteuerkategorie gleich „IPSI“
+enthalten.
+
+BR-IP-02 (IPSI (Ceuta/Melilla))
+Eine Rechnung (INVOICE), die eine Position enthält, bei der als Code der
+Umsatzsteuerkategorie des in Rechnung gestellten Postens der Wert „IPSI“
+angegeben ist, muss die Umsatzsteuer-Identifikationsnummer des Verkäufers
+„Seller VAT identifier“ (BT-31), den Bezeichner der Steuerangaben des
+Verkäufers oder die Umsatzsteuer-Identifikationsnummer des Steuervertreters
+des Verkäufers „Seller tax representative VAT identifier“ (BT-63) enthalten.
+
+BR-IP-03 (IPSI (Ceuta/Melilla))
+Eine Rechnung (INVOICE), die eine Abgabe auf der Dokumentenebene enthält, bei
+dem als Code der Umsatzsteuerkategorie des in Rechnung gestellten Postens der
+Wert „IPSI“ angegeben ist, muss die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31), den Bezeichner der Steuerangaben
+des Verkäufers oder die Umsatzsteuer-Identifikationsnummer des
+Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) enthalten.
+
+BR-IP-04 (IPSI (Ceuta/Melilla))
+Eine Rechnung (INVOICE), die einen Nachlass auf der Dokumentenebene enthält,
+bei dem als Code der Umsatzsteuerkategorie des in Rechnung gestellten Postens
+der Wert „IPSI“ angegeben ist, muss die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31), den Bezeichner der Steuerangaben
+des Verkäufers oder die Umsatzsteuer-Identifikationsnummer des
+Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) enthalten.
+
+BR-IP-05 (IPSI (Ceuta/Melilla))
+In einer Rechnungsposition, in der als Code der Umsatzsteuerkategorie für den
+Rechnungsposten der Wert „IPSI“ angegeben ist, muss der Umsatzsteuersatz für
+den in Rechnung gestellten Posten „0“ oder größer „0“ sein.
+
+BR-IP-06 (IPSI (Ceuta/Melilla))
+In einem Abgabe auf der Dokumentenebene, in dem als Code der
+Umsatzsteuerkategorie für den Rechnungsposten der Wert „IPSI“ angegeben ist,
+muss der Umsatzsteuersatz für den in Rechnung gestellten Posten „0“ oder
+größer „0“ sein.
+
+BR-IP-07 (IPSI (Ceuta/Melilla))
+In einem Nachlass auf der Dokumentenebene, in dem als Code der
+Umsatzsteuerkategorie für den Rechnungsposten der Wert „IPSI“ angegeben ist,
+muss der Umsatzsteuersatz für den in Rechnung gestellten Posten „0“ oder
+größer „0“ sein.
+
+BR-IP-08 (IPSI (Ceuta/Melilla))
+Für jeden anderen Wert des kategoriespezifischen Umsatzsteuersatzes, bei dem
+als Code der Umsatzsteuerkategorie der Wert „IPSI“ angegeben ist, muss der
+nach der Umsatzsteuerkategorie zu versteuernde Betrag in einer
+Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) gleich der Summe der
+Rechnungspositions-Nettobeträge zuzüglich der Summe der Beträge aller
+Abschläge auf der Dokumentenebene abzüglich der Summe der Beträge aller
+Zuschläge auf der Dokumentenebene sein; wobei als Code der
+Umsatzsteuerkategorie der Wert „IPSI“ angegeben wird und der Umsatzsteuersatz
+gleich dem kategoriespezifischen Umsatzsteuersatz ist.
+
+BR-IP-09 (IPSI (Ceuta/Melilla))
+Der in der Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) angegebene
+Betrag der nach Kategorie zu entrichtenden Umsatzsteuer, bei dem als Code der
+Umsatzsteuerkategorie der Wert „IPSI“ angegeben ist, muss gleich dem mit dem
+kategoriespezifischen Umsatzsteuersatz multiplizierten nach der
+Umsatzsteuerkategorie zu versteuernden Betrag sein.
+
+BR-IP-10 (IPSI (Ceuta/Melilla))
+Eine Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie mit dem Wert „IPSI“ darf keinen Code für den
+Umsatzsteuerbefreiungsgrund oder Text für den Umsatzsteuerbefreiungsgrund
+haben.
+
+BR-O-01 (Nicht steuerbar)
+Eine Rechnung (INVOICE), die eine Position, einen Nachlass oder eine Abgabe
+auf der Rechnungsebene enthält, bei der als Code der Umsatzsteuerkategorie des
+in Rechnung gestellten Postens („Invoiced item VAT category code“ (BT-151),
+„Document level allowance VAT category code“ (BT-95) oder „Document level
+charge VAT category code“ (BT-102)) der Wert „Not subject to VAT“ angegeben
+ist, muss genau eine „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert „Not subject
+to VAT“ enthalten.
+
+BR-O-02 (Nicht steuerbar)
+Eine Rechnung (INVOICE), die eine Position enthält, in der als Code der
+Umsatzsteuerkategorie für den in Rechnung gestellten Posten der Wert „Not
+subject to VAT“ angegeben ist, darf keine Umsatzsteuer-Identifikationsnummer
+des Verkäufers „Seller VAT identifier“ (BT-31),
+Umsatzsteuer-Identifikationsnummer des Steuervertreters des Verkäufers „Seller
+tax representative VAT identifier“ (BT-63) und die
+Umsatzsteuer-Identifikationsnummer des Erwerbers „Buyer VAT identifier“
+(BT-48) enthalten.
+
+BR-O-03 (Nicht steuerbar)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+enthält, in der „Document level allowance VAT category code“ (BT-95) den Wert
+„Not subject to VAT“ hat, dürfen die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31), die
+Umsatzsteuer-Identifikationsnummer des Steuervertreters des Verkäufers „Seller
+tax representative VAT identifier“ (BT-63) sowie die
+Umsatzsteuer-Identifikationsnummer des Erwerbers „Buyer VAT identifier“
+(BT-48) nicht enthalten sein.
+
+BR-O-04 (Nicht steuerbar)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) enthält,
+in der „Document level charge VAT category code“ (BT-102) den Wert „Not
+subject to VAT“ hat, dürfen die Umsatzsteuer-Identifikationsnummer des
+Verkäufers „Seller VAT identifier“ (BT-31), die
+Umsatzsteuer-Identifikationsnummer des Steuervertreters des Verkäufers „Seller
+tax representative VAT identifier“ (BT-63) sowie die
+Umsatzsteuer-Identifikationsnummer des Erwerbers „Buyer VAT identifier“
+(BT-48) nicht enthalten sein.
+
+BR-O-05 (Nicht steuerbar)
+In einer „INVOICE LINE“ (BG-25), in der „Invoiced item VAT category code“
+(BT-151) den Wert „Not subject to VAT“ hat, darf „Invoiced item VAT rate“
+(BT-152) nicht enthalten sein.
+
+BR-O-06 (Nicht steuerbar)
+In einer „DOCUMENT LEVEL ALLOWANCES“ (BG-20), in der „Document level allowance
+VAT category code“ (BT-95) den Wert „Not subject to VAT“ hat, darf „Document
+level allowance VAT rate“ (BT-96) nicht enthalten sein.
+
+BR-O-07 (Nicht steuerbar)
+In einer „DOCUMENT LEVEL CHARGES“ (BG-21), in der „Document level charge VAT
+category code“ (BT-102) den Wert „Not subject to VAT“ hat, darf „Document
+level charge VAT rate“ (BT-103) nicht enthalten sein.
+
+BR-O-08 (Nicht steuerbar)
+In einer „VAT BREAKDOWN“ (BG-23), in der als Code der Umsatzsteuerkategorie
+„VAT category code“ (BT-118) der Wert „Not subject to VAT“ angegeben ist, muss
+der „VAT category taxable amount“ (BT-116) gleich der Summe der „Invoice line
+net amount“ (BT-131) abzüglich der „Document level allowance amount“ (BT-92)
+zuzüglich der „Document level charge amount“ (BT-99) sein, wobei als „Invoiced
+item VAT category code“ (BT-151), als „Document level allowance VAT category
+code“ (BT-95) sowie als „Document level charge VAT category code“ (BT-102)
+jeweils der Wert „Not subject to VAT“ angegeben wird.
+
+BR-O-09 (Nicht steuerbar)
+Der „VAT category tax amount“ (BT-117) muss in „VAT BREAKDOWN“ (BG-23) mit dem
+Code der Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert „Not
+subject to VAT“ gleich „0“ sein.
+
+BR-O-10 (Nicht steuerbar)
+Ein „VAT BREAKDOWN“ (BG-23) mit dem Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) mit dem Wert „Not subject to VAT“ muss einen „VAT
+exemption reason code“ (BT-121) mit dem Wert „Not subject to VAT“ oder einen
+„VAT exemption reason text“ (BT-120) des Wertes „Not subject to VAT“ (oder das
+Äquivalent in einer anderen Sprache) enthalten.
+
+BR-O-11 (Nicht steuerbar)
+Eine Rechnung (INVOICE), die ein „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) den Wert „Not subject to
+VAT“ enthält, darf keine weiteren „VAT BREAKDOWN“ (BG-23) enthalten.
+
+BR-O-12 (Nicht steuerbar)
+Eine Rechnung (INVOICE), die ein „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) den Wert „Not subject to
+VAT“ enthält, darf keine Positionen enthalten, deren „Invoiced item VAT
+category code“ (BT-151) einen anderen Wert als „Not subject to VAT“ hat.
+
+BR-O-13 (Nicht steuerbar)
+Eine Rechnung (INVOICE), die ein „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) den Wert „Not subject to
+VAT“ enthält, darf keine „DOCUMENT LEVEL ALLOWANCES“ (BG-20) enthalten, deren
+„Document level allowance VAT category code“ (BT-95) einen anderen Wert als
+„Not subject to VAT“ hat.
+
+BR-O-14 (Nicht steuerbar)
+Eine Rechnung (INVOICE), die ein „VAT BREAKDOWN“ (BG-23) mit dem Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem Wert „Not subject
+to VAT“ enthält, darf keine „DOCUMENT LEVEL CHARGES“ (BG-21) enthalten, deren
+„Document level charge VAT category code“ (BT-102) einen anderen Wert als „Not
+subject to VAT“ hat.
+
+BR-S-01 (Umsatzsteuer mit Normalsatz)
+Eine Rechnung (INVOICE), die eine Position, einen Nachlass oder eine Abgabe
+auf Rechnungsebene enthält, in der als Code der für den in Rechnung gestellten
+Posten geltenden Umsatzsteuerkategorie „Invoiced item VAT category code“
+(BT-151), als Code für das Umsatzsteuermerkmal, das auf den Nachlass auf
+Dokumentenebene anzuwenden ist „Document level allowance VAT category code“
+(BT-95) oder als Code für das Umsatzsteuermerkmal dieser Elementgruppe
+„Document level charge VAT category code“ (BT-102) der Wert „Standard rated“
+angegeben ist, muss in der Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23)
+mindestens einen Code der Umsatzsteuerkategorie „VAT category code“ (BT-118)
+gleich dem Wert „Standard rated“ enthalten.
+
+BR-S-02 (Umsatzsteuer mit Normalsatz)
+Eine Rechnung (INVOICE), die eine Position enthält, in der als Code der
+Umsatzsteuerkategorie für den in Rechnung gestellten Posten „Invoiced item VAT
+category code“ (BT-151) der Wert „Standard rated“ angegeben ist, muss die
+Umsatzsteuer-Identifikationsnummer des Verkäufers „Seller VAT identifier“
+(BT-31), die Steueridentifikationsnummer des Verkäufers „Seller tax
+registration identifier“ (BT-32) oder die UmsatzsteuerIdentifikationsnummer
+des Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) enthalten.
+
+BR-S-03 (Umsatzsteuer mit Normalsatz)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+enthält, in der „Document level allowance VAT category code“ (BT-95) den Wert
+„Standard rated“ hat, muss entweder „Seller VAT identifier“ (BT-31), „Seller
+tax registration identifier“ (BT-32) oder „Seller tax representative VAT
+identifier“ (BT-63) vorhanden sein.
+
+BR-S-04 (Umsatzsteuer mit Normalsatz)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) enthält,
+in der „Document level charge VAT category code“ (BT-102) den Wert „Standard
+rated“ hat, muss entweder „Seller VAT identifier“ (BT-31), „Seller tax
+registration identifier“ (BT-32) oder „Seller tax representative VAT
+identifier“ (BT-63) vorhanden sein.
+
+BR-S-05 (Umsatzsteuer mit Normalsatz)
+In einer „INVOICE LINE“ (BG-25), in der „Invoiced item VAT category code“
+(BT-151) den Wert „Standard rated“ hat, muss „Invoiced item VAT rate“ (BT-152)
+größer als „0“ sein.
+
+BR-S-06 (Umsatzsteuer mit Normalsatz)
+In einer „DOCUMENT LEVEL ALLOWANCES“ (BG-20), in der „Document level allowance
+VAT category code“ (BT-95) den Wert „Standard rated“ hat, muss „Document level
+allowance VAT rate“ (BT-96) größer als „0“ sein.
+
+BR-S-07 (Umsatzsteuer mit Normalsatz)
+In einer „DOCUMENT LEVEL CHARGES“ (BG-21), in der „Document level charge VAT
+category code“ (BT-102) den Wert „Standard rated“ hat, muss „Document level
+charge VAT rate“ (BT-103) größer als „0“ sein.
+
+BR-S-08 (Umsatzsteuer mit Normalsatz)
+Für jeden anderen Wert des kategoriespezifischen Umsatzsteuersatzes „VAT
+category rate“ (BT-119), bei dem als Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) der Wert „Standard rated“ angegeben ist, muss der nach
+der Umsatzsteuerkategorie zu versteuernde Betrag „VAT category taxable amount“
+(BT-116) in einer Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) gleich
+der Summe der RechnungszeilenNettobeträge „Invoice line net amount“ (BT-131)
+zuzüglich der Summe der Beträge aller Abgaben auf der Dokumentenebene
+„Document level charge amount“ (BT-99) abzüglich der Summe der Beträge aller
+Nachlässe auf der Dokumentenebene „Document level allowance amount“ (BT92)
+sein; wobei als Code der Umsatzsteuerkategorie („Invoiced item VAT category
+code“ (BT-151), „Document level charge VAT category code“ (BT-102) und
+„Document level allowance VAT category code“ (BT-95)) der Wert „Standard
+rated“ angegeben wird und der Umsatzsteuersatz („Invoiced item VAT rate“
+(BT-152), „Document level charge VAT rate“ (BT-103) und „Document level
+allowance VAT rate“ (BT-96)) gleich dem kategoriespezifischen Umsatzsteuersatz
+ist. Anmerkung: D.h. dass für jeden USt-Satz eine gesonderte Gruppe „VAT
+BREAKDOWN“ (BG-23) anzulegen ist.
+
+BR-S-09 (Umsatzsteuer mit Normalsatz)
+Der in der Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) angegebene
+Betrag der nach Kategorie zu entrichtenden Umsatzsteuer, bei dem als
+Umsatzsteuerkategorie der Wert „Standard rated“ angegeben ist, muss gleich dem
+mit dem kategoriespezifischen Umsatzsteuersatz multiplizierten nach der
+Umsatzsteuerkategorie zu versteuernden Betrag sein.
+
+BR-S-10 (Umsatzsteuer mit Normalsatz)
+Eine Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) in der als Code der
+Umsatzsteuerkategorie „VAT category code“ (BT-118) der Wert „Standard rated“
+angegeben ist, darf keinen Code des Umsatzsteuerbefreiungsgrundes „VAT
+exemption reason code“ (BT-121) oder Text des Umsatzsteuerbefreiungsgrundes
+„VAT exemption reason text“ (BT-120) enthalten.
+
+BR-Z-01 (Umsatzsteuer mit Nullsatz)
+Eine Rechnung (INVOICE), die eine Position, einen Nachlass oder eine Abgabe
+auf der Rechnungsebene enthält, bei der als Code der Umsatzsteuerkategorie des
+in Rechnung gestellten Postens („Invoiced item VAT category code“ (BT-151),
+„Document level allowance VAT category code“ (BT-95) oder „Document level
+charge VAT category code“ (BT-102)) der Wert „Zero rated“ angegeben ist, muss
+in „VAT BREAKDOWN“ (BG-23) genau einen Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) gleich dem Wert „Zero rated“ enthalten.
+
+BR-Z-02 (Umsatzsteuer mit Nullsatz)
+Eine Rechnung (INVOICE), die eine Position enthält, in der als Code der
+Umsatzsteuerkategorie für den in Rechnung gestellten Posten „Invoiced item VAT
+category code“ (BT-151) der Wert „Zero rated“ angegeben ist, muss die
+Umsatzsteuer-Identifikationsnummer des Verkäufers „Seller VAT identifier“
+(BT-31), die Steueridentifikationsnummer des Verkäufers „Seller tax
+registration identifier“ (BT-32) oder die UmsatzsteuerIdentifikationsnummer
+des Steuervertreters des Verkäufers „Seller tax representative VAT identifier“
+(BT-63) enthalten.
+
+BR-Z-03 (Umsatzsteuer mit Nullsatz)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL ALLOWANCES“ (BG-20)
+enthält, in der „Document level allowance VAT category code“ (BT-95) den Wert
+„Zero rated“ hat, muss entweder „Seller VAT identifier“ (BT-31), „Seller tax
+registration identifier“ (BT-32) oder „Seller tax representative VAT
+identifier“ (BT-63) vorhanden sein.
+
+BR-Z-04 (Umsatzsteuer mit Nullsatz)
+In einer Rechnung, die eine Gruppe „DOCUMENT LEVEL CHARGES“ (BG-21) enthält,
+in der „Document level charge VAT category code“ (BT-102) den Wert „Zero
+rated“ hat, muss entweder „Seller VAT identifier“ (BT-31), „Seller tax
+registration identifier“ (BT-32) oder „Seller tax representative VAT
+identifier“ (BT-63) vorhanden sein.
+
+BR-Z-05 (Umsatzsteuer mit Nullsatz)
+In einer „INVOICE LINE“ (BG-25), in der „Invoiced item VAT category code“
+(BT-151) den Wert „Zero rated“ hat, muss „Invoiced item VAT rate“ (BT-152)
+gleich „0“ sein.
+
+BR-Z-06 (Umsatzsteuer mit Nullsatz)
+In einer „DOCUMENT LEVEL ALLOWANCES“ (BG-20), in der „Document level allowance
+VAT category code“ (BT-95) den Wert „Zero rated“ hat, muss „Document level
+allowance VAT rate“ (BT-96) gleich „0“ sein.
+
+BR-Z-07 (Umsatzsteuer mit Nullsatz)
+In einer „DOCUMENT LEVEL CHARGES“ (BG-21), in der „Document level charge VAT
+category code“ (BT-102) den Wert „Zero rated“ hat, muss „Document level charge
+VAT rate“ (BT-103) gleich „0“ sein.
+
+BR-Z-08 (Umsatzsteuer mit Nullsatz)
+In einer „VAT BREAKDOWN“ (BG-23), in der als Code der Umsatzsteuerkategorie
+„VAT category code“ (BT-118) der Wert „Zero rated“ angegeben ist, muss der
+„VAT category taxable amount“ (BT-116) gleich der Summe der
+Informationselemente „Invoice line net amount“ (BT-131) abzüglich der
+„Document level allowance amount“ (BT-92) zuzüglich der „Document level charge
+amount“ (BT-99) sein, wobei als „Invoiced item VAT category code“ (BT-151),
+als „Document level allowance VAT category code“ (BT-95) sowie als „Document
+level charge VAT category code“ (BT102) jeweils der Wert „Zero rated“
+angegeben wird.
+
+BR-Z-09 (Umsatzsteuer mit Nullsatz)
+Der „VAT category tax amount“ (BT-117) muss in einer „VAT BREAKDOWN“ (BG-23)
+mit dem Code der Umsatzsteuerkategorie „VAT category code“ (BT-118) mit dem
+Wert „Zero rated“ gleich „0“ sein.
+
+BR-Z-10 (Umsatzsteuer mit Nullsatz)
+
+Ein „VAT BREAKDOWN“ (BG-23) mit dem Code der Umsatzsteuerkategorie „VAT
+category code“ (BT-118) mit dem Wert „Zero rated“ darf keinen Code des
+Umsatzsteuerbefreiungsgrundes „VAT exemption reason code“ (BT-121) oder Text
+des Umsatzsteuerbefreiungsgrundes „VAT exemption reason text“ (BT-120)
+enthalten.
+
+BR-CL-17
+Invoice tax categories MUST be coded using UNCL 5305 code list
+
+BR-CL-18
+Invoice tax categories MUST be coded using UNCL 5305 code list
+
+BR-CL-23
+Unit code MUST be coded according to the UN/ECE Recommendation 20 with
+Rec 21 extension
+
+CII-DT-097
+Date time string with format attribute 102 shall be YYYYMMDD
+
+CII-SR-360 (Warning)
+PostalTradeAddress should not be present [ID CII-SR-360] from
+/xslt/en16931schematron/EN16931-CII-validation.xslt)
+
+JSON_INV
+Der JSON-Code vom StreamServe ist nicht wohlgeformt. Siehe JSON-Datei.
+
+XML_INV
+Fehlermeldung, die keiner Geschäftsregel zugeordnet ist. Tritt im Falle von
+XML auf, das nicht dem ZUGFeRD XML Schema genügt. Siehe Validierungsbericht.
+

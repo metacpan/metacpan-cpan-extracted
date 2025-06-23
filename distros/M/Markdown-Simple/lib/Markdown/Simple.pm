@@ -3,13 +3,13 @@ package Markdown::Simple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use parent qw(Exporter);
 
 require XSLoader;
 XSLoader::load('Markdown::Simple', $Markdown::Simple::VERSION);
 
-our @EXPORT = qw/markdown_to_html/;
+our @EXPORT = qw/markdown_to_html strip_markdown/;
 
 1;
 
@@ -21,7 +21,7 @@ Markdown::Simple - Markdown to HTML
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -47,6 +47,8 @@ A few more prompts were needed to add ordered and unordered lists.
     links => 0, # disable links
   });
 
+  my $plain = strip_markdown($markdown);
+
 =head1 DESCRIPTION
 
 Markdown::Simple is a simple Perl XS module that converts Markdown text to HTML. It allows you to enable or disable specific Markdown features such as images, code blocks, links, and more.
@@ -60,6 +62,12 @@ Markdown::Simple is a simple Perl XS module that converts Markdown text to HTML.
 Converts the given Markdown text to HTML. The second argument is an optional hash reference that allows you to enable or disable specific Markdown features.
 
 The available options are:
+
+=head2 strip_markdown
+
+  strip_markdown($markdown);
+
+Removes all Markdown formatting from the given text, returning plain text.
 
 =over 12
 

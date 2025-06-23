@@ -1,4 +1,31 @@
 Revision history for noss (WWW::Noss)
 
+1.00  Jun 22 2025
+  - Add --read-format option for the read command: Specify the format to use for
+    the HTML contents of a post to format when reading.
+  - Add --list-format option for the list command: Specify the format to use for
+    posts in the list command.
+  - Add --post-format option for the post command: Specify the format to use for
+    printing post information.
+  - Add --feeds-option option for the feeds command: Specify the format to use
+    for printing feed information.
+  - Add --autoclean option: Automatically run the clean command after performing
+    an operation.
+  - Add --width option for the read command: Specify the line width to use for
+    formatted text.
+  - Changed default content formatting for the read command.
+  - list command now prints 'r' for read posts.
+  - The clean command now VACUUMs databases, which dramatically increases the
+    amount of space shaved off.
+  - noss no longer aborts when it fails to read a feed file in the update
+    command, it will just throw a warning and continue processing subsequent
+    feeds.
+  - Have --sort take priority over the "sort" configuration field.
+  - strftime is now used for formatting timestamps, which adds support for
+    non-English locales.
+  - Local time zone is now used for timestamps.
+  - Fix typos in documentation.
+  - Fix POD errors in developer documentation.
+
 0.01  Jun 20 2025
   - Initial release.

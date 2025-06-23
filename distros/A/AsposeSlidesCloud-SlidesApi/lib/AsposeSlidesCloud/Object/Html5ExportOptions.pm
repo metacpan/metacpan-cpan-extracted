@@ -40,7 +40,7 @@ use DateTime;
 use AsposeSlidesCloud::Object::ExportOptions;
 use AsposeSlidesCloud::Object::FontFallbackRule;
 use AsposeSlidesCloud::Object::FontSubstRule;
-use AsposeSlidesCloud::Object::NotesCommentsLayoutingOptions;
+use AsposeSlidesCloud::Object::SlidesLayoutOptions;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -130,6 +130,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'skip_java_script_links' => {
+    	datatype => 'boolean',
+    	base_name => 'SkipJavaScriptLinks',
+    	description => 'True to skip hyperlinks with javascript calls when saving the presentation.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -158,9 +165,9 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'notes_comments_layouting' => {
-    	datatype => 'NotesCommentsLayoutingOptions',
-    	base_name => 'NotesCommentsLayouting',
+    'slides_layout_options' => {
+    	datatype => 'SlidesLayoutOptions',
+    	base_name => 'SlidesLayoutOptions',
     	description => 'Slides layouting options',
     	format => '',
     	read_only => '',
@@ -172,6 +179,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'disable_font_ligatures' => {
+    	datatype => 'boolean',
+    	base_name => 'DisableFontLigatures',
+    	description => 'true to disable ligatures in the rendered output.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -180,12 +194,14 @@ __PACKAGE__->swagger_types( {
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
+    'skip_java_script_links' => 'boolean',
     'format' => 'string',
     'animate_transitions' => 'boolean',
     'animate_shapes' => 'boolean',
     'embed_images' => 'boolean',
-    'notes_comments_layouting' => 'NotesCommentsLayoutingOptions',
-    'templates_path' => 'string'
+    'slides_layout_options' => 'SlidesLayoutOptions',
+    'templates_path' => 'string',
+    'disable_font_ligatures' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -194,12 +210,14 @@ __PACKAGE__->attribute_map( {
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
+    'skip_java_script_links' => 'SkipJavaScriptLinks',
     'format' => 'Format',
     'animate_transitions' => 'AnimateTransitions',
     'animate_shapes' => 'AnimateShapes',
     'embed_images' => 'EmbedImages',
-    'notes_comments_layouting' => 'NotesCommentsLayouting',
-    'templates_path' => 'TemplatesPath'
+    'slides_layout_options' => 'SlidesLayoutOptions',
+    'templates_path' => 'TemplatesPath',
+    'disable_font_ligatures' => 'DisableFontLigatures'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

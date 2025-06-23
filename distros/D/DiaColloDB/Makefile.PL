@@ -1,15 +1,15 @@
 ##-*- Mode: CPerl -*-
 use ExtUtils::MakeMaker;
 use Config;
-use 5.010; ##-- in case old EU::MM doesn't grok MIN_PERL_VERSION
+use 5.010;       ##-- in case old EU::MM doesn't grok MIN_PERL_VERSION
 
 ##----------------------------------------------------------------------
 ## PDL-dependencies (for CONFIGURE_REQUIRES)
 my %pdl_deps = (
-		'PDL' => '2.007', ##-- dist:2.007, local:2.014
-		'PDL::CCS' => '1.23.1',
-		'PDL::VectorValued' => '1.0.5',
-	       );
+  'PDL' => '2.007',             ##-- dist:2.007, local:2.014
+  'PDL::CCS' => '1.23.1',
+  'PDL::VectorValued' => '1.0.5',
+);
 
 ##-- disable PDL-Utils build if PDL isn't installed
 my $WANT_PDL = prompt("Use PDL for (term x document) matrix modelling if available?", "y");
@@ -41,82 +41,82 @@ do "./find.hack" if (-e "./find.hack");
 ##----------------------------------------------------------------------
 WriteMakefile
   (
-   NAME		=> 'DiaColloDB',
-   AUTHOR       => 'Bryan Jurish <moocow@cpan.org>',
-   ABSTRACT	=> 'Diachronic collocation index',
-   VERSION_FROM	=> 'DiaColloDB.pm',
-   LICENSE      => 'perl_5',
-   MIN_PERL_VERSION => 5.010, ##-- v5.10.0
-   META_MERGE   => {
-		    'meta-spec' => { version => 2 }, ##-- doesn't seem to work
-		    resources  => {
-#				   repository => {
-#						  type => 'svn',
-#						  url => 'svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl/',
-#						  web => 'https://sourceforge.net/p/ddc-concordance/code/HEAD/tree/ddc-perl/',
-#						 },
-				  },
-		    ##-- prereqs: for Meta::Spec v2
-		    prereqs => {
-				runtime => {
-					    recommends => {
-							   'DDC::XS' => 0.23,
-							   %pdl_deps
-							  },
-					    #suggests => {},
-					   },
-				build => {
-					  recommends => { %pdl_deps },
-					 },
-			       },
-		   },
+    NAME		=> 'DiaColloDB',
+    AUTHOR       => 'Bryan Jurish <moocow@cpan.org>',
+    ABSTRACT	=> 'Diachronic collocation index',
+    VERSION_FROM	=> 'DiaColloDB.pm',
+    LICENSE      => 'perl_5',
+    MIN_PERL_VERSION => 5.010,  ##-- v5.10.0
+    META_MERGE   => {
+      'meta-spec' => { version => 2 }, ##-- doesn't seem to work
+      resources  => {
+        repository => {
+          type => 'git',
+          url => 'https://github.com/moocow-the-bovine/DiaColloDB.git',
+          web => 'https://github.com/moocow-the-bovine/DiaColloDB'
+        },
+      },
+      ##-- prereqs: for Meta::Spec v2
+      prereqs => {
+        runtime => {
+          recommends => {
+            'DDC::XS' => 0.23,
+            %pdl_deps
+          },
+          #suggests => {},
+        },
+        build => {
+          recommends => { %pdl_deps },
+        },
+      },
+    },
 
 
-   PREREQ_PM    => {
-		    'Algorithm::BinarySearch::Vec' => '0.07', ##-- for fast integer-set operations
-		    #'Cwd' => 0, ##-- for abs_path
-		    'DB_File' => 0,  ##-- for temporary hashes; 1.831
-		    'DDC::Concordance' => 0.44, ##-- for $DDC::Client::JSON_BACKEND
-		    'File::Copy'    => 0, ##-- for move()
-		    'File::Find'    => 0,
-		    'File::Map'     => 0,  # 0.63
-		    'File::Path'    => 0,  ##-- make_tree, remove_path; 2.08_01
-		    'File::Spec'    => 0,
-		    'File::Temp'    => 0,
-		    'Getopt::Long'  => 0,
-		    'IPC::Run'      => 0,  # 0.94
-		    'JSON'          => 0,  # 2.53
-		    'Log::Log4perl' => 1.07,   # 1.29
-		    'LWP::UserAgent' => 0, ##-- 6.06, for http client-mode
-		    'Tie::File::Indexed' => '0.08', ##-- for temporary object arrays
-		    'Time::HiRes' => 0,		    ##-- for runtime profiling
-		    'XML::LibXML' => '1.70',	    ##-- for XML-based input formats (TCF, TEI)
-		    'Test::More' => 0,
-                    ($Config{usethreads}
-                     ? ('threads' => 0,                 ##-- 2.07
-                        'threads::shared' => 0,         ##-- 1.51
-                       )
-                     : ('forks' => 0.36,
-                        'forks::shared' => 0.36,
-                       )),
-		    ##
-		    ##-- for (term x document) models (TDF, formerly "Vsem")
-		    #%pdl_deps,
-		   },
-   CONFIGURE_REQUIRES => {
-			  'ExtUtils::MakeMaker' => 6.52, ##-- for CONFIGURE_REQUIRES
-			  #%pdl_deps,
-			 },
+    PREREQ_PM    => {
+      'Algorithm::BinarySearch::Vec' => '0.07', ##-- for fast integer-set operations
+      #'Cwd' => 0, ##-- for abs_path
+      'DB_File' => 0,           ##-- for temporary hashes; 1.831
+      'DDC::Concordance' => 0.44, ##-- for $DDC::Client::JSON_BACKEND
+      'File::Copy'    => 0,       ##-- for move()
+      'File::Find'    => 0,
+      'File::Map'     => 0,       # 0.63
+      'File::Path'    => 0,       ##-- make_tree, remove_path; 2.08_01
+      'File::Spec'    => 0,
+      'File::Temp'    => 0,
+      'Getopt::Long'  => 0,
+      'IPC::Run'      => 0,          # 0.94
+      'JSON'          => 0,          # 2.53
+      'Log::Log4perl' => 1.07,       # 1.29
+      'LWP::UserAgent' => 0,         ##-- 6.06, for http client-mode
+      'Tie::File::Indexed' => '0.08', ##-- for temporary object arrays
+      'Time::HiRes' => 0,             ##-- for runtime profiling
+      'XML::LibXML' => '1.70', ##-- for XML-based input formats (TCF, TEI)
+      'Test::More' => 0,
+      ($Config{usethreads}
+       ? ('threads' => 0,                       ##-- 2.07
+          'threads::shared' => 0,               ##-- 1.51
+        )
+       : ('forks' => 0.36,
+          'forks::shared' => 0.36,
+        )),
+      ##
+      ##-- for (term x document) models (TDF, formerly "Vsem")
+      #%pdl_deps,
+    },
+    CONFIGURE_REQUIRES => {
+      'ExtUtils::MakeMaker' => 6.52, ##-- for CONFIGURE_REQUIRES
+      #%pdl_deps,
+    },
 
 
-   EXE_FILES => [ glob('dcdb-*.perl'), ],
-   ##
-   #NORECURS  => 1, ##-- don't recurse into local 'MUDL' mirror dir
-   ##
-   DIR => [
-           ($WANT_PDL ? 'PDL-Utils' : qw()),
-           ($WANT_XS  ? 'XS'        : qw()),
-          ],
+    EXE_FILES => [ glob('dcdb-*.perl'), ],
+    ##
+    #NORECURS  => 1, ##-- don't recurse into local 'MUDL' mirror dir
+    ##
+    DIR => [
+      ($WANT_PDL ? 'PDL-Utils' : qw()),
+      ($WANT_XS  ? 'XS'        : qw()),
+    ],
   );
 
 ##-----------------------------------------------------------------------
@@ -129,10 +129,10 @@ sub MY::constants {
   my $css = 'perlpod.css';
   my $inherited = shift->SUPER::constants(@_);
   $inherited .= (
-		 ###-- constants: html css
-		 "\n"
-		 ."CSS ?= $css\n"
-		);
+    ###-- constants: html css
+    "\n"
+    ."CSS ?= $css\n"
+  );
   return $inherited;
 }
 
@@ -152,19 +152,19 @@ sub MY::depend {
   package MY;
   my $inherited = shift->SUPER::depend(@_);
   $inherited .= (
-		 ###-- depends -> README.txt
-		 "\n\n"
-		 ."readme: README.txt\n"
-		 ."\n"
-		 ."dist: README.txt\n"
-		 ."\n"
-		 ."create_distdir: README.txt\n"
-		 ."\n"
-		 ."distcheck: README.txt\n"
-		 ."\n"
-		 ."manicheck: README.txt\n"
-		 ."\n"
-		);
+    ###-- depends -> README.txt
+    "\n\n"
+    ."readme: README.txt\n"
+    ."\n"
+    ."dist: README.txt\n"
+    ."\n"
+    ."create_distdir: README.txt\n"
+    ."\n"
+    ."distcheck: README.txt\n"
+    ."\n"
+    ."manicheck: README.txt\n"
+    ."\n"
+  );
   return $inherited;
 }
 
@@ -173,7 +173,7 @@ sub MY::special_targets {
   package MY;
   my $inherited = shift->SUPER::special_targets(@_);
   $inherited .=
-"
+    "
 .SUFFIXES: .pm .pod .rpod .man .txt .html
 
 .pm.html:
@@ -247,10 +247,10 @@ $(INST_HTMLDIR)$(DFSEP).exists :: Makefile.PL
   $rules =~ s/::/${html_ns_sep}/sg if ($html_ns_sep ne '::');
   $rules =~ s/\\\n/\n/sg;
   my $hackit = ("\\\n"
-		."\t | ".'$(PERL) -p'." \\\n"
-		."\t   ".'-e\'sub hackhref {($$href=shift)=~s{^/*}{}; $$href=~s{^(?:script|lib)/}{}; $$href=~s{/}{'.$html_ns_sep.'}g; $$href;}\''." \\\n"
-		."\t   ".'-e\'s/<a href="([^"]*)/\'\\\'\'<a href="\'\\\'\'.hackhref($$1)/eg;\''
-               );
+                ."\t | ".'$(PERL) -p'." \\\n"
+                ."\t   ".'-e\'sub hackhref {($$href=shift)=~s{^/*}{}; $$href=~s{^(?:script|lib)/}{}; $$href=~s{/}{'.$html_ns_sep.'}g; $$href;}\''." \\\n"
+                ."\t   ".'-e\'s/<a href="([^"]*)/\'\\\'\'<a href="\'\\\'\'.hackhref($$1)/eg;\''
+              );
   #$hackit = ' | cat - ';
   $rules =~ s/\t\s+(\S+)\s+(\S+)/\t\$(POD2HTML) --infile=$1 ${hackit} \\\n\t > $2 || (rm -f $2 && false)/sg;
   $out .= $htmlvars.$deps."\n".$rules."\n\n";
@@ -341,7 +341,7 @@ sub MY::dist_basics {
 sub MY::distdir {
   package MY;
   my $inherited = shift->SUPER::distdir(@_);
-  return $inherited; #.$local;
+  return $inherited;            #.$local;
 }
 
 ##---------------------------------------------------------------

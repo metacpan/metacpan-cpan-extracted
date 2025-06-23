@@ -35,11 +35,12 @@ requires:
   Getopt::Long: '0'
   JSON: '0'
   List::Util: '1.33'
+  POSIX: '0'
   Parallel::ForkManager: v0.7.6
   XML::LibXML: '1.70'
   perl: '5.016'
 resources:
   bugtracker: https://codeberg.org/1-1sam/noss/issues
   repository: https://codeberg.org/1-1sam/noss.git
-version: '0.01'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

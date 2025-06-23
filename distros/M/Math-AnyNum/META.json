@@ -4,7 +4,7 @@
       "Daniel Șuteu <trizen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -39,7 +39,7 @@
    "provides" : {
       "Math::AnyNum" : {
          "file" : "lib/Math/AnyNum.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/trizen/Math-AnyNum"
       }
    },
-   "version" : "0.40",
-   "x_serialization_backend" : "JSON::PP version 4.12"
+   "version" : "0.41",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

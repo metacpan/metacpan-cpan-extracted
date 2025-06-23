@@ -94,6 +94,7 @@ lib/Quiq/Html/Component/Bundle.pm
 lib/Quiq/Html/Construct.pm
 lib/Quiq/Html/Form/Layout.pm
 lib/Quiq/Html/Form/Matrix.pm
+lib/Quiq/Html/FrameSet.pm
 lib/Quiq/Html/HorizontalMenu.pm
 lib/Quiq/Html/Image.pm
 lib/Quiq/Html/List.pm
@@ -164,6 +165,7 @@ lib/Quiq/MediaWiki/Markup.pm
 lib/Quiq/ModelCache.pm
 lib/Quiq/Mojolicious/Plugin/Log/Parameters.pm
 lib/Quiq/Mustang.pm
+lib/Quiq/Mustang/business-rule.txt
 lib/Quiq/Net.pm
 lib/Quiq/Object.pm
 lib/Quiq/Option.pm
@@ -277,7 +279,6 @@ lib/Quiq/Zugferd/2.3.2/profile/minimum/Factur-X_1.07.2_MINIMUM_urn_un_unece_unce
 lib/Quiq/Zugferd/2.3.2/profile/minimum/Factur-X_1.07.2_MINIMUM_urn_un_unece_uncefact_data_standard_UnqualifiedDataType_100.xsd
 lib/Quiq/Zugferd/2.3.2/profile/minimum/template.xml
 lib/Quiq/Zugferd/Tree.pm
-lib/Quiq/Zugferd2.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -375,6 +376,7 @@ t/bin/Quiq/Html/Component/Bundle.t
 t/bin/Quiq/Html/Construct.t
 t/bin/Quiq/Html/Form/Layout.t
 t/bin/Quiq/Html/Form/Matrix.t
+t/bin/Quiq/Html/FrameSet.t
 t/bin/Quiq/Html/HorizontalMenu.t
 t/bin/Quiq/Html/Image.t
 t/bin/Quiq/Html/List.t
@@ -530,7 +532,6 @@ t/bin/Quiq/Xml/LibXml.t
 t/bin/Quiq/XTerm.t
 t/bin/Quiq/Zugferd.t
 t/bin/Quiq/Zugferd/Tree.t
-t/bin/Quiq/Zugferd2.t
 t/data/class/MyClass1.pm
 t/data/class/MyClass2.pm
 t/data/class/P1.pm

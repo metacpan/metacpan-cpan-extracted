@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,9 +41,10 @@ requires:
   Tie::File::Indexed: '0.08'
   Time::HiRes: '0'
   XML::LibXML: '1.70'
-  perl: '5.01'
+  perl: '5.010'
   threads: '0'
   threads::shared: '0'
-resources: {}
-version: v0.12.020
+resources:
+  repository: https://github.com/moocow-the-bovine/DiaColloDB.git
+version: v0.12.021
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

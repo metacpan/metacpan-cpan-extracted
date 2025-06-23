@@ -302,6 +302,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'volume_value' => {
+    	datatype => 'double',
+    	base_name => 'VolumeValue',
+    	description => 'Audio volume percent.',
+    	format => '',
+    	read_only => '',
+    		},
     'base64_data' => {
     	datatype => 'string',
     	base_name => 'Base64Data',
@@ -320,6 +327,34 @@ __PACKAGE__->method_documentation({
     	datatype => 'boolean',
     	base_name => 'RewindAudio',
     	description => 'Determines whether audio is automatically rewound to start after playing.',
+    	format => '',
+    	read_only => '',
+    		},
+    'fade_in_duration' => {
+    	datatype => 'double',
+    	base_name => 'FadeInDuration',
+    	description => 'Time duration for the initial fade-in of the media in milliseconds.',
+    	format => '',
+    	read_only => '',
+    		},
+    'fade_out_duration' => {
+    	datatype => 'double',
+    	base_name => 'FadeOutDuration',
+    	description => 'Time duration for the ending fade-out of the media in milliseconds.',
+    	format => '',
+    	read_only => '',
+    		},
+    'trim_from_start' => {
+    	datatype => 'double',
+    	base_name => 'TrimFromStart',
+    	description => 'Time duration to be removed from the beginning of the media during playback in milliseconds.',
+    	format => '',
+    	read_only => '',
+    		},
+    'trim_from_end' => {
+    	datatype => 'double',
+    	base_name => 'TrimFromEnd',
+    	description => 'Time duration to be removed from the end of the media during playback in milliseconds.',
     	format => '',
     	read_only => '',
     		},
@@ -362,9 +397,14 @@ __PACKAGE__->swagger_types( {
     'play_loop_mode' => 'boolean',
     'play_mode' => 'string',
     'volume' => 'string',
+    'volume_value' => 'double',
     'base64_data' => 'string',
     'play_across_slides' => 'boolean',
     'rewind_audio' => 'boolean',
+    'fade_in_duration' => 'double',
+    'fade_out_duration' => 'double',
+    'trim_from_start' => 'double',
+    'trim_from_end' => 'double',
     'picture_fill_format' => 'PictureFill'
 } );
 
@@ -398,9 +438,14 @@ __PACKAGE__->attribute_map( {
     'play_loop_mode' => 'PlayLoopMode',
     'play_mode' => 'PlayMode',
     'volume' => 'Volume',
+    'volume_value' => 'VolumeValue',
     'base64_data' => 'Base64Data',
     'play_across_slides' => 'PlayAcrossSlides',
     'rewind_audio' => 'RewindAudio',
+    'fade_in_duration' => 'FadeInDuration',
+    'fade_out_duration' => 'FadeOutDuration',
+    'trim_from_start' => 'TrimFromStart',
+    'trim_from_end' => 'TrimFromEnd',
     'picture_fill_format' => 'PictureFillFormat'
 } );
 

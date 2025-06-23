@@ -1,0 +1,71 @@
+use strict;
+use warnings;
+use alienfile;
+
+configure {
+    requires 'Alien::Meson';
+    requires 'Carp';
+    requires 'File::Copy::Recursive';
+    requires 'HTTP::Tiny';
+    requires 'Path::Tiny';
+};
+
+## not doing system install, so must deal with the package name
+## being not obvious
+plugin 'PkgConfig' => ( pkg_name => 'Bit', );
+
+share {
+    use Carp;
+    use File::Copy::Recursive qw(dircopy);
+    use HTTP::Tiny;
+    use Path::Tiny;
+
+    my $install_root;
+    my $path_to_static_lib;
+    my $repo_url;
+    my $repo_response;
+
+    ## use one of two locations to source edlib
+    plugin 'Download::GitHub' => (
+        github_repo => 'Bit',
+        github_user => 'chrisarg',
+    );
+    plugin 'Extract' => 'zip';
+    plugin 'Build::CMake';
+    plugin 'Gather::IsolateDynamic';
+
+    ## build both the dynamic and the dynamic libs in a single step
+    build [
+        ['%{make} all'],
+	['%{make} test'],
+	['%{make} bench']
+    ];
+
+    ## various postbuild activities to facilitate the gathering of files
+    after 'build' => sub {
+        my ($build) = @_;
+        ## move the bin directories into the final location
+        ## this includes the suite of the edlib library
+        if ( $build->meta_prop->{destdir} ) {
+            my $destdir = $ENV{DESTDIR};
+            $install_root =
+              Path::Tiny->new( $ENV{DESTDIR}, $build->install_prop->{prefix} );
+        }
+        else {
+            $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+        }
+        my $source_directory      = $build->{install_prop}->{extract};
+        my $binary_dest_directory = path $install_root, 'bin';
+        dircopy( path( $source_directory, 'bin' ), $binary_dest_directory );
+
+    };
+
+    test sub {
+        my ($build) = @_;
+        my $binary_dest_directory =
+          path( $build->install_prop->{stage}, 'bin' );
+    };
+};
+
+
+

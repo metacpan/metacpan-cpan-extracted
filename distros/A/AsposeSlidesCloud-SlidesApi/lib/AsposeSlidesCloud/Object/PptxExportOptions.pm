@@ -129,6 +129,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'skip_java_script_links' => {
+    	datatype => 'boolean',
+    	base_name => 'SkipJavaScriptLinks',
+    	description => 'True to skip hyperlinks with javascript calls when saving the presentation.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -150,6 +157,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'refresh_thumbnail' => {
+    	datatype => 'boolean',
+    	base_name => 'RefreshThumbnail',
+    	description => 'True to refresh the presentation thumbnail on save',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -158,9 +172,11 @@ __PACKAGE__->swagger_types( {
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
+    'skip_java_script_links' => 'boolean',
     'format' => 'string',
     'conformance' => 'string',
-    'zip64_mode' => 'string'
+    'zip64_mode' => 'string',
+    'refresh_thumbnail' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -169,9 +185,11 @@ __PACKAGE__->attribute_map( {
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
+    'skip_java_script_links' => 'SkipJavaScriptLinks',
     'format' => 'Format',
     'conformance' => 'Conformance',
-    'zip64_mode' => 'Zip64Mode'
+    'zip64_mode' => 'Zip64Mode',
+    'refresh_thumbnail' => 'RefreshThumbnail'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -52,7 +52,7 @@ perldoc Math::AnyNum
 
 # LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2021 by Daniel "Trizen" Șuteu
+Copyright (C) 2017-2025 by Daniel "Trizen" Șuteu
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

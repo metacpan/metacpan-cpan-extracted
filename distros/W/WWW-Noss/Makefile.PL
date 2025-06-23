@@ -41,6 +41,7 @@ my %WriteMakefileArgs = (
         'List::Util' => '1.33',
         # for retrieving data structures from children
         'Parallel::ForkManager' => '0.7.6',
+        'POSIX' => '0',
         # for load_xml()
         'XML::LibXML' => '1.70',
     },
