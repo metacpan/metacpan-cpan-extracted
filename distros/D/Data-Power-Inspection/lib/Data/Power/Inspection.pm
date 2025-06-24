@@ -18,11 +18,11 @@ Data::Power::Inspection - Power Equipment Fault Inspection and Troubleshooting L
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @EXPORT_OK = qw(
     get_inspection_rules
@@ -976,7 +976,7 @@ Retrieves the fault criteria for specific equipment or device types.
     binmode(STDOUT, ":utf8");
 
     # Retrieve inspection rules for a specific device type
-    my $pole_switch_rules = get_rules_by_device('device_name');
+    my $pole_switch_rules = get_rules_by_device('柱上开关');
 
     # Process and display the rules
 

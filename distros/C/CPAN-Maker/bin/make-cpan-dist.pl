@@ -31,7 +31,7 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny;
 use version;
 
-our $VERSION = '1.5.44';  ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.5.46';  ## no critic (RequireInterpolationOfMetachars)
 
 caller or __PACKAGE__->main();
 
@@ -144,6 +144,7 @@ sub get_provides {
   my ( $file, %options ) = @_;
 
   my %provides;
+  my @missing;
 
   if ($file) {
     my ($lines) = process_file(
@@ -159,7 +160,9 @@ sub get_provides {
           return ();
         }
 
-        my $include_path = $args->{'prefix'};
+        my $prefix = $args->{prefix};
+
+        my $include_path = $prefix;
 
         if ( $options{'work-dir'} ) {
           $include_path = $options{'work-dir'} . $SLASH . $include_path;
@@ -170,18 +173,83 @@ sub get_provides {
         my ( $provided_module, $version )
           = @{$module_version}{qw( module version)};
 
-        croak "$module not found in $include_path"
-          if !defined $version;
-
-        $provides{$provided_module} = {
-          file    => $args->{prefix} . $SLASH . $module_version->{'file'},
-          version => $version,
-        };
+        if ( !defined $version ) {
+          warn sprintf "provided module '%s' not found in %s\n", $module, $include_path;
+          push @missing, $module;
+        }
+        else {
+          $provides{$provided_module} = {
+            file    => sprintf( '%s/%s', $prefix, $module_version->{'file'} ),
+            version => $version,
+          };
+        }
 
         return $provided_module;
       }
     );
   }
+
+  # @missing is a list of modules in our provides file that do not map
+  # to an actual file. This is probably due to a module containing
+  # multiple classes. In that case if they were included in the
+  # provides list, then the packager most likely wants us to find the
+  # file they belong to.
+  #
+  # Iterate through the list of valid modules and search their files
+  # for our missing modules.
+
+  if (@missing) {
+    warn sprintf "Attempting to find files that belong to these modules.\n", scalar @missing;
+    my $dir = $options{'work-dir'} . '/lib';
+
+    my @file_list;
+
+    find(
+      sub {
+        return if !-f;
+        push @file_list, $File::Find::name;
+      },
+      $dir
+    );
+
+    unshift @INC, $dir;
+
+    foreach my $module (@missing) {
+      foreach my $file (@file_list) {
+        my $text = slurp_file($file);
+        next if $text !~ /^package\s+$module;/xsm;  # preliminary scan
+
+        # remove all pod so we don't get false positives
+        $text =~ s/^=pod(.*?)=cut//xsmg;
+        next if $text !~ /^package\s+$module;/xsm;
+
+        # see if we can get the version...this might work since we
+        # added $options{'work-dir'} to @INC. $options{'work-dir'}
+        # contains all the .pm modules to be packaged. It might not
+        # work for other reaasons (like some required packages are not
+        # installed?)
+        my $version = eval {
+          local $SIG{__WARN__} = sub { };
+          require $file;
+          return eval '$' . $module . '::VERSION';
+        };
+
+        $version //= 'undef';
+        my $rel_path = $file;
+        $rel_path =~ s/$options{'work-dir'}\///xsm;
+
+        $provides{$module} = {
+          file    => $rel_path,
+          version => $version,
+        };
+
+        print {*STDERR} sprintf "found %s version %s in %s\n", $module, $version, $rel_path;
+      }
+    }
+
+    shift @INC;
+  }
+
   return %provides;
 }
 
@@ -198,7 +266,7 @@ sub get_json_file {
 
   my ($json) = process_file(
     $file,
-    chomp       => 1,
+    - chomp     => 1,
     merge_lines => 1
   );
 
@@ -247,6 +315,22 @@ sub write_pl_files {
 }
 
 ########################################################################
+sub _write_provides {
+########################################################################
+  my ( $fh, $provides ) = @_;
+
+  croak "provides must be an array\n"
+    if !is_array($provides);
+
+  foreach my $file ( sort @{$provides} ) {
+    next if !$file;
+    print {$fh} "$file\n";
+  }
+
+  return;
+}
+
+########################################################################
 sub write_provides {
 ########################################################################
   my ( $provides, %args ) = @_;
@@ -259,10 +343,7 @@ sub write_provides {
   open my $fh, '>', $provides_file
     or croak "could not open 'provides' for writing\n";
 
-  foreach my $file ( sort @{$provides} ) {
-    next if !$file;
-    print {$fh} "$file\n";
-  }
+  _write_provides( $fh, $provides );
 
   close $fh
     or croak "could not close 'provides'\n";
@@ -757,6 +838,10 @@ sub parse_path {
       $args{l} = $path->{'pm_module'};
     }
 
+    if ( $path->{'exclude_files'} ) {
+      $args{E} = $path->{'exclude_files'};
+    }
+
     # -e
     if ( $path->{exe_files} ) {
       check_path( $project_root, $path->{exe_files}, 'exe_files' );
@@ -1186,7 +1271,9 @@ sub slurp_file {
   my ($file) = @_;
 
   open my $fh, '<', $file
-    or die "could not open $file for reading\n";
+    or croak "could not open $file for reading\n";
+
+  local $RS = undef;
 
   my $content = <$fh>;
 
@@ -1342,7 +1429,7 @@ sub main {
 
 __DATA__
 ---
-version: "1.5.44"
+version: "1.5.46"
 min_perl_version: "type:string"
 min-perl-version: "type:string"
 project:
@@ -1370,6 +1457,7 @@ path:
   tests: "type:string"
   exe_files: "type:string"
   scripts: "type:string"
+  exclude_files: "type:string"
 extra: "type:string"
 extra-files:
 provides: "type:string"

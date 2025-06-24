@@ -1,5 +1,16 @@
 Revision history for noss (WWW::Noss)
 
+1.01  Jun 23 2025
+  - Include read status of post in default post command output.
+  - feeds command now accepts group names as argument.
+  - feeds will no longer print the same feed more than once.
+  - Fix updating by group.
+  - Fix reloading by group.
+  - Fix group listing in list command.
+  - Fix feeds not being included in the default update when they are a part of
+    a group.
+  - Fix list when no valid groups are given.
+
 1.00  Jun 22 2025
   - Add --read-format option for the read command: Specify the format to use for
     the HTML contents of a post to format when reading.

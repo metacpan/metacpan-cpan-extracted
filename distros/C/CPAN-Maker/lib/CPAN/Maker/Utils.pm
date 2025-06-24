@@ -8,7 +8,7 @@ use parent qw( Exporter );
 our @EXPORT_OK   = qw( trim make_path_from_module get_module_version is_core );
 our %EXPORT_TAGS = ( 'all' => [@EXPORT_OK], );
 
-our $VERSION = '1.5.44';  ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.5.46';  ## no critic (RequireInterpolationOfMetachars)
 
 use CPAN::Maker::Constants qw( :all );
 

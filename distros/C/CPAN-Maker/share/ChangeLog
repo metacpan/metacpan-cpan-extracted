@@ -1,3 +1,33 @@
+Mon Jun 23 06:23:28 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.46]:
+	* src/main/bash/bin/make-cpan-dist.in
+	- tests will be run if SKIP_TESTS not '' or '1'
+
+Tue Jun 10 10:20:00 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.45]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- use [[ ]] instead of test
+	- -E exclude list
+	- support exclude file lists
+	- do not re-create provides if we already have one
+	(filter_file_list): new
+	(module2path): return file path if it is found
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(parse_path): exclude_files
+	(get_provides): find missing file for embedded modules
+	(_write_provides): new
+	(write_provides): use above
+	(slurp_file): was missing $RS = undef?
+	* src/main/perl/lib/README.md: generated
+	* src/main/perl/lib/CPAN/Maker.pm: pod
+	* src/main/perl/lib/CPAN/Maker/Constants.pm.in
+	- remove use of ReadonlyX
+	* .gitignore
+	- + requires.tmp, provides.tmp
+
 Fri Apr 25 09:38:51 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.5.44]:

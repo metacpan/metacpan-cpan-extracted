@@ -1,5 +1,5 @@
 {
-	"version" : "0.0.3",
+	"version" : "0.0.4",
 	"name"    : "Perl::Critic::Grape",
 	"author"  : "Brian Blackmore",
 	"abstract": "Additional Perl::Critic policies",
@@ -14,7 +14,7 @@
 				"Perl::Critic": "1.156",
 				"Perl::Critic::Policy": "1.156",
 				"Perl::Critic::Utils": "1.156",
-				"perl": "5.20.0",
+				"perl": "5.16.3",
 				"Readonly": "2.05"
 			}
 		},

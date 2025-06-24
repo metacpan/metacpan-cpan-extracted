@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -213,6 +213,7 @@ my $DEFAULT_POST_FMT = <<'HERE';
   Author:  %a
   Tags:    %c
   Updated: %C
+  Status:  %S
 HERE
 
 my $DEFAULT_FEED_FMT = <<'HERE';
@@ -881,8 +882,8 @@ sub update {
 		for my $arg (@{ $self->{ Args } }) {
 			if (exists $self->{ Feeds }{ $arg }) {
 				$feedset{ $arg } = 1;
-			} elsif (exists $self->{ Groups }{ $arg }{ feeds }) {
-				for my $k (keys %{ $self->{ Groups }{ $arg }{ feeds } }) {
+			} elsif ($self->{ Groups }{ $arg }) {
+				for my $k (@{ $self->{ Groups }{ $arg }->feeds }) {
 					$feedset{ $k } = 1;
 				}
 			} else {
@@ -994,8 +995,8 @@ sub reload {
 		for my $arg (@{ $self->{ Args } }) {
 			if (exists $self->{ Feeds }{ $arg }) {
 				$feedset{ $arg } = 1;
-			} elsif (exists $self->{ Groups }{ $arg }{ feeds }) {
-				for my $k (keys %{ $self->{ Groups }{ $arg }{ feeds } }) {
+			} elsif (exists $self->{ Groups }{ $arg }) {
+				for my $k (@{ $self->{ Groups }{ $arg }->feeds }) {
 					$feedset{ $k } = 1;
 				}
 			} else {
@@ -1200,8 +1201,8 @@ sub look {
 		for my $arg (@{ $self->{ Args } }) {
 			if (exists $self->{ Feeds }{ $arg }) {
 				$feedset{ $arg } = 1;
-			} elsif (exists $self->{ Groups }{ $arg }{ feeds }) {
-				for my $k (keys %{ $self->{ Groups }{ $arg }{ feeds } }) {
+			} elsif (exists $self->{ Groups }{ $arg }) {
+				for my $k (@{ $self->{ Groups }{ $arg }->feeds }) {
 					$feedset{ $k } = 1;
 				}
 			} else {
@@ -1223,9 +1224,13 @@ sub look {
 		: undef;
 	my @contrx = map { _arg2rx($_) } @{ $self->{ Content } };
 
+	unless (@feeds) {
+		return 1;
+	}
+
 	# TODO: Only calculate this stuff if we're not using list-format
 	my $idlen   = length($self->{ DB }->largest_id(@feeds) // 0);
-	my $feedlen = max map { length } @feeds;
+	my $feedlen = max( map { length } @feeds) // 1;
 
 	my $fmt = $self->{ ListFmt } // ("%s %-$feedlen" . "f %$idlen" ."i  %t");
 
@@ -1354,13 +1359,19 @@ sub feeds {
 	my @feeds;
 
 	if (@{ $self->{ Args } }) {
+		my %feedset;
 		for my $a (@{ $self->{ Args } }) {
 			if (exists $self->{ Feeds }{ $a }) {
-				push @feeds, $a;
+				$feedset{ $a } = 1;
+			} elsif (exists $self->{ Groups }{ $a }) {
+				for my $f (@{ $self->{ Groups }{ $a }->feeds }) {
+					$feedset{ $f } = 1;
+				}
 			} else {
-				warn "'$a' is not the name of a feed, skipping\n";
+				warn "'$a' is not the name of a feed or group, skipping\n";
 			}
 		}
+		@feeds = sort keys %feedset;
 	} else {
 		@feeds = sort keys %{ $self->{ Feeds } };
 	}

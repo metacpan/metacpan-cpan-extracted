@@ -1,0 +1,11 @@
+Revision history for Data-SimpleKV
+
+0.01    2025-06-23
+        First version
+
+0.02    2025-06-24
+        Encode::FB_QUIET
+
+0.03    2025-06-24
+        eval { decode_utf8($_) } || $_ 
+

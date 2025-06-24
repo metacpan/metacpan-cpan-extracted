@@ -124,18 +124,16 @@ Net::Cloudflare::DNS - DNS API for Cloudflare API v4
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 
 =head1 SYNOPSIS
 
 This perl module is working for Cloudflare DNS API v4.
-
-If you find any issues in using the module, please don't hesitate to email me: Wesley@Magenta.DE
 
 My system is Ubuntu, to use the module, I have the following perl modules pre-installed in the system.
 

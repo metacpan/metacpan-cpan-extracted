@@ -9,7 +9,7 @@ use Test::More tests=>4;
 my $failure=qr/Builtin.*without parentheses/;
 
 subtest 'Required cases'=>sub {
-	plan tests=>20;
+	plan tests=>24;
 	my $critic=Perl::Critic->new(-profile=>'NONE',-only=>1,-severity=>1);
 	$critic->add_policy(-policy=>'Perl::Critic::Policy::CodeLayout::RequireParensWithBuiltins',-params=>{});
 	foreach my $valid (
@@ -25,6 +25,9 @@ subtest 'Required cases'=>sub {
 		['method bare',     'my $x=$module->log;'],
 		['method child',    'my $x=$module->log->thing();'],
 		['key',             'my %hash=(one=>1,log=>0,two=>2);'],
+		['undef scalar',    'my $x=undef;'],
+		['undef kv',        'my %h=(one=>undef,two=>2);'],
+		['undef variable',  'undef($y);'],
 	) {
 		is_deeply([$critic->critique(\$$valid[1])],[],$$valid[0]);
 	}
@@ -37,6 +40,7 @@ subtest 'Required cases'=>sub {
 		['not mandatory',   'my $x=lc "hi";'],
 		['rand',            'my $x=rand 5;'],
 		['lc topic',        'my @A=map {lc} qw/a b c/'],
+		['undef variable',  'undef $y;'],
 	) {
 		like(($critic->critique(\$$invalid[1]))[0],$failure,$$invalid[0]);
 	}

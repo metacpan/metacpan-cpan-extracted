@@ -16,18 +16,16 @@ Email::Send::YYClouds - Send simple mail using smtp relay server
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 
 =head1 SYNOPSIS
 
 This module sends text based simple mail with any smtp relay server, default localhost.
-
-If you find any issues in using the module, please don't hesitate to email me: pyh@gmx.fr
 
 
     use Email::Send::YYClouds;

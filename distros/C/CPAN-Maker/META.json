@@ -56,15 +56,15 @@
    "provides" : {
       "CPAN::Maker" : {
          "file" : "lib/CPAN/Maker.pm",
-         "version" : "v1.5.44"
+         "version" : "v1.5.46"
       },
       "CPAN::Maker::Constants" : {
          "file" : "lib/CPAN/Maker/Constants.pm",
-         "version" : "v1.5.44"
+         "version" : "v1.5.46"
       },
       "CPAN::Maker::Utils" : {
          "file" : "lib/CPAN/Maker/Utils.pm",
-         "version" : "v1.5.44"
+         "version" : "v1.5.46"
       },
       "File::Process" : {
          "file" : "lib/File/Process.pm",
@@ -87,6 +87,6 @@
          "web" : "http://github.com/rlauer6/make-cpan-dist"
       }
    },
-   "version" : "v1.5.44",
+   "version" : "v1.5.46",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

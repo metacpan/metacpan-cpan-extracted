@@ -1,5 +1,9 @@
 Revision history for Perl::Critic::Grape
 
+0.0.4 - 2025-06-23
+	- RequireParensWithBuiltins permits undef literal/scalar
+	- Verified functional on 5.16.3
+
 0.0.3 - 2025-06-21
 	- viv RequireParensWithBuiltins
 	- viv ProhibitTopicIterator

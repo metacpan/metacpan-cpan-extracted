@@ -5,11 +5,11 @@ use warnings;
 
 use parent qw{ Exporter };
 
-our $VERSION = '1.5.44';  ## no critic (RequireInterpolation)
+our $VERSION = '1.5.46';  ## no critic (RequireInterpolation)
 
 our @EXPORT_OK = ();
 
-use ReadonlyX;
+use Readonly;
 
 # booleans
 Readonly our $TRUE       => 1;

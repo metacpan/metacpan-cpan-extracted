@@ -626,10 +626,10 @@ on how formatting works and a list of valid formatting codes.
 
 =back
 
-=item B<feeds> [I<feed>] ...
+=item B<feeds> [I<feed>|I<group>] ...
 
-View feed information. If no feeds are specified, prints information for all
-feeds.
+View feed information for specified feeds and/or groups. If no feeds are
+specified, prints information for all feeds.
 
 This command has the following options:
 

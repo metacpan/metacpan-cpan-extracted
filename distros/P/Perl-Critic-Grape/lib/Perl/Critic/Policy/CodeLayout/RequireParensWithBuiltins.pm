@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw/ :severities :data_conversion :classification :language /;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 Readonly::Scalar my $DESC  => q{Builtin function called without parentheses};
 Readonly::Scalar my $EXPL  => [ 13 ];
@@ -27,7 +27,7 @@ Readonly::Array my @REQUIRED => qw/
 	pack read syscall sysread sysseek syswrite unpack vec
 	chdir chmod chown chroot fcntl glob ioctl link lstat mkdir open opendir readlink rename rmdir select stat symlink sysopen umask unlink utime
 	caller
-	formline lock scalar undef
+	formline lock scalar
 	alarm exec getpriority kill pipe readpipe setpgrp setpriority sleep system waitpid
 	bless ref tie tied untie
 	accept bind connect getpeername getsockname getsockopt listen recv send setsockopt shutdown socket socketpair
@@ -38,7 +38,7 @@ Readonly::Array my @PERMITTED => qw/
 	pos
 	eof getc
 	exit
-	defined reset
+	defined reset undef
 	getpgrp
 	gmtime localtime time
 /;
@@ -154,7 +154,6 @@ Functions in the C<allow> section can be called with or without parentheses, no 
 Names configured in the C<require> section always require parentheses, even when called without arguments or inside blocks.  EG C<lc()> or C<grep {lc($_)}>.  This overrides the C<permit> option.
 
 	[CodeLayout::RequireParensWithBuiltins]
-	operators = lc lcfirst uc ucfirst
 	require = lc lcfirst uc ucfirst
 
 =head2 Required with arguments

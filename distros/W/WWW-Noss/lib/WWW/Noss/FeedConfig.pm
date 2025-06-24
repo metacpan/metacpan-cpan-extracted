@@ -2,7 +2,7 @@ package WWW::Noss::FeedConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use parent 'WWW::Noss::BaseConfig';
 
@@ -86,7 +86,7 @@ sub initialize {
 		# If any group does not want default_updates, we'll take no default
 		# updates
 		my $ndu = any { !$_->default_update } @{ $self->groups };
-		$self->set_default_update($ndu);
+		$self->set_default_update(!$ndu);
 
 		# If any groups wants hidden, take hidden
 		my $hid = any { $_->hidden } @{ $self->groups };
