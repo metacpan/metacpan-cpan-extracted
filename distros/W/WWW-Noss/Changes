@@ -1,5 +1,9 @@
 Revision history for noss (WWW::Noss)
 
+1.02  Jun 24 2025
+  - Add nossui: dialog-based frontend to noss.
+  - Fix documentation errors.
+
 1.01  Jun 23 2025
   - Include read status of post in default post command output.
   - feeds command now accepts group names as argument.

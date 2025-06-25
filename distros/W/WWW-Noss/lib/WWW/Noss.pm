@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -28,8 +28,6 @@ use WWW::Noss::TextToHtml qw(escape_html);
 
 my $PRGNAM = 'noss';
 my $PRGVER = $VERSION;
-
-# TODO: nossui script?
 
 # TODO: Command to view unread post information? (what feeds are unread, how many unread, etc.)
 

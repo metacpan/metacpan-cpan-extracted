@@ -161,16 +161,17 @@ if(-e 't/online.enabled') {
 	ok($l->locale()->code_alpha2() eq 'no');
 
 	delete($ENV{'HTTP_ACCEPT_LANGUAGE'});
-	$ENV{'REMOTE_ADDR'} = 'a.b.c.d';
-	$l = new_ok('CGI::Lingua' => [
-		supported => ['en', 'fr']
-	]);
-	local $SIG{__WARN__} = sub { die $_[0] };
-	eval { $l->language() };
-	like($@, qr/a\.b\.c\.d isn't a valid IP address/);
-	ok(defined($l->requested_language()));
-	ok($l->requested_language() eq 'Unknown');
-	ok(!defined($l->language_code_alpha2()));
+	{
+		local $ENV{'REMOTE_ADDR'} = 'a.b.c.d';
+		$l = new_ok('CGI::Lingua' => [
+			supported => ['en', 'fr']
+		]);
+		local $SIG{__WARN__} = sub { die $_[0] };
+		throws_ok { $l->language() } qr/a\.b\.c\.d isn't a valid IP address/, 'Detects invalid IP address';
+		ok(defined($l->requested_language()));
+		ok($l->requested_language() eq 'Unknown');
+		ok(!defined($l->language_code_alpha2()));
+	}
 
 	SKIP: {
 		eval { require IP::Country; };

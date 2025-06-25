@@ -1,10 +1,22 @@
 
 ==== version history of XML::Compile:WSS::Signature
 
+version 2.03: Tue 24 Jun 17:38:31 CEST 2025
+
+	Fixes:
+	- new test PEM files, because the old set used a padding which got
+	  unsupported. [Andreas Mock]
+
+	Improvements:
+	- converted to Git and GitHUB
+	- add .gitignore
+	- update README.md
+
 version 2.02: Sat 16 Jul 01:29:54 CEST 2016
 
 	Fixes:
 	- do not die on unused header elements.
+	- Usage not used. rt.cpan.org#105343 [Cheolgoo Kang]
 
 	Improvements:
 	- change documentation style.

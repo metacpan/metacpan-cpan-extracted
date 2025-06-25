@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 dump/60complex/answer.dd
 dump/60complex/msgsent
 dump/encrkey/read.dd

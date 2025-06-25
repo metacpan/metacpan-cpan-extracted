@@ -47,7 +47,12 @@ my %WriteMakefileArgs = (
     },
     EXE_FILES => [
         'bin/noss',
+        'bin/nossui',
     ],
+    MAN1PODS => {
+        'bin/noss'       => 'blib/man1/noss.1',
+        'doc/nossui.pod' => 'blib/man1/nossui.1',
+    },
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {

@@ -110,7 +110,6 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
     }, TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
-    	'Config::Abstraction' => 0,
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
 	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
@@ -124,6 +123,7 @@ WriteMakefile(
 	'Net::Whois::IANA' => 0,
 	'Net::Whois::IP' => 0,
 	'NetAddr::IP' => 0,
+	'Object::Configure' => 0,
 	'Params::Get' => 0,
 	'Class::Load' => 0,
 	'CGI::Info' => 0.60, # For AUTOLOAD

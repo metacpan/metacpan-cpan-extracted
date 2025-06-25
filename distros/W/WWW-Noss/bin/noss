@@ -52,7 +52,7 @@ L</"COMMANDS"> section of this manual.
 
 So basically, the typical usage of B<noss> would involve managing your feed
 list from the feeds file, using the C<update> command to fetch feed updates,
-using the C<list> command to see what posts are available, and the using
+using the C<list> command to see what posts are available, and then using
 C<read> or C<open> commands for actually reading posts.
 
   # Add your feeds
@@ -928,6 +928,14 @@ command after performing any operation. See also the C<--autoclean> option.
 
 =back
 
+=head1 NOSSUI
+
+For Unix-like systems, B<noss> also comes with a script called L<nossui(1)>,
+which is a L<dialog(1)>-based frontend that provides a terminal user
+interface for B<noss>. Not all of the functionality of B<noss> is available
+through L<nossui(1)>, so it shouldn't be used as a complete replacement for
+B<noss>, but it should be suitable for most of B<noss>'s routine usage.
+
 =head1 ENVIRONMENT
 
 =over 4
@@ -990,7 +998,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<curl(1)>, L<less(1)>, L<lynx(1)>, L<more(1)>, L<sqlite3(1)>
+L<nossui(1)>, L<curl(1)>, L<less(1)>, L<lynx(1)>, L<more(1)>, L<sqlite3(1)>
 
 =cut
 

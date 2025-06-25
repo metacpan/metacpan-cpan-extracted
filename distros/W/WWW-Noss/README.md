@@ -21,6 +21,7 @@ Perl.
 
 **noss** optionally depends on the following:
 * `JSON::XS`: For faster JSON processing.
+* `dialog`: For the `nossui` script.
 
 Once the aforementioned dependencies are installed, **noss** can be built and
 installed via the following commands:
@@ -39,6 +40,10 @@ The documentation for the usage of **noss** can be found in its manual.
 man noss
 ```
 It should contain all the information you need to get started using **noss**.
+
+**noss** also comes with **nossui**, a `dialog`-based TUI frontend to **noss**
+written in POSIX `sh`. Most of the regular functionality of **noss** should also
+be available through **nossui**.
 
 ## Thanks
 A huge thanks to the [newsraft](https://codeberg.org/newsraft/newsraft) and

@@ -82,8 +82,20 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Lukas Mai</foaf:name>
+      <foaf:mbox rdf:resource="mailto:lukasmai.403@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Luke Triantafyllidis</foaf:name>
       <foaf:mbox rdf:resource="mailto:luket@mailguard.com.au" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Maros Kollar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:maros.kollar@geizhals.at" />
     </foaf:Person>
   </helper>
   <helper>
@@ -284,6 +296,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.03</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2020-01-06</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.04</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2020-02-23</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

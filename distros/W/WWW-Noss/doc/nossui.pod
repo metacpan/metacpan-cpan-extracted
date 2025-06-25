@@ -1,0 +1,78 @@
+=head1 NAME
+
+nossui - dialog-based frontend to noss
+
+=head1 USAGE
+
+  nossui [options] ...
+
+=head1 DESCRIPTION
+
+B<nossui> is a L<dialog(1)>-based frontend to the L<noss(1)> feed reader and
+aggregator. Most of the regular functionality in L<noss(1)> should be
+accessible from this script.
+
+Just like with L<noss(1)>, B<nossui> must be given a list of feeds to
+aggregate via a feeds file. Consult the B<Feeds File> section in the
+L<noss(1)> manual for documentation on the format of a feeds file.
+
+B<nossui> can also have some of its behavior tweaked through a L<noss(1)>
+configuration file. Consult the B<CONFIGURATION> section in the
+L<noss(1)> manual for more information on the format of a configuration file
+and the available configuration options.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c> I<file>
+
+Specify path to the L<noss(1)> configuration file to use.
+
+=item B<-D> I<dir>
+
+Specify path to directory to use as the L<noss(1)> data directory.
+
+=item B<-f> I<file>
+
+Specify path to the L<noss(1)> feeds file to use.
+
+=item B<-h>
+
+Print usage message and exit.
+
+=item B<-v>
+
+Print version and copyright information, then exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+Consult the B<ENVIRONMENT> section in the L<noss(1)> manual for
+a list of recognized environment variables.
+
+=head1 AUTHOR
+
+Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+
+This project's source can be found on its
+L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull
+requests are welcome!
+
+=head1 COPYRIGHT
+
+Copyright (C) 2025 Samuel Young
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+=head1 SEE ALSO
+
+L<dialog(1)>, L<noss(1)>
+
+=cut
+
+# vim: expandtab shiftwidth=4

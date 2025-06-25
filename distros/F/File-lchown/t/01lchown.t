@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 4;
+use Test2::V0;
 
 use File::lchown qw( lchown );
 use POSIX qw( ENOENT );
@@ -32,3 +33,5 @@ SKIP: {
 }
 
 unlink $testlink;
+
+done_testing;

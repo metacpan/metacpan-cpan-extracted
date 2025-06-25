@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.27';
+$VERSION = '1.28';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -148,7 +148,11 @@ use vars '@Functions';
     UNITCHECK
    ) : ()), qw(
     abs
-    accept
+    accept ),
+  ($] >= 5.041007 ? qw(
+    any
+    all
+  ) : ()), qw(
     alarm
     atan2
     bind

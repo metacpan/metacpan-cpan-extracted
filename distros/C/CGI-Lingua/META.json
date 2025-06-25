@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -35,7 +35,6 @@
             "CGI::Info" : "0.6",
             "Class::Autouse" : "0",
             "Class::Load" : "0",
-            "Config::Abstraction" : "0",
             "DBD::SQLite" : "0",
             "Data::Validate::IP" : "0.25",
             "ExtUtils::MakeMaker" : "6.64",
@@ -51,6 +50,7 @@
             "Net::Whois::IANA" : "0",
             "Net::Whois::IP" : "0",
             "NetAddr::IP" : "0",
+            "Object::Configure" : "0",
             "Params::Get" : "0",
             "Sys::Syslog" : "0",
             "perl" : "5.006002"
@@ -87,6 +87,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.73",
+   "version" : "0.74",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

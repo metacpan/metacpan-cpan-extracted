@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/File/lchown.pm
@@ -7,7 +8,7 @@ t/00use.t
 t/01lchown.t
 t/02lutimes.t
 t/99pod.t
-Makefile.PL
 README
 LICENSE
 META.yml
+META.json

@@ -71,6 +71,6 @@
          "web" : "https://codeberg.org/1-1sam/noss"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,9 +1,13 @@
 #!/usr/bin/env perl
+# This code is part of distribution XML-Compile-WSS-Signature.
+# Meta-POD processed with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+
 use ExtUtils::MakeMaker;
 
 use 5.008;
 
-my $version = '2.02';
+my $version = '2.03';
 
 WriteMakefile
  ( NAME	 	=> 'XML::Compile::WSS::Signature'
@@ -36,9 +40,22 @@ WriteMakefile
      }
 
  , EXE_FILES    => []
- , AUTHOR       => 'Mark Overmeer'
+ , AUTHOR       => 'Mark Overmeer <markov@cpan.org>'
  , ABSTRACT     => 'OASIS WSS Signatures'
- , LICENSE      => 'perl'
+ , LICENSE      => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-XML-Compile-WSS-Signature.git'
+              , web  => 'https://github.com/markov2/perl5-XML-Compile-WSS-Signature'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
  );
 
 ### used by oodist during production of distribution
@@ -52,8 +69,7 @@ LICENSE         = artistic
 # for POD
 FIRST_YEAR      = 2012
 EMAIL           = perl@overmeer.net
-EXTENDS         = ../XMLCompile:../XMLCache:../XMLWSS:../XMLC14N
+EXTENDS         = ../XML-Compile:../XML-Compile-Cache:../XML-Compile-WSS:../XML-Compile-C14N
 WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL		= ../XML-shared-podtail
-SKIP_LINKS	= XML::LibXML
+SKIP_LINKS		= XML::LibXML
 __POSTAMBLE

@@ -1,9 +1,14 @@
 #!/usr/bin/env perl
+# This code is part of distribution XML-Compile-WSS-Signature.
+# Meta-POD processed with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+
 # Check processing of KeyInfo structures.
+
 use warnings;
 use strict;
 
-use lib '../XMLWSS/lib', 'lib';
+use lib '../XML-Compile-WSS/lib', 'lib';
 
 use Log::Report mode => 2;
 use Test::More  tests => 45;
@@ -122,8 +127,8 @@ compare_xml($xml1->toString(1), <<'__XML');
        wsu:Id="my-first-id"
        EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
        ValueType="http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#ThumbprintSHA1">
-Qzg6QUU6QjE6MjU6RDI6RkI6Rjk6MjA6RUE6RUU6NTM6NUM6NEQ6Mzk6OUU6MjQ6MDA6N0E6ODI6
-RjI=
+MTI6RjQ6NzY6NjY6QzI6NzA6RjM6MUU6OTk6RDQ6QjY6MjE6NTg6RjQ6RTE6MzM6NjQ6N0U6OTE6
+MDA=
     </wsse:KeyIdentifier>
   </wsse:SecurityTokenReference>
 </ds:KeyInfo>
@@ -201,16 +206,17 @@ compare_xml($sec2b->toString(1), <<'__SEC', 'binsectoken');
      wsu:Id="my-uri"
      EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
      ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3">
-MIICNjCCAZ+gAwIBAgIJAPCFsh4JQEyUMA0GCSqGSIb3DQEBBQUAMDQxCzAJBgNVBAYTAk5MMQ8w
-DQYDVQQHDAZBcm5oZW0xFDASBgNVBAMMC2V4YW1wbGUuY29tMB4XDTEyMTEwMjIyMDEwOFoXDTEz
-MTEwMjIyMDEwOFowNDELMAkGA1UEBhMCTkwxDzANBgNVBAcMBkFybmhlbTEUMBIGA1UEAwwLZXhh
-bXBsZS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAPLWMEhImMNpRTqMns6rADVhu8Yy
-xBpLjh75nOsAj1aIWVM/Oi7pPwjCsMMyZV4iXGhT2WxmE9EmHBwgIqBn90qhbC7G3HwAvsTUAv27
-phPco+u7tfhXmT1jG2NIWf0l/1SqDqXPUDecAz1xjTCYvMjCwm1dtsZDpmiUZVgCoR6XAgMBAAGj
-UDBOMB0GA1UdDgQWBBRvhcWDNhXGhIj34sLkTAHvAT2qNTAfBgNVHSMEGDAWgBRvhcWDNhXGhIj3
-4sLkTAHvAT2qNTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4GBAN+lDWtlhFSxqLAcqA7R
-IIj0LqMCL0RYEs3rbAaUliee5lM6cOkxStx2wkAVY68yBBLNmEYJ10yt/BLg6LiDeA7UxZ4gj/om
-Q6/OsNC7eQJsxGKedA34/JT0R/zAVrHFkQYWrPNSkRLxQuXYG3xGLbQ6WVGJ25Iw+iYGYnKQYoMk
+MIICRDCCAa2gAwIBAgIUZ2NSUF4rlanKHb4wRvj8URshOyowDQYJKoZIhvcNAQELBQAwNDELMAkG
+A1UEBhMCTkwxDzANBgNVBAcMBkFybmhlbTEUMBIGA1UEAwwLZXhhbXBsZS5jb20wHhcNMjUwNjI0
+MTQ1MzUwWhcNMjYwNjI0MTQ1MzUwWjA0MQswCQYDVQQGEwJOTDEPMA0GA1UEBwwGQXJuaGVtMRQw
+EgYDVQQDDAtleGFtcGxlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA0B+/p2ifYE1m
+f6f62PcBE842RlT0t4G0bCAgOT0AMFw/SZumvjKbsbLx+SUeGuakalvFCU9A/3WjPayCCtVGFLUR
+Sfq/SM4SGqxbKa6Hqe5+0NFhVHUg+SipnIM+mDyCcHc67OAcc/VykiM6lazptaSQ1aZ3D/l+lJig
+Vsc71uUCAwEAAaNTMFEwHQYDVR0OBBYEFMLSXKqdnhPsvSPbjTXti1FyLi8pMB8GA1UdIwQYMBaA
+FMLSXKqdnhPsvSPbjTXti1FyLi8pMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADgYEA
+av5TM+3k1nr7wObGiuwl15ilVae2aYQzGCI0X4x1lLdSQ5lFbdhgr/WNSKzE3CN9WKaWwRLAYzaq
+tUgq6FUbgfeDWiuy6VzLLcTyn2FQ83wQntm/mxTFerZfntm8Ln2eC9sQSXbY/pOWuFgJd1l+72jb
+FuH0CMzAKjwIxlBejms=
   </wsse:BinarySecurityToken>
 </top>
 __SEC

@@ -1,9 +1,14 @@
 #!/usr/bin/env perl
+# This code is part of distribution XML-Compile-WSS-Signature.
+# Meta-POD processed with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+
 # Check processing of KeyInfo structures.
+
 use warnings;
 use strict;
 
-use lib '../XMLWSS/lib', 'lib';
+use lib '../XML-Compile-WSS/lib', 'lib';
 
 use Log::Report;
 use Test::More  tests => 2;

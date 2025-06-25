@@ -3,13 +3,13 @@ package CGI::Lingua;
 use warnings;
 use strict;
 
-use Config::Abstraction;
 use Log::Abstraction;
+use Object::Configure;
 use Params::Get;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 =cut
 
@@ -175,14 +175,7 @@ sub new
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	# Load the configuration from a config file, if provided
-	if(exists($params->{'config_file'}) && (my $config = Config::Abstraction->new(config_dirs => ['/'], config_file => $params->{'config_file'})->all())) {
-		# my $config = YAML::XS::LoadFile($params->{'config_file'});
-		if($config->{$class}) {
-			$config = $config->{$class};
-		}
-		$params = {%{$config}, %{$params}};
-	}
+	$params = Object::Configure::configure($class, $params);
 
 	# TODO: check that the number of supported languages is > 0
 	# unless($params->{supported} && ($#params->{supported} > 0)) {
@@ -194,14 +187,6 @@ sub new
 	}
 
 	my $cache = $params->{cache};
-	my $logger;
-	if($logger = $params->{'logger'}) {
-		if(!Scalar::Util::blessed($logger)) {
-			$logger = Log::Abstraction->new($logger);
-		}
-	} else {
-		$logger = Log::Abstraction->new();
-	}
 	my $info = $params->{info};
 
 	if($cache && $ENV{'REMOTE_ADDR'}) {
@@ -213,15 +198,15 @@ sub new
 			$key .= "$l/";
 		}
 		$key .= join('/', @{$params->{supported}});
-		if($logger) {
+		# if($logger) {
 			# $self->debug("Looking in cache for $key");
-		}
+		# }
 		if(my $rc = $cache->get($key)) {
 			# if($logger) {
 				# $logger->debug('Found - thawing');
 			# }
 			$rc = Storable::thaw($rc);
-			$rc->{_logger} = $logger;
+			$rc->{_logger} = $params->{'logger'};
 			$rc->{_syslog} = $params->{syslog};
 			$rc->{_cache} = $cache;
 			$rc->{_supported} = $params->{supported};
@@ -253,12 +238,11 @@ sub new
 		# _locale => undef,	# Locale::Object::Country
 		_syslog => $params->{syslog},
 		_dont_use_ip => $params->{dont_use_ip} || 0,
-		_logger => $logger,
+		_logger => $params->{'logger'},
 		_have_ipcountry => -1,	# -1 = don't know
 		_have_geoip => -1,	# -1 = don't know
 		_have_geoipfree => -1,	# -1 = don't know
 		_debug => $params->{debug} || 0,
-		logger => $logger,
 	}, $class;
 }
 
@@ -920,7 +904,7 @@ sub country {
 			$ip = '127.0.0.1';
 		} elsif(!is_ipv6($ip)) {
 			$self->_warn({
-				warning => "$ip isn't a valid IP address\n"
+				warning => "$ip isn't a valid IP address"
 			});
 			return;
 		}
@@ -1396,8 +1380,9 @@ sub _warn
 	my $self = shift;
 	my $params = Params::Get::get_params('warning', @_);
 
-	if($params->{'warning'}) {
-		$self->_log('warn', $params->{'warning'});
+	$self->_log('warn', $params->{'warning'});
+	if(!defined($self->{'logger'})) {
+		Carp::carp($params->{'warning'});
 	}
 }
 

@@ -2,7 +2,7 @@ NAME
     Mo::utils::Number - Mo number utilities.
 
 SYNOPSIS
-     use Mo::utils::number qw(check_int check_natural check_number check_percent check_positive_natural);
+     use Mo::utils::Number qw(check_int check_natural check_number check_percent check_positive_natural);
 
      check_int($self, $key);
      check_natural($self, $key);
@@ -192,6 +192,9 @@ DEPENDENCIES
     Error::Pure, Exporter, Readonly, Scalar::Util.
 
 SEE ALSO
+    Mo::utils::Number::Range
+        Mo number utilities for ranges.
+
     Mo  Micro Objects. Mo is less.
 
     Mo::utils
@@ -214,5 +217,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -1,11 +1,12 @@
 package Promises;
 our $AUTHORITY = 'cpan:YANICK';
-$Promises::VERSION = '1.04';
+$Promises::VERSION = '1.05';
 # ABSTRACT: An implementation of Promises in Perl
 
 use strict;
 use warnings;
 
+use Scalar::Util qw[ blessed ];
 use Promises::Deferred;
 our $Backend = 'Promises::Deferred';
 
@@ -98,15 +99,25 @@ sub collect {
 
     my $all_done = resolved();
 
+    my @results;
     for my $p ( @promises ) {
-        my @results;
-        $all_done = $all_done->then( sub {
-            @results = @_;
-            return $p;
-        } )->then(sub{ ( @results, [ @_ ] ) } );
+        if ( $p && blessed $p && $p->can('then') ) {
+            $all_done = $all_done->then( sub {
+                $p->then( sub {
+                    push @results, [ @_ ];
+                    return;
+                } )
+            } );
+        } else {
+            # not actually a promise; collect directly
+            $all_done = $all_done->then( sub {
+                push @results, [ $p ];
+                return;
+            } );
+        }
     }
 
-    return $all_done;
+    return $all_done->then( sub { @results } );
 }
 
 1;
@@ -121,7 +132,7 @@ Promises - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -498,7 +509,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2014, 2012 by Infinity Interactive, Inc.
+This software is copyright (c) 2025, 2017, 2014, 2012 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

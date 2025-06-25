@@ -12,7 +12,7 @@ use Scalar::Util qw(looks_like_number);
 Readonly::Array our @EXPORT_OK => qw(check_int check_natural check_number
 	check_percent check_positive_natural);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # ... -2, -1, 0, 1, 2, ...
 sub check_int {
@@ -108,7 +108,7 @@ Mo::utils::Number - Mo number utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils::number qw(check_int check_natural check_number check_percent check_positive_natural);
+ use Mo::utils::Number qw(check_int check_natural check_number check_percent check_positive_natural);
 
  check_int($self, $key);
  check_natural($self, $key);
@@ -331,6 +331,10 @@ L<Scalar::Util>.
 
 =over
 
+=item L<Mo::utils::Number::Range>
+
+Mo number utilities for ranges.
+
 =item L<Mo>
 
 Micro Objects. Mo is less.
@@ -363,6 +367,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

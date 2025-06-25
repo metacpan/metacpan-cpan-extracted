@@ -9,6 +9,7 @@ BEGIN { use_ok('CGI::Lingua') }
 my @messages;
 
 my $lingua = CGI::Lingua->new(supported => ['en'], logger => \@messages);
+$lingua->{logger}->level('trace');
 
 my $country = $lingua->country();
 

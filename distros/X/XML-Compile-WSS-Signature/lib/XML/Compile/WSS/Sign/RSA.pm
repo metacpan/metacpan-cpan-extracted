@@ -1,15 +1,19 @@
-# Copyrights 2012-2016 by [Mark Overmeer].
+# Copyrights 2012-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.03.
+# This code is part of distribution XML-Compile-WSS-Signature.
+# Meta-POD processed with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package XML::Compile::WSS::Sign::RSA;
-use vars '$VERSION';
-$VERSION = '2.02';
+package XML::Compile::WSS::Sign::RSA;{
+our $VERSION = '2.03';
+}
 
 use base 'XML::Compile::WSS::Sign';
+
+use warnings;
+use strict;
 
 use Log::Report 'xml-compile-wss-sig';
 
@@ -175,6 +179,7 @@ sub decrypt(@)
 }
 
 
+#XXX Unused?  See checker()
 sub check($$)
 {   my ($self, $text, $signature) = @_;
     my $rsa = $self->publicKeyRSA

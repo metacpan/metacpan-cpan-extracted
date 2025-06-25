@@ -1,6 +1,6 @@
 package Promises::Deferred;
 our $AUTHORITY = 'cpan:YANICK';
-$Promises::Deferred::VERSION = '1.04';
+$Promises::Deferred::VERSION = '1.05';
 # ABSTRACT: An implementation of Promises in Perl
 
 use strict;
@@ -56,7 +56,7 @@ sub is_failed      { $_[0]->is_rejected }
 sub resolve {
     my $self = shift;
 
-    die "Cannot resolve. Already  " . $self->status
+    confess "Cannot resolve. Already " . $self->status
         unless $self->is_in_progress;
 
     $self->{'result'} = [@_];
@@ -67,7 +67,7 @@ sub resolve {
 
 sub reject {
     my $self = shift;
-    die "Cannot reject. Already  " . $self->status
+    confess "Cannot reject. Already " . $self->status
         unless $self->is_in_progress;
 
     $self->{'result'} = [@_];
@@ -240,7 +240,7 @@ Promises::Deferred - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -458,7 +458,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2014, 2012 by Infinity Interactive, Inc.
+This software is copyright (c) 2025, 2017, 2014, 2012 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,13 @@
 Revision history for File-lchown
 
+0.03    2025-06-24
+        [CHANGES]
+         * Implement sub-second resolution of `lutimes()` function
+         * Much module style refresh
+
+        [BUGFIXES]
+         * Need to `#include <sys/time.h>` when probing for `lutimes()`
+
 0.02    CHANGES:
          * Optionally support lutimes(); don't fail outright if it doesn't
            exist

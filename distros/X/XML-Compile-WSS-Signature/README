@@ -1,5 +1,5 @@
-=== README for XML-Compile-WSS-Signature version 2.02
-=   Generated on Sat Jul 16 01:30:08 2016 by OODoc 2.02
+=== README for XML-Compile-WSS-Signature version 2.03
+=   Generated on Tue Jun 24 17:26:45 2025 by OODoc 2.03
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d XML-Compile-WSS-Signature-2.02.tar.gz
-       tar -xf XML-Compile-WSS-Signature-2.02.tar
-       cd XML-Compile-WSS-Signature-2.02
+       gzip -d XML-Compile-WSS-Signature-2.03.tar.gz
+       tar -xf XML-Compile-WSS-Signature-2.03.tar
+       cd XML-Compile-WSS-Signature-2.03
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/XML-Compile-WSS-Signature-2.02/
+    http://search.cpan.org/dist/XML-Compile-WSS-Signature-2.03/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=XML-Compile-WSS-Signature

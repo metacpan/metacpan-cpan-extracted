@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010,2025 -- leonerd@leonerd.org.uk
 
-package File::lchown;
+package File::lchown 0.03;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.02';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -17,7 +15,7 @@ our @EXPORT_OK = qw(
 );
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
@@ -25,11 +23,13 @@ C<File::lchown> - modify attributes of symlinks without dereferencing them
 
 =head1 SYNOPSIS
 
- use File::lchown qw( lchown lutimes );
+=for highlighter language=perl
 
- lchown $uid, $gid, $linkpath or die "Cannot lchown() - $!";
+   use File::lchown qw( lchown lutimes );
 
- lutimes $atime, $mtime, $linkpath or die "Cannot lutimes() - $!";
+   lchown $uid, $gid, $linkpath or die "Cannot lchown() - $!";
+
+   lutimes $atime, $mtime, $linkpath or die "Cannot lutimes() - $!";
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,9 @@ which it points).
 
 =cut
 
-=head2 $count = lchown $uid, $gid, @paths
+=head2 lchown
+
+   $count = lchown $uid, $gid, @paths;
 
 Set the new user or group ownership of the specified paths, without
 dereferencing any symlinks. Passing the value C<-1> as either the C<$uid> or
@@ -55,7 +57,9 @@ successfully changed.
 
 =cut
 
-=head2 $count = lutimes $atime, $mtime, @paths
+=head2 lutimes
+
+   $count = lutimes $atime, $mtime, @paths;
 
 Set the access and modification times on the specified paths, without
 dereferencing any symlinks. Passing C<undef> as both C<$atime> and C<$mtime>
@@ -66,23 +70,12 @@ if later paths succeed after earlier failures, then the value of C<$!> will
 not be reliable to indicate the nature of the failure. If you wish to use
 C<$!> to report on failures, make sure only to pass one path at a time.
 
+I<Since version 0.03> either time may be given as a fractional value, or as an
+ARRAY reference containing at least two elements. In the latter case, the
+C<[0]> element should contain the integer seconds and C<[1]> the microseconds
+part of it; in the same style as L<Time::HiRes>.
+
 =cut
-
-# Keep perl happy; keep Britain tidy
-1;
-
-__END__
-
-=head1 TODO
-
-=over 4
-
-=item *
-
-Implement sub-second precision on C<lutimes>, most likely by taking floats or
-two-element ARRAY refs, similar to C<Time::HiRes> uses.
-
-=back
 
 =head1 SEE ALSO
 
@@ -101,3 +94,7 @@ C<lutimes(2)> - change file timestamps
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

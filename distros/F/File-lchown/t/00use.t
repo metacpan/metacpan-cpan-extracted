@@ -1,6 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
-use Test::More tests => 1;
+use v5.14;
+use warnings;
 
-use_ok( "File::lchown" );
+use Test2::V0;
+
+require File::lchown;
+
+pass "Modules loaded";
+done_testing;

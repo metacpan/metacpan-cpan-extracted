@@ -1,0 +1,13 @@
+10-compile.t
+Changes
+lib/Readonly/Values/Months.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/eof.t
+t/eol.t
+t/values.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

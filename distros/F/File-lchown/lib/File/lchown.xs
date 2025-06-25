@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2007,2008 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2007,2008,2025 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -11,13 +11,30 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+static void S_extract_timeval(pTHX_ struct timeval *tvp, SV *sv)
+{
+  if(SvNOK(sv)) {
+    NV nv = SvNV(sv);
+    tvp->tv_sec  = (long)nv;
+    tvp->tv_usec = 1000000 * (nv - tvp->tv_sec);
+  }
+  else if(SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
+    AV *av = (AV *)SvRV(sv);
+    if(AvFILL(av) < 1)
+      croak("Expected an ARRAY reference of at least 2 elements");
+    tvp->tv_sec  = SvUV(*av_fetch(av, 0, 0));
+    tvp->tv_usec = SvUV(*av_fetch(av, 1, 0));
+  }
+  else {
+    tvp->tv_sec  = SvUV(sv);
+    tvp->tv_usec = 0;
+  }
+}
+
 MODULE = File::lchown    PACKAGE = File::lchown
 
 int
-lchown(uid, gid, ...)
-    int uid
-    int gid
-
+lchown(int uid, int gid, ...)
   PREINIT:
     int i;
 
@@ -34,10 +51,7 @@ lchown(uid, gid, ...)
     RETVAL
 
 int
-lutimes(atime, mtime, ...)
-    SV *atime
-    SV *mtime
-
+lutimes(SV *atime, SV *mtime, ...)
   PREINIT:
     struct timeval tv[2];
     struct timeval *tvp;
@@ -48,12 +62,8 @@ lutimes(atime, mtime, ...)
     if(!SvOK(atime) && !SvOK(mtime))
       tvp = NULL;
     else {
-      tv[0].tv_sec  = SvUV(atime);
-      tv[0].tv_usec = 0;
-
-      tv[1].tv_sec  = SvUV(mtime);
-      tv[1].tv_usec = 0;
-
+      S_extract_timeval(aTHX_ &tv[0], atime);
+      S_extract_timeval(aTHX_ &tv[1], mtime);
       tvp = tv;
     }
 

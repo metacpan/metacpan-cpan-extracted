@@ -112,3 +112,5 @@ Revision history for Perl extension B::Keywords.
   - Updated README
 1.27 2024-05-27 12:13 rurban
   - Add bareword __CLASS__ since 5.39.2
+1.28 2025-06-25 08:52 rurban
+  - Add keywords any, all since 5.42.0

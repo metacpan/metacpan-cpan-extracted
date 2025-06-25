@@ -4,7 +4,7 @@ Promises - An implementation of Promises in Perl
 
 # VERSION
 
-version 1.04
+version 1.05
 
 # SYNOPSIS
 
@@ -83,7 +83,7 @@ was rejected, only rejected handlers in the chain would be called.
 ## Relation to the various Perl event loops
 
 This module is actually Event Loop agnostic, the SYNOPSIS above
-uses [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent::HTTP), but that is just an example, it can work
+uses [AnyEvent::HTTP](https://metacpan.org/pod/AnyEvent%3A%3AHTTP), but that is just an example, it can work
 with any of the existing event loops out on CPAN. Over the next
 few releases I will try to add in documentation illustrating each
 of the different event loops and how best to use Promises with
@@ -139,11 +139,11 @@ event loop AnyEvent is using.
 
 See:
 
-- [Promises::Deferred::AE](https://metacpan.org/pod/Promises::Deferred::AE)
-- [Promises::Deferred::AnyEvent](https://metacpan.org/pod/Promises::Deferred::AnyEvent)
-- [Promises::Deferred::EV](https://metacpan.org/pod/Promises::Deferred::EV)
-- [Promises::Deferred::Mojo](https://metacpan.org/pod/Promises::Deferred::Mojo)
-- [Promises::Deferred::IO::Async](https://metacpan.org/pod/Promises::Deferred::IO::Async)
+- [Promises::Deferred::AE](https://metacpan.org/pod/Promises%3A%3ADeferred%3A%3AAE)
+- [Promises::Deferred::AnyEvent](https://metacpan.org/pod/Promises%3A%3ADeferred%3A%3AAnyEvent)
+- [Promises::Deferred::EV](https://metacpan.org/pod/Promises%3A%3ADeferred%3A%3AEV)
+- [Promises::Deferred::Mojo](https://metacpan.org/pod/Promises%3A%3ADeferred%3A%3AMojo)
+- [Promises::Deferred::IO::Async](https://metacpan.org/pod/Promises%3A%3ADeferred%3A%3AIO%3A%3AAsync)
 
 ## Relation to Promises/Futures in Scala
 
@@ -154,44 +154,44 @@ cookbook entry below.
 
 ## Cookbook
 
-- [Promises::Cookbook::GentleIntro](https://metacpan.org/pod/Promises::Cookbook::GentleIntro)
+- [Promises::Cookbook::GentleIntro](https://metacpan.org/pod/Promises%3A%3ACookbook%3A%3AGentleIntro)
 
     Read this first! This cookbook provides a step-by-step explanation
     of how Promises work and how to use them.
 
-- [Promises::Cookbook::SynopsisBreakdown](https://metacpan.org/pod/Promises::Cookbook::SynopsisBreakdown)
+- [Promises::Cookbook::SynopsisBreakdown](https://metacpan.org/pod/Promises%3A%3ACookbook%3A%3ASynopsisBreakdown)
 
     This breaks down the example in the SYNOPSIS and walks through
     much of the details of Promises and how they work.
 
-- [Promises::Cookbook::TIMTOWTDI](https://metacpan.org/pod/Promises::Cookbook::TIMTOWTDI)
+- [Promises::Cookbook::TIMTOWTDI](https://metacpan.org/pod/Promises%3A%3ACookbook%3A%3ATIMTOWTDI)
 
     Promise are just one of many ways to do async programming, this
     entry takes the Promises SYNOPSIS again and illustrates some
     counter examples with various modules.
 
-- [Promises::Cookbook::ChainingAndPipelining](https://metacpan.org/pod/Promises::Cookbook::ChainingAndPipelining)
+- [Promises::Cookbook::ChainingAndPipelining](https://metacpan.org/pod/Promises%3A%3ACookbook%3A%3AChainingAndPipelining)
 
     One of the key benefits of Promises is that it retains much of
     the flow of a synchronous program, this entry illustrates that
     and compares it with a synchronous (or blocking) version.
 
-- [Promises::Cookbook::Recursion](https://metacpan.org/pod/Promises::Cookbook::Recursion)
+- [Promises::Cookbook::Recursion](https://metacpan.org/pod/Promises%3A%3ACookbook%3A%3ARecursion)
 
     This entry explains how to keep the stack under control when
     using Promises recursively.
 
-- [Promises::Cookbook::ScalaFuturesComparison](https://metacpan.org/pod/Promises::Cookbook::ScalaFuturesComparison)
+- [Promises::Cookbook::ScalaFuturesComparison](https://metacpan.org/pod/Promises%3A%3ACookbook%3A%3AScalaFuturesComparison)
 
     This entry takes some examples of Futures in the Scala language
     and translates them into Promises. This entry also showcases
-    using Promises with [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent).
+    using Promises with [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent).
 
 # EXPORTS
 
 - `deferred`
 
-    This just creates an instance of the [Promises::Deferred](https://metacpan.org/pod/Promises::Deferred) class
+    This just creates an instance of the [Promises::Deferred](https://metacpan.org/pod/Promises%3A%3ADeferred) class
     it is purely for convenience.
 
     Can take a coderef, which will be dealt with as a `then` argument.
@@ -218,7 +218,7 @@ cookbook entry below.
 
 - `resolved( @values )`
 
-    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises::Deferred) resolved with
+    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises%3A%3ADeferred) resolved with
     the provided `@values`. Purely a shortcut for
 
     ```perl
@@ -228,7 +228,7 @@ cookbook entry below.
 
 - `rejected( @values )`
 
-    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises::Deferred) rejected with
+    Creates an instance of [Promises::Deferred](https://metacpan.org/pod/Promises%3A%3ADeferred) rejected with
     the provided `@values`. Purely a shortcut for
 
     ```perl
@@ -238,8 +238,8 @@ cookbook entry below.
 
 - `collect( @promises )`
 
-    Accepts a list of [Promises::Promise](https://metacpan.org/pod/Promises::Promise) objects and then
-    returns a [Promises::Promise](https://metacpan.org/pod/Promises::Promise) object which will be called
+    Accepts a list of [Promises::Promise](https://metacpan.org/pod/Promises%3A%3APromise) objects and then
+    returns a [Promises::Promise](https://metacpan.org/pod/Promises%3A%3APromise) object which will be called
     once all the `@promises` have completed (either as an error
     or as a success).
 
@@ -345,14 +345,14 @@ cookbook entry below.
 ## Perl Alternatives
 
 - [Future](https://metacpan.org/pod/Future)
-- [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise)
+- [Mojo::Promise](https://metacpan.org/pod/Mojo%3A%3APromise)
 
     Part of the [Mojolicious](https://metacpan.org/pod/Mojolicious) package.
 
-- [Promise::ES6](https://metacpan.org/pod/Promise::ES6)
-- [Promise::Tiny](https://metacpan.org/pod/Promise::Tiny)
-- [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises)
-- [Promise::XS](https://metacpan.org/pod/Promise::XS)
+- [Promise::ES6](https://metacpan.org/pod/Promise%3A%3AES6)
+- [Promise::Tiny](https://metacpan.org/pod/Promise%3A%3ATiny)
+- [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent%3A%3AXSPromises)
+- [Promise::XS](https://metacpan.org/pod/Promise%3A%3AXS)
 
 # AUTHOR
 
@@ -360,7 +360,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2014, 2012 by Infinity Interactive, Inc.
+This software is copyright (c) 2025, 2017, 2014, 2012 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

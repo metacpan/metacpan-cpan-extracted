@@ -19,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,6 @@ requires:
   CGI::Info: '0.6'
   Class::Autouse: '0'
   Class::Load: '0'
-  Config::Abstraction: '0'
   DBD::SQLite: '0'
   Data::Validate::IP: '0.25'
   ExtUtils::MakeMaker: '6.64'
@@ -49,11 +48,12 @@ requires:
   Net::Whois::IANA: '0'
   Net::Whois::IP: '0'
   NetAddr::IP: '0'
+  Object::Configure: '0'
   Params::Get: '0'
   Sys::Syslog: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Lingua/issues
   repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.73'
+version: '0.74'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

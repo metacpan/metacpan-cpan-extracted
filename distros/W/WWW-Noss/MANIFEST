@@ -1,5 +1,7 @@
 bin/noss
+bin/nossui
 Changes
+doc/nossui.pod
 lib/WWW/Noss.pm
 lib/WWW/Noss/BaseConfig.pm
 lib/WWW/Noss/Curl.pm

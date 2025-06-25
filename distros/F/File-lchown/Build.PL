@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -23,6 +24,7 @@ $cc->try_compile_run(
    source => <<'EOF' );
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/time.h>
 int main(int argc, char *argv[]) {
   if(lutimes(".", NULL) != 0)
     exit(1);
@@ -34,18 +36,23 @@ my $build = $cc->new_module_build(
    module_name => 'File::lchown',
    configure_requires => {
       'ExtUtils::CChecker' => 0.03,
+      'Module::Build' => 0.4004,
    },
    requires => {
+      'Exporter' => '5.57',
    },
    build_requires => {
       'Module::Build' => 0,
       'Module::Build::Compat' => 0,
       'Test::More' => 0,
    },
+   test_requires => {
+      'Test2::V0' => 0,
+      'Time::HiRes' => 0,
+   },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );
-  
+
 $build->create_build_script;

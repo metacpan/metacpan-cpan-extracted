@@ -1,49 +1,61 @@
 NAME
-    "File::lchown" - modify attributes of symlinks without dereferencing
-    them
+
+    File::lchown - modify attributes of symlinks without dereferencing them
 
 SYNOPSIS
-     use File::lchown qw( lchown lutimes );
 
-     lchown $uid, $gid, $linkpath or die "Cannot lchown() - $!";
-
-     lutimes $atime, $mtime, $linkpath or die "Cannot lutimes() - $!";
+       use File::lchown qw( lchown lutimes );
+    
+       lchown $uid, $gid, $linkpath or die "Cannot lchown() - $!";
+    
+       lutimes $atime, $mtime, $linkpath or die "Cannot lutimes() - $!";
 
 DESCRIPTION
-    The regular "chown" system call will dereference a symlink and apply
+
+    The regular chown system call will dereference a symlink and apply
     ownership changes to the file at which it points. Some OSes provide
     system calls that do not dereference a symlink but instead apply their
     changes directly to the named path, even if that path is a symlink (in
-    much the same way that "lstat" will return attributes of a symlink
-    rather than the file at which it points).
+    much the same way that lstat will return attributes of a symlink rather
+    than the file at which it points).
 
 FUNCTIONS
-  $count = lchown $uid, $gid, @paths
+
+ lchown
+
+       $count = lchown $uid, $gid, @paths;
+
     Set the new user or group ownership of the specified paths, without
     dereferencing any symlinks. Passing the value -1 as either the $uid or
     $gid will leave that attribute unchanged. Returns the number of files
     successfully changed.
 
-  $count = lutimes $atime, $mtime, @paths
+ lutimes
+
+       $count = lutimes $atime, $mtime, @paths;
+
     Set the access and modification times on the specified paths, without
-    dereferencing any symlinks. Passing "undef" as both $atime and $mtime
+    dereferencing any symlinks. Passing undef as both $atime and $mtime
     will update the times to the current system time.
 
-    Note that for both "lchown" and "lutimes", if more than one path is
-    given, if later paths succeed after earlier failures, then the value of
-    $! will not be reliable to indicate the nature of the failure. If you
-    wish to use $! to report on failures, make sure only to pass one path at
-    a time.
+    Note that for both lchown and lutimes, if more than one path is given,
+    if later paths succeed after earlier failures, then the value of $!
+    will not be reliable to indicate the nature of the failure. If you wish
+    to use $! to report on failures, make sure only to pass one path at a
+    time.
 
-TODO
-    *   Implement sub-second precision on "lutimes", most likely by taking
-        floats or two-element ARRAY refs, similar to "Time::HiRes" uses.
+    Since version 0.03 either time may be given as a fractional value, or
+    as an ARRAY reference containing at least two elements. In the latter
+    case, the [0] element should contain the integer seconds and [1] the
+    microseconds part of it; in the same style as Time::HiRes.
 
 SEE ALSO
-    *   lchown(2) - change ownership of a file
 
-    *   lutimes(2) - change file timestamps
+      * lchown(2) - change ownership of a file
+
+      * lutimes(2) - change file timestamps
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 
