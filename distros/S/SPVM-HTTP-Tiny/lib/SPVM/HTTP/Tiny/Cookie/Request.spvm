@@ -21,7 +21,7 @@ class HTTP::Tiny::Cookie::Request extends HTTP::Tiny::Cookie {
     
     my $pairs = StringList->new;
     for my $pair (@$tree) {
-      $pairs->push_array($pair);
+      $pairs->push_($pair);
     }
     
     for (my $i = 0; $i < $pairs->length; $i += 2) {

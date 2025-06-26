@@ -212,22 +212,16 @@ class HTTP::Tiny::Headers {
   
   method parse : void ($chunk : string) {
     
-    my $_ = 0;
-    my $_ = 0;
-    my $_ = 0;
-    my $_ = 0;
-    my $_ = 0;
-    my $_ = 0;
-    my $_ = 0;
-    my $_ = 0;
-    
-    my $headers = $self->{cache} //= List->new(new string[][0]);
+    $self->{state} = "headers";
     $self->{buffer}->push($chunk);
+    my $headers = $self->{cache} //= List->new(new string[][0]);
     my $buffer = $self->{buffer};
     my $size    = $self->max_line_size;
     my $lines   = $self->max_lines;
     
-    $self->{state} = "headers";
+    # TODO: This is not needed. For SPVM or SPVM::Regex bug
+    # $self->{state} = "finished"; removes $buffer if this line does not exists
+    my $buffer_tmp = $buffer;
     
     my $offset = 0;
     while (1) {
@@ -240,17 +234,16 @@ class HTTP::Tiny::Headers {
       
       my $line_buffer = StringBuffer->new($_->match->cap1);
       
+      # TODO: This is not needed. For SPVM or SPVM::Regex bug
+      # $self->{state} = "finished"; removes $line_buffer if this line does not exists
+      my $line_buffer_tmp = $line_buffer;
+      
       # Check line size limit
-
-=pod TODO
-
       if ($offset > $size || $headers->length >= $lines) {
         $self->{state} = "finished";
         $self->{limit} = 1;
         return;
       }
-
-=cut
       
       # New header
       if (my $_ = Re->m($line_buffer, "^(\S[^:]*):\s*(.*)$")) {
@@ -294,17 +287,12 @@ class HTTP::Tiny::Headers {
       }
       
     }
-
-=pod
-
+   
     # Check line size limit
     if ($self->{buffer}->length > $size) {
       $self->{state} = "finished";
       $self->{limit} = 1;
     }
-
-=cut
-
   }
   
   method to_string : string () {

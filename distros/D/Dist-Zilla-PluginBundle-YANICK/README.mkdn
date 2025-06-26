@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 # VERSION
 
-version 0.30.0
+version 0.32.0
 
 # DESCRIPTION
 
@@ -93,12 +93,11 @@ group=STATISTICS
 [UploadToCPAN]
 
 [Git::Push]
-    push_to = github master releases
+    push_to = github main releases
 
 [InstallRelease]
 install_command = cpanm .
 
-[Twitter]
 [SchwartzRatio]
 
 
@@ -108,16 +107,11 @@ install_command = cpanm .
 [DOAP]
 process_changes = 1
 
-[TravisCI]
-verbose = 0
-
 [CPANFile]
 
 [CopyrightYearFromGit]
 
 [GitHubREADME::Badge]
-
-[MinimumPerlFast]
 ```
 
 ## ARGUMENTS
@@ -128,16 +122,15 @@ Passed as `skip` to AutoPrereqs.
 
 ### authority
 
-Passed to [Dist::Zilla::Plugin::Authority](https://metacpan.org/pod/Dist::Zilla::Plugin::Authority).
+Passed to [Dist::Zilla::Plugin::Authority](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AAuthority).
 
 ### fake\_release
 
-If given a true value, uses [Dist::Zilla::Plugin::FakeRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::FakeRelease)
+If given a true value, uses [Dist::Zilla::Plugin::FakeRelease](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AFakeRelease)
 instead of
-[Dist::Zilla::Plugin::Git::Push](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Push),
-[Dist::Zilla::Plugin::UploadToCPAN](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN),
-[Dist::Zilla::Plugin::InstallRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::InstallRelease) and
-[Dist::Zilla::Plugin::Twitter](https://metacpan.org/pod/Dist::Zilla::Plugin::Twitter).
+[Dist::Zilla::Plugin::Git::Push](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGit%3A%3APush),
+[Dist::Zilla::Plugin::UploadToCPAN](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AUploadToCPAN),
+and [Dist::Zilla::Plugin::InstallRelease](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AInstallRelease).
 
 Can also be triggered via the _FAKE_ environment variable.
 
@@ -164,9 +157,9 @@ off the changelog. Defaults to _true_.
 
 ### dev\_branch
 
-Master development branch.
+Main development branch.
 
-Defaults to `master`.
+Defaults to `main`.
 
 ### release\_branch
 
@@ -180,17 +173,16 @@ The name of the upstream repo.
 
 Defaults to `github`.
 
-### travis\_perl\_versions
+### import\_from\_build
 
 ```
-travis_perl_versions = 22,24,26,28,30
+import_from_build = cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md
 ```
 
-Comma-separated list of perl versions (without the leading '5') that
-travis should test. Ranges can be given (`14..16`), for which the
-odd numbers will be skipped. So `14..26` will result in `14,16,18,...`.
+Comma-separated list of files to import in the checked out
+repo from the build.
 
-Defaults to `22..30`.
+Defaults to `cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md`
 
 # AUTHOR
 
@@ -198,7 +190,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
+This software is copyright (c) 2025 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

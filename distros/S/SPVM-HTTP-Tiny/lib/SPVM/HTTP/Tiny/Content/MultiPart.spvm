@@ -26,10 +26,7 @@ class HTTP::Tiny::Content::MultiPart extends HTTP::Tiny::Content {
     
     my $self = new HTTP::Tiny::Content::MultiPart;
     
-    $self->on(read => method : void ($args : object[]) {
-      my $that = (HTTP::Tiny::Content::MultiPart)$args->[0];
-      my $chunk = (string)$args->[0];
-      
+    $self->on(read => method : void ($that : HTTP::Tiny::Content::MultiPart, $chunk : string) {
       $that->_read($chunk);
     });
     
@@ -251,7 +248,7 @@ class HTTP::Tiny::Content::MultiPart extends HTTP::Tiny::Content {
       # New part
       my $part = HTTP::Tiny::Content::Single->new;
       $part->{relaxed} = 1;
-      $self->emit(part => [(object)$part]);
+      $self->emit(part => $part);
       $self->{parts} = (HTTP::Tiny::Content[])Array->merge_object($self->{parts}, [$part]);
       $self->{multi_state} = "multipart_body";
       

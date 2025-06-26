@@ -4,24 +4,28 @@ Dist::Zilla::Plugin::HelpWanted - insert 'Help Wanted' information in the distri
 
 # VERSION
 
-version 0.3.1
+version 0.3.2
 
 # SYNOPSIS
 
 In dist.ini:
 
-    [HelpWanted]
-    positions = maintainer developer translator documenter tester helper
+```
+[HelpWanted]
+positions = maintainer developer translator documenter tester helper
+```
 
 or
 
-    [HelpWanted]
-    maintainer    = 1
-    developer     = 1
-    translator    = 1
-    documenter    = 1
-    tester        = 1
-    helper        = 1
+```
+[HelpWanted]
+maintainer    = 1
+developer     = 1
+translator    = 1
+documenter    = 1
+tester        = 1
+helper        = 1
+```
 
 # DESCRIPTION
 
@@ -44,19 +48,13 @@ The list of possible positions (inspired by
 - tester
 - helper
 
-# SEE ALSO
-
-- OpenHatch ([http://openhatch.org/](http://openhatch.org/)) 
-
-A non-profit site dedicated to matching prospective free software contributors with communities, tools, and education. 
-
 # AUTHOR
 
 Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2025 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

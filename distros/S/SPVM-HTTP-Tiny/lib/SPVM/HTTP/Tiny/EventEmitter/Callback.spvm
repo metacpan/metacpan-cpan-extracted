@@ -5,6 +5,6 @@ class HTTP::Tiny::EventEmitter::Callback : interface_t {
   version_from HTTP::Tiny;
   
   # Interface Methods
-  method : void ($that : object, $args : object[]);
+  method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);
   
 }

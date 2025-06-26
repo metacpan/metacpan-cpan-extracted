@@ -184,7 +184,7 @@ class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
     
     $self->_start_line;
     
-    $self->emit(progress => [(object)"start_line", $offset]);
+    $self->emit(progress => "start_line", $offset);
     
     my $start_buffer_length = length $self->{start_buffer};
     

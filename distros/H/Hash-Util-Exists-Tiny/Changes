@@ -1,5 +1,9 @@
 Revision history for Hash-Util-Exists-Tiny
 
+1.03    2025/06/25
+        Added functions list_exists_unique, num_exists_unique, list_defined_unique and
+        num_defined_unique.
+
 1.02    2025/06/20
         Fixed typo in changelog and in POD.
         Fixed bug in Makefile.PL.

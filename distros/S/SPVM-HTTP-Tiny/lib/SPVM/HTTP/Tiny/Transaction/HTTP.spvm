@@ -53,7 +53,7 @@ class HTTP::Tiny::Transaction::HTTP extends HTTP::Tiny::Transaction {
     
     $self->{res} = HTTP::Tiny::Message::Response->new;
     
-    $self->emit(unexpected => [(object)$res]);
+    $self->emit(unexpected => $res);
     
     my $leftovers = $res->content->leftovers;
     

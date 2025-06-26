@@ -4,7 +4,7 @@
       "Yuki Kimoto<kimoto.yuki@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.990052"
+            "SPVM" : "0.990074"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.990052",
+            "SPVM" : "0.990074",
             "SPVM::Digest::SHA" : "0.065",
             "SPVM::File::Copy" : "0.022",
             "SPVM::File::Temp" : "0.026",
@@ -54,6 +54,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-HTTP-Tiny"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

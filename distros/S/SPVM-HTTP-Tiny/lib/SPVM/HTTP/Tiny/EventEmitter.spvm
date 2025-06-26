@@ -23,14 +23,15 @@ class HTTP::Tiny::EventEmitter {
     $self->on(error => $cb);
   }
   
-  method emit : void ($name : string, $args : object[] = undef) {
+  method emit : void ($name : string, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
     
     my $events = $self->events;
     
     if (my $cbs_list = (List)$events->get($name)) {
       for (my $i = 0; $i < $cbs_list->length; $i++) {
         my $cb = (HTTP::Tiny::EventEmitter::Callback)$cbs_list->get($i);
-        $cb->($self, $args);
+        
+        $cb->($self, $arg1, $arg2, $arg3);
       }
     }
     else {

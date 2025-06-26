@@ -1,8 +1,6 @@
-#!perl
+use Test::More 0.96 tests => 1;
+use Test::Vars;
 
-use Test::More;
-
-eval "use Test::Vars";
-plan skip_all => "Test::Vars required for testing unused vars"
-  if $@;
+subtest 'unused vars' => sub {
 all_vars_ok();
+};

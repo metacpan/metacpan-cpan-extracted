@@ -1,15 +1,17 @@
 use strict;
 use warnings;
 
-use Test::More 0.96;
+use 5.24.0;
+
+use experimental qw/ signatures /;
+
+use Test2::V0;
 
 use Test::DZil;
 use Dist::Zilla::Plugin::MetaYAML;
 use JSON::Any;
 
-sub dzil_yield
-{
-    my %help_wanted = @_;
+sub dzil_yield(%help_wanted) {
 
     my $dist_ini = dist_ini(
         {
@@ -39,19 +41,13 @@ sub dzil_yield
     return [ sort @{ $meta->{x_help_wanted} || [] } ];
 }
 
-is_deeply(
-    dzil_yield(positions => 'maintainer co-maintainer documentation coder translator tester'),
-    [ sort qw( maintainer developer translator documenter tester ) ],
-);
+is dzil_yield(positions => 'maintainer co-maintainer documentation coder translator tester'),
+    [ sort qw( maintainer developer translator documenter tester ) ];
 
-is_deeply(
-    dzil_yield(tester => 1, coder => 1),
-    [ sort qw( developer tester ) ],
-);
+is dzil_yield(tester => 1, coder => 1),
+    [ sort qw( developer tester ) ];
 
-is_deeply(
-    dzil_yield(positions => 'helper documentation'),
-    [ sort qw( documenter helper ) ],
-);
+is dzil_yield(positions => 'helper documentation'),
+    [ sort qw( documenter helper ) ];
 
 done_testing;

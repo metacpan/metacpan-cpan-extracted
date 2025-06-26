@@ -1,5 +1,10 @@
 Revision history for Socket
 
+2.039   2025-06-25
+        [BUGFIXES]
+         * Make sure to invoke GETMAGIC on arguments to `pack_sockaddr_in` and
+           `pack_sockaddr_in6` (RT166524)
+
 2.038   2024-04-15
         [CHANGES]
          * Add extra TCP_ and IPV6_ constants for Linux (RT143712)

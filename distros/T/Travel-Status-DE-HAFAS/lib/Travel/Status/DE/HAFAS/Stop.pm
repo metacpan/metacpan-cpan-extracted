@@ -8,7 +8,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '6.20';
+our $VERSION = '6.21';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 	qw(loc
@@ -41,8 +41,10 @@ sub new {
 
 	# dIn. / aOut. -> may passengers enter / exit the train?
 
-	my $sched_platform   = $stop->{aPlatfS}  // $stop->{dPlatfS};
-	my $rt_platform      = $stop->{aPlatfR}  // $stop->{dPlatfR};
+	my $sched_platform = $stop->{aPlatfS} // $stop->{dPlatfS}
+	  // $stop->{aPltfS}{txt} // $stop->{dPltfS}{txt};
+	my $rt_platform = $stop->{aPlatfR} // $stop->{dPlatfR}
+	  // $stop->{aPltfR}{txt} // $stop->{dPltfR}{txt};
 	my $changed_platform = $stop->{aPlatfCh} // $stop->{dPlatfCh};
 
 	my $arr_cancelled = $stop->{aCncl};
@@ -227,7 +229,7 @@ Travel::Status::DE::HAFAS::Stop - Information about a HAFAS stop.
 
 =head1 VERSION
 
-version 6.20
+version 6.21
 
 =head1 DESCRIPTION
 

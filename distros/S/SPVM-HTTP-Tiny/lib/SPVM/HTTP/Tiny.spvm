@@ -2,7 +2,7 @@
 # MIT License
 
 class HTTP::Tiny {
-  version "0.011";
+  version "0.012";
   
   use Fn;
   use Re;

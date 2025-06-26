@@ -1,8 +1,25 @@
+Revision history for Module::Signature.
+
+0.92 -- Wed Jun 25 14:29:30 ADT 2025
+
+* Release 0.91-TRIAL as production release.  Includes:
+* Add SECURITY.md policy
+* move to three-arg open
+* Remove spaces from eol
+* Change build process to Dist::Zilla
+
+0.91 -- Tue Jun 24 12:18:51 ADT 2025
+
+* Add SECURITY.md policy
+* move to three-arg open
+* Remove spaces from eol
+* Change build process to Dist::Zilla
+
 [Changes for 0.90 - Wed Jun 11 21:51:22 ADT 2025]
 
 * Fixes RT#166901: Suspicious fail on signature file with an unexpected empty line
 
-[Changes for 0.89 - Fri Sep 13 21:56:06 ADT 2024] 
+[Changes for 0.89 - Fri Sep 13 21:56:06 ADT 2024]
 
 * Replace keyserver with keyserver.ubuntu.com (haarg)
 
@@ -238,7 +255,7 @@ Fix various issues reported by John Lightsey:
 * Move under SVK version control management; ditch keyword tags.
 
 * Michael Schwern pointed out that during development, the
-  "signature.t" file would keep failing. 
+  "signature.t" file would keep failing.
 
 * Documented how to generate SIGNATURE files as part of "make dist",
   for Module::Install, ExtUtils::MakeMaker and Module::Build users .
@@ -401,7 +418,7 @@ Fix various issues reported by John Lightsey:
 * Warn about potential 'Makefile' exploit as pointed out by Tels.
   Document pending.
 
-* Bugfix for incorrect 'MALFORMED' response to signatures made from 
+* Bugfix for incorrect 'MALFORMED' response to signatures made from
   older versions of GnuPG, as reported by Tels.
 
 [Changes for 0.18 - 2002-11-04]

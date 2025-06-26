@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,36 +12,36 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 bdf57e7cf3e9063a84d56df3f454f62cee638219 AUTHOR_PLEDGE
-SHA1 dc51cae02a67955fe2ced58ef55493e147c48e84 CODE_OF_CONDUCT.md
-SHA1 7725c510e53fce866158025edb3602581defe4de CONTRIBUTORS
-SHA1 d46ccbdbd7cbcb1cc3aa462b57f5586566bf41a9 Changes
-SHA1 9c907e7c9bdd027b253a328e471639ea45f1d195 INSTALL
-SHA1 62870465e517624bc20bb5f04fd43bc0a342fd49 LICENSE
-SHA1 9382ffdb6bafe7b32c689b6660972e0c0355f35b MANIFEST
-SHA1 693dc36b902187134ebbf5d559ad2bc66374ee46 META.json
-SHA1 dccea97d073ca6f2c0c55a4c4a9ef2f54b729ab6 META.yml
-SHA1 520f2b64764ea2db9039cc72e41098a9494873b5 Makefile.PL
-SHA1 6ca7307f70284a24d12217dee4398064b8d73e46 README.mkdn
-SHA1 d01bd5e61cbdf86e2d75fe6d03d16a0371ee5945 cpanfile
-SHA1 8425d1b10290c18c24380d9ae73dfebb175620b2 doap.xml
-SHA1 43e92305fc6098712f5c178bcc5058cea87abf05 lib/Dist/Zilla/MintingProfile/Author/YANICK.pm
-SHA1 2dbc1c0b493a77f355f6534616fa58e59322f1fb lib/Dist/Zilla/PluginBundle/YANICK.pm
-SHA1 0b51825e173f2e8c9ffee75e0d734c9705b701e2 share/profiles/default/Module.pm
-SHA1 ef4562036fe1014c7929c0d7a887d7236bd8a088 share/profiles/default/profile.ini
-SHA1 a70ae04ccaab747a11514bc7878f224993314fac share/profiles/default/skel/.gitignore
-SHA1 bf443072d48f2cafe3428b3936b108c95bff1bc6 share/profiles/default/skel/Changes
-SHA1 c8f95def5b8c0cc669a967ac2b0b89998d69a1df share/profiles/default/skel/MANIFEST.SKIP
-SHA1 e423a7053031e1df727b6132f68e2aa15ee08a41 share/profiles/default/skel/dist.ini
-SHA1 c25b3406502d90e0c02d31fcb65246d00b79c05e t/00-compile.t
-SHA1 092dcf4f4210465445d2622e873e47dd3583824e t/00-report-prereqs.dd
-SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
-SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+SHA256 3b96ddc0d3be2d25cdf2a014b360893a08c5bb89f94f11a05e5928ce169ac0fa AUTHOR_PLEDGE
+SHA256 6238bb7d4a4e1028777feb605f4f3253efe2baf2b24635f255a18bc51ea63be7 CODE_OF_CONDUCT.md
+SHA256 e3000bace3df47716193e1b4c343a7d24756f00f8da431f7d8ce7ee898493eb4 CONTRIBUTORS
+SHA256 0e95af63187a4c39365025ff3f04e3b2de09a901e6424835caec68b10af602e7 Changes
+SHA256 73d1594c60450cdd29affb62daeb15c46991b5fda80ebb3ac48bfbc0fb2ef106 INSTALL
+SHA256 29a1c02d4906cf9417bb7bf204e4a45704a111d471b3669d781b52a7420c4662 LICENSE
+SHA256 f4af161de13d3f3f73d80773b98cca2d276be98182087494ae304c2f3f02c708 MANIFEST
+SHA256 12ff7a41dca078176d88e68a18a5b9b72afb8ab91fad4914d588a7eabe829465 META.json
+SHA256 2ce1059ea716976bbd4bff52563e5cb3bf7cb89dd60c8603ff2a24079f867ec5 META.yml
+SHA256 0369cf0362d4463a279e6d617fdfa91ee54a7255e7165d4345c03aa3a76c7772 Makefile.PL
+SHA256 b1c95393d2ca2250716c8b2c825c55b5dd5656f24cc3a1945497eb84baa86d02 README.mkdn
+SHA256 ffe2e851944770b5a93675ebc1e664adf1298bd31d0892d1662b3c27a83a3269 cpanfile
+SHA256 c0d0a34d238d7e9a1e23b1d52ec2c3ea4cdc2c25499f4be0942ef441b8381bd7 doap.xml
+SHA256 4345c112f3fbd43217259c8d2da3b3d10078cb43e0a758eae113b6747a014c22 lib/Dist/Zilla/MintingProfile/Author/YANICK.pm
+SHA256 55214afedff7f698def08181b8c958184c6165f7148eb9ad7b4d3bb70fddea76 lib/Dist/Zilla/PluginBundle/YANICK.pm
+SHA256 0fa8aa259917a9325279299f5c4366d1e47425becb57aaaab49ffd02a692b4df share/profiles/default/Module.pm
+SHA256 6de5bea44e48f8aba792b48cd6b31d4424e7924bb7873d6982b093cdac1a1c1f share/profiles/default/profile.ini
+SHA256 d9e3b94becb3cf9202243a53c2389ba91c30124bdd25abb2e641ca578194d30d share/profiles/default/skel/.gitignore
+SHA256 09504b38420b8e3c02edc327364e590ac0f89ad952c076853b20cfb80f555443 share/profiles/default/skel/Changes
+SHA256 772d1fb01d71764a422983e0712983813085048a76f248915dd6f631298e2241 share/profiles/default/skel/MANIFEST.SKIP
+SHA256 46ed74e9670c00106673cfc494be34ee381b5c0ba96568663c7a84498977f81b share/profiles/default/skel/dist.ini
+SHA256 74dca9ec74548bb10b3784d0be7b83a188f45239db6c1beb9c4d9585f50a13cc t/00-compile.t
+SHA256 a41b7be48d672ae023694ec19830ccaca9e82a94c3bbfafd84cf8adb2d4ad039 t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 d34f839d8340478663bd6ae59c72760d7e1a2b7a2d4879ad1ec97db1a2271b2f xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAl0RbeIACgkQ34Hwf+GwC4yaTACgzg1RYgEUzrrxdII0tpYzessn
-27sAnjw8u++1ApNAWYwskcc/4/JcnzzF
-=blmZ
+iF0EAREDAB0WIQS4RMr2LZlyA/IlbHHfgfB/4bALjAUCaFx8IwAKCRDfgfB/4bAL
+jHFVAKCZhQb9HeNzRYMwTfMyosF/GcRxTwCgrW1K6Qm+otnd69oHua/GWpzU0Mg=
+=pok+
 -----END PGP SIGNATURE-----

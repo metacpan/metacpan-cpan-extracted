@@ -197,7 +197,7 @@ class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
   method get_start_line_chunk : string ($offset : int) {
     
     $self->_start_line;
-    $self->emit(progress => [(object)"start_line", $offset]);
+    $self->emit(progress => "start_line", $offset);
     
     return Fn->substr($self->{start_buffer}, $offset, 131072);
   }

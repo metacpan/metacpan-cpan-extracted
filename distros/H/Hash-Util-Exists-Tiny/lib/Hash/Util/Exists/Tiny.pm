@@ -6,11 +6,15 @@ use warnings FATAL => 'all';
 
 use Exporter 'import';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 
-our @EXPORT_OK   = qw(exists_one_of  list_exists  num_exists
-                      defined_one_of list_defined num_defined);
+our @EXPORT_OK   = qw(exists_one_of
+                      list_exists list_exists_unique
+                      num_exists  num_exists_unique
+                      defined_one_of
+                      list_defined list_defined_unique
+                      num_defined  num_defined_unique);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 
@@ -25,8 +29,20 @@ sub list_exists {
 }
 
 
+sub list_exists_unique {
+  my %seen;
+  return grep(exists($_[0]->{$_}), grep(!$seen{$_}++, @_));
+}
+
+
 sub num_exists {
   return scalar grep(exists($_[0]->{$_}), @_);
+}
+
+
+sub num_exists_unique {
+  my %seen;
+  return scalar grep(exists($_[0]->{$_}), grep(!$seen{$_}++, @_));
 }
 
 
@@ -40,8 +56,20 @@ sub list_defined {
 }
 
 
+sub list_defined_unique {
+  my %seen;
+  return grep(defined($_[0]->{$_}), grep(!$seen{$_}++, @_));
+}
+
+
 sub num_defined {
   return scalar grep(defined($_[0]->{$_}), @_);
+}
+
+
+sub num_defined_unique {
+  my %seen;
+  return scalar grep(defined($_[0]->{$_}), grep(!$seen{$_}++, @_));
 }
 
 
@@ -58,17 +86,18 @@ Hash::Util::Exists::Tiny - Some hash helper functions related to perl's "exists"
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 
 =head1 SYNOPSIS
 
    use Hash::Util::Exists::Tiny qw(exists_one_of
-                                   list_exists
-                                   num_exists
+                                   list_exists  list_exists_unique
+                                   num_exists   num_exists_unique
                                    defined_one_of
-                                   list_defined
-                                   num_defined);
+                                   list_defined list_defined_unique
+                                   num_defined  num_defined_unique
+                                   );
 
 or
 
@@ -101,10 +130,19 @@ otherwise false. Example:
 Returns the list of entries of C<LIST> that are keys in C<HASH_REF>. Note that
 duplicate keys in C<LIST> are also duplicate in the result.
 
+=item C<list_exists_unique HASH_REF [, LIST]>
+
+Like C<list_exists>, but each duplicated element is only counted once.
+
 =item C<num_exists HASH_REF [, LIST]>
 
 Returns the number of entries in C<LIST> that are keys in C<HASH_REF>.  Note
 that duplicate entries are counted twice.
+
+=item C<num_exists_unique HASH_REF [, LIST]>
+
+Like C<num_exists>, but each duplicated element is only counted once.
+
 
 =item C<defined_one_of HASH_REF [, LIST]>
 
@@ -114,9 +152,19 @@ Like C<exists_one_of>, but looks for defined values.
 
 Like C<list_exists>, but looks for defined values.
 
+=item C<list_defined_unique HASH_REF [, LIST]>
+
+Like C<list_exists_unique>, but looks for defined values.
+
+
 =item C<num_defined HASH_REF [, LIST]>
 
 Like C<num_exists>, but looks for defined values.
+
+
+=item C<num_defined_unique HASH_REF [, LIST]>
+
+Like C<num_exists_unique>, but looks for defined values.
 
 =back
 

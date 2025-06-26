@@ -4,29 +4,25 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-HelpWanted",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -35,51 +31,63 @@
             "Dist::Zilla::Role::Plugin" : "0",
             "List::MoreUtils" : "0",
             "Moose" : "0",
-            "strict" : "0",
+            "experimental" : "0",
+            "perl" : "v5.34.0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "JSON::Any" : "0",
+            "Test2::V0" : "0",
             "Test::DZil" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0",
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "Dist::Zilla::Plugin::HelpWanted" : {
          "file" : "lib/Dist/Zilla/Plugin/HelpWanted.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-dist-zilla-plugin-helpwanted at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-HelpWanted"
+         "web" : "https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-HelpWanted/",
+      "homepage" : "https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted.git",
          "web" : "https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted"
       }
    },
-   "version" : "0.3.1",
+   "version" : "0.3.2",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_contributors" : [
       "Toby Inkster <mail@tobyinkster.co.uk>"
    ],
+   "x_generated_by_perl" : "v5.38.0",
    "x_help_wanted" : [
       "developer"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

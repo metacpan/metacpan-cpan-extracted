@@ -60,7 +60,7 @@ class HTTP::Tiny::Transaction extends HTTP::Tiny::EventEmitter {
     
     $self->{connection} = $id;
     
-    $self->emit(connection => [(object)$id]);
+    $self->emit(connection => $id);
     
   }
   

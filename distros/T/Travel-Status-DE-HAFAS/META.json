@@ -51,39 +51,39 @@
    "provides" : {
       "Travel::Status::DE::HAFAS" : {
          "file" : "lib/Travel/Status/DE/HAFAS.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::Journey" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Journey.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::Location" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Location.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::Message" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Message.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::Polyline" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Polyline.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::Product" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Product.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::Services" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Services.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::Stop" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Stop.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       },
       "Travel::Status::DE::HAFAS::StopFinder" : {
          "file" : "lib/Travel/Status/DE/HAFAS/StopFinder.pm",
-         "version" : "6.20"
+         "version" : "6.21"
       }
    },
    "release_status" : "stable",
@@ -95,6 +95,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DeutscheBahn"
       }
    },
-   "version" : "6.20",
+   "version" : "6.21",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

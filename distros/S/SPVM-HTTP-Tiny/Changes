@@ -1,3 +1,6 @@
+0.012 2025-04-17
+  [Requirement Changes]
+    * Require SPVM 0.990074.
 0.011 2025-04-16
   [Internal Changes]
     * Implement internal classes.

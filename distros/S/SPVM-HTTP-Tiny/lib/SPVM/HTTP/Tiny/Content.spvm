@@ -156,7 +156,7 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     }
     
     unless (length $self->{body_buffer}) {
-      $self->emit(drain => [(object)$offset]);
+      $self->emit(drain => $offset);
     }
     
     if (length $self->{body_buffer}) {
@@ -322,8 +322,8 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
         $need = $len;
       }
       
-      my $chunk = Fn->substr($self->{buffer}, 0, $need);
-      $self->{buffer} = Fn->substr($self->{buffer}, $need);
+      my $chunk = Fn->substr(my $ref = [$self->{buffer}], 0, $need, "");
+      $self->{buffer} = $ref->[0];
       
       $self->_decompress($chunk);
       $self->{size} += length $chunk;
@@ -418,7 +418,7 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     
     # No compression
     unless ($self->auto_decompress && $self->is_compressed) {
-      $self->emit(read => [(object)$chunk]);
+      $self->emit(read => $chunk);
       return;
     }
     
@@ -431,7 +431,7 @@ class HTTP::Tiny::Content extends HTTP::Tiny::EventEmitter {
     my $status = &_inflate($gz, $post_buffer_ref,$out_ref);
     my $out = $out_ref->[0];
     if ($out) {
-      $self->emit(read => [(object)$out]) ;
+      $self->emit(read => $out) ;
     }
     
     # Replace Content-Encoding with Content-Length

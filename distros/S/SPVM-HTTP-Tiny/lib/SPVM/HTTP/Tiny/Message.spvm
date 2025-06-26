@@ -211,7 +211,7 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
   
   method get_body_chunk : string ($offset : int) {
     
-    $self->emit("progress", [(object)"body", $offset]);
+    $self->emit(progress => "body", $offset);
     my $chunk = $self->content->get_body_chunk($offset);
     if (!$chunk || length $chunk) {
       return $chunk;
@@ -224,7 +224,7 @@ class HTTP::Tiny::Message extends HTTP::Tiny::EventEmitter {
   
   method get_header_chunk : string ($offset : int) {
     
-    $self->emit("progress", [(object)"headers", $offset]);
+    $self->emit(progress => "headers", $offset);
     
     $self->fix_headers;
     

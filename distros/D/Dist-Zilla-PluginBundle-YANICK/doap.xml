@@ -293,5 +293,17 @@
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-06-24</dc:issued>
     </Version>
   </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.30.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-06-24</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.31.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2025-06-25</dc:issued>
+    </Version>
+  </release>
   <programming-language>Perl</programming-language>
 </Project>

@@ -3,27 +3,46 @@ abstract: 'Module signature file manipulation'
 author:
   - 'Audrey Tang <cpan@audreyt.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  IPC::Run: 0
-  Test::More: 0
+  ExtUtils::MakeMaker: '6.36'
+  IPC::Run: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
-license: unrestricted
+  ExtUtils::MakeMaker: '6.36'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Module-Signature
-no_index:
-  directory:
-    - inc
-    - t
+provides:
+  Module::Signature:
+    file: lib/Module/Signature.pm
+    version: '0.92'
 requires:
-  File::Temp: 0
-  IO::Socket::INET: 0
-  perl: '5.005'
+  File::Temp: '0'
+  perl: '5.010'
 resources:
-  repository: http://github.com/audreyt/module-signature
-version: '0.90'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Signature
+  repository: git://github.com/audreyt/module-signature.git
+version: '0.92'
+x_contributors:
+  - 'Audrey Tang <audreyt@audreyt.org>'
+  - 'Baldur Kristinsson <baldur.kristinsson@gmail.com>'
+  - 'Christian Loos <cloos@netcologne.de>'
+  - 'David E. Weekly <david@weekly.org>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Niklas Holm <jadedcyborg@gmail.com>'
+  - 'Roy Ivy III <rivy.dev@gmail.com>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Timothy Legge <timlegge@gmail.com>'
+  - 'Wes Young <wes@barely3am.com>'
+x_generated_by_perl: v5.38.2
+x_maintainers:
+  - 'Timothy Legge <timlegge@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
