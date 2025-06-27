@@ -29,7 +29,7 @@ p $obj;
 #     public methods (13):
 #         BUILD
 #         Data::MARC::Field008::Utils:
-#             check_item_form, check_music_accompanying_matter, check_music_composition_form, check_music_format, check_music_literary_text, check_music_part, check_music_transposition_and_arrangement, check_target_audience
+#             check_item_form, check_music_accompanying_matter, check_music_composition_form, check_music_format, check_music_literary_text, check_music_parts, check_music_transposition_and_arrangement, check_target_audience
 #         Error::Pure:
 #             err
 #         Error::Pure::Utils:

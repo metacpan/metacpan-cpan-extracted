@@ -6,7 +6,7 @@ use Error::Pure::Utils qw(clean);
 use MARC::Leader;
 use MARC::Field008;
 use Test::MockObject;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 
 # Test.
@@ -23,6 +23,18 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'leader' is required.\n",
 	"Parameter 'leader' is required.");
+clean();
+
+# Test.
+$leader = MARC::Leader->new->parse('     nam a22        4500');
+eval {
+	MARC::Field008->new(
+		'ignore_data_errors' => 'bad',
+		'leader' => $leader,
+	);
+};
+is($EVAL_ERROR, "Parameter 'ignore_data_errors' must be a bool (0/1).\n",
+	"Parameter 'ignore_data_errors' must be a bool (0/1) (bad).");
 clean();
 
 # Test.

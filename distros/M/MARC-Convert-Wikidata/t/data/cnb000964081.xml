@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01526nam a2200421 a 4500</leader>
+  <controlfield tag="001">cpk20000964081</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20250118155332.0</controlfield>
+  <controlfield tag="007">tu</controlfield>
+  <controlfield tag="008">000516s2000    xr     e      000 1 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000964081</subfield>
+    <subfield code="z">cnb000970263</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-7033-674-9</subfield>
+    <subfield code="q">(váz.) :</subfield>
+    <subfield code="c">Kč 149,00</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-7033-675-7</subfield>
+    <subfield code="q">(brož.) :</subfield>
+    <subfield code="c">Kč 109,00</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)45022846</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">eng</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">821.111-3</subfield>
+    <subfield code="x">Anglická próza, anglicky psaná</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">25</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">821.111-31</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Francis, Dick,</subfield>
+    <subfield code="d">1920-2010</subfield>
+    <subfield code="7">jn19990002376</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="240" ind1="1" ind2="0">
+    <subfield code="a">Whip hand.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun2009528705</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Bič :</subfield>
+    <subfield code="b">detektivní příběh z dostihového prostředí /</subfield>
+    <subfield code="c">Dick Francis ; přeložila Jaroslava Moserová-Davidová</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">3. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Olympia,</subfield>
+    <subfield code="c">2000</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">218 s. ;</subfield>
+    <subfield code="c">21 cm</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Přeloženo z angličtiny</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Large type books</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Halley, Sid (Fictitious character)</subfield>
+    <subfield code="x">Fiction</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Private investigators</subfield>
+    <subfield code="x">Fiction</subfield>
+    <subfield code="z">England</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Horse racing</subfield>
+    <subfield code="x">Fiction</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="9">
+    <subfield code="a">England</subfield>
+    <subfield code="x">Fiction</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">anglické romány</subfield>
+    <subfield code="7">fd131814</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">detektivní romány</subfield>
+    <subfield code="7">fd132010</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">Detective and mystery stories</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">English fiction</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Moserová, Jaroslava,</subfield>
+    <subfield code="d">1930-2006</subfield>
+    <subfield code="7">jk01082123</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="b">9788070336748</subfield>
+    <subfield code="f">3. vyd.</subfield>
+    <subfield code="o">20000529</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000964081</subfield>
+  </datafield>
+</record>
+
+</collection>

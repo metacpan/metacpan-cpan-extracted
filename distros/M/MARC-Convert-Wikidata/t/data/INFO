@@ -2,11 +2,13 @@ INFO
 ====
 cnb000024035.xml - Author of introduction without NKCR AUT ID (700 field).
 cnb000040543.xml - Multiple people roles (700 field).
+cnb000065206.xml - Field 008 with q (Questionable date) = 1969-1991
 cnb000080974.xml - Book series with ISSN (490 field).
 cnb000087983.xml - Translator (700 field).
 cnb000103538.xml - Multiple publishers (710 field).
 cnb000121825.mrc - Date of birth (100 field).
 cnb000403605.mrc - Multiple publishers (260 field). Series (490 field).
+cnb000510591.xml - Two languages (041 field).
 cnb000573607.mrc
 cnb000576456.mrc
 cnb000641953.mrc - Special format of series ordinal (490 field).
@@ -14,6 +16,7 @@ cnb000641953.mrc - Special format of series ordinal (490 field).
 cnb000750575.xml - Field 700 with t subfield.
 cnb000750997.mrc
 cnb000754547.mrc
+cnb000964081.xml - Two editions (paperback, hardback) (020 field).
 cnb000974260.mrc - Has sine loco as publication place.
 cnb001002340.mrc - Right and bad ISBNs.
 cnb001042253.mrc - Publication date in format [19--].
@@ -26,6 +29,7 @@ cnb002341867.mrc - Four ISBNs in two publishing houses with two book covers.
 cnb002467522.mrc - Publisher (264 field). Illustrator (700 field).
 cnb002536669.mrc - Two publishers, two places (264 field). Two ISBNs (020 field). Book series.
 cnb002662450.xml - Three ISBNs (020 field). Two publishing houses and box.
+cnb002835707.xml - 264c has bad date of publication from book, right publication date is in 008, note in 500
 cnb002896853.mrc - Different ČČNB (015 field, z subfield)
 cnb002964680.mrc - Two ISBNs. Book series.
 cnb002981333.mrc - Has OCoLC (035 field).
@@ -35,3 +39,4 @@ cnb003369415.mrc - Has weird format of number of pages (300 field).
 cnb003565872.xml - Has cycle (787 field).
 cnb003591924.xml - Slovak edition.
 cnb003633764.xml - Bad ISBN only.
+

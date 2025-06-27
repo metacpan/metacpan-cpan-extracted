@@ -4,7 +4,7 @@ use warnings;
 use Data::MARC::Field008::Book;
 use English;
 use Error::Pure::Utils qw(clean err_get);
-use Test::More 'tests' => 20;
+use Test::More 'tests' => 16;
 use Test::NoWarnings;
 
 # Test.
@@ -80,10 +80,5 @@ $obj = Data::MARC::Field008::Book->new(
 );
 isa_ok($obj, 'Data::MARC::Field008::Book');
 @errors = err_get;
-is(scalar @errors, 1, 'Number of errors (2).');
-is($errors[0]->{'msg'}->[0], "Parameter 'biography' has bad value.",
-	"Parameter 'biography' has bad value.");
-is($errors[0]->{'msg'}->[1], 'Value', "Error key (Value).");
-is($errors[0]->{'msg'}->[2], 'x', "Error key value (x).");
-is(scalar @{$errors[0]->{'msg'}}, 3, 'Number of error values (3).');
+is(scalar @errors, 0, 'Number of errors (0).');
 clean();

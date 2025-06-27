@@ -1,11 +1,12 @@
 package Bio::MUST::Apps::OmpaPa::Roles::Parsable;
 # ABSTRACT: Parsable Moose role for search report objects
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Roles::Parsable::VERSION = '0.201810';
+$Bio::MUST::Apps::OmpaPa::Roles::Parsable::VERSION = '0.251770';
 use Moose::Role;
 
 use autodie;
 use feature qw(say);
+use version;
 
 use Smart::Comments '###';
 
@@ -25,7 +26,7 @@ use Scalar::Util qw(looks_like_number);
 
 use IO::Prompter [
     -verbatim,
-    -style => 'blue bold dark ',
+    -style => 'blue strong',
     -must  => { 'be a string' => qr{\S+}xms }
 ];
 
@@ -46,14 +47,12 @@ requires 'file', 'collect_hits';
 has 'database' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Core::Types::File',
-    required => 1,
     coerce   => 1,
 );
 
 has 'scheme' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Core::Taxonomy::ColorScheme',
-    required => 0,
 );
 
 has 'extract_seqs' => (
@@ -93,6 +92,19 @@ has 'align' => (
     isa      => 'Num',
 );
 
+has 'gnuplot_term' => (
+    is      => 'ro',
+    isa     => 'Str',
+);
+
+has 'gnuplot_vers' => (
+    is       => 'ro',
+    isa      => 'version',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_gnuplot_vers',
+);
+
 # TODO: switch to coercions? what about Stash?
 
 has '_blastdb' => (
@@ -102,7 +114,6 @@ has '_blastdb' => (
     lazy     => 1,
     builder  => '_build_blastdb',
 );
-
 
 has '_hits' => (
     traits   => ['Array'],
@@ -119,7 +130,6 @@ has '_hits' => (
     },
 );
 
-
 has '_coeffs' => (
     traits   => ['Hash'],
     is       => 'ro',
@@ -133,7 +143,6 @@ has '_coeffs' => (
        get_coeffs => 'get',
     },
 );
-
 
 has '_selection' => (
     traits   => ['Array'],
@@ -152,7 +161,6 @@ has '_selection' => (
     },
 );
 
-
 has '_filter' => (
     traits   => ['Hash'],
     is       => 'ro',
@@ -169,7 +177,6 @@ has '_filter' => (
     },
 );
 
-
 has '_avg_len' => (          # average length of top-25% hits
     is       => 'ro',
     isa      => 'Num',
@@ -177,7 +184,6 @@ has '_avg_len' => (          # average length of top-25% hits
     lazy     => 1,
     builder  => '_build_avg_len',
 );
-
 
 has $_ . '_file' => (
     is       => 'ro',
@@ -187,7 +193,6 @@ has $_ . '_file' => (
     builder  => '_build_' . $_ . '_file',
 ) for qw(idl fas tax json list);
 
-
 has $_ . '_param_file' => (
     is       => 'ro',
     isa      => 'Path::Class::File',
@@ -195,7 +200,6 @@ has $_ . '_param_file' => (
     lazy     => 1,
     builder  => '_build_' . $_ . '_param_file',
 ) for qw(last new);
-
 
 has '_data_handle' => (
     is       => 'ro',
@@ -208,7 +212,6 @@ has '_data_handle' => (
     },
 );
 
-
 has '_plot_handle' => (
     is       => 'ro',
     isa      => 'FileHandle',
@@ -217,18 +220,15 @@ has '_plot_handle' => (
     builder  => '_build_plot_handle',
 );
 
-
 ## no critic (ProhibitUnusedPrivateSubroutines)
 
 sub _build_blastdb {
     return Database->new( file => shift->database );
 }
 
-
 sub _build_idl_file {
     return file( change_suffix( shift->new_param_file, '.idl' ) );
 }
-
 
 sub _build_fas_file {
     return file( change_suffix( shift->new_param_file, '.fasta' ) );
@@ -307,7 +307,6 @@ sub _build_avg_len {
     return $avg_len;
 }
 
-
 sub _build_coeffs {
     my $self = shift;
 
@@ -321,39 +320,24 @@ sub _build_coeffs {
         my $coeff_len = $hit->{len} / $hit->{qlen};
         my $coeff_hmm = ( $hit->{hmm_to} - $hit->{hmm_from} +1 ) / $hit->{qlen};
 
-        my $index;
-        my $tax;
+        my ($index, $label) = $self->scheme
+            ? $self->scheme->icol( $hit->{acc} ) : (undef, undef);
 
-        if ($self->scheme){
-            $index = $self->scheme->icol($hit->{acc});
-            $index = 0 unless($index);
+        # TODO: debug this: GCA_010025385.1
+#         unless (defined $index) {
+#             ### $hit
+#             ### test: $self->scheme->icol( $hit->{acc} )
+#         }
 
-            # TODO: should be in Bio::MUST::Core::Taxonomy::ColorScheme
-            TAX:
-            for my $lin ($self->scheme->tax->fetch_lineage($hit->{acc})){
-
-                NAME:
-                for my $name ($self->scheme->all_names){
-                    unless ($lin eq $name){
-                        next NAME;
-                    }
-                    $tax = $name;
-                }
-
-                if ($tax){
-                    last TAX;
-                }
-            }
-        }
-
-        $coeffs_for{$hit->{acc}} = {org         => $org,
-                                    count       => $count_for{$org},
-                                    max_count   => undef,
-                                    coeff_len   => sprintf("%.3f", $coeff_len),
-                                    align       => sprintf("%.3f", $coeff_hmm),
-                                    tax         => $tax,
-                                    index_tax   => $index,
-                                  };
+        $coeffs_for{ $hit->{acc} } = {
+            org       => $org,
+            count     => $count_for{$org},
+            max_count => undef,
+            coeff_len => sprintf("%.3f", $coeff_len),
+            align     => sprintf("%.3f", $coeff_hmm),
+            tax       => $label,
+            index_tax => $index,
+        };
     }
 
     for my $hit ($self->all_hits) {
@@ -375,6 +359,7 @@ sub _build_data_handle {
     for my $hit ($self->all_hits) {
 
         my $info_for = $self->get_coeffs( $hit->{acc} );
+        #### $info_for
 
         if ($self->scheme) {
             say {$data_handle} join "\t", _eval2log10( $hit->{exp} ),
@@ -387,6 +372,7 @@ sub _build_data_handle {
                 $hit->{len}, $info_for->{count}, $info_for->{align},
                 $info_for->{coeff_len};
         }
+
     }
 
     return $data_handle;
@@ -396,15 +382,28 @@ sub _build_parameters {
     my $self = shift;
 
     if ($self->restore_last_param) {
-        return Parameters->load($self->last_param_file->stringify);
+        return Parameters->load( $self->last_param_file->stringify );
     }
 
     if ($self->align && $self->nb_org) {
-        return Parameters->new(min_cov => $self->align,
-                               max_copy => $self->nb_org);
+        return Parameters->new( min_cov => $self->align,
+                               max_copy => $self->nb_org );
     }
 
     return Parameters->new();
+}
+
+sub _build_gnuplot_vers {
+    my $self = shift;
+
+    # determine gnuplot version
+    # TODO: doc OUM_GNUPLOT_EXEC
+    my $pgm = $ENV{OUM_GNUPLOT_EXEC} // 'gnuplot';
+    my ($version) = qx{$pgm --version} =~ m/gnuplot \s+ (\S+)/xms;
+    ### gnuplot version: $version
+    ### gnuplot terminal: $self->gnuplot_term
+
+    return version->parse($version);
 }
 
 sub _build_plot_handle {
@@ -449,7 +448,7 @@ sub change_filter {
     my $self = shift;
     my $ans;
     # TODO: update wording to match main script
-    do{
+    do {
         $ans = prompt "Would you like to change the limit for filtering the",
                       -menu => { 'number of gene in one organism' => 'O',
                                  'alignment' => 'A',
@@ -498,7 +497,7 @@ sub _build_filter {
     my $self = shift;
 
     my $nb_org = $self->max_copy;
-    my $align = $self->min_cov;
+    my $align  = $self->min_cov;
     my %filter_for;
 
     for my $hit ($self->all_selection) {
@@ -573,7 +572,7 @@ sub save_selection {
 
     $self->idl_file->spew( join("\n", @ids) . "\n" );
 
-    $self->list_file->spew( $self->list_selection( 'keep' ) );
+    $self->list_file->spew( $self->list_selection('keep') );
 
     # optionally write file of seqs
     if ($self->extract_seqs) {
@@ -594,22 +593,9 @@ sub save_selection {
         $ali->store_fasta( $self->fas_file );
     }
 
-    if($self->extract_taxs) {
-
-        unless ($self->scheme) {
-            carp "Warning: cannot extract taxonomies; need option --taxdir";
-            return;
-        }
-
-        my @taxs;
-
-        for my $id (@ids) {
-            my $tax = $self->scheme->classify($id);
-            $tax = "undef" unless ($tax);
-            push @taxs, $tax;
-        }
-
-        $self->tax_file->spew( join("\n", @taxs) . "\n" );
+    if ($self->extract_taxs) {
+        my @labels = map { $self->scheme->classify($_) // "undef" } @ids;
+        $self->tax_file->spew( join("\n", @labels) . "\n" );
     }
 
     return;
@@ -626,14 +612,14 @@ sub fetch_seqs {
 sub _setup_gnuplot {
     my $self = shift;
 
-    # TODO: allow custom X11 templates
     # fill-in command template with relevant object attributes
 
     my $template = $self->_template_gnuplot;
 
     my %longcol_for = ( O => 'organisms',
                         T => 'taxonomy',
-                        A => 'alignment',);
+                        A => 'alignment',
+                        G => 'global / alignment');
 
     # get variables for organism coloration
     my $org_col = $self->_org_col;
@@ -662,19 +648,27 @@ sub _setup_gnuplot {
         my $col_vars = $self->_set_col_variables( $coloration, $org_col,
                                                   $coeff_col, $tax_col );
 
+        my $global = $coloration eq 'G' ? $self->max_copy : undef;
+        my $dt = $self->gnuplot_vers >= version->parse(5) ? q{dt "-"} : q{};
+
         my $tt = Template->new;
         my $vars = {
-            report    => $self->file,
-            avg_len   => int( $self->_avg_len ),    # no fractional length
-            data_file => $self->_data_file,
-            palette   => $col_vars->{ palette },
-            range     => $col_vars->{ len_colors },
-            tic       => $col_vars->{ tic },
-            column    => $col_vars->{ column },
-            top       => $coeff_col->{ top },
-            bottom    => $coeff_col->{ bottom },
-            qlen      => $coeff_col->{ qlen },
-            coloration=> $longcol_for{$coloration},
+            term       => $self->gnuplot_term,
+            report     => $self->file,
+            avg_len    => int( $self->_avg_len ),   # no fractional length
+            data_file  => $self->_data_file,
+            palette    =>  $col_vars->{palette},
+            range      =>  $col_vars->{color_n},
+            tic        =>  $col_vars->{tic},
+            column     =>  $col_vars->{column},
+            limit      =>  $col_vars->{limit},
+            comparison =>  $col_vars->{comparison},
+            top        => $coeff_col->{top},
+            bottom     => $coeff_col->{bottom},
+            qlen       => $coeff_col->{qlen},
+            coloration => $longcol_for{$coloration},
+            global     => $global,
+            dt         => $dt,
         };
 
         # bug when "Undo": have to change colors twice to be correct (sometimes)
@@ -705,14 +699,17 @@ EOT
                           -def => 'N',
                           -menu => { 'Organisms' => 'O',
                                      'Taxonomy'  => 'T',
-                                     'Alignment' => 'A' },
+                                     'Alignment' => 'A',
+                                     'Global'    => 'G' },
                           '>';
         }
 
         else {
             $ans = prompt $msg,
                           -def => 'N',
-                          -menu => { 'Organisms' => 'O', 'Alignment' => 'A' },
+                          -menu => { 'Organisms' => 'O',
+                                     'Alignment' => 'A',
+                                     'Global'    => 'G' },
                           '>';
         }
 
@@ -726,7 +723,7 @@ sub _coeff_col {
     my $self = shift;
 
     my $palette_hmm = "0 \t 'yellow', 0.5 \t 'green', 1 \t 'black'"; # 1 = perfectly aligned
-    my $len_colors_hmm = 1;
+    my $color_n_hmm = 1;
     my $tic_hmm = "\"0\" 0, \"0.2\" 0.2, \"0.4\" 0.4, \"0.6\" 0.6, \"0.8\" 0.8, \"1\" 1";
 
     # TODO: find another way (do it twice: here and in _build_data_handle)
@@ -743,12 +740,12 @@ sub _coeff_col {
     }
 
     my %return = (
-        len_colors_hmm  => $len_colors_hmm,
-        palette_hmm     => $palette_hmm,
-        tic_hmm         => $tic_hmm,
-        top             => $top,
-        bottom          => $bottom,
-        qlen            => $qlen
+        color_n_hmm => $color_n_hmm,
+        palette_hmm => $palette_hmm,
+        tic_hmm     => $tic_hmm,
+        top         => $top,
+        bottom      => $bottom,
+        qlen        => $qlen
     );
 
     return \%return;
@@ -767,23 +764,23 @@ sub _org_col {
 
     my $nb_org_tot = keys %count_orgs;
     my $max = (sort {$a <=> $b} values %count_orgs)[$nb_org_tot-1];
-    my $len_colors = $max;     # range scale palette
+    my $color_n = $max;         # range scale palette
     # limit coloration: 3 (default) or more times the same organism in yellow
     my $limit = $self->max_copy;
     # if black: bug!
     my $palette = "0 \t 'black', 1 \t 'red', $limit \t 'yellow', $max \t 'yellow'";
 
-    if ($limit>$max) {
+    if ($limit > $max) {
         $palette = "0 \t 'black', 1 \t 'red', $max \t 'yellow'";
 
-        if ($max==1) {
+        if ($max == 1) {
             $palette = "0 \t 'black', 1 \t 'red'";
         }
     }
 
     my %return = (
-        len_colors  => $len_colors,
-        palette     => $palette,
+        color_n  => $color_n,
+        palette  => $palette,
     );
 
     return \%return;
@@ -792,49 +789,49 @@ sub _org_col {
 sub _tax_col {
     my $self = shift;
 
-    my %colorcode_for;
-    my @colors = $self->scheme->all_colors;
-    my $len_colors = @colors;
-    $len_colors = $len_colors+0.5;  # range scale palette
+    # make palette for legend
+    my $scheme = $self->scheme;
+    my $color_n = $scheme->count_colors;        # range scale palette
+    my %color_for = $scheme->all_icols;
+    #### %color_for
 
-    my %color_for = $self->scheme->all_icols;
-
-    for my $color (keys %color_for) {
-        $colorcode_for{$color_for{$color}} = $color;
-    }
+    # TODO: exclude black specs?
+    # TODO: warn of dupe specs
+    my %colorcode_for = (
+                           0 => '#000000',      # unclassified hit = black
+        map { $color_for{$_} => $_ } keys %color_for
+    );
+    #### %colorcode_for
 
     my @strings;
-    push @strings, "0 \t \"#000000\"";  # unclassified hit = black
-    push @strings, "0.5 \t \"#000000\"";
-
-    for my $num (sort{$a <=> $b} keys %colorcode_for) {
-        my $string1 = ($num-0.5) . "\t \"" . $colorcode_for{$num} . '"';
-        my $string2 = ($num+0.5) . "\t \"" . $colorcode_for{$num} . '"';
-        push @strings, $string1, $string2;
+    my $inc = 0;
+    for my $num ( sort {$a <=> $b} keys %colorcode_for ) {
+        push @strings, ($num-$inc) . "\t \"" . $colorcode_for{$num} . q{"};
+        $inc ||= $inc + 0.5;
+        push @strings, ($num+$inc) . "\t \"" . $colorcode_for{$num} . q{"};
     }
+    #### @strings
+    my $palette = join q{,}, @strings;
 
-    my $palette = join ",", @strings;
+    # make labels for legend
+    my @names = $scheme->all_names;
 
     my @tics;
-    my @names = $self->scheme->all_names;
-
     for my $label (@names) {
-        my $index = $self->scheme->icol_for($self->scheme->color_for($label));
-        my $string = '"' . $label . "\" \t" . $index;
+        my $index = $self->scheme->icol_for( $scheme->color_for($label) );
+        my $string = q{"} . $label . qq{" \t} . $index;
         push @tics, $string;
     }
-
-    my $tic = join ",", @tics;
+    my $tic_str = join q{,}, @tics;
 
     my %return = (
-        len_colors  => $len_colors,
-        palette     => $palette,
-        tic        => $tic,
+        color_n  => $color_n + 0.5,
+        palette  => $palette,
+        tic      => $tic_str,
     );
 
     return \%return;
 }
-
 
 sub _template_gnuplot {
     my $self = shift;
@@ -845,7 +842,7 @@ x = "-log10(evalue)"
 y = "hit length"
 [% IF print %]set terminal pdf enhanced font ",8"
 set output "[% report %].[% suffix %]_[% coloration %].pdf"
-[% ELSE %]set term X11 title "OmpaPa: [% report %]"
+[% ELSE %]set term [% term %] title "OmpaPa: [% report %]"
 [% END %]set format "%.0f"
 set mouse mouseformat x . ": %3.0f | " . y . ": %4.0f"
 set size square
@@ -854,16 +851,19 @@ set title "Selected hits given hit length and evalue and with \n [% coloration %
 set grid x y
 set xlabel x
 set ylabel y
-set arrow 1 from graph 0, first [% top %] to graph 1, first [% top %] nohead dt "-"
-set arrow 2 from graph 0, first [% bottom %] to graph 1, first [% bottom %] nohead dt "-"
-set arrow 3 from graph 0, first [% qlen %] to graph 1, first [% qlen %] nohead dt "-" lc rgb "blue"
+set arrow 1 from graph 0, first [% top %] to graph 1, first [% top %] nohead [% dt %]
+set arrow 2 from graph 0, first [% bottom %] to graph 1, first [% bottom %] nohead [% dt %]
+set arrow 3 from graph 0, first [% qlen %] to graph 1, first [% qlen %] nohead [% dt %] lc rgb "blue"
 set cbrange[0:[% range %]]
 [% IF tic %]set cbtics ([% tic %])
 [% ELSE %]unset cbtics
 set cbtics
 [% END %]set palette defined ([% palette %])
-[% IF print %]plot "[% data_file %]" using 1:2:[% column %] notitle with points pt 7 ps .2 palette
-[% ELSE %]plot "[% data_file %]" using 1:2:[% column %] notitle with points pt 7 ps 1 palette[% END %]
+[% IF print %][% IF global %][% IF all %]plot "[% data_file %]" using 1:2:[% column %] notitle with points pt 7 ps .2 palette
+[% ELSE %]plot "[% data_file %]" using 1:($[% column %] [%comparison %]= [% limit %] && $3 <= [% global %] ? $2 : 1/0):[% column %] notitle with points pt 7 ps .2 palette[% END %]
+[% ELSE %]plot "[% data_file %]" using 1:($[% column %] [%comparison %]= [% limit %] ? $2 : 1/0):[% column %] notitle with points pt 7 ps .2 palette[% END %]
+[% ELSE %][% IF global %]plot "[% data_file %]" using 1:($[% column %] [%comparison %]= [% limit %] && $3 <= [% global %] ? $2 : 1/0):[% column %] notitle with points pt 7 ps 1 palette
+[% ELSE %]plot "[% data_file %]" using 1:($[% column %] [%comparison %]= [% limit %] ? $2 : 1/0):[% column %] notitle with points pt 7 ps 1 palette[% END %][% END %]
 EOT
 
     return $template;
@@ -878,36 +878,55 @@ sub _set_col_variables {
     my $tax_col     = shift;
 
     my $palette;
-    my $len_colors;
+    my $color_n;
     my $tic;
     my $column;
+    my $limit;
+    my $comparison;
 
     if (uc($coloration) eq 'O') {
         $palette = $org_col->{palette};
-        $len_colors = $org_col->{len_colors};
+        $color_n = $org_col->{color_n};
         $tic = undef;
         $column = 3;
+        $limit = $self->max_copy;
+        $comparison = "<";
     }
 
     elsif (uc($coloration) eq 'T') {
         $palette = $tax_col->{palette};
-        $len_colors = $tax_col->{len_colors};
+        $color_n = $tax_col->{color_n};
         $tic = $tax_col->{tic};
         $column = 6;
+        $limit = '$6';
+        $comparison = "=";
     }
 
     elsif (uc($coloration) eq 'A') {
         $palette = $coeff_col->{palette_hmm};
-        $len_colors = $coeff_col->{len_colors_hmm};
+        $color_n = $coeff_col->{color_n_hmm};
         $tic = $coeff_col->{tic_hmm};
         $column = 4;
+        $limit = $self->min_cov;
+        $comparison = ">";
+    }
+
+    elsif (uc($coloration) eq 'G') {
+        $palette = $coeff_col->{palette_hmm};
+        $color_n = $coeff_col->{color_n_hmm};
+        $tic = $coeff_col->{tic_hmm};
+        $column = 4;
+        $limit = $self->min_cov;
+        $comparison = ">";
     }
 
     my $vars = {
-        palette     => $palette,
-        len_colors  => $len_colors,
-        tic         => $tic,
-        column      => $column,
+        palette    => $palette,
+        color_n    => $color_n,
+        tic        => $tic,
+        column     => $column,
+        limit      => $limit,
+        comparison => $comparison,
     };
 
     return $vars;
@@ -916,12 +935,13 @@ sub _set_col_variables {
 sub print_plot {
     my $self = shift;
     my $suf  = shift;
+    my $all  = shift;
 
     my $template = $self->_template_gnuplot;
 
-    my $org_col = $self->_org_col;
+    my   $org_col = $self->_org_col;
     my $coeff_col = $self->_coeff_col;
-    my @colorations = ('O', 'A');
+    my @colorations = qw(O A G);
 
     my $tax_col;
 
@@ -934,23 +954,32 @@ sub print_plot {
         my $col_vars = $self->_set_col_variables( $coloration, $org_col,
                                                   $coeff_col, $tax_col );
 
+        my $global = $coloration eq 'G' ? $self->max_copy : undef;
+        my $dt = $self->gnuplot_vers >= version->parse(5) ? q{dt "-"} : q{};
+
         my ($basename, $dir) = fileparse( $self->new_param_file, '.json' );
         my $report = join '', $dir, $basename;
+
         my $tt = Template->new;
         my $vars = {
-            report    => $report,
-            avg_len   => int( $self->_avg_len ),    # no fractional length
-            data_file => $self->_data_file,
-            palette   => $col_vars->{ palette },
-            range     => $col_vars->{ len_colors },
-            tic       => $col_vars->{ tic },
-            column    => $col_vars->{ column },
-            top       => $coeff_col->{ top },
-            bottom    => $coeff_col->{ bottom },
-            qlen      => $coeff_col->{ qlen },
-            coloration=> $coloration,
-            suffix    => $suf,
-            print     => 'Y',
+            report     => $report,
+            avg_len    => int( $self->_avg_len ),   # no fractional length
+            data_file  => $self->_data_file,
+            palette    =>  $col_vars->{palette},
+            range      =>  $col_vars->{color_n},
+            tic        =>  $col_vars->{tic},
+            column     =>  $col_vars->{column},
+            limit      =>  $col_vars->{limit},
+            comparison =>  $col_vars->{comparison},
+            top        => $coeff_col->{top},
+            bottom     => $coeff_col->{bottom},
+            qlen       => $coeff_col->{qlen},
+            coloration => $coloration,
+            suffix     => $suf,
+            print      => 'Y',
+            global     => $global,
+            all        => $all,
+            dt         => $dt,
         };
 
         my $print_cmds;
@@ -1009,7 +1038,7 @@ Bio::MUST::Apps::OmpaPa::Roles::Parsable - Parsable Moose role for search report
 
 =head1 VERSION
 
-version 0.201810
+version 0.251770
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Data::Kramerius;
 use Error::Pure qw(err);
 use List::Util qw(any none);
-use MARC::Convert::Wikidata::Object 0.10;
+use MARC::Convert::Wikidata::Object 0.13;
 use MARC::Convert::Wikidata::Object::ExternalId 0.05;
 use MARC::Convert::Wikidata::Object::ISBN;
 use MARC::Convert::Wikidata::Object::Kramerius;
@@ -18,6 +18,8 @@ use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_numbe
 	clean_issn clean_number_of_pages clean_oclc clean_publication_date
 	clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal
 	clean_subtitle clean_title);
+use MARC::Field008 0.03;
+use MARC::Leader 0.05;
 use Readonly;
 use Scalar::Util qw(blessed);
 use URI;
@@ -37,7 +39,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 
 # Constructor.
 sub new {
@@ -45,6 +47,9 @@ sub new {
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Ignore data errors.
+	$self->{'ignore_data_errors'} = 0;
 
 	# MARC::Record object.
 	$self->{'marc_record'} = undef;
@@ -62,6 +67,9 @@ sub new {
 	}
 
 	$self->{'_kramerius'} = Data::Kramerius->new;
+
+	$self->_process_leader;
+	$self->_process_field008;
 
 	# Process people in 100, 700.
 	$self->{'_people'} = {
@@ -140,7 +148,7 @@ sub _construct_kramerius {
 	return;
 }
 
-sub _cover {
+sub _covers {
 	my $self = shift;
 
 	my @cover = $self->_subfield('020', 'q');
@@ -161,13 +169,7 @@ sub _cover {
 		}
 	}
 
-	if (@ret_cover > 1) {
-		err 'Multiple book covers.',
-			'List', (join ',', @ret_cover),
-		;
-	}
-
-	return $ret_cover[0];
+	return @ret_cover;
 }
 
 sub _cycles {
@@ -334,6 +336,29 @@ sub _number_of_pages {
 	return $number_of_pages;
 }
 
+sub _process_field008 {
+	my $self = shift;
+
+	my $field008_string = $self->{'marc_record'}->field('008')->as_string;
+
+	$self->{'_field008'} = MARC::Field008->new(
+		'ignore_data_errors' => $self->{'ignore_data_errors'},
+		'leader' => $self->{'_leader'},
+	)->parse($field008_string);
+
+	return;
+}
+
+sub _process_leader {
+	my $self = shift;
+
+	my $leader_string = $self->{'marc_record'}->leader;
+
+	$self->{'_leader'} = MARC::Leader->new->parse($leader_string);
+
+	return;
+}
+
 sub _process_object {
 	my $self = shift;
 
@@ -353,7 +378,7 @@ sub _process_object {
 		'authors_of_afterword' => $self->{'_people'}->{'authors_of_afterword'},
 		'authors_of_introduction' => $self->{'_people'}->{'authors_of_introduction'},
 		'compilers' => $self->{'_people'}->{'compilers'},
-		'cover' => $self->_cover,
+		'covers' => [$self->_covers],
 		'cycles' => [$self->_cycles],
 		'directors' => $self->{'_people'}->{'directors'},
 		$self->_dml ? ('dml' => $self->_dml) : (),
@@ -514,13 +539,17 @@ sub _process_publisher_field {
 sub _publication_date {
 	my $self = shift;
 
-	my $publication_date = $self->_subfield('264', 'c');
-	if (! $publication_date) {
-		$publication_date = $self->_subfield('260', 'c');
+	my $publication_date = $self->{'_field008'}->date1;
+	if ($self->{'_field008'}->date2 ne '    ') {
+		$publication_date .= '-'.$self->{'_field008'}->date2;
 	}
+#	my $publication_date = $self->_subfield('264', 'c');
+#	if (! $publication_date) {
+#		$publication_date = $self->_subfield('260', 'c');
+#	}
 
 	my $option;
-	($publication_date, $option) = clean_publication_date($publication_date);
+#	($publication_date, $option) = clean_publication_date($publication_date);
 
 	return wantarray ? ($publication_date, $option) : $publication_date;
 }

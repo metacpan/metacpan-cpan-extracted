@@ -2,10 +2,10 @@ package Zonemaster::LDNS;
 
 use 5.014;
 
-our $VERSION = '4.1.0';
+our $VERSION = '5.0.0';
 
 use parent 'Exporter';
-our @EXPORT_OK = qw[to_idn has_idn ldns_version load_zonefile];
+our @EXPORT_OK = qw[lib_version to_idn has_idn has_gost load_zonefile];
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 require XSLoader;
@@ -37,7 +37,7 @@ C<Zonemaster::LDNS> represents a resolver, which is the part of the system respo
 
 =item lib_version()
 
-Returns the ldns version string. Can be exported, but is not by default.
+Returns the ldns version string.
 
 =item to_idn($name, ...)
 

@@ -40,12 +40,6 @@ Zonemaster::LDNS.
 When disabled, libldns is dynamically linked just like other dependencies.
 Enabled by default.
 
-=item --[no-]randomize
-
-This feature is deprecated and will be removed in Zonemaster 2025.1.
-Randomizes the capitalization of returned domain names.
-Disabled by default.
-
 =item --prefix-openssl=PATH
 
 Search for OpenSSL headers and libraries in PATH.
@@ -88,7 +82,6 @@ Enable debug mode, more verbose output.
 my $opt_ed25519        = 1;
 my $opt_idn            = 1;
 my $opt_internal_ldns  = 1;
-my $opt_randomize      = 0;
 my $opt_debug          = 0;
 my $opt_assets         = {
     openssl => {
@@ -110,7 +103,6 @@ GetOptions(
     'ed25519!'         => \$opt_ed25519,
     'idn!'             => \$opt_idn,
     'internal-ldns!'   => \$opt_internal_ldns,
-    'randomize!'       => \$opt_randomize,
     'debug!'           => \$opt_debug,
     'prefix-openssl=s' => \$$opt_assets{openssl}{prefix},
     'openssl-inc=s'    => \$$opt_assets{openssl}{inc},
@@ -120,6 +112,8 @@ GetOptions(
     'ldns-inc=s'       => \$$opt_assets{ldns}{inc},
     'ldns-lib=s'       => \$$opt_assets{ldns}{lib},
 );
+
+perl_version '5.026000'; # Perl v5.26.0 or higher is required for installation.
 
 configure_requires 'Devel::CheckLib'         => 0;
 configure_requires 'ExtUtils::PkgConfig'     => 0;
@@ -316,19 +310,6 @@ if ( $opt_idn ) {
 else {
     print "Feature idn disabled\n";
 }
-
-
-# Internals
-
-if ( $opt_randomize ) {
-    print "Feature randomized capitalization enabled\n";
-    print "WARNING: This feature is DEPRECATED and will be removed in Zonemaster v2025.1.\n";
-    cc_define '-DRANDOMIZE';
-}
-else {
-    print "Feature randomized capitalization disabled\n";
-}
-
 
 sub MY::postamble {
 

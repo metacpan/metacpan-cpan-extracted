@@ -23,7 +23,7 @@ INCLUDE: const-xs.inc
 void
 opcodes()
 PPCODE:
-    if (GIMME == G_ARRAY) {
+    if (GIMME_V == G_ARRAY) {
         int i;
         EXTEND(sp, MAXO);
         /* ([ opcode opname ppaddr check opargs ]) from opnames.h/opcode.h */

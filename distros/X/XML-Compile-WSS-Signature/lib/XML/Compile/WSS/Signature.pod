@@ -11,9 +11,6 @@ XML::Compile::WSS::Signature - WSS Signatures
 
 =head1 SYNOPSIS
 
-B<WARNING: Only limited real-life experience.>  Many optional
-extensions have never been tried.
-
  # You may need a few constants
  use XML::Compile::WSS::Util  qw/:dsig/;
  use XML::Compile::C14N::Util qw/:c14n/;
@@ -29,6 +26,14 @@ extensions have never been tried.
  my $sig    = $wss->signature(sign_method => ...);
 
 =head1 DESCRIPTION
+
+B<WARNING: Only limited real-life experience.>  Many optional
+extensions have never been tried.
+
+B<WARNING: RedHat derivates> like RedHat, Fedora, and AlmaLinux recently
+actively disable SHA1 support.  You may set their systemwide cryptopolicy
+to 'LEGACY', but better use SHA256 or higher.  Defaults of this module
+still use SHA1, which might change in the future.
 
 The generic Web Service Security protocol is implemented by the super
 class L<XML::Compile::WSS|XML::Compile::WSS>.  This extension implements cypto signatures.
@@ -249,8 +254,8 @@ Extends L<"DETAILS" in XML::Compile::WSS|XML::Compile::WSS/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of XML-Compile-WSS-Signature distribution version 2.03,
-built on June 24, 2025. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile-WSS-Signature distribution version 2.04,
+built on June 26, 2025. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 

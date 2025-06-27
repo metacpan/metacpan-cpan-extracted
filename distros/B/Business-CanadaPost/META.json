@@ -1,68 +1,88 @@
 {
-   "abstract" : "Fetch shipping costs for Canada Post",
+   "abstract" : "Fetch shipping costs for Canada Post (DEPRECATED)",
    "author" : [
       "Justin Wheeler",
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-CanadaPost",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Exporter" : 0,
-            "LWP" : 0,
-            "strict" : 0,
-            "vars" : 0
+            "Exporter" : "0",
+            "LWP" : "0",
+            "strict" : "0",
+            "vars" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Carp" : 0,
-            "Scalar::Util" : 0,
-            "Test::More" : "0.94",
-            "perl" : "5.004",
-            "warnings" : 0
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Business::CanadaPost" : {
          "file" : "lib/Business/CanadaPost.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-business-canadapost at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Business-CanadaPost"
+         "web" : "https://github.com/yanick/Business-CanadaPost/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Business-CanadaPost/",
+      "homepage" : "https://github.com/yanick/Business-CanadaPost",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/Business-CanadaPost.git",
          "web" : "https://github.com/yanick/Business-CanadaPost"
       }
    },
-   "version" : "1.06",
-   "x_authority" : "cpan:YANICK"
+   "version" : "1.07",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_contributors" : [
+      "Justin Wheeler <cpan@datademons.com>",
+      "Yanick Champoux <yanick@babyl.ca>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "GPL-2.0-only"
 }
 

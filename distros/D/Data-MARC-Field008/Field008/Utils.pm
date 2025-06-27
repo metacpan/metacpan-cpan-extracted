@@ -74,7 +74,7 @@ Readonly::Array our @TARGET_AUDIENCES => (' ', 'a', 'b', 'c', 'd', 'e', 'f',
 	'g', 'j', '|');
 Readonly::Array our @TYPE_OF_DATES => qw(b c d e i k m n p q r s t u |);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub check_book_biography {
 	my ($self, $key) = @_;
@@ -1495,6 +1495,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

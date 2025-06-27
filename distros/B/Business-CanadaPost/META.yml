@@ -1,36 +1,49 @@
 ---
-abstract: 'Fetch shipping costs for Canada Post'
+abstract: 'Fetch shipping costs for Canada Post (DEPRECATED)'
 author:
   - 'Justin Wheeler'
   - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  Carp: 0
-  Module::Build: 0.3601
-  Scalar::Util: 0
-  Test::More: 0.94
-  perl: 5.004
-  warnings: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Business-CanadaPost
 provides:
   Business::CanadaPost:
     file: lib/Business/CanadaPost.pm
-    version: 1.06
+    version: '1.07'
 requires:
-  Exporter: 0
-  LWP: 0
-  strict: 0
-  vars: 0
+  Exporter: '0'
+  LWP: '0'
+  strict: '0'
+  vars: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Business-CanadaPost
-  homepage: http://search.cpan.org/dist/Business-CanadaPost/
+  bugtracker: https://github.com/yanick/Business-CanadaPost/issues
+  homepage: https://github.com/yanick/Business-CanadaPost
   repository: https://github.com/yanick/Business-CanadaPost.git
-version: 1.06
+version: '1.07'
+x_author_pledge:
+  version: 1
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.02
+x_contributors:
+  - 'Justin Wheeler <cpan@datademons.com>'
+  - 'Yanick Champoux <yanick@babyl.ca>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+x_deprecated: 1
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: GPL-2.0-only

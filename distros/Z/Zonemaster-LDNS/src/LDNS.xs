@@ -154,9 +154,6 @@ new(class, ...)
             }
         }
         sv_setref_pv(RETVAL, class, res);
-#ifdef USE_ITHREADS
-		net_ldns_remember_resolver(RETVAL);
-#endif
     }
     OUTPUT:
         RETVAL
@@ -225,9 +222,6 @@ query(obj, dname, rrtype="A", rrclass="IN")
         RETVAL = sv_setref_pv(newSV(0), "Zonemaster::LDNS::Packet", clone);
         ldns_rdf_deep_free(domain);
         ldns_pkt_free(pkt);
-#ifdef USE_ITHREADS
-        net_ldns_remember_packet(RETVAL);
-#endif
     }
     OUTPUT:
         RETVAL
@@ -271,9 +265,6 @@ query_with_pkt(obj, query_pkt)
         ldns_pkt_set_timestamp(clone, ldns_pkt_timestamp(pkt));
         RETVAL = sv_setref_pv(newSV(0), "Zonemaster::LDNS::Packet", clone);
         ldns_pkt_free(pkt);
-#ifdef USE_ITHREADS
-        net_ldns_remember_packet(RETVAL);
-#endif
     }
     OUTPUT:
         RETVAL
@@ -512,7 +503,7 @@ addr2name(obj,addr_in)
             {
                 ldns_rr *rr = ldns_rr_list_rr(names,i);
                 ldns_rdf *name_rdf = ldns_rr_rdf(rr,0);
-                char *name_str = randomize_capitalization(ldns_rdf2str(name_rdf));
+                char *name_str = ldns_rdf2str(name_rdf);
 
                 SV* sv = newSVpv(name_str,0);
                 mXPUSHs(sv);
@@ -748,21 +739,8 @@ void
 DESTROY(obj)
     Zonemaster::LDNS obj;
     CODE:
-#ifdef USE_ITHREADS
-        net_ldns_forget();
-#endif
         ldns_axfr_abort(obj);
         ldns_resolver_deep_free(obj);
-
-#ifdef USE_ITHREADS
-
-void
-CLONE(class)
-    char *class;
-	CODE:
-		net_ldns_clone_resolvers();
-
-#endif
 
 MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::Packet           PREFIX=packet_
 
@@ -800,9 +778,6 @@ packet_new(objclass,name,type="A",class="IN")
         pkt = ldns_pkt_query_new(rr_name, rr_type, rr_class,0);
         RETVAL = newSV(0);
         sv_setref_pv(RETVAL, objclass, pkt);
-#ifdef USE_ITHREADS
-        net_ldns_remember_packet(RETVAL);
-#endif
     }
     OUTPUT:
         RETVAL
@@ -1222,9 +1197,6 @@ packet_all(obj)
     CODE:
         ldns_rr_list *list = ldns_pkt_all_noquestion(obj);
         RETVAL = sv_setref_pv(newSV(0), "Zonemaster::LDNS::RRList", list);
-#ifdef USE_ITHREADS
-        net_ldns_remember_rrlist(RETVAL);
-#endif
     OUTPUT:
         RETVAL
 
@@ -1288,9 +1260,6 @@ packet_new_from_wireformat(class,buf)
         {
             RETVAL = newSV(0);
             sv_setref_pv(RETVAL, class, pkt);
-#ifdef USE_ITHREADS
-            net_ldns_remember_packet(RETVAL);
-#endif
         }
     }
     OUTPUT:
@@ -1533,22 +1502,10 @@ void
 packet_DESTROY(sv)
     SV *sv;
     CODE:
-#ifdef USE_ITHREADS
-        net_ldns_forget();
-#endif
         SvGETMAGIC(sv);
         ldns_pkt *obj = INT2PTR(ldns_pkt *, SvIV((SV *)SvRV(sv)));
         ldns_pkt_free(obj);
 
-#ifdef USE_ITHREADS
-
-void
-packet_CLONE(class)
-    char *class;
-	CODE:
-		net_ldns_clone_packets();
-
-#endif
 
 MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RRList           PREFIX=rrlist_
 
@@ -1586,9 +1543,6 @@ rrlist_new(objclass, ...)
 
         RETVAL = newSV(0);
         sv_setref_pv(RETVAL, objclass, rrs);
-#ifdef USE_ITHREADS
-        net_ldns_remember_rrlist(RETVAL);
-#endif
     }
     OUTPUT:
         RETVAL
@@ -1691,20 +1645,8 @@ void
 rrlist_DESTROY(obj)
     Zonemaster::LDNS::RRList obj;
     CODE:
-#ifdef USE_ITHREADS
-        net_ldns_forget();
-#endif
         ldns_rr_list_deep_free(obj);
 
-#ifdef USE_ITHREADS
-
-void
-rrlist_CLONE(class)
-    char *class;
-	CODE:
-		net_ldns_clone_rrlists();
-
-#endif
 
 MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR           PREFIX=rr_
 
@@ -1729,16 +1671,13 @@ rr_new_from_string(class,str)
         free(rrtype);
         rr_sv = sv_newmortal();
         sv_setref_pv(rr_sv, rrclass, rr);
-#ifdef USE_ITHREADS
-        net_ldns_remember_rr(rr_sv);
-#endif
         PUSHs(rr_sv);
 
 char *
 rr_owner(obj)
     Zonemaster::LDNS::RR obj;
     CODE:
-        RETVAL = randomize_capitalization(ldns_rdf2str(ldns_rr_owner(obj)));
+        RETVAL = ldns_rdf2str(ldns_rr_owner(obj));
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -1865,22 +1804,8 @@ void
 rr_DESTROY(obj)
     Zonemaster::LDNS::RR obj;
     CODE:
-#ifdef USE_ITHREADS
-        net_ldns_forget();
-#endif
         ldns_rr_free(obj);
 
-#ifdef USE_ITHREADS
-
-void
-rr_CLONE(class)
-    char *class;
-    CODE:
-        if(strEQ(class,"Zonemaster::LDNS::RR")) {
-            net_ldns_clone_rrs();
-        }
-
-#endif
 
 MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR::NS           PREFIX=rr_ns_
 
@@ -1888,7 +1813,7 @@ char *
 rr_ns_nsdname(obj)
     Zonemaster::LDNS::RR::NS obj;
     CODE:
-        RETVAL = randomize_capitalization(ldns_rdf2str(ldns_rr_rdf(obj, 0)));
+        RETVAL = ldns_rdf2str(ldns_rr_rdf(obj, 0));
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -1909,7 +1834,7 @@ char *
 rr_mx_exchange(obj)
     Zonemaster::LDNS::RR::MX obj;
     CODE:
-        RETVAL = randomize_capitalization(D_STRING(obj, 1));
+        RETVAL = D_STRING(obj, 1);
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -1948,7 +1873,7 @@ char *
 rr_soa_mname(obj)
     Zonemaster::LDNS::RR::SOA obj;
     CODE:
-        RETVAL = randomize_capitalization(D_STRING(obj,0));
+        RETVAL = D_STRING(obj,0);
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -1958,7 +1883,7 @@ char *
 rr_soa_rname(obj)
     Zonemaster::LDNS::RR::SOA obj;
     CODE:
-        RETVAL = randomize_capitalization(D_STRING(obj,1));
+        RETVAL = D_STRING(obj,1);
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -2324,7 +2249,7 @@ char *
 rr_nsec_next(obj)
     Zonemaster::LDNS::RR::NSEC obj;
     CODE:
-        RETVAL = randomize_capitalization(D_STRING(obj,0));
+        RETVAL = D_STRING(obj,0);
     OUTPUT:
         RETVAL
 
@@ -2654,7 +2579,7 @@ char *
 rr_ptr_ptrdname(obj)
     Zonemaster::LDNS::RR::PTR obj;
     CODE:
-        RETVAL = randomize_capitalization(D_STRING(obj,0));
+        RETVAL = D_STRING(obj,0);
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -2667,7 +2592,7 @@ char *
 rr_cname_cname(obj)
     Zonemaster::LDNS::RR::CNAME obj;
     CODE:
-        RETVAL = randomize_capitalization(D_STRING(obj,0));
+        RETVAL = D_STRING(obj,0);
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -2679,7 +2604,7 @@ char *
 rr_dname_dname(obj)
     Zonemaster::LDNS::RR::DNAME obj;
     CODE:
-        RETVAL = randomize_capitalization(D_STRING(obj,0));
+        RETVAL = D_STRING(obj,0);
     OUTPUT:
         RETVAL
     CLEANUP:

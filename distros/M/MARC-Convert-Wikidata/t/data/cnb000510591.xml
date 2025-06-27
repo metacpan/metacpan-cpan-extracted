@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02194nam a22003371  4500</leader>
+  <controlfield tag="001">bk195401402</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20140207133118.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">980218s1954    xr afh        000 | cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000510591</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Váz.) :</subfield>
+    <subfield code="c">Kčs 36,00</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)85316815</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">CBA001</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="a">slo</subfield>
+    <subfield code="h">mul</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Naše národní minulost v dokumentech :</subfield>
+    <subfield code="b">chrestomatie k dějinám Československa.</subfield>
+    <subfield code="n">1. díl,</subfield>
+    <subfield code="p">Do zrušení nevolnictví /</subfield>
+    <subfield code="c">k vydání připravil Václav Husa ... [et al.] ; předmluva Václav Husa</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="0">
+    <subfield code="a">Do zrušení nevolnictví</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Nakladatelství Československé akademie věd,</subfield>
+    <subfield code="c">1954</subfield>
+    <subfield code="f">(Práce)</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">563 s., 15 s. obr. příl. :</subfield>
+    <subfield code="b">il., faksim. ;</subfield>
+    <subfield code="c">21 cm</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Československá akademie věd. Sekce filosofie a historie</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Z cizojazyčných dokumentů přeloženo do češtiny a slovenštiny</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Pozn.</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Příručka určená zejména učitelům dějepisu a vysokoškolským posluchačům podává bohatý výběr historických dokumentů, důležitých pro soustavné studium dějin ČSR. Jsou v ní uvedeny texty, charakterizující jak hospodářský, tak i společenský, politický a kulturní vývoj českého a slovenského národa. Osvětlen je tak život a třídní boje našeho lidu, vlastnické vztahy k výrobním prostředkům, vývoj výrobních technik, směna výrobků, vývoj státu a spravní organizace, vývoj jazykový, hrdinství českého a slovenského lidu, bratrské jeho vztahy k národu ruskému i ostatním slovanským národům, jeho solidarita s německým a maďarským lidem v bojích proti společným vykořisťovatelům a utlačovatelům. (Podle předmluvy.)</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Část. slovenský text</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Husa, Václav,</subfield>
+    <subfield code="d">1906-1965</subfield>
+    <subfield code="7">jk01043289</subfield>
+    <subfield code="4">com</subfield>
+    <subfield code="4">aui</subfield>
+  </datafield>
+  <datafield tag="810" ind1="2" ind2=" ">
+    <subfield code="a">Československá akademie věd.</subfield>
+    <subfield code="t">Práce.</subfield>
+    <subfield code="p">Sekce filosofie a historie</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:c4298420-fdd6-11e2-9923-005056827e52</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">ČSR - dějiny - prameny stol. 7.-18. - výbory</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000510591</subfield>
+  </datafield>
+</record>
+
+</collection>

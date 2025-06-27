@@ -4,7 +4,7 @@ DBIx::Class::FilterColumn::ByType - Apply FilterColumn by type instead of name
 
 # VERSION
 
-version 1.122121
+version 1.251750
 
 # SYNOPSIS
 
@@ -29,15 +29,18 @@ Set up filters for the column types you want to convert.
 
 # DESCRIPTION
 
-This module is a subclass of [DBIx::Class::FilterColumn](http://search.cpan.org/perldoc?DBIx::Class::FilterColumn), which allows you to
+This module is a subclass of [DBIx::Class::FilterColumn](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AFilterColumn), which allows you to
 attach filters by column type, as well as by column name. You should look at
-[DBIx::Class::FilterColumn](http://search.cpan.org/perldoc?DBIx::Class::FilterColumn) documentation for a full explanation of how
+[DBIx::Class::FilterColumn](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AFilterColumn) documentation for a full explanation of how
 FilterColumn works.
 
 If you'd like to do something like filter all varchars in your entire schema,
 you would only need to create a base result class, then call
 filter\_columns\_by\_type from there. See t/lib/A/Schema inside the dist for an
 example.
+
+_Note_: as [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) doesn't allow filtering of primary keys, we skip
+these even if they match the column type.
 
 # METHODS
 
@@ -54,7 +57,7 @@ without modification.
 
 # SEE ALSO
 
-[DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class), [DBIx::Class::FilterColumn](http://search.cpan.org/perldoc?DBIx::Class::FilterColumn)
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass), [DBIx::Class::FilterColumn](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AFilterColumn)
 
 # AUTHOR
 
@@ -62,7 +65,7 @@ Matthew Phillips <mattp@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Matthew Phillips.
+This software is copyright (c) 2025 by Matthew Phillips.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

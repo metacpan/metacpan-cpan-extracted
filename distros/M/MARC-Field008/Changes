@@ -1,3 +1,7 @@
+0.03 2025-06-26T15:10:12+02:00
+ - Add 'ignore_data_errors' parameter.
+ - Add tests for computer file material in parse().
+
 0.02 2025-06-21T18:12:09+02:00
  - Add tests for book material in parse().
  - Add tests for errors.

@@ -1,29 +1,30 @@
 Revision history for Perl extension Business::CanadaPost.
 
-1.06      2011-11-30
-    - Switch to dist::zilla.
-    - Add LWP dependency.
+1.07 2025-06-26
+ [STATISTICS]
+ - code churn: 7 files changed, 195 insertions(+), 24 deletions(-)
+
+1.06 2011-11-30
+ - Switch to dist::zilla.
+ - Add LWP dependency.
 
 1.05 21-11-2011 
-    - Changed added of the Canada Post server.
+ - Changed added of the Canada Post server.
 
-1.04  Sun Sep 25 20:15:54 2005
-	- Fixed some bugs for when Canada Post returns an error on the shipment.
-	- Fixed some bad POD markup.
+1.04 2005-09-25T20:15:54Z
+ - Fixed some bugs for when Canada Post returns an error on the shipment.
+ - Fixed some bad POD markup.
 
-1.02  Thu Jun 09 22:10:17 2005
-	- Fixed some bugs including:
-		- Bad regex for CanadaPost comments.
-		- Fixed a function name. (getfrompostalcode)
-		- Fixed a bug when Canada Post returns an invalid date
-		  (ie '1 to 3 months') for estimated delivery date.
-		- Fixed getnextdayam to properly return 1 or 0.
-	- Added getinsurance.
-	- Made it set an error variable on error instead of it
-	  being fatal.
+1.02 2005-06-09T22:10:17Z
+ - Fixed some bugs including: - Bad regex for CanadaPost comments. - Fixed
+   a function name. (getfrompostalcode) - Fixed a bug when Canada Post
+   returns an invalid date (ie '1 to 3 months') for estimated delivery
+   date. - Fixed getnextdayam to properly return 1 or 0.
+ - Added getinsurance.
+ - Made it set an error variable on error instead of it being fatal.
 
-1.01  Sat Jun 04 11:05:36 2005
-	- Renamed to Business::CanadaPost for CPAN.
+1.01 2005-06-04T11:05:36Z
+ - Renamed to Business::CanadaPost for CPAN.
 
-1.00  Tue May 31 15:28:46 2005
-	- First release.
+1.00 2005-05-31T15:28:46Z
+ - First release.

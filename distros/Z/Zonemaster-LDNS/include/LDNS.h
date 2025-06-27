@@ -107,7 +107,6 @@ typedef ldns_rr *Zonemaster__LDNS__RR__X25;
 #define D_U32(what,where) ldns_rdf2native_int32(ldns_rr_rdf(what,where))
 
 SV *rr2sv(ldns_rr *rr);
-char *randomize_capitalization(char *in);
 void strip_newline(char* in);
 
 #ifdef USE_ITHREADS

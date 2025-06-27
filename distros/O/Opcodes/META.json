@@ -4,13 +4,13 @@
       "Reini Urban"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Opcodes",
    "no_index" : {
@@ -29,9 +29,6 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -43,5 +40,6 @@
          "url" : "http://github.com/rurban/Opcodes"
       }
    },
-   "version" : "0.14"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

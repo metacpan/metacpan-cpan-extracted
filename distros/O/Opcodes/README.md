@@ -14,8 +14,6 @@ Opcodes - More Opcodes information from opnames.h and opcode.h
     # Ops which can return other than op->next
     perl -MOpcodes -e'$,=q( );print map {opname $_} grep {Opcodes::maybranch $_} 1..opcodes'
 
-
-
 # DESCRIPTION
 
 # Operator Names and Operator Lists
@@ -39,8 +37,6 @@ return a the description for an OP.
     The opcode information functions all take the integer code, 0..MAX0,
     MAXO being accessed by scalar @opcodes, the length of
     the opcodes array.
-
-
 
 # Opcode Information
 
@@ -85,13 +81,13 @@ Functions names starting with "op" are automatically exported.
     Returns the arguments and types encoded as number acccording
     to the following table, 4 bit for each argument.
 
-        'S',  1,		# scalar
-        'L',  2,		# list
-        'A',  3,		# array value
-        'H',  4,		# hash value
-        'C',  5,		# code value
-        'F',  6,		# file value
-        'R',  7,		# scalar reference
+          'S',  1,            # scalar
+          'L',  2,            # list
+          'A',  3,            # array value
+          'H',  4,            # hash value
+          'C',  5,            # code value
+          'F',  6,            # file value
+          'R',  7,            # scalar reference
 
         + '?',  8,            # optional
 
@@ -108,20 +104,20 @@ Functions names starting with "op" are automatically exported.
     Returns the op class as number according to the following table
     from `opcode.pl`:
 
-        '0',  0,		# baseop
-        '1',  1,		# unop
-        '2',  2,		# binop
-        '|',  3,		# logop
-        '@',  4,		# listop
-        '/',  5,		# pmop
-        '$',  6,		# svop_or_padop
-        '#',  7,		# padop
-        '"',  8,		# pvop_or_svop
-        '{',  9,		# loop
-        ';',  10,		# cop
-        '%',  11,		# baseop_or_unop
-        '-',  12,		# filestatop
-        '}',  13,		# loopexop
+        '0',  0,            # baseop
+        '1',  1,            # unop
+        '2',  2,            # binop
+        '|',  3,            # logop
+        '@',  4,            # listop
+        '/',  5,            # pmop
+        '$',  6,            # svop_or_padop
+        '#',  7,            # padop
+        '"',  8,            # pvop_or_svop
+        '{',  9,            # loop
+        ';',  10,           # cop
+        '%',  11,           # baseop_or_unop
+        '-',  12,           # filestatop
+        '}',  13,           # loopexop
 
 - opflags (OP)
 
@@ -129,32 +125,32 @@ Functions names starting with "op" are automatically exported.
     from `opcode.pl`. In doubt see your perl source.
     _Warning: There is currently an attempt to change that, but I posted a fix_
 
-        'm' =>  OA_MARK,	 	# needs stack mark
-        'f' =>  OA_FOLDCONST,	# fold constants
-        's' =>  OA_RETSCALAR,	# always produces scalar
-        't' =>  OA_TARGET,		# needs target scalar
-        'T' =>  OA_TARGET | OA_TARGLEX,	# ... which may be lexical
-        'i' =>  OA_RETINTEGER,	# always produces integer (this bit is in question)
-        'I' =>  OA_OTHERINT,	# has corresponding int op
-        'd' =>  OA_DANGEROUS,	# danger, unknown side effects
-        'u' =>  OA_DEFGV,		# defaults to $_
+        'm' =>  OA_MARK,            # needs stack mark
+        'f' =>  OA_FOLDCONST,       # fold constants
+        's' =>  OA_RETSCALAR,       # always produces scalar
+        't' =>  OA_TARGET,          # needs target scalar
+        'T' =>  OA_TARGET | OA_TARGLEX,     # ... which may be lexical
+        'i' =>  OA_RETINTEGER,      # always produces integer (this bit is in question)
+        'I' =>  OA_OTHERINT,        # has corresponding int op
+        'd' =>  OA_DANGEROUS,       # danger, unknown side effects
+        'u' =>  OA_DEFGV,           # defaults to $_
 
     plus not from `opcode.pl`:
 
-        'n' => OA_NOSTACK,		# nothing on the stack, no args and return
-        'N' => OA_MAYBRANCH		# No next. may return other than PL_op->op_next, maybranch
+        'n' => OA_NOSTACK,          # nothing on the stack, no args and return
+        'N' => OA_MAYBRANCH         # No next. may return other than PL_op->op_next, maybranch
 
     These not yet:
 
-        'S' =>  OA_MAYSCALAR 	# retval may be scalar
-        'A' =>  OA_MAYARRAY 	# retval may be array
-        'V' =>  OA_MAYVOID 		# retval may be void
-        'F' =>  OA_RETFIXED 	# fixed retval type, either S or A or V
+        'S' =>  OA_MAYSCALAR        # retval may be scalar
+        'A' =>  OA_MAYARRAY         # retval may be array
+        'V' =>  OA_MAYVOID          # retval may be void
+        'F' =>  OA_RETFIXED         # fixed retval type, either S or A or V
 
 - OA\_\* constants
 
     All OA\_ flag, class and argnum constants from `op.h` are exported.
-    Addionally new OA\_ flags have been created which are needed for [B::CC](https://metacpan.org/pod/B::CC).
+    Addionally new OA\_ flags have been created which are needed for [B::CC](https://metacpan.org/pod/B%3A%3ACC).
 
 - opaliases (OP)
 
@@ -181,7 +177,7 @@ Functions names starting with "op" are automatically exported.
 
 [Safe](https://metacpan.org/pod/Safe) -- Opcode and namespace limited execution compartments
 
-[B::CC](https://metacpan.org/pod/B::CC) -- The optimizing perl compiler uses this module. [Jit](https://metacpan.org/pod/Jit) also,
+[B::CC](https://metacpan.org/pod/B%3A%3ACC) -- The optimizing perl compiler uses this module. [Jit](https://metacpan.org/pod/Jit) also,
             but only the static information
 
 # TEST REPORTS

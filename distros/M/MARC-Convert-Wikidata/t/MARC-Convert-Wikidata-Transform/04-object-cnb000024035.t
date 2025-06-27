@@ -16,6 +16,8 @@ my $data = File::Object->new->up->dir('data');
 # Test.
 my $marc_data = slurp($data->file('cnb000024035.xml')->s);
 my $obj = MARC::Convert::Wikidata::Transform->new(
+	# XXX
+	'ignore_data_errors' => 1,
 	'marc_record' => MARC::Record->new_from_xml($marc_data, 'UTF-8'),
 );
 my $ret = $obj->object;

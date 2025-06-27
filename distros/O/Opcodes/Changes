@@ -1,18 +1,25 @@
 -*- change-log -*-
 Based on CORE Opcode-1.16
 
+0.15	2025-06-27 rurban
+	* fix GIMME deprecation warning
+	* fix some pod and markdown linting issues
+	* added github ci actions
+	* removed unusable t/z_perl_minimum_version.t, added manifest test
+	* added make release target
+
 0.14	2014-07-16 rurban
-        * added .travis.yml and .gitignore
-        * replaced README with README.md
-        * added test_cover and test_coverall targets (37.9%)
+	* added .travis.yml and .gitignore
+	* replaced README with README.md
+	* added test_cover and test_coverall targets (37.9%)
 
 0.13	2013-12-30 rurban
-        * added LICENSE head1 to pod, fixes t/z_kwalitee.t
+	* added LICENSE head1 to pod, fixes t/z_kwalitee.t
 
 0.12	2013-04-05 rurban
 	* remove outdated SIGNATURE and META files from repo.
-        * fix t/kwalitee.t to use generated MYMETA.yml
-        * Update SIGNATURE with new gpg key
+	* fix t/kwalitee.t to use generated MYMETA.yml
+	* Update SIGNATURE with new gpg key
 
 0.11	2011-12-06 rurban
 	* remove Opcode, Carp and AutoLoader, too heavy and not needed.

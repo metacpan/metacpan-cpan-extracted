@@ -14,6 +14,14 @@ METHODS
 
     Constructor.
 
+    *       "ignore_data_errors"
+
+            Flag for ignoring material object errors.
+
+            It's required.
+
+            Default value is 0.
+
     *       "leader"
 
             MARC leader string.
@@ -47,6 +55,8 @@ METHODS
 ERRORS
      new():
              From Mo::utils::check_bool():
+                     Parameter 'ignore_data_errors' must be a bool (0/1).
+                             Value: %s
                      Parameter 'verbose' must be a bool (0/1).
                              Value: %s
              From Mo::utils::check_isa():
@@ -54,6 +64,7 @@ ERRORS
                              Value: %s
                              Reference: %s
              From Mo::utils::check_required():
+                     Parameter 'ignore_data_errors' is required.
                      Parameter 'leader' is required.
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
@@ -191,5 +202,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

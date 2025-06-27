@@ -1,5 +1,8 @@
 Revision history for List-Util-MaybeXS
 
+1.500014 - 2025-06-26
+  - fix sample and shuffle incompletely shuffling the array
+
 1.500013 - 2024-12-16
   - fix comparisons on perl version ($]) to always use numeric operators
 

@@ -11,7 +11,7 @@ use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 
 sub wikidata {
 	my $self = shift;
@@ -77,7 +77,11 @@ sub _description {
 		} elsif (@lang == 1 && $lang[0] eq 'slo') {
 			$ret = decode_utf8('slovenské');
 		} elsif (@lang > 1) {
-			err "Multiple language description isn't supported.";
+			if (@lang == 2 && $lang[0] eq 'cze' && $lang[1] eq 'slo') {
+				$ret = decode_utf8('česko-slovenské');
+			} else {
+				err "Multiple language description isn't supported.";
+			}
 		} else {
 			err "Description for language '$lang[0]' isn't supported.";
 		}
@@ -87,18 +91,42 @@ sub _description {
 		$ret .= decode_utf8('knižní vydání');
 		if (defined $self->{'transform_object'}->publication_date) {
 			$ret .= ' z roku '.$self->{'transform_object'}->publication_date;
+		} elsif (defined $self->{'transform_object'}->start_time) {
+			# XXX cnb003591924
+			if ($self->{'transform_object'}->start_time
+				== $self->{'transform_object'}->end_time) {
+
+				$ret .= ' z roku '.$self->{'transform_object'}->start_time;
+			} else {
+				$ret .= ' z let '.$self->{'transform_object'}->start_time.'-'.
+					$self->{'transform_object'}->end_time;
+			}
 		}
 
 	} elsif ($lang eq 'en') {
 		if (defined $self->{'transform_object'}->publication_date) {
 			$ret = $self->{'transform_object'}->publication_date.' ';
+		} elsif (defined $self->{'transform_object'}->start_time) {
+			# XXX cnb003591924
+			if ($self->{'transform_object'}->start_time
+				== $self->{'transform_object'}->end_time) {
+
+				$ret = $self->{'transform_object'}->start_time.' ';
+			} else {
+				$ret = $self->{'transform_object'}->start_time.'-'.
+					$self->{'transform_object'}->end_time.' ';
+			}
 		}
 		if (@lang == 1 && $lang[0] eq 'cze') {
 			$ret .= 'Czech';
 		} elsif (@lang == 1 && $lang[0] eq 'slo') {
 			$ret .= 'Slovak';
 		} elsif (@lang > 1) {
-			err "Multiple language description isn't supported.";
+			if (@lang == 2 && $lang[0] eq 'cze' && $lang[1] eq 'slo') {
+				$ret .= 'Czech-Slovak';
+			} else {
+				err "Multiple language description isn't supported.";
+			}
 		} else {
 			err "Description for language '$lang[0]' isn't supported.";
 		}

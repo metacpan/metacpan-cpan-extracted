@@ -8,13 +8,13 @@ use Data::MARC::Field008::Utils qw(check_book_biography check_book_festschrift
 	check_conference_publication check_government_publication check_index
 	check_item_form check_target_audience);
 use Error::Pure qw(err);
-use Error::Pure::Utils qw(err_get);
+use Error::Pure::Utils qw(clean err_get);
 use Mo qw(build is);
 use Mo::utils 0.22 qw(check_length_fix check_required);
 
 our $STRICT = 1;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has biography => (
 	is => 'ro',
@@ -103,6 +103,8 @@ sub BUILD {
 				defined $self->raw ? ('Raw string', $self->raw) : (),
 			;
 		}
+	} else {
+		clean();
 	}
 
 	return;
@@ -537,6 +539,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

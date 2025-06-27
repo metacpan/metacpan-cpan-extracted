@@ -1,6 +1,16 @@
 
 ==== version history of XML::Compile:WSS::Signature
 
+version 2.04: Thu 26 Jun 17:01:47 CEST 2025
+
+	Fixes:
+	- remove ::EncrKey::getChecker() because it does not work.
+
+	Improvements:
+	- add EncrKey tests in t/21enckey.t
+	- switch tests to replace SHA1 by SHA384, to pass on RedHat
+	  derivates.  Add warning to docs [Andreas Mock]
+
 version 2.03: Tue 24 Jun 17:38:31 CEST 2025
 
 	Fixes:

@@ -1,7 +1,7 @@
 #
 # This file is part of DBIx-Class-FilterColumn-ByType
 #
-# This software is copyright (c) 2012 by Matthew Phillips.
+# This software is copyright (c) 2025 by Matthew Phillips.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -9,7 +9,7 @@
 package DBIx::Class::FilterColumn::ByType;
 # ABSTRACT: Apply FilterColumn by type instead of name
 BEGIN {
-our $VERSION = '1.122121'; # VERSION
+our $VERSION = '1.251750'; # VERSION
 }
 
 use strict;
@@ -38,8 +38,13 @@ sub filter_columns_by_type {
       # in the case of 1, result_source_instance does not exist at invocation.
     if ($self->can('result_source_instance')) {
       my $cols = $self->columns_info;
+      my %pk_map = map { $_ => 1 } $self->primary_columns;
+
       while (my ($col, $attrs) = each %$cols) {
         next unless $attrs->{data_type} && $attrs->{data_type} eq $type;
+
+        # it isn't allowed to filter primary key columns
+        next if exists $pk_map{$col};
 
         # pass through to filter_columns. let validation happen there
         $self->filter_column($col => $hash);
@@ -64,9 +69,11 @@ sub add_columns {
 
 1;
 
-
+__END__
 
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -74,7 +81,7 @@ DBIx::Class::FilterColumn::ByType - Apply FilterColumn by type instead of name
 
 =head1 VERSION
 
-version 1.122121
+version 1.251750
 
 =head1 SYNOPSIS
 
@@ -109,7 +116,8 @@ you would only need to create a base result class, then call
 filter_columns_by_type from there. See t/lib/A/Schema inside the dist for an
 example.
 
-=encoding utf-8
+I<Note>: as L<DBIx::Class> doesn't allow filtering of primary keys, we skip
+these even if they match the column type.
 
 =head1 METHODS
 
@@ -134,13 +142,9 @@ Matthew Phillips <mattp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Matthew Phillips.
+This software is copyright (c) 2025 by Matthew Phillips.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

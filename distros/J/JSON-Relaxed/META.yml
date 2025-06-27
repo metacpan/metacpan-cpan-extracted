@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.54'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,13 +30,13 @@ no_index:
 provides:
   JSON::Relaxed:
     file: lib/JSON/Relaxed.pm
-    version: '0.097'
+    version: '0.098'
   JSON::Relaxed::ErrorCodes:
     file: lib/JSON/Relaxed/ErrorCodes.pm
-    version: '0.097'
+    version: '0.098'
   JSON::Relaxed::Parser:
     file: lib/JSON/Relaxed/Parser.pm
-    version: '0.097'
+    version: '0.098'
 requires:
   ExtUtils::MakeMaker: '7.54'
   Object::Pad: '0.8'
@@ -46,5 +46,5 @@ resources:
   homepage: https://github.com/sciurius/perl-JSON-Relaxed
   license: https://dev.perl.org/licenses/
   repository: git://github.com/sciurius/perl-JSON-Relaxed.git
-version: '0.097'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.098'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

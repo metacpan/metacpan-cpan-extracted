@@ -5,7 +5,7 @@ use strict;
 
 our($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 
-$VERSION = "0.14";
+$VERSION = "0.15";
 
 use Exporter ();
 use XSLoader ();
@@ -381,10 +381,10 @@ name.
 
 =item maybranch (OP)
 
-Returns if the OP function may return not op->op_next.
+Returns if the OP function may return not op-E<gt>op_next.
 
-Note that not all OP classes which have op->op_other, op->op_first or op->op_last
-(higher then UNOP) are actually returning an other next op than op->op_next.
+Note that not all OP classes which have op-E<gt>op_other, op-E<gt>op_first or op-E<gt>op_last
+(higher then UNOP) are actually returning an other next op than op-E<gt>op_next.
 
   opflags(OP) & 16384
 

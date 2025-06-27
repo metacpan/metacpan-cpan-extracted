@@ -1,0 +1,12 @@
+{
+   "auto_bump" : true,
+   "auto_git" : true,
+   "auto_repo" : false,
+   "auto_scan" : false,
+   "auto_tracker" : false,
+   "write_buildpl" : false,
+   "write_license" : true,
+   "write_manifest" : false,
+   "write_meta" : false,
+   "write_readme" : true
+}

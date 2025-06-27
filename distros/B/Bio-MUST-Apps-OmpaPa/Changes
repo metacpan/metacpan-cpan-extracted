@@ -1,3 +1,11 @@
+0.251770  2025-06-26 23:45:42+02:00 Europe/Brussels
+    - Additions
+       - lib/binaries: added support for non-x11 terminals
+    - Changes
+       - lib/binaries: --database argument is now optional
+    - Fixes
+       - lib/binaries: restored compatibility with gnuplot 4
+
 0.201810  2020-06-29 10:24:23+02:00 Europe/Brussels
 	- first release
 	

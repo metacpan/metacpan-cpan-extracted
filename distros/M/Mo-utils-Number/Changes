@@ -1,3 +1,9 @@
+0.04 2025-06-26T12:21:26+02:00
+ - Add example for check_percent() to doc.
+ - Add example for check_percent_range() to doc.
+ - Add example for check_positive_natural() to doc.
+ - Add example for check_positive_natural_range() to doc.
+
 0.03 2025-06-25T00:07:15+02:00
  - Add range checks.
  - Fix typo in SYNOPSIS section in doc.

@@ -34,9 +34,9 @@ no_index:
     - t
 requires:
   XSLoader: 0.02
-  perl: 5.14.0
+  perl: 5.26.0
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-ldns/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-ldns
-version: 4.1.0
+version: 5.0.0

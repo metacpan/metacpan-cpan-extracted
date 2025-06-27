@@ -5,19 +5,19 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use Data::MARC::Field008;
-use Data::MARC::Field008::Book;
-use Data::MARC::Field008::ComputerFile;
-use Data::MARC::Field008::ContinuingResource;
-use Data::MARC::Field008::Map;
-use Data::MARC::Field008::MixedMaterial;
-use Data::MARC::Field008::Music;
-use Data::MARC::Field008::VisualMaterial;
+use Data::MARC::Field008::Book 0.03;
+use Data::MARC::Field008::ComputerFile 0.03;
+use Data::MARC::Field008::ContinuingResource 0.03;
+use Data::MARC::Field008::Map 0.03;
+use Data::MARC::Field008::MixedMaterial 0.03;
+use Data::MARC::Field008::Music 0.03;
+use Data::MARC::Field008::VisualMaterial 0.03;
 use Error::Pure qw(err);
 use List::Util 1.33 qw(any);
 use Mo::utils 0.08 qw(check_bool check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -25,6 +25,9 @@ sub new {
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Ignore data errors.
+	$self->{'ignore_data_errors'} = 0;
 
 	# Leader.
 	$self->{'leader'} = undef;
@@ -34,6 +37,10 @@ sub new {
 
 	# Process parameters.
 	set_params($self, @params);
+
+	# Check 'ignore_data_errors'.
+	check_required($self, 'ignore_data_errors');
+	check_bool($self, 'ignore_data_errors');
 
 	# Check 'leader'.
 	check_required($self, 'leader');
@@ -124,7 +131,7 @@ sub _parse_different {
 
 			'raw' => substr($field_008, 18, 17),
 		);
-		$Data::MARC::Field008::Book::STRICT = 0;
+		$Data::MARC::Field008::Book::STRICT = $self->{'ignore_data_errors'} ? 0 : 1;
 		my $material = Data::MARC::Field008::Book->new(%mat_params);
 		%params = (
 			'material' => $material,
@@ -141,7 +148,7 @@ sub _parse_different {
 
 			'raw' => substr($field_008, 18, 17),
 		);
-		$Data::MARC::Field008::ComputerFile::STRICT = 0;
+		$Data::MARC::Field008::ComputerFile::STRICT = $self->{'ignore_data_errors'} ? 0 : 1;
 		my $material = Data::MARC::Field008::ComputerFile->new(%mat_params);
 		%params = (
 			'material' => $material,
@@ -161,7 +168,7 @@ sub _parse_different {
 
 			'raw' => substr($field_008, 18, 17),
 		);
-		$Data::MARC::Field008::Map::STRICT = 0;
+		$Data::MARC::Field008::Map::STRICT = $self->{'ignore_data_errors'} ? 0 : 1;
 		my $material = Data::MARC::Field008::Map->new(%mat_params);
 		%params = (
 			'material' => $material,
@@ -182,7 +189,7 @@ sub _parse_different {
 
 			'raw' => substr($field_008, 18, 17),
 		);
-		$Data::MARC::Field008::Music::STRICT = 0;
+		$Data::MARC::Field008::Music::STRICT = $self->{'ignore_data_errors'} ? 0 : 1;
 		my $material = Data::MARC::Field008::Music->new(%mat_params);
 		%params = (
 			'material' => $material,
@@ -208,7 +215,7 @@ sub _parse_different {
 
 			'raw' => substr($field_008, 18, 17),
 		);
-		$Data::MARC::Field008::ContinuingResource::STRICT = 0;
+		$Data::MARC::Field008::ContinuingResource::STRICT = $self->{'ignore_data_errors'} ? 0 : 1;
 		my $material = Data::MARC::Field008::ContinuingResource->new(%mat_params);
 		%params = (
 			'material' => $material,
@@ -227,7 +234,7 @@ sub _parse_different {
 
 			'raw' => substr($field_008, 18, 17),
 		);
-		$Data::MARC::Field008::VisualMaterial::STRICT = 0;
+		$Data::MARC::Field008::VisualMaterial::STRICT = $self->{'ignore_data_errors'} ? 0 : 1;
 		my $material = Data::MARC::Field008::VisualMaterial->new(%mat_params);
 		%params = (
 			'material' => $material,
@@ -241,7 +248,7 @@ sub _parse_different {
 
 			'raw' => substr($field_008, 18, 17),
 		);
-		$Data::MARC::Field008::MixedMaterial::STRICT = 0;
+		$Data::MARC::Field008::MixedMaterial::STRICT = $self->{'ignore_data_errors'} ? 0 : 1;
 		my $material = Data::MARC::Field008::MixedMaterial->new(%mat_params);
 		%params = (
 			'material' => $material,
@@ -367,6 +374,14 @@ Constructor.
 
 =over 8
 
+=item * C<ignore_data_errors>
+
+Flag for ignoring material object errors.
+
+It's required.
+
+Default value is 0.
+
 =item * C<leader>
 
 MARC leader string.
@@ -405,6 +420,8 @@ Returns string.
 
  new():
          From Mo::utils::check_bool():
+                 Parameter 'ignore_data_errors' must be a bool (0/1).
+                         Value: %s
                  Parameter 'verbose' must be a bool (0/1).
                          Value: %s
          From Mo::utils::check_isa():
@@ -412,6 +429,7 @@ Returns string.
                          Value: %s
                          Reference: %s
          From Mo::utils::check_required():
+                 Parameter 'ignore_data_errors' is required.
                  Parameter 'leader' is required.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
@@ -573,6 +591,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

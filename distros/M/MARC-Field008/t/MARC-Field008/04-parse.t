@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use MARC::Leader;
 use MARC::Field008;
-use Test::More 'tests' => 85;
+use Test::More 'tests' => 91;
 use Test::NoWarnings;
 
 # Test.
@@ -58,7 +58,11 @@ is($ret->date1, '1997', 'Get date1 (1997).');
 is($ret->date2, '    ', 'Get date2 (    ).');
 is($ret->language, 'cze', 'Get language (cze).');
 isa_ok($ret->material, 'Data::MARC::Field008::ComputerFile');
-# TODO Material
+is($ret->material->form_of_item, ' ', 'Get computer file material form of item ( ).');
+is($ret->material->government_publication, ' ', 'Get computer file material government publication ( ).');
+is($ret->material->raw, '        m        ', 'Get computer file material raw string (        m        ).');
+is($ret->material->target_audience, ' ', 'Get computer file material target audience ().');
+is($ret->material->type_of_computer_file,  'm', 'Get computer file material computer file type (m).');
 is($ret->material_type, 'computer_file', 'Get material type (computer_file).');
 is($ret->modified_record, ' ', 'Get modified record ( ).');
 is($ret->place_of_publication, 'xr ', 'Get place of publication (xr ).');
@@ -172,3 +176,14 @@ eval {
 };
 is($EVAL_ERROR, "Bad length of MARC 008 field.\n", "Bad length of MARC 008 field.");
 clean();
+
+# Test.
+## cnb000053898
+$leader = MARC::Leader->new->parse('01261nam a2200373   4500');
+$obj = MARC::Field008->new(
+	'ignore_data_errors' => 1,
+        'leader' => $leader,
+);
+## Bad MARC, ignore errors.
+$ret = $obj->parse('900912s1990    xr a         u0|1   cze  ');
+isa_ok($ret, 'Data::MARC::Field008');

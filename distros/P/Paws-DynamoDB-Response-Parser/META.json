@@ -1,0 +1,57 @@
+{
+   "abstract" : "Convert Paws DynamoDB response objects to Perl data structures.",
+   "author" : [
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Paws-DynamoDB-Response-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "Paws::DynamoDB::Response::Parser" : {
+         "file" : "lib/Paws/DynamoDB/Response/Parser.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Paws-DynamoDB-Response-Parser.git",
+         "web" : "https://github.com/manwar/Paws-DynamoDB-Response-Parser"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

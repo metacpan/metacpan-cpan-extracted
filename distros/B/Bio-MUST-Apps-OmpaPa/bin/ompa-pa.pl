@@ -11,7 +11,7 @@ use Smart::Comments;
 
 use IO::Prompter [
     -verbatim,
-    -style => 'blue strong dark',
+    -style => 'blue strong',
     -must  => { 'be a string' => qr{\S+}xms }
 ];
 
@@ -22,7 +22,17 @@ use aliased 'Bio::MUST::Core::Taxonomy::ColorScheme';
 use aliased 'Bio::MUST::Apps::OmpaPa::Blast';
 use aliased 'Bio::MUST::Apps::OmpaPa::Hmmer';
 
-# TODO: re-implement BLAST parsing and nr extraction ; done?
+# TODO: re-implement BLAST parsing and nr extraction; done?
+
+die <<'EOT' if !$ARGV_database && $ARGV_extract_seqs;
+Missing required arguments:
+    --database=<file>
+EOT
+
+die <<'EOT' if !$ARGV_taxdir && $ARGV_extract_tax;
+Missing required arguments:
+    --taxdir=<dir>
+EOT
 
 # setup OmpaPa sub-class based on report type
 my $class = $ARGV_report_type eq 'blastxml' ? Blast : Hmmer;
@@ -42,12 +52,13 @@ if ($ARGV_taxdir) {
 # build args hash for Bio::MUST::Apps::OmpaPa::XXX constructor
 # TODO: update attribute names
 my %args;
-$args{database}           = $ARGV_database;
+$args{database}           = $ARGV_database if $ARGV_database;
 $args{extract_seqs}       = 1 if $ARGV_extract_seqs;
 $args{extract_taxs}       = 1 if $ARGV_extract_tax;
 $args{restore_last_param} = 1 if $ARGV_restore_last_params;
 $args{nb_org}             = $ARGV_max_copy;
 $args{align}              = $ARGV_min_cov;
+$args{gnuplot_term}       = $ARGV_gnuplot_term;
 
 # process infiles
 for my $infile (@ARGV_infiles) {
@@ -63,21 +74,24 @@ for my $infile (@ARGV_infiles) {
     say '[' . $oum->count_hits . ' hits processed] ';
 
     if ($ARGV_print_plots) {
-        ### Printing graphical selection with all possible colorations...
-        $oum->print_plot('before');
+        my $suf = 'before';
+        my $all = 'Y';
+
+        ### print graph with all hits and with all possible colorations...
+        $oum->print_plot( $suf, $all );
     }
 
     # BATCH MODE
     if ($ARGV_restore_params_from) {
         say q{Here's the selection based on restored parameters...};
-        say $oum->list_selection( 'all' );
+        say $oum->list_selection('all');
         say '[' . $oum->count_selection . ' hits selected] ';
         say '[' . $oum->count_filter . ' hits selected after filtering] ';
     }
 
     elsif ($ARGV_restore_last_params) {
         say q{Here's the selection based on restored parameters...};
-        say $oum->list_selection( 'keep' );
+        say $oum->list_selection('keep');
         say '[' . $oum->count_filter . ' hits selected after filtering] ';
     }
 
@@ -91,7 +105,7 @@ for my $infile (@ARGV_infiles) {
             $oum->select_bounds;
 
             say q{Here's your current selection...};
-            say $oum->list_selection( 'all' );
+            say $oum->list_selection('all');
             say '[' . $oum->count_selection . ' hits selected] ';
             say '[' . $oum->count_filter . ' hits selected after filtering] ';
             say 'Threshold for minimum coverage: ' . $oum->min_cov;
@@ -107,8 +121,10 @@ for my $infile (@ARGV_infiles) {
     }
 
     if ($ARGV_print_plots) {
-        ### Printing graphical selection with all possible colorations...
-        $oum->print_plot('after');
+        my $suf = 'after';
+
+        ### print graphical selection with all possible colorations...
+        $oum->print_plot($suf);
     }
 
     # write accession file corresponding to current selection
@@ -125,7 +141,7 @@ ompa-pa.pl - Extract seqs from BLAST/HMMER interactively or in batch mode
 
 =head1 VERSION
 
-version 0.201810
+version 0.251770
 
 =head1 USAGE
 
@@ -141,19 +157,6 @@ Path to input BLAST/HMMER report files [repeatable argument].
 
 =for Euclid: infiles.type: readable
     repeatable
-
-=item --database=<file>
-
-Path to the sequence database used to generate the reports. For efficiency,
-this argument must always be the basename of a BLAST database, even when the
-reports where obtained using C<hmmsearch> on a FASTA file.
-
-To build such a database, use one of the following commands:
-
-    $ makeblastdb -in database.fasta -out database -dbtype prot -parse_seqids
-    $ makeblastdb -in database.fasta -out database -dbtype nucl -parse_seqids
-
-=for Euclid: file.type: string
 
 =back
 
@@ -172,6 +175,21 @@ following types are available:
 =for Euclid: str.type:       /blastxml|hmmertbl/
     str.type.error: <str> must be one of blastxml or hmmertbl (not str)
     str.default:    'blastxml'
+
+=item --database=<file>
+
+Path to the sequence database used to generate the reports. For efficiency,
+this argument must always be the basename of a BLAST database, even when the
+reports where obtained using C<hmmsearch> on a FASTA file.
+
+To build such a database, use one of the following commands:
+
+    $ makeblastdb -in database.fasta -out database -dbtype prot -parse_seqids
+    $ makeblastdb -in database.fasta -out database -dbtype nucl -parse_seqids
+
+This argument is required when the option C<--extract-seqs> is enabled.
+
+=for Euclid: file.type: string
 
 =item --colorize=<scheme>
 
@@ -209,12 +227,13 @@ Maximum gene copy number per organism for selected hits [default: 3].
 
 Sequence extraction switch [default: no]. When specified, selected sequences
 are stored into a FASTA file using the same basename as other output files.
+This requires a BLAST database (see option C<--database> above).
 
 =item --extract-tax
 
 Taxonomy extraction switch [default: no]. When specified, NCBI taxons of
 selected sequences are stored into a file using the same basename as other
-output files.
+output files. This requires a local mirror of the NCBI Taxonomy database.
 
 =item --restore-last-params
 
@@ -231,6 +250,17 @@ the user-specified JSON file.
 =item --print-plots
 
 When specified, plots are printed in PDF format [default: no].
+
+=item --gnuplot-term=<str>
+
+gnuplot terminal to use for the interactive mode [default: x11]. Other
+possible choices include qt but the option is open to experiment.
+
+If needed the gnuplot executable can be specified through the environment
+variable C<OUM_GNUPLOT_EXEC>.
+
+=for Euclid: str.type:    string
+    str.default: 'x11'
 
 =item --version
 

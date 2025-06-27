@@ -1,3 +1,7 @@
+0.03 2025-06-26T12:55:30+02:00
+ - API Change: In mode which is not strict, cleanup errors.
+ - Regen examples.
+
 0.02 2025-06-21T17:51:42+02:00
  - Add comment about real record id to doc.
  - Finish tests for Data::MARC::Field008::Book.

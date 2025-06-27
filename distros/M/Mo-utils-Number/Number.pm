@@ -12,7 +12,7 @@ use Scalar::Util qw(looks_like_number);
 Readonly::Array our @EXPORT_OK => qw(check_int check_natural check_number
 	check_percent check_positive_natural);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # ... -2, -1, 0, 1, 2, ...
 sub check_int {
@@ -320,6 +320,90 @@ Returns undef.
  # Output like:
  # #Error [...Number.pm:?] Parameter 'key' must be a number.
 
+=head1 EXAMPLE7
+
+=for comment filename=check_percent_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::Number qw(check_percent);
+
+ my $self = {
+         'key' => '10%',
+ };
+ check_percent($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE8
+
+=for comment filename=check_percent_fail.pl
+
+ use strict;
+ use warnings;
+
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils::Number qw(check_percent);
+
+ my $self = {
+         'key' => 'foo',
+ };
+ check_percent($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...Number.pm:?] Parameter 'key' has bad percent value.
+
+=head1 EXAMPLE9
+
+=for comment filename=check_positive_natural_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::Number qw(check_positive_natural);
+
+ my $self = {
+         'key' => '3',
+ };
+ check_positive_natural($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE10
+
+=for comment filename=check_positive_natural_fail.pl
+
+ use strict;
+ use warnings;
+
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils::Number qw(check_positive_natural);
+
+ my $self = {
+         'key' => -1,
+ };
+ check_positive_natural($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...Number.pm:?] Parameter 'key' must be a positive natural number.
+
 =head1 DEPENDENCIES
 
 L<Error::Pure>,
@@ -367,6 +451,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

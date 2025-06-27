@@ -38,6 +38,8 @@ my $obj;
 warning_like
 	{
 		$obj = MARC::Convert::Wikidata->new(
+			# XXX
+			'ignore_data_errors' => 1,
 			'marc_record' => MARC::Record->new_from_usmarc($marc_data),
 		);
 	}

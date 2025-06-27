@@ -14,7 +14,7 @@ use MARC::Leader;
 use Mo::utils 0.08 qw(check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 
 # Constructor.
 sub new {
@@ -47,6 +47,9 @@ sub new {
 	# Retrieved date.
 	$self->{'date_retrieved'} = undef;
 
+	# Ignore data errors.
+	$self->{'ignore_data_errors'} = 0;
+
 	# MARC::Record object.
 	$self->{'marc_record'} = undef;
 
@@ -60,6 +63,7 @@ sub new {
 	check_isa($self, 'marc_record', 'MARC::Record');
 
 	$self->{'_transform_object'} = MARC::Convert::Wikidata::Transform->new(
+		'ignore_data_errors' => $self->{'ignore_data_errors'},
 		'marc_record' => $self->{'marc_record'},
 	)->object;
 
@@ -527,6 +531,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.28
+0.29
 
 =cut

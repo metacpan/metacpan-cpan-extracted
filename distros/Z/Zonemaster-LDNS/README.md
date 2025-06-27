@@ -14,7 +14,6 @@
   * [Ed25519]
   * [IDN]
   * [Internal ldns]
-  * [Randomized capitalization (deprecated)](#randomized-capitalization-deprecated)
   * [Custom OpenSSL]
   * [Custom LDNS]
   * [Custom Libidn]
@@ -166,16 +165,6 @@ Disable with `--no-internal-ldns`.
 When enabled, an included version of ldns is statically linked into
 Zonemaster::LDNS.
 When disabled, libldns is dynamically linked just like other dependencies.
-
-### Randomized capitalization (deprecated)
-
-Disabled by default.
-Enable with `--randomize`.
-
-> **Note:** This feature is deprecated and will be removed in Zonemaster 2025.1.
-
-Randomizes the capitalization of returned domain names.
-
 
 ### Custom OpenSSL
 

@@ -394,7 +394,7 @@ subtest 'SPF' => sub {
 subtest 'DNAME' => sub {
     my $rr = Zonemaster::LDNS::RR->new( 'examplë.fake 3600  IN  DNAME example.fake' );
     isa_ok( $rr, 'Zonemaster::LDNS::RR::DNAME' );
-    is(fc($rr->dname()), fc('example.fake.'));
+    is($rr->dname(), 'example.fake.');
 };
 
 subtest 'croak when given malformed CAA records' => sub {

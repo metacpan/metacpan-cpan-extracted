@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Blast;
 # ABSTRACT: internal class for XML BLAST parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Blast::VERSION = '0.201810';
+$Bio::MUST::Apps::OmpaPa::Blast::VERSION = '0.251770';
 use Moose;
 use namespace::autoclean;
 
@@ -26,8 +26,8 @@ sub collect_hits {
 
         # split hit desc on Ctrl-A and keep only first line (nr database)
         # this is needed for table formatting as Ctrl-A has zero-width
-        my ($desc) = split /\cA.*/xms, $hit->def;
-        my $hsp = $hit->next_hsp;
+        my ($desc) = split /\cA.*/xms, ( $hit->def // $hit->id );
+        my $hsp = $hit->next_hsp;       # workaround for XML report change
 
         # collect useful hit/HSP attributes
         push @hits, {
@@ -58,7 +58,7 @@ Bio::MUST::Apps::OmpaPa::Blast - internal class for XML BLAST parser
 
 =head1 VERSION
 
-version 0.201810
+version 0.251770
 
 =head1 SYNOPSIS
 

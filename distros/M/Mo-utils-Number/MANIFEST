@@ -11,6 +11,14 @@ examples/check_number_fail.pl
 examples/check_number_ok.pl
 examples/check_number_range_fail.pl
 examples/check_number_range_ok.pl
+examples/check_percent_fail.pl
+examples/check_percent_ok.pl
+examples/check_percent_range_fail.pl
+examples/check_percent_range_ok.pl
+examples/check_positive_natural_fail.pl
+examples/check_positive_natural_ok.pl
+examples/check_positive_natural_range_fail.pl
+examples/check_positive_natural_range_ok.pl
 examples/sub_check_percent.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm

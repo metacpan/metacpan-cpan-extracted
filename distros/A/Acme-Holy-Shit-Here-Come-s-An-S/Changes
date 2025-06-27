@@ -1,5 +1,9 @@
 Revision hi'story for perl module Acme::Holy'Shit::Here::Come's::An'S
 
+0.003     2025-06-26 22:26:25+0100
+ - Change repo'sitory URL's to Codeberg
+ - Configure mbtiny to regenerate more file's
+
 0.002 - 2017-03-28
 
  - Fix POD to comply with project 'style

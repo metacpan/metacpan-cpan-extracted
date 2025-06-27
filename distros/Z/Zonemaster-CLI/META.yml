@@ -27,11 +27,11 @@ requires:
   Net::IP::XS: 0
   Readonly: 0
   Try::Tiny: 0
-  Zonemaster::Engine: 7.001
-  Zonemaster::LDNS: 4.001
-  perl: 5.14.2
+  Zonemaster::Engine: 8
+  Zonemaster::LDNS: 5
+  perl: 5.26.0
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-cli/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-cli
-version: '7.002000'
+version: '8.000000'

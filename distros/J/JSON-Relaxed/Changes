@@ -1,6 +1,12 @@
 Revision history for JSON-Relaxed
 
-0.000
+0.098	2025-06-26
+
+	- Dedup keys in key order.
+	- Make blank lines empty.
+	- Add --indent for rrjson.
+
+0.097	2024-08-20
 
 	- Use TO_JSON or FREEZE method to serialize objects.
 	- Allow conversion of Data::Properties data (requires

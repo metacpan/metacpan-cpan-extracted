@@ -5,6 +5,8 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
-cpanfile
+README
+dist.json
 lib/Acme/Holy/Shit/Here/Come/s/An/S.pm
+prereqs.yml
 t/verify.t

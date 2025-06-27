@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Hmmer;
 # ABSTRACT: internal class for tabular HMMER parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Hmmer::VERSION = '0.201810';
+$Bio::MUST::Apps::OmpaPa::Hmmer::VERSION = '0.251770';
 use Moose;
 use namespace::autoclean;
 
@@ -56,7 +56,7 @@ Bio::MUST::Apps::OmpaPa::Hmmer - internal class for tabular HMMER parser
 
 =head1 VERSION
 
-version 0.201810
+version 0.251770
 
 =head1 SYNOPSIS
 

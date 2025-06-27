@@ -1,3 +1,11 @@
+0.29 2025-06-26T18:45:09+02:00
+ - Add 'ignore_data_errors' parameter.
+ - Add support for cze/slo book editions in description.
+ - Add tests for field 008 dates.
+ - Ignore MARC validity errors in tests.
+ - Rewrite processing of covers.
+ - Rewrite processing of publication date to 008 field.
+
 0.28 2025-03-30T16:33:14+02:00
  - Add test file for field 700 testing.
  - Remove obsolete module in tests (GH#4, thank Slaven Rezić).

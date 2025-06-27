@@ -4,7 +4,7 @@
       "Johan Vromans <jv@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,15 +56,15 @@
    "provides" : {
       "JSON::Relaxed" : {
          "file" : "lib/JSON/Relaxed.pm",
-         "version" : "0.097"
+         "version" : "0.098"
       },
       "JSON::Relaxed::ErrorCodes" : {
          "file" : "lib/JSON/Relaxed/ErrorCodes.pm",
-         "version" : "0.097"
+         "version" : "0.098"
       },
       "JSON::Relaxed::Parser" : {
          "file" : "lib/JSON/Relaxed/Parser.pm",
-         "version" : "0.097"
+         "version" : "0.098"
       }
    },
    "release_status" : "stable",
@@ -83,6 +83,6 @@
          "web" : "https://github.com/sciurius/perl-JSON-Relaxed"
       }
    },
-   "version" : "0.097",
+   "version" : "0.098",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

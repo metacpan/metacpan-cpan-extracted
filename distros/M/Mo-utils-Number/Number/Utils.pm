@@ -9,7 +9,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(sub_check_percent);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub sub_check_percent {
 	my ($value, $key, $func, $error_value) = @_;
@@ -132,6 +132,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -12,7 +12,7 @@ use XML::Compile::WSDL11;
 use XML::Compile::SOAP11;
 use XML::Compile::Transport::SOAPHTTP;
 use XML::Compile::SOAP::WSS;
-use XML::Compile::WSS::Util  qw/:dsig :xtp10/;
+use XML::Compile::WSS::Util  qw/:dsig :dsigm :xtp10/;
 use XML::Compile::C14N::Util qw/:c14n/;
 
 use Log::Report mode => 2;
@@ -52,8 +52,8 @@ my $token =  XML::Compile::WSS::SecToken::X509v3->fromFile($certfn);
 isa_ok($token, 'XML::Compile::WSS::SecToken::X509v3');
 
 my $sig   = $wss->signature
-  ( digest_method   => DSIG_SHA1          # default
-  , signer          => DSIG_RSA_SHA1      # default
+  ( digest_method   => DSIGM_SHA384
+  , signer          => DSIGM_RSA_SHA384
   , canon_method    => C14N_EXC_NO_COMM   # default
   , private_key     => $privkeyfn
   , token           => $token

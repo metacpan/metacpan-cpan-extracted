@@ -66,6 +66,6 @@
          "web" : "https://github.com/markov2/perl5-XML-Compile-WSS-Signature"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

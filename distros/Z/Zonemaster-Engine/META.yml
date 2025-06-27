@@ -45,10 +45,10 @@ requires:
   Readonly: 0
   Text::CSV: 0
   YAML::XS: 0
-  Zonemaster::LDNS: 4.001
+  Zonemaster::LDNS: 5
   perl: 5.16.0
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '7.001000'
+version: '8.000000'

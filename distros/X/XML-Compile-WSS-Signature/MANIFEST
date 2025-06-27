@@ -46,6 +46,7 @@ t/20any.wsdl
 t/20cert.pem
 t/20privkey.pem
 t/20signature.t
+t/21enckey.t
 t/30signedinfo.t
 t/31keyinfo.t
 t/example.wsdl

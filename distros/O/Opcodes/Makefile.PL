@@ -70,6 +70,20 @@ WriteMakefile(
 	 license     => 'http://dev.perl.org/licenses/',
 	 repository  => 'http://github.com/rurban/Opcodes',
        },
+       prereqs => {
+        develop => {
+          requires => {
+            'Pod::Markdown' => 0,
+            'Test::CPAN::Meta' => 0,
+            'Test::Pod' => 0,
+            'Test::Pod::Coverage' => 0,
+            'Class::XSAccessor' => 0,
+            'Text::CSV_XS' => 0,
+            'List::MoreUtils' => 0,
+            'Test::Kwalitee' => 0,
+          }
+        }
+       }
       }
      ) : ()),
     realclean => {FILES	=> 'const-c.inc const-xs.inc'},
@@ -88,6 +102,11 @@ sub depend { '
 README.md : $(VERSION_FROM)
 	pod2markdown $(VERSION_FROM) | \
 	  $(PERL) -pe\'s/png\]\(https:/png\)\](https:/; s/(Travis|Coveralls): \[/\[!\[\1]\(/;\' > $@
+release : dist
+	git tag \$(VERSION)
+	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
+	git push
+	git push --tags
 test_cover :: pure_all
 	$(RM_RF) cover_db
 	$(PERLRUNINST) -S cover -test

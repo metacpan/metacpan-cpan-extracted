@@ -18,6 +18,8 @@ my $data = File::Object->new->up->dir('data');
 my $marc_data = slurp($data->file('cnb000080974.xml')->s);
 my $marc_record = MARC::Record->new_from_xml($marc_data, 'UTF-8');
 my $transform_obj = MARC::Convert::Wikidata::Transform->new(
+	# XXX
+	'ignore_data_errors' => 1,
 	'marc_record' => $marc_record,
 );
 my $obj = MARC::Convert::Wikidata::Item::BookEdition->new(

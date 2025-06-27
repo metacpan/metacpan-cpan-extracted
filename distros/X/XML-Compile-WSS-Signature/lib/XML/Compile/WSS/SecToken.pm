@@ -7,7 +7,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::WSS::SecToken;{
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 }
 
 

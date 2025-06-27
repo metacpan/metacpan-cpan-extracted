@@ -12,9 +12,6 @@ SKIP: {
 
     my $s = Zonemaster::LDNS->new( '8.8.8.8' );
     isa_ok( $s, 'Zonemaster::LDNS' );
-    my $p = $s->query( 'nic.se', 'MX' );
-    isa_ok( $p, 'Zonemaster::LDNS::Packet' );
-    is( $p->rcode, 'NOERROR', 'expected rcode' );
 
     my $p2 = $s->query( 'iis.se', 'NS', 'IN' );
     isa_ok( $p2, 'Zonemaster::LDNS::Packet' );
@@ -68,11 +65,15 @@ SKIP: {
         ok( $known_ns{ lc($rr->nsdname) }, 'known nsdname (' . $rr->nsdname . ')' );
     }
 
-    my %known_mx = map { $_ => 1 } qw[mx1.iis.se. mx2.iis.se. ];
-    foreach my $rr ( $p->answer ) {
-        is( $rr->preference, 10, 'expected MX preference' );
-        ok( $known_mx{ lc($rr->exchange) }, 'known MX exchange (' . $rr->exchange . ')' );
-    }
+    my $p = $s->query( 'zonemaster.fr', 'MX' );
+    isa_ok( $p, 'Zonemaster::LDNS::Packet' );
+    is( $p->rcode, 'NOERROR', 'expected rcode' );
+
+    @answer = sort { $a->preference <=> $b->preference } $p->answer;
+    is( $answer[0]->preference, 7, 'expected MX preference 7' );
+    is( lc($answer[0]->exchange), 'mx1.nic.fr.', 'known MX exchange mx1.nic.fr' );
+    is( $answer[1]->preference, 8, 'expected MX preference 8' );
+    is( lc($answer[1]->exchange), 'mx2.nic.fr.', 'known MX exchange mx2.nic.fr' );
 
     my $lroot = Zonemaster::LDNS->new( '199.7.83.42' );
     my $se = $lroot->query( 'se', 'NS' );

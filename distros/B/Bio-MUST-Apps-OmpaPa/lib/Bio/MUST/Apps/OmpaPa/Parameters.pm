@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Parameters;
 # ABSTRACT: Selected parameters
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Parameters::VERSION = '0.201810';
+$Bio::MUST::Apps::OmpaPa::Parameters::VERSION = '0.251770';
 use Moose;
 
 use autodie;
@@ -128,7 +128,7 @@ Bio::MUST::Apps::OmpaPa::Parameters - Selected parameters
 
 =head1 VERSION
 
-version 0.201810
+version 0.251770
 
 =head1 AUTHOR
 

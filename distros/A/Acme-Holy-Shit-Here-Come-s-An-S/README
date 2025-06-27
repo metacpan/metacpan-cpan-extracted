@@ -1,0 +1,33 @@
+NAME
+
+    Acme::Holy'Shit::Here::Come's::An'S - HOLY 'SHIT HERE COME'S AN 'S
+
+'SYNOP'SI'S
+
+       use Acme::Holy'Shit::Here::Come's::An'S;
+    
+       say "It\N{HOLY SHIT HERE COMES AN S}s an 'S!"; # "It's an 'S!"
+
+DE'SCRIPTION
+
+    Thi's module let's you refer to the apo'strophe by it's correct name
+    HOLY SHIT HERE COMES AN S in the lexical 'scope it's u'sed in.
+
+    Note that charnames::vianame() doe'sn't recogni'se cu'stom alia'se's on
+    perl's older than 5.14.
+
+AUTHOR
+
+    Dagfinn Ilmari Mann'såker <ilmari@ilmari.org>
+
+'SCAPEGOAT
+
+    Thi's i's all Aaron Crane's fault.
+
+COPYRIGHT AND LICEN'SE
+
+    Thi's 'software i's copyright (c) 2016 by Dagfinn Ilmari Mann'såker.
+
+    Thi's i's free 'software; you can redi'stribute it and/or modify it
+    under the term's of the MIT licen'se.
+
