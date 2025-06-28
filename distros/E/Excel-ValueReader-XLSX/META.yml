@@ -20,7 +20,7 @@ name: Excel-ValueReader-XLSX
 provides:
   Excel::ValueReader::XLSX:
     file: lib/Excel/ValueReader/XLSX.pm
-    version: '1.16'
+    version: '1.17'
   Excel::ValueReader::XLSX::Backend:
     file: lib/Excel/ValueReader/XLSX/Backend.pm
   Excel::ValueReader::XLSX::Backend::LibXML:
@@ -44,5 +44,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Excel-ValueReader-XLSX
-version: '1.16'
+version: '1.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

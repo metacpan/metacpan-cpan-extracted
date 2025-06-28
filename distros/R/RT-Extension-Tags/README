@@ -14,7 +14,7 @@ DESCRIPTION
     The initdb step installs an example global Tag custom field.
 
 RT VERSION
-    Works with RT 4.0, 4.2, 4.4, 5.0
+    Works with RT 6.0. For RT 5.0 use the latest 0.* version.
 
 INSTALLATION
     perl Makefile.PL
@@ -22,22 +22,21 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
+    Patch RT
+        If you are running on RT 6.0.0, apply the included patch:
+
+            patch -p1 -d /opt/rt6 < patches/0001-Split-multiple-tomselect-initial-value-on-delimiter.patch
+
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
+        Add this line to your RT_SiteConfig.pm file:
 
             Plugin('RT::Extension::Tags');
-
-        For RT 4.0, add this line:
-
-            Set(@Plugins, qw(RT::Extension::Tags));
-
-        or add RT::Extension::Tags to your existing @Plugins line.
 
     make initdb
         This optional step installs an example global Tag custom field.
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -70,7 +69,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Tags>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2016-2020 by Best Practical Solutions,
+    This software is Copyright (c) 2016-2025 by Best Practical Solutions,
     LLC
 
     This is free software, licensed under:

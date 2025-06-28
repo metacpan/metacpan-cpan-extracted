@@ -84,7 +84,7 @@ is_deeply(
 		link      => 'https://phonysite.com/a1',
 		author    => 'samyoung12788 at gmail dot com (Samuel Young)',
 		category  => [ qw(test sample phony) ],
-		summary   => "<p>\nJust a plain-text post.</p>\n",
+		summary   => "<p>Just a plain-text post.</p>\n",
 		published => 1750011361,
 		updated   => 1750011361,
 		uid       => 'a1',

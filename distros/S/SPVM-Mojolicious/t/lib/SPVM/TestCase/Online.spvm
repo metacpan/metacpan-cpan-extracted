@@ -1,5 +1,4 @@
 class TestCase::Online {
-  use TestUtil::HTTP::Tiny;
   use Fn;
   use Go;
   use Array;
@@ -8,23 +7,25 @@ class TestCase::Online {
   use Mojo::Transaction::HTTP;
   use Mojo::Content::Single;
   
+  use Mojo::UserAgent;
+  
   our $RESULT : IntList;
   
   static method test_http_tiny : int () {
     
     my $url = "http://google.com";
     
-    my $http = TestUtil::HTTP::Tiny->new;
+    my $ua = Mojo::UserAgent->new;
     
-    my $res = $http->get($url);
+    my $res = $ua->get($url)->result;
     
-    my $content = $res->content;
+    my $body = $res->body;
     
-    unless (Fn->contains($content, "www.google.com")) {
+    unless (Fn->contains($body, "www.google.com")) {
       return 0;
     }
     
-    unless ($res->status == 200 || $res->status == 301) {
+    unless ($res->code == 200 || $res->code == 301) {
       return 0;
     }
     
@@ -38,25 +39,25 @@ class TestCase::Online {
     Go->go(method : void () {
       my $url = "http://google.com";
       
-      my $http = TestUtil::HTTP::Tiny->new;
+      my $ua = Mojo::UserAgent->new;
       
-      my $res = $http->get($url);
+      my $res = $ua->get($url)->result;
       
-      my $content = $res->content;
+      my $body = $res->body;
       
-      $RESULT->push(Fn->contains($content, "www.google.com"));
+      $RESULT->push(Fn->contains($body, "www.google.com"));
     });
     
     Go->go(method : void () {
       my $url = "http://google.com";
       
-      my $http = TestUtil::HTTP::Tiny->new;
+      my $ua = Mojo::UserAgent->new;
       
-      my $res = $http->get($url);
+      my $res = $ua->get($url)->result;
       
-      my $content = $res->content;
+      my $body = $res->body;
       
-      $RESULT->push(Fn->contains($content, "www.google.com"));
+      $RESULT->push(Fn->contains($body, "www.google.com"));
     });
     
     Go->gosched;

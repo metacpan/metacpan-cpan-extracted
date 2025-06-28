@@ -15,7 +15,7 @@ A class to model a link on a link site (part of App::LinkSite).
 use Feature::Compat::Class;
 
 class App::LinkSite::Link {
-  our $VERSION = '0.0.14';
+  our $VERSION = '0.0.15';
   use strict;
   use warnings;
   no if $] >= 5.038, 'warnings', 'experimental::class';

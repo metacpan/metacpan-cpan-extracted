@@ -17,4 +17,4 @@ check_css_class($self, 'key');
 print "ok\n";
 
 # Output like:
-# #Error [...utils.pm:?] Parameter 'key' has bad CSS class name (number of begin).
+# #Error [...CSS.pm:?] Parameter 'key' has bad CSS class name (number of begin).

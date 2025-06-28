@@ -54,6 +54,6 @@
          "web" : "https://github.com/davorg-cpan/app-linksite"
       }
    },
-   "version" : "v0.0.14",
+   "version" : "v0.0.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

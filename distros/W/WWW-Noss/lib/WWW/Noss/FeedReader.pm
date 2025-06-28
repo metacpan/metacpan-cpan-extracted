@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(read_feed);
@@ -72,6 +72,7 @@ sub read_feed {
 
 	for my $i (0 .. $#$entries) {
 		$entries->[$i]{ nossid } = $i + 1;
+		$entries->[$i]{ author } //= $channel->{ author };
 	}
 
 	return ($channel, $entries);

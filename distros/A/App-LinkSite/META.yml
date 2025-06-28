@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/app-linksite/issues
   repository: git://github.com/davorg-cpan/app-linksite.git
-version: v0.0.14
+version: v0.0.15
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

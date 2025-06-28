@@ -1,0 +1,7 @@
+class Mojo::UserAgent::CookieJar::Callback::Ignore : interface_t {
+  
+  use Mojo::Cookie::Response;
+  
+  required method : int ($cookie : Mojo::Cookie::Response);
+  
+}

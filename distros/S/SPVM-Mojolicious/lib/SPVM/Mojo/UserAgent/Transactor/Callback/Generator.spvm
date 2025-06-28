@@ -1,0 +1,10 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::UserAgent::Transactor::Callback::Generator : interface_t {
+  
+  use Mojo::Transaction::HTTP;
+  
+  required method : Mojo::Transaction::HTTP ($transactor : Mojo::UserAgent::Transactor, $tx : Mojo::Transaction::HTTP, $args : object[]);
+  
+}

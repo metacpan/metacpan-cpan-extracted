@@ -5,9 +5,9 @@ class Mojo::Cookie {
   version_from Mojo;
   
   # Fields
-  has name : ro string;
+  has name : rw string;
   
-  has value : ro string;
+  has value : rw string;
   
   method to_string : string () { die "Not implemented."; }
   

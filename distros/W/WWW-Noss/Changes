@@ -1,5 +1,19 @@
 Revision history for noss (WWW::Noss)
 
+1.03  Jun 27 2025
+  - Add cat command: Basically just an alias to `read --stdout`.
+  - Add --html option read command: Read the unformatted HTML contents of a
+    post.
+  - Add '%z' formatting code for feed and post formatting, and the --time-format
+    option: Print post/feed dates using the strftime format specified by
+    --time-format.
+  - nossui: Add 'Read' button to posts selection menu.
+  - nossui: Allow updating/reloading by group or feed.
+  - If a post does not have a specific author, use the feed's author if present.
+    Existing databases will have to be reloaded to reflect this change.
+  - Don't leak open directory handles in clean command.
+  - No longer maintain META files manually.
+
 1.02  Jun 24 2025
   - Add nossui: dialog-based frontend to noss.
   - Fix documentation errors.

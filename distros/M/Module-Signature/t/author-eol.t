@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/Module/Signature.pm',
+    'script/cpansign',
     't/0-signature.t',
     't/1-basic.t',
     't/2-cygwin.t',

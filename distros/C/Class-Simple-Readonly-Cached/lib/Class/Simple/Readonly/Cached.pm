@@ -5,6 +5,7 @@ use warnings;
 
 use Carp;
 use Class::Simple;
+use Data::Reuse;
 use Params::Get;
 
 my @ISA = ('Class::Simple');
@@ -17,11 +18,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -289,8 +290,27 @@ sub AUTOLOAD
 	if(wantarray) {
 		my @rc = $object->$method(@_);
 		if(scalar(@rc) == 0) {
+			if(ref($cache) eq 'HASH') {
+				$cache->{$key} = __PACKAGE__ . '>UNDEF<';
+			} else {
+				$cache->set($key, __PACKAGE__ . '>UNDEF<', 'never');
+			}
 			return;
 		}
+		my $can_fixate = 1;	# Work around for RT#163955
+		foreach (@rc) {
+			if(ref($_)) {
+				if(ref($_) eq 'GLOB') {
+					$can_fixate = 0;
+					last;
+				}
+				if((ref($_) ne 'ARRAY') && (ref($_) ne 'HASH') && (ref($_) ne 'SCALAR')) {
+					$can_fixate = 0;
+					last;
+				}
+			}
+		}
+		Data::Reuse::fixate(@rc) if($can_fixate);
 		if(ref($cache) eq 'HASH') {
 			$cache->{$key} = \@rc;
 		} else {
@@ -332,9 +352,23 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-L<Class::Simple>, L<CHI>
+=over 4
+
+=item * L<constant::defer>
+
+=item * L<Class::Simple>
+
+=item * L<CHI>
+
+=item * L<Data::Reuse>
+
+Values are shared between C<Class::Simple::Readonly::Cached> objects, since they are read-only.
+
+=back
 
 =head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 

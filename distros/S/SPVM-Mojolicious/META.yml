@@ -1,13 +1,13 @@
 ---
-abstract: 'Porting Mojolicious to SPVM'
+abstract: 'Web Frame Work'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.990058'
+  SPVM: '0.990075'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.990058'
+  SPVM: '0.990075'
   SPVM::Digest::SHA: '0.065'
   SPVM::File::Copy: '0.022'
   SPVM::File::Temp: '0.026'
@@ -31,5 +31,5 @@ requires:
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Mojolicious.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

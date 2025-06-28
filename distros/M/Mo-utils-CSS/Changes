@@ -1,3 +1,7 @@
+0.11 2025-06-27T20:21:17+02:00
+ - Fix DEPEDENCIES section in doc.
+ - Fix examples outputs.
+
 0.10 2025-04-10T09:21:25+02:00
  - Add tests for check_css_border().
  - Rewrite to use of Mo::utils::Number::Utils::sub_check_percent() and fix

@@ -50,7 +50,7 @@
    "provides" : {
       "Excel::ValueReader::XLSX" : {
          "file" : "lib/Excel/ValueReader/XLSX.pm",
-         "version" : "1.16"
+         "version" : "1.17"
       },
       "Excel::ValueReader::XLSX::Backend" : {
          "file" : "lib/Excel/ValueReader/XLSX/Backend.pm"
@@ -71,6 +71,6 @@
          "url" : "https://github.com/damil/Excel-ValueReader-XLSX"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

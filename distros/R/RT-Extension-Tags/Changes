@@ -1,5 +1,9 @@
 Revision history for RT-Extension-Tags
 
+1.00 2025-06-13
+
+ - Update for RT 6.0
+
 0.05 2020-07-17
 
  - Put "make initdb" after enabling the plugin in doc

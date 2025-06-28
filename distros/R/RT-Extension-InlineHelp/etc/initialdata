@@ -1,0 +1,90 @@
+use strict;
+use warnings;
+
+require RT::I18N;
+require I18N::LangTags::List;
+my ( @lang, %lang_to_desc );
+foreach my $lang ( map { s/:://; s/_/-/g; $_ } grep {/^\w+::$/} keys %RT::I18N:: ) {
+    next if $lang =~ /i-default|en-us/;
+    my $desc = I18N::LangTags::List::name($lang);
+    next                          unless ($desc);
+    $desc =~ s/(.*) (.*)/$2 ($1)/ unless ( $desc =~ /.* \(.*\)/ );
+    $lang_to_desc{$lang} = $desc;
+}
+@lang = sort { $lang_to_desc{$a} cmp $lang_to_desc{$b} } keys %lang_to_desc;
+
+our @CustomFields = (
+    {   Name        => 'Inline Help',
+        Description => 'Inline Help',
+        LookupType  => 'RT::Class',
+        Type        => 'Select',
+        MaxValues   => 1,
+        Values      => [ map { { Name => $_ } } qw/yes no/ ],
+    },
+    {   Name        => 'Locale',
+        Description => 'Locale',
+        LookupType  => 'RT::Class',
+        Type        => 'Select',
+        MaxValues   => 1,
+        Values      => [ map { { Name => $_, Description => $lang_to_desc{$_} } } @lang ],
+    },
+    {   Name        => 'Display Name',
+        Description => 'Localized article name',
+        LookupType  => 'RT::Class-RT::Article',
+        Type        => 'Freeform',
+        MaxValues   => 1,
+        ApplyTo     => 'Inline Help',
+    },
+    {   Name        => 'Target',
+        Description => 'jQuery Selector',
+        LookupType  => 'RT::Class-RT::Article',
+        Type        => 'Freeform',
+        MaxValues   => 1,
+        ApplyTo     => 'Inline Help',
+    },
+);
+
+our @Classes = (
+    {   Name        => 'Inline Help',
+        Description => 'Inline help',
+    }
+);
+
+our @OCFVs = (
+    {   Object => sub {
+            my $object = RT::Class->new( RT->SystemUser );
+            $object->Load('Inline Help');
+            return $object;
+        },
+        Field => 'Inline Help',
+        Value => 'yes',
+    },
+    {   Object => sub {
+            my $object = RT::Class->new( RT->SystemUser );
+            $object->Load('Inline Help');
+            return $object;
+        },
+        Field => 'Locale',
+        Value => 'en',
+    },
+);
+
+our @Final = (
+    sub {
+        my $cf = RT::CustomField->new( RT->SystemUser );
+        $cf->LoadByName( Name => 'Content', LookupType => RT::Article->CustomFieldLookupType );
+        die 'Failed to load Content customfield' unless $cf->Id;
+
+        return if $cf->IsGlobal;
+
+        my $help_class = RT::Class->new( RT->SystemUser );
+        $help_class->Load('Inline Help');
+
+        if ( !$cf->IsAdded( $help_class->Id ) ) {
+            my ( $ret, $msg ) = $cf->AddToObject($help_class);
+            die $msg unless $ret;
+        }
+    },
+);
+
+1;

@@ -1,0 +1,15 @@
+.darkmode .popover {
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.darkmode .popover-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.popup-help {
+    margin-left: 5px;
+}
+
+#app-nav span.popup-help svg {
+    margin-bottom: 2px;
+}

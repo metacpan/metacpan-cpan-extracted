@@ -2,7 +2,7 @@ package WWW::Noss::TextToHtml;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(text2html escape_html);
@@ -28,7 +28,7 @@ sub text2html {
     my @paras = split /(\s*\n){2,}/, $text;
 
     my $html = join '',
-        map { "<p>\n" . $_ . "</p>\n" }
+        map { "<p>" . $_ . "</p>\n" }
         grep { /\S/ }
         @paras;
 

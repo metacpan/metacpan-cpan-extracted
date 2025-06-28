@@ -80,14 +80,14 @@ CHI: {
 	while(my($k, $v) = each %{$hits}) {
 		$count += $v;
 	}
-	is($count, 8, 'cache contains 8 hits');
+	is($count, 9, 'cache contains 8 hits');
 
 	my $misses = $l->state()->{'misses'};
 	$count = 0;
 	while(my($k, $v) = each %{$misses}) {
 		$count += $v;
 	}
-	is($count, 9, 'cache contains 9 misses');
+	is($count, 8, 'cache contains 9 misses');
 
 	diag($l->x()->x());
 }

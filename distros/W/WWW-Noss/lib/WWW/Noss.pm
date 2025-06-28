@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -42,6 +42,7 @@ Commands:
   reload    Reload cached feeds
   read      Read post in pager
   open      Open post link in browser
+  cat       Print post to stdout
   list      List and filter posts
   unread    List unread posts
   mark      Mark posts as read/unread
@@ -53,9 +54,10 @@ Commands:
   import    Import feed list from OPML
 
 Global Options:
-  -c|--config=<file>   Specify path to configuration file
-  -D|--data=<dir>      Specify path to data directory
-  -f|--feeds=<file>    Specify path to feeds file
+  -c|--config=<file>        Specify path to configuration file
+  -D|--data=<dir>           Specify path to data directory
+  -f|--feeds=<file>         Specify path to feeds file
+  -z|--time-format=I<fmt>   Specify strftime format for %z
 
   -h|--help      Print this usage message
   -v|--version   Print $PRGNAM version/copyright info
@@ -79,6 +81,7 @@ my %COMMANDS = (
 	'reload'   => \&reload,
 	'read'     => \&read_post,
 	'open'     => \&open_post,
+	'cat'      => \&cat,
 	'list'     => \&look,
 	'unread'   => \&unread,
 	'mark'     => \&mark,
@@ -103,6 +106,8 @@ my %VALID_SORTS = map { $_ => 1 } qw(
 	title
 	date
 );
+
+my $Z_FMT = '%c';
 
 my $MARK = "\x{fffe}";
 
@@ -144,6 +149,14 @@ my %POST_FMT_CODES = (
 	'Y' => sub {
 		strftime('%G', localtime($_[0]->{ updated } // $_[0]->{ published } // return '????'))
 	},
+	'z' => sub {
+		my $t = $_[0]->{ updated } // $_[0]->{ published };
+		if (defined $t) {
+			return strftime($Z_FMT, localtime $t);
+		} else {
+			return strftime($Z_FMT, localtime 0) =~ s/\w/?/gr;
+		}
+	},
 );
 
 my %FEED_FMT_CODES = (
@@ -184,6 +197,14 @@ my %FEED_FMT_CODES = (
 	},
 	'Y' => sub {
 		strftime('%G', localtime($_[0]->{ updated } // return '????'))
+	},
+	'z' => sub {
+		my $t = $_[0]->{ updated };
+		if (defined $t) {
+			return strftime($Z_FMT, localtime $t);
+		} else {
+			return strftime($Z_FMT, localtime 0) =~ s/\w/?/gr;
+		}
 	},
 );
 
@@ -498,6 +519,14 @@ sub _read_config {
 
 	if (defined $json->{ autoclean }) {
 		$self->{ AutoClean } //= !! $json->{ autoclean };
+	}
+
+	if (defined $json->{ time_format }) {
+		if (ref $json->{ time_format }) {
+			warn "'time_format' is not a format string, ignoring\n";
+		} else {
+			$self->{ TimeFmt } //= $json->{ time_format };
+		}
 	}
 
 	return 1;
@@ -1058,7 +1087,6 @@ sub reload {
 
 }
 
-# TODO: --html option?
 sub read_post {
 
 	my ($self) = @_;
@@ -1066,7 +1094,7 @@ sub read_post {
 	my $feed_name = shift @{ $self->{ Args} };
 
 	unless (defined $feed_name) {
-		die "'read' requires a feed name as argument\n";
+		die "'$self->{ Cmd }' requires a feed name as argument\n";
 	}
 
 	unless (exists $self->{ Feeds }{ $feed_name }) {
@@ -1090,7 +1118,7 @@ sub read_post {
 		}
 	}
 
-	my $html = do {
+	my $fmt = do {
 		my %fmt_codes = %POST_FMT_CODES;
 		for my $f (keys %fmt_codes) {
 			next if $f eq 'P';
@@ -1098,21 +1126,34 @@ sub read_post {
 				escape_html($POST_FMT_CODES{ $f }->($_[0]))
 			};
 		}
-		_fmt($self->{ ReadFmt }, \%fmt_codes)->($post);
+		_fmt($self->{ ReadFmt }, \%fmt_codes);
 	};
 
-	my ($tmp_html_fh, $tmp_html_nm) = tempfile(UNLINK => 1);
-	print { $tmp_html_fh } $html;
-	close $tmp_html_fh;
+	my $dump;
+
+	if ($self->{ ReadHtml }) {
+
+		$dump = $fmt->($post);
+
+	} else {
+
+		my ($tmp_html_fh, $tmp_html_nm) = tempfile(UNLINK => 1);
+		print { $tmp_html_fh } $fmt->($post);
+		close $tmp_html_fh;
+
+		$dump = lynx_dump($tmp_html_nm, width => $self->{ LineWidth });
+
+	}
+
 
 	if ($self->{ Stdout }) {
 
-		say lynx_dump($tmp_html_nm, width => $self->{ LineWidth });
+		say $dump;
 
 	} else {
 
 		my ($tmp_lynx_fh, $tmp_lynx_nm) = tempfile(UNLINK => 1);
-		print { $tmp_lynx_fh } lynx_dump($tmp_html_nm, width => $self->{ LineWidth });
+		print { $tmp_lynx_fh } $dump;
 		close $tmp_lynx_fh;
 
 		system "$self->{ Pager } $tmp_lynx_nm";
@@ -1183,6 +1224,17 @@ sub open_post {
 			or die "Failed to mark '$feed_name:$post->{ nossid }' as read";
 		$self->{ DB }->commit;
 	}
+
+	return 1;
+
+}
+
+sub cat {
+
+	my ($self) = @_;
+
+	$self->{ Stdout } = 1;
+	$self->read_post;
 
 	return 1;
 
@@ -1609,6 +1661,7 @@ sub init {
 		DefaultGroup  => undef,
 		DB            => undef,
 		AutoClean     => undef,
+		TimeFmt       => undef,
 		# update
 		NewOnly       => 0,
 		NonDefaults   => 0,
@@ -1625,6 +1678,7 @@ sub init {
 		Stdout        => 0,
 		LineWidth     => undef,
 		ReadFmt       => undef,
+		ReadHtml      => 0,
 		# open
 		Browser       => undef,
 		# look/unread
@@ -1649,10 +1703,10 @@ sub init {
 
 	Getopt::Long::config('bundling');
 	GetOptionsFromArray(\@argv,
-		'config|c=s'     => \$self->{ ConfFile },
-		'data|D=s'       => \$self->{ DataDir },
-		'feeds|f=s'      => \$self->{ FeedFile },
-		'autoclean|A:s'  => sub {
+		'config|c=s'      => \$self->{ ConfFile },
+		'data|D=s'        => \$self->{ DataDir },
+		'feeds|f=s'       => \$self->{ FeedFile },
+		'autoclean|A:s'   => sub {
 			if ($_[1] eq '' or $_[1] eq '1') {
 				$self->{ AutoClean } = 1;
 			} elsif ($_[1] eq '0') {
@@ -1662,42 +1716,44 @@ sub init {
 				unshift @argv, $_[1];
 			}
 		},
+		'time-format|z=s' => \$self->{ TimeFmt },
 		# update
-		'new-only'       => \$self->{ NewOnly },
-		'non-defaults'   => \$self->{ NonDefaults },
-		'downloads=i'    => \$self->{ Forks },
-		'unconditional'  => \$self->{ Unconditional },
-		'limit-rate=s'   => \$self->{ RateLimit },
-		'user-agent=s'   => \$self->{ UserAgent },
-		'timeout=f'      => \$self->{ Timeout },
-		'proxy=s'        => \$self->{ Proxy },
-		'proxy-user=s'   => \$self->{ ProxyUser },
+		'new-only'        => \$self->{ NewOnly },
+		'non-defaults'    => \$self->{ NonDefaults },
+		'downloads=i'     => \$self->{ Forks },
+		'unconditional'   => \$self->{ Unconditional },
+		'limit-rate=s'    => \$self->{ RateLimit },
+		'user-agent=s'    => \$self->{ UserAgent },
+		'timeout=f'       => \$self->{ Timeout },
+		'proxy=s'         => \$self->{ Proxy },
+		'proxy-user=s'    => \$self->{ ProxyUser },
 		# read
-		'pager=s'        => \$self->{ Pager },
-		'no-mark'        => \$self->{ NoMark }, # open, too
-		'stdout'         => \$self->{ Stdout },
-		'width=i'        => \$self->{ LineWidth },
-		'read-format=s'  => \$self->{ ReadFmt },
+		'pager=s'         => \$self->{ Pager },
+		'no-mark'         => \$self->{ NoMark }, # open, too
+		'stdout'          => \$self->{ Stdout },
+		'width=i'         => \$self->{ LineWidth },
+		'read-format=s'   => \$self->{ ReadFmt },
+		'html'            => \$self->{ ReadHtml },
 		# open
-		'browser=s'      => \$self->{ Browser },
+		'browser=s'       => \$self->{ Browser },
 		# look/unread
-		'title=s'        => \$self->{ Title },
-		'tag=s'          =>  $self->{ Tags },
-		'status=s'       => \$self->{ Status }, # look only
-		'content=s'      =>  $self->{ Content },
-		'sort=s'         => \$self->{ Sort },
-		'reverse'        => \$self->{ Reverse },
-		'hidden'         => \$self->{ ShowHidden },
-		'list-format=s'  => \$self->{ ListFmt },
+		'title=s'         => \$self->{ Title },
+		'tag=s'           =>  $self->{ Tags },
+		'status=s'        => \$self->{ Status }, # look only
+		'content=s'       =>  $self->{ Content },
+		'sort=s'          => \$self->{ Sort },
+		'reverse'         => \$self->{ Reverse },
+		'hidden'          => \$self->{ ShowHidden },
+		'list-format=s'   => \$self->{ ListFmt },
 		# mark
-		'all'            => \$self->{ MarkAll },
+		'all'             => \$self->{ MarkAll },
 		# post
-		'post-format=s'  => \$self->{ PostFmt },
+		'post-format=s'   => \$self->{ PostFmt },
 		# feeds
-		'brief'          => \$self->{ Brief }, # groups, too
-		'feeds-format=s' => \$self->{ FeedsFmt },
+		'brief'           => \$self->{ Brief }, # groups, too
+		'feeds-format=s'  => \$self->{ FeedsFmt },
 		# export/import
-		'no-groups'      => \$self->{ NoGroups },
+		'no-groups'       => \$self->{ NoGroups },
 		# misc
 		'help|h'    => sub { print $HELP;    exit 0 },
 		'version|v' => sub { print $VER_MSG; exit 0 },
@@ -1800,6 +1856,10 @@ sub init {
 		File::Spec->catfile($self->{ DataDir }, 'database.sqlite3')
 	);
 
+	if (defined $self->{ TimeFmt }) {
+		$Z_FMT = $self->{ TimeFmt };
+	}
+
 	return $self;
 
 }
@@ -1867,6 +1927,10 @@ Method implementing the C<read> command.
 =item $noss->open_post()
 
 Method implementing the C<open> command.
+
+=item $noss->cat()
+
+Method implementing the C<cat> command.
 
 =item $noss->look()
 

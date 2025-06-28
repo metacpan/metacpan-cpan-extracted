@@ -27,6 +27,8 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
     my $self = new Mojo::Transaction::HTTP;
     
+    $self->SUPER::init;
+    
     $self->{writing} = -1;
     
     return $self;

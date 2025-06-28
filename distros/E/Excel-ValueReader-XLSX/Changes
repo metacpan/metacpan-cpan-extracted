@@ -1,5 +1,8 @@
 Revision history for Excel-ValueReader-XLSX
 
+1.17 27.06.2025
+  - fix bug on $xl_reader->table(sheet => 1)
+
 1.16 07.04.2025
   - new methods ivalues() and itable(), iterators for getting rows one at a time
   - tables with a 'totals' row can be retrieved without or with that final row

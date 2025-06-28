@@ -1,0 +1,8 @@
+package Module::Install::RTx;
+
+@remove_files = (
+    'html/Callbacks/RT-Extension-InlineHelp/Elements/Footer/Default',
+);
+
+1;
+

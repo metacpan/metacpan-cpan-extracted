@@ -14,7 +14,7 @@ use Iterator::Simple             qw/iter/;
 # GLOBALS
 #======================================================================
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 our %A1_to_num_memoized;
 
 #======================================================================
@@ -212,7 +212,8 @@ sub _table {
 
   # table boundaries 
   my ($scol1, $srow1, $scol2, $srow2) = $self->range_from_ref($sheet_ref);
-  my ($tcol1, $trow1, $tcol2, $trow2) = $self->range_from_ref($args{ref});
+  my ($tcol1, $trow1, $tcol2, $trow2) = $args{ref} ? $self->range_from_ref($args{ref})
+                                                   : ($scol1, $srow1, $scol2, $srow2);
   my $skip_initial_rows               = $trow1 - $srow1;
   my $keep_rows                       = $trow2 - $trow1 + 1;
   my $skip_initial_cols               = $tcol1 - $scol1;

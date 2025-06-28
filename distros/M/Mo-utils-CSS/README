@@ -253,7 +253,7 @@ EXAMPLE2
      print "ok\n";
 
      # Output like:
-     # #Error [...utils.pm:?] Parameter 'key' has bad color name.
+     # #Error [...CSS.pm:?] Parameter 'key' has bad color name.
 
 EXAMPLE3
      use strict;
@@ -290,7 +290,7 @@ EXAMPLE4
      print "ok\n";
 
      # Output like:
-     # #Error [...utils.pm:?] Parameter 'key' has bad border style.
+     # #Error [...CSS.pm:?] Parameter 'key' has bad border style.
 
 EXAMPLE5
      use strict;
@@ -327,7 +327,7 @@ EXAMPLE6
      print "ok\n";
 
      # Output like:
-     # #Error [...utils.pm:?] Parameter 'key' has bad CSS class name (number of begin).
+     # #Error [...CSS.pm:?] Parameter 'key' has bad CSS class name (number of begin).
 
 EXAMPLE7
      use strict;
@@ -364,7 +364,7 @@ EXAMPLE8
      print "ok\n";
 
      # Output like:
-     # #Error [...utils.pm:?] Parameter 'key' has bad color name.
+     # #Error [...CSS.pm:?] Parameter 'key' has bad color name.
 
 EXAMPLE9
      use strict;
@@ -401,11 +401,11 @@ EXAMPLE10
      print "ok\n";
 
      # Output like:
-     # #Error [...utils.pm:?] Parameter 'key' doesn't contain unit name.
+     # #Error [...CSS.pm:?] Parameter 'key' doesn't contain unit name.
 
 DEPENDENCIES
     Error::Pure, Exporter, Graphics::ColorNames::CSS, List::Util, Mo::utils,
-    Readonly.
+    Mo::utils::Number::Utils, Readonly.
 
 SEE ALSO
     Mo  Micro Objects. Mo is less.
@@ -433,5 +433,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.10
+    0.11
 

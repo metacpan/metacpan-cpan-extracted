@@ -42,6 +42,7 @@ Buenzli
 Burak
 Burke
 Burri
+CANONICALIZED
 CGI
 CPAN
 Campbell
@@ -67,8 +68,10 @@ Debug
 DebugFile
 Denaxas
 Desmond
+Devin
 Digest
 Dmitriy
+Dooley
 Doug
 Dubois
 Dunkin
@@ -340,6 +343,7 @@ bin
 brong
 bryan
 burak
+canonicalized
 capoeirab
 cjm
 colin
@@ -352,6 +356,7 @@ de
 denaxas
 dependabot
 dnstandish
+dooleydevin
 dot
 doug
 dpettit

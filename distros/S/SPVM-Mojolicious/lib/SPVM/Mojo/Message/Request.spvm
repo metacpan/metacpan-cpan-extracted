@@ -10,21 +10,21 @@ class Mojo::Message::Request extends Mojo::Message {
   use Mojo::URL;
   
   # Fields
-  has env : ro Hash of string;
+  has env : rw Hash of string;
   
-  has method : ro string;
+  has method : rw string;
   
-  has proxy : ro Mojo::URL;
+  has proxy : rw Mojo::URL;
   
-  has reverse_proxy : ro byte;
+  has reverse_proxy : rw byte;
   
-  has url : ro Mojo::URL;
+  has url : rw Mojo::URL;
   
   has request_id : int;
   
-  has trusted_proxies : ro string[];
+  has trusted_proxies : rw string[];
   
-  has via_proxy : ro byte;
+  has via_proxy : rw byte;
   
   # Undocumented Fields
   has params : Mojo::Parameters;
@@ -40,13 +40,17 @@ class Mojo::Message::Request extends Mojo::Message {
     
     $self->SUPER::init;
     
-    $self->{method} = $options_h->delete_or_default_string("method", undef);
+    $self->{method} = $options_h->get_or_default_string("method", undef);
     
-    $self->{url} = (Mojo::URL)$options_h->delete_or_default("url", undef);
+    my $url = (Mojo::URL)$options_h->get_or_default("url", undef);
+    $self->{url} = $url // Mojo::URL->new;
     
     $self->{content} = Mojo::Content::Single->new;
     
-    $self->content->set_headers((Mojo::Headers)$options_h->delete_or_default("headers", undef));
+    my $headers = (Mojo::Headers)$options_h->get_or_default("headers", undef);
+    if ($headers) {
+      $self->content->set_headers($headers);
+    }
     
     for my $name (@{$options_h->keys}) {
       die "The \"$name\" option is not available.";
@@ -89,6 +93,22 @@ class Mojo::Message::Request extends Mojo::Message {
     my $cookies = Mojo::Cookie::Request->parse($cookie_header);
     
     return $cookies;
+  }
+  
+  method set_cookies : void ($cookies : Mojo::Cookie::Request[]) {
+    
+    my $headers = $self->headers;
+    
+    # Add cookies
+    my $cookies_string_list = StringList->new;
+    if (my $header_cookie_string = $headers->cookie) {
+      $cookies_string_list->push($header_cookie_string);
+    }
+    for my $cookie (@$cookies) {
+      $cookies_string_list->push($cookie->to_string);
+    }
+    
+    $headers->set_cookie(Fn->join("; ", $cookies_string_list->to_array));
   }
   
   method every_param : string[] ($name : string) { return $self->params->every_param($name); }

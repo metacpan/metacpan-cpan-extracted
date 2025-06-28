@@ -3,14 +3,7 @@ my $content = $Object->LargeContent || $Object->Content;
 $content = $m->comp('/Elements/ScrubHTML', Content => $content);
 $content =~ s|\n|<br />|g;
 
-my $status;
-if ( RT::Handle::cmp_version($RT::VERSION, "4.4.0") < 0 ){
-    # For pre RT 4.4
-    $status = "(Status = 'new' OR Status = 'open')";
-} else {
-    # RT 4.4 introduced __Active__
-    $status = "Status = '__Active__'";
-}
+my $status = "Status = '__Active__'";
 
 my $cf = $Object->CustomFieldObj;
 my $cf_id = $cf->id;

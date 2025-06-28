@@ -1,0 +1,501 @@
+NAME
+    RT-Extension-InlineHelp - InlineHelp
+
+DESCRIPTION
+    This extension supplies the ability to add inline help to RT web pages.
+
+RT VERSION
+    Works with RT 6.0
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    make initdb
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate data in your
+        database.
+
+        If you are upgrading this module, check for upgrading instructions
+        in case changes need to be made to your database.
+
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::InlineHelp');
+
+        To show InlineHelp by default:
+
+            Set($ShowInlineHelp, 1);
+
+    Clear your mason cache
+            rm -rf /opt/rt6/var/mason_data/obj
+
+    Restart your webserver
+
+OVERVIEW
+    This extension adds help icons to various elements on pages throughout
+    the application. When the user hovers over the help icon, a popup dialog
+    will display useful information related to that element.
+
+    Custom fields and custom roles in RT already have input help that show
+    "Entry hints" as tooltips. This extension replaces those elements with
+    the version provided by InlineHelp, so the icons are the same size and
+    the display is a popup with a title instead of a tooltip. The content
+    still comes from the entry hint, so your existing configurations will
+    continue to work.
+
+  How it works
+    Help content is managed as a collection of articles in
+    specially-designated classes. If a class has the "Inline Help" custom
+    field set to "yes", then the articles in that class will be used when
+    finding help topics. A second custom field called "Locale" identifies
+    the language used by articles in that class. In these classes, the
+    article names map to parts of the RT interface to determine where to
+    show the article content as help.
+
+  Sync vs Async
+    There are basically two modes of operation for the InlineHelp:
+    synchronous and asynchronous.
+
+    In synchronous mode, all of the help content is either retrieved or
+    supplied directly on the server side when the initial page is rendered.
+    This means that the help content itself is delivered to the browser.
+
+    In asynchronous mode, only the help topic is supplied when the page is
+    rendered. When the user hovers over the help icon, the help content is
+    dynamically retrieved from the server and displayed in the popup dialog.
+    See "Async" for more details.
+
+    Both modes can be used interchangeably on the same page.
+
+USAGE
+    InlineHelp can be used at render time on the server. For example, in a
+    Mason template, you might use the PopupHelp template to annotate a form
+    field:
+
+        <div class="form-row">
+          <div class="label col-3">
+            <span>Ticket Id</span>
+            <& /Elements/PopupHelp, Title => 'My Topic' &>:
+          </div>
+          <div class="value col-9">
+            <input class="form-control" type="text" name="ticketId" />
+          </div>
+        </div>
+
+    InlineHelp can also be used at runtime on the client. For example, you
+    can add the same help topic to every HTML element matching a certain
+    query. The following would associate a help topic to a specific button:
+
+        <script>
+        jQuery(document).ready(function() {
+            addPopupHelpItems( { "selector": "button#save-form", "title": "My Topic" } )
+        })
+        </script>
+
+REFERENCE
+    There are four primary ways to use the Inline Help:
+
+    *   "Target Selector"
+
+    *   "Mason Templates"
+
+    *   "HTML Attributes"
+
+    *   "JavaScript"
+
+  Target Selector
+    With this approach, you don't need to write any Mason/HTML/JS code and
+    you can add new help topics by adding or updating articles via the RT
+    web UI. Articles in the Inline Help class will have a custom field
+    called Target applied to them. To add inline help to some element in RT,
+    specify the HTML elements of that element in the Target field, using
+    jQuery selector syntax. jQuery is very flexible, so you can use many
+    elements in the DOM to target elements including ids, classes, and even
+    text. Once you get the selector to match, the content of that article
+    will show up in the web UI on that location.
+
+   Examples
+    Below are some examples of the Target value you would use to add help
+    text to different parts of RT.
+
+    "Search" in the main top menu
+        Target: #search
+
+    Ticket display page, Status label
+        Target: div.form-row.status div.label
+
+    RT at a glance, Unowned tickets portlet
+        Target: .titlebox .titlebox-title span.left
+        a[href^="/Search/Results.html"]:contains("newest unowned tickets")
+
+  Mason Templates
+    Add a /Elements/PopupHelp component anywhere in a Mason template:
+
+        <& /Elements/PopupHelp, Title => "My Topic" &>
+
+    This will render an empty HTML span element
+
+        <span data-help="My Topic"
+              data-content="The article contents"
+              data-action="replace"
+              style="display: none;"
+        ></span>
+
+    which will be picked up and processed on page load by the default
+    "helpification" rule when all of the accumulated rules are executed when
+    renderPopupHelpItems is called (for example, in the Elements/Footer
+    component in the page footer).
+
+    If no valid help article named My Help Topic is found, (see "OVERVIEW")
+    or the ShowInlineHelp setting/user-preference is false, the <span> will
+    be suppressed altogether.
+
+    Because the help content has already been retrieved and sent to the
+    client, it will already be in the DOM and there should be virtually no
+    delay when displaying the help popup following a user hover.
+
+   Example
+    To add help to a form field, a Mason template might create a help tag
+    directly:
+
+        <div class="form-row">
+          <div class="label col-3">
+            <span>Ticket Id</span>
+            <& /Elements/PopupHelp, Title => 'My Topic' &>:
+          </div>
+          <div class="value col-9">
+            <input class="form-control" type="text" name="ticketId" />
+          </div>
+        </div>
+
+    or might create help tags dynamically based on a Custom Field called
+    Category:
+
+        % while (my $ticket = $tickets->Next) {
+        %   my $ctgy = $ticket->FirstCustomFieldValue("Category")
+        <h1><% $ticket->Subject %></h1><& /Elements/PopupHelp, Title => $ctgy &>
+        % }
+
+  HTML Attributes
+    Add data-help="My Topic" and (optionally) data-content="The help
+    content" attributes to any HTML elements.
+
+    *   data-help Required. The name of the help topic. If data-content is
+        omitted, content will come from an article with this Name. See
+        "Async".
+
+    *   data-content Optional. The help content. If omitted, asynchronous
+        mode will be used to dynamically retrieve the help content. See
+        "Async".
+
+    *   data-action Optional. The action to use when adding the help icon to
+        the DOM. Defaults to "append". See "Help Selector Rules" section for
+        more details.
+
+   Example
+    A Mason template might add the data-help attribute to an element along
+    with some static help content that includes custom HTML
+
+        <button data-help="Save Widget"
+                data-content="Saves the Widget to RT"
+                data-action="after">Save</button>
+
+    Or we could omit the data-content altogether to have RT return the help
+    content from the matching "List Sprockets" article when the user hovers
+    over the help icon
+
+        <button data-help="List Sprockets" data-action="after">List</button>
+
+  JavaScript
+    Call addPopupHelpItems to add one or more rules to the list of help
+    topics on a page that should be decorated with help icons.
+
+    The addPopupHelpItems function populates the pagePopupHelpItems array
+    with a list of declarative rules that define elements in the DOM that
+    should have associated help icons. If a rule's selector key matches one
+    or more elements, its action key will determine where a help icon should
+    be added to the DOM with help content corresponding to the content key
+    or from a valid help article with the same name as the title key.
+
+    Any rules thus added will be picked up and processed on page load when
+    all of the accumulated rules are executed when renderPopupHelpItems is
+    called (for example, in the Elements/Footer component in the page
+    footer).
+
+    This includes the default rule
+
+        { selector: "[data-help]" }
+
+    which matches anything with a data-help attribute and therefore powers
+    the "HTML Attributes" method.
+
+    This method of using JavaScript allows for tremendous flexibly
+    annotating the DOM with help items, even after it has been
+    rendered--perhaps by other templates altogether, making it attractive as
+    a mechanism for users to annotate aspects of RT--however it has been
+    installed for them, including any and all extensions--simply by
+    inspecting what is rendered to the browser and writing the appropriate
+    rules. Importantly, these rules can usually be added to one place (e.g.
+    in a page callback somewhere) so they do not need to overlay virtually
+    every template in RT just to add help icons throughout.
+
+   Help Selector Rules
+    A help selector rule is a JavaScript object with the following keys:
+
+    *   selector - *String*
+
+        Required. Defines which DOM elements should receive a help icon. Can
+        match 0, 1, or many elements. Selectors matching 0 elements have no
+        impact on the DOM.
+
+        *   *String* A JQuery selector string that defines the matching DOM
+            elements
+
+    *   title - *String*
+
+        Optional. The help topic(s) that should be associated with the
+        element(s) matching the selector
+
+        *   *String* The name of the help topic that should be matched
+            against the article Name. If the selector matches exactly one
+            element, this will be its help topic. If more than one element
+            are matched, they will all get this same help topic.
+
+    *   content - *String*
+
+        Optional. The help content to be displayed in the popup when the
+        user hovers over the help icon.
+
+        If missing, asynchronous mode is automatically triggered (see
+        "Async")
+
+        *   *String* The help content. May contain HTML. Will be applied for
+            all elements matched by selector.
+
+    *   action - *String*
+
+        Optional. The action that should be taken with each help icon that
+        results from the application of selector. Responsible for actually
+        adding the help icons to the DOM. This controls, for example, where
+        the icon should be rendered relative to the matching DOM element.
+
+        If missing, "append" is the default.
+
+        *   *String*
+
+            *   *before* The help icon will be prepended to the DOM *before*
+                the element(s) matched by selector
+
+            *   *after* Default. The help icon will be appended to the DOM
+                *after* the element(s) matched by selector
+
+            *   *append* The help icon will be appended to the end of the
+                DOM element(s) matched by selector
+
+            *   *prepend* The help icon will be prepended to the beginning
+                of the DOM element(s) matched by selector
+
+            *   *replace* The help icon will be inserted into the DOM *in
+                place of* the element(s) matched by selector. This action is
+                used, for example, by the /Elements/PopupHelp Mason
+                component.
+
+   Examples
+    Add a help topic named "My Topic" to the DOM element with an id of
+    "ticket-id"
+
+        addPopupHelpItems(
+            {
+                selector: "#ticket-id",
+                title: "My Topic"
+            }
+        )
+
+    Add a help topic named "Phone" and custom HTML content to the DOM
+    element with an id of "phone-nbr"
+
+        addPopupHelpItems(
+            {
+                selector: "#phone-nbr",
+                title: "Phone",
+                content: "The customer phone number. This <i>MUST</i> include the country code."
+            }
+        )
+
+    Add more than one rule at a time
+
+        addPopupHelpItems(
+            { selector: "#ticket-status", title: "Status Topic" },
+            { selector: "#ticket-queue",  title: "Queue Topic"  }
+        )
+
+    Add a help topic named "A Note on Submitting Forms" to every <button>
+    element of type submit.
+
+        addPopupHelpItems( { selector: "button[type='submit']", title: "A Note on Submitting Forms" } )
+
+    Prepend help topics to all form radio buttons
+
+        addPopupHelpItems(
+            {
+                selector: "form input[type='radio']",
+                title:    "Radio Button Help",
+                content:  "You can only select one at a time",
+                action:   "prepend"
+            }
+        )
+
+  Programmatic API
+    The following functions are part of, and used by, InlineHelp. You can
+    also call them directly from your code.
+
+   HTML::Mason::Commands::GetInlineHelpClass( locales )
+    Given a list of locales, find the best article class that has been
+    associated with the "Inline Help" custom field. Locales are searched in
+    order. The first Class with an "Inline Help" custom field and matching
+    "Locale" custom field will be returned.
+
+   HTML::Mason::Commands::GetInlineHelpArticleTitle( class_id, article_name )
+    Returns the value of the Display Name Custom Field of an Article of the
+    given Class.
+
+   HTML::Mason::Commands::GetInlineHelpArticleContent( class_id, article_name )
+    Returns the raw, unscrubbed and unescaped Content of an Article of the
+    given Class.
+
+  Async
+    In asynchronous mode, only the help topic is supplied when the page is
+    rendered. Only when the user hovers over the help icon is the help
+    content dynamically retrieved from the server with a second AJAX request
+    to which will attempt to fetch the given help article contents. The
+    contents are returned directly as an HTML fragment--that is, they are
+    not wrapped in a <html> tag, for example.
+
+    The AJAX call will be a request to /Helpers/HelpTopic?key=MyTopic which
+    will return the raw contents of the MyTopic Article, which may contain
+    HTML. It will not be sanitized. If no valid MyTopic help article exists
+    (see "OVERVIEW"),
+
+        <div class="text-danger">No help was found for 'MyTopic'.</div>
+
+    will be returned instead.
+
+    The /Helpers/HelpTopic component does not consider the ShowInlineHelp
+    setting/user-preference. However, if ShowInlineHelp is not set, the help
+    icon would generally not have been rendered anyway, so the AJAX call
+    would never have been made.
+
+    Asynchronous mode does have the benefit of reducing the number of
+    database calls that need to be made to retrieve help article content on
+    page request, but the user may experience a slight lag when the help
+    icon is hovered over and the AJAX request is being made. This will need
+    to be evaluated on a case-by-case basis. On a heavily used RT system,
+    the performance of pages with many help topics may benefit from using
+    asynchronous mode more generously.
+
+NAMING
+    Since InlineHelp uses the help topic as the key to find a corresponding
+    article, it helps to have a somewhat predictable naming convention for
+    help topics.
+
+  RT objects
+    In general, help topics for built-in RT functionality will be prefixed
+    by "RT-"
+
+    *   RT-{The Name}
+
+    *   RT-{Context}-{The Name}
+
+    *   RT-{Path/To/Page}-{The Name}
+
+    *   RT-MainMenu-{}-{}-...
+
+    *   RT-PageMenu-{}-{}-...
+
+  User-defined objects
+    When you wish to dynamically create help topics based on the name of an
+    object that the end users create, the following naming conventions can
+    serve as a guide
+
+    *   User-Dashboard-{The Name}
+
+    *   System-Dashboard-{The Name}
+
+    *   CustomRole-{The Name}
+
+    *   SystemRole-{The Name}
+
+    *   CustomField-{The Name}
+
+    *   User-SavedSearch-{The Name}
+
+    *   {Group Name}-SavedSearch-{The Name}
+
+    *   System-SavedSearch-{The Name}
+
+DESIGN CONSIDERATIONS
+    Choosing synchronous vs asynchronous mode involves several tradeoffs
+    already discussed in "Async".
+
+    In synchronous mode, there are also tradeoffs in choosing whether to
+    provide content directly via the data-content attribute or the content
+    property of a JavaScript help rule. It is often convenient to provide
+    the help directly, especially if it has to be constructed in order to do
+    so. However, this makes it much more difficult for end users to edit or
+    customize the help content (since it now lives in code instead of an
+    article). It also makes it more difficult to support multiple locales.
+
+MISC
+  Change Icon Size
+    By default the icon size is inherited from its parent, to customize it,
+    you can add css rules on Admin Theme page like:
+
+        span.popup-help {
+            font-size: larger;
+        }
+
+        span.popup-help {
+            font-size: smaller;
+        }
+
+        span.popup-help {
+            font-size: 12px;
+        }
+
+INTERNATIONALIZATION
+    InlineHelp works with multiple languages by using articles in classes.
+    Each class should have a different value for its Locale custom field.
+    All of the articles in that class should be in that language.
+
+  Adding a new language
+    *   To add a new language, create a new class with the settigns below.
+        You can use any name for the class. If you plan to have several
+        languages, you'll likely want to have consistent naming for your
+        classes.
+
+    *   Set the "Inline Help" custom field to "yes".
+
+    *   Set "Locale" to the language you want.
+
+    *   Add articles to your new Class
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+        bug-RT-Extension-InlineHelp@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-InlineHelp
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2025 by Best Practical Solutions, LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

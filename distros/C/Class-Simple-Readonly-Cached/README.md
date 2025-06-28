@@ -1,13 +1,10 @@
-[![Kwalitee](https://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached.png)](http://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached)
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Cache+messages+to+an+object+#perl&url=https://github.com/nigelhorne/class-simple-readonly-cached&via=nigelhorne)
-
 # NAME
 
 Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -98,9 +95,16 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
-[Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple), [CHI](https://metacpan.org/pod/CHI)
+- [constant::defer](https://metacpan.org/pod/constant%3A%3Adefer)
+- [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple)
+- [CHI](https://metacpan.org/pod/CHI)
+- [Data::Reuse](https://metacpan.org/pod/Data%3A%3AReuse)
+
+    Values are shared between `Class::Simple::Readonly::Cached` objects, since they are read-only.
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 

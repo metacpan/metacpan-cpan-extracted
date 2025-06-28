@@ -1,0 +1,31 @@
+<%INIT>
+return unless $session{CurrentUser} && $session{CurrentUser}->Id;
+return unless RT->Config->Get('ShowInlineHelp', $session{CurrentUser});
+$Config->{ShowInlineHelp} = 1;
+
+my $lh = $session{CurrentUser}->LanguageHandle;
+my @locs = ( $lh->language_tag(), $lh->fallback_languages() );
+my $help_class = GetInlineHelpClass( \@locs );
+return unless $help_class;
+
+my $articles = RT::Articles->new($session{CurrentUser});
+$articles->Limit( FIELD => 'Class', VALUE => $help_class->Id );
+
+my @help;
+while ( my $article = $articles->Next ) {
+    my $target = $article->FirstCustomFieldValue('Target') or next;
+    push @help,
+        {   selector => $target,
+            title    => $article->FirstCustomFieldValue('Display Name'),
+            content  => $article->FirstCustomFieldValue('Content'),
+            action   => 'append',
+        };
+}
+
+$CurrentUser->{InlineHelp} = \@help;
+</%INIT>
+
+<%ARGS>
+$CurrentUser
+$Config
+</%ARGS>

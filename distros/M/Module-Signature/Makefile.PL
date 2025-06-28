@@ -235,12 +235,15 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.36"
   },
   "DISTNAME" => "Module-Signature",
+  "EXE_FILES" => [
+    "script/cpansign"
+  ],
   "LICENSE" => "perl",
   "NAME" => "Module::Signature",
   "PREREQ_PM" => {
     "File::Temp" => 0
   },
-  "VERSION" => "0.92",
+  "VERSION" => "0.93",
   "test" => {
     "TESTS" => "t/*.t"
   }

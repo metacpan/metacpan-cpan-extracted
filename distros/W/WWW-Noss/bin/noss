@@ -476,15 +476,31 @@ The post's year in two-digit form (range 00 to 99).
 
 The post's full year.
 
-=back
+=item %z
 
+The post's time formatted according to the C<--time-format> option or
+C<time_format> configuration field.
+
+=back
 
 =item B<--width>=I<width>
 
 Specify the line width to use for the formatted text output. Defaults to C<80>.
 See also the C<line_width> configuration field.
 
+=item B<--html>
+
+Instead of reading the formatted contents of a post, read its unformatted HTML
+contents.
+
 =back
+
+=item B<cat> I<feed> [I<post>]
+
+Prints the specified post to F<stdout>. This command is basically just an alias
+to C<read --stdout>. If I<post> is not specified, prints the latest unread post.
+
+This command has the same options as the C<read> command.
 
 =item B<open> I<feed> [I<post>]
 
@@ -711,6 +727,8 @@ The number of unread posts in the feed.
 
 =item %Y
 
+=item %z
+
 The same as their post formatting counterparts.
 
 =back
@@ -797,6 +815,15 @@ equivalent to enabling autoclean. This command helps with automatically freeing
 up unused space at the cost of a slight performance penalty.
 By default, autoclean is disabled. This
 option can also be configured via the C<autoclean> configuration field.
+
+=item B<-z>|B<--time-format>=I<fmt>
+
+Specify the time format to use for the C<%z> formatting code. L<strftime(3)> is
+used to perform the time formatting, so consult its manual for writing a
+format string. See also the C<time_format> configuration field.
+
+If this option is not set, C<%z> will default to the C<%c> L<strftime(3)>
+formatting code.
 
 =item B<-h>|B<--help>
 
@@ -926,6 +953,11 @@ also the C<feeds> command's C<--feeds-format> option.
 Boolean determining whether B<noss> should automatically run the C<clean>
 command after performing any operation. See also the C<--autoclean> option.
 
+=item "B<time_format>": "I<fmt>"
+
+The L<strftime(3)> format string to use for formatting C<%z> times. See also
+the C<--time-format> option.
+
 =back
 
 =head1 NOSSUI
@@ -998,7 +1030,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 =head1 SEE ALSO
 
-L<nossui(1)>, L<curl(1)>, L<less(1)>, L<lynx(1)>, L<more(1)>, L<sqlite3(1)>
+L<nossui(1)>, L<curl(1)>, L<less(1)>, L<lynx(1)>, L<more(1)>, L<sqlite3(1)>,
+L<strftime(3)>
 
 =cut
 

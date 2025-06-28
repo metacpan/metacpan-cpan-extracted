@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.15] - 2025-06-27
+
+### Updated
+
+- Update version of Bootstrap used in example
+
 ## [0.0.14] - 2025-04-14
 
 ### Fixed

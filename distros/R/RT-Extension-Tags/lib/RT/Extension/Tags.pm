@@ -2,10 +2,10 @@ use strict;
 use warnings;
 package RT::Extension::Tags;
 
-our $VERSION = '0.05';
-
+our $VERSION = '1.00';
 
 require RT::CustomField;
+require RT::Interface::Web;
 
 $RT::CustomField::FieldTypes{Tags} = {
     sort_order     => 85,
@@ -17,11 +17,8 @@ $RT::CustomField::FieldTypes{Tags} = {
     ],
 };
 
-RT->AddJavaScript("tag-it.min.js");
-RT->AddStyleSheets("jquery.tagit.css");
-
 no warnings 'redefine';
-my $old = \&RT::CustomField::AddValueForObject;
+my $old_avfo = \&RT::CustomField::AddValueForObject;
 *RT::CustomField::AddValueForObject = sub {
     my $self = shift;
     my %args = (
@@ -30,7 +27,7 @@ my $old = \&RT::CustomField::AddValueForObject;
         @_
     );
 
-    my ($ok, $msg) = $old->($self, @_);
+    my ($ok, $msg) = $old_avfo->($self, @_);
     return ($ok, $msg) unless $ok;
 
     return ($ok, $msg) unless $self->Type eq "Tags";
@@ -47,6 +44,21 @@ my $old = \&RT::CustomField::AddValueForObject;
     return ($ok, $msg);
 };
 
+my $old_nocfv = \&HTML::Mason::Commands::_NormalizeObjectCustomFieldValue;
+*HTML::Mason::Commands::_NormalizeObjectCustomFieldValue = sub {
+    my %args = @_;
+    my $cf_type = $args{CustomField}->Type;
+
+    # if this is a Tags custom field replace ',  ' with newline
+    # tomselect uses ',  ' as a delimiter but _NormalizeObjectCustomFieldValue
+    # expects newline as a delimiter for non autocomplete custom fields
+    if ( ( $cf_type eq 'Tags' ) && !( ref( $args{Value} ) eq 'ARRAY' ) ) {
+        $args{Value} =~ s/,  /\n/g
+            if defined $args{Value};
+    }
+
+    return $old_nocfv->(%args);
+};
 
 =head1 NAME
 
@@ -68,7 +80,7 @@ The initdb step installs an example global Tag custom field.
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4, 5.0
+Works with RT 6.0. For RT 5.0 use the latest 0.* version.
 
 =head1 INSTALLATION
 
@@ -82,17 +94,17 @@ Works with RT 4.0, 4.2, 4.4, 5.0
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Patch RT
 
-If you are using RT 4.2 or greater, add this line:
+If you are running on RT 6.0.0, apply the included patch:
+
+    patch -p1 -d /opt/rt6 < patches/0001-Split-multiple-tomselect-initial-value-on-delimiter.patch
+
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
+
+Add this line to your F<RT_SiteConfig.pm> file:
 
     Plugin('RT::Extension::Tags');
-
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Extension::Tags));
-
-or add C<RT::Extension::Tags> to your existing C<@Plugins> line.
 
 =item C<make initdb>
 
@@ -100,7 +112,7 @@ This optional step installs an example global C<Tag> custom field.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -143,7 +155,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2016-2020 by Best Practical Solutions, LLC
+This software is Copyright (c) 2016-2025 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

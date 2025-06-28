@@ -65,7 +65,7 @@ subtest 'Atom entries ok' => sub {
 		);
 		like(
 			$e->{ summary },
-			qr/<p>\s+Just a plain-text post\.<\/p>/,
+			qr/<p>Just a plain-text post\.<\/p>/,
 			'summary ok'
 		);
 		is($e->{ link }, 'https://phonysite.com/a1', 'link ok');
@@ -154,7 +154,7 @@ subtest 'Atom entries ok' => sub {
 		);
 		like(
 			$e->{ summary },
-			qr/<p>\s*Post with some more text content\.<\/p>/,
+			qr/<p>Post with some more text content\.<\/p>/,
 			'summary ok'
 		);
 		is($e->{ link }, 'https://phonysite.com/a5', 'link ok');

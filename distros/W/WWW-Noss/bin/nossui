@@ -83,6 +83,22 @@ dialog_open_post() {
 
 }
 
+dialog_update() {
+
+	wnoss update "$@" 2>&1 | dialog \
+		--title 'Updating' \
+		--programbox 'Updating...' -1 -1
+
+}
+
+dialog_reload() {
+
+	wnoss reload "$@" 2>&1 | dialog \
+		--title 'Reloading' \
+		--programbox 'Reloading...' -1 -1
+
+}
+
 dialog_mark_read() {
 
 	wnoss mark read "$@"
@@ -218,8 +234,11 @@ dialog_posts() {
 		fi
 
 		dialog \
-			--ok-label 'Select' \
-			--extra-button --extra-label 'Sort' \
+			--erase-on-exit \
+			--ok-label 'Read' \
+			--extra-button --extra-label 'Actions' \
+			--cancel-label 'Sort' \
+			--help-button --help-label 'Cancel' \
 			$remember_post \
 			--menu 'Please select a post to view' 0 0 0 \
 			--file "$dialog_posts_tmpposts" \
@@ -228,11 +247,15 @@ dialog_posts() {
 		case "$?" in
 			"$DIALOG_OK")
 				remember_post="--default-item $(cat "$dialog_posts_tmpsel")"
-				dialog_select_post "$(cat "$dialog_posts_tmpsel")"
+				dialog_read_post "$(cat "$dialog_posts_tmpsel")"
 			;;
 			"$DIALOG_EXTRA")
+				remember_post="--default-item $(cat "$dialog_posts_tmpsel")"
+				dialog_select_post "$(cat "$dialog_posts_tmpsel")"
+			;;
+			"$DIALOG_CANCEL")
+				remember_post=
 				dialog_select_sort
-				remember_post=''
 			;;
 			*)
 				break
@@ -363,6 +386,8 @@ dialog_select_feed() {
 			'Posts'       "View all posts in $1" \
 			'Mark Read'   "Mark all posts in $1 as read" \
 			'Mark Unread' "Mark all posts in $1 as unread" \
+			'Update'      "Update $1" \
+			'Reload'      "Reload $1" \
 			'Info'        " View $1 feed information" \
 			2> "$dialog_select_feed_tmpsel"
 
@@ -380,6 +405,22 @@ dialog_select_feed() {
 			;;
 			'Mark Unread')
 				dialog_mark_unread "$1"
+			;;
+			'Update')
+				dialog --yesno "Would you like to update $1?" 0 0
+				if [ "$?" != '0' ]
+				then
+					continue
+				fi
+				dialog_update "$1"
+			;;
+			'Reload')
+				dialog --yesno "Would you like to reload $1?" 0 0
+				if [ "$?" != '0' ]
+				then
+					continue
+				fi
+				dialog_reload "$1"
 			;;
 			'Info')
 				dialog_info_feed "$1"
@@ -448,6 +489,8 @@ dialog_select_group() {
 			'Feeds'       'View list of feeds in this group' \
 			'Mark Read'   'Mark all posts in this group as read' \
 			'Mark Unread' 'Mark all posts in this group as unread' \
+			'Update'      'Update all feeds in this group' \
+			'Reload'      'Reload all feeds in this group' \
 			2> "$dialog_select_group_tmpsel"
 
 		if [ "$?" != "$DIALOG_OK" ]
@@ -467,6 +510,22 @@ dialog_select_group() {
 			;;
 			'Mark Unread')
 				dialog_mark_unread "$1"
+			;;
+			'Update')
+				dialog --yesno "Would you like to update the feeds in $1?" 0 0
+				if [ "$?" != '0' ]
+				then
+					continue
+				fi
+				dialog_update "$1"
+			;;
+			'Reload')
+				dialog --yesno "Would you like to reload the feeds in $1?" 0 0
+				if [ "$?" != '0' ]
+				then
+					continue
+				fi
+				dialog_reload "$1"
 			;;
 		esac
 
@@ -514,36 +573,6 @@ dialog_groups() {
 	done
 
 	rm -f "$dialog_groups_tmpsel" "$dialog_groups_tmpgroups"
-
-}
-
-dialog_update() {
-
-	dialog --yesno 'Would you like to fetch and load feed updates?' 0 0
-
-	if [ "$?" != "$DIALOG_OK" ]
-	then
-		return
-	fi
-
-	wnoss update 2>&1 | dialog \
-		--title 'Updating' \
-		--programbox 'Updating...' -1 -1
-
-}
-
-dialog_reload() {
-
-	dialog --yesno 'Would you like to reload the feeds in your cache?' 0 0
-
-	if [ "$?" != "$DIALOG_OK" ]
-	then
-		return
-	fi
-
-	wnoss reload 2>&1 | dialog \
-		--title 'Reloading' \
-		--programbox 'Reloading...' -1 -1
 
 }
 
@@ -599,9 +628,19 @@ dialog_main() {
 				dialog_groups
 			;;
 			'Update')
+				dialog --yesno "Would you like to update all of your feeds?" 0 0
+				if [ "$?" != '0' ]
+				then
+					continue
+				fi
 				dialog_update
 			;;
 			'Reload')
+				dialog --yesno "Would you like to reload all of your feeds?" 0 0
+				if [ "$?" != '0' ]
+				then
+					continue
+				fi
 				dialog_reload
 			;;
 			'Clean')

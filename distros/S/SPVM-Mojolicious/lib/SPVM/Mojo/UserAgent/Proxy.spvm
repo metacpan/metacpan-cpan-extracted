@@ -1,0 +1,109 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::UserAgent::Proxy {
+  version_from Mojolicious;
+  
+  use Mojo::URL;
+  use Mojo::Transaction::HTTP;
+  
+  use Sys;
+  use Re;
+  
+  # Fields
+  has http : rw string;
+  
+  has https : rw string;
+  
+  has not : rw string[];
+  
+  # Class Methods
+  static method new : Mojo::UserAgent::Proxy ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $self = new Mojo::UserAgent::Proxy;
+    
+    $self->{http} = $options_h->get_string("http");
+    
+    $self->{https} = $options_h->get_string("https");
+    
+    $self->{not} = (string[])$options_h->get("not");
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method detect : void () {
+    
+    if (length (my $_ = Sys->env("HTTP_PROXY"))) {
+      $self->{http} = $_;
+    }
+    elsif (length (my $_ = Sys->env("http_proxy"))) {
+      $self->{http} = $_;
+    }
+    
+    if (length (my $_ = Sys->env("HTTPS_PROXY"))) {
+      $self->{https} = $_;
+    }
+    elsif (length (my $_ = Sys->env("https_proxy"))) {
+      $self->{https} = $_;
+    }
+    
+    my $no_proxy = (string)undef;
+    if (length (my $_ = Sys->env("NO_PROXY"))) {
+      $no_proxy = $_;
+    }
+    elsif (length (my $_ = Sys->env("no_proxy"))) {
+      $no_proxy = $_;
+    }
+    if ($no_proxy) {
+      $self->{not} = Fn->split(",", $no_proxy);
+    }
+    
+  }
+  
+  method is_needed : int ($domain : string)  {
+    
+    unless ($domain) {
+      die "The domain \$domain must be defined";
+    }
+    
+    my $not_needed = 0;
+    for my $not_domain (@{$self->not // new string[0]}) {
+      if (Re->m($domain, "\Q$not_domain\E$")) {
+        $not_needed = 1;
+        last;
+      }
+    }
+    
+    return !$not_needed;
+  }
+  
+  method prepare : void ($tx : Mojo::Transaction::HTTP) {
+    
+    if (length Sys->env("SPVM_MOJO_PROXY")) {
+      $self->detect;
+    }
+    
+    my $req = $tx->req;
+    my $url = $req->url;
+    unless ($self->is_needed($url->host)) {
+      return;
+    }
+    # HTTP proxy
+    my $proto = $url->protocol;
+    my $http  = $self->http;
+    if ($http && $proto eq "http") {
+      $req->set_proxy(Mojo::URL->new($http));
+    }
+    
+    # HTTPS proxy
+    my $https = $self->https;
+    if ($https && $proto eq "https") {
+      $req->set_proxy(Mojo::URL->new($https));
+    }
+    
+  }
+
+}

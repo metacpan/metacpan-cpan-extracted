@@ -90,13 +90,13 @@ HASH: {
 	while(my($k, $v) = each %{$hits}) {
 		$count += $v;
 	}
-	ok($count == 8);
+	ok($count == 9);
 	my $misses = $cached->state()->{'misses'};
 	$count = 0;
 	while(my($k, $v) = each %{$misses}) {
 		$count += $v;
 	}
-	ok($count == 10);
+	ok($count == 9);
 
 	# Test caching objects that return objects
 	my $simple = new_ok('Class::Simple');

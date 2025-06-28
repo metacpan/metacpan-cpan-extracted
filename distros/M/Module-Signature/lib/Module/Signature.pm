@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Module signature file manipulation
 package Module::Signature;
-our $VERSION = '0.92'; #VERSION
+our $VERSION = '0.93'; #VERSION
 
 use vars qw($VERSION $SIGNATURE @ISA @EXPORT_OK);
 use vars qw($Preamble $Cipher $Debug $Verbose $Timeout $AUTHOR);
@@ -715,7 +715,7 @@ Module::Signature - Module signature file manipulation
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 

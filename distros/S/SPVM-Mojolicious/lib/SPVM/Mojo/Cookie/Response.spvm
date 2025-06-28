@@ -21,21 +21,21 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
   }
   
   # Fields
-  has domain : ro string;
+  has domain : rw string;
   
-  has expires : ro long;
+  has expires : rw long;
   
-  has host_only : ro byte;
+  has host_only : rw byte;
   
-  has httponly : ro byte;
+  has httponly : rw byte;
   
-  has max_age : ro int;
+  has max_age : rw int;
   
-  has path : ro string;
+  has path : rw string;
   
-  has samesite : ro string;
+  has samesite : rw string;
   
-  has secure : ro byte;
+  has secure : rw byte;
   
   # Class Methods
   static method new : Mojo::Cookie::Response () {
@@ -60,6 +60,8 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
       my $cookie = Mojo::Cookie::Response->new;
       $cookie->{name} = $name;
       $cookie->{value} = $value // "";
+      
+      $cookie->{expires} = -1;
       
       for (my $j = 2; $j < @$tree; $j += 2) {
         my $name = $pairs->[$j];

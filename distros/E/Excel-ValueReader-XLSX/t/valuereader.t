@@ -288,9 +288,14 @@ sub run_tests {
   my $tab_has_totals_incl_totals = $reader->$table_meth('HasTotals', with_totals => 1);
   is_deeply($tab_has_totals_incl_totals, \@expected_tab_HasTotals_incl_totals, "tab_HasTotals with_totals=>1, using $context");
 
-
   my $tab_by_ref = $reader->$table_meth(sheet => "Entities", ref => "B1:C4");
   is_deeply($tab_by_ref, \@expected_tab_by_ref, "tab_by_ref");
+
+  # access a table by sheet number
+  $entities = $reader->$table_meth(sheet => 3); # 3=Entities
+  is $entities->[0]{Name},   'amp'       , "by sheet num, 1st table row, name, using $context";
+  is $entities->[0]{Letter}, 'ampersand' , "by sheet num, 1st table row, letter, using $context";
+  is $entities->[-1]{Name},  'yuml' ,      "by sheet num, last table row, name, using $context";
 
   # check a pivot table
   my $tab_entities = $reader->$values_meth('Tab_entities');

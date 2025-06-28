@@ -2,7 +2,7 @@ package WWW::Noss::Dir;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(dir);
@@ -17,6 +17,7 @@ sub dir {
 	opendir my $dh, $dir
 		or die "Failed to open $dir as a directory: $!\n";
 	my @f = sort grep { ! /^\.\.?$/ } readdir $dh;
+	closedir $dh;
 
 	unless ($hidden) {
 		@f = grep { ! /^\./ } @f;

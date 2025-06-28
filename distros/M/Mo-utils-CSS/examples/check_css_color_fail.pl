@@ -17,4 +17,4 @@ check_css_color($self, 'key');
 print "ok\n";
 
 # Output like:
-# #Error [...utils.pm:?] Parameter 'key' has bad color name.
+# #Error [...CSS.pm:?] Parameter 'key' has bad color name.

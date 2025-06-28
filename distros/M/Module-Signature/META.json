@@ -50,7 +50,7 @@
    "provides" : {
       "Module::Signature" : {
          "file" : "lib/Module/Signature.pm",
-         "version" : "0.92"
+         "version" : "0.93"
       }
    },
    "release_status" : "stable",
@@ -64,7 +64,7 @@
          "web" : "https://github.com/audreyt/module-signature"
       }
    },
-   "version" : "0.92",
+   "version" : "0.93",
    "x_contributors" : [
       "Audrey Tang <audreyt@audreyt.org>",
       "Baldur Kristinsson <baldur.kristinsson@gmail.com>",

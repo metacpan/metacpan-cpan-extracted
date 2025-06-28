@@ -20,9 +20,9 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   
   has remote_port : ro int;
   
-  has req : ro Mojo::Message::Request;
+  has req : rw Mojo::Message::Request;
   
-  has res : ro Mojo::Message::Response;
+  has res : rw Mojo::Message::Response;
   
   has completed : byte;
   
@@ -33,11 +33,16 @@ class Mojo::Transaction extends Mojo::EventEmitter {
     
     my $self = new Mojo::Transaction;
     
+    $self->init;
+    
+    return $self;
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
     $self->{req} = Mojo::Message::Request->new;
     
     $self->{res} = Mojo::Message::Response->new;
-    
-    return $self;
   }
   
   # Instance Methods
@@ -130,10 +135,14 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   method result : Mojo::Message::Response () {
     my $err  = $self->error;
     
+=pod TODO
+
     if (!$err || $err->get_int("code")) {
       die $err->get_string("message");
     }
-    
+
+=cut
+
     my $result = $self->res;
     
     return $result;

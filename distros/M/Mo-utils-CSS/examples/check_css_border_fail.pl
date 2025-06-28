@@ -17,4 +17,4 @@ check_css_border($self, 'key');
 print "ok\n";
 
 # Output like:
-# #Error [...utils.pm:?] Parameter 'key' has bad border style.
+# #Error [...CSS.pm:?] Parameter 'key' has bad border style.

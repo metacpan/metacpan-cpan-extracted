@@ -1,5 +1,11 @@
 Change history for libwww-perl
 
+6.79      2025-06-27 22:43:32Z
+    - Remove example references to malicious domain (GH#476) (Devin Dooley)
+    - Documentation updates for mirror (GH#470) (Julien Fiegehenn)
+    - Allow underscores in headers not to be removed in lwp-request (GH#443)
+      (@JohnHughesAtlantech and Olaf Alders)
+
 6.78      2025-02-20 00:32:06Z
     - Don't warn on proxy as unrecognized option for LWP::UserAgent->new
       (GH#469) (Austin Hill)

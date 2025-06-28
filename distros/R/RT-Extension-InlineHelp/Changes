@@ -1,0 +1,17 @@
+Revision history for RT-Extension-InlineHelp
+
+1.00 2025-06-27
+ - Update for RT 6.0
+
+0.03 2021-11-23
+ - Replace default RT custom field and custom role entry help icons with
+   InlineHelp version and replace tooltips with popups so all help is
+   consistent.
+
+0.02 2021-11-08
+ - Fix typo of callback dir
+ - Check for valid current user before loading inline help
+   JavaScript callback
+
+0.01 2021-10-29
+ - Initial version

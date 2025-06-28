@@ -1,0 +1,8 @@
+package Module::Install::RTx;
+
+@remove_files = (
+    'static/css/jquery.tagit.css',
+    'static/js/tag-it.min.js',
+);
+
+1;
