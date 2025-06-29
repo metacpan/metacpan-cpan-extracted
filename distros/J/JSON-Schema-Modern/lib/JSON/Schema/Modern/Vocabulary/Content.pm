@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use Moo;
@@ -19,6 +19,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use Storable 'dclone';
+use Ref::Util 0.100 'is_ref';
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Utilities qw(is_type A assert_keyword_type E abort);
 use namespace::clean;
@@ -106,7 +107,7 @@ sub _eval_keyword_contentSchema ($class, $data, $schema, $state) {
         { %$state, schema_path => $state->{schema_path}.'/contentSchema' });
   }
 
-  return A($state, dclone($schema->{contentSchema}));
+  return A($state, is_ref($schema->{contentSchema}) ? dclone($schema->{contentSchema}) : $schema->{contentSchema});
 }
 
 1;
@@ -123,7 +124,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 DESCRIPTION
 

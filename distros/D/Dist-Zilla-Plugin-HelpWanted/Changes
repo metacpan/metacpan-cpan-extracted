@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-Plugin-HelpWanted
 
+0.3.3 2025-06-28
+ [BUG FIXES]
+ - Move 'use experimental qw/ signatures /;' below `use Moose`	   to quiet
+   the warning. (GH#3, robrwo)
+
+ [STATISTICS]
+ - code churn: 2 files changed, 11 insertions(+), 4 deletions(-)
+
 0.3.2 2025-06-25
  [DOCUMENTATION]
  - Remove mention of OpenHatch, as the foundation is gone. :-(

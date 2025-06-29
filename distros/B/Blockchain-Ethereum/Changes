@@ -1,0 +1,9 @@
+0.019     2025-06-28 23:31:03-03:00 America/Sao_Paulo
+- Initial release of Blockchain-Ethereum toolkit as a unified distribution
+- Includes functionality from the following previously separate modules:
+    * Blockchain::Ethereum::ABI
+    * Blockchain::Ethereum::RLP
+    * Blockchain::Ethereum::Transaction
+    * Blockchain::Ethereum::Keystore
+- Modules are now maintained together under one repo:
+    https://github.com/refeco/perl-Ethereum-Toolkit

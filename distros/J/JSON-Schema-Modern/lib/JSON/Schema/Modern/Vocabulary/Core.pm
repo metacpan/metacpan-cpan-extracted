@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use Moo;
@@ -89,7 +89,6 @@ sub __create_identifier ($class, $uri, $state) {
 
   $state->{initial_schema_uri} = $uri;
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
-  # we don't set or update document_path because it is identical to traversed_schema_path
   $state->{schema_path} = '';
 
   # Note that even though '$id' is considered ahead of '$schema' in the keyword list, we have
@@ -118,10 +117,13 @@ sub _eval_keyword_id ($class, $data, $schema, $state) {
   # this should never happen, if the pre-evaluation traversal was performed correctly
   abort($state, 'failed to resolve "%s" to canonical uri', $state->{keyword}) if not $schema_info;
 
+  abort($state, 'EXCEPTION: mismatched document when processing %s "%s"',
+      $state->{keyword}, $schema->{$state->{keyword}})
+    if $schema_info->{document} != $state->{document};
+
   $state->{initial_schema_uri} = $schema_info->{canonical_uri};
   # these will already be set in all cases: at document root, or if we are here via a $ref
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
-  $state->{document_path} = $state->{document_path}.$state->{schema_path};
   $state->{schema_path} = '';
   # these will already be set if there is an adjacent $schema keyword, or if we are here via a $ref
   $state->{spec_version} = $schema_info->{specification_version};
@@ -410,7 +412,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 DESCRIPTION
 

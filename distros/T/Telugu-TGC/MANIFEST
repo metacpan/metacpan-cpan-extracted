@@ -2,9 +2,10 @@ Changes
 lib/Telugu/TGC.pm
 Makefile.PL
 MANIFEST
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/Telugu-TGC.t
 Telugu-TGC-0.04.tar.gz
-Telugu-TGC-0.06.tar.gz
+Telugu-TGC-0.05.tar.gz
+Telugu-TGC-0.95.tar.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

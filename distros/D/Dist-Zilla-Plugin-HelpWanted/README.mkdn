@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::HelpWanted - insert 'Help Wanted' information in the distri
 
 # VERSION
 
-version 0.3.2
+version 0.3.3
 
 # SYNOPSIS
 

@@ -1,6 +1,6 @@
 Revision history for Perl extension Telugu::TGC.
 
-0.01  Sat Mar  9 05:44:39 2019
+0.01  Thu Jun 26 17:40:02 2025
 	- original version; created by h2xs 1.23 with options
-		-Xn Telugu::TGC
+		-AXn Telugu::TGC
 

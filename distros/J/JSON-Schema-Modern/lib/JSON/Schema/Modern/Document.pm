@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use Moo;
@@ -258,7 +258,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use Moo;
@@ -262,8 +262,8 @@ sub _eval_keyword_uniqueItems ($class, $data, $schema, $state) {
   return E($state, 'items at indices %d and %d are not unique', @$equal_indices);
 }
 
-# Note: no effort is made to check if the 'contains' keyword has been disabled via its vocabulary.
-# The evaluation implementation of maxContains and minContains are in the Applicator vocabulary
+# The evaluation implementations of maxContains and minContains are in the Applicator vocabulary,
+# as 'contains' needs to run first
 *_traverse_keyword_maxContains = \&_assert_non_negative_integer;
 
 *_traverse_keyword_minContains = \&_assert_non_negative_integer;
@@ -364,7 +364,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,15 @@
 package Dist::Zilla::Plugin::HelpWanted;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: insert 'Help Wanted' information in the distribution's META
-$Dist::Zilla::Plugin::HelpWanted::VERSION = '0.3.2';
+$Dist::Zilla::Plugin::HelpWanted::VERSION = '0.3.3';
 
 use 5.34.0;
 use warnings;
 
-use experimental qw/ signatures /;
-
 use Moose;
 use List::MoreUtils qw(uniq);
+
+use experimental qw/ signatures /;
 
 with qw/
     Dist::Zilla::Role::Plugin
@@ -78,7 +78,7 @@ Dist::Zilla::Plugin::HelpWanted - insert 'Help Wanted' information in the distri
 
 =head1 VERSION
 
-version 0.3.2
+version 0.3.3
 
 =head1 SYNOPSIS
 

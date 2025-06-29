@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.611-6-gfe437996
+package JSON::Schema::Modern; # git description: v0.613-3-g149b1900
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -36,7 +36,7 @@ use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
 use JSON::Schema::Modern::Document;
-use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations);
+use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations is_schema);
 use namespace::clean;
 
 our @CARP_NOT = qw(
@@ -152,8 +152,13 @@ sub add_schema {
   croak 'insufficient arguments' if @_ < 2;
   my $self = shift;
 
+  if ($_[0]->$_isa('JSON::Schema::Modern::Document')) {
+    Carp::carp('use of deprecated form of add_schema with document');
+    return $self->add_document($_[0]);
+  }
+
   # TODO: resolve $uri against $self->base_uri
-  my $uri = !is_ref($_[0]) ? Mojo::URL->new(shift)
+  my $uri = !is_schema($_[0]) ? Mojo::URL->new(shift)
     : $_[0]->$_isa('Mojo::URL') ? shift : Mojo::URL->new;
 
   croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
@@ -193,12 +198,13 @@ sub add_document {
   my $self = shift;
 
   # TODO: resolve $uri against $self->base_uri
-  my $base_uri = !is_ref($_[0]) ? Mojo::URL->new(shift)
+  my $base_uri = !$_[0]->$_isa('JSON::Schema::Modern::Document') ? Mojo::URL->new(shift)
     : $_[0]->$_isa('Mojo::URL') ? shift : Mojo::URL->new;
 
   croak 'cannot add a schema with a uri with a fragment' if defined $base_uri->fragment;
+  croak 'insufficient arguments' if not @_;
 
-  my $document = shift or croak 'insufficient arguments';
+  my $document = shift;
   croak 'wrong document type' if not $document->$_isa('JSON::Schema::Modern::Document');
 
   die JSON::Schema::Modern::Result->new(
@@ -389,9 +395,13 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
 
   my $valid;
   try {
-    # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
-    $schema_reference = $self->add_schema($schema_reference)->canonical_uri
-      if is_ref($schema_reference) and not $schema_reference->$_isa('Mojo::URL');
+    if (is_schema($schema_reference)) {
+      # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
+      $schema_reference = $self->add_schema($schema_reference)->canonical_uri;
+    }
+    elsif (is_ref($schema_reference) and not $schema_reference->$_isa('Mojo::URL')) {
+      abort($state, 'invalid schema type: %s', get_type($schema_reference));
+    }
 
     my $schema_info = $self->_fetch_from_uri($schema_reference);
     abort($state, 'EXCEPTION: unable to find resource "%s"', $schema_reference)
@@ -407,7 +417,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       %$state,
       initial_schema_uri => $schema_info->{canonical_uri}, # the canonical URI as of the start of evaluation, or last $id or $ref
       document => $schema_info->{document},   # the ::Document object containing this schema
-      document_path => $schema_info->{document_path}, # the path within the document of this schema, as of the start of evaluation, or last $id or $ref
       dynamic_scope => [ $schema_info->{canonical_uri} ],
       annotations => [],
       seen => {},
@@ -909,6 +918,10 @@ sub add_vocabulary ($self, $classname) {
     my ($uri_string, $spec_version) = @$pair;
     Str->where(q{my $uri = Mojo::URL->new($_); $uri->is_abs && !defined $uri->fragment})->($uri_string);
     $spec_version_type->($spec_version);
+
+    croak 'keywords starting with "$" are reserved for core and cannot be used'
+      if grep /^\$/, $classname->keywords;
+
     $self->{_vocabulary_classes}{$uri_string} = $vocabulary_type->([ $spec_version, $classname ]);
   }
 }
@@ -985,6 +998,16 @@ sub _fetch_vocabulary_data ($self, $state, $schema_info) {
 
   $valid = E($state, 'the first vocabulary (by evaluation_order) must be Core')
     if ($vocabulary_classes[0]//'') ne 'JSON::Schema::Modern::Vocabulary::Core';
+
+  my %seen_keyword;
+  foreach my $class (@vocabulary_classes) {
+    foreach my $keyword ($class->keywords($schema_info->{specification_version})) {
+      $valid = E($state, '%s keyword "%s" conflicts with keyword of the same name from %s',
+          $class, $keyword, $seen_keyword{$keyword})
+        if $seen_keyword{$keyword};
+      $seen_keyword{$keyword} = $class;
+    }
+  }
 
   return ($schema_info->{specification_version}, $valid ? \@vocabulary_classes : []);
 }
@@ -1069,7 +1092,7 @@ sub _get_or_load_resource ($self, $uri) {
 # - configs: the config overrides to set when considering schema keywords
 # creates a Document and adds it to the resource index, if not already present.
 sub _fetch_from_uri ($self, $uri_reference) {
-  $uri_reference = Mojo::URL->new($uri_reference) if not is_ref($uri_reference);
+  $uri_reference = Mojo::URL->new($uri_reference) if not is_schema($uri_reference);
 
   # this is *a* resource that would contain our desired location, but may not be the closest one
   my $resource = $self->_get_or_load_resource($uri_reference->clone->fragment(undef));
@@ -1264,7 +1287,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 SYNOPSIS
 
@@ -1284,9 +1307,9 @@ validator, targeting the currently-latest
 L<Draft 2020-12|https://json-schema.org/specification-links.html#2020-12>
 version of the specification.
 
-=head1 CONFIGURATION OPTIONS
+=head1 CONSTRUCTOR ARGUMENTS
 
-These values are all passed as arguments to the constructor.
+Unless otherwise noted, these are also available as read-only accessors.
 
 =head2 specification_version
 
@@ -1367,6 +1390,8 @@ the format sub is a subref that takes one argument and returns a boolean result.
 be specified in the form of C<< { $format_name => { type => $type, sub => $format_sub } } >>,
 where the type indicates which of the data model types (null, object, array, boolean, string,
 or number) the instance value must be for the format validation to be considered.
+
+Not available as an accessor.
 
 =head2 validate_content_schemas
 
@@ -1542,11 +1567,11 @@ The schema must be in one of these forms:
 
 =item *
 
-a Perl data structure, such as what is returned from a JSON decode operation,
+a Perl data structure, such as what is returned from a JSON decode operation
 
 =item *
 
-or a URI string indicating the identity of such a schema.
+or a URI string (or L<Mojo::URL>) indicating the identity of such a schema.
 
 =back
 

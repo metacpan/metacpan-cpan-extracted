@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use Moo::Role;
@@ -88,7 +88,6 @@ sub eval_subschema_at_uri ($class, $data, $schema, $state, $uri) {
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/'.$state->{keyword},
       initial_schema_uri => $schema_info->{canonical_uri},
       document => $schema_info->{document},
-      document_path => $schema_info->{document_path},
       spec_version => $schema_info->{specification_version},
       schema_path => '',
       vocabularies => $schema_info->{vocabularies},
@@ -109,7 +108,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 SYNOPSIS
 
@@ -120,7 +119,8 @@ version 0.612
 =head1 DESCRIPTION
 
 This package is the role which all all vocabulary classes for L<JSON::Schema::Modern>
-must compose, describing the basic structure expected of a vocabulary class.
+must compose, describing the basic structure expected of a vocabulary class and defining some basic
+methods which are useful for traversing or evaluating various keywords.
 
 =head1 ATTRIBUTES
 

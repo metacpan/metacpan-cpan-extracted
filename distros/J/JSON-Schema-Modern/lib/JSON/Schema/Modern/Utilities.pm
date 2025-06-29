@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use strictures 2;
@@ -24,6 +24,8 @@ use builtin::compat qw(blessed created_as_number);
 use Scalar::Util 'looks_like_number';
 use Storable 'dclone';
 use Feature::Compat::Try;
+use Mojo::JSON ();
+use JSON::PP ();
 use namespace::clean;
 
 use Exporter 'import';
@@ -31,6 +33,7 @@ use Exporter 'import';
 our @EXPORT_OK = qw(
   is_type
   get_type
+  is_schema
   is_bignum
   is_equal
   is_elements_unique
@@ -52,8 +55,15 @@ our @EXPORT_OK = qw(
   false
 );
 
-use JSON::PP ();
-use constant { true => JSON::PP::true, false => JSON::PP::false };
+use constant HAVE_BUILTIN => "$]" >= 5.035010;
+use if HAVE_BUILTIN, experimental => 'builtin';
+
+use constant _BUILTIN_BOOLS => 0;
+use constant {
+  _BUILTIN_BOOLS && HAVE_BUILTIN && Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION(4.38); 1 }
+    ? ( true => builtin::true, false => builtin::false )
+    : ( true => JSON::PP::true, false => JSON::PP::false )
+};
 
 # supports the six core types, plus integer (which is also a number)
 # we do NOT check stringy_numbers here -- you must do that in the caller
@@ -87,9 +97,10 @@ sub is_type ($type, $value, $config = {}) {
     if ($type eq 'string') {
       # like created_as_string, but rejects dualvars with stringwise-unequal string and numeric parts
       return !is_ref($value)
+        && !(HAVE_BUILTIN && builtin::is_bool($value))
         && $flags & B::SVf_POK
         && (!($flags & (B::SVf_IOK | B::SVf_NOK))
-          || do { no warnings 'numeric'; 0+$value eq $value });
+            || do { no warnings 'numeric'; 0+$value eq $value });
     }
 
     if ($type eq 'number') {
@@ -175,8 +186,6 @@ sub get_type ($value, $config = {}) {
 # note: unlike builtin::compat::is_bool on older perls, we do not accept
 # dualvar(0,"") or dualvar(1,"1") because JSON::PP and Cpanel::JSON::XS
 # do not encode these as booleans.
-use constant HAVE_BUILTIN => "$]" >= 5.035010;
-use if HAVE_BUILTIN, experimental => 'builtin';
 sub is_bool ($value) {
   HAVE_BUILTIN and builtin::is_bool($value)
   or
@@ -184,6 +193,10 @@ sub is_bool ($value) {
     and ($value->isa('JSON::PP::Boolean')
       or $value->isa('Cpanel::JSON::XS::Boolean')
       or $value->isa('JSON::XS::Boolean'));
+}
+
+sub is_schema ($value) {
+  is_plain_hashref($value) || is_bool($value);
 }
 
 sub is_bignum ($value) {
@@ -278,12 +291,13 @@ sub is_elements_unique ($array, $equal_indices = undef, $state = {}) {
 # encoded and appended
 sub jsonp {
   warn q{first argument to jsonp should be '' or start with '/'} if length($_[0]) and substr($_[0],0,1) ne '/';
-  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, grep defined, @_);
+  return join('/', shift, map s!~!~0!gr =~ s!/!~1!gr, grep defined, @_);
 }
 
 # splits a json pointer apart into its path segments
-sub unjsonp ($path) {
-  return map s!~0!~!gr =~ s!~1!/!gr, split m!/!, $path;
+sub unjsonp {
+  warn q{argument to unjsonp should be '' or start with '/'} if length($_[0]) and substr($_[0],0,1) ne '/';
+  return map s!~0!~!gr =~ s!~1!/!gr, split m!/!, $_[0];
 }
 
 # get all annotations produced for the current instance data location (that are visible to this
@@ -486,7 +500,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 SYNOPSIS
 
@@ -496,7 +510,7 @@ version 0.612
 
 This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 
-=for Pod::Coverage is_type get_type is_bignum is_bool is_equal is_elements_unique jsonp unjsonp local_annotations
+=for Pod::Coverage is_type get_type is_bignum is_bool is_schema is_equal is_elements_unique jsonp unjsonp local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
 annotate_self sprintf_num HAVE_BUILTIN true false
 

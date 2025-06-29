@@ -25,7 +25,7 @@ name: Dist-Zilla-Plugin-HelpWanted
 provides:
   Dist::Zilla::Plugin::HelpWanted:
     file: lib/Dist/Zilla/Plugin/HelpWanted.pm
-    version: v0.3.2
+    version: v0.3.3
 requires:
   Dist::Zilla::Role::InstallTool: '0'
   Dist::Zilla::Role::Plugin: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted/issues
   homepage: https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted
   repository: https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted.git
-version: 0.3.2
+version: 0.3.3
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK

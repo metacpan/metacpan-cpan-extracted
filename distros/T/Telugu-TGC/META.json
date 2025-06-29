@@ -1,10 +1,10 @@
 {
-   "abstract" : "Tailored grapheme clusters for Telugu languauge.",
+   "abstract" : "Perl extension for Tailored Grapheme Clusters for Telugu language.",
    "author" : [
-      "unknown"
+      "Rajkumar Reddy"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -31,15 +31,10 @@
          }
       },
       "runtime" : {
-         "requires" : {
-            "Alt::Devel::CallParser::ButWorking" : "0.002",
-            "Kavorka" : "0.039",
-            "Mouse" : "v2.5.6",
-            "Regexp::Grammars" : "1.049"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

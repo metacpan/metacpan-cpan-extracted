@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use Data::Dmp;
+use File::Slurper qw(read_text write_text);
+
+my $path = "$Bin/../lib/Filename/Image.pm";
+my $content = read_text($path);
+
+my %exts = (
+    # extra extensions that might not be in mime type registry
+    webp => 1,
+    xcf => 1,
+);
+
+open my $fh, "<", "/etc/mime.types" or die "Can't open /etc/mime.types: $!";
+while (<$fh>) {
+    next if /#/;
+    next unless /\S/;
+    next unless m!^image/\S+\s+(.+)!;
+    my $exts = $1;
+    while ($exts =~ /(\w+)/g) { $exts{$1}++ }
+}
+
+my $str_re = join("|", map { quotemeta $_ }
+                      sort { length($b) <=> length($a) || $a cmp $b } keys %exts);
+
+$content =~ s/^.+(# STR_RE)/"our \$STR_RE = ".dmp($str_re)."; $1"/em
+    or die "Can't replace # STR_RE line";
+
+write_text($path, $content);

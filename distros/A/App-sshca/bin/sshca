@@ -1,0 +1,489 @@
+#!/usr/bin/env perl
+
+use v5.20;
+use experimental qw(signatures);
+
+use Digest;
+use Fcntl;
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp;
+use Getopt::Long qw(GetOptionsFromArray);
+use JSON::PP;
+use YAML::PP;
+
+my $DEBUG = 0;
+my $VERBOSE = 0;
+my $json = JSON::PP->new->utf8->canonical;
+my $digest = Digest->new('SHA-256');
+
+my @config_locations = (
+    $ENV{SSHCA_CONF},
+    '/etc/sshca/sshca.conf',
+    '/usr/local/etc/sshca/sshca.conf',
+    '/opt/sshca/etc/sshca.conf',
+    );
+
+my %conf_envvars = (
+    basedir => 'SSHCA_HOME'
+    );
+
+my %conf_handlers = (
+    basedir           => sub($value) {
+        $value
+        // $ENV{HOME} ? File::Spec->catdir( $ENV{HOME}, 'sshca' )
+            : File::Spec->catdir( '.', 'sshca' )
+    },
+    cadir             => sub($value) { $value // File::Spec->catdir( opt( 'basedir' ), 'ca' ) },
+    caserial          => sub($) { File::Spec->catfile( opt( 'cadir' ), 'serial' ) },
+    hostca_key        => sub($value) { $value // File::Spec->catfile( opt( 'cadir' ), 'hostca' ) },
+    userca_key        => sub($value) { $value // File::Spec->catfile( opt( 'cadir' ), 'userca' ) },
+    hostca_pubkey     => sub($value) { opt( 'hostca_key' ) . '.pub' },
+    userca_pubkey     => sub($value) { opt( 'userca_key' ) . '.pub' },
+    certsdir          => sub($value) { $value // File::Spec->catdir( opt( 'basedir' ), 'certs' ) },
+    certtype          => sub($value) { $value // 'user' },
+    hostcert_validity => sub($value) { $value // '+53w' },
+    usercert_validity => sub($value) { $value // '+13w1d' },
+    configdir         => sub($) {
+        my $conf = opt( 'config' );
+        return unless $conf;
+        my ($vol, $dirs,) = File::Spec->splitpath( $conf );
+        File::Spec->catpath( $vol, $dirs );
+    },
+    ca_keytype        => sub($value) { $value // 'ed25519' },
+    );
+
+my %options = ();
+my %config = ();
+
+sub opt($opt, $value = undef) {
+    $options{$opt} = $value if defined $value;
+    my $val = $options{$opt} // $ENV{$conf_envvars{$opt}} // $config{$opt};
+    if (my $h = $conf_handlers{$opt}) {
+        return $h->($val);
+    }
+    return $val;
+}
+
+my $yaml = YAML::PP->new;
+
+sub configure() {
+    for my $l (@config_locations) {
+        if (-r $l) {
+            open my $fh, '<:encoding(UTF-8)', $l
+                or die "Failed to open '$l': $!";
+            my $content = <$fh>;
+            my $cfg = $yaml->load_string( "---\n" . $content ) || {};
+            %config = $cfg->%*;
+
+            return;
+        }
+    }
+}
+
+sub cert_new($identity, %args) {
+    return {
+        id => $identity,
+        type => $args{type} // 'user',
+        schema_version => "1",
+        state => 'ISSUED',
+        %args{qw(pubkey principals options validity)}
+    };
+}
+
+sub cert_renew($cert, $serial) {
+    return {
+        $cert->%*, serial => $serial, state => 'ISSUED'
+    };
+}
+
+sub cert_identity($cert) {
+    return $cert->{id};
+}
+
+sub cert_path($serial, $create = undef) {
+    $digest->reset;
+    $digest->add( $serial );
+    my $hash = $digest->hexdigest;
+    $hash =~ m/^(..)(..)/;
+
+    my $dir = File::Spec->catdir( opt( 'basedir' ), 'store', $1, $2 );
+    if ($create) {
+        make_path $dir;
+        ###TODO: verify success!
+    }
+    return File::Spec->catfile( $dir, "$hash.json");
+}
+
+sub cert_load($serial) {
+    my $path = cert_path($serial);
+    open(my $fh, '<:encoding(UTF-8)', $path)
+        or die "Unable to open certificate file for serial '$serial'";
+    return $json->decode( do { local $/ = undef; <$fh> } );
+}
+
+sub cert_save($cert) {
+    my $serial = cert_serial( $cert );
+    my $path = cert_path( $serial, 1 );
+    open(my $fh, '>:encoding(UTF-8)', $path)
+        or die "Unable to create certificate file for serial '$serial'";
+    print $fh $json->encode( $cert );
+}
+
+sub cert_pubkey($cert, $pubkey = undef) {
+    $cert->{pubkey} = $pubkey if defined $pubkey;
+    return $cert->{pubkey};
+}
+
+sub cert_certkey($cert, $certkey = undef) {
+    $cert->{certkey} = $certkey if defined $certkey;
+    return $cert->{certkey};
+}
+
+sub cert_principals($cert, $principals = undef) {
+    $cert->{principals} = $principals if defined $principals;
+    return $cert->{principals} ? $cert->{principals}->@* : ();
+}
+
+sub cert_options($cert, $options = undef) {
+    $cert->{options} = $options if defined $options;
+    return $cert->{options} ? $cert->{options}->@* : ();
+}
+
+sub cert_state($cert, $state = undef) {
+    $cert->{state} = $state if defined $state;
+    return $cert->{state};
+}
+
+sub cert_validity($cert, $validity = undef) {
+    $cert->{validity} = $validity if defined $validity;
+    return $cert->{validity};
+}
+
+sub cert_serial($cert, $serial = undef) {
+    $cert->{serial} = $serial if defined $serial;
+    return $cert->{serial};
+}
+
+sub cert_type($cert, $type = undef) {
+    $cert->{type} = $type if defined $type;
+    return $cert->{type};
+}
+
+sub conf_next_serial() {
+    my $serialpath = opt( 'caserial' );
+    sysopen(my $fh, $serialpath, O_RDWR|O_EXCL)
+        or die "Unable to generate new cert serial number; can't open '$serialpath': $!\n";
+    chomp( my $serial = <$fh> );
+    seek( $fh, SEEK_SET, 0 )
+        or die "Unable to update certificate serial number: $!\n"; # back to start
+    print $fh ($serial + 1);
+    return $serial;
+}
+
+sub _cert_issue_create_dir($cert) {
+    my $dir = File::Temp->newdir( CLEANUP => 1 );
+    my $pubkey = File::Temp->new( CLEANUP => 1, DIR => $dir->dirname );
+    print $pubkey cert_pubkey($cert);
+
+    return { dir => $dir, pubkey => $pubkey };
+}
+
+sub _cert_issue_pubkey_file($dir) {
+    return $dir->{pubkey}->filename;
+}
+
+sub _cert_issue_cert_file($dir) {
+    my $fn = _cert_issue_pubkey_file($dir);
+    return "$fn-cert.pub";
+}
+
+sub ssh_cert_issue($cert) {
+    my @cmd_args = qw(ssh-keygen -q);
+    my $dir = _cert_issue_create_dir( $cert );
+    my $pubkey_fn = _cert_issue_pubkey_file( $dir );
+    push @cmd_args, '-h'
+        if cert_type( $cert ) eq 'host';
+    push @cmd_args, ('-I', cert_identity( $cert ));
+
+    if (my @principals = cert_principals( $cert )) {
+        push @cmd_args, ('-n', join(',', @principals));
+    }
+    if (my @options = cert_options( $cert )) {
+        push @cmd_args, (map { ('-O', $_) } @options);
+    }
+    if (my $validity = cert_validity( $cert )) {
+        push @cmd_args, ('-V', $validity);
+    }
+    if (my $serial = cert_serial( $cert )) {
+        push @cmd_args, ('-z', $serial);
+    }
+
+    my $ca;
+    if (cert_type( $cert ) eq 'host') {
+        $ca = opt( 'hostca_key' );
+    }
+    else {
+        $ca = opt( 'userca_key' );
+    }
+    push @cmd_args, '-s', $ca, $pubkey_fn;
+
+    say join(' ', map { "'$_'" } @cmd_args)
+        if $DEBUG;
+
+    system @cmd_args;
+    my $certfile = _cert_issue_cert_file( $dir );
+    my $certkey = `cat $certfile`;
+    chomp $certkey;
+
+    cert_certkey( $cert, $certkey );
+}
+
+
+sub _init_ca_key( %args ) {
+    my @args = (
+        'ssh-keygen',
+        '-q',
+        '-N', '',
+        '-t', opt( 'ca_keytype' ),
+        '-f', File::Spec->catfile( opt( 'cadir' ), $args{name} ),
+        );
+    if ($args{comment}) {
+        push @args, ('-C', $args{comment});
+    }
+
+    say "Generating $args{name} key: " . join(' ', map { qq{"$_"} } @args);
+    system(@args);
+}
+
+sub cmd_init(@args) {
+    my $serial = $options{serial} // 1;
+
+    my $basedir = opt( 'basedir', (shift @args) );
+    die "Unable to create CA base directory '$basedir': Path exists\n"
+        if -e $basedir;
+    make_path $basedir;
+    make_path opt( 'cadir' );
+    make_path opt( 'certsdir' );
+    ### TODO! Check successful creation of the directories!
+
+    _init_ca_key( name => 'hostca', comment => opt( 'hostca_keycomment' ) );
+    _init_ca_key( name => 'userca', comment => opt( 'userca_keycomment' ) );
+
+    open my $fh, '>:encoding(UTF-8)', opt( 'caserial' )
+        or die "Unable to create serial file: $!\n";
+    print $fh $serial;
+
+    my $hostca_pubkey = opt( 'hostca_pubkey' );
+    my $userca_pubkey = opt( 'userca_pubkey' );
+    say <<~EOF;
+      Successfully created SSH CA directory $basedir
+
+      Please find how to install the user CA public key from '$hostca_pubkey'
+      on your servers to recognize certificates of users logging in:
+         https://github.com/ehuelsmann/perl-sshca/...
+
+      Please find how to install the host CA public key '$userca_pubkey'
+      on your clients to recognize certificates of hosts being logged into:
+         https://github.com/ehuelsmann/perl-sshca/...
+      EOF
+}
+
+sub _validity_for_cert( $cert ) {
+    return $options{validity} if defined $options{validity};
+    if (cert_type( $cert ) eq 'host') {
+        return opt( 'hostcert_validity' );
+    }
+    return opt( 'usercert_validity' );
+}
+
+sub cmd_issue(@args) {
+    my @options;
+    my @principals;
+    my $type = opt( 'certtype' );
+
+    my $identity = shift @args;
+    my $pubkey_file = (shift @args) || '-'; # map empty string to '-' too!
+    my $pubkey_fh;
+
+    if (not defined $identity) {
+        die <<~EOF;
+        Missing identity parameter!
+
+        Usage:
+          sshca issue [options...] <identity> [pubkey path]
+        EOF
+    }
+    if ($pubkey_file eq '-') {
+        say STDERR "Reading public key from standard input for identity '$identity'";
+        $pubkey_fh = *STDIN;
+    }
+    else {
+        open($pubkey_fh, '<:encoding(UTF-8)', $pubkey_file)
+            or die "Unable to open public key file ($pubkey_file): $!";
+    }
+    my $pubkey = do { local $/ = undef; <$pubkey_fh> };
+    chomp $pubkey;
+    my $validity = $options{validity};
+    unless (defined $validity) {
+        if ($type eq 'host') {
+            $validity = opt( 'hostcert_validity' );
+        }
+        else {
+            $validity = opt( 'usercert_validity' );
+        }
+    }
+    my $cert = cert_new( $identity,
+                         pubkey => $pubkey,
+                         options => \@options,
+                         principals => \@principals,
+                         type => $type );
+    cert_serial( $cert, conf_next_serial() );
+    cert_validity( $cert, _validity_for_cert( $cert ) );
+
+    ssh_cert_issue( $cert );
+    cert_save( $cert );
+    my $Type = ucfirst( $type );
+    my $serial = cert_serial( $cert );
+    say STDERR "$Type certificate with identity '$identity' and serial number $serial:";
+    say cert_certkey( $cert );
+}
+
+sub cmd_renew(@args) {
+    my $serial = shift @args;
+    my $cert = cert_load( $serial );
+
+    my $serial  = conf_next_serial;
+    my $renewed = cert_renew( $cert, $serial );
+    cert_validity( $renewed, _validity_for_cert( $renewed ) );
+    ssh_cert_issue( $renewed );
+    cert_save( $renewed );
+
+    cert_state( $cert, 'RENEWED' );
+    cert_save( $cert );
+
+    say cert_certkey( $renewed );
+}
+
+sub cmd_revoke(@args) {
+}
+
+sub cmd_history(@args) {
+}
+
+
+my $help = <<'HELP';
+usage: sshca <command> [options] args...
+
+  commands:
+    init
+    issue
+    renew
+    revoke
+    history
+HELP
+
+sub usage() {
+}
+
+if (@ARGV == 0 or $ARGV[0] eq 'help') {
+    usage();
+    exit 0;
+}
+
+my %cmd = (
+    init => \&cmd_init,
+    issue => \&cmd_issue,
+    renew => \&cmd_renew,
+    revoke => \&cmd_revoke,
+    history => \&cmd_history,
+    );
+
+my %common_opts = (
+    'basedir=s' => \$options{basedir},
+    'config=s'  => \$options{config},
+    'debug'     => \$DEBUG,
+    );
+
+my %cmd_opts = (
+    init => { 'serial=i' => \$options{serial},
+              'import-hostca=s' => \$options{"import-hostca"},
+              'import-userca=s' => \$options{"import-userca"},
+              %common_opts, },
+    issue => { 'host'        => sub { $options{certtype} = 'host' },
+               'option=s'    => \@{$options{certoptions}},
+               'principal=s' => \@{$options{certprincipals}},
+               'validity=s'  => \$options{certvalidity},
+               %common_opts },
+    renew => { 'serial'      => sub { $options{renewal} = 'serial' },
+               'fingerprint' => sub { $options{renewal} = 'fingerprint'; die "Fingerprint renewals are planned\n" },
+               'identity'    => sub { $options{renewal} = 'identity'; die "Identity renewals are planned\n" },
+               'validity=s'  => \$options{certvalidity},
+               %common_opts },
+    revoke => { %common_opts },
+    history => { %common_opts }
+    );
+
+Getopt::Long::Configure( 'require_order' );
+GetOptionsFromArray(\@ARGV, %common_opts);
+my $command = shift @ARGV;
+if ($cmd{$command}) {
+    configure();
+    Getopt::Long::Configure( 'permute' );
+    GetOptionsFromArray(\@ARGV, $cmd_opts{$command}->%*);
+    exit $cmd{$command}->(@ARGV);
+}
+else {
+    say "Unknown command: '$command'";
+    usage();
+    exit 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+sscha - Minimalistic SSH Certificate Authority
+
+=head1 VERSION
+
+version 0.0.1
+
+=head1 SYNOPSIS
+
+  $ sshca init
+  Successfully created SH CA directory ~/sshca
+  $ sshca issue certName ~/.ssh/id_ed25519.pub
+  User certificate with identity 'certName' and serial number 1:
+  ... certificate data ...
+  $ sshca renew 1
+  ... certificate data ...
+
+=head1 DESCRIPTION
+
+This is a simple SSH Certificate Authority. SSH certificates greatly
+enhance the functionality of SSH public keys. The C<sshca> script hands
+out certificates for public keys and tracks these certs.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2025 Erik Huelsmann <ehuels@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is furnished
+to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

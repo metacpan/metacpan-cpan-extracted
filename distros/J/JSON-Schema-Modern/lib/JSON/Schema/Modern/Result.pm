@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use Moo;
@@ -23,6 +23,7 @@ use Types::Standard qw(ArrayRef InstanceOf Enum Bool Str Maybe Tuple);
 use Types::Common::Numeric 'PositiveInt';
 use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
+use JSON::Schema::Modern::Utilities qw(true false);
 use JSON::PP ();
 use List::Util 1.50 qw(any uniq all);
 use Carp 'croak';
@@ -39,13 +40,10 @@ use overload
   '""' => sub { $_[0]->stringify },
   fallback => 1;
 
-use constant { true => JSON::PP::true, false => JSON::PP::false };
-use constant HAVE_BUILTIN => "$]" >= 5.036;
-
 has valid => (
   is => 'ro',
   isa => Bool|InstanceOf('JSON::PP::true')|InstanceOf('JSON::PP::false'),
-  coerce => sub { HAVE_BUILTIN ? !!$_[0] : $_[0] ? true : false },
+  coerce => sub { $_[0] ? true : false }, # might be JSON::PP::* or builtin::* booleans
   required => 1,
 );
 sub result { goto \&valid } # backcompat only
@@ -224,7 +222,6 @@ sub combine ($self, $other, $swap) {
   );
 }
 
-
 sub stringify ($self) {
   return $self->format('data_only');
 }
@@ -269,7 +266,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 SYNOPSIS
 
@@ -281,7 +278,7 @@ version 0.612
   my $result_data_encoded = encode_json($result); # calls TO_JSON
 
   # use in numeric and boolean context
-  say sprintf('got %d %ss', $result, ($result ? 'annotation' : 'error'));
+  say sprintf('got %d %ss', $result, ($result->valid ? 'annotation' : 'error'));
 
   # use in string context
   say 'full results: ', $result;

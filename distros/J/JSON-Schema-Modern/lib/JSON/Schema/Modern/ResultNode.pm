@@ -4,7 +4,7 @@ package JSON::Schema::Modern::ResultNode;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Common code for nodes of a JSON::Schema::Modern::Result
 
-our $VERSION = '0.612';
+our $VERSION = '0.614';
 
 use 5.020;
 use Moo::Role;
@@ -121,7 +121,7 @@ JSON::Schema::Modern::ResultNode - Common code for nodes of a JSON::Schema::Mode
 
 =head1 VERSION
 
-version 0.612
+version 0.614
 
 =head1 SYNOPSIS
 
