@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Electron;
-$Playwright::Electron::VERSION = '1.460';
+$Playwright::Electron::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::Electron - Automatically generated class for Playwright::Electron
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 

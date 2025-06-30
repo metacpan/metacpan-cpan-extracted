@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FrameLocator;
-$Playwright::FrameLocator::VERSION = '1.460';
+$Playwright::FrameLocator::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,51 +22,11 @@ sub spec {
     return $Playwright::spec->{'FrameLocator'}{members};
 }
 
-sub getByLabel {
+sub frameLocator {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'getByLabel',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub last {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'last',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub getByRole {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'getByRole',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub getByText {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'getByText',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub getByPlaceholder {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'getByPlaceholder',
+        command => 'frameLocator',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -82,51 +42,21 @@ sub getByTestId {
     );
 }
 
-sub first {
+sub getByLabel {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'first',
+        command => 'getByLabel',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub frameLocator {
+sub getByText {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'frameLocator',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub locator {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'locator',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub owner {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'owner',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub getByAltText {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'getByAltText',
+        command => 'getByText',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -142,11 +72,81 @@ sub getByTitle {
     );
 }
 
+sub getByAltText {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'getByAltText',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub getByPlaceholder {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'getByPlaceholder',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub owner {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'owner',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub nth {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'nth',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub first {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'first',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub getByRole {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'getByRole',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub last {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'last',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub locator {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'locator',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -196,7 +196,7 @@ Playwright::FrameLocator - Automatically generated class for Playwright::FrameLo
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -207,35 +207,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 getByLabel(@args)
+=head2 frameLocator(@args)
 
-Execute the FrameLocator::getByLabel playwright routine.
+Execute the FrameLocator::frameLocator playwright routine.
 
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByLabel> for more information.
-
-=head2 last(@args)
-
-Execute the FrameLocator::last playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-last> for more information.
-
-=head2 getByRole(@args)
-
-Execute the FrameLocator::getByRole playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByRole> for more information.
-
-=head2 getByText(@args)
-
-Execute the FrameLocator::getByText playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByText> for more information.
-
-=head2 getByPlaceholder(@args)
-
-Execute the FrameLocator::getByPlaceholder playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByPlaceholder> for more information.
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-frameLocator> for more information.
 
 =head2 getByTestId(@args)
 
@@ -243,35 +219,17 @@ Execute the FrameLocator::getByTestId playwright routine.
 
 See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByTestId> for more information.
 
-=head2 first(@args)
+=head2 getByLabel(@args)
 
-Execute the FrameLocator::first playwright routine.
+Execute the FrameLocator::getByLabel playwright routine.
 
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-first> for more information.
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByLabel> for more information.
 
-=head2 frameLocator(@args)
+=head2 getByText(@args)
 
-Execute the FrameLocator::frameLocator playwright routine.
+Execute the FrameLocator::getByText playwright routine.
 
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-frameLocator> for more information.
-
-=head2 locator(@args)
-
-Execute the FrameLocator::locator playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-locator> for more information.
-
-=head2 owner(@args)
-
-Execute the FrameLocator::owner playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-owner> for more information.
-
-=head2 getByAltText(@args)
-
-Execute the FrameLocator::getByAltText playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByAltText> for more information.
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByText> for more information.
 
 =head2 getByTitle(@args)
 
@@ -279,11 +237,53 @@ Execute the FrameLocator::getByTitle playwright routine.
 
 See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByTitle> for more information.
 
+=head2 getByAltText(@args)
+
+Execute the FrameLocator::getByAltText playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByAltText> for more information.
+
+=head2 getByPlaceholder(@args)
+
+Execute the FrameLocator::getByPlaceholder playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByPlaceholder> for more information.
+
+=head2 owner(@args)
+
+Execute the FrameLocator::owner playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-owner> for more information.
+
 =head2 nth(@args)
 
 Execute the FrameLocator::nth playwright routine.
 
 See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-nth> for more information.
+
+=head2 first(@args)
+
+Execute the FrameLocator::first playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-first> for more information.
+
+=head2 getByRole(@args)
+
+Execute the FrameLocator::getByRole playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-getByRole> for more information.
+
+=head2 last(@args)
+
+Execute the FrameLocator::last playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-last> for more information.
+
+=head2 locator(@args)
+
+Execute the FrameLocator::locator playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FrameLocator#FrameLocator-locator> for more information.
 
 =head2 on(@args)
 

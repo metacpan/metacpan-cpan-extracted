@@ -37,6 +37,7 @@
             "List::Util" : "1.33",
             "Net::ASN" : "0",
             "Net::DNS::Domain" : "0",
+            "Net::IDN::Encode" : "0",
             "Net::IP" : "0",
             "Net::RDAP" : "0.35",
             "Pod::Usage" : "0",
@@ -58,6 +59,6 @@
          "web" : "https://github.com/gbxyz/rdapper"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

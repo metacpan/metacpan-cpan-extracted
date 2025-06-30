@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FormData;
-$Playwright::FormData::VERSION = '1.460';
+$Playwright::FormData::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,21 +32,21 @@ sub set {
     );
 }
 
-sub append {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'append',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub create {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'create',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub append {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'append',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::FormData - Automatically generated class for Playwright::FormData
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -113,17 +113,17 @@ Execute the FormData::set playwright routine.
 
 See L<https://playwright.dev/docs/api/class-FormData#FormData-set> for more information.
 
-=head2 append(@args)
-
-Execute the FormData::append playwright routine.
-
-See L<https://playwright.dev/docs/api/class-FormData#FormData-append> for more information.
-
 =head2 create(@args)
 
 Execute the FormData::create playwright routine.
 
 See L<https://playwright.dev/docs/api/class-FormData#FormData-create> for more information.
+
+=head2 append(@args)
+
+Execute the FormData::append playwright routine.
+
+See L<https://playwright.dev/docs/api/class-FormData#FormData-append> for more information.
 
 =head2 on(@args)
 

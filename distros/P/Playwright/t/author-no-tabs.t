@@ -75,6 +75,7 @@ my @files = (
     'lib/Playwright/WebError.pm',
     'lib/Playwright/WebSocket.pm',
     'lib/Playwright/WebSocketFrame.pm',
+    'lib/Playwright/WebSocketRoute.pm',
     'lib/Playwright/Worker.pm',
     't/Playwright-Base.t',
     't/Playwright-Util.t',

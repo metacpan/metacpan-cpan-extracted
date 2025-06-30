@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,178 +21,181 @@ name: Playwright
 provides:
   Playwright:
     file: lib/Playwright.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::APIRequest:
     file: lib/Playwright/APIRequest.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::APIRequestContext:
     file: lib/Playwright/APIRequestContext.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::APIResponse:
     file: lib/Playwright/APIResponse.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::APIResponseAssertions:
     file: lib/Playwright/APIResponseAssertions.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Accessibility:
     file: lib/Playwright/Accessibility.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Android:
     file: lib/Playwright/Android.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::AndroidDevice:
     file: lib/Playwright/AndroidDevice.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::AndroidInput:
     file: lib/Playwright/AndroidInput.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::AndroidSocket:
     file: lib/Playwright/AndroidSocket.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::AndroidWebView:
     file: lib/Playwright/AndroidWebView.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Base:
     file: lib/Playwright/Base.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Browser:
     file: lib/Playwright/Browser.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::BrowserContext:
     file: lib/Playwright/BrowserContext.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::BrowserServer:
     file: lib/Playwright/BrowserServer.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::BrowserType:
     file: lib/Playwright/BrowserType.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::CDPSession:
     file: lib/Playwright/CDPSession.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::CDPSessionEvent:
     file: lib/Playwright/CDPSessionEvent.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Clock:
     file: lib/Playwright/Clock.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::ConsoleMessage:
     file: lib/Playwright/ConsoleMessage.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Coverage:
     file: lib/Playwright/Coverage.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Dialog:
     file: lib/Playwright/Dialog.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Download:
     file: lib/Playwright/Download.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Electron:
     file: lib/Playwright/Electron.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::ElectronApplication:
     file: lib/Playwright/ElectronApplication.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::ElementHandle:
     file: lib/Playwright/ElementHandle.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Error:
     file: lib/Playwright/Error.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::FileChooser:
     file: lib/Playwright/FileChooser.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::FormData:
     file: lib/Playwright/FormData.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Frame:
     file: lib/Playwright/Frame.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::FrameLocator:
     file: lib/Playwright/FrameLocator.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::GenericAssertions:
     file: lib/Playwright/GenericAssertions.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::JSHandle:
     file: lib/Playwright/JSHandle.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Keyboard:
     file: lib/Playwright/Keyboard.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Locator:
     file: lib/Playwright/Locator.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::LocatorAssertions:
     file: lib/Playwright/LocatorAssertions.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Logger:
     file: lib/Playwright/Logger.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::ModuleList:
     file: lib/Playwright/ModuleList.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Mouse:
     file: lib/Playwright/Mouse.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Page:
     file: lib/Playwright/Page.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::PageAssertions:
     file: lib/Playwright/PageAssertions.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::PlaywrightAssertions:
     file: lib/Playwright/PlaywrightAssertions.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::PlaywrightException:
     file: lib/Playwright/PlaywrightException.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Request:
     file: lib/Playwright/Request.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::RequestOptions:
     file: lib/Playwright/RequestOptions.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Response:
     file: lib/Playwright/Response.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Route:
     file: lib/Playwright/Route.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Selectors:
     file: lib/Playwright/Selectors.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::SnapshotAssertions:
     file: lib/Playwright/SnapshotAssertions.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::TimeoutError:
     file: lib/Playwright/TimeoutError.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Touchscreen:
     file: lib/Playwright/Touchscreen.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Tracing:
     file: lib/Playwright/Tracing.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Util:
     file: lib/Playwright/Util.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::Video:
     file: lib/Playwright/Video.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::WebError:
     file: lib/Playwright/WebError.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::WebSocket:
     file: lib/Playwright/WebSocket.pm
-    version: '1.460'
+    version: '1.531'
   Playwright::WebSocketFrame:
     file: lib/Playwright/WebSocketFrame.pm
-    version: '1.460'
+    version: '1.531'
+  Playwright::WebSocketRoute:
+    file: lib/Playwright/WebSocketRoute.pm
+    version: '1.531'
   Playwright::Worker:
     file: lib/Playwright/Worker.pm
-    version: '1.460'
+    version: '1.531'
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -223,11 +226,11 @@ resources:
   bugtracker: https://github.com/teodesian/playwright-perl/issues
   homepage: https://github.com/teodesian/playwright-perl
   repository: https://github.com/teodesian/playwright-perl.git
-version: '1.460'
+version: '1.531'
 x_contributors:
   - 'Keith Carangelo <mail@kcaran.com>'
   - 'reneeb <info@perl-services.de>'
   - 'Yanick Champoux <yanick.champoux@iinteractive.com>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

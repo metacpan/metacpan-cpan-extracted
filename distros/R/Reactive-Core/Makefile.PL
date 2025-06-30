@@ -24,10 +24,10 @@ my %WriteMakefileArgs = (
     "Module::Load" => 0,
     "Module::Loader" => 0,
     "Moo" => 0,
-    "Type::Tiny" => 0,
+    "Type::Tiny" => "2.003",
     "namespace::clean" => 0
   },
-  "VERSION" => "0.103",
+  "VERSION" => "0.104",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "Module::Load" => 0,
   "Module::Loader" => 0,
   "Moo" => 0,
-  "Type::Tiny" => 0,
+  "Type::Tiny" => "2.003",
   "namespace::clean" => 0
 );
 

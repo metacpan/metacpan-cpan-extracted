@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightAssertions;
-$Playwright::PlaywrightAssertions::VERSION = '1.460';
+$Playwright::PlaywrightAssertions::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,26 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'PlaywrightAssertions'}{members};
+}
+
+sub expectGeneric {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'expectGeneric',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub expectLocator {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'expectLocator',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub expectPage {
@@ -47,26 +67,6 @@ sub expectAPIResponse {
     return $self->_api_request(
         args    => [@_],
         command => 'expectAPIResponse',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub expectGeneric {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'expectGeneric',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub expectLocator {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'expectLocator',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::PlaywrightAssertions - Automatically generated class for Playwright:
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -126,6 +126,18 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
+
+=head2 expectGeneric(@args)
+
+Execute the PlaywrightAssertions::expectGeneric playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
+
+=head2 expectLocator(@args)
+
+Execute the PlaywrightAssertions::expectLocator playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectLocator> for more information.
 
 =head2 expectPage(@args)
 
@@ -144,18 +156,6 @@ See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAsser
 Execute the PlaywrightAssertions::expectAPIResponse playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectAPIResponse> for more information.
-
-=head2 expectGeneric(@args)
-
-Execute the PlaywrightAssertions::expectGeneric playwright routine.
-
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
-
-=head2 expectLocator(@args)
-
-Execute the PlaywrightAssertions::expectLocator playwright routine.
-
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectLocator> for more information.
 
 =head2 on(@args)
 

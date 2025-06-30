@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Mouse;
-$Playwright::Mouse::VERSION = '1.460';
+$Playwright::Mouse::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,11 @@ sub spec {
     return $Playwright::spec->{'Mouse'}{members};
 }
 
-sub click {
+sub wheel {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'click',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub move {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'move',
+        command => 'wheel',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,6 +42,26 @@ sub down {
     );
 }
 
+sub up {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'up',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub move {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'move',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub dblclick {
     my $self = shift;
     return $self->_api_request(
@@ -62,21 +72,11 @@ sub dblclick {
     );
 }
 
-sub wheel {
+sub click {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'wheel',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub up {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'up',
+        command => 'click',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -126,7 +126,7 @@ Playwright::Mouse - Automatically generated class for Playwright::Mouse
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -137,17 +137,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 click(@args)
+=head2 wheel(@args)
 
-Execute the Mouse::click playwright routine.
+Execute the Mouse::wheel playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Mouse#Mouse-click> for more information.
-
-=head2 move(@args)
-
-Execute the Mouse::move playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Mouse#Mouse-move> for more information.
+See L<https://playwright.dev/docs/api/class-Mouse#Mouse-wheel> for more information.
 
 =head2 down(@args)
 
@@ -155,23 +149,29 @@ Execute the Mouse::down playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Mouse#Mouse-down> for more information.
 
+=head2 up(@args)
+
+Execute the Mouse::up playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Mouse#Mouse-up> for more information.
+
+=head2 move(@args)
+
+Execute the Mouse::move playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Mouse#Mouse-move> for more information.
+
 =head2 dblclick(@args)
 
 Execute the Mouse::dblclick playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Mouse#Mouse-dblclick> for more information.
 
-=head2 wheel(@args)
+=head2 click(@args)
 
-Execute the Mouse::wheel playwright routine.
+Execute the Mouse::click playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Mouse#Mouse-wheel> for more information.
-
-=head2 up(@args)
-
-Execute the Mouse::up playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Mouse#Mouse-up> for more information.
+See L<https://playwright.dev/docs/api/class-Mouse#Mouse-click> for more information.
 
 =head2 on(@args)
 

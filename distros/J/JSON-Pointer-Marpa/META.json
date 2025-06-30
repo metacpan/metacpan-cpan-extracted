@@ -60,7 +60,7 @@
    "provides" : {
       "JSON::Pointer::Marpa" : {
          "file" : "lib/JSON/Pointer/Marpa.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "JSON::Pointer::Marpa::Semantics" : {
          "file" : "lib/JSON/Pointer/Marpa/Semantics.pm"
@@ -77,6 +77,6 @@
          "web" : "https://github.com/XSven/JSON-Pointer-Marpa"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

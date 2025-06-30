@@ -6,7 +6,7 @@ use File::Spec::Functions         qw( catfile );
 use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
 
 my @main_module_namespace = qw( JSON Pointer Marpa );
-my $version               = '1.0.0';
+my $version               = '1.0.1';
 my $release_status        = 'stable';                   # transition: unstable => testing => stable
 
 my $distname            = join '-',  @main_module_namespace;

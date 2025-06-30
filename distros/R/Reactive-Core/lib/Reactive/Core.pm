@@ -42,11 +42,11 @@ Reactive::Core - The great new Reactive::Core!
 
 =head1 VERSION
 
-Version 0.103
+Version 0.104
 
 =cut
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 
 =head1 SYNOPSIS

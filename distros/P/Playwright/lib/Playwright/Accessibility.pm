@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Accessibility;
-$Playwright::Accessibility::VERSION = '1.460';
+$Playwright::Accessibility::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::Accessibility - Automatically generated class for Playwright::Access
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 

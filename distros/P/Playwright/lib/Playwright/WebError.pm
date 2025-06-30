@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::WebError;
-$Playwright::WebError::VERSION = '1.460';
+$Playwright::WebError::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'WebError'}{members};
 }
 
-sub page {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'page',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub error {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'error',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub page {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'page',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -86,7 +86,7 @@ Playwright::WebError - Automatically generated class for Playwright::WebError
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -97,17 +97,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 page(@args)
-
-Execute the WebError::page playwright routine.
-
-See L<https://playwright.dev/docs/api/class-WebError#WebError-page> for more information.
-
 =head2 error(@args)
 
 Execute the WebError::error playwright routine.
 
 See L<https://playwright.dev/docs/api/class-WebError#WebError-error> for more information.
+
+=head2 page(@args)
+
+Execute the WebError::page playwright routine.
+
+See L<https://playwright.dev/docs/api/class-WebError#WebError-page> for more information.
 
 =head2 on(@args)
 

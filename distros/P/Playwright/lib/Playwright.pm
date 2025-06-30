@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '1.460';
+$Playwright::VERSION = '1.531';
 use strict;
 use warnings;
 
@@ -245,8 +245,10 @@ sub quit ($self) {
 
     # Best effort to whack this, we can't make guarantees during global destruction
     eval {
-        Playwright::Util::request( 'GET', 'shutdown', $self->{host},
-            $self->{port}, $self->{ua} );
+        capture_merged {
+            Playwright::Util::request( 'GET', 'shutdown', $self->{host},
+                $self->{port}, $self->{ua} )
+        };
     } if $self->{ua};
 
     return $self->_kill_playwright_server_windows() if IS_WIN;
@@ -382,7 +384,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 SYNOPSIS
 

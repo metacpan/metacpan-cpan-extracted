@@ -31,7 +31,7 @@ no_index:
 provides:
   JSON::Pointer::Marpa:
     file: lib/JSON/Pointer/Marpa.pm
-    version: v1.0.0
+    version: v1.0.1
   JSON::Pointer::Marpa::Semantics:
     file: lib/JSON/Pointer/Marpa/Semantics.pm
 requires:
@@ -45,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/JSON-Pointer-Marpa/issues
   repository: git://github.com/XSven/JSON-Pointer-Marpa.git
-version: 1.0.0
+version: 1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

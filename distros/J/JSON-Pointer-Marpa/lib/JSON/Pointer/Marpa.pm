@@ -5,7 +5,7 @@ package JSON::Pointer::Marpa;
 
 # Keeping the following $VERSION declaration on a single line is important.
 #<<<
-use version 0.9915; our $VERSION = version->declare( '1.0.0' );
+use version 0.9915; our $VERSION = version->declare( '1.0.1' );
 #>>>
 
 use Marpa::R2   ();
@@ -29,7 +29,7 @@ lexeme default = latm  => 1
 :lexeme ~ escaped_tilde
 
 # Structural (G1) rules:
-pointer          ::= pointer_segment*    action => get_currently_referenced_value
+pointer          ::= pointer_segment*    action => get_crv
 pointer_segment  ::= '/' reference_token
 reference_token  ::= next_array_index    action => next_array_index_dereferencing
                      | array_index       action => array_index_dereferencing
@@ -57,7 +57,7 @@ END_OF_DSL
 my $grammar = Marpa::R2::Scanless::G->new(
   {
     source            => \$dsl,
-    trace_file_handle => *STDERR,
+    trace_file_handle => *STDERR
   }
 );
 
@@ -73,14 +73,14 @@ sub get {
 
   my $recognizer = Marpa::R2::Scanless::R->new(
     {
-      grammar => $grammar,
+      grammar => $grammar
       #trace_terminals => 1,
       #trace_values    => 1,
     }
   );
   $recognizer->read( \$json_pointer );
 
-  return ${ $recognizer->value( JSON::Pointer::Marpa::Semantics->new( $json_document ) ) };
+  ${ $recognizer->value( JSON::Pointer::Marpa::Semantics->new( $json_document ) ) }
 }
 
-1;
+1

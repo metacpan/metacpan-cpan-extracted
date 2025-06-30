@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Keyboard;
-$Playwright::Keyboard::VERSION = '1.460';
+$Playwright::Keyboard::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,11 @@ sub spec {
     return $Playwright::spec->{'Keyboard'}{members};
 }
 
-sub type {
+sub up {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'type',
+        command => 'up',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,11 +62,11 @@ sub insertText {
     );
 }
 
-sub up {
+sub type {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'up',
+        command => 'type',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::Keyboard - Automatically generated class for Playwright::Keyboard
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -127,11 +127,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 type(@args)
+=head2 up(@args)
 
-Execute the Keyboard::type playwright routine.
+Execute the Keyboard::up playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Keyboard#Keyboard-type> for more information.
+See L<https://playwright.dev/docs/api/class-Keyboard#Keyboard-up> for more information.
 
 =head2 down(@args)
 
@@ -151,11 +151,11 @@ Execute the Keyboard::insertText playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Keyboard#Keyboard-insertText> for more information.
 
-=head2 up(@args)
+=head2 type(@args)
 
-Execute the Keyboard::up playwright routine.
+Execute the Keyboard::type playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Keyboard#Keyboard-up> for more information.
+See L<https://playwright.dev/docs/api/class-Keyboard#Keyboard-type> for more information.
 
 =head2 on(@args)
 

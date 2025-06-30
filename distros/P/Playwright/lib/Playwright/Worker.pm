@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Worker;
-$Playwright::Worker::VERSION = '1.460';
+$Playwright::Worker::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,21 +32,11 @@ sub close {
     );
 }
 
-sub evaluateHandle {
+sub url {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'evaluateHandle',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub waitForClose {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'waitForClose',
+        command => 'url',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,11 +52,21 @@ sub evaluate {
     );
 }
 
-sub url {
+sub evaluateHandle {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'url',
+        command => 'evaluateHandle',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub waitForClose {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'waitForClose',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::Worker - Automatically generated class for Playwright::Worker
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -113,6 +113,18 @@ Execute the Worker::close playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Worker#Worker-close> for more information.
 
+=head2 url(@args)
+
+Execute the Worker::url playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Worker#Worker-url> for more information.
+
+=head2 evaluate(@args)
+
+Execute the Worker::evaluate playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Worker#Worker-evaluate> for more information.
+
 =head2 evaluateHandle(@args)
 
 Execute the Worker::evaluateHandle playwright routine.
@@ -124,18 +136,6 @@ See L<https://playwright.dev/docs/api/class-Worker#Worker-evaluateHandle> for mo
 Execute the Worker::waitForClose playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Worker#Worker-waitForClose> for more information.
-
-=head2 evaluate(@args)
-
-Execute the Worker::evaluate playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Worker#Worker-evaluate> for more information.
-
-=head2 url(@args)
-
-Execute the Worker::url playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Worker#Worker-url> for more information.
 
 =head2 on(@args)
 

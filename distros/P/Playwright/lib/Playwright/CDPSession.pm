@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::CDPSession;
-$Playwright::CDPSession::VERSION = '1.460';
+$Playwright::CDPSession::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'CDPSession'}{members};
 }
 
-sub off {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'off',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub on {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'on',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub send {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'send',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,21 +52,21 @@ sub detach {
     );
 }
 
-sub event {
+sub off {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'event',
+        command => 'off',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub send {
+sub event {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'send',
+        command => 'event',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::CDPSession - Automatically generated class for Playwright::CDPSessio
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -117,17 +117,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 off(@args)
-
-Execute the CDPSession::off playwright routine.
-
-See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-off> for more information.
-
 =head2 on(@args)
 
 Execute the CDPSession::on playwright routine.
 
 See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-on> for more information.
+
+=head2 send(@args)
+
+Execute the CDPSession::send playwright routine.
+
+See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-send> for more information.
 
 =head2 detach(@args)
 
@@ -135,17 +135,17 @@ Execute the CDPSession::detach playwright routine.
 
 See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-detach> for more information.
 
+=head2 off(@args)
+
+Execute the CDPSession::off playwright routine.
+
+See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-off> for more information.
+
 =head2 event(@args)
 
 Execute the CDPSession::event playwright routine.
 
 See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-event> for more information.
-
-=head2 send(@args)
-
-Execute the CDPSession::send playwright routine.
-
-See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-send> for more information.
 
 =head2 evaluate(@args)
 

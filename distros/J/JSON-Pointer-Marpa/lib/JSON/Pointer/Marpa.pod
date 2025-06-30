@@ -22,6 +22,30 @@ ABNF syntax of JSON Pointer
   escaped         = "~" ( "0" / "1" )               ; representing '~' and '/', respectively
   array-index     = %x30 / ( %x31-39 *(%x30-39) )   ; "0", or digits without a leading "0"
 
+=head1 ERROR CONDITIONS
+
+This implementation will stop pointer processing, if one of the following
+error conditions is raised:
+
+=over 2
+
+=item * Handling of '-' array index isn't implemented!"
+
+=item * Currently referenced type '%s' isn't a JSON structured type (array or object)!
+
+=item * Currently referenced type '%s' isn't a JSON object!"
+
+=item * JSON array has been accessed with an index %i that is greater than or equal to the size of the array!
+
+=item * JSON object has been accessed with a member '%s' that does not exist!
+
+=back
+
+Other CPAN implementations do not stop processing but return C<undef> for
+some of these error conditions. This approach is questionable because it
+does not allow to differentiate a true JSON C<null> value (Perl C<undef>
+value) from an error condition anymore.
+
 =head1 SEE ALSO
 
 =over 2
@@ -30,7 +54,11 @@ ABNF syntax of JSON Pointer
 
 Augmented BNF for Syntax Specifications [L<RFC5234|https://www.rfc-editor.org/rfc/rfc5234>]
 
-=item  *
+=item *
+
+JSON [L<RFC8259|https://www.rfc-editor.org/rfc/rfc8259>]
+
+=item *
 
 JSON Pointer [L<RFC6901|https://www.rfc-editor.org/rfc/rfc6901>]
 
@@ -45,6 +73,10 @@ L<Marpa::R2>
 =item *
 
 L<JSON::Pointer>
+
+=item *
+
+L<Mojo::JSON::Pointer>
 
 =back
 

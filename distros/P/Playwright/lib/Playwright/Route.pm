@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Route;
-$Playwright::Route::VERSION = '1.460';
+$Playwright::Route::VERSION = '1.531';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,26 +22,6 @@ sub spec {
     return $Playwright::spec->{'Route'}{members};
 }
 
-sub request {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'request',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub fulfill {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'fulfill',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub fetch {
     my $self = shift;
     return $self->_api_request(
@@ -52,11 +32,21 @@ sub fetch {
     );
 }
 
-sub abort {
+sub continue {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'abort',
+        command => 'continue',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub request {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'request',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -72,11 +62,21 @@ sub fallback {
     );
 }
 
-sub continue {
+sub abort {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'continue',
+        command => 'abort',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub fulfill {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'fulfill',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -126,7 +126,7 @@ Playwright::Route - Automatically generated class for Playwright::Route
 
 =head1 VERSION
 
-version 1.460
+version 1.531
 
 =head1 CONSTRUCTOR
 
@@ -137,29 +137,23 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 request(@args)
-
-Execute the Route::request playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Route#Route-request> for more information.
-
-=head2 fulfill(@args)
-
-Execute the Route::fulfill playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Route#Route-fulfill> for more information.
-
 =head2 fetch(@args)
 
 Execute the Route::fetch playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Route#Route-fetch> for more information.
 
-=head2 abort(@args)
+=head2 continue(@args)
 
-Execute the Route::abort playwright routine.
+Execute the Route::continue playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Route#Route-abort> for more information.
+See L<https://playwright.dev/docs/api/class-Route#Route-continue> for more information.
+
+=head2 request(@args)
+
+Execute the Route::request playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Route#Route-request> for more information.
 
 =head2 fallback(@args)
 
@@ -167,11 +161,17 @@ Execute the Route::fallback playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Route#Route-fallback> for more information.
 
-=head2 continue(@args)
+=head2 abort(@args)
 
-Execute the Route::continue playwright routine.
+Execute the Route::abort playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Route#Route-continue> for more information.
+See L<https://playwright.dev/docs/api/class-Route#Route-abort> for more information.
+
+=head2 fulfill(@args)
+
+Execute the Route::fulfill playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Route#Route-fulfill> for more information.
 
 =head2 on(@args)
 
