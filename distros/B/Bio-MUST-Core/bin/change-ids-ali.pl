@@ -55,7 +55,7 @@ change-ids-ali.pl - Abbreviate or restore the org component of full seq ids in A
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 USAGE
 

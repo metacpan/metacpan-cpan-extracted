@@ -904,7 +904,7 @@ This method sends a form data POST request to C</api/timeline/create> with the p
 
 =cut
 
-=head1 timeline_update
+=head2 timeline_update
 
 	my $response = $api->timeline_update({
 		id => '12345',

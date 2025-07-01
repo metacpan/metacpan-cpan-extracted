@@ -1,3 +1,7 @@
+0.251810  2025-06-30 15:44:10+02:00 Europe/Brussels
+    - Fixes
+      - Taxonomy: updated URL for GTDB download (used in setup-taxdir.pl)
+
 0.251140  2025-04-24 20:39:26+02:00 Europe/Brussels
     - Changes
       - SeqId: improved generation of MUST ids from NCBI names

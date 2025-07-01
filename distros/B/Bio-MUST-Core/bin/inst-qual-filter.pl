@@ -61,7 +61,7 @@ inst-qual-filter.pl - Discard low-quality nt seqs in FASTA files (optimized)
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 USAGE
 

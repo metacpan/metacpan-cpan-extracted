@@ -1,5 +1,9 @@
 Revision history for Perl extension Net-Azure-NotificationHubs
 
+0.10 2025-07-01T09:48:14Z
+    - fix: Test suite fails: 599 Internal Exception or 402 Payment Required #8
+    - refactor: Mock HTTP::Tiny implementation for consistent testing responses
+
 0.09 2025-02-25T10:38:20Z
     - api_version required when `undef` assigned into DEFAULT_API_VERSION
 

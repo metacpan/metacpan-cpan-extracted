@@ -40,7 +40,7 @@ rest-ids-ali.pl - Change (restore) full seq ids in ALI files
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 USAGE
 

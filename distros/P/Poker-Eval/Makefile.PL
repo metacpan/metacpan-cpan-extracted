@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Nathaniel Graham <ngraham@cpan.org>},
     VERSION_FROM     => 'lib/Poker/Eval.pm',
     ABSTRACT_FROM    => 'lib/Poker/Eval.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {

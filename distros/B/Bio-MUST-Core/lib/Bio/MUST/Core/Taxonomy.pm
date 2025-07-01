@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.251140';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.251810';
 use Moose;
 use namespace::autoclean;
 
@@ -777,6 +777,23 @@ sub get_taxa_from_taxid {                   ## no critic (RequireArgUnpacking)
     return wantarray ? @taxa : \@taxa;      # specify level through currying
 }
 
+
+# TODO: improve method using the following code snippet
+# TODO: allows for non-pretty (@) MUST ids in --auto-final-ids
+#     # fetch full taxonomy and lowest taxon
+#     my @taxonomy = $tax->get_taxonomy($taxon_id);
+#     my $org = $taxonomy[-1];
+#
+#     # proceed only if valid taxon_id
+#     if ($org) {
+#
+#         # build base MUST id...
+#         $must_id = SeqId->new_with(
+#             org         => $org,
+#             taxon_id    => $taxon_id,
+#             keep_strain => $ARGV_keep_strain,
+#         )->full_id;
+#
 
 sub get_nexus_label_from_seq_id {
     my $self   = shift;
@@ -1678,6 +1695,11 @@ sub _make_gca_files {
             # skip GCF entries with corresponding GCA already available...
             # ... and transform remaining GCF entries into GCA entries
             # Note: versions are considered relevant; only prefix is ignored
+            # TODO: check how it goes with GTDB
+            # grep 021018745 gca0-names.dmp | cat -n
+            #  1	GCA_021018745.1	|	Gloeobacter morelensis	|		|	scientific name
+            #  2	GCF_021018745.1	|	Gloeobacter morelensis	|		|	scientific name
+
             if ($accession =~ $GCAONLY) {
                 $accession =~ tr/F/A/;
                 next LINE if defined $name_for{$accession};
@@ -1833,7 +1855,7 @@ sub _setup_gtdb_taxdir {
     ### Please be patient...
 
     # setup remote archive access
-    my $base = 'https://data.gtdb.ecogenomic.org/releases/latest';
+    my $base = 'https://data.ace.uq.edu.au/public/gtdb/data/releases/latest/';
 
     # get directory listing of latest GTDB release
     my $listing = get($base)
@@ -2101,7 +2123,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 SYNOPSIS
 

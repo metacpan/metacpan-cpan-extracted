@@ -156,7 +156,7 @@ for my $infile (@ARGV_infiles) {
 
     elsif ($ARGV_auto_final_ids) {
         ### Building final ids using NCBI Taxonomy
-        my $idm = $tax->tax_mapper($tree, { append_acc => 1} );
+        my $idm = $tax->tax_mapper($tree, { append_acc => 1 } );
         $tree->restore_ids($idm);
     }
 
@@ -200,7 +200,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 USAGE
 

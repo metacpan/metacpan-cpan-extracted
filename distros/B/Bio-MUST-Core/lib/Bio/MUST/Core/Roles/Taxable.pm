@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Taxable;
 # ABSTRACT: Taxable Moose role for objects that query a taxonomy
-$Bio::MUST::Core::Roles::Taxable::VERSION = '0.251140';
+$Bio::MUST::Core::Roles::Taxable::VERSION = '0.251810';
 use Moose::Role;
 
 use autodie;
@@ -54,7 +54,7 @@ Bio::MUST::Core::Roles::Taxable - Taxable Moose role for objects that query a ta
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 SYNOPSIS
 

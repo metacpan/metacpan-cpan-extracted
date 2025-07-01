@@ -31,7 +31,7 @@ tseq2ali.pl - Convert NCBI TinySeq XML files to ALI files
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 USAGE
 

@@ -62,7 +62,7 @@
    "provides" : {
       "Net::Azure::NotificationHubs" : {
          "file" : "lib/Net/Azure/NotificationHubs.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Net::Azure::NotificationHubs::Request" : {
          "file" : "lib/Net/Azure/NotificationHubs/Request.pm"
@@ -83,7 +83,7 @@
          "web" : "https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_authority" : "cpan:YTURTLE",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

@@ -367,5 +367,59 @@ formTools = {
             jQuery('.formtools-component-menu').find('hr').show();
             jQuery('.formtools-component-menu').find('.formtools-element').show();
         }
+    },
+
+    ckeOnChangeAdded: {},
+    validateRequiredFields: function (e) {
+        let missingRequiredRichtext = false;
+        const form = jQuery(e.target);
+        form.find('.cfhints.required').each( function() {
+            const cfhints = jQuery(this);
+            if ( cfhints.parent().find('textarea.richtext').length ) {
+                const textarea = cfhints.parent().find('textarea.richtext');
+                const editor   = RT.CKEditor.instances[textarea.attr('id')];
+                // add change handler to show/hide invalid feedback
+                if ( ! formTools.ckeOnChangeAdded.hasOwnProperty( textarea.attr('id') ) ) {
+                    editor.ui.focusTracker.on('change:isFocused', function ( evt, name, isFocused ) {
+                        if ( !isFocused ) {
+                            if ( editor.getData() ) {
+                                cfhints.addClass('hidden');
+                            }
+                            else {
+                                cfhints.removeClass('hidden');
+                            }
+                        }
+                    });
+                    formTools.ckeOnChangeAdded[ textarea.attr('id') ] = 1;
+                }
+                cfhints.addClass('invalid-feedback');
+                if ( editor.getData() ) {
+                    cfhints.addClass('hidden');
+                }
+                else {
+                    // only scroll to the first missing richtext
+                    if ( ! missingRequiredRichtext ) {
+                        editor.focus();
+                        textarea.get(0).scrollIntoView();
+                    }
+                    cfhints.removeClass('hidden');
+                    missingRequiredRichtext = true;
+                }
+            }
+            else {
+                cfhints.removeClass().addClass('invalid-feedback');
+            }
+        });
+
+        form.addClass('was-validated');
+        if ( e.target.checkValidity() && ( ! missingRequiredRichtext ) ) {
+            return;
+        }
+        else {
+            e.preventDefault();
+            form.removeClass('rt-form-submitted');
+            jQuery('div.main-container.refreshing').removeClass('refreshing');
+            jQuery('div#hx-boost-spinner').addClass('invisible');
+        }
     }
 };

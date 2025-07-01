@@ -64,31 +64,11 @@ jQuery(function () {
                 }
             }).change();
         }
-        else if ( elem.find('textarea.richtext').length ) {
-            const textarea = elem.find('textarea.richtext');
-            const form = elem.closest('form');
-            form.on('submit', function(e) {
-                const editor = CKEDITOR.instances[textarea.attr('id')];
-                if ( editor.getData() ) {
-                    return;
-                }
-                else {
-                    editor.focus();
-                    elem.get(0).scrollIntoView();
-                    e.preventDefault();
-                    form.removeClass('rt-form-submitted');
-                }
-            });
-        }
-        else {
+        else if ( ! elem.find('textarea.richtext').length ) {
             elem.find(':input:visible').attr('required', true);
 
             if ( elem.find('select.selectpicker').length ) {
-                elem.find('select.selectpicker option[value=""]').remove();
-                if ( !elem.find('select.selectpicker option[selected]').length ) {
-                    elem.find('select.selectpicker').val(null); // Do not automatically select the first valid option
-                }
-                elem.find('select.selectpicker').attr('required', true).selectpicker('refresh');
+                elem.find('select.selectpicker').attr('required', true);
             }
             else if ( elem.find('input[type=radio]').length ) {
                 elem.find('input[type=radio][value=""]').closest('div.custom-control').remove();
@@ -131,39 +111,28 @@ jQuery(function () {
                 }
             }
 
-            // Toggle "(No value)" on show to catch all cases including page re-rendering after clicking "Back"
-            if ( target.find('select.selectpicker').length ) {
-                target.find('select.selectpicker').on('show.bs.select', function() {
-                    if ( jQuery(this).hasClass('required') ) {
-                        jQuery(this).parent().find('.dropdown-menu li.disabled').addClass('hidden');
-                    }
-                    else {
-                        jQuery(this).parent().find('.dropdown-menu li').removeClass('hidden');
-                    }
-                });
-            }
-
             if ( matched ) {
                 if ( target.find('select.selectpicker').length ) {
-                    target.find('select.selectpicker option[value=""]').attr('selected', false).attr('disabled', true);
-                    target.find('select.selectpicker').addClass('required').selectpicker('refresh');
+                    target.find('select.selectpicker').addClass('required');
                 }
                 else if ( target.find('input[type=radio]').length ) {
                     target.find('input[type=radio][value=""]').prop('checked', false).attr('disabled', true);
                 }
                 target.find(':input:visible').attr('required', true);
                 target.find('.cfhints.required').removeClass('hidden');
+                if ( target.closest('form').hasClass('was-validated') ) {
+                    target.find('.cfhints.required').removeClass('').addClass('required invalid-feedback')
+                }
             }
             else {
                 if ( target.find('select.selectpicker').length ) {
-                    target.find('select.selectpicker option[value=""]').attr('disabled', false);
-                    target.find('select.selectpicker').removeClass('required').selectpicker('refresh');
+                    target.find('select.selectpicker').removeClass('required');
                 }
                 else if ( target.find('input[type=radio]').length ) {
                     target.find('input[type=radio][value=""]').attr('disabled', false);
                 }
                 target.find(':input:visible').attr('required', false);
-                target.find('.cfhints.required').addClass('hidden');
+                target.find('.cfhints.required').removeClass().addClass('cfhints my-1 d-inline-block required hidden');
             }
         };
         jQuery(':input[type!=hidden][name="' + dependent_name +'"]').change(syncValidation).change();

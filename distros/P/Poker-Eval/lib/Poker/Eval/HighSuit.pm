@@ -7,11 +7,11 @@ Poker::Eval::HighSuit - Calculate the highest card of a specific suit.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.06
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 
 =head1 INTRODUCTION

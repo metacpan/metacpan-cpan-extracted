@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Weights;
 # ABSTRACT: Random weights for resampling sequence sites
-$Bio::MUST::Core::SeqMask::Weights::VERSION = '0.251140';
+$Bio::MUST::Core::SeqMask::Weights::VERSION = '0.251810';
 use Moose;
 use namespace::autoclean;
 
@@ -88,7 +88,7 @@ Bio::MUST::Core::SeqMask::Weights - Random weights for resampling sequence sites
 
 =head1 VERSION
 
-version 0.251140
+version 0.251810
 
 =head1 SYNOPSIS
 

@@ -9,11 +9,11 @@ Poker::Score - Identify and score specific poker hands. Base class for specific 
 
 =head1 VERSION
 
-Version 0.01
+Version 0.06
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
  
