@@ -1,3 +1,6 @@
+v2.2.2 Wed 2 July 2025
+* Removed now redundant parameter ```MarkupOnDesignSpamTest``` from method client_setpaygbilling
+
 v2.2.1 Wed 8 May 2013
 
 * Added Test::Exception dependency correctly.

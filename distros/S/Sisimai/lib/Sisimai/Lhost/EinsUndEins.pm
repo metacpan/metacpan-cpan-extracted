@@ -26,13 +26,12 @@ sub inquire {
         'message' => ['This message was created automatically by mail delivery software'],
         'error'   => ['For the following reason:'],
     };
-    state $messagesof = { 'mesgtoobig' => ['Mail size limit exceeded'] };
+    state $messagesof = {'mesgtoobig' => ['Mail size limit exceeded']};
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $v = undef;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -42,8 +41,7 @@ sub inquire {
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # The following address failed:
         #
@@ -114,7 +112,7 @@ sub inquire {
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -154,7 +152,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

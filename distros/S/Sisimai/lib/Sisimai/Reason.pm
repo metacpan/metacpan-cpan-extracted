@@ -58,25 +58,22 @@ sub path {
     # @since    v4.25.6
     my $class = shift;
     my $index = __PACKAGE__->index;
-    my $table = {};
-    $table->{ __PACKAGE__.'::'.$_ } = 'Sisimai/Reason/'.$_.'.pm' for @$index;
+    my $table = {}; $table->{ __PACKAGE__.'::'.$_ } = 'Sisimai/Reason/'.$_.'.pm' for @$index;
     return $table;
 }
 
 sub find {
     # Detect the bounce reason
     # @param    [Hash]   argvs  Decoded email object
-    # @return   [String]        Bounce reason or undef if the argument is missing or not HASH
+    # @return   [String]        Bounce reason or an empty string if the argument is missing or not HASH
     # @see anotherone
     my $class = shift;
-    my $argvs = shift // return undef;
+    my $argvs = shift // return "";
 
-    unless( exists $GetRetried->{ $argvs->{'reason'} } ) {
-        # Return a reason text already decided except a reason matched with the regular expression
-        # of ->retry() method.
-        return $argvs->{'reason'} if $argvs->{'reason'};
-    }
-    return 'delivered' if substr($argvs->{'deliverystatus'}, 0, 2) eq '2.';
+    # Return a reason text already decided except a reason matched with the regular expression of
+    # Sisimai::Reason->retry() method.
+    return $argvs->{'reason'} if( (not exists $GetRetried->{ $argvs->{'reason'} }) && $argvs->{'reason'} );
+    return 'delivered'        if substr($argvs->{'deliverystatus'}, 0, 2) eq '2.';
 
     my $reasontext = '';
     my $issuedcode = $argvs->{'diagnosticcode'} || '';
@@ -114,11 +111,10 @@ sub find {
 sub anotherone {
     # Detect the other bounce reason, fall back method for find()
     # @param    [Hash] argvs    Decoded email structure
-    # @return   [String]        Bounce reason or undef if the argument is missing or not HASH
+    # @return   [String]        Bounce reason or an empty string if the argument is missing or not HASH
     # @see      find()
     my $class = shift;
-    my $argvs = shift // return undef;
-    return $argvs->{'reason'} if $argvs->{'reason'};
+    my $argvs = shift // return ""; return $argvs->{'reason'} if $argvs->{'reason'};
 
     require Sisimai::SMTP::Status;
     my $issuedcode = lc $argvs->{'diagnosticcode'} // '';
@@ -186,7 +182,7 @@ sub match {
     # @param    [String] argv1  Error message
     # @return   [String]        Bounce reason
     my $class = shift;
-    my $argv1 = shift // return undef;
+    my $argv1 = shift // return "";
 
     my $reasontext = '';
     my $issuedcode = lc $argv1;
@@ -271,7 +267,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

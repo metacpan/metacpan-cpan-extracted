@@ -2,7 +2,7 @@ package Sisimai;
 use v5.26;
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v5.3.0'); our $PATCHLV = 0;
+use version; our $VERSION = version->declare('v5.4.0'); our $PATCHLV = 0;
 sub version { return substr($VERSION->stringify, 1).($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
 sub libname { 'Sisimai' }
 
@@ -41,7 +41,7 @@ sub rise {
         if( $c___->[1] ) {
             # Run the callback function specified with "c___" parameter of Sisimai->rise after reading
             # each email file in Maildir/ every time
-            $args = { 'kind' => $kind, 'mail' => \$r, 'path' => $path, 'fact' => $fact };
+            $args = {'kind' => $kind, 'mail' => \$r, 'path' => $path, 'fact' => $fact};
             eval { $c___->[1]->($args) if ref $c___->[1] eq 'CODE' };
             warn sprintf(" ***warning: Something is wrong in the second element of the 'c___': %s", $@) if $@;
         }
@@ -138,7 +138,7 @@ sub match {
     # @param    [String]    Error message text
     # @return   [String]    Reason text
     my $class = shift;
-    my $argvs = shift || return undef;
+    my $argvs = shift || return "";
 
     require Sisimai::Reason;
     return Sisimai::Reason->match(lc $argvs);
@@ -159,9 +159,9 @@ Sisimai - Mail Analyzing Interface for bounce mails.
 
 =head1 DESCRIPTION
 
-B<Sisimai> is a library that decodes complex and diverse bounce emails and outputs the results of
-the delivery failure, such as the reason for the bounce and the recipient email address, in structured
-data. It is also possible to output in JSON format.
+B<Sisimai> (pronounced /ɕi.ɕi.ma.i/) is a library that decodes complex and diverse bounce emails and
+outputs the results of the delivery failure, such as the reason for the bounce and the recipient email
+address, in structured data. It is also possible to output in JSON format.
 
 =head1 BASIC USAGE
 

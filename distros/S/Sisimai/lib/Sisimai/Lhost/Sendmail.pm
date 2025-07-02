@@ -16,11 +16,10 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
 
     return undef if $mhead->{'x-aol-ip'};   # X-AOL-IP is a header defined in AOL
-    $match ||= 1 if index($mhead->{'subject'}, 'see transcript for details') > -1;
-    $match ||= 1 if index($mhead->{'subject'}, 'Warning: ')                  == 0;
+    my $match = 0; $match ||= 1 if index($mhead->{'subject'}, 'see transcript for details') > -1;
+                   $match ||= 1 if index($mhead->{'subject'}, 'Warning: ')                  == 0;
     return undef unless $match > 0;
 
     require Sisimai::RFC1123;
@@ -43,7 +42,7 @@ sub inquire {
 
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
@@ -51,7 +50,6 @@ sub inquire {
     my $esmtpreply = [];    # (Array) Reply from remote server on SMTP session
     my $sessionerr = 0;     # (Integer) Flag, 1 if it is SMTP session error
     my $anotherset = {};    # (Hash) Another error information
-    my $v = undef;
     my $p = '';
 
     for my $e ( split("\n", $emailparts->[0]) ) {
@@ -62,8 +60,7 @@ sub inquire {
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         if( my $f = Sisimai::RFC1894->match($e) ) {
             # $e matched with any field defined in RFC3464
@@ -158,8 +155,7 @@ sub inquire {
                 }
             } else {
                 # Continued line of the value of Diagnostic-Code field
-                next unless index($p, 'Diagnostic-Code:') == 0;
-                next unless index($e, ' ') == 0;
+                next if index($p, 'Diagnostic-Code:') != 0 || index($e, ' ') != 0;
                 $v->{'diagnosis'} .= ' '.Sisimai::String->sweep($e);
             }
         }
@@ -183,9 +179,7 @@ sub inquire {
         while(1) {
             # Replace or append the error message in "diagnosis" with the ESMTP Reply Code when the
             # following conditions have matched
-            last unless scalar @$esmtpreply;
-            last unless $recipients == 1;
-
+            last if scalar @$esmtpreply == 0 || $recipients != 1;
             $e->{'diagnosis'} = sprintf("%s %s", join(' ', @$esmtpreply), $e->{'diagnosis'});
             last;
         }
@@ -202,14 +196,13 @@ sub inquire {
             $e->{'status'} = $anotherset->{'status'};
             last;
         }
-
         # @example.jp, no local part
         # Get email address from the value of Diagnostic-Code field
         next unless index($e->{'recipient'}, '@') == 0;
         my $cv = Sisimai::Address->find($e->{'diagnosis'}, 1) || [];
         $e->{'recipient'} = $cv->[0]->{'address'} if scalar @$cv;
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;

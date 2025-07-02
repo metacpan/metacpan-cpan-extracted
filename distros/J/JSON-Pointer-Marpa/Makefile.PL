@@ -6,7 +6,7 @@ use File::Spec::Functions         qw( catfile );
 use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
 
 my @main_module_namespace = qw( JSON Pointer Marpa );
-my $version               = '1.0.1';
+my $version               = '1.0.2';
 my $release_status        = 'stable';                   # transition: unstable => testing => stable
 
 my $distname            = join '-',  @main_module_namespace;
@@ -19,7 +19,7 @@ my %WriteMakefileArgs   = (
   VERSION_FROM     => catfile( 'lib', $main_module_file ),
   ABSTRACT_FROM    => catfile( 'lib', $main_module_podfile ),
   LICENSE          => 'Perl_5',
-  MIN_PERL_VERSION => '5.14.4',
+  MIN_PERL_VERSION => '5.10.1',
   META_MERGE       => {
     'meta-spec' => { version => 2 },
     provides    => {

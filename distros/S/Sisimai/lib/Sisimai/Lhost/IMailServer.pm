@@ -15,15 +15,14 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
 
     # X-Mailer: <SMTP32 v8.22>
-    $match ||= 1 if index($mhead->{'subject'}, 'Undeliverable Mail ') == 0;
-    $match ||= 1 if defined $mhead->{'x-mailer'} && index($mhead->{'x-mailer'}, '<SMTP32 v') == 0;
+    my $match = 0; $match ||= 1 if index($mhead->{'subject'}, 'Undeliverable Mail ') == 0;
+                   $match ||= 1 if defined $mhead->{'x-mailer'} && index($mhead->{'x-mailer'}, '<SMTP32 v') == 0;
     return undef unless $match;
 
     state $boundaries = ['Original message follows.'];
-    state $startingof = { 'error' => ['Body of message generated response:'] };
+    state $startingof = {'error' => ['Body of message generated response:']};
     state $messagesof = {
         'hostunknown'   => ['Unknown host'],
         'userunknown'   => ['Unknown user', 'Invalid final delivery userid'],
@@ -33,10 +32,9 @@ sub inquire {
         'expired'       => ['Delivery failed '],
     };
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $v = undef;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -87,7 +85,7 @@ sub inquire {
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -129,7 +127,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

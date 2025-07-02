@@ -16,8 +16,7 @@ sub inquire {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef if     index($$mbody, "\nDiagnostic-Code:") > -1;
-    return undef if     index($$mbody, "\nFinal-Recipient:") > -1;
+    return undef if index($$mbody, "\nDiagnostic-Code:") > -1 || index($$mbody, "\nFinal-Recipient:") > -1;
     return undef unless rindex($mhead->{'from'}, '<mailer-daemon@googlemail.com>') > -1;
     return undef unless index($mhead->{'subject'}, "Delivery Status Notification") > -1;
 
@@ -50,8 +49,7 @@ sub inquire {
                 $entiremesg .= $e." ";
             }
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # ** Message not delivered **
         # You're sending this from a different address or alias using the 'Send mail as' feature.
@@ -85,7 +83,7 @@ sub inquire {
             $e->{'reason'} = $r; last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -125,7 +123,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

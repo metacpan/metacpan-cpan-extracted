@@ -18,8 +18,6 @@ sub inquire {
 
     # Message-Id: <E1P1YNN-0003AD-Ga@example.org>
     # X-Failed-Recipients: kijitora@example.ed.jp
-    my $thirdparty = 0;
-    my $proceedsto = 0;
     my $messageidv = $mhead->{"message-id"} || "";
     my $emailtitle = [
         "Delivery Status Notification",
@@ -29,13 +27,11 @@ sub inquire {
         "Warning: message ",
         "error(s) in forwarding or filtering",
     ];
-    $proceedsto++ if index($mhead->{"from"}, "Mail Delivery System") > -1;
+    my $proceedsto = 0; $proceedsto++ if index($mhead->{"from"}, "Mail Delivery System") > -1;
 
     while( $messageidv ne "" ) {
         # Message-Id: <E1P1YNN-0003AD-Ga@example.org>
-        last if index($messageidv, '<') !=  0;
-        last if index($messageidv, '-') !=  8;
-        last if index($messageidv, '@') != 18;
+        last if index($messageidv, '<') != 0 || index($messageidv, '-') !=  8 || index($messageidv, '@') != 18;
         $proceedsto++; last;
     }
     for my $e ( @$emailtitle ) {
@@ -46,15 +42,12 @@ sub inquire {
         $proceedsto++; last;
     }
 
-    while(1) {
-        # Exim clones of the third Parties
-        # 1. McAfee Saas (Formerly MXLogic)
-        if( exists $mhead->{"x-mx-bounce"} )    { $thirdparty = 1; last; }
-        if( exists $mhead->{"x-mxl-hash"} )     { $thirdparty = 1; last; }
-        if( exists $mhead->{"x-mxl-notehash"} ) { $thirdparty = 1; last; }
-        if( index($messageidv, "<mxl~") > -1 )  { $thirdparty = 1; last; }
-        last;
-    }
+    # Exim clones of the third Parties
+    # 1. McAfee Saas (Formerly MXLogic)
+    my $thirdparty = 0; $thirdparty ||= 1 if exists $mhead->{"x-mx-bounce"};
+                        $thirdparty ||= 1 if exists $mhead->{"x-mxl-hash"};
+                        $thirdparty ||= 1 if exists $mhead->{"x-mxl-notehash"};
+                        $thirdparty ||= 1 if index($messageidv, "<mxl~") > -1;
     return undef if $proceedsto < 2 && $thirdparty == 0;
 
     require Sisimai::Address;
@@ -176,18 +169,15 @@ sub inquire {
     }
 
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # Points the current cursor position
     my $nextcursor = 0;
     my $recipients = 0;     # The number of 'Final-Recipient' header
     my $boundary00 = '';    # Boundary string
-    my $v = undef;
 
-    if( $mhead->{'content-type'} ) {
-        # Get the boundary string and set regular expression for matching with the boundary string.
-        $boundary00 = Sisimai::RFC2045->boundary($mhead->{'content-type'});
-    }
+    # Get the boundary string and set regular expression for matching with the boundary string.
+    $boundary00 = Sisimai::RFC2045->boundary($mhead->{'content-type'}) if $mhead->{'content-type'};
 
     my $p1 = -1; my $p2 = -1;
     for my $e ( split("\n", $emailparts->[0]) ) {
@@ -201,8 +191,7 @@ sub inquire {
                 next unless grep { index($e, $_) > -1 } $startingof->{'frozen'}->@*;
             }
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # This message was created automatically by mail delivery software.
         #
@@ -487,7 +476,7 @@ sub inquire {
         }
         $e->{'command'} ||= '';
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -527,7 +516,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -24,9 +24,8 @@ sub new {
     # @return   [Sisimai::Mail::Mbox]   Object
     #           [Undef]                 is not a file or does not exist
     my $class = shift;
-    my $argv1 = shift // return undef;
-    my $param = { 'offset' => 0 };
-    return undef unless -f $argv1;
+    my $argv1 = shift // return undef; return undef unless -f $argv1;
+    my $param = {'offset' => 0};
 
     $param->{'dir'}    = File::Basename::dirname $argv1;
     $param->{'path'}   = $argv1;
@@ -41,19 +40,17 @@ sub new {
 sub read {
     # Mbox reader, works as an iterator.
     # @return   [String] Contents of mbox
-    my $self = shift;
-
+    my $self       = shift; return "" unless defined $self->{'path'};
     my $seekoffset = $self->{'offset'} // 0;
     my $filehandle = $self->{'handle'};
     my $readbuffer = '';
 
-    return undef unless defined $self->{'path'};
     unless( ref $self->{'path'} ) {
         # "path" is not IO::File object
-        return undef unless -f $self->{'path'};
-        return undef unless -T $self->{'path'};
+        return "" unless -f $self->{'path'};
+        return "" unless -T $self->{'path'};
     }
-    return undef unless $self->{'offset'} < $self->{'size'};
+    return "" unless $self->{'offset'} < $self->{'size'};
 
     eval {
         $seekoffset = 0 if $seekoffset < 0;
@@ -153,7 +150,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018,2019,2021,2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018,2019,2021,2024,2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

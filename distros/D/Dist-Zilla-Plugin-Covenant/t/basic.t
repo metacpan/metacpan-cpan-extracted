@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test2::V0;
 
 use Test::DZil;
 
@@ -34,3 +34,5 @@ $tzil->build;
 like $tzil->slurp_file('build/FOO'),
     qr/CPAN Covenant/,
     "Pledge file exists";
+
+done_testing;

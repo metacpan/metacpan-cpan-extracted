@@ -1,6 +1,6 @@
 Poker-Eval
 
-VERSION 0.06
+VERSION 0.09
 
 Deal, score, and evaluate poker hands. All major scoring systems 
 are covered, including highball, lowball 8 or better, lowball 2-7, 

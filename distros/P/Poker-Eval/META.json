@@ -22,12 +22,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Algorithm::Combinatorics" : "0",
-            "List::Util" : "0",
-            "Moo" : "0",
-            "Storable" : "0",
-            "Test::More" : "0",
-            "Tie::IxHash" : "0"
          }
       },
       "configure" : {
@@ -37,11 +31,17 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "perl" : "5.006",
+            "Algorithm::Combinatorics" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "Tie::IxHash" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

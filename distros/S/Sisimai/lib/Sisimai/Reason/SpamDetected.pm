@@ -3,6 +3,7 @@ use v5.26;
 use strict;
 use warnings;
 use Sisimai::String;
+use Sisimai::SMTP::Command;
 
 sub text  { 'spamdetected' }
 sub description { 'Email rejected by spam filter running on the remote host' }
@@ -13,7 +14,7 @@ sub match {
     #                           1: Matched
     # @since v4.1.19
     my $class = shift;
-    my $argv1 = shift // return undef;
+    my $argv1 = shift // return 0;
 
     state $index = [
         ' - spam',
@@ -130,18 +131,15 @@ sub true {
     # @since v4.1.19
     # @see http://www.ietf.org/rfc/rfc2822.txt
     my $class = shift;
-    my $argvs = shift // return undef;
+    my $argvs = shift // return 0; return 0 unless $argvs->{'deliverystatus'};
 
-    return undef unless $argvs->{'deliverystatus'};
     return 1 if $argvs->{'reason'} eq 'spamdetected';
     return 1 if (Sisimai::SMTP::Status->name($argvs->{'deliverystatus'}) || '') eq 'spamdetected';
 
     # The value of "reason" isn't "spamdetected" when the value of "command" is an SMTP command to
     # be sent before the SMTP DATA command because all the MTAs read the headers and the entire
     # message body after the DATA command.
-    my $thecommand = $argvs->{'command'} || '';
-    return 0 if $thecommand eq 'CONN' || $thecommand eq 'EHLO' || $thecommand eq 'HELO'
-             || $thecommand eq 'MAIL' || $thecommand eq 'RCPT';
+    return 0 if grep { $argvs->{'command'} eq $_ } Sisimai::SMTP::Command->ExceptDATA->@*;
     return __PACKAGE__->match(lc $argvs->{'diagnosticcode'});
 }
 
@@ -198,7 +196,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2018,2020-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2018,2020-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

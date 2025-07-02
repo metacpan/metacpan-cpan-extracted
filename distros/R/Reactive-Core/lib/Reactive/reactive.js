@@ -39,16 +39,38 @@ function sendRequest(el, addToPayload) {
 function updateReactiveModelInputs(rootElement) {
     let data = rootElement.__reactive.data;
 
-    rootElement.querySelectorAll('[reactive\\:model]').forEach(el => {
-        let property = el.getAttribute('reactive:model')
+    const regex = /^([A-Z]*)(?:\[(\d+)\])?(?:\.([A-Z]+))?$/i;
 
-        el.value = data[property]
+    const handleValue = (el, attr) => {
+        let property = el.getAttribute(attr)
+        let match = property.match(regex)
+
+        let value;
+
+        if (match && typeof match[3] !== 'undefined') {
+            value = data[match[1]][match[2]][match[3]]
+        } else if (match && typeof match[2] !== 'undefined') {
+            value = data[match[1]][match[2]]
+        } else {
+            value = data[property]
+        }
+
+        if (el.type === 'checkbox') {
+            el.checked = !! value
+        } else if (el.type === 'radio') {
+            el.checked = (el.value == value)
+        } else {
+            el.value = value
+        }
+
+    }
+
+    rootElement.querySelectorAll('[reactive\\:model]').forEach(el => {
+        handleValue(el, 'reactive:model')
     })
 
     rootElement.querySelectorAll('[reactive\\:model\\.lazy]').forEach(el => {
-        let property = el.getAttribute('reactive:model.lazy')
-
-        el.value = data[property]
+        handleValue(el, 'reactive:model.lazy')
     })
 }
 
@@ -70,10 +92,16 @@ function initReactiveModel(rootElement) {
     updateReactiveModelInputs(rootElement)
 
     rootElement.addEventListener('input', e => {
-        if (! e.target.hasAttribute('reactive:model')) return;
+        let el = e.target;
 
-        let property = e.target.getAttribute('reactive:model');
-        let value = e.target.value;
+        if (! el.hasAttribute('reactive:model')) return;
+
+        let property = el.getAttribute('reactive:model');
+        let value = el.value;
+
+        if (el.type === 'checkbox' && !el.checked) {
+            value = 0;
+        }
 
         sendRequest(rootElement, {
             updateProperty: [property, value],
@@ -87,10 +115,16 @@ function initReactiveModelLazy(rootElement) {
     updateReactiveModelInputs(rootElement)
 
     rootElement.addEventListener('change', e => {
-        if (! e.target.hasAttribute('reactive:model.lazy')) return;
+        let el = e.target;
 
-        let property = e.target.getAttribute('reactive:model.lazy');
-        let value = e.target.value;
+        if (! el.hasAttribute('reactive:model.lazy')) return;
+
+        let property = el.getAttribute('reactive:model.lazy');
+        let value = el.value;
+
+        if (el.type === 'checkbox' && !el.checked) {
+            value = 0;
+        }
 
         sendRequest(rootElement, {
             updateProperty: [property, value],

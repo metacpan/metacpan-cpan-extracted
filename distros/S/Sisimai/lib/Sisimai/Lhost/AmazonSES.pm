@@ -65,11 +65,9 @@ sub inquire {
     # @since v4.0.2
     my $class = shift;
     my $mhead = shift // return undef;
-    my $mbody = shift // return undef;
-
-    return undef unless index($$mbody, "{") > -1;
+    my $mbody = shift // return undef; return undef unless index($$mbody, "{") > -1;
     return undef unless exists $mhead->{'x-amz-sns-message-id'};
-    return undef unless $mhead->{'x-amz-sns-message-id'};
+    return undef unless        $mhead->{'x-amz-sns-message-id'};
 
     my $proceedsto = 0;
     my $sespayload = $$mbody;
@@ -97,18 +95,15 @@ sub inquire {
             $sespayload =~ s/,$//g;
             $sespayload =~ s/"$//g;
         }
-
-        last unless index($sespayload, "notificationType") > -1;
-        last unless index($sespayload, "{") == 0;
-        last unless substr($sespayload, -1, 1) eq "}";
+        last if index($sespayload, "notificationType") < 0 || index($sespayload, "{") != 0;
+        last if substr($sespayload, -1, 1) ne "}";
         $proceedsto = 1; last;
     }
     return undef unless $proceedsto;
 
     # Load as JSON string and decode
     require JSON;
-    my $jsonobject = undef;
-    eval { $jsonobject = JSON->new->decode($sespayload) };
+    my $jsonobject = undef; eval { $jsonobject = JSON->new->decode($sespayload) };
     if( $@ ) {
         # Something wrong in decoding JSON
         warn sprintf(" ***warning: Failed to decode JSON: %s", $@);
@@ -157,8 +152,7 @@ sub inquire {
         }
     } elsif( $whatnotify eq "C" ) {
         # "notificationType":"Complaint"
-        my $p = $jsonobject->{"complaint"};
-        for my $e ( $p->{"complainedRecipients"}->@* ) {
+        my $p = $jsonobject->{"complaint"}; for my $e ( $p->{"complainedRecipients"}->@* ) {
             # {"emailAddress":"neko@example.jp"}
             if( $v->{"recipient"} ) {
                 # There are multiple recipient addresses in the message body.
@@ -174,8 +168,7 @@ sub inquire {
         }
     } elsif( $whatnotify eq "D" ) {
         # "notificationType":"Delivery"
-        my $p = $jsonobject->{"delivery"};
-        for my $e ( $p->{"recipients"}->@* ) {
+        my $p = $jsonobject->{"delivery"}; for my $e ( $p->{"recipients"}->@* ) {
             # {"recipients":["neko@example.jp"]}
             if( $v->{"recipient"} ) {
                 # There are multiple recipient addresses in the message body.
@@ -210,7 +203,7 @@ sub inquire {
     map { $cv .= sprintf("%s: %s\n", $_->{"name"}, $_->{"value"}) } $or->{"headers"}->@*;
     map { $cv .= sprintf("%s: %s\n", ucfirst($_), $or->{"commonHeaders"}->{ $_ }) if exists $or->{"commonHeaders"}->{ $_ } } @$ch;
 
-    return { 'ds' => $dscontents, 'rfc822' => $cv };
+    return {"ds" => $dscontents, "rfc822" => $cv};
 }
 
 1;
@@ -250,7 +243,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

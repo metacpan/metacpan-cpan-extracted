@@ -8,11 +8,11 @@ Poker::Score::Badugi27 - Scoring system used in the game of Badeucy.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 =head1 INTRODUCTION
 

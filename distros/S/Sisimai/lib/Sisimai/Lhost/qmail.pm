@@ -20,18 +20,16 @@ sub inquire {
     # see https://cr.yp.to/qmail.html
     #   e.g.) Received: (qmail 12345 invoked for bounce); 29 Apr 2009 12:34:56 -0000
     #         Subject: failure notice
-    my $proceedsto = 0;
-    my $relayedvia = [["(qmail ", "invoked for bounce)"], ["(qmail ", "invoked from ", "network)"]];
     my $emailtitle = [
         "failure notice", # qmail-send.c:Subject: failure notice\n\
         "Failure Notice", # Yahoo
     ];
-    $proceedsto++ if grep { $mhead->{"subject"} eq $_ } @$emailtitle;
+    my $proceedsto = 0; $proceedsto++ if grep { $mhead->{"subject"} eq $_ } @$emailtitle;
 
     for my $e ( $mhead->{"received"}->@* ) {
         # Received: (qmail 2222 invoked for bounce);29 Apr 2017 23:34:45 +0900
         # Received: (qmail 2202 invoked from network); 29 Apr 2018 00:00:00 +0900
-        $proceedsto ||= 1 if grep { Sisimai::String->aligned(\$e, $_) } $relayedvia->@*;
+        $proceedsto ||= 1 if Sisimai::String->aligned(\$e, ["(qmail", " invoked "]);
     }
     return undef if $proceedsto == 0;
 
@@ -148,11 +146,10 @@ sub inquire {
         "userunknown" => ["no mailbox here by that name"],
     };
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $v = undef;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -162,8 +159,7 @@ sub inquire {
             $readcursor |= $indicators->{'deliverystatus'} if grep { index($e, $_) > -1 } $startingof->{'message'}->@*;
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # <kijitora@example.jp>:
         # 192.0.2.153 does not like recipient.
@@ -251,7 +247,7 @@ sub inquire {
         }
         $e->{"command"} ||= Sisimai::SMTP::Command->find($e->{"diagnosis"});
     }
-    return { "ds" => $dscontents, "rfc822" => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -292,7 +288,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

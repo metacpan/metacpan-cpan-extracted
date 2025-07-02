@@ -13,16 +13,11 @@ sub inquire {
     # @return   [undef]         failed to decode or the arguments are missing
     # @since v4.1.28
     my $class = shift;
-    my $mhead = shift // return undef;
-    my $mbody = shift // return undef;
-    my $leave = 0;
-    my $match = 0;
+    my $mhead = shift // return undef; return undef unless keys %$mhead;
+    my $mbody = shift // return undef; return undef unless ref $mbody eq 'SCALAR';
     my $lower = {};
 
-    return undef unless keys %$mhead;
-    return undef unless ref $mbody eq 'SCALAR';
-
-    my $markingsof = { 'boundary' => '__SISIMAI_PSEUDO_BOUNDARY__' };
+    my $markingsof = {'boundary' => '__SISIMAI_PSEUDO_BOUNDARY__'};
     my $lowerlabel = ['from', 'to', 'subject', 'auto-submitted', 'precedence', 'x-apple-action'];
 
     for my $e ( @$lowerlabel ) {
@@ -55,7 +50,7 @@ sub inquire {
         [ ]*(.+)\z
     }x;
 
-    DETECT_EXCLUSION_MESSAGE: for my $e ( keys %$donotparse ) {
+    my $leave = 0; DETECT_EXCLUSION_MESSAGE: for my $e ( keys %$donotparse ) {
         # Exclude message from root@
         next unless exists  $lower->{ $e };
         next unless grep { index($lower->{ $e }, $_) > -1 } $donotparse->{ $e }->@*;
@@ -64,7 +59,7 @@ sub inquire {
     }
     return undef if $leave;
 
-    DETECT_AUTO_REPLY_MESSAGE0: for my $e ( keys %$autoreply0 ) {
+    my $match = 0; DETECT_AUTO_REPLY_MESSAGE0: for my $e ( keys %$autoreply0 ) {
         # RFC3834 Auto-Submitted and other headers
         next unless exists  $lower->{ $e };
         next unless grep { index($lower->{ $e }, $_) == 0 } $autoreply0->{ $e }->@*;
@@ -75,13 +70,12 @@ sub inquire {
     return undef unless $match;
 
     require Sisimai::Lhost;
-    my $dscontents = [Sisimai::Lhost->DELIVERYSTATUS];
+    my $dscontents = [Sisimai::Lhost->DELIVERYSTATUS]; my $v = $dscontents->[-1];
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $maxmsgline = 5;     # (Integer) Max message length(lines)
     my $haveloaded = 0;     # (Integer) The number of lines loaded from message body
     my $blanklines = 0;     # (Integer) Counter for countinuous blank lines
     my $countuntil = 1;     # (Integer) Maximun value of blank lines in the body part
-    my $v = $dscontents->[-1];
 
     RECIPIENT_ADDRESS: {
         # Try to get the address of the recipient
@@ -118,9 +112,8 @@ sub inquire {
                 last if ++$blanklines > $countuntil;
                 next;
             }
-            next unless rindex($e, ' ') > -1;
-            next if      index($e, 'Content-Type')     == 0;
-            next if      index($e, 'Content-Transfer') == 0;
+            next if rindex($e, ' ') < 0;
+            next if index($e, 'Content-Type') == 0 || index($e, 'Content-Transfer') == 0;
 
             $v->{'diagnosis'} .= $e.' ';
             $haveloaded++;
@@ -136,7 +129,7 @@ sub inquire {
 
     # Get the Subject header from the original message
     my $rfc822part = $lower->{'subject'} =~ $subjectset ? 'Subject: '.$1."\n" : '';
-    return { 'ds' => $dscontents, 'rfc822' => $rfc822part };
+    return {"ds" => $dscontents, "rfc822" => $rfc822part};
 }
 
 1;
@@ -175,7 +168,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

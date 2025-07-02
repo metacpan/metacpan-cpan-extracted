@@ -15,26 +15,22 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
     my $tryto = [
         'Mail could not be delivered',
         'メッセージを配信できません。',
         'メール配信に失敗しました',
     ];
-
-    # 'received' => qr/[ ][(]InterScanMSS[)][ ]with[ ]/,
-    $match ||= 1 if index($mhead->{'from'}, '"InterScan MSS"') == 0;
-    $match ||= 1 if index($mhead->{'from'}, '"InterScan Notification"') == 0;
-    $match ||= 1 if grep { $mhead->{'subject'} eq $_ } @$tryto;
+    my $match = 0; $match ||= 1 if index($mhead->{'from'}, '"InterScan MSS"') == 0;
+                   $match ||= 1 if index($mhead->{'from'}, '"InterScan Notification"') == 0;
+                   $match ||= 1 if grep { $mhead->{'subject'} eq $_ } @$tryto;
     return undef unless $match;
 
     require Sisimai::SMTP::Command;
     state $boundaries = ['Content-type: message/rfc822'];
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $v = undef;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -83,7 +79,7 @@ sub inquire {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         $e->{'reason'} = 'userunknown' if index($e->{'diagnosis'}, 'Unable to deliver') > -1;
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -125,7 +121,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021,2023,2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2021,2023-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

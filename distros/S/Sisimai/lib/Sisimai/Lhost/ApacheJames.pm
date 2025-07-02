@@ -15,11 +15,9 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
-
-    $match ||= 1 if $mhead->{'subject'} eq '[BOUNCE]';
-    $match ||= 1 if defined $mhead->{'message-id'} && rindex($mhead->{'message-id'}, '.JavaMail.') > -1;
-    $match ||= 1 if grep { rindex($_, 'JAMES SMTP Server') > -1 } $mhead->{'received'}->@*;
+    my $match = 0; $match ||= 1 if $mhead->{'subject'} eq '[BOUNCE]';
+                   $match ||= 1 if defined $mhead->{'message-id'} && rindex($mhead->{'message-id'}, '.JavaMail.') > -1;
+                   $match ||= 1 if grep { rindex($_, 'JAMES SMTP Server') > -1 } $mhead->{'received'}->@*;
     return undef unless $match;
 
     state $indicators = __PACKAGE__->INDICATORS;
@@ -31,12 +29,11 @@ sub inquire {
         "message" => ["Message details:"],
     };
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = $dscontents->[-1];
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;                 # Points the current cursor position
     my $recipients = 0;                 # The number of 'Final-Recipient' header
     my $alternates = ["", "", "", ""];  # [Envelope-From, Header-From, Date, Subject]
-    my $v          = $dscontents->[-1];
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -51,8 +48,7 @@ sub inquire {
             $v->{"diagnosis"} .= $e." " if $e ne "";
             next;
         }
-        next unless $readcursor & $indicators->{"deliverystatus"};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # Message details:
         #   Subject: Nyaaan
@@ -107,7 +103,7 @@ sub inquire {
         $emailparts->[1] .= sprintf("Subject: %s\n", $alternates->[3]) if $alternates->[3] ne "";
     }
     $_->{"diagnosis"} = Sisimai::String->sweep($_->{"diagnosis"}) for @$dscontents;
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -147,7 +143,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

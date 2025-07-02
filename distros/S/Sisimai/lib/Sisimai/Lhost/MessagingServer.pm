@@ -15,22 +15,19 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
-
-    $match ||= 1 if rindex($mhead->{'content-type'}, 'Boundary_(ID_') > -1;
-    $match ||= 1 if index($mhead->{'subject'}, 'Delivery Notification: ') == 0;
+    my $match = 0; $match ||= 1 if rindex($mhead->{'content-type'}, 'Boundary_(ID_') > -1;
+                   $match ||= 1 if index($mhead->{'subject'}, 'Delivery Notification: ') == 0;
     return undef unless $match;
 
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ['Content-Type: message/rfc822', 'Return-path: '];
-    state $startingof = { 'message' => ['This report relates to a message you sent with the following header fields:'] };
-    state $messagesof = { 'hostunknown' => ['Illegal host/domain name found'] };
+    state $startingof = {'message' => ['This report relates to a message you sent with the following header fields:']};
+    state $messagesof = {'hostunknown' => ['Illegal host/domain name found']};
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $v = undef;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -40,8 +37,7 @@ sub inquire {
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # --Boundary_(ID_0000000000000000000000)
         # Content-type: text/plain; charset=us-ascii
@@ -153,7 +149,7 @@ sub inquire {
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -195,7 +191,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

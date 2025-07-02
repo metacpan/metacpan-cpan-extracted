@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 00-pod.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
+# $Id: 00-pod.t 2007 2025-02-08 16:45:23Z willem $	-*-perl-*-
 #
 
 use strict;

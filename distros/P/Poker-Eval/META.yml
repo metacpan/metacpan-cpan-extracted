@@ -2,7 +2,8 @@
 abstract: 'Deal, score, and calculate expected win rates of poker hands. Base class for specific game types. '
 author:
   - 'Nathaniel Graham <ngraham@cpan.org>'
-build_requires:
+requires:
+  perl: '5.006'
   Algorithm::Combinatorics: '0'
   List::Util: '0'
   Moo: '0'
@@ -22,7 +23,5 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  perl: '5.006'
-version: '0.04'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

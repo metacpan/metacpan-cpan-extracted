@@ -8,11 +8,11 @@ Poker::Score::Low8 - Identify and score lowball 8 or better poker hand.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 =head1 INTRODUCTION
 

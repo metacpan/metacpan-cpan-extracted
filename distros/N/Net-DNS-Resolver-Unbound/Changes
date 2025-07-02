@@ -1,6 +1,12 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.33  Jul 1, 2025
+
+Fix rt.cpan.org #167874
+	Segfaults with perl 5.41.10 and newer
+
+
 **** 1.32  Feb 5, 2025
 	Fix base class selection for Net::DNS pre-1.46.
 

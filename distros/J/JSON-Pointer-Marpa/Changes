@@ -1,5 +1,9 @@
 Release history for JSON-Pointer-Marpa
 
+1.0.2    2025-07-01
+         - fix runtime dependencies setup
+         - decrease perl min version requirement
+
 1.0.1    2025-06-29
          - fix error handling [RFC6901/7. Error Handling]
          - explicitly enable JSON::PP allow_nonref option

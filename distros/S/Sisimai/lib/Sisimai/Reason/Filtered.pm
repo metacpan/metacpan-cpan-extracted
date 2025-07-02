@@ -2,6 +2,7 @@ package Sisimai::Reason::Filtered;
 use v5.26;
 use strict;
 use warnings;
+use Sisimai::SMTP::Command;
 
 sub text  { 'filtered' }
 sub description { 'Email rejected due to a header content after SMTP DATA command' }
@@ -12,7 +13,7 @@ sub match {
     #                           1: Matched
     # @since v4.0.0
     my $class = shift;
-    my $argv1 = shift // return undef;
+    my $argv1 = shift // return 0;
 
     state $index = [
         'because the recipient is only accepting mail from specific email addresses',   # AOL Phoenix
@@ -44,8 +45,7 @@ sub true {
     # @since v4.0.0
     # @see http://www.ietf.org/rfc/rfc2822.txt
     my $class = shift;
-    my $argvs = shift // return undef;
-    return 1 if $argvs->{'reason'} eq 'filtered';
+    my $argvs = shift // return 0; return 1 if $argvs->{'reason'} eq 'filtered';
 
     my $tempreason = Sisimai::SMTP::Status->name($argvs->{'deliverystatus'}) || '';
     return 0 if $tempreason eq 'suspend';
@@ -56,18 +56,16 @@ sub true {
     if( $tempreason eq 'filtered' ) {
         # Delivery status code points "filtered".
         return 1 if Sisimai::Reason::UserUnknown->match($issuedcode);
-        return 1 if __PACKAGE__->match($issuedcode);
+        return __PACKAGE__->match($issuedcode);
 
     } else {
         # The value of "reason" isn't "filtered" when the value of "command" is an SMTP command to
         # be sent before the SMTP DATA command because all the MTAs read the headers and the entire
         # message body after the DATA command.
-        return 0 if $thecommand eq 'CONN' || $thecommand eq 'EHLO' || $thecommand eq 'HELO'
-                 || $thecommand eq 'MAIL' || $thecommand eq 'RCPT';
+        return 0 if grep { $argvs->{'command'} eq $_ } Sisimai::SMTP::Command->ExceptDATA->@*;
         return 1 if __PACKAGE__->match($issuedcode);
-        return 1 if Sisimai::Reason::UserUnknown->match($issuedcode);
+        return Sisimai::Reason::UserUnknown->match($issuedcode);
     }
-    return 0;
 }
 
 1;
@@ -126,7 +124,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018,2020-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018,2020-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

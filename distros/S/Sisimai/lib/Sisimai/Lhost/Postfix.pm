@@ -26,8 +26,7 @@ sub inquire {
         # Subject: Undelivered Mail Returned to Sender
         $match = 1 if $mhead->{'subject'} eq 'Undelivered Mail Returned to Sender';
     }
-    return undef if $match == 0;
-    return undef if $mhead->{'x-aol-ip'};
+    return undef if $match == 0 || $mhead->{'x-aol-ip'};
 
     require Sisimai::RFC1123;
     require Sisimai::SMTP::Reply;
@@ -46,22 +45,19 @@ sub inquire {
     };
 
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $anotherset = {};    # (Hash) Another error information
     my $nomessages = 0;     # (Integer) Delivery report unavailable
     my @commandset;         # (Array) ``in reply to * command'' list
-    my $v = undef;
     my $p = '';
 
     if( $match == 2 ) {
         # The message body starts with 'Transcript of session follows.'
         require Sisimai::SMTP::Transcript;
-        my $transcript = Sisimai::SMTP::Transcript->rise($emailparts->[0], 'In:', 'Out:');
-
-        return undef unless $transcript;
-        return undef unless scalar @$transcript;
+        my $transcript = Sisimai::SMTP::Transcript->rise($emailparts->[0], 'In:', 'Out:') || return undef;
+        return undef if scalar @$transcript == 0;
 
         for my $e ( @$transcript ) {
             # Pick email addresses, error messages, and the last SMTP command.
@@ -106,8 +102,7 @@ sub inquire {
                 $readcursor |= $indicators->{'deliverystatus'} if grep { Sisimai::String->aligned(\$e, $_) } $startingof->{'message'}->@*;
                 next;
             }
-            next unless $readcursor & $indicators->{'deliverystatus'};
-            next unless length $e;
+            next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
             if( my $f = Sisimai::RFC1894->match($e) ) {
                 # $e matched with any field defined in RFC3464
@@ -284,7 +279,7 @@ sub inquire {
         $e->{'command'} ||= 'HELO' if index($e->{'diagnosis'}, 'refused to talk to me:') > -1;
         $e->{'spec'}    ||= 'SMTP' if Sisimai::String->aligned(\$e->{'diagnosis'}, ['host ', ' said:']);
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;

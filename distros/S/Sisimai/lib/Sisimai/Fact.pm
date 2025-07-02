@@ -59,7 +59,7 @@ sub rise {
     die ' ***error: Sisimai::Fact->rise receives only a HASH reference as an argument' unless ref $argvs eq 'HASH';
 
     my $email = $argvs->{'data'} || return undef;
-    my $args1 = { 'data' => $email, 'hook' => $argvs->{'hook'} };
+    my $args1 = {'data' => $email, 'hook' => $argvs->{'hook'}};
     my $mesg1 = Sisimai::Message->rise($args1) || return undef;
 
     return undef unless $mesg1->{'ds'};
@@ -67,7 +67,7 @@ sub rise {
 
     state $retryindex = Sisimai::Reason->retry;
     state $rfc822head = Sisimai::RFC5322::HEADERTABLE;
-    state $actionlist = { 'delayed' => 1, 'delivered' => 1, 'expanded' => 1, 'failed' => 1, 'relayed' => 1 };
+    state $actionlist = {'delayed' => 1, 'delivered' => 1, 'expanded' => 1, 'failed' => 1, 'relayed' => 1};
     my    $rfc822data = $mesg1->{'rfc822'};
     my    $listoffact = [];
 
@@ -267,7 +267,7 @@ sub rise {
                     #   553-fail. Refer to the Troubleshooting page at
                     #   553-http://www.symanteccloud.com/troubleshooting for more
                     #   553 information. (#5.7.1)
-                    for my $q ( '-', ' ' ) {
+                    for my $q ('-', ' ') {
                         # Remove strings: "550-5.7.1", and "550 5.7.1" from the error message
                         my $cx = sprintf("%s%s%s", $cr, $q, $cs);
                         my $p0 = index($piece->{'diagnosticcode'}, $cx);
@@ -342,8 +342,7 @@ sub rise {
         ALIAS: {
             # Look up the Envelope-To address from the Received: header in the original message
             # when the recipient address is same with the value of $o->{'alias'}.
-            last if length $thing->{'alias'} == 0;
-            last if $thing->{'recipient'}->address ne $thing->{'alias'};
+            last if length $thing->{'alias'} == 0 || $thing->{'recipient'}->address ne $thing->{'alias'};
             last unless exists $rfc822data->{'received'};
             last unless scalar $rfc822data->{'received'}->@*;
 
@@ -352,9 +351,8 @@ sub rise {
                 next unless index($er, ' for ') > 1;
                 my $or = Sisimai::RFC5322->received($er);
 
-                next unless scalar @$or;
-                next unless length $or->[5];
-                next unless Sisimai::Address->is_emailaddress($or->[5]);
+                next if scalar(@$or) == 0 || length($or->[5]) == 0;
+                next if Sisimai::Address->is_emailaddress($or->[5]) == 0;
                 next if $thing->{'recipient'}->address eq $or->[5];
 
                 $thing->{'alias'} = $or->[5];
@@ -475,11 +473,9 @@ sub damn {
 sub dump {
     # Data dumper
     # @param    [String] type   Data format: json, yaml
-    # @return   [String]        Dumped data
-    #           [undef]         When the value of first argument is neither "json" nor "yaml"
+    # @return   [String]        Dumped data or an empty string when the argument is neither "json" nor "yaml"
     my $self = shift;
-    my $type = shift || 'json';
-    return undef unless $type =~ /\A(?:json|yaml)\z/;
+    my $type = shift || 'json'; return "" unless $type =~ /\A(?:json|yaml)\z/;
 
     my $referclass = 'Sisimai::Fact::'.uc($type);
     my $modulepath = 'Sisimai/Fact/'.uc($type).'.pm';
@@ -503,7 +499,7 @@ Sisimai::Fact - Decoded data object
 =head1 SYNOPSIS
 
     use Sisimai::Fact;
-    my $args = { 'data' => 'entire-email-text-including-all-the-headers' };
+    my $args = {'data' => 'entire-email-text-including-all-the-headers'};
     my $fact = Sisimai::Fact->rise($args);
     for my $e ( @$fact ) {
         print $e->reason;               # userunknown, mailboxfull, and so on.

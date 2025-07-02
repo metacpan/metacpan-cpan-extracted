@@ -12,7 +12,7 @@ sub match {
     #                           1: Matched
     # @since v4.0.0
     my $class = shift;
-    my $argv1 = shift // return undef;
+    my $argv1 = shift // return 0;
 
     state $index = [
         'exceeded maximum inbound message size',
@@ -41,8 +41,7 @@ sub true {
     # @since v4.0.0
     # @see http://www.ietf.org/rfc/rfc2822.txt
     my $class = shift;
-    my $argvs = shift // return undef;
-    return 1 if $argvs->{'reason'} eq 'mesgtoobig';
+    my $argvs = shift // return 0; return 1 if $argvs->{'reason'} eq 'mesgtoobig';
 
     my $statuscode = $argvs->{'deliverystatus'} // '';
     my $tempreason = Sisimai::SMTP::Status->name($statuscode) || '';
@@ -117,7 +116,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018,2020,2021,2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018,2020,2021,2024,2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

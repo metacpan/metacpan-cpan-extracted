@@ -67,7 +67,6 @@ SKIP: {
 		'MarkupPercentage'       => '20',
 		'MarkupOnDelivery'       => '5',
 		'MarkupPerRecipient'     => '4',
-		'MarkupOnDesignSpamTest' => '3',
 		'clientid'               => $client_id,
 	);
 

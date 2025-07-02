@@ -1,5 +1,17 @@
 Revision history for perl module Net::EPP::Server:
 
+0.10 - 2025-07-01
+  - version bump because the v0.09 tarball was *also* corrupted!
+
+0.09 - 2025-07-01
+  - version bump because the v0.08 tarball was corrupted.
+
+0.08 - 2025-07-01
+  - update this file with changes.
+
+0.07 - 2025-07-01
+  - validate <objURI> and <extURI> elements before calling the <login> handler.
+
 0.006 - 2025-04-16
   - remove debugging code from write_log()
 

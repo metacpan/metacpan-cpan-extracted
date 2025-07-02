@@ -5,7 +5,7 @@ package JSON::Pointer::Marpa;
 
 # Keeping the following $VERSION declaration on a single line is important.
 #<<<
-use version 0.9915; our $VERSION = version->declare( '1.0.1' );
+use version 0.9915; our $VERSION = version->declare( '1.0.2' );
 #>>>
 
 use Marpa::R2   ();

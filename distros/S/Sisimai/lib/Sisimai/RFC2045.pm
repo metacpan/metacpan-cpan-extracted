@@ -13,7 +13,7 @@ sub is_encoded {
     # @return   [Boolean]       0: Not MIME encoded string
     #                           1: MIME encoded string
     my $class = shift;
-    my $argv0 = shift || return undef;
+    my $argv0 = shift || return 0;
     my $text1 = $$argv0; $text1 =~ y/"//d;
     my @piece = ($text1);
     my $mime1 = 0;
@@ -81,7 +81,7 @@ sub decodeB {
     # @param    [String] argv0   MIME Encoded text
     # @return   [String]         MIME-Decoded text
     my $class = shift;
-    my $argv0 = shift // return undef;
+    my $argv0 = shift // return "";
 
     my $p = $$argv0 =~ m|([+/=0-9A-Za-z\r\n]+)| ? MIME::Base64::decode($1) : '';
     return \$p;
@@ -93,7 +93,7 @@ sub decodeQ {
     # @param    [String] argv1  The value of Content-Type: header
     # @return   [String]        MIME Decoded text
     my $class = shift;
-    my $argv0 = shift // return undef;
+    my $argv0 = shift // return "";
 
     my $p = MIME::QuotedPrint::decode($$argv0) || '';
     return \$p;
@@ -106,7 +106,7 @@ sub parameter {
     # @return   [String]        The value of the parameter
     # @since v5.0.0
     my $class = shift;
-    my $argv0 = shift || return undef;
+    my $argv0 = shift || return "";
     my $argv1 = shift || '';
 
     my $parameterq = length $argv1 > 0 ? $argv1.'=' : '';
@@ -128,15 +128,15 @@ sub boundary {
     #                            1: End of boundary
     # @return   [String] Boundary string
     my $class = shift;
-    my $argv0 = shift || return undef;
+    my $argv0 = shift || return "";
     my $start = shift // -1;
     my $btext = __PACKAGE__->parameter($argv0, 'boundary') || return '';
 
     # Content-Type: multipart/mixed; boundary=Apple-Mail-5--931376066
     # Content-Type: multipart/report; report-type=delivery-status;
     #    boundary="n6H9lKZh014511.1247824040/mx.example.jp"
-    $btext =  '--'.$btext if $start > -1;
-    $btext =  $btext.'--' if $start >  0;
+    $btext = '--'.$btext if $start > -1;
+    $btext = $btext.'--' if $start >  0;
     return $btext;
 }
 
@@ -203,14 +203,8 @@ sub haircut {
         last;
     }
 
-    LOWER: while(1) {
-        # Append LF before the lower chunk into the 2nd element of $multipart1
-        last if length $lowerchunk == 0;
-        last if substr($lowerchunk, 0, 1) eq "\n";
-
-        $multipart1->[2] .= "\n";
-        last;
-    }
+    # Append LF before the lower chunk into the 2nd element of $multipart1
+    $multipart1->[2] .= "\n" if $lowerchunk ne "" && substr($lowerchunk, 0, 1) ne "\n";
     $multipart1->[2] .= $lowerchunk;
     return $multipart1;
 }
@@ -222,11 +216,8 @@ sub levelout {
     # @return   [Array]         List of each part of multipart/*
     # @since v5.0.0
     my $class = shift;
-    my $argv0 = shift || return [];
-    my $argv1 = shift || return [];
-
-    return [] unless length $argv0;
-    return [] unless length $$argv1;
+    my $argv0 = shift || return []; return [] unless length $argv0;
+    my $argv1 = shift || return []; return [] unless length $$argv1;
 
     my $boundary01 = __PACKAGE__->boundary($argv0, 0) || return [];
     my $multiparts = [split(/\Q$boundary01\E\n/, $$argv1)];
@@ -243,8 +234,7 @@ sub levelout {
             # There is nested multipart/* block
             my $boundary02 = __PACKAGE__->boundary($f->[0], -1) || next;
             my $bodyinside = [split(/\n\n/, $f->[-1], 2)]->[-1];
-            next unless length $bodyinside > 8;
-            next unless index($bodyinside, $boundary02) > -1;
+            next if length $bodyinside < 9 || index($bodyinside, $boundary02) < 0;
 
             my $v = __PACKAGE__->levelout($f->[0], \$bodyinside);
             push @$partstable, @$v if scalar @$v;
@@ -275,9 +265,7 @@ sub makeflat {
     my $class = shift;
     my $argv0 = shift // return undef;
     my $argv1 = shift // return undef;
-
-    return \'' unless index($argv0, 'multipart/') > -1;
-    return \'' unless index($argv0, 'boundary=')  > -1;
+    return undef if index($argv0, 'multipart/') < 0 || index($argv0, 'boundary=')  < 0;
 
     my $iso2022set = qr/charset=["']?(iso-2022-[-a-z0-9]+)['"]?\b/;
     my $multiparts = __PACKAGE__->levelout($argv0, $argv1);
@@ -448,7 +436,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

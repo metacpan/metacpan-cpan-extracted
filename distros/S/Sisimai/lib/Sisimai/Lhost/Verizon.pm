@@ -15,36 +15,26 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = -1;
 
-    while(1) {
-        # Check the value of "From" header
-        # 'subject' => qr/Undeliverable Message/,
-        last unless grep { rindex($_, '.vtext.com (') > -1 } $mhead->{'received'}->@*;
-        $match = 1 if $mhead->{'from'} eq 'post_master@vtext.com';
-        $match = 0 if Sisimai::String->aligned(\$mhead->{'from'}, ['sysadmin@', '.vzwpix.com']);
-        last;
-    }
+    return undef unless grep { rindex($_, '.vtext.com (') > -1 } $mhead->{'received'}->@*;
+    my $match = -1; $match = 1 if $mhead->{'from'} eq 'post_master@vtext.com';
+                    $match = 0 if Sisimai::String->aligned(\$mhead->{'from'}, ['sysadmin@', '.vzwpix.com']);
     return undef if $match < 0;
 
     state $indicators = __PACKAGE__->INDICATORS;
     my $boundaries = [];
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = [];
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $senderaddr = '';    # (String) Sender address in the message body
     my $subjecttxt = '';    # (String) Subject of the original message
-
-    my $startingof = {};    # (Ref->Hash) Delimiter strings
-    my $markingsof = {};    # (Ref->Hash) Delimiter patterns
     my $messagesof = {};    # (Ref->Hash) Error message patterns
-    my $v = undef;
 
     if( $match == 1 ) {
         # vtext.com
-        $markingsof = { 'message' => ['Error: '] };
-        $messagesof = {
+        my $markingsof = {'message' => ['Error: ']};
+           $messagesof = {
             # The attempted recipient address does not exist.
             'userunknown' => ['550 - Requested action not taken: no such user here'],
         };
@@ -59,8 +49,7 @@ sub inquire {
                 $readcursor |= $indicators->{'deliverystatus'} if index($e, $markingsof->{'message'}->[0]) == 0;
                 next;
             }
-            next unless $readcursor & $indicators->{'deliverystatus'};
-            next unless length $e;
+            next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
             # Message details:
             #   Subject: Test message
@@ -94,10 +83,10 @@ sub inquire {
         }
     } else {
         # vzwpix.com
-        $startingof = { 'message' => ['Message could not be delivered to mobile'] };
-        $messagesof = { 'userunknown' => ['No valid recipients for this MM'] };
-        $boundaries = [Sisimai::RFC2045->boundary($mhead->{'content-type'})];
-        $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
+        my $startingof = {'message' => ['Message could not be delivered to mobile']};
+           $messagesof = {'userunknown' => ['No valid recipients for this MM']};
+           $boundaries = [Sisimai::RFC2045->boundary($mhead->{'content-type'})];
+           $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
         for my $e ( split("\n", $emailparts->[0]) ) {
             # Read error messages and delivery status lines from the head of the email to the previous
             # line of the beginning of the original message.
@@ -106,8 +95,7 @@ sub inquire {
                 $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
                 next;
             }
-            next unless $readcursor & $indicators->{'deliverystatus'};
-            next unless length $e;
+            next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
             # Original Message:
             # From: kijitora <kijitora@example.jp>
@@ -157,7 +145,7 @@ sub inquire {
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -197,7 +185,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2023,2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

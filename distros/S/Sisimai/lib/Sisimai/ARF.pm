@@ -14,7 +14,7 @@ sub is_arf {
     my $class = shift;
     my $heads = shift || return 0;
     my $abuse = ['staff@hotmail.com', 'complaints@email-abuse.amazonses.com'];
-    my $ctype = $heads->{"content-type"};
+    my $ctype = $heads->{"content-type"} || "";
 
     # Content-Type: multipart/report; report-type=feedback-report; ...
     return 1 if Sisimai::String->aligned(\$ctype, ["report-type=", "feedback-report"]);
@@ -30,12 +30,9 @@ sub is_arf {
         }
     }
 
-    APPLE: while(1) {
-        # X-Apple-Unsubscribe: true
-        last unless exists $heads->{"x-apple-unsubscribe"};
-        return 1 if $heads->{"x-apple-unsubscribe"} eq "true";
-        last APPLE;
-    }
+    # X-Apple-Unsubscribe: true
+    return 0 unless exists $heads->{"x-apple-unsubscribe"};
+    return 1 if $heads->{"x-apple-unsubscribe"} eq "true";
     return 0;
 }
 
@@ -46,9 +43,8 @@ sub inquire {
     # @return   [Hash]          Bounce data list and message/rfc822 part
     # @return   [undef]         failed to decode or the arguments are missing
     my $class = shift;
-    my $mhead = shift // return undef;
+    my $mhead = shift // return undef; return undef unless is_arf(undef, $mhead);
     my $mbody = shift // return undef;
-    return undef unless is_arf(undef, $mhead);
 
     # http://tools.ietf.org/html/rfc5965
     # http://en.wikipedia.org/wiki/Feedback_loop_(email)
@@ -73,7 +69,7 @@ sub inquire {
         ["this is an email abuse report"],
     ];
 
-    my $dscontents = [Sisimai::Lhost->DELIVERYSTATUS];
+    my $dscontents = [Sisimai::Lhost->DELIVERYSTATUS]; my $v = $dscontents->[-1];
     my $reportpart = 0;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # Points the current cursor position
@@ -82,7 +78,6 @@ sub inquire {
     my $remotehost = "";    # The value of "Source-IP" field
     my $reportedby = "";    # The value of "Reporting-MTA" field
     my $anotherone = "";    # Other fields(append to Diagnosis)
-    my $v = $dscontents->[-1];
 
     # 3.1.  Required Fields
     #
@@ -120,8 +115,7 @@ sub inquire {
             }
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
         if( $e eq $reportfrom ) { $reportpart = 1; next }
 
         if( $reportpart ) {
@@ -155,17 +149,17 @@ sub inquire {
                 # Feedback-Type: abuse
                 $v->{"feedbacktype"} = substr($e, index($e, " ") + 1,);
 
-            } elsif( index($e, "Authentication-Results: ") == 0 ) {
+            } elsif( index($e, "Authentication-Results: ") == 0 || index($e, "User-Agent: ") == 0 || index($e, "Original-Mail-From: ") == 0 ) {
                 # "Authentication-Results" indicates the result of one or more authentication checks
                 # run by the report generator.
+                #   - Authentication-Results: mail.example.com;
+                #   - spf=fail smtp.mail=somespammer@example.com
                 #
-                # Authentication-Results: mail.example.com;
-                #   spf=fail smtp.mail=somespammer@example.com
-                $anotherone .= $e.", ";
-
-            } elsif( index($e, "User-Agent: ") == 0 ) {
                 # The header field MUST appear exactly once.
-                # User-Agent: SomeGenerator/1.0
+                #   - User-Agent: SomeGenerator/1.0
+                #
+                # The header is optional and MUST NOT appear more than once.
+                #   - Original-Mail-From: <somespammer@example.net>
                 $anotherone .= $e.", ";
 
             } elsif( index($e, "Received-Date: ") == 0 || index($e, "Arrival-Date: ") == 0 ) {
@@ -184,11 +178,6 @@ sub inquire {
                 # The header is optional and MUST NOT appear more than once.
                 # Source-IP: 192.0.2.45
                 $remotehost = substr($e, index($e, ' ') + 1,);
-
-            } elsif( index($e, "Original-Mail-From: ") == 0 ) {
-                # the header is optional and MUST NOT appear more than once.
-                # Original-Mail-From: <somespammer@example.net>
-                $anotherone .= $e.", ";
             }
         } else {
             # Messages before "Content-Type: message/feedback-report" part
@@ -200,8 +189,7 @@ sub inquire {
         # There is no recipient address in the message
         if( exists $mhead->{"x-apple-unsubscribe"} ) {
             # X-Apple-Unsubscribe: true
-            last unless $mhead->{"x-apple-unsubscribe"} eq "true";
-            last unless index($mhead->{"from"}, "@") > 1;
+            last if $mhead->{"x-apple-unsubscribe"} ne "true" || index($mhead->{"from"}, "@") < 1;
             $dscontents->[0]->{"recipient"}    = $mhead->{"from"};
             $dscontents->[0]->{"diagnosis"}    = Sisimai::String->sweep($emailparts->[0]);
             $dscontents->[0]->{"feedbacktype"} = "opt-out";
@@ -241,7 +229,7 @@ sub inquire {
         $e->{"diagnosis"}    = $dscontents->[$j - 1]->{"diagnosis"};
         $e->{"feedbacktype"} = $dscontents->[$j - 1]->{"feedbacktype"};
     }
-    return { "ds" => $dscontents, "rfc822" => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -288,7 +276,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021,2023,2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2021,2023-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

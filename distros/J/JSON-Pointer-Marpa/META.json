@@ -41,8 +41,9 @@
             "Marpa::R2" : "0",
             "URI::Escape" : "0",
             "constant" : "0",
-            "perl" : "5.014004",
+            "perl" : "5.010001",
             "strict" : "0",
+            "subs" : "0",
             "version" : "0.9915",
             "warnings" : "0"
          }
@@ -60,7 +61,7 @@
    "provides" : {
       "JSON::Pointer::Marpa" : {
          "file" : "lib/JSON/Pointer/Marpa.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       },
       "JSON::Pointer::Marpa::Semantics" : {
          "file" : "lib/JSON/Pointer/Marpa/Semantics.pm"
@@ -77,6 +78,6 @@
          "web" : "https://github.com/XSven/JSON-Pointer-Marpa"
       }
    },
-   "version" : "1.0.1",
+   "version" : "1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

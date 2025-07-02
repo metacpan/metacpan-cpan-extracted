@@ -10,7 +10,7 @@ sub find {
     # @see      https://support.google.com/a/answer/3726730?hl=en
     # @since v4.0.0
     my $class = shift;
-    my $argvs = shift // return undef; return "" unless $argvs->{'diagnosticcode'};
+    my $argvs = shift // return ""; return "" unless $argvs->{'diagnosticcode'};
     return '' unless Sisimai::SMTP::Reply->test($argvs->{'replycode'});
     return '' unless Sisimai::SMTP::Status->test($argvs->{'deliverystatus'});
 
@@ -91,7 +91,15 @@ sub find {
             # - 421 4.7.32 Your email has been rate limited because the From: header (RFC5322) in
             #   this message isn't aligned with either the authenticated SPF or DKIM organizational
             #   domain.
+            # - 421 5.7.32 Your email was blocked because the From: header (RFC5322) in this message
+            #   isn't aligned with either the authenticated SPF or DKIM organizational domain.
             ['421', '4.7.32', 'aligned with either the authenticated spf or dkim'],
+            ["421", "5.7.32", "aligned with either the authenticated spf or dkim"],
+
+            # - 421 4.7.40 Your email has been rate limited because the sending domain doesn't
+            #   have a DMARC record, or the DMARC record doesn’t specify a DMARC policy. Gmail
+            #   requires all bulk email senders to add a DMARC record to their sending domain.
+            ["421", "4.7.40", "to add a dmarc record to "],
         ],
         'badreputation' => [
             # - 421 4.7.0 This message is suspicious due to the very low reputation of the sending
@@ -568,7 +576,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

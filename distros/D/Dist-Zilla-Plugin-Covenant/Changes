@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-Covenant
 
+0.1.3 2025-07-01
+ [BUG FIXES]
+ - Move to Test2::V0.
+
+ [STATISTICS]
+ - code churn: 9 files changed, 254 insertions(+), 5 deletions(-)
+
 0.1.2 2017-07-04
  - misc minor refactoring.
 

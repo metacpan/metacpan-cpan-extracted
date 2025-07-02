@@ -38,14 +38,14 @@ MAKETEST: {
     };
 
     my $v = '';
-    is $Package->test(),   undef, '->test() returns undef';
-    is $Package->test(''), undef, '->test("") returns undef';
+    is $Package->test(),       0, '->test() returns 0';
+    is $Package->test(''),     0, '->test("") returns 0';
     is $Package->test('NEKO'), 0, '->test("NEKO") returns 0';
     is $Package->test('CONN'), 1, '->test("CONN") returns 1';
 
-    is $Package->find(),       undef, '->find("") returns undef';
-    is $Package->find(''),     undef, '->find() returns undef';
-    is $Package->find('NEKO'), undef, '->find("NEKO") returns undef';
+    is $Package->find(),       "", '->find("") returns ""';
+    is $Package->find(''),     "", '->find() returns ""';
+    is $Package->find('NEKO'), "", '->find("NEKO") returns ""';
 
     for my $e ( keys %$smtperrors ) {
         ok $Package->test($e);
@@ -55,6 +55,15 @@ MAKETEST: {
             is $v, $e, 'SMTP command = '.$v;
         }
     }
+
+    $v = $Package->ExceptDATA;
+    isa_ok $v, 'ARRAY';
+    is scalar @$v, 5;
+    for my $e ( @$v ) {
+        is $Package->test($e), 1;
+        ok $e ne "DATA";
+    }
+
 }
 
 done_testing;

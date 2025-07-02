@@ -32,9 +32,9 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::DZil' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'strict' => '0'
                                  }
                  }

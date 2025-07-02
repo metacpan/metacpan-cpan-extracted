@@ -25,10 +25,12 @@ use base qw(Net::Server::PreFork);
 use bytes;
 use utf8;
 use open qw(:encoding(utf8));
-use feature qw(state);
-use vars qw(%MESSAGES);
+use feature qw(say state);
+use vars qw($VERSION %MESSAGES $HELLO);
 use strict;
 use warnings;
+
+our $VERSION = '0.10';
 
 our %MESSAGES = (
     1000 => 'Command completed successfully.',
@@ -67,6 +69,10 @@ our %MESSAGES = (
     2502 => 'Session limit exceeded; server closing connection.',
 );
 
+$HELLO = XML::LibXML::Document->new;
+$HELLO->setDocumentElement($HELLO->createElementNS($Net::EPP::Frame::EPP_URN, 'epp'));
+$HELLO->documentElement->appendChild($HELLO->createElement('hello'));
+
 
 sub new {
     my $package = shift;
@@ -92,7 +98,7 @@ sub run {
 
     if ($self->{'epp'}->{'client_ca_file'}) {
         $args{'SSL_verify_mode'}    = SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
-        $args{'SSL_ca_file'}        = $self->{'epp'}->{'client_ca_file'};
+        $args{'SSL_client_ca_file'} = $self->{'epp'}->{'client_ca_file'};
     }
 
     return $self->SUPER::run(%args);
@@ -213,8 +219,8 @@ sub write_log {
 
     make_path($dir, { mode => 0700});
 
-    write_file(File::Spec->catfile($dir, sprintf(q{%016u-command.xml}, $session->{'counter'})), $command);
-    write_file(File::Spec->catfile($dir, sprintf(q{%016u-response.xml}, $session->{'counter'})), $response);
+    write_file(File::Spec->catfile($dir, sprintf('%016u-command.xml', $session->{'counter'})), $command);
+    write_file(File::Spec->catfile($dir, sprintf('%016u-response.xml', $session->{'counter'})), $response);
 }
 
 #
@@ -312,13 +318,39 @@ sub process_frame {
         );
     }
 
-    if (defined($session->{'clid'}) && 'login' eq $command) {
-        return $self->generate_error(
-            code    => AUTHENTICATION_ERROR,
-            msg     => 'You are already logged in.',
-            clTRID  => $clTRID,
-            svTRID  => $svTRID,
-        );
+    if ('login' eq $command) {
+        if (defined($session->{'clid'})) {
+            return $self->generate_error(
+                code    => AUTHENTICATION_ERROR,
+                msg     => 'You are already logged in.',
+                clTRID  => $clTRID,
+                svTRID  => $svTRID,
+            );
+        }
+
+        my $meta = $self->run_callback(event => 'hello', frame => $HELLO);
+
+        foreach my $uri (map { $_->textContent } $frame->getElementsByTagName('objURI')) {
+            if (none { $_ eq $uri } @{$meta->{objects}}) {
+                return $self->generate_error(
+                    code    => UNIMPLEMENTED_OBJECT_SERVICE,
+                    msg     => sprintf("This server does not support '%s' objects.", $uri),
+                    clTRID  => $clTRID,
+                    svTRID  => $svTRID,
+                );
+            }
+        }
+
+        foreach my $uri (map { $_->textContent } $frame->getElementsByTagName('extURI')) {
+            if (none { $_ eq $uri } @{$meta->{extensions}}) {
+                return $self->generate_error(
+                    code    => UNIMPLEMENTED_EXTENSION,
+                    msg     => sprintf("This server does not support the '%s' extension.", $uri),
+                    clTRID  => $clTRID,
+                    svTRID  => $svTRID,
+                );
+            }
+        }
     }
 
     if ('logout' eq $command) {
@@ -426,19 +458,10 @@ sub handle_command {
 sub generate_greeting {
     my $self = shift;
 
-    state ($hello, $frame);
-
-    #
-    # this ensures that the hello handler always receives a valid EPP frame
-    #
-    if (!$hello) {
-        $hello = XML::LibXML::Document->new;
-        $hello->setDocumentElement($hello->createElementNS($Net::EPP::Frame::EPP_URN, 'epp'));
-        $hello->documentElement->appendChild($hello->createElement('hello'));
-    }
+    state $frame;
 
     if (!$frame) {
-        my $data = $self->run_callback(event => 'hello', frame => $hello);
+        my $data = $self->run_callback(event => 'hello', frame => $HELLO);
 
         $frame = XML::LibXML::Document->new;
 
@@ -744,7 +767,7 @@ Net::EPP::Server - A simple EPP server implementation.
 
 =head1 VERSION
 
-version 0.006
+version 0.10
 
 =head1 SYNOPSIS
 

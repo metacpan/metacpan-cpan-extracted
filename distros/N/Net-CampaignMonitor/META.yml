@@ -31,6 +31,6 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/campaignmonitor/createsend-perl/issues
-  homepage: http://campaignmonitor.github.com/createsend-perl/
+  homepage: http://campaignmonitor.github.io/createsend-perl/
   repository: https://github.com/campaignmonitor/createsend-perl.git
-version: v2.2.1
+version: v2.2.2

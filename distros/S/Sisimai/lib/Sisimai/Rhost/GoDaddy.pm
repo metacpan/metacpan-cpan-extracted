@@ -11,7 +11,7 @@ sub find {
     # @see      https://ca.godaddy.com/help/fix-rejected-email-with-a-bounce-error-40685
     # @since v4.22.2
     my $class = shift;
-    my $argvs = shift // return undef; return "" unless $argvs->{'diagnosticcode'};
+    my $argvs = shift // return ""; return "" unless $argvs->{'diagnosticcode'};
 
     state $errorcodes = {
         # Sender bounces
@@ -218,12 +218,10 @@ sub find {
 
     $issuedcode = lc $issuedcode;
     for my $e ( keys %$messagesof ) {
-        for my $f ( $messagesof->{ $e }->@* ) {
-            next if index($issuedcode, $f) == -1;
-            $reasontext = $e;
-            last
-        }
-        last if $reasontext;
+        # Try to find the error message matches with the given error message string
+        next unless grep { index($issuedcode, $_) > -1 } $messagesof->{ $e }->@*;
+        $reasontext = $e;
+        last;
     }
     return $reasontext;
 }
@@ -259,7 +257,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2018,2020-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2018,2020-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

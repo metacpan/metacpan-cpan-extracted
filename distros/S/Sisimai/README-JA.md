@@ -1,7 +1,7 @@
 ![](https://libsisimai.org/static/images/logo/sisimai-x01.png)
 [![License](https://img.shields.io/badge/license-BSD%202--Clause-orange.svg)](https://github.com/sisimai/p5-sisimai/blob/master/LICENSE)
 [![Perl](https://img.shields.io/badge/perl-v5.26--v5.40-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v5.3.0-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v5.4.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 [![codecov](https://codecov.io/github/sisimai/p5-sisimai/branch/5-stable/graph/badge.svg?token=8kvF4rWPM3)](https://codecov.io/github/sisimai/p5-sisimai)
 
 > [!IMPORTANT]
@@ -23,7 +23,7 @@
 > SisimaiはPerlモジュールまたはRuby Gemですが、PHPやPython、GoやRustなどJSONを読める言語であれば
 > どのような環境においても解析結果を得ることでバウンスの発生状況を捉えるのにとても有用です。
 
-- [**README(English)**](README.md)
+- [**🇬🇧README**](README.md)
 - [シシマイ? | What is Sisimai](#what-is-sisimai)
     - [主な特徴的機能 | The key features of Sisimai](#the-key-features-of-sisimai)
     - [コマンドラインでのデモ | command line demo](#command-line-demo)
@@ -448,7 +448,7 @@ Related sites
 
 See also
 ---------------------------------------------------------------------------------------------------
-* [README.md - README.md in English](https://github.com/sisimai/p5-sisimai/blob/master/README.md)
+* [README.md - README.md in English(🇬🇧)](https://github.com/sisimai/p5-sisimai/blob/master/README.md)
 * [RFC3463 - Enhanced Mail System Status Codes](https://tools.ietf.org/html/rfc3463)
 * [RFC3464 - An Extensible Message Format for Delivery Status Notifications](https://tools.ietf.org/html/rfc3464)
 * [RFC3834 - Recommendations for Automatic Responses to Electronic Mail](https://tools.ietf.org/html/rfc3834)

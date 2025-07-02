@@ -78,6 +78,10 @@ L<JSON::Pointer>
 
 L<Mojo::JSON::Pointer>
 
+=item *
+
+L<Struct::Path::JsonPointer>
+
 =back
 
 =head1 AUTHOR

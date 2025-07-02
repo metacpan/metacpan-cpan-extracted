@@ -8,11 +8,11 @@ Poker::Eval::Community - Evaluate and score hand using any combination of hole a
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 
 =head1 SYNOPSIS

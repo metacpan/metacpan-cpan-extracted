@@ -13,7 +13,7 @@ sub match {
     #                           1: Matched
     # @since v4.0.0
     my $class = shift;
-    my $argv1 = shift // return undef;
+    my $argv1 = shift // return 0;
 
     state $index = [
         'domain does not exist',
@@ -47,8 +47,7 @@ sub true {
     # @since v4.0.0
     # @see http://www.ietf.org/rfc/rfc2822.txt
     my $class = shift;
-    my $argvs = shift // return undef;
-    return 1 if $argvs->{'reason'} eq 'hostunknown';
+    my $argvs = shift // return 0; return 1 if $argvs->{'reason'} eq 'hostunknown';
 
     my $statuscode = $argvs->{'deliverystatus'}    // '';
     my $issuedcode = lc $argvs->{'diagnosticcode'} // '';
@@ -61,7 +60,7 @@ sub true {
     } else {
         # Status: 5.1.2
         # Diagnostic-Code: SMTP; 550 Host unknown
-        return 1 if __PACKAGE__->match($issuedcode);
+        return __PACKAGE__->match($issuedcode);
     }
     return 0;
 }
@@ -120,7 +119,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018,2020,2021,2023,2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018,2020,2021,2023-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

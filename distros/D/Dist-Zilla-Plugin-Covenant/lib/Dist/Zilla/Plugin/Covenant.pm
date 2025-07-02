@@ -1,8 +1,7 @@
 package Dist::Zilla::Plugin::Covenant;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: add the author's pledge to the distribution
-$Dist::Zilla::Plugin::Covenant::VERSION = '0.1.2';
-
+$Dist::Zilla::Plugin::Covenant::VERSION = '0.1.3';
 
 use 5.20.0;
 use warnings;
@@ -91,7 +90,7 @@ Dist::Zilla::Plugin::Covenant - add the author's pledge to the distribution
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 
@@ -130,7 +129,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Yanick Champoux.
+This software is copyright (c) 2025 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

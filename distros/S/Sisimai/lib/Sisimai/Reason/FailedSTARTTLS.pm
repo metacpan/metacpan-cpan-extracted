@@ -12,7 +12,7 @@ sub match {
     #                           1: Matched
     # @since v5.2.0
     my $class = shift;
-    my $argv1 = shift // return undef;
+    my $argv1 = shift // return 0;
 
     state $index = [
         "starttls is required to send mail",
@@ -30,11 +30,10 @@ sub true {
     # @see http://www.ietf.org/rfc/rfc2822.txt
     # @since v5.2.0
     my $class = shift;
-    my $argvs = shift // return undef;
+    my $argvs = shift // return 0;
     my $reply = int $argvs->{'replycode'} || 0;
 
-    return 1 if $argvs->{"reason"} eq "failedstarttls";
-    return 1 if $argvs->{"command"} eq "STARTTLS";
+    return 1 if $argvs->{"reason"} eq "failedstarttls" || $argvs->{"command"} eq "STARTTLS";
     return 1 if $reply == 523 || $reply == 524 || $reply == 538;
     return __PACKAGE__->match(lc $argvs->{"diagnosticcode"});
 }
@@ -84,7 +83,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2024-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

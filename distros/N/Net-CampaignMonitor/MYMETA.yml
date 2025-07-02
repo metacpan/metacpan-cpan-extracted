@@ -1,0 +1,36 @@
+---
+abstract: "A Perl wrapper for the Campaign Monitor API.\r"
+author:
+  - jeffery@astraaustralis.com.au
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+dynamic_config: 0
+generated_by: 'Module::Install version 1.02, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-CampaignMonitor
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 1.11
+  JSON: 2.27
+  LWP::UserAgent: 5.835
+  MIME::Base64: 3.13
+  Params::Util: 1.01
+  REST::Client: 171
+  Test::Exception: 0.32
+  XML::Simple: 2.18
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/campaignmonitor/createsend-perl/issues
+  homepage: http://campaignmonitor.github.io/createsend-perl/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/campaignmonitor/createsend-perl.git
+version: v2.2.2
+x_module_name: Net::CampaignMonitor

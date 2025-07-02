@@ -9,11 +9,11 @@ Poker::Card - Simple class to represent a poker card.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 
 =head1 SYNOPSIS

@@ -119,7 +119,7 @@ state $ReplyCode5 = [
     550, 552, 553, 551, 521, 525, 523, 524, 530, 533, 534, 535, 538, 555, 556, 554,
     500, 501, 502, 503, 504,
 ];
-state $CodeOfSMTP = { '2' => $ReplyCode2, '4' => $ReplyCode4, '5' => $ReplyCode5 };
+state $CodeOfSMTP = {'2' => $ReplyCode2, '4' => $ReplyCode4, '5' => $ReplyCode5};
 state $Associated = {
     "422" => ["AUTH",     "4.7.12",  "securityerror"], # RFC5238
     "432" => ["AUTH",     "4.7.12",  "securityerror"], # RFC4954, RFC5321
@@ -145,7 +145,7 @@ sub test {
     # @see      code
     # @since v5.0.0
     my $class = shift;
-    my $argv1 = shift || return undef;
+    my $argv1 = shift || return 0;
     my $reply = int $argv1;
     my $first = int($reply / 100);
 
@@ -177,10 +177,8 @@ sub find {
     #                           did not include SMTP Reply Code value
     # @since v4.14.0
     my $class = shift;
-    my $argv1 = shift || return undef;
+    my $argv1 = shift || return ""; return '' if length $argv1 < 3 || index(uc($argv1), 'X-UNIX;') > -1;
     my $argv2 = shift || 0;
-    return '' if length $argv1 < 3;
-    return '' if index(uc($argv1), 'X-UNIX;') > -1;
 
     my $esmtperror = ' '.$argv1.' ';
     my $esmtpreply = '';

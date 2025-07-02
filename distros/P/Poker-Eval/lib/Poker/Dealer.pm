@@ -12,11 +12,11 @@ Poker::Dealer - Simple class to represent a poker dealer
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 
 =head1 SYNOPSIS

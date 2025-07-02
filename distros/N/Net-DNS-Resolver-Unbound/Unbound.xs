@@ -13,7 +13,7 @@ It is NOT, nor will it ever be, suitable for general use.
 
 =head1 COPYRIGHT
 
-Copyright (c)2022-2024 Dick Franks
+Copyright (c)2022-2025 Dick Franks
 
 All Rights Reserved
 
@@ -112,7 +112,7 @@ err(struct av* handle)
 	SV** index = av_fetch(handle, 1, 0);
 	int err = index ? SvIVX(*index) : 0;
     CODE:
-	RETVAL = newSVpvf( err ? "%s (%d)" : "", ub_strerror(err), err );
+	RETVAL = err ? newSVpvf("%s (%d)", ub_strerror(err), err) : newSVpv("", 0);
     OUTPUT:
 	RETVAL
 

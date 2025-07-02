@@ -18,18 +18,14 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
 
-    while(1) {
-        $match ||= 1 if index($mhead->{'subject'}, 'DELIVERY FAILURE:') == 0;
-        $match ||= 1 if index($mhead->{'subject'}, 'DELIVERY_FAILURE:') == 0;
-        last;
-    }
+    my $match = 0; $match ||= 1 if index($mhead->{'subject'}, 'DELIVERY FAILURE:') == 0;
+                   $match ||= 1 if index($mhead->{'subject'}, 'DELIVERY_FAILURE:') == 0;
     return undef unless $match > 0;
 
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ['Content-Type: message/rfc822'];
-    state $startingof = { 'message' => ['Your message'] };
+    state $startingof = {'message' => ['Your message']};
     state $messagesof = {
         'filtered'    => ['Cannot route mail to user'],
         'systemerror' => ['Several matches found in Domino Directory'],
@@ -45,12 +41,11 @@ sub inquire {
     require Sisimai::RFC1123;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $subjecttxt = '';    # (String) The value of Subject:
-    my $v = undef;
     my $p = '';
 
     for my $e ( split("\n", $emailparts->[0]) ) {
@@ -61,8 +56,7 @@ sub inquire {
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # Your message
         #
@@ -137,8 +131,7 @@ sub inquire {
         UTF8FLAG: while(1) {
             # Delete the utf8 flag because there are a string including some characters which have 
             # utf8 flag but utf8::is_utf8 returns false
-            last unless length $e->{'diagnosis'};
-            last unless Sisimai::String->is_8bit(\$e->{'diagnosis'});
+            last if $e->{'diagnosis'} eq "" || Sisimai::String->is_8bit(\$e->{'diagnosis'}) == 0;
 
             my $cv = $e->{'diagnosis'};
             my $ce = Encode::Guess->guess($cv);
@@ -165,7 +158,7 @@ sub inquire {
     # Set the value of $subjecttxt as a Subject if there is no original message in the bounce mail.
     $emailparts->[1] .= sprintf("Subject: %s\n", $subjecttxt) if index($emailparts->[1], "\nSubject:") < 0;
 
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;

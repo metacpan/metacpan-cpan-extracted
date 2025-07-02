@@ -8,7 +8,7 @@ on 'configure' => sub {
   requires 'File::Spec::Functions'         => '0';
   requires 'strict'                        => '0';
   requires 'version'                       => '0.9915';
-  requires 'warnings'                      => '0';
+  requires 'warnings'                      => '0'
 };
 
 on 'runtime' => sub {
@@ -16,8 +16,9 @@ on 'runtime' => sub {
   requires 'URI::Escape' => '0';
   requires 'constant'    => '0';
   requires 'strict'      => '0';
+  requires 'subs'        => '0';
   requires 'version'     => '0.9915';
-  requires 'warnings'    => '0';
+  requires 'warnings'    => '0'
 };
 
 on 'test' => sub {
@@ -25,7 +26,7 @@ on 'test' => sub {
   requires 'Test::Fatal'   => '0';
   requires 'Test::Harness' => '3.50';
   requires 'Test::Needs'   => '0';
-  requires 'Test::More'    => '1.001005';    # Subtests accept args
+  requires 'Test::More' => '1.001005'    # Subtests accept args
 };
 
 on develop => sub {
@@ -34,5 +35,5 @@ on develop => sub {
   requires 'Template'           => '0';
   requires 'Test::Needs'        => '0';
   requires 'Test::Perl::Critic' => '0';
-  requires 'Test::Pod'          => '1.26';
-};
+  requires 'Test::Pod'          => '1.26'
+}

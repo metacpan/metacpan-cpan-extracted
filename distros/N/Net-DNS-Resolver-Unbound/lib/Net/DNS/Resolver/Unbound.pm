@@ -15,7 +15,7 @@ use base (OS_CONF)[0];			## backward compatibility only
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.32';
+	$VERSION = '1.33';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -187,8 +187,13 @@ sub new {
 
 =head2 nameservers
 
-	my $dnssec_resolver = Net::DNS::Resolver::Unbound->new(
+	my $DNSSEC_resolver = Net::DNS::Resolver::Unbound->new(
 		nameservers => [],	# override /etc/resolv.conf
+		add_ta_file => '/var/lib/unbound/root.key'
+		);
+
+	my $DNSSEC_stub = Net::DNS::Resolver::Unbound->new(
+		nameservers => ['8.8.8.8', '1.1.1.1'],
 		add_ta_file => '/var/lib/unbound/root.key'
 		);
 
@@ -197,6 +202,7 @@ sub new {
 		nameserver => '1.1.1.1@853#cloudflare-dns.com',
 		nameserver => '2001:4860:4860::8888@853#dns.google',
 		nameserver => '8.8.8.8@853#dns.google',
+		add_ta_file => '/var/lib/unbound/root.key',
 		option	=> ['tls-cert-bundle' => '/etc/ssl/cert.pem'],
 		set_tls	=> 1
 		);

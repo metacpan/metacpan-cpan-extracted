@@ -15,18 +15,17 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
 
     # Pre-process email headers of NON-STANDARD bounce message au by EZweb, as known as ezweb.ne.jp.
     #   Subject: Mail System Error - Returned Mail
     #   From: <Postmaster@ezweb.ne.jp>
     #   Received: from ezweb.ne.jp (wmflb12na02.ezweb.ne.jp [222.15.69.197])
     #   Received: from nmomta.auone-net.jp ([aaa.bbb.ccc.ddd]) by ...
-    $match++ if rindex($mhead->{'from'}, 'Postmaster@ezweb.ne.jp') > -1;
-    $match++ if rindex($mhead->{'from'}, 'Postmaster@au.com') > -1;
-    $match++ if $mhead->{'subject'} eq 'Mail System Error - Returned Mail';
-    $match++ if grep { rindex($_, 'ezweb.ne.jp (EZweb Mail) with') > -1 } $mhead->{'received'}->@*;
-    $match++ if grep { rindex($_, '.au.com (') > -1 } $mhead->{'received'}->@*;
+    my $match = 0; $match++ if rindex($mhead->{'from'}, 'Postmaster@ezweb.ne.jp') > -1;
+                   $match++ if rindex($mhead->{'from'}, 'Postmaster@au.com') > -1;
+                   $match++ if $mhead->{'subject'} eq 'Mail System Error - Returned Mail';
+                   $match++ if grep { rindex($_, 'ezweb.ne.jp (EZweb Mail) with') > -1 } $mhead->{'received'}->@*;
+                   $match++ if grep { rindex($_, '.au.com (') > -1 } $mhead->{'received'}->@*;
     if( defined $mhead->{'message-id'} ) {
         $match++ if substr($mhead->{'message-id'}, -13, 13) eq '.ezweb.ne.jp>';
         $match++ if substr($mhead->{'message-id'}, -8, 8) eq '.au.com>';
@@ -36,7 +35,7 @@ sub inquire {
     require Sisimai::SMTP::Command;
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ["--------------------------------------------------", "Content-Type: message/rfc822"];
-    state $startingof = { "message" => ['The user(s) ', 'Your message ', 'Each of the following', '<'] };
+    state $startingof = {"message" => ['The user(s) ', 'Your message ', 'Each of the following', '<']};
     state $messagesof = {
         #'notaccept'  => ['The following recipients did not receive this message:'],
         'expired' => [
@@ -55,12 +54,11 @@ sub inquire {
     };
 
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # Points the current cursor position
     my $recipients = 0;     # The number of 'Final-Recipient' header
     my $substrings = [];    # All the values of "messagesof"
-    my $v = undef;
     map { push @$substrings, $messagesof->{ $_ }->@* } keys %$messagesof;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
@@ -70,8 +68,7 @@ sub inquire {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if grep { index($e, $_) > -1 } $startingof->{'message'}->@*;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         # The user(s) account is disabled.
         #
@@ -158,7 +155,7 @@ sub inquire {
         next if index($e->{'recipient'}, '@ezweb.ne.jp') > 1 || index($e->{'recipient'}, '@au.com') > 1;
         $e->{"reason"} = "userunknown" if index($e->{"diagnosis"}, "<") == 0;
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -197,7 +194,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -35,7 +35,7 @@ sub rise {
     my $class = shift;
     my $argvs = shift            || return undef;
     my $email = $argvs->{'data'} || return undef;
-    my $thing = { 'from' => '', 'header' => {}, 'rfc822' => '', 'ds' => [], 'catch' => undef };
+    my $thing = {'from' => '', 'header' => {}, 'rfc822' => '', 'ds' => [], 'catch' => undef};
     my $param = {};
 
     my $aftersplit = undef;
@@ -69,7 +69,7 @@ sub rise {
 
         # 4. Rewrite message body for detecting the bounce reason
         $TryOnFirst = Sisimai::Order->make($thing->{'header'}->{'subject'});
-        $param = { 'hook' => $argvs->{'hook'} || undef, 'mail' => $thing, 'body' => \$aftersplit->[2] };
+        $param = {'hook' => $argvs->{'hook'} || undef, 'mail' => $thing, 'body' => \$aftersplit->[2]};
         last if $beforefact = __PACKAGE__->sift(%$param);
         last unless grep { index($aftersplit->[2], $_) > -1 } @$Boundaries;
 
@@ -92,7 +92,6 @@ sub rise {
     return $thing;
 }
 
-sub load { warn ' ***warning: Sisimai::Message->load will be removed at v5.3.0'; return [] }
 sub part {
     # Divide email data up headers and a body part.
     # @param         [String] email  Email data
@@ -105,14 +104,14 @@ sub part {
     $$email =~ s/\A\s+//m;
     $$email =~ s/\r\n/\n/gm if rindex($$email, "\r\n") > -1;
 
-    ($parts->[1], $parts->[2]) = split(/\n\n/, $$email, 2);
-    return undef unless $parts->[1];
-    return undef unless $parts->[2];
+    ($parts->[1], $parts->[2]) = split(/\n\n/, $$email, 2); $parts->[2] ||= "";
+    return undef if $parts->[1] eq "" || $parts->[2] eq "";
 
     if( substr($parts->[1], 0, 5) eq 'From ' ) {
         # From MAILER-DAEMON Tue Feb 11 00:00:00 2014
         $parts->[0] =  [split(/\n/, $parts->[1], 2)]->[0];
         $parts->[0] =~ y/\r\n//d;
+
     } else {
         # Set pseudo UNIX From line
         $parts->[0] =  'MAILER-DAEMON Tue Feb 11 00:00:00 2014';
@@ -145,21 +144,19 @@ sub makemap {
 
     # Select and convert all the headers in $argv0. The following regular expression is based on
     # https://gist.github.com/xtetsuji/b080e1f5551d17242f6415aba8a00239
-    my $firstpairs = { $$argv0 =~ /^([\w-]+):[ ]*(.*?)\n(?![\s\t])/gms };
-    my $headermaps = { 'subject' => '' };
+    my $firstpairs = {$$argv0 =~ /^([\w-]+):[ ]*(.*?)\n(?![\s\t])/gms};
+    my $headermaps = {'subject' => ''};
        $headermaps->{ lc $_ } = $firstpairs->{ $_ } for keys %$firstpairs;
     my $receivedby = [];
 
     for my $e ( values %$headermaps ) { s/\n\s+/ /, y/\t / /s for $e }
-
     if( index($$argv0, "\nReceived:") > 0 || index($$argv0, "Received:") == 0 ) {
         # Capture values of each Received: header
         my $re = [$$argv0 =~ /^Received:[ ]*(.*?)\n(?![\s\t])/gms];
         for my $e ( @$re ) {
             # 1. Exclude the Received header including "(qmail ** invoked from network)".
             # 2. Convert all consecutive spaces and line breaks into a single space character.
-            next if index($e, ' invoked by uid')       > 0;
-            next if index($e, ' invoked from network') > 0;
+            next if index($e, Sisimai::RFC5322->woReceived->[0]) > 0 || index($e, Sisimai::RFC5322->woReceived->[1]) > 0;
 
             $e =~ s/\n\s+/ /;
             $e =~ y/\n\t / /s;
@@ -248,8 +245,7 @@ sub tidy {
                         # - Final-Recipient: RFC822; ...          => rfc822
                         last if index($f, ' ') > 0;
 
-                        my $p2 = index($f, '=');
-                        if( $p2 > 0 ) {
+                        my $p2 = index($f, '='); if( $p2 > 0 ) {
                             # charset=, boundary=, and other pairs divided by "="
                             $ps = lc substr($f, 0, $p2);
                             substr($f, 0, $p2, $ps);
@@ -260,23 +256,19 @@ sub tidy {
                     push @$ab, $f;
                 }
 
-                while(1) {
+                if( $fn eq 'Diagnostic-Code' ) {
                     # Diagnostic-Code: x-unix;
                     #   /var/email/kijitora/Maildir/tmp/1000000000.A000000B00000.neko22:
                     #   Disk quota exceeded
-                    last unless $fn eq 'Diagnostic-Code';
-                    last unless scalar(@$ab) == 1;
-                    last unless index($lines[$index + 1], ' ') == 0;
-
-                    push @$ab, '';
-                    last;
+                    push @$ab, '' if scalar @$ab == 1 && index($lines[$index + 1], " ") == 0;
                 }
                 $bf = join('; ', @$ab); $ab = []; # Insert " " (space characer) immediately after ";"
 
             } else {
                 # There is no ";" in the field
-                last if index($fn, '-Date')       > 0;  # Arrival-Date, Last-Attempt-Date
-                last if index($fn, '-Message-ID') > 0;  # X-Original-Message-ID
+                # Arrival-Date, Last-Attempt-Date
+                # X-Original-Message-ID
+                last if index($fn, '-Date') > 0 || index($fn, '-Message-ID') > 0;
                 $bf = lc $bf;
             }
             last;
@@ -296,8 +288,7 @@ sub tidy {
         # 4. Concatenate the field name and the field value
         for my $f ( split(' ', $bf) ) {
             # Remove redundant space characters
-            next if length $f == 0;
-            push @$ab, $f;
+            push @$ab, $f if length $f > 0;
         }
         $email .= sprintf("%s: %s\n", $fn, join(' ', @$ab));
     }
@@ -321,8 +312,8 @@ sub sift {
     my $argvs = { @_ };
 
     my $mailheader = $argvs->{'mail'}->{'header'} || return undef;
-    my $bodystring = $argvs->{'body'} || return undef;
-    my $hookmethod = $argvs->{'hook'} || undef;
+    my $bodystring = $argvs->{'body'}             || return undef;
+    my $hookmethod = $argvs->{'hook'}             || undef;
     my $havecaught = undef;
 
     state $defaultset = Sisimai::Order->another;
@@ -356,14 +347,14 @@ sub sift {
     } elsif( index($mesgformat, 'multipart/') == 0 ) {
         # In case of Content-Type: multipart/*
         my $p = Sisimai::RFC2045->makeflat($mailheader->{'content-type'}, $bodystring);
-        $bodystring = $p if length $$p;
+        $bodystring = $p if defined $p && length $$p;
     }
     $$bodystring =~ tr/\r//d;
     $$bodystring =~ s/\t/ /g;
 
     if( ref $hookmethod eq 'CODE' ) {
         # Call hook method
-        my $p = { 'headers' => $mailheader, 'message' => $$bodystring };
+        my $p = {'headers' => $mailheader, 'message' => $$bodystring};
         eval { $havecaught = $hookmethod->($p) };
         warn sprintf(" ***warning: Something is wrong in hook method 'hook': %s", $@) if $@;
     }
@@ -387,37 +378,28 @@ sub sift {
             last(DECODER) if $havesifted;
         }
 
-        unless( $haveloaded->{'Sisimai::RFC3464'} ) {
-            # When the all of Sisimai::Lhost::* modules did not return bounce data, call Sisimai::RFC3464;
-            require Sisimai::RFC3464;
-            $havesifted = Sisimai::RFC3464->inquire($mailheader, $bodystring);
-            $modulename = 'RFC3464';
-            last(DECODER) if $havesifted;
-        }
+        # When the all of Sisimai::Lhost::* modules did not return bounce data, call Sisimai::RFC3464;
+        require Sisimai::RFC3464;
+        $havesifted = Sisimai::RFC3464->inquire($mailheader, $bodystring);
+        if( $havesifted ){ $modulename = 'RFC3464'; last(DECODER) }
 
-        unless( $haveloaded->{'Sisimai::ARF'} ) {
-            # Feedback Loop message
-            require Sisimai::ARF;
-            $havesifted = Sisimai::ARF->inquire($mailheader, $bodystring);
-            $modulename = "ARF";
-            last(DECODER) if $havesifted;
-        }
+        # Feedback Loop message
+        require Sisimai::ARF;
+        $havesifted = Sisimai::ARF->inquire($mailheader, $bodystring);
+        if( $havesifted ){ $modulename = "ARF"; last(DECODER) }
 
-        unless( $haveloaded->{'Sisimai::RFC3834'} ) {
-            # Try to sift the message as auto reply message defined in RFC3834
-            require Sisimai::RFC3834;
-            $havesifted = Sisimai::RFC3834->inquire($mailheader, $bodystring);
-            $modulename = 'RFC3834';
-            last(DECODER) if $havesifted;
-        }
+        # Try to sift the message as auto reply message defined in RFC3834
+        require Sisimai::RFC3834;
+        $havesifted = Sisimai::RFC3834->inquire($mailheader, $bodystring);
+        if( $havesifted ){ $modulename = 'RFC3834'; last(DECODER) }
+
         last; # as of now, we have no sample email for coding this block
 
     } # End of while(DECODER)
     return undef unless $havesifted;
 
     $havesifted->{'catch'} = $havecaught;
-    $modulename =~ s/\A.+:://;
-    $_->{'agent'} ||= $modulename for $havesifted->{'ds'}->@*;
+    $modulename =~ s/\A.+:://; $_->{'agent'} ||= $modulename for $havesifted->{'ds'}->@*;
     return $havesifted;
 }
 
@@ -461,14 +443,6 @@ C<rise()> method is a constructor of C<Sisimai::Message>
     my $mailtxt = 'Entire email text';
     my $message = Sisimai::Message->rise('data' => $mailtxt);
 
-If you have implemented a custom MTA module and use it, set the value of C<load> in the argument of
-this method as an array reference like following code:
-
-    my $message = Sisimai::Message->rise(
-                        'data' => $mailtxt,
-                        'load' => ['Your::Custom::MTA::Module']
-                  );
-
 =head1 INSTANCE METHODS
 
 =head2 C<B<(from)>>
@@ -510,7 +484,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

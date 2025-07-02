@@ -44,7 +44,7 @@ sub inquire {
     }
 
     my $permessage = {};
-    my $dscontents = [Sisimai::Lhost->DELIVERYSTATUS];
+    my $dscontents = [Sisimai::Lhost->DELIVERYSTATUS]; my $v = undef;
     my $alternates = Sisimai::Lhost->DELIVERYSTATUS;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
@@ -52,7 +52,6 @@ sub inquire {
     my $beforemesg = "";    # (String) String before $startingof->{"message"}
     my $goestonext = 0;     # (Bool) Flag: do not append the line into $beforemesg
     my $isboundary = [Sisimai::RFC2045->boundary($mhead->{"content-type"}, 0)]; $isboundary->[0] ||= "";
-    my $v = undef;
     my $p = "";
 
     while( index($emailparts->[0], '@') < 0 ) {
@@ -106,8 +105,7 @@ sub inquire {
             while(1) {
                 # Append each string before startingof["message"][0] except the following patterns
                 # for the later reference
-                last if $e eq "";       # Blank line
-                last if $goestonext;    # Skip if the part is text/html, image/icon, in multipart/*
+                last if $e eq "" || $goestonext; # Blank line or the part is text/html, image/icon, in multipart/*
 
                 # This line is a boundary kept in "multiparts" as a string, when the end of the boundary
                 # appeared, the condition above also returns true.
@@ -144,8 +142,7 @@ sub inquire {
             }
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         if( my $f = Sisimai::RFC1894->match($e) ) {
             # $e matched with any field defined in RFC3464
@@ -278,7 +275,7 @@ sub inquire {
     # Set the recipient address as To: header in the original message part
     $emailparts->[1] = sprintf("To: <%s>\n", $dscontents->[0]->{'recipient'}) unless $emailparts->[1];
     
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;

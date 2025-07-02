@@ -15,12 +15,11 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
 
     # X-MS-TNEF-Correlator: <00000000000000000000000000000000000000@example.com>
     # X-Mailer: Internet Mail Service (5.5.1960.3)
     # X-MS-Embedded-Report:
-    $match ||= 1 if defined $mhead->{'x-ms-embedded-report'};
+    my $match = 0; $match ||= 1 if defined $mhead->{'x-ms-embedded-report'};
     EXCHANGE_OR_NOT: while(1) {
         # Check the value of X-Mailer header
         last if $match;
@@ -85,7 +84,7 @@ sub inquire {
         ],
     };
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
@@ -96,7 +95,6 @@ sub inquire {
         'date'    => '',    # The value of "Date"
         'subject' => '',    # The value of "Subject"
     };
-    my $v = undef;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -106,8 +104,7 @@ sub inquire {
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next if $statuspart;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $statuspart == 1;
 
         if( $connvalues == scalar(keys %$connheader) ) {
             # did not reach the following recipient(s):
@@ -207,8 +204,8 @@ sub inquire {
 
         # Could not detect the reason from the value of "diagnosis", copy alternative error message
         next if $e->{'reason'};
-        next unless exists $e->{'alterrors'};
-        next unless length $e->{'alterrors'};
+        next unless exists $e->{'alterrors'} && length $e->{'alterrors'};
+
         $e->{'diagnosis'} = $e->{'alterrors'}.' '.$e->{'diagnosis'};
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         delete $e->{'alterrors'};
@@ -220,7 +217,7 @@ sub inquire {
         $emailparts->[1] .= sprintf("Date: %s\n", $connheader->{'date'});
         $emailparts->[1] .= sprintf("Subject: %s\n", $connheader->{'subject'});
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -262,7 +259,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

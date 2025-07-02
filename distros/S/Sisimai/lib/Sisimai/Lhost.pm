@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Sisimai::RFC5322;
 
+use constant INDICATORS => { 'deliverystatus' => (1 << 1), 'message-rfc822' => (1 << 2) };
 sub DELIVERYSTATUS {
     # Data structure for decoded bounce messages
     # @private
@@ -23,16 +24,6 @@ sub DELIVERYSTATUS {
         'diagnosis'    => '',   # The value of Diagnostic-Code header
         'recipient'    => '',   # The value of Final-Recipient header
         'feedbacktype' => '',   # Feedback Type
-    };
-}
-sub INDICATORS {
-    # Flags for position variables
-    # @private
-    # @return   [Hash] Position flag data
-    # @since    v4.13.0
-    return {
-        'deliverystatus' => (1 << 1),
-        'message-rfc822' => (1 << 2),
     };
 }
 sub description { return '' }
@@ -95,7 +86,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2021,2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2021,2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

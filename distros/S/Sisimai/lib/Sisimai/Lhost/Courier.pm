@@ -15,11 +15,9 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
-
-    $match ||= 1 if index($mhead->{'from'},    'Courier mail server at ')       > -1;
-    $match ||= 1 if index($mhead->{'subject'}, 'NOTICE: mail delivery status.') > -1;
-    $match ||= 1 if index($mhead->{'subject'}, 'WARNING: delayed mail.')        > -1;
+    my $match = 0; $match ||= 1 if index($mhead->{'from'},    'Courier mail server at ')       > -1;
+                   $match ||= 1 if index($mhead->{'subject'}, 'NOTICE: mail delivery status.') > -1;
+                   $match ||= 1 if index($mhead->{'subject'}, 'WARNING: delayed mail.')        > -1;
     if( defined $mhead->{'message-id'} ) {
         # Message-ID: <courier.4D025E3A.00001792@5jo.example.org>
         $match ||= 1 if index($mhead->{'message-id'}, '<courier.') == 0;
@@ -47,12 +45,11 @@ sub inquire {
 
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $thecommand = '';    # (String) SMTP Command name begin with the string '>>>'
-    my $v = undef;
     my $p = '';
 
     for my $e ( split("\n", $emailparts->[0]) ) {
@@ -60,14 +57,12 @@ sub inquire {
         # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
-            if( rindex($e, $startingof->{'message'}->[0]) > -1 ||
-                rindex($e, $startingof->{'message'}->[1]) > -1 ) {
+            if( rindex($e, $startingof->{'message'}->[0]) > -1 || rindex($e, $startingof->{'message'}->[1]) > -1 ) {
                 $readcursor |= $indicators->{'deliverystatus'};
                 next;
             }
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         if( my $f = Sisimai::RFC1894->match($e) ) {
             # $e matched with any field defined in RFC3464
@@ -93,7 +88,7 @@ sub inquire {
                 }
             } elsif( $o->[3] eq 'code' ) {
                 # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
-                $v->{'spec'} = $o->[1];
+                $v->{'spec'}      = $o->[1];
                 $v->{'diagnosis'} = $o->[2];
 
             } else {
@@ -156,7 +151,7 @@ sub inquire {
         }
         $e->{'command'} ||= $thecommand || '';
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;

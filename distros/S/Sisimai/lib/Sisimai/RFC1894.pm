@@ -4,28 +4,24 @@ use strict;
 use warnings;
 use Sisimai::String;
 
-sub FIELDINDEX {
-    return [qw|
-        Action Arrival-Date Diagnostic-Code Final-Recipient Last-Attempt-Date Original-Recipient
-        Received-From-MTA Remote-MTA Reporting-MTA Status X-Actual-Recipient X-Original-Message-ID
-    |];
-}
-sub FIELDTABLE {
+use constant FIELDINDEX => [qw|
+    Action Arrival-Date Diagnostic-Code Final-Recipient Last-Attempt-Date Original-Recipient
+    Received-From-MTA Remote-MTA Reporting-MTA Status X-Actual-Recipient X-Original-Message-ID
+|];
+use constant FIELDTABLE => {
     # Return pairs that a field name and key name defined in Sisimai::Lhost class
-    return {
-        'action'            => 'action',
-        'arrival-date'      => 'date',
-        'diagnostic-code'   => 'diagnosis',
-        'final-recipient'   => 'recipient',
-        'last-attempt-date' => 'date',
-        'original-recipient'=> 'alias',
-        'received-from-mta' => 'lhost',
-        'remote-mta'        => 'rhost',
-        'reporting-mta'     => 'lhost',
-        'status'            => 'status',
-        'x-actual-recipient'=> 'alias',
-    };
-}
+    'action'            => 'action',
+    'arrival-date'      => 'date',
+    'diagnostic-code'   => 'diagnosis',
+    'final-recipient'   => 'recipient',
+    'last-attempt-date' => 'date',
+    'original-recipient'=> 'alias',
+    'received-from-mta' => 'lhost',
+    'remote-mta'        => 'rhost',
+    'reporting-mta'     => 'lhost',
+    'status'            => 'status',
+    'x-actual-recipient'=> 'alias',
+};
 
 sub match {
     # Check the argument matches with a field defined in RFC3464
@@ -33,8 +29,8 @@ sub match {
     # @return   [Integer]      0: did not matched, 1,2: matched
     # @since v4.25.0
     my $class = shift;
-    my $argv0 = shift                      || return undef;
-    my $label = __PACKAGE__->label($argv0) || return undef;
+    my $argv0 = shift                      || return 0;
+    my $label = __PACKAGE__->label($argv0) || return 0;
     my $match = 0;
 
     state $fieldnames = [
@@ -104,8 +100,8 @@ sub label {
     # @return   [String]       Field name as a label
     # @since v4.25.15
     my $class = shift;
-    my $argv0 = shift || return undef;
-    return lc((split(':', $argv0, 2))[0]) || undef;
+    my $argv0 = shift || return "";
+    return lc((split(':', $argv0, 2))[0]) || "";
 }
 
 sub field {
@@ -116,9 +112,9 @@ sub field {
     my $class = shift;
     my $argv0 = shift || return undef;
 
-    state $subtypeset = { "addr" => "RFC822", "cdoe" => "SMTP", "host" => "DNS" };
+    state $subtypeset = {"addr" => "RFC822", "cdoe" => "SMTP", "host" => "DNS"};
     state $actionlist = ["failed", "delayed", "delivered", "relayed", "expanded"];
-    state $correction = { 'deliverable' => 'delivered', 'expired' => 'delayed', 'failure' => 'failed' };
+    state $correction = {'deliverable' => 'delivered', 'expired' => 'delayed', 'failure' => 'failed'};
     state $fieldgroup = {
         'original-recipient'    => 'addr',
         'final-recipient'       => 'addr',

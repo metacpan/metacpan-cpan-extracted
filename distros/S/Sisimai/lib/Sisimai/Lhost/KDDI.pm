@@ -15,29 +15,25 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
-
-    # 'message-id' => qr/[@].+[.]ezweb[.]ne[.]jp[>]\z/,
-    $match ||= 1 if Sisimai::String->aligned(\$mhead->{'from'}, ['no-reply@.', '.dion.ne.jp']);
-    $match ||= 1 if $mhead->{'reply-to'} && $mhead->{'reply-to'} eq 'no-reply@app.auone-net.jp';
-    $match ||= 1 if grep { rindex($_, 'ezweb.ne.jp (') > -1 } $mhead->{'received'}->@*;
-    $match ||= 1 if grep { rindex($_, '.au.com (') > -1 } $mhead->{'received'}->@*;
+    my $match = 0; $match ||= 1 if Sisimai::String->aligned(\$mhead->{'from'}, ['no-reply@.', '.dion.ne.jp']);
+                   $match ||= 1 if $mhead->{'reply-to'} && $mhead->{'reply-to'} eq 'no-reply@app.auone-net.jp';
+                   $match ||= 1 if grep { rindex($_, 'ezweb.ne.jp (') > -1 } $mhead->{'received'}->@*;
+                   $match ||= 1 if grep { rindex($_, '.au.com (') > -1 } $mhead->{'received'}->@*;
     return undef unless $match;
 
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ['Content-Type: message/rfc822'];
-    state $startingof = { 'message' => ['Your mail sent on:', 'Your mail attempted to be delivered on:'] };
+    state $startingof = {'message' => ['Your mail sent on:', 'Your mail attempted to be delivered on:']};
     state $messagesof = {
         'mailboxfull' => ['As their mailbox is full'],
         'norelaying'  => ['Due to the following SMTP relay error'],
         'hostunknown' => ['As the remote domain doesnt exist'],
     };
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $v = undef;
 
     for my $e ( split("\n", $emailparts->[0]) ) {
         # Read error messages and delivery status lines from the head of the email to the previous
@@ -46,8 +42,7 @@ sub inquire {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if grep { index($e, $_) == 0 } $startingof->{'message'}->@*;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
-        next unless length $e;
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0 || $e eq "";
 
         $v = $dscontents->[-1];
         if( index($e, ' Could not be delivered to: <') > -1 ) {
@@ -102,7 +97,7 @@ sub inquire {
             }
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -141,7 +136,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

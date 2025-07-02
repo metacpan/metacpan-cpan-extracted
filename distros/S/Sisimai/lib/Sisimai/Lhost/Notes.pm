@@ -16,11 +16,13 @@ sub inquire {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
+
+    return undef unless $mhead->{'subject'};
     return undef unless index($mhead->{'subject'}, 'Undeliverable message') == 0;
 
     state $indicators = __PACKAGE__->INDICATORS;
     state $boundaries = ['------- Returned Message --------'];
-    state $startingof = { 'message' => ['------- Failure Reasons '] };
+    state $startingof = {'message' => ['------- Failure Reasons ']};
     state $messagesof = {
         'userunknown' => [
             'User not listed in public Name & Address Book',
@@ -29,13 +31,12 @@ sub inquire {
         'networkerror' => ['Message has exceeded maximum hop count'],
     };
 
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS]; my $v = undef;
     my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $removedmsg = 'MULTIBYTE CHARACTERS HAVE BEEN REMOVED';
     my $encodedmsg = '';
-    my $v = undef;
 
     my $characters = '';
     if( index($mhead->{'content-type'}, 'charset=') > 0 ) {
@@ -51,7 +52,7 @@ sub inquire {
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
             next;
         }
-        next unless $readcursor & $indicators->{'deliverystatus'};
+        next if ($readcursor & $indicators->{'deliverystatus'}) == 0;
 
         # ------- Failure Reasons  --------
         #
@@ -71,8 +72,7 @@ sub inquire {
             $recipients++;
 
         } else {
-            next if $e eq '';
-            next if index($e, '-') == 0;
+            next if $e eq '' || index($e, '-') == 0;
 
             if( $e =~ /[^\x20-\x7e]/ ) {
                 # Error message is not ISO-8859-1
@@ -118,7 +118,7 @@ sub inquire {
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
+    return {"ds" => $dscontents, "rfc822" => $emailparts->[1]};
 }
 
 1;
@@ -158,7 +158,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2025 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 
