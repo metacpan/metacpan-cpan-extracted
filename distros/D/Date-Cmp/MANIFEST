@@ -1,0 +1,14 @@
+Changes
+lib/Date/Cmp.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/30-basics.t
+t/cmp.t
+t/eof.t
+t/eol.t
+t/pod-synopsis.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -26,7 +26,7 @@ optional_features: {}
 provides:
   Object::Adhoc:
     file: lib/Object/Adhoc.pm
-    version: '0.006'
+    version: '0.007'
 recommends:
   Class::XSAccessor: '0'
 requires:
@@ -38,6 +38,6 @@ resources:
   homepage: https://metacpan.org/release/Object-Adhoc
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-object-adhoc.git
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

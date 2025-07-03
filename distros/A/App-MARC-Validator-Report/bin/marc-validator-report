@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::MARC::Validator::Report;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::MARC::Validator::Report->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+marc-validator-report - Tool to process MARC validation report.
+
+=head1 SYNOPSIS
+
+ marc-validator-report [-e error] [-h] [-l] [-p plugin] [-v] [--version] report.json
+
+=head1 DESCRIPTION
+
+Tool to process validation report.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-e error>
+
+Use error defined by full error string.
+
+Default is 'all'.
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-l>
+
+Print list of unique error messages.
+
+=item * C<-p plugin>
+
+Use plugin defined by name of plugin.
+
+Default is 'all'.
+
+=item * C<-v>
+
+Verbose mode.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<report.json>
+
+Report file in JSON format.
+
+=back
+
+=head1 EXAMPLE
+
+ marc-validator-report __report.json__
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-MARC-Validator-Report>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2025 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

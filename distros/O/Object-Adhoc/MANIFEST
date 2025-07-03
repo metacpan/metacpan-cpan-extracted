@@ -14,3 +14,5 @@ doap.ttl
 lib/Object/Adhoc.pm
 t/01basic.t
 t/02json.t
+t/03recurse.t
+t/04make_class.t

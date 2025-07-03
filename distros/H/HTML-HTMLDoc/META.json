@@ -4,7 +4,7 @@
       "Eric Chernoff - ericschernoff at\tgmail.com - is the primary maintainer starting from the 0.12 release."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "mit"
    ],
@@ -56,11 +56,11 @@
    "provides" : {
       "HTML::HTMLDoc" : {
          "file" : "lib/HTML/HTMLDoc.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "HTML::HTMLDoc::PDF" : {
          "file" : "lib/HTML/HTMLDoc/PDF.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -70,15 +70,16 @@
       },
       "homepage" : "https://github.com/ericschernoff/HTMLDoc",
       "repository" : {
-         "url" : "git://github.com/ericschernoff/HTMLDoc.git",
+         "type" : "git",
+         "url" : "https://github.com/ericschernoff/HTMLDoc.git",
          "web" : "https://github.com/ericschernoff/HTMLDoc"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Eric Chernoff <eric@weaverstreet.net>",
       "Eric Chernoff <ericschernoff@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

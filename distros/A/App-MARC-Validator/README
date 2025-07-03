@@ -1,0 +1,69 @@
+NAME
+    marc-validator - Tool to validate records in MARC file.
+
+SYNOPSIS
+     marc-validator [-d] [-h] [-l] [-o output_file] [-p] [-v] [--version] marc_xml_file..
+
+DESCRIPTION
+    Tool to validate dataset from MARC record collections.
+
+    It supports MARC XML files now.
+
+ARGUMENTS
+    *       "-d"
+
+            Debug mode.
+
+    *       "-h"
+
+            Print help.
+
+    *       "-l"
+
+            Print list of plugins.
+
+    *       "-o output_file"
+
+            Output file to save result.
+
+            Default value is undef.
+
+    *       "-p"
+
+            Pretty print JSON output.
+
+    *       "-v"
+
+            Verbose mode.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "marc_xml_file.."
+
+            MARC XML file name(s).
+
+EXAMPLE
+     marc-validator __MARC.xml__
+
+SEE ALSO
+    marc-validator-report
+        Tool to process MARC validation report.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-MARC-Validator>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

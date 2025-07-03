@@ -27,7 +27,7 @@ DESCRIPTION
         Note that Object::Adhoc does not make a clone of %data before blessing
         it; it is blessed directly.
 
-    `object(\%data)`
+    object(\%data)
         If @keys is not supplied, Object::Adhoc will do this:
 
           @keys = keys(%data);
@@ -36,29 +36,42 @@ DESCRIPTION
         passing Object::Adhoc a full list of every possible key is strongly
         recommended!
 
-    `make_class(\@keys)`
+    `object(\%data, %opts)`
+        The following options are supported:
+
+        `recurse`
+            Number of levels to recurse. By default, 0.
+
+        `keys`
+            `object(\%data, \@keys)` is a shortcut for `object(\%data, keys =>
+            \@keys)`.
+
+    `make_class(\@keys, %opts)`
         Just makes the class, but doesn't bless a hashref into it. Returns a
         string which is the name of the class. If called repeatedly with the
         same keys, will return the same class name.
 
-        The class won't have a `new` method; if you need to create objects,
-        just directly bless hashrefs into it.
+        By default, the class won't have a `new` method; if you need to create
+        objects, you can just directly bless hashrefs into it.
+
+        Supported options.
+
+        `ctor`
+            Whether to create a constructor called `new`. Defaults to false.
 
         It is possible to use this in an @ISA, though that's not really the
         intention of Object::Adhoc.
 
           package My::Class {
-            use Object::Adhoc qw(make_class);
-            our @ISA = make_class[qw/ foo bar baz /];
-            sub new {
-              my ($class, $data) = (shift, @_);
-              bless $data, $class;
-            }
+            use Object::Adhoc 'make_class';
+            our @ISA = make_class [qw/ foo bar baz /], ctor => 1;
             sub foobar {
               my ($self) = (shift);
               $self->foo . $self->bar;
             }
           }
+  
+          say My::Class->new( foo => "Hello", bar => "World" )->foobar;
 
         `make_class` is not exported by default.
 
@@ -89,6 +102,9 @@ DESCRIPTION
     `DESTROY`, `isa`, `DOES`, `can`, etc. These have particular meanings in
     Perl that would conflict with them being used as a getter method.
 
+   Bad recurse option
+    The `recurse` option must be a positive integer or zero.
+
    Usage %s(self)
     The methods defined by Object::Adhoc expect to be invoked with a blessed
     object and no other parameters.
@@ -98,6 +114,14 @@ DESCRIPTION
 
     This throws an exception rather than just printing a warning.
 
+   Usage %s(class, hashref)
+    The constructor created by the `ctor` option was called with bad
+    parameters.
+
+   Bad key: %s
+    The constructor created by the `ctor` option was called with an unknown
+    key.
+
 BUGS
     Please report any bugs to
     <https://github.com/tobyink/p5-object-adhoc/issues>.
@@ -105,8 +129,9 @@ BUGS
 SEE ALSO
   Comparison with Similar Modules
     Object::Adhoc - requires Exporter::Tiny and uses Class::XSAccessor if
-    installed; read-only accessors; predicate methods; no recursion; no
-    overloading; dies on unknown keys.
+    installed; read-only accessors; predicate methods; optional recursion into
+    nested hashrefs, arrayrefs, scalarrefs, and coderefs; no overloading; dies
+    on unknown keys.
 
     Object::Anon only core dependencies; read-only accessors; no predicate
     methods; recuses into nested hashrefs and arrayrefs; treats coderef values
@@ -125,8 +150,8 @@ SEE ALSO
 
     I'd recommend Object::Adhoc if you want read-only accessors, or
     Hash::Objectify if you want read-write accessors. Use Object::Anon only if
-    you need the additional features it supports for overloading, custom
-    methods, and recursive application to nested data structures.
+    you need the additional features it supports for overloading, and custom
+    methods to nested data structures.
 
   Not Quite So Similar Modules
     Object::Result - fairly different idea, but can be used for similar
@@ -137,7 +162,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2020-2022 by Toby Inkster.
+    This software is copyright (c) 2020-2022, 2025 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

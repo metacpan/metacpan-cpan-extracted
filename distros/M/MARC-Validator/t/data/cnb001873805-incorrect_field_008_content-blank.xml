@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>00621ncm a2200217 a 4500</leader>
+  <controlfield tag="001">hud00900424</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20090417223033.0</controlfield>
+  <controlfield tag="007">qu</controlfield>
+  <controlfield tag="008">080921s        xr ||| g       nn        </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb001873805</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">78</subfield>
+    <subfield code="x">Hudba</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">9</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Brabec, Adolf,</subfield>
+    <subfield code="d">1875-1928</subfield>
+    <subfield code="7">jk01012877</subfield>
+    <subfield code="4">cmp</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="1">
+    <subfield code="a">"Žádný špás"</subfield>
+    <subfield code="h">[hudebnina] :</subfield>
+    <subfield code="b">op. 3 /</subfield>
+    <subfield code="c">pochod pro Piano dle národních písní složil Ad. Brabec</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Jindř. Hradec :</subfield>
+    <subfield code="b">J. Holče,</subfield>
+    <subfield code="c">[1888]</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">3 s.</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">st. s. 11 A 206/18</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="926" ind1=" " ind2=" ">
+    <subfield code="b">op. 3</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">001873805</subfield>
+  </datafield>
+</record>
+
+</collection>

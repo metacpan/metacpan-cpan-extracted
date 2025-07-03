@@ -1,0 +1,44 @@
+---
+abstract: 'MARC validator tool.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  File::Spec::Functions: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Output: 0
+  Test::Warn: 0.31
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MARC-Validator
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0
+  Cpanel::JSON::XS: 0
+  English: 0
+  Getopt::Std: 0
+  IO::Barf: 0
+  MARC::File::XML: 1.0.4
+  MARC::Validator: 0
+  Unicode::UTF8: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/App-MARC-Validator/issues
+  homepage: https://github.com/michal-josef-spacek/App-MARC-Validator
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/App-MARC-Validator
+version: '0.01'

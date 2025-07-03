@@ -1,0 +1,52 @@
+DBD::PgAsync
+------------
+
+This is a fork of DBD::Pg (3.18.0) intended to fully support
+asynchronous database operations. In addition to the existing DBD::Pg
+async support, this needs
+
+	1. Support for async connect via PQconnectStart/ PQconnectPoll.
+        2. Support for async prepare PQsendPrepare.
+        3. Removal of synchronous database operations embedded in
+           dbdimp.c functions, eg, in pg_db_cancel.
+
+1) is implemented using a special attribute to connect and a method
+named pg_continue_connect which functions as interface to
+PQconnectPoll. See manpage for more details.
+
+2) is implemented as well. The code should transparently use
+PQsendPrepare instead of PQprepare for async statements.
+
+3) completed so far:
+
+	- pg_cancel no longer waits for the result of the cancelled
+          query.
+
+	- transactions started automatically when autocommit is off
+          use asychronous command execution          
+
+Bug reports etc specifically about this code should probably rather be
+sent to me than to any other DBD::Pg address, especially including the
+principal author of most of the code (<greg@turnstep.com>).
+
+	-- Rainer Weikusat <rweikusat@talktalk.net>
+
+Present status
+--------------
+
+WIP to get this cleaned up for CPAN release. AFAICT, the code for this
+is complete and working but it still fails some of the automated
+style tests.
+
+
+Debian Package
+--------------
+
+Because development happens on Debian (Devuan, actually, but that's an
+unimportant detail), there's support for creating a Debian package of
+the driver. This has only been tested Devuan daedalus (Debian 12
+based) and the only tested way to build the package is executing
+
+fakeroot debian/rules binary
+
+in the top-level distribution directory.

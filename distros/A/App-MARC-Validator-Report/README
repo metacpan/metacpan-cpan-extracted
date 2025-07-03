@@ -1,0 +1,61 @@
+NAME
+    marc-validator-report - Tool to process MARC validation report.
+
+SYNOPSIS
+     marc-validator-report [-e error] [-h] [-l] [-p plugin] [-v] [--version] report.json
+
+DESCRIPTION
+    Tool to process validation report.
+
+ARGUMENTS
+    *       "-e error"
+
+            Use error defined by full error string.
+
+            Default is 'all'.
+
+    *       "-h"
+
+            Print help.
+
+    *       "-l"
+
+            Print list of unique error messages.
+
+    *       "-p plugin"
+
+            Use plugin defined by name of plugin.
+
+            Default is 'all'.
+
+    *       "-v"
+
+            Verbose mode.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "report.json"
+
+            Report file in JSON format.
+
+EXAMPLE
+     marc-validator-report __report.json__
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-MARC-Validator-Report>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

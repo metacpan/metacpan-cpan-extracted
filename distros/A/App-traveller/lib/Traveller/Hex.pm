@@ -37,6 +37,7 @@ has 'comm' => sub { [] };
 has 'trade' => sub { {} };
 has 'routes' => sub { [] };
 has 'culture';
+has 'colour';
 
 sub base {
   my ($self, $key) = @_;
@@ -103,54 +104,60 @@ sub system_svg {
   my $lead = ($url ? '  ' : '');
   my $data = '';
   $data .= qq{  <a xlink:href="$url">\n} if $url;
-  $data .= qq{$lead  <g id="$name">\n};
+  if ($name) {
+    $data .= qq{$lead  <g id="$name">\n};
+  } else {
+    $data .= qq{$lead  <g>\n};
+  }
   my $scale = 100;
   # travel zone red painted first, so it appears at the bottom
   $data .= sprintf(qq{$lead    <circle class="travelzone red" cx="%.3f" cy="%.3f" r="%.3f" />\n},
 		   (1 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2) * sqrt(3) * $scale, 0.52 * $scale)
-    if $self->travelzone eq 'R';
+      if $self->travelzone eq 'R';
   $data .= sprintf(qq{$lead    <circle cx="%.3f" cy="%.3f" r="%.3f" />\n},
 		   (1 + ($x-1) * 1.5) * $scale,
-		   ($y - $x%2/2) * sqrt(3) * $scale, 11 + $size);
+		   ($y - $x%2/2) * sqrt(3) * $scale, 11 + $size)
+      if $name or $starport ne 'X';
   $data .= sprintf(qq{$lead    <circle class="travelzone amber" cx="%.3f" cy="%.3f" r="%.3f" />\n},
 		   (1 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2) * sqrt(3) * $scale, 0.52 * $scale)
     if $self->travelzone eq 'A';
   $data .= sprintf(qq{$lead    <text class="starport" x="%.3f" y="%.3f">$starport</text>\n},
 		   (1 + ($x-1) * 1.5) * $scale,
-		   ($y - $x%2/2 - 0.17) * sqrt(3) * $scale);
+		   ($y - $x%2/2 - 0.17) * sqrt(3) * $scale)
+      if $name;
   $data .= sprintf(qq{$lead    <text class="name" x="%.3f" y="%.3f">$display</text>\n},
 		   (1 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 + 0.4) * sqrt(3) * $scale);
   $data .= sprintf(qq{$lead    <text class="consulate base" x="%.3f" y="%.3f">■</text>\n},
 		   (0.6 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 + 0.25) * sqrt(3) * $scale)
-    if $self->consulate;
+      if $self->consulate;
   $data .= sprintf(qq{$lead    <text class="TAS base" x="%.3f" y="%.3f">☼</text>\n},
   		   (0.4 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 + 0.1) * sqrt(3) * $scale)
-    if $self->TAS;
+      if $self->TAS;
   $data .= sprintf(qq{$lead    <text class="scout base" x="%.3f" y="%.3f">▲</text>\n},
   		   (0.4 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 - 0.1) * sqrt(3) * $scale)
-    if $self->scout;
+      if $self->scout;
   $data .= sprintf(qq{$lead    <text class="naval base" x="%.3f" y="%.3f">★</text>\n},
   		   (0.6 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 - 0.25) * sqrt(3) * $scale)
-    if $self->naval;
+      if $self->naval;
   $data .= sprintf(qq{$lead    <text class="gasgiant base" x="%.3f" y="%.3f">◉</text>\n},
    		   (1.4 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 - 0.25) * sqrt(3) * $scale)
-    if $self->gasgiant;
+      if $self->gasgiant;
   $data .= sprintf(qq{$lead    <text class="research base" x="%.3f" y="%.3f">π</text>\n},
    		   (1.6 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 - 0.1) * sqrt(3) * $scale)
-    if $self->research;
+      if $self->research;
   $data .= sprintf(qq{$lead    <text class="pirate base" x="%.3f" y="%.3f">☠</text>\n},
    		   (1.6 + ($x-1) * 1.5) * $scale,
 		   ($y - $x%2/2 + 0.1) * sqrt(3) * $scale)
-    if $self->pirate;
+      if $self->pirate;
   # last slot unused
   $data .= qq{$lead  </g>\n};
   $data .= qq{  </a>\n} if $url;

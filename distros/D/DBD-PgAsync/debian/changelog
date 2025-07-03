@@ -1,0 +1,54 @@
+libdbd-pg-async-perl (0.5.1) unstable; urgency=medium
+
+  * include auto-generated META.json
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Thu, 03 Jul 2025 10:37:59 +0100
+
+libdbd-pg-async-perl (0.5) unstable; urgency=medium
+
+  * make dbh cancel method work in face of asychronous operations
+    transparently issued by the driver
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Thu, 03 Jul 2025 10:00:53 +0100
+
+libdbd-pg-async-perl (0.4.2) unstable; urgency=medium
+
+  * fixed pg_db_result to work as documented in face of asychronous
+    statements transparently issued by the driver
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Thu, 26 Jun 2025 19:16:47 +0100
+
+libdbd-pg-async-perl (0.4.1) unstable; urgency=medium
+
+  * fix handling of prepare state variables after async prepare
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Tue, 24 Jun 2025 18:15:25 +0100
+
+libdbd-pg-async-perl (0.4) unstable; urgency=medium
+
+  * enable waiting for the result of an async prepare with calling execute
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Mon, 23 Jun 2025 18:17:54 +0100
+
+libdbd-pg-async-perl (0.3) unstable; urgency=medium
+
+  * only set imp_dbh->done_begin for automatically started transactions
+    after the corresponding begin statement actually succeeded
+  * much simpler pg_db_ready
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Wed, 18 Jun 2025 18:54:25 +0100
+
+libdbd-pg-async-perl (0.2) unstable; urgency=medium
+
+  * start transactions asychronously when AutoCommit is off 
+  * removed handle_old_async
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Fri, 13 Jun 2025 19:39:20 +0100
+
+libdbd-pg-async-perl (0.1) unstable; urgency=medium
+
+  * asynchronous connect
+  * asynchronous prepare
+  * asynchronous cancel
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Tue, 03 Jun 2025 12:53:44 +0100

@@ -1,0 +1,417 @@
+=========
+
+Async connect and async preprare changes merged into master
+alongside debianization files. Presently, this is WIP and
+pushed to GitHub to have an external backup.
+
+-- rweikusat@talktalk.net
+
+==========
+
+
+
+
+DBD::Pg is Copyright (C) 1994-2025, Greg Sabino Mullane
+
+DBD::Pg  --  the DBI PostgreSQL interface for Perl
+
+DESCRIPTION:
+------------
+
+This is version 3.18.0 of DBD::Pg, the Perl interface to Postgres using DBI.
+The web site for this interface, and the latest version, can be found at:
+
+	https://metacpan.org/pod/DBD::Pg
+
+The mailing list is at:
+
+	https://www.nntp.perl.org/group/perl.dbd.pg/
+
+Subscribe with an email to dbd-pg-subscribe@perl.org
+
+
+The development of DBD::Pg can be tracked at:
+
+	git://github.com/bucardo/dbdpg.git
+
+For information about PostgreSQL, visit:
+
+	https://www.postgresql.org/
+
+For information on what has changed for each version, see the Changes files.
+
+
+REQUIREMENTS:
+-------------
+
+	build, test, and install Perl 5         (at least 5.8.1)
+	build, test, and install the DBI module (at least 1.614)
+	build, test, and install PostgreSQL     (at least 8.0)
+	build, test, and install Test::Simple   (at least 0.47)
+
+DBD::Pg needs to know where to find the libpq libraries: this is usually done 
+by checking the output of the pg_config executable. If pg_config is not available, 
+then you may need to install the development package for PostgreSQL. To do this 
+on Debian and Ubuntu, use: apt-get install libpq-dev; on RedHat, CentOS, etc. 
+use: yum install postgresql-devel. Note that the development libraries are needed 
+even if you already have PostgreSQL up and running.
+
+
+IF YOU HAVE PROBLEMS OR COMMENTS:
+---------------------------------
+
+Please send any problems and comments to 
+
+<dbd-pg@perl.org>
+
+Please include what OS you are using, and the version of Perl, 
+DBI, and DBD::Pg you are using. Also tell which version of 
+PostgreSQL DBD::Pg was compiled against, and which version you 
+are connecting to. The easiest way to gather all of this 
+information is to run "make test", which outputs it all early in 
+the tests.
+
+View the archive at http://www.nntp.perl.org/group/perl.dbd.pg/
+
+To subscribe, email dbd-pg-subscribe@perl.org
+To unsubscribe, email dbd-pg-unsubscribe@perl.org
+To get help regarding your subscription, email dbd-pg-help@perl.org
+
+You can also try the #postgresql channel on irc.libera.chat, which 
+usually (but not always) has people who can help you with DBD::Pg.
+
+
+BUG REPORTS:
+-----------
+
+Bug reports are welcome at:
+
+https://github.com/bucardo/dbdpg/issues
+
+
+PATCHES:
+--------
+
+Patches are always welcome: the best way is to create a Pull Request 
+at https://github.com/bucardo/dbdpg
+
+
+INSTALLATION:
+-------------
+
+Before installing, please use the "cpansign -v" program to cryptographically 
+verify that your copy of DBD::Pg is complete and valid. The program 
+"cpansign" is part of Module::Signature, available from CPAN.
+
+By default Makefile.PL uses App::Info to find the location of the
+PostgreSQL library and include directories.  However, if you want to
+control it yourself, define the environment variables POSTGRES_INCLUDE 
+and POSTGRES_LIB, or define just POSTGRES_HOME. Note that if you have 
+compiled PostgreSQL with SSL support, you must define the POSTGRES_LIB
+environment variable and add "-lssl" and "-lcrypto" to it, like this:
+
+	export POSTGRES_LIB="/usr/local/pgsql/lib -lssl -lcrypto"
+
+The usual steps to install DBD::Pg:
+
+	1.   perl Makefile.PL
+	2.   make
+	3.   make test
+	4.   make install
+
+Do steps 1 to 2 as a normal user, not as root!
+
+If the script cannot find the pg_config information itself, it will 
+ask you for the path to it. Enter the complete path to the pg_config 
+file here, including the name of the file itself.
+
+
+TESTING:
+--------
+
+The tests rely on being able to connect to a valid Postgres database. 
+The easiest way to ensure this is to set the following environment variables:
+
+	DBI_DSN=dbi:Pg:dbname=<database>
+	DBI_USER=<username>
+	DBI_PASS=<password>
+
+If you are running on a non-standard port, you must set PGPORT or 
+add the port to the DBI_DSN variable like this:
+
+	DBI_DSN='dbi:Pg:dbname=<database>;port=<port#>'
+
+Put double quotes around the dbname if it has a semicolon 
+or a space inside of it:
+
+	DBI_DSN='dbi:Pg:dbname="<data;base>"'
+
+If no valid connection is found, the tests will use the "initdb" 
+program to try and create a Postgres database cluster to test with.
+The first available port starting at 5440 will be used.
+
+If your directory path is long, Postgres may fail to start as there is a
+maximum length to socket directory paths. If this happens, please set
+the environment variable DBDPG_TEMPDIR to something short, such as "/tmp".
+
+You can increase the verbosity of the tests by setting the 
+environment variable TEST_VERBOSE. You can also enable tracing 
+within the tests themselves by setting DBD_TRACE to whatever 
+trace level you want. Be aware that setting the trace level can 
+result in extremely verbose output.
+
+When reporting test failures, please use TEST_VERBOSE=1, but do *not* 
+set DBD_TRACE unless requested, and send only the relevant sections.
+
+Please consider installing CPAN::Reporter so that your tests are 
+automatically gathered and reported, which helps the development 
+of DBD::Pg.
+
+
+TROUBLESHOOTING:
+----------------
+
+* Placeholder issues
+
+If you find that some of your queries containing placeholders are no 
+longer working, this may because DBD::Pg now uses the native PostgreSQL 
+placeholders on the server itself whenever possible. Previously, DBD::Pg 
+did a simple emulation of placeholders, so the rules were not as strict.
+You should either rewrite your queries to make them legal SQL syntax for 
+PostgreSQL, or turn off server-side prepares.
+
+To change your queries, make sure that the type of each placeholder can 
+be determined by the PostgreSQL parser. So instead of:
+
+  SELECT ?
+
+use something like:
+
+  SELECT ?::int
+
+To turn off server-side prepares completely (with a loss of some performance 
+and features), do this at the top of your scripts:
+
+$dbh->{pg_server_prepare} = 0;
+
+This can also be set for individual queries at the statement handle level: see 
+the documentation section on "Placeholders" for more details.
+
+
+* PostgreSQL library issues:
+
+DBD::Pg uses the libpq library that comes with Postgres. If the shared libpq 
+library is not available, DBD::Pg will error with a message that 
+usually mentions a file names libpq.so, like this:
+
+    Can't load './blib/arch/auto/DBD/Pg/Pg.so' for module DBD::Pg: libpq.so.5: cannot open 
+    shared object file: No such file or directory at .../DynaLoader.pm line 230.
+
+This means that the libraries are not installed in a place where the system 
+can find them when it tries to load the Pg.so file. On some systems, you 
+can run /sbin/ldconfig -v to see a list of shared modules, or just search 
+the system for the file with "locate libpq.so". If it exists but is not being 
+loaded, you may need to add the directory it is in to /etc/ld.so.conf file 
+and run the ldconfig command. Otherwise, you may need to add the path to 
+the environment variable LD_LIBRARY_PATH.
+
+If you get an error message like:
+
+	perl: error while loading shared libraries:
+	/usr/lib/perl5/site_perl/5.6.1/i386-linux/auto/DBD/Pg/Pg.so: undefined
+	symbol: PQconnectdb
+
+when you call DBI->connect, then your libpq.so was probably not seen at
+build-time.  This should have caused 'make test' to fail; did you really
+run it and look at the output? 
+
+
+* Mac installation issues
+
+Modern Mac software has a feature called Software Integrity Protection that
+strips out all LD_* and DYLD_* environment variables when a program starts,
+which means DBD::Pg will no compile. One solution is to use the install_name_tool
+program to modify the relative paths to absolute ones. As an example:
+
+	sudo install_name_tool -change \
+	libpq.5.dylib /Library/PostgreSQL/11/lib/libpq.5.dylib \
+    ~/perl5/lib/perl5/darwin-thread-multi-2level/auto/DBD/Pg/Pg.bundle
+
+
+* Perl issues:
+
+Some Linux distributions have incomplete perl installations.  If you have
+compile errors like "XS_VERSION_BOOTCHECK undeclared", do:
+
+	find .../lib/perl5 -name XSUB.h -print
+
+If this file is not present, you need to recompile and re-install perl.
+
+
+If you get a message about "use of uninitialized value in -d" when doing 
+a "make install_vendor", you can work around this by adding a dummy value 
+to the INSTALLVENDORBIN environment variable:
+
+make install_vendor INSTALLVENDORBIN=/tmp
+(thanks to Peter Eisentraut <peter_e at gmx.net>)
+
+
+* Strawberry Perl issues:
+
+You'll need to create a .a library from the .dll before 
+running the Makefile.PL, by running pexports and dlltool
+as shown below, within the C:\Program Files\PostgreSQL\8.3\bin
+directory:
+
+  C:\Windows\> C:\MinGW\bin\pexports libpq.dll > libpq.def
+  C:\Windows\> C:\MinGW\bin\dlltool -dllname libpq.dll --def libpq.def
+--output-lib "C:\Program
+Files\PostgreSQL\12\lib\libpq.a"
+
+pexports and dlltool are included with MinGW - Minimalist Gnu for Windows,
+found here:
+
+  https://osdn.net/projects/mingw/releases/
+
+Once you have installed MinGW you can install pexports and dlltool as
+follows:
+
+  C:\Windows\> C:\MinGW\bin\mingw-get.exe install pexports
+  C:\Windows\> C:\MinGW\bin\mingw-get.exe install dlltool
+
+Then you'll need to set the required environment:
+
+  set PATH=C:\PROGRA~1\PostgreSQL\8.3\bin;%PATH%
+  set DBI_DSN=dbi:Pg:dbname=testdb
+  set DBI_USER=*PostgreSQL username*
+  set DBI_PASS=*PostgreSQL password*
+  set POSTGRES_HOME=C:/PROGRA~1/PostgreSQL/8.3
+  set POSTGRES_INCLUDE=C:/PROGRA~1/PostgreSQL/8.3/include
+  set POSTGRES_LIB=C:/PROGRA~1/PostgreSQL/8.3/lib
+
+Note that the username and password are the ones for PostgreSQL, NOT the 
+ones for the Windows account that the PostgreSQL installer creates to run 
+the service safely.
+
+(You may wish to set these variables on the system level, by going to
+Control Panel > System > Advanced tab > Environment Variables button and
+adding the environment variables there.)
+  
+Now the Makefile.PL can be ran:
+
+  perl Makefile.PL
+  dmake
+  dmake test
+  dmake install
+
+
+* SGI issues:
+
+If you get segmentation faults, make sure you are using the malloc
+which comes with perl when compiling perl (the default is not to).
+(thanks to "David R. Noble" <drnoble at engsci.sandia.gov>)
+
+
+* HP issues:
+
+If you get error messages like:
+
+	can't open shared library: .../lib/libpq.sl
+	No such file or directory
+
+when running the test script, try to replace the 'shared' option in the
+LDDFLAGS with 'archive'.
+(thanks to Dan Lauterbach <danla at dimensional.com>)
+
+
+* FreeBSD issues:
+
+If you get during "make test" the error message:
+
+	'DBD driver has not implemented the AutoCommit attribute'
+
+recompile the DBI module and the DBD-Pg module and disable optimization.
+This error message is due to the broken optimization in gcc-2.7.2.1.
+
+
+If you get compiler errors like:
+
+	In function `XS_DBD__Pg__dr_discon_all_'
+	`sv_yes' undeclared (first use in this function)
+
+it may be because there is a 'patchlevel.h' file from another package 
+(such as 'hdf') in your POSTGRES_INCLUDE dir.  The presence of this file 
+prevents the compiler from finding the perl include file 
+'mach/CORE/patchlevel.h'.  Do 'pg_config --includedir' to identify the 
+POSTGRES_INCLUDE dir.  Rename patchlevel.h whilst you build DBD::Pg. 
+
+
+* Sun issues:
+
+If you get compile errors like:
+
+	/usr/include/string.h:57: parse error before `]'
+
+then you need to remove from pgsql/include/libpq-fe.h the define for
+strerror, which clashes with the definition in the standard include
+file.
+
+
+* Win32 issues:
+
+For installation, please see the README.win32 file.
+
+Running DBD-Pg scripts on Win32 needs some configuration work
+on the server side:
+
+    o add a postgres user with the same name as the NT-User 
+      (e.g. Administrator)
+    o make sure, that your pg_hba.conf on the server is configured,
+      such that a connection from another host will be accepted
+
+
+* OS X issues:
+
+You may need to add "-lssl" and "-lcrypto" to your LIB variable 
+before compiling.
+(thanks to <rob at cabrion dot com>)
+
+If having problems compiling, try running:
+
+env -i command
+
+This trick stops 'command' from inheriting environment variables from 
+the shell process, which more often than not fixes up such weird build 
+errors without having to do anything else in particular.
+(thanks to David Landgren <david at landgren dot net>)
+
+
+* SCO issues:
+
+If the 'make test' gives an error about a symbol not being found, 
+you can correct the problem by manually running ld after the 
+'make' command:
+
+LD_RUN_PATH="/usr/local/pgsql/lib" ld -G -L/usr/local/lib Pg.o \
+dbdimp.o -o blib/arch/auto/DBD/Pg/Pg.so -L/usr/local/pgsql/lib -lpq \
+-L/opt/K/SKUNK2000/Gcc/2.95.2pl1/usr/local/lib/gcc-lib/i386-pc-sco3.2v5.0.5/2.95.2/ \
+-lgcc
+
+Once this is done, 'make test' succeeds properly.
+(thanks to <jmore at remote-print.com>)
+
+
+COPYRIGHT:
+----------
+
+	Copyright (c) 2002-2025 Greg Sabino Mullane and others: see the Changes file
+	Portions Copyright (c) 2002 Jeffrey W. Baker
+	Portions Copyright (c) 1997-2001 Edmund Mergl
+	Portions Copyright (c) 1994-1997 Tim Bunce
+
+
+LICENSE INFORMATION:
+--------------------
+This module (DBD::Pg) is free software; you can redistribute it and/or modify it 
+under the same terms as Perl 5.10.0. For more details, see the full text of the 
+licenses in the directory LICENSES.

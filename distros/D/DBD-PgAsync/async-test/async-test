@@ -1,0 +1,133 @@
+# -*- cperl -*-
+#
+# beginnings of async test script
+#
+
+#*  uses
+#
+use DBI;
+use DBD::PgAsync	':async';
+use Encode;
+
+#*  constants
+#
+use constant CSPEC_PRF =>	'dbi:PgAsync:';
+use constant SECS =>		qw(1 4 7);
+
+use constant R_CMD =>		0;
+use constant R_WHATIS =>	1;
+
+#*  subs
+#
+sub msg
+{
+    my $msg;
+
+    $msg = sprintf($_[0], @_[1 .. $#_]);
+    print STDERR ($msg, "\n");
+}
+
+sub wait_for
+{
+    my ($fd, $what) = @_;
+    my ($rin, $win, $vec, $nf);
+    
+    vec($vec, $fd, 1) = 1;
+    if ($what == 1) {
+        $rin = $vec;
+    } else {
+        $win = $vec;
+    }
+
+    $nf = select($rin, $win, undef, undef);
+    msg('select returned %d', $nf);
+}
+
+sub wait_for_query
+{
+    my $dbh = $_[0];
+    my ($fd, $rc);
+
+    $fd = $$dbh{pg_socket};
+    do {
+        wait_for($fd, 1);
+        $rc = $dbh->pg_ready();
+    } until $rc;
+
+    $dbh->pg_result();
+}
+
+sub make_cspec
+{
+    my $acct = $_[0];
+    my ($fh, $rc);
+
+    $rc = open($fh, '<', $acct);
+    die("open $acct: $!") unless $rc;
+
+    return CSPEC_PRF.join(' ', map { chomp; join('=', split) } <$fh>);
+}
+
+sub dbh_connect
+{
+    my $acct = $_[0];
+    my ($cs, $dbh, $rc);
+    
+    msg('connecting');
+
+    $cs = make_cspec($acct);
+    $dbh = DBI->connect($cs, '', '',
+                               {
+                                AutoCommit => 0,
+                                RaiseError => 1,
+                                pg_server_prepare => 1,
+                                pg_async_connect => 1});
+    $dbh->{ReadOnly} = 1;
+
+    do {
+        $rc = $dbh->pg_continue_connect();
+        msg('continue async connect %d', $rc);
+        wait_for($$dbh{pg_socket}, $rc) if $rc;
+    } while $rc;
+
+    msg('connected');
+
+    return $dbh;
+}
+
+sub print_pages
+{
+    my ($sect, $sth) = @_;
+    my ($fmt, @pgs, $cmd_max, $row);
+
+    print("Section $sect manpages\n");
+    return unless $sth;
+
+    while ($row = $sth->fetchrow_arrayref()) {
+        push(@pgs, [@$row]);
+        $cmd_max < $_ and $cmd_max = $_ for length($$row[R_CMD]);
+    }
+    
+    $cmd_max += 4;
+    $fmt = "\t%-${cmd_max}s%s\n";
+    printf($fmt, map { encode('UTF-8', $_) } @$_) for @pgs;
+    print("\n");
+}
+
+#*  main
+#
+{
+    my ($dbh, $sth, $row);
+    
+    DBI->trace(15);
+    $dbh = dbh_connect('../../pg-conn');
+    $sth = $dbh->prepare('select cmd, whatis from whatis where section = ? order by cmd', { pg_async => 1 });
+
+    for (SECS) {
+        $sth->execute($_);
+#        $dbh->do("select cmd, whatis from whatis where section = '$_' order by cmd", { pg_async => 1 });
+        wait_for_query($dbh);
+
+        print_pages($_, $sth);
+    }
+}

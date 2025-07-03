@@ -1,0 +1,13 @@
+Changes
+ANSI-Encode.png
+bin/ansi-encode
+t/00-sample.t
+ignore.txt
+lib/Term/ANSIEncode.pm
+Makefile.PL
+MANIFEST
+README.md
+VERSION
+examples/sample.ans
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -29,7 +29,7 @@ HTML::HTMLDoc - Perl interface to the htmldoc program for producing PDF Files fr
 
 # PREREQUISITE
 
-This module is just a front-end to the HTMLDOC program, therefore you must have 
+This module is just a front-end to the HTMLDOC program, therefore you must have
 that program installed prior to attempting to install and utilize this module.
 
 The HTMLDOC home page at [https://www.msweet.org/htmldoc](https://www.msweet.org/htmldoc)
@@ -483,8 +483,8 @@ via the native 'htmldoc' command prior to reporting an issue.
 
 [https://github.com/michaelrsweet/htmldoc](https://github.com/michaelrsweet/htmldoc).
 
-[PDF::API2](https://metacpan.org/pod/PDF::API2)
+[PDF::API2](https://metacpan.org/pod/PDF%3A%3AAPI2)
 
-[PDF::Create](https://metacpan.org/pod/PDF::Create)
+[PDF::Create](https://metacpan.org/pod/PDF%3A%3ACreate)
 
-[CAM::PDF](https://metacpan.org/pod/CAM::PDF)
+[CAM::PDF](https://metacpan.org/pod/CAM%3A%3APDF)

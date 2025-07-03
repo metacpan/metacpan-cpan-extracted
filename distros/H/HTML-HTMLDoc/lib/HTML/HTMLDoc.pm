@@ -9,7 +9,7 @@ use HTML::HTMLDoc::PDF;
 use vars qw(@ISA $VERSION);
 
 @ISA = qw();
-$VERSION = '0.21';
+$VERSION = '0.22';
 my $DEBUG = 0;
 
 ###############
@@ -42,7 +42,11 @@ sub _init {
 	my $self = shift;
 
 	if ((not defined $self->{'config'}->{'mode'}) || ($self->{'config'}->{'mode'} ne 'file' && $self->{'config'}->{'mode'} ne 'ipc')) {
-		$self->{'config'}->{'mode'} = 'ipc';
+		if ($^O eq 'freebsd') {
+			$self->{'config'}->{'mode'} = 'file';
+		} else {
+			$self->{'config'}->{'mode'} = 'ipc';
+		}
 	}
 
 	if ( (!$self->{'config'}->{'tmpdir'}) || (!-d $self->{'config'}->{'tmpdir'})) {
@@ -1269,7 +1273,7 @@ HTML::HTMLDoc - Perl interface to the htmldoc program for producing PDF Files fr
 
 =head1 PREREQUISITE
 
-This module is just a front-end to the HTMLDOC program, therefore you must have 
+This module is just a front-end to the HTMLDOC program, therefore you must have
 that program installed prior to attempting to install and utilize this module.
 
 The HTMLDOC home page at L<https://www.msweet.org/htmldoc>

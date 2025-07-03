@@ -8,6 +8,7 @@ lib/Traveller/System.pm
 lib/Traveller/System/Classic.pm
 lib/Traveller/System/Classic/MPTS.pm
 lib/Traveller/Util.pm
+Changes
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

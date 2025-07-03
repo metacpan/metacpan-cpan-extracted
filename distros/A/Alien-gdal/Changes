@@ -1,5 +1,10 @@
 Revision history for Alien::gdal
 
+1.40 2025-07-03
+    - Fall back to reading the gdal.pc if version is non-numeric.
+      This can happen when the pkg-config utility does not parse
+      variables in the gdal.pc file.
+
 1.39 2024-11-04
     - Share builds:
         - Use Alien::Build::Plugin::Build::SearchDep only for shared aliens.

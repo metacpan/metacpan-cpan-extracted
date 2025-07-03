@@ -5,9 +5,10 @@ use warnings;
 package Object::Adhoc;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use Digest::MD5 qw( md5_hex );
+use Scalar::Util qw( refaddr );
 use Exporter::Shiny qw( object make_class );
 our @EXPORT = qw( object );
 
@@ -43,17 +44,68 @@ our @RESERVED_METHODS = qw(
 # harm.
 
 sub object {
-	my ($data, $keys) = @_;
-	$keys ||= [ keys %$data ];
-	bless $data, make_class($keys);
+	my ($data, $keys, %opts) =
+		(@_ == 0) ? _croak('Expected hashref') :
+		(@_ <= 2) ? @_ : ($_[0], undef, @_[1..$#_]);
+	$keys ||= delete($opts{keys}) || [ keys %$data ];
+	bless $data, make_class($keys, %opts);
+	if ($opts{recurse}) {
+		_croak('Bad recurse option') if ref($opts{recurse}) || $opts{recurse} !~ /\A[0-9]+\z/;
+		my %seen = (refaddr($data) => undef, %{ delete($opts{seen}) or {}});
+		for my $k (keys %$data) {
+			ref $data->{$k} or next;
+			$data->{$k} = _recurse($data->{$k}, %opts, seen => \%seen);
+		}
+	}
 	lock_ref_keys($data, @$keys);
 	$data;
 }
 
+sub _recurse {
+	my ($ref, %opts) = @_;
+	my $lvl     = $opts{recurse} - 1;
+	my $reftype = ref $ref;
+	my %seen    = %{ delete($opts{seen}) or {} };
+	return $ref if $lvl < 1 || !$reftype || exists $seen{refaddr($ref)};
+	
+	$seen{refaddr($ref)} = undef;
+	
+	if ($reftype eq 'ARRAY') {
+		@$ref = map { ref($_) ? _recurse($_, %opts, recurse => $lvl, seen => \%seen) : $_ } @$ref;
+		return $ref;
+	}
+	
+	if ($reftype eq 'HASH') {
+		return object($ref, %opts, recurse => $lvl, seen => \%seen);
+	}
+	
+	if ($reftype eq 'CODE') {
+		return sub {
+			my $wa = wantarray;
+			if ($wa) {
+				return map { ref($_) ? _recurse($_, %opts, recurse => $lvl, seen => \%seen) : $_ } $ref->(@_);
+			}
+			elsif (defined $wa) {
+				local $_ = $ref->(@_);
+				return ref($_) ? _recurse($_, %opts, recurse => $lvl, seen => \%seen) : $_;
+			}
+			goto $ref;
+		};
+	}
+
+	if ($reftype eq 'REF') {
+		($$ref) = map { ref($_) ? _recurse($_, %opts, recurse => $lvl, seen => \%seen) : $_ } $$ref;
+		return $ref;
+	}
+
+	return $ref;
+}
+
 my %made;
 sub make_class {
-	my ($keys) = @_;
+	my ($keys, %opts) = @_;
 	my $joined = join "|", sort(@$keys);
+	$joined .= '*CTOR' if $opts{ctor};
 	return $made{$joined} if $made{$joined};
 	
 	my $class  = sprintf('%s::__ANON__::%s', __PACKAGE__, md5_hex($joined));
@@ -109,6 +161,19 @@ sub make_class {
 		*{"$class\::does"}     = \&_DOES;
 		*{"$class\::VERSION"}  = \$VERSION;
 		*{"$class\::TO_JSON"}  = \&_TO_JSON;
+		
+		if ( $opts{ctor} ) {
+			my $re = join "|", map quotemeta($_), @$keys;
+			*{"$class\::new"} = sub {
+				my ($class, %hash) = (@_ == 2 and ref $_[1] eq 'HASH') ? ($_[0], %{$_[1]}) : (@_ % 2 == 1) ? @_ : _usage('class', 'hashref');
+				for (keys %hash) {
+					next if /$re/;
+					require Carp;
+					Carp::croak("Bad key: $_");
+				}
+				return bless(\%hash, ref($class) || $class);
+			};
+		}
 	};
 	
 	$made{$joined} = $class;
@@ -118,7 +183,8 @@ sub _usage {
 	my $caller = (caller(1))[3];
 	require Carp;
 	local $Carp::CarpLevel = 1 + $Carp::CarpLevel;
-	Carp::croak("Usage: $caller\(self)"); # mimic XS usage message
+	my @fields = @_ ? @_ : ('self');
+	Carp::croak("Usage: $caller\(@{[join q[, ], @fields]})"); # mimic XS usage message
 }
 
 sub _DOES {
@@ -186,30 +252,54 @@ If there are some keys that will not always be present in your data,
 passing Object::Adhoc a full list of every possible key is strongly
 recommended!
 
-=item C<< make_class(\@keys) >>
+=item C<< object(\%data, %opts) >>
+
+The following options are supported:
+
+=over
+
+=item C<recurse>
+
+Number of levels to recurse. By default, 0.
+
+=item C<keys>
+
+C<< object(\%data, \@keys) >> is a shortcut for C<< object(\%data, keys => \@keys) >>.
+
+=back
+
+=item C<< make_class(\@keys, %opts) >>
 
 Just makes the class, but doesn't bless a hashref into it. Returns a string
 which is the name of the class. If called repeatedly with the same keys,
 will return the same class name.
 
-The class won't have a C<new> method; if you need to create objects, just
-directly bless hashrefs into it.
+By default, the class won't have a C<new> method; if you need to create
+objects, you can just directly bless hashrefs into it.
+
+Supported options.
+
+=over
+
+=item C<ctor>
+
+Whether to create a constructor called C<new>. Defaults to false.
+
+=back
 
 It is possible to use this in an C<< @ISA >>, though that's not really
 the intention of Object::Adhoc.
 
   package My::Class {
-    use Object::Adhoc qw(make_class);
-    our @ISA = make_class[qw/ foo bar baz /];
-    sub new {
-      my ($class, $data) = (shift, @_);
-      bless $data, $class;
-    }
+    use Object::Adhoc 'make_class';
+    our @ISA = make_class [qw/ foo bar baz /], ctor => 1;
     sub foobar {
       my ($self) = (shift);
       $self->foo . $self->bar;
     }
   }
+  
+  say My::Class->new( foo => "Hello", bar => "World" )->foobar;
 
 C<make_class> is not exported by default.
 
@@ -245,6 +335,10 @@ This also happens for a few reserved method names like C<AUTOLOAD>,
 C<DESTROY>, C<isa>, C<DOES>, C<can>, etc. These have particular meanings
 in Perl that would conflict with them being used as a getter method.
 
+=head3 Bad recurse option
+
+The C<recurse> option must be a positive integer or zero.
+
 =head3 Usage %s(self)
 
 The methods defined by Object::Adhoc expect to be invoked with
@@ -254,6 +348,16 @@ a blessed object and no other parameters.
   $alice->name(1234);   # error
 
 This throws an exception rather than just printing a warning.
+
+=head3 Usage %s(class, hashref)
+
+The constructor created by the C<ctor> option was called with bad
+parameters.
+
+=head3 Bad key: %s
+
+The constructor created by the C<ctor> option was called with an
+unknown key.
 
 =head1 BUGS
 
@@ -268,7 +372,7 @@ Object::Adhoc -
 requires Exporter::Tiny and uses Class::XSAccessor if installed;
 read-only accessors;
 predicate methods;
-no recursion;
+optional recursion into nested hashrefs, arrayrefs, scalarrefs, and coderefs;
 no overloading;
 dies on unknown keys.
 
@@ -303,8 +407,7 @@ the slowest.
 I'd recommend Object::Adhoc if you want read-only accessors,
 or Hash::Objectify if you want read-write accessors. Use
 Object::Anon only if you need the additional features it supports
-for overloading, custom methods, and recursive application to
-nested data structures.
+for overloading, and custom methods to nested data structures.
 
 =head2 Not Quite So Similar Modules
 
@@ -318,7 +421,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020-2022 by Toby Inkster.
+This software is copyright (c) 2020-2022, 2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

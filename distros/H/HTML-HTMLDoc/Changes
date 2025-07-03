@@ -1,5 +1,9 @@
 Revision history for Perl extension HTML-HTMLDoc
 
+0.22 2025-07-03T03:34:33Z
+
+    - Set the default mode in FreeBSD to 'file'
+
 0.21 2020-08-13T15:19:46Z
 
     - Highlight the requirement for 'htmldoc' in the POD.

@@ -7,7 +7,7 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2022 Toby Inkster.
+Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -28,7 +28,12 @@ License: Unknown
 
 Files: README
  lib/Object/Adhoc.pm
-Copyright: This software is copyright (c) 2020-2022 by Toby Inkster.
+Copyright: This software is copyright (c) 2020-2022, 2025 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/03recurse.t
+ t/04make_class.t
+Copyright: This software is copyright (c) 2025 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/02json.t
@@ -40,14 +45,14 @@ Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2022 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  

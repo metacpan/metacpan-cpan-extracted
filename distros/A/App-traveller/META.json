@@ -4,7 +4,7 @@
       "Alex Schroeder"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
@@ -51,6 +51,6 @@
          "web" : "https://alexschroeder.ch/cgit/traveller/about/"
       }
    },
-   "version" : 1.01,
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : 1.02,
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,38 @@
+{
+   "field_008" : {
+      "checks" : {
+         "not_valid" : {}
+      },
+      "datetime" : "2025-07-02T20:03:53",
+      "module_name" : "MARC::Validator::Plugin::Field008",
+      "module_version" : 0.01,
+      "name" : "field_008"
+   },
+   "field_260" : {
+      "checks" : {
+         "not_valid" : {
+            "cnb001926336" : [
+               {
+                  "error" : "Bad year in parenthesis in MARC field 260 $c.",
+                  "params" : {
+                     "Value" : "(1933)"
+                  }
+               }
+            ]
+         }
+      },
+      "datetime" : "2025-07-02T20:03:53",
+      "module_name" : "MARC::Validator::Plugin::Field260",
+      "module_version" : 0.01,
+      "name" : "field_260"
+   },
+   "field_264" : {
+      "checks" : {
+         "not_valid" : {}
+      },
+      "datetime" : "2025-07-02T20:03:53",
+      "module_name" : "MARC::Validator::Plugin::Field264",
+      "module_version" : 0.01,
+      "name" : "field_264"
+   }
+}

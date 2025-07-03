@@ -37,7 +37,7 @@ morbo $(which traveller)
 Using `cpan`:
 
 ```
-cpan App::phoebe
+cpan App::traveller
 ```
 
 Manual install:
@@ -50,7 +50,7 @@ make install
 
 ## Dependencies
 
-Perl libraries you need to install if you want to run it:
+Perl libraries you need to install if you install it manually:
 
 * [Mojolicious](https://metacpan.org/pod/Mojolicious) or `libmojolicious-perl`
 * [Modern::Perl](https://metacpan.org/pod/Modern::Perl) or `libmodern-perl-perl`

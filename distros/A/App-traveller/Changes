@@ -1,0 +1,13 @@
+v1.02
+
+- Show the system if it has a name or a starport.
+- Allow three digit or six digit hex colours.
+- System name is now optional.
+
+v1.01
+
+No user-visible changes.
+
+v1.00
+
+Initial release.

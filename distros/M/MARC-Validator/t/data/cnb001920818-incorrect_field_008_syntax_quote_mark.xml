@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>00877ncm a2200253 a 4500</leader>
+  <controlfield tag="001">hud08100606</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20090417223510.0</controlfield>
+  <controlfield tag="007">qu</controlfield>
+  <controlfield tag="008">081012s197?    xr ||| g       nn   zxx  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb001920818</subfield>
+  </datafield>
+  <datafield tag="028" ind1="2" ind2="1">
+    <subfield code="a">H 5726</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">785</subfield>
+    <subfield code="x">Instrumentální hudba. Symfonická hudba. Hudba pro více nástrojů</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">9</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Trojan, Václav,</subfield>
+    <subfield code="d">1907-1983</subfield>
+    <subfield code="7">jk01140195</subfield>
+    <subfield code="4">cmp</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Zlatá brána</subfield>
+    <subfield code="h">[hudebnina] :</subfield>
+    <subfield code="b">Jevištní báseň pro sóla, sbory a orchestr : (1973) /</subfield>
+    <subfield code="c">Libreto Karel Plicka</subfield>
+  </datafield>
+  <datafield tag="254" ind1=" " ind2=" ">
+    <subfield code="a">Partitura</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Supraphon,</subfield>
+    <subfield code="c">197</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">Díl : 3</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Předml.</subfield>
+  </datafield>
+  <datafield tag="505" ind1="0" ind2=" ">
+    <subfield code="a">2. Léto. 1977, 163 s. - 6029 Pv 308 / 77 -- 3. Podzim-období zralosti. 1976. 182 s. Pv 140 / 76</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Plicka, Karel,</subfield>
+    <subfield code="d">1894-1987</subfield>
+    <subfield code="7">jk01093460</subfield>
+    <subfield code="4">lbt</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">001920818</subfield>
+  </datafield>
+</record>
+
+</collection>

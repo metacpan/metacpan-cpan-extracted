@@ -1,0 +1,45 @@
+---
+abstract: 'MARC validator plugins.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  Error::Pure::Utils: 0
+  ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  MARC::File::XML: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.21'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MARC-Validator
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0.03
+  DateTime: 0
+  English: 0
+  Error::Pure: 0
+  MARC::Field008: 0
+  MARC::Leader: 0.04
+  Mo::utils: 0.06
+  Mo::utils::Hash: 0
+  Module::Pluggable: 0
+  perl: 5.6.2
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/MARC-Validator/issues
+  homepage: https://github.com/michal-josef-spacek/MARC-Validator
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/MARC-Validator
+version: '0.01'

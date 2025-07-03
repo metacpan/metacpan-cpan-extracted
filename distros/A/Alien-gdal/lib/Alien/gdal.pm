@@ -11,7 +11,7 @@ use Path::Tiny qw /path/;
 use List::Util qw /uniq/;
 use Alien::proj;
 
-our $VERSION = '1.39';
+our $VERSION = '1.40';
 
 my ($have_geos, $have_proj, $have_spatialite);
 my @have_aliens;
@@ -63,6 +63,26 @@ BEGIN {
           push @have_aliens, 'Alien::spatialite';
         }
     }
+}
+
+sub version {
+    my $self = shift;
+
+    my $version = $self->SUPER::version;
+
+    return $version if not $version =~ /CONFIG/;
+
+    #  we have a busted version on Windows due to PkgConfig not handling pc vars
+    #  system installs are on their own for now
+    if ($self->is_share_install) {
+        my $file = path($self->dist_dir, 'lib', 'pkgconfig', 'gdal.pc');
+        my @lines = grep {/CONFIG_VERSION=/} $file->lines;
+        $version = $lines[0];
+        chomp $version;
+        $version =~ s/CONFIG_VERSION=//;
+    }
+
+    return $version;
 }
 
 sub dynamic_libs {

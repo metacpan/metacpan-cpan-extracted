@@ -32,3 +32,10 @@ WriteMakefile(
     FILES => "test-[0-9][0-9][0-9][0-9] t/*.pem",
   },
 );
+
+sub MY::postamble {
+  return <<'EOT';
+run:
+	morbo --mode development --listen http://*:3090 script/traveller
+EOT
+}

@@ -29,6 +29,8 @@ has 'source';
 has 'width';
 has 'height';
 
+my $colour_re = qr/#([0-9a-f]{3}){1,2}/i;
+
 my $example = q!Inedgeus     0101 D7A5579-8        G  Fl Ni          A
 Geaan        0102 E66A999-7        G  Hi Wa          A
 Orgemaso     0103 C555875-5       SG  Ga Lt
@@ -155,37 +157,6 @@ sub header {
       #bg {
         fill: inherit;
       }
-      /* original culture */
-      .culture0 { fill: white; }
-      /* later cultures */
-      .culture1  { fill: #d3d3d3; }
-      .culture2  { fill: #f5f5f5; }
-      .culture3  { fill: #eaeaea; }
-      .culture4  { fill: #fffeb0; }
-      .culture5  { fill: #fff0f5; }
-      .culture6  { fill: #eee0e5; }
-      .culture7  { fill: #ffe1ff; }
-      .culture8  { fill: #eed2ee; }
-      .culture9  { fill: #c6e2ff; }
-      .culture10 { fill: #fdf5e6; }
-      .culture11 { fill: #e0ffff; }
-      .culture12 { fill: #d1eeee; }
-      .culture13 { fill: #c5fff5; }
-      .culture14 { fill: #eeeee0; }
-      .culture15 { fill: #fff68f; }
-      .culture16 { fill: #eee685; }
-      .culture17 { fill: #fffacd; }
-      .culture18 { fill: #eee9bf; }
-      .culture19 { fill: #ffe7ba; }
-      .culture20 { fill: #ffefdb; }
-      .culture21 { fill: #ffe4e1; }
-      .culture22 { fill: #eed5d2; }
-      .culture23 { fill: #e6e6fa; }
-      .culture24 { fill: #f0ffff; }
-      .culture25 { fill: #c5ffd5; }
-      .culture26 { fill: #e6ffe6; }
-      .culture27 { fill: #d5ffc5; }
-      .culture28 { fill: #f5f5dc; }
     ]]></style>
     <polygon id="hex" points="%s,%s %s,%s %s,%s %s,%s %s,%s %s,%s" />
     <polygon id="bg" points="%s,%s %s,%s %s,%s %s,%s %s,%s %s,%s" />
@@ -206,49 +177,30 @@ EOT
 		 -0.5, -0.5, 3 + ($self->width - 1) * 1.5, ($self->height + 1.5) * sqrt(3));
 }
 
+sub colour {
+  my $self = shift;
+  my $culture = shift or return "white";
+  # The same colours result from the same names.
+  my @colours = ("#d3d3d3", "#f5f5f5", "#eaeaea", "#fffeb0", "#fff0f5", "#eee0e5", "#ffe1ff",
+                 "#eed2ee", "#c6e2ff", "#fdf5e6", "#e0ffff", "#d1eeee", "#c5fff5", "#eeeee0",
+                 "#fff68f", "#eee685", "#fffacd", "#eee9bf", "#ffe7ba", "#ffefdb", "#ffe4e1",
+                 "#eed5d2", "#e6e6fa", "#f0ffff", "#c5ffd5", "#e6ffe6", "#d5ffc5", "#f5f5dc");
+  my $i = unpack("%32W*", lc $culture) % @colours; # checksum
+  return $colours[$i];
+}
+
 sub background {
   my $self = shift;
   my $scale = 100;
-  my $doc;
-  # We want to colour cultures such that the same colours result from the same
-  # names. The number of colours is given by the CSS. We must therefore hash all
-  # the names to one of these colours; but index 0 is a white background, so
-  # don't use that.
-  my $colours = 28;
-  my %id;
-  my %seen;
-  my %used;
-  for my $hex (@{$self->hexes}) {
-    if ($hex->culture) {
-      my $coord = $hex->x . $hex->y;
-      if ($seen{$hex->culture}) {
-	$id{$coord} = $seen{$hex->culture};
-      } else {
-	my $colour = 1 + unpack("%32W*", lc $hex->culture) % $colours; # checksum
-	# reduce collisions
-	for (1 .. 3) {
-	  last unless $used{$colour};
-	  $colour = 1+ ($colour + 1) % $colours;
-	}
-	$seen{$hex->culture} = $id{$coord} = $colour;
-	$used{$colour} = $hex->culture;
-      }
-    }
-  }
-  # warn scalar(keys %used) . " colours used\n";
-  $doc .= join("\n",
-	       map {
-		 my $n = shift;
-		 my $x = int($_/$self->height+1);
-		 my $y = $_ % $self->height + 1;
-		 my $coord = sprintf('%02d%02d', $x, $y);
-		 my $class = $id{$coord} // 0;
-		 my $svg = sprintf(qq{    <use xlink:href="#bg" x="%.3f" y="%.3f" class="culture$class"/>},
-				   (1 + ($x-1) * 1.5) * $scale,
-				   ($y - $x%2/2) * sqrt(3) * $scale);
-	       }
-	       (0 .. $self->width * $self->height - 1));
-  return $doc;
+  return join("\n", map {
+    my $hex = $_;
+    my $x = $hex->x;
+    my $y = $hex->y;
+    my $c = $hex->colour || $self->colour($hex->culture);
+    sprintf(qq{    <use xlink:href="#bg" x="%.3f" y="%.3f" fill="$c"/>},
+            (1 + ($x-1) * 1.5) * $scale,
+            ($y - $x%2/2) * sqrt(3) * $scale);
+  } @{$self->hexes});
 }
 
 sub grid {
@@ -326,19 +278,20 @@ sub initialize {
 sub initialize_map {
   my ($self, $wiki, $lines) = @_;
   foreach (@$lines) {
-    # parse Traveller UWP
+    # parse Traveller UWP, with optional name
     my ($name, $x, $y,
 	$starport, $size, $atmosphere, $hydrographic, $population,
 	$government, $law, $tech, $bases, $rest) =
-	  /([^>\r\n\t]*?)\s+(\d\d)(\d\d)\s+([A-EX])([\dA])([\dA-F])([\dA])([\dA-C])([\dA-F])([\dA-L])-(\d{1,2}|[\dA-HJ-NP-Z])(?:\s+([PCTRNSG ]+)\b)?(.*)/;
+	  /(?:([^>\r\n\t]*?)\s+)?(\d\d)(\d\d)\s+([A-EX])([\dA])([\dA-F])([\dA])([\dA-C])([\dA-F])([\dA-L])-(\d{1,2}|[\dA-HJ-NP-Z])(?:\s+([PCTRNSG ]+)\b)?(.*)/;
     # alternative super simple name, coordinates, optional size (0-9), optional bases (PCTRNSG), optional travel zones (AR)
     ($name, $x, $y, $size, $bases, $rest) =
       /([^>\r\n\t]*?)\s+(\d\d)(\d\d)(?:\s+(\d)\b)?(?:\s+([PCTRNSG ]+)\b)?(.*)/
-	unless $name;
-    next unless $name;
+	unless $x and $y;
+    next unless $x and $y;
     $self->width($x) if $x > $self->width;
     $self->height($y) if $y > $self->height;
     my @tokens = split(' ', $rest);
+    my @colours = grep(/^$colour_re$/, @tokens);
     my %trade = map { $_ => 1 } grep(/^[A-Z][A-Za-z]$/, @tokens);
     my ($culture) = grep /^\[.*\]$/, @tokens; # culture in square brackets
     my ($travelzone) = grep /^([AR])$/, @tokens;    # amber or red travel zone
@@ -371,7 +324,8 @@ sub initialize_map {
       size => $size,
       travelzone => $travelzone,
       trade => \%trade,
-      culture => $culture // '');
+      culture => $culture // '',
+      colour => shift(@colours) || $self->colour($culture));
     $hex->url("$wiki$name") if $wiki;
     if ($bases) {
       for my $base (split(//, $bases)) {
@@ -391,7 +345,7 @@ sub initialize_routes {
   my ($self, $lines) = @_;
   foreach (@$lines) {
     # parse non-standard routes
-    my ($from, $to, $type) = /^(\d\d\d\d)-(\d\d\d\d)\s+(C|T)\b/i;
+    my ($from, $to, $type, $colour) = /^(\d\d\d\d)-(\d\d\d\d)\s+(C|T)\b\s*($colour_re)?/i;
     next unless $type;
     if (lc($type) eq 'c') {
       $self->comm_set(1); # at least one hex here has comm

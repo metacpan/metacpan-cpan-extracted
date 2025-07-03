@@ -1,0 +1,58 @@
+NAME
+    MARC::Validator - Set of plugins for MARC validation.
+
+SYNOPSIS
+     use MARC::Validator;
+
+     my @plugins = MARC::Validator->plugins;
+
+METHODS
+  "plugins"
+     my @plugins = MARC::Validator->plugins;
+
+    Get list of present plugins.
+
+    Returns list of plugin module name strings.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use MARC::Validator;
+
+     my @plugins = MARC::Validator->plugins;
+
+     if (@plugins) {
+             print "List of plugins:\n";
+             foreach my $plugin (@plugins) {
+                     print "- $plugin\n";
+             }
+     } else {
+             print "No plugins.\n";
+     }
+
+     # Output like:
+     # List of plugins:
+     # - MARC::Validator::Plugin::Field008
+     # - MARC::Validator::Plugin::Field260
+     # - MARC::Validator::Plugin::Field264
+
+DEPENDENCIES
+    Module::Pluggable.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/MARC-Validator>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

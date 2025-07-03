@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::MARC::Validator;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::MARC::Validator->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+marc-validator - Tool to validate records in MARC file.
+
+=head1 SYNOPSIS
+
+ marc-validator [-d] [-h] [-l] [-o output_file] [-p] [-v] [--version] marc_xml_file..
+
+=head1 DESCRIPTION
+
+Tool to validate dataset from MARC record collections.
+
+It supports MARC XML files now.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-d>
+
+Debug mode.
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-l>
+
+Print list of plugins.
+
+=item * C<-o output_file>
+
+Output file to save result.
+
+Default value is undef.
+
+=item * C<-p>
+
+Pretty print JSON output.
+
+=item * C<-v>
+
+Verbose mode.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<marc_xml_file..>
+
+MARC XML file name(s).
+
+=back
+
+=head1 EXAMPLE
+
+ marc-validator __MARC.xml__
+
+=head1 SEE ALSO
+
+=over
+
+=item L<marc-validator-report>
+
+Tool to process MARC validation report.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-MARC-Validator>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2025 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

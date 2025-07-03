@@ -1,0 +1,20 @@
+Source: libdbd-pg-async-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper-compat (= 13), perl,
+ libdbi-perl,
+ libpq-dev
+Maintainer: Rainer Weikusat <rweikusat@talktalk.net>
+Standards-Version: 3.9.1
+Homepage: http://search.cpan.org/dist/DBD-Pg/
+
+Package: libdbd-pg-async-perl
+Architecture: any
+Conflicts: libdbd-pg-perl
+Depends: ${misc:Depends}, ${perl:Depends}, ${shlibs:Depends},
+ libdbi-perl (>= 1.643)
+Description: DBI PostgreSQL interface
+ DBD::Pg is a Perl module that works with the DBI module to provide access to
+ PostgreSQL databases.
+ .
+ This description was automagically extracted from the module by dh-make-perl.
