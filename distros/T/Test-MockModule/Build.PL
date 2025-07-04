@@ -23,7 +23,6 @@ my $builder = Module::Build->new(
 		'Carp'                => 0,
 		'Scalar::Util'        => 0,
 		'SUPER'               => '1.20',
-		'Software::License' => '0.104006',
 	},
 	test_requires => {
 		'Test::More'          => 0.88,

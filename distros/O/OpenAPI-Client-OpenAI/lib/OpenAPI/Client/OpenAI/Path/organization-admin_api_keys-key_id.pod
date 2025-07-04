@@ -111,19 +111,20 @@ Details of the requested API key.
 Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
 
     {
-       "created_at" : 1711471533,
-       "id" : "key_abc",
-       "name" : "Administration Key",
-       "object" : "organization.admin_api_key",
-       "owner" : {
-          "created_at" : 1711471533,
-          "id" : "sa_456",
-          "name" : "My Service Account",
-          "role" : "member",
-          "type" : "service_account"
-       },
-       "redacted_value" : "sk-admin...def",
-       "value" : "sk-admin-1234abcd"
+      "object": "organization.admin_api_key",
+      "id": "key_abc",
+      "name": "Main Admin Key",
+      "redacted_value": "sk-admin...xyz",
+      "created_at": 1711471533,
+      "last_used_at": 1711471534,
+      "owner": {
+        "type": "user",
+        "object": "organization.user",
+        "id": "user_123",
+        "name": "John Doe",
+        "created_at": 1711471533,
+        "role": "owner"
+      }
     }
 
 

@@ -4,7 +4,9 @@ MANIFEST			This list of files
 t/01-load.t
 t/02-ancestors.t
 t/03-cousins.t
+t/04-attribute-names.t
 t/lib/TestPerson.pm
+t/lib/TestPerson2.pm
 README.md
 Changes.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)

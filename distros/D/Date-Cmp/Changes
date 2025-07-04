@@ -1,4 +1,11 @@
 Revision history for Date::Cmp
 
+0.03	Thu Jul  3 10:38:28 EDT 2025
+	use ABSTRACT_FROM
+	Correctly compare 16/11/1689' <=> '1659-07-01'
+
+0.02	Thu Jul  3 08:00:42 EDT 2025
+	Use of uninitialized value $start
+
 0.01	Wed Jul  2 17:06:14 EDT 2025
         First draft

@@ -5,7 +5,7 @@ use warnings;
 package Object::Adhoc;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 use Digest::MD5 qw( md5_hex );
 use Scalar::Util qw( refaddr );
@@ -152,7 +152,7 @@ sub make_class {
 			$code .= "sub $getter :method { &Object::Adhoc::_usage if \@_ > 1; \$_[0]{$qkey} }\n";
 		}
 		$code .= "1;\n";
-		eval($code) or do { require Carp; Carp::croak($@) };
+		eval($code) or die($@);
 	}
 	
 	do {
@@ -167,9 +167,7 @@ sub make_class {
 			*{"$class\::new"} = sub {
 				my ($class, %hash) = (@_ == 2 and ref $_[1] eq 'HASH') ? ($_[0], %{$_[1]}) : (@_ % 2 == 1) ? @_ : _usage('class', 'hashref');
 				for (keys %hash) {
-					next if /$re/;
-					require Carp;
-					Carp::croak("Bad key: $_");
+					/\A(?:$re)\z/ or _croak("Bad key: $_");
 				}
 				return bless(\%hash, ref($class) || $class);
 			};
@@ -185,6 +183,11 @@ sub _usage {
 	local $Carp::CarpLevel = 1 + $Carp::CarpLevel;
 	my @fields = @_ ? @_ : ('self');
 	Carp::croak("Usage: $caller\(@{[join q[, ], @fields]})"); # mimic XS usage message
+}
+
+sub _croak {
+	require Carp;
+	goto \&Carp::croak;
 }
 
 sub _DOES {
@@ -266,6 +269,9 @@ Number of levels to recurse. By default, 0.
 
 C<< object(\%data, \@keys) >> is a shortcut for C<< object(\%data, keys => \@keys) >>.
 
+When C<keys> and C<recurse> are both used, C<keys> only applies to the root
+hashref.
+
 =back
 
 =item C<< make_class(\@keys, %opts) >>
@@ -277,7 +283,13 @@ will return the same class name.
 By default, the class won't have a C<new> method; if you need to create
 objects, you can just directly bless hashrefs into it.
 
-Supported options.
+  my $k = make_class( 'foo', 'bar' );
+  my $o = bless { foo => 'Hello', bar => 'World' }, $k;
+  if ( $o->isa($k) ) {
+    say $o->foo, q( ), $o->bar;
+  }
+
+Supported options:
 
 =over
 
@@ -407,7 +419,7 @@ the slowest.
 I'd recommend Object::Adhoc if you want read-only accessors,
 or Hash::Objectify if you want read-write accessors. Use
 Object::Anon only if you need the additional features it supports
-for overloading, and custom methods to nested data structures.
+like overloading and custom methods.
 
 =head2 Not Quite So Similar Modules
 

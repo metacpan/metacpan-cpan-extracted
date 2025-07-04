@@ -122,6 +122,7 @@ WriteMakefile(
     CONFIGURE_REQUIRES	=> {
 	'Devel::CheckLib'	=> 0,
     },
+    EXE_FILES		=> [ 'script/opcua-dump' ],
     PREREQ_PM		=> {},
     ABSTRACT_FROM	=> 'lib/OPCUA/Open62541.pm',
     AUTHOR		=> [

@@ -478,6 +478,7 @@ d_fd_set=''
 d_fds_bits=''
 d_fdclose=''
 d_fdim=''
+d_fdopendir=''
 d_fegetround=''
 d_ffs=''
 d_ffsl=''
@@ -7685,6 +7686,9 @@ EOPL
 # of three digit per group separate by '.'s or '_'s. Names are extended
 # with ".0.0" to ensure at least three elements for the pack.
 #                                   -- H.Merijn Brand (m)'06 23-10-2006
+# pack "s>" was introduced in perl-5.10, so I had to rewrite this to an
+# sprintf approach to support bases systems with 5.6.x and 5.8.x
+#                                   -- H.Merijn Brand (m)'25 16-05-2025
 
 my @inc_version_list;
 my @candidates;
@@ -7692,7 +7696,7 @@ my @candidates;
 if (-d $stem) {
     chdir($stem);
     ;@candidates = map {
-	[ $_, pack "s>s>s>", split m/[._]/, "$_.0.0" ] } glob("5.*");
+	[ $_, sprintf "%04d%04d%04d", (split m/[._]/, "$_.0.0")[0,1,2] ] } glob("5.*");
     ;@candidates = sort { $a->[1] cmp $b->[1]} @candidates;
 }
 else {
@@ -7700,7 +7704,7 @@ else {
 }
 
 my ($pversion, $aversion, $vsn5005) = map {
-    pack "s>s>s>", split m/[._]/, "$_.0.0" } $version, $api_versionstring, "5.005";
+    sprintf "%04d%04d%04d", (split m/[._]/, "$_.0.0")[0,1,2] } $version, $api_versionstring, "5.005";
 foreach my $d (@candidates) {
     if ($d->[1] lt $pversion) {
 	if ($d->[1] ge $aversion) {
@@ -14061,6 +14065,10 @@ eval $inlibc
 set fdim d_fdim
 eval $inlibc
 
+: see if fdopendir exists
+set fdopendir d_fdopendir
+eval $inlibc
+
 : see if fegetround exists
 set fegetround d_fegetround
 eval $inlibc
@@ -16754,6 +16762,11 @@ define:define:?*)
 	uvsize=$longsize
 	;;
 esac
+
+if test $ivsize -lt $ptrsize; then
+    echo "Re-run Configure adding -Duse64bitint so as to make integers as large as pointer values" >&4
+    exit 1
+fi
 
 case "$uselongdouble:$d_longdbl" in
 define:define)
@@ -22979,7 +22992,7 @@ else
 #include <signal.h>
 #include <stdio.h>
 int main() {
-printf("$xx %d\n", SIG${xx});
+printf("$xx %ld\n", (long) SIG${xx});
 return 0;
 }
 EOCP
@@ -25034,6 +25047,7 @@ d_fd_macros='$d_fd_macros'
 d_fd_set='$d_fd_set'
 d_fdclose='$d_fdclose'
 d_fdim='$d_fdim'
+d_fdopendir='$d_fdopendir'
 d_fds_bits='$d_fds_bits'
 d_fegetround='$d_fegetround'
 d_ffs='$d_ffs'

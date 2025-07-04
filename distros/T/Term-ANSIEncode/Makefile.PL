@@ -19,10 +19,22 @@ if (-e 'Makefile') {
 }
 
 # ANSI Encode
-my $banner = slurp_file('banner.vt');
+my $banner = slurp_file('examples/banner.vt');
 chomp(my $VERSION = slurp_file('VERSION'));
 $banner =~ s/XXXX/$VERSION/gs;
 print $banner;
+
+print 'Adding version to module ... ';
+
+my $module = slurp_file('src/ANSIEncode.pm.template');
+
+$module =~ s/XXXX/$VERSION/gs;
+
+open(my $FILE,'>','lib/Term/ANSIEncode.pm');
+print $FILE $module;
+close($FILE);
+
+print colored(['green'],'ok'),"\n";
 
 WriteMakefile(
     NAME               => 'Term::ANSIEncode',
@@ -33,7 +45,7 @@ WriteMakefile(
     MIN_PERL_VERSION   => 5.020, # 5.6 (5.006) is considered slow and unstable.  Upgrade
     CONFIGURE_REQUIRES => {
 		'Config'              => '0',
-        'ExtUtils::MakeMaker' => '6.52',
+        'ExtUtils::MakeMaker' => '6.00',
         'Term::ANSIColor'     => '0',
         'Term::ReadKey'       => '0',
     },
@@ -43,6 +55,8 @@ WriteMakefile(
     },
     PREREQ_PRINT   => TRUE,
     PREREQ_PM      => {
+		'charnames'        => '0',
+		'List::Util'       => '1.20',
 		'Term::ANSIColor'  => '0',
 		'Term::ANSIScreen' => '0',
 		'Time::HiRes'      => '0',
@@ -50,7 +64,7 @@ WriteMakefile(
     },
 	EXE_FILES => ['bin/ansi-encode'],
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
-    clean => {FILES    => 'Term::ASNSIEncode* *bak *old'},
+    clean => {FILES    => '*gz *bak *old'},
 );
 
 print colored(['blue on_blue'],$line),"\n";

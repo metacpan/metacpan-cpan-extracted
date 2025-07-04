@@ -4,7 +4,7 @@ List::Lazy - Generate lists lazily
 
 # VERSION
 
-version 0.3.3
+version 0.4.0
 
 # SYNOPSIS
 
@@ -117,6 +117,9 @@ while( my $next = $range->next ) {
 }
 ```
 
+As a safety valve, if the number of entries to be returned exceeds 
+&lt;$Lazy::List::MAX\_NEXT> (which defaults to `10_000`), the call will die.
+
 ## reduce
 
 ```perl
@@ -219,8 +222,24 @@ Note that the new list do a deep clone of the original lists's state, so reading
 from the new list won't affect the original lists.
 
 ```perl
-my $range = lazy_range 1..100;
+my $range = lazy_range 1, 100;
 my $twice = $range->append( $range );
+```
+
+Non-lazy lists can also be given to `append`, in which case they will 
+be converted into `lazy_fixed_list`s under the hood.
+
+```perl
+my $list = lazy_range 1, 100;
+
+$list = $list->append( 101, lazy_range(102,200), 201..210 );
+
+# equivalent to
+$list = $list->append( 
+    fixed_lazy_list(101), 
+    lazy_range(102,200), 
+    fixed_lazy_list(201..210) 
+);
 ```
 
 ## prepend
@@ -240,8 +259,8 @@ from the new list won't affect the original lists.
 my @rest = $list->all;
 ```
 
-Returns all the remaining values of the list. Be careful: if the list is unbounded,
-calling `all()` on it will result into an infinite loop.
+Returns all the remaining values of the list. As for `next`, this method 
+will die if the number of entries generated exceeds `$Lazy::List::MAX_NEXT`.
 
 # AUTHOR
 
@@ -249,7 +268,7 @@ Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/y
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Yanick Champoux.
+This software is copyright (c) 2025 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

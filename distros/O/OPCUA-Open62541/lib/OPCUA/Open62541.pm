@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '2.06';
+our $VERSION = '2.08';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -396,6 +396,8 @@ run_iterate() or open62541 may try to operate on a non existent socket.
 
 =item ($channel_state, $session_state, $connect_status) = $client->getState()
 
+=item $status_code = $client->getEndpoints($serverUrl, \$endpointDescriptions)
+
 1.1 API
 
 In scalar context croak due to 1.0 API incompatibility.
@@ -416,7 +418,11 @@ In scalar context croak due to 1.0 API incompatibility.
 
 =back
 
+=item $response = $client->Service_read(\%request)
+
 =item $response = $client->Service_browse(\%request)
+
+=item $response = $client->Service_browseNext(\%request)
 
 =item $status_code = $client->readAccessLevelAttribute(\%nodeId, \$outByte)
 
@@ -739,6 +745,10 @@ If no trust or revocation list is set, the client will accept all certificates.
 =item $securityMode = $client_config->getSecurityMode()
 
 =item $client_config->setSecurityMode($securityMode)
+
+=item $timeout = $client_config->getTimeout()
+
+=item $client_config->setTimeout($timeout)
 
 =item $clientDescription = $client_config->getClientDescription()
 

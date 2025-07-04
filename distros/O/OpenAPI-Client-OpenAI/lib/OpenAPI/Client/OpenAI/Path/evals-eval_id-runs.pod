@@ -1,0 +1,384 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::evals-eval_id-runs - Documentation for the /evals/{eval_id}/runs path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</evals/{eval_id}/runs>.
+
+=head1 PATHS
+
+
+=head2 C<GET /evals/{eval_id}/runs>
+
+Get a list of runs for an evaluation.
+
+
+
+=head3 Operation ID
+
+C<getEvalRuns>
+
+    $client->getEvalRuns( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to retrieve runs for.
+
+Type: C<string>
+
+
+
+=item * C<after> (in query) (Optional) - Identifier for the last run from the previous pagination request.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - Number of runs to retrieve.
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<order> (in query) (Optional) - Sort order for runs by timestamp. Use `asc` for ascending order or `desc` for descending order. Defaults to `asc`.
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<asc>
+
+
+=item * C<status> (in query) (Optional) - Filter runs by status. One of `queued` | `in_progress` | `failed` | `completed` | `canceled`.
+
+Type: C<string>
+
+Allowed values: C<queued, in_progress, completed, canceled, failed>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+A list of runs for the evaluation
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "list",
+      "data": [
+        {
+          "object": "eval.run",
+          "id": "evalrun_67b7fbdad46c819092f6fe7a14189620",
+          "eval_id": "eval_67b7fa9a81a88190ab4aa417e397ea21",
+          "report_url": "https://platform.openai.com/evaluations/eval_67b7fa9a81a88190ab4aa417e397ea21?run_id=evalrun_67b7fbdad46c819092f6fe7a14189620",
+          "status": "completed",
+          "model": "o3-mini",
+          "name": "Academic Assistant",
+          "created_at": 1740110812,
+          "result_counts": {
+            "total": 171,
+            "errored": 0,
+            "failed": 80,
+            "passed": 91
+          },
+          "per_model_usage": null,
+          "per_testing_criteria_results": [
+            {
+              "testing_criteria": "String check grader",
+              "passed": 91,
+              "failed": 80
+            }
+          ],
+          "run_data_source": {
+            "type": "completions",
+            "template_messages": [
+              {
+                "type": "message",
+                "role": "system",
+                "content": {
+                  "type": "input_text",
+                  "text": "You are a helpful assistant."
+                }
+              },
+              {
+                "type": "message",
+                "role": "user",
+                "content": {
+                  "type": "input_text",
+                  "text": "Hello, can you help me with my homework?"
+                }
+              }
+            ],
+            "datasource_reference": null,
+            "model": "o3-mini",
+            "max_completion_tokens": null,
+            "seed": null,
+            "temperature": null,
+            "top_p": null
+          },
+          "error": null,
+          "metadata": {"test": "synthetics"}
+        }
+      ],
+      "first_id": "evalrun_67abd54d60ec8190832b46859da808f7",
+      "last_id": "evalrun_67abd54d60ec8190832b46859da808f7",
+      "has_more": false
+    }
+
+
+=back
+
+=head2 C<POST /evals/{eval_id}/runs>
+
+Kicks off a new run for a given evaluation, specifying the data source, and what model configuration to use to test. The datasource will be validated against the schema specified in the config of the evaluation.
+
+
+
+=head3 Operation ID
+
+C<createEvalRun>
+
+    $client->createEvalRun( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to create a run for.
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<201>
+
+Successfully created a run for the evaluation
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "eval.run",
+      "id": "evalrun_67e57965b480819094274e3a32235e4c",
+      "eval_id": "eval_67e579652b548190aaa83ada4b125f47",
+      "report_url": "https://platform.openai.com/evaluations/eval_67e579652b548190aaa83ada4b125f47?run_id=evalrun_67e57965b480819094274e3a32235e4c",
+      "status": "queued",
+      "model": "gpt-4o-mini",
+      "name": "gpt-4o-mini",
+      "created_at": 1743092069,
+      "result_counts": {
+        "total": 0,
+        "errored": 0,
+        "failed": 0,
+        "passed": 0
+      },
+      "per_model_usage": null,
+      "per_testing_criteria_results": null,
+      "data_source": {
+        "type": "completions",
+        "source": {
+          "type": "file_content",
+          "content": [
+            {
+              "item": {
+                "input": "Tech Company Launches Advanced Artificial Intelligence Platform",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "Central Bank Increases Interest Rates Amid Inflation Concerns",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "International Summit Addresses Climate Change Strategies",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Major Retailer Reports Record-Breaking Holiday Sales",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "National Team Qualifies for World Championship Finals",
+                "ground_truth": "Sports"
+              }
+            },
+            {
+              "item": {
+                "input": "Stock Markets Rally After Positive Economic Data Released",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "Global Manufacturer Announces Merger with Competitor",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "Breakthrough in Renewable Energy Technology Unveiled",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "World Leaders Sign Historic Climate Agreement",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Professional Athlete Sets New Record in Championship Event",
+                "ground_truth": "Sports"
+              }
+            },
+            {
+              "item": {
+                "input": "Financial Institutions Adapt to New Regulatory Requirements",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "Tech Conference Showcases Advances in Artificial Intelligence",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "Global Markets Respond to Oil Price Fluctuations",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "International Cooperation Strengthened Through New Treaty",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Sports League Announces Revised Schedule for Upcoming Season",
+                "ground_truth": "Sports"
+              }
+            }
+          ]
+        },
+        "input_messages": {
+          "type": "template",
+          "template": [
+            {
+              "type": "message",
+              "role": "developer",
+              "content": {
+                "type": "input_text",
+                "text": "Categorize a given news headline into one of the following topics: Technology, Markets, World, Business, or Sports.\n\n# Steps\n\n1. Analyze the content of the news headline to understand its primary focus.\n2. Extract the subject matter, identifying any key indicators or keywords.\n3. Use the identified indicators to determine the most suitable category out of the five options: Technology, Markets, World, Business, or Sports.\n4. Ensure only one category is selected per headline.\n\n# Output Format\n\nRespond with the chosen category as a single word. For instance: \"Technology\", \"Markets\", \"World\", \"Business\", or \"Sports\".\n\n# Examples\n\n**Input**: \"Apple Unveils New iPhone Model, Featuring Advanced AI Features\"  \n**Output**: \"Technology\"\n\n**Input**: \"Global Stocks Mixed as Investors Await Central Bank Decisions\"  \n**Output**: \"Markets\"\n\n**Input**: \"War in Ukraine: Latest Updates on Negotiation Status\"  \n**Output**: \"World\"\n\n**Input**: \"Microsoft in Talks to Acquire Gaming Company for $2 Billion\"  \n**Output**: \"Business\"\n\n**Input**: \"Manchester United Secures Win in Premier League Football Match\"  \n**Output**: \"Sports\" \n\n# Notes\n\n- If the headline appears to fit into more than one category, choose the most dominant theme.\n- Keywords or phrases such as \"stocks\", \"company acquisition\", \"match\", or technological brands can be good indicators for classification.\n"
+              }
+            },
+            {
+              "type": "message",
+              "role": "user",
+              "content": {
+                "type": "input_text",
+                "text": "{{item.input}}"
+              }
+            }
+          ]
+        },
+        "model": "gpt-4o-mini",
+        "sampling_params": {
+          "seed": 42,
+          "temperature": 1.0,
+          "top_p": 1.0,
+          "max_completions_tokens": 2048
+        }
+      },
+      "error": null,
+      "metadata": {}
+    }
+
+
+=back
+
+=head4 Status Code: C<400>
+
+Bad request (for example, missing eval object)
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

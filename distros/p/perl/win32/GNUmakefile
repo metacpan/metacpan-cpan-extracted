@@ -6,7 +6,7 @@
 #	MinGW64 with gcc-4.4.3 or later
 #
 # This is set up to build a perl.exe that runs off a shared library
-# (perl540.dll).  Also makes individual DLLs for the XS extensions.
+# (perl542.dll).  Also makes individual DLLs for the XS extensions.
 #
 # The easiest way to customize the build process is to use parameters like this:
 #
@@ -63,7 +63,7 @@ INST_TOP := $(INST_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-#INST_VER	:= \5.40.2
+#INST_VER	:= \5.42.0
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -222,7 +222,7 @@ DEFAULT_INC_EXCLUDES_DOT := define
 # set this to additionally provide a statically linked perl-static.exe.
 # Note that dynamic loading will not work with this perl, so you must
 # include required modules statically using the STATIC_EXT or ALL_STATIC
-# variables below. A static library perl540s.lib will also be created.
+# variables below. A static library perl542s.lib will also be created.
 # Ordinary perl.exe is not affected by this option.
 #
 #BUILD_STATIC	:= define
@@ -899,9 +899,9 @@ ifeq ($(CCTYPE),GCC)
 
 CFGSH_TMPL	= config.gc
 CFGH_TMPL	= config_H.gc
-PERLIMPLIB	= $(COREDIR)\libperl540$(a)
-PERLIMPLIBBASE	= libperl540$(a)
-PERLSTATICLIB	= ..\libperl540s$(a)
+PERLIMPLIB	= $(COREDIR)\libperl542$(a)
+PERLIMPLIBBASE	= libperl542$(a)
+PERLSTATICLIB	= ..\libperl542s$(a)
 INT64		= long long
 
 else
@@ -914,12 +914,12 @@ endif
 
 # makedef.pl must be updated if this changes, and this should normally
 # only change when there is an incompatible revision of the public API.
-PERLIMPLIB	?= $(COREDIR)\perl540$(a)
-PERLIMPLIBBASE	?= perl540$(a)
-PERLEXPLIB	?= $(COREDIR)\perl540.exp
-PERLSTATICLIB	?= ..\perl540s$(a)
-PERLDLL		= ..\perl540.dll
-PERLDLLBASE	= perl540.dll
+PERLIMPLIB	?= $(COREDIR)\perl542$(a)
+PERLIMPLIBBASE	?= perl542$(a)
+PERLEXPLIB	?= $(COREDIR)\perl542.exp
+PERLSTATICLIB	?= ..\perl542s$(a)
+PERLDLL		= ..\perl542.dll
+PERLDLLBASE	= perl542.dll
 
 # don't let "gmake -n all" try to run "miniperl.exe make_ext.pl"
 PLMAKE		= gmake
@@ -1524,6 +1524,7 @@ MakePPPort : $(HAVEMINIPERL) $(CONFIGPM)
 	$(XCOPY) *.h $(COREDIR)\\*.*
 	$(RCOPY) include $(COREDIR)\\*.*
 	$(XCOPY) ..\\*.h $(COREDIR)\\*.*
+	$(XCOPY) ..\\charclass_invlists.inc $(COREDIR)\\*.*
 	rem. > $@
 
 perlmain$(o) : runperl.c $(CONFIGPM)
@@ -1643,7 +1644,7 @@ utils: $(HAVEMINIPERL) ..\utils\Makefile
 	copy ..\README.tw       ..\pod\perltw.pod
 	copy ..\README.vos      ..\pod\perlvos.pod
 	copy ..\README.win32    ..\pod\perlwin32.pod
-	copy ..\pod\perldelta.pod ..\pod\perl5402delta.pod
+	copy ..\pod\perldelta.pod ..\pod\perl5420delta.pod
 	$(MINIPERL) -I..\lib $(PL2BAT) $(UTILS)
 	$(MINIPERL) -I..\lib ..\autodoc.pl -c "win32\$(CONFIG_H)" ..
 	$(MINIPERL) -I..\lib ..\pod\perlmodlib.PL -q ..
@@ -1743,7 +1744,7 @@ distclean: realclean
 	-if exist $(LIBDIR)\Win32API rmdir /s /q $(LIBDIR)\Win32API
 	-if exist $(LIBDIR)\XS rmdir /s /q $(LIBDIR)\XS
 	-cd $(PODDIR) && del /f *.html *.bat roffitall \
-	    perl5402delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
+	    perl5420delta.pod perlaix.pod perlamiga.pod perlandroid.pod \
 	    perlapi.pod perlbs2000.pod perlcn.pod perlcygwin.pod \
 	    perlfreebsd.pod perlhaiku.pod perlhpux.pod perlhurd.pod \
 	    perlintern.pod perlirix.pod perljp.pod perlko.pod perllinux.pod \
@@ -1824,6 +1825,7 @@ test-prep-gcc :
 	if exist $(CCDLLDIR)\libwinpthread-1.dll $(XCOPY) $(CCDLLDIR)\libwinpthread-1.dll ..\t\$(NULL)
 	if exist $(CCDLLDIR)\libquadmath-0.dll $(XCOPY) $(CCDLLDIR)\libquadmath-0.dll ..\t\$(NULL)
 	if exist $(CCDLLDIR)\libmcfgthread-1.dll $(XCOPY) $(CCDLLDIR)\libmcfgthread-1.dll ..\t\$(NULL)
+	if exist $(CCDLLDIR)\libmcfgthread-2.dll $(XCOPY) $(CCDLLDIR)\libmcfgthread-2.dll ..\t\$(NULL)
 
 endif
 

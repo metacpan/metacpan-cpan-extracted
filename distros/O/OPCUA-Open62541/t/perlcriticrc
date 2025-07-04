@@ -36,6 +36,8 @@ severity = 2
 [InputOutput::RequireCheckedOpen]
 [InputOutput::RequireCheckedSyscalls]
 [Modules::ProhibitEvilModules]
+[Modules::ProhibitExcessMainComplexity]
+severity = 2
 [Modules::RequireExplicitPackage]
 severity = 2
 [Modules::RequireFilenameMatchesPackage]
@@ -64,5 +66,3 @@ severity = 2
 [Variables::ProhibitConditionalDeclarations]
 [Variables::RequireLocalizedPunctuationVars]
 severity = 2
-
-#[Modules::ProhibitExcessMainComplexity]

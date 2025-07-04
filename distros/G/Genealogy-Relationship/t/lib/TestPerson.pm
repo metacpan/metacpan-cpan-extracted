@@ -1,25 +1,11 @@
-package TestPerson;
-use Moo;
-use Types::Standard qw[Str Int InstanceOf Enum];
+use feature 'class';
+no warnings 'experimental::class';
 
-has id => (
-  is => 'ro',
-  isa => Str,
-);
+class TestPerson;
 
-has name => (
-  is => 'ro',
-  isa => Str,
-);
-
-has parent => (
-  is => 'ro',
-  isa => InstanceOf['TestPerson'],
-);
-
-has gender => (
-  is => 'ro',
-  isa => Enum[qw[m f]],
-);
+field $id :param :reader;
+field $name :param :reader;
+field $parent :param :reader = undef;
+field $gender :param :reader;
 
 1;

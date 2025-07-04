@@ -135,7 +135,7 @@ s_bsdipa_patch_parse_header(struct s_bsdipa_header *hp, uint8_t const *dat){
 	if(x < 0)
 		goto jleave;
 	/* If we generated the header, the latter is true. */
-	if(x >= s_BSDIPA_OFF_MAX || (size_t)x >= SIZE_MAX / sizeof(s_bsdipa_off_t))
+	if(x >= s_BSDIPA_OFF_MAX || (uint64_t)x >= SIZE_MAX / sizeof(s_bsdipa_off_t))
 		goto jleave;
 	if(x - hp->h_extra_len != hp->h_diff_len)
 		goto jleave;
@@ -211,18 +211,26 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 	if(pcp->pc_header.h_before_len < 0 || pcp->pc_header.h_before_len >= s_BSDIPA_OFF_MAX)
 		goto jleave;
 
-	if(pcp->pc_max_allowed_restored_len != 0 &&
-			pcp->pc_max_allowed_restored_len < (uint64_t)pcp->pc_header.h_before_len){
-		rv = s_BSDIPA_FBIG;
+	rv = s_BSDIPA_FBIG;
+
+	/* 32-bit size_t excess? */
+	if((uint64_t)pcp->pc_header.h_before_len >= SIZE_MAX - 1)
 		goto jleave;
-	}
+
+	if(pcp->pc_max_allowed_restored_len != 0 &&
+			pcp->pc_max_allowed_restored_len < (uint64_t)pcp->pc_header.h_before_len)
+		goto jleave;
 	pcp->pc_restored_len = pcp->pc_header.h_before_len;
 
 	/* Ensure room for one additional byte, as documented. */
 	pcp->pc_restored_dat = (uint8_t*)(*pcp->pc_mem.mc_custom_alloc)(pcp->pc_mem.mc_custom_cookie,
 			(size_t)pcp->pc_restored_len +1);
-	if(pcp->pc_restored_dat == NULL)
+	if(pcp->pc_restored_dat == NULL){
+		rv = s_BSDIPA_NOMEM;
 		goto jleave;
+	}
+
+	rv = s_BSDIPA_INVAL;
 
 	for(aftpos = respos = 0; respos < pcp->pc_header.h_before_len;){
 		s_bsdipa_off_t i, j;

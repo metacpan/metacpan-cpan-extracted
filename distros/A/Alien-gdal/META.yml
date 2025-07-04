@@ -7,15 +7,14 @@ build_requires:
   Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
+  Alien::MSYS: '0'
   Alien::cmake3: '0.02'
   Alien::geos::af: '1.010'
   Alien::libtiff: '0'
   Alien::patch: '0'
-  Alien::patchelf: '0'
   Alien::proj: '1.24'
   Alien::sqlite: '1.02'
   Archive::Tar: '0'
-  Config: '0'
   Env::ShellWords: '0.01'
   ExtUtils::MakeMaker: '6.52'
   FFI::CheckLib: '0.23'
@@ -43,7 +42,6 @@ configure_requires:
   Alien::geos::af: '1.010'
   Alien::libtiff: '0'
   Alien::patch: '0'
-  Alien::patchelf: '0'
   Alien::proj: '1.24'
   Alien::sqlite: '1.02'
   ExtUtils::MakeMaker: '6.52'
@@ -55,7 +53,7 @@ configure_requires:
   Sort::Versions: '0'
   parent: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -73,17 +71,17 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-gdal/issues/
   repository: https://github.com/shawnlaffan/perl-alien-gdal
-version: '1.40'
+version: '1.41'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.83'
+  generated_by: 'Alien::Build::MM version 2.84'
   requires:
     share:
+      Alien::MSYS: '0'
       Alien::cmake3: '0.02'
       Alien::geos::af: '0'
       Alien::proj: '0'
       Alien::sqlite: '0'
       Archive::Tar: '0'
-      Config: '0'
       Env::ShellWords: '0.01'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
@@ -95,4 +93,4 @@ x_alienfile:
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

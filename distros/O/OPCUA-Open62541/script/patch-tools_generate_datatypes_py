@@ -1,41 +1,135 @@
 generate c <-> perl conversion functions (Open62541-packed.xsh)
 
-This applies to open62541 1.0.6.  Place the patch into a OpenBSD
+This applies to open62541 1.3.15.  Place the patch into a OpenBSD
 /usr/ports/misc/open62541/patches/ ports directory that contains a
 matching open62541 version.  Build with FLAVOR=ns0_full to generate
 /usr/ports/pobj/open62541-1.0.6-ns0_full/build-amd64-ns0_full/
 src_generated/open62541/types_generated-Open62541-packed.xsh file.
 
-Index: tools/generate_datatypes.py
---- tools/generate_datatypes.py.orig
-+++ tools/generate_datatypes.py
-@@ -255,6 +255,11 @@ class EnumerationType(Type):
-                ",\n    __UA_{0}_FORCE32BIT = 0x7fffffff\n".format(makeCIdentifier(self.name.upper())) + "} " + \
-                "UA_{0};\nUA_STATIC_ASSERT(sizeof(UA_{0}) == sizeof(UA_Int32), enum_must_be_32bit);".format(makeCIdentifier(self.name))
+diff --git tools/nodeset_compiler/backend_open62541_typedefinitions.py tools/nodeset_compiler/backend_open62541_typedefinitions.py
+index aaac8592a..42790b094 100644
+--- tools/nodeset_compiler/backend_open62541_typedefinitions.py
++++ tools/nodeset_compiler/backend_open62541_typedefinitions.py
+@@ -73,6 +73,7 @@ class CGenerator(object):
+         self.ff = None
+         self.fc = None
+         self.fe = None
++        self.fp = None
+ 
+     @staticmethod
+     def get_type_index(datatype):
+@@ -333,16 +334,19 @@ class CGenerator(object):
+         self.fh = open(self.outfile + "_generated.h", 'w')
+         self.ff = open(self.outfile + "_generated_handling.h", 'w')
+         self.fc = open(self.outfile + "_generated.c", 'w')
++        self.fp = open(self.outfile + "_generated-Open62541-packed.xsh", 'w')
+ 
+         self.filtered_types = self.iter_types(self.parser.types)
+ 
+         self.print_header()
+         self.print_handling()
+         self.print_description_array()
++        self.print_perl()
+ 
+         self.fh.close()
+         self.ff.close()
+         self.fc.close()
++        self.fp.close()
+ 
+     def printh(self, string):
+         print(string, end='\n', file=self.fh)
+@@ -353,6 +357,9 @@ class CGenerator(object):
+     def printc(self, string):
+         print(string, end='\n', file=self.fc)
+ 
++    def printp(self, string):
++        print(string, end='\n', file=self.fp)
++
+     def iter_types(self, v):
+         # Make a copy. We cannot delete from the map that is iterated over at
+         # the same time.
+@@ -514,3 +521,37 @@ _UA_END_DECLS
+                     self.printc("/* " + t.name + " */")
+                     self.printc(self.print_datatype(t, self.namespaceMap) + ",")
+             self.printc("};\n")
++
++    def print_perl(self):
++        for ns in self.filtered_types:
++            for i, t_name in enumerate(self.filtered_types[ns]):
++                t = self.filtered_types[ns][t_name]
++                self.printp("\n/* " + t.name + " */")
++                self.printp("#ifdef UA_TYPES_%s" % t.name.upper())
++                self.printp("static void pack_UA_%s(SV *out, const UA_%s *in);" % (t.name, t.name))
++                self.printp("static void unpack_UA_%s(UA_%s *out, SV *in);" % (t.name, t.name))
++                if not isinstance(t, BuiltinType):
++                    self.printp("""
++static void
++pack_UA_%s(SV *out, const UA_%s *in)
++{
++\tdTHX;""" % (t_name, t_name))
++                    self.printp(t.conversion2perl())
++                    self.printp("}")
++                    self.printp("""
++static void
++unpack_UA_%s(UA_%s *out, SV *in)
++{
++\tdTHX;""" % (t_name, t_name))
++                    self.printp(t.conversion2c())
++                    self.printp("}")
++                else:
++                    if t.name in ["Boolean", "SByte", "Byte", "Int16", "UInt16", "Int32",
++                                  "UInt32", "Int64", "UInt64", "String", "ByteString",
++                                  "NodeId", "QualifiedName", "LocalizedText", "Double",
++                                  "Float", "Guid", "StatusCode", "DateTime", "Variant",
++                                  "DataValue", "XmlElement", "ExpandedNodeId",
++                                  "DiagnosticInfo", "ExtensionObject"]:
++                        self.printp("/* implemented in Open62541.xs */")
++
++                self.printp("#endif")
+diff --git tools/nodeset_compiler/type_parser.py tools/nodeset_compiler/type_parser.py
+index ebe24b746..56f38b43f 100644
+--- tools/nodeset_compiler/type_parser.py
++++ tools/nodeset_compiler/type_parser.py
+@@ -41,6 +41,14 @@ type_aliases = {"CharArray": "String"}
+ 
+ user_opaque_type_mapping = {}  # contains user defined opaque type mapping
+ 
++def makeCIdentifier(value):
++    keywords = frozenset(["double", "int", "float", "char"])
++    sanitized = re.sub(r'[^\w]', '', value)
++    if sanitized in keywords:
++        return "_" + sanitized
++    else:
++        return sanitized
++
+ class TypeNotDefinedException(Exception):
+     pass
+ 
+@@ -139,12 +147,21 @@ class EnumerationType(Type):
+             if child.tag == "{http://opcfoundation.org/BinarySchema/}EnumeratedValue":
+                 self.elements[child.get("Name")] = child.get("Value")
  
 +    def conversion2perl(self):
 +        return "\tsv_setiv(out, *in);"
 +    def conversion2c(self):
 +        return "\t*out = SvIV(in);"
-+
++    
+ 
  class OpaqueType(Type):
-     def __init__(self, outname, xml, namespace, baseType):
+     def __init__(self, outname, xml, namespace, base_type):
          Type.__init__(self, outname, xml, namespace)
-@@ -265,6 +270,11 @@ class OpaqueType(Type):
-     def typedef_h(self):
-         return "typedef UA_" + self.baseType + " UA_%s;" % self.name
+         self.base_type = base_type
  
 +    def conversion2perl(self):
-+        return "\tpack_UA_%s(out, in);" % self.baseType
++        return "\tpack_UA_%s(out, in);" % self.base_type
 +    def conversion2c(self):
-+        return "\tunpack_UA_%s(out, in);" % self.baseType
-+
- class StructType(Type):
-     def __init__(self, outname, xml, namespace):
-         Type.__init__(self, outname, xml, namespace)
-@@ -314,6 +324,110 @@ class StructType(Type):
-                 returnstr += "    UA_%s %s;\n" % (makeCIdentifier(member.memberType.name), makeCIdentifier(member.name))
-         return returnstr + "} UA_%s;" % makeCIdentifier(self.name)
++        return "\tunpack_UA_%s(out, in);" % self.base_type
+ 
+ class StructMember(object):
+     def __init__(self, name, member_type, is_array, is_optional):
+@@ -212,6 +229,109 @@ class StructType(Type):
+             if m.is_array or m.is_optional or not m.member_type.pointerfree:
+                 self.pointerfree = False
  
 +    def conversion2perl(self):
 +        if len(self.members) == 0:
@@ -43,7 +137,7 @@ Index: tools/generate_datatypes.py
 +
 +        hasArray = False
 +        for member in self.members:
-+            if member.isArray:
++            if member.is_array:
 +                hasArray = True
 +                break
 +
@@ -62,8 +156,8 @@ Index: tools/generate_datatypes.py
 +        for member in self.members:
 +            field = makeCIdentifier(member.name)
 +            fieldp = "%s_%s" % (self.name, field)
-+            type = makeCIdentifier(member.memberType.name)
-+            if member.isArray:
++            type = makeCIdentifier(member.member_type.name)
++            if member.is_array:
 +                returnstr += """	av = newAV();
 +	hv_stores(hv, "%s", newRV_noinc((SV*)av));
 +	av_extend(av, in->%sSize);
@@ -89,7 +183,7 @@ Index: tools/generate_datatypes.py
 +
 +        hasArray = False
 +        for member in self.members:
-+            if member.isArray:
++            if member.is_array:
 +                hasArray = True
 +                break
 +
@@ -111,16 +205,16 @@ Index: tools/generate_datatypes.py
 +        for member in self.members:
 +            field = makeCIdentifier(member.name)
 +            fieldp = "%s_%s" % (self.name, field)
-+            index = member.memberType.typeIndex
-+            type = makeCIdentifier(member.memberType.name)
-+            if member.isArray:
++            type = makeCIdentifier(member.member_type.name)
++            index = type.upper()
++            if member.is_array:
 +                returnstr += """	svp = hv_fetchs(hv, "%s", 0);
 +	if (svp != NULL) {
 +		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV)
 +			CROAK("No ARRAY reference for %s");
 +		av = (AV*)SvRV(*svp);
 +		top = av_top_index(av);
-+		out->%s = UA_Array_new(top + 1, &UA_TYPES[%s]);
++		out->%s = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_%s]);
 +		if (out->%s == NULL)
 +			CROAKE("UA_Array_new");
 +		out->%sSize = top + 1;
@@ -140,75 +234,6 @@ Index: tools/generate_datatypes.py
 +""" % (fieldp, type, field)
 +        returnstr += "	return;"
 +        return returnstr 
-+
- #########################
- # Parse Typedefinitions #
- #########################
-@@ -558,6 +672,7 @@ fh = open(args.outfile + "_generated.h", 'w')
- ff = open(args.outfile + "_generated_handling.h", 'w')
- fe = open(args.outfile + "_generated_encoding_binary.h", 'w')
- fc = open(args.outfile + "_generated.c",'w')
-+fp = open(args.outfile + "_generated-Open62541-packed.xsh",'w')
- def printh(string):
-     print(string, end='\n', file=fh)
- def printf(string):
-@@ -566,6 +681,8 @@ def printe(string):
-     print(string, end='\n', file=fe)
- def printc(string):
-     print(string, end='\n', file=fc)
-+def printp(string):
-+    print(string, end='\n', file=fp)
  
- def iter_types(v):
-     l = None
-@@ -628,6 +745,45 @@ _UA_END_DECLS
- 
- #endif /* %s_GENERATED_H_ */''' % outname.upper())
- 
-+#########################
-+# Print Perl Conversion #
-+#########################
-+
-+filtered_types = iter_types(types)
-+
-+for i, t in enumerate(filtered_types):
-+    tn = t.name
-+    printp("/* %s */" % tn)
-+    printp("#ifdef UA_TYPES_%s" % tn.upper())
-+    printp("static void pack_UA_%s(SV *out, const UA_%s *in);" % (tn, tn))
-+    printp("static void unpack_UA_%s(UA_%s *out, SV *in);" % (tn, tn))
-+    if type(t) != BuiltinType:
-+        printp("""
-+static void
-+pack_UA_%s(SV *out, const UA_%s *in)
-+{
-+\tdTHX;""" % (tn, tn))
-+        printp(t.conversion2perl())
-+        printp("}")
-+        printp("""
-+static void
-+unpack_UA_%s(UA_%s *out, SV *in)
-+{
-+\tdTHX;""" % (tn, tn))
-+        printp(t.conversion2c())
-+        printp("}")
-+    else:
-+        if tn in ["Boolean", "SByte", "Byte", "Int16", "UInt16", "Int32",
-+                  "UInt32", "Int64", "UInt64", "String", "ByteString",
-+                  "NodeId", "QualifiedName", "LocalizedText", "Double",
-+                  "Float", "Guid", "StatusCode", "DateTime", "Variant",
-+                  "DataValue", "XmlElement", "ExpandedNodeId",
-+                  "DiagnosticInfo", "ExtensionObject"]:
-+            printp("/* implemented in Open62541.xs */")
-+    printp("#endif")
-+    if i != len(filtered_types) - 1:
-+        printp("")
-+
- ##################
- # Print Handling #
- ##################
-@@ -709,3 +865,4 @@ fh.close()
- ff.close()
- fc.close()
- fe.close()
-+fp.close()
+ class TypeParser():
+     __metaclass__ = abc.ABCMeta

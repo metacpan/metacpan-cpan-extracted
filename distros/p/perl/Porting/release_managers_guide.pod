@@ -22,6 +22,35 @@ POD.
 
  $ perl Porting/make-rmg-checklist --html --version [5.X.Y-RC#] > /tmp/rmg.html
 
+This file serves as a template for the checklist. In particular, the following
+placeholders in the instructions below are recognized and expanded by
+F<Porting/make-rmg-checklist>:
+
+=over
+
+=item C<5.X.Y>
+
+The perl version whose release is being prepared (e.g. C<5.41.9>).
+
+=item C<5.X>
+
+The perl version whose release is being prepared, but without the final
+component (e.g. C<5.41>).
+
+=item C<5.LAST>
+
+The "previous" perl version. Normally, this is just C<5.X.(Y-1)>, but if the
+last component is 0, it subtracts 2 from the middle component:
+
+    5.X.Y       5.LAST
+    ======      ======
+    5.41.9  ->  5.41.8
+    5.40.1  ->  5.40.0
+    5.40.0  ->  5.38.0
+    5.41.0  ->  5.39.0
+
+=back
+
 =head1 SYNOPSIS
 
 This document describes the series of tasks required - some automatic, some
@@ -148,14 +177,17 @@ Andreas' email address at:
 
 =head3 GitHub access
 
-You will need a working C<git> installation, checkout of the perl
-git repository and perl commit bit.  For information about working
-with perl and git, see L<perlgit>.
+You will need a working C<git> installation and a checkout of the perl
+git repository.  For information about working with perl and git, see
+L<perlgit>.
 
-If you are not yet a perl committer, you won't be able to make a
-release.  You will need to have a GitHub account (if you don't have one)
-and contact the Steering Council with your username to get membership in the
-L<< Perl-Releasers|https://github.com/orgs/Perl/teams/perl-releasers >> team.
+You will also need a L<GitHub account|https://github.com/>, a perl commit bit
+and be a member of the L<Perl
+Releasers|https://github.com/orgs/Perl/teams/perl-releasers> team.  If you are
+not yet a perl committer, you won't be able to commit changes to the main
+repository; if you are not in Perl Releasers, you won't be able to push new
+version tags.  Contact the Steering Council with your GitHub username to be
+added to the Perl Releasers team.
 
 =head3 Web-based file share
 
@@ -793,7 +825,7 @@ an entry has been added by F<corelist-perldelta.pl>.
 
 You should add pod links for GitHub issue references thusly:
 
- $ perl -gpi -e 's{\b(?:GH|github)\s*#(\d+)}{L<GH #$1|https://github.com/Perl/perl5/issues/$1>}ig' pod/perldelta.pod
+ $ perl -gpi -e 's{(?<!<)\b(?:GH|github)\s*#(\d+)}{L<GH #$1|https://github.com/Perl/perl5/issues/$1>}ig' pod/perldelta.pod
 
 Re-read the perldelta to try to find any embarrassing typos and thinkos;
 remove any C<TODO> or C<XXX> flags; update the "Known Problems" section
@@ -1092,9 +1124,10 @@ which is why you should test from the tarball.
 
 =head4 Run the Installation Verification Procedure utility
 
- $ ./perl -Ilib ./utils/perlivp
+ $ bin/perlivp
+
  # Or, perhaps:
- $ ./perl5.X.Y ./utils/perlivp5.X.Y
+ $ bin/perlivp5.X.Y
  ...
  All tests successful.
  $
@@ -1358,7 +1391,7 @@ Skip to the end of its test output to see the options it offers you.
 
 When C<make test_porting> passes, commit the new perldelta.
 
- $ git commit -m'New perldelta for 5.X.Y'
+ $ git commit -m'Archive perldelta 5.X.Y'
 
 =back
 
@@ -1574,7 +1607,7 @@ about blead's current version.
 Commit and push your changes.
 
  $ git add -u
- $ git commit -m "Prepare Module::Corelist for 5.X.Y"
+ $ git commit -m "Prepare Module::Corelist"
  $ git push origin
 
 =back

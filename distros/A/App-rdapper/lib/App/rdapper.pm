@@ -26,7 +26,7 @@ use constant {
 use vars qw($VERSION);
 use strict;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 #
 # global arg variables (note: nopager is now ignored)
@@ -415,7 +415,7 @@ sub display_object {
 
     if ($object->can('name')) {
         my $name = $object->name->name;
-        my $xname = $object->can('unicodeName') ? $object->unicodeName : $name;
+        my $xname = $object->can('unicodeName') ? $object->unicodeName || $name : $name;
 
         if ($xname ne $name) {
             $package->print_kv('Name', sprintf('%s (%s)', uc($xname), uc($name)));

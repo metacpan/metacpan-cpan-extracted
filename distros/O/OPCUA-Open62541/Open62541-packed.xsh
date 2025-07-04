@@ -1,3 +1,4 @@
+
 /* Boolean */
 #ifdef UA_TYPES_BOOLEAN
 static void pack_UA_Boolean(SV *out, const UA_Boolean *in);
@@ -193,6 +194,26 @@ unpack_UA_NamingRuleType(UA_NamingRuleType *out, SV *in)
 }
 #endif
 
+/* Enumeration */
+#ifdef UA_TYPES_ENUMERATION
+static void pack_UA_Enumeration(SV *out, const UA_Enumeration *in);
+static void unpack_UA_Enumeration(UA_Enumeration *out, SV *in);
+
+static void
+pack_UA_Enumeration(SV *out, const UA_Enumeration *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_Enumeration(UA_Enumeration *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
 /* ImageBMP */
 #ifdef UA_TYPES_IMAGEBMP
 static void pack_UA_ImageBMP(SV *out, const UA_ImageBMP *in);
@@ -364,6 +385,122 @@ unpack_UA_KeyValuePair(UA_KeyValuePair *out, SV *in)
 }
 #endif
 
+/* AdditionalParametersType */
+#ifdef UA_TYPES_ADDITIONALPARAMETERSTYPE
+static void pack_UA_AdditionalParametersType(SV *out, const UA_AdditionalParametersType *in);
+static void unpack_UA_AdditionalParametersType(UA_AdditionalParametersType *out, SV *in);
+
+static void
+pack_UA_AdditionalParametersType(SV *out, const UA_AdditionalParametersType *in)
+{
+	dTHX;
+	SV *sv;
+	AV *av;
+	size_t i;
+	HV *hv;
+
+	hv = newHV();
+	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
+
+	av = newAV();
+	hv_stores(hv, "AdditionalParametersType_parameters", newRV_noinc((SV*)av));
+	av_extend(av, in->parametersSize);
+	for (i = 0; i < in->parametersSize; i++) {
+		sv = newSV(0);
+		av_push(av, sv);
+		pack_UA_KeyValuePair(sv, &in->parameters[i]);
+	}
+
+	return;
+}
+
+static void
+unpack_UA_AdditionalParametersType(UA_AdditionalParametersType *out, SV *in)
+{
+	dTHX;
+	SV **svp;
+	AV *av;
+	ssize_t i, top;
+	HV *hv;
+
+	SvGETMAGIC(in);
+	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV)
+		CROAK("Not a HASH reference");
+	UA_AdditionalParametersType_init(out);
+	hv = (HV*)SvRV(in);
+
+	svp = hv_fetchs(hv, "AdditionalParametersType_parameters", 0);
+	if (svp != NULL) {
+		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV)
+			CROAK("No ARRAY reference for AdditionalParametersType_parameters");
+		av = (AV*)SvRV(*svp);
+		top = av_top_index(av);
+		out->parameters = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_KEYVALUEPAIR]);
+		if (out->parameters == NULL)
+			CROAKE("UA_Array_new");
+		out->parametersSize = top + 1;
+		for (i = 0; i <= top; i++) {
+			svp = av_fetch(av, i, 0);
+			if (svp != NULL)
+				unpack_UA_KeyValuePair(&out->parameters[i], *svp);
+		}
+	}
+
+	return;
+}
+#endif
+
+/* EphemeralKeyType */
+#ifdef UA_TYPES_EPHEMERALKEYTYPE
+static void pack_UA_EphemeralKeyType(SV *out, const UA_EphemeralKeyType *in);
+static void unpack_UA_EphemeralKeyType(UA_EphemeralKeyType *out, SV *in);
+
+static void
+pack_UA_EphemeralKeyType(SV *out, const UA_EphemeralKeyType *in)
+{
+	dTHX;
+	SV *sv;
+	HV *hv;
+
+	hv = newHV();
+	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
+
+	sv = newSV(0);
+	hv_stores(hv, "EphemeralKeyType_publicKey", sv);
+	pack_UA_ByteString(sv, &in->publicKey);
+
+	sv = newSV(0);
+	hv_stores(hv, "EphemeralKeyType_signature", sv);
+	pack_UA_ByteString(sv, &in->signature);
+
+	return;
+}
+
+static void
+unpack_UA_EphemeralKeyType(UA_EphemeralKeyType *out, SV *in)
+{
+	dTHX;
+	SV **svp;
+	HV *hv;
+
+	SvGETMAGIC(in);
+	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV)
+		CROAK("Not a HASH reference");
+	UA_EphemeralKeyType_init(out);
+	hv = (HV*)SvRV(in);
+
+	svp = hv_fetchs(hv, "EphemeralKeyType_publicKey", 0);
+	if (svp != NULL)
+		unpack_UA_ByteString(&out->publicKey, *svp);
+
+	svp = hv_fetchs(hv, "EphemeralKeyType_signature", 0);
+	if (svp != NULL)
+		unpack_UA_ByteString(&out->signature, *svp);
+
+	return;
+}
+#endif
+
 /* RationalNumber */
 #ifdef UA_TYPES_RATIONALNUMBER
 static void pack_UA_RationalNumber(SV *out, const UA_RationalNumber *in);
@@ -412,26 +549,6 @@ unpack_UA_RationalNumber(UA_RationalNumber *out, SV *in)
 		unpack_UA_UInt32(&out->denominator, *svp);
 
 	return;
-}
-#endif
-
-/* Vector */
-#ifdef UA_TYPES_VECTOR
-static void pack_UA_Vector(SV *out, const UA_Vector *in);
-static void unpack_UA_Vector(UA_Vector *out, SV *in);
-
-static void
-pack_UA_Vector(SV *out, const UA_Vector *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_Vector(UA_Vector *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
 }
 #endif
 
@@ -494,26 +611,6 @@ unpack_UA_ThreeDVector(UA_ThreeDVector *out, SV *in)
 }
 #endif
 
-/* CartesianCoordinates */
-#ifdef UA_TYPES_CARTESIANCOORDINATES
-static void pack_UA_CartesianCoordinates(SV *out, const UA_CartesianCoordinates *in);
-static void unpack_UA_CartesianCoordinates(UA_CartesianCoordinates *out, SV *in);
-
-static void
-pack_UA_CartesianCoordinates(SV *out, const UA_CartesianCoordinates *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_CartesianCoordinates(UA_CartesianCoordinates *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
 /* ThreeDCartesianCoordinates */
 #ifdef UA_TYPES_THREEDCARTESIANCOORDINATES
 static void pack_UA_ThreeDCartesianCoordinates(SV *out, const UA_ThreeDCartesianCoordinates *in);
@@ -573,26 +670,6 @@ unpack_UA_ThreeDCartesianCoordinates(UA_ThreeDCartesianCoordinates *out, SV *in)
 }
 #endif
 
-/* Orientation */
-#ifdef UA_TYPES_ORIENTATION
-static void pack_UA_Orientation(SV *out, const UA_Orientation *in);
-static void unpack_UA_Orientation(UA_Orientation *out, SV *in);
-
-static void
-pack_UA_Orientation(SV *out, const UA_Orientation *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_Orientation(UA_Orientation *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
 /* ThreeDOrientation */
 #ifdef UA_TYPES_THREEDORIENTATION
 static void pack_UA_ThreeDOrientation(SV *out, const UA_ThreeDOrientation *in);
@@ -649,26 +726,6 @@ unpack_UA_ThreeDOrientation(UA_ThreeDOrientation *out, SV *in)
 		unpack_UA_Double(&out->c, *svp);
 
 	return;
-}
-#endif
-
-/* Frame */
-#ifdef UA_TYPES_FRAME
-static void pack_UA_Frame(SV *out, const UA_Frame *in);
-static void unpack_UA_Frame(UA_Frame *out, SV *in);
-
-static void
-pack_UA_Frame(SV *out, const UA_Frame *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_Frame(UA_Frame *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
 }
 #endif
 
@@ -1312,26 +1369,6 @@ unpack_UA_ConfigurationVersionDataType(UA_ConfigurationVersionDataType *out, SV 
 }
 #endif
 
-/* PublishedDataSetSourceDataType */
-#ifdef UA_TYPES_PUBLISHEDDATASETSOURCEDATATYPE
-static void pack_UA_PublishedDataSetSourceDataType(SV *out, const UA_PublishedDataSetSourceDataType *in);
-static void unpack_UA_PublishedDataSetSourceDataType(UA_PublishedDataSetSourceDataType *out, SV *in);
-
-static void
-pack_UA_PublishedDataSetSourceDataType(SV *out, const UA_PublishedDataSetSourceDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_PublishedDataSetSourceDataType(UA_PublishedDataSetSourceDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
 /* PublishedVariableDataType */
 #ifdef UA_TYPES_PUBLISHEDVARIABLEDATATYPE
 static void pack_UA_PublishedVariableDataType(SV *out, const UA_PublishedVariableDataType *in);
@@ -1667,106 +1704,6 @@ unpack_UA_DataSetWriterDataType(UA_DataSetWriterDataType *out, SV *in)
 }
 #endif
 
-/* DataSetWriterTransportDataType */
-#ifdef UA_TYPES_DATASETWRITERTRANSPORTDATATYPE
-static void pack_UA_DataSetWriterTransportDataType(SV *out, const UA_DataSetWriterTransportDataType *in);
-static void unpack_UA_DataSetWriterTransportDataType(UA_DataSetWriterTransportDataType *out, SV *in);
-
-static void
-pack_UA_DataSetWriterTransportDataType(SV *out, const UA_DataSetWriterTransportDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_DataSetWriterTransportDataType(UA_DataSetWriterTransportDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* DataSetWriterMessageDataType */
-#ifdef UA_TYPES_DATASETWRITERMESSAGEDATATYPE
-static void pack_UA_DataSetWriterMessageDataType(SV *out, const UA_DataSetWriterMessageDataType *in);
-static void unpack_UA_DataSetWriterMessageDataType(UA_DataSetWriterMessageDataType *out, SV *in);
-
-static void
-pack_UA_DataSetWriterMessageDataType(SV *out, const UA_DataSetWriterMessageDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_DataSetWriterMessageDataType(UA_DataSetWriterMessageDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* WriterGroupTransportDataType */
-#ifdef UA_TYPES_WRITERGROUPTRANSPORTDATATYPE
-static void pack_UA_WriterGroupTransportDataType(SV *out, const UA_WriterGroupTransportDataType *in);
-static void unpack_UA_WriterGroupTransportDataType(UA_WriterGroupTransportDataType *out, SV *in);
-
-static void
-pack_UA_WriterGroupTransportDataType(SV *out, const UA_WriterGroupTransportDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_WriterGroupTransportDataType(UA_WriterGroupTransportDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* WriterGroupMessageDataType */
-#ifdef UA_TYPES_WRITERGROUPMESSAGEDATATYPE
-static void pack_UA_WriterGroupMessageDataType(SV *out, const UA_WriterGroupMessageDataType *in);
-static void unpack_UA_WriterGroupMessageDataType(UA_WriterGroupMessageDataType *out, SV *in);
-
-static void
-pack_UA_WriterGroupMessageDataType(SV *out, const UA_WriterGroupMessageDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_WriterGroupMessageDataType(UA_WriterGroupMessageDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* ConnectionTransportDataType */
-#ifdef UA_TYPES_CONNECTIONTRANSPORTDATATYPE
-static void pack_UA_ConnectionTransportDataType(SV *out, const UA_ConnectionTransportDataType *in);
-static void unpack_UA_ConnectionTransportDataType(UA_ConnectionTransportDataType *out, SV *in);
-
-static void
-pack_UA_ConnectionTransportDataType(SV *out, const UA_ConnectionTransportDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_ConnectionTransportDataType(UA_ConnectionTransportDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
 /* NetworkAddressDataType */
 #ifdef UA_TYPES_NETWORKADDRESSDATATYPE
 static void pack_UA_NetworkAddressDataType(SV *out, const UA_NetworkAddressDataType *in);
@@ -1858,106 +1795,6 @@ unpack_UA_NetworkAddressUrlDataType(UA_NetworkAddressUrlDataType *out, SV *in)
 		unpack_UA_String(&out->url, *svp);
 
 	return;
-}
-#endif
-
-/* ReaderGroupTransportDataType */
-#ifdef UA_TYPES_READERGROUPTRANSPORTDATATYPE
-static void pack_UA_ReaderGroupTransportDataType(SV *out, const UA_ReaderGroupTransportDataType *in);
-static void unpack_UA_ReaderGroupTransportDataType(UA_ReaderGroupTransportDataType *out, SV *in);
-
-static void
-pack_UA_ReaderGroupTransportDataType(SV *out, const UA_ReaderGroupTransportDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_ReaderGroupTransportDataType(UA_ReaderGroupTransportDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* ReaderGroupMessageDataType */
-#ifdef UA_TYPES_READERGROUPMESSAGEDATATYPE
-static void pack_UA_ReaderGroupMessageDataType(SV *out, const UA_ReaderGroupMessageDataType *in);
-static void unpack_UA_ReaderGroupMessageDataType(UA_ReaderGroupMessageDataType *out, SV *in);
-
-static void
-pack_UA_ReaderGroupMessageDataType(SV *out, const UA_ReaderGroupMessageDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_ReaderGroupMessageDataType(UA_ReaderGroupMessageDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* DataSetReaderTransportDataType */
-#ifdef UA_TYPES_DATASETREADERTRANSPORTDATATYPE
-static void pack_UA_DataSetReaderTransportDataType(SV *out, const UA_DataSetReaderTransportDataType *in);
-static void unpack_UA_DataSetReaderTransportDataType(UA_DataSetReaderTransportDataType *out, SV *in);
-
-static void
-pack_UA_DataSetReaderTransportDataType(SV *out, const UA_DataSetReaderTransportDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_DataSetReaderTransportDataType(UA_DataSetReaderTransportDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* DataSetReaderMessageDataType */
-#ifdef UA_TYPES_DATASETREADERMESSAGEDATATYPE
-static void pack_UA_DataSetReaderMessageDataType(SV *out, const UA_DataSetReaderMessageDataType *in);
-static void unpack_UA_DataSetReaderMessageDataType(UA_DataSetReaderMessageDataType *out, SV *in);
-
-static void
-pack_UA_DataSetReaderMessageDataType(SV *out, const UA_DataSetReaderMessageDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_DataSetReaderMessageDataType(UA_DataSetReaderMessageDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
-/* SubscribedDataSetDataType */
-#ifdef UA_TYPES_SUBSCRIBEDDATASETDATATYPE
-static void pack_UA_SubscribedDataSetDataType(SV *out, const UA_SubscribedDataSetDataType *in);
-static void unpack_UA_SubscribedDataSetDataType(UA_SubscribedDataSetDataType *out, SV *in);
-
-static void
-pack_UA_SubscribedDataSetDataType(SV *out, const UA_SubscribedDataSetDataType *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_SubscribedDataSetDataType(UA_SubscribedDataSetDataType *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
 }
 #endif
 
@@ -2919,6 +2756,290 @@ unpack_UA_PubSubDiagnosticsCounterClassification(UA_PubSubDiagnosticsCounterClas
 }
 #endif
 
+/* AliasNameDataType */
+#ifdef UA_TYPES_ALIASNAMEDATATYPE
+static void pack_UA_AliasNameDataType(SV *out, const UA_AliasNameDataType *in);
+static void unpack_UA_AliasNameDataType(UA_AliasNameDataType *out, SV *in);
+
+static void
+pack_UA_AliasNameDataType(SV *out, const UA_AliasNameDataType *in)
+{
+	dTHX;
+	SV *sv;
+	AV *av;
+	size_t i;
+	HV *hv;
+
+	hv = newHV();
+	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
+
+	sv = newSV(0);
+	hv_stores(hv, "AliasNameDataType_aliasName", sv);
+	pack_UA_QualifiedName(sv, &in->aliasName);
+
+	av = newAV();
+	hv_stores(hv, "AliasNameDataType_referencedNodes", newRV_noinc((SV*)av));
+	av_extend(av, in->referencedNodesSize);
+	for (i = 0; i < in->referencedNodesSize; i++) {
+		sv = newSV(0);
+		av_push(av, sv);
+		pack_UA_ExpandedNodeId(sv, &in->referencedNodes[i]);
+	}
+
+	return;
+}
+
+static void
+unpack_UA_AliasNameDataType(UA_AliasNameDataType *out, SV *in)
+{
+	dTHX;
+	SV **svp;
+	AV *av;
+	ssize_t i, top;
+	HV *hv;
+
+	SvGETMAGIC(in);
+	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV)
+		CROAK("Not a HASH reference");
+	UA_AliasNameDataType_init(out);
+	hv = (HV*)SvRV(in);
+
+	svp = hv_fetchs(hv, "AliasNameDataType_aliasName", 0);
+	if (svp != NULL)
+		unpack_UA_QualifiedName(&out->aliasName, *svp);
+
+	svp = hv_fetchs(hv, "AliasNameDataType_referencedNodes", 0);
+	if (svp != NULL) {
+		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV)
+			CROAK("No ARRAY reference for AliasNameDataType_referencedNodes");
+		av = (AV*)SvRV(*svp);
+		top = av_top_index(av);
+		out->referencedNodes = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_EXPANDEDNODEID]);
+		if (out->referencedNodes == NULL)
+			CROAKE("UA_Array_new");
+		out->referencedNodesSize = top + 1;
+		for (i = 0; i <= top; i++) {
+			svp = av_fetch(av, i, 0);
+			if (svp != NULL)
+				unpack_UA_ExpandedNodeId(&out->referencedNodes[i], *svp);
+		}
+	}
+
+	return;
+}
+#endif
+
+/* Duplex */
+#ifdef UA_TYPES_DUPLEX
+static void pack_UA_Duplex(SV *out, const UA_Duplex *in);
+static void unpack_UA_Duplex(UA_Duplex *out, SV *in);
+
+static void
+pack_UA_Duplex(SV *out, const UA_Duplex *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_Duplex(UA_Duplex *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* InterfaceAdminStatus */
+#ifdef UA_TYPES_INTERFACEADMINSTATUS
+static void pack_UA_InterfaceAdminStatus(SV *out, const UA_InterfaceAdminStatus *in);
+static void unpack_UA_InterfaceAdminStatus(UA_InterfaceAdminStatus *out, SV *in);
+
+static void
+pack_UA_InterfaceAdminStatus(SV *out, const UA_InterfaceAdminStatus *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_InterfaceAdminStatus(UA_InterfaceAdminStatus *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* InterfaceOperStatus */
+#ifdef UA_TYPES_INTERFACEOPERSTATUS
+static void pack_UA_InterfaceOperStatus(SV *out, const UA_InterfaceOperStatus *in);
+static void unpack_UA_InterfaceOperStatus(UA_InterfaceOperStatus *out, SV *in);
+
+static void
+pack_UA_InterfaceOperStatus(SV *out, const UA_InterfaceOperStatus *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_InterfaceOperStatus(UA_InterfaceOperStatus *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* NegotiationStatus */
+#ifdef UA_TYPES_NEGOTIATIONSTATUS
+static void pack_UA_NegotiationStatus(SV *out, const UA_NegotiationStatus *in);
+static void unpack_UA_NegotiationStatus(UA_NegotiationStatus *out, SV *in);
+
+static void
+pack_UA_NegotiationStatus(SV *out, const UA_NegotiationStatus *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_NegotiationStatus(UA_NegotiationStatus *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* TsnFailureCode */
+#ifdef UA_TYPES_TSNFAILURECODE
+static void pack_UA_TsnFailureCode(SV *out, const UA_TsnFailureCode *in);
+static void unpack_UA_TsnFailureCode(UA_TsnFailureCode *out, SV *in);
+
+static void
+pack_UA_TsnFailureCode(SV *out, const UA_TsnFailureCode *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_TsnFailureCode(UA_TsnFailureCode *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* TsnStreamState */
+#ifdef UA_TYPES_TSNSTREAMSTATE
+static void pack_UA_TsnStreamState(SV *out, const UA_TsnStreamState *in);
+static void unpack_UA_TsnStreamState(UA_TsnStreamState *out, SV *in);
+
+static void
+pack_UA_TsnStreamState(SV *out, const UA_TsnStreamState *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_TsnStreamState(UA_TsnStreamState *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* TsnTalkerStatus */
+#ifdef UA_TYPES_TSNTALKERSTATUS
+static void pack_UA_TsnTalkerStatus(SV *out, const UA_TsnTalkerStatus *in);
+static void unpack_UA_TsnTalkerStatus(UA_TsnTalkerStatus *out, SV *in);
+
+static void
+pack_UA_TsnTalkerStatus(SV *out, const UA_TsnTalkerStatus *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_TsnTalkerStatus(UA_TsnTalkerStatus *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* TsnListenerStatus */
+#ifdef UA_TYPES_TSNLISTENERSTATUS
+static void pack_UA_TsnListenerStatus(SV *out, const UA_TsnListenerStatus *in);
+static void unpack_UA_TsnListenerStatus(UA_TsnListenerStatus *out, SV *in);
+
+static void
+pack_UA_TsnListenerStatus(SV *out, const UA_TsnListenerStatus *in)
+{
+	dTHX;
+	sv_setiv(out, *in);
+}
+
+static void
+unpack_UA_TsnListenerStatus(UA_TsnListenerStatus *out, SV *in)
+{
+	dTHX;
+	*out = SvIV(in);
+}
+#endif
+
+/* UnsignedRationalNumber */
+#ifdef UA_TYPES_UNSIGNEDRATIONALNUMBER
+static void pack_UA_UnsignedRationalNumber(SV *out, const UA_UnsignedRationalNumber *in);
+static void unpack_UA_UnsignedRationalNumber(UA_UnsignedRationalNumber *out, SV *in);
+
+static void
+pack_UA_UnsignedRationalNumber(SV *out, const UA_UnsignedRationalNumber *in)
+{
+	dTHX;
+	SV *sv;
+	HV *hv;
+
+	hv = newHV();
+	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
+
+	sv = newSV(0);
+	hv_stores(hv, "UnsignedRationalNumber_numerator", sv);
+	pack_UA_UInt32(sv, &in->numerator);
+
+	sv = newSV(0);
+	hv_stores(hv, "UnsignedRationalNumber_denominator", sv);
+	pack_UA_UInt32(sv, &in->denominator);
+
+	return;
+}
+
+static void
+unpack_UA_UnsignedRationalNumber(UA_UnsignedRationalNumber *out, SV *in)
+{
+	dTHX;
+	SV **svp;
+	HV *hv;
+
+	SvGETMAGIC(in);
+	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV)
+		CROAK("Not a HASH reference");
+	UA_UnsignedRationalNumber_init(out);
+	hv = (HV*)SvRV(in);
+
+	svp = hv_fetchs(hv, "UnsignedRationalNumber_numerator", 0);
+	if (svp != NULL)
+		unpack_UA_UInt32(&out->numerator, *svp);
+
+	svp = hv_fetchs(hv, "UnsignedRationalNumber_denominator", 0);
+	if (svp != NULL)
+		unpack_UA_UInt32(&out->denominator, *svp);
+
+	return;
+}
+#endif
+
 /* IdType */
 #ifdef UA_TYPES_IDTYPE
 static void pack_UA_IdType(SV *out, const UA_IdType *in);
@@ -3665,26 +3786,6 @@ unpack_UA_OptionSet(UA_OptionSet *out, SV *in)
 }
 #endif
 
-/* Union */
-#ifdef UA_TYPES_UNION
-static void pack_UA_Union(SV *out, const UA_Union *in);
-static void unpack_UA_Union(UA_Union *out, SV *in);
-
-static void
-pack_UA_Union(SV *out, const UA_Union *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_Union(UA_Union *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
 /* NormalizedString */
 #ifdef UA_TYPES_NORMALIZEDSTRING
 static void pack_UA_NormalizedString(SV *out, const UA_NormalizedString *in);
@@ -3819,6 +3920,46 @@ pack_UA_UtcTime(SV *out, const UA_UtcTime *in)
 
 static void
 unpack_UA_UtcTime(UA_UtcTime *out, SV *in)
+{
+	dTHX;
+	unpack_UA_DateTime(out, in);
+}
+#endif
+
+/* Time */
+#ifdef UA_TYPES_TIME
+static void pack_UA_Time(SV *out, const UA_Time *in);
+static void unpack_UA_Time(UA_Time *out, SV *in);
+
+static void
+pack_UA_Time(SV *out, const UA_Time *in)
+{
+	dTHX;
+	pack_UA_String(out, in);
+}
+
+static void
+unpack_UA_Time(UA_Time *out, SV *in)
+{
+	dTHX;
+	unpack_UA_String(out, in);
+}
+#endif
+
+/* Date */
+#ifdef UA_TYPES_DATE
+static void pack_UA_Date(SV *out, const UA_Date *in);
+static void unpack_UA_Date(UA_Date *out, SV *in);
+
+static void
+pack_UA_Date(SV *out, const UA_Date *in)
+{
+	dTHX;
+	pack_UA_DateTime(out, in);
+}
+
+static void
+unpack_UA_Date(UA_Date *out, SV *in)
 {
 	dTHX;
 	unpack_UA_DateTime(out, in);
@@ -4345,20 +4486,9 @@ pack_UA_SessionlessInvokeRequestType(SV *out, const UA_SessionlessInvokeRequestT
 	hv = newHV();
 	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
 
-#ifdef HAVE_UA_SESSIONLESSINVOKEREQUESTTYPE_URISVERSIONSIZE
-	av = newAV();
-	hv_stores(hv, "SessionlessInvokeRequestType_urisVersion", newRV_noinc((SV*)av));
-	av_extend(av, in->urisVersionSize);
-	for (i = 0; i < in->urisVersionSize; i++) {
-		sv = newSV(0);
-		av_push(av, sv);
-		pack_UA_UInt32(sv, &in->urisVersion[i]);
-	}
-#else
 	sv = newSV(0);
 	hv_stores(hv, "SessionlessInvokeRequestType_urisVersion", sv);
 	pack_UA_UInt32(sv, &in->urisVersion);
-#endif
 
 	av = newAV();
 	hv_stores(hv, "SessionlessInvokeRequestType_namespaceUris", newRV_noinc((SV*)av));
@@ -4409,28 +4539,9 @@ unpack_UA_SessionlessInvokeRequestType(UA_SessionlessInvokeRequestType *out, SV 
 	UA_SessionlessInvokeRequestType_init(out);
 	hv = (HV*)SvRV(in);
 
-#ifdef HAVE_UA_SESSIONLESSINVOKEREQUESTTYPE_URISVERSIONSIZE
-	svp = hv_fetchs(hv, "SessionlessInvokeRequestType_urisVersion", 0);
-	if (svp != NULL) {
-		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV)
-			CROAK("No ARRAY reference for SessionlessInvokeRequestType_urisVersion");
-		av = (AV*)SvRV(*svp);
-		top = av_top_index(av);
-		out->urisVersion = UA_Array_new(top + 1, &UA_TYPES[UA_TYPES_UINT32]);
-		if (out->urisVersion == NULL)
-			CROAKE("UA_Array_new");
-		out->urisVersionSize = top + 1;
-		for (i = 0; i <= top; i++) {
-			svp = av_fetch(av, i, 0);
-			if (svp != NULL)
-				unpack_UA_UInt32(&out->urisVersion[i], *svp);
-		}
-	}
-#else
 	svp = hv_fetchs(hv, "SessionlessInvokeRequestType_urisVersion", 0);
 	if (svp != NULL)
 		unpack_UA_UInt32(&out->urisVersion, *svp);
-#endif
 
 	svp = hv_fetchs(hv, "SessionlessInvokeRequestType_namespaceUris", 0);
 	if (svp != NULL) {
@@ -5698,26 +5809,6 @@ unpack_UA_RegisterServerResponse(UA_RegisterServerResponse *out, SV *in)
 }
 #endif
 
-/* DiscoveryConfiguration */
-#ifdef UA_TYPES_DISCOVERYCONFIGURATION
-static void pack_UA_DiscoveryConfiguration(SV *out, const UA_DiscoveryConfiguration *in);
-static void unpack_UA_DiscoveryConfiguration(UA_DiscoveryConfiguration *out, SV *in);
-
-static void
-pack_UA_DiscoveryConfiguration(SV *out, const UA_DiscoveryConfiguration *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_DiscoveryConfiguration(UA_DiscoveryConfiguration *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
 /* MdnsDiscoveryConfiguration */
 #ifdef UA_TYPES_MDNSDISCOVERYCONFIGURATION
 static void pack_UA_MdnsDiscoveryConfiguration(SV *out, const UA_MdnsDiscoveryConfiguration *in);
@@ -6955,6 +7046,26 @@ pack_UA_RsaEncryptedSecret(SV *out, const UA_RsaEncryptedSecret *in)
 
 static void
 unpack_UA_RsaEncryptedSecret(UA_RsaEncryptedSecret *out, SV *in)
+{
+	dTHX;
+	unpack_UA_ByteString(out, in);
+}
+#endif
+
+/* EccEncryptedSecret */
+#ifdef UA_TYPES_ECCENCRYPTEDSECRET
+static void pack_UA_EccEncryptedSecret(SV *out, const UA_EccEncryptedSecret *in);
+static void unpack_UA_EccEncryptedSecret(UA_EccEncryptedSecret *out, SV *in);
+
+static void
+pack_UA_EccEncryptedSecret(SV *out, const UA_EccEncryptedSecret *in)
+{
+	dTHX;
+	pack_UA_ByteString(out, in);
+}
+
+static void
+unpack_UA_EccEncryptedSecret(UA_EccEncryptedSecret *out, SV *in)
 {
 	dTHX;
 	unpack_UA_ByteString(out, in);
@@ -11028,43 +11139,23 @@ unpack_UA_Counter(UA_Counter *out, SV *in)
 }
 #endif
 
-/* Time */
-#ifdef UA_TYPES_TIME
-static void pack_UA_Time(SV *out, const UA_Time *in);
-static void unpack_UA_Time(UA_Time *out, SV *in);
+/* OpaqueNumericRange */
+#ifdef UA_TYPES_OPAQUENUMERICRANGE
+static void pack_UA_OpaqueNumericRange(SV *out, const UA_OpaqueNumericRange *in);
+static void unpack_UA_OpaqueNumericRange(UA_OpaqueNumericRange *out, SV *in);
 
 static void
-pack_UA_Time(SV *out, const UA_Time *in)
+pack_UA_OpaqueNumericRange(SV *out, const UA_OpaqueNumericRange *in)
 {
 	dTHX;
 	pack_UA_String(out, in);
 }
 
 static void
-unpack_UA_Time(UA_Time *out, SV *in)
+unpack_UA_OpaqueNumericRange(UA_OpaqueNumericRange *out, SV *in)
 {
 	dTHX;
 	unpack_UA_String(out, in);
-}
-#endif
-
-/* Date */
-#ifdef UA_TYPES_DATE
-static void pack_UA_Date(SV *out, const UA_Date *in);
-static void unpack_UA_Date(UA_Date *out, SV *in);
-
-static void
-pack_UA_Date(SV *out, const UA_Date *in)
-{
-	dTHX;
-	pack_UA_DateTime(out, in);
-}
-
-static void
-unpack_UA_Date(UA_Date *out, SV *in)
-{
-	dTHX;
-	unpack_UA_DateTime(out, in);
 }
 #endif
 
@@ -11640,26 +11731,6 @@ unpack_UA_ContentFilter(UA_ContentFilter *out, SV *in)
 	}
 
 	return;
-}
-#endif
-
-/* FilterOperand */
-#ifdef UA_TYPES_FILTEROPERAND
-static void pack_UA_FilterOperand(SV *out, const UA_FilterOperand *in);
-static void unpack_UA_FilterOperand(UA_FilterOperand *out, SV *in);
-
-static void
-pack_UA_FilterOperand(SV *out, const UA_FilterOperand *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_FilterOperand(UA_FilterOperand *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
 }
 #endif
 
@@ -12986,26 +13057,6 @@ unpack_UA_HistoryReadResult(UA_HistoryReadResult *out, SV *in)
 		unpack_UA_ExtensionObject(&out->historyData, *svp);
 
 	return;
-}
-#endif
-
-/* HistoryReadDetails */
-#ifdef UA_TYPES_HISTORYREADDETAILS
-static void pack_UA_HistoryReadDetails(SV *out, const UA_HistoryReadDetails *in);
-static void unpack_UA_HistoryReadDetails(UA_HistoryReadDetails *out, SV *in);
-
-static void
-pack_UA_HistoryReadDetails(SV *out, const UA_HistoryReadDetails *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_HistoryReadDetails(UA_HistoryReadDetails *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
 }
 #endif
 
@@ -14889,26 +14940,6 @@ unpack_UA_DeadbandType(UA_DeadbandType *out, SV *in)
 }
 #endif
 
-/* MonitoringFilter */
-#ifdef UA_TYPES_MONITORINGFILTER
-static void pack_UA_MonitoringFilter(SV *out, const UA_MonitoringFilter *in);
-static void unpack_UA_MonitoringFilter(UA_MonitoringFilter *out, SV *in);
-
-static void
-pack_UA_MonitoringFilter(SV *out, const UA_MonitoringFilter *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_MonitoringFilter(UA_MonitoringFilter *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-#endif
-
 /* DataChangeFilter */
 #ifdef UA_TYPES_DATACHANGEFILTER
 static void pack_UA_DataChangeFilter(SV *out, const UA_DataChangeFilter *in);
@@ -15180,26 +15211,6 @@ unpack_UA_AggregateFilter(UA_AggregateFilter *out, SV *in)
 		unpack_UA_AggregateConfiguration(&out->aggregateConfiguration, *svp);
 
 	return;
-}
-#endif
-
-/* MonitoringFilterResult */
-#ifdef UA_TYPES_MONITORINGFILTERRESULT
-static void pack_UA_MonitoringFilterResult(SV *out, const UA_MonitoringFilterResult *in);
-static void unpack_UA_MonitoringFilterResult(UA_MonitoringFilterResult *out, SV *in);
-
-static void
-pack_UA_MonitoringFilterResult(SV *out, const UA_MonitoringFilterResult *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_MonitoringFilterResult(UA_MonitoringFilterResult *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
 }
 #endif
 
@@ -17280,26 +17291,6 @@ unpack_UA_NotificationMessage(UA_NotificationMessage *out, SV *in)
 	}
 
 	return;
-}
-#endif
-
-/* NotificationData */
-#ifdef UA_TYPES_NOTIFICATIONDATA
-static void pack_UA_NotificationData(SV *out, const UA_NotificationData *in);
-static void unpack_UA_NotificationData(UA_NotificationData *out, SV *in);
-
-static void
-pack_UA_NotificationData(SV *out, const UA_NotificationData *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
-}
-
-static void
-unpack_UA_NotificationData(UA_NotificationData *out, SV *in)
-{
-	dTHX;
-	CROAK("No conversion implemented");
 }
 #endif
 
@@ -20220,15 +20211,9 @@ pack_UA_ProgramDiagnostic2DataType(SV *out, const UA_ProgramDiagnostic2DataType 
 	hv_stores(hv, "ProgramDiagnostic2DataType_lastMethodCallTime", sv);
 	pack_UA_DateTime(sv, &in->lastMethodCallTime);
 
-#ifdef HAVE_UA_PROGRAMDIAGNOSTIC2DATATYPE_STATUSRESULT
-	sv = newSV(0);
-	hv_stores(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", sv);
-	pack_UA_StatusResult(sv, &in->lastMethodReturnStatus);
-#else
 	sv = newSV(0);
 	hv_stores(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", sv);
 	pack_UA_StatusCode(sv, &in->lastMethodReturnStatus);
-#endif
 
 	return;
 }
@@ -20344,15 +20329,9 @@ unpack_UA_ProgramDiagnostic2DataType(UA_ProgramDiagnostic2DataType *out, SV *in)
 	if (svp != NULL)
 		unpack_UA_DateTime(&out->lastMethodCallTime, *svp);
 
-#ifdef HAVE_UA_PROGRAMDIAGNOSTIC2DATATYPE_STATUSRESULT
-	svp = hv_fetchs(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", 0);
-	if (svp != NULL)
-		unpack_UA_StatusResult(&out->lastMethodReturnStatus, *svp);
-#else
 	svp = hv_fetchs(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", 0);
 	if (svp != NULL)
 		unpack_UA_StatusCode(&out->lastMethodReturnStatus, *svp);
-#endif
 
 	return;
 }

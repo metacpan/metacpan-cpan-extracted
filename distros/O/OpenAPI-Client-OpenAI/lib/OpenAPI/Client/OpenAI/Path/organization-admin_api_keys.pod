@@ -76,21 +76,7 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
     {
        "data" : [
-          {
-             "created_at" : 1711471533,
-             "id" : "key_abc",
-             "name" : "Administration Key",
-             "object" : "organization.admin_api_key",
-             "owner" : {
-                "created_at" : 1711471533,
-                "id" : "sa_456",
-                "name" : "My Service Account",
-                "role" : "member",
-                "type" : "service_account"
-             },
-             "redacted_value" : "sk-admin...def",
-             "value" : "sk-admin-1234abcd"
-          }
+          "{\n  \"object\": \"organization.admin_api_key\",\n  \"id\": \"key_abc\",\n  \"name\": \"Main Admin Key\",\n  \"redacted_value\": \"sk-admin...xyz\",\n  \"created_at\": 1711471533,\n  \"last_used_at\": 1711471534,\n  \"owner\": {\n    \"type\": \"user\",\n    \"object\": \"organization.user\",\n    \"id\": \"user_123\",\n    \"name\": \"John Doe\",\n    \"created_at\": 1711471533,\n    \"role\": \"owner\"\n  }\n}\n"
        ],
        "first_id" : "key_abc",
        "has_more" : false,
@@ -158,19 +144,20 @@ The newly created admin API key.
 Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
 
     {
-       "created_at" : 1711471533,
-       "id" : "key_abc",
-       "name" : "Administration Key",
-       "object" : "organization.admin_api_key",
-       "owner" : {
-          "created_at" : 1711471533,
-          "id" : "sa_456",
-          "name" : "My Service Account",
-          "role" : "member",
-          "type" : "service_account"
-       },
-       "redacted_value" : "sk-admin...def",
-       "value" : "sk-admin-1234abcd"
+      "object": "organization.admin_api_key",
+      "id": "key_abc",
+      "name": "Main Admin Key",
+      "redacted_value": "sk-admin...xyz",
+      "created_at": 1711471533,
+      "last_used_at": 1711471534,
+      "owner": {
+        "type": "user",
+        "object": "organization.user",
+        "id": "user_123",
+        "name": "John Doe",
+        "created_at": 1711471533,
+        "role": "owner"
+      }
     }
 
 

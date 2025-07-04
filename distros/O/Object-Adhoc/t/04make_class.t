@@ -39,9 +39,11 @@ my $YYY2 = $yyy->new( foo => 666, bar => 999 );
 is $YYY2->foo, 666;
 is $YYY2->bar, 999;
 
-ok !eval {
+my $e;
+eval {
 	$yyy->new( foo => 666, bar => 999, baz => 111 );
 	1;
-};
+} or $e = $@;
+like $e, qr/Bad key: baz/;
 
 done_testing;

@@ -6,7 +6,7 @@ use File::Spec::Functions qw(catfile);
 
 use Mojo::Base 'OpenAPI::Client';
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 sub new {
     my ( $class, $specification ) = ( shift, shift );

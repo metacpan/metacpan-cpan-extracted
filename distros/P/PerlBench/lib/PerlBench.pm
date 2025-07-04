@@ -4,7 +4,7 @@ use strict;
 use base 'Exporter';
 our @EXPORT_OK = qw(timeit timeit_once make_timeit_sub make_timeit_sub_code);
 
-our $VERSION = "1.005";
+our $VERSION = "1.006";
 
 use PerlBench::Stats qw(calc_stats);
 use PerlBench::Utils qw(sec_f);

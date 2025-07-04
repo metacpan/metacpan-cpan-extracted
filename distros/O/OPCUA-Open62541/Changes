@@ -1,5 +1,20 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+2.08 2025-07-04
+  * Actually ship opcua-dump script with the distribution.
+
+2.07 2025-07-03
+  * New tool "opcua_dump" that recursively browses the OPC UA address
+    space of a server and dumps all nodes with their references and
+    attributes.
+  * Implemented some higher functionalities to easily get attributes,
+    references and mappings between some constant IDs and names.
+  * Updated generated packed types and functions to reflect
+    changes to constants.
+  * Implement synchronous client read, browseNext, findServers and
+    getEndpoints functions.
+  * Provide accessors to client config timeout.
+
 2.06 2025-04-17
   * For open62541 1.4 use secureChannelPKI and sessionPKI instead
     of certificateVerification.

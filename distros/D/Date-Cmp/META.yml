@@ -1,5 +1,5 @@
 ---
-abstract: 'A Perl module for improving grammar using an external API.'
+abstract: 'Compare two dates with approximate parsing support'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Date-Cmp/issues
   homepage: https://metacpan.org/pod/Date::Cmp
   repository: git://github.com/nigelhorne/Date-Cmp.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

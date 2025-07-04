@@ -46,6 +46,9 @@ DESCRIPTION
             `object(\%data, \@keys)` is a shortcut for `object(\%data, keys =>
             \@keys)`.
 
+            When `keys` and `recurse` are both used, `keys` only applies to
+            the root hashref.
+
     `make_class(\@keys, %opts)`
         Just makes the class, but doesn't bless a hashref into it. Returns a
         string which is the name of the class. If called repeatedly with the
@@ -54,7 +57,13 @@ DESCRIPTION
         By default, the class won't have a `new` method; if you need to create
         objects, you can just directly bless hashrefs into it.
 
-        Supported options.
+          my $k = make_class( 'foo', 'bar' );
+          my $o = bless { foo => 'Hello', bar => 'World' }, $k;
+          if ( $o->isa($k) ) {
+            say $o->foo, q( ), $o->bar;
+          }
+
+        Supported options:
 
         `ctor`
             Whether to create a constructor called `new`. Defaults to false.
@@ -150,8 +159,8 @@ SEE ALSO
 
     I'd recommend Object::Adhoc if you want read-only accessors, or
     Hash::Objectify if you want read-write accessors. Use Object::Anon only if
-    you need the additional features it supports for overloading, and custom
-    methods to nested data structures.
+    you need the additional features it supports like overloading and custom
+    methods.
 
   Not Quite So Similar Modules
     Object::Result - fairly different idea, but can be used for similar

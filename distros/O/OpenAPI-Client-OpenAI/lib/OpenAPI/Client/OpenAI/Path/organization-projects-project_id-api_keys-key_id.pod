@@ -137,6 +137,7 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
         "redacted_value": "sk-abc...def",
         "name": "My API Key",
         "created_at": 1711471533,
+        "last_used_at": 1711471534,
         "id": "key_abc",
         "owner": {
             "type": "user",

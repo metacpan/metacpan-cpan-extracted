@@ -8,6 +8,9 @@ Makefile.PL
 MANIFEST
 README.md
 VERSION
+AUTHOR
+HISTORY
 examples/sample.ans
+examples/banner.vt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

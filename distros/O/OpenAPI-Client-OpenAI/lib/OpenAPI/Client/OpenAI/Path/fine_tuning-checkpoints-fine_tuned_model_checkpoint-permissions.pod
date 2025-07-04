@@ -1,0 +1,183 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_checkpoint-permissions - Documentation for the /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions>.
+
+=head1 PATHS
+
+
+=head2 C<GET /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions>
+
+B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys>.
+
+Organization owners can use this endpoint to view all permissions for a fine-tuned model checkpoint.
+
+
+
+=head3 Operation ID
+
+C<listFineTuningCheckpointPermissions>
+
+    $client->listFineTuningCheckpointPermissions( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<fine_tuned_model_checkpoint> (in path) (Required) - The ID of the fine-tuned model checkpoint to get permissions for.
+
+
+Type: C<string>
+
+
+
+=item * C<project_id> (in query) (Optional) - The ID of the project to get permissions for.
+
+Type: C<string>
+
+
+
+=item * C<after> (in query) (Optional) - Identifier for the last permission ID from the previous pagination request.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - Number of permissions to retrieve.
+
+Type: C<integer>
+
+
+Default: C<10>
+
+
+=item * C<order> (in query) (Optional) - The order in which to retrieve permissions.
+
+Type: C<string>
+
+Allowed values: C<ascending, descending>
+
+
+Default: C<descending>
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"object\": \"checkpoint.permission\",\n  \"id\": \"cp_zc4Q7MP6XxulcVzj4MZdwsAB\",\n  \"created_at\": 1712211699,\n  \"project_id\": \"proj_abGMw1llN8IrBb6SvvY5A1iH\"\n}\n"
+       ]
+    }
+
+
+=back
+
+=head2 C<POST /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions>
+
+B<NOTE:> Calling this endpoint requires an L<admin API key|../admin-api-keys>.
+
+This enables organization owners to share fine-tuned models with other projects in their organization.
+
+
+
+=head3 Operation ID
+
+C<createFineTuningCheckpointPermission>
+
+    $client->createFineTuningCheckpointPermission( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<fine_tuned_model_checkpoint> (in path) (Required) - The ID of the fine-tuned model checkpoint to create a permission for.
+
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+      
+Example:
+
+    {
+       "project_ids" : [
+          null
+       ]
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"object\": \"checkpoint.permission\",\n  \"id\": \"cp_zc4Q7MP6XxulcVzj4MZdwsAB\",\n  \"created_at\": 1712211699,\n  \"project_id\": \"proj_abGMw1llN8IrBb6SvvY5A1iH\"\n}\n"
+       ]
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

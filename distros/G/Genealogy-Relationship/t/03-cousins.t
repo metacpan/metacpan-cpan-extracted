@@ -73,7 +73,7 @@ is($rel->get_relationship($generations[9][0], $generations[9][1]),
 is($rel->get_relationship($generations[8][0], $generations[5][1]),
    'Fourth cousin three times removed');
 
-can_ok($rel, 'abbr');
+# can_ok($rel, 'abbr');
 
 # Test a higher number for abbr
 $rel = Genealogy::Relationship->new(abbr => 4);

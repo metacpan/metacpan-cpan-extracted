@@ -1,4 +1,4 @@
-package Extism v0.3.0;
+package Extism v0.3.1;
 
 use 5.016;
 use strict;

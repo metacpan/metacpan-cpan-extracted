@@ -1,5 +1,8 @@
 Revision history for Perl module perlbench
 
+1.006 2025-07-03T17:13:15Z
+	* removed apostrophe package separator (#12)
+
 1.005 2025-04-14T19:22:58Z
 	* require a newer version.pm for v5.10.1 tests
 

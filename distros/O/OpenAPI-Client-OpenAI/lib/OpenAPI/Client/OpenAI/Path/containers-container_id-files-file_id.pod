@@ -1,0 +1,132 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id - Documentation for the /containers/{container_id}/files/{file_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</containers/{container_id}/files/{file_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /containers/{container_id}/files/{file_id}>
+
+Delete Container File
+
+
+Delete a container file.
+
+
+
+=head3 Operation ID
+
+C<DeleteContainerFile>
+
+    $client->DeleteContainerFile( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<container_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=item * C<file_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+OK
+
+
+=head2 C<GET /containers/{container_id}/files/{file_id}>
+
+Retrieve Container File
+
+
+Retrieves a container file.
+
+
+
+=head3 Operation ID
+
+C<RetrieveContainerFile>
+
+    $client->RetrieveContainerFile( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<container_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=item * C<file_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Success
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+        "id": "cfile_682e0e8a43c88191a7978f477a09bdf5",
+        "object": "container.file",
+        "created_at": 1747848842,
+        "bytes": 880,
+        "container_id": "cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04",
+        "path": "/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json",
+        "source": "user"
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

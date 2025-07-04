@@ -1,5 +1,16 @@
 Revision history for Device-AVR-UPDI
 
+0.18    2025-07-03
+        [CHANGES]
+         * Expand shell globs in configured serial port paths
+
+        [BUGFIXES]
+         * Ensure that `erase` command actually works, by remembering to load
+         * Generate correct partinfo flash size field for parts with more than
+           32Ki of flash
+         * Support reading and writing Intel Hex files with 0x02 record type,
+           required for devices with flash sizes above 64Ki
+
 0.17    2025-06-09
         [CHANGES]
          * Allow a user-specific config file to override --port and --baud

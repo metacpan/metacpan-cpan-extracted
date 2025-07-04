@@ -203,15 +203,27 @@ my $symtab = \%{"OPCUA::Open62541::"};
 use strict;
 
 our (@EXPORT_OK, %EXPORT_TAGS);
+my (%mapping_attributeid_ids, %mapping_attributeid_names);
 foreach my $prefix (keys %hash) {
     while (my ($name, $scalar) = each %{$hash{$prefix}}) {
 	next unless defined $scalar;  # has typedef, implemented in XS
 	Internals::SvREADONLY($scalar, 1);
 	$symtab->{$name} = \$scalar;
+	if ($prefix eq 'ATTRIBUTEID') {
+	    my $short = lc($name);
+	    $short =~ s/^${prefix}_//i;
+	    $mapping_attributeid_ids{$short} = $scalar;
+	    $mapping_attributeid_names{$scalar} = $short;
+	}
     }
     push @EXPORT_OK, keys %{$hash{$prefix}};
     $EXPORT_TAGS{$prefix} = [keys %{$hash{$prefix}}];
 }
+
+$symtab->{get_mapping_attributeid_ids} = sub { %mapping_attributeid_ids };
+$symtab->{get_mapping_attributeid_names} = sub { %mapping_attributeid_names };
+push @EXPORT_OK, qw(get_mapping_attributeid_ids get_mapping_attributeid_names);
+
 mro::method_changed_in("OPCUA::Open62541");
 
 1;
@@ -272,6 +284,14 @@ EOPODHEADER
 sub print_pod_footer {
     my ($pf) = @_;
     print $pf <<"EOPODFOOTER";
+=item get_mapping_attributeid_ids
+
+Returns a hash which maps shorter attribute names to the attribute IDs.
+
+=item get_mapping_attributeid_names
+
+Returns a hash which maps the attribute IDs to shorter attribute names.
+
 =back
 
 =head1 SEE ALSO

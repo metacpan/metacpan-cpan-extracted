@@ -7,6 +7,7 @@ use CXC::Data::Visitor '-all';
 use Ref::Util 'is_refref', 'is_arrayref';
 use Scalar::Util 'refaddr';
 use experimental 'signatures', 'postderef', 'lexical_subs';
+use Data::Dump 'pp';
 
 sub myhash {
     (
@@ -439,6 +440,27 @@ subtest 'visit' => sub {
         );
 
     };
+
+};
+
+subtest 'sort' => sub {
+
+    my %hash = myhash;
+
+    my @order;
+
+    visit(
+        \%hash,
+        sub ( $kydx, $vref, @ ) {
+            push @order, $kydx;
+            return RESULT_CONTINUE;
+        },
+        visit     => VISIT_ALL,
+        sort_keys => sub { $_[1] cmp $_[0] },
+    );
+
+    is( \@order, [qw( c e d 0 1 2 b 0 1 2 a )] )
+      or diag pp @order;
 
 };
 

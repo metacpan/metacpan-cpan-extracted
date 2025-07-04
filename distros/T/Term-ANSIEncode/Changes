@@ -5,3 +5,18 @@
 1.06    Jul 2, 2025
 
         Better version handling
+
+1.07    Jul 3, 2025
+
+        Added AUTHOR and HISTORY files and small improvements to the executable
+
+1.08    Jul 3, 2025
+
+        Vastly improved token handling, expanded symbols, and improved
+		documentation.
+
+		New symbol list feature as well as search.
+
+1.09    Jul 3, 2025
+
+        Automatic version handling improved.

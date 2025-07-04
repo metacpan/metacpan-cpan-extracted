@@ -13,7 +13,7 @@ This document describes the API endpoint at C</images/variations>.
 
 =head2 C<POST /images/variations>
 
-Creates a variation of a given image.
+Creates a variation of a given image. This endpoint only supports C<dall-e-2>.
 
 
 
@@ -80,9 +80,25 @@ OK
 Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
 
     {
-       "data" : [
-          "{\n  \"url\": \"...\",\n  \"revised_prompt\": \"...\"\n}\n"
-       ]
+      "created": 1713833628,
+      "data": [
+        {
+          "b64_json": "..."
+        }
+      ],
+      "background": "transparent",
+      "output_format": "png",
+      "size": "1024x1024",
+      "quality": "high",
+      "usage": {
+        "total_tokens": 100,
+        "input_tokens": 50,
+        "output_tokens": 50,
+        "input_tokens_details": {
+          "text_tokens": 10,
+          "image_tokens": 40
+        }
+      }
     }
 
 

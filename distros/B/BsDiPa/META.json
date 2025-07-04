@@ -4,7 +4,7 @@
       "Steffen Nurpmeso <steffen@sdaoden.eu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.7.0",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v0.8.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

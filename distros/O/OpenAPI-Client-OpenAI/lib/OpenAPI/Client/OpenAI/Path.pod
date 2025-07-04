@@ -184,6 +184,75 @@ See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id-messages> fo
 
 See L<OpenAPI::Client::OpenAI::Path::completions> for more details.
 
+=head2 C</containers>
+
+=over
+
+=item * C<GET> - List Containers
+
+
+=item * C<POST> - Create Container
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::containers> for more details.
+
+=head2 C</containers/{container_id}>
+
+=over
+
+=item * C<DELETE> - Delete Container
+
+
+=item * C<GET> - Retrieve Container
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id> for more details.
+
+=head2 C</containers/{container_id}/files>
+
+=over
+
+=item * C<GET> - List Container files
+
+
+=item * C<POST> - Create a Container File
+
+You can send either a multipart/form-data request with the raw file content, or a JSON request with a file ID.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files> for more details.
+
+=head2 C</containers/{container_id}/files/{file_id}>
+
+=over
+
+=item * C<DELETE> - Delete Container File
+
+
+=item * C<GET> - Retrieve Container File
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id> for more details.
+
+=head2 C</containers/{container_id}/files/{file_id}/content>
+
+=over
+
+=item * C<GET> - Retrieve Container File Content
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id-content> for more details.
+
 =head2 C</embeddings>
 
 =over
@@ -194,6 +263,92 @@ See L<OpenAPI::Client::OpenAI::Path::completions> for more details.
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::embeddings> for more details.
+
+=head2 C</evals>
+
+=over
+
+=item * C<GET> - List evaluations for a project.
+
+
+=item * C<POST> - Create the structure of an evaluation that can be used to test a model's performance.
+An evaluation is a set of testing criteria and the config for a data source, which dictates the schema of the data used in the evaluation. After creating an evaluation, you can run it on different models and model parameters. We support several types of graders and datasources.
+For more information, see the L<Evals guide|https://platform.openai.com/docs/guides/evals>.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::evals> for more details.
+
+=head2 C</evals/{eval_id}>
+
+=over
+
+=item * C<DELETE> - Delete an evaluation.
+
+
+=item * C<GET> - Get an evaluation by ID.
+
+
+=item * C<POST> - Update certain properties of an evaluation.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id> for more details.
+
+=head2 C</evals/{eval_id}/runs>
+
+=over
+
+=item * C<GET> - Get a list of runs for an evaluation.
+
+
+=item * C<POST> - Kicks off a new run for a given evaluation, specifying the data source, and what model configuration to use to test. The datasource will be validated against the schema specified in the config of the evaluation.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs> for more details.
+
+=head2 C</evals/{eval_id}/runs/{run_id}>
+
+=over
+
+=item * C<DELETE> - Delete an eval run.
+
+
+=item * C<GET> - Get an evaluation run by ID.
+
+
+=item * C<POST> - Cancel an ongoing evaluation run.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id> for more details.
+
+=head2 C</evals/{eval_id}/runs/{run_id}/output_items>
+
+=over
+
+=item * C<GET> - Get a list of output items for an evaluation run.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items> for more details.
+
+=head2 C</evals/{eval_id}/runs/{run_id}/output_items/{output_item_id}>
+
+=over
+
+=item * C<GET> - Get an evaluation run output item by ID.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items-output_item_id> for more details.
 
 =head2 C</files>
 
@@ -242,14 +397,31 @@ See L<OpenAPI::Client::OpenAI::Path::files-file_id> for more details.
 
 See L<OpenAPI::Client::OpenAI::Path::files-file_id-content> for more details.
 
-=head2 C</fine_tuning/checkpoints/{permission_id}/permissions>
+=head2 C</fine_tuning/alpha/graders/run>
 
 =over
 
-=item * C<DELETE> - B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys>.
+=item * C<POST> - Run a grader.
 
-Organization owners can use this endpoint to delete a permission for a fine-tuned model checkpoint.
 
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-run> for more details.
+
+=head2 C</fine_tuning/alpha/graders/validate>
+
+=over
+
+=item * C<POST> - Validate a grader.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-validate> for more details.
+
+=head2 C</fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions>
+
+=over
 
 =item * C<GET> - B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys>.
 
@@ -263,7 +435,20 @@ This enables organization owners to share fine-tuned models with other projects 
 
 =back
 
-See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-permission_id-permissions> for more details.
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_checkpoint-permissions> for more details.
+
+=head2 C</fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions/{permission_id}>
+
+=over
+
+=item * C<DELETE> - B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys>.
+
+Organization owners can use this endpoint to delete a permission for a fine-tuned model checkpoint.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_checkpoint-permissions-permission_id> for more details.
 
 =head2 C</fine_tuning/jobs>
 
@@ -276,7 +461,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-permission_id-permi
 
 Response includes details of the enqueued job including job status and the name of the fine-tuned models once complete.
 
-L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/fine-tuning>
+L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/model-optimization>
 
 
 =back
@@ -289,7 +474,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs> for more details.
 
 =item * C<GET> - Get info about a fine-tuning job.
 
-L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/fine-tuning>
+L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/model-optimization>
 
 
 =back
@@ -329,11 +514,33 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-checkpo
 
 See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-events> for more details.
 
+=head2 C</fine_tuning/jobs/{fine_tuning_job_id}/pause>
+
+=over
+
+=item * C<POST> - Pause a fine-tune job.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-pause> for more details.
+
+=head2 C</fine_tuning/jobs/{fine_tuning_job_id}/resume>
+
+=over
+
+=item * C<POST> - Resume a fine-tune job.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-resume> for more details.
+
 =head2 C</images/edits>
 
 =over
 
-=item * C<POST> - Creates an edited or extended image given an original image and a prompt.
+=item * C<POST> - Creates an edited or extended image given one or more source images and a prompt. This endpoint only supports C<gpt-image-1> and C<dall-e-2>.
 
 
 =back
@@ -344,7 +551,7 @@ See L<OpenAPI::Client::OpenAI::Path::images-edits> for more details.
 
 =over
 
-=item * C<POST> - Creates an image given a prompt.
+=item * C<POST> - Creates an image given a prompt. L<Learn more|https://platform.openai.com/docs/guides/images>.
 
 
 =back
@@ -355,7 +562,7 @@ See L<OpenAPI::Client::OpenAI::Path::images-generations> for more details.
 
 =over
 
-=item * C<POST> - Creates a variation of a given image.
+=item * C<POST> - Creates a variation of a given image. This endpoint only supports C<dall-e-2>.
 
 
 =back
@@ -437,6 +644,69 @@ See L<OpenAPI::Client::OpenAI::Path::organization-admin_api_keys-key_id> for mor
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::organization-audit_logs> for more details.
+
+=head2 C</organization/certificates>
+
+=over
+
+=item * C<GET> - List uploaded certificates for this organization.
+
+
+=item * C<POST> - Upload a certificate to the organization. This does B<not> automatically activate the certificate.
+
+Organizations can upload up to 50 certificates.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates> for more details.
+
+=head2 C</organization/certificates/activate>
+
+=over
+
+=item * C<POST> - Activate certificates at the organization level.
+
+You can atomically and idempotently activate up to 10 certificates at a time.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-activate> for more details.
+
+=head2 C</organization/certificates/deactivate>
+
+=over
+
+=item * C<POST> - Deactivate certificates at the organization level.
+
+You can atomically and idempotently deactivate up to 10 certificates at a time.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-deactivate> for more details.
+
+=head2 C</organization/certificates/{certificate_id}>
+
+=over
+
+=item * C<DELETE> - Delete a certificate from the organization.
+
+The certificate must be inactive for the organization and all projects.
+
+
+=item * C<GET> - Get a certificate that has been uploaded to the organization.
+
+You can get a certificate regardless of whether it is active or not.
+
+
+=item * C<POST> - Modify a certificate. Note that only the name can be modified.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-certificate_id> for more details.
 
 =head2 C</organization/costs>
 
@@ -540,6 +810,42 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys-k
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-archive> for more details.
+
+=head2 C</organization/projects/{project_id}/certificates>
+
+=over
+
+=item * C<GET> - List certificates for this project.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates> for more details.
+
+=head2 C</organization/projects/{project_id}/certificates/activate>
+
+=over
+
+=item * C<POST> - Activate certificates at the project level.
+
+You can atomically and idempotently activate up to 10 certificates at a time.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-activate> for more details.
+
+=head2 C</organization/projects/{project_id}/certificates/deactivate>
+
+=over
+
+=item * C<POST> - Deactivate certificates at the project level. You can atomically and 
+idempotently deactivate up to 10 certificates at a time.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-deactivate> for more details.
 
 =head2 C</organization/projects/{project_id}/rate_limits>
 
@@ -802,6 +1108,19 @@ See L<OpenAPI::Client::OpenAI::Path::responses> for more details.
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::responses-response_id> for more details.
+
+=head2 C</responses/{response_id}/cancel>
+
+=over
+
+=item * C<POST> - Cancels a model response with the given ID. Only responses created with
+the C<background> parameter set to C<true> can be cancelled. 
+L<Learn more|https://platform.openai.com/docs/guides/background>.
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::responses-response_id-cancel> for more details.
 
 =head2 C</responses/{response_id}/input_items>
 

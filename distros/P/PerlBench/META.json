@@ -48,8 +48,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1",
-            "version" : "0.86"
+            "Test::More" : "1"
          }
       }
    },
@@ -65,6 +64,6 @@
          "web" : "https://github.com/briandfoy/perlbench"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,176 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::containers - Documentation for the /containers path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</containers>.
+
+=head1 PATHS
+
+
+=head2 C<GET /containers>
+
+List Containers
+
+
+Lists containers.
+
+
+
+=head3 Operation ID
+
+C<ListContainers>
+
+    $client->ListContainers( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
+
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<desc>
+
+
+=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
+
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Success
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n   \"id\": \"cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863\",\n   \"object\": \"container\",\n   \"created_at\": 1747844794,\n   \"status\": \"running\",\n   \"expires_after\": {\n     \"anchor\": \"last_active_at\",\n     \"minutes\": 20\n   },\n   \"last_active_at\": 1747844794,\n   \"name\": \"My Container\"\n}\n"
+       ]
+    }
+
+
+=back
+
+=head2 C<POST /containers>
+
+Create Container
+
+
+Creates a container.
+
+
+
+=head3 Operation ID
+
+C<CreateContainer>
+
+    $client->CreateContainer( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+      
+Example:
+
+    {
+       "expires_after" : null,
+       "file_ids" : [
+          null
+       ]
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Success
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "id": "cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863",
+       "object": "container",
+       "created_at": 1747844794,
+       "status": "running",
+       "expires_after": {
+         "anchor": "last_active_at",
+         "minutes": 20
+       },
+       "last_active_at": 1747844794,
+       "name": "My Container"
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

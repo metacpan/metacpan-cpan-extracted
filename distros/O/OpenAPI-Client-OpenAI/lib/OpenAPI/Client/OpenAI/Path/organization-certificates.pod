@@ -1,0 +1,162 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-certificates - Documentation for the /organization/certificates path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</organization/certificates>.
+
+=head1 PATHS
+
+
+=head2 C<GET /organization/certificates>
+
+List uploaded certificates for this organization.
+
+
+
+=head3 Operation ID
+
+C<listOrganizationCertificates>
+
+    $client->listOrganizationCertificates( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
+
+
+Type: C<string>
+
+
+
+=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
+
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<desc>
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Certificates listed successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n  \"object\": \"certificate\",\n  \"id\": \"cert_abc\",\n  \"name\": \"My Certificate\",\n  \"created_at\": 1234567,\n  \"certificate_details\": {\n    \"valid_at\": 1234567,\n    \"expires_at\": 12345678,\n    \"content\": \"-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----\"\n  }\n}\n"
+       ],
+       "first_id" : "cert_abc",
+       "last_id" : "cert_abc"
+    }
+
+
+=back
+
+=head2 C<POST /organization/certificates>
+
+Upload a certificate to the organization. This does B<not> automatically activate the certificate.
+
+Organizations can upload up to 50 certificates.
+
+
+
+=head3 Operation ID
+
+C<uploadCertificate>
+
+    $client->uploadCertificate( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Certificate uploaded successfully.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "certificate",
+      "id": "cert_abc",
+      "name": "My Certificate",
+      "created_at": 1234567,
+      "certificate_details": {
+        "valid_at": 1234567,
+        "expires_at": 12345678,
+        "content": "-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----"
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

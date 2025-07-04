@@ -7,6 +7,7 @@ use Extism ':all';
 use JSON::PP qw(encode_json decode_json);
 use File::Temp qw(tempfile);
 use Devel::Peek qw(Dump);
+use POSIX ();
 plan tests => 54;
 
 # ...

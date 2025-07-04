@@ -148,6 +148,18 @@ The ID of the L<Model|https://platform.openai.com/docs/api-reference/models> to 
 
 =over 4
       
+=item * C<gpt-4.1>
+
+=item * C<gpt-4.1-mini>
+
+=item * C<gpt-4.1-nano>
+
+=item * C<gpt-4.1-2025-04-14>
+
+=item * C<gpt-4.1-mini-2025-04-14>
+
+=item * C<gpt-4.1-nano-2025-04-14>
+
 =item * C<o3-mini>
 
 =item * C<o3-mini-2025-01-31>

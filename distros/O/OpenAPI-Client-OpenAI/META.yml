@@ -21,7 +21,7 @@ configure_requires:
   File::ShareDir::Install: '0'
   IO::Socket::SSL: '2'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/nferraz/perl-openapi-client-openai/issues
   repository: https://github.com/nferraz/perl-openapi-client-openai.git
-version: '0.21'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

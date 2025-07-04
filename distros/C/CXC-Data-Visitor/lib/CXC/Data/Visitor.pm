@@ -10,7 +10,7 @@ use warnings;
 use feature 'current_sub';
 use experimental 'signatures', 'lexical_subs', 'postderef';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use base 'Exporter::Tiny';
 use Hash::Util 'lock_hash', 'unlock_hash', 'unlock_value';
@@ -109,7 +109,14 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
   SCAN: {
         last unless --$revisit_limit;
 
-        my @idx = $is_hashref ? sort keys $node->%* : keys $node->@*;
+        my @idx
+          = $is_hashref
+          ? (
+            $meta->{sort_keys}
+            ? ( sort { $meta->{sort_keys}->( $a, $b ) } keys $node->%* )
+            : sort keys $node->%*
+          )
+          : keys $node->@*;
 
         for my $idx ( @idx ) {
 
@@ -406,39 +413,13 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 sub visit ( $struct, $callback, %opts ) {
 
     is_coderef( $callback )
       or croak( q{parameter 'callback' must be a coderef} );
+
+    croak( q{parameter 'sort_keys' must be a coderef} )
+      if exists $opts{sort_keys} && !is_coderef( $opts{sort_keys} );
 
     my $context = delete $opts{context} // {};
 
@@ -448,6 +429,7 @@ sub visit ( $struct, $callback, %opts ) {
         ancestors     => [],
         container     => undef,
         revisit_limit => delete $opts{revisit_limit} // 10,
+        sort_keys     => delete $opts{sort_keys},
     );
 
     croak( "illegal value for 'revisit_limit' : $metadata{revisit_limit}" )
@@ -500,7 +482,7 @@ CXC::Data::Visitor - Invoke a callback on every element at every level of a data
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -522,27 +504,62 @@ version 0.06
 
 B<CXC::Data::Visitor> provides a means of performing a depth first
 traversal of a data structure.  There are similar modules on CPAN
-(L</SEE ALSO>); this module provides a few extras:
+(L</SEE ALSO>); this module provides a few extras.
 
 =over
 
 =item *
 
+Hashes are traversed in sorted key order.  By default the order is
+that provided by Perl's standard string sort order. The caller may
+provide a coderef to provide an alternative sort order
+(L</sort_keys>).
+
+=item *
+
+The callback is invoked first on a container and then its
+elements.  Given
+
+  { a => { b => [ 0 ], c => 2 } }
+
+the callback order is
+
+  {a}, {a}{b}, {a}{b}[0], {a}{c}
+
+=item *
+
+Blessed hashes or arrays are treated as terminal elements and are not
+further traversed.
+
+=item *
+
+Cycles are detected upon traversing a container a second time in a
+depth first search, and the resultant action is caller selectable.
+
+=item *
+
+Containers that can be reached multiple times without cycling, e.g.
+
+  %hash = ( a => { b => 1 }, );
+  $hash{c} = $hash{a};
+
+are visited once per parent, e.g.
+
+  {a}, {a}{b}, {a}{b}[0]
+  {c}, {c}{b}, {c}{b}[0]
+
+=item *
+
+A container (hash or array) may be optionally be immediately revisited.
+
+=item *
+
+An element whose value is a container may be optionally be revisited after the container is
+visited.
+
+=item *
+
 The traversal may be aborted.
-
-=item *
-
-A container (hash or array) may be immediately revisited if the
-callback requests it.
-
-=item *
-
-An element whose value is a container may be revisited after the container is
-visited if the callback requests it.
-
-=item *
-
-User selectable behavior upon detection of a traversal cycle.
 
 =item *
 
@@ -561,123 +578,13 @@ path) is available.
 Perform a depth-first traversal of B<$struct>, invoking B<$callback>
 on containers (hashes and arrays) and terminal elements in B<$struct>.
 
-=over
-
-=item *
-
-Blessed hashes or arrays are treated as terminal elements and are not
-further traversed.
-
-=item *
-
-Hashes are traversed in sorted key order.
-
-=item *
-
-Cycles are detected upon traversing a container a second time in a
-depth first search.
-
-=item *
-
-Containers that can be reached multiple times without cycling, e.g.
-
-  %hash = ( a => { b => 1 }, );
-  $hash{c} = $hash{a};
-
-are visited once per parent, e.g.
-
-  {a}, {a}{b}, {a}{b}[0]
-  {c}, {c}{b}, {c}{b}[0]
-
-=item *
-
-B<$callback> is first invoked on a container and then its
-elements.  Given
-
-  { a => { b => [ 0 ], c => 2 } }
-
-the callback order is
-
-  {a}, {a}{b}, {a}{b}[0], {a}{c}
-
-=back
-
-L</visit> returns the following:
-
-=over
-
-=item B<$completed>  => I<Boolean>
-
-I<true> if all elements were visited, I<false> if
-B<$callback> requested a premature return.
-
-=item B<$context>
-
-The variable of the same name passed to B<$callback>; see the L</context> option to L</visit>.
-
-=item B<$metadata> => I<hash>
-
-collected metadata. See L</$metadata> below.
-
-=back
+C<$struct> is the data structure to traverse, C<$callback> is a coderef
+to be applied to specified members of the structure (see  the L</visit> option),
+and C<%opts> controls optional behavior.
 
 B<$callback> will be called as:
 
   $handle_return = $callback->( $kydx, $vref, $context, \%metadata );
-
-and should return one of the following (see L</EXPORTS> to import the constants):
-
-=over
-
-=item RESULT_CONTINUE
-
-The process of visiting elements should continue.
-
-=item RESULT_RETURN
-
-L</visit> should return immediately to the caller.
-
-=item RESULT_STOP_DESCENT
-
-If the current element is a container, do not visit the container's contents
-(containers are visited before their contents).
-
-For leaf elements, this is equivalent to L</RESULT_CONTINUE>.
-
-=item RESULT_REVISIT_CONTAINER
-
-Further processing of the elements in the current container should stop
-and the container should be revisited.  This allows L</$callback> to
-modify the container and have it reprocessed.
-
-To avoid inadvertent infinite loops, a finite number of revisits
-is allowed during a traversal of a container (see L</revisit_limit>).
-Containers with multiple parents are traversed once per parent;
-The limit is reset for each traversal.
-
-=item RESULT_REVISIT_ELEMENT
-
-If the value of this element is a container, it should be revisited
-(by calling L</$callback>) after its value is visited.  This
-allows post-processing results when travelling back up the structure.
-
-During the initial visit
-
-  $metadataa->{pass} & PASS_VISIT_ELEMENT
-
-will be true.  During the followup visit
-
-  $metadata->{pass} & PASS_REVISIT_ELEMENT
-
-will be true and L</$callback> may only return values of
-B<RESULT_RETURN> and B<RESULT_CONTINUE>; any other values will cause
-an exception.
-
-The ordered contents of the L<$metadata{path}> array uniquely
-identify an element, so may be used to track elements using external data
-structures.  Do not depend upon reference addresses remaining constant.
-
-=back
 
 L</$callback> is passed
 
@@ -685,12 +592,12 @@ L</$callback> is passed
 
 =item B<$kydx>
 
-the key or index into B<$container> of the element being visited.
+the key or index into the visited element's parent container.
 
 =item B<$vref>
 
 a reference to the value of the element being visited.  Use B<$$vref>
-to get the actual value.
+to extract or modify the value.
 
 =item B<$context>
 
@@ -813,12 +720,92 @@ Invoke L</$callback> on all elements.  This is the default.
 
 =back
 
+=item sort_keys => I<coderef>
+
+An optional coderef which implements a caller specific sort order.  It
+is passed two keys as arguments.  It should return C<-1>, C<0>, or
+C<1> indicating that the sort order of the first argument is less
+than, equal to, or greater than that of the second argument.
+
 =item revisit_limit
 
-If L</$callback> returns B<RESULT_REVISIT_CONTAINER>, then the parent container
-of the element is re-scanned for its elements and revisited.  To avoid an inadvertent
+If L</$callback> returns B<RESULT_REVISIT_CONTAINER> the element's parent container
+is re-scanned for its elements and revisited.  To avoid an inadvertent
 infinite loop, an exception is thrown if the parent container is revisited more
-than this number of times.  It defaults to 10;
+than this number of times.  It defaults to 10;  Set it to C<0> to indicate no limit.
+
+=back
+
+C<$callback> should return one of the following constants (see L</EXPORTS>):
+
+=over
+
+=item RESULT_CONTINUE
+
+The process of visiting elements should continue.
+
+=item RESULT_RETURN
+
+L</visit> should return immediately to the caller.
+
+=item RESULT_STOP_DESCENT
+
+If the current element is a container, do not visit the container's contents
+(containers are visited before their contents).
+
+For leaf elements, this is equivalent to L</RESULT_CONTINUE>.
+
+=item RESULT_REVISIT_CONTAINER
+
+Further processing of the elements in the current container should stop
+and the container should be revisited.  This allows L</$callback> to
+modify the container and have it reprocessed.
+
+To avoid inadvertent infinite loops, a finite number of revisits
+is allowed during a traversal of a container (see L</revisit_limit>).
+Containers with multiple parents are traversed once per parent;
+The limit is reset for each traversal.
+
+=item RESULT_REVISIT_ELEMENT
+
+If the value of this element is a container, it should be revisited
+(by calling L</$callback>) after its value is visited.  This
+allows post-processing results when travelling back up the structure.
+
+During the initial visit
+
+  $metadataa->{pass} & PASS_VISIT_ELEMENT
+
+will be true.  During the followup visit
+
+  $metadata->{pass} & PASS_REVISIT_ELEMENT
+
+will be true and L</$callback> may only return values of
+B<RESULT_RETURN> and B<RESULT_CONTINUE>; any other values will cause
+an exception.
+
+The ordered contents of the L<$metadata{path}> array uniquely
+identify an element, so may be used to track elements using external data
+structures.  Do not depend upon reference addresses remaining constant.
+
+=back
+
+L</visit> returns the following:
+
+=over
+
+=item B<$completed>  => I<Boolean>
+
+I<true> if all elements were visited, I<false> if
+B<$callback> requested a premature return.
+
+=item B<$context>
+
+The variable of the same name passed to B<$callback>; see the L</context> option.
+
+=item B<$metadata> => I<hash>
+
+collected metadata. See L</$metadata>.
 
 =back
 

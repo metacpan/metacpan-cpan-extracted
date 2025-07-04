@@ -348,11 +348,11 @@ ERRORS
                      String base: %s
 
      check_strings():
-             Parameter '%s' must have strings definition.
-             Parameter '%s' must have right string definition.
              Parameter '%s' must be one of defined strings.
                      String: %s
                      Possible strings: %s
+             Parameter '%s' must have right string definition.
+             Parameter '%s' must have strings definition.
 
 EXAMPLE1
      use strict;
@@ -1133,10 +1133,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2024 Michal Josef Špaček
+    © 2020-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.29
+    0.30
 

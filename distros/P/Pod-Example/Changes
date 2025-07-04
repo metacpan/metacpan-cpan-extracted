@@ -1,3 +1,7 @@
+0.15 2025-07-04T11:11:09+02:00
+ - Fix MANIFEST file.
+ - Update copyright years.
+
 0.14 2023-11-21T13:54:12+01:00
  - Add test for parse example with pod comment.
  - Remove nonsense code.

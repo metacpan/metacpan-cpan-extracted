@@ -18,7 +18,7 @@ eval {
 is($EVAL_ERROR, "Parameter 'key' must be a array.\n",
 	"Parameter 'key' must be a array.");
 my $err_msg_hr = err_msg_hr();
-is($err_msg_hr->{'Reference'}, '', 'Test error parameter (Reference: ).');
+is($err_msg_hr->{'Reference'}, 'SCALAR', 'Test error parameter (Reference: SCALAR).');
 is($err_msg_hr->{'Value'}, 'foo', 'Test error parameter (Value: foo).');
 clean();
 
@@ -44,6 +44,6 @@ eval {
 is($EVAL_ERROR, "Parameter 'key' must be a array.\n",
 	"Parameter 'key' must be a array.");
 $err_msg_hr = err_msg_hr();
-is($err_msg_hr->{'Reference'}, '', 'Test error parameter (Reference: ).');
+is($err_msg_hr->{'Reference'}, 'SCALAR', 'Test error parameter (Reference: SCALAR).');
 is($err_msg_hr->{'Value'}, 'undef', 'Test error parameter (Value: undef).');
 clean();

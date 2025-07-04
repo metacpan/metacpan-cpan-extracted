@@ -89,7 +89,7 @@ our $PORT
                  "Path to the device where the UPDI adapter is connected")
    = join ",", grep { defined } $configvars{port}, "/dev/ttyUSB0";
 if( $PORT =~ m/,/ ) {
-   my $chosen_port = first { -e $_ } split m/,/, $PORT;
+   my $chosen_port = first { -e $_ } map { glob $_ } split m/,/, $PORT;
    defined $chosen_port or
       die "Cannot find a UPDI port out of $PORT\n";
    $PORT = $chosen_port;
@@ -397,6 +397,8 @@ sub command_erase
    make_updi;
 
    $updi->erase_chip( no_reset => 1 )->get;
+
+   check_signature;
 }
 
 =head2 read-flash
@@ -705,24 +707,75 @@ package main::Fileformat::Binary {
 
 package main::Fileformat::IntelHex {
    use base 'main::Fileformat';
+
+   # Because this file format was invented for Intel x86 in the 16-bit era,
+   # we have to account for its crazy 16bit offset + 16bit segment == 20bit
+   # linear addressing madness.
+
+   sub print_record {
+      my $self = shift;
+      my ( $addr, $type, $data ) = @_;
+      my $clen = length $data;
+      my $cksum = $clen + ( $addr & 0xFF ) + ( $addr >> 8 ) + $type;
+      my $encdata = "";
+      ( $encdata .= sprintf "%02X", ord $_), ( $cksum += ord $_ )
+         for split //, $data;
+      $self->printf( ":%02X%04X%02X%s%02X\n",
+         $clen, $addr, $type, $encdata, ( -$cksum ) & 0xFF );
+   }
+   sub output_chunk {
+      my $self = shift;
+      my ( $addr, $bytes ) = @_;
+
+      my $segaddr = 0;
+
+      foreach my $data ( $bytes =~ m/(.{1,16})/gs ) {
+         my $hiaddr = $addr & 0xFFFF0000;
+         if( $segaddr << 4 != $hiaddr ) {
+            $segaddr = $hiaddr >> 4;
+            $self->print_record( 0, 0x02, pack "S>", $segaddr );
+         }
+         $self->print_record( $addr & 0xFFFF, 0x00, $data );
+         $addr += length $data;
+      }
+   }
    sub output {
       my $self = shift;
       my ( $bytes ) = @_;
+
       my $addr = 0;
-      foreach my $chunk ( $bytes =~ m/(.{1,16})/gs ) {
-         my $clen = length $chunk;
-         my $cksum = $clen + ( $addr & 0xff ) + ( $addr >> 8 );
-         $self->printf( ":%02X%04X%02X", $clen, $addr, 0 );
-         foreach my $byte ( split //, $chunk ) {
-            $byte = ord $byte;
-            $cksum += $byte;
-            $self->printf( "%02X", $byte );
+      my $chunk = "";
+
+      foreach my $data ( $bytes =~ m/(.{1,16})/gs ) {
+         if( $data !~ m/[^\xff]/ ) {
+            # data contains only 0xFF bytes.
+
+            if( length $chunk ) {
+               # Write the current chunk then reset it
+
+               my $chunkaddr = $addr;
+               $addr += length $chunk;
+
+               $chunk =~ s/\xFF+$//;
+               $self->output_chunk( $chunkaddr, $chunk );
+
+               $chunk = "";
+            }
+
+            $addr += length $data;
          }
-         $self->printf( "%02X\n", ( -$cksum ) & 0xff );
-         $addr += $clen;
+         else {
+            $chunk .= $data;
+         }
       }
-      $self->print( ":00000001FF\n" );
+
+      if( length $chunk ) {
+         $self->output_chunk( $addr, $chunk );
+      }
+
+      $self->print_record( 0, 0x01, "" );
    }
+
    sub input {
       my $self = shift;
 
@@ -740,16 +793,32 @@ package main::Fileformat::IntelHex {
    sub input_chunks {
       my $self = shift;
       my @chunks; my $lastchunk;
+      my $segaddr = 0;
       while( my $line = <$self> ) {
          $line =~ s/\r?\n$//; # chomp doesn't do CRLF on Linux
          next unless my ( $clen, $addr, $type, $data, $cksum ) =
             $line =~ m/^:([0-9a-f]{2})([0-9a-f]{4})([0-9a-f]{2})([0-9a-f]*)([0-9a-f]{2})$/i;
          # TODO: check checksum
          $_ = hex $_ for $clen, $addr, $type;
-         last if $type == 1; # EOF
-         next if $type != 0; # unrecognised record
          warn "Bad record length on line $.\n" and next if
             length $data != 2 * $clen;
+         if( $type == 0x01 ) {
+            # EOF
+            last;
+         }
+         elsif( $type == 0x02 ) {
+            # Extended Segment Address; sets upper bits
+            warn "Expected 16 bits of Extended Segment Address on line $.\n" and next
+               if length $data != 4;
+            $segaddr = hex $data;
+            next;
+         }
+         elsif( $type != 0 ) {
+            warn sprintf "TODO: unrecognised input record type 0x%02X on line %d\n",
+               $type, $.;
+            next;
+         }
+         $addr |= ( $segaddr << 4 );
          $data = pack "H*", $data;
          if( $lastchunk and ( $lastchunk->[0] + length $lastchunk->[1] ) == $addr ) {
             # merge

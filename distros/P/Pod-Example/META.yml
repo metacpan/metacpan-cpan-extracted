@@ -36,4 +36,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Pod-Example
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Pod-Example
-version: '0.14'
+version: '0.15'

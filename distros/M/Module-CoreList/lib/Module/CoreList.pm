@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20250528';
+our $VERSION = '5.20250702';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -441,6 +441,7 @@ sub changes_between {
     5.041011 => '2025-04-20',
     5.041012 => '2025-04-21',
     5.041013 => '2025-05-28',
+    5.042000 => '2025-07-02',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -23417,7 +23418,34 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'strict'                => '1.14',
         },
         removed => {
-            'unicore::Name'         => 1,
+        }
+    },
+    5.042000 => {
+        delta_from => 5.041013,
+        changed => {
+            'B::Op_private'         => '5.042000',
+            'Config'                => '5.042',
+            'ExtUtils::CBuilder'    => '0.280242',
+            'ExtUtils::CBuilder::Base'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::Unix'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::VMS'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::Windows'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::Windows::BCC'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::Windows::GCC'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::Windows::MSVC'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::aix'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::android'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::cygwin'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::darwin'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::dec_osf'=> '0.280242',
+            'ExtUtils::CBuilder::Platform::os2'=> '0.280242',
+            'Module::CoreList'      => '5.20250702',
+            'Module::CoreList::Utils'=> '5.20250702',
+            'XS::APItest'           => '1.43',
+            'feature'               => '1.97',
+            'perlfaq'               => '5.20250619',
+        },
+        removed => {
         }
     },
 );
@@ -25054,6 +25082,13 @@ sub is_core
     },
     5.041013 => {
         delta_from => 5.041012,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.042000 => {
+        delta_from => 5.041013,
         changed => {
         },
         removed => {

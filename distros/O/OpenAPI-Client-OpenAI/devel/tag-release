@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# Script to create and push a git tag based on the version number in a Perl module
+# Only runs if on the main branch
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+# Check if we're on the main branch
+current_branch=$(git symbolic-ref --short HEAD)
+if [ "$current_branch" != "main" ]; then
+    echo "Not on main branch. Currently on: $current_branch"
+    echo "Exiting without creating tag."
+    exit 0
+fi
+
+echo "On main branch, proceeding with version extraction..."
+
+# Check if the module file exists
+module_path="lib/OpenAPI/Client/OpenAI.pm"
+if [ ! -f "$module_path" ]; then
+    echo "Error: Module file not found at $module_path"
+    exit 1
+fi
+
+# Extract version number using Perl
+version=$(perl -e '
+    $file = "'$module_path'";
+    open(my $fh, "<", $file) or die "Could not open $file: $!";
+    my $content = do { local $/; <$fh> };
+    close($fh);
+    
+    # Look for version declaration (handles multiple patterns)
+    if ($content =~ /(?:our|my)\s+\$VERSION\s*=\s*["'\''"]([0-9]+(?:\.[0-9]+)*)["'\''"]/) {
+        print $1;
+    } elsif ($content =~ /package\s+OpenAPI::Client::OpenAI\s+([0-9]+(?:\.[0-9]+)*)/) {
+        print $1;
+    } elsif ($content =~ /\$OpenAPI::Client::OpenAI::VERSION\s*=\s*["'\''"]([0-9]+(?:\.[0-9]+)*)["'\''"]/) {
+        print $1;
+    } else {
+        die "Could not find version number in $file";
+    }
+')
+
+# Check if version was successfully extracted
+if [ -z "$version" ]; then
+    echo "Error: Could not extract version from module"
+    exit 1
+fi
+
+echo "Extracted version: $version"
+
+# Check if the tag already exists
+if git rev-parse "v$version" >/dev/null 2>&1; then
+    echo "Tag v$version already exists. Exiting."
+    exit 0
+fi
+
+# Create and push the tag
+echo "Creating tag v$version..."
+git tag -a "v$version" -m "Release version $version"
+
+echo "Pushing tag to remote..."
+git push origin "v$version"
+
+echo "Successfully created and pushed tag v$version"

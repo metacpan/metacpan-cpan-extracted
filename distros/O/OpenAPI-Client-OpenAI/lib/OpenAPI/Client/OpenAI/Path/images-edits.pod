@@ -13,7 +13,7 @@ This document describes the API endpoint at C</images/edits>.
 
 =head2 C<POST /images/edits>
 
-Creates an edited or extended image given an original image and a prompt.
+Creates an edited or extended image given one or more source images and a prompt. This endpoint only supports C<gpt-image-1> and C<dall-e-2>.
 
 
 
@@ -40,11 +40,13 @@ C<createImageEdit>
 
 =head4 Models
 
-The model to use for image generation. Only C<dall-e-2> is supported at this time.
+The model to use for image generation. Only C<dall-e-2> and C<gpt-image-1> are supported. Defaults to C<dall-e-2> unless a parameter specific to C<gpt-image-1> is used.
 
 =over 4
       
 =item * C<dall-e-2>
+
+=item * C<gpt-image-1>
 
 =back
       
@@ -52,9 +54,13 @@ The model to use for image generation. Only C<dall-e-2> is supported at this tim
 Example:
 
     {
-       "model" : "dall-e-2",
+       "background" : "transparent",
+       "model" : "gpt-image-1",
        "n" : 1,
+       "output_compression" : 100,
+       "output_format" : "png",
        "prompt" : "A cute baby sea otter wearing a beret",
+       "quality" : "high",
        "response_format" : "url",
        "size" : "1024x1024",
        "user" : "user-1234"
@@ -81,9 +87,25 @@ OK
 Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
 
     {
-       "data" : [
-          "{\n  \"url\": \"...\",\n  \"revised_prompt\": \"...\"\n}\n"
-       ]
+      "created": 1713833628,
+      "data": [
+        {
+          "b64_json": "..."
+        }
+      ],
+      "background": "transparent",
+      "output_format": "png",
+      "size": "1024x1024",
+      "quality": "high",
+      "usage": {
+        "total_tokens": 100,
+        "input_tokens": 50,
+        "output_tokens": 50,
+        "input_tokens_details": {
+          "text_tokens": 10,
+          "image_tokens": 40
+        }
+      }
     }
 
 

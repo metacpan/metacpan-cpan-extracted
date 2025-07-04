@@ -12,10 +12,10 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	NAME	 => 'Date::Cmp',		# Name of the module
 	VERSION_FROM => 'lib/Date/Cmp.pm',	# Automatically fetch version from the module
-	AUTHOR	=> 'Nigel Horne <njh@nigelhorne.com>', # Author information
-	ABSTRACT	 => 'A Perl module for improving grammar using an external API.',
+	ABSTRACT_FROM	=> 'lib/Date/Cmp.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),

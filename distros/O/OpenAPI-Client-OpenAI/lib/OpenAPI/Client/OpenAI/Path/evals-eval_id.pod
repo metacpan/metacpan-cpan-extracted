@@ -1,0 +1,254 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::evals-eval_id - Documentation for the /evals/{eval_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</evals/{eval_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /evals/{eval_id}>
+
+Delete an evaluation.
+
+
+
+=head3 Operation ID
+
+C<deleteEval>
+
+    $client->deleteEval( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to delete.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Successfully deleted the evaluation.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "deleted" : true,
+       "eval_id" : "eval_abc123",
+       "object" : "eval.deleted"
+    }
+
+
+=back
+
+=head4 Status Code: C<404>
+
+Evaluation not found.
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head2 C<GET /evals/{eval_id}>
+
+Get an evaluation by ID.
+
+
+
+=head3 Operation ID
+
+C<getEval>
+
+    $client->getEval( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to retrieve.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+The evaluation
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "eval",
+      "id": "eval_67abd54d9b0081909a86353f6fb9317a",
+      "data_source_config": {
+        "type": "custom",
+        "item_schema": {
+          "type": "object",
+          "properties": {
+            "label": {"type": "string"},
+          },
+          "required": ["label"]
+        },
+        "include_sample_schema": true
+      },
+      "testing_criteria": [
+        {
+          "name": "My string check grader",
+          "type": "string_check",
+          "input": "{{sample.output_text}}",
+          "reference": "{{item.label}}",
+          "operation": "eq",
+        }
+      ],
+      "name": "External Data Eval",
+      "created_at": 1739314509,
+      "metadata": {
+        "test": "synthetics",
+      }
+    }
+
+
+=back
+
+=head2 C<POST /evals/{eval_id}>
+
+Update certain properties of an evaluation.
+
+
+
+=head3 Operation ID
+
+C<updateEval>
+
+    $client->updateEval( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to update.
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+The updated evaluation
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "eval",
+      "id": "eval_67abd54d9b0081909a86353f6fb9317a",
+      "data_source_config": {
+        "type": "custom",
+        "item_schema": {
+          "type": "object",
+          "properties": {
+            "label": {"type": "string"},
+          },
+          "required": ["label"]
+        },
+        "include_sample_schema": true
+      },
+      "testing_criteria": [
+        {
+          "name": "My string check grader",
+          "type": "string_check",
+          "input": "{{sample.output_text}}",
+          "reference": "{{item.label}}",
+          "operation": "eq",
+        }
+      ],
+      "name": "External Data Eval",
+      "created_at": 1739314509,
+      "metadata": {
+        "test": "synthetics",
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

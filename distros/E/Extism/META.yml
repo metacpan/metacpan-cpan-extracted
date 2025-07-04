@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/extism/perl-sdk/issues
   homepage: https://github.com/extism/perl-sdk
   repository: https://github.com/extism/perl-sdk.git
-version: v0.3.0
+version: v0.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

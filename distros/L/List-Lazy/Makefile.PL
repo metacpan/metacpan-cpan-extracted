@@ -23,19 +23,20 @@ my %WriteMakefileArgs = (
     "List::MoreUtils" => 0,
     "Moo" => 0,
     "MooX::HandlesVia" => 0,
-    "experimental" => 0,
-    "warnings" => 0
+    "experimental" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0,
     "Test::Warn" => 0,
-    "strict" => 0
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.3.3",
+  "VERSION" => "0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "List::MoreUtils" => 0,
   "Moo" => 0,
   "MooX::HandlesVia" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
   "Test::Warn" => 0,
   "experimental" => 0,

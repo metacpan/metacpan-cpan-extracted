@@ -1,0 +1,176 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::containers-container_id-files - Documentation for the /containers/{container_id}/files path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</containers/{container_id}/files>.
+
+=head1 PATHS
+
+
+=head2 C<GET /containers/{container_id}/files>
+
+List Container files
+
+
+Lists container files.
+
+
+
+=head3 Operation ID
+
+C<ListContainerFiles>
+
+    $client->ListContainerFiles( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<container_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
+
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<desc>
+
+
+=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
+
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Success
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "data" : [
+          "{\n    \"id\": \"cfile_682e0e8a43c88191a7978f477a09bdf5\",\n    \"object\": \"container.file\",\n    \"created_at\": 1747848842,\n    \"bytes\": 880,\n    \"container_id\": \"cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04\",\n    \"path\": \"/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json\",\n    \"source\": \"user\"\n}\n"
+       ]
+    }
+
+
+=back
+
+=head2 C<POST /containers/{container_id}/files>
+
+Create a Container File
+
+You can send either a multipart/form-data request with the raw file content, or a JSON request with a file ID.
+
+
+Creates a container file.
+
+
+
+=head3 Operation ID
+
+C<CreateContainerFile>
+
+    $client->CreateContainerFile( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<container_id> (in path) (Required) - 
+
+Type: C<string>
+
+
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<multipart/form-data>
+
+    
+      
+
+      
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Success
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+        "id": "cfile_682e0e8a43c88191a7978f477a09bdf5",
+        "object": "container.file",
+        "created_at": 1747848842,
+        "bytes": 880,
+        "container_id": "cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04",
+        "path": "/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json",
+        "source": "user"
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,5 +1,13 @@
 Revision history for List-Lazy
 
+0.4.0 2025-07-03
+ [ENHANCEMENTS]
+ - Add a safety limit of 10_000 returned values for `next()`.
+ - Can `append()` and `prepend()` values as well as lazy lists.
+
+ [STATISTICS]
+ - code churn: 12 files changed, 202 insertions(+), 71 deletions(-)
+
 0.3.3 2022-07-07
  [DOCUMENTATION]
  - Fixed pod error as reported by CPANTS. (GH#5, Mohammad S Anwar)

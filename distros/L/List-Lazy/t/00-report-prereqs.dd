@@ -19,8 +19,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'MooX::HandlesVia' => '0',
                                       'experimental' => '0',
-                                      'perl' => 'v5.22.0',
-                                      'warnings' => '0'
+                                      'perl' => 'v5.22.0'
                                     }
                     },
        'test' => {
@@ -32,9 +31,11 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Test::Warn' => '0',
-                                   'strict' => '0'
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

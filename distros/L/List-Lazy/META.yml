@@ -7,9 +7,11 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
   Test::Warn: '0'
   strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -22,7 +24,7 @@ name: List-Lazy
 provides:
   List::Lazy:
     file: lib/List/Lazy.pm
-    version: v0.3.3
+    version: v0.4.0
 requires:
   Carp: '0'
   Clone: '0'
@@ -32,12 +34,11 @@ requires:
   MooX::HandlesVia: '0'
   experimental: '0'
   perl: v5.22.0
-  warnings: '0'
 resources:
   bugtracker: https://github.com/yanick/List-Lazy/issues
   homepage: https://github.com/yanick/List-Lazy
   repository: https://github.com/yanick/List-Lazy.git
-version: 0.3.3
+version: 0.4.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
@@ -47,5 +48,5 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Yanick Champoux <yanick@cpan.org>'
 x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

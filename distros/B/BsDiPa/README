@@ -4,6 +4,9 @@ s-bsdipa, a mutation of BSDiff
 Colin Percival's BSDiff, imported from FreeBSD and transformed into
 a library; please see header comment of c-lib/s-bsdipa-lib.h for more:
 create or apply binary difference patch.
+
+For liblzma (XZ) support the according library must be available at
+compile time.
 Please see c-lib/README and/or the lib/BsDiPa.pm POD for more.
 
 # s-ts-mode

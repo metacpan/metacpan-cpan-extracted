@@ -27,6 +27,7 @@ OPCUA_Open62541_DataType		T_PACKED
 OPCUA_Open62541_GlobalNodeLifecycle	T_PACKED
 # these are used only as return value
 UA_ApplicationDescription		T_RETVAL_PACKED
+UA_BrowseNextResponse			T_RETVAL_PACKED
 UA_BrowseResponse			T_RETVAL_PACKED
 UA_BrowseResult				T_RETVAL_PACKED
 UA_BuildInfo				T_RETVAL_PACKED
@@ -40,6 +41,7 @@ UA_MessageSecurityMode			T_RETVAL_PACKED
 UA_ModifySubscriptionResponse		T_RETVAL_PACKED
 UA_MonitoredItemCreateRequest		T_RETVAL_PACKED
 UA_MonitoredItemCreateResult		T_RETVAL_PACKED
+UA_ReadResponse				T_RETVAL_PACKED
 UA_SetPublishingModeResponse		T_RETVAL_PACKED
 # these are needed to pass an output parameter
 OPCUA_Open62541_Boolean			T_PTROBJ_PACKED

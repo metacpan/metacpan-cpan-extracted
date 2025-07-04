@@ -21,11 +21,11 @@ Date::Cmp - Compare two dates with approximate parsing support
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -138,6 +138,19 @@ sub datecmp
 
 	return 0 if($left eq $right);
 
+	if((!ref($left)) && (!ref($right)) && ($left =~ /\d{3,4}/) && ($right =~ /\d{3,4}/) && ($left !~ /^bet/i) && ($right !~ /^bet/i)) {
+		if($left =~ /(\d{4})/) {
+			my $lyear = $1;
+			if($right =~ /(\d{4})/) {
+				my $ryear = $1;
+
+				if($lyear != $ryear) {
+					return $lyear <=> $ryear;
+				}
+			}
+		}
+	}
+
 	if((!ref($left)) && (!ref($right)) && ($left =~ /(\d{3,4})$/) && ($left !~ /^bet/i) && ($right !~ /^bet/i)) {
 		# Simple year test for fast comparison
 		my $yol = $1;
@@ -208,13 +221,15 @@ sub datecmp
 			}
 		}
 
-		if(($left =~ /(\d{3,4})/) && ($left !~ /^bet/i) && ($right =~ /^bet/)) {
+		if($left =~ /(\d{3,4})/) {
 			my $start = $1;
-			if($right =~ /(\d{3,4})/) {
-				# e.g. 26 Aug 1744 <=> 1673-02-22T00:00:00
-				my $end = $1;
-				if($start != $end) {
-					return $start <=> $end;
+			if(($left !~ /^bet/i) && ($right =~ /^bet/)) {
+				if($right =~ /(\d{3,4})/) {
+					# e.g. 26 Aug 1744 <=> 1673-02-22T00:00:00
+					my $end = $1;
+					if($start != $end) {
+						return $start <=> $end;
+					}
 				}
 			}
 		}
@@ -443,6 +458,16 @@ L<Sort::Key::DateTime>
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to C<bug-date-cmp at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Cmp>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Date::Cmp
 
 =head1 LICENCE AND COPYRIGHT
 

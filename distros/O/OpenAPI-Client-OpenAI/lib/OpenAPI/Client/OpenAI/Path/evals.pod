@@ -1,0 +1,243 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::evals - Documentation for the /evals path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</evals>.
+
+=head1 PATHS
+
+
+=head2 C<GET /evals>
+
+List evaluations for a project.
+
+
+
+=head3 Operation ID
+
+C<listEvals>
+
+    $client->listEvals( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<after> (in query) (Optional) - Identifier for the last eval from the previous pagination request.
+
+Type: C<string>
+
+
+
+=item * C<limit> (in query) (Optional) - Number of evals to retrieve.
+
+Type: C<integer>
+
+
+Default: C<20>
+
+
+=item * C<order> (in query) (Optional) - Sort order for evals by timestamp. Use `asc` for ascending order or `desc` for descending order.
+
+Type: C<string>
+
+Allowed values: C<asc, desc>
+
+
+Default: C<asc>
+
+
+=item * C<order_by> (in query) (Optional) - Evals can be ordered by creation time or last updated time. Use
+`created_at` for creation time or `updated_at` for last updated time.
+
+
+Type: C<string>
+
+Allowed values: C<created_at, updated_at>
+
+
+Default: C<created_at>
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+A list of evals
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "list",
+      "data": [
+        {
+          "object": "eval",
+          "id": "eval_67abd54d9b0081909a86353f6fb9317a",
+          "data_source_config": {
+            "type": "custom",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "string"
+                    },
+                    "ground_truth": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "input",
+                    "ground_truth"
+                  ]
+                }
+              },
+              "required": [
+                "item"
+              ]
+            }
+          },
+          "testing_criteria": [
+            {
+              "name": "String check",
+              "id": "String check-2eaf2d8d-d649-4335-8148-9535a7ca73c2",
+              "type": "string_check",
+              "input": "{{item.input}}",
+              "reference": "{{item.ground_truth}}",
+              "operation": "eq"
+            }
+          ],
+          "name": "External Data Eval",
+          "created_at": 1739314509,
+          "metadata": {},
+        }
+      ],
+      "first_id": "eval_67abd54d9b0081909a86353f6fb9317a",
+      "last_id": "eval_67abd54d9b0081909a86353f6fb9317a",
+      "has_more": true
+    }
+
+
+=back
+
+=head2 C<POST /evals>
+
+Create the structure of an evaluation that can be used to test a model's performance.
+An evaluation is a set of testing criteria and the config for a data source, which dictates the schema of the data used in the evaluation. After creating an evaluation, you can run it on different models and model parameters. We support several types of graders and datasources.
+For more information, see the L<Evals guide|https://platform.openai.com/docs/guides/evals>.
+
+
+
+=head3 Operation ID
+
+C<createEval>
+
+    $client->createEval( ... );
+
+=head3 Parameters
+
+=over 4
+
+=back
+
+=head3 Request Body
+  
+=head3 Content Type: C<application/json>
+
+    
+      
+
+      
+      
+Example:
+
+    {
+       "testing_criteria" : [
+          null
+       ]
+    }
+
+
+             
+
+=head3 Responses
+
+
+=head4 Status Code: C<201>
+
+OK
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "eval",
+      "id": "eval_67abd54d9b0081909a86353f6fb9317a",
+      "data_source_config": {
+        "type": "custom",
+        "item_schema": {
+          "type": "object",
+          "properties": {
+            "label": {"type": "string"},
+          },
+          "required": ["label"]
+        },
+        "include_sample_schema": true
+      },
+      "testing_criteria": [
+        {
+          "name": "My string check grader",
+          "type": "string_check",
+          "input": "{{sample.output_text}}",
+          "reference": "{{item.label}}",
+          "operation": "eq",
+        }
+      ],
+      "name": "External Data Eval",
+      "created_at": 1739314509,
+      "metadata": {
+        "test": "synthetics",
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

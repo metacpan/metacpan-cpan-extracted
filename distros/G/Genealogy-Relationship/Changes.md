@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.0.0 - 2025-07-03]
+
+### Changed
+
+- Switched to using 'perlclass' instead of Moo
+- Use (and document) the field name attributes
+
 ## [0.2.0 - 2023-05-24]
 
 ### Fixed

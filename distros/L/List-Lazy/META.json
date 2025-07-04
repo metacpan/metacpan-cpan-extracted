@@ -34,8 +34,7 @@
             "Moo" : "0",
             "MooX::HandlesVia" : "0",
             "experimental" : "0",
-            "perl" : "v5.22.0",
-            "warnings" : "0"
+            "perl" : "v5.22.0"
          }
       },
       "test" : {
@@ -47,16 +46,18 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0",
             "Test::Warn" : "0",
-            "strict" : "0"
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "List::Lazy" : {
          "file" : "lib/List/Lazy.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/yanick/List-Lazy"
       }
    },
-   "version" : "0.3.3",
+   "version" : "0.4.0",
    "x_author_pledge" : {
       "version" : 1
    },

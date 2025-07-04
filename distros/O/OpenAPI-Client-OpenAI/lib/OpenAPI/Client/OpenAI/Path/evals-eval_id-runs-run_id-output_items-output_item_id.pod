@@ -1,0 +1,136 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items-output_item_id - Documentation for the /evals/{eval_id}/runs/{run_id}/output_items/{output_item_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</evals/{eval_id}/runs/{run_id}/output_items/{output_item_id}>.
+
+=head1 PATHS
+
+
+=head2 C<GET /evals/{eval_id}/runs/{run_id}/output_items/{output_item_id}>
+
+Get an evaluation run output item by ID.
+
+
+
+=head3 Operation ID
+
+C<getEvalRunOutputItem>
+
+    $client->getEvalRunOutputItem( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to retrieve runs for.
+
+Type: C<string>
+
+
+
+=item * C<run_id> (in path) (Required) - The ID of the run to retrieve.
+
+Type: C<string>
+
+
+
+=item * C<output_item_id> (in path) (Required) - The ID of the output item to retrieve.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+The evaluation run output item
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "eval.run.output_item",
+      "id": "outputitem_67abd55eb6548190bb580745d5644a33",
+      "run_id": "evalrun_67abd54d60ec8190832b46859da808f7",
+      "eval_id": "eval_67abd54d9b0081909a86353f6fb9317a",
+      "created_at": 1739314509,
+      "status": "pass",
+      "datasource_item_id": 137,
+      "datasource_item": {
+          "teacher": "To grade essays, I only check for style, content, and grammar.",
+          "student": "I am a student who is trying to write the best essay."
+      },
+      "results": [
+        {
+          "name": "String Check Grader",
+          "type": "string-check-grader",
+          "score": 1.0,
+          "passed": true,
+        }
+      ],
+      "sample": {
+        "input": [
+          {
+            "role": "system",
+            "content": "You are an evaluator bot..."
+          },
+          {
+            "role": "user",
+            "content": "You are assessing..."
+          }
+        ],
+        "output": [
+          {
+            "role": "assistant",
+            "content": "The rubric is not clear nor concise."
+          }
+        ],
+        "finish_reason": "stop",
+        "model": "gpt-4o-2024-08-06",
+        "usage": {
+          "total_tokens": 521,
+          "completion_tokens": 2,
+          "prompt_tokens": 519,
+          "cached_tokens": 0
+        },
+        "error": null,
+        "temperature": 1.0,
+        "max_completion_tokens": 2048,
+        "top_p": 1.0,
+        "seed": 42
+      }
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

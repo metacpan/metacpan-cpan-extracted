@@ -324,6 +324,33 @@ table_unpack_UA_AddReferencesResponse(void *out, SV *in)
 }
 #endif
 
+#ifdef UA_TYPES_ADDITIONALPARAMETERSTYPE
+static void XS_pack_UA_AdditionalParametersType(SV *out, UA_AdditionalParametersType in) __attribute__((unused));
+static UA_AdditionalParametersType XS_unpack_UA_AdditionalParametersType(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_AdditionalParametersType(SV *out, UA_AdditionalParametersType in)
+{
+	pack_UA_AdditionalParametersType(out, &in);
+}
+static UA_AdditionalParametersType
+XS_unpack_UA_AdditionalParametersType(SV *in)
+{
+	UA_AdditionalParametersType out;
+	unpack_UA_AdditionalParametersType(&out, in);
+	return out;
+}
+static void
+table_pack_UA_AdditionalParametersType(SV *out, const void *in)
+{
+	pack_UA_AdditionalParametersType(out, in);
+}
+static void
+table_unpack_UA_AdditionalParametersType(void *out, SV *in)
+{
+	unpack_UA_AdditionalParametersType(out, in);
+}
+#endif
+
 #ifdef UA_TYPES_AGGREGATECONFIGURATION
 static void XS_pack_UA_AggregateConfiguration(SV *out, UA_AggregateConfiguration in) __attribute__((unused));
 static UA_AggregateConfiguration XS_unpack_UA_AggregateConfiguration(SV *in) __attribute__((unused));
@@ -402,6 +429,33 @@ static void
 table_unpack_UA_AggregateFilterResult(void *out, SV *in)
 {
 	unpack_UA_AggregateFilterResult(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_ALIASNAMEDATATYPE
+static void XS_pack_UA_AliasNameDataType(SV *out, UA_AliasNameDataType in) __attribute__((unused));
+static UA_AliasNameDataType XS_unpack_UA_AliasNameDataType(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_AliasNameDataType(SV *out, UA_AliasNameDataType in)
+{
+	pack_UA_AliasNameDataType(out, &in);
+}
+static UA_AliasNameDataType
+XS_unpack_UA_AliasNameDataType(SV *in)
+{
+	UA_AliasNameDataType out;
+	unpack_UA_AliasNameDataType(&out, in);
+	return out;
+}
+static void
+table_pack_UA_AliasNameDataType(SV *out, const void *in)
+{
+	pack_UA_AliasNameDataType(out, in);
+}
+static void
+table_unpack_UA_AliasNameDataType(void *out, SV *in)
+{
+	unpack_UA_AliasNameDataType(out, in);
 }
 #endif
 
@@ -1431,33 +1485,6 @@ table_unpack_UA_CancelResponse(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_CARTESIANCOORDINATES
-static void XS_pack_UA_CartesianCoordinates(SV *out, UA_CartesianCoordinates in) __attribute__((unused));
-static UA_CartesianCoordinates XS_unpack_UA_CartesianCoordinates(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_CartesianCoordinates(SV *out, UA_CartesianCoordinates in)
-{
-	pack_UA_CartesianCoordinates(out, &in);
-}
-static UA_CartesianCoordinates
-XS_unpack_UA_CartesianCoordinates(SV *in)
-{
-	UA_CartesianCoordinates out;
-	unpack_UA_CartesianCoordinates(&out, in);
-	return out;
-}
-static void
-table_pack_UA_CartesianCoordinates(SV *out, const void *in)
-{
-	pack_UA_CartesianCoordinates(out, in);
-}
-static void
-table_unpack_UA_CartesianCoordinates(void *out, SV *in)
-{
-	unpack_UA_CartesianCoordinates(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_CHANNELSECURITYTOKEN
 static void XS_pack_UA_ChannelSecurityToken(SV *out, UA_ChannelSecurityToken in) __attribute__((unused));
 static UA_ChannelSecurityToken XS_unpack_UA_ChannelSecurityToken(SV *in) __attribute__((unused));
@@ -1644,33 +1671,6 @@ static void
 table_unpack_UA_ConfigurationVersionDataType(void *out, SV *in)
 {
 	unpack_UA_ConfigurationVersionDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_CONNECTIONTRANSPORTDATATYPE
-static void XS_pack_UA_ConnectionTransportDataType(SV *out, UA_ConnectionTransportDataType in) __attribute__((unused));
-static UA_ConnectionTransportDataType XS_unpack_UA_ConnectionTransportDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_ConnectionTransportDataType(SV *out, UA_ConnectionTransportDataType in)
-{
-	pack_UA_ConnectionTransportDataType(out, &in);
-}
-static UA_ConnectionTransportDataType
-XS_unpack_UA_ConnectionTransportDataType(SV *in)
-{
-	UA_ConnectionTransportDataType out;
-	unpack_UA_ConnectionTransportDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_ConnectionTransportDataType(SV *out, const void *in)
-{
-	pack_UA_ConnectionTransportDataType(out, in);
-}
-static void
-table_unpack_UA_ConnectionTransportDataType(void *out, SV *in)
-{
-	unpack_UA_ConnectionTransportDataType(out, in);
 }
 #endif
 
@@ -2241,60 +2241,6 @@ table_unpack_UA_DataSetReaderDataType(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_DATASETREADERMESSAGEDATATYPE
-static void XS_pack_UA_DataSetReaderMessageDataType(SV *out, UA_DataSetReaderMessageDataType in) __attribute__((unused));
-static UA_DataSetReaderMessageDataType XS_unpack_UA_DataSetReaderMessageDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_DataSetReaderMessageDataType(SV *out, UA_DataSetReaderMessageDataType in)
-{
-	pack_UA_DataSetReaderMessageDataType(out, &in);
-}
-static UA_DataSetReaderMessageDataType
-XS_unpack_UA_DataSetReaderMessageDataType(SV *in)
-{
-	UA_DataSetReaderMessageDataType out;
-	unpack_UA_DataSetReaderMessageDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_DataSetReaderMessageDataType(SV *out, const void *in)
-{
-	pack_UA_DataSetReaderMessageDataType(out, in);
-}
-static void
-table_unpack_UA_DataSetReaderMessageDataType(void *out, SV *in)
-{
-	unpack_UA_DataSetReaderMessageDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_DATASETREADERTRANSPORTDATATYPE
-static void XS_pack_UA_DataSetReaderTransportDataType(SV *out, UA_DataSetReaderTransportDataType in) __attribute__((unused));
-static UA_DataSetReaderTransportDataType XS_unpack_UA_DataSetReaderTransportDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_DataSetReaderTransportDataType(SV *out, UA_DataSetReaderTransportDataType in)
-{
-	pack_UA_DataSetReaderTransportDataType(out, &in);
-}
-static UA_DataSetReaderTransportDataType
-XS_unpack_UA_DataSetReaderTransportDataType(SV *in)
-{
-	UA_DataSetReaderTransportDataType out;
-	unpack_UA_DataSetReaderTransportDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_DataSetReaderTransportDataType(SV *out, const void *in)
-{
-	pack_UA_DataSetReaderTransportDataType(out, in);
-}
-static void
-table_unpack_UA_DataSetReaderTransportDataType(void *out, SV *in)
-{
-	unpack_UA_DataSetReaderTransportDataType(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_DATASETWRITERDATATYPE
 static void XS_pack_UA_DataSetWriterDataType(SV *out, UA_DataSetWriterDataType in) __attribute__((unused));
 static UA_DataSetWriterDataType XS_unpack_UA_DataSetWriterDataType(SV *in) __attribute__((unused));
@@ -2319,60 +2265,6 @@ static void
 table_unpack_UA_DataSetWriterDataType(void *out, SV *in)
 {
 	unpack_UA_DataSetWriterDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_DATASETWRITERMESSAGEDATATYPE
-static void XS_pack_UA_DataSetWriterMessageDataType(SV *out, UA_DataSetWriterMessageDataType in) __attribute__((unused));
-static UA_DataSetWriterMessageDataType XS_unpack_UA_DataSetWriterMessageDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_DataSetWriterMessageDataType(SV *out, UA_DataSetWriterMessageDataType in)
-{
-	pack_UA_DataSetWriterMessageDataType(out, &in);
-}
-static UA_DataSetWriterMessageDataType
-XS_unpack_UA_DataSetWriterMessageDataType(SV *in)
-{
-	UA_DataSetWriterMessageDataType out;
-	unpack_UA_DataSetWriterMessageDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_DataSetWriterMessageDataType(SV *out, const void *in)
-{
-	pack_UA_DataSetWriterMessageDataType(out, in);
-}
-static void
-table_unpack_UA_DataSetWriterMessageDataType(void *out, SV *in)
-{
-	unpack_UA_DataSetWriterMessageDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_DATASETWRITERTRANSPORTDATATYPE
-static void XS_pack_UA_DataSetWriterTransportDataType(SV *out, UA_DataSetWriterTransportDataType in) __attribute__((unused));
-static UA_DataSetWriterTransportDataType XS_unpack_UA_DataSetWriterTransportDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_DataSetWriterTransportDataType(SV *out, UA_DataSetWriterTransportDataType in)
-{
-	pack_UA_DataSetWriterTransportDataType(out, &in);
-}
-static UA_DataSetWriterTransportDataType
-XS_unpack_UA_DataSetWriterTransportDataType(SV *in)
-{
-	UA_DataSetWriterTransportDataType out;
-	unpack_UA_DataSetWriterTransportDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_DataSetWriterTransportDataType(SV *out, const void *in)
-{
-	pack_UA_DataSetWriterTransportDataType(out, in);
-}
-static void
-table_unpack_UA_DataSetWriterTransportDataType(void *out, SV *in)
-{
-	unpack_UA_DataSetWriterTransportDataType(out, in);
 }
 #endif
 
@@ -3105,33 +2997,6 @@ table_unpack_UA_DiagnosticsLevel(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_DISCOVERYCONFIGURATION
-static void XS_pack_UA_DiscoveryConfiguration(SV *out, UA_DiscoveryConfiguration in) __attribute__((unused));
-static UA_DiscoveryConfiguration XS_unpack_UA_DiscoveryConfiguration(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_DiscoveryConfiguration(SV *out, UA_DiscoveryConfiguration in)
-{
-	pack_UA_DiscoveryConfiguration(out, &in);
-}
-static UA_DiscoveryConfiguration
-XS_unpack_UA_DiscoveryConfiguration(SV *in)
-{
-	UA_DiscoveryConfiguration out;
-	unpack_UA_DiscoveryConfiguration(&out, in);
-	return out;
-}
-static void
-table_pack_UA_DiscoveryConfiguration(SV *out, const void *in)
-{
-	pack_UA_DiscoveryConfiguration(out, in);
-}
-static void
-table_unpack_UA_DiscoveryConfiguration(void *out, SV *in)
-{
-	unpack_UA_DiscoveryConfiguration(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_DOUBLE
 static void XS_pack_UA_Double(SV *out, UA_Double in) __attribute__((unused));
 static UA_Double XS_unpack_UA_Double(SV *in) __attribute__((unused));
@@ -3183,6 +3048,33 @@ static void
 table_unpack_UA_DoubleComplexNumberType(void *out, SV *in)
 {
 	unpack_UA_DoubleComplexNumberType(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_DUPLEX
+static void XS_pack_UA_Duplex(SV *out, UA_Duplex in) __attribute__((unused));
+static UA_Duplex XS_unpack_UA_Duplex(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_Duplex(SV *out, UA_Duplex in)
+{
+	pack_UA_Duplex(out, &in);
+}
+static UA_Duplex
+XS_unpack_UA_Duplex(SV *in)
+{
+	UA_Duplex out;
+	unpack_UA_Duplex(&out, in);
+	return out;
+}
+static void
+table_pack_UA_Duplex(SV *out, const void *in)
+{
+	pack_UA_Duplex(out, in);
+}
+static void
+table_unpack_UA_Duplex(void *out, SV *in)
+{
+	unpack_UA_Duplex(out, in);
 }
 #endif
 
@@ -3264,6 +3156,33 @@ static void
 table_unpack_UA_EUInformation(void *out, SV *in)
 {
 	unpack_UA_EUInformation(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_ECCENCRYPTEDSECRET
+static void XS_pack_UA_EccEncryptedSecret(SV *out, UA_EccEncryptedSecret in) __attribute__((unused));
+static UA_EccEncryptedSecret XS_unpack_UA_EccEncryptedSecret(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_EccEncryptedSecret(SV *out, UA_EccEncryptedSecret in)
+{
+	pack_UA_EccEncryptedSecret(out, &in);
+}
+static UA_EccEncryptedSecret
+XS_unpack_UA_EccEncryptedSecret(SV *in)
+{
+	UA_EccEncryptedSecret out;
+	unpack_UA_EccEncryptedSecret(&out, in);
+	return out;
+}
+static void
+table_pack_UA_EccEncryptedSecret(SV *out, const void *in)
+{
+	pack_UA_EccEncryptedSecret(out, in);
+}
+static void
+table_unpack_UA_EccEncryptedSecret(void *out, SV *in)
+{
+	unpack_UA_EccEncryptedSecret(out, in);
 }
 #endif
 
@@ -3507,6 +3426,60 @@ static void
 table_unpack_UA_EnumValueType(void *out, SV *in)
 {
 	unpack_UA_EnumValueType(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_ENUMERATION
+static void XS_pack_UA_Enumeration(SV *out, UA_Enumeration in) __attribute__((unused));
+static UA_Enumeration XS_unpack_UA_Enumeration(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_Enumeration(SV *out, UA_Enumeration in)
+{
+	pack_UA_Enumeration(out, &in);
+}
+static UA_Enumeration
+XS_unpack_UA_Enumeration(SV *in)
+{
+	UA_Enumeration out;
+	unpack_UA_Enumeration(&out, in);
+	return out;
+}
+static void
+table_pack_UA_Enumeration(SV *out, const void *in)
+{
+	pack_UA_Enumeration(out, in);
+}
+static void
+table_unpack_UA_Enumeration(void *out, SV *in)
+{
+	unpack_UA_Enumeration(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_EPHEMERALKEYTYPE
+static void XS_pack_UA_EphemeralKeyType(SV *out, UA_EphemeralKeyType in) __attribute__((unused));
+static UA_EphemeralKeyType XS_unpack_UA_EphemeralKeyType(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_EphemeralKeyType(SV *out, UA_EphemeralKeyType in)
+{
+	pack_UA_EphemeralKeyType(out, &in);
+}
+static UA_EphemeralKeyType
+XS_unpack_UA_EphemeralKeyType(SV *in)
+{
+	UA_EphemeralKeyType out;
+	unpack_UA_EphemeralKeyType(&out, in);
+	return out;
+}
+static void
+table_pack_UA_EphemeralKeyType(SV *out, const void *in)
+{
+	pack_UA_EphemeralKeyType(out, in);
+}
+static void
+table_unpack_UA_EphemeralKeyType(void *out, SV *in)
+{
+	unpack_UA_EphemeralKeyType(out, in);
 }
 #endif
 
@@ -3780,33 +3753,6 @@ table_unpack_UA_FieldTargetDataType(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_FILTEROPERAND
-static void XS_pack_UA_FilterOperand(SV *out, UA_FilterOperand in) __attribute__((unused));
-static UA_FilterOperand XS_unpack_UA_FilterOperand(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_FilterOperand(SV *out, UA_FilterOperand in)
-{
-	pack_UA_FilterOperand(out, &in);
-}
-static UA_FilterOperand
-XS_unpack_UA_FilterOperand(SV *in)
-{
-	UA_FilterOperand out;
-	unpack_UA_FilterOperand(&out, in);
-	return out;
-}
-static void
-table_pack_UA_FilterOperand(SV *out, const void *in)
-{
-	pack_UA_FilterOperand(out, in);
-}
-static void
-table_unpack_UA_FilterOperand(void *out, SV *in)
-{
-	unpack_UA_FilterOperand(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_FILTEROPERATOR
 static void XS_pack_UA_FilterOperator(SV *out, UA_FilterOperator in) __attribute__((unused));
 static UA_FilterOperator XS_unpack_UA_FilterOperator(SV *in) __attribute__((unused));
@@ -3966,33 +3912,6 @@ static void
 table_unpack_UA_Float(void *out, SV *in)
 {
 	unpack_UA_Float(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_FRAME
-static void XS_pack_UA_Frame(SV *out, UA_Frame in) __attribute__((unused));
-static UA_Frame XS_unpack_UA_Frame(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_Frame(SV *out, UA_Frame in)
-{
-	pack_UA_Frame(out, &in);
-}
-static UA_Frame
-XS_unpack_UA_Frame(SV *in)
-{
-	UA_Frame out;
-	unpack_UA_Frame(&out, in);
-	return out;
-}
-static void
-table_pack_UA_Frame(SV *out, const void *in)
-{
-	pack_UA_Frame(out, in);
-}
-static void
-table_unpack_UA_Frame(void *out, SV *in)
-{
-	unpack_UA_Frame(out, in);
 }
 #endif
 
@@ -4236,33 +4155,6 @@ static void
 table_unpack_UA_HistoryModifiedData(void *out, SV *in)
 {
 	unpack_UA_HistoryModifiedData(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_HISTORYREADDETAILS
-static void XS_pack_UA_HistoryReadDetails(SV *out, UA_HistoryReadDetails in) __attribute__((unused));
-static UA_HistoryReadDetails XS_unpack_UA_HistoryReadDetails(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_HistoryReadDetails(SV *out, UA_HistoryReadDetails in)
-{
-	pack_UA_HistoryReadDetails(out, &in);
-}
-static UA_HistoryReadDetails
-XS_unpack_UA_HistoryReadDetails(SV *in)
-{
-	UA_HistoryReadDetails out;
-	unpack_UA_HistoryReadDetails(&out, in);
-	return out;
-}
-static void
-table_pack_UA_HistoryReadDetails(SV *out, const void *in)
-{
-	pack_UA_HistoryReadDetails(out, in);
-}
-static void
-table_unpack_UA_HistoryReadDetails(void *out, SV *in)
-{
-	unpack_UA_HistoryReadDetails(out, in);
 }
 #endif
 
@@ -4830,6 +4722,60 @@ static void
 table_unpack_UA_IntegerId(void *out, SV *in)
 {
 	unpack_UA_IntegerId(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_INTERFACEADMINSTATUS
+static void XS_pack_UA_InterfaceAdminStatus(SV *out, UA_InterfaceAdminStatus in) __attribute__((unused));
+static UA_InterfaceAdminStatus XS_unpack_UA_InterfaceAdminStatus(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_InterfaceAdminStatus(SV *out, UA_InterfaceAdminStatus in)
+{
+	pack_UA_InterfaceAdminStatus(out, &in);
+}
+static UA_InterfaceAdminStatus
+XS_unpack_UA_InterfaceAdminStatus(SV *in)
+{
+	UA_InterfaceAdminStatus out;
+	unpack_UA_InterfaceAdminStatus(&out, in);
+	return out;
+}
+static void
+table_pack_UA_InterfaceAdminStatus(SV *out, const void *in)
+{
+	pack_UA_InterfaceAdminStatus(out, in);
+}
+static void
+table_unpack_UA_InterfaceAdminStatus(void *out, SV *in)
+{
+	unpack_UA_InterfaceAdminStatus(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_INTERFACEOPERSTATUS
+static void XS_pack_UA_InterfaceOperStatus(SV *out, UA_InterfaceOperStatus in) __attribute__((unused));
+static UA_InterfaceOperStatus XS_unpack_UA_InterfaceOperStatus(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_InterfaceOperStatus(SV *out, UA_InterfaceOperStatus in)
+{
+	pack_UA_InterfaceOperStatus(out, &in);
+}
+static UA_InterfaceOperStatus
+XS_unpack_UA_InterfaceOperStatus(SV *in)
+{
+	UA_InterfaceOperStatus out;
+	unpack_UA_InterfaceOperStatus(&out, in);
+	return out;
+}
+static void
+table_pack_UA_InterfaceOperStatus(SV *out, const void *in)
+{
+	pack_UA_InterfaceOperStatus(out, in);
+}
+static void
+table_unpack_UA_InterfaceOperStatus(void *out, SV *in)
+{
+	unpack_UA_InterfaceOperStatus(out, in);
 }
 #endif
 
@@ -5508,60 +5454,6 @@ table_unpack_UA_MonitoredItemNotification(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_MONITORINGFILTER
-static void XS_pack_UA_MonitoringFilter(SV *out, UA_MonitoringFilter in) __attribute__((unused));
-static UA_MonitoringFilter XS_unpack_UA_MonitoringFilter(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_MonitoringFilter(SV *out, UA_MonitoringFilter in)
-{
-	pack_UA_MonitoringFilter(out, &in);
-}
-static UA_MonitoringFilter
-XS_unpack_UA_MonitoringFilter(SV *in)
-{
-	UA_MonitoringFilter out;
-	unpack_UA_MonitoringFilter(&out, in);
-	return out;
-}
-static void
-table_pack_UA_MonitoringFilter(SV *out, const void *in)
-{
-	pack_UA_MonitoringFilter(out, in);
-}
-static void
-table_unpack_UA_MonitoringFilter(void *out, SV *in)
-{
-	unpack_UA_MonitoringFilter(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_MONITORINGFILTERRESULT
-static void XS_pack_UA_MonitoringFilterResult(SV *out, UA_MonitoringFilterResult in) __attribute__((unused));
-static UA_MonitoringFilterResult XS_unpack_UA_MonitoringFilterResult(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_MonitoringFilterResult(SV *out, UA_MonitoringFilterResult in)
-{
-	pack_UA_MonitoringFilterResult(out, &in);
-}
-static UA_MonitoringFilterResult
-XS_unpack_UA_MonitoringFilterResult(SV *in)
-{
-	UA_MonitoringFilterResult out;
-	unpack_UA_MonitoringFilterResult(&out, in);
-	return out;
-}
-static void
-table_pack_UA_MonitoringFilterResult(SV *out, const void *in)
-{
-	pack_UA_MonitoringFilterResult(out, in);
-}
-static void
-table_unpack_UA_MonitoringFilterResult(void *out, SV *in)
-{
-	unpack_UA_MonitoringFilterResult(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_MONITORINGMODE
 static void XS_pack_UA_MonitoringMode(SV *out, UA_MonitoringMode in) __attribute__((unused));
 static UA_MonitoringMode XS_unpack_UA_MonitoringMode(SV *in) __attribute__((unused));
@@ -5640,6 +5532,33 @@ static void
 table_unpack_UA_NamingRuleType(void *out, SV *in)
 {
 	unpack_UA_NamingRuleType(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_NEGOTIATIONSTATUS
+static void XS_pack_UA_NegotiationStatus(SV *out, UA_NegotiationStatus in) __attribute__((unused));
+static UA_NegotiationStatus XS_unpack_UA_NegotiationStatus(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_NegotiationStatus(SV *out, UA_NegotiationStatus in)
+{
+	pack_UA_NegotiationStatus(out, &in);
+}
+static UA_NegotiationStatus
+XS_unpack_UA_NegotiationStatus(SV *in)
+{
+	UA_NegotiationStatus out;
+	unpack_UA_NegotiationStatus(&out, in);
+	return out;
+}
+static void
+table_pack_UA_NegotiationStatus(SV *out, const void *in)
+{
+	pack_UA_NegotiationStatus(out, in);
+}
+static void
+table_unpack_UA_NegotiationStatus(void *out, SV *in)
+{
+	unpack_UA_NegotiationStatus(out, in);
 }
 #endif
 
@@ -5913,33 +5832,6 @@ table_unpack_UA_NormalizedString(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_NOTIFICATIONDATA
-static void XS_pack_UA_NotificationData(SV *out, UA_NotificationData in) __attribute__((unused));
-static UA_NotificationData XS_unpack_UA_NotificationData(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_NotificationData(SV *out, UA_NotificationData in)
-{
-	pack_UA_NotificationData(out, &in);
-}
-static UA_NotificationData
-XS_unpack_UA_NotificationData(SV *in)
-{
-	UA_NotificationData out;
-	unpack_UA_NotificationData(&out, in);
-	return out;
-}
-static void
-table_pack_UA_NotificationData(SV *out, const void *in)
-{
-	pack_UA_NotificationData(out, in);
-}
-static void
-table_unpack_UA_NotificationData(void *out, SV *in)
-{
-	unpack_UA_NotificationData(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_NOTIFICATIONMESSAGE
 static void XS_pack_UA_NotificationMessage(SV *out, UA_NotificationMessage in) __attribute__((unused));
 static UA_NotificationMessage XS_unpack_UA_NotificationMessage(SV *in) __attribute__((unused));
@@ -6018,6 +5910,33 @@ static void
 table_unpack_UA_ObjectTypeAttributes(void *out, SV *in)
 {
 	unpack_UA_ObjectTypeAttributes(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_OPAQUENUMERICRANGE
+static void XS_pack_UA_OpaqueNumericRange(SV *out, UA_OpaqueNumericRange in) __attribute__((unused));
+static UA_OpaqueNumericRange XS_unpack_UA_OpaqueNumericRange(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_OpaqueNumericRange(SV *out, UA_OpaqueNumericRange in)
+{
+	pack_UA_OpaqueNumericRange(out, &in);
+}
+static UA_OpaqueNumericRange
+XS_unpack_UA_OpaqueNumericRange(SV *in)
+{
+	UA_OpaqueNumericRange out;
+	unpack_UA_OpaqueNumericRange(&out, in);
+	return out;
+}
+static void
+table_pack_UA_OpaqueNumericRange(SV *out, const void *in)
+{
+	pack_UA_OpaqueNumericRange(out, in);
+}
+static void
+table_unpack_UA_OpaqueNumericRange(void *out, SV *in)
+{
+	unpack_UA_OpaqueNumericRange(out, in);
 }
 #endif
 
@@ -6126,33 +6045,6 @@ static void
 table_unpack_UA_OptionSet(void *out, SV *in)
 {
 	unpack_UA_OptionSet(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_ORIENTATION
-static void XS_pack_UA_Orientation(SV *out, UA_Orientation in) __attribute__((unused));
-static UA_Orientation XS_unpack_UA_Orientation(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_Orientation(SV *out, UA_Orientation in)
-{
-	pack_UA_Orientation(out, &in);
-}
-static UA_Orientation
-XS_unpack_UA_Orientation(SV *in)
-{
-	UA_Orientation out;
-	unpack_UA_Orientation(&out, in);
-	return out;
-}
-static void
-table_pack_UA_Orientation(SV *out, const void *in)
-{
-	pack_UA_Orientation(out, in);
-}
-static void
-table_unpack_UA_Orientation(void *out, SV *in)
-{
-	unpack_UA_Orientation(out, in);
 }
 #endif
 
@@ -6558,33 +6450,6 @@ static void
 table_unpack_UA_PublishedDataSetDataType(void *out, SV *in)
 {
 	unpack_UA_PublishedDataSetDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_PUBLISHEDDATASETSOURCEDATATYPE
-static void XS_pack_UA_PublishedDataSetSourceDataType(SV *out, UA_PublishedDataSetSourceDataType in) __attribute__((unused));
-static UA_PublishedDataSetSourceDataType XS_unpack_UA_PublishedDataSetSourceDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_PublishedDataSetSourceDataType(SV *out, UA_PublishedDataSetSourceDataType in)
-{
-	pack_UA_PublishedDataSetSourceDataType(out, &in);
-}
-static UA_PublishedDataSetSourceDataType
-XS_unpack_UA_PublishedDataSetSourceDataType(SV *in)
-{
-	UA_PublishedDataSetSourceDataType out;
-	unpack_UA_PublishedDataSetSourceDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_PublishedDataSetSourceDataType(SV *out, const void *in)
-{
-	pack_UA_PublishedDataSetSourceDataType(out, in);
-}
-static void
-table_unpack_UA_PublishedDataSetSourceDataType(void *out, SV *in)
-{
-	unpack_UA_PublishedDataSetSourceDataType(out, in);
 }
 #endif
 
@@ -7125,60 +6990,6 @@ static void
 table_unpack_UA_ReaderGroupDataType(void *out, SV *in)
 {
 	unpack_UA_ReaderGroupDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_READERGROUPMESSAGEDATATYPE
-static void XS_pack_UA_ReaderGroupMessageDataType(SV *out, UA_ReaderGroupMessageDataType in) __attribute__((unused));
-static UA_ReaderGroupMessageDataType XS_unpack_UA_ReaderGroupMessageDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_ReaderGroupMessageDataType(SV *out, UA_ReaderGroupMessageDataType in)
-{
-	pack_UA_ReaderGroupMessageDataType(out, &in);
-}
-static UA_ReaderGroupMessageDataType
-XS_unpack_UA_ReaderGroupMessageDataType(SV *in)
-{
-	UA_ReaderGroupMessageDataType out;
-	unpack_UA_ReaderGroupMessageDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_ReaderGroupMessageDataType(SV *out, const void *in)
-{
-	pack_UA_ReaderGroupMessageDataType(out, in);
-}
-static void
-table_unpack_UA_ReaderGroupMessageDataType(void *out, SV *in)
-{
-	unpack_UA_ReaderGroupMessageDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_READERGROUPTRANSPORTDATATYPE
-static void XS_pack_UA_ReaderGroupTransportDataType(SV *out, UA_ReaderGroupTransportDataType in) __attribute__((unused));
-static UA_ReaderGroupTransportDataType XS_unpack_UA_ReaderGroupTransportDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_ReaderGroupTransportDataType(SV *out, UA_ReaderGroupTransportDataType in)
-{
-	pack_UA_ReaderGroupTransportDataType(out, &in);
-}
-static UA_ReaderGroupTransportDataType
-XS_unpack_UA_ReaderGroupTransportDataType(SV *in)
-{
-	UA_ReaderGroupTransportDataType out;
-	unpack_UA_ReaderGroupTransportDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_ReaderGroupTransportDataType(SV *out, const void *in)
-{
-	pack_UA_ReaderGroupTransportDataType(out, in);
-}
-static void
-table_unpack_UA_ReaderGroupTransportDataType(void *out, SV *in)
-{
-	unpack_UA_ReaderGroupTransportDataType(out, in);
 }
 #endif
 
@@ -8613,33 +8424,6 @@ table_unpack_UA_StructureType(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_SUBSCRIBEDDATASETDATATYPE
-static void XS_pack_UA_SubscribedDataSetDataType(SV *out, UA_SubscribedDataSetDataType in) __attribute__((unused));
-static UA_SubscribedDataSetDataType XS_unpack_UA_SubscribedDataSetDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_SubscribedDataSetDataType(SV *out, UA_SubscribedDataSetDataType in)
-{
-	pack_UA_SubscribedDataSetDataType(out, &in);
-}
-static UA_SubscribedDataSetDataType
-XS_unpack_UA_SubscribedDataSetDataType(SV *in)
-{
-	UA_SubscribedDataSetDataType out;
-	unpack_UA_SubscribedDataSetDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_SubscribedDataSetDataType(SV *out, const void *in)
-{
-	pack_UA_SubscribedDataSetDataType(out, in);
-}
-static void
-table_unpack_UA_SubscribedDataSetDataType(void *out, SV *in)
-{
-	unpack_UA_SubscribedDataSetDataType(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_SUBSCRIBEDDATASETMIRRORDATATYPE
 static void XS_pack_UA_SubscribedDataSetMirrorDataType(SV *out, UA_SubscribedDataSetMirrorDataType in) __attribute__((unused));
 static UA_SubscribedDataSetMirrorDataType XS_unpack_UA_SubscribedDataSetMirrorDataType(SV *in) __attribute__((unused));
@@ -9153,6 +8937,114 @@ table_unpack_UA_TrustListMasks(void *out, SV *in)
 }
 #endif
 
+#ifdef UA_TYPES_TSNFAILURECODE
+static void XS_pack_UA_TsnFailureCode(SV *out, UA_TsnFailureCode in) __attribute__((unused));
+static UA_TsnFailureCode XS_unpack_UA_TsnFailureCode(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_TsnFailureCode(SV *out, UA_TsnFailureCode in)
+{
+	pack_UA_TsnFailureCode(out, &in);
+}
+static UA_TsnFailureCode
+XS_unpack_UA_TsnFailureCode(SV *in)
+{
+	UA_TsnFailureCode out;
+	unpack_UA_TsnFailureCode(&out, in);
+	return out;
+}
+static void
+table_pack_UA_TsnFailureCode(SV *out, const void *in)
+{
+	pack_UA_TsnFailureCode(out, in);
+}
+static void
+table_unpack_UA_TsnFailureCode(void *out, SV *in)
+{
+	unpack_UA_TsnFailureCode(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_TSNLISTENERSTATUS
+static void XS_pack_UA_TsnListenerStatus(SV *out, UA_TsnListenerStatus in) __attribute__((unused));
+static UA_TsnListenerStatus XS_unpack_UA_TsnListenerStatus(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_TsnListenerStatus(SV *out, UA_TsnListenerStatus in)
+{
+	pack_UA_TsnListenerStatus(out, &in);
+}
+static UA_TsnListenerStatus
+XS_unpack_UA_TsnListenerStatus(SV *in)
+{
+	UA_TsnListenerStatus out;
+	unpack_UA_TsnListenerStatus(&out, in);
+	return out;
+}
+static void
+table_pack_UA_TsnListenerStatus(SV *out, const void *in)
+{
+	pack_UA_TsnListenerStatus(out, in);
+}
+static void
+table_unpack_UA_TsnListenerStatus(void *out, SV *in)
+{
+	unpack_UA_TsnListenerStatus(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_TSNSTREAMSTATE
+static void XS_pack_UA_TsnStreamState(SV *out, UA_TsnStreamState in) __attribute__((unused));
+static UA_TsnStreamState XS_unpack_UA_TsnStreamState(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_TsnStreamState(SV *out, UA_TsnStreamState in)
+{
+	pack_UA_TsnStreamState(out, &in);
+}
+static UA_TsnStreamState
+XS_unpack_UA_TsnStreamState(SV *in)
+{
+	UA_TsnStreamState out;
+	unpack_UA_TsnStreamState(&out, in);
+	return out;
+}
+static void
+table_pack_UA_TsnStreamState(SV *out, const void *in)
+{
+	pack_UA_TsnStreamState(out, in);
+}
+static void
+table_unpack_UA_TsnStreamState(void *out, SV *in)
+{
+	unpack_UA_TsnStreamState(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_TSNTALKERSTATUS
+static void XS_pack_UA_TsnTalkerStatus(SV *out, UA_TsnTalkerStatus in) __attribute__((unused));
+static UA_TsnTalkerStatus XS_unpack_UA_TsnTalkerStatus(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_TsnTalkerStatus(SV *out, UA_TsnTalkerStatus in)
+{
+	pack_UA_TsnTalkerStatus(out, &in);
+}
+static UA_TsnTalkerStatus
+XS_unpack_UA_TsnTalkerStatus(SV *in)
+{
+	UA_TsnTalkerStatus out;
+	unpack_UA_TsnTalkerStatus(&out, in);
+	return out;
+}
+static void
+table_pack_UA_TsnTalkerStatus(SV *out, const void *in)
+{
+	pack_UA_TsnTalkerStatus(out, in);
+}
+static void
+table_unpack_UA_TsnTalkerStatus(void *out, SV *in)
+{
+	unpack_UA_TsnTalkerStatus(out, in);
+}
+#endif
+
 #ifdef UA_TYPES_UABINARYFILEDATATYPE
 static void XS_pack_UA_UABinaryFileDataType(SV *out, UA_UABinaryFileDataType in) __attribute__((unused));
 static UA_UABinaryFileDataType XS_unpack_UA_UABinaryFileDataType(SV *in) __attribute__((unused));
@@ -9396,33 +9288,6 @@ table_unpack_UA_UadpWriterGroupMessageDataType(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_UNION
-static void XS_pack_UA_Union(SV *out, UA_Union in) __attribute__((unused));
-static UA_Union XS_unpack_UA_Union(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_Union(SV *out, UA_Union in)
-{
-	pack_UA_Union(out, &in);
-}
-static UA_Union
-XS_unpack_UA_Union(SV *in)
-{
-	UA_Union out;
-	unpack_UA_Union(&out, in);
-	return out;
-}
-static void
-table_pack_UA_Union(SV *out, const void *in)
-{
-	pack_UA_Union(out, in);
-}
-static void
-table_unpack_UA_Union(void *out, SV *in)
-{
-	unpack_UA_Union(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_UNREGISTERNODESREQUEST
 static void XS_pack_UA_UnregisterNodesRequest(SV *out, UA_UnregisterNodesRequest in) __attribute__((unused));
 static UA_UnregisterNodesRequest XS_unpack_UA_UnregisterNodesRequest(SV *in) __attribute__((unused));
@@ -9474,6 +9339,33 @@ static void
 table_unpack_UA_UnregisterNodesResponse(void *out, SV *in)
 {
 	unpack_UA_UnregisterNodesResponse(out, in);
+}
+#endif
+
+#ifdef UA_TYPES_UNSIGNEDRATIONALNUMBER
+static void XS_pack_UA_UnsignedRationalNumber(SV *out, UA_UnsignedRationalNumber in) __attribute__((unused));
+static UA_UnsignedRationalNumber XS_unpack_UA_UnsignedRationalNumber(SV *in) __attribute__((unused));
+static void
+XS_pack_UA_UnsignedRationalNumber(SV *out, UA_UnsignedRationalNumber in)
+{
+	pack_UA_UnsignedRationalNumber(out, &in);
+}
+static UA_UnsignedRationalNumber
+XS_unpack_UA_UnsignedRationalNumber(SV *in)
+{
+	UA_UnsignedRationalNumber out;
+	unpack_UA_UnsignedRationalNumber(&out, in);
+	return out;
+}
+static void
+table_pack_UA_UnsignedRationalNumber(SV *out, const void *in)
+{
+	pack_UA_UnsignedRationalNumber(out, in);
+}
+static void
+table_unpack_UA_UnsignedRationalNumber(void *out, SV *in)
+{
+	unpack_UA_UnsignedRationalNumber(out, in);
 }
 #endif
 
@@ -9774,33 +9666,6 @@ table_unpack_UA_Variant(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_VECTOR
-static void XS_pack_UA_Vector(SV *out, UA_Vector in) __attribute__((unused));
-static UA_Vector XS_unpack_UA_Vector(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_Vector(SV *out, UA_Vector in)
-{
-	pack_UA_Vector(out, &in);
-}
-static UA_Vector
-XS_unpack_UA_Vector(SV *in)
-{
-	UA_Vector out;
-	unpack_UA_Vector(&out, in);
-	return out;
-}
-static void
-table_pack_UA_Vector(SV *out, const void *in)
-{
-	pack_UA_Vector(out, in);
-}
-static void
-table_unpack_UA_Vector(void *out, SV *in)
-{
-	unpack_UA_Vector(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_VERSIONTIME
 static void XS_pack_UA_VersionTime(SV *out, UA_VersionTime in) __attribute__((unused));
 static UA_VersionTime XS_unpack_UA_VersionTime(SV *in) __attribute__((unused));
@@ -9990,60 +9855,6 @@ table_unpack_UA_WriterGroupDataType(void *out, SV *in)
 }
 #endif
 
-#ifdef UA_TYPES_WRITERGROUPMESSAGEDATATYPE
-static void XS_pack_UA_WriterGroupMessageDataType(SV *out, UA_WriterGroupMessageDataType in) __attribute__((unused));
-static UA_WriterGroupMessageDataType XS_unpack_UA_WriterGroupMessageDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_WriterGroupMessageDataType(SV *out, UA_WriterGroupMessageDataType in)
-{
-	pack_UA_WriterGroupMessageDataType(out, &in);
-}
-static UA_WriterGroupMessageDataType
-XS_unpack_UA_WriterGroupMessageDataType(SV *in)
-{
-	UA_WriterGroupMessageDataType out;
-	unpack_UA_WriterGroupMessageDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_WriterGroupMessageDataType(SV *out, const void *in)
-{
-	pack_UA_WriterGroupMessageDataType(out, in);
-}
-static void
-table_unpack_UA_WriterGroupMessageDataType(void *out, SV *in)
-{
-	unpack_UA_WriterGroupMessageDataType(out, in);
-}
-#endif
-
-#ifdef UA_TYPES_WRITERGROUPTRANSPORTDATATYPE
-static void XS_pack_UA_WriterGroupTransportDataType(SV *out, UA_WriterGroupTransportDataType in) __attribute__((unused));
-static UA_WriterGroupTransportDataType XS_unpack_UA_WriterGroupTransportDataType(SV *in) __attribute__((unused));
-static void
-XS_pack_UA_WriterGroupTransportDataType(SV *out, UA_WriterGroupTransportDataType in)
-{
-	pack_UA_WriterGroupTransportDataType(out, &in);
-}
-static UA_WriterGroupTransportDataType
-XS_unpack_UA_WriterGroupTransportDataType(SV *in)
-{
-	UA_WriterGroupTransportDataType out;
-	unpack_UA_WriterGroupTransportDataType(&out, in);
-	return out;
-}
-static void
-table_pack_UA_WriterGroupTransportDataType(SV *out, const void *in)
-{
-	pack_UA_WriterGroupTransportDataType(out, in);
-}
-static void
-table_unpack_UA_WriterGroupTransportDataType(void *out, SV *in)
-{
-	unpack_UA_WriterGroupTransportDataType(out, in);
-}
-#endif
-
 #ifdef UA_TYPES_X509IDENTITYTOKEN
 static void XS_pack_UA_X509IdentityToken(SV *out, UA_X509IdentityToken in) __attribute__((unused));
 static UA_X509IdentityToken XS_unpack_UA_X509IdentityToken(SV *in) __attribute__((unused));
@@ -10208,6 +10019,9 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_NAMINGRULETYPE
 	[UA_TYPES_NAMINGRULETYPE] = table_pack_UA_NamingRuleType,
 #endif
+#ifdef UA_TYPES_ENUMERATION
+	[UA_TYPES_ENUMERATION] = table_pack_UA_Enumeration,
+#endif
 #ifdef UA_TYPES_IMAGEBMP
 	[UA_TYPES_IMAGEBMP] = table_pack_UA_ImageBMP,
 #endif
@@ -10229,29 +10043,23 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_KEYVALUEPAIR
 	[UA_TYPES_KEYVALUEPAIR] = table_pack_UA_KeyValuePair,
 #endif
+#ifdef UA_TYPES_ADDITIONALPARAMETERSTYPE
+	[UA_TYPES_ADDITIONALPARAMETERSTYPE] = table_pack_UA_AdditionalParametersType,
+#endif
+#ifdef UA_TYPES_EPHEMERALKEYTYPE
+	[UA_TYPES_EPHEMERALKEYTYPE] = table_pack_UA_EphemeralKeyType,
+#endif
 #ifdef UA_TYPES_RATIONALNUMBER
 	[UA_TYPES_RATIONALNUMBER] = table_pack_UA_RationalNumber,
-#endif
-#ifdef UA_TYPES_VECTOR
-	[UA_TYPES_VECTOR] = table_pack_UA_Vector,
 #endif
 #ifdef UA_TYPES_THREEDVECTOR
 	[UA_TYPES_THREEDVECTOR] = table_pack_UA_ThreeDVector,
 #endif
-#ifdef UA_TYPES_CARTESIANCOORDINATES
-	[UA_TYPES_CARTESIANCOORDINATES] = table_pack_UA_CartesianCoordinates,
-#endif
 #ifdef UA_TYPES_THREEDCARTESIANCOORDINATES
 	[UA_TYPES_THREEDCARTESIANCOORDINATES] = table_pack_UA_ThreeDCartesianCoordinates,
 #endif
-#ifdef UA_TYPES_ORIENTATION
-	[UA_TYPES_ORIENTATION] = table_pack_UA_Orientation,
-#endif
 #ifdef UA_TYPES_THREEDORIENTATION
 	[UA_TYPES_THREEDORIENTATION] = table_pack_UA_ThreeDOrientation,
-#endif
-#ifdef UA_TYPES_FRAME
-	[UA_TYPES_FRAME] = table_pack_UA_Frame,
 #endif
 #ifdef UA_TYPES_THREEDFRAME
 	[UA_TYPES_THREEDFRAME] = table_pack_UA_ThreeDFrame,
@@ -10292,9 +10100,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_CONFIGURATIONVERSIONDATATYPE
 	[UA_TYPES_CONFIGURATIONVERSIONDATATYPE] = table_pack_UA_ConfigurationVersionDataType,
 #endif
-#ifdef UA_TYPES_PUBLISHEDDATASETSOURCEDATATYPE
-	[UA_TYPES_PUBLISHEDDATASETSOURCEDATATYPE] = table_pack_UA_PublishedDataSetSourceDataType,
-#endif
 #ifdef UA_TYPES_PUBLISHEDVARIABLEDATATYPE
 	[UA_TYPES_PUBLISHEDVARIABLEDATATYPE] = table_pack_UA_PublishedVariableDataType,
 #endif
@@ -10307,41 +10112,11 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_DATASETWRITERDATATYPE
 	[UA_TYPES_DATASETWRITERDATATYPE] = table_pack_UA_DataSetWriterDataType,
 #endif
-#ifdef UA_TYPES_DATASETWRITERTRANSPORTDATATYPE
-	[UA_TYPES_DATASETWRITERTRANSPORTDATATYPE] = table_pack_UA_DataSetWriterTransportDataType,
-#endif
-#ifdef UA_TYPES_DATASETWRITERMESSAGEDATATYPE
-	[UA_TYPES_DATASETWRITERMESSAGEDATATYPE] = table_pack_UA_DataSetWriterMessageDataType,
-#endif
-#ifdef UA_TYPES_WRITERGROUPTRANSPORTDATATYPE
-	[UA_TYPES_WRITERGROUPTRANSPORTDATATYPE] = table_pack_UA_WriterGroupTransportDataType,
-#endif
-#ifdef UA_TYPES_WRITERGROUPMESSAGEDATATYPE
-	[UA_TYPES_WRITERGROUPMESSAGEDATATYPE] = table_pack_UA_WriterGroupMessageDataType,
-#endif
-#ifdef UA_TYPES_CONNECTIONTRANSPORTDATATYPE
-	[UA_TYPES_CONNECTIONTRANSPORTDATATYPE] = table_pack_UA_ConnectionTransportDataType,
-#endif
 #ifdef UA_TYPES_NETWORKADDRESSDATATYPE
 	[UA_TYPES_NETWORKADDRESSDATATYPE] = table_pack_UA_NetworkAddressDataType,
 #endif
 #ifdef UA_TYPES_NETWORKADDRESSURLDATATYPE
 	[UA_TYPES_NETWORKADDRESSURLDATATYPE] = table_pack_UA_NetworkAddressUrlDataType,
-#endif
-#ifdef UA_TYPES_READERGROUPTRANSPORTDATATYPE
-	[UA_TYPES_READERGROUPTRANSPORTDATATYPE] = table_pack_UA_ReaderGroupTransportDataType,
-#endif
-#ifdef UA_TYPES_READERGROUPMESSAGEDATATYPE
-	[UA_TYPES_READERGROUPMESSAGEDATATYPE] = table_pack_UA_ReaderGroupMessageDataType,
-#endif
-#ifdef UA_TYPES_DATASETREADERTRANSPORTDATATYPE
-	[UA_TYPES_DATASETREADERTRANSPORTDATATYPE] = table_pack_UA_DataSetReaderTransportDataType,
-#endif
-#ifdef UA_TYPES_DATASETREADERMESSAGEDATATYPE
-	[UA_TYPES_DATASETREADERMESSAGEDATATYPE] = table_pack_UA_DataSetReaderMessageDataType,
-#endif
-#ifdef UA_TYPES_SUBSCRIBEDDATASETDATATYPE
-	[UA_TYPES_SUBSCRIBEDDATASETDATATYPE] = table_pack_UA_SubscribedDataSetDataType,
 #endif
 #ifdef UA_TYPES_OVERRIDEVALUEHANDLING
 	[UA_TYPES_OVERRIDEVALUEHANDLING] = table_pack_UA_OverrideValueHandling,
@@ -10406,6 +10181,36 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_PUBSUBDIAGNOSTICSCOUNTERCLASSIFICATION
 	[UA_TYPES_PUBSUBDIAGNOSTICSCOUNTERCLASSIFICATION] = table_pack_UA_PubSubDiagnosticsCounterClassification,
 #endif
+#ifdef UA_TYPES_ALIASNAMEDATATYPE
+	[UA_TYPES_ALIASNAMEDATATYPE] = table_pack_UA_AliasNameDataType,
+#endif
+#ifdef UA_TYPES_DUPLEX
+	[UA_TYPES_DUPLEX] = table_pack_UA_Duplex,
+#endif
+#ifdef UA_TYPES_INTERFACEADMINSTATUS
+	[UA_TYPES_INTERFACEADMINSTATUS] = table_pack_UA_InterfaceAdminStatus,
+#endif
+#ifdef UA_TYPES_INTERFACEOPERSTATUS
+	[UA_TYPES_INTERFACEOPERSTATUS] = table_pack_UA_InterfaceOperStatus,
+#endif
+#ifdef UA_TYPES_NEGOTIATIONSTATUS
+	[UA_TYPES_NEGOTIATIONSTATUS] = table_pack_UA_NegotiationStatus,
+#endif
+#ifdef UA_TYPES_TSNFAILURECODE
+	[UA_TYPES_TSNFAILURECODE] = table_pack_UA_TsnFailureCode,
+#endif
+#ifdef UA_TYPES_TSNSTREAMSTATE
+	[UA_TYPES_TSNSTREAMSTATE] = table_pack_UA_TsnStreamState,
+#endif
+#ifdef UA_TYPES_TSNTALKERSTATUS
+	[UA_TYPES_TSNTALKERSTATUS] = table_pack_UA_TsnTalkerStatus,
+#endif
+#ifdef UA_TYPES_TSNLISTENERSTATUS
+	[UA_TYPES_TSNLISTENERSTATUS] = table_pack_UA_TsnListenerStatus,
+#endif
+#ifdef UA_TYPES_UNSIGNEDRATIONALNUMBER
+	[UA_TYPES_UNSIGNEDRATIONALNUMBER] = table_pack_UA_UnsignedRationalNumber,
+#endif
 #ifdef UA_TYPES_IDTYPE
 	[UA_TYPES_IDTYPE] = table_pack_UA_IdType,
 #endif
@@ -10454,9 +10259,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_OPTIONSET
 	[UA_TYPES_OPTIONSET] = table_pack_UA_OptionSet,
 #endif
-#ifdef UA_TYPES_UNION
-	[UA_TYPES_UNION] = table_pack_UA_Union,
-#endif
 #ifdef UA_TYPES_NORMALIZEDSTRING
 	[UA_TYPES_NORMALIZEDSTRING] = table_pack_UA_NormalizedString,
 #endif
@@ -10477,6 +10279,12 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_UTCTIME
 	[UA_TYPES_UTCTIME] = table_pack_UA_UtcTime,
+#endif
+#ifdef UA_TYPES_TIME
+	[UA_TYPES_TIME] = table_pack_UA_Time,
+#endif
+#ifdef UA_TYPES_DATE
+	[UA_TYPES_DATE] = table_pack_UA_Date,
 #endif
 #ifdef UA_TYPES_LOCALEID
 	[UA_TYPES_LOCALEID] = table_pack_UA_LocaleId,
@@ -10559,9 +10367,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_REGISTERSERVERRESPONSE
 	[UA_TYPES_REGISTERSERVERRESPONSE] = table_pack_UA_RegisterServerResponse,
 #endif
-#ifdef UA_TYPES_DISCOVERYCONFIGURATION
-	[UA_TYPES_DISCOVERYCONFIGURATION] = table_pack_UA_DiscoveryConfiguration,
-#endif
 #ifdef UA_TYPES_MDNSDISCOVERYCONFIGURATION
 	[UA_TYPES_MDNSDISCOVERYCONFIGURATION] = table_pack_UA_MdnsDiscoveryConfiguration,
 #endif
@@ -10621,6 +10426,9 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_RSAENCRYPTEDSECRET
 	[UA_TYPES_RSAENCRYPTEDSECRET] = table_pack_UA_RsaEncryptedSecret,
+#endif
+#ifdef UA_TYPES_ECCENCRYPTEDSECRET
+	[UA_TYPES_ECCENCRYPTEDSECRET] = table_pack_UA_EccEncryptedSecret,
 #endif
 #ifdef UA_TYPES_ACTIVATESESSIONREQUEST
 	[UA_TYPES_ACTIVATESESSIONREQUEST] = table_pack_UA_ActivateSessionRequest,
@@ -10787,11 +10595,8 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_COUNTER
 	[UA_TYPES_COUNTER] = table_pack_UA_Counter,
 #endif
-#ifdef UA_TYPES_TIME
-	[UA_TYPES_TIME] = table_pack_UA_Time,
-#endif
-#ifdef UA_TYPES_DATE
-	[UA_TYPES_DATE] = table_pack_UA_Date,
+#ifdef UA_TYPES_OPAQUENUMERICRANGE
+	[UA_TYPES_OPAQUENUMERICRANGE] = table_pack_UA_OpaqueNumericRange,
 #endif
 #ifdef UA_TYPES_ENDPOINTCONFIGURATION
 	[UA_TYPES_ENDPOINTCONFIGURATION] = table_pack_UA_EndpointConfiguration,
@@ -10816,9 +10621,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_CONTENTFILTER
 	[UA_TYPES_CONTENTFILTER] = table_pack_UA_ContentFilter,
-#endif
-#ifdef UA_TYPES_FILTEROPERAND
-	[UA_TYPES_FILTEROPERAND] = table_pack_UA_FilterOperand,
 #endif
 #ifdef UA_TYPES_ELEMENTOPERAND
 	[UA_TYPES_ELEMENTOPERAND] = table_pack_UA_ElementOperand,
@@ -10870,9 +10672,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_HISTORYREADRESULT
 	[UA_TYPES_HISTORYREADRESULT] = table_pack_UA_HistoryReadResult,
-#endif
-#ifdef UA_TYPES_HISTORYREADDETAILS
-	[UA_TYPES_HISTORYREADDETAILS] = table_pack_UA_HistoryReadDetails,
 #endif
 #ifdef UA_TYPES_READRAWMODIFIEDDETAILS
 	[UA_TYPES_READRAWMODIFIEDDETAILS] = table_pack_UA_ReadRawModifiedDetails,
@@ -10955,9 +10754,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_DEADBANDTYPE
 	[UA_TYPES_DEADBANDTYPE] = table_pack_UA_DeadbandType,
 #endif
-#ifdef UA_TYPES_MONITORINGFILTER
-	[UA_TYPES_MONITORINGFILTER] = table_pack_UA_MonitoringFilter,
-#endif
 #ifdef UA_TYPES_DATACHANGEFILTER
 	[UA_TYPES_DATACHANGEFILTER] = table_pack_UA_DataChangeFilter,
 #endif
@@ -10969,9 +10765,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_AGGREGATEFILTER
 	[UA_TYPES_AGGREGATEFILTER] = table_pack_UA_AggregateFilter,
-#endif
-#ifdef UA_TYPES_MONITORINGFILTERRESULT
-	[UA_TYPES_MONITORINGFILTERRESULT] = table_pack_UA_MonitoringFilterResult,
 #endif
 #ifdef UA_TYPES_EVENTFILTERRESULT
 	[UA_TYPES_EVENTFILTERRESULT] = table_pack_UA_EventFilterResult,
@@ -11044,9 +10837,6 @@ static pack_UA pack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_NOTIFICATIONMESSAGE
 	[UA_TYPES_NOTIFICATIONMESSAGE] = table_pack_UA_NotificationMessage,
-#endif
-#ifdef UA_TYPES_NOTIFICATIONDATA
-	[UA_TYPES_NOTIFICATIONDATA] = table_pack_UA_NotificationData,
 #endif
 #ifdef UA_TYPES_MONITOREDITEMNOTIFICATION
 	[UA_TYPES_MONITOREDITEMNOTIFICATION] = table_pack_UA_MonitoredItemNotification,
@@ -11336,6 +11126,9 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_NAMINGRULETYPE
 	[UA_TYPES_NAMINGRULETYPE] = table_unpack_UA_NamingRuleType,
 #endif
+#ifdef UA_TYPES_ENUMERATION
+	[UA_TYPES_ENUMERATION] = table_unpack_UA_Enumeration,
+#endif
 #ifdef UA_TYPES_IMAGEBMP
 	[UA_TYPES_IMAGEBMP] = table_unpack_UA_ImageBMP,
 #endif
@@ -11357,29 +11150,23 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_KEYVALUEPAIR
 	[UA_TYPES_KEYVALUEPAIR] = table_unpack_UA_KeyValuePair,
 #endif
+#ifdef UA_TYPES_ADDITIONALPARAMETERSTYPE
+	[UA_TYPES_ADDITIONALPARAMETERSTYPE] = table_unpack_UA_AdditionalParametersType,
+#endif
+#ifdef UA_TYPES_EPHEMERALKEYTYPE
+	[UA_TYPES_EPHEMERALKEYTYPE] = table_unpack_UA_EphemeralKeyType,
+#endif
 #ifdef UA_TYPES_RATIONALNUMBER
 	[UA_TYPES_RATIONALNUMBER] = table_unpack_UA_RationalNumber,
-#endif
-#ifdef UA_TYPES_VECTOR
-	[UA_TYPES_VECTOR] = table_unpack_UA_Vector,
 #endif
 #ifdef UA_TYPES_THREEDVECTOR
 	[UA_TYPES_THREEDVECTOR] = table_unpack_UA_ThreeDVector,
 #endif
-#ifdef UA_TYPES_CARTESIANCOORDINATES
-	[UA_TYPES_CARTESIANCOORDINATES] = table_unpack_UA_CartesianCoordinates,
-#endif
 #ifdef UA_TYPES_THREEDCARTESIANCOORDINATES
 	[UA_TYPES_THREEDCARTESIANCOORDINATES] = table_unpack_UA_ThreeDCartesianCoordinates,
 #endif
-#ifdef UA_TYPES_ORIENTATION
-	[UA_TYPES_ORIENTATION] = table_unpack_UA_Orientation,
-#endif
 #ifdef UA_TYPES_THREEDORIENTATION
 	[UA_TYPES_THREEDORIENTATION] = table_unpack_UA_ThreeDOrientation,
-#endif
-#ifdef UA_TYPES_FRAME
-	[UA_TYPES_FRAME] = table_unpack_UA_Frame,
 #endif
 #ifdef UA_TYPES_THREEDFRAME
 	[UA_TYPES_THREEDFRAME] = table_unpack_UA_ThreeDFrame,
@@ -11420,9 +11207,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_CONFIGURATIONVERSIONDATATYPE
 	[UA_TYPES_CONFIGURATIONVERSIONDATATYPE] = table_unpack_UA_ConfigurationVersionDataType,
 #endif
-#ifdef UA_TYPES_PUBLISHEDDATASETSOURCEDATATYPE
-	[UA_TYPES_PUBLISHEDDATASETSOURCEDATATYPE] = table_unpack_UA_PublishedDataSetSourceDataType,
-#endif
 #ifdef UA_TYPES_PUBLISHEDVARIABLEDATATYPE
 	[UA_TYPES_PUBLISHEDVARIABLEDATATYPE] = table_unpack_UA_PublishedVariableDataType,
 #endif
@@ -11435,41 +11219,11 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_DATASETWRITERDATATYPE
 	[UA_TYPES_DATASETWRITERDATATYPE] = table_unpack_UA_DataSetWriterDataType,
 #endif
-#ifdef UA_TYPES_DATASETWRITERTRANSPORTDATATYPE
-	[UA_TYPES_DATASETWRITERTRANSPORTDATATYPE] = table_unpack_UA_DataSetWriterTransportDataType,
-#endif
-#ifdef UA_TYPES_DATASETWRITERMESSAGEDATATYPE
-	[UA_TYPES_DATASETWRITERMESSAGEDATATYPE] = table_unpack_UA_DataSetWriterMessageDataType,
-#endif
-#ifdef UA_TYPES_WRITERGROUPTRANSPORTDATATYPE
-	[UA_TYPES_WRITERGROUPTRANSPORTDATATYPE] = table_unpack_UA_WriterGroupTransportDataType,
-#endif
-#ifdef UA_TYPES_WRITERGROUPMESSAGEDATATYPE
-	[UA_TYPES_WRITERGROUPMESSAGEDATATYPE] = table_unpack_UA_WriterGroupMessageDataType,
-#endif
-#ifdef UA_TYPES_CONNECTIONTRANSPORTDATATYPE
-	[UA_TYPES_CONNECTIONTRANSPORTDATATYPE] = table_unpack_UA_ConnectionTransportDataType,
-#endif
 #ifdef UA_TYPES_NETWORKADDRESSDATATYPE
 	[UA_TYPES_NETWORKADDRESSDATATYPE] = table_unpack_UA_NetworkAddressDataType,
 #endif
 #ifdef UA_TYPES_NETWORKADDRESSURLDATATYPE
 	[UA_TYPES_NETWORKADDRESSURLDATATYPE] = table_unpack_UA_NetworkAddressUrlDataType,
-#endif
-#ifdef UA_TYPES_READERGROUPTRANSPORTDATATYPE
-	[UA_TYPES_READERGROUPTRANSPORTDATATYPE] = table_unpack_UA_ReaderGroupTransportDataType,
-#endif
-#ifdef UA_TYPES_READERGROUPMESSAGEDATATYPE
-	[UA_TYPES_READERGROUPMESSAGEDATATYPE] = table_unpack_UA_ReaderGroupMessageDataType,
-#endif
-#ifdef UA_TYPES_DATASETREADERTRANSPORTDATATYPE
-	[UA_TYPES_DATASETREADERTRANSPORTDATATYPE] = table_unpack_UA_DataSetReaderTransportDataType,
-#endif
-#ifdef UA_TYPES_DATASETREADERMESSAGEDATATYPE
-	[UA_TYPES_DATASETREADERMESSAGEDATATYPE] = table_unpack_UA_DataSetReaderMessageDataType,
-#endif
-#ifdef UA_TYPES_SUBSCRIBEDDATASETDATATYPE
-	[UA_TYPES_SUBSCRIBEDDATASETDATATYPE] = table_unpack_UA_SubscribedDataSetDataType,
 #endif
 #ifdef UA_TYPES_OVERRIDEVALUEHANDLING
 	[UA_TYPES_OVERRIDEVALUEHANDLING] = table_unpack_UA_OverrideValueHandling,
@@ -11534,6 +11288,36 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_PUBSUBDIAGNOSTICSCOUNTERCLASSIFICATION
 	[UA_TYPES_PUBSUBDIAGNOSTICSCOUNTERCLASSIFICATION] = table_unpack_UA_PubSubDiagnosticsCounterClassification,
 #endif
+#ifdef UA_TYPES_ALIASNAMEDATATYPE
+	[UA_TYPES_ALIASNAMEDATATYPE] = table_unpack_UA_AliasNameDataType,
+#endif
+#ifdef UA_TYPES_DUPLEX
+	[UA_TYPES_DUPLEX] = table_unpack_UA_Duplex,
+#endif
+#ifdef UA_TYPES_INTERFACEADMINSTATUS
+	[UA_TYPES_INTERFACEADMINSTATUS] = table_unpack_UA_InterfaceAdminStatus,
+#endif
+#ifdef UA_TYPES_INTERFACEOPERSTATUS
+	[UA_TYPES_INTERFACEOPERSTATUS] = table_unpack_UA_InterfaceOperStatus,
+#endif
+#ifdef UA_TYPES_NEGOTIATIONSTATUS
+	[UA_TYPES_NEGOTIATIONSTATUS] = table_unpack_UA_NegotiationStatus,
+#endif
+#ifdef UA_TYPES_TSNFAILURECODE
+	[UA_TYPES_TSNFAILURECODE] = table_unpack_UA_TsnFailureCode,
+#endif
+#ifdef UA_TYPES_TSNSTREAMSTATE
+	[UA_TYPES_TSNSTREAMSTATE] = table_unpack_UA_TsnStreamState,
+#endif
+#ifdef UA_TYPES_TSNTALKERSTATUS
+	[UA_TYPES_TSNTALKERSTATUS] = table_unpack_UA_TsnTalkerStatus,
+#endif
+#ifdef UA_TYPES_TSNLISTENERSTATUS
+	[UA_TYPES_TSNLISTENERSTATUS] = table_unpack_UA_TsnListenerStatus,
+#endif
+#ifdef UA_TYPES_UNSIGNEDRATIONALNUMBER
+	[UA_TYPES_UNSIGNEDRATIONALNUMBER] = table_unpack_UA_UnsignedRationalNumber,
+#endif
 #ifdef UA_TYPES_IDTYPE
 	[UA_TYPES_IDTYPE] = table_unpack_UA_IdType,
 #endif
@@ -11582,9 +11366,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_OPTIONSET
 	[UA_TYPES_OPTIONSET] = table_unpack_UA_OptionSet,
 #endif
-#ifdef UA_TYPES_UNION
-	[UA_TYPES_UNION] = table_unpack_UA_Union,
-#endif
 #ifdef UA_TYPES_NORMALIZEDSTRING
 	[UA_TYPES_NORMALIZEDSTRING] = table_unpack_UA_NormalizedString,
 #endif
@@ -11605,6 +11386,12 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_UTCTIME
 	[UA_TYPES_UTCTIME] = table_unpack_UA_UtcTime,
+#endif
+#ifdef UA_TYPES_TIME
+	[UA_TYPES_TIME] = table_unpack_UA_Time,
+#endif
+#ifdef UA_TYPES_DATE
+	[UA_TYPES_DATE] = table_unpack_UA_Date,
 #endif
 #ifdef UA_TYPES_LOCALEID
 	[UA_TYPES_LOCALEID] = table_unpack_UA_LocaleId,
@@ -11687,9 +11474,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_REGISTERSERVERRESPONSE
 	[UA_TYPES_REGISTERSERVERRESPONSE] = table_unpack_UA_RegisterServerResponse,
 #endif
-#ifdef UA_TYPES_DISCOVERYCONFIGURATION
-	[UA_TYPES_DISCOVERYCONFIGURATION] = table_unpack_UA_DiscoveryConfiguration,
-#endif
 #ifdef UA_TYPES_MDNSDISCOVERYCONFIGURATION
 	[UA_TYPES_MDNSDISCOVERYCONFIGURATION] = table_unpack_UA_MdnsDiscoveryConfiguration,
 #endif
@@ -11749,6 +11533,9 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_RSAENCRYPTEDSECRET
 	[UA_TYPES_RSAENCRYPTEDSECRET] = table_unpack_UA_RsaEncryptedSecret,
+#endif
+#ifdef UA_TYPES_ECCENCRYPTEDSECRET
+	[UA_TYPES_ECCENCRYPTEDSECRET] = table_unpack_UA_EccEncryptedSecret,
 #endif
 #ifdef UA_TYPES_ACTIVATESESSIONREQUEST
 	[UA_TYPES_ACTIVATESESSIONREQUEST] = table_unpack_UA_ActivateSessionRequest,
@@ -11915,11 +11702,8 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_COUNTER
 	[UA_TYPES_COUNTER] = table_unpack_UA_Counter,
 #endif
-#ifdef UA_TYPES_TIME
-	[UA_TYPES_TIME] = table_unpack_UA_Time,
-#endif
-#ifdef UA_TYPES_DATE
-	[UA_TYPES_DATE] = table_unpack_UA_Date,
+#ifdef UA_TYPES_OPAQUENUMERICRANGE
+	[UA_TYPES_OPAQUENUMERICRANGE] = table_unpack_UA_OpaqueNumericRange,
 #endif
 #ifdef UA_TYPES_ENDPOINTCONFIGURATION
 	[UA_TYPES_ENDPOINTCONFIGURATION] = table_unpack_UA_EndpointConfiguration,
@@ -11944,9 +11728,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_CONTENTFILTER
 	[UA_TYPES_CONTENTFILTER] = table_unpack_UA_ContentFilter,
-#endif
-#ifdef UA_TYPES_FILTEROPERAND
-	[UA_TYPES_FILTEROPERAND] = table_unpack_UA_FilterOperand,
 #endif
 #ifdef UA_TYPES_ELEMENTOPERAND
 	[UA_TYPES_ELEMENTOPERAND] = table_unpack_UA_ElementOperand,
@@ -11998,9 +11779,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_HISTORYREADRESULT
 	[UA_TYPES_HISTORYREADRESULT] = table_unpack_UA_HistoryReadResult,
-#endif
-#ifdef UA_TYPES_HISTORYREADDETAILS
-	[UA_TYPES_HISTORYREADDETAILS] = table_unpack_UA_HistoryReadDetails,
 #endif
 #ifdef UA_TYPES_READRAWMODIFIEDDETAILS
 	[UA_TYPES_READRAWMODIFIEDDETAILS] = table_unpack_UA_ReadRawModifiedDetails,
@@ -12083,9 +11861,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #ifdef UA_TYPES_DEADBANDTYPE
 	[UA_TYPES_DEADBANDTYPE] = table_unpack_UA_DeadbandType,
 #endif
-#ifdef UA_TYPES_MONITORINGFILTER
-	[UA_TYPES_MONITORINGFILTER] = table_unpack_UA_MonitoringFilter,
-#endif
 #ifdef UA_TYPES_DATACHANGEFILTER
 	[UA_TYPES_DATACHANGEFILTER] = table_unpack_UA_DataChangeFilter,
 #endif
@@ -12097,9 +11872,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_AGGREGATEFILTER
 	[UA_TYPES_AGGREGATEFILTER] = table_unpack_UA_AggregateFilter,
-#endif
-#ifdef UA_TYPES_MONITORINGFILTERRESULT
-	[UA_TYPES_MONITORINGFILTERRESULT] = table_unpack_UA_MonitoringFilterResult,
 #endif
 #ifdef UA_TYPES_EVENTFILTERRESULT
 	[UA_TYPES_EVENTFILTERRESULT] = table_unpack_UA_EventFilterResult,
@@ -12172,9 +11944,6 @@ static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {
 #endif
 #ifdef UA_TYPES_NOTIFICATIONMESSAGE
 	[UA_TYPES_NOTIFICATIONMESSAGE] = table_unpack_UA_NotificationMessage,
-#endif
-#ifdef UA_TYPES_NOTIFICATIONDATA
-	[UA_TYPES_NOTIFICATIONDATA] = table_unpack_UA_NotificationData,
 #endif
 #ifdef UA_TYPES_MONITOREDITEMNOTIFICATION
 	[UA_TYPES_MONITOREDITEMNOTIFICATION] = table_unpack_UA_MonitoredItemNotification,

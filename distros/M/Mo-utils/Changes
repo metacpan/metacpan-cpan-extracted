@@ -1,3 +1,9 @@
+0.30 2025-07-04T11:48:54+02:00
+ - In case of scalar reference in check_array() present 'SCALAR' value in
+   reference error parameter.
+ - Sort check_strings() error messages in doc.
+ - Update copyright years.
+
 0.29 2024-05-27T09:53:09+02:00
  - Fix typo in doc.
 

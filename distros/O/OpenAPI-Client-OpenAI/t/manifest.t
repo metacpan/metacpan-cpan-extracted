@@ -14,4 +14,4 @@ eval "use Test::CheckManifest $min_tcm";
 plan skip_all => "Test::CheckManifest $min_tcm required" if $@;
 
 my @paths = map { abs_path($_) } qw( .gitignore .git openai-openapi );
-ok_manifest( { exclude => \@paths } );
+ok_manifest( { exclude => \@paths, filter => [qr/\.DS_Store|TODO/] } );

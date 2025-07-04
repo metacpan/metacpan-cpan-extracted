@@ -598,6 +598,49 @@ unpack_UA_ByteString_List(UA_ByteString **outList, size_t *outSize, SV *in)
 	}
 }
 
+
+static void
+unpack_UA_String_List(UA_String **outList, size_t *outSize, SV *in)
+{
+	dTHX;
+	AV *		av;
+	SV *		sv;
+	SV **		svp;
+	UA_String *	s;
+	size_t		i;
+
+	*outList = NULL;
+	*outSize = 0;
+
+	if (SvOK(in)) {
+		if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVAV) {
+			CROAK("Not an ARRAY reference with String list");
+		}
+		av = (AV*)SvRV(in);
+		*outSize = av_top_index(av) + 1;
+	}
+
+	if (*outSize > 0) {
+		if ((*outSize >= MUL_NO_OVERFLOW ||
+		    sizeof(UA_String) >= MUL_NO_OVERFLOW) &&
+		    SIZE_MAX / *outSize < sizeof(UA_String)) {
+			CROAK("String list too big");
+		}
+		sv = sv_2mortal(newSV(*outSize * sizeof(UA_String)));
+		*outList = (UA_String *)SvPVX(sv);
+
+		for (i = 0, s = *outList; i < *outSize; i++, s++) {
+			svp = av_fetch(av, i, 0);
+
+			if (svp == NULL || !SvOK(*svp)) {
+				UA_String_init(s);
+			} else {
+				s->data = SvPV(*svp, s->length);
+			}
+		}
+	}
+}
+
 /* 6.1.17 XmlElement, types.h */
 
 static void
@@ -4485,6 +4528,85 @@ UA_Client_getState(client)
 	RETVAL
 
 UA_StatusCode
+UA_Client_getEndpoints(client, serverUrl, endpointsRSV)
+	OPCUA_Open62541_Client		client
+	char *				serverUrl
+	SV *				endpointsRSV
+    PREINIT:
+	AV *				endpointsAV;
+	SV *				endpointsSV;
+	size_t				i;
+	size_t				endpointDescriptionsSize = 0;
+	UA_EndpointDescription *	endpointDescriptions = NULL;
+    CODE:
+	if (!(SvROK(endpointsRSV) && SvTYPE(SvRV(endpointsRSV)) < SVt_PVAV) ||
+	    sv_isobject(endpointsRSV) || SvREADONLY(SvRV(endpointsRSV)))
+		CROAK("Output parameter endpoints is not a scalar reference");
+
+	RETVAL = UA_Client_getEndpoints(client->cl_client, serverUrl,
+		&endpointDescriptionsSize, &endpointDescriptions);
+
+	endpointsAV = newAV();
+	sv_setsv(SvRV(endpointsRSV), sv_2mortal(newRV_noinc((SV*)endpointsAV)));
+	av_extend(endpointsAV, endpointDescriptionsSize);
+	for (i = 0; i < endpointDescriptionsSize; i++) {
+		endpointsSV = newSV(0);
+		av_push(endpointsAV, endpointsSV);
+		pack_UA_EndpointDescription(
+		    endpointsSV, &endpointDescriptions[i]);
+	}
+	UA_Array_delete(endpointDescriptions, endpointDescriptionsSize,
+	    &UA_TYPES[UA_TYPES_ENDPOINTDESCRIPTION]);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
+UA_Client_findServers(client, serverUrl, serverUrisRAV = &PL_sv_undef, localeIdsRAV = &PL_sv_undef, registeredServersRSV)
+	OPCUA_Open62541_Client		client
+	char *				serverUrl
+	SV *				serverUrisRAV
+	SV *				localeIdsRAV
+	SV *				registeredServersRSV
+    PREINIT:
+	AV *				registeredServersAV;
+	SV *				registeredServersSV;
+	UA_String *			serverUris;
+	size_t				serverUrisSize;
+	UA_String *			localeIds;
+	size_t				localeIdsSize;
+	size_t				i;
+	size_t				applicationDescriptionsSize = 0;
+	UA_ApplicationDescription *	applicationDescriptions = NULL;
+    CODE:
+	if (!(SvROK(registeredServersRSV) &&
+	    SvTYPE(SvRV(registeredServersRSV)) < SVt_PVAV) ||
+	    sv_isobject(registeredServersRSV) ||
+	    SvREADONLY(SvRV(registeredServersRSV)))
+		CROAK("Output parameter registeredServers is not a scalar reference");
+
+	unpack_UA_String_List(&serverUris, &serverUrisSize, serverUrisRAV);
+	unpack_UA_String_List(&localeIds, &localeIdsSize, localeIdsRAV);
+
+	RETVAL = UA_Client_findServers(client->cl_client, serverUrl,
+	    serverUrisSize, serverUris, localeIdsSize, localeIds,
+	    &applicationDescriptionsSize, &applicationDescriptions);
+
+	registeredServersAV = newAV();
+	sv_setsv(SvRV(registeredServersRSV),
+	    sv_2mortal(newRV_noinc((SV*)registeredServersAV)));
+	av_extend(registeredServersAV, applicationDescriptionsSize);
+	for (i = 0; i < applicationDescriptionsSize; i++) {
+		registeredServersSV = newSV(0);
+		av_push(registeredServersAV, registeredServersSV);
+		pack_UA_ApplicationDescription(
+		    registeredServersSV, &applicationDescriptions[i]);
+	}
+	UA_Array_delete(applicationDescriptions, applicationDescriptionsSize,
+	    &UA_TYPES[UA_TYPES_APPLICATIONDESCRIPTION]);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
 UA_Client_sendAsyncBrowseRequest(client, request, callback, data, outoptReqId)
 	OPCUA_Open62541_Client		client
 	OPCUA_Open62541_BrowseRequest	request
@@ -4532,12 +4654,30 @@ UA_Client_sendAsyncBrowseNextRequest(client, request, callback, data, \
     OUTPUT:
 	RETVAL
 
+UA_ReadResponse
+UA_Client_Service_read(client, request)
+	OPCUA_Open62541_Client		client
+	OPCUA_Open62541_ReadRequest	request
+    CODE:
+	RETVAL = UA_Client_Service_read(client->cl_client, *request);
+    OUTPUT:
+	RETVAL
+
 UA_BrowseResponse
 UA_Client_Service_browse(client, request)
 	OPCUA_Open62541_Client		client
 	OPCUA_Open62541_BrowseRequest	request
     CODE:
 	RETVAL = UA_Client_Service_browse(client->cl_client, *request);
+    OUTPUT:
+	RETVAL
+
+UA_BrowseNextResponse
+UA_Client_Service_browseNext(client, request)
+	OPCUA_Open62541_Client			client
+	OPCUA_Open62541_BrowseNextRequest	request
+    CODE:
+	RETVAL = UA_Client_Service_browseNext(client->cl_client, *request);
     OUTPUT:
 	RETVAL
 
@@ -5076,6 +5216,21 @@ UA_ClientConfig_setSecurityMode(config, securityMode)
 	UA_MessageSecurityMode_clear(&config->clc_clientconfig->securityMode);
 	UA_MessageSecurityMode_copy(securityMode,
 	    &config->clc_clientconfig->securityMode);
+
+UA_UInt32
+UA_ClientConfig_getTimeout(config)
+	OPCUA_Open62541_ClientConfig	config
+    CODE:
+	RETVAL = config->clc_clientconfig->timeout;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ClientConfig_setTimeout(config, timeout)
+	OPCUA_Open62541_ClientConfig	config
+	UA_UInt32			timeout
+    CODE:
+	config->clc_clientconfig->timeout = timeout;
 
 #ifdef HAVE_UA_CLIENTCONFIG_APPLICATIONURI
 

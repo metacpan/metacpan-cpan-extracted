@@ -55,6 +55,19 @@ the character 'm' or 'f'.
 
 =back
 
+=head2 Note
+
+THe objects that you use with this class can actually have different names
+for these methods. C<parent>, C<id> and C<gender> are the default names
+used by this module, but you can change them by passing the correct names
+to the constructor. For example:
+
+    my $rel = Genealogy::Relationship->new(
+      parent_field_name     => 'progenitor',
+      identifier_field_name => 'person_id',
+      gender_field_name     => 'sex',
+    );
+
 =head2 Limitations
 
 This module was born out of a need I had while creating
@@ -98,66 +111,39 @@ consider putting a caching layer in front of C<get_relationship>.
 
 =cut
 
-package Genealogy::Relationship;
+use feature 'class';
+no warnings 'experimental::class';
+class Genealogy::Relationship;
 
-use Moo;
-use Types::Standard qw[Int Str HashRef];
 use List::Util qw[first];
-use List::MoreUtils qw[firstidx];
 use Lingua::EN::Numbers qw[num2en num2en_ordinal];
 
-our $VERSION = '0.2.0';
+our $VERSION = '1.0.0';
 
-has parent_field_name => (
-  is => 'ro',
-  isa => Str,
-  default => 'parent',
-);
+field $parent_field_name :param = 'parent';
+field $identifier_field_name :param = 'id';
+field $gender_field_name :param = 'gender';
 
-has identifier_field_name => (
-  is => 'ro',
-  isa => Str,
-  default => 'id',
-);
-
-has gender_field_name => (
-  is => 'ro',
-  isa => Str,
-  default => 'gender',
-);
-
-has relationship_table => (
-  is => 'ro',
-  isa => HashRef,
-  builder => '_build_relationship_table',
-);
-
-sub _build_relationship_table {
-  return {
-    m => [
+field $relationship_table :param = {
+  m => [
     [ undef, 'Father', 'Grandfather', 'Great grandfather', 'Great, great grandfather', 'Great, great, great grandfather' ],
     ['Son', 'Brother', 'Uncle', 'Great uncle', 'Great, great uncle', 'Great, great, great uncle' ],
     ['Grandson', 'Nephew', 'First cousin', 'First cousin once removed', 'First cousin twice removed', 'First cousin three times removed' ],
     ['Great grandson', 'Great nephew', 'First cousin once removed', 'Second cousin', 'Second cousin once removed', 'Second cousin twice removed' ],
     ['Great, great grandson', 'Great, great nephew', 'First cousin twice removed', 'Second cousin once removed', 'Third cousin', 'Third cousin once removed' ],
     ['Great, great, great grandson', 'Great, great, great nephew', 'First cousin three times removed', 'Second cousin twice removed', 'Third cousin once removed', 'Fourth cousin' ],
-    ],
-    f => [
+  ],
+  f => [
     [ undef, 'Mother', 'Grandmother', 'Great grandmother', 'Great, great grandmother', 'Great, great great grandmother' ],
     ['Daughter', 'Sister', 'Aunt', 'Great aunt', 'Great, great aunt', 'Great, great, great aunt' ],
     ['Granddaughter', 'Niece', 'First cousin', 'First cousin once removed', 'First cousin twice removed', 'First cousin three times removed' ],
     ['Great granddaughter', 'Great niece', 'First cousin once removed', 'Second cousin', 'Second cousin once removed', 'Second cousin twice removed' ],
     ['Great, great granddaughter', 'Great, great niece', 'First cousin twice removed', 'Second cousin once removed', 'Third cousin', 'Third cousin once removed' ],
     ['Great, great, great granddaughter', 'Great, great, great niece', 'First cousin three times removed', 'Second cousin twice removed', 'Third cousin once removed', 'Fourth cousin' ],
-    ],
-  };
-}
+  ],
+};
 
-has abbr => (
-  is => 'ro',
-  isa => Int,
-  default => 3,
-);
+field $abbr :param = 3;
 
 =head1 Methods
 
@@ -170,19 +156,20 @@ ancestor for the given people.
 
 =cut
 
-sub most_recent_common_ancestor {
-  my $self = shift;
+method most_recent_common_ancestor {
   my ($person1, $person2) = @_;
 
   # Are they the same person?
-  return $person1 if $person1->id eq $person2->id;
+  return $person1
+    if $person1->$identifier_field_name eq $person2->$identifier_field_name;
 
   my @ancestors1 = ($person1, $self->get_ancestors($person1));
   my @ancestors2 = ($person2, $self->get_ancestors($person2));
 
   for my $anc1 (@ancestors1) {
     for my $anc2 (@ancestors2) {
-      return $anc1 if $anc1->id eq $anc2->id;
+      return $anc1
+        if $anc1->$identifier_field_name eq $anc2->$identifier_field_name;
     }
   }
 
@@ -199,13 +186,12 @@ will be their most distant ancestor.
 
 =cut
 
-sub get_ancestors {
-  my $self = shift;
+method get_ancestors {
   my ($person) = @_;
 
   my @ancestors = ();
 
-  while (defined ($person = $person->parent)) {
+  while (defined ($person = $person->$parent_field_name)) {
     push @ancestors, $person;
   }
 
@@ -219,22 +205,21 @@ relationship between those two people.
 
 =cut
 
-sub get_relationship {
-  my $self = shift;
+method get_relationship {
   my ($person1, $person2) = @_;
 
   my ($x, $y) = $self->get_relationship_coords($person1, $person2);
 
   my $rel;
 
-  if (defined $self->relationship_table->{$person1->gender}[$x][$y]) {
-    $rel = $self->relationship_table->{$person1->gender}[$x][$y];
+  if (defined $relationship_table->{$person1->$gender_field_name}[$x][$y]) {
+    $rel = $relationship_table->{$person1->$gender_field_name}[$x][$y];
   } else {
-    $rel = $self->relationship_table->{$person1->gender}[$x][$y] =
-      ucfirst $self->make_rel($person1->gender, $x, $y);
+    $rel = $relationship_table->{$person1->$gender_field_name}[$x][$y] =
+      ucfirst $self->make_rel($person1->$gender_field_name, $x, $y);
   }
 
-  $rel = $self->abbr_rel($rel) if $self->abbr;
+  $rel = $self->abbr_rel($rel) if $abbr;
 
   return $rel;
 }
@@ -245,16 +230,15 @@ Optionally abbreviate a relationship description.
 
 =cut
 
-sub abbr_rel {
-  my $self = shift;
+method abbr_rel {
   my ($rel) = @_;
 
-  return $rel unless $self->abbr;
+  return $rel unless $abbr;
 
   my @greats = $rel =~ /(great)/gi;
   my $count  = @greats;
 
-  return $rel if $count < $self->abbr;
+  return $rel if $count < $abbr;
 
   $rel =~ s/(great,\s+)+/$count x /i;
 
@@ -269,8 +253,7 @@ table that covers all of the trickier situations.
 
 =cut
 
-sub make_rel {
-  my $self = shift;
+method make_rel {
   my ($gender, $x, $y) = @_;
 
   my %terms = (
@@ -345,19 +328,21 @@ the second person and their most recent common ancestor.
 
 =cut
 
-sub get_relationship_coords {
-  my $self = shift;
+method get_relationship_coords {
   my ($person1, $person2) = @_;
 
   # If the two people are the same person, then return (0, 0).
-  return (0, 0) if $person1->id eq $person2->id;
+  return (0, 0)
+    if $person1->$identifier_field_name eq $person2->$identifier_field_name;
 
   my @ancestors1 = ($person1, $self->get_ancestors($person1));
   my @ancestors2 = ($person2, $self->get_ancestors($person2));
 
   for my $i (0 .. $#ancestors1) {
     for my $j (0 .. $#ancestors2) {
-      return ($i, $j) if $ancestors1[$i]->id eq $ancestors2[$j]->id;
+      return ($i, $j)
+        if $ancestors1[$i]->$identifier_field_name
+          eq $ancestors2[$j]->$identifier_field_name;
     }
   }
 
@@ -376,8 +361,7 @@ ancestor. The second list does the same for person2.
 
 =cut
 
-sub get_relationship_ancestors {
-  my $self = shift;
+method get_relationship_ancestors {
   my ($person1, $person2) = @_;
 
   my $mrca = $self->most_recent_common_ancestor($person1, $person2)
@@ -387,12 +371,12 @@ sub get_relationship_ancestors {
 
   for ($person1, $self->get_ancestors($person1)) {
     push @ancestors1, $_;
-    last if $_->id eq $mrca->id;
+    last if $_->$identifier_field_name eq $mrca->$identifier_field_name;
   }
 
   for ($person2, $self->get_ancestors($person2)) {
     push @ancestors2, $_;
-    last if $_->id eq $mrca->id;
+    last if $_->$identifier_field_name eq $mrca->$identifier_field_name;
   }
 
   return [ \@ancestors1, \@ancestors2 ];

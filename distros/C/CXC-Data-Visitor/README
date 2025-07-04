@@ -2,17 +2,45 @@ CXC::Data::Visitor
 
 CXC::Data::Visitor provides a means of performing a depth first
 traversal of a data structure. There are similar modules on CPAN ("SEE
-ALSO"); this module provides a few extras:
+ALSO"); this module provides a few extras.
+
+*   Hashes are traversed in sorted key order. By default the order is
+    that provided by Perl's standard string sort order. The caller may
+    provide a coderef to provide an alternative sort order
+    ("sort_keys").
+
+*   The callback is invoked first on a container and then its elements.
+    Given
+
+      { a => { b => [ 0 ], c => 2 } }
+
+    the callback order is
+
+      {a}, {a}{b}, {a}{b}[0], {a}{c}
+
+*   Blessed hashes or arrays are treated as terminal elements and are
+    not further traversed.
+
+*   Cycles are detected upon traversing a container a second time in a
+    depth first search, and the resultant action is caller selectable.
+
+*   Containers that can be reached multiple times without cycling, e.g.
+
+      %hash = ( a => { b => 1 }, );
+      $hash{c} = $hash{a};
+
+    are visited once per parent, e.g.
+
+      {a}, {a}{b}, {a}{b}[0]
+      {c}, {c}{b}, {c}{b}[0]
+
+*   A container (hash or array) may be optionally be immediately
+    revisited.
+
+*   An element whose value is a container may be optionally be revisited
+    after the container is visited.
 
 *   The traversal may be aborted.
-
-*   A container (hash or array) may be immediately revisited if the
-    callback requests it.
-
-*   An element whose value is a container may be revisited after the
-    container is visited if the callback requests it.
-
-*   User selectable behavior upon detection of a traversal cycle.
 
 *   The complete path from the structure route to an element (both the
     ancestor containers and the keys and indexes required to traverse

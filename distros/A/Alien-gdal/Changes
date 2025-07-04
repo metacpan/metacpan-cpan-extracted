@@ -1,5 +1,12 @@
 Revision history for Alien::gdal
 
+1.41 2025-07-04
+    - No functional changes.  Only difference is that
+      the release is packaged on Windows to avoid
+      pulling in Alien::patchelf on systems that don't
+      need it.  It depends on Alien::m4 which currently
+      has build failures.
+
 1.40 2025-07-03
     - Fall back to reading the gdal.pc if version is non-numeric.
       This can happen when the pkg-config utility does not parse

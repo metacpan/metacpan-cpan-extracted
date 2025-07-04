@@ -6,7 +6,7 @@ use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
 # This is now auto-updated at release time by the github action
-$VERSION = '0.179.0';
+$VERSION = '0.180.0';
 
 sub import {
     my ( $class, @args ) = @_;

@@ -3,7 +3,8 @@
 # vim: ft=sh
 
 function show_help() {
-    less <<END
+    cat <<END
+
 $(basename "$0") [-?|-h|--help] [-f|--force] [-u|--update]
 
     -u --update   Update OpenAI OpenAPI spec from github
@@ -20,10 +21,11 @@ END
 force=false
 notest=false
 update=false
-openai_url="https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml"
+#openai_url="https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml"
+# This is a recent change to the location of the spec
+openai_url="https://app.stainless.com/api/spec/documented/openai/openapi.documented.yml"
 target_dir="share/openapi.yaml"
 
-POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
 key="$1"
@@ -46,12 +48,12 @@ case $key in
     exit;
     ;;
     *)    # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
-    shift # past argument
+    echo "Error: Unknown option: $1"
+    show_help
+    exit 1
     ;;
 esac
 done
-set -- "${POSITIONAL[@]}" # restore positional parameters
 
 set -Eeuo pipefail
 

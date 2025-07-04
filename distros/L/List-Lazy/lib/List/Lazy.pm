@@ -1,9 +1,7 @@
 package List::Lazy;
-our $AUTHORITY = 'cpan:YANICK';
+our $AUTHORITY = 'cpan:YANICK'; 
 # ABSTRACT: Generate lists lazily
-$List::Lazy::VERSION = '0.3.3';
-
-
+$List::Lazy::VERSION = '0.4.0';
 
 use Moo;
 use MooX::HandlesVia;
@@ -30,8 +28,9 @@ sub _exporter_validate_opts {
     } or die $@;
 }
 
-
 our @EXPORT_OK = qw/ lazy_list lazy_range lazy_fixed_list /;
+
+our $MAX_NEXT = 10_000;
 
 sub _lazy_list ($generator,$state=undef) {
     return List::Lazy->new(
@@ -45,7 +44,7 @@ sub lazy_list :prototype(&@) { goto &_lazy_list }
 sub _lazy_range ($min,$max,$step=1) {
     my $it = ref $step ? $step : sub { $_ + $step };
 
-    return scalar lazy_list {
+    return scalar lazy_list { 
         return if defined $max and  $_ > $max;
         my $current = $_;
         $_ = $it->();
@@ -57,10 +56,8 @@ sub _lazy_range ($min,$max,$step=1) {
 sub lazy_range :prototype($$@) { goto &_lazy_range }
 
 sub lazy_fixed_list {
-    my @list = @_;
     return List::Lazy->new(
-        _next => [ @list ],
-        is_done => 0,
+        _next => [ @_ ],
         generator => sub { return () },
     );
 }
@@ -105,10 +102,20 @@ sub generate_next($self) {
 sub next($self,$num=1) {
     my @returns;
 
+    my $count = 0;
+
     croak "next called in scalar context with \$num = $num"
         if defined wantarray and not wantarray and $num != 1;
 
     while( @returns < $num and not $self->is_done ) {
+        if( ++$count > $MAX_NEXT ) {
+            die <<"END";
+Number of items returned by the lazy list exceeds MAX_NEXT ($MAX_NEXT).
+
+If this is what you want, you can increase this limit via \$Lazy::List::MAX_NEXT
+END
+        }
+
         $self->push_next( $self->generate_next )
             unless $self->has_next;
 
@@ -131,19 +138,15 @@ sub all ($self) {
     return $self->next(1E99);
 }
 
-{
-    no warnings;
+sub reduce($self,$reducer,$reduced=undef) {
+    $reduced //= $self->next;
 
-    sub reduce($self,$reducer,$reduced=undef) {
-        $reduced = $self->next if @_ < 3;
-
-        while( my $next = $self->next ) {
-            local ( $::a, $::b ) = ( $reduced, $next );
-            $reduced = $reducer->();
-        }
-
-        return $reduced;
+    while( my $next = $self->next ) {
+        local ( $::a, $::b ) = ( $reduced, $next );
+        $reduced = $reducer->();
     }
+
+    return $reduced;
 }
 
 sub map($self,$map) {
@@ -211,8 +214,21 @@ sub until($self,$condition) {
 
 sub append($self,@list) {
 
+    my @state = ( $self->_clone );
+
+    while(@list) {
+        if( ref $list[0] eq 'List::Lazy' ) {
+            push @state, (shift @list)->_clone;
+        }
+        else {
+            my @lazy;
+            push @lazy, shift @list while @list and ref $list[0] ne 'List::Lazy';
+            push @state, lazy_fixed_list @lazy;
+        }
+    }
+
     return List::Lazy->new(
-        state => [ map { $_->_clone } $self, @list ],
+        state => \@state,
         generator => sub {
             while(@$_) {
                 shift @$_ while @$_ and $_->[0]->is_done;
@@ -223,13 +239,12 @@ sub append($self,@list) {
             return ();
         },
     );
-
 }
 
 sub prepend( $self, @list ) {
-    push @list, $self;
-    $self = shift @list;
-    $self->append(@list);
+    List::Lazy->new(done => 1, generator => sub {})->append(
+        @list, $self,
+    );
 }
 
 1;
@@ -246,7 +261,7 @@ List::Lazy - Generate lists lazily
 
 =head1 VERSION
 
-version 0.3.3
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -345,6 +360,9 @@ that many items left). C<$num> defaults to C<1>.
         ...
     }
 
+As a safety valve, if the number of entries to be returned exceeds 
+<$Lazy::List::MAX_NEXT> (which defaults to C<10_000>), the call will die.
+
 =head2 reduce
 
     my $value = $list->reduce( $reducing_sub, $initial_value );
@@ -422,8 +440,22 @@ and those of the C<@other_lists>.
 Note that the new list do a deep clone of the original lists's state, so reading
 from the new list won't affect the original lists.
 
-    my $range = lazy_range 1..100;
+    my $range = lazy_range 1, 100;
     my $twice = $range->append( $range );
+
+Non-lazy lists can also be given to C<append>, in which case they will 
+be converted into C<lazy_fixed_list>s under the hood.
+
+    my $list = lazy_range 1, 100;
+
+    $list = $list->append( 101, lazy_range(102,200), 201..210 );
+    
+    # equivalent to
+    $list = $list->append( 
+        fixed_lazy_list(101), 
+        lazy_range(102,200), 
+        fixed_lazy_list(201..210) 
+    );
 
 =head2 prepend
 
@@ -438,8 +470,8 @@ from the new list won't affect the original lists.
 
     my @rest = $list->all;
 
-Returns all the remaining values of the list. Be careful: if the list is unbounded,
-calling C<all()> on it will result into an infinite loop.
+Returns all the remaining values of the list. As for C<next>, this method 
+will die if the number of entries generated exceeds C<$Lazy::List::MAX_NEXT>.
 
 =head1 AUTHOR
 
@@ -447,7 +479,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Yanick Champoux.
+This software is copyright (c) 2025 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

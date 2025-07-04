@@ -39,5 +39,5 @@ no_index:
 requires: {}
 resources:
   repository: git://github.com/bluhm/p5-opcua-open62541.git
-version: '2.06'
+version: '2.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -47,6 +47,9 @@ C<create-realtime-transcription-session>
 Example:
 
     {
+       "client_secret" : {
+          "expires_at" : null
+       },
        "include" : [
           null
        ],

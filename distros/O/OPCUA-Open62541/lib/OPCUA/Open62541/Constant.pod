@@ -30677,6 +30677,14 @@ You want to import only the ones you need.
 
 =back
 
+=item get_mapping_attributeid_ids
+
+Returns a hash which maps shorter attribute names to the attribute IDs.
+
+=item get_mapping_attributeid_names
+
+Returns a hash which maps the attribute IDs to shorter attribute names.
+
 =back
 
 =head1 SEE ALSO

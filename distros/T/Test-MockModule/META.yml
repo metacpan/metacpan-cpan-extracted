@@ -18,17 +18,16 @@ name: Test-MockModule
 provides:
   Test::MockModule:
     file: lib/Test/MockModule.pm
-    version: v0.179.0
+    version: v0.180.0
 requires:
   Carp: '0'
   SUPER: '1.20'
   Scalar::Util: '0'
-  Software::License: '0.104006'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/geofffranks/test-mockmodule/issues
   homepage: https://github.com/geofffranks/test-mockmodule
   license: http://dev.perl.org/licenses/
   repository: git://github.com/geofffranks/test-mockmodule.git
-version: v0.179.0
+version: v0.180.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

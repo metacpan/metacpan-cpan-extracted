@@ -48,6 +48,7 @@
 	"and it uses libdivsufsort that is\n" \
 	"	Copyright (c) 2003 Yuta Mori All rights reserved.\n" \
 	"	SPDX-License-Identifier: MIT\n"
+/* L5E> */
 /*@ S-bsdipa copyright:
  *
  * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
@@ -119,6 +120,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+/* L5E< */
 #ifndef s_BSDIPA_LIB_H
 #define s_BSDIPA_LIB_H
 
@@ -199,9 +201,11 @@ struct s_bsdipa_diff_ctx{
 	/* Number of bytes in "a window".  If <=0 s_BSDIPA_MAGIC_WINDOW is assigned and used.
 	 * For binary data sizeof(void*) is useful, higher values (16, 32) impose savings for text.
 	 * There is no maximum imposed, but the algorithm does *not* perform integer overflow checks! */
-	s_bsdipa_off_t dc_magic_window;
+	int32_t dc_magic_window;
+	int8_t dc__dummy[3];
 	/* Outputs: (allocated result data; freed by s_bsdipa_diff_free()). */
-	s_bsdipa_off_t dc_ctrl_len; /* Sum of dc_ctrl lengths. MUST be first meaningful result field! */
+	int8_t dc_is_equal_data; /* Whether .dc_before_dat and .dc_after_dat and their lengths are equal */
+	s_bsdipa_off_t dc_ctrl_len; /* Sum of dc_ctrl lengths.  (Struct field offset used - do not move!) */
 	s_bsdipa_off_t dc_diff_len; /* Length of .dc_diff_dat. */
 	s_bsdipa_off_t dc_extra_len; /* Length of .dc_extra_dat. */
 	struct s_bsdipa_ctrl_chunk *dc_ctrl; /* Control block result list. */

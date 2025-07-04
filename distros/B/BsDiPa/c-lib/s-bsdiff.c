@@ -181,18 +181,19 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 
 	rv = s_BSDIPA_FBIG;
 
-	if(dcp->dc_before_len >= s_BSDIPA_OFF_MAX)
+	/* Fail early if we cannot create a patch with a header and one control triple */
+	if(dcp->dc_before_len >= s_BSDIPA_OFF_MAX -sizeof(struct s_bsdipa_header) -sizeof(struct s_bsdipa_ctrl_triple))
+		goto jleave;
+	if(dcp->dc_before_len + 1 >= SIZE_MAX / sizeof(saidx_t))
 		goto jleave;
 	beflen = (s_bsdipa_off_t)dcp->dc_before_len;
-	if((size_t)beflen + 1 >= SIZE_MAX / sizeof(saidx_t))
-		goto jleave;
 	befdat = dcp->dc_before_dat;
 
 	if(dcp->dc_after_len >= s_BSDIPA_OFF_MAX)
 		goto jleave;
-	aftlen = (s_bsdipa_off_t)dcp->dc_after_len;
-	if((size_t)aftlen + 1 >= SIZE_MAX / sizeof(saidx_t))
+	if(dcp->dc_after_len + 1 >= SIZE_MAX / sizeof(saidx_t))
 		goto jleave;
+	aftlen = (s_bsdipa_off_t)dcp->dc_after_len;
 	aftdat = dcp->dc_after_dat;
 
 	rv = s_BSDIPA_NOMEM;
@@ -218,7 +219,9 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 		s_bsdipa_off_t ctrl_len_max, scan, len, pos, lastscan, lastpos, lastoff, aftscore;
 		uint32_t ctrlno;
 		struct s_bsdipa_ctrl_chunk **ccpp, *ccp;
+		int isneq;
 
+		isneq = (aftlen != beflen);
 		ccpp = NULL;
 		ccp = NULL; /* xxx UNINIT() */
 		ctrlno = 0; /* xxx UNINIT() */
@@ -301,8 +304,13 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 					lenb -= lens;
 				}
 
-				for(i = 0; i < lenf; ++i)
-					*--diffp = befdat[lastscan + i] - aftdat[lastpos + i];
+				for(i = 0; i < lenf; ++i){
+					uint8_t u;
+
+					u = befdat[lastscan + i] - aftdat[lastpos + i];
+					isneq |= (u != 0);
+					*--diffp = u;
+				}
 				dcp->dc_diff_len += lenf;
 				assert(diffp > extrap);
 
@@ -314,7 +322,7 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 
 				/* */
 				if(ccpp == NULL || --ctrlno == 0){
-					/* Do not use: sizeof(struct s_bsdipa_ctrl_triple) * a_BSDIPA_CTRL_NO */
+					/* xxx Do not use: sizeof(struct s_bsdipa_ctrl_triple) * a_BSDIPA_CTRL_NO */
 					ccp = (struct s_bsdipa_ctrl_chunk*)(*dcp->dc_mem.mc_custom_alloc)
 							(dcp->dc_mem.mc_custom_cookie,
 							 (sizeof(struct s_bsdipa_ctrl_chunk) +
@@ -344,6 +352,8 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 				lastoff = pos - scan;
 			}
 		}
+
+		dcp->dc_is_equal_data = !isneq;
 	}
 
 	dcp->dc_diff_dat = diffp;

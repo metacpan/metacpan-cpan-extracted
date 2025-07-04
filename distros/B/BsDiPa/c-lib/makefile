@@ -9,6 +9,8 @@
 #@ For example:
 #@	CFLAGS='-O1 -DNDEBUG' make s_BSDIPA_32=y s_BSDIPA_CFLAGS='$(SUFX)' all
 
+RM ?= rm
+
 LIB = libsbsdipa.a
 LIBDIVSUFSORT = libdivsufsort
 
@@ -59,7 +61,8 @@ $(CONFIGH):
 	./configh.sh "$$v1" "$$v2"
 $(LIB): $(CONFIGH) $(OBJS)
 	$(AR) crs $(@) $(OBJS)
+test: all
 clean:
-	rm -f $(LIB) $(OBJS) $(CONFIGH)
+	$(RM) -f $(LIB) $(OBJS) $(CONFIGH)
 
 # s-mk-mode

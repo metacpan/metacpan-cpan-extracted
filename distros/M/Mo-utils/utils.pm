@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_number_of_items check_number_range check_regexp check_required
 	check_string check_string_begin check_strings);
 
-our $VERSION = 0.29;
+our $VERSION = 0.30;
 
 sub check_angle {
 	my ($self, $key) = @_;
@@ -33,9 +33,10 @@ sub check_array {
 	}
 
 	if (ref $self->{$key} ne 'ARRAY') {
+		my $ref = ref $self->{$key};
 		err "Parameter '".$key."' must be a array.",
 			'Value', $self->{$key},
-			'Reference', (ref $self->{$key}),
+			'Reference', ($ref eq '' ? 'SCALAR' : $ref),
 		;
 	}
 
@@ -720,11 +721,11 @@ Returns undef.
                  String base: %s
 
  check_strings():
-         Parameter '%s' must have strings definition.
-         Parameter '%s' must have right string definition.
          Parameter '%s' must be one of defined strings.
                  String: %s
                  Possible strings: %s
+         Parameter '%s' must have right string definition.
+         Parameter '%s' must have strings definition.
 
 =head1 EXAMPLE1
 
@@ -1637,12 +1638,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.30
 
 =cut

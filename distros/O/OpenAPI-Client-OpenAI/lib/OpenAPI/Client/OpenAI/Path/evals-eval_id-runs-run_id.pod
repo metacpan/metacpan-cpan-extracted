@@ -1,0 +1,497 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id - Documentation for the /evals/{eval_id}/runs/{run_id} path.
+
+=head1 DESCRIPTION
+
+This document describes the API endpoint at C</evals/{eval_id}/runs/{run_id}>.
+
+=head1 PATHS
+
+
+=head2 C<DELETE /evals/{eval_id}/runs/{run_id}>
+
+Delete an eval run.
+
+
+
+=head3 Operation ID
+
+C<deleteEvalRun>
+
+    $client->deleteEvalRun( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to delete the run from.
+
+Type: C<string>
+
+
+
+=item * C<run_id> (in path) (Required) - The ID of the run to delete.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+Successfully deleted the eval run
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+       "deleted" : true,
+       "object" : "eval.run.deleted",
+       "run_id" : "evalrun_677469f564d48190807532a852da3afb"
+    }
+
+
+=back
+
+=head4 Status Code: C<404>
+
+Run not found
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+
+
+=back
+
+=head2 C<GET /evals/{eval_id}/runs/{run_id}>
+
+Get an evaluation run by ID.
+
+
+
+=head3 Operation ID
+
+C<getEvalRun>
+
+    $client->getEvalRun( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation to retrieve runs for.
+
+Type: C<string>
+
+
+
+=item * C<run_id> (in path) (Required) - The ID of the run to retrieve.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+The evaluation run
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "eval.run",
+      "id": "evalrun_67e57965b480819094274e3a32235e4c",
+      "eval_id": "eval_67e579652b548190aaa83ada4b125f47",
+      "report_url": "https://platform.openai.com/evaluations/eval_67e579652b548190aaa83ada4b125f47?run_id=evalrun_67e57965b480819094274e3a32235e4c",
+      "status": "queued",
+      "model": "gpt-4o-mini",
+      "name": "gpt-4o-mini",
+      "created_at": 1743092069,
+      "result_counts": {
+        "total": 0,
+        "errored": 0,
+        "failed": 0,
+        "passed": 0
+      },
+      "per_model_usage": null,
+      "per_testing_criteria_results": null,
+      "data_source": {
+        "type": "completions",
+        "source": {
+          "type": "file_content",
+          "content": [
+            {
+              "item": {
+                "input": "Tech Company Launches Advanced Artificial Intelligence Platform",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "Central Bank Increases Interest Rates Amid Inflation Concerns",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "International Summit Addresses Climate Change Strategies",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Major Retailer Reports Record-Breaking Holiday Sales",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "National Team Qualifies for World Championship Finals",
+                "ground_truth": "Sports"
+              }
+            },
+            {
+              "item": {
+                "input": "Stock Markets Rally After Positive Economic Data Released",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "Global Manufacturer Announces Merger with Competitor",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "Breakthrough in Renewable Energy Technology Unveiled",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "World Leaders Sign Historic Climate Agreement",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Professional Athlete Sets New Record in Championship Event",
+                "ground_truth": "Sports"
+              }
+            },
+            {
+              "item": {
+                "input": "Financial Institutions Adapt to New Regulatory Requirements",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "Tech Conference Showcases Advances in Artificial Intelligence",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "Global Markets Respond to Oil Price Fluctuations",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "International Cooperation Strengthened Through New Treaty",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Sports League Announces Revised Schedule for Upcoming Season",
+                "ground_truth": "Sports"
+              }
+            }
+          ]
+        },
+        "input_messages": {
+          "type": "template",
+          "template": [
+            {
+              "type": "message",
+              "role": "developer",
+              "content": {
+                "type": "input_text",
+                "text": "Categorize a given news headline into one of the following topics: Technology, Markets, World, Business, or Sports.\n\n# Steps\n\n1. Analyze the content of the news headline to understand its primary focus.\n2. Extract the subject matter, identifying any key indicators or keywords.\n3. Use the identified indicators to determine the most suitable category out of the five options: Technology, Markets, World, Business, or Sports.\n4. Ensure only one category is selected per headline.\n\n# Output Format\n\nRespond with the chosen category as a single word. For instance: \"Technology\", \"Markets\", \"World\", \"Business\", or \"Sports\".\n\n# Examples\n\n**Input**: \"Apple Unveils New iPhone Model, Featuring Advanced AI Features\"  \n**Output**: \"Technology\"\n\n**Input**: \"Global Stocks Mixed as Investors Await Central Bank Decisions\"  \n**Output**: \"Markets\"\n\n**Input**: \"War in Ukraine: Latest Updates on Negotiation Status\"  \n**Output**: \"World\"\n\n**Input**: \"Microsoft in Talks to Acquire Gaming Company for $2 Billion\"  \n**Output**: \"Business\"\n\n**Input**: \"Manchester United Secures Win in Premier League Football Match\"  \n**Output**: \"Sports\" \n\n# Notes\n\n- If the headline appears to fit into more than one category, choose the most dominant theme.\n- Keywords or phrases such as \"stocks\", \"company acquisition\", \"match\", or technological brands can be good indicators for classification.\n"
+              }
+            },
+            {
+              "type": "message",
+              "role": "user",
+              "content": {
+                "type": "input_text",
+                "text": "{{item.input}}"
+              }
+            }
+          ]
+        },
+        "model": "gpt-4o-mini",
+        "sampling_params": {
+          "seed": 42,
+          "temperature": 1.0,
+          "top_p": 1.0,
+          "max_completions_tokens": 2048
+        }
+      },
+      "error": null,
+      "metadata": {}
+    }
+
+
+=back
+
+=head2 C<POST /evals/{eval_id}/runs/{run_id}>
+
+Cancel an ongoing evaluation run.
+
+
+
+=head3 Operation ID
+
+C<cancelEvalRun>
+
+    $client->cancelEvalRun( ... );
+
+=head3 Parameters
+
+=over 4
+
+=item * C<eval_id> (in path) (Required) - The ID of the evaluation whose run you want to cancel.
+
+Type: C<string>
+
+
+
+=item * C<run_id> (in path) (Required) - The ID of the run to cancel.
+
+Type: C<string>
+
+
+
+=back
+
+
+=head3 Responses
+
+
+=head4 Status Code: C<200>
+
+The canceled eval run object
+
+
+=head4 Content Types:
+
+=over 4
+
+
+=item * C<application/json>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
+    {
+      "object": "eval.run",
+      "id": "evalrun_67e57965b480819094274e3a32235e4c",
+      "eval_id": "eval_67e579652b548190aaa83ada4b125f47",
+      "report_url": "https://platform.openai.com/evaluations/eval_67e579652b548190aaa83ada4b125f47?run_id=evalrun_67e57965b480819094274e3a32235e4c",
+      "status": "queued",
+      "model": "gpt-4o-mini",
+      "name": "gpt-4o-mini",
+      "created_at": 1743092069,
+      "result_counts": {
+        "total": 0,
+        "errored": 0,
+        "failed": 0,
+        "passed": 0
+      },
+      "per_model_usage": null,
+      "per_testing_criteria_results": null,
+      "data_source": {
+        "type": "completions",
+        "source": {
+          "type": "file_content",
+          "content": [
+            {
+              "item": {
+                "input": "Tech Company Launches Advanced Artificial Intelligence Platform",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "Central Bank Increases Interest Rates Amid Inflation Concerns",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "International Summit Addresses Climate Change Strategies",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Major Retailer Reports Record-Breaking Holiday Sales",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "National Team Qualifies for World Championship Finals",
+                "ground_truth": "Sports"
+              }
+            },
+            {
+              "item": {
+                "input": "Stock Markets Rally After Positive Economic Data Released",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "Global Manufacturer Announces Merger with Competitor",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "Breakthrough in Renewable Energy Technology Unveiled",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "World Leaders Sign Historic Climate Agreement",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Professional Athlete Sets New Record in Championship Event",
+                "ground_truth": "Sports"
+              }
+            },
+            {
+              "item": {
+                "input": "Financial Institutions Adapt to New Regulatory Requirements",
+                "ground_truth": "Business"
+              }
+            },
+            {
+              "item": {
+                "input": "Tech Conference Showcases Advances in Artificial Intelligence",
+                "ground_truth": "Technology"
+              }
+            },
+            {
+              "item": {
+                "input": "Global Markets Respond to Oil Price Fluctuations",
+                "ground_truth": "Markets"
+              }
+            },
+            {
+              "item": {
+                "input": "International Cooperation Strengthened Through New Treaty",
+                "ground_truth": "World"
+              }
+            },
+            {
+              "item": {
+                "input": "Sports League Announces Revised Schedule for Upcoming Season",
+                "ground_truth": "Sports"
+              }
+            }
+          ]
+        },
+        "input_messages": {
+          "type": "template",
+          "template": [
+            {
+              "type": "message",
+              "role": "developer",
+              "content": {
+                "type": "input_text",
+                "text": "Categorize a given news headline into one of the following topics: Technology, Markets, World, Business, or Sports.\n\n# Steps\n\n1. Analyze the content of the news headline to understand its primary focus.\n2. Extract the subject matter, identifying any key indicators or keywords.\n3. Use the identified indicators to determine the most suitable category out of the five options: Technology, Markets, World, Business, or Sports.\n4. Ensure only one category is selected per headline.\n\n# Output Format\n\nRespond with the chosen category as a single word. For instance: \"Technology\", \"Markets\", \"World\", \"Business\", or \"Sports\".\n\n# Examples\n\n**Input**: \"Apple Unveils New iPhone Model, Featuring Advanced AI Features\"  \n**Output**: \"Technology\"\n\n**Input**: \"Global Stocks Mixed as Investors Await Central Bank Decisions\"  \n**Output**: \"Markets\"\n\n**Input**: \"War in Ukraine: Latest Updates on Negotiation Status\"  \n**Output**: \"World\"\n\n**Input**: \"Microsoft in Talks to Acquire Gaming Company for $2 Billion\"  \n**Output**: \"Business\"\n\n**Input**: \"Manchester United Secures Win in Premier League Football Match\"  \n**Output**: \"Sports\" \n\n# Notes\n\n- If the headline appears to fit into more than one category, choose the most dominant theme.\n- Keywords or phrases such as \"stocks\", \"company acquisition\", \"match\", or technological brands can be good indicators for classification.\n"
+              }
+            },
+            {
+              "type": "message",
+              "role": "user",
+              "content": {
+                "type": "input_text",
+                "text": "{{item.input}}"
+              }
+            }
+          ]
+        },
+        "model": "gpt-4o-mini",
+        "sampling_params": {
+          "seed": 42,
+          "temperature": 1.0,
+          "top_p": 1.0,
+          "max_completions_tokens": 2048
+        }
+      },
+      "error": null,
+      "metadata": {}
+    }
+
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2025 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

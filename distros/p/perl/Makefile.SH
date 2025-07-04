@@ -74,6 +74,14 @@ true)
 		;;
 	cygwin*)
 		shrpldflags="$shrpldflags -Wl,--out-implib=libperl.dll.a"
+		# The cygperl dll can be large and has conflicted with
+		# other DLLs as its name has changed from release to release.
+		# Give it its own space (and a lot of it) to work in.
+		# 32-bit (untested) gets less space since it is 32-bit.
+		case "$myarchname" in
+			"x86_64-cygwin") shrpldflags="$shrpldflags -Wl,--image-base=0x00380000000" ;;
+			*)  shrpldflags="$shrpldflags -Wl,--image-base=0x60500000" ;;
+		esac
 		linklibperl="-L. -lperl"
 		;;
 	sunos*)
@@ -530,11 +538,11 @@ unidatadirs = lib/unicore/To lib/unicore/lib
 
 h = \
     EXTERN.h INTERN.h XSUB.h \
-    av.h charclass_invlists.h cop.h cv.h dosish.h embed.h form.h gv.h \
-    handy.h hv.h hv_func.h iperlsys.h keywords.h l1_char_class_tab.h \
-    mg.h mydtrace.h op.h op_reg_common.h opcode.h pad.h patchlevel.h \
-    perl.h perlapi.h perly.h pp.h proto.h regcomp.h regcomp_internal.h \
-    regexp.h scope.h sv.h thread.h unixish.h utf8.h util.h warnings.h \
+    av.h cop.h cv.h dosish.h embed.h form.h gv.h handy.h hv.h hv_func.h \
+    iperlsys.h keywords.h l1_char_class_tab.h mg.h mydtrace.h op.h \
+    op_reg_common.h opcode.h pad.h patchlevel.h perl.h perlapi.h perly.h pp.h \
+    proto.h regcomp.h regcomp_internal.h regexp.h regexp_constants.h scope.h \
+    sv.h thread.h unixish.h utf8.h util.h warnings.h \
     $(CONFIGH)
 
 c_base = \
@@ -627,7 +635,7 @@ esac
 
 $spitshell >>$Makefile <<'!NO!SUBS!'
 
-perltoc_pod_prereqs = extra.pods pod/perl5402delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
+perltoc_pod_prereqs = extra.pods pod/perl5420delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
 generated_pods = pod/perltoc.pod $(perltoc_pod_prereqs)
 generated_headers = uudmap.h bitcount.h mg_data.h
 
@@ -1136,9 +1144,9 @@ pod/perlintern.pod: $(MINIPERL_EXE) autodoc.pl embed.fnc
 pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
 	$(MINIPERL) pod/perlmodlib.PL -q
 
-pod/perl5402delta.pod: pod/perldelta.pod
-	$(RMS) pod/perl5402delta.pod
-	$(LNS) perldelta.pod pod/perl5402delta.pod
+pod/perl5420delta.pod: pod/perldelta.pod
+	$(RMS) pod/perl5420delta.pod
+	$(LNS) perldelta.pod pod/perl5420delta.pod
 
 extra.pods: $(MINIPERL_EXE)
 	-@test ! -f extra.pods || rm -f `cat extra.pods`
@@ -1430,25 +1438,26 @@ _cleaner2:
 	-rmdir lib/Test2/Bundle lib/Test2/AsyncSubtest/Event
 	-rmdir lib/Test2/AsyncSubtest lib/Test2/API/InterceptResult
 	-rmdir lib/Test2/API lib/Test2 lib/Test/use lib/Test/Tester
-	-rmdir lib/Test/Builder/Tester lib/Test/Builder/IO lib/Test/Builder
-	-rmdir lib/Test lib/Term/Table lib/Term lib/TAP/Parser/YAMLish
+	-rmdir lib/Test/Builder/Tester lib/Test/Builder lib/Test
+	-rmdir lib/Term/Table lib/Term lib/TAP/Parser/YAMLish
 	-rmdir lib/TAP/Parser/SourceHandler lib/TAP/Parser/Scheduler
 	-rmdir lib/TAP/Parser/Result lib/TAP/Parser/Iterator lib/TAP/Parser
 	-rmdir lib/TAP/Harness lib/TAP/Formatter/File
 	-rmdir lib/TAP/Formatter/Console lib/TAP/Formatter lib/TAP
-	-rmdir lib/Sys/Syslog lib/Sys lib/Sub lib/Search lib/Scalar
-	-rmdir lib/Pod/Text lib/Pod/Simple lib/Pod/Perldoc lib/Pod/Html
-	-rmdir lib/PerlIO/via lib/PerlIO lib/Perl lib/Parse/CPAN lib/Parse
-	-rmdir lib/Params lib/Net/FTP lib/Module/Load lib/Module/CoreList
-	-rmdir lib/Module lib/Memoize lib/Math/BigRat lib/Math/BigInt
-	-rmdir lib/Math/BigFloat lib/Math lib/MIME lib/Locale/Maketext
-	-rmdir lib/Locale lib/List/Util lib/List lib/JSON/PP lib/JSON lib/IPC
-	-rmdir lib/IO/Uncompress/Adapter lib/IO/Uncompress lib/IO/Socket
-	-rmdir lib/IO/Compress/Zlib lib/IO/Compress/Zip lib/IO/Compress/Gzip
-	-rmdir lib/IO/Compress/Base lib/IO/Compress/Adapter lib/IO/Compress
-	-rmdir lib/IO lib/I18N/LangTags lib/I18N lib/Hash/Util lib/Hash
-	-rmdir lib/HTTP lib/Getopt/Long lib/Filter/Util lib/Filter
-	-rmdir lib/File/Spec lib/ExtUtils/Typemaps lib/ExtUtils/ParseXS
+	-rmdir lib/Sys/Syslog lib/Sys lib/Sub lib/Search lib/Scalar/List
+	-rmdir lib/Scalar lib/Pod/Text lib/Pod/Simple lib/Pod/Perldoc
+	-rmdir lib/Pod/Html lib/PerlIO/via lib/PerlIO lib/Perl lib/Parse/CPAN
+	-rmdir lib/Parse lib/Params lib/Net/FTP lib/Module/Load
+	-rmdir lib/Module/CoreList lib/Module lib/Memoize lib/Math/BigRat
+	-rmdir lib/Math/BigInt lib/Math/BigFloat lib/Math lib/MIME
+	-rmdir lib/Locale/Maketext lib/Locale lib/List/Util lib/List
+	-rmdir lib/JSON/PP lib/JSON lib/IPC lib/IO/Uncompress/Adapter
+	-rmdir lib/IO/Uncompress lib/IO/Socket lib/IO/Compress/Zlib
+	-rmdir lib/IO/Compress/Zip lib/IO/Compress/Gzip lib/IO/Compress/Base
+	-rmdir lib/IO/Compress/Adapter lib/IO/Compress lib/IO
+	-rmdir lib/I18N/LangTags lib/I18N lib/Hash/Util lib/Hash lib/HTTP
+	-rmdir lib/Getopt/Long lib/Filter/Util lib/Filter lib/File/Spec
+	-rmdir lib/ExtUtils/Typemaps lib/ExtUtils/ParseXS
 	-rmdir lib/ExtUtils/MakeMaker/version lib/ExtUtils/MakeMaker
 	-rmdir lib/ExtUtils/Liblist lib/ExtUtils/Constant lib/ExtUtils/Command
 	-rmdir lib/ExtUtils/CBuilder/Platform/Windows
@@ -1749,7 +1758,7 @@ TAGS: $(c_base) $(h)
 $spitshell >>$Makefile <<!GROK!THIS!
 
 ctags:
-	ctags -f Tags -N --totals --languages=c --langmap=c:+.h $ctags_exclude *.c *.h
+	ctags -N --languages=c --langmap=c:+.h.inc $ctags_exclude *.c *.h *.inc
 
 # AUTOMATICALLY GENERATED MAKE DEPENDENCIES--PUT NOTHING BELOW THIS LINE
 # If this runs make out of memory, delete /usr/include lines.

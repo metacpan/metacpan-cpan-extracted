@@ -1,5 +1,33 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.23    2025-07-03
+        - Version number bump to replace bad PAUSE upload. No functional change.
+
+0.22    2025-07-03
+        - Added new `git-release` script to automate the release process.
+        - Audio API Updates: The audio text-to-speech model is updated to
+          gpt-4o-mini-tts, and the audio transcription model is updated to
+          gpt-4o-transcribe, with the addition of a streaming option for the
+          [cite_start]transcription api. [cite: 1]
+        - Chat Completions Enhancements: Introduces new features for the Chat
+          Completions API, including the ability to list, retrieve, update, and delete
+          [cite_start]chat completions. [cite: 1] Support for metadata filtering is added, and the
+          [cite_start]documentation clarifies parameter support across different models. [cite: 1]
+        - Realtime API Expansion: Adds a new endpoint for creating realtime
+          transcription sessions and incorporates C# examples for both audio generation
+          [cite_start]and transcription. [cite: 1, 19]
+        - Responses API Improvements:  Significant updates to the Responses
+          API, with a focus on enhanced tool usage, including web search and file search,
+          [cite_start]and the ability to stream responses. [cite: 19] The API now also supports including image
+          [cite_start]URLs in the input and provides detailed usage information. [cite: 5, 19]
+        - Fine-tuning API Updates: Introduces new endpoints for managing
+          fine-tuning checkpoints and their permissions, enabling organization owners to
+          [cite_start]share and control access to fine-tuned models. [cite: 1, 2] Metadata is now supported for
+          [cite_start]fine-tuning jobs. [cite: 1]
+        - Other Updates:  Minor documentation improvements and clarifications
+          across various API endpoints and parameters, including updates to model
+          [cite_start]descriptions and available tools. [cite: 1]
+
 0.21    2025-04-11
         - Added examples to the docs, along with allowed models for each path.
 
@@ -15,18 +43,18 @@ Revision history for OpenAPI-Client-OpenAI
         - Chat Completions Enhancements: Introduces new features for the Chat
           Completions API, including the ability to list, retrieve, update, and delete
           chat completions. Support for metadata filtering is added, and the
-          documentation clarifies parameter support across different models.   
+          documentation clarifies parameter support across different models.
         - Realtime API Expansion: Adds a new endpoint for creating realtime
           transcription sessions and incorporates C# examples for both audio generation
-          and transcription.   
+          and transcription.
         - Responses API Improvements:  Significant updates to the Responses
           API, with a focus on enhanced tool usage, including web search and file search,
           and the ability to stream responses. The API now also supports including image
-          URLs in the input and provides detailed usage information.   
+          URLs in the input and provides detailed usage information.
         - Fine-tuning API Updates: Introduces new endpoints for managing
           fine-tuning checkpoints and their permissions, enabling organization owners to
           share and control access to fine-tuned models. Metadata is now supported for
-          fine-tuning jobs.   
+          fine-tuning jobs.
         - Other Updates:  Minor documentation improvements and clarifications
           across various API endpoints and parameters, including updates to model
           descriptions and available tools.
@@ -94,4 +122,3 @@ Revision history for OpenAPI-Client-OpenAI
 
 0.01    2023-04-11
         First version, released on an unsuspecting world.
-

@@ -74,6 +74,7 @@ lib/Mojo/Server/Morbo/Backend.pm
 lib/Mojo/Server/Morbo/Backend/Poll.pm
 lib/Mojo/Server/Prefork.pm
 lib/Mojo/Server/PSGI.pm
+lib/Mojo/SSE.pm
 lib/Mojo/Template.pm
 lib/Mojo/Transaction.pm
 lib/Mojo/Transaction/HTTP.pm
@@ -247,6 +248,7 @@ t/mojo/request_cgi.t
 t/mojo/response.t
 t/mojo/roles.t
 t/mojo/signatures.t
+t/mojo/sse.t
 t/mojo/subprocess.t
 t/mojo/subprocess_ev.t
 t/mojo/template.t
@@ -351,6 +353,7 @@ t/mojolicious/secret.txt
 t/mojolicious/session_lite_app.t
 t/mojolicious/signatures_lite_app.t
 t/mojolicious/single_file_test_app.conf
+t/mojolicious/sse_lite_app.t
 t/mojolicious/static_lite_app.t
 t/mojolicious/static_prefix_lite_app.t
 t/mojolicious/tag_helper_lite_app.t

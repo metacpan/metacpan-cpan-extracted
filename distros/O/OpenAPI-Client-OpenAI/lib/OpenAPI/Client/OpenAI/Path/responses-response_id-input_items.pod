@@ -43,7 +43,7 @@ Type: C<integer>
 Default: C<20>
 
 
-=item * C<order> (in query) (Optional) - The order to return the input items in. Default is `asc`.
+=item * C<order> (in query) (Optional) - The order to return the input items in. Default is `desc`.
 - `asc`: Return the input items in ascending order.
 - `desc`: Return the input items in descending order.
 
@@ -65,6 +65,14 @@ Type: C<string>
 
 
 Type: C<string>
+
+
+
+=item * C<include> (in query) (Optional) - Additional fields to include in the response. See the `include`
+parameter for Response creation above for more information.
+
+
+Type: C<array>
 
 
 
