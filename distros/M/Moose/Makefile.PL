@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Needs" => "0.002010"
   },
-  "VERSION" => "2.2207",
+  "VERSION" => "2.4000",
   "XS" => {
     "xs/Attribute.xs" => "xs/Attribute.c",
     "xs/AttributeCore.xs" => "xs/AttributeCore.c",

@@ -1,5 +1,9 @@
 Revision history for noss (WWW::Noss)
 
+1.04  Jul 04 2025
+  - Skip lynx tests if lynx is not installed.
+  - nossui: Clean up temporary files that were forgotten in some menus.
+
 1.03  Jun 27 2025
   - Add cat command: Basically just an alias to `read --stdout`.
   - Add --html option read command: Read the unformatted HTML contents of a

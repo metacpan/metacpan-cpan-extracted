@@ -15,17 +15,16 @@ foreach ( [ 0 => 0 ], [ 1 => 1 ], [ 2 => 1 ], [ 3 => 1 ], [ 4 => 0 ] ) {
     if ( $exp ) {
 
         like(
-           dies { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
-             qr/recursion fail-safe limit/,
-             "recursion fail limit = $limit"
-            ) or BAIL_OUT( "fail-safe recursion limit doesn't work! Must Abort!\n" );
+            dies { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
+            qr/recursion fail-safe limit/,
+            "recursion fail limit = $limit"
+        ) or BAIL_OUT( "fail-safe recursion limit doesn't work! Must Abort!\n" );
     }
 
     else {
-        ok(
-           lives { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
-           "recursion fail limit = $limit"
-          )  or BAIL_OUT( "fail-safe recursion limit doesn't work! Must Abort!\n" );
+        ok( lives { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
+            "recursion fail limit = $limit" )
+          or BAIL_OUT( "fail-safe recursion limit doesn't work! Must Abort!\n" );
     }
 }
 
@@ -51,18 +50,21 @@ is( strinterp( '$a/$c/$d', \%vars, { recurse => 1 } ),
 
 # and now the dangerous one; circular dependencies
 
-foreach ( [ 'loop => 0 <= 0', '$a', { a => '$a' } ],
-          [ 'loop => 0 <= 1', '$a', { a => '$b', b => '$a' } ],
-          [ 'loop => 1 <= 2', '$a', { a => '$b', b => '$c', c => '$b' } ],
-          [ 'loop => 1 <= 3', '$a', { a => '$b', b => '$c', c => '$d', d => '$c' } ],
-        ) {
+foreach (
+    [ 'loop => 0 <= 0', '$a', { a => '$a' } ],
+    [ 'loop => 0 <= 1', '$a', { a => '$b', b => '$a' } ],
+    [ 'loop => 1 <= 2', '$a', { a => '$b', b => '$c', c => '$b' } ],
+    [ 'loop => 1 <= 3', '$a', { a => '$b', b => '$c', c => '$d', d => '$c' } ],
+  )
+{
 
     my ( $label, $str, $var ) = @$_;
 
-    like( dies { strinterp( $str, $var, { recurse => 1 } ) },
-          qr/circular interpolation loop detected/,
-          "dependency loops: $label"
-        );
+    like(
+        dies { strinterp( $str, $var, { recurse => 1 } ) },
+        qr/circular interpolation loop detected/,
+        "dependency loops: $label"
+    );
 
 }
 

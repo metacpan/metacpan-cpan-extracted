@@ -8,6 +8,7 @@ class Mojo::Util {
   use Hash;
   use MIME::Base64;
   use StringList;
+  use Digest::SHA;
   
   our $QUOTED_VALUE_RE : string;
   INIT {
@@ -357,7 +358,7 @@ class Mojo::Util {
     
     return [(object)$params, Fn->substr($value, $offset)];
   }
-
+  
 }
 
 __END__

@@ -6,6 +6,7 @@ use warnings;
 
 use Carp;
 use GIS::Distance;
+use Params::Get;
 use Scalar::Util;
 
 use overload (
@@ -22,18 +23,18 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
 Geo::Location::Point encapsulates geographical point data with latitude and longitude.
 It supports distance calculations,
 comparison between points,
-and provides various convenience methods for attributes like latitude, longitude, and related string representations
+and provides various convenience methods for attributes like latitude, longitude, and related string representations.
 
     use Geo::Location::Point;
 
@@ -52,48 +53,39 @@ Takes one optional argument 'key' which is an API key for L<https://timezonedb.c
 
 sub new {
 	my $class = shift;
-
-	my %args;
-	if(ref($_[0]) eq 'HASH') {
-		%args = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
-		return;
-	} elsif((@_ % 2) == 0) {
-		%args = @_;
-	}
+	my $params = Params::Get::get_params(undef, \@_);
 
 	if(!defined($class)) {
 		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		return;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	$args{'lat'} //= $args{'latitude'} // $args{'Latitude'};
-	if(!defined($args{'lat'})) {
+	$params->{'lat'} //= $params->{'latitude'} // $params->{'Latitude'};
+	if(!defined($params->{'lat'})) {
 		Carp::carp(__PACKAGE__, ': latitude not given');
 		return;
 	}
-	if(abs($args{'lat'}) > 180) {
-		Carp::carp(__PACKAGE__, ': ', $args{'lat'}, ': invalid latitude');
+	if(abs($params->{'lat'}) > 180) {
+		Carp::carp(__PACKAGE__, ': ', $params->{'lat'}, ': invalid latitude');
 		return;
 	}
 
-	$args{'long'} //= $args{'longitude'} // $args{'Longitude'};
-	if(!defined($args{'long'})) {
+	$params->{'long'} //= $params->{'longitude'} // $params->{'Longitude'};
+	if(!defined($params->{'long'})) {
 		Carp::carp(__PACKAGE__, ': longitude not given');
 		return;
 	}
-	if(abs($args{'long'}) > 180) {
-		Carp::carp(__PACKAGE__, ': ', $args{'long'}, ': invalid longitude');
+	if(abs($params->{'long'}) > 180) {
+		Carp::carp(__PACKAGE__, ': ', $params->{'long'}, ': invalid longitude');
 		return;
 	}
-	$args{'lng'} = $args{'long'};
+	$params->{'lng'} = $params->{'long'};
 
 	# Return the blessed object
-	return bless \%args, $class;
+	return bless $params, $class;
 }
 
 =head2 lat
@@ -372,12 +364,12 @@ sub AUTOLOAD {
 		$self->{$key} = $value;
 	}
 
-	return $self->{$key};
+	return $self->{$key} || $self->{ucfirst($key)}
 }
 
 =head1 AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne <njh@nigelhorne.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

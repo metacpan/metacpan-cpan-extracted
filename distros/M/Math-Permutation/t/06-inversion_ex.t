@@ -3,7 +3,7 @@ use warnings;
 use Math::Permutation;
 use Test::More tests => 24;
 use List::Util qw/sum/;
-use v5.10.0;
+use v5.24.0;
 
 # from OEIS:A268532
 my %perm = qw/

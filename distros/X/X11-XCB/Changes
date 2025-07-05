@@ -1,5 +1,9 @@
 Revision history for libXcb Perl bindings.
 
+0.24    2025-07-04
+
+    - Fix _GenerateMyXS.pm incompatibility with 5.42.0
+
 0.23    2024-10-05
 
     - Add XComposite support

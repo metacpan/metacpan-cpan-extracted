@@ -12,9 +12,9 @@ my $app = sub {
 
 my $agent = Plack::Test::Agent->new( app => $app );
 my $res   = $agent->get('http://localhost/hello');
-is $res->content,      'Hello World';
-is $res->content_type, 'text/plain';
-is $res->code,         200;
+is $res->content,          'Hello World';
+is $res->content_type,     'text/plain';
+is $res->code,             200;
 is $res->header('Server'), undef, '... should default to MockHTTP server';
 
 done_testing;

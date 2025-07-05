@@ -1,3 +1,7 @@
+1.6       2025-07-05 01:02:12Z
+* Remove experimental note, given age of API (GH#2) (Andy Beverley)
+* Add PUT and DELETE HTTP methods (GH#1) (Andy Beverley)
+
 1.5       2020-10-06 00:54:06Z
 * Added cookie jar capability to non-server usage (Torsten Raudssus)
 

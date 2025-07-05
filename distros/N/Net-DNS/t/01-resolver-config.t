@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver-config.t 2013 2025-02-11 15:52:59Z willem $	-*-perl-*-
+# $Id: 01-resolver-config.t 2016 2025-02-27 15:27:42Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -52,7 +52,7 @@ is( $IPv4, '127.0.0.1', 'IPv4 nameserver' );
 my ($IPv6) = $resolver->nameserver(qw(::1));
 
 SKIP: {
-	skip( 'IPv6 specific test', 6 ) unless $IPv6;
+	skip( 'IPv6 specific test', 5 ) unless $IPv6;
 	is( $IPv6, '::1', 'IPv6 nameserver' );
 
 	my ($pref4) = $class->new( prefer_v4 => 1 )->nameserver(qw(::1 127.0.0.1));

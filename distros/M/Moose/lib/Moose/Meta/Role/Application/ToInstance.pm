@@ -1,5 +1,5 @@
 package Moose::Meta::Role::Application::ToInstance;
-our $VERSION = '2.2207';
+our $VERSION = '2.4000';
 
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ Moose::Meta::Role::Application::ToInstance - Compose a role into an instance
 
 =head1 VERSION
 
-version 2.2207
+version 2.4000
 
 =head1 DESCRIPTION
 

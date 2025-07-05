@@ -1,5 +1,17 @@
 Revision history for String-Interpolate-RE
 
+0.12      2025-07-04 21:32:44-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * new option, fallback, provides a coderef used if a variable is not found
+      in the $vars hash; more efficient than setting $vars to a codref, which
+      will be called for every lookup.
+
+  [BACK INCOMPAT]
+
+    * minimum Perl is now  v5.10
+
 0.11      2021-09-01 15:37:30-04:00 America/New_York
 
   [BUG FIX]

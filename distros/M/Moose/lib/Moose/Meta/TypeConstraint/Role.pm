@@ -1,5 +1,5 @@
 package Moose::Meta::TypeConstraint::Role;
-our $VERSION = '2.2207';
+our $VERSION = '2.4000';
 
 use strict;
 use warnings;
@@ -124,7 +124,7 @@ Moose::Meta::TypeConstraint::Role - Role/TypeConstraint parallel hierarchy
 
 =head1 VERSION
 
-version 2.2207
+version 2.4000
 
 =head1 DESCRIPTION
 

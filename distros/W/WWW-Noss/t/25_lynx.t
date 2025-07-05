@@ -10,6 +10,12 @@ use WWW::Noss::Lynx qw(lynx_dump);
 
 my $HTML = File::Spec->catfile(qw/t data lynx.html/);
 
+qx/lynx -version 2>&1/;
+
+if ($? == -1) {
+	plan skip_all => 'lynx not installed';
+}
+
 my $format = lynx_dump($HTML, width => 72);
 
 like(

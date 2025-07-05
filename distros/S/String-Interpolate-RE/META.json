@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -70,7 +70,6 @@
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
@@ -94,7 +93,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0",
             "Test::Version" : "1"
          }
       },
@@ -102,6 +100,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter::Shiny" : "0",
+            "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -116,15 +115,14 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test2::V0" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "String::Interpolate::RE" : {
          "file" : "lib/String/Interpolate/RE.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -139,9 +137,9 @@
          "web" : "https://gitlab.com/djerius/string-interpolate-re"
       }
    },
-   "version" : "0.11",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
+   "version" : "0.12",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

@@ -4,10 +4,13 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.042';
+our $VERSION = '1.043';
 
 my %introduces = do { no warnings 'qw';
-                 ( '5.040' => [qw[
+                 ( '5.042' => [qw[
+                                  :writer my_method ->& unicode16.0 ^^=
+                             ]],
+                   '5.040' => [qw[
                                   ^^ __CLASS__ :reader
                              ]],
                    '5.038' => [qw[
@@ -185,6 +188,9 @@ my %alias = (
     'optimistic-eval' => '*{}',
     # 5.040
     'logical-xor' => '^^',
+    # 5.042
+    'lexical-method-invocation-operator' => '->&',
+    'assign-logical-xor' => '^^=',
 );
 
 my %_introduced = map {
@@ -305,7 +311,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.042
+Version 1.043
 
 =head1 SYNOPSIS
 
@@ -988,6 +994,32 @@ L<perl5400delta/New __CLASS__ Keyword>.
 =head3 :reader
 
 L<perl5400delta/:reader attribute for field variables>
+
+=head2 5.042
+
+=head3 :writer
+
+L<perldelta/New :writer attribute on field variables>
+
+=head3 my_method
+
+L<perldelta/Lexical method declaration using my method>
+
+=head3 ->&
+
+L<< perldelta/Lexical method invocation operator ->& >>
+
+Alias: lexical-method-invocation-operator
+
+=head3 unicode16.0
+
+L<perldelta/Unicode 16.0 supported>
+
+=head3 ^^=
+
+L<perldelta/Assigning logical xor ^^= operator>
+
+Alias: assign-logical-xor
 
 =for completeness
 =head2 old

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use utf8;
 use DateTime;
@@ -107,7 +107,7 @@ elsif ( $opt{station} =~ m{[|]} ) {
 	$opt{with_polyline} = $with_polyline;
 	delete $opt{station};
 }
-elsif ( $opt{station} =~ m{ [@] L = (?<eva> \d+ ) [@] }x ) {
+elsif ( $opt{station} =~ m{ [@] L = (?<eva> \d+ ) }x ) {
 	$opt{station} = {
 		eva => $+{eva},
 		id  => $opt{station},
@@ -311,12 +311,12 @@ if ( my $err = $status->errstr ) {
 	exit 2;
 }
 
-if ($raw_json_output) {
+if ( $raw_json_output and not $train_no ) {
 	say JSON->new->convert_blessed->encode( $status->{raw_json} );
 	exit 0;
 }
 
-if ($json_output) {
+if ( $json_output and not $train_no ) {
 	if ( $opt{journey} ) {
 		say JSON->new->convert_blessed->encode( $status->result );
 	}
@@ -364,7 +364,7 @@ if ( $opt{station} ) {
 		}
 	}
 }
-elsif ( $opt{journey} ) {
+elsif ( $opt{journey} and not( $raw_json_output or $json_output ) ) {
 	my $trip = $status->result;
 
 	my $max_name     = max map { length( $_->name ) } $trip->route;
@@ -462,6 +462,21 @@ if ($train_no) {
 		developer_mode => $developer_mode,
 		formation      => $train_no
 	);
+
+	if ($raw_json_output) {
+		say JSON->new->convert_blessed->encode( $status->{raw_json} );
+		exit 0;
+	}
+
+	if ($json_output) {
+		if ( $opt{journey} ) {
+			say JSON->new->convert_blessed->encode( $status->result );
+		}
+		else {
+			say JSON->new->convert_blessed->encode( [ $status->results ] );
+		}
+		exit 0;
+	}
 
 	my $wr = $status->result;
 
@@ -588,7 +603,7 @@ B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 

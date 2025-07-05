@@ -1,4 +1,11 @@
-$Id: Changes 2015 2025-02-21 08:37:21Z willem $                       -*-text-*-
+$Id: Changes 2022 2025-07-04 13:03:53Z willem $                       -*-text-*-
+
+
+**** 1.51 Jul 4, 2025
+
+	Resync with IANA DNS Parameters registry.
+	Add prototype DELEG RR package.
+	Minor code and documentation improvements.
 
 
 **** 1.50 Feb 21, 2025

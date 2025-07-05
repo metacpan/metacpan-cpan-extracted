@@ -13,7 +13,7 @@ Moose::Cookbook::Basics::Document_AugmentAndInner - The augment modifier, which 
 
 =head1 VERSION
 
-version 2.2207
+version 2.4000
 
 =head1 SYNOPSIS
 

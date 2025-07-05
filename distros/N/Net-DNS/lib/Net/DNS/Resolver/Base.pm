@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 2011 2025-02-11 15:18:03Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 2016 2025-02-27 15:27:42Z willem $)[2];
 
 
 #
@@ -321,11 +321,9 @@ sub nameservers {
 	if ( scalar(@ns) || !defined(wantarray) ) {
 		my @ipv4 = grep { _ipv4($_) } @ip;
 		my @ipv6 = grep { _ipv6($_) } @ip;
-		my @map4 = map	{"::FFFF:$_"} @ipv4;
 		$self->{nameservers} = \@ip;
 		$self->{nameserver4} = \@ipv4;
 		$self->{nameserver6} = \@ipv6;
-		$self->{mapped_IPv4} = \@map4;
 	}
 
 	my @IPv4 = @{$self->{nameserver4}};

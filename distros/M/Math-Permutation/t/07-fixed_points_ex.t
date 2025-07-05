@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::Permutation;
 use Test::More tests => 40;
-use v5.10.0;
+use v5.24.0;
 
 # from OEIS:A320588
 my @derangements = qw/21

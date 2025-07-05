@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1996 2024-12-16 13:05:08Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 2017 2025-06-27 13:48:03Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -14,7 +14,7 @@ exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
 		unless ( $] > 5.018001 )
 		or ( $] < 5.018 );
 
-plan tests => 48;
+plan tests => 49;
 
 
 my $name = 'SVCB.example';
@@ -59,14 +59,16 @@ for my $rr ( Net::DNS::RR->new(". $type") ) {
 		is( $rr->$_(), undef, "empty RR has undefined $_" );
 	}
 
-	$rr->svcpriority(1);
-	$rr->targetname('.');
+	$rr->SvcPriority(1);
+	$rr->TargetName('.');
 	my $l0 = length $rr->encode;
 	$rr->no_default_alpn(0);
 	$rr->no_default_alpn(1);
 	isnt( length( $rr->encode ), $l0, 'insert SvcParams key' );
 	$rr->no_default_alpn(undef);
 	is( length( $rr->encode ), $l0, 'delete SvcParams key' );
+
+	exception( 'non-existent method', sub { $rr->bogus } );
 }
 
 
@@ -77,7 +79,7 @@ for my $corruption ( pack 'H*', '00004000010000000000070001000bad0001' ) {
 }
 
 
-Net::DNS::RR->new( <<'END' )->print;
+Net::DNS::RR->new(<<'END')->print;
 example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 			no-default-alpn port=1234 ipv4hint=192.0.2.1
 			ech=AEP+DQA/BAAgACCW2/dfOBZAtQU55/py/BlhdRdaauPAkrERAUwppoeSEgAEAAEAAQAQY2QxLnRlc3QuZGVmby5pZQAA

@@ -28,7 +28,7 @@ MODULE = PHP::Serialization::XS		PACKAGE = PHP::Serialization::XS
 PROTOTYPES: ENABLE
 
 SV *
-_c_decode(SV *input, SV *preference, ....)
+_c_decode(SV *input, SV *preference, ...)
     CODE:
         struct ps_parser_state *ps_state;
         ps_parser_error_handler = _register_error;

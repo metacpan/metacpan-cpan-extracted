@@ -1,5 +1,10 @@
 Revision history for stubb (File::Stubb)
 
+0.03  Jul 04 2025
+  - When perform shell rendering, the substitution environment is applied on
+    top of the running environment instead of replacing it.
+  - META files are no longer maintained manually.
+
 0.02  May 26 2025
   - Skip shell rendering tests on Windows.
   - Update example templates.

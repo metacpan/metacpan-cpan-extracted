@@ -8,7 +8,7 @@ use parent 'Class::Accessor';
 
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # ->number is deprecated
 # TODO: Rename ->train, ->train_no to ->trip, ->trip_no
@@ -201,7 +201,7 @@ journey received by Travel::Status::DE::DBRIS
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 

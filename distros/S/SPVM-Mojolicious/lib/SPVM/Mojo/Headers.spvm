@@ -119,6 +119,8 @@ class Mojo::Headers {
     }
     
     $clone->{buffer} = $self->{buffer}->clone;
+    
+    return $clone;
   }
   
   method dehop : void () {

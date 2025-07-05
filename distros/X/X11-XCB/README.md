@@ -69,7 +69,7 @@ To install this module type the following:
 
 Copyright (C) 2009-2023 Michael Stapelberg,
 Copyright (C) 2011 Maik Fischer,
-Copyright (C) 2023 Sergei Zhmylev
+Copyright (C) 2023-2025 Sergei Zhmylev
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

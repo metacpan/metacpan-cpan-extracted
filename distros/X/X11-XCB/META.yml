@@ -40,4 +40,4 @@ resources:
   bugtracker: https://github.com/zhmylove/X11-XCB/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/zhmylove/X11-XCB
-version: '0.23'
+version: '0.24'

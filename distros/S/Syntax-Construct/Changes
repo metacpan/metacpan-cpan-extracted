@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.043   2025-07-04
+        - Perl 5.42.0 released
+
 1.042   2025-06-13
         - Add sig-warn-obj
 

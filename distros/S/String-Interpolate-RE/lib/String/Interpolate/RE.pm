@@ -2,27 +2,30 @@ package String::Interpolate::RE;
 
 # ABSTRACT: interpolate variables into strings using regular expressions
 
+use v5.10;
+
 use strict;
 use warnings;
 
 use Exporter::Shiny qw[ strinterp ];
 
-our $VERSION = '0.11';
-
-## no critic (ProhibitAccessOfPrivateData)
+our $VERSION = '0.12';
 
 my %Opt = (
-        variable_re        => qr/\w+/,
-        raiseundef         => 0,
-        emptyundef         => 0,
-        useenv             => 1,
-        format             => 0,
-        recurse            => 0,
-        recurse_limit      => 0,
-        recurse_fail_limit => 100,
+    variable_re        => qr/\w+/,
+    raiseundef         => !!0,
+    emptyundef         => !!0,
+    useenv             => !!1,
+    format             => !!0,
+    recurse            => !!0,
+    recurse_limit      => 0,
+    recurse_fail_limit => 100,
+    fallback           => undef,
 );
+my %Defaults = map { $_ => $Opt{$_} } grep { defined $Opt{$_} } keys %Opt;
 
-*strinterp =  _mk_strinterp( \%Opt );
+
+*strinterp = _mk_strinterp( \%Defaults );
 
 sub _croak {
     require Carp;
@@ -31,13 +34,20 @@ sub _croak {
 
 sub _generate_strinterp {
 
-    my ( $me, $name, $args ) = @_;
+    my ( undef, undef, $args ) = @_;
 
     return \&strinterp
-      if ! defined $args || ! defined $args->{opts};
+      if !defined $args || !defined $args->{opts};
 
-    my %opt = %Opt;
-    $opt{lc $_} = $args->{opts}{$_} foreach keys %{$args->{opts}};
+    my %opt = %Defaults;
+    $opt{ lc $_ } = $args->{opts}{$_} foreach keys %{ $args->{opts} };
+    if ( my @bad = grep !exists $Opt{$_}, keys %opt ) {
+        _croak( 'unrecognized option(s): ' . join( ', ', @bad ) );
+    }
+
+    _croak( q{'fallback' option must be a coderef} )
+      if exists $opt{fallback} && ref( $opt{fallback} ) ne 'CODE';
+
     return _mk_strinterp( \%opt );
 }
 
@@ -55,8 +65,12 @@ sub _mk_strinterp {
 
         if ( defined $opts ) {
             $opt{ lc $_ } = $opts->{$_} foreach keys %$opts;
+            if ( my @bad = grep !exists $Opt{$_}, keys %opt ) {
+                _croak( 'unrecognized option(s): ' . join( ', ', @bad ) );
+            }
+            _croak( q{'fallback' option must be a coderef} )
+              if exists $opt{fallback} && ref( $opt{fallback} ) ne 'CODE';
         }
-        ## use critic
 
         my $fmt = $opt{format} ? ':([^}]+)' : '()';
 
@@ -67,7 +81,7 @@ sub _mk_strinterp {
         _strinterp( $text, $var, \%opt );
 
         return $text;
-    }
+    };
 }
 
 sub _strinterp {
@@ -77,73 +91,87 @@ sub _strinterp {
     my $fmt = $opt->{fmt};
     my $re  = $opt->{variable_re};
 
+    # The following code pulls things out of the hash to reduce the
+    # number of hash lookups in the code in the RE.  Unfortunately, iqt
+    # doesn't seem to make much of a difference, but it does clean
+    # that code up a bit.
+
+    my ( $useenv, $raiseundef, $recurse, $fallback, $emptyundef, $track,
+        $recurse_limit, $recurse_fail_limit )
+      = @{$opt}{
+        qw( useenv raiseundef recurse fallback emptyundef track
+          recurse_limit recurse_fail_limit
+        ) };
+
+    my $rloop   = \( $opt->{loop} );
+    my $is_code = 'CODE' eq ref $var;
+
     $_[0] =~ s{
                \$                    # find a literal dollar sign
               (                      # followed by either
-               \{ ($re)(?:$fmt)? \}  #  a variable name in curly brackets ($2)
+               [{] ($re)(?:$fmt)? [}]  #  a variable name in curly brackets ($2)
                                      #  and an optional sprintf format
                |                     # or
                 (\w+)                #   a bareword ($3)
               )
             }{
-              my $t = defined $4 ? $4 : $2;
+                my $t = defined $4 ? $4 : $2;
 
-              my $user_value = 'CODE' eq ref $var ? $var->($t) : $var->{$t};
+                my $user_value
+                  = $is_code          ? $var->( $t )
+                  : exists $var->{$t} ? $var->{$t}
+                  : $fallback         ? $fallback->( $t )
+                  :                     undef;
 
-              my $v =
-              # user provided?
-                defined $user_value               ? $user_value
+                #<<<
+                my $v =
+                  # user provided?
+                  defined $user_value          ? $user_value
 
-              # maybe in the environment
-              : $opt->{useenv} && exists $ENV{$t}   ? $ENV{$t}
+                  # maybe in the environment
+                  : $useenv && exists $ENV{$t} ? $ENV{$t}
 
-              # undefined: throw an error?
-              : $opt->{raiseundef}                  ? _croak( "undefined variable: $t\n" )
+                  # undefined: throw an error  ?
+                  : $raiseundef                ? _croak( "undefined variable: $t\n" )
 
-              # undefined
-              :                                     undef
+                  # undefined
+                  : undef;
+                #>>>
 
-              ;
+                if ( $recurse && defined $v ) {
 
-              if ( $opt->{recurse} && defined $v ) {
+                  RECURSE:
+                    {
+                        _croak( "circular interpolation loop detected with repeated interpolation of <\$$t>\n" )
+                          if $track->{$t}++;
 
+                        my $loop = ++$$rloop;
 
-                RECURSE:
-                  {
+                        last RECURSE if $recurse_limit && $loop > $recurse_limit;
 
-                      _croak(
-                          "circular interpolation loop detected with repeated interpolation of <\$$t>\n"
-                      ) if $opt->{track}{$t}++;
+                        _croak( "recursion fail-safe limit ($recurse_fail_limit) reached at interpolation of <\$$t>\n" )
+                          if $recurse_fail_limit && $loop > $recurse_fail_limit;
 
-                      ++$opt->{loop};
+                        _strinterp( $v, $_[1], $_[2] );
+                    }
 
-                      last RECURSE if $opt->{recurse_limit} && $opt->{loop} > $opt->{recurse_limit};
+                    delete $track->{$t};
+                    --$$rloop;
+                }
 
-                      _croak(
-                          "recursion fail-safe limit ($opt->{recurse_fail_limit}) reached at interpolation of <\$$t>\n"
-                      ) if $opt->{recurse_fail_limit} && $opt->{loop} > $opt->{recurse_fail_limit};
+                # if not defined:
+                #   if emptyundef, replace with an empty string
+                #   otherwise,     just put it back into the string
+                !defined $v
+                  ? ( $emptyundef ? '' : '$' . $1 )
 
-                      _strinterp( $v, $_[1], $_[2] );
+                  # no format? return as is
+                  : !defined $3 || $3 eq '' ? $v
 
-                  }
+                  # format it
+                  : sprintf( $3, $v )
 
-                  delete $opt->{track}{$t};
-                  --$opt->{loop};
-              }
-
-              # if not defined:
-              #   if emptyundef, replace with an empty string
-              #   otherwise,     just put it back into the string
-                 ! defined $v ? ( $opt->{emptyundef}  ? '' : '$' . $1 )
-
-              # no format? return as is
-              :  ! defined $3 || $3 eq ''         ? $v
-
-              # format it
-              :                                     sprintf( $3, $v)
-
-              ;
-
+                  ;
         }egx;
 }
 
@@ -163,13 +191,15 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory useenv
+
 =head1 NAME
 
 String::Interpolate::RE - interpolate variables into strings using regular expressions
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -196,12 +226,12 @@ thought out.  B<String::Interpolate::RE> uses L<Exporter::Tiny>,
 allowing a version of L</strinterp> with saner defaults to be
 exported.  Simply specify them when importing:
 
-  use String::Interpolate::RE strinterp => { opts => { useENV => 0 } };
+  use String::Interpolate::RE strinterp => { opts => { useenv => 0 } };
 
 The subroutine may be renamed using the C<-as> option:
 
   use String::Interpolate::RE strinterp => { -as => strinterp_noenv,
-                                             opts => { useENV => 0 } };
+                                             opts => { useenv => 0 } };
 
   strinterp_noenv( ... );
 
@@ -222,20 +252,42 @@ form
     $VAR
     ${VAR}
 
-where C<VAR> is composed of one or more word characters (as defined by
-the C<\w> Perl regular expression pattern). C<VAR> is resolved using
-the optional C<$vars> argument, which may either by a hashref (in
-which case C<VAR> must be a key), or a function reference (which is
-passed C<VAR> as its only argument and must return the value).
+where C<VAR> is composed of one or more characters specified by the
+L</variable_re> option (which has a reasonable default).
+
+=over
+
+=item 1
+
+If C<$vars> is a code reference, it is passed C<VAR> as its sole
+argument and should return its value (or B<undef>)
+
+=item 2
+
+Otherwise, C<$vars> should be a hash reference.  If C<VAR> is a
+key in C<$vars>, its value is used.
+
+If C<VAR> is I<not> in C<$vars>, and if the L</fallback> option was
+specified, that coderef is called with C<VAR> as its sole argument,
+and should return C<VAR>'s value (or B<undef>).
+
+=back
 
 If the value returned for C<VAR> is defined, it will be interpolated
-into the string at that point.  By default, variables which are not
-defined are by default left as is in the string.
+into the string at that point.  If it is I<not> defined, it will be
+left as is in the string (see the L</raiseundef> and
+L</emptyundef> options for alternative behaviors).
 
 The C<%opts> parameter may be used to modify the behavior of this
 function.  The following (case insensitive) keys are recognized:
 
 =over
+
+=item fallback I<coderef>
+
+If provided, this coderef is passed the variable name if C<$vars> is a
+hash reference and does not contain an entry with a key matching the
+variable name.
 
 =item format I<boolean>
 
@@ -265,7 +317,7 @@ exception being raised.  This defaults to false.
 If true, a variable which has not been defined will be replaced with
 the empty string.  This defaults to false.
 
-=item useENV I<boolean>
+=item useenv I<boolean>
 
 If true, the C<%ENV> hash will be searched for variables which are not
 defined in the passed C<%var> hash.  This defaults to true.
@@ -322,6 +374,14 @@ break.
 This string is thrown if the C<RaiseUndef> option is set and the
 variable C<%s> is not defined.
 
+=item C<< unrecognized option(s): %s >>
+
+One or more of the passed options isn't something this module recognizes
+
+=item C<< 'fallback' option must be a coderef >>
+
+As noted.
+
 =item C<< recursive interpolation loop detected with repeated interpolation of <%s> >>
 
 When resolving nested interpolated values (with the C<recurse> option
@@ -338,7 +398,7 @@ interpolating nested variable values (with the C<recurse> option true ).
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-string-interpolate-re@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-RE
+Please report any bugs or feature requests to bug-string-interpolate-re@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-RE>
 
 =head2 Source
 

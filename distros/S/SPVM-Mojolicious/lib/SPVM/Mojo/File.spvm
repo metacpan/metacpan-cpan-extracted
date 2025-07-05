@@ -9,7 +9,7 @@ class Mojo::File {
   use File::Spec;
   use Cwd;
   
-  has path : object of string|string[]|File::Temp|File::Temp::Dir;
+  has path : object of string|File::Temp|File::Temp::Dir;
   
   # Class Methods
   static method new : Mojo::File ($path : object of string|string[]|File::Temp|File::Temp::Dir) {
@@ -42,6 +42,54 @@ class Mojo::File {
     return &new($path);
   }
   
+  method child : Mojo::File ($base_name : object of string|string[]) {
+    
+    my $child = Mojo::File->new($base_name);
+    
+    return $child;
+  }
+  
+  method to_array : string[] () {
+    
+    return File::Spec->splitdir($self->to_string);
+  }
+  
+  method to_abs : Mojo::File () {
+    
+    my $abs = Mojo::File->new(File::Spec->rel2abs($self->to_string));
+    
+    return $abs;
+  }
+  
+  method to_string : string () {
+    
+    my $string = (string)undef;
+    
+    my $path = $self->{path};
+    if ($path) {
+      if ($path isa string) {
+        $string = (string)$path;
+      }
+      elsif ($path isa File::Temp) {
+        $string = $path->(File::Temp)->filename;
+      }
+      elsif ($path isa File::Temp::Dir) {
+        $string = $path->(File::Temp::Dir)->dirname;
+      }
+    }
+    
+    return $string;
+  }
+  
+  method open : IO::File ($mode : string) {
+    
+    my $handle = IO::File->new;
+    
+    $handle->open($self->to_string, $mode);
+    
+    return $handle;
+  }
+
 }
 
 __END__

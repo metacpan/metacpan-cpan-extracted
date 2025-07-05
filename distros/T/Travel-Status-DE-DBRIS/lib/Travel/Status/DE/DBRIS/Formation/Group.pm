@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use List::Util qw(uniq);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 Travel::Status::DE::DBRIS::Formation::Group->mk_ro_accessors(
 	qw(designation name train_no train_type description desc_short destination has_sectors model series start_percent end_percent)
@@ -239,7 +239,9 @@ my %ice_name = (
 	2871 => 'Leipziger Neuseenland',
 	2874 => 'Oberer Neckar',
 	2875 => 'Magdeburger Börde',
+	4102 => 'Naturpark Schönbuch',
 	4103 => 'Allgäu',
+	4108 => 'Hegau',
 	4111 => 'Gäu',
 	4114 => 'Dresden Elbland',
 	4117 => 'Mecklenburgische Ostseeküste',
@@ -249,7 +251,6 @@ my %ice_name = (
 	4604 => 'Brussel/Bruxelles',
 	4607 => 'Hannover',
 	4610 => 'Frankfurt am Main',
-	4611 => 'Düsseldorf',
 	4651 => 'Amsterdam',
 	4652 => 'Arnhem',
 	4680 => 'Würzburg',
@@ -260,9 +261,15 @@ my %ice_name = (
 	4712 => 'Dillingen a.d. Donau',
 	4710 => 'Ansbach',
 	4717 => 'Paris',
+	4893 => 'Bodetal',
+	4898 => 'Lahntal',
 	8007 => 'Rheinland',
+	8019 => 'Düsseldorf',
+	8020 => 'Amsterdam',
 	8022 => 'Waldecker Land',
+	8029 => 'Europa/Europe',
 	9006 => 'Martin Luther',
+	9009 => 'Cottbus/Chóśebuz',
 	9018 => 'Freistaat Bayern',
 	9025 => 'Nordrhein-Westfalen',
 	9026 => 'Zürichsee',
@@ -271,7 +278,9 @@ my %ice_name = (
 	9046 => 'Female ICE',
 	9050 => 'Metropole Ruhr',
 	9202 => 'Schleswig-Holstein',
+	9208 => 'Nationalpark Bayrischer Wald',
 	9212 => 'Fan-Hauptstadt Hamburg',
+	9234 => 'Ruhr',
 	9237 => 'Spree',
 	9457 => 'Bundesrepublik Deutschland',
 	9481 => 'Rheinland-Pfalz'
@@ -282,9 +291,10 @@ my %ice_name = (
 # {{{ Rolling Stock Models
 
 my %model_name = (
-	'011'      => [ 'ICE T', 'ÖBB 4011' ],
-	'401'      => ['ICE 1'],
-	'402'      => ['ICE 2'],
+	'011'      => [ 'ICE T',        'ÖBB 4011' ],
+	'023'      => [ 'CFL KISS',     'CFL 2300' ],
+	'401'      => [ 'ICE 1',        'BR 401' ],
+	'402'      => [ 'ICE 2',        'BR 402' ],
 	'403.S1'   => [ 'ICE 3',        'BR 403, 1. Serie' ],
 	'403.S2'   => [ 'ICE 3',        'BR 403, 2. Serie' ],
 	'403.R'    => [ 'ICE 3',        'BR 403 Redesign' ],
@@ -294,11 +304,12 @@ my %model_name = (
 	'408'      => [ 'ICE 3neo',     'BR 408' ],
 	'411.S1'   => [ 'ICE T',        'BR 411, 1. Serie' ],
 	'411.S2'   => [ 'ICE T',        'BR 411, 2. Serie' ],
-	'412'      => ['ICE 4'],
-	'415'      => [ 'ICE T', 'BR 415' ],
+	'412'      => [ 'ICE 4',        'BR 412' ],
+	'415'      => [ 'ICE T',        'BR 415' ],
 	'420'      => ['BR 420'],
 	'422'      => ['BR 422'],
 	'423'      => ['BR 423'],
+	'424'      => ['BR 424'],
 	'425'      => ['BR 425'],
 	'427'      => [ 'FLIRT', 'BR 427' ],
 	'428'      => [ 'FLIRT', 'BR 428' ],
@@ -311,6 +322,7 @@ my %model_name = (
 	'462'      => [ 'Desiro HC',           'BR 462' ],
 	'463'      => [ 'Mireo',               'BR 463' ],
 	'475'      => [ 'TGV',                 'BR 475' ],
+	'563'      => [ 'Mireo Plus B',        'BR 563' ],
 	'612'      => [ 'RegioSwinger',        'BR 612' ],
 	'620'      => [ 'LINT 81',             'BR 620' ],
 	'622'      => [ 'LINT 54',             'BR 622' ],
@@ -322,6 +334,7 @@ my %model_name = (
 	'643'      => [ 'TALENT',              'BR 643' ],
 	'644'      => [ 'TALENT',              'BR 644' ],
 	'648'      => [ 'LINT 41',             'BR 648' ],
+	'650'      => [ 'Regio-Shuttle RS1',   'BR 650' ],
 	'IC2.TWIN' => ['IC 2 Twindexx'],
 	'IC2.KISS' => ['IC 2 KISS'],
 );
@@ -412,6 +425,7 @@ sub parse_model {
 
 	my %ml = (
 		'011'      => 0,
+		'023'      => 0,
 		'401'      => 0,
 		'402'      => 0,
 		'403.S1'   => 0,
@@ -427,6 +441,7 @@ sub parse_model {
 		'420'      => 0,
 		'422'      => 0,
 		'423'      => 0,
+		'424'      => 0,
 		'425'      => 0,
 		'427'      => 0,
 		'428'      => 0,
@@ -439,6 +454,7 @@ sub parse_model {
 		'462'      => 0,
 		'463'      => 0,
 		'475'      => 0,
+		'563'      => 0,
 		'612'      => 0,
 		'620'      => 0,
 		'622'      => 0,
@@ -450,6 +466,7 @@ sub parse_model {
 		'643'      => 0,
 		'644'      => 0,
 		'648'      => 0,
+		'650'      => 0,
 		'IC2.TWIN' => 0,
 		'IC2.KISS' => 0,
 	);
@@ -460,7 +477,11 @@ sub parse_model {
 		if ( not $carriage->model ) {
 			next;
 		}
-		if ( $carriage->model == 401
+
+		if ( $carriage->model == 023 ) {
+			$ml{'023'}++;
+		}
+		elsif ( $carriage->model == 401
 			or ( $carriage->model >= 801 and $carriage->model <= 804 ) )
 		{
 			$ml{'401'}++;
@@ -514,6 +535,9 @@ sub parse_model {
 		elsif ( $carriage->model == 423 or $carriage->model == 433 ) {
 			$ml{'423'}++;
 		}
+		elsif ( $carriage->model == 424 or $carriage->model == 434 ) {
+			$ml{'424'}++;
+		}
 		elsif ( $carriage->model == 425 or $carriage->model == 435 ) {
 			$ml{'425'}++;
 		}
@@ -559,6 +583,9 @@ sub parse_model {
 		elsif ( $carriage->model == 475 ) {
 			$ml{'475'}++;
 		}
+		elsif ( $carriage->model == 563 ) {
+			$ml{'563'}++;
+		}
 		elsif ( $carriage->model == 612 ) {
 			$ml{'612'}++;
 		}
@@ -592,6 +619,9 @@ sub parse_model {
 		elsif ( $carriage->model == 648 ) {
 			$ml{'648'}++;
 		}
+		elsif ( $carriage->model == 650 ) {
+			$ml{'650'}++;
+		}
 		elsif ( $self->train_type eq 'IC' and $carriage->model == 110 ) {
 			$ml{'IC2.KISS'}++;
 		}
@@ -606,12 +636,19 @@ sub parse_model {
 	my @likelihood = reverse sort { $ml{$a} <=> $ml{$b} } keys %ml;
 
 	# Less than two carriages are generally inconclusive.
-	# Exception: BR 631 (Link I) only has a single carriage
+	# Exceptions: BR 631 (Link I), 640 (LINT 27, 650 (RS1)
+	# only have a single carriage
 	if (
 		$ml{ $likelihood[0] } < 2
-		and not($likelihood[0] eq '631'
+		and not(
+			(
+				   $likelihood[0] eq '631'
+				or $likelihood[0] eq '640'
+				or $likelihood[0] eq '650'
+			)
 			and @carriages == 1
-			and substr( $carriages[0]->uic_id, 0, 2 ) eq '95' )
+			and substr( $carriages[0]->uic_id, 0, 2 ) eq '95'
+		)
 	  )
 	{
 		$self->{subtype} = undef;

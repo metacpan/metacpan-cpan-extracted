@@ -3,6 +3,9 @@ ignore.txt
 lib/Math/Permutation.pm
 Makefile.PL
 MANIFEST			This list of files
+Math-Permutation-0.0201.tar.gz
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-matrix_pdl.t
@@ -16,5 +19,3 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

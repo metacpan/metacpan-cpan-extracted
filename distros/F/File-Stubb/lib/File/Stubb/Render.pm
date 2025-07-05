@@ -1,6 +1,6 @@
 package File::Stubb::Render;
 use 5.016;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -95,7 +95,11 @@ sub _qx_subst {
 
     my ($self, $qx) = @_;
 
-    local %ENV = %{ $self->{ Subst } };
+    local %ENV = %ENV;
+    for my $k (%{ $self->{ Subst } }) {
+        $ENV{ $k } = $self->{ Subst }{ $k };
+    }
+
     my $rt = qx/$qx/;
     chomp $rt;
     return $rt;

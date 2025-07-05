@@ -1,8 +1,43 @@
-# severity = brutal
-
+severity = brutal
 verbose = 9
 
+exclude = Freenode
+[-BuiltinFunctions::ProhibitUselessTopic]
+[-BuiltinFunctions::RequireBlockGrep]
+[-BuiltinFunctions::RequireBlockMap]
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::PodSpelling]
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodSections]
+[-ErrorHandling::RequireCarping]
+[-InputOutput::RequireBriefOpen]
+[-NamingConventions::Capitalization]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::RequireFinalReturn]
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+[-TryTiny::RequireUse]
 [-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitFiletest_f]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+[-ValuesAndExpressions::ProhibitVersionStrings]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-ValuesAndExpressions::RequireNumericVersion]
+[-Variables::ProhibitPunctuationVars]
 
-[TestingAndDebugging::RequireUseStrict]
-equivalent_modules = Moo Moo::Role strictures Test2::V0
+[CodeLayout::RequireTidyCode]
+perltidyrc = perltidy.rc
+
+[Community::StrictWarnings]
+extra_importers = Moo Moo::Role strictures Test2::V0

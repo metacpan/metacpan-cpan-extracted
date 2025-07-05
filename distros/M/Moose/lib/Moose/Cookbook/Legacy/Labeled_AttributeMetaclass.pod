@@ -13,7 +13,7 @@ Moose::Cookbook::Legacy::Labeled_AttributeMetaclass - A meta-attribute, attribut
 
 =head1 VERSION
 
-version 2.2207
+version 2.4000
 
 =head1 SYNOPSIS
 

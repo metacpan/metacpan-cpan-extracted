@@ -10,7 +10,7 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   use Mojo::Content;
   
   # Field
-  has previous : ro Mojo::Transaction::HTTP;
+  has previous : rw Mojo::Transaction::HTTP;
   
   # Undocumented Fields
   has writing : byte;
@@ -260,6 +260,8 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
     return $chunk;
   }
+  
+  method is_websocket : int () { return 0; }
   
 }
 

@@ -4,9 +4,9 @@
       "Cheok-Yin Fung <fungcheokyin@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -35,7 +35,7 @@
          "requires" : {
             "Carp" : "0",
             "List::Util" : "1.50",
-            "perl" : "5.010"
+            "perl" : "5.025"
          }
       },
       "test" : {
@@ -57,6 +57,6 @@
          "url" : "https://github.com/E7-87-83/Math-Permutation.git"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "version" : "0.021",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

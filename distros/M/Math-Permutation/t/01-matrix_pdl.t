@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::Permutation;
 use Test::More;
-use v5.10.0;
+use v5.24.0;
  
 eval "use PDL";
 eval "use Test::PDL qw{is_pdl}";

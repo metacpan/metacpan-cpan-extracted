@@ -3,7 +3,7 @@ package Net::DNS::Resolver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Resolver.pm 2009 2025-02-10 13:43:50Z willem $)[2];
+our $VERSION = (qw$Id: Resolver.pm 2017 2025-06-27 13:48:03Z willem $)[2];
 
 
 =head1 NAME
@@ -587,8 +587,6 @@ The default value is false.
 	$resolver->tsig( $keyfile );
 
 	$resolver->tsig( $keyfile, fudge => 60 );
-
-	$resolver->tsig( $tsig_rr );
 
 	$resolver->tsig( undef );
 

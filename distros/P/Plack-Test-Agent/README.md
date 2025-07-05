@@ -4,7 +4,7 @@ Plack::Test::Agent - OO interface for testing low-level Plack/PSGI apps
 
 # VERSION
 
-version 1.5
+version 1.6
 
 ## SYNOPSIS
 
@@ -26,10 +26,8 @@ version 1.5
 ## DESCRIPTION
 
 `Plack::Test::Agent` is an OO interface to test PSGI applications. It can
-perform GET and POST requests against PSGI applications either in process or
-over HTTP through a [Plack::Handler](https://metacpan.org/pod/Plack%3A%3AHandler) compatible backend.
-
-**NOTE:** This is an experimental module and its interface may change.
+perform GET, POST, PUT and DELETE requests against PSGI applications either in
+process or over HTTP through a [Plack::Handler](https://metacpan.org/pod/Plack%3A%3AHandler) compatible backend.
 
 ## CONSTRUCTION
 
@@ -81,6 +79,26 @@ reference of key/value pairs for the form content:
             status    => 'twin',
         ]);
 
+### `put`
+
+This method takes a URI and makes a `PUT` request against the PSGI
+application with that URI. It returns an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object representing
+the results of that request. As an optional second parameter, pass an array
+reference of key/value pairs for the form content:
+
+    $agent->put( '/edit_user',
+        [
+            shoe_size => '10.5',
+            eye_color => 'blue green',
+            status    => 'twin',
+        ]);
+
+### `delete`
+
+This method takes a URI and makes a `DELETE` request against the PSGI
+application with that URI. It returns an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object representing
+the results of that request.
+
 ### `execute_request`
 
 This method takes an [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest), performs it against the bound app, and
@@ -117,6 +135,7 @@ Thanks to Zbigniew Łukasiak and Tatsuhiko Miyagawa for suggestions.
 
 # CONTRIBUTORS
 
+- Andy Beverley <andy@andybev.com>
 - Dave Rolsky <drolsky@maxmind.com>
 - Olaf Alders <oalders@maxmind.com>
 - Ran Eilam <reilam@maxmind.com>

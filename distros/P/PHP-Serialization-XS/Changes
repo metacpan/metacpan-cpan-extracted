@@ -38,3 +38,6 @@ Revision history for Perl extension PHP::Serialization::XS.
 0.11  Sun Jan 19 20:55:33 EST 2025
     - Point to new phpserialize that compiles under modern Perl without
       `struct object` compilation failure
+
+0.12  Fri Jul  4 13:38:37 EDT 2025
+    - Remove an extra `.` in an XS ellipsis, as reported by SREZIC in RT #167875.

@@ -13,7 +13,7 @@ our @ISA = qw(PHP::Serialization Exporter);
 our %EXPORT_TAGS = (all => [ qw(serialize unserialize) ]);
 our @EXPORT_OK = @{ $EXPORT_TAGS{all} };
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('PHP::Serialization::XS', $VERSION);

@@ -45,7 +45,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::PodSpelling' => '0',
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
                                       'Dist::Zilla::Plugin::Test::TrailingSpace' => '0',
-                                      'Dist::Zilla::Plugin::Test::UnusedVars' => '0',
                                       'Dist::Zilla::Plugin::Test::Version' => '0',
                                       'Dist::Zilla::PluginBundle::Basic' => '0',
                                       'Dist::Zilla::PluginBundle::Filter' => '0',
@@ -69,7 +68,6 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -77,6 +75,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Exporter::Shiny' => '0',
+                                      'perl' => 'v5.10.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -91,8 +90,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test2::V0' => '0',
-                                   'Test::More' => '0',
-                                   'perl' => '5.006'
+                                   'Test::More' => '0'
                                  }
                  }
      };

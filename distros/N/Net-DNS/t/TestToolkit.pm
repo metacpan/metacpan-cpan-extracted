@@ -1,4 +1,4 @@
-# $Id: TestToolkit.pm 1908 2023-03-15 07:28:50Z willem $	-*-perl-*-
+# $Id: TestToolkit.pm 2017 2025-06-27 13:48:03Z willem $	-*-perl-*-
 
 package TestToolkit;
 
@@ -54,7 +54,7 @@ sub _execute {
 	local ( $@, $!, $SIG{__DIE__} );	## isolate eval
 	eval {
 		&$code;
-		croak shift(@warning) if @warning;
+		die "$_\n" for @warning;
 	};
 	my ($exception) = split /[\r\n]+/, "$@\n";
 	return $exception;

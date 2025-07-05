@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 2003 2025-01-21 12:06:06Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 2018 2025-07-01 11:57:43Z willem $)[2];
 
 
 =head1 NAME
@@ -769,12 +769,10 @@ sub AUTOLOAD {				## Default method
 	our $AUTOLOAD;
 	my ($method) = reverse split /::/, $AUTOLOAD;
 
-	for ( my $action = $method ) {	## tolerate mixed-case attribute name
-		tr [A-Z-] [a-z_];
-		if ( $self->can($action) ) {
-			*{$AUTOLOAD} = sub { shift->$action(@_) };
-			return &$AUTOLOAD;
-		}
+	my $canonical = lc($method);	## tolerate mixed-case attribute name
+	if ( $self->can($canonical) ) {
+		*{$AUTOLOAD} = sub { shift->$canonical(@_) };
+		return &$AUTOLOAD;
 	}
 
 	my $oref = ref($self);
@@ -786,7 +784,7 @@ sub AUTOLOAD {				## Default method
 	my $module = join '::', __PACKAGE__, $self->type;
 	eval("require $module") if $oref eq __PACKAGE__;	## no critic ProhibitStringyEval
 
-	@_ = ( <<"END" );
+	@_ = (<<"END");
 ***  FATAL PROGRAM ERROR!!	Unknown instance method "$method"
 ***  which the program has attempted to call for the object:
 ***

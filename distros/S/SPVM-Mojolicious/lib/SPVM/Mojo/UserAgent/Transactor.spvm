@@ -118,6 +118,191 @@ class Mojo::UserAgent::Transactor {
     
     return $tx;
   }
+  
+  method proxy_connect : Mojo::Transaction::HTTP ($old : Mojo::Transaction::HTTP) {
+   
+    # Already a CONNECT request
+    my $req = $old->req;
+    if (Fn->uc($req->method) eq "CONNECT") {
+      return undef ;
+    }
+    
+    # No proxy
+    my $proxy = $req->proxy;
+    unless ($proxy && $req->via_proxy) {
+      return undef;
+    }
+    if ($proxy->protocol eq "socks") {
+      return undef;
+    }
+    
+    # WebSocket and/or HTTPS
+    my $url = $req->url;
+    unless ($req->is_handshake || $url->protocol eq "https") {
+      return undef ;
+    }
+    
+    # CONNECT request (expect a bad response)
+    my $new_url = $url->clone;
+    $new_url->set_userinfo(undef);
+    my $new = $self->tx(CONNECT => $new_url);
+    $new->req->set_proxy($proxy);
+    my $new_res_content = $new->res->content;
+    $new_res_content->set_auto_relax(0);
+    $new_res_content->headers->set_connection("keep-alive");
+    
+    return $new;
+  }
+  
+  method redirect : Mojo::Transaction::HTTP ($old : Mojo::Transaction::HTTP) {
+    
+    # Commonly used codes
+    my $res  = $old->res;
+    my $code = $res->code;
+    
+    unless (@{Fn->grep([$code : int] method : int ($_ : object) { return $_->(int) == $code; }, [(Int)301, 302, 303, 307, 308])}) {
+      return undef ;
+    }
+    
+    # CONNECT requests cannot be redirected
+    my $req = $old->req;
+    
+    if (Fn->uc($req->method) eq "CONNECT") {
+      return undef ;
+    }
+    
+    # Fix location without authority and/or scheme
+    my $location = $res->headers->header("Location");
+    unless (length $location) {
+      return undef;
+    }
+    
+    my $location_url = Mojo::URL->new($location);
+    unless ($location_url->is_abs) {
+      $location_url->set_base($req->url);
+      $location_url = $location_url->to_abs;
+    }
+    my $proto = $location_url->protocol;
+    if (($proto ne "http" && $proto ne "https") || !$location_url->host) {
+      return undef;
+    }
+    
+    # Clone request if necessary
+    my $new = Mojo::Transaction::HTTP->new;
+    if ($code == 307 || $code == 308) {
+      my $clone = $req->clone;
+      unless ($clone) {
+        return undef;
+      }
+      $new->set_req($clone);
+    }
+    else {
+      my $method = Fn->uc($req->method);
+      $method = $code == 303 || $method eq "POST" ? "GET" : $method;
+      
+      my $new_req = $new->req;
+      $new_req->set_method($method);
+      my $headers = $req->headers->clone;
+      $new_req->content->set_headers($headers);
+      
+      for my $_ (@{$headers->names}) {
+        if (Re->m($_, ["^content-", "i"])) {
+          $headers->remove($_) ;
+        }
+      }
+    }
+    
+    unless ($self->compressed) {
+      $new->res->content->set_auto_decompress(0);
+    }
+    
+    my $new_req = $new->req;
+    $new_req->set_url($location_url);
+    my $headers = $new_req->headers;
+    
+    for my $_ (@{["Authorization", "Cookie", "Host", "Referer"]}) {
+      $headers->remove($_) ;
+    }
+    
+    $new->set_previous($old);
+    
+    return $new;
+  }
+  
+  method endpoint : object[] ($tx : Mojo::Transaction) {
+    
+    # Basic endpoint
+    my $req   = $tx->req;
+    my $url   = $req->url;
+    my $proto = $url->protocol // "http";
+    my $host  = $url->ihost;
+    my $port  = $url->port;
+    unless ($port > 0) {
+      $port = $proto eq "https" ? 443 : 80;
+    }
+    
+    # Proxy for normal HTTP requests
+    my $socks = 0;
+    if (my $proxy = $req->proxy) {
+      $socks = $proxy->protocol eq "socks";
+    }
+    
+    if ($proto eq "http" && !$req->is_handshake && !$socks) {
+      return &_proxy($tx, $proto, $host, $port) ;
+    }
+    
+    return [(object)$proto, $host, $port];
+  }
+  
+  private static method _proxy : object[] ($tx : Mojo::Transaction, $proto : string, $host : string, $port : int) {
+    
+    my $req = $tx->req;
+    if ($req->via_proxy && (my $proxy = $req->proxy)) {
+      
+      my $proxy_port  = $proxy->port;
+      unless ($proxy_port > 0) {
+        $proxy_port = $proto eq "https" ? 443 : 80;
+      }
+      
+      return [(object)$proxy->protocol, $proxy->ihost, $proxy_port];
+    }
+    
+    return [(object)$proto, $host, $port];
+  }
+  
+  method upgrade : Mojo::Transaction::WebSocket ($tx : Mojo::Transaction::HTTP) {
+    
+    my $code = $tx->res->code;
+    
+    unless ($tx->req->is_handshake && $code == 101) {
+      return undef;
+    }
+    
+    my $ws = Mojo::Transaction::WebSocket->new;
+    $ws->set_handshake($tx);
+    $ws->set_masked(1);
+    
+    my $challenge = Mojo::WebSocket->challenge($ws);
+    
+    unless ($challenge) {
+      return undef;
+    }
+    
+    $ws->set_established(1);
+    
+    return $ws;
+  }
+  
+  method peer : object[] ($tx : Mojo::Transaction::HTTP) {
+    
+    my $_ = $self->endpoint($tx);
+    my $proto = (string)$_->[0];
+    my $host = (string)$_->[1];
+    my $port = (int)$_->[2];
+    
+    return &_proxy($tx, $proto, $host, $port);
+  }
+  
 }
 
 __END__
@@ -714,3 +899,32 @@ Versatile L<Mojo::Transaction::HTTP> transaction builder for WebSocket handshake
 L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut
+
+# To regenerate the certificate run this command (28.06.2019)
+# openssl req -x509 -newkey rsa:4096 -nodes -sha256 -out server.crt \
+#   -keyout server.key -days 7300 -subj '/CN=localhost'
+my $CERT = curfile->sibling('resources', 'server.crt')->to_string;
+my $KEY  = curfile->sibling('resources', 'server.key')->to_string;
+
+sub _expand {
+  my ($self, $args) = @_;
+
+  weaken $self;
+  my $tls = {SSL_error_trap => sub { $self->_cleanup->emit(error => $_[1]) }, SSL_startHandshake => 0};
+  $tls->{SSL_ca_file}   = $args->{tls_ca}   if $args->{tls_ca} && -T $args->{tls_ca};
+  $tls->{SSL_cert_file} = $args->{tls_cert} if $args->{tls_cert};
+  $tls->{SSL_key_file}  = $args->{tls_key}  if $args->{tls_key};
+  $tls->{SSL_server}    = $args->{server}   if $args->{server};
+  @{$tls}{keys %{$args->{tls_options}}} = values %{$args->{tls_options}} if $args->{tls_options};
+
+  if ($args->{server}) {
+    $tls->{SSL_cert_file} ||= $CERT;
+    $tls->{SSL_key_file}  ||= $KEY;
+  }
+  else {
+    $tls->{SSL_hostname}      = IO::Socket::SSL->can_client_sni ? $args->{address} : '';
+    $tls->{SSL_verifycn_name} = $args->{address};
+  }
+
+  return $tls;
+}

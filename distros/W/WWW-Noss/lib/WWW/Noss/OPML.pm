@@ -2,7 +2,7 @@ package WWW::Noss::OPML;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use XML::LibXML;
 

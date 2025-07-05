@@ -1,0 +1,8 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Log::Callback::Format : interface_t {
+  
+  # Interface Methods
+  required method : string ($time : long, $level : string);
+}

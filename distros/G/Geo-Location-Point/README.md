@@ -4,14 +4,14 @@ Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 
 Geo::Location::Point encapsulates geographical point data with latitude and longitude.
 It supports distance calculations,
 comparison between points,
-and provides various convenience methods for attributes like latitude, longitude, and related string representations
+and provides various convenience methods for attributes like latitude, longitude, and related string representations.
 
     use Geo::Location::Point;
 
@@ -100,7 +100,7 @@ Get or set arbitrary attributes, such as city or country.
 
 # AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne <njh@nigelhorne.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -48,7 +48,7 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
   # Instance Methods
   static method parse : Mojo::Cookie::Response[] ($str : string) {
     
-    my $cookies = List->new(new Mojo::Cookie::Request[0]);
+    my $cookies = List->new(new Mojo::Cookie::Response[0]);
     
     my $tree = Mojo::Util->split_cookie_header($str // "");
     

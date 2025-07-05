@@ -57,7 +57,7 @@ class Mojo::UserAgent::CookieJar {
       my $age = $cookie->max_age;
       if (Re->m($age, "^\d+$")) {
         my $age_int = (int)$age;
-        $cookie->set_expires($age <= 0 ? 0 : $age + Sys->time) ;
+        $cookie->set_expires($age <= 0 ? (long)0 : $age + Sys->time) ;
       }
       
       # Check cookie size
@@ -230,7 +230,7 @@ class Mojo::UserAgent::CookieJar {
       my $line = [(string)
         $cookie->domain, $cookie->host_only ? "FALSE" : "TRUE",
         $cookie->path,   $cookie->secure    ? "TRUE"  : "FALSE",
-        $cookie->expires < 0 ? $cookie->expires : 0, $cookie->name,
+        $cookie->expires < 0 ? $cookie->expires : (long)0, $cookie->name,
         $cookie->value
       ];
       $lines->push(Fn->join("\t", $line));

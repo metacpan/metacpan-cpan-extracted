@@ -4,7 +4,7 @@
       "Samuel Young <samyoung12788@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -60,6 +60,6 @@
          "web" : "https://codeberg.org/1-1sam/stubb"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

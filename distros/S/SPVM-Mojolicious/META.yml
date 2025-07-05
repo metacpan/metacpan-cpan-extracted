@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.990075'
+  SPVM: '0.990077'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.990075'
+  SPVM: '0.990077'
   SPVM::Digest::SHA: '0.065'
   SPVM::File::Copy: '0.022'
   SPVM::File::Temp: '0.026'
+  SPVM::FindBin: '0.035'
   SPVM::IO: '0.211'
   SPVM::JSON: '1.002'
   SPVM::MIME::Base64: '1.003'
@@ -31,5 +32,5 @@ requires:
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Mojolicious.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

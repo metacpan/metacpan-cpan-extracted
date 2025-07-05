@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 2003 2025-01-21 12:06:06Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 2018 2025-07-01 11:57:43Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -33,11 +33,6 @@ my %keybyname = (
 	dohpath		       => 'key7',			# RFC9461
 	ohttp		       => 'key8',			# RFC9540(4)
 	'tls-supported-groups' => 'key9',
-	);
-
-my %boolean = (
-	'no-default-alpn' => 'key2',
-	ohttp		  => 'key8',
 	);
 
 
@@ -123,7 +118,9 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	while ( my $svcparam = shift @argument ) {
 		for ($svcparam) {
 			my @value;
-			if (/^key\d+=(.*)$/i) {
+			if (/^key\d+$/i) {
+				push @value, '';
+			} elsif (/^key\d+=(.*)$/i) {
 				local $_ = length($1) ? $1 : shift @argument;
 				s/^"([^"]*)"$/$1/;		# strip enclosing quotes
 				push @value, $_;
@@ -131,20 +128,16 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 				local $_ = length($1) ? $1 : shift @argument;
 				die <<"Amen" if /\\092[,\\]/;
 SVCB:	Please use standard RFC1035 escapes
-	RFC9460 double-escape nonsense not implemented
+	RFC9460 double-escape insanity not implemented
 Amen
 				s/^"([^"]*)"$/$1/;		# strip enclosing quotes
 				s/\\,/\\044/g;			# disguise (RFC1035) escaped comma
 				push @value, split /,/;
-			} else {
-				push @value, '' unless $keybyname{$_};	  # unregistered boolean key
 			}
 
-			m/^([^=]+)/;				# extract identifier
-			my $key = $1;
-			push @value, 1 if $boolean{$key};
-			$key =~ s/[-]/_/g;
-			$self->$key(@value);
+			s/[-]/_/g;				# extract identifier
+			m/^([^=]+)/;
+			$self->$1(@value);
 		}
 	}
 	return;
@@ -212,6 +205,7 @@ sub alpn {				## alpn=h3,h2,...
 
 sub no_default_alpn {			## no-default-alpn	(Boolean)
 	my ( $self, @value ) = @_;				# uncoverable pod
+	return $self->key2() if defined wantarray;
 	return $self->key2( _boolean(@value) );
 }
 
@@ -242,6 +236,7 @@ sub dohpath {				## dohpath=/dns-query{?dns}
 
 sub ohttp {				## ohttp
 	my ( $self, @value ) = @_;				# uncoverable pod
+	return $self->key8() if defined wantarray;
 	return $self->key8( _boolean(@value) );
 }
 
@@ -262,10 +257,8 @@ sub _presentation {			## represent octet string(s) using local charset
 
 sub _boolean {
 	my @arg = @_;
-	return @arg unless scalar @arg;				# read key
-	my $arg = shift @arg;
-	return $arg unless defined $arg;			# delete key.
-	return ( $arg ? '' : undef, @arg );			# set key
+	return '' unless scalar @arg;
+	return shift(@arg) ? '' : undef;
 }
 
 sub _string {
@@ -298,7 +291,14 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 	my ( $self, @argument ) = @_;
 
 	our $AUTOLOAD;
-	my ($method) = reverse split /::/, $AUTOLOAD;
+	my ($method)  = reverse split /::/, $AUTOLOAD;
+	my $canonical = lc($method);
+	$canonical =~ s/-/_/g;
+	if ( $self->can($canonical) ) {
+		no strict 'refs';	## no critic ProhibitNoStrict
+		*{$AUTOLOAD} = sub { shift->$canonical(@_) };
+		return $self->$canonical(@argument);
+	}
 
 	my $super = "SUPER::$method";
 	return $self->$super(@argument) unless $method =~ /^key[0]*(\d+)$/i;
@@ -404,7 +404,7 @@ The specified key will be deleted if the argument is undefined.
 
 =head1 COPYRIGHT
 
-Copyright (c)2020-2024 Dick Franks. 
+Copyright (c)2020-2025 Dick Franks. 
 
 All rights reserved.
 

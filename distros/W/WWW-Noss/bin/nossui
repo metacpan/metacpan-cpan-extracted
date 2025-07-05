@@ -193,6 +193,7 @@ dialog_select_sort() {
 
 	if [ "$?" != "$DIALOG_OK" ]
 	then
+		rm -f "$dialog_select_sort_tmpsel"
 		return
 	fi
 
@@ -230,6 +231,7 @@ dialog_posts() {
 		if [ ! -s "$dialog_posts_tmpposts" ]
 		then
 			dialog --msgbox 'No posts were found' 0 0
+			rm -f "$dialog_posts_tmpposts" "$dialog_posts_tmpsel"
 			return
 		fi
 

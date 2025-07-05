@@ -33,7 +33,7 @@ my $ci_version = (sort_by_version(
     @{ $ci->{jobs}{'matrix-tests'}{strategy}{matrix}{'perl-version'} }))[-1];
 
 plan(tests => 2);
-ok($perl_org =~ /version-highlight.*\Q$ci_version\E\b/, $ci_version);
+like($perl_org, qr/version-highlight.*\Q$ci_version\E\b/, $ci_version);
 
 my $doc_version = $ci_version;
 $doc_version =~ s/\.[0-9]+$//;

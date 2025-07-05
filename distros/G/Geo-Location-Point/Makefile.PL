@@ -13,7 +13,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
     NAME		=> 'Geo::Location::Point',
-    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+    AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
     VERSION_FROM	=> 'lib/Geo/Location/Point.pm',
     ABSTRACT_FROM       => 'lib/Geo/Location/Point.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -25,6 +25,7 @@ WriteMakefile(
 		'Carp' => 0,
 		'GIS::Distance' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'Params::Get' => 0,
 		'Scalar::Util' => 0
 	}, TEST_REQUIRES => {
 		'Test::Carp' => 0,

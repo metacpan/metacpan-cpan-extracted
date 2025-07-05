@@ -35,6 +35,14 @@ lib/SPVM/Mojo/File.pm
 lib/SPVM/Mojo/File.spvm
 lib/SPVM/Mojo/Headers.pm
 lib/SPVM/Mojo/Headers.spvm
+lib/SPVM/Mojo/Home.pm
+lib/SPVM/Mojo/Home.spvm
+lib/SPVM/Mojo/Log.pm
+lib/SPVM/Mojo/Log.spvm
+lib/SPVM/Mojo/Log/Callback/Format.pm
+lib/SPVM/Mojo/Log/Callback/Format.spvm
+lib/SPVM/Mojo/Log/Line.pm
+lib/SPVM/Mojo/Log/Line.spvm
 lib/SPVM/Mojo/Message.pm
 lib/SPVM/Mojo/Message.spvm
 lib/SPVM/Mojo/Message/Request.pm
@@ -71,6 +79,8 @@ lib/SPVM/Mojo/Util.pm
 lib/SPVM/Mojo/Util.spvm
 lib/SPVM/Mojo/WebSocket.pm
 lib/SPVM/Mojo/WebSocket.spvm
+lib/SPVM/Mojo/WebSocket/Frame.pm
+lib/SPVM/Mojo/WebSocket/Frame.spvm
 lib/SPVM/Mojolicious.pm
 lib/SPVM/Mojolicious.spvm
 LICENSE

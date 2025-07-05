@@ -1,5 +1,5 @@
 package Moose::Meta::Attribute::Native::Trait::Code;
-our $VERSION = '2.2207';
+our $VERSION = '2.4000';
 
 use Moose::Role;
 with 'Moose::Meta::Attribute::Native::Trait';
@@ -24,7 +24,7 @@ Moose::Meta::Attribute::Native::Trait::Code - Helper trait for CodeRef attribute
 
 =head1 VERSION
 
-version 2.2207
+version 2.4000
 
 =head1 SYNOPSIS
 

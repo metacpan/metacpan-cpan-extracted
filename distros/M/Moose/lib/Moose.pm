@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Moose; # git description: 2.2206-2-ge01558bb6
-our $VERSION = '2.2207';
+package Moose; # git description: 2.2207-12-g499a3490c
+our $VERSION = '2.4000';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use 5.008003;
@@ -298,7 +298,7 @@ Moose - A postmodern object system for Perl 5
 
 =head1 VERSION
 
-version 2.2207
+version 2.4000
 
 =head1 SYNOPSIS
 

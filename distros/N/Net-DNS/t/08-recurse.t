@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-recurse.t 2007 2025-02-08 16:45:23Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 2017 2025-06-27 13:48:03Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -43,7 +43,7 @@ eval {
 	exit plan skip_all => "Non-authoritative response from $from" unless $reply->header->aa;
 
 	1;
-} || exit( plan skip_all => "Cannot reach global root: $@" );
+} || exit( plan skip_all => $@ || 'Cannot reach global root' );
 
 
 plan tests => 12;

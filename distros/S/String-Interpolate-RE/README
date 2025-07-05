@@ -12,12 +12,12 @@ out. String::Interpolate::RE uses Exporter::Tiny, allowing a version of
 "strinterp" with saner defaults to be exported. Simply specify them when
 importing:
 
-  use String::Interpolate::RE strinterp => { opts => { useENV => 0 } };
+  use String::Interpolate::RE strinterp => { opts => { useenv => 0 } };
 
 The subroutine may be renamed using the "-as" option:
 
   use String::Interpolate::RE strinterp => { -as => strinterp_noenv,
-                                             opts => { useENV => 0 } };
+                                             opts => { useenv => 0 } };
 
   strinterp_noenv( ... );
 
@@ -33,10 +33,10 @@ tool you use to manage your installation of Perl, e.g. any of
 Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
-  perl Makefile.PL
-  make
-  make test
-  make install
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
 COPYRIGHT AND LICENSE
 

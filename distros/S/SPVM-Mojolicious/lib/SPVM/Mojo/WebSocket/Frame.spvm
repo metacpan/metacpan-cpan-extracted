@@ -1,0 +1,43 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::WebSocket::Frame {
+  version_from Mojolicious;
+  
+  # Fields
+  has fin : byte;
+  
+  has rsv1 : byte;
+  
+  has rsv2 : byte;
+  
+  has rsv3 : byte;
+  
+  has opcode : byte;
+  
+  has payload : string;
+  
+  has mask : rw byte;
+  
+  # Class Methods
+  static method new : Mojo::WebSocket::Frame ($fin : int, $rsv1 : int, $rsv2 : int, $rsv3 : int, $opcode : int, $payload : string, $mask : int = -1) {
+    
+    my $self = new Mojo::WebSocket::Frame;
+    
+    $self->{fin} = (byte)$fin;
+    
+    $self->{rsv1} = (byte)$rsv1;
+    
+    $self->{rsv2} = (byte)$rsv2;
+    
+    $self->{rsv3} = (byte)$rsv3;
+    
+    $self->{opcode} = (byte)$opcode;
+    
+    $self->{payload} = $payload;
+    
+    $self->{mask} = (byte)$mask;
+    
+    return $self;
+  }
+}

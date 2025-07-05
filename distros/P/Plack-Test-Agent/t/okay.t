@@ -58,6 +58,14 @@ sub run_tests_with_agent
         '... including description when provided';
     is $res->content_type, 'text/plain', '... with plain text content';
     is $res->content_charset, 'UTF-8', '... in ASCII';
+
+    $res    = $agent->put( '/', [ have => 'sheep', want => 'sheep', desc => 'Sheep comparison' ] );
+    ok $res->is_success, 'Put request succeeds';
+    is $res->decoded_content, "ok - Sheep comparison", 'Response content for put request correct';
+
+    $res    = $agent->delete( '/?have=duck;want=duck;desc=Duck%20comparison' );
+    ok $res->is_success, 'Delete request succeeds';
+    is $res->decoded_content, "ok - Duck comparison", 'Response content for delete request correct';
 }
 
 done_testing;

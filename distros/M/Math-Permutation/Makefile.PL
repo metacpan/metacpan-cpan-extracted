@@ -8,8 +8,8 @@ my %WriteMakefileArgs = (
     AUTHOR           => q{Cheok-Yin Fung <fungcheokyin@gmail.com>},
     VERSION_FROM     => 'lib/Math/Permutation.pm',
     ABSTRACT_FROM    => 'lib/Math/Permutation.pm',
-    LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    LICENSE          => 'mit',
+    MIN_PERL_VERSION => '5.025',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

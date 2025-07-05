@@ -27,6 +27,34 @@ sub skippable {
 
 
 my %tests = (
+    '5.042' => [
+        [ ':writer',
+          'use experimental qw{ class };
+           class MyClass3 { field $x :writer :reader }
+           my $o = MyClass3->new;
+           $o->set_x(2);
+           $o->x',
+          '2' ],
+        [ 'my_method',
+          'use experimental qw{ class };
+           class MyClass4 { my method x { "x" }; method p { $self->&x() } }
+           my $o = MyClass4->new;
+           $o->p',
+          'x' ],
+        [ '->&',
+          'use experimental qw{ class };
+           class MyClass5 { my method x { "x" }; method p { $self->&x() } }
+           my $o = MyClass5->new;
+           $o->p',
+          'x' ],
+        [ 'unicode16.0',
+          '"\N{HARP}" eq "\N{U+1FA89}"', 1],
+        [ '^^=',
+         'my $x = 1;
+          $x ^^= 0;
+          $x',
+          1 ]
+    ],
     '5.040' => [
         [ '^^',
           '1 ^^ 0', 1 ],

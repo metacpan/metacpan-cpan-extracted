@@ -11,6 +11,7 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/bad_opts.t',
     't/format.t',
     't/generate.t',
     't/interp.t',

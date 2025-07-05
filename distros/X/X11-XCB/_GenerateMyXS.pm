@@ -71,13 +71,14 @@ sub tmpl_struct {
     my $constructor = 'new';
 
     my $param = join ',', @$params;
+    $param = ",$param" if length $param;
     my $param_decl = indent { "$types->{$_} $_" } "\n", @$params;
     my $set_struct = indent { 'buf->' . cname($_) . " = $_;" } "\n", @$params;
 
     push @struct, << "__"
 MODULE = X11::XCB PACKAGE = $name
 $name *
-$constructor(self,$param)
+$constructor(self$param)
     char *self
 $param_decl
   PREINIT:

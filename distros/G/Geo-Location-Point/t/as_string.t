@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 16;
+use Test::Most tests => 17;
 use Test::NoWarnings;
 
 BEGIN {
@@ -52,5 +52,6 @@ STRING: {
 	cmp_ok($loc->lat(), '==', 1.32, 'Latitude is set');
 	cmp_ok($loc->long(), '==', 51.34, 'Longitude is set');
 	is($loc->Country(), 'gb', 'Country is gb');
+	is($loc->country(), 'gb', 'country is gb');
 	like($loc->as_string(), qr/, GB$/, 'GB is put in upper case in as_string');
 }

@@ -1,17 +1,15 @@
 package Math::Permutation;
-
-use 5.010;
+ 
 use strict;
 use warnings;
 use Carp;
-use List::Util qw/tail reduce any uniq none all sum first max min/;
-
+use List::Util qw/tail reduce any uniq none all sum first max min pairs mesh/;
 
 # supportive math function
 sub _lcm {
     return reduce { $a*$b/_gcd($a,$b) } @_;
 }
-
+ 
 sub _gcd {    # _gcd of two positive integers
     my $x = min($_[0], $_[1]);
     my $y = max($_[0], $_[1]);
@@ -20,7 +18,7 @@ sub _gcd {    # _gcd of two positive integers
     }
     return $y;
 }
-
+ 
 sub _factorial {
     my $ans = 1;
     for (1..$_[0]) {
@@ -28,7 +26,7 @@ sub _factorial {
     }
     return $ans;
 }
-
+ 
 sub eqv {
     my $wrepr  = $_[0]->{_wrepr};
     my $wrepr2 = $_[1]->{_wrepr};
@@ -41,7 +39,7 @@ sub eqv {
     }
     return $check == $n ? 1 : 0;
 }
-
+ 
 sub clone {
     my ($class) = @_;
     my $wrepr = $_[1]->{_wrepr};
@@ -49,7 +47,7 @@ sub clone {
     $_[0]->{_wrepr} = $wrepr;
     $_[0]->{_n} = $n;
 }
-
+ 
 sub init {
     my ($class) = @_;
     my $n = $_[1];
@@ -58,7 +56,7 @@ sub init {
         _n => $n,
     }, $class;
 }
-
+ 
 sub wrepr {
     my ($class) = @_;
     my $wrepr = $_[1] || [1];
@@ -78,7 +76,7 @@ sub wrepr {
         _n => $n,
     }, $class;
 }
-
+ 
 sub tabular {
     my ($class) = @_;
     my @domain = $_[1]->@*;
@@ -110,8 +108,8 @@ sub tabular {
         _n => $n,
     }, $class;
 }
-
-
+ 
+ 
 sub cycles {
     my ($class) = @_;
     my @cycles = $_[1]->@*;
@@ -165,7 +163,7 @@ sub cycles {
         _n => $n,
     }, $class;
 }
-
+ 
 sub _cycles_to_wrepr {
     my $n = $_[0];
     my @cycles = $_[1]->@*;
@@ -182,7 +180,7 @@ sub _cycles_to_wrepr {
     }
     return [ map {$hash{$_} == 0 ? $_ : $hash{$_}} (1..$n) ];
 }
-
+ 
 sub cycles_with_len {
     my ($class) = @_;
     my $n = $_[1];
@@ -192,21 +190,22 @@ sub cycles_with_len {
     return (any {$n == $_} @elements) ? $_[0]->cycles([@cycles]) 
                                       : $_[0]->cycles([@cycles, [$n]]);
 }
-
+ 
 sub sprint_wrepr {
     return "\"" . (join ",", $_[0]->{_wrepr}->@*) . "\"";
 }
-
+ 
 sub sprint_tabular {
     my $n = $_[0]->{_n};
     my $digit_len = length $n;
-    return "|" . (join " ", map {sprintf("%*s", $digit_len, $_)} 1..$n )
-    . "|" . "\n"
-    ."|" 
-    . (join " ", map {sprintf("%*s", $digit_len, $_)} $_[0]->{_wrepr}->@* )
-    . "|";
+    return 
+          "|" . (join " ", map {sprintf("%*s", $digit_len, $_)} 1..$n )
+        . "|" . "\n"
+        ."|"
+        . (join " ", map {sprintf("%*s", $digit_len, $_)} $_[0]->{_wrepr}->@* )
+        . "|";
 }
-
+ 
 sub sprint_cycles {
     my @cycles = $_[0]->cyc->@*;
     @cycles = grep { scalar @{$_} > 1 } @cycles;
@@ -214,21 +213,26 @@ sub sprint_cycles {
     my @p_cycles = map {"(".(join " ", @{$_}). ")"} @cycles;
     return join " ", @p_cycles;
 }
-
+ 
 sub sprint_cycles_full {
     my @cycles = $_[0]->cyc->@*;
     my @p_cycles = map {"(".(join " ", @{$_}). ")"} @cycles;
     return join " ", @p_cycles;
 }
 
+sub array {
+    return $_[0]->{_wrepr}->@*;
+}
+ 
 sub swap {
     my $i = $_[1];
     my $j = $_[2];
     my $wrepr = $_[0]->{_wrepr};
     ($wrepr->[$i-1], $wrepr->[$j-1]) = ($wrepr->[$j-1], $wrepr->[$i-1]);
     $_[0]->{_wrepr} = $wrepr;
+    return $_[0];
 }
-
+ 
 sub comp {
     my $n = $_[0]->{_n};
     my @p = $_[0]->{_wrepr}->@*;
@@ -237,8 +241,9 @@ sub comp {
     my @qp;
     push @qp, $q[$p[$_-1]-1] for 1..$n;
     $_[0]->{_wrepr} = [@qp];
+    return $_[0];
 }
-
+ 
 sub inverse {
     my $n = $_[0]->{_n};
     my @cycles = $_[0]->cyc->@*;
@@ -247,8 +252,9 @@ sub inverse {
         push @new_cycles, [reverse @{$_}];
     }
     $_[0]->{_wrepr} = _cycles_to_wrepr($n, [@new_cycles]);
+    return $_[0];
 }
-
+ 
 sub nxt {
     my $n = $_[0]->{_n};
     my @w = $_[0]->{_wrepr}->@*;
@@ -263,8 +269,9 @@ sub nxt {
     $i++ until $w[-$ind-1] < $suffix[-$i];
     ($w[-$ind-1], $suffix[-$i]) = ($suffix[-$i], $w[-$ind-1]);
     $_[0]->{_wrepr} = [ @w[0..$n-$ind-1], reverse @suffix ];
+    return $_[0];
 }
-
+ 
 sub prev {
     my $n = $_[0]->{_n};
     my @w = $_[0]->{_wrepr}->@*;
@@ -279,8 +286,9 @@ sub prev {
     $i++ until $w[-$ind-1] > $suffix[-$i];
     ($w[-$ind-1], $suffix[-$i]) = ($suffix[-$i], $w[-$ind-1]);
     $_[0]->{_wrepr} = [ @w[0..$n-$ind-1], reverse @suffix ];
+    return $_[0];
 }
-
+ 
 sub unrank {
     my ($class) = @_;
     my $n = $_[1];
@@ -302,7 +310,7 @@ sub unrank {
         _n => $n,
     }, $class;
 }
-
+ 
 # Fisher-Yates shuffle
 sub random {
     my ($class) = @_;
@@ -320,7 +328,7 @@ sub random {
         _n => $n,
     }, $class;
 }
-
+ 
 sub cyc {
     my $w = $_[0]->{_wrepr};
     my $n = $_[0]->{_n};
@@ -341,21 +349,21 @@ sub cyc {
     }
     return [@cycles];
 }
-
-
-
+ 
+ 
+ 
 sub sigma {
     return $_[0]->{_wrepr}->[$_[1]-1];
 }
-
+ 
 sub rule {
     return $_[0]->{_wrepr};
 }
-
+ 
 sub elems {
     return $_[0]->{_n};
 }
-
+ 
 sub rank {
     my @list = $_[0]->{_wrepr}->@*;
     my $n = scalar @list;
@@ -370,7 +378,7 @@ sub rank {
     }
     return $r;
 }
-
+ 
 # rank() and unrank($n, $i) using
 # O(n^2) solution, translation of Python code on
 # https://tryalgo.org/en/permutations/2016/09/05/permutation-rank/
@@ -384,26 +392,26 @@ sub index {
     }
     return $ans;
 }
-
+ 
 sub order {
     my @cycles = $_[0]->cyc->@*;
     return _lcm(map {scalar @{$_}} @cycles);
 }
-
+ 
 sub is_even {
     my @cycles = $_[0]->cyc->@*;
     my $num_of_two_swaps = sum(map { scalar @{$_} - 1 } @cycles);
     return $num_of_two_swaps % 2 == 0 ? 1 : 0;
 }
-
+ 
 sub is_odd {
     return $_[0]->is_even ? 0 : 1;
 }
-
+ 
 sub sgn {
     return $_[0]->is_even ? 1 : -1;
 }
-
+ 
 sub inversion {
     my $n = $_[0]->{_n};
     my @w = $_[0]->{_wrepr}->@*;
@@ -419,7 +427,7 @@ sub inversion {
     }
     return [@inv];
 }
-
+ 
 sub matrix {
     my $mat;
     my $n = $_[0]->{_n};
@@ -432,7 +440,7 @@ sub matrix {
     $mat->[$w[$_]-1]->[$_] = 1 for (0..$n-1);
     return $mat;
 }
-
+ 
 sub fixed_points {
     my @fp;
     for (1..$_[0]->{_n}) {
@@ -441,18 +449,67 @@ sub fixed_points {
     return [@fp];
 }
 
+sub _reorder_odd_cycle {
+    my @arr = @_;
+    my @ans;
+    my $m = $#arr / 2;
+    for (0..$m-1) {
+        push @ans, $arr[$_], $arr[$m+$_+1];
+    }
+    push @ans, $arr[$m];
+    return @ans;
+}
+
+sub sqrt {
+    my ($class) = @_;
+    my @new_cycles;
+    my @cycles = $_[0]->cyc->@*;
+    my %odd_cycle;
+    my %even_cycle;
+    for my $i (0..$#cycles) {
+        if (scalar $cycles[$i]->@* % 2 == 1) {
+            $odd_cycle{$i} = 1;
+        } else {
+            $even_cycle{$i} = scalar $cycles[$i]->@*;
+        }
+    }
+    if ((scalar (values %even_cycle) % 2) == 0) {
+        my @epairs = pairs sort {$a<=>$b} values %even_cycle;
+        for (@epairs) {
+            if ($_->[0] != $_->[1]) {
+                return undef;
+            }
+        }
+        for my $i (keys %odd_cycle) {
+            push @new_cycles, [_reorder_odd_cycle($cycles[$i]->@*)];
+        }
+        my @tol = keys %even_cycle;
+        for my $i (@tol) {
+            next if !defined($even_cycle{$i});
+            my $j = first {$even_cycle{$_} == $even_cycle{$i} && $_ != $i} keys %even_cycle;
+            delete $even_cycle{$j};
+            push @new_cycles, [ mesh($cycles[$i], $cycles[$j]) ];
+            delete $even_cycle{$i};
+        }
+    }
+    else {
+        return undef;
+    }
+    return Math::Permutation->cycles([@new_cycles]);
+}
+
+ 
 =head1 NAME
-
+ 
 Math::Permutation - pure Perl implementation of functions related to the permutations 
-
+ 
 =head1 VERSION
-
-Version 0.01
-
+ 
+Version 0.021
+ 
 =cut
-
-our $VERSION = '0.01';
-
+ 
+our $VERSION = '0.021';
 
 =head1 SYNOPSIS
 
@@ -461,9 +518,10 @@ our $VERSION = '0.01';
     my $foo = Math::Permutation->cycles([[1,2,6,7], [3,4,5]]);
     say $foo->sprint_wrepr;
     # "2,6,4,5,3,7,1"
+    say join ",", $foo->array;
+    # 2,6,4,5,3,7,1
 
     my $bar = Math::Permutation->unrank(5, 19);
-    $bar->comp($foo);
     say $bar->sprint_cycles;
     # (2 5 4 3)
     # Note that there is no canonical cycle representation in this module,
@@ -537,6 +595,8 @@ Initialize $p by the cycle notation. If the length is not specific, the length w
 
 Initialize $p referring to the lexicological rank of all $n-permutations. $i must be between 1 and $n!.
 
+Note: The current version is not optimal. It is using an O(n^2) implementation, instead of the best O(n log n) implementation.
+
 =item $p->random($n)
 
 Initialize $p by a randomly selected $n-permutation.
@@ -546,6 +606,10 @@ Initialize $p by a randomly selected $n-permutation.
 =head2 DISPLAY THE PERMUTATION
 
 =over 4
+
+=item $p->array()
+
+Return an array showing the permutation.
 
 =item $p->sprint_wrepr()
 
@@ -642,6 +706,8 @@ Return the length of $p.
 
 Return the lexicological rank of $p. See $p->unrank($n, $i).
 
+Note: The current version is not optimal. It is using an O(n^2) implementation, instead of the best O(n log n) implementation.
+
 =item $p->index()
 
 Return the permutation index of $p.
@@ -677,15 +743,15 @@ Return the permutation matrix of $p.
 
 Return the list of fixed points of $p.
 
+=item $p->sqrt()
+
+Caveat: may return undef.
+
 =back
 
 =head1 METHODS TO BE INPLEMENTED
 
 =over 4
-
-=item sqrt()
-
-Caveat: may return [].
 
 =item longest_increasing()
 
@@ -750,10 +816,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Permutation>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Math-Permutation>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Math-Permutation>
@@ -791,12 +853,11 @@ General resources:
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Cheok-Yin Fung.
+This software is Copyright (c) 2022-2025 by Cheok-Yin Fung.
 
 This is free software, licensed under:
 
   MIT License
-
 
 =cut
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Math::Permutation;
 use Test::More tests => 8;
-use v5.10.0;
+use v5.24.0;
 
 for (1..8) {
     my $a = Math::Permutation->init(8);
