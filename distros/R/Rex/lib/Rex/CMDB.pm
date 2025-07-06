@@ -32,10 +32,10 @@ This module exports a function to access a CMDB via a common interface. When the
 
 package Rex::CMDB;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Rex::Commands;
 use Rex::Value;

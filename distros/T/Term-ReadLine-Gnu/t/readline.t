@@ -11,7 +11,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 148;
+use Test::More tests => 152;
 use Data::Dumper;
 
 # redefine Test::Mode::note due to it requires Perl 5.10.1.
@@ -90,7 +90,7 @@ SKIP: {
 }
 
 # Version 2.0 and before are NOT supported.
-ok($version > 0x0200, 'readline_version');
+ok($version > 0x0200, 'readline_version');                              # GRL 4.2a
 
 # check the values of initialized variables
 ok($a->{line_buffer} eq '', 'line_buffer');
@@ -98,17 +98,18 @@ ok($a->{point} == 0, 'point');
 ok($a->{end} == 0, 'end');
 ok($a->{mark} == 0, 'mark');
 ok($a->{done} == 0, 'done');
+ok($a->{eof_found} == 0, 'eof_found');                                  # GRL 8.2!!!
 
-ok($a->{num_chars_to_read} == 0, 'num_chars_to_read');
+ok($a->{num_chars_to_read} == 0, 'num_chars_to_read');                  # GRL 4.1
 ok($a->{pending_input} == 0, 'pending_input');
-ok($a->{dispatching} == 0, 'dispatching');
+ok($a->{dispatching} == 0, 'dispatching');                              # GRL 4.2
 
-ok($a->{erase_empty_line} == 0, 'erase_empty_line');
+ok($a->{erase_empty_line} == 0, 'erase_empty_line');                    # GRL 4.0
 ok(! defined($a->{prompt}), 'prompt');
-ok($a->{display_prompt} eq "", 'display_prompt');
-ok($a->{already_prompted} == 0, 'already_prompted');
+ok($a->{display_prompt} eq "", 'display_prompt');                       # GRL 6.0
+ok($a->{already_prompted} == 0, 'already_prompted');                    # GRL 4.1
 # library_version and readline_version are tested above.
-ok($a->{gnu_readline_p} == 1, 'gnu_readline_p');
+ok($a->{gnu_readline_p} == 1, 'gnu_readline_p');                        # GRL 4.1
 
 if ($version < 0x0402) {
     # defined but left assgined as NULL
@@ -119,38 +120,40 @@ if ($version < 0x0402) {
 ok($a->{readline_name} eq 'ReadLineTest', 'readline_name');
 
 # rl_instream and rl_outstream are tested below.
-ok($a->{prefer_env_winsize} == 0, 'prefer_envwin_size');
+ok($a->{prefer_env_winsize} == 0, 'prefer_env_winsize');                # GRL 5.1
 ok(! defined($a->{last_func}), 'last_func');
 
 ok(! defined($a->{startup_hook}), 'startup_hook');
-ok(! defined($a->{pre_input_hook}), 'pre_input_hook');
+ok(! defined($a->{pre_input_hook}), 'pre_input_hook');                  # GRL 4.0
 ok(! defined($a->{event_hook}), 'event_hook');
 ok(! defined($a->{getc_function}), 'getc_function');
-ok(! defined($a->{signal_event_hook}), 'signal_event_hook'); # not tested!!!
-ok(! defined($a->{input_available_hook}), 'input_available_hook');
+ok(! defined($a->{signal_event_hook}), 'signal_event_hook');            # GRL 6.3!!!
+ok(! defined($a->{timeout_event_hook}), 'timeout_event_hook');          # GRL 8.2!!!
+ok(! defined($a->{input_available_hook}), 'input_available_hook');      # GRL 6.3
 ok(! defined($a->{redisplay_function}), 'redisplay_function');
-ok(! defined($a->{prep_term_function}), 'prep_term_function');   # not tested!!!
-ok(! defined($a->{deprep_term_function}), 'deprep_term_function'); # not tested!!!
+ok(! defined($a->{prep_term_function}), 'prep_term_function');          # GRL 4.2!!!
+ok(! defined($a->{deprep_term_function}), 'deprep_term_function');      # GRL 4.2!!!
+ok(! defined($a->{macro_display_hook}), 'macro_display_hook');          # GRL 8.3!!!
 
 # not defined here yet
 ok(! defined($a->{executing_keymap}), 'executing_keymap');
 # anonymous keymap
 ok(defined($a->{binding_keymap}), 'binding_keymap');
 
-ok(! defined($a->{executing_macro}), 'executing_macro');
-ok($a->{executing_key} == 0, 'executing_key');
+ok(! defined($a->{executing_macro}), 'executing_macro');                # GRL 4.2
+ok($a->{executing_key} == 0, 'executing_key');                          # GRL 6.3
 
 if ($version < 0x0603) {
-    ok(! defined($a->{executing_keyseq}), 'executing_keyseq');
+    ok(! defined($a->{executing_keyseq}), 'executing_keyseq');          # GRL 6.3
 } else {
     ok(defined($a->{executing_keyseq}), 'executing_keyseq');
 }
-ok($a->{key_sequence_length} == 0, 'key_sequence_length');
+ok($a->{key_sequence_length} == 0, 'key_sequence_length');              # GRL 6.3
 
-ok(($a->{readline_state} == RL_STATE_INITIALIZED), 'readline_state');
-ok($a->{explicit_arg} == 0, 'explicit_arg');
-ok($a->{numeric_arg} == 1, 'numeric_arg');
-ok($a->{editing_mode} == 1, 'editing_mode');
+ok(($a->{readline_state} == RL_STATE_INITIALIZED), 'readline_state');   # GRL 4.2
+ok($a->{explicit_arg} == 0, 'explicit_arg');                            # GRL 4.2
+ok($a->{numeric_arg} == 1, 'numeric_arg');                              # GRL 4.2
+ok($a->{editing_mode} == 1, 'editing_mode');                            # GRL 4.2
 
 
 ########################################################################
@@ -169,10 +172,11 @@ sub reverse_line {              # reverse a whole line
 # From the GNU Readline Library Manual
 # Invert the case of the COUNT following characters.
 sub invert_case_line {
-    my($count, $key) = @_;
+    my ($count, $key) = @_;
 
     my $start = $a->{point};
-    return 0 if ($start >= $a->{end});
+
+    return 0 if $start >= $a->{end};
 
     # Find the end of the range to modify.
     my $end = $start + $count;
@@ -186,10 +190,15 @@ sub invert_case_line {
 
     return 0 if $start == $end;
 
+    # For positive arguments, put point after the last changed character. For
+    # negative arguments, put point before the last changed character.
+    $a->{point} = $end;
+
+    # Swap start and end if we are moving backwards.
     if ($start > $end) {
         my $temp = $start;
         $start = $end;
-        $end = $temp;
+        $end   = $temp;
     }
 
     # Tell readline that we are modifying the line, so it will save
@@ -197,10 +206,8 @@ sub invert_case_line {
     $t->modifying($start, $end);
 
     # I'm happy with Perl :-)
-    substr($a->{line_buffer}, $start, $end-$start) =~ tr/a-zA-Z/A-Za-z/;
+    substr($a->{line_buffer}, $start, $end - $start) =~ tr/A-Za-z/a-zA-Z/;
 
-    # Move point to on top of the last character changed.
-    $a->{point} = $count < 0 ? $start : $end - 1;
     return 0;
 }
 
@@ -235,6 +242,7 @@ ok($type == ISFUNC && $t->get_function_name($func) eq 'reverse-line', 'add_defun
 note "2.4.2 Selecting a Keymap";
 
 # test rl_make_bare_keymap, rl_copy_keymap, rl_make_keymap, rl_discard_keymap, rl_free_keymap
+# rl_empty_keymap!!! GRL 8.0
 my $baremap = $t->make_bare_keymap;
 $t->bind_key(ord "a", 'abort', $baremap);
 my $copymap = $t->copy_keymap($baremap);
@@ -259,6 +267,7 @@ $t->free_keymap($normmap);
 ok(1, 'free_keymap');
 
 # test rl_get_keymap, rl_set_keymap, rl_get_keymap_by_name, rl_get_keymap_name
+# rl_set_keymap_name!!! GRL 8.0
 ok($t->get_keymap_name($t->get_keymap) eq 'emacs', 'get_keymap_name, get_keymap');
 
 $t->set_keymap('vi');
@@ -391,7 +400,9 @@ note "2.4.4 Associating Function Names and Bindings";
 bind_my_function;               # do bind
 
 # rl_named_function, get_function_name, rl_function_of_keyseq,
+# rl_trim_arg_from_keyseq!!! GRL 8.2
 # rl_invoking_keyseqs[_in_map]
+# rl_print_keybinding!!! GRL 8.3
 # rl_function_dumper!!!, rl_list_funmap_names!!!, rl_funmap_names!!!
 # rl_add_funmap_entry (above)
 
@@ -417,12 +428,13 @@ note "2.4.6 Redisplay";
 ########################################################################
 note "2.4.7 Modifying Text";
 # rl_insert_text!!!, rl_delete_text!!!, rl_copy_text!!!, rl_kill_text!!!,
-# rl_push_macro_input!!!
+# rl_replace_line!!!, rl_push_macro_input!!!
 
 ########################################################################
 note "2.4.8 Character Input";
 # rl_read_key!!!, rl_getc, rl_stuff_char!!!, rl_execute_next!!!,
 # rl_clear_pending_input!!!, rl_set_keyboard_input_timeout!!!
+# rl_set_timeout!!!, rl_clear_timeout!!!, rl_timeout_remaining!!! GRL 8.2
 
 ########################################################################
 note "2.4.9 Terminal Management";
@@ -432,7 +444,7 @@ note "2.4.9 Terminal Management";
 
 ########################################################################
 note "2.4.10 Utility Functions";
-# rl_save_state, rl_restore_state, -rl_free-, rl_replace_line!!!,
+# rl_save_state, rl_restore_state, -rl_free-,
 # -rl_extend_line_buffer-,
 # rl_initialize, rl_ding!!!, rl_alphabetic!!!,
 # rl_display_match_list (below)
@@ -452,7 +464,10 @@ SKIP:
 note "2.4.11 Miscellaneous Functions";
 # rl_macro_bind!!!, rl_macro_dumpter!!!,
 # rl_variable_bind!!!, rl_variable_value!!!, rl_variable_dumper!!!
-# rl_set_paren_blink_timeout!!!, rl_get_termcap!!!, rl_clear_history!!!
+# rl_set_paren_blink_timeout!!!, rl_get_termcap!!!,
+# rl_reparse_colors!!! GRL 8.3,
+# rl_clear_history!!!
+# rl_active_mark!!!, rl_deactive_mark!!!, rl_keep_mark_active!!!, rl_mark_active_p!!! GRL 8.1
 
 ########################################################################
 note "2.4.12 Alternate Interface";
@@ -462,17 +477,19 @@ note "2.4.12 Alternate Interface";
 
 ########################################################################
 note "2.5 Readline Signal Handling";
-ok($a->{catch_signals} == 1, 'catch_signals');
-if ($^O eq 'MSWin32') {
+ok($a->{catch_signals} == 1, 'catch_signals');                                  # GRL 4.0
+if ($^O eq 'MSWin32') {                                                         # GRL 4.0
     ok($a->{catch_sigwinch} == 0, 'catch_sigwinch');
 } else {
     ok($a->{catch_sigwinch} == 1, 'catch_sigwinch');
 }
-ok($a->{persistent_signal_handlers} == 0, 'persistent_signal_handlers');
-ok($a->{change_environment} == 1, 'change_environment');
+ok($a->{persistent_signal_handlers} == 0, 'persistent_signal_handlers');        # GRL 7.0
+ok($a->{change_environment} == 1, 'change_environment');                        # GRL 6.3
 
 # rl_pending_signal()!!!, rl_cleanup_after_signal!!!, rl_free_line_state!!!,
-# rl_reset_after_signal!!!, rl_echo_signal_char!!!, rl_resize_terminal!!!,
+# rl_reset_after_signal!!!,
+# rl_check_signals!!! GRL 8.0,
+# rl_echo_signal_char!!!, rl_resize_terminal!!!,
 
 # rl_set_screen_size, rl_get_screen_size
 SKIP: {
@@ -505,15 +522,16 @@ ok(! defined $a->{filename_dequoting_function}, 'filename_dequoting_function');
 ok(! defined $a->{char_is_quoted_p}, 'char_is_quoted_p');
 ok(! defined $a->{ignore_some_completions_function}, 'ignore_some_completions_function');
 ok(! defined $a->{directory_completions_hook}, 'directory_completions_hook');
-ok(! defined $a->{directory_rewrite_hook}, 'directory_rewrite_hook');
-ok(! defined $a->{filename_stat_hook}, 'filename_stat_hook');
-ok(! defined $a->{filename_rewrite_hook}, 'filename_rewrite_hook');
+ok(! defined $a->{directory_rewrite_hook}, 'directory_rewrite_hook');           # GRL 4.2
+ok(! defined $a->{filename_stat_hook}, 'filename_stat_hook');                   # GRL 6.3
+ok(! defined $a->{filename_rewrite_hook}, 'filename_rewrite_hook');             # GRL 6.1
+ok(! defined $a->{completion_rewrite_hook}, 'completion_rewrite_hook');         # GRL 8.3
 ok(! defined $a->{completions_display_matches_hook}, 'completions_display_matches_hook');
 
 ok($a->{basic_word_break_characters} eq " \t\n\"\\'`\@\$><=;|&{(", 'basic_word_break_characters');
 ok($a->{basic_quote_characters} eq "\"'", 'basic_quote_characters');
 ok($a->{completer_word_break_characters} eq " \t\n\"\\'`\@\$><=;|&{(", 'completer_word_break_characters');
-ok(! defined $a->{completion_word_break_hook}, 'completion_word_break_hook');
+ok(! defined $a->{completion_word_break_hook}, 'completion_word_break_hook');   # GRL 5.0
 ok(! defined $a->{completer_quote_characters}, 'completer_quote_characters');
 ok(! defined $a->{filename_quote_characters}, 'filename_quote_characters');
 ok(! defined $a->{special_prefixes}, 'special_prefixes');
@@ -521,20 +539,20 @@ ok(! defined $a->{special_prefixes}, 'special_prefixes');
 ok($a->{completion_query_items} == 100, 'completion_query_items');
 ok($a->{completion_append_character} eq " ", 'completion_append_character');
 
-ok($a->{completion_suppress_append} == 0, 'completion_suppress_append');
-ok($a->{completion_quote_character} eq "\0", 'completion_quote_character');
-ok($a->{completion_suppress_quote} == 0, 'completion_suppress_quote');
-ok($a->{completion_found_quote} == 0, 'completion_found_quote');
-ok($a->{completion_mark_symlink_dirs} == 0, 'completion_mark_symlink_dirs');
+ok($a->{completion_suppress_append} == 0, 'completion_suppress_append');        # GRL 4.3
+ok($a->{completion_suppress_quote} == 0, 'completion_suppress_quote');          # GRL 5.0
+ok($a->{completion_found_quote} == 0, 'completion_found_quote');                # GRL 5.0
+ok($a->{completion_quote_character} eq "\0", 'completion_quote_character');     # GRL 5.0
+ok($a->{completion_mark_symlink_dirs} == 0, 'completion_mark_symlink_dirs');    # GRL 4.3
 
 ok($a->{ignore_completion_duplicates} == 1, 'ignore_completion_duplicates');
 ok($a->{filename_completion_desired} == 0, 'filename_completion_desired');
 ok($a->{filename_quoting_desired} == 1, 'filename_quoting_desired');
-ok($a->{attempted_completion_over} == 0, 'attempted_completion_over');
-ok($a->{sort_completion_matches} == 1, 'sort_completion_matches');
+ok($a->{attempted_completion_over} == 0, 'attempted_completion_over');          # GRL 4.2
+ok($a->{sort_completion_matches} == 1, 'sort_completion_matches');              # GRL 6.0
 
-ok($a->{completion_type} == 0, 'completion_type');
-ok($a->{completion_invoking_key} eq "\0", 'completion_invoking_key');
+ok($a->{completion_type} == 0, 'completion_type');                              # GRL 4.2
+ok($a->{completion_invoking_key} eq "\0", 'completion_invoking_key');           # GRL 6.0
 ok($a->{inhibit_completion} == 0, 'inhibit_completion');
 
 
@@ -891,7 +909,7 @@ SKIP: {
 }
 
 #########################################################################
-note "test rl_completion_display_matches_hook";
+note "test rl_completion_display_matches_hook";                                 # GRL 4.0
 
 SKIP: {
     skip "GNU Readline Library is older than 4.0.", 1 unless ($version >= 0x0400);

@@ -108,13 +108,13 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Output" => 0,
     "Test::UseAllModules" => 0,
-    "Test::Warnings" => 0,
+    "Test::Warnings" => "0.033",
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.16.0",
+  "VERSION" => "1.16.1",
   "test" => {
-    "TESTS" => "t/*.t t/commands/*.t t/issue/*.t t/scm/*.t"
+    "TESTS" => "t/*.t t/commands/*.t t/hardware/*.t t/issue/*.t t/scm/*.t"
   }
 );
 
@@ -165,7 +165,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Output" => 0,
   "Test::UseAllModules" => 0,
-  "Test::Warnings" => 0,
+  "Test::Warnings" => "0.033",
   "Text::Glob" => 0,
   "Text::Wrap" => ">= 0, != 2023.0509",
   "Time::HiRes" => 0,

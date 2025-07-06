@@ -1,5 +1,31 @@
 Revision history for Rex
 
+1.16.1 2025-07-05 Ferenc Erki <erkiferenc@gmail.com>
+ - No code changes since the 1.16.0.3-TRIAL release
+
+1.16.0.3-TRIAL 2025-06-29 Ferenc Erki <erkiferenc@gmail.com>
+ [REVISION]
+ - Allow libxml2 version warnings for CPAN Testers
+
+1.16.0.2-TRIAL 2025-06-16 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix hostgroup membership list for all groups
+
+1.16.0.1-TRIAL 2025-06-12 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Fix FQDN parsing
+ - Handle SMBios errors gracefully
+ - Fix parsing free memory on Solaris
+ - Fix shared variable lockfile on Solaris
+ - Prefer GNU tools on Solaris
+ - Fix parsing FreeBSD memory details
+ - Recognize laundry memory on FreeBSD
+ - Fix command existence checks without which
+ - Fix hostgroup membership list
+
+ [DOCUMENTATION]
+ - Document temporary filename during file operations
+
 1.16.0 2025-02-05 Ferenc Erki <erkiferenc@gmail.com>
  - No code changes since the 1.15.0.2-TRIAL release
 

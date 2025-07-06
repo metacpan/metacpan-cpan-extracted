@@ -12,7 +12,7 @@ build_requires:
   Test::More: '0'
   Test::Output: '0'
   Test::UseAllModules: '0'
-  Test::Warnings: '0'
+  Test::Warnings: '0.033'
   autodie: '0'
   utf8: '0'
 configure_requires:
@@ -21,7 +21,7 @@ configure_requires:
   File::ShareDir::Install: '0.06'
   Module::Metadata: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -58,1033 +58,1033 @@ optional_features:
 provides:
   Rex:
     file: lib/Rex.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Args:
     file: lib/Rex/Args.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Args::Integer:
     file: lib/Rex/Args/Integer.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Args::Single:
     file: lib/Rex/Args/Single.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Args::String:
     file: lib/Rex/Args/String.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Batch:
     file: lib/Rex/Batch.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Box:
     file: lib/Rex/Box.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Box::Amazon:
     file: lib/Rex/Box/Amazon.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Box::Base:
     file: lib/Rex/Box/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Box::Docker:
     file: lib/Rex/Box/Docker.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Box::KVM:
     file: lib/Rex/Box/KVM.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Box::VBox:
     file: lib/Rex/Box/VBox.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::CLI:
     file: lib/Rex/CLI.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::CMDB:
     file: lib/Rex/CMDB.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::CMDB::Base:
     file: lib/Rex/CMDB/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::CMDB::YAML:
     file: lib/Rex/CMDB/YAML.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cloud:
     file: lib/Rex/Cloud.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cloud::Amazon:
     file: lib/Rex/Cloud/Amazon.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cloud::Base:
     file: lib/Rex/Cloud/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cloud::Jiffybox:
     file: lib/Rex/Cloud/Jiffybox.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cloud::OpenStack:
     file: lib/Rex/Cloud/OpenStack.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands:
     file: lib/Rex/Commands.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Augeas:
     file: lib/Rex/Commands/Augeas.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Box:
     file: lib/Rex/Commands/Box.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Cloud:
     file: lib/Rex/Commands/Cloud.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Cron:
     file: lib/Rex/Commands/Cron.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::DB:
     file: lib/Rex/Commands/DB.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Download:
     file: lib/Rex/Commands/Download.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::File:
     file: lib/Rex/Commands/File.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Fs:
     file: lib/Rex/Commands/Fs.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Gather:
     file: lib/Rex/Commands/Gather.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Host:
     file: lib/Rex/Commands/Host.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Inventory:
     file: lib/Rex/Commands/Inventory.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Iptables:
     file: lib/Rex/Commands/Iptables.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::JobControl:
     file: lib/Rex/Commands/JobControl.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Kernel:
     file: lib/Rex/Commands/Kernel.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::LVM:
     file: lib/Rex/Commands/LVM.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::MD5:
     file: lib/Rex/Commands/MD5.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Mkfs:
     file: lib/Rex/Commands/Mkfs.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Network:
     file: lib/Rex/Commands/Network.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Notify:
     file: lib/Rex/Commands/Notify.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Partition:
     file: lib/Rex/Commands/Partition.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Pkg:
     file: lib/Rex/Commands/Pkg.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::PkgConf:
     file: lib/Rex/Commands/PkgConf.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Process:
     file: lib/Rex/Commands/Process.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Rsync:
     file: lib/Rex/Commands/Rsync.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Run:
     file: lib/Rex/Commands/Run.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::SCM:
     file: lib/Rex/Commands/SCM.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Service:
     file: lib/Rex/Commands/Service.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::SimpleCheck:
     file: lib/Rex/Commands/SimpleCheck.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Sync:
     file: lib/Rex/Commands/Sync.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Sysctl:
     file: lib/Rex/Commands/Sysctl.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Tail:
     file: lib/Rex/Commands/Tail.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Upload:
     file: lib/Rex/Commands/Upload.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::User:
     file: lib/Rex/Commands/User.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Commands::Virtualization:
     file: lib/Rex/Commands/Virtualization.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Config:
     file: lib/Rex/Config.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Constants:
     file: lib/Rex/Constants.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cron:
     file: lib/Rex/Cron.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cron::Base:
     file: lib/Rex/Cron/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cron::FreeBSD:
     file: lib/Rex/Cron/FreeBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cron::Linux:
     file: lib/Rex/Cron/Linux.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Cron::SunOS:
     file: lib/Rex/Cron/SunOS.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Exporter:
     file: lib/Rex/Exporter.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::FS::File:
     file: lib/Rex/FS/File.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::File::Parser::Data:
     file: lib/Rex/File/Parser/Data.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::File::Parser::Ini:
     file: lib/Rex/File/Parser/Ini.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Fork::Manager:
     file: lib/Rex/Fork/Manager.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Fork::Task:
     file: lib/Rex/Fork/Task.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group:
     file: lib/Rex/Group.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group::Entry::Server:
     file: lib/Rex/Group/Entry/Server.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group::Lookup::Command:
     file: lib/Rex/Group/Lookup/Command.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group::Lookup::DBI:
     file: lib/Rex/Group/Lookup/DBI.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group::Lookup::File:
     file: lib/Rex/Group/Lookup/File.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group::Lookup::INI:
     file: lib/Rex/Group/Lookup/INI.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group::Lookup::XML:
     file: lib/Rex/Group/Lookup/XML.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Group::Lookup::YAML:
     file: lib/Rex/Group/Lookup/YAML.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware:
     file: lib/Rex/Hardware.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Host:
     file: lib/Rex/Hardware/Host.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Kernel:
     file: lib/Rex/Hardware/Kernel.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Memory:
     file: lib/Rex/Hardware/Memory.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Network:
     file: lib/Rex/Hardware/Network.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Network::Darwin:
     file: lib/Rex/Hardware/Network/Darwin.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Network::FreeBSD:
     file: lib/Rex/Hardware/Network/FreeBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Network::Linux:
     file: lib/Rex/Hardware/Network/Linux.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Network::NetBSD:
     file: lib/Rex/Hardware/Network/NetBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Network::OpenBSD:
     file: lib/Rex/Hardware/Network/OpenBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Network::Solaris:
     file: lib/Rex/Hardware/Network/Solaris.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::Swap:
     file: lib/Rex/Hardware/Swap.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hardware::VirtInfo:
     file: lib/Rex/Hardware/VirtInfo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::Array:
     file: lib/Rex/Helper/Array.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::DBI:
     file: lib/Rex/Helper/DBI.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::Encode:
     file: lib/Rex/Helper/Encode.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::File::Spec:
     file: lib/Rex/Helper/File/Spec.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::File::Stat:
     file: lib/Rex/Helper/File/Stat.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::File::Stat::Unix:
     file: lib/Rex/Helper/File/Stat/Unix.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::File::Stat::Win32:
     file: lib/Rex/Helper/File/Stat/Win32.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::Hash:
     file: lib/Rex/Helper/Hash.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::INI:
     file: lib/Rex/Helper/INI.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::IP:
     file: lib/Rex/Helper/IP.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::Misc:
     file: lib/Rex/Helper/Misc.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::Path:
     file: lib/Rex/Helper/Path.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::Rexfile::ParamLookup:
     file: lib/Rex/Helper/Rexfile/ParamLookup.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::Run:
     file: lib/Rex/Helper/Run.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::SSH2:
     file: lib/Rex/Helper/SSH2.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::SSH2::Expect:
     file: lib/Rex/Helper/SSH2/Expect.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::System:
     file: lib/Rex/Helper/System.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::URI:
     file: lib/Rex/Helper/URI.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Helper::UserAgent:
     file: lib/Rex/Helper/UserAgent.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Hook:
     file: lib/Rex/Hook.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Cache:
     file: lib/Rex/Interface/Cache.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Cache::Base:
     file: lib/Rex/Interface/Cache/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Cache::YAML:
     file: lib/Rex/Interface/Cache/YAML.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection:
     file: lib/Rex/Interface/Connection.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection::Base:
     file: lib/Rex/Interface/Connection/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection::Fake:
     file: lib/Rex/Interface/Connection/Fake.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection::HTTP:
     file: lib/Rex/Interface/Connection/HTTP.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection::HTTPS:
     file: lib/Rex/Interface/Connection/HTTPS.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection::Local:
     file: lib/Rex/Interface/Connection/Local.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection::OpenSSH:
     file: lib/Rex/Interface/Connection/OpenSSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Connection::SSH:
     file: lib/Rex/Interface/Connection/SSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec:
     file: lib/Rex/Interface/Exec.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec::Base:
     file: lib/Rex/Interface/Exec/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec::HTTP:
     file: lib/Rex/Interface/Exec/HTTP.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec::IOReader:
     file: lib/Rex/Interface/Exec/IOReader.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec::Local:
     file: lib/Rex/Interface/Exec/Local.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec::OpenSSH:
     file: lib/Rex/Interface/Exec/OpenSSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec::SSH:
     file: lib/Rex/Interface/Exec/SSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Exec::Sudo:
     file: lib/Rex/Interface/Exec/Sudo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Executor:
     file: lib/Rex/Interface/Executor.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Executor::Base:
     file: lib/Rex/Interface/Executor/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Executor::Default:
     file: lib/Rex/Interface/Executor/Default.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::File:
     file: lib/Rex/Interface/File.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::File::Base:
     file: lib/Rex/Interface/File/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::File::HTTP:
     file: lib/Rex/Interface/File/HTTP.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::File::Local:
     file: lib/Rex/Interface/File/Local.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::File::OpenSSH:
     file: lib/Rex/Interface/File/OpenSSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::File::SSH:
     file: lib/Rex/Interface/File/SSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::File::Sudo:
     file: lib/Rex/Interface/File/Sudo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Fs:
     file: lib/Rex/Interface/Fs.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Fs::Base:
     file: lib/Rex/Interface/Fs/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Fs::HTTP:
     file: lib/Rex/Interface/Fs/HTTP.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Fs::Local:
     file: lib/Rex/Interface/Fs/Local.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Fs::OpenSSH:
     file: lib/Rex/Interface/Fs/OpenSSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Fs::SSH:
     file: lib/Rex/Interface/Fs/SSH.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Fs::Sudo:
     file: lib/Rex/Interface/Fs/Sudo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell:
     file: lib/Rex/Interface/Shell.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Ash:
     file: lib/Rex/Interface/Shell/Ash.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Base:
     file: lib/Rex/Interface/Shell/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Bash:
     file: lib/Rex/Interface/Shell/Bash.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Csh:
     file: lib/Rex/Interface/Shell/Csh.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Default:
     file: lib/Rex/Interface/Shell/Default.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Idrac:
     file: lib/Rex/Interface/Shell/Idrac.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Ksh:
     file: lib/Rex/Interface/Shell/Ksh.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Sh:
     file: lib/Rex/Interface/Shell/Sh.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Tcsh:
     file: lib/Rex/Interface/Shell/Tcsh.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Interface::Shell::Zsh:
     file: lib/Rex/Interface/Shell/Zsh.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory:
     file: lib/Rex/Inventory.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Bios:
     file: lib/Rex/Inventory/Bios.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode:
     file: lib/Rex/Inventory/DMIDecode.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode::BaseBoard:
     file: lib/Rex/Inventory/DMIDecode/BaseBoard.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode::Bios:
     file: lib/Rex/Inventory/DMIDecode/Bios.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode::CPU:
     file: lib/Rex/Inventory/DMIDecode/CPU.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode::Memory:
     file: lib/Rex/Inventory/DMIDecode/Memory.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode::MemoryArray:
     file: lib/Rex/Inventory/DMIDecode/MemoryArray.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode::Section:
     file: lib/Rex/Inventory/DMIDecode/Section.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::DMIDecode::SystemInformation:
     file: lib/Rex/Inventory/DMIDecode/SystemInformation.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::HP::ACU:
     file: lib/Rex/Inventory/HP/ACU.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Hal:
     file: lib/Rex/Inventory/Hal.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Hal::Object:
     file: lib/Rex/Inventory/Hal/Object.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Hal::Object::Net:
     file: lib/Rex/Inventory/Hal/Object/Net.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Hal::Object::Storage:
     file: lib/Rex/Inventory/Hal/Object/Storage.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Hal::Object::Volume:
     file: lib/Rex/Inventory/Hal/Object/Volume.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Proc:
     file: lib/Rex/Inventory/Proc.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::Proc::Cpuinfo:
     file: lib/Rex/Inventory/Proc/Cpuinfo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios:
     file: lib/Rex/Inventory/SMBios.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios::BaseBoard:
     file: lib/Rex/Inventory/SMBios/BaseBoard.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios::Bios:
     file: lib/Rex/Inventory/SMBios/Bios.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios::CPU:
     file: lib/Rex/Inventory/SMBios/CPU.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios::Memory:
     file: lib/Rex/Inventory/SMBios/Memory.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios::MemoryArray:
     file: lib/Rex/Inventory/SMBios/MemoryArray.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios::Section:
     file: lib/Rex/Inventory/SMBios/Section.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Inventory::SMBios::SystemInformation:
     file: lib/Rex/Inventory/SMBios/SystemInformation.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Logger:
     file: lib/Rex/Logger.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Notify:
     file: lib/Rex/Notify.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Output:
     file: lib/Rex/Output.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Output::Base:
     file: lib/Rex/Output/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Output::JUnit:
     file: lib/Rex/Output/JUnit.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg:
     file: lib/Rex/Pkg.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::ALT:
     file: lib/Rex/Pkg/ALT.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Arch:
     file: lib/Rex/Pkg/Arch.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Base:
     file: lib/Rex/Pkg/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Debian:
     file: lib/Rex/Pkg/Debian.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::FreeBSD:
     file: lib/Rex/Pkg/FreeBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Gentoo:
     file: lib/Rex/Pkg/Gentoo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Mageia:
     file: lib/Rex/Pkg/Mageia.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::NetBSD:
     file: lib/Rex/Pkg/NetBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::OpenBSD:
     file: lib/Rex/Pkg/OpenBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::OpenWrt:
     file: lib/Rex/Pkg/OpenWrt.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Redhat:
     file: lib/Rex/Pkg/Redhat.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::SuSE:
     file: lib/Rex/Pkg/SuSE.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::SunOS:
     file: lib/Rex/Pkg/SunOS.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::SunOS::OpenCSW:
     file: lib/Rex/Pkg/SunOS/OpenCSW.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::SunOS::pkg:
     file: lib/Rex/Pkg/SunOS/pkg.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Test:
     file: lib/Rex/Pkg/Test.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::Ubuntu:
     file: lib/Rex/Pkg/Ubuntu.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Pkg::VoidLinux:
     file: lib/Rex/Pkg/VoidLinux.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::PkgConf:
     file: lib/Rex/PkgConf.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::PkgConf::Base:
     file: lib/Rex/PkgConf/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::PkgConf::Debian:
     file: lib/Rex/PkgConf/Debian.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Profiler:
     file: lib/Rex/Profiler.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Report:
     file: lib/Rex/Report.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Report::Base:
     file: lib/Rex/Report/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Report::YAML:
     file: lib/Rex/Report/YAML.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Require:
     file: lib/Rex/Require.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Resource:
     file: lib/Rex/Resource.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Resource::Common:
     file: lib/Rex/Resource/Common.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Resource::firewall:
     file: lib/Rex/Resource/firewall.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Resource::firewall::Provider::base:
     file: lib/Rex/Resource/firewall/Provider/base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Resource::firewall::Provider::iptables:
     file: lib/Rex/Resource/firewall/Provider/iptables.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Resource::firewall::Provider::ufw:
     file: lib/Rex/Resource/firewall/Provider/ufw.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::RunList:
     file: lib/Rex/RunList.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::SCM::Git:
     file: lib/Rex/SCM/Git.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::SCM::Subversion:
     file: lib/Rex/SCM/Subversion.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service:
     file: lib/Rex/Service.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::ALT:
     file: lib/Rex/Service/ALT.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::ALT::systemd:
     file: lib/Rex/Service/ALT/systemd.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Arch::systemd:
     file: lib/Rex/Service/Arch/systemd.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Base:
     file: lib/Rex/Service/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Debian:
     file: lib/Rex/Service/Debian.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Debian::systemd:
     file: lib/Rex/Service/Debian/systemd.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::FreeBSD:
     file: lib/Rex/Service/FreeBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Gentoo:
     file: lib/Rex/Service/Gentoo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Gentoo::systemd:
     file: lib/Rex/Service/Gentoo/systemd.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Mageia:
     file: lib/Rex/Service/Mageia.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Mageia::systemd:
     file: lib/Rex/Service/Mageia/systemd.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::NetBSD:
     file: lib/Rex/Service/NetBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::OpenBSD:
     file: lib/Rex/Service/OpenBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::OpenWrt:
     file: lib/Rex/Service/OpenWrt.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Redhat:
     file: lib/Rex/Service/Redhat.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Redhat::systemd:
     file: lib/Rex/Service/Redhat/systemd.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::SuSE:
     file: lib/Rex/Service/SuSE.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::SuSE::systemd:
     file: lib/Rex/Service/SuSE/systemd.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::SunOS:
     file: lib/Rex/Service/SunOS.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::SunOS::svcadm:
     file: lib/Rex/Service/SunOS/svcadm.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::Ubuntu:
     file: lib/Rex/Service/Ubuntu.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Service::VoidLinux:
     file: lib/Rex/Service/VoidLinux.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Shared::Var:
     file: lib/Rex/Shared/Var.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Shared::Var::Array:
     file: lib/Rex/Shared/Var/Array.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Shared::Var::Common:
     file: lib/Rex/Shared/Var/Common.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Shared::Var::Hash:
     file: lib/Rex/Shared/Var/Hash.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Shared::Var::Scalar:
     file: lib/Rex/Shared/Var/Scalar.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Sudo::File:
     file: lib/Rex/Sudo/File.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Task:
     file: lib/Rex/Task.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::TaskList:
     file: lib/Rex/TaskList.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::TaskList::Base:
     file: lib/Rex/TaskList/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::TaskList::Parallel_ForkManager:
     file: lib/Rex/TaskList/Parallel_ForkManager.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Template:
     file: lib/Rex/Template.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Template::NG:
     file: lib/Rex/Template/NG.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test:
     file: lib/Rex/Test.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base:
     file: lib/Rex/Test/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_content:
     file: lib/Rex/Test/Base/has_content.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_cron:
     file: lib/Rex/Test/Base/has_cron.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_cron_env:
     file: lib/Rex/Test/Base/has_cron_env.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_dir:
     file: lib/Rex/Test/Base/has_dir.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_file:
     file: lib/Rex/Test/Base/has_file.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_file_content:
     file: lib/Rex/Test/Base/has_file_content.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_output:
     file: lib/Rex/Test/Base/has_output.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_output_matching:
     file: lib/Rex/Test/Base/has_output_matching.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_package:
     file: lib/Rex/Test/Base/has_package.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_service_running:
     file: lib/Rex/Test/Base/has_service_running.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_service_stopped:
     file: lib/Rex/Test/Base/has_service_stopped.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Test::Base::has_stat:
     file: lib/Rex/Test/Base/has_stat.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Transaction:
     file: lib/Rex/Transaction.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User:
     file: lib/Rex/User.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User::Base:
     file: lib/Rex/User/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User::FreeBSD:
     file: lib/Rex/User/FreeBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User::Linux:
     file: lib/Rex/User/Linux.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User::NetBSD:
     file: lib/Rex/User/NetBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User::OpenBSD:
     file: lib/Rex/User/OpenBSD.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User::OpenWrt:
     file: lib/Rex/User/OpenWrt.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::User::SunOS:
     file: lib/Rex/User/SunOS.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Value:
     file: lib/Rex/Value.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization:
     file: lib/Rex/Virtualization.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Base:
     file: lib/Rex/Virtualization/Base.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker:
     file: lib/Rex/Virtualization/Docker.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::create:
     file: lib/Rex/Virtualization/Docker/create.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::daemon:
     file: lib/Rex/Virtualization/Docker/daemon.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::delete:
     file: lib/Rex/Virtualization/Docker/delete.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::destroy:
     file: lib/Rex/Virtualization/Docker/destroy.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::guestinfo:
     file: lib/Rex/Virtualization/Docker/guestinfo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::images:
     file: lib/Rex/Virtualization/Docker/images.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::import:
     file: lib/Rex/Virtualization/Docker/import.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::info:
     file: lib/Rex/Virtualization/Docker/info.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::list:
     file: lib/Rex/Virtualization/Docker/list.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::reboot:
     file: lib/Rex/Virtualization/Docker/reboot.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::shutdown:
     file: lib/Rex/Virtualization/Docker/shutdown.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::start:
     file: lib/Rex/Virtualization/Docker/start.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Docker::status:
     file: lib/Rex/Virtualization/Docker/status.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt:
     file: lib/Rex/Virtualization/LibVirt.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::blklist:
     file: lib/Rex/Virtualization/LibVirt/blklist.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::clone:
     file: lib/Rex/Virtualization/LibVirt/clone.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::create:
     file: lib/Rex/Virtualization/LibVirt/create.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::delete:
     file: lib/Rex/Virtualization/LibVirt/delete.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::destroy:
     file: lib/Rex/Virtualization/LibVirt/destroy.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::dumpxml:
     file: lib/Rex/Virtualization/LibVirt/dumpxml.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::guestinfo:
     file: lib/Rex/Virtualization/LibVirt/guestinfo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::hypervisor:
     file: lib/Rex/Virtualization/LibVirt/hypervisor.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::iflist:
     file: lib/Rex/Virtualization/LibVirt/iflist.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::import:
     file: lib/Rex/Virtualization/LibVirt/import.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::info:
     file: lib/Rex/Virtualization/LibVirt/info.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::list:
     file: lib/Rex/Virtualization/LibVirt/list.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::option:
     file: lib/Rex/Virtualization/LibVirt/option.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::reboot:
     file: lib/Rex/Virtualization/LibVirt/reboot.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::shutdown:
     file: lib/Rex/Virtualization/LibVirt/shutdown.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::start:
     file: lib/Rex/Virtualization/LibVirt/start.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::status:
     file: lib/Rex/Virtualization/LibVirt/status.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::LibVirt::vncdisplay:
     file: lib/Rex/Virtualization/LibVirt/vncdisplay.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc:
     file: lib/Rex/Virtualization/Lxc.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::attach:
     file: lib/Rex/Virtualization/Lxc/attach.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::copy:
     file: lib/Rex/Virtualization/Lxc/copy.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::create:
     file: lib/Rex/Virtualization/Lxc/create.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::destroy:
     file: lib/Rex/Virtualization/Lxc/destroy.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::info:
     file: lib/Rex/Virtualization/Lxc/info.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::list:
     file: lib/Rex/Virtualization/Lxc/list.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::start:
     file: lib/Rex/Virtualization/Lxc/start.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::Lxc::stop:
     file: lib/Rex/Virtualization/Lxc/stop.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox:
     file: lib/Rex/Virtualization/VBox.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::bridge:
     file: lib/Rex/Virtualization/VBox/bridge.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::create:
     file: lib/Rex/Virtualization/VBox/create.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::delete:
     file: lib/Rex/Virtualization/VBox/delete.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::destroy:
     file: lib/Rex/Virtualization/VBox/destroy.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::forward_port:
     file: lib/Rex/Virtualization/VBox/forward_port.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::guestinfo:
     file: lib/Rex/Virtualization/VBox/guestinfo.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::import:
     file: lib/Rex/Virtualization/VBox/import.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::info:
     file: lib/Rex/Virtualization/VBox/info.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::list:
     file: lib/Rex/Virtualization/VBox/list.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::option:
     file: lib/Rex/Virtualization/VBox/option.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::reboot:
     file: lib/Rex/Virtualization/VBox/reboot.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::share_folder:
     file: lib/Rex/Virtualization/VBox/share_folder.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::shutdown:
     file: lib/Rex/Virtualization/VBox/shutdown.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::start:
     file: lib/Rex/Virtualization/VBox/start.pm
-    version: v1.16.0
+    version: v1.16.1
   Rex::Virtualization::VBox::status:
     file: lib/Rex/Virtualization/VBox/status.pm
-    version: v1.16.0
+    version: v1.16.1
 requires:
   AWS::Signature4: '0'
   Carp: '0'
@@ -1148,7 +1148,7 @@ resources:
   bugtracker: https://github.com/RexOps/Rex/issues
   homepage: https://www.rexify.org
   repository: https://github.com/RexOps/Rex.git
-version: 1.16.0
+version: 1.16.1
 x_contributors:
   - 'A Happy User <auser@nothing.none>'
   - 'Alexander Karelas <karjala@cpan.org>'

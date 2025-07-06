@@ -57,11 +57,11 @@ With this module you can manipulate files.
 
 package Rex::Commands::File;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -791,6 +791,14 @@ sub file {
 
   return $__ret->{changed};
 }
+
+=head2 get_tmp_file_name($file_name)
+
+To avoid partial changes and to ensure atomic operations when managing files, Rex first creates a temporary file with the new content, then replaces the target file when necessary.
+
+This function returns the name of the temporary file used for a given target file, which may prove useful in hooks.
+
+=cut
 
 sub get_tmp_file_name {
   my $file = shift;

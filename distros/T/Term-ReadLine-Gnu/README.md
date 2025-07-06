@@ -1,6 +1,6 @@
 # `Term::ReadLine::Gnu` --- The GNU Readline Library Wrapper Module
 
-Copyright (c) 1996-2022 Hiroo Hayashi.  All rights reserved.
+Copyright (c) 1996-2025 Hiroo Hayashi.  All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -67,7 +67,7 @@ Hiroo Hayashi <hiroo.hayashi@computer.org>
 ## Links
 
 - [Term::ReadLine::Gnu](https://metacpan.org/dist/Term-ReadLine-Gnu)
-    - [Term::ReadLine::Gnu Users' Manual](https://metacpan.org/pod/Term::ReadLine::Gnu)
+  - [Term::ReadLine::Gnu Users' Manual](https://metacpan.org/pod/Term::ReadLine::Gnu)
 - [Term::ReadLine::Gnu GitHub Repository](https://github.com/hirooih/perl-trg)
 - [The GNU Readline Library Manual](https://tiswww.cwru.edu/php/chet/readline/readline.html)
 - [The GNU History Library Manual](https://tiswww.cwru.edu/php/chet/readline/history.html)

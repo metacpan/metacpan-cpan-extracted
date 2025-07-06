@@ -4,11 +4,11 @@
 
 package Rex::Interface::Shell::Default;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 use Rex::Interface::Shell::Bash;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use base qw(Rex::Interface::Shell::Bash);
 

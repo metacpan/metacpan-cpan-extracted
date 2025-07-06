@@ -1,5 +1,17 @@
 Math-Permutation
 
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it to get an idea of the module's uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+
 INSTALLATION
 
 To install this module, run the following commands:
@@ -18,14 +30,8 @@ perldoc command.
 
 You can also look for information at:
 
-    GitHub Repository (welcome to report bugs on the section "Issues")
-        https://github.com/E7-87-83/Math-Permutation
-
-    RT, CPAN's request tracker
+    RT, CPAN's request tracker (report bugs here)
         https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Permutation
-
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Math-Permutation
 
     Search CPAN
         https://metacpan.org/release/Math-Permutation
@@ -33,7 +39,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022-2025 by Cheok-Yin Fung.
+This software is Copyright (c) 2025 by Cheok-Yin Fung.
 
 This is free software, licensed under:
 

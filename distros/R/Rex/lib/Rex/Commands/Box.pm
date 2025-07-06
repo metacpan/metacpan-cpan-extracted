@@ -57,10 +57,10 @@ Version <= 1.0: All these functions will not be reported.
 
 package Rex::Commands::Box;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use YAML;
 use Data::Dumper;

@@ -4,10 +4,10 @@
 
 package Rex::Group;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Rex::Logger;
 
@@ -24,8 +24,19 @@ sub new {
   my $self  = {@_};
 
   bless( $self, $proto );
+
   for my $srv ( @{ $self->{servers} } ) {
     $srv->append_to_group( $self->{name} );
+
+    for my $group ( keys %groups ) {
+
+      for my $host ( $groups{$group}->get_servers ) {
+        if ( $host eq $srv ) {
+          $host->append_to_group( $self->{name} );
+          $srv->append_to_group($group);
+        }
+      }
+    }
   }
 
   return $self;

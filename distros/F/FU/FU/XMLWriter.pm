@@ -1,4 +1,4 @@
-package FU::XMLWriter 1.1;
+package FU::XMLWriter 1.2;
 use v5.36;
 use Carp 'confess';
 use Exporter 'import';

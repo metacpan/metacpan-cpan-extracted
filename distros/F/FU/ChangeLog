@@ -1,3 +1,8 @@
+1.2 - 2025-07-06
+	- FU::Pg: Throw error on non-boolean-looking Perl values for boolean bind
+	  parameters
+	- FU: Improve setting process status during startup
+
 1.1 - 2025-06-07
 	- FU::SQL: Add IDENT function and `quote_identifier` option
 	- FU::Pg: Set appropriate `quote_identifier` for `$conn->Q()`

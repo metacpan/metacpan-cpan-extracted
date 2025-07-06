@@ -1,4 +1,4 @@
-package FU::Pg 1.1;
+package FU::Pg 1.2;
 use v5.36;
 use FU::XS;
 
@@ -631,10 +631,12 @@ Some built-in types deserve a few additional notes:
 
 =item bool
 
-Boolean values are converted to C<builtin::true> and C<builtin::false>. As bind
-parameters, Perl's idea of truthiness is used: C<0>, C<false> and C<""> are
-false, everything else is true. Objects that overload I<bool> are also
-supported. C<undef> always converts to SQL C<NULL>.
+Boolean values are converted to C<builtin::true> and C<builtin::false>.
+
+As bind parameters, values recognized by C<to_bool()> in L<FU::Util> are
+accepted, in addition to C<0>, C<"f"> and C<""> for false and C<1>, and C<"t">
+for true.  C<undef> always converts to SQL C<NULL>. Everything else throws an
+error.
 
 =item bytea
 

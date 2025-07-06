@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+# There's a problem with
+#	https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit
+#	on my desktop it gives protocol errors
+#	on my phone it redirects to ancestry.com
+# So this file looks through the LWP::UserAgent::WithCache cache and retrieves the files
+#	ready to import using create_db.PL
+# Once you've done this, set MLARCHIVEDIR in your environment and run "make"
+
+use strict;
+use warnings;
+use autodie qw(:all);
+use File::Slurp;
+
+die "Usage: $0 dir" unless($ARGV[0]);
+die "Usage: $0 dir" unless(-d $ARGV[0]);
+
+# e.g.
+#	mkdir ../ml
+#	cp ~/.cache/lwp-cache/?/?/?/* ../ml
+opendir(my $dir, $ARGV[0]) or die "$ARGV[0]: $!";
+
+my @files = readdir $dir;
+closedir $dir;
+
+foreach my $file(@files) {
+	next if($file =~ /^\./);
+	my @lines = read_file("../ml/$file");
+
+	shift @lines;
+	pop @lines;
+
+	$lines[0] =~ s/^.*?https:/https:/;
+	$lines[0] =~ s/...Cache::Object.*$//;
+	my $url = shift @lines;
+	$url =~ s/[\r\n]//g;
+	next unless($url =~ /mlarchives/);
+	shift @lines;
+
+	$url =~ s/.+\///;
+	open(my $fout, '>', $url);
+	print $fout @lines;
+	close($fout);
+}

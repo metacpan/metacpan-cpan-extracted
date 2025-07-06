@@ -1,13 +1,14 @@
 #!/usr/bin/env perl
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
 our $VERSION = '9999.99.99_99'; # VERSION
 
-use Test::More tests => 99;
+use Test::More tests => 103;
 use Test::Warnings;
 use Test::Exception;
+use Test::Deep;
 
 use Rex -feature => '0.31';
 use Rex::Group;
@@ -83,3 +84,31 @@ is( *{$function_ref}->(), $function_result, 'calling custom function' );
 
 dies_ok( sub { Rex::Commands::evaluate_hostname('s[78]') },
   'die on invalid hostgroup expression' );
+
+# group membership
+
+group first  => qw(one two);
+group second => qw(two three);
+
+my $expected_results_for = {
+  first => {
+    one => [qw(first)],
+    two => [qw(first second)],
+  },
+  second => {
+    two   => [qw(first second)],
+    three => [qw(second)],
+  },
+};
+
+for my $group (qw(first second)) {
+  my @hosts = Rex::Group->get_group($group);
+
+  for my $host (@hosts) {
+    cmp_bag(
+      [ $host->groups ],
+      $expected_results_for->{$group}->{$host},
+      "correct host groups for host $host in group $group"
+    );
+  }
+}

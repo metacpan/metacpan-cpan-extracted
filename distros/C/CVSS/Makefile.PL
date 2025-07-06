@@ -27,6 +27,6 @@ WriteMakefile(
         },
         x_purl => 'pkg:cpan/GDT/CVSS'
     },
-    dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
+    dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
     clean => {FILES    => 'CVSS-*'},
 );

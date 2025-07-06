@@ -4,7 +4,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 # VERSION
 
-version v0.5.0
+version v0.6.0
 
 # SYNOPSIS
 
@@ -98,6 +98,14 @@ When tests fail, the diagnostic message will indicate the unexpected script and 
 Unexpected Cyrillic character CYRILLIC SMALL LETTER ER on line 286 character 45 in lib/Foo/Bar.pm
 ```
 
+You can also specify "ASCII" as a special script name for only 7-bit ASCII characters:
+
+```
+file_scripts_ok( $filepath, qw/ ASCII / );
+```
+
+Note that "ASCII" is available in version v0.6.0 or later.
+
 ## all\_perl\_files\_scripts\_ok
 
 ```
@@ -159,9 +167,6 @@ report security vulnerabilities
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
-
-The file traversing code used in ["all\_perl\_files\_scripts\_ok"](#all_perl_files_scripts_ok) is based on code from [Test::EOL](https://metacpan.org/pod/Test%3A%3AEOL) by Tomas Doran
-<bobtfish@bobtfish.net> and others.
 
 # COPYRIGHT AND LICENSE
 

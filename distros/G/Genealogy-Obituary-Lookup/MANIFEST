@@ -1,0 +1,40 @@
+bin/create_db.PL
+bin/extract
+bin/ml_from_cache
+Changes
+config.yaml
+lib/Genealogy/Obituary/Lookup.pm
+lib/Genealogy/Obituary/Lookup/obituaries.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/10-new.t
+t/30-basics.t
+t/carp.t
+t/comment-spelling.t
+t/config_file.t
+t/coverage.t
+t/critic.t
+t/eof.t
+t/eol.t
+t/fixme.t
+t/lib/MyLogger.pm
+t/links.t
+t/no404s.t
+t/noopentickets.t
+t/noplan.t
+t/obituaries.t
+t/pod-cm.t
+t/pod-snippets.t
+t/pod-spelling.t
+t/pod-synopsis.t
+t/pod.t
+t/strict.t
+t/unused.t
+t/vars.t
+t/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

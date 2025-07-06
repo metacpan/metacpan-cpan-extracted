@@ -23,7 +23,7 @@ sub cli_version {
     say <<"VERSION";
 $progname version $CSAF::VERSION
 
-Copyright 2023-2024, Giuseppe Di Terlizzi <gdt\@cpan.org>
+Copyright 2023-2025, Giuseppe Di Terlizzi <gdt\@cpan.org>
 
 This program is part of the CSAF distribution and is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
@@ -94,7 +94,7 @@ L<https://github.com/giterlizzi/perl-CSAF>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

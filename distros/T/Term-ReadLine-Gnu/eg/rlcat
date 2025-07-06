@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+#
+# rlcat - cat(1) using readline
+#
+# usage: rlcat [-vEVN] [filename]
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/rl.c in the GNU Readline Library
+#   Copyright (C) 1987-2023 Free Software Foundation, Inc.
+
+use strict;
+use warnings;
+use Term::ReadLine;
+use File::Basename;
+use Getopt::Std;
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+my $VERSION = "1.0";
+
+my $t = new Term::ReadLine 'rl';
+my $a = $t->Attribs;
+
+my $progname = basename($0);
+
+sub HELP_MESSAGE {
+    my ($fh) = @_;
+    print $fh <<EOM;
+usage: $progname [-vEVN] [filename]
+  -v: untraslate control characters (not implemented yet)
+  -E: emacs mode (default)
+  -V: vi mode
+  -N: No readline
+EOM
+}
+
+sub VERSION_MESSAGE {
+    my ($fh) = @_;
+    print $fh "version: $VERSION\n";
+}
+
+our ($opt_v, $opt_E, $opt_V, $opt_N);
+getopts('vEVN');
+
+if (!-t STDIN or @ARGV or $opt_N) {
+    system "cat @ARGV";
+    exit $?;
+}
+
+$t->variable_bind("editing-mode", $opt_V ? "vi" : "emacs");
+while (my $temp = $t->readline("")) {
+    print "$temp\n";
+}
+exit 0;    # perl does not support ferror()
+
+# rl_untranslate_keyseq() is not documented but used in rlcat.c.

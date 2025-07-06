@@ -31,12 +31,12 @@ The Task Object. Typically you only need this class if you want to manipulate ta
 
 package Rex::Task;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 use Data::Dumper;
 use Time::HiRes qw(time);
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Rex::Logger;
 use Rex::TaskList;

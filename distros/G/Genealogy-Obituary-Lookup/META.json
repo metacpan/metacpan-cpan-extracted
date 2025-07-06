@@ -1,0 +1,99 @@
+{
+   "abstract" : "Lookup an obituary",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Genealogy-Obituary-Lookup",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::SQLite" : "0",
+            "DBD::SQLite::Constants" : "0",
+            "DBI" : "0",
+            "Data::Reuse" : "0",
+            "Database::Abstraction" : "0.04",
+            "Error::Simple" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "File::pfopen" : "0",
+            "HTML::Entities" : "0",
+            "HTTP::Cache::Transparent" : "0",
+            "LWP::ConnCache" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent::WithCache" : "0",
+            "Lingua::EN::NameCase" : "0",
+            "Module::Info" : "0",
+            "Object::Configure" : "0.1",
+            "Params::Get" : "0.04",
+            "Scalar::Util" : "0",
+            "Text::CSV" : "0",
+            "Try::Tiny" : "0",
+            "YAML::XS" : "0",
+            "autodie" : "0",
+            "constant" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::Carp" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::HTTPStatus" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "Test::NoWarnings" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Genealogy-Obituary-Lookup@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues",
+         "x_url" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Genealogy::Obituary::Lookup",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Genealogy-Obituary-Lookup.git",
+         "web" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup",
+         "x_repository" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup"
+      }
+   },
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

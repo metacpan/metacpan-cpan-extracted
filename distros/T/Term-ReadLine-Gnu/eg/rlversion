@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+#
+# rlversion -- print out readline's version number
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/rlversion.c in the GNU Readline Library
+#   Copyright (C) 1987-2009 Free Software Foundation, Inc.
+
+use strict;
+use warnings;
+use Term::ReadLine;
+
+my $t = new Term::ReadLine 'rlversion';
+my $a = $t->Attribs;
+
+print(($a->{library_version} or 'unknown'), "\n");
+exit 0;

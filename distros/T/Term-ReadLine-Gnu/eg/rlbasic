@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+#
+# rlbasic: A basic readline() loop example
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/rlbasic.c in the GNU Readline Library
+
+use strict;
+use warnings;
+use Term::ReadLine;
+
+my $t = new Term::ReadLine 'rlbasic';
+
+while (1) {
+    my $input = $t->readline('');
+    last unless defined $input;
+    print("$input\n");
+    if ($input eq 'exit') {
+        last;
+    }
+}
+exit 0;

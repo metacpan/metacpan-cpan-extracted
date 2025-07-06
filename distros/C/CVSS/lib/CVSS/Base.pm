@@ -7,7 +7,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 $VERSION =~ tr/_//d;    ## no critic
 
 use overload '""' => \&to_string, fallback => 1;
@@ -50,7 +50,7 @@ sub new {
 
     my $self = bless {%params}, $class;
 
-    if (!$self->version =~ /(2.0|3.[0-1]|4.0)/) {
+    if ($self->version !~ /(2.0|3.[0-1]|4.0)/) {
         Carp::croak 'Invalid CVSS version';
     }
 
@@ -564,7 +564,7 @@ L<https://github.com/giterlizzi/perl-CVSS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

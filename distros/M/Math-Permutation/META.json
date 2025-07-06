@@ -4,7 +4,7 @@
       "Cheok-Yin Fung <fungcheokyin@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -34,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "List::Util" : "1.50",
+            "List::Util" : "1.56",
             "perl" : "5.025"
          }
       },
@@ -45,18 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/E7-87-83/Math-Permutation/issues"
-      },
-      "homepage" : "https://github.com/E7-87-83/Math-Permutation",
-      "license" : [
-         "https://mit-license.org/"
-      ],
-      "repository" : {
-         "url" : "https://github.com/E7-87-83/Math-Permutation.git"
-      }
-   },
-   "version" : "0.021",
+   "version" : "0.0212",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

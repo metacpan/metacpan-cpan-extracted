@@ -20,7 +20,7 @@ use Test2::API 1.302200 qw( context );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.6.0';
 
 
 sub file_scripts_ok {
@@ -95,11 +95,11 @@ sub _check_file_scripts {
 }
 
 sub _make_regex_set {
-    state $scripts = charscripts();
+    state $scripts = { ASCII => undef, map { $_ => 1 } keys %{ charscripts() } };
     if ( my $err = first { !exists $scripts->{$_} } @_ ) {
         croak "Unknown script ${err}";
     }
-    return join( "", map { sprintf( '\p{scx=%s}', $_ ) } @_ );
+    return join( "", map { $_ eq "ASCII" ? '\x00-\x7f' : sprintf( '\p{scx=%s}', $_ ) } @_ );
 }
 
 sub _make_regex {
@@ -112,8 +112,6 @@ sub _make_negative_regex {
     return qr/([^${set}])/up;
 }
 
-
-# This code is originally based on code from Test::EOL v2.02, originally by Tomas Doran <bobtfish@bobtfish.net>
 
 sub all_perl_files_scripts_ok {
     my $options = { };
@@ -205,7 +203,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.5.0
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -279,6 +277,12 @@ When tests fail, the diagnostic message will indicate the unexpected script and 
 
     Unexpected Cyrillic character CYRILLIC SMALL LETTER ER on line 286 character 45 in lib/Foo/Bar.pm
 
+You can also specify "ASCII" as a special script name for only 7-bit ASCII characters:
+
+  file_scripts_ok( $filepath, qw/ ASCII / );
+
+Note that "ASCII" is available in version v0.6.0 or later.
+
 =head2 all_perl_files_scripts_ok
 
   all_perl_files_scripts_ok();
@@ -338,9 +342,6 @@ report security vulnerabilities
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
-
-The file traversing code used in L</all_perl_files_scripts_ok> is based on code from L<Test::EOL> by Tomas Doran
-<bobtfish@bobtfish.net> and others.
 
 =head1 COPYRIGHT AND LICENSE
 

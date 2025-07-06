@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+#
+# histexamp -- history library example program.
+# https://tiswww.case.edu/php/chet/readline/history.html#History-Programming-Example
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/histexamp.c in the GNU Readline Library
+#   Copyright (C) 1987-2009 Free Software Foundation, Inc.
+
+use strict;
+use warnings;
+use Term::ReadLine;
+use POSIX qw(strftime);
+
+my $t = new Term::ReadLine 'histexamp';
+my $a = $t->Attribs;
+
+my $done = 0;
+$t->using_history();
+$| = 1;    # autoflush
+while (!$done) {
+    printf('history$ ');
+    my $line = <>;
+    $line = 'quit' unless $line;
+    chomp $line;
+
+    if ($line) {
+        my ($result, $expansion) = $t->history_expand($line);
+        print $expansion, "\n" if ($result);
+
+        continue if ($result < 0 || $result == 2);
+
+        $t->add_history($expansion);
+        $line = $expansion;
+    }
+
+    if ($line eq "quit") {
+        $done = 1;
+    } elsif ($line eq "save") {
+        $t->write_history("history_file");
+    } elsif ($line eq "read") {
+        $t->read_history("history_file");
+    } elsif ($line eq "list") {
+        my $i = 0;
+        for (my $i = 0; $i < $a->{history_length}; $i++) {
+            my $offset  = $i + $a->{history_base};
+            my $tt      = $t->history_get_time($offset);
+            my $timestr = strftime("%a %R", localtime($tt));
+            printf("%d: %s: %s\n", $offset, $timestr, $t->history_get($offset));
+        }
+    } elsif ($line =~ /^delete/) {
+        my $which;
+        if (($which) = $line =~ /^delete\s+(\d+)$/) {
+            my $entry = $t->remove_history($which - $a->{history_base});
+            if (!$entry) {
+                warn("No such entry $which\n");
+            }
+        } else {
+            warn("non-numeric arg given to `delete'\n");
+        }
+    }
+}
+exit 0;

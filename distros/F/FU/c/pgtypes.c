@@ -82,8 +82,15 @@ RECVFN(bool) {
 }
 
 SENDFN(bool) {
-    int r = fu_2bool(aTHX_ val); /* So that we also recognize \0 and \1 */
-    fustr_write_ch(out, r < 0 ? SvTRUE(val) : r);
+    int r = fu_2bool(aTHX_ val);
+    if (r < 0) {
+        STRLEN l;
+        const char *x = SvPV(val, l);
+        if (l == 0 || (l == 1 && (*x == '0' || *x == 'f'))) r = 0;
+        else if (l == 1 && (*x == '1' || *x == 't')) r = 1;
+        else SERR("invalid boolean value: %s", x);
+    }
+    fustr_write_ch(out, r);
 }
 
 RECVFN(void) {

@@ -1,5 +1,10 @@
 Revision history for CSAF.
 
+0.26 2026-07-05
+    - FIX "Possible precedence problem between ! and %s" in Perl 5.42
+    - Updated the minimum versions of some dependencies (GH#6)
+    - Use jsDelivr CDN for Gutenberg CSS in CSAF HTML template
+
 0.25 2025-02-20
     - FIX typo in ROLIE (GH#4)
     - Removed space before the ":" in JSON (GH#3)

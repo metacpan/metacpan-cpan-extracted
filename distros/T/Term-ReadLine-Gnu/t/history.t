@@ -11,7 +11,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 98;
+use Test::More tests => 99;
 
 # redefine Test::Mode::note due to it requires Perl 5.10.1.
 no warnings 'redefine';
@@ -85,6 +85,7 @@ ok($attribs->{history_word_delimiters} eq " \t\n;&()|<>", 'history_word_delimite
 ok($attribs->{history_no_expand_chars} eq " \t\n\r=", 'history_no_expand_chars');
 ok(!defined $attribs->{history_search_delimiter_chars}, 'history_search_delimiter_chars');
 ok($attribs->{history_quotes_inhibit_expansion} == 0, 'history_quotes_inhibit_expansion');
+ok($attribs->{history_quoting_state} == 0, 'history_quoting_state');    # GRL 8.0!!!
 ok(!defined $attribs->{history_inhibit_expansion_function}, 'history_inhibit_expansion_function');
 
 

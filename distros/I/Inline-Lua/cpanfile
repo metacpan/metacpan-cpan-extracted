@@ -1,0 +1,4 @@
+# cpanfile
+requires 'FFI::Platypus', '2.00';
+requires 'JSON::MaybeXS', '1.004000';
+requires 'Data::SExpression', '0.41'; # Loosened version constraint

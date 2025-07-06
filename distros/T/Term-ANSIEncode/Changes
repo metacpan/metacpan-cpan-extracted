@@ -20,3 +20,7 @@
 1.09    Jul 3, 2025
 
         Automatic version handling improved.
+
+1.10    Jul 5, 2025
+
+        Improved color grid output for -c option

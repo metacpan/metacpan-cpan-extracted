@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,9 +26,9 @@ requires:
   File::Path: '0'
   File::Spec::Functions: '0'
   GnuPG::Interface: '0'
-  JSON::Validator: '0'
+  JSON::Validator: '3.15'
   LWP::UserAgent: '0'
-  List::MoreUtils: '0'
+  List::MoreUtils: '0.423'
   List::Util: '0'
   Log::Any: '0'
   Moo: '0'
@@ -42,6 +42,6 @@ requires:
 resources:
   bugtracker: https://github.com/giterlizzi/perl-CSAF/issues
   repository: git://github.com/giterlizzi/perl-CSAF
-version: '0.25'
+version: '0.26'
 x_purl: pkg:cpan/GDT/CSAF
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

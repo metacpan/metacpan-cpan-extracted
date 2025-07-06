@@ -4,10 +4,10 @@
 
 package Rex::Interface::Exec::Local;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands;
@@ -114,7 +114,7 @@ sub exec {
 sub can_run {
   my ( $self, $commands_to_check, $check_with_command ) = @_;
 
-  $check_with_command ||= $^O =~ /^MSWin/i ? 'where' : 'which';
+  $check_with_command ||= $^O =~ /^MSWin/i ? 'where' : 'command -v';
 
   return $self->SUPER::can_run( $commands_to_check, $check_with_command );
 }

@@ -4,3 +4,7 @@ Revision history for Math-Permutation
         First version, released on an unsuspecting world.
 
 0.02    Correct unrank(); add array() and sqrt(); correct minimum Perl version needed to 5.024
+
+0.0210  correct minimum Perl version needed to 5.025
+
+0.0211  correct minimum List::Util version needed to 1.56

@@ -1,0 +1,249 @@
+#!/usr/bin/env perl
+#
+# rlptytest: Another test harness for the readline callback interface.
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/rlptytest.c in the GNU Readline Library
+#   Author: Bob Rossi <bob@brasko.net>
+
+use strict;
+use warnings;
+use Term::ReadLine;
+use IO::Pty;
+use POSIX qw(termios_h _POSIX_VDISABLE);
+
+# sys/ioctl.ph may not exist on some systems.
+#   cf. https://perldoc.perl.org/functions/ioctl
+# require 'sys/ioctl.ph';   # for TIOCGWINSZ
+
+my $debug = 1;
+my $t = new Term::ReadLine 'rlptytest';
+my $a = $t->Attribs;
+
+# Master/Slave PTY used to keep readline off of stdin/stdout.
+my $masterfh;
+my $slavefh;
+
+sub quit {
+    tty_reset(fileno(STDIN));
+    close($masterfh);
+    close($slavefh);
+    print "\n";
+    exit(0);
+}
+
+sub sigint {
+    quit();
+}
+
+sub sigwinch {
+    $t->resize_terminal();
+}
+
+# STDIN  -> user_input()     -> masterfh -> pty -> slavefh -> rl_instream -> callback_read_char()
+# STDERR <- readline_input() <- masterfh <- pty <- slavefh <- rl_outstream
+
+sub user_input {
+    my $buf;
+    my $MAX  = 1024;
+    my $size = sysread(STDIN, $buf, $MAX);
+    die "read: $!\n" unless defined $size;
+
+    my $ret = syswrite($masterfh, $buf, $size);
+    die "print: $!\n" unless $ret;
+}
+
+sub readline_input {
+    my $buf;
+    my $MAX  = 1024;
+    my $size = sysread($masterfh, $buf, $MAX);
+    die "read: $!\n" unless defined $size;
+
+    # Display output from readline
+    print STDERR $buf if ($size > 0);
+}
+
+sub rlctx_send_user_command {
+    my ($line) = @_;
+
+    # This happens when rl_callback_read_char gets EOF
+    return if (!$line);
+    quit() if ($line eq "exit");
+
+    # Don't add the enter command
+    if ($line && $line ne "") {
+        $t->add_history($line);
+    }
+}
+
+sub custom_deprep_term_function {
+}
+
+sub init_readline {
+    my ($inputfh, $outputfh) = @_;
+    $a->{instream}  = $inputfh;
+    $a->{outstream} = $outputfh;
+
+    # Tell readline what the prompt is if it needs to put it back
+    $t->callback_handler_install("(rltest):  ", \&rlctx_send_user_command);
+
+    # Set the terminal type to dumb so the output of readline can be
+    # understood by tgdb
+    $t->reset_terminal("dumb");    # always returns 0
+
+    # For some reason, readline can not deprep the terminal.
+    # However, it doesn't matter because no other application is working on
+    # the terminal besides readline
+    $a->{deprep_term_function} = \&custom_deprep_term_function;
+
+    $t->using_history();
+    $t->read_history(".history");
+}
+
+sub main_loop {
+    while (1) {
+        # Reset the fd_set, and watch for input from GDB or stdin
+        my $rset = '';
+
+        vec($rset, fileno(STDIN),     1) = 1;
+        vec($rset, fileno($slavefh),  1) = 1;
+        vec($rset, fileno($masterfh), 1) = 1;
+
+        # Wait for input
+        if (select($rset, undef, undef, undef) == -1) {
+            if ($! && $!{EINTR}) {
+                next;
+            } else {
+                die "select: $!\n";
+            }
+        }
+
+        # Input received through the pty:  Handle it
+        # Wrote to masterfd, slave fd has that input, alert readline to read it.
+        $t->callback_read_char() if (vec($rset, fileno($slavefh),  1));
+
+        # Input received through the pty.
+        # Readline read from slavefd, and it wrote to the masterfd.
+        readline_input()         if (vec($rset, fileno($masterfh), 1));
+
+        # Input received:  Handle it, write to masterfd (input to readline)
+        user_input()             if (vec($rset, fileno(STDIN),     1));
+    }
+}
+
+# The terminal attributes before calling tty_cbreak
+my $save_termios;
+my ($RESET, $TCBREAK) = (0, 1);
+my $ttystate = $RESET;
+
+# tty_cbreak: Sets terminal to cbreak mode. Also known as noncanonical mode.
+#    1. Signal handling is still turned on, so the user can still type those.
+#    2. echo is off
+#    3. Read in one char at a time.
+#
+# $fh    - The file handle of the terminal
+sub tty_cbreak {
+    my ($fh) = @_;
+    my $fd = fileno($fh);
+
+    $save_termios = POSIX::Termios->new;
+    if (!defined($save_termios->getattr($fd))) {
+        die "tcgetattr: $!\n";
+    }
+    my $buf = POSIX::Termios->new;
+    if (!defined($buf->getattr($fd))) {
+        die "tcgetattr: $!\n";
+    }
+
+    $buf->setlflag($buf->getlflag() & ~(ECHO | ICANON));
+    $buf->setiflag($buf->getiflag() & ~(ICRNL | INLCR));
+    $buf->setcc(1, VMIN);
+    $buf->setcc(0, VTIME);
+
+    $buf->setcc(_POSIX_VDISABLE, &POSIX::VLNEXT)
+      if defined(&POSIX::VLNEXT) && defined(_POSIX_VDISABLE);
+
+    $buf->setcc(_POSIX_VDISABLE, &POSIX::VDSUSP)
+      if defined(&POSIX::VDSUSP) && defined(_POSIX_VDISABLE);
+
+    # enable flow control; only stty start char can restart output
+    # $buf->setiflag($buf->getiflag() | IXON | IXOFF);
+    # $buf->setiflag($buf->getiflag() & ~&POSIX::IXANY) if defined(&POSIX::IXANY);
+
+    # disable flow control; let ^S and ^Q through to pty
+    $buf->setiflag($buf->getiflag() & ~(IXON | IXOFF));
+    $buf->setiflag($buf->getiflag() & ~&POSIX::IXANY) if defined(&POSIX::IXANY);
+
+    if (!defined($buf->setattr($fd, TCSAFLUSH))) {
+        die "tcsetattr: $!\n";
+    }
+
+    $ttystate = $TCBREAK;
+
+    # set size
+
+    # my $winsize = '';
+    # if (!defined(ioctl($fh, TIOCGWINSZ(), $winsize))) {
+    #     die "ioctl: $!\n";
+    # } else {
+    #     my ($rows, $cols, $xpix, $ypix) = unpack 'S4', $winsize;
+    #     warn "$rows rows and $cols cols\n" if $debug;
+    # }
+
+    # use IO::Pty->get_winsize() instead of ioctl() for better portability
+    if ($slavefh->clone_winsize_from(\*STDIN)) {
+        my ($rows, $cols, $xpix, $ypix) = $slavefh->get_winsize();
+        warn "$rows rows and $cols cols\n" if $debug;
+    }
+}
+
+sub tty_off_xon_xoff {
+    my ($fh) = @_;
+    my $fd = fileno($fh);
+
+    my $buf = POSIX::Termios->new;
+    if (!defined($buf->getattr($fd))) {
+        die "tcgetattr: $!\n";
+    }
+
+    $buf->setiflag($buf->getiflag() & ~(IXON | IXOFF));
+
+    if (!defined($buf->setattr($fd, TCSAFLUSH))) {
+        die "tcsetattr: $!\n";
+    }
+}
+
+# tty_reset: Sets the terminal attributes back to their previous state.
+# PRE: tty_cbreak must have already been called.
+#
+# fd    - The file descrioptor of the terminal to reset.
+sub tty_reset {
+    my ($fd) = @_;
+    return if ($ttystate != $TCBREAK);
+
+    if (!defined($save_termios->setattr($fd, TCSAFLUSH))) {
+        die "tcsetattr: $!\n";
+    }
+    $ttystate = $RESET;
+}
+
+#
+# main
+#
+$masterfh = new IO::Pty;
+$slavefh  = $masterfh->slave;
+
+tty_off_xon_xoff($masterfh);
+
+$SIG{INT}   = \&sigint;
+$SIG{WINCH} = \&sigwinch;
+
+init_readline($slavefh, $slavefh);
+tty_cbreak(\*STDIN);
+
+main_loop();
+
+tty_reset(fileno(STDIN));
+
+exit 0;

@@ -1,7 +1,7 @@
 /*
  *      Gnu.xs --- GNU Readline wrapper module
  *
- *      Copyright (c) 1996-2023 Hiroo Hayashi.  All rights reserved.
+ *      Copyright (c) 1996-2025 Hiroo Hayashi.  All rights reserved.
  *
  *      This program is free software; you can redistribute it and/or
  *      modify it under the same terms as Perl itself.
@@ -385,6 +385,17 @@ static int rl_eof_found = 0;
 static rl_hook_func_t *rl_timeout_event_hook = NULL;
 #endif /* (RL_READLINE_VERSION < 0x0802) */
 
+#if (RL_READLINE_VERSION < 0x0803)
+/* features introduced by GNU Readline 8.3 */
+static void rl_print_keybinding (const char *name, Keymap kmap, int print_readonly) {}
+static void rl_reparse_colors (void) {}
+/* Functions for displaying key bindings. Currently only one. */
+typedef void rl_macro_print_func_t (const char *, const char *, int, const char *); // 8.3
+static rl_macro_print_func_t *rl_macro_display_hook = NULL;
+static rl_dequote_func_t *rl_completion_rewrite_hook = NULL;
+static int rl_full_quoting_desired = 0;
+#endif /* (RL_READLINE_VERSION < 0x0803) */
+
 /*
  * utility/dummy functions
  */
@@ -572,6 +583,7 @@ static struct int_vars {
   { &history_quoting_state,                     0, 0, 0},       /* 45 */
   { &utf8_mode,                                 0, 0, 0},       /* 46 */
   { &rl_eof_found,                              0, 0, 0},       /* 47 */
+  { &rl_full_quoting_desired,                   0, 0, 0},       /* 48 */
 };
 
 /*
@@ -603,6 +615,8 @@ static int signal_event_hook_wrapper (void);
 static int input_available_hook_wrapper (void);
 static int filename_stat_hook_wrapper (char **fnamep);
 static int timeout_event_hook_wrapper (void);
+static int macro_display_hook_wrapper (const char *, const char *, int, const char *);
+static char *completion_rewrite_hook_wrapper (char *text, int quote_char);
 
 enum { STARTUP_HOOK, EVENT_HOOK, GETC_FN, REDISPLAY_FN,
        CMP_ENT, ATMPT_COMP,
@@ -611,9 +625,10 @@ enum { STARTUP_HOOK, EVENT_HOOK, GETC_FN, REDISPLAY_FN,
        PRE_INPUT_HOOK, COMP_DISP_HOOK, COMP_WD_BRK_HOOK,
        PREP_TERM, DEPREP_TERM, DIR_REWRITE, FN_REWRITE,
        SIG_EVT, INP_AVL, FN_STAT, TIMEOUT_EVENT,
+       FH_MACRO_DISPLAY_HOOK, FH_COMPLETION_REWRITE_HOOK,
 };
 
-typedef int XFunction ();
+typedef int XFunction (void);
 static struct fn_vars {
   XFunction **rlfuncp;          /* GNU Readline Library variable */
   XFunction *defaultfn;         /* default function */
@@ -622,7 +637,12 @@ static struct fn_vars {
 } fn_tbl[] = {
   { &rl_startup_hook,   NULL,   startup_hook_wrapper,   NULL }, /* 0 */
   { &rl_event_hook,     NULL,   event_hook_wrapper,     NULL }, /* 1 */
-  { &rl_getc_function,  rl_getc, getc_function_wrapper, NULL }, /* 2 */
+  {
+    (XFunction **)&rl_getc_function,                            /* 2 */
+    (XFunction *)rl_getc,
+    (XFunction *)getc_function_wrapper,
+    NULL
+  },
   {
     (XFunction **)&rl_redisplay_function,                       /* 3 */
     (XFunction *)rl_redisplay,
@@ -736,6 +756,18 @@ static struct fn_vars {
     (XFunction **)&rl_timeout_event_hook,                       /* 22 */
     NULL,
     (XFunction *)timeout_event_hook_wrapper,
+    NULL
+  },
+  {
+    (XFunction **)&rl_macro_display_hook,                       /* 23 */
+    NULL,
+    (XFunction *)macro_display_hook_wrapper,
+    NULL
+  },
+  {
+    (XFunction **)&rl_completion_rewrite_hook,                  /* 24 */
+    NULL,
+    (XFunction *)completion_rewrite_hook_wrapper,
     NULL
   },
 };
@@ -1634,6 +1666,56 @@ filename_stat_hook_wrapper(char **fnamep)
 static int
 timeout_event_hook_wrapper() { return hook_func_wrapper(TIMEOUT_EVENT); }
 
+static int
+macro_display_hook_wrapper(const char *keyname, const char *out, int print_readably, const char *prefix)
+{
+  dSP;
+  int count;
+  int ret;
+  SV *svret;
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(sp);
+  if (keyname) {
+    XPUSHs(sv_2mortal_utf8(newSVpv(keyname, 0)));
+  } else {
+    XPUSHs(&PL_sv_undef);
+  }
+  if (out) {
+    XPUSHs(sv_2mortal_utf8(newSVpv(out, 0)));
+  } else {
+    XPUSHs(&PL_sv_undef);
+  }
+  XPUSHs(sv_2mortal(newSViv(print_readably)));
+  if (prefix) {
+    XPUSHs(sv_2mortal_utf8(newSVpv(prefix, 0)));
+  } else {
+    XPUSHs(&PL_sv_undef);
+  }
+
+  PUTBACK;
+  count = call_sv(fn_tbl[FH_MACRO_DISPLAY_HOOK].callback, G_SCALAR);
+  SPAGAIN;
+
+  if (count != 1)
+    croak("Gnu.xs:macro_display_hook_wrapper: Internal error\n");
+
+  svret = POPs;
+  ret = SvIOK(svret) ? SvIV(svret) : -1;
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+  return ret;
+}
+
+static char *
+completion_rewrite_hook_wrapper(char *text, int quote_char)
+{
+  return dequoting_function_wrapper(FH_COMPLETION_REWRITE_HOOK, text, quote_char);
+}
+
 /*
  *      If you need more custom functions, define more funntion_wrapper_xx()
  *      and add entry on fntbl[].
@@ -1820,15 +1902,19 @@ _rl_discard_keymap(Keymap map)
     OUTPUT:
         RETVAL
 
- # comment out until GNU Readline 6.2 will be released.
-
 void
-rl_free_keymap(Keymap map)
+_rl_free_keymap(Keymap map)
     PROTOTYPE: $
+    CODE:
+        rl_free_keymap(map);
 
 int
-rl_empty_keymap(Keymap map)
+_rl_empty_keymap(Keymap map)
     PROTOTYPE: $
+    CODE:
+        RETVAL = rl_empty_keymap(map);
+    OUTPUT:
+        RETVAL
 
 Keymap
 rl_get_keymap()
@@ -1853,8 +1939,12 @@ rl_get_keymap_name(Keymap map)
     PROTOTYPE: $
 
 int
-rl_set_keymap_name(CONST char *name, Keymap map)
+_rl_set_keymap_name(CONST char *name, Keymap map)
     PROTOTYPE: $$
+    CODE:
+        RETVAL = rl_set_keymap_name(name, map);
+    OUTPUT:
+        RETVAL
 
  #
  #      2.4.3 Binding Keys
@@ -1991,7 +2081,7 @@ rl_get_function_name(rl_command_func_t *function)
     PROTOTYPE: $
 
 void
-rl_function_of_keyseq(SV *keyseq, Keymap map = rl_get_keymap())
+_rl_function_of_keyseq(SV *keyseq, Keymap map = rl_get_keymap())
     PROTOTYPE: $;$
     PPCODE:
         {
@@ -2031,7 +2121,7 @@ rl_function_of_keyseq(SV *keyseq, Keymap map = rl_get_keymap())
         }
 
 int
-rl_trim_arg_from_keyseq(SV *keyseq, Keymap map = rl_get_keymap())
+_rl_trim_arg_from_keyseq(SV *keyseq, Keymap map = rl_get_keymap())
     PROTOTYPE: $;$
     CODE:
         {
@@ -2069,6 +2159,12 @@ _rl_invoking_keyseqs(rl_command_func_t *function, Keymap map = rl_get_keymap())
             /* return null list */
           }
         }
+
+void
+_rl_print_keybinding (const char *name, Keymap map = rl_get_keymap(), int readable = 0)
+    PROTOTYPE: $;$$
+    CODE:
+        rl_print_keybinding(name, map, readable);
 
 void
 rl_function_dumper(int readable = 0)
@@ -2537,6 +2633,10 @@ rl_set_paren_blink_timeout(int usec)
 char *
 rl_get_termcap(CONST char *cap)
     PROTOTYPE: $
+
+void
+rl_reparse_colors ()
+    PROTOTYPE:
 
  #
  #      2.4.12 Alternate Interface

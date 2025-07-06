@@ -48,6 +48,6 @@
          "web" : "https://code.blicky.net/yorhel/fu"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

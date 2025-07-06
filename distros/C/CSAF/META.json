@@ -4,7 +4,7 @@
       "Giuseppe Di Terlizzi <gdt@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -39,9 +39,9 @@
             "File::Path" : "0",
             "File::Spec::Functions" : "0",
             "GnuPG::Interface" : "0",
-            "JSON::Validator" : "0",
+            "JSON::Validator" : "3.15",
             "LWP::UserAgent" : "0",
-            "List::MoreUtils" : "0",
+            "List::MoreUtils" : "0.423",
             "List::Util" : "0",
             "Log::Any" : "0",
             "Moo" : "0",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/giterlizzi/perl-CSAF"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_purl" : "pkg:cpan/GDT/CSAF",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

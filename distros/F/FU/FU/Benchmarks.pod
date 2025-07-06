@@ -30,7 +30,7 @@ The following module versions were used:
 
 =item L<DBD::Pg> 3.18.0
 
-=item L<FU> 1.1
+=item L<FU> 1.2
 
 =item L<HTML::Tiny> 1.08
 

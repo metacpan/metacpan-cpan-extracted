@@ -24,8 +24,8 @@ WriteMakefile(
         'File::Spec::Functions' => '0',    # CORE
         'GnuPG::Interface'      => '0',
         'LWP::UserAgent'        => '0',
-        'JSON::Validator'       => '0',
-        'List::MoreUtils'       => '0',
+        'JSON::Validator'       => '3.15',
+        'List::MoreUtils'       => '0.423',
         'List::Util'            => '0',    # CORE
         'Log::Any'              => '0',
         'Moo'                   => '0',

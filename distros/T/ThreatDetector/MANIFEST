@@ -1,0 +1,47 @@
+.vstags
+bin/detect.pl
+config/config.json
+data/ip_cache.sqlite
+lib/ThreatDetector/Classifier.pm
+lib/ThreatDetector/Dispatcher.pm
+lib/ThreatDetector/Handlers/BotFingerprint.pm
+lib/ThreatDetector/Handlers/ClientError.pm
+lib/ThreatDetector/Handlers/CommandInjection.pm
+lib/ThreatDetector/Handlers/DirectoryTraversal.pm
+lib/ThreatDetector/Handlers/EncodedPayload.pm
+lib/ThreatDetector/Handlers/HeaderAbuse.pm
+lib/ThreatDetector/Handlers/LoginBruteForce.pm
+lib/ThreatDetector/Handlers/MethodAbuse.pm
+lib/ThreatDetector/Handlers/RateLimiter.pm
+lib/ThreatDetector/Handlers/SQLInjection.pm
+lib/ThreatDetector/Handlers/XSS.pm
+lib/ThreatDetector/Parser.pm
+lib/ThreatDetector/Reporter.pm
+lib/ThreatDetector/ThreatDetector.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/classifier.t
+t/dispatcher.t
+t/handlers-botfp.t
+t/handlers-clienterror.t
+t/handlers-commandinj.t
+t/handlers-dirtrav.t
+t/handlers-encoded.t
+t/handlers-headerabuse.t
+t/handlers-loginbruteforce.t
+t/handlers-methodabuse.t
+t/handlers-ratelimiter.t
+t/handlers-sqli.t
+t/handlers-xss.t
+t/oo-load.t
+t/parser.t
+t/reporter.t
+utils/add_shebang.pl
+utils/check_deps.pl
+utils/find_used_modules.pl
+utils/remote_detect_launcher.pl
+utils/versionUpdate.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,177 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 cee25266425c7b7b206e2ddbae41c5aa0099c32d7fd4e65a9ec8c2d69c0c8680 CONCEPT
+SHA256 5d21e2fcfaa6833daa4a26a375e117c887b473a5e2d0c2032d40b566302c25ef Changes
+SHA256 50cc0acdbd0c823530f3aced1dd2931d1b4adaf88e286da1cbf4ec8f01c0b1dc LICENSE
+SHA256 7d0d2274801a226b8c26115b79af76aeb39db6bb99d25fedce2e2f9a675ed0c3 MANIFEST
+SHA256 1870b0d55fd68127d4c68ea5946a543a6cceb0285a3835aee585a25d893b06e8 META.yml
+SHA256 e073830685ca862b3b4022f4b08da13b83b0bcf8d3822405b80a248e71e8491b Makefile.PL
+SHA256 15418f1d4e7a1f5512974e3ec2ef0972c4e8f731b886f359f1ea807c0ec424b6 README
+SHA256 16a36aef9746b9e64b74a94bdf0923ec21f48a30d22201893eb49285a59f7117 examples/create_and_print_ofn_address.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 e350568b94d9b197e8720389076873916d86fe38cea24a9f52d66ea954a9ba35 lib/Data/OFN/Address.pm
+SHA256 53496c8a05d33445531955385f83cd226feee975e082833aeab13ad26e93fbae lib/Test/Shared/Fixture/Data/OFN/Address/Place.pm
+SHA256 42299f357d975817e00d0d5ec363d5f0cb2a3c754c757805bfcd42624500f8f6 lib/Test/Shared/Fixture/Data/OFN/Address/String.pm
+SHA256 6bf050cf3b8a33758455a510896095163430357ea3547dfa936fb3c2e18dfa65 lib/Test/Shared/Fixture/Data/OFN/Address/Struct.pm
+SHA256 17ed2c6163c1e9c8153bf90d6dc661b07994cbe6b7416504c13d82b1a8eed7bb t/Data-OFN-Address/01-use.t
+SHA256 6d300deecb71dcb4d5e72c7988e26450a4e29e156638e90d1d660e5c308482b5 t/Data-OFN-Address/02-version.t
+SHA256 36b8a69816c8ad4093c953abafa36a9439e77d686ed30b14f8609d700152b5e7 t/Data-OFN-Address/03-new.t
+SHA256 1ad4b4cce43cf8647e72046ec03d3fce769ee2f8c20570b5e25699d96accd36a t/Data-OFN-Address/04-address_place.t
+SHA256 1524070938b66c5ac59004a35b45bfb4565d31d886e14326dea405bc1dd808a8 t/Data-OFN-Address/05-address_place_code.t
+SHA256 40a49a76da8d489310c1df34805a1ac83bb5cfe44c6fd5f868dce2bf75c1c60d t/Data-OFN-Address/06-cadastral_area.t
+SHA256 20f042977b93724c4fe7b084df4ac198f0ce13e6679176b8610adb79013568e1 t/Data-OFN-Address/07-cadastral_area_name.t
+SHA256 9fa0ce53cd7225babde1abace0b2e5157001f5e7602aee35431e8b361e71870d t/Data-OFN-Address/08-conscription_number.t
+SHA256 a4d975e471c6da3d6e1e8c902961066520eb17941acffa7bc732f9bb49d630eb t/Data-OFN-Address/09-conscription_number_flag.t
+SHA256 8092053958b8cdaa227e3e2d10248ced62de4b70e813e3ef0bcdb9cd475c344f t/Data-OFN-Address/10-district.t
+SHA256 9d718024ed0628fd301777cf28d5afa3d5d9bfdd101536054c2c03ad1794719e t/Data-OFN-Address/11-district_name.t
+SHA256 921df3a91623fb7212a29a90de0b8404e4fbe44ea75fc4e72613176454f7a57c t/Data-OFN-Address/12-element_ruian.t
+SHA256 529fd36c6f815a4c466bc461769541942dc11bb3e588f991fb37d434d8eb6de5 t/Data-OFN-Address/13-house_number.t
+SHA256 39ceeb39bd776241a1718990cc93795be15fee54235522e41368617df6156962 t/Data-OFN-Address/14-house_number_type.t
+SHA256 7b5abbb08f537bc417ebfe20b22fac8ab0edf09bb8eb97d13935bf0390c8aadb t/Data-OFN-Address/15-id.t
+SHA256 62533f5d82288e26beb1f852e3bdb3399444da1b4039b19fe0fe4f55ff27dcb7 t/Data-OFN-Address/16-momc.t
+SHA256 944c8ed9ddb34c4be24f2c65391ea9436a0e2823d4e4c0f1be8312d24c4e31e3 t/Data-OFN-Address/17-momc_name.t
+SHA256 d0f1b608ee5afc52ff32f7870a3aded3098e2e060cb2ae48269f7bae580f388e t/Data-OFN-Address/18-mop.t
+SHA256 eefe857dda4633511b3ccabb4a88d1d14664755f8dec9eabb04730fd6fbbd2ed t/Data-OFN-Address/19-mop_name.t
+SHA256 df4f11acf4027e321a9f47c4cb1541b189ea351b785c443e485e33f3a29d3281 t/Data-OFN-Address/20-municipality.t
+SHA256 5f3762419c4405b03b5bab02b1fcc93058c3bc84d71585a21f10d7c08f502610 t/Data-OFN-Address/21-municipality_name.t
+SHA256 a6e73bc473c569c2972f6b67f978093a00c474bc70af9fc3be8f4ed18fc67e6b t/Data-OFN-Address/22-municipality_part.t
+SHA256 e914596933805ee3ee4cc1bab1b37ca650d5e5cd299bb94f4241ce6934e01621 t/Data-OFN-Address/23-municipality_part_name.t
+SHA256 e945a732aef3af1bb42edf6a39abbd5e677d0ac167e2303e3e58c6df4b9acd87 t/Data-OFN-Address/24-psc.t
+SHA256 028abadb1b890bffb06b92b979f4e20ecf7a00679d8068c19a59b700755c391f t/Data-OFN-Address/25-street.t
+SHA256 95c94f362775211b77ebc184b3bca6d74c20df96e72caea0c924af0a27a89960 t/Data-OFN-Address/26-street_name.t
+SHA256 1845e7b21a9e62895b48695082c258a0fcb4d90dbba234de10f39165ec8d25c3 t/Data-OFN-Address/27-text.t
+SHA256 02c3f29c176a683bc675aadfbc1060cd3a1a17a5430d43f82c4549c0e215f7c6 t/Data-OFN-Address/28-vusc.t
+SHA256 712f2ccf06e05f36ac263800d1c0607ea556f2d128d54901c5d41a7eab98d8a3 t/Data-OFN-Address/29-vusc_name.t
+SHA256 a712becfc2ca6cd360c65f24f63e8a544ad1db7e7101a1a2d10053e721cc70b8 t/Test-Shared-Fixture-Data-OFN-Address-Place/01-use.t
+SHA256 6bfb0ecfbc6a991a7fd29a8730d0082cd7041cd5647a7ae33e9d39e4e524cfe8 t/Test-Shared-Fixture-Data-OFN-Address-Place/02-version.t
+SHA256 35eaeb76aceede61dbbecf1f2eb1575e68024376c9c41ade4de2aef7d2b7a127 t/Test-Shared-Fixture-Data-OFN-Address-Place/03-new.t
+SHA256 94bf8378360295d4e24cf8ac9f29a331a96f6f442c246507a43ef47697590203 t/Test-Shared-Fixture-Data-OFN-Address-Place/04-address_place.t
+SHA256 fac2e7c4e580e6fd7969b33be3466e7c7854741824debf57ed4948d3ef5b03da t/Test-Shared-Fixture-Data-OFN-Address-Place/05-address_place_code.t
+SHA256 1681dd20bcf2b264e70ed6b0625a6a5f4a8977aa778089fb6c5da88d0eb3792f t/Test-Shared-Fixture-Data-OFN-Address-Place/06-cadastral_area.t
+SHA256 56fc5b60c96d75af701f9a0b343227f485fbf5fb4f45eff65d9b693d3a87f86a t/Test-Shared-Fixture-Data-OFN-Address-Place/07-cadastral_area_name.t
+SHA256 721d17c571c11ec64ef689062ba6135e06eeb1e4a229b9477ac56633beee3c1f t/Test-Shared-Fixture-Data-OFN-Address-Place/08-conscription_number.t
+SHA256 3a12bc568c9ad5e93537463633417e134ef2affdd27ca10b5f9545c7618c88e5 t/Test-Shared-Fixture-Data-OFN-Address-Place/09-conscription_number_flag.t
+SHA256 6e2bf64a730c62a54ecc90368f3ea4ace82f84b16d705fff9ecb884e08619a4d t/Test-Shared-Fixture-Data-OFN-Address-Place/10-district.t
+SHA256 0f4df550d56029622808a3ec4934bc55217cdecc8dfed9600815562393c6e998 t/Test-Shared-Fixture-Data-OFN-Address-Place/11-district_name.t
+SHA256 95f7412f52e4c17ba94d43548fbc91e8d17a7b988b458689100d4c5a5ea23616 t/Test-Shared-Fixture-Data-OFN-Address-Place/12-element_ruian.t
+SHA256 415b632833dd1f61933e4cb2145bf3eacd6779018c9f56525170ad19d0e5d8ae t/Test-Shared-Fixture-Data-OFN-Address-Place/13-house_number.t
+SHA256 efe3e673c32548737d832b2082204475d89b9bb9f022c07ba19f81706d041b21 t/Test-Shared-Fixture-Data-OFN-Address-Place/14-house_number_type.t
+SHA256 dc4006ca325066f0e9ca71c4916ce9ab6f807e96ff8f95cfc8be6c2d24eb041a t/Test-Shared-Fixture-Data-OFN-Address-Place/15-id.t
+SHA256 34a0c1d6a573105a26e4f4b8795a9991c6d8cc31a0988681abfa794b1eb3bdfa t/Test-Shared-Fixture-Data-OFN-Address-Place/16-momc.t
+SHA256 e17d49edaa793be25212f72f20bd92f7ca4ddefee4edc46d73fd8515d54505db t/Test-Shared-Fixture-Data-OFN-Address-Place/17-momc_name.t
+SHA256 2bb53b6ca4feae15030a1d66f5c6cde161a9ec876b9a07250d4cc7cddb6c5a64 t/Test-Shared-Fixture-Data-OFN-Address-Place/18-mop.t
+SHA256 725635ffac4eb5d79e44ad92188b865be88a500dcce1be22436372ebb71f39b2 t/Test-Shared-Fixture-Data-OFN-Address-Place/19-mop_name.t
+SHA256 6e42d3771df2121668be80c69fa82eebdf43e94998f49b1f982dabee0e19c2ea t/Test-Shared-Fixture-Data-OFN-Address-Place/20-municipality.t
+SHA256 375d7802ad719fd5549af90158d12c7457149dff15c26434294dbb54beef2f91 t/Test-Shared-Fixture-Data-OFN-Address-Place/21-municipality_name.t
+SHA256 4004a9a2d2be1dd92752b65e9d798c17467151ec314c772e9548f9ccfd709552 t/Test-Shared-Fixture-Data-OFN-Address-Place/22-municipality_part.t
+SHA256 9e15b8fffdc3d4a578dd8111a236dfef1ebccd9ef64389b7375cc6f395bfb543 t/Test-Shared-Fixture-Data-OFN-Address-Place/23-municipality_part_name.t
+SHA256 8907f7e26d6015cc7cd6987d3a0e745635b8b508403df3e55e3ed11c016f3fd1 t/Test-Shared-Fixture-Data-OFN-Address-Place/24-psc.t
+SHA256 390b17346339ad41d1e2b7969aa9e8398200090097f16ad7d69162f10e37b278 t/Test-Shared-Fixture-Data-OFN-Address-Place/25-street.t
+SHA256 f564a1e29d007ffeb13ccf320da53d150d620fcc0601d05087f5eefd9bcd7075 t/Test-Shared-Fixture-Data-OFN-Address-Place/26-street_name.t
+SHA256 96929951919e8bb57cb4f8b63f319ccb18ec36f1898793d066ffd3402c5b165e t/Test-Shared-Fixture-Data-OFN-Address-Place/27-text.t
+SHA256 975c5ec07d8e547856c1f58de8f50b21de4b9361e00f7a1402c6d2e4631ca724 t/Test-Shared-Fixture-Data-OFN-Address-Place/28-vusc.t
+SHA256 aeb03099bad928586d35dc913a5815d282bafdee08090215b6b88647a39fcf13 t/Test-Shared-Fixture-Data-OFN-Address-Place/29-vusc_name.t
+SHA256 32dccc2a3ac046a41a263a48b1b85b0a082c8a95427394943484804970a7318b t/Test-Shared-Fixture-Data-OFN-Address-String/01-use.t
+SHA256 14c9076415a6a0deaab9c95ed71467522d83c5a56182cff0d699f869ab47b8f4 t/Test-Shared-Fixture-Data-OFN-Address-String/02-version.t
+SHA256 5d8c46c3d15ef4bdb127ed9e00dd515c227a29f271f2ae9598499e64d49425c9 t/Test-Shared-Fixture-Data-OFN-Address-String/03-new.t
+SHA256 17c021e5f6e7cf625e63650b19b3b0ad93ce83b7c3b3c8148d582a66af004c02 t/Test-Shared-Fixture-Data-OFN-Address-String/04-address_place.t
+SHA256 ce5e70930725d00e014d936d2b00ae8802cd04224609e21495424637b4f665c3 t/Test-Shared-Fixture-Data-OFN-Address-String/05-address_place_code.t
+SHA256 2ac3de0275c7f24b1b03f06bcec03d7a1cde47078426dd7c3e5a8709380e6a7a t/Test-Shared-Fixture-Data-OFN-Address-String/06-cadastral_area.t
+SHA256 0c3a6cc34537bc97a96a4d427e9ea78e9dc8d1aa5d3facff5d359ddebcec9414 t/Test-Shared-Fixture-Data-OFN-Address-String/07-cadastral_area_name.t
+SHA256 f0c9049d30867879fbdbbd8555d394cedd362ce0f96a7aa40b64912de7b62536 t/Test-Shared-Fixture-Data-OFN-Address-String/08-conscription_number.t
+SHA256 b80d21a0f0f7b012eff49e2a88ca38ee78eb61c4d0cfa7220017d0158dd3a957 t/Test-Shared-Fixture-Data-OFN-Address-String/09-conscription_number_flag.t
+SHA256 a43fb875fcea7b7ba1f96d3167575423a724ac935531f319ef535a9a772b41ed t/Test-Shared-Fixture-Data-OFN-Address-String/10-district.t
+SHA256 a5e66e98b2bff658e3ee3b0b1899e2f2b07e2b7559bff0f764abe8dabe1ebd52 t/Test-Shared-Fixture-Data-OFN-Address-String/11-district_name.t
+SHA256 e33e1940f64d8dc9dde0912c13583d9df37d18b5be5b9b45a4d8121924724751 t/Test-Shared-Fixture-Data-OFN-Address-String/12-element_ruian.t
+SHA256 48eb88c881e6b1f1c47853d753a6e17b325202db156a718c37fed54ec566808c t/Test-Shared-Fixture-Data-OFN-Address-String/13-house_number.t
+SHA256 5449995da7aa486e7c23797ab660410a742e74ed9cdbb43c6cde2d7d7d0b7b6d t/Test-Shared-Fixture-Data-OFN-Address-String/14-house_number_type.t
+SHA256 ab68f08ff05dd5aecddf125d25d650b19e66ca2ad6026049edc2399ece0a9c3c t/Test-Shared-Fixture-Data-OFN-Address-String/15-id.t
+SHA256 c048d829fe36ea8562f476eae567ad6df44dd8940e71b02f1ccf514b9ccdfd18 t/Test-Shared-Fixture-Data-OFN-Address-String/16-momc.t
+SHA256 fb29348045f782b0df6a9fc97e83b49f0f74ab6e4f6f32c87ff683b675841f1e t/Test-Shared-Fixture-Data-OFN-Address-String/17-momc_name.t
+SHA256 4b86e50a67a54aad4b85c1afa60a3a211d818ca8818bc66de9d32f9a5e0ce6bc t/Test-Shared-Fixture-Data-OFN-Address-String/18-mop.t
+SHA256 3e4489e12257914ff68f62eb209776e3c0a7263bbe674ba81cfd8fe36dacccd2 t/Test-Shared-Fixture-Data-OFN-Address-String/19-mop_name.t
+SHA256 6b3006fab6001e3a097aad276cb283d661d1c83f258a8de4b9e1b7ae161e6892 t/Test-Shared-Fixture-Data-OFN-Address-String/20-municipality.t
+SHA256 4e4eefb9b5f85dc4a44deddfc2135c58e677d7d15975cb87ffe68ef1aa10ac1e t/Test-Shared-Fixture-Data-OFN-Address-String/21-municipality_name.t
+SHA256 1c12fb85686d8a685a765fbb0e95c00128606e13c46afa8c35ff005bffc55ae4 t/Test-Shared-Fixture-Data-OFN-Address-String/22-municipality_part.t
+SHA256 706c7d4143dacedfc0a0cdf8a8eb5084121c72494670bddff5ebf4f62e7606a6 t/Test-Shared-Fixture-Data-OFN-Address-String/23-municipality_part_name.t
+SHA256 13a2903b931f9ece0856015e4b901b898c20b9af8adce85d2c927dbb68ea6789 t/Test-Shared-Fixture-Data-OFN-Address-String/24-psc.t
+SHA256 3a897656ce184c39547876f9a14d0c99fda2c2e22f9a2439bb8fd2687ae42fdd t/Test-Shared-Fixture-Data-OFN-Address-String/25-street.t
+SHA256 1c9d104c23a8b917272c0d847f5cf6fe4acdc49314d278c678c609c575c6e52d t/Test-Shared-Fixture-Data-OFN-Address-String/26-street_name.t
+SHA256 3d262fc1799816fbe2fdbe6d8e32d8c4168bcdd2cb20003a962291b859984357 t/Test-Shared-Fixture-Data-OFN-Address-String/27-text.t
+SHA256 9889dc7a17f6b78d38fc680db33eff6fd54ae76fe55ef3a9013c81bf96521f00 t/Test-Shared-Fixture-Data-OFN-Address-String/28-vusc.t
+SHA256 9b6005eadf2a4d285f5e81cbcaa278d9e7837ff60b390edcc3eb7e0f4041a235 t/Test-Shared-Fixture-Data-OFN-Address-String/29-vusc_name.t
+SHA256 6367fff3afbcb6d1d78d252beb02aac941b73fad6504573eae5f937a1819e0bc t/Test-Shared-Fixture-Data-OFN-Address-Struct/01-use.t
+SHA256 35fd9b1452bf00a12b06b7ae2a8bc9fe3d9adcc62100c96a514bc1f87365e01f t/Test-Shared-Fixture-Data-OFN-Address-Struct/02-version.t
+SHA256 a516959f3218ff03c1ac2357003432e383e50fde6a02f1f73bf2ed18ba153ba7 t/Test-Shared-Fixture-Data-OFN-Address-Struct/03-new.t
+SHA256 d4110c900adec4b0ce6f6dc75fe22f8d228d83666dd5ef8f4833f89a3175d022 t/Test-Shared-Fixture-Data-OFN-Address-Struct/04-address_place.t
+SHA256 2eba45a5ae10a82fcf82851bf34590c622624ee576bd478e4597dcfdc756cc0a t/Test-Shared-Fixture-Data-OFN-Address-Struct/05-address_place_code.t
+SHA256 8e0138b6c07eeda125959f901a9ccd8e0e7c79115f61de7e87a9c174f4c520a9 t/Test-Shared-Fixture-Data-OFN-Address-Struct/06-cadastral_area.t
+SHA256 e17eae9df25ed7fa7dac4478c9f0057a8a6c647e87dd1936d89bb6e07339c973 t/Test-Shared-Fixture-Data-OFN-Address-Struct/07-cadastral_area_name.t
+SHA256 1373b397c1cec1281632a633d455a754be9503d00643f555386ca4e1e467cc23 t/Test-Shared-Fixture-Data-OFN-Address-Struct/08-conscription_number.t
+SHA256 a64fa001dd6d86edbb94de4dbc08f68ac44b0ed0d312997e072af88f12220ad3 t/Test-Shared-Fixture-Data-OFN-Address-Struct/09-conscription_number_flag.t
+SHA256 78173e921faf8a92e23f79e50871317a09f5798185789b4c91637fcae3916275 t/Test-Shared-Fixture-Data-OFN-Address-Struct/10-district.t
+SHA256 636ad48848e3168f08f391bf40e1af142a297c827cd7f6c073d1b84b48760d26 t/Test-Shared-Fixture-Data-OFN-Address-Struct/11-district_name.t
+SHA256 1bfe754f272d8380bcb5666acdf35054c728fafbf13651a2021053d689ef7243 t/Test-Shared-Fixture-Data-OFN-Address-Struct/12-element_ruian.t
+SHA256 1da4b032e1cbb3c346be564bd37417ec78d254920ce6e57462b9fa9e24c25f31 t/Test-Shared-Fixture-Data-OFN-Address-Struct/13-house_number.t
+SHA256 d3205548bd52b6bd4eda742026110cbd1ecb5bf333c0953efbe37806bc06e9fe t/Test-Shared-Fixture-Data-OFN-Address-Struct/14-house_number_type.t
+SHA256 166ef70565379014b96efb83a43663864ec27f4e5de29340ba1b011705aaa481 t/Test-Shared-Fixture-Data-OFN-Address-Struct/15-id.t
+SHA256 5c1afd40a43e8b9fe3f25d3eb33eec97aaf1f0a53a6fe9d245b1578b76255739 t/Test-Shared-Fixture-Data-OFN-Address-Struct/16-momc.t
+SHA256 04915df87012f04047aa883ac294c08a70a5505b9c1d74bd89cfc8e15d79796a t/Test-Shared-Fixture-Data-OFN-Address-Struct/17-momc_name.t
+SHA256 9102663ab761268b5acbb70ad4af18e69a5df7af9b54679bd51e9f088ac35243 t/Test-Shared-Fixture-Data-OFN-Address-Struct/18-mop.t
+SHA256 eeabe687676ee1ce37ea37a2b994c2e1379a2da5f2c5278ba8a5ed1484288ca7 t/Test-Shared-Fixture-Data-OFN-Address-Struct/19-mop_name.t
+SHA256 8020644495825e7a0224c116d115905cd6a177ef3d7105eaa2fbc333928dacbb t/Test-Shared-Fixture-Data-OFN-Address-Struct/20-municipality.t
+SHA256 d7ccad4f5aaff579df4f3c00009229f15f6556839fa322d48e3785cd14e8ca5e t/Test-Shared-Fixture-Data-OFN-Address-Struct/21-municipality_name.t
+SHA256 62e168c94c4d41e1afa94ece6f5bffb9943c7b4413ca0fb6cedc5628e917963d t/Test-Shared-Fixture-Data-OFN-Address-Struct/22-municipality_part.t
+SHA256 4c1a72e64d4029d0fed2780d9e06e1b63011b0cb088b89a73d969e38d802674a t/Test-Shared-Fixture-Data-OFN-Address-Struct/23-municipality_part_name.t
+SHA256 042c39012708f81dd38c245ea0aabfa3469b9ebe3243ce00c621a0c3419411fc t/Test-Shared-Fixture-Data-OFN-Address-Struct/24-psc.t
+SHA256 66826154b825198e7743b349641d09d6e6c41cd88862e2eb5f5687c258abadef t/Test-Shared-Fixture-Data-OFN-Address-Struct/25-street.t
+SHA256 df4586652ac2dc3762e61bbe52059a581f5aa25c9627a3e1f61c28b1661add05 t/Test-Shared-Fixture-Data-OFN-Address-Struct/26-street_name.t
+SHA256 86c9dfae66506f727aea48d3ece799162b8873c215cc539bd057c4218cffb870 t/Test-Shared-Fixture-Data-OFN-Address-Struct/27-text.t
+SHA256 e6c733638e78e8382f8b3f2645b15ef92f23d810f0bc229f4782b89d604b7a62 t/Test-Shared-Fixture-Data-OFN-Address-Struct/28-vusc.t
+SHA256 15a0734dfc9100a57dda832c0fabac28da96c40c1c84daa7716f28b960b2291b t/Test-Shared-Fixture-Data-OFN-Address-Struct/29-vusc_name.t
+SHA256 65d0252d28522ecc4f5004e4079b6c6824225c66a05f8126da03ebf592ee200a xt/Data-OFN-Address/01-pod_coverage.t
+SHA256 5c0ee62001e2d6f0d1ca2d0dd5a3600d6e7a8cf3172a96f2836379a8cc44e840 xt/Data-OFN-Address/02-pod.t
+SHA256 d614d3f21212d634ad968039126e02cb7ce2357591e27db2fca57538c88f1cdf xt/Test-Shared-Fixture-Data-OFN-Address-Place/01-pod_coverage.t
+SHA256 4a10155974e7bf3acc21df7f74634e888f063b9b0242951ecf47f233b7a9d73c xt/Test-Shared-Fixture-Data-OFN-Address-Place/02-pod.t
+SHA256 4dced59d944eeb675442d2e7379274604ce35da48f0b9695a9195ec069812c83 xt/Test-Shared-Fixture-Data-OFN-Address-String/01-pod_coverage.t
+SHA256 084b226d128af9c2ba1949f694aa79433fa087db22354c121f7384e20a942608 xt/Test-Shared-Fixture-Data-OFN-Address-String/02-pod.t
+SHA256 7696e97c1618a35e75222f3aa77335ae8449666a5b8d1f407dc326fe944b4ec4 xt/Test-Shared-Fixture-Data-OFN-Address-Struct/01-pod_coverage.t
+SHA256 421382bb02b9c65829c54fada2afa66fffef69cb5fb0879d2c89edf86c43d89c xt/Test-Shared-Fixture-Data-OFN-Address-Struct/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmhpd+MACgkQonze/HtI
+OPDyYgwAkjPr4V2LumHdVKzi5AAZj9odffXHb1aFH6OrixnM+V4fO9M1RIolKl6r
+7IoBslJOeCkyA2IUUoLEECoJQdrYQC39dA1mCYUo9zJBkEp+ynASWNN98ZolYvNu
+fD72fcys/kHEnvrx/wtQQMkVzziUyGS/QZnpZYBKAy1oYN7WVd7gWObx1pQQThSL
+27B+YBcwPid45LE9HvRlC0z6nnyJPGxGGVNchQ0YTgJliQM+EzzwY3uKiWU0wK+g
+nuIvICiPFMIY5f8AeUpbYhoykfq0RvxUN5++z9pPthuqGTxwlLBqIrPvs+RUvyvd
+4VwGrqFKHMC4RRLM8jd6K7iyTozk1fsnxtgj2d3HTufwta1VGK0AFwDNJFKuGx5C
+BXEpljDsLInsL1PNHQdnB8tmMWknRBM7ebyIesQsLh1Rv+PM/wVHQGHvLnS1kLGb
+5L0+m1t5GQXTKw/cbpxLdpPXVJTsTxkbrzNMOTsJRpcC4qjTDk+TX4zkrnl9/Z7/
+ue4BAEuy
+=jCAS
+-----END PGP SIGNATURE-----

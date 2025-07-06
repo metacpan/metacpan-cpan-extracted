@@ -1,18 +1,22 @@
 #!/usr/bin/env perl
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
 our $VERSION = '9999.99.99_99'; # VERSION
 
 use Rex::Virtualization;
 use Test::More tests => 7;
-use Test::Warnings;
+use Test::Warnings 0.033 'allow_patterns';
 use Data::Dumper;
 use Rex::Helper::Run;
 use Rex::Commands::File;
 use Rex::Commands::Fs;
 use Rex::Commands::Run;
+
+if ( $ENV{AUTOMATED_TESTING} ) {
+  allow_patterns(qr{\bcompiled[ ]against\b}msx);
+}
 
 $::QUIET = 1;
 

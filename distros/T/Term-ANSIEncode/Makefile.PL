@@ -13,7 +13,7 @@ use ExtUtils::MakeMaker;
 use Term::ReadKey;
 use Term::ANSIColor;
 
-my $line = '-' x 28 . ' ansi-encode ' . '-' x 28;
+my $line = '-' x 33 . ' ansi-encode ' . '-' x 33;
 if (-e 'Makefile') {
 	`make veryclean;reset`;
 }

@@ -1,0 +1,763 @@
+NAME
+    Data::OFN::Address - Data object for OFN address.
+
+SYNOPSIS
+     use Data::OFN::Address;
+
+     my $obj = Data::OFN::Address->new(%params);
+     my $address_place = $obj->address_place;
+     my $address_place_code = $obj->address_place_code;
+     my $cadastral_area = $obj->cadastral_area;
+     my $cadastral_area_name_ar = $obj->cadastral_area_name;
+     my $conscription_number = $obj->conscription_number;
+     my $conscription_number_flag = $obj->conscription_number_flag;
+     my $district = $obj->district;
+     my $district_name_ar = $obj->district_name;
+     my $element_ruian = $obj->element_ruian;
+     my $house_number = $obj->house_number;
+     my $house_number_type = $obj->house_number_type;
+     my $id = $obj->id;
+     my $momc = $obj->momc;
+     my $momc_name_ar = $obj->momc_name;
+     my $mop = $obj->mop;
+     my $mop_name_ar = $obj->mop_name;
+     my $municipality = $obj->municipality;
+     my $municipality_name_ar = $obj->municipality_name;
+     my $municipality_part = $obj->municipality_part;
+     my $municipality_part_name_ar = $obj->municipality_part_name;
+     my $psc = $obj->psc;
+     my $street = $obj->street;
+     my $street_name_ar = $obj->street_name;
+     my $text_ar = $obj->text;
+     my $vusc = $obj->vusc;
+     my $vusc_name_ar = $obj->vusc_name;
+
+DESCRIPTION
+    Immutable data object for OFN (Otevřené formální normy) representation
+    of address in the Czech Republic.
+
+    This object is actual with 2020-07-01
+    <https://ofn.gov.cz/adresy/2020-07-01/> version of OFN address standard.
+
+METHODS
+  "new"
+     my $obj = Data::OFN::Address->new(%params);
+
+    Constructor.
+
+    *       "address_place"
+
+            Address place IRI.
+
+            IRI has format
+            https://linked.cuzk.cz/resource/ruian/adresni-misto/ and unique
+            number on the end.
+
+            It's optional.
+
+    *       "address_place_code"
+
+            Address place numeric code.
+
+            Same number as on the "address_place" end.
+
+            It's optional.
+
+    *       "cadastral_area"
+
+            Address cadastral area IRI.
+
+            IRI has format
+            https://linked.cuzk.cz/resource/ruian/katastralni-uzemi/ and
+            unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "cadastral_area_name"
+
+            Address cadastral area name(s).
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "conscription_number"
+
+            Address consciption number.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "conscription_number_flag"
+
+            Address conscription number type.
+
+            It's possible to set in case if "conscription_number" is set.
+            It's something like "a" if this is defined in real number.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "district"
+
+            Address district IRI.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/okres/ and
+            unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "district_name"
+
+            Address district name(s).
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "element_ruian"
+
+            Address element IRI from the RÚIAN register.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/parcela/
+            and unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "house_number"
+
+            Address house number.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "house_number_type"
+
+            Address house number type.
+
+            Possible term values are:
+
+            *   č.p.
+
+                The building object descriptive number.
+
+            *   č.ev.
+
+                The building registration number.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "id"
+
+            Address id.
+
+            This is not official identifier of address in the Czech
+            Republic. It's used for internal identification like database.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "momc"
+
+            Address city district IRI.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/momc/ and
+            unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "momc_name"
+
+            Address city district name(s).
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "mop"
+
+            Municipal district in the capital city of Prague IRI.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/mop/ and
+            unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "mop_name"
+
+            Municipal district in the capital city of Prague name(s).
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "municipality"
+
+            Municipality or military district IRI.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/obec/ and
+            unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "municipality_name"
+
+            Municipality or military district name(s).
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "municipality_part"
+
+            Part of the village IRI.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/cast-obce/
+            and unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "municipality_part_name"
+
+            Part of the village name(s).
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "psc"
+
+            Zip code.
+
+            The form is 5 character length number.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "street"
+
+            Street IRI.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/ulice/ and
+            unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "street_name"
+
+            Street name.
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "text"
+
+            Address text.
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "vusc"
+
+            Higher territorial self-governing unit IRI.
+
+            IRI has format https://linked.cuzk.cz/resource/ruian/vusc/ and
+            unique number on the end.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "vusc_name"
+
+            Higher territorial self-governing unit name(s).
+
+            This name is in form of reference to array of Data::Text::Simple
+            instances with language definition.
+
+            It's optional.
+
+            Default value is [].
+
+    Returns instance of object.
+
+  "address_place"
+     my $address_place = $obj->address_place;
+
+    Get address place IRI.
+
+    Returns string with IRI.
+
+  "address_place_code"
+     my $address_place_code = $obj->address_place_code;
+
+    Get address place numeric code.
+
+    Returns number.
+
+  "cadastral_area"
+     my $cadastral_area = $obj->cadastral_area;
+
+    Get address cadastral area IRI.
+
+    Returns string with IRI.
+
+  "cadastral_area_name"
+     my $cadastral_area_name_ar = $obj->cadastral_area_name;
+
+    Get address cadastral area name(s).
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "conscription_number"
+     my $conscription_number = $obj->conscription_number;
+
+    Get address consciption number.
+
+    Returns number.
+
+  "conscription_number_flag"
+     my $conscription_number_flag = $obj->conscription_number_flag;
+
+    Get address conscription number type.
+
+    Returns string.
+
+  "district"
+     my $district = $obj->district;
+
+    Get address district IRI.
+
+    Returns string with IRI.
+
+  "district_name"
+     my $district_name_ar = $obj->district_name;
+
+    Get address district name(s).
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "element_ruian"
+     my $element_ruian = $obj->element_ruian;
+
+    Get address element IRI from the RÚIAN register.
+
+    Returns string with IRI.
+
+  "house_number"
+     my $house_number = $obj->house_number;
+
+    Get address house number.
+
+    Returns string.
+
+  "house_number_type"
+     my $house_number_type = $obj->house_number_type;
+
+    Get address house number type.
+
+    Returns string.
+
+  "id"
+     my $id = $obj->id;
+
+    Get OFN address id.
+
+    Returns number.
+
+  "momc"
+     my $momc = $obj->momc;
+
+    Get address city district IRI.
+
+    Returns string with IRI.
+
+  "momc_name"
+     my $momc_name_ar = $obj->momc_name;
+
+    Get address city district name(s).
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "mop"
+     my $mop = $obj->mop;
+
+    Get municipal district in the capital city of Prague IRI.
+
+    Returns string with IRI.
+
+  "mop_name"
+     my $mop_name_ar = $obj->mop_name;
+
+    Get municipal district in the capital city of Prague name(s).
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "municipality"
+     my $municipality = $obj->municipality;
+
+    Get municipality or military district IRI.
+
+    Returns string with IRI.
+
+  "municipality_name"
+     my $municipality_name_ar = $obj->municipality_name;
+
+    Get municipality or military district name(s).
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "municipality_part"
+     my $municipality_part = $obj->municipality_part;
+
+    Get part of the village IRI.
+
+    Returns string with IRI.
+
+  "municipality_part_name"
+     my $municipality_part_name_ar = $obj->municipality_part_name;
+
+    Get part of the village name(s).
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "psc"
+     my $psc = $obj->psc;
+
+    Get zip code.
+
+    Returns number.
+
+  "street"
+     my $street = $obj->street;
+
+    Get street IRI.
+
+    Returns string with IRI.
+
+  "street_name"
+     my $street_name_ar = $obj->street_name;
+
+    Get street name.
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "text"
+     my $text_ar = $obj->text;
+
+    Get address text.
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "vusc"
+     my $vusc = $obj->vusc;
+
+    Get higher territorial self-governing unit IRI.
+
+    Returns string with IRI.
+
+  "vusc_name"
+     my $vusc_name_ar = $obj->vusc_name;
+
+    Get higher territorial self-governing unit name(s).
+
+    Returns reference to array with Data::Text::Simple instances.
+
+ERRORS
+     new():
+             From Mo::utils::check_array_object():
+                     Cadastral area name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     District name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     MOMC name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     MOP name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     Municipality name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     Municipality part name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     Street name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     Text isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     VUSC name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'cadastral_area_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'district_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'momc_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'mop_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'municipality_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'municipality_part_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'street_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'text' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'vusc_name' must be a array.
+                             Value: %s
+                             Reference: %s
+             From Mo::utils::check_length_fix():
+                     Parameter 'psc' has length different than '%s'.
+                             Value: %s
+             From Mo::utils::check_regexp():
+                     Parameter 'address_place' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/adresni-misto/\d+$)
+                     Parameter 'cadastral_area' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/katastralni-uzemi/\d+$)
+                     Parameter 'district' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/okres/\d+)
+                     Parameter 'element_ruian' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/parcela/\d+$)
+                     Parameter 'momc' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/momc/\d+$)
+                     Parameter 'mop' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/mop/\d+$)
+                     Parameter 'municipality' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/obec/\d+$)
+                     Parameter 'municipality_part' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/cast-obce/\d+$)
+                     Parameter 'psc' does not match the specified regular expression.
+                             String: %s
+                             Regexp: ^\d+$
+                     Parameter 'street' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/ulice/\d+$)
+                     Parameter 'vusc' does not match the specified regular expression.
+                             String: %s
+                             Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/vusc/\d+$)
+             From Mo::utils::check_strings():
+                     Parameter 'house_number_type' must be one of defined strings.
+                             String: %s
+                             Possible strings: 'č.p.', 'č.ev.'
+             From Mo::utils::Number::check_positive_natural():
+                     Parameter 'address_place_code' must be a positive natural number.
+                             Value: %s
+                     Parameter 'conscription_number' must be a positive natural number.
+                             Value: %s
+                     Parameter 'house_number' must be a positive natural number.
+                             Value: %s
+                     Parameter 'id' must be a positive natural number.
+                             Value: %s
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::OFN::Address;
+     use Data::Text::Simple;
+     use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+     my $obj = Data::OFN::Address->new(
+             'address_place' => 'https://linked.cuzk.cz/resource/ruian/adresni-misto/83163832',
+             'address_place_code' => 83163832,
+             'cadastral_area' => 'https://linked.cuzk.cz/resource/ruian/katastralni-uzemi/635448',
+             'cadastral_area_name' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => 'Fulnek',
+                     ),
+             ],
+             'conscription_number' => 123,
+             'conscription_number_flag' => 'a',
+             'district' => 'https://linked.cuzk.cz/resource/ruian/okres/3804',
+             'district_name' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => decode_utf8('Nový Jičín'),
+                     ),
+             ],
+             'element_ruian' => 'https://linked.cuzk.cz/resource/ruian/parcela/91188411010',
+             'house_number' => 386,
+             'house_number_type' => decode_utf8('č.p.'),
+             'id' => 7,
+             'municipality' => 'https://linked.cuzk.cz/resource/ruian/obec/599352',
+             'municipality_name' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => 'Fulnek',
+                     ),
+             ],
+             'municipality_part' => 'https://linked.cuzk.cz/resource/ruian/cast-obce/413551',
+             'municipality_part_name' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => 'Fulnek',
+                     ),
+             ],
+             'psc' => 74245,
+             'street' => 'https://linked.cuzk.cz/resource/ruian/ulice/309184',
+             'street_name' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => decode_utf8('Bílovecká'),
+                     ),
+             ],
+             'text' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => decode_utf8('Bílovecká 386, 74245 Fulnek'),
+                     ),
+             ],
+             'vusc' => 'https://linked.cuzk.cz/resource/ruian/vusc/132',
+             'vusc_name' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => decode_utf8('Moravskoslezský kraj'),
+                     ),
+             ],
+     );
+
+     sub _text {
+             my $obj = shift;
+
+             return encode_utf8($obj->text.' ('.$obj->lang.')');
+     }
+
+     # Print out.
+     print 'Address place: '.$obj->address_place."\n";
+     print 'Address place code: '.$obj->address_place_code."\n";
+     print 'Cadastral area: '.$obj->cadastral_area."\n";
+     print 'Cadastral area name: '._text($obj->cadastral_area_name->[0])."\n";
+     print 'Conscription number: '.$obj->conscription_number."\n";
+     print 'Conscription number flag: '.$obj->conscription_number_flag."\n";
+     print 'District: '.$obj->district."\n";
+     print 'District name: '._text($obj->district_name->[0])."\n";
+     print 'Element RUIAN: '.$obj->element_ruian."\n";
+     print 'House number: '.$obj->house_number."\n";
+     print 'House number type: '.encode_utf8($obj->house_number_type)."\n";
+     print 'Id: '.$obj->id."\n";
+     print 'Municipality: '.$obj->municipality."\n";
+     print 'Municipality name: '._text($obj->municipality_name->[0])."\n";
+     print 'Municipality part: '.$obj->municipality_part."\n";
+     print 'Municipality part name: '._text($obj->municipality_part_name->[0])."\n";
+     print 'PSC: '.$obj->psc."\n";
+     print 'Street: '.$obj->street."\n";
+     print 'Street name: '._text($obj->street_name->[0])."\n";
+     print 'Text: '._text($obj->text->[0])."\n";
+     print 'VUSC: '.$obj->vusc."\n";
+     print 'VUSC name: '._text($obj->vusc_name->[0])."\n";
+
+     # Output:
+     # Address place: https://linked.cuzk.cz/resource/ruian/adresni-misto/83163832
+     # Address place code: 83163832
+     # Cadastral area: https://linked.cuzk.cz/resource/ruian/katastralni-uzemi/635448
+     # Cadastral area name: Fulnek (cs)
+     # Conscription number: 123
+     # Conscription number flag: a
+     # District: https://linked.cuzk.cz/resource/ruian/okres/3804
+     # District name: Nový Jičín (cs)
+     # Element RUIAN: https://linked.cuzk.cz/resource/ruian/parcela/91188411010
+     # House number: 386
+     # House number type: č.p.
+     # Id: 7
+     # Municipality: https://linked.cuzk.cz/resource/ruian/obec/599352
+     # Municipality name: Fulnek (cs)
+     # Municipality part: https://linked.cuzk.cz/resource/ruian/cast-obce/413551
+     # Municipality part name: Fulnek (cs)
+     # PSC: 74245
+     # Street: https://linked.cuzk.cz/resource/ruian/ulice/309184
+     # Street name: Bílovecká (cs)
+     # Text: Bílovecká 386, 74245 Fulnek (cs)
+     # VUSC: https://linked.cuzk.cz/resource/ruian/vusc/132
+     # VUSC name: Moravskoslezský kraj (cs)
+
+DEPENDENCIES
+    Error::Pure Mo, Mo::utils, Readonly, Unicode::UTF8.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-OFN-Address>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

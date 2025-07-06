@@ -1,31 +1,56 @@
-Changes		A change history
-Gnu.pm		The GNU Readline extension Perl module
-Gnu.xs		The GNU Readline extension external subroutines
+# This file lists the files included in Term::ReadLine::Gnu module distribution
+
+Changes                 A change history
+INSTALL.md              Installation instructions
+MANIFEST                This list of files
+Makefile.PL             The GNU Readline extension makefile writer
+README.md               The Instructions
+ppport.h                Perl/Pollution/Portability Version 3.68
+typemap                 The GNU Readline extension interface types
+
+# Main Module Files
+Gnu.pm                  The GNU Readline extension Perl module
+Gnu.xs                  The GNU Readline extension external subroutines
 Gnu/XS.pm
-INSTALL.md	Installtion instructions
-MANIFEST	This list of files
-Makefile.PL	The GNU Readline extension makefile writer
-README.md	The Instructions
-eg/perlsh	A powerful calculator
-eg/fileman	A short completion example
-eg/pftp		An ftp client with the GNU Readline support
-eg/ptksh+	Simple perl/Tk shell which demonstrates the callback functions
-ppport.h	Perl/Pollution/Portability Version 1.0007
-t/comptest/0123		A file for t/readline.t
-t/comptest/012345	A file for t/readline.t
-t/comptest/023456	A file for t/readline.t
-t/comptest/README	A file for t/readline.t
-t/comptest/a_b		A file for t/readline.t
-t/00checkver.t	A version check script
-t/01test_use.t	A test for "use Term::ReadLine"
-t/02test_use.t	A test for "use Term::ReadLine"
-t/callback.t	A test script for the GNU Readline callback function
-t/history.t	A test script for the GNU History Library function
-t/inputrc	A file for t/readline.t
-t/readline.t	A test script for the GNU Readline Library function
-t/utf8_binary.t	A test script for UTF-8 binary string
-t/utf8_text.t	A test script for UTF-8 text string
-t/utf8.txt	A file for t/utf8_*.t
-typemap		The GNU Readline extension interface types
+
+# Test Scripts
+t/comptest/0123         A file for t/readline.t
+t/comptest/012345       A file for t/readline.t
+t/comptest/023456       A file for t/readline.t
+t/comptest/README       A file for t/readline.t
+t/comptest/a_b          A file for t/readline.t
+t/00checkver.t          A version check script
+t/01test_use.t          A test for "use Term::ReadLine"
+t/02test_use.t          A test for "use Term::ReadLine"
+t/callback.t            A test script for the GNU Readline callback function
+t/history.t             A test script for the GNU History Library function
+t/inputrc               A file for t/readline.t
+t/readline.t            A test script for the GNU Readline Library function
+t/utf8_binary.t         A test script for UTF-8 binary string
+t/utf8_text.t           A test script for UTF-8 text string
+t/utf8.txt              A file for t/utf8_*.t
+
+# Sample Scripts
+eg/perlsh               A Perl REPL supporting line-editing and completion.  Can be used as a powerful calculator
+eg/pftp                 An ftp client with the GNU Readline support
+eg/ptksh+               A simple perl/Tk shell which demonstrates the callback functions
+
+# The following are ported from the examples in the GNU Readline Library distribution.
+eg/rlversion            Print out readline's version number
+eg/rlbasic              A basic readline() loop example
+eg/manexamp             2.1 Basic Behavior: rl_gets(), 2.4.13 A Readline Example: invert_case_line()
+eg/rltest               readline() loop + add_history() + history_list()
+eg/rl                   readline() loop + ri_startup_hook, rl_insert_text(), rl_instream, rl_num_chars_to_read
+eg/rlevent              rl + rl_event_hook
+eg/rlkeymaps            Tests for keymap functions
+eg/histexamp            The GNU History Library example program
+eg/rl-callbacktest      2.4.14 Alternate Interface Example
+eg/rl-callbacktest2     Provides readline()-like interface using the alternate interface
+eg/rl-callbacktest3     rl-callbacktest + sigint_handler() + rl_getc_function
+eg/excallback           Alternate interface + rl_set_prompt()
+eg/rlptytest            Another alternate interface example using pty
+eg/rl-timeout           Test various readline builtin timeouts
+eg/rlcat                cat(1) using readline
+eg/fileman              2.6.4 A Short Completion Example: file manager example for readline library
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

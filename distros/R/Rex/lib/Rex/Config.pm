@@ -30,10 +30,10 @@ While it's possible to use the methods below to set a configuration option direc
 
 package Rex::Config;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Rex::Helper::File::Spec;
 use Rex::Logger;
@@ -731,6 +731,7 @@ The value should be set as an array reference, and will be dereferenced as such 
 Default is
 
  qw(
+   /usr/gnu/bin
    /bin
    /sbin
    /usr/bin
@@ -750,10 +751,16 @@ sub set_path {
 
 sub get_path {
   if ( !$path ) {
-    return (
-      "/bin",         "/sbin",          "/usr/bin",
-      "/usr/sbin",    "/usr/local/bin", "/usr/local/sbin",
-      "/usr/pkg/bin", "/usr/pkg/sbin"
+    return qw(
+      /usr/gnu/bin
+      /bin
+      /sbin
+      /usr/bin
+      /usr/sbin
+      /usr/local/bin
+      /usr/local/sbin
+      /usr/pkg/bin
+      /usr/pkg/sbin
     );
   }
   return @{$path};

@@ -4,10 +4,10 @@
 
 package Rex::Hardware::Host;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use English qw(-no_match_vars);
 use Rex;
@@ -57,7 +57,7 @@ sub get {
   else {
     my @out = i_run "hostname -f 2>/dev/null", fail_ok => 1;
 
-    if ( $? == 0 ) {
+    if ( $? == 0 && defined $out[0] ) {
       ( $hostname, $domain ) = split( /\./, $out[0], 2 );
     }
     else {

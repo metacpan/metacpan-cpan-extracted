@@ -1,28 +1,31 @@
 ---
-abstract: 'Perl extension for embedding Lua scripts into Perl code'
+abstract: unknown
 author:
-  - 'Rob Hoelz <rob@hoelz.ro>'
+  - 'Andrew D. France <andrewforlua@gmail.com>'
 build_requires:
-  File::Spec: '0'
-  IO::Handle: '0'
-  IPC::Open3: '0'
-  Test::More: '0'
-configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
-license: perl
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  FFI::Build::File::Cargo: '0.17'
+  FFI::Build::MM: '2.00'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Inline-Lua
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Inline: '0'
-  Test::Exception: '0'
-  perl: v5.8.8
+  Cpanel::JSON::XS: '4.00'
+  FFI::Platypus: '2.00'
+  FFI::Platypus::Lang::Rust: '0.11'
+  JSON::MaybeXS: '1.004000'
 resources:
-  bugtracker: https://github.com/hoelzro/inline-lua/issues
-  homepage: https://github.com/hoelzro/inline-lua
-  repository: https://github.com/hoelzro/inline-lua.git
-version: '0.17'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  bugtracker: https://github.com/ItsMeForLua/Inline-Lua/issues
+  repository: https://github.com/ItsMeForLua/Inline-Lua.git
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

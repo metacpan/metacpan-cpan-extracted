@@ -1,0 +1,1 @@
+/home/andreu/projectstuff/inline-lua/ffi/target/release/libinline_lua_backend.so: /home/andreu/projectstuff/inline-lua/ffi/fennel.lua /home/andreu/projectstuff/inline-lua/ffi/src/error.rs /home/andreu/projectstuff/inline-lua/ffi/src/lib.rs /home/andreu/projectstuff/inline-lua/ffi/src/runtime.rs

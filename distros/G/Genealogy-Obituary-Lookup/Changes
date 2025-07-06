@@ -1,0 +1,93 @@
+Revision history for Genealogy::Obituary::Lookup
+
+0.18	Sat Jul  5 21:28:33 EDT 2025
+	Updated the MANIFEST with the new module name (Fixes Github#9)
+
+0.17	Sat Jul  5 09:00:03 EDT 2025
+	Use Object::Configure
+	Use Params::Get in new()
+	Changed from Genealogy::ObituaryDailyTimes to Genealogy::Obituary::Lookup
+
+0.16	Tue Apr 15 08:25:19 EDT 2025
+	Entries taken down on funeral-notices.co.uk do not return 404
+	Added config_file argument to new()
+	If just one argument is given it is taken to be "directory"
+	Use Data::Reuse
+	Use Config::Abstraction instead of Config::Auto
+
+0.15	Thu Mar  6 07:45:33 EST 2025
+	Started to add code to index funeral-notices.co.uk
+	Added bin/extract
+	Use Test::HTTPStatus
+
+0.14	Mon Jan  6 14:06:53 EST 2025
+	Added t/30-basics.t
+	Added volume 30 (2025)
+
+0.13	Sun Sep 15 14:52:02 EDT 2024
+	search() can now just take one parameter which is the last name
+	Added CircleCI, Coveralls and Codecov
+	Fix test for init() value
+	t/obituaries.t: fix test on systems without MLARCHIVE_DIR
+		http://www.cpantesters.org/report/4d79ae70-3e18-11ef-ac77-928c3be27139
+
+0.12	Wed Jun 19 21:01:56 EDT 2024
+	t/carp.t could sometimes fail
+	Added t/version.t
+	Use directory from Database::Abstraction::init, if that is set
+	Import "other" file from MLARCHIVES_DIR
+	Import DATA section of bin/create_db.PL for locally added data
+
+0.11	Thu Feb  8 09:03:49 EST 2024
+	Added first, last, age as an index
+	Renamed database to data
+	Use Database::Abstraction
+	Improved argument checking for 'directory'
+	Try using the Wayback machine archive
+	Get the 2024 data from Freelists
+	"make realclean" now removes the database
+
+0.10	Sun Oct 15 16:04:03 EDT 2023
+	Latest DB.pm from NJH-Snippets
+	Allow new() to take a ref to a hash of arguments
+
+0.09	Sat Jun 24 09:14:41 EDT 2023
+	create_db failed on 5.36.1
+	freelists now separate lines by <br/> instead of <br />
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
+0.08	Fri Feb 24 18:03:24 EST 2023
+	Halved the size of the database
+	Avoid adding duplicates into the database
+	Added volume 28
+	Refactored handling of "<br>" and "<br />" in the input files
+
+0.07	Thu Apr  7 09:24:57 EDT 2022
+	Remove the column called "VARCHAR"
+	Fix test for Coppage now that the database has more than one entry for John Coppage
+	Added '-f' option to bin/create_db.PL to force a database build
+	Added volume 27
+
+0.06	Thu Apr  8 09:00:35 EDT 2021
+	Reduce the amount of memory that bin/create_db uses
+	Error if 'last' is not given to search()
+	Latest freelists were not being imported
+	Added middle name column
+
+0.05	Thu Mar 25 18:02:30 EDT 2021
+	2021 is v26 on freelists
+	Faster database import
+
+0.04	Wed Dec 30 09:45:11 EST 2020
+	Remove old sqlite file before re-creating it
+	Stash the URL in the database
+	Improved parser imports more data and dies on failure
+
+0.03	Mon Nov 23 08:13:44 EST 2020
+	Fix https://www.cpantesters.org/cpan/report/2d3bc734-2d40-11eb-84bc-edd243e66a77
+
+0.02	Sun Nov 22 10:59:25 EST 2020
+	Dereference the return so that we get an array of hash refs
+
+0.01	Sat Nov 21 21:17:41 EST 2020
+	First draft

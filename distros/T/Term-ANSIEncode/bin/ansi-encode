@@ -58,8 +58,8 @@ GetOptions(
     'version' => \$version,
     'help'    => \$help,
     'tokens'  => \$tokens,
-	'colors'  => \$colors,
-	'symbols' => \$symbols,
+    'colors'  => \$colors,
+    'symbols' => \$symbols,
 );
 
 my $text = <<'VERSION';
@@ -139,9 +139,9 @@ my $small = <<'SMALL';
 ╚══════════════════════════════════════════════╝
 SMALL
 
-my $greydient = ''; # Yes, the spelling is intentional
+my $greydient = '';    # Yes, the spelling is intentional
 foreach my $c (0 .. 23) {
-	$greydient .= "[% B_GREY$c %] ";
+    $greydient .= "[% B_GREY$c %] ";
 }
 $greydient .= '[% RESET %]';
 my $to = <<'TOKENS';
@@ -257,7 +257,6 @@ TOKENS
 ###
 $to =~ s/\[\% GREYDIENT \%\]/$greydient/g;
 
-
 if ($version) {
     $| = 1;
     $ansi->ansi_output($text, 0);
@@ -267,54 +266,71 @@ if ($version) {
     $| = 1;
     $ansi->ansi_output($small, 0);
 } elsif ($tokens) {
-	$ansi->ansi_output($to,0);
+    $ansi->ansi_output($to, 0);
 } elsif ($symbols) {
-	my @names;
-	my $search = pop(@ARGV);
-	if (defined($search) && $search ne '') {
-		@names = grep(/$search/i,(sort(keys %{$ansi->{'characters'}})));
-	} else {
-		@names = (sort(keys %{$ansi->{'characters'}}));
-	}
-	my $size = 0;
-	foreach my $name (@names) {
-		$size = max($size,length($name));
-	}
-	my $temp = "\nSYMBOL TOKEN NAMES\n" . '╭─' . '─' x $size . '─╮' . "\n";
+    my @names;
+    my $search = pop(@ARGV);
+    if (defined($search) && $search ne '') {
+        @names = grep(/$search/i, (sort(keys %{ $ansi->{'characters'} })));
+    } else {
+        @names = (sort(keys %{ $ansi->{'characters'} }));
+    }
+    my $size = 0;
+    foreach my $name (@names) {
+        $size = max($size, length($name));
+    }
+    my $temp = "\nSYMBOL TOKEN NAMES\n" . '╭─' . '─' x $size . '─╮' . "\n";
     while (scalar(@names)) {
-		my $name = shift(@names);
-		if ($name =~ /^COMBINING/) {
-			$temp .= sprintf('│ %-' . $size . 's │   %s', $name, $ansi->{'characters'}->{$name}) . "\n";
+        my $name = shift(@names);
+        if ($name =~ /^COMBINING/) {
+            $temp .= sprintf('│ %-' . $size . 's │   %s', $name, $ansi->{'characters'}->{$name}) . "\n";
+        } else {
+            $temp .= sprintf('│ %-' . $size . 's │ %s', $name, $ansi->{'characters'}->{$name}) . "\n";
+        }
+    } ## end while (scalar(@names))
+    $temp .= '╰─' . '─' x $size . '─╯' . "\n\n";
+    $ansi->ansi_output($temp, 0);
+} elsif ($colors) {
+	my $grey = chr(27) . '[38;5;235m';
+	my $off  = chr(27) . '[0m';
+	print "\nANSI Colors and GREY colors\n";
+	print $grey, '╭────┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──╮', $off, "\n";
+	print $grey, '│', $off, 'ANSI';
+	foreach my $i (0..35) {
+		printf('%s│%s%2d',$grey,$off,$i);
+	}
+	print $grey, "│\n├────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤", $off, "\n";
+	printf('%s│%s %3d%s│%s', $grey, $off, 0, $grey, $off);
+	foreach my $i (0..35) {
+		if ($i <= 15) {
+			print chr(27), '[48;5;', $i, 'm  ', $off, $grey, '│', $off;
 		} else {
-			$temp .= sprintf('│ %-' . $size . 's │ %s', $name, $ansi->{'characters'}->{$name}) . "\n";
+			print '  ', $grey, '│', $off;
 		}
 	}
-	$temp .= '╰─' . '─' x $size . '─╯' . "\n\n";
-	$ansi->ansi_output($temp,0);
-} elsif ($colors) {
-	print "=== ANSI COLORS ===\n";
-	foreach my $c (0 .. 231) {
-		my $s = "$c \[\% B_ANSI$c \%\]" . ' ' x 60 . '[% RESET %]' . "\n";
-		$s = ' ' . $s if ($c < 10);
-		$s = ' ' . $s if ($c < 100);
-        $ansi->ansi_output($s, 0);
+	foreach my $i (0..6) {
+		my $_i = ($i * 36) + 16;
+		print "\n", $grey, '├────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤', $off, "\n";
+		if ($i == 6) {
+			print $grey, '│', $off, 'GREY', $grey, '│', $off;
+		} else {
+			printf("%s│%s %3d%s│%s",$grey,$off,$_i,$grey,$off);
+		}
+		foreach my $j (0..35) {
+			print chr(27),'[48;5;',($_i+$j),'m  ',chr(27),'[m', $grey, '│', $off;
+		}
 	}
-	print "=== GREYS ===\n";
-	foreach my $g (0 .. 23) {
-		my $s = " $g \[\% B_GREY$g \%\]" . ' ' x 60 . '[% RESET %]' . "\n";
-		$s = ' ' . $s if ($g < 10);
-        $ansi->ansi_output($s, 0);
-	}
+	print "\n", $grey, '╰────┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──╯', $off, "\n";
 } else {
     my $file = $ARGV[0];
     if (defined($file) && -e $file) {
         $text = do { local (@ARGV, $/) = $file; <> };
         $ansi->ansi_output($text, 0);
     } else {
-		$| = 1;
-		$ansi->ansi_output($small, 0);
-	}
-}
+        $| = 1;
+        $ansi->ansi_output($small, 0);
+    }
+} ## end else [ if ($version) ]
 
 exit;
 

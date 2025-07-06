@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+#
+# rltest: readline() + add_history() + history_list()
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/rltest.c in the GNU Readline Library
+#   Copyright (C) 1987-2009,2023 Free Software Foundation, Inc.
+
+use strict;
+use warnings;
+use Term::ReadLine;
+
+my $t = new Term::ReadLine 'rltest';
+
+my $prompt = 'readline$ ';
+my $done   = 0;
+while (!$done) {
+    # use full qualified name not to call addhistory() implicitly.
+    my $temp = Term::ReadLine::Gnu::XS::rl_readline($prompt);
+    exit 1 unless defined $temp;
+
+    if ($temp) {
+        print STDERR "$temp\n";
+        $t->addhistory($temp);
+    }
+    $done = 1 if $temp eq 'quit';
+
+    if ($temp eq 'list') {
+        my @list = $t->history_list();
+        foreach my $i (@list) {
+            print STDERR "$i\n";
+        }
+    }
+}
+exit 0;

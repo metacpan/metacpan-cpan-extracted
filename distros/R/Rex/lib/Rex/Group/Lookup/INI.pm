@@ -21,10 +21,10 @@ With this module you can define host groups in an INI style file.
 
 package Rex::Group::Lookup::INI;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Rex -base;
 

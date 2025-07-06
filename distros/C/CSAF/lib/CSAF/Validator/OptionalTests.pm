@@ -270,13 +270,13 @@ sub TEST_6_2_11 {
 
         my ($reference, $ref_idx) = @_;
 
-        return if (!$reference->category eq 'self');
+        return if ($reference->category ne 'self');
 
         $have_self = 1;
 
         my $url = $reference->url;
 
-        if (!$url =~ /^https\:/) {
+        if ($url !~ /^https\:/) {
             return $self->add_message(
                 type     => 'warning',
                 category => 'optional',
@@ -942,7 +942,7 @@ L<https://github.com/giterlizzi/perl-CSAF>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

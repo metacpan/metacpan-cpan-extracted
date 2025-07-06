@@ -1,5 +1,8 @@
 Change history for CVSS
 
+1.14 2025-07-05
+    - FIX "Possible precedence problem between ! and %s" in Perl 5.42
+
 1.13 2024-08-16
     - Return undef in "to_vector_string" if any of "base" metrics is missing
 

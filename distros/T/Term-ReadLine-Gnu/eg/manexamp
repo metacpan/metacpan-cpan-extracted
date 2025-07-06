@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+#
+# manexamp -- The examples which appear in the documentation are here.
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/manexamp.c in the GNU Readline Library
+#   Copyright (C) 1987-2023 Free Software Foundation, Inc.
+
+use strict;
+use warnings;
+use Term::ReadLine;
+
+my $t = new Term::ReadLine 'manexamp';
+my $a = $t->Attribs;
+
+# ****************************************************************
+#
+#   			How to Emulate gets ()
+#
+# ****************************************************************
+# https://tiswww.case.edu/php/chet/readline/readline.html#Basic-Behavior
+
+# Read a string, and return it.  Returns undef on EOF.
+sub rl_gets () {
+    return $t->readline('');
+}
+
+# ****************************************************************
+#
+#        Writing a Function to be Called by Readline.
+#
+# ****************************************************************
+# https://tiswww.case.edu/php/chet/readline/readline.html#A-Readline-Example
+
+# Invert the case of the COUNT following characters.
+sub invert_case_line {
+    my ($count, $key) = @_;
+
+    my $start = $a->{point};
+
+    return 0 if $start >= $a->{end};
+
+    # Find the end of the range to modify.
+    my $end = $start + $count;
+
+    # Force it to be within range.
+    if ($end > $a->{end}) {
+        $end = $a->{end};
+    } elsif ($end < 0) {
+        $end = 0;
+    }
+
+    return 0 if $start == $end;
+
+    # For positive arguments, put point after the last changed character. For
+    # negative arguments, put point before the last changed character.
+    $a->{point} = $end;
+
+    # Swap start and end if we are moving backwards.
+    if ($start > $end) {
+        my $temp = $start;
+        $start = $end;
+        $end   = $temp;
+    }
+
+    # Tell readline that we are modifying the line, so it will save
+    # undo information.
+    $t->modifying($start, $end);
+
+    # I'm happy with Perl :-)
+    substr($a->{line_buffer}, $start, $end - $start) =~ tr/A-Za-z/a-zA-Z/;
+
+    return 0;
+}
+
+$t->initialize();
+$t->add_defun('invert-case-line', \&invert_case_line);
+$t->bind_key(ord 'c', 'invert-case-line', 'emacs-meta');
+while (defined($_ = rl_gets())) {
+    invert_case_line(1, '');
+    print "$_\n";
+}
+exit 0;

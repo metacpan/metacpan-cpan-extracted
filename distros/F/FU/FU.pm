@@ -1,4 +1,4 @@
-package FU 1.1;
+package FU 1.2;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
@@ -503,6 +503,7 @@ sub _supervisor($c) {
             die $! if !defined $pid;
             if (!$pid) { # child
                 $SIG{CHLD} = $SIG{HUP} = $SIG{INT} = $SIG{TERM} = undef;
+                $0 = sprintf '%s: starting', $procname if $procname;
                 # In error state, wait with loading the script until we've received a request.
                 # Otherwise we'll end up in an infinite spawning loop if the script doesn't start properly.
                 $client = $c->{listen_sock}->accept() or die $! if !$client && $err;

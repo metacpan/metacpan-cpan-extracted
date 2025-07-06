@@ -4,15 +4,16 @@
 
 package Rex::Inventory::SMBios;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Data::Dumper;
 use Rex::Logger;
 use Rex::Commands::Run;
 use Rex::Helper::Run;
+use English qw(-no_match_vars);
 
 use Rex::Inventory::SMBios::BaseBoard;
 use Rex::Inventory::SMBios::Bios;
@@ -114,6 +115,12 @@ sub _read_smbios {
   my ($self) = @_;
 
   my @data = i_run( "smbios", fail_ok => 1 );
+
+  if ( $CHILD_ERROR != 0 ) {
+    Rex::Logger::debug('Error running smbios. Output:');
+    Rex::Logger::debug( join "\n", @data );
+    return;
+  }
 
   my ( $current_section, %section, $key, $val, %cur_data );
   for my $line (@data) {

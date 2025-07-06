@@ -42,7 +42,7 @@ on 'develop' => sub {
   requires "ExtUtils::Manifest" => "1.68";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Software::Security::Policy::Individual" => "0.10";
-  requires "Test::CPAN::Changes" => "0";
+  requires "Test::CPAN::Changes" => "0.19";
   requires "Test::DistManifest" => "0";
   requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";
@@ -55,6 +55,7 @@ on 'develop' => sub {
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Portability::Files" => "0";
+  requires "Test::Spelling" => "0.17";
   requires "Test::TrailingSpace" => "0.0203";
   requires "Test::Vars" => "0.015";
 };

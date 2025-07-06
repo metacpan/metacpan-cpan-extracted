@@ -1,7 +1,7 @@
 #
 #       Gnu.pm --- The GNU Readline/History Library wrapper module
 #
-#       Copyright (c) 1996-2023 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 1996-2025 Hiroo Hayashi.  All rights reserved.
 #
 #       This program is free software; you can redistribute it and/or
 #       modify it under the same terms as Perl itself.
@@ -54,7 +54,7 @@ Features">
 
 The sample programs under F<eg/> directory and test programs under
 F<t/> directory in L<the C<Term::ReadLine::Gnu> distribution|http://search.cpan.org/dist/Term-ReadLine-Gnu/> include
-many examples of this module.
+many examples of this module.  See F<eg/README.md> for details on F<eg/> directory.
 
 =head2 Standard Methods
 
@@ -84,10 +84,15 @@ BEGIN {
     $ENV{TERM} = 'dumb' unless defined($ENV{TERM});
 
     # Use Term::ReadLine::Stub in Emacs
-    # as bash does not do line-editing in the case. (cf. bash-5.2/shell.c)
+    # as bash does not do line-editing in the case.
     # https://rt.cpan.org/Ticket/Display.html?id=123398
     # https://github.com/hirooih/perl-trg/issues/11
-    if ($ENV{TERM} eq "emacs" || defined($ENV{EMACS}) || defined($ENV{INSIDE_EMACS})) {
+    # https://github.com/hirooih/perl-trg/issues/28
+    # https://git.savannah.gnu.org/cgit/bash.git/tree/shell.c#n595
+    my $in_emacs = defined($ENV{INSIDE_EMACS})
+            || (defined($ENV{EMACS})
+                && ($ENV{EMACS} =~ / \(term:/ || $ENV{EMACS} eq "t"));
+    if ($ENV{TERM} eq "emacs" || $in_emacs && $ENV{TERM} eq "dumb") {
         croak "Use Term::ReadLine::Stub.";
     }
 }
@@ -96,7 +101,7 @@ BEGIN {
     use Exporter ();
     use DynaLoader;
 
-    our $VERSION = '1.46';              # update Gnu::XS::VERSION also.
+    our $VERSION = '1.47';              # update Gnu::XS::VERSION also.
 
     # Term::ReadLine::Gnu::AU makes a function in
     # `Term::ReadLine::Gnu::XS' as a method.
@@ -107,6 +112,7 @@ BEGIN {
                   Exporter DynaLoader);
 
     our %EXPORT_TAGS = (
+        readerr =>      [qw(READERR)],
         prompt =>       [qw(RL_PROMPT_START_IGNORE RL_PROMPT_END_IGNORE)],
         match_type =>   [qw(NO_MATCH SINGLE_MATCH MULT_MATCH)],
         keymap_type =>  [qw(ISFUNC ISKMAP ISMACR)],
@@ -125,9 +131,10 @@ BEGIN {
                             RL_STATE_MULTIKEY RL_STATE_VICMDONCE
                             RL_STATE_CHARSEARCH RL_STATE_REDISPLAYING
                             RL_STATE_DONE RL_STATE_TIMEOUT
-                            RL_STATE_EOF
+                            RL_STATE_EOF RL_STATE_READSTR
                             )],
         );
+    Exporter::export_ok_tags('readerr');
     Exporter::export_ok_tags('prompt');
     Exporter::export_ok_tags('match_type');
     Exporter::export_ok_tags('keymap_type');
@@ -173,6 +180,10 @@ our %Features = (
 # readline.h, etc.  But it needs some calling convention change and
 # will cause compatiblity problem. I hope the definition of these
 # constant value will not be changed.
+
+# Input error; can be returned by (*rl_getc_function) if readline is reading
+# a top-level command (RL_ISSTATE (RL_STATE_READCMD)).
+sub READERR      { -2; }
 
 # for non-printing characters in prompt string
 sub RL_PROMPT_START_IGNORE      { "\001"; }
@@ -225,11 +236,12 @@ sub RL_STATE_REDISPLAYING       {              # updating terminal display [6.1]
 }
 sub RL_STATE_DONE {                            # done; accepted line
     $readline_version < 0x0501 ? 0x8_0000 :
-        ($readline_version < 0x0601 ? 0x80_0000 :
-         ($readline_version < 0x0700 ? 0x100_0000 : 0x200_0000));
+    $readline_version < 0x0601 ? 0x80_0000 :
+    $readline_version < 0x0700 ? 0x100_0000 : 0x200_0000;
 }
 sub RL_STATE_TIMEOUT            { 0x400_0000; } # [8.2]
 sub RL_STATE_EOF                { 0x800_0000; } # [8.2]
+sub RL_STATE_READSTR            { 0x1000_0000; } # [8.3] reading a string for M-x
 
 #
 #       Methods Definition
@@ -705,6 +717,7 @@ our %_rl_vars;
        history_quoting_state                    => ['I', 45], # GRL 8.0
        utf8_mode                                => ['I', 46], # internal
        rl_eof_found                             => ['I', 47], # GRL 8.2
+       rl_full_quoting_desired                  => ['I', 48], # GRL 8.3
 
        rl_startup_hook                          => ['F', 0],
        rl_event_hook                            => ['F', 1],
@@ -729,6 +742,8 @@ our %_rl_vars;
        rl_input_available_hook                  => ['F', 20], # GRL 6.3
        rl_filename_stat_hook                    => ['F', 21], # GRL 6.3
        rl_timeout_event_hook                    => ['F', 22], # GRL 8.2
+       rl_macro_display_hook                    => ['F', 23], # GRL 8.3
+       rl_completion_rewrite_hook               => ['F', 24], # GRL 8.3
 
        rl_instream                              => ['IO', 0],
        rl_outstream                             => ['IO', 1],
@@ -1118,6 +1133,12 @@ Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
         (@str)  rl_invoking_keyseqs(FunctionPtr|str function,
                                     Keymap|str map = rl_get_keymap())
 
+=item C<print_keybinding(NAME [MAP [,READABLE]])>
+
+        void    rl_print_keybinding(str name,
+                                    Keymap|str map = rl_get_keymap(),
+                                    int readable = 0)             # GRL 8.3
+
 =item C<function_dumper([READABLE])>
 
         void    rl_function_dumper(int readable = 0)
@@ -1248,6 +1269,10 @@ Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
 
         int     rl_kill_text(int start = 0, int end = rl_end)
 
+=item C<replace_line(TEXT [,CLEAR_UNDO])>
+
+        int     rl_replace_line(str text, int clear_undo = 0)   # GRL 4.3
+
 =item C<push_macro_input(MACRO)>
 
         int     rl_push_macro_input(str macro)
@@ -1331,6 +1356,18 @@ Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
 
 =over 4
 
+=item C<SETSTATE(READLINE_STATE)>
+
+        int  RL_SETSTATE(int)                                   # GRL 6.0
+
+=item C<UNSETSTATE(READLINE_STATE)>
+
+        int  RL_UNSETSTATE(int)                                 # GRL 6.0
+
+=item C<ISSTATE(READLINE_STATE)>
+
+        int  RL_ISSTATE(int)                                    # GRL 6.0
+
 =item C<save_state(READLINE_STATE)>
 
         READLINE_STATE  rl_save_state()                         # GRL 6.0
@@ -1343,10 +1380,6 @@ Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
 
         Not implemented since not required for Perl.
         int     rl_free(void *mem)                              # GRL 6.0
-
-=item C<replace_line(TEXT [,CLEAR_UNDO])>
-
-        int     rl_replace_line(str text, int clear_undo = 0)   # GRL 4.3
 
 =item C<extend_line_buffer(LEN)>
 
@@ -1408,6 +1441,10 @@ When C<MAX> is omitted, the max length of an item in C<@matches> is used.
 
         str     rl_get_termcap(cap)
 
+=item C<reparse_colors>
+
+        void    rl_reparse_colors()                             # GRL 8.3
+
 =item C<clear_history>
 
         void    rl_clear_history()                              # GRL 6.3
@@ -1442,9 +1479,9 @@ When C<MAX> is omitted, the max length of an item in C<@matches> is used.
 
         void    rl_callback_read_char()
 
-=item C<callback_sigcleanup>                                    # GRL 7.0
+=item C<callback_sigcleanup>
 
-        void    rl_callback_sigcleanup()
+        void    rl_callback_sigcleanup()                        # GRL 7.0
 
 =item C<callback_handler_remove>
 
@@ -1803,6 +1840,7 @@ Examples:
         pfunc rl_redisplay_function
         pfunc rl_prep_term_function (GRL 2.1)
         pfunc rl_deprep_term_function (GRL 2.1)
+        pfunc rl_macro_display_hook (GRL 8.3)
         Keymap rl_executing_keymap (read only)
         Keymap rl_binding_keymap (read only)
         str rl_executing_macro (GRL 4.2, read only)
@@ -1833,6 +1871,7 @@ Examples:
         pfunc rl_directory_rewrite_hook (GRL 4.2)
         pfunc rl_filename_stat_hook (GRL 6.3)
         pfunc rl_filename_rewrite_hook (GRL 6.1)
+        pfunc rl_completion_rewrite_hook (GRL 8.3)
         pfunc rl_completion_display_matches_hook (GRL 4.0)
         str rl_basic_word_break_characters
         str rl_basic_quote_characters
@@ -1844,13 +1883,14 @@ Examples:
         int rl_completion_query_items
         int rl_completion_append_character
         int rl_completion_suppress_append (GRL 4.3)
-        int rl_completion_quote_character (GRL 5.0, read only)
         int rl_completion_suppress_quote (GRL 5.0)
         int rl_completion_found_quote (GRL 5.0, read only)
+        int rl_completion_quote_character (GRL 5.0, read only)
         int rl_completion_mark_symlink_dirs (GRL 4.3)
         int rl_ignore_completion_duplicates
         int rl_filename_completion_desired
         int rl_filename_quoting_desired
+        int rl_full_quoting_desired (GRL 8.3)
         int rl_attempted_completion_over
         int rl_sort_completion_matches (GRL 6.0)
         int rl_completion_type (read only)
@@ -2143,6 +2183,10 @@ The following tags are defined and their symbols can be exported.
 
 =over 4
 
+=item readerr
+
+READERR
+
 =item prompt
 
 RL_PROMPT_START_IGNORE RL_PROMPT_END_IGNORE
@@ -2201,17 +2245,29 @@ C<Term::ReadLine::Stub> is used instead of <Term::ReadLine:Gnu>.
 
 =over 4
 
-=item L<Term::ReadLine::Gnu Project Home Page|https://github.com/hirooih/perl-trg>
+=item *
 
-=item L<GNU Readline Library Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>
+L<Term::ReadLine::Gnu Project Home Page|https://github.com/hirooih/perl-trg>
 
-=item L<GNU History Library Manual|https://tiswww.cwru.edu/php/chet/readline/history.html>
+=item *
 
-=item Sample and test programs (F<eg/*> and F<t/*>) in L<the C<Term::ReadLine::Gnu> distribution|http://search.cpan.org/dist/Term-ReadLine-Gnu/>
+L<GNU Readline Library Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>
 
-=item L<Term::ReadLine|http://search.cpan.org/dist/Term-ReadLine/>
+=item *
 
-=item Works which use Term::ReadLine::Gnu
+L<GNU History Library Manual|https://tiswww.cwru.edu/php/chet/readline/history.html>
+
+=item *
+
+Sample and test programs (F<eg/*> and F<t/*>) in L<the C<Term::ReadLine::Gnu> distribution|http://search.cpan.org/dist/Term-ReadLine-Gnu/>
+
+=item *
+
+L<Term::ReadLine|http://search.cpan.org/dist/Term-ReadLine/>
+
+=item *
+
+Works which use Term::ReadLine::Gnu
 
 =over 4
 
@@ -2287,15 +2343,24 @@ GTK+ support in addition to Tk.
 
 =over 4
 
-=item Submit a bug report to
+=item *
+
+Submit a bug report to
 L<the bug tracker on GitHub|https://github.com/hirooih/perl-trg/issues>.
 
-=item C<add_defun()> can define up to 16 functions.
+=item *
 
-=item Some functions and variables do not have test code yet.  Your
+C<add_defun()> can define up to 16 functions including predefined functions.
+See L<#23|https://github.com/hirooih/perl-trg/issues/23> for details.
+
+=item *
+
+Some functions and variables do not have test code yet.  Your
 contribution is welcome.  See F<t/readline.t> for details.
 
-=item If the pager command (| or ||) in Perl debugger causes segmentation
+=item *
+
+If the pager command (| or ||) in Perl debugger causes segmentation
 fault, you need to fix F<perl5db.pl>.  See
 L<https://rt.perl.org/Public/Bug/Display.html?id=121456> for details.
 
@@ -2303,7 +2368,7 @@ L<https://rt.perl.org/Public/Bug/Display.html?id=121456> for details.
 
 =head1 LICENSE
 
-Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
+Copyright (c) 1996-2024 Hiroo Hayashi.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

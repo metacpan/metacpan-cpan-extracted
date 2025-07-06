@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+#
+# rl-callbacktest2: Provides readline()-like interface using the alternate interface
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/rl-callbacktest2.c in the GNU Readline Library
+
+use strict;
+use warnings;
+use Term::ReadLine;
+
+BEGIN {
+    import Term::ReadLine::Gnu qw(RL_STATE_ISEARCH RL_STATE_NSEARCH);
+}
+
+my $t = new Term::ReadLine 'rl-callbacktest2';
+my $a = $t->Attribs;
+
+my $saw_signal = 0;
+
+my $running = 0;
+my $prompt  = 'rltest$ ';
+my $input_string;
+
+# Callback function called for each line when accept-line executed, EOF
+# seen, or EOF character read.  This sets a flag and returns; it could
+# also call exit(3).
+sub cb_linehandler {
+    my $line = shift;
+    $t->add_history($line) if $line;
+    print "input line: ", ($line or ""), "\n";
+    $input_string = $line;
+    $t->callback_handler_remove();
+}
+
+sub cb_readline {
+    my $not_done = "";
+
+    # Install the line handler.
+    $t->callback_handler_install($prompt, \&cb_linehandler);
+
+    # printf STDERR ("readline_state = 0x%lx\n", $a->{readline_state});
+    if ($t->ISSTATE(RL_STATE_ISEARCH)) {
+        printf STDERR (
+            "cb_readline: after handler install, state (ISEARCH) = %lx\n",
+            $a->{readline_state}
+        );
+    } elsif ($t->ISSTATE(RL_STATE_NSEARCH)) {
+        printf STDERR (
+            "cb_readline: after handler install, state (NSEARCH) = %lx\n",
+            $a->{readline_state}
+        );
+    }
+
+    # MULTIKEY VIMOTION NUMERICARG _rl_callback_func
+
+    my $fds = '';
+    vec($fds, fileno($a->{instream}), 1) = 1;
+
+    $input_string = $not_done;
+
+    while (defined($input_string) and $input_string eq $not_done) {
+        my $r   = 0;
+        my $err = 0;
+
+        # Enter a simple event loop. This waits until something is available
+        # to read on readline's input stream (defaults to standard input) and
+        # calls the builtin character read callback to read it. It does not
+        # have to modify the user's terminal settings.
+        while ($r == 0) {
+            vec($fds, fileno($a->{instream}), 1) = 1;
+            $r   = select($fds, undef, undef, 0.1);
+            $err = $!;
+        }
+
+        if ($saw_signal) {
+            sigint_handler($saw_signal);
+        }
+
+        if ($r < 0) {
+            warn "rltest: select: $!\n";
+            $t->callback_handler_remove();
+            last;
+        }
+
+        if ($r > 0) {
+            $t->callback_read_char();
+        }
+    }
+    return $input_string;
+}
+
+sub sigint_sighandler {
+    $saw_signal = shift;
+}
+
+sub sigint_handler {
+    my $s = shift;
+    $t->free_line_state();
+    $t->callback_sigcleanup();
+    $t->cleanup_after_signal();
+    $t->callback_handler_remove();
+    $saw_signal = 0;
+    return $s;
+}
+
+$running = 1;
+$a->{catch_signals} = 1;
+
+$t->bind_key(ord 'r', 'history-search-backward', 'emacs-meta');
+$t->bind_key(ord 's', 'history-search-forward',  'emacs-meta');
+
+$SIG{INT} = \&sigint_sighandler;
+while ($running) {
+    my $p = cb_readline();
+    last if (!$p or $p eq 'exit');
+}
+
+print "$0: Event loop has exited\n";
+exit 0;

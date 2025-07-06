@@ -4,14 +4,14 @@
 
 package Rex::Shared::Var::Common;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
 require Exporter;
 use base qw/Exporter/;
 our @EXPORT_OK = qw/__lock __store __retrieve/;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 use Fcntl qw(:DEFAULT :flock);
 use Storable;
@@ -26,8 +26,8 @@ our $LOCK_FILE =
   File::Spec->catfile( File::Spec->tmpdir(), "vars.db.lock.$PARENT_PID" );
 
 sub __lock {
-  sysopen( my $dblock, $LOCK_FILE, O_RDONLY | O_CREAT ) or die($!);
-  flock( $dblock, LOCK_EX )                             or die($!);
+  sysopen( my $dblock, $LOCK_FILE, O_RDWR | O_CREAT ) or die($!);
+  flock( $dblock, LOCK_EX )                           or die($!);
 
   my $ret = $_[0]->();
 

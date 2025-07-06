@@ -1,0 +1,198 @@
+#!/usr/bin/env perl
+#
+# rl-timeout: Test various readline builtin timeouts
+#
+#   Copyright (C) 2024 Hiroo Hayashi
+#
+# Derived from: examples/rl-timeout.c in the GNU Readline Library
+#   Copyright (C) 2021 Free Software Foundation, Inc.
+
+use strict;
+use warnings;
+use Term::ReadLine;
+
+BEGIN {
+    import Term::ReadLine::Gnu qw(RL_STATE_TIMEOUT READERR);
+}
+
+sub usage {
+    print <<EOM;
+usage: rl-timeout [readline1 | readline2 | callback1 | callback2] [timeout]
+EOM
+}
+
+my $t = new Term::ReadLine 'rl-timeout';
+my $a = $t->Attribs;
+
+if ($a->{readline_version} < 0x0802) {
+    warn "rl-timeout: This example requires readline 8.2 or later.\n";
+    exit(1);
+}
+my $timeout_secs  = 1;
+my $timeout_usecs = 0;
+my $running       = 0;
+my $prompt        = 'rl-timeout$ ';
+my $UINT_MAX      = ~0;
+
+# ****************************************************************
+#
+# Example 1: readline () with rl_readline_state
+#
+# ****************************************************************
+
+sub rltest_timeout_readline1 {
+    $t->set_timeout($timeout_secs, $timeout_usecs);
+    my $temp = $t->readline($prompt);
+    if ($t->ISSTATE(RL_STATE_TIMEOUT)) {
+        print "timeout\n";
+    } elsif (!$temp) {
+        print "no input line\n";
+    } else {
+        print "input line: $temp\n";
+    }
+}
+
+# ****************************************************************
+#
+# Example 2: readline () with rl_timeout_event_hook
+#
+# ****************************************************************
+
+sub timeout_handler {
+    print "timeout\n";
+    return READERR;
+}
+
+sub rltest_timeout_readline2 {
+    my $temp;
+
+    $t->set_timeout($timeout_secs, $timeout_usecs);
+    $a->{timeout_event_hook} = \&timeout_handler;
+    $temp = $t->readline($prompt);
+    if (!$temp) {
+        print "no input line\n";
+    } else {
+        print "input line: $temp\n";
+    }
+}
+
+# ****************************************************************
+#
+# Example 3: rl_callback_* () with rl_timeout_remaining
+#
+# ****************************************************************
+
+# Callback function called for each line when accept-line executed, EOF
+# seen, or EOF character read.  This sets a flag and returns; it could
+# also call exit(3).
+sub cb_linehandler {
+    my ($line) = @_;
+
+    if (!$line || $line eq "exit") {
+        if (!$line) {
+            print "\n";
+        }
+        print "exit\n";
+
+        # This function needs to be called to reset the terminal settings,
+        # and calling it from the line handler keeps one extra prompt from
+        # being displayed.
+        $t->callback_handler_remove();
+        $running = 0;
+    } else {
+        if ($line ne "") {
+            $t->add_history($line);
+        }
+        print "input line: $line\n";
+    }
+}
+
+sub rltest_timeout_callback1 {
+    $t->set_timeout($timeout_secs, $timeout_usecs);
+    $t->callback_handler_install($prompt, \&cb_linehandler);
+    $running = 1;
+    while ($running) {
+        my $fds = '';
+        vec($fds, fileno($a->{instream}), 1) = 1;
+        # -1: error, 0: timeout, 1: input available (the timeout has not expired)
+        my ($r, $sec, $usec) = $t->timeout_remaining();
+        if ($r == 1) {
+            my $timeout = $sec + $usec / 1000000;
+            $r = select($fds, undef, undef, $timeout);
+        } elsif ($r < 0) {
+            die "Error in rl_timout_remaining().\n";
+        }
+        if ($r < 0 && $! && !$!{EINTR}) {
+            warn "rl-timeout: select: $!";
+            $t->callback_handler_remove();
+            last;
+        } elsif ($r == 0) { # timeout in rl_timeout_remaining() or select()
+            print "rl-timeout: timeout\n";
+            $t->callback_handler_remove();
+            last;
+        }
+
+        # FD_ISSET(fileno($a->{instream}), $fds)
+        if (vec($fds, fileno($a->{instream}), 1)) {
+            $t->callback_read_char();
+        }
+    }
+
+    print "rl-timeout: Event loop has exited\n";
+}
+
+# ****************************************************************
+#
+# Example 4: rl_callback_* () with rl_timeout_event_hook
+#
+# ****************************************************************
+
+sub cb_timeouthandler {
+    print "timeout\n";
+    $t->callback_handler_remove();
+    $running = 0;
+    return READERR;
+}
+
+sub rltest_timeout_callback2 {
+    $t->set_timeout($timeout_secs, $timeout_usecs);
+    $a->{timeout_event_hook} = \&cb_timeouthandler;
+    $t->callback_handler_install($prompt, \&cb_linehandler);
+    $running = 1;
+    while ($running) {
+        $t->callback_read_char();
+    }
+
+    print "rl-timeout: Event loop has exited\n";
+}
+
+if ($#ARGV >= 0) {
+    if ($#ARGV >= 1) {
+        my $timeout = $ARGV[1];
+        if ($timeout <= 0.0) {
+            warn "rl-timeout: specify a positive number for timeout.\n";
+            exit(2);
+        } elsif ($timeout > $UINT_MAX) {
+            warn "rl-timeout: timeout too large.\n";
+            exit(2);
+        }
+        $timeout_secs  = int $timeout;
+        $timeout_usecs = int(($timeout - $timeout_secs) * 1000000 + 0.5);
+    }
+    if ($ARGV[0] eq "readline1") {
+        rltest_timeout_readline1();
+    } elsif ($ARGV[0] eq "readline2") {
+        rltest_timeout_readline2();
+    } elsif ($ARGV[0] eq "callback1") {
+        rltest_timeout_callback1();
+    } elsif ($ARGV[0] eq "callback2") {
+        rltest_timeout_callback2();
+    } else {
+        usage();
+        exit(2);
+    }
+} else {
+    usage();
+    exit(2);
+}
+exit(0);

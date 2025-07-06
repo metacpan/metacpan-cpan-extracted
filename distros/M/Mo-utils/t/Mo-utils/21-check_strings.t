@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use English;
-use Error::Pure::Utils qw(clean);
+use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils qw(check_strings);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Test.
@@ -16,6 +16,9 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'key' must be one of defined strings.\n",
 	"Parameter 'key' must be one of defined strings.");
+my $err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'String'}, 'foo', 'Test error parameter (String: foo).');
+is($err_msg_hr->{'Possible strings'}, "'key', 'value'", "Test error parameter (Possible strings: 'key', 'value').");
 clean();
 
 # Test.

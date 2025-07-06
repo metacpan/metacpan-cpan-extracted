@@ -11,7 +11,7 @@ package Term::ANSIEncode;
 #                     Written By Richard Kelsch                       #
 #                  © Copyright 2025 Richard Kelsch                    #
 #                        All Rights Reserved                          #
-#                           Version 1.09                              #
+#                           Version 1.10                              #
 #######################################################################
 # This program is free software: you can redistribute it and/or       #
 # modify it under the terms of the GNU General Public License as      #
@@ -45,7 +45,7 @@ use constant {
 binmode(STDOUT, ":encoding(UTF-8)");
 
 BEGIN {
-	our $VERSION = '1.09';
+    our $VERSION = '1.10';
 }
 
 sub ansi_output {
@@ -63,9 +63,9 @@ sub ansi_output {
             }
         } ## end foreach my $string (keys %{...})
         foreach my $string (keys %{ $self->{'characters'} }) {
-			$text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{$string}/gi;
+            $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{$string}/gi;
         }
-    }
+    } ## end if (length($text) > 1)
     my $s_len = length($text);
     my $nl    = $self->{'ansi_sequences'}->{'NEWLINE'};
     my $found = FALSE;
@@ -88,7 +88,7 @@ sub ansi_output {
 
 sub new {
     my $class = shift;
-	my $self;
+    my $self;
 
     my $esc = chr(27) . '[';
 
@@ -181,43 +181,45 @@ sub new {
         'BRIGHT B_CYAN'    => $esc . '106m',
         'BRIGHT B_WHITE'   => $esc . '107m',
 
-        'HORIZONTAL RULE ORANGE'           => "\r" . $self->{'ansi_sequences'}->{'B_ORANGE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE PINK'             => "\r" . $self->{'ansi_sequences'}->{'B_PINK'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE RED'              => "\r" . $self->{'ansi_sequences'}->{'B_RED'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BRIGHT RED'       => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_RED'} . clline . $self->{'ansi_sequences'}->{'RESET'}, 
-        'HORIZONTAL RULE GREEN'            => "\r" . $self->{'ansi_sequences'}->{'B_GREEN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BRIGHT GREEN'     => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_GREEN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE YELLOW'           => "\r" . $self->{'ansi_sequences'}->{'B_YELLOW'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BRIGHT YELLOW'    => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_YELLOW'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BLUE'             => "\r" . $self->{'ansi_sequences'}->{'B_BLUE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BRIGHT BLUE'      => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_BLUE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE MAGENTA'          => "\r" . $self->{'ansi_sequences'}->{'B_MAGENTA'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BRIGHT MAGENTA'   => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_MAGENTA'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE CYAN'             => "\r" . $self->{'ansi_sequences'}->{'B_CYAN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BRIGHT CYAN'      => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_CYAN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE WHITE'            => "\r" . $self->{'ansi_sequences'}->{'B_WHITE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
-        'HORIZONTAL RULE BRIGHT WHITE'     => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_WHITE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE ORANGE'         => "\r" . $self->{'ansi_sequences'}->{'B_ORANGE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE PINK'           => "\r" . $self->{'ansi_sequences'}->{'B_PINK'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE RED'            => "\r" . $self->{'ansi_sequences'}->{'B_RED'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BRIGHT RED'     => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_RED'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE GREEN'          => "\r" . $self->{'ansi_sequences'}->{'B_GREEN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BRIGHT GREEN'   => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_GREEN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE YELLOW'         => "\r" . $self->{'ansi_sequences'}->{'B_YELLOW'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BRIGHT YELLOW'  => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_YELLOW'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BLUE'           => "\r" . $self->{'ansi_sequences'}->{'B_BLUE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BRIGHT BLUE'    => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_BLUE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE MAGENTA'        => "\r" . $self->{'ansi_sequences'}->{'B_MAGENTA'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BRIGHT MAGENTA' => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_MAGENTA'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE CYAN'           => "\r" . $self->{'ansi_sequences'}->{'B_CYAN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BRIGHT CYAN'    => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_CYAN'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE WHITE'          => "\r" . $self->{'ansi_sequences'}->{'B_WHITE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
+        'HORIZONTAL RULE BRIGHT WHITE'   => "\r" . $self->{'ansi_sequences'}->{'BRIGHT B_WHITE'} . clline . $self->{'ansi_sequences'}->{'RESET'},
     };
-	# Generate generic colors
+
+    # Generate generic colors
     foreach my $count (0 .. 255) {
         $self->{'ansi_sequences'}->{"ANSI$count"}   = $esc . '38;5;' . $count . 'm';
         $self->{'ansi_sequences'}->{"B_ANSI$count"} = $esc . '48;5;' . $count . 'm';
-		if ($count >= 232 && $count <= 255) {
-			my $num = $count - 232;
-			$self->{'ansi_sequences'}->{"GREY$num"} = $esc . '38;5;' . $count . 'm'; 
-			$self->{'ansi_sequences'}->{"B_GREY$num"} = $esc . '48;5;' . $count . 'm'; 
-		}
-    }
-	# Generate symbols
-	foreach my $u (0x2000 .. 0x2B59) {
-		my $name = charnames::viacode($u);
-		unless ($name =~ /^(ZERO|LINE SEPARATOR|LEFT-TO-RIGHT|PARAGRAPH|POP |RIGHT-TO-LEFT|TRIGRAM|BRAILLE)/) {
-			$self->{'characters'}->{$name} = charnames::string_vianame($name);
-		}
-	}
-	bless($self,$class);
+        if ($count >= 232 && $count <= 255) {
+            my $num = $count - 232;
+            $self->{'ansi_sequences'}->{"GREY$num"}   = $esc . '38;5;' . $count . 'm';
+            $self->{'ansi_sequences'}->{"B_GREY$num"} = $esc . '48;5;' . $count . 'm';
+        }
+    } ## end foreach my $count (0 .. 255)
+
+    # Generate symbols
+    foreach my $u (0x2000 .. 0x2B59) {
+        my $name = charnames::viacode($u);
+        unless ($name =~ /^(ZERO|LINE SEPARATOR|LEFT-TO-RIGHT|PARAGRAPH|POP |RIGHT-TO-LEFT|TRIGRAM|BRAILLE)/) {
+            $self->{'characters'}->{$name} = charnames::string_vianame($name);
+        }
+    } ## end foreach my $u (0x2000 .. 0x2B59)
+    bless($self, $class);
     return ($self);
-}
+} ## end sub new
 
 __END__
 
@@ -228,6 +230,7 @@ ANSI Encode
 =head1 SYNOPSIS
 
 A markup language to generate basic ANSI text
+This module is for use with the executable file
 
 =head1 AUTHOR & COPYRIGHT
 
@@ -257,13 +260,13 @@ Simple usage and options documentation
 
 Shows the most used tokens available.  A token is encapsulated within [% and %] (with at lease one space on each side)
 
-For example:
-
 =item --B<symbols> or -B<s> [search]
 
 Similar to "tokens", but instead shows special symbol character tokens.
 
 You may also add a search string to shorten the list.
+
+IT IS HIGHLY SUGGESTED YOU USE A SEARCH STRING.
 
 =back
 

@@ -30,8 +30,9 @@ use Cwd 'cwd';
 use File::Spec;
 use JSON;
 use DateTime;
+use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub get_timestamp{
     my $local_time_zone = DateTime::TimeZone->new( name => 'local' );
@@ -47,7 +48,7 @@ sub get_array_from_authenticated_json_file{
     my $parsed_json = decode_json($document);
     my @arr_to_iterate = @{$parsed_json};
     my $arr_size = @arr_to_iterate;
-    print "\@arr_to_iterate size=$arr_size\n";
+    # print "\@arr_to_iterate size=$arr_size\n";
     return @arr_to_iterate;
 }
 
@@ -63,13 +64,14 @@ sub read_mhouse_llm_scored_data{
 	
 	foreach my $rec (@cumulative_llm_answers){
 		my ($llm_answer_json_part) = ($rec->{llm_answer} =~ /(\{.*\})/s);
+        my ($address_composed_string) = ($rec->{address_composed_string} =~ /(\{.*\})/s);
         $rec->{company_employee_count_range} = $rec->{employees};
 		
 		$llm_answer_json_part =~ s/\R/ /g;
 		my $data;
 		eval{$data = decode_json($llm_answer_json_part);};
 		if($@){
-			print "Exception in decode_json\n";
+            printf "Exception in decode_json : %s %s\n", $rec->{all_preexisting_data}->{address}->{addressRegion}, $rec->{legalName} ;
 			next;
 		}
         foreach my $kw (@{$scored_field_ref}){
@@ -177,6 +179,48 @@ sub output_llm_scored_mhouse_json_annotated{
     }
     close $outfh;
 }
+
+=pod
+USAGE:
+    # creating a hash
+        my @folder_list_1 = (
+        '../ag',
+        '../bl',
+        );
+        my %returned_hash = Mhouse::Reports::get_hash_by_legalname(\@folder_list_2);
+        my $json = encode_json(\%returned_hash);
+        open(my $fh, '>', 'hash_by_legalname_1.json') or die "Cannot open file: $!";
+        print $fh $json;
+        close $fh;
+
+    # using a hash
+        open(my $fh_in, '<', 'hash_by_legalname_1.json') or die "Cannot open file: $!";
+        my $json_file_contents = do{local $/; <$fh_in>};
+        my $hash_to_use = decode_json($json_file_contents);
+        my $legalName = 'Sedinum Stiftung';
+        print "$legalName : ";
+        print Dumper $hash_to_use->{$legalName};
+
+=cut
+sub get_hash_by_legalname{
+    my $folder_list_ref        = shift;
+    my @folder_list = @{$folder_list_ref};
+    my @data_extracted = read_mhouse_llm_scored_data(\@folder_list);
+    my %returned_hash = ();
+    foreach my $d (@data_extracted){
+        my ($llm_answer_json_part) = ($d->{llm_answer} =~ /(\{.*\})/s);
+        $llm_answer_json_part =~ s/\R/ /g;
+        my $llm_answer;
+        eval{$llm_answer = decode_json($llm_answer_json_part);};
+        $returned_hash{$d->{legalName}} = {
+            'employees' => $d->{employees},
+             'personnel' => $llm_answer -> {personnel},
+             'e_data'    => $llm_answer -> {e_data},
+             } ;
+    }
+    return %returned_hash;
+}
+
 
 
 sub get_freq_table{

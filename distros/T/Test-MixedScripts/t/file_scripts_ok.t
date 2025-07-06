@@ -61,4 +61,27 @@ like(
      "died on unknown script name"
 );
 
+file_scripts_ok( 't/data/ascii-01.txt', qw( ASCII ) );
+
+my $b3 = intercept {
+    file_scripts_ok('t/data/bad-03.txt', qw( ASCII ) );
+};
+
+is $b3->squash_info->flatten,
+  [
+    {
+        about          => "fail",
+        causes_failure => 1,
+        diag           => [ "Unexpected Latin character LATIN SMALL LETTER E WITH CIRCUMFLEX on line 4 character 4 in t/data/bad-03.txt", ],
+        name           => 't/data/bad-03.txt',
+        pass           => 0,
+        trace_file     => __FILE__,
+        trace_line     => 67,
+    }
+  ],
+  "expected failure";
+
+file_scripts_ok( 't/data/ascii-01.txt', qw( Latin Common ) );
+
+
 done_testing;

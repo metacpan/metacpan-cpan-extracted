@@ -16,7 +16,7 @@ use CVSS::v4 ();
 
 our @EXPORT = qw(encode_cvss decode_cvss cvss_to_xml);
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 $VERSION =~ tr/_//d;    ## no critic
 
 my $CVSS_CLASSES = {'2.0' => 'CVSS::v2', '3.0' => 'CVSS::v3', '3.1' => 'CVSS::v3', '4.0' => 'CVSS::v4'};
@@ -268,7 +268,7 @@ L<https://github.com/giterlizzi/perl-CVSS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2023-2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2023-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

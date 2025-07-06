@@ -61,8 +61,17 @@ sub f($type, $p_in) {
     $array->[0] = 0;
 }
 
-v bool => true,  undef, 1, 't';
-v bool => false, undef, 0, 'f';
+v bool => true,  true, 1, 't';
+v bool => \1,    true, 1, 't';
+v bool => 1,     true, 1, 't';
+v bool => 't',   true, 1, 't';
+v bool => false, false, 0, 'f';
+v bool => \0,    false, 0, 'f';
+v bool => 0,     false, 0, 'f';
+v bool => '',    false, 0, 'f';
+v bool => 'f',   false, 0, 'f';
+f bool => 2;
+f bool => [];
 
 v int2 => $_ for (1, -1, -32768, 32767, '12345', -12345, 123.0);
 f int2 => $_ for (-32769, 32768, [], '', 'a', 1.5);

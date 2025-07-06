@@ -1,4 +1,4 @@
-package FU::Validate 1.1;
+package FU::Validate 1.2;
 
 use v5.36;
 use experimental 'builtin', 'for_list';

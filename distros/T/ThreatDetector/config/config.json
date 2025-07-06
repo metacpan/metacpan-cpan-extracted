@@ -1,0 +1,5 @@
+{
+  "logfile": "access_log test",
+  "output_log": "logs",
+  "verbose": false
+}

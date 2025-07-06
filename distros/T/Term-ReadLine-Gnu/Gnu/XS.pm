@@ -1,7 +1,7 @@
 #
 #       XS.pm : perl function definition for Term::ReadLine::Gnu
 #
-#       Copyright (c) 1999-2023 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 1999-2025 Hiroo Hayashi.  All rights reserved.
 #
 #       This program is free software; you can redistribute it and/or
 #       modify it under the same terms as Perl itself.
@@ -14,7 +14,7 @@ use warnings;
 use AutoLoader 'AUTOLOAD';
 
 our $VERSION;
-$VERSION='1.46';        # added for CPAN
+$VERSION='1.47';        # added for CPAN
 
 # make aliases
 our %Attribs;
@@ -86,7 +86,12 @@ sub _str2fn ($) {
 
 sub rl_copy_keymap ($)    { return _rl_copy_keymap(_str2map($_[0])); }
 sub rl_discard_keymap ($) { return _rl_discard_keymap(_str2map($_[0])); }
+sub rl_free_keymap ($)    { return _rl_free_keymap(_str2map($_[0])); }
+sub rl_empty_keymap ($)   { return _rl_empty_keymap(_str2map($_[0])); }
 sub rl_set_keymap ($)     { return _rl_set_keymap(_str2map($_[0])); }
+sub rl_set_keymap_name ($$) {
+    return _rl_set_keymap_name($_[0], _str2map($_[1]));
+}
 
 # rl_bind_key
 sub rl_bind_key ($$;$) {
@@ -240,11 +245,37 @@ sub rl_call_function ($;$$) {
     }
 }
 
+sub rl_function_of_keyseq ($;$) {
+    if (defined $_[1]) {
+        return _rl_function_of_keyseq($_[0], _str2map($_[1]));
+    } else {
+        return _rl_function_of_keyseq($_[0]);
+    }
+}
+
+sub rl_trim_arg_from_keyseq ($;$) {
+    if (defined $_[1]) {
+        return _rl_trim_arg_from_keyseq($_[0], _str2map($_[1]));
+    } else {
+        return _rl_trim_arg_from_keyseq($_[0]);
+    }
+}
+
 sub rl_invoking_keyseqs ($;$) {
     if (defined $_[1]) {
         return _rl_invoking_keyseqs(_str2fn($_[0]), _str2map($_[1]));
     } else {
         return _rl_invoking_keyseqs(_str2fn($_[0]));
+    }
+}
+
+sub rl_print_keybinding ($;$$) {
+    if (defined $_[2]) {
+        return _rl_print_keybinding($_[0], _str2map($_[1]), $_[2]);
+    } elsif (defined $_[1]) {
+        return _rl_print_keybinding($_[0], _str2map($_[1]));
+    } else {
+        return _rl_print_keybinding($_[0]);
     }
 }
 
@@ -301,6 +332,24 @@ sub rl_completion_mode {
         return;
     }
     return _rl_completion_mode(_str2fn($_[0]));
+}
+
+#
+#       the GNU Readline Macros
+#
+sub SETSTATE {
+    my ($x) = @_;
+    return ($Attribs{readline_state} |= $x);
+}
+
+sub UNSETSTATE {
+    my ($x) = @_;
+    return ($Attribs{readline_state} &= ~$x);
+}
+
+sub ISSTATE {
+    my ($x) = @_;
+    return ($Attribs{readline_state} & $x);
 }
 
 #

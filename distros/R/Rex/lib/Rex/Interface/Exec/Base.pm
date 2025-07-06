@@ -4,14 +4,14 @@
 
 package Rex::Interface::Exec::Base;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 use Carp;
 use Rex::Helper::Run;
 use Rex::Commands::Fs;
 use Rex::Interface::Shell;
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 sub new {
   my $that  = shift;
@@ -54,7 +54,7 @@ sub execute_line_based_operation {
 sub can_run {
   my ( $self, $commands_to_check, $check_with_command ) = @_;
 
-  $check_with_command ||= "which";
+  $check_with_command ||= "command -v";
 
   my $exec  = Rex::Interface::Exec->create;
   my $cache = Rex::get_cache();

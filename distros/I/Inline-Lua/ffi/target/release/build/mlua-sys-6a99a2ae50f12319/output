@@ -1,0 +1,130 @@
+cargo:rerun-if-changed=build
+TARGET = Some(x86_64-unknown-linux-gnu)
+OUT_DIR = Some(/home/andreu/projectstuff/inline-lua/ffi/target/release/build/mlua-sys-6a99a2ae50f12319/out)
+cargo:rerun-if-env-changed=CC_x86_64-unknown-linux-gnu
+CC_x86_64-unknown-linux-gnu = None
+cargo:rerun-if-env-changed=CC_x86_64_unknown_linux_gnu
+CC_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+RUSTC_WRAPPER = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+DEBUG = Some(false)
+CARGO_CFG_TARGET_FEATURE = Some(fxsr,sse,sse2)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_unknown_linux_gnu
+CFLAGS_x86_64_unknown_linux_gnu = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-unknown-linux-gnu
+CFLAGS_x86_64-unknown-linux-gnu = None
+CARGO_ENCODED_RUSTFLAGS = Some()
+running cd "/home/andreu/projectstuff/inline-lua/ffi/target/release/build/mlua-sys-6a99a2ae50f12319/out/luajit-build/build/src" && BUILDMODE="static" STATIC_CC="/usr/bin/cc -O2 -ffunction-sections -fdata-sections -fPIC -m64" TARGET_AR="/usr/bin/ar rcus" TARGET_LD="/usr/bin/cc -O2 -ffunction-sections -fdata-sections -fPIC -m64" TARGET_STRIP="/usr/bin/strip" TARGET_SYS="Linux" XCFLAGS="-fPIC" "make" "-e"
+make[1]: Entering directory '/home/andreu/projectstuff/inline-lua/ffi/target/release/build/mlua-sys-6a99a2ae50f12319/out/luajit-build/build/src'
+HOSTCC    host/minilua.o
+HOSTLINK  host/minilua
+VERSION   luajit.h
+DYNASM    host/buildvm_arch.h
+HOSTCC    host/buildvm.o
+HOSTCC    host/buildvm_asm.o
+HOSTCC    host/buildvm_peobj.o
+HOSTCC    host/buildvm_lib.o
+HOSTCC    host/buildvm_fold.o
+HOSTLINK  host/buildvm
+BUILDVM   lj_vm.S
+ASM       lj_vm.o
+CC        lj_assert.o
+CC        lj_gc.o
+BUILDVM   lj_ffdef.h
+CC        lj_err.o
+CC        lj_char.o
+BUILDVM   lj_bcdef.h
+CC        lj_bc.o
+CC        lj_obj.o
+CC        lj_buf.o
+CC        lj_str.o
+CC        lj_tab.o
+CC        lj_func.o
+CC        lj_udata.o
+CC        lj_meta.o
+CC        lj_debug.o
+CC        lj_prng.o
+CC        lj_state.o
+CC        lj_dispatch.o
+CC        lj_vmevent.o
+CC        lj_vmmath.o
+CC        lj_strscan.o
+CC        lj_strfmt.o
+CC        lj_strfmt_num.o
+CC        lj_serialize.o
+CC        lj_api.o
+CC        lj_profile.o
+CC        lj_lex.o
+CC        lj_parse.o
+CC        lj_bcread.o
+CC        lj_bcwrite.o
+CC        lj_load.o
+CC        lj_ir.o
+CC        lj_opt_mem.o
+BUILDVM   lj_folddef.h
+CC        lj_opt_fold.o
+CC        lj_opt_narrow.o
+CC        lj_opt_dce.o
+CC        lj_opt_loop.o
+CC        lj_opt_split.o
+CC        lj_opt_sink.o
+CC        lj_mcode.o
+CC        lj_snap.o
+CC        lj_record.o
+CC        lj_crecord.o
+BUILDVM   lj_recdef.h
+CC        lj_ffrecord.o
+CC        lj_asm.o
+CC        lj_trace.o
+CC        lj_gdbjit.o
+CC        lj_ctype.o
+CC        lj_cdata.o
+CC        lj_cconv.o
+CC        lj_ccall.o
+CC        lj_ccallback.o
+CC        lj_carith.o
+CC        lj_clib.o
+CC        lj_cparse.o
+CC        lj_lib.o
+CC        lj_alloc.o
+CC        lib_aux.o
+BUILDVM   lj_libdef.h
+CC        lib_base.o
+CC        lib_math.o
+CC        lib_bit.o
+CC        lib_string.o
+CC        lib_table.o
+CC        lib_io.o
+CC        lib_os.o
+CC        lib_package.o
+CC        lib_debug.o
+CC        lib_jit.o
+CC        lib_ffi.o
+CC        lib_buffer.o
+CC        lib_init.o
+AR        libluajit.a
+CC        luajit.o
+BUILDVM   jit/vmdef.lua
+LINK      luajit
+OK        Successfully built LuaJIT
+make[1]: Leaving directory '/home/andreu/projectstuff/inline-lua/ffi/target/release/build/mlua-sys-6a99a2ae50f12319/out/luajit-build/build/src'
+cargo:rerun-if-env-changed=HOST_CC
+cargo:rerun-if-env-changed=STATIC_CC
+cargo:rerun-if-env-changed=TARGET_LD
+cargo:rerun-if-env-changed=TARGET_AR
+cargo:rerun-if-env-changed=TARGET_STRIP
+cargo:rerun-if-env-changed=MACOSX_DEPLOYMENT_TARGET
+cargo:rustc-link-search=native=/home/andreu/projectstuff/inline-lua/ffi/target/release/build/mlua-sys-6a99a2ae50f12319/out/luajit-build/lib
+cargo:rustc-link-lib=static=luajit-5.1
+cargo:include=/home/andreu/projectstuff/inline-lua/ffi/target/release/build/mlua-sys-6a99a2ae50f12319/out/luajit-build/include
+cargo:lib=/home/andreu/projectstuff/inline-lua/ffi/target/release/build/mlua-sys-6a99a2ae50f12319/out/luajit-build/lib

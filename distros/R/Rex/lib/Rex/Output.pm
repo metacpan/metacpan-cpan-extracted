@@ -4,7 +4,7 @@
 
 package Rex::Output;
 
-use v5.12.5;
+use v5.14.4;
 use warnings;
 
 my $handle;
@@ -15,7 +15,7 @@ END   { IPC::Shareable->clean_up_all; }
 
 use base 'Rex::Output::Base';
 
-our $VERSION = '1.16.0'; # VERSION
+our $VERSION = '1.16.1'; # VERSION
 
 sub get {
   my ( $class, $output_module ) = @_;
