@@ -1,0 +1,124 @@
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Crypt::Protocol::Noise>
+
+=head2 PROTOCOL
+
+L<https://noiseprotocol.org/>
+
+=head2 EXAMPLE
+
+see also t/ directory
+
+=head1 Handshake FUNCTION
+
+=head2  noise_pattern
+
+    my $pattern = noise_pattern($pattern_name);
+
+=head2  noise_hkdf
+
+    noise_hkdf( $cnf, $chaining_key, $input_key_material, $num_outputs );
+
+=head2  init_symmetric_state
+
+    $hs = init_symmetric_state($cnf, $hs);
+
+=head2  mix_key
+
+    $ss = mix_key( $cnf, $ss, $dh );
+
+=head2  mix_hash
+
+    $ss = mix_hash( $cnf, $ss, $data );
+
+=head2  init_key
+
+    $ss = init_key($ss, $k);
+
+=head2  has_key
+
+    my $is_has_key = has_key($ss);
+
+=head2 set_nonce
+
+    $ss = set_nonce($ss, $n);
+
+=head2  mix_keyandhash
+
+    $ss = mix_keyandhash( $cnf, $ss, $data );
+
+=head2  noise_split
+
+    my ($c1, $c2) = noise_split( $cnf,     $ss );
+
+=head2  init_ciphersuite_name
+
+    my $ciphersuite_name = init_ciphersuite_name($cnf);
+
+=head2 init_handshake_pattern
+
+    my $pattern = init_handshake_pattern($hs);
+
+=head2  init_protocol_name
+
+    my $protocol_name = init_protocol_name( $cnf, $hs );
+
+=head2  new_handshake_state
+
+    $hs = new_handshake_state( $cnf, $hs );
+
+=head2  rekey
+
+    my $k = rekey( $cnf, $hs );
+
+=head2  encrypt_with_ad
+
+    my $cipher_info = encrypt_with_ad( $cnf, $ss, $ad, $plaintext );
+
+=head2  decrypt_with_ad
+
+    my $plaintext = decrypt_with_ad($cnf, $ss, $ad, $cipher_info);
+
+=head2  encrypt_and_hash
+
+    my $out = encrypt_and_hash( $cnf, $out, $ss, $plaintext );
+
+=head2  decrypt_and_hash
+
+    my $out = decrypt_and_hash( $cnf, $out, $ss, $cipher_info );
+
+=head2  write_message
+
+    my $out_msg_pack = write_message( $cnf, $hs, $out, $payload );
+
+=head2  read_message
+
+    my $out = read_message( $cnf, $hs, $out, $recv_message_pack );
+
+=head1 OPTIONAL SESSION FUNCTION
+
+use c1/c2 with nonce directly
+
+or
+
+derive sub { key, iv } from c1/c2, and calc iv' = iv xor current_time, to make sure iv' is not resuse
+
+=head2  derive_session_key_iv
+
+    my ($sk, $siv) = derive_session_key_iv($cnf, $k, $salt);
+
+=head2  session_encrypt
+
+    my $cipher_info = session_encrypt( $cnf, $key, $iv, $aad, $plaintext );
+
+=head2  session_decrypt
+
+    my $plaintext = session_decrypt( $cnf, $key, $iv, $aad, $cipher_info );
+
+=cut

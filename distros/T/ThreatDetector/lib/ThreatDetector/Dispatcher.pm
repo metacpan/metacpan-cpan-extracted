@@ -15,7 +15,7 @@ use ThreatDetector::Handlers::EncodedPayload qw(handle_encoded);
 use ThreatDetector::Handlers::BotFingerprint qw(handle_scanner);
 use ThreatDetector::Handlers::MethodAbuse qw(handle_http_method);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %handlers = (
     sql_injection => \&handle_sql_injection,

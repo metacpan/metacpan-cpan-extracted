@@ -1,6 +1,5 @@
 package POE::Component::IRC::Qnet;
-our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::Qnet::VERSION = '6.93';
+$POE::Component::IRC::Qnet::VERSION = '6.95';
 use strict;
 use warnings FATAL => 'all';
 use Carp;

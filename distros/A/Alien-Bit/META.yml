@@ -3,12 +3,21 @@ abstract: 'Provides the Bit library'
 author:
   - 'Christos Argyropoulos <chrisarg@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
   File::Spec: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 0
+  Alien::Build: '1.40'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::Make: '0.99'
+  Carp: '0'
+  ExtUtils::MakeMaker: '6.52'
+  File::Copy::Recursive: '0'
+  HTTP::Tiny: '0'
+  Path::Tiny: '0'
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
@@ -26,11 +35,23 @@ no_index:
 provides:
   Alien::Bit:
     file: lib/Alien/Bit.pm
-    version: '0.01'
-requires:
-  strict: '0'
-  warnings: '0'
-version: '0.01'
+    version: '0.02'
+resources:
+  IRC: irc://irc.perl.org/#native
+  homepage: https://github.com/chrisarg/Alien-Bit
+  repository: https://github.com/chrisarg/Alien-Bit.git
+version: '0.02'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.33'
+  requires:
+    share:
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

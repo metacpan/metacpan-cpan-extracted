@@ -1,6 +1,5 @@
 package POE::Component::Server::IRC::Backend;
-our $AUTHORITY = 'cpan:BINGOS';
-$POE::Component::Server::IRC::Backend::VERSION = '1.62';
+$POE::Component::Server::IRC::Backend::VERSION = '1.66';
 use strict;
 use warnings;
 use Carp qw(carp croak);

@@ -1,6 +1,5 @@
 package POE::Component::IRC;
-our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::VERSION = '6.93';
+$POE::Component::IRC::VERSION = '6.95';
 use strict;
 use warnings FATAL => 'all';
 use Carp;
@@ -174,7 +173,7 @@ sub _configure {
     }
 
     if ($self->{useipv6} && !$GOT_SOCKET6) {
-        warn "'useipv6' option specified, but Socket6 was not found\n";
+        warn "'useipv6' option specified, but Socket/Socket6 was not found\n";
     }
 
     if ($self->{usessl} && !$GOT_SSL) {
@@ -215,7 +214,7 @@ sub _configure {
     }
 
     if (defined $self->{webirc}) {
-        if (!ref $self->{webirc} ne 'HASH') {
+        if (!(ref $self->{webirc} ne 'HASH')) {
             die "webirc param expects a hashref";
         }
         for my $expect_key (qw(pass user host ip)) {
@@ -655,7 +654,7 @@ sub _do_connect {
     for my $address (qw(socks_proxy proxy server resolved_server use_localaddr)) {
         next if !$self->{$address} || !_ip_is_ipv6( $self->{$address} );
         if (!$GOT_SOCKET6) {
-            warn "IPv6 address specified for '$address' but Socket6 not found\n";
+            warn "IPv6 address specified for '$address' but Socket/Socket6 not found\n";
             return;
         }
         $domain = AF_INET6;
@@ -693,7 +692,7 @@ sub _got_dns_response {
 
     for my $net_dns_answer (@net_dns_answers) {
         next if $net_dns_answer->type !~ /^A/;
-        push @{ $self->{res_addresses} }, $net_dns_answer->rdatastr;
+        push @{ $self->{res_addresses} }, $net_dns_answer->rdstring;
     }
 
     if ( !@{ $self->{res_addresses} } && $type eq 'AAAA') {

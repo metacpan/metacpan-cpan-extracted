@@ -1,0 +1,46 @@
+---
+abstract: 'Crypt Base Functions, using the OpenSSL libraries'
+author:
+  - 'Pan Lanlan <abbypan@gmail.com>'
+build_requires:
+  Carp: '0.01'
+  Crypt::OpenSSL::Bignum: '0.09'
+  Crypt::OpenSSL::EC: '1.31'
+  Crypt::OpenSSL::Guess: '0.12'
+  ExtUtils::MakeMaker: '0'
+  Test: '0'
+  Test::More: '0.01'
+  bignum: '0.52'
+configure_requires:
+  Crypt::OpenSSL::Guess: '0.12'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-OpenSSL-BaseFunc
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Crypt::OpenSSL::Bignum: '0.09'
+requires:
+  Carp: '0.01'
+  Crypt::OpenSSL::Bignum: '0.09'
+  Crypt::OpenSSL::EC: '1.31'
+  Crypt::OpenSSL::Guess: '0.12'
+  Math::BigInt: '1.999815'
+  Test: '0.01'
+  Test::More: '0.01'
+  bignum: '0.52'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/abbypan/Crypt-OpenSSL-BaseFunc/issues
+  homepage: http://github.com/abbypan/Crypt-OpenSSL-BaseFunc
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/abbypan/Crypt-OpenSSL-BaseFunc
+version: '0.039'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

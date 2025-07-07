@@ -1,0 +1,106 @@
+TYPEMAP
+BIGNUM *		BIGNUM
+const BIGNUM *		BIGNUM
+BN_CTX *		T_PTRREF
+const EC_METHOD *	EC_METHOD
+EC_GROUP *		EC_GROUP
+const EC_GROUP *	EC_GROUP
+EC_POINT *		EC_POINT
+const EC_POINT *	EC_POINT
+EC_KEY * 		EC_KEY
+const EC_KEY * 		EC_KEY
+EVP_PKEY * 	EVP_PKEY
+const EVP_PKEY * 		EVP_PKEY
+BIO * 			T_PTRREF
+point_conversion_form_t	T_ENUM
+EVP_MD *		EVP_MD
+const EVP_MD *		EVP_MD
+EVP_MD_CTX *		EVP_MD_CTX
+const EVP_MD_CTX *		EVP_MD_CTX
+ENGINE *		ENGINE
+const ENGINE *		ENGINE
+char *	T_PV
+unsigned char *	T_PV
+const unsigned char *	T_PV
+const char *	T_PV
+const char *	T_PV
+char **	T_PV
+unsigned char **	T_PV
+const unsigned char **	T_PV
+const void *    T_PV
+unsigned int *    T_PV
+size_t * T_PV
+AV*   T_AVREF_REFCOUNT_FIXED
+
+INPUT
+BIGNUM
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EC_METHOD
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EC_GROUP
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EC_POINT
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EC_KEY
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EVP_PKEY
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EVP_MD
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EVP_MD_CTX
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+ENGINE
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+T_PV
+  $var = ($type)SvPV_nolen($arg)
+
+
+OUTPUT
+BIGNUM
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::Bignum",1))));
+
+EC_METHOD
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EC_METHOD",1))));
+
+EC_GROUP
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EC_GROUP",1))));
+
+EC_POINT
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EC_POINT",1))));
+
+EC_KEY
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EC_KEY",1))));
+
+
+EVP_MD
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EVP_MD",1))));
+
+EVP_PKEY
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EVP_PKEY",1))));
+
+EVP_MD_CTX
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EVP_MD_CTX",1))));
+
+ENGINE
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::ENGINE",1))));
+
+T_PV
+  sv_setpv((SV*)$arg, $var);

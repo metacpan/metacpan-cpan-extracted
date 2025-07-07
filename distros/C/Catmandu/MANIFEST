@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile
 README
+README-Docker.md
 benchmark/clone.pl
 benchmark/data.json
 benchmark/util_vs_data_util.pl

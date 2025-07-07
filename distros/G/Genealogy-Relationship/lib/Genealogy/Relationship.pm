@@ -118,7 +118,7 @@ class Genealogy::Relationship;
 use List::Util qw[first];
 use Lingua::EN::Numbers qw[num2en num2en_ordinal];
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 field $parent_field_name :param = 'parent';
 field $identifier_field_name :param = 'id';

@@ -1,7 +1,21 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Alien::Build' => '0.32',
+                                    'Alien::Build::MM' => '0.32',
+                                    'ExtUtils::MakeMaker' => '6.52'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'Alien::Build' => '1.40',
+                                        'Alien::Build::MM' => '0.32',
+                                        'Alien::Build::Plugin::Build::Make' => '0.99',
+                                        'Carp' => '0',
+                                        'ExtUtils::MakeMaker' => '6.52',
+                                        'File::Copy::Recursive' => '0',
+                                        'HTTP::Tiny' => '0',
+                                        'Path::Tiny' => '0'
                                       }
                       },
        'develop' => {
@@ -10,14 +24,7 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41',
-                                      'perl' => '5.006'
-                                    }
-                    },
-       'runtime' => {
-                      'requires' => {
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'Test::Pod' => '1.41'
                                     }
                     },
        'test' => {
@@ -25,7 +32,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'ExtUtils::MakeMaker' => '0',
+                                   'ExtUtils::MakeMaker' => '6.52',
                                    'File::Spec' => '0',
                                    'Test::More' => '0'
                                  }

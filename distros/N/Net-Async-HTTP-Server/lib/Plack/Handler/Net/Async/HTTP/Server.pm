@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Plack::Handler::Net::Async::HTTP::Server 0.14;
+package Plack::Handler::Net::Async::HTTP::Server 0.15;
 
 use v5.14;
 use warnings;
@@ -17,22 +17,22 @@ C<Plack::Handler::Net::Async::HTTP::Server> - HTTP handler for Plack using L<Net
 
 =head1 SYNOPSIS
 
- use Plack::Handler::Net::Async::HTTP::Server;
+   use Plack::Handler::Net::Async::HTTP::Server;
 
- my $handler = Plack::Handler::Net::Async::HTTP::Server->new(
-    listen => [ ":8080" ],
- );
+   my $handler = Plack::Handler::Net::Async::HTTP::Server->new(
+      listen => [ ":8080" ],
+   );
 
- sub psgi_app { ... }
+   sub psgi_app { ... }
 
- $handler->run( \&psgi_app );
+   $handler->run( \&psgi_app );
 
 =head1 DESCRIPTION
 
 This module allows L<Plack> to run a L<PSGI> application as a standalone
 HTTP daemon under L<IO::Async>, by using L<Net::Async::HTTP::Server>.
 
- plackup -s Net::Async::HTTP::Server --listen ":8080" application.psgi
+   plackup -s Net::Async::HTTP::Server --listen ":8080" application.psgi
 
 This is internally implemented using L<Net::Async::HTTP::Server::PSGI>;
 further information on environment etc.. is documented there.
@@ -40,22 +40,22 @@ further information on environment etc.. is documented there.
 If L<IO::Async::SSL> is available, this handler supports accepting connections
 via C<https>
 
- plackup -s Net::Async::HTTP::Server --ssl ...
+   plackup -s Net::Async::HTTP::Server --ssl ...
 
 Or per-listen argument by appending C<:SSL>, as
 
- plackup -s Net::Async::HTTP::Server --listen ":8443:SSL" ...
+   plackup -s Net::Async::HTTP::Server --listen ":8443:SSL" ...
 
 Any other options whose names start C<ssl_> will be passed on to the SSL
 listen method.
 
 =cut
 
-=head1 METHODS
+=head1 CONSTRUCTOR
 
-=cut
+=head2 new
 
-=head2 $handler = Plack::Handler::Net::Async::HTTP::Server->new( %args )
+   $handler = Plack::Handler::Net::Async::HTTP::Server->new( %args );
 
 Returns a new instance of a C<Plack::Handler::Net::Async::HTTP::Server>
 object. Takes the following named arguments:
@@ -73,11 +73,11 @@ Reference to code to invoke when the server is set up and listening, ready to
 accept connections. It is invoked with a HASH reference containing the
 following details:
 
- $server_ready->( {
-    host            => HOST,
-    port            => SERVICE,
-    server_software => NAME,
- } )
+   $server_ready->( {
+      host            => HOST,
+      port            => SERVICE,
+      server_software => NAME,
+   } )
 
 =item socket => STRING
 
@@ -114,7 +114,13 @@ sub new
    return $self;
 }
 
-=head2 $handler->run( $psgi_app )
+=head1 METHODS
+
+=cut
+
+=head2 run
+
+   $handler->run( $psgi_app );
 
 Creates the HTTP-listening socket or sockets, and runs the given PSGI
 application for received requests.

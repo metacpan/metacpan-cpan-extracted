@@ -77,7 +77,7 @@ to DNS records for channel members.
      my $irc = $_[HEAP]->{irc};
      my $res = $_[ARG0];
      my @answers = $res->{response}
-         ? map { $_->rdatastr } $res->{response}->answer()
+         ? map { $_->rdstring } $res->{response}->answer()
          : ();
 
      $irc->yield(

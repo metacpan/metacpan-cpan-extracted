@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.0.1 - 2025-07-07]
+
+### Changed
+
+- Removed :reader from the test person classes
+
 ## [1.0.0 - 2025-07-03]
 
 ### Changed

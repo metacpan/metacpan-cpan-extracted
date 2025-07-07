@@ -1,5 +1,11 @@
 Revision history for Net-Async-HTTP-Server
 
+0.15    2025-07-06
+        [CHANGES]
+         * Tests no longer use Test::Refcount so remember to remove it from
+           the `test_requires` field
+         * Updated Pod style
+
 0.14    2023-06-05
         [CHANGES]
          * `use v5.14` in all perl files

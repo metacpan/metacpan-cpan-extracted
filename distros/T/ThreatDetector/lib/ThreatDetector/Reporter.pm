@@ -5,7 +5,7 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(generate_summary);
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub generate_summary {
     my ($label, $events_ref, $fh) = @_;

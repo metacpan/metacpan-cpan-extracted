@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Crypt::PasswdMD5" => "1.3",
     "IRC::Utils" => "0.10",
     "List::Util" => 0,
-    "Net::CIDR" => "0.18",
+    "Net::CIDR" => "0.22",
     "Net::IP::Minimal" => 0,
     "Net::Netmask" => "1.9104",
     "POE" => "0.9999",
@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.47",
     "Test::POE::Client::TCP" => "1.22"
   },
-  "VERSION" => "1.62",
+  "VERSION" => "1.66",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "Crypt::PasswdMD5" => "1.3",
   "IRC::Utils" => "0.10",
   "List::Util" => 0,
-  "Net::CIDR" => "0.18",
+  "Net::CIDR" => "0.22",
   "Net::IP::Minimal" => 0,
   "Net::Netmask" => "1.9104",
   "POE" => "0.9999",

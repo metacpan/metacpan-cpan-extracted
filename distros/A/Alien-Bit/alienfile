@@ -1,9 +1,222 @@
+use alienfile;
+use strict;
+use warnings;
+
+# Define metadata and build requirements
+configure {
+    requires 'Path::Tiny';
+    requires 'File::Copy::Recursive';
+    requires 'HTTP::Tiny';
+    requires 'Carp';
+};
+
+# Always use the share approach (build from source)
+# since there's no reliable system package detection
+probe sub { 'share' };
+
+share {
+    # Import necessary modules
+    use Path::Tiny            qw( path );
+    use File::Copy::Recursive qw( dircopy fcopy );
+    use Carp                  qw( croak );
+
+    # Set source repository information
+    my $repo_url =
+      'https://github.com/chrisarg/Bit/archive/refs/heads/master.zip';
+
+    # Configure download
+    start_url $repo_url;
+    plugin 'Download';
+    plugin 'Extract' => 'zip';
+
+    # Build configuration
+    plugin 'Build::Make';
+
+    # Define build commands
+    build [
+        # Standard build process
+        ['%{make}'],
+
+        # This builds the test program too
+        ['%{make} test'],
+
+        # This builds the benchmark programs
+        ['%{make} bench']
+    ];
+
+    # Post-build file handling - copy files to staging directory
+    after 'build' => sub {
+        my ($build) = @_;
+
+        # Determine destination directory
+        my $stage_dir  = path( $build->install_prop->{stage} );
+        my $source_dir = path( $build->install_prop->{extract} );
+
+        # Create lib and include directories
+        my $lib_dir     = $stage_dir->child('lib');
+        my $include_dir = $stage_dir->child('include');
+        $lib_dir->mkpath;
+        $include_dir->mkpath;
+
+        # Copy shared library to lib directory
+        my $build_dir = $source_dir->child('build');
+        my @libs;
+
+        # Handle different platform library extensions
+        if ( $^O eq 'MSWin32' ) {
+            @libs = $build_dir->children(qr/\.(dll|lib)$/);
+        }
+        elsif ( $^O eq 'darwin' ) {
+            @libs = $build_dir->children(qr/\.(dylib|a)$/);
+        }
+        else {
+            @libs = $build_dir->children(qr/\.(so|a)$/);
+        }
+
+        # Copy each library file
+        foreach my $lib (@libs) {
+            my $dest = $lib_dir->child( $lib->basename );
+            $lib->copy($dest) or croak "Failed to copy $lib to $dest: $!";
+            print "Copied library: ", $lib->basename, "\n";
+        }
+
+        # Copy test and benchmark executables
+        my @executables;
+        if ( $^O eq 'MSWin32' ) {
+            @executables = $build_dir->children(qr/\.(exe)$/);
+        }
+        else {
+            @executables = grep {
+                     -x $_
+                  && !-d $_
+                  && $_->basename !~ /\.(so|dylib|dll|o|a)$/
+            } $build_dir->children;
+        }
+
+        foreach my $exe (@executables) {
+            my $dest = $lib_dir->child( $exe->basename );
+            $exe->copy($dest) or croak "Failed to copy $exe to $dest: $!";
+            chmod 0755, $dest;    # Ensure executable permissions
+            print "Copied executable: ", $exe->basename, "\n";
+        }
+
+        # Copy header files
+        my $headers_dir = $source_dir->child('include');
+        my @headers     = $headers_dir->children(qr/\.h$/);
+
+        foreach my $header (@headers) {
+            my $dest = $include_dir->child( $header->basename );
+            $header->copy($dest) or croak "Failed to copy $header to $dest: $!";
+            print "Copied header: ", $header->basename, "\n";
+        }
+    };
+
+    # Set runtime properties for client code
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+
+        # Set include and library paths
+        my $include_dir = path( $prefix, 'include' )->stringify;
+        my $lib_dir     = path( $prefix, 'lib' )->stringify;
+
+        # Set compiler flags
+        $build->runtime_prop->{cflags} = "-I$include_dir";
+
+        # Set linker flags with appropriate library name
+        $build->runtime_prop->{libs} = "-L$lib_dir -lbit";
+
+        # Store raw paths for Platypus FFI
+        $build->runtime_prop->{ffi_name}    = "bit";
+        $build->runtime_prop->{include_dir} = $include_dir;
+        $build->runtime_prop->{lib_dir}     = $lib_dir;
+
+        # Print confirmation
+        print "Alien::Bit configured with:\n";
+        print "  cflags: ",      $build->runtime_prop->{cflags},      "\n";
+        print "  libs: ",        $build->runtime_prop->{libs},        "\n";
+        print "  ffi_name: ",    $build->runtime_prop->{ffi_name},    "\n";
+        print "  include_dir: ", $build->runtime_prop->{include_dir}, "\n";
+        print "  lib_dir: ",     $build->runtime_prop->{lib_dir},     "\n";
+    };
+
+    # Run tests after installation
+    test sub {
+        my ($build) = @_;
+        my $lib_dir = path( $build->install_prop->{stage}, 'lib' );
+
+        # Define test executable names based on platform
+        my $test_exe   = $^O eq 'MSWin32' ? 'test_bit.exe'   : 'test_bit';
+        my $bench_exe  = $^O eq 'MSWin32' ? 'benchmark.exe'  : 'benchmark';
+        my $openmp_exe = $^O eq 'MSWin32' ? 'openmp_bit.exe' : 'openmp_bit';
+
+        # Get full paths
+        my $test_path   = $lib_dir->child($test_exe);
+        my $bench_path  = $lib_dir->child($bench_exe);
+        my $openmp_path = $lib_dir->child($openmp_exe);
+
+        # Run main tests if available
+        if ( -x $test_path ) {
+            print "\n**************** Running Bit Tests ****************\n";
+            my $test_output = `$test_path 2>&1`;
+            print $test_output;
+
+            if ( $test_output =~ /All tests passed/m ) {
+                print
+"\n**************** Bit tests passed successfully ****************\n";
+            }
+            else {
+                croak("Bit tests failed");
+            }
+        }
+        else {
+            print "Test executable not found at $test_path - skipping tests\n";
+        }
+        unlink $test_path;    # Clean up test executable
+                              # Run benchmarks if available
+        if ( -x $bench_path ) {
+            print
+              "\n**************** Running Bit Benchmarks ****************\n";
+            my $bench_output = `$bench_path 2>&1`;
+            print $bench_output;
+            unlink $bench_path;    # Clean up benchmark executable
+        }
+        else {
+            print
+"Benchmark executable not found at $bench_path - skipping benchmarks\n";
+        }
+
+        # Run OpenMP benchmarks if available
+        if ( -x $openmp_path ) {
+            print
+"\n**************** Running Bit OpenMP Benchmarks ****************\n";
+            my $openmp_output = `$openmp_path 1024 1000 1000 4 2>&1`;
+            print $openmp_output;
+            unlink $openmp_path;    # Clean up OpenMP benchmark executable
+        }
+        else {
+            print
+"OpenMP benchmark executable not found at $openmp_path - skipping OpenMP benchmarks\n";
+        }
+
+        # delete object files that end in .o
+        my @object_files = $lib_dir->children(qr/\.o$/);
+        foreach my $obj_file (@object_files) {
+            $obj_file->remove;
+            print "Removed object file: ", $obj_file->basename, "\n";
+        }
+    };
+
+};
+
+=pod
+# old version of alienfile
+
 use strict;
 use warnings;
 use alienfile;
 
 configure {
-    requires 'Alien::Meson';
     requires 'Carp';
     requires 'File::Copy::Recursive';
     requires 'HTTP::Tiny';
@@ -12,34 +225,41 @@ configure {
 
 ## not doing system install, so must deal with the package name
 ## being not obvious
-plugin 'PkgConfig' => ( pkg_name => 'Bit', );
+
+probe sub {
+    return 'share';
+};
 
 share {
     use Carp;
-    use File::Copy::Recursive qw(dircopy);
+    use File::Copy::Recursive qw(dircopy fcopy);
     use HTTP::Tiny;
-    use Path::Tiny;
+    use File::Spec::Functions;
 
     my $install_root;
     my $path_to_static_lib;
     my $repo_url;
     my $repo_response;
 
-    ## use one of two locations to source edlib
-    plugin 'Download::GitHub' => (
-        github_repo => 'Bit',
-        github_user => 'chrisarg',
-    );
+    $repo_url = 'https://github.com/chrisarg/Bit/archive/refs/heads/master.zip';
+    $repo_response = HTTP::Tiny->new->head($repo_url);
+    croak
+"Failed to download Bit repository: $repo_response->{status} $repo_response->{reason}"
+      unless ( $repo_response->{success} );
+
+    start_url $repo_url;
+
+    plugin 'Download';
     plugin 'Extract' => 'zip';
-    plugin 'Build::CMake';
-    plugin 'Gather::IsolateDynamic';
+    plugin 'Build::Make';
+
+    #    plugin 'Gather::IsolateDynamic' => (
+    #        dynamic_libs => [ 'libbit.so', 'libbit.dylib', 'bit.dll' ],
+    #        static_libs  => ['libbit.a'],
+    #    );
 
     ## build both the dynamic and the dynamic libs in a single step
-    build [
-        ['%{make} all'],
-	['%{make} test'],
-	['%{make} bench']
-    ];
+    build [ ['%{make} all'], ['%{make} test'], ['%{make} bench'] ];
 
     ## various postbuild activities to facilitate the gathering of files
     after 'build' => sub {
@@ -49,23 +269,94 @@ share {
         if ( $build->meta_prop->{destdir} ) {
             my $destdir = $ENV{DESTDIR};
             $install_root =
-              Path::Tiny->new( $ENV{DESTDIR}, $build->install_prop->{prefix} );
+              catfile( $ENV{DESTDIR}, $build->install_prop->{prefix} );
         }
         else {
-            $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+            $install_root = catfile( $build->install_prop->{stage} );
         }
-        my $source_directory      = $build->{install_prop}->{extract};
-        my $binary_dest_directory = path $install_root, 'bin';
-        dircopy( path( $source_directory, 'bin' ), $binary_dest_directory );
+        my $source_directory   = $build->install_prop->{extract};
+        my $lib_dest_directory = catfile( $install_root, 'lib' );
+        dircopy( catfile( $source_directory, 'build' ), $lib_dest_directory );
+        ## get the include files
+        my $source_header = catfile( $source_directory, 'include', 'bit.h' );
+        my $dest_header   = catfile( $install_root,     'include', 'bit.h' );
+        print "\n**************** Copying header file ****************\n";
+        print "Copying header file from $source_header to $dest_header\n";
+        print "\n","==" x 50, "\n";
+        mkdir( catfile( $install_root, 'include' ) )
+          unless -d catfile( $install_root, 'include' );
+        fcopy( $source_header, $dest_header );
+
+    };
+
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        my $incdir = catfile( $prefix, 'include' );
+        my $libdir = catfile( $prefix, 'lib' );
+
+        # Set the compiler flags
+        $build->runtime_prop->{cflags} = "-I$incdir";
+
+        # Set the linker flags
+        $build->runtime_prop->{libs}     = "-L$libdir -lbit";
+        $build->runtime_prop->{ffi_name} = "bit";
+
+        # store the actual paths if you ever have to debug
+        $build->runtime_prop->{include_dir} = $incdir;
+        $build->runtime_prop->{lib_dir}     = $libdir;
 
     };
 
     test sub {
         my ($build) = @_;
         my $binary_dest_directory =
-          path( $build->install_prop->{stage}, 'bin' );
+          catfile( $build->install_prop->{stage}, 'lib' );
+        my $runTests_exec = $^O eq 'MSWin32' ? 'test_bit.exe' : 'test_bit';
+        $runTests_exec = catfile( $binary_dest_directory, $runTests_exec );
+        print("Can't find test executable") if not -e $runTests_exec;
+        print("\n**************** Running Bit Tests ****************\n");
+        my $test_output = `$runTests_exec`;
+        print $test_output;
+
+        if ( $test_output =~ /All tests passed/m ) {
+            print(
+"\n**************** Bit tests passed successfully ****************\n"
+            );
+        }
+        else {
+            croak("Bit tests failed");
+        }
+        ## execute benchmarks
+        my $runBench_exec = $^O eq 'MSWin32' ? 'benchmark.exe' : 'benchmark';
+        $runBench_exec = catfile( $binary_dest_directory, $runBench_exec );
+        print("Can't find benchmark executable") if not -e $runBench_exec;
+        print("\n**************** Running Bit Benchmarks ****************\n");
+        my $bench_output = `$runBench_exec`;
+        print $bench_output;
+
+        # execute openmp + gpu benchmarks
+        my $runBenchOpenMP_exec =
+          $^O eq 'MSWin32' ? 'openmp_bit.exe' : 'openmp_bit';
+        $runBenchOpenMP_exec =
+          catfile( $binary_dest_directory, $runBenchOpenMP_exec );
+        print("Can't find openmp benchmark executable")
+          if not -e $runBenchOpenMP_exec;
+        print(
+"\n**************** Running Bit OpenMP Benchmarks ****************\n"
+        );
+        my $bench_openmp_output = qx{$runBenchOpenMP_exec 1024 1000 1000 4};
+        print $bench_openmp_output;
+
+        unlink $runTests_exec;
+        unlink $runBench_exec;
+        unlink $runBenchOpenMP_exec;
+
+        # delete object files that end in .o
+        my @object_files = glob( catfile( $binary_dest_directory, '*.o' ) );
+        unlink $_ for @object_files;
     };
 };
 
 
-
+=cut

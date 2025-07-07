@@ -22,7 +22,7 @@ requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Graphics::ColorNames::CSS' => 0;
 requires 'List::Util' => 1.33;
-requires 'Mo::utils' => 0.06;
+requires 'Mo::utils' => 0.31;
 requires 'Mo::utils::Number::Utils' => 0;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Mo-utils-CSS/issues',
@@ -34,7 +34,7 @@ test_requires 'Readonly' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.11';
+version '0.12';
 
 # Run.
 WriteAll();

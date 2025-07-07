@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Server::Protocol 0.14;
+package Net::Async::HTTP::Server::Protocol 0.15;
 
 use v5.14;
 use warnings;

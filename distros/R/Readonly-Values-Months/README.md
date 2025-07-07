@@ -4,13 +4,34 @@ Readonly::Values::Months - Months Constants
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
     use Readonly::Values::Months;
 
-    print $JAN, "\n";   # Prints 1
+    # Simple month constants
+    print "January is month number $JAN\n";    # January is month number 1
+    print "December is month number $DEC\n";   # December is month number 12
+
+    # Lookup a month number by name (case-insensitive keys)
+    my $num = $months{'april'};     # 4
+    print "April => $num\n";
+
+    # Iterate full month names
+    for my $name (@month_names) {
+        printf "%-9s => %2d\n", ucfirst($name), $months{$name};
+    }
+
+    # Short names (first three letters)
+    print 'Abbreviations: ', join(', ', @short_month_names), "\n";
+    # Abbreviations: jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec
+
+    # Exported symbols:
+    #   $JAN ... $DEC
+    #   %months
+    #   @month_names
+    #   @short_month_names
 
 # AUTHOR
 

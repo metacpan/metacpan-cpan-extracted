@@ -1,0 +1,69 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Crypt::Protocol::SIGMA> 
+
+=head2 PROTOCOL
+
+L<https://www.ietf.org/proceedings/52/slides/ipsec-9.pdf>
+
+SIGMA_I
+
+=head1 FUNCTION
+
+=head2  derive_z_ke_km
+
+    my $r = derive_z_ke_km( $self_priv, $peer_pub, $hash_name, $key_len );
+
+=head2  derive_ks
+
+    my $ks = derive_ks( $z, $na, $nb, $hash_name, $key_len );
+
+=head2  verify_msg_mac_sig
+    
+    my $verify_result = verify_msg_mac_sig($data_to_mac_r, $sig_r, $km, $sig_pub, $pack_msg_func, $mac_func, $verify_func);
+
+=head2  gen_msg_mac_sig_enc
+
+    my $cipher_info = gen_msg_mac_sig_enc($data_to_enc_r, $data_to_mac_r, $km, $sign_priv, $ke, $pack_msg_func, $mac_func, $sign_func, $enc_func);
+
+=head2  a_send_msg1
+
+    my $a_send_msg1_r = a_send_msg1( $group, $random_range, $point_compress_t, $pack_msg_func, $ctx );
+
+=head2  b_recv_msg1
+
+    my $b_recv_msg1_r = b_recv_msg1($group, $msg1, $unpack_msg_func, $ctx);
+
+=head2  b_send_msg2
+
+    my $b_send_msg2_r = b_send_msg2( $group, $b_recv_msg1_r, $id_b, $random_range, $point_compress_t, $hash_name, $key_len, $pack_msg_func, $mac_func, $sign_func, $enc_func, $ctx );
+
+=head2  a_recv_msg2
+
+    my $a_recv_msg2_r = a_recv_msg2( $group, $msg1_r, $msg2, $hash_name, $key_len, $unpack_msg_func, $dec_func, $ctx );
+
+=head2  a_verify_msg2
+
+    my $a_verify_msg2_result = a_verify_msg2( $msg1_r, $a_recv_msg2_r, $pack_msg_func, $mac_func, $sig_verify_func );
+
+=head2  a_send_msg3
+    
+    my $a_send_msg3 = a_send_msg3( $id_a, $a_recv_nb, $ek_key_a_r, $derive_key, $pack_msg_func, $mac_func, $sign_func, $enc_func );
+
+=head2  b_recv_msg3
+
+    my $verify_result = b_recv_msg3( $msg3, $b_send_msg2_r, $pack_msg_func, $unpack_msg_func, $mac_func, $sig_verify_func, $dec_func );
+
+=head2  b_send_msg4
+
+    my $b_send_msg4 = b_send_msg4($b_recv_msg1_r, $b_send_msg2_r, $pack_msg_func, $mac_func);
+
+=head2  a_recv_msg4
+    
+    my $sigma_result = a_recv_msg4( $msg4, $na, $a_recv_msg2_r, $pack_msg_func, $mac_func );
+
+=cut

@@ -1,0 +1,75 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Crypt::Protocol::OPRF> 
+
+=head2 PROTOCOL
+
+L<https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/>
+
+=head2 EXAMPLE
+
+    use Crypt::OpenSSL::EC;
+    use Crypt::OpenSSL::Bignum;
+    use Crypt::OpenSSL::Hash2Curve;
+    use Crypt::OpenSSL::Base::Func;
+    use Crypt::OPRF;
+
+    my $prefix         = "VOPRF09-";
+    my $mode           = 0x00;
+    my $suite_id       = 0x0003;
+    my $context_string = creat_context_string( $prefix, $mode, $suite_id );
+    my $DSI            = "HashToGroup-" . $context_string;
+    my $group_name     = 'prime256v1';
+    my $type           = 'sswu';
+
+    my $hash_name           = 'SHA256';
+    my $expand_message_func = \&expand_message_xmd;
+    my $clear_cofactor_flag = 1;
+
+    my $input = pack( "H*", '00' );
+    my $blind = Crypt::OpenSSL::Bignum->new_from_hex( 'f70cf205f782fa11a0d61b2f5a8a2a1143368327f3077c68a1545e9aafbba6aa' );
+    my $blindedElement;
+    ( $blind, $blindedElement ) = blind( $input, $blind, $DSI, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+    my $params_ref = get_ec_params( $group_name );
+    my ( $group, $order, $ctx ) = @{$params_ref}{qw/group order ctx/};
+
+    my $bn = Crypt::OpenSSL::EC::EC_POINT::point2hex( $group, $blindedElement, 2, $ctx );
+    print "$bn\n";
+
+    my $skS               = Crypt::OpenSSL::Bignum->new_from_hex( '88a91851d93ab3e4f2636babc60d6ce9d1aee2b86dece13fa8590d955a08d987' );
+    my $evaluationElement = evaluate( $group, $blindedElement, $skS, $ctx );
+    my $bn_ev             = Crypt::OpenSSL::EC::EC_POINT::point2hex( $group, $evaluationElement, 2, $ctx );
+    print "$bn_ev\n";
+
+    my $dgst = finalize( $group, $order, $input, $blind, $evaluationElement, $hash_name, $ctx );
+    print unpack( "H*", $dgst ), "\n";
+
+=head1 FUNCTION
+
+=head2 creat_context_string
+
+    my $s  = creat_context_string($prefix, $mode, $suite_id);
+
+=head2 derive_key_pair
+
+    my $DST = "DeriveKeyPair".$context_string;
+    my $ec_key_r = derive_key_pair($group_name, $seed, $info, $DST, $hash_name, $expand_message_func);
+
+=head2  blind
+
+    my ($blind, $blindedElement) = blind($input, $blind, $DSI, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag);
+
+=head2 evaluate
+
+    my $evaluationElement = evaluate($group, $blindedElement, $skS, $ctx);
+
+=head2 finalize
+
+    my $output = finalize($group, $order, $input, $blind, $evaluationElement, $hash_name, $ctx); 
+
+=cut

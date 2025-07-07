@@ -1,6 +1,5 @@
 package POE::Component::IRC::Plugin::Whois;
-our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::Plugin::Whois::VERSION = '6.93';
+$POE::Component::IRC::Plugin::Whois::VERSION = '6.95';
 use strict;
 use warnings FATAL => 'all';
 use POE;

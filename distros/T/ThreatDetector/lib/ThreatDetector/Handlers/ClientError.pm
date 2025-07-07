@@ -9,7 +9,7 @@ use Time::HiRes qw(gettimeofday);
 our $VERBOSE = 0;
 our @EXPORT_OK = qw(handle_client_error get_client_error_events);
 our @CLIENT_ERROR_EVENTS;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub handle_client_error {
     my ($entry) = @_;

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Server::PSGI 0.14;
+package Net::Async::HTTP::Server::PSGI 0.15;
 
 use v5.14;
 use warnings;
@@ -22,30 +22,30 @@ C<Net::Async::HTTP::Server::PSGI> - use C<PSGI> applications with C<Net::Async::
 
 =head1 SYNOPSIS
 
- use Net::Async::HTTP::Server::PSGI;
- use IO::Async::Loop;
+   use Net::Async::HTTP::Server::PSGI;
+   use IO::Async::Loop;
 
- my $loop = IO::Async::Loop->new;
+   my $loop = IO::Async::Loop->new;
 
- my $httpserver = Net::Async::HTTP::Server::PSGI->new(
-    app => sub {
-       my $env = shift;
+   my $httpserver = Net::Async::HTTP::Server::PSGI->new(
+      app => sub {
+         my $env = shift;
 
-       return [
-          200,
-          [ "Content-Type" => "text/plain" ],
-          [ "Hello, world!" ],
-       ];
-    },
- );
+         return [
+            200,
+            [ "Content-Type" => "text/plain" ],
+            [ "Hello, world!" ],
+         ];
+      },
+   );
 
- $loop->add( $httpserver );
+   $loop->add( $httpserver );
 
- $httpserver->listen(
-    addr => { family => "inet6", socktype => "stream", port => 8080 },
- )->get;
+   $httpserver->listen(
+      addr => { family => "inet6", socktype => "stream", port => 8080 },
+   )->get;
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

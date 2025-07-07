@@ -1,5 +1,17 @@
 Revision history for POE-Component-Server-IRC
 
+1.66  Mon Jul 7 02:58:43 BST 2025
+    - Bump Net::CIDR version required
+
+1.65  Mon Jul 7 02:50:19 BST 2025
+    - Fix possible precedence problem warnings
+
+1.64  Wed Nov 22 15:59:33 GMT 2023
+    - Fix distribution indexing
+
+1.63  Mon Nov 20 23:28:53 GMT 2023
+    - MAP output should include server IDs, for OPERs
+
 1.62  Tue Dec 28 18:56:15 GMT 2021
     - Add TLSv1_3 definition
 

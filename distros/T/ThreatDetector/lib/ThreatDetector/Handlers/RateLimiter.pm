@@ -9,7 +9,7 @@ use Time::HiRes qw(gettimeofday);
 our $VERBOSE = 0;
 our @EXPORT_OK = qw(handle_rate_burst get_rate_burst_events);
 our @RATE_BURST_EVENTS;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my %ip_activity;
 

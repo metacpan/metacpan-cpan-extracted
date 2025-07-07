@@ -1,0 +1,106 @@
+0.000018 Jul 06 2025
+
+- BREAKING CHANGES - but not published yet. change constant and function names
+  to match new internal protected memory naming ("protmem" vs. "safemem").
+
+- add environment variables for flag defaults
+
+- use a single protected memory api the hood for all protected memory
+
+- doc updates
+
+0.000017 Jul 04 2025
+
+- add a test for pminisign, just compiles
+
+- doc updates
+
+0.000016 Jul 04 2025
+
+- add demo program for passphrase encryption/decryption
+
+- minor bugfixes and improvements
+
+- doc updates
+
+0.000015 Jul 02 2025
+
+- add flag to munlock sodium allocated memory
+
+- minor bugfixes and improvements
+
+- doc updates
+
+0.000014 Jul 02 2025
+
+- minor bugfixes and improvements
+
+- doc updates
+
+0.000013 Jul 02 2025
+
+- minor bugfixes and improvements
+
+- doc updates
+
+0.000012 Jun 26 2025
+
+- doc updates
+
+0.000011 Jun 27 2025
+
+- minor bugfixes and improvements
+
+- doc updates
+
+0.000010 Jun 26 2025
+
+- no functional change
+
+0.000009 Jun 25 2025
+
+- OO interface added
+
+- minor bugfixes and improvements
+
+- doc updates
+
+0.000008 Apr 12 2024
+
+- C style improvements
+
+- fix mpstate and memvault grant and release
+
+- bugfix makefile for current libsodium
+
+0.000007 Feb 16 2024
+
+- move hkdf to own package
+
+0.000006 Feb 15 2024
+
+- bump libsodium to 1.0.19
+
+- add hkdf
+
+- add feature guards for hkdf and aegis
+
+- makefile improvements
+
+- bugfix aes256gcm decrypt
+
+0.000005 Feb 12 2024
+
+- makefile improvements
+
+0.000004 Aug 30 2023
+
+- fix undocumented memvault new_from_ttyno
+
+0.000003 Aug 23 2023
+
+- minor bugfixes
+
+0.000002 Sun Jul 9 2023
+
+- First release

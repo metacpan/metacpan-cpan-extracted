@@ -9,7 +9,7 @@ use Time::HiRes qw(gettimeofday);
 our $VERBOSE = 0;
 our @EXPORT_OK = qw(handle_directory_traversal get_directory_traversal_events);
 our @DIRECTORY_TRAVERSAL_EVENTS;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub handle_directory_traversal {
     my ($entry) = @_;

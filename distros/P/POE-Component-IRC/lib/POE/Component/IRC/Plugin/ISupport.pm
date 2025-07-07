@@ -1,6 +1,5 @@
 package POE::Component::IRC::Plugin::ISupport;
-our $AUTHORITY = 'cpan:HINRIK';
-$POE::Component::IRC::Plugin::ISupport::VERSION = '6.93';
+$POE::Component::IRC::Plugin::ISupport::VERSION = '6.95';
 use strict;
 use warnings FATAL => 'all';
 use POE::Component::IRC::Plugin qw(:ALL);

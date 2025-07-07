@@ -30,7 +30,7 @@ requires:
   Exporter: 0
   Graphics::ColorNames::CSS: 0
   List::Util: 1.33
-  Mo::utils: 0.06
+  Mo::utils: 0.31
   Mo::utils::Number::Utils: 0
   Readonly: 0
   perl: 5.6.2
@@ -39,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-CSS
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-CSS
-version: '0.11'
+version: '0.12'

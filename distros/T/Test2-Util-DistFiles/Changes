@@ -1,0 +1,11 @@
+Revision history for Test2-Util-DistFiles:
+
+v0.1.1    2025-07-06 14:23:32+01:00 Europe/London
+  [Documentation]
+  - Fixed typo in abstract. (Thanks Rihards Olups and Oriel Jutty.)
+
+  [Tests]
+  - Added more author tests.
+
+v0.1.0    2025-07-06 12:06:39+01:00 Europe/London
+  - Initial release.

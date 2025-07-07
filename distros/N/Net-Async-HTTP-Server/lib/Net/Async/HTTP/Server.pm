@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Server 0.14;
+package Net::Async::HTTP::Server 0.15;
 
 use v5.14;
 use warnings;
@@ -47,34 +47,34 @@ C<Net::Async::HTTP::Server> - serve HTTP with C<IO::Async>
 
 =head1 SYNOPSIS
 
- use Net::Async::HTTP::Server;
- use IO::Async::Loop;
+   use Net::Async::HTTP::Server;
+   use IO::Async::Loop;
 
- use HTTP::Response;
+   use HTTP::Response;
 
- my $loop = IO::Async::Loop->new();
+   my $loop = IO::Async::Loop->new();
 
- my $httpserver = Net::Async::HTTP::Server->new(
-    on_request => sub {
-       my $self = shift;
-       my ( $req ) = @_;
+   my $httpserver = Net::Async::HTTP::Server->new(
+      on_request => sub {
+         my $self = shift;
+         my ( $req ) = @_;
 
-       my $response = HTTP::Response->new( 200 );
-       $response->add_content( "Hello, world!\n" );
-       $response->content_type( "text/plain" );
-       $response->content_length( length $response->content );
+         my $response = HTTP::Response->new( 200 );
+         $response->add_content( "Hello, world!\n" );
+         $response->content_type( "text/plain" );
+         $response->content_length( length $response->content );
 
-       $req->respond( $response );
-    },
- );
+         $req->respond( $response );
+      },
+   );
 
- $loop->add( $httpserver );
+   $loop->add( $httpserver );
 
- $httpserver->listen(
-    addr => { family => "inet6", socktype => "stream", port => 8080 },
- )->get
+   $httpserver->listen(
+      addr => { family => "inet6", socktype => "stream", port => 8080 },
+   )->get
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -181,7 +181,7 @@ sub on_accept
 
 =head2 make_request
 
-   $request = $server->make_request( @args )
+   $request = $server->make_request( @args );
 
 Invoked by the protocol stream handler to create a new request object
 representing an incoming request. This is provided as a method for subclasses

@@ -1,0 +1,755 @@
+#!/usr/bin/env perl
+our $VERSION = '0.000001';
+use strict;
+use warnings;
+use 5.20.0;
+use experimental 'signatures';
+use Getopt::Long qw/:config bundling/;
+use Crypt::Sodium::XS::Base64 "BASE64_VARIANT_ORIGINAL";
+use Crypt::Sodium::XS::MemVault;
+use Crypt::Sodium::XS::ProtMem "PROTMEM_ALL_DISABLED";
+use Crypt::Sodium::XS::generichash ":all";
+use Crypt::Sodium::XS::pwhash ":all";
+use Crypt::Sodium::XS::sign ":all";
+use Fcntl;
+use File::Basename "basename";
+use File::Spec;
+
+# this code is structured to resemble minisign from which it derives, for ease
+# of comparison.
+
+# sk format
+# untrusted comment, arbitrary length
+# "\n"
+# base64url {
+#   sig_alg ------- a2
+#   kdf_alg ------- a2
+#   chk_alg ------- a2
+#   kdf_salt ------ a#saltbytes (depends on kdf_alg)
+#   kdf_opslimit -- Q< (8)
+#   kdf_memlimit -- Q< (8)
+#   key_num ------- a8 (LE integer)
+#   sk ------------ a#skbytes (depends on sig_alg)
+#   chk ----------- a#chkbytes (depends on chk_alg)
+# }
+# "\n"
+
+# pk format
+# base64url {
+#   sig_alg -------- a2
+#   key_num -------- a8 (LE integer)
+#   pk ------------- a#pkbytes (depends on sig_alg)
+# }
+# "\n"
+
+# sig format
+# untrusted comment, arbitrary length
+# "\n"
+# base64url {
+#   sig_alg -------- a2
+#   key_num -------- a8 (LE integer)
+#   sig ------------ a#signbytes (depends on sig_alg)
+# }
+# "\n"
+# trusted comment, arbitrary length
+# "\n"
+# base64url {
+#   complete_sig, aribitrary length
+# }
+# "\n"
+
+# minisign clearly intended to support multiple algorithms but doesn't.
+# 'Ed' is referred to as "legacy" (non-pre-hashed) and 'ED' is pre-hashed.
+my %sig_algs = (
+  Ed => {
+    name => 'ed25519',
+    bytes => sign_ed25519_BYTES,
+    pkbytes => sign_ed25519_PUBLICKEYBYTES,
+    skbytes => sign_ed25519_SECRETKEYBYTES,
+    keypair_gen => \&sign_ed25519_keypair,
+    sign => \&sign_ed25519_detached,
+    verify => \&sign_ed25519_verify,
+  },
+  ED => {
+    name => 'ed25519 pre-hashed',
+    bytes => sign_ed25519_BYTES,
+    pkbytes => sign_ed25519_PUBLICKEYBYTES,
+    skbytes => sign_ed25519_SECRETKEYBYTES,
+    hash_init => \&generichash_blake2b_init,
+    hashbytes => generichash_blake2b_BYTES_MAX,
+    keypair_gen => \&sign_ed25519_keypair,
+    sign => \&sign_ed25519_detached,
+    verify => \&sign_ed25519_verify,
+  },
+);
+my %kdf_algs = (
+  Sc => {
+    name => 'scrypt',
+    saltbytes => pwhash_scryptsalsa208sha256_SALTBYTES,
+    opslimit_default => pwhash_scryptsalsa208sha256_OPSLIMIT_SENSITIVE,
+    memlimit_default => pwhash_scryptsalsa208sha256_MEMLIMIT_SENSITIVE,
+    salt_gen => \&pwhash_scryptsalsa208sha256_salt,
+    kdf_gen => \&pwhash_scryptsalsa208sha256,
+  },
+);
+my %chk_algs = (
+  B2 => {
+    name => 'blake2b',
+    bytes => generichash_blake2b_BYTES,
+    init => \&generichash_blake2b_init,
+  },
+);
+
+my $sig_alg_default = "Ed";
+my $sig_alg_hashed_default = "ED";
+my $kdf_alg_default = "Sc";
+my $chk_alg_default = "B2";
+my $comment_prefix = "untrusted comment: ";
+my $default_comment = "signature from minisign secret key";
+my $sk_default_comment = "pminisign encrypted secret key";
+my $trusted_comment_prefix = "trusted comment: ";
+# other stuff is just hardcoded.
+
+sub usage {
+  print STDERR "@_\n" if @_;
+  print STDERR <<'EOUSAGE';
+usage:
+  pminisign -G [-f] [-p pubkeyfile] [-s seckeyfile]
+  pminisign -S [-l] [-x sigfile] [-s seckeyfile] [-c untrusted_comment] \
+               [-t trusted_comment] -m file
+  pminisign -V [-H] [-x sigfile] [-p pubkeyfile | -P pubkey] [-o] [-q] -m file
+  pminisign -R -s seckeyfile -p pubkeyfile
+
+  actions:
+    -G                generate a new key pair
+    -H                require input to be prehashed
+    -S                sign files
+    -V                verify that a signature is valid for a given file
+  options:
+    -l                sign using the legacy format
+    -m <file>         file to sign/verify
+    -o                output the file content after verification
+    -p <pubkeyfile>   public key file (default: ./minisign.pub)
+    -P <pubkey>       public key, as a base64 string
+    -s <seckey>       secret key file (default: ~/.minisign/minisign.key)
+    -x <sigfile>      signature file (default: <file>.minisig)
+    -c <comment>      add a one-line untrusted comment
+    -t <comment>      add a one-line trusted comment
+    -T                don't require nor add trusted comment (signify compat)
+    -q                quiet mode, suppress output
+    -Q                pretty quiet mode, only print the trusted comment
+    -R                recreate a public key file from a secret key file
+    -f                force. Combined with -G, overwrite a previous key pair
+    -v                display version number
+EOUSAGE
+  exit 1 if @_;
+  exit 0;
+}
+
+sub config_dir {
+  return ($ENV{MINISIGN_CONFIG_DIR}
+         or $ENV{HOME} && (File::Spec->catdir($ENV{HOME}, ".minisign"))
+         or undef);
+}
+
+sub default_pk_path {
+  return File::Spec->catfile(config_dir() // (), "minisign.pub");
+}
+
+sub default_sk_path {
+  return File::Spec->catfile(config_dir() // (), "minisign.key");
+}
+
+sub pack_sig_data($sig_data) {
+  my $sig_alg = $sig_algs{$sig_data->{sig_alg}};
+  my $sig_fmt = "a2a8a$sig_alg->{bytes}";
+  return pack($sig_fmt, @$sig_data{qw/sig_alg key_num sig/});
+}
+
+sub pack_pk_data($pk_data) {
+  my $sig_alg = $sig_algs{$pk_data->{sig_alg}};
+  my $pk_fmt = "a2a8a$sig_alg->{pkbytes}";
+  return pack($pk_fmt, @$pk_data{qw/sig_alg key_num pk/});
+}
+
+sub pack_sk_data($sk_data) {
+  my $sig_alg = $sig_algs{$sk_data->{sig_alg}};
+  my $kdf_alg = $kdf_algs{$sk_data->{kdf_alg}};
+  my $chk_alg = $chk_algs{$sk_data->{chk_alg}};
+  my $header_fmt = "a2a2a2a$kdf_alg->{saltbytes}Q<Q<a8";
+  my @header_keys = qw/sig_alg kdf_alg chk_alg salt opslimit memlimit key_num/;
+  my $header_str = pack($header_fmt, @$sk_data{@header_keys});
+  return $header_str . $sk_data->{sk} . pack("a$chk_alg->{bytes}", $sk_data->{chk});
+}
+
+sub unpack_sig_data($sig_blob) {
+  my $sig_data = {};
+  $sig_data->{sig_alg} = unpack("a2", $sig_blob);
+  my $sig_alg = $sig_algs{$sig_data->{sig_alg}}
+                // die "unsupported signature algorithm '$sig_data->{sig_alg}'";
+  my $fmt = "a2a8a$sig_alg->{bytes}"; # a2 ignores algorithm, parsed above
+  (undef, @$sig_data{qw/key_num sig/}) = unpack($fmt, $sig_blob);
+  return $sig_data;
+}
+
+sub unpack_pk_data($pk_blob) {
+  my $pk_data = {};
+  die "invalid public key blob (too short)" if length($pk_blob) < 1;
+  $pk_data->{sig_alg} = unpack("a2", $pk_blob);
+  my $sig_alg = $sig_algs{$pk_data->{sig_alg}};
+  die "unsupported signature algorithm '$pk_data->{sig_alg}'" unless $sig_alg;
+  # length matches unpack format below
+  die "invalid public key blob (too short)" if length($pk_blob) < 2 + 8 + $sig_alg->{pkbytes};
+  # bleh, perl has to be 64-bit int here. :(
+  my $fmt = "a2a8a$sig_alg->{pkbytes}"; # a2 ignores algorithm, parsed above
+  (undef, @$pk_data{qw/key_num pk/}) = unpack($fmt, $pk_blob);
+  return $pk_data;
+}
+
+# NB: $sk_blob must be a MemVault
+sub unpack_sk_data($sk_blob) {
+  my $sk_data = {};
+
+  die "invalid secret key blob (too short)" if $sk_blob->length < 6;
+  @$sk_data{qw/sig_alg kdf_alg chk_alg/}
+    = unpack("a2a2a2", $sk_blob->extract(0, 6, PROTMEM_ALL_DISABLED));
+  my $sig_alg = $sig_algs{$sk_data->{sig_alg}}
+                // die "unsupported signature algorithm '$sk_data->{sig_alg}'";
+  my $kdf_alg = $kdf_algs{$sk_data->{kdf_alg}}
+                // die "unsupported key derivation algorithm '$sk_data->{kdf_alg}'";
+  my $chk_alg = $chk_algs{$sk_data->{chk_alg}}
+                // die "unsupported hash algorithm '$sk_data->{chk_alg}'";
+
+  my $salt_len = $kdf_alg->{saltbytes};
+  my $sk_len = $sig_alg->{skbytes};
+  my $chk_len = $chk_alg->{bytes};
+  # bleh, perl has to be 64-bit int here for 'Q'. :(
+  my $header_fmt = "a6a${salt_len}Q<Q<"; # a6 ignores algorithms, parsed above
+  my $header_chunk_len = 6 + $salt_len + 8 + 8;
+  my $key_fmt = "Q<a${sk_len}a${chk_len}";
+  my $key_len = 8 + $sk_len + $chk_len;
+  my $total_len = $header_chunk_len + $key_len;
+  die "invalid secret key blob (too short)" if $sk_blob->length < $total_len;
+
+  my $header_chunk = $sk_blob->extract(0, $header_chunk_len, PROTMEM_ALL_DISABLED);
+  my $key_chunk = $sk_blob->extract($header_chunk_len);
+  undef $sk_blob;
+  (undef, @$sk_data{qw/salt opslimit memlimit/})
+    = unpack($header_fmt, $header_chunk);
+  die "unsupported key derivation algorithm '$sk_data->{kdf_alg}'"
+    unless exists $kdf_algs{$sk_data->{kdf_alg}};
+  die "unsupported signature algorithm '$sk_data->{sig_alg}'"
+    unless exists $sig_algs{$sk_data->{sig_alg}};
+  die "unsupported checksum algorithm '$sk_data->{chk_alg}'"
+    unless exists $chk_algs{$sk_data->{chk_alg}};
+
+  $sk_data->{key_num} = $key_chunk->extract(0, 8, PROTMEM_ALL_DISABLED);
+  $sk_data->{sk} = $key_chunk->extract(8, $sk_len);
+  print "deriving a key from the password and decrypting the secret key...\n";
+  STDOUT->flush;
+  my $passwd = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno(*STDIN), "Passphrase: ");
+  $passwd = $kdf_alg->{kdf_gen}->($passwd, $sk_data->{salt}, $sig_alg->{skbytes},
+                                  @$sk_data{qw/opslimit memlimit/});
+  $sk_data->{sk}->xor($passwd);
+  $sk_data->{chk} = $key_chunk->extract(8 + $sk_len, undef, PROTMEM_ALL_DISABLED);
+  die "Invalid secret key (wrong passphrase?)" if $sk_data->{chk} ne chk_sk($sk_data);
+  return $sk_data;
+}
+
+sub load_sig($opts) {
+  my $path = $opts->{sig_path};
+  open(my $fh, "<:raw", $path) or die "$path: $!";
+  my $comment = readline($fh) =~ s/[\r\n]+\z//r;
+  die "$path: invalid sig file (missing comment)\n" unless $comment;
+  die "$path: invalid sig file (comment should start '$comment_prefix')\n"
+    unless $comment =~ s/\A\Q$comment_prefix//;
+  my $sig_blob = readline($fh);
+  die "$path: invalid sig file (missing sig data)\n" unless $sig_blob;
+  my $trusted_comment = readline($fh);
+  my $full_sig = "";
+  if ($trusted_comment) {
+    $trusted_comment =~ s/[\r\n]+\z//;
+    die "$path: invalid sig file (trusted comment should start '$trusted_comment_prefix')\n"
+      unless $trusted_comment =~ s/\A\Q$trusted_comment_prefix//;
+    $full_sig = readline($fh) =~ s/[\r\n]+\z//r;
+  }
+  elsif (!$opts->{no_trusted_comment}) {
+    die "$path: invalid sig file (missing trusted comment)\n";
+  }
+  my $sig_data = unpack_sig_data(sodium_base642bin($sig_blob, BASE64_VARIANT_ORIGINAL));
+  $sig_data->{comment} = $comment;
+  $sig_data->{trusted_comment} = $trusted_comment;
+  $sig_data->{full_sig} = sodium_base642bin($full_sig, BASE64_VARIANT_ORIGINAL);
+  return $sig_data;
+}
+
+sub load_pk($path) {
+  open(my $fh, "<:raw", $path) or die "$path: $!";
+  my $comment = readline($fh) =~ s/[\r\n]+\z//r;
+  die "$path: invalid public key file (missing comment)\n" unless $comment;
+  die "$path: invalid public key file (comment should start '$comment_prefix')\n"
+    unless $comment =~ s/\A\Q$comment_prefix//;
+  my $pk_blob;
+  {
+    local $/ = undef;
+    defined($pk_blob = readline($fh)) or die "$path: $!";
+  }
+  return unpack_pk_data(sodium_base642bin($pk_blob, BASE64_VARIANT_ORIGINAL));
+}
+
+sub load_sk($path) {
+  open(my $fh, "<:raw", $path) or die "$path: $!";
+  my $sk_blob = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($fh));
+  my $idx = $sk_blob->index("\n");
+  die "$path: invalid secret key file (missing comment)" unless defined($idx);
+  my $comment = $sk_blob->extract(0, $idx, PROTMEM_ALL_DISABLED);
+  die "$path: invalid public key file (comment should start '$comment_prefix')\n"
+    unless $comment =~ s/\A\Q$comment_prefix//;
+  $sk_blob = $sk_blob->extract($idx + 1);
+  my $sk_data = unpack_sk_data($sk_blob->from_base64(BASE64_VARIANT_ORIGINAL));
+  $sk_data->{comment} = $comment;
+  return $sk_data;
+}
+
+sub load_msg { # no sub signature; uses alias to first arg
+  my (undef, $path, $hasher) = @_;
+  open(my $fh, "<:raw", $path) or die "$path: $!";
+  # eh, no read error handling...
+  if ($hasher) {
+    # 8k buf size chosen arbitrarily
+    while (read($fh, my $buf, 8192)) {
+      $hasher->update($buf);
+    }
+    $_[0] = $hasher->final;
+  }
+  else {
+    # yikes. same as minisign, slurp it up.
+    local $/ = undef;
+    $_[0] = readline($fh);
+  }
+}
+
+sub chk_sk($sk_data) {
+  my $chk_alg = $chk_algs{$sk_data->{chk_alg}};
+  my $hash = $chk_alg->{init}->($chk_alg->{bytes});
+  $hash->update($sk_data->{sig_alg});
+  $hash->update($sk_data->{key_num});
+  $hash->update($sk_data->{sk});
+  return $hash->final;
+}
+
+sub generate($opts) {
+  my $pk_path = $opts->{pk_path};
+  my $sk_path = $opts->{sk_path};
+  my $comment = $opts->{comment};
+  if ((-e $sk_path or $pk_path && -e $pk_path) and !$opts->{force}) {
+    my $path = -e $sk_path ? $sk_path : $pk_path;
+    die <<EODIE
+Key generation aborted:
+$path already exists.
+
+If you really want to overwrite the existing key pair, add the -f switch to
+force this operation.
+EODIE
+  }
+  $comment =~ tr/\r\n/ /s;
+  my $sig_alg = $sig_algs{$sig_alg_hashed_default};
+  my $kdf_alg = $kdf_algs{$kdf_alg_default};
+  my $chk_alg = $chk_algs{$chk_alg_default};
+  my $key_num = sodium_random_bytes(8);
+  my ($pk, $sk) = $sig_alg->{keypair_gen}->();
+  my $pk_data = {
+    sig_alg => $sig_alg_hashed_default,
+    key_num => $key_num,
+    pk => $pk,
+  };
+  my $sk_data = {
+    sig_alg => $sig_alg_hashed_default,
+    kdf_alg => $kdf_alg_default,
+    chk_alg => $chk_alg_default,
+    key_num => $key_num,
+    sk => $sk,
+  };
+  $sk_data->{chk} = chk_sk($sk_data);
+  print "Please enter a passphrase to protect the secret key.\n";
+  STDOUT->flush;
+  my $pw = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno(*STDIN), "Passphrase: ");
+  my $pw_chk = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno(*STDIN), "Passphrase (one more time): ");
+  unless ($pw->length == $pw_chk->length and $pw eq $pw_chk) {
+    die "Passphrases don't match\n";
+  }
+  print "Deriving a key from the password in order to encrypt to secret key...\n";
+  print "(this may take a few moments)...\n";
+  my $pw_salt = $sk_data->{salt} = $kdf_alg->{salt_gen}->();
+  my $pw_hash;
+  my $opslimit = $kdf_alg->{opslimit_default};
+  my $memlimit = $kdf_alg->{memlimit_default};
+  $pw_hash = $kdf_alg->{kdf_gen}->($pw, $pw_salt, $sig_alg->{skbytes}, $opslimit, $memlimit);
+  $sk_data->{sk}->xor($pw_hash);
+  # supposed to /= 2 opslimit and memlimit down to minimum til it works.
+  $sk_data->{opslimit} = $opslimit;
+  $sk_data->{memlimit} = $memlimit;
+  my $sk_packed = pack_sk_data($sk_data);
+  sysopen(my $fh, $sk_path, O_WRONLY|O_NOCTTY|O_CREAT|O_TRUNC, 0600)
+    or die "$sk_path: $!";
+  print $fh "$comment_prefix$comment\n";
+  $fh->flush;
+  $sk_packed->to_base64(BASE64_VARIANT_ORIGINAL)->to_fd(fileno($fh));
+  print $fh "\n" or die "$sk_path: $!";
+  close($fh) or die "$sk_path: $!";
+  open($fh, ">:raw", $pk_path) or die "$pk_path: $!";
+  print $fh "$comment_prefix$comment\n" or die "$pk_path: $!";
+  print $fh sodium_bin2base64(pack_pk_data($pk_data), BASE64_VARIANT_ORIGINAL)."\n" or die "$pk_path: $!";
+  close($fh) or die "$pk_path: $!";
+  print "The secret key was saved as '$sk_path' - Keep it secret!\n";
+  print "The public key was saved as '$pk_path' - That one can be public.\n";
+  print "Files signed using this key pair can be verified with the following command:\n";
+  my $b64 = sodium_bin2base64(pack_pk_data($pk_data), BASE64_VARIANT_ORIGINAL);
+  print "pminisign -Vm <file> -P $b64\n";
+}
+
+sub recreate($opts) {
+  my $pk_path = $opts->{pk_path};
+  my $sk_path = $opts->{sk_path};
+  if (-e $pk_path and !$opts->{force}) {
+    die "Public key '$pk_path' already exists."
+      . "Use -f (force) if you wish to overwrite it.\n";
+  }
+  my $sk_data = load_sk($sk_path);
+  # depends on the fact secret key is really sk . pk
+  my $pk_len = $sig_algs{$sk_data->{sig_alg}}->{pkbytes};
+  my $pk_data = {
+    sig_alg => $sk_data->{sig_alg},
+    key_num => $sk_data->{key_num},
+    pk => $sk_data->{sk}->extract(-$pk_len, undef, PROTMEM_ALL_DISABLED),
+  };
+  open(my $fh, ">:raw", $pk_path) or die "$pk_path: $!";
+  print $fh sodium_bin2base64(pack_pk_data($pk_data), BASE64_VARIANT_ORIGINAL)."\n" or die "$pk_path: $!";
+  close($fh) or die "$pk_path: $!";
+}
+
+sub signify($sk_data, $opts, $msg_path) {
+  my $sig_path = $opts->{sig_path} || "$msg_path.minisig";
+  my $comment = $opts->{comment} // "signature from pminisign secret key";
+  my $trusted_comment = $opts->{trusted_comment};
+  my $sig_alg;
+  if ($opts->{legacy_sign}) {
+    # this is a hack. there's no support for alternate algorithms.
+    $sig_alg = $sig_algs{'Ed'};
+  }
+  else {
+    $sig_alg = $sig_algs{$sk_data->{sig_alg}};
+  }
+  $comment =~ tr/\r\n/ /s;
+  $comment ||= $default_comment;
+  $comment = "$comment_prefix$comment";
+  if (length($comment) > 1024) {
+    warn "Warning: comment too long. This breaks compatibility with signify.\n";
+  }
+  unless ($trusted_comment) {
+    $trusted_comment = "timestamp:" . time
+                     . "\tfile:" . basename($msg_path)
+                     . ($sig_alg->{hashbytes} ? "\thashed" : "");
+  }
+  $trusted_comment =~ tr/\r\n/ /s;
+  if (length($trusted_comment) > 8192 - length($trusted_comment_prefix)) {
+    die "Trusted comment too long\n";
+  }
+  my $sig_input;
+  if (exists $sig_alg->{hash_init}) {
+    load_msg($sig_input, $msg_path, $sig_alg->{hash_init}->($sig_alg->{hashbytes}));
+  }
+  else {
+    load_msg($sig_input, $msg_path);
+  }
+  my $sig_data = {
+    sig_alg => $sk_data->{sig_alg},
+    key_num => $sk_data->{key_num},
+    sig => $sig_alg->{sign}->($sig_input, $sk_data->{sk}),
+  };
+  open(my $fh, ">:raw", $sig_path) or die "$sig_path: $!";
+  print $fh $comment, "\n";
+  print $fh sodium_bin2base64(pack_sig_data($sig_data), BASE64_VARIANT_ORIGINAL), "\n";
+  unless ($opts->{no_trusted_comment}) {
+    my $trusted_sig = $sig_alg->{sign}->($sig_data->{sig}."$trusted_comment", $sk_data->{sk});
+    print $fh "$trusted_comment_prefix$trusted_comment", "\n";
+    print $fh sodium_bin2base64($trusted_sig, BASE64_VARIANT_ORIGINAL), "\n";
+  }
+}
+
+sub verify($pk_data, $opts) {
+  my $sig_data = load_sig($opts);
+  my $msg_path = $opts->{msg_path};
+  my $quiet = $opts->{pretty_quiet} ? 2 : $opts->{quiet} ? 1 : 0;
+  unless ($sig_data->{key_num} eq $pk_data->{key_num}) {
+    # could just use 64 bit numbers everywhere but meh.
+    my $sig_num = unpack("Q<", $sig_data->{key_num});
+    my $pk_num = unpack("Q<", $pk_data->{key_num});
+    warn "Signature key id in '$opts->{sig_path}' is $sig_num\n";
+    warn "but the key id in the public key is $pk_num\n";
+  }
+  # pk_data sig_alg and sig_data sig_alg should match. Ed vs. ED just means
+  # pre-hashed. this format is janky.
+  my $sig_alg = $sig_algs{$sig_data->{sig_alg}};
+  if ($sig_data->{trusted_comment}) {
+    unless ($sig_alg->{verify}->($sig_data->{sig}.$sig_data->{trusted_comment},
+                                 $sig_data->{full_sig}, $pk_data->{pk})) {
+      die "Comment signature verification failed\n";
+    }
+  }
+  my $sig_input;
+  if (exists $sig_alg->{hash_init}) {
+    load_msg($sig_input, $msg_path, $sig_alg->{hash_init}->($sig_alg->{hashbytes}));
+  }
+  else {
+    die "Legacy (non-prehashed) signature found\n" if $opts->{prehashed};
+    load_msg($sig_input, $msg_path);
+  }
+  unless ($sig_alg->{verify}->($sig_input, $sig_data->{sig}, $pk_data->{pk})) {
+    die "Signature verification failed";
+  }
+  unless ($quiet) {
+    my $handle = $opts->{do_print} ? \*STDERR : \*STDOUT;
+    if ($quiet > 1) {
+      if ($sig_data->{trusted_comment}) {
+        print { $handle } $sig_data->{trusted_comment}, "\n";
+      }
+      else {
+        print { $handle } "No trusted comment\n";
+      }
+    }
+    else {
+      if ($sig_data->{trusted_comment}) {
+        print { $handle } "Signature and comment signature verified\n";
+        print { $handle } "Trusted comment: $sig_data->{trusted_comment}\n";
+      }
+      else {
+        print { $handle } "Signature verified\n";
+        print { $handle } "No trusted comment\n";
+      }
+    }
+  }
+  if ($opts->{do_print}) {
+    open(my $fh, "<", $msg_path) or die "$msg_path: $!";
+    seek($fh, 0, 0);
+    while (read($fh, my $buf, 40960)) {
+      print $buf or die "stdout: $!";
+    }
+  }
+}
+
+sub main(@argv) {
+  my $opts = {};
+  Getopt::Long::GetOptionsFromArray(\@argv, $opts, qw(
+    help|h
+    version|v
+    generate|G
+    recreate|R
+    sign|S
+    verify|V
+    prehashed|H
+    legacy_sign|l
+    msg_path|m:s
+    print|o
+    pk_path|p:s
+    pk_b64|P:s
+    sk_path|s:s
+    sig_path|x:s
+    comment|c:s
+    trusted_comment|t:s
+    no_trusted_comment|T
+    quiet|q
+    pretty_quiet|Q
+    force|f
+  )) or usage("Invalid options");
+
+  usage() if $opts->{help};
+  print "pminisign $VERSION\n" and exit(0) if $opts->{version};
+
+  if ((grep { $opts->{$_} } qw(generate sign verify recreate)) != 1) {
+    usage("one (and only one) of -G, -S, -V, or -R must be specified");
+  }
+  if ($opts->{pk_path} and $opts->{pk_b64}) {
+    die "a public key cannot be provided both inline and as a file";
+  }
+  if ($opts->{sig_path} and @argv > 1) {
+    die "a signature file can not be used when signing multiple files";
+  }
+
+  if ($opts->{generate}) {
+    $opts->{pk_path} //= default_pk_path();
+    $opts->{sk_path} //= default_sk_path();
+    $opts->{comment} //= $sk_default_comment;
+    generate($opts);
+    return 0;
+  }
+  elsif ($opts->{sign}) {
+    $opts->{sk_path} //= default_sk_path();
+    usage("no file to sign provided") unless $opts->{msg_path};
+    my $sk_data = load_sk($opts->{sk_path});
+    for my $path ($opts->{msg_path}, @argv) {
+      signify($sk_data, $opts, $path);
+    }
+    return 0;
+  }
+  elsif ($opts->{recreate}) {
+    $opts->{pk_path} //= default_pk_path();
+    $opts->{sk_path} //= default_sk_path();
+    recreate($opts);
+    return 0;
+  }
+  elsif ($opts->{verify}) {
+    usage("No message file given") unless $opts->{msg_path};
+    my $pk_data;
+    if ($opts->{pk_path}) {
+      $pk_data = load_pk($opts->{pk_path}) if $opts->{pk_path};
+    }
+    elsif ($opts->{pk_b64}) {
+      $pk_data = unpack_pk_data(sodium_base642bin($opts->{pk_b64}, BASE64_VARIANT_ORIGINAL)) if $opts->{pk_b64};
+    }
+    else {
+      $pk_data = load_pk(default_pk_path());
+    }
+    $opts->{sig_path} //= "$opts->{msg_path}.minisig";
+    verify($pk_data, $opts);
+    return 0;
+  }
+}
+
+main(@ARGV) unless caller();
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+pminisign -- perl implementation of minisign
+
+=head1 SYNOPSIS
+
+  pminisign -G [-p pubkey] [-s seckey]
+
+  pminisign -S [-H] [-x sigfile] [-s seckey] [-c untrusted_comment] [-t trusted_comment] -m file [file ...]
+
+  pminisign -V [-x sigfile] [-p pubkeyfile | -P pubkey] [-o] [-q] -m file
+
+  pminisign -R -s seckey -p pubkeyfile
+
+=head1 OPTIONS
+
+These options control the actions of pminisign.
+
+  actions:
+    -G: Generate a new key pair
+    -S: Sign files
+    -V: Verify that a signature is valid for a given file
+    -R: Recreate a public key file from a secret key file
+
+  options:
+    -m <file>: File to sign/verify
+    -o: Combined with -V, output the file content after verification
+    -p <pubkeyfile>: Public key file (default: ./minisign.pub)
+    -P <pubkey>: Public key, as a base64 string
+    -s <seckey>: Secret key file (default: ~/.minisign/minisign.key)
+    -x <sigfile>: Signature file (default: <file>.minisig)
+    -c <comment>: Add a one-line untrusted comment
+    -t <comment>: Add a one-line trusted comment
+    -T: Do not require (verifying) nor add (signing) trusted comment
+    -l: Sign using the legacy format
+    -q: Quiet mode, suppress output
+    -H: Requires the input to be prehashed
+    -Q: Pretty quiet mode, only print the trusted comment
+    -f: Force. Combined with -G, overwrite a previous key pair
+    -v: Display version number
+
+=head1 DESCRIPTION
+
+This tool and its documentation are ported to perl from
+L<minisign|https://github.com/jedisct1/minisign>. It intends to be
+interoperable and bug-for-bug compatible.
+
+Minisign is a dead simple tool to sign files and verify signatures using
+libsodium. This is a perl version of that command using L<Crypt::Sodium::XS>.
+
+It uses the highly secure Ed25519 public-key signature system.
+
+=head1 EXAMPLES
+
+NOTE: MINISIGN_CONFIG_DIR defaults to "$HOME/.minisign". the variable and
+default directory names are for compatibility with C<minisign>.
+
+=head2 Creating a key pair
+
+  pminisign -G
+
+The public key is printed and put into the file specified by the C<-P
+E<lt>pubkeyfileE<gt>> option, or C<$ENV{MINISIGN_CONFIG_DIR}/minisign.pub>. The
+secret key is encrypted and saved as a file specified by the C<-s
+E<lt>seckeyE<gt>> option, or C<$ENV{MINISIGN_CONFIG_DIR}/minisign.key>.
+
+=head2 Signing files
+
+  $ pminisign -Sm myfile.txt
+  $ pminisign -Sm myfile.txt myfile2.txt *.c
+
+Or to include a comment in the signature, that will be verified and displayed
+when verifying the file:
+
+  $ pminisign -Sm myfile.txt -t 'This comment will be signed as well'
+
+The secret key is loaded from the file specified by the C<-x
+E<lt>seckeyfileE<gt>> option, or C<${MINISIGN_CONFIG_DIR}/minisign.key>. The
+signature will be written to the file specified by the C<-x E<lt>sigfileE<gt>>
+option, or to the input file path with C<.sig> appended.
+
+=head2 Verifying a file
+
+  $ pminisign -Vm myfile.txt -P <pubkey>
+
+or
+
+  $ pminisign -Vm myfile.txt -p signature.pub
+
+This requires the signature myfile.txt.minisig to be present in the same
+directory unless overriden with the C<-x E<lt>fileE<gt>> option. The public key
+can either reside in a file (./minisign.pub by default) or be directly
+specified on the command line.
+
+=head1 NOTES
+
+Signature files include an untrusted comment line that can be freely modified,
+even after signature creation.
+
+They also include a second comment line, that cannot be modified without the
+secret key. Trusted comments can be used to add instructions or
+application-specific metadata (intended file name, timestamps, resource
+identifiers, version numbers to prevent downgrade attacks).
+
+=head1 AUTHOR
+
+Brad Barden E<lt>perlmodules@5c30.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Minisign is developed by the author of libsodium. It is released under the ISC
+License. This script adopts the same license.
+
+Copyright (c) 2022 Brad Barden
+
+Copyright (c) 2015-2021
+Frank Denis E<lt>j at pureftpd dot orgE<gt>
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+=cut

@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Alien::YAMLScript - Find or install libyamlscript
+Alien::YAMLScript - Find or install libys
 
 =head2 SYNOPSIS
 
@@ -19,7 +19,7 @@ This is ALPHA software. Expect things to change.
 
 =head2 DESCRIPTION
 
-This L<Alien|https://metacpan.org/pod/Alien> module provides access to the libyamlscript shared library. You are unlikely to need to use this module directly. See L<YAMLScript|https://metacpan.org/pod/YAMLScript> for a more likely entrypoint.
+This L<Alien|https://metacpan.org/pod/Alien> module provides access to the libys shared library. You are unlikely to need to use this module directly. See L<YAMLScript|https://metacpan.org/pod/YAMLScript> for a more likely entrypoint.
 
 =head2 SEE ALSO
 

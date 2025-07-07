@@ -1,0 +1,34 @@
+---
+abstract: 'Crypt Protocol'
+author:
+  - 'Pan Lanlan <abbypan@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Protocol
+requires:
+  CBOR::XS: '0'
+  Crypt::OpenSSL::BaseFunc: '0.039'
+  Crypt::OpenSSL::Bignum: '0.09'
+  Crypt::OpenSSL::EC: '1.31'
+  Crypt::OpenSSL::ECDSA: '0'
+  Crypt::Perl: '0'
+  Crypt::ScryptKDF: '0'
+  CryptX: '0'
+  Digest::CMAC: '0'
+  List::Util: '1.55'
+  Math::BigInt: '0'
+  Smart::Comments: '0'
+  bignum: '0.52'
+resources:
+  repository: https://github.com/abbypan/Crypt-Protocol.git
+version: '0.001'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: MPL-2.0

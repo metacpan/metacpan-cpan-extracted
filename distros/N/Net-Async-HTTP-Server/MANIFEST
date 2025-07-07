@@ -7,11 +7,15 @@ lib/Net/Async/HTTP/Server/Protocol.pm
 lib/Net/Async/HTTP/Server/PSGI.pm
 lib/Net/Async/HTTP/Server/Request.pm
 lib/Plack/Handler/Net/Async/HTTP/Server.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
 psgifiles/counter.psgi
 psgifiles/env.psgi
 psgifiles/helloworld.psgi
 psgifiles/sleepy.psgi
+README
 t/00use.t
 t/01respond.t
 t/02respond-chunked.t
@@ -29,7 +33,3 @@ t/99pod.t
 t/privkey.pem
 t/regen-certs.sh
 t/server.pem
-README
-LICENSE
-META.yml
-META.json

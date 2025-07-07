@@ -2,7 +2,7 @@ package Catmandu;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2024';
+our $VERSION = '1.2025';
 
 use Catmandu::Env;
 use Catmandu::Util qw(:is);
@@ -197,6 +197,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Catmandu - a data toolkit
@@ -362,13 +364,12 @@ Stefan Weil
 
 Tom Hukins
 
+Michal Josef Špaček C<<michal.josef.spacek at gmail.com>>
+
 =head1 QUESTIONS, ISSUES & BUG REPORTS
 
-For any questions on the use of our modules please join our mailing list at:
-
-    librecat-dev@lists.uni-bielefeld.de
-
-or send in your bug reports or feature requests to our issue tracker at:
+For any questions on the use of our modules, or bug reports, or feature requests,
+please use our issue tracker at:
 
     https://github.com/LibreCat/Catmandu/issues
 

@@ -122,7 +122,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.2024",
+   "version" : "1.2025",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",
@@ -136,6 +136,7 @@
       "Johann Rolschewski <jorol@cpan.org>",
       "Magnus Enger <magnus@enger.priv.no>",
       "Matthias Vandermaesen <matthias@colada.be>",
+      "Michal Josef \u0160pa\u010dek <michal.josef.spacek@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",
       "Nicolas Franck <njfranck@cpan.org>",

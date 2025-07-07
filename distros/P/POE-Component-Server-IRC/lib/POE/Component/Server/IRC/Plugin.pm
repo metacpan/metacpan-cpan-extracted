@@ -1,6 +1,5 @@
 package POE::Component::Server::IRC::Plugin;
-our $AUTHORITY = 'cpan:BINGOS';
-$POE::Component::Server::IRC::Plugin::VERSION = '1.62';
+$POE::Component::Server::IRC::Plugin::VERSION = '1.66';
 use strict;
 use warnings FATAL => 'all';
 

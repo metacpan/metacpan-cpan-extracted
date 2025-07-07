@@ -9,7 +9,7 @@ use Time::HiRes qw(gettimeofday);
 our $VERBOSE = 0;
 our @EXPORT_OK = qw(handle_login_bruteforce get_login_brute_force_events);
 our @BRUTE_FORCE_EVENTS;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub handle_login_bruteforce {
     my ($entry) = @_;

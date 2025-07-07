@@ -9,22 +9,31 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Provides the Bit library",
   "AUTHOR" => "Christos Argyropoulos <chrisarg\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "Alien::Build" => "0.32",
+    "Alien::Build::MM" => "0.32",
+    "ExtUtils::MakeMaker" => "6.52"
+  },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "Alien::Build" => "1.40",
+    "Alien::Build::MM" => "0.32",
+    "Alien::Build::Plugin::Build::Make" => "0.99",
+    "Carp" => 0,
+    "ExtUtils::MakeMaker" => "6.52",
+    "File::Copy::Recursive" => 0,
+    "HTTP::Tiny" => 0,
+    "Path::Tiny" => 0
   },
   "DISTNAME" => "Alien-Bit",
   "LICENSE" => "mit",
   "NAME" => "Alien::Bit",
-  "PREREQ_PM" => {
-    "strict" => 0,
-    "warnings" => 0
-  },
+  "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::MakeMaker" => "6.52",
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,12 +41,19 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "ExtUtils::MakeMaker" => 0,
+  "Alien::Build" => "0.32",
+  "Alien::Build::MM" => "0.32",
+  "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
-  "Test::More" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
+
+
+# BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
+use Alien::Build::MM;
+my $abmm = Alien::Build::MM->new;
+%WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
+# END code inserted by Dist::Zilla::Plugin::AlienBuild
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -50,3 +66,19 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+
+# BEGIN postamble code inserted by Dist::Zilla::Plugin::AlienBuild
+{ package
+    MY;
+  sub postamble {
+    $abmm->mm_postamble(@_);
+  }
+  sub install {
+    $abmm->can('mm_install')
+      ? $abmm->mm_install(@_)
+      : shift->SUPER::install(@_);
+  }
+}
+# END postamble code inserted by Dist::Zilla::Plugin::AlienBuild
+

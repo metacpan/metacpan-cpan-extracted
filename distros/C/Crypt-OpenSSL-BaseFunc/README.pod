@@ -1,0 +1,212 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Crypt::OpenSSL::BaseFunc - Base Functions, using the OpenSSL libraries
+
+=head1 SYNOPSIS
+
+    use Crypt::OpenSSL::BaseFunc;
+
+
+=head1 Methods
+
+=head2 symmetric
+
+=head3 aes_cmac
+
+RFC4493: aes_cmac
+
+    my $mac = aes_cmac($cipher_name, $key, $plaintext)
+
+    my $cipher_name = 'aes-128-cbc'; 
+    my $key = pack("H*", '2b7e151628aed2a6abf7158809cf4f3c');
+    my $msg_1 = pack("H*", '6bc1bee22e409f96e93d7e117393172a');
+    my $mac_1 = aes_cmac($cipher_name, $key, $msg_1);
+    print unpack("H*", $mac_1), "\n";
+
+    #$ echo -n '6bc1bee22e409f96e93d7e117393172a' | xxd -r -p | openssl dgst -mac cmac -macopt cipher:aes-128-cbc -macopt hexkey:2b7e151628aed2a6abf7158809cf4f3c 
+    #(stdin)= 070a16b46b4d4144f79bdd9dd04a287c
+
+=head3 aead_encrypt
+    
+    my $r = aead_encrypt($cipher_name, $plaintext, $aad, $key, $iv, $tag_len);
+    # $r = [ $ciphertext, $tag ];
+
+=head3 aead decrypt
+
+    my $plaintext = aead_decrypt($cipher_name, $ciphertext, $aad, $tag, $key, $iv);
+
+
+=head2 pkcs
+
+=head3 pkcs12_key_gen
+
+RFC7292 : PKCS12_key_gen
+
+see also openssl/crypto/pkcs12/p12_key.c
+
+    pkcs12_key_gen($password, $salt, $id, $iteration, $digest_name)
+
+    my $macdata_key = pkcs12_key_gen('123456', pack("H*", 'e241f01650dbeae4'), 3, 2048, 'sha256');
+    print unpack("H*", $macdata_key), "\n";
+
+=head3 pkcs5_pbkdf2_hmac
+
+RFC2898 : PBKDF2
+
+see also openssl/crypto/evp/p5_crpt2.c 
+
+    my $k = pkcs5_pbkdf2_hmac($password, $salt, $iteration, $digest_name)
+
+    my $pbkdf2_key = pkcs5_pbkdf2_hmac('123456', pack("H*", 'b698314b0d68bcbd'), 2048, 'sha256');
+    print unpack("H*", $pbkdf2_key), "\n";
+
+=head2 bignum
+
+=head3  random_bn
+
+    my $random_bn = random_bn($Nn);
+
+    my $Nn = 16;
+    my $random_bn = random_bn($Nn);
+    print $random_bn->to_hex, "\n";
+
+=head2 hash
+
+=head3 digest
+
+    my $dgst = digest($digest_name, $msg);
+
+=head2 ec
+
+=head3  gen_ec_key
+
+    my $priv_pkey = gen_ec_key(group_name, $priv_hex);
+
+=head3 gen_ec_pubkey
+
+    my $pub_pkey = gen_ec_pubkey(group_name, $pub_hex);
+
+=head3 export_ec_pubkey
+
+    my $pub_pkey = export_ec_pubkey($priv_pkey);
+
+=head3 read_ec_pubkey
+
+    my $pub_hex = read_ec_pubkey($pub_pkey, $want_compressed);
+
+=head3  ecdh
+
+    my $z_bin = ecdh($local_priv_pkey, $peer_pub_pkey);
+
+=head3 ecdh_pem
+    
+    my $z_bin = ecdh_pem($local_priv_pem_file, $peer_pub_pem_file);
+
+=head2 pkey
+
+=head3 read_key
+
+    my $priv_hex = read_key($priv_pkey);
+
+=head3 read_pubkey
+
+    my $pub_hex = read_pubkey($pub_pkey);
+
+=head3 read_key_from_pem
+    
+    my $priv_pkey = read_key_from_pem($priv_pem_filename);
+
+=head3 read_pubkey_from_pem
+    
+    my $pub_pkey = read_pubkey_from_pem($pub_pem_filename);
+
+=head3 read_key_from_der
+    
+    my $priv_pkey = read_key_from_der($priv_der_filename);
+
+=head3 read_pubkey_from_der
+    
+    my $pub_pkey = read_pubkey_from_der($pub_der_filename);
+
+=head3 write_key_to_pem
+
+    write_key_to_pem($dst_fname, $priv_pkey);
+
+=head3 write_pubkey_to_pem
+
+    write_key_to_pem($dst_fname, $pub_pkey);
+
+=head3 write_key_to_der
+
+    write_key_to_der($dst_fname, $priv_pkey);
+
+=head3 write_pubkey_to_der
+
+    write_key_to_der($dst_fname, $pub_pkey);
+
+=head3 get_pkey_bn_param
+
+    my $x_bn = get_pkey_bn_param($pkey, $param_name);
+
+=head3 get_pkey_octet_string_param
+
+    my $x_hex = get_pkey_octet_string_param($pkey, $param_name);
+
+=head3 get_pkey_utf8_string_param
+
+    my $s = get_pkey_utf8_string_param($pkey, $param_name);
+
+=head2 hash2curve
+
+https://datatracker.ietf.org/doc/draft-irtf-cfrg-hash-to-curve/
+
+    use Crypt::OpenSSL::EC;
+    use Crypt::OpenSSL::Bignum;
+    use Crypt::OpenSSL::BaseFunc;
+
+    my $msg='abc';
+    my $DST = 'QUUX-V01-CS02-with-P256_XMD:SHA-256_SSWU_RO_';
+    my $group_name = "prime256v1";
+    my $type = 'sswu';
+    my $P = hash_to_curve($msg, $DST, $group_name, $type, 'SHA256', \&expand_message_xmd , 1 );
+
+    my $params_ref = get_hash2curve_params($group_name, $type);
+    my $group = $params_ref->[0];
+    my $ctx = $params_ref->[-1];
+    my $bn = Crypt::OpenSSL::EC::EC_POINT::point2hex($group, $P, 4, $ctx);
+    print $bn, "\n";
+
+=head3 encode_to_curve
+
+  my $P = encode_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+  my ($P, $group_params_ref) = encode_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+=head3 hash_to_curve
+
+  my $P = hash_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+  my ($P, $group_params_ref)  = hash_to_curve( $msg, $DST, $group_name, $type, $hash_name, $expand_message_func, $clear_cofactor_flag );
+
+=head3 get_hash2curve_params
+
+    my $group_params_ref = get_hash2curve_params($group_name, $type);
+
+=head3 map_to_curve
+
+  my $P = map_to_curve( $params_ref, $group_name, $type, $u, $clear_cofactor_flag );
+
+=head3 hash_to_field
+
+  my $res_arr_ref =  hash_to_field( $msg, $count, $DST, $p, $m, $k, $hash_name, $expand_message_func );
+
+=head3 expand_message_xmd
+
+  my $s = expand_message_xmd( $msg, $DST, $len_in_bytes, $hash_name );
+
+
+=cut

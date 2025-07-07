@@ -1,0 +1,192 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Crypt::Protocol::SPAKE2Plus> 
+
+spake2+
+
+=head2 PROTOCOL
+
+L<https://www.potaroo.net/ietf/ids/draft-bar-cfrg-spake2plus-03.html>
+
+=head2 EXAMPLE
+
+    #init SPAKE2Plus
+    my $curve_name = 'prime256v1';
+    my $sp = Crypt::SPAKE2Plus->new(curve_name => $curve_name);
+    $sp->init_M_or_N('M');
+    $sp->init_M_or_N('N');
+
+    #init
+    my $Context = 'SPAKE2+-P256-SHA256-HKDF draft-01';
+    my $A = 'client';
+    my $B = 'server';
+
+    #bigint: w0, w1
+    my $w0 = Crypt::Perl::BigInt->from_hex( 'e6887cf9bdfb7579c69bf47928a84514b5e355ac034863f7ffaf4390e67d798c' );
+    my $w1 = Crypt::Perl::BigInt->from_hex( '24b5ae4abda868ec9336ffc3b78ee31c5755bef1759227ef5372ca139b94e512' );
+
+
+=head1 FUNCTION
+
+=head2 new 
+
+Curve Name: L<Crypt::Perl::ECDSA::EC::CurvesDB>
+
+    my $sp = Crypt::SPAKE2Plus->new(
+        curve_name => 'prime256v1',
+        hash_name => 'SHA256', 
+        kdf => sub { 
+            my ( $Ka, $salt, $dst_len, $info ) = @_;
+        }, 
+        mac => sub { 
+            my ( $key, $data ) = @_;
+        },  
+    );
+
+=head2 init_M_or_N
+
+$label is 'M' or 'N', $X is EC Point, optional, to set $sp->{M} or $sp->{N}
+
+    $sp->{$label} = $sp->init_M_or_N($label, $X);
+    my $M_Point = $sp->{M};
+    my $N_Point = $sp->{N};
+
+=head2  encode_ec_point
+
+    my $N_uncompressed_bin = $sp->encode_ec_point($N_Point);  # 0x04, N.x, N.y
+
+=head2 decode_ec_point 
+    
+    my $U_Point = $sp->decode_ec_point($U_bin); # 0x02, U.x ; 0x03, U.x; 0x04, U.x, U.y
+
+=head2 concat_data
+
+len(d): eight-byte little-endian number, d
+
+    my $s = $sp->concat_data(@data);
+
+=head2 calc_w0_w1
+
+w0s || w1s = PBKDF(len(pw) || pw || len(A) || A || len(B) || B)
+len(A) = len(B) = 0, w0s || w1s = PBKDF(pw)
+
+    my ($w0, $w1) = $sp->calc_w0_w1($bmod_w0_w1_sub, $pw, $A, $B, @pbkdf_args);
+
+=head2 bmod_w0_w1
+
+w0 = w0s mod p
+w1 = w1s mod p
+
+    $w0 = $sp->bmod_w0_w1($w0);
+    $w1 = $sp->bmod_w0_w1($w1);
+
+=head2 bmod_w0_w1_alt
+
+w0 = [ w0s mod (p-1) ]  + 1
+w1 = [ w1s mod (p-1) ]  + 1
+
+    $w0 = $sp->bmod_w0_w1_alt($w0);
+    $w1 = $sp->bmod_w0_w1_alt($w1);
+
+=head2 calc_L
+
+A, B: L = w1*P
+w1: BigInt
+P: EC Point
+
+    my $L_Point = $sp->calc_L($w1);
+
+=head2 random_le_p
+
+random from the integers in [0, p), to generate x and y
+    my $rnd_bigint = $sp->random_le_p();
+
+    my $x = $sp->random_le_p();
+
+    my $y = $sp->random_le_p();
+
+=head2 A_calc_X
+
+A : X = x*P + w0*M
+
+    my $X_Point = $sp->A_calc_X($w0, $x);
+
+=head2 B_calc_Y
+
+B : Y = y*P + w0*N
+
+    my $Y_Point = $sp->B_calc_Y($w0, $y);
+
+=head2 is_X_or_Y_suitable
+
+A computes h*Y and aborts if the result is equal to I
+
+  A check Y: $sp->is_X_or_Y_suitable($Y);
+
+B computes h*X and aborts if the result is equal to I
+
+  B check X: $sp->is_X_or_Y_suitable($X); 
+
+=head2 A_calc_ZV
+
+A: Z = h*x*(Y - w0*N), V = h*w1*(Y - w0*N)
+
+    my ($A_Calc_Z_Point, $A_Calc_V_Point) = $sp->A_calc_ZV($w0, $w1, $x, $Y_Point);
+
+=head2 B_calc_ZV
+
+B: Z = h*y*(X - w0*M), V = h*y*L
+
+    my ($B_Calc_Z_Point, $B_Calc_V_Point) = $sp->B_calc_ZV($w0, $L_Point, $y, $X_Point);
+
+=head2 generate_TT
+
+TT = len(Context) || Context ||  || len(A) || A || len(B) || B  || len(M) || M || len(N) || N  || len(X) || X || len(Y) || Y  || len(Z) || Z || len(V) || V  || len(w0) || w0
+
+    my $TT = $sp->generate_TT($Context, $A, $B, $X_Point, $Y_Point, $A_Calc_Z_Point, $A_Calc_V_Point, $w0);
+    my $TT = $sp->generate_TT($Context, $A, $B, $X_Point, $Y_Point, $B_Calc_Z_Point, $B_Calc_V_Point, $w0);
+
+=head2 generate_TT_alt
+
+TT = len(X) || X || len(Y) || Y  || len(Z) || Z || len(V) || V  || len(w0) || w0
+
+    my $TT = $sp->generate_TT_alt($X_Point, $Y_Point, $A_Calc_Z_Point, $A_Calc_V_Point, $w0);
+    my $TT = $sp->generate_TT_alt($X_Point, $Y_Point, $B_Calc_Z_Point, $B_Calc_V_Point, $w0);
+
+=head2 calc_Ka_and_Ke
+
+Ka || Ke = Hash(TT)
+
+    my ( $Ka, $Ke ) = $sp->calc_Ka_and_Ke( $TT );
+
+=head2 calc_KcA_and_KcB
+
+KcA || KcB = KDF(nil, Ka, "ConfirmationKeys".aad)
+
+    my ( $KcA, $KcB ) = $sp->calc_KcA_and_KcB($Ka);
+
+    my ( $KcA, $KcB ) = $sp->calc_KcA_and_KcB($Ka, $kdf_dst_len, $aad); 
+
+=head2 A_calc_MacA
+
+cA = MAC(KcA, ...)
+
+    my $MacA = $sp->A_calc_MacA($KcA, $Y);
+
+=head2 B_calc_MacB
+
+cB = MAC(KcB, ...)
+
+    my $MacB = $sp->B_calc_MacB($KcB, $X);
+
+=head2 split_key
+
+$k1 || $k2 = $k
+
+    my ( $k1, $k2 ) = $sp->split_key( $k );
+
+=cut

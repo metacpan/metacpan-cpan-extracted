@@ -1,0 +1,38 @@
+Revision history for Perl extension Crypt::OpenSSL::BaseFunc.
+
+0.039 2025/07/05
+  -  merge hash2curve
+
+0.038 2024/04/26
+   -  ec_conv.pl
+
+0.035 2022/05/16
+   - gcm: aead_encrypt/aead_decrypt 
+
+0.034 2022/04/16
+    - random_bn
+
+0.033 2022/04/13
+    - generate_ec_key
+
+0.032 2022/04/10
+    - evp_pkey_from_point_hex
+    - evp_pkey_from_priv_hex
+    - pem_write_evp_pkey
+    - pem_read_pkey
+    - ecdh_pkey
+
+0.031 2022/04/06
+    - i2osp
+
+0.03  2022/04/02   
+    - input/output binary
+    - add more base func
+
+0.02   March 3 2021
+    - ecdh.
+    - bn_mod_sqrt.
+
+0.01   June 9 2019
+    - PKCS12_key_gen PKCS5_PBKDF2_HMAC
+	- Initial release, aes-cmac.

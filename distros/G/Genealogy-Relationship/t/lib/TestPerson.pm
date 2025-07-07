@@ -3,9 +3,13 @@ no warnings 'experimental::class';
 
 class TestPerson;
 
-field $id :param :reader;
-field $name :param :reader;
-field $parent :param :reader = undef;
-field $gender :param :reader;
+field $id :param;
+method id { return $id }
+field $name :param;
+method name { return $name }
+field $parent :param = undef;
+method parent { return $parent }
+field $gender :param;
+method gender { return $gender }
 
 1;

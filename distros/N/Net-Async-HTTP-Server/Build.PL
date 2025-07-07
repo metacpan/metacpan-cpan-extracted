@@ -18,7 +18,6 @@ my $build = Module::Build->new(
       'HTTP::Response' => 0,
       'IO::Async::Test' => 0,
       'Test::Metrics::Any' => 0,
-      'Test::Refcount' => 0,
       'Test2::V0' => '0.000147',
    },
    configure_requires => {

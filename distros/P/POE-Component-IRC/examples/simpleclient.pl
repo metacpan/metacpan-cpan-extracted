@@ -18,6 +18,7 @@ my $socks_port;
 my $socks_id;
 my $no_dns;
 my $ip6;
+my $usessl;
 
 GetOptions(
 "nick=s" => \$nick,
@@ -31,13 +32,14 @@ GetOptions(
 "ircname=s" => \$ircname,
 "nodns" => \$no_dns,
 "ip6" => \$ip6,
+"usessl" => \$usessl,
 );
 
 die unless $nick and $server;
 print "$nick $server\n";
 
 my $irc = POE::Component::IRC::State->spawn( Nick => $nick, Server => $server, Port => $port, Ircname => $ircname, Username => $user, Password => $password,
-                                             socks_proxy => $socks_proxy, socks_port => $socks_port, socks_id => $socks_id, NoDNS => $no_dns, useipv6 => $ip6 );
+                                             socks_proxy => $socks_proxy, socks_port => $socks_port, socks_id => $socks_id, NoDNS => $no_dns, useipv6 => $ip6, UseSSL => $usessl );
 
 print STDOUT $irc->VERSION(), "\n";
 

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Server::Request 0.14;
+package Net::Async::HTTP::Server::Request 0.15;
 
 use v5.14;
 use warnings;
@@ -49,7 +49,7 @@ sub new
 
 =head2 is_closed
 
-   $is_closed = $request->is_closed
+   $is_closed = $request->is_closed;
 
 Returns true if the underlying network connection for this request has already
 been closed. If this is the case, the application is free to drop the request
@@ -71,7 +71,7 @@ sub is_closed
 
 =head2 method
 
-   $method = $request->method
+   $method = $request->method;
 
 Return the method name from the request header.
 
@@ -85,7 +85,7 @@ sub method
 
 =head2 path
 
-   $path = $request->path
+   $path = $request->path;
 
 Return the path name from the request header.
 
@@ -99,7 +99,7 @@ sub path
 
 =head2 query_string
 
-   $query_string = $request->query_string
+   $query_string = $request->query_string;
 
 Return the query string from the request header.
 
@@ -113,7 +113,7 @@ sub query_string
 
 =head2 query_form
 
-   %params = $request->query_form
+   %params = $request->query_form;
 
 I<Since version 0.09.>
 
@@ -131,7 +131,7 @@ sub query_form
 
 =head2 query_param_names
 
-   @names = $request->query_param_names
+   @names = $request->query_param_names;
 
 I<Since version 0.09.>
 
@@ -147,9 +147,9 @@ sub query_param_names
 
 =head2 query_param
 
-   $value = $request->query_param( $name )
+   $value = $request->query_param( $name );
 
-   @values = $request->query_param( $name )
+   @values = $request->query_param( $name );
 
 I<Since version 0.09.>
 
@@ -165,7 +165,7 @@ sub query_param
 
 =head2 protocol
 
-   $protocol = $request->protocol
+   $protocol = $request->protocol;
 
 Return the protocol version from the request header. This will be the full
 string, such as C<HTTP/1.1>.
@@ -180,7 +180,7 @@ sub protocol
 
 =head2 header
 
-   $value = $request->header( $key )
+   $value = $request->header( $key );
 
 Return the value of a request header.
 
@@ -195,7 +195,7 @@ sub header
 
 =head2 headers
 
-   @headers = $request->headers
+   @headers = $request->headers;
 
 Returns a list of 2-element C<ARRAY> refs containing all the request headers.
 Each referenced array contains, in order, the name and the value.
@@ -217,7 +217,7 @@ sub headers
 
 =head2 body
 
-   $body = $request->body
+   $body = $request->body;
 
 Return the body content from the request as a string of bytes.
 
@@ -258,7 +258,7 @@ sub _write_to_stream
 
 =head2 write
 
-   $request->write( $data )
+   $request->write( $data );
 
 Append more data to the response to be written to the client. C<$data> can
 either be a plain string, or a C<CODE> reference to be used in the underlying
@@ -285,7 +285,7 @@ sub write
 
 =head2 write_chunk
 
-   $request->write_chunk( $data )
+   $request->write_chunk( $data );
 
 Append more data to the response in the form of an HTTP chunked-transfer
 chunk. This convenience is a shortcut wrapper for prepending the chunk header.
@@ -305,7 +305,7 @@ sub write_chunk
 
 =head2 done
 
-   $request->done
+   $request->done;
 
 Marks this response as completed.
 
@@ -325,7 +325,7 @@ sub done
 
 =head2 write_chunk_eof
 
-   $request->write_chunk_eof
+   $request->write_chunk_eof;
 
 Sends the final EOF chunk and marks this response as completed.
 
@@ -343,7 +343,7 @@ sub write_chunk_eof
 
 =head2 as_http_request
 
-   $req = $request->as_http_request
+   $req = $request->as_http_request;
 
 Returns the data of the request as an L<HTTP::Request> object.
 
@@ -357,7 +357,7 @@ sub as_http_request
 
 =head2 respond
 
-   $request->respond( $response )
+   $request->respond( $response );
 
 Respond to the request using the given L<HTTP::Response> object.
 
@@ -377,7 +377,7 @@ sub respond
 
 =head2 respond_chunk_header
 
-   $request->respond_chunk_header( $response )
+   $request->respond_chunk_header( $response );
 
 Respond to the request using the given L<HTTP::Response> object to send in
 HTTP/1.1 chunked encoding mode.
@@ -415,7 +415,7 @@ sub respond_chunk_header
 
 =head2 stream
 
-   $stream = $request->stream
+   $stream = $request->stream;
 
 Returns the L<IO::Async::Stream> object representing this connection. Usually
 this would be used for such things as inspecting the client's connection
@@ -432,7 +432,7 @@ sub stream
 
 =head2 response_status_line
 
-   $status = $request->response_status_line
+   $status = $request->response_status_line;
 
 If a response header has been written by calling the C<write> method, returns
 the first line of it.
@@ -447,7 +447,7 @@ sub response_status_line
 
 =head2 response_status_code
 
-   $code = $request->response_status_code
+   $code = $request->response_status_code;
 
 If a response header has been written by calling the C<write> method, returns
 the status code from it.

@@ -1,4 +1,3 @@
-.vstags
 bin/detect.pl
 config/config.json
 data/ip_cache.sqlite
