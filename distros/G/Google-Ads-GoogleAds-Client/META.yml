@@ -76,5 +76,5 @@ resources:
   bugtracker: https://github.com/googleads/google-ads-perl/issues
   license: http://apache.org/licenses/LICENSE-2.0
   repository: https://github.com/googleads/google-ads-perl
-version: v27.0.0
+version: v27.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

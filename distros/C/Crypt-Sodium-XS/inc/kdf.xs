@@ -80,8 +80,8 @@ SV * kdf_derive( \
      * always CONTEXTBYTES long (in case it ever changes). */
     ctx_buf = "00000000";
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_mv = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_mv = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_mv->pm_ptr;
     key_len = key_mv->size;
   }
@@ -118,7 +118,7 @@ SV * kdf_derive( \
     croak("derive: Failed to release protmem RO");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_key_mv, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_key_mv, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL

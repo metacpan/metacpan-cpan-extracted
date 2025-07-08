@@ -1,5 +1,8 @@
 Revision history for Perl::Critic::Grape
 
+0.0.5 - 2025-07-07
+	- ProhibitRefChecks ignore lower precedence op chains
+
 0.0.4 - 2025-06-23
 	- RequireParensWithBuiltins permits undef literal/scalar
 	- Verified functional on 5.16.3

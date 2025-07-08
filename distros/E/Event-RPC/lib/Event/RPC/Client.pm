@@ -15,7 +15,7 @@ use Carp;
 use strict;
 use utf8;
 
-use IO::Socket::INET;
+use IO::Socket;
 
 #-- This can be changed for testing purposes e.g. to simulate
 #-- old clients connecting straight with Storable format.
@@ -166,6 +166,13 @@ sub connect {
         )
         or croak "Can't open SSL connection to $server:$port: $IO::Socket::SSL::ERROR";
     }
+    elsif ($server eq "unix/") {
+        $sock = IO::Socket::UNIX->new(
+            Type => IO::Socket::UNIX::SOCK_STREAM(),
+            Peer => $port,
+        )
+        or croak "Can't open Unix Domain connection to $server:$port - $!";
+    }
     else {
         $sock = IO::Socket::INET->new(
             Proto    => 'tcp',
@@ -174,7 +181,7 @@ sub connect {
             Type     => SOCK_STREAM,
             Timeout  => $timeout,
         )
-        or croak "Can't open connection to $server:$port - $!";
+        or croak "Can't open TCP connection to $server:$port - $!";
     }
 
     $sock->autoflush(1);
@@ -228,13 +235,23 @@ sub log_connect {
     my %par   = @_;
     my ( $server, $port ) = @par{ 'server', 'port' };
 
-    my $sock = IO::Socket::INET->new(
-        Proto    => 'tcp',
-        PeerPort => $port,
-        PeerAddr => $server,
-        Type     => SOCK_STREAM
-    )
-    or croak "Can't open connection to $server:$port - $!";
+    my $sock;
+    if ($server eq "unix/") {
+        $sock = IO::Socket::UNIX->new(
+            Type => IO::Socket::UNIX::SOCK_STREAM(),
+            Peer => $port,
+        )
+        or croak "Can't open Unix Domain log connection to $server:$port - $!";
+    }
+    else {
+        $sock = IO::Socket::INET->new(
+            Proto    => 'tcp',
+            PeerPort => $port,
+            PeerAddr => $server,
+            Type     => SOCK_STREAM,
+        )
+        or croak "Can't open TCP log connection to $server:$port - $!";
+    }
 
     return $sock;
 }
@@ -555,9 +572,9 @@ Event::RPC::Client - Client API to connect to Event::RPC Servers
 
   my $rpc_client = Event::RPC::Client->new (
     #-- Required arguments
-    host => "localhost",
-    port => 5555,
-    
+    host => "localhost",    # or "unix/" for Unix Domain socket
+    port => 5555,           # or path to Unix Domain socket
+
     #-- Optional arguments
     classes   => [ "Event::RPC::Test" ],
     class_map => { "Event::RPC::Test" => "My::Event::RPC::Test" },
@@ -629,14 +646,17 @@ These are necessary to connect the server:
 
 =over 4
 
-=item B<server>
+=item B<host>
 
 This is the hostname of the server running Event::RPC::Server.
 Use a IP address or DNS name here.
 
+Set "unix/" for Unix Domain socket.
+
 =item B<port>
 
-This is the TCP port the server is listening to.
+This is the TCP port or Unix Domain socket path the server is
+listening to.
 
 =back
 

@@ -31,6 +31,7 @@ quote.h
 async-test/async-test
 async-test/cancel-test
 async-test/prepare-wait-test
+async-test/xact-test
 
 debian/changelog
 debian/copyright

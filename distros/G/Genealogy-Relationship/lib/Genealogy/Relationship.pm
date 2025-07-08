@@ -111,14 +111,16 @@ consider putting a caching layer in front of C<get_relationship>.
 
 =cut
 
+use v5.38;
 use feature 'class';
 no warnings 'experimental::class';
+
 class Genealogy::Relationship;
 
 use List::Util qw[first];
 use Lingua::EN::Numbers qw[num2en num2en_ordinal];
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 field $parent_field_name :param = 'parent';
 field $identifier_field_name :param = 'id';

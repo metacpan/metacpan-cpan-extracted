@@ -101,6 +101,6 @@
          "url" : "https://github.com/googleads/google-ads-perl"
       }
    },
-   "version" : "v27.0.0",
+   "version" : "v27.0.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

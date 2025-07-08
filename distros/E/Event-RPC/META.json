@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Event-RPC",
    "no_index" : {
@@ -32,19 +32,19 @@
       },
       "runtime" : {
          "requires" : {
+            "CBOR::XS" : "0",
             "Event" : "0",
             "Glib" : "0",
             "IO::Socket::INET" : "0",
             "IO::Socket::SSL" : "0",
             "JSON::XS" : "3",
             "Net::SSLeay" : "0",
-            "Sereal" : "3",
             "Storable" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

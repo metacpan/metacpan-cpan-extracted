@@ -1,0 +1,102 @@
+
+class Foo {
+ 
+public:
+ 
+  // note you should avoid inlining functions
+  // for classes you intend to use with FFI
+  // as the compiler may not emit code/symbols
+  // for those functions.
+  Foo();
+  ~Foo();
+ 
+  char* get_g();
+  void set_g(char*);
+  // void free_string(char*);
+  double get_r1();
+  void set_r1(double);
+  double get_r2();
+  void set_r2(double);
+  double foo_mjsolve();
+ 
+  int _size();
+ 
+private:
+ 
+  char* g;
+  double r1;
+  double r2;
+ 
+};
+ 
+Foo::Foo()
+{
+  r1 = 0.0;
+  r2 = 142.0;
+}
+ 
+Foo::~Foo()
+{
+}
+ 
+double
+Foo::get_r1()
+{
+  return r1;
+}
+ 
+double
+Foo::get_r2()
+{
+  return r2;
+}
+ 
+char*
+Foo::get_g()
+{
+  char *buffer;
+  asprintf(&buffer, "%s", g); // https://stackoverflow.com/questions/34632067/malloc-strlen-strcat
+  return buffer;
+}
+
+// void
+// Foo::free_string(char *buffer)
+// {
+//   free(buffer);
+// }
+
+void
+Foo::set_g(char* value)
+{
+  g = value;
+}
+ 
+void
+Foo::set_r1(double value)
+{
+  r1 = value;
+}
+ 
+void
+Foo::set_r2(double value)
+{
+  r2 = value;
+}
+ 
+int
+Foo::_size()
+{
+  return sizeof(Foo);
+}
+
+double
+Foo::foo_mjsolve ()
+{
+  char* inner_g = g;
+  double inner_r1 = r1;
+  double inner_r2 = r2;
+  double inner_r = mjsolve(inner_g, inner_r1, inner_r2);
+  // cerr << "# inner_g after foo_mjsolve: " << inner_g << "\n";
+  g = inner_g;
+  return inner_r;
+}

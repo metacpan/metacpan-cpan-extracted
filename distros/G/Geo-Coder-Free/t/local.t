@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 110;
+use Test::Most tests => 111;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -87,11 +87,13 @@ LOCAL: {
 		'Minster Cemetery, 116 Tothill St, Minster, Thanet, Kent, GB',
 	);
 
-	check($geo_coder,
+	my $res = check($geo_coder,
 		'106 Tothill St, Ramsgate, Kent, GB',
 		51.33995174,
 		1.31570211
 	);
+
+	ok($res->{'number'} == 106);
 
 	cmp_deeply($geo_coder->geocode(location => '106 Tothill St, Minster, Thanet, Kent, England'),
 		methods('lat' => num(51.34, 1e-2), 'long' => num(1.32, 1e-2)));
@@ -147,6 +149,8 @@ sub check {
 	ok(scalar(@rc) > 0);
 	cmp_deeply(@rc,
 		methods('lat' => num($lat, 1e-2), 'long' => num($long, 1e-2)));
+
+	my $res = $rc[0];
 
 	@rc = $geo_coder->reverse_geocode(lat => $lat, long => $long);
 	ok(scalar(@rc) > 0);
@@ -238,4 +242,6 @@ sub check {
 		diag(Data::Dumper->new([\@rc])->Dump());
 	}
 	ok($found);
+
+	return $res;
 }

@@ -24,16 +24,30 @@ typedef struct { const char* key; STRLEN key_length; clockid_t value; } map[];
 
 static map clocks = {
 	{ STR_WITH_LEN("realtime") , CLOCK_REALTIME  }
+#ifdef CLOCK_MONOTONIC
+	, { STR_WITH_LEN("monotonic"), CLOCK_MONOTONIC }
+#endif
+#ifdef CLOCK_PROCESS_CPUTIME_ID
+	, { STR_WITH_LEN("process"), CLOCK_PROCESS_CPUTIME_ID }
+#endif
+#ifdef CLOCK_THREAD_CPUTIME_ID
+	, { STR_WITH_LEN("thread"), CLOCK_THREAD_CPUTIME_ID }
+#endif
+#ifdef CLOCK_BOOTTIME
+	, { STR_WITH_LEN("boottime"), CLOCK_BOOTTIME }
+#endif
+
 #ifdef CLOCK_REALTIME_COARSE
 	, { STR_WITH_LEN("realtime_coarse"), CLOCK_REALTIME_COARSE }
 #endif
 #ifdef CLOCK_REALTIME_ALARM
 	, { STR_WITH_LEN("realtime_alarm"), CLOCK_REALTIME_ALARM }
 #endif
-#ifdef CLOCK_MONOTONIC
-	, { STR_WITH_LEN("monotonic"), CLOCK_MONOTONIC }
-#elif defined CLOCK_HIGHRES
-	, { STR_WITH_LEN("monotonic"), CLOCK_HIGHRES }
+#ifdef CLOCK_REALTIME_PRECISE
+	, { STR_WITH_LEN("realtime_precise"), CLOCK_REALTIME_PRECISE }
+#endif
+#if defined CLOCK_HIGHRES
+	, { STR_WITH_LEN("highres"), CLOCK_HIGHRES }
 #endif
 #ifdef CLOCK_MONOTONIC_RAW
 	, { STR_WITH_LEN("monotonic_raw"), CLOCK_MONOTONIC_RAW }
@@ -41,19 +55,20 @@ static map clocks = {
 #ifdef CLOCK_MONOTONIC_COARSE
 	, { STR_WITH_LEN("monotonic_coarse"), CLOCK_MONOTONIC_COARSE }
 #endif
-#ifdef CLOCK_PROCESS_CPUTIME_ID
-	, { STR_WITH_LEN("process"), CLOCK_PROCESS_CPUTIME_ID }
-#elif defined CLOCK_PROF
-	, { STR_WITH_LEN("process"), CLOCK_PROF }
+#ifdef CLOCK_MONOTONIC_PRECISE
+	, { STR_WITH_LEN("monotonic_precise"), CLOCK_MONOTONIC_PRECISE }
 #endif
-#ifdef CLOCK_THREAD_CPUTIME_ID
-	, { STR_WITH_LEN("thread"), CLOCK_THREAD_CPUTIME_ID }
+#if defined CLOCK_PROF
+	, { STR_WITH_LEN("prof"), CLOCK_PROF }
 #endif
 #ifdef CLOCK_UPTIME
 	, { STR_WITH_LEN("uptime"), CLOCK_UPTIME }
 #endif
-#ifdef CLOCK_BOOTTIME
-	, { STR_WITH_LEN("boottime"), CLOCK_BOOTTIME }
+#ifdef CLOCK_UPTIME_PRECISE
+	, { STR_WITH_LEN("uptime_precise"), CLOCK_UPTIME_PRECISE }
+#endif
+#ifdef CLOCK_UPTIME_FAST
+	, { STR_WITH_LEN("uptime_fast"), CLOCK_UPTIME_FAST }
 #endif
 #ifdef CLOCK_BOOTTIME_ALARM
 	, { STR_WITH_LEN("boottime_alarm"), CLOCK_BOOTTIME_ALARM }

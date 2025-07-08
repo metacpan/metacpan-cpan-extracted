@@ -60,7 +60,8 @@ struct imp_dbh_st {
     PGresult  *last_result;     /* PGresult structure from the last executed query (can be from imp_dbh or imp_sth) */
     bool      result_clearable; /* Is it alright to call PQclear on last_result? (statements handles set it to false */
     imp_sth_t *do_tmp_sth;      /* temporary sth to refer inside a do() call */
-    async_action_t *aa_first, **aa_pp;
+    async_action_t *aa_first, **aa_pp; /* list of asynchronous actions which need to be done before pg_ready can return true */
+    int       use_async;               /* use async operations for everything */
 };
 
 /* Each statement is broken up into segments */

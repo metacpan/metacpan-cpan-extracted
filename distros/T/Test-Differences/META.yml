@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/Test-Differences/issues
   repository: https://github.com/DrHyde/Test-Differences
-version: '0.71'
+version: '0.72'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

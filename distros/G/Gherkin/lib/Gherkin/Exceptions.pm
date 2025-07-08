@@ -4,18 +4,18 @@ use strict;
 use warnings;
 
 package Gherkin::Exceptions;
-$Gherkin::Exceptions::VERSION = '32.1.2';
+$Gherkin::Exceptions::VERSION = '33.0.0';
 sub stringify { my $self  = shift; $self->message }
 sub throw     { my $class = shift; die $class->new(@_) }
 
 # Parent of single and composite exceptions
 package Gherkin::Exceptions::Parser;
-$Gherkin::Exceptions::Parser::VERSION = '32.1.2';
+$Gherkin::Exceptions::Parser::VERSION = '33.0.0';
 use base 'Gherkin::Exceptions';
 
 # Composite exceptions
 package Gherkin::Exceptions::CompositeParser;
-$Gherkin::Exceptions::CompositeParser::VERSION = '32.1.2';
+$Gherkin::Exceptions::CompositeParser::VERSION = '33.0.0';
 use base 'Gherkin::Exceptions::Parser';
 use Class::XSAccessor accessors => [qw/errors/];
 
@@ -36,7 +36,7 @@ sub throw { my $class = shift; die $class->new(@_) }
 # Various non-composite exceptions
 #
 package Gherkin::Exceptions::SingleParser;
-$Gherkin::Exceptions::SingleParser::VERSION = '32.1.2';
+$Gherkin::Exceptions::SingleParser::VERSION = '33.0.0';
 use base 'Gherkin::Exceptions::Parser';
 use Class::XSAccessor accessors => [qw/detailed_message location/];
 
@@ -54,7 +54,7 @@ sub message {
 }
 
 package Gherkin::Exceptions::NoSuchLanguage;
-$Gherkin::Exceptions::NoSuchLanguage::VERSION = '32.1.2';
+$Gherkin::Exceptions::NoSuchLanguage::VERSION = '33.0.0';
 use base 'Gherkin::Exceptions::SingleParser';
 use Class::XSAccessor accessors => [qw/language location/];
 
@@ -69,7 +69,7 @@ sub detailed_message {
 }
 
 package Gherkin::Exceptions::AstBuilder;
-$Gherkin::Exceptions::AstBuilder::VERSION = '32.1.2';
+$Gherkin::Exceptions::AstBuilder::VERSION = '33.0.0';
 use base 'Gherkin::Exceptions::SingleParser';
 use Class::XSAccessor accessors => [qw/location ast_message/];
 
@@ -85,7 +85,7 @@ sub detailed_message {
 }
 
 package Gherkin::Exceptions::UnexpectedEOF;
-$Gherkin::Exceptions::UnexpectedEOF::VERSION = '32.1.2';
+$Gherkin::Exceptions::UnexpectedEOF::VERSION = '33.0.0';
 use base 'Gherkin::Exceptions::SingleParser';
 use Class::XSAccessor accessors => [qw/location expected_token_types/];
 
@@ -105,7 +105,7 @@ sub detailed_message {
 }
 
 package Gherkin::Exceptions::UnexpectedToken;
-$Gherkin::Exceptions::UnexpectedToken::VERSION = '32.1.2';
+$Gherkin::Exceptions::UnexpectedToken::VERSION = '33.0.0';
 use base 'Gherkin::Exceptions::SingleParser';
 use Class::XSAccessor accessors =>
     [qw/location received_token_value expected_token_types state_comment/];

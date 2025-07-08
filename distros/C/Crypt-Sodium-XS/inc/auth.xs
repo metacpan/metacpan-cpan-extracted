@@ -92,8 +92,8 @@ SV * auth(SV * msg, SV * key)
       func = crypto_auth;
   }
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -102,8 +102,8 @@ SV * auth(SV * msg, SV * key)
   if (key_len != key_req_len)
     croak("auth: Invalid key length %lu", key_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -161,8 +161,8 @@ void auth_verify(SV * mac, SV * msg, SV * key)
   int ret;
 
   CODE:
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -171,8 +171,8 @@ void auth_verify(SV * mac, SV * msg, SV * key)
   if (key_len != crypto_auth_KEYBYTES)
     croak("auth_verify: Invalid key length %lu", key_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -262,8 +262,8 @@ void auth_hmacsha256_verify(SV * mac, SV * msg, SV * key = &PL_sv_undef)
   }
 
   if (SvOK(key)) {
-    if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-      key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(key, MEMVAULT_CLASS)) {
+      key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
       key_buf = key_pm->pm_ptr;
       key_len = key_pm->size;
     }
@@ -271,8 +271,8 @@ void auth_hmacsha256_verify(SV * mac, SV * msg, SV * key = &PL_sv_undef)
       key_buf = (unsigned char *)SvPVbyte(key, key_len);
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -374,8 +374,8 @@ SV * auth_init(SV * key = &PL_sv_undef, SV * flags = &PL_sv_undef)
   CODE:
   if (SvOK(key)) {
     state_flags = g_protmem_flags_key_default;
-    if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-      key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(key, MEMVAULT_CLASS)) {
+      key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
       key_buf = key_pm->pm_ptr;
       key_len = key_pm->size;
     }
@@ -578,8 +578,8 @@ void update(SV * self, ...)
     croak("update: Failed to grant state protmem RW");
 
   for (i = 1; i < items; i++) {
-    if (sv_derived_from(ST(i), "Crypt::Sodium::XS::MemVault")) {
-      msg_mv = protmem_get(aTHX_ ST(i), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(i), MEMVAULT_CLASS)) {
+      msg_mv = protmem_get(aTHX_ ST(i), MEMVAULT_CLASS);
       msg_buf = msg_mv->pm_ptr;
       msg_len = msg_mv->size;
     }

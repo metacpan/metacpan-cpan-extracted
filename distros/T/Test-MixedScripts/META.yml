@@ -27,16 +27,16 @@ name: Test-MixedScripts
 provides:
   Test::MixedScripts:
     file: lib/Test/MixedScripts.pm
-    version: v0.6.0
+    version: v0.6.1
 requires:
   Carp: '0'
   Exporter: '5.57'
-  ExtUtils::Manifest: '1.68'
   File::Basename: '0'
   File::Spec: '0'
   IO: '0'
   List::Util: '0'
   Test2::API: '1.302200'
+  Test2::Util::DistFiles: '0'
   Unicode::UCD: '0'
   perl: v5.16.0
   utf8: '0'
@@ -44,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Test-MixedScripts/issues
   repository: git://github.com/robrwo/perl-Test-MixedScripts.git
-version: v0.6.0
+version: v0.6.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.76'

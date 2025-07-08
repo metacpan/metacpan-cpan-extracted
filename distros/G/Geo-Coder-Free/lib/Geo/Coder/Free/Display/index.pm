@@ -5,11 +5,11 @@ use warnings;
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 # Display the index page
 

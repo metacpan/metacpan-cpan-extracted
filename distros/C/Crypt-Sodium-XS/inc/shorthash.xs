@@ -54,8 +54,8 @@ SV * shorthash(SV * msg, SV * key)
       func = crypto_shorthash;
   }
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_mv = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_mv = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_mv->pm_ptr;
     key_len = key_mv->size;
   }

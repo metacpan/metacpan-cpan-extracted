@@ -70,8 +70,8 @@ void kx_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     unsigned char *seed_buf;
     STRLEN seed_len;
 
-    if (sv_derived_from(ST(0), "Crypt::Sodium::XS::MemVault")) {
-      seed_pm = protmem_get(aTHX_ ST(0), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(0), MEMVAULT_CLASS)) {
+      seed_pm = protmem_get(aTHX_ ST(0), MEMVAULT_CLASS);
       seed_buf = seed_pm->pm_ptr;
       seed_len = seed_pm->size;
     }
@@ -114,7 +114,7 @@ void kx_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   pk_sv = newSV(0);
   sv_usepvn_flags(pk_sv, (char *)pk_buf, crypto_kx_PUBLICKEYBYTES, SV_HAS_TRAILING_NUL);
   mXPUSHs(pk_sv);
-  mXPUSHs(protmem_to_sv(aTHX_ sk_pm, "Crypt::Sodium::XS::MemVault"));
+  mXPUSHs(protmem_to_sv(aTHX_ sk_pm, MEMVAULT_CLASS));
   XSRETURN(2);
 
 void kx_client_session_keys(SV * cpk, SV * csk, SV * spk, SV * flags = &PL_sv_undef)
@@ -145,8 +145,8 @@ void kx_client_session_keys(SV * cpk, SV * csk, SV * spk, SV * flags = &PL_sv_un
   if (cpk_len != crypto_kx_PUBLICKEYBYTES)
     croak("kx_client_session_keys: Invalid public key length %lu", cpk_len);
 
-  if (sv_derived_from(csk, "Crypt::Sodium::XS::MemVault")) {
-    csk_pm = protmem_get(aTHX_ csk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(csk, MEMVAULT_CLASS)) {
+    csk_pm = protmem_get(aTHX_ csk, MEMVAULT_CLASS);
     csk_buf = csk_pm->pm_ptr;
     csk_len = csk_pm->size;
   }
@@ -202,8 +202,8 @@ void kx_client_session_keys(SV * cpk, SV * csk, SV * spk, SV * flags = &PL_sv_un
     croak("kx_client_session_keys: Failed to generate session keys (invalid server pubkey?)");
   }
 
-  mXPUSHs(protmem_to_sv(aTHX_ rx, "Crypt::Sodium::XS::MemVault"));
-  mXPUSHs(protmem_to_sv(aTHX_ tx, "Crypt::Sodium::XS::MemVault"));
+  mXPUSHs(protmem_to_sv(aTHX_ rx, MEMVAULT_CLASS));
+  mXPUSHs(protmem_to_sv(aTHX_ tx, MEMVAULT_CLASS));
   XSRETURN(2);
 
 void kx_server_session_keys(SV * spk, SV * ssk, SV * cpk, SV * flags = &PL_sv_undef)
@@ -234,8 +234,8 @@ void kx_server_session_keys(SV * spk, SV * ssk, SV * cpk, SV * flags = &PL_sv_un
   if (spk_len != crypto_kx_PUBLICKEYBYTES)
     croak("kx_server_session_keys: Invalid public key length %lu", spk_len);
 
-  if (sv_derived_from(ssk, "Crypt::Sodium::XS::MemVault")) {
-    ssk_pm = protmem_get(aTHX_ ssk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(ssk, MEMVAULT_CLASS)) {
+    ssk_pm = protmem_get(aTHX_ ssk, MEMVAULT_CLASS);
     ssk_buf = ssk_pm->pm_ptr;
     ssk_len = ssk_pm->size;
   }
@@ -290,6 +290,6 @@ void kx_server_session_keys(SV * spk, SV * ssk, SV * cpk, SV * flags = &PL_sv_un
     croak("kx_server_session_keys: Failed to generate session keys (invalid client pubkey?)");
   }
 
-  mXPUSHs(protmem_to_sv(aTHX_ rx, "Crypt::Sodium::XS::MemVault"));
-  mXPUSHs(protmem_to_sv(aTHX_ tx, "Crypt::Sodium::XS::MemVault"));
+  mXPUSHs(protmem_to_sv(aTHX_ rx, MEMVAULT_CLASS));
+  mXPUSHs(protmem_to_sv(aTHX_ tx, MEMVAULT_CLASS));
   XSRETURN(2);

@@ -17,7 +17,7 @@ use Carp;
 use strict;
 use utf8;
 
-use IO::Socket::INET;
+use IO::Socket;
 use Sys::Hostname;
 
 sub get_host                    { shift->{host}                         }
@@ -255,14 +255,24 @@ sub setup_listeners {
             ($ssl_opts?%{$ssl_opts}:()),
         ) or die "can't start SSL RPC listener: $IO::Socket::SSL::ERROR";
     }
+    elsif ($host eq "unix/") {
+        require IO::Socket::UNIX;
+        unlink $port;
+        $rpc_socket = IO::Socket::UNIX->new (
+            Type      => IO::Socket::UNIX::SOCK_STREAM(),
+            Listen    => SOMAXCONN,
+            Local     => $port,
+        ) or die "can't start Unix Domain RPC listener at $port: $!";
+    }
     else {
+        require IO::Socket::INET;
         $rpc_socket = IO::Socket::INET->new (
             Listen    => SOMAXCONN,
             @LocalHost,
             LocalPort => $port,
             Proto     => 'tcp',
             ReuseAddr => 1,
-        ) or die "can't start RPC listener: $!";
+        ) or die "can't start TCP RPC listener: $!";
     }
 
     $self->set_rpc_socket($rpc_socket);
@@ -282,13 +292,26 @@ sub setup_listeners {
 
     # setup log listener
     if ( $self->get_start_log_listener ) {
-        my $log_socket = IO::Socket::INET->new (
-            Listen    => SOMAXCONN,
-            LocalPort => $port + 1,
-            @LocalHost,
-            Proto     => 'tcp',
-            ReuseAddr => 1,
-        ) or die "can't start log listener: $!";
+        my $log_socket;
+        if ($host eq "unix/") {
+            $port =~ s/\.sock//;
+            $port .= ".log.sock";
+            unlink $port;
+            $log_socket = IO::Socket::UNIX->new (
+                Type      => IO::Socket::UNIX::SOCK_STREAM(),
+                Listen    => SOMAXCONN,
+                Local     => $port,
+            ) or die "can't start Unix Domain log listener at $port: $!";
+        }
+        else {
+            $log_socket = IO::Socket::INET->new (
+                Listen    => SOMAXCONN,
+                LocalPort => $port + 1,
+                @LocalHost,
+                Proto     => 'tcp',
+                ReuseAddr => 1,
+            ) or die "can't start log listener: $!";
+        }
 
         $loop->add_io_watcher (
             fh      => $log_socket,
@@ -538,7 +561,7 @@ Event::RPC::Server - Simple API for event driven RPC servers
 
   my $server = Event::RPC::Server->new (
       #-- Required arguments
-      port               => 8888,
+      port               => 8888,   # or a path to a Unix Domain Socket with host "unix/"
       classes            => {
         "My::TestModule" => {
           new      => "_constructor",
@@ -565,7 +588,7 @@ Event::RPC::Server - Simple API for event driven RPC servers
 
       loop                => Event::RPC::Loop::Event->new(),
       
-      host                => "localhost",
+      host                => "localhost", # or "unix/" for Unix Domain socket
       load_modules        => 1,
       auto_reload_modules => 1,
       connection_hook     => sub { ... },
@@ -624,6 +647,9 @@ These are the required options:
 =item B<port>
 
 TCP port number of the RPC listener.
+
+As an alternative you can pass a path of a Unix Domain
+Socket and specify "unix/" as host parameter.
 
 =item B<classes>
 
@@ -927,6 +953,9 @@ By default the network listeners are bound to all interfaces
 in the system. Use the host option to bind to a specific
 interface, e.g. "localhost" if you efficiently want to prevent
 network clients from accessing your server.
+
+Set to "unix/" for a Unix Domain Socket and pass the path
+as "port" parameter.
 
 =item B<load_modules>
 

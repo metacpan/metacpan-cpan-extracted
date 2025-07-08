@@ -40,16 +40,16 @@ SV *onetimeauth(SV *msg, SV *key)
       func = crypto_onetimeauth;
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -139,16 +139,16 @@ void onetimeauth_verify(SV *mac, SV *msg, SV *key)
       func = crypto_onetimeauth_verify;
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -200,8 +200,8 @@ SV * onetimeauth_init(SV *key, SV *flags = &PL_sv_undef)
   if (SvOK(flags))
     state_flags = SvUV(flags);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -381,8 +381,8 @@ void update(SV *self, ...)
     croak("update: Failed to grant state protmem RW");
 
   for (i = 1; i < items; i++) {
-    if (sv_derived_from(ST(i), "Crypt::Sodium::XS::MemVault")) {
-      msg_mv = protmem_get(aTHX_ ST(i), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(i), MEMVAULT_CLASS)) {
+      msg_mv = protmem_get(aTHX_ ST(i), MEMVAULT_CLASS);
       msg_buf = msg_mv->pm_ptr;
       msg_len = msg_mv->size;
     }

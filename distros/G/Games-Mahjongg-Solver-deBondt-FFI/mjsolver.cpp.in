@@ -1,0 +1,1394 @@
+//#define XMAHJONGG
+#define DLL
+//#define QUARTER
+
+#include <stdio.h>
+#include <assert.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#ifdef DLL
+// #include <windows.h>
+#endif
+
+#define maxwidth 40
+#define maxheight 40
+#define maxdepth 10
+#define maxgroups 100
+
+#ifndef max
+#define max(a,b) (((a)>(b))?(a):(b))
+#endif
+#ifndef min
+#define min(a,b) (((a)<(b))?(a):(b))
+#endif
+
+struct tile
+{
+// NULL-terminated arrays of neighbo(u)rs
+  tile *left[3], *right[3], *above[5], *below[5];
+// The group of the tile (0-35)
+  int value;
+// If the tile has been played already by the solver during 
+// the routine prune()
+  bool isplayed;
+// If a tile can be played by the solver during the routine
+// prune()
+  bool isplayable ();  
+};
+
+struct group
+{
+// the pairing of the four tiles (0-5): see prune() for
+// more info
+  int pairing;
+// number of tiles with the value of this group
+  int nmembers;
+// array of tiles of this group  
+  tile *member[4];
+// whether all tiles are already played
+  bool isplayed;  
+// the pairing for the best partial solution found this far
+  int bestpairing;
+// how often the last three tiles are cycled 
+  int rotation;
+};
+
+// number of tiles
+static int _ntiles;
+// number of "game simulations" of randomsolve and 
+// suresolve
+static int nplays, nrplays;
+// tile array;
+static tile tl[4*maxgroups];
+// group array, indexed by group value
+static group qt[maxgroups];
+// pointers of grid positions to tile array, to describe
+// layout 
+static tile *lo[maxheight][maxwidth][maxdepth];
+// array of pointers to groups, indexes in order of 
+// search path
+static group *qts[maxgroups];
+// start index and bottom index of search path
+static int qtsindex, ngroups;
+// search interval for the number of tiles that remains finally
+static int remain_max, remain_min;
+// for aborting the solver
+bool aborted;
+
+// computes if a tile can be played by the solver
+inline bool 
+tile::isplayable ()
+{
+  int k;
+  k = 0;
+// checks if there are no above neighbo(u)rs
+  while (above[k] != NULL)
+  {
+    if (!above[k]->isplayed) return false;
+    k++;
+  }
+  k = 0;
+// checks if there are no left neighbo(u)rs
+  while (left[k] != NULL)
+  {
+    if (!left[k]->isplayed)
+    {
+      k = 0;
+// checks if there are no right neighbo(u)rs
+      while (right[k] != NULL)
+      {
+        if (!right[k]->isplayed) return false;
+        k++;
+      }      
+      return true;
+    }
+    k++;
+  }
+  return true;
+}
+
+// initializes both randomsolve and suresolve
+void 
+initsolve ()
+{
+// clear tile neighbours
+  for (int k=0; k<4*maxgroups; k++)
+  {
+    tl[k].left[0] = tl[k].left[1] = 
+                    tl[k].left[2] = NULL;
+    tl[k].right[0] = tl[k].right[1] = 
+                     tl[k].right[2] = NULL;
+    tl[k].above[0] = tl[k].above[1] = 
+                     tl[k].above[2] = 
+                     tl[k].above[3] = 
+                     tl[k].above[4] = NULL;
+    tl[k].below[0] = tl[k].below[1] = 
+                     tl[k].below[2] = 
+                     tl[k].below[3] = 
+                     tl[k].below[4] = NULL;
+    tl[k].isplayed = false;
+  }
+// compute left and right neighbours
+  for (int row=0; row<maxheight; row++)
+  {
+    for (int col=2; col<maxwidth; col++)
+    {
+      for (int lev=0; lev<maxdepth; lev++)
+      {
+        if (lo[row][col][lev] != NULL)
+        {
+          int k = 0;
+          for (int r=max(row-1,0);
+               r<min(row+2,maxheight); r++)
+          {
+            if (lo[r][col-2][lev] != NULL)
+            {
+              lo[row][col][lev]->left[k] =
+                          lo[r][col-2][lev];
+              k++;
+            }
+          }
+        }
+        if (lo[row][col-2][lev] != NULL)
+        {
+          int k=0;
+          for (int r=max(row-1,0);
+               r<min(row+2,maxheight); r++)
+          {
+            if (lo[r][col][lev] != NULL)
+            {
+              lo[row][col-2][lev]->right[k] =
+                              lo[r][col][lev];
+              k++;
+            }
+          }
+        }
+      }
+    }
+  }
+// compute above and below neighbours
+  for (int row=0; row<maxheight; row++)
+  {
+    for (int col=0; col<maxwidth; col++)
+    {
+      for (int lev=1; lev<maxdepth; lev++)
+      {
+        if (lo[row][col][lev-1] != NULL)
+        {
+          int k = 0;
+          for (int r=max(row-1,0);
+               r<min(row+2,maxheight); r++)
+          {
+            for (int c=max(col-1,0);
+                 c<min(col+2,maxwidth); c++)
+            {
+              if (lo[r][c][lev] != NULL)
+              {
+                lo[row][col][lev-1]->above[k] =
+                                  lo[r][c][lev];
+                k++;
+              }
+            }
+          }
+        }
+        if (lo[row][col][lev] != NULL)
+        {
+          int k = 0;
+          for (int r=max(row-1,0);
+               r<min(row+2,maxheight); r++)
+          {
+            for (int c=max(col-1,0);
+                 c<min(col+2,maxwidth); c++)
+            {
+              if (lo[r][c][lev-1] != NULL)
+              {
+                lo[row][col][lev]->below[k] =
+                                  lo[r][c][lev-1];
+                k++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+// clear groups
+  for (int k=0; k<maxgroups; k++)
+  {
+    qt[k].pairing = qt[k].bestpairing = -1;
+    qt[k].nmembers = 0;
+    qt[k].member[0] = qt[k].member[1] =
+                      qt[k].member[2] =
+                      qt[k].member[3] = NULL;
+    qt[k].isplayed = false;		      
+    qt[k].rotation = 0;
+  }
+// collect groups
+  for (int k=0; k<_ntiles; k++)
+  {
+    int v = tl[k].value;
+    assert (v >= 0 && v < maxgroups &&
+            qt[v].nmembers < 4);
+    qt[v].member[qt[v].nmembers] = tl + k;
+    qt[v].nmembers++;
+  }
+// initialize search system of suresolve
+  srand (time (NULL));
+  int l=0, lq=0;
+  for (int k=0; k<maxgroups; k++)
+  {
+    assert ((qt[k].nmembers & 1) == 0);
+    if (qt[k].nmembers == 2)
+    {
+      qts[l] = &qt[k];
+      qts[l]->pairing = 4;
+      l++;
+    }
+    if (qt[k].nmembers != 0)
+    {
+      lq = k;
+    }
+  }
+  for (int k=0; k<=lq; k++)
+  {
+    if (qt[k].nmembers == 0)
+    {
+      qts[l] = &qt[k];
+      qts[l]->pairing = -1;
+      l++;
+    }
+  }  
+  qtsindex = l;
+  for (int k=0; k<=lq; k++)
+  {
+    if (qt[k].nmembers == 4)
+    {
+      qts[l] = &qt[k];
+      qts[l]->pairing = 0;
+      group *d = qts[l];
+      int r = rand() % (l + 1 - qtsindex);
+      qts[l] = qts[qtsindex + r];
+      qts[qtsindex + r] = d;
+      l++;
+    }
+  }
+  ngroups = l;
+  aborted = false;
+}
+
+// test solvability with the given pairing of all tiles
+int 
+prune ()
+{
+  int ntiles1, ntiles2=_ntiles;
+  nplays++;
+// play until no tiles can be removed any more
+  do
+  {
+    ntiles1 = ntiles2;
+    for (int k=0; k<ngroups; k++)
+    {
+      if (!(qt[k].isplayed))
+      {
+        switch (qt[k].pairing)
+        {
+          case 0: // free group, no pairing
+                  // first two played together, 
+                  // last two played separate
+            if (qt[k].member[0]->isplayed |
+                qt[k].member[1]->isplayed |
+                qt[k].member[2]->isplayed) 
+            {
+              if (!(qt[k].member[0]->isplayed) && 
+                  qt[k].member[0]->isplayable ())
+              {
+                qt[k].member[0]->isplayed = true; 
+		ntiles1++; 
+              }
+              if (!(qt[k].member[1]->isplayed) && 
+                  qt[k].member[1]->isplayable ())
+              {
+                qt[k].member[1]->isplayed = true; 
+		ntiles1++;
+              }
+              if (!(qt[k].member[2]->isplayed) && 
+                  qt[k].member[2]->isplayable ())
+              {
+                qt[k].member[2]->isplayed = true; 
+		ntiles1++;
+              }
+              if (!(qt[k].member[3]->isplayed) && 
+                  qt[k].member[3]->isplayable ())
+              {
+                qt[k].member[3]->isplayed = true; 
+		ntiles1++;
+              }
+              if (qt[k].member[0]->isplayed &
+                  qt[k].member[1]->isplayed &
+                  qt[k].member[2]->isplayed &
+                  qt[k].member[3]->isplayed)
+	      {
+	        qt[k].isplayed = true;
+		ntiles2 -= 2;
+              }			   
+            }
+            else
+            {
+              if (!(qt[k].member[0]->isplayed) && 
+                  qt[k].member[0]->isplayable ())
+              {
+                if (!(qt[k].member[1]->isplayed) && 
+                    qt[k].member[1]->isplayable ())
+                {
+                  qt[k].member[0]->isplayed = true;
+                  qt[k].member[1]->isplayed = true;
+                  ntiles2 -= 2;
+                }
+                else if (!(qt[k].member[2]->isplayed) && 
+                         qt[k].member[2]->isplayable ())
+                {
+                  qt[k].member[0]->isplayed = true;
+                  qt[k].member[2]->isplayed = true;
+                  ntiles2 -= 2;
+                }
+                else if (!(qt[k].member[3]->isplayed) && 
+                         qt[k].member[3]->isplayable ())
+                {
+                  qt[k].member[0]->isplayed = true;
+                  qt[k].member[3]->isplayed = true;
+                  ntiles2 -= 2;
+                }
+              }
+              else if (!(qt[k].member[1]->isplayed) && 
+                       qt[k].member[1]->isplayable ())
+              {
+                if (!(qt[k].member[2]->isplayed) && 
+                    qt[k].member[2]->isplayable ())
+                {
+                  qt[k].member[1]->isplayed = true;
+                  qt[k].member[2]->isplayed = true;
+                  ntiles2 -= 2;
+                }
+                else if (!(qt[k].member[3]->isplayed) && 
+                         qt[k].member[3]->isplayable ())
+                {
+                  qt[k].member[1]->isplayed = true;
+                  qt[k].member[3]->isplayed = true;
+                  ntiles2 -= 2;
+                }
+              }
+              else if (!(qt[k].member[2]->isplayed) && 
+                       qt[k].member[2]->isplayable ())
+              {
+                if (!(qt[k].member[3]->isplayed) && 
+                    qt[k].member[3]->isplayable ())
+                {
+                  qt[k].member[2]->isplayed = true;
+                  qt[k].member[3]->isplayed = true;
+                  ntiles2 -= 2;
+                }
+              }
+            }
+            break;
+          case 1: // pairing 0-1, 2-3
+            if (!(qt[k].member[0]->isplayed) && 
+                qt[k].member[0]->isplayable() &&
+                qt[k].member[1]->isplayable())
+            {
+              qt[k].member[0]->isplayed = true;
+              qt[k].member[1]->isplayed = true;
+              ntiles2 -= 2;
+	      qt[k].isplayed = qt[k].member[2]->isplayed;
+            }
+            if (!(qt[k].member[2]->isplayed) && 
+                qt[k].member[2]->isplayable() &&
+                qt[k].member[3]->isplayable())
+            {
+              qt[k].member[2]->isplayed = true;
+              qt[k].member[3]->isplayed = true;
+              ntiles2 -= 2;
+	      qt[k].isplayed = qt[k].member[0]->isplayed;
+            }
+	    break;
+          case 2: // pairing 0-2, 1-3
+            if (!(qt[k].member[0]->isplayed) && 
+                qt[k].member[0]->isplayable() &&
+                qt[k].member[2]->isplayable())
+            {
+              qt[k].member[0]->isplayed = true;
+              qt[k].member[2]->isplayed = true;
+              ntiles2 -= 2;
+	      qt[k].isplayed = qt[k].member[1]->isplayed;
+            }
+            if (!(qt[k].member[1]->isplayed) && 
+                qt[k].member[1]->isplayable() &&
+                qt[k].member[3]->isplayable())
+            {
+              qt[k].member[1]->isplayed = true;
+              qt[k].member[3]->isplayed = true;
+              ntiles2 -= 2;
+	      qt[k].isplayed = qt[k].member[0]->isplayed;
+            }
+            break;
+          case 3: // pairing 0-3, 1-2
+            if (!(qt[k].member[0]->isplayed) && 
+                qt[k].member[0]->isplayable() &&
+                qt[k].member[3]->isplayable())
+            {
+              qt[k].member[0]->isplayed = true;
+              qt[k].member[3]->isplayed = true;
+              ntiles2 -= 2;
+	      qt[k].isplayed = qt[k].member[1]->isplayed;
+            }
+            if (!(qt[k].member[1]->isplayed) && 
+                qt[k].member[1]->isplayable() &&
+                qt[k].member[2]->isplayable())
+            {
+              qt[k].member[1]->isplayed = true;
+              qt[k].member[2]->isplayed = true;
+              ntiles2 -= 2;
+	      qt[k].isplayed = qt[k].member[0]->isplayed;
+            }
+            break;
+          case 4: // half a group, pairing 0-1
+            if (qt[k].member[0]->isplayable() &&
+                qt[k].member[1]->isplayable())
+            {
+              qt[k].member[0]->isplayed = true;
+              qt[k].member[1]->isplayed = true;
+              ntiles2 -= 2;
+	      qt[k].isplayed = true;
+            }
+            break;
+          case 5: // all four removed simultaneously
+                  // for heuristic to smell blockades
+            if (qt[k].member[0]->isplayable() &&
+                qt[k].member[1]->isplayable() &&
+                qt[k].member[2]->isplayable() &&
+                qt[k].member[3]->isplayable())
+            {
+              qt[k].member[0]->isplayed = true;
+              qt[k].member[1]->isplayed = true;
+              qt[k].member[2]->isplayed = true;
+              qt[k].member[3]->isplayed = true;
+              ntiles2 -= 4;
+	      qt[k].isplayed = true; 
+            }
+            break;
+        }
+      }
+    } 
+  }
+  while (ntiles2 != ntiles1);
+// unplay all played tiles
+  for (int k=0; k<_ntiles; k++)
+  {
+    tl[k].isplayed = false;
+  }
+  for (int k=0; k<ngroups; k++)
+  {
+    qt[k].isplayed = false;
+  }
+// test if all tiles were removed  
+  return ntiles2;
+}
+
+// stores the solution found
+void unrotategroups ()
+{
+  for (int i=0; i<ngroups; i++)
+  {
+    switch (qt[i].rotation)
+    {
+     case 1:
+     {
+       tile *t = qt[i].member[1];
+       qt[i].member[1] = qt[i].member[2];
+       qt[i].member[2] = qt[i].member[3];
+       qt[i].member[3] = t;
+       break;
+     }	 
+     case 2:	 
+     {
+       tile *t = qt[i].member[3];
+       qt[i].member[3] = qt[i].member[2];
+       qt[i].member[2] = qt[i].member[1];
+       qt[i].member[1] = t;
+       break;
+     }	 
+    }
+    qt[i].rotation = 0;
+  }
+}
+
+int testsolution ()
+{
+  unrotategroups ();
+  for (int i=0; i<ngroups; i++)
+  {
+    int t = qt[i].pairing;
+    qt[i].pairing = qt[i].bestpairing;
+    qt[i].bestpairing = t;
+  }
+  int r = prune ();
+  for (int i=0; i<ngroups; i++)
+  {
+    int t = qt[i].pairing;
+    qt[i].pairing = qt[i].bestpairing;
+    qt[i].bestpairing = t;
+  }
+  return r;
+}     
+
+// recursive search routine to determine (un)solvability
+// improves speed by changing search order backwards
+bool 
+suresolve (int si)
+{
+  static group *qts2[maxgroups];
+  // test whether the current branch might still lead to a solution
+  if (prune () > remain_max) return false;  
+  int k;
+  // descent left in search tree until on bottom or having found a prune
+  for (k=si; k<ngroups; k++)
+  {
+    qts[k]->pairing = 1;
+    // test whether a prune is found
+    if (prune () > remain_max) break;
+  }
+  // test whether on bottom of search tree
+  if (k == ngroups) 
+  {
+    // solution found
+    for (int i=0; i<ngroups; i++) qt[i].bestpairing = qt[i].pairing;
+    for (int i=qtsindex; i<ngroups; i++) 
+    {
+      qts[i]->bestpairing += 3 - qts[i]->rotation;
+      if (qts[i]->bestpairing > 3) qts[i]->bestpairing -= 3;
+    }
+    // redefine remain_max such that next solutions will be better  
+    remain_max = prune () - 2;
+    if (remain_max < remain_min)
+    {
+      // no need to search further: remain_min tiles remaining is good enough
+      for (int i=qtsindex; i<ngroups; i++) 
+      {
+        qts[i]->pairing = 0;
+      }  
+      return true;
+    }  
+    else
+    {
+      // search for better solution: redo suresolve with smaller remain_max
+      for (k=si; k<ngroups; k++) qts[k]->pairing = 0;
+      return suresolve (si);
+    }      
+  }
+  // prune found
+  int l = 0;  
+  qts2[l++] = qts[k];
+  // test which nodes in the interval [si..ngroups-1] had a pairing that
+  // was required for prune
+  for (int i=k-1; i>=si; i--)
+  {
+    qts[i]->pairing = 0;
+    if (prune () <= remain_max)
+    {
+      // pairing of node required for prune
+      qts[i]->pairing = 1;
+      qts2[l++] = qts[i];
+    }
+    else  
+    {
+      // pairing of node not required for prune
+      // shake (rotate) node in order to get a prune from it later
+      {
+        if (rand () % 2)
+	{
+          tile *t = qts[i]->member[3];
+	  qts[i]->member[3] = qts[i]->member[2];
+	  qts[i]->member[2] = qts[i]->member[1];
+	  qts[i]->member[1] = t;
+	  qts[i]->rotation += 1;
+	  if (qts[i]->rotation > 2) qts[i]->rotation = 0;
+	}
+	else 
+	{  
+          tile *t = qts[i]->member[1];
+	  qts[i]->member[1] = qts[i]->member[2];
+	  qts[i]->member[2] = qts[i]->member[3];
+	  qts[i]->member[3] = t;
+	  qts[i]->rotation -= 1;
+	  if (qts[i]->rotation < 0) qts[i]->rotation = 2;
+	}  
+      }
+      qts[k] = qts[i];
+      k--;
+    }  
+  }
+  // remove nodes of [si..ngroups-1] that were not required for prune from 
+  // search tree 
+  for (int i=k; i>=si; i--)
+  {
+    qts[i] = qts2[--l];
+  }
+  // advance search
+  for (int i=k; i>=si; i--)
+  {
+    qts[i]->pairing = 2;
+    if (suresolve(i+1)) return true;
+    qts[i]->pairing = 3;
+    if (suresolve(i+1)) return true;
+    qts[i]->pairing = 0;
+  }  
+  return false;
+}
+
+// play a tile for randomsolve
+inline void
+playtile (tile *t, int nfree[], int &ntiles2)
+{
+  for (int i=0; t->left[i]!=NULL; i++)
+  {
+    if (!(t->left[i])->isplayed)   
+    {
+      nfree[(t->left[i])->value] -= (t->left[i])->isplayable();
+    }
+  }
+  for (int i=0; t->right[i]!=NULL; i++)
+  {
+    if (!(t->right[i])->isplayed)
+    {
+      nfree[(t->right[i])->value] -= (t->right[i])->isplayable();
+    }
+  }
+  t->isplayed = true;
+  ntiles2--;
+  for (int i=0; t->left[i]!=NULL; i++)
+  {
+    if (!(t->left[i])->isplayed)
+    {
+      nfree[(t->left[i])->value] += (t->left[i])->isplayable();
+    }
+  }
+  for (int i=0; t->right[i]!=NULL; i++)
+  {
+    if (!(t->right[i])->isplayed)
+    {
+      nfree[(t->right[i])->value] += (t->right[i])->isplayable();
+    }
+  }
+  for (int i=0; t->below[i]!=NULL; i++)
+  {
+    nfree[(t->below[i])->value] += (t->below[i])->isplayable();
+  }
+}
+
+// iterative search routine to determine solvability, but
+// not unsolvability
+bool 
+randomsolve (int count)
+{
+  static int nfree[maxgroups];
+  static int nmatches[] = {0,0,1,3,6};
+  static int p[][4] = {{0,1,2,3},{1,0,3,2},{2,3,0,1},{3,2,1,0}}; 
+// play count games by randomly removing matches, until the
+// game is solved
+  for (int n=0; n<count; n++)
+  {
+    int ntiles2 = _ntiles;
+// count matches
+    for (int k=0; k<ngroups; k++)
+    {
+      nfree[k] = 0;
+      for (int l=0; l<qt[k].nmembers; l++)
+      {
+        if (qt[k].member[l]->isplayable()) nfree[k]++;	
+      }
+      qt[k].pairing = -1;
+      if (qt[k].nmembers == 2) qt[k].isplayed = true;
+    }
+    while (1)
+    {
+      int r=0;
+      for (int k=0; k<ngroups; k++) 
+      {
+        if ((qt[k].isplayed << 2) + nmatches[nfree[k]] >= 5)
+        {
+          // last two tiles or four tiles of a group
+          goto play_match;     
+        }
+	r += nmatches[nfree[k]];
+      }	  
+      if (r == 0)
+      {
+        // no tiles to remove
+	break;
+      }
+      r = rand () % r;	
+play_match:
+      int k = 0;
+      do
+      {
+         r -= nmatches[nfree[k]];
+	 k++;
+      } while (r >= 0);
+      k--;
+      r += nmatches[nfree[k]];
+      int i=0, j=qt[k].nmembers-1;
+      if (r <= 1)
+      {
+	// play the first
+	while (qt[k].member[i]->isplayed || !qt[k].member[i]->isplayable ())
+	{
+	  i++;
+	}
+        if (r == 0)
+	{
+	  j = i + 1;
+	  // play the next
+	  while (qt[k].member[j]->isplayed || !qt[k].member[j]->isplayable ())
+	  {
+	    j++;
+	  }
+	}
+      }
+      if (r >= 1)
+      {
+	// play the last
+	while (qt[k].member[j]->isplayed || !qt[k].member[j]->isplayable ())
+	{
+	  j--;
+	}
+	if (r == 2)
+	{
+	  i = j - 1;
+	  // play the previous
+	  while (qt[k].member[i]->isplayed || !qt[k].member[i]->isplayable ())
+	  {
+	    i--;
+	  }
+	}
+      }
+      playtile (qt[k].member[i], nfree, ntiles2);  
+      playtile (qt[k].member[j], nfree, ntiles2);  
+      qt[k].isplayed = true;
+      qt[k].pairing = p[i][j];
+      nfree[k] -= 2;
+    }
+    for (int k=0; k<_ntiles; k++) tl[k].isplayed = false;
+    for (int k=0; k<ngroups; k++) 
+    {
+      qt[k].isplayed = false;  	  	
+      if (qt[k].nmembers == 2) qt[k].pairing = 4;
+    } 
+    nrplays++;
+    if (ntiles2 <= remain_max)
+    {
+      for (int k=0; k<ngroups; k++) qt[k].bestpairing = qt[k].pairing;
+      remain_max = ntiles2 - 2;  
+      if (remain_max < remain_min) 
+      {
+        for (int k=0; k<ngroups; k++) 
+        {
+          if (qt[k].nmembers == 4) qt[k].pairing = 0;
+        }  
+        return true;
+      }	
+    }
+  }
+  for (int k=0; k<ngroups; k++) 
+  {
+    if (qt[k].nmembers == 4) qt[k].pairing = 0;
+  }  
+  return false;
+}      	
+
+int 
+solve (int remain1, int remain2)
+{
+  initsolve ();
+  nrplays = 0;
+  nplays = 0;
+  remain_max = max(remain1, remain2);
+  remain_min = min(remain1, remain2);
+  if (prune () > remain_max)
+  {
+    return remain_max + 2;
+  }
+  if (randomsolve ((int) pow(1.2, (ngroups-qtsindex))))
+  {
+    return remain_max + 2;
+  }
+  suresolve (qtsindex);
+  unrotategroups();
+  return remain_max + 2;
+}
+
+#ifdef XMAHJONGG
+
+static int idx[4*maxgroups];
+
+void Game::build_solution ()
+{
+  unrotategroups ();
+  int index = _solution_start;
+  while (index != _solution_end)
+  {
+    for (int k=0; k<ngroups; k++)
+    {
+      switch (qt[k].bestpairing)
+      {
+	case 1: // pairing 0-1, 2-3
+          if (!(qt[k].member[2]->isplayed) && 
+              qt[k].member[2]->isplayable() &&
+              qt[k].member[3]->isplayable())
+          {
+            qt[k].member[2]->isplayed = true;
+            qt[k].member[3]->isplayed = true;
+            _solution[index].m1 = _tiles[idx[qt[k].member[2] - tl]];
+            _solution[index].m2 = _tiles[idx[qt[k].member[3] - tl]];
+	    index++;
+          }
+        case 4: // half a group, pairing 0-1
+          if (!(qt[k].member[0]->isplayed) && 
+              qt[k].member[0]->isplayable() &&
+              qt[k].member[1]->isplayable())
+          {
+            qt[k].member[0]->isplayed = true;
+            qt[k].member[1]->isplayed = true;
+            _solution[index].m1 = _tiles[idx[qt[k].member[0] - tl]];
+            _solution[index].m2 = _tiles[idx[qt[k].member[1] - tl]];
+	    index++;
+          }
+          break;
+        case 2: // pairing 0-2, 1-3
+          if (!(qt[k].member[0]->isplayed) && 
+              qt[k].member[0]->isplayable() &&
+              qt[k].member[2]->isplayable())
+          {
+            qt[k].member[0]->isplayed = true;
+            qt[k].member[2]->isplayed = true;
+            _solution[index].m1 = _tiles[idx[qt[k].member[0] - tl]];
+            _solution[index].m2 = _tiles[idx[qt[k].member[2] - tl]];
+	    index++;
+          }
+          if (!(qt[k].member[1]->isplayed) && 
+              qt[k].member[1]->isplayable() &&
+              qt[k].member[3]->isplayable())
+          {
+            qt[k].member[1]->isplayed = true;
+            qt[k].member[3]->isplayed = true;
+            _solution[index].m1 = _tiles[idx[qt[k].member[1] - tl]];
+            _solution[index].m2 = _tiles[idx[qt[k].member[3] - tl]];
+	    index++;
+          }
+          break;
+        case 3: // pairing 0-3, 1-2
+          if (!(qt[k].member[0]->isplayed) && 
+              qt[k].member[0]->isplayable() &&
+              qt[k].member[3]->isplayable())
+          {
+            qt[k].member[0]->isplayed = true;
+            qt[k].member[3]->isplayed = true;
+            _solution[index].m1 = _tiles[idx[qt[k].member[0] - tl]];
+            _solution[index].m2 = _tiles[idx[qt[k].member[3] - tl]];
+	    index++;
+          }
+          if (!(qt[k].member[1]->isplayed) && 
+              qt[k].member[1]->isplayable() &&
+              qt[k].member[2]->isplayable())
+          {
+            qt[k].member[1]->isplayed = true;
+            qt[k].member[2]->isplayed = true;
+            _solution[index].m1 = _tiles[idx[qt[k].member[1] - tl]];
+            _solution[index].m2 = _tiles[idx[qt[k].member[2] - tl]];
+	    index++;
+          }
+          break;
+      }
+    }
+  }
+}
+
+void Game::find_solution ()
+{
+  if (_taken == 0 && (unsolvable_known() || _partial))
+  {
+    if (_solution_end < ntiles()/2) 
+    {
+      // game cannot be won
+      // we already know how far we can get
+      _partial = !_partial;
+      for (int i = 0; i < _hooks.size(); i++)
+        _hooks[i]->move_made_hook(this);
+      return;
+    }  
+  }   
+
+// clear layout pointers
+  {
+    for (int row=0; row<maxheight; row++)
+    {
+      for (int col=0; col<maxwidth; col++)
+      {
+        for (int lev=0; lev<maxdepth; lev++)
+        {
+          lo[row][col][lev] = NULL;
+        }
+      }
+    }
+  }
+// read tiles 
+  _ntiles = 0;
+  for (int k=0; k<ntiles(); k++)
+  {
+    if (tile(k)->real())
+    {
+      if (quarter_twisted)
+      {       
+        lo[tile(k)->col()][tile(k)->row()][tile(k)->lev()] = &tl[_ntiles];
+      }
+      else
+      {	
+        lo[tile(k)->row()][tile(k)->col()][tile(k)->lev()] = &tl[_ntiles];
+      }
+      tl[_ntiles].value = tile(k)->match();
+      idx[_ntiles] = k;
+      _ntiles++;
+    }
+  }
+    
+  if (_unsolvable_start == 0 && _taken == 0)
+  {
+    // the goal becomes to get as far as possible
+    int remain = ntiles();
+    remain = solve (remain, 2);
+    if (!aborted)
+    {
+      _partial = true;
+      _solution_start = _taken/2;
+      _solution_end = ntiles()/2 - remain/2;
+      build_solution ();
+      _unsolvable_start = ntiles()/2;
+    }
+  }  
+  else 
+  {
+    // test if the goal (all or afap) can stil be reached
+    int remain = ntiles() - 2*_solution_end;
+    if (solve (remain, remain) <= remain && !aborted)
+    {
+      _solution_start = _taken/2;
+      build_solution ();
+    }  
+    else if (!aborted)
+    {
+      _unsolvable_start = _taken/2;
+    }
+  }      
+
+  for (int i = 0; i < _hooks.size(); i++)
+    _hooks[i]->move_made_hook(this);
+}
+
+#else
+#ifdef DLL
+
+static char *firstnumber (char *g)
+{
+  if (!g) return NULL;
+  while (*g && !(*g >= '0' && *g <= '9')) g++;
+  if (*g) return g; else return NULL;
+}
+
+static char *nextnumber (char *g)
+{
+  if (!g) return NULL;
+  while (*g >= '0' && *g <= '9') g++;
+  while (*g && !(*g >= '0' && *g <= '9')) g++;
+  if (*g) return g; else return NULL;
+}  
+
+static void readgame (char *g)
+{
+// clear layout pointers
+  {
+    for (int row=0; row<maxheight; row++)
+    {
+      for (int col=0; col<maxwidth; col++)
+      {
+        for (int lev=0; lev<maxdepth; lev++)
+        {
+          lo[row][col][lev] = NULL;
+        }
+      }
+    }
+  }
+// read game 
+  int k = 0;
+  g = firstnumber (g);
+  while (g)  
+  {
+    int row, col, lev, vau;
+    sscanf (g, "%d", &row);
+    g = nextnumber (g); assert (!!g);
+    sscanf (g, "%d", &col);
+    g = nextnumber (g); assert (!!g);
+    sscanf (g, "%d", &lev);
+    g = nextnumber (g); assert (!!g);
+    sscanf (g, "%d", &vau);
+    assert (k < 4*maxgroups && 
+            row >= 0 && row < maxheight &&
+            col >= 0 && col < maxwidth &&
+            lev >= 0 && lev < maxdepth &&
+            vau >= 0 && vau < maxgroups &&
+            lo[row][col][lev] == NULL);
+    lo[row][col][lev] = &tl[k];
+    tl[k].value = vau;
+    k++;
+    g = nextnumber (g);
+  }
+  _ntiles = k;
+// test for overlapping tiles 
+  for (int row=1; row<maxheight; row++)
+  {
+    for (int col=1; col<maxwidth; col++)
+    {
+      for (int lev=1; lev<maxdepth; lev++)
+      {
+        assert ((lo[row-1][col-1][lev] != NULL) +
+                (lo[row-1][col-0][lev] != NULL) +
+                (lo[row-0][col-1][lev] != NULL) +
+                (lo[row-0][col-0][lev] != NULL) < 2);
+      }
+    }
+  }
+}
+
+static void writepair (char *g, int k, int i1, int i2)
+{
+  tile *t1, *t2;
+  char s[20];
+  int row, col, lev;
+  t1 = qt[k].member[i1];
+  t2 = qt[k].member[i2];
+
+  for (int row=0; row<maxheight; row++)
+  {
+    for (int col=0; col<maxwidth; col++)
+    {
+      for (int lev=0; lev<maxdepth; lev++)
+      {
+        if (lo[row][col][lev] == t1 || lo[row][col][lev] == t2)
+        {
+          *s = '\0';
+          sprintf (s, "%02d %02d %02d %02d\n", row, col, lev, k);
+          strcat (g, s);
+        }
+      }
+    }
+  }
+}
+
+static void writegame (char *g)
+{
+  int ntiles1, ntiles2=_ntiles;
+// play until no tiles can be removed any more
+  int l = strlen (g); 
+  assert (l >= 12*_ntiles);
+  for (int k=0; k<l; k++) g[k] = ' ';
+  *g = '\0';
+  unrotategroups ();
+  do
+  {
+    ntiles1 = ntiles2;
+    for (int k=0; k<ngroups; k++)
+    {
+      switch (qt[k].bestpairing)
+      {
+        case 1: // pairing 0-1, 2-3
+          if (!(qt[k].member[0]->isplayed) && 
+              qt[k].member[0]->isplayable() &&
+              qt[k].member[1]->isplayable())
+          {
+            writepair (g, k, 0, 1);
+            qt[k].member[0]->isplayed = true;
+            qt[k].member[1]->isplayed = true;
+            ntiles2 -= 2;
+            qt[k].isplayed = qt[k].member[2]->isplayed;
+          }
+          if (!(qt[k].member[2]->isplayed) && 
+              qt[k].member[2]->isplayable() &&
+              qt[k].member[3]->isplayable())
+          {
+            writepair (g, k, 2, 3);
+            qt[k].member[2]->isplayed = true;
+            qt[k].member[3]->isplayed = true;
+            ntiles2 -= 2;
+          }
+          break;
+        case 2: // pairing 0-2, 1-3
+          if (!(qt[k].member[0]->isplayed) && 
+              qt[k].member[0]->isplayable() &&
+              qt[k].member[2]->isplayable())
+          {
+            writepair (g, k, 0, 2);
+            qt[k].member[0]->isplayed = true;
+            qt[k].member[2]->isplayed = true;
+            ntiles2 -= 2;
+          }
+          if (!(qt[k].member[1]->isplayed) && 
+              qt[k].member[1]->isplayable() &&
+              qt[k].member[3]->isplayable())
+          {
+            writepair (g, k, 1, 3);
+            qt[k].member[1]->isplayed = true;
+            qt[k].member[3]->isplayed = true;
+            ntiles2 -= 2;
+          }
+          break;
+        case 3: // pairing 0-3, 1-2
+          if (!(qt[k].member[0]->isplayed) && 
+              qt[k].member[0]->isplayable() &&
+              qt[k].member[3]->isplayable())
+          {
+            writepair (g, k, 0, 3);
+            qt[k].member[0]->isplayed = true;
+            qt[k].member[3]->isplayed = true;
+            ntiles2 -= 2;
+          }
+          if (!(qt[k].member[1]->isplayed) && 
+              qt[k].member[1]->isplayable() &&
+              qt[k].member[2]->isplayable())
+          {
+            writepair (g, k, 1, 2);
+            qt[k].member[1]->isplayed = true;
+            qt[k].member[2]->isplayed = true;
+            ntiles2 -= 2;
+          }
+          break;
+        case 4: // half a group, pairing 0-1
+          if (!(qt[k].member[0]->isplayed) && 
+              qt[k].member[0]->isplayable() &&
+              qt[k].member[1]->isplayable())
+          {
+            writepair (g, k, 0, 1);
+            qt[k].member[0]->isplayed = true;
+            qt[k].member[1]->isplayed = true;
+            ntiles2 -= 2;
+          }
+          break;
+      }
+    } 
+  }
+  while (ntiles2 != ntiles1);
+}
+
+// extern "C" __declspec (dllexport)
+double mjsolve (char* g, double r1, double r2)
+{
+  readgame (g);
+  int i1 = (int) r1;
+  int i2 = (int) r2;
+  int r = solve (i1, i2);
+  if (r <= max (i1, i2)) writegame (g);
+  return (double) r;
+}
+
+#else
+
+static void 
+shaketiles (int gn)
+{  
+// shake tiles
+  srand (gn);
+  for (int k=0; k<_ntiles; k++)
+  {
+    int l = rand () % (k + 1);
+    tl[k].value = tl[l].value;
+    tl[l].value = k / 4;
+  }
+// shake better
+  for (int t=0; t<99; t++) {
+    for (int k=1; k<_ntiles; k++) {
+      int l = rand () % (k + 1);
+      int m = tl[k].value;
+      tl[k].value = tl[l].value;
+      tl[l].value = m;
+    }  
+  }  
+}
+
+static void readlayout (const char *fn)
+{
+// clear layout pointers
+  {
+    for (int row=0; row<maxheight; row++)
+    {
+      for (int col=0; col<maxwidth; col++)
+      {
+        for (int lev=0; lev<maxdepth; lev++)
+        {
+          lo[row][col][lev] = NULL;
+        }
+      }
+    }
+  }
+// read layout 
+  FILE *f=fopen (fn,"r");
+  if (f == NULL)
+  {
+    fprintf (stderr, "Layout file \"%s\" not found!\n", fn);
+    exit (0);
+  }  
+  {
+    int k=0, row, col, lev;
+    char s[1000];
+    do
+    {
+      fgets(s, 1000, f);
+    }
+    while (!feof(f) && (s[0] == '#' ||
+#ifdef QUARTER
+           sscanf(s, "%d %d %d", &col, &row, &lev) != 3));
+#else    
+           sscanf(s, "%d %d %d", &row, &col, &lev) != 3));
+#endif	   
+    while (!feof(f))
+    {
+      assert (k < 4*maxgroups && 
+              row >= 0 && row < maxheight &&
+              col >= 0 && col < maxwidth &&
+              lev >= 0 && lev < maxdepth &&
+              lo[row][col][lev] == NULL);
+      lo[row][col][lev] = &tl[k];
+      k++;
+      do
+      {
+        fgets(s, 1000, f);
+      }
+      while (!feof(f) && (s[0] == '#' ||
+#ifdef QUARTER
+             sscanf(s, "%d %d %d", &col, &row, &lev) != 3));
+#else    
+             sscanf(s, "%d %d %d", &row, &col, &lev) != 3));
+#endif	   
+    }
+    _ntiles = k;
+  }
+  fclose (f);
+// test for overlapping tiles 
+  {
+    for (int row=1; row<maxheight; row++)
+    {
+      for (int col=1; col<maxwidth; col++)
+      {
+        for (int lev=1; lev<maxdepth; lev++)
+        {
+        assert ((lo[row-1][col-1][lev] != NULL) +
+                (lo[row-1][col-0][lev] != NULL) +
+                (lo[row-0][col-1][lev] != NULL) +
+                (lo[row-0][col-0][lev] != NULL) < 2);
+        }
+      }
+    }
+  }
+}
+
+main (int argc, char* argv[])
+{
+  char l[101];
+  strcpy (l, argc<=1?"default":argv[1]);
+  readlayout (l);
+#ifdef QUARTER
+  FILE *f = fopen (strcat(l, "-q.log"), "w");
+#else    
+  FILE *f = fopen (strcat(l, ".log"), "w");
+#endif	   
+  if (f == NULL)
+  {
+    fprintf (stderr, "Cannot create/reset file \"%s\"!\n", l);
+    exit (0);
+  }  
+  int win = 0, imp = 0;
+  int st = argc<=2?1:atoi(argv[2]);
+  int e = argc<=3?(argc<=2?1000:st):atoi(argv[3]);
+  int it = argc<=4?1:atoi(argv[4]);
+  int remn = argc<=5?0:atoi(argv[5]);
+  int npl[it], nrpl[it];  
+  for (int k=st; k<=e; k++)  
+  {
+    shaketiles (k);
+    printf ("Game %d:\n", k);
+    int remn1;
+    bool s;
+    if (solve (0, 0) <= 0)
+    {
+      s = true;
+      printf ("Winnable\n");      
+    }
+    else 
+    {
+      s = false;
+      if (remn >= 2) remn1 = solve (remn, 2);
+      else remn1 = 2; 
+      if (remn1 <= remn)
+      {  
+        printf ("Impossible (%d remaining)\n", remn1);
+      }
+      else
+      {  
+        printf ("Impossible (>=%d remaining)\n", remn1);
+      }
+    }    
+    int nplmax = nplays;
+    for (int l=0; l<it; l++)
+    {
+      if (l) 
+      {
+	do 
+	{
+          int remn2;
+	  if (solve (0, 0) > 0) remn2 = solve (remn, 2);
+	}  
+	while (nplays == npl[l-1] && nrplays == nrpl[l-1]);
+	nplmax = max (nplmax, nplays);
+      }  
+      nrpl[l] = nrplays; npl[l] = nplays;
+      printf ("nrplays = %d, nplays = %d\n", nrpl[l], npl[l]);
+    }            
+    win += s;
+    imp += 1-s;
+    printf ("win=%d, imp=%d\n", win, imp);
+    if (nplmax >= 100000 || k == e || k % 1000 == 0 || (!s && remn1 <= remn))
+    {
+      fprintf (f, "Game %d:\n", k);
+      if (s)
+      {
+        fprintf (f, "Winnable\n");
+      }
+      else if (remn1 <= remn)
+      {  
+        fprintf (f, "Impossible (%d remaining)\n", remn1);
+      }  
+      else
+      {  
+        fprintf (f, "Impossible (>=%d remaining)\n", remn1);
+      }
+      for (int l=0; l<it; l++)
+      {
+        fprintf (f, "nrplays = %d, nplays = %d\n", nrpl[l], npl[l]);
+      }
+      fprintf (f, "win=%d, imp=%d\n", win, imp);
+      fflush (f);
+    }
+  }
+  fclose (f);
+  return 0;
+}
+
+#endif
+#endif

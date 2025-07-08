@@ -4,6 +4,7 @@ MANIFEST
 MANIFEST.SKIP
 XS.xs
 Makefile.PL
+bin/csxs-ppcrypt
 bin/pminisign
 inc/aead.xs
 inc/auth.xs

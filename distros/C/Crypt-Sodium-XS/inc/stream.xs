@@ -124,8 +124,8 @@ SV * stream(STRLEN out_len, SV * nonce, SV * key)
   if (nonce_len != nonce_req_len)
     croak("stream: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -304,16 +304,16 @@ SV * stream_xor(SV * msg, SV * nonce, SV * key)
   if (nonce_len != nonce_req_len)
     croak("stream_xor: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -418,16 +418,16 @@ SV * stream_xor_ic(SV * msg, SV * nonce, UV ic, SV * key)
   if (nonce_len != nonce_req_len)
     croak("stream_xor_ic: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -498,16 +498,16 @@ SV * stream_chacha20_ietf_xor_ic(SV * msg, SV * nonce, U32 ic, SV * key)
   if (nonce_len != crypto_stream_chacha20_ietf_NONCEBYTES)
     croak("stream_chacha20_ietf_xor_ic: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }

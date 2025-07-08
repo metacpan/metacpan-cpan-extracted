@@ -14,28 +14,40 @@ sub start_server {
     my $server_pid = fork();
     die "can't fork" unless defined $server_pid;
     
+    my $host = $opts{h} || "127.0.0.1";
+    my $port = $opts{p};
+
     #-- Client?
     if ( $server_pid ) {
         #-- client tries to make a log connection to
         #-- verify that the server is up and running
         #-- (20 times with a usleep of 0.25, so the
         #--  overall timeout is 5 seconds)
+        my $log_port = $port;
+        if ($host eq "unix/") {
+            $log_port =~ s/\.sock//;
+            $log_port .= ".log.sock";
+        }
+        else {
+            $log_port++;
+        }
+
         for ( 1..20 ) {
-	    eval {
-	        Event::RPC::Client->log_connect (
-		    server => "localhost",
-		    port   => $opts{p}+1,
-	        );
-	    };
-	    #-- return to client code if connect succeeded
-	    return $server_pid if !$@;
-	    #-- bail out if the limit is reached
-	    if ( $_ == 20 ) {
-	        die "Couldn't start server: $@";
-	    }
-	    #-- wait a quarter second...
-	    select(undef, undef, undef, 0.25);
-	}
+            eval {
+                Event::RPC::Client->log_connect (
+                    server => $host,
+                    port   => $log_port,
+                );
+            };
+            #-- return to client code if connect succeeded
+            return $server_pid if !$@;
+            #-- bail out if the limit is reached
+            if ( $_ == 20 ) {
+                die "Couldn't start server: $@";
+            }
+            #-- wait a quarter second...
+            select(undef, undef, undef, 0.25);
+        }
         #-- Client is finished here
         return $server_pid;
     }
@@ -45,6 +57,8 @@ sub start_server {
     require Event::RPC::Logger;
     require Event_RPC_Test;
     require Event_RPC_Test2;
+
+    $0 = "stress rpc server: $host:$port";
 
     #-- This code is mainly copied from the server.pl
     #-- example and works with a command line style
@@ -96,6 +110,7 @@ sub start_server {
     my $server;
     $server = Event::RPC::Server->new (
         name               => "test daemon",
+        host               => $host,
         port               => $port,
         loop               => $loop,
         logger             => $logger,

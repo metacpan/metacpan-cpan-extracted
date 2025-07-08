@@ -1,5 +1,5 @@
 package Gherkin::Parser;
-$Gherkin::Parser::VERSION = '32.1.2';
+$Gherkin::Parser::VERSION = '33.0.0';
 use strict;
 use warnings;
 
@@ -74,6 +74,8 @@ The C<$uri> parameter is expected to be passed in all but the third case.
 =item * L<Gherkin::AstBuilder>
 
 =item * L<Gherkin::Dialect>
+
+=item * L<Gherkin::MarkdownTokenMatcher>
 
 =item * L<Gherkin::TokenMatcher>
 

@@ -10,7 +10,7 @@ use warnings;
 use feature 'current_sub';
 use experimental 'signatures', 'lexical_subs', 'postderef';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use base 'Exporter::Tiny';
 use Hash::Util 'lock_hash', 'unlock_hash', 'unlock_value';
@@ -482,7 +482,7 @@ CXC::Data::Visitor - Invoke a callback on every element at every level of a data
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

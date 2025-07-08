@@ -1,5 +1,11 @@
 Revision history for POSIX-RT-Timer
 
+0.021     2025-07-07 21:50:09+02:00 Europe/Brussels
+          - Split prof time from process time
+          - Split highres time from monotonic time
+          - Add missing uptime variants
+          - Add missing precise variants
+
 0.020     2025-03-04 20:32:24+01:00 Europe/Brussels
           - Update test to new POSIX::RT::Signal version
 

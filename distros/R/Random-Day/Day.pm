@@ -11,7 +11,7 @@ use English;
 use Error::Pure qw(err);
 use Mo::utils 0.08 qw(check_isa);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 # Constructor.
 sub new {
@@ -47,6 +47,19 @@ sub new {
 
 	if (DateTime->compare($self->{'dt_from'}, $self->{'dt_to'}) == 1) {
 		err "Parameter 'dt_from' must have older or same date than 'dt_to'.",
+			'Date from', $self->{'dt_from'},
+			'Date to', $self->{'dt_to'},
+		;
+	}
+
+	# There is no sense in case that dt_from and dt_to parameters are in
+	# same day and not in 00:00:00.
+	if ($self->{'dt_from'}->year == $self->{'dt_to'}->year
+		&& $self->{'dt_from'}->month == $self->{'dt_to'}->month
+		&& $self->{'dt_from'}->day == $self->{'dt_to'}->day
+		&& $self->{'dt_from'}->hms ne '00:00:00') {
+
+		err "Parameters 'dt_from' and 'dt_to' are in the same day and not on begin.",
 			'Date from', $self->{'dt_from'},
 			'Date to', $self->{'dt_to'},
 		;
@@ -109,9 +122,26 @@ sub get {
 sub random {
 	my $self = shift;
 
-	my $daily = DateTime::Event::Recurrence->daily;
+	# Random DateTime between from and to.
+	my $dt_from = $self->{'dt_from'}->clone;
+	if ($dt_from->hms ne '00:00:00') {
+		$dt_from->add('days' => 1);
+		$dt_from->set(
+			'hour' => 0,
+			'minute' => 0,
+			'second' => 0,
+		);
+	}
+	my $dt = DateTime::Event::Random->datetime(
+		'after' => $dt_from,
+		'before' => $self->{'dt_to'},
+	);
 
-	return $daily->next($self->_range);
+	# Unify to begin of day.
+	my $daily = DateTime::Event::Recurrence->daily;
+	my $ret_dt = $daily->current($dt);
+
+	return $ret_dt;
 }
 
 # Random DateTime object for day defined by day.
@@ -349,16 +379,6 @@ sub _check_day {
 	return;
 }
 
-# Random date in range.
-sub _range {
-	my $self = shift;
-
-	return DateTime::Event::Random->datetime(
-		'after' => $self->{'dt_from'},
-		'before' => $self->{'dt_to'},
-	);
-}
-
 1;
 
 __END__
@@ -517,6 +537,9 @@ Returns DateTime object for date.
          Parameter 'dt_from' must have older or same date than 'dt_to'.
                  Date from: %s
                  Date to: %s
+         Parameters 'dt_from' and 'dt_to' are in the same day and not on begin.
+                 Date from: %s
+                 Date to: %s
 
  random_day():
          Day cannot be a zero.
@@ -653,12 +676,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2013-2024 Michal Josef Špaček
+© 2013-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

@@ -1,5 +1,11 @@
 Revision history and release notes for Event::RPC:
 
+1.11 Wed Jun 25, 2025, joern
+    Features:
+    - Add support for listening and connecting through
+      a Unix Domain socket by specifying "unix/" as
+      'host' and the socket filename as 'port'.
+
 1.10 Wed Jun 27, 2018, joern
     Bugfixes:
     - Test suite failed on newer Perl versions which

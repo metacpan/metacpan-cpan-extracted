@@ -219,7 +219,7 @@ SV * sodium_random_bytes( \
       protmem_free(aTHX_ new_pm);
       croak("Failed to release protmem RW");
     }
-    RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
   }
   else {
     unsigned char *out_buf;

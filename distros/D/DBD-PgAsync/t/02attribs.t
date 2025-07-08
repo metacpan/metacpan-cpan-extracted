@@ -18,7 +18,7 @@ my (undef,undef,$dbh) = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 291;
+plan tests => 293;
 
 isnt ($dbh, undef, 'Connect to database for handle attributes testing');
 
@@ -1576,6 +1576,20 @@ is ($attrib, 1, $t);
 #
 # Not tested: handle attribute Profile
 #
+
+#
+# Test of database handle attribute "pg_use_async" (FETCH/ STORE only)
+#
+$t='pg_use_async initially 0';
+$attrib = $dbh->{pg_use_async};
+is ($attrib, 0, $t);
+
+$t='pg_use_async fetch returns 1 after set to 1';
+$dbh->{pg_use_async} = 1;
+$attrib = $dbh->{pg_use_async};
+is ($attrib, 1, $t);
+
+$dbh->{pg_use_async} = 0;
 
 #
 # Test of the database handle attribute "ReadOnly"

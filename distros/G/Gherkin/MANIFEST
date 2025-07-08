@@ -20,6 +20,7 @@ lib/Gherkin/Exceptions.pm
 lib/Gherkin/Generated/Languages.pm
 lib/Gherkin/Generated/Parser.pm
 lib/Gherkin/Line.pm
+lib/Gherkin/MarkdownTokenMatcher.pm
 lib/Gherkin/Parser.pm
 lib/Gherkin/ParserBase.pm
 lib/Gherkin/ParserContext.pm

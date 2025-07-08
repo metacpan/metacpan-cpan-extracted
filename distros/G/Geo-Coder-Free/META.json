@@ -31,11 +31,12 @@
             "Devel::Size" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
+            "File::Find" : "0",
             "File::Open::NoCache::ReadOnly" : "0.02",
             "File::Slurp" : "0",
             "File::Spec" : "0",
             "Geo::Coder::Abbreviations" : "0.03",
-            "Geo::Location::Point" : "0.02",
+            "Geo::Location::Point" : "0.14",
             "IO::AIO" : "0",
             "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
@@ -79,6 +80,7 @@
             "Locale::SubCountry" : "0",
             "Locale::US" : "0",
             "Module::Info" : "0",
+            "Object::Configure" : "0",
             "Params::Get" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
@@ -116,6 +118,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use Readonly;
 
-use Perl::Critic::Utils qw/:severities :classification/;
+use Perl::Critic::Utils qw/:severities :classification precedence_of/;
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 Readonly::Scalar my $DESC  => q{Do not perform manual ref checks};
 Readonly::Scalar my $EXPL  => undef; # [ ];
+Readonly::Scalar my $UPREC => precedence_of('-e'); # named unary function precedence
 
 ####-----------------------------------------------------------------------------
 
@@ -76,6 +77,7 @@ sub decompose {
 			$rhs=$node->snext_sibling();
 			$node=0;
 		}
+		elsif($node->isa('PPI::Token::Operator') && (precedence_of($node)>$UPREC)) { $node=0 }
 		else { $node=$node->snext_sibling() }
 	}
 	if(!$rhs) { return ($operator) }

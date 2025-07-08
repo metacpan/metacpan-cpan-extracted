@@ -3,11 +3,59 @@
 use strict;
 use warnings;
 use Perl::Critic;
+use Perl::Critic::Policy::References::ProhibitRefChecks;
+use PPI;
 use Ref::Util;
 
-use Test::More tests=>11;
+use Test::More tests=>12;
 
 my $failure=qr/Do not perform manual ref/;
+
+subtest 'decompose'=>sub {
+	plan tests=>33;
+	my $decompose=sub {
+		my ($code)=@_;
+		my $doc=PPI::Document->new(\$code);
+		my $node=$doc->find_first('PPI::Token::Word');
+		return Perl::Critic::Policy::References::ProhibitRefChecks::decompose($node);
+	};
+	my %tests=(
+		'lc ref($x) eq "array"'          => ['eq','array'],
+		'ref $$aref[0] !~ /ARRAY/'       => ['!~','/ARRAY/'],
+		'ref $$aref[0] && $x=~/\d/'      => [undef],
+		'ref $$aref[0] =~ /CODE/'        => ['=~','/CODE/'],
+		'ref $$aref[0] eq "CODE" && 1'   => ['eq','code'],
+		'ref $$aref[0] eq "CODE"'        => ['eq','code'],
+		'ref $$aref[0] eq ref $y'        => ['eq','ref'],
+		'ref $$aref[0] ne "CODE"?1:0'    => ['ne','code'],
+		'ref $$aref[0]'                  => [undef],
+		'ref $href->{k} !~ /ARRAY/'      => ['!~','/ARRAY/'],
+		'ref $href->{k} && $x=~/\d/'     => [undef],
+		'ref $href->{k} =~ /CODE/'       => ['=~','/CODE/'],
+		'ref $href->{k} eq "CODE" && 1'  => ['eq','code'],
+		'ref $href->{k} eq "CODE"'       => ['eq','code'],
+		'ref $href->{k} eq ref $y'       => ['eq','ref'],
+		'ref $href->{k} ne "CODE"?1:0'   => ['ne','code'],
+		'ref $href->{k}'                 => [undef],
+		'ref($$aref[0]) !~ /ARRAY/'      => ['!~','/ARRAY/'],
+		'ref($$aref[0]) && $x=~/\d/'     => [undef],
+		'ref($$aref[0]) =~ /CODE/'       => ['=~','/CODE/'],
+		'ref($$aref[0]) eq "CODE" && 1'  => ['eq','code'],
+		'ref($$aref[0]) eq "CODE"'       => ['eq','code'],
+		'ref($$aref[0]) eq ref $y'       => ['eq','ref'],
+		'ref($$aref[0]) ne "CODE"?1:0'   => ['ne','code'],
+		'ref($$aref[0])'                 => [undef],
+		'ref($href->{k}) !~ /ARRAY/'     => ['!~','/ARRAY/'],
+		'ref($href->{k}) && $x=~/\d/'    => [undef],
+		'ref($href->{k}) =~ /CODE/'      => ['=~','/CODE/'],
+		'ref($href->{k}) eq "CODE" && 1' => ['eq','code'],
+		'ref($href->{k}) eq "CODE"'      => ['eq','code'],
+		'ref($href->{k}) eq ref $y'      => ['eq','ref'],
+		'ref($href->{k}) ne "CODE"?1:0'  => ['ne','code'],
+		'ref($href->{k})'                => [undef],
+	);
+	while(my ($code,$expect)=each %tests) { is_deeply([&$decompose($code)],$expect,"decompose:  $code") }
+};
 
 subtest 'Valid Ref::Util'=>sub {
 	plan tests=>384;
@@ -103,7 +151,7 @@ subtest 'Default eq/ne/regexp/bare'=>sub {
 };
 
 subtest 'eq parameter'=>sub {
-	plan tests=>768;
+	plan tests=>2*2*8*2*2*6*3;
 	my $critic=Perl::Critic->new(-profile=>'NONE',-only=>1,-severity=>1);
 	$critic->add_policy(-policy=>'Perl::Critic::Policy::References::ProhibitRefChecks',-params=>{eq=>'code'});
 	#
@@ -114,7 +162,8 @@ subtest 'eq parameter'=>sub {
 	foreach my $op (qw/eq ne/) {
 	foreach my $quote ("'",'"') {
 	foreach my $type (qw/ARRAY HASH SCALAR CODE GLOB FORMAT/) {
-		my $code=sprintf('ref%s%s%s%s %s %s%s%s'
+	foreach my $suffix ('',' && ref $y eq "CODE"',' ? $x eq "foo" : $y eq "bar"') {
+		my $code=sprintf('ref%s%s%s%s %s %s%s%s%s'
 			,$whitespace
 			,($parens?'(':($whitespace||' ')) # )
 			,$var # ( for next line
@@ -122,14 +171,16 @@ subtest 'eq parameter'=>sub {
 			,$op
 			,$quote
 			,$type
-			,$quote);
+			,$quote
+			,$suffix
+			);
 		if(($op eq 'eq')&&($type eq 'CODE')) { is_deeply([$critic->critique(\$code)],[],$code) }
 		else { like(($critic->critique(\$code))[0],$failure,$code) }
-	} } } } } }
+	} } } } } } }
 };
 
 subtest 'ne parameter'=>sub {
-	plan tests=>768;
+	plan tests=>2*2*8*2*2*6*3;
 	my $critic=Perl::Critic->new(-profile=>'NONE',-only=>1,-severity=>1);
 	$critic->add_policy(-policy=>'Perl::Critic::Policy::References::ProhibitRefChecks',-params=>{ne=>'code'});
 	#
@@ -140,7 +191,8 @@ subtest 'ne parameter'=>sub {
 	foreach my $op (qw/eq ne/) {
 	foreach my $quote ("'",'"') {
 	foreach my $type (qw/ARRAY HASH SCALAR CODE GLOB FORMAT/) {
-		my $code=sprintf('ref%s%s%s%s %s %s%s%s'
+	foreach my $suffix ('',' && ref $y ne "CODE"',' ? $x eq "foo" : $y eq "bar"') {
+		my $code=sprintf('ref%s%s%s%s %s %s%s%s%s'
 			,$whitespace
 			,($parens?'(':($whitespace||' ')) # )
 			,$var # ( for next line
@@ -148,10 +200,12 @@ subtest 'ne parameter'=>sub {
 			,$op
 			,$quote
 			,$type
-			,$quote);
+			,$quote
+			,$suffix
+			);
 		if(($op eq 'ne')&&($type eq 'CODE')) { is_deeply([$critic->critique(\$code)],[],$code) }
 		else { like(($critic->critique(\$code))[0],$failure,$code) }
-	} } } } } }
+	} } } } } } }
 };
 
 subtest 'regexp parameter'=>sub {
@@ -178,7 +232,7 @@ subtest 'regexp parameter'=>sub {
 };
 
 subtest 'bareref parameter'=>sub {
-	plan tests=>256;
+	plan tests=>768;
 	my $critic=Perl::Critic->new(-profile=>'NONE',-only=>1,-severity=>1);
 	$critic->add_policy(-policy=>'Perl::Critic::Policy::References::ProhibitRefChecks',-params=>{bareref=>1});
 	#
@@ -188,16 +242,18 @@ subtest 'bareref parameter'=>sub {
 	foreach my $parens (0,1) {
 	foreach my $var ('$var','$array[0]','$hash{key}','$$sref','$$aref[0]','$$href{key}','$aref->[0]','$href->{key}') {
 	foreach my $op (' ','!') {
-		my $code=sprintf('%s(%sref%s%s%s%s)'
+	foreach my $suffix ('',' && $x=~/\d/',' || $x eq "A"') {
+		my $code=sprintf('%s(%sref%s%s%s%s%s)'
 			,$condition
 			,$op
 			,$whitespace
 			,($parens?'(':($whitespace||' ')) # )
 			,$var # ( for next line
 			,($parens?')':'')
+			,$suffix
 			);
 		is_deeply([$critic->critique(\$code)],[],$code);
-	} } } } }
+	} } } } } }
 };
 
 subtest 'ref eq ref'=>sub {

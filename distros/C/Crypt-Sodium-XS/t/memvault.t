@@ -22,8 +22,9 @@ for my $mv_data (@mv_datas) {
   ok($mv->is_locked, "locked by default");
   is($mv->length, length($mv_data), "correct length");
   eval { my $x = "$mv"; };
-  like($@, qr/Unlock MemVault object before stringifying/,
-       "cannot stringify locked bytes");
+  like($@, qr/Unlock MemVault object before/, "cannot stringify locked bytes");
+  eval { my $x = $mv->index("dangerous"); };
+  like($@, qr/Unlock MemVault object before/, "cannot index locked bytes");
   my $mv_clone = $mv->clone;
   isa_ok($mv_clone, "Crypt::Sodium::XS::MemVault");
   ok($mv_clone->is_locked, "clone of locked MemVault is_locked");
@@ -209,6 +210,9 @@ $mv2 = "\x03\x03\x03" ^ $mv;
 is($mv2->to_hex->unlock, "020100", "overloaded ^ result, reverse args");
 $mv ^= "\x03\x03\x03";
 is($mv->to_hex->unlock, "020100", "overloaded ^= mutates");
+$mv2 = Crypt::Sodium::XS::MemVault->new("\x03\x03\x03");
+$mv->xor($mv2);
+is($mv->to_hex->unlock, "010203", "xor method with memvault arg");
 
 my $secret = "secret secrets are no fun...";
 my $tmpfile = File::Temp->new;

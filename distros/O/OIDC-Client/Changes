@@ -1,5 +1,9 @@
 Changes for OIDC-Client distribution
 
+0.09 2025-07-07
+  - build_api_useragent() : $audience_alias parameter is now optional (current audience by default)
+  - added build_user_from_claims() method
+
 0.08 2025-05-12
   - The stored identity now expires by default. The expiration time is the one defined in the ID token, but you can also override this value by specifying the lifetime in the parameters.
   - The new get_identity_expiration_time() method lets you know the time when the stored identity expires, including the configured leeway.

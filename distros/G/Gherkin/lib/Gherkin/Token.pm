@@ -1,5 +1,5 @@
 package Gherkin::Token;
-$Gherkin::Token::VERSION = '32.1.2';
+$Gherkin::Token::VERSION = '33.0.0';
 use strict;
 use warnings;
 

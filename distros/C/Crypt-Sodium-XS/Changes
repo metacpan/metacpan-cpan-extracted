@@ -1,4 +1,30 @@
-0.000018 Jul 06 2025
+0.000022 Jul 8 2025
+
+- BUGFIX: fix compile failure on threaded builds
+
+- fix some compatability issues found by cpantesters smokes
+
+0.000021 Jul 8 2025
+
+- BUGFIX: fix a comment that breaks parsexs.
+
+0.000020 Jul 7 2025
+
+- BUGFIX: fixed memvault xor method with memvault arg
+
+- add csxs-ppcrypt program to dist
+
+- doc updates
+
+0.000019 Jul 7 2025
+
+- fix parallel make
+
+- minor bugfixes and improvements
+
+- doc updates
+
+0.000018 Jul 6 2025
 
 - BREAKING CHANGES - but not published yet. change constant and function names
   to match new internal protected memory naming ("protmem" vs. "safemem").
@@ -9,13 +35,13 @@
 
 - doc updates
 
-0.000017 Jul 04 2025
+0.000017 Jul 5 2025
 
 - add a test for pminisign, just compiles
 
 - doc updates
 
-0.000016 Jul 04 2025
+0.000016 Jul 4 2025
 
 - add demo program for passphrase encryption/decryption
 
@@ -23,7 +49,7 @@
 
 - doc updates
 
-0.000015 Jul 02 2025
+0.000015 Jul 4 2025
 
 - add flag to munlock sodium allocated memory
 
@@ -31,13 +57,13 @@
 
 - doc updates
 
-0.000014 Jul 02 2025
+0.000014 Jul 2 2025
 
 - minor bugfixes and improvements
 
 - doc updates
 
-0.000013 Jul 02 2025
+0.000013 Jul 2 2025
 
 - minor bugfixes and improvements
 

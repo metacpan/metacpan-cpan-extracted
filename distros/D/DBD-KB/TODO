@@ -1,0 +1,37 @@
+Possible items to do, in no particular order
+
+Feature requests can be entered at 
+https://github.com/bucardo/dbdpg/issues
+
+- Support pipeline mode: https://www.postgresql.org/docs/14/libpq-pipeline-mode.html
+- Consider adding pg_application_name
+- Evaluate if we really need strtod in the code
+- Have docs describe various ways to set client_encoding
+- Change license to Artistic 2
+- Remove the "goto" calls in the tests
+- Force a test database rebuild when a git branch switch is detected
+- Make all tests work when server and/or client encoding is SQL_ASCII
+- Enable native JSON decoding, similar to arrays, perhaps with JSON::PP
+- Allow partial result sets, either via PQsetSingleRowMode or something better
+- Hack libpq to make user-defined number of rows returned
+- Map hstore to hashes similar to the array/array mapping
+- Fix ping problem: http://www.cpantesters.org/cpan/report/53c5cc72-6d39-11e1-8b9d-82c3d2d9ea9f
+- Use WITH HOLD for cursor work
+- Devise a way to automatically create ppm for Windows builds
+- I8N docs and error messages
+- Change quote and dequote functions to take Sv instead of string so that
+   things like arrays can be serialized by the quote function.  This will
+   take care of broken chopblanks and pg_bool_tf (pass the quote/dequote 
+   options struct to function quote/dequote functions)
+- Allow user callbacks to quote user-defined types
+- Revisit the use of version.pm
+- Test heavily with a thread-enabled Perl
+- Remove libpq dependency
+- Handle and/or better tests for different encoding, especially those not 
+   supported as a server encoding (e.g. BIG5)
+- Support passing hashrefs in and out for custom types.
+- Support a flag for behind-the-scenes CURSOR to emulate partial fetches.
+- Composite type support: http://www.postgresql.org/docs/current/interactive/rowtypes.html
+- Full support for execute_array, e.g. the return values
+- Fix array support: execute([1,2]) not working as expected, deep arrays not returned correctly.
+- Support RaiseError on $sth from closed $dbh (GH #28)

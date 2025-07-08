@@ -1,0 +1,11 @@
+.exists
+blib
+*~
+*.bs
+*.tar.gz
+*.bak
+MYMETA.*
+Makefile
+fbx.json
+**/*.o
+pm_to_blib

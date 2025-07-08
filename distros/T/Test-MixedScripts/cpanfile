@@ -3,12 +3,12 @@
 
 requires "Carp" => "0";
 requires "Exporter" => "5.57";
-requires "ExtUtils::Manifest" => "1.68";
 requires "File::Basename" => "0";
 requires "File::Spec" => "0";
 requires "IO" => "0";
 requires "List::Util" => "0";
 requires "Test2::API" => "1.302200";
+requires "Test2::Util::DistFiles" => "0";
 requires "Unicode::UCD" => "0";
 requires "perl" => "v5.16.0";
 requires "utf8" => "0";

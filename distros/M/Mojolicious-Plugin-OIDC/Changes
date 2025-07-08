@@ -1,5 +1,8 @@
 Changes for Mojolicious-Plugin-OIDC distribution
 
+0.03 2025-07-07
+  - Bump dependency on OIDC::Client v0.09
+
 0.02 2025-05-15
   - Bump dependency on OIDC::Client v0.08
   - Version number from dist.ini

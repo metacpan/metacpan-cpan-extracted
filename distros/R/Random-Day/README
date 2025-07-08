@@ -130,6 +130,9 @@ ERRORS
              Parameter 'dt_from' must have older or same date than 'dt_to'.
                      Date from: %s
                      Date to: %s
+             Parameters 'dt_from' and 'dt_to' are in the same day and not on begin.
+                     Date from: %s
+                     Date to: %s
 
      random_day():
              Day cannot be a zero.
@@ -245,10 +248,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2013-2024 Michal Josef Špaček
+    © 2013-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.16
+    0.17
 

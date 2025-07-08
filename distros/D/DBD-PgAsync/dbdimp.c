@@ -314,6 +314,18 @@ static int want_async_connect(pTHX_ SV *attrs)
                 && SvTRUE(sv);
 }
 
+static int want_use_async(pTHX_ SV *attrs)
+{
+        HV *hv;
+        SV **psv, *sv;
+
+        return
+                attrs
+                && (psv = hv_fetchs((HV *)SvRV(attrs), "pg_use_async", 0))
+                && (sv = *psv)
+                && SvTRUE(sv);
+}
+
 static void after_connect_init(pTHX_ SV *dbh, imp_dbh_t * imp_dbh)
 {
     /* Figure out what protocol this server is using (most likely 3) */
@@ -367,7 +379,14 @@ int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, cha
     ConnStatusType connstatus;
     int            async_connect;
 
-    async_connect = want_async_connect(aTHX_ attr);
+    if (want_use_async(aTHX_ attr)) {
+        async_connect = 1;
+        imp_dbh->use_async = 1;
+    } else {
+        async_connect = want_async_connect(aTHX_ attr);
+        imp_dbh->use_async = 0;
+    }
+
     imp_dbh->aa_first = NULL;
     imp_dbh->aa_pp = &imp_dbh->aa_first;
 
@@ -849,6 +868,7 @@ static int pg_db_rollback_commit (pTHX_ SV * dbh, imp_dbh_t * imp_dbh, int actio
 {
     PGTransactionStatusType tstatus;
     ExecStatusType          status;
+    char                    *err;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_rollback_commit (action: %s AutoCommit: %d BegunWork: %d)\n",
                     THEADER_slow,
@@ -860,6 +880,11 @@ static int pg_db_rollback_commit (pTHX_ SV * dbh, imp_dbh_t * imp_dbh, int actio
     if ((NULL == imp_dbh->conn) || (DBIc_has(imp_dbh, DBIcf_AutoCommit))) {
         if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_commit (result: 0)\n", THEADER_slow);
         return 0;
+    }
+
+    if (DBH_NO_ASYNC != imp_dbh->async_status) {
+        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_commit (error: async query active))\n", THEADER_slow);
+        croak("Must wait for async query to finish before commit/ rollback");
     }
 
     /* We only perform these actions if we need to. For newer servers, we 
@@ -898,15 +923,36 @@ static int pg_db_rollback_commit (pTHX_ SV * dbh, imp_dbh_t * imp_dbh, int actio
         return 1;
     }
 
-    status = _result(aTHX_ imp_dbh, action ? "commit" : "rollback");
-        
+    if (imp_dbh->use_async) {
+        imp_dbh->async_status = DBH_ASYNC;
+        TRACE_PQSENDQUERY;
+        status = PQsendQuery(imp_dbh->conn, action ? "commit" : "rollback");
+        status = status ? PGRES_COMMAND_OK : PGRES_FATAL_ERROR;
+
+        /*
+          Code in DBI.xs DBI_dispatch function will try to "fix" the state
+          if a driver didn't set BegunWork to off and AutoCommit to on
+          after a commit/ rollback. This triggers a second commit/ rollback
+          which will cause an error because of the async commit/ rollback
+          which was just started. Because of this, resetting the DBI state
+          cannot be delayed until the outcome of the command is known when
+          doing an async commit/ rollback.
+
+          :-(
+        */
+        err = "PQsendQuery failed";
+    } else {
+        status = _result(aTHX_ imp_dbh, action ? "commit" : "rollback");
+        err = "status not OK";
+    }
+
     /* Set this early, for scripts that continue despite the error below */
     imp_dbh->done_begin = DBDPG_FALSE;
 
     if (PGRES_COMMAND_OK != status) {
         TRACE_PQERRORMESSAGE;
         pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_commit (error: status not OK)\n", THEADER_slow);
+        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_commit (error: %s)\n", THEADER_slow, err);
         return 0;
     }
 
@@ -915,7 +961,6 @@ static int pg_db_rollback_commit (pTHX_ SV * dbh, imp_dbh_t * imp_dbh, int actio
         DBIc_set(imp_dbh, DBIcf_AutoCommit, 1);
         DBIc_set(imp_dbh, DBIcf_BegunWork, 0);
     }
-
 
     /* We just did a rollback or a commit, so savepoints are not relevant, and we cannot be in a PGRES_COPY state */
     av_undef(imp_dbh->savepoints);
@@ -1102,12 +1147,14 @@ SV * dbd_db_FETCH_attrib (SV * dbh, imp_dbh_t * imp_dbh, SV * keysv)
             return dbd_st_FETCH_attrib (dbh, imp_dbh->do_tmp_sth, keysv);
         break;
 
-    case 12: /* pg_INV_WRITE  pg_utf8_flag */
+    case 12: /* pg_INV_WRITE  pg_utf8_flag pg_use_async */
 
         if (strEQ("pg_INV_WRITE", key))
             retsv = newSViv((IV) INV_WRITE );
         else if (strEQ("pg_utf8_flag", key))
             retsv = newSViv((IV)imp_dbh->pg_utf8_flag);
+        else if (strEQ("pg_use_async", key))
+            retsv = newSViv((IV)imp_dbh->use_async);
         break;
 
     case 13: /* pg_errorlevel */
@@ -1202,6 +1249,7 @@ int dbd_db_STORE_attrib (SV * dbh, imp_dbh_t * imp_dbh, SV * keysv, SV * valuesv
     char *       key = SvPV(keysv,kl);
     unsigned int newval = SvTRUE(valuesv);
     int          retval = 0;
+    int          was_async;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin dbd_db_STORE (key: %s newval: %d kl:%d)\n", THEADER_slow, key, newval, (int)kl);
     
@@ -1221,13 +1269,21 @@ int dbd_db_STORE_attrib (SV * dbh, imp_dbh_t * imp_dbh, SV * keysv, SV * valuesv
     case 10: /* AutoCommit  pg_bool_tf */
 
         if (strEQ("AutoCommit", key)) {
-            if (newval != DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
-                if (newval!=0) { /* It was off but is now on, so do a final commit */
-                    if (0!=dbd_db_commit(dbh, imp_dbh) && TRACE4_slow)
-                        TRC(DBILOGFP, "%sSetting AutoCommit to 'on' forced a commit\n", THEADER_slow);
-                }
-                DBIc_set(imp_dbh, DBIcf_AutoCommit, newval);
+            if (imp_dbh->done_begin && newval && !DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
+                /*
+                  Force a synchronous commit when enabling AutoCommit while
+                  inside a transaction.
+                */
+                was_async = imp_dbh->use_async;
+                imp_dbh->use_async = 0;
+                
+                if (0!=dbd_db_commit(dbh, imp_dbh) && TRACE4_slow)
+                    TRC(DBILOGFP, "%sSetting AutoCommit to 'on' forced a commit\n", THEADER_slow);
+
+                imp_dbh->use_async = was_async;
             }
+
+            DBIc_set(imp_dbh, DBIcf_AutoCommit, newval);
             retval = 1;
         }
         else if (strEQ("pg_bool_tf", key)) {
@@ -1235,7 +1291,18 @@ int dbd_db_STORE_attrib (SV * dbh, imp_dbh_t * imp_dbh, SV * keysv, SV * valuesv
             retval = 1;
         }
         break;
-    
+
+    case 12: /* pg_use_async */
+
+        if (strEQ("pg_use_async", key)) {
+            imp_dbh->use_async = newval;
+
+            if (TRACE5_slow)
+                TRC(DBILOGFP, "%sSet use_async to %d\n", THEADER_slow, newval);
+            retval = 1;
+        }
+        break;
+
     case 13: /* pg_errorlevel */
 
         if (strEQ("pg_errorlevel", key)) {
@@ -1936,7 +2003,6 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
     imp_sth->cur_tuple         = 0;
     imp_sth->rows              = -1; /* per DBI spec */
     imp_sth->totalsize         = 0;
-    imp_sth->async_flag        = 0;
     imp_sth->async_status      = STH_NO_ASYNC;
     imp_sth->prepare_name      = NULL;
     imp_sth->statement         = NULL;
@@ -1960,6 +2026,7 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
     imp_sth->number_iterations = 0;
 
     /* We inherit some preferences from the database handle */
+    imp_sth->async_flag       = imp_dbh->use_async;
     imp_sth->server_prepare   = imp_dbh->server_prepare;
     imp_sth->switch_prepared  = imp_dbh->switch_prepared;
     imp_sth->prepare_now      = imp_dbh->prepare_now;
@@ -5798,6 +5865,7 @@ long pg_db_result (SV *h, imp_dbh_t *imp_dbh)
         imp_dbh->async_sth->async_status = STH_NO_ASYNC;
     }
     imp_dbh->async_status = DBH_NO_ASYNC;
+
     if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_result (rows: %ld)\n", THEADER_slow, rows);
     return rows;
 } /* end of pg_db_result */

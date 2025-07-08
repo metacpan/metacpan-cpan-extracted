@@ -33,77 +33,118 @@ Crypt::Sodium::XS::MemVault - Protected memory objects
 
 =head1 SYNOPSIS
 
+  use Crypt::Sodium::XS;
   use Crypt::Sodium::XS::MemVault;
 
-  ...
+  my $key = Crypt::Sodium::XS->generichash->keygen;
+  # keygen returns a Crypt::Sodium::XS::MemVault
+  $key->to_file("/some/path");
+  print "hex: ", $key->to_hex->unlock, "\n";
+  print "base64: ", $key->to_base64->unlock, "\n";
+
+  my $key2 = Crypt::Sodium::XS::MemVault->new_from_file("/other/path");
+
+  if ($key1->memcmp($key2)) {
+    die "randomly generated key matches loaded key: impossible.";
+  }
+
+  my $mv = Crypt::Sodium::XS::MemVault->new("hello");
+
+  my $extracted_data_mv = $mv->extract(1, 3); # "ell"
+  print $extracted_data_mv->unlock, "\n";
+  undef $extracted_data_mv;
+
+  $mv->unlock;
+  my $mv2 = $mv->clone; # unlocked clone is unlocked
+  $mv2->xor("\x{1f}\x{0a}\x{1e}\x{00}\x{0b}");
+  print "$mv, $mv2!\n";
+  my $colon_idx = $mv->index('ll'); # 2
+  my $unlocked_mv = $mv->clone;
+  $mv->lock;
 
 =head1 DESCRIPTION
+
+L<Crypt::Sodium::XS::MemVault> is the container for protected memory objects in
+L<Crypt::Sodium::XS> which can be accessed from perl. It has constructors which
+can read in the sensitive data without going through perl. It also provides
+methods for manipulating the data while it remains only in protected memory.
+These methods (except L</index>) are time-dependent only on the length of
+protected data, not its content, so using them should not create any
+sidechannels.
+
+Memory protections are documented in L<Crypt::Sodium::XS::ProtMem>.
 
 =head1 CONSTRUCTORS
 
 =head2 new
 
+  my $mv = Crypt::Sodium::XS::MemVault->new($bytes);
   my $mv = Crypt::Sodium::XS::MemVault->new($bytes, $flags);
 
-C<$flags> is optional (default:
-L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>).
+Create a new L<Crypt::Sodium::XS::MemVault> from the content of C<$bytes>.
+
+The default for C<$flags> is
+L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 =head2 new_from_hex
 
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_hex($bytes, $flags);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_hex($hex_string);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_hex($hex_string, $flags);
 
-C<$flags> is optional (default:
-L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>).
+Create a new L<Crypt::Sodium::XS::MemVault> from the decoded content of
+C<$hex_string>.
+
+The default for C<$flags> is
+L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 =head2 new_from_base64
 
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_base64($base64);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_base64($base64, $variant);
   my $mv
     = Crypt::Sodium::XS::MemVault->new_from_base64($base64, $variant, $flags);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_base64($base64, undef, $flags);
 
-C<$variant> is optional (default:
-L<Crypt::Sodium::XS::Base64/BASE64_VARIANT_URLSAFE_NO_PADDING>). See
+Create a new L<Crypt::Sodium::XS::MemVault> from the decoded content of
+C<$base64>.
+
+The default for C<$variant> is
+L<Crypt::Sodium::XS::Base64/BASE64_VARIANT_URLSAFE_NO_PADDING>. See
 L<Crypt::Sodium::XS::Base64/CONSTANTS>.
 
-C<$flags> is optional (default:
-L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>).
+The default for C<$flags> is
+L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 =head2 new_from_file
 
   my $mv = Crypt::Sodium::XS::MemVault->new_from_file($path, $flags);
 
-C<$flags> is optional (default:
-L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>).
+Create a new L<Crypt::Sodium::XS::MemVault> by slurping all content from the
+file located at C<$path>.
+
+The default for C<$flags> is
+L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 =head2 new_from_fd
 
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($fh), $flags);
+  my $fd = fileno($fh);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $flags);
 
-B<Note>: this requires the file descriptor number, not a perl file handle.
+Create a new L<Crypt::Sodium::XS::MemVault> by reading from C<$fd> until EOF.
 
-C<$flags> is optional (default:
-L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>).
+B<Note>: This requires the file descriptor number, not a perl file handle.
+
+The default for C<$flags> is
+L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 =head1 METHODS
-
-=head2 is_locked
-
-  my $is_locked = $mv->is_locked;
-
-Returns a boolean indicating if the object is conceptually "locked."
 
 =head2 clone
 
   my $new_mv = $mv->clone;
 
-Returns a new object C<$new_mv> with identical contents to the original C<$mv>.
-
-=head2 concat
-
-  my $new_mv = $mv->concat($bytes);
-  my $new_mv = $mv->concat($other_mv);
-
-Returns a new object with the concatenated contents of C<$mv> followed by
-C<$bytes> or the contents of C<$other_mv>.
+Returns a new object C<$new_mv> with identical flags and contents to the
+original C<$mv>.
 
 =head2 compare
 
@@ -118,45 +159,36 @@ Comparible to the C<cmp> perl operator.
 C<$length> is optional iif C<$mv> and C<$other_mv> (or C<$bytes>) are equal
 lengths. If provided, only C<$length> bytes are compared.
 
+=head2 concat
+
+  my $new_mv = $mv->concat($bytes);
+  my $new_mv = $mv->concat($other_mv);
+
+Returns a new L<Crypt::Sodium::Memvault> with the concatenated contents of
+C<$mv> followed by C<$bytes> or the contents of C<$other_mv>. The new object's
+flags will be the combined restrictions of C<$mv> and C<$new_mv>.
+
 =head2 flags
 
   my $flags = $mv->flags;
   $mv->flags($new_flags);
 
-Return or set memory protection flags. See
-L<Crypt::Sodium::XS::ProtMem/MEMORY SAFETY>.
+Return or set memory protection flags. See L<Crypt::Sodium::XS::ProtMem>.
 
 =head2 from_base64
 
-  # shortcut for Crypt::Sodium::XS::MemVault->new_from_base64($mv, ..);
-  my $new_mv = $mv->from_base64($variant, $flags);
-
-C<$variant> is optional (default:
-L<Crypt::Sodium::XS::Base64/BASE64_VARIANT_URLSAFE_NO_PADDING>). See
-L<Crypt::Sodium::XS::BASE64/CONSTANTS>.
-
-C<$flags> is optional. If not provided, the new MemVault will use the same
-flags as the one from which it is created.
-
-Stops parsing at the first non-base64 byte (valid characters depend on
-C<$variant>). C<$new_mv> will be empty if the data cannot be parsed as valid
-base64 (i.e., the output would not be a multiple of 8 bits).
+Shortcut for L<Crypt::Sodium::XS::MemVault/new_from_base64>.
 
 =head2 from_hex
 
-  # shortcut for Crypt::Sodium::XS::MemVault->new_from_hex($mv, ..);
-  my $new_mv = $mv->from_hex($flags);
-
-C<$flags> is optional. If not provided, the new MemVault will use the same
-flags as the one from which it is created.
-
-Stops parsing at the first non-hex ([0-9a-f] case insensitive) byte.
+Shortcut for L<Crypt::Sodium::XS::MemVault/new_from_hex>.
 
 =head2 index
 
-  my $pos = $mv->index($substr, $offset);
+B<!!WARNING!!>: This method does not run in constant-time and may leak
+information about the protected memory.
 
-B<WARNING>: this method does B<NOT> run in constant-time!
+  my $pos = $mv->index($substr, $offset);
 
 Searches for an occurence of C<$substr> in protected memory. This is similar to
 perl's own index function. Returns the first match of C<$substr> at or after
@@ -169,6 +201,18 @@ protected memory.
 
 This method should only be used when protected memory starts with non-sensitive
 data, and is guaranteed to find C<$substr> before any sensitive data.
+
+This method will croak if the L<Crypt::Sodium::XS::MemVault> is conceptually
+"locked". See L</lock> and L</unlock>.
+
+The C<Crypt::Sodium::XS::MemVault> object must be unlocked (L</unlock>) before
+using this method.
+
+=head2 is_locked
+
+  my $is_locked = $mv->is_locked;
+
+Returns a boolean indicating if the object is conceptually "locked."
 
 =head2 is_zero
 
@@ -188,9 +232,8 @@ data.
 
   $mv->lock;
 
-Conceptually "lock" the object. This prevents access to the protected memory
-from perl (e.g., the object cannot be stringified, and attempting to do so will
-croak).
+Conceptually "lock" the object. This prevents use of the protected memory from
+perl in a way which could leak the data (i.e., stringification and L<index>).
 
 =head2 memcmp
 
@@ -240,7 +283,7 @@ hexadecimal string.
   $mv->unlock;
 
 Conceptually "unlock" the object. This allows access to the protected memory
-from perl (e.g., the object can be stringified).
+from perl (i.e., stringification and L</index>).
 
 =head2 memzero
 
@@ -262,6 +305,11 @@ the object is destroyed.
 Modifies protected memory using the exclusive-or operation with the provided
 argument. The argument must be the same number of bytes in length as the
 protected memory.
+
+B<NOTE>: Read carefully, this modifies in-place! It is much more performant
+this way. To instead return a new L<Crypt::Sodium::XS::MemVault> (without
+modifying the original), use the C<^> operator overload instead. An explicit
+method will be added in a future release.
 
 =head1 OVERLOADS
 
@@ -286,7 +334,8 @@ protected memory.
 
   my $var = "$mv";
 
-Stringifying a MemVault will croak if it is conceptually "locked."
+Stringification will croak if the L<Crypt::Sodium::XS::MemVault> is
+conceptually "locked". See L</lock> and L</unlock>.
 
 =head2 concatenation
 
@@ -294,7 +343,7 @@ Stringifying a MemVault will croak if it is conceptually "locked."
   my $new_mv = $string . $mv;
   my $new_mv = $mv . $other_mv;
 
-C<.=> is equivalent to L</concat>.
+Note: C<.=> is equivalent to L</concat>.
 
 =head2 repetition
 

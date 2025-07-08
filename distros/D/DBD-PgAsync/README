@@ -25,18 +25,41 @@ PQsendPrepare instead of PQprepare for async statements.
 	- transactions started automatically when autocommit is off
           use asychronous command execution          
 
+	- commit and rollback can be executed asynchronusly
+
 Bug reports etc specifically about this code should probably rather be
 sent to me than to any other DBD::Pg address, especially including the
 principal author of most of the code (<greg@turnstep.com>).
 
 	-- Rainer Weikusat <rweikusat@talktalk.net>
 
-Present status
---------------
 
-WIP to get this cleaned up for CPAN release. AFAICT, the code for this
-is complete and working but it still fails some of the automated
-style tests.
+New Method to Enable Async Operations
+-------------------------------------
+
+Starting with version 0.6, the recommended method to enable
+asychronous operation is to pass pg_use_async to the DBI connect
+method, example:
+
+    $dbh = DBI->connect($cs, '', '',
+                               {
+                                AutoCommit => 1,
+                                RaiseError => 1,
+                                pg_server_prepare => 1,
+                                pg_use_async => 1});
+
+This will use asynchronous operations by default whereever support
+for them has been implemented. It's possible to disable this for
+individual statement handles by passing a pg_async attribute with
+value 0 to prepare. Async-by-default can also be disabled at any time
+by setting pg_use_async to 0, eg,
+
+    $$dbh{pg_use_async} = 0;
+
+The original DBD::Pg method for demanding asynchronous operations,
+including the extension for async connect, is still supported within
+its technical limits. In particular, this means that commit and rollback
+are always sychronous.
 
 
 Debian Package

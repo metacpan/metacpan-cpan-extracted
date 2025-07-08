@@ -1,3 +1,10 @@
+0.17 2025-07-07T15:45:31+02:00
+ - Add error check for dates in the same day and not on the begin of day.
+ - Fix random() method which returned result greater than value in 'dt_to'
+   parameter.
+ - Remove _range() private method.
+ - Update copyright year.
+
 0.16 2024-06-23T12:55:50+02:00
  - Add DateTime::Event::Random to SEE ALSO section in doc.
  - Add check for parameters 'dt_from' <= 'dt_to'.

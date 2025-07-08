@@ -1,0 +1,4713 @@
+---
+'0':
+  '7':
+    '0':
+      facename: 19:Dots 9
+      middle: tile_middle_nw_view-YnfW.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 110.5
+            top: 355
+            width: 51
+          img: tile_full_0_view-Hu1h.png
+        '1':
+          crop:
+            height: 65
+            left: 89.5
+            top: 355
+            width: 51
+          img: tile_full_1_view-knvS.png
+        '2':
+          crop:
+            height: 65
+            left: 89.5
+            top: 334
+            width: 51
+          img: tile_full_2_view-jRdI.png
+        '3':
+          crop:
+            height: 65
+            left: 110.5
+            top: 334
+            width: 51
+          img: tile_full_3_view-7WBV.png
+'10':
+  '0':
+    '0':
+      facename: 05:Bamboo 5
+      middle: tile_middle_nw_view-xwxh.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-zj4B.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-DSns.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-BjIU.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-bqQd.png
+  '10':
+    '0':
+      facename: 22:20000
+      middle: tile_middle_nw_view-1HKu.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-QPht.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-VUvt.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-wB42.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-CXED.png
+    '1':
+      facename: 00:Red Dragon
+      middle: tile_middle_nw_view-56xH.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 373.5
+            top: 460
+            width: 51
+          img: tile_full_0_view-JnGC.png
+        '1':
+          crop:
+            height: 65
+            left: 336.5
+            top: 460
+            width: 51
+          img: tile_full_1_view-Fze4.png
+        '2':
+          crop:
+            height: 65
+            left: 336.5
+            top: 423
+            width: 51
+          img: tile_full_2_view-F7IR.png
+        '3':
+          crop:
+            height: 65
+            left: 373.5
+            top: 423
+            width: 51
+          img: tile_full_3_view-9yBI.png
+    '2':
+      facename: 30:East Wind
+      middle: tile_middle_nw_view-Y987.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 381.5
+            top: 468
+            width: 51
+          img: tile_full_0_view-fqJs.png
+        '1':
+          crop:
+            height: 65
+            left: 328.5
+            top: 468
+            width: 51
+          img: tile_full_1_view-CsZY.png
+        '2':
+          crop:
+            height: 65
+            left: 328.5
+            top: 415
+            width: 51
+          img: tile_full_2_view-Vzng.png
+        '3':
+          crop:
+            height: 65
+            left: 381.5
+            top: 415
+            width: 51
+          img: tile_full_3_view-Yd74.png
+  '12':
+    '0':
+      facename: 06:Bamboo 6
+      middle: tile_middle_nw_view-O8Ix.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-TKCp.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-B63D.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-9IQN.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-yV8r.png
+    '1':
+      facename: 34:2:Autumn
+      middle: tile_middle_nw_view-qeZB.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 373.5
+            top: 525
+            width: 51
+          img: tile_full_0_view-HlWr.png
+        '1':
+          crop:
+            height: 65
+            left: 336.5
+            top: 525
+            width: 51
+          img: tile_full_1_view-x9MJ.png
+        '2':
+          crop:
+            height: 65
+            left: 336.5
+            top: 488
+            width: 51
+          img: tile_full_2_view-Bs6f.png
+        '3':
+          crop:
+            height: 65
+            left: 373.5
+            top: 488
+            width: 51
+          img: tile_full_3_view-eXE0.png
+  '14':
+    '0':
+      facename: 16:Dots 6
+      middle: tile_middle_nw_view-5R2P.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-BoqR.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-OMVF.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-B4wc.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-MjY2.png
+  '2':
+    '0':
+      facename: 29:90000
+      middle: tile_middle_nw_view-QIDA.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-r3De.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-yADy.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-2O2K.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-lkx1.png
+    '1':
+      facename: 10:Green Dragon
+      middle: tile_middle_nw_view-cUNE.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 373.5
+            top: 200
+            width: 51
+          img: tile_full_0_view-cvJ6.png
+        '1':
+          crop:
+            height: 65
+            left: 336.5
+            top: 200
+            width: 51
+          img: tile_full_1_view-sGpT.png
+        '2':
+          crop:
+            height: 65
+            left: 336.5
+            top: 163
+            width: 51
+          img: tile_full_2_view-dvkq.png
+        '3':
+          crop:
+            height: 65
+            left: 373.5
+            top: 163
+            width: 51
+          img: tile_full_3_view-EVAh.png
+  '4':
+    '0':
+      facename: 12:Dots 2
+      middle: tile_middle_nw_view-GnvB.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-lPUt.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-jS5k.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-smQb.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-uZuH.png
+    '1':
+      facename: 15:Dots 5
+      middle: tile_middle_nw_view-H3ba.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 373.5
+            top: 265
+            width: 51
+          img: tile_full_0_view-wzZN.png
+        '1':
+          crop:
+            height: 65
+            left: 336.5
+            top: 265
+            width: 51
+          img: tile_full_1_view-_CoN.png
+        '2':
+          crop:
+            height: 65
+            left: 336.5
+            top: 228
+            width: 51
+          img: tile_full_2_view-TGKR.png
+        '3':
+          crop:
+            height: 65
+            left: 373.5
+            top: 228
+            width: 51
+          img: tile_full_3_view-xMw9.png
+    '2':
+      facename: 13:Dots 3
+      middle: tile_middle_nw_view-oPBG.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 381.5
+            top: 273
+            width: 51
+          img: tile_full_0_view-q4Wa.png
+        '1':
+          crop:
+            height: 65
+            left: 328.5
+            top: 273
+            width: 51
+          img: tile_full_1_view-xQxa.png
+        '2':
+          crop:
+            height: 65
+            left: 328.5
+            top: 220
+            width: 51
+          img: tile_full_2_view-hQSW.png
+        '3':
+          crop:
+            height: 65
+            left: 381.5
+            top: 220
+            width: 51
+          img: tile_full_3_view-AooD.png
+  '6':
+    '0':
+      facename: 30:East Wind
+      middle: tile_middle_nw_view-4Luk.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-TbiT.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-iqMX.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-5KJ6.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-CuzS.png
+    '1':
+      facename: 30:East Wind
+      middle: tile_middle_nw_view-gNVx.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 373.5
+            top: 330
+            width: 51
+          img: tile_full_0_view-KcAc.png
+        '1':
+          crop:
+            height: 65
+            left: 336.5
+            top: 330
+            width: 51
+          img: tile_full_1_view-hMDq.png
+        '2':
+          crop:
+            height: 65
+            left: 336.5
+            top: 293
+            width: 51
+          img: tile_full_2_view-HtDY.png
+        '3':
+          crop:
+            height: 65
+            left: 373.5
+            top: 293
+            width: 51
+          img: tile_full_3_view-BXZV.png
+    '2':
+      facename: 24:40000
+      middle: tile_middle_nw_view-9xGE.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 381.5
+            top: 338
+            width: 51
+          img: tile_full_0_view-10mq.png
+        '1':
+          crop:
+            height: 65
+            left: 328.5
+            top: 338
+            width: 51
+          img: tile_full_1_view-ugzU.png
+        '2':
+          crop:
+            height: 65
+            left: 328.5
+            top: 285
+            width: 51
+          img: tile_full_2_view-X84w.png
+        '3':
+          crop:
+            height: 65
+            left: 381.5
+            top: 285
+            width: 51
+          img: tile_full_3_view-DNAd.png
+  '8':
+    '0':
+      facename: 04:Bamboo 4
+      middle: tile_middle_nw_view-Sgq8.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 365.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-VwMV.png
+        '1':
+          crop:
+            height: 65
+            left: 344.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-9BNz.png
+        '2':
+          crop:
+            height: 65
+            left: 344.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-vVEU.png
+        '3':
+          crop:
+            height: 65
+            left: 365.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-6R_c.png
+    '1':
+      facename: 23:30000
+      middle: tile_middle_nw_view-WwKS.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 373.5
+            top: 395
+            width: 51
+          img: tile_full_0_view-oXCY.png
+        '1':
+          crop:
+            height: 65
+            left: 336.5
+            top: 395
+            width: 51
+          img: tile_full_1_view-yq2d.png
+        '2':
+          crop:
+            height: 65
+            left: 336.5
+            top: 358
+            width: 51
+          img: tile_full_2_view-inH6.png
+        '3':
+          crop:
+            height: 65
+            left: 373.5
+            top: 358
+            width: 51
+          img: tile_full_3_view-V7Dn.png
+    '2':
+      facename: 24:40000
+      middle: tile_middle_nw_view-OnHJ.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 381.5
+            top: 403
+            width: 51
+          img: tile_full_0_view-Y1Rb.png
+        '1':
+          crop:
+            height: 65
+            left: 328.5
+            top: 403
+            width: 51
+          img: tile_full_1_view-HoUc.png
+        '2':
+          crop:
+            height: 65
+            left: 328.5
+            top: 350
+            width: 51
+          img: tile_full_2_view-00cm.png
+        '3':
+          crop:
+            height: 65
+            left: 381.5
+            top: 350
+            width: 51
+          img: tile_full_3_view-Uhsm.png
+'12':
+  '0':
+    '0':
+      facename: 34:1:Summer
+      middle: tile_middle_nw_view-PvTp.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-Jwjp.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-ZALl.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-sSyg.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-7qS3.png
+  '10':
+    '0':
+      facename: 28:80000
+      middle: tile_middle_nw_view-A4xN.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-o6OV.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-eXUe.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-mFSx.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-OmFK.png
+    '1':
+      facename: 02:Bamboo 2
+      middle: tile_middle_nw_view-bYtO.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 424.5
+            top: 460
+            width: 51
+          img: tile_full_0_view-ZcZC.png
+        '1':
+          crop:
+            height: 65
+            left: 387.5
+            top: 460
+            width: 51
+          img: tile_full_1_view-kC5i.png
+        '2':
+          crop:
+            height: 65
+            left: 387.5
+            top: 423
+            width: 51
+          img: tile_full_2_view-3gbx.png
+        '3':
+          crop:
+            height: 65
+            left: 424.5
+            top: 423
+            width: 51
+          img: tile_full_3_view-VyuB.png
+    '2':
+      facename: 10:Green Dragon
+      middle: tile_middle_nw_view-uVEI.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 432.5
+            top: 468
+            width: 51
+          img: tile_full_0_view-iNEz.png
+        '1':
+          crop:
+            height: 65
+            left: 379.5
+            top: 468
+            width: 51
+          img: tile_full_1_view-JatK.png
+        '2':
+          crop:
+            height: 65
+            left: 379.5
+            top: 415
+            width: 51
+          img: tile_full_2_view-W7RE.png
+        '3':
+          crop:
+            height: 65
+            left: 432.5
+            top: 415
+            width: 51
+          img: tile_full_3_view-MYWO.png
+  '12':
+    '0':
+      facename: 21:10000
+      middle: tile_middle_nw_view-TVjo.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-vdAY.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-ClcZ.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-HtJ0.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-NYmS.png
+    '1':
+      facename: 34:0:Spring
+      middle: tile_middle_nw_view-CdjL.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 424.5
+            top: 525
+            width: 51
+          img: tile_full_0_view-ffIv.png
+        '1':
+          crop:
+            height: 65
+            left: 387.5
+            top: 525
+            width: 51
+          img: tile_full_1_view-U3rS.png
+        '2':
+          crop:
+            height: 65
+            left: 387.5
+            top: 488
+            width: 51
+          img: tile_full_2_view-43u_.png
+        '3':
+          crop:
+            height: 65
+            left: 424.5
+            top: 488
+            width: 51
+          img: tile_full_3_view-0SBB.png
+  '14':
+    '0':
+      facename: 33:North Wind
+      middle: tile_middle_nw_view-LOp2.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-WdBk.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-h5FX.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-zfVW.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-ZLr9.png
+  '2':
+    '0':
+      facename: 11:Dots 1
+      middle: tile_middle_nw_view-Psce.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-HyDX.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-2DOW.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-AmsT.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-6hS3.png
+    '1':
+      facename: 19:Dots 9
+      middle: tile_middle_nw_view-1cjq.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 424.5
+            top: 200
+            width: 51
+          img: tile_full_0_view-fZfm.png
+        '1':
+          crop:
+            height: 65
+            left: 387.5
+            top: 200
+            width: 51
+          img: tile_full_1_view-J7SD.png
+        '2':
+          crop:
+            height: 65
+            left: 387.5
+            top: 163
+            width: 51
+          img: tile_full_2_view-khn6.png
+        '3':
+          crop:
+            height: 65
+            left: 424.5
+            top: 163
+            width: 51
+          img: tile_full_3_view-W1rL.png
+  '4':
+    '0':
+      facename: 20:White Dragon
+      middle: tile_middle_nw_view-E61L.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-bXKh.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-JBZb.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-VmqM.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-VZim.png
+    '1':
+      facename: 15:Dots 5
+      middle: tile_middle_nw_view-cQvV.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 424.5
+            top: 265
+            width: 51
+          img: tile_full_0_view-iocc.png
+        '1':
+          crop:
+            height: 65
+            left: 387.5
+            top: 265
+            width: 51
+          img: tile_full_1_view-acox.png
+        '2':
+          crop:
+            height: 65
+            left: 387.5
+            top: 228
+            width: 51
+          img: tile_full_2_view-r3i5.png
+        '3':
+          crop:
+            height: 65
+            left: 424.5
+            top: 228
+            width: 51
+          img: tile_full_3_view-Y3ZB.png
+    '2':
+      facename: 24:40000
+      middle: tile_middle_nw_view-eUdw.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 432.5
+            top: 273
+            width: 51
+          img: tile_full_0_view-WSYJ.png
+        '1':
+          crop:
+            height: 65
+            left: 379.5
+            top: 273
+            width: 51
+          img: tile_full_1_view-IznM.png
+        '2':
+          crop:
+            height: 65
+            left: 379.5
+            top: 220
+            width: 51
+          img: tile_full_2_view-TUWQ.png
+        '3':
+          crop:
+            height: 65
+            left: 432.5
+            top: 220
+            width: 51
+          img: tile_full_3_view-iymv.png
+  '6':
+    '0':
+      facename: 35:0:Plum
+      middle: tile_middle_nw_view-BaeT.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-ATCF.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-hWFj.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-W1Eh.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-zyLA.png
+    '1':
+      facename: 00:Red Dragon
+      middle: tile_middle_nw_view-Xm8x.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 424.5
+            top: 330
+            width: 51
+          img: tile_full_0_view-UWh7.png
+        '1':
+          crop:
+            height: 65
+            left: 387.5
+            top: 330
+            width: 51
+          img: tile_full_1_view-QKUq.png
+        '2':
+          crop:
+            height: 65
+            left: 387.5
+            top: 293
+            width: 51
+          img: tile_full_2_view-Z0Dr.png
+        '3':
+          crop:
+            height: 65
+            left: 424.5
+            top: 293
+            width: 51
+          img: tile_full_3_view-5Umw.png
+    '2':
+      facename: 10:Green Dragon
+      middle: tile_middle_nw_view-oHIk.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 432.5
+            top: 338
+            width: 51
+          img: tile_full_0_view-6u7Y.png
+        '1':
+          crop:
+            height: 65
+            left: 379.5
+            top: 338
+            width: 51
+          img: tile_full_1_view-PfUa.png
+        '2':
+          crop:
+            height: 65
+            left: 379.5
+            top: 285
+            width: 51
+          img: tile_full_2_view-xF1z.png
+        '3':
+          crop:
+            height: 65
+            left: 432.5
+            top: 285
+            width: 51
+          img: tile_full_3_view-glIX.png
+    '3':
+      facename: 22:20000
+      middle: tile_middle_nw_view-LuZo.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 440.5
+            top: 346
+            width: 51
+          img: tile_full_0_view-HZFm.png
+        '1':
+          crop:
+            height: 65
+            left: 371.5
+            top: 346
+            width: 51
+          img: tile_full_1_view-esUE.png
+        '2':
+          crop:
+            height: 65
+            left: 371.5
+            top: 277
+            width: 51
+          img: tile_full_2_view-0zEf.png
+        '3':
+          crop:
+            height: 65
+            left: 440.5
+            top: 277
+            width: 51
+          img: tile_full_3_view-a88y.png
+  '8':
+    '0':
+      facename: 30:East Wind
+      middle: tile_middle_nw_view-uxNa.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 416.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-5TXk.png
+        '1':
+          crop:
+            height: 65
+            left: 395.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-QEYx.png
+        '2':
+          crop:
+            height: 65
+            left: 395.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-B3K3.png
+        '3':
+          crop:
+            height: 65
+            left: 416.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-Yrvy.png
+    '1':
+      facename: 03:Bamboo 3
+      middle: tile_middle_nw_view-Rr5k.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 424.5
+            top: 395
+            width: 51
+          img: tile_full_0_view-89Js.png
+        '1':
+          crop:
+            height: 65
+            left: 387.5
+            top: 395
+            width: 51
+          img: tile_full_1_view-xgK2.png
+        '2':
+          crop:
+            height: 65
+            left: 387.5
+            top: 358
+            width: 51
+          img: tile_full_2_view-TC5Z.png
+        '3':
+          crop:
+            height: 65
+            left: 424.5
+            top: 358
+            width: 51
+          img: tile_full_3_view-B8k8.png
+    '2':
+      facename: 25:50000
+      middle: tile_middle_nw_view-HTDd.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 432.5
+            top: 403
+            width: 51
+          img: tile_full_0_view-fPeR.png
+        '1':
+          crop:
+            height: 65
+            left: 379.5
+            top: 403
+            width: 51
+          img: tile_full_1_view-IJP6.png
+        '2':
+          crop:
+            height: 65
+            left: 379.5
+            top: 350
+            width: 51
+          img: tile_full_2_view-OAKR.png
+        '3':
+          crop:
+            height: 65
+            left: 432.5
+            top: 350
+            width: 51
+          img: tile_full_3_view-Cf_d.png
+    '3':
+      facename: 17:Dots 7
+      middle: tile_middle_nw_view-zUzo.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 440.5
+            top: 411
+            width: 51
+          img: tile_full_0_view-tvZJ.png
+        '1':
+          crop:
+            height: 65
+            left: 371.5
+            top: 411
+            width: 51
+          img: tile_full_1_view-YZNd.png
+        '2':
+          crop:
+            height: 65
+            left: 371.5
+            top: 342
+            width: 51
+          img: tile_full_2_view-PbzK.png
+        '3':
+          crop:
+            height: 65
+            left: 440.5
+            top: 342
+            width: 51
+          img: tile_full_3_view-buYb.png
+'13':
+  '7':
+    '4':
+      facename: 26:60000
+      middle: tile_middle_nw_view-5w5m.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 474.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-W3R3.png
+        '1':
+          crop:
+            height: 65
+            left: 389.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-JNGz.png
+        '2':
+          crop:
+            height: 65
+            left: 389.5
+            top: 302
+            width: 51
+          img: tile_full_2_view-xv0K.png
+        '3':
+          crop:
+            height: 65
+            left: 474.5
+            top: 302
+            width: 51
+          img: tile_full_3_view-wMWq.png
+'14':
+  '0':
+    '0':
+      facename: 23:30000
+      middle: tile_middle_nw_view-7tP1.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-Mh4j.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-wCan.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-ElU2.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-rpyA.png
+  '10':
+    '0':
+      facename: 32:West Wind
+      middle: tile_middle_nw_view-POk7.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-P5yx.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-Illq.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-dXED.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-j5Br.png
+    '1':
+      facename: 09:Bamboo 9
+      middle: tile_middle_nw_view-vXk_.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 475.5
+            top: 460
+            width: 51
+          img: tile_full_0_view-_uom.png
+        '1':
+          crop:
+            height: 65
+            left: 438.5
+            top: 460
+            width: 51
+          img: tile_full_1_view-JX9_.png
+        '2':
+          crop:
+            height: 65
+            left: 438.5
+            top: 423
+            width: 51
+          img: tile_full_2_view-z5fV.png
+        '3':
+          crop:
+            height: 65
+            left: 475.5
+            top: 423
+            width: 51
+          img: tile_full_3_view-2pcw.png
+    '2':
+      facename: 35:1:Orchid
+      middle: tile_middle_nw_view-ab34.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 483.5
+            top: 468
+            width: 51
+          img: tile_full_0_view-l3hX.png
+        '1':
+          crop:
+            height: 65
+            left: 430.5
+            top: 468
+            width: 51
+          img: tile_full_1_view-0ofQ.png
+        '2':
+          crop:
+            height: 65
+            left: 430.5
+            top: 415
+            width: 51
+          img: tile_full_2_view-qlXw.png
+        '3':
+          crop:
+            height: 65
+            left: 483.5
+            top: 415
+            width: 51
+          img: tile_full_3_view-WiHU.png
+  '12':
+    '0':
+      facename: 15:Dots 5
+      middle: tile_middle_nw_view-DyaN.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-XhXZ.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-1AqJ.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-G9lI.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-8lmd.png
+    '1':
+      facename: 13:Dots 3
+      middle: tile_middle_nw_view-e4eN.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 475.5
+            top: 525
+            width: 51
+          img: tile_full_0_view-mn5S.png
+        '1':
+          crop:
+            height: 65
+            left: 438.5
+            top: 525
+            width: 51
+          img: tile_full_1_view-vOoh.png
+        '2':
+          crop:
+            height: 65
+            left: 438.5
+            top: 488
+            width: 51
+          img: tile_full_2_view-r_I2.png
+        '3':
+          crop:
+            height: 65
+            left: 475.5
+            top: 488
+            width: 51
+          img: tile_full_3_view-l0YZ.png
+  '14':
+    '0':
+      facename: 28:80000
+      middle: tile_middle_nw_view-7v8Z.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-mEOC.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-H_hP.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-iPlP.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-F1tM.png
+  '2':
+    '0':
+      facename: 27:70000
+      middle: tile_middle_nw_view-Uu8w.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-VNwI.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-NDI6.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-SqD1.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-FiB1.png
+    '1':
+      facename: 05:Bamboo 5
+      middle: tile_middle_nw_view-81XB.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 475.5
+            top: 200
+            width: 51
+          img: tile_full_0_view-uoFB.png
+        '1':
+          crop:
+            height: 65
+            left: 438.5
+            top: 200
+            width: 51
+          img: tile_full_1_view-CZYC.png
+        '2':
+          crop:
+            height: 65
+            left: 438.5
+            top: 163
+            width: 51
+          img: tile_full_2_view-RUwF.png
+        '3':
+          crop:
+            height: 65
+            left: 475.5
+            top: 163
+            width: 51
+          img: tile_full_3_view-KR27.png
+  '4':
+    '0':
+      facename: 02:Bamboo 2
+      middle: tile_middle_nw_view-p7_Z.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-VVlf.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-_Rkm.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-TRsN.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-wCkN.png
+    '1':
+      facename: 26:60000
+      middle: tile_middle_nw_view-Umrr.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 475.5
+            top: 265
+            width: 51
+          img: tile_full_0_view-Mlyz.png
+        '1':
+          crop:
+            height: 65
+            left: 438.5
+            top: 265
+            width: 51
+          img: tile_full_1_view-BzOr.png
+        '2':
+          crop:
+            height: 65
+            left: 438.5
+            top: 228
+            width: 51
+          img: tile_full_2_view-QN1t.png
+        '3':
+          crop:
+            height: 65
+            left: 475.5
+            top: 228
+            width: 51
+          img: tile_full_3_view-3jhc.png
+    '2':
+      facename: 34:3:Winter
+      middle: tile_middle_nw_view-UozJ.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 483.5
+            top: 273
+            width: 51
+          img: tile_full_0_view-hX8r.png
+        '1':
+          crop:
+            height: 65
+            left: 430.5
+            top: 273
+            width: 51
+          img: tile_full_1_view-x9pb.png
+        '2':
+          crop:
+            height: 65
+            left: 430.5
+            top: 220
+            width: 51
+          img: tile_full_2_view-s0LA.png
+        '3':
+          crop:
+            height: 65
+            left: 483.5
+            top: 220
+            width: 51
+          img: tile_full_3_view-r0Tj.png
+  '6':
+    '0':
+      facename: 12:Dots 2
+      middle: tile_middle_nw_view-yPz3.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-PWLP.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-Ee8y.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-pubQ.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-wmGb.png
+    '1':
+      facename: 02:Bamboo 2
+      middle: tile_middle_nw_view-VjkS.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 475.5
+            top: 330
+            width: 51
+          img: tile_full_0_view-lvkb.png
+        '1':
+          crop:
+            height: 65
+            left: 438.5
+            top: 330
+            width: 51
+          img: tile_full_1_view-dEQO.png
+        '2':
+          crop:
+            height: 65
+            left: 438.5
+            top: 293
+            width: 51
+          img: tile_full_2_view-wPGw.png
+        '3':
+          crop:
+            height: 65
+            left: 475.5
+            top: 293
+            width: 51
+          img: tile_full_3_view-xkcb.png
+    '2':
+      facename: 16:Dots 6
+      middle: tile_middle_nw_view-tIC_.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 483.5
+            top: 338
+            width: 51
+          img: tile_full_0_view-LhJy.png
+        '1':
+          crop:
+            height: 65
+            left: 430.5
+            top: 338
+            width: 51
+          img: tile_full_1_view-FpYa.png
+        '2':
+          crop:
+            height: 65
+            left: 430.5
+            top: 285
+            width: 51
+          img: tile_full_2_view-la_D.png
+        '3':
+          crop:
+            height: 65
+            left: 483.5
+            top: 285
+            width: 51
+          img: tile_full_3_view-VfTh.png
+    '3':
+      facename: 26:60000
+      middle: tile_middle_nw_view-2yzz.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 491.5
+            top: 346
+            width: 51
+          img: tile_full_0_view-eDmx.png
+        '1':
+          crop:
+            height: 65
+            left: 422.5
+            top: 346
+            width: 51
+          img: tile_full_1_view-gVxd.png
+        '2':
+          crop:
+            height: 65
+            left: 422.5
+            top: 277
+            width: 51
+          img: tile_full_2_view-wvtB.png
+        '3':
+          crop:
+            height: 65
+            left: 491.5
+            top: 277
+            width: 51
+          img: tile_full_3_view-Qtdc.png
+  '8':
+    '0':
+      facename: 07:Bamboo 7
+      middle: tile_middle_nw_view-6oRw.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 467.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-tszk.png
+        '1':
+          crop:
+            height: 65
+            left: 446.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-jKmI.png
+        '2':
+          crop:
+            height: 65
+            left: 446.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-naec.png
+        '3':
+          crop:
+            height: 65
+            left: 467.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-lw2g.png
+    '1':
+      facename: 01:Bamboo 1 Peacock
+      middle: tile_middle_nw_view-Wb1W.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 475.5
+            top: 395
+            width: 51
+          img: tile_full_0_view-WCjw.png
+        '1':
+          crop:
+            height: 65
+            left: 438.5
+            top: 395
+            width: 51
+          img: tile_full_1_view-exAN.png
+        '2':
+          crop:
+            height: 65
+            left: 438.5
+            top: 358
+            width: 51
+          img: tile_full_2_view-HFvR.png
+        '3':
+          crop:
+            height: 65
+            left: 475.5
+            top: 358
+            width: 51
+          img: tile_full_3_view-bBXP.png
+    '2':
+      facename: 27:70000
+      middle: tile_middle_nw_view-szpl.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 483.5
+            top: 403
+            width: 51
+          img: tile_full_0_view-v29s.png
+        '1':
+          crop:
+            height: 65
+            left: 430.5
+            top: 403
+            width: 51
+          img: tile_full_1_view-TE0N.png
+        '2':
+          crop:
+            height: 65
+            left: 430.5
+            top: 350
+            width: 51
+          img: tile_full_2_view-W5Vk.png
+        '3':
+          crop:
+            height: 65
+            left: 483.5
+            top: 350
+            width: 51
+          img: tile_full_3_view-Kr8D.png
+    '3':
+      facename: 09:Bamboo 9
+      middle: tile_middle_nw_view-BSxe.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 491.5
+            top: 411
+            width: 51
+          img: tile_full_0_view-MsIL.png
+        '1':
+          crop:
+            height: 65
+            left: 422.5
+            top: 411
+            width: 51
+          img: tile_full_1_view-PeHQ.png
+        '2':
+          crop:
+            height: 65
+            left: 422.5
+            top: 342
+            width: 51
+          img: tile_full_2_view-HN6C.png
+        '3':
+          crop:
+            height: 65
+            left: 491.5
+            top: 342
+            width: 51
+          img: tile_full_3_view-64Hf.png
+'16':
+  '0':
+    '0':
+      facename: 11:Dots 1
+      middle: tile_middle_nw_view-m3wU.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-CHYS.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-qt_3.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-QDnR.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-QDwE.png
+  '10':
+    '0':
+      facename: 12:Dots 2
+      middle: tile_middle_nw_view-CMAy.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-CYb2.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-jUd_.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-4AQy.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-CEwe.png
+    '1':
+      facename: 04:Bamboo 4
+      middle: tile_middle_nw_view-nKvI.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 526.5
+            top: 460
+            width: 51
+          img: tile_full_0_view-w0UO.png
+        '1':
+          crop:
+            height: 65
+            left: 489.5
+            top: 460
+            width: 51
+          img: tile_full_1_view-Sclr.png
+        '2':
+          crop:
+            height: 65
+            left: 489.5
+            top: 423
+            width: 51
+          img: tile_full_2_view-J6Fd.png
+        '3':
+          crop:
+            height: 65
+            left: 526.5
+            top: 423
+            width: 51
+          img: tile_full_3_view-LSMR.png
+    '2':
+      facename: 15:Dots 5
+      middle: tile_middle_nw_view-TSLw.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 534.5
+            top: 468
+            width: 51
+          img: tile_full_0_view-K7Y8.png
+        '1':
+          crop:
+            height: 65
+            left: 481.5
+            top: 468
+            width: 51
+          img: tile_full_1_view-m1eV.png
+        '2':
+          crop:
+            height: 65
+            left: 481.5
+            top: 415
+            width: 51
+          img: tile_full_2_view-sNMH.png
+        '3':
+          crop:
+            height: 65
+            left: 534.5
+            top: 415
+            width: 51
+          img: tile_full_3_view-Pq1S.png
+  '12':
+    '0':
+      facename: 13:Dots 3
+      middle: tile_middle_nw_view-poPe.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-cNTD.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-Ifn7.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-OApk.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-RbOY.png
+    '1':
+      facename: 08:Bamboo 8
+      middle: tile_middle_nw_view-A7_B.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 526.5
+            top: 525
+            width: 51
+          img: tile_full_0_view-3SLk.png
+        '1':
+          crop:
+            height: 65
+            left: 489.5
+            top: 525
+            width: 51
+          img: tile_full_1_view-d2Xy.png
+        '2':
+          crop:
+            height: 65
+            left: 489.5
+            top: 488
+            width: 51
+          img: tile_full_2_view-Hnfr.png
+        '3':
+          crop:
+            height: 65
+            left: 526.5
+            top: 488
+            width: 51
+          img: tile_full_3_view-tnNj.png
+  '14':
+    '0':
+      facename: 21:10000
+      middle: tile_middle_nw_view-Lonq.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-a_9T.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-8DsJ.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-O6Mv.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-0SpS.png
+  '2':
+    '0':
+      facename: 06:Bamboo 6
+      middle: tile_middle_nw_view-9TbI.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-Oe_T.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-bqKf.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-R3fn.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-4VzJ.png
+    '1':
+      facename: 04:Bamboo 4
+      middle: tile_middle_nw_view-QGgn.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 526.5
+            top: 200
+            width: 51
+          img: tile_full_0_view-oHac.png
+        '1':
+          crop:
+            height: 65
+            left: 489.5
+            top: 200
+            width: 51
+          img: tile_full_1_view-5CjF.png
+        '2':
+          crop:
+            height: 65
+            left: 489.5
+            top: 163
+            width: 51
+          img: tile_full_2_view-7uAO.png
+        '3':
+          crop:
+            height: 65
+            left: 526.5
+            top: 163
+            width: 51
+          img: tile_full_3_view-HHPE.png
+  '4':
+    '0':
+      facename: 29:90000
+      middle: tile_middle_nw_view-JgT0.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-JVjd.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-zpWv.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-Tvpy.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-OT2B.png
+    '1':
+      facename: 35:2:Chrysanthemum
+      middle: tile_middle_nw_view-Txyq.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 526.5
+            top: 265
+            width: 51
+          img: tile_full_0_view-W6Uw.png
+        '1':
+          crop:
+            height: 65
+            left: 489.5
+            top: 265
+            width: 51
+          img: tile_full_1_view-y3qG.png
+        '2':
+          crop:
+            height: 65
+            left: 489.5
+            top: 228
+            width: 51
+          img: tile_full_2_view-Y4AF.png
+        '3':
+          crop:
+            height: 65
+            left: 526.5
+            top: 228
+            width: 51
+          img: tile_full_3_view-UGXv.png
+    '2':
+      facename: 22:20000
+      middle: tile_middle_nw_view-C3Ue.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 534.5
+            top: 273
+            width: 51
+          img: tile_full_0_view-8VVv.png
+        '1':
+          crop:
+            height: 65
+            left: 481.5
+            top: 273
+            width: 51
+          img: tile_full_1_view-THcg.png
+        '2':
+          crop:
+            height: 65
+            left: 481.5
+            top: 220
+            width: 51
+          img: tile_full_2_view-I2XD.png
+        '3':
+          crop:
+            height: 65
+            left: 534.5
+            top: 220
+            width: 51
+          img: tile_full_3_view-xL4a.png
+  '6':
+    '0':
+      facename: 11:Dots 1
+      middle: tile_middle_nw_view-xZAn.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-RigI.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-nXUE.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-VC35.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-k7da.png
+    '1':
+      facename: 08:Bamboo 8
+      middle: tile_middle_nw_view-2VIo.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 526.5
+            top: 330
+            width: 51
+          img: tile_full_0_view-0mrv.png
+        '1':
+          crop:
+            height: 65
+            left: 489.5
+            top: 330
+            width: 51
+          img: tile_full_1_view-QQqH.png
+        '2':
+          crop:
+            height: 65
+            left: 489.5
+            top: 293
+            width: 51
+          img: tile_full_2_view-crMP.png
+        '3':
+          crop:
+            height: 65
+            left: 526.5
+            top: 293
+            width: 51
+          img: tile_full_3_view-VkMe.png
+    '2':
+      facename: 19:Dots 9
+      middle: tile_middle_nw_view-xAbe.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 534.5
+            top: 338
+            width: 51
+          img: tile_full_0_view-Nvk5.png
+        '1':
+          crop:
+            height: 65
+            left: 481.5
+            top: 338
+            width: 51
+          img: tile_full_1_view-8lO0.png
+        '2':
+          crop:
+            height: 65
+            left: 481.5
+            top: 285
+            width: 51
+          img: tile_full_2_view-soYz.png
+        '3':
+          crop:
+            height: 65
+            left: 534.5
+            top: 285
+            width: 51
+          img: tile_full_3_view-H_wh.png
+  '8':
+    '0':
+      facename: 05:Bamboo 5
+      middle: tile_middle_nw_view-uJDM.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 518.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-xry7.png
+        '1':
+          crop:
+            height: 65
+            left: 497.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-0sqD.png
+        '2':
+          crop:
+            height: 65
+            left: 497.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-NVFr.png
+        '3':
+          crop:
+            height: 65
+            left: 518.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-y5vn.png
+    '1':
+      facename: 32:West Wind
+      middle: tile_middle_nw_view-7UZP.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 526.5
+            top: 395
+            width: 51
+          img: tile_full_0_view-eFtN.png
+        '1':
+          crop:
+            height: 65
+            left: 489.5
+            top: 395
+            width: 51
+          img: tile_full_1_view-TLDQ.png
+        '2':
+          crop:
+            height: 65
+            left: 489.5
+            top: 358
+            width: 51
+          img: tile_full_2_view-AAVz.png
+        '3':
+          crop:
+            height: 65
+            left: 526.5
+            top: 358
+            width: 51
+          img: tile_full_3_view-c3XA.png
+    '2':
+      facename: 23:30000
+      middle: tile_middle_nw_view-XMa8.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 534.5
+            top: 403
+            width: 51
+          img: tile_full_0_view-Z49s.png
+        '1':
+          crop:
+            height: 65
+            left: 481.5
+            top: 403
+            width: 51
+          img: tile_full_1_view-gw9W.png
+        '2':
+          crop:
+            height: 65
+            left: 481.5
+            top: 350
+            width: 51
+          img: tile_full_2_view-CFJL.png
+        '3':
+          crop:
+            height: 65
+            left: 534.5
+            top: 350
+            width: 51
+          img: tile_full_3_view-HmwP.png
+'18':
+  '0':
+    '0':
+      facename: 24:40000
+      middle: tile_middle_nw_view-baC5.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-K9Cn.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-rXnf.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-rMyh.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-5Znr.png
+  '10':
+    '0':
+      facename: 29:90000
+      middle: tile_middle_nw_view-ThlK.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-Vjum.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-xkef.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-fnjA.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-5gfH.png
+    '1':
+      facename: 12:Dots 2
+      middle: tile_middle_nw_view-GKhl.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 577.5
+            top: 460
+            width: 51
+          img: tile_full_0_view-uaOZ.png
+        '1':
+          crop:
+            height: 65
+            left: 540.5
+            top: 460
+            width: 51
+          img: tile_full_1_view-hRdF.png
+        '2':
+          crop:
+            height: 65
+            left: 540.5
+            top: 423
+            width: 51
+          img: tile_full_2_view-8HYf.png
+        '3':
+          crop:
+            height: 65
+            left: 577.5
+            top: 423
+            width: 51
+          img: tile_full_3_view-y3D5.png
+  '12':
+    '0':
+      facename: 33:North Wind
+      middle: tile_middle_nw_view-_WA6.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-KuR9.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-T_nq.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-fdMK.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-jKtF.png
+    '1':
+      facename: 11:Dots 1
+      middle: tile_middle_nw_view-RdRc.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 577.5
+            top: 525
+            width: 51
+          img: tile_full_0_view-PwpP.png
+        '1':
+          crop:
+            height: 65
+            left: 540.5
+            top: 525
+            width: 51
+          img: tile_full_1_view-R95u.png
+        '2':
+          crop:
+            height: 65
+            left: 540.5
+            top: 488
+            width: 51
+          img: tile_full_2_view-yBNb.png
+        '3':
+          crop:
+            height: 65
+            left: 577.5
+            top: 488
+            width: 51
+          img: tile_full_3_view-jwcC.png
+  '14':
+    '0':
+      facename: 05:Bamboo 5
+      middle: tile_middle_nw_view-q0bt.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-ASP0.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-jM4F.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-f4x0.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-V7wS.png
+  '2':
+    '0':
+      facename: 07:Bamboo 7
+      middle: tile_middle_nw_view-zc0r.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-ZSWG.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-fUMp.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-nU0c.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-K3e5.png
+    '1':
+      facename: 20:White Dragon
+      middle: tile_middle_nw_view-8TY1.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 577.5
+            top: 200
+            width: 51
+          img: tile_full_0_view-fQqp.png
+        '1':
+          crop:
+            height: 65
+            left: 540.5
+            top: 200
+            width: 51
+          img: tile_full_1_view-XyrW.png
+        '2':
+          crop:
+            height: 65
+            left: 540.5
+            top: 163
+            width: 51
+          img: tile_full_2_view-bmNJ.png
+        '3':
+          crop:
+            height: 65
+            left: 577.5
+            top: 163
+            width: 51
+          img: tile_full_3_view-17YJ.png
+  '4':
+    '0':
+      facename: 09:Bamboo 9
+      middle: tile_middle_nw_view-BHi1.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-yucP.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-_s67.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-Kt4M.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-DzMF.png
+    '1':
+      facename: 27:70000
+      middle: tile_middle_nw_view-n9T8.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 577.5
+            top: 265
+            width: 51
+          img: tile_full_0_view-nQdR.png
+        '1':
+          crop:
+            height: 65
+            left: 540.5
+            top: 265
+            width: 51
+          img: tile_full_1_view-AZ5V.png
+        '2':
+          crop:
+            height: 65
+            left: 540.5
+            top: 228
+            width: 51
+          img: tile_full_2_view-B0yu.png
+        '3':
+          crop:
+            height: 65
+            left: 577.5
+            top: 228
+            width: 51
+          img: tile_full_3_view-I8dD.png
+  '6':
+    '0':
+      facename: 28:80000
+      middle: tile_middle_nw_view-tTmM.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-smMJ.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-njfq.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-GPXq.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-Qvv6.png
+    '1':
+      facename: 14:Dots 4
+      middle: tile_middle_nw_view-E7Nf.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 577.5
+            top: 330
+            width: 51
+          img: tile_full_0_view-lbHi.png
+        '1':
+          crop:
+            height: 65
+            left: 540.5
+            top: 330
+            width: 51
+          img: tile_full_1_view-ByPt.png
+        '2':
+          crop:
+            height: 65
+            left: 540.5
+            top: 293
+            width: 51
+          img: tile_full_2_view-9Y3g.png
+        '3':
+          crop:
+            height: 65
+            left: 577.5
+            top: 293
+            width: 51
+          img: tile_full_3_view-5lx1.png
+  '8':
+    '0':
+      facename: 31:South Wind
+      middle: tile_middle_nw_view-uSk6.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 569.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-S7YL.png
+        '1':
+          crop:
+            height: 65
+            left: 548.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-RTGy.png
+        '2':
+          crop:
+            height: 65
+            left: 548.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-lO9f.png
+        '3':
+          crop:
+            height: 65
+            left: 569.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-Dncq.png
+    '1':
+      facename: 08:Bamboo 8
+      middle: tile_middle_nw_view-tSTi.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 577.5
+            top: 395
+            width: 51
+          img: tile_full_0_view-Yv6r.png
+        '1':
+          crop:
+            height: 65
+            left: 540.5
+            top: 395
+            width: 51
+          img: tile_full_1_view-BbDa.png
+        '2':
+          crop:
+            height: 65
+            left: 540.5
+            top: 358
+            width: 51
+          img: tile_full_2_view-sLt7.png
+        '3':
+          crop:
+            height: 65
+            left: 577.5
+            top: 358
+            width: 51
+          img: tile_full_3_view-gOrN.png
+'2':
+  '0':
+    '0':
+      facename: 06:Bamboo 6
+      middle: tile_middle_nw_view-If2C.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 161.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-uDvE.png
+        '1':
+          crop:
+            height: 65
+            left: 140.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-ildV.png
+        '2':
+          crop:
+            height: 65
+            left: 140.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-utOQ.png
+        '3':
+          crop:
+            height: 65
+            left: 161.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-l8yG.png
+  '14':
+    '0':
+      facename: 29:90000
+      middle: tile_middle_nw_view-8R1L.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 161.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-ZFOU.png
+        '1':
+          crop:
+            height: 65
+            left: 140.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-rvUy.png
+        '2':
+          crop:
+            height: 65
+            left: 140.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-fPsL.png
+        '3':
+          crop:
+            height: 65
+            left: 161.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-8_r8.png
+  '6':
+    '0':
+      facename: 25:50000
+      middle: tile_middle_nw_view-5s6S.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 161.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-Yd1D.png
+        '1':
+          crop:
+            height: 65
+            left: 140.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-s88V.png
+        '2':
+          crop:
+            height: 65
+            left: 140.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-jGez.png
+        '3':
+          crop:
+            height: 65
+            left: 161.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-MQRH.png
+  '8':
+    '0':
+      facename: 01:Bamboo 1 Peacock
+      middle: tile_middle_nw_view-P516.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 161.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-JrFZ.png
+        '1':
+          crop:
+            height: 65
+            left: 140.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-uCIp.png
+        '2':
+          crop:
+            height: 65
+            left: 140.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-thrA.png
+        '3':
+          crop:
+            height: 65
+            left: 161.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-lhg4.png
+'20':
+  '0':
+    '0':
+      facename: 20:White Dragon
+      middle: tile_middle_nw_view-0NYb.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-t85T.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-Y2U_.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-T_kv.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-9Sn6.png
+  '10':
+    '0':
+      facename: 14:Dots 4
+      middle: tile_middle_nw_view-XRV6.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-51M4.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-VvDs.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-pCqp.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-KJvy.png
+  '12':
+    '0':
+      facename: 17:Dots 7
+      middle: tile_middle_nw_view-ukuh.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-cmqm.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-S5fX.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-hJCG.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-zVN6.png
+  '14':
+    '0':
+      facename: 18:Dots 8
+      middle: tile_middle_nw_view-IUeo.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-85v9.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-8eJX.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-B8rK.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-Hooa.png
+  '2':
+    '0':
+      facename: 10:Green Dragon
+      middle: tile_middle_nw_view-qQj_.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-J9RZ.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-kMyQ.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-qyi9.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-xbtA.png
+  '4':
+    '0':
+      facename: 28:80000
+      middle: tile_middle_nw_view-GCZA.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-kuSx.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-9AQH.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-H8RE.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-1pKj.png
+  '6':
+    '0':
+      facename: 17:Dots 7
+      middle: tile_middle_nw_view-K0eV.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-xE1a.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-KAyB.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-IRMp.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-WG4T.png
+  '8':
+    '0':
+      facename: 33:North Wind
+      middle: tile_middle_nw_view-cU8_.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 620.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-87oY.png
+        '1':
+          crop:
+            height: 65
+            left: 599.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-Bobs.png
+        '2':
+          crop:
+            height: 65
+            left: 599.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-RKR6.png
+        '3':
+          crop:
+            height: 65
+            left: 620.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-J2iv.png
+'22':
+  '0':
+    '0':
+      facename: 01:Bamboo 1 Peacock
+      middle: tile_middle_nw_view-5UUE.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 671.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-5N7N.png
+        '1':
+          crop:
+            height: 65
+            left: 650.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-nQET.png
+        '2':
+          crop:
+            height: 65
+            left: 650.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-ZZr6.png
+        '3':
+          crop:
+            height: 65
+            left: 671.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-ZQYf.png
+  '10':
+    '0':
+      facename: 03:Bamboo 3
+      middle: tile_middle_nw_view-KKDL.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 671.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-vEQ3.png
+        '1':
+          crop:
+            height: 65
+            left: 650.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-aSKO.png
+        '2':
+          crop:
+            height: 65
+            left: 650.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-eDxu.png
+        '3':
+          crop:
+            height: 65
+            left: 671.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-BKLp.png
+  '14':
+    '0':
+      facename: 17:Dots 7
+      middle: tile_middle_nw_view-fFFU.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 671.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-ON5w.png
+        '1':
+          crop:
+            height: 65
+            left: 650.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-Dw9b.png
+        '2':
+          crop:
+            height: 65
+            left: 650.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-LuFE.png
+        '3':
+          crop:
+            height: 65
+            left: 671.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-gPaO.png
+  '4':
+    '0':
+      facename: 32:West Wind
+      middle: tile_middle_nw_view-wzA1.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 671.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-2FBH.png
+        '1':
+          crop:
+            height: 65
+            left: 650.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-8q4W.png
+        '2':
+          crop:
+            height: 65
+            left: 650.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-cw14.png
+        '3':
+          crop:
+            height: 65
+            left: 671.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-mNdm.png
+  '6':
+    '0':
+      facename: 21:10000
+      middle: tile_middle_nw_view-FMW9.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 671.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-0ffa.png
+        '1':
+          crop:
+            height: 65
+            left: 650.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-NQFi.png
+        '2':
+          crop:
+            height: 65
+            left: 650.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-a7jp.png
+        '3':
+          crop:
+            height: 65
+            left: 671.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-Ocun.png
+  '8':
+    '0':
+      facename: 16:Dots 6
+      middle: tile_middle_nw_view-igvx.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 671.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-Ko36.png
+        '1':
+          crop:
+            height: 65
+            left: 650.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-zkJd.png
+        '2':
+          crop:
+            height: 65
+            left: 650.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-PTeK.png
+        '3':
+          crop:
+            height: 65
+            left: 671.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-KnXF.png
+'24':
+  '0':
+    '0':
+      facename: 19:Dots 9
+      middle: tile_middle_nw_view-bTKS.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 722.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-h21A.png
+        '1':
+          crop:
+            height: 65
+            left: 701.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-nLWg.png
+        '2':
+          crop:
+            height: 65
+            left: 701.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-FcHl.png
+        '3':
+          crop:
+            height: 65
+            left: 722.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-g05o.png
+  '14':
+    '0':
+      facename: 06:Bamboo 6
+      middle: tile_middle_nw_view-YxG0.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 722.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-47W0.png
+        '1':
+          crop:
+            height: 65
+            left: 701.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-HJYs.png
+        '2':
+          crop:
+            height: 65
+            left: 701.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-PTpJ.png
+        '3':
+          crop:
+            height: 65
+            left: 722.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-9_Ko.png
+  '6':
+    '0':
+      facename: 14:Dots 4
+      middle: tile_middle_nw_view-RuHt.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 722.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-Wc4N.png
+        '1':
+          crop:
+            height: 65
+            left: 701.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-bNOB.png
+        '2':
+          crop:
+            height: 65
+            left: 701.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-_4Ab.png
+        '3':
+          crop:
+            height: 65
+            left: 722.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-uu8I.png
+  '8':
+    '0':
+      facename: 18:Dots 8
+      middle: tile_middle_nw_view-qZV9.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 722.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-kRwx.png
+        '1':
+          crop:
+            height: 65
+            left: 701.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-_aDx.png
+        '2':
+          crop:
+            height: 65
+            left: 701.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-bVoz.png
+        '3':
+          crop:
+            height: 65
+            left: 722.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-z0mv.png
+'26':
+  '7':
+    '0':
+      facename: 07:Bamboo 7
+      middle: tile_middle_nw_view-jgwb.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 773.5
+            top: 355
+            width: 51
+          img: tile_full_0_view-Hoy5.png
+        '1':
+          crop:
+            height: 65
+            left: 752.5
+            top: 355
+            width: 51
+          img: tile_full_1_view-ccpW.png
+        '2':
+          crop:
+            height: 65
+            left: 752.5
+            top: 334
+            width: 51
+          img: tile_full_2_view-Eicv.png
+        '3':
+          crop:
+            height: 65
+            left: 773.5
+            top: 334
+            width: 51
+          img: tile_full_3_view-CmFS.png
+'28':
+  '7':
+    '0':
+      facename: 18:Dots 8
+      middle: tile_middle_nw_view-llMw.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 824.5
+            top: 355
+            width: 51
+          img: tile_full_0_view-bDy9.png
+        '1':
+          crop:
+            height: 65
+            left: 803.5
+            top: 355
+            width: 51
+          img: tile_full_1_view-KHOv.png
+        '2':
+          crop:
+            height: 65
+            left: 803.5
+            top: 334
+            width: 51
+          img: tile_full_2_view-8PhC.png
+        '3':
+          crop:
+            height: 65
+            left: 824.5
+            top: 334
+            width: 51
+          img: tile_full_3_view-cpYU.png
+'4':
+  '0':
+    '0':
+      facename: 35:3:Bamboo
+      middle: tile_middle_nw_view-LcYu.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 212.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-EWZI.png
+        '1':
+          crop:
+            height: 65
+            left: 191.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-Hxgn.png
+        '2':
+          crop:
+            height: 65
+            left: 191.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-ocHC.png
+        '3':
+          crop:
+            height: 65
+            left: 212.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-KxLJ.png
+  '10':
+    '0':
+      facename: 31:South Wind
+      middle: tile_middle_nw_view-1hrD.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 212.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-h6wk.png
+        '1':
+          crop:
+            height: 65
+            left: 191.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-UaaB.png
+        '2':
+          crop:
+            height: 65
+            left: 191.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-nOFY.png
+        '3':
+          crop:
+            height: 65
+            left: 212.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-0I3n.png
+  '14':
+    '0':
+      facename: 00:Red Dragon
+      middle: tile_middle_nw_view-c0kj.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 212.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-2AWz.png
+        '1':
+          crop:
+            height: 65
+            left: 191.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-tqRG.png
+        '2':
+          crop:
+            height: 65
+            left: 191.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-uc6v.png
+        '3':
+          crop:
+            height: 65
+            left: 212.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-SkPU.png
+  '4':
+    '0':
+      facename: 01:Bamboo 1 Peacock
+      middle: tile_middle_nw_view-zuZV.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 212.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-qcJV.png
+        '1':
+          crop:
+            height: 65
+            left: 191.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-F02v.png
+        '2':
+          crop:
+            height: 65
+            left: 191.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-PIch.png
+        '3':
+          crop:
+            height: 65
+            left: 212.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-Mu8H.png
+  '6':
+    '0':
+      facename: 09:Bamboo 9
+      middle: tile_middle_nw_view-cjXs.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 212.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-lLIV.png
+        '1':
+          crop:
+            height: 65
+            left: 191.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-sgjI.png
+        '2':
+          crop:
+            height: 65
+            left: 191.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-mjw9.png
+        '3':
+          crop:
+            height: 65
+            left: 212.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-faaC.png
+  '8':
+    '0':
+      facename: 20:White Dragon
+      middle: tile_middle_nw_view-ykrJ.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 212.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-3pFu.png
+        '1':
+          crop:
+            height: 65
+            left: 191.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-8Dql.png
+        '2':
+          crop:
+            height: 65
+            left: 191.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-2HJI.png
+        '3':
+          crop:
+            height: 65
+            left: 212.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-EUPH.png
+'6':
+  '0':
+    '0':
+      facename: 16:Dots 6
+      middle: tile_middle_nw_view-zheC.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-H9uM.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-7nKk.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-s7SL.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-Z5i6.png
+  '10':
+    '0':
+      facename: 18:Dots 8
+      middle: tile_middle_nw_view-2YwZ.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-4gCp.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-kwg5.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-KWTO.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-ZBJf.png
+  '12':
+    '0':
+      facename: 31:South Wind
+      middle: tile_middle_nw_view-5oDf.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-UkjH.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-sJnD.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-orGW.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-PvJN.png
+  '14':
+    '0':
+      facename: 21:10000
+      middle: tile_middle_nw_view-CXR6.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-WL0y.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-Ugep.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-t0Da.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-zDCf.png
+  '2':
+    '0':
+      facename: 03:Bamboo 3
+      middle: tile_middle_nw_view-jicI.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-xgR2.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-__3E.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-yW35.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-tUWY.png
+  '4':
+    '0':
+      facename: 31:South Wind
+      middle: tile_middle_nw_view-7ON5.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-kZOR.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-3MjU.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-92yg.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-RC4G.png
+  '6':
+    '0':
+      facename: 27:70000
+      middle: tile_middle_nw_view-UWNt.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-YnbG.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-datP.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-2CQZ.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-NN0Z.png
+  '8':
+    '0':
+      facename: 26:60000
+      middle: tile_middle_nw_view-jGHC.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 263.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-olpt.png
+        '1':
+          crop:
+            height: 65
+            left: 242.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-T5ax.png
+        '2':
+          crop:
+            height: 65
+            left: 242.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-1xjT.png
+        '3':
+          crop:
+            height: 65
+            left: 263.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-9eu3.png
+'8':
+  '0':
+    '0':
+      facename: 25:50000
+      middle: tile_middle_nw_view-xTWc.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 127
+            width: 51
+          img: tile_full_0_view-4PfA.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 127
+            width: 51
+          img: tile_full_1_view-uvZl.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 106
+            width: 51
+          img: tile_full_2_view-Pzru.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 106
+            width: 51
+          img: tile_full_3_view-EPF9.png
+  '10':
+    '0':
+      facename: 04:Bamboo 4
+      middle: tile_middle_nw_view-K9sH.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 452
+            width: 51
+          img: tile_full_0_view-Qaqh.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 452
+            width: 51
+          img: tile_full_1_view-LjOg.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 431
+            width: 51
+          img: tile_full_2_view-Iwfq.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 431
+            width: 51
+          img: tile_full_3_view-qgds.png
+    '1':
+      facename: 08:Bamboo 8
+      middle: tile_middle_nw_view-7f2b.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 322.5
+            top: 460
+            width: 51
+          img: tile_full_0_view-iLou.png
+        '1':
+          crop:
+            height: 65
+            left: 285.5
+            top: 460
+            width: 51
+          img: tile_full_1_view-ucff.png
+        '2':
+          crop:
+            height: 65
+            left: 285.5
+            top: 423
+            width: 51
+          img: tile_full_2_view-y3wZ.png
+        '3':
+          crop:
+            height: 65
+            left: 322.5
+            top: 423
+            width: 51
+          img: tile_full_3_view-k0kt.png
+  '12':
+    '0':
+      facename: 14:Dots 4
+      middle: tile_middle_nw_view-6Wu_.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 517
+            width: 51
+          img: tile_full_0_view-VRXs.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 517
+            width: 51
+          img: tile_full_1_view-8U1o.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 496
+            width: 51
+          img: tile_full_2_view-7KHv.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 496
+            width: 51
+          img: tile_full_3_view-JUJC.png
+    '1':
+      facename: 22:20000
+      middle: tile_middle_nw_view-682v.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 322.5
+            top: 525
+            width: 51
+          img: tile_full_0_view-44eO.png
+        '1':
+          crop:
+            height: 65
+            left: 285.5
+            top: 525
+            width: 51
+          img: tile_full_1_view-xH04.png
+        '2':
+          crop:
+            height: 65
+            left: 285.5
+            top: 488
+            width: 51
+          img: tile_full_2_view-spOB.png
+        '3':
+          crop:
+            height: 65
+            left: 322.5
+            top: 488
+            width: 51
+          img: tile_full_3_view-Js70.png
+  '14':
+    '0':
+      facename: 25:50000
+      middle: tile_middle_nw_view-Hfoz.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 582
+            width: 51
+          img: tile_full_0_view-7Daq.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 582
+            width: 51
+          img: tile_full_1_view-VK7J.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 561
+            width: 51
+          img: tile_full_2_view-lauh.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 561
+            width: 51
+          img: tile_full_3_view-AQrS.png
+  '2':
+    '0':
+      facename: 00:Red Dragon
+      middle: tile_middle_nw_view-GWed.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 192
+            width: 51
+          img: tile_full_0_view-7Urp.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 192
+            width: 51
+          img: tile_full_1_view-a2H4.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 171
+            width: 51
+          img: tile_full_2_view-DDJE.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 171
+            width: 51
+          img: tile_full_3_view-onPU.png
+    '1':
+      facename: 02:Bamboo 2
+      middle: tile_middle_nw_view-ENBk.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 322.5
+            top: 200
+            width: 51
+          img: tile_full_0_view-XtFA.png
+        '1':
+          crop:
+            height: 65
+            left: 285.5
+            top: 200
+            width: 51
+          img: tile_full_1_view-oNUE.png
+        '2':
+          crop:
+            height: 65
+            left: 285.5
+            top: 163
+            width: 51
+          img: tile_full_2_view-VRRB.png
+        '3':
+          crop:
+            height: 65
+            left: 322.5
+            top: 163
+            width: 51
+          img: tile_full_3_view-2b6i.png
+  '4':
+    '0':
+      facename: 13:Dots 3
+      middle: tile_middle_nw_view-BjW7.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 257
+            width: 51
+          img: tile_full_0_view-DcCY.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 257
+            width: 51
+          img: tile_full_1_view-VPiW.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 236
+            width: 51
+          img: tile_full_2_view-DIG3.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 236
+            width: 51
+          img: tile_full_3_view-798Y.png
+    '1':
+      facename: 23:30000
+      middle: tile_middle_nw_view-PzUX.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 322.5
+            top: 265
+            width: 51
+          img: tile_full_0_view-RT9v.png
+        '1':
+          crop:
+            height: 65
+            left: 285.5
+            top: 265
+            width: 51
+          img: tile_full_1_view-qfXm.png
+        '2':
+          crop:
+            height: 65
+            left: 285.5
+            top: 228
+            width: 51
+          img: tile_full_2_view-nHB5.png
+        '3':
+          crop:
+            height: 65
+            left: 322.5
+            top: 228
+            width: 51
+          img: tile_full_3_view-SIfE.png
+  '6':
+    '0':
+      facename: 07:Bamboo 7
+      middle: tile_middle_nw_view-2juz.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 322
+            width: 51
+          img: tile_full_0_view-4ZDz.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 322
+            width: 51
+          img: tile_full_1_view-1nKf.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 301
+            width: 51
+          img: tile_full_2_view-BDSN.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 301
+            width: 51
+          img: tile_full_3_view-tQF8.png
+    '1':
+      facename: 32:West Wind
+      middle: tile_middle_nw_view-5_ql.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 322.5
+            top: 330
+            width: 51
+          img: tile_full_0_view-F0Mu.png
+        '1':
+          crop:
+            height: 65
+            left: 285.5
+            top: 330
+            width: 51
+          img: tile_full_1_view-jNxl.png
+        '2':
+          crop:
+            height: 65
+            left: 285.5
+            top: 293
+            width: 51
+          img: tile_full_2_view-H9B7.png
+        '3':
+          crop:
+            height: 65
+            left: 322.5
+            top: 293
+            width: 51
+          img: tile_full_3_view-wPVq.png
+  '8':
+    '0':
+      facename: 03:Bamboo 3
+      middle: tile_middle_nw_view-S3OO.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 314.5
+            top: 387
+            width: 51
+          img: tile_full_0_view-Vw3w.png
+        '1':
+          crop:
+            height: 65
+            left: 293.5
+            top: 387
+            width: 51
+          img: tile_full_1_view-wrXm.png
+        '2':
+          crop:
+            height: 65
+            left: 293.5
+            top: 366
+            width: 51
+          img: tile_full_2_view-PKwM.png
+        '3':
+          crop:
+            height: 65
+            left: 314.5
+            top: 366
+            width: 51
+          img: tile_full_3_view-frq6.png
+    '1':
+      facename: 33:North Wind
+      middle: tile_middle_nw_view-Dh5b.png
+      psp:
+        '0':
+          crop:
+            height: 65
+            left: 322.5
+            top: 395
+            width: 51
+          img: tile_full_0_view-yg1A.png
+        '1':
+          crop:
+            height: 65
+            left: 285.5
+            top: 395
+            width: 51
+          img: tile_full_1_view-HOfs.png
+        '2':
+          crop:
+            height: 65
+            left: 285.5
+            top: 358
+            width: 51
+          img: tile_full_2_view-r0eZ.png
+        '3':
+          crop:
+            height: 65
+            left: 322.5
+            top: 358
+            width: 51
+          img: tile_full_3_view-YrGA.png

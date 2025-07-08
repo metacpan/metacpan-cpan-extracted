@@ -2,10 +2,12 @@ package Plack::Session::State;
 use strict;
 use warnings;
 
-our $VERSION   = '0.34';
+our $VERSION   = '0.35';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Digest::SHA ();
+use Crypt::SysRandom ();
+
+# RECOMMEND PREREQ: Crypt::SysRandom::XS
 
 use Plack::Request;
 use Plack::Util::Accessor qw[
@@ -19,7 +21,7 @@ sub new {
 
     $params{'session_key'}   ||= 'plack_session';
     $params{'sid_generator'} ||= sub {
-        Digest::SHA::sha1_hex(rand() . $$ . {} . time)
+        unpack('H*', Crypt::SysRandom::random_bytes(20))
     };
     $params{'sid_validator'} ||= qr/\A[0-9a-f]{40}\Z/;
 

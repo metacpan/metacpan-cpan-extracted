@@ -114,8 +114,8 @@ SV * box_beforenm(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   if (pk_len != pk_req_len)
     croak("box_before_nm: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -237,8 +237,8 @@ SV * box_decrypt( \
   if (pk_len != pk_req_len)
     croak("box_decrypt: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -269,7 +269,7 @@ SV * box_decrypt( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("box_decrypt: Message forged");
@@ -357,8 +357,8 @@ SV * box_decrypt_detached( \
   if (pk_len != pk_req_len)
     croak("box_decrypt_detached: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -389,7 +389,7 @@ SV * box_decrypt_detached( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("box_decrypt_detached: Message forged");
@@ -465,8 +465,8 @@ void box_encrypt(SV * msg, SV * nonce, SV * pk, SV * sk)
       easy_func = crypto_box_easy;
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -477,8 +477,8 @@ void box_encrypt(SV * msg, SV * nonce, SV * pk, SV * sk)
   if (nonce_len != nonce_req_len)
     croak("box_encrypt: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -628,8 +628,8 @@ void box_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     unsigned char *seed_buf;
     STRLEN seed_len;
 
-    if (sv_derived_from(ST(0), "Crypt::Sodium::XS::MemVault")) {
-      seed_pm = protmem_get(aTHX_ ST(0), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(0), MEMVAULT_CLASS)) {
+      seed_pm = protmem_get(aTHX_ ST(0), MEMVAULT_CLASS);
       seed_buf = seed_pm->pm_ptr;
       seed_len = seed_pm->size;
     }
@@ -679,7 +679,7 @@ void box_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   pk_sv = newSV(0);
   sv_usepvn_flags(pk_sv, (char *)pk_buf, pk_len, SV_HAS_TRAILING_NUL);
   mXPUSHs(pk_sv);
-  mXPUSHs(protmem_to_sv(aTHX_ sk_pm, "Crypt::Sodium::XS::MemVault"));
+  mXPUSHs(protmem_to_sv(aTHX_ sk_pm, MEMVAULT_CLASS));
   XSRETURN(2);
 
 SV * box_nonce(SV * base = &PL_sv_undef)
@@ -740,8 +740,8 @@ SV * box_seal_encrypt(SV * msg, SV * pk)
   if (pk_len != pk_req_len)
     croak("box_seal_encrypt: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -823,8 +823,8 @@ SV * box_seal_decrypt(SV * ciphertext, SV * pk, SV * sk, SV * flags = &PL_sv_und
   if (pk_len != pk_req_len)
     croak("box_seal_decrypt: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -850,7 +850,7 @@ SV * box_seal_decrypt(SV * ciphertext, SV * pk, SV * sk, SV * flags = &PL_sv_und
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("box_seal_decrypt: Message forged");
@@ -959,7 +959,7 @@ SV * decrypt(SV * self, SV * ciphertext, SV * nonce, SV * flags = &PL_sv_undef)
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("decrypt: Message forged");
@@ -1048,7 +1048,7 @@ SV * decrypt_detached(SV * self, SV * ciphertext, SV * mac, SV * nonce, SV * fla
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("decrypt_detached: Message forged");
@@ -1118,8 +1118,8 @@ void encrypt(SV * self, SV * msg, SV * nonce)
   if (nonce_len != nonce_req_len)
     croak("encrypt: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_mv = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_mv = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_mv->pm_ptr;
     msg_len = msg_mv->size;
   }

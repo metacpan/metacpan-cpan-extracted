@@ -1,4 +1,7 @@
-package App::sshca v0.0.1;
+package App::sshca v0.0.3;
+
+use strict;
+use warnings;
 
 1;
 
@@ -10,7 +13,7 @@ sshca - A minimal SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -105,7 +108,7 @@ Used to change the interpretation of the C<identifier> argument.
 
 =over 8
 
-=item * C<--seria> indicates the identifier argument is to be interpreted as a
+=item * C<--serial> indicates the identifier argument is to be interpreted as a
 certificate serial number.
 
 =item * (planned) C<--fingerprint> indicates the identifier argument is to be

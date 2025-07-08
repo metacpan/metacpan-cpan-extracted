@@ -98,7 +98,8 @@ else {
 !!! if this is not what you want, please set environment variables SODIUM_INC
 !!! and/or SODIUM_LIBS as needed
 EOWARN
-
+    $ENV{SODIUM_BUNDLED} = 1;
+    $eumm_args{depend} = { '$(OBJECT)' => '$(MYEXTLIB)' };
     $eumm_args{INC} .= " -Isrc/libsodium-$libsodium_version/src/libsodium/include ";
     $eumm_args{MYEXTLIB} = "src/lib/libsodium$Config{lib_ext}";
     $eumm_args{clean} = { FILES => "src/libsodium-$libsodium_version src/libsodium-stable src/include src/lib" };
@@ -119,6 +120,7 @@ my %WriteMakefileArgs = (
   },
   VERSION_FROM => "lib/Crypt/Sodium/XS.pm",
   EXE_FILES => [
+    "bin/csxs-ppcrypt",
     "bin/pminisign",
   ],
   "test" => {
@@ -150,7 +152,7 @@ delete $WriteMakefileArgs{LICENSE} if $eumm_version < 6.31;
 WriteMakefile(%WriteMakefileArgs);
 
 sub MY::postamble {
-  return '' if $ENV{SODIUM_INC} || $ENV{SODIUM_LIBS}; # env vars mean not using bundled lib
+  return '' unless $ENV{SODIUM_BUNDLED};
   my $src_dir = File::Spec->catdir(getcwd(), "src");
   # handle the upstream insanity. now release tarballs do not have a
   # libsodium-$version subdir, it's always libsodium-stable. just move it into

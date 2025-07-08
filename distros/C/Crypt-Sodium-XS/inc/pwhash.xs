@@ -246,8 +246,8 @@ SV * pwhash( \
   if (salt_len != salt_req_len)
     croak("pwhash: Invalid salt length %lu", salt_len);
 
-  if (sv_derived_from(passphrase, "Crypt::Sodium::XS::MemVault")) {
-    pw_pm = protmem_get(aTHX_ passphrase, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(passphrase, MEMVAULT_CLASS)) {
+    pw_pm = protmem_get(aTHX_ passphrase, MEMVAULT_CLASS);
     pw_buf = pw_pm->pm_ptr;
     pw_len = pw_pm->size;
   }
@@ -403,8 +403,8 @@ SV * pwhash_str(SV * passphrase, STRLEN opslimit = 0, STRLEN memlimit = 0)
       croak("pwhash_str: Invalid memlimit %lu", memlimit);
   }
 
-  if (sv_derived_from(passphrase, "Crypt::Sodium::XS::MemVault")) {
-    pw_pm = protmem_get(aTHX_ passphrase, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(passphrase, MEMVAULT_CLASS)) {
+    pw_pm = protmem_get(aTHX_ passphrase, MEMVAULT_CLASS);
     pw_buf = pw_pm->pm_ptr;
     pw_len = pw_pm->size;
   }
@@ -519,8 +519,8 @@ void pwhash_str_needs_rehash(SV * str, STRLEN opslimit = 0, STRLEN memlimit = 0)
       croak("pwhash_str_needs_rehash: Invalid memlimit %lu", memlimit);
   }
 
-  if (sv_derived_from(str, "Crypt::Sodium::XS::MemVault")) {
-    str_pm = protmem_get(aTHX_ str, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(str, MEMVAULT_CLASS)) {
+    str_pm = protmem_get(aTHX_ str, MEMVAULT_CLASS);
     str_buf = str_pm->pm_ptr;
     str_len = str_pm->size;
   }
@@ -575,8 +575,8 @@ void pwhash_verify(SV * str, SV * passphrase)
       func = crypto_pwhash_str_verify;
   }
 
-  if (sv_derived_from(passphrase, "Crypt::Sodium::XS::MemVault")) {
-    pw_pm = protmem_get(aTHX_ passphrase, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(passphrase, MEMVAULT_CLASS)) {
+    pw_pm = protmem_get(aTHX_ passphrase, MEMVAULT_CLASS);
     pw_buf = pw_pm->pm_ptr;
     pw_len = pw_pm->size;
   }

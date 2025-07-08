@@ -1,7 +1,7 @@
 package Crypt::Sodium::XS;
 BEGIN {
   # BEGIN block and use line for MemVault are for its overloads to work
-  our $VERSION = '0.000018';
+  our $VERSION = '0.000022';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -147,9 +147,10 @@ encryption, decryption, signatures, password hashing and more. Its goal is to
 provide all of the core operations needed to build higher-level cryptographic
 tools.
 
-L<Crypt::Sodium::XS> provides an interface to the libsodium API. It uses
-safer-by-default memory handling and intends to provide a complete interface to
-the libsodium API, including algorithm-specific functions.
+L<Crypt::Sodium::XS> provides an interface to the libsodium API. By default, it
+uses hardened memory handling provided by libsodium for sensitive data. It is a
+complete interface to the libsodium API, including algorithm-specific
+functions.
 
 =head1 FUNCTIONS
 
@@ -191,13 +192,12 @@ L<Crypt::Sodium::XS::MemVault> objects; the documentation will say so.
 
 The default method of installation will attempt to detect a recent enough
 version of libsodium headers on your system or fall back to a bundled version
-of libsodium (note that the bundled version depends on autotools). You should
-prefer to install libsodium via your operating system's package manager (be
-sure to install the "development" package) before building this dist. If you
-instead fall back to the bundled libsodium, keep in mind that it cannot be kept
-up to date without updating this perl package. The bundled libsodium is
-distributed in its original form along with its OpenPGP signature file. You are
-encouraged to manually check its signature.
+of libsodium. You should prefer to install libsodium via your operating
+system's package manager (be sure to install the "development" package) before
+building this dist. If you instead fall back to the bundled libsodium, keep in
+mind that it cannot be kept up to date without updating this perl package. The
+bundled libsodium is distributed in its original form along with its OpenPGP
+signature file. You are encouraged to manually check its signature.
 
 You may prevent the automatic libsodium detection (forcing the use of the
 bundled version) by setting the environment variable SODIUM_BUNDLED to any

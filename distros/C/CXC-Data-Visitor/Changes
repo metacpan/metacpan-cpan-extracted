@@ -1,5 +1,11 @@
 Revision history for CXC-Data-Visitor
 
+0.08      2025-07-07 13:46:35-04:00 America/New_York
+
+  [BUILD]
+
+    * add missing test dependency on Data::Dump
+
 0.07      2025-07-03 11:30:56-04:00 America/New_York
 
   [ENHANCEMENT]

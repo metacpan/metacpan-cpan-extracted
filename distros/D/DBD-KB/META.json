@@ -1,0 +1,62 @@
+{
+   "generated_by" : "emacs",
+   "dynamic_config" : "1",
+   "recommends" : {
+      "Encode" : "0",
+      "Module::Signature" : "0.50",
+      "Cwd" : "0"
+   },
+   "name" : "DBD-KB",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/DBD-KB/",
+      "MailingList" : "http://www.nntp.perl.org/group/perl.dbd.kb/",
+      "repository" : "https://github.com/bucardo/dbdkb",
+      "bugtracker" : "https://github.com/bucardo/dbdkb/issues",
+      "license" : "http://dev.perl.org/licenses/",
+      "IRC" : "irc://irc.libera.chat/#postgresql"
+   },
+   "provides" : {
+      "DBD::KB" : {
+         "file" : "KB.pm",
+         "version" : "3.18.5"
+      },
+      "Bundle::DBD::KB" : {
+         "version" : "3.18.5",
+         "file" : "lib/Bundle/DBD/KB.pm"
+      }
+   },
+   "version" : "3.18.5",
+   "requires" : {
+      "perl" : "5.018000",
+      "DBI" : "1.614",
+      "version" : "0"
+   },
+   "keywords" : [
+      "Postgres",
+      "KingBase",
+      "DBI",
+      "libpq",
+      "dbdkb"
+   ],
+   "meta-spec" : {
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html",
+      "version" : "1.4"
+   },
+   "author" : [
+      "H.Q.Wang <hqwang@qq.com>"
+   ],
+   "configure_requires" : {
+      "DBI" : "1.614",
+      "version" : "0"
+   },
+   "license" : "perl",
+   "distribution_type" : "module",
+   "build_requires" : {
+      "File::Temp" : "0",
+      "version" : "0",
+      "Time::HiRes" : "0",
+      "DBI" : "1.614",
+      "Test::More" : "0.88"
+   },
+   "abstract" : "DBI KingBase interface"
+}

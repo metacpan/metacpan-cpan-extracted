@@ -379,6 +379,7 @@ void do(dbh, statement_sv, attr=Nullsv, ...)
             return;
         }
 
+        asyncflag = imp_dbh->use_async;
         if (attr && SvROK(attr) && SvTYPE(SvRV(attr)) == SVt_PVHV) {
             SV **svp;
             if ((svp = hv_fetchs((HV*)SvRV(attr),"pg_async", 0)) != NULL) {

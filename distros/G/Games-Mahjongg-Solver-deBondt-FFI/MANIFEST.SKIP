@@ -1,0 +1,11 @@
+fbx.json
+~$
+\.git/
+blib/
+\.o$
+\.bak$
+\.exists$
+^Makefile$
+^pm_to_blib$
+\.tar\.gz$
+^MYMETA\.

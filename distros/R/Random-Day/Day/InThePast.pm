@@ -6,7 +6,7 @@ use warnings;
 
 use DateTime;
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 sub new {
 	my ($class, @params) = @_;
@@ -270,12 +270,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2013-2024 Michal Josef Špaček
+© 2013-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

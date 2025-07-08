@@ -5,7 +5,7 @@
       "Cucumber Ltd"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -38,239 +38,239 @@
    "provides" : {
       "Cucumber::Messages" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Attachment" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Background" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Ci" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Comment" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::DataTable" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::DocString" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Duration" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Envelope" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Examples" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Exception" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Feature" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::FeatureChild" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::GherkinDocument" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Git" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Group" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Hook" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::JavaMethod" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::JavaStackTraceElement" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Location" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Message" : {
          "file" : "lib/Cucumber/Messages/Message.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Meta" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::ParameterType" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::ParseError" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Pickle" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::PickleDocString" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::PickleStep" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::PickleStepArgument" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::PickleTable" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::PickleTableCell" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::PickleTableRow" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::PickleTag" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Product" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Rule" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::RuleChild" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Scenario" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Source" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::SourceReference" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Step" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::StepDefinition" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::StepDefinitionPattern" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::StepMatchArgument" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::StepMatchArgumentsList" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TableCell" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TableRow" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Tag" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestCase" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestCaseFinished" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestCaseStarted" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestRunFinished" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestRunHookFinished" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestRunHookStarted" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestRunStarted" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestStep" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestStepFinished" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestStepResult" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::TestStepStarted" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::Timestamp" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       },
       "Cucumber::Messages::UndefinedParameterType" : {
          "file" : "lib/Cucumber/Messages.pm",
-         "version" : "v27.2.0"
+         "version" : "v28.0.0"
       }
    },
    "release_status" : "stable",
@@ -284,7 +284,7 @@
          "web" : "https://github.com/cucumber/messages"
       }
    },
-   "version" : "27.2.0",
+   "version" : "28.0.0",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "MIT"

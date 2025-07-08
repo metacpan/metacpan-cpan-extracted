@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [28.0.0] - 2025-07-07
+### Changed
+- Add `Attachment.testRunHookStartedId` for traceability of attachments to test run hooks ([#301](https://github.com/cucumber/messages/pull/301))
+- Add `Attachment.timestamp` ([#305](https://github.com/cucumber/messages/pull/305))
+
+### Fixed
+- [python] Add a LICENSE file for Python ([#278](https://github.com/cucumber/messages/pull/278))
+- [.NET] Fix NuGet package generation
+
 ## [27.2.0] - 2025-01-31
 ### Added
 - [python] Added Python implementation ([#165](https://github.com/cucumber/messages/pull/165))
@@ -573,7 +582,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v27.2.0...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v28.0.0...HEAD
+[28.0.0]: https://github.com/cucumber/messages/compare/v27.2.0...v28.0.0
 [27.2.0]: https://github.com/cucumber/messages/compare/v27.1.0...v27.2.0
 [27.1.0]: https://github.com/cucumber/messages/compare/v27.0.2...v27.1.0
 [27.0.2]: https://github.com/cucumber/messages/compare/v27.0.1...v27.0.2

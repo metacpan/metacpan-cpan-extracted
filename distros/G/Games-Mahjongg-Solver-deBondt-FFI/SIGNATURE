@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 fbd3a227f66f8ceca541ae09c5e312c54d23e7b7e61eba8a121d564e62712eae .gitignore
+SHA256 f300678fc3880697eee80c2b323fc6c46a9b96335d30eb073c81644fc80a5d80 COPYRIGHT
+SHA256 ed91f2afdc834f8e2b925f2496727b6f2b1ec0be3729b833f0dc0fe13d370bf7 Changes
+SHA256 2c98188ae0ddfb0dd0a9c8ac96f57ef9a9a984beb2eb3cd8ff53a5baab2ebf98 MANIFEST
+SHA256 94b9ef173d75defa293aa0dfe23e092de44878b59780f1e2256b3f46aa6b1a5b MANIFEST.SKIP
+SHA256 6ede3830568dca2108b93a8b2ee626a9f1969a028baa14f9c6f068dda66826dc META.json
+SHA256 dc3363e88c6827eb1ef7cd5ec84687d5f266e78906e7f5c18a66665d62bfc451 META.yml
+SHA256 646b752cfe5be82a54703cdc42cc6cc0b31339bf6f110c47abba064149f62452 Makefile.PL
+SHA256 1db13ae59e5f7d3542e5d0b765c61fca2c4903079657994d27b9066fc26e72a4 README.md
+SHA256 f0f589a31be237e3793517a9220d035a58d7b58d461e1ea70d446dc72c4eef83 ffi.cpp.in
+SHA256 db7afaa4c4eb0c259df8556161259277659b50ec6e68b49fa8230a65c535c2aa lib/Games/Mahjongg/Solver/deBondt/FFI.pm
+SHA256 5e8c583b214f26273ce742b68febbf63854ea077fbf9fc4938461e1f412a4738 mjsolver.cpp.in
+SHA256 8cb277e88391d59250bb852bc990b703ca1d5df22b86668c9f19512d38b721f8 t/memo_geom.yaml
+SHA256 7cad97dc121c6f9340fa61e5512ac25a240d4f28dbb60a8bb91c5fdd82753888 t/mjsolve.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEExAulU/cwFz2mOqIPfvzorEIe4goFAmhsMC8ACgkQfvzorEIe
+4gpWFQv/Y09qO3wDDlT9wD+eC0WjYmEmaz1PnnAM9pdRw9cbgj16+paLWIcT8Ixm
+0Z8zjfyv8YkfqW8H4Vrs4Y9BKf5NPCxzfHXBtI9dXSKaL9ygh9GOy37TkciYaBg5
+1AxoJIjCvMMlVZ5AYcVbF3YhHq7hinVWELjbbx+LXaBG8HNntiGnD6/C71HRFoTI
+iKb3wXNnMdgBokiE6HTW57zHpBKG1ljbotqONW3Rn7OUKO3Z9d322awelyDAfFvx
+CqShwXHhWSnIRW6mdoDLqdfhVEc5pJDC3CGUCzuQsbOL+sXaLkVQNyylCW9C3Q9q
+EKpt50T4if0aHEeOMoNeXCSPg7kQW5OicZ3/yOAA0ffvJFoL1KRNnP2m+sB4aqPS
+PtxObDI3t7Mt+9aaDwS2WvSWB0gDrVNHulD8k96qK+RfAu7Q6fMtjFnJznuEzTIA
+u5XFHGOmSrG235L72QS+WYzMayP6SxKF6cJOdavG/rNLGEJQ+vEvPCBMQ4kkWzrR
+oy3+oR/3
+=2dQu
+-----END PGP SIGNATURE-----

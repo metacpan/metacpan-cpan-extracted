@@ -55,8 +55,8 @@ SV * secretstream_xchacha20poly1305_init_decrypt( \
   if (header_len != crypto_secretstream_xchacha20poly1305_HEADERBYTES)
     croak("secretstream_init_decrypt: Invalid header length %lu", header_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -111,8 +111,8 @@ void secretstream_xchacha20poly1305_init_encrypt(SV * key, SV * flags = &PL_sv_u
   if (SvOK(flags))
     state_flags = SvUV(flags);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -217,8 +217,8 @@ void decrypt( \
   if (SvOK(flags))
     msg_flags = SvUV(flags);
 
-  if (sv_derived_from(ciphertext, "Crypt::Sodium::XS::MemVault")) {
-    ct_pm = protmem_get(aTHX_ ciphertext, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(ciphertext, MEMVAULT_CLASS)) {
+    ct_pm = protmem_get(aTHX_ ciphertext, MEMVAULT_CLASS);
     ct_buf = ct_pm->pm_ptr;
     ct_len = ct_pm->size;
   }
@@ -273,7 +273,7 @@ void decrypt( \
     croak("decrypt: Message forged");
   }
 
-  mXPUSHs(protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault"));
+  mXPUSHs(protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS));
   if (GIMME_V == G_ARRAY) {
     mXPUSHs(newSViv(tag));
     XSRETURN(2);
@@ -304,8 +304,8 @@ SV * encrypt( \
   STRLEN adata_len = 0;
 
   CODE:
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }

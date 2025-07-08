@@ -1,4 +1,14 @@
 
-0.01   2025-06-28
+0.0.3   2025-07-07
+   [Fixed]
+     - Fixed exit codes (zero on success)
+
+0.0.2   2025-07-07
+   [Fixed]
+     - CHANGES first release version number
+     - Typos in documentation
+     - Certificate storage directory name
+
+0.0.1   2025-06-28
    [Added]
      - Initial release

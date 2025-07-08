@@ -1,6 +1,10 @@
 
 Revision history for Test-MixedScripts:
 
+v0.6.1    2025-07-07 20:52:38+01:00 Europe/London
+  [Enhancements]
+  - Use Test2::Util::DistFiles to gather files for testing.
+
 v0.6.0    2025-07-05 12:50:00+01:00 Europe/London
   [Enhancements]
   - Allow testing for ASCII characters.

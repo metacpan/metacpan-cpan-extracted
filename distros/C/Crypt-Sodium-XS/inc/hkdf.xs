@@ -88,8 +88,8 @@ SV * hkdf_sha256_extract( \
   if (SvOK(salt))
     salt_buf = (unsigned char *)SvPVbyte(salt, salt_len);
 
-  if (sv_derived_from(ikm, "Crypt::Sodium::XS::MemVault")) {
-    ikm_pm = protmem_get(aTHX_ ikm, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(ikm, MEMVAULT_CLASS)) {
+    ikm_pm = protmem_get(aTHX_ ikm, MEMVAULT_CLASS);
     ikm_buf = ikm_pm->pm_ptr;
     ikm_len = ikm_pm->size;
   }
@@ -117,7 +117,7 @@ SV * hkdf_sha256_extract( \
     croak("hkdf_extract: Failed to release prk protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ prk_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ prk_pm, MEMVAULT_CLASS);
 #else
   croak("hkdf_extract: HKDF not supported by this version of libsodium");
 #endif
@@ -167,8 +167,8 @@ SV * hkdf_sha256_expand( \
   if (SvOK(ctx))
     ctx_buf = (unsigned char *)SvPVbyte(ctx, ctx_len);
 
-  if (sv_derived_from(prk, "Crypt::Sodium::XS::MemVault")) {
-    prk_pm = protmem_get(aTHX_ prk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(prk, MEMVAULT_CLASS)) {
+    prk_pm = protmem_get(aTHX_ prk, MEMVAULT_CLASS);
     prk_buf = prk_pm->pm_ptr;
     prk_len = prk_pm->size;
   }
@@ -206,7 +206,7 @@ SV * hkdf_sha256_expand( \
     croak("hkdf_expand: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ out_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ out_pm, MEMVAULT_CLASS);
 #else
   croak("hkdf_expand: HKDF not supported by this version of libsodium");
 #endif
@@ -357,7 +357,7 @@ SV * final(SV * self, SV * flags = &PL_sv_undef)
     croak("final: Failed to release prk protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ prk_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ prk_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -387,8 +387,8 @@ SV * update(SV * self, ...)
     croak("update: Failed to grant state protmem RW");
 
   for (i = 1; i < items; i++) {
-    if (sv_derived_from(ST(i), "Crypt::Sodium::XS::MemVault")) {
-      msg_pm = protmem_get(aTHX_ ST(i), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(i), MEMVAULT_CLASS)) {
+      msg_pm = protmem_get(aTHX_ ST(i), MEMVAULT_CLASS);
       msg_buf = msg_pm->pm_ptr;
       msg_len = msg_pm->size;
     }

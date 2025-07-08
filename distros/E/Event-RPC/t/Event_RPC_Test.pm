@@ -115,7 +115,7 @@ sub new_object2 {
 sub get_big_data_struct {
     my @records;
 
-    for (0..100) {
+    for (0..10000) {
         push @records, {
             a   => 123,
             b   => 456789,

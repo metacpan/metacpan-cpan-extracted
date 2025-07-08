@@ -251,7 +251,7 @@ when it sees them instead of telling you that the comparison failed.
 
 =cut
 
-our $VERSION = "0.71"; # or "0.001_001" for a dev release
+our $VERSION = "0.72"; # or "0.001_001" for a dev release
 $VERSION = eval $VERSION;
 
 use Exporter;

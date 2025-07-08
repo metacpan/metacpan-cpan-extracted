@@ -88,8 +88,8 @@ SV * secretbox_decrypt( \
   if (nonce_len != nonce_req_len)
     croak("secretbox_decrypt: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -120,7 +120,7 @@ SV * secretbox_decrypt( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("secretbox_decrypt: Message forged");
@@ -190,8 +190,8 @@ SV * secretbox_decrypt_detached( \
   if (nonce_len != nonce_req_len)
     croak("secretbox_decrypt_detached: Invalid nonce length: %lu", nonce_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -222,7 +222,7 @@ SV * secretbox_decrypt_detached( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("secretbox_decrypt_detached: Message forged");
@@ -288,8 +288,8 @@ void secretbox_encrypt(SV * msg, SV * nonce, SV * key)
   if (nonce_len != nonce_req_len)
     croak("secretbox_encrypt: Invalid nonce length %lu", nonce_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -298,8 +298,8 @@ void secretbox_encrypt(SV * msg, SV * nonce, SV * key)
   if (key_len != key_req_len)
     croak("secretbox_encrypt: Invalid key length %lu", key_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_mv = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_mv = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_mv->pm_ptr;
     msg_len = msg_mv->size;
   }

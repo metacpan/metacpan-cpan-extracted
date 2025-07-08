@@ -1,5 +1,5 @@
 package Gherkin::TokenMatcher;
-$Gherkin::TokenMatcher::VERSION = '32.1.2';
+$Gherkin::TokenMatcher::VERSION = '33.0.0';
 use strict;
 use warnings;
 
@@ -350,6 +350,8 @@ scanner with a C<reset> call in-between.
 =item * L<Gherkin>
 
 =item * L<Gherkin::Dialect>
+
+=item * L<Gherkin::MarkdownTokenMatcher>
 
 =item * L<Gherkin::Parser>
 

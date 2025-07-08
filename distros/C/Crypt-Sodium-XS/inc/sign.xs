@@ -62,16 +62,16 @@ SV * sign(SV * msg, SV * sk)
       func = crypto_sign;
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -122,7 +122,7 @@ SV * sign(SV * msg, SV * sk)
     }
 
     if (ret == 0)
-      RETVAL = protmem_to_sv(aTHX_ smsg_pm, "Crypt::Sodium::XS::MemVault");
+      RETVAL = protmem_to_sv(aTHX_ smsg_pm, MEMVAULT_CLASS);
   }
   else {
     STRLEN smsg_len = sig_len + msg_len;
@@ -178,16 +178,16 @@ SV * sign_detached(SV * msg, SV * sk)
       func = crypto_sign_detached;
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -286,8 +286,8 @@ SV * sign_sk_to_curve25519(SV * sk, SV * flags = &PL_sv_undef)
   if (SvOK(flags))
     ed_flags = SvUV(flags);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -322,7 +322,7 @@ SV * sign_sk_to_curve25519(SV * sk, SV * flags = &PL_sv_undef)
     croak("sign_sk_to_curve25519: Failed to release ed protmem RO");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ ed_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ ed_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -341,8 +341,8 @@ SV * sign_sk_to_pk(SV * sk)
   CODE:
   PERL_UNUSED_VAR(ix);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -398,8 +398,8 @@ SV * sign_sk_to_seed(SV * sk, SV * flags = &PL_sv_undef)
   if (SvOK(flags))
     seed_flags = SvUV(flags);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -434,7 +434,7 @@ SV * sign_sk_to_seed(SV * sk, SV * flags = &PL_sv_undef)
     croak("sign_sk_to_seed: Failed to release seed protmem RO");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ seed_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ seed_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -536,8 +536,8 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     unsigned char *seed_buf;
     STRLEN seed_len;
 
-    if (sv_derived_from(ST(0), "Crypt::Sodium::XS::MemVault")) {
-      seed_pm = protmem_get(aTHX_ ST(0), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(0), MEMVAULT_CLASS)) {
+      seed_pm = protmem_get(aTHX_ ST(0), MEMVAULT_CLASS);
       seed_buf = seed_pm->pm_ptr;
       seed_len = seed_pm->size;
     }
@@ -585,7 +585,7 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   pk_sv = newSV(0);
   sv_usepvn_flags(pk_sv, (char *)pk_buf, pk_len, SV_HAS_TRAILING_NUL);
   mXPUSHs(pk_sv);
-  mXPUSHs(protmem_to_sv(aTHX_ sk_pm, "Crypt::Sodium::XS::MemVault"));
+  mXPUSHs(protmem_to_sv(aTHX_ sk_pm, MEMVAULT_CLASS));
   XSRETURN(2);
 
 SV * sign_open(SV * smsg, SV * pk)
@@ -622,8 +622,8 @@ SV * sign_open(SV * smsg, SV * pk)
   if (pk_len != pk_req_len)
     croak("sign_open: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(smsg, "Crypt::Sodium::XS::MemVault")) {
-    smsg_pm = protmem_get(aTHX_ smsg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(smsg, MEMVAULT_CLASS)) {
+    smsg_pm = protmem_get(aTHX_ smsg, MEMVAULT_CLASS);
     smsg_buf = smsg_pm->pm_ptr;
     smsg_len = smsg_pm->size;
   }
@@ -660,7 +660,7 @@ SV * sign_open(SV * smsg, SV * pk)
       croak("sign_open: Failed to release msg protmem RO");
     }
 
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   }
   else {
     STRLEN msg_len = smsg_len - sig_len;
@@ -708,8 +708,8 @@ void sign_to_curve25519(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   if (pk_len != crypto_sign_ed25519_PUBLICKEYBYTES)
     croak("sign_to_curve25519: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -764,7 +764,7 @@ void sign_to_curve25519(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   sv_usepvn_flags(pk_ed_sv, (char *)pk_ed_buf, crypto_scalarmult_curve25519_BYTES,
                   SV_HAS_TRAILING_NUL);
   mXPUSHs(pk_ed_sv);
-  mXPUSHs(protmem_to_sv(aTHX_ sk_ed_pm, "Crypt::Sodium::XS::MemVault"));
+  mXPUSHs(protmem_to_sv(aTHX_ sk_ed_pm, MEMVAULT_CLASS));
   XSRETURN(2);
 
 void sign_verify(SV * msg, SV * sig, SV * pk)
@@ -807,8 +807,8 @@ void sign_verify(SV * msg, SV * sig, SV * pk)
   if (pk_len != pk_req_len)
     croak("sign_verify: Invalid public key length %lu", pk_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -878,8 +878,8 @@ SV * final_sign(SV * self, SV * sk)
   STRLEN sk_len;
 
   CODE:
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -1032,8 +1032,8 @@ void update(SV * self, ...)
     croak("update: Failed to grant state protmem RW");
 
   for (i = 1; i < items; i++) {
-    if (sv_derived_from(ST(i), "Crypt::Sodium::XS::MemVault")) {
-      msg_pm = protmem_get(aTHX_ ST(i), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(i), MEMVAULT_CLASS)) {
+      msg_pm = protmem_get(aTHX_ ST(i), MEMVAULT_CLASS);
       msg_buf = msg_pm->pm_ptr;
       msg_len = msg_pm->size;
     }

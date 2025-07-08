@@ -84,6 +84,7 @@ use Geo::StreetAddress::US;
 use CHI;
 use CHI::Driver::RawMemory;
 use File::Basename;
+use File::Find;
 use File::Spec;
 use Lingua::EN::AddressParse;
 use Locale::SubCountry;
@@ -3797,10 +3798,22 @@ sub get_wof {
 	if($repo eq '*') {
 		# Do a glob expansion on the string, useful if it's something like
 		#	$ENV{'WHOSONFIRST_HOME'} . "/*/data/286/455/973/286455973.geojson"
-		# Because of the layout of WOF (lots of small directories), this can be slow on EXT4, would be nice to find a better way
 		print "Glob expand $filename\n" if(DEBUG&DEBUG_GET_WOF);
-		my @filelist = <"$filename">;
-		$filename = $filelist[0];
+
+		# Because of the layout of WOF (lots of small directories), this can be slow on EXT4, it would be nice to find a better way
+		# my @filelist = <"$filename">;
+		# $filename = $filelist[0];
+
+		# File::Find
+		find({	
+			wanted => sub {
+				return unless $_ =~ qr/$id.geojson$/;
+				$filename = $File::Find::name;
+				$File::Find::prune = 1;	# stop descending further
+			},
+			no_chdir => 1,
+		}, $ENV{'WHOSONFIRST_HOME'});
+		print "Found: $filename\n" if(DEBUG & DEBUG_GET_WOF);
 	}
 	if((!$filename) || (! -r $filename)) {
 		# Probably shouldn't die here
@@ -3812,7 +3825,7 @@ sub get_wof {
 			my @call_details = caller(0);
 			print STDERR "\tcalled from line ",
 				$call_details[2], "\n\t";
-			die "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, "\n"
+			die "$geojson_file: can't find $id file for ", $properties->{'wof:name'};
 		}
 		if($filename) {
 			print STDERR "$geojson_file: can't find $id file for ", $properties->{'wof:name'}, ": $filename: $!\n";

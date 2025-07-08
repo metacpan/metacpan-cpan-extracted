@@ -1,0 +1,64 @@
+{
+   "abstract" : "Perl/FFI bindings to Mahjongg Solitaire Solver (after peeking) by Michiel de Bondt",
+   "author" : [
+      "Andreas Koenig <andk@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Games-Mahjongg-Solver-deBondt-FFI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "FFI::Build::MM" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "1",
+            "FFI::Platypus::Lang::CPP" : "1",
+            "FFI::Platypus::Memory" : "0",
+            "File::Path" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/andk/Games-Mahjongg-Solver-deBondt-FFI/issues",
+         "x_url" : "https://github.com/andk/Games-Mahjongg-Solver-deBondt-FFI/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/andk/Games-Mahjongg-Solver-deBondt-FFI.git",
+         "web" : "https://github.com/andk/Games-Mahjongg-Solver-deBondt-FFI",
+         "x_repository" : "https://github.com/andk/Games-Mahjongg-Solver-deBondt-FFI"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

@@ -26,8 +26,8 @@ SV * scalarmult_base(SV * sk)
   STRLEN sk_len;
 
   CODE:
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -77,8 +77,8 @@ SV * scalarmult(SV * sk, SV * pk, SV * flags = &PL_sv_undef)
   if (SvOK(flags))
     sk_flags = SvUV(flags);
 
-  if (sv_derived_from(sk, "Crypt::Sodium::XS::MemVault")) {
-    sk_pm = protmem_get(aTHX_ sk, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(sk, MEMVAULT_CLASS)) {
+    sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
     sk_len = sk_pm->size;
   }
@@ -117,7 +117,7 @@ SV * scalarmult(SV * sk, SV * pk, SV * flags = &PL_sv_undef)
     croak("scalarmult: Failed to calculate shared secret");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ ss_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ ss_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL

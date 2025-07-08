@@ -77,8 +77,8 @@ SV * generichash(SV * msg, STRLEN out_len = 0, SV * key = &PL_sv_undef)
       func = crypto_generichash;
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -86,8 +86,8 @@ SV * generichash(SV * msg, STRLEN out_len = 0, SV * key = &PL_sv_undef)
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
   if (SvOK(key)) {
-    if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-      key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(key, MEMVAULT_CLASS)) {
+      key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
       key_buf = key_pm->pm_ptr;
       key_len = key_pm->size;
     }
@@ -168,8 +168,8 @@ SV * generichash_blake2b_init_salt_personal( \
     croak("generichash_init_salt_personal: Invalid personalization length (too short) %lu", personal_len);
 
   if (SvOK(key)) {
-    if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-      key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(key, MEMVAULT_CLASS)) {
+      key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
       key_buf = key_pm->pm_ptr;
       key_len = key_pm->size;
     }
@@ -252,8 +252,8 @@ SV * generichash_blake2b_salt_personal( \
   if (personal_len < crypto_generichash_blake2b_PERSONALBYTES)
     croak("generichash_salt_personal: Invalid personalization length (too short) %lu", personal_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -261,8 +261,8 @@ SV * generichash_blake2b_salt_personal( \
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
   if (SvOK(key)) {
-    if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-      key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(key, MEMVAULT_CLASS)) {
+      key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
       key_buf = key_pm->pm_ptr;
       key_len = key_pm->size;
     }
@@ -344,8 +344,8 @@ SV * generichash_init( \
   }
 
   if (SvOK(key)) {
-    if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-      key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(key, MEMVAULT_CLASS)) {
+      key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
       key_buf = key_pm->pm_ptr;
       key_len = key_pm->size;
     }
@@ -452,10 +452,14 @@ void DESTROY(SV * self)
 
   PREINIT:
   protmem *state_pm;
+  SV *obj;
   SV **state;
 
   PPCODE:
-  state = hv_fetchs(HV_FROM_REF(self), "state", 0);
+  obj = SvRV(self);
+  if (SvTYPE(obj) != SVt_PVHV)
+    croak("BUG: DESTROY: not a hash ref");
+  state = hv_fetchs((HV *)obj, "state", 0);
   if (state == NULL)
     croak("BUG: DESTROY: missing state");
 
@@ -475,15 +479,19 @@ SV * clone(SV * self)
 
   PREINIT:
   HV *newobj;
+  SV *obj;
   SV **state;
   SV **newstate;
 
   CODE:
-  state = hv_fetchs(HV_FROM_REF(self), "state", 0);
+  obj = SvRV(self);
+  if (SvTYPE(obj) != SVt_PVHV)
+    croak("BUG: clone: not a hash ref");
+  state = hv_fetchs((HV *)obj, "state", 0);
   if (state == NULL)
     croak("BUG: clone: missing state");
 
-  newobj = newHVhv(HV_FROM_REF(self));
+  newobj = newHVhv((HV *)obj);
 
   switch(ix) {
     case 1:
@@ -517,16 +525,18 @@ SV * final(SV * self)
   protmem *state_pm;
   unsigned char *out_buf;
   STRLEN out_len;
-  HV *obj;
+  SV *obj;
   SV **state;
   SV **fetch;
 
   CODE:
-  obj = HV_FROM_REF(self);
-  state = hv_fetchs(obj, "state", 0);
+  obj = SvRV(self);
+  if (SvTYPE(obj) != SVt_PVHV)
+    croak("BUG: final: not a hash ref");
+  state = hv_fetchs((HV *)obj, "state", 0);
   if (state == NULL)
     croak("BUG: final: missing state");
-  fetch = hv_fetchs(obj, "out_len", 0);
+  fetch = hv_fetchs((HV *)obj, "out_len", 0);
   if (fetch == NULL)
     croak("BUG: final: missing out_len");
   out_len = SvUV(*fetch);
@@ -578,11 +588,15 @@ void update(SV * self, ...)
   protmem *msg_pm = NULL;
   unsigned char *msg_buf;
   STRLEN msg_len;
+  SV *obj;
   SV **state;
   I32 i;
 
   PPCODE:
-  state = hv_fetchs(HV_FROM_REF(self), "state", 0);
+  obj = SvRV(self);
+  if (SvTYPE(obj) != SVt_PVHV)
+    croak("BUG: final: not a hash ref");
+  state = hv_fetchs((HV *)obj, "state", 0);
   if (state == NULL)
     croak("BUG: update: missing state");
 
@@ -597,8 +611,8 @@ void update(SV * self, ...)
     croak("update: Failed to grant protmem RW");
 
   for (i = 1; i < items; i++) {
-    if (sv_derived_from(ST(i), "Crypt::Sodium::XS::MemVault")) {
-      msg_pm = protmem_get(aTHX_ ST(i), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(i), MEMVAULT_CLASS)) {
+      msg_pm = protmem_get(aTHX_ ST(i), MEMVAULT_CLASS);
       msg_buf = msg_pm->pm_ptr;
       msg_len = msg_pm->size;
     }

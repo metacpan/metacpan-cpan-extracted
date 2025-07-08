@@ -26,7 +26,11 @@ my $stderr = capture_error { system (
         eq_or_diff(1, !!1);
     '
 ) };
-if($] >= 5.038000) {
+
+# check both perl version and D::D version - while 5.38 comes with a compatible
+# Data::Dumper, the user might have an older version installed if their app's
+# deps pin to an older version
+if($] >= 5.038000 && $Data::Dumper::VERSION >= 2.188) {
     ok(1 == !!1, "sanity check: 1 and !!1 are numerically the same on this perl");
     ok(''.1 == ''.(!!1), "sanity check: 1 and !!1 stringify the same on this perl");
     isnt(Dumper(1), Dumper(!!1), "sanity check: 1 and !!1 are Data::Dumper-ly different on this perl");

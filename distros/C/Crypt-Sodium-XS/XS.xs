@@ -50,37 +50,44 @@
 #define SODIUM_HAS_HKDF 1U
 #endif
 
-#define PROTMEM_FLAG_MPROTECT_MASK 0b00000011U
+/* 00000011 */
+#define PROTMEM_FLAG_MPROTECT_MASK 0x3U
 #define PROTMEM_FLAG_MPROTECT_NOACCESS 0U
-#define PROTMEM_FLAG_MPROTECT_RO 0b00000001U
+#define PROTMEM_FLAG_MPROTECT_RO 0x1U
 /* WR unused (no sodium_mprotect_writeonly), just for completeness */
-#define PROTMEM_FLAG_MPROTECT_WR 0b00000010U
-#define PROTMEM_FLAG_MPROTECT_RW 0b00000011U
+#define PROTMEM_FLAG_MPROTECT_WR 0x2U
+#define PROTMEM_FLAG_MPROTECT_RW 0x3U
 
-/* 000001xx reserved */
+/* 00000100 reserved */
 
-#define PROTMEM_FLAG_MLOCK_MASK 0b00011000U
+/* 00011000 */
+#define PROTMEM_FLAG_MLOCK_MASK 0x18U
 #define PROTMEM_FLAG_MLOCK_STRICT 0U
-#define PROTMEM_FLAG_MLOCK_PERMISSIVE 0b00001000U
-#define PROTMEM_FLAG_MLOCK_NONE 0b00011000U
+#define PROTMEM_FLAG_MLOCK_PERMISSIVE 0x8U
+#define PROTMEM_FLAG_MLOCK_NONE 0x18U
 
-#define PROTMEM_FLAG_LOCK_MASK 0b00100000U
+/* 00100000 */
+#define PROTMEM_FLAG_LOCK_MASK 0x20U
 #define PROTMEM_FLAG_LOCK_LOCKED 0U
-#define PROTMEM_FLAG_LOCK_UNLOCKED 0b00100000U
+#define PROTMEM_FLAG_LOCK_UNLOCKED 0x20U
 
-#define PROTMEM_FLAG_MEMZERO_MASK 0b01000000U
+/* 01000000 */
+#define PROTMEM_FLAG_MEMZERO_MASK 0x40U
 #define PROTMEM_FLAG_MEMZERO_ENABLED 0U
-#define PROTMEM_FLAG_MEMZERO_DISABLED 0b01000000U
+#define PROTMEM_FLAG_MEMZERO_DISABLED 0x40U
 
-#define PROTMEM_FLAG_MALLOC_MASK 0b10000000U
+/* 10000000 */
+#define PROTMEM_FLAG_MALLOC_MASK 0x80U
 #define PROTMEM_FLAG_MALLOC_SODIUM 0U
-#define PROTMEM_FLAG_MALLOC_PLAIN 0b10000000U
+#define PROTMEM_FLAG_MALLOC_PLAIN 0x80U
 
 #define PROTMEM_FLAG_ALL_DISABLED 0xffffffffU
 #define PROTMEM_FLAG_ALL_ENABLED 0x0U
 
 #define MEMVAULT_READ_BUFSIZE 4096U
 #define MEMVAULT_WRITE_BUFSIZE 4096U
+
+#define MEMVAULT_CLASS ("Crypt::Sodium::XS::MemVault")
 
 #define SODIUM_MALLOC(size) (sodium_malloc(((size) + (size_t)63U) & ~(size_t)63U))
 
@@ -159,12 +166,6 @@ static protmem * protmem_clone(pTHX_ protmem *cur_pm, size_t new_size) {
   return new_pm;
 }
 
-/*
-static inline protmem * protmem_clone(pTHX_ protmem *cur_pm) {
-  return protmem_clone(aTHX_ cur_pm, cur_pm->size);
-}
-*/
-
 static int protmem_grant(pTHX_ protmem *pm, int flags) {
   int pm_flags;
   if (pm == NULL)
@@ -215,7 +216,7 @@ STATIC int dup_protmem(pTHX_ MAGIC *mg, CLONE_PARAMS *params) {
   if (protmem_grant(aTHX_ cur_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("Failed to grant protmem RO");
 
-  new_pm = protmem_clone(aTHX_ cur_pm);
+  new_pm = protmem_clone(aTHX_ cur_pm, cur_pm->size);
   if (new_pm == NULL)
     croak("Failed to clone protmem");
 
@@ -294,8 +295,9 @@ static protmem * protmem_get(pTHX_ SV *sv, const char *sv_pkg) {
   if (!sv_derived_from(sv, sv_pkg))
     croak("Not a reference to a %s object", sv_pkg);
 
-  if ((mg = mg_findext(SvRV(sv), PERL_MAGIC_ext, &vtbl_protmem)))
-    return (protmem *)mg->mg_ptr;
+  for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic)
+    if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &vtbl_protmem)
+      return (protmem *)mg->mg_ptr;
 
   croak("Failed to get %s pointer", sv_pkg);
   return NULL;
@@ -396,7 +398,7 @@ static SV * sv_keygen(pTHX_ STRLEN size, SV * flags) {
     croak("sv_keygen: Failed to release key protmem RW");
   }
 
-  return protmem_to_sv(aTHX_ key_pm, "Crypt::Sodium::XS::MemVault");
+  return protmem_to_sv(aTHX_ key_pm, MEMVAULT_CLASS);
 }
 
 =for TODO

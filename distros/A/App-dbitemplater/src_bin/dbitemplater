@@ -1,0 +1,229 @@
+#!perl
+
+=head1 NAME
+
+dbitemplater -  Utility for running a SQL query via DBI and using the output in a template.
+
+=head1 SYNOPSIS
+
+dbitemplater [B<-c> <config>|B<-f> <config file>] [B<-o>]
+
+dbitemplater -h/--help
+
+dbitemplater -v/--version
+
+=head1 FLAGS
+
+=head2 -c $config
+
+A short config file to use.
+
+This will convert it to `/usr/local/etc/dbitemplater/$config.yaml`.
+
+=head2 -f $config_file
+
+The full path to the config file to use.
+
+Default: `/usr/local/etc/dbitemplater.yaml`
+
+=head2 -o
+
+Print to STDOUT even if a file is specified in the config.
+
+=head2 -h / --help
+
+Print the help info.
+
+=head2 -v / --version
+
+Print the version info.
+
+=head1 CONFIG
+
+Thw following variables are accepted.
+
+    - ds :: The DBI connection string to use.
+
+    - user :: The user to use for the connection.
+
+    - pass :: The pass to use for the connection.
+
+    - output :: The file to use to the results to.
+        If undef it is printed to STDOUT.
+
+    - query :: The SQL query to run.
+
+    - header :: The header template to use.
+
+    - row :: The template to use for each returned row.
+
+    - footer :: The footer template.
+
+The required ones are below.
+
+    ds
+    header
+    row
+    footer
+
+The following will be passed to L<Template>->new.
+
+    POST_CHOMP
+    PRE_CHOMP
+    TRIM
+    START_TAG
+    END_TAG
+
+Other variables may be specified, which can be used in the templats
+as the entire config is passed to the templates under the name config.
+
+For the template variable, header/row/footer, those are assumpted to be a under
+"/usr/local/etc/dbitemplater/$type/$name". So if the value of "header" is "foo" then the
+path for that template will be "/usr/local/etc/dbitemplater/header/foo". Although if it
+contains a slash character, it is assumed to be a full path.
+
+=head1 EXAMPLE
+
+Lets say you want to set create a HTML display of LibreNMS alerts you could do like
+below...
+
+For `/usr/local/etc/dbitemplater.yaml` ...
+
+
+    ds: DBI:mysql:database=librenms;hostname=127.0.0.1
+    user: librenms
+    pass: somePassword
+    query: 'select *,alerts.timestamp AS alert_timestamp,alert_rules.notes AS alert_notes,devices.notes AS device_notes from alerts inner join alert_rules on alerts.rule_id = alert_rules.id inner join devices on alerts.device_id = devices.device_id where alerts.state != 0 order by alerts.timestamp DESC'
+    header: librenms_alerts
+    row: librenms_alerts
+    footer: librenms_alerts
+    librenms_dev_base: https://librenms.foo.bar/device/
+
+For `/usr/local/etc/dbitemplater/templates/header/librenms_alerts`...
+
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <table>
+        <tr>
+            <th>Alert Name</th>
+            <th>Device Hostname</th>
+            <th>State</th>
+            <th>Status</th>
+            <th>Reason</th>
+            <th>Timestamp</th>
+            <th>Dev Notes</th>
+            <th>Alert Notes</th>
+        </tr>
+
+For `/usr/local/etc/dbitemplater/templates/row/librenms_alerts`...
+
+        <tr>
+            <th>[% row.name %]</th>
+            <th><a href="[% config.librenms_dev_base %][% row.device_id %]">[% row.hostname %]</a></th>
+            <th>[% row.state %]</th>
+            <th>[% row.status %]</th>
+            <th>[% row.status_reason %]</th>
+            <th>[% row.alert_timestamp %]</th>
+            <th>[% row.device_notes %]</th>
+            <th>[% row.alert_notes %]</th>
+        </tr>
+
+For `/usr/local/etc/dbitemplater/templates/footer/librenms_alerts` ...
+
+    </table>
+    </body>
+    </html>
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+use File::Slurp qw(read_file);
+use App::dbitemplater;
+use YAML qw(Load);
+
+sub version {
+	print "dbitemplater v. " . $App::dbitemplater::VERSION . ".\n";
+}
+
+sub help {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
+}
+
+# get the commandline options
+my $help    = 0;
+my $version = 0;
+my $config_file_short;
+my $config_file_long = '/usr/local/etc/dbitemplater.yaml';
+my $print_to_stdout  = 0;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'c=s'     => \$config_file_short,
+	'f=s'     => \$config_file_long,
+	'o'       => \$print_to_stdout,
+);
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($version) {
+	&version;
+	exit 42;
+}
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($version) {
+	&version;
+	exit 42;
+}
+
+# if short config is specified, form the full config path
+if ( defined($config_file_short) ) {
+	$config_file_long = '/usr/local/etc/dbitemplater/' . $config_file_short . '.yaml';
+}
+
+# ensure the config file exists
+if (! -f $config_file_long ) {
+	die( 'Config file, "' . $config_file_long . '", is not a file or does not exist' );
+}
+
+# read in the config
+my $config_raw;
+eval {
+	$config_raw = read_file($config_file_long);
+};
+if ($@) {
+	die('Failed to read the config file, "'.$config_file_long.'"... '.$@);
+}
+
+# parse the config
+my $config;
+eval {
+	$config=Load($config_raw);
+};
+if ($@) {
+	die('Failed to parse the config file, "'.$config_file_long.'"... '.$@);
+}
+
+# ensure the output is undef if -o is specified
+if ($print_to_stdout) {
+	$config->{'output'} = undef;
+}
+
+my $dbitemplater = App::dbitemplater->new($config);
+
+$dbitemplater->process;

@@ -1,5 +1,10 @@
 Revision history for Geo-Coder-Free
 
+0.41	Mon Jul  7 13:45:41 EDT 2025
+	Use Object::Configure
+	Attempt improvement on EXT4
+	No need to clone Geo::Location::Point objects
+
 0.40	Wed Jun 11 07:32:17 EDT 2025
 	Improved the support for Berkeley DB databases
 	Don't use IO::AIO on Windows

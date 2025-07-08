@@ -1,3 +1,11 @@
+libdbd-pg-async-perl (0.6) unstable; urgency=medium
+
+  * pg_use_async dbh attribute to enable async everywhere where it's
+    supported 
+  * support asynchronous commit/ rollback
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Mon, 07 Jul 2025 13:17:46 +0100
+
 libdbd-pg-async-perl (0.5.1) unstable; urgency=medium
 
   * include auto-generated META.json

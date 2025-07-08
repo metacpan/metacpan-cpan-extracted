@@ -97,8 +97,8 @@ SV * aead_aes256gcm_beforenm(SV * key, SV * flags = &PL_sv_undef)
   if (SvOK(flags))
     precalc_pm_flags = SvUV(flags);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -231,8 +231,8 @@ SV * aead_chacha20poly1305_decrypt( \
   if (SvOK(adata))
     adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -264,7 +264,7 @@ SV * aead_chacha20poly1305_decrypt( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("aead_decrypt: Message forged");
@@ -374,8 +374,8 @@ SV * aead_chacha20poly1305_decrypt_detached( \
   if (SvOK(flags))
     msg_flags = SvUV(flags);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -407,7 +407,7 @@ SV * aead_chacha20poly1305_decrypt_detached( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("aead_decrypt_detached: Message forged");
@@ -530,16 +530,16 @@ void aead_chacha20poly1305_encrypt( \
   if (SvOK(adata))
     adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
-  if (sv_derived_from(key, "Crypt::Sodium::XS::MemVault")) {
-    key_pm = protmem_get(aTHX_ key, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(key, MEMVAULT_CLASS)) {
+    key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
     key_buf = key_pm->pm_ptr;
     key_len = key_pm->size;
   }
@@ -786,7 +786,7 @@ SV * decrypt( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("decrypt: Message forged");
@@ -861,7 +861,7 @@ SV * decrypt_detached( \
   }
 
   if (ret == 0)
-    RETVAL = protmem_to_sv(aTHX_ msg_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ msg_pm, MEMVAULT_CLASS);
   else {
     protmem_free(aTHX_ msg_pm);
     croak("decrypt_detached: Message forged");
@@ -897,8 +897,8 @@ void encrypt(SV * self, SV * msg, SV * nonce, SV * adata = &PL_sv_undef)
   if (SvOK(adata))
     adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }

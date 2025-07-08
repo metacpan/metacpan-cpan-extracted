@@ -3,7 +3,7 @@ package Perl::Critic::Grape;
 use strict;
 use warnings;
 
-our $VERSION='0.0.4';
+our $VERSION='0.0.5';
 
 1;
 
@@ -32,6 +32,10 @@ Do not use inline do blocks.
 =item L<References::ProhibitRefChecks|Perl::Critic::Policy::References::ProhibitRefChecks>
 
 Do not perform manual ref checks.
+
+=item L<Perl::Critic::Policy::Variables::ProhibitTopicIterator>
+
+Always use named loop control variables.
 
 =back
 

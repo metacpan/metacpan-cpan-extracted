@@ -1,0 +1,32 @@
+---
+abstract: 'Perl/FFI bindings to Mahjongg Solitaire Solver (after peeking) by Michiel de Bondt'
+author:
+  - 'Andreas Koenig <andk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  YAML::XS: '0'
+configure_requires:
+  FFI::Build::MM: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Games-Mahjongg-Solver-deBondt-FFI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  FFI::CheckLib: '0'
+  FFI::Platypus: '1'
+  FFI::Platypus::Lang::CPP: '1'
+  FFI::Platypus::Memory: '0'
+  File::Path: '0'
+resources:
+  bugtracker: https://github.com/andk/Games-Mahjongg-Solver-deBondt-FFI/issues
+  repository: git://github.com/andk/Games-Mahjongg-Solver-deBondt-FFI.git
+version: v0.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

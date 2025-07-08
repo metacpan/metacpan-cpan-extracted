@@ -39,8 +39,8 @@ SV * hash(SV * msg)
       func = crypto_hash;
   }
 
-  if (sv_derived_from(msg, "Crypt::Sodium::XS::MemVault")) {
-    msg_pm = protmem_get(aTHX_ msg, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(msg, MEMVAULT_CLASS)) {
+    msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
     msg_buf = msg_pm->pm_ptr;
     msg_len = msg_pm->size;
   }
@@ -237,8 +237,8 @@ void update(SV * self, ...)
     croak("update: Failed to grant state protmem RW");
 
   for (i = 1; i < items; i++) {
-    if (sv_derived_from(ST(i), "Crypt::Sodium::XS::MemVault")) {
-      msg_pm = protmem_get(aTHX_ ST(i), "Crypt::Sodium::XS::MemVault");
+    if (sv_derived_from(ST(i), MEMVAULT_CLASS)) {
+      msg_pm = protmem_get(aTHX_ ST(i), MEMVAULT_CLASS);
       msg_buf = msg_pm->pm_ptr;
       msg_len = msg_pm->size;
     }

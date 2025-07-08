@@ -3,12 +3,14 @@ package Geo::Coder::Free::Local;
 use strict;
 use warnings;
 
-use Geo::Location::Point;
+use Geo::Location::Point 0.14;
 use Geo::Coder::Free;
 use Geo::StreetAddress::US;
 use Lingua::EN::AddressParse;
 use Locale::CA;
 use Locale::US;
+use Object::Configure;
+use Params::Get;
 use Text::xSV::Slurp;
 
 =head1 NAME
@@ -24,11 +26,11 @@ or by using the app GPSCF which are included here.
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
@@ -68,7 +70,7 @@ Initializes a geocoder object, loading the local data.
 sub new
 {
 	my $class = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, \@_) || {};
 
 	if(!defined($class)) {
 		# Geo::Coder::Free::Local->new not Geo::Coder::Free::Local::new
@@ -79,8 +81,10 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(ref($class)) {
 		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
+
+	$params = Object::Configure::configure($class, $params);
 
 	# TODO: since 'hoh' doesn't allow a CODEREF as a key,
 	#	I could build an hoh manually from this aoh,
@@ -96,7 +100,8 @@ sub new
 				escape_char => '\\',
 			},
 			string => \join('', grep(!/^\s*(#|$)/, <DATA>))
-		)
+		),
+		%{$params}
 	}, $class;
 
 	# Build the hash-based index
@@ -112,11 +117,12 @@ sub new
 
 # Helper function to normalize location strings
 sub _normalize_location {
-    my $location = shift;
-    $location = lc($location);                 # Convert to lowercase
-    $location =~ s/^\s+|\s+$//g;               # Trim leading and trailing whitespace
-    $location =~ s/\s+/ /g;                    # Collapse multiple spaces
-    return $location;
+	my $location = shift;
+
+	$location = lc($location);                 # Convert to lowercase
+	$location =~ s/^\s+|\s+$//g;               # Trim leading and trailing whitespace
+	$location =~ s/\s+/ /g;                    # Collapse multiple spaces
+	return $location;
 }
 
 =head2 geocode
@@ -185,12 +191,8 @@ sub geocode {
 
 	# Use the hash-based index for a quick lookup
 	if(exists $self->{index}{$lc}) {
-		my $rc = Geo::Location::Point->new($self->{index}{$lc});
-
 		# Store the result in the cache for future requests
-		$self->{cache}{$lc} = $rc;
-
-		return $rc;
+		return $self->{cache}{$lc} = $self->{index}{$lc};	# Geo::Location::Point object
 	}
 	# ::diag("$location: hash search failed");
 
@@ -768,7 +770,7 @@ sub reverse_geocode {
 			if(_equal($row->{'latitude'}, $latitude, 4) &&
 			   _equal($row->{'longitude'}, $longitude, 4)) {
 				# ::diag('match');
-				my $location = uc(Geo::Location::Point->new($row)->as_string());
+				my $location = uc($row->as_string());	# Geo::Location::Point object
 				if(wantarray) {
 					push @rc, $location;
 					while(my($left, $right) = each %alternatives) {

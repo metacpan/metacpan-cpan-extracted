@@ -8,6 +8,21 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [33.0.0] - 2025-07-07
+### Changed
+- [Elixir, Go, JavaScript, Java, Perl, Php, Ruby] Update dependency messages to v28 ([#420](https://github.com/cucumber/gherkin/pull/420))
+
+## [32.2.0] - 2025-07-07
+### Added
+- [Perl] Support for Gherkin in Markdown format (MDG)
+
+### Fixed
+- [C] Prefer the longest step keyword ([#417](https://github.com/cucumber/gherkin/pull/417))
+- [cpp] Actually allow comment inside descriptions ([#414](https://github.com/cucumber/gherkin/pull/414))
+- [cpp] Add missing translations for Rule ([#415](https://github.com/cucumber/gherkin/pull/415))
+- [cpp] Prefer the longest step keyword ([#416](https://github.com/cucumber/gherkin/pull/416))
+- [Python] Fix acceptance tests ([#64](https://github.com/cucumber/gherkin/pull/64))
+
 ## [32.1.2] - 2025-05-25
 ### Fixed
 - [cpp] Actually use the VERSION file ([#376](https://github.com/cucumber/gherkin/pull/376))
@@ -775,7 +790,9 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v32.1.2...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v33.0.0...HEAD
+[33.0.0]: https://github.com/cucumber/gherkin/compare/v32.2.0...v33.0.0
+[32.2.0]: https://github.com/cucumber/gherkin/compare/v32.1.2...v32.2.0
 [32.1.2]: https://github.com/cucumber/gherkin/compare/v32.1.1...v32.1.2
 [32.1.1]: https://github.com/cucumber/gherkin/compare/v32.1.0...v32.1.1
 [32.1.0]: https://github.com/cucumber/gherkin/compare/v32.0.1...v32.1.0

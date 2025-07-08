@@ -26,7 +26,7 @@ SV * new(SV * class, SV * bytes, SV * flags = &PL_sv_undef)
     croak("new: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -43,8 +43,8 @@ SV * new_from_hex(SV * class, SV * hex, SV * flags = &PL_sv_undef)
   CODE:
   PERL_UNUSED_VAR(class);
 
-  if (sv_derived_from(hex, "Crypt::Sodium::XS::MemVault")) {
-    hex_pm = protmem_get(aTHX_ hex, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(hex, MEMVAULT_CLASS)) {
+    hex_pm = protmem_get(aTHX_ hex, MEMVAULT_CLASS);
     hex_buf = hex_pm->pm_ptr;
     hex_len = hex_pm->size;
   }
@@ -80,7 +80,7 @@ SV * new_from_hex(SV * class, SV * hex, SV * flags = &PL_sv_undef)
     croak("new_from_hex: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -103,8 +103,8 @@ SV * new_from_base64( \
   CODE:
   PERL_UNUSED_VAR(class);
 
-  if (sv_derived_from(b64, "Crypt::Sodium::XS::MemVault")) {
-    b64_pm = protmem_get(aTHX_ b64, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(b64, MEMVAULT_CLASS)) {
+    b64_pm = protmem_get(aTHX_ b64, MEMVAULT_CLASS);
     b64_buf = (char *)b64_pm->pm_ptr;
     b64_len = b64_pm->size;
     new_flags = b64_pm->flags;
@@ -156,7 +156,7 @@ SV * new_from_base64( \
     croak("new_from_base64: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -253,7 +253,7 @@ SV * new_from_fd(SV * class, SV * file, SV * flags = &PL_sv_undef)
     croak("new_from_fd|file: Failed to release protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -339,7 +339,7 @@ SV * new_from_ttyno( \
       fflush(file);
     }
 
-    RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+    RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
   }
 
   setvbuf(file, NULL, _IOLBF, 0);
@@ -365,7 +365,7 @@ void DESTROY(SV * self)
   protmem *self_pm;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   protmem_free(aTHX_ self_pm);
 
 void _overload_bool(SV * self, ...)
@@ -374,7 +374,7 @@ void _overload_bool(SV * self, ...)
   protmem *self_pm;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
 
   if (self_pm->size)
     XSRETURN_YES;
@@ -394,7 +394,7 @@ SV * _overload_mult(SV * self, SV * other, SV * swapped)
 
   count = SvUV(other);
 
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   new_pm = protmem_init(aTHX_ self_pm->size * count, self_pm->flags);
   if (new_pm == NULL)
     croak("_overload_mult: Failed to allocate protmem");
@@ -415,7 +415,7 @@ SV * _overload_mult(SV * self, SV * other, SV * swapped)
     croak("_overload_mult: Failed to release new protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -436,7 +436,7 @@ SV * _overload_str(SV * self, ...)
   protmem *self_pm;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
 
   if (!(self_pm->flags & PROTMEM_FLAG_LOCK_UNLOCKED))
     croak("_overload_str: Unlock MemVault object before stringifying");
@@ -455,7 +455,7 @@ SV * _overload_str(SV * self, ...)
 SV * clone(SV * self)
 
   CODE:
-  RETVAL = protmem_clone_sv(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_clone_sv(aTHX_ self, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -475,15 +475,15 @@ void compare(SV * self, SV * other, STRLEN length = 0)
   int ret = 0;
 
   PPCODE:
-  if (sv_derived_from(other, "Crypt::Sodium::XS::MemVault")) {
-    other_pm = protmem_get(aTHX_ other, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(other, MEMVAULT_CLASS)) {
+    other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
     other_buf = other_pm->pm_ptr;
     other_len = other_pm->size;
   }
   else
     other_buf = (unsigned char *)SvPVbyte(other, other_len);
 
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   if (self_pm->size != other_len) {
     switch(ix) {
       case 1: /* fallthrough */
@@ -562,7 +562,7 @@ void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
   protmem *other_pm = NULL;
   protmem *new_pm;
   unsigned char *buf;
-  MAGIC *mg;
+  MAGIC *mg, *mg_found=NULL;
   STRLEN buf_len;
   unsigned int new_flags;
 
@@ -570,8 +570,8 @@ void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
   if (items > 3)
     croak("Invalid number of arguments");
 
-  if (sv_derived_from(other, "Crypt::Sodium::XS::MemVault")) {
-    other_pm = protmem_get(aTHX_ other, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(other, MEMVAULT_CLASS)) {
+    other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
     buf = other_pm->pm_ptr;
     buf_len = other_pm->size;
   }
@@ -579,7 +579,7 @@ void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
     buf = (unsigned char *)SvPVbyte(other, buf_len);
     /* should probably zero buf afterwards */
 
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   new_flags = self_pm->flags;
   if (other_pm)
     new_flags &= other_pm->flags;
@@ -621,7 +621,7 @@ void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
       croak("concat: Failed to release new protmem RW");
     }
 
-    mXPUSHs(protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault"));
+    mXPUSHs(protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS));
   }
   else {
     if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
@@ -647,9 +647,16 @@ void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
       croak("concat: Failed to release new protmem RW");
     }
 
-    if ((mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &vtbl_protmem))) {
-      protmem_free(aTHX_ (protmem *)mg->mg_ptr);
-      mg->mg_ptr = (char *)new_pm;
+    for (mg = SvMAGIC(SvRV(self)); mg; mg = mg->mg_moremagic)
+      if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &vtbl_protmem) {
+        mg_found = mg;
+        break;
+      }
+
+    if (mg_found != NULL) {
+      protmem_free(aTHX_ (protmem *)mg_found->mg_ptr);
+      mg_found->mg_ptr = (char *)new_pm;
+      new_pm = NULL;
     }
     else {
       if (other_pm)
@@ -687,7 +694,7 @@ SV * extract( \
   long new_len;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   self_len = self_pm->size;
 
   if (offset && (offset > (long)self_len - 1
@@ -732,7 +739,7 @@ SV * extract( \
     croak("extract: Failed to release new protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -743,7 +750,7 @@ unsigned int flags(SV * self, SV * flags = &PL_sv_undef)
   protmem *self_pm;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
 
   if (SvOK(flags)) {
     unsigned int new_flags;
@@ -781,7 +788,7 @@ SV * from_base64( \
   unsigned int new_flags = g_protmem_flags_memvault_default;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   self_buf = (char *)self_pm->pm_ptr;
   self_len = self_pm->size;
   new_flags = self_pm->flags;
@@ -826,7 +833,7 @@ SV * from_base64( \
     croak("from_base64: Failed to release new protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -841,7 +848,7 @@ SV * from_hex(SV * self, SV * flags = &PL_sv_undef)
   unsigned int new_flags = g_protmem_flags_memvault_default;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   self_buf = (char *)self_pm->pm_ptr;
   self_len = self_pm->size;
   new_flags = self_pm->flags;
@@ -871,7 +878,7 @@ SV * from_hex(SV * self, SV * flags = &PL_sv_undef)
     croak("from_hex: Failed to release new protmem RW");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -882,7 +889,7 @@ void increment(SV * self)
   protmem *self_pm;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0)
     croak("increment: Failed to grant self protmem RW");
 
@@ -902,7 +909,10 @@ SV * index(SV * self, SV * str, STRLEN offset = 0)
   STRLEN str_len;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
+
+  if (!(self_pm->flags & PROTMEM_FLAG_LOCK_UNLOCKED))
+    croak("index: Unlock MemVault object before using index");
 
   if (offset > self_pm->size - 1)
     XSRETURN_IV(-1);
@@ -949,7 +959,7 @@ void is_locked(SV * self)
   protmem *self_pm;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
 
   if (self_pm->flags & PROTMEM_FLAG_LOCK_UNLOCKED)
     XSRETURN_NO;
@@ -963,7 +973,7 @@ void is_zero(SV * self)
   int ret;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("is_zero: Failed to grant self protmem RO");
 
@@ -983,7 +993,7 @@ SV * length(SV * self)
   protmem *self_pm;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   RETVAL = newSVuv((UV)self_pm->size);
 
   OUTPUT:
@@ -995,7 +1005,7 @@ void lock(SV * self)
   protmem *self_pm;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   self_pm->flags &= ~PROTMEM_FLAG_LOCK_UNLOCKED;
   XSRETURN(1);
 
@@ -1012,7 +1022,7 @@ SV * to_base64( \
   unsigned int new_flags;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   new_flags = self_pm->flags;
 
   if (SvOK(flags))
@@ -1043,7 +1053,7 @@ SV * to_base64( \
     croak("to_base64: Failed to release self protmem RO");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -1057,7 +1067,7 @@ SV * to_hex(SV * self, SV * flags = &PL_sv_undef)
   unsigned int new_flags;
 
   CODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   new_flags = self_pm->flags;
 
   if (SvOK(flags))
@@ -1087,7 +1097,7 @@ SV * to_hex(SV * self, SV * flags = &PL_sv_undef)
     croak("to_hex: Failed to release self protmem RO");
   }
 
-  RETVAL = protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault");
+  RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL
@@ -1130,7 +1140,7 @@ SV * to_fd(SV * self, SV * file, int mode = 0600)
       fd = SvIV(file);
   }
 
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) < 0) {
     if (ix == 1)
       close(fd);
@@ -1180,7 +1190,7 @@ void unlock(SV * self)
   protmem *self_pm;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   self_pm->flags |= PROTMEM_FLAG_LOCK_UNLOCKED;
   XSRETURN(1);
 
@@ -1190,12 +1200,20 @@ void memzero(SV * self)
   protmem *self_pm;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) < 0)
     croak("memzero: Failed to grant self protmem RW");
   sodium_memzero(self_pm->pm_ptr, self_pm->size);
   if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) < 0)
     croak("memzero: Failed to release self protmem RW");
+
+=for FIXME
+
+  separate methods for xor (modify in place) from the overload (new
+  memvault). currently no explicit method for returning new memvault, only the
+  overload.
+
+=cut
 
 void xor(SV * self, SV * other, ...)
 
@@ -1213,10 +1231,10 @@ void xor(SV * self, SV * other, ...)
   unsigned int new_flags;
 
   PPCODE:
-  self_pm = protmem_get(aTHX_ self, "Crypt::Sodium::XS::MemVault");
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
 
-  if (sv_derived_from(other, "Crypt::Sodium::XS::MemVault")) {
-    other_pm = protmem_get(aTHX_ other, "Crypt::Sodium::XS::MemVault");
+  if (sv_derived_from(other, MEMVAULT_CLASS)) {
+    other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
     other_buf = other_pm->pm_ptr;
     other_len = other_pm->size;
   }
@@ -1262,9 +1280,14 @@ void xor(SV * self, SV * other, ...)
       croak("xor: Failed to release self protmem RW");
     }
 
-    mXPUSHs(protmem_to_sv(aTHX_ new_pm, "Crypt::Sodium::XS::MemVault"));
+    mXPUSHs(protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS));
   }
   else {
+    if (other_pm)
+      if (protmem_grant(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+        protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+        croak("xor: Failed to grant other protmem RO");
+      }
     if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
       if (other_pm)
         protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);

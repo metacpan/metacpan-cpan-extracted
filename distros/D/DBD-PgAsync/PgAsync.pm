@@ -19,7 +19,7 @@ use 5.008001;
 {
     package DBD::PgAsync;
 
-    use version; our $VERSION = qv('0.5.1');
+    use version; our $VERSION = qv('0.6.0');
 
     use DBI 1.614 ();
     use Exporter ();
@@ -3459,6 +3459,12 @@ command. 0 indicates no asynchronous command is in progress, 1 indicates that
 an asynchronous command has started and -1 indicated that an asynchronous command
 has been cancelled.
 
+=head3 B<pg_use_async>
+
+DBD::PgAsync-specific attribute. If set, all operation will be
+performed asynchronusly. See L<Asynchronous Queries> below for
+more details.
+
 =head3 B<pg_standard_conforming_strings> (boolean, read-only)
 
 DBD::PgAsync specific attribute. Returns true if the server is currently using
@@ -4059,15 +4065,15 @@ being treated as a placeholder.
 
 =head3 B<pg_async> (integer)
 
-DBD::PgAsync specific attribute. Indicates the current behavior for asynchronous queries. See the section
-on L</Asynchronous Constants> for more information.
+DBD::PgAsync specific attribute. Can be used to enable asynchronous
+query processing if the database-level C<pg_use_async> attribute is
+disabled or to disable asynchronous query processing when it's enabled.
 
 =head3 B<pg_async_status> (integer, read-only)
 
 DBD::PgAsync specific attribute. Returns the current status of an L<asynchronous|/Asynchronous Queries>
-command. 0 indicates no asynchronous command is in progress, 1 indicates that
-an asynchronous command has started and -1 indicated that an asynchronous command
-has been cancelled.
+command. 0 indicates no asynchronous command is in progress and 1 indicates that
+an asynchronous command has started.
 
 =head3 B<RowsInCache>
 
@@ -4137,6 +4143,17 @@ created after the one being released are also destroyed.
 
 =head2 Asynchronous Queries
 
+B<This documents the legacy DBD::Pg async interface. For versions of
+DBD::PgAsync E<gt>= 0.6, it's recommend to pass the attribute
+C<pg_use_async> to C<DBI-E<gt>connect> instead. This will cause all
+operations where support for this has been implemented to be performed
+asynchronously unless a C<pg_async> attribute with value C<0> is used
+to disable this.
+
+B<Presently, this means connect, prepare, all explicit query executions
+and the operations necessary to start or end a transaction will be
+performed asynchronously.>
+
 It is possible to send a query to the backend and have your script do other work while the query is
 running on the backend. Both queries sent by the L</do> method, and by the L</execute> method can be
 sent asynchronously. The basic usage is as follows:
@@ -4169,17 +4186,6 @@ sent asynchronously. The basic usage is as follows:
 
   ## We wait until it is done, and get the result:
   $res = $dbh->pg_result();
-
-=head3 Asynchronous Constants
-
-There is currently one asynchronou constants automatically exported by DBD::PgAsync.
-
-=over 4
-
-=item PG_ASYNC
-
-This is a constant for the number 1. It is passed to either the L</do> or the L</prepare> method as a value
-to the pg_async key and indicates that the query should be sent asynchronously.
 
 =back
 
@@ -4529,8 +4535,7 @@ L<The B<DBI> module|DBI>
 
 =head1 BUGS
 
-Known deficiency: Presently (0.5), there's no support for asychronous
-commit or rollback.
+Savepoint support is still entirely synchronous.
 
 To report a bug, or view the current list of bugs, please visit
 https://github.com/rweikusat/dbdpg/issues
